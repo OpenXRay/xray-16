@@ -81,43 +81,43 @@ void CUIMessageBox::InitMessageBox(LPCSTR box_template)
     R_ASSERT(_type);
 
     m_eMessageBoxStyle = MESSAGEBOX_OK;
-    if (0 == stricmp(_type, "ok"))
+    if (0 == _stricmp(_type, "ok"))
     {
         m_eMessageBoxStyle = MESSAGEBOX_OK;
     }
-    else if (0 == stricmp(_type, "yes_no"))
+    else if (0 == _stricmp(_type, "yes_no"))
     {
         m_eMessageBoxStyle = MESSAGEBOX_YES_NO;
     }
-    else if (0 == stricmp(_type, "yes_no_cancel"))
+    else if (0 == _stricmp(_type, "yes_no_cancel"))
     {
         m_eMessageBoxStyle = MESSAGEBOX_YES_NO_CANCEL;
     }
-    else if (0 == stricmp(_type, "yes_no_copy"))
+    else if (0 == _stricmp(_type, "yes_no_copy"))
     {
         m_eMessageBoxStyle = MESSAGEBOX_YES_NO_COPY;
     }
-    else if (0 == stricmp(_type, "direct_ip"))
+    else if (0 == _stricmp(_type, "direct_ip"))
     {
         m_eMessageBoxStyle = MESSAGEBOX_DIRECT_IP;
     }
-    else if (0 == stricmp(_type, "ra_login"))
+    else if (0 == _stricmp(_type, "ra_login"))
     {
         m_eMessageBoxStyle = MESSAGEBOX_RA_LOGIN;
     }
-    else if (0 == stricmp(_type, "password"))
+    else if (0 == _stricmp(_type, "password"))
     {
         m_eMessageBoxStyle = MESSAGEBOX_PASSWORD;
     }
-    else if (0 == stricmp(_type, "quit_windows"))
+    else if (0 == _stricmp(_type, "quit_windows"))
     {
         m_eMessageBoxStyle = MESSAGEBOX_QUIT_WINDOWS;
     }
-    else if (0 == stricmp(_type, "quit_game"))
+    else if (0 == _stricmp(_type, "quit_game"))
     {
         m_eMessageBoxStyle = MESSAGEBOX_QUIT_GAME;
     }
-    else if (0 == stricmp(_type, "info"))
+    else if (0 == _stricmp(_type, "info"))
     {
         m_eMessageBoxStyle = MESSAGEBOX_INFO;
     };

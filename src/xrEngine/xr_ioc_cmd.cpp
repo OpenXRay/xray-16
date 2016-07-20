@@ -305,7 +305,7 @@ class CCC_Start : public IConsole_Command
     {
         string4096 out;
         xr_strcpy(out, sizeof(out), str);
-        strlwr(str);
+        _strlwr(str);
 
         LPCSTR name_str = "name=";
         LPCSTR name1 = strstr(str, name_str);
@@ -348,7 +348,7 @@ public:
         parse(op_client, args, "client"); // 2. client
         parse(op_demo, args, "demo"); // 3. demo
 
-        strlwr(op_server);
+        _strlwr(op_server);
         protect_Name_strlwr(op_client);
 
         if (!op_client[0] && strstr(op_server, "single"))

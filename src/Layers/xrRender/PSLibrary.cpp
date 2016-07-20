@@ -155,7 +155,7 @@ bool CPSLibrary::Load2()
 #endif
 
         xr_sprintf(_path, sizeof(_path), "%s%s", p_path, p_name);
-        if (0 == stricmp(p_ext, ".pe"))
+        if (0 == _stricmp(p_ext, ".pe"))
         {
             PS::CPEDef* def = new PS::CPEDef();
             def->m_Name = _path;
@@ -164,7 +164,7 @@ bool CPSLibrary::Load2()
             else
                 xr_delete(def);
         }
-        else if (0 == stricmp(p_ext, ".pg"))
+        else if (0 == _stricmp(p_ext, ".pg"))
         {
             PS::CPGDef* def = new PS::CPGDef();
             def->m_Name = _path;

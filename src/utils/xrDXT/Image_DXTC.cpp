@@ -76,7 +76,7 @@ bool Image_DXTC::LoadFromFile(LPCSTR filename)
     int next = 1;
     char fileupper[256];
     strcpy_s(fileupper, filename);
-    strupr(fileupper);
+    _strupr(fileupper);
     // TRACE( "\n" );
     // TRACE( "\n" );
     bool knownformat = false;

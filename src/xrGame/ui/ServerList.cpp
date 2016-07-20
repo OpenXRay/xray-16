@@ -797,7 +797,7 @@ void CServerList::SrvInfo2LstSrvInfo(const ServerInfo* pServerInfo)
     xr_string address = pServerInfo->m_HostName;
     char port[8];
     address += "/port=";
-    address += itoa(pServerInfo->m_Port, port, 10);
+    address += _itoa(pServerInfo->m_Port, port, 10);
     m_itemInfo.info.address = address.c_str();
     m_itemInfo.info.map = pServerInfo->m_SessionName;
     m_itemInfo.info.game = GameTypeToString((EGameIDs)pServerInfo->m_GameType, true);

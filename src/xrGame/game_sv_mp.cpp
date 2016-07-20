@@ -1033,7 +1033,7 @@ void game_sv_mp::OnVoteStart(LPCSTR VoteCommand, ClientID sender)
     m_bVotingReal = false;
     while (votecommands[i].command)
     {
-        if (!stricmp(votecommands[i].name, CommandName))
+        if (!_stricmp(votecommands[i].name, CommandName))
         {
             m_bVotingReal = true;
             if (!IsVotingEnabled(votecommands[i].flag))
@@ -1054,7 +1054,7 @@ void game_sv_mp::OnVoteStart(LPCSTR VoteCommand, ClientID sender)
     m_uVoteStartTime = CurTime;
     if (m_bVotingReal)
     {
-        if (!stricmp(votecommands[i].name, "changeweather"))
+        if (!_stricmp(votecommands[i].name, "changeweather"))
         {
             string256 WeatherTime = "", WeatherName = "";
             sscanf(CommandParams, "%255s %255s", WeatherName, WeatherTime);
@@ -1062,7 +1062,7 @@ void game_sv_mp::OnVoteStart(LPCSTR VoteCommand, ClientID sender)
             m_pVoteCommand.printf("%s %s", votecommands[i].command, WeatherTime);
             xr_sprintf(resVoteCommand, "%s %s", votecommands[i].name, WeatherName);
         }
-        else if (!stricmp(votecommands[i].name, "changemap"))
+        else if (!_stricmp(votecommands[i].name, "changemap"))
         {
             string256 LevelName;
             string256 LevelVersion;
@@ -1078,7 +1078,7 @@ void game_sv_mp::OnVoteStart(LPCSTR VoteCommand, ClientID sender)
             m_pVoteCommand = sv_vote_command;
             xr_sprintf(resVoteCommand, "%s %s [%s]", votecommands[i].name, LevelName, LevelVersion);
         }
-        else if (!stricmp(votecommands[i].name, "kick"))
+        else if (!_stricmp(votecommands[i].name, "kick"))
         {
             SearcherClientByName tmp_predicate(CommandParams);
             IClient* tmp_client = m_server->FindClient(tmp_predicate);
@@ -1092,7 +1092,7 @@ void game_sv_mp::OnVoteStart(LPCSTR VoteCommand, ClientID sender)
             }
             xr_strcpy(resVoteCommand, VoteCommand);
         }
-        else if (!stricmp(votecommands[i].name, "ban"))
+        else if (!_stricmp(votecommands[i].name, "ban"))
         {
             string256 tmp_victim_name;
             s32 ban_time = ExcludeBanTimeFromVoteStr(CommandParams, tmp_victim_name, sizeof(tmp_victim_name));
@@ -1340,7 +1340,7 @@ void game_sv_mp::SetPlayersDefItems(game_PlayerState* ps)
     char tmp[5];
     for (int i = 1; i <= ps->rank; i++)
     {
-        strconcat(sizeof(RankStr), RankStr, "rank_", itoa(i, tmp, 10));
+        strconcat(sizeof(RankStr), RankStr, "rank_", _itoa(i, tmp, 10));
         if (!pSettings->section_exist(RankStr))
             continue;
         for (u32 it = 0; it < ps->pItemList.size(); it++)

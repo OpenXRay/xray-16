@@ -52,7 +52,7 @@ AnsiString& GetTokenNameFromVal_EQ(u32 val, AnsiString& res, const xr_token* tok
 u32 GetTokenValFromName(const LPCSTR val, const xr_token* token_list)
 {
     for (int i = 0; token_list[i].name; i++)
-        if (!stricmp(val, token_list[i].name))
+        if (!_stricmp(val, token_list[i].name))
             return token_list[i].id;
     return 0;
 }

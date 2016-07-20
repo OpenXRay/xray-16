@@ -25,12 +25,12 @@ void EScene::UndoClear()
 {
     while (!m_RedoStack.empty())
     {
-        unlink(m_RedoStack.back().m_FileName);
+        _unlink(m_RedoStack.back().m_FileName);
         m_RedoStack.pop_back();
     }
     while (!m_UndoStack.empty())
     {
-        unlink(m_UndoStack.back().m_FileName);
+        _unlink(m_UndoStack.back().m_FileName);
         m_UndoStack.pop_back();
     }
 }
@@ -53,13 +53,13 @@ void EScene::UndoSave()
 
     while (!m_RedoStack.empty())
     {
-        unlink(m_RedoStack.back().m_FileName);
+        _unlink(m_RedoStack.back().m_FileName);
         m_RedoStack.pop_back();
     }
 
     if (m_UndoStack.size() > EPrefs->scene_undo_level)
     {
-        unlink(m_UndoStack.front().m_FileName);
+        _unlink(m_UndoStack.front().m_FileName);
         m_UndoStack.pop_front();
     }
 }
@@ -74,7 +74,7 @@ bool EScene::Undo()
 
         if (m_RedoStack.size() > EPrefs->scene_undo_level)
         {
-            unlink(m_RedoStack.front().m_FileName);
+            _unlink(m_RedoStack.front().m_FileName);
             m_RedoStack.pop_front();
         }
 
@@ -104,7 +104,7 @@ bool EScene::Redo()
 
         if (m_UndoStack.size() > EPrefs->scene_undo_level)
         {
-            unlink(m_UndoStack.front().m_FileName);
+            _unlink(m_UndoStack.front().m_FileName);
             m_UndoStack.pop_front();
         }
 

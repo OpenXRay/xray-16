@@ -58,7 +58,7 @@ SECommand* FindCommandByName(LPCSTR nm)
     for (u32 cmd_idx = 0; cmd_idx < cmds.size(); cmd_idx++)
     {
         SECommand*& CMD = cmds[cmd_idx];
-        if (CMD && (0 == stricmp(CMD->name, nm)))
+        if (CMD && (0 == _stricmp(CMD->name, nm)))
             return CMD;
     }
     return 0;
@@ -70,7 +70,7 @@ SESubCommand* FindSubCommandByName(SECommand* CMD, LPCSTR nm)
     for (u32 sub_cmd_idx = 0; sub_cmd_idx < CMD->sub_commands.size(); sub_cmd_idx++)
     {
         SESubCommand* SUB_CMD = CMD->sub_commands[sub_cmd_idx];
-        if (0 == stricmp(SUB_CMD->desc.c_str(), nm))
+        if (0 == _stricmp(SUB_CMD->desc.c_str(), nm))
             return SUB_CMD;
     }
     return 0;

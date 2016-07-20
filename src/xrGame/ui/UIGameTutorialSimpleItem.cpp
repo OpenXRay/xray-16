@@ -250,22 +250,22 @@ void CUISequenceSimpleItem::Start()
         bool bShowPda = false;
         CUIGameSP* ui_game_sp = smart_cast<CUIGameSP*>(CurrentGameUI());
 
-        if (!stricmp(m_pda_section, "pda_tasks"))
+        if (!_stricmp(m_pda_section, "pda_tasks"))
         {
             ui_game_sp->GetPdaMenu().SetActiveSubdialog("eptTasks");
             bShowPda = true;
         }
-        else if (!stricmp(m_pda_section, "pda_ranking"))
+        else if (!_stricmp(m_pda_section, "pda_ranking"))
         {
             ui_game_sp->GetPdaMenu().SetActiveSubdialog("eptRanking");
             bShowPda = true;
         }
-        else if (!stricmp(m_pda_section, "pda_logs"))
+        else if (!_stricmp(m_pda_section, "pda_logs"))
         {
             ui_game_sp->GetPdaMenu().SetActiveSubdialog("eptLogs");
             bShowPda = true;
         }
-        else if (!stricmp(m_pda_section, "pda_show_second_task_wnd"))
+        else if (!_stricmp(m_pda_section, "pda_show_second_task_wnd"))
         {
             ui_game_sp->GetPdaMenu().Show_SecondTaskWnd(true);
             bShowPda = true;

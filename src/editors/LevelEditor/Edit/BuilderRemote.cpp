@@ -1274,7 +1274,7 @@ int SceneBuilder::BuildShaderXRLC(const char* s)
 int SceneBuilder::FindInTextures(const char* name)
 {
     for (u32 i = 0; i < l_textures.size(); i++)
-        if (stricmp(l_textures[i].name, name) == 0)
+        if (_stricmp(l_textures[i].name, name) == 0)
             return i;
     return -1;
 }

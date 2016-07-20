@@ -35,7 +35,7 @@ bool net_global_data_impl<gl_base_cl_data>::create_data(LPCSTR path)
     VERIFY(inlc_global_data());
     inlc_global_data()->read_base(r_global);
 
-    // unlink( fn );
+    // _unlink( fn );
 
     FPU::m64r();
     Memory.mem_compact();

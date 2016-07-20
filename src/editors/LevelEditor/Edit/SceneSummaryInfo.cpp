@@ -35,7 +35,7 @@ void SSceneSummary::Prepare()
 xr_string _itoa(int val)
 {
     string64 tmp;
-    return itoa(val, tmp, 10);
+    return _itoa(val, tmp, 10);
 }
 
 void SSceneSummary::SObjectInfo::Prepare()

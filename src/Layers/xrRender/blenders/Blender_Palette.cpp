@@ -5,7 +5,7 @@
 
 //////////////////////////////////////////////////////////////////////
 #include "blender_clsid.h"
-IC bool p_sort(IBlender* A, IBlender* B) { return stricmp(A->getComment(), B->getComment()) < 0; }
+IC bool p_sort(IBlender* A, IBlender* B) { return _stricmp(A->getComment(), B->getComment()) < 0; }
 #ifdef __BORLANDC__
 #define TYPES_EQUAL(A, B) (typeid(A) == typeid(B))
 #else

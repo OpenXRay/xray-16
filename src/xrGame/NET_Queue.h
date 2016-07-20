@@ -97,7 +97,7 @@ public:
         case 2: EventName = "GE_OWNERSHIP_REJECT [2]"; break;
         case 5: EventName = "GE_DIE [5]"; break;
         case 7: EventName = "GE_DESTROY [7]"; break;
-        default: EventName = itoa(E.type, tmp, 10); break;
+        default: EventName = _itoa(E.type, tmp, 10); break;
         }
 
         Msg("Event %s to %d - at %d", *EventName, E.destination, E.timestamp);

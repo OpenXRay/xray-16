@@ -25,7 +25,7 @@ static u32 g_batch_5000;
 u16 RegisterShader(LPCSTR T)
 {
     for (u32 it = 0; it < pBuild->g_Shaders.size(); it++)
-        if (0 == stricmp(T, pBuild->g_Shaders[it]))
+        if (0 == _stricmp(T, pBuild->g_Shaders[it]))
             return it;
     pBuild->g_Shaders.push_back(xr_strdup(T));
     return pBuild->g_Shaders.size() - 1;

@@ -53,7 +53,7 @@ bool CEditableObject::ImportLWO(const char* fn, bool optimize)
         surf->SetName(lwSurf->name && lwSurf->name[0] ? lwSurf->name : "Default");
         surf->m_Flags.set(CSurface::sf2Sided, lwSurf->sideflags == 3);
         AnsiString enName = "default", lcName = "default", gmName = "default";
-        if (lwSurf->nshaders && !stricmp(lwSurf->shader->name, SH_PLUGIN_NAME))
+        if (lwSurf->nshaders && !_stricmp(lwSurf->shader->name, SH_PLUGIN_NAME))
         {
             auto shader = (XRShader*)lwSurf->shader->data;
             enName = shader->en_name;

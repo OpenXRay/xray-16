@@ -106,7 +106,7 @@ map_POOL.clear();
 IGameObject* IGame_ObjectPool::create ( LPCSTR name )
 {
 string256 l_name;
-POOL_IT it = map_POOL.find (shared_str(strlwr(xr_strcpy(l_name,name))));
+POOL_IT it = map_POOL.find (shared_str(_strlwr(xr_strcpy(l_name,name))));
 if (it!=map_POOL.end())
 {
 // Instance found

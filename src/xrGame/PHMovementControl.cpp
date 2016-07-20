@@ -43,7 +43,7 @@ CPHMovementControl::CPHMovementControl(IGameObject* parent)
 
 #ifdef DEBUG
     if (debug_output().ph_dbg_draw_mask1().test(ph_m1_DbgTrackObject) && (!!pObject->cName()) &&
-        stricmp(debug_output().PH_DBG_ObjectTrackName(), *pObject->cName()) == 0)
+        _stricmp(debug_output().PH_DBG_ObjectTrackName(), *pObject->cName()) == 0)
     {
         Msg("CPHMovementControl::CPHMovementControl %s (constructor) %f,%f,%pObjectf",
             debug_output().PH_DBG_ObjectTrackName(), pObject->Position().x, pObject->Position().y,
@@ -319,7 +319,7 @@ void CPHMovementControl::Calculate(
 {
 #ifdef DEBUG
     if (debug_output().ph_dbg_draw_mask1().test(ph_m1_DbgTrackObject) && (!!pObject->cName()) &&
-        stricmp(debug_output().PH_DBG_ObjectTrackName(), *pObject->cName()) == 0)
+        _stricmp(debug_output().PH_DBG_ObjectTrackName(), *pObject->cName()) == 0)
     {
         Msg("CPHMovementControl::Calculate in %s (Object Position) %f,%f,%f", debug_output().PH_DBG_ObjectTrackName(),
             pObject->Position().x, pObject->Position().y, pObject->Position().z);
@@ -577,7 +577,7 @@ void CPHMovementControl::PathNearestPoint(const xr_vector<DetailPathManager::STr
     }
 #ifdef DEBUG
     if (ph_dbg_draw_mask1.test(ph_m1_DbgTrackObject) && (!!pObject->cName()) &&
-        stricmp(PH_DBG_ObjectTrackName(), *pObject->cName()) == 0)
+        _stricmp(PH_DBG_ObjectTrackName(), *pObject->cName()) == 0)
     {
         Msg("CPHMovementControl::Calculate out %s (Object Position) %f,%f,%f", PH_DBG_ObjectTrackName(),
             pObject->Position().x, pObject->Position().y, pObject->Position().z);
@@ -967,7 +967,7 @@ void CPHMovementControl::SetPosition(const Fvector& P)
 {
 #ifdef DEBUG
     if (ph_dbg_draw_mask1.test(ph_m1_DbgTrackObject) && (!!pObject->cName()) &&
-        stricmp(PH_DBG_ObjectTrackName(), *pObject->cName()) == 0)
+        _stricmp(PH_DBG_ObjectTrackName(), *pObject->cName()) == 0)
     {
         Msg("CPHMovementControl::SetPosition %s (Object Position) %f,%f,%f", PH_DBG_ObjectTrackName(),
             pObject->Position().x, pObject->Position().y, pObject->Position().z);
@@ -986,7 +986,7 @@ bool CPHMovementControl::TryPosition(Fvector& pos)
 
 #ifdef DEBUG
     if (ph_dbg_draw_mask1.test(ph_m1_DbgTrackObject) && (!!pObject->cName()) &&
-        stricmp(PH_DBG_ObjectTrackName(), *pObject->cName()) == 0)
+        _stricmp(PH_DBG_ObjectTrackName(), *pObject->cName()) == 0)
     {
         Msg("CPHMovementControl::TryPosition %s (Object Position) %f,%f,%f", PH_DBG_ObjectTrackName(),
             pObject->Position().x, pObject->Position().y, pObject->Position().z);
@@ -1012,7 +1012,7 @@ void CPHMovementControl::GetPosition(Fvector& P)
 
 #ifdef DEBUG
     if (ph_dbg_draw_mask1.test(ph_m1_DbgTrackObject) && (!!pObject->cName()) &&
-        stricmp(PH_DBG_ObjectTrackName(), *pObject->cName()) == 0)
+        _stricmp(PH_DBG_ObjectTrackName(), *pObject->cName()) == 0)
     {
         Msg("CPHMovementControl::GetPosition %s (Object Position) %f,%f,%f", PH_DBG_ObjectTrackName(),
             pObject->Position().x, pObject->Position().y, pObject->Position().z);
@@ -1042,7 +1042,7 @@ void CPHMovementControl::AllocateCharacterObject(CharacterType type)
     m_character->SetPosition(vPosition);
 #ifdef DEBUG
     if (ph_dbg_draw_mask1.test(ph_m1_DbgTrackObject) && (!!pObject->cName()) &&
-        stricmp(PH_DBG_ObjectTrackName(), *pObject->cName()) == 0)
+        _stricmp(PH_DBG_ObjectTrackName(), *pObject->cName()) == 0)
     {
         Msg("CPHMovementControl::AllocateCharacterObject %s (Object Position) %f,%f,%f", PH_DBG_ObjectTrackName(),
             pObject->Position().x, pObject->Position().y, pObject->Position().z);
@@ -1204,7 +1204,7 @@ void CPHMovementControl::CreateCharacter()
     m_character->SetAirControlFactor(fAirControlParam);
 #ifdef DEBUG
     if (ph_dbg_draw_mask1.test(ph_m1_DbgTrackObject) && (!!pObject->cName()) &&
-        stricmp(PH_DBG_ObjectTrackName(), *pObject->cName()) == 0)
+        _stricmp(PH_DBG_ObjectTrackName(), *pObject->cName()) == 0)
     {
         Msg("CPHMovementControl::CreateCharacter %s (Object Position) %f,%f,%f", PH_DBG_ObjectTrackName(),
             pObject->Position().x, pObject->Position().y, pObject->Position().z);

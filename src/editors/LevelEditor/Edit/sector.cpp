@@ -44,7 +44,7 @@ CSectorItem::CSectorItem(CSceneObject* o, CEditableMesh* m)
 void CSectorItem::GetTransform(Fmatrix& parent) { object->GetFullTransformToWorld(parent); }
 bool CSectorItem::IsItem(const char* O, const char* M)
 {
-    return (0 == stricmp(O, object->Name)) && (0 == stricmp(M, mesh->Name().c_str()));
+    return (0 == _stricmp(O, object->Name)) && (0 == _stricmp(M, mesh->Name().c_str()));
 }
 
 //------------------------------------------------------------------------------

@@ -181,7 +181,7 @@ void ESceneObjectTools::HighlightTexture(LPCSTR tex_name, bool allow_ratio, u32 
             SurfaceVec& s_vec = e_obj->Surfaces();
             for (SurfaceIt it = s_vec.begin(); it != s_vec.end(); it++)
             {
-                if (0 == stricmp((*it)->_Texture(), tex_name))
+                if (0 == _stricmp((*it)->_Texture(), tex_name))
                 {
                     Fvector verts[3];
                     for (EditMeshIt mesh_it = e_obj->FirstMesh(); mesh_it != e_obj->LastMesh(); mesh_it++)

@@ -502,7 +502,7 @@ HRESULT IPureServer::net_Handler(u32 dwMessageType, PVOID pMessage)
         PDPNMSG_ENUM_HOSTS_QUERY msg = PDPNMSG_ENUM_HOSTS_QUERY(pMessage);
         if (0 == msg->dwReceivedDataSize)
             return S_FALSE;
-        if (!stricmp((const char*)msg->pvReceivedData, "ToConnect"))
+        if (!_stricmp((const char*)msg->pvReceivedData, "ToConnect"))
             return S_OK;
         if (*((const GUID*)msg->pvReceivedData) != NET_GUID)
             return S_FALSE;

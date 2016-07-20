@@ -663,7 +663,7 @@ void TfrmEditLibrary::ChangeReference(const RStringVec& items)
             // save new position
             CEditableObject* E				= m_pEditObject->GetReference();
 
-            if (E && new_name && (stricmp(E->GetName(),new_name))==0 ) return;
+            if (E && new_name && (_stricmp(E->GetName(),new_name))==0 ) return;
 
             if (E)
             {

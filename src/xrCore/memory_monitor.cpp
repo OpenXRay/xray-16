@@ -89,7 +89,7 @@ void memory_monitor::monitor_alloc(
 {
     counter++;
     counter_alloc++;
-    // if(0==stricmp(allocation_description,"char"))
+    // if(0==_stricmp(allocation_description,"char"))
     //{
     // int d = 65+56;
     //}

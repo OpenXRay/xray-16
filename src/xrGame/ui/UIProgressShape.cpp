@@ -27,7 +27,7 @@ void CUIProgressShape::SetPos(int pos, int max)
     if (m_bText)
     {
         string256 _buff;
-        TextItemControl()->SetText(itoa(pos, _buff, 10));
+        TextItemControl()->SetText(_itoa(pos, _buff, 10));
     }
 }
 

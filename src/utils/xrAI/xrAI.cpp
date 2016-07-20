@@ -160,7 +160,7 @@ void Startup(LPSTR lpCmdLine)
     BOOL bModifyOptions = FALSE;
 
     xr_strcpy(cmd, lpCmdLine);
-    strlwr(cmd);
+    _strlwr(cmd);
     if (strstr(cmd, "-?") || strstr(cmd, "-h"))
     {
         Help();

@@ -142,7 +142,7 @@ SVS* CResourceManager::_CreateVS(LPCSTR _name)
         m_vs.insert(std::make_pair(_vs->set_name(name), _vs));
         //_vs->vs				= NULL;
         //_vs->signature		= NULL;
-        if (0 == stricmp(_name, "null"))
+        if (0 == _stricmp(_name, "null"))
         {
             return _vs;
         }
@@ -265,7 +265,7 @@ SPS* CResourceManager::_CreatePS(LPCSTR _name)
         SPS* _ps = new SPS();
         _ps->dwFlags |= xr_resource_flagged::RF_REGISTERED;
         m_ps.insert(std::make_pair(_ps->set_name(name), _ps));
-        if (0 == stricmp(_name, "null"))
+        if (0 == _stricmp(_name, "null"))
         {
             _ps->ps = NULL;
             return _ps;
@@ -370,7 +370,7 @@ SGS* CResourceManager::_CreateGS(LPCSTR name)
         SGS* _gs = new SGS();
         _gs->dwFlags |= xr_resource_flagged::RF_REGISTERED;
         m_gs.insert(std::make_pair(_gs->set_name(name), _gs));
-        if (0 == stricmp(name, "null"))
+        if (0 == _stricmp(name, "null"))
         {
             _gs->gs = NULL;
             return _gs;
@@ -687,7 +687,7 @@ void CResourceManager::DBG_VerifyTextures()
 CMatrix* CResourceManager::_CreateMatrix(LPCSTR Name)
 {
     R_ASSERT(Name && Name[0]);
-    if (0 == stricmp(Name, "$null"))
+    if (0 == _stricmp(Name, "$null"))
         return NULL;
 
     LPSTR N = LPSTR(Name);
@@ -725,7 +725,7 @@ void CResourceManager::ED_UpdateMatrix(LPCSTR Name, CMatrix* data)
 CConstant* CResourceManager::_CreateConstant(LPCSTR Name)
 {
     R_ASSERT(Name && Name[0]);
-    if (0 == stricmp(Name, "$null"))
+    if (0 == _stricmp(Name, "$null"))
         return NULL;
 
     LPSTR N = LPSTR(Name);

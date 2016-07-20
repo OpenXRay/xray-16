@@ -237,7 +237,7 @@ void CKinematics::Load(const char* N, IReader* data, u32 dwFlags)
         // Bone
         u16 ID = u16(bones->size());
         data->r_stringZ(buf, sizeof(buf));
-        strlwr(buf);
+        _strlwr(buf);
         CBoneData* pBone = CreateBoneData(ID);
         pBone->name = shared_str(buf);
         pBone->child_faces.resize(children.size());
@@ -247,7 +247,7 @@ void CKinematics::Load(const char* N, IReader* data, u32 dwFlags)
 
         // It's parent
         data->r_stringZ(buf, sizeof(buf));
-        strlwr(buf);
+        _strlwr(buf);
         L_parents.push_back(buf);
 
         data->r(&pBone->obb, sizeof(Fobb));

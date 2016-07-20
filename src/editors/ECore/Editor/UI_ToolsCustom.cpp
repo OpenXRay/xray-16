@@ -180,13 +180,13 @@ bool __fastcall CToolCustom::MouseStart(TShiftState Shift)
         if (pinfo.e_mesh)
         {
             LPCSTR mn = pinfo.e_mesh->Name().c_str();
-            if (0 == stricmp(mn, "axis_x"))
+            if (0 == _stricmp(mn, "axis_x"))
                 SetAxis(etAxisX);
-            else if (0 == stricmp(mn, "axis_y"))
+            else if (0 == _stricmp(mn, "axis_y"))
                 SetAxis(etAxisY);
-            else if (0 == stricmp(mn, "axis_z"))
+            else if (0 == _stricmp(mn, "axis_z"))
                 SetAxis(etAxisZ);
-            else if (0 == stricmp(mn, "center"))
+            else if (0 == _stricmp(mn, "center"))
                 SetAxis(etAxisZX);
             else
                 R_ASSERT2(0, "fix axis name");

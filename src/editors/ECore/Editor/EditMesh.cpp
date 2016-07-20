@@ -543,7 +543,7 @@ int CEditableMesh::FindVMapByName(VMapVec& vmaps, const char* name, u8 t, bool p
 {
     for (VMapIt vm_it = vmaps.begin(); vm_it != vmaps.end(); vm_it++)
     {
-        if (((*vm_it)->type == t) && (stricmp((*vm_it)->name.c_str(), name) == 0) && (polymap == (*vm_it)->polymap))
+        if (((*vm_it)->type == t) && (_stricmp((*vm_it)->name.c_str(), name) == 0) && (polymap == (*vm_it)->polymap))
             return vm_it - vmaps.begin();
     }
     return -1;

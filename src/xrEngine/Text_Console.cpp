@@ -251,7 +251,7 @@ void CTextConsole::DrawLog(HDC hDC, RECT* pRect)
     SetTextColor(hDC, RGB(205, 205, 225));
     u32 log_line = LogFile->size() - 1;
     string16 q, q2;
-    itoa(log_line, q, 10);
+    _itoa(log_line, q, 10);
     xr_strcpy(q2, sizeof(q2), "[");
     xr_strcat(q2, sizeof(q2), q);
     xr_strcat(q2, sizeof(q2), "]");

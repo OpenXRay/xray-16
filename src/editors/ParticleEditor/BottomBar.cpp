@@ -197,7 +197,7 @@ void __fastcall TfraBottomBar::pmOptionsPopup(TObject* Sender)
     {
         TMenuItem* mi = miWeather->Items[i];
         BOOL bch;
-        bch = ((EPrefs->sWeather.size()) && (0 == stricmp(mi->Caption.c_str(), EPrefs->sWeather.c_str()))) ||
+        bch = ((EPrefs->sWeather.size()) && (0 == _stricmp(mi->Caption.c_str(), EPrefs->sWeather.c_str()))) ||
             (mi->Caption == "none" && EPrefs->sWeather.size() == 0);
         mi->Checked = bch;
     }

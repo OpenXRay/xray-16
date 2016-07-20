@@ -174,7 +174,7 @@ void SActorState::CreateClimb(IKinematicsAnimated* K)
     landing[1] = K->ID_Cycle(strconcat(sizeof(buf), buf, base, "_jump_end_1"));
 
     for (int k = 0; k < 12; ++k)
-        m_damage[k] = K->ID_FX(strconcat(sizeof(buf), buf, base, "_damage_", itoa(k, buf1, 10)));
+        m_damage[k] = K->ID_FX(strconcat(sizeof(buf), buf, base, "_damage_", _itoa(k, buf1, 10)));
 }
 
 void SActorState::Create(IKinematicsAnimated* K, LPCSTR base)
@@ -209,7 +209,7 @@ void SActorState::Create(IKinematicsAnimated* K, LPCSTR base)
     landing[1] = K->ID_Cycle(strconcat(sizeof(buf), buf, base, "_jump_end_1"));
 
     for (int k = 0; k < 12; ++k)
-        m_damage[k] = K->ID_FX(strconcat(sizeof(buf), buf, base, "_damage_", itoa(k, buf1, 10)));
+        m_damage[k] = K->ID_FX(strconcat(sizeof(buf), buf, base, "_damage_", _itoa(k, buf1, 10)));
 }
 
 void SActorSprintState::Create(IKinematicsAnimated* K)
@@ -254,13 +254,13 @@ SVehicleAnimCollection::SVehicleAnimCollection()
 void SVehicleAnimCollection::Create(IKinematicsAnimated* V, u16 num)
 {
     string128 buf, buff1, buff2;
-    strconcat(sizeof(buff1), buff1, itoa(num, buf, 10), "_");
+    strconcat(sizeof(buff1), buff1, _itoa(num, buf, 10), "_");
     steer_left = V->ID_Cycle(strconcat(sizeof(buf), buf, "steering_idle_", buff1, "ls"));
     steer_right = V->ID_Cycle(strconcat(sizeof(buf), buf, "steering_idle_", buff1, "rs"));
 
     for (int i = 0; MAX_IDLES > i; ++i)
     {
-        idles[i] = V->ID_Cycle_Safe(strconcat(sizeof(buf), buf, "steering_idle_", buff1, itoa(i, buff2, 10)));
+        idles[i] = V->ID_Cycle_Safe(strconcat(sizeof(buf), buf, "steering_idle_", buff1, _itoa(i, buff2, 10)));
         if (idles[i])
             idles_num++;
         else

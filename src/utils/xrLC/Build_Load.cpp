@@ -257,17 +257,17 @@ void CBuild::Load(const b_params& Params, const IReader& _in_FS)
         for (u32 LH = 0; LH < L_layers.size(); LH++)
         {
             R_Layer& TEST = L_layers[LH];
-            if (0 == stricmp(TEST.control.name, LCONTROL_HEMI))
+            if (0 == _stricmp(TEST.control.name, LCONTROL_HEMI))
             {
                 // Hemi found
                 L_static().hemi = TEST.lights;
             }
-            if (0 == stricmp(TEST.control.name, LCONTROL_SUN))
+            if (0 == _stricmp(TEST.control.name, LCONTROL_SUN))
             {
                 // Sun found
                 L_static().sun = TEST.lights;
             }
-            if (0 == stricmp(TEST.control.name, LCONTROL_STATIC))
+            if (0 == _stricmp(TEST.control.name, LCONTROL_STATIC))
             {
                 // Static found
                 L_static().rgb = TEST.lights;
@@ -304,7 +304,7 @@ void CBuild::Load(const b_params& Params, const IReader& _in_FS)
             LPSTR N = BT.name;
             if (strchr(N, '.'))
                 *(strchr(N, '.')) = 0;
-            strlwr(N);
+            _strlwr(N);
             if (0 == xr_strcmp(N, "level_lods"))
             {
                 // HACK for merged lod textures

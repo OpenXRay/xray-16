@@ -514,7 +514,7 @@ bool EDetailManager::UpdateObjects(bool bUpdateTex, bool bUpdateSelectedOnly)
 CDetailManager::DetailIt EDetailManager::FindDOByNameIt(LPCSTR name)
 {
     for (DetailIt it = objects.begin(); it != objects.end(); it++)
-        if (stricmp(((EDetail*)(*it))->GetName(), name) == 0)
+        if (_stricmp(((EDetail*)(*it))->GetName(), name) == 0)
             return it;
     return objects.end();
 }
@@ -588,7 +588,7 @@ EDetail* EDetailManager::FindObjectInColorIndices(u32 index, LPCSTR name)
     {
         DOVec& lst = CI->second;
         for (DOIt it = lst.begin(); it != lst.end(); it++)
-            if (stricmp((*it)->GetName(), name) == 0)
+            if (_stricmp((*it)->GetName(), name) == 0)
                 return *it;
     }
     return 0;

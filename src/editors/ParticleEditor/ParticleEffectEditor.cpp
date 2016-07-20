@@ -79,7 +79,7 @@ void __fastcall PS::CPEDef::FindActionByName(LPCSTR new_name, bool& res)
 {
     res = false;
     for (EPAVecIt s_it = m_EActionList.begin(); s_it != m_EActionList.end(); s_it++)
-        if (0 == stricmp(new_name, *(*s_it)->actionName))
+        if (0 == _stricmp(new_name, *(*s_it)->actionName))
         {
             res = true;
             break;

@@ -273,7 +273,7 @@ public:
     virtual void Execute(LPCSTR arguments)
     {
         string64 cdkey;
-        if (0 == stricmp(arguments, "clear"))
+        if (0 == _stricmp(arguments, "clear"))
         {
             cdkey[0] = 0;
         }

@@ -42,13 +42,13 @@ void reward_manager::load_rewards()
     LPCSTR section_name = NULL;
     char tmp_dst_buff[16];
 
-    STRCONCAT(section_name, section_name_prefix, itoa(reward_index, tmp_dst_buff, 10));
+    STRCONCAT(section_name, section_name_prefix, _itoa(reward_index, tmp_dst_buff, 10));
 
     while (rewards_config.section_exist(section_name))
     {
         load_reward_item(rewards_config, reward_index, section_name);
         ++reward_index;
-        STRCONCAT(section_name, section_name_prefix, itoa(reward_index, tmp_dst_buff, 10));
+        STRCONCAT(section_name, section_name_prefix, _itoa(reward_index, tmp_dst_buff, 10));
     }
 
     FS.r_close(tmp_reader);

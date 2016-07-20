@@ -313,7 +313,7 @@ bool CEditableObject::RemoveSMotion(const char* name)
 {
     SMotionVec& lst = m_SMotions;
     for (SMotionIt m = lst.begin(); m != lst.end(); m++)
-        if ((stricmp((*m)->Name(), name) == 0))
+        if ((_stricmp((*m)->Name(), name) == 0))
         {
             if (m_ActiveSMotion == *m)
                 SetActiveSMotion(0);
@@ -361,7 +361,7 @@ bool CEditableObject::AppendSMotion(LPCSTR fname, SMotionVec* inserted)
     bool bRes = true;
 
     LPCSTR ext = strext(fname);
-    if (0 == stricmp(ext, ".skl"))
+    if (0 == _stricmp(ext, ".skl"))
     {
         CSMotion* M = new CSMotion();
         if (!M->LoadMotion(fname))
@@ -394,7 +394,7 @@ bool CEditableObject::AppendSMotion(LPCSTR fname, SMotionVec* inserted)
             }
         }
     }
-    else if (0 == stricmp(ext, ".skls"))
+    else if (0 == _stricmp(ext, ".skls"))
     {
         IReader* F = FS.r_open(fname);
         if (!F)
@@ -460,7 +460,7 @@ bool CEditableObject::SaveSMotions(const char* fname)
 
 bool CEditableObject::RenameSMotion(const char* old_name, const char* new_name)
 {
-    if (stricmp(old_name, new_name) == 0)
+    if (_stricmp(old_name, new_name) == 0)
         return true;
     if (FindSMotionByName(new_name))
         return false;
@@ -476,7 +476,7 @@ CSMotion* CEditableObject::FindSMotionByName(const char* name, const CSMotion* I
     {
         SMotionVec& lst = m_SMotions;
         for (SMotionIt m = lst.begin(); m != lst.end(); m++)
-            if ((Ignore != (*m)) && (stricmp((*m)->Name(), name) == 0))
+            if ((Ignore != (*m)) && (_stricmp((*m)->Name(), name) == 0))
                 return (*m);
     }
     return 0;
@@ -491,7 +491,7 @@ void CEditableObject::GenerateSMotionName(char* buffer, const char* start_name, 
         sprintf(buffer, "%s_%2d", start_name, idx);
         idx++;
     }
-    strlwr(buffer);
+    _strlwr(buffer);
 }
 
 ICF

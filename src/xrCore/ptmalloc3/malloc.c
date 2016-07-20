@@ -1921,7 +1921,7 @@ static MLOCK_T morecore_mutex = NULL_LOCK_INITIALIZER;
 
   Given a pointer to a chunk (which can be derived trivially from the
   payload pointer) we can, in O(1) time, find out whether the adjacent
-  chunks are free, and if so, unlink them from the lists that they
+  chunks are free, and if so, _unlink them from the lists that they
   are on and merge them with the current chunk.
 
   Chunks always begin on even word boundaries, so the mem portion
@@ -3434,7 +3434,7 @@ static void internal_malloc_stats(mstate m) {
 /*
   Unlink steps:
 
-  1. If x is a chained node, unlink it from its same-sized fd/bk links
+  1. If x is a chained node, _unlink it from its same-sized fd/bk links
      and choose its bk node as its replacement.
   2. If x was the last node of its size, but not a leaf node, it must
      be replaced with a leaf node (not merely one with an open left or
@@ -3962,7 +3962,7 @@ static void* sys_alloc(mstate m, size_t nb) {
 
 /* -----------------------  system deallocation -------------------------- */
 
-/* Unmap and unlink any mmapped segments that don't contain used chunks */
+/* Unmap and _unlink any mmapped segments that don't contain used chunks */
 static size_t release_unused_segments(mstate m) {
   size_t released = 0;
   int nsegs = 0;
@@ -3990,7 +3990,7 @@ static size_t release_unused_segments(mstate m) {
         if (CALL_MUNMAP(base, size) == 0) {
           released += size;
           m->footprint -= size;
-          /* unlink obsoleted record */
+          /* _unlink obsoleted record */
           sp = pred;
           sp->next = next;
         }

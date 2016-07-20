@@ -27,7 +27,7 @@ bool net_global_data_impl<gl_ref_model_data>::create_data(LPCSTR path)
         inlc_global_data()->read_mu_model_refs(r_global);
         inlc_global_data()->read_modes_color(r_global);
     }
-    // unlink( fn );
+    // _unlink( fn );
     FPU::m64r();
     Memory.mem_compact();
     return true;

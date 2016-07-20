@@ -394,7 +394,7 @@ void CheckEffect(const xr_string& group_path, const shared_str& eff_full_name, x
 {
     res_name = group_path + "effects\\" + EFS.ExtractFileName(eff_full_name.c_str());
 
-    if (0 != stricmp(res_name.c_str(), eff_full_name.c_str()))
+    if (0 != _stricmp(res_name.c_str(), eff_full_name.c_str()))
     {
         PS::CPEDef* old_ped = ::Render->PSLibrary.FindPED(eff_full_name.c_str());
         PS::CPEDef* new_ped = ::Render->PSLibrary.FindPED(res_name.c_str());
@@ -413,7 +413,7 @@ void CheckEffect(const xr_string& group_path, const shared_str& eff_full_name, x
             else
                 Msg("create new effect [%s]", res_name.c_str());
         }
-        VERIFY(0 == stricmp(new_ped->m_Name.c_str(), res_name.c_str()));
+        VERIFY(0 == _stricmp(new_ped->m_Name.c_str(), res_name.c_str()));
     }
 }
 

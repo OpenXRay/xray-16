@@ -175,7 +175,7 @@ static int region_list_append (region_list_entry **last, void *base_reserved, IN
     *last = next;
     return TRUE;
 }
-/* Free and unlink the last region entry from the region list */
+/* Free and _unlink the last region entry from the region list */
 static int region_list_remove (region_list_entry **last) {
     region_list_entry *previous = (*last)->previous;
     if (! HeapFree (GetProcessHeap (), sizeof (region_list_entry), *last))

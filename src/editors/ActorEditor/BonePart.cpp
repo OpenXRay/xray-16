@@ -282,7 +282,7 @@ void __fastcall TfrmBonePart::ebLoadFromClick(TObject* Sender)
             CInifile::SectCIt e = S.Data.end();
             for (; it != e; ++it)
             {
-                if (0 != stricmp(it->first.c_str(), "partition_name"))
+                if (0 != _stricmp(it->first.c_str(), "partition_name"))
                 {
                     FHelper.AppendObject(T[i], it->first.c_str(), false, true);
                 }

@@ -71,7 +71,7 @@ void type_pair::on_key_press(line_edit_control* const control)
         // The following 3 lines looks useless
 
         LPSTR loc;
-        STRCONCAT ( loc, ".", itoa( GetACP(), code_page, 10 ) );
+        STRCONCAT ( loc, ".", _itoa( GetACP(), code_page, 10 ) );
         setlocale ( LC_ALL, loc );*/
 
         static _locale_t current_locale = _create_locale(LC_ALL, "");

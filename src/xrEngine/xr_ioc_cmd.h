@@ -168,7 +168,7 @@ public:
         xr_token* tok = tokens;
         while (tok->name)
         {
-            if (stricmp(tok->name, args) == 0)
+            if (_stricmp(tok->name, args) == 0)
             {
                 *value = tok->id;
                 break;
@@ -347,7 +347,7 @@ public:
         else
             *value = v;
     }
-    virtual void Status(TStatus& S) { itoa(*value, S, 10); }
+    virtual void Status(TStatus& S) { _itoa(*value, S, 10); }
     virtual void Info(TInfo& I) { xr_sprintf(I, sizeof(I), "integer value in range [%d,%d]", min, max); }
     virtual void fill_tips(vecTips& tips, u32 mode)
     {

@@ -133,7 +133,7 @@ void CSoundRender_Source::load(LPCSTR name)
 {
     string_path fn, N;
     xr_strcpy(N, name);
-    strlwr(N);
+    _strlwr(N);
     if (strext(N))
         *strext(N) = 0;
 

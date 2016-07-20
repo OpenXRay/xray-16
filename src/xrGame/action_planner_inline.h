@@ -158,7 +158,7 @@ LPCSTR CPlanner::action2string(const _action_id_type& action_id) { return (actio
 TEMPLATE_SPECIALIZATION
 LPCSTR CPlanner::property2string(const _condition_type& property_id)
 {
-    return (evaluator(property_id).m_evaluator_name); // itoa(property_id,m_temp_string,10));
+    return (evaluator(property_id).m_evaluator_name); // _itoa(property_id,m_temp_string,10));
 }
 
 TEMPLATE_SPECIALIZATION

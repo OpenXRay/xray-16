@@ -1244,7 +1244,7 @@ bool CExportSkeleton::ExportMotionDefs(IWriter& F)
                 {
                     string512 buff;
                     strcpy(buff, bp_it->alias.c_str());
-                    strlwr(buff);
+                    _strlwr(buff);
                     F.w_stringZ(buff);
                     F.w_u16((u16)bp_it->bones.size());
                     for (int i = 0; i < int(bp_it->bones.size()); ++i)

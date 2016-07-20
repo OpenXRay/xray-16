@@ -115,7 +115,7 @@ CSE_Abstract* CALifeSimulatorBase::spawn_item(LPCSTR section, const Fvector& pos
     if (abstract->ID < 10)
         xr_strcat(s_name_replace, "0");
     string16 S1;
-    xr_strcat(s_name_replace, itoa(abstract->ID, S1, 10));
+    xr_strcat(s_name_replace, _itoa(abstract->ID, S1, 10));
     abstract->set_name_replace(s_name_replace);
 
     CSE_ALifeDynamicObject* dynamic_object = smart_cast<CSE_ALifeDynamicObject*>(abstract);
@@ -172,7 +172,7 @@ CSE_Abstract* CALifeSimulatorBase::create(CSE_ALifeGroupAbstract* tpALifeGroupAb
     if (k->ID < 10)
         xr_strcat(s_name_replace, "0");
     string16 S1;
-    xr_strcat(s_name_replace, itoa(k->ID, S1, 10));
+    xr_strcat(s_name_replace, _itoa(k->ID, S1, 10));
     k->set_name_replace(s_name_replace);
 
     register_object(k, true);

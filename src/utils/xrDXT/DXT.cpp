@@ -283,7 +283,7 @@ int DXTCompressImage(LPCSTR out_name, u8* raw_data, u32 w, u32 h, u32 pitch, STe
     _close(gFileOut);
     if (!result)
     {
-        unlink(out_name);
+        _unlink(out_name);
         return 0;
     }
     return 1;
