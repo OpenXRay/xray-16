@@ -534,19 +534,21 @@ u32 CSE_ALifeObject::ef_detector_type() const
     return (u32(-1));
 }
 
-bool CSE_ALifeObject::used_ai_locations() const { return (!!m_flags.is(flUsedAI_Locations)); }
-bool CSE_ALifeObject::can_switch_online() const { return (match_configuration() && !!m_flags.is(flSwitchOnline)); }
-bool CSE_ALifeObject::can_switch_offline() const { return (!match_configuration() || !!m_flags.is(flSwitchOffline)); }
-bool CSE_ALifeObject::can_save() const { return (!!m_flags.is(flCanSave)); }
-bool CSE_ALifeObject::interactive() const
-{
-    return (!!m_flags.is(flInteractive) && !!m_flags.is(flVisibleForAI) && !!m_flags.is(flUsefulForAI));
-}
+bool CSE_ALifeObject::used_ai_locations() const throw()
+{ return !!m_flags.is(flUsedAI_Locations); }
+bool CSE_ALifeObject::can_switch_online() const throw()
+{ return match_configuration() && !!m_flags.is(flSwitchOnline); }
+bool CSE_ALifeObject::can_switch_offline() const throw()
+{ return !match_configuration() || !!m_flags.is(flSwitchOffline); }
+bool CSE_ALifeObject::can_save() const throw()
+{ return !!m_flags.is(flCanSave); }
+bool CSE_ALifeObject::interactive() const throw()
+{ return !!m_flags.is(flInteractive) && !!m_flags.is(flVisibleForAI) && !!m_flags.is(flUsefulForAI); }
 
 void CSE_ALifeObject::use_ai_locations(bool value) { m_flags.set(flUsedAI_Locations, BOOL(value)); }
-void CSE_ALifeObject::can_switch_online(bool value) { m_flags.set(flSwitchOnline, BOOL(value)); }
-void CSE_ALifeObject::can_switch_offline(bool value) { m_flags.set(flSwitchOffline, BOOL(value)); }
-void CSE_ALifeObject::interactive(bool value) { m_flags.set(flInteractive, BOOL(value)); }
+void CSE_ALifeObject::can_switch_online(bool value) throw() { m_flags.set(flSwitchOnline, BOOL(value)); }
+void CSE_ALifeObject::can_switch_offline(bool value) throw() { m_flags.set(flSwitchOffline, BOOL(value)); }
+void CSE_ALifeObject::interactive(bool value) throw() { m_flags.set(flInteractive, BOOL(value)); }
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifeGroupAbstract
 ////////////////////////////////////////////////////////////////////////////
@@ -688,8 +690,8 @@ void CSE_ALifePHSkeletonObject::UPDATE_Read(NET_Packet& tNetPacket)
     inherited2::UPDATE_Read(tNetPacket);
 };
 
-bool CSE_ALifePHSkeletonObject::can_save() const { return CSE_PHSkeleton::need_save(); }
-bool CSE_ALifePHSkeletonObject::used_ai_locations() const { return false; }
+bool CSE_ALifePHSkeletonObject::can_save() const throw() { return CSE_PHSkeleton::need_save(); }
+bool CSE_ALifePHSkeletonObject::used_ai_locations() const throw() { return false; }
 #ifndef XRGAME_EXPORTS
 void CSE_ALifePHSkeletonObject::FillProps(LPCSTR pref, PropItemVec& items)
 {
@@ -711,8 +713,8 @@ CSE_ALifeSpaceRestrictor::CSE_ALifeSpaceRestrictor(LPCSTR caSection) : CSE_ALife
 }
 
 CSE_ALifeSpaceRestrictor::~CSE_ALifeSpaceRestrictor() {}
-bool CSE_ALifeSpaceRestrictor::can_switch_offline() const { return (false); }
-bool CSE_ALifeSpaceRestrictor::used_ai_locations() const { return (false); }
+bool CSE_ALifeSpaceRestrictor::can_switch_offline() const throw() { return false; }
+bool CSE_ALifeSpaceRestrictor::used_ai_locations() const throw() { return false; }
 IServerEntityShape* CSE_ALifeSpaceRestrictor::shape() { return (this); }
 void CSE_ALifeSpaceRestrictor::STATE_Read(NET_Packet& tNetPacket, u16 size)
 {
@@ -1133,8 +1135,8 @@ void CSE_ALifeObjectPhysic::FillProps(LPCSTR pref, PropItemVec& values)
 }
 #endif // #ifndef XRGAME_EXPORTS
 
-bool CSE_ALifeObjectPhysic::used_ai_locations() const { return (false); }
-bool CSE_ALifeObjectPhysic::can_save() const { return CSE_PHSkeleton::need_save(); }
+bool CSE_ALifeObjectPhysic::used_ai_locations() const throw() { return false; }
+bool CSE_ALifeObjectPhysic::can_save() const throw() { return CSE_PHSkeleton::need_save(); }
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifeObjectHangingLamp
 ////////////////////////////////////////////////////////////////////////////
@@ -1403,7 +1405,7 @@ CDUInterface* du, IServerEntityLEOwner* owner, bool bSelected, const Fmatrix& pa
 }
 #endif // #ifndef XRGAME_EXPORTS
 
-bool CSE_ALifeObjectHangingLamp::used_ai_locations() const { return (false); }
+bool CSE_ALifeObjectHangingLamp::used_ai_locations() const throw() { return false; }
 bool CSE_ALifeObjectHangingLamp::validate()
 {
     if (flags.test(flR1) || flags.test(flR2))
@@ -1413,7 +1415,7 @@ bool CSE_ALifeObjectHangingLamp::validate()
     return (false);
 }
 
-bool CSE_ALifeObjectHangingLamp::match_configuration() const
+bool CSE_ALifeObjectHangingLamp::match_configuration() const throw()
 {
     R_ASSERT3(flags.test(flR1) || flags.test(flR2), "no renderer type set for hanging-lamp ", name_replace());
 #ifdef XRGAME_EXPORTS
@@ -1443,7 +1445,7 @@ void CSE_ALifeObjectProjector::UPDATE_Write(NET_Packet& tNetPacket) { inherited:
 void CSE_ALifeObjectProjector::FillProps(LPCSTR pref, PropItemVec& values) { inherited::FillProps(pref, values); }
 #endif // #ifndef XRGAME_EXPORTS
 
-bool CSE_ALifeObjectProjector::used_ai_locations() const { return (false); }
+bool CSE_ALifeObjectProjector::used_ai_locations() const throw() { return false; }
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifeSchedulable
 ////////////////////////////////////////////////////////////////////////////
@@ -1547,7 +1549,7 @@ void CSE_ALifeHelicopter::load(NET_Packet& tNetPacket)
     inherited1::load(tNetPacket);
     inherited3::load(tNetPacket);
 }
-bool CSE_ALifeHelicopter::can_save() const { return CSE_PHSkeleton::need_save(); }
+bool CSE_ALifeHelicopter::can_save() const throw() { return CSE_PHSkeleton::need_save(); }
 #ifndef XRGAME_EXPORTS
 void CSE_ALifeHelicopter::FillProps(LPCSTR pref, PropItemVec& values)
 {
@@ -1559,7 +1561,7 @@ void CSE_ALifeHelicopter::FillProps(LPCSTR pref, PropItemVec& values)
 }
 #endif // #ifndef XRGAME_EXPORTS
 
-bool CSE_ALifeHelicopter::used_ai_locations() const { return (false); }
+bool CSE_ALifeHelicopter::used_ai_locations() const throw() { return false; }
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifeCar
 ////////////////////////////////////////////////////////////////////////////
@@ -1606,8 +1608,8 @@ void CSE_ALifeCar::UPDATE_Write(NET_Packet& tNetPacket)
     inherited2::UPDATE_Write(tNetPacket);
 }
 
-bool CSE_ALifeCar::used_ai_locations() const { return (false); }
-bool CSE_ALifeCar::can_save() const { return CSE_PHSkeleton::need_save(); }
+bool CSE_ALifeCar::used_ai_locations() const throw() { return false; }
+bool CSE_ALifeCar::can_save() const throw() { return CSE_PHSkeleton::need_save(); }
 void CSE_ALifeCar::load(NET_Packet& tNetPacket)
 {
     inherited1::load(tNetPacket);
@@ -1722,8 +1724,8 @@ void CSE_ALifeObjectBreakable::FillProps(LPCSTR pref, PropItemVec& values)
 }
 #endif // #ifndef XRGAME_EXPORTS
 
-bool CSE_ALifeObjectBreakable::used_ai_locations() const { return (false); }
-bool CSE_ALifeObjectBreakable::can_switch_offline() const { return (false); }
+bool CSE_ALifeObjectBreakable::used_ai_locations() const throw() { return false; }
+bool CSE_ALifeObjectBreakable::can_switch_offline() const throw() { return false; }
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifeObjectClimable
 ////////////////////////////////////////////////////////////////////////////
@@ -1784,8 +1786,8 @@ void CSE_ALifeObjectClimable::set_additional_info(void* info)
 }
 #endif // #ifndef XRGAME_EXPORTS
 
-bool CSE_ALifeObjectClimable::used_ai_locations() const { return (false); }
-bool CSE_ALifeObjectClimable::can_switch_offline() const { return (false); }
+bool CSE_ALifeObjectClimable::used_ai_locations() const throw() { return false; }
+bool CSE_ALifeObjectClimable::can_switch_offline() const throw() { return false; }
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifeMountedWeapon
 ////////////////////////////////////////////////////////////////////////////

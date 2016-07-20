@@ -152,7 +152,7 @@ public:
     virtual CSE_Abstract* base();
     virtual const CSE_Abstract* base() const;
     virtual CSE_Abstract* init();
-    virtual bool match_configuration() const { return true; }
+    virtual bool match_configuration() const throw() { return true; }
     // end of the virtual inheritance dependant code
     IC int script_clsid() const
     {

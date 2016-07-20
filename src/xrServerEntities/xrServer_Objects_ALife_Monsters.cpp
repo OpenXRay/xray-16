@@ -517,7 +517,7 @@ CSE_ALifeTrader::CSE_ALifeTrader(LPCSTR caSection)
 
 CSE_ALifeTrader::~CSE_ALifeTrader() {}
 #ifdef DEBUG
-bool CSE_ALifeTrader::match_configuration() const { return (!strstr(Core.Params, "-designer")); }
+bool CSE_ALifeTrader::match_configuration() const throw() { return (!strstr(Core.Params, "-designer")); }
 #endif
 
 CSE_Abstract* CSE_ALifeTrader::init()
@@ -585,7 +585,7 @@ void CSE_ALifeTrader::UPDATE_Read(NET_Packet& tNetPacket)
     inherited2::UPDATE_Read(tNetPacket);
 };
 
-bool CSE_ALifeTrader::interactive() const { return (false); }
+bool CSE_ALifeTrader::interactive() const throw() { return false; }
 #ifndef XRGAME_EXPORTS
 void CSE_ALifeTrader::FillProps(LPCSTR _pref, PropItemVec& items)
 {
@@ -859,7 +859,7 @@ CSE_ALifeCreatureAbstract::CSE_ALifeCreatureAbstract(LPCSTR caSection) : CSE_ALi
 
 CSE_ALifeCreatureAbstract::~CSE_ALifeCreatureAbstract() {}
 #ifdef DEBUG
-bool CSE_ALifeCreatureAbstract::match_configuration() const { return (!strstr(Core.Params, "-designer")); }
+bool CSE_ALifeCreatureAbstract::match_configuration() const throw() { return !strstr(Core.Params, "-designer"); }
 #endif
 
 u32 CSE_ALifeCreatureAbstract::ef_creature_type() const { return (m_ef_creature_type); }
@@ -980,9 +980,9 @@ void CSE_ALifeCreatureAbstract::FillProps(LPCSTR pref, PropItemVec& items)
 }
 #endif // #ifndef XRGAME_EXPORTS
 
-bool CSE_ALifeCreatureAbstract::used_ai_locations() const { return (true); }
-bool CSE_ALifeCreatureAbstract::can_switch_online() const { return (inherited::can_switch_online()); }
-bool CSE_ALifeCreatureAbstract::can_switch_offline() const
+bool CSE_ALifeCreatureAbstract::used_ai_locations() const throw() { return true; }
+bool CSE_ALifeCreatureAbstract::can_switch_online() const throw() { return inherited::can_switch_online(); }
+bool CSE_ALifeCreatureAbstract::can_switch_offline() const throw()
 {
     return (inherited::can_switch_offline() && (get_health() > 0.f));
 }
@@ -1207,7 +1207,7 @@ CSE_ALifeCreatureActor::CSE_ALifeCreatureActor(LPCSTR caSection)
 
 CSE_ALifeCreatureActor::~CSE_ALifeCreatureActor() {}
 #ifdef DEBUG
-bool CSE_ALifeCreatureActor::match_configuration() const { return (true); }
+bool CSE_ALifeCreatureActor::match_configuration() const throw() { return true; }
 #endif
 
 CSE_Abstract* CSE_ALifeCreatureActor::init()
@@ -1397,7 +1397,7 @@ void CSE_ALifeCreatureCrow::UPDATE_Write(NET_Packet& tNetPacket) { inherited::UP
 void CSE_ALifeCreatureCrow::FillProps(LPCSTR pref, PropItemVec& values) { inherited::FillProps(pref, values); }
 #endif // #ifndef XRGAME_EXPORTS
 
-bool CSE_ALifeCreatureCrow::used_ai_locations() const { return (false); }
+bool CSE_ALifeCreatureCrow::used_ai_locations() const throw() { return false; }
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifeCreaturePhantom
 ////////////////////////////////////////////////////////////////////////////
@@ -1418,7 +1418,7 @@ void CSE_ALifeCreaturePhantom::UPDATE_Write(NET_Packet& tNetPacket) { inherited:
 void CSE_ALifeCreaturePhantom::FillProps(LPCSTR pref, PropItemVec& values) { inherited::FillProps(pref, values); }
 #endif // #ifndef XRGAME_EXPORTS
 
-bool CSE_ALifeCreaturePhantom::used_ai_locations() const { return (false); }
+bool CSE_ALifeCreaturePhantom::used_ai_locations() const throw() { return false; }
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifeMonsterRat
 ////////////////////////////////////////////////////////////////////////////

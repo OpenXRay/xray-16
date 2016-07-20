@@ -321,44 +321,44 @@ struct CWrapperAbstractItem : public T, public luabind::wrap_base
 //////////////////////////////////////////////////////////////////////////
 // 0
 //////////////////////////////////////////////////////////////////////////
-#define luabind_class_pure0(a, b)                         \
-    DEFINE_LUABIND_CLASS_WRAPPER_0(a, CWrapperPure<a>, b) \
-    luabind_virtual_Pure(a, CWrapperPure<a>)
+//#define luabind_class_pure0(a, b)                         \
+//    DEFINE_LUABIND_CLASS_WRAPPER_0(a, CWrapperPure<a>, b) \
+//    luabind_virtual_Pure(a, CWrapperPure<a>)
 
-#define luabind_class_abstract0(a, b)                         \
-    DEFINE_LUABIND_CLASS_WRAPPER_0(a, CWrapperAbstract<a>, b) \
-    luabind_virtual_Abstract(a, CWrapperAbstract<a>)
+//#define luabind_class_abstract0(a, b)                         \
+//    DEFINE_LUABIND_CLASS_WRAPPER_0(a, CWrapperAbstract<a>, b) \
+//    luabind_virtual_Abstract(a, CWrapperAbstract<a>)
 
-#define luabind_class_alife0(a, b)                                 \
-    DEFINE_LUABIND_CLASS_WRAPPER_0(a, CWrapperAbstractALife<a>, b) \
-    luabind_virtual_Alife(a, CWrapperAbstractALife<a>)
+//#define luabind_class_alife0(a, b)                                 \
+//    DEFINE_LUABIND_CLASS_WRAPPER_0(a, CWrapperAbstractALife<a>, b) \
+//    luabind_virtual_Alife(a, CWrapperAbstractALife<a>)
 
-#define luabind_class_dynamic_alife0(a, b)                                \
-    DEFINE_LUABIND_CLASS_WRAPPER_0(a, CWrapperAbstractDynamicALife<a>, b) \
-    luabind_virtual_DynamicAlife(a, CWrapperAbstractDynamicALife<a>)
+//#define luabind_class_dynamic_alife0(a, b)                                \
+//    DEFINE_LUABIND_CLASS_WRAPPER_0(a, CWrapperAbstractDynamicALife<a>, b) \
+//    luabind_virtual_DynamicAlife(a, CWrapperAbstractDynamicALife<a>)
 
-#define luabind_class_zone0(a, b)                                 \
-    DEFINE_LUABIND_CLASS_WRAPPER_0(a, CWrapperAbstractZone<a>, b) \
-    luabind_virtual_Zone(a, CWrapperAbstractZone<a>)
+//#define luabind_class_zone0(a, b)                                 \
+//    DEFINE_LUABIND_CLASS_WRAPPER_0(a, CWrapperAbstractZone<a>, b) \
+//    luabind_virtual_Zone(a, CWrapperAbstractZone<a>)
 
-#define luabind_class_creature0(a, b)                                 \
-    DEFINE_LUABIND_CLASS_WRAPPER_0(a, CWrapperAbstractCreature<a>, b) \
-    luabind_virtual_Creature(a, CWrapperAbstractCreature<a>)
+//#define luabind_class_creature0(a, b)                                 \
+//    DEFINE_LUABIND_CLASS_WRAPPER_0(a, CWrapperAbstractCreature<a>, b) \
+//    luabind_virtual_Creature(a, CWrapperAbstractCreature<a>)
 
-#define luabind_class_monster0(a, b)                                 \
-    DEFINE_LUABIND_CLASS_WRAPPER_0(a, CWrapperAbstractMonster<a>, b) \
-    luabind_virtual_Monster(a, CWrapperAbstractMonster<a>)
+//#define luabind_class_monster0(a, b)                                 \
+//    DEFINE_LUABIND_CLASS_WRAPPER_0(a, CWrapperAbstractMonster<a>, b) \
+//    luabind_virtual_Monster(a, CWrapperAbstractMonster<a>)
 
-#define luabind_class_item0(a, b)                                 \
-    DEFINE_LUABIND_CLASS_WRAPPER_0(a, CWrapperAbstractItem<a>, b) \
-    luabind_virtual_Item(a, CWrapperAbstractItem<a>)
+//#define luabind_class_item0(a, b)                                 \
+//    DEFINE_LUABIND_CLASS_WRAPPER_0(a, CWrapperAbstractItem<a>, b) \
+//    luabind_virtual_Item(a, CWrapperAbstractItem<a>)
 
 //////////////////////////////////////////////////////////////////////////
 // 1
 //////////////////////////////////////////////////////////////////////////
-#define luabind_class_pure1(a, b, c)                         \
-    DEFINE_LUABIND_CLASS_WRAPPER_1(a, CWrapperPure<a>, b, c) \
-    luabind_virtual_Pure(a, CWrapperPure<a>)
+//#define luabind_class_pure1(a, b, c)                         \
+//    DEFINE_LUABIND_CLASS_WRAPPER_1(a, CWrapperPure<a>, b, c) \
+//    luabind_virtual_Pure(a, CWrapperPure<a>)
 
 #define luabind_class_abstract1(a, b, c)                         \
     DEFINE_LUABIND_CLASS_WRAPPER_1(a, CWrapperAbstract<a>, b, c) \
@@ -372,9 +372,9 @@ struct CWrapperAbstractItem : public T, public luabind::wrap_base
     DEFINE_LUABIND_CLASS_WRAPPER_1(a, CWrapperAbstractDynamicALife<a>, b, c) \
     luabind_virtual_DynamicAlife(a, CWrapperAbstractDynamicALife<a>)
 
-#define luabind_class_zone1(a, b, c)                                 \
-    DEFINE_LUABIND_CLASS_WRAPPER_1(a, CWrapperAbstractZone<a>, b, c) \
-    luabind_virtual_Zone(a, CWrapperAbstractZone<a>)
+//#define luabind_class_zone1(a, b, c)                                 \
+//    DEFINE_LUABIND_CLASS_WRAPPER_1(a, CWrapperAbstractZone<a>, b, c) \
+//    luabind_virtual_Zone(a, CWrapperAbstractZone<a>)
 
 #define luabind_class_creature1(a, b, c)                                 \
     DEFINE_LUABIND_CLASS_WRAPPER_1(a, CWrapperAbstractCreature<a>, b, c) \
@@ -391,17 +391,17 @@ struct CWrapperAbstractItem : public T, public luabind::wrap_base
 //////////////////////////////////////////////////////////////////////////
 // 2
 //////////////////////////////////////////////////////////////////////////
-#define luabind_class_pure2(a, b, c, d)                         \
-    DEFINE_LUABIND_CLASS_WRAPPER_2(a, CWrapperPure<a>, b, c, d) \
-    luabind_virtual_Pure(a, CWrapperPure<a>)
+//#define luabind_class_pure2(a, b, c, d)                         \
+//    DEFINE_LUABIND_CLASS_WRAPPER_2(a, CWrapperPure<a>, b, c, d) \
+//    luabind_virtual_Pure(a, CWrapperPure<a>)
 
 #define luabind_class_abstract2(a, b, c, d)                         \
     DEFINE_LUABIND_CLASS_WRAPPER_2(a, CWrapperAbstract<a>, b, c, d) \
     luabind_virtual_Abstract(a, CWrapperAbstract<a>)
 
-#define luabind_class_alife2(a, b, c, d)                                 \
-    DEFINE_LUABIND_CLASS_WRAPPER_2(a, CWrapperAbstractALife<a>, b, c, d) \
-    luabind_virtual_Alife(a, CWrapperAbstractALife<a>)
+//#define luabind_class_alife2(a, b, c, d)                                 \
+//    DEFINE_LUABIND_CLASS_WRAPPER_2(a, CWrapperAbstractALife<a>, b, c, d) \
+//    luabind_virtual_Alife(a, CWrapperAbstractALife<a>)
 
 #define luabind_class_dynamic_alife2(a, b, c, d)                                \
     DEFINE_LUABIND_CLASS_WRAPPER_2(a, CWrapperAbstractDynamicALife<a>, b, c, d) \
@@ -415,9 +415,9 @@ struct CWrapperAbstractItem : public T, public luabind::wrap_base
     DEFINE_LUABIND_CLASS_WRAPPER_2(a, CWrapperAbstractOnlineOfflineGroup<a>, b, c, d) \
     luabind_virtual_OnlineOfflineGroup(a, CWrapperAbstractOnlineOfflineGroup<a>)
 
-#define luabind_class_creature2(a, b, c, d)                                 \
-    DEFINE_LUABIND_CLASS_WRAPPER_2(a, CWrapperAbstractCreature<a>, b, c, d) \
-    luabind_virtual_Creature(a, CWrapperAbstractCreature<a>)
+//#define luabind_class_creature2(a, b, c, d)                                 \
+//    DEFINE_LUABIND_CLASS_WRAPPER_2(a, CWrapperAbstractCreature<a>, b, c, d) \
+//    luabind_virtual_Creature(a, CWrapperAbstractCreature<a>)
 
 #define luabind_class_monster2(a, b, c, d)                                 \
     DEFINE_LUABIND_CLASS_WRAPPER_2(a, CWrapperAbstractMonster<a>, b, c, d) \
@@ -430,69 +430,69 @@ struct CWrapperAbstractItem : public T, public luabind::wrap_base
 //////////////////////////////////////////////////////////////////////////
 // 3
 //////////////////////////////////////////////////////////////////////////
-#define luabind_class_pure3(a, b, c, d, e)                         \
-    DEFINE_LUABIND_CLASS_WRAPPER_3(a, CWrapperPure<a>, b, c, d, e) \
-    luabind_virtual_Pure(a, CWrapperPure<a>)
+//#define luabind_class_pure3(a, b, c, d, e)                         \
+//    DEFINE_LUABIND_CLASS_WRAPPER_3(a, CWrapperPure<a>, b, c, d, e) \
+//    luabind_virtual_Pure(a, CWrapperPure<a>)
 
-#define luabind_class_abstract3(a, b, c, d, e)                         \
-    DEFINE_LUABIND_CLASS_WRAPPER_3(a, CWrapperAbstract<a>, b, c, d, e) \
-    luabind_virtual_Abstract(a, CWrapperAbstract<a>)
+//#define luabind_class_abstract3(a, b, c, d, e)                         \
+//    DEFINE_LUABIND_CLASS_WRAPPER_3(a, CWrapperAbstract<a>, b, c, d, e) \
+//    luabind_virtual_Abstract(a, CWrapperAbstract<a>)
 
-#define luabind_class_alife3(a, b, c, d, e)                                 \
-    DEFINE_LUABIND_CLASS_WRAPPER_3(a, CWrapperAbstractALife<a>, b, c, d, e) \
-    luabind_virtual_Alife(a, CWrapperAbstractALife<a>)
+//#define luabind_class_alife3(a, b, c, d, e)                                 \
+//    DEFINE_LUABIND_CLASS_WRAPPER_3(a, CWrapperAbstractALife<a>, b, c, d, e) \
+//    luabind_virtual_Alife(a, CWrapperAbstractALife<a>)
 
 #define luabind_class_dynamic_alife3(a, b, c, d, e)                                \
     DEFINE_LUABIND_CLASS_WRAPPER_3(a, CWrapperAbstractDynamicALife<a>, b, c, d, e) \
     luabind_virtual_DynamicAlife(a, CWrapperAbstractDynamicALife<a>)
 
-#define luabind_class_zone3(a, b, c, d, e)                                 \
-    DEFINE_LUABIND_CLASS_WRAPPER_3(a, CWrapperAbstractZone<a>, b, c, d, e) \
-    luabind_virtual_Zone(a, CWrapperAbstractZone<a>)
+//#define luabind_class_zone3(a, b, c, d, e)                                 \
+//    DEFINE_LUABIND_CLASS_WRAPPER_3(a, CWrapperAbstractZone<a>, b, c, d, e) \
+//    luabind_virtual_Zone(a, CWrapperAbstractZone<a>)
 
 #define luabind_class_creature3(a, b, c, d, e)                                 \
     DEFINE_LUABIND_CLASS_WRAPPER_3(a, CWrapperAbstractCreature<a>, b, c, d, e) \
     luabind_virtual_Creature(a, CWrapperAbstractCreature<a>)
 
-#define luabind_class_monster3(a, b, c, d, e)                                 \
-    DEFINE_LUABIND_CLASS_WRAPPER_3(a, CWrapperAbstractMonster<a>, b, c, d, e) \
-    luabind_virtual_Monster(a, CWrapperAbstractMonster<a>)
+//#define luabind_class_monster3(a, b, c, d, e)                                 \
+//    DEFINE_LUABIND_CLASS_WRAPPER_3(a, CWrapperAbstractMonster<a>, b, c, d, e) \
+//    luabind_virtual_Monster(a, CWrapperAbstractMonster<a>)
 
-#define luabind_class_item3(a, b, c, d, e)                                 \
-    DEFINE_LUABIND_CLASS_WRAPPER_3(a, CWrapperAbstractItem<a>, b, c, d, e) \
-    luabind_virtual_Item(a, CWrapperAbstractItem<a>)
+//#define luabind_class_item3(a, b, c, d, e)                                 \
+//    DEFINE_LUABIND_CLASS_WRAPPER_3(a, CWrapperAbstractItem<a>, b, c, d, e) \
+//    luabind_virtual_Item(a, CWrapperAbstractItem<a>)
 
 //////////////////////////////////////////////////////////////////////////
 // 4
 //////////////////////////////////////////////////////////////////////////
-#define luabind_class_pure4(a, b, c, d, e, f)                         \
-    DEFINE_LUABIND_CLASS_WRAPPER_4(a, CWrapperPure<a>, b, c, d, e, f) \
-    luabind_virtual_Pure(a, CWrapperPure<a>)
-
-#define luabind_class_abstract4(a, b, c, d, e, f)                         \
-    DEFINE_LUABIND_CLASS_WRAPPER_4(a, CWrapperAbstract<a>, b, c, d, e, f) \
-    luabind_virtual_Abstract(a, CWrapperAbstract<a>)
-
-#define luabind_class_alife4(a, b, c, d, e, f)                                 \
-    DEFINE_LUABIND_CLASS_WRAPPER_4(a, CWrapperAbstractALife<a>, b, c, d, e, f) \
-    luabind_virtual_Alife(a, CWrapperAbstractALife<a>)
-
-#define luabind_class_dynamic_alife4(a, b, c, d, e, f)                                \
-    DEFINE_LUABIND_CLASS_WRAPPER_4(a, CWrapperAbstractDynamicALife<a>, b, c, d, e, f) \
-    luabind_virtual_DynamicAlife(a, CWrapperAbstractDynamicALife<a>)
-
-#define luabind_class_zone4(a, b, c, d, e, f)                                 \
-    DEFINE_LUABIND_CLASS_WRAPPER_4(a, CWrapperAbstractZone<a>, b, c, d, e, f) \
-    luabind_virtual_Zone(a, CWrapperAbstractZone<a>)
-
-#define luabind_class_creature4(a, b, c, d, e, f)                                 \
-    DEFINE_LUABIND_CLASS_WRAPPER_4(a, CWrapperAbstractCreature<a>, b, c, d, e, f) \
-    luabind_virtual_Creature(a, CWrapperAbstractCreature<a>)
-
-#define luabind_class_monster4(a, b, c, d, e, f)                                 \
-    DEFINE_LUABIND_CLASS_WRAPPER_4(a, CWrapperAbstractMonster<a>, b, c, d, e, f) \
-    luabind_virtual_Monster(a, CWrapperAbstractMonster<a>)
-
-#define luabind_class_item4(a, b, c, d, e, f)                                 \
-    DEFINE_LUABIND_CLASS_WRAPPER_4(a, CWrapperAbstractItem<a>, b, c, d, e, f) \
-    luabind_virtual_Item(a, CWrapperAbstractItem<a>)
+//#define luabind_class_pure4(a, b, c, d, e, f)                         \
+//    DEFINE_LUABIND_CLASS_WRAPPER_4(a, CWrapperPure<a>, b, c, d, e, f) \
+//    luabind_virtual_Pure(a, CWrapperPure<a>)
+//
+//#define luabind_class_abstract4(a, b, c, d, e, f)                         \
+//    DEFINE_LUABIND_CLASS_WRAPPER_4(a, CWrapperAbstract<a>, b, c, d, e, f) \
+//    luabind_virtual_Abstract(a, CWrapperAbstract<a>)
+//
+//#define luabind_class_alife4(a, b, c, d, e, f)                                 \
+//    DEFINE_LUABIND_CLASS_WRAPPER_4(a, CWrapperAbstractALife<a>, b, c, d, e, f) \
+//    luabind_virtual_Alife(a, CWrapperAbstractALife<a>)
+//
+//#define luabind_class_dynamic_alife4(a, b, c, d, e, f)                                \
+//    DEFINE_LUABIND_CLASS_WRAPPER_4(a, CWrapperAbstractDynamicALife<a>, b, c, d, e, f) \
+//    luabind_virtual_DynamicAlife(a, CWrapperAbstractDynamicALife<a>)
+//
+//#define luabind_class_zone4(a, b, c, d, e, f)                                 \
+//    DEFINE_LUABIND_CLASS_WRAPPER_4(a, CWrapperAbstractZone<a>, b, c, d, e, f) \
+//    luabind_virtual_Zone(a, CWrapperAbstractZone<a>)
+//
+//#define luabind_class_creature4(a, b, c, d, e, f)                                 \
+//    DEFINE_LUABIND_CLASS_WRAPPER_4(a, CWrapperAbstractCreature<a>, b, c, d, e, f) \
+//    luabind_virtual_Creature(a, CWrapperAbstractCreature<a>)
+//
+//#define luabind_class_monster4(a, b, c, d, e, f)                                 \
+//    DEFINE_LUABIND_CLASS_WRAPPER_4(a, CWrapperAbstractMonster<a>, b, c, d, e, f) \
+//    luabind_virtual_Monster(a, CWrapperAbstractMonster<a>)
+//
+//#define luabind_class_item4(a, b, c, d, e, f)                                 \
+//    DEFINE_LUABIND_CLASS_WRAPPER_4(a, CWrapperAbstractItem<a>, b, c, d, e, f) \
+//    luabind_virtual_Item(a, CWrapperAbstractItem<a>)

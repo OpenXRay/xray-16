@@ -86,12 +86,12 @@ CSE_SmartCover::~CSE_SmartCover()
 #endif // XRSE_FACTORY_EXPORTS
 }
 
-IServerEntityShape* CSE_SmartCover::shape() { return (this); }
-bool CSE_SmartCover::used_ai_locations() const { return (true); }
-bool CSE_SmartCover::can_save() const { return (true); }
-bool CSE_SmartCover::can_switch_online() const { return (true); }
-bool CSE_SmartCover::can_switch_offline() const { return (false); }
-bool CSE_SmartCover::interactive() const { return (false); }
+IServerEntityShape* CSE_SmartCover::shape() { return this; }
+bool CSE_SmartCover::used_ai_locations() const throw() { return true; }
+bool CSE_SmartCover::can_save() const throw() { return true; }
+bool CSE_SmartCover::can_switch_online() const throw() { return true; }
+bool CSE_SmartCover::can_switch_offline() const throw() { return false; }
+bool CSE_SmartCover::interactive() const throw() { return false; }
 LPCSTR CSE_SmartCover::description() const { return (m_description.c_str()); }
 #ifndef AI_COMPILER
 void CSE_SmartCover::set_available_loopholes(luabind::object table) { m_available_loopholes = table; }

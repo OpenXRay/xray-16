@@ -228,7 +228,7 @@ public:
     SPHBonesData saved_bones;
     u16 source_id; // for break only
     virtual void load(NET_Packet& tNetPacket);
-    virtual bool need_save() const { return (!_flags.test(flNotSave)); }
+    virtual bool need_save() const throw() { return !_flags.test(flNotSave); }
     virtual void set_sorce_id(u16 si) { source_id = si; }
     virtual u16 get_source_id() { return source_id; }
     virtual CSE_Abstract* cast_abstract() { return 0; }

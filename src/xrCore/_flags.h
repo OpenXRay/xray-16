@@ -15,43 +15,43 @@ public:
 public:
     T flags;
 
-    TYPE get() const { return flags; }
-    SelfRef zero()
+    TYPE get() const throw() { return flags; }
+    SelfRef zero() throw()
     {
         flags = T(0);
         return *this;
     }
-    SelfRef one()
+    SelfRef one() throw()
     {
         flags = T(-1);
         return *this;
     }
-    SelfRef invert()
+    SelfRef invert() throw()
     {
         flags = ~flags;
         return *this;
     }
-    SelfRef invert(const Self& f)
+    SelfRef invert(const Self& f) throw()
     {
         flags = ~f.flags;
         return *this;
     }
-    SelfRef invert(const T mask)
+    SelfRef invert(const T mask) throw()
     {
         flags ^= mask;
         return *this;
     }
-    SelfRef assign(const Self& f)
+    SelfRef assign(const Self& f) throw()
     {
         flags = f.flags;
         return *this;
     }
-    SelfRef assign(const T mask)
+    SelfRef assign(const T mask) throw()
     {
         flags = mask;
         return *this;
     }
-    SelfRef set(const T mask, BOOL value)
+    SelfRef set(const T mask, BOOL value) throw()
     {
         if (value)
             flags |= mask;
@@ -59,31 +59,31 @@ public:
             flags &= ~mask;
         return *this;
     }
-    BOOL is(const T mask) const { return mask == (flags & mask); }
-    BOOL is_any(const T mask) const { return BOOL(!!(flags & mask)); }
-    BOOL test(const T mask) const { return BOOL(!!(flags & mask)); }
-    SelfRef or (const T mask)
+    BOOL is(const T mask) const throw() { return mask == (flags & mask); }
+    BOOL is_any(const T mask) const throw() { return BOOL(!!(flags & mask)); }
+    BOOL test(const T mask) const throw() { return BOOL(!!(flags & mask)); }
+    SelfRef or (const T mask) throw()
     {
         flags |= mask;
         return *this;
     }
-    SelfRef or (const Self& f, const T mask)
+    SelfRef or (const Self& f, const T mask) throw()
     {
         flags = f.flags | mask;
         return *this;
     }
-    SelfRef and (const T mask)
+    SelfRef and (const T mask) throw()
     {
         flags &= mask;
         return *this;
     }
-    SelfRef and (const Self& f, const T mask)
+    SelfRef and (const Self& f, const T mask) throw()
     {
         flags = f.flags & mask;
         return *this;
     }
-    BOOL equal(const Self& f) const { return flags == f.flags; }
-    BOOL equal(const Self& f, const T mask) const { return (flags & mask) == (f.flags & mask); }
+    BOOL equal(const Self& f) const throw() { return flags == f.flags; }
+    BOOL equal(const Self& f, const T mask) const throw() { return (flags & mask) == (f.flags & mask); }
 };
 
 typedef _flags<u8> Flags8;
