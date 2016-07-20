@@ -181,8 +181,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\xrEngine\GameMtlLib.cpp" />
-    <ClCompile Include="..\..\xrEngine\GameMtlLib_Engine.cpp" />
+    <ClCompile Include="$(SolutionDir)xrEngine\GameMtlLib.cpp" />
+    <ClCompile Include="$(SolutionDir)xrEngine\GameMtlLib_Engine.cpp" />
     <ClCompile Include="..\Shared\BlenderListLoader.cpp" />
     <ClCompile Include="..\Shared\ELog.cpp" />
     <ClCompile Include="Material\crc16.cpp" />
@@ -194,7 +194,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\xrEngine\GameMtlLib.h" />
+    <ClInclude Include="$(SolutionDir)xrEngine\GameMtlLib.h" />
     <ClInclude Include="..\Shared\BlenderListLoader.h" />
     <ClInclude Include="..\Shared\ELog.h" />
     <CustomBuild Include="Material\Stdafx.h" />
@@ -204,7 +204,7 @@
     <None Include="Material\AEXRayMtlTemplate.mel" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\xrCore\xrCore.vcxproj">
+    <ProjectReference Include="$(SolutionDir)xrCore\xrCore.vcxproj">
       <Project>{a0f7d1fb-59a7-4717-a7e4-96f37e91998e}</Project>
     </ProjectReference>
   </ItemGroup>
