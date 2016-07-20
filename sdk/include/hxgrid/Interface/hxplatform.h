@@ -1,4 +1,3 @@
-
 #pragma once
 
 #ifdef _XBOX
@@ -15,7 +14,13 @@
 
 #else _WINDOWS_ANYWAY
 
+// XXX: Perhaps requesting Windows 2000 functionality is a bit silly in 2016?
+#if !defined(_WIN32_WINNT) || (_WIN32_WINNT < 0x0500)
+#ifdef _WIN32_WINNT
+#undef _WIN32_WINNT
+#endif
 #define _WIN32_WINNT	0x0500
+#endif
 
 #include <windows.h>
 

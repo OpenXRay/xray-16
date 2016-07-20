@@ -1,6 +1,6 @@
 #ifndef __Q__
 #define __Q__
-#include "Common/inlining_macros.h"
+#include "xrCommon/inlining_macros.h"
 #include "_vector3d.h"
 
 /***************************************************************************

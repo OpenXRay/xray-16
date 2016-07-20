@@ -7,7 +7,7 @@
 #endif
 
 #include "xr_impexp_macros.h"
-#include "inlining_macros.h"
+#include "xrCommon/inlining_macros.h"
 
 #if defined(__GNUC__)
 #define XR_ASSUME(expr)  if (expr){} else __builtin_unreachable()

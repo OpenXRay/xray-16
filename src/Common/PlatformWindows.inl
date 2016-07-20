@@ -4,6 +4,7 @@
 #define DIRECTINPUT_VERSION 0x0800 //
 
 #ifndef _WIN32_WINNT
+// Request Windows XP functionality
 #define _WIN32_WINNT 0x0501
 #endif
 

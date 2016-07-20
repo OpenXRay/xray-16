@@ -6639,15 +6639,13 @@
     <ClInclude Include="CdkeyDecode\cdkeydecode.h">
       <Filter>Core\Server\CdkeyDecode</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Externals\GameSpy\src\GameSpy\md5.h">
-      <Filter>Core\Client\Level\ClientDigestComputer</Filter>
-    </ClInclude>
     <ClInclude Include="..\xrServerEntities\pch_script.h">
       <Filter>PCH</Filter>
     </ClInclude>
     <ClInclude Include="StdAfx.h">
       <Filter>PCH</Filter>
     </ClInclude>
+    <ClInclude Include="$(xrExternals)GameSpy\src\GameSpy\md5.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="damage_manager.cpp">
@@ -10148,15 +10146,13 @@
     <ClCompile Include="CdkeyDecode\cdkeydecode.c">
       <Filter>Core\Server\CdkeyDecode</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Externals\GameSpy\src\GameSpy\md5c.c">
-      <Filter>Core\Client\Level\ClientDigestComputer</Filter>
-    </ClCompile>
     <ClCompile Include="..\xrServerEntities\pch_script.cpp">
       <Filter>PCH</Filter>
     </ClCompile>
     <ClCompile Include="StdAfx.cpp">
       <Filter>PCH</Filter>
     </ClCompile>
+    <ClCompile Include="$(xrExternals)GameSpy\src\GameSpy\md5c.c" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="ai\monsters\chimera\chimera_attack_state.h">

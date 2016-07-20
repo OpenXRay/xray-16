@@ -7,7 +7,7 @@
 #include "xrCore/_flags.h"
 #include "xrCore/xr_resource.h"
 #include "xrCore/_vector3d.h"
-#include "xrCore/_stl_extensions.h" // DEFINE_VECTOR
+#include "xrCommon/xr_vector.h" // DEFINE_VECTOR
 
 #ifdef XRSOUND_EXPORTS
 #define XRSOUND_API XR_EXPORT
@@ -321,9 +321,5 @@ public:
 
 class CSound_manager_interface;
 extern XRSOUND_API CSound_manager_interface* Sound;
-
-#ifndef DEBUG
-#include "Sound.inl"
-#endif
 
 #endif // include guard

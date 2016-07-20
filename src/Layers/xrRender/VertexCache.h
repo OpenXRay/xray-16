@@ -1,7 +1,7 @@
 #pragma once
 #ifndef VERTEX_CACHE_H
 #define VERTEX_CACHE_H
-#include"Common/inlining_macros.h"
+#include"xrCommon/inlining_macros.h"
 #include"xrCore/_types.h"
 #include"xrCore/_stl_extensions.h"
 

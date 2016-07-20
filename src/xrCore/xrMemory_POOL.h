@@ -3,7 +3,7 @@
 #define xrMemory_POOLh
 #include "_types.h"
 #include "Threading/Lock.hpp"
-#include "Common/inlining_macros.h"
+#include "xrCommon/inlining_macros.h"
 
 class xrMemory;
 

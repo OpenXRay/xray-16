@@ -89,7 +89,7 @@ public:
 
     BENCH_SEC_SCRAMBLEVTBL2
 
-    virtual void fill_tips(vecTips& tips, u32 mode) { add_LRU_to_tips(tips); }
+    virtual void fill_tips(vecTips& tips, u32 /*mode*/) { add_LRU_to_tips(tips); }
     // vecLRU& LRU () { return m_LRU; }
     virtual void add_to_LRU(shared_str const& arg);
     void add_LRU_to_tips(vecTips& tips);
@@ -137,7 +137,7 @@ protected:
 public:
     CCC_ToggleMask(LPCSTR N, Flags32* V, u32 M) : IConsole_Command(N), value(V), mask(M) { bEmptyArgsHandled = TRUE; };
     const BOOL GetValue() const { return value->test(mask); }
-    virtual void Execute(LPCSTR args)
+    virtual void Execute(LPCSTR /*args*/)
     {
         value->set(mask, !GetValue());
         TStatus S;
