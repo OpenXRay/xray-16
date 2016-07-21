@@ -24,7 +24,7 @@ void	CreateIndexBuffer(GLuint* pBuffer, const void* pData, UINT DataSize, bool b
 	return CreateBuffer(pBuffer, pData, DataSize, bImmutable, true);
 }
 
-GLsizei	VertexSizeList[] =
+const GLsizei VertexSizeList[] =
 {
 	1,	// D3DDECLTYPE_FLOAT1
 	2,	// D3DDECLTYPE_FLOAT2
@@ -45,7 +45,7 @@ GLsizei	VertexSizeList[] =
 	4	// D3DDECLTYPE_FLOAT16_4
 };
 
-GLenum	VertexTypeList[] =
+const GLenum VertexTypeList[] =
 {
 	GL_FLOAT,			// D3DDECLTYPE_FLOAT1
 	GL_FLOAT,			// D3DDECLTYPE_FLOAT2
@@ -66,7 +66,7 @@ GLenum	VertexTypeList[] =
 	GL_HALF_FLOAT		// D3DDECLTYPE_FLOAT16_4
 };
 
-GLboolean	VertexNormalizedList[] =
+const GLboolean VertexNormalizedList[] =
 {
 	GL_FALSE,	// D3DDECLTYPE_FLOAT1
 	GL_FALSE,	// D3DDECLTYPE_FLOAT2
@@ -87,7 +87,7 @@ GLboolean	VertexNormalizedList[] =
 	GL_FALSE	// D3DDECLTYPE_FLOAT16_4
 };
 
-GLsizei	VertexTypeSizeList[] =
+const GLsizei VertexTypeSizeList[] =
 {
 	sizeof(GLfloat),	// D3DDECLTYPE_FLOAT1
 	sizeof(GLfloat),	// D3DDECLTYPE_FLOAT2
@@ -108,22 +108,22 @@ GLsizei	VertexTypeSizeList[] =
 	sizeof(GLhalf)		// D3DDECLTYPE_FLOAT16_4
 };
 
-GLuint	VertexUsageList[] =
+const GLuint VertexUsageList[] =
 {
 	3,	// D3DDECLUSAGE_POSITION
-	-1,	// D3DDECLUSAGE_BLENDWEIGHT
-	-1,	// D3DDECLUSAGE_BLENDINDICES
+	~0u,	// D3DDECLUSAGE_BLENDWEIGHT
+	~0u,	// D3DDECLUSAGE_BLENDINDICES
 	5,	// D3DDECLUSAGE_NORMAL
-	-1,	// D3DDECLUSAGE_PSIZE
+	~0u,	// D3DDECLUSAGE_PSIZE
 	8,	// D3DDECLUSAGE_TEXCOORD
 	4,	// D3DDECLUSAGE_TANGENT
 	6,	// D3DDECLUSAGE_BINORMAL
-	-1,	// D3DDECLUSAGE_TESSFACTOR
-	-1,	// D3DDECLUSAGE_POSITIONT
+	~0u,	// D3DDECLUSAGE_TESSFACTOR
+	~0u,	// D3DDECLUSAGE_POSITIONT
 	0,	// D3DDECLUSAGE_COLOR
 	7,	// D3DDECLUSAGE_FOG
-	-1,	// D3DDECLUSAGE_DEPTH
-	-1,	// D3DDECLUSAGE_SAMPLE
+	~0u,	// D3DDECLUSAGE_DEPTH
+	~0u,	// D3DDECLUSAGE_SAMPLE
 };
 
 GLsizei GetDeclVertexSize(const D3DVERTEXELEMENT9* decl)
@@ -145,6 +145,7 @@ void ConvertVertexDeclaration(const D3DVERTEXELEMENT9* dxdecl, SDeclaration* dec
 {
 	RCache.set_Format(decl);
 
+	// XXX: tamlin: use 'stride', or drop it.
 	GLsizei stride = GetDeclVertexSize(dxdecl);
 	for (int i = 0; i < MAXD3DDECLLENGTH; ++i)
 	{
@@ -279,4 +280,4 @@ u32 GetDeclLength(const D3DVERTEXELEMENT9 *decl)
 	return element - decl;
 }
 
-};
+} // namespace glBufferUtils

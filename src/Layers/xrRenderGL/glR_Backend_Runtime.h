@@ -70,7 +70,9 @@ ICF void CBackend::set_PS(GLuint _ps, LPCSTR _n)
 {
 	if (ps != _ps)
 	{
+#ifdef RBackend_PGO
 		string_path name;
+#endif
 		PGO(glGetObjectLabel(GL_PROGRAM, _ps, sizeof(name), nullptr, name));
 		PGO(Msg("PGO:Pshader:%d,%s", _ps, _n ? _n : name));
 		stat.ps++;
@@ -86,7 +88,9 @@ ICF void CBackend::set_GS(GLuint _gs, LPCSTR _n)
 {
 	if (gs != _gs)
 	{
+#ifdef RBackend_PGO
 		string_path name;
+#endif
 		PGO(glGetObjectLabel(GL_PROGRAM, _ps, sizeof(name), nullptr, name));
 		PGO(Msg("PGO:Gshader:%d,%s", _ps, _n ? _n : name));
 		//	TODO: OGL: Get statistics for G Shader change
@@ -103,7 +107,9 @@ ICF void CBackend::set_VS(GLuint _vs, LPCSTR _n)
 {
 	if (vs != _vs)
 	{
+#ifdef RBackend_PGO
 		string_path name;
+#endif
 		PGO(glGetObjectLabel(GL_PROGRAM, _vs, sizeof(name), nullptr, name));
 		PGO(Msg("PGO:Vshader:%d,%s", _vs, _n ? _n : name));
 		stat.vs++;

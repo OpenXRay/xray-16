@@ -328,7 +328,7 @@ public:
 		dbg_lines.back().P1		= P1;
 		dbg_lines.back().color	= c;
 	}
-	IC void						dbg_addplane			(Fplane& P0,  u32 c)								{
+	IC void dbg_addplane(Fplane& P0,  u32 /*c*/) {
 		dbg_planes.push_back(P0);
 	}
 #else

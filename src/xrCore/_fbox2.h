@@ -32,10 +32,10 @@ public:
         max.set(_max);
         return *this;
     };
-    IC SelfRef set(T x1, T y1, T x2, T y2)
+    IC SelfRef set(T x1_, T y1_, T x2_, T y2_)
     {
-        min.set(x1, y1);
-        max.set(x2, y2);
+        min.set(x1_, y1_);
+        max.set(x2_, y2_);
         return *this;
     };
     IC SelfRef set(SelfCRef b)

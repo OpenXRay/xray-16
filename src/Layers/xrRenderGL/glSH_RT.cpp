@@ -38,8 +38,9 @@ void CRT::create	(LPCSTR Name, u32 w, u32 h,	D3DFORMAT f, u32 SampleCount )
 	CHK_GL(glGetIntegerv(GL_MAX_FRAMEBUFFER_HEIGHT, &max_height));
 
 	// Check width-and-height of render target surface
-	if (w>max_width)		return;
-	if (h>max_height)		return;
+	// XXX: While seemingly silly, assert w/h are positive?
+	if (w>u32(max_width))		return;
+	if (h>u32(max_height))		return;
 
 	RImplementation.Resources->Evict();
 
@@ -58,7 +59,7 @@ void CRT::create	(LPCSTR Name, u32 w, u32 h,	D3DFORMAT f, u32 SampleCount )
 	pZRT = pRT;
 }
 
-void CRT::destroy		()
+void CRT::destroy()
 {
 	if (pTexture._get())	{
 		pTexture->surface_set(target, 0);
@@ -66,15 +67,18 @@ void CRT::destroy		()
 	}
 	CHK_GL(glDeleteTextures(1, &pRT));
 }
-void CRT::reset_begin	()
+
+void CRT::reset_begin()
 {
 	destroy		();
 }
-void CRT::reset_end		()
+
+void CRT::reset_end()
 {
-	create		(*cName,dwWidth,dwHeight,fmt);
+	create(*cName,dwWidth,dwHeight,fmt);
 }
-void resptrcode_crt::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount)
+
+void resptrcode_crt::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 /*SampleCount*/)
 {
-	_set			(RImplementation.Resources->_CreateRT(Name,w,h,f));
+	_set(RImplementation.Resources->_CreateRT(Name,w,h,f));
 }

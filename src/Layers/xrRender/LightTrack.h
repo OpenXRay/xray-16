@@ -82,9 +82,9 @@ public:
     virtual void force_mode(u32 mode) { MODE = mode; };
     virtual float get_luminocity()
     {
-        float result = _max(approximate.x, _max(approximate.y, approximate.z));
-        clamp(result, 0.f, 1.f);
-        return (result);
+        float result_ = _max(approximate.x, _max(approximate.y, approximate.z));
+        clamp(result_, 0.f, 1.f);
+        return (result_);
     };
     virtual float get_luminocity_hemi() { return get_hemi(); }
     virtual float* get_luminocity_hemi_cube() { return hemi_cube_smooth; }

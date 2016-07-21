@@ -51,7 +51,7 @@ public:
     void Render_ZB();
     //	void					Debug		();
 
-    void occlude(Fbox2& space) {}
+    void occlude(Fbox2& /*space*/) {}
     void Disable();
     void Enable();
 

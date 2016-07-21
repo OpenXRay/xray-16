@@ -95,7 +95,7 @@ static class cl_sun_shafts_intensity : public R_constant_setup
 
 static class cl_alpha_ref	: public R_constant_setup 
 {	
-	virtual void setup (R_constant* C) 
+	virtual void setup (R_constant* /*C*/) 
 	{ 
 		// TODO: OGL: Implement AlphaRef.
 		//StateManager.BindAlphaRef(C);
