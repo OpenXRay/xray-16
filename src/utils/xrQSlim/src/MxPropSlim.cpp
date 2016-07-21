@@ -460,7 +460,7 @@ void MxPropSlim::compute_target_placement(edge_info* info)
         {
             e_min = ej;
             best = vj;
-            swap(info->v1, info->v2);
+            std::swap(info->v1, info->v2);
         }
 
         if (placement_policy >= MX_PLACE_ENDORMID)

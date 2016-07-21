@@ -48,25 +48,28 @@ CScriptIniFile* get_game_ini() { return (CScriptIniFile*)pGameIni; }
 
 static void CScriptIniFile_Export(lua_State* luaState)
 {
-    module(luaState)[class_<CScriptIniFile>("ini_file")
-                         .def(constructor<LPCSTR>())
-                         .def("section_exist", &CScriptIniFile::section_exist)
-                         .def("line_exist", &CScriptIniFile::line_exist)
-                         .def("r_clsid", &CScriptIniFile::r_clsid)
-                         .def("r_bool", &CScriptIniFile::r_bool)
-                         .def("r_token", &CScriptIniFile::r_token)
-                         .def("r_string_wq", &CScriptIniFile::r_string_wb)
-                         .def("line_count", &CScriptIniFile::line_count)
-                         .def("r_string", &CScriptIniFile::r_string)
-                         .def("r_u32", &CScriptIniFile::r_u32)
-                         .def("r_s32", &CScriptIniFile::r_s32)
-                         .def("r_float", &CScriptIniFile::r_float)
-                         .def("r_vector", &CScriptIniFile::r_fvector3)
-                         .def("r_line", &::r_line, policy_list<out_value<4>, out_value<5>>()),
+    module(luaState)
+    [
+        class_<CScriptIniFile>("ini_file")
+            .def(constructor<LPCSTR>())
+            .def("section_exist", &CScriptIniFile::section_exist)
+            .def("line_exist", (bool (CScriptIniFile::*)(LPCSTR, LPCSTR) const)&CScriptIniFile::line_exist)
+            .def("r_clsid", &CScriptIniFile::r_clsid)
+            .def("r_bool", &CScriptIniFile::r_bool)
+            .def("r_token", &CScriptIniFile::r_token)
+            .def("r_string_wq", &CScriptIniFile::r_string_wb)
+            .def("line_count", &CScriptIniFile::line_count)
+            .def("r_string", &CScriptIniFile::r_string)
+            .def("r_u32", &CScriptIniFile::r_u32)
+            .def("r_s32", &CScriptIniFile::r_s32)
+            .def("r_float", &CScriptIniFile::r_float)
+            .def("r_vector", &CScriptIniFile::r_fvector3)
+            .def("r_line", &::r_line, policy_list<out_value<4>, out_value<5>>()),
 #ifdef XRGAME_EXPORTS
-        def("game_ini", &get_game_ini),
+            def("game_ini", &get_game_ini),
 #endif
-        def("system_ini", &get_system_ini), def("create_ini_file", &create_ini_file, adopt<0>())];
+            def("system_ini", &get_system_ini), def("create_ini_file", &create_ini_file, adopt<0>())
+    ];
 }
 
 SCRIPT_EXPORT_FUNC(CScriptIniFile, (), CScriptIniFile_Export);

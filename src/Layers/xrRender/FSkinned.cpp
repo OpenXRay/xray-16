@@ -11,6 +11,12 @@
 #include "SkeletonX.h"
 #include "Layers/xrRenderDX10/dx10BufferUtils.h"
 #include "xrEngine/EnnumerateVertices.h"
+#include "xrCore/xrDebug_macros.h"
+
+#ifdef DEBUG
+#include "xrCore/dump_string.h"
+#endif
+
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
@@ -42,7 +48,7 @@ float errN(Fvector3 v, u8* qv)
     return v.dotproduct(uv);
 }
 #else
-float errN(Fvector3 v, u8* qv) { return 0; }
+float errN(Fvector3 /*v*/, u8* /*qv*/) { return 0; }
 #endif
 
 static D3DVERTEXELEMENT9 dwDecl_01W[] = // 24bytes
@@ -342,7 +348,7 @@ void CSkeletonX_PM::Render(float LOD)
     FSlideWindow& SW = nSWI.sw[lod_id];
     _Render(rm_geom, SW.num_verts, SW.offset, SW.num_tris);
 }
-void CSkeletonX_ST::Render(float LOD) { _Render(rm_geom, vCount, 0, dwPrimitives); }
+void CSkeletonX_ST::Render(float /*LOD*/) { _Render(rm_geom, vCount, 0, dwPrimitives); }
 //////////////////////////////////////////////////////////////////////
 void CSkeletonX_PM::Release() { inherited1::Release(); }
 void CSkeletonX_ST::Release() { inherited1::Release(); }
@@ -1043,7 +1049,7 @@ indices, CBoneData::FacesVec& faces)
 */
 
 BOOL CSkeletonX_ext::_PickBone(IKinematics::pick_result& r, float dist, const Fvector& start, const Fvector& dir,
-    Fvisual* V, u16 bone_id, u32 iBase, u32 iCount)
+    Fvisual* V, u16 bone_id, u32 iBase, u32 /*iCount*/)
 {
     VERIFY(Parent && (ChildIDX != u16(-1)));
     CBoneData& BD = Parent->LL_GetData(bone_id);
@@ -1224,21 +1230,21 @@ void CSkeletonX_ext::_FillVerticesHW4W(const Fmatrix& view, CSkeletonWallmark& w
         CHK_DX(V->p_rm_Vertices->Unlock());
     }
 
-    void CSkeletonX_ext::_FillVerticesHW3W(const Fmatrix& view, CSkeletonWallmark& wm, const Fvector& normal,
-        float size, Fvisual* V, u16* indices, CBoneData::FacesVec& faces)
+    void CSkeletonX_ext::_FillVerticesHW3W(const Fmatrix& /*view*/, CSkeletonWallmark& /*wm*/, const Fvector& /*normal*/,
+        float /*size*/, Fvisual* /*V*/, u16* /*indices*/, CBoneData::FacesVec& /*faces*/)
     {
         R_ASSERT2(0, "CSkeletonX_ext::_FillVerticesHW3W not implemented");
     }
 
-    void CSkeletonX_ext::_FillVerticesHW4W(const Fmatrix& view, CSkeletonWallmark& wm, const Fvector& normal,
-        float size, Fvisual* V, u16* indices, CBoneData::FacesVec& faces)
+    void CSkeletonX_ext::_FillVerticesHW4W(const Fmatrix& /*view*/, CSkeletonWallmark& /*wm*/, const Fvector& /*normal*/,
+        float /*size*/, Fvisual* /*V*/, u16* /*indices*/, CBoneData::FacesVec& /*faces*/)
     {
         R_ASSERT2(0, "CSkeletonX_ext::_FillVerticesHW4W not implemented");
     }
 #endif // USE_DX10
 
-void CSkeletonX_ext::_FillVertices(const Fmatrix& view, CSkeletonWallmark& wm, const Fvector& normal, float size,
-    Fvisual* V, u16 bone_id, u32 iBase, u32 iCount)
+void CSkeletonX_ext::_FillVertices(const Fmatrix& /*view*/, CSkeletonWallmark& /*wm*/, const Fvector& /*normal*/,
+    float /*size*/, Fvisual* /*V*/, u16 /*bone_id*/, u32 /*iBase*/, u32 /*iCount*/)
 {
     R_ASSERT2(0, "CSkeletonX_ext::_FillVertices not implemented");
 }
@@ -1368,7 +1374,7 @@ IC void TEnumBoneVertices(
     }
 }
 
-void CSkeletonX_ext::_EnumBoneVertices(SEnumVerticesCallback& C, Fvisual* V, u16 bone_id, u32 iBase, u32 iCount) const
+void CSkeletonX_ext::_EnumBoneVertices(SEnumVerticesCallback& C, Fvisual* V, u16 bone_id, u32 iBase, u32 /*iCount*/) const
 {
     VERIFY(Parent && (ChildIDX != u16(-1)));
     CBoneData& BD = Parent->LL_GetData(bone_id);

@@ -14,6 +14,7 @@
 #include "secure_messaging.h"
 #include "xrServer_updates_compressor.h"
 #include "xrClientsPool.h"
+#include "xrCore/_stl_extensions.h" // xr_hash_map
 
 #ifdef DEBUG
 //. #define SLOW_VERIFY_ENTITIES

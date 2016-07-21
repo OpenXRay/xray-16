@@ -12,6 +12,7 @@
 #include "xrServerEntities/xrServer_Space.h"
 #include "xrGame/game_object_space.h"
 #include "xrServerEntities/alife_space.h"
+#include "xrCommon/misc_math_types.h" // SRotation
 
 // refs
 // class ENGINE_API IRender_Visual;

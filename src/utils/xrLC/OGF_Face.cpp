@@ -3,6 +3,8 @@
 #include "ogf_face.h"
 #include "xrCore/fs.h"
 #include "xrCore/FMesh.hpp"
+#include "xrCore/_sphere.h"
+#include "xrCore/Threading/Lock.hpp"
 
 using namespace std;
 
@@ -520,8 +522,8 @@ void OGF_Node::Save(IWriter& fs)
     H.format_version = xrOGF_FormatVersion;
     H.type = MT_HIERRARHY;
     H.shader_id = 0;
-    H.bb.min = bbox.min;
-    H.bb.max = bbox.max;
+    H.bb.vMin = bbox.vMin;
+    H.bb.vMax = bbox.vMax;
     H.bs.c = C;
     H.bs.r = R;
     fs.w(&H, sizeof(H));
@@ -549,8 +551,8 @@ void OGF_LOD::Save(IWriter& fs)
     H.format_version = xrOGF_FormatVersion;
     H.type = MT_LOD;
     H.shader_id = RegisterShader(sid);
-    H.bb.min = bbox.min;
-    H.bb.max = bbox.max;
+    H.bb.vMin = bbox.vMin;
+    H.bb.vMax = bbox.vMax;
     H.bs.c = C;
     H.bs.r = R;
     fs.w(&H, sizeof(H));

@@ -1,6 +1,8 @@
+#pragma once
 #ifndef vis_commonH
 #define vis_commonH
-#pragma once
+#include "xrCore/_sphere.h"
+#include "xrCore/_fbox.h"
 
 #pragma pack(push, 4)
 struct vis_data

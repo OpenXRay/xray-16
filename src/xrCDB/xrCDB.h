@@ -1,9 +1,10 @@
+//#pragma once
 #ifndef XRCDB_H
 #define XRCDB_H
 
 #include "Common/Platform.hpp"
+#include "xrCore/Threading/Lock.hpp" // XXX: Remove from header. Put in .cpp.
 
-//#pragma once
 // The following ifdef block is the standard way of creating macros which make exporting
 // from a DLL simpler. All files within this DLL are compiled with the XRCDB_EXPORTS
 // symbol defined on the command line. this symbol should not be defined on any project
@@ -24,6 +25,9 @@ namespace Opcode
 class OPCODE_Model;
 class AABBNoLeafNode;
 };
+template <class T> class _box3;
+typedef _box3<float> Fbox;
+
 
 #pragma pack(push, 8)
 namespace CDB

@@ -550,7 +550,7 @@ CRTC*	CResourceManager::_CreateRTC		(LPCSTR Name, u32 size,	D3DFORMAT f)
     {
         CRTC *RT				=	new CRTC();
         RT->dwFlags				|=	xr_resource_flagged::RF_REGISTERED;
-        m_rtargets_c.insert		(mk_pair(RT->set_name(Name),RT));
+        m_rtargets_c.insert		(std::make_pair(RT->set_name(Name),RT));
         if (Device.b_is_Ready)	RT->create	(Name,size,f);
         return					RT;
     }

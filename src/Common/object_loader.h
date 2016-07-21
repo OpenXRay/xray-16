@@ -16,14 +16,14 @@ struct CLoader
     struct CHelper1
     {
         template <bool a>
-        static void load_data(T& data, M& stream, const P& p)
+        static void load_data(T& data, M& stream, const P& /*p*/)
         {
             static_assert(!std::is_polymorphic<T>::value, "Cannot load polymorphic classes as binary data.");
             stream.r(&data, sizeof(T));
         }
 
         template <>
-        static void load_data<true>(T& data, M& stream, const P& p)
+        static void load_data<true>(T& data, M& stream, const P& /*p*/)
         {
             T* data1 = const_cast<T*>(&data);
             data1->load(stream);
@@ -279,11 +279,11 @@ namespace detail
 struct CEmptyPredicate
 {
     template <typename T1, typename T2>
-    void after_load(T1& data, T2& stream) const {}
+    void after_load(T1& /*data*/, T2& /*stream*/) const {}
     template <typename T1, typename T2>
-    bool operator()(T1& data, const T2& value) const { return (true); }
+    bool operator()(T1& /*data*/, const T2& /*value*/) const { return true; }
     template <typename T1, typename T2>
-    bool operator()(T1& data, const T2& value, bool) const { return true; }
+    bool operator()(T1& /*data*/, const T2& /*value*/, bool) const { return true; }
     bool can_clear() const { return true; }
     bool can_add() const { return true; }
 };

@@ -95,9 +95,9 @@
     do\
     {\
         static bool ignoreAlways = false;\
-        HRESULT hr = expr;\
-        if (!ignoreAlways && FAILED(hr))\
-            xrDebug::Fail(ignoreAlways, DEBUG_INFO, #expr, hr);\
+        HRESULT hr_ = expr;\
+        if (!ignoreAlways && FAILED(hr_))\
+            xrDebug::Fail(ignoreAlways, DEBUG_INFO, #expr, hr_);\
     } while (false)
 #define CHK_GL(expr)\
     do\

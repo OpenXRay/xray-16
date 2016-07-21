@@ -11,7 +11,7 @@
 #include "ode/include/ode/collision.h"
 #include "ode/include/ode/matrix.h"
 
-#include "mathutils.h"
+#include "MathUtils.h"
 #include "ode_redefine.h"
 
 static const dReal accurate_normalize_epsilon = 1.192092896e-05F;

@@ -6646,6 +6646,9 @@
       <Filter>PCH</Filter>
     </ClInclude>
     <ClInclude Include="$(xrExternals)GameSpy\src\GameSpy\md5.h" />
+    <ClInclude Include="profile_data_types_script.h">
+      <Filter>Core\Server\Games\PlayerAccounts</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="damage_manager.cpp">

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "net_stream.h"
+#include "xrCore/_sphere.h"
 
 template <typename T>
 void r_pod_vector(INetReader& r, xr_vector<T>& v)

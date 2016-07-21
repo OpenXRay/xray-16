@@ -587,7 +587,7 @@ class CCC_Fog_Reload : public IConsole_Command
 {
 public:
     CCC_Fog_Reload(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = TRUE; };
-    virtual void Execute(LPCSTR args) { FluidManager.UpdateProfiles(); }
+    virtual void Execute(LPCSTR /*args*/) { FluidManager.UpdateProfiles(); }
 };
 #endif // DEBUG
 #endif // (RENDER == R_R3) || (RENDER == R_R4)

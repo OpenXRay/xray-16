@@ -58,8 +58,8 @@ void CDetailManager::cache_Task(int gx, int gz, Slot* D)
     D->sx = sx;
     D->sz = sz;
 
-    D->vis.box.min.set(sx * dm_slot_size, DS.r_ybase(), sz * dm_slot_size);
-    D->vis.box.max.set(D->vis.box.min.x + dm_slot_size, DS.r_ybase() + DS.r_yheight(), D->vis.box.min.z + dm_slot_size);
+    D->vis.box.vMin.set(sx * dm_slot_size, DS.r_ybase(), sz * dm_slot_size);
+    D->vis.box.vMax.set(D->vis.box.vMin.x + dm_slot_size, DS.r_ybase() + DS.r_yheight(), D->vis.box.vMin.z + dm_slot_size);
     D->vis.box.grow(EPS_L);
 
     for (u32 i = 0; i < dm_obj_in_slot; i++)

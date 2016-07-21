@@ -111,7 +111,7 @@ public:
         set_value(value, val);
         set_value(init_value, *val);
     };
-    virtual xr_string GetDrawText(TOnDrawTextEvent OnDrawText) { return ""; }
+    virtual xr_string GetDrawText(TOnDrawTextEvent /*OnDrawText*/) { return ""; }
     virtual bool Equal(PropValue* val)
     {
         CustomValue<T>* prop = (CustomValue<T>*)val;
@@ -364,7 +364,7 @@ public:
         return t.c_str() ? t.c_str() : "";
     }
     virtual void ResetValue() { ; }
-    virtual bool Equal(PropValue* val) { return true; }
+    virtual bool Equal(PropValue* /*val*/) { return true; }
     bool OnBtnClick(bool& bSafe)
     {
         if (!OnBtnClickEvent.empty())
@@ -769,7 +769,7 @@ public:
 
 public:
     TokenValueSH(u32* val, const Item* _items, u32 _cnt) : CustomValue<u32>(val), cnt(_cnt), items(_items){};
-    virtual xr_string GetDrawText(TOnDrawTextEvent OnDrawText)
+    virtual xr_string GetDrawText(TOnDrawTextEvent /*OnDrawText*/)
     {
         u32 draw_val = GetValue();
         for (u32 i = 0; i < cnt; i++)

@@ -160,22 +160,22 @@ void CRender::render_rain()
         //	HACK
         //	TODO: DX10: Calculate bounding sphere for view frustum
         //	TODO: DX10: Reduce resolution.
-        // bb.min.x = -50;
-        // bb.max.x = 50;
-        // bb.min.y = -50;
-        // bb.max.y = 50;
+        // bb.vMin.x = -50;
+        // bb.vMax.x = 50;
+        // bb.vMin.y = -50;
+        // bb.vMax.y = 50;
 
         //	Offset RainLight position to center rain shadowmap
         Fvector3 vRectOffset;
         vRectOffset.set(
             fBoundingSphereRadius * Device.vCameraDirection.x, 0, fBoundingSphereRadius * Device.vCameraDirection.z);
-        bb.min.x = -fBoundingSphereRadius + vRectOffset.x;
-        bb.max.x = fBoundingSphereRadius + vRectOffset.x;
-        bb.min.y = -fBoundingSphereRadius + vRectOffset.z;
-        bb.max.y = fBoundingSphereRadius + vRectOffset.z;
+        bb.vMin.x = -fBoundingSphereRadius + vRectOffset.x;
+        bb.vMax.x = fBoundingSphereRadius + vRectOffset.x;
+        bb.vMin.y = -fBoundingSphereRadius + vRectOffset.z;
+        bb.vMax.y = fBoundingSphereRadius + vRectOffset.z;
 
-        // D3DXMatrixOrthoOffCenterLH	((D3DXMATRIX*)&mdir_Project,bb.min.x,bb.max.x,  bb.min.y,bb.max.y,
-        // bb.min.z-tweak_rain_ortho_xform_initial_offs,bb.max.z);
+        // D3DXMatrixOrthoOffCenterLH	((D3DXMATRIX*)&mdir_Project,bb.vMin.x,bb.vMax.x,  bb.vMin.y,bb.vMax.y,
+        // bb.vMin.z-tweak_rain_ortho_xform_initial_offs,bb.vMax.z);
         D3DXMatrixOrthoOffCenterLH((D3DXMATRIX*)&mdir_Project, bb.min.x, bb.max.x, bb.min.y, bb.max.y,
             bb.min.z - tweak_rain_ortho_xform_initial_offs, bb.min.z + 2 * tweak_rain_ortho_xform_initial_offs);
 

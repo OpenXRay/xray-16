@@ -1,6 +1,6 @@
+#pragma once
 #ifndef xr_device
 #define xr_device
-#pragma once
 
 // Note:
 // ZNear - always 0.0f
@@ -14,6 +14,7 @@
 #include "xrCore/ftimer.h"
 #include "stats.h"
 #include "xrCore/Threading/Event.hpp"
+#include "xrCommon/xr_list.h"
 
 #define VIEWPORT_NEAR 0.2f
 

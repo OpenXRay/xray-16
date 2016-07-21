@@ -45,7 +45,7 @@ public:
         return *this;
     };
 
-    IC SelfRef null()
+    IC SelfRef set_zero()
     {
         min.set(0.f, 0.f);
         max.set(0.f, 0.f);

@@ -4,6 +4,8 @@
 
 #include <assert.h>
 #include "VertexCache.h"
+#include "xrCommon/xr_vector.h"
+#include "xrCommon/xr_list.h"
 
 /////////////////////////////////////////////////////////////////////////////////
 //

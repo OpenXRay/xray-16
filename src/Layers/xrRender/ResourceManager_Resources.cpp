@@ -416,7 +416,7 @@ CRTC*	CResourceManager::_CreateRTC		(LPCSTR Name, u32 size,	D3DFORMAT f)
     {
         CRTC *RT				=	new CRTC();
         RT->dwFlags				|=	xr_resource_flagged::RF_REGISTERED;
-        m_rtargets_c.insert		(mk_pair(RT->set_name(Name),RT));
+        m_rtargets_c.insert		(std::make_pair(RT->set_name(Name),RT));
         if (RDEVICE.b_is_Ready)	RT->create	(Name,size,f);
         return					RT;
     }
@@ -783,7 +783,7 @@ SVS* CResourceManager::_CreateVS(LPCSTR _name)
     {
         SVS* _vs = new SVS();
         _vs->dwFlags |= xr_resource_flagged::RF_REGISTERED;
-        m_vs.insert(mk_pair(_vs->set_name(name), _vs));
+        m_vs.insert(std::make_pair(_vs->set_name(name), _vs));
         if (0 == _stricmp(_name, "null"))
         {
             _vs->vs = NULL;
@@ -905,7 +905,7 @@ SPS* CResourceManager::_CreatePS(LPCSTR name)
     {
         SPS* _ps = new SPS();
         _ps->dwFlags |= xr_resource_flagged::RF_REGISTERED;
-        m_ps.insert(mk_pair(_ps->set_name(name), _ps));
+        m_ps.insert(std::make_pair(_ps->set_name(name), _ps));
         if (0 == _stricmp(name, "null"))
         {
             _ps->ps = NULL;

@@ -7,6 +7,7 @@
 #include "xrGame/quadtree.h"
 #include "xrGame/cover_point.h"
 #include "Common/object_broker.h"
+#include "xrCore/_fbox2.h"
 
 Shader_xrLC_LIB* g_shaders_xrlc;
 xr_vector<b_material> g_materials;
@@ -272,8 +273,8 @@ public:
             R_ASSERT(ID < g_nodes.size());
             if (N == ID)
                 continue;
-            vertex& N = g_nodes[ID];
-            Fvector& Pos = N.Pos;
+            vertex& N2 = g_nodes[ID];
+            Fvector& Pos = N2.Pos;
             Fvector Dir;
             Dir.sub(Pos, BasePos);
             float range = Dir.magnitude();
@@ -428,10 +429,10 @@ bool vertex_in_direction(const u32& start_vertex_id, const u32& target_vertex_id
                 if (next_vertex_id == target_vertex_id)
                     return (true);
 
-                Fvector2 temp;
-                temp.add(box.min, box.max);
-                temp.mul(.5f);
-                float dist = _sqr(temp.x - dest.x) + _sqr(temp.y - dest.y);
+                Fvector2 temp2;
+                temp2.add(box.vMin, box.vMax);
+                temp2.mul(.5f);
+                float dist = _sqr(temp2.x - dest.x) + _sqr(temp2.y - dest.y);
                 if (dist > cur_sqr)
                     continue;
 
@@ -564,10 +565,10 @@ void compute_non_covers()
             }
         }
 
-        for (int i = 0; i < 4; ++i)
+        for (int i2 = 0; i2 < 4; ++i)
         {
-            clamp((*I).high_cover[i], 0.f, 1.f);
-            clamp((*I).low_cover[i], 0.f, 1.f);
+            clamp((*I).high_cover[i2], 0.f, 1.f);
+            clamp((*I).low_cover[i2], 0.f, 1.f);
         }
     }
 }

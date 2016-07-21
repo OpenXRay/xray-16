@@ -36,7 +36,7 @@ public:
     {
         return (*this);
     }
-    pointer allocate(size_type n, const void* p = 0) const
+    pointer allocate(size_type n, const void* /*p*/ = 0) const
     {
         return (T*)g_render_allocator.malloc_impl(sizeof(T) * (u32)n);
     }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Common/GUID.hpp"
+#include "xrCore/_fbox.h"
 
 enum fsL_Chunks
 {

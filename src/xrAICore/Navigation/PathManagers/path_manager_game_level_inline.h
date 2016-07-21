@@ -29,9 +29,10 @@ IC void CGameVertexTypePathManager::setup(const _Graph* _graph, _DataStorage* _d
 }
 
 TEMPLATE_SPECIALIZATION
-IC _dist_type CGameVertexTypePathManager::estimate(const _index_type& node_index) const { return (_dist_type(0)); }
+IC _dist_type CGameVertexTypePathManager::estimate(const _index_type& /*node_index*/) const
+{ return (_dist_type(0)); }
 TEMPLATE_SPECIALIZATION
-IC bool CGameVertexTypePathManager::is_goal_reached(const _index_type& node_index)
+IC bool CGameVertexTypePathManager::is_goal_reached(const _index_type& /*node_index*/)
 {
     VERIFY(m_evaluator);
     if (graph->vertex(data_storage->get_best().index())->level_id() == m_evaluator->m_level_id)

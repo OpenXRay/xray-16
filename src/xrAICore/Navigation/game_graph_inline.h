@@ -89,7 +89,7 @@ IC void CGameGraph::begin(u32 const vertex_id, const_iterator& start, const_iter
         vertex(_GRAPH_ID(vertex_id))->edge_count();
 }
 
-IC const CGameGraph::_GRAPH_ID& CGameGraph::value(u32 const vertex_id, const_iterator& i) const
+IC const CGameGraph::_GRAPH_ID& CGameGraph::value(u32 const /*vertex_id*/, const_iterator& i) const
 {
     return (i->vertex_id());
 }

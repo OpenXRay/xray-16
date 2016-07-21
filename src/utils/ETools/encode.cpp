@@ -422,9 +422,8 @@ void final_statistics(char* fn, double time, int rate, long samples, long bytes)
 
     speed_ratio = (double)samples / (double)rate / time;
 
-    fprintf(stderr, _("\n\tFile length:  %dm %04.1fs\n"), (int)(samples / rate / 60),
-    samples / rate - samples / rate / 60 * 60);
-    fprintf(stderr, _("\tElapsed time: %dm %04.1fs\n"), (int)(time / 60), time - iFloor((float)time / 60) * 60);
+    fprintf(stderr, _("\n\tFile length:  %dm %04.1fs\n"), int(samples/rate/60), float(samples/rate - samples/rate/60*60));
+    fprintf(stderr, _("\tElapsed time: %dm %04.1fs\n"), int(time/60), time - iFloor(float(time)/60)*60);
     fprintf(stderr, _("\tRate:         %.4f\n"), speed_ratio);
     fprintf(
     stderr, _("\tAverage bitrate: %.1f kb/s\n\n"), 8. / 1000. * ((double)bytes / ((double)samples / (double)rate)));

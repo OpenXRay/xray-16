@@ -11,8 +11,8 @@ class IGameObject;
 #include "Include/xrRender/FactoryPtr.h"
 #include "Include/xrRender/ObjectSpaceRender.h"
 #include "xrXRC.h"
-
-#include "xrcdb.h"
+#include "xrCDB.h"
+#include "xrCore/_fbox.h"
 
 //-----------------------------------------------------------------------------------------------------------
 // Space Area

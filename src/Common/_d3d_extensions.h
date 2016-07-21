@@ -1,5 +1,7 @@
+#pragma once
 #ifndef _D3D_EXT_internal
 #define _D3D_EXT_internal
+#include "xrCore/FixedVector.h"
 
 #ifndef NO_XR_LIGHT
 struct Flight

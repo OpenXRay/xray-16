@@ -9,8 +9,10 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Include Guard
+#pragma once
 #ifndef __ICETYPES_H__
 #define __ICETYPES_H__
+#include "xrCore/xrDebug_macros.h"
 
 // Constants
 #ifndef PI
@@ -34,6 +36,7 @@
 #define INV9 0.11111111111111111111f //!<	1/9
 #define INV255 0.00392156862745098039f //!<	1/255
 
+#pragma todo("tamlin: Get rid of this 'null' macro!!!")
 #define null 0 //!<	our own NULL pointer
 
 // New types

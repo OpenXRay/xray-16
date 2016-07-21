@@ -199,12 +199,12 @@ void ai_obstacle::prepare_inside(Fvector& min, Fvector& max)
 void ai_obstacle::correct_position(Fvector& position)
 {
     const Fbox& box = ai().level_graph().header().box();
-    position.x = std::max(position.x, box.min.x);
-    position.y = std::max(position.y, box.min.y);
-    position.z = std::max(position.z, box.min.z);
-    position.x = std::min(position.x, box.max.x);
-    position.y = std::min(position.y, box.max.y);
-    position.z = std::min(position.z, box.max.z);
+    position.x = std::max(position.x, box.vMin.x);
+    position.y = std::max(position.y, box.vMin.y);
+    position.z = std::max(position.z, box.vMin.z);
+    position.x = std::min(position.x, box.vMax.x);
+    position.y = std::min(position.y, box.vMax.y);
+    position.z = std::min(position.z, box.vMax.z);
 }
 
 void ai_obstacle::compute_impl()

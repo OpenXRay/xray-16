@@ -85,13 +85,13 @@ public:
     virtual ~CInifile();
     bool save_as(LPCSTR new_fname = 0);
     void save_as(IWriter& writer, bool bcheck = false) const;
-    void set_override_names(BOOL b) { m_flags.set(eOverrideNames, b); }
-    void save_at_end(BOOL b) { m_flags.set(eSaveAtEnd, b); }
-    LPCSTR fname() const { return m_file_name; };
+    void set_override_names(bool b) throw() { m_flags.set(eOverrideNames, b); }
+    void save_at_end(bool b) throw() { m_flags.set(eSaveAtEnd, b); }
+    LPCSTR fname() const throw() { return m_file_name; };
     Sect& r_section(LPCSTR S) const;
     Sect& r_section(const shared_str& S) const;
-    BOOL line_exist(LPCSTR S, LPCSTR L) const;
-    BOOL line_exist(const shared_str& S, const shared_str& L) const;
+    bool line_exist(LPCSTR S, LPCSTR L)const;
+    bool line_exist(const shared_str& S, const shared_str& L)const;
     u32 line_count(LPCSTR S) const;
     u32 line_count(const shared_str& S) const;
     u32 section_count() const;

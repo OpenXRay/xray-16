@@ -9,6 +9,8 @@
 #include "light_point.h"
 #include "xrface.h"
 #include "net_task.h"
+#include "xrCore/buffer_vector.h"
+
 // const	u32	rms_discard			= 8;
 // extern	BOOL		gl_linear	;
 

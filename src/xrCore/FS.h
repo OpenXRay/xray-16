@@ -5,7 +5,17 @@
 
 #ifndef fsH
 #define fsH
-#include "_stl_extensions.h"
+#include "_types.h"
+#include "_bitwise.h"
+#include "_compressed_normal.h"
+#include "_vector2.h"
+#include "_vector3d.h"
+#include "_vector4.h"
+#include "_color.h"
+#include "xrCommon/math_funcs.h"
+#include "xrCommon/xr_stack.h"
+#include "xrCommon/xr_stack.h"
+//#include "_stl_extensions.h"
 
 #define CFS_CompressMark (1ul << 31ul)
 #define CFS_HeaderChunkID (666)

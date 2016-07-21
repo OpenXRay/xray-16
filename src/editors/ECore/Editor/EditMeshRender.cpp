@@ -75,7 +75,7 @@ void CEditableMesh::GenerateRenderBuffers()
             start_face += (_S->m_Flags.is(CSurface::sf2Sided)) ? rb.dwNumVertex / 6 : rb.dwNumVertex / 3;
         } while (v_cnt > 0);
         if (num_verts > 0)
-            m_RenderBuffers->insert(mk_pair(_S, rb_vec));
+            m_RenderBuffers->insert(std::make_pair(_S, rb_vec));
     }
     UnloadVNormals();
 }

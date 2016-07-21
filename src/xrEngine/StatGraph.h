@@ -4,6 +4,7 @@
 
 #include "Include/xrRender/FactoryPtr.h"
 #include "Include/xrRender/StatGraphRender.h"
+#include "xrCommon/xr_deque.h"
 
 //---------------------------------------------------------------------------
 class ENGINE_API CStatGraph : public pureRender

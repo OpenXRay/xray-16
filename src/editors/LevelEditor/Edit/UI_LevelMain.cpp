@@ -1476,7 +1476,7 @@ void CLevelMain::LoadSettings(CInifile* I)
     string_path fn;
     INI_RTP_NAME(fn);
     m_rt_object_props = CInifile::Create(fn, FALSE);
-    m_rt_object_props->save_at_end(FALSE);
+    m_rt_object_props->save_at_end(false);
 
     inherited::LoadSettings(I);
     SSceneSummary::Load(I);

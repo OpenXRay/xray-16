@@ -1,5 +1,6 @@
 #pragma once
 #include "ILevelCompilerLogger.hpp"
+#include "xrCore/Threading/Lock.hpp"
 
 class XRLCUTIL_API LevelCompilerLoggerWindow : public ILevelCompilerLogger
 {

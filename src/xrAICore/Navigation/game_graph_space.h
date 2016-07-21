@@ -9,6 +9,7 @@
 #pragma once
 
 #include "xrCore/Containers/AssociativeVector.hpp"
+#include "xrCore/FixedVector.h"
 #include "Common/LevelStructure.hpp"
 
 namespace GameGraph

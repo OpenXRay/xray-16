@@ -283,21 +283,21 @@ IC BOOL _visible(Fbox& B, Fmatrix& m_xform_01)
     // Find min/max points of xformed-box
     Fvector2 min, max;
     float z;
-    if (xform_b0(min, max, z, m_xform_01, B.min.x, B.min.y, B.min.z))
+    if (xform_b0(min, max, z, m_xform_01, B.vMin.x, B.vMin.y, B.vMin.z))
         return TRUE;
-    if (xform_b1(min, max, z, m_xform_01, B.min.x, B.min.y, B.max.z))
+    if (xform_b1(min, max, z, m_xform_01, B.vMin.x, B.vMin.y, B.vMax.z))
         return TRUE;
-    if (xform_b1(min, max, z, m_xform_01, B.max.x, B.min.y, B.max.z))
+    if (xform_b1(min, max, z, m_xform_01, B.vMax.x, B.vMin.y, B.vMax.z))
         return TRUE;
-    if (xform_b1(min, max, z, m_xform_01, B.max.x, B.min.y, B.min.z))
+    if (xform_b1(min, max, z, m_xform_01, B.vMax.x, B.vMin.y, B.vMin.z))
         return TRUE;
-    if (xform_b1(min, max, z, m_xform_01, B.min.x, B.max.y, B.min.z))
+    if (xform_b1(min, max, z, m_xform_01, B.vMin.x, B.vMax.y, B.vMin.z))
         return TRUE;
-    if (xform_b1(min, max, z, m_xform_01, B.min.x, B.max.y, B.max.z))
+    if (xform_b1(min, max, z, m_xform_01, B.vMin.x, B.vMax.y, B.vMax.z))
         return TRUE;
-    if (xform_b1(min, max, z, m_xform_01, B.max.x, B.max.y, B.max.z))
+    if (xform_b1(min, max, z, m_xform_01, B.vMax.x, B.vMax.y, B.vMax.z))
         return TRUE;
-    if (xform_b1(min, max, z, m_xform_01, B.max.x, B.max.y, B.min.z))
+    if (xform_b1(min, max, z, m_xform_01, B.vMax.x, B.vMax.y, B.vMin.z))
         return TRUE;
     return Raster.test(min.x, min.y, max.x, max.y, z);
 }

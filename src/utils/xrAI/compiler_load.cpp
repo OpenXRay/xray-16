@@ -8,12 +8,12 @@ IC const Fvector vertex_position(const CLevelGraph::CPosition& Psrc, const Fbox&
 {
     Fvector Pdest;
     int x, z, row_length;
-    row_length = iFloor((bb.max.z - bb.min.z) / params.fPatchSize + EPS_L + 1.5f);
+    row_length = iFloor((bb.vMax.z - bb.vMin.z) / params.fPatchSize + EPS_L + 1.5f);
     x = Psrc.xz() / row_length;
     z = Psrc.xz() % row_length;
-    Pdest.x = float(x) * params.fPatchSize + bb.min.x;
-    Pdest.y = (float(Psrc.y()) / 65535) * (bb.max.y - bb.min.y) + bb.min.y;
-    Pdest.z = float(z) * params.fPatchSize + bb.min.z;
+    Pdest.x = float(x) * params.fPatchSize + bb.vMin.x;
+    Pdest.y = (float(Psrc.y()) / 65535) * (bb.vMax.y - bb.vMin.y) + bb.vMin.y;
+    Pdest.z = float(z) * params.fPatchSize + bb.vMin.z;
     return (Pdest);
 }
 
@@ -26,7 +26,7 @@ IC CNodePositionConverter::CNodePositionConverter(const SNodePositionOld& Psrc, 
 {
     Fvector Pdest;
     Pdest.x = float(Psrc.x) * m_header.size;
-    Pdest.y = (float(Psrc.y) / 65535) * m_header.size_y + m_header.aabb.min.y;
+    Pdest.y = (float(Psrc.y) / 65535) * m_header.size_y + m_header.aabb.vMin.y;
     Pdest.z = float(Psrc.z) * m_header.size;
     CNodePositionCompressor(np, Pdest, m_header);
     np.y(Psrc.y);

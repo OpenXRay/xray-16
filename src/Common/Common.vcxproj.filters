@@ -42,6 +42,45 @@
     <ClInclude Include="Compiler.inl">
       <Filter>Platform</Filter>
     </ClInclude>
+    <ClInclude Include="..\xrCommon\inlining_macros.h">
+      <Filter>xrCommon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrCommon\math_funcs.h">
+      <Filter>xrCommon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrCommon\math_funcs_inline.h">
+      <Filter>xrCommon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrCommon\misc_math_types.h">
+      <Filter>xrCommon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrCommon\xalloc.h">
+      <Filter>xrCommon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrCommon\xr_map.h">
+      <Filter>xrCommon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrCommon\xr_set.h">
+      <Filter>xrCommon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrCommon\xr_stack.h">
+      <Filter>xrCommon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrCommon\xr_string.h">
+      <Filter>xrCommon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrCommon\xr_vector.h">
+      <Filter>xrCommon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrCommon\predicates.h">
+      <Filter>xrCommon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrCommon\xr_list.h">
+      <Filter>xrCommon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\xrCommon\xr_deque.h">
+      <Filter>xrCommon</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="NvMender2003">
@@ -49,6 +88,9 @@
     </Filter>
     <Filter Include="Platform">
       <UniqueIdentifier>{05b6dbf9-e387-495f-9d92-e2b8ecc350fa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="xrCommon">
+      <UniqueIdentifier>{103b77e6-94b0-400a-a75f-3b0b45f13ee2}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

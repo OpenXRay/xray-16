@@ -2,6 +2,7 @@
 
 #include "xrCore/xrCore.h"
 #include "xrGameSpy/xrGameSpy.h"
+#include "xrCore/Threading/Lock.hpp"
 
 class CServerList;
 class CGameSpy_QR2;

@@ -3,9 +3,13 @@
 #define logH
 #include "Common/Platform.hpp"
 #include "xrCore_impexp.h"
+#include "xrCommon/xr_vector.h"
 
+// fwd. decl.
 class shared_str;
-template <typename T, typename allocator> class xr_vector;
+template <class T> struct _vector3; typedef _vector3<float> Fvector;
+template <class T> struct _matrix; typedef _matrix<float> Fmatrix;
+
 
 #define VPUSH(a) ((a).x), ((a).y), ((a).z)
 

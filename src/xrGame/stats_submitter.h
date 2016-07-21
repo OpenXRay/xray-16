@@ -6,6 +6,7 @@
 #include "profile_data_types.h"
 #include "gsc_dsigned_ltx.h"
 #include "xrCore/Crypto/xr_dsa.h"
+#include "profile_data_types_script.h"
 
 class CGameSpy_Full;
 

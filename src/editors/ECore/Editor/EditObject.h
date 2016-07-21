@@ -1,8 +1,10 @@
+#pragma once
 #ifndef EditObjectH
 #define EditObjectH
 
 #include "xrCore/Animation/Bone.hpp"
 #include "xrCore/Animation/Motion.hpp"
+#include "xrCore/_fbox.h"
 
 #ifdef _EDITOR
 #include "xrServerEntities/PropertiesListTypes.h"

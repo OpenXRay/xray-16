@@ -1,9 +1,11 @@
+#pragma once
 #ifndef ATLAS_SUBMIT_QUEUE_INCLUDED
 #define ATLAS_SUBMIT_QUEUE_INCLUDED
 
 #include "Common/Noncopyable.hpp"
 #include "xrCore/fastdelegate.h"
 #include "profile_data_types.h"
+#include "profile_data_types_script.h"
 
 namespace gamespy_profile
 {

@@ -1,5 +1,9 @@
+#pragma once
 #ifndef PHNETSTATE_H
 #define PHNETSTATE_H
+#include "xrCore/_vector3d.h"
+#include "xrCore/_quaternion.h"
+#include "xrCommon/xr_vector.h"
 
 class NET_Packet;
 

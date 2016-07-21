@@ -106,7 +106,7 @@ struct FTreeVisual_setup
     }
 };
 
-void FTreeVisual::Render(float LOD)
+void FTreeVisual::Render(float /*LOD*/)
 {
     static FTreeVisual_setup tvs;
     if (tvs.dwFrame != Device.dwFrame)

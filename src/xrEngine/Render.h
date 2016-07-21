@@ -11,11 +11,13 @@ typedef FactoryPtr<IUIShader> wm_shader;
 class ENGINE_API IRenderable;
 struct ENGINE_API FSlideWindowItem;
 
-// Igor
+// fwd. decl.
 class IRenderVisual;
 class IKinematics;
 class IGameFont;
 class IPerformanceAlert;
+template <class T> class _box2; typedef _box2<float> Fbox2;
+
 
 #ifndef _EDITOR
 extern const float fLightSmoothFactor;

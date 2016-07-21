@@ -6,6 +6,7 @@
 #include "profile_data_types.h"
 #include <GameSpy/sake/sake.h>
 #include "gsc_dsigned_ltx.h"
+#include "profile_data_types_script.h"
 
 class CGameSpy_Full;
 class CGameSpy_SAKE;

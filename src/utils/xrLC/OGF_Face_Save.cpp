@@ -150,8 +150,8 @@ void OGF::Save(IWriter& fs)
     H.format_version = xrOGF_FormatVersion;
     H.type = data.m_SWI.count ? MT_PROGRESSIVE : MT_NORMAL;
     H.shader_id = RegisterShader(sid);
-    H.bb.min = bbox.min;
-    H.bb.max = bbox.max;
+    H.bb.vMin = bbox.vMin;
+    H.bb.vMax = bbox.vMax;
     H.bs.c = C;
     H.bs.r = R;
 
@@ -197,8 +197,8 @@ void OGF_Reference::Save(IWriter& fs)
     H.format_version = xrOGF_FormatVersion;
     H.type = model->data.m_SWI.count ? MT_TREE_PM : MT_TREE_ST;
     H.shader_id = RegisterShader(sid);
-    H.bb.min = bbox.min;
-    H.bb.max = bbox.max;
+    H.bb.vMin = bbox.vMin;
+    H.bb.vMax = bbox.vMax;
     H.bs.c = C;
     H.bs.r = R;
 

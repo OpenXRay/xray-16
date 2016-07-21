@@ -2,7 +2,11 @@
 
 #include "animation_motion.h"
 //*** Run-time Blend definition *******************************************************************
+
+// XXX: This header contains a few WAY too large functions to inline.
+
 #ifdef DEBUG
+
 class bnon_copy
 {
 protected:
@@ -143,8 +147,8 @@ IC bool CBlend::update_time(float dt)
     timeCurrent += quant; // stop@end - time is not going
 
     bool running_fwrd = (quant > 0);
-    float const END_EPS = SAMPLE_SPF + EPS;
-    bool at_end = running_fwrd && (timeCurrent > (timeTotal - END_EPS));
+    float const END_EPS_l = SAMPLE_SPF + EPS;
+    bool at_end = running_fwrd && (timeCurrent > (timeTotal - END_EPS_l));
     bool at_begin = !running_fwrd && (timeCurrent < 0.f);
 
     if (!stop_at_end)
@@ -152,7 +156,7 @@ IC bool CBlend::update_time(float dt)
         if (at_begin)
             timeCurrent += timeTotal;
         if (at_end)
-            timeCurrent -= (timeTotal - END_EPS);
+            timeCurrent -= (timeTotal - END_EPS_l);
         VERIFY(timeCurrent >= 0.f);
         return false;
     }
@@ -161,7 +165,7 @@ IC bool CBlend::update_time(float dt)
 
     if (at_end)
     {
-        timeCurrent = timeTotal - END_EPS; // stop@end - time frozen at the end
+        timeCurrent = timeTotal - END_EPS_l; // stop@end - time frozen at the end
         if (timeCurrent < 0.f)
             timeCurrent = 0.f;
     }

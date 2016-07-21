@@ -24,14 +24,13 @@ using namespace R_dsgraph;
 CRender RImplementation;
 
 //////////////////////////////////////////////////////////////////////////
-ShaderElement* CRender::rimp_select_sh_dynamic(dxRender_Visual* pVisual, float cdist_sq)
+ShaderElement* CRender::rimp_select_sh_dynamic(dxRender_Visual* pVisual, float /*cdist_sq*/)
 {
     switch (phase)
     {
     case PHASE_NORMAL:
-        return (RImplementation.L_Projector->shadowing() ? pVisual->shader->E[SE_R1_NORMAL_HQ] :
-                                                           pVisual->shader->E[SE_R1_NORMAL_LQ])
-            ._get();
+        return (RImplementation.L_Projector->shadowing() ?
+            pVisual->shader->E[SE_R1_NORMAL_HQ] : pVisual->shader->E[SE_R1_NORMAL_LQ])._get();
     case PHASE_POINT: return pVisual->shader->E[SE_R1_LPOINT]._get();
     case PHASE_SPOT: return pVisual->shader->E[SE_R1_LSPOT]._get();
     default: NODEFAULT;

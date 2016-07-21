@@ -1,6 +1,10 @@
 //---------------------------------------------------------------------------
+#pragma once
 #ifndef intersectH
 #define intersectH
+#include "xrCore/_matrix33.h"
+#include "xrCore/_obb.h"
+#include "xrCore/_sphere.h"
 
 namespace CDB
 {

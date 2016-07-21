@@ -1,5 +1,6 @@
 #include "stdafx.h"
-#pragma hdrstop
+#pragma hdrstop // ???
+#include "xrCore/_fbox.h"
 #pragma warning(push)
 #pragma warning(disable : 4995)
 #include <xmmintrin.h>
@@ -247,9 +248,9 @@ public:
     ICF BOOL _box_fpu(const Fvector& bCenter, const Fvector& bExtents, Fvector& coord)
     {
         Fbox BB;
-        BB.min.sub(bCenter, bExtents);
-        BB.max.add(bCenter, bExtents);
-        return isect_fpu(BB.min, BB.max, ray, coord);
+        BB.vMin.sub(bCenter, bExtents);
+        BB.vMax.add(bCenter, bExtents);
+        return isect_fpu(BB.vMin, BB.vMax, ray, coord);
     }
     // sse
     ICF BOOL _box_sse(const Fvector& bCenter, const Fvector& bExtents, float& dist)

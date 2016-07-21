@@ -4,7 +4,10 @@
 
 #include "Bone.hpp"
 #include "SkeletonMotionDefs.hpp"
-// refs
+#include "xrCore/_quaternion.h"
+#include "xrCore/_vector3d.h"
+
+// fwd. decl.
 class CKinematicsAnimated;
 class CBlend;
 class IKinematics;

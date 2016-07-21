@@ -1,5 +1,6 @@
 #include "stdafx.h"
-#pragma hdrstop
+#pragma hdrstop // huh?
+#include "xrCore/Threading/Lock.hpp"
 
 struct auth_options
 {
@@ -23,14 +24,14 @@ void CLocatorAPI::auth_generate(xr_vector<shared_str>& ignore, xr_vector<shared_
 
 u64 CLocatorAPI::auth_get()
 {
-    m_auth_lock.Enter();
-    m_auth_lock.Leave();
+    m_auth_lock->Enter(); // huh? What's the point of enter+leave, except slow things down?
+    m_auth_lock->Leave();
     return m_auth_code;
 }
 
 void CLocatorAPI::auth_runtime(void* params)
 {
-    m_auth_lock.Enter();
+	m_auth_lock->Enter();
     auth_options* _o = (auth_options*)params;
 
     CMemoryWriter writer;
@@ -111,5 +112,5 @@ void CLocatorAPI::auth_runtime(void* params)
 #endif // DEBUG
     xr_delete(_o);
 
-    m_auth_lock.Leave();
+	m_auth_lock->Leave();
 }

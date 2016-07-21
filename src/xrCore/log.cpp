@@ -4,6 +4,7 @@
 #include <time.h>
 #include "resource.h"
 #include "log.h"
+#include "xrCore/Threading/Lock.hpp"
 #ifdef _EDITOR
 #include "malloc.h"
 #endif

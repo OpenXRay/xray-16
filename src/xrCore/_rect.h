@@ -57,7 +57,7 @@ public:
         y2 = r.y2;
         return *this;
     };
-    IC SelfRef null()
+    IC SelfRef set_zero()
     {
         x1 = T(0);
         y1 = T(0);

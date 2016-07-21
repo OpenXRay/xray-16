@@ -108,8 +108,8 @@ public:
 
     virtual void UpdateGameType(){};
     virtual void GetCurrentDof(Fvector3& dof) { dof.set(-1.4f, 0.0f, 250.f); };
-    virtual void SetBaseDof(const Fvector3& dof){};
-    virtual void OnSectorChanged(int sector){};
+    virtual void SetBaseDof(const Fvector3& /*dof*/) {};
+    virtual void OnSectorChanged(int /*sector*/) {};
     virtual void OnAssetsChanged();
 
     virtual void RegisterModel(IRenderVisual* V)
@@ -133,7 +133,7 @@ public:
 
     ICF u32 GameType() { return m_game_params.m_e_game_type; };
     virtual void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert);
-    virtual void LoadTitle(bool change_tip = false, shared_str map_name = "") {}
+    virtual void LoadTitle(bool /*change_tip*/ = false, shared_str /*map_name*/ = "") {}
     virtual bool CanBePaused() { return true; }
 };
 

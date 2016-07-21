@@ -15,8 +15,8 @@ TEMPLATE_SPECIALIZATION
 IC CSQuadTree::CQuadTree(const Fbox& box, float min_cell_size, u32 max_node_count, u32 max_list_item_count)
 {
     m_leaf_count = 0;
-    m_radius = _max(box.max.x - box.min.x, box.max.z - box.min.z) * .5f;
-    m_center.add(box.min, box.max);
+    m_radius = _max(box.vMax.x - box.vMin.x, box.vMax.z - box.vMin.z) * .5f;
+    m_center.add(box.vMin, box.vMax);
     m_center.mul(.5f);
 
     VERIFY(!fis_zero(min_cell_size));

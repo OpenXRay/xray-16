@@ -2,6 +2,8 @@
 
 #include "net_shared.h"
 #include "NET_Common.h"
+#include "xrCommon/xr_deque.h"
+#include "xrCommon/xr_vector.h"
 
 struct ip_address;
 

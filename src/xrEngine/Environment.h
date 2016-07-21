@@ -1,5 +1,14 @@
+#pragma once
 #ifndef EnvironmentH
 #define EnvironmentH
+
+#include "Include/xrRender/FactoryPtr.h"
+#include "Include/xrRender/EnvironmentRender.h"
+#include "xrCore/_vector3d.h"
+#include "xrCore/_quaternion.h"
+#include "xrCommon/xr_vector.h"
+#include "xrCommon/xr_map.h"
+
 
 // refs
 class ENGINE_API IRender_Visual;
@@ -19,9 +28,6 @@ struct SThunderboltCollection;
 class CLensFlareDescriptor;
 
 #define DAY_LENGTH 86400.f
-
-#include "Include/xrRender/FactoryPtr.h"
-#include "Include/xrRender/EnvironmentRender.h"
 
 #ifdef INGAME_EDITOR
 #define INGAME_EDITOR_VIRTUAL virtual

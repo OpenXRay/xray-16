@@ -2,10 +2,12 @@
 #ifndef _STD_EXT_internal
 #define _STD_EXT_internal
 
-#include "Common/Platform.hpp"
 #include <math.h>
 #include <float.h>
 #include <stdio.h>
+#include "Common/Platform.hpp"
+#include "xrCore/xrCore_impexp.h"
+#include "xrCommon/math_funcs_inline.h"
 
 #define BREAK_AT_STRCMP
 #ifndef DEBUG
@@ -63,7 +65,7 @@ IC int xr_sprintf(char* dest, size_t sizeOfBuffer, const char* format, ...)
     va_end(mark);
     return sz;
 }
-#endif
+#endif // _EDITOR
 
 // token type definition
 struct XRCORE_API xr_token
@@ -112,12 +114,7 @@ IC T _sqr(T a)
     return a * a;
 }
 
-// float
-IC float _abs(float x) { return fabsf(x); }
-IC float _sqrt(float x) { return sqrtf(x); }
-IC float _sin(float x) { return sinf(x); }
-IC float _cos(float x) { return cosf(x); }
-IC BOOL _valid(const float x)
+IC bool _valid(const float x) throw()
 {
     // check for: Signaling NaN, Quiet NaN, Negative infinity ( –INF), Positive infinity (+INF), Negative denormalized,
     // Positive denormalized
@@ -135,10 +132,6 @@ IC BOOL _valid(const float x)
 }
 
 // double
-IC double _abs(double x) { return fabs(x); }
-IC double _sqrt(double x) { return sqrt(x); }
-IC double _sin(double x) { return sin(x); }
-IC double _cos(double x) { return cos(x); }
 IC BOOL _valid(const double x)
 {
     // check for: Signaling NaN, Quiet NaN, Negative infinity ( –INF), Positive infinity (+INF), Negative denormalized,
@@ -156,6 +149,7 @@ IC BOOL _valid(const double x)
     return true;
 }
 
+// XXX: "magic" specializations, that really require profiling to see if they are worth this effort.
 // int8
 IC s8 _abs(s8 x) { return (x >= 0) ? x : s8(-x); }
 IC s8 _min(s8 x, s8 y) { return y + ((x - y) & ((x - y) >> (sizeof(s8) * 8 - 1))); };

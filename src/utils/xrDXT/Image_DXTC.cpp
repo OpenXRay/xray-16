@@ -228,7 +228,7 @@ void Image_DXTC::Decompress()
         for (int x = 0; x < m_nWidth; x++)
         {
             BYTE* ptr = m_pDecompBytes + (y * m_nWidth + x) * 4;
-            swap(ptr[0], ptr[2]);
+            std::swap(ptr[0], ptr[2]);
         }
     }
 }

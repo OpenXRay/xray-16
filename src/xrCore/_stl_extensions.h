@@ -4,10 +4,8 @@
 
 #include <string>
 #include <vector>
-#include <deque>
 #include <list>
 #include <set>
-#include <map>
 #include "_types.h"
 #include "_rect.h"
 #include "_plane.h"
@@ -16,10 +14,16 @@
 #include "_color.h"
 #include "_std_extensions.h"
 #include "xrMemory.h"
-#include "xrCommon/xr_vector.h"
 #include "xrCommon/xalloc.h"
+#include "xrCommon/xr_vector.h"
+#include "xrCommon/xr_map.h"
+#include "xrCommon/xr_set.h"
+#include "xrCommon/xr_stack.h"
+#include "xrCommon/xr_list.h"
+#include "xrCommon/xr_deque.h"
 #include "xrstring.h"
 #include "xrCommon/inlining_macros.h"
+#include "xrCommon/xr_string.h"
 #include "xrDebug_macros.h" // only for pragma todo. Remove once handled.
 
 #pragma todo("tamlin: This header includes pretty much every std collection there are. Compiler-hog! FIX!")
@@ -90,80 +94,6 @@ public:
 
 #else // M_NOSTDCONTAINERS_EXT
 
-// string(char)
-typedef std::basic_string<char, std::char_traits<char>, xalloc<char>> xr_string;
-
-// deque
-template <typename T, typename allocator = xalloc<T>>
-class xr_deque : public std::deque<T, allocator>
-{
-public:
-    typedef typename allocator allocator_type;
-    typedef typename allocator_type::value_type value_type;
-    typedef typename allocator_type::size_type size_type;
-    u32 size() const { return (u32)std::deque<T, allocator>::size(); }
-};
-
-// stack
-template <typename _Ty, class _C = xr_vector<_Ty>>
-class xr_stack
-{
-public:
-    typedef typename _C::allocator_type allocator_type;
-    typedef typename allocator_type::value_type value_type;
-    typedef typename allocator_type::size_type size_type;
-    typedef xr_stack<Ty, C> _Myt;
-
-    // explicit stack(const allocator_type& _Al = allocator_type()) : c(_Al) {}
-    allocator_type get_allocator() const { return (c.get_allocator()); }
-    bool empty() const { return (c.empty()); }
-    u32 size() const { return c.size(); }
-    value_type& top() { return (c.back()); }
-    const value_type& top() const { return (c.back()); }
-    void push(const value_type& _X) { c.push_back(_X); }
-    void pop() { c.pop_back(); }
-    bool operator==(const _Myt& _X) const { return (c == _X.c); }
-    bool operator!=(const _Myt& _X) const { return (!(*this == _X)); }
-    bool operator<(const _Myt& _X) const { return (c < _X.c); }
-    bool operator>(const _Myt& _X) const { return (_X < *this); }
-    bool operator<=(const _Myt& _X) const { return (!(_X < *this)); }
-    bool operator>=(const _Myt& _X) const { return (!(*this < _X)); }
-protected:
-    _C c;
-};
-
-// instantiate the (simplest) member function in the collections, to get xalloc<T> as the default allocator.
-template <typename T, typename allocator = xalloc<T>>
-class xr_list : public std::list<T, allocator>
-{
-public:
-    u32 size() const { return (u32)std::list<T, allocator>::size(); }
-};
-template <typename K, class P = std::less<K>, typename allocator = xalloc<K>>
-class xr_set : public std::set<K, P, allocator>
-{
-public:
-    u32 size() const { return (u32)std::set<K, P, allocator>::size(); }
-};
-template <typename K, class P = std::less<K>, typename allocator = xalloc<K>>
-class xr_multiset : public std::multiset<K, P, allocator>
-{
-public:
-    u32 size() const { return (u32)std::multiset<K, P, allocator>::size(); }
-};
-template <typename K, class V, class P = std::less<K>, typename allocator = xalloc<std::pair<K, V>>>
-class xr_map : public std::map<K, V, P, allocator>
-{
-public:
-    u32 size() const { return (u32)std::map<K, V, P, allocator >::size(); }
-};
-template <typename K, class V, class P = std::less<K>, typename allocator = xalloc<std::pair<K, V>>>
-class xr_multimap : public std::multimap<K, V, P, allocator>
-{
-public:
-    u32 size() const { return (u32)std::multimap<K, V, P, allocator>::size(); }
-};
-
 #ifdef STLPORT
 namespace std
 {
@@ -212,101 +142,17 @@ public:
 
 #endif // M_NOSTDCONTAINERS_EXT
 
-struct pred_str : public std::binary_function<char*, char*, bool>
-{
-    IC bool operator()(const char* x, const char* y) const { return xr_strcmp(x, y) < 0; }
-};
-struct pred_stri : public std::binary_function<char*, char*, bool>
-{
-    IC bool operator()(const char* x, const char* y) const { return _stricmp(x, y) < 0; }
-};
-
-IC void xr_strlwr(xr_string& src)
-{
-    for (xr_string::iterator it = src.begin(); it!=src.end(); it++)
-        *it = xr_string::value_type(tolower(*it));
-}
+#include "xrCommon/predicates.h"
 
 // tamlin: TODO (low priority, for a rainy day): Rename these macros from DEFINE_* to DECLARE_*
 // Xottab_DUTY: TODO: or maybe use Im-Dex variant (Get rid of this DEFINE macroses)
 
 // STL extensions
-#define DEF_LIST(N, T)    \
-    typedef xr_list<T> N; \
-    typedef N::iterator N##_it;
-#define DEF_DEQUE(N, T)    \
-    typedef xr_deque<T> N; \
-    typedef N::iterator N##_it;
-#define DEF_MAP(N, K, T)    \
-    typedef xr_map<K, T> N; \
-    typedef N::iterator N##_it;
-
-#define DEFINE_DEQUE(T, N, I) \
-    typedef xr_deque<T> N;    \
-    typedef N::iterator I;
-#define DEFINE_LIST(T, N, I) \
-    typedef xr_list<T> N;    \
-    typedef N::iterator I;
-#define DEFINE_MAP(K, T, N, I) \
-    typedef xr_map<K, T> N;    \
-    typedef N::iterator I;
-#define DEFINE_MAP_PRED(K, T, N, I, P) \
-    typedef xr_map<K, T, P> N;         \
-    typedef N::iterator I;
-#define DEFINE_MMAP(K, T, N, I)  \
-    typedef xr_multimap<K, T> N; \
-    typedef N::iterator I;
 #define DEFINE_SVECTOR(T, C, N, I) \
     typedef svector<T, C> N;       \
     typedef N::iterator I;
-#define DEFINE_SET(T, N, I) \
-    typedef xr_set<T> N;    \
-    typedef N::iterator I;
-#define DEFINE_SET_PRED(T, N, I, P) \
-    typedef xr_set<T, P> N;         \
-    typedef N::iterator I;
-#define DEFINE_STACK(T, N) typedef xr_stack<T> N;
-
 #include "FixedVector.h"
 #include "buffer_vector.h"
-
-// auxilary definition
-DEFINE_VECTOR(bool, boolVec, boolIt);
-DEFINE_VECTOR(BOOL, BOOLVec, BOOLIt);
-DEFINE_VECTOR(BOOL*, LPBOOLVec, LPBOOLIt);
-DEFINE_VECTOR(Frect, FrectVec, FrectIt);
-DEFINE_VECTOR(Irect, IrectVec, IrectIt);
-DEFINE_VECTOR(Fplane, PlaneVec, PlaneIt);
-DEFINE_VECTOR(Fvector2, Fvector2Vec, Fvector2It);
-DEFINE_VECTOR(Fvector, FvectorVec, FvectorIt);
-DEFINE_VECTOR(Fvector*, LPFvectorVec, LPFvectorIt);
-DEFINE_VECTOR(Fcolor, FcolorVec, FcolorIt);
-DEFINE_VECTOR(Fcolor*, LPFcolorVec, LPFcolorIt);
-DEFINE_VECTOR(LPSTR, LPSTRVec, LPSTRIt);
-DEFINE_VECTOR(LPCSTR, LPCSTRVec, LPCSTRIt);
-DEFINE_VECTOR(string64, string64Vec, string64It);
-DEFINE_VECTOR(xr_string, SStringVec, SStringVecIt);
-
-DEFINE_VECTOR(s8, S8Vec, S8It);
-DEFINE_VECTOR(s8*, LPS8Vec, LPS8It);
-DEFINE_VECTOR(s16, S16Vec, S16It);
-DEFINE_VECTOR(s16*, LPS16Vec, LPS16It);
-DEFINE_VECTOR(s32, S32Vec, S32It);
-DEFINE_VECTOR(s32*, LPS32Vec, LPS32It);
-DEFINE_VECTOR(u8, U8Vec, U8It);
-DEFINE_VECTOR(u8*, LPU8Vec, LPU8It);
-DEFINE_VECTOR(u16, U16Vec, U16It);
-DEFINE_VECTOR(u16*, LPU16Vec, LPU16It);
-DEFINE_VECTOR(u32, U32Vec, U32It);
-DEFINE_VECTOR(u32*, LPU32Vec, LPU32It);
-DEFINE_VECTOR(float, FloatVec, FloatIt);
-DEFINE_VECTOR(float*, LPFloatVec, LPFloatIt);
-DEFINE_VECTOR(int, IntVec, IntIt);
-DEFINE_VECTOR(int*, LPIntVec, LPIntIt);
-
-#ifdef __BORLANDC__
-DEFINE_VECTOR(AnsiString, AStringVec, AStringIt);
-DEFINE_VECTOR(AnsiString*, LPAStringVec, LPAStringIt);
-#endif
+#include "xr_vector_defs.h"
 
 #endif // include guard

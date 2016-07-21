@@ -3,7 +3,7 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
-#pragma hdrstop
+#pragma hdrstop // huh?
 
 #pragma warning(push)
 #pragma warning(disable : 4995)
@@ -15,6 +15,7 @@
 #include "FS_internal.h"
 #include "stream_reader.h"
 #include "file_stream_reader.h"
+#include "xrCore/Threading/Lock.hpp"
 
 const u32 BIG_FILE_READER_WINDOW_SIZE = 1024 * 1024;
 
@@ -161,9 +162,11 @@ XRCORE_API void _dump_open_files(int mode)
         Log("----total count=", g_open_files.size());
 }
 
-CLocatorAPI::CLocatorAPI()
+CLocatorAPI::CLocatorAPI() :
 #ifdef CONFIG_PROFILE_LOCKS
-    : m_auth_lock(MUTEX_PROFILE_ID(CLocatorAPI::m_auth_lock))
+    m_auth_lock(new Lock(MUTEX_PROFILE_ID(CLocatorAPI::m_auth_lock)))
+#else
+    m_auth_lock(new Lock)
 #endif // CONFIG_PROFILE_LOCKS
 {
     m_Flags.zero();
@@ -179,6 +182,7 @@ CLocatorAPI::~CLocatorAPI()
 {
     VERIFY(0 == m_iLockRescan);
     _dump_open_files(1);
+	delete m_auth_lock;
 }
 
 const CLocatorAPI::file* CLocatorAPI::RegisterExternal(const char* name)
@@ -245,9 +249,9 @@ const CLocatorAPI::file* CLocatorAPI::Register(
             desc.size_real = 0;
             desc.size_compressed = 0;
             desc.modif = u32(-1);
-            std::pair<files_it, bool> I = m_files.insert(desc);
+            std::pair<files_it, bool> I2 = m_files.insert(desc);
 
-            R_ASSERT(I.second);
+            R_ASSERT(I2.second);
         }
         xr_strcpy(temp, sizeof(temp), folder);
         if (xr_strlen(temp))

@@ -13,7 +13,15 @@ class IRenderVisual;
 class CBoneInstance;
 struct SEnumVerticesCallback;
 
-// 10 fps
+template <class T>
+class _box3;
+typedef _box3<float> Fbox;
+
+template <class T>
+struct _obb;
+typedef _obb<float> Fobb;
+
+// 100 ms = 10 fps
 #define UCalc_Interval (u32(100))
 
 class IKinematics

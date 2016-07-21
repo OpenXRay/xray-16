@@ -2,9 +2,10 @@
 //
 //////////////////////////////////////////////////////////////////////
 
+#pragma once
 #if !defined(_PORTAL_H_)
 #define _PORTAL_H_
-#pragma once
+#include "xrCore/_fbox2.h"
 
 class CPortal;
 class CSector;

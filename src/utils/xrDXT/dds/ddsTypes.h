@@ -13,7 +13,8 @@ typedef unsigned char BYTE;
 typedef unsigned short WORD;
 typedef unsigned long DWORD;
 
-typedef enum nvD3DFORMAT {
+typedef enum nvD3DFORMAT
+{
     nvD3DFMT_UNKNOWN = 0,
     nvD3DFMT_R8G8B8 = 20,
     nvD3DFMT_A8R8G8B8 = 21,
@@ -81,7 +82,8 @@ typedef enum nvD3DFORMAT {
     nvD3DFMT_FORCE_DWORD = 0x7fffffff
 } nvD3DFORMAT;
 
-typedef enum nvRescaleTypes {
+typedef enum nvRescaleTypes
+{
     kRescaleNone, // no rescale
     kRescaleNearestPower2, // rescale to nearest power of two
     kRescaleBiggestPower2, // rescale to next bigger power of 2
@@ -91,7 +93,8 @@ typedef enum nvRescaleTypes {
     kRescaleRelScale, // relative rescale
 } RescaleTypes;
 
-typedef enum nvSharpenFilterTypes {
+enum nvSharpenFilterTypes
+{
     kSharpenFilterNone,
     kSharpenFilterNegative,
     kSharpenFilterLighter,
@@ -114,14 +117,16 @@ typedef enum nvSharpenFilterTypes {
     kSharpenFilterCustom,
 };
 
-typedef enum nvMipMapGeneration {
+typedef enum nvMipMapGeneration
+{
     kGenerateMipMaps = 30,
     kUseExistingMipMaps = 31,
     kNoMipMaps = 32,
     kCompleteMipMapChain = 33, // fill in missing MIP maps
 };
 
-typedef enum nvMipFilterTypes {
+typedef enum nvMipFilterTypes
+{
     kMipFilterPoint,
     kMipFilterBox,
     kMipFilterTriangle,

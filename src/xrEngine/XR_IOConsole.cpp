@@ -452,7 +452,7 @@ void CConsole::DrawBackgrounds(bool bGame)
                 continue;
             }
 
-            r.null();
+            r.set_zero();
             tmp.assign(ts.text.c_str(), ts.HL_start);
             r.x1 = pr.x1 + w1 + pFont->SizeOf_(tmp.c_str());
             r.y1 = pr.y1 + i * font_h;

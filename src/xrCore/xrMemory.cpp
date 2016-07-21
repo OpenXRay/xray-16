@@ -240,7 +240,7 @@ void xrMemory::mem_statistic(LPCSTR fn)
     size = F->r_u32 ();
     xr_map<u32,u32>::iterator I = stats.find(size);
     if (I!=stats.end()) I->second += 1;
-    else stats.insert(mk_pair(size,1));
+    else stats.insert(std::make_pair(size,1));
     }
     FS.r_close (F);
     FS.file_delete (fn);

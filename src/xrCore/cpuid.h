@@ -1,3 +1,4 @@
+#pragma once
 #ifndef _INC_CPUID
 #define _INC_CPUID
 

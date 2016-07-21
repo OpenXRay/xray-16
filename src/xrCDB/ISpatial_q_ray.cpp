@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "ISpatial.h"
+#include "xrCore/_fbox.h"
 #pragma warning(push)
 #pragma warning(disable : 4995)
 #include <xmmintrin.h>
@@ -244,7 +245,7 @@ public:
         float n_vR = 2 * n_R;
         Fbox BB;
         BB.set(n_C.x - n_vR, n_C.y - n_vR, n_C.z - n_vR, n_C.x + n_vR, n_C.y + n_vR, n_C.z + n_vR);
-        return isect_fpu(BB.min, BB.max, ray, coord);
+        return isect_fpu(BB.vMin, BB.vMax, ray, coord);
     }
     // sse
     ICF BOOL _box_sse(const Fvector& n_C, const float n_R, float& dist)

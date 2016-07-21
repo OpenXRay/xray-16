@@ -731,9 +731,6 @@
     <ClCompile Include="r2_R_lights.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="r2_R_sun.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="r2_sector_detect.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -1281,6 +1278,9 @@
       <Filter>Debug</Filter>
     </ClCompile>
     <ClCompile Include="..\xrRender\RenderAllocator.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="r3_R_sun.cpp">
       <Filter>Core</Filter>
     </ClCompile>
   </ItemGroup>

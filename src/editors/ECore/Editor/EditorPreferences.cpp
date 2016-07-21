@@ -336,7 +336,7 @@ void CCustomPreferences::Save()
     string_path fn;
     INI_NAME(fn);
     CInifile* I = new CInifile(fn, FALSE, TRUE, TRUE);
-    I->set_override_names(TRUE);
+    I->set_override_names(true);
     Save(I);
     xr_delete(I);
 }

@@ -227,7 +227,7 @@ void CSE_Abstract::Spawn_Write(NET_Packet& tNetPacket, BOOL bLocal)
     tNetPacket.w_seek(position, &size, sizeof(u16));
 }
 
-static enum EGameTypes {
+enum EGameTypes {
     GAME_ANY = 0,
     GAME_SINGLE = 1,
     GAME_DEATHMATCH = 2,
@@ -319,8 +319,8 @@ BOOL CSE_Abstract::Spawn_Read(NET_Packet& tNetPacket)
         if (m_wVersion > 83)
         {
             tNetPacket.r_u32(); // m_spawn_flags.assign(tNetPacket.r_u32());
-            xr_string temp;
-            tNetPacket.r_stringZ(temp); // tNetPacket.r_stringZ(m_spawn_control);
+            xr_string temp2;
+            tNetPacket.r_stringZ(temp2); // tNetPacket.r_stringZ(m_spawn_control);
             tNetPacket.r_u32(); // m_max_spawn_count);
             // this stuff we do not need even in case of uncomment
             tNetPacket.r_u32(); // m_spawn_count);

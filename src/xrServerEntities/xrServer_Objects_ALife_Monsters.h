@@ -6,6 +6,7 @@
 //  Description : Server objects monsters for ALife simulator
 ////////////////////////////////////////////////////////////////////////////
 
+#pragma once
 #ifndef xrServer_Objects_ALife_MonstersH
 #define xrServer_Objects_ALife_MonstersH
 
@@ -14,6 +15,7 @@
 #include "character_info_defs.h"
 #include "xrCore/Containers/AssociativeVector.hpp"
 #include "alife_movement_manager_holder.h"
+#include "xrCommon/misc_math_types.h"
 
 class CALifeMonsterBrain;
 class CALifeHumanBrain;

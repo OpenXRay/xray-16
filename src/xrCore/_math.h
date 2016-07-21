@@ -2,6 +2,7 @@
 #ifndef __XR_MATH_H__
 #define __XR_MATH_H__
 
+#include "_types.h"
 #include "cpuid.h"
 #include "xrCore_impexp.h"
 #include "xrCommon/inlining_macros.h"

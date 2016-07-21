@@ -356,10 +356,10 @@ IC bool __aabb_tri(Point center, Point extents, const Point* mLeafVerts)
     v2.x = mLeafVerts[2].x - center.x;
 
     // First, test overlap in the {x,y,z}-directions
-    float min, max;
+    float min1, max1;
     // Find min, max of the triangle in x-direction, and test for overlap in X
-    FINDMINMAX(v0.x, v1.x, v2.x, min, max);
-    if (min > extents.x || max < -extents.x)
+    FINDMINMAX(v0.x, v1.x, v2.x, min1, max1);
+    if (min1 > extents.x || max1 < -extents.x)
         return false;
 
     // Same for Y
@@ -367,8 +367,8 @@ IC bool __aabb_tri(Point center, Point extents, const Point* mLeafVerts)
     v1.y = mLeafVerts[1].y - center.y;
     v2.y = mLeafVerts[2].y - center.y;
 
-    FINDMINMAX(v0.y, v1.y, v2.y, min, max);
-    if (min > extents.y || max < -extents.y)
+    FINDMINMAX(v0.y, v1.y, v2.y, min1, max1);
+    if (min1 > extents.y || max1 < -extents.y)
         return false;
 
     // Same for Z
@@ -376,8 +376,8 @@ IC bool __aabb_tri(Point center, Point extents, const Point* mLeafVerts)
     v1.z = mLeafVerts[1].z - center.z;
     v2.z = mLeafVerts[2].z - center.z;
 
-    FINDMINMAX(v0.z, v1.z, v2.z, min, max);
-    if (min > extents.z || max < -extents.z)
+    FINDMINMAX(v0.z, v1.z, v2.z, min1, max1);
+    if (min1 > extents.z || max1 < -extents.z)
         return false;
 
     // 2) Test if the box intersects the plane of the triangle

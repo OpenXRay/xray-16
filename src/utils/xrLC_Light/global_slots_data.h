@@ -1,10 +1,13 @@
+#pragma once
 #ifndef __GLOBAL_SLOTS_DATA_H__
 #define __GLOBAL_SLOTS_DATA_H__
 
 #include "Layers/xrRender/DetailFormat.h"
 #include "recalculation.h"
+
 class INetReader;
 class IWriter;
+
 class global_slots_data
 {
 private:
@@ -60,12 +63,12 @@ public:
 
     IC void get_slot_box(Fbox& BB, int _x, int _z) const
     {
-        get_slot_box_min(BB.min, _x, _z);
+        get_slot_box_min(BB.vMin, _x, _z);
 
         Fvector diameter;
         get_slot_diameter(diameter, get_slot(_x, _z));
 
-        BB.max.add(BB.min, diameter);
+        BB.vMax.add(BB.vMin, diameter);
         BB.grow(0.05f);
     }
     void process_all_pallete();

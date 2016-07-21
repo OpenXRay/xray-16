@@ -108,20 +108,23 @@
 #include "xrCore_impexp.h"
 
 #include "xrDebug.h"
-#include "vector.h"
+//#include "vector.h"
 
 #include "clsid.h"
-#include "Threading/Lock.hpp"
+//#include "Threading/Lock.hpp"
 #include "xrMemory.h"
 #include "xrDebug.h"
 
-#include "_stl_extensions.h"
+//#include "_stl_extensions.h"
+#include "xrCommon/xr_vector.h"
+#include "xrCommon/xr_set.h"
 #include "xrsharedmem.h"
 #include "xrstring.h"
 #include "xr_resource.h"
 #include "Compression/rt_compressor.h"
 #include "xr_shared.h"
 #include "string_concatenations.h"
+#include "_flags.h"
 
 // stl ext
 struct XRCORE_API xr_rtoken

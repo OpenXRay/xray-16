@@ -112,6 +112,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="color.cpp" />
     <ClCompile Include="Sound.cpp" />
     <ClCompile Include="string_functions.cpp" />
     <ClCompile Include="xrMisc_xrMemory.cpp" />

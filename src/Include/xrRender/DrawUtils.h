@@ -6,12 +6,21 @@
 #ifndef DrawUtilsH
 #define DrawUtilsH
 #include "xrCore/_types.h"
-#include "xrCore/_vector3d.h"
+// tamlin WIP
+//#include "xrCore/_vector3d.h"
 
 #ifndef ECORE_API
 #pragma message("ECORE_API not defined. Invoking ugly hack to enable compilation.")
 #define ECORE_API
 #endif
+
+template <class T>
+struct _vector3;
+typedef _vector3<float> Fvector;
+
+template <class T>
+struct _obb;
+typedef _obb<float> Fobb;
 
 //----------------------------------------------------
 // Utilities

@@ -1,8 +1,9 @@
 #ifndef xr_sharedH
 #define xr_sharedH
 #pragma once
-#include "_stl_extensions.h"
+//#include "_stl_extensions.h"
 #include "xrstring.h"
+#include "xrCommon/xr_map.h"
 
 class XRCORE_API shared_value
 {

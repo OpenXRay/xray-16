@@ -9,6 +9,7 @@
 #include "line_edit_control.h"
 
 #include "xrCore/os_clipboard.h"
+#include "xrCore/buffer_vector.h"
 #include "Common/object_broker.h"
 #include "xr_input.h"
 

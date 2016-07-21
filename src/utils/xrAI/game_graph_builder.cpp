@@ -539,7 +539,7 @@ void CGameGraphBuilder::connectivity_check(const float& start, const float& amou
     Logger.Progress(start + amount);
 }
 
-void CGameGraphBuilder::create_tripples(const float& start, const float& amount)
+void CGameGraphBuilder::create_tripples(const float& /*start*/, const float& /*amount*/)
 {
     graph_type::const_vertex_iterator I = graph().vertices().begin();
     graph_type::const_vertex_iterator E = graph().vertices().end();

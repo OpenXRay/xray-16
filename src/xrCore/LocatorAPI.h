@@ -6,8 +6,12 @@
 #pragma warning(pop)
 #include "Common/Util.hpp"
 #include "LocatorAPI_defs.h"
+//#include "xrCore/Threading/Lock.hpp"
+#include "xrCommon/xr_map.h"
+#include "xrCommon/predicates.h"
 
-class XRCORE_API CStreamReader;
+class CStreamReader;
+class Lock;
 
 enum class FSType
 {
@@ -82,7 +86,7 @@ private:
     files_set m_files;
     BOOL bNoRecurse;
 
-    Lock m_auth_lock;
+    Lock* m_auth_lock;
     u64 m_auth_code;
 
     const file* RegisterExternal(const char* name);
@@ -201,6 +205,10 @@ public:
     void rescan_pathes();
     void lock_rescan();
     void unlock_rescan();
+
+private:
+	CLocatorAPI(const CLocatorAPI&) = delete;
+	void operator=(const CLocatorAPI&) = delete;
 };
 
 extern XRCORE_API CLocatorAPI* xr_FS;

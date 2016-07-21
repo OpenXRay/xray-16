@@ -524,9 +524,6 @@
     <ClInclude Include="xrMemory_align.h">
       <Filter>Memory manager</Filter>
     </ClInclude>
-    <ClInclude Include="xrMEMORY_POOL.h">
-      <Filter>Memory manager</Filter>
-    </ClInclude>
     <ClInclude Include="xrMemory_pure.h">
       <Filter>Memory manager</Filter>
     </ClInclude>
@@ -751,6 +748,12 @@
     </ClInclude>
     <ClInclude Include="math_constants.h">
       <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="xrMemory_POOL.h">
+      <Filter>Memory manager</Filter>
+    </ClInclude>
+    <ClInclude Include="xr_vector_defs.h">
+      <Filter>Math\Extensions</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

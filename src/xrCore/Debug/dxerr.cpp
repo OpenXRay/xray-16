@@ -11,6 +11,9 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 //--------------------------------------------------------------------------------------
 #include "stdafx.h"
+#ifdef _MSC_VER
+#pragma warning(disable: 4005) // macro redefinition of DXGI_ macros if mixinf DX SDK and new PSDK
+#endif
 #include "dxerr.h"
 
 #include <stdio.h>

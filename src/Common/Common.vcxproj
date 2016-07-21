@@ -106,6 +106,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\xrCommon\inlining_macros.h" />
+    <ClInclude Include="..\xrCommon\math_funcs.h" />
+    <ClInclude Include="..\xrCommon\math_funcs_inline.h" />
+    <ClInclude Include="..\xrCommon\misc_math_types.h" />
+    <ClInclude Include="..\xrCommon\predicates.h" />
+    <ClInclude Include="..\xrCommon\xalloc.h" />
+    <ClInclude Include="..\xrCommon\xr_deque.h" />
+    <ClInclude Include="..\xrCommon\xr_list.h" />
+    <ClInclude Include="..\xrCommon\xr_map.h" />
+    <ClInclude Include="..\xrCommon\xr_set.h" />
+    <ClInclude Include="..\xrCommon\xr_stack.h" />
+    <ClInclude Include="..\xrCommon\xr_string.h" />
+    <ClInclude Include="..\xrCommon\xr_vector.h" />
     <ClInclude Include="Compiler.inl" />
     <ClInclude Include="Config.hpp" />
     <ClInclude Include="face_smoth_flags.h" />

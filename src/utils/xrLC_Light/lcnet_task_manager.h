@@ -3,6 +3,8 @@
 #include "hxgrid/Interface/IAgent.h"
 #include "hxgrid/Interface/hxgridinterface.h"
 #include "lightstab_interface.h"
+#include "xrCore/Threading/Lock.hpp"
+
 namespace lc_net
 {
 #include "hxgrid/Interface/IAgent.h"

@@ -1,8 +1,42 @@
 #include "stdafx.h"
-#pragma hdrstop
+#pragma hdrstop // Huh?
 
 #include "xrMemory_POOL.h"
 #include "xrMemory_align.h"
+#include "Threading/Lock.hpp"
+
+
+MEMPOOL::MEMPOOL() :
+#ifdef CONFIG_PROFILE_LOCKS
+	pcs(new Lock(MUTEX_PROFILE_ID(memory_pool))
+#else
+	pcs(new Lock)
+#endif
+{
+}
+
+MEMPOOL::~MEMPOOL()
+{
+	delete pcs;
+}
+
+void* MEMPOOL::create()
+{
+	pcs->Enter();
+	if (0 == list) block_create();
+
+	void* E = list;
+	list = (u8*)*access(list);
+	pcs->Leave();
+	return E;
+}
+void MEMPOOL::destroy(void*& P)
+{
+	pcs->Enter();
+	*access(P) = list;
+	list = (u8*)P;
+	pcs->Leave();
+}
 
 void MEMPOOL::block_create()
 {

@@ -201,8 +201,8 @@ void CCF_Skeleton::BuildTopLevel()
     IRenderVisual* K = owner->Visual();
     vis_data& vis = K->getVisData();
     Fbox& B = vis.box;
-    bv_box.min.average(B.min);
-    bv_box.max.average(B.max);
+    bv_box.vMin.average(B.vMin);
+    bv_box.vMax.average(B.vMax);
     bv_box.grow(0.05f);
     bv_sphere.P.average(vis.sphere.P);
     bv_sphere.R += vis.sphere.R;
@@ -292,7 +292,7 @@ CCF_EventBox::CCF_EventBox(IGameObject* O) : ICollisionForm(O, cftShape)
     }
     bv_box.set(-.5f, -.5f, -.5f, +.5f, +.5f, +.5f);
     Fvector R;
-    R.set(bv_box.min);
+    R.set(bv_box.vMin);
     T.transform_dir(R);
     bv_sphere.R = R.magnitude();
 

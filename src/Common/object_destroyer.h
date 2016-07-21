@@ -11,8 +11,8 @@
 
 struct CDestroyer
 {
-    static void delete_data(LPCSTR data)
-    IC static void delete_data(LPSTR data) { xr_free(data); }
+    static void delete_data(LPCSTR /*data*/) {}
+    static void delete_data(LPSTR data) { xr_free(data); }
     template <typename T1, typename T2>
     static void delete_data(std::pair<T1, T2>& data)
     {
@@ -47,7 +47,7 @@ struct CDestroyer
             delete_data(temp.front());
     }
 
-    template <template <typename _1, typename _2> class T1, typename T2, typename T3>
+    template <template <typename TX1, typename TX2> class T1, typename T2, typename T3>
     static void delete_data(T1<T2, T3>& data, bool)
     {
         T1<T2, T3> temp = data;
@@ -55,7 +55,7 @@ struct CDestroyer
             delete_data(temp.top());
     }
 
-    template <template <typename _1, typename _2, typename _3> class T1, typename T2, typename T3, typename T4>
+    template <template <typename TX1, typename TX2, typename TX3> class T1, typename T2, typename T3, typename T4>
     static void delete_data(T1<T2, T3, T4>& data, bool)
     {
         T1<T2, T3, T4> temp = data;

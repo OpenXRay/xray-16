@@ -248,7 +248,7 @@ void CShaderTool::RegisterTools()
             break;
         }
         R_ASSERT(tools);
-        m_Tools.insert(mk_pair(k, tools));
+        m_Tools.insert(std::make_pair(k, tools));
     }
 }
 

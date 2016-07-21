@@ -3,6 +3,10 @@
 #define BoneH
 
 #include "xrCore/xrCore.h"
+#include "xrCore/_obb.h"
+#include "xrCore/_sphere.h"
+#include "xrCore/_cylinder.h"
+#include "xrCore/FixedVector.h"
 
 // refs
 class CBone;

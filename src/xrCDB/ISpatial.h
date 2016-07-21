@@ -7,6 +7,7 @@
 //#include "xr_collide_defs.h"
 #include "xrCore/_types.h"
 #include "xrCore/_vector3d.h"
+#include "xrCore/_sphere.h"
 #include "xrCDB.h"
 
 #pragma pack(push, 4)

@@ -104,7 +104,7 @@ IC void swap(AssociativeVector<TKey, TValue, TKeyComparer>& left, AssociativeVec
 #define _associative_vector AssociativeVector<TKey, TValue, TKeyComparer>
 
 TEMPLATE_SPECIALIZATION
-IC _associative_vector::AssociativeVector(const key_compare& predicate, const allocator_type& allocator)
+IC _associative_vector::AssociativeVector(const key_compare& predicate, const allocator_type& /*allocator*/)
     : TComparer(predicate)
 {
 }
@@ -227,32 +227,32 @@ TEMPLATE_SPECIALIZATION
 IC typename _associative_vector::iterator _associative_vector::lower_bound(const key_type& key)
 {
     actualize();
-    TComparer& self = *this;
-    return std::lower_bound(begin(), end(), key, self);
+    TComparer& self_ = *this;
+    return std::lower_bound(begin(), end(), key, self_);
 }
 
 TEMPLATE_SPECIALIZATION
 IC typename _associative_vector::const_iterator _associative_vector::lower_bound(const key_type& key) const
 {
     actualize();
-    const TComparer& self = *this;
-    return std::lower_bound(begin(), end(), key, self);
+    const TComparer& self_ = *this;
+    return std::lower_bound(begin(), end(), key, self_);
 }
 
 TEMPLATE_SPECIALIZATION
 IC typename _associative_vector::iterator _associative_vector::upper_bound(const key_type& key)
 {
     actualize();
-    TComparer& self = *this;
-    return std::upper_bound(begin(), end(), key, self);
+    TComparer& self_ = *this;
+    return std::upper_bound(begin(), end(), key, self_);
 }
 
 TEMPLATE_SPECIALIZATION
 IC typename _associative_vector::const_iterator _associative_vector::upper_bound(const key_type& key) const
 {
     actualize();
-    const TComparer& self = *this;
-    return std::upper_bound(begin(), end(), key, self);
+    const TComparer& self_ = *this;
+    return std::upper_bound(begin(), end(), key, self_);
 }
 
 TEMPLATE_SPECIALIZATION

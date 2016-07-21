@@ -686,7 +686,7 @@ struct DumbClipper
     }
     D3DXVECTOR3 point(Fbox& bb, int i) const
     {
-        return D3DXVECTOR3((i & 1) ? bb.min.x : bb.max.x, (i & 2) ? bb.min.y : bb.max.y, (i & 4) ? bb.min.z : bb.max.z);
+        return D3DXVECTOR3(i&1 ? bb.vMin.x : bb.vMax.x, i&2 ? bb.vMin.y : bb.vMax.y, i&4 ? bb.vMin.z : bb.vMax.z);
     }
     Fbox clipped_AABB(xr_vector<Fbox, render_alloc<Fbox3>>& src, Fmatrix& xf)
     {
@@ -696,7 +696,7 @@ struct DumbClipper
         {
             Fbox& bb = src[it];
             u32 mask = frustum.getMask();
-            EFC_Visible res = frustum.testAABB(&bb.min.x, mask);
+            EFC_Visible res = frustum.testAABB(&bb.vMin.x, mask);
             switch (res)
             {
             case fcvNone: continue;
@@ -845,8 +845,8 @@ void CRender::render_sun()
         }
         Fbox& bb = frustum_bb;
         bb.grow(EPS);
-        D3DXMatrixOrthoOffCenterLH((D3DXMATRIX*)&mdir_Project, bb.min.x, bb.max.x, bb.min.y, bb.max.y,
-            bb.min.z - tweak_ortho_xform_initial_offs, bb.max.z);
+        D3DXMatrixOrthoOffCenterLH((D3DXMATRIX*)&mdir_Project, bb.vMin.x, bb.vMax.x, bb.vMin.y, bb.vMax.y,
+            bb.vMin.z - tweak_ortho_xform_initial_offs, bb.vMax.z);
 
         // full-xform
         cull_xform.mul(mdir_Project, mdir_View);
@@ -1149,33 +1149,33 @@ void CRender::render_sun()
 
         // because caster points are from coarse representation only allow to "shrink" box, not grow
         // that is the same as if we first clip casters by frustum
-        if (b_receivers.min.x < -1)
-            b_receivers.min.x = -1;
-        if (b_receivers.min.y < -1)
-            b_receivers.min.y = -1;
-        if (b_casters.min.z < 0)
-            b_casters.min.z = 0;
-        if (b_receivers.max.x > +1)
-            b_receivers.max.x = +1;
-        if (b_receivers.max.y > +1)
-            b_receivers.max.y = +1;
-        if (b_casters.max.z > +1)
-            b_casters.max.z = +1;
+        if (b_receivers.vMin.x < -1)
+            b_receivers.vMin.x = -1;
+        if (b_receivers.vMin.y < -1)
+            b_receivers.vMin.y = -1;
+        if (b_casters.vMin.z < 0)
+            b_casters.vMin.z = 0;
+        if (b_receivers.vMax.x > +1)
+            b_receivers.vMax.x = +1;
+        if (b_receivers.vMax.y > +1)
+            b_receivers.vMax.y = +1;
+        if (b_casters.vMax.z > +1)
+            b_casters.vMax.z = +1;
 
         // refit?
         /*
         const float EPS				= 0.001f;
         D3DXMATRIX					refit;
-        D3DXMatrixOrthoOffCenterLH	( &refit, b_receivers.min.x, b_receivers.max.x, b_receivers.min.y,
-        b_receivers.max.y, b_casters.min.z-EPS, b_casters.max.z+EPS );
+        D3DXMatrixOrthoOffCenterLH	( &refit, b_receivers.vMin.x, b_receivers.vMax.x, b_receivers.vMin.y,
+        b_receivers.vMax.y, b_casters.vMin.z-EPS, b_casters.vMax.z+EPS );
         D3DXMatrixMultiply			( &m_LightViewProj, &m_LightViewProj, &refit);
         */
 
-        float boxWidth = b_receivers.max.x - b_receivers.min.x;
-        float boxHeight = b_receivers.max.y - b_receivers.min.y;
+        float boxWidth = b_receivers.vMax.x - b_receivers.vMin.x;
+        float boxHeight = b_receivers.vMax.y - b_receivers.vMin.y;
         //  the divide by two's cancel out in the translation, but included for clarity
-        float boxX = (b_receivers.max.x + b_receivers.min.x) / 2.f;
-        float boxY = (b_receivers.max.y + b_receivers.min.y) / 2.f;
+        float boxX = (b_receivers.vMax.x + b_receivers.vMin.x) / 2.f;
+        float boxY = (b_receivers.vMax.y + b_receivers.vMin.y) / 2.f;
         D3DXMATRIX trapezoidUnitCube(2.f / boxWidth, 0.f, 0.f, 0.f, 0.f, 2.f / boxHeight, 0.f, 0.f, 0.f, 0.f, 1.f, 0.f,
             -2.f * boxX / boxWidth, -2.f * boxY / boxHeight, 0.f, 1.f);
         D3DXMatrixMultiply(&m_LightViewProj, &m_LightViewProj, &trapezoidUnitCube);
@@ -1337,15 +1337,15 @@ void CRender::render_sun_near()
         Fvector	xf	= wform		(mdir_View,hull.points[it]);
         frustum_bb.modify		(xf);
         }
-        float	size_x				= frustum_bb.max.x - frustum_bb.min.x;
-        float	size_y				= frustum_bb.max.y - frustum_bb.min.y;
+        float	size_x				= frustum_bb.vMax.x - frustum_bb.vMin.x;
+        float	size_y				= frustum_bb.vMax.y - frustum_bb.vMin.y;
         float	diff_x				= (spherical_range - size_x)/2.f;	//VERIFY(diff_x>=0);
         float	diff_y				= (spherical_range - size_y)/2.f;	//VERIFY(diff_y>=0);
-        frustum_bb.min.x -= diff_x; frustum_bb.max.x += diff_x;
-        frustum_bb.min.y -= diff_y; frustum_bb.max.y += diff_y;
+        frustum_bb.vMin.x -= diff_x; frustum_bb.vMax.x += diff_x;
+        frustum_bb.vMin.y -= diff_y; frustum_bb.vMax.y += diff_y;
         Fbox&	bb					= frustum_bb;
-        D3DXMatrixOrthoOffCenterLH	((D3DXMATRIX*)&mdir_Project,bb.min.x,bb.max.x,  bb.min.y,bb.max.y,
-        bb.min.z-tweak_ortho_xform_initial_offs,bb.max.z);
+        D3DXMatrixOrthoOffCenterLH	((D3DXMATRIX*)&mdir_Project,bb.vMin.x,bb.vMax.x,  bb.vMin.y,bb.vMax.y,
+        bb.vMin.z-tweak_ortho_xform_initial_offs,bb.vMax.z);
         /**/
 
         //	Simple
@@ -1359,8 +1359,8 @@ void CRender::render_sun_near()
         }
         Fbox& bb = frustum_bb;
         bb.grow(EPS);
-        D3DXMatrixOrthoOffCenterLH((D3DXMATRIX*)&mdir_Project, bb.min.x, bb.max.x, bb.min.y, bb.max.y,
-            bb.min.z - tweak_ortho_xform_initial_offs, bb.max.z);
+        D3DXMatrixOrthoOffCenterLH((D3DXMATRIX*)&mdir_Project, bb.vMin.x, bb.vMax.x, bb.vMin.y, bb.vMax.y,
+            bb.vMin.z - tweak_ortho_xform_initial_offs, bb.vMax.z);
         /**/
 
         // build viewport xform
@@ -1394,10 +1394,10 @@ void CRender::render_sun_near()
             scissor.modify(xf);
         }
         s32 limit = RImplementation.o.smapsize - 1;
-        fuckingsun->X.D.minX = clampr(iFloor(scissor.min.x), 0, limit);
-        fuckingsun->X.D.maxX = clampr(iCeil(scissor.max.x), 0, limit);
-        fuckingsun->X.D.minY = clampr(iFloor(scissor.min.y), 0, limit);
-        fuckingsun->X.D.maxY = clampr(iCeil(scissor.max.y), 0, limit);
+        fuckingsun->X.D.minX = clampr(iFloor(scissor.vMin.x), 0, limit);
+        fuckingsun->X.D.maxX = clampr(iCeil(scissor.vMax.x), 0, limit);
+        fuckingsun->X.D.minY = clampr(iFloor(scissor.vMin.y), 0, limit);
+        fuckingsun->X.D.maxY = clampr(iCeil(scissor.vMax.y), 0, limit);
 
         // full-xform
         FPU::m24r();

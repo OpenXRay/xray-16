@@ -1,11 +1,14 @@
 //----------------------------------------------------
 // file: StaticMesh.h
 //----------------------------------------------------
+#pragma once
 #ifndef EditMeshH
 #define EditMeshH
+#include "xrCore/_types.h"
+#include "xrCore/_fbox.h"
 
 //----------------------------------------------------
-// refs
+// fwd. decl.
 class CSurface;
 struct SRayPickInfo;
 // struct CFrustum;

@@ -1164,6 +1164,7 @@
     <ClInclude Include="pp_effector_custom.h" />
     <ClInclude Include="pp_effector_distance.h" />
     <ClInclude Include="profile_data_types.h" />
+    <ClInclude Include="profile_data_types_script.h" />
     <ClInclude Include="profile_store.h" />
     <ClInclude Include="property_evaluator.h" />
     <ClInclude Include="property_evaluator_const.h" />

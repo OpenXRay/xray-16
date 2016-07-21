@@ -95,7 +95,7 @@ void CDetailManager::hw_Load_Geom()
                     pV->z = vP.z;
                     pV->u = QC(D.vertices[v].u);
                     pV->v = QC(D.vertices[v].v);
-                    pV->t = QC(vP.y / (D.bv_bb.max.y - D.bv_bb.min.y));
+                    pV->t = QC(vP.y / (D.bv_bb.vMax.y - D.bv_bb.vMin.y));
                     pV->mid = short(mid);
                     pV++;
                 }

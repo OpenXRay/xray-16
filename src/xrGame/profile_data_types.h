@@ -1,8 +1,8 @@
+#pragma once
 #ifndef PLAYER_AWARDS
 #define PLAYER_AWARDS
 
 #include "xrCore/Containers/AssociativeVector.hpp"
-#include "mixed_delegate.h"
 #include "atlas_stalkercoppc_v1.h"
 
 namespace gamespy_profile
@@ -87,8 +87,6 @@ enum_best_score_type get_best_score_type_by_sname(char const* stat_name);
 
 typedef AssociativeVector<enum_best_score_type, s32> all_best_scores_t;
 
-typedef mixed_delegate<void(bool, char const*), store_operation_cb_tag> store_operation_cb;
-
 extern char* profile_table_name;
 
 extern char* profile_store_file_name;
@@ -100,7 +98,5 @@ extern char* profile_id_line;
 extern char* profile_last_submit_time;
 
 } // namespace gamespy_profile
-
-typedef gamespy_profile::store_operation_cb gamespy_profile_store_operation_cb;
 
 #endif //#ifndef PLAYER_AWARDS

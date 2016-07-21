@@ -1,7 +1,11 @@
+#pragma once
 #ifndef __XR_COLLIDE_FORM_H__
 #define __XR_COLLIDE_FORM_H__
 
 #include "xrCDB/xr_collide_defs.h"
+#include "xrCore/_obb.h"
+#include "xrCore/_cylinder.h"
+#include "xrCore/_sphere.h"
 
 // refs
 class ENGINE_API IGameObject;

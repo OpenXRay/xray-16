@@ -13,6 +13,9 @@
 #include "Common/object_broker.h"
 #include "restriction_space.h"
 
+#ifdef _MSC_VER
+#pragma warning(disable 4100) // unreferenced formal parameter
+#endif
 #ifndef AI_COMPILER
 #include "character_info.h"
 #endif // AI_COMPILER
@@ -228,7 +231,11 @@ static SFillPropData fp_data;
 #endif // #ifdef XRSE_FACTORY_EXPORTS
 
 #ifndef XRGAME_EXPORTS
+#ifdef XRSE_FACTORY_EXPORTS
 void CSE_ALifeTraderAbstract::FillProps(LPCSTR pref, PropItemVec& items)
+#else
+void CSE_ALifeTraderAbstract::FillProps (LPCSTR /*pref*/, PropItemVec& /*items*/)
+#endif
 {
 #ifdef XRSE_FACTORY_EXPORTS
     PHelper().CreateU32(items, PrepareKey(pref, *base()->s_name, "Money"), &m_dwMoney, 0, u32(-1));
@@ -264,7 +271,7 @@ CSE_ALifeGraphPoint::~CSE_ALifeGraphPoint()
 #endif // XRSE_FACTORY_EXPORTS
 }
 
-void CSE_ALifeGraphPoint::STATE_Read(NET_Packet& tNetPacket, u16 size)
+void CSE_ALifeGraphPoint::STATE_Read(NET_Packet& tNetPacket, u16 /*size*/)
 {
     tNetPacket.r_stringZ(m_caConnectionPointName);
     if (m_wVersion < 33)
@@ -286,8 +293,8 @@ void CSE_ALifeGraphPoint::STATE_Write(NET_Packet& tNetPacket)
     tNetPacket.w_u8(m_tLocations[2]);
     tNetPacket.w_u8(m_tLocations[3]);
 };
-void CSE_ALifeGraphPoint::UPDATE_Read(NET_Packet& tNetPacket) {}
-void CSE_ALifeGraphPoint::UPDATE_Write(NET_Packet& tNetPacket) {}
+void CSE_ALifeGraphPoint::UPDATE_Read(NET_Packet& /*tNetPacket*/) {}
+void CSE_ALifeGraphPoint::UPDATE_Write(NET_Packet& /*tNetPacket*/) {}
 #ifndef XRGAME_EXPORTS
 void CSE_ALifeGraphPoint::FillProps(LPCSTR pref, PropItemVec& items)
 {
@@ -306,14 +313,19 @@ void CSE_ALifeGraphPoint::FillProps(LPCSTR pref, PropItemVec& items)
 #endif // #ifdef XRSE_FACTORY_EXPORTS
 }
 
-void CSE_ALifeGraphPoint::on_render(
-CDUInterface* du, IServerEntityLEOwner* owner, bool bSelected, const Fmatrix& parent, int priority, bool strictB2F)
+void CSE_ALifeGraphPoint::on_render(CDUInterface* du, IServerEntityLEOwner* /*owner*/,
+    bool /*bSelected*/, const Fmatrix& parent, int /*priority*/, bool /*strictB2F*/)
 {
 #ifdef XRSE_FACTORY_EXPORTS
     static const u32 IL[16] = {0, 1, 0, 2, 0, 3, 0, 4, 1, 3, 3, 2, 2, 4, 4, 1};
     static const u32 IT[12] = {1, 3, 0, 3, 2, 0, 2, 4, 0, 4, 1, 0};
-    static Fvector PT[5] = {
-    {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, -0.5f}, {0.0f, 0.0f, 0.5f}, {-0.5f, 0.0f, 0.0f}, {0.5f, 0.0f, 0.0f},
+    static const Fvector PT[5] =
+    {
+        {0.0f, 1.0f, 0.0f},
+        {0.0f, 0.0f, -0.5f},
+        {0.0f, 0.0f, 0.5f},
+        {-0.5f, 0.0f, 0.0f},
+        {0.5f, 0.0f, 0.0f},
     };
 
     Fcolor C;
@@ -475,8 +487,8 @@ void CSE_ALifeObject::STATE_Read(NET_Packet& tNetPacket, u16 size)
         tNetPacket.r_u32(m_spawn_story_id);
 }
 
-void CSE_ALifeObject::UPDATE_Write(NET_Packet& tNetPacket) {}
-void CSE_ALifeObject::UPDATE_Read(NET_Packet& tNetPacket){};
+void CSE_ALifeObject::UPDATE_Write(NET_Packet& /*tNetPacket*/) {}
+void CSE_ALifeObject::UPDATE_Read(NET_Packet& /*tNetPacket*/) {};
 
 #ifndef XRGAME_EXPORTS
 void CSE_ALifeObject::FillProps(LPCSTR pref, PropItemVec& items)
@@ -552,7 +564,7 @@ void CSE_ALifeObject::interactive(bool value) throw() { m_flags.set(flInteractiv
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifeGroupAbstract
 ////////////////////////////////////////////////////////////////////////////
-CSE_ALifeGroupAbstract::CSE_ALifeGroupAbstract(LPCSTR caSection)
+CSE_ALifeGroupAbstract::CSE_ALifeGroupAbstract(LPCSTR /*caSection*/)
 {
     m_tpMembers.clear();
     m_bCreateSpawnPositions = true;
@@ -1759,13 +1771,13 @@ void CSE_ALifeObjectClimable::STATE_Write(NET_Packet& tNetPacket)
     tNetPacket.w_stringZ(material);
 }
 
-void CSE_ALifeObjectClimable::UPDATE_Read(NET_Packet& tNetPacket)
+void CSE_ALifeObjectClimable::UPDATE_Read(NET_Packet& /*tNetPacket*/)
 {
     // inherited1::UPDATE_Read       (tNetPacket);
     // inherited2::UPDATE_Read       (tNetPacket);
 }
 
-void CSE_ALifeObjectClimable::UPDATE_Write(NET_Packet& tNetPacket)
+void CSE_ALifeObjectClimable::UPDATE_Write(NET_Packet& /*tNetPacket*/)
 {
     // inherited1::UPDATE_Write      (tNetPacket);
     // inherited2::UPDATE_Write      (tNetPacket);
@@ -1879,7 +1891,7 @@ void CSE_ALifeSmartZone::FillProps(LPCSTR pref, PropItemVec& items) { inherited1
 
 void CSE_ALifeSmartZone::update() {}
 float CSE_ALifeSmartZone::detect_probability() { return (0.f); }
-void CSE_ALifeSmartZone::smart_touch(CSE_ALifeMonsterAbstract* monster) {}
+void CSE_ALifeSmartZone::smart_touch(CSE_ALifeMonsterAbstract* /*monster*/) {}
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifeInventoryBox
 ////////////////////////////////////////////////////////////////////////////

@@ -1,6 +1,7 @@
 #pragma once
 
-typedef enum NV_ERROR_CODE {
+enum NV_ERROR_CODE
+{
     NV_OK = 0,
     NV_FAIL = -1, // generic
     NV_CANT_OPEN_INPUT_FILE = -2,
@@ -95,4 +96,4 @@ typedef enum NV_ERROR_CODE {
     NV_VOLUME_MAP_IS_NOT_POWER2 = -102,
 };
 
-const char* getErrorString(NV_ERROR_CODE hr);
+//const char* getErrorString(NV_ERROR_CODE hr);

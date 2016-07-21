@@ -169,7 +169,7 @@ IC int xr_strcmp(const shared_str& a, const shared_str& b) throw()
         return xr_strcmp(*a, *b);
 }
 
-// void xr_strlwr(xr_string& src) // in _stl_extensions.h, since it depends on xr_string defined there.
+// void xr_strlwr(xr_string& src) // in xrCommon/xr_string.h, since it depends on xr_string defined there.
 void xr_strlwr(shared_str& src);
 
 #pragma pack(pop)

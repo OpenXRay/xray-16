@@ -36,8 +36,8 @@ void CBuild::PreOptimize()
 
     // Calculate offset,scale,epsilon
     Fbox bb = scene_bb;
-    VMscale.set(bb.max.x - bb.min.x, bb.max.y - bb.min.y, bb.max.z - bb.min.z);
-    VMmin.set(bb.min);
+    VMscale.set(bb.vMax.x - bb.vMin.x, bb.vMax.y - bb.vMin.y, bb.vMax.z - bb.vMin.z);
+    VMmin.set(bb.vMin);
     VMeps.set(VMscale.x / HDIM_X / 2, VMscale.y / HDIM_Y / 2, VMscale.z / HDIM_Z / 2);
     VMeps.x = (VMeps.x < EPS_L) ? VMeps.x : EPS_L;
     VMeps.y = (VMeps.y < EPS_L) ? VMeps.y : EPS_L;

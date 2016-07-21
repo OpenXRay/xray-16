@@ -1,5 +1,9 @@
+#pragma once
 #ifndef xr_trimsH
 #define xr_trimsH
+//#include "xrCore/_stl_extensions.h"
+#include "Common/Platform.hpp" // LPCSTR etc
+#include "xrCore/xr_vector_defs.h"
 
 // refs
 struct xr_token;

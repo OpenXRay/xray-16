@@ -6,9 +6,9 @@
 //#include "xrCore/net_utils.h"
 #include <dplay/dplay8.h>
 #include "NET_Messages.h"
-
 #include "NET_Log.h"
 #include "xrGameSpy/xrGameSpy_MainDefs.h"
+#include "xrCore/buffer_vector.h"
 
 #pragma warning(push)
 #pragma warning(disable : 4995)

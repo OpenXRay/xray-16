@@ -11,25 +11,13 @@
 #define xrServer_SpaceH
 #include "xrCore/_types.h"
 #include "xrCore/_vector3d.h"
-#include "xrCore/_stl_extensions.h"
+#include "xrCommon/xr_vector.h"
 
 #ifndef XRGAME_EXPORTS
 #define SERVER_ENTITY_EDITOR_METHODS virtual void FillProps(LPCSTR pref, PropItemVec& values);
 #else // #ifdef XRGAME_EXPORTS
 #define SERVER_ENTITY_EDITOR_METHODS
 #endif // #ifndef XRGAME_EXPORTS
-// XXX: move to core/math
-struct SRotation
-{
-    float yaw, pitch, roll;
-    SRotation() { yaw = pitch = roll = 0; }
-    SRotation(float y, float p, float r)
-    {
-        yaw = y;
-        pitch = p;
-        roll = r;
-    }
-};
 
 enum EPOType
 {

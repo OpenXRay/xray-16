@@ -3,6 +3,7 @@
 #pragma hdrstop
 
 #include "particle_core.h"
+#include "xrCore/_fbox.h"
 
 using namespace PAPI;
 

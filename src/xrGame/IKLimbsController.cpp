@@ -6,7 +6,7 @@
 #include "physicsshellholder.h"
 
 #include "ik_anim_state.h"
-#include "xrPhysics/mathutils.h"
+#include "xrPhysics/MathUtils.h"
 #include "Include/xrRender/RenderVisual.h"
 #include "Include/xrRender/Kinematics.h"
 

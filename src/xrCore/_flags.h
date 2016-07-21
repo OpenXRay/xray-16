@@ -51,7 +51,7 @@ public:
         flags = mask;
         return *this;
     }
-    SelfRef set(const T mask, BOOL value) throw()
+    SelfRef set(const T mask, bool value) throw()
     {
         if (value)
             flags |= mask;
@@ -59,9 +59,9 @@ public:
             flags &= ~mask;
         return *this;
     }
-    BOOL is(const T mask) const throw() { return mask == (flags & mask); }
-    BOOL is_any(const T mask) const throw() { return BOOL(!!(flags & mask)); }
-    BOOL test(const T mask) const throw() { return BOOL(!!(flags & mask)); }
+    bool is(const T mask) const throw() { return mask == (flags & mask); }
+    bool is_any(const T mask) const throw() { return !!(flags & mask); }
+    bool test(const T mask) const throw() { return !!(flags & mask); }
     SelfRef or (const T mask) throw()
     {
         flags |= mask;
@@ -82,8 +82,8 @@ public:
         flags = f.flags & mask;
         return *this;
     }
-    BOOL equal(const Self& f) const throw() { return flags == f.flags; }
-    BOOL equal(const Self& f, const T mask) const throw() { return (flags & mask) == (f.flags & mask); }
+    bool equal(const Self& f) const throw() { return flags == f.flags; }
+    bool equal(const Self& f, const T mask) const throw() { return (flags & mask) == (f.flags & mask); }
 };
 
 typedef _flags<u8> Flags8;

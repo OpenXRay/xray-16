@@ -1,5 +1,10 @@
+#pragma once
 #ifndef ShapeDataH
 #define ShapeDataH
+#include "xrCore/_types.h"
+#include "xrCore/_sphere.h"
+#include "xrCore/_matrix.h"
+#include "xrCommon/xr_vector.h"
 
 struct CShapeData
 {

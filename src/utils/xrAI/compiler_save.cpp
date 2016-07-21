@@ -49,7 +49,7 @@ float CalculateHeight(Fbox& BB)
         vertex& N = g_nodes[i];
         BB.modify(N.Pos);
     }
-    return BB.max.y - BB.min.y + EPS_L;
+    return BB.vMax.y - BB.vMin.y + EPS_L;
 }
 
 xr_vector<NodeCompressed> compressed_nodes;
@@ -105,7 +105,7 @@ public:
     }
 };
 
-void xrSaveNodes(LPCSTR N, LPCSTR out_name)
+void xrSaveNodes(LPCSTR name, LPCSTR out_name)
 {
     Msg("NS: %d, CNS: %d, ratio: %f%%", sizeof(vertex), sizeof(CLevelGraph::CVertex),
         100 * float(sizeof(CLevelGraph::CVertex)) / float(sizeof(vertex)));
@@ -113,7 +113,7 @@ void xrSaveNodes(LPCSTR N, LPCSTR out_name)
     Msg("Renumbering nodes...");
 
     string_path fName;
-    strconcat(sizeof(fName), fName, N, out_name);
+    strconcat(sizeof(fName), fName, name, out_name);
 
     IWriter* fs = FS.w_open(fName);
 

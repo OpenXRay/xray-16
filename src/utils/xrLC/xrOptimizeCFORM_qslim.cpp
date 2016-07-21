@@ -52,14 +52,14 @@ IC u32 common_edge_idx(const MxFace& base_f, u32 base_edge_idx, const MxFace& te
     MxVertexID bv0 = base_f[base_edge_idx];
     MxVertexID bv1 = base_f[(base_edge_idx + 1) % 3];
     if (bv0 > bv1)
-        swap(bv0, bv1);
+        std::swap(bv0, bv1);
 
     for (u8 i = 0; i < 3; ++i)
     {
         MxVertexID tv0 = test_f[i];
         MxVertexID tv1 = test_f[(i + 1) % 3];
         if (tv0 > tv1)
-            swap(tv0, tv1);
+            std::swap(tv0, tv1);
         if (bv0 == tv0 && bv1 == tv1)
             return i;
     }

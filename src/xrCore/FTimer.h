@@ -1,8 +1,10 @@
 #pragma once
 #ifndef FTimerH
 #define FTimerH
+#include "_types.h"
 #include "xrCore_impexp.h"
-#include "_stl_extensions.h"
+#include "xrCommon/xr_vector.h"
+//#include "_stl_extensions.h"
 #include "_math.h"
 #include "log.h"
 

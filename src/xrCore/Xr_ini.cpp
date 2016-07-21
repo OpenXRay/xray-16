@@ -453,7 +453,7 @@ BOOL CInifile::section_exist(LPCSTR S) const
     return (I != DATA.end() && xr_strcmp(*(*I)->Name, S) == 0);
 }
 
-BOOL CInifile::line_exist(LPCSTR S, LPCSTR L) const
+bool CInifile::line_exist(LPCSTR S, LPCSTR L) const
 {
     if (!section_exist(S))
         return FALSE;
@@ -476,7 +476,7 @@ u32 CInifile::line_count(LPCSTR Sname) const
 u32 CInifile::section_count() const { return DATA.size(); }
 //--------------------------------------------------------------------------------------
 CInifile::Sect& CInifile::r_section(const shared_str& S) const { return r_section(*S); }
-BOOL CInifile::line_exist(const shared_str& S, const shared_str& L) const { return line_exist(*S, *L); }
+bool CInifile::line_exist(const shared_str& S, const shared_str& L)const { return line_exist(*S, *L); }
 u32 CInifile::line_count(const shared_str& S) const { return line_count(*S); }
 BOOL CInifile::section_exist(const shared_str& S) const { return section_exist(*S); }
 //--------------------------------------------------------------------------------------

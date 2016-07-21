@@ -1,6 +1,6 @@
+#pragma once
 #ifndef PhysicsShellH
 #define PhysicsShellH
-#pragma once
 
 #include "PHDefs.h"
 #include "PhysicsCommon.h"
@@ -9,6 +9,8 @@
 
 #include "xrEngine/iphysicsshell.h"
 #include "iphysics_scripted.h"
+
+// fwd. decl.
 class CPhysicsJoint;
 class CPhysicsElement;
 class CPhysicsShell;
@@ -25,8 +27,11 @@ class CPHShellSplitterHolder;
 class IKinematics;
 typedef u32 CLClassBits;
 typedef u32 CLBits;
-
 struct dMass;
+template <class T> class _cylinder; typedef _cylinder<float> Fcylinder;
+template <class T> struct _sphere; typedef _sphere<float> Fsphere;
+template <class T> struct _obb; typedef _obb<float> Fobb;
+template <class T> struct _quaternion;  typedef _quaternion<float> Fquaternion;
 
 enum motion_history_state
 {

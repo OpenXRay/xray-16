@@ -1,5 +1,11 @@
 #pragma once
 #include "serialize.h"
+#include "xrCore/_types.h"
+#include "xrCore/_fbox2.h"
+#include "xrCore/_vector2.h"
+#include "xrCore/_bitwise.h"
+#include "xrCommon/xr_vector.h"
+
 template <class T, u32 s_X, u32 s_Y>
 class hash2D
 {
