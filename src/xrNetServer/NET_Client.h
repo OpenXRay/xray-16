@@ -4,6 +4,7 @@
 #include "NET_Common.h"
 #include "xrCommon/xr_deque.h"
 #include "xrCommon/xr_vector.h"
+#include "Common/Noncopyable.hpp"
 
 struct ip_address;
 
@@ -47,7 +48,7 @@ class XRNETSERVER_API IPureClient : private MultipacketReciever, private Multipa
     friend void sync_thread(void*);
 
 protected:
-    struct HOST_NODE // deprecated...
+    struct HOST_NODE : Noncopyable // deprecated...
     {
         HOST_NODE();
         HOST_NODE(const HOST_NODE& rhs);
@@ -57,9 +58,6 @@ protected:
         DPN_APPLICATION_DESC* pdpAppDesc;
         IDirectPlay8Address* pHostAddress;
         shared_str dpSessionName;
-
-    private:
-        void operator=(const HOST_NODE&) = delete;
     };
 
     GameDescriptionData m_game_description;

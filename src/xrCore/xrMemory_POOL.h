@@ -3,11 +3,12 @@
 #define xrMemory_POOLh
 #include "_types.h"
 #include "xrCommon/inlining_macros.h"
+#include "Common/Noncopyable.hpp"
 
 class xrMemory;
 class Lock;
 
-class MEMPOOL
+class MEMPOOL : Noncopyable
 {
 #ifdef DEBUG_MEMORY_MANAGER
     friend class xrMemory;
@@ -25,10 +26,6 @@ public:
     void destroy(void*& P);
 
 private:
-    // noncopyable
-    MEMPOOL(const MEMPOOL&) = delete;
-    void operator=(const MEMPOOL&) = delete;
-
     ICF void** access(void* P) { return (void**)((void*)(P)); }
     void block_create();
 
