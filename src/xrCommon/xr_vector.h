@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include "xalloc.h"
+#include "xrCore/xrDebug_macros.h"
 
 #ifdef _M_AMD64
 #define M_DONTDEFERCLEAR_EXT
@@ -30,9 +31,9 @@ public:
     xr_vector() : inherited() {}
     xr_vector(size_t _count, const T& _value) : inherited(_count, _value) {}
     explicit xr_vector(size_t _count) : inherited(_count) {}
-    u32 size() const { return (u32)inherited::size(); }
+    u32 size() const throw() { return (u32)inherited::size(); }
 
-    void clear_and_free() { inherited::clear(); }
+    void clear_and_free() throw() { inherited::clear(); }
     void clear_not_free() { erase(begin(), end()); }
     void clear_and_reserve()
     {
@@ -52,15 +53,21 @@ public:
 #endif
     const_reference operator[](size_type _Pos) const
     {
-        VERIFY2(_Pos<size(),
-            make_string("index is out of range: index requested[%d], size of container[%d]", _Pos, size()).c_str());
+        check_idx(_Pos);
         return *(begin()+_Pos);
     }
     reference operator[](size_type _Pos)
     {
-        VERIFY2(_Pos<size(),
-            make_string("index is out of range: index requested[%d], size of container[%d]", _Pos, size()).c_str());
+        check_idx(_Pos);
         return *(begin()+_Pos);
+    }
+
+private:
+    void check_idx(size_type _Pos) const
+    {
+        VERIFY2(_Pos < size(),
+            make_string("index is out of range: index requested[%d], size of container[%d]",
+            _Pos, size()).c_str());
     }
 };
 
