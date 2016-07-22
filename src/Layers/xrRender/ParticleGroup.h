@@ -130,7 +130,7 @@ public:
     virtual ~CParticleGroup();
     virtual void OnFrame(u32 dt);
 
-    virtual void Copy(dxRender_Visual* pFrom) { FATAL("Can't duplicate particle system - NOT IMPLEMENTED"); }
+    virtual void Copy(dxRender_Visual* /*pFrom*/) { FATAL("Can't duplicate particle system - NOT IMPLEMENTED"); }
     virtual void OnDeviceCreate();
     virtual void OnDeviceDestroy();
 

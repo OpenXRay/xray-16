@@ -129,8 +129,8 @@ void CUISequencer::Start(LPCSTR tutor_name)
     uiXml.SetLocalRoot(uiXml.NavigateToNode("global_wnd", 0));
     {
         LPCSTR str = uiXml.Read("pause_state", 0, "ignore");
-        m_flags.set(etsNeedPauseOn, 0 == _stricmp(str, "on"));
-        m_flags.set(etsNeedPauseOff, 0 == _stricmp(str, "off"));
+        m_flags.set(etsNeedPauseOn, 0 == xr_stricmp(str, "on"));
+        m_flags.set(etsNeedPauseOff, 0 == xr_stricmp(str, "off"));
     }
 
     LPCSTR snd_name = uiXml.Read("sound", 0, "");
@@ -147,7 +147,7 @@ void CUISequencer::Start(LPCSTR tutor_name)
     for (int i = 0; i < items_count; ++i)
     {
         LPCSTR _tp = uiXml.ReadAttrib("item", i, "type", "");
-        bool bVideo = 0 == _stricmp(_tp, "video");
+        bool bVideo = 0 == xr_stricmp(_tp, "video");
         CUISequenceItem* pItem = 0;
         if (bVideo)
             pItem = new CUISequenceVideoItem(this);

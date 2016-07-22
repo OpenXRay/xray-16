@@ -69,7 +69,7 @@ CDemoRecord::CDemoRecord(const char* name, float life_time) : CEffectorCam(cefDe
      psHUD_Flags.set(HUD_CROSSHAIR, FALSE);
      */
     m_b_redirect_input_to_level = false;
-    _unlink(name);
+    xr_unlink(name);
     file = FS.w_open(name);
     if (file)
     {
@@ -267,10 +267,10 @@ void CDemoRecord::MakeCubeMapFace(Fvector& D, Fvector& N)
     case 5:
         N.set(cmNorm[m_Stage]);
         D.set(cmDir[m_Stage]);
-        GEnv.Render->Screenshot(IRender::SM_FOR_CUBEMAP, _itoa(m_Stage, buf, 10));
+        GEnv.Render->Screenshot(IRender::SM_FOR_CUBEMAP, xr_itoa(m_Stage, buf, 10));
         break;
     case 6:
-        GEnv.Render->Screenshot(IRender::SM_FOR_CUBEMAP, _itoa(m_Stage, buf, 10));
+        GEnv.Render->Screenshot(IRender::SM_FOR_CUBEMAP, xr_itoa(m_Stage, buf, 10));
         N.set(m_Camera.j);
         D.set(m_Camera.k);
         psHUD_Flags.assign(s_hud_flag);

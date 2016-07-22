@@ -797,6 +797,8 @@ void D3DXRenderBase::setGamma(float fGamma)
 {
 #ifndef USE_OGL
     m_Gamma.Gamma(fGamma);
+#else
+    UNUSED(fGamma);
 #endif
 }
 
@@ -804,6 +806,8 @@ void D3DXRenderBase::setBrightness(float fGamma)
 {
 #ifndef USE_OGL
     m_Gamma.Brightness(fGamma);
+#else
+    UNUSED(fGamma);
 #endif
 }
 
@@ -811,6 +815,8 @@ void D3DXRenderBase::setContrast(float fGamma)
 {
 #ifndef USE_OGL
     m_Gamma.Contrast(fGamma);
+#else
+    UNUSED(fGamma);
 #endif
 }
 

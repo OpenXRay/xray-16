@@ -79,7 +79,7 @@ void LevelCompilerLoggerWindow::LogThreadProc()
     string256 u_name;
     unsigned long u_size = sizeof(u_name) - 1;
     GetUserName(u_name, &u_size);
-    _strlwr(u_name);
+    xr_strlwr(u_name);
     if (!xr_strcmp(u_name, "oles") || !xr_strcmp(u_name, "alexmx"))
         bHighPriority = TRUE;
     // Main cycle

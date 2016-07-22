@@ -23,10 +23,10 @@ void fix_texture_name(LPSTR fn)
 {
     LPSTR _ext = strext(fn);
     if (_ext &&
-        (0==_stricmp(_ext, ".tga") ||
-        0==_stricmp(_ext, ".dds") ||
-        0==_stricmp(_ext, ".bmp") ||
-        0==_stricmp(_ext, ".ogm")))
+        (0==xr_stricmp(_ext, ".tga") ||
+        0==xr_stricmp(_ext, ".dds") ||
+        0==xr_stricmp(_ext, ".bmp") ||
+        0==xr_stricmp(_ext, ".ogm")))
         *_ext = 0;
 }
 */
@@ -121,7 +121,7 @@ void CResourceManager::_ParseList(sh_list& dest, LPCSTR names)
         {
             // flush
             N.push_back(0);
-            _strlwr(N.begin());
+            xd_strlwr(N.begin());
 
             fix_texture_name(N.begin());
             //. andy			if (strext(N.begin())) *strext(N.begin())=0;
@@ -138,7 +138,7 @@ void CResourceManager::_ParseList(sh_list& dest, LPCSTR names)
     {
         // flush
         N.push_back(0);
-        _strlwr(N.begin());
+        xd_strlwr(N.begin());
 
         fix_texture_name(N.begin());
         //. andy		if (strext(N.begin())) *strext(N.begin())=0;
@@ -186,12 +186,15 @@ Shader* CResourceManager::_cpp_Create(
     C.bEditor = FALSE;
     C.bDetail = FALSE;
 #ifdef _EDITOR
+<<<<<<< HEAD
     if (!C.BT)
     {
         ELog.Msg(mtError, "Can't find shader '%s'", s_shader);
         return 0;
     }
     C.bEditor = TRUE;
+#else
+    UNUSED(s_shader);
 #endif
 
     // Parse names

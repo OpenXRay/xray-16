@@ -190,7 +190,7 @@ void xrCore::CalculateBuildId()
     sscanf(buffer, "%s %d %d", month, &days, &years);
     for (int i = 0; i < 12; i++)
     {
-        if (_stricmp(monthId[i], month))
+        if (xr_stricmp(monthId[i], month))
             continue;
         months = i;
         break;

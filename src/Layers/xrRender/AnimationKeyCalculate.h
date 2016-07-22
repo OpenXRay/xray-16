@@ -89,8 +89,8 @@ IC void Dequantize(CKey& K, const CBlend& BD, const CMotion& M)
     // rotation
     if (M.test_flag(flRKeyAbsent))
     {
-        const CKeyQR* K = &M._keysR[0];
-        QR2Quat(*K, D->Q);
+        const CKeyQR* K2 = &M._keysR[0];
+        QR2Quat(*K2, D->Q);
     }
     else
     {
@@ -394,7 +394,7 @@ IC void MixAdd(CKey& Result, const CKey* R, const float* BA, int b_count)
     MixinAdd(Result, R, BA, b_count);
 }
 IC void process_single_channel(
-    CKey& Result, const animation::channel_def& ch, const CKey* R, const CBlend* const BA[MAX_BLENDED], int b_count)
+    CKey& Result, const animation::channel_def& /*ch*/, const CKey* R, const CBlend* const BA[MAX_BLENDED], int b_count)
 {
     MixInterlerp(Result, R, BA, b_count);
     VERIFY(_valid(Result.T));

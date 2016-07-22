@@ -9,12 +9,12 @@ void CActorTools::UndoClear()
 {
     while (!m_RedoStack.empty())
     {
-        _unlink(m_RedoStack.back().m_FileName);
+        xr_unlink(m_RedoStack.back().m_FileName);
         m_RedoStack.pop_back();
     }
     while (!m_UndoStack.empty())
     {
-        _unlink(m_UndoStack.back().m_FileName);
+        xr_unlink(m_UndoStack.back().m_FileName);
         m_UndoStack.pop_back();
     }
 }
@@ -33,13 +33,13 @@ void CActorTools::UndoSave()
 
     while (!m_RedoStack.empty())
     {
-        _unlink(m_RedoStack.back().m_FileName);
+        xr_unlink(m_RedoStack.back().m_FileName);
         m_RedoStack.pop_back();
     }
 
     if (m_UndoStack.size() > EPrefs->scene_undo_level)
     {
-        _unlink(m_UndoStack.front().m_FileName);
+        xr_unlink(m_UndoStack.front().m_FileName);
         m_UndoStack.pop_front();
     }
 }
@@ -54,7 +54,7 @@ bool CActorTools::Undo()
 
         if (m_RedoStack.size() > EPrefs->scene_undo_level)
         {
-            _unlink(m_RedoStack.front().m_FileName);
+            xr_unlink(m_RedoStack.front().m_FileName);
             m_RedoStack.pop_front();
         }
 
@@ -83,7 +83,7 @@ bool CActorTools::Redo()
 
         if (m_UndoStack.size() > EPrefs->scene_undo_level)
         {
-            _unlink(m_UndoStack.front().m_FileName);
+            xr_unlink(m_UndoStack.front().m_FileName);
             m_UndoStack.pop_front();
         }
 

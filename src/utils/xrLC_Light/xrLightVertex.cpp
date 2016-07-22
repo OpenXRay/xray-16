@@ -4,6 +4,7 @@
 #include "xrface.h"
 #include "xrLC_GlobalData.h"
 #include "light_point.h"
+#include "xrCore/Threading/Lock.hpp"
 
 #include "xrCDB/xrCDB.h"
 //-----------------------------------------------------------------------

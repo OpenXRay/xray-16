@@ -177,7 +177,7 @@ SVS*	CResourceManager::_CreateVS		(LPCSTR _name)
 		m_vs.insert					(std::make_pair(_vs->set_name(name),_vs));
 		//_vs->vs				= NULL;
 		//_vs->signature		= NULL;
-		VERIFY(_strcmpi(name, "null") != 0);
+		VERIFY(xr_strcmpi(name, "null") != 0);
 
 		string_path					shName;
 		{
@@ -266,7 +266,7 @@ SPS*	CResourceManager::_CreatePS			(LPCSTR _name)
 		SPS*	_ps					=	new SPS	();
 		_ps->dwFlags				|=	xr_resource_flagged::RF_REGISTERED;
 		m_ps.insert					(std::make_pair(_ps->set_name(name),_ps));
-		VERIFY(_strcmpi(name, "null") != 0);
+		VERIFY(xr_strcmpi(name, "null") != 0);
 
 		string_path					shName;
 		const char*	pchr = strchr(_name, '(');
@@ -345,7 +345,7 @@ SGS*	CResourceManager::_CreateGS			(LPCSTR name)
 		SGS*	_gs					=	new SGS	();
 		_gs->dwFlags				|=	xr_resource_flagged::RF_REGISTERED;
 		m_gs.insert					(std::make_pair(_gs->set_name(name),_gs));
-		if (0==_stricmp(name,"null"))	{
+		if (0==xr_stricmp(name,"null"))	{
 			_gs->gs				= NULL;
 			return _gs;
 		}
@@ -574,7 +574,7 @@ void	CResourceManager::DBG_VerifyTextures	()
 CMatrix*	CResourceManager::_CreateMatrix	(LPCSTR Name)
 {
 	R_ASSERT(Name && Name[0]);
-	if (0==_stricmp(Name,"$null"))	return NULL;
+	if (0==xr_stricmp(Name,"$null"))	return NULL;
 
 	LPSTR N = LPSTR(Name);
 	map_Matrix::iterator I = m_matrices.find	(N);
@@ -608,7 +608,7 @@ void	CResourceManager::ED_UpdateMatrix		(LPCSTR Name, CMatrix* data)
 CConstant*	CResourceManager::_CreateConstant	(LPCSTR Name)
 {
 	R_ASSERT(Name && Name[0]);
-	if (0==_stricmp(Name,"$null"))	return NULL;
+	if (0==xr_stricmp(Name,"$null"))	return NULL;
 
 	LPSTR N = LPSTR(Name);
 	map_Constant::iterator I	= m_constants.find	(N);

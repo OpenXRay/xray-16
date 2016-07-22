@@ -6,6 +6,7 @@
 #include "xrCDB.h"
 
 #include "xrCore/FixedVector.h"
+#include "xrCore/_plane.h"
 
 #pragma pack(push, 4)
 

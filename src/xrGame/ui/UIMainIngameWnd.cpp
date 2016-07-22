@@ -397,7 +397,7 @@ void CUIMainIngameWnd::RenderQuickInfos()
 
     if (NULL != actor_action)
     {
-        if (_stricmp(actor_action, UIStaticQuickHelp->GetText()))
+        if (xr_stricmp(actor_action, UIStaticQuickHelp->GetText()))
             UIStaticQuickHelp->SetTextST(actor_action);
     }
 

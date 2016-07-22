@@ -33,7 +33,7 @@ void Startup(LPSTR lpCmdLine)
     BOOL bModifyOptions = FALSE;
 
     xr_strcpy(cmd, lpCmdLine);
-    _strlwr(cmd);
+    xr_strlwr(cmd);
     if (strstr(cmd, "-?") || strstr(cmd, "-h"))
     {
         Help();

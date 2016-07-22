@@ -352,7 +352,7 @@ void CConsole::OnRender()
     }
 
     string16 q;
-    _itoa(log_line, q, 10);
+    xr_itoa(log_line, q, 10);
     u32 qn = xr_strlen(q);
     pFont->SetColor(total_font_color);
     pFont->OutI(0.95f - 0.03f * qn, fMaxY - 2.0f * LDIST, "[%d]", log_line);
@@ -429,13 +429,13 @@ void CConsole::DrawBackgrounds(bool bGame)
 
     if (m_select_tip < (int)m_tips.size())
     {
-        Frect r;
+        Frect r2;
         xr_string tmp;
-        vecTipsEx::iterator itb = m_tips.begin() + m_start_tip;
-        vecTipsEx::iterator ite = m_tips.end();
-        for (u32 i = 0; itb != ite; ++itb, ++i) // tips
+        vecTipsEx::iterator itb2 = m_tips.begin() + m_start_tip;
+        vecTipsEx::iterator ite2 = m_tips.end();
+        for (u32 i = 0; itb2 != ite2; ++itb2, ++i) // tips
         {
-            TipString const& ts = (*itb);
+            TipString const& ts = (*itb2);
             if ((ts.HL_start < 0) || (ts.HL_finish < 0) || (ts.HL_start > ts.HL_finish))
             {
                 continue;
@@ -446,22 +446,26 @@ void CConsole::DrawBackgrounds(bool bGame)
                 continue;
             }
 
-            r.set_zero();
+			r2.set_zero();
             tmp.assign(ts.text.c_str(), ts.HL_start);
-            r.x1 = pr.x1 + w1 + pFont->SizeOf_(tmp.c_str());
-            r.y1 = pr.y1 + i * font_h;
+			r2.x1 = pr.x1 + w1 + pFont->SizeOf_(tmp.c_str());
+			r2.y1 = pr.y1 + i * font_h;
 
             tmp.assign(ts.text.c_str(), ts.HL_finish);
-            r.x2 = pr.x1 + w1 + pFont->SizeOf_(tmp.c_str());
-            r.y2 = r.y1 + font_h;
+			r2.x2 = pr.x1 + w1 + pFont->SizeOf_(tmp.c_str());
+			r2.y2 = r2.y1 + font_h;
 
-            DrawRect(r, tips_word_color);
+            DrawRect(r2, tips_word_color);
 
             if (i >= VIEW_TIPS_COUNT - 1)
             {
-                break; // for itb
+                break; // for itb2
             }
+<<<<<<< HEAD
         } // for itb
+=======
+        }// for itb2
+>>>>>>> bf03c55e9... More cleaning/decoupling. Some 'override' added. Fixed up stricmp -> _stricmp & co.
     } // if
 
     // --------------------------- scroll bar --------------------
@@ -553,7 +557,7 @@ void CConsole::ExecuteCommand(LPCSTR cmd_str, bool record_cmd)
         {
             if (cc->bLowerCaseArgs)
             {
-                _strlwr(last);
+                xr_strlwr(last);
             }
             if (last[0] == 0)
             {
@@ -754,7 +758,7 @@ bool CConsole::add_internal_cmds(LPCSTR in_str, vecTipsEx& out_v)
         if (name_sz >= in_sz)
         {
             name2.assign(name, in_sz);
-            if (!_stricmp(name2.c_str(), in_str))
+            if (!xr_stricmp(name2.c_str(), in_str))
             {
                 shared_str temp;
                 temp._set(name);

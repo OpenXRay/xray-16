@@ -252,7 +252,7 @@ public:
 
     GameMtlIt GetMaterialIt(LPCSTR name)
     {
-        auto pred = [&](const SGameMtl* mtl) { return !_strcmpi(mtl->m_Name.c_str(), name); };
+        auto pred = [&](const SGameMtl* mtl) { return !xr_strcmpi(mtl->m_Name.c_str(), name); };
         return std::find_if(materials.begin(), materials.end(), pred);
     }
     GameMtlIt GetMaterialIt(shared_str& name)

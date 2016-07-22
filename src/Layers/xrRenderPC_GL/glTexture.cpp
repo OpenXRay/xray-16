@@ -10,10 +10,10 @@ void fix_texture_name(LPSTR fn)
 {
 	LPSTR _ext = strext(fn);
 	if (_ext &&
-		(0 == _stricmp(_ext, ".tga") ||
-		0 == _stricmp(_ext, ".dds") ||
-		0 == _stricmp(_ext, ".bmp") ||
-		0 == _stricmp(_ext, ".ogm")))
+		(0 == xr_stricmp(_ext, ".tga") ||
+		0 == xr_stricmp(_ext, ".dds") ||
+		0 == xr_stricmp(_ext, ".bmp") ||
+		0 == xr_stricmp(_ext, ".ogm")))
 		*_ext = 0;
 }
 
@@ -154,7 +154,7 @@ _DDS:
 	_DDS_3D:
 		{
 			// Check for LMAP and compress if needed
-			_strlwr(fn);
+			xr_strlwr(fn);
 
 
 			// Load   SYS-MEM-surface, bound to device restrictions
@@ -191,7 +191,7 @@ _DDS:
 	_DDS_2D:
 		{
 			// Check for LMAP and compress if needed
-			_strlwr(fn);
+			xr_strlwr(fn);
 
 
 			// Load   SYS-MEM-surface, bound to device restrictions

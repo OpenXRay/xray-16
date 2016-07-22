@@ -22,27 +22,27 @@ const xr_token hit_types_token[] =
 
 EHitType g_tfString2HitType(LPCSTR caHitType)
 {
-    if (!_stricmp(caHitType, "burn"))
+    if (!xr_stricmp(caHitType, "burn"))
         return eHitTypeBurn;
-    if (!_stricmp(caHitType, "light_burn"))
+    if (!xr_stricmp(caHitType, "light_burn"))
         return eHitTypeLightBurn;
-    if (!_stricmp(caHitType, "shock"))
+    if (!xr_stricmp(caHitType, "shock"))
         return eHitTypeShock;
-    if (!_stricmp(caHitType, "strike"))
+    if (!xr_stricmp(caHitType, "strike"))
         return eHitTypeStrike;
-    if (!_stricmp(caHitType, "wound"))
+    if (!xr_stricmp(caHitType, "wound"))
         return eHitTypeWound;
-    if (!_stricmp(caHitType, "radiation"))
+    if (!xr_stricmp(caHitType, "radiation"))
         return eHitTypeRadiation;
-    if (!_stricmp(caHitType, "telepatic"))
+    if (!xr_stricmp(caHitType, "telepatic"))
         return eHitTypeTelepatic;
-    if (!_stricmp(caHitType, "fire_wound"))
+    if (!xr_stricmp(caHitType, "fire_wound"))
         return eHitTypeFireWound;
-    if (!_stricmp(caHitType, "chemical_burn"))
+    if (!xr_stricmp(caHitType, "chemical_burn"))
         return eHitTypeChemicalBurn;
-    if (!_stricmp(caHitType, "explosion"))
+    if (!xr_stricmp(caHitType, "explosion"))
         return eHitTypeExplosion;
-    if (!_stricmp(caHitType, "wound_2"))
+    if (!xr_stricmp(caHitType, "wound_2"))
         return eHitTypeWound_2;
 
     FATAL("Unsupported hit type!");

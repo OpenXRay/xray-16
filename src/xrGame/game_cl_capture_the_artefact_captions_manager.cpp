@@ -198,7 +198,7 @@ u32 CTAGameClCaptionsManager::SetWarmupTime(u32 current_warmup_time, u32 current
                 }
             }
             dwLastTimeRemains = dwCurTimeRemains;
-            _itoa(dwCurTimeRemains, time_str, 10);
+            xr_itoa(dwCurTimeRemains, time_str, 10);
             strconcat(sizeof(warmup_message), warmup_message, *st.translate("mp_ready"), "...", time_str);
         }
     };

@@ -8,7 +8,7 @@
 
 #include "xrEngine/Engine.h"
 #include "xrCore/ModuleLookup.hpp"
-
+#include "xrCore/clsid.h"
 
 class IFactoryObject
 {

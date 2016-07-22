@@ -232,7 +232,7 @@ void CDetailManager::hw_Render()
     hw_Render_dump(&*hwc_s_array, 0, 1, c_hdr);
 }
 
-void CDetailManager::hw_Render_dump(ref_constant x_array, u32 var_id, u32 lod_id, u32 c_offset)
+void CDetailManager::hw_Render_dump(ref_constant x_array, u32 var_id, u32 lod_id, u32 /*c_offset*/)
 {
     RImplementation.BasicStats.DetailCount = 0;
 

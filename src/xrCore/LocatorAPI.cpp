@@ -295,7 +295,7 @@ void CLocatorAPI::LoadArchive(archive& A, pcstr entrypoint)
     if (A.header)
     {
         shared_str read_path = A.header->r_string("header", "entry_point");
-        if (0 == _stricmp(read_path.c_str(), "gamedata"))
+        if (0 == xr_stricmp(read_path.c_str(), "gamedata"))
         {
             read_path = "$fs_root$";
             auto P = pathes.find(read_path.c_str());
@@ -1428,7 +1428,7 @@ bool CLocatorAPI::dir_delete(pcstr initial, pcstr nm, bool remove_files)
                 // const char* entry_begin = entry.name+base_len;
                 if (!remove_files)
                     return false;
-                _unlink(entry.name);
+                xr_unlink(entry.name);
                 m_files.erase(cur_item);
             }
             else
@@ -1463,7 +1463,7 @@ void CLocatorAPI::file_delete(pcstr path, pcstr nm)
     if (I != m_files.end())
     {
         // remove file
-        _unlink(I->name);
+        xr _unlink(I->name);
         auto str = pstr(I->name);
         xr_free(str);
         m_files.erase(I);
@@ -1498,7 +1498,7 @@ void CLocatorAPI::file_rename(pcstr src, pcstr dest, bool overwrite)
         {
             if (!overwrite)
                 return;
-            _unlink(D->name);
+            xr_unlink(D->name);
             auto str = pstr(D->name);
             xr_free(str);
             m_files.erase(D);
@@ -1672,7 +1672,7 @@ bool CLocatorAPI::can_write_to_folder(pcstr path)
         if (hf == nullptr)
             return false;
         fclose(hf);
-        _unlink(temp);
+        xr_unlink(temp);
         return true;
     }
     return false;

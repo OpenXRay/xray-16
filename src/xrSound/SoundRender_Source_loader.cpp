@@ -126,7 +126,7 @@ void CSoundRender_Source::load(pcstr name)
 {
     string_path fn, N;
     xr_strcpy(N, name);
-    _strlwr(N);
+    xr_strlwr(N);
     if (strext(N))
         *strext(N) = 0;
 

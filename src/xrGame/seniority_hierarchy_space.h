@@ -15,7 +15,7 @@ namespace SeniorityHierarchy
 IC shared_str to_string(u32 number)
 {
     string16 S;
-    _itoa(number, S, 10);
+    xr_itoa(number, S, 10);
     return (shared_str(S));
 }
 

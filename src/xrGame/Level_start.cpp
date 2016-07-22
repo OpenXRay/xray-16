@@ -204,7 +204,7 @@ bool CLevel::net_start3()
         const char* start = strstr(m_caClientOptions.c_str(), "/cdkey=") + xr_strlen("/cdkey=");
         sscanf(start, "%[^/]", CDKey);
         string128 cmd;
-        xr_sprintf(cmd, "cdkey %s", _strupr(CDKey));
+        xr_sprintf(cmd, "cdkey %s", xr_strupr(CDKey));
         Console->Execute(cmd);
     }
     return true;

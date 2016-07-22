@@ -3,6 +3,8 @@
 #define XRSHEDULER_H_INCLUDED
 
 //#include "ISheduled.h"
+#include "xrCore/xrstring.h"
+
 class ISheduled;
 
 class ENGINE_API CSheduler

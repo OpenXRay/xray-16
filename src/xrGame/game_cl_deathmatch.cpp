@@ -535,7 +535,7 @@ void game_cl_Deathmatch::shedule_Update(u32 dt)
                                 PlaySndMessage(ID_COUNTDOWN_1 + dwCurTimeRemains - 1);
                         }
                         dwLastTimeRemains = dwCurTimeRemains;
-                        _itoa(dwCurTimeRemains, S, 10);
+                        xr_itoa(dwCurTimeRemains, S, 10);
                         strconcat(sizeof(tmpStr), tmpStr, *st.translate("mp_ready"), "...", S);
                     }
                 };

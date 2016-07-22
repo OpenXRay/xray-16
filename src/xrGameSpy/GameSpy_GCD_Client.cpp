@@ -4,5 +4,5 @@
 void CGameSpy_GCD_Client::CreateRespond(char* cdkey, char* RespondStr, char* ChallengeStr, u8 Reauth)
 {
     gcd_compute_response(
-        _strupr(cdkey), ChallengeStr, RespondStr, Reauth == 1 ? CDResponseMethod_REAUTH : CDResponseMethod_NEWAUTH);
+        xr_strupr(cdkey), ChallengeStr, RespondStr, Reauth == 1 ? CDResponseMethod_REAUTH : CDResponseMethod_NEWAUTH);
 }

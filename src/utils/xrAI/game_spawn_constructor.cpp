@@ -66,7 +66,7 @@ void CGameSpawnConstructor::load_spawns(LPCSTR name, bool no_separator_check)
     xr_vector<LPCSTR> needed_levels;
     string4096 levels_string;
     xr_strcpy(levels_string, name);
-    _strlwr(levels_string);
+    xr_strlwr(levels_string);
     fill_needed_levels(levels_string, needed_levels);
 
     // fill level info

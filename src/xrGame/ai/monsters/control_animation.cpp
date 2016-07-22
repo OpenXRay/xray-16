@@ -294,3 +294,15 @@ void CControlAnimation::unfreeze()
         m_data.torso.blend->speed = m_saved_torso_speed;
     }
 }
+
+// get motion time, when just MotionID available
+float CControlAnimation::motion_time(MotionID motion_id, IRenderVisual* visual)
+{
+    IKinematicsAnimated* skeleton_animated = smart_cast<IKinematicsAnimated*>(visual);
+    VERIFY(skeleton_animated);
+    CMotionDef* motion_def = skeleton_animated->LL_GetMotionDef(motion_id);
+    VERIFY(motion_def);
+    CMotion* motion = skeleton_animated->LL_GetRootMotion(motion_id);
+    VERIFY(motion);
+    return (motion->GetLength() / motion_def->Speed());
+}

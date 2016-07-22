@@ -92,7 +92,7 @@ public:
     u32 GetID(LPCSTR name) const
     {
         for (auto it = library.begin(); it != library.end(); it++)
-            if (0 == _stricmp(name, it->Name))
+            if (0 == xr_stricmp(name, it->Name))
                 return u32(it - library.begin());
         return u32(-1);
     }
@@ -100,7 +100,7 @@ public:
     Shader_xrLC* Get(LPCSTR name)
     {
         for (auto& shader : library)
-            if (0 == _stricmp(name, shader.Name))
+            if (0 == xr_stricmp(name, shader.Name))
                 return &shader;
         return nullptr;
     }
@@ -118,7 +118,7 @@ public:
     void Remove(LPCSTR name)
     {
         for (auto it = library.begin(); it != library.end(); it++)
-            if (0 == _stricmp(name, it->Name))
+            if (0 == xr_stricmp(name, it->Name))
             {
                 library.erase(it);
                 break;

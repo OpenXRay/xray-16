@@ -47,7 +47,7 @@ IC char* xr_strcpy(char* strDestination, size_t sizeInBytes, const char* strSour
 }
 
 IC char* xr_strcpy(char* strDestination, const char* strSource) { return strcpy(strDestination, strSource); }
-IC char* _strlwr_s(char* strDestination, size_t sizeInBytes) { return _strlwr(strDestination); }
+IC char* _strlwr_s(char* strDestination, size_t sizeInBytes) { return xr_strlwr(strDestination); }
 IC char* xr_strcat(char* strDestination, size_t sizeInBytes, const char* strSource)
 {
     return strncat(strDestination, strSource, sizeInBytes);
@@ -86,7 +86,7 @@ IC LPCSTR get_token_name(const xr_token* tokens, int key)
 IC int get_token_id(const xr_token* tokens, LPCSTR key)
 {
     for (int k = 0; tokens[k].name; k++)
-        if (_stricmp(tokens[k].name, key) == 0)
+        if (xr_stricmp(tokens[k].name, key) == 0)
             return tokens[k].id;
     return -1;
 }
@@ -177,8 +177,8 @@ IC s64 _max(s64 x, s64 y) { return x - ((x - y) & ((x - y) >> (sizeof(s64) * 8 -
 // return pointer to ".ext"
 IC char* strext(const char* S) { return (char*)strrchr(S, '.'); }
 IC size_t xr_strlen(const char* S) { return strlen(S); }
-IC char* xr_strupr(char* S) { return _strupr(S); }
-IC char* xr_strlwr(char* S) { return _strlwr(S); }
+IC char* xr_strupr(char* S) { return xr_strupr(S); }
+IC char* xr_strlwr(char* S) { return xr_strlwr(S); }
 #ifdef BREAK_AT_STRCMP
 XRCORE_API int xr_strcmp(const char* S1, const char* S2);
 #else

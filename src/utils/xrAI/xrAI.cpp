@@ -139,7 +139,7 @@ void Startup(LPSTR lpCmdLine)
     string4096 cmd;
 
     xr_strcpy(cmd, lpCmdLine);
-    _strlwr(cmd);
+    xr_strlwr(cmd);
     if (strstr(cmd, "-?") || strstr(cmd, "-h"))
     {
         Help();

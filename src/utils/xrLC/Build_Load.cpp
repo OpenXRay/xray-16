@@ -257,17 +257,17 @@ void CBuild::Load(const b_params& Params, const IReader& _in_FS)
         for (u32 LH = 0; LH < L_layers.size(); LH++)
         {
             R_Layer& TEST = L_layers[LH];
-            if (0 == _stricmp(TEST.control.name, LCONTROL_HEMI))
+            if (0 == xr_stricmp(TEST.control.name, LCONTROL_HEMI))
             {
                 // Hemi found
                 L_static().hemi = TEST.lights;
             }
-            if (0 == _stricmp(TEST.control.name, LCONTROL_SUN))
+            if (0 == xr_stricmp(TEST.control.name, LCONTROL_SUN))
             {
                 // Sun found
                 L_static().sun = TEST.lights;
             }
-            if (0 == _stricmp(TEST.control.name, LCONTROL_STATIC))
+            if (0 == xr_stricmp(TEST.control.name, LCONTROL_STATIC))
             {
                 // Static found
                 L_static().rgb = TEST.lights;
@@ -304,14 +304,14 @@ void CBuild::Load(const b_params& Params, const IReader& _in_FS)
             LPSTR N = BT.name;
             if (strchr(N, '.'))
                 *(strchr(N, '.')) = 0;
-            _strlwr(N);
+            xr_strlwr(N);
             if (0 == xr_strcmp(N, "level_lods"))
             {
                 // HACK for merged lod textures
                 BT.dwWidth = 1024;
                 BT.dwHeight = 1024;
                 BT.bHasAlpha = TRUE;
-                BT.THM.SetHasSurface(FALSE);
+                BT.THM.SetHasSurface(false);
                 BT.pSurface = 0;
             }
             else
@@ -344,7 +344,7 @@ void CBuild::Load(const b_params& Params, const IReader& _in_FS)
                         Logger.clMsg("- loading: %s", N);
                         u32 w = 0, h = 0;
                         BT.pSurface = Surface_Load(N, w, h);
-                        BT.THM.SetHasSurface(TRUE);
+                        BT.THM.SetHasSurface(true);
                         R_ASSERT2(BT.pSurface, "Can't load surface");
                         if ((w != BT.dwWidth) || (h != BT.dwHeight))
                         {

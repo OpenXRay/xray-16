@@ -31,3 +31,21 @@
 #define XR_NOEXCEPT noexcept
 #define XR_NOEXCEPT_OP(x) noexcept(x)
 #endif
+
+#ifdef _MSC_VER
+// We use xr_* instead of defining e.g. strupr => _strupr, since the macro definition could
+// come before the std. header file declaring it, and thereby renaming that one too.
+#define xr_strupr _strupr
+#define xr_strlwr _strlwr
+#define xr_stricmp _stricmp
+#define xr_strcmpi _strcmpi
+#define xr_unlink _unlink
+#define xr_itoa _itoa
+#else
+#define xr_strupr strupr
+#define xr_strlwr strlwr
+#define xr_stricmp stricmp
+#define xr_strcmpi strcmpi
+#define xr_unlink unlink
+#define xr_itoa itoa
+#endif

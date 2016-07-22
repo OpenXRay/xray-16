@@ -158,7 +158,7 @@ void CTexture::Load()
 
     flags.bUser = false;
     flags.MemoryUsage = 0;
-    if (0 == _stricmp(*cName, "$null"))
+    if (0 == xr_stricmp(*cName, "$null"))
         return;
     if (nullptr != strstr(*cName, "$user$"))
     {
@@ -242,7 +242,7 @@ void CTexture::Load()
 
             flags.seqCycles = FALSE;
             _fs->r_string(buffer, sizeof(buffer));
-            if (0 == _stricmp(buffer, "cycled"))
+            if (0 == xr_stricmp(buffer, "cycled"))
             {
                 flags.seqCycles = TRUE;
                 _fs->r_string(buffer, sizeof(buffer));

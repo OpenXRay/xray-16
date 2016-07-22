@@ -89,7 +89,7 @@ public:
     void unfreeze();
 
     // Services
-    IC float motion_time(MotionID motion_id, IRenderVisual* visual);
+    float motion_time(MotionID motion_id, IRenderVisual* visual);
 
 private:
     void play();
@@ -106,15 +106,3 @@ public:
         eAnimationCustom
     };
 };
-
-// get motion time, when just MotionID available
-IC float CControlAnimation::motion_time(MotionID motion_id, IRenderVisual* visual)
-{
-    IKinematicsAnimated* skeleton_animated = smart_cast<IKinematicsAnimated*>(visual);
-    VERIFY(skeleton_animated);
-    CMotionDef* motion_def = skeleton_animated->LL_GetMotionDef(motion_id);
-    VERIFY(motion_def);
-    CMotion* motion = skeleton_animated->LL_GetRootMotion(motion_id);
-    VERIFY(motion);
-    return (motion->GetLength() / motion_def->Speed());
-}

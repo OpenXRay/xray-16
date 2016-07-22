@@ -505,8 +505,8 @@ IC
     bool
     get_bool(LPCSTR a, var& val)
 {
-    bool b0 = (0 == _stricmp(a, "false"));
-    bool b1 = (0 == _stricmp(a, "true"));
+    bool b0 = (0 == xr_stricmp(a, "false"));
+    bool b1 = (0 == xr_stricmp(a, "true"));
     if (b0 == b1)
         return false;
     val = (BOOL)b1;

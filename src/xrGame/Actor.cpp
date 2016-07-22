@@ -1,4 +1,4 @@
-#include "pch_script.h"
+    #include "pch_script.h"
 #include "Actor_Flags.h"
 #include "hudmanager.h"
 #ifdef DEBUG
@@ -265,9 +265,9 @@ void set_box(LPCSTR section, CPHMovementControl& mc, u32 box_num)
     Fvector vBOX_center, vBOX_size;
     // m_PhysicMovementControl: BOX
     string64 buff, buff1;
-    strconcat(sizeof(buff), buff, "ph_box", _itoa(box_num, buff1, 10), "_center");
+    strconcat(sizeof(buff), buff, "ph_box", xr_itoa(box_num, buff1, 10), "_center");
     vBOX_center = pSettings->r_fvector3(section, buff);
-    strconcat(sizeof(buff), buff, "ph_box", _itoa(box_num, buff1, 10), "_size");
+    strconcat(sizeof(buff), buff, "ph_box", xr_itoa(box_num, buff1, 10), "_size");
     vBOX_size = pSettings->r_fvector3(section, buff);
     vBOX_size.y += cammera_into_collision_shift / 2.f;
     bb.set(vBOX_center, vBOX_center);

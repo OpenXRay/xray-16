@@ -1207,7 +1207,7 @@ void game_cl_mp::OnEventMoneyChanged(NET_Packet& P)
     OnMoneyChanged();
     {
         string256 MoneyStr;
-        _itoa(local_player->money_for_round, MoneyStr, 10);
+        xr_itoa(local_player->money_for_round, MoneyStr, 10);
         m_game_ui_custom->ChangeTotalMoneyIndicator(MoneyStr);
     }
     s32 Money_Added = P.r_s32();
@@ -1446,7 +1446,7 @@ void game_cl_mp::OnRadminMessage(u16 type, NET_Packet* P)
             if (!m_pAdminMenuWindow)
                 m_pAdminMenuWindow = new CUIMpAdminMenu();
 
-            if (0 == _stricmp(buff, "Access permitted."))
+            if (0 == xr_stricmp(buff, "Access permitted."))
                 m_pAdminMenuWindow->ShowDialog(true);
             else
                 m_pAdminMenuWindow->ShowMessageBox(CUIMessageBox::MESSAGEBOX_OK, buff);

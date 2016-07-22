@@ -45,15 +45,15 @@ void CUISequenceVideoItem::Load(CUIXml* xml, int idx)
     xml->SetLocalRoot(xml->NavigateToNode("item", idx));
 
     LPCSTR str = xml->Read("pause_state", 0, "ignore");
-    m_flags.set(etiNeedPauseOn, 0 == _stricmp(str, "on"));
-    m_flags.set(etiNeedPauseOff, 0 == _stricmp(str, "off"));
-    m_flags.set(etiNeedPauseSound, 0 == _stricmp(str, "on"));
+    m_flags.set(etiNeedPauseOn, 0 == xr_stricmp(str, "on"));
+    m_flags.set(etiNeedPauseOff, 0 == xr_stricmp(str, "off"));
+    m_flags.set(etiNeedPauseSound, 0 == xr_stricmp(str, "on"));
 
     str = xml->Read("can_be_stopped", 0, "on");
-    m_flags.set(etiCanBeStopped, 0 == _stricmp(str, "on"));
+    m_flags.set(etiCanBeStopped, 0 == xr_stricmp(str, "on"));
 
     str = xml->Read("back_show", 0, "on");
-    m_flags.set(etiBackVisible, 0 == _stricmp(str, "on"));
+    m_flags.set(etiBackVisible, 0 == xr_stricmp(str, "on"));
 
     m_flags.set(etiGrabInput, TRUE);
 

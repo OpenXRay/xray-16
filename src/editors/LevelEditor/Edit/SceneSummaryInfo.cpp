@@ -32,10 +32,10 @@ void SSceneSummary::Prepare()
     }
 }
 
-xr_string _itoa(int val)
+xr_string xr_itoa(int val)
 {
     string64 tmp;
-    return _itoa(val, tmp, 10);
+    return xr_itoa(val, tmp, 10);
 }
 
 void SSceneSummary::SObjectInfo::Prepare()
@@ -49,13 +49,13 @@ void SSceneSummary::SObjectInfo::Prepare()
         {
             SPairInfo tmp;
             tmp.first = pref + "\\References";
-            tmp.second = _itoa(ref_count);
+            tmp.second = xr_itoa(ref_count);
             info.push_back(tmp);
             tmp.first = pref + "\\Geometry\\Faces";
-            tmp.second = _itoa(O->GetFaceCount());
+            tmp.second = xr_itoa(O->GetFaceCount());
             info.push_back(tmp);
             tmp.first = pref + "\\Geometry\\Vertices";
-            tmp.second = _itoa(O->GetVertexCount());
+            tmp.second = xr_itoa(O->GetVertexCount());
             info.push_back(tmp);
             SurfaceVec& surfaces = O->Surfaces();
             for (SurfaceIt it = surfaces.begin(); it != surfaces.end(); it++)
@@ -65,7 +65,7 @@ void SSceneSummary::SObjectInfo::Prepare()
                 tmp.second = (*it)->_Texture();
                 info.push_back(tmp);
                 tmp.first = pr + "\\Faces";
-                tmp.second = _itoa(O->GetSurfFaceCount((*it)->_Name()));
+                tmp.second = xr_itoa(O->GetSurfFaceCount((*it)->_Name()));
                 info.push_back(tmp);
             }
             Lib.RemoveEditObject(O);

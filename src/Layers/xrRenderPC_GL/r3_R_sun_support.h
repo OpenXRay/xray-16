@@ -291,7 +291,7 @@ public:
 	{
 		int				p0,p1;
 		int				counter;
-		_edge		(int _p0, int _p1, int m) : p0(_p0), p1(_p1), counter(m){ if (p0>p1)	swap(p0,p1); 	}
+		_edge		(int _p0, int _p1, int m) : p0(_p0), p1(_p1), counter(m){ if (p0>p1)	std::swap(p0,p1); 	}
 		bool			equal		(_edge& E)												{ return p0==E.p0 && p1==E.p1;	}
 	};
 public:

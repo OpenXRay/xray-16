@@ -243,7 +243,7 @@ void game_cl_CaptureTheArtefact::UpdateMoneyIndicator()
     }
     if (total_money != last_money)
     {
-        _itoa(total_money, MoneyStr, 10);
+        xr_itoa(total_money, MoneyStr, 10);
         m_game_ui->ChangeTotalMoneyIndicator(MoneyStr);
         last_money = total_money;
     }

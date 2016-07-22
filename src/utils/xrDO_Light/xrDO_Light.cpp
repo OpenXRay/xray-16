@@ -16,7 +16,7 @@ void Startup(LPSTR lpCmdLine)
     char cmd[512];
     bool bNet = false;
     xr_strcpy(cmd, lpCmdLine);
-    _strlwr(cmd);
+    xr_strlwr(cmd);
     if (strstr(cmd, "-?") || strstr(cmd, "-h"))
     {
         Help();

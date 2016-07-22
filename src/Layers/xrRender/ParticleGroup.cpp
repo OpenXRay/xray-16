@@ -352,20 +352,20 @@ struct zero_vis_pred
 };
 void CParticleGroup::SItem::OnFrame(u32 u_dt, const CPGDef::SEffect& def, Fbox& box, bool& bPlaying)
 {
-    CParticleEffect* E = static_cast<CParticleEffect*>(_effect);
-    if (E)
+    CParticleEffect* E1 = static_cast<CParticleEffect*>(_effect);
+    if (E1)
     {
-        E->OnFrame(u_dt);
-        if (E->IsPlaying())
+        E1->OnFrame(u_dt);
+        if (E1->IsPlaying())
         {
             bPlaying = true;
-            if (E->vis.box.is_valid())
-                box.merge(E->vis.box);
+            if (E1->vis.box.is_valid())
+                box.merge(E1->vis.box);
             if (def.m_Flags.is(CPGDef::SEffect::flOnPlayChild) && def.m_OnPlayChildName.size())
             {
                 PAPI::Particle* particles;
                 u32 p_cnt;
-                PAPI::ParticleManager()->GetParticles(E->GetHandleEffect(), particles, p_cnt);
+                PAPI::ParticleManager()->GetParticles(E1->GetHandleEffect(), particles, p_cnt);
                 VERIFY(p_cnt == _children_related.size());
                 if (p_cnt)
                 {

@@ -4,6 +4,8 @@
 #include "xrCDB/Frustum.h"
 #include "vis_common.h"
 #include "Include/xrRender/FactoryPtr.h"
+#include "xrCore/xr_resource.h"
+
 class IUIShader;
 typedef FactoryPtr<IUIShader> wm_shader;
 // refs
@@ -16,7 +18,9 @@ class IKinematics;
 class IGameFont;
 class IPerformanceAlert;
 template <class T> class _box2; typedef _box2<float> Fbox2;
-
+struct Fcolor;
+class IReader;
+class CMemoryWriter;
 
 #ifndef _EDITOR
 extern const float fLightSmoothFactor;

@@ -29,12 +29,12 @@ struct BLK_NODE
         next = p;
     }
 
-    void _unlink() { next = next->next; }
+    void unlink() { next = next->next; }
 
     void* remove()
     {
         BLK_NODE* p = next;
-        _unlink();
+        unlink();
         Stamp--;
         return p;
     }
@@ -325,7 +325,7 @@ static void ExpandTextArea()
         for (p = BList + i; Count[i] != 0; p = p->next)
             while (!p->next->Stamp)
             {
-                p->_unlink();
+                p->unlink();
                 BList[i].Stamp--;
                 if (!--Count[i])
                     break;

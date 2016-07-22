@@ -12,5 +12,5 @@ struct pred_str
 struct pred_stri
 {
     bool operator()(const char* x, const char* y) const
-    { return _stricmp(x, y) < 0; }
+    { return xr_stricmp(x, y) < 0; }
 };

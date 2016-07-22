@@ -44,48 +44,48 @@ bool xrCompressor::testSKIP(LPCSTR path)
     if (strstr(path, "textures\\det\\"))
         return true;
 
-    if (_stricmp(p_ext, ".thm") && strstr(path, "textures\\terrain\\terrain_") && !is_tail(p_name, "_mask", 5))
+    if (xr_stricmp(p_ext, ".thm") && strstr(path, "textures\\terrain\\terrain_") && !is_tail(p_name, "_mask", 5))
         return true;
 
     if (strstr(path, "textures\\") && is_tail(p_name, "_nmap", 5) && !strstr(p_name, "water_flowing_nmap"))
         return true;
 
-    if (0 == _stricmp(p_name, "build"))
+    if (0 == xr_stricmp(p_name, "build"))
     {
-        if (0 == _stricmp(p_ext, ".aimap"))
+        if (0 == xr_stricmp(p_ext, ".aimap"))
             return true;
-        if (0 == _stricmp(p_ext, ".cform"))
+        if (0 == xr_stricmp(p_ext, ".cform"))
             return true;
-        if (0 == _stricmp(p_ext, ".details"))
+        if (0 == xr_stricmp(p_ext, ".details"))
             return true;
-        if (0 == _stricmp(p_ext, ".prj"))
+        if (0 == xr_stricmp(p_ext, ".prj"))
             return true;
-        if (0 == _stricmp(p_ext, ".lights"))
+        if (0 == xr_stricmp(p_ext, ".lights"))
             return false;
     }
-    if (0 == _stricmp(p_name, "do_light") && 0 == _stricmp(p_ext, ".ltx"))
+    if (0 == xr_stricmp(p_name, "do_light") && 0 == xr_stricmp(p_ext, ".ltx"))
         return true;
 
-    if (0 == _stricmp(p_ext, ".txt"))
+    if (0 == xr_stricmp(p_ext, ".txt"))
         return true;
-    if (0 == _stricmp(p_ext, ".tga"))
+    if (0 == xr_stricmp(p_ext, ".tga"))
         return true;
-    if (0 == _stricmp(p_ext, ".db"))
+    if (0 == xr_stricmp(p_ext, ".db"))
         return true;
-    if (0 == _stricmp(p_ext, ".smf"))
+    if (0 == xr_stricmp(p_ext, ".smf"))
         return true;
 
     if ('~' == p_ext[1])
         return true;
     if ('_' == p_ext[1])
         return true;
-    if (0 == _stricmp(p_ext, ".vcproj"))
+    if (0 == xr_stricmp(p_ext, ".vcproj"))
         return true;
-    if (0 == _stricmp(p_ext, ".sln"))
+    if (0 == xr_stricmp(p_ext, ".sln"))
         return true;
-    if (0 == _stricmp(p_ext, ".old"))
+    if (0 == xr_stricmp(p_ext, ".old"))
         return true;
-    if (0 == _stricmp(p_ext, ".rc"))
+    if (0 == xr_stricmp(p_ext, ".rc"))
         return true;
 
     for (const auto &it : exclude_exts)
@@ -103,13 +103,13 @@ bool xrCompressor::testVFS(LPCSTR path)
     string256 p_ext;
     _splitpath(path, 0, 0, 0, p_ext);
 
-    if (!_stricmp(p_ext, ".xml"))
+    if (!xr_stricmp(p_ext, ".xml"))
         return (false);
 
-    if (!_stricmp(p_ext, ".ltx"))
+    if (!xr_stricmp(p_ext, ".ltx"))
         return (FALSE);
 
-    if (!_stricmp(p_ext, ".script"))
+    if (!xr_stricmp(p_ext, ".script"))
         return (FALSE);
 
     return (TRUE);
@@ -332,11 +332,11 @@ void xrCompressor::OpenPack(LPCSTR tgt_folder, int num)
     string_path fname;
     string128 s_num;
 #ifdef MOD_COMPRESS
-    strconcat(sizeof(fname), fname, tgt_folder, ".xdb", _itoa(num, s_num, 10));
+    strconcat(sizeof(fname), fname, tgt_folder, ".xdb", xr_itoa(num, s_num, 10));
 #else
-    strconcat(sizeof(fname), fname, tgt_folder, ".pack_#", _itoa(num, s_num, 10));
+    strconcat(sizeof(fname), fname, tgt_folder, ".pack_#", xr_itoa(num, s_num, 10));
 #endif
-    _unlink(fname);
+    xr_unlink(fname);
     fs_pack_writer = FS.w_open(fname);
     fs_desc.clear();
 

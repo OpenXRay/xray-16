@@ -506,7 +506,7 @@ bool IPureClient::Connect(pcstr options)
 
                     R_CHK(NET->SetClientInfo(&Pinfo, nullptr, nullptr, DPNSETCLIENTINFO_SYNC));
                 }
-                if (_stricmp(server_name, "localhost") == 0)
+                if (xr_stricmp(server_name, "localhost") == 0)
                 {
                     WCHAR SessionPasswordUNICODE[4096];
                     if (xr_strlen(password_str))

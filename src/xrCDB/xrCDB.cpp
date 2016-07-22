@@ -4,6 +4,7 @@
 #include "stdafx.h"
 
 #include "xrCDB.h"
+#include "xrCore/Threading/Lock.hpp"
 
 namespace Opcode
 {
@@ -26,9 +27,11 @@ BOOL APIENTRY DllMain(HANDLE hModule, u32 ul_reason_for_call, LPVOID lpReserved)
 }
 
 // Model building
-MODEL::MODEL()
+MODEL::MODEL() :
 #ifdef CONFIG_PROFILE_LOCKS
-    : cs(MUTEX_PROFILE_ID(MODEL))
+    pcs(new Lock(MUTEX_PROFILE_ID(MODEL)))
+#else
+    pcs(new Lock)
 #endif // CONFIG_PROFILE_LOCKS
 {
     tree = 0;
@@ -47,6 +50,15 @@ MODEL::~MODEL()
     tris_count = 0;
     xr_free(verts);
     verts_count = 0;
+    delete pcs;
+}
+
+void MODEL::syncronize_impl() const
+{
+    Log("! WARNING: syncronized CDB::query");
+    Lock* C = pcs;
+	C->Enter();
+	C->Leave();
 }
 
 struct BTHREAD_params
@@ -65,10 +77,10 @@ void MODEL::build_thread(void* params)
     _initialize_cpu_thread();
     FPU::m64r();
     BTHREAD_params P = *((BTHREAD_params*)params);
-    P.M->cs.Enter();
+    P.M->pcs->Enter();
     P.M->build_internal(P.V, P.Vcnt, P.T, P.Tcnt, P.BC, P.BCP);
     P.M->status = S_READY;
-    P.M->cs.Leave();
+    P.M->pcs->Leave();
     // Msg						("* xrCDB: cform build completed, memory usage: %d K",P.M->memory()/1024);
 }
 

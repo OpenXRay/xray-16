@@ -390,7 +390,7 @@ void read_levels(CInifile* Ini, xr_set<CLevelInfo>& levels, bool rebuild_graph, 
     {
         string256 N;
         xr_strcpy(N, _N);
-        _strlwr(N);
+        xr_strlwr(N);
 
         if (!Ini->section_exist(N))
         {
@@ -420,7 +420,7 @@ void read_levels(CInifile* Ini, xr_set<CLevelInfo>& levels, bool rebuild_graph, 
         auto _S = Ini->r_string(N, "name");
         string256 S;
         xr_strcpy(S, _S);
-        _strlwr(S);
+        xr_strlwr(S);
 
         if (needed_levels)
         {
@@ -544,7 +544,7 @@ CGraphMerger::CGraphMerger(LPCSTR game_graph_id, LPCSTR name, bool rebuild)
     xr_vector<LPCSTR> needed_levels;
     string4096 levels_string;
     xr_strcpy(levels_string, name);
-    _strlwr(levels_string);
+    xr_strlwr(levels_string);
     fill_needed_levels(levels_string, needed_levels);
 
     read_levels(Ini, levels, rebuild, &needed_levels);
@@ -601,7 +601,7 @@ CGraphMerger::CGraphMerger(LPCSTR game_graph_id, LPCSTR name, bool rebuild)
                         R_ASSERT(M != (*K).second->m_tVertexMap.end());
                     }
 
-                    //if (!_stricmp("l06_rostok",*i.second->m_tLevel.name()))
+                    //if (!xr_stricmp("l06_rostok",*i.second->m_tLevel.name()))
                     //    __asm int 3;
 
                     Msg("Level %s with id %d has VALID connection point %s,\nwhich references to graph point %s on the level %s with id %d\n",

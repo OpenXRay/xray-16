@@ -66,13 +66,13 @@ void CUISequenceSimpleItem::Load(CUIXml* xml, int idx)
     xr_strcpy(m_pda_section, xml->Read("pda_section", 0, ""));
 
     LPCSTR str = xml->Read("pause_state", 0, "ignore");
-    m_flags.set(etiNeedPauseOn, 0 == _stricmp(str, "on"));
-    m_flags.set(etiNeedPauseOff, 0 == _stricmp(str, "off"));
-    m_flags.set(etiNeedPauseSound, 0 == _stricmp(str, "on"));
+    m_flags.set(etiNeedPauseOn, 0 == xr_stricmp(str, "on"));
+    m_flags.set(etiNeedPauseOff, 0 == xr_stricmp(str, "off"));
+    m_flags.set(etiNeedPauseSound, 0 == xr_stricmp(str, "on"));
 
     str = xml->Read("guard_key", 0, NULL);
     m_continue_dik_guard = -1;
-    if (str && !_stricmp(str, "any"))
+    if (str && !xr_stricmp(str, "any"))
     {
         m_continue_dik_guard = 9999;
         str = nullptr;
@@ -86,7 +86,7 @@ void CUISequenceSimpleItem::Load(CUIXml* xml, int idx)
     m_flags.set(etiCanBeStopped, (m_continue_dik_guard == -1));
 
     LPCSTR str_grab_input = xml->Read("grab_input", 0, "on");
-    m_flags.set(etiGrabInput, (0 == _stricmp(str_grab_input, "on") || 0 == _stricmp(str_grab_input, "1")));
+    m_flags.set(etiGrabInput, (0 == xr_stricmp(str_grab_input, "on") || 0 == xr_stricmp(str_grab_input, "1")));
 
     int actions_count = xml->GetNodesNum(0, 0, "action");
     m_actions.resize(actions_count);
@@ -250,22 +250,22 @@ void CUISequenceSimpleItem::Start()
         bool bShowPda = false;
         CUIGameSP* ui_game_sp = smart_cast<CUIGameSP*>(CurrentGameUI());
 
-        if (!_stricmp(m_pda_section, "pda_tasks"))
+        if (!xr_stricmp(m_pda_section, "pda_tasks"))
         {
             ui_game_sp->GetPdaMenu().SetActiveSubdialog("eptTasks");
             bShowPda = true;
         }
-        else if (!_stricmp(m_pda_section, "pda_ranking"))
+        else if (!xr_stricmp(m_pda_section, "pda_ranking"))
         {
             ui_game_sp->GetPdaMenu().SetActiveSubdialog("eptRanking");
             bShowPda = true;
         }
-        else if (!_stricmp(m_pda_section, "pda_logs"))
+        else if (!xr_stricmp(m_pda_section, "pda_logs"))
         {
             ui_game_sp->GetPdaMenu().SetActiveSubdialog("eptLogs");
             bShowPda = true;
         }
-        else if (!_stricmp(m_pda_section, "pda_show_second_task_wnd"))
+        else if (!xr_stricmp(m_pda_section, "pda_show_second_task_wnd"))
         {
             ui_game_sp->GetPdaMenu().Show_SecondTaskWnd(true);
             bShowPda = true;
