@@ -13,6 +13,10 @@
 #include "attachable_item.h"
 #include "xrserver_objects_alife.h"
 #include "xrserver_objects_alife_items.h"
+#include "xrCommon/xr_deque.h"
+#ifdef DEBUG
+#include "xrEngine/pure.h"
+#endif
 
 enum EHandDependence
 {

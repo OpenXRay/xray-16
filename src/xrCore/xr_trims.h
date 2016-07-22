@@ -1,11 +1,13 @@
 #pragma once
-#ifndef xr_trimsH
-#define xr_trimsH
-//#include "xrCore/_stl_extensions.h"
+#include "xrCore/_types.h"
 #include "xrCore/xr_vector_defs.h"
+#include "xrCore/xrstring.h"
 
 // refs
 struct xr_token;
+using RStringVec = xr_vector<shared_str>;
+using string64Vec = xr_vector<string64>;
+
 
 #ifdef __BORLANDC__
 XRCORE_API AnsiString& _Trim(AnsiString& str);
@@ -55,5 +57,3 @@ XRCORE_API LPCSTR _CopyVal(LPCSTR src, xr_string& dst, char separator = ',');
 XRCORE_API LPCSTR _GetItem(LPCSTR src, int, xr_string& p, char separator = ',', LPCSTR = "", bool trim = true);
 XRCORE_API xr_string _ListToSequence(const SStringVec& lst);
 XRCORE_API shared_str _ListToSequence(const RStringVec& lst);
-
-#endif

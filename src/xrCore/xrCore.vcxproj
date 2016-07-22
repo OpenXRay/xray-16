@@ -363,6 +363,7 @@
     <ClInclude Include="xr_ini.h" />
     <ClInclude Include="xr_resource.h" />
     <ClInclude Include="xr_shared.h" />
+    <ClInclude Include="xr_shortcut.h" />
     <ClInclude Include="xr_trims.h" />
     <ClInclude Include="xr_vector_defs.h" />
     <ClInclude Include="_bitwise.h" />

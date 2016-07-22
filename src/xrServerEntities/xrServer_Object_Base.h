@@ -13,6 +13,7 @@
 #include "script_value_container.h"
 #include "alife_space.h"
 #include "xrCore/client_id.h"
+#include "xrCore/clsid.h"
 
 class NET_Packet;
 class xrClientData;

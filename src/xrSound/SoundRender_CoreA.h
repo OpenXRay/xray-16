@@ -9,15 +9,15 @@
     {                                                              \
         alGetError();                                              \
         expr;                                                      \
-        ALenum error = alGetError();                               \
-        VERIFY2(error == AL_NO_ERROR, (pcstr)alGetString(error)); \
+        ALenum err_ = alGetError();                               \
+        VERIFY2(err_ == AL_NO_ERROR, (pcstr)alGetString(err_)); \
     }
 #define AC_CHK(expr)                                                          \
     {                                                                         \
         alcGetError(pDevice);                                                 \
         expr;                                                                 \
-        ALCenum error = alcGetError(pDevice);                                 \
-        VERIFY2(error == ALC_NO_ERROR, (pcstr)alcGetString(pDevice, error)); \
+        ALCenum err_ = alcGetError(pDevice);                                 \
+        VERIFY2(err_ == ALC_NO_ERROR, (pcstr)alcGetString(pDevice, err_)); \
     }
 #else
 #define A_CHK(expr) \

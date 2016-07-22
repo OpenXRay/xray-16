@@ -1,5 +1,12 @@
-#ifndef ChooseTypesH
-#define ChooseTypesH
+#pragma once
+#include "xrCore/fastdelegate.h"
+#include "xrCommon/xr_vector.h"
+
+// fwd. decl.
+template <class T>
+struct _rect;
+using Irect = _rect<int>;
+
 
 enum EChooseMode
 {
@@ -84,5 +91,3 @@ struct SChooseEvents
 };
 
 #define NONE_CAPTION "<none>"
-
-#endif

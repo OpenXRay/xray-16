@@ -13,6 +13,7 @@
 #include "xrAICore/Navigation/ai_object_location.h"
 #include "ai_space.h"
 #include "xrAICore/Navigation/game_graph.h"
+#include "xrNetServer/NET_Messages.h"
 
 #include "xrPhysics/MathUtils.h"
 #ifdef DEBUG

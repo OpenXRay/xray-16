@@ -121,7 +121,7 @@ void CResourceManager::_ParseList(sh_list& dest, LPCSTR names)
         {
             // flush
             N.push_back(0);
-            xd_strlwr(N.begin());
+            xr_strlwr(N.begin());
 
             fix_texture_name(N.begin());
             //. andy			if (strext(N.begin())) *strext(N.begin())=0;
@@ -138,7 +138,7 @@ void CResourceManager::_ParseList(sh_list& dest, LPCSTR names)
     {
         // flush
         N.push_back(0);
-        xd_strlwr(N.begin());
+        xr_strlwr(N.begin());
 
         fix_texture_name(N.begin());
         //. andy		if (strext(N.begin())) *strext(N.begin())=0;

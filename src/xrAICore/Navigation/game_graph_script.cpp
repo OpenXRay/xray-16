@@ -16,9 +16,9 @@ using namespace luabind;
 using namespace luabind::policy;
 
 const CGameGraph* get_game_graph() { return &GEnv.AISpace->game_graph(); }
-const CGameGraph::CHeader* get_header(const CGameGraph* self) { return (&self->header()); }
-bool get_accessible1(const CGameGraph* self, const u32& vertex_id) { return (self->accessible(vertex_id)); }
-void get_accessible2(const CGameGraph* self, const u32& vertex_id, bool value) { self->accessible(vertex_id, value); }
+const CGameGraph::CHeader* get_header(const CGameGraph* self_) { return (&self_->header()); }
+bool get_accessible1(const CGameGraph* self_, const u32& vertex_id) { return (self_->accessible(vertex_id)); }
+void get_accessible2(const CGameGraph* self_, const u32& vertex_id, bool value) { self_->accessible(vertex_id, value); }
 Fvector CVertex__level_point(const CGameGraph::CVertex* vertex)
 {
     THROW(vertex);

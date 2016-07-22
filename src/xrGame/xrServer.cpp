@@ -22,6 +22,7 @@
 #include "file_transfer.h"
 #include "screenshot_server.h"
 #include "xrServer_info.h"
+#include "xrNetServer/NET_Messages.h"
 #include <functional>
 
 #pragma warning(push)

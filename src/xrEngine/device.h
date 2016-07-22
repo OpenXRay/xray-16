@@ -14,6 +14,7 @@
 #include "xrCore/FTimer.h"
 #include "Stats.h"
 #include "xrCore/Threading/Event.hpp"
+#include "xrCore/fastdelegate.h"
 #include "xrCommon/xr_list.h"
 #include "xrCore/ModuleLookup.hpp"
 

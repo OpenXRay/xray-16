@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Level.h"
 #include <GameSpy/md5.h>
+#include "xrNetServer/NET_Messages.h"
 
 extern void GetCDKey_FromRegistry(char* CDKeyStr);
 char const* ComputeClientDigest(string128& dest)

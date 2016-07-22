@@ -11,6 +11,7 @@
 #include "xrAICore/Navigation/graph_vertex.h"
 #include "xrAICore/Navigation/graph_edge.h"
 #include "Common/object_broker.h"
+#include "xrCommon/xr_map.h"
 
 template <typename _data_type = Loki::EmptyType, typename _edge_weight_type = float, typename _vertex_id_type = u32,
     typename _edge_data_type = Loki::EmptyType>

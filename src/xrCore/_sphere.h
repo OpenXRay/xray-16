@@ -1,5 +1,7 @@
+#pragma once
 #ifndef _F_SPHERE_H_
 #define _F_SPHERE_H_
+#include "_vector3d.h"
 
 template <class T>
 struct _sphere;

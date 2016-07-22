@@ -8,6 +8,7 @@
 #include "PHSynchronize.h"
 #include "xrPhysics/MathUtils.h"
 #include "Include/xrRender/Kinematics.h"
+#include "xrNetServer/NET_Messages.h"
 
 #include "xrAICore/Navigation/ai_object_location.h"
 #include "ai_space.h"

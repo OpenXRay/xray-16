@@ -1,4 +1,7 @@
 #include "pch.hpp"
+
+#include <limits>
+
 #include "xrCore/_matrix.h"
 #include "xrCore/_quaternion.h"
 #include "xrCore/xrDebug_macros.h"

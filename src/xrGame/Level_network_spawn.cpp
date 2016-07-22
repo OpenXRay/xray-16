@@ -9,6 +9,7 @@
 #include "client_spawn_manager.h"
 #include "xrEngine/xr_object.h"
 #include "xrEngine/IGame_Persistent.h"
+#include "xrNetServer/NET_Messages.h"
 
 void CLevel::cl_Process_Spawn(NET_Packet& P)
 {

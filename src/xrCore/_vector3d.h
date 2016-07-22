@@ -2,11 +2,9 @@
 #ifndef __V3D__
 #define __V3D__
 #include <algorithm>
-// XXX: review
-//#include "Common/Platform.hpp"
 #include "xrCommon/inlining_macros.h"
 #include "_random.h"
-#include "_std_extensions.h"
+#include "_std_extensions.h" // only for _min/_max. FIX!
 
 template <class T>
 struct _vector3

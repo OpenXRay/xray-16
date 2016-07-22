@@ -1,8 +1,19 @@
 #pragma once
 
-// TODO: tamlin: Get rid of _std_extensions.h as compile-time dependency, if possible.
 #include "_types.h"
-#include "_std_extensions.h"
+#include "xrCommon/inlining_macros.h"
+
+#define BREAK_AT_STRCMP
+#ifndef DEBUG
+#undef BREAK_AT_STRCMP
+#endif
+#ifdef _EDITOR
+#undef BREAK_AT_STRCMP
+#endif
+
+#ifndef BREAK_AT_STRCMP
+#include <string.h>
+#endif
 
 #pragma pack(push, 4)
 #pragma warning(push)
@@ -145,6 +156,15 @@ public:
         return (shared_str&)*this;
     }
 };
+
+#ifdef BREAK_AT_STRCMP
+XRCORE_API int xr_strcmp(const char* S1, const char* S2);
+#else
+inline int xr_strcmp(const char* S1, const char* S2)
+{
+    return (int)strcmp(S1, S2);
+}
+#endif
 
 // res_ptr == res_ptr
 // res_ptr != res_ptr

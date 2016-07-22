@@ -8,9 +8,9 @@
 
 #pragma once
 
-#include "xrMessages.h"
 #include "xrServer_Object_Base.h"
-#include "phnetstate.h"
+#include "ShapeData.h"
+#include "PHNetState.h"
 
 #pragma warning(push)
 #pragma warning(disable : 4005)

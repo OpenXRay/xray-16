@@ -21,6 +21,7 @@
 #include "UI/UIDialogWnd.h"
 #include "xrEngine/xr_input.h"
 #include "saved_game_wrapper.h"
+#include "xrNetServer/NET_Messages.h"
 
 #include "Include/xrRender/DebugRender.h"
 

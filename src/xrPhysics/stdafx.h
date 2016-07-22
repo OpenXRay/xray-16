@@ -11,12 +11,15 @@
 
 #include "xrCDB/xrCDB.h"
 #include "xrSound/sound.h"
+#include "xrEngine/GameMtlLib.h"
 
 #include "xrPhysics.h"
 
 #ifdef DEBUG
-#include "d3d9types.h"
+#include <d3d9types.h>
 #endif
+
+// XXX: TODO: What on earth have CODE to do in a PCH header like this?!
 // IC IGame_Level &GLevel()
 //{
 //	VERIFY( g_pGameLevel );

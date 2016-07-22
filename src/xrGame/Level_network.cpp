@@ -19,6 +19,7 @@
 #include "UI/UIGameTutorial.h"
 #include "ui/UIPdaWnd.h"
 #include "xrNetServer/NET_AuthCheck.h"
+#include "xrNetServer/NET_Messages.h"
 
 #include "xrPhysics/physicscommon.h"
 

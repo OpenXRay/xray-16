@@ -2,6 +2,7 @@
 #include "Level.h"
 #include "xrServer.h"
 #include "xrServerMapSync.h"
+#include "xrNetServer/NET_Messages.h"
 
 void xrServer::OnProcessClientMapData(NET_Packet& P, ClientID const& clientID)
 {

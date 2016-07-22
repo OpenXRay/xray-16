@@ -1,13 +1,22 @@
 //---------------------------------------------------------------------------
-#ifndef PropertiesListTypesH
-#define PropertiesListTypesH
+#pragma once
 
 #include "WaveForm.H"
 #include "gametype_chooser.h"
+#include "xrCommon/xr_string.h"
+#include "xrCommon/xr_vector.h"
+#include "xrCore/_rect.h"
+#include "xrCore/xr_trims.h"
+#include "xrCore/xr_shortcut.h"
+//#include "xrCore/xrCore.h"
 
 #ifdef __BORLANDC__
 #include "ElTree.hpp"
 #endif
+
+// fwd. decl.
+using RStringVec = xr_vector<shared_str>;
+struct xr_rtoken;
 
 #pragma pack(push, 1)
 
@@ -822,5 +831,3 @@ public:
 };
 //------------------------------------------------------------------------------
 #pragma pack(pop)
-
-#endif

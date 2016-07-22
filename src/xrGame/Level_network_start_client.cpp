@@ -9,6 +9,7 @@
 #include "NET_Queue.h"
 #include "file_transfer.h"
 #include "hudmanager.h"
+#include "xrNetServer/NET_Messages.h"
 
 #include "xrPhysics/iphworld.h"
 

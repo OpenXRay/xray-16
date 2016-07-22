@@ -10,6 +10,7 @@
 #include "Level.h"
 #include "xrAICore/Navigation/ai_object_location.h"
 #include "xrEngine/IGame_Persistent.h"
+#include "xrNetServer/NET_Messages.h"
 
 CRocketLauncher::CRocketLauncher()
 {

@@ -7,8 +7,8 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #pragma once
-#ifndef XRAY_ALIFE_SPACE
-#define XRAY_ALIFE_SPACE
+#include "xrCommon/xr_vector.h"
+#include "xrCommon/xr_map.h"
 
 // ALife objects, events and tasks
 #define ALIFE_VERSION 0x0006
@@ -159,12 +159,8 @@ enum EWeaponAddonStatus
 };
 
 EHitType g_tfString2HitType(LPCSTR caHitType);
+pcstr g_cafHitType2String(EHitType tHitType);
 
-#ifndef _EDITOR
-extern const xr_token hit_types_token[];
-
-IC LPCSTR g_cafHitType2String(EHitType tHitType) { return get_token_name(hit_types_token, tHitType); }
-#endif
 using INT_VECTOR = xr_vector<int>;
 using OBJECT_VECTOR = xr_vector<_OBJECT_ID>;
 using OBJECT_IT = OBJECT_VECTOR::iterator;
@@ -175,5 +171,3 @@ using SCHEDULE_P_VECTOR = xr_vector<CSE_ALifeSchedulable*>;
 using D_OBJECT_P_MAP = xr_map<_OBJECT_ID, CSE_ALifeDynamicObject*>;
 using STORY_P_MAP = xr_map<_STORY_ID, CSE_ALifeDynamicObject*>;
 }
-
-#endif // XRAY_ALIFE_SPACE

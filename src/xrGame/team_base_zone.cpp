@@ -18,6 +18,7 @@
 #include "map_location.h"
 #include "xrEngine/IGame_Persistent.h"
 #include "xrEngine/xr_collide_form.h"
+#include "xrNetServer/NET_Messages.h"
 #ifdef DEBUG
 #include "debug_renderer.h"
 #endif

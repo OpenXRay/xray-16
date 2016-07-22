@@ -7,6 +7,7 @@
 #include "string_table.h"
 #include "clsid_game.h"
 #include <functional>
+#include "xrNetServer/NET_Messages.h"
 
 #include "ui\UIBuyWndShared.h"
 

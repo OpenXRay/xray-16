@@ -1,5 +1,6 @@
-#ifndef _CYLINDER_H
-#define _CYLINDER_H
+#pragma once
+#include <limits>
+#include "_vector3d.h"
 
 template <class T>
 class _cylinder
@@ -275,5 +276,3 @@ BOOL _valid(const _cylinder<T>& c)
 {
     return _valid(c.m_center) && _valid(c.m_direction) && _valid(c.m_height) && _valid(c.m_radius);
 }
-
-#endif // _DEBUG

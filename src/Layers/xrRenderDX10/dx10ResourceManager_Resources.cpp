@@ -202,8 +202,7 @@ SVS* CResourceManager::_CreateVS(LPCSTR _name)
 
         VERIFY(SUCCEEDED(_hr));
 
-        CHECK_OR_EXIT(!FAILED(_hr),
-            make_string("Your video card doesn't meet game requirements.\n\nTry to lower game settings."));
+        CHECK_OR_EXIT(!FAILED(_hr), "Your video card doesn't meet game requirements.\n\nTry to lower game settings.");
 
         return _vs;
     }
@@ -337,8 +336,7 @@ SPS* CResourceManager::_CreatePS(LPCSTR _name)
 
         VERIFY(SUCCEEDED(_hr));
 
-        CHECK_OR_EXIT(!FAILED(_hr),
-            make_string("Your video card doesn't meet game requirements.\n\nTry to lower game settings."));
+        CHECK_OR_EXIT(!FAILED(_hr), "Your video card doesn't meet game requirements.\n\nTry to lower game settings.");
 
         return _ps;
     }
@@ -409,8 +407,7 @@ SGS* CResourceManager::_CreateGS(LPCSTR name)
 
         FS.r_close(file);
 
-        CHECK_OR_EXIT(!FAILED(_hr),
-            make_string("Your video card doesn't meet game requirements.\n\nTry to lower game settings."));
+        CHECK_OR_EXIT(!FAILED(_hr), "Your video card doesn't meet game requirements.\n\nTry to lower game settings.");
 
         return _gs;
     }

@@ -52,4 +52,9 @@ EHitType g_tfString2HitType(LPCSTR caHitType)
 #endif
 }
 
+pcstr g_cafHitType2String(EHitType tHitType)
+{
+    return get_token_name(hit_types_token, tHitType);
+}
+
 } // namespace ALife

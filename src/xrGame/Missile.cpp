@@ -15,6 +15,7 @@
 #include "CharacterPhysicsSupport.h"
 #include "inventory.h"
 #include "xrEngine/IGame_Persistent.h"
+#include "xrNetServer/NET_Messages.h"
 #ifdef DEBUG
 #include "phdebug.h"
 #endif

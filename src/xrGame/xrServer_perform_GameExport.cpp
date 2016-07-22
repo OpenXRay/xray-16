@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "xrserver.h"
 #include "xrmessages.h"
+#include "xrNetServer/NET_Messages.h"
 
 void xrServer::Perform_game_export()
 {

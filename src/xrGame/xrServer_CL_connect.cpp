@@ -4,6 +4,7 @@
 #include "xrserver_objects.h"
 #include "xrServer_Objects_Alife_Monsters.h"
 #include "Level.h"
+#include "xrNetServer/NET_Messages.h"
 
 void xrServer::Perform_connect_spawn(CSE_Abstract* E, xrClientData* CL, NET_Packet& P)
 {
@@ -256,4 +257,4 @@ void xrServer::Check_BuildVersion_Success(IClient* CL)
 {
     CL->flags.bVerified = TRUE;
     SendConnectResult(CL, 1, 0, "All Ok");
-};
+}

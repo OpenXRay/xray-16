@@ -94,6 +94,7 @@
 #include "ui/UIProgressBar.h"
 #include "ui/UIOptionsItem.h"
 #include "ui/UIScrollView.h"
+#include "xrNetServer/NET_Messages.h"
 //#include "ui/UIStatic.h"
 #include "ui/UISubLine.h"
 #include "ui/UIXmlInit.h"

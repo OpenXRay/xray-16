@@ -2,6 +2,7 @@
 
 #include "xrCore/Threading/Lock.hpp" // XXX: Remove from header. Put in .cpp.
 #include "Common/Noncopyable.hpp"
+#include "xrCore/math_constants.h"
 
 // forward declarations
 class CFrustum;

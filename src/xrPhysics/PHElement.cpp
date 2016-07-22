@@ -1197,12 +1197,12 @@ void CPHElement::add_Mass(
         l.sub(pos, mass_center);
         dMassSetCylinder(&m, 1.f, 2, shape.cylinder.m_radius, shape.cylinder.m_height);
         dMassAdjust(&m, mass);
-        dMatrix3 DMatx;
+        dMatrix3 DMatx2;
         Fmatrix33 m33;
         m33.j.set(shape.cylinder.m_direction);
         Fvector::generate_orthonormal_basis(m33.j, m33.k, m33.i);
-        PHDynamicData::FMX33toDMX(m33, DMatx);
-        dMassRotate(&m, DMatx);
+        PHDynamicData::FMX33toDMX(m33, DMatx2);
+        dMassRotate(&m, DMatx2);
         dMassTranslate(&m, l.x, l.y, l.z);
         break;
     }

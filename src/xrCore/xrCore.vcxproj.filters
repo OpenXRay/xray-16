@@ -731,6 +731,9 @@
     <ClInclude Include="xrCore_benchmark_macros.h">
       <Filter>Kernel</Filter>
     </ClInclude>
+    <ClInclude Include="xr_shortcut.h">
+      <Filter>Kernel</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="xrCore.rc">

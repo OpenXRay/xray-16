@@ -1,6 +1,5 @@
 #pragma once
-#ifndef FixedVectorH
-#define FixedVectorH
+#include "xrCore/_types.h"
 
 // deprecated, use xr_array instead
 template <class T, std::size_t dim>
@@ -114,4 +113,3 @@ public:
         return true;
     }
 };
-#endif

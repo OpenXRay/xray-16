@@ -21,6 +21,7 @@
 #include "xrAICore/Navigation/ai_object_location.h"
 #include "Common/object_broker.h"
 #include "xrEngine/IGame_Persistent.h"
+#include "xrNetServer/NET_Messages.h"
 
 #ifdef DEBUG
 #include "debug_renderer.h"

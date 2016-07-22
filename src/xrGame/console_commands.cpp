@@ -38,6 +38,7 @@
 #include "MainMenu.h"
 #include "saved_game_wrapper.h"
 #include "xrAICore/Navigation/level_graph.h"
+#include "xrNetServer/NET_Messages.h"
 
 #include "cameralook.h"
 #include "character_hit_animations_params.h"

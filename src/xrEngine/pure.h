@@ -1,3 +1,4 @@
+#pragma once
 #ifndef _PURE_H_AAA_
 #define _PURE_H_AAA_
 

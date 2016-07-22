@@ -8,6 +8,8 @@
 
 #pragma once
 #include <type_traits>
+#include "xrCore/xrstring.h"
+#include "xrCommon/xr_string.h"
 
 template <class M, typename P>
 struct CSaver

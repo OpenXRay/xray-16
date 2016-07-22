@@ -10,6 +10,7 @@
 #include "xrEngine/CameraBase.h"
 #include "player_hud.h"
 #include "xrCore/Animation/SkeletonMotions.hpp"
+#include "xrNetServer/NET_Messages.h"
 
 #include "ui_base.h"
 

@@ -8,6 +8,8 @@
 
 #pragma once
 #include "xrCore/FixedVector.h"
+#include "xrCore/xrstring.h"
+#include "xrCommon/xr_stack.h"
 
 template <typename P>
 struct CComparer

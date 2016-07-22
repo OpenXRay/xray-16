@@ -7,7 +7,8 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #pragma once
-#include "xrCore/xrCore.h"
+#include "xrCore/_types.h"
+#include "xrCommon/inlining_macros.h"
 
 class NET_Packet;
 class IReader;

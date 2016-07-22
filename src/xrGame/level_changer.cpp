@@ -17,6 +17,7 @@
 #include "ai_space.h"
 #include "xrAICore/Navigation/level_graph.h"
 #include "xrAICore/Navigation/game_level_cross_table.h"
+#include "xrNetServer/NET_Messages.h"
 
 #include "UIGameSP.h"
 #include "xrEngine/xr_collide_form.h"

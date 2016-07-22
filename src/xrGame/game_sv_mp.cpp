@@ -19,6 +19,7 @@
 #include "WeaponKnife.h"
 #include "game_cl_base_weapon_usage_statistic.h"
 #include "xrGameSpyServer.h"
+#include "xrNetServer/NET_Messages.h"
 
 #include "game_sv_mp_vote_flags.h"
 #include "player_name_modifyer.h"

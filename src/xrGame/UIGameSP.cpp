@@ -3,6 +3,7 @@
 #include "actor.h"
 #include "Level.h"
 #include "xrEngine/xr_input.h"
+#include "xrNetServer/NET_Messages.h"
 
 #ifdef DEBUG
 #include "attachable_item.h"

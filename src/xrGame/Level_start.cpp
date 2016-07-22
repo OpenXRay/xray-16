@@ -13,6 +13,7 @@
 #include "string_table.h"
 #include "UIGameCustom.h"
 #include "ui/UICDkey.h"
+#include "xrNetServer/NET_Messages.h"
 
 int g_cl_save_demo = 0;
 extern XRCORE_API bool g_allow_heap_min;

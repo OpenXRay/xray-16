@@ -14,6 +14,7 @@
 #include "spawn_constructor_space.h"
 #include "guid_generator.h"
 #include "game_graph_builder.h"
+#include "xrServerEntities/xrMessages.h"
 #include <direct.h>
 
 extern LPCSTR GAME_CONFIG;

@@ -1463,7 +1463,7 @@ void CLocatorAPI::file_delete(pcstr path, pcstr nm)
     if (I != m_files.end())
     {
         // remove file
-        xr _unlink(I->name);
+        xr_unlink(I->name);
         auto str = pstr(I->name);
         xr_free(str);
         m_files.erase(I);

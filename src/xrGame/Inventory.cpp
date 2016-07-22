@@ -20,6 +20,7 @@
 #include "clsid_game.h"
 #include "static_cast_checked.hpp"
 #include "player_hud.h"
+#include "xrNetServer/NET_Messages.h"
 
 using namespace InventoryUtilities;
 
@@ -1312,6 +1313,11 @@ bool CInventory::isBeautifulForActiveSlot(CInventoryItem* pIItem)
             return (true);
     }
     return (false);
+}
+
+void CInventory::InvalidateState() throw()
+{
+    m_dwModifyFrame = Device.dwFrame;
 }
 
 //.#include "WeaponHUD.h"

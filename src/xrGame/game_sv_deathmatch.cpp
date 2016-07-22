@@ -14,6 +14,7 @@
 #include "eatable_item_object.h"
 #include "Missile.h"
 #include "game_cl_base_weapon_usage_statistic.h"
+#include "xrNetServer/NET_Messages.h"
 #include "clsid_game.h"
 
 //#define DELAYED_ROUND_TIME	7000

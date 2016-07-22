@@ -5,6 +5,7 @@
 #include "xrServer.h"
 #include "xrmessages.h"
 #include "ai_space.h"
+#include "xrNetServer/NET_Messages.h"
 
 void xrServer::Perform_destroy(CSE_Abstract* object, u32 mode)
 {

@@ -1,5 +1,4 @@
-#ifndef __XR_OBJECT_H__
-#define __XR_OBJECT_H__
+#pragma once
 
 #include "xrCDB/ISpatial.h"
 #include "ISheduled.h"
@@ -14,13 +13,13 @@
 #include "xrServerEntities/alife_space.h"
 #include "xrCommon/misc_math_types.h" // SRotation
 
-// refs
-// class ENGINE_API IRender_Visual;
-class ENGINE_API IRender_Sector;
-class ENGINE_API IRender_ObjectSpecific;
-class ENGINE_API CCustomHUD;
+// fwd. decl.
+class IRender_Sector;
+class IRender_ObjectSpecific;
+class CCustomHUD;
 class NET_Packet;
 class CSE_Abstract;
+class CInifile;
 
 //-----------------------------------------------------------------------------------------------------------
 #define CROW_RADIUS (30.f)
@@ -355,4 +354,3 @@ public:
 };
 
 inline IGameObject::~IGameObject() {}
-#endif //__XR_OBJECT_H__

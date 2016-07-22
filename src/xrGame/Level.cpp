@@ -48,6 +48,7 @@
 #include "CustomDetector.h"
 #include "xrPhysics/IPHWorld.h"
 #include "xrPhysics/console_vars.h"
+#include "xrNetServer/NET_Messages.h"
 
 #ifdef DEBUG
 #include "level_debug.h"

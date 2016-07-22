@@ -5,6 +5,7 @@
 #include "xrGameSpy/GameSpy_GCD_Client.h"
 #include "xrEngine/IGame_Persistent.h"
 #include "ui/UICDkey.h"
+#include "xrNetServer/NET_Messages.h"
 
 void CLevel::OnGameSpyChallenge(NET_Packet* P)
 {

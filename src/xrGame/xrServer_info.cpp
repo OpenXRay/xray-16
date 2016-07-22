@@ -2,6 +2,7 @@
 #include "xrServer_info.h"
 #include "Level.h"
 #include "xrserver.h"
+#include "xrNetServer/NET_Messages.h"
 
 #define SERVER_LOGO_FN "server_logo.jpg"
 #define SERVER_RULES_FN "server_rules.txt"

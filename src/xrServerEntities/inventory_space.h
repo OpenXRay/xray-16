@@ -1,4 +1,6 @@
 #pragma once
+#include "xrCommon/xr_vector.h"
+#include "xrCore/xrstring.h"
 
 #define CMD_START (1 << 0)
 #define CMD_STOP (1 << 1)

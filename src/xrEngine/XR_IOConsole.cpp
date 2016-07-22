@@ -461,11 +461,7 @@ void CConsole::DrawBackgrounds(bool bGame)
             {
                 break; // for itb2
             }
-<<<<<<< HEAD
         } // for itb
-=======
-        }// for itb2
->>>>>>> bf03c55e9... More cleaning/decoupling. Some 'override' added. Fixed up stricmp -> _stricmp & co.
     } // if
 
     // --------------------------- scroll bar --------------------

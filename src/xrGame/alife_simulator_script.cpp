@@ -20,6 +20,7 @@
 #include "xrServer.h"
 #include "Level.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
+#include "xrNetServer/NET_Messages.h"
 
 using namespace luabind;
 
