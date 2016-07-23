@@ -1,3 +1,4 @@
+#pragma once
 #ifndef _CPS_Instance_H_
 #define _CPS_Instance_H_
 

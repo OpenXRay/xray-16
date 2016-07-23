@@ -2,6 +2,7 @@
 #include "xrServer.h"
 #include "xrserver_objects.h"
 #include "xrNetServer/NET_Messages.h"
+#include "xrServerEntities/xrMessages.h"
 
 #ifdef DEBUG
 #include "xrserver_objects_alife_items.h"

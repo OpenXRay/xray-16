@@ -133,7 +133,6 @@
     <ClInclude Include="..\..\xrServerEntities\script_rtoken_list.h" />
     <ClInclude Include="..\..\xrServerEntities\script_rtoken_list_inline.h" />
     <ClInclude Include="..\..\xrServerEntities\script_token_list.h" />
-    <ClInclude Include="..\..\xrServerEntities\script_token_list_inline.h" />
     <ClInclude Include="..\..\xrServerEntities\script_value_container.h" />
     <ClInclude Include="..\..\xrServerEntities\script_value_container_impl.h" />
     <ClInclude Include="..\..\xrServerEntities\ShapeData.h" />

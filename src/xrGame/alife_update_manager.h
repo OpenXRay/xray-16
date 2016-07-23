@@ -11,6 +11,7 @@
 #include "alife_switch_manager.h"
 #include "alife_surge_manager.h"
 #include "alife_storage_manager.h"
+#include "xrEngine/ISheduled.h"
 
 namespace RestrictionSpace
 {

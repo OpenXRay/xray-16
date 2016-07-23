@@ -28,6 +28,7 @@ class IKinematics;
 typedef u32 CLClassBits;
 typedef u32 CLBits;
 struct dMass;
+struct SAllDDOParams;
 template <class T> class _cylinder; typedef _cylinder<float> Fcylinder;
 template <class T> struct _sphere; typedef _sphere<float> Fsphere;
 template <class T> struct _obb; typedef _obb<float> Fobb;

@@ -3,6 +3,7 @@
 #define MATH_UTILS_H
 #include "xrCore/_fbox.h"
 #include "xrCore/_obb.h"
+#include "xrPhysics.h"
 #ifdef DEBUG
 #include "xrCore/dump_string.h"
 #endif

@@ -6,6 +6,7 @@
 #include "xrCore/fastdelegate.h"
 #include "profile_data_types.h"
 #include "profile_data_types_script.h"
+#include "xrCommon/xr_deque.h"
 
 namespace gamespy_profile
 {
@@ -47,7 +48,7 @@ private:
     reward_tasks_t m_reward_tasks;
     gamespy_profile::all_best_scores_t m_best_results_to_submit;
 
-    void do_task(submit_task const& td);
+    //void do_task(submit_task const& td);
     void do_atlas_reward(
         gamespy_gp::profile const* profile, gamespy_profile::enum_awards_t const award_id, u32 const count);
     void do_atlas_best_results(gamespy_gp::profile const* profile, gamespy_profile::all_best_scores_t* br_ptr);

@@ -1,8 +1,14 @@
+#pragma once
 #ifndef FILETRANSFER_NODE
 #define FILETRANSFER_NODE
 
 #include "filetransfer_common.h"
 #include "Common/Noncopyable.hpp"
+#include "xrCommon/xr_deque.h"
+
+// fwd. decl.
+template <typename T> class buffer_vector;
+
 
 namespace file_transfer
 {

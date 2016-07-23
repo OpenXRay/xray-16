@@ -12,6 +12,7 @@
 #include "Common/object_broker.h"
 #include "UIGameCustom.h"
 #include "UIDialogHolder.h"
+#include "UIFrameWindow.h"
 
 CUIChangeMap::CUIChangeMap()
 {

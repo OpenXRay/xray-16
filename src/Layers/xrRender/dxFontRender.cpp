@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "dxFontRender.h"
-
 #include "xrEngine/GameFont.h"
+#include "xrCore/Text/MbHelpers.h"
 
 dxFontRender::dxFontRender() {}
 dxFontRender::~dxFontRender()

@@ -1,4 +1,6 @@
 #pragma once
+#include "xrCDB/xr_collide_defs.h"
+
 class CBaseMonster;
 class CEntityAlive;
 

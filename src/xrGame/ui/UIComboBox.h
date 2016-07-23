@@ -4,6 +4,7 @@
 #include "UIListBox.h"
 #include "UIInteractiveBackground.h"
 #include "UIOptionsItem.h"
+#include "UIFrameWindow.h"
 
 class CUIListBoxItem;
 

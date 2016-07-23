@@ -1,9 +1,12 @@
+#pragma once
 #ifndef UIGAMECTA
 #define UIGAMECTA
 
 #include "UIGameMP.h"
 #include "game_base.h"
 #include "inventory.h"
+#include "xrCommon/xr_vector.h"
+#include "xrCore/buffer_vector.h"
 
 class UITeamPanels;
 

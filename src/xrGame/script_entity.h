@@ -7,10 +7,9 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #pragma once
-
 #include "script_entity_space.h"
-
 #include "Include/xrRender/KinematicsAnimated.h"
+#include "xrCommon/xr_deque.h"
 
 class CSE_Abstract;
 class CGameObject;

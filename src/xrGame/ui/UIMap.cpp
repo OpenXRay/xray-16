@@ -6,6 +6,7 @@
 #include "UIMap.h"
 #include "UIMapWnd.h"
 #include "xrEngine/xr_input.h" //remove me !!!
+#include "xrCore/_fbox2.h"
 
 const u32 activeLocalMapColor = 0xffffffff; // 0xffc80000;
 const u32 inactiveLocalMapColor = 0xffffffff; // 0xff438cd1;

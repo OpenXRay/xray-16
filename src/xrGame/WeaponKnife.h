@@ -2,6 +2,7 @@
 
 #include "WeaponCustomPistol.h"
 #include "xrEngine/xr_collide_form.h"
+#include "xrCore/buffer_vector.h"
 
 class CWeaponKnife : public CWeapon
 {

@@ -1,19 +1,19 @@
 #pragma once
-#ifndef CPHMOVEMENT_CONTROL_H
-#define CPHMOVEMENT_CONTROL_H
 
-#include "xrPhysics/physicsexternalcommon.h"
+#include "xrPhysics/PhysicsExternalCommon.h"
 #include "xrPhysics/MathUtils.h"
-#include "xrPhysics/movementboxdynamicactivate.h"
+#include "xrPhysics/MovementBoxDynamicActivate.h"
+#include "xrCDB/xr_collide_defs.h"
+
 namespace ALife
 {
 enum EHitType;
-};
+}
 
 namespace DetailPathManager
 {
 struct STravelPathPoint;
-};
+}
 
 class CPHAICharacter;
 class CPHSimpleCharacter;
@@ -304,5 +304,3 @@ private:
     bool MakeJumpPath(
         xr_vector<DetailPathManager::STravelPathPoint>& out_path, u32& travel_point, Fvector& dist_to_enemy);
 };
-
-#endif

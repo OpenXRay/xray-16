@@ -5,6 +5,7 @@
 
 class CHUDTarget;
 class CUIGameCustom;
+namespace collide { struct rq_result; }
 
 class CHUDManager : public CCustomHUD
 {

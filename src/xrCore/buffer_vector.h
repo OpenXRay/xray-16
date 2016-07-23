@@ -6,6 +6,7 @@
 // Description : buffer vector template class
 ////////////////////////////////////////////////////////////////////////////
 
+#pragma once
 #ifndef BUFFER_VECTOR_H_INCLUDED
 #define BUFFER_VECTOR_H_INCLUDED
 

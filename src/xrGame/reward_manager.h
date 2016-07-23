@@ -1,7 +1,9 @@
+#pragma once
 #ifndef REWARD_MANAGER_INCLUDED
 #define REWARD_MANAGER_INCLUDED
 
 #include "xrCore/Containers/AssociativeVector.hpp"
+#include "xrCommon/xr_deque.h"
 
 class game_cl_mp;
 

@@ -4,8 +4,10 @@
 
 #pragma once
 
-#include "weaponammo.h"
-#include "tracer.h"
+#include "WeaponAmmo.h"
+#include "Tracer.h"
+#include "xrCDB/xr_collide_defs.h"
+#include "xrCommon/xr_vector.h"
 
 //коэфициенты и параметры патрона
 struct SBullet_Hit

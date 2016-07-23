@@ -43,6 +43,7 @@
 #include "cover_evaluators.h"
 #include "smart_cover_object.h"
 #include "debug_renderer.h"
+#include "xrEngine/GameFont.h"
 
 LevelGraphDebugRender::LevelGraphDebugRender()
 {

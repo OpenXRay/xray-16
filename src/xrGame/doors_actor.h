@@ -8,6 +8,7 @@
 #define DOORS_ACTOR_H_INCLUDED
 
 #include "Common/Noncopyable.hpp"
+#include "xrCore/buffer_vector.h"
 #include "doors.h"
 
 class CAI_Stalker;

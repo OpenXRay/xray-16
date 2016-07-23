@@ -14,6 +14,7 @@
 #include "space_restriction_base.h"
 #include "xrEngine/profiler.h"
 #include "xrCore/xrDebug_macros.h"
+#include "xrCore/buffer_vector.h"
 
 const float dependent_distance = 100.f;
 

@@ -1,5 +1,6 @@
 #pragma once
 #ifdef DEBUG
+#include "xrPhysics.h"
 
 enum
 {
@@ -138,4 +139,4 @@ IC IDebugOutput& debug_output()
     return *ph_debug_output;
 }
 
-#endif
+#endif // DEBUG

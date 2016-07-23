@@ -1,3 +1,4 @@
+#pragma once
 #ifndef UIPLAYERITEM
 #define UIPLAYERITEM
 
@@ -9,6 +10,7 @@
 #include "string_table.h"
 #include "Level.h"
 #include "xrCore/Containers/AssociativeVector.hpp"
+#include "xrCore/buffer_vector.h"
 
 class UITeamState;
 class UITeamPanels; // for switching teams

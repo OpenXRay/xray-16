@@ -1,6 +1,6 @@
 #pragma once
-
 #include "xrEngine/CameraBase.h"
+#include "xrCore/_quaternion.h"
 
 class CCameraLook : public CCameraBase
 {

@@ -11,6 +11,7 @@
 #include "ui/UIPDAWnd.h"
 #include "encyclopedia_article.h"
 #include "ui/UIMapWnd.h"
+#include "xrCore/buffer_vector.h"
 
 #pragma warning(push)
 #pragma warning(disable : 4995)

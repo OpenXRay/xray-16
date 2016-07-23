@@ -21,12 +21,14 @@
 #include "script_monster_hit_info.h"
 #include "script_entity_action.h"
 #include "action_planner.h"
+#include "detail_path_manager_space.h"
 
 #include "helicopter.h"
 #include "script_zone.h"
 #include "relation_registry.h"
 #include "danger_object.h"
 #include "smart_cover_object.h"
+#include "xrScriptEngine/Functor.hpp"
 
 using namespace luabind;
 using namespace luabind::policy;

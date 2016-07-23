@@ -65,8 +65,7 @@ typedef xr_vector<shared_str> PSVec;
 typedef PSVec::iterator PSIt;
 #endif
 
-#include "xrCore/xrDebug_macros.h"
-#pragma todo("Place at least CGameMtlLibrary in a static lib or something. It currently gets instantiated a huge amount of times.")
+// XXX: Place at least CGameMtlLibrary in a static lib or something? It currently gets instantiated a measurable amount of times.
 
 struct MTL_EXPORT_API SGameMtl
 {

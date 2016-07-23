@@ -40,11 +40,13 @@
 #include "HUDManager.h"
 #include "raypick.h"
 #include "xrCDB/xr_collide_defs.h"
-
+#ifdef NAMESPACE_LEVEL_EXPORTS
+#include "xrNetServer/NET_Messages.h"
+#endif
 using namespace luabind;
 using namespace luabind::policy;
 
-LPCSTR command_line() { return (Core.Params); }
+LPCSTR command_line() { return Core.Params; }
 bool IsDynamicMusic() { return !!psActorFlags.test(AF_DYNAMIC_MUSIC); }
 bool IsImportantSave() { return !!psActorFlags.test(AF_IMPORTANT_SAVE); }
 #ifdef DEBUG

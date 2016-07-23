@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #pragma once
+#include "xrEngine/ISheduled.h"
 
 class CAutosaveManager : public ScheduledBase
 {

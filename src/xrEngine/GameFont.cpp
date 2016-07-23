@@ -2,6 +2,7 @@
 #pragma hdrstop
 
 #include "GameFont.h"
+#include "xrCore/Text/MbHelpers.h"
 #ifndef _EDITOR
 #include "Render.h"
 #endif
@@ -12,7 +13,7 @@ ENGINE_API Fvector2 g_current_font_scale = {1.0f, 1.0f};
 #include "Include/xrRender/RenderFactory.h"
 #include "Include/xrRender/FontRender.h"
 
-CGameFont::CGameFont(LPCSTR section, u32 flags)
+CGameFont::CGameFont(pcstr section, u32 flags)
 {
     pFontRender = GEnv.RenderFactory->CreateFontRender();
     fCurrentHeight = 0.0f;
@@ -34,7 +35,7 @@ CGameFont::CGameFont(LPCSTR section, u32 flags)
         SetInterval(pSettings->r_fvector2(section, "interval"));
 }
 
-CGameFont::CGameFont(LPCSTR shader, LPCSTR texture, u32 flags)
+CGameFont::CGameFont(pcstr shader, pcstr texture, u32 flags)
 {
     pFontRender = GEnv.RenderFactory->CreateFontRender();
     fCurrentHeight = 0.0f;
@@ -46,7 +47,7 @@ CGameFont::CGameFont(LPCSTR shader, LPCSTR texture, u32 flags)
     Initialize(shader, texture);
 }
 
-void CGameFont::Initialize(LPCSTR cShader, LPCSTR cTextureName)
+void CGameFont::Initialize(pcstr cShader, pcstr cTextureName)
 {
     string_path cTexture;
 
@@ -191,14 +192,14 @@ void CGameFont::OutSet(float x, float y)
 }
 
 void CGameFont::OutSetI(float x, float y) { OutSet(DI2PX(x), DI2PY(y)); }
-u32 CGameFont::smart_strlen(const char* S) { return (IsMultibyte() ? mbhMulti2Wide(NULL, NULL, 0, S) : xr_strlen(S)); }
+u32 CGameFont::smart_strlen(pcstr S) { return (IsMultibyte() ? mbhMulti2Wide(NULL, NULL, 0, S) : xr_strlen(S)); }
 void CGameFont::OnRender()
 {
     pFontRender->OnRender(*this);
     strings.clear();
 }
 
-u16 CGameFont::GetCutLengthPos(float fTargetWidth, const char* pszText)
+u16 CGameFont::GetCutLengthPos(float fTargetWidth, pcstr pszText)
 {
     VERIFY(pszText);
 
@@ -224,7 +225,7 @@ u16 CGameFont::GetCutLengthPos(float fTargetWidth, const char* pszText)
     return wsPos[i - 1];
 }
 
-u16 CGameFont::SplitByWidth(u16* puBuffer, u16 uBufferSize, float fTargetWidth, const char* pszText)
+u16 CGameFont::SplitByWidth(u16* puBuffer, u16 uBufferSize, float fTargetWidth, pcstr pszText)
 {
     VERIFY(puBuffer && uBufferSize && pszText);
 
@@ -261,8 +262,8 @@ u16 CGameFont::SplitByWidth(u16* puBuffer, u16 uBufferSize, float fTargetWidth, 
     return nLines;
 }
 
-void CGameFont::MasterOut(BOOL bCheckDevice, BOOL bUseCoords, BOOL bScaleCoords, BOOL bUseSkip, float _x, float _y,
-    float _skip, LPCSTR fmt, va_list p)
+void CGameFont::MasterOut(bool bCheckDevice, bool bUseCoords, bool bScaleCoords, bool bUseSkip, float _x, float _y,
+    float _skip, pcstr fmt, va_list p)
 {
     if (bCheckDevice && (!RDEVICE.b_is_Active))
         return;
@@ -300,18 +301,18 @@ void CGameFont::MasterOut(BOOL bCheckDevice, BOOL bUseCoords, BOOL bScaleCoords,
     \
 }
 
-void __cdecl CGameFont::OutI(float _x, float _y, LPCSTR fmt, ...)
+void __cdecl CGameFont::OutI(float _x, float _y, pcstr fmt, ...)
 {
-    MASTER_OUT(FALSE, TRUE, TRUE, FALSE, _x, _y, 0.0f, fmt);
+    MASTER_OUT(false, true, true, false, _x, _y, 0.0f, fmt);
 };
 
-void __cdecl CGameFont::Out(float _x, float _y, LPCSTR fmt, ...)
+void __cdecl CGameFont::Out(float _x, float _y, pcstr fmt, ...)
 {
-    MASTER_OUT(TRUE, TRUE, FALSE, FALSE, _x, _y, 0.0f, fmt);
+    MASTER_OUT(true, true, false, false, _x, _y, 0.0f, fmt);
 };
 
-void __cdecl CGameFont::OutNext(LPCSTR fmt, ...) { MASTER_OUT(TRUE, FALSE, FALSE, TRUE, 0.0f, 0.0f, 1.0f, fmt); };
-void CGameFont::OutNextVA(const char* format, va_list args)
+void __cdecl CGameFont::OutNext(pcstr fmt, ...) { MASTER_OUT(TRUE, FALSE, FALSE, TRUE, 0.0f, 0.0f, 1.0f, fmt); };
+void CGameFont::OutNextVA(pcstr format, va_list args)
 {
     MasterOut(TRUE, FALSE, FALSE, TRUE, 0.0f, 0.0f, 1.0f, format, args);
 }
@@ -322,7 +323,7 @@ float CGameFont::SizeOf_(const char cChar)
     return (GetCharTC((u16)(u8)(((IsMultibyte() && cChar == ' ')) ? 0 : cChar)).z * vInterval.x);
 }
 
-float CGameFont::SizeOf_(LPCSTR s)
+float CGameFont::SizeOf_(pcstr s)
 {
     if (!(s && s[0]))
         return 0;

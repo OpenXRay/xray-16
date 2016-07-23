@@ -16,6 +16,7 @@
 #include "alife_graph_registry.h"
 #include "xrServer.h"
 #include "alife_schedule_registry.h"
+#include "xrServerEntities/xrMessages.h"
 
 #ifdef DEBUG
 extern Flags32 psAI_Flags;

@@ -4,6 +4,8 @@
 #include "xrScriptEngine/script_engine.hpp"
 #include "xrScriptEngine/script_space_forward.hpp"
 #include "script_callback_ex.h"
+#include "xrEngine/xr_object.h"
+
 // template<>
 // IC bool compare_safe(const functor<>& f1,const functor<>& f2)
 //{

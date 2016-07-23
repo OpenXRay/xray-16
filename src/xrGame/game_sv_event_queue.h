@@ -1,4 +1,10 @@
 #pragma once
+#include "Common/Noncopyable.hpp"
+#include "xrCommon/xr_deque.h"
+#include "xrCommon/xr_vector.h"
+#include "xrCommon/xr_set.h"
+
+class Lock;
 
 struct GameEvent
 {
@@ -8,9 +14,9 @@ struct GameEvent
     NET_Packet P;
 };
 
-class GameEventQueue
+class GameEventQueue : Noncopyable
 {
-    Lock cs;
+    Lock* pcs;
     xr_deque<GameEvent*> ready;
     xr_vector<GameEvent*> unused;
     xr_set<ClientID> m_blocked_clients;

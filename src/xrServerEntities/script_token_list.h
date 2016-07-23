@@ -8,15 +8,15 @@
 
 #pragma once
 #include "xrCommon/xr_vector.h"
-#include "xrCore/xrstring.h"
 #include "xrCore/xr_token.h"
 
 class CScriptTokenList
 {
 protected:
-    typedef xr_vector<xr_token> TOKEN_LIST;
-    typedef TOKEN_LIST::iterator iterator;
-    typedef TOKEN_LIST::const_iterator const_iterator;
+    // XXX: tamlin: See if it's possible to place the vector in an impl.
+    using TOKEN_LIST = xr_vector<xr_token>;
+    using iterator = TOKEN_LIST::iterator;
+    using const_iterator = TOKEN_LIST::const_iterator;
 
 protected:
     struct CTokenPredicateName
@@ -35,23 +35,19 @@ protected:
         IC bool operator()(const xr_token& token) const { return token.name && (token.id == m_id); }
     };
 
-protected:
     TOKEN_LIST m_token_list;
 
-protected:
-    IC iterator token(pcstr name);
-    IC iterator token(int id);
+    iterator token(pcstr name);
+    iterator token(int id);
 
 public:
-    IC CScriptTokenList();
+    CScriptTokenList();
     ~CScriptTokenList();
-    IC void add(pcstr name, int id);
-    IC void remove(pcstr name);
-    IC void clear();
-    IC int id(pcstr name);
-    IC pcstr name(int id);
+    void add(pcstr name, int id);
+    void remove(pcstr name);
+    void clear();
+    int id(pcstr name);
+    pcstr name(int id);
     const TOKEN_LIST& tokens() const throw() { return m_token_list; }
     TOKEN_LIST& tokens() throw() { return m_token_list; }
 };
-
-#include "script_token_list_inline.h"

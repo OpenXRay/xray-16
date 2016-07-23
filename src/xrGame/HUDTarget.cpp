@@ -4,6 +4,7 @@
 
 #include "xrEngine/Environment.h"
 #include "xrEngine/CustomHUD.h"
+#include "xrEngine/GameFont.h"
 #include "Entity.h"
 #include "Level.h"
 #include "game_cl_base.h"
@@ -20,7 +21,7 @@
 #include "inventory_item.h"
 #include "inventory.h"
 
-#include <ai/monsters/poltergeist/poltergeist.h>
+#include "ai/monsters/poltergeist/poltergeist.h"
 
 u32 C_ON_ENEMY = color_rgba(0xff, 0, 0, 0x80);
 u32 C_ON_NEUTRAL = color_rgba(0xff, 0xff, 0x80, 0x80);

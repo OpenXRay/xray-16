@@ -13,6 +13,7 @@
 #include "inventory.h"
 #include "xrEngine/xr_input.h"
 #include "ui_base.h"
+#include "xrEngine/GameFont.h"
 
 #ifdef DEBUG
 CAttachableItem* CAttachableItem::m_dbgItem = NULL;

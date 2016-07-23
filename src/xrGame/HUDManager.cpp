@@ -13,6 +13,7 @@
 #include "UICursor.h"
 #include "string_table.h"
 #include "game_cl_base.h"
+#include "xrEngine/GameFont.h"
 #ifdef DEBUG
 #include "phdebug.h"
 #endif

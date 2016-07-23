@@ -1,117 +1,80 @@
 #pragma once
+// XXX: Identify what parts of xrGame requires only "core", ui, and finally script.
+// Split up source (PCH-wise) accordingly.
+// This will likely for a long time be WIP.
 
 #include "Common/Common.hpp"
 
-#include "xrEngine/stdafx.h"
+#include "xrEngine/stdafx.h" // XXX: This seems bad. PCH's are for internal (building) use.
 #include "DPlay/dplay8.h"
 
-#pragma region
-#include "xrEngine/gamefont.h"
-#include "xrEngine/xr_object.h"
-#include "xrEngine/IGame_Level.h"
-#include "xrPhysics/xrPhysics.h"
-#include "xrPhysics/PhysicsShell.h"
-#include "xrServerEntities/smart_cast.h"
-#include "Common/LevelStructure.hpp"
-#include "Common/object_broker.h"
-#include "Actor.h"
-#include "alife_smart_terrain_task.h"
-#include "alife_abstract_registry.h"
-#include "alife_graph_registry.h"
-#include "alife_simulator.h"
-#include "alife_storage_manager.h"
-#include "attachable_item.h"
-#include "abstract_location_selector.h"
-#include "action_planner.h"
-//#include "dynamic_obstacles_avoider.h" // included by stalker_movement_manager_obstacles.h
-#include "Explosive.h"
-#include "HudItem.h"
-#include "Inventory.h"
-#include "Level.h"
-#include "memory_manager.h"
-#include "object_handler.h"
-#include "object_handler_planner.h"
-#include "object_manager.h"
-#include "obsolete_queue.h"
-#include "obstacles_query.h"
-#include "patrol_path_manager.h"
-#include "PdaMsg.h"
-#include "PhysicsShellHolder.h"
-#include "PHCollisionDamageReceiver.h"
-#include "PHCommander.h"
-#include "PHDebug.h"
-#include "PHDestroyable.h"
-#include "PHDestroyableNotificate.h"
-#include "PHSkeleton.h"
-#include "PHSoundPlayer.h"
-#include "space_restrictor.h"
-#include "stalker_animation_manager.h"
-//#include "stalker_movement_params.h" // included by stalker_movement_manager_base.h
-//#include "stalker_movement_manager_base.h" // included by stalker_movement_manager_obstacles.h
-//#include "stalker_movement_manager_obstacles.h" // included by stalker_movement_manager_smart_cover.h
-#include "stalker_movement_manager_smart_cover.h"
-#include "state_arguments_functions.h"
-//#include "static_obstacles_avoider.h" // include by dynamic_obstacles_avoider.h
-#include "steering_behaviour.h"
-#include "string_table.h"
-#include "script_game_object.h"
-#include "smart_cover.h"
-#include "smart_cover_detail.h"
-#include "sound_player.h"
-#include "Spectator.h"
-#include "team_hierarchy_holder.h"
-#include "Tracer.h"
-#include "UICursor.h"
-#include "UIGameCTA.h"
-#include "ui_defs.h"
-#include "UIGameCustom.h"
-#include "UIStaticItem.h"
-#include "visual_memory_manager.h"
-#include "Weapon.h"
-#include "WeaponCustomPistol.h"
-//#include "WeaponMagazined.h"
-#include "xr_time.h"
-#include "ai/monsters/basemonster/base_monster.h"
-#include "ui/Restrictions.h"
-#include "ui/UI_IB_Static.h"
-#include "ui/UI3tButton.h"
-#include "ui/UIButton.h"
-#include "ui/UIBuyWndBase.h"
-#include "ui/UIBuyWndShared.h"
-#include "ui/UICellItem.h"
-#include "ui/UICustomEdit.h"
-#include "ui/UIDialogWnd.h"
-#include "ui/UIEditBox.h"
-#include "ui/UIFrameLineWnd.h"
-#include "ui/UIFrameWindow.h"
-#include "ui/UIGameLog.h"
-#include "ui/UIHelper.h"
-#include "ui/UIHint.h"
-#include "ui/UIInteractiveBackground.h"
-#include "ui/UIInventoryUtilities.h"
-#include "ui/UIListBox.h"
-#include "ui/UIMainIngameWnd.h"
-#include "ui/UIProgressBar.h"
-#include "ui/UIOptionsItem.h"
-#include "ui/UIScrollView.h"
-#include "xrNetServer/NET_Messages.h"
-//#include "ui/UIStatic.h"
-#include "ui/UISubLine.h"
-#include "ui/UIXmlInit.h"
-#include "Include/xrRender/Kinematics.h"
-#include "xrAICore/Navigation/graph_abstract.h"
-#include "xrAICore/Navigation/ai_object_location.h"
-#include "xrCore/_vector3d_ext.h"
-#include "xrCore/Crypto/xr_dsa_signer.h"
-#include "xrCore/Crypto/xr_dsa_verifyer.h"
-#include "xrEngine/CameraBase.h"
-#include "xrEngine/CustomHUD.h"
-#include "xrEngine/Effector.h"
-#include "xrEngine/EffectorPP.h"
-#include "xrEngine/GameMtlLib.h"
-#include "xrEngine/LightAnimLibrary.h"
-#include "xrNetServer/NET_Messages.h"
-#include "xrPhysics/PHObject.h"
-#include "xrPhysics/PHUpdateObject.h"
-#include "xrServerEntities/alife_monster_brain.h"
-#pragma endregion Bloat galore!
+// xrEngine src file count is ~1100.
+// Comments following individual includes refers to number of times they are included in xrEngine as a whole.
+#include <assert.h> // ~440 - but it has no include guard! Perhaps that's intentional?
+#include <queue> // ~360
+#include "luabind/luabind.hpp" // luabind/*, almost 5000
+#include "xrServerEntities/smart_cast.h" // a lot
+#include "xrScriptEngine/script_space_forward.hpp" // ~765 // XXX: See to it this goes to pch_script
+#include "xrScriptEngine/DebugMacros.hpp" // ~700 // XXX: See to it this goes to pch_script
+#include "Common/LevelStructure.hpp" // ~730
+#include "xrCommon/misc_math_types.h" // ~770
+#include "xrEngine/ISheduled.h" // ~740
+#include "xrCDB/ISpatial.h" // ~700
+#include "xrCore/xrPool.h" // ~700
+#include "xrEngine/ICollidable.h" // ~700
+#include "xrEngine/IObjectPhysicsCollision.h" // ~700
+#include "xrEngine/IRenderable.h" // ~700
+#include "xrEngine/xr_object.h" // ~700
+#include "xrEngine/PS_instance.h" // ~650
+#include "xrPhysics/IPhysicsShellHolder.h" // ~640
+#include "Level.h" // ~550
+#include "Common/GUID.hpp" // ~530
+#include "Common/object_broker.h" // ~500
+#include "Common/object_cloner.h" // ~500
+#include "Common/object_comparer.h" // ~500
+#include "Common/object_destroyer.h" // ~500
+#include "Common/object_loader.h" // ~500
+#include "Common/object_saver.h" // ~500
+#include "Include/xrRender/animation_blend.h" // ~500
+#include "Include/xrRender/animation_motion.h" // ~500
+#include "Include/xrRender/Kinematics.h" // ~360
+#include "Include/xrRender/KinematicsAnimated.h" // ~500
+#include "Include/xrRender/RenderVisual.h" // ~370
+#include "Include/xrRender/UIRender.h" // ~450
+#include "Include/xrRender/UIShader.h" // ~490
+#include "xrCore/_plane2.h" // ~450
+#include "xrAICore/AISpaceBase.hpp" // ~650
+#include "xrAICore/Navigation/game_graph.h" // ~600
+#include "xrServerEntities/xrServer_Objects.h" // ~500
+#include "xrServerEntities/xrServer_Objects_ALife.h" // ~500
+#include "xrServerEntities/xrServer_Objects_ALife_Items.h" // ~500
+#include "xrAICore/Navigation/graph_edge.h" // ~380
+#include "xrAICore/Navigation/graph_abstract.h" // ~380
+#include "xrPhysics/xrPhysics.h" // ~400
+#include "loki/EmptyType.h" // ~380
+#include "loki/NullType.h" // only ~50, but so small it's cool.
+#include "xrPhysics/PhysicsShell.h" // ~350
+#include "xrServerEntities/ShapeData.h" // ~330
+#include "xrScriptEngine/ScriptExporter.hpp" // ~330 // XXX: See to it this goes to pch_script
+#include "xrServerEntities/specific_character.h" // ~330
+#include "xrServerEntities/shared_data.h" // ~330
+#include "xrServerEntities/xml_str_id_loader.h" // ~330
+#include "xrServerEntities/character_info.h" // ~320
+#include "xrServerEntities/ai_sounds.h" // ~320
+#include "xrCore/XML/XMLDocument.hpp" // ~400
+#include "xrGame/step_manager.h" // ~370
+#include "xrGame/physic_item.h" // ~330
+#include "xrGame/script_entity.h" // ~290
+#include "xrPhysics/MathUtils.h" // ~260
+#include "xrGame/WeaponAmmo.h" // ~250
+#include "xrPhysics/MovementBoxDynamicActivate.h" // ~240
+#include "xrScriptEngine/functor.hpp" // ~225 // XXX: See to it this goes to pch_script
+#include "xrScriptEngine/script_engine.hpp" // only ~200, but VERY heavy! // XXX: See to it this goes to pch_script
+#include "xrServerEntities/restriction_space.h" // only ~110, but so small it's worth it
+#include "xrAICore/Components/condition_state.h" // only ~100, but it includes more
+//#include "xrScriptEngine/script_engine.hpp" // ~210 // XXX: See to it this goes to pch_script
+//#include "xrCore/dump_string.h" // ~260
+//#include "xrCore/Math/Random32.hpp" // ~220
+//#include "xrEngine/LightAnimLibrary.h" // ~200
+//#include "xrCore/_fbox2.h" // ~155
+//#include "xrServerEntities/xrServer_Objects_ALife_Monsters.h" // ~120

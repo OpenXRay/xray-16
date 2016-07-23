@@ -10,6 +10,7 @@
 #include "xrServer_Objects_ALife_Items.h"
 #include "xrServer_Objects_ALife_Monsters.h"
 #include "xrNetServer/NET_Messages.h"
+#include "xrServerEntities/xrMessages.h"
 
 void xrServer::Process_event(NET_Packet& P, ClientID sender)
 {

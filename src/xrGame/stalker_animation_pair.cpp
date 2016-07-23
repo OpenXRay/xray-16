@@ -14,9 +14,11 @@
 #include "ai/stalker/ai_stalker.h"
 #include "ai/ai_monsters_anims.h"
 #include "animation_movement_controller.h"
+#include "xrCore/buffer_vector.h"
 #ifdef DEBUG
 #include "phdebug.h"
 #endif
+
 #pragma warning(push)
 #pragma warning(disable : 4995)
 #include <malloc.h>

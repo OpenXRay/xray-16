@@ -453,8 +453,7 @@ IC CPHCommander& CLevel::ph_commander_physics_worldstep()
     return *m_ph_commander_physics_worldstep;
 }
 
-#include "xrCore/xrDebug_macros.h"
-// XXX: To have these OnServer(), OnClient() INLINED and depend on this whole (huge) header file is insanity. FIX!
+// XXX: Move OnServer(), OnClient() out-of-line?
 
 IC bool OnServer() { return Level().IsServer(); }
 IC bool OnClient() { return Level().IsClient(); }

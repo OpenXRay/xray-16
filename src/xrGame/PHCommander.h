@@ -1,9 +1,13 @@
+#pragma once
 #ifndef PH_COMMANDER_H
 #define PH_COMMANDER_H
+#include "xrPhysics/iphworld.h"
+#include "xrCore/Threading/Lock.hpp"
+
 class CPHReqBase;
 class CPHReqComparerV;
-#include "xrPhysics/iphworld.h"
 class CPhysicsShell;
+
 class CPHReqBase
 {
 public:

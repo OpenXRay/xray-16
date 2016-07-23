@@ -8,6 +8,7 @@
 #include "ai_space.h"
 #include "alife_object_registry.h"
 #include "xrNetServer/NET_Messages.h"
+#include "xrServerEntities/xrMessages.h"
 
 xr_string xrServer::ent_name_safe(u16 eid)
 {

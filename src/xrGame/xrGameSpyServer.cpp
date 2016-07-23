@@ -2,6 +2,7 @@
 #include "xrMessages.h"
 #include "xrGameSpyServer.h"
 #include "xrEngine/IGame_Persistent.h"
+#include "xrEngine/IGame_Level.h"
 #include "xrGameSpy/xrGameSpy.h"
 #include "xrGameSpy/GameSpy_Available.h"
 #include "xrGameSpy/GameSpy_GCD_Server.h"

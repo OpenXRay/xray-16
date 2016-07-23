@@ -11,9 +11,11 @@
 #include "xrPhysics/DamageSource.h"
 #include "wallmark_manager.h"
 #include "ParticlesObject.h"
+#include "xrCDB/xr_collide_defs.h"
 
 class IRender_Light;
 using BLASTED_OBJECTS_V = xr_vector<CPhysicsShellHolder*>;
+
 class CExplosive : public IDamageSource
 {
 private:
@@ -162,12 +164,4 @@ protected:
     } effector;
 };
 
-IC void random_point_in_object_box(Fvector& out_pos, IGameObject* obj)
-{
-    const Fbox& l_b1 = obj->BoundingBox();
-    Fvector l_c, l_d;
-    l_b1.get_CD(l_c, l_d);
-    out_pos.random_point(l_d);
-    obj->XFORM().transform_tiny(out_pos);
-    out_pos.add(l_c);
-}
+void random_point_in_object_box(Fvector& out_pos, IGameObject* obj);

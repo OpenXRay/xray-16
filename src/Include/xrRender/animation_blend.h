@@ -1,22 +1,12 @@
 #pragma once
 
 #include "animation_motion.h"
+#include "xrCore/Animation/SkeletonMotions.hpp" // PlayCallback XXX: fwd. decl. it instead?
+
 //*** Run-time Blend definition *******************************************************************
 
 // XXX: This header contains a few WAY too large functions to inline.
 
-#ifdef DEBUG
-
-class bnon_copy
-{
-protected:
-    bnon_copy() {}
-protected:
-    bnon_copy(const bnon_copy&) {}
-protected:
-    const bnon_copy& operator=(const bnon_copy&) { return *this; }
-};
-#endif
 class CBlend
 {
 public:

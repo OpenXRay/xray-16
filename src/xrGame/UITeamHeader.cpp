@@ -2,6 +2,7 @@
 #include "UITeamHeader.h"
 #include "UITeamState.h"
 #include "ui/UIStatic.h"
+#include "xrCore/buffer_vector.h"
 
 UITeamHeader::UITeamHeader(UITeamState const* const parent) : m_parent(parent), m_team_header_root() {}
 UITeamHeader::~UITeamHeader() {}

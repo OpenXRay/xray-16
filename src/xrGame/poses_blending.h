@@ -1,4 +1,6 @@
 #pragma once
+#include "xrCore/_vector3d.h"
+#include "xrCore/_quaternion.h"
 
 class poses_interpolation
 {

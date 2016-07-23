@@ -3,6 +3,7 @@
 
 #include "ui\UIBuyWndShared.h"
 #include "ui\UIBuyWndBase.h"
+#include "xrCore/buffer_vector.h"
 
 class CUISkinSelectorWnd;
 class CUIDialogWnd;

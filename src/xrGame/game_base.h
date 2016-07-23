@@ -4,6 +4,8 @@
 #include "alife_space.h"
 #include "gametype_chooser.h"
 #include "player_account.h"
+#include "xrCommon/xr_deque.h"
+#include "xrCommon/xr_vector.h"
 
 #pragma pack(push, 1)
 

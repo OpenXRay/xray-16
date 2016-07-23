@@ -56,6 +56,7 @@
 #include "smart_cover_planner_target_selector.h"
 #include "ui_base.h"
 #include "doors_actor.h"
+#include "xrEngine/GameFont.h"
 
 CActor* g_debug_actor = 0;
 

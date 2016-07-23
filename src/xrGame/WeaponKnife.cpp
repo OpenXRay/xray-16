@@ -14,6 +14,9 @@
 #include "xrCore/Animation/SkeletonMotions.hpp"
 #include "player_hud.h"
 #include "ActorEffector.h"
+#ifdef DEBUG
+#include <iterator>
+#endif
 
 #define KNIFE_MATERIAL_NAME "objects\\knife"
 

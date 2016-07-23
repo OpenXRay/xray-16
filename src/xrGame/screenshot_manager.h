@@ -1,8 +1,11 @@
+#pragma once
 #ifndef SCREENSHOT_MANAGER_FOR_MP
 #define SCREENSHOT_MANAGER_FOR_MP
+#include "xrEngine/ISheduled.h"
 
 #define RESULT_WIDTH 640
 #define RESULT_HEIGHT 480
+
 class screenshot_manager : public ScheduledBase
 {
 public:

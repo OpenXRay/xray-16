@@ -5,7 +5,7 @@
 //	Author		: Dmitriy Iassenev
 //	Description : moving objects
 ////////////////////////////////////////////////////////////////////////////
-
+#pragma once
 #ifndef MOVING_OBJECTS_H
 #define MOVING_OBJECTS_H
 
@@ -15,6 +15,7 @@
 class moving_object;
 class IGameObject;
 class MagicBox3;
+class ISpatial;
 struct boxes;
 
 class moving_objects

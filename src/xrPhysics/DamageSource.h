@@ -1,7 +1,6 @@
 #pragma once
 
-#include "xrCore/xrDebug_macros.h" // ONLY for pragma todo!
-#pragma todo("__declspec(novtable) for IDamageSource ?")
+// XXX: tamlin: Can we declare IDamageSource __declspec(novtable), or is its RTTI info required somewhere?
 class IDamageSource
 {
 public:

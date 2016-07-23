@@ -7,6 +7,9 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #pragma once
+#ifdef LOG_ACTION
+#include "ai_space.h"
+#endif
 
 #define TEMPLATE_SPECIALIZATION                                                                                     \
     template <typename _object_type, bool _reverse_search, typename _world_operator, typename _condition_evaluator, \

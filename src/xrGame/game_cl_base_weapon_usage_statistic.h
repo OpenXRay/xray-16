@@ -1,6 +1,10 @@
 #pragma once
 #include "level_bullet_manager.h"
 #include "game_base_kill_type.h"
+#include "xrCore/xrstring.h"
+#include "xrCore/buffer_vector.h"
+#include "xrCommon/xr_vector.h"
+#include "xrCore/Threading/Lock.hpp" // XXX: Try to get rid of this compile-time dependency
 
 #define STAT_TEAM_COUNT 3
 

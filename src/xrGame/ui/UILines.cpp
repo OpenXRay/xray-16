@@ -12,6 +12,7 @@
 #include "UIXmlInit.h"
 #include "uilinestd.h"
 #include "string_table.h"
+#include "xrCore/Text/MbHelpers.h"
 
 CUILines::CUILines()
 {
