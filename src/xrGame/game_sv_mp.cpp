@@ -20,6 +20,7 @@
 #include "game_cl_base_weapon_usage_statistic.h"
 #include "xrGameSpyServer.h"
 #include "xrNetServer/NET_Messages.h"
+#include "xrCore/xr_token.h"
 
 #include "game_sv_mp_vote_flags.h"
 #include "player_name_modifyer.h"
@@ -43,7 +44,7 @@ u32 g_sv_adm_menu_ban_time = 1;
 int g_sv_adm_menu_ping_limit = 25;
 //-----------------------------------------------------------------
 
-extern xr_token round_end_result_str[];
+extern const xr_token round_end_result_str[];
 
 #include "ui\UIBuyWndShared.h"
 

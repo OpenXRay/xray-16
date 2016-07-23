@@ -19,6 +19,7 @@
 #include "Include/xrRender/KinematicsAnimated.h"
 #include "xrCore/Animation/Bone.hpp"
 #include "xrEngine/iphdebug.h"
+#include "xrCore/xr_token.h"
 
 #include "ui_base.h"
 
@@ -699,7 +700,7 @@ void PH_DBG_SetTrackObject()
 
 static LPCSTR name_bool(BOOL v)
 {
-    static xr_token token_bool[] = {{"false", 0}, {"true", 1}};
+    static const xr_token token_bool[] = {{"false", 0}, {"true", 1}};
     return get_token_name(token_bool, v);
 }
 

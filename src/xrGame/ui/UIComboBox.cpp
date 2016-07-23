@@ -4,6 +4,7 @@
 #include "UIScrollBar.h"
 #include "uilistboxitem.h"
 #include "string_table.h"
+#include "xrCore/xr_token.h"
 
 #define CB_HEIGHT 20.0f
 
@@ -120,7 +121,7 @@ void CUIComboBox::SetCurrentOptValue()
     CUIOptionsItem::SetCurrentOptValue();
 
     m_list_box.Clear();
-    xr_token* tok = GetOptToken();
+    const xr_token* tok = GetOptToken();
 
     while (tok->name)
     {
@@ -159,7 +160,7 @@ void CUIComboBox::UndoOptValue()
 void CUIComboBox::SaveOptValue()
 {
     CUIOptionsItem::SaveOptValue();
-    xr_token* tok = GetOptToken();
+    const xr_token* tok = GetOptToken();
     if (tok)
     {
         LPCSTR cur_val = get_token_name(tok, m_itoken_id);

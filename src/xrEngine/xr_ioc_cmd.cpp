@@ -15,7 +15,7 @@
 
 xr_vector<xr_token> vid_quality_token;
 
-xr_token vid_bpp_token[] = {{"16", 16}, {"32", 32}, {0, 0}};
+const xr_token vid_bpp_token[] = {{"16", 16}, {"32", 32}, {0, 0}};
 //-----------------------------------------------------------------------
 
 void IConsole_Command::add_to_LRU(shared_str const& arg)
@@ -415,7 +415,7 @@ public:
         }
     }
     virtual void Status(TStatus& S) { xr_sprintf(S, sizeof(S), "%dx%d", psCurrentVidMode[0], psCurrentVidMode[1]); }
-    virtual xr_token* GetToken() { return GEnv.vid_mode_token; }
+    const xr_token* GetToken() throw() override { return GEnv.vid_mode_token; }
     virtual void Info(TInfo& I) { xr_strcpy(I, sizeof(I), "change screen resolution WxH"); }
     virtual void fill_tips(vecTips& tips, u32 mode)
     {
@@ -423,7 +423,7 @@ public:
         Status(cur);
 
         bool res = false;
-        xr_token* tok = GetToken();
+        const xr_token* tok = GetToken();
         while (tok->name && !res)
         {
             if (!xr_strcmp(tok->name, cur))
@@ -562,7 +562,8 @@ public:
         tokens = vid_quality_token.data();
         inherited::Save(F);
     }
-    virtual xr_token* GetToken()
+
+    const xr_token* GetToken() throw() override
     {
         tokens = vid_quality_token.data();
         return inherited::GetToken();
@@ -592,7 +593,7 @@ public:
         inherited::Status(S);
     }
 
-    virtual xr_token* GetToken()
+    const xr_token* GetToken() throw() override
     {
         tokens = snd_devices_token;
         return inherited::GetToken();

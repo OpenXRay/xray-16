@@ -7,6 +7,7 @@
 #include "Layers/xrRender/HW.h"
 #include "xrEngine/XR_IOConsole.h"
 #include "Include/xrAPI/xrAPI.h"
+#include "xrCore/xr_token.h"
 
 #ifndef _EDITOR
 void	fill_vid_mode_list			(CHW* _hw);
@@ -289,7 +290,7 @@ void free_vid_mode_list()
 	GEnv.vid_mode_token = NULL;
 }
 
-void fill_vid_mode_list(CHW* _hw)
+void fill_vid_mode_list(CHW* /*_hw*/)
 {
 	if (GEnv.vid_mode_token != NULL)		return;
 	xr_vector<LPCSTR>	_tmp;
@@ -403,7 +404,7 @@ void CHW::ClearDepthStencilView(GLuint pDepthStencilView, UINT ClearFlags, FLOAT
 	glPopAttrib();
 }
 
-HRESULT CHW::Present(UINT SyncInterval, UINT Flags)
+HRESULT CHW::Present(UINT /*SyncInterval*/, UINT /*Flags*/)
 {
 	RImplementation.Target->phase_flip();
 	return SwapBuffers(m_hDC) ? S_OK : E_FAIL;

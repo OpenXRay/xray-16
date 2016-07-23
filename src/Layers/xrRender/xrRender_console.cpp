@@ -2,41 +2,42 @@
 #pragma hdrstop
 
 #include "xrRender_console.h"
+#include "xrCore/xr_token.h"
 
 u32 ps_Preset = 2;
-xr_token qpreset_token[] = {{"Minimum", 0}, {"Low", 1}, {"Default", 2}, {"High", 3}, {"Extreme", 4}, {nullptr, 0}};
+const xr_token qpreset_token[] = {{"Minimum", 0}, {"Low", 1}, {"Default", 2}, {"High", 3}, {"Extreme", 4}, {nullptr, 0}};
 
 u32 ps_r_ssao_mode = 2;
-xr_token qssao_mode_token[] = {{"disabled", 0}, {"default", 1}, {"hdao", 2}, {"hbao", 3}, {nullptr, 0}};
+const xr_token qssao_mode_token[] = {{"disabled", 0}, {"default", 1}, {"hdao", 2}, {"hbao", 3}, {nullptr, 0}};
 
 u32 ps_r_sun_shafts = 2;
-xr_token qsun_shafts_token[] = {{"st_opt_off", 0}, {"st_opt_low", 1}, {"st_opt_medium", 2}, {"st_opt_high", 3}, {nullptr, 0}};
+const xr_token qsun_shafts_token[] = {{"st_opt_off", 0}, {"st_opt_low", 1}, {"st_opt_medium", 2}, {"st_opt_high", 3}, {nullptr, 0}};
 
 u32 ps_r_ssao = 3;
-xr_token qssao_token[] = {{"st_opt_off", 0}, {"st_opt_low", 1}, {"st_opt_medium", 2}, {"st_opt_high", 3},
+const xr_token qssao_token[] = {{"st_opt_off", 0}, {"st_opt_low", 1}, {"st_opt_medium", 2}, {"st_opt_high", 3},
 #if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
     {"st_opt_ultra", 4},
 #endif
     {nullptr, 0}};
 
 u32 ps_r_sun_quality = 1; // = 0;
-xr_token qsun_quality_token[] = {{"st_opt_low", 0}, {"st_opt_medium", 1}, {"st_opt_high", 2},
+const xr_token qsun_quality_token[] = {{"st_opt_low", 0}, {"st_opt_medium", 1}, {"st_opt_high", 2},
 #if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
     {"st_opt_ultra", 3}, {"st_opt_extreme", 4},
 #endif // USE_DX10
     {nullptr, 0}};
 
 u32 ps_r3_msaa = 0; // = 0;
-xr_token qmsaa_token[] = {{"st_opt_off", 0}, {"2x", 1}, {"4x", 2},
+const xr_token qmsaa_token[] = {{"st_opt_off", 0}, {"2x", 1}, {"4x", 2},
     //{"8x", 3},
     {nullptr, 0}};
 
 u32 ps_r3_msaa_atest = 0; // = 0;
-xr_token qmsaa__atest_token[] = {
+const xr_token qmsaa__atest_token[] = {
     {"st_opt_off", 0}, {"st_opt_atest_msaa_dx10_0", 1}, {"st_opt_atest_msaa_dx10_1", 2}, {nullptr, 0}};
 
 u32 ps_r3_minmax_sm = 3; // = 0;
-xr_token qminmax_sm_token[] = {{"off", 0}, {"on", 1}, {"auto", 2}, {"autodetect", 3}, {nullptr, 0}};
+const xr_token qminmax_sm_token[] = {{"off", 0}, {"on", 1}, {"auto", 2}, {"autodetect", 3}, {nullptr, 0}};
 
 int ps_r2_fxaa = 0;
 
@@ -358,7 +359,7 @@ public:
 class CCC_SSAO_Mode : public CCC_Token
 {
 public:
-    CCC_SSAO_Mode(LPCSTR N, u32* V, xr_token* T) : CCC_Token(N, V, T){};
+    CCC_SSAO_Mode(LPCSTR N, u32* V, const xr_token* T) : CCC_Token(N, V, T){};
 
     virtual void Execute(LPCSTR args)
     {
@@ -415,7 +416,7 @@ public:
 class CCC_Preset : public CCC_Token
 {
 public:
-    CCC_Preset(LPCSTR N, u32* V, xr_token* T) : CCC_Token(N, V, T){};
+    CCC_Preset(LPCSTR N, u32* V, const xr_token* T) : CCC_Token(N, V, T){};
 
     virtual void Execute(LPCSTR args)
     {
@@ -454,33 +455,26 @@ public:
 
         Msg("memory usage  mb \t \t video    \t managed      \t system \n");
 
-        float vb_video =
-            (float)HW.stats_manager.memory_usage_summary[enum_stats_buffer_type_vertex][D3DPOOL_DEFAULT] / 1024 / 1024;
-        float vb_managed =
-            (float)HW.stats_manager.memory_usage_summary[enum_stats_buffer_type_vertex][D3DPOOL_MANAGED] / 1024 / 1024;
-        float vb_system =
-            (float)HW.stats_manager.memory_usage_summary[enum_stats_buffer_type_vertex][D3DPOOL_SYSTEMMEM] / 1024 /
-            1024;
+        const float MiB = 1024*1024; // XXX: use it as common enum value (like in X-Ray 2.0)
+        const u32* mem_usage = HW.stats_manager.memory_usage_summary[enum_stats_buffer_type_vertex];
+
+        float vb_video = mem_usage[D3DPOOL_DEFAULT] / MiB;
+        float vb_managed = mem_usage[D3DPOOL_MANAGED] / MiB;
+        float vb_system = mem_usage[D3DPOOL_SYSTEMMEM] / MiB;
         Msg("vertex buffer      \t \t %f \t %f \t %f ", vb_video, vb_managed, vb_system);
 
-        float ib_video =
-            (float)HW.stats_manager.memory_usage_summary[enum_stats_buffer_type_index][D3DPOOL_DEFAULT] / 1024 / 1024;
-        float ib_managed =
-            (float)HW.stats_manager.memory_usage_summary[enum_stats_buffer_type_index][D3DPOOL_MANAGED] / 1024 / 1024;
-        float ib_system =
-            (float)HW.stats_manager.memory_usage_summary[enum_stats_buffer_type_index][D3DPOOL_SYSTEMMEM] / 1024 / 1024;
+        float ib_video = mem_usage[D3DPOOL_DEFAULT] / MiB;
+        float ib_managed = mem_usage[D3DPOOL_MANAGED] / MiB;
+        float ib_system = mem_usage[D3DPOOL_SYSTEMMEM] / MiB;
         Msg("index buffer      \t \t %f \t %f \t %f ", ib_video, ib_managed, ib_system);
 
-        float textures_managed = (float)(m_base + m_lmaps) / 1024 / 1024;
+        float textures_managed = (m_base+m_lmaps)/MiB;
         Msg("textures          \t \t %f \t %f \t %f ", 0.f, textures_managed, 0.f);
 
-        float rt_video =
-            (float)HW.stats_manager.memory_usage_summary[enum_stats_buffer_type_rtarget][D3DPOOL_DEFAULT] / 1024 / 1024;
-        float rt_managed =
-            (float)HW.stats_manager.memory_usage_summary[enum_stats_buffer_type_rtarget][D3DPOOL_MANAGED] / 1024 / 1024;
-        float rt_system =
-            (float)HW.stats_manager.memory_usage_summary[enum_stats_buffer_type_rtarget][D3DPOOL_SYSTEMMEM] / 1024 /
-            1024;
+        mem_usage = HW.stats_manager.memory_usage_summary[enum_stats_buffer_type_rtarget];
+        float rt_video = mem_usage[D3DPOOL_DEFAULT] / MiB;
+        float rt_managed = mem_usage[D3DPOOL_MANAGED] / MiB;
+        float rt_system = mem_usage[D3DPOOL_SYSTEMMEM] / MiB;
         Msg("R-Targets         \t \t %f \t %f \t %f ", rt_video, rt_managed, rt_system);
 
         Msg("\nTotal             \t \t %f \t %f \t %f ", vb_video + ib_video + rt_video,

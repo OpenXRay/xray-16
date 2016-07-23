@@ -81,6 +81,6 @@ enum ESoundTypes
 #define CROUCH_SOUND_FACTOR .3f
 #define ACCELERATED_SOUND_FACTOR .5f
 
-extern xr_token anomaly_type_token[];
+extern const xr_token anomaly_type_token[];
 
 #endif

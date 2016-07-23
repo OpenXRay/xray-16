@@ -91,7 +91,7 @@ extern u32 g_sv_Client_Reconnect_Time;
 int g_dwEventDelay = 0;
 
 extern u32 g_sv_adm_menu_ban_time;
-extern xr_token g_ban_times[];
+extern const xr_token g_ban_times[];
 
 extern int g_sv_adm_menu_ping_limit;
 extern u32 g_sv_cta_dwInvincibleTime;

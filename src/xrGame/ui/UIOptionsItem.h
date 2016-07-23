@@ -45,7 +45,7 @@ protected:
     void SaveOptBoolValue(bool val);
     // token
     LPCSTR GetOptTokenValue();
-    xr_token* GetOptToken();
+    const xr_token* GetOptToken();
 
     shared_str m_entry;
     ESystemDepends m_dep;

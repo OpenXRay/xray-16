@@ -1,6 +1,7 @@
 #include "stdafx.h"
 
 #include "FileSystem.h"
+#include "xrCore/xr_token.h"
 
 XRCORE_API CInifile const* pSettings = nullptr;
 XRCORE_API CInifile const* pSettingsAuth = nullptr;

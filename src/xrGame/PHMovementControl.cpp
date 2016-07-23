@@ -1,6 +1,6 @@
 #include "stdafx.h"
-#include "phmovementcontrol.h"
 
+#include "phmovementcontrol.h"
 #include "xrCDB/Intersect.hpp"
 #include "xrServerEntities/alife_space.h"
 
@@ -20,6 +20,7 @@
 #include "CaptureBoneCallback.h"
 #include "Level.h"
 #include "physicsshellholder.h"
+#include "xrCore/xr_token.h"
 #ifdef DEBUG
 #include "phdebug.h"
 #endif
@@ -907,7 +908,7 @@ void CPHMovementControl::Load(LPCSTR section)
     float cs_min = pSettings->r_float(section, "ph_crash_speed_min");
     float cs_max = pSettings->r_float(section, "ph_crash_speed_max");
     float mass = pSettings->r_float(section, "ph_mass");
-    xr_token retrictor_types[] = {
+    static const xr_token retrictor_types[] = {
         {"actor", rtActor}, {"medium_monster", rtMonsterMedium}, {"stalker", rtStalker}, {"none", rtNone}, {0, 0}};
 
     if (pSettings->line_exist(section, "actor_restrictor"))

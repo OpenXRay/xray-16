@@ -130,7 +130,7 @@ public:
     int GetInteger(LPCSTR cmd, int& min, int& max) const;
     LPCSTR GetString(LPCSTR cmd) const;
     LPCSTR GetToken(LPCSTR cmd) const;
-    xr_token* GetXRToken(LPCSTR cmd) const;
+    const xr_token* GetXRToken(LPCSTR cmd) const;
     Fvector GetFVector(LPCSTR cmd) const;
     Fvector* GetFVectorPtr(LPCSTR cmd) const;
     IConsole_Command* GetCommand(LPCSTR cmd) const;

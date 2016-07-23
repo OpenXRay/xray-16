@@ -7,11 +7,13 @@
 #include "AnimationKeyCalculate.h"
 #include "SkeletonX.h"
 #include "xrCore/FMesh.hpp"
+#include "xrCore/xr_token.h"
 #ifdef DEBUG
 #include "xrCore/dump_string.h"
 #endif
 extern int psSkeletonUpdate;
 using namespace animation;
+
 //////////////////////////////////////////////////////////////////////////
 // BoneInstance methods
 void CBlendInstance::construct() { Blend.clear(); }
@@ -72,13 +74,13 @@ std::pair<LPCSTR, LPCSTR> CKinematicsAnimated::LL_MotionDefName_dbg(MotionID ID)
 
 static LPCSTR name_bool(BOOL v)
 {
-    static xr_token token_bool[] = {{"false", 0}, {"true", 1}};
+    static const xr_token token_bool[] = {{"false", 0}, {"true", 1}};
     return get_token_name(token_bool, v);
 }
 
 static LPCSTR name_blend_type(CBlend::ECurvature blend)
 {
-    static xr_token token_blend[] = {{"eFREE_SLOT", CBlend::eFREE_SLOT}, {"eAccrue", CBlend::eAccrue},
+    static const xr_token token_blend[] = {{"eFREE_SLOT", CBlend::eFREE_SLOT}, {"eAccrue", CBlend::eAccrue},
         {"eFalloff", CBlend::eFalloff}, {"eFORCEDWORD", CBlend::eFORCEDWORD}};
     return get_token_name(token_blend, blend);
 }

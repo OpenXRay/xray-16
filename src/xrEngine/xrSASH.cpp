@@ -581,7 +581,7 @@ void xrSASH::DescribeOption(pcstr pszOptionName, const oaOptionDependency& Depen
     else if (pToken)
     {
         Option.DataType = OA_TYPE_ENUM;
-        xr_token* pXRToken = pToken->GetToken();
+        const xr_token* pXRToken = pToken->GetToken();
 
         while (pXRToken->name)
         {

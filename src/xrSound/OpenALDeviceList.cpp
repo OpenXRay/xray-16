@@ -24,6 +24,7 @@
 #include "stdafx.h"
 
 #include "OpenALDeviceList.h"
+#include "xrCore/xr_token.h"
 
 #pragma warning(push)
 #pragma warning(disable : 4995)

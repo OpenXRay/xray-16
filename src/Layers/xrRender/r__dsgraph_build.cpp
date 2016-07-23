@@ -103,12 +103,12 @@ void D3DXRenderBase::r_dsgraph_insert_dynamic(dxRender_Visual* pVisual, Fvector&
 #if RENDER != R_R1
             if (sh->flags.bEmissive)
             {
-                mapSorted_Node* N = mapHUDEmissive.insertInAnyWay(distSQ);
-                N->val.ssa = SSA;
-                N->val.pObject = RI.val_pObject;
-                N->val.pVisual = pVisual;
-                N->val.Matrix = *RI.val_pTransform;
-                N->val.se = &*pVisual->shader->E[4]; // 4=L_special
+                mapSorted_Node* N2 = mapHUDEmissive.insertInAnyWay(distSQ);
+                N2->val.ssa = SSA;
+                N2->val.pObject = RI.val_pObject;
+                N2->val.pVisual = pVisual;
+                N2->val.Matrix = *RI.val_pTransform;
+                N2->val.se = &*pVisual->shader->E[4]; // 4=L_special
             }
 #endif //   RENDER!=R_R1
             return;
@@ -627,10 +627,10 @@ BOOL CRender::add_Dynamic(dxRender_Visual* pVisual, u32 planes)
         BOOL _use_lod = FALSE;
         if (pV->m_lod)
         {
-            Fvector Tpos;
+            Fvector Tpos2;
             float D;
-            val_pTransform->transform_tiny(Tpos, pV->vis.sphere.P);
-            float ssa = CalcSSA(D, Tpos, pV->vis.sphere.R / 2.f); // assume dynamics never consume full sphere
+            val_pTransform->transform_tiny(Tpos2, pV->vis.sphere.P);
+            float ssa = CalcSSA(D, Tpos2, pV->vis.sphere.R / 2.f); // assume dynamics never consume full sphere
             if (ssa < r_ssaLOD_A)
                 _use_lod = TRUE;
         }

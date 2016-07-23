@@ -2,8 +2,9 @@
 #pragma hdrstop
 
 #include "ai_sounds.h"
+#include "xrCore/xr_token.h"
 
-xr_token anomaly_type_token[] = {{"undefined", sg_Undefined}, {"Item picking up", SOUND_TYPE_ITEM_PICKING_UP},
+const xr_token anomaly_type_token[] = {{"undefined", sg_Undefined}, {"Item picking up", SOUND_TYPE_ITEM_PICKING_UP},
     {"Item dropping", SOUND_TYPE_ITEM_DROPPING}, {"Item taking", SOUND_TYPE_ITEM_TAKING},
     {"Item hiding", SOUND_TYPE_ITEM_HIDING}, {"Item using", SOUND_TYPE_ITEM_USING},
     {"Weapon shooting", SOUND_TYPE_WEAPON_SHOOTING}, {"Weapon empty clicking", SOUND_TYPE_WEAPON_EMPTY_CLICKING},

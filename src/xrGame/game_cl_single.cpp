@@ -7,12 +7,13 @@
 #include "alife_simulator.h"
 #include "alife_time_manager.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
+#include "xrCore/xr_token.h"
 
 using namespace luabind;
 
 ESingleGameDifficulty g_SingleGameDifficulty = egdStalker;
 
-xr_token difficulty_type_token[] = {
+extern const  xr_token difficulty_type_token[] = {
     {"gd_novice", egdNovice}, {"gd_stalker", egdStalker}, {"gd_veteran", egdVeteran}, {"gd_master", egdMaster}, {0, 0}};
 
 game_cl_Single::game_cl_Single() {}

@@ -1,3 +1,4 @@
+#pragma once
 #ifndef xrEPropsH
 #define xrEPropsH
 
@@ -116,7 +117,7 @@ public:
         PropItemVec& items, shared_str key, Flags16* val, u16 mask, LPCSTR c0 = nullptr, LPCSTR c1 = nullptr, u32 flags = 0) = 0;
     virtual Flag32Value* __stdcall CreateFlag32(
         PropItemVec& items, shared_str key, Flags32* val, u32 mask, LPCSTR c0 = nullptr, LPCSTR c1 = nullptr, u32 flags = 0) = 0;
-    virtual Token8Value* __stdcall CreateToken8(PropItemVec& items, shared_str key, u8* val, xr_token* token) = 0;
+    virtual Token8Value* __stdcall CreateToken8(PropItemVec& items, shared_str key, u8* val, const xr_token* token) = 0;
     virtual Token16Value* __stdcall CreateToken16(PropItemVec& items, shared_str key, u16* val, xr_token* token) = 0;
     virtual Token32Value* __stdcall CreateToken32(PropItemVec& items, shared_str key, u32* val, xr_token* token) = 0;
     virtual RToken8Value* __stdcall CreateRToken8(

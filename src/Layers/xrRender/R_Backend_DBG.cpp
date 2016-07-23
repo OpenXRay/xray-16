@@ -20,6 +20,11 @@ void CBackend::dbg_Draw(D3DPRIMITIVETYPE T, FVF::L* pVerts, int vcnt, u16* pIdx,
 #if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
 //	TODO: DX10: implement
 // VERIFY(!"CBackend::dbg_Draw not implemented.");
+    UNUSED(T);
+    UNUSED(pVerts);
+    UNUSED(vcnt);
+    UNUSED(pIdx);
+    UNUSED(pcnt);
 #else //	USE_DX10
     OnFrameEnd();
     CHK_DX(HW.pDevice->SetFVF(FVF::F_L));
@@ -31,6 +36,9 @@ void CBackend::dbg_Draw(D3DPRIMITIVETYPE T, FVF::L* pVerts, int pcnt)
 #if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
 //	TODO: DX10: implement
 // VERIFY(!"CBackend::dbg_Draw not implemented.");
+    UNUSED(T);
+    UNUSED(pVerts);
+    UNUSED(pcnt);
 #else //	USE_DX10
     OnFrameEnd();
     CHK_DX(HW.pDevice->SetFVF(FVF::F_L));

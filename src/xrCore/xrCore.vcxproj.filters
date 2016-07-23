@@ -339,6 +339,9 @@
     <ClCompile Include="Threading\ThreadPool.cpp">
       <Filter>Threading</Filter>
     </ClCompile>
+    <ClCompile Include="xr_token.cpp">
+      <Filter>Math\Extensions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FTimer.h">
@@ -733,6 +736,9 @@
     </ClInclude>
     <ClInclude Include="xr_shortcut.h">
       <Filter>Kernel</Filter>
+    </ClInclude>
+    <ClInclude Include="xr_token.h">
+      <Filter>Math\Extensions</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -6,6 +6,7 @@
 #include <float.h>
 #include <stdio.h>
 #include "xrCommon/math_funcs_inline.h"
+//#include "xr_token.h"
 
 #ifdef abs
 #undef abs
@@ -56,39 +57,6 @@ IC int xr_sprintf(char* dest, size_t sizeOfBuffer, const char* format, ...)
     return sz;
 }
 #endif // _EDITOR
-
-// token type definition
-struct XRCORE_API xr_token
-{
-    xr_token(): name(nullptr), id(0) {}
-    xr_token(const pcstr _name, const int _id) : name(_name), id(_id) {}
-
-    pcstr name;
-    int id;
-};
-
-IC LPCSTR get_token_name(const xr_token* tokens, int key)
-{
-    for (int k = 0; tokens[k].name; k++)
-        if (key == tokens[k].id)
-            return tokens[k].name;
-    return "";
-}
-
-IC int get_token_id(const xr_token* tokens, LPCSTR key)
-{
-    for (int k = 0; tokens[k].name; k++)
-        if (xr_stricmp(tokens[k].name, key) == 0)
-            return tokens[k].id;
-    return -1;
-}
-
-struct XRCORE_API xr_token2
-{
-    LPCSTR name;
-    LPCSTR info;
-    int id;
-};
 
 // generic
 template <class T>

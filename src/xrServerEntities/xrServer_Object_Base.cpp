@@ -12,6 +12,7 @@
 #include "game_base_space.h"
 #include "script_value_container_impl.h"
 #include "clsid_game.h"
+#include "xrCore/xr_token.h"
 
 #pragma warning(push)
 #pragma warning(disable : 4995)
@@ -375,7 +376,7 @@ LPCSTR CSE_Abstract::name_replace() const { return (s_name_replace); }
 Fvector& CSE_Abstract::position() { return (o_Position); }
 Fvector& CSE_Abstract::angle() { return (o_Angle); }
 Flags16& CSE_Abstract::flags() { return (s_flags); }
-xr_token game_types[] = {{"any_game", eGameIDNoGame}, {"single", eGameIDSingle}, {"deathmatch", eGameIDDeathmatch},
+const xr_token game_types[] = {{"any_game", eGameIDNoGame}, {"single", eGameIDSingle}, {"deathmatch", eGameIDDeathmatch},
     {"team_deathmatch", eGameIDTeamDeathmatch}, {"artefacthunt", eGameIDArtefactHunt},
     {"capture_the_artefact", eGameIDCaptureTheArtefact},
     // eGameIDDominationZone

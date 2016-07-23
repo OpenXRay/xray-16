@@ -65,7 +65,7 @@ void CUIOptionsItem::SaveOptBoolValue(bool val)
 }
 
 LPCSTR CUIOptionsItem::GetOptTokenValue() { return Console->GetToken(m_entry.c_str()); }
-xr_token* CUIOptionsItem::GetOptToken() { return Console->GetXRToken(m_entry.c_str()); }
+const xr_token* CUIOptionsItem::GetOptToken() { return Console->GetXRToken(m_entry.c_str()); }
 void CUIOptionsItem::SaveOptValue()
 {
     if (!IsChangedOptValue())

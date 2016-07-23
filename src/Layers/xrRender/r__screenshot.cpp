@@ -180,18 +180,18 @@ void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* me
         { // hq
             xr_sprintf(buf, sizeof buf, "ssq_%s_%s_(%s).tga", Core.UserName, timestamp(t_stemp),
                        g_pGameLevel ? g_pGameLevel->name().c_str() : "mainmenu");
-            ID3DBlob* saved = nullptr;
+            ID3DBlob* saved2 = nullptr;
 #ifdef USE_DX11
-            CHK_DX(D3DX11SaveTextureToMemory(HW.pContext, pSrcTexture, D3DX11_IFF_BMP, &saved, 0));
+            CHK_DX(D3DX11SaveTextureToMemory(HW.pContext, pSrcTexture, D3DX11_IFF_BMP, &saved2, 0));
 #else
-            CHK_DX(D3DX10SaveTextureToMemory(pSrcTexture, D3DX10_IFF_BMP, &saved, 0));
+            CHK_DX(D3DX10SaveTextureToMemory(pSrcTexture, D3DX10_IFF_BMP, &saved2, 0));
             //CHK_DX(D3DXSaveSurfaceToFileInMemory(&saved, D3DXIFF_TGA, pFB, 0, 0));
 #endif
-            IWriter* fs = FS.w_open("$screenshots$", buf);
-            R_ASSERT(fs);
-            fs->w(saved->GetBufferPointer(), (u32)saved->GetBufferSize());
-            FS.w_close(fs);
-            _RELEASE(saved);
+            IWriter* fs2 = FS.w_open("$screenshots$", buf);
+            R_ASSERT(fs2);
+            fs2->w(saved2->GetBufferPointer(), (u32)saved2->GetBufferSize());
+            FS.w_close(fs2);
+            _RELEASE(saved2);
         }
     }
         break;

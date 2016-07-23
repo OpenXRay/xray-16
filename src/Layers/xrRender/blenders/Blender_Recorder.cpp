@@ -287,6 +287,9 @@ void CBlender_Compile::StageSET_XForm(u32 tf, u32 tc)
 #ifdef _EDITOR
     RS.SetTSS(Stage(), D3DTSS_TEXTURETRANSFORMFLAGS, tf);
     RS.SetTSS(Stage(), D3DTSS_TEXCOORDINDEX, tc);
+#else
+    UNUSED(tf);
+    UNUSED(tc);
 #endif
 }
 void CBlender_Compile::StageSET_Color(u32 a1, u32 op, u32 a2) { RS.SetColor(Stage(), a1, op, a2); }

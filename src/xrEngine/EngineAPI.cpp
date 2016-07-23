@@ -7,6 +7,7 @@
 #include "XR_IOConsole.h"
 
 #include "xrCore/ModuleLookup.hpp"
+#include "xrCore/xr_token.h"
 
 extern xr_vector<xr_token> vid_quality_token;
 

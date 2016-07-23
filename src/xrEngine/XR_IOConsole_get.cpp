@@ -83,7 +83,7 @@ LPCSTR CConsole::GetString(LPCSTR cmd) const
 }
 
 LPCSTR CConsole::GetToken(LPCSTR cmd) const { return GetString(cmd); }
-xr_token* CConsole::GetXRToken(LPCSTR cmd) const
+const xr_token* CConsole::GetXRToken(LPCSTR cmd) const
 {
     IConsole_Command* cc = GetCommand(cmd);
 

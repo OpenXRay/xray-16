@@ -11,6 +11,7 @@
 
 #include "HW.h"
 #include "xrEngine/XR_IOConsole.h"
+#include "xrCore/xr_token.h"
 
 #ifndef _EDITOR
 void fill_vid_mode_list(CHW* _hw);

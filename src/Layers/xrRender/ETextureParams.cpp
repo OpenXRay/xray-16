@@ -2,8 +2,9 @@
 #pragma hdrstop
 
 #include "ETextureParams.h"
+#include "xrCore/xr_token.h"
 
-xr_token tparam_token[] = {{"Advanced", STextureParams::kMIPFilterAdvanced},
+const xr_token tparam_token[] = {{"Advanced", STextureParams::kMIPFilterAdvanced},
 
     {"Point", STextureParams::kMIPFilterPoint}, {"Box", STextureParams::kMIPFilterBox},
     {"Triangle", STextureParams::kMIPFilterTriangle}, {"Quadratic", STextureParams::kMIPFilterQuadratic},
@@ -17,21 +18,21 @@ xr_token tparam_token[] = {{"Advanced", STextureParams::kMIPFilterAdvanced},
     {"Hanning", STextureParams::kMIPFilterHanning}, {"Hamming", STextureParams::kMIPFilterHamming},
     {"Blackman", STextureParams::kMIPFilterBlackman}, {"Kaiser", STextureParams::kMIPFilterKaiser}, {nullptr, 0}};
 
-xr_token ttype_token[] = {{"2D Texture", STextureParams::ttImage}, {"Cube Map", STextureParams::ttCubeMap},
+const xr_token ttype_token[] = {{"2D Texture", STextureParams::ttImage}, {"Cube Map", STextureParams::ttCubeMap},
     {"Bump Map", STextureParams::ttBumpMap}, {"Normal Map", STextureParams::ttNormalMap},
     {"Terrain", STextureParams::ttTerrain}, {nullptr, 0}};
 
-xr_token tfmt_token[] = {{"DXT1", STextureParams::tfDXT1}, {"DXT1 Alpha", STextureParams::tfADXT1},
+const xr_token tfmt_token[] = {{"DXT1", STextureParams::tfDXT1}, {"DXT1 Alpha", STextureParams::tfADXT1},
     {"DXT3", STextureParams::tfDXT3}, {"DXT5", STextureParams::tfDXT5}, {"16 bit (1:5:5:5)", STextureParams::tf1555},
     {"16 bit (5:6:5)", STextureParams::tf565}, {"32 bit (8:8:8:8)", STextureParams::tfRGBA},
     {"8 bit (alpha)", STextureParams::tfA8}, {"8 bit (luminance)", STextureParams::tfL8},
     {"16 bit (alpha:luminance)", STextureParams::tfA8L8}, {nullptr, 0}};
 
-xr_token tmtl_token[] = {{"OrenNayar <-> Blin", STextureParams::tmOrenNayar_Blin},
+const xr_token tmtl_token[] = {{"OrenNayar <-> Blin", STextureParams::tmOrenNayar_Blin},
     {"Blin <-> Phong", STextureParams::tmBlin_Phong}, {"Phong <-> Metal", STextureParams::tmPhong_Metal},
     {"Metal <-> OrenNayar", STextureParams::tmMetal_OrenNayar}, {nullptr, 0}};
 
-xr_token tbmode_token[] = {{"None", STextureParams::tbmNone}, {"Use", STextureParams::tbmUse},
+const xr_token tbmode_token[] = {{"None", STextureParams::tbmNone}, {"Use", STextureParams::tbmUse},
     {"Use parallax", STextureParams::tbmUseParallax}, {nullptr, 0}};
 
 void STextureParams::Load(IReader& F)

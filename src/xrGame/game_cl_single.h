@@ -34,4 +34,4 @@ enum ESingleGameDifficulty
 };
 
 extern ESingleGameDifficulty g_SingleGameDifficulty;
-xr_token difficulty_type_token[];
+extern const xr_token difficulty_type_token[];

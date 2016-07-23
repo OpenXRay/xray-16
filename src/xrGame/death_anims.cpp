@@ -1,10 +1,8 @@
 #include "stdafx.h"
-
 #include "death_anims.h"
-
 #include "Include/xrRender/KinematicsAnimated.h"
-
 #include "entity_alive.h"
+#include "xrCore/xr_token.h"
 
 #ifdef DEBUG
 BOOL death_anim_debug = FALSE;
@@ -47,7 +45,7 @@ void type_motion::set_motion( IKinematicsAnimated* k, CInifile* ini, LPCSTR type
             anims[ u16( id_dir ) ] = new rnd_motion()->setup( k, ini->r_string( type, dir ) );
 }
 */
-xr_token motion_dirs[] = {{"front", type_motion::front}, {"back", type_motion::back}, {"left", type_motion::left},
+extern const xr_token motion_dirs[] = {{"front", type_motion::front}, {"back", type_motion::back}, {"left", type_motion::left},
     {"right", type_motion::right}, {0, 0}};
 
 void type_motion::set_motion(IKinematicsAnimated* k, u16 id_motion, LPCSTR dir_anim)

@@ -602,7 +602,7 @@ void dx103DFluidManager::ApplyExternalForces(const dx103DFluidData& FluidData, f
     m_pEmittersHandler->RenderVelocity(FluidData);
 }
 
-void dx103DFluidManager::ComputeVelocityDivergence(float timestep)
+void dx103DFluidManager::ComputeVelocityDivergence(float /*timestep*/)
 {
     PIX_EVENT(ComputeVelocityDivergence);
 

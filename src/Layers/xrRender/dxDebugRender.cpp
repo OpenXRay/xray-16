@@ -95,6 +95,7 @@ void dxDebugRender::SetAmbient(u32 colour)
 #if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
     //	TODO: DX10: Check if need this for DX10
     VERIFY(!"Not implemented for DX10");
+    UNUSED(colour);
 #else //	USE_DX10
     CHK_DX(HW.pDevice->SetRenderState(D3DRS_AMBIENT, colour));
 #endif //	USE_DX10

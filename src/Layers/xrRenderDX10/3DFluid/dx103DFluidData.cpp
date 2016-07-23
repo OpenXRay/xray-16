@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "dx103DFluidData.h"
-
 #include "dx103DFluidManager.h"
+#include "xrCore/xr_token.h"
 
 namespace
 {
