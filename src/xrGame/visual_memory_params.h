@@ -21,5 +21,5 @@ struct CVisionParameters
     float m_luminocity_factor;
     u32 m_still_visible_time;
 
-    void Load(LPCSTR section, bool not_a_stalker);
+    void Load(pcstr section, bool not_a_stalker);
 };
