@@ -1,7 +1,11 @@
 #pragma once
 #include "physicsexternalcommon.h"
 #include "iphysics_scripted.h"
+#include "xrCore/FTimer.h"
+#include "xrCDB/xrCDB.h" // build_callback
+
 class CPhysicsShell;
+
 class IPHWorldUpdateCallbck
 {
 public:

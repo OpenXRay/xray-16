@@ -1,7 +1,8 @@
 #pragma once
 
-#include "engineAPI.h"
-#include "eventAPI.h"
+#include "EngineAPI.h"
+#include "EventAPI.h"
+#include "xrCore/xrCore_benchmark_macros.h"
 #include "xrSheduler.h"
 
 class ENGINE_API CEngine

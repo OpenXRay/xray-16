@@ -7,8 +7,8 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #pragma once
-
 #include "seniority_hierarchy_space.h"
+#include "xrCore/FixedVector.h"
 
 class CSquadHierarchyHolder;
 class CSeniorityHierarchyHolder;

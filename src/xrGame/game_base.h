@@ -6,6 +6,7 @@
 #include "player_account.h"
 #include "xrCommon/xr_deque.h"
 #include "xrCommon/xr_vector.h"
+#include "xrEngine/EngineAPI.h"
 
 #pragma pack(push, 1)
 

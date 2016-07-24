@@ -8,8 +8,8 @@
 
 #pragma once
 
-#include "xrEngine/effectorpp.h"
-#include "xrEngine/cameramanager.h"
+#include "xrEngine/Effector.h"
+#include "xrEngine/CameraManager.h"
 
 class CScriptEffector : public CEffectorPP
 {

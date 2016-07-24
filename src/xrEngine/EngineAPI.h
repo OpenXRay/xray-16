@@ -9,6 +9,7 @@
 #include "xrEngine/Engine.h"
 #include "xrCore/ModuleLookup.hpp"
 #include "xrCore/clsid.h"
+#include "xrCore/xrCore_benchmark_macros.h"
 
 class IFactoryObject
 {

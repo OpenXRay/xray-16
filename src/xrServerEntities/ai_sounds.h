@@ -6,8 +6,10 @@
 //	Description : Sounds for AI personalities
 ////////////////////////////////////////////////////////////////////////////
 
+#pragma once
 #ifndef ai_soundsH
 #define ai_soundsH
+#include "xrCore/xr_token.h"
 
 enum ESoundTypes
 {

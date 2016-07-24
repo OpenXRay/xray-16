@@ -1,5 +1,11 @@
 #pragma once
 #include "xrPhysics.h"
+#include "xrCore/_types.h"
+
+// fwd. decl.
+template <class T> struct _vector3;
+using Fvector = _vector3<float>;
+struct SGameMtl;
 
 class ICollisionDamageReceiver
 {

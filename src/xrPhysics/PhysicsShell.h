@@ -6,6 +6,8 @@
 #include "PhysicsCommon.h"
 #include "icollidevalidator.h"
 #include "xrServerEntities/alife_space.h"
+#include "xrCore/_flags.h"
+#include "xrCore/xr_vector_defs.h"
 
 #include "xrEngine/iphysicsshell.h"
 #include "iphysics_scripted.h"
@@ -25,6 +27,7 @@ struct SBoneShape;
 struct NearestToPointCallback;
 class CPHShellSplitterHolder;
 class IKinematics;
+class shared_str;
 typedef u32 CLClassBits;
 typedef u32 CLBits;
 struct dMass;

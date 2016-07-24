@@ -1,4 +1,5 @@
 #pragma once
+#include "xrSound/Sound.h"
 
 struct HUD_SOUND_ITEM
 {

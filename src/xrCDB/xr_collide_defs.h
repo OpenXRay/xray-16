@@ -1,6 +1,10 @@
 #pragma once
 
+#include <algorithm>
+
 #include "xrCDB.h"
+#include "xrCore/_vector3d.h"
+#include "xrCore/_matrix.h"
 
 class IGameObject;
 namespace collide

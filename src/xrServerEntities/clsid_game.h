@@ -1,4 +1,5 @@
 #pragma once
+#include "xrCore/clsid.h"
 
 #define CLSID_OBJECT_ACTOR MK_CLSID('O', '_', 'A', 'C', 'T', 'O', 'R', ' ')
 #define CLSID_OBJECT_HLAMP MK_CLSID('O', '_', 'H', 'L', 'A', 'M', 'P', ' ')

@@ -1,5 +1,9 @@
+#pragma once
 #ifndef PHDEFS_H
 #define PHDEFS_H
+#include <utility>
+#include "xrCommon/xr_vector.h"
+
 class CPHElement;
 class CPHJoint;
 class CPhysicsShell;

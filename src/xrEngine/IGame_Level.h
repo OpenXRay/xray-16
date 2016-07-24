@@ -6,6 +6,10 @@
 #include "xr_object_list.h"
 #include "xrCDB/xr_area.h"
 #include "xrSound/Sound.h"
+#include "xrCore/FixedVector.h"
+#include "EngineAPI.h"
+#include "EventAPI.h"
+#include "pure.h"
 
 // refs
 class ENGINE_API CCameraManager;

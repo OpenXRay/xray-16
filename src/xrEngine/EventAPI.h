@@ -2,6 +2,7 @@
 
 #include "xrCore/Threading/Lock.hpp"
 #include "Common/Noncopyable.hpp"
+#include "xrCommon/xr_vector.h"
 
 class ENGINE_API CEvent;
 typedef CEvent* EVENT;

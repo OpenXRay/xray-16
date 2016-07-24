@@ -4,6 +4,7 @@
 
 //#include "ISheduled.h"
 #include "xrCore/xrstring.h"
+#include "xrCore/FTimer.h"
 
 class ISheduled;
 

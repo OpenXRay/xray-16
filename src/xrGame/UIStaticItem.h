@@ -1,5 +1,10 @@
 #pragma once
 #include "ui_defs.h"
+#include "xrCore/_flags.h"
+#include "xrCore/_vector2.h"
+#ifdef DEBUG
+#include "xrCore/xrstring.h"
+#endif
 
 class CUIStaticItem
 {

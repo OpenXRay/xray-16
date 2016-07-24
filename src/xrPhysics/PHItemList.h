@@ -1,6 +1,7 @@
+#pragma once
 #ifndef PH_ITEM_LIST_H
 #define PH_ITEM_LIST_H
-#include "xrCore/xrDebug_macros.h" // for pragma todo. Remove once resolved.
+
 /*
 #define DECLARE_PHLIST_ITEM(class_name) public:\
                                                 class CPHListItem\

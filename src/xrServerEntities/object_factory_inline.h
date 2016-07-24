@@ -6,10 +6,10 @@
 //	Description : Object factory inline functions
 ////////////////////////////////////////////////////////////////////////////
 
+#pragma once
 #ifndef object_factory_inlineH
 #define object_factory_inlineH
-
-#pragma once
+#include <algorithm>
 
 IC const CObjectFactory& object_factory()
 {

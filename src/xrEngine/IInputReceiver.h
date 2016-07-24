@@ -5,6 +5,12 @@
 #pragma once
 #ifndef IINPUTRECEIVERH
 #define IINPUTRECEIVERH
+#include "xrCore/_flags.h"
+
+// fwd. decl.
+template <class T> struct _vector2;
+using Fvector2 = _vector2<float>;
+using Ivector2 = _vector2<int>;
 
 class ENGINE_API IInputReceiver
 {

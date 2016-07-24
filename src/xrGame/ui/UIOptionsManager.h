@@ -1,4 +1,7 @@
 #pragma once
+#include "xrCore/xrstring.h"
+#include "xrCommon/xr_vector.h"
+#include "xrCommon/xr_map.h"
 
 class CUIOptionsItem;
 

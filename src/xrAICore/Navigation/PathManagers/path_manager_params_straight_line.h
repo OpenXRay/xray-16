@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #pragma once
+#include "xrCore/_vector3d.h"
 
 template <typename _dist_type, typename _index_type, typename _iteration_type>
 struct SStraightLineParams : public SBaseParameters<_dist_type, _index_type, _iteration_type>

@@ -1,6 +1,7 @@
 #pragma once
 #ifndef xrDebug_macrosH
 #define xrDebug_macrosH
+#include "xrDebug.h"
 
 #define DEBUG_INFO {__FILE__, __LINE__, __FUNCTION__}
 #define CHECK_OR_EXIT(expr, message)\
@@ -61,7 +62,6 @@
 #endif
 
 #ifdef DEBUG
-#include "xrDebug.h"
 #define NODEFAULT FATAL("nodefault reached")
 #define VERIFY(expr)\
     do\

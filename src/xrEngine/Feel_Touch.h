@@ -1,8 +1,13 @@
 #pragma once
 
 #include "pure_relcase.h"
+#include "xrCommon/xr_vector.h"
 
-class ENGINE_API IGameObject;
+// fwd. decl.
+class IGameObject;
+template <class T> struct _vector3;
+using Fvector = _vector3<float>;
+
 namespace Feel
 {
 class ENGINE_API Touch : private pure_relcase
@@ -13,7 +18,7 @@ public:
     struct DenyTouch
     {
         IGameObject* O;
-        DWORD Expire;
+        /*DWORD*/ unsigned long Expire;
     };
 
 protected:

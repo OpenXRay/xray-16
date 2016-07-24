@@ -3,8 +3,8 @@
 //////////////////////////////////////////////////////////////////////////
 
 #pragma once
-
 #include "string_table_defs.h"
+#include "xrCommon/xr_map.h"
 
 using STRING_TABLE_MAP = xr_map<STRING_ID, STRING_VALUE>;
 

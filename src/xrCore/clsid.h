@@ -1,6 +1,7 @@
 #pragma once
 #ifndef _CLSID_H
 #define _CLSID_H
+#include "_types.h"
 
 //***** CLASS ID type
 typedef u64 CLASS_ID;

@@ -1,6 +1,7 @@
 #pragma once
 #ifndef _PURE_H_AAA_
 #define _PURE_H_AAA_
+#include "xrCommon/xr_vector.h"
 
 // messages
 #define REG_PRIORITY_LOW 0x11111111ul

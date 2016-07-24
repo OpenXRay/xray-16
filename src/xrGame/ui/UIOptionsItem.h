@@ -1,6 +1,9 @@
 #pragma once
 #include "UIOptionsManager.h"
 
+// fwd. decl.
+struct xr_token;
+
 class CUIOptionsItem
 {
 public:

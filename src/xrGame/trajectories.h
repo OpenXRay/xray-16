@@ -2,6 +2,7 @@
 #ifndef TRAJECTORIES_H
 #define TRAJECTORIES_H
 #include "xrCore/_vector3d.h"
+#include "xrCommon/xr_vector.h"
 
 // fwd. decl.
 namespace collide { class rq_results; }

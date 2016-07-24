@@ -1,6 +1,8 @@
 #pragma once
 
 #include "xrUIXmlParser.h"
+#include "xrCore/_rect.h"
+#include "xrCommon/xr_map.h"
 
 class ITextureOwner;
 class CUIWindow;
@@ -32,6 +34,7 @@ class CUITrackBar;
 class UIHintWindow;
 class CUILines;
 class CUITextWnd;
+class CGameFont;
 
 class CUIXmlInit
 {

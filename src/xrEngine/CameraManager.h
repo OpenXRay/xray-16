@@ -2,6 +2,8 @@
 
 #include "CameraDefs.h"
 #include "xrCore/PostProcess/PPInfo.hpp"
+#include "xrCommon/xr_list.h"
+#include "xrCommon/xr_vector.h"
 
 using EffectorCamVec = xr_list<CEffectorCam*>;
 using EffectorPPVec = xr_vector<CEffectorPP*>;

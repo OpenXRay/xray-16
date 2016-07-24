@@ -1,4 +1,7 @@
 #pragma once
+#include "xrEngine/EngineAPI.h"
+#include "xrEngine/EventAPI.h"
+#include "xrEngine/pure.h"
 
 ENGINE_API extern Flags32 psHUD_Flags;
 #define HUD_CROSSHAIR (1 << 0)
@@ -14,8 +17,7 @@ ENGINE_API extern Flags32 psHUD_Flags;
 #define HUD_WEAPON_RT2 (1 << 11)
 #define HUD_DRAW_RT2 (1 << 12)
 
-class ENGINE_API IRender_Visual;
-class CUI;
+class IGameObject;
 
 class ENGINE_API CCustomHUD : public FactoryObjectBase, public IEventReceiver, public pureScreenResolutionChanged
 {

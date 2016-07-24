@@ -6,8 +6,9 @@
 #include "UIDialogHolder.h"
 #include "xrEngine/CustomHUD.h"
 #include "script_game_object.h"
+#include "xrCommon/xr_string.h"
 
-// refs
+// fwd. decl.
 class CUI;
 class CTeamBaseZone;
 class game_cl_GameState;

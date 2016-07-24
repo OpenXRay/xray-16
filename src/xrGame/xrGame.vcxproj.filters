@@ -4992,9 +4992,6 @@
     <ClInclude Include="attachment_owner.h">
       <Filter>Core\Client\Objects\inventory\AttachmentOwner</Filter>
     </ClInclude>
-    <ClInclude Include="attachment_owner_inline.h">
-      <Filter>Core\Client\Objects\inventory\AttachmentOwner</Filter>
-    </ClInclude>
     <ClInclude Include="eatable_item.h">
       <Filter>Core\Client\Objects\inventory\EatableItem</Filter>
     </ClInclude>

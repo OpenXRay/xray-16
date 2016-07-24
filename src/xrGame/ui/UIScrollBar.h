@@ -1,5 +1,5 @@
 #pragma once
-#include "uiwindow.h"
+#include "UIWindow.h"
 
 class CUI3tButton;
 class CUIScrollBox;

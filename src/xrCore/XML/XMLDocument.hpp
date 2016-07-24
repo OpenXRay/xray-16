@@ -8,6 +8,8 @@
 #define PUGIXML_NO_XPATH
 #define PUGIXML_HAS_LONG_LONG
 #include "pugixml.hpp"
+#include "xrCommon/xr_vector.h"
+#include "xrCore/xrstring.h"
 
 static constexpr pcstr CONFIG_PATH = "$game_config$";
 static constexpr pcstr UI_PATH = "ui";
@@ -34,7 +36,7 @@ public:
         return XML_NODE(node.first_child());
     }
 
-    XML_NODE firstChild(const char* name) const
+    XML_NODE firstChild(pcstr name) const
     {
         return XML_NODE(node.child(name));
     }
@@ -44,18 +46,18 @@ public:
         return XML_NODE(node.next_sibling());
     }
 
-    XML_NODE nextSibling(const char* name) const
+    XML_NODE nextSibling(pcstr name) const
     {
         return XML_NODE(node.next_sibling(name));
     }
 
-    const char* textValueOr(const char* defaultValue) const
+    pcstr textValueOr(pcstr defaultValue) const
     {
         const auto text = node.text();
         return text ? text.get() : defaultValue;
     }
 
-    const char* elementAttribute(const char* name) const
+    pcstr elementAttribute(pcstr name) const
     {
         if (node.type() == pugi::node_element)
         {
@@ -65,7 +67,7 @@ public:
         return nullptr;
     }
 
-    const char* elementValue() const
+    pcstr elementValue() const
     {
         if (node.type() == pugi::node_element)
             return node.name();
@@ -73,7 +75,7 @@ public:
         return nullptr;
     }
 
-    const char* value() const
+    pcstr value() const
     {
         switch (node.type())
         {
@@ -95,7 +97,7 @@ struct XML_DOC
         doc.reset();
     }
 
-    void parse(const char* data)
+    void parse(pcstr data)
     {
         res = doc.load_string(data);
     }
@@ -105,7 +107,7 @@ struct XML_DOC
         return !res;
     }
 
-    const char* error() const
+    pcstr error() const
     {
         return res.description();
     }
