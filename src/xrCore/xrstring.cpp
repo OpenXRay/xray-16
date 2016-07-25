@@ -3,6 +3,7 @@
 
 #include "xrstring.h"
 #include "Threading/Lock.hpp"
+#include "xrCore/_std_extensions.h"
 
 #include "FS_impl.h"
 

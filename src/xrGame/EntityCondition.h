@@ -6,8 +6,7 @@ class CEntityAlive;
 class CLevel;
 
 #include "hit_immunity.h"
-//#include "Hit.h"
-#include "Level.h"
+#include "game_type.h"
 
 struct SHit;
 

@@ -2,6 +2,7 @@
 #pragma hdrstop
 
 #include "xrsharedmem.h"
+#include "xrCore/_std_extensions.h"
 
 #include <malloc.h>
 

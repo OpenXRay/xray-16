@@ -2,6 +2,7 @@
 
 #include "SoundRender.h"
 #include "SoundRender_Environment.h"
+#include "xrCore/_std_extensions.h"
 
 class CSoundRender_Emitter : public CSound_emitter
 {

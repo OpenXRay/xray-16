@@ -11,7 +11,7 @@
 class ISpatial;
 class ICollisionForm;
 class IGameObject;
-//class Lock;
+class Lock;
 
 //-----------------------------------------------------------------------------------------------------------
 // Space Area

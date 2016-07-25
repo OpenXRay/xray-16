@@ -2,6 +2,7 @@
 
 #include "openal/al.h"
 #include "openal/alc.h"
+#include "xrCore/_std_extensions.h"
 
 constexpr pcstr AL_GENERIC_HARDWARE = "Generic Hardware";
 constexpr pcstr AL_GENERIC_SOFTWARE = "Generic Software";

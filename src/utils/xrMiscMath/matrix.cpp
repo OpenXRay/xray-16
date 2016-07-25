@@ -6,6 +6,7 @@
 #include "xrCore/_quaternion.h"
 #include "xrCore/xrDebug_macros.h"
 #include "xrCore/xrDebug.h"
+#include "xrCommon/math_funcs_inline.h"
 
 
 template <typename T>

@@ -12,6 +12,9 @@
 
 #define NUM_THREADS 8
 
+#include "xrCore/cdecl_cast.hpp"
+#include "xrCore/_std_extensions.h"
+
 extern ILevelCompilerLogger& Logger;
 extern CThread::LogFunc ProxyMsg;
 extern CThreadManager::ReportStatusFunc ProxyStatus;

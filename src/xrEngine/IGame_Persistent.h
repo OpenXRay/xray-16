@@ -1,10 +1,15 @@
+#pragma once
 #ifndef IGame_PersistentH
 #define IGame_PersistentH
-#pragma once
 
 #include "xrServerEntities/gametype_chooser.h"
+#include "xrCommon/xr_set.h"
+#include "xrCommon/xr_vector.h"
+#include "xrCore/xr_trims.h"
+#include "pure.h"
 #ifndef _EDITOR
 #include "Environment.h"
+#include "EngineAPI.h"
 #include "IGame_ObjectPool.h"
 #endif
 

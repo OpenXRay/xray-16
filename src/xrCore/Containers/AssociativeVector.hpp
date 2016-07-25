@@ -7,12 +7,14 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #pragma once
-#include "xrCore/xrCore.h"
-#include "xrCommon/xr_vector.h"
-#include "AssociativeVectorComparer.hpp"
+
 #include <algorithm>
 #include <functional>
 #include <utility>
+
+#include "xrCore/xrCore.h"
+#include "xrCommon/xr_vector.h"
+#include "AssociativeVectorComparer.hpp"
 
 template <typename TKey, typename TValue, typename TKeyComparer = std::less<TKey>>
 class AssociativeVector : protected xr_vector<std::pair<TKey, TValue>>,

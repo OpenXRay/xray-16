@@ -6673,6 +6673,7 @@
     <ClInclude Include="ui\UIWarState.h">
       <Filter>UI\Common\PDA\FractionWar</Filter>
     </ClInclude>
+    <ClInclude Include="game_type.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="damage_manager.cpp">
@@ -10204,6 +10205,7 @@
     <ClCompile Include="ui\UIWarState.cpp">
       <Filter>UI\Common\PDA\FractionWar</Filter>
     </ClCompile>
+    <ClCompile Include="game_type.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="ai\monsters\chimera\chimera_attack_state.h">

@@ -4,6 +4,7 @@
 #include "net_Server.h"
 #include "net_Messages.h"
 #include "NET_Log.h"
+#include "xrCore/Threading/Lock.hpp"
 
 #include "xrGameSpy/xrGameSpy_MainDefs.h"
 
@@ -95,9 +96,9 @@ void dump_URL(pcstr p, IDirectPlay8Address* A)
 }
 
 #ifdef CONFIG_PROFILE_LOCKS
-INetQueue::INetQueue() : cs(MUTEX_PROFILE_ID(INetQueue))
+INetQueue::INetQueue() : pcs(new Lock(MUTEX_PROFILE_ID(INetQueue)))
 #else
-INetQueue::INetQueue()
+INetQueue::INetQueue() : pcs(new Lock)
 #endif
 {
     unused.reserve(128);
@@ -107,13 +108,14 @@ INetQueue::INetQueue()
 
 INetQueue::~INetQueue()
 {
-    cs.Enter();
+    pcs->Enter();
     u32 it;
     for (it = 0; it < unused.size(); it++)
         xr_delete(unused[it]);
     for (it = 0; it < ready.size(); it++)
         xr_delete(ready[it]);
-    cs.Leave();
+    pcs->Leave();
+    delete pcs;
 }
 
 static u32 LastTimeCreate = 0;
@@ -121,7 +123,7 @@ static u32 LastTimeCreate = 0;
 NET_Packet* INetQueue::Create()
 {
     NET_Packet* P = nullptr;
-    //cs.Enter();
+    //pcs->Enter();
 //#ifdef _DEBUG
     //Msg("- INetQueue::Create - ready %d, unused %d", ready.size(), unused.size());
 //#endif
@@ -139,14 +141,14 @@ NET_Packet* INetQueue::Create()
         unused.pop_back();
         P = ready.back();
     }
-    //cs.Leave();
+    //pcs->Leave();
     return P;
 }
 
 NET_Packet* INetQueue::Create(const NET_Packet& _other)
 {
     NET_Packet* P = nullptr;
-    cs.Enter();
+    pcs->Enter();
 //#ifdef _DEBUG
     //Msg("- INetQueue::Create - ready %d, unused %d", ready.size(), unused.size());
 //#endif
@@ -165,14 +167,14 @@ NET_Packet* INetQueue::Create(const NET_Packet& _other)
         P = ready.back();
     }
     CopyMemory(P, &_other, sizeof(NET_Packet));
-    cs.Leave();
+    pcs->Leave();
     return P;
 }
 
 NET_Packet* INetQueue::Retreive()
 {
     NET_Packet* P = nullptr;
-    //cs.Enter();
+    //pcs->Enter();
 //#ifdef _DEBUG
     //Msg("INetQueue::Retreive - ready %d, unused %d", ready.size(), unused.size());
 //#endif
@@ -190,13 +192,13 @@ NET_Packet* INetQueue::Retreive()
         }
     }
     //---------------------------------------------
-    //cs.Leave();
+    //pcs->Leave();
     return P;
 }
 
 void INetQueue::Release()
 {
-    //cs.Enter();
+    //pcs->Enter();
 //#ifdef _DEBUG
     //Msg("INetQueue::Release - ready %d, unused %d", ready.size(), unused.size());
 //#endif
@@ -213,10 +215,19 @@ void INetQueue::Release()
         unused.push_back(ready.front());
     //---------------------------------------------
     ready.pop_front();
-    //cs.Leave();
+    //pcs->Leave();
 }
 
-//
+void INetQueue::LockQ()
+{
+    pcs->Enter();
+}
+
+void INetQueue::UnlockQ()
+{
+    pcs->Leave();
+}
+
 const u32 syncQueueSize = 512;
 const int syncSamples = 256;
 
@@ -324,9 +335,9 @@ void IPureClient::_Recieve(const void* data, u32 data_size, u32 /*param*/)
 
 //==============================================================================
 #ifdef CONFIG_PROFILE_LOCKS
-IPureClient::IPureClient(CTimer* timer) : net_Statistic(timer), net_csEnumeration(MUTEX_PROFILE_ID(IPureClient::net_csEnumeration))
+IPureClient::IPureClient(CTimer* timer) : net_Statistic(timer), net_csEnumeration(new Lock(MUTEX_PROFILE_ID(IPureClient::net_csEnumeration)))
 #else
-IPureClient::IPureClient(CTimer* timer) : net_Statistic(timer)
+IPureClient::IPureClient(CTimer* timer) : net_Statistic(timer), net_csEnumeration(new Lock)
 #endif
 {
     NET = nullptr;
@@ -346,6 +357,7 @@ IPureClient::~IPureClient()
     xr_delete(pClNetLog);
     pClNetLog = nullptr;
     psNET_direct_connect = false;
+    delete net_csEnumeration;
 }
 
 bool IPureClient::Connect(pcstr options)
@@ -663,7 +675,7 @@ bool IPureClient::Connect(pcstr options)
                         dpAppDesc.pwszPassword = SessionPasswordUNICODE;
                     }
 
-                    net_csEnumeration.Enter();
+                    net_csEnumeration->Enter();
                     // real connect
                     for (u32 I = 0; I < net_Hosts.size(); I++)
                         Msg("* HOST #%d: %s\n", I + 1, *net_Hosts[I].dpSessionName);
@@ -680,7 +692,7 @@ bool IPureClient::Connect(pcstr options)
                                        nullptr, // pvAsyncHandle
                                        DPNCONNECT_SYNC); // dwFlags
                     //		R_CHK(res);
-                    net_csEnumeration.Leave();
+                    net_csEnumeration->Leave();
                     _RELEASE(pHostAddress);
 #ifdef DEBUG
                     //		const char* x = DXGetErrorString9(res);
@@ -734,14 +746,14 @@ bool IPureClient::Connect(pcstr options)
                         NET->Close(0);
 
                     // Clean up Host _list_
-                    net_csEnumeration.Enter();
+                    net_csEnumeration->Enter();
                     for (u32 i = 0; i < net_Hosts.size(); i++)
                     {
                         HOST_NODE& N = net_Hosts[i];
                         _RELEASE(N.pHostAddress);
                     }
                     net_Hosts.clear();
-                    net_csEnumeration.Leave();
+                    net_csEnumeration->Leave();
 
                     // Release interfaces
                     _SHOW_REF("cl_netADR_Server", net_Address_server);
@@ -778,7 +790,7 @@ bool IPureClient::Connect(pcstr options)
                         }
 
                         // Insert each host response if it isn't already present
-                        net_csEnumeration.Enter();
+                        net_csEnumeration->Enter();
                         bool bHostRegistered = false;
                         for (u32 I = 0; I < net_Hosts.size(); I++)
                         {
@@ -819,7 +831,7 @@ bool IPureClient::Connect(pcstr options)
 
                             net_Hosts.push_back(NODE);
                         }
-                        net_csEnumeration.Leave();
+                        net_csEnumeration->Leave();
                     }
                         break;
 
@@ -933,7 +945,7 @@ bool IPureClient::Connect(pcstr options)
                 void IPureClient::OnMessage(void* data, u32 size)
                 {
                     // One of the messages - decompress it
-                    net_Queue.Lock();
+                    net_Queue.LockQ();
                     NET_Packet* P = net_Queue.Create();
 
                     P->construct(data, size);
@@ -941,7 +953,7 @@ bool IPureClient::Connect(pcstr options)
 
                     u16 m_type;
                     P->r_begin(m_type);
-                    net_Queue.Unlock();
+                    net_Queue.UnlockQ();
                 }
 
                 void IPureClient::timeServer_Correct(u32 sv_time, u32 cl_time)

@@ -1,6 +1,6 @@
+#pragma once
 #ifndef _VECTOR4_H
 #define _VECTOR4_H
-#pragma once
 
 #include "_types.h"
 
@@ -212,7 +212,7 @@ typedef ALIGN(16) _vector4<s32> Ivector4a;
 #endif
 
 template <class T>
-BOOL _valid(const _vector4<T>& v)
+bool _valid(const _vector4<T>& v)
 {
     return _valid((T)v.x) && _valid((T)v.y) && _valid((T)v.z) && _valid((T)v.w);
 }

@@ -13,6 +13,7 @@
 #include "property_evaluator_member.h"
 #include "danger_object.h"
 #include "smart_cover.h"
+#include "xrGame/ai/stalker/ai_stalker.h"
 
 class CAI_Stalker;
 

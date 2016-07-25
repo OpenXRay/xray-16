@@ -1,23 +1,23 @@
 #pragma once
 #ifndef FTimerH
 #define FTimerH
+#include "Common/Noncopyable.hpp"
 #include "_types.h"
 #include "xrCommon/xr_vector.h"
-//#include "_stl_extensions.h"
 #include "_math.h"
 #include "log.h"
 #include <chrono>
 
 class CTimer_paused;
 
-class XRCORE_API pauseMngr
+class XRCORE_API pauseMngr : Noncopyable
 {
     xr_vector<CTimer_paused*> m_timers;
     bool paused;
 
 public:
     pauseMngr();
-    bool Paused() const { return paused; };
+    bool Paused() const { return paused; }
     void Pause(const bool b);
     void Register(CTimer_paused& t);
     void UnRegister(CTimer_paused& t);

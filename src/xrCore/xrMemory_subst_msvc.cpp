@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "xrMemory_align.h"
+#include "xrCore/_std_extensions.h"
 
 #ifndef DEBUG_MEMORY_MANAGER
 #define debug_mode 0

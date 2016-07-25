@@ -4,6 +4,7 @@
 #include "xrCore/_fbox.h"
 #include "xrCore/_obb.h"
 #include "xrPhysics.h"
+#include "xrCore/_std_extensions.h"
 #ifdef DEBUG
 #include "xrCore/dump_string.h"
 #endif

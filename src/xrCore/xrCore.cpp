@@ -8,6 +8,7 @@
 #include "xrCore.h"
 #include "Threading/ThreadPool.hpp"
 #include "Math/MathUtil.hpp"
+#include "xrCore/_std_extensions.h"
 
 #pragma comment(lib, "winmm.lib")
 

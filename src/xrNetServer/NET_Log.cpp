@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "net_log.h"
+#include "xrCore/Threading/Lock.hpp"
 //---------------------------------------------------------
 string64 PacketName[] = {"M_UPDATE", // DUAL: Update state
     "M_SPAWN", // DUAL: Spawning, full state
@@ -46,9 +47,9 @@ string64 PacketName[] = {"M_UPDATE", // DUAL: Update state
     "MSG_FORCEDWORD"};
 //---------------------------------------------------------
 #ifdef CONFIG_PROFILE_LOCKS
-INetLog::INetLog(pcstr sFileName, u32 dwStartTime) : m_cs(MUTEX_PROFILE_ID(NET_Log))
+INetLog::INetLog(pcstr sFileName, u32 dwStartTime) : m_pcs(new Lock(MUTEX_PROFILE_ID(NET_Log)))
 #else
-INetLog::INetLog(pcstr sFileName, u32 dwStartTime)
+INetLog::INetLog(pcstr sFileName, u32 dwStartTime) : m_pcs(new Lock)
 #endif
 {
     xr_strcpy(m_cFileName, sFileName);
@@ -64,6 +65,7 @@ INetLog::~INetLog()
     if (m_pLogFile)
         fclose(m_pLogFile);
     m_pLogFile = nullptr;
+    delete m_pcs;
 }
 
 void INetLog::FlushLog()
@@ -90,7 +92,7 @@ void INetLog::LogPacket(u32 Time, NET_Packet* pPacket, bool IsIn)
     if (!pPacket)
         return;
 
-    m_cs.Enter();
+    m_pcs->Enter();
 
     SLogPacket NewPacket;
 
@@ -103,7 +105,7 @@ void INetLog::LogPacket(u32 Time, NET_Packet* pPacket, bool IsIn)
     if (m_aLogPackets.size() > 100)
         FlushLog();
 
-    m_cs.Leave();
+    m_pcs->Leave();
 }
 
 void INetLog::LogData(u32 Time, void* data, u32 size, bool IsIn)
@@ -111,7 +113,7 @@ void INetLog::LogData(u32 Time, void* data, u32 size, bool IsIn)
     if (!data)
         return;
 
-    m_cs.Enter();
+    m_pcs->Enter();
 
     SLogPacket NewPacket;
 
@@ -124,5 +126,5 @@ void INetLog::LogData(u32 Time, void* data, u32 size, bool IsIn)
     if (m_aLogPackets.size() > 100)
         FlushLog();
 
-    m_cs.Leave();
+    m_pcs->Leave();
 }

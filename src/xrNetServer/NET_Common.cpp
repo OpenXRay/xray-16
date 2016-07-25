@@ -2,6 +2,7 @@
 
 #include "NET_Common.h"
 #include "NET_Messages.h"
+#include "xrCore/Threading/Lock.hpp"
 
 /*
 #ifdef DEBUG
@@ -59,9 +60,20 @@ XRNETSERVER_API int psNET_GuaranteedPacketMode = NET_GUARANTEEDPACKET_DEFAULT;
 
 //------------------------------------------------------------------------------
 
+#ifdef CONFIG_PROFILE_LOCKS
+MultipacketSender::MultipacketSender() : _buf_cs(new Lock(MUTEX_PROFILE_ID(MultipacketSender))) {}
+#else
+MultipacketSender::MultipacketSender() : _buf_cs(new Lock) {}
+#endif
+
+MultipacketSender::~MultipacketSender()
+{
+    delete _buf_cs;
+}
+
 void MultipacketSender::SendPacket(const void* packet_data, u32 packet_sz, u32 flags, u32 timeout)
 {
-    _buf_cs.Enter();
+    _buf_cs->Enter();
 
     //PrintParsedPacket("-- LL Sending:", 1, packet_data, packet_sz);
 
@@ -99,19 +111,19 @@ void MultipacketSender::SendPacket(const void* packet_data, u32 packet_sz, u32 f
         _FlushSendBuffer(timeout, buf);
 
     buf->last_flags = flags;
-    _buf_cs.Leave();
+    _buf_cs->Leave();
 }
 
 //------------------------------------------------------------------------------
 
 void MultipacketSender::FlushSendBuffer(u32 timeout)
 {
-    _buf_cs.Enter();
+    _buf_cs->Enter();
 
     _FlushSendBuffer(timeout, &_buf);
     _FlushSendBuffer(timeout, &_gbuf);
 
-    _buf_cs.Leave();
+    _buf_cs->Leave();
 }
 
 //------------------------------------------------------------------------------

@@ -33,6 +33,7 @@ class CZoneList;
 class message_filter;
 class demoplay_control;
 class demo_info;
+class CStreamReader;
 
 #ifdef DEBUG
 class CDebugRenderer;
@@ -453,9 +454,4 @@ IC CPHCommander& CLevel::ph_commander_physics_worldstep()
     return *m_ph_commander_physics_worldstep;
 }
 
-// XXX: Move OnServer(), OnClient() out-of-line?
-
-IC bool OnServer() { return Level().IsServer(); }
-IC bool OnClient() { return Level().IsClient(); }
-IC bool IsGameTypeSingle() { return (g_pGamePersistent->GameType() == eGameIDSingle); }
 extern bool g_bDebugEvents;

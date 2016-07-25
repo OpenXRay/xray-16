@@ -11,6 +11,7 @@
 #pragma hdrstop
 
 #include "MxGeom3D.h"
+#include "xrCore/_std_extensions.h"
 
 void mx3d_box_corners(const Vec3& min, const Vec3& max, Vec3* v)
 {

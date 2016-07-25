@@ -17,8 +17,8 @@ inline double _cos(double x) { return cos(x); }
 inline bool fsimilar(float a, float b, float cmp = EPS) { return _abs(a-b)<cmp; }
 inline bool dsimilar(double a, double b, double cmp = EPS) { return _abs(a-b)<cmp; }
 
-inline bool fis_zero(float val, float cmp = EPS_S) { return _abs(val)<cmp; }
-inline bool dis_zero(double val, double cmp = EPS_S) { return _abs(val)<cmp; }
+inline bool fis_zero(float val, float cmp = EPS_S) throw() { return _abs(val) < cmp; }
+inline bool dis_zero(double val, double cmp = EPS_S) throw() { return _abs(val) < cmp; }
 
 // degree to radians and vice-versa
 ICF float  deg2rad(float  val) { return val*M_PI / 180; }

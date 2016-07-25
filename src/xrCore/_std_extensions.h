@@ -93,7 +93,7 @@ IC bool _valid(const float x) throw()
 }
 
 // double
-IC BOOL _valid(const double x)
+IC bool _valid(const double x)
 {
     // check for: Signaling NaN, Quiet NaN, Negative infinity ( –INF), Positive infinity (+INF), Negative denormalized,
     // Positive denormalized

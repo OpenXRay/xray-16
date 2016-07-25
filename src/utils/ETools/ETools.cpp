@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "ETools.h"
 #include "xrXRC.h"
+#include "xrCommon/math_funcs_inline.h"
 
 #pragma warning(disable : 4267)
 

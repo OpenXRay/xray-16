@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "xrCommon/xr_vector.h"
 
 XRCORE_API bool g_bEnableStatGather = false;
 

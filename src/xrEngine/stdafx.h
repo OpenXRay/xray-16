@@ -13,6 +13,7 @@
 #endif // #ifndef NDEBUG
 
 #include "xrCore/xrCore.h"
+#include "xrCore/_std_extensions.h"
 
 #define ECORE_API
 

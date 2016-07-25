@@ -1,5 +1,5 @@
 #pragma once
-#include "xrCore/xrCore.h"
+#include "xrCore/_types.h"
 
 XRCORE_API int lzo_compress_dict(
     const void* input, u32 inputSize, void* output, u32& outputSize, void* workMem, const void* dict, u32 dictSize);

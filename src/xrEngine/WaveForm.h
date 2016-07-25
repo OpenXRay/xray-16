@@ -1,6 +1,6 @@
+#pragma once
 #ifndef WAVEFORM_H
 #define WAVEFORM_H
-#pragma once
 
 #pragma pack(push, 4)
 struct WaveForm
@@ -40,7 +40,6 @@ public:
         float x = (t + arg[2]) * arg[3];
         return arg[0] + arg[1] * Func(x - floorf(x));
     }
-
     WaveForm()
     {
         F = fCONSTANT;
@@ -50,21 +49,21 @@ public:
         arg[3] = 1;
     }
 
-    IC BOOL Similar(const WaveForm& W) const
+    IC bool Similar(const WaveForm& W) const
     {
         if (!fsimilar(arg[0], W.arg[0], EPS_L))
-            return FALSE;
+            return false;
         if (!fsimilar(arg[1], W.arg[1], EPS_L))
-            return FALSE;
+            return false;
         if (fis_zero(arg[1], EPS_L))
-            return TRUE;
+            return true;
         if (F != W.F)
-            return FALSE;
+            return false;
         if (!fsimilar(arg[2], W.arg[2], EPS_L))
-            return FALSE;
+            return false;
         if (!fsimilar(arg[3], W.arg[3], EPS_L))
-            return FALSE;
-        return TRUE;
+            return false;
+        return true;
     }
 };
 

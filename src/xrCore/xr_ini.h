@@ -3,10 +3,19 @@
 #define xr_iniH
 
 #include "fastdelegate.h"
+#include "xrCore/xrstring.h"
+#include "xrCore/_flags.h"
+#include "xrCore/_color.h"
+#include "xrCore/_vector2.h"
+#include "xrCore/_vector3d.h"
+#include "xrCore/_vector4.h"
+#include "xrCore/clsid.h"
+#include "xrCommon/xr_vector.h"
 
 // refs
 class CInifile;
 struct xr_token;
+class IReader;
 
 class XRCORE_API CInifile
 {

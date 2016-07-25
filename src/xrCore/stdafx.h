@@ -5,3 +5,4 @@
 #include "Common/Common.hpp"
 #include "xrCore.h"
 #include "Common/Util.hpp"
+#include "_std_extensions.h"

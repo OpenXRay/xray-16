@@ -5,6 +5,7 @@
 #include "xrCDB/ISpatial.h"
 #include "ISheduled.h"
 #include "IRenderable.h"
+#include "xrCore/_bitwise.h"
 
 class ENGINE_API CPS_Instance : public SpatialBase, public ScheduledBase, public RenderableBase
 {

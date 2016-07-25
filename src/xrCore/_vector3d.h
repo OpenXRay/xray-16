@@ -3,8 +3,9 @@
 #define __V3D__
 #include <algorithm>
 #include "xrCommon/inlining_macros.h"
+#include "_types.h"
 #include "_random.h"
-#include "_std_extensions.h" // only for _min/_max. FIX!
+#include "math_constants.h"
 
 template <class T>
 struct _vector3

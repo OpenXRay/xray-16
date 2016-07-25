@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #pragma hdrstop
 #include "xrCore/xr_token.h"
+#include "xrCore/_std_extensions.h"
 
 LPSTR _TrimLeft(LPSTR str)
 {

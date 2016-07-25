@@ -1,8 +1,11 @@
 #pragma once
 #ifndef _INCDEF_NETCOMMON_H_
 #define _INCDEF_NETCOMMON_H_
+#include "xrCore/net_utils.h"
+#include "xrNetServer/NET_Shared.h"
 
-//==============================================================================
+// fwd. decl.
+class Lock;
 
 struct GameDescriptionData
 {
@@ -41,7 +44,9 @@ void PrintParsedPacket(const char* message, u16 message_type, const void* packet
 class XRNETSERVER_API MultipacketSender
 {
 public:
-    virtual ~MultipacketSender() {}
+    MultipacketSender();
+    virtual ~MultipacketSender();
+
 protected:
     void SendPacket(const void* packet_data, u32 packet_sz, u32 flags, u32 timeout);
     void FlushSendBuffer(u32 timeout);
@@ -61,7 +66,7 @@ private:
 
     Buffer _buf;
     Buffer _gbuf;
-    Lock _buf_cs;
+    Lock* _buf_cs;
 };
 
 //==============================================================================

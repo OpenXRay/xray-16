@@ -1,5 +1,8 @@
+#pragma once
 #ifndef _matrix33H_
 #define _matrix33H_
+#include "_vector3d.h"
+#include "_matrix.h"
 
 template <class T>
 struct _matrix33
@@ -411,7 +414,7 @@ typedef _matrix33<float> Fmatrix33;
 typedef _matrix33<double> Dmatrix33;
 
 template <class T>
-BOOL _valid(const _matrix33<T>& m)
+bool _valid(const _matrix33<T>& m)
 {
     return _valid(m.i) && _valid(m.j) && _valid(m.k);
 }

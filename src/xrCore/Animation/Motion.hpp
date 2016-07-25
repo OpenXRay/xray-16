@@ -1,8 +1,11 @@
 //----------------------------------------------------
+#pragma once
 #ifndef MotionH
 #define MotionH
 
 #include "xrCore/Animation/Bone.hpp"
+#include "xrCore/_std_extensions.h"
+#include "xrCommon/xr_vector.h"
 
 // refs
 class CEnvelope;

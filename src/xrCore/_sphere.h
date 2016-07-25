@@ -189,7 +189,7 @@ public:
 };
 
 template <class T>
-BOOL _valid(const _sphere<T>& s)
+bool _valid(const _sphere<T>& s)
 {
     return _valid(s.P) && _valid(s.R);
 }

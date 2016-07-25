@@ -6,6 +6,7 @@
 #define EditMeshH
 #include "xrCore/_types.h"
 #include "xrCore/_fbox.h"
+#include "xrCommon/math_funcs_inline.h"
 
 //----------------------------------------------------
 // fwd. decl.

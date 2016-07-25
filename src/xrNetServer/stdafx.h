@@ -2,6 +2,7 @@
 
 #include "Common/Common.hpp"
 #include "xrCore/xrCore.h"
+#include "xrCore/_std_extensions.h"
 
 #pragma warning(push)
 #pragma warning(disable : 4995)

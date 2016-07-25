@@ -17,6 +17,7 @@ class CScriptEntityAction;
 class CEntity;
 class CScriptGameObject;
 class CCustomMonster;
+struct ref_sound;
 
 using namespace ScriptEntity;
 

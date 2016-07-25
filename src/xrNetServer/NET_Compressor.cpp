@@ -5,6 +5,8 @@
 
 #include "NET_Common.h"
 #include "NET_Compressor.h"
+#include "xrCore/Threading/Lock.hpp"
+
 #if NET_USE_COMPRESSION
 
 #ifdef DEBUG
@@ -249,11 +251,10 @@ void NET_Compressor::done_decoding()
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 #ifdef CONFIG_PROFILE_LOCKS
-NET_Compressor::NET_Compressor() : CS(MUTEX_PROFILE_ID(NET_Compressor))
+NET_Compressor::NET_Compressor() : pcs(new Lock(MUTEX_PROFILE_ID(NET_Compressor))) {}
 #else
-NET_Compressor::NET_Compressor()
-#endif // CONFIG_PROFILE_LOCKS
-{}
+NET_Compressor::NET_Compressor() : pcs(new Lock) {}
+#endif
 
 NET_Compressor::~NET_Compressor()
 {
@@ -274,12 +275,13 @@ NET_Compressor::~NET_Compressor()
         RawTrafficDump = nullptr;
     }
 #endif // DEBUG
+	delete pcs;
 }
 
 /*
 void NET_Compressor::Initialize	()
 {
-    CS.Enter();
+    pcs->Enter();
 
 #if 1//def DEBUG
     if (strstr(Core.Params, "-dump_traffic"))
@@ -289,7 +291,7 @@ void NET_Compressor::Initialize	()
     }
 #endif // DEBUG
 
-    CS.Leave();
+    pcs->Leave();
 }*/
 
 u16 NET_Compressor::compressed_size(const u32& count) const
@@ -355,13 +357,13 @@ u16 NET_Compressor::Compress(BYTE* dest, const u32& dest_size, BYTE* src, const 
 
     if (!psNET_direct_connect && g_net_compressor_enabled && b_compress_packet)
     {
-        CS.Enter();
+        pcs->Enter();
         compressed_size = offset + ENCODE(dest + offset, dest_size - offset, src, count);
 
         if (g_net_compressor_gather_stats)
             m_stats.total_compressed_bytes += compressed_size;
 
-        CS.Leave();
+        pcs->Leave();
     }
 
     if (compressed_size < count)
@@ -424,7 +426,7 @@ u16 NET_Compressor::Compress(BYTE* dest, const u32& dest_size, BYTE* src, const 
     for (; I != E; ++I , ++J)
     VERIFY (*I == *J);
 
-    CS.Leave();
+    pcs->Leave();
 #endif // DEBUG
 
     return (u16(compressed_size));
@@ -484,9 +486,9 @@ u16 NET_Compressor::Decompress(BYTE* dest, const u32& dest_size, BYTE* src, cons
     R_ASSERT2(crc == *((u32*)(src + 1)), make_string("crc is different! (0x%08x != 0x%08x)", crc, *((u32*)(src + 1))));
 #endif // NET_USE_COMPRESSION_CRC
 
-    CS.Enter();
+    pcs->Enter();
     u32 uncompressed_size = DECODE(dest, dest_size, src + offset, count - offset);
-    CS.Leave();
+    pcs->Leave();
 
     return (u16)uncompressed_size;
 

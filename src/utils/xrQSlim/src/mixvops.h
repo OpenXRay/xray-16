@@ -2,6 +2,9 @@
 #define MIXVOPS_INCLUDED //
 #endif // WARNING:  Multiple inclusions allowed
 
+#include "xrCommon/math_funcs_inline.h"
+#include "xrCore/_std_extensions.h"
+
 /************************************************************************
 
   Low-level vector math operations.

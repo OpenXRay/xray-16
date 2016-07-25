@@ -865,6 +865,7 @@
     <ClInclude Include="game_sv_mp_vote_flags.h" />
     <ClInclude Include="game_sv_single.h" />
     <ClInclude Include="game_sv_teamdeathmatch.h" />
+    <ClInclude Include="game_type.h" />
     <ClInclude Include="GlobalFeelTouch.hpp" />
     <ClInclude Include="GraviArtifact.h" />
     <ClInclude Include="GraviZone.h" />
@@ -2459,6 +2460,7 @@
     <ClCompile Include="game_sv_single.cpp" />
     <ClCompile Include="game_sv_teamdeathmatch.cpp" />
     <ClCompile Include="game_sv_teamdeathmatch_process_event.cpp" />
+    <ClCompile Include="game_type.cpp" />
     <ClCompile Include="GlobalFeelTouch.cpp" />
     <ClCompile Include="GraviArtifact.cpp" />
     <ClCompile Include="GraviZone.cpp" />

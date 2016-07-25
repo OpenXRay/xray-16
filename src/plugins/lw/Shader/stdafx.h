@@ -8,6 +8,7 @@
 #pragma once
 
 #include "xrCore/xrCore.h"
+#include "xrCore/_std_extensions.h"
 #pragma comment(lib, "xrCore.lib")
 
 #define ENGINE_API
