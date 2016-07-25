@@ -24,7 +24,7 @@ XRCORE_API extern u64 qpc_freq;
 XRCORE_API extern u32 qpc_counter;
 
 XRCORE_API extern processor_info ID;
-XRCORE_API extern u64 QPC();
+XRCORE_API extern u64 QPC() noexcept;
 
 #ifdef _MSC_VER
 // XXX: Stale checks. All MS' x86&x64 compilers cabable of compiling XRay-16 have __rdtsc

@@ -23,7 +23,7 @@ protected:
     {
         pcstr m_name;
 
-        CTokenPredicateName(pcstr name) noexcept : m_name(name) {}
+        constexpr CTokenPredicateName(pcstr name) noexcept : m_name(name) {}
         IC bool operator()(const xr_token& token) const noexcept { return token.name && !xr_strcmp(token.name, m_name); }
     };
 

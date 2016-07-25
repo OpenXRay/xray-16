@@ -39,7 +39,7 @@ protected:
     bool paused;
 
 public:
-    CTimerBase() : startTime(), pauseDuration(), pauseAccum(), paused(false) {}
+    constexpr CTimerBase() noexcept : startTime(), pauseDuration(), pauseAccum(), paused(false) {}
 
     void Start()
     {
@@ -88,18 +88,18 @@ class XRCORE_API CTimer : public CTimerBase
     }
 
 public:
-    CTimer() : m_time_factor(1.f), realTime(), time() {}
+    constexpr CTimer() noexcept : m_time_factor(1.f), realTime(), time() {}
 
-    void Start()
+    void Start() noexcept
     {
         if (paused) return;
 
         super::Start();
     }
 
-    float time_factor() const { return m_time_factor; }
+    float time_factor() const noexcept { return m_time_factor; }
 
-    void time_factor(const float time_factor)
+    void time_factor(const float time_factor) noexcept
     {
         const auto current = super::getElapsedTime();
         time = getElapsedTime(current);
@@ -118,11 +118,11 @@ class XRCORE_API CTimer_paused_ex : public CTimer
     Time save_clock;
 
 public:
-    CTimer_paused_ex() : save_clock() {}
+    CTimer_paused_ex() noexcept : save_clock() {}
     virtual ~CTimer_paused_ex() {}
-    bool Paused() const { return paused; }
+    bool Paused() const noexcept { return paused; }
 
-    void Pause(const bool b)
+    void Pause(const bool b) noexcept
     {
         if (paused == b) return;
 

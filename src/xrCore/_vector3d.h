@@ -21,7 +21,7 @@ struct _vector3
     ICF T& operator[](int i) { return *((T*)this + i); }
     ICF T& operator[](int i) const { return *((T*)this + i); }
 
-    ICF SelfRef set(T _x, T _y, T _z)
+    ICF SelfRef set(T _x, T _y, T _z) noexcept
     {
         x = _x;
         y = _y;
@@ -29,7 +29,7 @@ struct _vector3
         return *this;
     }
 
-    ICF SelfRef set(const _vector3<float>& v)
+    ICF SelfRef set(const _vector3<float>& v) noexcept
     {
         x = T(v.x);
         y = T(v.y);
@@ -37,7 +37,7 @@ struct _vector3
         return *this;
     }
 
-    ICF SelfRef set(const _vector3<double>& v)
+    ICF SelfRef set(const _vector3<double>& v) noexcept
     {
         x = T(v.x);
         y = T(v.y);
@@ -45,7 +45,7 @@ struct _vector3
         return *this;
     }
 
-    ICF SelfRef set(float* p)
+    ICF SelfRef set(float* p) noexcept
     {
         x = p[0];
         y = p[1];
@@ -53,7 +53,7 @@ struct _vector3
         return *this;
     }
 
-    ICF SelfRef set(double* p)
+    ICF SelfRef set(double* p) noexcept
     {
         x = p[0];
         y = p[1];
@@ -61,7 +61,8 @@ struct _vector3
         return *this;
     }
 
-    ICF SelfRef add(const Self& v)
+    // XXX: The vast majority of these basic math operations can be expressed as non-class functions.
+    ICF SelfRef add(const Self& v) noexcept
     {
         x += v.x;
         y += v.y;
@@ -69,7 +70,7 @@ struct _vector3
         return *this;
     }
 
-    ICF SelfRef add(T s)
+    ICF SelfRef add(T s) noexcept
     {
         x += s;
         y += s;
@@ -77,7 +78,7 @@ struct _vector3
         return *this;
     }
 
-    ICF SelfRef add(const Self& a, const Self& v)
+    ICF SelfRef add(const Self& a, const Self& v) noexcept
     {
         x = a.x + v.x;
         y = a.y + v.y;
@@ -85,7 +86,7 @@ struct _vector3
         return *this;
     }
 
-    ICF SelfRef add(const Self& a, T s)
+    ICF SelfRef add(const Self& a, T s) noexcept
     {
         x = a.x + s;
         y = a.y + s;
@@ -93,7 +94,7 @@ struct _vector3
         return *this;
     }
 
-    ICF SelfRef sub(const Self& v)
+    ICF SelfRef sub(const Self& v) noexcept
     {
         x -= v.x;
         y -= v.y;
@@ -101,7 +102,7 @@ struct _vector3
         return *this;
     }
 
-    ICF SelfRef sub(T s)
+    ICF SelfRef sub(T s) noexcept
     {
         x -= s;
         y -= s;
@@ -109,7 +110,7 @@ struct _vector3
         return *this;
     }
 
-    ICF SelfRef sub(const Self& a, const Self& v)
+    ICF SelfRef sub(const Self& a, const Self& v) noexcept
     {
         x = a.x - v.x;
         y = a.y - v.y;
@@ -117,7 +118,7 @@ struct _vector3
         return *this;
     }
 
-    ICF SelfRef sub(const Self& a, T s)
+    ICF SelfRef sub(const Self& a, T s) noexcept
     {
         x = a.x - s;
         y = a.y - s;
@@ -125,7 +126,7 @@ struct _vector3
         return *this;
     }
 
-    ICF SelfRef mul(const Self& v)
+    ICF SelfRef mul(const Self& v) noexcept
     {
         x *= v.x;
         y *= v.y;
@@ -133,7 +134,7 @@ struct _vector3
         return *this;
     }
 
-    ICF SelfRef mul(T s)
+    ICF SelfRef mul(T s) noexcept
     {
         x *= s;
         y *= s;
@@ -141,7 +142,7 @@ struct _vector3
         return *this;
     }
 
-    ICF SelfRef mul(const Self& a, const Self& v)
+    ICF SelfRef mul(const Self& a, const Self& v) noexcept
     {
         x = a.x * v.x;
         y = a.y * v.y;
@@ -149,7 +150,7 @@ struct _vector3
         return *this;
     }
 
-    ICF SelfRef mul(const Self& a, T s)
+    ICF SelfRef mul(const Self& a, T s) noexcept
     {
         x = a.x * s;
         y = a.y * s;
@@ -157,7 +158,7 @@ struct _vector3
         return *this;
     }
 
-    ICF SelfRef div(const Self& v)
+    ICF SelfRef div(const Self& v) noexcept
     {
         x /= v.x;
         y /= v.y;
@@ -165,7 +166,7 @@ struct _vector3
         return *this;
     }
 
-    ICF SelfRef div(T s)
+    ICF SelfRef div(T s) noexcept
     {
         x /= s;
         y /= s;
@@ -173,7 +174,7 @@ struct _vector3
         return *this;
     }
 
-    ICF SelfRef div(const Self& a, const Self& v)
+    ICF SelfRef div(const Self& a, const Self& v) noexcept
     {
         x = a.x / v.x;
         y = a.y / v.y;
@@ -181,7 +182,7 @@ struct _vector3
         return *this;
     }
 
-    ICF SelfRef div(const Self& a, T s)
+    ICF SelfRef div(const Self& a, T s) noexcept
     {
         x = a.x / s;
         y = a.y / s;

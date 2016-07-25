@@ -159,7 +159,7 @@ XRCORE_API u32 qpc_counter = 0;
 
 XRCORE_API processor_info ID;
 
-XRCORE_API u64 QPC()
+XRCORE_API u64 QPC() noexcept
 {
     u64 _dest;
     QueryPerformanceCounter((PLARGE_INTEGER)&_dest);

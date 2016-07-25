@@ -4,14 +4,14 @@
 #include "xrCommon/inlining_macros.h"
 #include "xrCore/_bitwise.h" // iFloor
 
-inline float _abs(float x) { return fabsf(x); }
-inline float _sqrt(float x) { return sqrtf(x); }
-inline float _sin(float x) { return sinf(x); }
-inline float _cos(float x) { return cosf(x); }
-inline double _abs(double x) { return fabs(x); }
-inline double _sqrt(double x) { return sqrt(x); }
-inline double _sin(double x) { return sin(x); }
-inline double _cos(double x) { return cos(x); }
+inline float _abs(float x) noexcept { return fabsf(x); }
+inline float _sqrt(float x) noexcept { return sqrtf(x); }
+inline float _sin(float x) noexcept { return sinf(x); }
+inline float _cos(float x) noexcept { return cosf(x); }
+inline double _abs(double x) noexcept { return fabs(x); }
+inline double _sqrt(double x) noexcept { return sqrt(x); }
+inline double _sin(double x) noexcept { return sin(x); }
+inline double _cos(double x) noexcept { return cos(x); }
 
 // comparisions
 inline bool fsimilar(float a, float b, float cmp = EPS) { return _abs(a-b)<cmp; }
@@ -21,14 +21,14 @@ inline bool fis_zero(float val, float cmp = EPS_S) noexcept { return _abs(val) <
 inline bool dis_zero(double val, double cmp = EPS_S) noexcept { return _abs(val) < cmp; }
 
 // degree to radians and vice-versa
-ICF float  deg2rad(float  val) { return val*M_PI / 180; }
-ICF double deg2rad(double val) { return val*M_PI / 180; }
-ICF float  rad2deg(float  val) { return val*180 / M_PI; }
-ICF double rad2deg(double val) { return val*180 / M_PI;}
+constexpr float  deg2rad(float  val) noexcept { return val*M_PI / 180; }
+constexpr double deg2rad(double val) noexcept { return val*M_PI / 180; }
+constexpr float  rad2deg(float  val) noexcept { return val*180 / M_PI; }
+constexpr double rad2deg(double val) noexcept { return val*180 / M_PI;}
 
 // clamping/snapping
 template <class T>
-IC void clamp(T& val, const T& _low, const T& _high)
+constexpr void clamp(T& val, const T& _low, const T& _high)
 {
     if (val<_low)
         val = _low;
@@ -36,17 +36,18 @@ IC void clamp(T& val, const T& _low, const T& _high)
         val = _high;
 }
 
+// XXX: Check usages and provide overloads for native types where arguments are NOT references.
 template <class T>
-IC T clampr(const T& val, const T& _low, const T& _high)
+constexpr T clampr(const T& val, const T& _low, const T& _high)
 {
-    if (val<_low)
+    if (val < _low)
         return _low;
-    if (val>_high)
+    if (val > _high)
         return _high;
     return val;
 }
 
-IC float snapto(float value, float snap)
+inline float snapto(float value, float snap)
 {
     if (snap <= 0.f)
         return value;
