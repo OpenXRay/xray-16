@@ -14,6 +14,7 @@
 #include "alife_object_registry.h"
 #include "xrServer_Objects_ALife_Monsters.h"
 #include "xrScriptEngine/script_engine.hpp"
+#include "xrGame/game_type.h"
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -62,7 +63,7 @@ RELATION_REGISTRY::~RELATION_REGISTRY() {}
 //////////////////////////////////////////////////////////////////////////
 
 extern void load_attack_goodwill();
-extern bool IsGameTypeSingle();
+
 CRelationRegistryWrapper& RELATION_REGISTRY::relation_registry()
 {
     if (!m_relation_registry)

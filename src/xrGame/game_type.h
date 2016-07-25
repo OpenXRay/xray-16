@@ -1,5 +1,5 @@
 #pragma once
 
-bool OnServer() throw();
-bool OnClient() throw();
-bool IsGameTypeSingle() throw();
+bool OnServer() noexcept;
+bool OnClient() noexcept;
+bool IsGameTypeSingle() noexcept;

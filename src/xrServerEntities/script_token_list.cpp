@@ -15,7 +15,7 @@ CScriptTokenList::CScriptTokenList()
     clear();
 }
 
-CScriptTokenList::~CScriptTokenList() throw()
+CScriptTokenList::~CScriptTokenList() noexcept
 {
     // XXX: Xottab_DUTY: Replace with range-based for
     iterator I = tokens().begin();

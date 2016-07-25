@@ -28,8 +28,8 @@ public:
         };
     };
 
-    bool is_valid() const throw() { return (x2 >= x1) && (y2 >= y1) && (z2 >= z1); }
-    const T* data() const throw() { return &vMin.x; }
+    bool is_valid() const noexcept { return (x2 >= x1) && (y2 >= y1) && (z2 >= z1); }
+    const T* data() const noexcept { return &vMin.x; }
 
     SelfRef set(const Tvector& _min, const Tvector& _max)
     {

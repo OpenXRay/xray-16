@@ -12,7 +12,7 @@ bool OnClient() noexcept
     return g_pGameLevel != nullptr ? Level().IsClient() : false;
 }
 
-bool IsGameTypeSingle() throw()
+bool IsGameTypeSingle() noexcept
 {
     return g_pGamePersistent->GameType() == eGameIDSingle;
 }

@@ -180,10 +180,10 @@ IC bool operator<(shared_str const& a, shared_str const& b) { return a._get() < 
 IC bool operator>(shared_str const& a, shared_str const& b) { return a._get() > b._get(); }
 // externally visible standard functionality
 IC void swap(shared_str& lhs, shared_str& rhs) { lhs.swap(rhs); }
-IC u32 xr_strlen(const shared_str& a) throw() { return a.size(); }
-IC int xr_strcmp(const shared_str& a, const char* b) throw() { return xr_strcmp(*a, b); }
-IC int xr_strcmp(const char* a, const shared_str& b) throw() { return xr_strcmp(a, *b); }
-IC int xr_strcmp(const shared_str& a, const shared_str& b) throw()
+IC u32 xr_strlen(const shared_str& a) noexcept { return a.size(); }
+IC int xr_strcmp(const shared_str& a, const char* b) noexcept { return xr_strcmp(*a, b); }
+IC int xr_strcmp(const char* a, const shared_str& b) noexcept { return xr_strcmp(a, *b); }
+IC int xr_strcmp(const shared_str& a, const shared_str& b) noexcept
 {
     if (a.equal(b))
         return 0;

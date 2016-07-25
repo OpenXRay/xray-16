@@ -109,7 +109,7 @@ public:
     struct W_guard
     {
         bool* guarded;
-        W_guard(bool* b) throw() : guarded(b) { *b = true; }
+        W_guard(bool* b) noexcept : guarded(b) { *b = true; }
         ~W_guard() { *guarded = false; }
     };
 	void w(const void* p, u32 count);

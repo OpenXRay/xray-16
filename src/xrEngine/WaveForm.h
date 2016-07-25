@@ -15,8 +15,9 @@ struct WaveForm
         fINVSAWTOOTH,
         fFORCE32 = u32(-1)
     };
-    IC float signf(float t) { return t / _abs(t); }
-    IC float Func(float t)
+
+    IC float signf(float t) noexcept { return t / _abs(t); }
+    IC float Func(float t) noexcept
     {
         switch (F)
         {
@@ -26,20 +27,21 @@ struct WaveForm
         case fSQUARE: return signf(_cos(t * PI));
         case fSAWTOOTH: return atanf(tanf((t + 0.5f) * PI)) / PI_DIV_2;
         case fINVSAWTOOTH: return -(atanf(tanf((t + 0.5f) * PI)) / PI_DIV_2);
+        default: return 0.f;
         }
-        return 0.f;
     }
 
 public:
     EFunction F;
     float arg[4];
 
-    IC float Calculate(float t)
+    IC float Calculate(float t) noexcept
     {
         // y = arg0 + arg1*func( (time+arg2)*arg3 )
         float x = (t + arg[2]) * arg[3];
         return arg[0] + arg[1] * Func(x - floorf(x));
     }
+
     WaveForm()
     {
         F = fCONSTANT;
@@ -49,7 +51,7 @@ public:
         arg[3] = 1;
     }
 
-    IC bool Similar(const WaveForm& W) const
+    IC bool Similar(const WaveForm& W) const noexcept
     {
         if (!fsimilar(arg[0], W.arg[0], EPS_L))
             return false;

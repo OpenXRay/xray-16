@@ -11,8 +11,8 @@
 void* operator new(const size_t size) { return Memory.mem_alloc(size); }
 void* operator new[](const size_t size) { return Memory.mem_alloc(size); }
 
-void operator delete(void* p) throw() { Memory.mem_free(p); }
-void operator delete[](void* p) throw() { Memory.mem_free(p); }
+void operator delete(void* p) noexcept { Memory.mem_free(p); }
+void operator delete[](void* p) noexcept { Memory.mem_free(p); }
 #endif
 
 #ifdef USE_DOUG_LEA_ALLOCATOR

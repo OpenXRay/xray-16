@@ -75,7 +75,7 @@ IC T _sqr(T a)
     return a * a;
 }
 
-IC bool _valid(const float x) throw()
+IC bool _valid(const float x) noexcept
 {
     // check for: Signaling NaN, Quiet NaN, Negative infinity ( –INF), Positive infinity (+INF), Negative denormalized,
     // Positive denormalized

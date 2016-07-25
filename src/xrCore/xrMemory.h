@@ -96,7 +96,7 @@ T* xr_alloc(const size_t count)
 
 
 template <class T>
-void xr_free(T*& P) throw()
+void xr_free(T*& P) noexcept
 {
     if (P)
     {
@@ -117,9 +117,9 @@ XRCORE_API pstr xr_strdup(pcstr string);
 // XXX: Implementations of operator new/delete are in xrMisc/xrMemory.cpp, since they need
 // to be in a static link library.
 void* operator new(const size_t size);
-void operator delete(void* p);
+void operator delete(void* p) noexcept;
 void* operator new[](const size_t size);
-void operator delete[](void* p);
+void operator delete[](void* p) noexcept;
 #endif
 
 // POOL-ing

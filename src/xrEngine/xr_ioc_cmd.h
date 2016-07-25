@@ -207,7 +207,7 @@ public:
             tok++;
         }
     }
-    virtual const xr_token* GetToken() { return tokens; }
+    virtual const xr_token* GetToken() noexcept { return tokens; }
     virtual void fill_tips(vecTips& tips, u32 /*mode*/)
     {
         TStatus str;

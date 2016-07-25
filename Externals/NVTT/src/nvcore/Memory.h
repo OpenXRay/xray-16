@@ -28,22 +28,22 @@ namespace nv
 
 // Override new/delete
 
-inline void * operator new (size_t size) throw()
+inline void * operator new (size_t size) noexcept
 {
 	return nv::mem::malloc(size); 
 }
 
-inline void operator delete (void *p) throw()
+inline void operator delete (void *p) noexcept
 {
 	nv::mem::free(p); 
 }
 
-inline void * operator new [] (size_t size) throw()
+inline void * operator new [] (size_t size) noexcept
 {
 	return nv::mem::malloc(size);
 }
 
-inline void operator delete [] (void * p) throw()
+inline void operator delete [] (void * p) noexcept
 {
 	nv::mem::free(p); 
 }
@@ -139,7 +139,7 @@ void* operator new(std::size_t sz) throw (std::bad_alloc)
 	gNewCounter++;
 	return result;
 }
-void operator delete(void* p) throw()
+void operator delete(void* p) noexcept
 {
 	if (p == NULL)
 		return;
@@ -150,7 +150,7 @@ void operator delete(void* p) throw()
 /* These are the 'nothrow' versions of the above operators.
    The system version will try to call a std::new_handler if they
    fail, but your overriding versions are not required to do this.  */
-void* operator new(std::size_t sz, const std::nothrow_t&) throw()
+void* operator new(std::size_t sz, const std::nothrow_t&) noexcept
 {
 	try {
 		void * result = ::operator new (sz);  // calls our overridden operator new
@@ -159,7 +159,7 @@ void* operator new(std::size_t sz, const std::nothrow_t&) throw()
 	  return NULL;
 	}
 }
-void operator delete(void* p, const std::nothrow_t&) throw()
+void operator delete(void* p, const std::nothrow_t&) noexcept
 {
 	::operator delete (p);
 }

@@ -161,7 +161,7 @@ template Dquaternion& Dquaternion::set(const _matrix<double>& M);
 // quaternion non-member functions
 
 /* Commented out, since it's currently unused (only use is commented out in xrPhysics)
-void twoq_2w(const Fquaternion& q1, const Fquaternion& q2, float dt, Fvector& w) throw()
+void twoq_2w(const Fquaternion& q1, const Fquaternion& q2, float dt, Fvector& w) noexcept
 {
 	//	
 	//	w=	2/dt*arccos(q1.w*q2.w+ q1.v.dotproduct(q2.v))

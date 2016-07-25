@@ -7,7 +7,6 @@
 // Copyright 2005 GSC Game World
 
 #include "StdAfx.h"
-bool IsGameTypeSingle();
 #include "UIMessagesWindow.h"
 #include "UIGameLog.h"
 #include "UIChatWnd.h"
@@ -16,6 +15,7 @@ bool IsGameTypeSingle();
 #include "UIInventoryUtilities.h"
 #include "game_news.h"
 #include "UIPdaMsgListItem.h"
+#include "xrGame/game_type.h"
 
 CUIMessagesWindow::CUIMessagesWindow() : m_pChatLog(NULL), m_pChatWnd(NULL), m_pGameLog(NULL)
 {

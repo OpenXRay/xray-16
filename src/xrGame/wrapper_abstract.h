@@ -22,7 +22,7 @@ protected:
     _object_type* m_object;
 
 public:
-    CWrapperAbstract() throw() : m_object(nullptr) {}
+    CWrapperAbstract() noexcept : m_object(nullptr) {}
 
     template <typename T1>
     CWrapperAbstract(T1 t1) : inherited(t1), m_object(nullptr) {}
@@ -46,7 +46,7 @@ protected:
     _object_type* m_object;
 
 public:
-    CWrapperAbstract2() throw() : m_object(nullptr) {}
+    CWrapperAbstract2() noexcept : m_object(nullptr) {}
 
     template <typename T1>
     CWrapperAbstract2(T1 t1) : inherited(t1), m_object(nullptr) {}

@@ -7,17 +7,17 @@ private:
     void* handle;
 
 public:
-    Event() throw();
-    ~Event() throw();
+    Event() noexcept;
+    ~Event() noexcept;
 
     // Reset the event to the unsignalled state.
-    void Reset() throw();
+    void Reset() noexcept;
     // Set the event to the signalled state.
-    void Set() throw();
+    void Set() noexcept;
     // Wait indefinitely for the object to become signalled.
-    void Wait() const throw();
+    void Wait() const noexcept;
     // Wait, with a time limit, for the object to become signalled.
-    bool Wait(u32 millisecondsTimeout) const throw();
+    bool Wait(u32 millisecondsTimeout) const noexcept;
 
-    void* GetHandle() const throw() { return handle; }
+    void* GetHandle() const noexcept { return handle; }
 };

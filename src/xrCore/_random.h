@@ -31,7 +31,7 @@ public:
 
     void seed(s32 val) { holdrand = val; }
     s32 maxI() { return 32767; }
-    ICN s32 randI() { return (holdrand = holdrand * 214013L + 2531011L) >> 16 & 0x7fff; }
+    ICN s32 randI() noexcept { return (holdrand = holdrand * 214013L + 2531011L) >> 16 & 0x7fff; }
     s32 randI(s32 max) { VERIFY(max); return randI() % max; };
     s32 randI(s32 min, s32 max) { return min + randI(max - min); }
     s32 randIs(s32 range) { return randI(-range, range); }

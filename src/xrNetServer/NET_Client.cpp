@@ -1186,7 +1186,7 @@ bool IPureClient::Connect(pcstr options)
                     dpSessionName = rhs.dpSessionName;
                 }
 
-                IPureClient::HOST_NODE::HOST_NODE(HOST_NODE&& rhs) throw() :
+                IPureClient::HOST_NODE::HOST_NODE(HOST_NODE&& rhs) noexcept :
                     pdpAppDesc(rhs.pdpAppDesc)
                 {
                     pHostAddress = rhs.pHostAddress;
@@ -1195,7 +1195,7 @@ bool IPureClient::Connect(pcstr options)
                     rhs.pHostAddress = nullptr;
                 }
 
-                IPureClient::HOST_NODE::~HOST_NODE() throw()
+                IPureClient::HOST_NODE::~HOST_NODE() noexcept
                 {
                     delete pdpAppDesc;
                 }

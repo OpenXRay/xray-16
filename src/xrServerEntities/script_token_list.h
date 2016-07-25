@@ -23,15 +23,15 @@ protected:
     {
         pcstr m_name;
 
-        CTokenPredicateName(pcstr name) throw() : m_name(name) {}
-        IC bool operator()(const xr_token& token) const throw() { return token.name && !xr_strcmp(token.name, m_name); }
+        CTokenPredicateName(pcstr name) noexcept : m_name(name) {}
+        IC bool operator()(const xr_token& token) const noexcept { return token.name && !xr_strcmp(token.name, m_name); }
     };
 
     struct CTokenPredicateID
     {
         int m_id;
 
-        CTokenPredicateID(int id) throw() : m_id(id) {}
+        CTokenPredicateID(int id) noexcept : m_id(id) {}
         IC bool operator()(const xr_token& token) const { return token.name && (token.id == m_id); }
     };
 
@@ -48,6 +48,6 @@ public:
     void clear();
     int id(pcstr name);
     pcstr name(int id);
-    const TOKEN_LIST& tokens() const throw() { return m_token_list; }
-    TOKEN_LIST& tokens() throw() { return m_token_list; }
+    const TOKEN_LIST& tokens() const noexcept { return m_token_list; }
+    TOKEN_LIST& tokens() noexcept { return m_token_list; }
 };

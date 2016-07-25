@@ -53,8 +53,8 @@ protected:
     {
         HOST_NODE();
         HOST_NODE(const HOST_NODE& rhs);
-        HOST_NODE(HOST_NODE&& rhs) throw();
-        ~HOST_NODE() throw();
+        HOST_NODE(HOST_NODE&& rhs) noexcept;
+        ~HOST_NODE() noexcept;
 
         DPN_APPLICATION_DESC* pdpAppDesc;
         IDirectPlay8Address* pHostAddress;
