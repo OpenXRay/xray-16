@@ -10206,6 +10206,9 @@
       <Filter>UI\Common\PDA\FractionWar</Filter>
     </ClCompile>
     <ClCompile Include="game_type.cpp" />
+    <ClCompile Include="ai\monsters\state.cpp">
+      <Filter>AI\AMonsters\common\components\State</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="ai\monsters\chimera\chimera_attack_state.h">

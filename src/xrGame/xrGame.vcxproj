@@ -2038,6 +2038,7 @@
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
     <ClCompile Include="ai\Monsters\Snork\snork_state_manager.cpp" />
+    <ClCompile Include="ai\monsters\state.cpp" />
     <ClCompile Include="ai\Monsters\telekinesis.cpp" />
     <ClCompile Include="ai\Monsters\telekinetic_object.cpp" />
     <ClCompile Include="ai\Monsters\Tushkano\tushkano.cpp" />
