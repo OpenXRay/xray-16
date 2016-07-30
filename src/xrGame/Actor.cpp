@@ -1,6 +1,6 @@
 #include "pch_script.h"
 #include "Actor_Flags.h"
-#include "hudmanager.h"
+#include "HUDManager.h"
 
 #ifdef DEBUG
 #include "PHDebug.h"
@@ -10,7 +10,7 @@
 #include "hit.h"
 #include "PHDestroyable.h"
 #include "Car.h"
-#include "xrserver_objects_alife_monsters.h"
+#include "xrServer_Objects_ALife_Monsters.h"
 #include "CameraLook.h"
 #include "CameraFirstEye.h"
 #include "effectorfall.h"
@@ -78,6 +78,11 @@
 const u32 patch_frames = 50;
 const float respawn_delay = 1.f;
 const float respawn_auto = 7.f;
+
+//Alundaio
+#include "script_hit.h"
+#include "xrScriptEngine/script_engine.hpp"
+//-Alundaio
 
 static float IReceived = 0;
 static float ICoincidenced = 0;
@@ -583,6 +588,28 @@ void CActor::Hit(SHit* pHDS)
         HDS.add_wound = true;
         if (g_Alive())
         {
+            CScriptHit tLuaHit;
+
+            tLuaHit.m_fPower = HDS.power;
+            tLuaHit.m_fImpulse = HDS.impulse;
+            tLuaHit.m_tDirection = HDS.direction();
+            tLuaHit.m_tHitType = HDS.hit_type;
+            tLuaHit.m_tpDraftsman = smart_cast<const CGameObject*>(HDS.who)->lua_game_object();
+
+            luabind::functor<bool> funct;
+            if (GEnv.ScriptEngine->functor("_G.CActor__BeforeHitCallback", funct))
+            {
+                if (!funct(smart_cast<CGameObject*>(this->lua_game_object()), &tLuaHit, HDS.boneID))
+                    return;
+            }
+
+            HDS.power = tLuaHit.m_fPower;
+            HDS.impulse = tLuaHit.m_fImpulse;
+            HDS.dir = tLuaHit.m_tDirection;
+            HDS.hit_type = (ALife::EHitType)tLuaHit.m_tHitType;
+            //HDS.who = smart_cast<IGameObject*>(tLuaHit.m_tpDraftsman->object());
+            //HDS.whoID = tLuaHit.m_tpDraftsman->ID();
+
             /* AVO: send script callback*/
             callback(GameObject::eHit)(
                 this->lua_game_object(),

@@ -14,6 +14,9 @@
 
 #include "ui_base.h"
 
+#include "script_callback_ex.h"
+#include "script_game_object.h"
+
 CHudItem::CHudItem()
 {
     RenderHud(TRUE);
@@ -138,6 +141,12 @@ void CHudItem::OnStateSwitch(u32 S, u32 oldState)
 
 void CHudItem::OnAnimationEnd(u32 state)
 {
+    CActor* A = smart_cast<CActor*>(object().H_Parent());
+    if (A)
+        A->callback(GameObject::eActorHudAnimationEnd)(smart_cast<CGameObject*>(this)->lua_game_object(),
+                                                       this->hud_sect.c_str(), this->m_current_motion.c_str(), state,
+                                                       this->animation_slot());
+
     switch (state)
     {
     case eBore: { SwitchState(eIdle);

@@ -54,6 +54,8 @@ enum ECallbackType
     eInvBoxItemTake,
     eWeaponNoAmmoAvailable,
 
+    //Alundaio: added defines
+    eActorHudAnimationEnd,
     //AVO: custom callbacks
     // Input
     eKeyPress,
@@ -78,6 +80,7 @@ enum ECallbackType
     eOnWeaponZoomIn,
     eOnWeaponZoomOut,
     eOnWeaponJammed,
+    eOnWeaponMagazineEmpty,
 
     eDummy = u32(-1),
 };

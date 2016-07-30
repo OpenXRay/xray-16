@@ -11,6 +11,7 @@
 #include "xrPhysics/DamageSource.h"
 #include "wallmark_manager.h"
 #include "ParticlesObject.h"
+#include "HudSound.h"
 #include "xrCDB/xr_collide_defs.h"
 
 class IRender_Light;
@@ -75,6 +76,12 @@ private:
         collide::rq_results& storage, IGameObject* blasted_obj);
     void LightCreate();
     void LightDestroy();
+
+    //Alundaio: LAYERED_SND_SHOOT
+#ifdef LAYERED_SND_SHOOT
+    HUD_SOUND_COLLECTION_LAYERED m_layered_sounds;
+#endif
+    //-Alundaio
 
 protected:
     CWalmarkManager m_wallmark_manager;

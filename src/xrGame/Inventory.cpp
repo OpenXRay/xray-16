@@ -1071,6 +1071,13 @@ bool CInventory::Eat(PIItem pIItem)
         pItemToEat->object().cNameSect().c_str());
 #endif // MP_LOGGING
 
+    luabind::functor<bool>	funct;
+    if (GEnv.ScriptEngine->functor("_G.CInventory__eat", funct))
+    {
+        if (!funct(smart_cast<CGameObject*>(pItemToEat->object().H_Parent())->lua_game_object(), (smart_cast<CGameObject*>(pIItem))->lua_game_object()))
+            return false;
+    }
+
     if (Actor()->m_inventory == this)
     {
         if (IsGameTypeSingle())

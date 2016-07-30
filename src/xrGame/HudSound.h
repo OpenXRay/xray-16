@@ -89,6 +89,8 @@ public:
     void StopSound(pcstr alias);
     void StopAllSounds();
     void LoadSound(pcstr section, pcstr line, pcstr alias, bool exclusive = false, int type = sg_SourceType);
+    void LoadSound(CInifile const* ini, pcstr section, pcstr line, pcstr alias, bool exclusive = false,
+                   int type = sg_SourceType);
     void SetPosition(pcstr alias, const Fvector& pos);
 };
 #endif

@@ -20,6 +20,8 @@
 #include "level_bullet_manager.h"
 #include "xrmessages.h"
 #include "xrEngine/GameMtlLib.h"
+#include "HudSound.h"
+#include "script_game_object.h"
 
 #ifdef DEBUG
 #include "xrEngine/StatGraph.h"
@@ -76,7 +78,12 @@ void CExplosive::LightCreate()
 }
 
 void CExplosive::LightDestroy() { m_pLight.destroy(); }
-CExplosive::~CExplosive(void) { sndExplode.destroy(); }
+CExplosive::~CExplosive(void)
+{
+#ifndef LAYERED_SND_SHOOT
+    sndExplode.destroy();
+#endif
+}
 void CExplosive::Load(LPCSTR section) { Load(pSettings, section); }
 void CExplosive::Load(CInifile const* ini, LPCSTR section)
 {
@@ -106,8 +113,13 @@ void CExplosive::Load(CInifile const* ini, LPCSTR section)
     //трассы для разлета осколков
     m_fFragmentSpeed = ini->r_float(section, "fragment_speed");
 
-    LPCSTR snd_name = ini->r_string(section, "snd_explode");
+    //Alundaio: LAYERED_SND_SHOOT
+#ifdef LAYERED_SND_SHOOT
+    m_layered_sounds.LoadSound(ini,section, "snd_explode", "sndExplode", false, m_eSoundExplode);
+#else
+    pcstr snd_name = ini->r_string(section, "snd_explode");
     sndExplode.create(snd_name, st_Effect, m_eSoundExplode);
+#endif
 
     m_fExplodeDurationMax = ini->r_float(section, "explode_duration");
 
@@ -333,7 +345,11 @@ void CExplosive::Explode()
     //	Msg("---------CExplosive Explode [%d] frame[%d]",cast_game_object()->ID(), Device.dwFrame);
     OnBeforeExplosion();
     //играем звук взрыва
+#ifdef LAYERED_SND_SHOOT
+    m_layered_sounds.PlaySound("sndExplode", pos, smart_cast<IGameObject*>(this), false, false, (u8)-1);
+#else
     GEnv.Sound->play_at_pos(sndExplode, 0, pos, false);
+#endif
 
     //показываем эффекты
 
