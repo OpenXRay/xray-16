@@ -332,5 +332,38 @@ void HUD_SOUND_COLLECTION_LAYERED::LoadSound(LPCSTR section, LPCSTR line, LPCSTR
 		snd_item.m_alias = alias;
 	}
 }
+
+void HUD_SOUND_COLLECTION_LAYERED::LoadSound(CInifile const *ini, LPCSTR section, LPCSTR line, LPCSTR alias, bool exclusive, int type)
+{
+	LPCSTR str = ini->r_string(section, line);
+	string256 buf_str;
+
+	int	count = _GetItemCount(str);
+	R_ASSERT(count);
+
+	_GetItem(str, 0, buf_str);
+
+	if (ini->section_exist(buf_str))
+	{
+		string256 sound_line;
+		xr_strcpy(sound_line, "snd_1_layer");
+		int k = 1;
+		while (ini->line_exist(buf_str, sound_line))
+		{
+			m_sound_items.resize(m_sound_items.size() + 1);
+			HUD_SOUND_COLLECTION& snd_item = m_sound_items.back();
+			snd_item.LoadSound(buf_str, sound_line, alias, exclusive, type);
+			snd_item.m_alias = alias;
+			xr_sprintf(sound_line, "snd_%d_layer", ++k);
+		}
+	}
+	else //For compatibility with normal HUD_SOUND_COLLECTION sounds
+	{
+		m_sound_items.resize(m_sound_items.size() + 1);
+		HUD_SOUND_COLLECTION& snd_item = m_sound_items.back();
+		snd_item.LoadSound(section, line, alias, exclusive, type);
+		snd_item.m_alias = alias;
+	}
+}
 #endif
 //-Alundaio

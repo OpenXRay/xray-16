@@ -12,6 +12,8 @@
 #include "../xrphysics/DamageSource.h"
 #include "wallmark_manager.h"
 #include "ParticlesObject.h"
+#include "hudsound.h"
+
 class IRender_Light;
 DEFINE_VECTOR(CPhysicsShellHolder*,BLASTED_OBJECTS_V,BLASTED_OBJECTS_I);
 class CExplosive : 
@@ -77,6 +79,12 @@ static		float				TestPassEffect			(const	Fvector	&source_p,	const	Fvector	&dir,f
 			void				LightCreate				();
 			void				LightDestroy			();
 protected:
+
+	//Alundaio: LAYERED_SND_SHOOT
+#ifdef LAYERED_SND_SHOOT
+	HUD_SOUND_COLLECTION_LAYERED m_layered_sounds;
+#endif
+	//-Alundaio
 
 	CWalmarkManager				m_wallmark_manager;
 	//ID персонажа который иницировал действие

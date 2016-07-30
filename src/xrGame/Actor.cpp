@@ -76,6 +76,12 @@
 
 #include "build_config_defines.h"
 
+//Alundaio
+#include "script_hit.h"
+#include "../../xrServerEntities/script_engine.h" 
+using namespace luabind;
+//-Alundaio
+
 const u32		patch_frames = 50;
 const float		respawn_delay = 1.f;
 const float		respawn_auto = 7.f;
@@ -618,6 +624,28 @@ void	CActor::Hit(SHit* pHDS)
             HDS.add_wound = true;
             if (g_Alive())
             {
+				CScriptHit tLuaHit;
+
+				tLuaHit.m_fPower = HDS.power;
+				tLuaHit.m_fImpulse = HDS.impulse;
+				tLuaHit.m_tDirection = HDS.direction();
+				tLuaHit.m_tHitType = HDS.hit_type;
+				tLuaHit.m_tpDraftsman = smart_cast<const CGameObject*>(HDS.who)->lua_game_object();
+
+				luabind::functor<bool>	funct;
+				if (ai().script_engine().functor("_G.CActor__BeforeHitCallback", funct))
+				{
+					if ( !funct(smart_cast<CGameObject*>(this->lua_game_object()), &tLuaHit, HDS.boneID) )
+						return;
+				}
+
+				HDS.power = tLuaHit.m_fPower;
+				HDS.impulse = tLuaHit.m_fImpulse;
+				HDS.dir = tLuaHit.m_tDirection;
+				HDS.hit_type = (ALife::EHitType)(tLuaHit.m_tHitType);
+				//HDS.who = smart_cast<CObject*>(tLuaHit.m_tpDraftsman->object());
+				//HDS.whoID = tLuaHit.m_tpDraftsman->ID();
+				
                 /* AVO: send script callback*/
                 callback(GameObject::eHit)(
                     this->lua_game_object(),

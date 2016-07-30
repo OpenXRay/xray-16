@@ -92,6 +92,8 @@ void CScriptGameObject::script_register(lua_State *L)
                 value("take_item_from_box",			int(GameObject::eInvBoxItemTake)),
                 value("weapon_no_ammo",				int(GameObject::eWeaponNoAmmoAvailable)),
 
+				//Alundaio:
+				value("hud_animation_end", int(GameObject::eActorHudAnimationEnd)),
                 //AVO: custom callbacks
                 // input
 #ifdef INPUT_CALLBACKS
@@ -118,6 +120,7 @@ void CScriptGameObject::script_register(lua_State *L)
 				value("weapon_jammed",				int(GameObject::eOnWeaponJammed)),
 				value("weapon_zoom_in",				int(GameObject::eOnWeaponZoomIn)),
 				value("weapon_zoom_out",			int(GameObject::eOnWeaponZoomOut)),
+				value("weapon_magazine_empty",		int(GameObject::eOnWeaponMagazineEmpty)),
 #endif
 #ifdef EXTENDED_ITEM_CALLBACKS
 				// inventory

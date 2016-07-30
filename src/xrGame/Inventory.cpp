@@ -27,6 +27,10 @@
 #include "player_hud.h"
 
 using namespace InventoryUtilities;
+//Alundaio
+#include "../../xrServerEntities/script_engine.h" 
+using namespace luabind; 
+//-Alundaio
 
 // what to block
 u16	INV_STATE_LADDER		= (1<<INV_SLOT_3 | 1<<BINOCULAR_SLOT);
@@ -1062,6 +1066,13 @@ bool CInventory::Eat(PIItem pIItem)
 	Msg( "--- Actor [%d] use or eat [%d][%s]", entity_alive->ID(), pItemToEat->object().ID(), pItemToEat->object().cNameSect().c_str() );
 #endif // MP_LOGGING
 
+	luabind::functor<bool>	funct;
+	if (ai().script_engine().functor("_G.CInventory__eat", funct))
+	{
+		if (!funct(smart_cast<CGameObject*>(pItemToEat->object().H_Parent())->lua_game_object(), (smart_cast<CGameObject*>(pIItem))->lua_game_object()))
+			return false;
+	}
+	
 	if (Actor()->m_inventory == this)
 	{
 		if (IsGameTypeSingle())

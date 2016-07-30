@@ -94,6 +94,7 @@ public:
 	void						StopSound(LPCSTR alias);
 	void						StopAllSounds();
 	void						LoadSound(LPCSTR section, LPCSTR line, LPCSTR alias, bool exclusive = false, int type = sg_SourceType);
+	void						LoadSound(CInifile const *ini, LPCSTR section, LPCSTR line, LPCSTR alias, bool exclusive = false, int type = sg_SourceType);
 	void						SetPosition(LPCSTR alias, const Fvector& pos);
 };
 #endif

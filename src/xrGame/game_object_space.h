@@ -4,56 +4,57 @@ namespace GameObject
 {
     enum ECallbackType
     {
-        eTradeStart = u32(0),
-        eTradeStop,
-        eTradeSellBuyItem,
-        eTradePerformTradeOperation,
+		eTradeStart = u32(0),
+		eTradeStop,
+		eTradeSellBuyItem,
+		eTradePerformTradeOperation,
 
-        eZoneEnter,
-        eZoneExit,
-        eExitLevelBorder,
-        eEnterLevelBorder,
-        eDeath,
+		eZoneEnter,
+		eZoneExit,
+		eExitLevelBorder,
+		eEnterLevelBorder,
+		eDeath,
 
-        ePatrolPathInPoint,
+		ePatrolPathInPoint,
 
-        eInventoryPda,
-        eInventoryInfo,
-        eArticleInfo,
-        eTaskStateChange,
-        eMapLocationAdded,
+		eInventoryPda,
+		eInventoryInfo,
+		eArticleInfo,
+		eTaskStateChange,
+		eMapLocationAdded,
 
-        eUseObject,
+		eUseObject,
 
-        eHit,
+		eHit,
 
-        eSound,
+		eSound,
 
-        eActionTypeMovement,
-        eActionTypeWatch,
-        eActionTypeRemoved,
-        eActionTypeAnimation,
-        eActionTypeSound,
-        eActionTypeParticle,
-        eActionTypeObject,
+		eActionTypeMovement,
+		eActionTypeWatch,
+		eActionTypeRemoved,
+		eActionTypeAnimation,
+		eActionTypeSound,
+		eActionTypeParticle,
+		eActionTypeObject,
 
-        eActorSleep,
+		eActorSleep,
 
-        eHelicopterOnPoint,
-        eHelicopterOnHit,
+		eHelicopterOnPoint,
+		eHelicopterOnHit,
 
-        eOnItemTake,
-        eOnItemDrop,
+		eOnItemTake,
+		eOnItemDrop,
 
-        eScriptAnimation,
+		eScriptAnimation,
 
-        eTraderGlobalAnimationRequest,
-        eTraderHeadAnimationRequest,
-        eTraderSoundEnd,
+		eTraderGlobalAnimationRequest,
+		eTraderHeadAnimationRequest,
+		eTraderSoundEnd,
 
-        eInvBoxItemTake,
-        eWeaponNoAmmoAvailable,
+		eInvBoxItemTake,
+		eWeaponNoAmmoAvailable,
 		//Alundaio: added defines
+		eActorHudAnimationEnd,
         //AVO: custom callbacks
 #ifdef INPUT_CALLBACKS
 		// input
@@ -76,6 +77,7 @@ namespace GameObject
 		eOnWeaponZoomIn,
 		eOnWeaponZoomOut,
 		eOnWeaponJammed,
+		eOnWeaponMagazineEmpty,
 #endif
         // actor
 #ifdef ACTOR_BEFORE_DEATH_CALLBACK
