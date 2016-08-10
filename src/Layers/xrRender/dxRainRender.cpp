@@ -2,7 +2,7 @@
 #include "dxRainRender.h"
 
 #include "../../xrEngine/Rain.h"
-#include "../../xrEngine/iGame_persistent.h"
+
 //	Warning: duplicated in rain.cpp
 static const int	max_desired_items	= 2500;
 static const float	source_radius		= 12.5f;
@@ -45,6 +45,8 @@ void dxRainRender::Copy(IRainRender &_in)
 {
 	*this = *(dxRainRender*)&_in;
 }
+
+#include "../../xrEngine/iGame_persistent.h"
 
 void dxRainRender::Render(CEffect_Rain &owner)
 {
