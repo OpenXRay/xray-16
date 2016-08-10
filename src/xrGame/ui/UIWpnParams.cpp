@@ -227,6 +227,11 @@ bool CUIWpnParams::Check(const shared_str& wpn_section)
 {
     if (pSettings->line_exist(wpn_section, "fire_dispersion_base"))
     {
+        //Alundaio: Most likely a fake weapon or melee weapon
+		if (pSettings->line_exist(wpn_section, "ammo_mag_size") &&
+			pSettings->r_u32(wpn_section, "ammo_mag_size") == 0)
+				return false;
+
         if (0 == xr_strcmp(wpn_section, "wpn_addon_silencer"))
             return false;
         if (0 == xr_strcmp(wpn_section, "wpn_binoc"))
