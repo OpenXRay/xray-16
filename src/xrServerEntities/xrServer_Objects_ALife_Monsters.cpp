@@ -268,6 +268,8 @@ void CSE_ALifeTraderAbstract::OnChangeProfile(PropValue* sender)
 	base()->set_editor_flag		(ISE_Abstract::flVisualChange);
 }
 
+
+
 #ifndef AI_COMPILER
 
 
@@ -420,6 +422,8 @@ void CSE_ALifeTraderAbstract::set_specific_character	(shared_str new_spec_char)
 
 	if(NO_REPUTATION == m_reputation)
 		m_reputation = selected_char.Reputation();
+
+	m_icon_name = selected_char.IconName();
 
 	m_character_name = *(CStringTable().translate(selected_char.Name()));
 	

@@ -1908,10 +1908,11 @@ void CCC_RegisterCommands()
 #ifndef MASTER_GOLD
 	CMD1(CCC_ALifeTimeFactor, "al_time_factor");		// set time factor
 	CMD1(CCC_ALifeSwitchDistance, "al_switch_distance");		// set switch distance
-	CMD1(CCC_ALifeProcessTime, "al_process_time");		// set process time
-	CMD1(CCC_ALifeObjectsPerUpdate, "al_objects_per_update");		// set process time
 	CMD1(CCC_ALifeSwitchFactor, "al_switch_factor");		// set switch factor
 #endif // #ifndef MASTER_GOLD
+
+	CMD1(CCC_ALifeProcessTime, "al_process_time");		// set process time
+	CMD1(CCC_ALifeObjectsPerUpdate, "al_objects_per_update");		// set process time
 
 	CMD3(CCC_Mask, "hud_weapon", &psHUD_Flags, HUD_WEAPON);
 	CMD3(CCC_Mask, "hud_info", &psHUD_Flags, HUD_INFO);

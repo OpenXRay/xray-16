@@ -787,6 +787,11 @@ bool ray_pick (const Fvector& start, const Fvector& dir, float range, collide::r
 	   return false;
 }
 
+xrTime get_start_time()
+{
+	return (xrTime(Level().GetStartGameTime()));
+}
+
 #pragma optimize("s",on)
 void CLevel::script_register(lua_State *L)
 {
@@ -808,6 +813,7 @@ void CLevel::script_register(lua_State *L)
 		def("spawn_item", &spawn_section),
 		def("get_active_cam", &get_active_cam),
 		def("set_active_cam", &set_active_cam),
+		def("get_start_time", &get_start_time),
 #endif
 		//Alundaio: END
 		// obsolete\deprecated

@@ -10,6 +10,16 @@
 #include "xrServer_Objects_ALife_Items.h"
 #include "xrServer_script_macroses.h"
 
+void add_upgrade_script(CSE_ALifeInventoryItem* ta, LPCSTR str)
+{
+	ta->add_upgrade(str);
+}
+
+bool has_upgrade_script(CSE_ALifeInventoryItem* ta,LPCSTR str)
+{
+	return ta->has_upgrade(str);
+}
+
 using namespace luabind;
 
 #pragma optimize("s",on)
@@ -19,6 +29,8 @@ void CSE_ALifeInventoryItem::script_register(lua_State *L)
 		class_<CSE_ALifeInventoryItem>
 			("cse_alife_inventory_item")
 //			.def(		constructor<LPCSTR>())
+			.def("has_upgrade", &has_upgrade)
+			.def("add_upgrade", &add_upgrade)
 	];
 }
 
@@ -66,6 +78,9 @@ void CSE_ALifeItemWeapon::script_register(lua_State *L)
 			CSE_ALifeItem
 		)
 		.def("clone_addons",						&CSE_ALifeItemWeapon::clone_addons)
+		.def("set_ammo_elapsed", &CSE_ALifeItemWeapon::set_ammo_elapsed)
+		.def("get_ammo_elapsed", &CSE_ALifeItemWeapon::get_ammo_elapsed)
+		.def("get_ammo_magsize", &CSE_ALifeItemWeapon::get_ammo_magsize)
 	];
 }
 

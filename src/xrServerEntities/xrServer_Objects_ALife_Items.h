@@ -193,6 +193,7 @@ SERVER_ENTITY_DECLARE_BEGIN(CSE_ALifeItemWeapon,CSE_ALifeItem)
 	u16								get_ammo_limit		();
 	u16								get_ammo_total		();
 	u16								get_ammo_elapsed	();
+	void							set_ammo_elapsed	(u16 count);
 	u16								get_ammo_magsize	();
 	void							clone_addons		(CSE_ALifeItemWeapon* parent);
 

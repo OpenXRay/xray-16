@@ -47,8 +47,9 @@ public:
 	bool					DropItem			(CGameObject *pObj, bool just_before_destroy, bool dont_create_shell);
 	void					Clear				();
 
+	u16 					m_last_slot;
 	IC u16					FirstSlot			() const {return KNIFE_SLOT;}
-	IC u16					LastSlot			() const {return LAST_SLOT;} // not "end"
+	IC u16					LastSlot			() const {return m_last_slot;} // not "end"
 	IC bool					SlotIsPersistent	(u16 slot_id) const {return m_slots[slot_id].m_bPersistent;}
 	bool					Slot				(u16 slot_id, PIItem pIItem, bool bNotActivate = false, bool strict_placement=false);	
 	bool					Belt				(PIItem pIItem, bool strict_placement=false);
@@ -189,7 +190,7 @@ private:
 	except_next_items_t		m_next_items_exceptions;
 	u32						m_next_item_iteration_time;
 
-	u8					m_blocked_slots[LAST_SLOT+1];
+	std::vector<u8> m_blocked_slots;
 	bool				IsSlotBlocked(u16 slot_id) const;
 	void				TryActivatePrevSlot		();
 	void				TryDeactivateActiveSlot	();

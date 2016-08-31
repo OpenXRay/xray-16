@@ -15,6 +15,7 @@
 #include "associative_vector.h"
 #include "alife_movement_manager_holder.h"
 
+
 class CALifeMonsterBrain;
 class CALifeHumanBrain;
 class CALifeOnlineOfflineGroupBrain;
@@ -46,7 +47,7 @@ SERVER_ENTITY_DECLARE_BEGIN0(CSE_ALifeTraderAbstract)
 	CHARACTER_REPUTATION_VALUE		m_reputation;
 	CHARACTER_RANK_VALUE			m_rank;
 	xr_string						m_character_name;
-	
+	shared_str						m_icon_name;
 	bool							m_deadbody_can_take;
 	bool							m_deadbody_closed;
 

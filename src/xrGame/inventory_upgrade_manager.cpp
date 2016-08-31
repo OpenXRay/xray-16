@@ -14,7 +14,6 @@
 #include "inventory_upgrade_group.h"
 #include "inventory_upgrade_property.h"
 
-
 extern int g_upgrades_log = 0;
 
 namespace inventory
@@ -158,6 +157,7 @@ bool Manager::item_upgrades_exist( shared_str const& item_id )
 
 void Manager::load_all_inventory()
 {
+	/*
 	LPCSTR items_section = "upgraded_inventory";
 	
 	VERIFY2( pSettings->section_exist( items_section ), make_string( "Section [%s] does not exist !", items_section ) );
@@ -183,7 +183,27 @@ void Manager::load_all_inventory()
 	{
 		Msg( "# Upgrades of inventory items loaded." );
 	}
+	*/
 
+	//Alundaio: No longer the need to define upgradable sections in [upgraded_inventory]
+	typedef CInifile::Root sections_type;
+	sections_type sections = pSettings->sections();
+
+	sections_type::const_iterator i = sections.begin();
+	sections_type::const_iterator e = sections.end();
+	for (; i != e; ++i)
+	{
+		if (!pSettings->line_exist((*i)->Name, "upgrades") || !pSettings->r_string((*i)->Name, "upgrades"))
+			continue;
+
+		if (!pSettings->line_exist((*i)->Name, "upgrade_scheme") || !pSettings->r_string((*i)->Name, "upgrade_scheme"))
+			continue;
+
+		add_root((*i)->Name);
+	}
+	//-Alundaio
+
+	
 	/*
 	float low, high; ///? <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	LPCSTR param = "cost";

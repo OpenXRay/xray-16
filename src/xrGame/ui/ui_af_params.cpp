@@ -45,7 +45,7 @@ LPCSTR af_immunity_section_names[] = // ALife::EInfluenceType
 	"wound_immunity",		
 	"fire_wound_immunity",
 	"explosion_immunity",
-	//"strike_immunity",
+	"strike_immunity",
 };
 
 LPCSTR af_restore_section_names[] = // ALife::EConditionRestoreType
@@ -69,7 +69,7 @@ LPCSTR af_immunity_caption[] =  // ALife::EInfluenceType
 	"ui_inv_outfit_wound_protection",			// "(wound_imm)",
 	"ui_inv_outfit_explosion_protection",		// "(explosion_imm)",
 	"ui_inv_outfit_fire_wound_protection",		// "(fire_wound_imm)",
-	//"ui_inv_outfit_strike_protection",			// "(strike_imm)",
+	"ui_inv_outfit_strike_protection",			// "(strike_imm)",
 };
 
 LPCSTR af_restore_caption[] =  // ALife::EConditionRestoreType

@@ -268,6 +268,7 @@ protected:
 	void						UpdateButtonsLayout			();
 
 	// inventory
+	bool						ToSlotScript				(CScriptGameObject* GO, bool force_place, u16 slot_id);
 	bool						ToSlot						(CUICellItem* itm, bool force_place, u16 slot_id);
 	bool						ToBag						(CUICellItem* itm, bool b_use_cursor_pos);
 	bool						ToBelt						(CUICellItem* itm, bool b_use_cursor_pos);
@@ -352,6 +353,7 @@ public:
 
 	CScriptGameObject* GetCurrentItemAsGameObject();
 	void HighlightSectionInSlot(LPCSTR section, u8 type, u16 slot_id = 0);
+	void HighlightForEachInSlot(luabind::functor<bool> functor, u8 type, u16 slot_id);
 
 	//-AxelDominator && Alundaio consumable use condition
 	void DonateCurrentItem(CUICellItem* cell_item); //Alundaio: Donate item via context menu while in trade menu

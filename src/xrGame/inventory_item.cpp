@@ -120,6 +120,8 @@ void CInventoryItem::Load(LPCSTR section)
 	// Added by Axel, to enable optional condition use on any item
 	m_flags.set( FUsingCondition, READ_IF_EXISTS( pSettings, r_bool, section, "use_condition", FALSE ));
 
+	m_highlight_equipped = !!READ_IF_EXISTS(pSettings, r_bool, section, "highlight_equipped", FALSE);
+
 	if ( BaseSlot() != NO_ACTIVE_SLOT || Belt())
 	{
 		m_flags.set					(FRuckDefault, pSettings->r_bool(section, "default_to_ruck" ));

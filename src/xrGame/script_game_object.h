@@ -838,6 +838,11 @@ public:
 			u8					GetWeaponSubstate();
 			u8					GetAmmoType();
 
+			//CWeaponAmmo
+			u16					AmmoGetCount();
+			void				AmmoSetCount(u16 count);
+			u16					AmmoBoxSize();
+
 			//Weapon & Outfit
 			bool				InstallUpgrade(LPCSTR upgrade);
 			bool				HasUpgrade(LPCSTR upgrade);
@@ -856,6 +861,8 @@ public:
 			bool				IsBoneVisible(LPCSTR bone_name);
 			void				SetBoneVisible(LPCSTR bone_name, bool bVisibility, bool bRecursive = true);
 
+			//CAI_Stalker
+			void				ResetBoneProtections(LPCSTR imm_sect, LPCSTR bone_sect);
 			//Anything with PPhysicShell (ie. car, actor, stalker, monster, heli)
 			void				ForceSetPosition(Fvector pos, bool bActivate = false);
 

@@ -129,7 +129,8 @@ CUIDragItem* CUIInventoryCellItem::CreateDragItem()
 }
 
 void CUIInventoryCellItem::SetTextureColor(u32 color)
-{
+{	
+	inherited::SetTextureColor(color);
 	for (xr_vector<SIconLayer*>::iterator it = m_layers.begin(); m_layers.end() != it; ++it)
 	{
 		if ((*it)->m_icon)

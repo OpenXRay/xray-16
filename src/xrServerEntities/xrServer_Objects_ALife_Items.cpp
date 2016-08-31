@@ -316,7 +316,7 @@ void CSE_ALifeInventoryItem::add_upgrade( const shared_str& upgrade_id )
 ////////////////////////////////////////////////////////////////////////////
 CSE_ALifeItem::CSE_ALifeItem				(LPCSTR caSection) : CSE_ALifeDynamicObjectVisual(caSection), CSE_ALifeInventoryItem(caSection)
 {
-	m_physics_disabled			= false;
+	m_physics_disabled		= false;
 }
 
 CSE_ALifeItem::~CSE_ALifeItem				()
@@ -616,6 +616,11 @@ u16	 CSE_ALifeItemWeapon::get_ammo_total	()
 u16	 CSE_ALifeItemWeapon::get_ammo_elapsed	()
 {
 	return						((u16)a_elapsed);
+}
+
+void CSE_ALifeItemWeapon::set_ammo_elapsed(u16 count)
+{
+	a_elapsed = count;
 }
 
 u16	 CSE_ALifeItemWeapon::get_ammo_magsize	()

@@ -6741,6 +6741,9 @@
     <ClInclude Include="ui\UIAchievements.h">
       <Filter>UI\Common\PDA\Statistics &amp; Rankings</Filter>
     </ClInclude>
+    <ClInclude Include="ui\UIRankingsCoC.h">
+      <Filter>UI\Common\PDA\Statistics &amp; Rankings</Filter>
+    </ClInclude>
     <ClInclude Include="ui\UIRankingWnd.h">
       <Filter>UI\Common\PDA\Statistics &amp; Rankings</Filter>
     </ClInclude>
@@ -10344,6 +10347,9 @@
       <Filter>UI\Common\PDA\MAP</Filter>
     </ClCompile>
     <ClCompile Include="ui\UIAchievements.cpp">
+      <Filter>UI\Common\PDA\Statistics &amp; Rankings</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\UIRankingsCoC.cpp">
       <Filter>UI\Common\PDA\Statistics &amp; Rankings</Filter>
     </ClCompile>
     <ClCompile Include="ui\UIRankFraction.cpp">
