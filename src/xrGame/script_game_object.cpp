@@ -39,8 +39,6 @@
 #include "smart_cover.h"
 #include "smart_cover_description.h"
 #include "physics_shell_scripted.h"
-#include "CharacterPhysicsSupport.h" //Alundaio: For set_visual
-#include "damage_manager.h" //Alundaio: For set_visual
 #include "ai/phantom/phantom.h"
 
 #include "UIGameCustom.h"
@@ -675,9 +673,6 @@ pcstr CScriptGameObject::get_smart_cover_description() const
     }
     return smart_cover_object->cover().description()->table_id().c_str();
 }
-
-void CScriptGameObject::set_visual_name(LPCSTR visual) { object().cNameVisual_set(visual); }
-LPCSTR CScriptGameObject::get_visual_name() const { return object().cNameVisual().c_str(); }
 
 void CScriptGameObject::PhantomSetEnemy(CScriptGameObject* enemy)
 {

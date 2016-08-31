@@ -686,8 +686,8 @@ public:
     bool invulnerable() const;
     void invulnerable(bool invulnerable);
     pcstr get_smart_cover_description() const;
-    void set_visual_name(LPCSTR visual);
-    LPCSTR get_visual_name() const;
+    void set_visual_name(pcstr visual);
+    pcstr get_visual_name() const;
 
     bool can_throw_grenades() const;
     void can_throw_grenades(bool can_throw_grenades);
@@ -855,6 +855,11 @@ public:
     u8 GetWeaponSubstate();
     u8 GetAmmoType();
 
+    //CWeaponAmmo
+    u16 AmmoGetCount();
+    void AmmoSetCount(u16 count);
+    u16 AmmoBoxSize();
+
     //Weapon & Outfit
     bool InstallUpgrade(pcstr upgrade);
     bool HasUpgrade(pcstr upgrade) const;
@@ -873,6 +878,9 @@ public:
     //Works for anything with visual
     bool IsBoneVisible(pcstr bone_name);
     void SetBoneVisible(pcstr bone_name, bool bVisibility, bool bRecursive = true);
+
+    //CAI_Stalker
+    void ResetBoneProtections(pcstr imm_sect, pcstr bone_sect);
 
     //Anything with PPhysicShell (ie. car, actor, stalker, monster, heli)
     void ForceSetPosition(Fvector pos, bool bActivate = false);

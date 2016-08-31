@@ -145,6 +145,8 @@ void CUIInventoryCellItem::Update()
 
 void CUIInventoryCellItem::SetTextureColor(u32 color)
 {
+    inherited::SetTextureColor(color);
+
 	for (auto& it : m_layers)
 		if (it->m_icon)
 			it->m_icon->SetTextureColor(color);

@@ -655,6 +655,11 @@ bool ray_pick(const Fvector& start, const Fvector& dir, float range,
     return false;
 }
 
+xrTime get_start_time()
+{
+    return xrTime(Level().GetStartGameTime());
+}
+
 // XXX nitrocaster: one can export enum like class, without defining dummy type
 template<typename T>
 struct EnumCallbackType {};
@@ -678,6 +683,7 @@ IC static void CLevel_Export(lua_State* luaState)
         def("spawn_item", &spawn_section),
         def("get_active_cam", &get_active_cam),
         def("set_active_cam", &set_active_cam),
+        def("get_start_time", &get_start_time),
 #endif
         //Alundaio: END
         // obsolete\deprecated

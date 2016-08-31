@@ -423,8 +423,15 @@ void CUIActorMenu::InitInventoryContents(CUIDragDropListEx* pBagList)
         InitCellForSlot(ARTEFACT_SLOT);
     if (!m_pActorInvOwner->inventory().SlotIsPersistent(PDA_SLOT))
         InitCellForSlot(PDA_SLOT);
-    if (!m_pActorInvOwner->inventory().SlotIsPersistent(TORCH_SLOT))
-        InitCellForSlot(TORCH_SLOT); //Alundaio: TODO find out why this crash when you unequip
+    //if (!m_pActorInvOwner->inventory().SlotIsPersistent(TORCH_SLOT))
+    //    InitCellForSlot(TORCH_SLOT); //Alundaio: TODO find out why this crash when you unequip
+
+    //for custom slots that exist past LAST_SLOT
+    for (u16 i = LAST_SLOT + 1; i <= m_pActorInvOwner->inventory().LastSlot(); ++i)
+    {
+        if (!m_pActorInvOwner->inventory().SlotIsPersistent(i))
+            InitCellForSlot(i);
+    }
     //-Alundaio
 
     curr_list = m_pInventoryBeltList;
@@ -487,6 +494,34 @@ bool CUIActorMenu::TryActiveSlot(CUICellItem* itm)
     if (slot == DETECTOR_SLOT)
     {
     }
+    return false;
+}
+
+bool CUIActorMenu::ToSlotScript(CScriptGameObject* GO, const bool force_place, u16 slot_id)
+{
+    if (GO->ID() != m_pActorInvOwner->object_id())
+        return false;
+
+    CInventoryItem* iitem = smart_cast<CInventoryItem*>(GO->object().dcast_GameObject());
+
+    if (!iitem || !m_pActorInvOwner->inventory().InRuck(iitem))
+        return false;
+
+    CUIDragDropListEx* invlist = GetListByType(iActorBag);
+    CUICellContainer* c = invlist->GetContainer();
+    WINDOW_LIST child_list = c->GetChildWndList();
+
+    for (auto& it : child_list)
+    {
+        CUICellItem* i = static_cast<CUICellItem*>(it);
+        const PIItem pitm = static_cast<PIItem>(i->m_pData);
+        if (pitm == iitem)
+        {
+            ToSlot(i, force_place, slot_id);
+            return true;
+        }
+    }
+
     return false;
 }
 
@@ -723,35 +758,21 @@ bool CUIActorMenu::ToBelt(CUICellItem* itm, bool b_use_cursor_pos)
 CUIDragDropListEx* CUIActorMenu::GetSlotList(u16 slot_idx)
 {
     if (slot_idx == NO_ACTIVE_SLOT)
-    {
-        return NULL;
-    }
+        return nullptr;
+
     switch (slot_idx)
     {
-    case INV_SLOT_2: return m_pInventoryPistolList; break;
-
-    case INV_SLOT_3: return m_pInventoryAutomaticList; break;
-
-    case OUTFIT_SLOT: return m_pInventoryOutfitList; break;
-
-    case HELMET_SLOT: return m_pInventoryHelmetList; break;
-
-    case DETECTOR_SLOT: return m_pInventoryDetectorList; break;
-
-    case PDA_SLOT:
-    case TORCH_SLOT:
-    case ARTEFACT_SLOT:
-    case BINOCULAR_SLOT:
-    case KNIFE_SLOT:
-
-    case GRENADE_SLOT: // fake
+    case INV_SLOT_2: return m_pInventoryPistolList;
+    case INV_SLOT_3: return m_pInventoryAutomaticList;
+    case OUTFIT_SLOT: return m_pInventoryOutfitList;
+    case HELMET_SLOT: return m_pInventoryHelmetList;
+    case DETECTOR_SLOT: return m_pInventoryDetectorList;
+    default:
         if (m_currMenuMode == mmTrade)
-        {
             return m_pTradeActorBagList;
-        }
+
         return m_pInventoryBagList;
-        break;
-    };
+    }
     return NULL;
 }
 
@@ -1253,8 +1274,11 @@ void CUIActorMenu::PropertiesBoxForRepair(PIItem item, bool& b_show)
 //Alundaio: Ability to donate item during trade
 void CUIActorMenu::PropertiesBoxForDonate(PIItem item, bool& b_show)
 {
-    m_UIPropertiesBox->AddItem("st_donate", nullptr, INVENTORY_DONATE_ACTION);
-    b_show = true;
+    if (!item->IsQuestItem())
+    {
+        m_UIPropertiesBox->AddItem("st_donate", nullptr, INVENTORY_DONATE_ACTION);
+        b_show = true;
+    }
 }
 //-Alundaio
 

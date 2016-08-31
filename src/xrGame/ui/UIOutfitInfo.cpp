@@ -10,19 +10,42 @@
 #include "ActorCondition.h"
 #include "player_hud.h"
 
-LPCSTR immunity_names[] = {
-    "burn_immunity", "shock_immunity", "chemical_burn_immunity", "radiation_immunity", "telepatic_immunity",
-    "wound_immunity", "fire_wound_immunity",
-    //	"strike_immunity",
-    "explosion_immunity", //Alundaio: uncommented
+/*
+eHitTypeBurn = u32(0),
+eHitTypeShock,
+eHitTypeChemicalBurn,
+eHitTypeRadiation,
+eHitTypeTelepatic,
+eHitTypeWound,
+eHitTypeFireWound,
+eHitTypeStrike,
+eHitTypeExplosion,
+*/
+
+constexpr pcstr immunity_names[] =
+{
+    "burn_immunity",
+    "shock_immunity",
+    "chemical_burn_immunity",
+    "radiation_immunity",
+    "telepatic_immunity",
+    "wound_immunity",
+    "fire_wound_immunity",
+    "strike_immunity",
+    "explosion_immunity",
 };
 
-LPCSTR immunity_st_names[] = {
-    "ui_inv_outfit_burn_protection", "ui_inv_outfit_shock_protection", "ui_inv_outfit_chemical_burn_protection",
-    "ui_inv_outfit_radiation_protection", "ui_inv_outfit_telepatic_protection", "ui_inv_outfit_wound_protection",
+constexpr pcstr immunity_st_names[] =
+{
+    "ui_inv_outfit_burn_protection",
+    "ui_inv_outfit_shock_protection",
+    "ui_inv_outfit_chemical_burn_protection",
+    "ui_inv_outfit_radiation_protection",
+    "ui_inv_outfit_telepatic_protection",
+    "ui_inv_outfit_wound_protection",
     "ui_inv_outfit_fire_wound_protection",
-    //	"ui_inv_outfit_strike_protection",
-    "ui_inv_outfit_explosion_protection", //Alundaio: uncommented
+    "ui_inv_outfit_strike_protection",
+    "ui_inv_outfit_explosion_protection",
 };
 
 CUIOutfitImmunity::CUIOutfitImmunity()
@@ -85,7 +108,7 @@ CUIOutfitInfo::~CUIOutfitInfo()
 
 void CUIOutfitInfo::InitFromXml(CUIXml& xml_doc)
 {
-    LPCSTR base_str = "outfit_info";
+    pcstr base_str = "outfit_info";
 
     CUIXmlInit::InitWindow(xml_doc, base_str, 0, this);
 
@@ -106,6 +129,7 @@ void CUIOutfitInfo::InitFromXml(CUIXml& xml_doc)
     Fvector2 pos;
     pos.set(0.0f, m_Prop_line->GetWndPos().y + m_Prop_line->GetWndSize().y);
 
+    /*
     for (u32 i = 0; i < max_count; ++i)
     {
         m_items[i] = new CUIOutfitImmunity();
@@ -114,6 +138,63 @@ void CUIOutfitInfo::InitFromXml(CUIXml& xml_doc)
         m_items[i]->SetWndPos(pos);
         pos.y += m_items[i]->GetWndSize().y;
     }
+    */
+
+    //Alundaio: Specific Display Order
+    m_items[ALife::eHitTypeFireWound] = new CUIOutfitImmunity();
+    m_items[ALife::eHitTypeFireWound]->InitFromXml(xml_doc, base_str, ALife::eHitTypeFireWound);
+    AttachChild(m_items[ALife::eHitTypeFireWound]);
+    m_items[ALife::eHitTypeFireWound]->SetWndPos(pos);
+    pos.y += m_items[ALife::eHitTypeFireWound]->GetWndSize().y;
+
+    m_items[ALife::eHitTypeWound] = new CUIOutfitImmunity();
+    m_items[ALife::eHitTypeWound]->InitFromXml(xml_doc, base_str, ALife::eHitTypeWound);
+    AttachChild(m_items[ALife::eHitTypeWound]);
+    m_items[ALife::eHitTypeWound]->SetWndPos(pos);
+    pos.y += m_items[ALife::eHitTypeWound]->GetWndSize().y;
+
+    m_items[ALife::eHitTypeStrike] = new CUIOutfitImmunity();
+    m_items[ALife::eHitTypeStrike]->InitFromXml(xml_doc, base_str, ALife::eHitTypeStrike);
+    AttachChild(m_items[ALife::eHitTypeStrike]);
+    m_items[ALife::eHitTypeStrike]->SetWndPos(pos);
+    pos.y += m_items[ALife::eHitTypeStrike]->GetWndSize().y;
+
+    m_items[ALife::eHitTypeExplosion] = new CUIOutfitImmunity();
+    m_items[ALife::eHitTypeExplosion]->InitFromXml(xml_doc, base_str, ALife::eHitTypeExplosion);
+    AttachChild(m_items[ALife::eHitTypeExplosion]);
+    m_items[ALife::eHitTypeExplosion]->SetWndPos(pos);
+    pos.y += m_items[ALife::eHitTypeExplosion]->GetWndSize().y;
+
+    m_items[ALife::eHitTypeBurn] = new CUIOutfitImmunity();
+    m_items[ALife::eHitTypeBurn]->InitFromXml(xml_doc, base_str, ALife::eHitTypeBurn);
+    AttachChild(m_items[ALife::eHitTypeBurn]);
+    m_items[ALife::eHitTypeBurn]->SetWndPos(pos);
+    pos.y += m_items[ALife::eHitTypeBurn]->GetWndSize().y;
+
+    m_items[ALife::eHitTypeShock] = new CUIOutfitImmunity();
+    m_items[ALife::eHitTypeShock]->InitFromXml(xml_doc, base_str, ALife::eHitTypeShock);
+    AttachChild(m_items[ALife::eHitTypeShock]);
+    m_items[ALife::eHitTypeShock]->SetWndPos(pos);
+    pos.y += m_items[ALife::eHitTypeShock]->GetWndSize().y;
+
+    m_items[ALife::eHitTypeChemicalBurn] = new CUIOutfitImmunity();
+    m_items[ALife::eHitTypeChemicalBurn]->InitFromXml(xml_doc, base_str, ALife::eHitTypeChemicalBurn);
+    AttachChild(m_items[ALife::eHitTypeChemicalBurn]);
+    m_items[ALife::eHitTypeChemicalBurn]->SetWndPos(pos);
+    pos.y += m_items[ALife::eHitTypeChemicalBurn]->GetWndSize().y;
+
+    m_items[ALife::eHitTypeRadiation] = new CUIOutfitImmunity();
+    m_items[ALife::eHitTypeRadiation]->InitFromXml(xml_doc, base_str, ALife::eHitTypeRadiation);
+    AttachChild(m_items[ALife::eHitTypeRadiation]);
+    m_items[ALife::eHitTypeRadiation]->SetWndPos(pos);
+    pos.y += m_items[ALife::eHitTypeRadiation]->GetWndSize().y;
+
+    m_items[ALife::eHitTypeTelepatic] = new CUIOutfitImmunity();
+    m_items[ALife::eHitTypeTelepatic]->InitFromXml(xml_doc, base_str, ALife::eHitTypeTelepatic);
+    AttachChild(m_items[ALife::eHitTypeTelepatic]);
+    m_items[ALife::eHitTypeTelepatic]->SetWndPos(pos);
+    pos.y += m_items[ALife::eHitTypeTelepatic]->GetWndSize().y;
+
     pos.x = GetWndSize().x;
     SetWndSize(pos);
 }

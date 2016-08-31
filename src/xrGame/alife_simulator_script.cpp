@@ -188,6 +188,32 @@ CSE_Abstract* CALifeSimulator__spawn_item2(CALifeSimulator* self, LPCSTR section
     return (self->server().Process_spawn(packet, clientID));
 }
 
+//Alundaio: Allows to call alife():register(se_obj) manually afterward so that packet editing can be done safely when spawning object with a parent
+CSE_Abstract* CALifeSimulator__spawn_item3(CALifeSimulator* self, pcstr section, const Fvector& position,
+                                           u32 level_vertex_id, GameGraph::_GRAPH_ID game_vertex_id,
+                                           ALife::_OBJECT_ID id_parent, bool reg = true)
+{
+    if (reg == true)
+        return CALifeSimulator__spawn_item2(self, section, position, level_vertex_id, game_vertex_id, id_parent);
+
+    if (id_parent == ALife::_OBJECT_ID(-1))
+        return self->spawn_item(section, position, level_vertex_id, game_vertex_id, id_parent);
+
+    CSE_ALifeDynamicObject* object = ai().alife().objects().object(id_parent, true);
+    if (!object)
+    {
+        Msg("! invalid parent id [%d] specified", id_parent);
+        return nullptr;
+    }
+
+    if (!object->m_bOnline)
+        return self->spawn_item(section, position, level_vertex_id, game_vertex_id, id_parent);
+
+    CSE_Abstract* item = self->spawn_item(section, position, level_vertex_id, game_vertex_id, id_parent, false);
+
+    return item;
+}
+
 CSE_Abstract* CALifeSimulator__spawn_ammo(CALifeSimulator* self, LPCSTR section, const Fvector& position,
     u32 level_vertex_id, GameGraph::_GRAPH_ID game_vertex_id, ALife::_OBJECT_ID id_parent, int ammo_to_spawn)
 {
@@ -320,6 +346,64 @@ void IterateInfo(const CALifeSimulator* alife, const ALife::_OBJECT_ID& id, func
     for (const auto& it : *known_info)
         functor(id, it.c_str());
 }
+
+CSE_Abstract* reprocess_spawn(CALifeSimulator* self, CSE_Abstract* object)
+{
+    NET_Packet packet;
+    packet.w_begin(M_SPAWN);
+    packet.w_stringZ(object->s_name);
+
+    object->Spawn_Write(packet, FALSE);
+    self->server().FreeID(object->ID, 0);
+    F_entity_Destroy(object);
+
+    ClientID clientID;
+    clientID.set(0xffff);
+
+    u16 dummy;
+    packet.r_begin(dummy);
+
+    return self->server().Process_spawn(packet, clientID);
+}
+
+CSE_Abstract* try_to_clone_object(CALifeSimulator* self, CSE_Abstract* object, pcstr section, const Fvector& position,
+                                  u32 level_vertex_id, GameGraph::_GRAPH_ID game_vertex_id, ALife::_OBJECT_ID id_parent,
+                                  bool bRegister = true)
+{
+    CSE_ALifeItemWeaponMagazined* wpnmag = smart_cast<CSE_ALifeItemWeaponMagazined*>(object);
+    if (wpnmag)
+    {
+        CSE_Abstract* absClone = self->spawn_item(section, position, level_vertex_id, game_vertex_id, id_parent, false);
+        if (!absClone)
+            return nullptr;
+
+        CSE_ALifeItemWeaponMagazined * clone = smart_cast<CSE_ALifeItemWeaponMagazined*>(absClone);
+        if (!clone)
+            return nullptr;
+
+        clone->wpn_flags = wpnmag->wpn_flags;
+        clone->m_addon_flags = wpnmag->m_addon_flags;
+        clone->m_fCondition = wpnmag->m_fCondition;
+        clone->ammo_type = wpnmag->ammo_type;
+        clone->m_upgrades = wpnmag->m_upgrades;
+        clone->set_ammo_elapsed(wpnmag->get_ammo_elapsed());
+
+        return bRegister ? reprocess_spawn(self, absClone) : absClone;
+        // (self->server().Process_spawn(packet, clientID));
+    }
+
+    return nullptr;
+}
+
+void set_objects_per_update(CALifeSimulator* self, u32 count)
+{
+    self->objects_per_update(count);
+}
+
+void set_process_time(CALifeSimulator* self, int micro)
+{
+    self->set_process_time(micro);
+}
 //-Alundaio
 
 SCRIPT_EXPORT(CALifeSimulator, (), {
@@ -349,6 +433,7 @@ SCRIPT_EXPORT(CALifeSimulator, (), {
                          .def("remove_out_restriction", &remove_out_restriction)
                          .def("remove_all_restrictions", &CALifeSimulator::remove_all_restrictions)
                          .def("create", &CALifeSimulator__create)
+                         .def("create", &CALifeSimulator__spawn_item3)
                          .def("create", &CALifeSimulator__spawn_item2)
                          .def("create", &CALifeSimulator__spawn_item)
                          .def("create_ammo", &CALifeSimulator__spawn_ammo)
@@ -362,6 +447,10 @@ SCRIPT_EXPORT(CALifeSimulator, (), {
                          //Alundaio: extend alife simulator exports
                          .def("teleport_object", &teleport_object)
                          .def("iterate_info", &IterateInfo)
+                         .def("clone_weapon", &try_to_clone_object)
+                         .def("register", &reprocess_spawn)
+                         .def("set_objects_per_update", &set_objects_per_update)
+                         .def("set_process_time", &set_process_time)
                          //Alundaio: END
 
                          ,

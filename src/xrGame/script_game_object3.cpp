@@ -48,6 +48,7 @@
 #include "eatable_item.h"
 #include "script_callback_ex.h"
 #include "xrEngine/feel_touch.h"
+#include "WeaponAmmo.h"
 #endif
 //-Alundaio
 
@@ -1236,6 +1237,33 @@ bool CScriptGameObject::is_weapon_going_to_be_strapped(CScriptGameObject const* 
 
 //Alundaio: Taken from Radium
 #ifdef GAME_OBJECT_EXTENDED_EXPORTS
+u16 CScriptGameObject::AmmoGetCount()
+{
+    CWeaponAmmo* ammo = smart_cast<CWeaponAmmo*>(&object());
+    if (!ammo)
+        return 0;
+
+    return ammo->m_boxCurr;
+}
+
+void CScriptGameObject::AmmoSetCount(u16 count)
+{
+    CWeaponAmmo* ammo = smart_cast<CWeaponAmmo*>(&object());
+    if (!ammo)
+        return;
+
+    ammo->m_boxCurr = count;
+}
+
+u16 CScriptGameObject::AmmoBoxSize()
+{
+    CWeaponAmmo* ammo = smart_cast<CWeaponAmmo*>(&object());
+    if (!ammo)
+        return 0;
+
+    return ammo->m_boxSize;
+}
+
 float CScriptGameObject::GetArtefactHealthRestoreSpeed()
 {
     CArtefact* artefact = smart_cast<CArtefact*>(&object());

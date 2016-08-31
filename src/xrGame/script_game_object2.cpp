@@ -561,3 +561,29 @@ bool CScriptGameObject::is_there_items_to_pickup() const
     }
     return (!!stalker->memory().item().selected());
 }
+
+void CScriptGameObject::ResetBoneProtections(pcstr imm_sect, pcstr bone_sect)
+{
+    CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
+    if (!stalker)
+        return;
+
+    stalker->ResetBoneProtections(imm_sect, bone_sect);
+}
+
+void CScriptGameObject::set_visual_name(pcstr visual)
+{
+    object().cNameVisual_set(visual);
+
+
+    /*CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
+    if (!stalker)
+        return;
+
+    stalker->ResetBoneProtections(nullptr, nullptr);*/
+}
+
+pcstr CScriptGameObject::get_visual_name() const
+{
+    return object().cNameVisual().c_str();
+}

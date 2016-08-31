@@ -256,6 +256,7 @@ public:
     bool ready_to_detour();
     void update_best_item_info();
     void update_best_item_info_impl();
+    void ResetBoneProtections(pcstr imm_sect, pcstr bone_sect);
     virtual float GetWeaponAccuracy() const;
     virtual bool unlimited_ammo();
     virtual void spawn_supplies();

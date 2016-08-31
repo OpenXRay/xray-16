@@ -22,11 +22,18 @@
 #include "xrScriptEngine/script_engine.hpp"
 #include "eatable_item.h"
 
+#include "UIPdaWnd.h"
+
 using namespace luabind;
 
 CUIActorMenu* GetActorMenu()
 {
     return &CurrentGameUI()->GetActorMenu();
+}
+
+CUIPdaWnd* GetPDAMenu()
+{
+	return &CurrentGameUI()->GetPdaMenu();
 }
 
 u8 GrabMenuMode()
@@ -119,6 +126,117 @@ void CUIActorMenu::CurModeToScript()
     funct(mode);
 }
 
+void CUIActorMenu::HighlightSectionInSlot(pcstr section, u8 type, u16 slot_id /*= 0*/)
+{
+    CUIDragDropListEx* slot_list = m_pInventoryBagList;
+    switch (type)
+    {
+    case iActorBag:
+        slot_list = m_pInventoryBagList;
+        break;
+    case iActorBelt:
+        slot_list = m_pInventoryBeltList;
+        break;
+    case iActorSlot:
+        slot_list = GetSlotList(slot_id);
+        break;
+    case iActorTrade:
+        slot_list = m_pTradeActorBagList;
+        break;
+    case iDeadBodyBag:
+        slot_list = m_pDeadBodyBagList;
+        break;
+    case iPartnerTrade:
+        slot_list = m_pTradePartnerList;
+        break;
+    case iPartnerTradeBag:
+        slot_list = m_pTradePartnerBagList;
+        break;
+    case iQuickSlot:
+        slot_list = m_pQuickSlot;
+        break;
+    case iTrashSlot:
+        slot_list = m_pTrashList;
+        break;
+    }
+
+    if (!slot_list)
+        return;
+
+    u32 const cnt = slot_list->ItemsCount();
+    for (u32 i = 0; i < cnt; ++i)
+    {
+        CUICellItem* ci = slot_list->GetItemIdx(i);
+        const PIItem item = static_cast<PIItem>(ci->m_pData);
+        if (!item)
+            continue;
+
+        if (!strcmp(section, item->m_section_id.c_str()) == 0)
+            continue;
+
+        ci->m_select_armament = true;
+    }
+
+    m_highlight_clear = false;
+}
+
+void CUIActorMenu::HighlightForEachInSlot(functor<bool> functor, u8 type, u16 slot_id)
+{
+    if (!functor)
+        return;
+
+    CUIDragDropListEx* slot_list = m_pInventoryBagList;
+    switch (type)
+    {
+    case iActorBag:
+        slot_list = m_pInventoryBagList;
+        break;
+    case iActorBelt:
+        slot_list = m_pInventoryBeltList;
+        break;
+    case iActorSlot:
+        slot_list = GetSlotList(slot_id);
+        break;
+    case iActorTrade:
+        slot_list = m_pTradeActorBagList;
+        break;
+    case iDeadBodyBag:
+        slot_list = m_pDeadBodyBagList;
+        break;
+    case iPartnerTrade:
+        slot_list = m_pTradePartnerList;
+        break;
+    case iPartnerTradeBag:
+        slot_list = m_pTradePartnerBagList;
+        break;
+    case iQuickSlot:
+        slot_list = m_pQuickSlot;
+        break;
+    case iTrashSlot:
+        slot_list = m_pTrashList;
+        break;
+    }
+
+    if (!slot_list)
+        return;
+
+    u32 const cnt = slot_list->ItemsCount();
+    for (u32 i = 0; i < cnt; ++i)
+    {
+        CUICellItem* ci = slot_list->GetItemIdx(i);
+        PIItem item = (PIItem)ci->m_pData;
+        if (!item)
+            continue;
+
+        if (functor(item->object().cast_game_object()->lua_game_object()) == false)
+            continue;
+
+        ci->m_select_armament = true;
+    }
+
+    m_highlight_clear = false;
+}
+
 template<class T>
 class enum_dummy {};
 
@@ -146,14 +264,24 @@ SCRIPT_EXPORT(CUIActorMenu, (),
             .def(constructor<>())
             .def("get_drag_item", &CUIActorMenu::GetCurrentItemAsGameObject)
             .def("highlight_section_in_slot", &CUIActorMenu::HighlightSectionInSlot)
+            .def("highlight_for_each_in_slot", &CUIActorMenu::HighlightForEachInSlot)
             .def("refresh_current_cell_item", &CUIActorMenu::RefreshCurrentItemCell)
             .def("IsShown", &CUIActorMenu::IsShown)
             .def("ShowDialog", &CUIActorMenu::ShowDialog)
             .def("HideDialog", &CUIActorMenu::HideDialog)
+            .def("ToSlot", &CUIActorMenu::ToSlotScript),
+
+        class_< CUIPdaWnd, CUIDialogWnd>("CUIPdaWnd")
+            .def(constructor<>())
+            .def("IsShown", &CUIPdaWnd::IsShown)
+            .def("ShowDialog", &CUIPdaWnd::ShowDialog)
+            .def("HideDialog", &CUIPdaWnd::HideDialog)
+            .def("SetActiveSubdialog", &CUIPdaWnd::SetActiveSubdialog)
     ];
 
     module(luaState, "ActorMenu")
     [
+        def("get_pda_menu", &GetPDAMenu),
         def("get_actor_menu", &GetActorMenu),
         def("get_menu_mode", &GrabMenuMode)
     ];
