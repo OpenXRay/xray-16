@@ -288,6 +288,8 @@ protected:
     // inventory
 public:
     bool ToSlotScript(CScriptGameObject* GO, const bool force_place, u16 slot_id);
+    bool ToBeltScript(CScriptGameObject* GO, const bool b_use_cursor_pos);
+
 protected:
 
     bool ToSlot(CUICellItem* itm, bool force_place, u16 slot_id);

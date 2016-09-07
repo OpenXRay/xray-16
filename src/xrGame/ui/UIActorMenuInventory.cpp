@@ -499,9 +499,6 @@ bool CUIActorMenu::TryActiveSlot(CUICellItem* itm)
 
 bool CUIActorMenu::ToSlotScript(CScriptGameObject* GO, const bool force_place, u16 slot_id)
 {
-    if (GO->ID() != m_pActorInvOwner->object_id())
-        return false;
-
     CInventoryItem* iitem = smart_cast<CInventoryItem*>(GO->object().dcast_GameObject());
 
     if (!iitem || !m_pActorInvOwner->inventory().InRuck(iitem))
@@ -694,6 +691,31 @@ bool CUIActorMenu::ToBag(CUICellItem* itm, bool b_use_cursor_pos)
         return true;
     }
     return false;
+}
+
+bool CUIActorMenu::ToBeltScript(CScriptGameObject* GO, const bool b_use_cursor_pos)
+{
+	CInventoryItem* iitem = smart_cast<CInventoryItem*>(GO->object().dcast_GameObject());
+
+	if (!iitem || !m_pActorInvOwner->inventory().InRuck(iitem))
+		return false;
+
+	CUIDragDropListEx* invlist = GetListByType(iActorBag);
+	CUICellContainer* c = invlist->GetContainer();
+	WINDOW_LIST child_list = c->GetChildWndList();
+
+    for (auto& it : child_list)
+    {
+        CUICellItem* i = static_cast<CUICellItem*>(it);
+        const PIItem pitm = static_cast<PIItem>(i->m_pData);
+        if (pitm == iitem)
+        {
+            ToBelt(i, b_use_cursor_pos);
+            return true;
+        }
+    }
+
+	return false;
 }
 
 bool CUIActorMenu::ToBelt(CUICellItem* itm, bool b_use_cursor_pos)

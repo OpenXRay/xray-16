@@ -269,7 +269,8 @@ SCRIPT_EXPORT(CUIActorMenu, (),
             .def("IsShown", &CUIActorMenu::IsShown)
             .def("ShowDialog", &CUIActorMenu::ShowDialog)
             .def("HideDialog", &CUIActorMenu::HideDialog)
-            .def("ToSlot", &CUIActorMenu::ToSlotScript),
+            .def("ToSlot", &CUIActorMenu::ToSlotScript)
+            .def("ToBelt", &CUIActorMenu::ToBeltScript),
 
         class_< CUIPdaWnd, CUIDialogWnd>("CUIPdaWnd")
             .def(constructor<>())

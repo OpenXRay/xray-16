@@ -68,7 +68,7 @@ void CSoundRender_Source::i_decompress_fr(OggVorbis_File* ovf, char* _dest, u32 
             break;
         else if (ret < 0) // Error in bitstream
         {
-            //
+            break;
         }
         else
         {

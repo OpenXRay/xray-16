@@ -7,6 +7,7 @@
 #include "UIXmlInit.h"
 #include "UIHelper.h"
 #include "string_table.h"
+#include "Inventory_Item.h"
 
 u32 const red_clr = color_argb(255, 210, 50, 50);
 u32 const green_clr = color_argb(255, 170, 170, 170);
@@ -101,6 +102,15 @@ void CUIArtefactParams::InitFromXml(CUIXml& xml)
     m_Prop_line->SetAutoDelete(false);
     CUIXmlInit::InitStatic(xml, "prop_line", 0, m_Prop_line);
 
+    //Alundaio: Show AF Condition
+    m_disp_condition = new UIArtefactParamItem();
+    m_disp_condition->Init(xml, "condition");
+    m_disp_condition->SetAutoDelete(false);
+    pcstr name = CStringTable().translate("ui_inv_af_condition").c_str();
+    m_disp_condition->SetCaption(name);
+    xml.SetLocalRoot(base_node);
+    //-Alundaio
+
     for (u32 i = 0; i < ALife::infl_max_count; ++i)
     {
         m_immunity_item[i] = new UIArtefactParamItem();
@@ -144,20 +154,29 @@ bool CUIArtefactParams::Check(const shared_str& af_section)
     return !!pSettings->line_exist(af_section, "af_actor_properties");
 }
 
-void CUIArtefactParams::SetInfo(shared_str const& af_section)
+void CUIArtefactParams::SetInfo(const CInventoryItem& pInvItem)
 {
     DetachAll();
     AttachChild(m_Prop_line);
 
     CActor* actor = smart_cast<CActor*>(Level().CurrentViewEntity());
     if (!actor)
-    {
         return;
-    }
+
+    const shared_str& af_section = pInvItem.object().cNameSect();
 
     float val = 0.0f, max_val = 1.0f;
     Fvector2 pos;
     float h = m_Prop_line->GetWndPos().y + m_Prop_line->GetWndSize().y;
+
+    //Alundaio: Show AF Condition
+    m_disp_condition->SetValue(pInvItem.GetCondition());
+    pos.set(m_disp_condition->GetWndPos());
+    pos.y = h;
+    m_disp_condition->SetWndPos(pos);
+    h += m_disp_condition->GetWndSize().y;
+    AttachChild(m_disp_condition);
+    //-Alundaio
 
     for (u32 i = 0; i < ALife::infl_max_count; ++i)
     {
