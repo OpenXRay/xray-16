@@ -15,7 +15,7 @@
 
 #include "../Include/xrRender/UIRender.h"
 
-#include "securom_api.h"
+//#include "securom_api.h"
 
 static float const UI_BASE_WIDTH = 1024.0f;
 static float const UI_BASE_HEIGHT = 768.0f;
@@ -650,7 +650,7 @@ void CConsole::ExecuteCommand(LPCSTR cmd_str, bool record_cmd)
 
 void CConsole::Show()
 {
-    SECUROM_MARKER_HIGH_SECURITY_ON(11)
+    //SECUROM_MARKER_HIGH_SECURITY_ON(11)
 
     if (bVisible)
     {
@@ -670,7 +670,7 @@ void CConsole::Show()
     Device.seqRender.Add(this, 1);
     Device.seqFrame.Add(this);
 
-    SECUROM_MARKER_HIGH_SECURITY_OFF(11)
+    //SECUROM_MARKER_HIGH_SECURITY_OFF(11)
 }
 
 extern CInput* pInput;

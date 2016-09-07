@@ -86,6 +86,8 @@ void LogStackTrace(LPCSTR header)
 
 void xrDebug::gather_info(const char* expression, const char* description, const char* argument0, const char* argument1, const char* file, int line, const char* function, LPSTR assertion_info, u32 const assertion_info_size)
 {
+    if (!expression)
+        expression = "<no expression>";
     LPSTR buffer_base = assertion_info;
     LPSTR buffer = assertion_info;
     int assertion_size = (int) assertion_info_size;
@@ -243,10 +245,10 @@ void xrDebug::backend(const char* expression, const char* description, const cha
 #ifdef USE_OWN_ERROR_MESSAGE_WINDOW
     LPCSTR endline = "\r\n";
     LPSTR buffer = assertion_info + xr_strlen(assertion_info);
-    buffer += xr_sprintf(buffer, sizeof(assertion_info) - u32(buffer - &assertion_info[0]), "%sPress OK to abort execution%s", endline, endline);
-    /*buffer += xr_sprintf(buffer, sizeof(assertion_info) - u32(buffer - &assertion_info[0]), "%sPress CANCEL to abort execution%s", endline, endline);
+    buffer += xr_sprintf(buffer, sizeof(assertion_info) - u32(buffer - &assertion_info[0]), "%sPress CANCEL to abort execution%s", endline, endline);
+
     buffer += xr_sprintf(buffer, sizeof(assertion_info) - u32(buffer - &assertion_info[0]), "Press TRY AGAIN to continue execution%s", endline);
-    buffer += xr_sprintf(buffer, sizeof(assertion_info) - u32(buffer - &assertion_info[0]), "Press CONTINUE to continue execution and ignore all the errors of this type%s%s", endline, endline);*/
+    buffer += xr_sprintf(buffer, sizeof(assertion_info) - u32(buffer - &assertion_info[0]), "Press CONTINUE to continue execution and ignore all the errors of this type%s%s", endline, endline);
 #endif // USE_OWN_ERROR_MESSAGE_WINDOW
 
     if (handler)
@@ -334,17 +336,17 @@ LPCSTR xrDebug::error2string(long code)
 
 void xrDebug::error(long hr, const char* expr, const char* file, int line, const char* function, bool& ignore_always)
 {
-    backend(error2string(hr), expr, 0, 0, file, line, function, ignore_always);
+    backend(expr, error2string(hr), 0, 0, file, line, function, ignore_always);
 }
 
 void xrDebug::error(long hr, const char* expr, const char* e2, const char* file, int line, const char* function, bool& ignore_always)
 {
-    backend(error2string(hr), expr, e2, 0, file, line, function, ignore_always);
+    backend(expr, error2string(hr), e2, 0, file, line, function, ignore_always);
 }
 
 void xrDebug::fail(const char* e1, const char* file, int line, const char* function, bool& ignore_always)
 {
-    backend("assertion failed", e1, 0, 0, file, line, function, ignore_always);
+    backend(e1, "assertion failed", 0, 0, file, line, function, ignore_always);
 }
 
 void xrDebug::fail(const char* e1, const std::string& e2, const char* file, int line, const char* function, bool& ignore_always)
@@ -405,7 +407,7 @@ void __cdecl xrDebug::fatal(const char* file, int line, const char* function, co
 
     bool ignore_always = true;
 
-    backend("fatal error", "<no expression>", buffer, 0, file, line, function, ignore_always);
+    backend(nullptr, "fatal error", buffer, 0, file, line, function, ignore_always);
 }
 
 typedef void(*full_memory_stats_callback_type) ();
@@ -473,6 +475,8 @@ void CALLBACK PreErrorHandler(INT_PTR)
 #ifdef USE_BUG_TRAP
 void SetupExceptionHandler(const bool& dedicated)
 {
+	UINT prevMode = SetErrorMode(SEM_NOGPFAULTERRORBOX);
+	SetErrorMode(prevMode|SEM_NOGPFAULTERRORBOX);
     BT_InstallSehFilter();
 #if 1//ndef USE_OWN_ERROR_MESSAGE_WINDOW
     if (!dedicated && !strstr(GetCommandLine(), "-silent_error_mode"))
@@ -884,8 +888,7 @@ void _terminate()
     string4096 assertion_info;
 
     Debug.gather_info (
-        //gather_info (
-        "<no expression>",
+        nullptr,
         "Unexpected application termination",
         0,
         0,
@@ -925,7 +928,7 @@ static void handler_base(LPCSTR reason_string)
 {
     bool ignore_always = false;
     Debug.backend(
-        "error handler is invoked!",
+        nullptr,
         reason_string,
         0,
         0,
@@ -986,8 +989,8 @@ static void invalid_parameter_handler(
     }
 
     Debug.backend(
-        "error handler is invoked!",
         expression_,
+		"invalid parameter",
         0,
         0,
         file_,

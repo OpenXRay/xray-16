@@ -271,6 +271,7 @@ protected:
 	bool						ToSlotScript				(CScriptGameObject* GO, bool force_place, u16 slot_id);
 	bool						ToSlot						(CUICellItem* itm, bool force_place, u16 slot_id);
 	bool						ToBag						(CUICellItem* itm, bool b_use_cursor_pos);
+	bool						ToBeltScript				(CScriptGameObject* GO, bool b_use_cursor_pos);
 	bool						ToBelt						(CUICellItem* itm, bool b_use_cursor_pos);
 	bool						TryUseItem					(CUICellItem* cell_itm);
 	bool						ToQuickSlot					(CUICellItem* itm);

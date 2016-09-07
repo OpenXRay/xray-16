@@ -45,8 +45,10 @@ public:
     Fmaterial				m_DefaultMat;
 public:
    // u32 					dwWidth, dwHeight;
-    u32 					m_RenderWidth_2, m_RenderHeight_2;
-    u32 					m_RealWidth, m_RealHeight;
+	u32 					m_RenderWidth_2;
+	u32						m_RenderHeight_2;
+	u32 					m_RealWidth;
+	u32						m_RealHeight;
     float					m_RenderArea;
     float 					m_ScreenQuality;
 

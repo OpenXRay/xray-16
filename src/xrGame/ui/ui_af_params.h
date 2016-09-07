@@ -2,7 +2,7 @@
 #include "UIWindow.h"
 #include "..\..\xrServerEntities\alife_space.h"
 
-
+class CInventoryItem;
 class CUIXml;
 class CUIStatic;
 class CUITextWnd;
@@ -15,12 +15,13 @@ public:
 	virtual			~CUIArtefactParams		();
 			void	InitFromXml				(CUIXml& xml);
 			bool	Check					(const shared_str& af_section);
-			void	SetInfo					(const shared_str& af_section);
+			void	SetInfo					(CInventoryItem& pInvItem);
 
 protected:
 	UIArtefactParamItem*	m_immunity_item[ALife::infl_max_count];
 	UIArtefactParamItem*	m_restore_item[ALife::eRestoreTypeMax];
 	UIArtefactParamItem*	m_additional_weight;
+	UIArtefactParamItem*	m_disp_condition; //Alundaio: Show AF Condition
 
 	CUIStatic*				m_Prop_line;
 

@@ -38,8 +38,11 @@ class CDUInterface;
 
 class ISE_Shape{
 public:
+	virtual ~ISE_Shape() = 0;
 	virtual void __stdcall			assign_shapes			(CShapeData::shape_def* shapes, u32 cnt)=0;
 };
+
+IC ISE_Shape::~ISE_Shape() {}
 
 SERVER_ENTITY_DECLARE_BEGIN0(CSE_Visual)
     void __stdcall					OnChangeVisual			(PropValue* sender);  
@@ -94,9 +97,11 @@ add_to_type_list(CSE_Motion)
 #define script_type_list save_type_list(CSE_Motion)
 
 struct ISE_AbstractLEOwner{
+	virtual ~ISE_AbstractLEOwner() = 0;
 	virtual void		__stdcall	get_bone_xform			(LPCSTR name, Fmatrix& xform) = 0;
 };
 
+IC ISE_AbstractLEOwner::~ISE_AbstractLEOwner() {}
 #pragma pack(push,1)
 struct visual_data {
 	Fmatrix		matrix;
@@ -113,6 +118,7 @@ public:
 		flMotionChange				= u32(1 << 3),
 		flVisualAnimationPauseChange= u32(1 << 4),
 	};
+	virtual ~ISE_Abstract() = 0;
 	Flags32							m_editor_flags;
 	IC	void						set_editor_flag			(u32 mask)	{m_editor_flags.set	(mask,TRUE);}
 
@@ -139,6 +145,7 @@ public:
 	virtual bool		__stdcall	validate				() = 0;
 };
 
+IC ISE_Abstract::~ISE_Abstract() {}
 #pragma warning(pop)
 
 #pragma pack(pop)

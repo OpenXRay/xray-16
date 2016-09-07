@@ -21,14 +21,13 @@
 #include "resource.h"
 #include "LightAnimLibrary.h"
 #include "../xrcdb/ispatial.h"
-#include "CopyProtection.h"
 #include "Text_Console.h"
 #include <process.h>
 #include <locale.h>
 
 #include "xrSash.h"
 
-#include "securom_api.h"
+//#include "securom_api.h"
 
 //---------------------------------------------------------------------
 ENGINE_API CInifile* pGameIni = NULL;
@@ -73,7 +72,7 @@ static char szEngineHash[33] = DEFAULT_MODULE_HASH;
 
 PROTECT_API char* ComputeModuleHash(char* pszHash)
 {
-    SECUROM_MARKER_HIGH_SECURITY_ON(3)
+    //SECUROM_MARKER_HIGH_SECURITY_ON(3)
 
     char szModuleFileName[MAX_PATH];
     HANDLE hModuleHandle = NULL, hFileMapping = NULL;
@@ -122,7 +121,7 @@ PROTECT_API char* ComputeModuleHash(char* pszHash)
     CloseHandle(hFileMapping);
     CloseHandle(hModuleHandle);
 
-    SECUROM_MARKER_HIGH_SECURITY_OFF(3)
+    //SECUROM_MARKER_HIGH_SECURITY_OFF(3)
 
     return pszHash;
 }
@@ -193,7 +192,6 @@ void InitEngine()
     Engine.Initialize();
     while (!g_bIntroFinished) Sleep(100);
     Device.Initialize();
-    CheckCopyProtection();
 }
 
 struct path_excluder_predicate
@@ -248,7 +246,7 @@ PROTECT_API void InitSettings()
 }
 PROTECT_API void InitConsole()
 {
-    SECUROM_MARKER_SECURITY_ON(5)
+    ////SECUROM_MARKER_SECURITY_ON(5)
 
 #ifdef DEDICATED_SERVER
     {
@@ -270,7 +268,7 @@ PROTECT_API void InitConsole()
         xr_strcpy(Console->ConfigFile, c_name);
     }
 
-    SECUROM_MARKER_SECURITY_OFF(5)
+    ////SECUROM_MARKER_SECURITY_OFF(5)
 }
 
 PROTECT_API void InitInput()
@@ -385,7 +383,6 @@ void Startup()
     logoWindow = NULL;
 
     // Main cycle
-    CheckCopyProtection();
     Memory.mem_usage();
     Device.Run();
 
@@ -614,7 +611,7 @@ BOOL IsOutOfVirtualMemory()
 #define VIRT_ERROR_SIZE 256
 #define VIRT_MESSAGE_SIZE 512
 
-    SECUROM_MARKER_HIGH_SECURITY_ON(1)
+    //SECUROM_MARKER_HIGH_SECURITY_ON(1)
 
     MEMORYSTATUSEX statex;
     DWORD dwPageFileInMB = 0;
@@ -646,7 +643,7 @@ BOOL IsOutOfVirtualMemory()
 
     MessageBox(NULL, pszMessage, pszError, MB_OK | MB_ICONHAND);
 
-    SECUROM_MARKER_HIGH_SECURITY_OFF(1)
+    //SECUROM_MARKER_HIGH_SECURITY_OFF(1)
 
     return 1;
 }
@@ -698,8 +695,7 @@ void foo()
 ENGINE_API bool g_dedicated_server = false;
 
 #ifndef DEDICATED_SERVER
-// forward declaration for Parental Control checks
-BOOL IsPCAccessAllowed();
+
 #endif // DEDICATED_SERVER
 
 int APIENTRY WinMain_impl(HINSTANCE hInstance,
@@ -744,13 +740,6 @@ int APIENTRY WinMain_impl(HINSTANCE hInstance,
     // Check for virtual memory
     if ((strstr(lpCmdLine, "--skipmemcheck") == NULL) && IsOutOfVirtualMemory())
         return 0;
-
-    // Parental Control for Vista and upper
-    if (!IsPCAccessAllowed())
-    {
-        MessageBox(NULL, "Access restricted", "Parental Control", MB_OK | MB_ICONERROR);
-        return 1;
-    }
 
     // Check for another instance
 #ifdef NO_MULTI_INSTANCES
@@ -1222,7 +1211,6 @@ void CApplication::LoadBegin()
         phase_timer.Start();
         load_stage = 0;
 
-        CheckCopyProtection();
     }
 }
 
@@ -1268,7 +1256,6 @@ PROTECT_API void CApplication::LoadDraw()
         load_draw_internal();
 
     Device.End();
-    CheckCopyProtection();
 }
 
 void CApplication::LoadTitleInt(LPCSTR str1, LPCSTR str2, LPCSTR str3)
@@ -1330,7 +1317,7 @@ void CApplication::Level_Append(LPCSTR folder)
 
 void CApplication::Level_Scan()
 {
-    SECUROM_MARKER_PERFORMANCE_ON(8)
+    //SECUROM_MARKER_PERFORMANCE_ON(8)
 
     for (u32 i = 0; i < Levels.size(); i++)
     {
@@ -1348,7 +1335,7 @@ void CApplication::Level_Scan()
 
     FS.file_list_close(folder);
 
-    SECUROM_MARKER_PERFORMANCE_OFF(8)
+    //SECUROM_MARKER_PERFORMANCE_OFF(8)
 }
 
 void gen_logo_name(string_path& dest, LPCSTR level_name, int num)
@@ -1366,7 +1353,7 @@ void gen_logo_name(string_path& dest, LPCSTR level_name, int num)
 
 void CApplication::Level_Set(u32 L)
 {
-    SECUROM_MARKER_PERFORMANCE_ON(9)
+    //SECUROM_MARKER_PERFORMANCE_ON(9)
 
     if (L >= Levels.size()) return;
     FS.get_path("$level$")->_set(Levels[L].folder);
@@ -1400,16 +1387,14 @@ void CApplication::Level_Set(u32 L)
     if (path[0])
         m_pRender->setLevelLogo(path);
 
-    CheckCopyProtection();
-
-    SECUROM_MARKER_PERFORMANCE_OFF(9)
+    //SECUROM_MARKER_PERFORMANCE_OFF(9)
 }
 
 int CApplication::Level_ID(LPCSTR name, LPCSTR ver, bool bSet)
 {
     int result = -1;
 
-    SECUROM_MARKER_SECURITY_ON(7)
+    ////SECUROM_MARKER_SECURITY_ON(7)
 
     CLocatorAPI::archives_it it = FS.m_archives.begin();
     CLocatorAPI::archives_it it_e = FS.m_archives.end();
@@ -1450,7 +1435,7 @@ int CApplication::Level_ID(LPCSTR name, LPCSTR ver, bool bSet)
     if (arch_res)
         g_pGamePersistent->OnAssetsChanged();
 
-    SECUROM_MARKER_SECURITY_OFF(7)
+    ////SECUROM_MARKER_SECURITY_OFF(7)
 
     return result;
 }
@@ -1482,57 +1467,6 @@ void CApplication::LoadAllArchives()
         g_pGamePersistent->OnAssetsChanged();
     }
 }
-
-#ifndef DEDICATED_SERVER
-// Parential control for Vista and upper
-typedef BOOL(*PCCPROC)(CHAR*);
-
-BOOL IsPCAccessAllowed()
-{
-    CHAR szPCtrlChk[MAX_PATH], szGDF[MAX_PATH], *pszLastSlash;
-    HINSTANCE hPCtrlChk = NULL;
-    PCCPROC pctrlchk = NULL;
-    BOOL bAllowed = TRUE;
-
-    if (!GetModuleFileName(NULL, szPCtrlChk, MAX_PATH))
-        return TRUE;
-
-    if ((pszLastSlash = strrchr(szPCtrlChk, '\\')) == NULL)
-        return TRUE;
-
-    *pszLastSlash = '\0';
-
-    strcpy_s(szGDF, szPCtrlChk);
-
-    strcat_s(szPCtrlChk, "\\pctrlchk.dll");
-    if (GetFileAttributes(szPCtrlChk) == INVALID_FILE_ATTRIBUTES)
-        return TRUE;
-
-    if ((pszLastSlash = strrchr(szGDF, '\\')) == NULL)
-        return TRUE;
-
-    *pszLastSlash = '\0';
-
-    strcat_s(szGDF, "\\Stalker-COP.exe");
-    if (GetFileAttributes(szGDF) == INVALID_FILE_ATTRIBUTES)
-        return TRUE;
-
-    if ((hPCtrlChk = LoadLibrary(szPCtrlChk)) == NULL)
-        return TRUE;
-
-    if ((pctrlchk = (PCCPROC)GetProcAddress(hPCtrlChk, "pctrlchk")) == NULL)
-    {
-        FreeLibrary(hPCtrlChk);
-        return TRUE;
-    }
-
-    bAllowed = pctrlchk(szGDF);
-
-    FreeLibrary(hPCtrlChk);
-
-    return bAllowed;
-}
-#endif // DEDICATED_SERVER
 
 //launcher stuff----------------------------
 extern "C" {

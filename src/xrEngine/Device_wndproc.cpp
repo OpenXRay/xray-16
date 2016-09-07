@@ -59,6 +59,10 @@ bool CRenderDevice::on_message(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
         result = 0;
         return (true);
     }
+    case WM_HOTKEY: // prevent 'ding' sounds caused by Alt+key combinations
+    case WM_SYSCHAR:
+        result = 0;
+        return true;
     }
 
     return (false);

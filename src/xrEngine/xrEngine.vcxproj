@@ -523,7 +523,6 @@
     <ClInclude Include="CameraManager.h" />
     <ClInclude Include="cf_dynamic_mesh.h" />
     <ClInclude Include="cl_intersect.h" />
-    <ClInclude Include="CopyProtection.h" />
     <ClInclude Include="CustomHUD.h" />
     <ClInclude Include="dedicated_server_only.h" />
     <ClInclude Include="defines.h" />
