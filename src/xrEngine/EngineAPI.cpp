@@ -218,7 +218,7 @@ void CEngineAPI::CreateRendererList()
             SupportsAdvancedRendering* test_rendering = (SupportsAdvancedRendering*)GetProcAddress(hRender, "SupportsAdvancedRendering");
             R_ASSERT(test_rendering);
             bSupports_r2_5 = test_rendering();
-            //FreeLibrary(hRender);
+            FreeLibrary(hRender);
         }
 
         // try to initialize R3
@@ -233,7 +233,7 @@ void CEngineAPI::CreateRendererList()
             SupportsDX10Rendering* test_dx10_rendering = (SupportsDX10Rendering*)GetProcAddress(hRender, "SupportsDX10Rendering");
             R_ASSERT(test_dx10_rendering);
             bSupports_r3 = test_dx10_rendering();
-            //FreeLibrary(hRender);
+            FreeLibrary(hRender);
         }
 
         // try to initialize R4
@@ -248,25 +248,24 @@ void CEngineAPI::CreateRendererList()
             SupportsDX11Rendering* test_dx11_rendering = (SupportsDX11Rendering*)GetProcAddress(hRender, "SupportsDX11Rendering");
             R_ASSERT(test_dx11_rendering);
             bSupports_r4 = test_dx11_rendering();
-            //FreeLibrary(hRender);
+            FreeLibrary(hRender);
         }
     }
 
     hRender = 0;
     bool proceed = true;
     xr_vector<LPCSTR> _tmp;
-	_tmp.push_back("renderer_r1");
-	 
-    if (proceed && (proceed = bSupports_r2))
+    _tmp.push_back("renderer_r1");
+    if (proceed &= bSupports_r2, proceed)
     {
         _tmp.push_back("renderer_r2a");
         _tmp.push_back("renderer_r2");
     }
-    if (proceed && (proceed = bSupports_r2_5))
+    if (proceed &= bSupports_r2_5, proceed)
         _tmp.push_back("renderer_r2.5");
-    if (proceed && (proceed = bSupports_r3))
+    if (proceed &= bSupports_r3, proceed)
         _tmp.push_back("renderer_r3");
-    if (proceed && (proceed = bSupports_r4))
+    if (proceed &= bSupports_r4, proceed)
         _tmp.push_back("renderer_r4");
     
 	u32 _cnt = _tmp.size() + 1;
