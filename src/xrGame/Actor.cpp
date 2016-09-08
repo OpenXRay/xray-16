@@ -1791,18 +1791,19 @@ void CActor::UpdateArtefactsOnBeltAndOutfit()
         const auto artefact = smart_cast<CArtefact*>(it);
         if (artefact)
         {
-            conditions().ChangeBleeding(artefact->m_fBleedingRestoreSpeed * f_update_time);
-            conditions().ChangeHealth(artefact->m_fHealthRestoreSpeed * f_update_time);
-            conditions().ChangePower(artefact->m_fPowerRestoreSpeed * f_update_time);
-            conditions().ChangeSatiety(artefact->m_fSatietyRestoreSpeed * f_update_time);
-            if (artefact->m_fRadiationRestoreSpeed > 0.0f)
+            float art_cond = artefact->GetCondition();
+            conditions().ChangeBleeding(artefact->m_fBleedingRestoreSpeed * art_cond * f_update_time);
+            conditions().ChangeHealth(artefact->m_fHealthRestoreSpeed * art_cond * f_update_time);
+            conditions().ChangePower(artefact->m_fPowerRestoreSpeed * art_cond * f_update_time);
+            conditions().ChangeSatiety(artefact->m_fSatietyRestoreSpeed * art_cond * f_update_time);
+            if (artefact->m_fRadiationRestoreSpeed * art_cond > 0.0f)
             {
-                float val = artefact->m_fRadiationRestoreSpeed - conditions().GetBoostRadiationImmunity();
+                float val = artefact->m_fRadiationRestoreSpeed * art_cond - conditions().GetBoostRadiationImmunity();
                 clamp(val, 0.0f, val);
                 conditions().ChangeRadiation(val * f_update_time);
             }
             else
-                conditions().ChangeRadiation(artefact->m_fRadiationRestoreSpeed * f_update_time);
+                conditions().ChangeRadiation(artefact->m_fRadiationRestoreSpeed * art_cond * f_update_time);
         }
     }
 
@@ -1849,7 +1850,7 @@ float CActor::GetProtection_ArtefactsOnBelt(ALife::EHitType hit_type)
     {
         const auto artefact = smart_cast<CArtefact*>(it);
         if (artefact)
-            sum += artefact->m_ArtefactHitImmunities.AffectHit(1.0f, hit_type);
+            sum += artefact->m_ArtefactHitImmunities.AffectHit(1.0f, hit_type) * artefact->GetCondition();
     }
     return sum;
 }
@@ -2008,7 +2009,7 @@ float CActor::GetRestoreSpeed(ALife::EConditionRestoreType const& type)
         {
             const auto artefact = smart_cast<CArtefact*>(it);
             if (artefact)
-                res += artefact->m_fHealthRestoreSpeed;
+                res += artefact->m_fHealthRestoreSpeed * artefact->GetCondition();
         }
 
         const auto outfit = GetOutfit();
@@ -2023,7 +2024,7 @@ float CActor::GetRestoreSpeed(ALife::EConditionRestoreType const& type)
         {
             const auto artefact = smart_cast<CArtefact*>(it);
             if (artefact)
-                res += artefact->m_fRadiationRestoreSpeed;
+                res += artefact->m_fRadiationRestoreSpeed * artefact->GetCondition();
         }
 
         const auto outfit = GetOutfit();
@@ -2040,7 +2041,7 @@ float CActor::GetRestoreSpeed(ALife::EConditionRestoreType const& type)
         {
             const auto artefact = smart_cast<CArtefact*>(it);
             if (artefact)
-                res += artefact->m_fSatietyRestoreSpeed;
+                res += artefact->m_fSatietyRestoreSpeed * artefact->GetCondition();
         }
 
         const auto outfit = GetOutfit();
@@ -2057,7 +2058,7 @@ float CActor::GetRestoreSpeed(ALife::EConditionRestoreType const& type)
         {
             const auto artefact = smart_cast<CArtefact*>(it);
             if (artefact)
-                res += artefact->m_fPowerRestoreSpeed;
+                res += artefact->m_fPowerRestoreSpeed * artefact->GetCondition();
         }
         auto outfit = GetOutfit();
         if (outfit)
@@ -2079,7 +2080,7 @@ float CActor::GetRestoreSpeed(ALife::EConditionRestoreType const& type)
         {
             const auto artefact = smart_cast<CArtefact*>(it);
             if (artefact)
-                res += artefact->m_fBleedingRestoreSpeed;
+                res += artefact->m_fBleedingRestoreSpeed * artefact->GetCondition();
         }
 
         const auto outfit = GetOutfit();
