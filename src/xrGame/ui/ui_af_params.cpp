@@ -197,6 +197,8 @@ void CUIArtefactParams::SetInfo( CInventoryItem& pInvItem )
 		{
 			continue;
 		}
+		
+		val *= pInvItem.GetCondition();
 		max_val = actor->conditions().GetZoneMaxPower( (ALife::EInfluenceType)i );
 		val /= max_val;
 		m_immunity_item[i]->SetValue( val );
@@ -213,6 +215,7 @@ void CUIArtefactParams::SetInfo( CInventoryItem& pInvItem )
 		val	= pSettings->r_float( af_section, "additional_inventory_weight" );
 		if ( !fis_zero(val) )
 		{
+			val *= pInvItem.GetCondition();
 			m_additional_weight->SetValue( val );
 
 			pos.set( m_additional_weight->GetWndPos() );
@@ -231,6 +234,7 @@ void CUIArtefactParams::SetInfo( CInventoryItem& pInvItem )
 		{
 			continue;
 		}
+		val *= pInvItem.GetCondition();
 		m_restore_item[i]->SetValue( val );
 
 		pos.set( m_restore_item[i]->GetWndPos() );
