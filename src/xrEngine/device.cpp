@@ -144,36 +144,24 @@ void CRenderDevice::End(void)
 #endif
 }
 
-
-volatile u32 mt_Thread_marker = 0x12345678;
-void mt_Thread(void* ptr)
+void CRenderDevice::SecondaryThreadProc(void *context)
 {
-	auto &device = *static_cast<CRenderDevice*>(ptr);
+	auto &device = *static_cast<CRenderDevice*>(context);
     while (true)
     {
-        // waiting for Device permission to execute
-		device.mt_csEnter.Enter();
-
-		if (device.mt_bMustExit)
+		device.syncProcessFrame.Wait();
+        if (device.mt_bMustExit)
         {
-			device.mt_bMustExit = FALSE; // Important!!!
-			device.mt_csEnter.Leave(); // Important!!!
+            device.mt_bMustExit = FALSE;
+            device.syncThreadExit.Set();
             return;
         }		
-        // we has granted permission to execute
-		mt_Thread_marker = device.dwFrame;
 
-		for (u32 pit = 0; pit < device.seqParallel.size(); pit++)
-			device.seqParallel[pit]();
-		device.seqParallel.clear_not_free();
-		device.seqFrameMT.Process(rp_Frame);
-
-        // now we give control to device - signals that we are ended our work
-		device.mt_csEnter.Leave();
-        // waits for device signal to continue - to start again
-		device.mt_csLeave.Enter();
-        // returns sync signal to device
-		device.mt_csLeave.Leave();
+        for (u32 pit = 0; pit < device.seqParallel.size(); pit++)
+            device.seqParallel[pit]();
+        device.seqParallel.clear_not_free();
+        device.seqFrameMT.Process(rp_Frame);
+        device.syncFrameDone.Set();
     }		
 }
 
@@ -262,12 +250,7 @@ void CRenderDevice::on_idle()
     mView_saved = mView;
     mProject_saved = mProject;
     
-    // *** Resume threads
-    // Capture end point - thread must run only ONE cycle
-    // Release start point - allow thread to run
-    mt_csLeave.Enter();
-    mt_csEnter.Leave();
-
+	syncProcessFrame.Set(); // allow secondary thread to do its job
 #ifdef ECO_RENDER // ECO_RENDER START
 	static u32 time_frame = 0;
 	u32 time_curr = timeGetTime();
@@ -283,8 +266,10 @@ void CRenderDevice::on_idle()
 #endif // ECO_RENDER END
 
 #ifndef DEDICATED_SERVER
-    Statistic->RenderTOTAL_Real.FrameStart();
-    Statistic->RenderTOTAL_Real.Begin();
+    // all rendering is done here
+    CStatTimer renderTotalReal;
+    renderTotalReal.FrameStart();
+    renderTotalReal.Begin();
 	
     if (b_is_Active && Begin())
     {
@@ -293,25 +278,11 @@ void CRenderDevice::on_idle()
 			Statistic->Show();
 		End();
     }
-    Statistic->RenderTOTAL_Real.End();
-    Statistic->RenderTOTAL_Real.FrameEnd();
-    Statistic->RenderTOTAL.accum = Statistic->RenderTOTAL_Real.accum;
+    renderTotalReal.End();
+    renderTotalReal.FrameEnd();
+    Statistic->RenderTOTAL.accum = renderTotalReal.accum;
 #endif // #ifndef DEDICATED_SERVER
-    // *** Suspend threads
-    // Capture startup point
-    // Release end point - allow thread to wait for startup point
-    mt_csEnter.Enter();
-    mt_csLeave.Leave();
-
-    // Ensure, that second thread gets chance to execute anyway
-    if (dwFrame != mt_Thread_marker)
-    {
-        for (u32 pit = 0; pit < Device.seqParallel.size(); pit++)
-            Device.seqParallel[pit]();
-        Device.seqParallel.clear_not_free();
-        seqFrameMT.Process(rp_Frame);
-    }
-
+    syncFrameDone.Wait(); // wait until secondary thread finish its job
 #ifdef DEDICATED_SERVER
     u32 FrameEndTime = TimerGlobal.GetElapsed_ms();
     u32 FrameTime = (FrameEndTime - FrameStartTime);
@@ -357,7 +328,6 @@ void CRenderDevice::message_loop()
 
 void CRenderDevice::Run()
 {
-    // DUMP_PHASE;
     g_bLoaded = FALSE;
     Log("Starting engine...");
     thread_name("X-RAY Primary thread");
@@ -372,11 +342,8 @@ void CRenderDevice::Run()
         Timer_MM_Delta = time_system - time_local;
     }
     // Start all threads
-    // InitializeCriticalSection (&mt_csEnter);
-    // InitializeCriticalSection (&mt_csLeave);
-    mt_csEnter.Enter();
     mt_bMustExit = FALSE;
-    thread_spawn(mt_Thread, "X-RAY Secondary thread", 0, this);
+    thread_spawn(SecondaryThreadProc, "X-RAY Secondary thread", 0, this);
     // Message cycle
     seqAppStart.Process(rp_AppStart);
 
@@ -385,10 +352,10 @@ void CRenderDevice::Run()
     seqAppEnd.Process(rp_AppEnd);
     // Stop Balance-Thread
     mt_bMustExit = TRUE;
-    mt_csEnter.Leave();
-    while (mt_bMustExit) Sleep(0);
-    // DeleteCriticalSection (&mt_csEnter);
-    // DeleteCriticalSection (&mt_csLeave);
+    syncProcessFrame.Set();
+    syncThreadExit.Wait();
+    while (mt_bMustExit) 
+		Sleep(0);
 }
 
 u32 app_inactive_time = 0;
@@ -432,6 +399,7 @@ void CRenderDevice::FrameMove()
         dwTimeDelta = dwTimeGlobal - _old_global;
     }
     // Frame move
+    Statistic->EngineTOTAL.FrameStart();
 	Statistic->EngineTOTAL.Begin();
     // TODO: HACK to test loading screen.
     //if(!g_bLoaded)
@@ -440,6 +408,7 @@ void CRenderDevice::FrameMove()
     //else
     // seqFrame.Process(rp_Frame);
 	Statistic->EngineTOTAL.End();
+	Statistic->EngineTOTAL.FrameEnd();
 }
 ENGINE_API BOOL bShowPauseString = TRUE;
 #include "IGame_Persistent.h"

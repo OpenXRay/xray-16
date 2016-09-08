@@ -10,11 +10,10 @@
 //class ENGINE_API CGammaControl;
 
 #include "pure.h"
-//#include "hw.h"
+
 #include "../xrcore/ftimer.h"
 #include "stats.h"
-//#include "shader.h"
-//#include "R_Backend.h"
+#include "../xrCore/Event.hpp"
 
 #define VIEWPORT_NEAR 0.2f
 
@@ -25,18 +24,19 @@
 
 #ifdef INGAME_EDITOR
 # include "../Include/editor/interfaces.hpp"
-#endif // #ifdef INGAME_EDITOR
+#endif
 
 class engine_impl;
 
 #pragma pack(push,4)
 
-class IRenderDevice
+class ENGINE_API IRenderDevice
 {
 public:
-    virtual CStatsPhysics* _BCL StatPhysics() = 0;
-    virtual void _BCL AddSeqFrame(pureFrame* f, bool mt) = 0;
-    virtual void _BCL RemoveSeqFrame(pureFrame* f) = 0;
+     virtual ~IRenderDevice() {}
+	virtual CStatsPhysics* StatPhysics() = 0;
+    virtual void  AddSeqFrame(pureFrame* f, bool mt) = 0;
+    virtual void  RemoveSeqFrame(pureFrame* f) = 0;
 };
 
 class ENGINE_API CRenderDeviceData
@@ -100,8 +100,6 @@ public:
     CRegistrator <pureScreenResolutionChanged> seqResolutionChanged;
 
     HWND m_hWnd;
-    // CStats* Statistic;
-
 };
 
 class ENGINE_API CRenderDeviceBase :
@@ -109,6 +107,7 @@ class ENGINE_API CRenderDeviceBase :
     public CRenderDeviceData
 {
 public:
+    CStats* Statistic;
 };
 
 #pragma pack(pop)
@@ -121,9 +120,6 @@ private:
     RECT m_rcWindowBounds;
     RECT m_rcWindowClient;
 
-    //u32 Timer_MM_Delta;
-    //CTimer_paused Timer;
-    //CTimer_paused TimerGlobal;
     CTimer TimerMM;
 
     void _Create(LPCSTR shName);
@@ -169,47 +165,12 @@ public:
 
     void DumpResourcesMemoryUsage() { m_pRender->ResourcesDumpMemoryUsage(); }
 public:
-    // Registrators
-    //CRegistrator <pureRender > seqRender;
-    // CRegistrator <pureAppActivate > seqAppActivate;
-    // CRegistrator <pureAppDeactivate > seqAppDeactivate;
-    // CRegistrator <pureAppStart > seqAppStart;
-    // CRegistrator <pureAppEnd > seqAppEnd;
-    //CRegistrator <pureFrame > seqFrame;
     CRegistrator <pureFrame > seqFrameMT;
     CRegistrator <pureDeviceReset > seqDeviceReset;
     xr_vector <fastdelegate::FastDelegate0<> > seqParallel;
-
-    // Dependent classes
-    //CResourceManager* Resources;
-
-    CStats* Statistic;
-
-    // Engine flow-control
-    //float fTimeDelta;
-    //float fTimeGlobal;
-    //u32 dwTimeDelta;
-    //u32 dwTimeGlobal;
-    //u32 dwTimeContinual;
-
-    // Cameras & projection
-    //Fvector vCameraPosition;
-    //Fvector vCameraDirection;
-    //Fvector vCameraTop;
-    //Fvector vCameraRight;
-
-    //Fmatrix mView;
-    //Fmatrix mProject;
-    //Fmatrix mFullTransform;
-
     Fmatrix mInvFullTransform;
 
-    //float fFOV;
-    //float fASPECT;
-
-    CRenderDevice()
-        :
-        m_pRender(0)
+    CRenderDevice():m_pRender(0)
 #ifdef INGAME_EDITOR
         , m_editor_module(0),
         m_editor_initialize(0),
@@ -231,6 +192,9 @@ public:
 
     void Pause(BOOL bOn, BOOL bTimer, BOOL bSound, LPCSTR reason);
     BOOL Paused();
+private:
+    static void SecondaryThreadProc(void *context);
+public:
 
     // Scene control
     void PreCache(u32 amount, bool b_draw_loadscreen, bool b_wait_user_input);
@@ -257,7 +221,6 @@ public:
 
     void Initialize(void);
     void ShutDown(void);
-
 public:
     void time_factor(const float& time_factor)
     {
@@ -270,10 +233,10 @@ public:
         VERIFY(Timer.time_factor() == TimerGlobal.time_factor());
         return (Timer.time_factor());
     }
+private:
+    Event syncProcessFrame, syncFrameDone, syncThreadExit;
+public:
 
-    // Multi-threading
-    xrCriticalSection mt_csEnter;
-    xrCriticalSection mt_csLeave;
     volatile BOOL mt_bMustExit;
 
     ICF void remove_from_seq_parallel(const fastdelegate::FastDelegate0<>& delegate)
@@ -299,9 +262,9 @@ public:
 
 private:
     void message_loop();
-    virtual void _BCL AddSeqFrame(pureFrame* f, bool mt);
-    virtual void _BCL RemoveSeqFrame(pureFrame* f);
-    virtual CStatsPhysics* _BCL StatPhysics() { return Statistic; }
+    virtual void  AddSeqFrame(pureFrame* f, bool mt);
+    virtual void  RemoveSeqFrame(pureFrame* f);
+    virtual CStatsPhysics* StatPhysics() { return Statistic; }
 #ifdef INGAME_EDITOR
 public:
     IC editor::ide* editor() const { return m_editor; }
