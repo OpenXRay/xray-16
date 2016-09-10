@@ -258,8 +258,11 @@ void CSE_ALifeOnlineOfflineGroup::switch_offline		()
 	MEMBERS::iterator			I = m_members.begin();
 	MEMBERS::iterator			E = m_members.end();
 	for ( ; I != E; ++I){
-		(*I).second->clear_client_data();
-		alife().remove_online		((*I).second, false);
+		if ((*I).second->m_bOnline == true)
+		{
+			(*I).second->clear_client_data();
+			alife().remove_online		((*I).second, false);
+		}
 	}
 
 	alife().scheduled().add		(this);
