@@ -1325,7 +1325,7 @@ void CUIActorMenu::PropertiesBoxForRepair( PIItem item, bool& b_show )
 //Alundaio: Ability to donate item during trade
 void CUIActorMenu::PropertiesBoxForDonate(PIItem item, bool& b_show)
 {
-	if (item->IsQuestItem())
+	if (!item->IsQuestItem())
 	{
 		m_UIPropertiesBox->AddItem("st_donate", NULL, INVENTORY_DONATE_ACTION);
 		b_show = true;
