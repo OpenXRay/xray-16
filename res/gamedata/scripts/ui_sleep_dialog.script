@@ -6,6 +6,8 @@ function sleep_dialog:__init() super()
 	if(device().width/device().height>(1024/768+0.01)) then
 		wide = true
 	end
+	
+	self:SetAutoDelete(true)
 
 	local xml = CScriptXmlInit()
 	xml:ParseFile("ui_sleep_dialog.xml")
@@ -18,10 +20,10 @@ function sleep_dialog:__init() super()
 	self.static_cover = xml:InitStatic("static_cover", self.back)
 	self.st_marker = xml:InitStatic("st_marker", self.static_cover)
 
-	sleep_st_tbl = {}
-		for i = 1, 24 do
-		sleep_st_tbl[i] = xml:InitStatic("sleep_st_"..i, self.back)
-		end
+	self.sleep_st_tbl = {}
+	for i = 1, 24 do
+		self.sleep_st_tbl[i] = xml:InitStatic("sleep_st_"..i, self.back)
+	end
 
 	self.time_track = xml:InitTrackBar("time_track", self.back)
 	self:Register(self.time_track, "time_track")
@@ -33,6 +35,7 @@ function sleep_dialog:__init() super()
 	self:Register(self.btn_cancel, "btn_cancel")
 
 	self.sleep_mb = CUIMessageBoxEx()
+	self.sleep_mb:self:SetAutoDelete(true)
 	self:Register(self.sleep_mb, "sleep_mb")
 --------------------------------------------------------------------------------
 	self:AddCallback("btn_sleep", ui_events.BUTTON_CLICKED, self.OnButtonSleep, self)
@@ -43,11 +46,11 @@ end
 function sleep_dialog:Initialize()
 	local cur_hours = level.get_time_hours()
 	for i = 1, 24 do
-	local hours = cur_hours + i
-	if(hours>=24) then
-		hours = hours - 24
-	end
-	sleep_st_tbl[i]:TextControl():SetText(hours..game.translate_string("st_sleep_hours"))
+		local hours = cur_hours + i
+		if(hours>=24) then
+			hours = hours - 24
+		end
+		self.sleep_st_tbl[i]:TextControl():SetText(hours..game.translate_string("st_sleep_hours"))
 	end
 
 	local delta = math.floor(591/24*cur_hours)
@@ -70,6 +73,10 @@ function sleep_dialog:Initialize()
 	local pos = self.sleep_static2:GetWndPos()
 	pos.x = self.sleep_static:GetWndPos().x+self.sleep_static:GetWidth()
 	self.sleep_static2:SetWndPos(pos)
+end
+
+function sleep_dialog:__finalize()
+	sleep_control = nil
 end
 
 function sleep_dialog:TestAndShow()
