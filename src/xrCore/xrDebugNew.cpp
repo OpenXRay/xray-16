@@ -300,7 +300,7 @@ void xrDebug::backend(const char* expression, const char* description, const cha
         TerminateProcess(GetCurrentProcess(), 1);
     }
     default:
-        NODEFAULT;
+        DEBUG_INVOKE;
     }
 # else // USE_OWN_ERROR_MESSAGE_WINDOW
 # ifdef USE_BUG_TRAP
