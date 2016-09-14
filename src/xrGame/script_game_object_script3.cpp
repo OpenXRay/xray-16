@@ -371,6 +371,7 @@ class_<CScriptGameObject> &script_register_game_object2(class_<CScriptGameObject
 		.def("install_upgrade", &CScriptGameObject::InstallUpgrade)
 		.def("has_upgrade", &CScriptGameObject::HasUpgrade)
 		.def("iterate_installed_upgrades", &CScriptGameObject::IterateInstalledUpgrades)
+		.def("weapon_in_grenade_mode", &CScriptGameObject::WeaponInGrenadeMode)
 		// For CHudItem
 		.def("play_hud_motion", &CScriptGameObject::PlayHudMotion)
 		.def("switch_state", &CScriptGameObject::SwitchState)
