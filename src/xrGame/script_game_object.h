@@ -864,6 +864,7 @@ public:
     bool InstallUpgrade(pcstr upgrade);
     bool HasUpgrade(pcstr upgrade) const;
     void IterateInstalledUpgrades(luabind::functor<void> functor);
+    bool WeaponInGrenadeMode();
 
     //Car
     CScriptGameObject* GetAttachedVehicle();

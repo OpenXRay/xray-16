@@ -49,6 +49,7 @@
 #include "script_callback_ex.h"
 #include "xrEngine/feel_touch.h"
 #include "WeaponAmmo.h"
+#include "WeaponMagazinedWGrenade.h"
 #endif
 //-Alundaio
 
@@ -1433,6 +1434,15 @@ u32 CScriptGameObject::GetState()
     }
 
     return 65535;
+}
+
+bool CScriptGameObject::WeaponInGrenadeMode()
+{
+    CWeaponMagazinedWGrenade* wpn = smart_cast<CWeaponMagazinedWGrenade*>(&object());
+    if (!wpn)
+        return false;
+
+    return wpn->m_bGrenadeMode;
 }
 
 void CScriptGameObject::SetBoneVisible(pcstr bone_name, bool bVisibility, bool bRecursive)

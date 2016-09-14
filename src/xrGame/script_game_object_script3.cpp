@@ -382,6 +382,7 @@ class_<CScriptGameObject>& script_register_game_object2(class_<CScriptGameObject
         //For Weapons
         .def("weapon_addon_attach", &CScriptGameObject::Weapon_AddonAttach)
         .def("weapon_addon_detach", &CScriptGameObject::Weapon_AddonDetach)
+        .def("weapon_in_grenade_mode", &CScriptGameObject::WeaponInGrenadeMode)
 
         //For Weapon & Outfit
         .def("install_upgrade", &CScriptGameObject::InstallUpgrade)
