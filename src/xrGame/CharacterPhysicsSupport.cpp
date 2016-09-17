@@ -1170,18 +1170,9 @@ void	CCharacterPhysicsSupport::	CreateShell						( CObject* who, Fvector& dp, Fv
 	{
 		m_pPhysicsShell->SetPrefereExactIntegration	();//use exact integration for ragdolls in single
         //AVO: turn on collision with dead bodies (thanks malandrinus)
-		//Alundaio: DEAD_BODY_COLLSION ONLY FOR ACTOR, NPC get stuck on bodies in chokepoints
-		CActor* A=smart_cast<CActor*>( &m_EntityAlife );
-		if (A)
-		{
 #ifndef DEAD_BODY_COLLISION
 			m_pPhysicsShell->SetRemoveCharacterCollLADisable();
 #endif
-		}
-		else {
-			m_pPhysicsShell->SetRemoveCharacterCollLADisable();
-		}
-		//-Alundaio
         //-AVO
 	}
 	else

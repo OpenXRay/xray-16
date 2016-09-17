@@ -254,6 +254,8 @@ void CEntity::KillEntity(u16 whoID, BOOL bypass_actor_check /*AVO: added for act
 #ifdef ACTOR_BEFORE_DEATH_CALLBACK
     if (IsGameTypeSingle() && (this->ID() == Actor()->ID()) && (bypass_actor_check != TRUE))
     {
+		Actor()->detach_Vehicle();
+		Actor()->use_MountedWeapon(NULL);
         Actor()->callback(GameObject::eActorBeforeDeath)(whoID);
         return;
     }
