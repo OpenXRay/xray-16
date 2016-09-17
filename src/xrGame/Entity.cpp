@@ -254,7 +254,7 @@ void CEntity::net_Destroy()
 
 void CEntity::KillEntity(u16 whoID, bool bypass_actor_check)
 {
-    if (GameID() == eGameIDSingle && this->ID() == Actor()->ID())
+    if (IsGameTypeSingle() && this->ID() == Actor()->ID())
     {
     //AVO: allow scripts to process actor condition and prevent actor's death or kill him if desired.
     //IMPORTANT: if you wish to kill actor you need to call db.actor:kill(level:object_by_id(whoID), true) in actor_before_death callback, to ensure all objects are properly destroyed

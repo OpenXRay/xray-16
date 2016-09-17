@@ -239,6 +239,7 @@ public:
     s32 GetZoomRndSeed() { return m_ZoomRndSeed; };
     void SetShotRndSeed(s32 Seed = 0);
     s32 GetShotRndSeed() { return m_ShotRndSeed; };
+
 public:
     void detach_Vehicle();
     void steer_Vehicle(float angle);
@@ -250,7 +251,6 @@ protected:
     CHolderCustom* m_holder;
     u16 m_holderID;
     bool use_Holder(CHolderCustom* holder);
-
     bool use_Vehicle(CHolderCustom* object);
     void ActorUse();
 
