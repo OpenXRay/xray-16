@@ -246,6 +246,11 @@ void CEntity::net_Destroy	()
 
 void CEntity::KillEntity(u16 whoID)
 {
+	if (this->ID() == Actor()->ID())
+	{
+		Actor()->detach_Vehicle();
+		Actor()->use_MountedWeapon(NULL);
+	}
 	if (whoID != ID()) {
 #ifdef DEBUG
 		if (m_killer_id != ALife::_OBJECT_ID(-1)) {
