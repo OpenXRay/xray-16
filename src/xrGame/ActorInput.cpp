@@ -349,9 +349,9 @@ bool CActor::use_Holder(CHolderCustom* holder)
         CGameObject* holderGO = smart_cast<CGameObject*>(m_holder);
 
         if (smart_cast<CCar*>(holderGO))
-            b = use_Vehicle(0);
-        else if (holderGO->CLS_ID == CLSID_OBJECT_W_STATMGUN)
-            b = use_MountedWeapon(0);
+            b = use_Vehicle(nullptr);
+        else if (holderGO->CLS_ID == CLSID_OBJECT_W_STATMGUN || holderGO->CLS_ID == CLSID_OBJECT_HOLDER_ENT)
+            b = use_HolderEx(nullptr, false);
 
         if (inventory().ActiveItem())
         {
@@ -369,8 +369,8 @@ bool CActor::use_Holder(CHolderCustom* holder)
         if (smart_cast<CCar*>(holder))
             b = use_Vehicle(holder);
 
-        if (holderGO->CLS_ID == CLSID_OBJECT_W_STATMGUN)
-            b = use_MountedWeapon(holder);
+        if (holderGO->CLS_ID == CLSID_OBJECT_W_STATMGUN || holderGO->CLS_ID == CLSID_OBJECT_HOLDER_ENT)
+            b = use_HolderEx(holder, false);
 
         if (b)
         { // used succesfully

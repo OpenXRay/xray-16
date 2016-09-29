@@ -129,6 +129,7 @@
 #define CLSID_OBJECT_ITEM_STD MK_CLSID('O', '_', 'I', 'T', 'E', 'M', ' ', ' ')
 #define CLSID_OBJECT_BREAKABLE MK_CLSID('O', '_', 'B', 'R', 'K', 'B', 'L', ' ')
 #define CLSID_OBJECT_CLIMABLE MK_CLSID('O', '_', 'C', 'L', 'M', 'B', 'L', ' ')
+#define CLSID_OBJECT_HOLDER_ENT MK_CLSID('O', '_', 'H', 'L', 'D', 'R', '_', 'E')
 
 //
 #define CLSID_PH_SKELETON_OBJECT MK_CLSID('P', '_', 'S', 'K', 'E', 'L', 'E', 'T')

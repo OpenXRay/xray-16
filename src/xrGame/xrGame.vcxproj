@@ -1349,6 +1349,7 @@
     <ClInclude Include="stalker_velocity_holder.h" />
     <ClInclude Include="stalker_velocity_holder_inline.h" />
     <ClInclude Include="state_arguments_functions.h" />
+    <ClInclude Include="StaticHolderEntity.h" />
     <ClInclude Include="static_cast_checked.hpp" />
     <ClInclude Include="static_obstacles_avoider.h" />
     <ClInclude Include="static_obstacles_avoider_inline.h" />
@@ -1414,7 +1415,7 @@
     <ClInclude Include="ui\UI3tButton.h" />
     <ClInclude Include="ui\uiabstract.h" />
     <ClInclude Include="ui\UIAchievements.h" />
-	<ClInclude Include="ui\UIRankingsCoC.h" />
+    <ClInclude Include="ui\UIRankingsCoC.h" />
     <ClInclude Include="ui\UIActorMenu.h" />
     <ClInclude Include="ui\UIActorStateInfo.h" />
     <ClInclude Include="ui\UIAnimatedStatic.h" />
@@ -1583,6 +1584,7 @@
     <ClInclude Include="WeaponRPG7.h" />
     <ClInclude Include="WeaponShotgun.h" />
     <ClInclude Include="WeaponStatMgun.h" />
+    <ClInclude Include="HolderEntityObject.h" />
     <ClInclude Include="WeaponSVD.h" />
     <ClInclude Include="WeaponSVU.h" />
     <ClInclude Include="WeaponUSP45.h" />
@@ -3716,6 +3718,7 @@
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
     <ClCompile Include="WeaponStatMgun.cpp" />
+    <ClCompile Include="HolderEntityObject.cpp" />
     <ClCompile Include="WeaponStatMgunFire.cpp" />
     <ClCompile Include="WeaponStatMgunIR.cpp" />
     <ClCompile Include="WeaponSVD.cpp">

@@ -30,10 +30,12 @@ void CWeaponStatMgun::BoneCallbackY(CBoneInstance* B)
 
 CWeaponStatMgun::CWeaponStatMgun()
 {
+    m_firing_disabled = false;
     m_Ammo = new CCartridge();
     camera = new CCameraFirstEye(
         this, CCameraBase::flRelativeLink | CCameraBase::flPositionRigid | CCameraBase::flDirectionRigid);
     camera->Load("mounted_weapon_cam");
+    p_overheat = nullptr;
 }
 
 CWeaponStatMgun::~CWeaponStatMgun()
@@ -73,6 +75,15 @@ void CWeaponStatMgun::Load(LPCSTR section)
     camMaxAngle = _abs(deg2rad(camMaxAngle));
     camRelaxSpeed = pSettings->r_float(section, "cam_relax_speed");
     camRelaxSpeed = _abs(deg2rad(camRelaxSpeed));
+
+    m_overheat_enabled = pSettings->line_exist(section, "overheat_enabled") ? !!pSettings->r_bool(section, "overheat_enabled") : false;
+    m_overheat_time_quant = READ_IF_EXISTS(pSettings, r_float, section, "overheat_time_quant", 0.025f);
+    m_overheat_decr_quant = READ_IF_EXISTS(pSettings, r_float, section, "overheat_decr_quant", 0.002f);
+    m_overheat_threshold = READ_IF_EXISTS(pSettings, r_float, section, "overheat_threshold", 110.f);
+    m_overheat_particles = READ_IF_EXISTS(pSettings, r_string, section, "overheat_particles", "damage_fx\\burn_creatures00");
+
+    m_bEnterLocked = !!READ_IF_EXISTS(pSettings, r_bool, section, "lock_enter", false);
+    m_bExitLocked = !!READ_IF_EXISTS(pSettings, r_bool, section, "lock_exit", false);
 
     VERIFY(!fis_zero(camMaxAngle));
     VERIFY(!fis_zero(camRelaxSpeed));
@@ -128,6 +139,13 @@ BOOL CWeaponStatMgun::net_Spawn(CSE_Abstract* DC)
 
 void CWeaponStatMgun::net_Destroy()
 {
+    if (p_overheat)
+    {
+        if (p_overheat->IsPlaying())
+            p_overheat->Stop(false);
+        CParticlesObject::Destroy(p_overheat);
+    }
+
     inheritedPH::net_Destroy();
     processing_deactivate();
 }

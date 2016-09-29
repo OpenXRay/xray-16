@@ -6677,6 +6677,12 @@
     <ClInclude Include="..\xrEngine\WaveForm.h">
       <Filter>Core\Server\Editor</Filter>
     </ClInclude>
+    <ClInclude Include="HolderEntityObject.h">
+      <Filter>Core\Client\Objects\base\GameObject\Holder</Filter>
+    </ClInclude>
+    <ClInclude Include="StaticHolderEntity.h">
+      <Filter>Core\Client\Objects\base\GameObject\Holder</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="damage_manager.cpp">
@@ -10214,6 +10220,9 @@
     <ClCompile Include="game_type.cpp" />
     <ClCompile Include="ai\monsters\state.cpp">
       <Filter>AI\AMonsters\common\components\State</Filter>
+    </ClCompile>
+    <ClCompile Include="HolderEntityObject.cpp">
+      <Filter>Core\Client\Objects\base\GameObject\Holder</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -267,8 +267,7 @@ void CEntity::KillEntity(u16 whoID, bool bypass_actor_check)
         }
 #endif
     //-AVO
-        Actor()->detach_Vehicle();
-        Actor()->use_MountedWeapon(nullptr);
+        Actor()->use_HolderEx(NULL,true);
     }
     if (whoID != ID())
     {
