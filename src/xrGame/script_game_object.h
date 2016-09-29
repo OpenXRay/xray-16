@@ -851,8 +851,8 @@ public:
 
 			//Car
 			CScriptGameObject*  GetAttachedVehicle();
-			void				AttachVehicle(CScriptGameObject* veh);
-			void				DetachVehicle();
+			void				AttachVehicle(CScriptGameObject* veh, bool bForce = false);
+			void				DetachVehicle(bool bForce = false);
 
 			//Any class that is derived from CHudItem
 			u32					PlayHudMotion(LPCSTR M, bool bMixIn, u32 state);

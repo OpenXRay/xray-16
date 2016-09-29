@@ -1,22 +1,15 @@
 #pragma once
 
 #include "holder_custom.h"
-#include "shootingobject.h"
 #include "physicsshellholder.h"
-#include "hudsound.h"
-class CCartridge;
 class CCameraBase;
 
-#define DESIRED_DIR 1
-
-class CWeaponStatMgun:	public CPhysicsShellHolder, 
-						public CHolderCustom,
-						public CShootingObject
+class CHolderEntityObject:	public CPhysicsShellHolder, 
+						public CHolderCustom
 {
 private:
 	typedef CPhysicsShellHolder inheritedPH;
 	typedef CHolderCustom		inheritedHolder;
-	typedef CShootingObject		inheritedShooting;
 
 private:
 	CCameraBase*			camera;
@@ -26,16 +19,14 @@ private:
 	void					SetBoneCallbacks	();
 	void					ResetBoneCallbacks	();
 
-	HUD_SOUND_COLLECTION	m_sounds;
-
 //casts
 public:
 	virtual CHolderCustom	*cast_holder_custom	()				{return this;}
 
 //general
 public:
-							CWeaponStatMgun		();
-	virtual					~CWeaponStatMgun	();
+							CHolderEntityObject		();
+	virtual					~CHolderEntityObject	();
 
 	virtual void			Load				(LPCSTR section);
 
@@ -50,41 +41,13 @@ public:
 
 //shooting
 private:
-	u16						m_rotate_x_bone, m_rotate_y_bone, m_fire_bone, m_camera_bone;
-	float					m_tgt_x_rot, m_tgt_y_rot, m_cur_x_rot, m_cur_y_rot, m_bind_x_rot, m_bind_y_rot;
-	Fvector					m_bind_x, m_bind_y;
-	Fvector					m_fire_dir,m_fire_pos;
+	Fvector3				m_camera_position;
+	Fvector3				m_exit_position;
+	Fvector3				m_camera_angle;
 
-	Fmatrix					m_i_bind_x_xform, m_i_bind_y_xform, m_fire_bone_xform;
 	Fvector2				m_lim_x_rot, m_lim_y_rot; //in bone space
-	CCartridge*				m_Ammo;
-	float					m_barrel_speed;
-	Fvector2				m_dAngle;
-	Fvector					m_destEnemyDir;
-	bool					m_allow_fire;
-	float					camRelaxSpeed;
-	float					camMaxAngle;
-
-	bool 			m_firing_disabled;
-	bool			m_overheat_enabled;
-	float 			m_overheat_value;
-	float 			m_overheat_time_quant;
-	float 			m_overheat_decr_quant;
-	float 			m_overheat_threshold;
-	shared_str		m_overheat_particles;
-	CParticlesObject*	p_overheat;
+	bool 					m_bAllowWeapon;
 protected:
-	void					UpdateBarrelDir		();
-	virtual const Fvector&	get_CurrentFirePoint();
-	virtual const Fmatrix&	get_ParticlesXFORM	();
-
-	virtual	void			FireStart			();
-	virtual	void			FireEnd				();
-	virtual	void			UpdateFire			();
-	virtual	void			OnShot				();
-			void			AddShotEffector		();
-			void			RemoveShotEffector	();
-			void			SetDesiredDir		(float h, float p);
 	virtual bool			IsHudModeNow		(){return false;};
 
 //HolderCustom
@@ -94,16 +57,19 @@ public:
 	virtual void			OnKeyboardPress		(int dik);
 	virtual void			OnKeyboardRelease	(int dik);
 	virtual void			OnKeyboardHold		(int dik);
-	virtual CInventory*		GetInventory		()						{return NULL;};
+	virtual CInventory*		GetInventory		(){return NULL;};
 	virtual void			cam_Update			(float dt, float fov=90.0f);
 
 	virtual void			renderable_Render	();
 
+	virtual void			attach_actor_script(bool bForce = false);
+	virtual void			detach_actor_script(bool bForce = false);
+
 	virtual bool			attach_Actor		(CGameObject* actor);
 	virtual void			detach_Actor		();
-	virtual bool			allowWeapon			()	const				{return false;};
+	virtual bool			allowWeapon			()	const				{return m_bAllowWeapon;};
 	virtual bool			HUDView				()	const				{return true;};
-	virtual Fvector			ExitPosition		()						{return Fvector().set(0.0f,0.0f,0.0f);};
+	virtual Fvector			ExitPosition()								{ return m_exit_position; };
 
 	virtual CCameraBase*	Camera				()						{return camera;};
 

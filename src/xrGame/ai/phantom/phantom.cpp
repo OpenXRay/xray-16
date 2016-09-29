@@ -72,11 +72,11 @@ BOOL CPhantom::net_Spawn(CSE_Abstract* DC)
 
 	SwitchToState		(stBirth);			// initial state (changed on load method in inherited::)
 
+	OBJ->set_killer_id(u16(-1)); // Alundaio: Hack to prevent strange crash with dynamic phantoms
+	
 	// inherited
 	if (!inherited::net_Spawn(DC)) return FALSE;
 	
-	OBJ->set_killer_id(u16(-1)); // Alundaio: Hack to prevent strange crash with dynamic phantoms
-
 	m_enemy			= Level().CurrentEntity();
 	VERIFY			(m_enemy);
 

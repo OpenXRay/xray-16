@@ -8,34 +8,55 @@
 #include "holder_custom.h"
 #include "script_callback_ex.h"
 #include "script_game_object.h"
+#include "Car.h"
 
-bool CActor::use_MountedWeapon(CHolderCustom* object)
+bool CActor::use_HolderEx(CHolderCustom* object, bool bForce)
 {
-	CHolderCustom* wpn = object;
-	if (m_holder){
-		if (!wpn || (m_holder == wpn)){
-			m_holder->detach_Actor();
-			CGameObject* go = smart_cast<CGameObject*>(m_holder);
-			if (go)
-				this->callback(GameObject::eDetachVehicle)(go->lua_game_object());
-			character_physics_support()->movement()->CreateCharacter();
-			m_holder = NULL;
+	if (m_holder)
+	{
+		CCar* car = smart_cast<CCar*>(m_holder);
+		if (car)
+		{
+			detach_Vehicle();
+			return true;
+		}
+		if (!m_holder->ExitLocked())
+		{
+			if (!object || (m_holder == object)){
+				m_holder->detach_Actor();
+
+				CGameObject* go = smart_cast<CGameObject*>(m_holder);
+				if (go)
+					this->callback(GameObject::eDetachVehicle)(go->lua_game_object());
+
+				character_physics_support()->movement()->CreateCharacter();
+				m_holder = NULL;
+			}
 		}
 		return true;
-	}
-	else{
-		if (wpn){
+	} 
+	else
+	{
+		CCar* car = smart_cast<CCar*>(m_holder);
+		if (car)
+		{
+			attach_Vehicle(object);
+			return true;
+		}
+		if (object && !object->EnterLocked())
+		{
 			Fvector center;	Center(center);
-			if (wpn->Use(Device.vCameraPosition, Device.vCameraDirection, center)){
-				if (wpn->attach_Actor(this)){
+			if (object->Use(Device.vCameraPosition, Device.vCameraDirection, center)){
+				if (object->attach_Actor(this)){
 					// destroy actor character
 					character_physics_support()->movement()->DestroyCharacter();
-					//PickupModeOff();
-					m_holder = wpn;
+
+					m_holder = object;
 					if (pCamBobbing){
 						Cameras().RemoveCamEffector(eCEBobbing);
 						pCamBobbing = NULL;
 					}
+
 					CGameObject* go = smart_cast<CGameObject*>(m_holder);
 					if (go)
 						this->callback(GameObject::eAttachVehicle)(go->lua_game_object());

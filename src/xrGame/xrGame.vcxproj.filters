@@ -5856,6 +5856,9 @@
     <ClInclude Include="WeaponStatMgun.h">
       <Filter>Core\Client\Objects\items &amp; weapons\Weapons\StationaryMgun</Filter>
     </ClInclude>
+    <ClInclude Include="HolderEntityObject.h">
+      <Filter>Core\Client\Objects\items &amp; HolderEntityObject</Filter>
+    </ClInclude>
     <ClInclude Include="Artefact.h">
       <Filter>Core\Client\Objects\items &amp; weapons\Artifacts</Filter>
     </ClInclude>
@@ -9433,6 +9436,9 @@
     </ClCompile>
     <ClCompile Include="WeaponStatMgun.cpp">
       <Filter>Core\Client\Objects\items &amp; weapons\Weapons\StationaryMgun</Filter>
+    </ClCompile>
+    <ClCompile Include="HolderEntityObject.cpp">
+      <Filter>Core\Client\Objects\items &amp; HolderEntityObject</Filter>
     </ClCompile>
     <ClCompile Include="WeaponStatMgunFire.cpp">
       <Filter>Core\Client\Objects\items &amp; weapons\Weapons\StationaryMgun</Filter>

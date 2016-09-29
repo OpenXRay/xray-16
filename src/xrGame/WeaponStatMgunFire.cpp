@@ -20,6 +20,9 @@ const Fmatrix&	CWeaponStatMgun::get_ParticlesXFORM	()
 
 void CWeaponStatMgun::FireStart()
 {
+	if (m_firing_disabled)
+		return;
+	
 	m_dAngle.set(0.0f,0.0f);
 	inheritedShooting::FireStart();
 }
@@ -35,16 +38,67 @@ void CWeaponStatMgun::FireEnd()
 void CWeaponStatMgun::UpdateFire()
 {
 	fShotTimeCounter -= Device.fTimeDelta;
-	
 
 	inheritedShooting::UpdateFlameParticles();
 	inheritedShooting::UpdateLight();
+	
+	if (m_overheat_enabled)
+	{
+		m_overheat_value -= m_overheat_decr_quant;
+		if (m_overheat_value < 100.f)
+		{
+			if (p_overheat)
+			{
+				if (p_overheat->IsPlaying())
+					p_overheat->Stop(FALSE);
+				CParticlesObject::Destroy(p_overheat);
+			}
+			if (m_firing_disabled)
+				m_firing_disabled = false;
+		}
+		else {
+			if (p_overheat)
+			{
+				Fmatrix	pos;
+				pos.set(get_ParticlesXFORM());
+				pos.c.set(get_CurrentFirePoint());
+				p_overheat->SetXFORM(pos);
+			}
+		}
+	}
 
 	if(!IsWorking()){
 		clamp(fShotTimeCounter,0.0f, flt_max);
+		clamp(m_overheat_value, 0.0f, m_overheat_threshold);
 		return;
 	}
 
+	if (m_overheat_enabled)
+	{
+		m_overheat_value += m_overheat_time_quant;
+		clamp(m_overheat_value, 0.0f, m_overheat_threshold);
+
+		if (m_overheat_value >= 100.f)
+		{
+			if (!p_overheat)
+			{
+				p_overheat = CParticlesObject::Create(m_overheat_particles.c_str(),FALSE);
+				Fmatrix	pos;
+				pos.set(get_ParticlesXFORM());
+				pos.c.set(get_CurrentFirePoint());
+				p_overheat->SetXFORM(pos);
+				p_overheat->Play(false);
+			}
+
+			if (m_overheat_value >= m_overheat_threshold)
+			{
+				m_firing_disabled = true;
+				FireEnd();
+				return;
+			}
+		}
+	}
+	
 	if(fShotTimeCounter<=0)
 	{
 		OnShot			();
