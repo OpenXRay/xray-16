@@ -95,7 +95,7 @@ void CScriptIniFile::script_register(lua_State *L)
 			.def(constructor<LPCSTR>())
 			//Alundaio: Extend script ini file
 #ifdef INI_FILE_EXTENDED_EXPORTS
-            //.def(constructor<LPCSTR,BOOL,BOOL,BOOL,BOOL>())
+            .def(constructor<LPCSTR,BOOL,BOOL,BOOL,LPCSTR>())
 			.def("w_bool",&CScriptIniFile::w_bool)
 			.def("w_color", &CScriptIniFile::w_color)
 			.def("w_fcolor", &CScriptIniFile::w_fcolor)

@@ -16,8 +16,8 @@ CScriptIniFile::CScriptIniFile(IReader *F, LPCSTR path) :
 inherited(F, path)
 {}
 
-CScriptIniFile::CScriptIniFile(LPCSTR szFileName, BOOL ReadOnly, BOOL bLoadAtStart, BOOL SaveAtEnd) :
-inherited(update(szFileName), ReadOnly, bLoadAtStart, SaveAtEnd)
+CScriptIniFile::CScriptIniFile(LPCSTR szFileName, BOOL ReadOnly, BOOL bLoadAtStart, BOOL SaveAtEnd, LPCSTR path) :
+inherited(path?path:update(szFileName), ReadOnly, bLoadAtStart, SaveAtEnd)
 {}
 
 CScriptIniFile::~CScriptIniFile()

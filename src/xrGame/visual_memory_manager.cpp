@@ -33,6 +33,12 @@
 #	include "ai_debug.h"
 #endif // MASTER_GOLD
 
+//Alundaio
+#include "../../xrServerEntities/script_engine.h"
+#include "script_game_object.h"
+using namespace luabind; //Alundaio
+//-Alundaio
+
 void SetActorVisibility(u16 who, float value);
 
 struct SRemoveOfflinePredicate {
@@ -289,7 +295,7 @@ float CVisualMemoryManager::object_visible_distance(const CGameObject *game_obje
 
 float CVisualMemoryManager::object_luminocity	(const CGameObject *game_object) const
 {
-	if (!smart_cast<CActor const*>(game_object))
+	if (!smart_cast<CEntityAlive const*>(game_object)) //Alundaio
 		return	(1.f);
 	float		luminocity = const_cast<CGameObject*>(game_object)->ROS()->get_luminocity();
 	float		power = log(luminocity > .001f ? luminocity : .001f)*current_state().m_luminocity_factor;
@@ -298,6 +304,11 @@ float CVisualMemoryManager::object_luminocity	(const CGameObject *game_object) c
 
 float CVisualMemoryManager::get_object_velocity	(const CGameObject *game_object, const CNotYetVisibleObject &not_yet_visible_object) const
 {
+	//Alundaio: no need to check velocity on anything but stalkers, mutants and actor
+	if (!smart_cast<CEntityAlive const*>(game_object))
+		return (0.f);
+	//-Alundaio
+	
 	if ((game_object->ps_Size() < 2) || (not_yet_visible_object.m_prev_time == game_object->ps_Element(game_object->ps_Size() - 2).dwTime))
 		return							(0.f);
 
@@ -313,13 +324,19 @@ float CVisualMemoryManager::get_object_velocity	(const CGameObject *game_object,
 	);
 }
 
-float CVisualMemoryManager::get_visible_value	(float distance, float object_distance, float time_delta, float object_velocity, float luminocity) const
+float CVisualMemoryManager::get_visible_value(const CGameObject *game_object, float distance, float object_distance, float time_delta, float object_velocity, float luminocity) const
 {
 	float								always_visible_distance = current_state().m_always_visible_distance;
 
 	if (distance <= always_visible_distance + EPS_L)
 		return							(current_state().m_visibility_threshold);
 
+	//Alundaio: hijack not_yet_visible_object to lua
+	luabind::functor<float>	funct;
+	if (ai().script_engine().functor("visual_memory_manager.get_visible_value", funct))
+		return (funct(m_object?m_object->lua_game_object():0,game_object?game_object->lua_game_object():0, time_delta, current_state().m_time_quant, luminocity, current_state().m_velocity_factor, object_velocity, distance, object_distance, always_visible_distance));
+	//-Alundaio
+	
 	return								(
 		time_delta / 
 		current_state().m_time_quant * 
@@ -395,7 +412,7 @@ bool CVisualMemoryManager::visible				(const CGameObject *game_object, float tim
 		CNotYetVisibleObject		new_object;
 		new_object.m_object			= game_object;
 		new_object.m_prev_time		= 0;
-		new_object.m_value			= get_visible_value(distance,object_distance,time_delta,get_object_velocity(game_object,new_object),object_luminocity(game_object));
+		new_object.m_value = get_visible_value(game_object,distance, object_distance, time_delta, get_object_velocity(game_object, new_object), object_luminocity(game_object));
 		clamp						(new_object.m_value,0.f,current_state().m_visibility_threshold + EPS_L);
 		new_object.m_update_time	= Device.dwTimeGlobal;
 		new_object.m_prev_time		= get_prev_time(game_object);
@@ -404,7 +421,7 @@ bool CVisualMemoryManager::visible				(const CGameObject *game_object, float tim
 	}
 
 	object->m_update_time		= Device.dwTimeGlobal;
-	object->m_value				+= get_visible_value(distance,object_distance,time_delta,get_object_velocity(game_object,*object),object_luminocity(game_object));
+	object->m_value += get_visible_value(game_object,distance, object_distance, time_delta, get_object_velocity(game_object, *object), object_luminocity(game_object));
 	clamp						(object->m_value,0.f,current_state().m_visibility_threshold + EPS_L);
 	object->m_prev_time			= get_prev_time(game_object);
 
