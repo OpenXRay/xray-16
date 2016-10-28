@@ -328,7 +328,39 @@ ID3DBaseTexture*	CRender::texture_load(LPCSTR fRName, u32& ret_msize, bool bStag
 	xr_strcpy(fname,fRName); //. andy if (strext(fname)) *strext(fname)=0;
 	fix_texture_name		(fname);
 	IReader* S				= NULL;
-	if (!FS.exist(fn,"$game_textures$",	fname,	".dds")	&& strstr(fname,"_bump"))	goto _BUMP_from_base;
+	//if (!FS.exist(fn,"$game_textures$",	fname,	".dds")	&& strstr(fname,"_bump"))	goto _BUMP_from_base;
+	if (strstr(fname,"_bump")) 
+	{
+		if (!FS.exist(fn,"$game_textures$",	fname,	".dds"))
+			goto _BUMP_from_base;
+		else if (strstr(Core.Params,"-no_bump_mode2"))
+		{
+			if (strstr(fname,"_bump#"))
+			{
+				R_ASSERT2	(FS.exist(fn,"$game_textures$",	"ed\\ed_dummy_bump#",	".dds"), "ed_dummy_bump#");
+				S						= FS.r_open	(fn);
+				R_ASSERT2				(S, fn);
+				img_size				= S->length	();
+				goto		_DDS_2D;
+			}
+		
+			R_ASSERT2	(FS.exist(fn,"$game_textures$",	"ed\\ed_dummy_bump",	".dds"),"ed_dummy_bump");
+			S						= FS.r_open	(fn);
+
+			R_ASSERT2	(S, fn);
+
+			img_size				= S->length	();
+			goto		_DDS_2D;
+		}
+		else if (strstr(Core.Params,"-no_bump_mode1") && strstr(fname,"_bump#"))
+		{
+			R_ASSERT2	(FS.exist(fn,"$game_textures$",	"ed\\ed_dummy_bump#",	".dds"), "ed_dummy_bump#");
+			S						= FS.r_open	(fn);
+			R_ASSERT2				(S, fn);
+			img_size				= S->length	();
+			goto		_DDS_2D;
+		}
+	} 	
 	if (FS.exist(fn,"$level$",			fname,	".dds"))							goto _DDS;
 	if (FS.exist(fn,"$game_saves$",		fname,	".dds"))							goto _DDS;
 	if (FS.exist(fn,"$game_textures$",	fname,	".dds"))							goto _DDS;

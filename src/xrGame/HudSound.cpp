@@ -179,9 +179,9 @@ void HUD_SOUND_COLLECTION::PlaySound(	LPCSTR alias,
 			HUD_SOUND_ITEM::StopSound	(*it);
 	}
 
-
-	HUD_SOUND_ITEM* snd_item		= FindSoundItem(alias, true);
-	HUD_SOUND_ITEM::PlaySound		(*snd_item, position, parent, hud_mode, looped, index);
+	HUD_SOUND_ITEM* snd_item = FindSoundItem(alias, false);
+	if (snd_item)
+		HUD_SOUND_ITEM::PlaySound		(*snd_item, position, parent, hud_mode, looped, index);
 }
 
 void HUD_SOUND_COLLECTION::StopSound(LPCSTR alias)
@@ -192,8 +192,8 @@ void HUD_SOUND_COLLECTION::StopSound(LPCSTR alias)
 
 void HUD_SOUND_COLLECTION::SetPosition(LPCSTR alias, const Fvector& pos)
 {
-	HUD_SOUND_ITEM* snd_item		= FindSoundItem(alias, true);
-	if(snd_item->playing())
+	HUD_SOUND_ITEM* snd_item		= FindSoundItem(alias, false);
+	if(snd_item && snd_item->playing())
 		snd_item->set_position		(pos);
 }
 
