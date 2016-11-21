@@ -18,7 +18,7 @@ void	R_occlusion::occq_create	(u32	limit	)
 	fids.reserve	(limit);
 	for (u32 it=0; it<limit; it++)	{
 		_Q	q;	q.order	= it;
-		if	(FAILED( CreateQuery(&q.Q) ))	break;
+		if	(FAILED( CreateQuery(&q.Q, D3DQUERYTYPE_OCCLUSION) ))	break;
 		pool.push_back	(q);
 	}
 	std::reverse	(pool.begin(), pool.end());
@@ -26,11 +26,11 @@ void	R_occlusion::occq_create	(u32	limit	)
 void	R_occlusion::occq_destroy	(				)
 {
 	while	(!used.empty())	{
-		ReleaseQuery(used.back().Q);
+		_RELEASE(used.back().Q);
 		used.pop_back	();
 	}
 	while	(!pool.empty())	{
-		ReleaseQuery(pool.back().Q);
+		_RELEASE(pool.back().Q);
 		pool.pop_back	();
 	}
 	used.clear	();
@@ -108,9 +108,7 @@ R_occlusion::occq_result R_occlusion::occq_get		(u32&	ID		)
 		}
 	}
     RImplementation.BasicStats.Wait.End();
-#ifndef USE_OGL
 	if		(hr == D3DERR_DEVICELOST)	fragments = 0xffffffff;
-#endif // !USE_OGL
 
 	if (0==fragments)
         RImplementation.BasicStats.OcclusionCulled++;

@@ -14,7 +14,7 @@ public:
 
 private:
 
-#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
+#if defined(USE_DX10) || defined(USE_DX11)
 	ref_shader	m_Shader;
 	ref_geom	m_Geom;
 #endif

@@ -1,6 +1,10 @@
 #include "stdafx.h"
 #pragma hdrstop
 
+#pragma warning(disable:4995)
+#include <d3dx9.h>
+#pragma warning(default:4995)
+
 #include "ResourceManager.h"
 #include "xrCore/xrPool.h"
 #include "r_constants.h"
@@ -48,7 +52,7 @@ ref_constant R_constant_table::get	(shared_str& S)
 	return	0;
 }
 
-#if !defined(USE_DX10) && !defined(USE_DX11) && !defined(USE_OGL)
+#if !defined(USE_DX10) && !defined(USE_DX11)
 BOOL	R_constant_table::parse	(void* _desc, u32 destination)
 {
 	D3DXSHADER_CONSTANTTABLE* desc	= (D3DXSHADER_CONSTANTTABLE*) _desc;
@@ -197,7 +201,7 @@ void R_constant_table::merge(R_constant_table* T)
 			C->type				=	src->type;
 			C->ps				=	src->ps;
 			C->vs				=	src->vs;
-#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
+#if defined(USE_DX10) || defined(USE_DX11)
 			C->gs				=	src->gs;
 #	ifdef USE_DX11
 			C->hs				=	src->hs;
@@ -218,10 +222,6 @@ void R_constant_table::merge(R_constant_table* T)
 			R_constant_load& dL	=	C->get_load(src->destination);
 			dL.index			=	sL.index;
 			dL.cls				=	sL.cls;
-#ifdef USE_OGL
-			dL.location			=	sL.location;
-			dL.program			=	sL.program;
-#endif // USE_OGL
 		}
 	}
 

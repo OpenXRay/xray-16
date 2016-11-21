@@ -6,42 +6,7 @@
 CBackend			RCache;
 
 // Create Quad-IB
-#if defined(USE_OGL)
-
-// Igor: is used to test bug with rain, particles corruption
-void CBackend::RestoreQuadIBData()
-{
-}
-
-void CBackend::CreateQuadIB()
-{
-	const u32 dwTriCount = 4 * 1024;
-	const u32 dwIdxCount = dwTriCount * 2 * 3;
-	u16		IndexBuffer[dwIdxCount];
-	u16		*Indices = IndexBuffer;
-	GLenum	dwUsage = GL_STATIC_DRAW;
-
-	int		Cnt = 0;
-	int		ICnt = 0;
-	for (int i = 0; i<dwTriCount; i++)
-	{
-		Indices[ICnt++] = u16(Cnt + 0);
-		Indices[ICnt++] = u16(Cnt + 1);
-		Indices[ICnt++] = u16(Cnt + 2);
-
-		Indices[ICnt++] = u16(Cnt + 3);
-		Indices[ICnt++] = u16(Cnt + 2);
-		Indices[ICnt++] = u16(Cnt + 1);
-
-		Cnt += 4;
-	}
-
-	glGenBuffers(1, &QuadIB);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, QuadIB);
-	CHK_GL(glBufferData(GL_ELEMENT_ARRAY_BUFFER, dwIdxCount * 2, Indices, dwUsage));
-}
-
-#elif defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11)
 
 // Igor: is used to test bug with rain, particles corruption
 void CBackend::RestoreQuadIBData()
@@ -179,12 +144,8 @@ void CBackend::OnDeviceDestroy()
 	Vertex.Destroy		();
 
 	// Quad
-#ifdef	USE_OGL
-	glDeleteBuffers(1, &QuadIB);
-#else
-	HW.stats_manager.decrement_stats_ib(QuadIB);
-	_RELEASE(QuadIB);
-#endif
+	HW.stats_manager.decrement_stats_ib	(QuadIB);
+	_RELEASE							(QuadIB);
 
 #if defined(USE_DX10) || defined(USE_DX11)
 	//DestroyConstantBuffers();

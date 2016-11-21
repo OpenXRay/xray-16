@@ -1,1 +1,0 @@
-void						phase_wallmarks			();

@@ -585,8 +585,6 @@ void CTexture::desc_update	()
 		{
 			ID3DTexture2D*	T	= (ID3DTexture2D*)pSurface;
 			T->GetDesc(&desc);
-			m_width				= desc.Width;
-			m_height			= desc.Height;
 		}
 	}
 }
