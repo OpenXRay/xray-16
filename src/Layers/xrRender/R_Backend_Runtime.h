@@ -7,10 +7,7 @@
 #include "sh_constant.h"
 #include "sh_rt.h"
 
-#if defined(USE_OGL)
-#include "Layers/xrRenderGL/glR_Backend_Runtime.h"
-#include "Layers/xrRenderGL/glState.h"
-#elif defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11)
 #include "Layers/xrRenderDX10/dx10R_Backend_Runtime.h"
 #include "Layers/xrRenderDX10/StateManager/dx10State.h"
 #else	//	USE_DX10
@@ -41,44 +38,31 @@ IC	const Fmatrix&	CBackend::get_xform_world	()	{ return xforms.get_W();	}
 IC	const Fmatrix&	CBackend::get_xform_view	()	{ return xforms.get_V();	}
 IC	const Fmatrix&	CBackend::get_xform_project	()	{ return xforms.get_P();	}
 
-#ifdef USE_OGL
-IC	GLuint					CBackend::get_RT(u32 ID)
-#else
-IC	ID3DRenderTargetView*	CBackend::get_RT(u32 ID)
-#endif // USE_OGL
+IC	ID3DRenderTargetView* CBackend::get_RT(u32 ID)
 {
 	VERIFY((ID>=0)&&(ID<4));
 
 	return pRT[ID];
 }
 
-#ifdef USE_OGL
-IC	GLuint CBackend::get_ZB()
-#else
-IC	ID3DDepthStencilView* CBackend::get_ZB()
-#endif // USE_OGL
+IC	ID3DDepthStencilView* CBackend::get_ZB				()
 {
 	return pZB;
 }
 
-ICF void	CBackend::set_States		(SState* _state)
+ICF void	CBackend::set_States		(ID3DState* _state)
 {
 //	DX10 Manages states using it's own algorithm. Don't mess with it.
-#if !defined(USE_DX10) && !defined(USE_DX11) && !defined(USE_OGL)
-	if (state!=_state->state)
+#if !defined(USE_DX10) && !defined(USE_DX11)
+	if (state!=_state)
 #endif	//	USE_DX10
 	{
 		PGO				(Msg("PGO:state_block"));
 #ifdef DEBUG
 		stat.states		++;
 #endif
-#ifdef USE_OGL
-		state = _state;
-		state->state.Apply();
-#else
-		state = _state->state;
-		state->Apply();
-#endif // USE_OGL
+		state			= _state;
+		state->Apply	();
 	}
 }
 

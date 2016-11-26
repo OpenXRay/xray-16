@@ -17,11 +17,7 @@ class R_occlusion
 private:
 	struct	_Q	{
 		u32					order;
-#ifdef USE_OGL
-		GLuint				Q;
-#else
-		ID3DQuery*			Q;
-#endif // USE_OGL
+		ID3DQuery*	Q;
 	};
 
 	static const u32		iInvalidHandle = 0xFFFFFFFF;

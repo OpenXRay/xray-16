@@ -95,7 +95,7 @@ u32 m_ColorSafeRect = 0xffB040B0;
 
 void SPrimitiveBuffer::CreateFromData(D3DPRIMITIVETYPE _pt, u32 _p_cnt, u32 FVF, LPVOID vertices, u32 _v_cnt, u16* indices, u32 _i_cnt)
 {
-#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
+#if defined(USE_DX10) || defined(USE_DX11)
 //	TODO: DX10: Implement SPrimitiveBuffer::CreateFromData for DX10
 //	VERIFY(!"SPrimitiveBuffer::CreateFromData not implemented for dx10");
 #else	//	USE_DX10
@@ -130,7 +130,6 @@ void SPrimitiveBuffer::CreateFromData(D3DPRIMITIVETYPE _pt, u32 _p_cnt, u32 FVF,
 }
 void SPrimitiveBuffer::Destroy()
 {                       
-#ifndef USE_OGL
 	if (pGeom){
 		HW.stats_manager.decrement_stats_vb	(pGeom->vb);
 		HW.stats_manager.decrement_stats_ib	(pGeom->ib);
@@ -138,7 +137,6 @@ void SPrimitiveBuffer::Destroy()
 		_RELEASE		(pGeom->ib);
 		pGeom.destroy	();
 	}
-#endif // !USE_OGL
 }
 
 void CDrawUtilities::UpdateGrid(int number_of_cell, float square_size, int subdiv){

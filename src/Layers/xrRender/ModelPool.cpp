@@ -460,22 +460,7 @@ void CModelPool::memory_stats		( u32& vb_mem_video, u32& vb_mem_system, u32& ib_
 
 		if( vis_ptr == NULL )
 			continue;
-#if defined(USE_OGL)
-		GLint IB_size;
-		GLint VB_size;
-
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vis_ptr->m_fast->p_rm_Indices);
-		CHK_GL(glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &IB_size));
-
-		ib_mem_video += IB_size;
-		ib_mem_system += IB_size;
-
-		glBindBuffer(GL_ARRAY_BUFFER, vis_ptr->m_fast->p_rm_Vertices);
-		CHK_GL(glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &VB_size));
-
-		vb_mem_video += VB_size;
-		vb_mem_system += VB_size;
-#elif !defined(USE_DX10) && !defined(USE_DX11)
+#if !defined(USE_DX10) && !defined(USE_DX11)
 		D3DINDEXBUFFER_DESC IB_desc;
 		D3DVERTEXBUFFER_DESC VB_desc;
 
@@ -512,7 +497,14 @@ void CModelPool::memory_stats		( u32& vb_mem_video, u32& vb_mem_system, u32& ib_
 
 		vb_mem_video += IB_desc.ByteWidth;
 		vb_mem_system += IB_desc.ByteWidth;
+
 #endif
+
+
+
+
+
+
 	}
 } 
 

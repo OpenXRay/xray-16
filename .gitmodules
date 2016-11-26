@@ -4,18 +4,12 @@
 [submodule "src/Externals/luajit"]
 	path = src/Externals/luajit
 	url = https://github.com/OpenXRay/LuaJIT.git
-[submodule "src/Externals/gli"]
-	path = src/Externals/gli
-	url = https://github.com/g-truc/gli
 [submodule "src/Externals/GameSpy"]
 	path = src/Externals/GameSpy
 	url = https://github.com/nitrocaster/GameSpy.git
 [submodule "src/Externals/AGS_SDK"]
 	path = src/Externals/AGS_SDK
 	url = https://github.com/GPUOpen-LibrariesAndSDKs/AGS_SDK.git
-[submodule "src/Externals/glew"]
-	path = src/Externals/glew
-	url = https://github.com/Armada651/glew.git
 [submodule "src/Externals/lzo"]
 	path = src/Externals/lzo
 	url = https://github.com/alexgdi/lzo.git

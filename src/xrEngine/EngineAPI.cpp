@@ -53,23 +53,9 @@ bool is_enough_address_space_available()
 
 void CEngineAPI::InitializeNotDedicated()
 {
-    LPCSTR gl_name = "xrRender_GL";
     LPCSTR r2_name = "xrRender_R2";
     LPCSTR r3_name = "xrRender_R3";
     LPCSTR r4_name = "xrRender_R4";
-
-    if (psDeviceFlags.test(rsGL))
-    {
-        // try to initialize GL
-        Log("Loading DLL:", gl_name);
-        hRender = LoadLibrary(gl_name);
-        if (0 == hRender)
-        {
-            // try to load R1
-            Msg("! ...Failed - incompatible hardware.");
-            psDeviceFlags.set(rsR2, TRUE);
-        }
-    }
 
     if (psDeviceFlags.test(rsR4))
     {
@@ -203,20 +189,17 @@ void CEngineAPI::CreateRendererList()
 #else
     // TODO: ask renderers if they are supported!
     if (vid_quality_token != NULL) return;
-    bool bSupports_gl = false;
     bool bSupports_r2 = false;
     bool bSupports_r2_5 = false;
     bool bSupports_r3 = false;
     bool bSupports_r4 = false;
 
-    LPCSTR gl_name = "xrRender_GL";
     LPCSTR r2_name = "xrRender_R2";
     LPCSTR r3_name = "xrRender_R3";
     LPCSTR r4_name = "xrRender_R4";
 
     if (strstr(Core.Params, "-perfhud_hack"))
     {
-        bSupports_gl = true;
         bSupports_r2 = true;
         bSupports_r2_5 = true;
         bSupports_r3 = true;
@@ -224,12 +207,6 @@ void CEngineAPI::CreateRendererList()
     }
     else
     {
-        // XXX: since we are going to support OpenGL render with its own feature levels,
-        // the reference render availability checking trick doesn't quite work: it's based
-        // on assumption that first unsupported render quality level means all the rest
-        // (greater) levels are not supported too, which is incorrect in case of Linux,
-        // where we have OpenGL only (so the engine would crash on R_ASSERT below).
-        // ...
         // try to initialize R2
         hRender = XRay::LoadLibrary(r2_name);
         if (hRender)
@@ -267,12 +244,6 @@ void CEngineAPI::CreateRendererList()
             R_ASSERT(test_dx11_rendering);
             bSupports_r4 = test_dx11_rendering();
         }
-
-        // try to initialize GL
-        Log("Loading DLL:", gl_name);
-        hRender = LoadLibrary(gl_name);
-        if (hRender)
-            bSupports_gl = true;
     }
 
     hRender = 0;
@@ -286,8 +257,6 @@ void CEngineAPI::CreateRendererList()
     }
     if (proceed &= bSupports_r2_5, proceed)
         tmp.push_back("renderer_r2.5");
-    if (proceed &= bSupports_gl, proceed)
-        tmp.push_back("renderer_gl");
     if (proceed &= bSupports_r3, proceed)
         tmp.push_back("renderer_r3");
     if (proceed &= bSupports_r4, proceed)
