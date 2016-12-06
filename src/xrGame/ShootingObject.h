@@ -51,7 +51,8 @@ protected:
 												const CCartridge& cartridge,
 												u16 parent_id,
 												u16 weapon_id,
-												bool send_hit);
+												bool send_hit,
+												int iShotNum = 0);
 	void					SetBulletSpeed(float new_speed) {m_fStartBulletSpeed = new_speed;}
 	float					GetBulletSpeed()				{return m_fStartBulletSpeed;}
 

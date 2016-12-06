@@ -539,13 +539,19 @@ void CUILevelMap::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 		{
 			MapWnd()->ShowHintSpot( sp );
 		}
-	}else
-	if(msg==MAP_HIDE_HINT)
+	}
+	else if(msg==MAP_HIDE_HINT)
 	{
 		MapWnd()->HideHint	(pWnd);
-	}else
-	if(msg==MAP_SELECT_SPOT)
+	}
+	else if(msg==MAP_SELECT_SPOT)
+	{
 		MapWnd()->SpotSelected	(pWnd);
+	}
+	else if (msg == MAP_SELECT_SPOT2)
+	{
+		MapWnd()->ActivatePropertiesBox(pWnd);
+	}
 }
 
 void CUILevelMap::OnFocusLost()

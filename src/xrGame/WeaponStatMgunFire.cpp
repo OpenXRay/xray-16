@@ -116,7 +116,7 @@ void CWeaponStatMgun::OnShot()
 	VERIFY(Owner());
 
 	FireBullet				(	m_fire_pos, m_fire_dir, fireDispersionBase, *m_Ammo, 
-								Owner()->ID(),ID(), SendHitAllowed(Owner()));
+								Owner()->ID(),ID(), SendHitAllowed(Owner()),::Random.randI(0,30));
 
 	StartShotParticles		();
 	

@@ -1,5 +1,8 @@
 #pragma once
 #include "../xr_level_controller.h"
+
+class UIHint;
+class CScriptXmlInit;
 class CUIWindow;
 
 struct _12b	{ DWORD _[3]; };
@@ -106,7 +109,22 @@ public:
 
 	virtual void 			OnFocusReceive		();
 	virtual void 			OnFocusLost			();
-	
+
+	//Alundaio
+	/*
+	void			DisableHint			(); 
+	void			EnableHint			();
+	void			SetHintDelay		(u32 val);
+	u32				GetHintDelay		();
+	void			DrawHintWnd			();
+	void			RemoveHint			();
+	void			SetHintText			(LPCSTR text);
+	LPCSTR			GetHintText			();
+	void			SetHintWnd			(UIHint* hintWnd) { m_pHint = hintWnd; };
+	UIHint*			GetHintWnd			() { return m_pHint; };
+	*/
+	//-Alundaio
+
 	//захватить/освободить мышь окном
 	//сообщение посылается дочерним окном родительскому
 	void					SetCapture			(CUIWindow* pChildWindow, bool capture_status);
@@ -131,7 +149,7 @@ public:
 			bool			IsEnabled			()												{return m_bIsEnabled;}
 
 	//убрать/показать окно и его дочерние окна
-	virtual void			Show				(bool status)									{SetVisible(status); Enable(status); }
+			virtual void			Show(bool status)									{ SetVisible(status); Enable(status); }
 	IC		bool			IsShown				()												{return GetVisible();}
 			void			ShowChildren		(bool show);
 	

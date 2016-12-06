@@ -93,7 +93,8 @@ public:
 										float	maximum_distance,
 										const	CCartridge& cartridge,
 										float const air_resistance_factor,
-										bool	SendHit);
+										bool	SendHit,
+										int iShotNum = 0);
 };
 
 class CLevel;
@@ -233,7 +234,7 @@ public:
 												ALife::EHitType e_hit_type, float maximum_distance, 
 												const CCartridge& cartridge,
 												float const air_resistance_factor,
-												bool SendHit,bool AimBullet=false);
+												bool SendHit,bool AimBullet=false, int iShotNum = 0);
 
 	void					CommitEvents		();	// @ the start of frame
 	void					CommitRenderSet		();	// @ the end of frame

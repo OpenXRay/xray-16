@@ -292,6 +292,9 @@ void CUIActorMenu::script_register(lua_State *L)
 				.def("ShowDialog", &CUIPdaWnd::ShowDialog)
 				.def("HideDialog", &CUIPdaWnd::HideDialog)
 				.def("SetActiveSubdialog", &CUIPdaWnd::SetActiveSubdialog)
+				.def("SetActiveDialog", &CUIPdaWnd::SetActiveDialog)
+				.def("GetActiveDialog", &CUIPdaWnd::GetActiveDialog)
+				.def("GetActiveSection", &CUIPdaWnd::GetActiveSection)
 	];
 
 	module(L, "ActorMenu")

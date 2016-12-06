@@ -8,7 +8,7 @@ CUIListBoxItem::CUIListBoxItem(float height)
 :m_text(NULL),tag(u32(-1))
 {
 	SetHeight		(height);
-	m_text			= AddTextField("---", 10.0f);
+	m_text			= AddTextField("", 10.0f);
 }
 
 void CUIListBoxItem::SetTAG(u32 value)
@@ -58,7 +58,10 @@ bool CUIListBoxItem::OnMouseDown(int mouse_btn)
 		GetMessageTarget()->SendMessage(this, LIST_ITEM_SELECT, &tag);
 		GetMessageTarget()->SendMessage(this, LIST_ITEM_CLICKED, &tag);
 		return true;
-	}else
+	}else if (mouse_btn==MOUSE_2) {
+		GetMessageTarget()->SendMessage(this, WINDOW_RBUTTON_DOWN, &tag);
+		return true;
+	}
 		return false;
 }
 

@@ -63,7 +63,7 @@ void CSE_ALifeObject::spawn_supplies		(LPCSTR ini_string)
 
 		if (!OnlyOne.empty())
 		{
-			s32 sel = ::Random.randI(0, OnlyOne.size());
+			s32 sel = ::Random.randI(0, OnlyOne.size()-1);
 			if (ini.r_line(loadout_section, OnlyOne.at(sel), &itmSection, &V))
 			{
 				VERIFY(xr_strlen(itmSection));

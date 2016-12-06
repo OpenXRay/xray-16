@@ -5,6 +5,10 @@
 
 #include "../Include/xrRender/DebugRender.h"
 #include "../Include/xrRender/UIRender.h"
+//#include "UIHelper.h"
+//#include "UIHint.h"
+//#include "../ScriptXMLInit.h"
+
 
 poolSS< _12b, 128>	ui_allocator;
 
@@ -100,9 +104,13 @@ m_pMouseCapturer(NULL),
 m_pMessageTarget(NULL),
 m_pKeyboardCapturer(NULL),
 m_bAutoDelete(false),
+//m_pHint(NULL),
 m_bCursorOverWindow(false),
 m_bPP(false),
 m_dwFocusReceiveTime(0),
+//dwHintDelay(1000),
+//bShowHint(false),
+//m_sHint(""),
 m_bCustomDraw(false)
 {
 	Show					(true);
@@ -119,6 +127,9 @@ m_bCustomDraw(false)
 CUIWindow::~CUIWindow()
 {
 	VERIFY( !(GetParent()&&IsAutoDelete()) );
+
+	//if (m_pHint)
+	//	xr_delete(m_pHint);
 
 	CUIWindow* parent	= GetParent();
 	bool ad				= IsAutoDelete();
@@ -170,8 +181,8 @@ void CUIWindow::Draw()
 
 void CUIWindow::Draw(float x, float y)
 {
-	SetWndPos		(Fvector2().set(x,y));
-	Draw			();
+	SetWndPos(Fvector2().set(x,y));
+	Draw();
 }
 
 void CUIWindow::Update()
@@ -198,6 +209,15 @@ void CUIWindow::Update()
 		if(!(*it)->IsShown()) continue;
 			(*it)->Update();
 	}
+
+	/*
+	if (m_pHint && bShowHint)
+	{
+		if (Device.dwTimeGlobal < (m_dwFocusReceiveTime + dwHintDelay))
+			return;
+		m_pHint->set_text(m_sHint);
+	}
+	*/
 }
 
 void CUIWindow::AttachChild(CUIWindow* pChild)
@@ -376,6 +396,9 @@ void CUIWindow::OnFocusReceive()
 
 	if (GetMessageTarget())
         GetMessageTarget()->SendMessage(this, WINDOW_FOCUS_RECEIVED, NULL);
+
+	//if (m_pHint)
+	//	bShowHint = true;
 }
 
 void CUIWindow::OnFocusLost()
@@ -385,6 +408,8 @@ void CUIWindow::OnFocusLost()
 
 	if (GetMessageTarget())
         GetMessageTarget()->SendMessage(this, WINDOW_FOCUS_LOST, NULL);
+
+	//bShowHint = false;
 }
 
 
@@ -614,3 +639,54 @@ bool fit_in_rect(CUIWindow* w, Frect const& vis_rect, float border, float dx16po
 	w->SetWndPos( rect.lt );
 	return true;
 }
+
+/*
+void CUIWindow::DisableHint()
+{
+	bShowHint = false;
+}
+
+void CUIWindow::EnableHint()
+{
+	bShowHint = true;
+}
+
+u32 CUIWindow::GetHintDelay()
+{
+	return dwHintDelay;
+}
+
+void CUIWindow::SetHintDelay(u32 val)
+{
+	dwHintDelay = val;
+}
+
+void CUIWindow::DrawHintWnd()
+{
+	if (m_pHint && bShowHint)
+	{
+		Frect r;
+		GetAbsoluteRect(r);
+		Fvector2 pos = UI().GetUICursor().GetCursorPosition();
+		if (r.in(pos))
+			m_pHint->Draw();
+	}
+}
+
+void CUIWindow::RemoveHint()
+{
+	if (m_pHint)
+		xr_delete(m_pHint);
+	m_pHint = NULL;
+}
+
+void CUIWindow::SetHintText(LPCSTR text)	
+{ 
+	m_sHint = text;
+}
+
+LPCSTR CUIWindow::GetHintText()
+{ 
+	return m_sHint;
+}
+*/

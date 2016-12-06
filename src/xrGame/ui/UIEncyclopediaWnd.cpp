@@ -8,7 +8,7 @@
 
 #include "StdAfx.h"
 #include "UIEncyclopediaWnd.h"
-/*#include "UIXmlInit.h"
+#include "UIXmlInit.h"
 #include "UIFrameWindow.h"
 #include "UIFrameLineWnd.h"
 #include "UIAnimatedStatic.h"
@@ -123,7 +123,7 @@ void CUIEncyclopediaWnd::SendMessage(CUIWindow *pWnd, s16 msg, void* pData)
 			caption					+= "/";
 			caption					+= CStringTable().translate(A->data()->name).c_str();
 			UIEncyclopediaInfoHeader->UITitleText.SetText(caption.c_str());
-*
+*/
 			SetCurrentArtice		(pTVItem);
 			UIArticleHeader->SetTextST(*(A->data()->name));
 		}
@@ -249,4 +249,3 @@ void CUIEncyclopediaWnd::Reset()
 	inherited::Reset	();
 	ReloadArticles		();
 }
-*/

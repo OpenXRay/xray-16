@@ -43,14 +43,14 @@ void CUIEncyclopediaArticleWnd::SetArticle(CEncyclopediaArticle* article)
 	if( article->data()->image.GetShader() && article->data()->image.GetShader()->inited())
 	{
 		m_UIImage->SetShader			(article->data()->image.GetShader());
-		m_UIImage->SetOriginalRect		(article->data()->image.GetStaticItem()->GetOriginalRect());
+		//m_UIImage->SetOriginalRect		(article->data()->image.GetStaticItem()->GetOriginalRect());
 		m_UIImage->SetWndSize			(article->data()->image.GetWndSize());
 
 		float img_x						= (GetWidth()-m_UIImage->GetWidth())/2.0f;
 		img_x							= _max(0.0f, img_x);
 		m_UIImage->SetWndPos			(Fvector2().set(img_x ,m_UIImage->GetWndPos().y) );
 	};
-	m_UIText->SetText					(*CStringTable().translate(article->data()->text.c_str()));
+	m_UIText->TextItemControl()->SetTextST(article->data()->text.c_str());
 	m_UIText->AdjustHeightToText		();
 
 	AdjustLauout						();

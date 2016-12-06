@@ -676,6 +676,18 @@ void CScriptGameObject::ChangeCharacterReputation(int char_rep)
     pInventoryOwner->ChangeReputation(char_rep);
 }
 
+void CScriptGameObject::SetCharacterReputation(int char_rep)
+{
+    CInventoryOwner* pInventoryOwner = smart_cast<CInventoryOwner*>(&object());
+
+    if (!pInventoryOwner)
+    {
+        ai().script_engine().script_log(ScriptStorage::eLuaMessageTypeError, "SetCharacterReputation available only for InventoryOwner");
+        return;
+    }
+    pInventoryOwner->SetReputation(char_rep);
+}
+
 LPCSTR CScriptGameObject::CharacterCommunity()
 {
     CInventoryOwner* pInventoryOwner = smart_cast<CInventoryOwner*>(&object());

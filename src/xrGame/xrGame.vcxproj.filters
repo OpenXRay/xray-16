@@ -2140,9 +2140,6 @@
     <Filter Include="UI\Common\PDA\Tasks">
       <UniqueIdentifier>{ddf96ea9-ef48-422b-9ac9-d1c7aafa5cd6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="UI\Common\PDA\FactionWar">
-      <UniqueIdentifier>{73dc453e-a9d1-4200-83b7-3564dbf9fc80}</UniqueIdentifier>
-    </Filter>
     <Filter Include="UI\Common\PDA\logs">
       <UniqueIdentifier>{88b2008c-d91b-4387-b903-9223e6800188}</UniqueIdentifier>
     </Filter>
@@ -2493,6 +2490,9 @@
     </Filter>
     <Filter Include="Core\Client\Objects\zones\Ameba">
       <UniqueIdentifier>{7111b5cd-588d-46ec-81c2-ccc6c70fa4de}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\Common\PDA\Encylopedia">
+      <UniqueIdentifier>{73dc453e-a9d1-4200-83b7-3564dbf9fc80}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -5856,9 +5856,6 @@
     <ClInclude Include="WeaponStatMgun.h">
       <Filter>Core\Client\Objects\items &amp; weapons\Weapons\StationaryMgun</Filter>
     </ClInclude>
-    <ClInclude Include="HolderEntityObject.h">
-      <Filter>Core\Client\Objects\items &amp; HolderEntityObject</Filter>
-    </ClInclude>
     <ClInclude Include="Artefact.h">
       <Filter>Core\Client\Objects\items &amp; weapons\Artifacts</Filter>
     </ClInclude>
@@ -6759,18 +6756,6 @@
     <ClInclude Include="ui\UITaskWnd.h">
       <Filter>UI\Common\PDA\Tasks</Filter>
     </ClInclude>
-    <ClInclude Include="ui\FactionState.h">
-      <Filter>UI\Common\PDA\FactionWar</Filter>
-    </ClInclude>
-    <ClInclude Include="ui\FactionState_inline.h">
-      <Filter>UI\Common\PDA\FactionWar</Filter>
-    </ClInclude>
-    <ClInclude Include="ui\UIFactionWarWnd.h">
-      <Filter>UI\Common\PDA\FactionWar</Filter>
-    </ClInclude>
-    <ClInclude Include="ui\UIWarState.h">
-      <Filter>UI\Common\PDA\FactionWar</Filter>
-    </ClInclude>
     <ClInclude Include="ui\UILogsWnd.h">
       <Filter>UI\Common\PDA\logs</Filter>
     </ClInclude>
@@ -7398,6 +7383,7 @@
     <ClInclude Include="AmebaZone.h">
       <Filter>Core\Client\Objects\zones\Ameba</Filter>
     </ClInclude>
+    <ClInclude Include="HolderEntityObject.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="damage_manager.cpp">
@@ -9437,9 +9423,6 @@
     <ClCompile Include="WeaponStatMgun.cpp">
       <Filter>Core\Client\Objects\items &amp; weapons\Weapons\StationaryMgun</Filter>
     </ClCompile>
-    <ClCompile Include="HolderEntityObject.cpp">
-      <Filter>Core\Client\Objects\items &amp; HolderEntityObject</Filter>
-    </ClCompile>
     <ClCompile Include="WeaponStatMgunFire.cpp">
       <Filter>Core\Client\Objects\items &amp; weapons\Weapons\StationaryMgun</Filter>
     </ClCompile>
@@ -10358,9 +10341,6 @@
     <ClCompile Include="ui\UIRankingsCoC.cpp">
       <Filter>UI\Common\PDA\Statistics &amp; Rankings</Filter>
     </ClCompile>
-    <ClCompile Include="ui\UIRankFraction.cpp">
-      <Filter>UI\Common\PDA\Statistics &amp; Rankings</Filter>
-    </ClCompile>
     <ClCompile Include="ui\UIRankingWnd.cpp">
       <Filter>UI\Common\PDA\Statistics &amp; Rankings</Filter>
     </ClCompile>
@@ -10372,15 +10352,6 @@
     </ClCompile>
     <ClCompile Include="ui\UITaskWnd.cpp">
       <Filter>UI\Common\PDA\Tasks</Filter>
-    </ClCompile>
-    <ClCompile Include="ui\FactionState.cpp">
-      <Filter>UI\Common\PDA\FactionWar</Filter>
-    </ClCompile>
-    <ClCompile Include="ui\UIFactionWarWnd.cpp">
-      <Filter>UI\Common\PDA\FactionWar</Filter>
-    </ClCompile>
-    <ClCompile Include="ui\UIWarState.cpp">
-      <Filter>UI\Common\PDA\FactionWar</Filter>
     </ClCompile>
     <ClCompile Include="ui\UILogsWnd.cpp">
       <Filter>UI\Common\PDA\logs</Filter>
@@ -11063,6 +11034,7 @@
     <ClCompile Include="AmebaZone.cpp">
       <Filter>Core\Client\Objects\zones\Ameba</Filter>
     </ClCompile>
+    <ClCompile Include="HolderEntityObject.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="ai\monsters\chimera\chimera_attack_state.h">
@@ -11079,9 +11051,6 @@
     </CustomBuild>
     <CustomBuild Include="Explosive.h">
       <Filter>Core\Client\Objects\items &amp; weapons\Explosives</Filter>
-    </CustomBuild>
-    <CustomBuild Include="ui\UIRankFaction.h">
-      <Filter>UI\Common\PDA\Statistics &amp; Rankings</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>

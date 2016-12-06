@@ -569,7 +569,7 @@ void CDemoRecord::MakeScreenshot()
 
 void CDemoRecord::MakeLevelMapScreenshot(BOOL bHQ)
 {
-    Console->Execute("run_string level.set_weather(\"map\",true)");
+    //Console->Execute("run_string level.set_weather(\"map\",true)");
 
     if (!bHQ)
         m_iLMScreenshotFragment = -1;

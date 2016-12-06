@@ -401,6 +401,7 @@ public:
             void SetCharacterRank			(int);
             void ChangeCharacterRank		(int);
             void ChangeCharacterReputation	(int);
+			void SetCharacterReputation		(int);
             void SetCharacterCommunity		(LPCSTR,int,int);
         
 
