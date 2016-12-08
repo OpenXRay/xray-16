@@ -172,6 +172,7 @@ void CUIWindow::script_register(lua_State *L)
 		.def("GetMinScrollPos",			&CUIScrollView::GetMinScrollPos)
 		.def("GetMaxScrollPos",			&CUIScrollView::GetMaxScrollPos)
 		.def("GetCurrentScrollPos",		&CUIScrollView::GetCurrentScrollPos)
+		.def("SetFixedScrollBar", 		&CUIScrollView::SetFixedScrollBar)
 		.def("SetScrollPos",			&CUIScrollView::SetScrollPos),
 
 		class_<enum_exporter<EUIMessages> >("ui_events")

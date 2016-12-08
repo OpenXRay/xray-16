@@ -80,7 +80,8 @@ public:
 			CUIWindow*		GetActiveDialog		() 					{return m_pActiveDialog;};
 			LPCSTR			GetActiveSection	()					{return m_sActiveSection.c_str();};
 			
-			void			SetActiveSubdialog	(const shared_str& section);
+			void			SetActiveSubdialog			(const shared_str& section);
+			void			SetActiveSubdialog_script(LPCSTR section)				{ SetActiveSubdialog((const shared_str&)section); };
 	virtual bool			StopAnyMove			(){return false;}
 
 			void			UpdatePda			();
