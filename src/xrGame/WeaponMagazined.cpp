@@ -1207,7 +1207,7 @@ void CWeaponMagazined::PlayAnimReload()
 #ifdef NEW_ANIMS //AVO: use new animations
     if (bMisfire)
     {
-        Msg("AVO: ------ MISFIRE");
+        //Msg("AVO: ------ MISFIRE");
         if (HudAnimationExist("anm_reload_misfire"))
             PlayHUDMotion("anm_reload_misfire", TRUE, this, GetState());
         else
