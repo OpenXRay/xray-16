@@ -229,6 +229,9 @@ u32	CTrade::GetItemPrice(PIItem pItem, bool b_buying, bool b_free)
 		_min(trade_factors.enemy_factor(),trade_factors.friend_factor()),
 		_max(trade_factors.enemy_factor(),trade_factors.friend_factor())
 	);
+
+	if (action_factor == 0)
+		return 0;
 	
 	// computing deficit_factor
 #if 0
@@ -245,6 +248,7 @@ u32	CTrade::GetItemPrice(PIItem pItem, bool b_buying, bool b_free)
 			action_factor*
 			deficit_factor
 		);
+
 	// use some script discounts
 	luabind::functor<float>	func;
 	if(b_buying)

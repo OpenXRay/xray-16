@@ -117,18 +117,24 @@ IC	void CTradeParameters::process							(_action_type type, CInifile &ini_file, 
 	CInifile::SectCIt		I = S.Data.begin();
 	CInifile::SectCIt		E = S.Data.end();
 	for ( ; I != E; ++I) {
+		if (!pSettings->section_exist((*I).first))
+			continue;
+
 		if (!(*I).second.size()) {
 			_action.disable	((*I).first);
 			continue;
 		}
 
 		string256			temp0, temp1;
-		THROW3				(_GetItemCount(*(*I).second) == 2,"Invalid parameters in section",*section);
+		//THROW3				(_GetItemCount(*(*I).second) == 2,"Invalid parameters in section",*section);
+		LPCSTR param1 = _GetItem(*(*I).second, 0, temp0);
+		LPCSTR param2 = _GetItemCount(*(*I).second) >= 2 ? _GetItem(*(*I).second, 1, temp1) : param1;
+
 		_action.enable		(
 			(*I).first,
 			CTradeFactors	(
-				(float)atof(_GetItem(*(*I).second,0,temp0)),
-				(float)atof(_GetItem(*(*I).second,1,temp1))
+			(float)atof(param1),
+			(float)atof(param2)
 			)
 		);
 	}
