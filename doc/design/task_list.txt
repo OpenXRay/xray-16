@@ -81,7 +81,7 @@ o get rid of any borland specific code
     - better multithreading
     - 'stuttering' problem (likely due to old luajit)
   - UI
-    - close sleep dialog by ESC key
+    + close sleep dialog by ESC key
   - multiplayer
     - ipv6 support
     - get rid of DirectPlay
