@@ -517,6 +517,8 @@ IC	size_t				CurrentTransmission					(){return m_current_transmission_num;}
 	void PlayDamageParticles(){ m_damage_particles.Play1(this); m_damage_particles.Play2(this); }
 	void StopDamageParticles(){ m_damage_particles.Stop1(this); m_damage_particles.Stop2(this); }
 	bool isActiveEngine();
+	float GetRPM() { return m_current_rpm; }
+	void SetRPM(float val) { m_current_rpm = val; }
 #endif
 	//-Alundaio
 	/*************************************************** added by Ray Twitty (aka Shadows) END ***************************************************/
