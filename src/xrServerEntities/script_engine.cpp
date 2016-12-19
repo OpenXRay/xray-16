@@ -92,7 +92,7 @@ static void initialize_lua_studio	( lua_State* state, cs::lua_studio::world*& wo
     jit_command						(state, "debug=2");
     jit_command						(state, "off");
 #else
-    luaJIT_setmode(lua(), 0, LUAJIT_MODE_ENGINE | LUAJIT_MODE_OFF);
+	luaJIT_setmode(state, 0, LUAJIT_MODE_ENGINE | LUAJIT_MODE_OFF);
 #endif
 
     world->add						(state);
@@ -154,13 +154,9 @@ CScriptEngine::~CScriptEngine()
     while (!m_script_processes.empty())
         remove_script_process(m_script_processes.begin()->first);
 
-#ifdef DEBUG
+#ifdef LUA_DEBUG_PRINT
     flush_log();
-#else
-#   ifdef LUA_DEBUG_PRINT
-    flush_log();
-#   endif //-LUA_DEBUG_PRINT
-#endif //-DEBUG
+#endif //-LUA_DEBUG_PRINT
 
 #ifdef USE_DEBUGGER
 #	ifndef USE_LUA_STUDIO

@@ -13,9 +13,11 @@
     <xrGameDir>$(XRAY_16X_GAME)</xrGameDir>
     <xrGameBinDir>$(xrGameDir)bin\</xrGameBinDir>
     <xr3rdPartyDir>$(SolutionDir)3rd party\</xr3rdPartyDir>
+    <dxSdkDir>$(xrSdkDir)include\dxsdk\</dxSdkDir>
   </PropertyGroup>
   <PropertyGroup>
-    <IncludePath>E:\STALKER\X-Ray Source\x_ray_1602_VS13\xray-16\src\3rd party;$(IncludePath)</IncludePath>
+    <IncludePath>E:\STALKER\X-Ray Source\x_ray_1602_VS13\xray-16\src\3rd party;$(IncludePath);$(xrSdkDir)include;</IncludePath>
+    <OutDir>$(xrGameDir)bin_dbg\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
@@ -24,6 +26,9 @@
       <Optimization>Full</Optimization>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FloatingPointModel>Fast</FloatingPointModel>
+      <UndefinePreprocessorDefinitions>USE_LUAJIT_ONE</UndefinePreprocessorDefinitions>
+      <PreprocessorDefinitions>USE_LUAJIT_ONE;_VC80_UPGRADE=0x0710;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
     </ClCompile>
     <Link>
       <LargeAddressAware>true</LargeAddressAware>
@@ -72,6 +77,10 @@
     </BuildMacro>
     <BuildMacro Include="xr3rdPartyDir">
       <Value>$(xr3rdPartyDir)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="dxSdkDir">
+      <Value>$(dxSdkDir)</Value>
       <EnvironmentVariable>true</EnvironmentVariable>
     </BuildMacro>
   </ItemGroup>

@@ -58,7 +58,9 @@ public:
 #endif
 
 public:
+#ifndef LOG_ACTION
 	LPCSTR						m_action_name; //alundaio
+#endif
 	IC							CActionBase			(const xr_vector<COperatorCondition> &conditions, const xr_vector<COperatorCondition> &effects, _object_type *object = 0, LPCSTR action_name = "");
 	IC							CActionBase			(_object_type *object, LPCSTR action_name = "");
 	virtual						~CActionBase		();

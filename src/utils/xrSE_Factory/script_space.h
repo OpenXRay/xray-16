@@ -17,11 +17,14 @@
 #pragma warning(disable:4530)
 #pragma warning(disable:4267)
 
-extern "C" {
-	#include <lua/lua.h>
-	#include <lua/lualib.h>
-	#include <lua/lauxlib.h>
-};
+//AVO: lua re-org
+#include "lua.hpp"
+/*extern "C" {
+#include <lua/lua.h>
+#include <lua/lualib.h>
+#include <lua/lauxlib.h>
+}*/
+//-AVO
 
 #include <luabind/luabind.hpp>
 #include <luabind/object.hpp>
