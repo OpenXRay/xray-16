@@ -109,9 +109,9 @@ void CInventoryItem::Load(LPCSTR section)
 	m_Description = CStringTable().translate( pSettings->r_string(section, "description") );
 
 	m_flags.set(Fbelt,			READ_IF_EXISTS(pSettings, r_bool, section, "belt",		FALSE));
-	m_can_trade = READ_IF_EXISTS(pSettings, r_bool, section, "can_take",	TRUE);
-	m_flags.set(FCanTake,		m_can_trade);
-	m_flags.set(FCanTrade,		READ_IF_EXISTS(pSettings, r_bool, section, "can_trade",	TRUE));
+	m_can_trade = READ_IF_EXISTS(pSettings, r_bool, section, "can_trade",	TRUE);
+	m_flags.set(FCanTake, READ_IF_EXISTS(pSettings, r_bool, section, "can_take",	TRUE));
+	m_flags.set(FCanTrade, m_can_trade);
 	m_flags.set(FIsQuestItem,	READ_IF_EXISTS(pSettings, r_bool, section, "quest_item",FALSE));
 
 
