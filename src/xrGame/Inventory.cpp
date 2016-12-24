@@ -1262,14 +1262,14 @@ u32  CInventory::BeltWidth() const
 	return 0; //m_iMaxBelt;
 }
 
-void  CInventory::AddAvailableItems(TIItemContainer& items_container, bool for_trade) const
+void  CInventory::AddAvailableItems(TIItemContainer& items_container, bool for_trade, bool bOverride) const
 {
 	for(TIItemContainer::const_iterator it = m_ruck.begin(); m_ruck.end() != it; ++it) 
 	{
 		PIItem pIItem = *it;
 		if (!for_trade || pIItem->CanTrade())
 		{
-			if (m_pOwner->is_alive())
+			if (bOverride)
 			{
 				luabind::functor<bool> funct;
 				if (ai().script_engine().functor("actor_menu_inventory.CInventory_ItemAvailableToTrade", funct))
@@ -1289,7 +1289,7 @@ void  CInventory::AddAvailableItems(TIItemContainer& items_container, bool for_t
 			PIItem pIItem = *it;
 			if (!for_trade || pIItem->CanTrade())
 			{
-				if (m_pOwner->is_alive())
+				if (bOverride)
 				{
 					luabind::functor<bool> funct;
 					if (ai().script_engine().functor("actor_menu_inventory.CInventory_ItemAvailableToTrade", funct))
@@ -1314,7 +1314,7 @@ void  CInventory::AddAvailableItems(TIItemContainer& items_container, bool for_t
 			{
 				if (!SlotIsPersistent(I) || item->BaseSlot() == GRENADE_SLOT)
 				{
-					if (m_pOwner->is_alive())
+					if (bOverride)
 					{
 						luabind::functor<bool> funct;
 						if (ai().script_engine().functor("actor_menu_inventory.CInventory_ItemAvailableToTrade", funct))

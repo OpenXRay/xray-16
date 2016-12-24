@@ -449,7 +449,7 @@ ALvoid BuildDeviceSpecifierList()
 													list += specifierSize + 1;
 												}
 												specifier += strlen(specifier) + 1;
-											} while (strlen(specifier) > 0);
+											} while (specifier[0] != '\0'/*strlen(specifier) > 0*/);
 										}
 									} else 
 									{
@@ -558,7 +558,7 @@ ALvoid CleanDeviceSpecifierList()
 
 	// dump new terminator into copy list, so that string searches are easier
 	int len;
-	while (strlen((const char *)copyList) > 0) 
+	while (copyList[0] != '\0'/*strlen((const char *)copyList) > 0*/)
 	{
 		len = (int)strlen(copyList);
 		copyList[len] = ';';
@@ -568,7 +568,7 @@ ALvoid CleanDeviceSpecifierList()
 
 	AlLog("CleanDeviceSpecifierList %s", list);
 	// create new list
-	while (strlen(list) > 0) 
+	while (list[0] != '\0'/*strlen(list) > 0*/)
 	{
 		strcpy_s		(newListPtr, MAX_PATH, list);
 		advancePtr		= TRUE;
@@ -991,7 +991,7 @@ HINSTANCE FindDllWithMatchingSpecifier(TCHAR* dllSearchPattern, char* specifier,
 														found = false;
 													}
 													deviceSpecifier += strlen(deviceSpecifier) + 1;
-												} while (!found && (strlen(deviceSpecifier) > 0));
+												} while (!found && (deviceSpecifier[0] != '\0'/*strlen(deviceSpecifier) > 0*/));
 											}
 										} else {
 											// no enumeration ability
@@ -1057,7 +1057,7 @@ HINSTANCE FindDllWithMatchingSpecifier(TCHAR* dllSearchPattern, char* specifier,
 														found = false;
 													}
 													deviceSpecifier += strlen(deviceSpecifier) + 1;
-												} while (!found && (strlen(deviceSpecifier) > 0));
+												} while (!found && (deviceSpecifier[0] != '\0'/*strlen(deviceSpecifier) > 0*/));
 											}
 										}
 									}
@@ -1552,7 +1552,8 @@ ALCAPI ALvoid ALCAPIENTRY alcGetIntegerv(ALCdevice* device, ALenum param, ALsize
 
         default:
         {
-            device->LastError = ALC_INVALID_ENUM;
+			if (device)
+				device->LastError = ALC_INVALID_ENUM;
         }
         break;
     }
@@ -1687,11 +1688,11 @@ ALCAPI ALboolean ALCAPIENTRY alcMakeContextCurrent(ALCcontext* context)
                 {
                     alCurrentContext->Device->AlcApi.alcMakeContextCurrent(alCurrentContext->DllContext);
                 }
-
-                else
-                {
-                    alCurrentContext->Device->AlcApi.alcMakeContextCurrent(0);
-                }
+				//Alun: Figure out what should be here instead
+                //else
+               // {
+                //    alCurrentContext->Device->AlcApi.alcMakeContextCurrent(0);
+               // }
             }
         }
 	} else {

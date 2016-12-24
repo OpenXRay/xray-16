@@ -134,7 +134,7 @@ protected:
 	TISlotArr				m_slots;
 public:
 	//возвращает все кроме PDA в слоте и болта
-	void				AddAvailableItems			(TIItemContainer& items_container, bool for_trade) const;
+	void				AddAvailableItems			(TIItemContainer& items_container, bool for_trade, bool bOverride = false) const;
 
 	float				GetMaxWeight				() const				{return m_fMaxWeight;}
 	void				SetMaxWeight				(float weight)			{m_fMaxWeight = weight;}
