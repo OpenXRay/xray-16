@@ -244,7 +244,7 @@ public:
 	void					detach_Vehicle			();
 	void					steer_Vehicle			(float angle);
 	void					attach_Vehicle			(CHolderCustom* vehicle);
-
+	bool					use_MountedWeapon		(CHolderCustom* object);
 	virtual bool			can_attach				(const CInventoryItem *inventory_item) const;
 protected:
 	CHolderCustom*			m_holder;
@@ -252,7 +252,6 @@ protected:
 	bool					use_Holder				(CHolderCustom* holder);
 
 	bool					use_Vehicle				(CHolderCustom* object);
-	bool					use_MountedWeapon		(CHolderCustom* object);
 	void					ActorUse				();
 
 protected:
