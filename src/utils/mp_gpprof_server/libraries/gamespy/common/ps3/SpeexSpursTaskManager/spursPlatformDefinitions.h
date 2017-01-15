@@ -3,11 +3,11 @@
 
 //////////////////////////////////////////////////////////////////////////
 // Don't need printf in this sample
-///Playstation 3 Cell SDK
+/// Playstation 3 Cell SDK
 //#include <spu_printf.h>
 
 #include <stdint.h>
 #include <stdlib.h>
-#include <string.h> //for memcpy
+#include <string.h>  //for memcpy
 
-#endif //TYPE_DEFINITIONS_H
+#endif  // TYPE_DEFINITIONS_H

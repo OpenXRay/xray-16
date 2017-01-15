@@ -24,9 +24,8 @@
    <markus@oberhumer.com>
  */
 
-
 #include "config1y.h"
 
-#define DO_OPTIMIZE		lzo1y_optimize
+#define DO_OPTIMIZE lzo1y_optimize
 
 #include "lzo1x_oo.ch"

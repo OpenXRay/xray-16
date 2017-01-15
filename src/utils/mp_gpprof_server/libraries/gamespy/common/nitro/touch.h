@@ -8,7 +8,7 @@ void TouchInit(void);
 
 // 0 <= x <= 255
 // 0 <= y <= 191
-BOOL GetTouch(int * x, int * y);
+BOOL GetTouch(int* x, int* y);
 
 void WaitForTouch(void);
 

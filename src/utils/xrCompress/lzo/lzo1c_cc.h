@@ -24,16 +24,13 @@
    <markus@oberhumer.com>
  */
 
-
 /* WARNING: this file should *not* be used by applications. It is
    part of the implementation of the library and is subject
    to change.
  */
 
-
 #ifndef __LZO1C_CC_H
 #define __LZO1C_CC_H
-
 
 /***********************************************************************
 //
@@ -51,30 +48,22 @@ extern const lzo_compress_t _lzo1c_9_compress_func;
 
 extern const lzo_compress_t _lzo1c_99_compress_func;
 
-
 /***********************************************************************
 //
 ************************************************************************/
 
-LZO_EXTERN(lzo_byte *)
-_lzo1c_store_run ( lzo_byte * const oo, const lzo_byte * const ii,
-				   lzo_uint r_len);
+LZO_EXTERN(lzo_byte*)
+_lzo1c_store_run(lzo_byte* const oo, const lzo_byte* const ii, lzo_uint r_len);
 
-#define STORE_RUN	_lzo1c_store_run
-
+#define STORE_RUN _lzo1c_store_run
 
 lzo_compress_t _lzo1c_get_compress_func(int clevel);
 
-int _lzo1c_do_compress   ( const lzo_byte *in,  lzo_uint  in_len,
-								 lzo_byte *out, lzo_uintp out_len,
-								 lzo_voidp wrkmem,
-								 lzo_compress_t func );
-
+int _lzo1c_do_compress(
+    const lzo_byte* in, lzo_uint in_len, lzo_byte* out, lzo_uintp out_len, lzo_voidp wrkmem, lzo_compress_t func);
 
 #endif /* already included */
 
 /*
 vi:ts=4:et
 */
-
-

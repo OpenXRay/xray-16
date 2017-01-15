@@ -1,13 +1,19 @@
-#include "pch.hpp"
 #include "LevelCompilerLoggerConsole.hpp"
+#include "pch.hpp"
 
-LevelCompilerLoggerConsole::LevelCompilerLoggerConsole() {}
+LevelCompilerLoggerConsole::LevelCompilerLoggerConsole()
+{
+}
 
-void LevelCompilerLoggerConsole::Initialize(const char *name) {}
+void LevelCompilerLoggerConsole::Initialize(const char* name)
+{
+}
 
-void LevelCompilerLoggerConsole::Destroy() {}
+void LevelCompilerLoggerConsole::Destroy()
+{
+}
 
-void LevelCompilerLoggerConsole::clMsg(const char *format, ...)
+void LevelCompilerLoggerConsole::clMsg(const char* format, ...)
 {
     va_list args;
     va_start(args, format);
@@ -15,14 +21,14 @@ void LevelCompilerLoggerConsole::clMsg(const char *format, ...)
     va_end(args);
 }
 
-void LevelCompilerLoggerConsole::clMsgV(const char *format, va_list args)
+void LevelCompilerLoggerConsole::clMsgV(const char* format, va_list args)
 {
     char buf[1024];
     vsprintf(buf, format, args);
     Msg("clMsg: %s", buf);
 }
 
-void LevelCompilerLoggerConsole::clLog(const char *format, ...)
+void LevelCompilerLoggerConsole::clLog(const char* format, ...)
 {
     va_list mark;
     char buf[1024];
@@ -31,7 +37,7 @@ void LevelCompilerLoggerConsole::clLog(const char *format, ...)
     Msg("clLog: %s", buf);
 }
 
-void LevelCompilerLoggerConsole::Status(const char *format, ...)
+void LevelCompilerLoggerConsole::Status(const char* format, ...)
 {
     va_list args;
     va_start(args, format);
@@ -39,7 +45,7 @@ void LevelCompilerLoggerConsole::Status(const char *format, ...)
     va_end(args);
 }
 
-void LevelCompilerLoggerConsole::StatusV(const char *format, va_list args)
+void LevelCompilerLoggerConsole::StatusV(const char* format, va_list args)
 {
     char buf[1024] = "";
     vsprintf(buf, format, args);
@@ -47,11 +53,19 @@ void LevelCompilerLoggerConsole::StatusV(const char *format, va_list args)
 }
 
 void LevelCompilerLoggerConsole::Progress(float progress)
-{ Msg("Progress: %f", progress); }
+{
+    Msg("Progress: %f", progress);
+}
 
-void LevelCompilerLoggerConsole::Phase(const char *phaseName)
-{ Msg("Phase: %s", phaseName); }
+void LevelCompilerLoggerConsole::Phase(const char* phaseName)
+{
+    Msg("Phase: %s", phaseName);
+}
 
-void LevelCompilerLoggerConsole::Success(const char *msg) {}
+void LevelCompilerLoggerConsole::Success(const char* msg)
+{
+}
 
-void LevelCompilerLoggerConsole::Failure(const char *msg) {}
+void LevelCompilerLoggerConsole::Failure(const char* msg)
+{
+}

@@ -24,62 +24,41 @@
    <markus@oberhumer.com>
  */
 
-
 #include "config1b.h"
-
 
 /***********************************************************************
 //
 ************************************************************************/
 
-static const lzo_compress_t * const c_funcs [9] =
-{
-	&_lzo1b_1_compress_func,
-	&_lzo1b_2_compress_func,
-	&_lzo1b_3_compress_func,
-	&_lzo1b_4_compress_func,
-	&_lzo1b_5_compress_func,
-	&_lzo1b_6_compress_func,
-	&_lzo1b_7_compress_func,
-	&_lzo1b_8_compress_func,
-	&_lzo1b_9_compress_func
-};
-
+static const lzo_compress_t* const c_funcs[9] = {&_lzo1b_1_compress_func, &_lzo1b_2_compress_func,
+    &_lzo1b_3_compress_func, &_lzo1b_4_compress_func, &_lzo1b_5_compress_func, &_lzo1b_6_compress_func,
+    &_lzo1b_7_compress_func, &_lzo1b_8_compress_func, &_lzo1b_9_compress_func};
 
 lzo_compress_t _lzo1b_get_compress_func(int clevel)
 {
-	const lzo_compress_t *f;
+    const lzo_compress_t* f;
 
-	if (clevel < LZO1B_BEST_SPEED || clevel > LZO1B_BEST_COMPRESSION)
-	{
-		if (clevel == LZO1B_DEFAULT_COMPRESSION)
-			clevel = LZO1B_BEST_SPEED;
-		else
-			return 0;
-	}
-	f = c_funcs[clevel-1];
-	assert(f && *f);
-	return *f;
+    if (clevel < LZO1B_BEST_SPEED || clevel > LZO1B_BEST_COMPRESSION) {
+        if (clevel == LZO1B_DEFAULT_COMPRESSION)
+            clevel = LZO1B_BEST_SPEED;
+        else
+            return 0;
+    }
+    f = c_funcs[clevel - 1];
+    assert(f && *f);
+    return *f;
 }
-
 
 LZO_PUBLIC(int)
-lzo1b_compress ( const lzo_byte *src, lzo_uint  src_len,
-                       lzo_byte *dst, lzo_uintp dst_len,
-                       lzo_voidp wrkmem,
-                       int clevel )
+lzo1b_compress(const lzo_byte* src, lzo_uint src_len, lzo_byte* dst, lzo_uintp dst_len, lzo_voidp wrkmem, int clevel)
 {
-	lzo_compress_t f;
+    lzo_compress_t f;
 
-	f = _lzo1b_get_compress_func(clevel);
-	if (!f)
-		return LZO_E_ERROR;
-	return _lzo1b_do_compress(src,src_len,dst,dst_len,wrkmem,f);
+    f = _lzo1b_get_compress_func(clevel);
+    if (!f) return LZO_E_ERROR;
+    return _lzo1b_do_compress(src, src_len, dst, dst_len, wrkmem, f);
 }
-
-
 
 /*
 vi:ts=4:et
 */
-

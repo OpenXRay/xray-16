@@ -1,15 +1,15 @@
 #pragma once
 
-#include "net_task.h"
 #include "light_execute.h"
+#include "net_task.h"
 /*
 class net_light_task:
-	public net_task
+    public net_task
 {
-	light_execute execute;
+    light_execute execute;
 
-	net_light_task(  INetReader* inStream,  IWriter* outStream ): net_task(inStream, outStream ){}
+    net_light_task(  INetReader* inStream,  IWriter* outStream ): net_task(inStream, outStream ){}
 
-	virtual void run();
+    virtual void run();
 };
 */
