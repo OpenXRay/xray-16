@@ -1,8 +1,8 @@
 // PHDynamicData.cpp: implementation of the PHDynamicData class.
 //
 //////////////////////////////////////////////////////////////////////
-#include "stdafx.h"
 #include "PHDynamicData.h"
+#include "stdafx.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -204,4 +204,4 @@ void PHDynamicData::SetZeroTransform(Fmatrix& aTransform){
 	ZeroTransform.set(aTransform);
 }
 
-#endif // #if 0
+#endif  // #if 0

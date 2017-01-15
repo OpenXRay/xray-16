@@ -2,18 +2,17 @@
 #define D_TRI_COLLIDER_COMMON
 
 #include "Externals/ode/include/ode/common.h"
-#include "xrPhysics/ExtendedGeom.h"
 #include "dTriColliderMath.h"
+#include "xrPhysics/ExtendedGeom.h"
 
-extern xr_vector< flags8 >			gl_cl_tries_state	;
+extern xr_vector<flags8> gl_cl_tries_state;
 
-//extern xr_vector<int>::iterator		I,E,B				;
+// extern xr_vector<int>::iterator		I,E,B				;
 
-
-#define CONTACT(Ptr, Stride) ((dContactGeom*) (((char*)Ptr) + (Stride)))
-#define SURFACE(Ptr, Stride) ((dSurfaceParameters*) (((char*)Ptr) + (Stride-sizeof(dSurfaceParameters))))
+#define CONTACT(Ptr, Stride) ((dContactGeom*)(((char*)Ptr) + (Stride)))
+#define SURFACE(Ptr, Stride) ((dSurfaceParameters*)(((char*)Ptr) + (Stride - sizeof(dSurfaceParameters))))
 #define NUMC_MASK (0xffff)
 
-#define M_SIN_PI_3		REAL(0.8660254037844386467637231707529362)
-#define M_COS_PI_3		REAL(0.5000000000000000000000000000000000)
+#define M_SIN_PI_3 REAL(0.8660254037844386467637231707529362)
+#define M_COS_PI_3 REAL(0.5000000000000000000000000000000000)
 #endif
