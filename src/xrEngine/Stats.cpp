@@ -1,18 +1,18 @@
-#include "stdafx.h"
 #include "GameFont.h"
+#include "stdafx.h"
 #pragma hdrstop
 
-#include "xrCDB/ISpatial.h"
-#include "IGame_Persistent.h"
 #include "IGame_Level.h"
+#include "IGame_Persistent.h"
 #include "Render.h"
+#include "xrCDB/ISpatial.h"
 #include "xr_object.h"
 
 #include "Include/xrRender/DrawUtils.h"
-#include "xr_input.h"
+#include "PerformanceAlert.hpp"
 #include "xrCore/cdecl_cast.hpp"
 #include "xrPhysics/IPHWorld.h"
-#include "PerformanceAlert.hpp"
+#include "xr_input.h"
 
 int g_ErrorLineCount = 15;
 Flags32 g_stats_flags = {0};
@@ -24,6 +24,7 @@ class optimizer
 {
     float average_;
     BOOL enabled_;
+
 public:
     optimizer()
     {
@@ -35,12 +36,23 @@ public:
     }
 
     BOOL enabled() { return enabled_; }
-    void enable() { if (!enabled_) { Engine.External.tune_resume(); enabled_ = TRUE; } }
-    void disable() { if (enabled_) { Engine.External.tune_pause(); enabled_ = FALSE; } }
+    void enable()
+    {
+        if (!enabled_) {
+            Engine.External.tune_resume();
+            enabled_ = TRUE;
+        }
+    }
+    void disable()
+    {
+        if (enabled_) {
+            Engine.External.tune_pause();
+            enabled_ = FALSE;
+        }
+    }
     void update(float value)
     {
-        if (value < average_*0.7f)
-        {
+        if (value < average_ * 0.7f) {
             // 25% deviation
             enable();
         }
@@ -48,7 +60,7 @@ public:
         {
             disable();
         };
-        average_ = 0.99f*average_ + 0.01f*value;
+        average_ = 0.99f * average_ + 0.01f * value;
     };
 };
 static optimizer vtune;
@@ -56,7 +68,7 @@ static optimizer vtune;
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
-BOOL   g_bDisableRedText = FALSE;
+BOOL g_bDisableRedText = FALSE;
 CStats::CStats()
 {
     statsFont = nullptr;
@@ -70,12 +82,12 @@ CStats::~CStats()
     xr_delete(statsFont);
 }
 
-static void DumpSpatialStatistics(IGameFont &font, IPerformanceAlert *alert, ISpatial_DB &db, float engineTotal)
+static void DumpSpatialStatistics(IGameFont& font, IPerformanceAlert* alert, ISpatial_DB& db, float engineTotal)
 {
 #ifdef DEBUG
-    auto &stats = db.Stats;
+    auto& stats = db.Stats;
     stats.FrameEnd();
-#define PPP(a) (100.f*float(a)/engineTotal)
+#define PPP(a) (100.f * float(a) / engineTotal)
     font.OutNext("%s:", db.Name);
     font.OutNext("- query:      %.2fms, %u", stats.Query.result, stats.Query.count);
     font.OutNext("- nodes/obj:  %u/%u", stats.NodeCount, stats.ObjectCount);
@@ -92,16 +104,14 @@ void CStats::Show()
     if (memCalls > fMem_calls)
         fMem_calls = memCalls;
     else
-        fMem_calls = 0.9f*fMem_calls + 0.1f*memCalls;
+        fMem_calls = 0.9f * fMem_calls + 0.1f * memCalls;
     Memory.stat_calls = 0;
-    if (g_dedicated_server)
-        return;
-    auto &font = *statsFont;
+    if (g_dedicated_server) return;
+    auto& font = *statsFont;
     auto engineTotal = Device.GetStats().EngineTotal.result;
     PerformanceAlert alertInstance(font.GetHeight(), {300, 300});
     auto alertPtr = g_bDisableRedText ? nullptr : &alertInstance;
-    if (vtune.enabled())
-    {
+    if (vtune.enabled()) {
         float sz = font.GetHeight();
         font.SetHeightI(0.02f);
         font.SetColor(0xFFFF0000);
@@ -110,8 +120,7 @@ void CStats::Show()
         font.SetHeight(sz);
     }
     // Show them
-    if (psDeviceFlags.test(rsStatistic))
-    {
+    if (psDeviceFlags.test(rsStatistic)) {
         font.SetColor(0xFFFFFFFF);
         font.OutSet(0, 0);
 #if defined(FS_DEBUG)
@@ -119,20 +128,18 @@ void CStats::Show()
 #endif
         Device.DumpStatistics(font, alertPtr);
         font.OutNext("Memory:       %2.2f", fMem_calls);
-        if (g_pGameLevel)
-            g_pGameLevel->DumpStatistics(font, alertPtr);
+        if (g_pGameLevel) g_pGameLevel->DumpStatistics(font, alertPtr);
         Engine.Sheduler.DumpStatistics(font, alertPtr);
         g_pGamePersistent->DumpStatistics(font, alertPtr);
         DumpSpatialStatistics(font, alertPtr, *g_SpatialSpace, engineTotal);
         DumpSpatialStatistics(font, alertPtr, *g_SpatialSpacePhysic, engineTotal);
-        if (physics_world())
-            physics_world()->DumpStatistics(font, alertPtr);
+        if (physics_world()) physics_world()->DumpStatistics(font, alertPtr);
         font.OutSet(200, 0);
         GlobalEnv.Render->DumpStatistics(font, alertPtr);
         font.OutSkip();
         Sound->DumpStatistics(font, alertPtr);
         font.OutSkip();
-        pInput->DumpStatistics(font, alertPtr);        
+        pInput->DumpStatistics(font, alertPtr);
         font.OutSkip();
 #ifdef DEBUG_MEMORY_MANAGER
         font.OutNext("str: cmp[%3d], dock[%3d], qpc[%3d]", Memory.stat_strcmp, Memory.stat_strdock, CPU::qpc_counter);
@@ -144,8 +151,7 @@ void CStats::Show()
         CPU::qpc_counter = 0;
 #endif
     }
-    if (psDeviceFlags.test(rsCameraPos))
-    {
+    if (psDeviceFlags.test(rsCameraPos)) {
         float refHeight = font.GetHeight();
         font.SetHeightI(0.02f);
         font.SetColor(0xffffffff);
@@ -153,8 +159,7 @@ void CStats::Show()
         font.SetHeight(refHeight);
     }
 #ifdef DEBUG
-    if (!g_bDisableRedText && errors.size())
-    {
+    if (!g_bDisableRedText && errors.size()) {
         font.SetColor(color_rgba(255, 16, 16, 191));
         font.OutSet(400, 0);
         for (u32 it = (u32)_max(int(0), (int)errors.size() - g_ErrorLineCount); it < errors.size(); it++)
@@ -171,11 +176,9 @@ void CStats::OnDeviceCreate()
     statsFont = new CGameFont("stat_font", CGameFont::fsDeviceIndependent);
 #endif
 #ifdef DEBUG
-    if (!g_bDisableRedText)
-    {
-        auto cb = [](void *ctx, const char *s)
-        {
-            auto &stats = *static_cast<CStats*>(ctx);
+    if (!g_bDisableRedText) {
+        auto cb = [](void* ctx, const char* s) {
+            auto& stats = *static_cast<CStats*>(ctx);
             stats.FilteredLog(s);
         };
         SetLogCB(LogCallback(cdecl_cast(cb), this));
@@ -189,41 +192,39 @@ void CStats::OnDeviceDestroy()
     xr_delete(statsFont);
 }
 
-void CStats::FilteredLog(const char *s)
+void CStats::FilteredLog(const char* s)
 {
-    if (s && s[0] == '!' && s[1] == ' ')
-        errors.push_back(shared_str(s));
+    if (s && s[0] == '!' && s[1] == ' ') errors.push_back(shared_str(s));
 }
 
 void CStats::OnRender()
 {
-    // XXX: move to xrSound
+// XXX: move to xrSound
 #ifdef DEBUG
-    if (g_stats_flags.is(st_sound))
-    {
-        CSound_stats_ext    snd_stat_ext;
+    if (g_stats_flags.is(st_sound)) {
+        CSound_stats_ext snd_stat_ext;
         ::Sound->statistic(0, &snd_stat_ext);
         CSound_stats_ext::item_vec_it _I = snd_stat_ext.items.begin();
         CSound_stats_ext::item_vec_it _E = snd_stat_ext.items.end();
         for (; _I != _E; _I++)
         {
             const CSound_stats_ext::SItem& item = *_I;
-            if (item._3D)
-            {
+            if (item._3D) {
                 GlobalEnv.DU->DrawCross(item.params.position, 0.5f, 0xFF0000FF, true);
                 if (g_stats_flags.is(st_sound_min_dist))
-                    GlobalEnv.DU->DrawSphere(Fidentity, item.params.position, item.params.min_distance, 0x400000FF, 0xFF0000FF, true, true);
+                    GlobalEnv.DU->DrawSphere(
+                        Fidentity, item.params.position, item.params.min_distance, 0x400000FF, 0xFF0000FF, true, true);
                 if (g_stats_flags.is(st_sound_max_dist))
-                    GlobalEnv.DU->DrawSphere(Fidentity, item.params.position, item.params.max_distance, 0x4000FF00, 0xFF008000, true, true);
+                    GlobalEnv.DU->DrawSphere(
+                        Fidentity, item.params.position, item.params.max_distance, 0x4000FF00, 0xFF008000, true, true);
 
                 xr_string out_txt = (out_txt.size() && g_stats_flags.is(st_sound_info_name)) ? item.name.c_str() : "";
 
-                if (item.game_object)
-                {
+                if (item.game_object) {
                     if (g_stats_flags.is(st_sound_ai_dist))
-                        GlobalEnv.DU->DrawSphere(Fidentity, item.params.position, item.params.max_ai_distance, 0x80FF0000, 0xFF800000, true, true);
-                    if (g_stats_flags.is(st_sound_info_object))
-                    {
+                        GlobalEnv.DU->DrawSphere(Fidentity, item.params.position, item.params.max_ai_distance,
+                            0x80FF0000, 0xFF800000, true, true);
+                    if (g_stats_flags.is(st_sound_info_object)) {
                         out_txt += " (";
                         out_txt += item.game_object->cNameSect().c_str();
                         out_txt += ")";

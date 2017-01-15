@@ -22,7 +22,7 @@ struct ENGINE_API SCamEffectorInfo
     bool dont_apply;
     bool affected_on_hud;
     SCamEffectorInfo();
-    SCamEffectorInfo& operator = (const SCamEffectorInfo& other)
+    SCamEffectorInfo& operator=(const SCamEffectorInfo& other)
     {
         p = other.p;
         d = other.d;

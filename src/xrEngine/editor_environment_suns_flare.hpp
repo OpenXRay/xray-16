@@ -20,10 +20,7 @@ namespace environment
 {
 namespace suns
 {
-
-class flare :
-    public editor::property_holder_holder,
-    private Noncopyable
+class flare : public editor::property_holder_holder, private Noncopyable
 {
 public:
     flare();
@@ -44,12 +41,12 @@ public:
     float m_opacity;
     float m_position;
     float m_radius;
-}; // class flare
+};  // class flare
 
-} // namespace suns
-} // namespace environment
-} // namespace editor
+}  // namespace suns
+}  // namespace environment
+}  // namespace editor
 
-#endif // #ifdef INGAME_EDITOR
+#endif  // #ifdef INGAME_EDITOR
 
-#endif // ifndef EDITOR_WEATHER_FLARE_HPP_INCLUDED
+#endif  // ifndef EDITOR_WEATHER_FLARE_HPP_INCLUDED

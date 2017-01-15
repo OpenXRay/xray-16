@@ -12,25 +12,20 @@
 #ifdef INGAME_EDITOR
 
 #include "Common/Noncopyable.hpp"
-#include "Include/editor/property_holder.hpp"
 #include "Environment.h"
+#include "Include/editor/property_holder.hpp"
 
 namespace editor
 {
 namespace environment
 {
-
 class manager;
 
 namespace effects
 {
-
 class manager;
 
-class effect :
-    public CEnvAmbient::SEffect,
-    public editor::property_holder_holder,
-    private Noncopyable
+class effect : public CEnvAmbient::SEffect, public editor::property_holder_holder, private Noncopyable
 {
 public:
     effect(manager const& manager, shared_str const& id);
@@ -39,15 +34,12 @@ public:
     void save(CInifile& config);
     void fill(editor::property_holder_collection* collection);
     inline LPCSTR id() const { return m_id.c_str(); }
-
-
 private:
     LPCSTR xr_stdcall id_getter() const;
     void xr_stdcall id_setter(LPCSTR value);
 
     float xr_stdcall wind_blast_longitude_getter() const;
     void xr_stdcall wind_blast_longitude_setter(float value);
-
 
     LPCSTR xr_stdcall sound_getter();
     void xr_stdcall sound_setter(LPCSTR value);
@@ -65,12 +57,12 @@ private:
 
 public:
     manager const& m_manager;
-}; // class effect
+};  // class effect
 
-} // namespace effects
-} // namespace environment
-} // namespace editor
+}  // namespace effects
+}  // namespace environment
+}  // namespace editor
 
-#endif // #ifdef INGAME_EDITOR
+#endif  // #ifdef INGAME_EDITOR
 
-#endif // ifndef EDITOR_WEATHER_EFFECTS_EFFECT_HPP_INCLUDED
+#endif  // ifndef EDITOR_WEATHER_EFFECTS_EFFECT_HPP_INCLUDED

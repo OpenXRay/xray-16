@@ -1,7 +1,7 @@
 #include "stdafx.h"
 /*
-#include "xr_input_xinput.h"
 #include <xinput.h>
+#include "xr_input_xinput.h"
 
 #include "xrCore/ModuleLookup.hpp"
 
@@ -12,7 +12,8 @@ typedef DWORD (WINAPI* LPXINPUTSETSTATE)(DWORD dwUserIndex, XINPUT_VIBRATION* pV
 typedef DWORD (WINAPI* LPXINPUTGETCAPABILITIES)( DWORD dwUserIndex, DWORD dwFlags, XINPUT_CAPABILITIES* pCapabilities );
 typedef void (WINAPI* LPXINPUTENABLE)(BOOL bEnable);
 
-HRESULT DXUTGetGamepadState( DWORD dwPort, DXUT_GAMEPAD* pGamePad, bool bThumbstickDeadZone, bool bSnapThumbstickToCardinals )
+HRESULT DXUTGetGamepadState( DWORD dwPort, DXUT_GAMEPAD* pGamePad, bool bThumbstickDeadZone, bool
+bSnapThumbstickToCardinals )
 {
 if( dwPort >= DXUT_MAX_CONTROLLERS || pGamePad == NULL )
 return E_FAIL;
@@ -60,26 +61,33 @@ memcpy( pGamePad, &InputState.Gamepad, sizeof(XINPUT_GAMEPAD) );
 if( bSnapThumbstickToCardinals )
 {
 // Apply deadzone to each axis independantly to slightly snap to up/down/left/right
-if( pGamePad->sThumbLX < XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE && pGamePad->sThumbLX > -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE )
+if( pGamePad->sThumbLX < XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE && pGamePad->sThumbLX > -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE
+)
 pGamePad->sThumbLX = 0;
-if( pGamePad->sThumbLY < XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE && pGamePad->sThumbLY > -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE )
+if( pGamePad->sThumbLY < XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE && pGamePad->sThumbLY > -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE
+)
 pGamePad->sThumbLY = 0;
-if( pGamePad->sThumbRX < XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE && pGamePad->sThumbRX > -XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE )
+if( pGamePad->sThumbRX < XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE && pGamePad->sThumbRX >
+-XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE )
 pGamePad->sThumbRX = 0;
-if( pGamePad->sThumbRY < XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE && pGamePad->sThumbRY > -XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE )
+if( pGamePad->sThumbRY < XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE && pGamePad->sThumbRY >
+-XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE )
 pGamePad->sThumbRY = 0;
 }
 else if( bThumbstickDeadZone )
 {
 // Apply deadzone if centered
-if( (pGamePad->sThumbLX < XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE && pGamePad->sThumbLX > -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE) &&
+if( (pGamePad->sThumbLX < XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE && pGamePad->sThumbLX >
+-XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE) &&
 (pGamePad->sThumbLY < XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE && pGamePad->sThumbLY > -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE) )
 {
 pGamePad->sThumbLX = 0;
 pGamePad->sThumbLY = 0;
 }
-if( (pGamePad->sThumbRX < XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE && pGamePad->sThumbRX > -XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE) &&
-(pGamePad->sThumbRY < XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE && pGamePad->sThumbRY > -XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE) )
+if( (pGamePad->sThumbRX < XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE && pGamePad->sThumbRX >
+-XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE) &&
+(pGamePad->sThumbRY < XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE && pGamePad->sThumbRY > -XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE)
+)
 {
 pGamePad->sThumbRX = 0;
 pGamePad->sThumbRY = 0;

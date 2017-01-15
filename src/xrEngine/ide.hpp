@@ -16,7 +16,7 @@
 namespace editor
 {
 class ide;
-} // namespace editor
+}  // namespace editor
 
 inline editor::ide& ide()
 {
@@ -24,6 +24,6 @@ inline editor::ide& ide()
     return (*Device.editor());
 }
 
-#endif // #ifdef INGAME_EDITOR
+#endif  // #ifdef INGAME_EDITOR
 
-#endif // ifndef IDE_HPP_INCLUDED
+#endif  // ifndef IDE_HPP_INCLUDED

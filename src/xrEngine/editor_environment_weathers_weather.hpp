@@ -19,27 +19,20 @@ namespace editor
 {
 namespace environment
 {
-
 class manager;
 
 namespace weathers
 {
-
 class manager;
 class time;
 
-class weather :
-    public editor::property_holder_holder,
-    private Noncopyable
+class weather : public editor::property_holder_holder, private Noncopyable
 {
 public:
     typedef editor::property_holder property_holder_type;
 
 public:
-    weather(
-        environment::manager* manager,
-        shared_str const& id
-    );
+    weather(environment::manager* manager, shared_str const& id);
     virtual ~weather();
     void load();
     void save();
@@ -70,12 +63,8 @@ public:
 
 public:
     inline container_type const& times() const { return m_times; }
-
 private:
-    typedef property_collection <
-    container_type,
-    weather
-    > collection_type;
+    typedef property_collection<container_type, weather> collection_type;
 
 private:
     shared_str m_id;
@@ -85,11 +74,11 @@ private:
 
 public:
     environment::manager& m_manager;
-}; // class weather
-} // namespace weathers
-} // namespace environment
-} // namespace editor
+};  // class weather
+}  // namespace weathers
+}  // namespace environment
+}  // namespace editor
 
-#endif // #ifdef INGAME_EDITOR
+#endif  // #ifdef INGAME_EDITOR
 
-#endif // ifndef EDITOR_ENVIRONMENT_WEATHERS_WEATHER_HPP_INCLUDED
+#endif  // ifndef EDITOR_ENVIRONMENT_WEATHERS_WEATHER_HPP_INCLUDED

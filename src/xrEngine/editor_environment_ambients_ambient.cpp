@@ -10,13 +10,13 @@
 
 #ifdef INGAME_EDITOR
 #include "editor_environment_ambients_ambient.hpp"
+#include "editor_environment_ambients_effect_id.hpp"
+#include "editor_environment_ambients_manager.hpp"
+#include "editor_environment_ambients_sound_id.hpp"
+#include "editor_environment_effects_effect.hpp"
+#include "editor_environment_sound_channels_channel.hpp"
 #include "ide.hpp"
 #include "property_collection.hpp"
-#include "editor_environment_ambients_effect_id.hpp"
-#include "editor_environment_ambients_sound_id.hpp"
-#include "editor_environment_ambients_manager.hpp"
-#include "editor_environment_sound_channels_channel.hpp"
-#include "editor_environment_effects_effect.hpp"
 
 using editor::environment::ambients::ambient;
 using editor::environment::ambients::manager;
@@ -26,7 +26,8 @@ using editor::environment::sound_channels::channel;
 using editor::environment::effects::effect;
 
 template <>
-void property_collection<ambient::effect_container_type, ambient>::display_name(u32 const& item_index, LPSTR const& buffer, u32 const& buffer_size)
+void property_collection<ambient::effect_container_type, ambient>::display_name(
+    u32 const& item_index, LPSTR const& buffer, u32 const& buffer_size)
 {
     xr_strcpy(buffer, buffer_size, m_container[item_index]->id().c_str());
 }
@@ -40,7 +41,8 @@ editor::property_holder* property_collection<ambient::effect_container_type, amb
 }
 
 template <>
-void property_collection<ambient::sound_container_type, ambient>::display_name(u32 const& item_index, LPSTR const& buffer, u32 const& buffer_size)
+void property_collection<ambient::sound_container_type, ambient>::display_name(
+    u32 const& item_index, LPSTR const& buffer, u32 const& buffer_size)
 {
     xr_strcpy(buffer, buffer_size, m_container[item_index]->id().c_str());
 }
@@ -53,11 +55,8 @@ editor::property_holder* property_collection<ambient::sound_container_type, ambi
     return (object->object());
 }
 
-ambient::ambient(manager const& manager, shared_str const& id) :
-    m_manager(manager),
-    m_property_holder(0),
-    m_effects_collection(0),
-    m_sounds_collection(0)
+ambient::ambient(manager const& manager, shared_str const& id)
+    : m_manager(manager), m_property_holder(0), m_effects_collection(0), m_sounds_collection(0)
 {
     m_load_section = id;
     m_effects_collection = new effect_collection_type(&m_effects_ids, this);
@@ -72,26 +71,16 @@ ambient::~ambient()
     delete_data(m_sound_channels_ids);
     xr_delete(m_sounds_collection);
 
-    if (!Device.editor())
-        return;
+    if (!Device.editor()) return;
 
     ::ide().destroy(m_property_holder);
 }
 
 void ambient::load(
-    CInifile& ambients_config,
-    CInifile& sound_channels_config,
-    CInifile& effects_config,
-    const shared_str& section
-)
+    CInifile& ambients_config, CInifile& sound_channels_config, CInifile& effects_config, const shared_str& section)
 {
     VERIFY(m_load_section == section);
-    inherited::load(
-        ambients_config,
-        sound_channels_config,
-        effects_config,
-        m_load_section
-    );
+    inherited::load(ambients_config, sound_channels_config, effects_config, m_load_section);
 
     {
         VERIFY(m_effects_ids.empty());
@@ -128,12 +117,11 @@ void ambient::save(CInifile& config)
         for (; i != e; ++i)
             count += (*i)->id().size() + 2;
 
-        temp = (LPSTR)_alloca(count*sizeof(char));
+        temp = (LPSTR)_alloca(count * sizeof(char));
         *temp = 0;
         for (i = b; i != e; ++i)
         {
-            if (i == b)
-            {
+            if (i == b) {
                 xr_strcpy(temp, count, (*i)->id().c_str());
                 continue;
             }
@@ -154,12 +142,11 @@ void ambient::save(CInifile& config)
         for (; i != e; ++i)
             count += (*i)->id().size() + 2;
 
-        temp = (LPSTR)_alloca(count*sizeof(char));
+        temp = (LPSTR)_alloca(count * sizeof(char));
         *temp = 0;
         for (i = b; i != e; ++i)
         {
-            if (i == b)
-            {
+            if (i == b) {
                 xr_strcpy(temp, count, (*i)->id().c_str());
                 continue;
             }
@@ -179,8 +166,7 @@ LPCSTR ambient::id_getter() const
 void ambient::id_setter(LPCSTR value_)
 {
     shared_str value = value_;
-    if (m_load_section._get() == value._get())
-        return;
+    if (m_load_section._get() == value._get()) return;
 
     m_load_section = m_manager.unique_id(value);
 }
@@ -198,40 +184,16 @@ void ambient::fill(editor::property_holder_collection* collection)
     string_setter_type string_setter;
     string_setter.bind(this, &ambient::id_setter);
 
+    m_property_holder->add_property("id", "properties", "this option is resposible for ambient identifier",
+        m_load_section.c_str(), string_getter, string_setter);
+    m_property_holder->add_property("minimum period", "effects",
+        "this option is resposible for minimum effect period (in seconds)", m_effect_period.x, m_effect_period.x);
+    m_property_holder->add_property("maximum period", "effects",
+        "this option is resposible for maximum effect period (in seconds)", m_effect_period.y, m_effect_period.y);
     m_property_holder->add_property(
-        "id",
-        "properties",
-        "this option is resposible for ambient identifier",
-        m_load_section.c_str(),
-        string_getter,
-        string_setter
-    );
+        "effects", "effects", "this option is resposible for maximum effects", m_effects_collection);
     m_property_holder->add_property(
-        "minimum period",
-        "effects",
-        "this option is resposible for minimum effect period (in seconds)",
-        m_effect_period.x,
-        m_effect_period.x
-    );
-    m_property_holder->add_property(
-        "maximum period",
-        "effects",
-        "this option is resposible for maximum effect period (in seconds)",
-        m_effect_period.y,
-        m_effect_period.y
-    );
-    m_property_holder->add_property(
-        "effects",
-        "effects",
-        "this option is resposible for maximum effects",
-        m_effects_collection
-    );
-    m_property_holder->add_property(
-        "sound channels",
-        "sounds",
-        "this option is resposible for sound channels",
-        m_sounds_collection
-    );
+        "sound channels", "sounds", "this option is resposible for sound channels", m_sounds_collection);
 }
 
 ambient::property_holder_type* ambient::object()
@@ -275,4 +237,4 @@ CEnvAmbient::SSndChannelVec& ambient::get_snd_channels()
     return (inherited::get_snd_channels());
 }
 
-#endif // #ifdef INGAME_EDITOR
+#endif  // #ifdef INGAME_EDITOR

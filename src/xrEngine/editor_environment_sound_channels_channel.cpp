@@ -10,17 +10,18 @@
 
 #ifdef INGAME_EDITOR
 #include "editor_environment_sound_channels_channel.hpp"
+#include "editor_environment_sound_channels_manager.hpp"
+#include "editor_environment_sound_channels_source.hpp"
 #include "ide.hpp"
 #include "property_collection.hpp"
-#include "editor_environment_sound_channels_source.hpp"
-#include "editor_environment_sound_channels_manager.hpp"
 
 using editor::environment::sound_channels::channel;
 using editor::environment::sound_channels::source;
 using editor::environment::sound_channels::manager;
 
 template <>
-void property_collection<channel::sound_container_type, channel>::display_name(u32 const& item_index, LPSTR const& buffer, u32 const& buffer_size)
+void property_collection<channel::sound_container_type, channel>::display_name(
+    u32 const& item_index, LPSTR const& buffer, u32 const& buffer_size)
 {
     xr_strcpy(buffer, buffer_size, m_container[item_index]->id());
 }
@@ -33,10 +34,8 @@ editor::property_holder* property_collection<channel::sound_container_type, chan
     return (object->object());
 }
 
-channel::channel(manager const& manager, shared_str const& id) :
-    m_manager(manager),
-    m_property_holder(0),
-    m_collection(0)
+channel::channel(manager const& manager, shared_str const& id)
+    : m_manager(manager), m_property_holder(0), m_collection(0)
 {
     m_load_section = id;
     m_sound_dist = Fvector2().set(0.f, 0.f);
@@ -49,8 +48,7 @@ channel::~channel()
     xr_delete(m_collection);
     delete_data(m_sounds);
 
-    if (!Device.editor())
-        return;
+    if (!Device.editor()) return;
 
     ::ide().destroy(m_property_holder);
 }
@@ -85,12 +83,11 @@ void channel::save(CInifile& config)
     for (; i != e; ++i)
         count += xr_strlen((*i)->id()) + 2;
 
-    LPSTR temp = (LPSTR)_alloca(count*sizeof(char));
+    LPSTR temp = (LPSTR)_alloca(count * sizeof(char));
     *temp = 0;
     for (i = b; i != e; ++i)
     {
-        if (i == b)
-        {
+        if (i == b) {
             xr_strcpy(temp, count, (*i)->id());
             continue;
         }
@@ -110,8 +107,7 @@ LPCSTR channel::id_getter() const
 void channel::id_setter(LPCSTR value_)
 {
     shared_str value = value_;
-    if (m_load_section._get() == value._get())
-        return;
+    if (m_load_section._get() == value._get()) return;
 
     m_load_section = m_manager.unique_id(value);
 }
@@ -129,62 +125,22 @@ void channel::fill(editor::property_holder_collection* collection)
     string_setter_type string_setter;
     string_setter.bind(this, &channel::id_setter);
 
+    m_property_holder->add_property("id", "properties", "this option is resposible for sound channel id",
+        m_load_section.c_str(), string_getter, string_setter);
+    m_property_holder->add_property("minimum distance", "properties",
+        "this option is resposible for minimum distance (in meters)", m_sound_dist.x, m_sound_dist.x);
+    m_property_holder->add_property("maximum distance", "properties",
+        "this option is resposible for maximum distance (in meters)", m_sound_dist.y, m_sound_dist.y);
+    m_property_holder->add_property("period 0", "properties",
+        "this option is resposible for minimum start time interval (in seconds)", m_sound_period.x, m_sound_period.x);
+    m_property_holder->add_property("period 1", "properties",
+        "this option is resposible for maximum start time interval (in seconds)", m_sound_period.y, m_sound_period.y);
+    m_property_holder->add_property("period 2", "properties",
+        "this option is resposible for minimum pause interval (in seconds)", m_sound_period.z, m_sound_period.z);
+    m_property_holder->add_property("period 3", "properties",
+        "this option is resposible for maximum pause interval (in seconds)", m_sound_period.w, m_sound_period.w);
     m_property_holder->add_property(
-        "id",
-        "properties",
-        "this option is resposible for sound channel id",
-        m_load_section.c_str(),
-        string_getter,
-        string_setter
-    );
-    m_property_holder->add_property(
-        "minimum distance",
-        "properties",
-        "this option is resposible for minimum distance (in meters)",
-        m_sound_dist.x,
-        m_sound_dist.x
-    );
-    m_property_holder->add_property(
-        "maximum distance",
-        "properties",
-        "this option is resposible for maximum distance (in meters)",
-        m_sound_dist.y,
-        m_sound_dist.y
-    );
-    m_property_holder->add_property(
-        "period 0",
-        "properties",
-        "this option is resposible for minimum start time interval (in seconds)",
-        m_sound_period.x,
-        m_sound_period.x
-    );
-    m_property_holder->add_property(
-        "period 1",
-        "properties",
-        "this option is resposible for maximum start time interval (in seconds)",
-        m_sound_period.y,
-        m_sound_period.y
-    );
-    m_property_holder->add_property(
-        "period 2",
-        "properties",
-        "this option is resposible for minimum pause interval (in seconds)",
-        m_sound_period.z,
-        m_sound_period.z
-    );
-    m_property_holder->add_property(
-        "period 3",
-        "properties",
-        "this option is resposible for maximum pause interval (in seconds)",
-        m_sound_period.w,
-        m_sound_period.w
-    );
-    m_property_holder->add_property(
-        "sounds",
-        "properties",
-        "this option is resposible for sound sources",
-        m_collection
-    );
+        "sounds", "properties", "this option is resposible for sound sources", m_collection);
 }
 
 channel::property_holder_type* channel::object()
@@ -197,4 +153,4 @@ CEnvAmbient::SSndChannel::sounds_type& channel::sounds()
     return (inherited::sounds());
 }
 
-#endif // #ifdef INGAME_EDITOR
+#endif  // #ifdef INGAME_EDITOR

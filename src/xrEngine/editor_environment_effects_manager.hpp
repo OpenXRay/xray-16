@@ -16,17 +16,14 @@
 
 namespace editor
 {
-
 class property_holder;
 
 namespace environment
 {
-
 class manager;
 
 namespace effects
 {
-
 class effect;
 
 class manager : private Noncopyable
@@ -41,7 +38,6 @@ public:
 
 public:
     inline ::editor::environment::manager& environment() const { return m_environment; }
-
 public:
     typedef xr_vector<effect*> effect_container_type;
     typedef xr_vector<LPSTR> effects_ids_type;
@@ -51,10 +47,7 @@ public:
 
 private:
     typedef editor::property_holder property_holder_type;
-    typedef property_collection <
-    effect_container_type,
-    manager
-    > collection_type;
+    typedef property_collection<effect_container_type, manager> collection_type;
 
 private:
     effect_container_type m_effects;
@@ -63,12 +56,12 @@ private:
     property_holder_type* m_property_holder;
     collection_type* m_collection;
     mutable bool m_changed;
-}; // class effects_manager
+};  // class effects_manager
 
-} // namespace effects
-} // namespace environment
-} // namespace editor
+}  // namespace effects
+}  // namespace environment
+}  // namespace editor
 
-#endif // #ifdef INGAME_EDITOR
+#endif  // #ifdef INGAME_EDITOR
 
-#endif // ifndef EDITOR_WEATHER_EFFECTS_MANAGER_HPP_INCLUDED
+#endif  // ifndef EDITOR_WEATHER_EFFECTS_MANAGER_HPP_INCLUDED

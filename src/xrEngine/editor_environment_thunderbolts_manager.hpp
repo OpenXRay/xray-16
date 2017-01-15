@@ -19,17 +19,14 @@ struct SThunderboltCollection;
 
 namespace editor
 {
-
 class property_holder;
 
 namespace environment
 {
-
 class manager;
 
 namespace thunderbolts
 {
-
 class thunderbolt;
 class thunderbolt_id;
 class collection;
@@ -68,14 +65,8 @@ private:
 
 private:
     typedef editor::property_holder property_holder_type;
-    typedef property_collection <
-    thunderbolt_container_type,
-    manager
-    > thunderbolt_collection_type;
-    typedef property_collection <
-    collection_container_type,
-    manager
-    > collection_collection_type;
+    typedef property_collection<thunderbolt_container_type, manager> thunderbolt_collection_type;
+    typedef property_collection<collection_container_type, manager> collection_collection_type;
 
 private:
     float xr_stdcall altitude_getter() const;
@@ -98,11 +89,11 @@ private:
     mutable collections_ids_type m_collections_ids;
     property_holder_type* m_property_holder;
     ::editor::environment::manager& m_environment;
-}; // class manager
-} // namespace thunderbolts
-} // namespace environment
-} // namespace editor
+};  // class manager
+}  // namespace thunderbolts
+}  // namespace environment
+}  // namespace editor
 
-#endif // #ifdef INGAME_EDITOR
+#endif  // #ifdef INGAME_EDITOR
 
-#endif // ifndef EDITOR_WEATHER_THUNDERBOLTS_MANAGER_HPP_INCLUDED
+#endif  // ifndef EDITOR_WEATHER_THUNDERBOLTS_MANAGER_HPP_INCLUDED

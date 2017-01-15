@@ -16,7 +16,6 @@
 
 namespace editor
 {
-
 class property_holder;
 class property_holder_collection;
 
@@ -24,7 +23,6 @@ namespace environment
 {
 namespace suns
 {
-
 class manager;
 class flare;
 
@@ -36,6 +34,7 @@ public:
     void load(CInifile& config, shared_str const& section);
     void save(CInifile& config, shared_str const& section);
     void fill(manager const& manager, editor::property_holder* holder, editor::property_holder_collection* collection);
+
 private:
     typedef xr_vector<flare*> flares_type;
     typedef editor::property_holder_collection property_holder_collection;
@@ -48,12 +47,12 @@ private:
     shared_str m_shader;
     collection_type* m_collection;
     bool m_use;
-}; // class flares
+};  // class flares
 
-} // namespace suns
-} // namespace environment
-} // namespace editor
+}  // namespace suns
+}  // namespace environment
+}  // namespace editor
 
-#endif // #ifdef INGAME_EDITOR
+#endif  // #ifdef INGAME_EDITOR
 
-#endif // ifndef EDITOR_WEATHER_SUNS_FLARES_HPP_INCLUDED
+#endif  // ifndef EDITOR_WEATHER_SUNS_FLARES_HPP_INCLUDED

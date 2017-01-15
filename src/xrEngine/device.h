@@ -6,14 +6,14 @@
 // ZNear - always 0.0f
 // ZFar - always 1.0f
 
-//class ENGINE_API CResourceManager;
-//class ENGINE_API CGammaControl;
+// class ENGINE_API CResourceManager;
+// class ENGINE_API CGammaControl;
 
 #include "pure.h"
 
-#include "xrCore/ftimer.h"
 #include "stats.h"
 #include "xrCore/Threading/Event.hpp"
+#include "xrCore/ftimer.h"
 
 #define VIEWPORT_NEAR 0.2f
 
@@ -23,21 +23,21 @@
 #include "Render.h"
 
 #ifdef INGAME_EDITOR
-# include "Include/editor/interfaces.hpp"
+#include "Include/editor/interfaces.hpp"
 #endif
 
 class engine_impl;
 
-#pragma pack(push,4)
+#pragma pack(push, 4)
 
 class ENGINE_API IRenderDevice
 {
 public:
     struct RenderDeviceStatictics
     {
-        CStatTimer RenderTotal; // pureRender
-        CStatTimer EngineTotal; // pureFrame
-        float fFPS, fRFPS, fTPS; // FPS, RenderFPS, TPS
+        CStatTimer RenderTotal;   // pureRender
+        CStatTimer EngineTotal;   // pureFrame
+        float fFPS, fRFPS, fTPS;  // FPS, RenderFPS, TPS
 
         RenderDeviceStatictics()
         {
@@ -48,10 +48,10 @@ public:
     };
 
     virtual ~IRenderDevice() {}
-    virtual void  AddSeqFrame(pureFrame* f, bool mt) = 0;
-    virtual void  RemoveSeqFrame(pureFrame* f) = 0;
-    virtual const RenderDeviceStatictics &GetStats() const = 0;
-    virtual void DumpStatistics(class IGameFont &font, class IPerformanceAlert *alert) = 0;
+    virtual void AddSeqFrame(pureFrame* f, bool mt) = 0;
+    virtual void RemoveSeqFrame(pureFrame* f) = 0;
+    virtual const RenderDeviceStatictics& GetStats() const = 0;
+    virtual void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert) = 0;
 };
 
 class ENGINE_API CRenderDeviceData
@@ -63,8 +63,8 @@ public:
     u32 dwPrecacheFrame;
     BOOL b_is_Ready;
     BOOL b_is_Active;
-public:
 
+public:
     // Engine flow-control
     u32 dwFrame;
 
@@ -92,28 +92,26 @@ public:
 
     float fFOV;
     float fASPECT;
-protected:
 
+protected:
     u32 Timer_MM_Delta;
     CTimer_paused Timer;
     CTimer_paused TimerGlobal;
-public:
 
+public:
     // Registrators
-    CRegistrator <pureRender > seqRender;
-    CRegistrator <pureAppActivate > seqAppActivate;
-    CRegistrator <pureAppDeactivate > seqAppDeactivate;
-    CRegistrator <pureAppStart > seqAppStart;
-    CRegistrator <pureAppEnd > seqAppEnd;
-    CRegistrator <pureFrame > seqFrame;
-    CRegistrator <pureScreenResolutionChanged> seqResolutionChanged;
+    CRegistrator<pureRender> seqRender;
+    CRegistrator<pureAppActivate> seqAppActivate;
+    CRegistrator<pureAppDeactivate> seqAppDeactivate;
+    CRegistrator<pureAppStart> seqAppStart;
+    CRegistrator<pureAppEnd> seqAppEnd;
+    CRegistrator<pureFrame> seqFrame;
+    CRegistrator<pureScreenResolutionChanged> seqResolutionChanged;
 
     HWND m_hWnd;
 };
 
-class ENGINE_API CRenderDeviceBase :
-    public IRenderDevice,
-    public CRenderDeviceData
+class ENGINE_API CRenderDeviceBase : public IRenderDevice, public CRenderDeviceData
 {
 protected:
     CStats* Statistic;
@@ -133,6 +131,7 @@ private:
     RenderDeviceStatictics stats;
 
     void _SetupStates();
+
 public:
     // HWND m_hWnd;
     LRESULT MsgProc(HWND, UINT, WPARAM, LPARAM);
@@ -146,47 +145,43 @@ public:
     // BOOL b_is_Ready;
     // BOOL b_is_Active;
     void OnWM_Activate(WPARAM wParam, LPARAM lParam);
+
 public:
-    //ref_shader m_WireShader;
-    //ref_shader m_SelectionShader;
-    
+    // ref_shader m_WireShader;
+    // ref_shader m_SelectionShader;
+
     BOOL m_bNearer;
     void SetNearer(BOOL enabled)
     {
-        if (enabled&&!m_bNearer)
-        {
+        if (enabled && !m_bNearer) {
             m_bNearer = TRUE;
             mProject._43 -= EPS_L;
         }
-        else if (!enabled&&m_bNearer)
+        else if (!enabled && m_bNearer)
         {
             m_bNearer = FALSE;
             mProject._43 += EPS_L;
         }
         GlobalEnv.Render->SetCacheXform(mView, mProject);
-        //R_ASSERT(0);
+        // R_ASSERT(0);
         // TODO: re-implement set projection
-        //RCache.set_xform_project (mProject);
+        // RCache.set_xform_project (mProject);
     }
 
     void DumpResourcesMemoryUsage() { GlobalEnv.Render->ResourcesDumpMemoryUsage(); }
 public:
-    CRegistrator <pureFrame > seqFrameMT;
-    CRegistrator <pureDeviceReset > seqDeviceReset;
-    xr_vector <fastdelegate::FastDelegate0<> > seqParallel;
-    
+    CRegistrator<pureFrame> seqFrameMT;
+    CRegistrator<pureDeviceReset> seqDeviceReset;
+    xr_vector<fastdelegate::FastDelegate0<>> seqParallel;
+
     Fmatrix mInvFullTransform;
 
     CRenderDevice()
         : m_dwWindowStyle(0)
 #ifdef INGAME_EDITOR
-        ,
-        m_editor_module(0),
-        m_editor_initialize(0),
-        m_editor_finalize(0),
-        m_editor(0),
-        m_engine(0)
-#endif // #ifdef INGAME_EDITOR
+          ,
+          m_editor_module(0), m_editor_initialize(0), m_editor_finalize(0), m_editor(0), m_engine(0)
+#endif  // #ifdef INGAME_EDITOR
     {
         m_hWnd = NULL;
         b_is_Active = FALSE;
@@ -197,8 +192,10 @@ public:
 
     void Pause(BOOL bOn, BOOL bTimer, BOOL bSound, LPCSTR reason);
     BOOL Paused();
+
 private:
-    static void SecondaryThreadProc(void *context);
+    static void SecondaryThreadProc(void* context);
+
 public:
     // Scene control
     void PreCache(u32 amount, bool b_draw_loadscreen, bool b_wait_user_input);
@@ -215,7 +212,6 @@ public:
     IC CTimer_paused* GetTimerGlobal() { return &TimerGlobal; }
     u32 TimerAsync() { return TimerGlobal.GetElapsed_ms(); }
     u32 TimerAsync_MMT() { return TimerMM.GetElapsed_ms() + Timer_MM_Delta; }
-
     // Creation & Destroying
     void Create(void);
     void Run(void);
@@ -224,8 +220,9 @@ public:
 
     void Initialize(void);
     void ShutDown(void);
-    virtual const RenderDeviceStatictics &GetStats() const override { return stats; }
-    virtual void DumpStatistics(class IGameFont &font, class IPerformanceAlert *alert) override;
+    virtual const RenderDeviceStatictics& GetStats() const override { return stats; }
+    virtual void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert) override;
+
 public:
     void time_factor(const float& time_factor)
     {
@@ -238,36 +235,34 @@ public:
         VERIFY(Timer.time_factor() == TimerGlobal.time_factor());
         return (Timer.time_factor());
     }
+
 private:
     Event syncProcessFrame, syncFrameDone, syncThreadExit;
+
 public:
     volatile BOOL mt_bMustExit;
 
     ICF void remove_from_seq_parallel(const fastdelegate::FastDelegate0<>& delegate)
     {
-        xr_vector<fastdelegate::FastDelegate0<> >::iterator I = std::find(
-                    seqParallel.begin(),
-                    seqParallel.end(),
-                    delegate
-                );
-        if (I != seqParallel.end())
-            seqParallel.erase(I);
+        xr_vector<fastdelegate::FastDelegate0<>>::iterator I =
+            std::find(seqParallel.begin(), seqParallel.end(), delegate);
+        if (I != seqParallel.end()) seqParallel.erase(I);
     }
 
 private:
     void CalcFrameStats();
+
 public:
     void xr_stdcall on_idle();
     bool xr_stdcall on_message(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& result);
 
 private:
     void message_loop();
-    virtual void  AddSeqFrame(pureFrame* f, bool mt);
-    virtual void  RemoveSeqFrame(pureFrame* f);
+    virtual void AddSeqFrame(pureFrame* f, bool mt);
+    virtual void RemoveSeqFrame(pureFrame* f);
 #ifdef INGAME_EDITOR
 public:
     IC editor::ide* editor() const { return m_editor; }
-
 private:
     void initialize_editor();
     void message_loop_editor();
@@ -282,7 +277,7 @@ private:
     finalize_function_ptr m_editor_finalize;
     editor::ide* m_editor;
     engine_impl* m_engine;
-#endif // #ifdef INGAME_EDITOR
+#endif  // #ifdef INGAME_EDITOR
 };
 
 extern ENGINE_API CRenderDevice Device;
@@ -293,13 +288,12 @@ extern ENGINE_API CRenderDevice Device;
 #define RDEVICE EDevice
 #endif
 
-
 extern ENGINE_API bool g_bBenchmark;
 
 typedef fastdelegate::FastDelegate0<bool> LOADING_EVENT;
 extern ENGINE_API xr_list<LOADING_EVENT> g_loading_events;
 
-class ENGINE_API CLoadScreenRenderer :public pureRender
+class ENGINE_API CLoadScreenRenderer : public pureRender
 {
 public:
     CLoadScreenRenderer();

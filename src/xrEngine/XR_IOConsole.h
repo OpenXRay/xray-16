@@ -7,7 +7,7 @@
 #include "Include/xrRender/FactoryPtr.h"
 #include "Include/xrRender/UIShader.h"
 
-//refs
+// refs
 class ENGINE_API CGameFont;
 class ENGINE_API IConsole_Command;
 
@@ -20,7 +20,7 @@ class line_edit_control;
 struct TipString
 {
     shared_str text;
-    int HL_start; // Highlight
+    int HL_start;  // Highlight
     int HL_finish;
 
     TipString()
@@ -47,24 +47,15 @@ struct TipString
         HL_start = 0;
         HL_finish = 0;
     }
-    IC bool operator== (shared_str const& tips_text)
-    {
-        return (text == tips_text);
-    }
+    IC bool operator==(shared_str const& tips_text) { return (text == tips_text); }
 };
 
-class ENGINE_API CConsole :
-    public pureRender,
-    public pureFrame,
-    public pureScreenResolutionChanged
+class ENGINE_API CConsole : public pureRender, public pureFrame, public pureScreenResolutionChanged
 {
 public:
-    struct str_pred : public std::binary_function < char*, char*, bool >
+    struct str_pred : public std::binary_function<char*, char*, bool>
     {
-        IC bool operator()(const char* x, const char* y) const
-        {
-            return (xr_strcmp(x, y) < 0);
-        }
+        IC bool operator()(const char* x, const char* y) const { return (xr_strcmp(x, y) < 0); }
     };
     typedef xr_map<LPCSTR, IConsole_Command*, str_pred> vecCMD;
     typedef vecCMD::iterator vecCMD_IT;
@@ -74,8 +65,15 @@ public:
     typedef xr_vector<shared_str> vecTips;
     typedef xr_vector<TipString> vecTipsEx;
 
-    enum { CONSOLE_BUF_SIZE = 1024 };
-    enum { VIEW_TIPS_COUNT = 14, MAX_TIPS_COUNT = 220 };
+    enum
+    {
+        CONSOLE_BUF_SIZE = 1024
+    };
+    enum
+    {
+        VIEW_TIPS_COUNT = 14,
+        MAX_TIPS_COUNT = 220
+    };
 
 protected:
     int scroll_delta;
@@ -110,7 +108,7 @@ public:
     virtual void Destroy();
 
     virtual void OnRender();
-    virtual void  OnFrame();
+    virtual void OnFrame();
     virtual void OnScreenResolutionChanged();
     string64 ConfigFile;
     bool bVisible;
@@ -136,25 +134,26 @@ public:
     Fvector GetFVector(LPCSTR cmd) const;
     Fvector* GetFVectorPtr(LPCSTR cmd) const;
     IConsole_Command* GetCommand(LPCSTR cmd) const;
+
 protected:
     text_editor::line_editor* m_editor;
     text_editor::line_edit_control& ec();
 
     BENCH_SEC_SCRAMBLEMEMBER2
 
-    enum Console_mark // (int)=char
+    enum Console_mark  // (int)=char
     {
         no_mark = ' ',
         mark0 = '~',
-        mark1 = '!', // error
-        mark2 = '@', // console cmd
+        mark1 = '!',  // error
+        mark2 = '@',  // console cmd
         mark3 = '#',
         mark4 = '$',
         mark5 = '%',
         mark6 = '^',
         mark7 = '&',
         mark8 = '*',
-        mark9 = '-', // green = ok
+        mark9 = '-',  // green = ok
         mark10 = '+',
         mark11 = '=',
         mark12 = '/'
@@ -212,8 +211,8 @@ protected:
     void update_tips();
     void select_for_filter(LPCSTR filter_str, vecTips& in_v, vecTipsEx& out_v);
 
-}; // class CConsole
+};  // class CConsole
 
 ENGINE_API extern CConsole* Console;
 
-#endif // XR_IOCONSOLE_H_INCLUDED
+#endif  // XR_IOCONSOLE_H_INCLUDED

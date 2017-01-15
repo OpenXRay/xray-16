@@ -16,24 +16,19 @@
 
 namespace editor
 {
-
 class property_holder_collection;
 
 namespace environment
 {
 namespace sound_channels
 {
-
-class source :
-    public editor::property_holder_holder,
-    private Noncopyable
+class source : public editor::property_holder_holder, private Noncopyable
 {
 public:
     source(shared_str const& source);
     ~source();
     void fill(editor::property_holder_collection* collection);
     inline LPCSTR id() const { return m_source.c_str(); }
-
 private:
     typedef editor::property_holder property_holder_type;
 
@@ -43,11 +38,11 @@ public:
 private:
     property_holder_type* m_property_holder;
     shared_str m_source;
-}; // class source
-} // namespace sound_channels
-} // namespace environment
-} // namespace editor
+};  // class source
+}  // namespace sound_channels
+}  // namespace environment
+}  // namespace editor
 
-#endif // #ifdef INGAME_EDITOR
+#endif  // #ifdef INGAME_EDITOR
 
-#endif // ifndef EDITOR_WEATHER_SOUND_CHANNELS_SOURCE_HPP_INCLUDED
+#endif  // ifndef EDITOR_WEATHER_SOUND_CHANNELS_SOURCE_HPP_INCLUDED

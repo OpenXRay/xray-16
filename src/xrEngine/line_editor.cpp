@@ -5,15 +5,12 @@
 // Description : line editor class implementation
 ////////////////////////////////////////////////////////////////////////////
 
-
-#include "stdafx.h"
 #include "line_editor.h"
+#include "stdafx.h"
 
 namespace text_editor
 {
-
-line_editor::line_editor(u32 str_buffer_size)
-    : m_control(str_buffer_size)
+line_editor::line_editor(u32 str_buffer_size) : m_control(str_buffer_size)
 {
 }
 
@@ -41,4 +38,4 @@ void line_editor::IR_OnKeyboardRelease(int dik)
     m_control.on_key_release(dik);
 }
 
-} // namespace text_editor
+}  // namespace text_editor

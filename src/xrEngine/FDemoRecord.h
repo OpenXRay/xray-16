@@ -3,13 +3,10 @@
 
 #pragma once
 
-#include "IInputReceiver.h"
 #include "Effector.h"
+#include "IInputReceiver.h"
 
-class ENGINE_API CDemoRecord :
-    public CEffectorCam,
-    public IInputReceiver,
-    public pureRender
+class ENGINE_API CDemoRecord : public CEffectorCam, public IInputReceiver, public pureRender
 {
 private:
     static struct force_position
@@ -50,6 +47,7 @@ private:
     void MakeCubemap();
     void MakeScreenshot();
     void MakeLevelMapScreenshot(BOOL bHQ);
+
 public:
     CDemoRecord(const char* name, float life_time = 60 * 60 * 1000);
     virtual ~CDemoRecord();
@@ -66,4 +64,4 @@ public:
     virtual void OnRender();
 };
 
-#endif // !defined(AFX_FDEMORECORD_H__D7638760_FB61_11D3_B4E3_4854E82A090D__INCLUDED_)
+#endif  // !defined(AFX_FDEMORECORD_H__D7638760_FB61_11D3_B4E3_4854E82A090D__INCLUDED_)

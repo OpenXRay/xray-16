@@ -2,19 +2,19 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
 #include "IGame_Level.h"
 #include "IGame_Persistent.h"
+#include "stdafx.h"
 
-#include "Environment.h"
 #include "CameraBase.h"
 #include "CameraManager.h"
 #include "Effector.h"
 #include "EffectorPP.h"
+#include "Environment.h"
 
-#include "x_ray.h"
 #include "GameFont.h"
 #include "Render.h"
+#include "x_ray.h"
 
 float psCamInert = 0.f;
 float psCamSlideInert = 0.25f;
@@ -63,8 +63,7 @@ CCameraManager::~CCameraManager()
 CEffectorCam* CCameraManager::GetCamEffector(ECamEffectorType type)
 {
     for (EffectorCamIt it = m_EffectorsCam.begin(); it != m_EffectorsCam.end(); it++)
-        if ((*it)->eType == type)
-        {
+        if ((*it)->eType == type) {
             return *it;
         }
     return 0;
@@ -96,8 +95,7 @@ void CCameraManager::UpdateDeffered()
 void CCameraManager::RemoveCamEffector(ECamEffectorType type)
 {
     for (EffectorCamIt it = m_EffectorsCam.begin(); it != m_EffectorsCam.end(); it++)
-        if ((*it)->eType == type)
-        {
+        if ((*it)->eType == type) {
             OnEffectorReleased(*it);
             m_EffectorsCam.erase(it);
             return;
@@ -114,9 +112,7 @@ CEffectorPP* CCameraManager::GetPPEffector(EEffectorPPType type)
 ECamEffectorType CCameraManager::RequestCamEffectorId()
 {
     ECamEffectorType index = (ECamEffectorType)effCustomEffectorStartID;
-    for (;
-         GetCamEffector(index);
-         index = (ECamEffectorType)(index + 1))
+    for (; GetCamEffector(index); index = (ECamEffectorType)(index + 1))
     {
         ;
     }
@@ -126,9 +122,7 @@ ECamEffectorType CCameraManager::RequestCamEffectorId()
 EEffectorPPType CCameraManager::RequestPPEffectorId()
 {
     EEffectorPPType index = (EEffectorPPType)effCustomEffectorStartID;
-    for (;
-         GetPPEffector(index);
-         index = (EEffectorPPType)(index + 1))
+    for (; GetPPEffector(index); index = (EEffectorPPType)(index + 1))
     {
         ;
     }
@@ -145,10 +139,8 @@ CEffectorPP* CCameraManager::AddPPEffector(CEffectorPP* ef)
 void CCameraManager::RemovePPEffector(EEffectorPPType type)
 {
     for (EffectorPPIt it = m_EffectorsPP.begin(); it != m_EffectorsPP.end(); it++)
-        if ((*it)->Type() == type)
-        {
-            if ((*it)->FreeOnRemove())
-            {
+        if ((*it)->Type() == type) {
+            if ((*it)->FreeOnRemove()) {
                 OnEffectorReleased(*it);
                 // xr_delete (*it);
             }
@@ -159,33 +151,32 @@ void CCameraManager::RemovePPEffector(EEffectorPPType type)
 
 void CCameraManager::OnEffectorReleased(SBaseEffector* e)
 {
-    if (!e->m_on_b_remove_callback.empty())
-        e->m_on_b_remove_callback();
+    if (!e->m_on_b_remove_callback.empty()) e->m_on_b_remove_callback();
 
     xr_delete(e);
 }
 
 void CCameraManager::UpdateFromCamera(const CCameraBase* C)
 {
-    Update(C->vPosition, C->vDirection, C->vNormal, C->f_fov, C->f_aspect, g_pGamePersistent->Environment().CurrentEnv->far_plane, C->m_Flags.flags);
+    Update(C->vPosition, C->vDirection, C->vNormal, C->f_fov, C->f_aspect,
+        g_pGamePersistent->Environment().CurrentEnv->far_plane, C->m_Flags.flags);
 }
 
-void CCameraManager::Update(const Fvector& P, const Fvector& D, const Fvector& N, float fFOV_Dest, float fASPECT_Dest, float fFAR_Dest, u32 flags)
+void CCameraManager::Update(const Fvector& P, const Fvector& D, const Fvector& N, float fFOV_Dest, float fASPECT_Dest,
+    float fFAR_Dest, u32 flags)
 {
 #ifdef DEBUG
-    if (!Device.Paused())
-    {
-        VERIFY(dbg_upd_frame != Device.dwFrame);// already updated !!!
+    if (!Device.Paused()) {
+        VERIFY(dbg_upd_frame != Device.dwFrame);  // already updated !!!
         dbg_upd_frame = Device.dwFrame;
     }
-#endif // DEBUG
+#endif  // DEBUG
     // camera
-    if (flags&CCameraBase::flPositionRigid)
+    if (flags & CCameraBase::flPositionRigid)
         m_cam_info.p.set(P);
     else
         m_cam_info.p.inertion(P, psCamInert);
-    if (flags&CCameraBase::flDirectionRigid)
-    {
+    if (flags & CCameraBase::flDirectionRigid) {
         m_cam_info.d.set(D);
         m_cam_info.n.set(N);
     }
@@ -205,17 +196,16 @@ void CCameraManager::Update(const Fvector& P, const Fvector& D, const Fvector& N
     float src = 10 * Device.fTimeDelta;
     clamp(src, 0.f, 1.f);
     float dst = 1 - src;
-    m_cam_info.fFov = m_cam_info.fFov*dst + fFOV_Dest*src;
-    m_cam_info.fFar = m_cam_info.fFar*dst + fFAR_Dest*src;
-    m_cam_info.fAspect = m_cam_info.fAspect*dst + (fASPECT_Dest*aspect)*src;
+    m_cam_info.fFov = m_cam_info.fFov * dst + fFOV_Dest * src;
+    m_cam_info.fFar = m_cam_info.fFar * dst + fFAR_Dest * src;
+    m_cam_info.fAspect = m_cam_info.fAspect * dst + (fASPECT_Dest * aspect) * src;
     m_cam_info.dont_apply = false;
 
     UpdateCamEffectors();
 
     UpdatePPEffectors();
 
-    if (false == m_cam_info.dont_apply && m_bAutoApply)
-        ApplyDevice(VIEWPORT_NEAR);
+    if (false == m_cam_info.dont_apply && m_bAutoApply) ApplyDevice(VIEWPORT_NEAR);
 
     UpdateDeffered();
 }
@@ -223,14 +213,12 @@ void CCameraManager::Update(const Fvector& P, const Fvector& D, const Fvector& N
 bool CCameraManager::ProcessCameraEffector(CEffectorCam* eff)
 {
     bool res = false;
-    if (eff->Valid() && eff->ProcessCam(m_cam_info))
-    {
+    if (eff->Valid() && eff->ProcessCam(m_cam_info)) {
         res = true;
     }
     else
     {
-        if (eff->AllowProcessingIfInvalid())
-        {
+        if (eff->AllowProcessingIfInvalid()) {
             eff->ProcessIfInvalid(m_cam_info);
             res = true;
         }
@@ -261,25 +249,21 @@ void CCameraManager::UpdatePPEffectors()
     pp_affected.validate("before applying pp");
 
     int _count = 0;
-    if (m_EffectorsPP.size())
-    {
+    if (m_EffectorsPP.size()) {
         bool b = false;
         pp_affected = pp_identity;
         for (int i = m_EffectorsPP.size() - 1; i >= 0; --i)
         {
             CEffectorPP* eff = m_EffectorsPP[i];
             SPPInfo l_PPInf = pp_zero;
-            if (eff->Valid() && eff->Process(l_PPInf))
-            {
+            if (eff->Valid() && eff->Process(l_PPInf)) {
                 ++_count;
-                if (!b)
-                {
+                if (!b) {
                     pp_affected.add(l_PPInf);
                     pp_affected.sub(pp_identity);
                     pp_affected.validate("in cycle");
                 }
-                if (!eff->bOverlap)
-                {
+                if (!eff->bOverlap) {
                     b = true;
                     pp_affected = l_PPInf;
                 }
@@ -297,13 +281,10 @@ void CCameraManager::UpdatePPEffectors()
         pp_affected = pp_identity;
     }
 
-    if (!positive(pp_affected.noise.grain))
-        pp_affected.noise.grain = pp_identity.noise.grain;
+    if (!positive(pp_affected.noise.grain)) pp_affected.noise.grain = pp_identity.noise.grain;
 
     pp_affected.validate("after applying pp");
 }
-
-
 
 void CCameraManager::ApplyDevice(float _viewport_near)
 {

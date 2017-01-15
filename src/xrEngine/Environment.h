@@ -20,14 +20,14 @@ class CLensFlareDescriptor;
 
 #define DAY_LENGTH 86400.f
 
-#include "Include/xrRender/FactoryPtr.h"
 #include "Include/xrRender/EnvironmentRender.h"
+#include "Include/xrRender/FactoryPtr.h"
 
 #ifdef INGAME_EDITOR
-# define INGAME_EDITOR_VIRTUAL virtual
-#else // #ifdef INGAME_EDITOR
-# define INGAME_EDITOR_VIRTUAL
-#endif // #ifdef INGAME_EDITOR
+#define INGAME_EDITOR_VIRTUAL virtual
+#else  // #ifdef INGAME_EDITOR
+#define INGAME_EDITOR_VIRTUAL
+#endif  // #ifdef INGAME_EDITOR
 
 // t-defs
 class ENGINE_API CEnvModifier
@@ -77,16 +77,25 @@ public:
 
         void load(CInifile& config, LPCSTR sect);
         ref_sound& get_rnd_sound() { return sounds()[Random.randI(sounds().size())]; }
-        u32 get_rnd_sound_time() { return (m_sound_period.z < m_sound_period.w) ? Random.randI(m_sound_period.z, m_sound_period.w) : 0; }
-        u32 get_rnd_sound_first_time() { return (m_sound_period.x < m_sound_period.y) ? Random.randI(m_sound_period.x, m_sound_period.y) : 0; }
-        float get_rnd_sound_dist() { return (m_sound_dist.x < m_sound_dist.y) ? Random.randF(m_sound_dist.x, m_sound_dist.y) : 0; }
+        u32 get_rnd_sound_time()
+        {
+            return (m_sound_period.z < m_sound_period.w) ? Random.randI(m_sound_period.z, m_sound_period.w) : 0;
+        }
+        u32 get_rnd_sound_first_time()
+        {
+            return (m_sound_period.x < m_sound_period.y) ? Random.randI(m_sound_period.x, m_sound_period.y) : 0;
+        }
+        float get_rnd_sound_dist()
+        {
+            return (m_sound_dist.x < m_sound_dist.y) ? Random.randF(m_sound_dist.x, m_sound_dist.y) : 0;
+        }
         INGAME_EDITOR_VIRTUAL ~SSndChannel() {}
         inline INGAME_EDITOR_VIRTUAL sounds_type& sounds() { return m_sounds; }
-
     protected:
         xr_vector<ref_sound> m_sounds;
     };
     DEFINE_VECTOR(SSndChannel*, SSndChannelVec, SSndChannelVecIt);
+
 protected:
     shared_str m_load_section;
 
@@ -99,16 +108,10 @@ protected:
 public:
     IC const shared_str& name() { return m_load_section; }
     IC const shared_str& get_ambients_config_filename() { return m_ambients_config_filename; }
-
-    INGAME_EDITOR_VIRTUAL void load(
-        CInifile& ambients_config,
-        CInifile& sound_channels_config,
-        CInifile& effects_config,
-        const shared_str& section
-        );
+    INGAME_EDITOR_VIRTUAL void load(CInifile& ambients_config, CInifile& sound_channels_config,
+        CInifile& effects_config, const shared_str& section);
     IC SEffect* get_rnd_effect() { return effects().empty() ? 0 : effects()[Random.randI(effects().size())]; }
     IC u32 get_rnd_effect_time() { return Random.randI(m_effect_period.x, m_effect_period.y); }
-
     INGAME_EDITOR_VIRTUAL SEffect* create_effect(CInifile& config, LPCSTR id);
     INGAME_EDITOR_VIRTUAL SSndChannel* create_sound_channel(CInifile& config, LPCSTR id);
     INGAME_EDITOR_VIRTUAL ~CEnvAmbient();
@@ -129,12 +132,12 @@ public:
 
     BENCH_SEC_SCRAMBLEMEMBER1
 
-        /*
-        ref_texture sky_texture ;
-        ref_texture sky_texture_env ;
-        ref_texture clouds_texture ;
-        */
-        FactoryPtr<IEnvDescriptorRender> m_pDescriptor;
+    /*
+    ref_texture sky_texture ;
+    ref_texture sky_texture_env ;
+    ref_texture clouds_texture ;
+    */
+    FactoryPtr<IEnvDescriptorRender> m_pDescriptor;
 
     Fvector4 clouds_color;
     Fvector3 sky_color;
@@ -156,12 +159,11 @@ public:
     float wind_direction;
 
     Fvector3 ambient;
-    Fvector4 hemi_color; // w = R2 correction
+    Fvector4 hemi_color;  // w = R2 correction
     Fvector3 sun_color;
     Fvector3 sun_dir;
     float m_fSunShaftsIntensity;
     float m_fWaterIntensity;
-
 
     // int lens_flare_id;
     // int tb_id;
@@ -169,7 +171,6 @@ public:
     shared_str tb_id;
 
     CEnvAmbient* env_ambient;
-
 
     CEnvDescriptor(shared_str const& identifier);
 
@@ -202,9 +203,11 @@ public:
 
     float fog_near;
     float fog_far;
+
 public:
     CEnvDescriptorMixer(shared_str const& identifier);
-    INGAME_EDITOR_VIRTUAL void lerp(CEnvironment* parent, CEnvDescriptor& A, CEnvDescriptor& B, float f, CEnvModifier& M, float m_power);
+    INGAME_EDITOR_VIRTUAL void lerp(
+        CEnvironment* parent, CEnvDescriptor& A, CEnvDescriptor& B, float f, CEnvModifier& M, float m_power);
     void clear();
     void destroy();
 };
@@ -212,21 +215,21 @@ public:
 class ENGINE_API CEnvironment
 {
     friend class dxEnvironmentRender;
-    struct str_pred : public std::binary_function < shared_str, shared_str, bool >
+    struct str_pred : public std::binary_function<shared_str, shared_str, bool>
     {
-        IC bool operator()(const shared_str& x, const shared_str& y) const
-        {
-            return xr_strcmp(x, y) < 0;
-        }
+        IC bool operator()(const shared_str& x, const shared_str& y) const { return xr_strcmp(x, y) < 0; }
     };
+
 public:
     DEFINE_VECTOR(CEnvAmbient*, EnvAmbVec, EnvAmbVecIt);
     DEFINE_VECTOR(CEnvDescriptor*, EnvVec, EnvIt);
     DEFINE_MAP_PRED(shared_str, EnvVec, EnvsMap, EnvsMapIt, str_pred);
+
 private:
     // clouds
     FvectorVec CloudsVerts;
     U16Vec CloudsIndices;
+
 private:
     float NormalizeTime(float tm);
     float TimeDiff(float prev, float cur);
@@ -235,19 +238,19 @@ private:
     void SelectEnv(EnvVec* envs, CEnvDescriptor*& e, float tm);
 
     void calculate_dynamic_sun_dir();
+
 public:
-    static bool sort_env_pred(const CEnvDescriptor* x, const CEnvDescriptor* y)
-    {
-        return x->exec_time < y->exec_time;
-    }
+    static bool sort_env_pred(const CEnvDescriptor* x, const CEnvDescriptor* y) { return x->exec_time < y->exec_time; }
     static bool sort_env_etl_pred(const CEnvDescriptor* x, const CEnvDescriptor* y)
     {
         return x->exec_time_loaded < y->exec_time_loaded;
     }
+
 protected:
     CPerlinNoise1D* PerlinNoise1D;
 
     float fGameTime;
+
 public:
     FactoryPtr<IEnvironmentRender> m_pRender;
     BOOL bNeed_re_create_env;
@@ -265,7 +268,7 @@ public:
     Fquaternion wind_blast_current;
     // Environments
     BENCH_SEC_SCRAMBLEMEMBER2
-        CEnvDescriptorMixer* CurrentEnv;
+    CEnvDescriptorMixer* CurrentEnv;
     CEnvDescriptor* Current[2];
 
     bool bWFX;
@@ -293,6 +296,7 @@ public:
     INGAME_EDITOR_VIRTUAL CEnvAmbient* AppendEnvAmb(const shared_str& sect);
 
     void Invalidate();
+
 public:
     CEnvironment();
 
@@ -325,21 +329,22 @@ public:
     void OnDeviceCreate();
     void OnDeviceDestroy();
 
-    // editor-related
+// editor-related
 #ifdef _EDITOR
 public:
     float ed_from_time;
     float ed_to_time;
+
 public:
     void ED_Reload();
     float GetGameTime() { return fGameTime; }
-#else // #ifdef _EDITOR
-# ifdef INGAME_EDITOR
+#else  // #ifdef _EDITOR
+#ifdef INGAME_EDITOR
     float GetGameTime() { return fGameTime; }
-# endif // #ifdef INGAME_EDITOR
+#endif  // #ifdef INGAME_EDITOR
 
     bool m_paused;
-#endif // #ifdef _EDITOR
+#endif  // #ifdef _EDITOR
 
     CInifile* m_ambients_config;
     CInifile* m_sound_channels_config;
@@ -359,9 +364,12 @@ protected:
 
 public:
     INGAME_EDITOR_VIRTUAL SThunderboltDesc* thunderbolt_description(CInifile& config, shared_str const& section);
-    INGAME_EDITOR_VIRTUAL SThunderboltCollection* thunderbolt_collection(CInifile* pIni, CInifile* thunderbolts, LPCSTR section);
-    INGAME_EDITOR_VIRTUAL SThunderboltCollection* thunderbolt_collection(xr_vector<SThunderboltCollection*>& collection, shared_str const& id);
-    INGAME_EDITOR_VIRTUAL CLensFlareDescriptor* add_flare(xr_vector<CLensFlareDescriptor*>& collection, shared_str const& id);
+    INGAME_EDITOR_VIRTUAL SThunderboltCollection* thunderbolt_collection(
+        CInifile* pIni, CInifile* thunderbolts, LPCSTR section);
+    INGAME_EDITOR_VIRTUAL SThunderboltCollection* thunderbolt_collection(
+        xr_vector<SThunderboltCollection*>& collection, shared_str const& id);
+    INGAME_EDITOR_VIRTUAL CLensFlareDescriptor* add_flare(
+        xr_vector<CLensFlareDescriptor*>& collection, shared_str const& id);
 
 public:
     float p_var_alt;
@@ -379,4 +387,4 @@ public:
 ENGINE_API extern Flags32 psEnvFlags;
 ENGINE_API extern float psVisDistance;
 
-#endif //EnvironmentH
+#endif  // EnvironmentH

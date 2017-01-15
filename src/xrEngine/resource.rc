@@ -19,125 +19,96 @@
 #ifdef _WIN32
 LANGUAGE LANG_RUSSIAN, SUBLANG_DEFAULT
 #pragma code_page(1251)
-#endif //_WIN32
+#endif  //_WIN32
 
-/////////////////////////////////////////////////////////////////////////////
-//
-// Icon
-//
+    /////////////////////////////////////////////////////////////////////////////
+    //
+    // Icon
+    //
 
-// Icon with lowest ID value placed first to ensure application icon
-// remains consistent on all systems.
-IDI_ICON1               ICON                    "stalker_cs.ico"
+    // Icon with lowest ID value placed first to ensure application icon
+    // remains consistent on all systems.
+    IDI_ICON1 ICON "stalker_cs.ico"
 
-/////////////////////////////////////////////////////////////////////////////
-//
-// Bitmap
-//
+    /////////////////////////////////////////////////////////////////////////////
+    //
+    // Bitmap
+    //
 
-IDB_BITMAP1             BITMAP                  "splash_xrcs_en.bmp"
+    IDB_BITMAP1 BITMAP "splash_xrcs_en.bmp"
 
-/////////////////////////////////////////////////////////////////////////////
-//
-// Version
-//
+    /////////////////////////////////////////////////////////////////////////////
+    //
+    // Version
+    //
 
-VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,6,0,2
- PRODUCTVERSION 1,6,0,2
- FILEFLAGSMASK 0x17L
+    VS_VERSION_INFO VERSIONINFO FILEVERSION 1,
+    6, 0, 2 PRODUCTVERSION 1, 6, 0, 2 FILEFLAGSMASK 0x17L
 #ifdef _DEBUG
- FILEFLAGS 0x1L
+    FILEFLAGS 0x1L
 #else
- FILEFLAGS 0x0L
+    FILEFLAGS 0x0L
 #endif
- FILEOS 0x4L
- FILETYPE 0x1L
- FILESUBTYPE 0x0L
-BEGIN
-    BLOCK "StringFileInfo"
-    BEGIN
-        BLOCK "000004b0"
-        BEGIN
-            VALUE "CompanyName", "GSC Game World"
-            VALUE "FileDescription", "X-Ray 1.6 Engine"
-            VALUE "FileVersion", "1.6.02"
-            VALUE "InternalName", "xrEngine"
-            VALUE "LegalCopyright", "Copyright © 2009 GSC Game World"
-            VALUE "OriginalFilename", "xrEngine.exe"
-            VALUE "ProductName", "S.T.A.L.K.E.R.: Call Of Pripyat"
-            VALUE "ProductVersion", "1.6.02"
-        END
-    END
-    BLOCK "VarFileInfo"
-    BEGIN
-        VALUE "Translation", 0x0, 1200
-    END
-END
+    FILEOS 0x4L FILETYPE 0x1L FILESUBTYPE 0x0L BEGIN BLOCK "StringFileInfo" BEGIN BLOCK "000004b0" BEGIN VALUE
+                                                           "CompanyName",
+    "GSC Game World" VALUE "FileDescription", "X-Ray 1.6 Engine" VALUE "FileVersion", "1.6.02" VALUE "InternalName",
+    "xrEngine" VALUE "LegalCopyright", "Copyright © 2009 GSC Game World" VALUE "OriginalFilename",
+    "xrEngine.exe" VALUE "ProductName", "S.T.A.L.K.E.R.: Call Of Pripyat" VALUE "ProductVersion",
+    "1.6.02" END END BLOCK "VarFileInfo" BEGIN VALUE "Translation", 0x0, 1200 END END
 
-#endif    // Russian resources
+#endif  // Russian resources
 /////////////////////////////////////////////////////////////////////////////
-
 
 /////////////////////////////////////////////////////////////////////////////
 // Ukrainian resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_UKR)
 #ifdef _WIN32
-LANGUAGE LANG_UKRAINIAN, SUBLANG_DEFAULT
+                                                                             LANGUAGE LANG_UKRAINIAN,
+    SUBLANG_DEFAULT
 #pragma code_page(1251)
-#endif //_WIN32
+#endif  //_WIN32
 
 #ifdef APSTUDIO_INVOKED
+    /////////////////////////////////////////////////////////////////////////////
+    //
+    // TEXTINCLUDE
+    //
+
+    1 TEXTINCLUDE BEGIN "resource.h\0" END
+
+    2 TEXTINCLUDE BEGIN "#include "
+                        "afxres.h"
+                        "\r\n"
+                        "\0" END
+
+    3 TEXTINCLUDE BEGIN "\r\n"
+                        "\0" END
+
+#endif  // APSTUDIO_INVOKED
+
+#endif  // Ukrainian resources
 /////////////////////////////////////////////////////////////////////////////
-//
-// TEXTINCLUDE
-//
-
-1 TEXTINCLUDE 
-BEGIN
-    "resource.h\0"
-END
-
-2 TEXTINCLUDE 
-BEGIN
-    "#include ""afxres.h""\r\n"
-    "\0"
-END
-
-3 TEXTINCLUDE 
-BEGIN
-    "\r\n"
-    "\0"
-END
-
-#endif    // APSTUDIO_INVOKED
-
-#endif    // Ukrainian resources
-/////////////////////////////////////////////////////////////////////////////
-
 
 /////////////////////////////////////////////////////////////////////////////
 // English (U.S.) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 #ifdef _WIN32
-LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+                            LANGUAGE LANG_ENGLISH,
+    SUBLANG_ENGLISH_US
 #pragma code_page(1252)
-#endif //_WIN32
+#endif  //_WIN32
 
-/////////////////////////////////////////////////////////////////////////////
-//
-// Dialog
-//
+    /////////////////////////////////////////////////////////////////////////////
+    //
+    // Dialog
+    //
 
-IDD_STARTUP DIALOGEX 0, 0, 333, 165
-STYLE DS_ABSALIGN | DS_SETFONT | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | WS_VISIBLE
-FONT 8, "MS Sans Serif", 0, 0, 0x0
-BEGIN
-    CONTROL         123,IDC_STATIC_LOGO,"Static",SS_BITMAP | SS_REALSIZEIMAGE,0,0,333,165
-END
-
+    IDD_STARTUP DIALOGEX 0,
+    0, 333, 165 STYLE DS_ABSALIGN | DS_SETFONT | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | WS_VISIBLE FONT 8,
+    "MS Sans Serif", 0, 0, 0x0 BEGIN CONTROL 123, IDC_STATIC_LOGO, "Static", SS_BITMAP | SS_REALSIZEIMAGE, 0, 0, 333,
+    165 END
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -145,19 +116,12 @@ END
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO 
-BEGIN
-    IDD_STARTUP, DIALOG
-    BEGIN
-        RIGHTMARGIN, 332
-    END
-END
-#endif    // APSTUDIO_INVOKED
+        GUIDELINES DESIGNINFO BEGIN IDD_STARTUP,
+    DIALOG BEGIN RIGHTMARGIN, 332 END END
+#endif  // APSTUDIO_INVOKED
 
-#endif    // English (U.S.) resources
+#endif  // English (U.S.) resources
 /////////////////////////////////////////////////////////////////////////////
-
-
 
 #ifndef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -165,7 +129,5 @@ END
 // Generated from the TEXTINCLUDE 3 resource.
 //
 
-
 /////////////////////////////////////////////////////////////////////////////
-#endif    // not APSTUDIO_INVOKED
-
+#endif  // not APSTUDIO_INVOKED

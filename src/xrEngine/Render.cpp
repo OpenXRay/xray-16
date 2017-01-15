@@ -1,5 +1,5 @@
-#include "stdafx.h"
 #include "Render.h"
+#include "stdafx.h"
 
 // resources
 IRender_Light::~IRender_Light()

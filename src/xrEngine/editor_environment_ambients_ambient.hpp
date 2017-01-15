@@ -12,36 +12,31 @@
 #ifdef INGAME_EDITOR
 
 #include "Common/Noncopyable.hpp"
+#include "Environment.h"
 #include "Include/editor/property_holder.hpp"
 #include "property_collection_forward.hpp"
-#include "Environment.h"
 
 namespace editor
 {
 namespace environment
 {
-
 namespace effects
 {
 class manager;
-} // namespace effects
+}  // namespace effects
 
 namespace sound_channels
 {
 class manager;
-} // namespace sound_channels
+}  // namespace sound_channels
 
 namespace ambients
 {
-
 class manager;
 class effect_id;
 class sound_id;
 
-class ambient :
-    public CEnvAmbient,
-    public editor::property_holder_holder,
-    private Noncopyable
+class ambient : public CEnvAmbient, public editor::property_holder_holder, private Noncopyable
 {
 private:
     typedef CEnvAmbient inherited;
@@ -49,12 +44,8 @@ private:
 public:
     ambient(manager const& manager, shared_str const& id);
     virtual ~ambient();
-    virtual void load(
-        CInifile& ambients_config,
-        CInifile& sound_channels_config,
-        CInifile& effects_config,
-        const shared_str& section
-    );
+    virtual void load(CInifile& ambients_config, CInifile& sound_channels_config, CInifile& effects_config,
+        const shared_str& section);
     void save(CInifile& config);
     void fill(editor::property_holder_collection* collection);
     inline shared_str const& id() const { return m_load_section; }
@@ -73,17 +64,11 @@ public:
 
 public:
     typedef xr_vector<effect_id*> effect_container_type;
-    typedef property_collection <
-    effect_container_type,
-    ambient
-    > effect_collection_type;
+    typedef property_collection<effect_container_type, ambient> effect_collection_type;
 
 public:
     typedef xr_vector<sound_id*> sound_container_type;
-    typedef property_collection <
-    sound_container_type,
-    ambient
-    > sound_collection_type;
+    typedef property_collection<sound_container_type, ambient> sound_collection_type;
 
 private:
     typedef editor::property_holder property_holder_type;
@@ -101,11 +86,11 @@ private:
 
     sound_collection_type* m_sounds_collection;
     sound_container_type m_sound_channels_ids;
-}; // class ambient
-} // namespace ambients
-} // namespace environment
-} // namespace editor
+};  // class ambient
+}  // namespace ambients
+}  // namespace environment
+}  // namespace editor
 
-#endif // #ifdef INGAME_EDITOR
+#endif  // #ifdef INGAME_EDITOR
 
-#endif // ifndef EDITOR_WEATHER_AMBIENTS_AMBIENT_HPP_INCLUDED
+#endif  // ifndef EDITOR_WEATHER_AMBIENTS_AMBIENT_HPP_INCLUDED

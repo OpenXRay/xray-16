@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include "xr_input.h"
 #include "IInputReceiver.h"
+#include "xr_input.h"
 
 void IInputReceiver::IR_Capture(void)
 {
@@ -26,12 +26,10 @@ void IInputReceiver::IR_OnDeactivate(void)
 {
     int i;
     for (i = 0; i < CInput::COUNT_KB_BUTTONS; i++)
-        if (IR_GetKeyState(i))
-            IR_OnKeyboardRelease(i);
+        if (IR_GetKeyState(i)) IR_OnKeyboardRelease(i);
 
     for (i = 0; i < CInput::COUNT_MOUSE_BUTTONS; i++)
-        if (IR_GetBtnState(i))
-            IR_OnMouseRelease(i);
+        if (IR_GetBtnState(i)) IR_OnMouseRelease(i);
     IR_OnMouseStop(DIMOFS_X, 0);
     IR_OnMouseStop(DIMOFS_Y, 0);
 }
@@ -69,10 +67,7 @@ void IInputReceiver::IR_GetMousePosIndependent(Fvector2& f)
 {
     Ivector2 p;
     IR_GetMousePosReal(p);
-    f.set(
-        2.f*float(p.x) / float(RDEVICE.dwWidth) - 1.f,
-        2.f*float(p.y) / float(RDEVICE.dwHeight) - 1.f
-        );
+    f.set(2.f * float(p.x) / float(RDEVICE.dwWidth) - 1.f, 2.f * float(p.y) / float(RDEVICE.dwHeight) - 1.f);
 }
 void IInputReceiver::IR_GetMousePosIndependentCrop(Fvector2& f)
 {

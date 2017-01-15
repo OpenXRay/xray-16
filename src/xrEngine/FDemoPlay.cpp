@@ -2,13 +2,13 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
-#include "IGame_Level.h"
 #include "FDemoPlay.h"
-#include "XR_IOConsole.h"
-#include "xrCore/Animation/Motion.hpp"
-#include "Render.h"
 #include "CameraManager.h"
+#include "IGame_Level.h"
+#include "Render.h"
+#include "XR_IOConsole.h"
+#include "stdafx.h"
+#include "xrCore/Animation/Motion.hpp"
 
 #include "xrSASH.h"
 
@@ -16,12 +16,12 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-CDemoPlay::CDemoPlay(const char* name, float ms, u32 cycles, float life_time) : CEffectorCam(cefDemo, life_time/*,FALSE*/)
+CDemoPlay::CDemoPlay(const char* name, float ms, u32 cycles, float life_time)
+    : CEffectorCam(cefDemo, life_time /*,FALSE*/)
 {
     Msg("*** Playing demo: %s", name);
     Console->Execute("hud_weapon 0");
-    if (g_bBenchmark || g_SASH.IsRunning())
-        Console->Execute("hud_draw 0");
+    if (g_bBenchmark || g_SASH.IsRunning()) Console->Execute("hud_draw 0");
 
     fSpeed = ms;
     dwCyclesLeft = cycles ? cycles : 1;
@@ -31,11 +31,9 @@ CDemoPlay::CDemoPlay(const char* name, float ms, u32 cycles, float life_time) : 
     string_path nm, fn;
     xr_strcpy(nm, sizeof(nm), name);
     LPSTR extp = strext(nm);
-    if (extp)
-        xr_strcpy(nm, sizeof(nm) - (extp - nm), ".anm");
+    if (extp) xr_strcpy(nm, sizeof(nm) - (extp - nm), ".anm");
 
-    if (FS.exist(fn, "$level$", nm) || FS.exist(fn, "$game_anims$", nm))
-    {
+    if (FS.exist(fn, "$level$", nm) || FS.exist(fn, "$game_anims$", nm)) {
         m_pMotion = new COMotion();
         m_pMotion->LoadMotion(fn);
         m_MParam = new SAnimParams();
@@ -44,15 +42,13 @@ CDemoPlay::CDemoPlay(const char* name, float ms, u32 cycles, float life_time) : 
     }
     else
     {
-        if (!FS.exist(name))
-        {
+        if (!FS.exist(name)) {
             g_pGameLevel->Cameras().RemoveCamEffector(cefDemo);
             return;
         }
         IReader* fs = FS.r_open(name);
         u32 sz = fs->length();
-        if (sz%sizeof(Fmatrix) != 0)
-        {
+        if (sz % sizeof(Fmatrix) != 0) {
             FS.r_close(fs);
             g_pGameLevel->Cameras().RemoveCamEffector(cefDemo);
             return;
@@ -74,13 +70,12 @@ CDemoPlay::~CDemoPlay()
     xr_delete(m_pMotion);
     xr_delete(m_MParam);
     Console->Execute("hud_weapon 1");
-    if (g_bBenchmark || g_SASH.IsRunning())
-        Console->Execute("hud_draw 1");
+    if (g_bBenchmark || g_SASH.IsRunning()) Console->Execute("hud_draw 1");
 }
 
 void CDemoPlay::stat_Start()
 {
-    //if (stat_started) return;
+    // if (stat_started) return;
     VERIFY(!stat_started);
     stat_started = TRUE;
     Sleep(1);
@@ -98,7 +93,7 @@ void CDemoPlay::stat_Stop()
 {
     if (!stat_started) return;
 
-    //g_SASH.EndBenchmark();
+    // g_SASH.EndBenchmark();
 
     stat_started = FALSE;
     float stat_total = stat_Timer_total.GetElapsed_sec();
@@ -118,8 +113,7 @@ void CDemoPlay::stat_Stop()
     const u32 iAvgFPS = _max((u32)rfps_average, 10);
     const u32 WindowSize = _max(16, iAvgFPS / 2);
 
-    if (stat_table.size() > WindowSize * 4)
-    {
+    if (stat_table.size() > WindowSize * 4) {
         for (u32 it = 2; it < stat_table.size() - WindowSize + 1; it++)
         {
             float fTime = 0;
@@ -158,15 +152,13 @@ void CDemoPlay::stat_Stop()
 
     Msg("* [DEMO] FPS: average[%f], min[%f], max[%f], middle[%f]", rfps_average, rfps_min, rfps_max, rfps_middlepoint);
 
-    if (g_bBenchmark)
-    {
+    if (g_bBenchmark) {
         string_path fname;
 
         if (xr_strlen(g_sBenchmarkName))
             xr_sprintf(fname, sizeof(fname), "%s.result", g_sBenchmarkName);
         else
             xr_strcpy(fname, sizeof(fname), "benchmark.result");
-
 
         FS.update_path(fname, "$app_data_root$", fname);
         CInifile res(fname, FALSE, FALSE, TRUE);
@@ -179,7 +171,8 @@ void CDemoPlay::stat_Stop()
         {
             string32 id;
             xr_sprintf(id, sizeof(id), "%7d", it);
-            for (u32 c = 0; id[c]; c++) if (' ' == id[c]) id[c] = '0';
+            for (u32 c = 0; id[c]; c++)
+                if (' ' == id[c]) id[c] = '0';
             res.w_float("per_frame_stats", id, 1.f / stat_table[it]);
         }
 
@@ -187,7 +180,9 @@ void CDemoPlay::stat_Stop()
     }
 }
 
-#define FIX(a) while (a>=m_count) a-=m_count
+#define FIX(a)                                                                                                         \
+    while (a >= m_count)                                                                                               \
+    a -= m_count
 void spline1(float t, Fvector* p, Fvector* ret)
 {
     float t2 = t * t;
@@ -215,13 +210,12 @@ BOOL CDemoPlay::ProcessCam(SCamEffectorInfo& info)
     // skeep a few frames before counting
     if (Device.dwPrecacheFrame) return TRUE;
 
-    if (stat_started)
-    {
-        //g_SASH.DisplayFrame(Device.fTimeGlobal);
+    if (stat_started) {
+        // g_SASH.DisplayFrame(Device.fTimeGlobal);
     }
     else
     {
-        //g_SASH.StartBenchmark();
+        // g_SASH.StartBenchmark();
         stat_Start();
     }
 
@@ -232,22 +226,23 @@ BOOL CDemoPlay::ProcessCam(SCamEffectorInfo& info)
     }
 
     // Process motion
-    if (m_pMotion)
-    {
+    if (m_pMotion) {
         Fvector R;
         Fmatrix mRotate;
         m_pMotion->_Evaluate(m_MParam->Frame(), info.p, R);
         m_MParam->Update(Device.fTimeDelta, 1.f, true);
         fLifeTime -= Device.fTimeDelta;
-        if (m_MParam->bWrapped) { stat_Stop(); stat_Start(); }
+        if (m_MParam->bWrapped) {
+            stat_Stop();
+            stat_Start();
+        }
         mRotate.setXYZi(R.x, R.y, R.z);
         info.d.set(mRotate.k);
         info.n.set(mRotate.j);
     }
     else
     {
-        if (seq.empty())
-        {
+        if (seq.empty()) {
             g_pGameLevel->Cameras().RemoveCamEffector(cefDemo);
             return TRUE;
         }
@@ -260,8 +255,7 @@ BOOL CDemoPlay::ProcessCam(SCamEffectorInfo& info)
         int frame = iFloor(ip);
         VERIFY(t >= 0);
 
-        if (frame >= m_count)
-        {
+        if (frame >= m_count) {
             dwCyclesLeft--;
             if (0 == dwCyclesLeft) return FALSE;
             fStartTime = 0;
@@ -279,7 +273,7 @@ BOOL CDemoPlay::ProcessCam(SCamEffectorInfo& info)
         int f4 = f3 + 1;
         FIX(f4);
 
-        Fmatrix* m1, *m2, *m3, *m4;
+        Fmatrix *m1, *m2, *m3, *m4;
         Fvector v[4];
         m1 = (Fmatrix*)&seq[f1];
         m2 = (Fmatrix*)&seq[f2];

@@ -4,7 +4,7 @@
 
 #ifdef SDL_OUTPUT
 #include <SDL.h>
-#pragma comment (lib,"SDL.lib")
+#pragma comment(lib, "SDL.lib")
 #endif
 
 // refs
@@ -27,15 +27,17 @@ class ENGINE_API CTheoraSurface
     BOOL ready;
     BOOL bShaderYUV2RGB;
     int prefetch;
+
 public:
     BOOL playing;
     BOOL looped;
+
 protected:
     void Reset();
 
 #ifdef SDL_OUTPUT
-    void open_sdl_video ();
-    void write_sdl_video ();
+    void open_sdl_video();
+    void write_sdl_video();
 #endif
 public:
     CTheoraSurface();
@@ -49,11 +51,14 @@ public:
 
     void Play(BOOL _looped, u32 _time);
     void Pause(BOOL _pause) { playing = !_pause; }
-    void Stop() { playing = FALSE; Reset(); }
+    void Stop()
+    {
+        playing = FALSE;
+        Reset();
+    }
     BOOL IsPlaying() { return playing; }
-
     u32 Width(bool bRealSize);
     u32 Height(bool bRealSize);
 };
 
-#endif //xrTheora_SurfaceH
+#endif  // xrTheora_SurfaceH
