@@ -6,5 +6,5 @@
 class XRGAMESPY_API CGameSpy_Available
 {
 public:
-	bool	CheckAvailableServices	(shared_str& resultstr);
+    bool CheckAvailableServices(shared_str& resultstr);
 };

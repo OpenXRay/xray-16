@@ -6,48 +6,55 @@
 class CServerList;
 class CGameSpy_QR2;
 
-struct GameInfo	{
-	shared_str	InfoName;
-	shared_str	InfoData;
-	GameInfo(LPCSTR Name, LPCSTR Data) { InfoName._set(Name); InfoData._set(Data); };
+struct GameInfo
+{
+    shared_str InfoName;
+    shared_str InfoData;
+    GameInfo(LPCSTR Name, LPCSTR Data)
+    {
+        InfoName._set(Name);
+        InfoData._set(Data);
+    };
 };
 
-struct PlayerInfo {
-	string128	Name;
-	s16			Frags;
-	u16			Deaths;
-	u8			Rank;
-	u8			Team;
-	bool		Spectator;
-	u8			Artefacts;
+struct PlayerInfo
+{
+    string128 Name;
+    s16 Frags;
+    u16 Deaths;
+    u8 Rank;
+    u8 Team;
+    bool Spectator;
+    u8 Artefacts;
 };
 
 struct TeamInfo
 {
-	u8			Score;
+    u8 Score;
 };
 
-struct ServerInfo{
-//	SBServer pSBServer;
-	string128	m_Address;
-	string128	m_HostName;
-	string128	m_ServerName;
-	string128	m_SessionName;
-	string128	m_ServerGameType;
-	string128	m_ServerVersion;
-	u32			m_GameType;
+struct ServerInfo
+{
+    //	SBServer pSBServer;
+    string128 m_Address;
+    string128 m_HostName;
+    string128 m_ServerName;
+    string128 m_SessionName;
+    string128 m_ServerGameType;
+    string128 m_ServerVersion;
+    u32 m_GameType;
 
-	s16						m_ServerNumPlayers;
-	s16						m_ServerMaxPlayers;
-	string128				m_ServerUpTime;
-	s16						m_ServerNumTeams;
-	bool					m_bDedicated;
-	bool					m_bFFire;
-	s16						m_s16FFire;
-	bool					m_bPassword;
-	bool					m_bUserPass;
-	s16						m_Ping;
-	s16						m_Port, m_HPort;
+    s16 m_ServerNumPlayers;
+    s16 m_ServerMaxPlayers;
+    string128 m_ServerUpTime;
+    s16 m_ServerNumTeams;
+    bool m_bDedicated;
+    bool m_bFFire;
+    s16 m_s16FFire;
+    bool m_bPassword;
+    bool m_bUserPass;
+    s16 m_Ping;
+    s16 m_Port, m_HPort;
     int MaxPing;
     bool MapRotation;
     bool VotingEnabled;
@@ -73,18 +80,18 @@ struct ServerInfo{
     bool ReturnPlayers;
     bool BearerCantSprint;
 
-	xr_vector<PlayerInfo>	m_aPlayers;
-	xr_vector<TeamInfo>		m_aTeams;
+    xr_vector<PlayerInfo> m_aPlayers;
+    xr_vector<TeamInfo> m_aTeams;
 
-	int						Index;
+    int Index;
 
-	ServerInfo () {};
-	ServerInfo (string128 NewAddress) 
-	{
-		xr_strcpy(m_Address, NewAddress);
-	};
-
-	bool			operator	==		(LPCSTR Address){int res = xr_strcmp(m_Address, Address);return	res	 == 0;};
+    ServerInfo(){};
+    ServerInfo(string128 NewAddress) { xr_strcpy(m_Address, NewAddress); };
+    bool operator==(LPCSTR Address)
+    {
+        int res = xr_strcmp(m_Address, Address);
+        return res == 0;
+    };
 };
 
 enum class GSUpdateStatus
@@ -102,51 +109,50 @@ class XRGAMESPY_API CGameSpy_Browser
 {
 public:
     using UpdateCallback = fastdelegate::FastDelegate<void()>;
-    using DestroyCallback = fastdelegate::FastDelegate<void(CGameSpy_Browser *)>;
+    using DestroyCallback = fastdelegate::FastDelegate<void(CGameSpy_Browser*)>;
 
 private:
-//	string16	m_SecretKey;
-    _ServerBrowser *m_pGSBrowser;
-	CGameSpy_QR2*	m_pQR2;
+    //	string16	m_SecretKey;
+    _ServerBrowser* m_pGSBrowser;
+    CGameSpy_QR2* m_pQR2;
     UpdateCallback onUpdate;
     DestroyCallback onDestroy;
-    	
-	void	ReadServerInfo	(ServerInfo* pServerInfo, void* pServer);
 
+    void ReadServerInfo(ServerInfo* pServerInfo, void* pServer);
 
-	bool	m_bAbleToConnectToMasterServer;
-	bool	m_bTryingToConnectToMasterServer;
-	bool	m_bShowCMSErr;
+    bool m_bAbleToConnectToMasterServer;
+    bool m_bTryingToConnectToMasterServer;
+    bool m_bShowCMSErr;
 
-	Lock			m_refresh_lock		;
+    Lock m_refresh_lock;
 
 public:
-	CGameSpy_Browser();
-	~CGameSpy_Browser();
+    CGameSpy_Browser();
+    ~CGameSpy_Browser();
 
-	bool			Init(UpdateCallback updateCb, DestroyCallback destroyCb);
-	void			Clear();
+    bool Init(UpdateCallback updateCb, DestroyCallback destroyCb);
+    void Clear();
 
     GSUpdateStatus RefreshList_Full(bool Local, const char* FilterStr = "");
-	void			RefreshQuick(int Index);
-	bool			HasAllKeys			(int Index);
-	bool			CheckDirectConnection(int Index);
-	
-	void CallBack_OnUpdateCompleted		();
+    void RefreshQuick(int Index);
+    bool HasAllKeys(int Index);
+    bool CheckDirectConnection(int Index);
 
-	int				GetServersCount();
-	void			GetServerInfoByIndex(ServerInfo* pServerInfo, int idx);
-    void *GetServerByIndex(int id);
-    bool GetBool(void *srv, int keyId, bool defaultValue = false);
-    int GetInt(void *srv, int keyId, int defaultValue = 0);
-    float GetFloat(void *srv, int keyId, float defaultValue = 0.0f);
-    const char *GetString(void *srv, int keyId, const char *defaultValue = nullptr);
+    void CallBack_OnUpdateCompleted();
 
-	void			OnUpdateFailed		(void* server);
+    int GetServersCount();
+    void GetServerInfoByIndex(ServerInfo* pServerInfo, int idx);
+    void* GetServerByIndex(int id);
+    bool GetBool(void* srv, int keyId, bool defaultValue = false);
+    int GetInt(void* srv, int keyId, int defaultValue = 0);
+    float GetFloat(void* srv, int keyId, float defaultValue = 0.0f);
+    const char* GetString(void* srv, int keyId, const char* defaultValue = nullptr);
+
+    void OnUpdateFailed(void* server);
     GSUpdateStatus Update();
 
-	void			UpdateServerList	();
-	void			SortBrowserByPing	();
+    void UpdateServerList();
+    void SortBrowserByPing();
 
-	void			RefreshListInternet (const char* FilterStr);
+    void RefreshListInternet(const char* FilterStr);
 };
