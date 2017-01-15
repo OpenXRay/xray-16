@@ -6,21 +6,21 @@
 //	Description : Stalker death action classes
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
 #include "stalker_death_actions.h"
+#include "CharacterPhysicsSupport.h"
 #include "ai/stalker/ai_stalker.h"
-#include "stalker_decision_space.h"
+#include "clsid_game.h"
+#include "detail_path_manager_space.h"
+#include "inventory.h"
+#include "movement_manager_space.h"
 #include "script_game_object.h"
 #include "script_game_object_impl.h"
-#include "movement_manager_space.h"
-#include "detail_path_manager_space.h"
+#include "stalker_decision_space.h"
 #include "stalker_movement_manager_smart_cover.h"
-#include "inventory.h"
+#include "stdafx.h"
 #include "weapon.h"
-#include "xr_level_controller.h"
-#include "clsid_game.h"
-#include "CharacterPhysicsSupport.h"
 #include "weaponmagazined.h"
+#include "xr_level_controller.h"
 
 using namespace StalkerDecisionSpace;
 
@@ -28,107 +28,88 @@ using namespace StalkerDecisionSpace;
 // CStalkerActionDead
 //////////////////////////////////////////////////////////////////////////
 
-CStalkerActionDead::CStalkerActionDead	(CAI_Stalker *object, LPCSTR action_name) :
-	inherited							(object,action_name)
+CStalkerActionDead::CStalkerActionDead(CAI_Stalker* object, LPCSTR action_name) : inherited(object, action_name)
 {
 }
 
-bool CStalkerActionDead::fire			() const
+bool CStalkerActionDead::fire() const
 {
-	if (object().inventory().TotalWeight() <= 0)
-		return							(false);
-	
-	CWeapon								*weapon = smart_cast<CWeapon*>(object().inventory().ActiveItem());
-	if (!weapon)
-		return							(false);
+    if (object().inventory().TotalWeight() <= 0) return (false);
 
-	if (!weapon->GetAmmoElapsed())
-		return							(false);
+    CWeapon* weapon = smart_cast<CWeapon*>(object().inventory().ActiveItem());
+    if (!weapon) return (false);
 
-	if (!object().hammer_is_clutched())
-		return							(false);
+    if (!weapon->GetAmmoElapsed()) return (false);
 
-	if (!object().character_physics_support()->can_drop_active_weapon())
-		return							(true);
+    if (!object().hammer_is_clutched()) return (false);
 
-	if (Device.dwTimeGlobal - object().GetLevelDeathTime() > 500)
-		return							(false);
+    if (!object().character_physics_support()->can_drop_active_weapon()) return (true);
 
-	return								(true);
+    if (Device.dwTimeGlobal - object().GetLevelDeathTime() > 500) return (false);
+
+    return (true);
 }
 
-void CStalkerActionDead::initialize		()
+void CStalkerActionDead::initialize()
 {
-	inherited::initialize				();
+    inherited::initialize();
 
-	if (object().getDestroy())
-		return;
+    if (object().getDestroy()) return;
 
-	if (!fire())
-		return;
+    if (!fire()) return;
 
-	object().inventory().Action			(kWPN_FIRE,CMD_START);
+    object().inventory().Action(kWPN_FIRE, CMD_START);
 
-	u16 active_slot						= object().inventory().GetActiveSlot();
-	if (active_slot == INV_SLOT_3) {
-		CInventoryItem*					item = object().inventory().ItemFromSlot(active_slot);
-		if (item) {
-			CWeaponMagazined*			weapon = smart_cast<CWeaponMagazined*>(item);
-			VERIFY						(weapon);
-			weapon->SetQueueSize		(weapon->GetAmmoElapsed());
-		}
-	}
+    u16 active_slot = object().inventory().GetActiveSlot();
+    if (active_slot == INV_SLOT_3) {
+        CInventoryItem* item = object().inventory().ItemFromSlot(active_slot);
+        if (item) {
+            CWeaponMagazined* weapon = smart_cast<CWeaponMagazined*>(item);
+            VERIFY(weapon);
+            weapon->SetQueueSize(weapon->GetAmmoElapsed());
+        }
+    }
 
-	u16 I = object().inventory().FirstSlot();
-	u16 E = object().inventory().LastSlot();
-	for ( ; I <= E; ++I) 
-	{
-		if (I==BOLT_SLOT)
-			continue;
+    u16 I = object().inventory().FirstSlot();
+    u16 E = object().inventory().LastSlot();
+    for (; I <= E; ++I)
+    {
+        if (I == BOLT_SLOT) continue;
 
-		if (I == object().inventory().GetActiveSlot())
-			continue;
-		
-		PIItem item = object().inventory().ItemFromSlot(I);
-		if (item)
-			object().inventory().Ruck		(item);
-	}
+        if (I == object().inventory().GetActiveSlot()) continue;
+
+        PIItem item = object().inventory().ItemFromSlot(I);
+        if (item) object().inventory().Ruck(item);
+    }
 }
 
-void CStalkerActionDead::execute		()
+void CStalkerActionDead::execute()
 {
-	inherited::execute					();
+    inherited::execute();
 
-	if (object().getDestroy())
-		return;
+    if (object().getDestroy()) return;
 
-	object().movement().enable_movement	(false);
+    object().movement().enable_movement(false);
 
-	if (fire())
-		return;
+    if (fire()) return;
 
-	if (!object().character_physics_support()->can_drop_active_weapon())
-		return;
+    if (!object().character_physics_support()->can_drop_active_weapon()) return;
 
-	u16 I = object().inventory().FirstSlot();
-	u16 E = object().inventory().LastSlot();
-	for ( ; I <= E; ++I) 
-	{
-		if (I==BOLT_SLOT)
-			continue;
+    u16 I = object().inventory().FirstSlot();
+    u16 E = object().inventory().LastSlot();
+    for (; I <= E; ++I)
+    {
+        if (I == BOLT_SLOT) continue;
 
-		PIItem item = object().inventory().ItemFromSlot(I);
-		if(!item)
-			continue;
+        PIItem item = object().inventory().ItemFromSlot(I);
+        if (!item) continue;
 
-		if (I == object().inventory().GetActiveSlot())
-		{
-			item->SetDropManual(TRUE);
-			continue;
-		}
-		object().inventory().Ruck		(item);
-	}
+        if (I == object().inventory().GetActiveSlot()) {
+            item->SetDropManual(TRUE);
+            continue;
+        }
+        object().inventory().Ruck(item);
+    }
 
-
-	set_property						(eWorldPropertyDead,true);
+    set_property(eWorldPropertyDead, true);
 }

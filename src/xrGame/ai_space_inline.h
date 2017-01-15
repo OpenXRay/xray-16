@@ -8,52 +8,52 @@
 
 #pragma once
 
-IC	CEF_Storage					&CAI_Space::ef_storage				() const
+IC CEF_Storage& CAI_Space::ef_storage() const
 {
-	VERIFY					(m_ef_storage);
-	return					(*m_ef_storage);
+    VERIFY(m_ef_storage);
+    return (*m_ef_storage);
 }
 
-IC	const CALifeSimulator		&CAI_Space::alife					() const
+IC const CALifeSimulator& CAI_Space::alife() const
 {
-	VERIFY					(m_alife_simulator);
-	return					(*m_alife_simulator);
+    VERIFY(m_alife_simulator);
+    return (*m_alife_simulator);
 }
 
-IC	const CALifeSimulator		*CAI_Space::get_alife				() const
+IC const CALifeSimulator* CAI_Space::get_alife() const
 {
-	return					(m_alife_simulator);
+    return (m_alife_simulator);
 }
 
-IC	const CCoverManager			&CAI_Space::cover_manager			() const
+IC const CCoverManager& CAI_Space::cover_manager() const
 {
-	VERIFY					(m_cover_manager);
-	return					(*m_cover_manager);
+    VERIFY(m_cover_manager);
+    return (*m_cover_manager);
 }
 // XXX: [ai] delete
-IC	CScriptEngine				&CAI_Space::script_engine			() const
+IC CScriptEngine& CAI_Space::script_engine() const
 {
-	VERIFY					(GlobalEnv.ScriptEngine);
-	return					(*GlobalEnv.ScriptEngine);
+    VERIFY(GlobalEnv.ScriptEngine);
+    return (*GlobalEnv.ScriptEngine);
 }
 
-IC	moving_objects &CAI_Space::moving_objects						() const
+IC moving_objects& CAI_Space::moving_objects() const
 {
-	VERIFY					(m_moving_objects);
-	return					(*m_moving_objects);
+    VERIFY(m_moving_objects);
+    return (*m_moving_objects);
 }
 
-IC	doors::manager& CAI_Space::doors								() const
+IC doors::manager& CAI_Space::doors() const
 {
-	VERIFY					(m_doors_manager);
-	return					(*m_doors_manager);
+    VERIFY(m_doors_manager);
+    return (*m_doors_manager);
 }
 
-IC	CAI_Space &ai													()
+IC CAI_Space& ai()
 {
-	if (!g_ai_space) {
-		g_ai_space			= new CAI_Space();
-		g_ai_space->init	();
-	}
-	return					(*g_ai_space);
+    if (!g_ai_space) {
+        g_ai_space = new CAI_Space();
+        g_ai_space->init();
+    }
+    return (*g_ai_space);
 }

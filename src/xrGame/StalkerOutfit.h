@@ -7,10 +7,12 @@
 
 #include "customoutfit.h"
 
-class CStalkerOutfit : public CCustomOutfit {
+class CStalkerOutfit : public CCustomOutfit
+{
 private:
-    typedef	CCustomOutfit inherited;
+    typedef CCustomOutfit inherited;
+
 public:
-	CStalkerOutfit(void);
-	virtual ~CStalkerOutfit(void);
+    CStalkerOutfit(void);
+    virtual ~CStalkerOutfit(void);
 };

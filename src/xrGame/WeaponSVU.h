@@ -2,11 +2,11 @@
 
 #include "weaponcustompistol.h"
 
-class CWeaponSVU :
-	public CWeaponCustomPistol
+class CWeaponSVU : public CWeaponCustomPistol
 {
-	typedef CWeaponCustomPistol inherited;
+    typedef CWeaponCustomPistol inherited;
+
 public:
-	CWeaponSVU(void);
-	virtual ~CWeaponSVU(void);
+    CWeaponSVU(void);
+    virtual ~CWeaponSVU(void);
 };

@@ -1,14 +1,14 @@
-#include "stdafx.h"
 #include "ChangeWeatherDialog.hpp"
-#include "UIXmlInit.h"
-#include "UI3tButton.h"
-#include "game_cl_teamdeathmatch.h"
-#include "UIKickPlayer.h"
-#include "UIChangeMap.h"
 #include <dinput.h>
-#include "xrEngine/XR_IOConsole.h"
-#include "UIMapList.h"
+#include "UI3tButton.h"
+#include "UIChangeMap.h"
 #include "UIGameCustom.h"
+#include "UIKickPlayer.h"
+#include "UIMapList.h"
+#include "UIXmlInit.h"
+#include "game_cl_teamdeathmatch.h"
+#include "stdafx.h"
+#include "xrEngine/XR_IOConsole.h"
 
 ButtonListDialog::ButtonListDialog()
 {
@@ -20,7 +20,7 @@ ButtonListDialog::ButtonListDialog()
     AttachChild(Header);
     CancelButton = new CUI3tButton();
     CancelButton->SetAutoDelete(true);
-    AttachChild(CancelButton);    
+    AttachChild(CancelButton);
 }
 
 void ButtonListDialog::Initialize(int buttonCount)
@@ -52,17 +52,15 @@ const ButtonListDialog::NamedButton& ButtonListDialog::GetButton(int i) const
 bool ButtonListDialog::OnKeyboardAction(int dik, EUIMessages keyboardAction)
 {
     CUIDialogWnd::OnKeyboardAction(dik, keyboardAction);
-    if (WINDOW_KEY_PRESSED == keyboardAction)
-    {
-        if (DIK_ESCAPE == dik)
-        {
+    if (WINDOW_KEY_PRESSED == keyboardAction) {
+        if (DIK_ESCAPE == dik) {
             OnCancel();
             return true;
         }
         int btnCount = buttons.size();
-        if (dik >= DIK_1 && dik <= DIK_1-1+btnCount && btnCount <= 9) // handle 1..9 keys only
+        if (dik >= DIK_1 && dik <= DIK_1 - 1 + btnCount && btnCount <= 9)  // handle 1..9 keys only
         {
-            OnButtonClick(dik-DIK_1);
+            OnButtonClick(dik - DIK_1);
             return true;
         }
     }
@@ -71,14 +69,11 @@ bool ButtonListDialog::OnKeyboardAction(int dik, EUIMessages keyboardAction)
 
 void ButtonListDialog::SendMessage(CUIWindow* wnd, s16 msg, void* data /*= nullptr */)
 {
-    if (BUTTON_CLICKED == msg)
-    {
-        if (CancelButton == wnd)
-            OnCancel();
+    if (BUTTON_CLICKED == msg) {
+        if (CancelButton == wnd) OnCancel();
         for (u32 i = 0; i < buttons.size(); i++)
         {
-            if (buttons[i].Button == wnd)
-            {
+            if (buttons[i].Button == wnd) {
                 OnButtonClick(i);
                 return;
             }
@@ -95,7 +90,7 @@ void ChangeWeatherDialog::InitChangeWeather(CUIXml& xmlDoc)
     auto& gameWeathers = gMapListHelper.GetGameWeathers();
     Initialize(gameWeathers.size());
     weathers.resize(gameWeathers.size());
-	string256 path;
+    string256 path;
     for (u32 i = 0; i < weathers.size(); i++)
     {
         xr_sprintf(path, "change_weather:btn_%s", gameWeathers[i].Name.c_str());
@@ -128,9 +123,9 @@ void ChangeGameTypeDialog::InitChangeGameType(CUIXml& xmlDoc)
     string256 path;
     for (u32 i = 0; i < gameTypes.size(); i++)
     {
-        xr_sprintf(path, "change_gametype:btn_%d", i+1);
+        xr_sprintf(path, "change_gametype:btn_%d", i + 1);
         CUIXmlInit::Init3tButton(xmlDoc, path, 0, GetButton(i).Button);
-        xr_sprintf(path, "change_gametype:txt_%d", i+1);
+        xr_sprintf(path, "change_gametype:txt_%d", i + 1);
         CUIXmlInit::InitTextWnd(xmlDoc, path, 0, GetButton(i).Text);
         gameTypes[i] = xmlDoc.ReadAttrib(path, 0, "id");
     }

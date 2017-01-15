@@ -6,31 +6,27 @@
 //	Description : saved game wrapper class script export
 ////////////////////////////////////////////////////////////////////////////
 
+#include "ai_space.h"
 #include "pch_script.h"
 #include "saved_game_wrapper.h"
-#include "ai_space.h"
 #include "xrAICore/Navigation/game_graph.h"
-#include "xr_time.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
+#include "xr_time.h"
 
 using namespace luabind;
 
-xrTime CSavedGameWrapper__game_time		(const CSavedGameWrapper *self)
+xrTime CSavedGameWrapper__game_time(const CSavedGameWrapper* self)
 {
-	return			(xrTime(self->game_time()));
+    return (xrTime(self->game_time()));
 }
 
-SCRIPT_EXPORT(CSavedGameWrapper, (),
-{
-	module(luaState)
-	[
-		class_<CSavedGameWrapper>("CSavedGameWrapper")
-			.def(constructor<LPCSTR>())
-			.def("game_time",		&CSavedGameWrapper__game_time)
-			.def("level_id",		&CSavedGameWrapper::level_id)
-			.def("level_name",		&CSavedGameWrapper::level_name)
-			.def("actor_health",	&CSavedGameWrapper::actor_health),
+SCRIPT_EXPORT(CSavedGameWrapper, (), {
+    module(luaState)[class_<CSavedGameWrapper>("CSavedGameWrapper")
+                         .def(constructor<LPCSTR>())
+                         .def("game_time", &CSavedGameWrapper__game_time)
+                         .def("level_id", &CSavedGameWrapper::level_id)
+                         .def("level_name", &CSavedGameWrapper::level_name)
+                         .def("actor_health", &CSavedGameWrapper::actor_health),
 
-		def("valid_saved_game",		(bool (*)(LPCSTR))(&CSavedGameWrapper::valid_saved_game))
-	];
+        def("valid_saved_game", (bool (*)(LPCSTR))(&CSavedGameWrapper::valid_saved_game))];
 });

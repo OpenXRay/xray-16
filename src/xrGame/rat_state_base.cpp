@@ -6,11 +6,11 @@
 //	Description : rat state base class
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
 #include "rat_state_base.h"
+#include "stdafx.h"
 
-void rat_state_base::construct	(CAI_Rat *object)
+void rat_state_base::construct(CAI_Rat* object)
 {
-	VERIFY		(object);
-	m_object	= object;
+    VERIFY(object);
+    m_object = object;
 }

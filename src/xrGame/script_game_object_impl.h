@@ -8,22 +8,25 @@
 
 #pragma once
 
-#include "gameobject.h"
 #include "ai_space.h"
+#include "gameobject.h"
 #include "xrScriptEngine/script_engine.hpp"
 
-IC	CGameObject &CScriptGameObject::object	() const
+IC CGameObject& CScriptGameObject::object() const
 {
 #ifdef DEBUG
-	__try {
-		if (m_game_object && m_game_object->lua_game_object() == this)
-			return	(*m_game_object);
-	}
-	__except(EXCEPTION_EXECUTE_HANDLER) {
-	}
+    __try
+    {
+        if (m_game_object && m_game_object->lua_game_object() == this) return (*m_game_object);
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+    }
 
-	ai().script_engine().script_log(LuaMessageType::Error,"you are trying to use a destroyed object [%x]",m_game_object);
-	THROW2			(m_game_object && m_game_object->lua_game_object() == this,"Probably, you are trying to use a destroyed object!");
-#endif // #ifdef DEBUG
-	return			(*m_game_object);
+    ai().script_engine().script_log(
+        LuaMessageType::Error, "you are trying to use a destroyed object [%x]", m_game_object);
+    THROW2(m_game_object && m_game_object->lua_game_object() == this,
+        "Probably, you are trying to use a destroyed object!");
+#endif  // #ifdef DEBUG
+    return (*m_game_object);
 }

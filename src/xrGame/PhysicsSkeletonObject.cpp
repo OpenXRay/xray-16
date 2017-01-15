@@ -1,109 +1,96 @@
-#include "stdafx.h"
 #include "physicsskeletonobject.h"
+#include "stdafx.h"
 
-#include "xrPhysics/physicsshell.h"
-#include "phsynchronize.h"
-#include "xrserver_objects_alife.h"
 #include "Include/xrRender/Kinematics.h"
+#include "phsynchronize.h"
 #include "xrEngine/xr_collide_form.h"
+#include "xrPhysics/physicsshell.h"
+#include "xrserver_objects_alife.h"
 
 CPhysicsSkeletonObject::CPhysicsSkeletonObject()
 {
-
 }
 
 CPhysicsSkeletonObject::~CPhysicsSkeletonObject()
 {
-
 }
-
 
 BOOL CPhysicsSkeletonObject::net_Spawn(CSE_Abstract* DC)
 {
-	CSE_Abstract			  *e	= (CSE_Abstract*)(DC);
+    CSE_Abstract* e = (CSE_Abstract*)(DC);
 
-	inherited::net_Spawn	(DC);
-	xr_delete(CForm);
-	CForm = new CCF_Skeleton(this);
-	CPHSkeleton::Spawn(e);
-	setVisible(TRUE);
-	setEnabled(TRUE);
-	if(!PPhysicsShell()->isBreakable())
-		SheduleUnregister		();
-	return TRUE;
+    inherited::net_Spawn(DC);
+    xr_delete(CForm);
+    CForm = new CCF_Skeleton(this);
+    CPHSkeleton::Spawn(e);
+    setVisible(TRUE);
+    setEnabled(TRUE);
+    if (!PPhysicsShell()->isBreakable()) SheduleUnregister();
+    return TRUE;
 }
 
-void	CPhysicsSkeletonObject::SpawnInitPhysics	(CSE_Abstract	*D)
+void CPhysicsSkeletonObject::SpawnInitPhysics(CSE_Abstract* D)
 {
-	CreatePhysicsShell(D);
-	IKinematics* K=smart_cast<IKinematics*>	(Visual());
-	if(K)	
-	{	
-		K->CalculateBones_Invalidate();
-		K->CalculateBones	(TRUE);
-	}
+    CreatePhysicsShell(D);
+    IKinematics* K = smart_cast<IKinematics*>(Visual());
+    if (K) {
+        K->CalculateBones_Invalidate();
+        K->CalculateBones(TRUE);
+    }
 }
 
 void CPhysicsSkeletonObject::net_Destroy()
 {
-
-	inherited::net_Destroy		();
-	CPHSkeleton::RespawnInit	();
-
+    inherited::net_Destroy();
+    CPHSkeleton::RespawnInit();
 }
 
 void CPhysicsSkeletonObject::Load(LPCSTR section)
 {
-	inherited::Load(section);
-	CPHSkeleton::Load(section);
+    inherited::Load(section);
+    CPHSkeleton::Load(section);
 }
 
 void CPhysicsSkeletonObject::CreatePhysicsShell(CSE_Abstract* e)
 {
-	CSE_PHSkeleton	*po=smart_cast<CSE_PHSkeleton*>(e);
-	if(m_pPhysicsShell) return;
-	if (!Visual()) return;
-	m_pPhysicsShell=P_build_Shell(this,!po->_flags.test(CSE_PHSkeleton::flActive));
-
+    CSE_PHSkeleton* po = smart_cast<CSE_PHSkeleton*>(e);
+    if (m_pPhysicsShell) return;
+    if (!Visual()) return;
+    m_pPhysicsShell = P_build_Shell(this, !po->_flags.test(CSE_PHSkeleton::flActive));
 }
-
 
 void CPhysicsSkeletonObject::shedule_Update(u32 dt)
 {
-	inherited::shedule_Update(dt);
+    inherited::shedule_Update(dt);
 
-	CPHSkeleton::Update(dt);
+    CPHSkeleton::Update(dt);
 }
 
-void CPhysicsSkeletonObject::net_Save(NET_Packet &P)
+void CPhysicsSkeletonObject::net_Save(NET_Packet& P)
 {
-	inherited::net_Save(P);
-	CPHSkeleton::SaveNetState	   (P);
+    inherited::net_Save(P);
+    CPHSkeleton::SaveNetState(P);
 }
-
-
 
 BOOL CPhysicsSkeletonObject::net_SaveRelevant()
 {
-	return TRUE;//!m_flags.test(CSE_ALifeObjectPhysic::flSpawnCopy);
+    return TRUE;  //! m_flags.test(CSE_ALifeObjectPhysic::flSpawnCopy);
 }
-
 
 BOOL CPhysicsSkeletonObject::UsedAI_Locations()
 {
-	return					(FALSE);
+    return (FALSE);
 }
 
 void CPhysicsSkeletonObject::UpdateCL()
 {
-	inherited::UpdateCL		();
-	PHObjectPositionUpdate	();
+    inherited::UpdateCL();
+    PHObjectPositionUpdate();
 }
 
-void CPhysicsSkeletonObject::	PHObjectPositionUpdate()
+void CPhysicsSkeletonObject::PHObjectPositionUpdate()
 {
-	if(m_pPhysicsShell)
-	{
-			m_pPhysicsShell->InterpolateGlobalTransform(&XFORM());
-	}
+    if (m_pPhysicsShell) {
+        m_pPhysicsShell->InterpolateGlobalTransform(&XFORM());
+    }
 }

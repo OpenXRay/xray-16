@@ -16,32 +16,32 @@ class CAgentManager;
 class CDangerLocation;
 class IGameObject;
 
-class CAgentLocationManager {
+class CAgentLocationManager
+{
 public:
-	typedef intrusive_ptr<CDangerLocation>				CDangerLocationPtr;
-	typedef xr_vector<CDangerLocationPtr>				LOCATIONS;
+    typedef intrusive_ptr<CDangerLocation> CDangerLocationPtr;
+    typedef xr_vector<CDangerLocationPtr> LOCATIONS;
 
 private:
-	CAgentManager				*m_object;
-	LOCATIONS					m_danger_locations;
+    CAgentManager* m_object;
+    LOCATIONS m_danger_locations;
 
 protected:
-	IC		CAgentManager		&object					() const;
-			void				remove_old_danger_covers();
-
+    IC CAgentManager& object() const;
+    void remove_old_danger_covers();
 
 public:
-	IC							CAgentLocationManager	(CAgentManager *object);
-	IC		CDangerLocationPtr	location				(const Fvector &position);
-	IC		CDangerLocationPtr	location				(const IGameObject *object);
-	IC		void				clear					();
-			void				update					();
-			void				add						(CDangerLocationPtr location);
-			float				danger					(const CCoverPoint *cover, CAI_Stalker *member) const;
-			bool				suitable				(CAI_Stalker *object, const CCoverPoint *location, bool use_enemy_info) const;
-			void				make_suitable			(CAI_Stalker *object, const CCoverPoint *location) const;
-			void				remove_links			(IGameObject *object);
-	IC		const LOCATIONS		&locations				() const;
+    IC CAgentLocationManager(CAgentManager* object);
+    IC CDangerLocationPtr location(const Fvector& position);
+    IC CDangerLocationPtr location(const IGameObject* object);
+    IC void clear();
+    void update();
+    void add(CDangerLocationPtr location);
+    float danger(const CCoverPoint* cover, CAI_Stalker* member) const;
+    bool suitable(CAI_Stalker* object, const CCoverPoint* location, bool use_enemy_info) const;
+    void make_suitable(CAI_Stalker* object, const CCoverPoint* location) const;
+    void remove_links(IGameObject* object);
+    IC const LOCATIONS& locations() const;
 };
 
 #include "agent_location_manager_inline.h"

@@ -1,5 +1,5 @@
-#include "stdafx.h"
 #include "FryupZone.h"
+#include "stdafx.h"
 
 CFryupZone::CFryupZone()
 {

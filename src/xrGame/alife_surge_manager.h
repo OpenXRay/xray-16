@@ -13,24 +13,25 @@
 
 class CSE_ALifeTrader;
 
-class CALifeSurgeManager : public virtual CALifeSimulatorBase {
+class CALifeSurgeManager : public virtual CALifeSimulatorBase
+{
 protected:
-	typedef CALifeSimulatorBase inherited;
+    typedef CALifeSimulatorBase inherited;
 
 protected:
-	xr_vector<ALife::_SPAWN_ID>		m_temp_spawns;
-	xr_vector<ALife::_SPAWN_ID>		m_temp_spawned_objects;
+    xr_vector<ALife::_SPAWN_ID> m_temp_spawns;
+    xr_vector<ALife::_SPAWN_ID> m_temp_spawned_objects;
 
 private:
-			void			fill_spawned_objects		();
-			void			spawn_new_spawns			();
+    void fill_spawned_objects();
+    void spawn_new_spawns();
 
 protected:
-			void			spawn_new_objects			();
+    void spawn_new_objects();
 
 public:
-	IC						CALifeSurgeManager			(IPureServer *server, LPCSTR section);
-	virtual					~CALifeSurgeManager			();
+    IC CALifeSurgeManager(IPureServer* server, LPCSTR section);
+    virtual ~CALifeSurgeManager();
 };
 
 #include "alife_surge_manager_inline.h"

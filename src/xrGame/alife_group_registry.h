@@ -13,21 +13,22 @@
 class CSE_ALifeOnlineOfflineGroup;
 class CSE_ALifeDynamicObject;
 
-class CALifeGroupRegistry {
+class CALifeGroupRegistry
+{
 public:
-	typedef CSE_ALifeOnlineOfflineGroup				OBJECT;
-	typedef xr_map<ALife::_OBJECT_ID,OBJECT*>		OBJECTS;
+    typedef CSE_ALifeOnlineOfflineGroup OBJECT;
+    typedef xr_map<ALife::_OBJECT_ID, OBJECT*> OBJECTS;
 
 protected:
-	OBJECTS					m_objects;
+    OBJECTS m_objects;
 
 public:
-	virtual					~CALifeGroupRegistry	();
-			void			add						(CSE_ALifeDynamicObject *object);
-			void			remove					(CSE_ALifeDynamicObject *object);
-			OBJECT			&object					(const ALife::_OBJECT_ID &id) const;
-	IC		const OBJECTS	&objects				() const;
-			void			on_after_game_load		();
+    virtual ~CALifeGroupRegistry();
+    void add(CSE_ALifeDynamicObject* object);
+    void remove(CSE_ALifeDynamicObject* object);
+    OBJECT& object(const ALife::_OBJECT_ID& id) const;
+    IC const OBJECTS& objects() const;
+    void on_after_game_load();
 };
 
 #include "alife_group_registry_inline.h"

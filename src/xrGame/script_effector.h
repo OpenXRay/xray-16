@@ -8,20 +8,21 @@
 
 #pragma once
 
-#include "xrEngine/effectorpp.h"
 #include "xrEngine/cameramanager.h"
+#include "xrEngine/effectorpp.h"
 
-class CScriptEffector : public CEffectorPP {
+class CScriptEffector : public CEffectorPP
+{
 public:
-	typedef CEffectorPP inherited;
-	EEffectorPPType		m_tEffectorType;
+    typedef CEffectorPP inherited;
+    EEffectorPPType m_tEffectorType;
 
-	IC					CScriptEffector		(int iType, float time);
-	virtual				~CScriptEffector	();
-	virtual	BOOL		Process				(SPPInfo &pp);
-	virtual	bool		process				(SPPInfo *pp);
-	virtual	void		Add					();
-	virtual	void		Remove				();
+    IC CScriptEffector(int iType, float time);
+    virtual ~CScriptEffector();
+    virtual BOOL Process(SPPInfo& pp);
+    virtual bool process(SPPInfo* pp);
+    virtual void Add();
+    virtual void Remove();
 };
 
 #include "script_effector_inline.h"

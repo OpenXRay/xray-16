@@ -1,60 +1,55 @@
 #pragma once
 #include "ai/Monsters/BaseMonster/base_monster.h"
-#include "ai/Monsters/controlled_entity.h"
 #include "ai/Monsters/ai_monster_bones.h"
 #include "ai/Monsters/anim_triple.h"
+#include "ai/Monsters/controlled_entity.h"
 
+#define FAKE_DEATH_TYPES_COUNT 4
 
-#define FAKE_DEATH_TYPES_COUNT	4
+class CZombie : public CBaseMonster, public CControlledEntity<CZombie>
+{
+    typedef CBaseMonster inherited;
+    typedef CControlledEntity<CZombie> CControlled;
 
-class CZombie :	public CBaseMonster,
-				public CControlledEntity<CZombie> {
-	
-	typedef		CBaseMonster				inherited;
-	typedef		CControlledEntity<CZombie>	CControlled;
-
-	bonesManipulation	Bones;
+    bonesManipulation Bones;
 
 public:
-					CZombie		();
-	virtual			~CZombie	();	
+    CZombie();
+    virtual ~CZombie();
 
-	virtual void	Load				(LPCSTR section);
-	virtual BOOL	net_Spawn			(CSE_Abstract* DC);
-	virtual void	reinit				();
-	virtual	void	reload				(LPCSTR section);
-	
-	virtual	void	Hit					(SHit* pHDS);
+    virtual void Load(LPCSTR section);
+    virtual BOOL net_Spawn(CSE_Abstract* DC);
+    virtual void reinit();
+    virtual void reload(LPCSTR section);
 
-	virtual bool	ability_pitch_correction () {return false;}
+    virtual void Hit(SHit* pHDS);
 
-	virtual void	shedule_Update		(u32 dt);
-	
-	static	void 	BoneCallback		(CBoneInstance *B);
-			void	vfAssignBones		();
+    virtual bool ability_pitch_correction() { return false; }
+    virtual void shedule_Update(u32 dt);
 
-	virtual bool	use_center_to_aim				() const {return true;}
-	virtual	char*	get_monster_class_name () { return "zombie"; }
+    static void BoneCallback(CBoneInstance* B);
+    void vfAssignBones();
 
+    virtual bool use_center_to_aim() const { return true; }
+    virtual char* get_monster_class_name() { return "zombie"; }
+    CBoneInstance* bone_spine;
+    CBoneInstance* bone_head;
 
-	CBoneInstance			*bone_spine;
-	CBoneInstance			*bone_head;
+    SAnimationTripleData anim_triple_death[FAKE_DEATH_TYPES_COUNT];
+    u8 active_triple_idx;
 
-	SAnimationTripleData	anim_triple_death[FAKE_DEATH_TYPES_COUNT];
-	u8				active_triple_idx;
-	
-	u32				time_dead_start;
-	u32				last_hit_frame;
-	u32				time_resurrect;
+    u32 time_dead_start;
+    u32 last_hit_frame;
+    u32 time_resurrect;
 
-	u8				fake_death_count;
-	float			health_death_threshold;
-	u8				fake_death_left;
+    u8 fake_death_count;
+    float health_death_threshold;
+    u8 fake_death_left;
 
-	bool			fake_death_fall_down	(); //return true if everything is ok
-	void			fake_death_stand_up		();
+    bool fake_death_fall_down();  // return true if everything is ok
+    void fake_death_stand_up();
 
 #ifdef _DEBUG
-	virtual void	debug_on_key			(int key);
+    virtual void debug_on_key(int key);
 #endif
 };

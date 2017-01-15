@@ -12,25 +12,21 @@
 
 using namespace luabind;
 
-SCRIPT_EXPORT(CScriptParticles, (),
-{
-	module(luaState)
-	[
-		class_<CScriptParticles>("particles_object")
-			.def(								constructor<LPCSTR>())
-			.def("play",						&CScriptParticles::Play)
-			.def("play_at_pos",					&CScriptParticles::PlayAtPos)
-			.def("stop",						&CScriptParticles::Stop)
-			.def("stop_deffered",				&CScriptParticles::StopDeffered)
+SCRIPT_EXPORT(CScriptParticles, (), {
+    module(luaState)[class_<CScriptParticles>("particles_object")
+                         .def(constructor<LPCSTR>())
+                         .def("play", &CScriptParticles::Play)
+                         .def("play_at_pos", &CScriptParticles::PlayAtPos)
+                         .def("stop", &CScriptParticles::Stop)
+                         .def("stop_deffered", &CScriptParticles::StopDeffered)
 
-			.def("playing",						&CScriptParticles::IsPlaying)
-			.def("looped",						&CScriptParticles::IsLooped)
+                         .def("playing", &CScriptParticles::IsPlaying)
+                         .def("looped", &CScriptParticles::IsLooped)
 
-			.def("move_to",						&CScriptParticles::MoveTo)
+                         .def("move_to", &CScriptParticles::MoveTo)
 
-			.def("load_path",					&CScriptParticles::LoadPath)
-			.def("start_path",					&CScriptParticles::StartPath)
-			.def("stop_path",					&CScriptParticles::StopPath)
-			.def("pause_path",					&CScriptParticles::PausePath)
-	];
+                         .def("load_path", &CScriptParticles::LoadPath)
+                         .def("start_path", &CScriptParticles::StartPath)
+                         .def("stop_path", &CScriptParticles::StopPath)
+                         .def("pause_path", &CScriptParticles::PausePath)];
 });

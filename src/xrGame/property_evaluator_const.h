@@ -11,17 +11,17 @@
 #include "property_evaluator.h"
 
 template <typename _object_type>
-class CPropertyEvaluatorConst : public CPropertyEvaluator<_object_type> {
+class CPropertyEvaluatorConst : public CPropertyEvaluator<_object_type>
+{
 protected:
-	typedef CPropertyEvaluator<_object_type>		inherited;
+    typedef CPropertyEvaluator<_object_type> inherited;
 
 protected:
-	_value_type			m_value;
+    _value_type m_value;
 
 public:
-	IC					CPropertyEvaluatorConst	(_value_type value, LPCSTR evaluator_name = "");
-	virtual _value_type	evaluate				();
+    IC CPropertyEvaluatorConst(_value_type value, LPCSTR evaluator_name = "");
+    virtual _value_type evaluate();
 };
-
 
 #include "property_evaluator_const_inline.h"

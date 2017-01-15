@@ -6,15 +6,16 @@
 #pragma once
 #include "artefact.h"
 
-class CRustyHairArtefact : public CArtefact 
+class CRustyHairArtefact : public CArtefact
 {
 private:
-	typedef CArtefact inherited;
-public:
-	CRustyHairArtefact(void);
-	virtual ~CRustyHairArtefact(void);
+    typedef CArtefact inherited;
 
-	virtual void Load				(LPCSTR section);
+public:
+    CRustyHairArtefact(void);
+    virtual ~CRustyHairArtefact(void);
+
+    virtual void Load(LPCSTR section);
 
 protected:
 };

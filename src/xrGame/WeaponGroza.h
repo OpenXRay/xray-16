@@ -2,11 +2,11 @@
 
 #include "weaponmagazinedwgrenade.h"
 
-class CWeaponGroza :
-	public CWeaponMagazinedWGrenade
+class CWeaponGroza : public CWeaponMagazinedWGrenade
 {
-	typedef CWeaponMagazinedWGrenade inherited;
+    typedef CWeaponMagazinedWGrenade inherited;
+
 public:
-				CWeaponGroza();
-	virtual		~CWeaponGroza();
+    CWeaponGroza();
+    virtual ~CWeaponGroza();
 };

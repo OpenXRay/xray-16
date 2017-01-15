@@ -10,19 +10,20 @@
 
 #include "obstacles_query.h"
 
-class refreshable_obstacles_query : public obstacles_query {
+class refreshable_obstacles_query : public obstacles_query
+{
 private:
-	typedef obstacles_query								inherited;
+    typedef obstacles_query inherited;
 
 private:
-	static const u32	m_large_update_check_time		= 1000;
+    static const u32 m_large_update_check_time = 1000;
 
 private:
-	u32					m_last_update_time;
+    u32 m_last_update_time;
 
 public:
-	IC					refreshable_obstacles_query		();
-	IC		const float	&refresh_radius					();
+    IC refreshable_obstacles_query();
+    IC const float& refresh_radius();
 };
 
 #include "refreshable_obstacles_query_inline.h"

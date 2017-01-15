@@ -6,42 +6,39 @@
 //	Description : Stalker animation manager : head animations
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
-#include "stalker_animation_manager.h"
 #include "ai/stalker/ai_stalker.h"
 #include "ai/stalker/ai_stalker_space.h"
 #include "sound_player.h"
 #include "stalker_animation_data.h"
-#include "uigamesp.h"
+#include "stalker_animation_manager.h"
+#include "stdafx.h"
 #include "ui/uitalkwnd.h"
+#include "uigamesp.h"
 
-void CStalkerAnimationManager::head_play_callback		(CBlend *blend)
+void CStalkerAnimationManager::head_play_callback(CBlend* blend)
 {
-	CAI_Stalker				*object = (CAI_Stalker*)blend->CallbackParam;
-	VERIFY					(object);
+    CAI_Stalker* object = (CAI_Stalker*)blend->CallbackParam;
+    VERIFY(object);
 
-	CStalkerAnimationPair	&pair = object->animation().head();
-	pair.on_animation_end	();
+    CStalkerAnimationPair& pair = object->animation().head();
+    pair.on_animation_end();
 }
 
-MotionID CStalkerAnimationManager::assign_head_animation	()
+MotionID CStalkerAnimationManager::assign_head_animation()
 {
-	const ANIM_VECTOR		&animations = m_data_storage->m_head_animations.A;
+    const ANIM_VECTOR& animations = m_data_storage->m_head_animations.A;
 
-	CUIGameSP*				pGameSP = smart_cast<CUIGameSP*>(CurrentGameUI());
-	if (pGameSP && pGameSP->TalkMenu->IsShown()) {
-		if (pGameSP->TalkMenu->OthersInvOwner() == m_object) {
-			if (pGameSP->TalkMenu->playing_sound())
-				return		(animations[1]);
-		}
-	}
+    CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(CurrentGameUI());
+    if (pGameSP && pGameSP->TalkMenu->IsShown()) {
+        if (pGameSP->TalkMenu->OthersInvOwner() == m_object) {
+            if (pGameSP->TalkMenu->playing_sound()) return (animations[1]);
+        }
+    }
 
-	CSoundPlayer			&sound = object().sound();
-	if (!sound.active_sound_count(true))
-		return				(animations[0]);
+    CSoundPlayer& sound = object().sound();
+    if (!sound.active_sound_count(true)) return (animations[0]);
 
-	if (!sound.active_sound_type((u32)StalkerSpace::eStalkerSoundMaskMovingInDanger))
-		return				(animations[1]);
+    if (!sound.active_sound_type((u32)StalkerSpace::eStalkerSoundMaskMovingInDanger)) return (animations[1]);
 
-	return					(animations[0]);
+    return (animations[0]);
 }

@@ -9,28 +9,30 @@
 #pragma once
 
 template <typename T>
-class CObjectManager {
+class CObjectManager
+{
 public:
-	typedef xr_vector<T*>	OBJECTS;
+    typedef xr_vector<T*> OBJECTS;
+
 protected:
-	OBJECTS					m_objects;
-	T						*m_selected;
+    OBJECTS m_objects;
+    T* m_selected;
 
 public:
-							CObjectManager	();
-	virtual					~CObjectManager	();
-	virtual void			Load			(LPCSTR section);
-	virtual void			reinit			();
-	virtual void			reload			(LPCSTR section);
-	virtual void			update			();
-			bool			add				(T *object);
-	virtual bool			is_useful		(T *object) const;
-	virtual	float			do_evaluate		(T *object) const;
-	virtual	void			reset			();
+    CObjectManager();
+    virtual ~CObjectManager();
+    virtual void Load(LPCSTR section);
+    virtual void reinit();
+    virtual void reload(LPCSTR section);
+    virtual void update();
+    bool add(T* object);
+    virtual bool is_useful(T* object) const;
+    virtual float do_evaluate(T* object) const;
+    virtual void reset();
 
 public:
-	IC		T				*selected		() const;
-	IC		const OBJECTS	&objects		() const;
+    IC T* selected() const;
+    IC const OBJECTS& objects() const;
 };
 
 #include "object_manager_inline.h"

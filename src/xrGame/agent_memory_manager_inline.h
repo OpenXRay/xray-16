@@ -8,54 +8,53 @@
 
 #pragma once
 
-IC	CAgentMemoryManager::CAgentMemoryManager						(CAgentManager *object)
+IC CAgentMemoryManager::CAgentMemoryManager(CAgentManager* object)
 {
-	VERIFY						(object);
-	m_object					= object;
+    VERIFY(object);
+    m_object = object;
 }
 
-IC	CAgentManager &CAgentMemoryManager::object						() const
+IC CAgentManager& CAgentMemoryManager::object() const
 {
-	VERIFY				(m_object);
-	return				(*m_object);
+    VERIFY(m_object);
+    return (*m_object);
 }
 
-IC	void CAgentMemoryManager::set_squad_objects						(VISIBLES *objects)
+IC void CAgentMemoryManager::set_squad_objects(VISIBLES* objects)
 {
-	m_visible_objects			= objects;
+    m_visible_objects = objects;
 }
 
-IC	void CAgentMemoryManager::set_squad_objects						(SOUNDS *objects)
+IC void CAgentMemoryManager::set_squad_objects(SOUNDS* objects)
 {
-	m_sound_objects				= objects;
+    m_sound_objects = objects;
 }
 
-IC	void CAgentMemoryManager::set_squad_objects						(HITS *objects)
+IC void CAgentMemoryManager::set_squad_objects(HITS* objects)
 {
-	m_hit_objects				= objects;
+    m_hit_objects = objects;
 }
 
-IC	CAgentMemoryManager::VISIBLES &CAgentMemoryManager::visibles	() const
+IC CAgentMemoryManager::VISIBLES& CAgentMemoryManager::visibles() const
 {
-	VERIFY						(m_visible_objects);
-	return						(*m_visible_objects);
+    VERIFY(m_visible_objects);
+    return (*m_visible_objects);
 }
 
-IC	CAgentMemoryManager::SOUNDS &CAgentMemoryManager::sounds		() const
+IC CAgentMemoryManager::SOUNDS& CAgentMemoryManager::sounds() const
 {
-	VERIFY						(m_sound_objects);
-	return						(*m_sound_objects);
+    VERIFY(m_sound_objects);
+    return (*m_sound_objects);
 }
 
-IC	CAgentMemoryManager::HITS &CAgentMemoryManager::hits			() const
+IC CAgentMemoryManager::HITS& CAgentMemoryManager::hits() const
 {
-	VERIFY						(m_hit_objects);
-	return						(*m_hit_objects);
+    VERIFY(m_hit_objects);
+    return (*m_hit_objects);
 }
 
-IC	void CAgentMemoryManager::update_memory_mask	(const squad_mask_type &mask, squad_mask_type &current)
+IC void CAgentMemoryManager::update_memory_mask(const squad_mask_type& mask, squad_mask_type& current)
 {
-	// this function removes specified bit and shifts all the others
-	current					= (((mask ^ squad_mask_type(-1) ^ (mask - 1)) & current) >> 1) | (current & (mask - 1));
+    // this function removes specified bit and shifts all the others
+    current = (((mask ^ squad_mask_type(-1) ^ (mask - 1)) & current) >> 1) | (current & (mask - 1));
 }
-

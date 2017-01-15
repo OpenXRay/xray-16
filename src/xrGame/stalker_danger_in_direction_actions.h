@@ -14,79 +14,84 @@
 // CStalkerActionDangerInDirectionTakeCover
 //////////////////////////////////////////////////////////////////////////
 
-class CStalkerActionDangerInDirectionTakeCover : public CStalkerActionCombatBase {
+class CStalkerActionDangerInDirectionTakeCover : public CStalkerActionCombatBase
+{
 protected:
-	typedef CStalkerActionCombatBase inherited;
+    typedef CStalkerActionCombatBase inherited;
 
 private:
-	bool				m_direction_sight;
+    bool m_direction_sight;
 
 public:
-						CStalkerActionDangerInDirectionTakeCover	(CAI_Stalker *object, LPCSTR action_name = "");
-	virtual void		initialize									();
-	virtual void		execute										();
-	virtual void		finalize									();
+    CStalkerActionDangerInDirectionTakeCover(CAI_Stalker* object, LPCSTR action_name = "");
+    virtual void initialize();
+    virtual void execute();
+    virtual void finalize();
 };
 
 //////////////////////////////////////////////////////////////////////////
 // CStalkerActionDangerInDirectionLookOut
 //////////////////////////////////////////////////////////////////////////
 
-class CStalkerActionDangerInDirectionLookOut : public CStalkerActionCombatBase {
+class CStalkerActionDangerInDirectionLookOut : public CStalkerActionCombatBase
+{
 protected:
-	typedef CStalkerActionCombatBase inherited;
+    typedef CStalkerActionCombatBase inherited;
 
 private:
-	CRandom32			m_crouch_look_out_random;
+    CRandom32 m_crouch_look_out_random;
 
 public:
-						CStalkerActionDangerInDirectionLookOut		(CAI_Stalker *object, LPCSTR action_name = "");
-	virtual void		initialize									();
-	virtual void		execute										();
-	virtual void		finalize									();
+    CStalkerActionDangerInDirectionLookOut(CAI_Stalker* object, LPCSTR action_name = "");
+    virtual void initialize();
+    virtual void execute();
+    virtual void finalize();
 };
 
 //////////////////////////////////////////////////////////////////////////
 // CStalkerActionDangerInDirectionHoldPosition
 //////////////////////////////////////////////////////////////////////////
 
-class CStalkerActionDangerInDirectionHoldPosition : public CStalkerActionCombatBase {
+class CStalkerActionDangerInDirectionHoldPosition : public CStalkerActionCombatBase
+{
 protected:
-	typedef CStalkerActionCombatBase inherited;
+    typedef CStalkerActionCombatBase inherited;
 
 public:
-						CStalkerActionDangerInDirectionHoldPosition	(CAI_Stalker *object, LPCSTR action_name = "");
-	virtual void		initialize									();
-	virtual void		execute										();
-	virtual void		finalize									();
+    CStalkerActionDangerInDirectionHoldPosition(CAI_Stalker* object, LPCSTR action_name = "");
+    virtual void initialize();
+    virtual void execute();
+    virtual void finalize();
 };
 
 //////////////////////////////////////////////////////////////////////////
 // CStalkerActionDangerInDirectionDetour
 //////////////////////////////////////////////////////////////////////////
 
-class CStalkerActionDangerInDirectionDetour : public CStalkerActionCombatBase {
+class CStalkerActionDangerInDirectionDetour : public CStalkerActionCombatBase
+{
 protected:
-	typedef CStalkerActionCombatBase inherited;
+    typedef CStalkerActionCombatBase inherited;
 
 public:
-						CStalkerActionDangerInDirectionDetour		(CAI_Stalker *object, LPCSTR action_name = "");
-	virtual void		initialize									();
-	virtual void		execute										();
-	virtual void		finalize									();
+    CStalkerActionDangerInDirectionDetour(CAI_Stalker* object, LPCSTR action_name = "");
+    virtual void initialize();
+    virtual void execute();
+    virtual void finalize();
 };
 
 //////////////////////////////////////////////////////////////////////////
 // CStalkerActionDangerInDirectionSearch
 //////////////////////////////////////////////////////////////////////////
 
-class CStalkerActionDangerInDirectionSearch : public CStalkerActionCombatBase {
+class CStalkerActionDangerInDirectionSearch : public CStalkerActionCombatBase
+{
 protected:
-	typedef CStalkerActionCombatBase inherited;
+    typedef CStalkerActionCombatBase inherited;
 
 public:
-						CStalkerActionDangerInDirectionSearch	(CAI_Stalker *object, LPCSTR action_name = "");
-	virtual void		initialize								();
-	virtual void		execute									();
-	virtual void		finalize								();
+    CStalkerActionDangerInDirectionSearch(CAI_Stalker* object, LPCSTR action_name = "");
+    virtual void initialize();
+    virtual void execute();
+    virtual void finalize();
 };
