@@ -12,21 +12,17 @@
 
 using namespace luabind;
 
-SCRIPT_EXPORT(CScriptTokenList, (),
-{
-	module(luaState)
-	[
-		class_<xr_token>("token")
-			.def(					constructor<>())
-			.def_readwrite("name",	&xr_token::name)
-			.def_readwrite("id",	&xr_token::id),
+SCRIPT_EXPORT(CScriptTokenList, (), {
+    module(luaState)[class_<xr_token>("token")
+                         .def(constructor<>())
+                         .def_readwrite("name", &xr_token::name)
+                         .def_readwrite("id", &xr_token::id),
 
-		class_<CScriptTokenList>("token_list")
-			.def(					constructor<>())
-			.def("add",				&CScriptTokenList::add)
-			.def("remove",			&CScriptTokenList::remove)
-			.def("clear",			&CScriptTokenList::clear)
-			.def("id",				&CScriptTokenList::id)
-			.def("name",			&CScriptTokenList::name)
-	];
+        class_<CScriptTokenList>("token_list")
+            .def(constructor<>())
+            .def("add", &CScriptTokenList::add)
+            .def("remove", &CScriptTokenList::remove)
+            .def("clear", &CScriptTokenList::clear)
+            .def("id", &CScriptTokenList::id)
+            .def("name", &CScriptTokenList::name)];
 });
