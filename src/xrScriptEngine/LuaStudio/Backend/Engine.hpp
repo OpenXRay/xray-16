@@ -83,67 +83,69 @@ public:
 
     typedef double lua_Number;
     typedef ptrdiff_t lua_Integer;
-    typedef void (*lua_Hook)(lua_State *L, lua_Debug *ar);
-    typedef int (*lua_CFunction)(lua_State *L);
+    typedef void (*lua_Hook)(lua_State* L, lua_Debug* ar);
+    typedef int (*lua_CFunction)(lua_State* L);
 
 public:
     virtual ~engine() {}
-    virtual int CS_LUA_STUDIO_BACKEND_CALL luaL_loadstring(lua_State *L, const char *s) = 0;
-    virtual int CS_LUA_STUDIO_BACKEND_CALL luaL_newmetatable(lua_State *L, const char *tname) = 0;
-    virtual void CS_LUA_STUDIO_BACKEND_CALL lua_createtable(lua_State *L, int narray, int nrec) = 0;
-    virtual int CS_LUA_STUDIO_BACKEND_CALL lua_sethook(lua_State *L, lua_Hook func, lua_mask_type mask, int count) = 0;
-    virtual lua_Hook CS_LUA_STUDIO_BACKEND_CALL lua_gethook(lua_State *L) = 0;
-    virtual int CS_LUA_STUDIO_BACKEND_CALL lua_getinfo(lua_State *L, const char *what, lua_Debug *ar) = 0;
-    virtual void CS_LUA_STUDIO_BACKEND_CALL lua_getfenv(lua_State *L, int idx) = 0;
-    virtual void CS_LUA_STUDIO_BACKEND_CALL lua_getfield(lua_State *L, int idx, const char *k) = 0;
-    virtual char const * CS_LUA_STUDIO_BACKEND_CALL lua_getlocal(lua_State *L, const lua_Debug *ar, int n) = 0;
-    virtual void CS_LUA_STUDIO_BACKEND_CALL lua_gettable(lua_State *L, int idx) = 0;
-    virtual int CS_LUA_STUDIO_BACKEND_CALL lua_getstack(lua_State *L, int level, lua_Debug *ar) = 0;
-    virtual int CS_LUA_STUDIO_BACKEND_CALL lua_gettop(lua_State *L) = 0;
-    virtual char const * CS_LUA_STUDIO_BACKEND_CALL lua_getupvalue(lua_State *L, int funcindex, int n) = 0;
-    virtual int CS_LUA_STUDIO_BACKEND_CALL lua_iscfunction(lua_State *L, int idx) = 0;
-    virtual int CS_LUA_STUDIO_BACKEND_CALL lua_next(lua_State *L, int idx) = 0;
-    virtual int CS_LUA_STUDIO_BACKEND_CALL lua_pcall(lua_State *L, int nargs, int nresults, int errfunc) = 0;
-    virtual void CS_LUA_STUDIO_BACKEND_CALL lua_pushcclosure(lua_State *L, lua_CFunction fn, int n) = 0;
-    virtual void CS_LUA_STUDIO_BACKEND_CALL lua_pushnil(lua_State *L) = 0;
-    virtual void CS_LUA_STUDIO_BACKEND_CALL lua_pushstring(lua_State *L, const char *s) = 0;
-    virtual void CS_LUA_STUDIO_BACKEND_CALL lua_pushvalue(lua_State *L, int idx) = 0;
-    virtual void CS_LUA_STUDIO_BACKEND_CALL lua_pushnumber(lua_State *L, lua_Number idx) = 0;
-    virtual void CS_LUA_STUDIO_BACKEND_CALL lua_remove(lua_State *L, int idx) = 0;
-    virtual void CS_LUA_STUDIO_BACKEND_CALL lua_replace(lua_State *L, int idx) = 0;
-    virtual int CS_LUA_STUDIO_BACKEND_CALL lua_setfenv(lua_State *L, int idx) = 0;
-    virtual int CS_LUA_STUDIO_BACKEND_CALL lua_setmetatable(lua_State *L, int objindex) = 0;
-    virtual void CS_LUA_STUDIO_BACKEND_CALL lua_settable(lua_State *L, int idx) = 0;
-    virtual void CS_LUA_STUDIO_BACKEND_CALL lua_settop(lua_State *L, int idx) = 0;
-    virtual int CS_LUA_STUDIO_BACKEND_CALL lua_toboolean(lua_State *L, int idx) = 0;
-    virtual lua_Integer CS_LUA_STUDIO_BACKEND_CALL lua_tointeger(lua_State *L, int idx) = 0;
-    virtual char const * CS_LUA_STUDIO_BACKEND_CALL lua_tolstring(lua_State *L, int idx, size_t *len) = 0;
-    virtual lua_Number CS_LUA_STUDIO_BACKEND_CALL lua_tonumber(lua_State *L, int idx) = 0;
-    virtual const void * CS_LUA_STUDIO_BACKEND_CALL lua_topointer(lua_State *L, int idx) = 0;
-    virtual bool CS_LUA_STUDIO_BACKEND_CALL lua_isnumber(lua_State *L, int idx) = 0;
-    virtual int CS_LUA_STUDIO_BACKEND_CALL lua_type(lua_State *L, int idx) = 0;
-    virtual char const * CS_LUA_STUDIO_BACKEND_CALL lua_typename(lua_State *L, int t) = 0;
+    virtual int CS_LUA_STUDIO_BACKEND_CALL luaL_loadstring(lua_State* L, const char* s) = 0;
+    virtual int CS_LUA_STUDIO_BACKEND_CALL luaL_newmetatable(lua_State* L, const char* tname) = 0;
+    virtual void CS_LUA_STUDIO_BACKEND_CALL lua_createtable(lua_State* L, int narray, int nrec) = 0;
+    virtual int CS_LUA_STUDIO_BACKEND_CALL lua_sethook(lua_State* L, lua_Hook func, lua_mask_type mask, int count) = 0;
+    virtual lua_Hook CS_LUA_STUDIO_BACKEND_CALL lua_gethook(lua_State* L) = 0;
+    virtual int CS_LUA_STUDIO_BACKEND_CALL lua_getinfo(lua_State* L, const char* what, lua_Debug* ar) = 0;
+    virtual void CS_LUA_STUDIO_BACKEND_CALL lua_getfenv(lua_State* L, int idx) = 0;
+    virtual void CS_LUA_STUDIO_BACKEND_CALL lua_getfield(lua_State* L, int idx, const char* k) = 0;
+    virtual char const* CS_LUA_STUDIO_BACKEND_CALL lua_getlocal(lua_State* L, const lua_Debug* ar, int n) = 0;
+    virtual void CS_LUA_STUDIO_BACKEND_CALL lua_gettable(lua_State* L, int idx) = 0;
+    virtual int CS_LUA_STUDIO_BACKEND_CALL lua_getstack(lua_State* L, int level, lua_Debug* ar) = 0;
+    virtual int CS_LUA_STUDIO_BACKEND_CALL lua_gettop(lua_State* L) = 0;
+    virtual char const* CS_LUA_STUDIO_BACKEND_CALL lua_getupvalue(lua_State* L, int funcindex, int n) = 0;
+    virtual int CS_LUA_STUDIO_BACKEND_CALL lua_iscfunction(lua_State* L, int idx) = 0;
+    virtual int CS_LUA_STUDIO_BACKEND_CALL lua_next(lua_State* L, int idx) = 0;
+    virtual int CS_LUA_STUDIO_BACKEND_CALL lua_pcall(lua_State* L, int nargs, int nresults, int errfunc) = 0;
+    virtual void CS_LUA_STUDIO_BACKEND_CALL lua_pushcclosure(lua_State* L, lua_CFunction fn, int n) = 0;
+    virtual void CS_LUA_STUDIO_BACKEND_CALL lua_pushnil(lua_State* L) = 0;
+    virtual void CS_LUA_STUDIO_BACKEND_CALL lua_pushstring(lua_State* L, const char* s) = 0;
+    virtual void CS_LUA_STUDIO_BACKEND_CALL lua_pushvalue(lua_State* L, int idx) = 0;
+    virtual void CS_LUA_STUDIO_BACKEND_CALL lua_pushnumber(lua_State* L, lua_Number idx) = 0;
+    virtual void CS_LUA_STUDIO_BACKEND_CALL lua_remove(lua_State* L, int idx) = 0;
+    virtual void CS_LUA_STUDIO_BACKEND_CALL lua_replace(lua_State* L, int idx) = 0;
+    virtual int CS_LUA_STUDIO_BACKEND_CALL lua_setfenv(lua_State* L, int idx) = 0;
+    virtual int CS_LUA_STUDIO_BACKEND_CALL lua_setmetatable(lua_State* L, int objindex) = 0;
+    virtual void CS_LUA_STUDIO_BACKEND_CALL lua_settable(lua_State* L, int idx) = 0;
+    virtual void CS_LUA_STUDIO_BACKEND_CALL lua_settop(lua_State* L, int idx) = 0;
+    virtual int CS_LUA_STUDIO_BACKEND_CALL lua_toboolean(lua_State* L, int idx) = 0;
+    virtual lua_Integer CS_LUA_STUDIO_BACKEND_CALL lua_tointeger(lua_State* L, int idx) = 0;
+    virtual char const* CS_LUA_STUDIO_BACKEND_CALL lua_tolstring(lua_State* L, int idx, size_t* len) = 0;
+    virtual lua_Number CS_LUA_STUDIO_BACKEND_CALL lua_tonumber(lua_State* L, int idx) = 0;
+    virtual const void* CS_LUA_STUDIO_BACKEND_CALL lua_topointer(lua_State* L, int idx) = 0;
+    virtual bool CS_LUA_STUDIO_BACKEND_CALL lua_isnumber(lua_State* L, int idx) = 0;
+    virtual int CS_LUA_STUDIO_BACKEND_CALL lua_type(lua_State* L, int idx) = 0;
+    virtual char const* CS_LUA_STUDIO_BACKEND_CALL lua_typename(lua_State* L, int t) = 0;
 
-    bool lua_typestring(lua_State *L, int n) { return this->lua_type(L, n)==lua_type_string; }
-    bool lua_typenumber(lua_State *L, int n) { return this->lua_type(L, n)==lua_type_number; }
-    bool lua_is_table(lua_State *L, int n) { return lua_type(L, n)==lua_type_table; }
-    bool lua_is_nil(lua_State *L, int n) { return lua_type(L, n)==lua_type_nil; }
-    void lua_new_table(lua_State *L) { lua_createtable(L, 0, 0); }
-    void lua_pop_value(lua_State *L, int n) { lua_settop(L, -n - 1); }
-    void lua_push_c_function(lua_State *L, lua_CFunction fn) { lua_pushcclosure(L, fn, 0); }
-    const char *lua_to_string(lua_State *L, int n) { return lua_tolstring(L, n, nullptr); }
-
-    virtual lua_Debug * CS_LUA_STUDIO_BACKEND_CALL lua_debug_create() = 0;
-    virtual void CS_LUA_STUDIO_BACKEND_CALL lua_debug_destroy(lua_Debug *&instance) = 0;
-    virtual char const * CS_LUA_STUDIO_BACKEND_CALL lua_debug_get_name(lua_Debug &instance) = 0;
-    virtual char const * CS_LUA_STUDIO_BACKEND_CALL lua_debug_get_source(lua_Debug &instance) = 0;
-    virtual char const * CS_LUA_STUDIO_BACKEND_CALL lua_debug_get_short_source(lua_Debug &instance) = 0;
-    virtual int CS_LUA_STUDIO_BACKEND_CALL lua_debug_get_current_line(lua_Debug &instance) = 0;
-    virtual void CS_LUA_STUDIO_BACKEND_CALL log(log_message_types message_type, char const *message) = 0;
-    virtual bool CS_LUA_STUDIO_BACKEND_CALL type_to_string(char *buffer, unsigned int size, lua_State *state, int index, bool &use_in_description) = 0;
-    virtual bool CS_LUA_STUDIO_BACKEND_CALL value_to_string(cs::lua_studio::backend &backend, char *buffer, unsigned int size, lua_State *state, int index, icon_type &icon_type, bool full_description) = 0;
-    virtual bool CS_LUA_STUDIO_BACKEND_CALL push_value(lua_State *state, char const *id, icon_type icon_type) = 0;
-    virtual bool CS_LUA_STUDIO_BACKEND_CALL expand_value(cs::lua_studio::backend &backend, cs::lua_studio::value_to_expand &value, lua_State *state) = 0;
+    bool lua_typestring(lua_State* L, int n) { return this->lua_type(L, n) == lua_type_string; }
+    bool lua_typenumber(lua_State* L, int n) { return this->lua_type(L, n) == lua_type_number; }
+    bool lua_is_table(lua_State* L, int n) { return lua_type(L, n) == lua_type_table; }
+    bool lua_is_nil(lua_State* L, int n) { return lua_type(L, n) == lua_type_nil; }
+    void lua_new_table(lua_State* L) { lua_createtable(L, 0, 0); }
+    void lua_pop_value(lua_State* L, int n) { lua_settop(L, -n - 1); }
+    void lua_push_c_function(lua_State* L, lua_CFunction fn) { lua_pushcclosure(L, fn, 0); }
+    const char* lua_to_string(lua_State* L, int n) { return lua_tolstring(L, n, nullptr); }
+    virtual lua_Debug* CS_LUA_STUDIO_BACKEND_CALL lua_debug_create() = 0;
+    virtual void CS_LUA_STUDIO_BACKEND_CALL lua_debug_destroy(lua_Debug*& instance) = 0;
+    virtual char const* CS_LUA_STUDIO_BACKEND_CALL lua_debug_get_name(lua_Debug& instance) = 0;
+    virtual char const* CS_LUA_STUDIO_BACKEND_CALL lua_debug_get_source(lua_Debug& instance) = 0;
+    virtual char const* CS_LUA_STUDIO_BACKEND_CALL lua_debug_get_short_source(lua_Debug& instance) = 0;
+    virtual int CS_LUA_STUDIO_BACKEND_CALL lua_debug_get_current_line(lua_Debug& instance) = 0;
+    virtual void CS_LUA_STUDIO_BACKEND_CALL log(log_message_types message_type, char const* message) = 0;
+    virtual bool CS_LUA_STUDIO_BACKEND_CALL type_to_string(
+        char* buffer, unsigned int size, lua_State* state, int index, bool& use_in_description) = 0;
+    virtual bool CS_LUA_STUDIO_BACKEND_CALL value_to_string(cs::lua_studio::backend& backend, char* buffer,
+        unsigned int size, lua_State* state, int index, icon_type& icon_type, bool full_description) = 0;
+    virtual bool CS_LUA_STUDIO_BACKEND_CALL push_value(lua_State* state, char const* id, icon_type icon_type) = 0;
+    virtual bool CS_LUA_STUDIO_BACKEND_CALL expand_value(
+        cs::lua_studio::backend& backend, cs::lua_studio::value_to_expand& value, lua_State* state) = 0;
 };
-} // namespace lua_studio
-} // namespace cs
+}  // namespace lua_studio
+}  // namespace cs

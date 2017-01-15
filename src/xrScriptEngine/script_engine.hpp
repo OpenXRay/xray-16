@@ -8,10 +8,10 @@
 
 #pragma once
 #include "xrCore/xrCore.h"
-#include "xrScriptEngine/xrScriptEngine.hpp"
+#include "xrScriptEngine/Functor.hpp"
 #include "xrScriptEngine/ScriptExporter.hpp"
 #include "xrScriptEngine/script_space_forward.hpp"
-#include "xrScriptEngine/Functor.hpp"
+#include "xrScriptEngine/xrScriptEngine.hpp"
 
 struct lua_State;
 
@@ -69,34 +69,34 @@ class XRSCRIPTENGINE_API CScriptEngine
 {
 public:
     typedef AssociativeVector<ScriptProcessor, CScriptProcess*> CScriptProcessStorage;
-    static const char *const GlobalNamespace;
+    static const char* const GlobalNamespace;
 
 private:
     static Lock stateMapLock;
-    static xr_hash_map<lua_State*, CScriptEngine*> *stateMap;
-    lua_State *m_virtual_machine;
-    CScriptThread *m_current_thread;
+    static xr_hash_map<lua_State*, CScriptEngine*>* stateMap;
+    lua_State* m_virtual_machine;
+    CScriptThread* m_current_thread;
     bool m_reload_modules;
     string128 m_last_no_file;
     u32 m_last_no_file_length;
     static string4096 g_ca_stdout;
     bool logReenterability = false;
     bool bindingsDumped = false;
-    char *scriptBuffer = nullptr;
+    char* scriptBuffer = nullptr;
     size_t scriptBufferSize = 0;
 
 protected:
     CScriptProcessStorage m_script_processes;
     int m_stack_level;
 #ifdef DEBUG
-    CMemoryWriter m_output; // for call stack
+    CMemoryWriter m_output;  // for call stack
 #endif
 #ifdef USE_DEBUGGER
 #ifndef USE_LUA_STUDIO
-    CScriptDebugger *m_scriptDebugger;
+    CScriptDebugger* m_scriptDebugger;
 #else
-    cs::lua_studio::world *m_lua_studio_world;
-    lua_studio_engine *m_lua_studio_engine;
+    cs::lua_studio::world* m_lua_studio_world;
+    lua_studio_engine* m_lua_studio_engine;
 #endif
 #endif
 
@@ -106,9 +106,9 @@ public:
 #endif
 
 private:
-    static CScriptEngine *GetInstance(lua_State *state);
-    static bool RegisterState(lua_State *state, CScriptEngine *scriptEngine);
-    static bool UnregisterState(lua_State *state);
+    static CScriptEngine* GetInstance(lua_State* state);
+    static bool RegisterState(lua_State* state, CScriptEngine* scriptEngine);
+    static bool UnregisterState(lua_State* state);
     bool no_file_exists(LPCSTR file_name, u32 string_length);
     void add_no_file(LPCSTR file_name, u32 string_length);
 
@@ -119,14 +119,15 @@ protected:
     void reinit();
 
 public:
-    lua_State *lua() { return m_virtual_machine; }
-    void current_thread(CScriptThread *thread)
+    lua_State* lua() { return m_virtual_machine; }
+    void current_thread(CScriptThread* thread)
     {
         VERIFY(thread && !m_current_thread || !thread);
         m_current_thread = thread;
     }
-    CScriptThread *current_thread() const { return m_current_thread; }
-    bool load_buffer(lua_State *L, LPCSTR caBuffer, size_t tSize, LPCSTR caScriptName, LPCSTR caNameSpaceName = nullptr);
+    CScriptThread* current_thread() const { return m_current_thread; }
+    bool load_buffer(
+        lua_State* L, LPCSTR caBuffer, size_t tSize, LPCSTR caScriptName, LPCSTR caNameSpaceName = nullptr);
     bool load_file_into_namespace(LPCSTR caScriptName, LPCSTR caNamespaceName);
     bool namespace_loaded(LPCSTR caName, bool remove_from_stack = true);
     // check if object exists
@@ -135,11 +136,13 @@ public:
     luabind::object name_space(LPCSTR namespace_name);
     int error_log(LPCSTR caFormat, ...);
     int script_log(LuaMessageType message, LPCSTR caFormat, ...);
-    static bool print_output(lua_State *L, LPCSTR caScriptName, int iErrorCode = 0);
+    static bool print_output(lua_State* L, LPCSTR caScriptName, int iErrorCode = 0);
+
 private:
-    static void print_error(lua_State *L, int iErrorCode);
+    static void print_error(lua_State* L, int iErrorCode);
+
 public:
-    static void on_error(lua_State *state);
+    static void on_error(lua_State* state);
 #ifdef DEBUG
     void flush_log();
     void print_stack();
@@ -149,57 +152,56 @@ public:
     virtual ~CScriptEngine();
     void init(ExporterFunc exporterFunc, bool loadGlobalNamespace);
     virtual void unload();
-    static int lua_panic(lua_State *L);
-    static void lua_error(lua_State *L);
-    static int lua_pcall_failed(lua_State *L);
+    static int lua_panic(lua_State* L);
+    static void lua_error(lua_State* L);
+    static int lua_pcall_failed(lua_State* L);
 #if !XRAY_EXCEPTIONS
-    static void lua_cast_failed(lua_State *L, const luabind::type_id &info);
+    static void lua_cast_failed(lua_State* L, const luabind::type_id& info);
 #endif
 #ifdef DEBUG
-    static void lua_hook_call(lua_State *L, lua_Debug *dbg);
+    static void lua_hook_call(lua_State* L, lua_Debug* dbg);
 #endif
     void setup_callbacks();
-    bool load_file(const char *scriptName, const char *namespaceName);
-    CScriptProcess *script_process(const ScriptProcessor &process_id) const;
-    void add_script_process(const ScriptProcessor &process_id, CScriptProcess *script_process);
-    void remove_script_process(const ScriptProcessor &process_id);
-    static int auto_load(lua_State *L);
+    bool load_file(const char* scriptName, const char* namespaceName);
+    CScriptProcess* script_process(const ScriptProcessor& process_id) const;
+    void add_script_process(const ScriptProcessor& process_id, CScriptProcess* script_process);
+    void remove_script_process(const ScriptProcessor& process_id);
+    static int auto_load(lua_State* L);
     void setup_auto_load();
     bool process_file_if_exists(LPCSTR file_name, bool warn_if_not_exist);
     bool process_file(LPCSTR file_name);
     bool process_file(LPCSTR file_name, bool reload_modules);
-    bool function_object(LPCSTR function_to_call, luabind::object &object, int type = LUA_TFUNCTION);
-    void parse_script_namespace(const char *name, char *ns, u32 nsSize, char *func, u32 funcSize);
-    template<typename TResult>
-    IC bool functor(LPCSTR function_to_call, luabind::functor<TResult> &lua_function);
+    bool function_object(LPCSTR function_to_call, luabind::object& object, int type = LUA_TFUNCTION);
+    void parse_script_namespace(const char* name, char* ns, u32 nsSize, char* func, u32 funcSize);
+    template <typename TResult>
+    IC bool functor(LPCSTR function_to_call, luabind::functor<TResult>& lua_function);
 #ifdef USE_DEBUGGER
 #ifndef USE_LUA_STUDIO
     void stopDebugger();
     void restartDebugger();
-    CScriptDebugger *debugger() { return m_scriptDebugger; }
+    CScriptDebugger* debugger() { return m_scriptDebugger; }
 #else
     void try_connect_to_debugger();
     void disconnect_from_debugger();
-    cs::lua_studio::world *debugger() const { return m_lua_studio_world; }
-    void initialize_lua_studio(lua_State *state, cs::lua_studio::world *&world, lua_studio_engine *&engine);
-    void finalize_lua_studio(lua_State *state, cs::lua_studio::world *&world, lua_studio_engine *&engine);
+    cs::lua_studio::world* debugger() const { return m_lua_studio_world; }
+    void initialize_lua_studio(lua_State* state, cs::lua_studio::world*& world, lua_studio_engine*& engine);
+    void finalize_lua_studio(lua_State* state, cs::lua_studio::world*& world, lua_studio_engine*& engine);
 #endif
 #endif
     void collect_all_garbage();
     static u32 GetMemoryUsage();
 
-    CScriptProcess *CreateScriptProcess(shared_str name, shared_str scripts);
-    CScriptThread *CreateScriptThread(LPCSTR caNamespaceName, bool do_string = false, bool reload = false);
+    CScriptProcess* CreateScriptProcess(shared_str name, shared_str scripts);
+    CScriptThread* CreateScriptThread(LPCSTR caNamespaceName, bool do_string = false, bool reload = false);
     // This function is called from CScriptThread destructor
-    void DestroyScriptThread(const CScriptThread *thread);
+    void DestroyScriptThread(const CScriptThread* thread);
 };
 
-template<typename TResult>
-IC bool CScriptEngine::functor(LPCSTR function_to_call, luabind::functor<TResult> &lua_function)
+template <typename TResult>
+IC bool CScriptEngine::functor(LPCSTR function_to_call, luabind::functor<TResult>& lua_function)
 {
     luabind::object object;
-    if (!function_object(function_to_call, object))
-        return false;
+    if (!function_object(function_to_call, object)) return false;
     lua_function = object;
     return true;
 }
