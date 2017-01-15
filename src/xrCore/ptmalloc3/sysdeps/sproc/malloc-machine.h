@@ -25,26 +25,32 @@ PERFORMANCE OF THIS SOFTWARE.
 #ifndef _SPROC_MALLOC_MACHINE_H
 #define _SPROC_MALLOC_MACHINE_H
 
-#include <sys/wait.h>
-#include <sys/types.h>
-#include <sys/prctl.h>
 #include <abi_mutex.h>
+#include <sys/prctl.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
 typedef abilock_t mutex_t;
 
-#define MUTEX_INITIALIZER          { 0 }
-#define mutex_init(m)              init_lock(m)
-#define mutex_lock(m)              (spin_lock(m), 0)
-#define mutex_trylock(m)           acquire_lock(m)
-#define mutex_unlock(m)            release_lock(m)
+#define MUTEX_INITIALIZER                                                                                              \
+    {                                                                                                                  \
+        0                                                                                                              \
+    }
+#define mutex_init(m) init_lock(m)
+#define mutex_lock(m) (spin_lock(m), 0)
+#define mutex_trylock(m) acquire_lock(m)
+#define mutex_unlock(m) release_lock(m)
 
 typedef int tsd_key_t;
 int tsd_key_next;
 #define tsd_key_create(key, destr) ((*key) = tsd_key_next++)
-#define tsd_setspecific(key, data) (((void **)(&PRDA->usr_prda))[key] = data)
-#define tsd_getspecific(key, vptr) (vptr = ((void **)(&PRDA->usr_prda))[key])
+#define tsd_setspecific(key, data) (((void**)(&PRDA->usr_prda))[key] = data)
+#define tsd_getspecific(key, vptr) (vptr = ((void**)(&PRDA->usr_prda))[key])
 
-#define thread_atfork(prepare, parent, child) do {} while(0)
+#define thread_atfork(prepare, parent, child)                                                                          \
+    do                                                                                                                 \
+    {                                                                                                                  \
+    } while (0)
 
 #include <sysdeps/generic/malloc-machine.h>
 

@@ -26,48 +26,53 @@
 #if 1
 typedef volatile long mutex_t;
 
-#define MUTEX_INITIALIZER          0
-#define mutex_init(m)              (*(m) = 0)
-#define mutex_lock(m)              slwait(m)
-#define mutex_trylock(m)           sltrywait(m)
-#define mutex_unlock(m)            slrelease(m)
+#define MUTEX_INITIALIZER 0
+#define mutex_init(m) (*(m) = 0)
+#define mutex_lock(m) slwait(m)
+#define mutex_trylock(m) sltrywait(m)
+#define mutex_unlock(m) slrelease(m)
 #else
 /* This won't work on Windows 9x. Can't say I personally care (crappy OS) */
 typedef CRITICAL_SECTION mutex_t;
 
-#define MUTEX_INITIALIZER          { 0 }
-#define mutex_init(m)              (!InitializeCriticalSectionAndSpinCount(m, 4000))
-#define mutex_lock(m)              (EnterCriticalSection(m), 0)
-#define mutex_trylock(m)           (!TryEnterCriticalSection(m))
-#define mutex_unlock(m)            (LeaveCriticalSection(m), 0)
+#define MUTEX_INITIALIZER                                                                                              \
+    {                                                                                                                  \
+        0                                                                                                              \
+    }
+#define mutex_init(m) (!InitializeCriticalSectionAndSpinCount(m, 4000))
+#define mutex_lock(m) (EnterCriticalSection(m), 0)
+#define mutex_trylock(m) (!TryEnterCriticalSection(m))
+#define mutex_unlock(m) (LeaveCriticalSection(m), 0)
 #endif
 
 typedef DWORD tsd_key_t;
-#define tsd_key_create(key, destr) (*(key)=TlsAlloc(), TLS_OUT_OF_INDEXES!=(*key))
+#define tsd_key_create(key, destr) (*(key) = TlsAlloc(), TLS_OUT_OF_INDEXES != (*key))
 #define tsd_setspecific(key, data) (!TlsSetValue(key, data))
 #define tsd_getspecific(key, vptr) (vptr = TlsGetValue(key))
 
-#define thread_atfork(prepare, parent, child) do {} while(0)
-
+#define thread_atfork(prepare, parent, child)                                                                          \
+    do                                                                                                                 \
+    {                                                                                                                  \
+    } while (0)
 
 #ifndef atomic_full_barrier
-# if defined(__GNUC__)
-#  define atomic_full_barrier() __asm ("" ::: "memory")
-# else
-#  define atomic_full_barrier()
-# endif
+#if defined(__GNUC__)
+#define atomic_full_barrier() __asm("" ::: "memory")
+#else
+#define atomic_full_barrier()
+#endif
 #endif
 
 #ifndef atomic_read_barrier
-# define atomic_read_barrier() atomic_full_barrier ()
+#define atomic_read_barrier() atomic_full_barrier()
 #endif
 
 #ifndef atomic_write_barrier
-# define atomic_write_barrier() atomic_full_barrier ()
+#define atomic_write_barrier() atomic_full_barrier()
 #endif
 
 #ifndef DEFAULT_TOP_PAD
-# define DEFAULT_TOP_PAD 131072
+#define DEFAULT_TOP_PAD 131072
 #endif
 
 #endif /* !defined(_WIN32_MALLOC_MACHINE_H) */

@@ -37,7 +37,7 @@ struct SChooseItem
 {
     shared_str name;
     shared_str hint;
-    SChooseItem(LPCSTR nm, LPCSTR ht) :name(nm), hint(ht) {}
+    SChooseItem(LPCSTR nm, LPCSTR ht) : name(nm), hint(ht) {}
 };
 DEFINE_VECTOR(SChooseItem, ChooseItemVec, ChooseItemVecIt);
 
@@ -47,7 +47,7 @@ typedef fastdelegate::FastDelegate2<SChooseItem*, PropItemVec&> TOnChooseSelectI
 typedef fastdelegate::FastDelegate3<LPCSTR, HDC, const Irect&> TOnDrawThumbnail;
 typedef fastdelegate::FastDelegate0<> TOnChooseClose;
 
-typedef void(*TOnChooseFillEvents)();
+typedef void (*TOnChooseFillEvents)();
 
 struct SChooseEvents
 {
@@ -61,8 +61,13 @@ struct SChooseEvents
     TOnDrawThumbnail on_thm;
     TOnChooseClose on_close;
     Flags32 flags;
-    SChooseEvents() { caption = "Select Item"; flags.zero(); }
-    SChooseEvents(LPCSTR capt, TOnChooseFillItems f, TOnChooseSelectItem s, TOnDrawThumbnail t, TOnChooseClose c, u32 fl)
+    SChooseEvents()
+    {
+        caption = "Select Item";
+        flags.zero();
+    }
+    SChooseEvents(
+        LPCSTR capt, TOnChooseFillItems f, TOnChooseSelectItem s, TOnDrawThumbnail t, TOnChooseClose c, u32 fl)
     {
         Set(capt, f, s, t, c, fl);
     }

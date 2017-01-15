@@ -31,13 +31,13 @@ XRCORE_API extern u64 QPC();
 
 #ifdef M_VISUAL
 #ifndef _M_AMD64
-#pragma warning(disable:4035)
+#pragma warning(disable : 4035)
 IC u64 GetCLK(void)
 {
     _asm _emit 0x0F;
     _asm _emit 0x31;
 }
-#pragma warning(default:4035)
+#pragma warning(default : 4035)
 #else
 IC u64 GetCLK(void)
 {
@@ -47,7 +47,7 @@ IC u64 GetCLK(void)
 #endif
 
 #ifdef M_BORLAND
-XRCORE_API u64 __fastcall GetCLK (void);
+XRCORE_API u64 __fastcall GetCLK(void);
 #endif
 };
 
@@ -57,11 +57,6 @@ extern XRCORE_API void _initialize_cpu_thread();
 // threading
 typedef void thread_t(void*);
 extern XRCORE_API void thread_name(const char* name);
-extern XRCORE_API void thread_spawn(
-    thread_t* entry,
-    const char* name,
-    unsigned stack,
-    void* arglist
-);
+extern XRCORE_API void thread_spawn(thread_t* entry, const char* name, unsigned stack, void* arglist);
 
-#endif //__XR_MATH_H__
+#endif  //__XR_MATH_H__

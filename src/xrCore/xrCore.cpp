@@ -5,15 +5,15 @@
 
 #include <mmsystem.h>
 #include <objbase.h>
-#include "xrCore.h"
-#include "Threading/ttapi.h"
 #include "Math/MathUtil.hpp"
+#include "Threading/ttapi.h"
+#include "xrCore.h"
 
-#pragma comment(lib,"winmm.lib")
+#pragma comment(lib, "winmm.lib")
 
 #ifdef DEBUG
-# include <malloc.h>
-#endif // DEBUG
+#include <malloc.h>
+#endif  // DEBUG
 
 XRCORE_API xrCore Core;
 
@@ -29,14 +29,12 @@ static u32 init_counter = 0;
 void xrCore::_initialize(LPCSTR _ApplicationName, LogCallback cb, BOOL init_fs, LPCSTR fs_fname, bool plugin)
 {
     xr_strcpy(ApplicationName, _ApplicationName);
-    if (0 == init_counter)
-    {
+    if (0 == init_counter) {
         PluginMode = plugin;
         // Init COM so we can use CoCreateInstance
         // HRESULT co_res =
         Params = xr_strdup(GetCommandLine());
-        if (!strstr(Params, "-editor"))
-            CoInitializeEx(NULL, COINIT_MULTITHREADED);
+        if (!strstr(Params, "-editor")) CoInitializeEx(NULL, COINIT_MULTITHREADED);
 
         string_path fn, dr, di;
 
@@ -47,8 +45,7 @@ void xrCore::_initialize(LPCSTR _ApplicationName, LogCallback cb, BOOL init_fs, 
 
 #ifdef _EDITOR
         // working path
-        if (strstr(Params, "-wf"))
-        {
+        if (strstr(Params, "-wf")) {
             string_path c_name;
             sscanf(strstr(Core.Params, "-wf ") + 4, "%[^ ] ", c_name);
             SetCurrentDirectory(c_name);
@@ -66,14 +63,14 @@ void xrCore::_initialize(LPCSTR _ApplicationName, LogCallback cb, BOOL init_fs, 
 
         // Mathematics & PSI detection
         CPU::Detect();
-        
+
         Memory._initialize(strstr(Params, "-mem_debug") ? TRUE : FALSE);
 
         DUMP_PHASE;
 
         InitLog();
         _initialize_cpu();
-        R_ASSERT(CPU::ID.feature&_CPU_FEATURE_SSE);
+        R_ASSERT(CPU::ID.feature & _CPU_FEATURE_SSE);
         ttapi_Init(CPU::ID);
         XRay::Math::Initialize();
         // xrDebug::Initialize ();
@@ -85,18 +82,19 @@ void xrCore::_initialize(LPCSTR _ApplicationName, LogCallback cb, BOOL init_fs, 
         xr_EFS = new EFS_Utils();
         //. R_ASSERT (co_res==S_OK);
     }
-    if (init_fs)
-    {
+    if (init_fs) {
         u32 flags = 0;
         if (0 != strstr(Params, "-build")) flags |= CLocatorAPI::flBuildCopy;
         if (0 != strstr(Params, "-ebuild")) flags |= CLocatorAPI::flBuildCopy | CLocatorAPI::flEBuildCopy;
 #ifdef DEBUG
-        if (strstr(Params, "-cache")) flags |= CLocatorAPI::flCacheFiles;
-        else flags &= ~CLocatorAPI::flCacheFiles;
-#endif // DEBUG
-#ifdef _EDITOR // for EDITORS - no cache
+        if (strstr(Params, "-cache"))
+            flags |= CLocatorAPI::flCacheFiles;
+        else
+            flags &= ~CLocatorAPI::flCacheFiles;
+#endif          // DEBUG
+#ifdef _EDITOR  // for EDITORS - no cache
         flags &= ~CLocatorAPI::flCacheFiles;
-#endif // _EDITOR
+#endif  // _EDITOR
         flags |= CLocatorAPI::flScanAppRoot;
 
 #ifndef _EDITOR
@@ -112,7 +110,7 @@ void xrCore::_initialize(LPCSTR _ApplicationName, LogCallback cb, BOOL init_fs, 
 #ifndef _EDITOR
         Msg("Process heap 0x%08x", GetProcessHeap());
 #endif
-#endif // DEBUG
+#endif  // DEBUG
     }
     SetLogCB(cb);
     init_counter++;
@@ -125,8 +123,7 @@ extern compression::ppmd::stream* trained_model;
 void xrCore::_destroy()
 {
     --init_counter;
-    if (0 == init_counter)
-    {
+    if (0 == init_counter) {
         ttapi_Done();
         FS._destroy();
         EFS._destroy();
@@ -134,8 +131,7 @@ void xrCore::_destroy()
         xr_delete(xr_EFS);
 
 #ifndef _EDITOR
-        if (trained_model)
-        {
+        if (trained_model) {
             void* buffer = trained_model->buffer();
             xr_free(buffer);
             xr_delete(trained_model);
@@ -151,14 +147,8 @@ void xrCore::CalculateBuildId()
     const int startDay = 31;
     const int startMonth = 1;
     const int startYear = 1999;
-    const char *monthId[12] =
-    {
-        "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-    };
-    const int daysInMonth[12] =
-    {
-        31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31
-    };
+    const char* monthId[12] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+    const int daysInMonth[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
     buildDate = __DATE__;
     int days;
     int months = 0;
@@ -167,17 +157,16 @@ void xrCore::CalculateBuildId()
     string256 buffer;
     xr_strcpy(buffer, buildDate);
     sscanf(buffer, "%s %d %d", month, &days, &years);
-    for (int i = 0; i<12; i++)
+    for (int i = 0; i < 12; i++)
     {
-        if (_stricmp(monthId[i], month))
-            continue;
+        if (_stricmp(monthId[i], month)) continue;
         months = i;
         break;
     }
-    buildId = (years- startYear)*365+days-startDay;
-    for (int i = 0; i<months; i++)
+    buildId = (years - startYear) * 365 + days - startDay;
+    for (int i = 0; i < months; i++)
         buildId += daysInMonth[i];
-    for (int i = 0; i<startMonth-1; i++)
+    for (int i = 0; i < startMonth - 1; i++)
         buildId -= daysInMonth[i];
 }
 
@@ -198,19 +187,17 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD ul_reason_for_call, LPVOID lpvRese
         _control87(_RC_NEAR, MCW_RC);
         _control87(_MCW_EM, MCW_EM);
     }
-        //. LogFile.reserve (256);
+    //. LogFile.reserve (256);
     break;
     case DLL_THREAD_ATTACH:
-        if (!strstr(GetCommandLine(), "-editor"))
-            CoInitializeEx(NULL, COINIT_MULTITHREADED);
+        if (!strstr(GetCommandLine(), "-editor")) CoInitializeEx(NULL, COINIT_MULTITHREADED);
         timeBeginPeriod(1);
         break;
-    case DLL_THREAD_DETACH:
-        break;
+    case DLL_THREAD_DETACH: break;
     case DLL_PROCESS_DETACH:
 #ifdef USE_MEMORY_MONITOR
         memory_monitor::flush_each_time(true);
-#endif // USE_MEMORY_MONITOR
+#endif  // USE_MEMORY_MONITOR
         break;
     }
     return TRUE;

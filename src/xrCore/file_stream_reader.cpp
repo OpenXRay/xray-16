@@ -1,5 +1,5 @@
-#include "stdafx.h"
 #include "file_stream_reader.h"
+#include "stdafx.h"
 
 void CFileStreamReader::construct(LPCSTR file_name, const u32& window_size)
 {

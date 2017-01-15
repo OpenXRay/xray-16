@@ -1,12 +1,11 @@
 #pragma once
-#include "xrCore/xrCore.h"
 #include "xrCore/FS.h"
+#include "xrCore/xrCore.h"
 
 namespace XRay
 {
 namespace Media
 {
-
 enum class ImageFormat : u32
 {
     Unknown = 0,
@@ -38,7 +37,7 @@ private:
     ImageFormat format;
     int channelCount;
     u16 width, height;
-    void *data;
+    void* data;
 
 public:
     Image()
@@ -50,17 +49,15 @@ public:
     }
 
     ~Image() {}
-
-    Image &Create(u16 width, u16 height, void *data, ImageFormat format);
-    void SaveTGA(IWriter &writer, bool align);
-    void SaveTGA(IWriter &writer, ImageFormat format, bool align);
-    void SaveTGA(const char *name, bool align);
-    void SaveTGA(const char *name, ImageFormat format, bool align);
+    Image& Create(u16 width, u16 height, void* data, ImageFormat format);
+    void SaveTGA(IWriter& writer, bool align);
+    void SaveTGA(IWriter& writer, ImageFormat format, bool align);
+    void SaveTGA(const char* name, bool align);
+    void SaveTGA(const char* name, ImageFormat format, bool align);
 
 private:
-    template<typename TWriter>
-    void SaveTGA(TWriter &writer, ImageFormat format, bool align);
+    template <typename TWriter>
+    void SaveTGA(TWriter& writer, ImageFormat format, bool align);
 };
-
 }
 }
