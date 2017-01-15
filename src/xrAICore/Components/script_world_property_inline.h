@@ -8,7 +8,7 @@
 
 #pragma once
 
-//IC	CScriptWorldProperty::CScriptWorldProperty	(const _condition_type condition, const _value_type value) :
+// IC	CScriptWorldProperty::CScriptWorldProperty	(const _condition_type condition, const _value_type value) :
 //	inherited	(condition,value)
 //{
 //}
