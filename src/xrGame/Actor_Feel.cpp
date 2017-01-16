@@ -64,11 +64,11 @@ ICF static BOOL info_trace_callback(collide::rq_result& result, LPVOID params)
 {
     BOOL& bOverlaped = *(BOOL*)params;
     if (result.O) {
-        if (Level().CurrentEntity() == result.O) {  // ignore self-actor
+        if (Level().CurrentEntity() == result.O) { // ignore self-actor
             return TRUE;
         }
         else
-        {  // check obstacle flag
+        { // check obstacle flag
             if (result.O->GetSpatialData().type & STYPE_OBSTACLE) bOverlaped = TRUE;
 
             return TRUE;
@@ -106,7 +106,7 @@ BOOL CActor::CanPickItem(const CFrustum& frustum, const Fvector& from, IGameObje
 
 void CActor::PickupModeUpdate()
 {
-    if (!m_bPickupMode) return;  // kUSE key pressed
+    if (!m_bPickupMode) return; // kUSE key pressed
     if (!IsGameTypeSingle()) return;
 
     //подбирание объекта
@@ -296,7 +296,7 @@ void CActor::Feel_Grenade_Update(float rad)
     // select only grenade
     for (; it_b != it_e; ++it_b)
     {
-        if ((*it_b)->getDestroy()) continue;  // Don't touch candidates for destroy
+        if ((*it_b)->getDestroy()) continue; // Don't touch candidates for destroy
 
         CGrenade* grn = smart_cast<CGrenade*>(*it_b);
         if (!grn || grn->Initiator() == ID() || grn->Useful()) {
@@ -308,7 +308,7 @@ void CActor::Feel_Grenade_Update(float rad)
         if (HUD().AddGrenade_ForMark(grn)) {
             //.	Msg("__ __ Add new grenade! id = %d ", grn->ID() );
         }
-    }  // for it
+    } // for it
 
     HUD().Update_GrenadeView(pos_actor);
 }

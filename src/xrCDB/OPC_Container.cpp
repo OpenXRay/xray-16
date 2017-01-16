@@ -90,7 +90,7 @@ bool Container::Resize(udword needed)
 #endif
 
     // Get more entries
-    mMaxNbEntries = mMaxNbEntries ? udword(float(mMaxNbEntries) * mGrowthFactor) : 2;  // Default nb Entries = 2
+    mMaxNbEntries = mMaxNbEntries ? udword(float(mMaxNbEntries) * mGrowthFactor) : 2; // Default nb Entries = 2
     if (mMaxNbEntries < mCurNbEntries + needed) mMaxNbEntries = mCurNbEntries + needed;
 
     // Get some bytes for _new_ entries

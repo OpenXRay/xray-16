@@ -22,7 +22,7 @@ class FileStatus
 {
 public:
     bool Exists;
-    bool External;  // File can be accessed only as external
+    bool External; // File can be accessed only as external
 
     inline FileStatus(bool exists, bool external)
     {
@@ -40,13 +40,13 @@ class XRCORE_API CLocatorAPI
 public:
     struct file
     {
-        LPCSTR name;          // low-case name
-        u32 vfs;              // 0xffffffff - standart file
-        u32 crc;              // contents CRC
-        u32 ptr;              // pointer inside vfs
-        u32 size_real;        //
-        u32 size_compressed;  // if (size_real==size_compressed) - uncompressed
-        u32 modif;            // for editor
+        LPCSTR name;         // low-case name
+        u32 vfs;             // 0xffffffff - standart file
+        u32 crc;             // contents CRC
+        u32 ptr;             // pointer inside vfs
+        u32 size_real;       //
+        u32 size_compressed; // if (size_real==size_compressed) - uncompressed
+        u32 modif;           // for editor
     };
     struct archive
     {

@@ -49,7 +49,7 @@ struct victim_raw_kill
     shared_str m_killer;
     shared_str m_victim;
     u32 m_after_time;
-};  // struct victim_raw_kill
+}; // struct victim_raw_kill
 
 void harvest_time::OnPlayerKilled(
     u16 killer_id, u16 target_id, u16 weapon_id, std::pair<KILL_TYPE, SPECIAL_KILL_TYPE> kill_type)
@@ -78,4 +78,4 @@ void harvest_time::OnPlayerSpawned(game_PlayerState const* ps)
     }
 }
 
-}  // namespace award_system
+} // namespace award_system

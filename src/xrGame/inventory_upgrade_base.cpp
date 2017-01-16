@@ -72,7 +72,7 @@ void UpgradeBase::test_all_upgrades( CInventoryItem& item )
     }
 }
 */
-#endif  // DEBUG
+#endif // DEBUG
 
 bool UpgradeBase::is_root()
 {
@@ -93,7 +93,7 @@ bool UpgradeBase::contain_upgrade(const shared_str& upgrade_id)
 void UpgradeBase::fill_root_container(Root* root)
 {
     //!=R_ASSERT2( 0, make_string( "! Can`t fill <%s> in <UpgradeBase::fill_root_container> for root = %s", id_str(),
-    //!root->id_str() ) );
+    //! root->id_str() ) );
     Groups_type::iterator ib = m_depended_groups.begin();
     Groups_type::iterator ie = m_depended_groups.end();
     for (; ib != ie; ++ib)
@@ -120,10 +120,10 @@ UpgradeStateResult UpgradeBase::can_install(CInventoryItem& item, bool loading)
             FATAL( make_string( "Loading item: Upgrade <%s> (id = %d) is installed already.", id_str(), item.object_id()
         ).c_str() );
         }*/
-        return result_e_installed;  // true
+        return result_e_installed; // true
     }
     return result_ok;
 }
 
-}  // namespace upgrade
-}  // namespace inventory
+} // namespace upgrade
+} // namespace inventory

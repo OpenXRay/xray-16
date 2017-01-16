@@ -23,10 +23,10 @@ public:
     ~smapvis();
 
     void invalidate();
-    void begin();  // should be called before 'marker++' and before graph-build
+    void begin(); // should be called before 'marker++' and before graph-build
     void end();
     void mark();
-    void flushoccq();  // should be called when no rendering of light is supposed
+    void flushoccq(); // should be called when no rendering of light is supposed
 
     void resetoccq();
 

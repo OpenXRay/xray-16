@@ -243,8 +243,9 @@ bool CAI_Stalker::bfAssignObject(CScriptEntityAction* tpEntityAction)
         //					l_tObjectAction.m_bCompleted = true;
         //			}
         //			else
-        //				ai().script_engine().script_log(LuaMessageType::Error,"cannot reload active item because it is not
-        //selected!");
+        //				ai().script_engine().script_log(LuaMessageType::Error,"cannot reload active item because it is
+        //not
+        // selected!");
         break;
     }
     case eObjectActionActivate:

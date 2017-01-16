@@ -231,7 +231,7 @@ IC void TW_Iterate_2OP(ID3DTexture2D* t_dst, ID3DTexture2D* t_src0, ID3DTexture2
 
 IC u32 it_gloss_rev(u32 d, u32 s)
 {
-    return color_rgba(color_get_A(s),  // gloss
+    return color_rgba(color_get_A(s), // gloss
         color_get_B(d), color_get_G(d), color_get_R(d));
 }
 IC u32 it_gloss_rev_base(u32 d, u32 s)
@@ -239,29 +239,29 @@ IC u32 it_gloss_rev_base(u32 d, u32 s)
     u32 occ = color_get_A(d) / 3;
     u32 def = 8;
     u32 gloss = (occ * 1 + def * 3) / 4;
-    return color_rgba(gloss,  // gloss
+    return color_rgba(gloss, // gloss
         color_get_B(d), color_get_G(d), color_get_R(d));
 }
 IC u32 it_difference(u32 d, u32 orig, u32 ucomp)
 {
-    return color_rgba(128 + (int(color_get_R(orig)) - int(color_get_R(ucomp))) * 2,  // R-error
-        128 + (int(color_get_G(orig)) - int(color_get_G(ucomp))) * 2,                // G-error
-        128 + (int(color_get_B(orig)) - int(color_get_B(ucomp))) * 2,                // B-error
-        128 + (int(color_get_A(orig)) - int(color_get_A(ucomp))) * 2);               // A-error
+    return color_rgba(128 + (int(color_get_R(orig)) - int(color_get_R(ucomp))) * 2, // R-error
+        128 + (int(color_get_G(orig)) - int(color_get_G(ucomp))) * 2,               // G-error
+        128 + (int(color_get_B(orig)) - int(color_get_B(ucomp))) * 2,               // B-error
+        128 + (int(color_get_A(orig)) - int(color_get_A(ucomp))) * 2);              // A-error
 }
 IC u32 it_height_rev(u32 d, u32 s)
 {
-    return color_rgba(color_get_A(d),  // diff x
-        color_get_B(d),                // diff y
-        color_get_G(d),                // diff z
-        color_get_R(s));               // height
+    return color_rgba(color_get_A(d), // diff x
+        color_get_B(d),               // diff y
+        color_get_G(d),               // diff z
+        color_get_R(s));              // height
 }
 IC u32 it_height_rev_base(u32 d, u32 s)
 {
-    return color_rgba(color_get_A(d),                             // diff x
-        color_get_B(d),                                           // diff y
-        color_get_G(d),                                           // diff z
-        (color_get_R(s) + color_get_G(s) + color_get_B(s)) / 3);  // height
+    return color_rgba(color_get_A(d),                            // diff x
+        color_get_B(d),                                          // diff y
+        color_get_G(d),                                          // diff z
+        (color_get_R(s) + color_get_G(s) + color_get_B(s)) / 3); // height
 }
 
 ID3DBaseTexture* CRender::texture_load(LPCSTR fRName, u32& ret_msize)
@@ -280,7 +280,7 @@ ID3DBaseTexture* CRender::texture_load(LPCSTR fRName, u32& ret_msize)
 
     // make file name
     string_path fname;
-    xr_strcpy(fname, fRName);  //. andy if (strext(fname)) *strext(fname)=0;
+    xr_strcpy(fname, fRName); //. andy if (strext(fname)) *strext(fname)=0;
     fix_texture_name(fname);
     IReader* S = NULL;
     // if (FS.exist(fn,"$game_textures$",fname,	".dds")	&& strstr(fname,"_bump"))	goto _BUMP;
@@ -309,7 +309,7 @@ _DDS:
     S = FS.r_open(fn);
 #ifdef DEBUG
     Msg("* Loaded: %s[%d]", fn, S->length());
-#endif  // DEBUG
+#endif // DEBUG
     img_size = S->length();
     R_ASSERT(S);
     HRESULT const result = D3DXGetImageInfoFromFileInMemory(S->pointer(), S->length(), &IMG);
@@ -531,7 +531,7 @@ _BUMP_from_base:
     strconcat(sizeof(fnameB), fnameB, "$user$", fname, "_bumpX");
     ref_texture t_temp = Resources->_CreateTexture(fnameB);
     t_temp->surface_set(T_normal_2C);
-    _RELEASE(T_normal_2C);  // texture should keep reference to it by itself
+    _RELEASE(T_normal_2C); // texture should keep reference to it by itself
 #endif
     // T_normal_1C	- normal.gloss,		reversed
     // T_normal_2C	- 2*error.height,	non-reversed

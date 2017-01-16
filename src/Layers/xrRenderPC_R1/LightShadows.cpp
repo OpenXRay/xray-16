@@ -12,11 +12,11 @@ using namespace XRay::Math;
 
 const float S_distance = 48;
 const float S_distance2 = S_distance * S_distance;
-const float S_ideal_size = 4.f;  // ideal size for the object
+const float S_ideal_size = 4.f; // ideal size for the object
 const float S_fade = 4.5;
 const float S_fade2 = S_fade * S_fade;
 
-const float S_level = .05f;  // clip by energy level
+const float S_level = .05f; // clip by energy level
 const int S_size = 85;
 const int S_rt_size = 512;
 const int batch_size = 256;
@@ -26,7 +26,7 @@ const int S_clip = 256 - 8;
 const D3DFORMAT S_rtf = D3DFMT_A8R8G8B8;
 const float S_blur_kernel = 0.75f;
 
-const u32 cache_old = 30 * 1000;  // 30 secs
+const u32 cache_old = 30 * 1000; // 30 secs
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -146,7 +146,7 @@ void CLightShadows::calculate()
 {
 #ifdef _GPA_ENABLED
     TAL_SCOPED_TASK_NAMED("CLightShadows::calculate()");
-#endif  // _GPA_ENABLED
+#endif // _GPA_ENABLED
 
     if (casters.empty()) return;
 
@@ -204,7 +204,7 @@ void CLightShadows::calculate()
                     _dist = C.C.distance_to(Lpos);
                     // Msg		("* o-dist: %f",	_dist);
                     if (_dist > EPS_L) break;
-                    Lpos.y += .01f;  //. hack to avoid light-in-the-center-of-object
+                    Lpos.y += .01f; //. hack to avoid light-in-the-center-of-object
                 }
                 float _R = C.O->GetRenderData().visual->getVisData().sphere.R + 0.1f;
                 // Msg	("* o-r: %f",_R);
@@ -330,7 +330,7 @@ IC bool cache_search(const CLightShadows::cache_item& A, const CLightShadows::ca
     if (A.O > B.O) return false;
     if (A.L < B.L) return true;
     if (A.L > B.L) return false;
-    return false;  // eq
+    return false; // eq
 }
 
 IC float PLC_energy(Fvector& P, Fvector& N, light* L, float E)
@@ -426,14 +426,14 @@ void CLightShadows::render()
         CI_what.L = S.L;
         CI_what.tris = 0;
         xr_vector<cache_item>::iterator CI_ptr = std::lower_bound(cache.begin(), cache.end(), CI_what, cache_search);
-        if (CI_ptr == cache.end()) {  // empty ?
+        if (CI_ptr == cache.end()) { // empty ?
             CI_ptr = cache.insert(CI_ptr, CI_what);
             CI = &*CI_ptr;
             bValid = FALSE;
         }
         else
         {
-            if (CI_ptr->O != CI_what.O || CI_ptr->L != CI_what.L) {  // we found something different
+            if (CI_ptr->O != CI_what.O || CI_ptr->L != CI_what.L) { // we found something different
                 CI_ptr = cache.insert(CI_ptr, CI_what);
                 CI = &*CI_ptr;
                 bValid = FALSE;
@@ -449,7 +449,7 @@ void CLightShadows::render()
                     bValid = FALSE;
             }
         }
-        CI->time = Device.dwTimeGlobal;  // acess time
+        CI->time = Device.dwTimeGlobal; // acess time
 
         if (!bValid) {
             // Frustum

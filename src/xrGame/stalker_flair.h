@@ -26,12 +26,12 @@ public:
 protected:
     u32 m_art_spawn_time;
     u32 m_art_take_time;
-};  // class stalker_flair
+}; // class stalker_flair
 
 ADD_ACCUMULATIVE_STATE(acpv_stalker_flair, stalker_flair);
 #undef ACCUMULATIVE_STATE_LIST
 #define ACCUMULATIVE_STATE_LIST SAVE_TYPE_LIST(acpv_stalker_flair, stalker_flair)
 
-}  // namespace award_system
+} // namespace award_system
 
-#endif  //#ifndef PLAYER_STATE_BLITZKRIEG_INCLUDED
+#endif //#ifndef PLAYER_STATE_BLITZKRIEG_INCLUDED

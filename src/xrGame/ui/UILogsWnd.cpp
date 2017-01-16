@@ -278,7 +278,7 @@ void CUILogsWnd::PrevPeriod(CUIWindow* w, void* d)
 void CUILogsWnd::NextPeriod(CUIWindow* w, void* d)
 {
     ALife::_TIME_ID current_period = m_selected_period;
-    m_selected_period = GetShiftPeriod(m_selected_period, 1);  // +1
+    m_selected_period = GetShiftPeriod(m_selected_period, 1); // +1
     ALife::_TIME_ID game_time = GetShiftPeriod(Level().GetGameTime(), 0);
     if (m_selected_period > game_time) {
         m_selected_period = game_time;
@@ -377,5 +377,5 @@ void CUILogsWnd::on_scroll_keys(int dik)
         m_list->ScrollBar()->TryScrollInc();
         break;
     }
-    }  // switch
+    } // switch
 }

@@ -13,7 +13,7 @@ struct subnet_item
             u8 a4;
         };
         u32 data;
-    } subnet_ip;  // IN NBO !!!
+    } subnet_ip; // IN NBO !!!
     u32 subnet_mask;
     subnet_item()
     {
@@ -36,4 +36,4 @@ public:
     bool is_ip_present(u32 ip_address);
 };
 
-#endif  //#ifndef NET_SERVER_IP_FILTER
+#endif //#ifndef NET_SERVER_IP_FILTER

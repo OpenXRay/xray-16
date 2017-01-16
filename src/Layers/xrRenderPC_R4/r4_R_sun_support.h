@@ -397,7 +397,7 @@ public:
         for (int it = 0; it < int(polys.size()); it++)
         {
             _poly& base = polys[it];
-            VERIFY(base.classify(cog) < 0);  // debug
+            VERIFY(base.classify(cog) < 0); // debug
 
             int marker = (base.planeN.dotproduct(direction) <= 0) ? -1 : 1;
 
@@ -440,8 +440,8 @@ public:
             int pend = int(points.size());
             P.points.push_back(E.p0);
             P.points.push_back(E.p1);
-            P.points.push_back(pend - 1);  // p1 mod
-            P.points.push_back(pend - 2);  // p0 mod
+            P.points.push_back(pend - 1); // p1 mod
+            P.points.push_back(pend - 2); // p0 mod
             if (_debug)
                 T.dbg_addline(points[E.p0], point.mad(points[E.p0], direction, -1000), color_rgba(0, 255, 0, 255));
             if (_debug)
@@ -467,4 +467,4 @@ public:
     }
 };
 
-#endif  //	r3_R_sun_support_included
+#endif //	r3_R_sun_support_included

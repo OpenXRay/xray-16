@@ -26,7 +26,7 @@ private:
     mp_sections_t m_mp_sections;
     mp_sections_t::const_iterator m_current_dump_sect;
     CInifile m_tmp_dumper;
-};  // class mp_config_sections
+}; // class mp_config_sections
 
 class mp_active_params
 {
@@ -34,10 +34,10 @@ public:
     mp_active_params();
     ~mp_active_params();
 
-    void dump(IAnticheatDumpable const* dumpable_obj, LPCSTR sect_name_key, CInifile& dest_dumper);  // for cheater
-    void load_to(LPCSTR sect_name, CInifile& dest_dumper);                                           // for verifyer
-};  // class mp_active_params
+    void dump(IAnticheatDumpable const* dumpable_obj, LPCSTR sect_name_key, CInifile& dest_dumper); // for cheater
+    void load_to(LPCSTR sect_name, CInifile& dest_dumper);                                          // for verifyer
+}; // class mp_active_params
 
-}  // namespace mp_anticheat
+} // namespace mp_anticheat
 
-#endif  //#ifndef MP_CONFIG_SECTIONS_INCLUDED
+#endif //#ifndef MP_CONFIG_SECTIONS_INCLUDED

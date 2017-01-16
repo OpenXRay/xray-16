@@ -42,4 +42,4 @@ public:
     virtual int stopSPU() = 0;
 };
 
-#endif  // THREAD_SUPPORT_INTERFACE_H
+#endif // THREAD_SUPPORT_INTERFACE_H

@@ -9,8 +9,8 @@ devsupport@gamespy.com
 */
 
 #ifdef XRAY_DISABLE_GAMESPY_WARNINGS
-#pragma warning(disable : 4244)  // lines: 130
-#endif                           //#ifdef XRAY_DISABLE_GAMESPY_WARNINGS
+#pragma warning(disable : 4244) // lines: 130
+#endif                          //#ifdef XRAY_DISABLE_GAMESPY_WARNINGS
 
 #include "gt2Utility.h"
 #include <stdio.h>
@@ -85,7 +85,7 @@ const char* gt2AddressToString(unsigned int ip, unsigned short port, char string
 
 GT2Bool gt2StringToAddress(const char* string, unsigned int* ip, unsigned short* port)
 {
-    unsigned int srcIP = 0;  // avoid use uninit condition
+    unsigned int srcIP = 0; // avoid use uninit condition
     unsigned short srcPort = 0;
 
     if (!string || !string[0]) {
@@ -175,13 +175,13 @@ gsi_u32 gti2MacToIp(const char* mac)
     GTI2MacEntry* entry;
     int i;
     gsi_u32 ip;
-    memcpy(&ip, mac, 4);  // store rest in table
+    memcpy(&ip, mac, 4); // store rest in table
 
     // find match in table
     for (i = 0; i < MAC_TABLE_SIZE; i++)
     {
         if (MacTable[i].ip == ip) {
-            return ip;  // already there, don't add to the table.
+            return ip; // already there, don't add to the table.
         }
     }
 
@@ -338,7 +338,7 @@ unsigned int** gt2StringToIPs(const char* string)
 ** INTERNAL FUNCTIONS **
 ***********************/
 
-#ifdef __MWERKS__  // CodeWarrior will warn if not prototyped
+#ifdef __MWERKS__ // CodeWarrior will warn if not prototyped
 void gti2MessageCheck(const GT2Byte** message, int* len);
 #endif
 

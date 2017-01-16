@@ -22,7 +22,7 @@ enum
     physics_state_enabled_flag = u32(1) << 14,
 #ifdef USE_LOGIC_ACCELERATION
     logic_acceleration_flag = u32(1) << 15,
-#endif  // USE_LOGIC_ACCELERATION
+#endif // USE_LOGIC_ACCELERATION
 };
 
 #if 0
@@ -32,7 +32,7 @@ enum {
 	is_camera_yaw_the_same_as_model_yaw	= u32(1) << 2,
 	is_physics_state_enabled			= u32(1) << 3,
 };
-#endif  // 0
+#endif // 0
 
 enum
 {
@@ -66,15 +66,15 @@ IC bool is_similar(const u16& _0, const u16& _1)
 {
     return (_0 == _1);
 }
-#endif  // USE_DIFFERENCES
+#endif // USE_DIFFERENCES
 
 IC bool actor_mp_state_holder::check(const int& flag) const
 {
 #ifdef USE_DIFFERENCES
     return (!!(m_mask & flag));
-#else   // USE_DIFFERENCES
+#else  // USE_DIFFERENCES
     return (true);
-#endif  // USE_DIFFERENCES
+#endif // USE_DIFFERENCES
 }
 
 IC void write(const u32& bit_count, const u32& value, u32& current, u32& output)
@@ -141,15 +141,15 @@ bool actor_mp_state_holder::relevant(const actor_mp_state& state)
     m_mask |= is_similar(m_state.physics_state_enabled, state.physics_state_enabled) ? physics_state_enabled_flag : 0;
 #ifdef USE_LOGIC_ACCELERATION
     m_mask |= is_similar(m_state.logic_acceleration, state.logic_acceleration) ? logic_acceleration_flag : 0;
-#endif  // USE_LOGIC_ACCELERATION
-#endif  // USE_DIFFERENCES
+#endif // USE_LOGIC_ACCELERATION
+#endif // USE_DIFFERENCES
     m_state = state;
 
 #ifdef USE_DIFFERENCES
     return (!!m_mask);
-#else   // USE_DIFFERENCES
+#else  // USE_DIFFERENCES
     return (true);
-#endif  // USE_DIFFERENCES
+#endif // USE_DIFFERENCES
 }
 
 void actor_mp_state_holder::write(NET_Packet& packet)
@@ -157,7 +157,7 @@ void actor_mp_state_holder::write(NET_Packet& packet)
 #ifdef USE_DIFFERENCES
     R_ASSERT(m_mask);
     packet.w_u32(m_mask);
-#endif  // USE_DIFFERENCES
+#endif // USE_DIFFERENCES
 
     packet.w_u32(m_state.time);
 
@@ -178,22 +178,22 @@ void actor_mp_state_holder::write(NET_Packet& packet)
     if (check(physics_position_y_flag)) packet.w_float(m_state.physics_position.y);
     if (check(physics_position_z_flag)) packet.w_float(m_state.physics_position.z);
     if (check(model_yaw_flag))
-        packet.w_float(m_state.model_yaw);  // packet.w_float_q8	(m_state.model_yaw		,0.f	,PI_MUL_2);
+        packet.w_float(m_state.model_yaw); // packet.w_float_q8	(m_state.model_yaw		,0.f	,PI_MUL_2);
     if (check(camera_yaw_flag))
         packet.w_float_q8(
-            m_state.camera_yaw, 0.f, PI_MUL_2);  // packet.w_float		(m_state.camera_yaw						);
+            m_state.camera_yaw, 0.f, PI_MUL_2); // packet.w_float		(m_state.camera_yaw						);
     if (check(camera_pitch_flag))
         packet.w_float_q8(
-            m_state.camera_pitch, 0.f, PI_MUL_2);  // packet.w_float		(m_state.camera_pitch					);
+            m_state.camera_pitch, 0.f, PI_MUL_2); // packet.w_float		(m_state.camera_pitch					);
     if (check(camera_roll_flag))
         packet.w_float_q8(
-            m_state.camera_roll, 0.f, PI_MUL_2);  // packet.w_float		(m_state.camera_roll					);
+            m_state.camera_roll, 0.f, PI_MUL_2); // packet.w_float		(m_state.camera_roll					);
 
 #ifdef USE_LOGIC_ACCELERATION
     if (check(logic_acceleration_flag)) packet.w_sdir(m_state.logic_acceleration);
-#else   // USE_LOGIC_ACCELERATION
+#else  // USE_LOGIC_ACCELERATION
     m_state.logic_acceleration.set(0.f, 0.f, 0.f);
-#endif  // USE_LOGIC_ACCELERATION
+#endif // USE_LOGIC_ACCELERATION
 
     u32 current = 0;
     u32 output = 0;
@@ -222,7 +222,7 @@ void actor_mp_state_holder::read(NET_Packet& packet)
 {
 #ifdef USE_DIFFERENCES
     packet.r_u32(m_mask);
-#endif  // USE_DIFFERENCES
+#endif // USE_DIFFERENCES
 
     packet.r_u32(m_state.time);
 
@@ -239,22 +239,22 @@ void actor_mp_state_holder::read(NET_Packet& packet)
     if (check(physics_position_y_flag)) packet.r_float(m_state.physics_position.y);
     if (check(physics_position_z_flag)) packet.r_float(m_state.physics_position.z);
     if (check(model_yaw_flag))
-        packet.r_float(m_state.model_yaw);  // packet.r_float_q8	(m_state.model_yaw,0.f,PI_MUL_2			);
+        packet.r_float(m_state.model_yaw); // packet.r_float_q8	(m_state.model_yaw,0.f,PI_MUL_2			);
     if (check(camera_yaw_flag))
         packet.r_float_q8(
-            m_state.camera_yaw, 0.f, PI_MUL_2);  // packet.r_float		(m_state.camera_yaw						);
+            m_state.camera_yaw, 0.f, PI_MUL_2); // packet.r_float		(m_state.camera_yaw						);
     if (check(camera_pitch_flag))
         packet.r_float_q8(
-            m_state.camera_pitch, 0.f, PI_MUL_2);  // packet.r_float		(m_state.camera_pitch					);
+            m_state.camera_pitch, 0.f, PI_MUL_2); // packet.r_float		(m_state.camera_pitch					);
     if (check(camera_roll_flag))
         packet.r_float_q8(
-            m_state.camera_roll, 0.f, PI_MUL_2);  // packet.r_float		(m_state.camera_roll					);
+            m_state.camera_roll, 0.f, PI_MUL_2); // packet.r_float		(m_state.camera_roll					);
 
 #ifdef USE_LOGIC_ACCELERATION
     if (check(logic_acceleration_flag)) packet.r_sdir(m_state.logic_acceleration);
-#else   // USE_LOGIC_ACCELERATION
+#else  // USE_LOGIC_ACCELERATION
     m_state.logic_acceleration.set(0.f, 0.f, 0.f);
-#endif  // USE_LOGIC_ACCELERATION
+#endif // USE_LOGIC_ACCELERATION
 
     m_state.position = m_state.physics_position;
 

@@ -87,7 +87,7 @@ class execution_type_creator : public base_execution_type_creator
     {
         return new execution(u32(-1));
         // return pool.create() ;
-        return pool.create();  // spool<execution>::pool.create() ;
+        return pool.create(); // spool<execution>::pool.create() ;
     }
     virtual void pool_destroy(net_execution*& e)
     {

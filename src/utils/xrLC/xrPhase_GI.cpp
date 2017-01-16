@@ -19,7 +19,7 @@ static xr_vector<R_Light>* task;
 Lock task_cs
 #ifdef CONFIG_PROFILE_LOCKS
     (MUTEX_PROFILE_ID(task_cs))
-#endif  // CONFIG_PROFILE_LOCKS
+#endif // CONFIG_PROFILE_LOCKS
         ;
 static u32 task_it;
 
@@ -34,7 +34,7 @@ static Fvector GetPixel_7x7(CDB::RESULT& rpinf)
     if (0 == F) return R;
     const Shader_xrLC& SH = F->Shader();
     if (!SH.flags.bLIGHT_CastShadow) return R;
-    if (!F->flags.bOpaque) return R;  // don't use transparency
+    if (!F->flags.bOpaque) return R; // don't use transparency
 
     b_material& M = pBuild->materials()[F->dwMaterial];
     b_texture& T = pBuild->textures()[M.surfidx];
@@ -118,12 +118,12 @@ public:
             // analyze
             CRandom random;
             random.seed(0x12071980);
-            float factor = _sqrt(src.range / gi_optimal_range);  // smaller lights get smaller amount of photons
+            float factor = _sqrt(src.range / gi_optimal_range); // smaller lights get smaller amount of photons
             if (factor > 1) factor = 1;
             if (LT_SECONDARY == src.type)
-                factor /= powf(2.f, float(src.level));  // secondary lights get half the photons
-            factor *= _sqrt(src.energy);                // 2.f is optimal energy = baseline
-                                                        // factor	= _sqrt (factor);								// move towards 1.0 (one)
+                factor /= powf(2.f, float(src.level)); // secondary lights get half the photons
+            factor *= _sqrt(src.energy);               // 2.f is optimal energy = baseline
+                                                       // factor	= _sqrt (factor);								// move towards 1.0 (one)
             int count = iCeil(factor * float(gi_num_photons));
             // count		= gi_num_photons;
             float _clip = (_sqrt(src.energy) / 10.f + gi_clip) / 2.f;
@@ -139,11 +139,11 @@ public:
                 {
                 case LT_POINT: dir.random_dir(random).normalize(); break;
                 case LT_SECONDARY:
-                    dir.random_dir(src.direction, PI_DIV_2, random);  //. or PI ?
+                    dir.random_dir(src.direction, PI_DIV_2, random); //. or PI ?
                     s = src.direction.dotproduct(dir.normalize());
                     break;
                 default:
-                    continue;  // continue loop
+                    continue; // continue loop
                 }
                 xrc.ray_query(model, src.position, dir, src.range);
                 if (!xrc.r_count()) continue;
@@ -155,7 +155,7 @@ public:
                 float dot = TN.dotproduct(idir.invert(dir));
 
                 dst.position.mad(src.position, dir, R->range);
-                dst.position.mad(TN, 0.01f);  // 1cm away from surface
+                dst.position.mad(TN, 0.01f); // 1cm away from surface
                 dst.direction.reflect(dir, TN);
                 dst.energy = src.energy * dot * gi_reflect * (1 - R->range / src.range) * _scale;
                 if (dst.energy < _clip) continue;
@@ -182,7 +182,7 @@ public:
                 float _r1 = src.range * _sqrt(dst.energy / src.energy);
                 float _r2 = (dst.energy - _clip) / _clip;
                 float _r3 = src.range;
-                dst.range = 1 * ((1.f * _r1 + 3.f * _r2 + 3.f * _r3) / 7.f);  // empirical
+                dst.range = 1 * ((1.f * _r1 + 3.f * _r2 + 3.f * _r3) / 7.f); // empirical
                 // clMsg			("submit: level[%d],type[%d], energy[%f]",dst.level,dst.type,dst.energy);
 
                 // submit answer

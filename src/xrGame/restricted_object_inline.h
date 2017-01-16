@@ -35,4 +35,4 @@ IC void CRestrictedObject::initialize()
 {
     if (m_applied) remove_border();
 }
-#endif  // DEBUG
+#endif // DEBUG

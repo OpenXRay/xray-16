@@ -13,4 +13,4 @@ public:
     virtual void Render(CEffect_Thunderbolt& owner) = 0;
 };
 
-#endif  //	ThunderboltRender_included
+#endif //	ThunderboltRender_included

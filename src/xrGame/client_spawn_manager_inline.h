@@ -17,4 +17,4 @@ IC const CClientSpawnManager::REQUEST_REGISTRY& CClientSpawnManager::registry() 
 {
     return (m_registry);
 }
-#endif  // DEBUG
+#endif // DEBUG

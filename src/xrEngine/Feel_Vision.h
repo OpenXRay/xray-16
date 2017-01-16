@@ -10,10 +10,10 @@ class ISpatial;
 
 namespace Feel
 {
-const float fuzzy_update_vis = 1000.f;    // speed of fuzzy-logic desisions
-const float fuzzy_update_novis = 1000.f;  // speed of fuzzy-logic desisions
-const float fuzzy_guaranteed = 0.001f;    // distance which is supposed 100% visible
-const float lr_granularity = 0.1f;        // assume similar positions
+const float fuzzy_update_vis = 1000.f;   // speed of fuzzy-logic desisions
+const float fuzzy_update_novis = 1000.f; // speed of fuzzy-logic desisions
+const float fuzzy_guaranteed = 0.001f;   // distance which is supposed 100% visible
+const float lr_granularity = 0.1f;       // assume similar positions
 
 class ENGINE_API Vision : private pure_relcase
 {
@@ -40,9 +40,9 @@ public:
         Fvector cp_LP;
         Fvector cp_LR_src;
         Fvector cp_LR_dst;
-        Fvector cp_LAST;  // last point found to be visible
+        Fvector cp_LAST; // last point found to be visible
         IGameObject* O;
-        float fuzzy;  // note range: (-1[no]..1[yes])
+        float fuzzy; // note range: (-1[no]..1[yes])
         float Cache_vis;
         u16 bone_id;
     };

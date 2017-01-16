@@ -296,7 +296,7 @@ void CRenderTarget::DoAsyncScreenshot()
 
 void CRenderTarget::End()
 {
-    if (g_pGamePersistent) g_pGamePersistent->OnRenderPPUI_main();  // PP-UI
+    if (g_pGamePersistent) g_pGamePersistent->OnRenderPPUI_main(); // PP-UI
 
     // find if distortion is needed at all
     BOOL bPerform = Perform();
@@ -393,5 +393,5 @@ void CRenderTarget::phase_distortion()
     else
         RImplementation.mapDistort.clear();
 
-    if (g_pGamePersistent) g_pGamePersistent->OnRenderPPUI_PP();  // PP-UI
+    if (g_pGamePersistent) g_pGamePersistent->OnRenderPPUI_PP(); // PP-UI
 }

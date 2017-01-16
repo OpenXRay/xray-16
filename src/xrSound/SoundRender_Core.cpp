@@ -246,8 +246,8 @@ void CSoundRender_Core::set_geometry_env(IReader* I)
     for (u32 it = 0; it < H.facecount; it++)
     {
         CDB::TRI* T = tris + it;
-        u16 id_front = (u16)((T->dummy & 0x0000ffff) >> 0);  //	front face
-        u16 id_back = (u16)((T->dummy & 0xffff0000) >> 16);  //	back face
+        u16 id_front = (u16)((T->dummy & 0x0000ffff) >> 0); //	front face
+        u16 id_back = (u16)((T->dummy & 0xffff0000) >> 16); //	back face
         R_ASSERT(id_front < (u16)ids.size());
         R_ASSERT(id_back < (u16)ids.size());
         T->dummy = u32(ids[id_back] << 16) | u32(ids[id_front]);
@@ -279,7 +279,7 @@ void CSoundRender_Core::attach_tail(ref_sound& S, const char* fName)
     if (S._p->fn_attached[0].size() && S._p->fn_attached[1].size()) {
 #ifdef DEBUG
         Msg("! 2 file already in queue [%s][%s]", S._p->fn_attached[0].c_str(), S._p->fn_attached[1].c_str());
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
         return;
     }
 
@@ -421,12 +421,12 @@ CSoundRender_Environment* CSoundRender_Core::get_environment(const Fvector& P)
                 tri_norm.mknormal(V[T->verts[0]], V[T->verts[1]], V[T->verts[2]]);
                 float dot = dir.dotproduct(tri_norm);
                 if (dot < 0) {
-                    u16 id_front = (u16)((T->dummy & 0x0000ffff) >> 0);  //	front face
+                    u16 id_front = (u16)((T->dummy & 0x0000ffff) >> 0); //	front face
                     return s_environment->Get(id_front);
                 }
                 else
                 {
-                    u16 id_back = (u16)((T->dummy & 0xffff0000) >> 16);  //	back face
+                    u16 id_back = (u16)((T->dummy & 0xffff0000) >> 16); //	back face
                     return s_environment->Get(id_back);
                 }
             }
@@ -468,20 +468,20 @@ void CSoundRender_Core::i_eax_listener_set(CSound_environment* _E)
     VERIFY(bEAX);
     CSoundRender_Environment* E = static_cast<CSoundRender_Environment*>(_E);
     EAXLISTENERPROPERTIES ep;
-    ep.lRoom = iFloor(E->Room);                         // room effect level at low frequencies
-    ep.lRoomHF = iFloor(E->RoomHF);                     // room effect high-frequency level re. low frequency level
-    ep.flRoomRolloffFactor = E->RoomRolloffFactor;      // like DS3D flRolloffFactor but for room effect
-    ep.flDecayTime = E->DecayTime;                      // reverberation decay time at low frequencies
-    ep.flDecayHFRatio = E->DecayHFRatio;                // high-frequency to low-frequency decay time ratio
-    ep.lReflections = iFloor(E->Reflections);           // early reflections level relative to room effect
-    ep.flReflectionsDelay = E->ReflectionsDelay;        // initial reflection delay time
-    ep.lReverb = iFloor(E->Reverb);                     // late reverberation level relative to room effect
-    ep.flReverbDelay = E->ReverbDelay;                  // late reverberation delay time relative to initial reflection
-    ep.dwEnvironment = EAXLISTENER_DEFAULTENVIRONMENT;  // sets all listener properties
-    ep.flEnvironmentSize = E->EnvironmentSize;          // environment size in meters
-    ep.flEnvironmentDiffusion = E->EnvironmentDiffusion;  // environment diffusion
-    ep.flAirAbsorptionHF = E->AirAbsorptionHF;            // change in level per meter at 5 kHz
-    ep.dwFlags = EAXLISTENER_DEFAULTFLAGS;                // modifies the behavior of properties
+    ep.lRoom = iFloor(E->Room);                          // room effect level at low frequencies
+    ep.lRoomHF = iFloor(E->RoomHF);                      // room effect high-frequency level re. low frequency level
+    ep.flRoomRolloffFactor = E->RoomRolloffFactor;       // like DS3D flRolloffFactor but for room effect
+    ep.flDecayTime = E->DecayTime;                       // reverberation decay time at low frequencies
+    ep.flDecayHFRatio = E->DecayHFRatio;                 // high-frequency to low-frequency decay time ratio
+    ep.lReflections = iFloor(E->Reflections);            // early reflections level relative to room effect
+    ep.flReflectionsDelay = E->ReflectionsDelay;         // initial reflection delay time
+    ep.lReverb = iFloor(E->Reverb);                      // late reverberation level relative to room effect
+    ep.flReverbDelay = E->ReverbDelay;                   // late reverberation delay time relative to initial reflection
+    ep.dwEnvironment = EAXLISTENER_DEFAULTENVIRONMENT;   // sets all listener properties
+    ep.flEnvironmentSize = E->EnvironmentSize;           // environment size in meters
+    ep.flEnvironmentDiffusion = E->EnvironmentDiffusion; // environment diffusion
+    ep.flAirAbsorptionHF = E->AirAbsorptionHF;           // change in level per meter at 5 kHz
+    ep.dwFlags = EAXLISTENER_DEFAULTFLAGS;               // modifies the behavior of properties
 
     u32 deferred = bDeferredEAX ? DSPROPERTY_EAXLISTENER_DEFERRED : 0;
 

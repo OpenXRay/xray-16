@@ -325,7 +325,7 @@ SThunderboltDesc* manager::description(CInifile& config, shared_str const& secti
     NODEFAULT;
 #ifdef DEBUG
     return (0);
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 }
 
 SThunderboltCollection* manager::get_collection(shared_str const& section)
@@ -338,7 +338,7 @@ SThunderboltCollection* manager::get_collection(shared_str const& section)
     NODEFAULT;
 #ifdef DEBUG
     return (0);
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 }
 
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR

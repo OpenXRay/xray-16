@@ -62,12 +62,12 @@ private:
     shared_str m_color_animator;
     shared_str m_lighting_model;
     shared_str m_sound;
-};  // class thunderbolt
+}; // class thunderbolt
 
-}  // namespace thunderbolts
-}  // namespace environment
-}  // namespace editor
+} // namespace thunderbolts
+} // namespace environment
+} // namespace editor
 
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR
 
-#endif  // ifndef EDITOR_WEATHER_THUNDERBOLTS_THUNDERBOLT_HPP_INCLUDED
+#endif // ifndef EDITOR_WEATHER_THUNDERBOLTS_THUNDERBOLT_HPP_INCLUDED

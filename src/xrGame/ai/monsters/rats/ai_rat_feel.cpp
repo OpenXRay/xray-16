@@ -38,9 +38,9 @@ void CAI_Rat::feel_sound_new(
                 m_fMorale += m_fMoraleDeathQuant;
             else if (((eType & SOUND_TYPE_WEAPON_SHOOTING) == SOUND_TYPE_WEAPON_SHOOTING) &&
                      !memory().enemy().selected())
-                m_fMorale += m_fMoraleFearQuant;  /// fDistance;
+                m_fMorale += m_fMoraleFearQuant; /// fDistance;
             else if ((eType & SOUND_TYPE_MONSTER_ATTACKING) == SOUND_TYPE_MONSTER_ATTACKING)
-                m_fMorale += m_fMoraleSuccessAttackQuant;  /// fDistance;
+                m_fMorale += m_fMoraleSuccessAttackQuant; /// fDistance;
         }
     }
 

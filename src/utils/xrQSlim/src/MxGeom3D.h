@@ -1,4 +1,4 @@
-#ifndef MXGEOM3D_INCLUDED  // -*- C++ -*-
+#ifndef MXGEOM3D_INCLUDED // -*- C++ -*-
 #define MXGEOM3D_INCLUDED
 #if !defined(__GNUC__)
 #pragma once

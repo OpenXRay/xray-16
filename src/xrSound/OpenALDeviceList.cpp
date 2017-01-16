@@ -200,7 +200,7 @@ void ALDeviceList::SelectBestDevice()
         }
         if (new_device_id == u32(-1)) {
             R_ASSERT(GetNumDevices() != 0);
-            new_device_id = 0;  // first
+            new_device_id = 0; // first
         };
         snd_device_id = new_device_id;
     }

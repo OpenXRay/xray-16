@@ -440,7 +440,7 @@ MStatus CXRayMtl::compute(const MPlug& plug, MDataBlock& block)
             if (currentLight.child(aLightDiffuse).asBool()) {
                 float cosln = lightDirection * surfaceNormal;
                 ;
-                if (cosln > 0.0f)  // calculate only if facing light
+                if (cosln > 0.0f) // calculate only if facing light
                 {
                     diffuseR += lightIntensity[0] * (cosln * diffuseReflectivity);
                     diffuseG += lightIntensity[1] * (cosln * diffuseReflectivity);
@@ -449,7 +449,7 @@ MStatus CXRayMtl::compute(const MPlug& plug, MDataBlock& block)
 
                 CHECK_MSTATUS(cameraPosition.normalize());
 
-                if (cosln > 0.0f)  // calculate only if facing light
+                if (cosln > 0.0f) // calculate only if facing light
                 {
                     float RV = (((2 * surfaceNormal) * cosln) - lightDirection) * cameraPosition;
                     if (RV > 0.0) RV = 0.0;
@@ -468,7 +468,7 @@ MStatus CXRayMtl::compute(const MPlug& plug, MDataBlock& block)
         else
         {
             float cosln = MRenderUtil::diffuseReflectance(blindData, lightDirection, point, surfaceNormal, true);
-            if (cosln > 0.0f)  // calculate only if facing light
+            if (cosln > 0.0f) // calculate only if facing light
             {
                 diffuseR += lightIntensity[0] * (cosln * diffuseReflectivity);
                 diffuseG += lightIntensity[1] * (cosln * diffuseReflectivity);
@@ -538,7 +538,7 @@ MStatus CXRayMtl::compute(const MPlug& plug, MDataBlock& block)
         MFloatVector l = -direction;
         float dot = l * normal;
         if (dot < 0.0) dot = -dot;
-        MFloatVector refVector = 2 * normal * dot - l;  // reflection ray
+        MFloatVector refVector = 2 * normal * dot - l; // reflection ray
         float dotRef = refVector * triangleNormal;
         if (dotRef < 0.0) {
             const float s = 0.01f;
@@ -548,12 +548,12 @@ MStatus CXRayMtl::compute(const MPlug& plug, MDataBlock& block)
         }
         CHECK_MSTATUS(refVector.normalize());
 
-        status = MRenderUtil::raytrace(point,  //  origin
-            refVector,                         //  direction
-            objId,                             //  object id
-            samplerPtr,                        //  sampler info
-            depth,                             //  ray depth
-            reflectColor,                      // output color and transp
+        status = MRenderUtil::raytrace(point, //  origin
+            refVector,                        //  direction
+            objId,                            //  object id
+            samplerPtr,                       //  sampler info
+            depth,                            //  ray depth
+            reflectColor,                     // output color and transp
             reflectTransparency);
 
         // add in the reflection color

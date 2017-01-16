@@ -72,7 +72,7 @@ void CLevel::StartPlayDemo()
         FS.update_path(demo_msg_path, "$logs$", "dbg_msg.log");
         tmp_msg_filter->dbg_set_message_log_file(demo_msg_path);
     }
-#endif  //#ifdef MP_LOGGING
+#endif //#ifdef MP_LOGGING
 }
 
 void CLevel::RestartPlayDemo()
@@ -82,7 +82,7 @@ void CLevel::RestartPlayDemo()
         return;
     }
     if (IsDemoPlayStarted()) {
-        remove_objects();  // WARNING ! need to be in DemoPlayStarted mode .
+        remove_objects(); // WARNING ! need to be in DemoPlayStarted mode .
 // After remove_objects() invokation there where left a serveral (20) UpdateCLs so:
 #ifdef DEBUG
         VERIFY(g_pGameLevel);
@@ -186,14 +186,14 @@ bool CLevel::LoadPacket(NET_Packet& dest_packet, u32 global_time_delta)
     m_reader->r(&tmp_hdr, sizeof(DemoPacket));
     m_prev_packet_dtime = tmp_hdr.m_time_global_delta;
 
-    if (map_data.m_sended_map_name_request ?  /// ???
+    if (map_data.m_sended_map_name_request ? /// ???
             (tmp_hdr.m_time_global_delta <= global_time_delta) :
             (tmp_hdr.m_time_global_delta < global_time_delta))
     {
         R_ASSERT2(tmp_hdr.m_packet_size < NET_PacketSizeLimit, "bad demo packet");
         m_reader->r(dest_packet.B.data, tmp_hdr.m_packet_size);
         dest_packet.B.count = tmp_hdr.m_packet_size;
-        dest_packet.timeReceive = tmp_hdr.m_timeReceive;  // not used ..
+        dest_packet.timeReceive = tmp_hdr.m_timeReceive; // not used ..
         dest_packet.r_pos = 0;
         if (m_reader->elapsed() <= sizeof(DemoPacket)) {
             StopPlayDemo();
@@ -229,7 +229,7 @@ void CLevel::SpawnDemoSpectator()
     specentity->set_name_replace(mp_cl_game->local_player->getName());
     specentity->s_flags.assign(
         M_SPAWN_OBJECT_LOCAL | M_SPAWN_OBJECT_ASPLAYER |
-        M_SPAWN_OBJECT_PHANTOM);  // M_SPAWN_OBJECT_PHANTOM is ONLY to indicate thath this is a fake spectator
+        M_SPAWN_OBJECT_PHANTOM); // M_SPAWN_OBJECT_PHANTOM is ONLY to indicate thath this is a fake spectator
     tmp_sv_game->assign_RP(specentity, Level().game->local_player);
 
     g_sv_Spawn(specentity);

@@ -115,7 +115,7 @@ Matrix3x3& Matrix3x3::FromTo(const Point& from, const Point& to)
         m[1][2] = m[2][1];
         m[2][2] = fzz + uzz + lzz;
     }
-    else  // the most common case, unless "from"="to", or "from"=-"to"
+    else // the most common case, unless "from"="to", or "from"=-"to"
     {
 #if 0
 		// unoptimized version - a good compiler will optimize this.

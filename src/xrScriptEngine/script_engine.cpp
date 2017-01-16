@@ -98,7 +98,7 @@ static void* lua_alloc(void* ud, void* ptr, size_t osize, size_t nsize)
 #endif
 }
 
-#endif  // PURE_ALLOC
+#endif // PURE_ALLOC
 
 static void* __cdecl luabind_allocator(void* context, const void* pointer, size_t const size)
 {
@@ -158,7 +158,7 @@ void CScriptEngine::reinit()
     stateMapLock.Enter();
     if (!stateMap) {
         stateMap = new xr_hash_map<lua_State*, CScriptEngine*>();
-        stateMap->reserve(32);  // 32 lua states should be enough
+        stateMap->reserve(32); // 32 lua states should be enough
     }
     stateMapLock.Leave();
     if (m_virtual_machine) {
@@ -363,14 +363,14 @@ bool CScriptEngine::do_file(LPCSTR caScriptName, LPCSTR caNameSpaceName)
     if (debugger()) errFuncId = debugger()->PrepareLua(lua());
 #endif
 #endif
-    if (0)  //.
+    if (0) //.
     {
         for (int i = 0; lua_type(lua(), -i - 1); i++)
             Msg("%2d : %s", -i - 1, lua_typename(lua(), lua_type(lua(), -i - 1)));
     }
     // because that's the first and the only call of the main chunk - there is no point to compile it
     // luaJIT_setmode(lua(), 0, LUAJIT_MODE_ENGINE|LUAJIT_MODE_OFF); // Oles
-    int l_iErrorCode = lua_pcall(lua(), 0, 0, (-1 == errFuncId) ? 0 : errFuncId);  // new_Andy
+    int l_iErrorCode = lua_pcall(lua(), 0, 0, (-1 == errFuncId) ? 0 : errFuncId); // new_Andy
 // luaJIT_setmode(lua(), 0, LUAJIT_MODE_ENGINE|LUAJIT_MODE_ON); // Oles
 #ifdef USE_DEBUGGER
 #ifndef USE_LUA_STUDIO
@@ -424,7 +424,7 @@ bool CScriptEngine::namespace_loaded(LPCSTR name, bool remove_from_stack)
             VERIFY(lua_gettop(lua()) >= 2);
             lua_pop(lua(), 2);
             VERIFY(start == lua_gettop(lua()));
-            return false;  // there is no namespace!
+            return false; // there is no namespace!
         }
         else if (!lua_istable(lua(), -1))
         {
@@ -958,7 +958,7 @@ bool CScriptEngine::process_file_if_exists(LPCSTR file_name, bool warn_if_not_ex
         FS.update_path(S, "$game_scripts$", strconcat(sizeof(S1), S1, file_name, ".script"));
         if (!warn_if_not_exist && !FS.exist(S)) {
 #ifdef DEBUG
-            if (false)  // XXX: restore (check script engine flags)
+            if (false) // XXX: restore (check script engine flags)
             {
                 print_stack();
                 Msg("! WARNING: Access to nonexistent variable '%s' or loading nonexistent script '%s'", file_name, S1);

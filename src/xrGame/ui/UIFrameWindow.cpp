@@ -17,7 +17,7 @@ void CUIFrameWindow::SetWndSize(const Fvector2& sz)
     Fvector2 size_test = sz;
     UI().ClientToScreenScaled(size_test);
 
-    if (m_bTextureVisible) {  // fit to min size
+    if (m_bTextureVisible) { // fit to min size
         Fvector2 min_size;
         min_size.x = m_tex_rect[fmLT].width() + m_tex_rect[fmRT].width();
         min_size.y = m_tex_rect[fmLT].height() + m_tex_rect[fmLB].height();
@@ -92,21 +92,21 @@ void CUIFrameWindow::DrawElements()
     UI().ClientToScreenScaled(rect.rb);
 
     Fvector2 back_len = {0.0f, 0.0f};
-    u32 rect_count = 4;  // lt+rt+lb+rb
+    u32 rect_count = 4; // lt+rt+lb+rb
     back_len.x = rect.width() - m_tex_rect[fmLT].width() - m_tex_rect[fmRT].width();
     back_len.y = rect.height() - m_tex_rect[fmLT].height() - m_tex_rect[fmRB].height();
     R_ASSERT(back_len.x + EPS_L >= 0.0f && back_len.y + EPS_L >= 0.0f);
 
     u32 cnt = 0;
-    if (back_len.x > 0.0f)  // top+bottom
+    if (back_len.x > 0.0f) // top+bottom
         cnt = 2 * iCeil(back_len.x / m_tex_rect[fmT].width());
     rect_count += cnt;
 
-    if (back_len.y > 0.0f)  // left+right
+    if (back_len.y > 0.0f) // left+right
         cnt = 2 * iCeil(back_len.y / m_tex_rect[fmL].height());
     rect_count += cnt;
 
-    if (back_len.x > 0.0f && back_len.y > 0.0f)  // back
+    if (back_len.x > 0.0f && back_len.y > 0.0f) // back
         cnt = iCeil(back_len.x / m_tex_rect[fmBK].width()) * iCeil(back_len.y / m_tex_rect[fmBK].height());
 
     rect_count += cnt;

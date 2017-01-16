@@ -19,8 +19,8 @@ IC void SetJointLimit(CPhysicsJoint& J, const IBoneData& bone_data, u8 limit_num
 {
     const SJointIKData& joint_data = bone_data.get_IK_data();
     const SJointLimit& limit = joint_data.limits[limit_num];
-    float lo = bone_data.lo_limit(limit_num);  // limit.x;
-    float hi = bone_data.hi_limit(limit_num);  // limit.y;
+    float lo = bone_data.lo_limit(limit_num); // limit.x;
+    float hi = bone_data.hi_limit(limit_num); // limit.y;
 
     J.SetLimits(lo, hi, axis_num);
     J.SetAxisSDfactors(limit.spring_factor, limit.damping_factor, axis_num);
@@ -30,8 +30,8 @@ IC bool IsFreeRLimit(const IBoneData& bone_data, u8 limit_num)
 {
     // const SJointIKData& joint_data	=	bone_data.get_IK_data();
     // const SJointLimit&	limit		=	joint_data.limits[limit_num];
-    float lo = bone_data.lo_limit(limit_num);  // limit.x;
-    float hi = bone_data.hi_limit(limit_num);  // limit.y;
+    float lo = bone_data.lo_limit(limit_num); // limit.x;
+    float hi = bone_data.hi_limit(limit_num); // limit.y;
     return !(hi - lo < M_PI * 2.f);
 }
 
@@ -198,7 +198,7 @@ IC CPhysicsJoint* BuildJoint(const IBoneData& bone_data, CPhysicsElement* root_e
     default: NODEFAULT;
     }
 
-    if (J) J->SetForceAndVelocity(joint_data.friction);  // joint_data.friction
+    if (J) J->SetForceAndVelocity(joint_data.friction); // joint_data.friction
 
     return J;
 }

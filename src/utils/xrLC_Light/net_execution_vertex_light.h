@@ -22,7 +22,7 @@ class tnet_execution_base<et_vertex_light>::net_execution_impl
 
 public:
     net_execution_impl() : start(u32(-1)), end(-1) {}
-    void construct(u32 _start, u32 _end);  // { start = _start;end = _end; }
+    void construct(u32 _start, u32 _end); // { start = _start;end = _end; }
     void send_task(IGenericStream* outStream);
     void receive_result(IGenericStream* outStream);
     bool receive_task(IAgent* agent, DWORD sessionId, IGenericStream* inStream);
@@ -44,4 +44,4 @@ struct add_global<et_vertex_light, gl_lm_data>
 //
 //}; // class net_execution_vertex_light
 
-#endif  // #ifndef NET_EXECUTION_VERTEX_LIGHT_H_INCLUDED
+#endif // #ifndef NET_EXECUTION_VERTEX_LIGHT_H_INCLUDED

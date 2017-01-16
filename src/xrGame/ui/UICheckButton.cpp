@@ -69,7 +69,7 @@ void CUICheckButton::InitCheckButton(Fvector2 pos, Fvector2 size, LPCSTR texture
 
 void CUICheckButton::InitTexture2(LPCSTR texture_name)
 {
-    CUI3tButton::InitTexture(texture_name);  // "ui_checker"
+    CUI3tButton::InitTexture(texture_name); // "ui_checker"
     Frect r = m_background->Get(S_Enabled)->GetStaticItem()->GetTextureRect();
     TextItemControl()->m_TextOffset.x = TextItemControl()->m_TextOffset.x + r.width();
 }

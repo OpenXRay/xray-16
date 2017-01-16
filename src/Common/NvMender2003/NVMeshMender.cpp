@@ -194,7 +194,7 @@ void MeshMender::UpdateIndices(const size_t oldIndex, const size_t newIndex, Tri
 void MeshMender::ProcessNormals(TriangleList& possibleNeighbors, xr_vector<Vertex>& theVerts,
     xr_vector<unsigned int>& mappingNewToOldVert, D3DXVECTOR3 workingPosition)
 {
-    NeighborGroupList neighborGroups;  // a fresh group for each pass
+    NeighborGroupList neighborGroups; // a fresh group for each pass
 
     // reset each triangle to prepare for smoothing group building
     for (u32 i = 0; i < possibleNeighbors.size(); ++i)
@@ -223,7 +223,7 @@ void MeshMender::ProcessNormals(TriangleList& possibleNeighbors, xr_vector<Verte
         D3DXVECTOR3 gnorm(0.0f, 0.0f, 0.0f);
 
         assert(curGroup.size() != 0 && "should not be a zero group here.");
-        for (size_t t = 0; t < curGroup.size(); ++t)  // for each triangle in the group,
+        for (size_t t = 0; t < curGroup.size(); ++t) // for each triangle in the group,
         {
             TriID tID = curGroup[t];
             gnorm += m_Triangles[tID].normal;
@@ -240,10 +240,10 @@ void MeshMender::ProcessNormals(TriangleList& possibleNeighbors, xr_vector<Verte
         TriangleList& curGroup = neighborGroups[i];
         xr_set<size_t> thisGroupIndices;
 
-        for (size_t t = 0; t < curGroup.size(); ++t)  // for each tri
+        for (size_t t = 0; t < curGroup.size(); ++t) // for each tri
         {
             TriID tID = curGroup[t];
-            for (size_t indx = 0; indx < 3; ++indx)  // for each vert in that tri
+            for (size_t indx = 0; indx < 3; ++indx) // for each vert in that tri
             {
                 // if it is at the positions in question
                 if (theVerts[m_Triangles[tID].indices[indx]].pos == workingPosition) {
@@ -281,7 +281,7 @@ void MeshMender::ProcessNormals(TriangleList& possibleNeighbors, xr_vector<Verte
 void MeshMender::ProcessTangents(TriangleList& possibleNeighbors, xr_vector<Vertex>& theVerts,
     xr_vector<unsigned int>& mappingNewToOldVert, D3DXVECTOR3 workingPosition)
 {
-    NeighborGroupList neighborGroups;  // a fresh group for each pass
+    NeighborGroupList neighborGroups; // a fresh group for each pass
 
     // reset each triangle to prepare for smoothing group building
     for (u32 i = 0; i < possibleNeighbors.size(); ++i)
@@ -306,7 +306,7 @@ void MeshMender::ProcessTangents(TriangleList& possibleNeighbors, xr_vector<Vert
     for (u32 i = 0; i < neighborGroups.size(); ++i)
     {
         D3DXVECTOR3 gtang(0, 0, 0);
-        for (unsigned int t = 0; t < neighborGroups[i].size(); ++t)  // for each triangle in the group,
+        for (unsigned int t = 0; t < neighborGroups[i].size(); ++t) // for each triangle in the group,
         {
             TriID tID = neighborGroups[i][t];
             gtang += m_Triangles[tID].tangent;
@@ -323,10 +323,10 @@ void MeshMender::ProcessTangents(TriangleList& possibleNeighbors, xr_vector<Vert
         TriangleList& curGroup = neighborGroups[i];
         xr_set<size_t> thisGroupIndices;
 
-        for (size_t t = 0; t < curGroup.size(); ++t)  // for each tri
+        for (size_t t = 0; t < curGroup.size(); ++t) // for each tri
         {
             TriID tID = curGroup[t];
-            for (size_t indx = 0; indx < 3; indx++)  // for each vert in that tri
+            for (size_t indx = 0; indx < 3; indx++) // for each vert in that tri
             {
                 // if it is at the positions in question
                 if (theVerts[m_Triangles[tID].indices[indx]].pos == workingPosition) {
@@ -364,7 +364,7 @@ void MeshMender::ProcessTangents(TriangleList& possibleNeighbors, xr_vector<Vert
 void MeshMender::ProcessBinormals(TriangleList& possibleNeighbors, xr_vector<Vertex>& theVerts,
     xr_vector<unsigned int>& mappingNewToOldVert, D3DXVECTOR3 workingPosition)
 {
-    NeighborGroupList neighborGroups;  // a fresh group for each pass
+    NeighborGroupList neighborGroups; // a fresh group for each pass
 
     // reset each triangle to prepare for smoothing group building
     for (u32 i = 0; i < possibleNeighbors.size(); ++i)
@@ -389,7 +389,7 @@ void MeshMender::ProcessBinormals(TriangleList& possibleNeighbors, xr_vector<Ver
     for (u32 i = 0; i < neighborGroups.size(); ++i)
     {
         D3DXVECTOR3 gbinormal(0, 0, 0);
-        for (unsigned int t = 0; t < neighborGroups[i].size(); ++t)  // for each triangle in the group,
+        for (unsigned int t = 0; t < neighborGroups[i].size(); ++t) // for each triangle in the group,
         {
             TriID tID = neighborGroups[i][t];
             gbinormal += m_Triangles[tID].binormal;
@@ -406,10 +406,10 @@ void MeshMender::ProcessBinormals(TriangleList& possibleNeighbors, xr_vector<Ver
         TriangleList& curGroup = neighborGroups[i];
         xr_set<size_t> thisGroupIndices;
 
-        for (size_t t = 0; t < curGroup.size(); ++t)  // for each tri
+        for (size_t t = 0; t < curGroup.size(); ++t) // for each tri
         {
             TriID tID = curGroup[t];
-            for (size_t indx = 0; indx < 3; ++indx)  // for each vert in that tri
+            for (size_t indx = 0; indx < 3; ++indx) // for each vert in that tri
             {
                 // if it is at the positions in question
                 if (theVerts[m_Triangles[tID].indices[indx]].pos == workingPosition) {
@@ -482,9 +482,9 @@ bool MeshMender::Mend(xr_vector<Vertex>& theVerts, xr_vector<unsigned int>& theI
     return true;
 }
 
-void MeshMender::BuildGroups(Triangle* tri,  // the tri of interest
-    TriangleList& possibleNeighbors,         // all tris arround a vertex
-    NeighborGroupList& neighborGroups,       // the neighbor groups to be updated
+void MeshMender::BuildGroups(Triangle* tri, // the tri of interest
+    TriangleList& possibleNeighbors,        // all tris arround a vertex
+    NeighborGroupList& neighborGroups,      // the neighbor groups to be updated
     xr_vector<Vertex>& theVerts, CanSmoothChecker* smoothChecker, const float& minCreaseAngle)
 {
     if ((!tri) || (tri->handled)) return;
@@ -535,7 +535,7 @@ void MeshMender::FindNeighbors(Triangle* tri, TriangleList& possibleNeighbors, T
     {
         TriID tID = possibleNeighbors[n];
         Triangle* possible = &(m_Triangles[tID]);
-        if (possible != tri)  // check for myself
+        if (possible != tri) // check for myself
         {
             if (SharesEdge(tri, possible, theVerts)) {
                 theNeighbors.push_back(possible);
@@ -661,7 +661,7 @@ void MeshMender::SetUpData(xr_vector<Vertex>& theVerts, const xr_vector<unsigned
         // set up bin, norm, and tan
         SetUpFaceVectors(t, theVerts, computeNormals);
 
-        t.myID = m_Triangles.size();  // set id, to my index into m_Triangles
+        t.myID = m_Triangles.size(); // set id, to my index into m_Triangles
         m_Triangles.push_back(t);
     }
 
@@ -751,7 +751,7 @@ void MeshMender::OrthogonalizeTangentsAndBinormals(xr_vector<Vertex>& theVerts)
         float lenTan = D3DXVec3Length(&(theVerts[i].tangent));
         float lenBin = D3DXVec3Length(&(theVerts[i].binormal));
 
-        if ((lenTan <= 0.001f) || (lenBin <= 0.001f))  // should be approx 1.0f
+        if ((lenTan <= 0.001f) || (lenBin <= 0.001f)) // should be approx 1.0f
         {
             // the tangent space is ill defined at this vertex
             // so we can generate a valid one based on the normal vector,

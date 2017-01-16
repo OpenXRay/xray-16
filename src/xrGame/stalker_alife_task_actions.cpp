@@ -41,11 +41,11 @@ using namespace StalkerDecisionSpace;
 
 #ifdef DEBUG
 //#define GRENADE_TEST
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 
 #ifdef GRENADE_TEST
 #include "actor.h"
-#endif  // #ifdef GRENADE_TEST
+#endif // #ifdef GRENADE_TEST
 
 //////////////////////////////////////////////////////////////////////////
 // CStalkerActionSolveZonePuzzle
@@ -149,7 +149,8 @@ void CStalkerActionSolveZonePuzzle::execute()
 #else
     const CWeapon* weapon = smart_cast<const CWeapon*>(object().best_weapon());
     VERIFY(weapon);
-    //			Msg										("weapon %s is strapped : %c",*weapon->cName(),weapon->strapped_mode() ? '+' :
+    //			Msg										("weapon %s is strapped : %c",*weapon->cName(),weapon->strapped_mode() ? '+'
+    //:
     //'-');
 
     static u32 m_time_to_strap = 0;

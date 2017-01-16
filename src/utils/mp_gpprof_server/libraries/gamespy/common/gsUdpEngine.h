@@ -70,7 +70,7 @@ typedef enum _GSUdpCloseReason {
     GS_UDP_CLOSED_LOCALLY,
     GS_UDP_CLOSED_REMOTELY,
     // errors:
-    GS_UDP_CLOSED_BY_COMM_ERROR,  // An invalid message was received (it was either unexpected or wrongly formatted).
+    GS_UDP_CLOSED_BY_COMM_ERROR, // An invalid message was received (it was either unexpected or wrongly formatted).
     GS_UDP_CLOSED_BY_LOW_MEM,
     // Add new reasons before here
     GS_UDP_CLOSED_NUM

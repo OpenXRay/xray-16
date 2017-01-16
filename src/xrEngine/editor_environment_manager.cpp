@@ -237,9 +237,9 @@ CLensFlareDescriptor* manager::add_flare(xr_vector<CLensFlareDescriptor*>& colle
     NODEFAULT;
 #ifdef DEBUG
     return (0);
-#endif  // #ifdef DEBUG
-#endif  // #if 0
+#endif // #ifdef DEBUG
+#endif // #if 0
     return (inherited::add_flare(collection, id));
 }
 
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR

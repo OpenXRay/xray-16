@@ -168,7 +168,7 @@ private:
 
     // Pyramid levels (assumes 4 bytes per pixel for now)
     unsigned char** m_levels;
-    unsigned int m_numLevels;  // Number of mipmaps + base texture
+    unsigned int m_numLevels; // Number of mipmaps + base texture
 
     // Cached variables (Depend on previous private variables)
     GLint m_internalFormat;
@@ -176,4 +176,4 @@ private:
     GLenum m_componentFormat;
 };
 
-#endif  // MAYA_API_MTexture
+#endif // MAYA_API_MTexture

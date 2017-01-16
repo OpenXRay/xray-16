@@ -39,7 +39,7 @@ struct SpursSpeexTaskDesc
     int mQuality;
     int mSamplesPerSecond;
     int mEncodedFrameSize;
-    void* mInputBuffer;  // make it
+    void* mInputBuffer; // make it
     unsigned int mInputBufferSize;
 
     SpursSpeexTaskOutput* mSpeexTaskOutput;
@@ -112,4 +112,4 @@ public:
     int flush();
 };
 
-#endif  // SPU_SAMPLE_TASK_PROCESS_H
+#endif // SPU_SAMPLE_TASK_PROCESS_H

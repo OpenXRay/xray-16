@@ -237,4 +237,4 @@ CEnvAmbient::SSndChannelVec& ambient::get_snd_channels()
     return (inherited::get_snd_channels());
 }
 
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR

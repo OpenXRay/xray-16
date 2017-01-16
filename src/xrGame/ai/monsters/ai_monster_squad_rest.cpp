@@ -94,7 +94,7 @@ void CMonsterSquad::Idle_AssignAction(ENTITY_VEC& members)
             const CEntity* entity = 0;
             switch (cur_type)
             {
-            case 0:  // front
+            case 0: // front
                 entity = front.back();
                 front.pop_back();
                 for (u32 i = 0; i < back.size(); i++)
@@ -117,7 +117,7 @@ void CMonsterSquad::Idle_AssignAction(ENTITY_VEC& members)
                     }
                 command.position.mad(front_pos, random_dir, random_r);
                 break;
-            case 1:  // back
+            case 1: // back
                 entity = back.back();
                 back.pop_back();
                 for (u32 i = 0; i < front.size(); i++)
@@ -140,7 +140,7 @@ void CMonsterSquad::Idle_AssignAction(ENTITY_VEC& members)
                     }
                 command.position.mad(back_pos, random_dir, random_r);
                 break;
-            case 2:  // left
+            case 2: // left
                 entity = left.back();
                 left.pop_back();
                 for (u32 i = 0; i < front.size(); i++)
@@ -163,7 +163,7 @@ void CMonsterSquad::Idle_AssignAction(ENTITY_VEC& members)
                     }
                 command.position.mad(left_pos, random_dir, random_r);
                 break;
-            case 3:  // right
+            case 3: // right
                 entity = right.back();
                 right.pop_back();
                 for (u32 i = 0; i < front.size(); i++)

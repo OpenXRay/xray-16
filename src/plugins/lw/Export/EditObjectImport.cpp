@@ -61,7 +61,7 @@ bool CEditableObject::Import_LWO(const char* fn, bool bNeedOptimize)
                 for (Isf = I->surf; Isf; Isf = Isf->next)
                 {
                     //                    UI->ProgressUpdate(i);
-                    Isf->alpha_mode = i;  // перетираем для внутренних целей !!!
+                    Isf->alpha_mode = i; // перетираем для внутренних целей !!!
                     CSurface* Osf = xr_new<CSurface>();
                     m_Surfaces.push_back(Osf);
                     if (Isf->name && Isf->name[0])
@@ -331,7 +331,7 @@ bool CEditableObject::Import_LWO(const char* fn, bool bNeedOptimize)
                                     if (Ipv.vm[vm_i].vmap->type != ID_TXUV) continue;
                                     vm_lst.push_back(st_VMapPt());
                                     st_VMapPt& pt = vm_lst.back();
-                                    pt.vmap_index = VMIndices[Ipv.vm[vm_i].vmap];  // номер моей VMap
+                                    pt.vmap_index = VMIndices[Ipv.vm[vm_i].vmap]; // номер моей VMap
                                     names.push_back(Ipv.vm[vm_i].vmap->name);
                                     pt.index = Ipv.vm[vm_i].index;
                                 }
@@ -345,7 +345,7 @@ bool CEditableObject::Import_LWO(const char* fn, bool bNeedOptimize)
                                         continue;
                                     vm_lst.push_back(st_VMapPt());
                                     st_VMapPt& pt = vm_lst.back();
-                                    pt.vmap_index = VMIndices[Ipt.vm[vm_i].vmap];  // номер моей VMap
+                                    pt.vmap_index = VMIndices[Ipt.vm[vm_i].vmap]; // номер моей VMap
                                     pt.index = Ipt.vm[vm_i].index;
                                 }
                             }
@@ -359,7 +359,7 @@ bool CEditableObject::Import_LWO(const char* fn, bool bNeedOptimize)
                                 if (Ipt.vm[vm_i].vmap->type != ID_WGHT) continue;
                                 vm_lst.push_back(st_VMapPt());
                                 st_VMapPt& pt = vm_lst.back();
-                                pt.vmap_index = VMIndices[Ipt.vm[vm_i].vmap];  // номер моей VMap
+                                pt.vmap_index = VMIndices[Ipt.vm[vm_i].vmap]; // номер моей VMap
                                 pt.index = Ipt.vm[vm_i].index;
                             }
                             m_vm_lst.count = vm_lst.size();
@@ -379,7 +379,7 @@ bool CEditableObject::Import_LWO(const char* fn, bool bNeedOptimize)
                     // MESH->DumpAdjacency();
                     if (bNeedOptimize) MESH->Optimize(false);
                     // MESH->DumpAdjacency();
-                    MESH->RebuildVMaps();  // !!!!!!
+                    MESH->RebuildVMaps(); // !!!!!!
                 }
             }
         }

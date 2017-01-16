@@ -9,9 +9,9 @@ devsupport@gamespy.com
 */
 
 #ifdef XRAY_DISABLE_GAMESPY_WARNINGS
-#pragma warning(disable : 4244)  // lines: 980, 1202, 1207, 1298, 1447, 1451
-#pragma warning(disable : 4267)  // lines: 1071
-#endif                           //#ifdef XRAY_DISABLE_GAMESPY_WARNINGS
+#pragma warning(disable : 4244) // lines: 980, 1202, 1207, 1298, 1447, 1451
+#pragma warning(disable : 4267) // lines: 1071
+#endif                          //#ifdef XRAY_DISABLE_GAMESPY_WARNINGS
 
 #include "ghttpProcess.h"
 #include "ghttpCallbacks.h"
@@ -190,7 +190,7 @@ void ghiDoHostLookup(GHIConnection* connection)
 
     // Check for using a proxy.
     ///////////////////////////
-    if (connection->proxyOverrideServer)  // request specific proxy
+    if (connection->proxyOverrideServer) // request specific proxy
         server = connection->proxyOverrideServer;
     else if (ghiProxyAddress)
         server = ghiProxyAddress;
@@ -456,7 +456,7 @@ void ghiDoSecuringSession(GHIConnection* connection)
         // Continue to send and receive handshake messages until the session has been secured
         // Send any session messages
         if (connection->sendBuffer.pos < connection->sendBuffer.len) {
-            if (!ghiSendBufferedData(connection)) return;  // Todo: handle error?
+            if (!ghiSendBufferedData(connection)) return; // Todo: handle error?
 
             // Check for data still buffered.
             /////////////////////////////////
@@ -785,11 +785,11 @@ static GHTTPBool ghiParseStatus(GHIConnection* connection)
 
     // Check what we got.
     /////////////////////
-    if ((rcode != 3) ||  // Not all fields read.
+    if ((rcode != 3) || // Not all fields read.
         //!*statusString ||  // No status string.  PANTS|9.16.02 - apparently some servers don't return a status string
-        (majorVersion < 1) ||  // Major version is less than 1.
-        (statusCode < 100) ||  // 1xx is lowest status code.
-        (statusCode >= 600))   // 5xx is highest status code.
+        (majorVersion < 1) || // Major version is less than 1.
+        (statusCode < 100) || // 1xx is lowest status code.
+        (statusCode >= 600))  // 5xx is highest status code.
     {
         connection->completed = GHTTPTrue;
         connection->result = GHTTPBadResponse;
@@ -890,7 +890,7 @@ void ghiDoReceivingStatus(GHIConnection* connection)
         if (connection->statusCode == 100 && connection->postingState.waitPostContinue) {
             // DIME uploads must wait for initial continue before posting
             connection->postingState.waitPostContinue = GHTTPFalse;
-            ghiResetBuffer(&connection->recvBuffer);  // clear the continue
+            ghiResetBuffer(&connection->recvBuffer); // clear the continue
             connection->state = GHTTPPosting;
             ghiCallProgressCallback(connection, NULL, 0);
 
@@ -1266,7 +1266,7 @@ void ghiDoReceivingHeaders(GHIConnection* connection)
     }
     if (!endOfHeaders) {
         endOfHeaders =
-            strstr(headers, "\xA\xA");  // some servers seem to use LFs only?! Seen in 302 redirect. (28may01/bgw)
+            strstr(headers, "\xA\xA"); // some servers seem to use LFs only?! Seen in 302 redirect. (28may01/bgw)
     }
     if (endOfHeaders) {
         char* fileStart;
@@ -1406,9 +1406,9 @@ void ghiDoReceivingHeaders(GHIConnection* connection)
 // Verify that the download size is something we can handle
 ///////////////////////////////////////////////////////////
 #if (GSI_MAX_INTEGRAL_BITS >= 64)
-            char szMaxSize[] = "9223372036854775807";  // == GSI_MAX_I64
+            char szMaxSize[] = "9223372036854775807"; // == GSI_MAX_I64
 #else
-            char szMaxSize[] = "2147483647";  // == GSI_MAX_I32
+            char szMaxSize[] = "2147483647"; // == GSI_MAX_I32
 #endif
             char* pStart = contentLength + 16;
             char* pEnd = pStart;

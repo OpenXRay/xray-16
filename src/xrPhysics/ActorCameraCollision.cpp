@@ -46,7 +46,7 @@ static void cammera_shell_collide_callback_common(
     c.surface.mu = 0;
 
     dJointID contact_joint =
-        dJointCreateContactSpecial(0, ContactGroup, &c);  // dJointCreateContact(0, ContactGroup, &c);//
+        dJointCreateContactSpecial(0, ContactGroup, &c); // dJointCreateContact(0, ContactGroup, &c);//
     CPHObject* obj = (CPHObject*)my_data->callback_data;
     VERIFY(obj);
 #ifdef DEBUG
@@ -129,7 +129,7 @@ CPhysicsShell* create_camera_shell(IPhysicsShellHolder* actor)
     cyl.m_radius = 0.5f;
     // roote->add_Box(obb);
     CODEGeom* character_test_geom = smart_cast<CODEGeom*>(new CCylinderGeom(cyl));
-    character_test_geom->build(Fvector().set(0, 0, 0));  // roote->mass_Center()
+    character_test_geom->build(Fvector().set(0, 0, 0)); // roote->mass_Center()
     VERIFY(smart_cast<CPHElement*>(roote));
     CPHElement* eeroot = static_cast<CPHElement*>(roote);
 

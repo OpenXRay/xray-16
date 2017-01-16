@@ -70,7 +70,7 @@ void CSpectator::UpdateCL()
     m_timer.Start();
     m_fTimeDelta = 0.3f * m_fTimeDelta + 0.7f * fPreviousFrameTime;
 
-    if (m_fTimeDelta > 0.1f) m_fTimeDelta = 0.1f;  // maximum 10 fps
+    if (m_fTimeDelta > 0.1f) m_fTimeDelta = 0.1f; // maximum 10 fps
     if (m_fTimeDelta < 0.0f) m_fTimeDelta = EPS_S;
 
     if (Device.Paused()) {
@@ -404,9 +404,9 @@ void CSpectator::cam_Update(CActor* A)
         P.y -= 1.6f;
         XFORM().translate_over(P);
         if (Device.Paused()) {
-            Device.fTimeDelta = m_fTimeDelta;  // fake, to update cam (problem with fov)
+            Device.fTimeDelta = m_fTimeDelta; // fake, to update cam (problem with fov)
             g_pGameLevel->Cameras().UpdateFromCamera(cam);
-            Device.fTimeDelta = 0.0f;  // fake, to update cam (problem with fov)
+            Device.fTimeDelta = 0.0f; // fake, to update cam (problem with fov)
         }
         else
         {
@@ -431,9 +431,9 @@ void CSpectator::cam_Update(CActor* A)
         cam->Update(point, dangle);
         //		cam->vPosition.set(point0);
         if (Device.Paused()) {
-            Device.fTimeDelta = m_fTimeDelta;  // fake, to update cam (problem with fov)
+            Device.fTimeDelta = m_fTimeDelta; // fake, to update cam (problem with fov)
             g_pGameLevel->Cameras().UpdateFromCamera(cam);
-            Device.fTimeDelta = 0.0f;  // fake, to update cam (problem with fov)
+            Device.fTimeDelta = 0.0f; // fake, to update cam (problem with fov)
         }
         else
         {
@@ -471,7 +471,7 @@ BOOL CSpectator::net_Spawn(CSE_Abstract* DC)
     }
     look_idx = 0;
 
-    cameras[cam_active]->Set(-E->o_Angle.y, -E->o_Angle.x, tmp_roll);  // set's camera orientation
+    cameras[cam_active]->Set(-E->o_Angle.y, -E->o_Angle.x, tmp_roll); // set's camera orientation
     cameras[cam_active]->vPosition.set(E->o_Position);
 
     if (OnServer()) {
@@ -543,7 +543,7 @@ void CSpectator::net_Relcase(IGameObject* O)
 {
     if (O != m_pActorToLookAt) return;
 
-    if (m_pActorToLookAt != Level().CurrentEntity())  // new spectator was spawned
+    if (m_pActorToLookAt != Level().CurrentEntity()) // new spectator was spawned
     {
         m_pActorToLookAt = NULL;
         return;
@@ -552,7 +552,7 @@ void CSpectator::net_Relcase(IGameObject* O)
     m_pActorToLookAt = NULL;
     if (cam_active != eacFreeFly) {
         SelectNextPlayerToLook(false);
-        if (m_pActorToLookAt == O)  // selected to look at player that will be destroyed
+        if (m_pActorToLookAt == O) // selected to look at player that will be destroyed
         {
             m_pActorToLookAt = NULL;
         }

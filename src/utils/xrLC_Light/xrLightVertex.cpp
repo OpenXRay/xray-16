@@ -13,7 +13,7 @@ mapVert* g_trans;
 Lock g_trans_CS
 #ifdef CONFIG_PROFILE_LOCKS
     (MUTEX_PROFILE_ID(g_trans_CS))
-#endif  // CONFIG_PROFILE_LOCKS
+#endif // CONFIG_PROFILE_LOCKS
         ;
 extern XRLC_LIGHT_API void LightPoint(CDB::COLLIDER* DB, CDB::MODEL* MDL, base_color_c& C, Fvector& P, Fvector& N,
     base_lighting& lights, u32 flags, Face* skip);
@@ -74,7 +74,7 @@ public:
 #ifdef CONFIG_PROFILE_LOCKS
           ,
           cs(MUTEX_PROFILE_ID(CVertexLightTasker))
-#endif  // CONFIG_PROFILE_LOCKS
+#endif // CONFIG_PROFILE_LOCKS
               {};
 
     void init() { index = 0; }
@@ -136,7 +136,7 @@ public:
                     (lc_global_data()->b_nosun() ? LP_dont_sun : 0) | LP_dont_hemi, 0);
                 vC._tmp_ = v_trans;
                 vC.mul(.5f);
-                vC.hemi = old.hemi;  // preserve pre-calculated hemisphere
+                vC.hemi = old.hemi; // preserve pre-calculated hemisphere
                 V->C._set(vC);
 
                 g_trans_register(V);

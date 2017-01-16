@@ -61,7 +61,7 @@ struct XRCORE_API FS_File
     unsigned attrib;
     time_t time_write;
     long size;
-    xr_string name;  // low-case name
+    xr_string name; // low-case name
     void set(const xr_string& nm, long sz, time_t modif, unsigned attr);
 
 public:
@@ -76,4 +76,4 @@ DEFINE_SET(FS_File, FS_FileSet, FS_FileSetIt);
 
 extern bool XRCORE_API PatternMatch(LPCSTR s, LPCSTR mask);
 
-#endif  // LocatorAPI_defsH
+#endif // LocatorAPI_defsH

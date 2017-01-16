@@ -98,7 +98,7 @@ void dump_URL(LPCSTR p, IDirectPlay8Address* A)
 INetQueue::INetQueue()
 #ifdef CONFIG_PROFILE_LOCKS
     : cs(MUTEX_PROFILE_ID(INetQueue))
-#endif  // CONFIG_PROFILE_LOCKS
+#endif // CONFIG_PROFILE_LOCKS
 {
     unused.reserve(128);
     for (int i = 0; i < 16; i++)
@@ -237,7 +237,7 @@ public:
 
 //-------
 XRNETSERVER_API Flags32 psNET_Flags = {0};
-XRNETSERVER_API int psNET_ClientUpdate = 30;  // FPS
+XRNETSERVER_API int psNET_ClientUpdate = 30; // FPS
 XRNETSERVER_API int psNET_ClientPending = 2;
 XRNETSERVER_API char psNET_Name[32] = "Player";
 XRNETSERVER_API BOOL psNET_direct_connect = FALSE;
@@ -309,7 +309,7 @@ IPureClient::IPureClient(CTimer* timer)
 #ifdef CONFIG_PROFILE_LOCKS
       ,
       net_csEnumeration(MUTEX_PROFILE_ID(IPureClient::net_csEnumeration))
-#endif  // CONFIG_PROFILE_LOCKS
+#endif // CONFIG_PROFILE_LOCKS
 {
     NET = NULL;
     net_Address_server = NULL;
@@ -320,7 +320,7 @@ IPureClient::IPureClient(CTimer* timer)
     net_TimeDelta = 0;
     net_TimeDelta_Calculated = 0;
 
-    pClNetLog = NULL;  // new INetLog("logs\\net_cl_log.log", timeServer());
+    pClNetLog = NULL; // new INetLog("logs\\net_cl_log.log", timeServer());
 }
 
 IPureClient::~IPureClient()
@@ -490,15 +490,15 @@ BOOL IPureClient::Connect(LPCSTR options)
             while (res != S_OK)
             {
                 R_CHK(net_Address_device->AddComponent(DPNA_KEY_PORT, &c_port, sizeof(c_port), DPNA_DATATYPE_DWORD));
-                res = NET->Connect(&dpAppDesc,  // pdnAppDesc
-                    net_Address_server,         // pHostAddr
-                    net_Address_device,         // pDeviceInfo
-                    NULL,                       // pdnSecurity
-                    NULL,                       // pdnCredentials
-                    NULL, 0,                    // pvUserConnectData/Size
-                    NULL,                       // pvAsyncContext
-                    NULL,                       // pvAsyncHandle
-                    DPNCONNECT_SYNC);           // dwFlags
+                res = NET->Connect(&dpAppDesc, // pdnAppDesc
+                    net_Address_server,        // pHostAddr
+                    net_Address_device,        // pDeviceInfo
+                    NULL,                      // pdnSecurity
+                    NULL,                      // pdnCredentials
+                    NULL, 0,                   // pvUserConnectData/Size
+                    NULL,                      // pvAsyncContext
+                    NULL,                      // pvAsyncHandle
+                    DPNCONNECT_SYNC);          // dwFlags
                 if (res != S_OK) {
                     //			xr_string res = xrDebug::ErrorToString(HostSuccess);
 
@@ -566,16 +566,16 @@ BOOL IPureClient::Connect(LPCSTR options)
             {
                 R_CHK(net_Address_device->AddComponent(DPNA_KEY_PORT, &c_port, sizeof(c_port), DPNA_DATATYPE_DWORD));
 
-                res = NET->EnumHosts(&dpAppDesc,  // pApplicationDesc - for unknown reason
-                    net_Address_server,           // pdpaddrHost
-                    net_Address_device,           // pdpaddrDeviceInfo
-                    EnumData, EnumSize,           // pvUserEnumData, size
-                    10,                           // dwEnumCount
-                    1000,                         // dwRetryInterval
-                    1000,                         // dwTimeOut
-                    NULL,                         // pvUserContext
-                    NULL,                         // pAsyncHandle
-                    DPNENUMHOSTS_SYNC             // dwFlags
+                res = NET->EnumHosts(&dpAppDesc, // pApplicationDesc - for unknown reason
+                    net_Address_server,          // pdpaddrHost
+                    net_Address_device,          // pdpaddrDeviceInfo
+                    EnumData, EnumSize,          // pvUserEnumData, size
+                    10,                          // dwEnumCount
+                    1000,                        // dwRetryInterval
+                    1000,                        // dwTimeOut
+                    NULL,                        // pvUserContext
+                    NULL,                        // pAsyncHandle
+                    DPNENUMHOSTS_SYNC            // dwFlags
                     );
                 if (res != S_OK) {
                     //			xr_string res = xrDebug::ErrorToString(HostSuccess);
@@ -636,16 +636,16 @@ BOOL IPureClient::Connect(LPCSTR options)
 
             R_CHK(net_Hosts.front().pHostAddress->Duplicate(&pHostAddress));
             // dump_URL		("! c2s ",	pHostAddress);
-            res = NET->Connect(&dpAppDesc,  // pdnAppDesc
-                pHostAddress,               // pHostAddr
-                net_Address_device,         // pDeviceInfo
-                NULL,                       // pdnSecurity
-                NULL,                       // pdnCredentials
-                NULL, 0,                    // pvUserConnectData/Size
-                NULL,                       // pvAsyncContext
-                NULL,                       // pvAsyncHandle
-                DPNCONNECT_SYNC);           // dwFlags
-                                            //		R_CHK(res);
+            res = NET->Connect(&dpAppDesc, // pdnAppDesc
+                pHostAddress,              // pHostAddr
+                net_Address_device,        // pDeviceInfo
+                NULL,                      // pdnSecurity
+                NULL,                      // pdnCredentials
+                NULL, 0,                   // pvUserConnectData/Size
+                NULL,                      // pvAsyncContext
+                NULL,                      // pvAsyncHandle
+                DPNCONNECT_SYNC);          // dwFlags
+                                           //		R_CHK(res);
             net_csEnumeration.Leave();
             _RELEASE(pHostAddress);
 #ifdef DEBUG
@@ -681,7 +681,7 @@ BOOL IPureClient::Connect(LPCSTR options)
         R_CHK			(NET->SetSPCaps(&sp_guid,&sp_caps,0));
         R_CHK			(NET->GetSPCaps(&sp_guid,&sp_caps,0));
         */
-    }  // psNET_direct_connect
+    } // psNET_direct_connect
     // Sync
     net_TimeDelta = 0;
     return TRUE;
@@ -866,7 +866,7 @@ void IPureClient::OnMessage(void* data, u32 size)
     NET_Packet* P = net_Queue.Create();
 
     P->construct(data, size);
-    P->timeReceive = timeServer_Async();  // TimerAsync				(device_timer);
+    P->timeReceive = timeServer_Async(); // TimerAsync				(device_timer);
 
     u16 m_type;
     P->r_begin(m_type);
@@ -932,7 +932,7 @@ BOOL IPureClient::net_HasBandwidth()
     if (net_Disconnected) return FALSE;
 
     if (psNET_ClientUpdate != 0) dwInterval = 1000 / psNET_ClientUpdate;
-    if (psNET_Flags.test(NETFLAG_MINIMIZEUPDATES)) dwInterval = 1000;  // approx 3 times per second
+    if (psNET_Flags.test(NETFLAG_MINIMIZEUPDATES)) dwInterval = 1000; // approx 3 times per second
 
     if (psNET_direct_connect) {
         if (0 != psNET_ClientUpdate && (dwTime - net_Time_LastUpdate) > dwInterval) {
@@ -988,7 +988,7 @@ void IPureClient::Sync_Thread()
     {
         // Waiting for queue empty state
         if (net_Syncronised)
-            break;  // Sleep(2000);
+            break; // Sleep(2000);
         else
         {
             DWORD dwPending = 0;

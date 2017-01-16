@@ -7,11 +7,11 @@ namespace PAPI
 // A effect of particles - Info and an array of Particles
 struct ParticleEffect
 {
-    u32 p_count;              // Number of particles currently existing.
-    u32 max_particles;        // Max particles allowed in effect.
-    u32 particles_allocated;  // Actual allocated size.
-    Particle* particles;      // Actually, num_particles in size
-    void* real_ptr;           // Base, possible not aligned pointer
+    u32 p_count;             // Number of particles currently existing.
+    u32 max_particles;       // Max particles allowed in effect.
+    u32 particles_allocated; // Actual allocated size.
+    Particle* particles;     // Actually, num_particles in size
+    void* real_ptr;          // Base, possible not aligned pointer
     OnBirthParticleCB b_cb;
     OnDeadParticleCB d_cb;
     void* owner;
@@ -74,8 +74,8 @@ public:
         if (0 == p_count) return;
         Particle& m = particles[i];
         if (d_cb) d_cb(owner, param, m, i);
-        m = particles[--p_count];  // не менять правило удаления !!! (dependence ParticleGroup)
-                                   // Msg( "pDel() : %u" , p_count );
+        m = particles[--p_count]; // не менять правило удаления !!! (dependence ParticleGroup)
+                                  // Msg( "pDel() : %u" , p_count );
     }
 
     IC BOOL Add(const pVector& pos, const pVector& posB, const pVector& size, const pVector& rot, const pVector& vel,

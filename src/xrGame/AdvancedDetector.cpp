@@ -37,7 +37,7 @@ void CAdvancedDetector::UpdateAf()
     float min_dist = flt_max;
 
     Fvector detector_pos = Position();
-    for (; it_b != it_e; ++it_b)  // only nearest
+    for (; it_b != it_e; ++it_b) // only nearest
     {
         CArtefact* pAf = it_b->first;
         if (pAf->H_Parent()) continue;

@@ -21,10 +21,10 @@ class CAgentManagerPlanner;
 #ifdef USE_SCHEDULER_IN_AGENT_MANAGER
 class CAgentManager : public ScheduledBase
 {
-#else   // USE_SCHEDULER_IN_AGENT_MANAGER
+#else  // USE_SCHEDULER_IN_AGENT_MANAGER
 class CAgentManager
 {
-#endif  // USE_SCHEDULER_IN_AGENT_MANAGER
+#endif // USE_SCHEDULER_IN_AGENT_MANAGER
 
 private:
     CAgentCorpseManager* m_corpse;
@@ -39,7 +39,7 @@ private:
 private:
     u32 m_last_update_time;
     u32 m_update_rate;
-#endif  // USE_SCHEDULER_IN_AGENT_MANAGER
+#endif // USE_SCHEDULER_IN_AGENT_MANAGER
 
 private:
     void init_scheduler();
@@ -50,7 +50,7 @@ private:
 #ifdef USE_SCHEDULER_IN_AGENT_MANAGER
 private:
     void remove_scheduler();
-#endif  // USE_SCHEDULER_IN_AGENT_MANAGER
+#endif // USE_SCHEDULER_IN_AGENT_MANAGER
 
 public:
     CAgentManager();
@@ -61,9 +61,9 @@ public:
     virtual float shedule_Scale();
     virtual void shedule_Update(u32 time_delta);
     virtual shared_str shedule_Name() const { return shared_str("agent_manager"); };
-#else   // USE_SCHEDULER_IN_AGENT_MANAGER
+#else  // USE_SCHEDULER_IN_AGENT_MANAGER
     void update();
-#endif  // USE_SCHEDULER_IN_AGENT_MANAGER
+#endif // USE_SCHEDULER_IN_AGENT_MANAGER
     shared_str cName() const;
     void remove_links(IGameObject* object);
 

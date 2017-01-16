@@ -24,4 +24,4 @@ protected:
     CUIGameLog* m_achivement_log;
 };
 
-#endif  //#ifndef UI_ACHIVEMENTS_INDICATOR_INCLUDED
+#endif //#ifndef UI_ACHIVEMENTS_INDICATOR_INCLUDED

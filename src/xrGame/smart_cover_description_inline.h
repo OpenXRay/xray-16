@@ -25,6 +25,6 @@ IC description::TransitionGraph const& description::transitions() const
     return (m_transitions);
 }
 
-}  // namespace smart_cover
+} // namespace smart_cover
 
-#endif  // SMART_COVER_DESCRIPTION_INLINE_H_INCLUDED
+#endif // SMART_COVER_DESCRIPTION_INLINE_H_INCLUDED

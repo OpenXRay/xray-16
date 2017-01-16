@@ -90,7 +90,7 @@ void CHelicopter::Load(LPCSTR section)
     HUD_SOUND_ITEM::LoadSound(section, "snd_shoot_rocket", m_sndShotRocket, SOUND_TYPE_WEAPON_SHOOTING);
     CRocketLauncher::Load(section);
 
-    UseFireTrail(m_enemy.bUseFireTrail);  // temp force reloar disp params
+    UseFireTrail(m_enemy.bUseFireTrail); // temp force reloar disp params
 
     m_sAmmoType = pSettings->r_string(section, "ammo_class");
     m_CurrentAmmo.Load(*m_sAmmoType, 0);
@@ -311,7 +311,7 @@ void CHelicopter::MoveStep()
         if (aaa) Log("2-m_movement.curLinearSpeed=", m_movement.curLinearSpeed);
     }
     else
-    {  // go stopping
+    { // go stopping
         if (!fis_zero(m_movement.curLinearSpeed)) {
             m_movement.curLinearAcc = -m_movement.LinearAcc_bk;
 
@@ -470,7 +470,7 @@ void CHelicopter::load(IReader& input_packet)
     m_enemy.load(input_packet);
     input_packet.r_fvector3(XFORM().c);
     m_barrel_dir_tolerance = input_packet.r_float();
-    UseFireTrail(m_enemy.bUseFireTrail);  // force reloar disp params
+    UseFireTrail(m_enemy.bUseFireTrail); // force reloar disp params
 
     load_data(m_use_rocket_on_attack, input_packet);
     load_data(m_use_mgun_on_attack, input_packet);

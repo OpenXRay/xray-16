@@ -94,7 +94,7 @@ int solve_trig1(float a, float b, float c, float theta[2])
             return 0;
     }
 
-    temp = (float)atan2((float)_sqrt(temp), (float)c);  //.(float) c
+    temp = (float)atan2((float)_sqrt(temp), (float)c); //.(float) c
     int num = (!iszero(temp)) ? 2 : 1;
 
     // Calculate answer in radians

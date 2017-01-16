@@ -63,7 +63,7 @@ Please see the GameSpy Presence SDK documentation for more information
 // FUNCTIONS
 ///////////
 void strzcpy(char* dest, const char* src,
-    size_t len  // length of buffer, including space for '\0'
+    size_t len // length of buffer, including space for '\0'
     );
 
 void gpiDebug(GPConnection* connection, const char* fmt, ...);

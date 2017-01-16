@@ -14,9 +14,8 @@ const int quant = 16384;
 const int c_hdr = 10;
 const int c_size = 4;
 
-static D3DVERTEXELEMENT9 dwDecl[] = {
-    {0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},   // pos
-    {0, 12, D3DDECLTYPE_SHORT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0},  // uv
+static D3DVERTEXELEMENT9 dwDecl[] = {{0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0}, // pos
+    {0, 12, D3DDECLTYPE_SHORT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0},                                 // uv
     D3DDECL_END()};
 
 #pragma pack(push, 1)
@@ -69,7 +68,7 @@ void CDetailManager::hw_Load_Geom()
     R_CHK(HW.pDevice->CreateIndexBuffer(dwIndices * 2, dwUsage, D3DFMT_INDEX16, D3DPOOL_MANAGED, &hw_IB, 0));
     HW.stats_manager.increment_stats_ib(hw_IB);
 
-#endif  //	USE_DX10
+#endif //	USE_DX10
     Msg("* [DETAILS] Batch(%d), VB(%dK), IB(%dK)", hw_BatchSize, (dwVerts * vSize) / 1024, (dwIndices * 2) / 1024);
 
     // Fill VB
@@ -79,9 +78,9 @@ void CDetailManager::hw_Load_Geom()
         vertHW* pVOriginal;
         pVOriginal = xr_alloc<vertHW>(dwVerts);
         pV = pVOriginal;
-#else   //	USE_DX10
+#else  //	USE_DX10
         R_CHK(hw_VB->Lock(0, 0, (void**)&pV, 0));
-#endif  //	USE_DX10
+#endif //	USE_DX10
         for (u32 o = 0; o < objects.size(); o++)
         {
             const CDetail& D = *objects[o];
@@ -106,9 +105,9 @@ void CDetailManager::hw_Load_Geom()
         R_CHK(dx10BufferUtils::CreateVertexBuffer(&hw_VB, pVOriginal, dwVerts * vSize));
         HW.stats_manager.increment_stats_vb(hw_VB);
         xr_free(pVOriginal);
-#else   //	USE_DX10
+#else  //	USE_DX10
         R_CHK(hw_VB->Unlock());
-#endif  //	USE_DX10
+#endif //	USE_DX10
     }
 
     // Fill IB
@@ -118,9 +117,9 @@ void CDetailManager::hw_Load_Geom()
         u16* pIOriginal;
         pIOriginal = xr_alloc<u16>(dwIndices);
         pI = pIOriginal;
-#else   //	USE_DX10
+#else  //	USE_DX10
         R_CHK(hw_IB->Lock(0, 0, (void**)(&pI), 0));
-#endif  //	USE_DX10
+#endif //	USE_DX10
         for (u32 o = 0; o < objects.size(); o++)
         {
             const CDetail& D = *objects[o];
@@ -136,9 +135,9 @@ void CDetailManager::hw_Load_Geom()
         R_CHK(dx10BufferUtils::CreateIndexBuffer(&hw_IB, pIOriginal, dwIndices * 2));
         HW.stats_manager.increment_stats_ib(hw_IB);
         xr_free(pIOriginal);
-#else   //	USE_DX10
+#else  //	USE_DX10
         R_CHK(hw_IB->Unlock());
-#endif  //	USE_DX10
+#endif //	USE_DX10
     }
 
     // Declare geometry
@@ -202,16 +201,16 @@ void CDetailManager::hw_Render()
     Fvector4 wave;
     // wave.set				(1.f/5.f,		1.f/7.f,	1.f/3.f,	RDEVICE.fTimeGlobal*swing_current.speed);
     wave.set(1.f / 5.f, 1.f / 7.f, 1.f / 3.f, m_time_pos);
-    RCache.set_c(&*hwc_consts, scale, scale, ps_r__Detail_l_aniso, ps_r__Detail_l_ambient);  // consts
-    RCache.set_c(&*hwc_wave, wave.div(PI_MUL_2));                                            // wave
-    RCache.set_c(&*hwc_wind, dir1);                                                          // wind-dir
+    RCache.set_c(&*hwc_consts, scale, scale, ps_r__Detail_l_aniso, ps_r__Detail_l_ambient); // consts
+    RCache.set_c(&*hwc_wave, wave.div(PI_MUL_2));                                           // wave
+    RCache.set_c(&*hwc_wind, dir1);                                                         // wind-dir
     hw_Render_dump(&*hwc_array, 1, 0, c_hdr);
 
     // Wave1
     // wave.set				(1.f/3.f,		1.f/7.f,	1.f/5.f,	RDEVICE.fTimeGlobal*swing_current.speed);
     wave.set(1.f / 3.f, 1.f / 7.f, 1.f / 5.f, m_time_pos);
-    RCache.set_c(&*hwc_wave, wave.div(PI_MUL_2));  // wave
-    RCache.set_c(&*hwc_wind, dir2);                // wind-dir
+    RCache.set_c(&*hwc_wave, wave.div(PI_MUL_2)); // wave
+    RCache.set_c(&*hwc_wind, dir2);               // wind-dir
     hw_Render_dump(&*hwc_array, 2, 0, c_hdr);
 
     // Still
@@ -327,4 +326,4 @@ void CDetailManager::hw_Render_dump(ref_constant x_array, u32 var_id, u32 lod_id
     }
 }
 
-#endif  //	USE_DX10
+#endif //	USE_DX10

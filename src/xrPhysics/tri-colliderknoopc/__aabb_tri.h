@@ -22,10 +22,12 @@ public:
     // IC	float		Max()								const		{ return MAX(x, MAX(y, z));
     // }
     //! TO BE DOCUMENTED
-    // IC	Point&		Min(const Point& p)								{ x = MIN(x, p.x); y = MIN(y, p.y); z = MIN(z, p.z);	return *this;
+    // IC	Point&		Min(const Point& p)								{ x = MIN(x, p.x); y = MIN(y, p.y); z = MIN(z, p.z);	return
+    // *this;
     // }
     //! TO BE DOCUMENTED
-    // IC	Point&		Max(const Point& p)								{ x = MAX(x, p.x); y = MAX(y, p.y); z = MAX(z, p.z);	return *this;
+    // IC	Point&		Max(const Point& p)								{ x = MAX(x, p.x); y = MAX(y, p.y); z = MAX(z, p.z);	return
+    // *this;
     // }
 
     //! Computes square magnitude
@@ -130,9 +132,9 @@ public:
     //! Access as array
     ICF operator float*() { return &x; }
 public:
-    float x;  //!< x coordinate
-    float y;  //!< y coordinate
-    float z;  //!< z coordinate
+    float x; //!< x coordinate
+    float y; //!< y coordinate
+    float z; //!< z coordinate
 };
 // using namespace CDB;
 using namespace Opcode;

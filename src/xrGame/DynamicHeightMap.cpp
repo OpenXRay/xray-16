@@ -119,7 +119,7 @@ void CHM_Static::Update()
         bb.grow(EPS_L);
 
         // Select polygons
-        XRC.BBoxMode(0);  // BBOX_TRITEST
+        XRC.BBoxMode(0); // BBOX_TRITEST
         XRC.BBoxCollide(precalc_identity, g_pGameLevel->ObjectSpace.GetStaticModel(), precalc_identity, bb);
         u32 triCount = XRC.GetBBoxContactCount();
         if (0 == triCount) {

@@ -55,4 +55,4 @@ public:
     void SelectBestDevice();
 };
 
-#endif  // ALDEVICELIST_H
+#endif // ALDEVICELIST_H

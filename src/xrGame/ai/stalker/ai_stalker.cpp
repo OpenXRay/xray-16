@@ -63,12 +63,12 @@
 #include "xr_level_controller.h"
 
 #ifdef DEBUG
-#include "alife_simulator.h"
-#include "alife_object_registry.h"
 #include "Level.h"
+#include "alife_object_registry.h"
+#include "alife_simulator.h"
 #include "map_location.h"
 #include "map_manager.h"
-#endif  // DEBUG
+#endif // DEBUG
 
 using namespace StalkerSpace;
 
@@ -86,7 +86,7 @@ CAI_Stalker::CAI_Stalker()
 #ifdef DEBUG
     m_debug_planner = 0;
     m_dbg_hud_draw = false;
-#endif  // DEBUG
+#endif // DEBUG
     m_registered_in_combat_on_migration = false;
 }
 
@@ -114,13 +114,13 @@ void CAI_Stalker::reinit()
 #ifdef DEBUG_MEMORY_MANAGER
     u32 start = 0;
     if (g_bMEMO) start = Memory.mem_usage();
-#endif  // DEBUG_MEMORY_MANAGER
+#endif // DEBUG_MEMORY_MANAGER
 
     LoadSounds(*cNameSect());
 
 #ifdef DEBUG_MEMORY_MANAGER
     if (g_bMEMO) Msg("CAI_Stalker::LoadSounds() : %d", Memory.mem_usage() - start);
-#endif  // DEBUG_MEMORY_MANAGER
+#endif // DEBUG_MEMORY_MANAGER
 
     m_pPhysics_support->in_Init();
 
@@ -248,8 +248,8 @@ void CAI_Stalker::LoadSounds(LPCSTR section)
         u32(eStalkerSoundMaskMovingInDanger), eStalkerSoundRunningInDanger, head_bone_name,
         new CStalkerSoundData(this));
     //	sound().add						(pSettings->r_string(section,"sound_walking_in_danger"),			100,
-    //SOUND_TYPE_MONSTER_TALKING,	6, u32(eStalkerSoundMaskMovingInDanger),			eStalkerSoundWalkingInDanger,
-    //head_bone_name, new CStalkerSoundData(this));
+    // SOUND_TYPE_MONSTER_TALKING,	6, u32(eStalkerSoundMaskMovingInDanger),			eStalkerSoundWalkingInDanger,
+    // head_bone_name, new CStalkerSoundData(this));
     sound().add(pSettings->r_string(section, "sound_kill_wounded"), 100, SOUND_TYPE_MONSTER_TALKING, 5,
         u32(eStalkerSoundMaskKillWounded), eStalkerSoundKillWounded, head_bone_name, new CStalkerSoundData(this));
     sound().add(pSettings->r_string(section, "sound_enemy_critically_wounded"), 100, SOUND_TYPE_MONSTER_TALKING, 4,
@@ -267,13 +267,13 @@ void CAI_Stalker::reload(LPCSTR section)
 #ifdef DEBUG_MEMORY_MANAGER
     u32 start = 0;
     if (g_bMEMO) start = Memory.mem_usage();
-#endif  // DEBUG_MEMORY_MANAGER
+#endif // DEBUG_MEMORY_MANAGER
 
     brain().setup(this);
 
 #ifdef DEBUG_MEMORY_MANAGER
     if (g_bMEMO) Msg("brain().setup() : %d", Memory.mem_usage() - start);
-#endif  // DEBUG_MEMORY_MANAGER
+#endif // DEBUG_MEMORY_MANAGER
 
     CCustomMonster::reload(section);
     if (!already_dead()) CStepManager::reload(section);
@@ -402,23 +402,23 @@ void CAI_Stalker::reload(LPCSTR section)
             READ_IF_EXISTS(pSettings, r_u32, queue_sect, "auto_max_queue_interval_close", 500);
 
         //		m_pstl_queue_fire_dist_close		=
-        //READ_IF_EXISTS(pSettings,r_float,queue_sect,"pstl_queue_fire_dist_close", 15.0f);
+        // READ_IF_EXISTS(pSettings,r_float,queue_sect,"pstl_queue_fire_dist_close", 15.0f);
         m_pstl_queue_fire_dist_med = READ_IF_EXISTS(pSettings, r_float, queue_sect, "pstl_queue_fire_dist_med", 15.0f);
         m_pstl_queue_fire_dist_far = READ_IF_EXISTS(pSettings, r_float, queue_sect, "pstl_queue_fire_dist_far", 30.0f);
         //		m_shtg_queue_fire_dist_close		=
-        //READ_IF_EXISTS(pSettings,r_float,queue_sect,"shtg_queue_fire_dist_close", 15.0f);
+        // READ_IF_EXISTS(pSettings,r_float,queue_sect,"shtg_queue_fire_dist_close", 15.0f);
         m_shtg_queue_fire_dist_med = READ_IF_EXISTS(pSettings, r_float, queue_sect, "shtg_queue_fire_dist_med", 15.0f);
         m_shtg_queue_fire_dist_far = READ_IF_EXISTS(pSettings, r_float, queue_sect, "shtg_queue_fire_dist_far", 30.0f);
         //		m_snp_queue_fire_dist_close			=
-        //READ_IF_EXISTS(pSettings,r_float,queue_sect,"snp_queue_fire_dist_close", 15.0f);
+        // READ_IF_EXISTS(pSettings,r_float,queue_sect,"snp_queue_fire_dist_close", 15.0f);
         m_snp_queue_fire_dist_med = READ_IF_EXISTS(pSettings, r_float, queue_sect, "snp_queue_fire_dist_med", 15.0f);
         m_snp_queue_fire_dist_far = READ_IF_EXISTS(pSettings, r_float, queue_sect, "snp_queue_fire_dist_far", 30.0f);
         //		m_mchg_queue_fire_dist_close			=
-        //READ_IF_EXISTS(pSettings,r_float,queue_sect,"mchg_queue_fire_dist_close", 15.0f);
+        // READ_IF_EXISTS(pSettings,r_float,queue_sect,"mchg_queue_fire_dist_close", 15.0f);
         m_mchg_queue_fire_dist_med = READ_IF_EXISTS(pSettings, r_float, queue_sect, "mchg_queue_fire_dist_med", 15.0f);
         m_mchg_queue_fire_dist_far = READ_IF_EXISTS(pSettings, r_float, queue_sect, "mchg_queue_fire_dist_far", 30.0f);
         //		m_auto_queue_fire_dist_close		=
-        //READ_IF_EXISTS(pSettings,r_float,queue_sect,"auto_queue_fire_dist_close", 15.0f);
+        // READ_IF_EXISTS(pSettings,r_float,queue_sect,"auto_queue_fire_dist_close", 15.0f);
         m_auto_queue_fire_dist_med = READ_IF_EXISTS(pSettings, r_float, queue_sect, "auto_queue_fire_dist_med", 15.0f);
         m_auto_queue_fire_dist_far = READ_IF_EXISTS(pSettings, r_float, queue_sect, "auto_queue_fire_dist_far", 30.0f);
     }
@@ -530,29 +530,29 @@ void CAI_Stalker::reload(LPCSTR section)
             READ_IF_EXISTS(pSettings, r_u32, *cNameSect(), "auto_max_queue_interval_close", 500);
 
         //		m_pstl_queue_fire_dist_close		=
-        //READ_IF_EXISTS(pSettings,r_float,*cNameSect(),"pstl_queue_fire_dist_close", 15.0f);
+        // READ_IF_EXISTS(pSettings,r_float,*cNameSect(),"pstl_queue_fire_dist_close", 15.0f);
         m_pstl_queue_fire_dist_med =
             READ_IF_EXISTS(pSettings, r_float, *cNameSect(), "pstl_queue_fire_dist_med", 15.0f);
         m_pstl_queue_fire_dist_far =
             READ_IF_EXISTS(pSettings, r_float, *cNameSect(), "pstl_queue_fire_dist_far", 30.0f);
         //		m_shtg_queue_fire_dist_close		=
-        //READ_IF_EXISTS(pSettings,r_float,*cNameSect(),"shtg_queue_fire_dist_close", 15.0f);
+        // READ_IF_EXISTS(pSettings,r_float,*cNameSect(),"shtg_queue_fire_dist_close", 15.0f);
         m_shtg_queue_fire_dist_med =
             READ_IF_EXISTS(pSettings, r_float, *cNameSect(), "shtg_queue_fire_dist_med", 15.0f);
         m_shtg_queue_fire_dist_far =
             READ_IF_EXISTS(pSettings, r_float, *cNameSect(), "shtg_queue_fire_dist_far", 30.0f);
         //		m_snp_queue_fire_dist_close			=
-        //READ_IF_EXISTS(pSettings,r_float,*cNameSect(),"snp_queue_fire_dist_close", 15.0f);
+        // READ_IF_EXISTS(pSettings,r_float,*cNameSect(),"snp_queue_fire_dist_close", 15.0f);
         m_snp_queue_fire_dist_med = READ_IF_EXISTS(pSettings, r_float, *cNameSect(), "snp_queue_fire_dist_med", 15.0f);
         m_snp_queue_fire_dist_far = READ_IF_EXISTS(pSettings, r_float, *cNameSect(), "snp_queue_fire_dist_far", 30.0f);
         //		m_mchg_queue_fire_dist_close			=
-        //READ_IF_EXISTS(pSettings,r_float,*cNameSect(),"mchg_queue_fire_dist_close", 15.0f);
+        // READ_IF_EXISTS(pSettings,r_float,*cNameSect(),"mchg_queue_fire_dist_close", 15.0f);
         m_mchg_queue_fire_dist_med =
             READ_IF_EXISTS(pSettings, r_float, *cNameSect(), "mchg_queue_fire_dist_med", 15.0f);
         m_mchg_queue_fire_dist_far =
             READ_IF_EXISTS(pSettings, r_float, *cNameSect(), "mchg_queue_fire_dist_far", 30.0f);
         //		m_auto_queue_fire_dist_close		=
-        //READ_IF_EXISTS(pSettings,r_float,**cNameSect(),"auto_queue_fire_dist_close", 15.0f);
+        // READ_IF_EXISTS(pSettings,r_float,**cNameSect(),"auto_queue_fire_dist_close", 15.0f);
         m_auto_queue_fire_dist_med =
             READ_IF_EXISTS(pSettings, r_float, *cNameSect(), "auto_queue_fire_dist_med", 15.0f);
         m_auto_queue_fire_dist_far =
@@ -627,7 +627,7 @@ BOOL CAI_Stalker::net_Spawn(CSE_Abstract* DC)
 #ifdef DEBUG_MEMORY_MANAGER
     u32 start = 0;
     if (g_bMEMO) start = Memory.mem_usage();
-#endif  // DEBUG_MEMORY_MANAGER
+#endif // DEBUG_MEMORY_MANAGER
 
     CSE_Abstract* e = (CSE_Abstract*)(DC);
     CSE_ALifeHumanStalker* tpHuman = smart_cast<CSE_ALifeHumanStalker*>(e);
@@ -648,13 +648,13 @@ BOOL CAI_Stalker::net_Spawn(CSE_Abstract* DC)
 #ifdef DEBUG_MEMORY_MANAGER
     u32 _start = 0;
     if (g_bMEMO) _start = Memory.mem_usage();
-#endif  // DEBUG_MEMORY_MANAGER
+#endif // DEBUG_MEMORY_MANAGER
 
     animation().reload();
 
 #ifdef DEBUG_MEMORY_MANAGER
     if (g_bMEMO) Msg("CStalkerAnimationManager::reload() : %d", Memory.mem_usage() - _start);
-#endif  // DEBUG_MEMORY_MANAGER
+#endif // DEBUG_MEMORY_MANAGER
 
     movement().m_head.current.yaw = movement().m_head.target.yaw = movement().m_body.current.yaw =
         movement().m_body.target.yaw = angle_normalize_signed(-tpHuman->o_torso.yaw);
@@ -720,13 +720,13 @@ BOOL CAI_Stalker::net_Spawn(CSE_Abstract* DC)
 
         map_location->SetHint(cName());
     }
-#endif  // _DEBUG
+#endif // _DEBUG
 
 #ifdef DEBUG_MEMORY_MANAGER
     if (g_bMEMO) {
         Msg("CAI_Stalker::net_Spawn() : %d", Memory.mem_usage() - start);
     }
-#endif  // DEBUG_MEMORY_MANAGER
+#endif // DEBUG_MEMORY_MANAGER
 
     if (SpecificCharacter().terrain_sect().size()) {
         movement().locations().Load(*SpecificCharacter().terrain_sect());
@@ -753,7 +753,7 @@ void CAI_Stalker::net_Destroy()
     xr_vector<fastdelegate::FastDelegate0<>>::const_iterator I;
     I = std::find(Device.seqParallel.begin(), Device.seqParallel.end(), f);
     VERIFY(I == Device.seqParallel.end());
-#endif  // DEBUG
+#endif // DEBUG
 
     xr_delete(m_ce_close);
     xr_delete(m_ce_far);
@@ -1037,10 +1037,10 @@ void CAI_Stalker::shedule_Update(u32 DT)
 
 #ifndef USE_SCHEDULER_IN_AGENT_MANAGER
         agent_manager().update();
-#endif  // USE_SCHEDULER_IN_AGENT_MANAGER
+#endif // USE_SCHEDULER_IN_AGENT_MANAGER
 
 //		bool			check = !!memory().enemy().selected();
-#if 0  // def DEBUG
+#if 0 // def DEBUG
 		memory().visual().check_visibles();
 #endif
         if (false && g_mt_config.test(mtAiVision))
@@ -1198,7 +1198,7 @@ void CAI_Stalker::Think()
     //	try {
     movement().update(update_delta);
 //	}
-#if 0   // def DEBUG
+#if 0  // def DEBUG
 	catch (luabind::cast_failed &message) {
 		Msg						("! Expression \"%s\" from luabind::object to %s",message.what(),message.info().name());
 		movement().initialize	();
@@ -1217,7 +1217,7 @@ void CAI_Stalker::Think()
 		movement().update		(update_delta);
 		throw;
 	}
-#endif  // DEBUG
+#endif // DEBUG
 
     STOP_PROFILE
     STOP_PROFILE
@@ -1271,7 +1271,7 @@ IFactoryObject* CAI_Stalker::_construct()
 #ifdef DEBUG_MEMORY_MANAGER
     u32 start = 0;
     if (g_bMEMO) start = Memory.mem_usage();
-#endif  // DEBUG_MEMORY_MANAGER
+#endif // DEBUG_MEMORY_MANAGER
 
     m_pPhysics_support = new CCharacterPhysicsSupport(CCharacterPhysicsSupport::etStalker, this);
     CCustomMonster::_construct();
@@ -1286,7 +1286,7 @@ IFactoryObject* CAI_Stalker::_construct()
 
 #ifdef DEBUG_MEMORY_MANAGER
     if (g_bMEMO) Msg("CAI_Stalker::_construct() : %d", Memory.mem_usage() - start);
-#endif  // DEBUG_MEMORY_MANAGER
+#endif // DEBUG_MEMORY_MANAGER
 
     return (this);
 }

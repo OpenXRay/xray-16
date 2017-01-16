@@ -147,5 +147,5 @@ public:
     virtual bool CS_LUA_STUDIO_BACKEND_CALL expand_value(
         cs::lua_studio::backend& backend, cs::lua_studio::value_to_expand& value, lua_State* state) = 0;
 };
-}  // namespace lua_studio
-}  // namespace cs
+} // namespace lua_studio
+} // namespace cs

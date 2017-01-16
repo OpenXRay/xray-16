@@ -14,16 +14,16 @@
 enum xrProperties
 {
     xrPID_MARKER = 0,
-    xrPID_MATRIX,    // really only name(stringZ) is written into stream
-    xrPID_CONSTANT,  // really only name(stringZ) is written into stream
-    xrPID_TEXTURE,   // really only name(stringZ) is written into stream
+    xrPID_MATRIX,   // really only name(stringZ) is written into stream
+    xrPID_CONSTANT, // really only name(stringZ) is written into stream
+    xrPID_TEXTURE,  // really only name(stringZ) is written into stream
     xrPID_INTEGER,
     xrPID_FLOAT,
     xrPID_BOOL,
     xrPID_TOKEN,
     xrPID_CLSID,
-    xrPID_OBJECT,  // really only name(stringZ) is written into stream
-    xrPID_STRING,  // really only name(stringZ) is written into stream
+    xrPID_OBJECT, // really only name(stringZ) is written into stream
+    xrPID_STRING, // really only name(stringZ) is written into stream
     xrPID_MARKER_TEMPLATE,
     xrPID_FORCEDWORD = u32(-1)
 };
@@ -152,4 +152,4 @@ IC void xrPREAD_MARKER(IReader& fs)
 // };
 //}
 #pragma pack(pop)
-#endif  // xrPROPERTIES_H
+#endif // xrPROPERTIES_H

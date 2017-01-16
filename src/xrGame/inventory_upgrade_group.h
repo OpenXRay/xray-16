@@ -28,7 +28,7 @@ public:
 
 #ifdef DEBUG
     void log_hierarchy(LPCSTR nesting);
-#endif  // DEBUG
+#endif // DEBUG
 
     void fill_root(Root* root);
 
@@ -46,11 +46,11 @@ private:
     Upgrades_type m_parent_upgrades;
     Upgrades_type m_included_upgrades;
 
-};  // class group
+}; // class group
 
-}  // namespace upgrade
-}  // namespace inventory
+} // namespace upgrade
+} // namespace inventory
 
 #include "inventory_upgrade_group_inline.h"
 
-#endif  // INVENTORY_UPGRADE_GROUP_H_INCLUDED
+#endif // INVENTORY_UPGRADE_GROUP_H_INCLUDED

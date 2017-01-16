@@ -82,7 +82,7 @@ void CSoundRender_Emitter::fill_block(void* ptr, u32 size)
         switch (m_current_state)
         {
         case stPlaying:
-        {  // Fill as much data as we can, zeroing remainder
+        { // Fill as much data as we can, zeroing remainder
             if (get_cursor(true) >= dwBytesTotal) {
                 // ??? We requested the block after remainder - just zero
                 memset(dest, 0, size);
@@ -128,13 +128,13 @@ void CSoundRender_Emitter::fill_block(void* ptr, u32 size)
 
 #ifdef DEBUG
                 Msg("reminder from prev source %d", rem);
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
                 fill_data(dest, get_cursor(false), rem);
                 move_cursor(rem);
             }
 #ifdef DEBUG
             Msg("recurce from next source %d", size - rem);
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
             fill_block(dest + rem, size - rem);
         }
         else

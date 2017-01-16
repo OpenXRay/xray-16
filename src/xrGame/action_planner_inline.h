@@ -80,8 +80,9 @@ void CPlanner::update()
 
         show_current_world_state();
         show_target_world_state();
-        //		VERIFY2						(!m_failed,"Problem solver couldn't build a valid path - verify your conditions,
-        //effects and goals!");
+        //		VERIFY2						(!m_failed,"Problem solver couldn't build a valid path - verify your
+        //conditions,
+        // effects and goals!");
     }
 #endif
 
@@ -168,7 +169,7 @@ LPCSTR CPlanner::action2string(const _action_id_type& action_id)
 TEMPLATE_SPECIALIZATION
 LPCSTR CPlanner::property2string(const _condition_type& property_id)
 {
-    return (evaluator(property_id).m_evaluator_name);  // itoa(property_id,m_temp_string,10));
+    return (evaluator(property_id).m_evaluator_name); // itoa(property_id,m_temp_string,10));
 }
 
 TEMPLATE_SPECIALIZATION

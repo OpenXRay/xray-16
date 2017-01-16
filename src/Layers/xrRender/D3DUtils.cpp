@@ -18,7 +18,7 @@
 
 CDrawUtilities DUImpl;
 
-#define LINE_DIVISION 32  // не меньше 6!!!!!
+#define LINE_DIVISION 32 // не меньше 6!!!!!
 // for drawing sphere
 static Fvector circledef1[LINE_DIVISION];
 static Fvector circledef2[LINE_DIVISION];
@@ -113,7 +113,7 @@ void SPrimitiveBuffer::CreateFromData(
 #if defined(USE_DX10) || defined(USE_DX11)
 //	TODO: DX10: Implement SPrimitiveBuffer::CreateFromData for DX10
 //	VERIFY(!"SPrimitiveBuffer::CreateFromData not implemented for dx10");
-#else   //	USE_DX10
+#else  //	USE_DX10
     ID3DVertexBuffer* pVB = 0;
     ID3DIndexBuffer* pIB = 0;
     p_cnt = _p_cnt;
@@ -144,7 +144,7 @@ void SPrimitiveBuffer::CreateFromData(
         OnRender.bind(this, &SPrimitiveBuffer::RenderDP);
     }
     pGeom.create(FVF, pVB, pIB);
-#endif  //	USE_DX10
+#endif //	USE_DX10
 }
 void SPrimitiveBuffer::Destroy()
 {
@@ -168,8 +168,8 @@ void CDrawUtilities::UpdateGrid(int number_of_cell, float square_size, int subdi
     m_GridStep.set(square_size, square_size);
     m_GridSubDiv[0] = subdiv;
     m_GridSubDiv[1] = subdiv;
-    m_GridCounts[0] = number_of_cell;  // iFloor(size/step)*subdiv;
-    m_GridCounts[1] = number_of_cell;  // iFloor(size/step)*subdiv;
+    m_GridCounts[0] = number_of_cell; // iFloor(size/step)*subdiv;
+    m_GridCounts[1] = number_of_cell; // iFloor(size/step)*subdiv;
 
     FVF::L left, right;
     left.p.y = right.p.y = 0;
@@ -701,7 +701,7 @@ void CDrawUtilities::dbgDrawPlacement(const Fvector& p, int sz, u32 clr, LPCSTR 
     Fvector c;
     float w = p.x * Device.mFullTransform._14 + p.y * Device.mFullTransform._24 + p.z * Device.mFullTransform._34 +
               Device.mFullTransform._44;
-    if (w < 0) return;  // culling
+    if (w < 0) return; // culling
 
     float s = (float)sz;
     Device.mFullTransform.transform(c, p);
@@ -1291,7 +1291,7 @@ void CDrawUtilities::DrawObjectAxis(const Fmatrix& T, float sz, BOOL sel)
     Fvector c, r, n, d;
     float w = T.c.x * Device.mFullTransform._14 + T.c.y * Device.mFullTransform._24 +
               T.c.z * Device.mFullTransform._34 + Device.mFullTransform._44;
-    if (w < 0) return;  // culling
+    if (w < 0) return; // culling
 
     float s = w * sz;
     Device.mFullTransform.transform(c, T.c);

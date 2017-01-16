@@ -196,8 +196,8 @@ void ScreenInit(void)
     // g2
     GX_SetBankForBG(GX_VRAM_BG_128_A);
     G2_SetBG0Control(GX_BG_SCRSIZE_TEXT_256x256, GX_BG_COLORMODE_16,
-        GX_BG_SCRBASE_0xf800,    // SCR base block 31
-        GX_BG_CHARBASE_0x00000,  // CHR base block 0
+        GX_BG_SCRBASE_0xf800,   // SCR base block 31
+        GX_BG_CHARBASE_0x00000, // CHR base block 0
         GX_BG_EXTPLTT_01);
     G2_SetBG0Priority(0);
     G2_BG0Mosaic(FALSE);
@@ -209,8 +209,8 @@ void ScreenInit(void)
     // g2s
     GX_SetBankForSubBG(GX_VRAM_SUB_BG_128_C);
     G2S_SetBG0Control(GX_BG_SCRSIZE_TEXT_256x256, GX_BG_COLORMODE_16,
-        GX_BG_SCRBASE_0xf800,    // SCR base block 31
-        GX_BG_CHARBASE_0x00000,  // CHR base block 0
+        GX_BG_SCRBASE_0xf800,   // SCR base block 31
+        GX_BG_CHARBASE_0x00000, // CHR base block 0
         GX_BG_EXTPLTT_01);
     G2S_SetBG0Priority(0);
     G2S_BG0Mosaic(FALSE);

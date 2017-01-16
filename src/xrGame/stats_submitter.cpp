@@ -93,7 +93,7 @@ void stats_submitter::shedule_Update(u32 dt)
 #ifdef DEBUG
     Msg("--- GameSpy core and atlas thinking ...");
 #endif
-    m_fullgs_obj->CoreThink(10);  // 10 milliseconds on update
+    m_fullgs_obj->CoreThink(10); // 10 milliseconds on update
     m_atlas_obj->Think();
 }
 
@@ -106,7 +106,7 @@ void __stdcall stats_submitter::onlylog_operation(bool const result, char const*
     Msg("* Store operation successfullly complete.");
 }
 
-u32 const stats_submitter::operation_timeout_value = 60000;  // 60 seconds
+u32 const stats_submitter::operation_timeout_value = 60000; // 60 seconds
 void stats_submitter::begin_session()
 {
     VERIFY(m_last_operation_profile && m_last_operation_cb);
@@ -254,7 +254,7 @@ bool stats_submitter::prepare_report()
     }
     break;
     default: NODEFAULT;
-    };  // switch (m_report_type)
+    }; // switch (m_report_type)
     if (report_creation_result) {
         tmp_res = m_atlas_obj->ReportEnd(m_atlas_report, gsi_true, SCGameStatus_COMPLETE);
         VERIFY(tmp_res == SCResult_NO_ERROR);
@@ -433,4 +433,4 @@ void stats_submitter::fill_private_key(crypto::xr_dsa::private_key_t& priv_key_d
     priv_key_dest.m_value[19] = 0xf2;
 }
 
-}  // namespace gamespy_profile
+} // namespace gamespy_profile

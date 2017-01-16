@@ -62,7 +62,7 @@ void player_state_cherub::OnPlayerKilled(
         shared_str m_hitter_name;
         shared_str m_victim_name;
         u32 m_art_take_time;
-    };  // struct hit_fetcher
+    }; // struct hit_fetcher
 
     game_PlayerState* tmp_player_state = m_owner->get_local_player();
     if (!tmp_player_state) return;
@@ -95,4 +95,4 @@ void player_state_cherub::OnPlayerSpawned(game_PlayerState const* ps)
     }
 }
 
-}  // namespace award_system
+} // namespace award_system

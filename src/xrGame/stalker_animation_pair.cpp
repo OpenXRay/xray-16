@@ -104,7 +104,7 @@ void CStalkerAnimationPair::play(IKinematicsAnimated* skeleton_animated, PlayCal
 
 #ifdef DEBUG
         m_just_started = false;
-#endif  // DEBUG
+#endif // DEBUG
         return;
     }
 
@@ -115,7 +115,7 @@ void CStalkerAnimationPair::play(IKinematicsAnimated* skeleton_animated, PlayCal
 
 #ifdef DEBUG
     m_just_started = true;
-#endif  // DEBUG
+#endif // DEBUG
 
     if (!global_animation()) {
         // here we should know if it is a head
@@ -193,7 +193,7 @@ std::pair<LPCSTR, LPCSTR>* CStalkerAnimationPair::blend_id(
     result = skeleton_animated->LL_MotionDefName_dbg(b->motionID);
     return (&result);
 }
-#endif  // DEBUG
+#endif // DEBUG
 
 void CStalkerAnimationPair::select_animation(const ANIM_VECTOR& array, const ANIMATION_WEIGHTS* weights)
 {
@@ -277,10 +277,10 @@ bool CStalkerAnimationPair::use_animation_movement_control(
 
 void CStalkerAnimationPair::reset()
 {
-#if 0   // def DEBUG
+#if 0  // def DEBUG
 	if (m_animation)
 		Msg						("animation [%s][%s] is reset",m_object_name,m_animation_type_name);
-#endif  // DEBUG
+#endif // DEBUG
 
     m_animation.invalidate();
     m_blend = 0;

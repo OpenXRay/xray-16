@@ -12,9 +12,9 @@ void msCreate(LPCSTR name)
     string256 fn;
     xr_sprintf(fn, sizeof(fn), "\\\\.\\mailslot\\%s", name);
     hLocalSlot = CreateMailslot(fn,
-        0,                             // no maximum message size
-        MAILSLOT_WAIT_FOREVER,         // no time-out for operations
-        (LPSECURITY_ATTRIBUTES)NULL);  // no security attributes
+        0,                            // no maximum message size
+        MAILSLOT_WAIT_FOREVER,        // no time-out for operations
+        (LPSECURITY_ATTRIBUTES)NULL); // no security attributes
     if (hLocalSlot == INVALID_HANDLE_VALUE) return;
     // Msg ("* mailSLOT successfully created.");
 }
@@ -26,14 +26,14 @@ void msRead(void)
     LPSTR lpszBuffer;
 
     cbMessage = cMessage = cbRead = 0;
-    fResult = GetMailslotInfo(hLocalSlot,  // mailslot handle
-        (LPDWORD)NULL,                     // no maximum message size
-        &cbMessage,                        // size of next message
-        &cMessage,                         // number of messages
-        (LPDWORD)NULL);                    // no read time-out
+    fResult = GetMailslotInfo(hLocalSlot, // mailslot handle
+        (LPDWORD)NULL,                    // no maximum message size
+        &cbMessage,                       // size of next message
+        &cMessage,                        // number of messages
+        (LPDWORD)NULL);                   // no read time-out
     if (!fResult) return;
     if (cbMessage == MAILSLOT_NO_MESSAGE) return;
-    while (cMessage != 0)  // retrieve all messages
+    while (cMessage != 0) // retrieve all messages
     {
         // Allocate memory for the message.
         lpszBuffer = (LPSTR)GlobalAlloc(GPTR, cbMessage);
@@ -45,11 +45,11 @@ void msRead(void)
         }
         msParse(lpszBuffer);
         GlobalFree((HGLOBAL)lpszBuffer);
-        fResult = GetMailslotInfo(hLocalSlot,  // mailslot handle
-            (LPDWORD)NULL,                     // no maximum message size
-            &cbMessage,                        // size of next message
-            &cMessage,                         // number of messages
-            (LPDWORD)NULL);                    // no read time-out
+        fResult = GetMailslotInfo(hLocalSlot, // mailslot handle
+            (LPDWORD)NULL,                    // no maximum message size
+            &cbMessage,                       // size of next message
+            &cMessage,                        // number of messages
+            (LPDWORD)NULL);                   // no read time-out
         if (!fResult) return;
     }
 }
@@ -63,7 +63,7 @@ void msWrite(char* name, char* dest, char* msg)
 
     xr_sprintf(cName, sizeof(cName), "\\\\%s\\mailslot\\%s", name, dest);
     hFile = CreateFile(cName, GENERIC_WRITE,
-        FILE_SHARE_READ,  // required to write to a mailslot
+        FILE_SHARE_READ, // required to write to a mailslot
         (LPSECURITY_ATTRIBUTES)NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, (HANDLE)NULL);
     if (hFile == INVALID_HANDLE_VALUE) return;
     fResult = WriteFile(hFile, msg, (u32)lstrlen(msg) + 1, &cbWritten, (LPOVERLAPPED)NULL);

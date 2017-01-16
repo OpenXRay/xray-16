@@ -58,7 +58,7 @@ void CGameFont::Initialize(LPCSTR cShader, LPCSTR cTextureName)
         xr_strcpy(cTexture, sizeof(cTexture), cTextureName);
 
     uFlags &= ~fsValid;
-    vTS.set(1.f, 1.f);  // обязательно !!!
+    vTS.set(1.f, 1.f); // обязательно !!!
 
     eCurrentAlignment = alLeft;
     vInterval.set(1.f, 1.f);
@@ -112,7 +112,7 @@ void CGameFont::Initialize(LPCSTR cShader, LPCSTR cTextureName)
                 TCMap[i].set(v.x, v.y, 1 + v[2] - v[0]);
             }
             else
-                TCMap[i] = vFirstValid;  // "unassigned" unprintable characters
+                TCMap[i] = vFirstValid; // "unassigned" unprintable characters
         }
 
         // Special case for space
@@ -239,10 +239,10 @@ u16 CGameFont::SplitByWidth(u16* puBuffer, u16 uBufferSize, float fTargetWidth, 
 
         if (IsNeedSpaceCharacter(wsStr[i])) fDelta += fXStep;
 
-        if (((fCurWidth + fDelta) > fTargetWidth) &&         // overlength
-            (!IsBadStartCharacter(wsStr[i])) &&              // can start with this character
-            (i < len) &&                                     // is not the last character
-            ((i > 1) && (!IsBadEndCharacter(wsStr[i - 1])))  // && // do not stop the string on a "bad" character
+        if (((fCurWidth + fDelta) > fTargetWidth) &&        // overlength
+            (!IsBadStartCharacter(wsStr[i])) &&             // can start with this character
+            (i < len) &&                                    // is not the last character
+            ((i > 1) && (!IsBadEndCharacter(wsStr[i - 1]))) // && // do not stop the string on a "bad" character
             // ( ( i > 1 ) && ( ! ( ( IsAlphaCharacter( wsStr[ i - 1 ] ) ) && ( IsAlphaCharacter( wsStr[ i ] ) ) ) ) )
             // // do not split numbers or words
             )

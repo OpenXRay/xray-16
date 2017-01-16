@@ -17,7 +17,7 @@ class CUIMessageBoxEx;
 namespace award_system
 {
 class reward_manager;
-}  // namespace award_system
+} // namespace award_system
 
 struct SND_Message
 {
@@ -43,7 +43,7 @@ struct SND_Message
 
 struct cl_TeamStruct
 {
-    shared_str caSection;  // имя секции комманды
+    shared_str caSection; // имя секции комманды
     //-----------------------------------
     ui_shader IndicatorShader;
     ui_shader InvincibleShader;
@@ -305,8 +305,8 @@ public:
         shared_str m_file_name;
         string256 m_diff;
         u32 m_detect_time;
-        static u32 const max_showing_time = 10000;  // 10 seconds
-    };                                              // struct detected_cheater_t
+        static u32 const max_showing_time = 10000; // 10 seconds
+    };                                             // struct detected_cheater_t
     void add_detected_cheater(shared_str const& file_name, string256 diff);
 
 private:

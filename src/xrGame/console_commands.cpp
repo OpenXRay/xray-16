@@ -49,18 +49,18 @@
 #include "ai_debug_variables.h"
 #include "xrPhysics/console_vars.h"
 #ifdef DEBUG
+#include "CharacterPhysicsSupport.h"
+#include "LevelGraphDebugRender.hpp"
 #include "PHDebug.h"
 #include "ui/UIDebugFonts.h"
 #include "xrAICore/Navigation/game_graph.h"
-#include "LevelGraphDebugRender.hpp"
-#include "CharacterPhysicsSupport.h"
-#endif  // DEBUG
+#endif // DEBUG
 
 string_path g_last_saved_game;
 
 #ifdef DEBUG
 extern float air_resistance_epsilon;
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 
 extern void show_smart_cast_stats();
 extern void clear_smart_cast_stats();
@@ -81,7 +81,7 @@ extern BOOL net_sv_control_hit;
 extern int g_dwInputUpdateDelta;
 #ifdef DEBUG
 extern BOOL g_ShowAnimationInfo;
-#endif  // DEBUG
+#endif // DEBUG
 extern BOOL g_bShowHitSectors;
 // extern	BOOL	g_bDebugDumpPhysicsStep	;
 extern ESingleGameDifficulty g_SingleGameDifficulty;
@@ -185,7 +185,7 @@ public:
     virtual void Save(IWriter* F) {}
 };
 
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 // console commands
 class CCC_GameDifficulty : public CCC_Token
 {
@@ -235,14 +235,14 @@ public:
                     //						timer.Start			();
                     //						float				fValue = ai().m_tpAStar->ffFindMinimalPath(id1,id2);
                     //						Msg					("* %7.2f[%d] : %11I64u cycles (%.3f
-                    //microseconds)",fValue,ai().m_tpAStar->m_tpaNodes.size(),timer.GetElapsed_ticks(),timer.GetElapsed_ms()*1000.f);
+                    // microseconds)",fValue,ai().m_tpAStar->m_tpaNodes.size(),timer.GetElapsed_ticks(),timer.GetElapsed_ms()*1000.f);
                 }
             else
                 Msg("! not enough parameters!");
         }
     }
 };
-#endif  // DEBUG
+#endif // DEBUG
 
 class CCC_ALifeTimeFactor : public IConsole_Command
 {
@@ -445,7 +445,7 @@ public:
             LPSTR comma = strchr(const_cast<LPSTR>(args), ',');
             if (comma) {
                 loops = atoi(comma + 1);
-                *comma = 0;  //. :)
+                *comma = 0; //. :)
             }
             strconcat(sizeof(fn), fn, args, ".xrdemo");
             FS.update_path(fn, "$game_saves$", fn);
@@ -574,10 +574,10 @@ public:
 #ifdef DEBUG
         Msg("Screenshot overhead : %f milliseconds", timer.GetElapsed_sec() * 1000.f);
 #endif
-    }  // virtual void Execute
+    } // virtual void Execute
 
     virtual void fill_tips(vecTips& tips, u32 mode) { get_files_list(tips, "$game_saves$", SAVE_EXTENSION); }
-};  // CCC_ALifeSave
+}; // CCC_ALifeSave
 
 class CCC_ALifeLoadFrom : public IConsole_Command
 {
@@ -642,7 +642,7 @@ public:
     }
 
     virtual void fill_tips(vecTips& tips, u32 mode) { get_files_list(tips, "$game_saves$", SAVE_EXTENSION); }
-};  // CCC_ALifeLoadFrom
+}; // CCC_ALifeLoadFrom
 
 class CCC_LoadLastSave : public IConsole_Command
 {
@@ -849,7 +849,7 @@ public:
             xr_strcpy(I, "restarts script debugger or start if no script debugger presents");
     }
 };
-#endif  // #if defined(USE_DEBUGGER) && !defined(USE_LUA_STUDIO)
+#endif // #if defined(USE_DEBUGGER) && !defined(USE_LUA_STUDIO)
 
 #if defined(USE_DEBUGGER) && defined(USE_LUA_STUDIO)
 class CCC_ScriptLuaStudioConnect : public IConsole_Command
@@ -865,7 +865,7 @@ public:
     CCC_ScriptLuaStudioDisconnect(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
     virtual void Execute(LPCSTR args) { ai().script_engine().disconnect_from_debugger(); };
 };
-#endif  // #if defined(USE_DEBUGGER) && defined(USE_LUA_STUDIO)
+#endif // #if defined(USE_DEBUGGER) && defined(USE_LUA_STUDIO)
 
 class CCC_DumpInfos : public IConsole_Command
 {
@@ -1054,7 +1054,7 @@ public:
             S[xr_strlen(S) - 1] = 0;
     }
 };
-#endif  // DEBUG
+#endif // DEBUG
 
 class CCC_PHFps : public IConsole_Command
 {
@@ -1205,7 +1205,7 @@ public:
 
             ai().script_engine().print_output(ai().script_engine().lua(), *m_script_name, l_iErrorCode);
         }
-    }  // void	Execute
+    } // void	Execute
 
     virtual void Status(TStatus& S) { xr_strcpy(S, "<script_name.function()> (Specify script and function name!)"); }
     virtual void Save(IWriter* F) {}
@@ -1241,7 +1241,7 @@ public:
     }
 };
 
-#endif  // MASTER_GOLD
+#endif // MASTER_GOLD
 
 #include "GamePersistent.h"
 
@@ -1453,7 +1453,7 @@ public:
     virtual void Execute(LPCSTR) { mem_alloc_clear_stats(); }
 };
 
-#endif  // DEBUG_MEMORY_MANAGER
+#endif // DEBUG_MEMORY_MANAGER
 
 class CCC_DumpModelBones : public IConsole_Command
 {
@@ -1564,9 +1564,9 @@ public:
             Msg("! ActorMenu is not in state `Inventory`");
         }
     }
-};  // CCC_InvDropAllItems
+}; // CCC_InvDropAllItems
 
-#endif  // DEBUG
+#endif // DEBUG
 
 class CCC_DumpObjects : public IConsole_Command
 {
@@ -1660,7 +1660,7 @@ void CCC_RegisterCommands()
     CMD1(CCC_MemStats, "stat_memory");
 #ifdef DEBUG
     CMD1(CCC_MemCheckpoint, "stat_memory_checkpoint");
-#endif  //#ifdef DEBUG
+#endif //#ifdef DEBUG
     // game
     CMD3(CCC_Mask, "g_crouch_toggle", &psActorFlags, AF_CROUCH_TOGGLE);
     CMD1(CCC_GameDifficulty, "g_game_difficulty");
@@ -1669,24 +1669,24 @@ void CCC_RegisterCommands()
 
 // alife
 #ifdef DEBUG
-    CMD1(CCC_ALifePath, "al_path");  // build path
+    CMD1(CCC_ALifePath, "al_path"); // build path
 
-#endif  // DEBUG
+#endif // DEBUG
 
-    CMD1(CCC_ALifeSave, "save");               // save game
-    CMD1(CCC_ALifeLoadFrom, "load");           // load game from ...
-    CMD1(CCC_LoadLastSave, "load_last_save");  // load last saved game from ...
+    CMD1(CCC_ALifeSave, "save");              // save game
+    CMD1(CCC_ALifeLoadFrom, "load");          // load game from ...
+    CMD1(CCC_LoadLastSave, "load_last_save"); // load last saved game from ...
 
-    CMD1(CCC_FlushLog, "flush");  // flush log
+    CMD1(CCC_FlushLog, "flush"); // flush log
     CMD1(CCC_ClearLog, "clear_log");
 
 #ifndef MASTER_GOLD
-    CMD1(CCC_ALifeTimeFactor, "al_time_factor");               // set time factor
-    CMD1(CCC_ALifeSwitchDistance, "al_switch_distance");       // set switch distance
-    CMD1(CCC_ALifeProcessTime, "al_process_time");             // set process time
-    CMD1(CCC_ALifeObjectsPerUpdate, "al_objects_per_update");  // set process time
-    CMD1(CCC_ALifeSwitchFactor, "al_switch_factor");           // set switch factor
-#endif                                                         // #ifndef MASTER_GOLD
+    CMD1(CCC_ALifeTimeFactor, "al_time_factor");              // set time factor
+    CMD1(CCC_ALifeSwitchDistance, "al_switch_distance");      // set switch distance
+    CMD1(CCC_ALifeProcessTime, "al_process_time");            // set process time
+    CMD1(CCC_ALifeObjectsPerUpdate, "al_objects_per_update"); // set process time
+    CMD1(CCC_ALifeSwitchFactor, "al_switch_factor");          // set switch factor
+#endif                                                        // #ifndef MASTER_GOLD
 
     CMD3(CCC_Mask, "hud_weapon", &psHUD_Flags, HUD_WEAPON);
     CMD3(CCC_Mask, "hud_info", &psHUD_Flags, HUD_INFO);
@@ -1704,14 +1704,14 @@ void CCC_RegisterCommands()
 #ifdef DEBUG
     CMD4(CCC_Float, "hud_fov", &psHUD_FOV, 0.1f, 1.0f);
     CMD4(CCC_Float, "fov", &g_fov, 5.0f, 180.0f);
-#endif  // DEBUG
+#endif // DEBUG
 
 // Demo
-#if 1  // ndef MASTER_GOLD
+#if 1 // ndef MASTER_GOLD
     CMD1(CCC_DemoPlay, "demo_play");
     CMD1(CCC_DemoRecord, "demo_record");
     CMD1(CCC_DemoRecordSetPos, "demo_set_cam_position");
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
 
 #ifndef MASTER_GOLD
     // ai
@@ -1725,7 +1725,7 @@ void CCC_RegisterCommands()
     CMD3(CCC_Mask, "mt_level_sounds", &g_mt_config, mtLevelSounds);
     CMD3(CCC_Mask, "mt_alife", &g_mt_config, mtALife);
     CMD3(CCC_Mask, "mt_map", &g_mt_config, mtMap);
-#endif  // MASTER_GOLD
+#endif // MASTER_GOLD
 
 #ifndef MASTER_GOLD
     CMD3(CCC_Mask, "ai_obstacles_avoiding", &psAI_Flags, aiObstaclesAvoiding);
@@ -1734,7 +1734,7 @@ void CCC_RegisterCommands()
     CMD3(CCC_Mask, "ai_use_smart_covers_animation_slots", &psAI_Flags, (u32)aiUseSmartCoversAnimationSlot);
     CMD4(CCC_Float, "ai_smart_factor", &g_smart_cover_factor, 0.f, 1000000.f);
     CMD3(CCC_Mask, "lua_debug", &g_LuaDebug, 1);
-#endif  // MASTER_GOLD
+#endif // MASTER_GOLD
 
 #ifdef DEBUG
     CMD4(CCC_Integer, "lua_gcstep", &psLUA_GCSTEP, 1, 1000);
@@ -1793,7 +1793,7 @@ void CCC_RegisterCommands()
     CMD4(CCC_Float, "debug_on_frame_gather_stats_frequency", &debug_on_frame_gather_stats_frequency, 0.f, 1.f);
     CMD1(CCC_MemAllocShowStats, "debug_on_frame_show_stats");
     CMD1(CCC_MemAllocClearStats, "debug_on_frame_clear_stats");
-#endif  // DEBUG_MEMORY_MANAGER
+#endif // DEBUG_MEMORY_MANAGER
 
     CMD1(CCC_DumpModelBones, "debug_dump_model_bones");
 
@@ -1808,23 +1808,23 @@ void CCC_RegisterCommands()
     CMD1(CCC_ScriptDbg, "script_debug_break");
     CMD1(CCC_ScriptDbg, "script_debug_stop");
     CMD1(CCC_ScriptDbg, "script_debug_restart");
-#endif  // #if defined(USE_DEBUGGER) && !defined(USE_LUA_STUDIO)
+#endif // #if defined(USE_DEBUGGER) && !defined(USE_LUA_STUDIO)
 
 #if defined(USE_DEBUGGER) && defined(USE_LUA_STUDIO)
     CMD1(CCC_ScriptLuaStudioConnect, "lua_studio_connect");
     CMD1(CCC_ScriptLuaStudioDisconnect, "lua_studio_disconnect");
-#endif  // #if defined(USE_DEBUGGER) && defined(USE_LUA_STUDIO)
+#endif // #if defined(USE_DEBUGGER) && defined(USE_LUA_STUDIO)
 
     CMD1(CCC_ShowMonsterInfo, "ai_monster_info");
     CMD1(CCC_DebugFonts, "debug_fonts");
     CMD1(CCC_TuneAttachableItem, "dbg_adjust_attachable_item");
 
     CMD1(CCC_ShowAnimationStats, "ai_show_animation_stats");
-#endif  // DEBUG
+#endif // DEBUG
 
 #ifndef MASTER_GOLD
     CMD3(CCC_Mask, "ai_ignore_actor", &psAI_Flags, aiIgnoreActor);
-#endif  // MASTER_GOLD
+#endif // MASTER_GOLD
 
     // Physics
     CMD1(CCC_PHFps, "ph_frequency");
@@ -1838,7 +1838,7 @@ void CCC_RegisterCommands()
     CMD4(CCC_Integer, "ph_tri_clear_disable_count", &ph_console::ph_tri_clear_disable_count, 0, 255);
     CMD4(CCC_FloatBlock, "ph_tri_query_ex_aabb_rate", &ph_console::ph_tri_query_ex_aabb_rate, 1.01f, 3.f);
     CMD3(CCC_Mask, "g_no_clip", &psActorFlags, AF_NO_CLIP);
-#endif  // DEBUG
+#endif // DEBUG
 
 #ifndef MASTER_GOLD
     CMD1(CCC_JumpToLevel, "jump_to_level");
@@ -1847,7 +1847,7 @@ void CCC_RegisterCommands()
     CMD1(CCC_Script, "run_script");
     CMD1(CCC_ScriptCommand, "run_string");
     CMD1(CCC_TimeFactor, "time_factor");
-#endif  // MASTER_GOLD
+#endif // MASTER_GOLD
 
     CMD3(CCC_Mask, "g_autopickup", &psActorFlags, AF_AUTOPICKUP);
     CMD3(CCC_Mask, "g_dynamic_music", &psActorFlags, AF_DYNAMIC_MUSIC);
@@ -2011,7 +2011,7 @@ void CCC_RegisterCommands()
 #ifndef MASTER_GOLD
     CMD1(CCC_StartTimeSingle, "start_time_single");
     CMD4(CCC_TimeFactorSingle, "time_factor_single", &g_fTimeFactor, 0.f, 1000.0f);
-#endif  // MASTER_GOLD
+#endif // MASTER_GOLD
 
     g_uCommonFlags.zero();
     g_uCommonFlags.set(flAiUseTorchDynamicLights, TRUE);
@@ -2021,7 +2021,7 @@ void CCC_RegisterCommands()
 #ifndef MASTER_GOLD
     CMD4(CCC_Vector3, "psp_cam_offset", &CCameraLook2::m_cam_offset, Fvector().set(-1000, -1000, -1000),
         Fvector().set(1000, 1000, 1000));
-#endif  // MASTER_GOLD
+#endif // MASTER_GOLD
 
     CMD1(CCC_GSCheckForUpdates, "check_for_updates");
 #ifdef DEBUG
@@ -2054,7 +2054,7 @@ void CCC_RegisterCommands()
 #ifdef DEBUG
     CMD4(CCC_Float, "ai_smart_cover_animation_speed_factor", &g_smart_cover_animation_speed_factor, .1f, 10.f);
     CMD4(CCC_Float, "air_resistance_epsilon", &air_resistance_epsilon, .0f, 1.f);
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 
     CMD4(CCC_Integer, "g_sleep_time", &psActorSleepTime, 1, 24);
 
@@ -2075,7 +2075,7 @@ void CCC_RegisterCommands()
 
     extern BOOL g_ai_aim_use_smooth_aim;
     CMD4(CCC_Integer, "ai_aim_use_smooth_aim", &g_ai_aim_use_smooth_aim, 0, 1);
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 
     extern float g_ai_aim_min_speed;
     CMD4(CCC_Float, "ai_aim_min_speed", &g_ai_aim_min_speed, 0.f, 10.f * PI);
@@ -2089,7 +2089,7 @@ void CCC_RegisterCommands()
 #ifdef DEBUG
     extern BOOL g_debug_doors;
     CMD4(CCC_Integer, "ai_debug_doors", &g_debug_doors, 0, 1);
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 
     *g_last_saved_game = 0;
 

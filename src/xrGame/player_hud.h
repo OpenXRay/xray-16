@@ -41,9 +41,9 @@ struct hud_item_measures
     };
     Flags8 m_prop_flags;
 
-    Fvector m_item_attach[2];  // pos,rot
+    Fvector m_item_attach[2]; // pos,rot
 
-    Fvector m_hands_offset[2][3];  // pos,rot/ normal,aim,GL
+    Fvector m_hands_offset[2][3]; // pos,rot/ normal,aim,GL
 
     u16 m_fire_bone;
     Fvector m_fire_point_offset;
@@ -52,7 +52,7 @@ struct hud_item_measures
     u16 m_shell_bone;
     Fvector m_shell_point_offset;
 
-    Fvector m_hands_attach[2];  // pos,rot
+    Fvector m_hands_attach[2]; // pos,rot
 
     void load(const shared_str& sect_name, IKinematics* K);
 };

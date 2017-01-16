@@ -31,7 +31,7 @@ namespace upgrade
 {
 class Upgrade;
 }
-}  // namespace upgrade, inventory
+} // namespace upgrade, inventory
 
 enum EDDListType
 {
@@ -259,7 +259,7 @@ protected:
     CUICellItem* CurrentItem();
     PIItem CurrentIItem();
 
-    void InfoCurItem(CUICellItem* cell_item);  // on update item
+    void InfoCurItem(CUICellItem* cell_item); // on update item
 
     void ActivatePropertiesBox();
     void TryHidePropertiesBox();
@@ -336,7 +336,7 @@ public:
     bool SetInfoCurUpgrade(Upgrade_type* upgrade_type, CInventoryItem* inv_item);
     void SeparateUpgradeItem();
     PIItem get_upgrade_item();
-    bool DropAllItemsFromRuck(bool quest_force = false);  // debug func
+    bool DropAllItemsFromRuck(bool quest_force = false); // debug func
 
     void UpdateActor();
     void UpdatePartnerBag();
@@ -350,4 +350,4 @@ public:
     void UpdateConditionProgressBars();
 
     IC UIHint* get_hint_wnd() { return m_hint_wnd; }
-};  // class CUIActorMenu
+}; // class CUIActorMenu

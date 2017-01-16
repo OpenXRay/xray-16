@@ -20,4 +20,4 @@ struct cascade
     bool reset_chain;
 };
 
-}  // namespace sun
+} // namespace sun

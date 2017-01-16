@@ -67,7 +67,7 @@ void CRenderTarget::u_stencil_optimize(BOOL common_stencil)
     pv++;
     RCache.Vertex.Unlock(4, g_combine->vb_stride);
     RCache.set_CullMode(CULL_NONE);
-    if (common_stencil) RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, dwLightMarkerID, 0xff, 0x00);  // keep/keep/keep
+    if (common_stencil) RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, dwLightMarkerID, 0xff, 0x00); // keep/keep/keep
     RCache.set_Element(s_occq->E[1]);
     RCache.set_Geometry(g_combine);
     RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
@@ -234,14 +234,14 @@ CRenderTarget::CRenderTarget()
             // can't - mix-depth
             if (RImplementation.o.fp16_blend) {
                 // NV40
-                rt_Color.create(r2_RT_albedo, w, h, D3DFMT_A16B16G16R16F);  // expand to full
+                rt_Color.create(r2_RT_albedo, w, h, D3DFMT_A16B16G16R16F); // expand to full
                 rt_Accumulator.create(r2_RT_accum, w, h, D3DFMT_A16B16G16R16F);
             }
             else
             {
                 // R4xx, no-fp-blend,-> albedo_wo
                 VERIFY(RImplementation.o.albedo_wo);
-                rt_Color.create(r2_RT_albedo, w, h, D3DFMT_A8R8G8B8);  // normal
+                rt_Color.create(r2_RT_albedo, w, h, D3DFMT_A8R8G8B8); // normal
                 rt_Accumulator.create(r2_RT_accum, w, h, D3DFMT_A16B16G16R16F);
                 rt_Accumulator_temp.create(r2_RT_accum_temp, w, h, D3DFMT_A16B16G16R16F);
             }
@@ -323,7 +323,7 @@ CRenderTarget::CRenderTarget()
 
     // BLOOM
     {
-        D3DFORMAT fmt = D3DFMT_A8R8G8B8;  //;		// D3DFMT_X8R8G8B8
+        D3DFORMAT fmt = D3DFMT_A8R8G8B8; //;		// D3DFMT_X8R8G8B8
         u32 w = BLOOM_size_X, h = BLOOM_size_Y;
         u32 fvf_build = D3DFVF_XYZRHW | D3DFVF_TEX4 | D3DFVF_TEXCOORDSIZE2(0) | D3DFVF_TEXCOORDSIZE2(1) |
                         D3DFVF_TEXCOORDSIZE2(2) | D3DFVF_TEXCOORDSIZE2(3);
@@ -391,7 +391,7 @@ CRenderTarget::CRenderTarget()
     // COMBINE
     {
         static D3DVERTEXELEMENT9 dwDecl[] = {
-            {0, 0, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},  // pos+uv
+            {0, 0, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0}, // pos+uv
             {0, 16, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 0},
             {0, 20, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0}, D3DDECL_END()};
         s_combine.create(b_combine, "r2\\combine");
@@ -445,29 +445,29 @@ CRenderTarget::CRenderTarget()
                         switch (slice)
                         {
                         case 0:
-                        {                          // looks like OrenNayar
-                            fd = powf(ld, 0.75f);  // 0.75
+                        {                         // looks like OrenNayar
+                            fd = powf(ld, 0.75f); // 0.75
                             fs = powf(ls, 16.f) * .5f;
                         }
                         break;
                         case 1:
-                        {                          // looks like Blinn
-                            fd = powf(ld, 0.90f);  // 0.90
+                        {                         // looks like Blinn
+                            fd = powf(ld, 0.90f); // 0.90
                             fs = powf(ls, 24.f);
                         }
                         break;
                         case 2:
-                        {             // looks like Phong
-                            fd = ld;  // 1.0
+                        {            // looks like Phong
+                            fd = ld; // 1.0
                             fs = powf(ls * 1.01f, 128.f);
                         }
                         break;
                         case 3:
-                        {  // looks like Metal
+                        { // looks like Metal
                             float s0 = _abs(1 - _abs(0.05f * _sin(33.f * ld) + ld - ls));
                             float s1 = _abs(1 - _abs(0.05f * _cos(33.f * ld * ls) + ld - ls));
                             float s2 = _abs(1 - _abs(ld - ls));
-                            fd = ld;  // 1.0
+                            fd = ld; // 1.0
                             fs = powf(_max(_max(s0, s1), s2), 24.f);
                             fs *= powf(ld, 1 / 7.f);
                         }
@@ -597,7 +597,7 @@ CRenderTarget::~CRenderTarget()
 
 #ifdef DEBUG
     _SHOW_REF("t_material_surf", t_material_surf);
-#endif  // DEBUG
+#endif // DEBUG
     _RELEASE(t_material_surf);
 
     t_LUM_src->surface_set(NULL);
@@ -615,7 +615,7 @@ CRenderTarget::~CRenderTarget()
     _SHOW_REF("t_envmap_1 - #small", pSurf);
 //_SHOW_REF("t_envmap_0 - #small",t_envmap_0->pSurface);
 //_SHOW_REF("t_envmap_1 - #small",t_envmap_1->pSurface);
-#endif  // DEBUG
+#endif // DEBUG
     t_envmap_0->surface_set(NULL);
     t_envmap_1->surface_set(NULL);
     t_envmap_0.destroy();
@@ -629,7 +629,7 @@ CRenderTarget::~CRenderTarget()
         t_noise[it]->surface_set(NULL);
 #ifdef DEBUG
         _SHOW_REF("t_noise_surf[it]", t_noise_surf[it]);
-#endif  // DEBUG
+#endif // DEBUG
         _RELEASE(t_noise_surf[it]);
     }
 

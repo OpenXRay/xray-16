@@ -46,7 +46,7 @@ void CRenderTarget::draw_rain(light& RainSetup)
 
         // setup
         //		float	intensity			= 0.3f*fuckingsun->color.r + 0.48f*fuckingsun->color.g +
-        //0.22f*fuckingsun->color.b;
+        // 0.22f*fuckingsun->color.b;
         //		Fvector	dir					= L_dir;
         //		dir.normalize().mul	(- _sqrt(intensity+EPS));
         //		RCache.set_Element			(s_accum_mask->E[SE_MASK_DIRECT]);		// masker

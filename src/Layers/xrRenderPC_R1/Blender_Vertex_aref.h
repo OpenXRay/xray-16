@@ -24,4 +24,4 @@ public:
     virtual ~CBlender_Vertex_aref();
 };
 
-#endif  // !defined(AFX_BLENDER_VERTEX_AREF_H__07141B30_A968_407E_86F8_D12702FE0B9B__INCLUDED_)
+#endif // !defined(AFX_BLENDER_VERTEX_AREF_H__07141B30_A968_407E_86F8_D12702FE0B9B__INCLUDED_)

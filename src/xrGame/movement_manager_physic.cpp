@@ -23,9 +23,9 @@
 #include "PHDebug.h"
 
 #define DBG_PH_MOVE_CONDITIONS(c) c
-#else  // DEBUG
+#else // DEBUG
 #define DBG_PH_MOVE_CONDITIONS(c)
-#endif  // DEBUG
+#endif // DEBUG
 
 #define DISTANCE_PHISICS_ENABLE_CHARACTERS 2.f
 
@@ -108,8 +108,8 @@ Fvector CMovementManager::path_position(const float& velocity, const Fvector& po
     // Вычислить пройденную дистанцию, определить целевую позицию на маршруте,
     //			 изменить detail().m_current_travel_point
 
-    float desirable_speed = velocity;     // желаемая скорость объекта
-    dist = desirable_speed * time_delta;  // пройденное расстояние в соостветствие с желаемой скоростью
+    float desirable_speed = velocity;    // желаемая скорость объекта
+    dist = desirable_speed * time_delta; // пройденное расстояние в соостветствие с желаемой скоростью
 
     // определить целевую точку
     Fvector target;
@@ -206,17 +206,17 @@ void CMovementManager::move_along_path(CPHMovementControl* movement_control, Fve
         // проверка на хит
         apply_collision_hit(movement_control);
         //		Msg				("[%6d][%s] no move,
-        //curr_tp=%d",Device.dwFrame,*object().cName(),detail().m_current_travel_point);
+        // curr_tp=%d",Device.dwFrame,*object().cName(),detail().m_current_travel_point);
         return;
     }
 
     //. 	VERIFY2(movement_control->CharacterExist() || object().animation_movement_controlled() , "! Can not move -
-    //physics movement shell does not exist. Try to move in wonded state?" );
+    // physics movement shell does not exist. Try to move in wonded state?" );
     if (!movement_control->CharacterExist()) return;
 
     if (time_delta < EPS) return;
 
-    float desirable_speed = old_desirable_speed();  // желаемая скорость объекта
+    float desirable_speed = old_desirable_speed(); // желаемая скорость объекта
     float desirable_dist = desirable_speed * time_delta;
     float dist;
 
@@ -273,14 +273,14 @@ void CMovementManager::move_along_path(CPHMovementControl* movement_control, Fve
     velocity.normalize_safe();
     if (velocity.y > 0.9f) velocity.y = 0.8f;
     if (velocity.y < -0.9f) velocity.y = -0.8f;
-    velocity.normalize_safe();      //как не странно, mdir - не нормирован
-    velocity.mul(desirable_speed);  //*1.25f
+    velocity.normalize_safe();     //как не странно, mdir - не нормирован
+    velocity.mul(desirable_speed); //*1.25f
 
     if (!movement_control->PhysicsOnlyMode()) movement_control->SetCharacterVelocity(velocity);
 
     if (DBG_PH_MOVE_CONDITIONS(ph_dbg_draw_mask.test(phDbgNeverUseAiPhMove) ||
                                !ph_dbg_draw_mask.test(phDbgAlwaysUseAiPhMove) &&) !(m_nearest_objects.empty()))
-    {  //  физ. объект
+    { //  физ. объект
 
         if (DBG_PH_MOVE_CONDITIONS(!ph_dbg_draw_mask.test(phDbgNeverUseAiPhMove) &&) !movement_control->TryPosition(
                 dest_position))

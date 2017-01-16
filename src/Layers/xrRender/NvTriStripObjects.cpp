@@ -368,7 +368,7 @@ IC void NvStripInfo::MarkTriangle(NvFaceInfo* faceInfo)
 
 bool NvStripInfo::Unique(NvFaceInfoVec& faceVec, NvFaceInfo* face)
 {
-    bool bv0, bv1, bv2;  // bools to indicate whether a vertex is in the faceVec or not
+    bool bv0, bv1, bv2; // bools to indicate whether a vertex is in the faceVec or not
     bv0 = bv1 = bv2 = false;
 
     for (int i = 0; i < faceVec.size(); i++)
@@ -604,7 +604,7 @@ bool NvStripifier::FindTraversal(
     startInfo.m_startEdge = edgeIter;
     if (edgeIter != NULL) {
         if (strip->SharesEdge(startInfo.m_startFace, edgeInfos))
-            startInfo.m_toV1 = (edgeIter->m_v0 == v);  // note! used to be m_v1
+            startInfo.m_toV1 = (edgeIter->m_v0 == v); // note! used to be m_v1
         else
             startInfo.m_toV1 = (edgeIter->m_v1 == v);
     }
@@ -621,7 +621,7 @@ bool NvStripifier::FindTraversal(
 void NvStripifier::RemoveSmallStrips(NvStripInfoVec& allStrips, NvStripInfoVec& allBigStrips, NvFaceInfoVec& faceList)
 {
     faceList.clear();
-    allBigStrips.clear();  // make sure these are empty
+    allBigStrips.clear(); // make sure these are empty
     NvFaceInfoVec tempFaceList;
 
     for (int i = 0; i < allStrips.size(); i++)
@@ -822,7 +822,7 @@ void NvStripifier::Stripify(const WordVec& in_indices, const int in_cacheSize, c
     NvStripInfoVec& outStrips, NvFaceInfoVec& outFaceList)
 {
     meshJump = 0.0f;
-    bFirstTimeResetPoint = true;  // used in FindGoodResetPoint()
+    bFirstTimeResetPoint = true; // used in FindGoodResetPoint()
 
     // the number of times to run the experiments
     int numSamples = 10;
@@ -830,7 +830,7 @@ void NvStripifier::Stripify(const WordVec& in_indices, const int in_cacheSize, c
     // the cache size, clamped to one
     cacheSize = _max(1, in_cacheSize - CACHE_INEFFICIENCY);
 
-    minStripLength = in_minStripLength;  // this is the strip size threshold below which we dump the strip into a list
+    minStripLength = in_minStripLength; // this is the strip size threshold below which we dump the strip into a list
 
     indices = in_indices;
 

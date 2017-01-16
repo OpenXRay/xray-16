@@ -21,9 +21,9 @@ public:
     inline u32 tell() const;
 };
 
-}  // namespace ppmd
-}  // namespace compression
+} // namespace ppmd
+} // namespace compression
 
 #include "compression_ppmd_stream_inline.h"
 
-#endif  // COMPRESSION_PPMD_STREAM_H
+#endif // COMPRESSION_PPMD_STREAM_H

@@ -17,9 +17,9 @@
 #include "map_spot.h"
 #include "stdafx.h"
 #include "uicursor.h"
-#include "xrEngine/xr_input.h"  //remove me !!!
+#include "xrEngine/xr_input.h" //remove me !!!
 
-CUIMapWnd* g_map_wnd = NULL;  // quick temporary solution -(
+CUIMapWnd* g_map_wnd = NULL; // quick temporary solution -(
 CUIMapWnd* GetMapWnd()
 {
     return g_map_wnd;
@@ -94,14 +94,14 @@ void CUIMapWnd::Init(LPCSTR xml_name, LPCSTR start_from)
         sx = uiXml.ReadAttribFlt(pth, 0, "sx", 5.0f);
         sy = uiXml.ReadAttribFlt(pth, 0, "sy", 5.0f);
 
-        CUIWindow* rect_parent = m_UIMainFrame;  // m_UILevelFrame;
+        CUIWindow* rect_parent = m_UIMainFrame; // m_UILevelFrame;
         Frect r = rect_parent->GetWndRect();
 
         m_UIMainScrollH = new CUIFixedScrollBar();
         m_UIMainScrollH->SetAutoDelete(true);
         m_UIMainScrollH->InitScrollBar(Fvector2().set(r.left + dx, r.bottom - sy), true);
         m_UIMainScrollH->SetStepSize(_max(1, (int)(m_UILevelFrame->GetWidth() * 0.1f)));
-        m_UIMainScrollH->SetPageSize((int)m_UILevelFrame->GetWidth());  // iFloor
+        m_UIMainScrollH->SetPageSize((int)m_UILevelFrame->GetWidth()); // iFloor
         AttachChild(m_UIMainScrollH);
         Register(m_UIMainScrollH);
         AddCallback(m_UIMainScrollH, SCROLLBAR_HSCROLL, CUIWndCallback::void_function(this, &CUIMapWnd::OnScrollH));
@@ -216,7 +216,7 @@ void CUIMapWnd::Show(bool status)
         }
 
         if (m_view_actor) {
-            inherited::Update();  // only maps, not action planner
+            inherited::Update(); // only maps, not action planner
             ViewActor();
             m_view_actor = false;
         }
@@ -325,7 +325,7 @@ void CUIMapWnd::MapLocationRelcase(CMapLocation* ml)
     CUIWindow* owner = m_map_location_hint->GetOwner();
     if (owner) {
         CMapSpot* ms = smart_cast<CMapSpot*>(owner);
-        if (ms && ms->MapLocation() == ml)  // CUITaskItem also can be a HintOwner
+        if (ms && ms->MapLocation() == ml) // CUITaskItem also can be a HintOwner
             m_map_location_hint->SetOwner(NULL);
     }
 }
@@ -425,7 +425,7 @@ bool CUIMapWnd::OnMouseAction(float x, float y, EUIMessages mouse_action)
             return true;
             break;
 
-        }  // switch
+        } // switch
     };
 
     return false;
@@ -584,7 +584,7 @@ void CUIMapWnd::ViewActor()
     SetTargetMap(lm, m_prev_actor_pos, true);
 }
 
-void CUIMapWnd::ShowHintStr(CUIWindow* parent, LPCSTR text)  // map name
+void CUIMapWnd::ShowHintStr(CUIWindow* parent, LPCSTR text) // map name
 {
     if (m_map_location_hint->GetOwner()) return;
 

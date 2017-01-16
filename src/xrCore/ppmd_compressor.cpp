@@ -108,7 +108,7 @@ u32 ppmd_trained_decompress(void* dest_buffer, const u32& dest_buffer_size, cons
     return (dest.tell());
 }
 
-static const u32 compress_chunk_size = 100 * 1024;  // 100 kb
+static const u32 compress_chunk_size = 100 * 1024; // 100 kb
 
 u32 ppmd_compress_mt(void* dest_buffer, const u32& dest_buffer_size, const void* source_buffer,
     const u32& source_buffer_size, ppmd_yield_callback_t ycb)

@@ -77,7 +77,7 @@ void CPHShellSplitterHolder::PassEndSplitters(
     R_ASSERT2(source_elements.size() >= spl_inf.m_start_el_num && source_elements.size() >= spl_inf.m_end_el_num,
         "wrong spl_inf");
 
-    for (; i_elem != e_elem; ++i_elem)  // until start elem in both joint or elem split fractures
+    for (; i_elem != e_elem; ++i_elem) // until start elem in both joint or elem split fractures
     // end elems have to be corrected
     // if grater then end elem in moving diapason
     {
@@ -215,11 +215,11 @@ void CPHShellSplitterHolder::PassEndSplitters(
         u16& elem = spl_i->m_element;
         u16& joint = spl_i->m_joint;
         if (spl_i->m_type == CPHShellSplitter::splElement) {
-            if (elem != u16(-1) && elem >= spl_inf.m_start_el_num) break;  // we at begining
+            if (elem != u16(-1) && elem >= spl_inf.m_start_el_num) break; // we at begining
         }
         else
         {
-            if (joint != u16(-1) && joint >= spl_inf.m_start_jt_num) break;  // we at begining
+            if (joint != u16(-1) && joint >= spl_inf.m_start_jt_num) break; // we at begining
         }
         if (elem != u16(-1) && elem > spl_inf.m_end_el_num) elem = elem - shift_e;
         if (joint != u16(-1) && joint > spl_inf.m_end_jt_num) joint = joint - shift_j;
@@ -231,11 +231,11 @@ void CPHShellSplitterHolder::PassEndSplitters(
         u16& elem = spl_i->m_element;
         u16& joint = spl_i->m_joint;
         if (spl_i->m_type == CPHShellSplitter::splElement) {
-            if (elem != u16(-1) && elem >= spl_inf.m_end_el_num) break;  // we after begining
+            if (elem != u16(-1) && elem >= spl_inf.m_end_el_num) break; // we after begining
         }
         else
         {
-            if (joint != u16(-1) && joint >= spl_inf.m_end_jt_num) break;  // we after begining
+            if (joint != u16(-1) && joint >= spl_inf.m_end_jt_num) break; // we after begining
         }
         if (elem != u16(-1)) elem = elem - passed_shift_e;
         if (joint != u16(-1)) joint = joint - passed_shift_j;
@@ -318,8 +318,8 @@ shell_root CPHShellSplitterHolder::ElementSingleSplit(
     // the last new shell will have all splitted old elements end joints and one new element reattached to old joint
     // m_splitters.erase(m_splitters.begin()+aspl);
     // now aspl points to the next splitter
-    if ((split_elem.first)->FracturesHolder())  // if this element can be splitted add a splitter for it
-        new_shell_last_desc->AddSplitter(CPHShellSplitter::splElement, 0, u16(-1));  //
+    if ((split_elem.first)->FracturesHolder()) // if this element can be splitted add a splitter for it
+        new_shell_last_desc->AddSplitter(CPHShellSplitter::splElement, 0, u16(-1)); //
 
     new_shell_last_desc->add_Element(split_elem.first);
     // pass splitters taking into account that one element was olready added
@@ -379,9 +379,9 @@ void CPHShellSplitterHolder::SplitElement(u16 aspl, PHSHELL_PAIR_VECTOR& out_she
     }
 
     if (!E->FracturesHolder())
-        m_splitters.erase(spl_i);  // delete splitter if the element no longer have fractures
+        m_splitters.erase(spl_i); // delete splitter if the element no longer have fractures
     else
-        spl_i->m_breaked = false;  // it is no longer breaked
+        spl_i->m_breaked = false; // it is no longer breaked
 }
 
 void CPHShellSplitterHolder::SplitProcess(PHSHELL_PAIR_VECTOR& out_shels)
@@ -438,8 +438,8 @@ void CPHShellSplitterHolder::PhDataUpdate(dReal step)
         case CPHShellSplitter::splElement:
         {
             CPHElement* element = m_pShell->elements[i->m_element];
-            dBodyID body = element->get_body();  //! element->EnabledStateOnStep()
-            if (!dBodyIsEnabled(body)) return;   //
+            dBodyID body = element->get_body(); //! element->EnabledStateOnStep()
+            if (!dBodyIsEnabled(body)) return;  //
             i->m_breaked = (element->FracturesHolder()->PhDataUpdate(element)) || i->m_breaked;
             break;
         }

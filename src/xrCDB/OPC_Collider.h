@@ -22,10 +22,10 @@
 
 enum CollisionFlag
 {
-    OPC_FIRST_CONTACT = (1 << 0),       //!< Report all contacts (false) or only first one (true)
-    OPC_TEMPORAL_COHERENCE = (1 << 1),  //!< Use temporal coherence or not
-    OPC_CONTACT = (1 << 2),             //!< Final contact status after a collision query
-    OPC_TEMPORAL_HIT = (1 << 3),        //!< There has been an early exit due to temporal coherence
+    OPC_FIRST_CONTACT = (1 << 0),      //!< Report all contacts (false) or only first one (true)
+    OPC_TEMPORAL_COHERENCE = (1 << 1), //!< Use temporal coherence or not
+    OPC_CONTACT = (1 << 2),            //!< Final contact status after a collision query
+    OPC_TEMPORAL_HIT = (1 << 3),       //!< There has been an early exit due to temporal coherence
 
     OPC_CONTACT_FOUND = OPC_FIRST_CONTACT | OPC_CONTACT,
     OPC_TEMPORAL_CONTACT = OPC_TEMPORAL_HIT | OPC_CONTACT,
@@ -123,7 +123,7 @@ public:
     //								return "Collider::ValidateSettings: pure virtual function called!";
     //							}
 protected:
-    udword mFlags;  //!< Bit flags
+    udword mFlags; //!< Bit flags
     // Internal methods
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -134,4 +134,4 @@ protected:
     virtual inline_ void InitQueryEx() { mFlags &= ~OPC_TEMPORAL_CONTACT; }
 };
 
-#endif  // __OPC_COLLIDER_H__
+#endif // __OPC_COLLIDER_H__

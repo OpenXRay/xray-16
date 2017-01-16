@@ -8,7 +8,7 @@
 
 #include "ScriptPCH.hpp"
 #include "patrol_path_params.h"
-#include "xrScriptEngine/DebugMacros.hpp"  // for THROW3 // XXX: move debug macros to xrCore
+#include "xrScriptEngine/DebugMacros.hpp" // for THROW3 // XXX: move debug macros to xrCore
 #include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;

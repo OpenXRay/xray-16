@@ -49,12 +49,12 @@ shared_str strOOBBWorldAngularVelocity("OOBBWorldAngularVelocity");
 shared_str strOOBBWorldTranslationVelocity("OOBBWorldTranslationVelocity");
 
 Fvector4 UnitClipPlanes[] = {
-    {-1.f, 0.0f, 0.0f, 0.5f},  //
-    {1.f, 0.0f, 0.0f, 0.5f},   //
-    {0.0f, -1.f, 0.0f, 0.5f},  //	Top
-    {0.0f, 1.f, 0.0f, 0.5f},   //	Bottom
-    {0.0f, 0.0f, -1.f, 0.5f},  //
-    {0.0f, 0.0f, 1.f, 0.5f},   //
+    {-1.f, 0.0f, 0.0f, 0.5f}, //
+    {1.f, 0.0f, 0.0f, 0.5f},  //
+    {0.0f, -1.f, 0.0f, 0.5f}, //	Top
+    {0.0f, 1.f, 0.0f, 0.5f},  //	Bottom
+    {0.0f, 0.0f, -1.f, 0.5f}, //
+    {0.0f, 0.0f, 1.f, 0.5f},  //
 };
 }
 
@@ -184,7 +184,7 @@ void dx103DFluidObstacles::ProcessDynamicObstacles(
 
     // Traverse object database
     g_SpatialSpace->q_box(m_lstRenderables,
-        0,  // ISpatial_DB::O_ORDERED,
+        0, // ISpatial_DB::O_ORDERED,
         STYPE_RENDERABLE, center, size);
 
     // Determine visibility for dynamic part of scene

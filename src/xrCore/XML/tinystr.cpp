@@ -103,4 +103,4 @@ TiXmlString operator+(const char* a, const TiXmlString& b)
     return tmp;
 }
 
-#endif  // TIXML_USE_STL
+#endif // TIXML_USE_STL

@@ -251,26 +251,26 @@ public:
             if (origin[0] < min[0]) {
                 coord[0] = min[0];
                 Inside = FALSE;
-                if (IR(dir[0])) MaxT[0] = (min[0] - origin[0]) / dir[0];  // Calculate T distances to candidate planes
+                if (IR(dir[0])) MaxT[0] = (min[0] - origin[0]) / dir[0]; // Calculate T distances to candidate planes
             }
             else if (origin[0] > max[0])
             {
                 coord[0] = max[0];
                 Inside = FALSE;
-                if (IR(dir[0])) MaxT[0] = (max[0] - origin[0]) / dir[0];  // Calculate T distances to candidate planes
+                if (IR(dir[0])) MaxT[0] = (max[0] - origin[0]) / dir[0]; // Calculate T distances to candidate planes
             }
         }
         {
             if (origin[1] < min[1]) {
                 coord[1] = min[1];
                 Inside = FALSE;
-                if (IR(dir[1])) MaxT[1] = (min[1] - origin[1]) / dir[1];  // Calculate T distances to candidate planes
+                if (IR(dir[1])) MaxT[1] = (min[1] - origin[1]) / dir[1]; // Calculate T distances to candidate planes
             }
             else if (origin[1] > max[1])
             {
                 coord[1] = max[1];
                 Inside = FALSE;
-                if (IR(dir[1])) MaxT[1] = (max[1] - origin[1]) / dir[1];  // Calculate T distances to candidate planes
+                if (IR(dir[1])) MaxT[1] = (max[1] - origin[1]) / dir[1]; // Calculate T distances to candidate planes
             }
         }
 

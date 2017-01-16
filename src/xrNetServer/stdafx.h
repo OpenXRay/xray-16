@@ -18,4 +18,4 @@
 
 #include "NET_Shared.h"
 
-#endif  // stdafxH
+#endif // stdafxH

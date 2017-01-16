@@ -25,7 +25,7 @@ void HUD_SOUND_ITEM::LoadSound(LPCSTR section, LPCSTR line, HUD_SOUND_ITEM& hud_
 
         LoadSound(section, sound_line, s.snd, type, &s.volume, &s.delay);
         xr_sprintf(sound_line, "%s%d", line, ++k);
-    }  // while
+    } // while
 }
 
 void HUD_SOUND_ITEM::LoadSound(LPCSTR section, LPCSTR line, ref_sound& snd, int type, float* volume, float* delay)

@@ -251,7 +251,7 @@ void CSE_ALifeDynamicObject::clear_client_data()
 #ifdef DEBUG
     if (!client_data.empty())
         Msg("CSE_ALifeDynamicObject::switch_offline: client_data is cleared for [%d][%s]", ID, name_replace());
-#endif  // DEBUG
+#endif // DEBUG
     if (!keep_saved_data_anyway()) client_data.clear();
 }
 

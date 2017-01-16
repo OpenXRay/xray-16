@@ -114,13 +114,13 @@ void dxStatGraphRender::RenderBack(CStatGraph& owner)
     FVF::TL0uv* pv = pv_start;
     // base rect
     pv->set(owner.lt.x, owner.rb.y, owner.back_color);
-    pv++;  // 0
+    pv++; // 0
     pv->set(owner.lt.x, owner.lt.y, owner.back_color);
-    pv++;  // 1
+    pv++; // 1
     pv->set(owner.rb.x, owner.rb.y, owner.back_color);
-    pv++;  // 2
+    pv++; // 2
     pv->set(owner.rb.x, owner.lt.y, owner.back_color);
-    pv++;  // 3
+    pv++; // 3
     // render
     dwCount = u32(pv - pv_start);
     RCache.Vertex.Unlock(dwCount, hGeomTri->vb_stride);
@@ -132,15 +132,15 @@ void dxStatGraphRender::RenderBack(CStatGraph& owner)
     pv = pv_start;
     // base rect
     pv->set(owner.lt.x, owner.lt.y, owner.rect_color);
-    pv++;  // 0
+    pv++; // 0
     pv->set(owner.rb.x - 1, owner.lt.y, owner.rect_color);
-    pv++;  // 1
+    pv++; // 1
     pv->set(owner.rb.x - 1, owner.rb.y, owner.rect_color);
-    pv++;  // 2
+    pv++; // 2
     pv->set(owner.lt.x, owner.rb.y, owner.rect_color);
-    pv++;  // 3
+    pv++; // 3
     pv->set(owner.lt.x, owner.lt.y, owner.rect_color);
-    pv++;  // 0
+    pv++; // 0
     // render
     dwCount = u32(pv - pv_start);
     RCache.Vertex.Unlock(dwCount, hGeomLine->vb_stride);
@@ -161,9 +161,9 @@ void dxStatGraphRender::RenderBack(CStatGraph& owner)
     pv = pv_start;
     // base Coordinate Line
     pv->set(owner.lt.x, int(base_y), owner.base_color);
-    pv++;  // 0
+    pv++; // 0
     pv->set(owner.rb.x, int(base_y), owner.base_color);
-    pv++;  // 0
+    pv++; // 0
     // owner.grid
     //    float grid_offs_x		= float(owner.rb.x-owner.lt.x)/float(owner.grid.x+1);
     //    float grid_offs_y		= float(owner.rb.y-owner.lt.y)/float(owner.grid.y+1);

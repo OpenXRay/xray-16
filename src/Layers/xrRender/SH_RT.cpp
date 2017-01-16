@@ -24,7 +24,7 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount)
     if (pSurface) return;
 
     R_ASSERT(HW.pDevice && Name && Name[0] && w && h);
-    _order = CPU::GetCLK();  // RDEVICE.GetTimerGlobal()->GetElapsed_clk();
+    _order = CPU::GetCLK(); // RDEVICE.GetTimerGlobal()->GetElapsed_clk();
 
     HRESULT _hr;
 
@@ -76,7 +76,7 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount)
 // OK
 #ifdef DEBUG
     Msg("* created RT(%s), %dx%d", Name, w, h);
-#endif  // DEBUG
+#endif // DEBUG
     R_CHK(pSurface->GetSurfaceLevel(0, &pRT));
     pTexture = RImplementation.Resources->_CreateTexture(Name);
     pTexture->surface_set(pSurface);

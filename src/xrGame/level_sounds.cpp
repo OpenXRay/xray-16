@@ -88,8 +88,8 @@ void SMusicTrack::Load(LPCSTR fn, LPCSTR params)
 
     if (m_PauseTime.x == m_PauseTime.y) ++m_PauseTime.y;
 
-    m_ActiveTime.mul(60 * 60 * 1000);  // convert hour to ms
-    m_PauseTime.mul(1000);             // convert sec to ms
+    m_ActiveTime.mul(60 * 60 * 1000); // convert hour to ms
+    m_PauseTime.mul(1000);            // convert sec to ms
 }
 
 BOOL SMusicTrack::in(u32 game_time)
@@ -167,7 +167,7 @@ void CLevelSoundManager::Load()
             if (music_sect && music_sect[0]) {
 #ifdef DEBUG
                 Msg("- Loading music tracks from '%s'...", music_sect);
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
                 CInifile::Sect& S = gameLtx.r_section(music_sect);
                 CInifile::SectCIt it = S.Data.begin(), end = S.Data.end();
                 m_MusicTracks.reserve(S.Data.size());
@@ -230,7 +230,7 @@ void CLevelSoundManager::Update()
             }
             else
             {
-                m_NextTrackTime = engine_time + 10000;  // next check after 10 sec
+                m_NextTrackTime = engine_time + 10000; // next check after 10 sec
             }
         }
 

@@ -25,7 +25,7 @@ CGameSpawnConstructor::CGameSpawnConstructor(LPCSTR name, LPCSTR output, LPCSTR 
     :
 #ifdef CONFIG_PROFILE_LOCKS
       m_critical_section(MUTEX_PROFILE_ID(CGameSpawnConstructor)),
-#endif  // CONFIG_PROFILE_LOCKS
+#endif // CONFIG_PROFILE_LOCKS
       m_thread_manager(ProxyStatus, ProxyProgress)
 {
     load_spawns(name, no_separator_check);

@@ -8,8 +8,8 @@ class CPPEffectorDistance : public CPPEffectorController
 {
     typedef CPPEffectorController inherited;
 
-    float m_r_min_perc;  // min_radius (percents [0..1])
-    float m_r_max_perc;  // max_radius (percents [0..1])
+    float m_r_min_perc; // min_radius (percents [0..1])
+    float m_r_max_perc; // max_radius (percents [0..1])
     float m_radius;
     float m_dist;
 

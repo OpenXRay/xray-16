@@ -53,7 +53,7 @@ GPResult gpiInitializeNpBasic(GPConnection* connection)
         return GP_MISC_ERROR;
     }
     else
-        iconnection->npBasicGameInitialized = gsi_false;  // GP initialized, so destroy after complete
+        iconnection->npBasicGameInitialized = gsi_false; // GP initialized, so destroy after complete
 
     return GP_NO_ERROR;
 }
@@ -104,7 +104,7 @@ GPResult gpiCheckNpStatus(GPConnection* connection)
         // Note - we ignore error messages here - if something fails we really don't care
         /////////////////////////////////////////////////////////////////////////////////
         if (!iconnection->npBasicGameInitialized) {
-            ret = sceNpBasicInit();  // obsolete?
+            ret = sceNpBasicInit(); // obsolete?
             if (ret < 0) {
                 gsDebugFormat(GSIDebugCat_GP, GSIDebugType_Misc, GSIDebugLevel_HotError,
                     "gpiCheckNpStatus: sceNpBasicInit() failed. ret = 0x%x\n", ret);
@@ -195,7 +195,7 @@ GPResult gpiDestroyNpBasic(GPConnection* connection)
 GPResult gpiSyncNpBuddies(GPConnection* connection)
 {
     int ret;
-    SceNpId npId;  // Buffer to store friend list entry's NP ID
+    SceNpId npId; // Buffer to store friend list entry's NP ID
     gsi_u32 i, count = 0;
     GPIConnection* iconnection = (GPIConnection*)*connection;
 
@@ -267,7 +267,7 @@ void gpiSyncNpBuddiesCallback(GPConnection* pconnection, GPProfileSearchResponse
 GPResult gpiSyncNpBlockList(GPConnection* connection)
 {
     int ret;
-    SceNpId npId;  // Buffer to store block list entry's NP ID
+    SceNpId npId; // Buffer to store block list entry's NP ID
     gsi_u32 i, count = 0;
     GPIConnection* iconnection = (GPIConnection*)*connection;
 

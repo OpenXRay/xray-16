@@ -26,8 +26,8 @@ struct SStepInfo
 {
     struct
     {
-        bool handled;  // обработан
-        u8 cycle;      // цикл в котором отработан
+        bool handled; // обработан
+        u8 cycle;     // цикл в котором отработан
     } activity[MAX_LEGS_COUNT];
 
     SStepParam params;

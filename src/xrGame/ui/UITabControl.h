@@ -17,11 +17,11 @@ public:
     virtual ~CUITabControl();
 
     // options item
-    virtual void SetCurrentOptValue();       // opt->current
-    virtual void SaveBackUpOptValue();       // current->backup
-    virtual void SaveOptValue();             // current->opt
-    virtual void UndoOptValue();             // backup->current
-    virtual bool IsChangedOptValue() const;  // backup!=current
+    virtual void SetCurrentOptValue();      // opt->current
+    virtual void SaveBackUpOptValue();      // current->backup
+    virtual void SaveOptValue();            // current->opt
+    virtual void UndoOptValue();            // backup->current
+    virtual bool IsChangedOptValue() const; // backup!=current
 
     virtual bool OnKeyboardAction(int dik, EUIMessages keyboard_action);
     virtual void OnTabChange(const shared_str& sCur, const shared_str& sPrev);

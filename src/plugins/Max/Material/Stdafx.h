@@ -53,8 +53,8 @@ using std::string;
 
 // CS SDK
 #ifdef _MAX_EXPORT
-#include "phyexp.h"
 #include "bipexp.h"
+#include "phyexp.h"
 #endif
 
 #include <d3d9types.h>

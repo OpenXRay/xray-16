@@ -44,4 +44,4 @@ void player_state_climber::OnPlayerRankChanged()
     if (max_count && (max_player_rank == tmp_local_player)) m_player_is_climber = true;
 }
 
-}  // namespace award_system
+} // namespace award_system

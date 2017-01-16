@@ -41,7 +41,7 @@ class XRCDB_API CFrustum
 public:
     struct fplane : public Fplane
     {
-        u32 aabb_overlap_id;  // [0..7]
+        u32 aabb_overlap_id; // [0..7]
         void cache();
     };
     fplane planes[FRUSTUM_MAXPLANES];
@@ -73,7 +73,7 @@ public:
 
     void CreateOccluder(Fvector* p, int count, Fvector& vBase, CFrustum& clip);
     BOOL CreateFromClipPoly(
-        Fvector* p, int count, Fvector& vBase, CFrustum& clip);  // returns 'false' if creation failed
+        Fvector* p, int count, Fvector& vBase, CFrustum& clip); // returns 'false' if creation failed
     void CreateFromPoints(Fvector* p, int count, Fvector& vBase);
     void CreateFromMatrix(Fmatrix& M, u32 mask);
     void CreateFromPortal(sPoly* P, Fvector& vPN, Fvector& vBase, Fmatrix& mFullXFORM);
@@ -101,4 +101,4 @@ public:
 };
 #pragma pack(pop)
 
-#endif  // !defined(AFX_FRUSTUM_H__E66ED755_F741_49CF_8B2A_404CCF7067F2__INCLUDED_)
+#endif // !defined(AFX_FRUSTUM_H__E66ED755_F741_49CF_8B2A_404CCF7067F2__INCLUDED_)

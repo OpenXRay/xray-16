@@ -19,7 +19,7 @@
 
 #ifdef DEBUG
 #include "Level.h"
-#endif  // DEBUG
+#endif // DEBUG
 
 using namespace ALife;
 
@@ -144,7 +144,7 @@ bool CALifeSwitchManager::synchronize_location(CSE_ALifeDynamicObject* I)
             VERIFY3(test[i - 1] != test[i], "Child is registered twice in the child list", (*I).name_replace());
         }
     }
-#endif  // DEBUG
+#endif // DEBUG
 
     // check if we do not use ai locations
     if (!I->used_ai_locations()) return (true);

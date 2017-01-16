@@ -33,14 +33,14 @@ public:
     virtual void Show(bool status);
     virtual void SendMessage(CUIWindow* pWnd, s16 msg, void* pData);
 
-private:  // m_
+private: // m_
     CUIFrameWindow* m_background;
     CUIScrollView* m_list;
 
     CUIStatic* m_caption;
     CUI3tButton* m_btn_close;
 
-};  // class UIMapLegend
+}; // class UIMapLegend
 
 // -------------------------------------------------------------------------------------------------
 
@@ -56,10 +56,10 @@ public:
     void init_from_xml(CUIXml& xml, int index);
     //	virtual void	Update				();
 
-private:  // m_
+private: // m_
     CUIStatic* m_image[4];
     CUIStatic* m_text;
 
-};  // class UIMapLegendItem
+}; // class UIMapLegendItem
 
-#endif  // UI_MAP_LEGEND_WND_H_INCLUDED
+#endif // UI_MAP_LEGEND_WND_H_INCLUDED

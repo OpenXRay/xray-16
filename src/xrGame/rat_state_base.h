@@ -29,4 +29,4 @@ public:
 
 #include "rat_state_base_inline.h"
 
-#endif  // RAT_STATE_BASE_H_INCLUDED
+#endif // RAT_STATE_BASE_H_INCLUDED

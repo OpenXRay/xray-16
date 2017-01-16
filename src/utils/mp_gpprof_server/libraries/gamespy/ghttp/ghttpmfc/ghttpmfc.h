@@ -6,13 +6,13 @@
 
 #if _MSC_VER > 1000
 #pragma once
-#endif  // _MSC_VER > 1000
+#endif // _MSC_VER > 1000
 
 #ifndef __AFXWIN_H__
 #error include 'stdafx.h' before including this file for PCH
 #endif
 
-#include "resource.h"  // main symbols
+#include "resource.h" // main symbols
 
 /////////////////////////////////////////////////////////////////////////////
 // CGhttpmfcApp:
@@ -45,4 +45,4 @@ public:
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.
 
-#endif  // !defined(AFX_GHTTPMFC_H__30518F92_6CEC_4512_AC74_EF31A5DE2D1C__INCLUDED_)
+#endif // !defined(AFX_GHTTPMFC_H__30518F92_6CEC_4512_AC74_EF31A5DE2D1C__INCLUDED_)

@@ -21,7 +21,7 @@ namespace upgrade
 class Upgrade;
 class Property;
 }
-}  // namespace upgrade, inventory
+} // namespace upgrade, inventory
 
 class CUIStatic;
 class CUIInventoryUpgradeWnd;
@@ -144,4 +144,4 @@ public:
     virtual void OnFocusLost();
 };
 
-#endif  // UI_INVENTORY_UPGRADE_H_INCLUDED
+#endif // UI_INVENTORY_UPGRADE_H_INCLUDED

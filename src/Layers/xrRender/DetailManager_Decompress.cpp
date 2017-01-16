@@ -47,14 +47,14 @@ IC bool InterpolateAndDither(float* alpha255, u32 x, u32 y, u32 sx, u32 sy, u32 
 static void draw_obb(const Fmatrix& matrix, const u32& color)
 {
     Fvector aabb[8];
-    matrix.transform_tiny(aabb[0], Fvector().set(-1, -1, -1));  // 0
-    matrix.transform_tiny(aabb[1], Fvector().set(-1, +1, -1));  // 1
-    matrix.transform_tiny(aabb[2], Fvector().set(+1, +1, -1));  // 2
-    matrix.transform_tiny(aabb[3], Fvector().set(+1, -1, -1));  // 3
-    matrix.transform_tiny(aabb[4], Fvector().set(-1, -1, +1));  // 4
-    matrix.transform_tiny(aabb[5], Fvector().set(-1, +1, +1));  // 5
-    matrix.transform_tiny(aabb[6], Fvector().set(+1, +1, +1));  // 6
-    matrix.transform_tiny(aabb[7], Fvector().set(+1, -1, +1));  // 7
+    matrix.transform_tiny(aabb[0], Fvector().set(-1, -1, -1)); // 0
+    matrix.transform_tiny(aabb[1], Fvector().set(-1, +1, -1)); // 1
+    matrix.transform_tiny(aabb[2], Fvector().set(+1, +1, -1)); // 2
+    matrix.transform_tiny(aabb[3], Fvector().set(+1, -1, -1)); // 3
+    matrix.transform_tiny(aabb[4], Fvector().set(-1, -1, +1)); // 4
+    matrix.transform_tiny(aabb[5], Fvector().set(-1, +1, +1)); // 5
+    matrix.transform_tiny(aabb[6], Fvector().set(+1, +1, +1)); // 6
+    matrix.transform_tiny(aabb[7], Fvector().set(+1, -1, +1)); // 7
 
     u16 aabb_id[12 * 2] = {0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 1, 5, 2, 6, 3, 7, 0, 4};
 
@@ -114,7 +114,7 @@ void CDetailManager::cache_Decompress(Slot* S)
     u32 d_size = iCeil(dm_slot_size / density);
     svector<int, dm_obj_in_slot> selected;
 
-    u32 p_rnd = D.sx * D.sz;  // нужно для того чтобы убрать полосы(ряды)
+    u32 p_rnd = D.sx * D.sz; // нужно для того чтобы убрать полосы(ряды)
     CRandom r_selection(0x12071980 ^ p_rnd);
     CRandom r_jitter(0x12071980 ^ p_rnd);
     CRandom r_yaw(0x12071980 ^ p_rnd);
@@ -254,7 +254,7 @@ void CDetailManager::cache_Decompress(Slot* S)
 #ifndef _EDITOR
 #ifdef DEBUG
             if (det_render_debug)
-                draw_obb(mXform, color_rgba(255, 0, 0, 255));  // Fmatrix().mul_43( mXform, Fmatrix().scale(5,5,5) )
+                draw_obb(mXform, color_rgba(255, 0, 0, 255)); // Fmatrix().mul_43( mXform, Fmatrix().scale(5,5,5) )
 #endif
 #endif
 
@@ -295,9 +295,9 @@ gray255[3]						=	255.f*float(c_pal->a3)/15.f;
                 else
                 {
                     if (::Random.randI(0, 3) == 0)
-                        Item.vis_ID = 2;  // Second wave
+                        Item.vis_ID = 2; // Second wave
                     else
-                        Item.vis_ID = 1;  // First wave
+                        Item.vis_ID = 1; // First wave
                 }
             }
 #else

@@ -6,13 +6,13 @@
 
 #if _MSC_VER > 1000
 #pragma once
-#endif  // _MSC_VER > 1000
+#endif // _MSC_VER > 1000
 
 #ifndef __AFXWIN_H__
 #error include 'stdafx.h' before including this file for PCH
 #endif
 
-#include "resource.h"  // main symbols
+#include "resource.h" // main symbols
 
 /////////////////////////////////////////////////////////////////////////////
 // CGptestApp:
@@ -46,4 +46,4 @@ public:
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.
 
-#endif  // !defined(AFX_GPTEST_H__FFE82BD6_F31E_4222_818F_A8EE211E15E4__INCLUDED_)
+#endif // !defined(AFX_GPTEST_H__FFE82BD6_F31E_4222_818F_A8EE211E15E4__INCLUDED_)

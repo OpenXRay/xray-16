@@ -15,15 +15,15 @@
 
 #ifndef AI_COMPILER
 #include "character_info.h"
-#endif  // AI_COMPILER
+#endif // AI_COMPILER
 
 #include "xrCore/Animation/Bone.hpp"
 
 #ifndef XRGAME_EXPORTS
 LPCSTR GAME_CONFIG = "game.ltx";
-#else  // XRGAME_EXPORTS
+#else // XRGAME_EXPORTS
 #include "xrEngine/render.h"
-#endif  // XRGAME_EXPORTS
+#endif // XRGAME_EXPORTS
 
 #ifdef XRSE_FACTORY_EXPORTS
 #include "ai_space.h"
@@ -77,9 +77,9 @@ struct logical_string_predicate
 
         return (StrCmpLogicalW(buffer0, buffer1) < 0);
     }
-};  // struct logical_string_predicate
+}; // struct logical_string_predicate
 
-#endif  // XRSE_FACTORY_EXPORTS
+#endif // XRSE_FACTORY_EXPORTS
 
 bool SortStringsByAlphabetPred(const shared_str& s1, const shared_str& s2)
 {
@@ -116,13 +116,13 @@ void SFillPropData::load()
 // create ini
 #ifdef XRGAME_EXPORTS
     CInifile* Ini = pGameIni;
-#else   // XRGAME_EXPORTS
+#else  // XRGAME_EXPORTS
     CInifile* Ini = 0;
     string_path gm_name;
     FS.update_path(gm_name, "$game_config$", GAME_CONFIG);
     R_ASSERT3(FS.exist(gm_name), "Couldn't find file", gm_name);
     Ini = new CInifile(gm_name);
-#endif  // XRGAME_EXPORTS
+#endif // XRGAME_EXPORTS
 
     // location type
     LPCSTR N, V;
@@ -184,12 +184,12 @@ void SFillPropData::load()
     }
 
     std::sort(character_profiles.begin(), character_profiles.end(), SortStringsByAlphabetPred);
-#endif  // AI_COMPILER
+#endif // AI_COMPILER
 
 // destroy ini
 #ifndef XRGAME_EXPORTS
     xr_delete(Ini);
-#endif  // XRGAME_EXPORTS
+#endif // XRGAME_EXPORTS
 
     luabind::object table;
     R_ASSERT(ai().script_engine().function_object("smart_covers.descriptions", table, LUA_TTABLE));
@@ -229,7 +229,7 @@ void SFillPropData::inc()
     ++counter;
 }
 static SFillPropData fp_data;
-#endif  // #ifdef XRSE_FACTORY_EXPORTS
+#endif // #ifdef XRSE_FACTORY_EXPORTS
 
 #ifndef XRGAME_EXPORTS
 void CSE_ALifeTraderAbstract::FillProps(LPCSTR pref, PropItemVec& items)
@@ -242,9 +242,9 @@ void CSE_ALifeTraderAbstract::FillProps(LPCSTR pref, PropItemVec& items)
         &m_sCharacterProfile, &*fp_data.character_profiles.begin(), fp_data.character_profiles.size());
 
     value->OnChangeEvent.bind(this, &CSE_ALifeTraderAbstract::OnChangeProfile);
-#endif  // #ifdef XRSE_FACTORY_EXPORTS
+#endif // #ifdef XRSE_FACTORY_EXPORTS
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifeGraphPoint
 ////////////////////////////////////////////////////////////////////////////
@@ -258,14 +258,14 @@ CSE_ALifeGraphPoint::CSE_ALifeGraphPoint(LPCSTR caSection) : CSE_Abstract(caSect
 
 #ifdef XRSE_FACTORY_EXPORTS
     fp_data.inc();
-#endif  // XRSE_FACTORY_EXPORTS
+#endif // XRSE_FACTORY_EXPORTS
 }
 
 CSE_ALifeGraphPoint::~CSE_ALifeGraphPoint()
 {
 #ifdef XRSE_FACTORY_EXPORTS
     fp_data.dec();
-#endif  // XRSE_FACTORY_EXPORTS
+#endif // XRSE_FACTORY_EXPORTS
 }
 
 void CSE_ALifeGraphPoint::STATE_Read(NET_Packet& tNetPacket, u16 size)
@@ -313,7 +313,7 @@ void CSE_ALifeGraphPoint::FillProps(LPCSTR pref, PropItemVec& items)
     PHelper().CreateRList(items, PrepareKey(pref, *s_name, "Connection\\Level name"), &m_caConnectionLevelName,
         &*fp_data.level_ids.begin(), fp_data.level_ids.size());
     PHelper().CreateRText(items, PrepareKey(pref, *s_name, "Connection\\Point name"), &m_caConnectionPointName);
-#endif  // #ifdef XRSE_FACTORY_EXPORTS
+#endif // #ifdef XRSE_FACTORY_EXPORTS
 }
 
 void CSE_ALifeGraphPoint::on_render(
@@ -348,10 +348,10 @@ void CSE_ALifeGraphPoint::on_render(
     du->DrawIndexedPrimitive(4 /*D3DPT_TRIANGLELIST*/, 4, parent.c, PT, 6, IT, 12, C.get());
 
     if (bSelected) du->DrawSelectionBox(parent.c, Fvector().set(0.5f, 1.0f, 0.5f), NULL);
-#endif  // #ifdef XRSE_FACTORY_EXPORTS
+#endif // #ifdef XRSE_FACTORY_EXPORTS
 }
 
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifeObject
@@ -374,7 +374,7 @@ CSE_ALifeObject::CSE_ALifeObject(LPCSTR caSection) : CSE_Abstract(caSection)
 #endif
 #ifdef XRSE_FACTORY_EXPORTS
     fp_data.inc();
-#endif  // XRSE_FACTORY_EXPORTS
+#endif // XRSE_FACTORY_EXPORTS
     m_flags.set(flOfflineNoMove, FALSE);
     seed(u32(CPU::QPC() & 0xffffffff));
 }
@@ -396,7 +396,7 @@ CSE_ALifeObject::~CSE_ALifeObject()
 {
 #ifdef XRSE_FACTORY_EXPORTS
     fp_data.dec();
-#endif  // XRSE_FACTORY_EXPORTS
+#endif // XRSE_FACTORY_EXPORTS
 }
 
 bool CSE_ALifeObject::move_offline() const
@@ -436,7 +436,7 @@ void CSE_ALifeObject::STATE_Read(NET_Packet& tNetPacket, u16 size)
     if (m_wVersion >= 1) {
         if (m_wVersion > 24) {
             if (m_wVersion < 83) {
-                tNetPacket.r_float();  // m_spawn_probability);
+                tNetPacket.r_float(); // m_spawn_probability);
             }
         }
         else
@@ -470,7 +470,7 @@ void CSE_ALifeObject::STATE_Read(NET_Packet& tNetPacket, u16 size)
 
     if ((m_wVersion > 23) && (m_wVersion < 84)) {
         shared_str temp;
-        tNetPacket.r_stringZ(temp);  // m_spawn_control);
+        tNetPacket.r_stringZ(temp); // m_spawn_control);
     }
 
     if (m_wVersion > 49) {
@@ -510,9 +510,9 @@ void CSE_ALifeObject::FillProps(LPCSTR pref, PropItemVec& items)
         &*fp_data.story_names.begin(), fp_data.story_names.size());
     PHelper().CreateRToken32(items, PrepareKey(pref, *s_name, "ALife\\Spawn Story ID"), &m_spawn_story_id,
         &*fp_data.spawn_story_names.begin(), fp_data.spawn_story_names.size());
-#endif  // #ifdef XRSE_FACTORY_EXPORTS
+#endif // #ifdef XRSE_FACTORY_EXPORTS
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
 u32 CSE_ALifeObject::ef_equipment_type() const
 {
@@ -647,7 +647,7 @@ void CSE_ALifeGroupAbstract::FillProps(LPCSTR pref, PropItemVec& items)
 {
     PHelper().CreateU16(items, PrepareKey(pref, "ALife\\Count"), &m_wCount, 0, 0xff);
 };
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifeDynamicObject
@@ -688,7 +688,7 @@ void CSE_ALifeDynamicObject::FillProps(LPCSTR pref, PropItemVec& values)
 {
     inherited::FillProps(pref, values);
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifeDynamicObjectVisual
@@ -736,7 +736,7 @@ void CSE_ALifeDynamicObjectVisual::FillProps(LPCSTR pref, PropItemVec& items)
     inherited1::FillProps(pref, items);
     inherited2::FillProps(pref, items);
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifePHSkeletonObject
@@ -797,7 +797,7 @@ void CSE_ALifePHSkeletonObject::FillProps(LPCSTR pref, PropItemVec& items)
     inherited1::FillProps(pref, items);
     inherited2::FillProps(pref, items);
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifeSpaceRestrictor
@@ -867,7 +867,7 @@ void CSE_ALifeSpaceRestrictor::FillProps(LPCSTR pref, PropItemVec& items)
         items, PrepareKey(pref, *s_name, "restrictor type"), &m_space_restrictor_type, defaul_retrictor_types);
     PHelper().CreateFlag32(items, PrepareKey(pref, *s_name, "check for separator"), &m_flags, flCheckForSeparator);
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifeLevelChanger
@@ -880,7 +880,7 @@ CSE_ALifeLevelChanger::CSE_ALifeLevelChanger(LPCSTR caSection) : CSE_ALifeSpaceR
     m_tAngles.set(0.f, 0.f, 0.f);
 #ifdef XRSE_FACTORY_EXPORTS
     fp_data.inc();
-#endif  // XRSE_FACTORY_EXPORTS
+#endif // XRSE_FACTORY_EXPORTS
     m_bSilentMode = FALSE;
 }
 
@@ -888,7 +888,7 @@ CSE_ALifeLevelChanger::~CSE_ALifeLevelChanger()
 {
 #ifdef XRSE_FACTORY_EXPORTS
     fp_data.dec();
-#endif  // XRSE_FACTORY_EXPORTS
+#endif // XRSE_FACTORY_EXPORTS
 }
 
 void CSE_ALifeLevelChanger::STATE_Read(NET_Packet& tNetPacket, u16 size)
@@ -951,9 +951,9 @@ void CSE_ALifeLevelChanger::FillProps(LPCSTR pref, PropItemVec& items)
     PHelper().CreateRText(items, PrepareKey(pref, *s_name, "Level point to change"), &m_caLevelPointToChange);
 
     PHelper().CreateBOOL(items, PrepareKey(pref, *s_name, "Silent mode"), &m_bSilentMode);
-#endif  // #ifdef XRSE_FACTORY_EXPORTS
+#endif // #ifdef XRSE_FACTORY_EXPORTS
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifeObjectPhysic
@@ -1015,7 +1015,7 @@ void CSE_ALifeObjectPhysic::STATE_Read(NET_Packet& tNetPacket, u16 size)
     if (m_wVersion < 65 && m_wVersion > 28) tNetPacket.r_stringZ(startup_animation);
 
     if (m_wVersion < 64) {
-        if (m_wVersion > 39)  // > 39
+        if (m_wVersion > 39) // > 39
             tNetPacket.r_u8(_flags.flags);
 
         if (m_wVersion > 56) tNetPacket.r_u16(source_id);
@@ -1046,14 +1046,14 @@ const u32 CSE_ALifeObjectPhysic::random_limit = 40;
 
 #ifdef DEBUG
 const u32 CSE_ALifeObjectPhysic::m_update_delta_time = 0;
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 
 // if TRUE, then object sends update packet
 BOOL CSE_ALifeObjectPhysic::Net_Relevant()
 {
     if (!freezed) {
 #ifdef XRGAME_EXPORTS
-#ifdef DEBUG  // this block of code is only for test
+#ifdef DEBUG // this block of code is only for test
         if (Device.dwTimeGlobal < (m_last_update_time + m_update_delta_time)) return FALSE;
 #endif
 #endif
@@ -1064,7 +1064,7 @@ BOOL CSE_ALifeObjectPhysic::Net_Relevant()
     if (Device.dwTimeGlobal >= (m_freeze_time + m_freeze_delta_time)) return FALSE;
 #endif
     if (!prev_freezed) {
-        prev_freezed = true;  // i.e. freezed
+        prev_freezed = true; // i.e. freezed
         return TRUE;
     }
 
@@ -1078,7 +1078,7 @@ void CSE_ALifeObjectPhysic::UPDATE_Read(NET_Packet& tNetPacket)
     inherited1::UPDATE_Read(tNetPacket);
     inherited2::UPDATE_Read(tNetPacket);
 
-    if (tNetPacket.r_eof())  // backward compatibility
+    if (tNetPacket.r_eof()) // backward compatibility
         return;
 
     //////////////////////////////////////////////////////////////////////////
@@ -1138,7 +1138,7 @@ void CSE_ALifeObjectPhysic::UPDATE_Read(NET_Packet& tNetPacket)
         }*/
     }
     prev_freezed = freezed;
-    if (tNetPacket.r_eof())  // in case spawn + update
+    if (tNetPacket.r_eof()) // in case spawn + update
     {
         freezed = false;
         return;
@@ -1210,7 +1210,7 @@ void CSE_ALifeObjectPhysic::UPDATE_Write(NET_Packet& tNetPacket)
         }
     }
     //. Msg("--- Sync PH [%d].", ID);
-    tNetPacket.w_u8(1);  // not freezed - doesn't mean anything..
+    tNetPacket.w_u8(1); // not freezed - doesn't mean anything..
 
 #ifdef XRGAME_EXPORTS
 #ifdef DEBUG
@@ -1242,7 +1242,7 @@ void CSE_ALifeObjectPhysic::FillProps(LPCSTR pref, PropItemVec& values)
     PHelper().CreateChoose(values, PrepareKey(pref, *s_name, "Model\\Fixed bones"), &fixed_bones, smSkeletonBones, 0,
         (void*)visual()->get_visual(), 8);
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
 bool CSE_ALifeObjectPhysic::used_ai_locations() const
 {
@@ -1504,7 +1504,7 @@ void CSE_ALifeObjectHangingLamp::on_render(
         if (flags.is(flPointAmbient)) du->DrawPointLight(ambient_xform.c, VIS_RADIUS, clr);
     }
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
 bool CSE_ALifeObjectHangingLamp::used_ai_locations() const
 {
@@ -1569,7 +1569,7 @@ void CSE_ALifeObjectProjector::FillProps(LPCSTR pref, PropItemVec& values)
 {
     inherited::FillProps(pref, values);
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
 bool CSE_ALifeObjectProjector::used_ai_locations() const
 {
@@ -1706,7 +1706,7 @@ void CSE_ALifeHelicopter::FillProps(LPCSTR pref, PropItemVec& values)
 
     PHelper().CreateChoose(values, PrepareKey(pref, *s_name, "Engine Sound"), &engine_sound, smSoundSource);
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
 bool CSE_ALifeHelicopter::used_ai_locations() const
 {
@@ -1854,7 +1854,7 @@ void CSE_ALifeCar::FillProps(LPCSTR pref, PropItemVec& values)
     inherited2::FillProps(pref, values);
     PHelper().CreateFloat(values, PrepareKey(pref, *s_name, "Health"), &health, 0.f, 1.0f);
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifeObjectBreakable
@@ -1898,7 +1898,7 @@ void CSE_ALifeObjectBreakable::FillProps(LPCSTR pref, PropItemVec& values)
     inherited::FillProps(pref, values);
     PHelper().CreateFloat(values, PrepareKey(pref, *s_name, "Health"), &m_health, 0.f, 100.f);
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
 bool CSE_ALifeObjectBreakable::used_ai_locations() const
 {
@@ -1972,7 +1972,7 @@ void CSE_ALifeObjectClimable::set_additional_info(void* info)
     LPCSTR material_name = (LPCSTR)info;
     material = material_name;
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
 bool CSE_ALifeObjectClimable::used_ai_locations() const
 {
@@ -2020,7 +2020,7 @@ void CSE_ALifeMountedWeapon::FillProps(LPCSTR pref, PropItemVec& values)
 {
     inherited::FillProps(pref, values);
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
 CSE_ALifeStationaryMgun::CSE_ALifeStationaryMgun(LPCSTR caSection) : CSE_ALifeDynamicObjectVisual(caSection)
 {
@@ -2059,7 +2059,7 @@ void CSE_ALifeStationaryMgun::FillProps(LPCSTR pref, PropItemVec& values)
 {
     inherited::FillProps(pref, values);
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifeTeamBaseZone
@@ -2101,7 +2101,7 @@ void CSE_ALifeTeamBaseZone::FillProps(LPCSTR pref, PropItemVec& items)
     inherited::FillProps(pref, items);
     PHelper().CreateU8(items, PrepareKey(pref, *s_name, "team"), &m_team, 0, 16);
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifeSmartZone
@@ -2158,7 +2158,7 @@ void CSE_ALifeSmartZone::FillProps(LPCSTR pref, PropItemVec& items)
 {
     inherited1::FillProps(pref, items);
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
 void CSE_ALifeSmartZone::update()
 {
@@ -2226,4 +2226,4 @@ void CSE_ALifeInventoryBox::FillProps(LPCSTR pref, PropItemVec& values)
 {
     inherited::FillProps(pref, values);
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS

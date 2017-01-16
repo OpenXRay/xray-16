@@ -218,8 +218,8 @@ inline_ BOOL AABBTreeCollider::TriTriOverlap(
     const float du0du1 = du0 * du1;
     const float du0du2 = du0 * du2;
 
-    if (du0du1 > 0.0f && du0du2 > 0.0f)  // same sign on all of them + not equal 0 ?
-        return FALSE;                    // no intersection occurs
+    if (du0du1 > 0.0f && du0du2 > 0.0f) // same sign on all of them + not equal 0 ?
+        return FALSE;                   // no intersection occurs
 
     // Compute plane of triangle (U0,U1,U2)
     E1 = U1 - U0;
@@ -242,8 +242,8 @@ inline_ BOOL AABBTreeCollider::TriTriOverlap(
     const float dv0dv1 = dv0 * dv1;
     const float dv0dv2 = dv0 * dv2;
 
-    if (dv0dv1 > 0.0f && dv0dv2 > 0.0f)  // same sign on all of them + not equal 0 ?
-        return FALSE;                    // no intersection occurs
+    if (dv0dv1 > 0.0f && dv0dv2 > 0.0f) // same sign on all of them + not equal 0 ?
+        return FALSE;                   // no intersection occurs
 
     // Compute direction of intersection line
     const Point D = N1 ^ N2;

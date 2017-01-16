@@ -81,7 +81,7 @@ IC void CDetailPathManager::set_dest_position(const Fvector& dest_position)
     if (!(!m_restricted_object || m_restricted_object->accessible(dest_position))) {
         xrDebug::LogStackTrace("error call stack");
     }
-#endif  // DEBUG
+#endif // DEBUG
     THROW2(!m_restricted_object || m_restricted_object->accessible(dest_position),
         "Old movement destination is not accessible after changing restrictions!");
 
@@ -291,4 +291,4 @@ IC xr_vector<CDetailPathManager::STravelPoint>& CDetailPathManager::key_points()
 {
     return (m_key_points);
 }
-#endif  // DEBUG
+#endif // DEBUG

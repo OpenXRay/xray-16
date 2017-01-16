@@ -18,4 +18,4 @@ public:
     IRender_DetailModel* l_model;
 };
 
-#endif  //	dxThunderboltDescRender_included
+#endif //	dxThunderboltDescRender_included

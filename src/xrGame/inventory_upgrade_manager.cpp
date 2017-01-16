@@ -28,7 +28,7 @@ namespace upgrade
 
 Manager::Manager()
 {
-    load_all_properties();  // first
+    load_all_properties(); // first
     load_all_inventory();
 }
 
@@ -38,7 +38,7 @@ Manager::~Manager()
     delete_data(m_groups);
     delete_data(m_upgrades);
     delete_data(m_properties);
-    m_roots.clear();  // !!!!!!!!!!!!
+    m_roots.clear(); // !!!!!!!!!!!!
     m_groups.clear();
     m_upgrades.clear();
     m_properties.clear();
@@ -207,7 +207,7 @@ void Manager::load_all_properties()
 
 void Manager::log_hierarchy()
 {
-    {  // roots
+    { // roots
         Msg("# inventory upgrades roots: [%d] ", m_roots.size());
         Roots_type::iterator ib = m_roots.begin();
         Roots_type::iterator ie = m_roots.end();
@@ -217,7 +217,7 @@ void Manager::log_hierarchy()
         }
     }
 
-    {  // groups
+    { // groups
         Msg("# inventory upgrades groups: [%d] ", m_groups.size());
         Groups_type::iterator ib = m_groups.begin();
         Groups_type::iterator ie = m_groups.end();
@@ -227,7 +227,7 @@ void Manager::log_hierarchy()
         }
     }
 
-    {  // upgrades
+    { // upgrades
         Msg("# inventory upgrades: [%d] ", m_upgrades.size());
         Upgrades_type::iterator ib = m_upgrades.begin();
         Upgrades_type::iterator ie = m_upgrades.end();
@@ -237,7 +237,7 @@ void Manager::log_hierarchy()
         }
     }
 
-    {  // properties
+    { // properties
         Msg("# inventory upgrade properties: [%d] ", m_properties.size());
         Properties_type::iterator ib = m_properties.begin();
         Properties_type::iterator ie = m_properties.end();
@@ -271,7 +271,7 @@ void Manager::test_all_upgrades(CInventoryItem& item)
     }
 }
 
-#endif  // DEBUG
+#endif // DEBUG
 
 Upgrade* Manager::upgrade_verify(shared_str const& item_section, shared_str const& upgrade_id)
 {
@@ -361,7 +361,7 @@ void Manager::init_install(CInventoryItem& item)
 
 #ifdef DEBUG
     test_all_upgrades(item);
-#endif  // DEBUG
+#endif // DEBUG
 
     if (pSettings->line_exist(item.m_section_id, "installed_upgrades")) {
         // installed_upgrades by default
@@ -375,7 +375,7 @@ void Manager::init_install(CInventoryItem& item)
                 upgrade_install(item, _GetItem(installed_upgrades_str, i, temp, buffer_size), true);
             }
         }
-    }  // if exist
+    } // if exist
 }
 
 LPCSTR Manager::get_item_scheme(CInventoryItem& item)
@@ -460,5 +460,5 @@ void Manager::reset_highlight(CInventoryItem& item)
     }
 }
 
-}  // namespace upgrade
-}  // namespace inventory
+} // namespace upgrade
+} // namespace inventory

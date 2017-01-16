@@ -84,12 +84,12 @@ void BONE::compute_bone(u32 const bone_id)
 	float const sin_alpha				= cross_product.magnitude();
 	float const cos_alpha				= current_direction.dotproduct(target_direction);
 	m_result[bone_id].rotation			(cross_product.normalize(), atan2f(sin_alpha, cos_alpha));
-#else   // #if 0
+#else  // #if 0
     m_result[bone_id] = Fidentity;
-#endif  // #if 0
+#endif // #if 0
 }
 
 #undef BONE
 #undef TEMPLATE_SPECIALIZATION
 
-#endif  // #ifndef AIMERS_BONE_INLINE_H_INCLUDED
+#endif // #ifndef AIMERS_BONE_INLINE_H_INCLUDED

@@ -98,11 +98,11 @@ bool CStateMonsterDragAbstract::check_completion()
         return true;
     }
 
-    if (m_cover_vertex_id != u32(-1)) {  // valid vertex so wait path end
+    if (m_cover_vertex_id != u32(-1)) { // valid vertex so wait path end
         if (object->Position().distance_to(m_cover_position) < 2.f) return true;
     }
     else
-    {  // invalid vertex so check distanced that passed
+    { // invalid vertex so check distanced that passed
         if (m_corpse_start_position.distance_to(object->Position()) > 20.f) return true;
     }
 

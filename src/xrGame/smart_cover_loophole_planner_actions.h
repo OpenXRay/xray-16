@@ -76,7 +76,7 @@ public:
     loophole_action_no_sight(CAI_Stalker* object, LPCSTR action_name);
     virtual void initialize();
     virtual void finalize();
-};  // class loophole_action_no_sight
+}; // class loophole_action_no_sight
 
 class loophole_lookout final : public loophole_action
 {
@@ -157,7 +157,7 @@ public:
         animation_planner* planner, bool const& use_weapon);
     virtual void initialize();
     virtual void finalize();
-};  // class idle_2_fire_transition
+}; // class idle_2_fire_transition
 
 class fire_2_idle_transition : public transition
 {
@@ -170,7 +170,7 @@ public:
         animation_planner* planner);
     virtual void initialize();
     virtual void finalize();
-};  // class idle_2_fire_transition
+}; // class idle_2_fire_transition
 
 class idle_2_lookout_transition : public transition
 {
@@ -183,7 +183,7 @@ public:
         animation_planner* planner);
     virtual void initialize();
     virtual void finalize();
-};  // class idle_2_fire_transition
+}; // class idle_2_fire_transition
 
 class lookout_2_idle_transition : public transition
 {
@@ -196,10 +196,10 @@ public:
         animation_planner* planner);
     virtual void initialize();
     virtual void finalize();
-};  // class lookout_2_idle_transition
+}; // class lookout_2_idle_transition
 
-}  // namespace smart_cover
+} // namespace smart_cover
 
 #include "smart_cover_loophole_planner_actions_inline.h"
 
-#endif  // SMART_COVER_LOOPHOLE_PLANNER_ACTIONS_H_INCLUDED
+#endif // SMART_COVER_LOOPHOLE_PLANNER_ACTIONS_H_INCLUDED

@@ -175,7 +175,7 @@ void CBlender_Compile::PassEnd()
     proto.cs = RImplementation.Resources->_CreateCS(pass_cs);
     ctable.merge(&proto.cs->constants);
 #endif
-#endif  //	USE_DX10
+#endif //	USE_DX10
     SetMapping();
     proto.constants = RImplementation.Resources->_CreateConstantTable(ctable);
     proto.T = RImplementation.Resources->_CreateTextureList(passTextures);
@@ -225,7 +225,7 @@ void CBlender_Compile::PassSET_ablend_mode(BOOL bABlend, u32 abSRC, u32 abDST)
     //	alpha in DX10 identical to color.
     RS.SetRS(D3DRS_SRCBLENDALPHA, bABlend ? abSRC : D3DBLEND_ONE);
     RS.SetRS(D3DRS_DESTBLENDALPHA, bABlend ? abDST : D3DBLEND_ZERO);
-#endif  //	USE_DX10
+#endif //	USE_DX10
 }
 void CBlender_Compile::PassSET_ablend_aref(BOOL bATest, u32 aRef)
 {
@@ -256,7 +256,7 @@ void CBlender_Compile::PassSET_LightFog(BOOL bLight, BOOL bFog)
 //
 void CBlender_Compile::StageBegin()
 {
-    StageSET_Address(D3DTADDRESS_WRAP);  // Wrapping enabled by default
+    StageSET_Address(D3DTADDRESS_WRAP); // Wrapping enabled by default
 }
 void CBlender_Compile::StageEnd()
 {
@@ -316,7 +316,7 @@ void CBlender_Compile::Stage_Texture(LPCSTR name, u32, u32 fmin, u32 fmip, u32 f
     //	i_Address				(Stage(),address);
     i_Filter(Stage(), fmin, fmip, fmag);
 }
-#endif  //	USE_DX10
+#endif //	USE_DX10
 void CBlender_Compile::Stage_Matrix(LPCSTR name, int iChannel)
 {
     sh_list& lst = L_matrices;

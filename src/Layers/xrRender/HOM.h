@@ -66,7 +66,7 @@ public:
     BOOL visible(vis_data& vis);
     BOOL visible(Fbox3& B);
     BOOL visible(sPoly& P);
-    BOOL visible(Fbox2& B, float depth);  // viewport-space (0..1)
+    BOOL visible(Fbox2& B, float depth); // viewport-space (0..1)
 
     CHOM();
     ~CHOM();

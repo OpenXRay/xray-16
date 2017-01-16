@@ -13,7 +13,7 @@ namespace lc_net
 {
 void net_global_data_impl<gl_detail_cl_data>::init()
 {
-    data_init();  // init as new data
+    data_init(); // init as new data
 }
 
 void net_global_data_impl<gl_detail_cl_data>::create_data_file(LPCSTR path)

@@ -280,7 +280,7 @@ void xrSASH::GetAllOptions()
     }
 
     // >=r2
-    oaInitOption(&Option);  // Reset dependency info
+    oaInitOption(&Option); // Reset dependency info
     // Currently only equal/not equal works
     // Option.Dependency.ParentName = TEXT("renderer");
     // Option.Dependency.ComparisonOp = OA_COMP_OP_GREATER_OR_EQUAL;

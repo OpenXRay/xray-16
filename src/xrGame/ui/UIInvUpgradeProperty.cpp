@@ -167,7 +167,7 @@ void UIInvUpgPropertiesWnd::init_from_xml(LPCSTR xml_name)
     CInifile::SectIt_ ie = inv_section.Data.end();
     for (; ib != ie; ++ib)
     {
-        UIProperty* ui_property = new UIProperty();  // load one time !!
+        UIProperty* ui_property = new UIProperty(); // load one time !!
         ui_property->init_from_xml(ui_xml);
 
         property_id._set((*ib).first);
@@ -178,7 +178,7 @@ void UIInvUpgPropertiesWnd::init_from_xml(LPCSTR xml_name)
 
         m_properties_ui.push_back(ui_property);
         AttachChild(ui_property);
-    }  // for ib
+    } // for ib
     ui_xml.SetLocalRoot(stored_root);
 }
 

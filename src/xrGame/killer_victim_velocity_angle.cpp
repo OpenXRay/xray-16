@@ -62,4 +62,4 @@ void killer_victim_angle::OnPlayerKilled(
     // Msg("* Killer victim angle: %d", get_u32_param());
 }
 
-}  // namespace award_system
+} // namespace award_system

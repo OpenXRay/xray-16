@@ -1,4 +1,4 @@
-#ifndef STDMIX_INCLUDED  // -*- C++ -*-
+#ifndef STDMIX_INCLUDED // -*- C++ -*-
 #define STDMIX_INCLUDED
 #if !defined(__GNUC__)
 #pragma once

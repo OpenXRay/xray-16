@@ -63,4 +63,4 @@ shared_str editor::environment::detail::real_path(LPCSTR folder, LPCSTR path)
     return (result);
 }
 
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR

@@ -9,8 +9,8 @@
 #define M_COS_PI_3 REAL(0.5000000000000000000000000000000000)
 
 struct dxCylinder
-{                      // cylinder
-    dReal radius, lz;  // radius, length along y axis //
+{                     // cylinder
+    dReal radius, lz; // radius, length along y axis //
 };
 
 int dCylinderClassUser = -1;
@@ -53,7 +53,7 @@ inline bool circleIntersection(
     B_A = B / A;
     B_A_2 = B_A * B_A;
     D = B_A_2 - C;
-    if (D < 0.f) {  // somewhat strange solution
+    if (D < 0.f) { // somewhat strange solution
         //- it is needed to set some
         // axis to sepparate cylinders
         // when their edges approach
@@ -202,7 +202,7 @@ extern "C" int dCylBox(const dVector3 p1, const dMatrix3 R1, const dReal radius,
     p[0] = p2[0] - p1[0];
     p[1] = p2[1] - p1[1];
     p[2] = p2[2] - p1[2];
-    dMULTIPLY1_331(pp, R1, p);  // get pp = p relative to body 1
+    dMULTIPLY1_331(pp, R1, p); // get pp = p relative to body 1
 
     // get side lengths / 2
     // A1 =radius; A2 = lz*REAL(0.5); A3 = radius;
@@ -639,7 +639,7 @@ extern "C" int dCylCyl(const dVector3 p1, const dMatrix3 R1, const dReal radius1
     p[0] = p2[0] - p1[0];
     p[1] = p2[1] - p1[1];
     p[2] = p2[2] - p1[2];
-    dMULTIPLY1_331(pp1, R1, p);  // get pp1 = p relative to body 1
+    dMULTIPLY1_331(pp1, R1, p); // get pp1 = p relative to body 1
     dMULTIPLY1_331(pp2, R2, p);
     // get side lengths / 2
     hlz1 = lz1 * REAL(0.5);
@@ -664,7 +664,7 @@ extern "C" int dCylCyl(const dVector3 p1, const dMatrix3 R1, const dReal radius1
     dReal c_cos = dFabs(dDOT44(R1 + 1, R2 + 1));
     dReal c_sin = dSqrt(1.f - (c_cos > 1.f ? 1.f : c_cos));
 
-    TEST(pp1[1], (hlz1 + radius2 * c_sin + hlz2 * c_cos), R1 + 1, 0);  // pp
+    TEST(pp1[1], (hlz1 + radius2 * c_sin + hlz2 * c_cos), R1 + 1, 0); // pp
 
 /// TEST (pp2[1],(radius1*c_sin + hlz1*c_cos + hlz2),R2+1,1);
 
@@ -1273,16 +1273,16 @@ int dCollideCylPlane(dxGeom* o1, dxGeom* o2, int flags, dContactGeom* contact, i
     dReal hlz;
     dGeomCylinderGetParams(o1, &radius, &hlz);
     hlz /= REAL(2.);
-    const dReal* R = dGeomGetRotation(o1);  // rotation of cylinder
+    const dReal* R = dGeomGetRotation(o1); // rotation of cylinder
     const dReal* p = dGeomGetPosition(o1);
-    dVector4 n;  // normal vector3
+    dVector4 n; // normal vector3
     dReal pp;
     dGeomPlaneGetParams(o2, n);
     pp = n[3];
     dReal cos1, sin1;
     cos1 = dFabs(dDOT14(n, R + 1));
 
-    cos1 = cos1 < REAL(1.) ? cos1 : REAL(1.);  // cos1 may slightly exeed 1.f
+    cos1 = cos1 < REAL(1.) ? cos1 : REAL(1.); // cos1 may slightly exeed 1.f
     sin1 = dSqrt(REAL(1.) - cos1 * cos1);
     //////////////////////////////
 
@@ -1374,10 +1374,10 @@ int dCollideCylRay(dxGeom* o1, dxGeom* o2, int flags, dContactGeom* contact, int
     dReal lz;
     dGeomCylinderGetParams(o1, &radius, &lz);
     dReal lz2 = lz * REAL(0.5);
-    const dReal* R = dGeomGetRotation(o1);  // rotation of the cylinder
-    const dReal* p = dGeomGetPosition(o1);  // position of the cylinder
+    const dReal* R = dGeomGetRotation(o1); // rotation of the cylinder
+    const dReal* p = dGeomGetPosition(o1); // position of the cylinder
     dVector3 start, dir;
-    dGeomRayGet(o2, start, dir);  // position and orientation of the ray
+    dGeomRayGet(o2, start, dir); // position and orientation of the ray
     dReal length = dGeomRayGetLength(o2);
 
     // compute some useful info
@@ -1386,7 +1386,7 @@ int dCollideCylRay(dxGeom* o1, dxGeom* o2, int flags, dContactGeom* contact, int
     cs[0] = start[0] - p[0];
     cs[1] = start[1] - p[1];
     cs[2] = start[2] - p[2];
-    k = dDOT41(R + 1, cs);  // position of ray start along cyl axis (Y)
+    k = dDOT41(R + 1, cs); // position of ray start along cyl axis (Y)
     q[0] = k * R[0 * 4 + 1] - cs[0];
     q[1] = k * R[1 * 4 + 1] - cs[1];
     q[2] = k * R[2 * 4 + 1] - cs[2];
@@ -1469,9 +1469,9 @@ int dCollideCylRay(dxGeom* o1, dxGeom* o2, int flags, dContactGeom* contact, int
     q[2] = start[2] - (p[2] + k * R[2 * 4 + 1]);
     dReal alpha = -dDOT14(q, R + 1);
     dReal k2 = dDOT14(dir, R + 1);
-    if (k2 == 0) return 0;  // ray parallel to the plane
+    if (k2 == 0) return 0; // ray parallel to the plane
     alpha /= k2;
-    if (alpha < 0 || alpha > length) return 0;  // too short
+    if (alpha < 0 || alpha > length) return 0; // too short
     contact->pos[0] = start[0] + alpha * dir[0];
     contact->pos[1] = start[1] + alpha * dir[1];
     contact->pos[2] = start[2] + alpha * dir[2];

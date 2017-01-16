@@ -45,8 +45,8 @@ XRSOUND_API extern u32 snd_device_id;
 // Flags
 enum
 {
-    ss_Hardware = (1ul << 1ul),  //!< Use hardware mixing only
-    ss_EAX = (1ul << 2ul),       //!< Use eax
+    ss_Hardware = (1ul << 1ul), //!< Use hardware mixing only
+    ss_EAX = (1ul << 2ul),      //!< Use eax
     ss_forcedword = u32(-1)
 };
 
@@ -66,8 +66,8 @@ enum
 };
 enum
 {
-    sm_Looped = (1ul << 0ul),  //!< Looped
-    sm_2D = (1ul << 1ul),      //!< 2D mode
+    sm_Looped = (1ul << 0ul), //!< Looped
+    sm_2D = (1ul << 1ul),     //!< 2D mode
     sm_forcedword = u32(-1),
 };
 enum esound_type
@@ -92,11 +92,11 @@ class ref_sound_data : public xr_resource
 {
 public:
     //	shared_str						nm;
-    CSound_source* handle;     //!< Pointer to wave-source interface
-    CSound_emitter* feedback;  //!< Pointer to emitter, automaticaly clears on emitter-stop
+    CSound_source* handle;    //!< Pointer to wave-source interface
+    CSound_emitter* feedback; //!< Pointer to emitter, automaticaly clears on emitter-stop
     esound_type s_type;
-    int g_type;             //!< Sound type, usually for AI
-    IGameObject* g_object;  //!< Game object that emitts ref_sound
+    int g_type;            //!< Sound type, usually for AI
+    IGameObject* g_object; //!< Game object that emitts ref_sound
     CSound_UserDataPtr g_userdata;
     shared_str fn_attached[2];
 

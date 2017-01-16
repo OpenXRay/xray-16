@@ -34,9 +34,9 @@ protected:
     //.	u8								m_LastRespawnPointID;
     CRandom ArtefactChooserRandom;
 
-    u16 artefactBearerID;  // ah,ZoneMap
+    u16 artefactBearerID; // ah,ZoneMap
     u16 m_iAfBearerMenaceID;
-    u8 teamInPossession;  // ah,ZoneMap
+    u8 teamInPossession; // ah,ZoneMap
 
     bool bNoLostMessage;
     bool m_bArtefactWasBringedToBase;
@@ -74,7 +74,7 @@ public:
     virtual LPCSTR type_name() const { return "artefacthunt"; };
     // Events
     virtual void OnEvent(NET_Packet& tNetPacket, u16 type, u32 time, ClientID sender);
-    virtual void OnRoundStart();  // старт раунда
+    virtual void OnRoundStart(); // старт раунда
     virtual KILL_RES GetKillResult(game_PlayerState* pKiller, game_PlayerState* pVictim);
     virtual bool OnKillResult(KILL_RES KillResult, game_PlayerState* pKiller, game_PlayerState* pVictim);
     virtual void OnGiveBonus(KILL_RES KillResult, game_PlayerState* pKiller, game_PlayerState* pVictim,
@@ -114,7 +114,7 @@ public:
     void RemoveArtefact();
     void Assign_Artefact_RPoint(CSE_Abstract* E);
 
-    virtual void net_Export_State(NET_Packet& P, ClientID id_to);  // full state
+    virtual void net_Export_State(NET_Packet& P, ClientID id_to); // full state
     bool ArtefactSpawn_Allowed();
     //-------------------------------------------------------------------------------
     virtual void RespawnAllNotAlivePlayers();

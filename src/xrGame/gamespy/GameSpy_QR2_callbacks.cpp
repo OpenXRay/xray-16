@@ -51,7 +51,7 @@ void __cdecl callback_serverkey(int keyid, qr2_buffer_t outbuf, void* userdata)
     case SERVER_UP_TIME_KEY: pQR2->BufferAdd(outbuf, time_str); break;
     case GAMETYPE_KEY:
         ADD_KEY_VAL(gameState, pQR2, BufferAdd, outbuf, type_name());
-        break;  //		pQR2->BufferAdd(outbuf, gameState->type_name()); break;
+        break; //		pQR2->BufferAdd(outbuf, gameState->type_name()); break;
     case GAMEMODE_KEY: pQR2->BufferAdd(outbuf, "openplaying"); break;
     case PASSWORD_KEY:
         if (0 == *(pServer->Password)) {
@@ -77,97 +77,105 @@ void __cdecl callback_serverkey(int keyid, qr2_buffer_t outbuf, void* userdata)
     case DEDICATED_KEY: pQR2->BufferAdd_Int(outbuf, pServer->IsDedicated()); break;
     case GAMETYPE_NAME_KEY:
         ADD_KEY_VAL(gameState, pQR2, BufferAdd_Int, outbuf, Type());
-        break;  // pQR2->BufferAdd_Int(outbuf, gameState->Type()); break;
+        break; // pQR2->BufferAdd_Int(outbuf, gameState->Type()); break;
     case NUMTEAMS_KEY:
         ADD_KEY_VAL(gmMP, pQR2, BufferAdd_Int, outbuf, GetNumTeams());
-        break;  // pQR2->BufferAdd_Int(outbuf, gmMP->GetNumTeams()); break;
+        break; // pQR2->BufferAdd_Int(outbuf, gmMP->GetNumTeams()); break;
     case G_MAX_PING_KEY:
         pQR2->BufferAdd_Int(outbuf, g_sv_dwMaxClientPing);
         break;
     //------- game ---------//
     case G_MAP_ROTATION_KEY:
         ADD_KEY_VAL(gmDM, pQR2, BufferAdd_Int, outbuf, HasMapRotation());
-        break;  // if (gmDM) pQR2->BufferAdd_Int(outbuf, gmDM->HasMapRotation());		else pQR2->BufferAdd(outbuf, "");
-                // break;
+        break; // if (gmDM) pQR2->BufferAdd_Int(outbuf, gmDM->HasMapRotation());		else pQR2->BufferAdd(outbuf,
+               // "");
+               // break;
     case G_VOTING_ENABLED_KEY:
         ADD_KEY_VAL(gmDM, pQR2, BufferAdd_Int, outbuf, IsVotingEnabled());
-        break;  // if (gmDM) pQR2->BufferAdd_Int(outbuf, gmDM->IsVotingEnabled());		else pQR2->BufferAdd(outbuf, "");
-                // break;
+        break; // if (gmDM) pQR2->BufferAdd_Int(outbuf, gmDM->IsVotingEnabled());		else pQR2->BufferAdd(outbuf,
+               // "");
+               // break;
     case G_SPECTATOR_MODES_KEY:
         ADD_KEY_VAL(gmDM, pQR2, BufferAdd_Int, outbuf, GetSpectatorModes());
-        break;  // if (gmDM) pQR2->BufferAdd_Int(outbuf, gmDM->GetSpectatorModes());	else pQR2->BufferAdd(outbuf, "");
-                // break;
+        break; // if (gmDM) pQR2->BufferAdd_Int(outbuf, gmDM->GetSpectatorModes());	else pQR2->BufferAdd(outbuf, "");
+               // break;
     //------- deathmatch -------//
     case G_FRAG_LIMIT_KEY:
         ADD_KEY_VAL(gmDM, pQR2, BufferAdd_Int, outbuf, GetFragLimit());
-        break;  // if (gmDM)pQR2->BufferAdd_Int(outbuf, gmDM->GetFragLimit());			else pQR2->BufferAdd(outbuf, "");
-                // break;
+        break; // if (gmDM)pQR2->BufferAdd_Int(outbuf, gmDM->GetFragLimit());			else pQR2->BufferAdd(outbuf,
+               // "");
+               // break;
     case G_TIME_LIMIT_KEY:
         ADD_KEY_VAL(gmDM, pQR2, BufferAdd_Int, outbuf, GetTimeLimit());
-        break;  // if (gmDM)pQR2->BufferAdd_Int(outbuf, gmDM->GetTimeLimit());			else pQR2->BufferAdd(outbuf, "");
-                // break;
+        break; // if (gmDM)pQR2->BufferAdd_Int(outbuf, gmDM->GetTimeLimit());			else pQR2->BufferAdd(outbuf,
+               // "");
+               // break;
     case G_DAMAGE_BLOCK_TIME_KEY:
         ADD_KEY_VAL(gmDM, pQR2, BufferAdd_Int, outbuf, GetDMBLimit());
-        break;  // if (gmDM)pQR2->BufferAdd_Int(outbuf, gmDM->GetDMBLimit());			else pQR2->BufferAdd(outbuf, "");
-                // break;
+        break; // if (gmDM)pQR2->BufferAdd_Int(outbuf, gmDM->GetDMBLimit());			else pQR2->BufferAdd(outbuf,
+               // "");
+               // break;
     case G_DAMAGE_BLOCK_INDICATOR_KEY:
         ADD_KEY_VAL(gmDM, pQR2, BufferAdd_Int, outbuf, IsDamageBlockIndEnabled());
-        break;  // if (gmDM)pQR2->BufferAdd_Int(outbuf, gmDM->IsDamageBlockIndEnabled()); else pQR2->BufferAdd(outbuf,
-                // "");	break;
+        break; // if (gmDM)pQR2->BufferAdd_Int(outbuf, gmDM->IsDamageBlockIndEnabled()); else pQR2->BufferAdd(outbuf,
+               // "");	break;
     case G_ANOMALIES_ENABLED_KEY:
         ADD_KEY_VAL(gmDM, pQR2, BufferAdd_Int, outbuf, IsAnomaliesEnabled());
-        break;  // if (gmDM)pQR2->BufferAdd_Int(outbuf, gmDM->IsAnomaliesEnabled());	else pQR2->BufferAdd(outbuf, "");
-                // break;
+        break; // if (gmDM)pQR2->BufferAdd_Int(outbuf, gmDM->IsAnomaliesEnabled());	else pQR2->BufferAdd(outbuf, "");
+               // break;
     case G_ANOMALIES_TIME_KEY:
         ADD_KEY_VAL(gmDM, pQR2, BufferAdd_Int, outbuf, GetAnomaliesTime());
-        break;  // if (gmDM)pQR2->BufferAdd_Int(outbuf, gmDM->GetAnomaliesTime());		else pQR2->BufferAdd(outbuf, "");
-                // break;
+        break; // if (gmDM)pQR2->BufferAdd_Int(outbuf, gmDM->GetAnomaliesTime());		else pQR2->BufferAdd(outbuf,
+               // "");
+               // break;
     case G_WARM_UP_TIME_KEY:
         ADD_KEY_VAL(gmDM, pQR2, BufferAdd_Int, outbuf, GetWarmUpTime());
-        break;  // if (gmDM)pQR2->BufferAdd_Int(outbuf, gmDM->GetWarmUpTime());			else pQR2->BufferAdd(outbuf, "");
-                // break;
+        break; // if (gmDM)pQR2->BufferAdd_Int(outbuf, gmDM->GetWarmUpTime());			else pQR2->BufferAdd(outbuf,
+               // "");
+               // break;
     case G_FORCE_RESPAWN_KEY:
         ADD_KEY_VAL(gmDM, pQR2, BufferAdd_Int, outbuf, GetForceRespawn());
-        break;  // if (gmDM)pQR2->BufferAdd_Int(outbuf, gmDM->GetForceRespawn());		else pQR2->BufferAdd(outbuf, "");
-                // break;
+        break; // if (gmDM)pQR2->BufferAdd_Int(outbuf, gmDM->GetForceRespawn());		else pQR2->BufferAdd(outbuf,
+               // "");
+               // break;
     //---- game_sv_teamdeathmatch ----
     case G_AUTO_TEAM_BALANCE_KEY:
         ADD_KEY_VAL(gmTDM, pQR2, BufferAdd_Int, outbuf, Get_AutoTeamBalance());
-        break;  // if (gmTDM)pQR2->BufferAdd_Int(outbuf, gmTDM->Get_AutoTeamBalance	());			break;
+        break; // if (gmTDM)pQR2->BufferAdd_Int(outbuf, gmTDM->Get_AutoTeamBalance	());			break;
     case G_AUTO_TEAM_SWAP_KEY:
         ADD_KEY_VAL(gmTDM, pQR2, BufferAdd_Int, outbuf, Get_AutoTeamSwap());
-        break;  // if (gmTDM)pQR2->BufferAdd_Int(outbuf, gmTDM->Get_AutoTeamSwap		());			break;
+        break; // if (gmTDM)pQR2->BufferAdd_Int(outbuf, gmTDM->Get_AutoTeamSwap		());			break;
     case G_FRIENDLY_INDICATORS_KEY:
         ADD_KEY_VAL(gmTDM, pQR2, BufferAdd_Int, outbuf, Get_FriendlyIndicators());
-        break;  // if (gmTDM)pQR2->BufferAdd_Int(outbuf, gmTDM->Get_FriendlyIndicators	());			break;
+        break; // if (gmTDM)pQR2->BufferAdd_Int(outbuf, gmTDM->Get_FriendlyIndicators	());			break;
     case G_FRIENDLY_NAMES_KEY:
         ADD_KEY_VAL(gmTDM, pQR2, BufferAdd_Int, outbuf, Get_FriendlyNames());
-        break;  // if (gmTDM)pQR2->BufferAdd_Int(outbuf, gmTDM->Get_FriendlyNames		());			break;
+        break; // if (gmTDM)pQR2->BufferAdd_Int(outbuf, gmTDM->Get_FriendlyNames		());			break;
     case G_FRIENDLY_FIRE_KEY:
         ADD_KEY_VAL_INT(gmTDM, pQR2, BufferAdd_Int, outbuf, GetFriendlyFire() * 100.0f);
-        break;  // if (gmTDM)pQR2->BufferAdd_Int(outbuf, int(gmTDM->GetFriendlyFire()*100.0f));		break;
+        break; // if (gmTDM)pQR2->BufferAdd_Int(outbuf, int(gmTDM->GetFriendlyFire()*100.0f));		break;
     //---- game_sv_artefacthunt ----
     case G_ARTEFACTS_COUNT_KEY:
         ADD_KEY_VAL(gmAhunt, pQR2, BufferAdd_Int, outbuf, Get_ArtefactsCount());
-        break;  // if (gmAhunt) pQR2->BufferAdd_Int(outbuf, gmAhunt->Get_ArtefactsCount		());			break;
+        break; // if (gmAhunt) pQR2->BufferAdd_Int(outbuf, gmAhunt->Get_ArtefactsCount		());			break;
     case G_ARTEFACT_STAY_TIME_KEY:
         ADD_KEY_VAL(gmAhunt, pQR2, BufferAdd_Int, outbuf, Get_ArtefactsStayTime());
-        break;  // if (gmAhunt) pQR2->BufferAdd_Int(outbuf, gmAhunt->Get_ArtefactsStayTime		());			break;
+        break; // if (gmAhunt) pQR2->BufferAdd_Int(outbuf, gmAhunt->Get_ArtefactsStayTime		());			break;
     case G_ARTEFACT_RESPAWN_TIME_KEY:
         ADD_KEY_VAL(gmAhunt, pQR2, BufferAdd_Int, outbuf, Get_ArtefactsRespawnDelta());
-        break;  // if (gmAhunt) pQR2->BufferAdd_Int(outbuf, gmAhunt->Get_ArtefactsRespawnDelta	());			break;
+        break; // if (gmAhunt) pQR2->BufferAdd_Int(outbuf, gmAhunt->Get_ArtefactsRespawnDelta	());			break;
     case G_REINFORCEMENT_KEY:
         ADD_KEY_VAL(gmAhunt, pQR2, BufferAdd_Int, outbuf, Get_ReinforcementTime());
-        break;  // if (gmAhunt) pQR2->BufferAdd_Int(outbuf, gmAhunt->Get_ReinforcementTime		());			break;
+        break; // if (gmAhunt) pQR2->BufferAdd_Int(outbuf, gmAhunt->Get_ReinforcementTime		());			break;
     case G_SHIELDED_BASES_KEY:
         ADD_KEY_VAL(gmAhunt, pQR2, BufferAdd_Int, outbuf, Get_ShieldedBases());
-        break;  // if (gmAhunt) pQR2->BufferAdd_Int(outbuf, gmAhunt->Get_ShieldedBases			());			break;
+        break; // if (gmAhunt) pQR2->BufferAdd_Int(outbuf, gmAhunt->Get_ShieldedBases			());			break;
     case G_RETURN_PLAYERS_KEY:
         ADD_KEY_VAL(gmAhunt, pQR2, BufferAdd_Int, outbuf, Get_ReturnPlayers());
-        break;  // if (gmAhunt) pQR2->BufferAdd_Int(outbuf, gmAhunt->Get_ReturnPlayers			());			break;
+        break; // if (gmAhunt) pQR2->BufferAdd_Int(outbuf, gmAhunt->Get_ReturnPlayers			());			break;
     case G_BEARER_CANT_SPRINT_KEY:
         ADD_KEY_VAL(gmAhunt, pQR2, BufferAdd_Int, outbuf, Get_BearerCantSprint());
-        break;  // if (gmAhunt) pQR2->BufferAdd_Int(outbuf, gmAhunt->Get_BearerCantSprint		());			break;
+        break; // if (gmAhunt) pQR2->BufferAdd_Int(outbuf, gmAhunt->Get_BearerCantSprint		());			break;
     default:
     {
         //			R_ASSERT2(0, "Unknown GameSpy Server key ");
@@ -280,7 +288,7 @@ void __cdecl callback_keylist(qr2_key_type keytype, qr2_keybuffer_t keybuffer, v
 
         pQR2->KeyBufferAdd(keybuffer, GAMETYPE_KEY);
         pQR2->KeyBufferAdd(keybuffer, PASSWORD_KEY);
-        pQR2->KeyBufferAdd(keybuffer, G_USER_PASSWORD_KEY);  // user
+        pQR2->KeyBufferAdd(keybuffer, G_USER_PASSWORD_KEY); // user
 
         pQR2->KeyBufferAdd(keybuffer, HOSTPORT_KEY);
 

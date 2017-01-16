@@ -13,7 +13,7 @@ namespace burer
 {
 float const health_delta = 0.01f;
 
-}  // namespace detail
+} // namespace detail
 
 template <typename Object>
 CStateBurerAttack<Object>::CStateBurerAttack(Object* obj) : inherited(obj)

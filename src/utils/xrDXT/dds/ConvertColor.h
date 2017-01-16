@@ -53,9 +53,9 @@ public:
     int FloatToUnsignedPS(float pixel, int depth);
     int FloatToSignedPS(float pixel, int depth, int plane);
     // format to float
-    static float UnsignedToFloat(int channel);             // unsigned, 8 bits
-    static float UnsignedToFloat(int channel, int nBits);  // unsigned
-    static float SignedToFloat(int channel);               // 8 bits
+    static float UnsignedToFloat(int channel);            // unsigned, 8 bits
+    static float UnsignedToFloat(int channel, int nBits); // unsigned
+    static float SignedToFloat(int channel);              // 8 bits
     static float SignedToFloat(int channel, int nBits);
 
     static void RGBAToFloat(int r, int g, int b, int a, fpPixel& fp)
@@ -93,7 +93,7 @@ public:
         else if (h.ieee.e == 0 && h.ieee.m != 0)
         {
             // denorm -- denorm half will fit in non-denorm single
-            const float half_denorm = 1.0f / 16384.0f;  // 2^-14
+            const float half_denorm = 1.0f / 16384.0f; // 2^-14
             float mantissa = (float)h.ieee.m / 1024.0f;
             float sgn = (h.ieee.s) ? -1.0f : 1.0f;
             sng.f = sgn * mantissa * half_denorm;
@@ -119,9 +119,9 @@ public:
     }
 
     /// float to format
-    static unsigned long FloatToUnsigned(float channel);  // 8 bits
+    static unsigned long FloatToUnsigned(float channel); // 8 bits
     static unsigned long FloatToUnsigned(float channel, int nBits);
-    static long FloatToSigned(float channel);  // 8 bits
+    static long FloatToSigned(float channel); // 8 bits
     static long FloatToSigned(float channel, int nBits);
 
     static unsigned long NormalToUnsigned(float inColor) { return FloatToUnsigned(inColor * 0.5f + 0.5f); }
@@ -234,14 +234,14 @@ public:
         {
             // regular number
             int new_exp = f.ieee.e - 127;
-            if (new_exp < -24) {  // this maps to 0
+            if (new_exp < -24) { // this maps to 0
                 h.ieee.m = 0;
                 h.ieee.e = 0;
             }
             if (new_exp < -14) {
                 // this maps to a denorm
                 h.ieee.e = 0;
-                unsigned int exp_val = (unsigned int)(-14 - new_exp);  // 2^-exp_val
+                unsigned int exp_val = (unsigned int)(-14 - new_exp); // 2^-exp_val
                 switch (exp_val)
                 {
                 case 0:
@@ -261,7 +261,7 @@ public:
                 }
             }
             else if (new_exp > 15)
-            {  // map this value to infinity
+            { // map this value to infinity
                 h.ieee.m = 0;
                 h.ieee.e = 31;
             }

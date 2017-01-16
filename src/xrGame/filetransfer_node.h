@@ -17,7 +17,7 @@ public:
     virtual u32 size() = 0;
     virtual u32 tell() = 0;
     virtual bool opened() const = 0;
-};  // class file_reader
+}; // class file_reader
 
 class disk_file_reader : public file_reader
 {
@@ -31,7 +31,7 @@ public:
     virtual u32 size();
     virtual u32 tell();
     virtual bool opened() const;
-};  // class disk_file_reader
+}; // class disk_file_reader
 
 class memory_reader : public file_reader
 {
@@ -45,7 +45,7 @@ public:
     virtual u32 size();
     virtual u32 tell();
     virtual bool opened() const;
-};  // class memory_reader
+}; // class memory_reader
 
 class buffers_vector_reader : public file_reader
 {
@@ -68,12 +68,12 @@ private:
     u32 m_current_buf_offs;
     u32 m_complete_buffers_size;
     u32 m_sum_size;
-};  // class buffer_vector_reader
+}; // class buffer_vector_reader
 
 class memory_writer_reader : public file_reader
 {
     CMemoryWriter* m_writer_as_src;
-    u32 m_writer_pointer;  // to read ..
+    u32 m_writer_pointer; // to read ..
     u32 const m_writer_max_size;
 
 public:
@@ -84,7 +84,7 @@ public:
     virtual u32 size();
     virtual u32 tell();
     virtual bool opened() const;
-};  // class memory_writer_reader
+}; // class memory_writer_reader
 
 class filetransfer_node
 {
@@ -111,7 +111,7 @@ public:
     ~filetransfer_node();
 
     void calculate_chunk_size(u32 peak_throughput, u32 current_throughput);
-    bool make_data_packet(NET_Packet& packet);  // returns true if this is a last packet ...
+    bool make_data_packet(NET_Packet& packet); // returns true if this is a last packet ...
     void signal_callback(sending_status_t status);
     bool is_complete();
     bool is_ready_to_send();
@@ -120,8 +120,8 @@ public:
     bool opened() const;
     // inline	IReader*			get_reader		() { return m_reader; };
     inline u32 const get_chunk_size() const { return m_chunk_size; };
-};  // class filetransfer_node
+}; // class filetransfer_node
 
-}  // namespace file_transfer
+} // namespace file_transfer
 
-#endif  //#ifndef FILETRANSFER_NODE
+#endif //#ifndef FILETRANSFER_NODE

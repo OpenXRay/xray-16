@@ -19,7 +19,7 @@
 #ifdef _WIN32
 LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
 #pragma code_page(1251)
-#endif  //_WIN32
+#endif //_WIN32
 
     /////////////////////////////////////////////////////////////////////////////
     //
@@ -46,9 +46,9 @@ LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
 #ifdef APSTUDIO_INVOKED
         GUIDELINES DESIGNINFO BEGIN IDD_STOP,
     DIALOG BEGIN LEFTMARGIN, 7 RIGHTMARGIN, 317 TOPMARGIN, 7 BOTTOMMARGIN, 117 END END
-#endif  // APSTUDIO_INVOKED
+#endif // APSTUDIO_INVOKED
 
-#endif  // Neutral resources
+#endif // Neutral resources
 /////////////////////////////////////////////////////////////////////////////
 
 /////////////////////////////////////////////////////////////////////////////
@@ -59,7 +59,7 @@ LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
                                                                                LANGUAGE LANG_ENGLISH,
     SUBLANG_ENGLISH_US
 #pragma code_page(1252)
-#endif  //_WIN32
+#endif //_WIN32
 
 #ifdef APSTUDIO_INVOKED
     /////////////////////////////////////////////////////////////////////////////
@@ -77,9 +77,9 @@ LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
     3 TEXTINCLUDE BEGIN "\r\n"
                         "\0" END
 
-#endif  // APSTUDIO_INVOKED
+#endif // APSTUDIO_INVOKED
 
-#endif  // English (U.S.) resources
+#endif // English (U.S.) resources
 /////////////////////////////////////////////////////////////////////////////
 
 #ifndef APSTUDIO_INVOKED
@@ -89,4 +89,4 @@ LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
 //
 
 /////////////////////////////////////////////////////////////////////////////
-#endif  // not APSTUDIO_INVOKED
+#endif // not APSTUDIO_INVOKED

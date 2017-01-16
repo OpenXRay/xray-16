@@ -37,6 +37,6 @@ private:
     game_cl_CaptureTheArtefact* m_game;
     Fvector3 const* m_artefact_rpoint;
     ETeam m_my_team;
-};  // class CtaGameArtefact
+}; // class CtaGameArtefact
 
-#endif  // CTA_GAME_ARTEFACT
+#endif // CTA_GAME_ARTEFACT

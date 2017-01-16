@@ -18,24 +18,24 @@ const char* GetGameVersion()
 }
 
 // WORD: Bit masks for languages
-#define SKU_HAS_E 0x0001  // English
-#define SKU_HAS_F 0x0002  // French
-#define SKU_HAS_I 0x0004  // Italian
-#define SKU_HAS_G 0x0008  // German
-#define SKU_HAS_S 0x0010  // Spanish
-#define SKU_HAS_R 0x0020  // Russian
-#define SKU_HAS_P 0x0040  // Polish
-#define SKU_HAS_C 0x0080  // Czech
-#define SKU_HAS_H 0x0100  // China
+#define SKU_HAS_E 0x0001 // English
+#define SKU_HAS_F 0x0002 // French
+#define SKU_HAS_I 0x0004 // Italian
+#define SKU_HAS_G 0x0008 // German
+#define SKU_HAS_S 0x0010 // Spanish
+#define SKU_HAS_R 0x0020 // Russian
+#define SKU_HAS_P 0x0040 // Polish
+#define SKU_HAS_C 0x0080 // Czech
+#define SKU_HAS_H 0x0100 // China
 
 // BYTE: Bit masks for protection
-#define SKU_PRT_NONE 0x10  // Without protection
-#define SKU_PRT_SECU 0x20  // SecuROM
-#define SKU_PRT_STAR 0x40  // StarForce
-#define SKU_PRT_PACK 0x80  // Different DB packing algorithm
+#define SKU_PRT_NONE 0x10 // Without protection
+#define SKU_PRT_SECU 0x20 // SecuROM
+#define SKU_PRT_STAR 0x40 // StarForce
+#define SKU_PRT_PACK 0x80 // Different DB packing algorithm
 // and subprotection
-#define SKU_SUB_KEYDISK 0x01  // Binding to key-disk
-#define SKU_SUB_ONLINE 0x02   // Binding to hardware with online activation
+#define SKU_SUB_KEYDISK 0x01 // Binding to key-disk
+#define SKU_SUB_ONLINE 0x02  // Binding to hardware with online activation
 
 int GetGameDistribution()
 {

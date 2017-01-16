@@ -15,4 +15,4 @@ IC CVisualMemoryManager& vision_client::visual() const
     return (*m_visual);
 }
 
-#endif  // VISION_CLIENT_INLINE_H
+#endif // VISION_CLIENT_INLINE_H

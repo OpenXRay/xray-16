@@ -5,9 +5,9 @@
 #include "stdafx.h"
 
 typedef CActionBase<CUIMapWnd> WORLD_OPERATOR;
-static const float map_resize_speed = 350.f;  // y.e./sec
-static const float map_zoom_time = 0.5f;      // sec
-static const float min_move_time = 0.25f;     // sec
+static const float map_resize_speed = 350.f; // y.e./sec
+static const float map_zoom_time = 0.5f;     // sec
+static const float min_move_time = 0.25f;    // sec
 // actions
 class CSomeMapAction : public WORLD_OPERATOR
 {
@@ -201,7 +201,7 @@ void CMapActionZoomControl::init_internal()
 void CMapActionZoomControl::update_target_state()
 {
     float cur_map_zoom = m_object->GetZoom();
-    if (!fsimilar(cur_map_zoom, m_targetZoom)) {  // re-init
+    if (!fsimilar(cur_map_zoom, m_targetZoom)) { // re-init
         m_targetZoom = cur_map_zoom;
         init_internal();
     }

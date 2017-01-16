@@ -570,7 +570,7 @@ void mu_mesh_clear();
 void xrLC_GlobalData::clear_mu_models()
 {
     Logger.clLog("mem usage before mu_clear %d", Memory.mem_usage());
-    vec_clear(_mu_models);  // not clear ogf
+    vec_clear(_mu_models); // not clear ogf
     vec_clear(_mu_refs);
     mu_mesh_clear();
     Memory.mem_compact();
@@ -587,7 +587,7 @@ void xrLC_GlobalData::clear()
     close_models_write();
 
     vec_clear(_g_lightmaps);
-    vec_clear(_mu_models);  // mem leak
+    vec_clear(_mu_models); // mem leak
     vec_clear(_mu_refs);
     mu_mesh_clear();
     gl_mesh_clear();

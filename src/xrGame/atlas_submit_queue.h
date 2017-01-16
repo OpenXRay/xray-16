@@ -40,7 +40,7 @@ private:
         gamespy_profile::enum_awards_t m_award_id;
         u32 m_awards_count;
         // gamespy_profile::all_best_scores_t*	m_best_scores_ptr;
-    };  // struct submit_task
+    }; // struct submit_task
     typedef xr_deque<submit_task> reward_tasks_t;
     reward_tasks_t m_reward_tasks;
     gamespy_profile::all_best_scores_t m_best_results_to_submit;
@@ -56,6 +56,6 @@ private:
     bool m_atlas_in_process;
 
     void __stdcall atlas_submitted(bool result, char const* err_string);
-};  // class atlas_submit_quque
+}; // class atlas_submit_quque
 
-#endif  //#ifndef ATLAS_SUBMIT_QUEUE_INCLUDED
+#endif //#ifndef ATLAS_SUBMIT_QUEUE_INCLUDED

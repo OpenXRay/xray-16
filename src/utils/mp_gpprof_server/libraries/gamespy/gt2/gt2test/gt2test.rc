@@ -19,7 +19,7 @@
 #ifdef _WIN32
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
-#endif  //_WIN32
+#endif //_WIN32
 
 #ifdef APSTUDIO_INVOKED
     /////////////////////////////////////////////////////////////////////////////
@@ -53,7 +53,7 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
                                     "#endif\r\n"
                                     "\0" END
 
-#endif  // APSTUDIO_INVOKED
+#endif // APSTUDIO_INVOKED
 
     /////////////////////////////////////////////////////////////////////////////
     //
@@ -146,7 +146,7 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
     "1, 0, 0, 1\0" END END BLOCK "VarFileInfo" BEGIN VALUE "Translation", 0x409,
     1200 END END
 
-#endif  // !_MAC
+#endif // !_MAC
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -156,9 +156,9 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #ifdef APSTUDIO_INVOKED
         GUIDELINES DESIGNINFO DISCARDABLE BEGIN IDD_GT2TEST_DIALOG,
     DIALOG BEGIN LEFTMARGIN, 7 RIGHTMARGIN, 340 VERTGUIDE, 15 VERTGUIDE, 332 TOPMARGIN, 7 BOTTOMMARGIN, 324 END END
-#endif  // APSTUDIO_INVOKED
+#endif // APSTUDIO_INVOKED
 
-#endif  // English (U.S.) resources
+#endif // English (U.S.) resources
 /////////////////////////////////////////////////////////////////////////////
 
 #ifndef APSTUDIO_INVOKED
@@ -176,10 +176,10 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
                                                                                                             LANGUAGE 9,
     1
 #pragma code_page(1252)
-#endif                      //_WIN32
-#include "afxres.rc"        // Standard components
-#include "res\gt2test.rc2"  // non-Microsoft Visual C++ edited resources
+#endif                     //_WIN32
+#include "afxres.rc"       // Standard components
+#include "res\gt2test.rc2" // non-Microsoft Visual C++ edited resources
 #endif
 
 /////////////////////////////////////////////////////////////////////////////
-#endif  // not APSTUDIO_INVOKED
+#endif // not APSTUDIO_INVOKED

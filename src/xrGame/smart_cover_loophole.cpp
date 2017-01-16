@@ -22,7 +22,7 @@ namespace smart_cover
 {
 shared_str transform_vertex(shared_str const& vertex_id, bool const& in);
 shared_str parse_vertex(luabind::object const& table, LPCSTR identifier, bool const& in);
-}  // namespace smart_cover
+} // namespace smart_cover
 
 class id_predicate
 {

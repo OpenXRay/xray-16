@@ -110,7 +110,7 @@ void CUIServerInfo::SetServerLogo(u8 const* data_ptr, u32 const data_size)
         Msg("! ERROR: failed to create temporary dds file");
         return;
     }
-    tmp_writer->w((void*)data_ptr, data_size);  // sorry :(
+    tmp_writer->w((void*)data_ptr, data_size); // sorry :(
     FS.w_close(tmp_writer);
     m_dds_file_created = true;
     m_image->InitTexture(tmp_logo_file_name);
@@ -137,7 +137,7 @@ void CUIServerInfo::SetServerRules(u8 const* data_ptr, u32 const data_size)
         tmp_iter = strstr(tmp_iter, "\r\n");
     }
 
-    m_text_body->SetText(tmp_string);  // will create shared_str
+    m_text_body->SetText(tmp_string); // will create shared_str
     m_text_body->AdjustHeightToText();
 }
 
@@ -170,6 +170,6 @@ bool CUIServerInfo::OnKeyboardAction(int dik, EUIMessages keyboard_action)
         return true;
     }
     break;
-    };  // switch (dik)
+    }; // switch (dik)
     return false;
 }

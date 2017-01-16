@@ -61,7 +61,7 @@ void CRenderTarget::u_DBT_disable()
     //	HW.pDevice->SetRenderState(D3DRS_ADAPTIVETESS_X,0);
 }
 
-BOOL CRenderTarget::enable_scissor(light* L)  // true if intersects near plane
+BOOL CRenderTarget::enable_scissor(light* L) // true if intersects near plane
 {
     // Msg	("%d: %x type(%d), pos(%f,%f,%f)",Device.dwFrame,u32(L),u32(L->flags.type),VPUSH(L->position));
 

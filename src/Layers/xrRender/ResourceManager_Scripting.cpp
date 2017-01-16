@@ -245,7 +245,7 @@ void CResourceManager::LS_Load()
                 .def("blend", &adopt_compiler::_blend, return_reference_to<1>())
                 .def("aref", &adopt_compiler::_aref, return_reference_to<1>())
                 .def("color_write_enable", &adopt_compiler::_color_write_enable, return_reference_to<1>())
-                .def("sampler", &adopt_compiler::_sampler),  // returns sampler-object
+                .def("sampler", &adopt_compiler::_sampler), // returns sampler-object
 
             class_<adopt_blend>("blend").enum_("blend")[value("zero", int(D3DBLEND_ZERO)),
                 value("one", int(D3DBLEND_ONE)), value("srccolor", int(D3DBLEND_SRCCOLOR)),

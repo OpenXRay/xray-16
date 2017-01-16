@@ -109,7 +109,7 @@ void UITeamPanels::UpdatePanels()
             }
             break;
         };
-        };  // end switch
+        }; // end switch
         i->second->Show(need_show);
     }
     need_update_panels = false;

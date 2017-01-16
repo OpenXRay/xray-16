@@ -48,8 +48,8 @@
 extern MagicBox3 MagicMinBox(int iQuantity, const Fvector* akPoint);
 
 #ifdef DEBUG
-#include "debug_renderer.h"
 #include "PHDebug.h"
+#include "debug_renderer.h"
 #endif
 
 ENGINE_API bool g_dedicated_server;
@@ -300,7 +300,7 @@ void CGameObject::net_Destroy()
         if (!Level().IsDemoPlayStarted()) {
             Level().SetControlEntity(0);
         }
-        Level().SetEntity(0);  // do not switch !!!
+        Level().SetEntity(0); // do not switch !!!
     }
 
     Level().RemoveObject_From_4CrPr(this);
@@ -395,7 +395,7 @@ void CGameObject::OnEvent(NET_Packet& P, u16 type)
         }
 #ifdef MP_LOGGING
         Msg("--- Object: GE_DESTROY of [%d][%s]", ID(), cNameSect().c_str());
-#endif  // MP_LOGGING
+#endif // MP_LOGGING
 
         setDestroy(TRUE);
         //			MakeMeCrow		();
@@ -469,7 +469,7 @@ BOOL CGameObject::net_Spawn(CSE_Abstract* DC)
 
     // Net params
     setLocal(E->s_flags.is(M_SPAWN_OBJECT_LOCAL));
-    if (Level().IsDemoPlay())  //&& OnClient())
+    if (Level().IsDemoPlay()) //&& OnClient())
     {
         if (!demo_spectator) {
             setLocal(FALSE);
@@ -674,7 +674,7 @@ void CGameObject::spawn_supplies()
         if (V && xr_strlen(V)) {
             int n = _GetItemCount(V);
             string16 temp;
-            if (n > 0) j = atoi(_GetItem(V, 0, temp));  // count
+            if (n > 0) j = atoi(_GetItem(V, 0, temp)); // count
 
             if (NULL != strstr(V, "prob=")) p = (float)atof(strstr(V, "prob=") + 5);
             if (fis_zero(p)) p = 1.f;
@@ -913,18 +913,18 @@ IGameObject* CGameObject::H_SetParent(IGameObject* new_parent, bool just_before_
     VERIFY2(!new_parent || !old_parent, "Before set parent - execute H_SetParent(0)");
     // if (Parent) Parent->H_ChildRemove (this);
     if (!old_parent)
-        OnH_B_Chield();  // before attach
+        OnH_B_Chield(); // before attach
     else
-        OnH_B_Independent(just_before_destroy);  // before detach
+        OnH_B_Independent(just_before_destroy); // before detach
     if (new_parent)
         spatial_unregister();
     else
         spatial_register();
     Parent = new_parent;
     if (!old_parent)
-        OnH_A_Chield();  // after attach
+        OnH_A_Chield(); // after attach
     else
-        OnH_A_Independent();  // after detach
+        OnH_A_Independent(); // after detach
     // if (Parent) Parent->H_ChildAdd (this);
     MakeMeCrow();
     return old_parent;
@@ -967,7 +967,7 @@ void CGameObject::setDestroy(BOOL _destroy)
 #endif
 #ifdef MP_LOGGING
         Msg("cl setDestroy [%d][%d]", ID(), Device.dwFrame);
-#endif  //#ifdef MP_LOGGING
+#endif //#ifdef MP_LOGGING
     }
     else
         VERIFY(!g_pGameLevel->Objects.registered_object_to_destroy(this));
@@ -1123,7 +1123,7 @@ void CGameObject::shedule_Update(u32 dt)
     if (NeedToDestroyObject()) {
 #ifndef MASTER_GOLD
         Msg("--NeedToDestroyObject for [%d][%d]", ID(), Device.dwFrame);
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
         DestroyObject();
     }
     // Msg("-SUB-:[%x][%s] CGameObject::shedule_Update",smart_cast<void*>(this),*cName());
@@ -1443,9 +1443,9 @@ void CGameObject::OnRender()
         renderer.draw_obb(T, bd, color_rgba(255, 255, 255, 255));
     }
 }
-#endif  // DEBUG
+#endif // DEBUG
 
-using namespace luabind;  // XXX: is it required here?
+using namespace luabind; // XXX: is it required here?
 
 bool CGameObject::use(IGameObject* obj)
 {

@@ -21,7 +21,7 @@ public:
     TSTR name;
     INode *node, *tnode;
     Object* obj;
-    int type;  // See above
+    int type; // See above
     int id;
     SceneEntry* next;
     SceneEntry(INode* n, Object* o, int t);
@@ -138,7 +138,7 @@ int SceneEnumProc::callback(INode* node)
         if (obj->ClassID() == Class_ID(LOOKAT_CAM_CLASS_ID, 0)) Append(node, obj, OBTYPE_CAMERA);
         break;
     }
-    return TREE_CONTINUE;  // Keep on enumeratin'!
+    return TREE_CONTINUE; // Keep on enumeratin'!
 }
 
 void SceneEnumProc::Append(INode* node, Object* obj, int type)

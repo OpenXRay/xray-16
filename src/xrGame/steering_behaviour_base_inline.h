@@ -23,4 +23,4 @@ bool const& Base::enabled() const
 
 #undef Base
 
-#endif  // STEERING_BEHAVIOUR_BASE_INLINE_H_INCLUDED
+#endif // STEERING_BEHAVIOUR_BASE_INLINE_H_INCLUDED

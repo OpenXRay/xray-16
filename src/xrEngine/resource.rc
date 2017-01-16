@@ -19,7 +19,7 @@
 #ifdef _WIN32
 LANGUAGE LANG_RUSSIAN, SUBLANG_DEFAULT
 #pragma code_page(1251)
-#endif  //_WIN32
+#endif //_WIN32
 
     /////////////////////////////////////////////////////////////////////////////
     //
@@ -56,7 +56,7 @@ LANGUAGE LANG_RUSSIAN, SUBLANG_DEFAULT
     "xrEngine.exe" VALUE "ProductName", "S.T.A.L.K.E.R.: Call Of Pripyat" VALUE "ProductVersion",
     "1.6.02" END END BLOCK "VarFileInfo" BEGIN VALUE "Translation", 0x0, 1200 END END
 
-#endif  // Russian resources
+#endif // Russian resources
 /////////////////////////////////////////////////////////////////////////////
 
 /////////////////////////////////////////////////////////////////////////////
@@ -67,7 +67,7 @@ LANGUAGE LANG_RUSSIAN, SUBLANG_DEFAULT
                                                                              LANGUAGE LANG_UKRAINIAN,
     SUBLANG_DEFAULT
 #pragma code_page(1251)
-#endif  //_WIN32
+#endif //_WIN32
 
 #ifdef APSTUDIO_INVOKED
     /////////////////////////////////////////////////////////////////////////////
@@ -85,9 +85,9 @@ LANGUAGE LANG_RUSSIAN, SUBLANG_DEFAULT
     3 TEXTINCLUDE BEGIN "\r\n"
                         "\0" END
 
-#endif  // APSTUDIO_INVOKED
+#endif // APSTUDIO_INVOKED
 
-#endif  // Ukrainian resources
+#endif // Ukrainian resources
 /////////////////////////////////////////////////////////////////////////////
 
 /////////////////////////////////////////////////////////////////////////////
@@ -98,7 +98,7 @@ LANGUAGE LANG_RUSSIAN, SUBLANG_DEFAULT
                             LANGUAGE LANG_ENGLISH,
     SUBLANG_ENGLISH_US
 #pragma code_page(1252)
-#endif  //_WIN32
+#endif //_WIN32
 
     /////////////////////////////////////////////////////////////////////////////
     //
@@ -118,9 +118,9 @@ LANGUAGE LANG_RUSSIAN, SUBLANG_DEFAULT
 #ifdef APSTUDIO_INVOKED
         GUIDELINES DESIGNINFO BEGIN IDD_STARTUP,
     DIALOG BEGIN RIGHTMARGIN, 332 END END
-#endif  // APSTUDIO_INVOKED
+#endif // APSTUDIO_INVOKED
 
-#endif  // English (U.S.) resources
+#endif // English (U.S.) resources
 /////////////////////////////////////////////////////////////////////////////
 
 #ifndef APSTUDIO_INVOKED
@@ -130,4 +130,4 @@ LANGUAGE LANG_RUSSIAN, SUBLANG_DEFAULT
 //
 
 /////////////////////////////////////////////////////////////////////////////
-#endif  // not APSTUDIO_INVOKED
+#endif // not APSTUDIO_INVOKED

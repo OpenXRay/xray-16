@@ -190,14 +190,14 @@ void CHW::selectResolution(u32& dwWidth, u32& dwHeight, BOOL bWindowed)
             dwWidth = psCurrentVidMode[0];
             dwHeight = psCurrentVidMode[1];
         }
-        else  // check
+        else // check
         {
 #ifndef _EDITOR
             string64 buff;
             xr_sprintf(buff, sizeof(buff), "%dx%d", psCurrentVidMode[0], psCurrentVidMode[1]);
 
-            if (_ParseItem(buff, GlobalEnv.vid_mode_token) == u32(-1))  // not found
-            {                                                           // select safe
+            if (_ParseItem(buff, GlobalEnv.vid_mode_token) == u32(-1)) // not found
+            {                                                          // select safe
                 xr_sprintf(buff, sizeof(buff), "vid_mode %s", GlobalEnv.vid_mode_token[0].name);
                 Console->Execute(buff);
             }
@@ -246,7 +246,7 @@ void CHW::CreateDevice(HWND m_hWnd, bool move_window)
             break;
         }
     }
-#endif  //	MASTER_GOLD
+#endif //	MASTER_GOLD
 
     // Display the name of video board
     D3DADAPTER_IDENTIFIER9 adapterID;
@@ -336,7 +336,7 @@ void CHW::CreateDevice(HWND m_hWnd, bool move_window)
     // Depth/stencil
     P.EnableAutoDepthStencil = TRUE;
     P.AutoDepthStencilFormat = fDepth;
-    P.Flags = 0;  //. D3DPRESENTFLAG_DISCARD_DEPTHSTENCIL;
+    P.Flags = 0; //. D3DPRESENTFLAG_DISCARD_DEPTHSTENCIL;
 
     // Refresh rate
     P.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
@@ -348,12 +348,12 @@ void CHW::CreateDevice(HWND m_hWnd, bool move_window)
     // Create the device
     u32 GPU = selectGPU();
     HRESULT R = HW.pD3D->CreateDevice(DevAdapter, DevT, m_hWnd,
-        GPU | D3DCREATE_MULTITHREADED,  //. ? locks at present
+        GPU | D3DCREATE_MULTITHREADED, //. ? locks at present
         &P, &pDevice);
 
     if (FAILED(R)) {
         R = HW.pD3D->CreateDevice(DevAdapter, DevT, m_hWnd,
-            GPU | D3DCREATE_MULTITHREADED,  //. ? locks at present
+            GPU | D3DCREATE_MULTITHREADED, //. ? locks at present
             &P, &pDevice);
     }
     if (D3DERR_DEVICELOST == R) {
@@ -410,7 +410,7 @@ u32 CHW::selectGPU()
 #if RENDER == R_R1
     BOOL isIntelGMA = FALSE;
 
-    if (Caps.id_vendor == 0x8086) {  // Intel
+    if (Caps.id_vendor == 0x8086) { // Intel
 
 #define GMA_SL_SIZE 43
 
@@ -446,7 +446,7 @@ u32 CHW::selectGPU()
         Msg("*   setting 'r1_software_skinning' to '0' should improve performance");
     }
 
-#endif  // RENDER == R_R1
+#endif // RENDER == R_R1
 
     if (Caps.bForceGPU_SW) return D3DCREATE_SOFTWARE_VERTEXPROCESSING;
 
@@ -609,14 +609,14 @@ void fill_vid_mode_list(CHW* _hw)
 
 #ifdef DEBUG
     Msg("Available video modes[%d]:", _tmp.size());
-#endif  // DEBUG
+#endif // DEBUG
     for (i = 0; i < _tmp.size(); ++i)
     {
         GlobalEnv.vid_mode_token[i].id = i;
         GlobalEnv.vid_mode_token[i].name = _tmp[i];
 #ifdef DEBUG
         Msg("[%s]", _tmp[i]);
-#endif  // DEBUG
+#endif // DEBUG
     }
 }
 #endif

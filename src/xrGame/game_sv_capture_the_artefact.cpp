@@ -24,12 +24,12 @@
 #include "xrserver_objects_alife_monsters.h"
 
 //-------------------------------------------------------------
-u32 g_sv_cta_dwInvincibleTime = 5;  // 5 seconds
+u32 g_sv_cta_dwInvincibleTime = 5; // 5 seconds
 // u32			g_sv_cta_dwAnomalySetLengthTime	=		3;	//3 seconds
-u32 g_sv_cta_artefactReturningTime = 45;  // 45 seconds
+u32 g_sv_cta_artefactReturningTime = 45; // 45 seconds
 u32 g_sv_cta_activatedArtefactRet = 0;
 // s32			g_sv_cta_ScoreLimit				=		3;
-u32 g_sv_cta_PlayerScoresDelayTime = 3;  // 3 seconds
+u32 g_sv_cta_PlayerScoresDelayTime = 3; // 3 seconds
 float g_sv_cta_artefactsBaseRadius = 1.0f;
 u32 g_sv_cta_rankUpToArtsCountDiv = 1;
 //-------------------------------------------------------------
@@ -189,8 +189,7 @@ void game_sv_CaptureTheArtefact::Update()
     case GAME_PHASE_PENDING:
         CheckStatisticsReady();
         if (!roundStarted &&
-            Level()
-                .m_bGameConfigStarted)  ////in case of starting server stage (net_start 1..6) we can't do restart ....
+            Level().m_bGameConfigStarted) ////in case of starting server stage (net_start 1..6) we can't do restart ....
         {
             if (CheckForAllPlayersReady()) {
                 if (HasMapRotation() && SwitchToNextMap()) {
@@ -216,7 +215,7 @@ void game_sv_CaptureTheArtefact::Update()
     {
         currentTime = Level().timeServer();
         if (nextReinforcementTime <= currentTime) {
-            OnRoundEnd();  // OnRoundEnd("Finish");
+            OnRoundEnd(); // OnRoundEnd("Finish");
         }
     }
     break;
@@ -303,7 +302,7 @@ void game_sv_CaptureTheArtefact::SM_SwitchOnNextActivePlayer()
     SM_SwitchOnPlayer(pNewObject);
 #ifndef MASTER_GOLD
     Msg("---SM Switched on player %s", pNewObject->cName().c_str());
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
 };
 
 bool game_sv_CaptureTheArtefact::CheckForRoundStart()
@@ -524,7 +523,7 @@ void game_sv_CaptureTheArtefact::OnPlayerReady(ClientID id_who)
 #ifndef MASTER_GOLD
         VERIFY(xrCData->ps);
         Msg("---Respawning player %s - he's ready", xrCData->ps->getName());
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
         RespawnPlayer(id_who, false);
         pOwner = xrCData->owner;
         CSE_ALifeCreatureActor* pA = smart_cast<CSE_ALifeCreatureActor*>(pOwner);
@@ -573,14 +572,14 @@ void game_sv_CaptureTheArtefact::Create(shared_str& options)
     teams[etBlueTeam].score = 0;
 #ifndef MASTER_GOLD
     Msg("---Starting new round, scores: [ %d : %d ]", teams[etGreenTeam].score, teams[etBlueTeam].score);
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
     m_iMoney_for_BuySpawn = READ_IF_EXISTS(pSettings, r_s32, "capturetheartefact_gamedata", "spawn_cost", -10000);
     m_not_free_ammo_str = READ_IF_EXISTS(pSettings, r_string, "capturetheartefact_gamedata", "not_free_ammo", "");
 }
 
 void game_sv_CaptureTheArtefact::OnRoundStart()
 {
-    m_AnomalyIds.clear();  // important !!!
+    m_AnomalyIds.clear(); // important !!!
 
     m_dwSM_LastSwitchTime = 0;
     m_dwSM_CurViewEntity = 0;
@@ -596,7 +595,7 @@ void game_sv_CaptureTheArtefact::OnRoundStart()
         }
     }
 
-    bool m_bFastRestartBefore = m_bFastRestart;  // fake, because next inherited::OnRoundStart() sets it to false :(
+    bool m_bFastRestartBefore = m_bFastRestart; // fake, because next inherited::OnRoundStart() sets it to false :(
     inherited::OnRoundStart();
     roundStarted = TRUE;
     // Respawn all players and some info
@@ -689,7 +688,7 @@ void game_sv_CaptureTheArtefact::BalanceTeams()
     u32 NumToMove;
     struct team_counter
     {
-        u32 l_teams[2];  // etGreenTeam , etBlueTeam
+        u32 l_teams[2]; // etGreenTeam , etBlueTeam
         team_counter()
         {
             l_teams[0] = 0;
@@ -1780,7 +1779,7 @@ void game_sv_CaptureTheArtefact::FillDeathActorRejectItems(CSE_ActorMP* actor, x
         if (!item) {
 #ifndef MASTER_GOLD
             Msg("! ERROR: item from slot %d is NULL", active_slot);
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
             return;
         }
 
@@ -1788,7 +1787,7 @@ void game_sv_CaptureTheArtefact::FillDeathActorRejectItems(CSE_ActorMP* actor, x
         if (!server_item) {
 #ifndef MASTER_GOLD
             Msg("! ERROR: server entity is NULL, object ID[%d]", item->object_id());
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
             return;
         }
 
@@ -1867,7 +1866,7 @@ void game_sv_CaptureTheArtefact::MoveArtefactToPoint(CSE_ALifeItemArtefact* arte
     // artefact->o_Position.set(toPoint.P);
 
     VERIFY(artefact->cast_inventory_item());
-    artefact->cast_inventory_item()->State.position.set(toPoint.P);  // settings position to server object
+    artefact->cast_inventory_item()->State.position.set(toPoint.P); // settings position to server object
 
     CArtefact* OArtefact = smart_cast<CArtefact*>(Level().Objects.net_Find(artefact->ID));
 
@@ -1875,7 +1874,7 @@ void game_sv_CaptureTheArtefact::MoveArtefactToPoint(CSE_ALifeItemArtefact* arte
         make_string("artefact not found. artefact_id = [%d]. CTA:MoveArtefactToPoint()", artefact->ID).c_str());
 
     OArtefact->StopActivation();
-    OArtefact->MoveTo(toPoint.P);  // to server client object
+    OArtefact->MoveTo(toPoint.P); // to server client object
 
     NET_Packet MovePacket;
     MovePacket.w_begin(M_MOVE_ARTEFACTS);
@@ -1883,7 +1882,7 @@ void game_sv_CaptureTheArtefact::MoveArtefactToPoint(CSE_ALifeItemArtefact* arte
     MovePacket.w_u16(artefact->ID);
     MovePacket.w_vec3(toPoint.P);
     m_server->SendBroadcast(BroadcastCID, MovePacket,
-        net_flags(TRUE, TRUE));  // and to all clients, because it will freeze and will not send updates...
+        net_flags(TRUE, TRUE)); // and to all clients, because it will freeze and will not send updates...
 }
 
 void game_sv_CaptureTheArtefact::MoveLifeActors()
@@ -1935,7 +1934,7 @@ void game_sv_CaptureTheArtefact::RespawnClient(xrClientData const* pclient)
 #ifndef MASTER_GOLD
         VERIFY(pclient->ps);
         Msg("---Respawning dead player [%s]", pclient->ps->getName());
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
         RespawnPlayer(pclient->ID, true);
         VERIFY(pclient->ps);
         TGameIDToBoughtFlag::const_iterator buyer_iter = m_dead_buyers.find(pclient->ID);
@@ -2088,7 +2087,7 @@ void game_sv_CaptureTheArtefact::StartNewRound()
     VERIFY(TeamList.size() >= 2);
 #ifndef MASTER_GOLD
     Msg("---Starting new round, scores: [ %d : %d ]", teams[etGreenTeam].score, teams[etBlueTeam].score);
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
 }
 
 void game_sv_CaptureTheArtefact::PrepareClientForNewRound(IClient* client)
@@ -2180,7 +2179,7 @@ void game_sv_CaptureTheArtefact::CheckForArtefactDelivering()
         if (!xrCData) {
 #ifdef MP_LOGGING
             Msg("! WARNING: bad actor [%d] tries to deliver artefact", tempActor->ID);
-#endif  //#ifdef MP_LOGGING
+#endif //#ifdef MP_LOGGING
             continue;
         }
         if (!xrCData->net_Ready) {
@@ -2224,7 +2223,7 @@ BOOL game_sv_CaptureTheArtefact::CheckForRoundEnd()
 bool game_sv_CaptureTheArtefact::ResetInvincibility(ClientID const clientId)
 {
     xrClientData* tempClient = m_server->ID_to_client(clientId);
-    if (!tempClient)  // when the time comes, we'll delete this element in collection
+    if (!tempClient) // when the time comes, we'll delete this element in collection
         return false;
 
     if (!tempClient->ps) return false;
@@ -2323,7 +2322,7 @@ void game_sv_CaptureTheArtefact::ReadOptions(shared_str& options)
 
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     g_sv_dm_bAnomaliesEnabled = (get_option_i(*options, "ans", (isAnomaliesEnabled() ? 1 : 0)) != 0);
-    g_sv_dm_dwAnomalySetLengthTime = get_option_i(*options, "anslen", g_sv_dm_dwAnomalySetLengthTime);  // in (min)
+    g_sv_dm_dwAnomalySetLengthTime = get_option_i(*options, "anslen", g_sv_dm_dwAnomalySetLengthTime); // in (min)
     g_sv_dm_bPDAHunt = (get_option_i(*options, "pdahunt", (isPDAHuntEnabled() ? 1 : 0)) != 0);
     g_sv_dm_bDamageBlockIndicators = (get_option_i(*options, "dmbi", (g_sv_dm_bDamageBlockIndicators ? 1 : 0)) != 0);
     g_sv_dm_dwWarmUp_MaxTime = get_option_i(*options, "warmup", g_sv_dm_dwWarmUp_MaxTime);
@@ -2343,9 +2342,9 @@ void game_sv_CaptureTheArtefact::ReadOptions(shared_str& options)
     g_sv_ah_iReinforcementTime = get_option_i(*options, "reinf", g_sv_ah_iReinforcementTime);
     if (g_sv_ah_iReinforcementTime <= 0) g_sv_ah_iReinforcementTime = 1;
     //----------------------------------------------------------------------------
-    g_sv_cta_dwInvincibleTime = get_option_i(*options, "dmgblock", g_sv_cta_dwInvincibleTime);              // in (sec)
-    g_sv_cta_artefactReturningTime = get_option_i(*options, "artrettime", g_sv_cta_artefactReturningTime);  // in (sec)
-    g_sv_cta_activatedArtefactRet = get_option_i(*options, "actret", g_sv_cta_activatedArtefactRet);        // in (sec)
+    g_sv_cta_dwInvincibleTime = get_option_i(*options, "dmgblock", g_sv_cta_dwInvincibleTime);             // in (sec)
+    g_sv_cta_artefactReturningTime = get_option_i(*options, "artrettime", g_sv_cta_artefactReturningTime); // in (sec)
+    g_sv_cta_activatedArtefactRet = get_option_i(*options, "actret", g_sv_cta_activatedArtefactRet);       // in (sec)
 
     m_bSpectatorMode = false;
     if (!g_dedicated_server && (get_option_i(*options, "spectr", -1) != -1)) {

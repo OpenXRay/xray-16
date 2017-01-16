@@ -9,21 +9,21 @@ class binary_function
 {
 public:
     virtual bool exec(T const left, T const right) = 0;
-};  // float_binary_function
+}; // float_binary_function
 
 template <typename T>
 class ge_function : public binary_function<T>
 {
 public:
     virtual bool exec(T const left, T const right) { return left >= right; }
-};  // class float_ge_function
+}; // class float_ge_function
 
 template <typename T>
 class le_function : public binary_function<T>
 {
 public:
     virtual bool exec(T const left, T const right) { return left <= right; }
-};  // float_le_function
+}; // float_le_function
 
 template <typename T>
 class functions_cf
@@ -35,7 +35,7 @@ public:
         tt_greater_equal = 0x00,
         tt_less_equal,
         tt_count
-    };  // enum type_tags
+    }; // enum type_tags
 
     static function_type* get_function(enum_type_tags ftype)
     {
@@ -47,7 +47,7 @@ public:
         case tt_less_equal: { return &le_function;
         }
         break;
-        };  // switch (ftype)
+        }; // switch (ftype)
         return NULL;
     }
 
@@ -62,6 +62,6 @@ typedef functions_cf<float> float_bfunc_cf;
 typedef binary_function<u32> u32_binary_function;
 typedef functions_cf<u32> u32_bfunc_cf;
 
-}  // namespace award_system
+} // namespace award_system
 
-#endif  //#ifndef STATE_PREDICATES_INCLUDED
+#endif //#ifndef STATE_PREDICATES_INCLUDED

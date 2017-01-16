@@ -135,7 +135,7 @@ void CSpaceRestrictor::prepare() const
         switch ((*I).type)
         {
         case 0:
-        {  // sphere
+        { // sphere
             Fsphere temp;
             const Fsphere& sphere = (*I).data.sphere;
             XFORM().transform_tiny(temp.P, sphere.P);
@@ -144,7 +144,7 @@ void CSpaceRestrictor::prepare() const
             break;
         }
         case 1:
-        {  // box
+        { // box
             Fmatrix sphere;
             const Fmatrix& box = (*I).data.box;
             sphere.mul_43(XFORM(), box);

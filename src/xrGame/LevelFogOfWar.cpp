@@ -35,7 +35,7 @@ CLevelFogOfWar* CFogOfWarMngr::GetFogOfWar(const shared_str& level_name)
     if (it != GetFogStorage().end())
         return &(*it);
     else
-    {  // create new or load...
+    { // create new or load...
         GetFogStorage().resize(GetFogStorage().size() + 1);
         CLevelFogOfWar& F = GetFogStorage().back();
         F.Init(level_name);
@@ -66,7 +66,7 @@ void CLevelFogOfWar::Init(const shared_str& level)
     if (gameLtx.line_exist(m_level_name, "bound_rect"))
         tmp = gameLtx.r_fvector4(m_level_name, "bound_rect");
     else
-        tmp.set(-10000.0f, -10000.0f, 10000.0f, 10000.0f);  //. hack
+        tmp.set(-10000.0f, -10000.0f, 10000.0f, 10000.0f); //. hack
 
     m_levelRect.set(tmp.x, tmp.y, tmp.z, tmp.w);
 
@@ -83,10 +83,10 @@ void CLevelFogOfWar::Init(const shared_str& level)
 
 void CLevelFogOfWar::Open(Fvector2 pos)
 {
-    if (!m_rowNum || !m_rowNum) return;  // invalid map
+    if (!m_rowNum || !m_rowNum) return; // invalid map
     if (!(pos.x >= m_levelRect.lt.x && pos.y >= m_levelRect.lt.y && pos.x <= m_levelRect.rb.x &&
             pos.y <= m_levelRect.rb.y))
-        return;  // invalid position
+        return; // invalid position
     VERIFY2((pos.x >= m_levelRect.lt.x && pos.y >= m_levelRect.lt.y && pos.x <= m_levelRect.rb.x &&
                 pos.y <= m_levelRect.rb.y),
         "invalid position for opening FogOfWar map cell");
@@ -180,7 +180,7 @@ void CLevelFogOfWar::Draw()
 
     Frect vis_rect;
     vis_rect.set(clip_rect.lt.x - map_abs_pos.x, clip_rect.lt.y - map_abs_pos.y, clip_rect.rb.x - map_abs_pos.x,
-        clip_rect.rb.y - map_abs_pos.y);  // vis_rect now in pixels
+        clip_rect.rb.y - map_abs_pos.y); // vis_rect now in pixels
 
     tgt.set(float(vis_rect.x1), float(vis_rect.y1), float(vis_rect.x2), float(vis_rect.y2));
     tgt.div(m->GetCurrentZoom(), m->GetCurrentZoom());

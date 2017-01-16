@@ -22,8 +22,8 @@
 #include "xrmessages.h"
 
 #ifdef DEBUG
-#include "xrEngine/StatGraph.h"
 #include "PHDebug.h"
+#include "xrEngine/StatGraph.h"
 #endif
 
 #include "xrPhysics/MathUtils.h"
@@ -37,9 +37,9 @@
 #define EFFECTOR_RADIUS 30.f
 const u16 TEST_RAYS_PER_OBJECT = 5;
 const u16 BLASTED_OBJ_PROCESSED_PER_FRAME = 3;
-const float exp_dist_extinction_factor = 3.f;  //(>1.f, 1.f -means no dist change of exp effect)	on the dist of
-                                               //m_fBlastRadius exp. wave effect in exp_dist_extinction_factor times
-                                               //less than maximum
+const float exp_dist_extinction_factor = 3.f; //(>1.f, 1.f -means no dist change of exp effect)	on the dist of
+                                              // m_fBlastRadius exp. wave effect in exp_dist_extinction_factor times
+// less than maximum
 
 CExplosive::CExplosive(void)
 {
@@ -312,7 +312,7 @@ float CExplosive::TestPassEffect(const Fvector& source_p, const Fvector& dir, fl
 void CExplosive::Explode()
 {
     VERIFY(0xffff != Initiator());
-    VERIFY(m_explosion_flags.test(flReadyToExplode));  // m_bReadyToExplode
+    VERIFY(m_explosion_flags.test(flReadyToExplode)); // m_bReadyToExplode
     VERIFY(!physics_world()->Processing());
     // m_bExploding = true;
     m_explosion_flags.set(flExploding, TRUE);
@@ -458,11 +458,11 @@ void CExplosive::UpdateCL()
 {
     // VERIFY(!this->getDestroy());
     VERIFY(!physics_world()->Processing());
-    if (!m_explosion_flags.test(flExploding)) return;  // !m_bExploding
+    if (!m_explosion_flags.test(flExploding)) return; // !m_bExploding
     if (m_explosion_flags.test(flExploded)) {
         CGameObject* go = cast_game_object();
         go->processing_deactivate();
-        m_explosion_flags.set(flExploding, FALSE);  // m_bExploding = false;
+        m_explosion_flags.set(flExploding, FALSE); // m_bExploding = false;
         OnAfterExplosion();
         return;
     }
@@ -519,7 +519,7 @@ void CExplosive::OnBeforeExplosion()
     if (m_bHideInExplosion) {
         HideExplosive();
         //	Msg("---------CExplosive OnBeforeExplosion setVisible(false) [%d] frame[%d]",cast_game_object()->ID(),
-        //Device.dwFrame);
+        // Device.dwFrame);
     }
 }
 void CExplosive::HideExplosive()
@@ -561,7 +561,7 @@ void CExplosive::ExplodeParams(const Fvector& pos, const Fvector& dir)
     // m_bReadyToExplode = true;
     m_explosion_flags.set(flReadyToExplode, TRUE);
     m_vExplodePos = pos;
-    m_vExplodePos.y += 0.1f;  // fake
+    m_vExplodePos.y += 0.1f; // fake
     m_vExplodeDir = dir;
 }
 
@@ -571,7 +571,7 @@ void CExplosive::GenExplodeEvent(const Fvector& pos, const Fvector& normal)
 
     //	if( m_bExplodeEventSent )
     //		return;
-    VERIFY(!m_explosion_flags.test(flExplodEventSent));  //! m_bExplodeEventSent
+    VERIFY(!m_explosion_flags.test(flExplodEventSent)); //! m_bExplodeEventSent
     VERIFY(0xffff != Initiator());
 
     NET_Packet P;
@@ -648,7 +648,7 @@ void CExplosive::ExplodeWaveProcessObject(collide::rq_results& storage, CPhysics
     if (l_pGO->Visual())
         l_pGO->Center(l_goPos);
     else
-        return;  //мне непонятно зачем наносить хит от взрыва по объектам не имеющим вижуал - поэтому игнорируем
+        return; //мне непонятно зачем наносить хит от взрыва по объектам не имеющим вижуал - поэтому игнорируем
 
 #ifdef DEBUG
     if (ph_dbg_draw_mask.test(phDbgDrawExplosions)) {
@@ -668,18 +668,18 @@ void CExplosive::ExplodeWaveProcessObject(collide::rq_results& storage, CPhysics
         l_dir.y += m_fUpThrowFactor;
         // rmag -модуль l_dir после l_dir.y += m_fUpThrowFactor,
         // модуль=_sqrt(l_dir^2+y^2+2.*(l_dir,y)),y=(0,m_fUpThrowFactor,0) (до этого модуль l_dir =1)
-        l_dir.mul(1.f / rmag);  //перенормировка
+        l_dir.mul(1.f / rmag); //перенормировка
         NET_Packet P;
         SHit HS;
-        HS.GenHeader(GE_HIT, l_pGO->ID());       //		cast_game_object()->u_EventGen		(P,GE_HIT,l_pGO->ID());
-        HS.whoID = Initiator();                  //		P.w_u16			(Initiator());
-        HS.weaponID = cast_game_object()->ID();  //		P.w_u16			(cast_game_object()->ID());
-        HS.dir = l_dir;                          //		P.w_dir			(l_dir);
-        HS.power = l_hit;                        //		P.w_float		(l_hit);
-        HS.p_in_bone_space = l_goPos;            //		P.w_vec3		(l_goPos);
-        HS.impulse = l_impuls;                   //		P.w_float		(l_impuls);
-        HS.hit_type = (m_eHitTypeBlast);         //		P.w_u16			(u16(m_eHitTypeBlast));
-        HS.boneID = 0;                           //		P.w_s16			(0);
+        HS.GenHeader(GE_HIT, l_pGO->ID());      //		cast_game_object()->u_EventGen		(P,GE_HIT,l_pGO->ID());
+        HS.whoID = Initiator();                 //		P.w_u16			(Initiator());
+        HS.weaponID = cast_game_object()->ID(); //		P.w_u16			(cast_game_object()->ID());
+        HS.dir = l_dir;                         //		P.w_dir			(l_dir);
+        HS.power = l_hit;                       //		P.w_float		(l_hit);
+        HS.p_in_bone_space = l_goPos;           //		P.w_vec3		(l_goPos);
+        HS.impulse = l_impuls;                  //		P.w_float		(l_impuls);
+        HS.hit_type = (m_eHitTypeBlast);        //		P.w_u16			(u16(m_eHitTypeBlast));
+        HS.boneID = 0;                          //		P.w_s16			(0);
         HS.Write_Packet(P);
         cast_game_object()->u_EventSend(P);
     }

@@ -10,11 +10,11 @@ class CUITrackBar : public CUI_IB_FrameLineWnd, public CUIOptionsItem
 public:
     CUITrackBar();
     // CUIOptionsItem
-    virtual void SetCurrentOptValue();       // opt->current
-    virtual void SaveBackUpOptValue();       // current->backup
-    virtual void SaveOptValue();             // current->opt
-    virtual void UndoOptValue();             // backup->current
-    virtual bool IsChangedOptValue() const;  // backup!=current
+    virtual void SetCurrentOptValue();      // opt->current
+    virtual void SaveBackUpOptValue();      // current->backup
+    virtual void SaveOptValue();            // current->opt
+    virtual void UndoOptValue();            // backup->current
+    virtual bool IsChangedOptValue() const; // backup!=current
 
     virtual void Draw();
     virtual void Update();

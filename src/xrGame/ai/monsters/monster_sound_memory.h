@@ -39,11 +39,11 @@ typedef struct tagSoundElement
 {
     const IGameObject* who;
     TSoundDangerValue type;
-    Fvector position;  // позиция звука, не объекта, издавшего звук
+    Fvector position; // позиция звука, не объекта, издавшего звук
     float power;
-    TTime time;  // время обнаружения звука
+    TTime time; // время обнаружения звука
 
-    int value;  // оценочное значение данного звука
+    int value; // оценочное значение данного звука
 
     tagSoundElement()
     {
@@ -76,7 +76,7 @@ typedef struct tagSoundElement
 
 class CMonsterSoundMemory
 {
-    TTime time_memory;  // время хранения звуков
+    TTime time_memory; // время хранения звуков
     xr_vector<SoundElem> Sounds;
 
     CBaseMonster* monster;
@@ -97,7 +97,7 @@ public:
     int GetNumSounds() { return Sounds.size(); }
     void GetFirstSound(SoundElem& s, bool& bDangerous);
 
-    void GetSound(SoundElem& s, bool& bDangerous);  // возвращает самый опасный звук
+    void GetSound(SoundElem& s, bool& bDangerous); // возвращает самый опасный звук
     SoundElem& GetSound();
     bool get_sound_from_object(const IGameObject* who, SoundElem& value);
 

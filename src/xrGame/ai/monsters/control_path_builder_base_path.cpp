@@ -21,7 +21,7 @@ bool CControlPathBuilderBase::target_point_need_update()
     {
         // если путь ещё не завершен
         if (!m_man->path_builder().is_path_end(m_distance_to_path_end)) {
-            if (m_target_actual && !global_failed()) return false;  // если global_failed - игнорировать актуальность
+            if (m_target_actual && !global_failed()) return false; // если global_failed - игнорировать актуальность
 
             // если первый раз строим
             if (m_last_time_target_set == 0) return true;
@@ -45,7 +45,7 @@ bool CControlPathBuilderBase::target_point_need_update()
     }
     else if ((m_state & eStatePathEnd) == eStatePathEnd)
     {
-        if (m_target_set.node() != m_object->ai_location().level_vertex_id()) return true;  // физический конец пути
+        if (m_target_set.node() != m_object->ai_location().level_vertex_id()) return true; // физический конец пути
     }
 
     return false;

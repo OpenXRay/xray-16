@@ -84,7 +84,7 @@ void CSE_Visual::FillProps(LPCSTR pref, PropItemVec& items)
     V->OnChangeEvent.bind(this, &CSE_Visual::OnChangeAnim);
     PHelper().CreateFlag8(items, PrepareKey(pref, abstract->name(), "Model\\Obstacle"), &flags, flObstacle);
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
 ////////////////////////////////////////////////////////////////////////////
 // CSE_Animated
@@ -129,6 +129,6 @@ void CSE_Motion::FillProps(LPCSTR pref, PropItemVec& items)
         PHelper().CreateChoose(items, PrepareKey(pref, abstract->name(), "Motion"), &motion_name, smGameAnim);
     V->OnChangeEvent.bind(this, &CSE_Motion::OnChangeMotion);
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
 #pragma pack(pop, 4)

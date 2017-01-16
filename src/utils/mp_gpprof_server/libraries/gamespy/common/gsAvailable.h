@@ -19,10 +19,10 @@ extern char GSIACHostname[64];
 
 // these are possible return types for GSIAvailableCheckThink
 typedef enum {
-    GSIACWaiting,                // still waiting for a response from the backend
-    GSIACAvailable,              // the game's backend services are available
-    GSIACUnavailable,            // the game's backend services are unavailable
-    GSIACTemporarilyUnavailable  // the game's backend services are temporarily unavailable
+    GSIACWaiting,               // still waiting for a response from the backend
+    GSIACAvailable,             // the game's backend services are available
+    GSIACUnavailable,           // the game's backend services are unavailable
+    GSIACTemporarilyUnavailable // the game's backend services are temporarily unavailable
 } GSIACResult;
 
 // start an available check for a particular game

@@ -78,9 +78,9 @@ private:
 
     static void __cdecl get_my_fields_cb(
         SAKE sake, SAKERequest request, SAKERequestResult result, void* inputData, void* outputData, void* userData);
-};  // class profile_store
-}  // namespace gamespy_profile
+}; // class profile_store
+} // namespace gamespy_profile
 
 typedef gamespy_profile::profile_store gamespy_profile_profile_store;
 
-#endif  //#ifndef GAMESPY_PROFILE_STORE
+#endif //#ifndef GAMESPY_PROFILE_STORE

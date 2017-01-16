@@ -30,7 +30,7 @@ private:
 
         ip_address admin_ip_addr;
         shared_str admin_name;
-        shared_str admin_hexstr_digest;  // ;) gg, for bad admins
+        shared_str admin_hexstr_digest; // ;) gg, for bad admins
 
         banned_client();
         bool load(CInifile* ini, shared_str const& name_sect);
@@ -40,6 +40,6 @@ private:
     typedef xr_vector<banned_client*> ban_list_t;
 
     ban_list_t m_ban_list;
-};  // class cdkey_ban_list
+}; // class cdkey_ban_list
 
-#endif  //#ifndef CDKEY_BAN_LIST_H
+#endif //#ifndef CDKEY_BAN_LIST_H

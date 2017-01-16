@@ -178,7 +178,7 @@ public:
     IC void clear() { pool = 0; }
     IC TNode* begin() { return nodes; }
     IC TNode* end() { return nodes + pool; }
-    IC TNode* last() { return nodes + limit; }  // for setup only
+    IC TNode* last() { return nodes + limit; } // for setup only
     IC u32 size() { return pool; }
     IC TNode& operator[](int v) { return nodes[v]; }
     IC void traverseLR(callback CB)

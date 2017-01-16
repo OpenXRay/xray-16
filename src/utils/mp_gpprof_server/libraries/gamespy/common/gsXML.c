@@ -7,9 +7,9 @@
 #include "gsStringUtil.h"
 
 #ifdef XRAY_DISABLE_GAMESPY_WARNINGS
-#pragma warning(disable : 4267)  // lines: 155, 156, 161, 162
-#pragma warning(disable : 4244)  // lines: 128, 720, 752
-#endif                           //#ifdef XRAY_DISABLE_GAMESPY_WARNINGS
+#pragma warning(disable : 4267) // lines: 155, 156, 161, 162
+#pragma warning(disable : 4244) // lines: 128, 720, 752
+#endif                          //#ifdef XRAY_DISABLE_GAMESPY_WARNINGS
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
@@ -64,7 +64,7 @@ typedef struct GSIXmlAttribute
 typedef struct GSIXmlElement
 {
     GSIXmlString mName;
-    GSIXmlString mValue;  // most do not have a value
+    GSIXmlString mValue; // most do not have a value
 
     int mIndex;
     int mParentIndex;
@@ -75,8 +75,8 @@ typedef struct GSIXmlStreamReader
     DArray mElementArray;
     DArray mAttributeArray;
 
-    int mElemReadIndex;   // current index
-    int mValueReadIndex;  // current child parsing index
+    int mElemReadIndex;  // current index
+    int mValueReadIndex; // current child parsing index
 } GSIXmlStreamReader;
 
 typedef struct GSIXmlStreamWriter
@@ -84,7 +84,7 @@ typedef struct GSIXmlStreamWriter
     char* mBuffer;
     int mLen;
     int mCapacity;
-    gsi_bool mClosed;  // footer has been written, append not allowed
+    gsi_bool mClosed; // footer has been written, append not allowed
 } GSIXmlStreamWriter;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -139,20 +139,20 @@ GSXmlStreamWriter gsXmlCreateStreamWriter(const char** namespaces, int count)
     if (newStream == NULL) {
         gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Memory, GSIDebugLevel_HotError,
             "Out of memory in gsXmlCreateStreamWriter, needed %d bytes", sizeof(GSIXmlStreamWriter));
-        return NULL;  // OOM
+        return NULL; // OOM
     }
 
     // do this to prevent an immediately reallocation due to long namespace string
     for (i = 0; i < GS_XML_SOAP_DEFAULT_NAMESPACE_COUNT; i++)
     {
         GS_ASSERT(GS_XML_SOAP_DEFAULT_NAMESPACES[i] != NULL);
-        namespaceLen += strlen(GS_XML_SOAP_NAMESPACE_PREFIX) + 1;  // +1 for space
+        namespaceLen += strlen(GS_XML_SOAP_NAMESPACE_PREFIX) + 1; // +1 for space
         namespaceLen += strlen(GS_XML_SOAP_DEFAULT_NAMESPACES[i]);
     }
     for (i = 0; i < count; i++)
     {
         GS_ASSERT(namespaces[i] != NULL);
-        namespaceLen += strlen(GS_XML_SOAP_NAMESPACE_PREFIX) + 1;  // +1 for space
+        namespaceLen += strlen(GS_XML_SOAP_NAMESPACE_PREFIX) + 1; // +1 for space
         namespaceLen += strlen(namespaces[i]);
     }
     while (initialCapacity < namespaceLen)
@@ -163,7 +163,7 @@ GSXmlStreamWriter gsXmlCreateStreamWriter(const char** namespaces, int count)
     if (newStream->mBuffer == NULL) {
         gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Memory, GSIDebugLevel_HotError,
             "Out of memory in gsXmlCreateStreamWriter, needed %d bytes", initialCapacity);
-        return NULL;  // OOM
+        return NULL; // OOM
     }
     newStream->mCapacity = initialCapacity;
     newStream->mLen = 0;
@@ -174,7 +174,7 @@ GSXmlStreamWriter gsXmlCreateStreamWriter(const char** namespaces, int count)
     if (gsi_is_false(gsiXmlUtilWriteString(newStream, GS_XML_SOAP_HEADER))) {
         gsifree(newStream->mBuffer);
         gsifree(newStream);
-        return NULL;  // OOM
+        return NULL; // OOM
     }
     for (i = 0; i < GS_XML_SOAP_DEFAULT_NAMESPACE_COUNT; i++)
     {
@@ -184,7 +184,7 @@ GSXmlStreamWriter gsXmlCreateStreamWriter(const char** namespaces, int count)
         {
             gsifree(newStream->mBuffer);
             gsifree(newStream);
-            return NULL;  // OOM
+            return NULL; // OOM
         }
     }
     for (i = 0; i < count; i++)
@@ -195,7 +195,7 @@ GSXmlStreamWriter gsXmlCreateStreamWriter(const char** namespaces, int count)
         {
             gsifree(newStream->mBuffer);
             gsifree(newStream);
-            return NULL;  // OOM
+            return NULL; // OOM
         }
     }
     if (gsi_is_false(gsiXmlUtilWriteChar(newStream, '>')) ||
@@ -203,7 +203,7 @@ GSXmlStreamWriter gsXmlCreateStreamWriter(const char** namespaces, int count)
     {
         gsifree(newStream->mBuffer);
         gsifree(newStream);
-        return NULL;  // OOM
+        return NULL; // OOM
     }
 
     return (GSXmlStreamWriter)newStream;
@@ -219,7 +219,7 @@ GSXmlStreamReader gsXmlCreateStreamReader()
     if (newStream == NULL) {
         gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Memory, GSIDebugLevel_HotError,
             "Out of memory in gsXmlCreateStream, needed %d bytes", sizeof(GSIXmlStreamReader));
-        return NULL;  // OOM
+        return NULL; // OOM
     }
 
     newStream->mElementArray =
@@ -228,7 +228,7 @@ GSXmlStreamReader gsXmlCreateStreamReader()
         gsDebugFormat(GSIDebugCat_Common, GSIDebugType_Memory, GSIDebugLevel_HotError,
             "Out of memory in gsXmlCreateStream with mElementArray=ArrayNew()");
         gsifree(newStream);
-        return NULL;  // OOM
+        return NULL; // OOM
     }
 
     newStream->mAttributeArray =
@@ -238,7 +238,7 @@ GSXmlStreamReader gsXmlCreateStreamReader()
             "Out of memory in gsXmlCreateStream with mElementArray=ArrayNew()");
         ArrayFree(newStream->mElementArray);
         gsifree(newStream);
-        return NULL;  // OOM
+        return NULL; // OOM
     }
 
     gsXmlMoveToStart(newStream);
@@ -358,7 +358,7 @@ static gsi_bool gsiXmlUtilSkipWhiteSpace(GSIXmlStreamReader* stream, const char*
     while (*pos < len)
     {
         if (NULL == strchr(GS_XML_WHITESPACE, buffer[*pos])) return gsi_true;
-        (*pos)++;  // move to next character
+        (*pos)++; // move to next character
     }
 
     GSI_UNUSED(stream);
@@ -379,7 +379,7 @@ static gsi_bool gsiXmlUtilParseElement(GSIXmlStreamReader* stream, char* buffer,
     GS_ASSERT(*pos < len);
 
     gsiXmlUtilSkipWhiteSpace(stream, buffer, len, pos);
-    if (*pos >= len) return gsi_true;  // legal EOF
+    if (*pos >= len) return gsi_true; // legal EOF
 
     memset(&newElem, 0, sizeof(newElem));
 
@@ -396,7 +396,7 @@ static gsi_bool gsiXmlUtilParseElement(GSIXmlStreamReader* stream, char* buffer,
         startPos = (*pos) - 2;
     }
     else
-        startPos = (*pos) - 1;  // store the position of '<'
+        startPos = (*pos) - 1; // store the position of '<'
 
     // should be a name (type) next
     GS_XML_CHECK(gsiXmlUtilParseName(stream, buffer, len, pos, &newElem.mName));
@@ -418,7 +418,7 @@ static gsi_bool gsiXmlUtilParseElement(GSIXmlStreamReader* stream, char* buffer,
         GS_XML_CHECK(gsiXmlUtilParseName(stream, buffer, len, pos, &newAttr.mName));
         GS_XML_CHECK(gsiXmlUtilSkipWhiteSpace(stream, buffer, len, pos));
         if (buffer[*pos] != '=') return gsi_false;
-        (*pos)++;  // skip the '='
+        (*pos)++; // skip the '='
         GS_XML_CHECK(gsiXmlUtilParseString(stream, buffer, len, pos, &newAttr.mValue));
         GS_XML_CHECK(gsiXmlUtilSkipWhiteSpace(stream, buffer, len, pos));
 
@@ -443,9 +443,9 @@ static gsi_bool gsiXmlUtilParseElement(GSIXmlStreamReader* stream, char* buffer,
     if ((!isalnum(buffer[startPos + 1]) && buffer[*pos] == buffer[startPos + 1]) || buffer[*pos] == '/') {
         (*pos)++;
         GS_XML_CHECK(gsiXmlUtilSkipWhiteSpace(stream, buffer, len, pos));
-        if (buffer[*pos] != '>') return gsi_false;  // only legal character here is closing brace
+        if (buffer[*pos] != '>') return gsi_false; // only legal character here is closing brace
         (*pos)++;
-        return gsi_true;  // legal termination
+        return gsi_true; // legal termination
     }
 
     // make sure we've found the end of the start tag
@@ -473,9 +473,9 @@ static gsi_bool gsiXmlUtilParseElement(GSIXmlStreamReader* stream, char* buffer,
             // close tags are in the form: </tagname>
             (*pos)++;
             GS_XML_CHECK(gsiXmlUtilSkipWhiteSpace(stream, buffer, len, pos));
-            if ((*pos) + newElem.mName.mLen >= len) return gsi_false;  // EOF before tag close
+            if ((*pos) + newElem.mName.mLen >= len) return gsi_false; // EOF before tag close
             if (0 != strncmp((const char*)newElem.mName.mData, &buffer[*pos], (size_t)newElem.mName.mLen))
-                return gsi_false;  // close tag mismatch
+                return gsi_false; // close tag mismatch
             (*pos) += newElem.mName.mLen;
             GS_XML_CHECK(gsiXmlUtilSkipWhiteSpace(stream, buffer, len, pos));
             if (buffer[*pos] != '>') return gsi_false;
@@ -484,7 +484,7 @@ static gsi_bool gsiXmlUtilParseElement(GSIXmlStreamReader* stream, char* buffer,
         }
         else
         {
-            if (newElem.mValue.mData != NULL) return gsi_false;  // elements with value cannot have children
+            if (newElem.mValue.mData != NULL) return gsi_false; // elements with value cannot have children
 
             // move read position to start of child element, then parse
             *pos = childStartPos;
@@ -492,7 +492,7 @@ static gsi_bool gsiXmlUtilParseElement(GSIXmlStreamReader* stream, char* buffer,
             gsiXmlUtilSkipWhiteSpace(stream, buffer, len, pos);
         }
     }
-    return gsi_false;  // EOF before tag close
+    return gsi_false; // EOF before tag close
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -523,11 +523,11 @@ static gsi_bool gsiXmlUtilParseName(
     {
         // only alpha numeric and '_' characters are allowed, plus one namespace separator ':'
         if (buffer[*pos] == ':') {
-            if (gsi_is_true(haveNamespace)) return gsi_false;  // already have a namespace!
+            if (gsi_is_true(haveNamespace)) return gsi_false; // already have a namespace!
             haveNamespace = gsi_true;
         }
         else if ((buffer[*pos] != '_') && (buffer[*pos] != '-') && (!isalnum(buffer[*pos])))
-            return gsi_true;  // treat all others as a new token example '='
+            return gsi_true; // treat all others as a new token example '='
 
         strOut->mLen++;
         (*pos)++;
@@ -552,20 +552,20 @@ static gsi_bool gsiXmlUtilParseString(GSIXmlStreamReader* stream, char* buffer, 
     if (startCh != '\"' && startCh != '\'') return gsi_false;
 
     (*pos)++;
-    strStart = &buffer[*pos];  // remember this for easier processing below
+    strStart = &buffer[*pos]; // remember this for easier processing below
     strOut->mLen = 0;
 
-    if (*pos >= len) return gsi_false;  // EOF when looking for string terminator
+    if (*pos >= len) return gsi_false; // EOF when looking for string terminator
     if (buffer[*pos] == startCh) {
         // empty string ?
         strOut->mData = (const gsi_u8*)strStart;
-        (*pos)++;  // skip the terminating character
+        (*pos)++; // skip the terminating character
         return gsi_true;
     }
 
     while (buffer[*pos] != startCh)
     {
-        if (*pos >= len) return gsi_false;  // EOF when looking for string terminator
+        if (*pos >= len) return gsi_false; // EOF when looking for string terminator
 
         // if (buffer[*pos] == '&')
         // hasMarkup = gsi_true;
@@ -573,7 +573,7 @@ static gsi_bool gsiXmlUtilParseString(GSIXmlStreamReader* stream, char* buffer, 
         (*pos)++;
         strOut->mLen++;
     }
-    (*pos)++;  // skip the terminating character
+    (*pos)++; // skip the terminating character
 
     // decode the string if necessary
     if (gsi_is_false(gsiXmlUtilDecodeString(strStart, &strOut->mLen))) return gsi_false;
@@ -636,8 +636,8 @@ static gsi_bool gsiXmlUtilDecodeString(char* buffer, int* len)
             unsigned int mask = 0xFF000000;
 
             char* digitEnd = strchr(&buffer[readPos + 3], ';');
-            if (digitEnd == NULL) return gsi_false;                     // missing ';'
-            if (digitEnd - &buffer[readPos + 3] > 8) return gsi_false;  // too many digits before end
+            if (digitEnd == NULL) return gsi_false;                    // missing ';'
+            if (digitEnd - &buffer[readPos + 3] > 8) return gsi_false; // too many digits before end
 
             // scan digits into memory, do this as a block so that &#x165 = 01 65
             sscanf(&buffer[readPos + 3], "%08x", &digitValue);
@@ -645,7 +645,7 @@ static gsi_bool gsiXmlUtilDecodeString(char* buffer, int* len)
             // write the digit back as a character array
             for (i = 0; i < 4; i++)
             {
-                ch = (char)((digitValue & mask) >> ((3 - i) * 8));  // make 0x00006500 into 0x65
+                ch = (char)((digitValue & mask) >> ((3 - i) * 8)); // make 0x00006500 into 0x65
                 if (haveWritten || ch != 0x00) {
                     buffer[readPos++] = ch;
                     haveWritten = gsi_true;
@@ -654,7 +654,7 @@ static gsi_bool gsiXmlUtilDecodeString(char* buffer, int* len)
             }
 
             // remove everything between the current read position and the semicolon
-            charsToRemove = digitEnd - &buffer[readPos] + 1;  // remove the semicolon
+            charsToRemove = digitEnd - &buffer[readPos] + 1; // remove the semicolon
         }
         else if (strncmp(&buffer[readPos], "&#", 2) == 0)
         {
@@ -667,7 +667,7 @@ static gsi_bool gsiXmlUtilDecodeString(char* buffer, int* len)
             unsigned int mask = 0xFF000000;
 
             char* digitEnd = strchr(&buffer[readPos + 2], ';');
-            if (digitEnd == NULL) return gsi_false;  // missing ';'
+            if (digitEnd == NULL) return gsi_false; // missing ';'
 
             // scan digits into memory, do this as a block so that &#357 = 0165h = 01 65
             digitValue = (unsigned int)atoi(&buffer[readPos + 2]);
@@ -675,7 +675,7 @@ static gsi_bool gsiXmlUtilDecodeString(char* buffer, int* len)
             // write the digit back as a character array
             for (i = 0; i < 4; i++)
             {
-                ch = (char)((digitValue & mask) >> ((3 - i) * 8));  // make 0x00006500 into 0x65
+                ch = (char)((digitValue & mask) >> ((3 - i) * 8)); // make 0x00006500 into 0x65
                 if (haveWritten || ch != 0x00) {
                     buffer[readPos++] = ch;
                     haveWritten = gsi_true;
@@ -684,10 +684,10 @@ static gsi_bool gsiXmlUtilDecodeString(char* buffer, int* len)
             }
 
             // remove everything between the current read position and the semicolon
-            charsToRemove = digitEnd - &buffer[readPos] + 1;  // remove the semicolon
+            charsToRemove = digitEnd - &buffer[readPos] + 1; // remove the semicolon
         }
         else
-            return gsi_false;  // unhandle '&' type
+            return gsi_false; // unhandle '&' type
 
         // remove characters by compressing buffer and adding whitespace at the end
         //      "&amp;&amp;" becomes "&&amp;    " after one iteration
@@ -711,7 +711,7 @@ static gsi_bool gsiXmlUtilParseValue(GSIXmlStreamReader* stream, char* buffer, i
     GS_XML_CHECK(gsiXmlUtilSkipWhiteSpace(stream, buffer, len, pos));
 
     if (buffer[*pos] != '<') {
-        strStart = &buffer[*pos];  // store this so we can find it later
+        strStart = &buffer[*pos]; // store this so we can find it later
         strOut->mData = (const gsi_u8*)strStart;
     }
 
@@ -720,12 +720,12 @@ static gsi_bool gsiXmlUtilParseValue(GSIXmlStreamReader* stream, char* buffer, i
         if (buffer[*pos] == '<') {
             // decode the string if necessary
             if (gsi_is_false(gsiXmlUtilDecodeString(strStart, &strOut->mLen))) return gsi_false;
-            return gsi_true;  // extracted and decoded
+            return gsi_true; // extracted and decoded
         }
         (*pos)++;
         strOut->mLen++;
     }
-    return gsi_false;  // EOF before tag end
+    return gsi_false; // EOF before tag end
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -887,12 +887,12 @@ gsi_bool gsXmlWriteUnicodeStringElement(
         // check values less than 0x20
         if (value[i] < 0x0020) {
             if ((value[i] != 0x0009) && (value[i] != 0x0A) && (value[i] != 0x0D))
-                return gsi_false;  // contains illegal (and unencodable) characters.
+                return gsi_false; // contains illegal (and unencodable) characters.
         }
         else if (value[i] > 0xD7FF && value[i] < 0xE000)
-            return gsi_false;  // contains illegal (and unencodable) characters.
+            return gsi_false; // contains illegal (and unencodable) characters.
         else if (value[i] > 0xFFFD)
-            return gsi_false;  // contains illegal (and unencodable) characters.
+            return gsi_false; // contains illegal (and unencodable) characters.
     }
 
     if (gsi_is_false(gsXmlWriteOpenTag(stream, namespaceName, tag)) ||
@@ -997,7 +997,7 @@ gsi_bool gsXmlWriteHexBinaryElement(
 
     while (pos < len)
     {
-        temp = data[pos];  // sprintf requires an int parameter for %02x operation
+        temp = data[pos]; // sprintf requires an int parameter for %02x operation
         sprintf(hex, "%02x", temp);
         pos++;
         if (gsi_is_false(gsiXmlUtilWriteChar(writer, hex[0]))) return gsi_false;
@@ -1124,7 +1124,7 @@ static gsi_bool gsiXmlUtilWriteChar(GSIXmlStreamWriter* stream, char ch)
     GS_ASSERT(gsi_is_false(stream->mClosed));
 
     if (stream->mLen >= stream->mCapacity) {
-        if (gsi_is_false(gsiXmlUtilGrowBuffer(stream))) return gsi_false;  // OOM
+        if (gsi_is_false(gsiXmlUtilGrowBuffer(stream))) return gsi_false; // OOM
     }
     stream->mBuffer[stream->mLen] = ch;
     stream->mLen++;
@@ -1148,7 +1148,7 @@ static gsi_bool gsiXmlUtilWriteString(GSIXmlStreamWriter* stream, const char* st
     // grow the buffer if necessary
     while ((stream->mCapacity - stream->mLen) <= strLen)
     {
-        if (gsi_is_false(gsiXmlUtilGrowBuffer(stream))) return gsi_false;  // OOM
+        if (gsi_is_false(gsiXmlUtilGrowBuffer(stream))) return gsi_false; // OOM
     }
 
     strcpy(&stream->mBuffer[stream->mLen], str);
@@ -1173,7 +1173,7 @@ static gsi_bool gsiXmlUtilWriteAsciiString(GSIXmlStreamWriter* stream, const gsi
     // grow the buffer if necessary
     while ((stream->mCapacity - stream->mLen) <= strLen)
     {
-        if (gsi_is_false(gsiXmlUtilGrowBuffer(stream))) return gsi_false;  // OOM
+        if (gsi_is_false(gsiXmlUtilGrowBuffer(stream))) return gsi_false; // OOM
     }
 
     UCS2ToAsciiString(str, &stream->mBuffer[stream->mLen]);
@@ -1201,7 +1201,7 @@ static gsi_bool gsiXmlUtilWriteUnicodeString(GSIXmlStreamWriter* stream, const u
     for (pos = 0; pos < strLen; pos++)
     {
         utf8Len = _UCS2CharToUTF8String(str[pos], utf8String);
-        utf8String[utf8Len] = '\0';  // null terminate it
+        utf8String[utf8Len] = '\0'; // null terminate it
         if (gsi_is_false(gsiXmlUtilWriteXmlSafeString(stream, utf8String))) return gsi_false;
     }
     return gsi_true;
@@ -1269,7 +1269,7 @@ static gsi_bool gsiXmlUtilGrowBuffer(GSIXmlStreamWriter* stream)
 gsi_bool gsXmlMoveToStart(GSXmlStreamReader stream)
 {
     GSIXmlStreamReader* reader = (GSIXmlStreamReader*)stream;
-    reader->mElemReadIndex = -1;  // start BEFORE first element
+    reader->mElemReadIndex = -1; // start BEFORE first element
     reader->mValueReadIndex = -1;
     return gsi_true;
 }
@@ -1304,13 +1304,13 @@ gsi_bool gsXmlMoveToParent(GSXmlStreamReader stream)
 
     // check for invalid position
     if (reader->mElemReadIndex >= ArrayLength(reader->mElementArray) || reader->mElemReadIndex == -1) {
-        return gsi_false;  // current position invalid
+        return gsi_false; // current position invalid
     }
     else
     {
         GSIXmlElement* elem = (GSIXmlElement*)ArrayNth(reader->mElementArray, reader->mElemReadIndex);
-        if (elem->mParentIndex == -1) return gsi_false;  // current elem is at highest level
-        if (elem->mParentIndex >= ArrayLength(reader->mElementArray)) return gsi_false;  // parent is invalid!
+        if (elem->mParentIndex == -1) return gsi_false; // current elem is at highest level
+        if (elem->mParentIndex >= ArrayLength(reader->mElementArray)) return gsi_false; // parent is invalid!
         reader->mElemReadIndex = elem->mParentIndex;
         reader->mValueReadIndex = -1;
         return gsi_true;
@@ -1393,7 +1393,7 @@ gsi_bool gsXmlReadChildAsString(GSXmlStreamReader stream, const char* matchtag, 
     int i = 0;
 
     // Do we have a valid value position already?
-    if (reader->mValueReadIndex == -1) reader->mValueReadIndex = reader->mElemReadIndex;  // start at current element
+    if (reader->mValueReadIndex == -1) reader->mValueReadIndex = reader->mElemReadIndex; // start at current element
 
     for (i = (reader->mValueReadIndex + 1); i < ArrayLength(reader->mElementArray); i++)
     {
@@ -1507,7 +1507,7 @@ gsi_bool gsXmlReadChildAsHexBinary(
     int i = 0;
 
     // Do we have a valid value position already?
-    if (reader->mValueReadIndex == -1) reader->mValueReadIndex = reader->mElemReadIndex;  // start at current element
+    if (reader->mValueReadIndex == -1) reader->mValueReadIndex = reader->mElemReadIndex; // start at current element
 
     for (i = (reader->mValueReadIndex + 1); i < ArrayLength(reader->mElementArray); i++)
     {
@@ -1540,23 +1540,23 @@ gsi_bool gsXmlReadChildAsHexBinary(
                 while (bytesleft > 1)
                 {
                     sscanf((char*)(&searchValueElem->mValue.mData[readpos]), "%02x",
-                        &temp);                         // sscanf requires a 4 byte dest
-                    valueOut[writepos] = (gsi_u8)temp;  // then we convert to byte, to ensure correct byte order
+                        &temp);                        // sscanf requires a 4 byte dest
+                    valueOut[writepos] = (gsi_u8)temp; // then we convert to byte, to ensure correct byte order
                     readpos += 2;
                     writepos += 1;
                     bytesleft -= 2;
                 }
                 if (bytesleft == 1) {
                     sscanf((char*)(&searchValueElem->mValue.mData[readpos]), "%01x",
-                        &temp);                         // sscanf requires a 4 byte dest
-                    valueOut[writepos] = (gsi_u8)temp;  // then we convert to byte, to ensure correct byte order
+                        &temp);                        // sscanf requires a 4 byte dest
+                    valueOut[writepos] = (gsi_u8)temp; // then we convert to byte, to ensure correct byte order
                     readpos += 1;
                     writepos += 1;
                     bytesleft -= 1;
                 }
                 if (lenOut != NULL) *lenOut = writepos;
 
-                reader->mValueReadIndex = i;  // mark that this element was read
+                reader->mValueReadIndex = i; // mark that this element was read
                 return gsi_true;
             }
         }
@@ -1575,7 +1575,7 @@ gsi_bool gsXmlReadChildAsBase64Binary(GSXmlStreamReader stream, const char* matc
     int i = 0;
 
     // Do we have a valid value position already?
-    if (reader->mValueReadIndex == -1) reader->mValueReadIndex = reader->mElemReadIndex;  // start at current element
+    if (reader->mValueReadIndex == -1) reader->mValueReadIndex = reader->mElemReadIndex; // start at current element
 
     for (i = (reader->mValueReadIndex + 1); i < ArrayLength(reader->mElementArray); i++)
     {
@@ -1616,7 +1616,7 @@ gsi_bool gsXmlReadChildAsInt(GSXmlStreamReader stream, const char* matchtag, int
     int i = 0;
 
     // Do we have a valid value position already?
-    if (reader->mValueReadIndex == -1) reader->mValueReadIndex = reader->mElemReadIndex;  // start at current element
+    if (reader->mValueReadIndex == -1) reader->mValueReadIndex = reader->mElemReadIndex; // start at current element
 
     for (i = (reader->mValueReadIndex + 1); i < ArrayLength(reader->mElementArray); i++)
     {
@@ -1625,7 +1625,7 @@ gsi_bool gsXmlReadChildAsInt(GSXmlStreamReader stream, const char* matchtag, int
             // check match
             if (gsi_is_true(gsiXmlUtilTagMatches(matchtag, &searchValueElem->mName))) {
                 reader->mValueReadIndex = i;
-                if (searchValueElem->mValue.mData == NULL) return gsi_false;  // invalid type!
+                if (searchValueElem->mValue.mData == NULL) return gsi_false; // invalid type!
                 *valueOut = atoi((const char*)searchValueElem->mValue.mData);
                 return gsi_true;
             }
@@ -1645,7 +1645,7 @@ gsi_bool gsXmlReadChildAsInt64(GSXmlStreamReader stream, const char* matchtag, g
     int i = 0;
 
     // Do we have a valid value position already?
-    if (reader->mValueReadIndex == -1) reader->mValueReadIndex = reader->mElemReadIndex;  // start at current element
+    if (reader->mValueReadIndex == -1) reader->mValueReadIndex = reader->mElemReadIndex; // start at current element
 
     for (i = (reader->mValueReadIndex + 1); i < ArrayLength(reader->mElementArray); i++)
     {
@@ -1654,7 +1654,7 @@ gsi_bool gsXmlReadChildAsInt64(GSXmlStreamReader stream, const char* matchtag, g
             // check match
             if (gsi_is_true(gsiXmlUtilTagMatches(matchtag, &searchValueElem->mName))) {
                 reader->mValueReadIndex = i;
-                if (searchValueElem->mValue.mData == NULL) return gsi_false;  // invalid type!
+                if (searchValueElem->mValue.mData == NULL) return gsi_false; // invalid type!
                 *valueOut = gsiStringToInt64((const char*)searchValueElem->mValue.mData);
                 return gsi_true;
             }
@@ -1675,7 +1675,7 @@ gsi_bool gsXmlReadChildAsDateTimeElement(GSXmlStreamReader stream, const char* m
     struct tm timePtr;
 
     // Do we have a valid value position already?
-    if (reader->mValueReadIndex == -1) reader->mValueReadIndex = reader->mElemReadIndex;  // start at current element
+    if (reader->mValueReadIndex == -1) reader->mValueReadIndex = reader->mElemReadIndex; // start at current element
 
     for (i = (reader->mValueReadIndex + 1); i < ArrayLength(reader->mElementArray); i++)
     {
@@ -1684,7 +1684,7 @@ gsi_bool gsXmlReadChildAsDateTimeElement(GSXmlStreamReader stream, const char* m
             // check match
             if (gsi_is_true(gsiXmlUtilTagMatches(matchtag, &searchValueElem->mName))) {
                 reader->mValueReadIndex = i;
-                if (searchValueElem->mValue.mData == NULL) return gsi_false;  // invalid type!
+                if (searchValueElem->mValue.mData == NULL) return gsi_false; // invalid type!
 
                 // convert the time to from a string to a time struct
                 sscanf((const char*)searchValueElem->mValue.mData, "%i-%02d-%02dT%02d:%02d:%02d", &timePtr.tm_year,
@@ -1713,7 +1713,7 @@ gsi_bool gsXmlReadChildAsFloat(GSXmlStreamReader stream, const char* matchtag, f
     int i = 0;
 
     // Do we have a valid value position already?
-    if (reader->mValueReadIndex == -1) reader->mValueReadIndex = reader->mElemReadIndex;  // start at current element
+    if (reader->mValueReadIndex == -1) reader->mValueReadIndex = reader->mElemReadIndex; // start at current element
 
     for (i = (reader->mValueReadIndex + 1); i < ArrayLength(reader->mElementArray); i++)
     {
@@ -1722,7 +1722,7 @@ gsi_bool gsXmlReadChildAsFloat(GSXmlStreamReader stream, const char* matchtag, f
             // check match
             if (gsi_is_true(gsiXmlUtilTagMatches(matchtag, &searchValueElem->mName))) {
                 reader->mValueReadIndex = i;
-                if (searchValueElem->mValue.mData == NULL) return gsi_false;  // invalid type!
+                if (searchValueElem->mValue.mData == NULL) return gsi_false; // invalid type!
                 *valueOut = (float)atof((const char*)searchValueElem->mValue.mData);
                 return gsi_true;
             }
@@ -1745,7 +1745,7 @@ static gsi_bool gsiXmlUtilTagMatches(const char* matchtag, GSIXmlString* xmlstr)
     GS_ASSERT(xmlstr != NULL);
 
     if (matchtag == NULL) return gsi_true;
-    if (matchtag[strlen(matchtag) - 1] == ':') return gsi_false;  // illegal to end with ':'
+    if (matchtag[strlen(matchtag) - 1] == ':') return gsi_false; // illegal to end with ':'
 
     // find post-namespace positions
     matchNoNamespace = strchr(matchtag, ':');
@@ -1756,7 +1756,7 @@ static gsi_bool gsiXmlUtilTagMatches(const char* matchtag, GSIXmlString* xmlstr)
     if (xmlNamespacePos == xmlstr->mLen)
         xmlNamespacePos = 0;
     else
-        xmlNamespacePos++;  // add one more to skip over the ':'
+        xmlNamespacePos++; // add one more to skip over the ':'
     xmlNoNamespace.mData = xmlstr->mData + xmlNamespacePos;
     xmlNoNamespace.mLen = xmlstr->mLen - xmlNamespacePos;
 
@@ -1800,7 +1800,7 @@ gsi_bool gsXmlReadChildAsLargeInt(GSXmlStreamReader stream, const char* matchtag
 gsi_bool gsXmlResetChildReadPosition(GSXmlStreamReader stream)
 {
     GSIXmlStreamReader* reader = (GSIXmlStreamReader*)stream;
-    reader->mValueReadIndex = -1;  // no current child position means start at first
+    reader->mValueReadIndex = -1; // no current child position means start at first
     return gsi_true;
 }
 

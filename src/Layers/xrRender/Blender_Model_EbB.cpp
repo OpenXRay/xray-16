@@ -170,13 +170,13 @@ void CBlender_Model_EbB::Compile(CBlender_Compile& C)
         // deferred
         switch (C.iElement)
         {
-        case SE_R2_NORMAL_HQ:  // deffer
+        case SE_R2_NORMAL_HQ: // deffer
             uber_deffer(C, true, "model", "base", false);
             break;
-        case SE_R2_NORMAL_LQ:  // deffer
+        case SE_R2_NORMAL_LQ: // deffer
             uber_deffer(C, false, "model", "base", false);
             break;
-        case SE_R2_SHADOW:  // smap
+        case SE_R2_SHADOW: // smap
             if (RImplementation.o.HW_smap)
                 C.r_Pass("shadow_direct_model", "dumb", FALSE, TRUE, TRUE, FALSE);
             else
@@ -219,19 +219,19 @@ void CBlender_Model_EbB::Compile(CBlender_Compile& C)
         // deferred
         switch (C.iElement)
         {
-        case SE_R2_NORMAL_HQ:  // deffer
+        case SE_R2_NORMAL_HQ: // deffer
             uber_deffer(C, true, "model", "base", false, 0, true);
             C.r_Stencil(TRUE, D3DCMP_ALWAYS, 0xff, 0x7f, D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
             C.r_StencilRef(0x01);
             C.r_End();
             break;
-        case SE_R2_NORMAL_LQ:  // deffer
+        case SE_R2_NORMAL_LQ: // deffer
             uber_deffer(C, false, "model", "base", false, 0, true);
             C.r_Stencil(TRUE, D3DCMP_ALWAYS, 0xff, 0x7f, D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
             C.r_StencilRef(0x01);
             C.r_End();
             break;
-        case SE_R2_SHADOW:  // smap
+        case SE_R2_SHADOW: // smap
             // if (RImplementation.o.HW_smap)	C.r_Pass	("shadow_direct_model","dumb",	FALSE,TRUE,TRUE,FALSE);
             // else							C.r_Pass	("shadow_direct_model","shadow_direct_base",FALSE);
             C.r_Pass("shadow_direct_model", "dumb", FALSE, TRUE, TRUE, FALSE);

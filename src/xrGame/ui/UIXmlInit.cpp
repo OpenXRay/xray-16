@@ -513,7 +513,7 @@ bool CUIXmlInit::InitProgressBar(CUIXml& xml_doc, LPCSTR path, int index, CUIPro
     CUIProgressBar::EOrientMode mode = CUIProgressBar::om_vert;
     int mode_horz = xml_doc.ReadAttribInt(path, index, "horz", 0);
     LPCSTR mode_str = xml_doc.ReadAttrib(path, index, "mode");
-    if (mode_horz == 1)  // om_horz
+    if (mode_horz == 1) // om_horz
     {
         mode = CUIProgressBar::om_horz;
     }

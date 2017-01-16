@@ -129,7 +129,7 @@ BOOL R_constant_table::parse(void* _desc, u32 destination)
                 // We have determined all valuable info, search if constant already created
                 ref_constant C = get(name);
                 if (!C) {
-                    C = new R_constant();  //.g_constant_allocator.create();
+                    C = new R_constant(); //.g_constant_allocator.create();
                     C->name = name;
                     C->destination = RC_dest_sampler;
                     C->type = RC_sampler;
@@ -160,7 +160,7 @@ BOOL R_constant_table::parse(void* _desc, u32 destination)
         // We have determined all valuable info, search if constant already created
         ref_constant C = get(name);
         if (!C) {
-            C = new R_constant();  //.g_constant_allocator.create();
+            C = new R_constant(); //.g_constant_allocator.create();
             C->name = name;
             C->destination = destination;
             C->type = type;
@@ -181,7 +181,7 @@ BOOL R_constant_table::parse(void* _desc, u32 destination)
     std::sort(table.begin(), table.end(), p_sort);
     return TRUE;
 }
-#endif  //	USE_DX10
+#endif //	USE_DX10
 
 /// !!!!!!!!FIX THIS FOR DX11!!!!!!!!!
 void R_constant_table::merge(R_constant_table* T)
@@ -194,7 +194,7 @@ void R_constant_table::merge(R_constant_table* T)
         ref_constant src = T->table[it];
         ref_constant C = get(*src->name);
         if (!C) {
-            C = new R_constant();  //.g_constant_allocator.create();
+            C = new R_constant(); //.g_constant_allocator.create();
             C->name = src->name;
             C->destination = src->destination;
             C->type = src->type;
@@ -233,18 +233,18 @@ void R_constant_table::merge(R_constant_table* T)
     m_CBTable.reserve(m_CBTable.size() + T->m_CBTable.size());
     for (u32 i = 0; i < T->m_CBTable.size(); ++i)
         m_CBTable.push_back(T->m_CBTable[i]);
-#endif  //	USE_DX10
+#endif //	USE_DX10
 }
 
 void R_constant_table::clear()
 {
     //.
     for (u32 it = 0; it < table.size(); it++)
-        table[it] = 0;  //.g_constant_allocator.destroy(table[it]);
+        table[it] = 0; //.g_constant_allocator.destroy(table[it]);
     table.clear();
 #if defined(USE_DX10) || defined(USE_DX11)
     m_CBTable.clear();
-#endif  //
+#endif //
 }
 
 BOOL R_constant_table::equal(R_constant_table& C)

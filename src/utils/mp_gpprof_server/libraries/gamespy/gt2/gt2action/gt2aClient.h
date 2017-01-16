@@ -18,30 +18,30 @@ Copyright 2000 GameSpy Industries, Inc
 
 typedef struct Player
 {
-    GT2Bool used;         // If this slot is in use or not.
-    V2f position;         // The current position (0 <= x,y < MAP_MAX).
-    float rotation;       // Client's view angle (0 <= rotation < 360).
-    int motion;           // The client's current motion (STILL, FORWARD, BACKWARD).
-    int turning;          // The client's current tunring direction (STILL, LEFT, RIGHT).
-    char nick[MAX_NICK];  // The client's nick.
-    int score;            // The client's score.
-    GT2Bool dead;         // True if this client is currently dead.
-    float roll;           // How much to roll them (-1->0->1).
+    GT2Bool used;        // If this slot is in use or not.
+    V2f position;        // The current position (0 <= x,y < MAP_MAX).
+    float rotation;      // Client's view angle (0 <= rotation < 360).
+    int motion;          // The client's current motion (STILL, FORWARD, BACKWARD).
+    int turning;         // The client's current tunring direction (STILL, LEFT, RIGHT).
+    char nick[MAX_NICK]; // The client's nick.
+    int score;           // The client's score.
+    GT2Bool dead;        // True if this client is currently dead.
+    float roll;          // How much to roll them (-1->0->1).
 } Player;
 
 typedef struct CObject
 {
-    GT2Bool used;             // If this slot is in use or not.
-    ObjectType type;          // The type of object.
-    V2f position;             // The object's position.
-    float rotation;           // The object's rotation.
-    unsigned long totalTime;  // The amount of time this object has existed.
+    GT2Bool used;            // If this slot is in use or not.
+    ObjectType type;         // The type of object.
+    V2f position;            // The object's position.
+    float rotation;          // The object's rotation.
+    unsigned long totalTime; // The amount of time this object has existed.
 } CObject;
 
 typedef struct UpdateInfo
 {
-    int diff;  // Time since the last update was received.
-    int len;   // Length of the update, in bytes.
+    int diff; // Time since the last update was received.
+    int len;  // Length of the update, in bytes.
 } UpdateInfo;
 
 extern float localRotation;

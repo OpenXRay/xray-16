@@ -291,7 +291,7 @@ void CServerList::FillUpDetailedServerInfo()
             PlayerInfo pf = *it;
             if (1 != pf.Team) continue;
             if (pf.Spectator) continue;
-            if (!t1)  // add header
+            if (!t1) // add header
             {
                 STRCONCAT(_buff, CStringTable().translate("ui_st_team").c_str(), "\"",
                     CTeamInfo::GetTeam1_name().c_str(), "\"");
@@ -782,7 +782,7 @@ void CServerList::SrvInfo2LstSrvInfo(const ServerInfo* pServerInfo)
     m_itemInfo.info.version = pServerInfo->m_ServerVersion;
     m_itemInfo.info.icons.pass = pServerInfo->m_bPassword;
     m_itemInfo.info.icons.dedicated = pServerInfo->m_bDedicated;
-    m_itemInfo.info.icons.punkbuster = false;  //	= pServerInfo->m_bPunkBuster;
+    m_itemInfo.info.icons.punkbuster = false; //	= pServerInfo->m_bPunkBuster;
     m_itemInfo.info.icons.user_pass = pServerInfo->m_bUserPass;
 
     m_itemInfo.info.Index = pServerInfo->Index;

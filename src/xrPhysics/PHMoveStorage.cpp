@@ -8,9 +8,9 @@
 
 struct dxGeomTransform : public dxGeom
 {
-    dxGeom* obj;   // object that is being transformed
-    int cleanup;   // 1 to destroy obj when destroyed
-    int infomode;  // 1 to put Tx geom in dContactGeom g1
+    dxGeom* obj;  // object that is being transformed
+    int cleanup;  // 1 to destroy obj when destroyed
+    int infomode; // 1 to put Tx geom in dContactGeom g1
 
     // cached final object transform (body tx + relative tx). this is set by
     // computeAABB(), and it is valid while the AABB is valid.

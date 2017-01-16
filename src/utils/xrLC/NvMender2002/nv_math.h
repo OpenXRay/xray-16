@@ -17,7 +17,7 @@ Comments:
 
 #ifndef _nv_mathdecl_h_
 #include "nv_mathdecl.h"
-#endif  // _nv_mathdecl_h_
+#endif // _nv_mathdecl_h_
 
 #include <assert.h>
 
@@ -49,6 +49,6 @@ struct vec4;
 
 #ifndef _nv_algebra_h_
 #include "nv_algebra.h"
-#endif  // _nv_algebra_h_
+#endif // _nv_algebra_h_
 
-#endif  //_nv_math_h_
+#endif //_nv_math_h_

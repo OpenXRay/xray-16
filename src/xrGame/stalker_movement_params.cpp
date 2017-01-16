@@ -123,7 +123,7 @@ struct loophole_id_predicate
 
     IC loophole_id_predicate(shared_str const& id) : m_id(id) {}
     IC bool operator()(smart_cover::loophole* loophole) const { return (loophole->id()._get() == m_id._get()); }
-};  // struct loophole_id_predicate
+}; // struct loophole_id_predicate
 
 void stalker_movement_params::cover_loophole_id(shared_str const& loophole_id)
 {

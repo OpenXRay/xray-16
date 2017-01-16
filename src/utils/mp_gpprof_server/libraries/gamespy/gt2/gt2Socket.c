@@ -329,7 +329,7 @@ GT2Bool gti2SocketSend(GT2Socket socket, unsigned int ip, unsigned short port, c
     gti2MessageCheck(&message, &len);
 
     if (socket->protocolType != GTI2AdHocProtocol) {
-#ifndef INSOCK  // insock never sets write flag for UDP sockets
+#ifndef INSOCK // insock never sets write flag for UDP sockets
         // check if we can't send
         if (!CanSendOnSocket(socket->socket)) return GT2True;
 #endif

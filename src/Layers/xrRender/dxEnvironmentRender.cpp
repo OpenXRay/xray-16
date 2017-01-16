@@ -8,15 +8,15 @@
 //////////////////////////////////////////////////////////////////////////
 // half box def
 static Fvector3 hbox_verts[24] = {
-    {-1.f, -1.f, -1.f}, {-1.f, -1.01f, -1.f},  // down
-    {1.f, -1.f, -1.f}, {1.f, -1.01f, -1.f},    // down
-    {-1.f, -1.f, 1.f}, {-1.f, -1.01f, 1.f},    // down
-    {1.f, -1.f, 1.f}, {1.f, -1.01f, 1.f},      // down
+    {-1.f, -1.f, -1.f}, {-1.f, -1.01f, -1.f}, // down
+    {1.f, -1.f, -1.f}, {1.f, -1.01f, -1.f},   // down
+    {-1.f, -1.f, 1.f}, {-1.f, -1.01f, 1.f},   // down
+    {1.f, -1.f, 1.f}, {1.f, -1.01f, 1.f},     // down
     {-1.f, 2.f, -1.f}, {-1.f, 1.f, -1.f}, {1.f, 2.f, -1.f}, {1.f, 1.f, -1.f}, {-1.f, 2.f, 1.f}, {-1.f, 1.f, 1.f},
-    {1.f, 2.f, 1.f}, {1.f, 1.f, 1.f}, {-1.f, 0.f, -1.f}, {-1.f, -1.f, -1.f},  // half
-    {1.f, 0.f, -1.f}, {1.f, -1.f, -1.f},                                      // half
-    {1.f, 0.f, 1.f}, {1.f, -1.f, 1.f},                                        // half
-    {-1.f, 0.f, 1.f}, {-1.f, -1.f, 1.f}                                       // half
+    {1.f, 2.f, 1.f}, {1.f, 1.f, 1.f}, {-1.f, 0.f, -1.f}, {-1.f, -1.f, -1.f}, // half
+    {1.f, 0.f, -1.f}, {1.f, -1.f, -1.f},                                     // half
+    {1.f, 0.f, 1.f}, {1.f, -1.f, 1.f},                                       // half
+    {-1.f, 0.f, 1.f}, {-1.f, -1.f, 1.f}                                      // half
 };
 static u16 hbox_faces[20 * 3] = {0, 2, 3, 3, 1, 0, 4, 5, 7, 7, 6, 4, 0, 1, 9, 9, 8, 0, 8, 9, 5, 5, 4, 8, 1, 3, 10, 10,
     9, 1, 9, 10, 7, 7, 5, 9, 3, 2, 11, 11, 10, 3, 10, 11, 6, 6, 7, 10, 2, 0, 8, 8, 11, 2, 11, 8, 4, 4, 6, 11};
@@ -147,16 +147,16 @@ void dxEnvironmentRender::OnFrame(CEnvironment& env)
         //. very very ugly hack
         if (HW.Caps.raster_major >= 3 && HW.Caps.geometry.bVTF) {
             // tonemapping in VS
-            mixRen.sky_r_textures.push_back(mk_pair(u32(CTexture::rstVertex), tonemap));      //. hack
-            mixRen.sky_r_textures_env.push_back(mk_pair(u32(CTexture::rstVertex), tonemap));  //. hack
-            mixRen.clouds_r_textures.push_back(mk_pair(u32(CTexture::rstVertex), tonemap));   //. hack
+            mixRen.sky_r_textures.push_back(mk_pair(u32(CTexture::rstVertex), tonemap));     //. hack
+            mixRen.sky_r_textures_env.push_back(mk_pair(u32(CTexture::rstVertex), tonemap)); //. hack
+            mixRen.clouds_r_textures.push_back(mk_pair(u32(CTexture::rstVertex), tonemap));  //. hack
         }
         else
         {
             // tonemapping in PS
-            mixRen.sky_r_textures.push_back(mk_pair(2, tonemap));      //. hack
-            mixRen.sky_r_textures_env.push_back(mk_pair(2, tonemap));  //. hack
-            mixRen.clouds_r_textures.push_back(mk_pair(2, tonemap));   //. hack
+            mixRen.sky_r_textures.push_back(mk_pair(2, tonemap));     //. hack
+            mixRen.sky_r_textures_env.push_back(mk_pair(2, tonemap)); //. hack
+            mixRen.clouds_r_textures.push_back(mk_pair(2, tonemap));  //. hack
         }
     }
 
@@ -172,24 +172,24 @@ void dxEnvironmentRender::OnFrame(CEnvironment& env)
 // ******************** Environment params (setting)
 #if defined(USE_DX10) || defined(USE_DX11)
 //	TODO: DX10: Implement environment parameters setting for DX10 (if necessary)
-#else  //	USE_DX10
+#else //	USE_DX10
 
 #if RENDER == R_R1
     Fvector3 fog_color = env.CurrentEnv->fog_color;
     fog_color.mul(ps_r1_fog_luminance);
-#else   //	RENDER==R_R1
+#else  //	RENDER==R_R1
     Fvector3& fog_color = env.CurrentEnv->fog_color;
-#endif  //	RENDER==R_R1
+#endif //	RENDER==R_R1
 
     CHK_DX(HW.pDevice->SetRenderState(D3DRS_FOGCOLOR, color_rgba_f(fog_color.x, fog_color.y, fog_color.z, 0)));
     CHK_DX(HW.pDevice->SetRenderState(D3DRS_FOGSTART, *(u32*)(&env.CurrentEnv->fog_near)));
     CHK_DX(HW.pDevice->SetRenderState(D3DRS_FOGEND, *(u32*)(&env.CurrentEnv->fog_far)));
-#endif  //	USE_DX10
+#endif //	USE_DX10
 }
 
 void dxEnvironmentRender::OnLoad()
 {
-    tonemap = RImplementation.Resources->_CreateTexture("$user$tonemap");  //. hack
+    tonemap = RImplementation.Resources->_CreateTexture("$user$tonemap"); //. hack
 }
 
 void dxEnvironmentRender::OnUnload()

@@ -13,8 +13,8 @@ public:
     rewarding_state_events(game_state_accumulator* pstate_accum, event_action_delegate_t ea_delegate);
     virtual ~rewarding_state_events();
     virtual void init();
-};  // class rewarding_state_events
+}; // class rewarding_state_events
 
-}  // namespace award_system
+} // namespace award_system
 
-#endif  //#ifndef REWARDING_EVENTS_INCLUDED
+#endif //#ifndef REWARDING_EVENTS_INCLUDED

@@ -126,7 +126,7 @@ IClient* xrServer::client_Find_Get(ClientID ID)
 
 #ifndef MASTER_GOLD
     Msg("# New player created.");
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
     return newCL;
 };
 
@@ -145,7 +145,7 @@ void xrServer::client_Destroy(IClient* C)
         if (pS) {
             NET_Packet P;
             P.w_begin(M_EVENT);
-            P.w_u32(Level().timeServer());  // Device.TimerAsync());
+            P.w_u32(Level().timeServer()); // Device.TimerAsync());
             P.w_u16(GE_DESTROY);
             P.w_u16(pS->ID);
             SendBroadcast(C->ID, P, net_flags(TRUE, TRUE));
@@ -171,7 +171,7 @@ void xrServer::client_Destroy(IClient* C)
 
         //.		if (!alife_client->flags.bVerified)
         xrClientData* xr_client = static_cast<xrClientData*>(alife_client);
-        m_disconnected_clients.Add(xr_client);  // xr_delete(alife_client);
+        m_disconnected_clients.Add(xr_client); // xr_delete(alife_client);
     }
 }
 
@@ -199,7 +199,7 @@ INT g_sv_SendUpdate = 0;
 
 void xrServer::Update()
 {
-    if (Level().IsDemoPlayStarted() || Level().IsDemoPlayFinished()) return;  // diabling server when demo is playing
+    if (Level().IsDemoPlayStarted() || Level().IsDemoPlayFinished()) return; // diabling server when demo is playing
     stats.Update.Begin();
     NET_Packet Packet;
 
@@ -239,7 +239,7 @@ void xrServer::Update()
     PerformCheckClientsForMaxPing();
     Flush_Clients_Buffers();
 
-    if (0 == (Device.dwFrame % 100))  // once per 100 frames
+    if (0 == (Device.dwFrame % 100)) // once per 100 frames
     {
         UpdateBannedList();
     }
@@ -280,12 +280,12 @@ void xrServer::MakeUpdatePackets()
     xrS_entities::iterator I = entities.begin();
     xrS_entities::iterator E = entities.end();
     for (; I != E; ++I)
-    {  // all entities
+    { // all entities
         CSE_Abstract& Test = *(I->second);
 
         if (0 == Test.owner) continue;
         if (!Test.net_Ready) continue;
-        if (Test.s_flags.is(M_SPAWN_OBJECT_PHANTOM)) continue;  // Surely: phantom
+        if (Test.s_flags.is(M_SPAWN_OBJECT_PHANTOM)) continue; // Surely: phantom
         if (!Test.Net_Relevant()) continue;
 
         tmpPacket.B.count = 0;
@@ -303,7 +303,7 @@ void xrServer::MakeUpdatePackets()
 #endif
             m_updator.write_update_for(Test.ID, tmpPacket);
         }
-    }  // all entities
+    } // all entities
 
     m_updator.end_updates(m_update_begin, m_update_end);
 }
@@ -358,7 +358,7 @@ void console_log_cb(void* context, const char* text)
     _tmp_log.push_back(text);
 }
 
-u32 xrServer::OnDelayedMessage(NET_Packet& P, ClientID sender)  // Non-Zero means broadcasting with "flags" as returned
+u32 xrServer::OnDelayedMessage(NET_Packet& P, ClientID sender) // Non-Zero means broadcasting with "flags" as returned
 {
     u16 type;
     P.r_begin(type);
@@ -430,7 +430,7 @@ u32 xrServer::OnMessageSync(NET_Packet& P, ClientID sender)
 }
 
 extern float g_fCatchObjectTime;
-u32 xrServer::OnMessage(NET_Packet& P, ClientID sender)  // Non-Zero means broadcasting with "flags" as returned
+u32 xrServer::OnMessage(NET_Packet& P, ClientID sender) // Non-Zero means broadcasting with "flags" as returned
 {
     u16 type;
     P.r_begin(type);
@@ -442,7 +442,7 @@ u32 xrServer::OnMessage(NET_Packet& P, ClientID sender)  // Non-Zero means broad
     {
     case M_UPDATE:
     {
-        Process_update(P, sender);  // No broadcast
+        Process_update(P, sender); // No broadcast
         VERIFY(verify_entities());
     }
     break;
@@ -910,7 +910,7 @@ void xrServer::verify_entity(const CSE_Abstract* entity) const
     }
 }
 
-#endif  // DEBUG
+#endif // DEBUG
 
 void xrServer::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
 {
@@ -968,7 +968,7 @@ void xrServer::AddDelayedPacket(NET_Packet& Packet, ClientID Sender)
 }
 
 u32 g_sv_dwMaxClientPing = 2000;
-u32 g_sv_time_for_ping_check = 15000;  // 15 sec
+u32 g_sv_time_for_ping_check = 15000; // 15 sec
 u8 g_sv_maxPingWarningsCount = 5;
 
 void xrServer::PerformCheckClientsForMaxPing()
@@ -991,16 +991,16 @@ void xrServer::PerformCheckClientsForMaxPing()
                 ++Client->m_ping_warn.m_maxPingWarnings;
                 Client->m_ping_warn.m_dwLastMaxPingWarningTime = Device.dwTimeGlobal;
 
-                if (Client->m_ping_warn.m_maxPingWarnings >= g_sv_maxPingWarningsCount) {  // kick
+                if (Client->m_ping_warn.m_maxPingWarnings >= g_sv_maxPingWarningsCount) { // kick
                     LPSTR reason;
                     STRCONCAT(reason, CStringTable().translate("st_kicked_by_server").c_str());
                     Level().Server->DisconnectClient(Client, reason);
                 }
                 else
-                {  // send warning
+                { // send warning
                     NET_Packet P;
                     P.w_begin(M_CLIENT_WARN);
-                    P.w_u8(1);  // 1 means max-ping-warning
+                    P.w_u8(1); // 1 means max-ping-warning
                     P.w_u16(ps->ping);
                     P.w_u8(Client->m_ping_warn.m_maxPingWarnings);
                     P.w_u8(g_sv_maxPingWarningsCount);
@@ -1164,7 +1164,7 @@ struct PlayerInfoWriter
         dest->w_stringZ(tmp_client->m_cAddress.to_string().c_str());
         dest->w_stringZ(tmp_client->m_cdkey_digest);
     }
-};  // struct PlayerInfoWriter
+}; // struct PlayerInfoWriter
 
 void xrServer::SendPlayersInfo(ClientID const& to_client)
 {

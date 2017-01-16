@@ -36,7 +36,7 @@ IC bool PhOutOfBoundaries(const Fvector& v)
 
 //#endif
 
-const float LOSE_CONTROL_DISTANCE = 0.5f;  // fly distance to lose control
+const float LOSE_CONTROL_DISTANCE = 0.5f; // fly distance to lose control
 const float CLAMB_DISTANCE = 0.5f;
 const float CLIMB_GETUP_HEIGHT = 0.3f;
 
@@ -378,7 +378,7 @@ void CPHSimpleCharacter::Destroy()
     if (!b_exist) return;
     b_exist = false;
     R_ASSERT2(!ph_world->Processing(),
-        "can not deactivate physics character shell during physics processing!!!");  // if(ph_world)
+        "can not deactivate physics character shell during physics processing!!!"); // if(ph_world)
     R_ASSERT2(!ph_world->IsFreezed(), "can not deactivate physics character when ph world is freezed!!!");
     R_ASSERT2(!CPHObject::IsFreezed(), "can not deactivate freezed !!!");
     m_elevator_state.Deactivate();
@@ -533,8 +533,8 @@ void CPHSimpleCharacter::PhDataUpdate(dReal /**step/**/)
     const float* linear_velocity = dBodyGetLinearVel(m_body);
     dReal linear_velocity_mag = _sqrt(dDOT(linear_velocity, linear_velocity));
     dBodyGetMass(m_body, &mass);
-    dReal l_air = linear_velocity_mag * default_k_l;                     // force/velocity !!!
-    if (l_air > mass.mass / fixed_step) l_air = mass.mass / fixed_step;  // validate
+    dReal l_air = linear_velocity_mag * default_k_l;                    // force/velocity !!!
+    if (l_air > mass.mass / fixed_step) l_air = mass.mass / fixed_step; // validate
 
     if (!fis_zero(l_air))
         dBodyAddForce(m_body, -linear_velocity[0] * l_air, -linear_velocity[1] * l_air, -linear_velocity[2] * l_air);
@@ -633,14 +633,14 @@ void CPHSimpleCharacter::PhTune(dReal step)
     if (b_lose_control && (b_on_ground && m_ground_contact_normal[1] > M_SQRT1_2 / 2.f
                               //&&
                               //			!b_external_impulse
-                              /*&& 
-			dSqrt(velocity[0]*velocity[0]+velocity[2]*velocity[2])<5.*/
+                              /*&&
+            dSqrt(velocity[0]*velocity[0]+velocity[2]*velocity[2])<5.*/
                               || fis_zero(linear_vel_smag) || m_elevator_state.ClimbingState()))
         b_lose_control = false;
 
     if (b_jumping && b_good_graund ||
         (m_elevator_state.ClimbingState() &&
-            b_valide_wall_contact))  // b_good_graund=b_valide_ground_contact&&m_ground_contact_normal[1]>M_SQRT1_2
+            b_valide_wall_contact)) // b_good_graund=b_valide_ground_contact&&m_ground_contact_normal[1]>M_SQRT1_2
         b_jumping = false;
 
     // deside if control lost
@@ -660,7 +660,7 @@ void CPHSimpleCharacter::PhTune(dReal step)
     if (b_jump) {
         b_lose_control = true;
         b_depart_control = true;
-        dBodySetLinearVel(m_body, m_jump_accel.x, m_jump_accel.y, m_jump_accel.z);  // vel[1]+
+        dBodySetLinearVel(m_body, m_jump_accel.x, m_jump_accel.y, m_jump_accel.z); // vel[1]+
         // Log("jmp",m_jump_accel);
         dVectorSet(m_jump_depart_position, dBodyGetPosition(m_body));
         // m_jump_accel=m_acceleration;
@@ -687,10 +687,10 @@ void CPHSimpleCharacter::PhTune(dReal step)
         accurate_normalize(sidedir);
         dReal vProj = dDOT(sidedir, chVel);
 
-        dBodyAddForce(m_body, m_control_force[0], m_control_force[1], m_control_force[2]);  //+2.f*9.8f*70.f
-        if (!b_lose_control || b_clamb_jump)                                                //)&&!b_external_impulse
+        dBodyAddForce(m_body, m_control_force[0], m_control_force[1], m_control_force[2]); //+2.f*9.8f*70.f
+        if (!b_lose_control || b_clamb_jump)                                               //)&&!b_external_impulse
             dBodyAddForce(m_body, -sidedir[0] * vProj * (500.f + 200.f * b_clamb_jump) * m_friction_factor,
-                -m.mass * (50.f) * (!b_lose_control && !(is_contact || (b_any_contacts))),  //&&!b_climb
+                -m.mass * (50.f) * (!b_lose_control && !(is_contact || (b_any_contacts))), //&&!b_climb
                 -sidedir[2] * vProj * (500.f + 200.f * b_clamb_jump) * m_friction_factor);
 #ifdef DEBUG
         if (debug_output().ph_dbg_draw_mask().test(phDbgCharacterControl)) {
@@ -717,7 +717,7 @@ void CPHSimpleCharacter::PhTune(dReal step)
 
     if (b_jumping) {
         float air_factor = 1.f;
-        if (b_lose_control && CastActorCharacter())  //
+        if (b_lose_control && CastActorCharacter()) //
             air_factor = 10.f * m_air_control_factor;
 
         dReal proj = m_acceleration.x * chVel[0] + m_acceleration.z * chVel[2];
@@ -728,7 +728,7 @@ void CPHSimpleCharacter::PhTune(dReal step)
         dReal amag = _sqrt(m_acceleration.x * m_acceleration.x + m_acceleration.z * m_acceleration.z);
         if (amag > 0.f)
             if (dif[0] * m_acceleration.x / amag + dif[2] * m_acceleration.z / amag < 0.3f) {
-                Fvector jump_fv = m_acceleration;  //{ m_acceleration.x/amag*1000.f,0,m_acceleration.z/amag*1000.f }
+                Fvector jump_fv = m_acceleration; //{ m_acceleration.x/amag*1000.f,0,m_acceleration.z/amag*1000.f }
                 jump_fv.mul(1000.f / amag * air_factor);
                 dBodyAddForce(m_body, jump_fv.x, 0, jump_fv.z);
             }
@@ -785,7 +785,7 @@ bool CPHSimpleCharacter::ValidateWalkOnObject()
         const dReal* current_pos = dBodyGetPosition(m_body);
         dVector3 dif = {current_pos[0] - m_clamb_depart_position[0], current_pos[1] - m_clamb_depart_position[1],
             current_pos[2] - m_clamb_depart_position[2]};
-        if (  //! b_valide_wall_contact||
+        if ( //! b_valide_wall_contact||
             //(dDOT(dif,dif)>CLAMB_DISTANCE*CLAMB_DISTANCE))	//	(m_wall_contact_normal[1]> M_SQRT1_2) ||
             //]
             dFabs(dif[1]) > CLAMB_DISTANCE)
@@ -798,7 +798,7 @@ bool CPHSimpleCharacter::ValidateWalkOnObject()
     // decide to clamb
     if (!m_elevator_state.Active() && b_valide_wall_contact && (m_contact_count > 1) &&
         (m_wall_contact_normal[1] < M_SQRT1_2) &&
-        !b_side_contact)  //&& dDOT(m_wall_contact_normal,m_ground_contact_normal)<.9f
+        !b_side_contact) //&& dDOT(m_wall_contact_normal,m_ground_contact_normal)<.9f
     {
         // if( dDOT(m_wall_contact_normal,m_ground_contact_normal)<.999999f)
         // dVector3
@@ -811,8 +811,8 @@ bool CPHSimpleCharacter::ValidateWalkOnObject()
     }
 
     if (b_valide_wall_contact && (m_contact_count > 1) && b_clamb_jump)
-        if (dFabs((m_wall_contact_position[0] - m_ground_contact_position[0]) +            //*m_control_force[0]
-                  (m_wall_contact_position[2] - m_ground_contact_position[2])) > 0.05f &&  // 0.01f//*m_control_force[2]
+        if (dFabs((m_wall_contact_position[0] - m_ground_contact_position[0]) +           //*m_control_force[0]
+                  (m_wall_contact_position[2] - m_ground_contact_position[2])) > 0.05f && // 0.01f//*m_control_force[2]
             m_wall_contact_position[1] - m_ground_contact_position[1] > 0.01f)
             dVectorSet(m_clamb_depart_position, dBodyGetPosition(m_body));
     return b_clamb_jump;
@@ -980,7 +980,7 @@ void CPHSimpleCharacter::ApplyAcceleration()
     }
     else
     {
-        if (b_valide_ground_contact && (m_ground_contact_normal[1] > M_SQRT1_2)) {  // M_SQRT1_2//0.8660f
+        if (b_valide_ground_contact && (m_ground_contact_normal[1] > M_SQRT1_2)) { // M_SQRT1_2//0.8660f
             dCROSS(fvdir, =, sidedir, m_ground_contact_normal);
             accurate_normalize(fvdir);
             dVectorAddMul(m_control_force, fvdir, m.mass * pull_force);
@@ -992,7 +992,7 @@ void CPHSimpleCharacter::ApplyAcceleration()
             dVectorAddMul(m_control_force, fvdir, m.mass * pull_force * 1.5f);
         }
     }
-    if (!m_elevator_state.ClimbingState() && b_clamb_jump) {  //&&m_wall_contact_normal[1]<M_SQRT1_2
+    if (!m_elevator_state.ClimbingState() && b_clamb_jump) { //&&m_wall_contact_normal[1]<M_SQRT1_2
         dVectorMul(m_control_force, 4.f);
         m_control_force[1] = dFabs(m_control_force[1]);
         m_control_force[0] = m_control_force[0] * accel[0] >= 0.f ? m_control_force[0] : -m_control_force[0];
@@ -1189,7 +1189,7 @@ void CPHSimpleCharacter::SafeAndLimitVelocity()
     const float* linear_velocity = dBodyGetLinearVel(m_body);
     if (dV_valid(linear_velocity)) {
         dReal mag = _sqrt(linear_velocity[0] * linear_velocity[0] + linear_velocity[1] * linear_velocity[1] +
-                          linear_velocity[2] * linear_velocity[2]);  //;
+                          linear_velocity[2] * linear_velocity[2]); //;
         // limit velocity
         dReal l_limit;
         if (is_control && !b_lose_control)
@@ -1215,12 +1215,12 @@ void CPHSimpleCharacter::SafeAndLimitVelocity()
         }
         ////////////////////////////////////////////////////////////////////////////////////////////
         m_mean_y = m_mean_y * 0.9999f + linear_velocity[1] * 0.0001f;
-        if (mag > l_limit) {  // CutVelocity(m_l_limit,m_w_limit);
+        if (mag > l_limit) { // CutVelocity(m_l_limit,m_w_limit);
             if (!fis_zero(l_limit)) {
                 dReal f = mag / l_limit;
 
                 if (b_lose_ground && linear_velocity[1] < 0.f && linear_velocity[1] > -default_l_limit)
-                    dBodySetLinearVel(m_body, linear_velocity[0] / f, linear_velocity[1], linear_velocity[2] / f);  /// f
+                    dBodySetLinearVel(m_body, linear_velocity[0] / f, linear_velocity[1], linear_velocity[2] / f); /// f
                 else
                     CutVelocity(l_limit, 0.f);
                 // dBodySetLinearVel(m_body,linear_velocity[0]/f,linear_velocity[1]/f,linear_velocity[2]/f);///f
@@ -1347,7 +1347,7 @@ u16 CPHSimpleCharacter::RetriveContactBone()
     Fvector dir;
     m_collision_damage_info.HitDir(dir);
     collide::ray_defs Q(m_collision_damage_info.HitPos(), dir, m_radius, CDB::OPT_ONLYNEAREST | CDB::OPT_CULL,
-        collide::rqtBoth);  // CDB::OPT_ONLYFIRST CDB::OPT_ONLYNEAREST
+        collide::rqtBoth); // CDB::OPT_ONLYFIRST CDB::OPT_ONLYNEAREST
     RQR.r_clear();
     u16 contact_bone = 0;
     //	IGameObject* object		=	smart_cast<IGameObject*>(m_phys_ref_object);
@@ -1377,12 +1377,12 @@ u16 CPHSimpleCharacter::RetriveContactBone()
         Fvector pos_in_object;
         pos_in_object.sub(m_collision_damage_info.HitPos(),
             m_phys_ref_object
-                ->ObjectPosition());  // vector from object center to contact position currently in global frame
+                ->ObjectPosition()); // vector from object center to contact position currently in global frame
         Fmatrix object_form;
         object_form.set(m_phys_ref_object->ObjectXFORM());
         object_form.transpose();
         object_form.transform_dir(
-            pos_in_object);  // project pos_in_object on object axes now it is position of contact in object frame
+            pos_in_object); // project pos_in_object on object axes now it is position of contact in object frame
         float sq_dist = dInfinity;
         for (u16 i = 0; i < count; ++i)
         {
@@ -1482,7 +1482,7 @@ void CPHSimpleCharacter::InitContact(dContact* c, bool& do_collide, u16 material
     ++m_contact_count;
 
     if (bo1) {
-        if (normal[1] > m_ground_contact_normal[1] || !b_valide_ground_contact)  //
+        if (normal[1] > m_ground_contact_normal[1] || !b_valide_ground_contact) //
         {
             dVectorSet(m_ground_contact_normal, normal);
             dVectorSet(m_ground_contact_position, pos);
@@ -1498,24 +1498,24 @@ void CPHSimpleCharacter::InitContact(dContact* c, bool& do_collide, u16 material
     }
     else
     {
-        if (normal[1] < -m_ground_contact_normal[1] || !b_valide_ground_contact)  //
+        if (normal[1] < -m_ground_contact_normal[1] || !b_valide_ground_contact) //
         {
             dVectorSetInvert(m_ground_contact_normal, normal);
             dVectorSet(m_ground_contact_position, pos);
             b_valide_ground_contact = true;
         }
         if (dXZDot(normal, cast_fp(m_acceleration)) > -dXZDot(m_wall_contact_normal, cast_fp(m_acceleration)) ||
-            !b_valide_wall_contact)  //
+            !b_valide_wall_contact) //
         {
             dVectorSetInvert(m_wall_contact_normal, normal);
             dVectorSet(m_wall_contact_position, pos);
             b_valide_wall_contact = true;
         }
     }
-    float soft_param = dumping_rate + normal[1] * (1.f - dumping_rate);  //=(1.f-normal[1])*dumping_rate +normal[1]
-    if (is_control) {                                                    //&&!b_lose_control||b_jumping
+    float soft_param = dumping_rate + normal[1] * (1.f - dumping_rate); //=(1.f-normal[1])*dumping_rate +normal[1]
+    if (is_control) {                                                   //&&!b_lose_control||b_jumping
         if (g1 == m_wheel || g2 == m_wheel && !bClimable) {
-            c->surface.mu = 0.f;  // 0.00f;
+            c->surface.mu = 0.f; // 0.00f;
         }
         else
         {
@@ -1647,7 +1647,7 @@ bool CPHSimpleCharacter::IsInitiated() const
 }
 u16 CPHSimpleCharacter::DamageInitiatorID() const
 {
-    u16 ret = u16(-1);  // m_collision_damage_info.DamageInitiatorID();
+    u16 ret = u16(-1); // m_collision_damage_info.DamageInitiatorID();
 
     IPhysicsShellHolder* object = 0;
     if (m_collision_damage_info.m_obj_id != u16(-1)) {

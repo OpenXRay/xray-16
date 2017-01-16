@@ -13,9 +13,9 @@
 #define _WIN32_WINNT 0x600
 #ifndef _XBOX
 #include <windows.h>
-#else  // #ifndef _XBOX
+#else // #ifndef _XBOX
 #include <xtl.h>
-#endif  // #ifndef _XBOX
+#endif // #ifndef _XBOX
 
 #include <assert.h>
 
@@ -99,7 +99,7 @@ static INLINE LONG interlockedexchange(LONG volatile* data, LONG value)
 static INLINE LONG slwait(volatile LONG* sl)
 {
     while (interlockedexchange(sl, 1) != 0)
-#ifndef FX_SMPBUILD  // Faster not to sleep on multiprocessor machines
+#ifndef FX_SMPBUILD // Faster not to sleep on multiprocessor machines
         Sleep(0)
 #endif
             ;
@@ -131,11 +131,11 @@ static INTERNAL_INTPTR_T getpagesize(void)
         SYSTEM_INFO system_info;
         GetSystemInfo(&system_info);
         g_pagesize = system_info.dwPageSize;
-#elif defined(_XBOX)  // #ifdef WIN32
+#elif defined(_XBOX) // #ifdef WIN32
         g_pagesize = 4096;
-#else                 // #elif defined(_XBOX)
+#else                // #elif defined(_XBOX)
 #error please define your platform
-#endif  // #elif defined(_XBOX)
+#endif // #elif defined(_XBOX)
     }
     return g_pagesize;
 }
@@ -147,11 +147,11 @@ static INTERNAL_INTPTR_T getregionsize(void)
         SYSTEM_INFO system_info;
         GetSystemInfo(&system_info);
         g_regionsize = system_info.dwAllocationGranularity;
-#elif defined(_XBOX)  // #ifdef WIN32
+#elif defined(_XBOX) // #ifdef WIN32
         g_regionsize = 64 * 1024;
-#else                 // #elif defined(_XBOX)
+#else                // #elif defined(_XBOX)
 #error please define your platform
-#endif  // #elif defined(_XBOX)
+#endif // #elif defined(_XBOX)
     }
     return g_regionsize;
 }
@@ -455,13 +455,13 @@ sbrk_exit:
     slrelease (&g_sl);
     return result;
 }
-#endif  // #if 0
+#endif // #if 0
 
 //#define USE_PTMALLOC3_ARENA
 
 #ifdef USE_PTMALLOC3_ARENA
 #include "virtual_alloc.h"
-#endif  // #ifdef USE_PTMALLOC3_ARENA
+#endif // #ifdef USE_PTMALLOC3_ARENA
 
 #pragma warning(disable : 4100)
 #pragma warning(disable : 4127)
@@ -554,13 +554,13 @@ mmap_exit:
     /* Release spin lock */
     slrelease(&g_sl);
     return ptr;
-#else   // #ifndef USE_PTMALLOC3_ARENA
+#else  // #ifndef USE_PTMALLOC3_ARENA
     void* result;
     slwait(&g_sl);
     result = virtual_alloc(&g_ptmalloc3_arena, (unsigned int)size);
     slrelease(&g_sl);
     return (result);
-#endif  // #ifndef USE_PTMALLOC3_ARENA
+#endif // #ifndef USE_PTMALLOC3_ARENA
 }
 
 /* munmap for windows */
@@ -592,12 +592,12 @@ munmap_exit:
     /* Release spin lock */
     /* slrelease (&g_sl); */
     return rc;
-#else   // #ifndef USE_PTMALLOC3_ARENA
+#else  // #ifndef USE_PTMALLOC3_ARENA
     slwait(&g_sl);
     virtual_free(&g_ptmalloc3_arena, ptr, size);
     slrelease(&g_sl);
     return (0);
-#endif  // #ifndef USE_PTMALLOC3_ARENA
+#endif // #ifndef USE_PTMALLOC3_ARENA
 }
 
 #if 0
@@ -725,6 +725,6 @@ static int cpuinfo (int whole, INTERNAL_SIZE_T  *kernel, INTERNAL_SIZE_T  *user)
         return TRUE;
     }
 }
-#endif  // #if 0
+#endif // #if 0
 
 #endif /* WIN32 */

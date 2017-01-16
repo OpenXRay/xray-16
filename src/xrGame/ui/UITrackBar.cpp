@@ -92,7 +92,7 @@ void CUITrackBar::InitTrackBar(Fvector2 pos, Fvector2 size)
     item_width *= UI().get_current_kx();
 
     m_pSlider->InitButton(
-        Fvector2().set(0.0f, 0.0f) /*(size.y - item_height)/2.0f)*/, Fvector2().set(item_width, item_height));  // size
+        Fvector2().set(0.0f, 0.0f) /*(size.y - item_height)/2.0f)*/, Fvector2().set(item_width, item_height)); // size
     m_pSlider->InitTexture("ui_inGame2_opt_slider_box");
 
     SetCurrentState(S_Enabled);

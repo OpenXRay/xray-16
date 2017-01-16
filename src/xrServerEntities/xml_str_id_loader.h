@@ -2,10 +2,10 @@
 
 #ifdef XRGAME_EXPORTS
 #include "ui/xrUIXmlParser.h"
-#else  // XRGAME_EXPORTS
-#include "xrUIXmlParser.h"
+#else // XRGAME_EXPORTS
 #include "Common/object_broker.h"
-#endif  // XRGAME_EXPORTS
+#include "xrUIXmlParser.h"
+#endif // XRGAME_EXPORTS
 
 // T_ID    - уникальный текстовый идентификатор (аттрибут id в XML файле)
 // T_INDEX - уникальный числовой индекс

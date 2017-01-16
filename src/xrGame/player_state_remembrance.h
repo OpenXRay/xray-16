@@ -25,12 +25,12 @@ public:
 protected:
     static int const max_kill_dist = 5;
     bool m_is_remembrance;
-};  // class player_state_remembrance
+}; // class player_state_remembrance
 
 ADD_ACCUMULATIVE_STATE(acpv_remembrance, player_state_remembrance);
 #undef ACCUMULATIVE_STATE_LIST
 #define ACCUMULATIVE_STATE_LIST SAVE_TYPE_LIST(acpv_remembrance, player_state_remembrance)
 
-}  // namespace award_system
+} // namespace award_system
 
-#endif  //#ifndef PLAYER_STATE_REMEMBRANCE
+#endif //#ifndef PLAYER_STATE_REMEMBRANCE

@@ -657,7 +657,7 @@ void dx103DFluidRenderer::Draw(const dx103DFluidData& FluidData)
     HW.pContext->ClearRenderTargetView(RT[RRT_RayCastTex]->pRT, color);
     // m_pD3DDevice->OMSetRenderTargets( 1, &pRayCastRTV , NULL );
     CRenderTarget* pTarget = RImplementation.Target;
-    pTarget->u_setrt(RT[RRT_RayCastTex], 0, 0, 0);  // LDR RT
+    pTarget->u_setrt(RT[RRT_RayCastTex], 0, 0, 0); // LDR RT
 
     // rtViewport.Width = renderTextureWidth;
     // rtViewport.Height = renderTextureHeight;
@@ -687,9 +687,9 @@ void dx103DFluidRenderer::Draw(const dx103DFluidData& FluidData)
     // m_pD3DDevice->OMSetRenderTargets( 1, &pRTV , pDSV );
     //	Restore render state
     if (!RImplementation.o.dx10_msaa)
-        pTarget->u_setrt(pTarget->rt_Generic_0, 0, 0, HW.pBaseZB);  // LDR RT
+        pTarget->u_setrt(pTarget->rt_Generic_0, 0, 0, HW.pBaseZB); // LDR RT
     else
-        pTarget->u_setrt(pTarget->rt_Generic_0_r, 0, 0, pTarget->rt_MSAADepth->pZRT);  // LDR RT
+        pTarget->u_setrt(pTarget->rt_Generic_0_r, 0, 0, pTarget->rt_MSAADepth->pZRT); // LDR RT
 
     if (bRenderFire)
         RCache.set_Element(m_RendererTechnique[RS_QuadRaycastCopyFire]);
@@ -724,7 +724,7 @@ void dx103DFluidRenderer::ComputeRayData()
     HW.pContext->ClearRenderTargetView(RT[RRT_RayDataTex]->pRT, blackColor);
     // m_pD3DDevice->OMSetRenderTargets(1, &pRayDataRTV, NULL);
     CRenderTarget* pTarget = RImplementation.Target;
-    pTarget->u_setrt(RT[RRT_RayDataTex], 0, 0, 0);  // LDR RT
+    pTarget->u_setrt(RT[RRT_RayDataTex], 0, 0, 0); // LDR RT
     // pEffect->GetVariableByName("sceneDepthTex")->AsShaderResource()->SetResource(g_pSceneDepthSRV);
     RCache.set_Element(m_RendererTechnique[RS_CompRayData_Back]);
 
@@ -752,7 +752,7 @@ void dx103DFluidRenderer::ComputeRayData()
     // We output xyz="position in grid space" and w=boxDepth,
     //  unless the pixel is occluded by the scene, in which case we output xyzw=(1,0,0,0)
     // m_pD3DDevice->OMSetRenderTargets(1, &pRayDataRTV, NULL);
-    pTarget->u_setrt(RT[RRT_RayDataTex], 0, 0, 0);  // LDR RT
+    pTarget->u_setrt(RT[RRT_RayDataTex], 0, 0, 0); // LDR RT
     RCache.set_Element(m_RendererTechnique[RS_CompRayData_Front]);
     // pTechnique->GetPassByName("CompRayData_Front")->Apply(0);
     DrawBox();
@@ -761,7 +761,7 @@ void dx103DFluidRenderer::ComputeRayData()
 void dx103DFluidRenderer::ComputeEdgeTexture()
 {
     CRenderTarget* pTarget = RImplementation.Target;
-    pTarget->u_setrt(RT[RRT_RayDataTexSmall], 0, 0, 0);  // LDR RT
+    pTarget->u_setrt(RT[RRT_RayDataTexSmall], 0, 0, 0); // LDR RT
     RCache.set_Element(m_RendererTechnique[RS_QuadDownSampleRayDataTexture]);
 
     // First setup viewport to match the size of the destination low-res texture
@@ -786,7 +786,7 @@ void dx103DFluidRenderer::ComputeEdgeTexture()
     DrawScreenQuad();
 
     // Create an edge texture, performing edge detection on 'rayDataTexSmall'
-    pTarget->u_setrt(RT[RRT_EdgeTex], 0, 0, 0);  // LDR RT
+    pTarget->u_setrt(RT[RRT_EdgeTex], 0, 0, 0); // LDR RT
     RCache.set_Element(m_RendererTechnique[RS_QuadEdgeDetect]);
     // m_pD3DDevice->OMSetRenderTargets( 1, &pEdgeRTV , NULL );
     // pRayDataSmallVar->SetResource(pRayDataSmallSRV);
@@ -848,7 +848,7 @@ void dx103DFluidRenderer::CalculateLighting(const dx103DFluidData& FluidData, Fo
 
     // Traverse object database
     g_SpatialSpace->q_box(m_lstRenderables,
-        0,  // ISpatial_DB::O_ORDERED,
+        0, // ISpatial_DB::O_ORDERED,
         STYPE_LIGHTSOURCE, center, size);
 
     u32 iNumRenderables = m_lstRenderables.size();

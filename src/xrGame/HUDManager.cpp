@@ -26,9 +26,9 @@ CFontManager::CFontManager()
 {
     Device.seqDeviceReset.Add(this, REG_PRIORITY_HIGH);
 
-    m_all_fonts.push_back(&pFontMedium);   // used cpp
-    m_all_fonts.push_back(&pFontDI);       // used cpp
-    m_all_fonts.push_back(&pFontArial14);  // used xml
+    m_all_fonts.push_back(&pFontMedium);  // used cpp
+    m_all_fonts.push_back(&pFontDI);      // used cpp
+    m_all_fonts.push_back(&pFontArial14); // used xml
     m_all_fonts.push_back(&pFontGraffiti19Russian);
     m_all_fonts.push_back(&pFontGraffiti22Russian);
     m_all_fonts.push_back(&pFontLetterica16Russian);
@@ -65,7 +65,7 @@ void CFontManager::InitializeFonts()
 LPCSTR CFontManager::GetFontTexName(LPCSTR section)
 {
     static char* tex_names[] = {"texture800", "texture", "texture1600"};
-    int def_idx = 1;  // default 1024x768
+    int def_idx = 1; // default 1024x768
     int idx = def_idx;
 #if 0
 	u32 w = Device.dwWidth;

@@ -20,7 +20,7 @@ public:
     virtual u32 const get_u32_param();
     virtual float const get_float_param() { return 0.0f; };
     virtual void reset_game(){};
-};  // class player_spots_counter
+}; // class player_spots_counter
 
 ADD_ACCUMULATIVE_STATE(acpv_spots, player_spots_counter);
 #undef ACCUMULATIVE_STATE_LIST
@@ -38,12 +38,12 @@ public:
 
 private:
     u32 const get_top_enemy_player_score();
-};  // player_spots_with_top_enemy_divider
+}; // player_spots_with_top_enemy_divider
 
 ADD_ACCUMULATIVE_STATE(acpv_enemy_top_player_div, player_spots_with_top_enemy_divider);
 #undef ACCUMULATIVE_STATE_LIST
 #define ACCUMULATIVE_STATE_LIST SAVE_TYPE_LIST(acpv_enemy_top_player_div, player_spots_with_top_enemy_divider)
 
-}  // namespace award_system
+} // namespace award_system
 
-#endif  //#ifndef PLAYER_SPOT_PARAMS_INCLUDED
+#endif //#ifndef PLAYER_SPOT_PARAMS_INCLUDED

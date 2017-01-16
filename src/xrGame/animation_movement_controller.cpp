@@ -118,7 +118,7 @@ void animation_movement_controller::GetInitalPositionBlenSpeed()
 
 bool animation_movement_controller::IsBlending() const
 {
-    return is_blending_in(*m_control_blend);  // inital_position_blending ||
+    return is_blending_in(*m_control_blend); // inital_position_blending ||
 }
 float blend_linear_accel = 1.f;
 float blend_angular_accel = 1.f;
@@ -308,7 +308,7 @@ anim: %s anim set: %s",
     else if (local_animation)
     {
         float blend_time = m_control_blend->timeCurrent;
-        m_control_blend->timeCurrent = m_control_blend->timeTotal - SAMPLE_SPF;  //(SAMPLE_SPF+EPS);
+        m_control_blend->timeCurrent = m_control_blend->timeTotal - SAMPLE_SPF; //(SAMPLE_SPF+EPS);
         Fmatrix root;
         animation_root_position(root);
         m_startObjXForm.mulB_43(root);
@@ -401,10 +401,10 @@ float change_pos_delta = 0.02f;
 //	float sq_diff = Fvector().sub( m_pObjXForm.c,m_update_vis_pos).magnitude();
 //
 //	float change_pos_sq_delta = change_pos_delta * change_pos_delta * (( Device.fTimeDelta/0.01f )*(
-//Device.fTimeDelta/0.01f ));
+// Device.fTimeDelta/0.01f ));
 //
 //	if(  pos_sq_delta > change_pos_sq_delta || sphere.P.square_magnitude() + change_pos_sq_delta + pos_sq_delta >
-//sphere.R*sphere.R )
+// sphere.R*sphere.R )
 //	{
 //		m_update_vis_pos = m_pObjXForm.c;
 //		m_pKinematicsC->LL_VisBoxInvalidate();

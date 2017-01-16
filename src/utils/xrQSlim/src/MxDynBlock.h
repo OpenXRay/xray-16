@@ -1,4 +1,4 @@
-#ifndef MXDYNBLOCK_INCLUDED  // -*- C++ -*-
+#ifndef MXDYNBLOCK_INCLUDED // -*- C++ -*-
 #define MXDYNBLOCK_INCLUDED
 #if !defined(__GNUC__)
 #pragma once

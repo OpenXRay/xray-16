@@ -230,9 +230,9 @@ BOOL CSoundStream::Decompress(unsigned char* dest)
 
 //--------------------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------------------
-void CSoundStream::AppWriteDataToBuffer(u32 dwOffset,  // our own write cursor
-    LPBYTE lpbSoundData,                               // start of our data
-    u32 dwSoundBytes)                                  // size of block to copy
+void CSoundStream::AppWriteDataToBuffer(u32 dwOffset, // our own write cursor
+    LPBYTE lpbSoundData,                              // start of our data
+    u32 dwSoundBytes)                                 // size of block to copy
 {
     LPVOID lpvPtr1, lpvPtr2;
     DWORD dwBytes1;
@@ -257,7 +257,7 @@ BOOL ADPCMCreateSoundBuffer(IDirectSound8* lpDS, IDirectSoundBuffer** pDSB, WAVE
     DSBUFFERDESC dsBD;
 
     // Set up DSBUFFERDESC structure.
-    ZeroMemory(&dsBD, sizeof(DSBUFFERDESC));  // Zero it out.
+    ZeroMemory(&dsBD, sizeof(DSBUFFERDESC)); // Zero it out.
     dsBD.dwSize = sizeof(DSBUFFERDESC);
     dsBD.dwFlags = DSBCAPS_CTRLVOLUME | DSBCAPS_GETCURRENTPOSITION2 | DSBCAPS_LOCSOFTWARE;
 

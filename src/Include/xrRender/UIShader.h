@@ -12,4 +12,4 @@ public:
     virtual void destroy() = 0;
 };
 
-#endif  //	UIShader_included
+#endif //	UIShader_included

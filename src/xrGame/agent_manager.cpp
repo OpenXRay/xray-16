@@ -28,7 +28,7 @@ CAgentManager::~CAgentManager()
     VERIFY(member().members().empty());
 #ifdef USE_SCHEDULER_IN_AGENT_MANAGER
     remove_scheduler();
-#endif  // USE_SCHEDULER_IN_AGENT_MANAGER
+#endif // USE_SCHEDULER_IN_AGENT_MANAGER
     remove_components();
 }
 
@@ -38,10 +38,10 @@ void CAgentManager::init_scheduler()
     shedule.t_min = 1000;
     shedule.t_max = 1000;
     shedule_register();
-#else   // USE_SCHEDULER_IN_AGENT_MANAGER
+#else  // USE_SCHEDULER_IN_AGENT_MANAGER
     m_last_update_time = 0;
     m_update_rate = 1000;
-#endif  // USE_SCHEDULER_IN_AGENT_MANAGER
+#endif // USE_SCHEDULER_IN_AGENT_MANAGER
 }
 
 void CAgentManager::init_components()
@@ -61,7 +61,7 @@ void CAgentManager::remove_scheduler()
 {
     shedule_unregister();
 }
-#endif  // USE_SCHEDULER_IN_AGENT_MANAGER
+#endif // USE_SCHEDULER_IN_AGENT_MANAGER
 
 void CAgentManager::remove_components()
 {
@@ -115,7 +115,7 @@ float CAgentManager::shedule_Scale()
     return (.5f);
 }
 
-#else  // USE_SCHEDULER_IN_AGENT_MANAGER
+#else // USE_SCHEDULER_IN_AGENT_MANAGER
 
 void CAgentManager::update()
 {
@@ -127,4 +127,4 @@ void CAgentManager::update()
     update_impl();
 }
 
-#endif  // USE_SCHEDULER_IN_AGENT_MANAGER
+#endif // USE_SCHEDULER_IN_AGENT_MANAGER

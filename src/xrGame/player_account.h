@@ -29,6 +29,6 @@ protected:
     bool m_online_account;
 
     gamespy_profile::all_awards_t m_awards;
-};  // class player_account
+}; // class player_account
 
-#endif  //#ifndef PLAYER_ACCOUNT_H
+#endif //#ifndef PLAYER_ACCOUNT_H

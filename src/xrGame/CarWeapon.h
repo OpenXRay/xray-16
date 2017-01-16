@@ -61,7 +61,7 @@ private:
     Fvector m_fire_dir, m_fire_pos, m_fire_norm;
 
     Fmatrix m_i_bind_x_xform, m_i_bind_y_xform, m_fire_bone_xform;
-    Fvector2 m_lim_x_rot, m_lim_y_rot;  // in bone space
+    Fvector2 m_lim_x_rot, m_lim_y_rot; // in bone space
     float m_min_gun_speed, m_max_gun_speed;
     CCartridge* m_Ammo;
     float m_barrel_speed;

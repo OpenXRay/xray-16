@@ -79,7 +79,7 @@ void CLevel::ClientReceive()
         {
         case M_SPAWN:
         {
-            if (!bReady)  //! m_bGameConfigStarted ||
+            if (!bReady) //! m_bGameConfigStarted ||
             {
                 Msg("! Unconventional M_SPAWN received : map_data[%s] | bReady[%s] | deny_m_spawn[%s]",
                     (map_data.m_map_sync_received) ? "true" : "false", (bReady) ? "true" : "false",
@@ -240,18 +240,18 @@ void CLevel::ClientReceive()
         case M_SV_CONFIG_FINISHED: { game_configured = TRUE;
 #ifdef DEBUG
             Msg("- Game configuring : Finished ");
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
             if (IsDemoPlayStarted() && !m_current_spectator) {
                 SpawnDemoSpectator();
             }
         }
         break;
-        case M_MIGRATE_DEACTIVATE:  // TO:   Changing server, just deactivate
+        case M_MIGRATE_DEACTIVATE: // TO:   Changing server, just deactivate
         {
             NODEFAULT;
         }
         break;
-        case M_MIGRATE_ACTIVATE:  // TO:   Changing server, full state
+        case M_MIGRATE_ACTIVATE: // TO:   Changing server, full state
         {
             NODEFAULT;
         }
@@ -285,7 +285,7 @@ void CLevel::ClientReceive()
         case M_CHANGE_LEVEL: {
 #ifdef DEBUG
             Msg("--- Changing level message received...");
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
             if (m_type == M_LOAD_GAME) {
                 string256 saved_name;
                 P->r_stringZ_s(saved_name);
@@ -419,7 +419,7 @@ void CLevel::ClientReceive()
             if (g_bDebugEvents) ProcessGameEvents();
         }
         break;
-        case M_STATISTIC_UPDATE_RESPOND:  // deprecated, see  xrServer::OnMessage
+        case M_STATISTIC_UPDATE_RESPOND: // deprecated, see  xrServer::OnMessage
         {
             /*Msg("--- CL: On Update Respond");
             if (!game) break;

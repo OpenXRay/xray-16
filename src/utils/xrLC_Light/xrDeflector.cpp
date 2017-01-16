@@ -178,7 +178,7 @@ void CDeflector::OA_Export()
     {
         UVtri* T = &*it;
         Face* F = T->owner;
-        Fvector P;  // projected
+        Fvector P; // projected
 
         for (int i = 0; i < 3; i++)
         {

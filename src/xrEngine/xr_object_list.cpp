@@ -112,7 +112,7 @@ void CObjectList::SingleUpdate(IGameObject* O)
 // if (O->getDestroy())
 // Msg ("- !!!processing_enabled ->destroy_queue.push_back %s[%d] frame [%d]",O->cName().c_str(), O->ID(),
 // Device.dwFrame);
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 
         return;
     }
@@ -122,7 +122,7 @@ void CObjectList::SingleUpdate(IGameObject* O)
 // if (O->getDestroy())
 // Msg ("- !!!processing_enabled ->destroy_queue.push_back %s[%d] frame [%d]",O->cName().c_str(), O->ID(),
 // Device.dwFrame);
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 
         return;
     }
@@ -136,7 +136,7 @@ void CObjectList::SingleUpdate(IGameObject* O)
     O->UpdateCL();
 
     VERIFY3(O->GetDbgUpdateFrame() == Device.dwFrame, "Broken sequence of calls to 'UpdateCL'", *O->cName());
-#if 0  // ndef DEBUG
+#if 0 // ndef DEBUG
     __try
     {
 #endif
@@ -145,7 +145,7 @@ void CObjectList::SingleUpdate(IGameObject* O)
         Msg("! ERROR: incorrect destroy sequence for object[%d:%s], section[%s], parent[%d:%s]", O->ID(), *O->cName(),
             *O->cNameSect(), O->H_Parent()->ID(), *O->H_Parent()->cName());
     }
-#if 0  // ndef DEBUG
+#if 0 // ndef DEBUG
     }
     __except (EXCEPTION_EXECUTE_HANDLER)
     {
@@ -189,7 +189,7 @@ void CObjectList::SingleUpdate(IGameObject* O)
 // if (O->getDestroy())
 // Msg ("- !!!processing_enabled ->destroy_queue.push_back %s[%d] frame [%d]",O->cName().c_str(), O->ID(),
 // Device.dwFrame);
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 }
 
 void CObjectList::clear_crow_vec(Objects& o)
@@ -235,7 +235,7 @@ void CObjectList::Update(bool bForce)
 #ifdef DEBUG
             std::sort(crows.begin(), crows.end());
             VERIFY(std::unique(crows.begin(), crows.end()) == crows.end());
-#endif  // ifdef DEBUG
+#endif // ifdef DEBUG
 #endif
 
             stats.Crows = crows.size();
@@ -311,7 +311,7 @@ void CObjectList::Update(bool bForce)
             if (debug_destroy)
                 Msg("Destroying object[%x][%x] [%d][%s] frame[%d]", dynamic_cast<void*>(O), O, O->ID(), *O->cName(),
                     Device.dwFrame);
-#endif  // DEBUG
+#endif // DEBUG
             O->net_Destroy();
             Destroy(O);
         }
@@ -332,7 +332,7 @@ void CObjectList::net_Register(IGameObject* O)
 void CObjectList::net_Unregister(IGameObject* O)
 {
     // R_ASSERT (O->ID() < 0xffff);
-    if (O->ID() < 0xffff)  // demo_spectator can have 0xffff
+    if (O->ID() < 0xffff) // demo_spectator can have 0xffff
         map_NETID[O->ID()] = NULL;
     /*
      xr_map<u32,IGameObject*>::iterator it = map_NETID.find(O->ID());
@@ -544,7 +544,7 @@ void CObjectList::dump_list(Objects& v, LPCSTR reason)
     for (; it != it_e; ++it)
         Msg("%x - name [%s] ID[%d] parent[%s] getDestroy()=[%s]", (*it), (*it)->cName().c_str(), (*it)->ID(),
             ((*it)->H_Parent()) ? (*it)->H_Parent()->cName().c_str() : "", ((*it)->getDestroy()) ? "yes" : "no");
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 }
 
 bool CObjectList::dump_all_objects()
@@ -593,4 +593,4 @@ bool CObjectList::registered_object_to_destroy(const IGameObject* object_to_dest
 {
     return (std::find(destroy_queue.begin(), destroy_queue.end(), object_to_destroy) != destroy_queue.end());
 }
-#endif  // DEBUG
+#endif // DEBUG

@@ -12,4 +12,4 @@ public:
     virtual void DestroyModel() = 0;
 };
 
-#endif  //	ThunderboltDescRender_included
+#endif //	ThunderboltDescRender_included

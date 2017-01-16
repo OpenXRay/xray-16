@@ -10,7 +10,7 @@
 
 struct EmptyVertexData
 {
-    template <typename TCompoundVertex>  // result mixin type
+    template <typename TCompoundVertex> // result mixin type
     struct VertexData
     {
     };
@@ -21,10 +21,10 @@ struct CompoundVertex : Components::template VertexData<CompoundVertex<Component
 {
 };
 
-template <typename TPriorityQueuee,  // CDataStorageBucketList|CDataStorageBinaryHeap
-    typename TVertexManager,         // CVertexManagerFixed|CVertexManagerHashFixed
-    typename TPathBuilder,           // CEdgePath|CVertexPath
-    typename TVertexAllocator,       // CVertexAllocatorFixed
+template <typename TPriorityQueuee, // CDataStorageBucketList|CDataStorageBinaryHeap
+    typename TVertexManager,        // CVertexManagerFixed|CVertexManagerHashFixed
+    typename TPathBuilder,          // CEdgePath|CVertexPath
+    typename TVertexAllocator,      // CVertexAllocatorFixed
     typename TCompoundVertex,
     typename TManagerDataStorage =
         typename TVertexManager::template CDataStorage<TPathBuilder, TVertexAllocator, TCompoundVertex>,

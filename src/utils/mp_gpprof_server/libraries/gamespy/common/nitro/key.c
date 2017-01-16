@@ -1,8 +1,8 @@
 #include "key.h"
 #include "..\nonport.h"
 
-#define KEY_REPEAT_START 25  // Number of frames before start of key repeat
-#define KEY_REPEAT_SPAN 10   // Number of frames of key repeat interval
+#define KEY_REPEAT_START 25 // Number of frames before start of key repeat
+#define KEY_REPEAT_SPAN 10  // Number of frames of key repeat interval
 
 static KeyInformation KeyInfo;
 
@@ -27,13 +27,13 @@ const KeyInformation* KeyRead(void)
     {
         if (r & (0x0001 << i)) {
             if (!(KeyInfo.cnt & (0x0001 << i))) {
-                KeyInfo.trg |= (0x0001 << i);  // Pressing trigger input
+                KeyInfo.trg |= (0x0001 << i); // Pressing trigger input
                 repeat_count[i] = 1;
             }
             else
             {
                 if (repeat_count[i] > KEY_REPEAT_START) {
-                    KeyInfo.rep |= (0x0001 << i);  // Pressing hold repeat
+                    KeyInfo.rep |= (0x0001 << i); // Pressing hold repeat
                     repeat_count[i] = KEY_REPEAT_START - KEY_REPEAT_SPAN;
                 }
                 else
@@ -45,11 +45,11 @@ const KeyInformation* KeyRead(void)
         else
         {
             if (KeyInfo.cnt & (0x0001 << i)) {
-                KeyInfo.up |= (0x0001 << i);  // Releasing trigger input
+                KeyInfo.up |= (0x0001 << i); // Releasing trigger input
             }
         }
     }
-    KeyInfo.cnt = r;  // Unprocessed key input
+    KeyInfo.cnt = r; // Unprocessed key input
 
     return &KeyInfo;
 }

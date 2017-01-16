@@ -13,7 +13,7 @@
 #include "script_engine.hpp"
 #include "script_thread.hpp"
 
-string4096 g_ca_stdout;  // XXX: allocate dynamically for each CScriptEngine instance
+string4096 g_ca_stdout; // XXX: allocate dynamically for each CScriptEngine instance
 
 CScriptProcess::CScriptProcess(CScriptEngine* scriptEngine, shared_str name, shared_str scripts)
 {
@@ -71,7 +71,7 @@ void CScriptProcess::update()
     if (!m_scripts[_id]->update()) {
         xr_delete(m_scripts[_id]);
         m_scripts.erase(m_scripts.begin() + _id);
-        --m_iterator;  // try to avoid skipping
+        --m_iterator; // try to avoid skipping
     }
     if (g_ca_stdout[0]) {
         fputc(0, stderr);

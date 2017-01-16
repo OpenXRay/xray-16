@@ -86,8 +86,8 @@ void ui_actor_state_wnd::UpdateActorInfo(CInventoryOwner* owner)
     float value = 0.0f;
 
     value = actor->conditions().GetHealth();
-    value = floor(value * 55) / 55;  // number of sticks in progress bar
-                                     // show bleeding icon
+    value = floor(value * 55) / 55; // number of sticks in progress bar
+                                    // show bleeding icon
     m_state[stt_health]->set_progress(value);
     value = actor->conditions().BleedingSpeed();
     m_state[stt_bleeding]->show_static(false, 1);
@@ -182,55 +182,55 @@ void ui_actor_state_wnd::UpdateActorInfo(CInventoryOwner* owner)
     {
         burn_value += actor->GetProtection_ArtefactsOnBelt(ALife::eHitTypeBurn);
         float max_power = actor->conditions().GetZoneMaxPower(ALife::eHitTypeBurn);
-        burn_value = floor(burn_value / max_power * 31) / 31;  // number of sticks in progress bar
-        m_state[stt_fire]->set_progress(burn_value);           // 0..1
+        burn_value = floor(burn_value / max_power * 31) / 31; // number of sticks in progress bar
+        m_state[stt_fire]->set_progress(burn_value);          // 0..1
     }
     // radiation protection progress bar
     {
         radi_value += actor->GetProtection_ArtefactsOnBelt(ALife::eHitTypeRadiation);
         float max_power = actor->conditions().GetZoneMaxPower(ALife::eHitTypeRadiation);
-        radi_value = floor(radi_value / max_power * 31) / 31;  // number of sticks in progress bar
-        m_state[stt_radia]->set_progress(radi_value);          // 0..1
+        radi_value = floor(radi_value / max_power * 31) / 31; // number of sticks in progress bar
+        m_state[stt_radia]->set_progress(radi_value);         // 0..1
     }
     // chemical burn protection progress bar
     {
         cmbn_value += actor->GetProtection_ArtefactsOnBelt(ALife::eHitTypeChemicalBurn);
         float max_power = actor->conditions().GetZoneMaxPower(ALife::eHitTypeChemicalBurn);
-        cmbn_value = floor(cmbn_value / max_power * 31) / 31;  // number of sticks in progress bar
-        m_state[stt_acid]->set_progress(cmbn_value);           // 0..1
+        cmbn_value = floor(cmbn_value / max_power * 31) / 31; // number of sticks in progress bar
+        m_state[stt_acid]->set_progress(cmbn_value);          // 0..1
     }
     // telepatic protection progress bar
     {
         tele_value += actor->GetProtection_ArtefactsOnBelt(ALife::eHitTypeTelepatic);
         float max_power = actor->conditions().GetZoneMaxPower(ALife::eHitTypeTelepatic);
-        tele_value = floor(tele_value / max_power * 31) / 31;  // number of sticks in progress bar
-        m_state[stt_psi]->set_progress(tele_value);            // 0..1
+        tele_value = floor(tele_value / max_power * 31) / 31; // number of sticks in progress bar
+        m_state[stt_psi]->set_progress(tele_value);           // 0..1
     }
     // wound protection progress bar
     {
         float max_power = actor->conditions().GetMaxWoundProtection();
-        woun_value = floor(woun_value / max_power * 31) / 31;  // number of sticks in progress bar
-        m_state[stt_wound]->set_progress(woun_value);          // 0..1
+        woun_value = floor(woun_value / max_power * 31) / 31; // number of sticks in progress bar
+        m_state[stt_wound]->set_progress(woun_value);         // 0..1
     }
     // shock protection progress bar
     {
         shoc_value += actor->GetProtection_ArtefactsOnBelt(ALife::eHitTypeShock);
         float max_power = actor->conditions().GetZoneMaxPower(ALife::eHitTypeShock);
-        shoc_value = floor(shoc_value / max_power * 31) / 31;  // number of sticks in progress bar
-        m_state[stt_shock]->set_progress(shoc_value);          // 0..1
+        shoc_value = floor(shoc_value / max_power * 31) / 31; // number of sticks in progress bar
+        m_state[stt_shock]->set_progress(shoc_value);         // 0..1
     }
     // fire wound protection progress bar
     {
         float max_power = actor->conditions().GetMaxFireWoundProtection();
-        fwou_value = floor(fwou_value / max_power * 31) / 31;  // number of sticks in progress bar
+        fwou_value = floor(fwou_value / max_power * 31) / 31; // number of sticks in progress bar
         m_state[stt_fire_wound]->set_progress(fwou_value);
     }
     // power restore speed progress bar
     {
         value = actor->GetRestoreSpeed(ALife::ePowerRestoreSpeed) / actor->conditions().GetMaxPowerRestoreSpeed();
         ;
-        value = floor(value * 31) / 31;           // number of sticks in progress bar
-        m_state[stt_power]->set_progress(value);  // 0..1
+        value = floor(value * 31) / 31;          // number of sticks in progress bar
+        m_state[stt_power]->set_progress(value); // 0..1
     }
     // -----------------------------------------------------------------------------------
 
@@ -247,15 +247,15 @@ void ui_actor_state_wnd::update_round_states(CActor* actor, ALife::EHitType hit_
     value += helmet ? helmet->GetDefHitTypeProtection(ALife::eHitTypeShock) : 0.0f;
 
     float max_power = actor->conditions().GetZoneMaxPower(hit_type);
-    value = value / max_power;  //  = 0..1
+    value = value / max_power; //  = 0..1
     //	m_state[stt_type]->set_progress_shape( value );
-    m_state[stt_type]->set_arrow(value);  // 0..1
-    m_state[stt_type]->set_text(value);   // 0..1
+    m_state[stt_type]->set_arrow(value); // 0..1
+    m_state[stt_type]->set_text(value);  // 0..1
 }
 
 void ui_actor_state_wnd::UpdateHitZone()
 {
-    CUIHudStatesWnd* wnd = CurrentGameUI()->UIMainIngameWnd->get_hud_states();  //некрасиво слишком
+    CUIHudStatesWnd* wnd = CurrentGameUI()->UIMainIngameWnd->get_hud_states(); //некрасиво слишком
     VERIFY(wnd);
     if (!wnd) {
         return;
@@ -344,7 +344,7 @@ void ui_actor_state_item::set_text(float value)
     if (!m_static) {
         return;
     }
-    int v = (int)(value * m_magnitude + 0.49f);  // m_magnitude=100
+    int v = (int)(value * m_magnitude + 0.49f); // m_magnitude=100
     clamp(v, 0, 99);
     string32 text_res;
     xr_sprintf(text_res, sizeof(text_res), "%d", v);

@@ -1,4 +1,4 @@
-#ifndef MXBLOCK2_INCLUDED  // -*- C++ -*-
+#ifndef MXBLOCK2_INCLUDED // -*- C++ -*-
 #define MXBLOCK2_INCLUDED
 #if !defined(__GNUC__)
 #pragma once

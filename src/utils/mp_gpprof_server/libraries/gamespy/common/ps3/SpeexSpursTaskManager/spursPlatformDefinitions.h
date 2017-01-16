@@ -8,6 +8,6 @@
 
 #include <stdint.h>
 #include <stdlib.h>
-#include <string.h>  //for memcpy
+#include <string.h> //for memcpy
 
-#endif  // TYPE_DEFINITIONS_H
+#endif // TYPE_DEFINITIONS_H

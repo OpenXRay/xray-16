@@ -12,7 +12,7 @@ struct L_point
 };
 struct L_rect
 {
-    L_point a, b;  // min,max
+    L_point a, b; // min,max
     int iArea;
 
     IC void set(L_rect& R)

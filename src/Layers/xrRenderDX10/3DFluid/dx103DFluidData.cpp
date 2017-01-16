@@ -12,9 +12,9 @@ const xr_token emitter_type_token[] = {{"SimpleGaussian", dx103DFluidEmitters::E
 }
 
 DXGI_FORMAT dx103DFluidData::m_VPRenderTargetFormats[VP_NUM_TARGETS] = {
-    DXGI_FORMAT_R16G16B16A16_FLOAT,  //	VP_VELOCITY0
-    DXGI_FORMAT_R16_FLOAT,           //	VP_PRESSURE
-    DXGI_FORMAT_R16_FLOAT            //	VP_COLOR
+    DXGI_FORMAT_R16G16B16A16_FLOAT, //	VP_VELOCITY0
+    DXGI_FORMAT_R16_FLOAT,          //	VP_PRESSURE
+    DXGI_FORMAT_R16_FLOAT           //	VP_COLOR
 };
 
 dx103DFluidData::dx103DFluidData()
@@ -48,7 +48,7 @@ dx103DFluidData::~dx103DFluidData()
 //	Allow real-time config reload
 #ifdef DEBUG
     FluidManager.DeregisterFluidData(this);
-#endif  //	DEBUG
+#endif //	DEBUG
 
     for (int rtIndex = 0; rtIndex < VP_NUM_TARGETS; rtIndex++)
     {
@@ -207,7 +207,7 @@ void dx103DFluidData::ParseProfile(const xr_string& Profile)
 //	Allow real-time config reload
 #ifdef DEBUG
     FluidManager.RegisterFluidData(this, Profile);
-#endif  //	DEBUG
+#endif //	DEBUG
 }
 
 //	Allow real-time config reload
@@ -217,4 +217,4 @@ void dx103DFluidData::ReparseProfile(const xr_string& Profile)
     m_Emitters.clear_not_free();
     ParseProfile(Profile);
 }
-#endif  //	DEBUG
+#endif //	DEBUG

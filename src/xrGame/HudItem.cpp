@@ -253,13 +253,13 @@ void CHudItem::on_a_hud_attach()
         PlayHUDMotion_noCB(m_current_motion, FALSE);
 #ifdef DEBUG
 //		Msg("continue playing [%s][%d]",m_current_motion.c_str(), Device.dwFrame);
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
     }
     else
     {
 #ifdef DEBUG
 //		Msg("no active motion");
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
     }
 }
 

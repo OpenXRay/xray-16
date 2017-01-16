@@ -4,11 +4,11 @@
 SAllDDWParams worldDisablingParams = {
     // object
     {
-        {0.001f, 0.1f},   // translational		vel	,	accel
-        {0.005f, 0.05f},  // rotational		vel	,	accel
-        64                // level2 frames 2^
+        {0.001f, 0.1f},  // translational		vel	,	accel
+        {0.005f, 0.05f}, // rotational		vel	,	accel
+        64               // level2 frames 2^
     },
-    1.5f  // reanable factor
+    1.5f // reanable factor
 };
 
 void SOneDDOParams::Mul(float v)

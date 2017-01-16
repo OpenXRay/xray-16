@@ -38,7 +38,7 @@
 using namespace std;
 
 #ifdef WIN32
-#pragma warning(disable : 4786)  // Disable stupid STL warnings.
+#pragma warning(disable : 4786) // Disable stupid STL warnings.
 #endif
 
 #include "ShadingConnection.h"
@@ -175,7 +175,7 @@ MStatus CXRayMtl::initialize()
 
     MFnNumericAttribute nAttr;
     MStatus status;
-    MFnTypedAttribute sAttr;  // For string attributes
+    MFnTypedAttribute sAttr; // For string attributes
     MFnEnumAttribute eAttr;
 
     // Create COLOR input attributes
@@ -197,7 +197,7 @@ MStatus CXRayMtl::initialize()
     color = nAttr.create("color", "c", colorR, colorG, colorB);
     nAttr.setStorable(true);
     nAttr.setKeyable(true);
-    nAttr.setDefault(1.0f, 0.5f, 0.5f);  // ugly pink-salmon color. You can't miss it.
+    nAttr.setDefault(1.0f, 0.5f, 0.5f); // ugly pink-salmon color. You can't miss it.
     nAttr.setUsedAsColor(true);
 
     // Create TRANSPARENCY input attributes
@@ -219,7 +219,7 @@ MStatus CXRayMtl::initialize()
     transparency = nAttr.create("transparency", "it", transparencyR, transparencyG, transparencyB);
     nAttr.setStorable(true);
     nAttr.setKeyable(true);
-    nAttr.setDefault(0.0001f, 0.0001f, 0.0001f);  // very light gray.
+    nAttr.setDefault(0.0001f, 0.0001f, 0.0001f); // very light gray.
     nAttr.setUsedAsColor(true);
 
     // Add the attributes here
@@ -363,7 +363,7 @@ void CXRayMtl::updateTransparencyFlags(MString objectPath)
         fConstantTransparency = (tc.r + tc.g + tc.b) / 3.0f;
     }
     else
-        fConstantTransparency = 0.0f;  // will result in alpha=1.
+        fConstantTransparency = 0.0f; // will result in alpha=1.
 }
 
 /* virtual */

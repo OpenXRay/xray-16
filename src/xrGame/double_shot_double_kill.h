@@ -35,12 +35,12 @@ protected:
 
     kills_times_t m_kills;
     u32 m_shot_count;
-};  // class double_shot_double_kill
+}; // class double_shot_double_kill
 
 ADD_ACCUMULATIVE_STATE(acpv_double_shot_double_kill_time, double_shot_double_kill);
 #undef ACCUMULATIVE_STATE_LIST
 #define ACCUMULATIVE_STATE_LIST SAVE_TYPE_LIST(acpv_double_shot_double_kill_time, double_shot_double_kill)
 
-}  // namespace award_system
+} // namespace award_system
 
-#endif  //#ifndef DOUBLE_SHOT_DOUBLE_KILL_INCLUDED
+#endif //#ifndef DOUBLE_SHOT_DOUBLE_KILL_INCLUDED

@@ -36,8 +36,8 @@ private:
     CInifile* m_info_section;
     sign_verifyer m_verifyer;
 
-};  // class reader
+}; // class reader
 
-}  // namespace screenshots
+} // namespace screenshots
 
-#endif  //#ifndef SCREENSHOT_READER_INCLUDED
+#endif //#ifndef SCREENSHOT_READER_INCLUDED

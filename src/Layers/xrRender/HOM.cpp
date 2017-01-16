@@ -298,8 +298,8 @@ BOOL CHOM::visible(Fbox2& B, float depth)
 
 BOOL CHOM::visible(vis_data& vis)
 {
-    if (Device.dwFrame < vis.hom_frame) return TRUE;  // not at this time :)
-    if (!bEnabled) return TRUE;                       // return - everything visible
+    if (Device.dwFrame < vis.hom_frame) return TRUE; // not at this time :)
+    if (!bEnabled) return TRUE;                      // return - everything visible
     stats.Total.Begin();
     // Now, the test time comes
     // 0. The object was hidden, and we must prove that each frame	- test		| frame-old, tested-new, hom_res =

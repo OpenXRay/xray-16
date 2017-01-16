@@ -199,10 +199,10 @@ void CAI_Rat::Load(LPCSTR section)
     m_bCannibalism = pSettings->r_bool(section, "Cannibalism");
     m_dwEatCorpseInterval = pSettings->r_s32(section, "EatCorpseInterval");
 
-    m_fNullASpeed = pSettings->r_float(section, "AngularStandSpeed") / 180.f * PI;     // PI_MUL_2
-    m_fMinASpeed = pSettings->r_float(section, "AngularMinSpeed") / 180.f * PI;        // PI_MUL_2
-    m_fMaxASpeed = pSettings->r_float(section, "AngularMaxSpeed") / 180.f * PI;        //.2f
-    m_fAttackASpeed = pSettings->r_float(section, "AngularAttackSpeed") / 180.f * PI;  //.15f;
+    m_fNullASpeed = pSettings->r_float(section, "AngularStandSpeed") / 180.f * PI;    // PI_MUL_2
+    m_fMinASpeed = pSettings->r_float(section, "AngularMinSpeed") / 180.f * PI;       // PI_MUL_2
+    m_fMaxASpeed = pSettings->r_float(section, "AngularMaxSpeed") / 180.f * PI;       //.2f
+    m_fAttackASpeed = pSettings->r_float(section, "AngularAttackSpeed") / 180.f * PI; //.15f;
 
     m_phMass = pSettings->r_float(section, "corp_mass");
     m_dwActiveScheduleMin = shedule.t_min;

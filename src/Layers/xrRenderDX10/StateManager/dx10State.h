@@ -10,7 +10,7 @@ class dx10State
 {
     //	Public interface
 public:
-    dx10State();  //	These have to be private bu new/xr_delete don't support this
+    dx10State(); //	These have to be private bu new/xr_delete don't support this
     ~dx10State();
 
     static dx10State* Create(SimulatorStates& state_code);
@@ -31,9 +31,9 @@ private:
 
 private:
     //	All states are supposed to live along all application lifetime
-    ID3DRasterizerState* m_pRasterizerState;      //	Weak link
-    ID3DDepthStencilState* m_pDepthStencilState;  //	Weak link
-    ID3DBlendState* m_pBlendState;                //	Weak link
+    ID3DRasterizerState* m_pRasterizerState;     //	Weak link
+    ID3DDepthStencilState* m_pDepthStencilState; //	Weak link
+    ID3DBlendState* m_pBlendState;               //	Weak link
 
     tSamplerHArray m_VSSamplers;
     tSamplerHArray m_PSSamplers;
@@ -51,4 +51,4 @@ private:
 private:
 };
 
-#endif  //	dx10State_included
+#endif //	dx10State_included

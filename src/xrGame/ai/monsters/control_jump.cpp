@@ -546,7 +546,7 @@ bool CControlJump::jump_intersect_geometry(Fvector const& target, IGameObject* c
     pass_jump_picks = &jump_picks;
     xr_vector<Fvector> collide_tris;
     pass_collide_tris = &collide_tris;
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 
     Fvector const sizes = {0.8f, 1.4f, 0.8f};
 
@@ -562,7 +562,7 @@ bool CControlJump::jump_intersect_geometry(Fvector const& target, IGameObject* c
 #ifdef DEBUG
         m_object->m_jump_picks = jump_picks;
         m_object->m_jump_collide_tris = collide_tris;
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 
         return true;
     }
@@ -570,7 +570,7 @@ bool CControlJump::jump_intersect_geometry(Fvector const& target, IGameObject* c
 #ifdef DEBUG
     m_object->m_jump_picks = jump_picks;
     m_object->m_jump_collide_tris = collide_tris;
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 
     return false;
 }

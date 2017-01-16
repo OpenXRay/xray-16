@@ -96,7 +96,7 @@ void Root::test_all_upgrades(CInventoryItem& item)
     }
 }
 
-#endif  // DEBUG
+#endif // DEBUG
 
 bool Root::contain_upgrade(const shared_str& upgrade_id)
 {
@@ -165,5 +165,5 @@ void Root::reset_highlight()
     }
 }
 
-}  // namespace upgrade
-}  // namespace inventory
+} // namespace upgrade
+} // namespace inventory

@@ -50,7 +50,7 @@
 namespace Opcode
 {
 #include "OPC_TreeBuilders.h"
-}  // namespace Opcode
+} // namespace Opcode
 
 using namespace Opcode;
 
@@ -82,7 +82,7 @@ void AABBTreeNode::destroy(AABBTreeBuilder* _tree)
         mN->destroy(_tree);
         _tree->node_destroy(mN);
     }
-    mNodePrimitives = null;  // This was just a shortcut to the global list => no release
+    mNodePrimitives = null; // This was just a shortcut to the global list => no release
     mNbPrimitives = 0;
 }
 
@@ -158,13 +158,13 @@ bool AABBTreeNode::Subdivide(AABBTreeBuilder* builder)
     // Check the user-defined limit
     if (mNbPrimitives <= builder->mLimit) return true;
 
-    bool ValidSplit = true;  // Optimism...
+    bool ValidSplit = true; // Optimism...
     udword NbPos = 0;
     if (builder->mRules & SPLIT_LARGESTAXIS) {
         // Find the largest axis to split along
         Point Extents;
-        mBV.GetExtents(Extents);              // Box extents
-        udword Axis = Extents.LargestAxis();  // Index of largest axis
+        mBV.GetExtents(Extents);             // Box extents
+        udword Axis = Extents.LargestAxis(); // Index of largest axis
 
         // Split along the axis
         NbPos = Split(Axis, builder);
@@ -240,7 +240,7 @@ bool AABBTreeNode::Subdivide(AABBTreeBuilder* builder)
 
         // Sort axis
         Point Extents;
-        mBV.GetExtents(Extents);  // Box extents
+        mBV.GetExtents(Extents); // Box extents
         udword SortedAxis[] = {0, 1, 2};
         float* Keys = (float*)&Extents.x;
         for (udword j = 0; j < 3; j++)
@@ -274,7 +274,7 @@ bool AABBTreeNode::Subdivide(AABBTreeBuilder* builder)
         NbPos = mNbPrimitives >> 1;
     }
     else
-        return false;  // Unknown splitting rules
+        return false; // Unknown splitting rules
 
     // Check the subdivision has been successful
     if (!ValidSplit) {

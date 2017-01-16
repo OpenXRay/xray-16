@@ -4,9 +4,9 @@
 #include "gsCommon.h"
 
 #ifdef XRAY_DISABLE_GAMESPY_WARNINGS
-#pragma warning(disable : 4244)  // lines: 1368, 1372
-#pragma warning(disable : 4267)  // lines: 1861
-#endif                           //#ifdef XRAY_DISABLE_GAMESPY_WARNINGS
+#pragma warning(disable : 4244) // lines: 1368, 1372
+#pragma warning(disable : 4267) // lines: 1861
+#endif                          //#ifdef XRAY_DISABLE_GAMESPY_WARNINGS
 
 // Include platform separated functions
 #if defined(_X360)
@@ -112,7 +112,7 @@ DWORD WINAPI gsiResolveHostnameThread(void* arg)
     return 0;
 #endif
 }
-#endif  // defined _WIN32
+#endif // defined _WIN32
 ////////////////////////////////////////////////////////////////////////////////
 
 #ifdef _REVOLUTION
@@ -156,7 +156,7 @@ static void* gsiResolveHostnameThread(void* arg)
 
     gsiLeaveCriticalSection(&aHostnameCrit);
 }
-#endif  // _REVOLUTION
+#endif // _REVOLUTION
 ////////////////////////////////////////////////////////////////////////////////
 
 //
@@ -210,7 +210,7 @@ static void gsiResolveHostnameThread(void* arg)
     // explicitly exit the thread to free resources
     gsiExitThread(handle->threadID);
 }
-#endif  //_UNIX
+#endif //_UNIX
 ////////////////////////////////////////////////////////////////////////////////
 
 int gsiStartResolvingHostname(const char* hostname, GSIResolveHostnameHandle* handle)
@@ -286,7 +286,7 @@ unsigned int gsiGetResolvedIP(GSIResolveHostnameHandle handle)
     return ip;
 }
 
-#else   // if * not a supported platform OR * no threads allowed OR * no async lookup allowed
+#else  // if * not a supported platform OR * no threads allowed OR * no async lookup allowed
 ///////////////////////////////////////////////////////////////////////////////////
 // if !(_WIN32 ||_PS2 || _LINUX || _MACOSX || _REVOLUTION) || GSI_NO_THREADS || GSI_NO_ASYNC_DNS
 
@@ -341,17 +341,17 @@ unsigned int gsiGetResolvedIP(GSIResolveHostnameHandle handle)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-#endif  // synch DNS lookup
+#endif // synch DNS lookup
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 char* goastrdup(const char* src)
 {
     char* res;
-    if (src == NULL)  // PANTS|02.11.00|check for NULL before strlen
+    if (src == NULL) // PANTS|02.11.00|check for NULL before strlen
         return NULL;
     res = (char*)gsimalloc(strlen(src) + 1);
-    if (res != NULL)  // PANTS|02.02.00|check for NULL before strcpy
+    if (res != NULL) // PANTS|02.02.00|check for NULL before strcpy
         strcpy(res, src);
     return res;
 }
@@ -513,7 +513,7 @@ time_t time(time_t* timer)
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
-gsi_time current_time()  // returns current time in milliseconds
+gsi_time current_time() // returns current time in milliseconds
 {
 #if defined(_WIN32)
     return (GetTickCount());
@@ -557,9 +557,9 @@ gsi_time current_time()  // returns current time in milliseconds
     if (result < 0) {
         ScePspDateTime time;
         result = sceRtcGetCurrentClock(&time, 0);
-        if (result < 0) return 0;  // um...error handling? //Nope, should return zero since time cannot be zero
+        if (result < 0) return 0; // um...error handling? //Nope, should return zero since time cannot be zero
         result = sceRtcGetTick(&time, &ticks);
-        if (result < 0) return 0;  // Nope, should return zero since time cannot be zero
+        if (result < 0) return 0; // Nope, should return zero since time cannot be zero
     }
 
     return (gsi_time)(ticks.tick / 1000);
@@ -577,7 +577,7 @@ gsi_time current_time()  // returns current time in milliseconds
 #endif
 }
 
-gsi_time current_time_hires()  // returns current time in microseconds
+gsi_time current_time_hires() // returns current time in microseconds
 {
 #ifdef _WIN32
 #if (!defined(_M_IX86) || (defined(_INTEGRAL_MAX_BITS) && _INTEGRAL_MAX_BITS >= 64))
@@ -632,9 +632,9 @@ gsi_time current_time_hires()  // returns current time in microseconds
     if (result < 0) {
         ScePspDateTime time;
         result = sceRtcGetCurrentClock(&time, 0);
-        if (result < 0) return 0;  // um...error handling? //Nope, should return zero since time cannot be zero
+        if (result < 0) return 0; // um...error handling? //Nope, should return zero since time cannot be zero
         result = sceRtcGetTick(&time, &ticks);
-        if (result < 0) return 0;  // Nope, should return zero since time cannot be zero
+        if (result < 0) return 0; // Nope, should return zero since time cannot be zero
     }
 
     return (gsi_time)(ticks.tick);
@@ -691,7 +691,7 @@ void msleep(gsi_time msec)
 #elif defined(_REVOLUTION)
     OSSleepMilliseconds(msec);
 #else
-    assert(0);  // missing platform handler, contact devsupport
+    assert(0); // missing platform handler, contact devsupport
 #endif
 }
 
@@ -740,7 +740,7 @@ static char* store_dt(char* p, int val)
     *p++ = (char)(_T('0') + val % 10);
     return (p);
 }
-#endif  //_NITRO || _REVOLUTION
+#endif //_NITRO || _REVOLUTION
 
 //////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////
@@ -1021,8 +1021,8 @@ char* gsiSecondsToString(const time_t* timp)
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 // Cross platform random number generator
-#define RANa 16807                // multiplier
-#define LONGRAND_MAX 2147483647L  // 2**31 - 1
+#define RANa 16807               // multiplier
+#define LONGRAND_MAX 2147483647L // 2**31 - 1
 
 static long randomnum = 1;
 
@@ -1069,7 +1069,7 @@ int Util_RandInt(int low, int high)
     unsigned int range = (unsigned int)high - low;
     int num;
 
-    if (range == 0) return (low);  // Prevent divide by zero
+    if (range == 0) return (low); // Prevent divide by zero
 
     num = (int)(longrand() % range);
 
@@ -1097,7 +1097,7 @@ static void TripToQuart(const char* trip, char* quart, int inlen)
     {
         triptemp[i] = (unsigned char)trip[i];
     }
-    while (i < 3)  // fill the rest with 0
+    while (i < 3) // fill the rest with 0
     {
         triptemp[i] = 0;
         i++;
@@ -1169,11 +1169,11 @@ void B64Decode(const char* input, char* output, int inlen, int* outlen, int enco
             //	(assert(0)); //bad input data
             if (outlen) *outlen = 0;
             output[0] = '\0';
-            return;  // invaid data
+            return; // invaid data
         }
 
         // every 4 bytes, convert QuartToTrip into destination
-        if (readpos % 4 == 3)  // zero based, so (3%4) means four bytes, 0-1-2-3
+        if (readpos % 4 == 3) // zero based, so (3%4) means four bytes, 0-1-2-3
         {
             QuartToTrip(block, &output[writepos], 4);
             writepos += 3;
@@ -1229,11 +1229,11 @@ void B64Encode(const char* input, char* output, int inlen, int encodingType)
         lastchar -= 2;
     else if (inlen % 3 == 2)
         lastchar -= 1;
-    *output = 0;  // null terminate!
+    *output = 0; // null terminate!
     while (output > holdout)
     {
         output--;
-        if (output >= lastchar)  // pad the end
+        if (output >= lastchar) // pad the end
             *output = encoding[2];
         else if (*output <= 25)
             *output = (char)(*output + 65);
@@ -1355,12 +1355,12 @@ char* gsiXxteaAlg(const char* sIn, int nIn, char key[XXTEA_KEY_SIZE], int bEnc, 
 
     // Convert stream length to a round number of 32-bit words
     // Convert byte	count to 32-bit	word count
-    if (nIn % 4 == 0)  // Fix for null terminated strings divisible by 4
+    if (nIn % 4 == 0) // Fix for null terminated strings divisible by 4
         nIn = (nIn / 4) + 1;
     else
         nIn = (nIn + 3) / 4;
 
-    if (nIn <= 1)  // XXTEA requires at least 64 bits
+    if (nIn <= 1) // XXTEA requires at least 64 bits
         nIn = 2;
 
     // Load	and	zero-pad first 16 characters (128 bits)	of key
@@ -1379,7 +1379,7 @@ char* gsiXxteaAlg(const char* sIn, int nIn, char key[XXTEA_KEY_SIZE], int bEnc, 
     y = v[0];
     i = (int)(6 + 52 / nIn);
 
-    if (bEnc == 1)  // Encrypt
+    if (bEnc == 1) // Encrypt
     {
         unsigned int sum = 0;
         while (i-- != 0)
@@ -1394,7 +1394,7 @@ char* gsiXxteaAlg(const char* sIn, int nIn, char key[XXTEA_KEY_SIZE], int bEnc, 
             }
         }
     }
-    else if (bEnc == 0)  // Decrypt
+    else if (bEnc == 0) // Decrypt
     {
         unsigned int sum = (unsigned int)i * 0x9E3779B9;
         while (sum != 0)
@@ -1484,9 +1484,9 @@ void gsiCheckStack(void)
         }
     }
 #endif
-#endif  // nitro
+#endif // nitro
 }
-#endif  // _DEBUG
+#endif // _DEBUG
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
@@ -1496,7 +1496,7 @@ int GOAGetLastError(SOCKET s)
     int val = 0;
     int soval = sizeof(val);
     if (0 != getsockopt(s, SOL_SOCKET, SO_ERROR, &val, &soval))
-        return 0;  // getsockopt failed
+        return 0; // getsockopt failed
     else
         return val;
 }
@@ -1637,8 +1637,8 @@ static const char* GOAGetUniqueID_Internal(void)
     return keyval;
 }
 
-#endif  // UNIQUEID
-#endif  // _PS2
+#endif // UNIQUEID
+#endif // _PS2
 
 #if ((defined(_WIN32) && !defined(_XBOX)) || defined(_UNIX))
 
@@ -1703,7 +1703,7 @@ const char* GOAGetUniqueID_Internal(void)
     }
 #endif
 
-    if (ret != 0 || strlen(keyval) != 19)  // need to generate a new key
+    if (ret != 0 || strlen(keyval) != 19) // need to generate a new key
     {
         GenerateID(keyval);
 #ifdef _WIN32
@@ -1719,7 +1719,7 @@ const char* GOAGetUniqueID_Internal(void)
             fclose(f);
         }
         else
-            keyval[0] = 0;  // don't generate one each time!!
+            keyval[0] = 0; // don't generate one each time!!
 #endif
     }
 

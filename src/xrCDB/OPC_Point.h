@@ -489,7 +489,7 @@ public:
     inline_ udword GetHashValue() const
     {
         const udword* h = (const udword*)(this);
-        udword f = (h[0] + h[1] * 11 - (h[2] * 17)) & 0x7fffffff;  // avoid problems with +-0
+        udword f = (h[0] + h[1] * 11 - (h[2] * 17)) & 0x7fffffff; // avoid problems with +-0
         return (f >> 22) ^ (f >> 12) ^ (f);
     }
 
@@ -612,7 +612,7 @@ public:
         {
         public:
             float m[3][3];
-        };  // To allow inlining
+        }; // To allow inlining
         const ShadowMatrix3x3* Mat = (const ShadowMatrix3x3*)&mat;
 
         return Point(x * Mat->m[0][0] + y * Mat->m[1][0] + z * Mat->m[2][0],
@@ -627,7 +627,7 @@ public:
         {
         public:
             float m[4][4];
-        };  // To allow inlining
+        }; // To allow inlining
         const ShadowMatrix4x4* Mat = (const ShadowMatrix4x4*)&mat;
 
         return Point(x * Mat->m[0][0] + y * Mat->m[1][0] + z * Mat->m[2][0] + Mat->m[3][0],
@@ -642,7 +642,7 @@ public:
         {
         public:
             float m[3][3];
-        };  // To allow inlining
+        }; // To allow inlining
         const ShadowMatrix3x3* Mat = (const ShadowMatrix3x3*)&mat;
 
         float xp = x * Mat->m[0][0] + y * Mat->m[1][0] + z * Mat->m[2][0];
@@ -663,7 +663,7 @@ public:
         {
         public:
             float m[4][4];
-        };  // To allow inlining
+        }; // To allow inlining
         const ShadowMatrix4x4* Mat = (const ShadowMatrix4x4*)&mat;
 
         float xp = x * Mat->m[0][0] + y * Mat->m[1][0] + z * Mat->m[2][0] + Mat->m[3][0];
@@ -691,4 +691,4 @@ public:
 FUNCTION ICEMATHS_API void Normalize1(Point& a);
 FUNCTION ICEMATHS_API void Normalize2(Point& a);
 
-#endif  //__ICEPOINT_H__
+#endif //__ICEPOINT_H__

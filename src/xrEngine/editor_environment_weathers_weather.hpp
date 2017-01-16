@@ -74,11 +74,11 @@ private:
 
 public:
     environment::manager& m_manager;
-};  // class weather
-}  // namespace weathers
-}  // namespace environment
-}  // namespace editor
+}; // class weather
+} // namespace weathers
+} // namespace environment
+} // namespace editor
 
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR
 
-#endif  // ifndef EDITOR_ENVIRONMENT_WEATHERS_WEATHER_HPP_INCLUDED
+#endif // ifndef EDITOR_ENVIRONMENT_WEATHERS_WEATHER_HPP_INCLUDED

@@ -96,8 +96,8 @@ void CBuild::xrPhase_Subdivide()
         // align plane onto vertices
 
         // Process all faces and rearrange them
-        u32 iteration_on_edge = 0;   // up to 3
-        u32 iteration_per_edge = 0;  // up to 10
+        u32 iteration_on_edge = 0;  // up to 3
+        u32 iteration_per_edge = 0; // up to 10
     resplit:
         s2.clear();
         s1.clear();
@@ -122,7 +122,7 @@ void CBuild::xrPhase_Subdivide()
                 s2.size());
             if (iteration_per_edge < 10) {
                 if (g_XSplit[X]->size() > c_SS_LowVertLimit * 4) {
-                    if (s2.size() > s1.size()) {  // b2 -less, b1-grow
+                    if (s2.size() > s1.size()) { // b2 -less, b1-grow
                         size.sub(b2.max, b2.min);
                         b1.max[box_edge] += size[box_edge] / 2;
                         b2.min[box_edge] = b1.max[box_edge];

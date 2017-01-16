@@ -235,7 +235,7 @@ float CCar::SWheelDrive::ASpeed()
     CPhysicsJoint* J = pwheel->joint;
     if (!J) return 0.f;
     // return (dJointGetHinge2Angle2Rate(J->GetDJoint()))*pos_fvd;//dFabs
-    return (J->GetAxisAngleRate(1)) * pos_fvd;  // dFabs
+    return (J->GetAxisAngleRate(1)) * pos_fvd; // dFabs
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CCar::SWheelSteer::Init()
@@ -248,7 +248,7 @@ void CCar::SWheelSteer::Init()
     {
     case jtWheel:
         pos_right =
-            bone_map.find(pwheel->bone_id)->second.element->mXFORM.i.y;  //.dotproduct(pwheel->car->m_root_transform.j);
+            bone_map.find(pwheel->bone_id)->second.element->mXFORM.i.y; //.dotproduct(pwheel->car->m_root_transform.j);
         break;
 
     default: NODEFAULT;
@@ -267,7 +267,7 @@ void CCar::SWheelSteer::Init()
 
 void CCar::SWheelSteer::SteerRight()
 {
-    limited = true;  // no need to limit wheels when steering
+    limited = true; // no need to limit wheels when steering
     if (pos_right > 0) {
         pwheel->SetSteerHiLimit(hi_limit);
         pwheel->ApplySteerAxisVel(pwheel->car->m_steering_speed);
@@ -280,7 +280,7 @@ void CCar::SWheelSteer::SteerRight()
 }
 void CCar::SWheelSteer::SteerLeft()
 {
-    limited = true;  // no need to limit wheels when steering
+    limited = true; // no need to limit wheels when steering
     if (pos_right < 0) {
         pwheel->SetSteerHiLimit(hi_limit);
         pwheel->ApplySteerAxisVel(pwheel->car->m_steering_speed);
@@ -340,7 +340,7 @@ float CCar::SWheelSteer::GetSteerAngle()
 {
     VERIFY(pwheel);
     VERIFY(pwheel->joint);
-    return -pos_right * pwheel->joint->GetAxisAngle(0);  // dJointGetHinge2Angle1 (pwheel->joint->GetDJoint());
+    return -pos_right * pwheel->joint->GetAxisAngle(0); // dJointGetHinge2Angle1 (pwheel->joint->GetDJoint());
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////

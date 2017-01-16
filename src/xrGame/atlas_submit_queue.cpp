@@ -52,7 +52,7 @@ void atlas_submit_queue::submit_reward(gamespy_profile::enum_awards_t const awar
     submit_task tmp_task;
     tmp_task.m_data_type = submit_task::edt_award_id;
     tmp_task.m_award_id = award_id;
-    tmp_task.m_awards_count = tmp_iter->second.m_count;  //+1 was on quick_reward_with_award
+    tmp_task.m_awards_count = tmp_iter->second.m_count; //+1 was on quick_reward_with_award
     m_reward_tasks.push_back(tmp_task);
 
     update();

@@ -168,37 +168,37 @@ public:
 
     enum ScreenshotMode
     {
-        SM_NORMAL = 0,        // jpeg, name ignored
-        SM_FOR_CUBEMAP = 1,   // tga, name used as postfix
-        SM_FOR_GAMESAVE = 2,  // dds/dxt1,name used as full-path
-        SM_FOR_LEVELMAP = 3,  // tga, name used as postfix (level_name)
+        SM_NORMAL = 0,       // jpeg, name ignored
+        SM_FOR_CUBEMAP = 1,  // tga, name used as postfix
+        SM_FOR_GAMESAVE = 2, // dds/dxt1,name used as full-path
+        SM_FOR_LEVELMAP = 3, // tga, name used as postfix (level_name)
         SM_FOR_MPSENDING = 4,
         SM_forcedword = u32(-1)
     };
 
     struct RenderStatistics
     {
-        CStatTimer Culling;           // portal traversal, frustum culling, entities "renderable_Render"
-        CStatTimer Animation;         // skeleton calculation
-        CStatTimer Primitives;        // actual primitive rendering
-        CStatTimer Wait;              // ...waiting something back (queries results, etc.)
-        CStatTimer WaitS;             // ...frame-limit sync
-        CStatTimer RenderTargets;     // ...render-targets
-        CStatTimer Skinning;          // ...skinning
-        CStatTimer DetailVisibility;  // ...details visibility detection
-        CStatTimer DetailRender;      // ...details rendering
-        CStatTimer DetailCache;       // ...details slot cache access
-        u32 DetailCount;              // ...number of DT-elements
-        CStatTimer Wallmarks;         // ...wallmark sorting, rendering
-        u32 StaticWMCount;            // ...number of static wallmark
-        u32 DynamicWMCount;           // ...number of dynamic wallmark
-        u32 WMTriCount;               // ...number of wallmark tri
-        CStatTimer HUD;               // ...hud rendering
-        CStatTimer Glows;             // ...glows vis-testing,sorting,render
-        CStatTimer Lights;            // ...d-lights building/rendering
-        CStatTimer Projectors;        // ...projectors building
-        CStatTimer ShadowsCalc;       // ...shadows building
-        CStatTimer ShadowsRender;     // ...shadows render
+        CStatTimer Culling;          // portal traversal, frustum culling, entities "renderable_Render"
+        CStatTimer Animation;        // skeleton calculation
+        CStatTimer Primitives;       // actual primitive rendering
+        CStatTimer Wait;             // ...waiting something back (queries results, etc.)
+        CStatTimer WaitS;            // ...frame-limit sync
+        CStatTimer RenderTargets;    // ...render-targets
+        CStatTimer Skinning;         // ...skinning
+        CStatTimer DetailVisibility; // ...details visibility detection
+        CStatTimer DetailRender;     // ...details rendering
+        CStatTimer DetailCache;      // ...details slot cache access
+        u32 DetailCount;             // ...number of DT-elements
+        CStatTimer Wallmarks;        // ...wallmark sorting, rendering
+        u32 StaticWMCount;           // ...number of static wallmark
+        u32 DynamicWMCount;          // ...number of dynamic wallmark
+        u32 WMTriCount;              // ...number of wallmark tri
+        CStatTimer HUD;              // ...hud rendering
+        CStatTimer Glows;            // ...glows vis-testing,sorting,render
+        CStatTimer Lights;           // ...d-lights building/rendering
+        CStatTimer Projectors;       // ...projectors building
+        CStatTimer ShadowsCalc;      // ...shadows building
+        CStatTimer ShadowsRender;    // ...shadows render
         u32 OcclusionQueries;
         u32 OcclusionCulled;
 
@@ -308,9 +308,9 @@ public:
     virtual void set_Invisible(BOOL V) = 0;
     virtual void flush() = 0;
     virtual void set_Object(IRenderable* O) = 0;
-    virtual void add_Occluder(Fbox2& bb_screenspace) = 0;  // mask screen region as oclluded (-1..1, -1..1)
-    virtual void add_Visual(IRenderVisual* V) = 0;         // add visual leaf (no culling performed at all)
-    virtual void add_Geometry(IRenderVisual* V) = 0;       // add visual(s) (all culling performed)
+    virtual void add_Occluder(Fbox2& bb_screenspace) = 0; // mask screen region as oclluded (-1..1, -1..1)
+    virtual void add_Visual(IRenderVisual* V) = 0;        // add visual leaf (no culling performed at all)
+    virtual void add_Geometry(IRenderVisual* V) = 0;      // add visual(s) (all culling performed)
     // virtual void add_StaticWallmark (ref_shader& S, const Fvector& P, float s, CDB::TRI* T, Fvector* V)=0;
     virtual void add_StaticWallmark(const wm_shader& S, const Fvector& P, float s, CDB::TRI* T, Fvector* V) = 0;
     // Prefer this function when possible

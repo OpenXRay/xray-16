@@ -481,4 +481,4 @@ void time::lerp(CEnvironment* parent, CEnvDescriptor& A, CEnvDescriptor& B, floa
     inherited::lerp(parent, A, B, f, M, m_power);
 }
 
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR

@@ -24,14 +24,14 @@ class CRender : public D3DXRenderBase
 public:
     enum
     {
-        PHASE_NORMAL = 0,  // E[0]
-        PHASE_SMAP = 1,    // E[1]
+        PHASE_NORMAL = 0, // E[0]
+        PHASE_SMAP = 1,   // E[1]
     };
 
     enum
     {
-        MSAA_ATEST_NONE = 0x0,         //	Hi bit - DX10.1 mode
-        MSAA_ATEST_DX10_0_ATOC = 0x1,  //	Lo bit - ATOC mode
+        MSAA_ATEST_NONE = 0x0,        //	Hi bit - DX10.1 mode
+        MSAA_ATEST_DX10_0_ATOC = 0x1, //	Lo bit - ATOC mode
         MSAA_ATEST_DX10_1_NATIVE = 0x2,
         MSAA_ATEST_DX10_1_ATOC = 0x3,
     };
@@ -62,7 +62,7 @@ public:
         u32 mrtmixdepth : 1;
         u32 fp16_filter : 1;
         u32 fp16_blend : 1;
-        u32 albedo_wo : 1;  // work-around albedo on less capable HW
+        u32 albedo_wo : 1; // work-around albedo on less capable HW
         u32 HW_smap : 1;
         u32 HW_smap_PCF : 1;
         u32 HW_smap_FETCH4 : 1;
@@ -82,17 +82,17 @@ public:
         u32 sunstatic : 1;
         u32 sjitter : 1;
         u32 noshadows : 1;
-        u32 Tshadows : 1;  // transluent shadows
+        u32 Tshadows : 1; // transluent shadows
         u32 disasm : 1;
-        u32 advancedpp : 1;  //	advanced post process (DOF, SSAO, volumetrics, etc.)
+        u32 advancedpp : 1; //	advanced post process (DOF, SSAO, volumetrics, etc.)
         u32 volumetricfog : 1;
 
-        u32 dx10_msaa : 1;            //	DX10.0 path
-        u32 dx10_msaa_hybrid : 1;     //	DX10.0 main path with DX10.1 A-test msaa allowed
-        u32 dx10_msaa_opt : 1;        //	DX10.1 path
-        u32 dx10_gbuffer_opt : 1;     //
-        u32 dx10_sm4_1 : 1;           //	DX10.1 path
-        u32 dx10_msaa_alphatest : 2;  //	A-test mode
+        u32 dx10_msaa : 1;           //	DX10.0 path
+        u32 dx10_msaa_hybrid : 1;    //	DX10.0 main path with DX10.1 A-test msaa allowed
+        u32 dx10_msaa_opt : 1;       //	DX10.1 path
+        u32 dx10_gbuffer_opt : 1;    //
+        u32 dx10_sm4_1 : 1;          //	DX10.1 path
+        u32 dx10_msaa_alphatest : 2; //	A-test mode
         u32 dx10_msaa_samples : 4;
 
         u32 dx10_minmax_sm : 2;
@@ -162,7 +162,7 @@ public:
     CModelPool* Models;
     CWallmarksEngine* Wallmarks;
 
-    CRenderTarget* Target;  // Render-target
+    CRenderTarget* Target; // Render-target
 
     CLight_DB Lights;
     CLight_Compute_XFORM_and_VIS LR;
@@ -182,7 +182,7 @@ public:
     u32 q_sync_count;
 
     bool m_bMakeAsyncSS;
-    bool m_bFirstFrameAfterReset;  // Determines weather the frame is the first after resetting device.
+    bool m_bFirstFrameAfterReset; // Determines weather the frame is the first after resetting device.
     xr_vector<sun::cascade> m_sun_cascades;
 
 private:
@@ -195,10 +195,10 @@ private:
     void LoadSWIs(CStreamReader* fs);
     void Load3DFluid();
 
-    BOOL add_Dynamic(dxRender_Visual* pVisual, u32 planes);  // normal processing
+    BOOL add_Dynamic(dxRender_Visual* pVisual, u32 planes); // normal processing
     void add_Static(dxRender_Visual* pVisual, u32 planes);
-    void add_leafs_Dynamic(dxRender_Visual* pVisual);  // if detected node's full visibility
-    void add_leafs_Static(dxRender_Visual* pVisual);   // if detected node's full visibility
+    void add_leafs_Dynamic(dxRender_Visual* pVisual); // if detected node's full visibility
+    void add_leafs_Static(dxRender_Visual* pVisual);  // if detected node's full visibility
 
 public:
     IRender_Sector* rimp_detectSector(Fvector& P, Fvector& D);
@@ -247,7 +247,7 @@ public:
     }
     IC void apply_lmaterial()
     {
-        R_constant* C = &*RCache.get_c(c_sbase);  // get sampler
+        R_constant* C = &*RCache.get_c(c_sbase); // get sampler
         if (0 == C) return;
         VERIFY(RC_dest_sampler == C->destination);
         VERIFY(RC_dx10texture == C->type);
@@ -294,9 +294,9 @@ public:
     // Main
     virtual void flush();
     virtual void set_Object(IRenderable* O);
-    virtual void add_Occluder(Fbox2& bb_screenspace);  // mask screen region as oclluded
-    virtual void add_Visual(IRenderVisual* V);         // add visual leaf	(no culling performed at all)
-    virtual void add_Geometry(IRenderVisual* V);       // add visual(s)	(all culling performed)
+    virtual void add_Occluder(Fbox2& bb_screenspace); // mask screen region as oclluded
+    virtual void add_Visual(IRenderVisual* V);        // add visual leaf	(no culling performed at all)
+    virtual void add_Geometry(IRenderVisual* V);      // add visual(s)	(all culling performed)
 
     // wallmarks
     virtual void add_StaticWallmark(ref_shader& S, const Fvector& P, float s, CDB::TRI* T, Fvector* V);

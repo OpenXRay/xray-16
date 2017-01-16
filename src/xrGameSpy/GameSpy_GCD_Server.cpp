@@ -10,7 +10,7 @@ bool CGameSpy_GCD_Server::Init()
     };
 #ifndef MASTER_GOLD
     Msg("- xrGS::CDKey : Initialized");
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
     return true;
 };
 

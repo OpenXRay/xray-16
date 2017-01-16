@@ -60,7 +60,7 @@ struct MTL_EXPORT_API SGameMtl
     friend class CGameMtlLibrary;
 
 protected:
-    int ID;  // auto number
+    int ID; // auto number
 public:
     enum
     {
@@ -78,10 +78,10 @@ public:
         flSuppressWallmarks = (1ul << 11ul),
         flActorObstacle = (1ul << 12ul),
         flNoRicoshet = (1ul << 13ul),
-        flInjurious = (1ul << 28ul),  // flInjurious = fInjuriousSpeed > 0.f
+        flInjurious = (1ul << 28ul), // flInjurious = fInjuriousSpeed > 0.f
         flShootable = (1ul << 29ul),
         flTransparent = (1ul << 30ul),
-        flSlowDown = (1ul << 31ul)  // flSlowDown = (fFlotationFactor<1.f)
+        flSlowDown = (1ul << 31ul) // flSlowDown = (fFlotationFactor<1.f)
     };
 
 public:
@@ -89,19 +89,19 @@ public:
     shared_str m_Desc;
     Flags32 Flags;
     // physics part
-    float fPHFriction;             // ?
-    float fPHDamping;              // ?
-    float fPHSpring;               // ?
-    float fPHBounceStartVelocity;  // ?
-    float fPHBouncing;             // ?
+    float fPHFriction;            // ?
+    float fPHDamping;             // ?
+    float fPHSpring;              // ?
+    float fPHBounceStartVelocity; // ?
+    float fPHBouncing;            // ?
     // shoot&bounce&visibility&flotation
-    float fFlotationFactor;        // 0.f - 1.f (1.f-полностью проходимый)
-    float fShootFactor;            // 0.f - 1.f (1.f-полностью простреливаемый)
-    float fShootFactorMP;          // 0.f - 1.f (1.f-полностью простреливаемый)
-    float fBounceDamageFactor;     // 0.f - 100.f
-    float fInjuriousSpeed;         // 0.f - ... (0.f-не отбирает здоровье (скорость уменьшения здоровья))
-    float fVisTransparencyFactor;  // 0.f - 1.f (1.f-полностью прозрачный)
-    float fSndOcclusionFactor;     // 0.f - 1.f (1.f-полностью слышен)
+    float fFlotationFactor;       // 0.f - 1.f (1.f-полностью проходимый)
+    float fShootFactor;           // 0.f - 1.f (1.f-полностью простреливаемый)
+    float fShootFactorMP;         // 0.f - 1.f (1.f-полностью простреливаемый)
+    float fBounceDamageFactor;    // 0.f - 100.f
+    float fInjuriousSpeed;        // 0.f - ... (0.f-не отбирает здоровье (скорость уменьшения здоровья))
+    float fVisTransparencyFactor; // 0.f - 1.f (1.f-полностью прозрачный)
+    float fSndOcclusionFactor;    // 0.f - 1.f (1.f-полностью слышен)
     float fDensityFactor;
 
 public:
@@ -155,7 +155,7 @@ private:
     int mtl1;
 
 protected:
-    int ID;  // auto number
+    int ID; // auto number
     int ID_parent;
 
 public:

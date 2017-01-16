@@ -226,4 +226,4 @@ void* xrMemory::mem_realloc(void* P, size_t size)
     return _ptr;
 }
 
-#endif  // __BORLANDC__
+#endif // __BORLANDC__

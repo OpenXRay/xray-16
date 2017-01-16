@@ -39,7 +39,7 @@ struct fury_killer
     }
     shared_str m_killer_name;
     u32 m_after_time;
-};  // struct fury_killer
+}; // struct fury_killer
 
 void player_state_invincible_fury::OnPlayerKilled(
     u16 killer_id, u16 target_id, u16 weapon_id, std::pair<KILL_TYPE, SPECIAL_KILL_TYPE> kill_type)
@@ -69,4 +69,4 @@ void player_state_invincible_fury::OnPlayerKilled(
     }
 }
 
-}  // namespace award_system
+} // namespace award_system

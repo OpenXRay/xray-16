@@ -23,7 +23,7 @@ void CWalmarkManager::Clear()
 void CWalmarkManager::AddWallmark(const Fvector& dir, const Fvector& start_pos, float range, float wallmark_size,
     IWallMarkArray& wallmarks_vector, int t)
 {
-    CDB::TRI* pTri = Level().ObjectSpace.GetStaticTris() + t;  // result.element;
+    CDB::TRI* pTri = Level().ObjectSpace.GetStaticTris() + t; // result.element;
     SGameMtl* pMaterial = GMLib.GetMaterialByIdx(pTri->material);
 
     if (pMaterial->Flags.is(SGameMtl::flBloodmark)) {
@@ -201,12 +201,12 @@ float Distance(
 {
     //.    Fvector kDiff = rkTri.Origin() - rkPoint;
     Fvector kDiff;
-    kDiff.sub(rkTri[0], rkPoint);  //
+    kDiff.sub(rkTri[0], rkPoint); //
 
     Fvector Edge0;
-    Edge0.sub(rkTri[1], rkTri[0]);  //
+    Edge0.sub(rkTri[1], rkTri[0]); //
     Fvector Edge1;
-    Edge1.sub(rkTri[2], rkTri[0]);  //
+    Edge1.sub(rkTri[2], rkTri[0]); //
 
     //.    float fA00 = rkTri.Edge0().SquaredLength();
     float fA00 = Edge0.square_magnitude();
@@ -234,7 +234,7 @@ float Distance(
 
     if (fS + fT <= fDet) {
         if (fS < 0.0f) {
-            if (fT < 0.0f)  // region 4
+            if (fT < 0.0f) // region 4
             {
                 if (fB0 < 0.0f) {
                     fT = 0.0f;
@@ -267,7 +267,7 @@ float Distance(
                     }
                 }
             }
-            else  // region 3
+            else // region 3
             {
                 fS = 0.0f;
                 if (fB1 >= 0.0f) {
@@ -286,7 +286,7 @@ float Distance(
                 }
             }
         }
-        else if (fT < 0.0f)  // region 5
+        else if (fT < 0.0f) // region 5
         {
             fT = 0.0f;
             if (fB0 >= 0.0f) {
@@ -304,7 +304,7 @@ float Distance(
                 fSqrDist = fB0 * fS + fC;
             }
         }
-        else  // region 0
+        else // region 0
         {
             // minimum at interior point
             float fInvDet = 1.0f / fDet;
@@ -317,7 +317,7 @@ float Distance(
     {
         float fTmp0, fTmp1, fNumer, fDenom;
 
-        if (fS < 0.0f)  // region 2
+        if (fS < 0.0f) // region 2
         {
             fTmp0 = fA01 + fB0;
             fTmp1 = fA11 + fB1;
@@ -356,7 +356,7 @@ float Distance(
                 }
             }
         }
-        else if (fT < 0.0f)  // region 6
+        else if (fT < 0.0f) // region 6
         {
             fTmp0 = fA01 + fB1;
             fTmp1 = fA00 + fB0;
@@ -395,7 +395,7 @@ float Distance(
                 }
             }
         }
-        else  // region 1
+        else // region 1
         {
             fNumer = fA11 + fB1 - fA01 - fB0;
             if (fNumer <= 0.0f) {

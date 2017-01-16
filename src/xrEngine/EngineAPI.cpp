@@ -36,7 +36,7 @@ CEngineAPI::~CEngineAPI()
     }
 }
 
-extern u32 renderer_value;  // con cmd
+extern u32 renderer_value; // con cmd
 ENGINE_API int g_current_renderer = 0;
 
 bool is_enough_address_space_available()
@@ -89,7 +89,7 @@ void CEngineAPI::InitializeNotDedicated()
             g_current_renderer = 2;
     }
 }
-#endif  // DEDICATED_SERVER
+#endif // DEDICATED_SERVER
 
 void CEngineAPI::Initialize(void)
 {
@@ -99,14 +99,14 @@ void CEngineAPI::Initialize(void)
 
 #ifndef DEDICATED_SERVER
     InitializeNotDedicated();
-#endif  // DEDICATED_SERVER
+#endif // DEDICATED_SERVER
 
     if (0 == hRender) {
         // try to load R1
         psDeviceFlags.set(rsR4, FALSE);
         psDeviceFlags.set(rsR3, FALSE);
         psDeviceFlags.set(rsR2, FALSE);
-        renderer_value = 0;  // con cmd
+        renderer_value = 0; // con cmd
 
         hRender = XRay::LoadLibrary(r1_name);
         if (0 == hRender) R_CHK(GetLastError());
@@ -258,14 +258,14 @@ void CEngineAPI::CreateRendererList()
 
 #ifdef DEBUG
     Msg("Available render modes[%d]:", tmp.size());
-#endif  // DEBUG
+#endif // DEBUG
     for (u32 i = 0; i < tmp.size(); ++i)
     {
         vid_quality_token[i].id = i;
         vid_quality_token[i].name = tmp[i];
 #ifdef DEBUG
         Msg("[%s]", tmp[i]);
-#endif  // DEBUG
+#endif // DEBUG
     }
 
 /*
@@ -327,5 +327,5 @@ Msg ("[%s]",_tmp[i]);
 #endif // DEBUG
 }
 */
-#endif  //#ifndef DEDICATED_SERVER
+#endif //#ifndef DEDICATED_SERVER
 }

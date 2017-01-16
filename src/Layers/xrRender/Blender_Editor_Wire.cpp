@@ -53,7 +53,7 @@ void CBlender_Editor_Wire::Compile(CBlender_Compile& C)
         C.PassEnd();
     }
     else
-#endif  //	USE_DX10
+#endif //	USE_DX10
     {
         C.r_Pass("editor", "simple_color", FALSE, TRUE, TRUE);
         C.r_End();

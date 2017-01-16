@@ -19,8 +19,8 @@ private:
 
     //	Can't implement in a single pass of a shader since
     //	should be compiled only for the hardware that supports it.
-    ref_shader s_postprocess[2];    //	Igor: 0 - plain, 1 - colormapped
-    ref_shader s_postprocess_D[2];  //	Igor: 0 - plain, 1 - colormapped
+    ref_shader s_postprocess[2];   //	Igor: 0 - plain, 1 - colormapped
+    ref_shader s_postprocess_D[2]; //	Igor: 0 - plain, 1 - colormapped
     ref_geom g_postprocess;
 
     float im_noise_time;
@@ -50,7 +50,7 @@ public:
     IDirect3DSurface9* pTempZB;
 
     //	Igor: for async screenshots
-    IDirect3DSurface9* pFB;  // 32bit		(r,g,b,a) is situated in the system memory
+    IDirect3DSurface9* pFB; // 32bit		(r,g,b,a) is situated in the system memory
 
 private:
     BOOL Create();

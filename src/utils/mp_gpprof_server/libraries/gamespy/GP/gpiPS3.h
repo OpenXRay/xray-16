@@ -20,9 +20,9 @@ Please see the GameSpy Presence SDK documentation for more information
 
 // DEFINES
 /////////
-#define GPI_NP_SYNC_DELAY 5000      // wait 5 seconds after login before doing any syncs
-#define GPI_NP_STATUS_TIMEOUT 5000  // timeout after 5 second max if NP status is not online
-#define GPI_NP_NUM_TRANSACTIONS 32  // Max num of simultaneous NP lookup transactions
+#define GPI_NP_SYNC_DELAY 5000     // wait 5 seconds after login before doing any syncs
+#define GPI_NP_STATUS_TIMEOUT 5000 // timeout after 5 second max if NP status is not online
+#define GPI_NP_NUM_TRANSACTIONS 32 // Max num of simultaneous NP lookup transactions
 
 // STRUCTURES
 ////////////

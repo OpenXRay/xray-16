@@ -179,8 +179,8 @@ void CLightmap::Save(LPCSTR path)
         xr_sprintf(lm_texture.name, "lmap#%d", lmapNameID);
         xr_sprintf(FN, "%s%s_1.dds", path, lm_texture.name);
         BYTE* raw_data = LPBYTE(&*lm_packed.begin());
-        u32 w = lm_texture.dwWidth;   // lm.width;
-        u32 h = lm_texture.dwHeight;  // lm.height;
+        u32 w = lm_texture.dwWidth;  // lm.width;
+        u32 h = lm_texture.dwHeight; // lm.height;
         u32 pitch = w * 4;
 
         STextureParams fmt;
@@ -191,10 +191,10 @@ void CLightmap::Save(LPCSTR path)
         DXTCompress(FN, raw_data, 0, w, h, pitch, &fmt, 4);
     }
     lm_packed.clear_and_free();
-    Logger.Status("Compression hemi...");  //.
+    Logger.Status("Compression hemi..."); //.
     {
-        u32 w = lm_texture.dwWidth;   // lm.width;
-        u32 h = lm_texture.dwHeight;  // lm.height;
+        u32 w = lm_texture.dwWidth;  // lm.width;
+        u32 h = lm_texture.dwHeight; // lm.height;
         u32 pitch = w * 4;
 
         string_path FN;

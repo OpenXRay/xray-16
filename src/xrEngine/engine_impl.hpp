@@ -76,8 +76,8 @@ private:
 private:
     IInputReceiver* m_input_receiver;
     bool m_input_captured;
-};  // class engine_impl
+}; // class engine_impl
 
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR
 
-#endif  // ifndef ENGINE_IMPL_HPP_INCLUDED
+#endif // ifndef ENGINE_IMPL_HPP_INCLUDED

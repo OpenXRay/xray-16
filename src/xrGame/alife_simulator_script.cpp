@@ -61,7 +61,7 @@ CSE_ALifeDynamicObject* alife_object(const CALifeSimulator* self, LPCSTR name)
 
     return (0);
 }
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 
 CSE_ALifeDynamicObject* alife_object(const CALifeSimulator* self, ALife::_OBJECT_ID id, bool no_assert)
 {
@@ -393,7 +393,7 @@ SCRIPT_EXPORT(CALifeSimulator, (), {
     }
 });
 
-#if 0   // def DEBUG
+#if 0  // def DEBUG
 struct dummy {
     int count;
     lua_State* state;
@@ -426,4 +426,4 @@ void CALifeSimulator::validate			()
 		);
 	}
 }
-#endif  // DEBUG
+#endif // DEBUG

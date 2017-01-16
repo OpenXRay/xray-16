@@ -27,8 +27,8 @@ namespace transitions
 {
 class action;
 class animation_action;
-}  // namespace transitions
-}  // namespace smart_cover
+} // namespace transitions
+} // namespace smart_cover
 
 template <typename _return_type>
 class CScriptCallbackEx;
@@ -184,8 +184,8 @@ private:
     bool m_default_behaviour;
     bool m_check_can_kill_enemy;
     bool m_combat_behaviour;
-};  // class stalker_movement_manager_smart_cover
+}; // class stalker_movement_manager_smart_cover
 
 #include "stalker_movement_manager_smart_cover_inline.h"
 
-#endif  // #ifndef STALKER_MOVEMENT_MANAGER_SMART_COVER_H_INCLUDED
+#endif // #ifndef STALKER_MOVEMENT_MANAGER_SMART_COVER_H_INCLUDED

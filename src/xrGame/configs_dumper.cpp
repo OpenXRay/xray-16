@@ -31,7 +31,7 @@ configs_dumper::~configs_dumper()
 {
     if (m_make_start_event) {
         SetEvent(m_make_start_event);
-        WaitForSingleObject(m_make_done_event, INFINITE);  // thread stoped
+        WaitForSingleObject(m_make_done_event, INFINITE); // thread stoped
         CloseHandle(m_make_done_event);
         CloseHandle(m_make_start_event);
     }
@@ -59,7 +59,7 @@ struct ExistDumpPredicate
         if (dump_obj->GetAnticheatSectionName() == section_name) return true;
         return false;
     }
-};  // struct ExistDumpPredicate
+}; // struct ExistDumpPredicate
 
 typedef buffer_vector<IAnticheatDumpable const*> active_objects_t;
 static active_objects_t::size_type get_active_objects(active_objects_t& dest)
@@ -226,7 +226,7 @@ void configs_dumper::dumper_thread(void* my_ptr)
     DWORD wait_result = WaitForSingleObject(this_ptr->m_make_start_event, INFINITE);
     while ((wait_result != WAIT_ABANDONED) || (wait_result != WAIT_FAILED))
     {
-        if (!this_ptr->is_active()) break;  // error
+        if (!this_ptr->is_active()) break; // error
         this_ptr->timer_begin("writing configs");
         this_ptr->write_configs();
         this_ptr->timer_end();
@@ -276,7 +276,7 @@ void configs_dumper::timer_end()
 {
     Msg("* %s : %u ms", m_timer_comment.c_str(), m_debug_timer.GetElapsed_ms());
 }
-#endif  //#ifdef DEBUG
+#endif //#ifdef DEBUG
 
 // dump_signer
 
@@ -314,4 +314,4 @@ void dump_signer::feel_private_dsa_key()
     m_private_key.m_value[19] = 0x17;
 }
 
-}  // namespace mp_anticheat
+} // namespace mp_anticheat

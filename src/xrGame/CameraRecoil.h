@@ -47,6 +47,6 @@ struct CameraRecoil
         VERIFY(!fis_zero(MaxAngleVert));
         VERIFY(!fis_zero(MaxAngleHorz));
     }
-};  // struct CameraRecoil
+}; // struct CameraRecoil
 
-#endif  // CAMERA_RECOIL_H_INCLUDED
+#endif // CAMERA_RECOIL_H_INCLUDED

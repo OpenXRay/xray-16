@@ -377,10 +377,10 @@ IC void CLevelGraph::contour(CLevelGraph::SContour& _contour, const CLevelGraph:
     _contour.v3.set(vertex_position.x + st, vertex_position.y, vertex_position.z + st);
     _contour.v4.set(vertex_position.x - st, vertex_position.y, vertex_position.z + st);
 
-    project_point(plane, _contour.v1);  // minX,minZ
-    project_point(plane, _contour.v2);  // maxX,minZ
-    project_point(plane, _contour.v3);  // maxX,maxZ
-    project_point(plane, _contour.v4);  // minX,maxZ
+    project_point(plane, _contour.v1); // minX,minZ
+    project_point(plane, _contour.v2); // maxX,minZ
+    project_point(plane, _contour.v3); // maxX,maxZ
+    project_point(plane, _contour.v4); // minX,maxZ
 }
 
 IC float CLevelGraph::nearest(Fvector& destination, const Fvector& position, const CLevelGraph::SContour& contour) const

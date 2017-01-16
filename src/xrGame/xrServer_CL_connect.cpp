@@ -134,7 +134,7 @@ void xrServer::SendConnectResult(IClient* CL, u8 res, u8 res1, char* ResultStr)
 
     SendTo(CL->ID, P);
 
-    if (!res)  // need disconnect
+    if (!res) // need disconnect
     {
 #ifdef MP_LOGGING
         Msg("* Server disconnecting client, resaon: %s", ResultStr);
@@ -210,7 +210,7 @@ void xrServer::OnBuildVersionRespond(IClient* CL, NET_Packet& P)
     Msg("_our = %d", _our);
     Msg("_him = %d", _him);
     _our = MP_DEBUG_AUTH;
-#endif  // USE_DEBUG_AUTH
+#endif // USE_DEBUG_AUTH
 
     if (_our != _him) {
         SendConnectResult(CL, 0, ecr_data_verification_failed, "Data verification failed. Cheater?");

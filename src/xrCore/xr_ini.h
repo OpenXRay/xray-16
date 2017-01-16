@@ -101,10 +101,10 @@ public:
     Root const& sections() const { return DATA; }
     CLASS_ID r_clsid(LPCSTR S, LPCSTR L) const;
     CLASS_ID r_clsid(const shared_str& S, LPCSTR L) const { return r_clsid(*S, L); }
-    LPCSTR r_string(LPCSTR S, LPCSTR L) const;                                                  // Left quotes in place
-    LPCSTR r_string(const shared_str& S, LPCSTR L) const { return r_string(*S, L); }            // Left quotes in place
-    shared_str r_string_wb(LPCSTR S, LPCSTR L) const;                                           // Remove quotes
-    shared_str r_string_wb(const shared_str& S, LPCSTR L) const { return r_string_wb(*S, L); }  // Remove quotes
+    LPCSTR r_string(LPCSTR S, LPCSTR L) const;                                                 // Left quotes in place
+    LPCSTR r_string(const shared_str& S, LPCSTR L) const { return r_string(*S, L); }           // Left quotes in place
+    shared_str r_string_wb(LPCSTR S, LPCSTR L) const;                                          // Remove quotes
+    shared_str r_string_wb(const shared_str& S, LPCSTR L) const { return r_string_wb(*S, L); } // Remove quotes
     u8 r_u8(LPCSTR S, LPCSTR L) const;
     u8 r_u8(const shared_str& S, LPCSTR L) const { return r_u8(*S, L); }
     u16 r_u16(LPCSTR S, LPCSTR L) const;
@@ -170,4 +170,4 @@ public:
 extern XRCORE_API CInifile const* pSettings;
 extern XRCORE_API CInifile const* pSettingsAuth;
 
-#endif  //__XR_INI_H__
+#endif //__XR_INI_H__

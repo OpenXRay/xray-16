@@ -25,7 +25,7 @@ float dbg_imotion_draw_velocity_scale = 0.01;
 
 #endif
 
-static const float max_collide_timedelta = 0.02f;  // 0.005f;
+static const float max_collide_timedelta = 0.02f; // 0.005f;
 static const float end_delta = 0.5f * max_collide_timedelta;
 static const float collide_adwance_delta = 2.f * max_collide_timedelta;
 static const float depth_resolve = 0.01f;
@@ -96,7 +96,7 @@ static std::string collide_diag()
 void disable_bone_calculation(IKinematics& K, bool v)
 {
     u16 bn = K.LL_BoneCount();
-    for (u16 i = 1; i < bn; ++i)  // ommit real root
+    for (u16 i = 1; i < bn; ++i) // ommit real root
     {
         CBoneInstance& bi = K.LL_GetBoneInstance(i);
         if (bi.callback_param() != 0) continue;
@@ -540,7 +540,7 @@ float imotion_position::motion_collide(float dt, IKinematicsAnimated& KA)
 #endif
         u32 sv_blends_num = blends_num(KA);
         buffer_vector<sblend_save> saved_blends(_alloca(sv_blends_num * sizeof(sblend_save)), sv_blends_num);
-        save_blends(saved_blends, KA);  //		sv1
+        save_blends(saved_blends, KA); //		sv1
         float depth0 = depth;
         advance_time += collide_animation(collide_adwance_delta, KA);
 
@@ -577,7 +577,7 @@ float imotion_position::motion_collide(float dt, IKinematicsAnimated& KA)
                 flags.set(fl_switch_dm_toragdoll, TRUE);
             }
         }
-        restore_blends(saved_blends);  // rs1
+        restore_blends(saved_blends); // rs1
         // advance_time += advance_animation( dt-advance_time, KA );
         time_to_end += (dt - advance_time);
         advance_time += (dt - advance_time);
@@ -647,7 +647,7 @@ void imotion_position::set_root_callback()
     VERIFY(K);
     CBoneInstance& bi = K->LL_GetBoneInstance(0);
     VERIFY(!bi.callback());
-    bi.set_callback(bctCustom, rootbone_callback, this, true);  // root may be not "0" !
+    bi.set_callback(bctCustom, rootbone_callback, this, true); // root may be not "0" !
 }
 
 void imotion_position::remove_root_callback()

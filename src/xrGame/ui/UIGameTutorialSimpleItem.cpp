@@ -268,7 +268,7 @@ bool CUISequenceSimpleItem::Stop(bool bForce)
 {
     if (!m_flags.test(etiCanBeStopped) && !bForce) return false;
 
-    if (m_UIWindow->GetParent() == m_owner->MainWnd())  // started??
+    if (m_UIWindow->GetParent() == m_owner->MainWnd()) // started??
         m_owner->MainWnd()->DetachChild(m_UIWindow);
 
     m_sound.stop();
@@ -295,10 +295,10 @@ void CUISequenceSimpleItem::OnKeyboardPress(int dik)
 {
     if (!m_flags.test(etiCanBeStopped)) {
         VERIFY(m_continue_dik_guard != -1);
-        if (m_continue_dik_guard == -1) m_flags.set(etiCanBeStopped, TRUE);  // not binded action :(
+        if (m_continue_dik_guard == -1) m_flags.set(etiCanBeStopped, TRUE); // not binded action :(
 
         if (m_continue_dik_guard == 9999 || dik == m_continue_dik_guard)
-            m_flags.set(etiCanBeStopped, TRUE);  // match key
+            m_flags.set(etiCanBeStopped, TRUE); // match key
     }
 
     for (u32 idx = 0; idx < m_actions.size(); ++idx)

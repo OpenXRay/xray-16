@@ -61,4 +61,4 @@ public:
     u32 Height(bool bRealSize);
 };
 
-#endif  // xrTheora_SurfaceH
+#endif // xrTheora_SurfaceH

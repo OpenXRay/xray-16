@@ -38,4 +38,4 @@ void hits_store::add_hit(
     tmp_iter->second->push_obsolete(tmp_hit);
 }
 
-}  // namespace award_system
+} // namespace award_system

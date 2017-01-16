@@ -42,10 +42,10 @@ protected:
     Fvector const& m_target;
     MotionID m_animation_id;
     bool m_animation_start;
-};  // class position_bone_aimer
+}; // class position_bone_aimer
 
-}  // namespace aimers
+} // namespace aimers
 
 #include "aimers_base_inline.h"
 
-#endif  // #ifndef AIMERS_BASE_H_INCLUDED
+#endif // #ifndef AIMERS_BASE_H_INCLUDED

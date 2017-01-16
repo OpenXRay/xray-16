@@ -58,8 +58,8 @@ private:
     void reset_stats();
     void reset_max();
     void write_max();
-};  // class best_scores_helper
+}; // class best_scores_helper
 
-}  // namespace award_system
+} // namespace award_system
 
-#endif  //#ifndef BEST_SCORES_HELPER_INCLUDED
+#endif //#ifndef BEST_SCORES_HELPER_INCLUDED

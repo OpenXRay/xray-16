@@ -121,7 +121,7 @@ void ImplicitExecute::Execute(net_task_callback* net_callback)
             }
             catch (...)
             {
-                Logger.clMsg("* THREAD #%d: Access violation. Possibly recovered.");  //,thID
+                Logger.clMsg("* THREAD #%d: Access violation. Possibly recovered."); //,thID
             }
             if (Fcount) {
                 // Calculate lighting amount

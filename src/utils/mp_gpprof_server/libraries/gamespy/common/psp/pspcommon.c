@@ -271,7 +271,7 @@ int gsiPspStartNetworkModules()
     ret = sceNetApDialogDummyInit();
     if (ret < 0) {
         printf("sceNetApDialogDummyInit() failed. ret = 0x%x\n", ret);
-        gsiPspnetErrorHandler(serviceToShutDown);  // called with 31
+        gsiPspnetErrorHandler(serviceToShutDown); // called with 31
         return ret;
     }
 
@@ -280,7 +280,7 @@ int gsiPspStartNetworkModules()
     ret = sceWlanGetSwitchState();
     if (ret == SCE_WLAN_SWITCH_STATE_OFF) {
         printf("Wireless LAN switch has been turned off.\n");
-        gsiPspnetErrorHandler(serviceToShutDown);  // called with 63
+        gsiPspnetErrorHandler(serviceToShutDown); // called with 63
         return ret;
     }
 
@@ -291,7 +291,7 @@ int gsiPspStartNetworkModules()
     ret = sceNetApDialogDummyConnect(&gApDialogDummyParam);
     if (ret < 0) {
         printf("sceNetApDialogDummyConnect() failed. ret = 0x%x\n", ret);
-        gsiPspnetErrorHandler(serviceToShutDown);  // called with 63
+        gsiPspnetErrorHandler(serviceToShutDown); // called with 63
         return ret;
     }
 
@@ -308,7 +308,7 @@ int gsiPspStartNetworkModules()
 
     if (ap_dialog_dummy_state.state == SceNetApDialogDummyState_Disconnected) {
         printf("failed to Join or Get IP addr. error = 0x%x\n", ap_dialog_dummy_state.error_code);
-        gsiPspnetErrorHandler(serviceToShutDown);  // called with 63
+        gsiPspnetErrorHandler(serviceToShutDown); // called with 63
         return ap_dialog_dummy_state.error_code;
     }
 
@@ -316,7 +316,7 @@ int gsiPspStartNetworkModules()
     ret = sceNetApctlGetInfo(SCE_NET_APCTL_INFO_IP_ADDRESS, &apctl_info);
     if (ret < 0) {
         printf("sceNetApctlGetInfo() failed. ret = 0x%x\n", ret);
-        gsiPspnetErrorHandler(serviceToShutDown);  // called with 127
+        gsiPspnetErrorHandler(serviceToShutDown); // called with 127
         return ret;
     }
     printf("obtained IP addr: %s\n", apctl_info.ip_address);
@@ -368,4 +368,4 @@ int main(int argc, char** argp)
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
-#endif  // _PSP only
+#endif // _PSP only

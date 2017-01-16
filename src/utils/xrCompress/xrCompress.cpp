@@ -14,7 +14,7 @@ xrCompressor::xrCompressor()
     c_heap = NULL;
     dwTimeStart = 0;
 
-    XRP_MAX_SIZE = 1024 * 1024 * 640;  // bytes (640Mb)
+    XRP_MAX_SIZE = 1024 * 1024 * 640; // bytes (640Mb)
 }
 
 xrCompressor::~xrCompressor()
@@ -208,7 +208,7 @@ void xrCompressor::CompressOne(LPCSTR path)
             Msg("%-80s   - VFS", path);
         }
         else
-        {  // if(testVFS(path))
+        { // if(testVFS(path))
             // Compress into BaseFS
             c_ptr = fs_pack_writer->tell();
             c_size_real = src->length();
@@ -248,7 +248,7 @@ void xrCompressor::CompressOne(LPCSTR path)
                         R_ASSERT(LZO_E_OK == lzo1x_optimize(c_data, c_size_compressed, c_out, &c_orig, NULL));
                         R_ASSERT(c_orig == c_size_real);
                         xr_free(c_out);
-                    }  // bFast
+                    } // bFast
                     fs_pack_writer->w(c_data, c_size_compressed);
                     printf("%3.1f%%", 100.f * float(c_size_compressed) / float(src->length()));
                     Msg("%-80s   - OK (%3.1f%%)", path, 100.f * float(c_size_compressed) / float(src->length()));
@@ -258,14 +258,14 @@ void xrCompressor::CompressOne(LPCSTR path)
                 xr_free(c_data);
             }
             else
-            {  // 0!=c_size_real
+            { // 0!=c_size_real
                 filesVFS++;
                 c_size_compressed = c_size_real;
                 printf("VFS (R)");
                 Msg("%-80s   - EMPTY FILE", path);
             }
-        }  // test VFS
-    }      //(A)
+        } // test VFS
+    }     //(A)
 
     // Write description
     write_file_header(path, c_crc32, c_ptr, c_size_real, c_size_compressed);
@@ -533,7 +533,7 @@ void xrCompressor::ProcessLTX(CInifile& ltx)
                 Msg("-F: %s", path);
             }
         }
-    }  // if(ltx.section_exist("include_folders"))
+    } // if(ltx.section_exist("include_folders"))
 
     if (ltx.section_exist("include_files")) {
         CInifile::Sect& if_sect = ltx.r_section("include_files");

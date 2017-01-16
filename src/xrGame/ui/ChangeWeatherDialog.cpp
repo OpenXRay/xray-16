@@ -58,7 +58,7 @@ bool ButtonListDialog::OnKeyboardAction(int dik, EUIMessages keyboardAction)
             return true;
         }
         int btnCount = buttons.size();
-        if (dik >= DIK_1 && dik <= DIK_1 - 1 + btnCount && btnCount <= 9)  // handle 1..9 keys only
+        if (dik >= DIK_1 && dik <= DIK_1 - 1 + btnCount && btnCount <= 9) // handle 1..9 keys only
         {
             OnButtonClick(dik - DIK_1);
             return true;

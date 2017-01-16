@@ -59,4 +59,4 @@ ETOOLS_API bool __stdcall intersect(const Fmatrix& object_transform, const IKine
 };
 };
 
-#endif  // EToolsH
+#endif // EToolsH

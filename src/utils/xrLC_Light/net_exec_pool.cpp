@@ -43,7 +43,7 @@ bool exec_pool::has(u32 id)
 
 void exec_pool::receive_result(IGenericStream* inStream)
 {
-    u32 id = u32(-1), type = u32(-1);  // r.r_u32();
+    u32 id = u32(-1), type = u32(-1); // r.r_u32();
     read_task_caption(inStream, id, type);
 
     // xr_vector<u32>::iterator it =std::find( pool.begin(), pool.end(), id );
@@ -147,7 +147,7 @@ void exec_pool::send_task(IGridUser& user, IGenericStream* Stream, u8 pool_id, u
     R_ASSERT(has(id));
     IGenericStream* outStream = CreateGenericStream();
     //////////////////////////////////////////////////////
-    write_task_pool(outStream, pool_id);  ////////////////////
+    write_task_pool(outStream, pool_id); ////////////////////
     //////////////////////////////////////////////////////
     cleanup().on_net_send(outStream);
 

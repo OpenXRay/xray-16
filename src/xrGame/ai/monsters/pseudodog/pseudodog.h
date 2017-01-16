@@ -12,7 +12,7 @@ public:
 
     TTime m_time_became_angry;
 
-    TTime time_growling;  // время нахождения в состоянии пугания
+    TTime time_growling; // время нахождения в состоянии пугания
 
     enum
     {

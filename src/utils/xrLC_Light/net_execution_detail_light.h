@@ -22,7 +22,7 @@ class tnet_execution_base<et_detail_light>::net_execution_impl
 
 public:
     net_execution_impl() : start(u32(-1)), end(-1) {}
-    void construct(u32 _x, u32 _z);  // { start = _start;end = _end; }
+    void construct(u32 _x, u32 _z); // { start = _start;end = _end; }
     void send_task(IGenericStream* outStream);
     void receive_result(IGenericStream* outStream);
     bool receive_task(IAgent* agent, DWORD sessionId, IGenericStream* inStream);
@@ -36,4 +36,4 @@ struct add_global<et_detail_light, gl_detail_cl_data>
 // execution_lightmaps
 };
 
-#endif  // #ifndef NET_EXECUTION_DETAIL_LIGHT_H_INCLUDED
+#endif // #ifndef NET_EXECUTION_DETAIL_LIGHT_H_INCLUDED

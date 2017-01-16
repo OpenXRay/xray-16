@@ -25,7 +25,7 @@ private:
     LPCSTR getMaterialName(MDagPath& mdagPath, int cid, int objectIdx);
     MStatus ExportPart(CEditableObject* O, MDagPath&, MObject&);
     MStatus set_smoth_flags(
-        u32& flags, const MIntArray& tri_vert_indeces);  // const MFnMesh &fnMesh, const MItMeshPolygon &meshPoly,
+        u32& flags, const MIntArray& tri_vert_indeces); // const MFnMesh &fnMesh, const MItMeshPolygon &meshPoly,
     MStatus ExportSelected(CEditableObject* O);
     MStatus ExportAll(CEditableObject* O);
 
@@ -99,4 +99,4 @@ private:
     MStringArray transformNodeNameArray;
 };
 
-#endif  // maTranslatorH
+#endif // maTranslatorH

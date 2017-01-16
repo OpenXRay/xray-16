@@ -78,4 +78,4 @@ public:
 
 extern ENGINE_API CApplication* pApp;
 
-#endif  //__XR_BASE_H__
+#endif //__XR_BASE_H__

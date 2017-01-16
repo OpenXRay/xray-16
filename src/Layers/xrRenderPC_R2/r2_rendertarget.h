@@ -43,38 +43,38 @@ public:
 #endif
 
     // MRT-path
-    ref_rt rt_Depth;     // Z-buffer like - initial depth
-    ref_rt rt_Position;  // 64bit,	fat	(x,y,z,?)				(eye-space)
-    ref_rt rt_Normal;    // 64bit,	fat	(x,y,z,hemi)			(eye-space)
-    ref_rt rt_Color;     // 64/32bit,fat	(r,g,b,specular-gloss)	(or decompressed MET-8-8-8-8)
+    ref_rt rt_Depth;    // Z-buffer like - initial depth
+    ref_rt rt_Position; // 64bit,	fat	(x,y,z,?)				(eye-space)
+    ref_rt rt_Normal;   // 64bit,	fat	(x,y,z,hemi)			(eye-space)
+    ref_rt rt_Color;    // 64/32bit,fat	(r,g,b,specular-gloss)	(or decompressed MET-8-8-8-8)
 
     //
-    ref_rt rt_Accumulator;       // 64bit		(r,g,b,specular)
-    ref_rt rt_Accumulator_temp;  // only for HW which doesn't feature fp16 blend
-    ref_rt rt_Generic_0;         // 32bit		(r,g,b,a)				// post-process, intermidiate results, etc.
-    ref_rt rt_Generic_1;         // 32bit		(r,g,b,a)				// post-process, intermidiate results, etc.
+    ref_rt rt_Accumulator;      // 64bit		(r,g,b,specular)
+    ref_rt rt_Accumulator_temp; // only for HW which doesn't feature fp16 blend
+    ref_rt rt_Generic_0;        // 32bit		(r,g,b,a)				// post-process, intermidiate results, etc.
+    ref_rt rt_Generic_1;        // 32bit		(r,g,b,a)				// post-process, intermidiate results, etc.
     //	Igor: for volumetric lights
-    ref_rt rt_Generic_2;  // 32bit		(r,g,b,a)				// post-process, intermidiate results, etc.
-    ref_rt rt_Bloom_1;    // 32bit, dim/4	(r,g,b,?)
-    ref_rt rt_Bloom_2;    // 32bit, dim/4	(r,g,b,?)
-    ref_rt rt_LUM_64;     // 64bit, 64x64,	log-average in all components
-    ref_rt rt_LUM_8;      // 64bit, 8x8,		log-average in all components
+    ref_rt rt_Generic_2; // 32bit		(r,g,b,a)				// post-process, intermidiate results, etc.
+    ref_rt rt_Bloom_1;   // 32bit, dim/4	(r,g,b,?)
+    ref_rt rt_Bloom_2;   // 32bit, dim/4	(r,g,b,?)
+    ref_rt rt_LUM_64;    // 64bit, 64x64,	log-average in all components
+    ref_rt rt_LUM_8;     // 64bit, 8x8,		log-average in all components
 
     //	Igor: for async screenshots
-    IDirect3DSurface9* pFB;  // 32bit		(r,g,b,a) is situated in the system memory
+    IDirect3DSurface9* pFB; // 32bit		(r,g,b,a) is situated in the system memory
 
-    ref_rt rt_LUM_pool[CHWCaps::MAX_GPUS * 2];  // 1xfp32,1x1,		exp-result -> scaler
-    ref_texture t_LUM_src;                      // source
-    ref_texture t_LUM_dest;                     // destination & usage for current frame
+    ref_rt rt_LUM_pool[CHWCaps::MAX_GPUS * 2]; // 1xfp32,1x1,		exp-result -> scaler
+    ref_texture t_LUM_src;                     // source
+    ref_texture t_LUM_dest;                    // destination & usage for current frame
 
     // env
-    ref_texture t_envmap_0;  // env-0
-    ref_texture t_envmap_1;  // env-1
+    ref_texture t_envmap_0; // env-0
+    ref_texture t_envmap_1; // env-1
 
     // smap
-    ref_rt rt_smap_surf;            // 32bit,		color
-    ref_rt rt_smap_depth;           // 24(32) bit,	depth
-    IDirect3DSurface9* rt_smap_ZB;  //
+    ref_rt rt_smap_surf;           // 32bit,		color
+    ref_rt rt_smap_depth;          // 24(32) bit,	depth
+    IDirect3DSurface9* rt_smap_ZB; //
 
     // Textures
     IDirect3DVolumeTexture9* t_material_surf;
@@ -134,7 +134,7 @@ private:
 
     // Combine
     ref_geom g_combine;
-    ref_geom g_combine_VP;  // xy=p,zw=tc
+    ref_geom g_combine_VP; // xy=p,zw=tc
     ref_geom g_combine_2UV;
     ref_geom g_combine_cuboid;
     ref_geom g_aa_blur;
@@ -220,7 +220,7 @@ public:
 
     bool need_to_render_sunshafts();
 
-    BOOL enable_scissor(light* L);  // true if intersects near plane
+    BOOL enable_scissor(light* L); // true if intersects near plane
     void enable_dbt_bounds(light* L);
 
     void disable_aniso();

@@ -28,7 +28,7 @@ static void on_error_dialog(bool before)
 {
 #ifdef INGAME_EDITOR
     if (Device.editor()) return;
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR
     if (!pInput || !g_exclusive) return;
 
     if (before) {
@@ -131,7 +131,7 @@ HRESULT CInput::CreateInputDevice(
 // should interact with the system and with other DirectInput applications.
 #ifdef INGAME_EDITOR
     if (!Device.editor())
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR
     {
         HRESULT _hr = (*device)->SetCooperativeLevel(RDEVICE.m_hWnd, dwFlags);
         if (FAILED(_hr) && (_hr == E_NOTIMPL))
@@ -204,7 +204,7 @@ void CInput::KeyUpdate()
 
             if (b_dik_pause_was_pressed && !(od[idx].dwData & 0x80)) {
                 od[idx].uAppData = 666;
-                continue;  // skip one-frame pause key on-off switch
+                continue; // skip one-frame pause key on-off switch
             }
         }
         KBState[od[idx].dwOfs] = od[idx].dwData & 0x80;
@@ -228,7 +228,7 @@ void CInput::KeyUpdate()
     {
         for (u32 i = 0; i < dwElements; i++)
         {
-            if (od[i].uAppData == 666)  // ignored action
+            if (od[i].uAppData == 666) // ignored action
                 continue;
 
             key = od[i].dwOfs;
@@ -321,7 +321,7 @@ BOOL CInput::iGetAsyncKeyState(int dik)
         return iGetAsyncBtnState(mk);
     }
     else
-        return FALSE;  // unknown key ???
+        return FALSE; // unknown key ???
 }
 
 BOOL CInput::iGetAsyncBtnState(int btn)
@@ -593,7 +593,7 @@ void CInput::acquire(const bool& exclusive)
     pKeyboard->SetCooperativeLevel(
 #ifdef INGAME_EDITOR
         Device.editor() ? Device.editor()->main_handle() :
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR
                           RDEVICE.m_hWnd,
         (exclusive ? DISCL_EXCLUSIVE : DISCL_NONEXCLUSIVE) | DISCL_FOREGROUND);
     pKeyboard->Acquire();
@@ -601,7 +601,7 @@ void CInput::acquire(const bool& exclusive)
     pMouse->SetCooperativeLevel(
 #ifdef INGAME_EDITOR
         Device.editor() ? Device.editor()->main_handle() :
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR
                           RDEVICE.m_hWnd,
         (exclusive ? DISCL_EXCLUSIVE : DISCL_NONEXCLUSIVE) | DISCL_FOREGROUND | DISCL_NOWINKEY);
     pMouse->Acquire();

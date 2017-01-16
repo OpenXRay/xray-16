@@ -307,7 +307,7 @@ bool weather::add_time_frame(char const* buffer, u32 const& buffer_size)
         {
             return (xr_strcmp(time->id(), id) < 0);
         }
-    };  // struct id
+    }; // struct id
 
     container_type::iterator found = std::lower_bound(m_times.begin(), m_times.end(), section, &id::predicate);
 
@@ -346,4 +346,4 @@ void weather::reload()
     load();
 }
 
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR

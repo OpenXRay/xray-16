@@ -30,7 +30,7 @@ Copyright 2000 GameSpy Industries, Inc
 #define PORT 12345
 #define MAX_CLIENTS 8
 #define TIMEOUT (30 * 1000)
-#define SEND_TIME 500  // (10 * 1000)
+#define SEND_TIME 500 // (10 * 1000)
 
 #define REPORT
 

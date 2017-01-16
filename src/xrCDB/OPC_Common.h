@@ -77,8 +77,8 @@ public:
         return true;
     }
 
-    Point mCenter;   //!< Box center
-    Point mExtents;  //!< Box extents
+    Point mCenter;  //!< Box center
+    Point mExtents; //!< Box extents
 };
 
 class OPCODE_API QuantizedAABB
@@ -88,8 +88,8 @@ public:
     inline_ QuantizedAABB() {}
     //! Destructor
     inline_ ~QuantizedAABB() {}
-    sword mCenter[3];   //!< Quantized center
-    uword mExtents[3];  //!< Quantized extents
+    sword mCenter[3];  //!< Quantized center
+    uword mExtents[3]; //!< Quantized extents
 };
 
 class OPCODE_API CollisionFace
@@ -99,9 +99,9 @@ public:
     inline_ CollisionFace() {}
     //! Destructor
     inline_ ~CollisionFace() {}
-    udword mFaceID;   //!< Index of touched face
-    float mDistance;  //!< Distance from collider to hitpoint
-    float mU, mV;     //!< Impact barycentric coordinates
+    udword mFaceID;  //!< Index of touched face
+    float mDistance; //!< Distance from collider to hitpoint
+    float mU, mV;    //!< Impact barycentric coordinates
 };
 
 class OPCODE_API CollisionFaces : private Container
@@ -125,4 +125,4 @@ inline_ void TransformPoint(Point& dest, const Point& source, const Matrix3x3& r
     dest.z = trans.z + source.x * rot.m[0][2] + source.y * rot.m[1][2] + source.z * rot.m[2][2];
 }
 
-#endif  //__OPC_COMMON_H__
+#endif //__OPC_COMMON_H__

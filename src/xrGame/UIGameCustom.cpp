@@ -352,7 +352,7 @@ void CMapListHelper::Load()
     levelsPath->_set_root(tempRoot);
     for (CLocatorAPI::archive& arch : FS.m_archives)
     {
-        if (arch.hSrcFile) continue;  // skip if loaded
+        if (arch.hSrcFile) continue; // skip if loaded
         const char* levelName = arch.header->r_string("header", "level_name");
         const char* levelVersion = arch.header->r_string("header", "level_ver");
         FS.LoadArchive(arch, tempRoot);

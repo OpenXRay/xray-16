@@ -54,7 +54,7 @@ reader::reader(IReader* freader)
         Msg("Can't find info section");
         return;
     }
-    --tmp_info_begin;  //- '['
+    --tmp_info_begin; //- '['
     u32 m_info_size = xr_strlen(tmp_info_begin);
     m_info_pos = static_cast<u32>((u8*)tmp_info_begin - m_jpeg_data);
 
@@ -106,10 +106,10 @@ bool const reader::verify()
     // xr_strcat(jpeg_info_start, m_info_size, admin_name().c_str());
     xr_strcat(jpeg_info_start, m_info_size, creation_date().c_str());
 
-    u32 jpeg_info_size = xr_strlen(jpeg_info_start) + 1;  // ending zero
+    u32 jpeg_info_size = xr_strlen(jpeg_info_start) + 1; // ending zero
     u32 jpeg_full_size = m_info_pos + jpeg_info_size;
 
     return m_verifyer.verify(m_jpeg_data, jpeg_full_size, tmp_sign);
 }
 
-}  // namespace screenshots
+} // namespace screenshots

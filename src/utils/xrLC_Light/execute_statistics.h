@@ -20,7 +20,7 @@ public:
     void log() const;
 
 private:
-};  // class execute_statistics
+}; // class execute_statistics
 class execute_statistics
 {
 public:
@@ -32,4 +32,4 @@ public:
 };
 
 #endif
-#endif  // #ifndef EXECUTE_STATISTICS_H_INCLUDED
+#endif // #ifndef EXECUTE_STATISTICS_H_INCLUDED

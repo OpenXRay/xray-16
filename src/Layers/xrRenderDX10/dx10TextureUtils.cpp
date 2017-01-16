@@ -12,12 +12,12 @@ struct TextureFormatPairs
 TextureFormatPairs TextureFormatList[] = {
     {D3DFMT_UNKNOWN, DXGI_FORMAT_UNKNOWN},
     // D3DFMT_R8G8B8 Not available
-    {D3DFMT_A8R8G8B8, DXGI_FORMAT_R8G8B8A8_UNORM},  // Not available
-                                                    // D3DFMT_X8R8G8B8 Not available
+    {D3DFMT_A8R8G8B8, DXGI_FORMAT_R8G8B8A8_UNORM}, // Not available
+                                                   // D3DFMT_X8R8G8B8 Not available
     //	TODO: DX10: Remove. Need only for nullrt
     //{ D3DFMT_R5G6B5,		DXGI_FORMAT_B5G6R5_UNORM },		// Not available
-    {D3DFMT_R5G6B5, DXGI_FORMAT_R8G8B8A8_UNORM},  // Not available
-                                                  // D3DFMT_X1R5G5B5 Not available
+    {D3DFMT_R5G6B5, DXGI_FORMAT_R8G8B8A8_UNORM}, // Not available
+                                                 // D3DFMT_X1R5G5B5 Not available
     // D3DFMT_A1R5G5B5 Not available
     // D3DFMT_A4R4G4B4 Not available
     // D3DFMT_R3G3B2 Not available
@@ -25,16 +25,16 @@ TextureFormatPairs TextureFormatList[] = {
     // D3DFMT_A8R3G3B2 Not available
     // D3DFMT_X4R4G4B4 Not available
     // D3DFMT_A2B10G10R10 DXGI_FORMAT_R10G10B10A2
-    {D3DFMT_A8B8G8R8, DXGI_FORMAT_R8G8B8A8_UNORM},  // & DXGI_FORMAT_R8G8B8A8_UNORM_SRGB
-                                                    // D3DFMT_X8B8G8R8 Not available
+    {D3DFMT_A8B8G8R8, DXGI_FORMAT_R8G8B8A8_UNORM}, // & DXGI_FORMAT_R8G8B8A8_UNORM_SRGB
+                                                   // D3DFMT_X8B8G8R8 Not available
     {D3DFMT_G16R16, DXGI_FORMAT_R16G16_UNORM},
     // D3DFMT_A2R10G10B10 Not available
     {D3DFMT_A16B16G16R16, DXGI_FORMAT_R16G16B16A16_UNORM},
     // D3DFMT_A8P8 Not available
     // D3DFMT_P8 Not available
-    {D3DFMT_L8, DXGI_FORMAT_R8_UNORM},  // Note: Use .r swizzle in shader to duplicate red to other components to get
-                                        // D3D9 behavior.
-                                        // D3DFMT_A8L8 Not available
+    {D3DFMT_L8, DXGI_FORMAT_R8_UNORM}, // Note: Use .r swizzle in shader to duplicate red to other components to get
+                                       // D3D9 behavior.
+                                       // D3DFMT_A8L8 Not available
     // D3DFMT_A4L4 Not available
     {D3DFMT_V8U8, DXGI_FORMAT_R8G8_SNORM},
     // D3DFMT_L6V5U5 Not available
@@ -61,7 +61,7 @@ TextureFormatPairs TextureFormatList[] = {
     // D3DFMT_D32 Not available
     // D3DFMT_D15S1 Not available
     // D3DFMT_D24S8 Not available
-    {D3DFMT_D24X8, DXGI_FORMAT_R24G8_TYPELESS},  // DXGI_FORMAT_D24_UNORM_S8_UINT},	// Not available
+    {D3DFMT_D24X8, DXGI_FORMAT_R24G8_TYPELESS}, // DXGI_FORMAT_D24_UNORM_S8_UINT},	// Not available
     // D3DFMT_D24X4S4 Not available
     // D3DFMT_D16 DXGI_FORMAT_D16_UNORM
     //{ D3DFMT_D32F_LOCKABLE, DXGI_FORMAT_D32_FLOAT},

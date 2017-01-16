@@ -34,7 +34,7 @@ void CStateCaptureJumpBloodsuckerAbstract::setup_substates()
         SStateDataAction data;
 
         data.action = ACT_STAND_IDLE;
-        data.time_out = 0;  // do not use time out
+        data.time_out = 0; // do not use time out
         /*data.sound_type	= MonsterSound::eMonsterSoundIdle;
         data.sound_delay = object->db().m_dwIdleSndDelay;
         */

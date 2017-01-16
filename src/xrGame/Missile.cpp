@@ -437,7 +437,7 @@ void CMissile::Throw()
 {
 #ifndef MASTER_GOLD
     Msg("throw [%d]", Device.dwFrame);
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
     VERIFY(smart_cast<CEntity*>(H_Parent()));
     setup_throw_params();
 
@@ -556,7 +556,7 @@ void CMissile::UpdateFireDependencies_internal()
         UpdateXForm();
 
         if (GetHUDmode() && !IsHidden()) {
-            R_ASSERT(0);  // implement this!!!
+            R_ASSERT(0); // implement this!!!
             /*
                         // 1st person view - skeletoned
                         CKinematics* V			= smart_cast<CKinematics*>(GetHUD()->Visual());
@@ -652,7 +652,7 @@ void CMissile::setup_physic_shell()
 {
     R_ASSERT(!m_pPhysicsShell);
     create_physic_shell();
-    m_pPhysicsShell->Activate(XFORM(), 0, XFORM());  //,true
+    m_pPhysicsShell->Activate(XFORM(), 0, XFORM()); //,true
     IKinematics* kinematics = smart_cast<IKinematics*>(Visual());
     R_ASSERT(kinematics);
     kinematics->CalculateBones_Invalidate();

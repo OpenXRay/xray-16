@@ -18,11 +18,11 @@
             spu_hcmpeq((cond), 0);                                                                                     \
         }                                                                                                              \
     } while (0)
-#else  // __CELLOS_LV2__
+#else // __CELLOS_LV2__
 #define SPU_ASSERT(cond) assert(cond)
-#endif  //__CELLOS_LV2__
+#endif //__CELLOS_LV2__
 
-#else  // _DEBUG
+#else // _DEBUG
 
 #ifdef __CELLOS_LV2__
 #include <spu_printf.h>
@@ -38,11 +38,11 @@
 // Sauce
 // Later on we'll want no asserts in release builds
 //#define SPU_ASSERT(cond) do {} while (0)
-#else  // __CELLOS_LV2__
+#else // __CELLOS_LV2__
 #define SPU_ASSERT(cond) assert(cond)
-#endif  // __CELLOS_LV2__
+#endif // __CELLOS_LV2__
 
-#endif  // _DEBUG
+#endif // _DEBUG
 
 // Usage:
 // SPU_COMPILE_TIME_ASSERT(sizeof(MyStructure) <= 128);

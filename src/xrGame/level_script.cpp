@@ -112,7 +112,7 @@ void set_weather(LPCSTR weather_name, bool forced)
 {
 #ifdef INGAME_EDITOR
     if (!Device.editor())
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR
         g_pGamePersistent->Environment().SetWeather(weather_name, forced);
 }
 
@@ -120,24 +120,24 @@ bool set_weather_fx(LPCSTR weather_name)
 {
 #ifdef INGAME_EDITOR
     if (!Device.editor())
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR
         return (g_pGamePersistent->Environment().SetWeatherFX(weather_name));
 
 #ifdef INGAME_EDITOR
     return (false);
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR
 }
 
 bool start_weather_fx_from_time(LPCSTR weather_name, float time)
 {
 #ifdef INGAME_EDITOR
     if (!Device.editor())
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR
         return (g_pGamePersistent->Environment().StartWeatherFXFromTime(weather_name, time));
 
 #ifdef INGAME_EDITOR
     return (false);
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR
 }
 
 bool is_wfx_playing()
@@ -161,7 +161,7 @@ void set_time_factor(float time_factor)
 
 #ifdef INGAME_EDITOR
     if (Device.editor()) return;
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR
 
     Level().Server->GetGameState()->SetGameTimeFactor(time_factor);
 }
@@ -213,7 +213,7 @@ void change_game_time(u32 days, u32 hours, u32 mins)
     if (tpGame && ai().get_alife()) {
         u32 value = days * 86400 + hours * 3600 + mins * 60;
         float fValue = static_cast<float>(value);
-        value *= 1000;  // msec
+        value *= 1000; // msec
         g_pGamePersistent->Environment().ChangeGameTime(fValue);
         tpGame->alife().time_manager().change_game_time(value);
     }
@@ -447,14 +447,14 @@ void disable_input()
     g_bDisableAllInput = true;
 #ifdef DEBUG
     Msg("input disabled");
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 }
 void enable_input()
 {
     g_bDisableAllInput = false;
 #ifdef DEBUG
     Msg("input enabled");
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 }
 
 void spawn_phantom(const Fvector& position)

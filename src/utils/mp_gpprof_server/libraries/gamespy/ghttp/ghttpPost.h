@@ -29,8 +29,8 @@ typedef struct GHIPostingState
     int totalBytes;
     ghttpPostCallback callback;
     void* param;
-    GHTTPBool waitPostContinue;  // does DIME need to wait for continue?
-    GHTTPBool completed;         // prevent re-post in the event of a redirect.
+    GHTTPBool waitPostContinue; // does DIME need to wait for continue?
+    GHTTPBool completed;        // prevent re-post in the event of a redirect.
 } GHIPostingState;
 
 GHTTPPost ghiNewPost(void);

@@ -74,7 +74,7 @@ IC void CStalkerAnimationManager::play_script_impl()
     head().animation(assign_head_animation());
     head().play(m_skeleton_animated, head_play_callback, false, false);
 }
-#else   // USE_HEAD_BONE_PART_FAKE
+#else  // USE_HEAD_BONE_PART_FAKE
 IC void CStalkerAnimationManager::play_script_impl()
 {
     clear_unsafe_callbacks();
@@ -88,7 +88,7 @@ IC void CStalkerAnimationManager::play_script_impl()
     script().play(m_skeleton_animated, script_play_callback, selected.use_movement_controller(),
         selected.local_animation(), false, m_script_bone_part_mask);
 }
-#endif  // USE_HEAD_BONE_PART_FAKE
+#endif // USE_HEAD_BONE_PART_FAKE
 
 bool CStalkerAnimationManager::play_script()
 {
@@ -118,7 +118,7 @@ IC void CStalkerAnimationManager::play_global_impl(const MotionID& animation, bo
     head().animation(assign_head_animation());
     head().play(m_skeleton_animated, head_play_callback, false, false);
 }
-#else   // USE_HEAD_BONE_PART_FAKE
+#else  // USE_HEAD_BONE_PART_FAKE
 IC void CStalkerAnimationManager::play_global_impl(const MotionID& animation, bool const& animation_movement_controller)
 {
     head().reset();
@@ -128,7 +128,7 @@ IC void CStalkerAnimationManager::play_global_impl(const MotionID& animation, bo
     global().animation(animation);
     global().play(m_skeleton_animated, global_play_callback, false, false, false);
 }
-#endif  // USE_HEAD_BONE_PART_FAKE
+#endif // USE_HEAD_BONE_PART_FAKE
 
 bool CStalkerAnimationManager::play_global()
 {

@@ -37,7 +37,7 @@ bool UIGameMP::IR_UIOnKeyboardPress(int dik)
     }
 #ifdef DEBUG
     if (dik == DIK_T) {
-        m_game->AddRewardTask(0);  // mp_award_massacre
+        m_game->AddRewardTask(0); // mp_award_massacre
     }
 #endif
     return inherited::IR_UIOnKeyboardPress(dik);

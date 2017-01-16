@@ -108,4 +108,4 @@ IC const bool& obstacles_query::actual() const
     return (m_actual);
 }
 
-#endif  // OBSTACLES_QUERY_INLINE_H
+#endif // OBSTACLES_QUERY_INLINE_H

@@ -35,9 +35,9 @@ LANGUAGE LANG_UKRAINIAN, SUBLANG_DEFAULT
     3 TEXTINCLUDE BEGIN "\r\n"
                         "\0" END
 
-#endif  // APSTUDIO_INVOKED
+#endif // APSTUDIO_INVOKED
 
-#endif  // Ukrainian (Ukraine) resources
+#endif // Ukrainian (Ukraine) resources
 /////////////////////////////////////////////////////////////////////////////
 
 /////////////////////////////////////////////////////////////////////////////
@@ -73,9 +73,9 @@ LANGUAGE LANG_UKRAINIAN, SUBLANG_DEFAULT
 #ifdef APSTUDIO_INVOKED
                                           GUIDELINES DESIGNINFO BEGIN IDD_NVIEW,
     DIALOG BEGIN LEFTMARGIN, 7 RIGHTMARGIN, 773 TOPMARGIN, 7 BOTTOMMARGIN, 528 END END
-#endif  // APSTUDIO_INVOKED
+#endif // APSTUDIO_INVOKED
 
-#endif  // English (United States) resources
+#endif // English (United States) resources
 /////////////////////////////////////////////////////////////////////////////
 
 #ifndef APSTUDIO_INVOKED
@@ -85,4 +85,4 @@ LANGUAGE LANG_UKRAINIAN, SUBLANG_DEFAULT
 //
 
 /////////////////////////////////////////////////////////////////////////////
-#endif  // not APSTUDIO_INVOKED
+#endif // not APSTUDIO_INVOKED

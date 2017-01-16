@@ -25,7 +25,7 @@ void CHitMarker::InitShader(LPCSTR tex_name)
 
 void CHitMarker::InitShader_Grenade(LPCSTR tex_name)
 {
-    hShader_Grenade->create("hud\\default", tex_name);  // "hud\\default2"
+    hShader_Grenade->create("hud\\default", tex_name); // "hud\\default2"
 }
 
 //--------------------------------------------------------------------
@@ -145,7 +145,7 @@ void CHitMarker::net_Relcase(IGameObject* obj)
             (*it_b)->removed_grenade = true;
             // break;
         }
-    }  // for
+    } // for
 }
 
 //==========================================================================================

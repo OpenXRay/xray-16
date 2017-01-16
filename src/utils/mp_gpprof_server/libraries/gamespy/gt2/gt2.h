@@ -52,36 +52,36 @@ typedef unsigned short GT2MessageID;
 // check individual function definitions to see possible results
 // TODO: list possible results wherever this is used
 typedef enum {
-    GT2Success,            // success
-                           // errors:
-    GT2OutOfMemory,        // ran out of memory
-    GT2Rejected,           // attempt rejected
-    GT2NetworkError,       // networking error (could be local or remote)
-    GT2AddressError,       // invalid or unreachable address
-    GT2DuplicateAddress,   // a connection was attempted to an address that already has a connection on the socket
-    GT2TimedOut,           // time out reached
-    GT2NegotiationError,   // there was an error negotiating with the remote side
-    GT2InvalidConnection,  // the connection didn't exist
-    GT2InvalidMessage,     // used for vdp reliable messages containing voice data, no voice data in reliable messages
-    GT2SendFailed          // the send failed,
+    GT2Success,           // success
+                          // errors:
+    GT2OutOfMemory,       // ran out of memory
+    GT2Rejected,          // attempt rejected
+    GT2NetworkError,      // networking error (could be local or remote)
+    GT2AddressError,      // invalid or unreachable address
+    GT2DuplicateAddress,  // a connection was attempted to an address that already has a connection on the socket
+    GT2TimedOut,          // time out reached
+    GT2NegotiationError,  // there was an error negotiating with the remote side
+    GT2InvalidConnection, // the connection didn't exist
+    GT2InvalidMessage,    // used for vdp reliable messages containing voice data, no voice data in reliable messages
+    GT2SendFailed         // the send failed,
 } GT2Result;
 
 // possible states for any GT2Connection
 typedef enum {
-    GT2Connecting,  // negotiating the connection
-    GT2Connected,   // the connection is active
-    GT2Closing,     // the connection is being closed
-    GT2Closed       // the connection has been closed and can no longer be used
+    GT2Connecting, // negotiating the connection
+    GT2Connected,  // the connection is active
+    GT2Closing,    // the connection is being closed
+    GT2Closed      // the connection has been closed and can no longer be used
 } GT2ConnectionState;
 
 // The cause of the connection being closed.
 typedef enum {
-    GT2LocalClose,          // The connection was closed with gt2CloseConnection.
-    GT2RemoteClose,         // The connection was closed remotely.
-                            // errors:
-    GT2CommunicationError,  // An invalid message was received (it was either unexpected or wrongly formatted).
-    GT2SocketError,         // An error with the socket forced the connection to close.
-    GT2NotEnoughMemory      // There wasn't enough memory to store an incoming or outgoing message.
+    GT2LocalClose,         // The connection was closed with gt2CloseConnection.
+    GT2RemoteClose,        // The connection was closed remotely.
+                           // errors:
+    GT2CommunicationError, // An invalid message was received (it was either unexpected or wrongly formatted).
+    GT2SocketError,        // An error with the socket forced the connection to close.
+    GT2NotEnoughMemory     // There wasn't enough memory to store an incoming or outgoing message.
 } GT2CloseReason;
 
 /************
@@ -116,24 +116,24 @@ typedef void (*gt2SocketErrorCallback)(GT2Socket socket);
 // and it needs to hold any messages that arrive out of order. if either buffer runs out
 // of space the connection will be dropped.
 GT2Result gt2CreateSocket(
-    GT2Socket* socket,         // if the result is GT2Success, the socket object handle will be stored at this address
-    const char* localAddress,  // the local address to bind to
-    int outgoingBufferSize,  // size of per-connection buffer where sent messages waiting to be confirmed are held, use
-                             // 0 for default
-    int incomingBufferSize,  // size of per-connection buffer where out-of-order received messages are held, use 0 for
-                             // default
-    gt2SocketErrorCallback callback  // a callback that is called if there is an error with the socket
+    GT2Socket* socket,        // if the result is GT2Success, the socket object handle will be stored at this address
+    const char* localAddress, // the local address to bind to
+    int outgoingBufferSize,   // size of per-connection buffer where sent messages waiting to be confirmed are held, use
+                              // 0 for default
+    int incomingBufferSize,   // size of per-connection buffer where out-of-order received messages are held, use 0 for
+                              // default
+    gt2SocketErrorCallback callback // a callback that is called if there is an error with the socket
     );
 
 // AdHoc Sockets use MAC address instead of IP address.
 GT2Result gt2CreateAdHocSocket(
-    GT2Socket* socket,         // if the result is GT2Success, the socket object handle will be stored at this address
-    const char* localAddress,  // the local address to bind to
-    int outgoingBufferSize,  // size of per-connection buffer where sent messages waiting to be confirmed are held, use
-                             // 0 for default
-    int incomingBufferSize,  // size of per-connection buffer where out-of-order received messages are held, use 0 for
-                             // default
-    gt2SocketErrorCallback callback  // a callback that is called if there is an error with the socket
+    GT2Socket* socket,        // if the result is GT2Success, the socket object handle will be stored at this address
+    const char* localAddress, // the local address to bind to
+    int outgoingBufferSize,   // size of per-connection buffer where sent messages waiting to be confirmed are held, use
+                              // 0 for default
+    int incomingBufferSize,   // size of per-connection buffer where out-of-order received messages are held, use 0 for
+                              // default
+    gt2SocketErrorCallback callback // a callback that is called if there is an error with the socket
     );
 
 #ifdef _XBOX
@@ -145,13 +145,13 @@ GT2Result gt2CreateAdHocSocket(
 // and it needs to hold any messages that arrive out of order. if either buffer runs out
 // of space the connection will be dropped.
 GT2Result gt2CreateVDPSocket(
-    GT2Socket* socket,         // if the result is GT2Success, the socket object handle will be stored at this address
-    const char* localAddress,  // the local address to bind to
-    int outgoingBufferSize,  // size of per-connection buffer where sent messages waiting to be confirmed are held, use
-                             // 0 for default
-    int incomingBufferSize,  // size of per-connection buffer where out-of-order received messages are held, use 0 for
-                             // default
-    gt2SocketErrorCallback callback  // a callback that is called if there is an error with the socket
+    GT2Socket* socket,        // if the result is GT2Success, the socket object handle will be stored at this address
+    const char* localAddress, // the local address to bind to
+    int outgoingBufferSize,   // size of per-connection buffer where sent messages waiting to be confirmed are held, use
+                              // 0 for default
+    int incomingBufferSize,   // size of per-connection buffer where out-of-order received messages are held, use 0 for
+                              // default
+    gt2SocketErrorCallback callback // a callback that is called if there is an error with the socket
     );
 #endif
 
@@ -168,10 +168,10 @@ void gt2Think(GT2Socket socket);
 // this function bypasses the normal connection logic
 // note that all messages sent this way will be unreliable
 // to broadcast a datagram, omit the IP from the remoteAddress (e.g., ":12345")
-GT2Result gt2SendRawUDP(GT2Socket socket,  // the socket through which to send the raw UDP datagram
-    const char* remoteAddress,             // the address to which to send the datagram
-    const GT2Byte* message,                // the message to send, or NULL for an empty datagram
-    int len                                // the len of the message (0 for an empty message, ignored if message==NULL)
+GT2Result gt2SendRawUDP(GT2Socket socket, // the socket through which to send the raw UDP datagram
+    const char* remoteAddress,            // the address to which to send the datagram
+    const GT2Byte* message,               // the message to send, or NULL for an empty datagram
+    int len                               // the len of the message (0 for an empty message, ignored if message==NULL)
     );
 
 /*************************
@@ -184,30 +184,30 @@ GT2Result gt2SendRawUDP(GT2Socket socket,  // the socket through which to send t
 // listener passed to gt2Reject.  If the
 // result is anything else, then message
 // is NULL and len is 0.
-typedef void (*gt2ConnectedCallback)(GT2Connection connection,  // The connection object.
-    GT2Result result,                                           // Result from connect attempt.
-    GT2Byte* message,                                           // If result==GT2Rejected, the reason.  Otherwise, NULL.
-    int len  // If result==GT2Rejected, the length of the reason.  Otherwise, 0.
+typedef void (*gt2ConnectedCallback)(GT2Connection connection, // The connection object.
+    GT2Result result,                                          // Result from connect attempt.
+    GT2Byte* message,                                          // If result==GT2Rejected, the reason.  Otherwise, NULL.
+    int len // If result==GT2Rejected, the length of the reason.  Otherwise, 0.
     );
 
 // Called when a message is received.
-typedef void (*gt2ReceivedCallback)(GT2Connection connection,  // The connection the message was received on.
-    GT2Byte* message,  // The message that was received.  Will be NULL if an empty message.
-    int len,           // The length of the message in bytes.  Will be 0 if an empty message.
-    GT2Bool reliable   // True if this is was sent reliably.
+typedef void (*gt2ReceivedCallback)(GT2Connection connection, // The connection the message was received on.
+    GT2Byte* message, // The message that was received.  Will be NULL if an empty message.
+    int len,          // The length of the message in bytes.  Will be 0 if an empty message.
+    GT2Bool reliable  // True if this is was sent reliably.
     );
 
 // Called when the connection is closed (remotely or locally).
 // The connection can no longer be used after this callback returns.
-typedef void (*gt2ClosedCallback)(GT2Connection connection,  // The connection that was closed.
-    GT2CloseReason reason                                    // The reason the connection was closed.
+typedef void (*gt2ClosedCallback)(GT2Connection connection, // The connection that was closed.
+    GT2CloseReason reason                                   // The reason the connection was closed.
     );
 
 // When a reply is received for a ping that was sent, this callback is called.
 // The latency reported here is the amount of time between when the ping
 // was first sent with gt2Ping and when the pong was received.
-typedef void (*gt2PingCallback)(GT2Connection connection,  // the connection the ping was sent on
-    int latency                                            // the round-trip time for the ping, in milliseconds
+typedef void (*gt2PingCallback)(GT2Connection connection, // the connection the ping was sent on
+    int latency                                           // the round-trip time for the ping, in milliseconds
     );
 
 // Callbacks set for each connection.
@@ -215,10 +215,10 @@ typedef void (*gt2PingCallback)(GT2Connection connection,  // the connection the
 // when this is passed to gt2Accept.
 typedef struct
 {
-    gt2ConnectedCallback connected;  // Called when gt2Connect is complete.
-    gt2ReceivedCallback received;    // Called when a message is received.
-    gt2ClosedCallback closed;        // Called when the connection is closed (remotely or locally).
-    gt2PingCallback ping;            // Called when a ping reply is received.
+    gt2ConnectedCallback connected; // Called when gt2Connect is complete.
+    gt2ReceivedCallback received;   // Called when a message is received.
+    gt2ClosedCallback closed;       // Called when the connection is closed (remotely or locally).
+    gt2PingCallback ping;           // Called when a ping reply is received.
 } GT2ConnectionCallbacks;
 
 /*************************
@@ -232,15 +232,15 @@ typedef struct
 // if blocking is false, the return value signals the current status of the attempt
 //   GT2Success means the connection is being attempted
 //   anything else means there was an error and the connection attempt has been aborted
-GT2Result gt2Connect(GT2Socket socket,  // the local socket to use for the connection
+GT2Result gt2Connect(GT2Socket socket, // the local socket to use for the connection
     GT2Connection*
-        connection,  // if the result is GT2Success, and blocking is false, the connection  object handle is stored here
-    const char* remoteAddress,          // the address to connect to
-    const GT2Byte* message,             // an optional initial message (may be NULL)
-    int len,                            // length of the initial message (may be 0, or -1 for strlen)
-    int timeout,                        // timeout in milliseconds (may be 0 for infinite retries)
-    GT2ConnectionCallbacks* callbacks,  // callbacks for connection related stuff
-    GT2Bool blocking                    // if true, don't return until complete (successfuly or unsuccessfuly)
+        connection, // if the result is GT2Success, and blocking is false, the connection  object handle is stored here
+    const char* remoteAddress,         // the address to connect to
+    const GT2Byte* message,            // an optional initial message (may be NULL)
+    int len,                           // length of the initial message (may be 0, or -1 for strlen)
+    int timeout,                       // timeout in milliseconds (may be 0 for infinite retries)
+    GT2ConnectionCallbacks* callbacks, // callbacks for connection related stuff
+    GT2Bool blocking                   // if true, don't return until complete (successfuly or unsuccessfuly)
     );
 
 // sends data reliably or unreliably
@@ -248,10 +248,10 @@ GT2Result gt2Connect(GT2Socket socket,  // the local socket to use for the conne
 // unreliable messages are not guaranteed to arrive, arrive in order, or arrive only once.
 // because messages may be held in the outgoing buffer (even unreliable messages may need
 // to be put in the buffer), the message size cannot exceed
-GT2Result gt2Send(GT2Connection connection,  // the connection to send the message on
-    const GT2Byte* message,                  // the message to send, or NULL for an empty message0
-    int len,          // the len of the message (0 for an empty message, ignored if message==NULL)
-    GT2Bool reliable  // if true, send the message reliably
+GT2Result gt2Send(GT2Connection connection, // the connection to send the message on
+    const GT2Byte* message,                 // the message to send, or NULL for an empty message0
+    int len,                                // the len of the message (0 for an empty message, ignored if message==NULL)
+    GT2Bool reliable                        // if true, send the message reliably
     );
 
 // sends a ping on a connection in an attempt to determine latency
@@ -285,13 +285,13 @@ void gt2CloseAllConnectionsHard(GT2Socket socket);
 // to be called from inside the callback, however they should be called in a timely manner so that the
 // remote side does not need to sit around indefinitely waiting for a response.
 // the latency is an estimate of the round trip time between connections.
-typedef void (*gt2ConnectAttemptCallback)(GT2Socket socket,  // the socket the attempt came in on
-    GT2Connection connection,                                // a connection object for the incoming connection attempt
-    unsigned int ip,                                         // the IP being used remotely for the connection attempt
-    unsigned short port,                                     // the port being used remotely for the connection attempt
-    int latency,                                             // the approximate latency on the connection
-    GT2Byte* message,  // an optional message sent with the attempt.  Will be NULL if an empty message.
-    int len            // the length of the message, in characters.  Will be 0 if an empty message.
+typedef void (*gt2ConnectAttemptCallback)(GT2Socket socket, // the socket the attempt came in on
+    GT2Connection connection,                               // a connection object for the incoming connection attempt
+    unsigned int ip,                                        // the IP being used remotely for the connection attempt
+    unsigned short port,                                    // the port being used remotely for the connection attempt
+    int latency,                                            // the approximate latency on the connection
+    GT2Byte* message, // an optional message sent with the attempt.  Will be NULL if an empty message.
+    int len           // the length of the message, in characters.  Will be 0 if an empty message.
     );
 
 /*********************
@@ -350,11 +350,11 @@ GT2Bool gt2WasMessageIDConfirmed(GT2Connection connection, GT2MessageID messageI
 // the message points to the same memory location as the message passed to gt2Send (or gt2FilteredSend).
 // so if the call to gt2FilteredSend is delayed, it is the filter's responsibility to make sure the
 // data is still around when and if it is needed.
-typedef void (*gt2SendFilterCallback)(GT2Connection connection,  // The connection on which the message is being sent.
-    int filterID,                                                // Pass this ID to gt2FilteredSend.
-    const GT2Byte* message,  // The message being sent.  Will be NULL if an empty message.
-    int len,                 // The length of the message being sent, in bytes. Will be 0 if an empty message.
-    GT2Bool reliable         // If the message is being sent reliably.
+typedef void (*gt2SendFilterCallback)(GT2Connection connection, // The connection on which the message is being sent.
+    int filterID,                                               // Pass this ID to gt2FilteredSend.
+    const GT2Byte* message, // The message being sent.  Will be NULL if an empty message.
+    int len,                // The length of the message being sent, in bytes. Will be 0 if an empty message.
+    GT2Bool reliable        // If the message is being sent reliably.
     );
 
 // Callback for filtering incoming data.
@@ -363,11 +363,11 @@ typedef void (*gt2SendFilterCallback)(GT2Connection connection,  // The connecti
 // the message may point to a memory location supplied to gt2FilteredReceive by a previous filter.
 // so if this filter's call to gt2FilteredReceive is delayed, it is the filter's responsibility
 // to make sure the data is still around when and if it is needed.
-typedef void (*gt2ReceiveFilterCallback)(GT2Connection connection,  // The connection the message was received on.
-    int filterID,                                                   // Pass this ID to gtFilteredReceive.
-    GT2Byte* message,  // The message that was received.  Will be NULL if an empty message.
-    int len,           // The length of the message in bytes.  Will be 0 if an empty message.
-    GT2Bool reliable   // True if this is a reliable message.
+typedef void (*gt2ReceiveFilterCallback)(GT2Connection connection, // The connection the message was received on.
+    int filterID,                                                  // Pass this ID to gtFilteredReceive.
+    GT2Byte* message, // The message that was received.  Will be NULL if an empty message.
+    int len,          // The length of the message in bytes.  Will be 0 if an empty message.
+    GT2Bool reliable  // True if this is a reliable message.
     );
 
 /*********************
@@ -376,44 +376,44 @@ typedef void (*gt2ReceiveFilterCallback)(GT2Connection connection,  // The conne
 
 // Adds a filter to the connection's outgoing data.
 // Returns GT2False if there was an error adding the filter (due to no free memory)
-GT2Bool gt2AddSendFilter(GT2Connection connection,  // The connection on which to add the filter.
-    gt2SendFilterCallback callback                  // The callback the outgoing data is filtered through.
+GT2Bool gt2AddSendFilter(GT2Connection connection, // The connection on which to add the filter.
+    gt2SendFilterCallback callback                 // The callback the outgoing data is filtered through.
     );
 
 // Removes a filter from the connection's outgoing data.
 // if callback is NULL, all send filters are removed
-void gt2RemoveSendFilter(GT2Connection connection,  // The connection on which to remove the filter.
-    gt2SendFilterCallback callback                  // The callback to remove.
+void gt2RemoveSendFilter(GT2Connection connection, // The connection on which to remove the filter.
+    gt2SendFilterCallback callback                 // The callback to remove.
     );
 
 // Called in response to a gt2SendFilterCallback being called.
 // It can be called from within the callback, or at any later time.
-void gt2FilteredSend(GT2Connection connection,  // The connection on which the message is being sent.
-    int filterID,                               // The ID passed to the gt2SendFilterCallback.
-    const GT2Byte* message,                     // The message being sent. May be NULL.
-    int len,                                    // The lengt2h of the message being sent, in bytes. May be 0 or -1.
-    GT2Bool reliable                            // If the message should be sent reliably.
+void gt2FilteredSend(GT2Connection connection, // The connection on which the message is being sent.
+    int filterID,                              // The ID passed to the gt2SendFilterCallback.
+    const GT2Byte* message,                    // The message being sent. May be NULL.
+    int len,                                   // The lengt2h of the message being sent, in bytes. May be 0 or -1.
+    GT2Bool reliable                           // If the message should be sent reliably.
     );
 
 // Adds a filter to the connection's incoming data.
 // Returns GT2False if there was an error adding the filter (due to no free memory)
-GT2Bool gt2AddReceiveFilter(GT2Connection connection,  // The connection on which to add the filter.
-    gt2ReceiveFilterCallback callback                  // The callback the incoming data is filtered through.
+GT2Bool gt2AddReceiveFilter(GT2Connection connection, // The connection on which to add the filter.
+    gt2ReceiveFilterCallback callback                 // The callback the incoming data is filtered through.
     );
 
 // Removes a filter from the connection's incoming data.
 // if callback is NULL, all receive filters are removed
-void gt2RemoveReceiveFilter(GT2Connection connection,  // The connection on which to remove the filter.
-    gt2ReceiveFilterCallback callback                  // The callback to remove.
+void gt2RemoveReceiveFilter(GT2Connection connection, // The connection on which to remove the filter.
+    gt2ReceiveFilterCallback callback                 // The callback to remove.
     );
 
 // Called in response to a gt2ReceiveFilterCallback being called.
 // It can be called from within the callback, or at any later time.
-void gt2FilteredReceive(GT2Connection connection,  // The connection the message was received on.
-    int filterID,                                  // The ID passed to the gt2ReceiveFilterCallback.
-    GT2Byte* message,                              // The message that was received.  May be NULL.
-    int len,                                       // The lengt2h of the message in bytes.  May be 0.
-    GT2Bool reliable                               // True if this is a reliable message.
+void gt2FilteredReceive(GT2Connection connection, // The connection the message was received on.
+    int filterID,                                 // The ID passed to the gt2ReceiveFilterCallback.
+    GT2Byte* message,                             // The message that was received.  May be NULL.
+    int len,                                      // The lengt2h of the message in bytes.  May be 0.
+    GT2Bool reliable                              // True if this is a reliable message.
     );
 
 /*****************************
@@ -424,11 +424,11 @@ void gt2FilteredReceive(GT2Connection connection,  // The connection the message
 // connection.  if the callback recognizes the message and handles it, it should return GT2True, which
 // will tell the socket to ignore the message.  if the callback does not recognize the message, it
 // should return GT2False, which tells the socket to let the other side know there is no connection.
-typedef GT2Bool (*gt2UnrecognizedMessageCallback)(GT2Socket socket,  // the socket the message was received on
-    unsigned int ip,      // the ip of the remote machine the message came from (in network byte order)
-    unsigned short port,  // the port on the remote machine (in host byte order)
-    GT2Byte* message,     // the message (may be NULL for an empty message)
-    int len               // the length of the message (may be 0)
+typedef GT2Bool (*gt2UnrecognizedMessageCallback)(GT2Socket socket, // the socket the message was received on
+    unsigned int ip,     // the ip of the remote machine the message came from (in network byte order)
+    unsigned short port, // the port on the remote machine (in host byte order)
+    GT2Byte* message,    // the message (may be NULL for an empty message)
+    int len              // the length of the message (may be 0)
     );
 
 /*****************************
@@ -515,9 +515,9 @@ unsigned short gt2NetworkToHostShort(unsigned short s);
 // If both the IP and port are zero, the string will be an empty string ("")
 // The string is returned.  If the string paramater is NULL, then an internal static string will be
 // used.  There are two internal strings that are alternated between.
-const char* gt2AddressToString(unsigned int ip,  // IP in network byte order.  Can be 0.
-    unsigned short port,                         // Port in host byte order.  Can be 0.
-    char string[22]                              // String will be placed in here.  Can be NULL.
+const char* gt2AddressToString(unsigned int ip, // IP in network byte order.  Can be 0.
+    unsigned short port,                        // Port in host byte order.  Can be 0.
+    char string[22]                             // String will be placed in here.  Can be NULL.
     );
 
 // Converts a string address into an IP and a port.  The IP is stored in network byte order, and the port
@@ -537,9 +537,9 @@ const char* gt2AddressToString(unsigned int ip,  // IP in network byte order.  C
 // If this function needs to resolve a hostname ("host.com") it may need to contact a DNS server, which can
 // cause the function to block for an indefinite period of time.  Usually it is < 2 seconds, but on certain
 // systems, and under certain circumstances, it can take 30 seconds or longer.
-GT2Bool gt2StringToAddress(const char* string,  // The string to convert.
-    unsigned int* ip,                           // The IP is stored here, in network byte order.  Can be NULL.
-    unsigned short* port                        // The port is stored here, in host byte order.  Can be NULL.
+GT2Bool gt2StringToAddress(const char* string, // The string to convert.
+    unsigned int* ip,                          // The IP is stored here, in network byte order.  Can be NULL.
+    unsigned short* port                       // The port is stored here, in host byte order.  Can be NULL.
     );
 
 // Gets the host information for a machine on the Internet.  The first version takes an IP in network byte order,
@@ -590,13 +590,13 @@ gsi_u32 gt2MacToIp(const char* mac);
 // called with either sent or received data
 // trying to send a message from within the send dump callback, or letting the socket think from within the receive
 // dump callback can cause serious problems, and should not be done.
-typedef void (*gt2DumpCallback)(GT2Socket socket,  // the socket the message was on
-    GT2Connection connection,  // the connection the message was on, or NULL if there is no connection for this message
-    unsigned int ip,           // the remote ip, in network byte order
-    unsigned short port,       // the remote port, in host byte order
-    GT2Bool reset,             // if true, the connection has been reset (only used by the receive callback)
-    const GT2Byte* message,    // the message (should not be modified)
-    int len                    // the length of the message
+typedef void (*gt2DumpCallback)(GT2Socket socket, // the socket the message was on
+    GT2Connection connection, // the connection the message was on, or NULL if there is no connection for this message
+    unsigned int ip,          // the remote ip, in network byte order
+    unsigned short port,      // the remote port, in host byte order
+    GT2Bool reset,            // if true, the connection has been reset (only used by the receive callback)
+    const GT2Byte* message,   // the message (should not be modified)
+    int len                   // the length of the message
     );
 
 /*******************

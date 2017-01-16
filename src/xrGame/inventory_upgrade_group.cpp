@@ -68,7 +68,7 @@ void Group::log_hierarchy(LPCSTR nest)
     }
 }
 
-#endif  // DEBUG
+#endif // DEBUG
 
 void Group::fill_root(Root* root)
 {
@@ -143,5 +143,5 @@ void Group::highlight_down()
     }
 }
 
-}  // namespace upgrade
-}  // namespace inventory
+} // namespace upgrade
+} // namespace inventory

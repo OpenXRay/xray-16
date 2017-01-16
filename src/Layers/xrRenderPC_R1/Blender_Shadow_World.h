@@ -16,4 +16,4 @@ public:
     virtual ~CBlender_ShWorld();
 };
 
-#endif  // BLENDER_SHADOW_WORLD_H
+#endif // BLENDER_SHADOW_WORLD_H

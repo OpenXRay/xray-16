@@ -17,9 +17,9 @@ struct OGF;
 struct OGF_Vertex
 {
     Fvector P;
-    Fvector N;     // normal
-    base_basis T;  // tangent
-    base_basis B;  // binormal
+    Fvector N;    // normal
+    base_basis T; // tangent
+    base_basis B; // binormal
     base_color Color;
     svector<Fvector2, 2> UV;
 
@@ -29,7 +29,7 @@ struct OGF_Vertex
 typedef xr_vector<OGF_Vertex> vecOGF_V;
 typedef vecOGF_V::iterator itOGF_V;
 typedef vecOGF_V::const_iterator citOGF_V;
-struct x_vertex  // "fast" geometry, 16b/vertex
+struct x_vertex // "fast" geometry, 16b/vertex
 {
     Fvector P;
     x_vertex(const OGF_Vertex& c) { P = c.P; }
@@ -261,7 +261,7 @@ struct OGF_LOD : public OGF_Node
     {
         Fvector v;
         Fvector2 t;
-        u32 c_rgb_hemi;  // rgb,hemi
+        u32 c_rgb_hemi; // rgb,hemi
         u8 c_sun;
     };
     struct _face

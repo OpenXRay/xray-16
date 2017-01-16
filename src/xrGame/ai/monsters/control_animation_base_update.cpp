@@ -284,7 +284,7 @@ void CControlAnimationBase::SelectVelocities()
         if (m_tAction == ACT_ATTACK) {
             float vel = item_it->velocity.velocity.angular_real;
             m_object->dir().set_heading_speed(
-                vel * m_object->m_melee_rotation_factor);  // todo: make as an external factor
+                vel * m_object->m_melee_rotation_factor); // todo: make as an external factor
         }
         else
             m_object->dir().set_heading_speed(item_it->velocity.velocity.angular_real);

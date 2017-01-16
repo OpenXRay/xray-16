@@ -23,7 +23,7 @@ namespace environment
 namespace effects
 {
 class manager;
-}  // namespace effects
+} // namespace effects
 
 namespace ambients
 {
@@ -48,11 +48,11 @@ private:
     property_holder_type* m_property_holder;
     effects::manager const& m_manager;
     shared_str m_id;
-};  // class effect_id
-}  // namespace ambients
-}  // namespace environment
-}  // namespace editor
+}; // class effect_id
+} // namespace ambients
+} // namespace environment
+} // namespace editor
 
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR
 
-#endif  // ifndef EDITOR_WEATHER_AMBIENTS_EFFECT_ID_HPP_INCLUDED
+#endif // ifndef EDITOR_WEATHER_AMBIENTS_EFFECT_ID_HPP_INCLUDED

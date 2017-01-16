@@ -162,7 +162,7 @@ void CUIMMShniaga::SetPage(enum_page_id page_id, LPCSTR xml_file, LPCSTR xml_pat
     case epi_new_network_game: { lst = &m_buttons_new_network;
     }
     break;
-    };  // switch (page_id)
+    }; // switch (page_id)
     delete_data(*lst);
 
     CUIXml tmp_xml;
@@ -183,7 +183,7 @@ void CUIMMShniaga::ShowPage(enum_page_id page_id)
     case epi_new_network_game: { ShowNetworkGame();
     }
     break;
-    };  // switch (page_id)
+    }; // switch (page_id)
 }
 
 void CUIMMShniaga::ShowMain()

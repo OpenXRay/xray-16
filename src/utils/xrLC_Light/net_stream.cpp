@@ -13,7 +13,7 @@ public:
         fr->w_close();
     };
 
-    INetFileBuffWriter(LPCSTR _file_name, u32 block_size, bool _reopen);  //:INetWriter(),file_name(file_name)
+    INetFileBuffWriter(LPCSTR _file_name, u32 block_size, bool _reopen); //:INetWriter(),file_name(file_name)
     virtual ~INetFileBuffWriter();
 };
 
@@ -143,7 +143,7 @@ void INetBlockReader::load_buffer(LPCSTR fn)
         // mem_reader = new CReadMemoryBlock( fs->length() );
         create_block(fs->length());
         fs->r(mem_reader.pdata(), fs->length());
-        FS.r_close(fs);  // ->close();
+        FS.r_close(fs); // ->close();
     }
 }
 void INetMemoryBuffWriter::send_and_clear()
@@ -363,12 +363,12 @@ void CFileWriteBlock::w_close()
 
 INetReaderFile::INetReaderFile(LPCSTR file_name) : file(0)
 {
-    file = fopen(file_name, "rb");  // FS.r_open( file_name );
+    file = fopen(file_name, "rb"); // FS.r_open( file_name );
 }
 
 INetReaderFile::~INetReaderFile()
 {
-    fclose(file);  // FS.r_close( file );
+    fclose(file); // FS.r_close( file );
 }
 
 void INetReaderFile::r(void* p, int cnt)

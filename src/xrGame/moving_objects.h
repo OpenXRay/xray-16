@@ -63,7 +63,7 @@ private:
 
 private:
     OBJECTS m_objects;
-#endif  // DEBUG
+#endif // DEBUG
 
 private:
     IC bool collided(const IGameObject* object, const Fvector& position, const float& radius) const;
@@ -120,4 +120,4 @@ public:
 
 #include "moving_objects_inline.h"
 
-#endif  // MOVING_OBJECTS_H
+#endif // MOVING_OBJECTS_H

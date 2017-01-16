@@ -196,7 +196,7 @@ void Texmaps::RescaleWorldUnits(float f)
     // This code will be replaced in particular implementations
     for (int i = 0; i < NumRefs(); i++)
     {
-        if ((i & 1) == 0) continue;  // skip the amount controllers
+        if ((i & 1) == 0) continue; // skip the amount controllers
         ReferenceMaker* srm = GetReference(i);
         if (srm) {
             srm->RescaleWorldUnits(f);

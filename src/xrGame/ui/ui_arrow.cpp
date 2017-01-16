@@ -54,7 +54,7 @@ void UI_Arrow::SetNewValue(float new_value)
         val *= (dif > 0.0f) ? +1.0f : -1.0f;
         m_pos += val;
     }
-    clamp(m_pos, 0.0f, 1.0f);  // min = 0,  max = 1
+    clamp(m_pos, 0.0f, 1.0f); // min = 0,  max = 1
     SetPos(m_pos);
 }
 

@@ -8,7 +8,7 @@
 #include "xrEngine/GameMtlLib.h"
 
 // const float JUMP_HIGHT=0.5;
-const float JUMP_UP_VELOCITY = 6.0f;  // 5.6f;
+const float JUMP_UP_VELOCITY = 6.0f; // 5.6f;
 const float JUMP_INCREASE_VELOCITY_RATE = 1.2f;
 //#ifdef DEBUG
 // XRPHYSICS_API BOOL use_controllers_separation = TRUE;
@@ -340,7 +340,7 @@ void CPHActorCharacter::ChooseRestrictionType(ERestrictionType my_type, float my
 {
     if (my_type != rtStalker || (ch->RestrictionType() != rtStalker && ch->RestrictionType() != rtStalkerSmall)) return;
     float checkR = m_restrictors[rtStalkerSmall]
-                       ->m_restrictor_radius;  // 1.5f;//+m_restrictors[rtStalker]->m_restrictor_radius)/2.f;
+                       ->m_restrictor_radius; // 1.5f;//+m_restrictors[rtStalker]->m_restrictor_radius)/2.f;
 
     switch (ch->RestrictionType())
     {
@@ -379,7 +379,7 @@ float free_fly_up_force_limit = 4000.f;
 void CPHActorCharacter::PhTune(dReal step)
 {
     inherited::PhTune(step);
-    if (b_lose_control && !b_external_impulse)  //
+    if (b_lose_control && !b_external_impulse) //
     {
         const float* force = dBodyGetForce(m_body);
         float fy = force[1];

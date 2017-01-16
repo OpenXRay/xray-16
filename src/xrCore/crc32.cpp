@@ -2,9 +2,9 @@
 #pragma hdrstop
 
 static BOOL crc32_ready = FALSE;
-static u32 crc32_table[256];  // Lookup table array
+static u32 crc32_table[256]; // Lookup table array
 
-inline u32 Reflect(u32 ref, char ch)  // Reflects CRC bits in the lookup table
+inline u32 Reflect(u32 ref, char ch) // Reflects CRC bits in the lookup table
 {
     // Used only by Init_CRC32_Table().
 

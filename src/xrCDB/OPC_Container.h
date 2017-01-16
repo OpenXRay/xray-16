@@ -165,12 +165,12 @@ public:
     Container& FindNext(udword& entry, bool wrap = false);
     Container& FindPrev(udword& entry, bool wrap = false);
     // Data access.
-    inline_ udword GetNbEntries() const { return mCurNbEntries; }    //!< Returns the current number of entries.
-    inline_ udword GetEntry(udword i) const { return mEntries[i]; }  //!< Returns ith entry
-    inline_ udword* GetEntries() const { return mEntries; }          //!< Returns the list of entries.
+    inline_ udword GetNbEntries() const { return mCurNbEntries; }   //!< Returns the current number of entries.
+    inline_ udword GetEntry(udword i) const { return mEntries[i]; } //!< Returns ith entry
+    inline_ udword* GetEntries() const { return mEntries; }         //!< Returns the list of entries.
     // Growth control
-    inline_ float GetGrowthFactor() const { return mGrowthFactor; }         //!< Returns the growth factor
-    inline_ void SetGrowthFactor(float growth) { mGrowthFactor = growth; }  //!< Sets the growth factor
+    inline_ float GetGrowthFactor() const { return mGrowthFactor; }        //!< Returns the growth factor
+    inline_ void SetGrowthFactor(float growth) { mGrowthFactor = growth; } //!< Sets the growth factor
     //! Access as an array
     inline_ udword& operator[](udword i) const
     {
@@ -193,17 +193,17 @@ public:
     inline_ udword GetNbContainers() const { return mNbContainers; }
     inline_ udword GetTotalBytes() const { return mUsedRam; }
 private:
-    static udword mNbContainers;  //!< Number of containers around
-    static udword mUsedRam;       //!< Amount of bytes used by containers in the system
+    static udword mNbContainers; //!< Number of containers around
+    static udword mUsedRam;      //!< Amount of bytes used by containers in the system
 #endif
 private:
     // Resizing
     bool Resize(udword needed = 1);
     // Data
-    udword mMaxNbEntries;  //!< Maximum possible number of entries
-    udword mCurNbEntries;  //!< Current number of entries
-    udword* mEntries;      //!< List of entries
-    float mGrowthFactor;   //!< Resize: _new_ number of entries = old number * mGrowthFactor
+    udword mMaxNbEntries; //!< Maximum possible number of entries
+    udword mCurNbEntries; //!< Current number of entries
+    udword* mEntries;     //!< List of entries
+    float mGrowthFactor;  //!< Resize: _new_ number of entries = old number * mGrowthFactor
 };
 
 class ICECORE_API Pairs : public Container
@@ -221,4 +221,4 @@ public:
     }
 };
 
-#endif  // __ICECONTAINER_H__
+#endif // __ICECONTAINER_H__

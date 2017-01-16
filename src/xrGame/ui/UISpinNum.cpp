@@ -12,33 +12,33 @@ CUISpinNum::CUISpinNum() : m_iVal(0), m_iMin(0), m_iMax(100), m_iStep(1)
 {
 }
 
-void CUISpinNum::SetCurrentOptValue()  // opt->current
+void CUISpinNum::SetCurrentOptValue() // opt->current
 {
     CUIOptionsItem::SetCurrentOptValue();
     GetOptIntegerValue(m_iVal, m_iMin, m_iMax);
     SetValue(m_iVal);
 }
 
-void CUISpinNum::SaveBackUpOptValue()  // current->backup
+void CUISpinNum::SaveBackUpOptValue() // current->backup
 {
     CUIOptionsItem::SaveBackUpOptValue();
     m_opt_backup_value = m_iVal;
 }
 
-void CUISpinNum::SaveOptValue()  // current->opt
+void CUISpinNum::SaveOptValue() // current->opt
 {
     CUIOptionsItem::SaveOptValue();
     SaveOptIntegerValue(m_iVal);
 }
 
-void CUISpinNum::UndoOptValue()  // backup->current
+void CUISpinNum::UndoOptValue() // backup->current
 {
     m_iVal = m_opt_backup_value;
     SetValue(m_iVal);
     CUIOptionsItem::UndoOptValue();
 }
 
-bool CUISpinNum::IsChangedOptValue() const  // backup!=current
+bool CUISpinNum::IsChangedOptValue() const // backup!=current
 {
     return m_iVal != m_opt_backup_value;
 }

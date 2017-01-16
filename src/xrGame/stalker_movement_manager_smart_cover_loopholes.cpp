@@ -26,7 +26,7 @@
 namespace smart_cover
 {
 shared_str transform_vertex(shared_str const& vertex_id, bool const& in);
-}  // namespace smart_cover
+} // namespace smart_cover
 
 using smart_cover::loophole;
 using MemorySpace::CMemoryInfo;
@@ -114,7 +114,7 @@ bool stalker_movement_manager_smart_cover::test_pick(Fvector source, Fvector des
         CAI_Stalker* m_object;
 
         inline parameters(float& range, CAI_Stalker& object) : m_range(&range), m_object(&object) {}
-    };  // struct parameters
+    }; // struct parameters
 
     struct test_pick
     {
@@ -480,7 +480,7 @@ void stalker_movement_manager_smart_cover::go_next_loophole()
         VERIFY(!m_current.cover());
 #ifdef DEBUG
         Msg("setting up cover (direct from target): %s (%s)", m_target.cover_id().c_str(), m_enter_cover_id.c_str());
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
         m_current.cover_id(m_target.cover_id());
         m_current.cover_loophole_id(m_path[1]);
         return;
@@ -492,7 +492,7 @@ void stalker_movement_manager_smart_cover::go_next_loophole()
         VERIFY(m_path.size() == 2);
 #ifdef DEBUG
         Msg("exiting from cover: %s", m_current.cover_id().c_str());
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
         m_current.cover_id("");
         on_smart_cover_exit();
         return;

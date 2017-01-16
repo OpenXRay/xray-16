@@ -11,7 +11,7 @@ class CPatrolPathStorage;
 class XRAICORE_API AISpaceBase
 {
 protected:
-    CGameGraph* m_game_graph = nullptr;  // not owned by AISpaceBase
+    CGameGraph* m_game_graph = nullptr; // not owned by AISpaceBase
     CLevelGraph* m_level_graph = nullptr;
     CGraphEngine* m_graph_engine = nullptr;
     CPatrolPathStorage* m_patrol_path_storage = nullptr;

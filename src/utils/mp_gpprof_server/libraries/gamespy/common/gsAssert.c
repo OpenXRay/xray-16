@@ -43,7 +43,7 @@ void _gsDebugAssert(const char* string)
 
 #elif defined _WIN32
 #include <windows.h>
-#pragma warning(disable : 4127)  // disable warnings from "conditional expression is constant"
+#pragma warning(disable : 4127) // disable warnings from "conditional expression is constant"
 
 // ErrorMessage: Displays message and goes into an infinite loop
 // continues rendering
@@ -51,7 +51,7 @@ void _gsDebugAssert(const char* string)
 {
 // DebugBreak();
 
-#ifdef _CONSOLE  //,_MBCS
+#ifdef _CONSOLE //,_MBCS
 
     printf("%s", string);
     while (1)
@@ -99,8 +99,8 @@ void _gsDebugAssert(const char* string)
 
 // already included in gsPlatform.h
 /*
-#include <eetypes.h>
 #include <eekernel.h>
+#include <eetypes.h>
 */
 
 // ErrorMessage: Displays message and goes into an infinite loop

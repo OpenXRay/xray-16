@@ -93,7 +93,7 @@ inline size_t calcMaxMipmap(size_t w, size_t h, size_t d)
 // get next mip level size
 inline size_t NextMip(size_t m)
 {
-    size_t next = m / 2;  // round down
+    size_t next = m / 2; // round down
     if (next == 0)
         return 1;
     else
@@ -150,7 +150,7 @@ public:
         };
     };
 
-    v16u16_t& operator+=(const v16u16_t& v);  // incrementation by a Vec4f
+    v16u16_t& operator+=(const v16u16_t& v); // incrementation by a Vec4f
 
     void set(unsigned short _u, unsigned short _v)
     {
@@ -172,7 +172,7 @@ public:
         };
     };
 
-    r12g12b8_t& operator+=(const r12g12b8_t& v);  // incrementation by a Vec4f
+    r12g12b8_t& operator+=(const r12g12b8_t& v); // incrementation by a Vec4f
 
     void set(unsigned long _r, unsigned long _g, unsigned long _b)
     {
@@ -212,7 +212,7 @@ public:
         return (unsigned long)a << 24 | (unsigned long)r << 16 | (unsigned long)g << 8 | (unsigned long)b;
     }
 
-    rgba_t& operator+=(const rgba_t& v)  // incrementation by a rgba_t
+    rgba_t& operator+=(const rgba_t& v) // incrementation by a rgba_t
     {
         r = (unsigned char)nv::Clamp((int)((int)r + (int)v.r), 0, 255);
         g = (unsigned char)nv::Clamp((int)g + (int)v.g, 0, 255);
@@ -221,9 +221,9 @@ public:
         return *this;
     }
 
-    rgba_t& operator-=(const rgba_t& v);  // decrementation by a rgba_t
-    rgba_t& operator*=(const float d);    // multiplication by a constant
-    rgba_t& operator/=(const float d);    // division by a constant
+    rgba_t& operator-=(const rgba_t& v); // decrementation by a rgba_t
+    rgba_t& operator*=(const float d);   // multiplication by a constant
+    rgba_t& operator/=(const float d);   // division by a constant
 
     rgba_t& operator=(const rgba_t& v)
     {
@@ -290,7 +290,7 @@ public:
         b = _b;
     }
 
-    rgba16_t& operator+=(const rgba16_t& v)  // incrementation by a rgba_t
+    rgba16_t& operator+=(const rgba16_t& v) // incrementation by a rgba_t
     {
         r = (unsigned char)nv::Clamp((int)r + (int)v.r, 0, 65535);
         g = (unsigned char)nv::Clamp((int)g + (int)v.g, 0, 65535);
@@ -299,9 +299,9 @@ public:
         return *this;
     }
 
-    rgba16_t& operator-=(const rgba16_t& v);  // decrementation by a rgba_t
-    rgba16_t& operator*=(const float d);      // multiplication by a constant
-    rgba16_t& operator/=(const float d);      // division by a constant
+    rgba16_t& operator-=(const rgba16_t& v); // decrementation by a rgba_t
+    rgba16_t& operator*=(const float d);     // multiplication by a constant
+    rgba16_t& operator/=(const float d);     // division by a constant
 
     rgba16_t& operator=(const rgba16_t& v)
     {
@@ -358,7 +358,7 @@ public:
         };
     };
 
-    urgba_t& operator+=(const urgba_t& v);  // incrementation by a Vec4f
+    urgba_t& operator+=(const urgba_t& v); // incrementation by a Vec4f
 
     void set(char _r, char _g, char _b, char _a)
     {
@@ -384,7 +384,7 @@ public:
         };
     };
 
-    q8w8v8u8_t& operator+=(const q8w8v8u8_t& v);  // incrementation by a Vec4f
+    q8w8v8u8_t& operator+=(const q8w8v8u8_t& v); // incrementation by a Vec4f
 
     void set(char _r, char _g, char _b, char _a)
     {
@@ -487,7 +487,7 @@ public:
         b = v.b;
     }
 
-    fpPixel& operator+=(const fpPixel& v)  // incrementation by a rgba_t
+    fpPixel& operator+=(const fpPixel& v) // incrementation by a rgba_t
     {
         r += v.r;
         g += v.g;
@@ -496,7 +496,7 @@ public:
         return *this;
     }
 
-    fpPixel& operator-=(const fpPixel& v)  // incrementation by a rgba_t
+    fpPixel& operator-=(const fpPixel& v) // incrementation by a rgba_t
     {
         r -= v.r;
         g -= v.g;
@@ -505,7 +505,7 @@ public:
         return *this;
     }
 
-    fpPixel& operator*=(const fpPixel& v)  // incrementation by a rgba_t
+    fpPixel& operator*=(const fpPixel& v) // incrementation by a rgba_t
     {
         r *= v.r;
         g *= v.g;
@@ -514,7 +514,7 @@ public:
         return *this;
     }
 
-    fpPixel& operator/=(const fpPixel& v)  // incrementation by a rgba_t
+    fpPixel& operator/=(const fpPixel& v) // incrementation by a rgba_t
     {
         r /= v.r;
         g /= v.g;
@@ -523,7 +523,7 @@ public:
         return *this;
     }
 
-    fpPixel& operator/=(const float& s)  // incrementation by a rgba_t
+    fpPixel& operator/=(const float& s) // incrementation by a rgba_t
     {
         r /= s;
         g /= s;
@@ -532,7 +532,7 @@ public:
         return *this;
     }
 
-    fpPixel& operator=(const fpPixel& v);  // assignment of a Vec3f
+    fpPixel& operator=(const fpPixel& v); // assignment of a Vec3f
 
     friend fpPixel operator+(const fpPixel& v1, const fpPixel& v2)
     {
@@ -545,7 +545,7 @@ public:
     NV_ERROR_CODE normalize()
     {
         double u = x * x + y * y + z * z;
-        if (fabs(u - 1.0) < 1e-12) return NV_OK;  // already normalized
+        if (fabs(u - 1.0) < 1e-12) return NV_OK; // already normalized
         if (fabs((double)u) < 1e-12) {
             x = y = z = 0.0f;
             return NV_CANT_NORMALIZE;
@@ -614,11 +614,11 @@ public:
         b = v.b;
     }
 
-    fpPixel3& operator+=(const fpPixel3& v);  // incrementation by a Vec4f
-    fpPixel3& operator=(const fpPixel3& v);   // assignment of a Vec3f
-    fpPixel3& operator-=(const fpPixel3& v);  // decrementation by a Vec3f
-    fpPixel3& operator*=(const float d);      // multiplication by a constant
-    fpPixel3& operator/=(const float d);      // division by a constant
+    fpPixel3& operator+=(const fpPixel3& v); // incrementation by a Vec4f
+    fpPixel3& operator=(const fpPixel3& v);  // assignment of a Vec3f
+    fpPixel3& operator-=(const fpPixel3& v); // decrementation by a Vec3f
+    fpPixel3& operator*=(const float d);     // multiplication by a constant
+    fpPixel3& operator/=(const float d);     // division by a constant
 
     friend fpPixel3 operator+(const fpPixel3& v1, const fpPixel3& v2)
     {
@@ -631,7 +631,7 @@ public:
     NV_ERROR_CODE normalize()
     {
         double u = x * x + y * y + z * z;
-        if (fabs(u - 1.0) < 1e-12) return NV_OK;  // already normalized
+        if (fabs(u - 1.0) < 1e-12) return NV_OK; // already normalized
         if (fabs((double)u) < 1e-12) {
             x = y = z = 0.0f;
             return NV_CANT_NORMALIZE;
@@ -890,7 +890,7 @@ typedef nvVector<RGBAImage> RGBAImageArray;
 class RGBAMipMappedImage
 {
 private:
-    RGBAImageArray mipArray;  // array of images, one for each MIP map RGBA
+    RGBAImageArray mipArray; // array of images, one for each MIP map RGBA
 
 public:
     void resize(size_t width, size_t height, size_t nMIPMaps)
@@ -931,7 +931,7 @@ public:
 class RGBAMipMappedCubeMap
 {
 private:
-    RGBAMipMappedImage cubeFaces[6];  // array of images, one for each MIP map RGBA
+    RGBAMipMappedImage cubeFaces[6]; // array of images, one for each MIP map RGBA
 
 public:
     void resize(size_t width, size_t height, size_t nMIPMaps)
@@ -966,7 +966,7 @@ typedef nvVector<RGBAImageArray> RGBAVolume;
 class RGBAMipMappedVolumeMap
 {
 private:
-    RGBAVolume volumeArray;  // array of MIP mapped images
+    RGBAVolume volumeArray; // array of MIP mapped images
 
 public:
     void resize(size_t width, size_t height, size_t depth, size_t nMIPMaps)
@@ -1049,7 +1049,7 @@ typedef nvVector<fpImage> fpImageArray;
 
 class fpMipMappedImage
 {
-    fpImageArray mipArray;  // array of images, one for each MIP map RGBA
+    fpImageArray mipArray; // array of images, one for each MIP map RGBA
 
 public:
     fpMipMappedImage() {}
@@ -1112,7 +1112,7 @@ public:
 class fpMipMappedCubeMap
 {
 private:
-    fpMipMappedImage cubeFaces[6];  // array of images, one for each MIP map RGBA
+    fpMipMappedImage cubeFaces[6]; // array of images, one for each MIP map RGBA
 
 public:
     void resize(size_t width, size_t height, size_t nMIPMaps)

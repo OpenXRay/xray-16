@@ -49,7 +49,7 @@ public:
         T numer = classify(P);
         T denom = n.dotproduct(D);
 
-        if (_abs(denom) < EPS_S)  // normal is orthogonal to vector3, cant intersect
+        if (_abs(denom) < EPS_S) // normal is orthogonal to vector3, cant intersect
             return FALSE;
 
         dist = -(numer / denom);
@@ -61,7 +61,7 @@ public:
         T denom = n.dotproduct(D);
 
         if (_abs(denom) < EPS_S)
-            return FALSE;  // normal is orthogonal to vector3, cant intersect
+            return FALSE; // normal is orthogonal to vector3, cant intersect
         else
         {
             float dist = -(numer / denom);
@@ -69,15 +69,15 @@ public:
             return ((dist > 0.f) || fis_zero(dist));
         }
     }
-    IC BOOL intersect(const _vector2<T>& u, const _vector2<T>& v,  // segment
-        _vector2<T>& isect)                                        // intersection point
+    IC BOOL intersect(const _vector2<T>& u, const _vector2<T>& v, // segment
+        _vector2<T>& isect)                                       // intersection point
     {
         T denom, dist;
         _vector2<T> t;
 
         t.sub(v, u);
         denom = n.dotproduct(t);
-        if (_abs(denom) < EPS) return false;  // they are parallel
+        if (_abs(denom) < EPS) return false; // they are parallel
 
         dist = -(n.dotproduct(u) + d) / denom;
         if (dist < -EPS || dist > 1 + EPS) return false;
@@ -85,8 +85,8 @@ public:
         return true;
     }
 
-    IC BOOL intersect_2(const _vector2<T>& u, const _vector2<T>& v,  // segment
-        _vector2<T>& isect)                                          // intersection point
+    IC BOOL intersect_2(const _vector2<T>& u, const _vector2<T>& v, // segment
+        _vector2<T>& isect)                                         // intersection point
     {
         T dist1, dist2;
         _vector2<T> t;

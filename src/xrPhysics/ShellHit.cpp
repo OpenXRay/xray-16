@@ -12,7 +12,7 @@
 
 void CPHShell::applyHit(const Fvector& pos, const Fvector& dir, float val, const u16 id, ALife::EHitType hit_type)
 {
-    if (id == u16(-1)) return;  //
+    if (id == u16(-1)) return; //
 #pragma todo("Kosya to kosya:this code shold treat all hit types")
     if (!m_pKinematics) {
         applyImpulseTrace(pos, dir, val);
@@ -53,7 +53,7 @@ void CPHShell::ExplosionHit(const Fvector& pos, const Fvector& dir, float val, c
                 r_dir.add(dir);
             }
 
-            r_dir.normalize_safe();  // safe???
+            r_dir.normalize_safe(); // safe???
             element->applyImpulseTrace(r_pos, r_dir, g_impulse, element->CPHGeometryOwner::Geom(j)->bone_id());
         }
     }

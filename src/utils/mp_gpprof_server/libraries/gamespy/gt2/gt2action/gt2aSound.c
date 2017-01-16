@@ -37,8 +37,8 @@ const char* soundFiles[] = {
 ///////////////////////////////////////////////
 static HRESULT ReadMMIO(HMMIO hmmioIn, MMCKINFO* pckInRIFF, WAVEFORMATEX** ppwfxInfo)
 {
-    MMCKINFO ckIn;                // chunk info. for general use.
-    PCMWAVEFORMAT pcmWaveFormat;  // Temp PCM structure to load in.
+    MMCKINFO ckIn;               // chunk info. for general use.
+    PCMWAVEFORMAT pcmWaveFormat; // Temp PCM structure to load in.
 
     *ppwfxInfo = NULL;
 
@@ -134,7 +134,7 @@ static HRESULT WaveStartDataRead(HMMIO* phmmioIn, MMCKINFO* pckIn, MMCKINFO* pck
 ///////////////////////////////////////////////
 static HRESULT WaveReadFile(HMMIO hmmioIn, UINT cbRead, BYTE* pbDest, MMCKINFO* pckIn, UINT* cbActualRead)
 {
-    MMIOINFO mmioinfoIn;  // current status of <hmmioIn>
+    MMIOINFO mmioinfoIn; // current status of <hmmioIn>
     UINT cbDataIn;
     DWORD cT;
 

@@ -15,13 +15,13 @@ public:
     enum RENDER_TARGET
     {
         RENDER_TARGET_VELOCITY1 = 0,
-        RENDER_TARGET_COLOR,  //	Swap with object's
+        RENDER_TARGET_COLOR, //	Swap with object's
         RENDER_TARGET_OBSTACLES,
         RENDER_TARGET_OBSTVELOCITY,
         RENDER_TARGET_TEMPSCALAR,
         RENDER_TARGET_TEMPVECTOR,
-        NUM_OWN_RENDER_TARGETS,                            //	Owns render targets only upt to this id.
-        RENDER_TARGET_VELOCITY0 = NUM_OWN_RENDER_TARGETS,  //	For textures generated from local data
+        NUM_OWN_RENDER_TARGETS,                           //	Owns render targets only upt to this id.
+        RENDER_TARGET_VELOCITY0 = NUM_OWN_RENDER_TARGETS, //	For textures generated from local data
         RENDER_TARGET_PRESSURE,
         RENDER_TARGET_COLOR_IN,
         NUM_RENDER_TARGETS
@@ -56,7 +56,7 @@ public:
     void RegisterFluidData(dx103DFluidData* pData, const xr_string& SectionName);
     void DeregisterFluidData(dx103DFluidData* pData);
     void UpdateProfiles();
-#endif  //	DEBUG
+#endif //	DEBUG
 
 private:
     enum SimulationShader
@@ -139,13 +139,13 @@ private:
 #ifdef DEBUG
     xr_vector<xr_string> m_lstSectionNames;
     xr_vector<dx103DFluidData*> m_lstFluidData;
-#endif  //	DEBUG
+#endif //	DEBUG
 
 //	Allow real-time config reload
 #ifdef DEBUG
-#endif  //	DEBUG
+#endif //	DEBUG
 };
 
 extern dx103DFluidManager FluidManager;
 
-#endif  //	dx103DFluidManager_included
+#endif //	dx103DFluidManager_included

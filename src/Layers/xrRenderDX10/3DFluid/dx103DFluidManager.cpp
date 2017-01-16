@@ -39,29 +39,29 @@ shared_str strGravityBuoyancy("GravityBuoyancy");
 }
 
 LPCSTR dx103DFluidManager::m_pEngineTextureNames[NUM_RENDER_TARGETS] = {
-    "$user$Texture_velocity1",     //	RENDER_TARGET_VELOCITY1 = 0,
-    "$user$Texture_color_out",     //	RENDER_TARGET_COLOR,	//	Swap with object's
-    "$user$Texture_obstacles",     //	RENDER_TARGET_OBSTACLES,
-    "$user$Texture_obstvelocity",  //	RENDER_TARGET_OBSTVELOCITY,
-    "$user$Texture_tempscalar",    //	RENDER_TARGET_TEMPSCALAR,
-    "$user$Texture_tempvector",    //	 RENDER_TARGET_TEMPVECTOR,
-    "$user$Texture_velocity0",     //	RENDER_TARGET_VELOCITY0 = NUM_OWN_RENDER_TARGETS,	//	For textures generated from
-                                   //local data
-    "$user$Texture_pressure",      //	RENDER_TARGET_PRESSURE,
-    "$user$Texture_color",         //	RENDER_TARGET_COLOR_IN,
+    "$user$Texture_velocity1",    //	RENDER_TARGET_VELOCITY1 = 0,
+    "$user$Texture_color_out",    //	RENDER_TARGET_COLOR,	//	Swap with object's
+    "$user$Texture_obstacles",    //	RENDER_TARGET_OBSTACLES,
+    "$user$Texture_obstvelocity", //	RENDER_TARGET_OBSTVELOCITY,
+    "$user$Texture_tempscalar",   //	RENDER_TARGET_TEMPSCALAR,
+    "$user$Texture_tempvector",   //	 RENDER_TARGET_TEMPVECTOR,
+    "$user$Texture_velocity0",    //	RENDER_TARGET_VELOCITY0 = NUM_OWN_RENDER_TARGETS,	//	For textures generated from
+                                  // local data
+    "$user$Texture_pressure",     //	RENDER_TARGET_PRESSURE,
+    "$user$Texture_color",        //	RENDER_TARGET_COLOR_IN,
 };
 
 LPCSTR dx103DFluidManager::m_pShaderTextureNames[NUM_RENDER_TARGETS] = {
-    "Texture_velocity1",     //	RENDER_TARGET_VELOCITY1 = 0,
-    "Texture_color_out",     //	RENDER_TARGET_COLOR,	//	Swap with object's
-    "Texture_obstacles",     //	RENDER_TARGET_OBSTACLES,
-    "Texture_obstvelocity",  //	RENDER_TARGET_OBSTVELOCITY,
-    "Texture_tempscalar",    //	RENDER_TARGET_TEMPSCALAR,
-    "Texture_tempvector",    //	 RENDER_TARGET_TEMPVECTOR,
-    "Texture_velocity0",     //	RENDER_TARGET_VELOCITY0 = NUM_OWN_RENDER_TARGETS,	//	For textures generated from
-                             //local data
-    "Texture_pressure",      //	RENDER_TARGET_PRESSURE,
-    "Texture_color",         //	RENDER_TARGET_COLOR_IN,
+    "Texture_velocity1",    //	RENDER_TARGET_VELOCITY1 = 0,
+    "Texture_color_out",    //	RENDER_TARGET_COLOR,	//	Swap with object's
+    "Texture_obstacles",    //	RENDER_TARGET_OBSTACLES,
+    "Texture_obstvelocity", //	RENDER_TARGET_OBSTVELOCITY,
+    "Texture_tempscalar",   //	RENDER_TARGET_TEMPSCALAR,
+    "Texture_tempvector",   //	 RENDER_TARGET_TEMPVECTOR,
+    "Texture_velocity0",    //	RENDER_TARGET_VELOCITY0 = NUM_OWN_RENDER_TARGETS,	//	For textures generated from
+                            // local data
+    "Texture_pressure",     //	RENDER_TARGET_PRESSURE,
+    "Texture_color",        //	RENDER_TARGET_COLOR_IN,
 };
 
 dx103DFluidManager::dx103DFluidManager()
@@ -273,10 +273,10 @@ void dx103DFluidManager::Update(dx103DFluidData& FluidData, float timestep)
 #ifdef USE_DX11
     rtViewport.Width = (float)m_iTextureWidth;
     rtViewport.Height = (float)m_iTextureHeight;
-#else   // #ifdef USE_DX11
+#else  // #ifdef USE_DX11
     rtViewport.Width = m_iTextureWidth;
     rtViewport.Height = m_iTextureHeight;
-#endif  // #ifdef USE_DX11
+#endif // #ifdef USE_DX11
     HW.pContext->RSSetViewports(1, &rtViewport);
 
     RCache.set_ZB(0);
@@ -345,9 +345,9 @@ void dx103DFluidManager::Update(dx103DFluidData& FluidData, float timestep)
     //	Restore render state
     CRenderTarget* pTarget = RImplementation.Target;
     if (!RImplementation.o.dx10_msaa)
-        pTarget->u_setrt(pTarget->rt_Generic_0, 0, 0, HW.pBaseZB);  // LDR RT
+        pTarget->u_setrt(pTarget->rt_Generic_0, 0, 0, HW.pBaseZB); // LDR RT
     else
-        pTarget->u_setrt(pTarget->rt_Generic_0_r, 0, 0, pTarget->rt_MSAADepth->pZRT);  // LDR RT
+        pTarget->u_setrt(pTarget->rt_Generic_0_r, 0, 0, pTarget->rt_MSAADepth->pZRT); // LDR RT
 
     RImplementation.rmNormal();
     // RImplementation.Target->phase_scene_begin();
@@ -727,9 +727,9 @@ void dx103DFluidManager::RenderFluid(dx103DFluidData& FluidData)
     //	Restore render state
     CRenderTarget* pTarget = RImplementation.Target;
     if (!RImplementation.o.dx10_msaa)
-        pTarget->u_setrt(pTarget->rt_Generic_0, 0, 0, HW.pBaseZB);  // LDR RT
+        pTarget->u_setrt(pTarget->rt_Generic_0, 0, 0, HW.pBaseZB); // LDR RT
     else
-        pTarget->u_setrt(pTarget->rt_Generic_0_r, 0, 0, pTarget->rt_MSAADepth->pZRT);  // LDR RT
+        pTarget->u_setrt(pTarget->rt_Generic_0_r, 0, 0, pTarget->rt_MSAADepth->pZRT); // LDR RT
 
     RImplementation.rmNormal();
 }
@@ -813,4 +813,4 @@ void dx103DFluidManager::UpdateProfiles()
     }
 }
 
-#endif  //	DEBUG
+#endif //	DEBUG

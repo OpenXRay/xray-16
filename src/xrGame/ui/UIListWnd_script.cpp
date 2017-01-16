@@ -72,7 +72,7 @@ void CUIListWnd::script_register(lua_State* L)
             .def_readwrite("without_ff", &SServerFilters::without_ff)
 #ifdef BATTLEYE
             .def_readwrite("with_battleye", &SServerFilters::with_battleye)
-#endif  // BATTLEYE
+#endif // BATTLEYE
             .def_readwrite("listen_servers", &SServerFilters::listen_servers),
 
         class_<CServerList, CUIWindow>("CServerList")

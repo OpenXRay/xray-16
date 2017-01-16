@@ -18,12 +18,12 @@ public:
     virtual u32 const get_u32_param();
     virtual float const get_float_param() { return 0.0f; };
     virtual void reset_game(){};
-};  // class player_state_ammo_elapsed
+}; // class player_state_ammo_elapsed
 
 ADD_ACCUMULATIVE_STATE(acpv_ammo_elapsed, player_state_ammo_elapsed);
 #undef ACCUMULATIVE_STATE_LIST
 #define ACCUMULATIVE_STATE_LIST SAVE_TYPE_LIST(acpv_ammo_elapsed, player_state_ammo_elapsed)
 
-}  // namespace award_system
+} // namespace award_system
 
-#endif  //#ifndef PLAYER_STATE_AMMO_ELAPSED_INCLUDED
+#endif //#ifndef PLAYER_STATE_AMMO_ELAPSED_INCLUDED

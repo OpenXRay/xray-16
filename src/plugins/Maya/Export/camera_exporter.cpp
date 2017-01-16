@@ -113,7 +113,7 @@ MStatus CXRayCameraExport::ExportCamera(const MFileObject& file)
     tmTemp.setUnit(MTime::uiUnit());
     tmTemp2.setUnit(MTime::uiUnit());
     tmQuant.setUnit(MTime::uiUnit());
-    tmQuant = 5.0;  // 10.0; //3 time in sec. temporary
+    tmQuant = 5.0; // 10.0; //3 time in sec. temporary
 
     COMotion M;
     int frms = (int)(endFrame - startFrame).as(MTime::uiUnit());

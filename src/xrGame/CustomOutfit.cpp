@@ -70,7 +70,7 @@ void CCustomOutfit::Load(LPCSTR section)
     m_HitTypeProtection[ALife::eHitTypeTelepatic] = pSettings->r_float(section, "telepatic_protection");
     m_HitTypeProtection[ALife::eHitTypeChemicalBurn] = pSettings->r_float(section, "chemical_burn_protection");
     m_HitTypeProtection[ALife::eHitTypeExplosion] = pSettings->r_float(section, "explosion_protection");
-    m_HitTypeProtection[ALife::eHitTypeFireWound] = 0.f;  // pSettings->r_float(section,"fire_wound_protection");
+    m_HitTypeProtection[ALife::eHitTypeFireWound] = 0.f; // pSettings->r_float(section,"fire_wound_protection");
     //	m_HitTypeProtection[ALife::eHitTypePhysicStrike]= pSettings->r_float(section,"physic_strike_protection");
     m_HitTypeProtection[ALife::eHitTypeLightBurn] = m_HitTypeProtection[ALife::eHitTypeBurn];
     m_boneProtection->m_fHitFracActor = pSettings->r_float(section, "hit_fraction_actor");
@@ -162,7 +162,7 @@ float CCustomOutfit::HitThroughArmor(float hit_power, s16 element, float ap, boo
         {
             //пуля НЕ пробила бронь
             NewHitPower *= m_boneProtection->m_fHitFracActor;
-            add_wound = false;  //раны нет
+            add_wound = false; //раны нет
         }
     }
     else
@@ -284,7 +284,7 @@ bool CCustomOutfit::install_upgrade_impl(LPCSTR section, bool test)
     result |= process_if_exists(
         section, "fire_wound_protection", &CInifile::r_float, m_HitTypeProtection[ALife::eHitTypeFireWound], test);
     //	result |= process_if_exists( section, "physic_strike_protection", &CInifile::r_float,
-    //m_HitTypeProtection[ALife::eHitTypePhysicStrike], test );
+    // m_HitTypeProtection[ALife::eHitTypePhysicStrike], test );
     LPCSTR str;
     bool result2 = process_if_exists_set(section, "nightvision_sect", &CInifile::r_string, str, test);
     if (result2 && !test) {

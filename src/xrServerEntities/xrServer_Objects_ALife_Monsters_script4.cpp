@@ -12,7 +12,7 @@
 #include "xrServer_script_macroses.h"
 #ifdef XRGAME_EXPORTS
 #include "relation_registry.h"
-#endif  // #ifdef XRGAME_EXPORTS
+#endif // #ifdef XRGAME_EXPORTS
 #include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
@@ -77,7 +77,7 @@ void ForceSetGoodwill(CSE_ALifeMonsterAbstract* self, int goodwill, ALife::_OBJE
 {
     RELATION_REGISTRY().ForceSetGoodwill(self->ID, pWhoToSet, goodwill);
 }
-#endif  // #ifdef XRGAME_EXPORTS
+#endif // #ifdef XRGAME_EXPORTS
 
 static void CSE_ALifeMonsterAbstract_Export(lua_State* luaState)
 {

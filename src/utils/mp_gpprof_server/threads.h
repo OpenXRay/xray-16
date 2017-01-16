@@ -21,7 +21,7 @@ public:
     pthread_mutex_t* get() { return &m_mutex; }
 private:
     pthread_mutex_t m_mutex;
-};  // class mutex
+}; // class mutex
 
 class condition
 {
@@ -33,7 +33,7 @@ public:
 
 private:
     pthread_cond_t m_cond;
-};  // class condition
+}; // class condition
 
 template <typename T>
 class thread_method
@@ -100,11 +100,11 @@ private:
         pthread_exit(ret_value);
         return ret_value;
     };
-};  // class thread_method
+}; // class thread_method
 
 unsigned int const get_clock_ms();
 void sleep(unsigned int const ms);
 
-}  // namespace xray
+} // namespace xray
 
-#endif  //#ifndef THREADS_H_INCLUDED
+#endif //#ifndef THREADS_H_INCLUDED

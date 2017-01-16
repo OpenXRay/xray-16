@@ -158,7 +158,7 @@ void SArtefactActivation::SpawnAnomaly()
     LPCSTR str = pSettings->r_string("artefact_spawn_zones", *m_af->cNameSect());
     VERIFY3(3 == _GetItemCount(str), "Bad record format in artefact_spawn_zones", str);
     float zone_radius = (float)atof(_GetItem(str, 1, tmp));
-    LPCSTR zone_sect = _GetItem(str, 0, tmp);  // must be last call of _GetItem... (LPCSTR !!!)
+    LPCSTR zone_sect = _GetItem(str, 0, tmp); // must be last call of _GetItem... (LPCSTR !!!)
 
     Fvector pos;
     m_af->Center(pos);
@@ -193,8 +193,8 @@ shared_str clear_brackets(LPCSTR src)
     xr_strcpy(_original, src);
     u32 _len = xr_strlen(_original);
     if (0 == _len) return shared_str("");
-    if ('"' == _original[_len - 1]) _original[_len - 1] = 0;        // skip end
-    if ('"' == _original[0]) return shared_str(&_original[0] + 1);  // skip begin
+    if ('"' == _original[_len - 1]) _original[_len - 1] = 0;       // skip end
+    if ('"' == _original[0]) return shared_str(&_original[0] + 1); // skip begin
     return shared_str(_original);
 }
 

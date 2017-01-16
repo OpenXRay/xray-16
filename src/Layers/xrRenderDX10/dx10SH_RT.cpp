@@ -33,7 +33,7 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount)
     if (pSurface) return;
 
     R_ASSERT(HW.pDevice && Name && Name[0] && w && h);
-    _order = CPU::GetCLK();  // Device.GetTimerGlobal()->GetElapsed_clk();
+    _order = CPU::GetCLK(); // Device.GetTimerGlobal()->GetElapsed_clk();
 
     // HRESULT		_hr;
 
@@ -140,7 +140,7 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount)
 // OK
 #ifdef DEBUG
     Msg("* created RT(%s), %dx%d, format = %d samples = %d", Name, w, h, dx10FMT, SampleCount);
-#endif  // DEBUG
+#endif // DEBUG
     // R_CHK		(pSurface->GetSurfaceLevel	(0,&pRT));
     if (bUseAsDepth) {
         D3D_DEPTH_STENCIL_VIEW_DESC ViewDesc;

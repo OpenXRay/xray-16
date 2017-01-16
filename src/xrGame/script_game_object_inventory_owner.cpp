@@ -101,7 +101,7 @@ void _give_news(LPCSTR caption, LPCSTR text, LPCSTR texture_name, int delay, int
     news_data.m_type = (GAME_NEWS_DATA::eNewsType)type;
     news_data.news_caption = caption;
     news_data.news_text = text;
-    if (show_time != 0) news_data.show_time = show_time;  // override default
+    if (show_time != 0) news_data.show_time = show_time; // override default
 
     VERIFY(xr_strlen(texture_name) > 0);
 
@@ -983,7 +983,7 @@ void CScriptGameObject::attachable_item_load_attach(LPCSTR section)
     }
     attachable_item->load_attach_position(section);
 
-    if (attachable_item->object().H_Parent()) {  // reattach
+    if (attachable_item->object().H_Parent()) { // reattach
         CAttachmentOwner* AO = smart_cast<CAttachmentOwner*>(attachable_item->object().H_Parent());
         if (AO) AO->reattach_items();
     }
@@ -994,7 +994,7 @@ void CScriptGameObject::RestoreWeapon()
 #ifdef DEBUG
     ai().script_engine().script_log(LuaMessageType::Message, "CScriptGameObject::RestoreWeapon called!!!");
     ai().script_engine().print_stack();
-#endif  //#ifdef DEBUG
+#endif //#ifdef DEBUG
     Actor()->SetWeaponHideState(INV_STATE_BLOCK_ALL, false);
 }
 
@@ -1003,7 +1003,7 @@ void CScriptGameObject::HideWeapon()
 #ifdef DEBUG
     ai().script_engine().script_log(LuaMessageType::Message, "CScriptGameObject::HideWeapon called!!!");
     ai().script_engine().print_stack();
-#endif  //#ifdef DEBUG
+#endif //#ifdef DEBUG
     Actor()->SetWeaponHideState(INV_STATE_BLOCK_ALL, true);
 }
 

@@ -74,4 +74,4 @@ IC bool stalker_movement_manager_smart_cover::combat_behaviour() const
     return (m_combat_behaviour);
 }
 
-#endif  // #ifndef STALKER_MOVEMENT_MANAGER_SMART_COVER_INLINE_H_INCLUDED
+#endif // #ifndef STALKER_MOVEMENT_MANAGER_SMART_COVER_INLINE_H_INCLUDED

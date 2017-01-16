@@ -13,7 +13,7 @@ namespace debug
 {
 class text_tree
 {
-public:  // START INTERFACE
+public: // START INTERFACE
     text_tree(char separator = ':', int group_id_ = 0) : group_id(group_id_), shown(true), separator(separator) {}
     void toggle_show(int group_id);
 
@@ -45,7 +45,7 @@ public:  // START INTERFACE
     void output(OutFunc func, int indent = 4);
 
     virtual ~text_tree() { clear(); }
-private:  // END INTERFACE
+private: // END INTERFACE
     typedef xr_list<text_tree*> Children;
     typedef xr_vector<int> Columns;
     typedef xr_vector<xr_string> Strings;
@@ -63,21 +63,21 @@ private:  // END INTERFACE
     int num_siblings;
 
     text_tree& add_line();
-    text_tree(const text_tree& t);  // no copying allowed
+    text_tree(const text_tree& t); // no copying allowed
 };
 
 void draw_text_tree(text_tree& tree,
-    int indent,  // in spaces
+    int indent, // in spaces
     int ori_x, int ori_y,
-    int offs,         // skip offs lines
-    int column_size,  // in pixels
+    int offs,        // skip offs lines
+    int column_size, // in pixels
     int max_rows, u32 color1, u32 color2);
 
 void log_text_tree(text_tree& tree);
 
 #include "debug_text_tree_inline.h"
 
-}  // namespace debug
+} // namespace debug
 
 IC xr_string __cdecl make_xrstr(LPCSTR format, ...)
 {
@@ -115,4 +115,4 @@ IC xr_string __cdecl make_xrstr(const xr_string& s)
     return s;
 }
 
-#endif  // defined(AI_DEBUG_TEXT_TREE_H_INCLUDED)
+#endif // defined(AI_DEBUG_TEXT_TREE_H_INCLUDED)

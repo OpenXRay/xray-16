@@ -1,4 +1,4 @@
-#ifndef MXGEOPRIMS_INCLUDED  // -*- C++ -*-
+#ifndef MXGEOPRIMS_INCLUDED // -*- C++ -*-
 #define MXGEOPRIMS_INCLUDED
 #if !defined(__GNUC__)
 #pragma once

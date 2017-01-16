@@ -18,7 +18,7 @@ class NVI_ImageBordered
 
 #include "stdafx.h"
 
-#include <limits.h>  // for UINT_MAX
+#include <limits.h> // for UINT_MAX
 #include "NVI_Image.h"
 
 using namespace xray_nvi;

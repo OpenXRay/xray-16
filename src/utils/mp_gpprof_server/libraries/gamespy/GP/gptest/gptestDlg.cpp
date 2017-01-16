@@ -1047,8 +1047,8 @@ BOOL CGptestDlg::OnInitDialog()
 
     // Set the icon for this dialog.  The framework does this automatically
     //  when the application's main window is not a dialog
-    SetIcon(m_hIcon, TRUE);   // Set big icon
-    SetIcon(m_hIcon, FALSE);  // Set small icon
+    SetIcon(m_hIcon, TRUE);  // Set big icon
+    SetIcon(m_hIcon, FALSE); // Set small icon
 
     dlg = this;
     m_connection = NULL;
@@ -1110,7 +1110,7 @@ BOOL CGptestDlg::OnInitDialog()
 
     UpdateData(FALSE);
 
-    return TRUE;  // return TRUE  unless you set the focus to a control
+    return TRUE; // return TRUE  unless you set the focus to a control
 }
 
 void CGptestDlg::OnDestroy()

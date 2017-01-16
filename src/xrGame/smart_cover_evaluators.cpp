@@ -203,7 +203,7 @@ _value_type can_exit_loophole_with_animation::evaluate()
 #ifdef DEBUG
         Msg("transition guard(cover): [%s] -> [%s]", current_cover ? current_cover->id().c_str() : "<world>",
             target_cover ? target_cover->id().c_str() : "<world>");
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
         return (movement.current_transition().animation().has_animation());
     }
 
@@ -213,7 +213,7 @@ _value_type can_exit_loophole_with_animation::evaluate()
 #ifdef DEBUG
         Msg("transition guard(loophole): [%s] -> [%s]", current_loophole ? current_loophole->id().c_str() : "<world>",
             target_loophole ? target_loophole->id().c_str() : "<world>");
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
         return (movement.current_transition().animation().has_animation());
     }
 

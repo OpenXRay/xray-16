@@ -19,7 +19,7 @@ void RetailOutputA(CHAR* tszErr, ...);
 #pragma warning(disable : 4127)
 #endif
 
-#ifdef __MWERKS__  // CodeWarrior will warn if function is not prototyped
+#ifdef __MWERKS__ // CodeWarrior will warn if function is not prototyped
 int test_main(int argc, char** argv);
 #endif
 
@@ -473,7 +473,7 @@ int test_main(int argc, char** argv)
         msleep(50);
         totalTime += 50;
         if (totalTime > 10000) {
-            if (appState == -1)  // buddy is not actually on our buddy list
+            if (appState == -1) // buddy is not actually on our buddy list
             {
                 if (noComLineArgs)
                     printf(" %s is not on our buddy list! Sending him a buddy request and waiting for a response...\n",
@@ -501,7 +501,7 @@ int test_main(int argc, char** argv)
                     break;
                 }
             }
-            else  // buddy is on our buddy list but did not come online and set status to "Ready"
+            else // buddy is on our buddy list but did not come online and set status to "Ready"
             {
                 if (noComLineArgs)
                     printf("\n%s never showed up =(\n", GPTC_NICK2);

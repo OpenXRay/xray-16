@@ -1,4 +1,4 @@
-#ifndef MXVEC3_INCLUDED  // -*- C++ -*-
+#ifndef MXVEC3_INCLUDED // -*- C++ -*-
 #define MXVEC3_INCLUDED
 #if !defined(__GNUC__)
 #pragma once

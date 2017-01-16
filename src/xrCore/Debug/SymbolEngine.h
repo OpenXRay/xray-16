@@ -214,7 +214,7 @@ public:
             *pdwDisplacement = dwTempDis;
         }
         return TRUE;
-#endif  // DO_NOT_WORK_AROUND_SRCLINE_BUG
+#endif // DO_NOT_WORK_AROUND_SRCLINE_BUG
     }
 
     BOOL SymGetLineFromName(IN LPSTR ModuleName, IN LPSTR FileName, IN DWORD dwLineNumber, OUT PLONG plDisplacement,

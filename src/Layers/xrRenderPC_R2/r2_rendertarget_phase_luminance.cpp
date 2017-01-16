@@ -34,8 +34,8 @@ void CRenderTarget::phase_luminance()
         float ts = 64;
         float _w = float(BLOOM_size_X);
         float _h = float(BLOOM_size_Y);
-        Fvector2 one = {2.f / _w, 2.f / _h};   // two, infact
-        Fvector2 half = {1.f / _w, 1.f / _h};  // one, infact
+        Fvector2 one = {2.f / _w, 2.f / _h};  // two, infact
+        Fvector2 half = {1.f / _w, 1.f / _h}; // one, infact
         Fvector2 a_0 = {half.x + 0, half.y + 0};
         Fvector2 a_1 = {half.x + one.x, half.y + 0};
         Fvector2 a_2 = {half.x + 0, half.y + one.y};
@@ -86,8 +86,8 @@ void CRenderTarget::phase_luminance()
         Fvector2 a[16], b[16];
         for (int k = 0; k < 16; k++)
         {
-            int _x = (k * 2 + 1) % 8;    // 1,3,5,7
-            int _y = ((k / 4) * 2 + 1);  // 1,1,1,1 ~ 3,3,3,3 ~...etc...
+            int _x = (k * 2 + 1) % 8;   // 1,3,5,7
+            int _y = ((k / 4) * 2 + 1); // 1,1,1,1 ~ 3,3,3,3 ~...etc...
             a[k].set(_x, _y).div(_src);
             b[k].set(a[k]).add(1);
         }
@@ -96,19 +96,19 @@ void CRenderTarget::phase_luminance()
         v_filter* pv = (v_filter*)RCache.Vertex.Lock(4, g_bloom_filter->vb_stride, Offset);
         pv->p.set(eps, float(_ts + eps), eps, 1.f);
         for (int t = 0; t < 8; t++)
-            pv->uv[t].set(a[t].x, b[t].y, b[t + 8].y, a[t + 8].x);  // xy/yx	- left+down
+            pv->uv[t].set(a[t].x, b[t].y, b[t + 8].y, a[t + 8].x); // xy/yx	- left+down
         pv++;
         pv->p.set(eps, eps, eps, 1.f);
         for (int t = 0; t < 8; t++)
-            pv->uv[t].set(a[t].x, a[t].y, a[t + 8].y, a[t + 8].x);  // xy/yx	- left+up
+            pv->uv[t].set(a[t].x, a[t].y, a[t + 8].y, a[t + 8].x); // xy/yx	- left+up
         pv++;
         pv->p.set(float(_ts + eps), float(_ts + eps), eps, 1.f);
         for (int t = 0; t < 8; t++)
-            pv->uv[t].set(b[t].x, b[t].y, b[t + 8].y, b[t + 8].x);  // xy/yx	- right+down
+            pv->uv[t].set(b[t].x, b[t].y, b[t + 8].y, b[t + 8].x); // xy/yx	- right+down
         pv++;
         pv->p.set(float(_ts + eps), eps, eps, 1.f);
         for (int t = 0; t < 8; t++)
-            pv->uv[t].set(b[t].x, a[t].y, a[t + 8].y, b[t + 8].x);  // xy/yx	- right+up
+            pv->uv[t].set(b[t].x, a[t].y, a[t + 8].y, b[t + 8].x); // xy/yx	- right+up
         pv++;
         RCache.Vertex.Unlock(4, g_bloom_filter->vb_stride);
         RCache.set_Element(s_luminance->E[1]);
@@ -126,8 +126,8 @@ void CRenderTarget::phase_luminance()
         Fvector2 a[16], b[16];
         for (int k = 0; k < 16; k++)
         {
-            int _x = (k * 2 + 1) % 8;    // 1,3,5,7
-            int _y = ((k / 4) * 2 + 1);  // 1,1,1,1 ~ 3,3,3,3 ~...etc...
+            int _x = (k * 2 + 1) % 8;   // 1,3,5,7
+            int _y = ((k / 4) * 2 + 1); // 1,1,1,1 ~ 3,3,3,3 ~...etc...
             a[k].set(_x, _y).div(_src);
             b[k].set(a[k]).add(1);
         }
@@ -136,19 +136,19 @@ void CRenderTarget::phase_luminance()
         v_filter* pv = (v_filter*)RCache.Vertex.Lock(4, g_bloom_filter->vb_stride, Offset);
         pv->p.set(eps, float(_ts + eps), eps, 1.f);
         for (int t = 0; t < 8; t++)
-            pv->uv[t].set(a[t].x, b[t].y, b[t + 8].y, a[t + 8].x);  // xy/yx	- left+down
+            pv->uv[t].set(a[t].x, b[t].y, b[t + 8].y, a[t + 8].x); // xy/yx	- left+down
         pv++;
         pv->p.set(eps, eps, eps, 1.f);
         for (int t = 0; t < 8; t++)
-            pv->uv[t].set(a[t].x, a[t].y, a[t + 8].y, a[t + 8].x);  // xy/yx	- left+up
+            pv->uv[t].set(a[t].x, a[t].y, a[t + 8].y, a[t + 8].x); // xy/yx	- left+up
         pv++;
         pv->p.set(float(_ts + eps), float(_ts + eps), eps, 1.f);
         for (int t = 0; t < 8; t++)
-            pv->uv[t].set(b[t].x, b[t].y, b[t + 8].y, b[t + 8].x);  // xy/yx	- right+down
+            pv->uv[t].set(b[t].x, b[t].y, b[t + 8].y, b[t + 8].x); // xy/yx	- right+down
         pv++;
         pv->p.set(float(_ts + eps), eps, eps, 1.f);
         for (int t = 0; t < 8; t++)
-            pv->uv[t].set(b[t].x, a[t].y, a[t + 8].y, b[t + 8].x);  // xy/yx	- right+up
+            pv->uv[t].set(b[t].x, a[t].y, a[t + 8].y, b[t + 8].x); // xy/yx	- right+up
         pv++;
         RCache.Vertex.Unlock(4, g_bloom_filter->vb_stride);
 

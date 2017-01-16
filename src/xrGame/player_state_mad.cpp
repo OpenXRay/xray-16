@@ -43,4 +43,4 @@ u32 const player_state_mad::get_u32_param()
     return m_kill_times.size();
 }
 
-}  // namespace award_system
+} // namespace award_system

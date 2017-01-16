@@ -123,4 +123,4 @@ float const player_state_ang_velocity::get_float_param()
     return state.fAVelocity;
 }
 
-}  // namespace award_system
+} // namespace award_system

@@ -19,9 +19,9 @@ ICF bool pred_dot(const std::pair<float, u32>& _1, const std::pair<float, u32>& 
 void D3DXRenderBase::r_dsgraph_render_lods(bool _setup_zb, bool _clear)
 {
     if (_setup_zb)
-        mapLOD.getLR(lstLODs);  // front-to-back
+        mapLOD.getLR(lstLODs); // front-to-back
     else
-        mapLOD.getRL(lstLODs);  // back-to-front
+        mapLOD.getRL(lstLODs); // back-to-front
     if (lstLODs.empty()) return;
 
     // *** Fill VB and generate groups

@@ -58,4 +58,4 @@ private:
 
 extern dxUIRender UIRenderImpl;
 
-#endif  //	dxUIRender_included
+#endif //	dxUIRender_included

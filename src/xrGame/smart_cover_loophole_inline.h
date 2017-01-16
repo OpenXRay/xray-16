@@ -85,6 +85,6 @@ IC void loophole::exitable(bool value)
     m_exitable = value;
 }
 
-}  // namespace smart_cover
+} // namespace smart_cover
 
-#endif  // SMART_COVER_LOOPHOLE_INLINE_H_INCLUDED
+#endif // SMART_COVER_LOOPHOLE_INLINE_H_INCLUDED

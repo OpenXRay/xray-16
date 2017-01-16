@@ -157,7 +157,7 @@ void CUIDemoPlayControl::InitAllPlayers()
 
     CStringTable st;
     m_all_players->InitPropertiesBox(Fvector2().set(0, 0), Fvector2().set(100, 200));
-    m_all_players->AddItem(st.translate("mpd_any_player").c_str(), NULL, 0);  // warning ! zero tag means Any player !
+    m_all_players->AddItem(st.translate("mpd_any_player").c_str(), NULL, 0); // warning ! zero tag means Any player !
 
     m_players->clear();
     for (u32 i = 0; i != players_count; ++i)
@@ -167,7 +167,7 @@ void CUIDemoPlayControl::InitAllPlayers()
         LPCSTR tmp_player_name = tmp_player->get_name();
         R_ASSERT(tmp_player_name);
         m_players->push_back(shared_str(tmp_player_name));
-        m_all_players->AddItem(tmp_player_name, NULL, i + 1);  // warning ! player_index = tag - 1 !!!
+        m_all_players->AddItem(tmp_player_name, NULL, i + 1); // warning ! player_index = tag - 1 !!!
     }
     m_all_players->AutoUpdateSize();
     m_all_players->Hide();
@@ -305,7 +305,7 @@ void CUIDemoPlayControl::OnRepeatRewind(CUIWindow* w, void* d)
     };
     break;
     default: NODEFAULT;
-    };  // switch (m_last_rewind_query)
+    }; // switch (m_last_rewind_query)
 
     if (rewind_result) UIStartRewind();
 }

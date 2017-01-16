@@ -6,7 +6,7 @@
 
 #if _MSC_VER > 1000
 #pragma once
-#endif  // _MSC_VER > 1000
+#endif // _MSC_VER > 1000
 
 /////////////////////////////////////////////////////////////////////////////
 // CGt2testDlg dialog
@@ -57,7 +57,7 @@ public:
     void EnableSocketControls(BOOL enable = TRUE);
     void EnableListenControls(BOOL enable = TRUE);
     void EnableConnectionControls(BOOL enable = TRUE);
-    CGt2testDlg(CWnd* pParent = NULL);  // standard constructor
+    CGt2testDlg(CWnd* pParent = NULL); // standard constructor
 
     DArray m_delayedSends;
     DArray m_delayedReceives;
@@ -112,8 +112,8 @@ public:
     virtual BOOL PreTranslateMessage(MSG* pMsg);
 
 protected:
-    virtual void DoDataExchange(CDataExchange* pDX);  // DDX/DDV support
-                                                      //}}AFX_VIRTUAL
+    virtual void DoDataExchange(CDataExchange* pDX); // DDX/DDV support
+                                                     //}}AFX_VIRTUAL
 
     // Implementation
 protected:
@@ -163,4 +163,4 @@ protected:
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.
 
-#endif  // !defined(AFX_GT2TESTDLG_H__0E64F324_FFA4_4A94_A87D_75652134DC2D__INCLUDED_)
+#endif // !defined(AFX_GT2TESTDLG_H__0E64F324_FFA4_4A94_A87D_75652134DC2D__INCLUDED_)

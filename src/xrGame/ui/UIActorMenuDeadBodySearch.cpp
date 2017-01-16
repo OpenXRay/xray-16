@@ -66,7 +66,7 @@ void CUIActorMenu::InitDeadBodySearchMode()
 
     TIItemContainer items_list;
     if (m_pPartnerInvOwner) {
-        m_pPartnerInvOwner->inventory().AddAvailableItems(items_list, false);  // true
+        m_pPartnerInvOwner->inventory().AddAvailableItems(items_list, false); // true
         UpdatePartnerBag();
     }
     else
@@ -130,7 +130,7 @@ bool CUIActorMenu::ToDeadBodyBag(CUICellItem* itm, bool b_use_cursor_pos)
             return false;
         }
     }
-    else  // box
+    else // box
     {
         if (!m_pInvBox->can_take()) {
             return false;
@@ -161,7 +161,7 @@ bool CUIActorMenu::ToDeadBodyBag(CUICellItem* itm, bool b_use_cursor_pos)
     if (m_pPartnerInvOwner) {
         move_item_from_to(m_pActorInvOwner->object_id(), m_pPartnerInvOwner->object_id(), iitem->object_id());
     }
-    else  // box
+    else // box
     {
         move_item_from_to(m_pActorInvOwner->object_id(), m_pInvBox->ID(), iitem->object_id());
     }
@@ -208,8 +208,8 @@ void CUIActorMenu::TakeAllFromPartner(CUIWindow* w, void* d)
         }
         PIItem item = (PIItem)(ci->m_pData);
         move_item_check(item, m_pPartnerInvOwner, m_pActorInvOwner, false);
-    }                                    // for i
-    m_pDeadBodyBagList->ClearAll(true);  // false
+    }                                   // for i
+    m_pDeadBodyBagList->ClearAll(true); // false
 }
 
 void CUIActorMenu::TakeAllFromInventoryBox()
@@ -228,6 +228,6 @@ void CUIActorMenu::TakeAllFromInventoryBox()
 
         PIItem item = (PIItem)(ci->m_pData);
         move_item_from_to(m_pInvBox->ID(), actor_id, item->object_id());
-    }                                    // for i
-    m_pDeadBodyBagList->ClearAll(true);  // false
+    }                                   // for i
+    m_pDeadBodyBagList->ClearAll(true); // false
 }

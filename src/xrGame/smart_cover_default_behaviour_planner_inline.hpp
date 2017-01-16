@@ -30,6 +30,6 @@ IC void default_behaviour_planner::lookout_time(u32 const& value)
     m_lookout_time = value;
 }
 
-}  // namespace smart_cover
+} // namespace smart_cover
 
-#endif  // SMART_COVER_DEFAULT_BEHAVIOUR_PLANNER_INLINE_HPP_INCLUDED
+#endif // SMART_COVER_DEFAULT_BEHAVIOUR_PLANNER_INLINE_HPP_INCLUDED

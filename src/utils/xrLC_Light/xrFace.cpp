@@ -6,7 +6,7 @@
 #include "serialize.h"
 #include "xrLC_globaldata.h"
 #include "xrdeflector.h"
-volatile u32 dwInvalidFaces;  //= 0;
+volatile u32 dwInvalidFaces; //= 0;
 u32 InvalideFaces()
 {
     return dwInvalidFaces;
@@ -28,7 +28,7 @@ void base_Face::CacheOpacity()
         flags.bOpaque = false;
     else
         flags.bOpaque = true;
-    if (!flags.bOpaque && !(T.THM.HasSurface()))  //(0==T.pSurface)//	pSurface was possible deleted
+    if (!flags.bOpaque && !(T.THM.HasSurface())) //(0==T.pSurface)//	pSurface was possible deleted
     {
         flags.bOpaque = true;
         Logger.clMsg("Strange face detected... Has alpha without texture...");
@@ -185,7 +185,7 @@ void Face::Verify()
 
     // 2nd :: TC0
     Fvector2* tc = getTC0();
-    float eps = .5f / 4096.f;  // half pixel from 4096 texture (0.0001220703125)
+    float eps = .5f / 4096.f; // half pixel from 4096 texture (0.0001220703125)
     float e0 = tc[0].distance_to(tc[1]);
     float e1 = tc[1].distance_to(tc[2]);
     float e2 = tc[2].distance_to(tc[0]);

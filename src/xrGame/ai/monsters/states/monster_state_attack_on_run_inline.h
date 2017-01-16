@@ -21,8 +21,8 @@ namespace monsters
 TTime const max_go_far_time = 6000;
 TTime const update_side_period = 5000;
 
-}  // namespace monsters
-}  // namespace detail
+} // namespace monsters
+} // namespace detail
 
 TEMPLATE_SIGNATURE
 ATTACK_ON_RUN_STATE::CStateMonsterAttackOnRun(_Object* obj) : inherited(obj)
@@ -103,7 +103,7 @@ void ATTACK_ON_RUN_STATE::set_movement_phaze(phaze const new_phaze)
     m_prepare_side_chosen_time = current_time();
 
     if (m_phaze == go_close) {
-        m_attack_side_chosen_time = 0;  // recalc attack_side
+        m_attack_side_chosen_time = 0; // recalc attack_side
     }
     else if (m_phaze == go_prepare)
     {
@@ -224,7 +224,7 @@ void ATTACK_ON_RUN_STATE::update_movement_target()
     DBG().get_text_tree().clear();
     debug::text_tree& text_tree = DBG().get_text_tree().find_or_add("ActorView");
     text_tree.add_line("attacking", m_attacking);
-#endif  // DEBUG_STATE
+#endif // DEBUG_STATE
 
     TTime const max_go_close_time = (TTime)(1000 * object->get_attack_on_move_max_go_close_time());
     float const far_radius = object->get_attack_on_move_far_radius();
@@ -284,7 +284,7 @@ void ATTACK_ON_RUN_STATE::update_movement_target()
 #ifdef DEBUG_STATE
     text_tree.add_line("phaze", m_phaze == go_prepare ? "preparation" : "close");
     text_tree.add_line("reach_old_target", m_reach_old_target);
-#endif  // DEBUG_STATE
+#endif // DEBUG_STATE
 
     if (m_reach_old_target) {
         self2target = m_target - self_pos;
@@ -332,7 +332,7 @@ void ATTACK_ON_RUN_STATE::update_movement_target()
         Fvector dir2target = Fvector().crossproduct(self2predicted, cr_fvector3(0, 1, 0)).normalize();
 #ifdef DEBUG_STATE
         text_tree.add_line("type", 1);
-#endif  // DEBUG_STATE
+#endif // DEBUG_STATE
         if (self_dir.dotproduct(dir2target) < 0) {
             dir2target.invert();
         }
@@ -431,7 +431,7 @@ void ATTACK_ON_RUN_STATE::update_attack()
 
 #ifdef DEBUG_STATE
             debug::text_tree& text_tree = DBG().get_text_tree().find_or_add("ActorView");
-#endif  // #ifdef DEBUG_STATE
+#endif // #ifdef DEBUG_STATE
 
             float velocity = object->movement().speed();
             Fvector self_to_enemy_xz = enemy_pos - object->Position();
@@ -465,7 +465,7 @@ void ATTACK_ON_RUN_STATE::update_attack()
             text_tree.add_line("good_attack_angle", good_attack_angle);
             // text_tree.add_line					("see_enemy_now", see_enemy_now);
             text_tree.add_line("good_attack_dist", good_attack_dist);
-#endif  // #ifdef DEBUG_STATE
+#endif // #ifdef DEBUG_STATE
 
             if (good_attack_angle && good_attack_dist) {
                 can_attack = true;
@@ -518,7 +518,7 @@ void ATTACK_ON_RUN_STATE::execute()
     object->anim().accel_set_braking(false);
 
     object->path().set_target_point(m_target, m_target_vertex);
-    object->path().set_rebuild_time(m_attacking ? 20 : 150);  // object->get_attack_rebuild_time());
+    object->path().set_rebuild_time(m_attacking ? 20 : 150); // object->get_attack_rebuild_time());
 
     object->path().set_use_covers();
     object->path().set_cover_params(0.1f, 30.f, 1.f, 30.f);
@@ -592,4 +592,4 @@ bool ATTACK_ON_RUN_STATE::check_completion()
 #undef TEMPLATE_SIGNATURE
 #undef ATTACK_ON_RUN_STATE
 
-#endif  // MONSTER_STATE_ATTACK_ON_RUN_INLINE_H
+#endif // MONSTER_STATE_ATTACK_ON_RUN_INLINE_H

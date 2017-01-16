@@ -48,7 +48,7 @@ void UIUpgrade::init_upgrade(LPCSTR upgrade_id, CInventoryItem& item)
     VERIFY(upgrade_id && xr_strcmp(upgrade_id, ""));
     m_upgrade_id = upgrade_id;
 
-    m_prev_state = STATE_COUNT;  // no defined
+    m_prev_state = STATE_COUNT; // no defined
     update_item(&item);
 }
 
@@ -76,7 +76,7 @@ void UIUpgrade::Reset()
 void UIUpgrade::load_from_xml(CUIXml& ui_xml, int i_column, int i_cell, Frect const& t_cell_item)
 {
     m_scheme_index.x = i_column;
-    m_scheme_index.y = i_cell;  // row
+    m_scheme_index.y = i_cell; // row
 
     CUIXmlInit::InitWindow(ui_xml, "cell", i_cell, this);
 
@@ -208,7 +208,7 @@ bool UIUpgrade::OnMouseAction(float x, float y, EUIMessages mouse_action)
             OnRClick();
             return true;
         }
-    }  // m_bCursorOverWindow
+    } // m_bCursorOverWindow
 
     if (mouse_action == WINDOW_LBUTTON_UP || mouse_action == WINDOW_RBUTTON_UP) {
         m_button_state = BUTTON_FREE;
@@ -302,7 +302,7 @@ void UIUpgrade::update_item(CInventoryItem* inv_item)
         m_state = STATE_UNKNOWN;
         m_state_lock = true;
         break;
-    case inventory::upgrade::result_e_installed:  // has_upgrade
+    case inventory::upgrade::result_e_installed: // has_upgrade
         m_item->SetTextureColor(color_rgba(255, 255, 255, 255));
         m_state = STATE_SELECTED;
         m_state_lock = true;

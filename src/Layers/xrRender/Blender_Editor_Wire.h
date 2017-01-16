@@ -18,4 +18,4 @@ public:
     virtual ~CBlender_Editor_Wire();
 };
 
-#endif  // BLENDER_EDITOR_WIRE_H
+#endif // BLENDER_EDITOR_WIRE_H

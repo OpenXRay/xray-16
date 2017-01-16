@@ -90,7 +90,7 @@ void CItemManager::update()
     for (; I != E; ++I)
         VERIFY3(m_object->movement().restrictions().accessible((*I)->ai_location().level_vertex_id()),
             *m_object->cName(), *(*I)->cName());
-#endif  // DEBUG
+#endif // DEBUG
 
     inherited::update();
 

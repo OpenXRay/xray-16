@@ -5,13 +5,13 @@
 void CLevel::OnSecureMessage(NET_Packet& P)
 {
     NET_Packet dec_packet;
-    dec_packet.B.count = P.B.count - sizeof(u16) - sizeof(u32);  // - r_begin - crypt_check_sum
+    dec_packet.B.count = P.B.count - sizeof(u16) - sizeof(u32); // - r_begin - crypt_check_sum
     P.r(dec_packet.B.data, dec_packet.B.count);
     u32 checksum = secure_messaging::decrypt(dec_packet.B.data, dec_packet.B.count, m_secret_key);
     u32 real_checksum = 0;
     P.r_u32(real_checksum);
-    VERIFY(checksum == real_checksum);  // cheater tries to change incoming data packet - need crash
-    game_events->insert(dec_packet);    // if checksum != real_checksum will be delayed crash ...
+    VERIFY(checksum == real_checksum); // cheater tries to change incoming data packet - need crash
+    game_events->insert(dec_packet);   // if checksum != real_checksum will be delayed crash ...
 }
 
 void CLevel::OnSecureKeySync(NET_Packet& P)
@@ -22,7 +22,7 @@ void CLevel::OnSecureKeySync(NET_Packet& P)
 
     NET_Packet ack_key;
     ack_key.w_begin(M_SECURE_KEY_SYNC);
-    ack_key.w_s32(new_seed);  // this parameter only for DEBUG !
+    ack_key.w_s32(new_seed); // this parameter only for DEBUG !
     Send(ack_key, net_flags(TRUE, TRUE, TRUE));
 }
 

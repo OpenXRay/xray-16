@@ -13,10 +13,10 @@ enum enum_event_operation
     eo_logical_and = 0x00,
     eo_logical_or,
     // player predicates
-    eo_hit_params,           // count, weapon_id, bone_id, operation for fly_dist, bullet fly_dist argument
-    eo_kill_params,          // count, weapon_id, bone_id, operation for fly_dist, bullet fly_dist argument
-    eo_accumul_value_params  // param name, operation for argument, argument
-};                           // enum enum_event_operation
+    eo_hit_params,          // count, weapon_id, bone_id, operation for fly_dist, bullet fly_dist argument
+    eo_kill_params,         // count, weapon_id, bone_id, operation for fly_dist, bullet fly_dist argument
+    eo_accumul_value_params // param name, operation for argument, argument
+};                          // enum enum_event_operation
 
 struct event_condition_t;
 
@@ -31,7 +31,7 @@ struct event_argument_type
         at_u32_bfunction,
         at_operation,
         at_condition
-    };  // enum enum_type
+    }; // enum enum_type
 
     union union_argument_value
     {
@@ -42,18 +42,18 @@ struct event_argument_type
         u32_binary_function* u32_function_ptr;
         enum_event_operation operation_value;
         event_condition_t* cond_ptr_value;
-    };  // union union_argument_value
+    }; // union union_argument_value
 
     enum_argument_type m_argument_type_tag;
     union_argument_value m_argument_value;
-};  // struct event_argument_type
+}; // struct event_argument_type
 typedef xr_vector<event_argument_type> arguments_t;
 
 struct event_condition_t
 {
     enum_event_operation m_operation;
     arguments_t m_arguments;
-};  // struct event_condition_t
+}; // struct event_condition_t
 
 struct event_root_condition_t
 {
@@ -61,7 +61,7 @@ struct event_root_condition_t
     u32 m_rise_count;
     u32 m_game_mask;
     event_condition_t* m_root_condition;
-};  // event_root_condition_t
+}; // event_root_condition_t
 
 typedef fastdelegate::FastDelegate<void(u32)> event_action_delegate_t;
 
@@ -110,8 +110,8 @@ private:
 
     bool execute_condition(event_condition_t* cond);
     void execute_root_condtiion(event_root_conditions_t::value_type& rcond);
-};  // class event_conditions_collection
+}; // class event_conditions_collection
 
-}  // namespace award_system
+} // namespace award_system
 
-#endif  //#ifndef EVENT_CONDITIONS_COLLECTION_INCLUDED
+#endif //#ifndef EVENT_CONDITIONS_COLLECTION_INCLUDED

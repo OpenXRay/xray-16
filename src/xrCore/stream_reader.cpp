@@ -130,12 +130,12 @@ void CStreamReader::r_stringZ(shared_str& dest)
             }
             else if (*end_str == 0)
             {
-                ++end_str;  // copying with ending zero
+                ++end_str; // copying with ending zero
                 break;
             }
             ++end_str;
         }
-        if (!dest_str)  // first iteration
+        if (!dest_str) // first iteration
             dest_str = static_cast<char*>(_alloca(4096));
 
         u32 current_chunk_size = static_cast<u32>(end_ptr - m_current_pointer);

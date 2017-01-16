@@ -55,8 +55,8 @@ public:
     void AddConnectedPlayers();
     void AddConnected_OnePlayer(xrClientData* CL);
 
-};  // class BattlEyeServer
+}; // class BattlEyeServer
 
-#endif  // BATTLEYE
+#endif // BATTLEYE
 
-#endif  // __XR_SERVER_BATTLEYE_H__
+#endif // __XR_SERVER_BATTLEYE_H__

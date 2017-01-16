@@ -35,10 +35,10 @@ GT2Connection Connection;
 
 Message initialMessage = {GT2True, "123456789012345", -1};
 
-Message messageList[] = {{GT2True, NULL, 0, GT2True},                              // empty
-    {GT2True, "1", 1, GT2True},                                                    // 1 byte     XXX
-    {GT2True, "1234567", 7, GT2True},                                              // 7 bytes    XXX
-    {GT2True, "12345678901234567890123456789012345678901234567890", 50, GT2True},  // 50 bytes
+Message messageList[] = {{GT2True, NULL, 0, GT2True},                             // empty
+    {GT2True, "1", 1, GT2True},                                                   // 1 byte     XXX
+    {GT2True, "1234567", 7, GT2True},                                             // 7 bytes    XXX
+    {GT2True, "12345678901234567890123456789012345678901234567890", 50, GT2True}, // 50 bytes
     {GT2True, FILL_IN, 128, GT2True}, {GT2True, FILL_IN, 256, GT2True}, {GT2True, FILL_IN, 512, GT2True},
     {GT2True, FILL_IN, 768, GT2True}, {GT2True, FILL_IN, 1024, GT2True}, {GT2True, FILL_IN, 1400, GT2True},
 #if !defined(_NITRO)
@@ -47,18 +47,18 @@ Message messageList[] = {{GT2True, NULL, 0, GT2True},                           
     {GT2True, FILL_IN, (5 * 1024) - 1, GT2True}, {GT2True, FILL_IN, (7 * 1024) - 1, GT2True},
 #if !defined(_PS2) && !defined(_PSP)
     {GT2True, FILL_IN, (8 * 1024) + 1017, GT2True},
-#if !defined(_MACOSX) && !defined(_PS3)  // Maximum send size for PS3 is 9216
+#if !defined(_MACOSX) && !defined(_PS3) // Maximum send size for PS3 is 9216
     {GT2True, FILL_IN, (9 * 1024) - 1, GT2True}, {GT2True, FILL_IN, (32 * 1024) - 1, GT2True},
 #endif
 #endif
 #endif
 #endif
 #if !defined(_NITRO) && !defined(_REVOLUTION)
-    {GT2True, NULL, 0, GT2False},  // empty
+    {GT2True, NULL, 0, GT2False}, // empty
 #endif
-    {GT2True, "1", 1, GT2False},                                                    // 1 byte     XXX
-    {GT2True, "1234567", 7, GT2False},                                              // 7 bytes    XXX
-    {GT2True, "12345678901234567890123456789012345678901234567890", 50, GT2False},  // 50 bytes
+    {GT2True, "1", 1, GT2False},                                                   // 1 byte     XXX
+    {GT2True, "1234567", 7, GT2False},                                             // 7 bytes    XXX
+    {GT2True, "12345678901234567890123456789012345678901234567890", 50, GT2False}, // 50 bytes
     {GT2True, FILL_IN, 128, GT2False}, {GT2True, FILL_IN, 256, GT2False}, {GT2True, FILL_IN, 512, GT2False},
     {GT2True, FILL_IN, 768, GT2False}, {GT2True, FILL_IN, 1024, GT2False}, {GT2True, FILL_IN, 1400, GT2False},
 #if !defined(_NITRO)
@@ -67,7 +67,7 @@ Message messageList[] = {{GT2True, NULL, 0, GT2True},                           
     {GT2True, FILL_IN, (5 * 1024) - 1, GT2False}, {GT2True, FILL_IN, (7 * 1024) - 1, GT2False},
 #if !defined(_PS2) && !defined(_PSP)
     {GT2True, FILL_IN, (9 * 1024), GT2False},
-#if !defined(_MACOSX) && !defined(_PS3)  // Maximum send size for PS3 is 9216
+#if !defined(_MACOSX) && !defined(_PS3) // Maximum send size for PS3 is 9216
     {GT2True, FILL_IN, (9 * 1024) + 1, GT2False},
 #endif
 #endif
@@ -283,7 +283,7 @@ static void EncodeTest()
 }
 #endif
 
-#ifdef __MWERKS__  // CodeWarrior will warn if function not prototyped
+#ifdef __MWERKS__ // CodeWarrior will warn if function not prototyped
 int test_main(int argc, char** argv);
 #endif
 
@@ -378,7 +378,7 @@ int test_main(int argc, char** argv)
             gt2Listen(socket, ConnectAttemptCallback);
 
             printf("Listening for incoming connections [%s]...\n", localAddress);
-            while (gsi_true)  /// now we just think forever!
+            while (gsi_true) /// now we just think forever!
             {
                 gt2Think(socket);
                 if (hardcore)
@@ -436,8 +436,8 @@ int test_main(int argc, char** argv)
             {
                 sendTime = current_time();
                 maxWait = (unsigned long)((message->reliable) ? 120000 : 20000);
-                while (sendTime != 0 && current_time() - sendTime < maxWait &&
-                       !quit)  // wait a max of 20 sec for the reply
+                while (
+                    sendTime != 0 && current_time() - sendTime < maxWait && !quit) // wait a max of 20 sec for the reply
                 {
                     gt2Think(socket);
                     msleep(5);
@@ -450,7 +450,7 @@ int test_main(int argc, char** argv)
             }
         }
         if (Connection) gt2CloseConnection(Connection);
-    } while (!server && (++count < 3));  // if client do the sequence 3 times
+    } while (!server && (++count < 3)); // if client do the sequence 3 times
 
     gt2CloseSocket(socket);
 

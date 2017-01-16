@@ -23,7 +23,7 @@ public:
     virtual void DiscardState();
 
     virtual void OnEvent(NET_Packet& P, u16 type);
-    virtual bool DropGrenade();  // in this case if grenade state is eReady, it should Throw
+    virtual bool DropGrenade(); // in this case if grenade state is eReady, it should Throw
 
     virtual void OnAnimationEnd(u32 state);
     virtual void UpdateCL();
@@ -46,7 +46,7 @@ public:
     virtual void DeactivateItem();
     virtual bool GetBriefInfo(II_BriefInfo& info);
 
-    virtual void SendHiddenItem();  // same as OnHiddenItem but for client... (sends message to a server)...
+    virtual void SendHiddenItem(); // same as OnHiddenItem but for client... (sends message to a server)...
 protected:
     ALife::_TIME_ID m_dwGrenadeRemoveTime;
     ALife::_TIME_ID m_dwGrenadeIndependencyTime;

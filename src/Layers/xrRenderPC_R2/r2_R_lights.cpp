@@ -4,7 +4,7 @@ IC bool pred_area(light* _1, light* _2)
 {
     u32 a0 = _1->X.S.size;
     u32 a1 = _2->X.S.size;
-    return a0 > a1;  // reverse -> descending
+    return a0 > a1; // reverse -> descending
 }
 
 void CRender::render_lights(light_Package& LP)
@@ -117,8 +117,8 @@ void CRender::render_lights(light_Package& LP)
                 if (bSpecial) {
                     L->X.S.transluent = TRUE;
                     Target->phase_smap_spot_tsh(L);
-                    r_dsgraph_render_graph(1);  // normal level, secondary priority
-                    r_dsgraph_render_sorted();  // strict-sorted geoms
+                    r_dsgraph_render_graph(1); // normal level, secondary priority
+                    r_dsgraph_render_sorted(); // strict-sorted geoms
                 }
             }
             else

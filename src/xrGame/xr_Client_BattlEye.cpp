@@ -69,7 +69,7 @@ void BattlEyeClient::PrintMessage(char* message)
         sprintf_s(text, sizeof(text), "BattlEye Client: %s", message);
         Msg("%s", text);
 
-        if (g_be_message_out)  //==2
+        if (g_be_message_out) //==2
         {
             if (Level().game) {
                 Level().game->CommonMessageOut(text);
@@ -137,4 +137,4 @@ void BattlEyeClient::ReleaseDLL()
     m_succefull = false;
 }
 
-#endif  // BATTLEYE
+#endif // BATTLEYE

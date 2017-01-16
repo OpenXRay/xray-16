@@ -20,7 +20,7 @@
 #include "../gsCommon.h"
 #include "../gsPlatformSocket.h"
 
-#if (0)  // enable after remove from platform socket
+#if (0) // enable after remove from platform socket
 int SetSockBlocking(SOCKET sock, int isblocking)
 {
     int rcode;
@@ -59,7 +59,7 @@ struct hostent* gsSocketGetHostByName(const char* name)
 // mj taking this off the stack 04/05/06
 #define GetHostByNameBufferSize 1024
         char* buf =
-            gsimalloc(GetHostByNameBufferSize);  //[GetHostByNameBufferSize]; // PSP documentation recommends 1024
+            gsimalloc(GetHostByNameBufferSize); //[GetHostByNameBufferSize]; // PSP documentation recommends 1024
         struct in_addr ip;
 
         static struct hostent ahostent;
@@ -81,7 +81,7 @@ struct hostent* gsSocketGetHostByName(const char* name)
         }
         // this will block until completed
         result = sceNetResolverStartNtoA(resolverID, name, &ip, GSI_RESOLVER_TIMEOUT, GSI_RESOLVER_RETRY);
-        sceNetResolverDelete(resolverID);  // delete right away, result is stored in ip
+        sceNetResolverDelete(resolverID); // delete right away, result is stored in ip
         if (result < 0) {
             gsifree(buf);
             return NULL;
@@ -138,8 +138,8 @@ HOSTENT* getlocalhost(void)
     }
 
     // fill in the hostent structure
-    addr = inet_addr(info.ip_address);     // NBO
-    memcpy(&ips[0], &addr, sizeof(addr));  // still NBO
+    addr = inet_addr(info.ip_address);    // NBO
+    memcpy(&ips[0], &addr, sizeof(addr)); // still NBO
     localhost.h_length = (gsi_u16)sizeof(addr);
 
     return &localhost;
@@ -164,7 +164,7 @@ int _NetworkAdHocSocketCreate(gsi_u16 port)
     ret = sceWlanGetEtherAddr(&tmp_local);
     if (ret < 0) {
         // Error handling
-        return -1;  // INVALID_SOCKET
+        return -1; // INVALID_SOCKET
     }
     memcpy(&addr, &tmp_local.addr, sizeof(struct SceNetEtherAddr));
 #ifdef _PSPNET_LOG
@@ -177,7 +177,7 @@ int _NetworkAdHocSocketCreate(gsi_u16 port)
     if (id < 0) {
         // SCE_ERROR_NET_ADHOC_INVALID_ADDR
         // ToDo: Error handling
-        return -1;  // INVALID_SOCKET
+        return -1; // INVALID_SOCKET
     }
     return id;
 }
@@ -194,13 +194,13 @@ void _NetworkAdHocSocketDestroy(int socket)
 int _NetworkAdHocSocketBroadcast(int socketid, const void* data, int len, int flags, gsi_u16 dest_port)
 {
     const static gsi_u8 broadcast_addr[SCE_NET_ETHER_ADDR_LEN] = {0xff};
-    int ret = sceNetAdhocPdpSend(socketid,  //	id Socket ID
-        broadcast_addr,                     //	daddr Destination MAC address
-        dest_port,                          //	dport Destination port number
-        data,                               //	data Pointer to send data
-        len,                                //	len Length of send data
-        10,                                 //	timeout Timeout (탎ec)
-        flags                               //	flag Send options
+    int ret = sceNetAdhocPdpSend(socketid, //	id Socket ID
+        broadcast_addr,                    //	daddr Destination MAC address
+        dest_port,                         //	dport Destination port number
+        data,                              //	data Pointer to send data
+        len,                               //	len Length of send data
+        10,                                //	timeout Timeout (탎ec)
+        flags                              //	flag Send options
         );
 
     // todo: translate return value to GSI specific
@@ -210,25 +210,25 @@ int _NetworkAdHocSocketBroadcast(int socketid, const void* data, int len, int fl
 int _NetworkAdHocSocketSendTo(
     int socketid, const void* data, int len, int flags, const char* dest_addr, gsi_u16 dest_port)
 {
-#if (0)  // test
+#if (0) // test
     const static gsi_u8 broadcast_addr[SCE_NET_ETHER_ADDR_LEN] = {0xff};
-    int ret = sceNetAdhocPdpSend(socketid,  //	id Socket ID
-        broadcast_addr,                     //	daddr Destination MAC address
-        dest_port,                          //	dport Destination port number
-        data,                               //	data Pointer to send data
-        len,                                //	len Length of send data
-        10,                                 //	timeout Timeout (탎ec)
-        flags                               //	flag Send options
+    int ret = sceNetAdhocPdpSend(socketid, //	id Socket ID
+        broadcast_addr,                    //	daddr Destination MAC address
+        dest_port,                         //	dport Destination port number
+        data,                              //	data Pointer to send data
+        len,                               //	len Length of send data
+        10,                                //	timeout Timeout (탎ec)
+        flags                              //	flag Send options
         );
 #else
 
-    int ret = sceNetAdhocPdpSend(socketid,  //	id Socket ID
-        dest_addr,                          //	daddr Destination MAC address
-        dest_port,                          //	dport Destination port number
-        data,                               //	data Pointer to send data
-        len,                                //	len Length of send data
-        10,                                 //	timeout Timeout (탎ec)
-        flags                               //	flag Send options
+    int ret = sceNetAdhocPdpSend(socketid, //	id Socket ID
+        dest_addr,                         //	daddr Destination MAC address
+        dest_port,                         //	dport Destination port number
+        data,                              //	data Pointer to send data
+        len,                               //	len Length of send data
+        10,                                //	timeout Timeout (탎ec)
+        flags                              //	flag Send options
         );
 #endif
 #ifdef _PSPNET_LOG
@@ -279,22 +279,22 @@ int _NetworkAdHocCanReceiveOnSocket(int socket_id)
         return 0;
     }
 
-    return stat.rcv_sb_cc;  // valid date to read
+    return stat.rcv_sb_cc; // valid date to read
 }
 
 // return length if successful
 // <=0 on error
 int _NetworkAdHocSocketRecv(int socket_id, char* buf, int bufferlen, int flags,
-    char* saddr,  // struct SceNetEtherAddr  = char[6];
+    char* saddr, // struct SceNetEtherAddr  = char[6];
     u_int16* sport)
 {
-    int ret = sceNetAdhocPdpRecv(socket_id,  // id		Socket ID
-        saddr,                               // saddr	Sender뭩 MAC address
-        sport,                               // sport	Sender port number
-        buf,                                 // buf		Pointer to receive buffer
-        &bufferlen,                          // len		Receive buffer size (IN), receive data length (OUT)
-        0,                                   // timeout	Timeout (탎ec)
-        SCE_NET_ADHOC_F_NONBLOCK             // flag		Receive options
+    int ret = sceNetAdhocPdpRecv(socket_id, // id		Socket ID
+        saddr,                              // saddr	Sender뭩 MAC address
+        sport,                              // sport	Sender port number
+        buf,                                // buf		Pointer to receive buffer
+        &bufferlen,                         // len		Receive buffer size (IN), receive data length (OUT)
+        0,                                  // timeout	Timeout (탎ec)
+        SCE_NET_ADHOC_F_NONBLOCK            // flag		Receive options
         );
 
     // translate return values to gsi standard

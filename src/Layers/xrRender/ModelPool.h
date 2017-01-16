@@ -39,10 +39,10 @@ private:
     typedef REGISTRY::iterator REGISTRY_IT;
 
 private:
-    xr_vector<ModelDef> Models;                  // Reference / Base
-    xr_vector<dxRender_Visual*> ModelsToDelete;  //
-    REGISTRY Registry;                           // Just pairing of pointer / Name
-    POOL Pool;                                   // Unused / Inactive
+    xr_vector<ModelDef> Models;                 // Reference / Base
+    xr_vector<dxRender_Visual*> ModelsToDelete; //
+    REGISTRY Registry;                          // Just pairing of pointer / Name
+    POOL Pool;                                  // Unused / Inactive
     BOOL bLogging;
     BOOL bForceDiscard;
     BOOL bAllowChildrenDuplicate;
@@ -81,4 +81,4 @@ public:
     void RenderSingle(dxRender_Visual* m_pVisual, const Fmatrix& mTransform, float m_fLOD);
 #endif
 };
-#endif  // ModelPoolH
+#endif // ModelPoolH

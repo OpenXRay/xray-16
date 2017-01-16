@@ -101,7 +101,7 @@ void CAI_Stalker::g_fireParams(const CHudItem* pHudItem, Fvector& P, Fvector& D)
     if (!inventory().ActiveItem()) {
 #ifdef DEBUG
         Msg("! CAI_Stalker::g_fireParams() : VERIFY(inventory().ActiveItem())");
-#endif  // DEBUG
+#endif // DEBUG
         P = Position();
         D = Fvector().set(0.f, 0.f, 1.f);
         return;
@@ -230,7 +230,7 @@ void CAI_Stalker::Hit(SHit* pHDS)
             }
         }
 
-        if (wounded())  //уже лежит => добивание
+        if (wounded()) //уже лежит => добивание
         {
             hit_power = 1000.f;
         }
@@ -280,7 +280,8 @@ void CAI_Stalker::Hit(SHit* pHDS)
                     HDS._dump();
                 }
 #endif
-                //				int						fx_index = iFloor(tpKinematics->LL_GetBoneInstance(HDS.bone()).get_param(1) +
+                //				int						fx_index = iFloor(tpKinematics->LL_GetBoneInstance(HDS.bone()).get_param(1)
+                //+
                 //(angle_difference(movement().m_body.current.yaw,-yaw) <= PI_DIV_2 ? 0 : 1));
                 //				if (fx_index != -1)
                 //					animation().play_fx	(power_factor,fx_index);
@@ -891,7 +892,7 @@ void CAI_Stalker::check_throw_trajectory(const float& throw_time)
 #ifdef DEBUG
     trajectory_picks = &m_throw_picks;
     collide_tris = &m_throw_collide_tris;
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 
     Fvector box_size = {0.f, 0.f, 0.f};
     // Fvector box_size				=	{ 0.1f, 0.1f , 0.1f };
@@ -955,7 +956,7 @@ void CAI_Stalker::update_throw_params()
 
 #ifdef DEBUG
         m_throw_picks.clear();
-#endif  // DEBUG
+#endif // DEBUG
         return;
     }
 
@@ -998,9 +999,9 @@ bool CAI_Stalker::critical_wound_external_conditions_suitable()
 
     switch (active_weapon->animation_slot())
     {
-    case 1:  // pistols
-    case 2:  // automatic weapon
-    case 3:  // rifles
+    case 1: // pistols
+    case 2: // automatic weapon
+    case 3: // rifles
         break;
     default: return (false);
     }
@@ -1066,7 +1067,7 @@ bool CAI_Stalker::can_cry_enemy_is_wounded() const
     }
 #ifdef DEBUG
     return (false);
-#endif  // DEBUG
+#endif // DEBUG
 }
 
 void CAI_Stalker::on_critical_wound_initiator(const CAI_Stalker* critically_wounded)

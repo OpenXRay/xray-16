@@ -85,7 +85,7 @@ TiXmlNode* TiXmlNode::LinkEndChild(TiXmlNode* node)
     if (lastChild)
         lastChild->next = node;
     else
-        firstChild = node;  // it was an empty list.
+        firstChild = node; // it was an empty list.
 
     lastChild = node;
     return node;
@@ -448,9 +448,9 @@ TiXmlAttributeSet::~TiXmlAttributeSet()
 void TiXmlAttributeSet::Add(TiXmlAttribute* addMe)
 {
 #ifdef TIXML_USE_STL
-    assert(!Find(TIXML_STRING(addMe->Name())));  // Shouldn't be multiply adding to the set.
+    assert(!Find(TIXML_STRING(addMe->Name()))); // Shouldn't be multiply adding to the set.
 #else
-    assert(!Find(addMe->Name()));  // Shouldn't be multiply adding to the set.
+    assert(!Find(addMe->Name())); // Shouldn't be multiply adding to the set.
 #endif
 
     addMe->next = &sentinel;
@@ -474,7 +474,7 @@ void TiXmlAttributeSet::Remove(TiXmlAttribute* removeMe)
             return;
         }
     }
-    assert(0);  // we tried to remove a non-linked attribute.
+    assert(0); // we tried to remove a non-linked attribute.
 }
 
 #ifdef TIXML_USE_STL

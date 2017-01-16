@@ -14,4 +14,4 @@ IC const moving_objects::COLLISIONS& moving_objects::collisions() const
     return (m_previous_collisions);
 }
 
-#endif  // MOVING_OBJECTS_INLINE_H
+#endif // MOVING_OBJECTS_INLINE_H

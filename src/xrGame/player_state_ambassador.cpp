@@ -78,4 +78,4 @@ void player_state_ambassador::OnPlayerBringArtefact(game_PlayerState const* ps)
     m_delivered = true;
 }
 
-}  // namespace award_system
+} // namespace award_system

@@ -24,7 +24,7 @@ public:
 
     virtual LPCSTR type_name() const { return "teamdeathmatch"; };
     virtual void Update();
-    virtual void net_Export_State(NET_Packet& P, ClientID id_to);  // full state
+    virtual void net_Export_State(NET_Packet& P, ClientID id_to); // full state
     // Events
     virtual void OnPlayerConnect(ClientID id_who);
     virtual void OnPlayerConnectFinished(ClientID id_who);

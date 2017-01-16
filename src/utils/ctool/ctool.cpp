@@ -4,8 +4,8 @@
 #include "xrCore/_types.h"
 #undef FLT_MAX
 #undef FLT_MIN
-#include <stdio.h>
 #include <algorithm>
+#include <stdio.h>
 #include <string>
 #include <vector>
 #define WIN32_LEAN_AND_MEAN
@@ -269,7 +269,7 @@ static void _BuildDictionary(const char* bins_file, const char* dst_name = "")
     const char* dic_file = IsEmptyString(dst_name) ? "lzo.dic" : dst_name;
     FILE* dic = fopen(dic_file, "wb");
 
-    float const lzo_dict_max_size = 5.0f * 1024;  // 5 Kb
+    float const lzo_dict_max_size = 5.0f * 1024; // 5 Kb
 
     if (dic) {
         //        unsigned    min_sz  = 200;

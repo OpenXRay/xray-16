@@ -50,6 +50,6 @@ public:
     void AddString(LPCSTR string);
     void OnPaint();
 
-};  // class TextConsole
+}; // class TextConsole
 
 // extern ENGINE_API CTextConsole* TextConsole;

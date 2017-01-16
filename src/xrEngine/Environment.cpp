@@ -189,7 +189,7 @@ void CEnvironment::ChangeGameTime(float game_time)
 void CEnvironment::SetGameTime(float game_time, float time_factor)
 {
 #ifndef _EDITOR
-    if (m_paused)  // BUG nitrocaster: g_pGameLevel may be null (game not started) -> crash
+    if (m_paused) // BUG nitrocaster: g_pGameLevel may be null (game not started) -> crash
     {
         g_pGameLevel->SetEnvironmentGameTimeFactor(iFloor(fGameTime * 1000.f), fTimeFactor);
         return;
@@ -467,7 +467,7 @@ void CEnvironment::OnFrame()
         Log("Current[1]->sun_dir", Current[1]->sun_dir);
     }
     VERIFY2(CurrentEnv->sun_dir.y < 0, "Invalid sun direction settings in lerp");
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
 
     PerlinNoise1D->SetFrequency(wind_gust_factor * MAX_NOISE_FREQ);
     wind_strength_factor = clampr(PerlinNoise1D->GetContinious(Device.fTimeGlobal) + 0.5f, 0.f, 1.f);
@@ -584,7 +584,7 @@ SThunderboltCollection* CEnvironment::thunderbolt_collection(
     NODEFAULT;
 #ifdef DEBUG
     return (0);
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 }
 
 CLensFlareDescriptor* CEnvironment::add_flare(xr_vector<CLensFlareDescriptor*>& collection, shared_str const& id)

@@ -12,4 +12,4 @@ IC const actor_mp_state& actor_mp_state_holder::state() const
     return (m_state);
 }
 
-#endif  // ACTOR_MP_STATE_INLINE_H
+#endif // ACTOR_MP_STATE_INLINE_H

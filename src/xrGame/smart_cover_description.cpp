@@ -42,7 +42,7 @@ shared_str parse_vertex(luabind::object const& table, LPCSTR identifier, bool co
 {
     return (transform_vertex(parse_string(table, identifier), in));
 }
-}  // namespace smart_cover
+} // namespace smart_cover
 
 class id_predicate
 {

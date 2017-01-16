@@ -56,7 +56,7 @@ public:
     IC const REQUEST_REGISTRY& registry() const;
     void dump() const;
     void dump(ALife::_OBJECT_ID requesting_id) const;
-#endif  // DEBUG
+#endif // DEBUG
 };
 
 #include "client_spawn_manager_inline.h"

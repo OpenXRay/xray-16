@@ -89,7 +89,7 @@ ShadingConnection::TYPE ShadingConnection::traverseTripleShadingSwitch(MObject c
     // This assumption should always be safe, unless some drastic changes occured in the
     // implementation of the shading switches... in which case this code won't work, so
     // we would throw an exception.
-    assert(numChildren >= 2);  // "Abnormal hierarchy in switching node."
+    assert(numChildren >= 2); // "Abnormal hierarchy in switching node."
 
     // Go through each row of the switch table.
     for (unsigned int index = 0; index < numElements; index++)

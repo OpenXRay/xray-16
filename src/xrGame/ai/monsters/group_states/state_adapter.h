@@ -48,4 +48,4 @@ private:
     CMonsterStateInterface* m_impl;
 };
 
-#endif  // GROUP_STATE_ADAPTER_H_INCLUDED
+#endif // GROUP_STATE_ADAPTER_H_INCLUDED

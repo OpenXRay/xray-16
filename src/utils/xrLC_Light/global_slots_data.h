@@ -71,4 +71,4 @@ public:
     void process_all_pallete();
 };
 
-#endif  //__GLOBAL_SLOTS_DATA_H__
+#endif //__GLOBAL_SLOTS_DATA_H__

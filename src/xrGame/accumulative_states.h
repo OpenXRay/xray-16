@@ -44,7 +44,7 @@ enum enum_accumulative_player_values
     acpv_thunder_count,
     acpv_killer_victim_angle,
     acpv_count,
-};  // enum enum_accumulative_player_values
+}; // enum enum_accumulative_player_values
 
 namespace detail
 {
@@ -53,8 +53,8 @@ struct accumulative_pair_t
 {
     static enum_accumulative_player_values const value_id = ValueId;
     typedef T value_type;
-};  // struct accumulative_pair_t
-}  // namespace detail
+}; // struct accumulative_pair_t
+} // namespace detail
 
 #define ACCUMULATIVE_STATE_LIST Loki::NullType
 #define ADD_ACCUMULATIVE_STATE(id, type)                                                                               \
@@ -62,6 +62,6 @@ struct accumulative_pair_t
         Accumulative_State_Type_##type;
 #define SAVE_TYPE_LIST(id, type) Accumulative_State_Type_##type
 
-}  // namespace award_system
+} // namespace award_system
 
-#endif  //#ifndef ACCUMULATIVE_STATES_INCLUDED
+#endif //#ifndef ACCUMULATIVE_STATES_INCLUDED

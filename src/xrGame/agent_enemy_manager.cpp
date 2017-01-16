@@ -410,7 +410,7 @@ void CAgentEnemyManager::assign_wounded()
 {
     VERIFY(m_only_wounded_left);
 
-#if 0   // def DEBUG
+#if 0  // def DEBUG
 	u32						enemy_mask = 0;
 	ENEMIES::iterator		I = m_enemies.begin();
 	ENEMIES::iterator		E = m_enemies.end();
@@ -419,7 +419,7 @@ void CAgentEnemyManager::assign_wounded()
 		enemy_mask			|= (*I).m_mask.get();
 	}
 	VERIFY					(enemy_mask == object().member().combat_mask());
-#endif  // DEBUG
+#endif // DEBUG
 
     u32 previous_wounded_count = m_wounded.size();
     WOUNDED_ENEMY* previous_wounded = (WOUNDED_ENEMY*)_alloca(previous_wounded_count * sizeof(WOUNDED_ENEMY));
@@ -436,7 +436,7 @@ void CAgentEnemyManager::assign_wounded()
             VERIFY((*I).m_mask.get());
         }
     }
-#endif  // DEBUG
+#endif // DEBUG
 
     squad_mask_type assigned = 0;
     {

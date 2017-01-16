@@ -21,7 +21,7 @@
 #ifdef INGAME_EDITOR
 #include "Include/editor/ide.hpp"
 #include "engine_impl.hpp"
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR
 
 #include "IGame_Persistent.h"
 #include "xrSASH.h"
@@ -71,7 +71,7 @@ void CRenderDevice::End(void)
 #ifndef DEDICATED_SERVER
 #ifdef INGAME_EDITOR
     bool load_finished = false;
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR
     if (dwPrecacheFrame) {
         ::Sound->set_master_volume(0.f);
         dwPrecacheFrame--;
@@ -93,7 +93,7 @@ void CRenderDevice::End(void)
             g_find_chunk_counter.flush();
 #endif
             CheckPrivilegySlowdown();
-            if (g_pGamePersistent->GameType() == 1)  // haCk
+            if (g_pGamePersistent->GameType() == 1) // haCk
             {
                 WINDOWINFO wi;
                 GetWindowInfo(m_hWnd, &wi);
@@ -109,7 +109,7 @@ void CRenderDevice::End(void)
 #ifdef INGAME_EDITOR
     if (load_finished && m_editor) m_editor->on_load_finished();
 #endif
-#endif  // !DEDICATED_SERVER
+#endif // !DEDICATED_SERVER
 }
 
 void CRenderDevice::SecondaryThreadProc(void* context)
@@ -188,7 +188,7 @@ void CRenderDevice::on_idle()
     u32 FrameStartTime = TimerGlobal.GetElapsed_ms();
 #endif
     if (psDeviceFlags.test(rsStatistic))
-        g_bEnableStatGather = TRUE;  // XXX: why not use either rsStatistic or g_bEnableStatGather?
+        g_bEnableStatGather = TRUE; // XXX: why not use either rsStatistic or g_bEnableStatGather?
     else
         g_bEnableStatGather = FALSE;
     if (g_loading_events.size()) {
@@ -216,7 +216,7 @@ void CRenderDevice::on_idle()
     mFullTransform_saved = mFullTransform;
     mView_saved = mView;
     mProject_saved = mProject;
-    syncProcessFrame.Set();  // allow secondary thread to do its job
+    syncProcessFrame.Set(); // allow secondary thread to do its job
     Sleep(0);
 
 #ifndef DEDICATED_SERVER
@@ -228,13 +228,13 @@ void CRenderDevice::on_idle()
         seqRender.Process(rp_Render);
         CalcFrameStats();
         Statistic->Show();
-        End();  // Present goes here
+        End(); // Present goes here
     }
     renderTotalReal.End();
     renderTotalReal.FrameEnd();
     stats.RenderTotal.accum = renderTotalReal.accum;
-#endif                     // #ifndef DEDICATED_SERVER
-    syncFrameDone.Wait();  // wait until secondary thread finish its job
+#endif                    // #ifndef DEDICATED_SERVER
+    syncFrameDone.Wait(); // wait until secondary thread finish its job
 #ifdef DEDICATED_SERVER
     u32 FrameEndTime = TimerGlobal.GetElapsed_ms();
     u32 FrameTime = (FrameEndTime - FrameStartTime);
@@ -251,7 +251,7 @@ void CRenderDevice::message_loop_editor()
     m_editor_finalize(m_editor);
     xr_delete(m_engine);
 }
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR
 
 void CRenderDevice::message_loop()
 {
@@ -285,7 +285,7 @@ void CRenderDevice::Run()
     {
         u32 time_mm = timeGetTime();
         while (timeGetTime() == time_mm)
-            ;  // wait for next tick
+            ; // wait for next tick
         u32 time_system = timeGetTime();
         u32 time_local = TimerAsync();
         Timer_MM_Delta = time_system - time_local;
@@ -330,15 +330,15 @@ void CRenderDevice::FrameMove()
     {
         // Timer
         float fPreviousFrameTime = Timer.GetElapsed_sec();
-        Timer.Start();  // previous frame
+        Timer.Start(); // previous frame
         fTimeDelta =
-            0.1f * fTimeDelta + 0.9f * fPreviousFrameTime;  // smooth random system activity - worst case ~7% error
+            0.1f * fTimeDelta + 0.9f * fPreviousFrameTime; // smooth random system activity - worst case ~7% error
         // fTimeDelta = 0.7f * fTimeDelta + 0.3f*fPreviousFrameTime; // smooth random system activity
-        if (fTimeDelta > .1f) fTimeDelta = .1f;             // limit to 15fps minimum
-        if (fTimeDelta <= 0.f) fTimeDelta = EPS_S + EPS_S;  // limit to 15fps minimum
+        if (fTimeDelta > .1f) fTimeDelta = .1f;            // limit to 15fps minimum
+        if (fTimeDelta <= 0.f) fTimeDelta = EPS_S + EPS_S; // limit to 15fps minimum
         if (Paused()) fTimeDelta = 0.0f;
         // u64 qTime = TimerGlobal.GetElapsed_clk();
-        fTimeGlobal = TimerGlobal.GetElapsed_sec();  // float(qTime)*CPU::cycles2seconds;
+        fTimeGlobal = TimerGlobal.GetElapsed_sec(); // float(qTime)*CPU::cycles2seconds;
         u32 _old_global = dwTimeGlobal;
         dwTimeGlobal = TimerGlobal.GetElapsed_ms();
         dwTimeDelta = dwTimeGlobal - _old_global;
@@ -369,10 +369,10 @@ void CRenderDevice::Pause(BOOL bOn, BOOL bTimer, BOOL bSound, LPCSTR reason)
             bShowPauseString =
 #ifdef INGAME_EDITOR
                 editor() ? FALSE :
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR
 #ifdef DEBUG
                            !xr_strcmp(reason, "li_pause_key_no_clip") ? FALSE :
-#endif  // DEBUG
+#endif // DEBUG
                                                                         TRUE;
         if (bTimer && (!g_pGamePersistent || g_pGamePersistent->CanBePaused())) {
             g_pauseMngr()->Pause(TRUE);
@@ -389,7 +389,7 @@ void CRenderDevice::Pause(BOOL bOn, BOOL bTimer, BOOL bSound, LPCSTR reason)
             g_pauseMngr()->Pause(FALSE);
         }
         if (bSound) {
-            if (snd_emitters_ > 0)  // avoid crash
+            if (snd_emitters_ > 0) // avoid crash
                 snd_emitters_ = ::Sound->pause_emitters(false);
             else
             {
@@ -420,9 +420,9 @@ void CRenderDevice::OnWM_Activate(WPARAM wParam, LPARAM lParam)
 #ifndef DEDICATED_SERVER
 #ifdef INGAME_EDITOR
             if (!editor())
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR
                 ShowCursor(FALSE);
-#endif  // #ifndef DEDICATED_SERVER
+#endif // #ifndef DEDICATED_SERVER
         }
         else
         {

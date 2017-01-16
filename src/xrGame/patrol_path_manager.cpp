@@ -19,7 +19,7 @@
 #include "xrAICore/Navigation/level_graph.h"
 #include "xrScriptEngine/script_engine.hpp"
 
-#if 1  // def DEBUG
+#if 1 // def DEBUG
 #include "space_restriction_manager.h"
 
 static void show_restrictions(LPCSTR restrictions)
@@ -195,8 +195,8 @@ void CPatrolPathManager::select_point(const Fvector& position, u32& dest_vertex_
     m_game_object->callback(GameObject::ePatrolPathInPoint)(
         m_game_object->lua_game_object(), u32(ScriptEntity::eActionTypeMovement), m_curr_point_index);
 
-    u32 count = 0;    // количество разветвлений
-    float sum = 0.f;  // сумма весов разветвления
+    u32 count = 0;   // количество разветвлений
+    float sum = 0.f; // сумма весов разветвления
     vertex = m_path->vertex(m_curr_point_index);
     CPatrolPath::const_iterator I = vertex->edges().begin(), E = vertex->edges().end();
     u32 target = u32(-1);
@@ -276,8 +276,8 @@ void CPatrolPathManager::select_point(const Fvector& position, u32& dest_vertex_
 
 u32 CPatrolPathManager::get_next_point(u32 prev_point_index)
 {
-    u32 count = 0;    // количество разветвлений
-    float sum = 0.f;  // сумма весов разветвления
+    u32 count = 0;   // количество разветвлений
+    float sum = 0.f; // сумма весов разветвления
     const CPatrolPath::CVertex* vertex = m_path->vertex(prev_point_index);
 
     CPatrolPath::const_iterator I = vertex->edges().begin(), E = vertex->edges().end();

@@ -28,7 +28,7 @@ LPCSTR AddHyphens(LPCSTR c);
 LPCSTR DelHyphens(LPCSTR c);
 
 extern float g_cl_lvInterp;
-extern int g_cl_InterpolationType;  // 0 - Linear, 1 - BSpline, 2 - HSpline
+extern int g_cl_InterpolationType; // 0 - Linear, 1 - BSpline, 2 - HSpline
 extern u32 g_cl_InterpolationMaxPoints;
 extern int g_cl_save_demo;
 extern string64 gsCDKey;
@@ -251,7 +251,7 @@ public:
     }
     virtual void Info(TInfo& I) { xr_strcpy(I, "dbg Num Objects"); }
 };
-#endif  // DEBUG
+#endif // DEBUG
 
 extern void WriteCDKey_ToRegistry(LPSTR cdkey);
 
@@ -283,10 +283,10 @@ public:
             if (!MainMenu()->ValidateCDKey()) {
 #ifdef DEBUG
                 Msg("! Invalid CD-Key");
-#endif  // DEBUG
+#endif // DEBUG
             }
         }
-    }  // Execute
+    } // Execute
     virtual void Save(IWriter* F){};
 
     virtual void fill_tips(vecTips& tips, u32 mode)
@@ -381,7 +381,7 @@ public:
         if (!g_pGameLevel || !Level().Server || !Level().Server->GetGameState()) return;
 
         u32 len = xr_strlen(args);
-        if ((len == 0) || (len >= 128))  // one digit and raid:%u
+        if ((len == 0) || (len >= 128)) // one digit and raid:%u
             return;
         ClientID client_id(0);
 
@@ -448,7 +448,7 @@ static char const* exclude_raid_from_args(LPCSTR args, LPSTR dest, size_t dest_s
         if (raidstr <= tmp_str)
             *raidstr = 0;
         else
-            *(raidstr - 1) = 0;  // with ' '
+            *(raidstr - 1) = 0; // with ' '
     }
     dest[dest_size - 1] = 0;
     return dest;
@@ -462,7 +462,7 @@ public:
     {
         if (!g_pGameLevel || !Level().Server || !Level().Server->GetGameState()) return;
         u32 len = xr_strlen(args_);
-        if ((len == 0) || (len >= 256))  // two digits and raid:%u
+        if ((len == 0) || (len >= 256)) // two digits and raid:%u
             return;
 
         ClientID client_id = 0;
@@ -496,7 +496,7 @@ public:
                          .c_str());
     }
 
-};  // class CCC_MakeScreenshot
+}; // class CCC_MakeScreenshot
 
 class CCC_MakeConfigDump : public IConsole_Command
 {
@@ -506,7 +506,7 @@ public:
     {
         if (!g_pGameLevel || !Level().Server || !Level().Server->GetGameState()) return;
         u32 len = xr_strlen(args_);
-        if ((len == 0) || (len >= 256))  // two digits and raid:%u
+        if ((len == 0) || (len >= 256)) // two digits and raid:%u
             return;
 
         ClientID client_id = 0;
@@ -540,7 +540,7 @@ public:
                          .c_str());
     }
 
-};  // class CCC_MakeConfigDump
+}; // class CCC_MakeConfigDump
 
 class CCC_SetDemoPlaySpeed : public IConsole_Command
 {
@@ -558,7 +558,7 @@ public:
     };
 
     virtual void Info(TInfo& I) { xr_strcpy(I, "Set demo play speed (0.0, 8.0]"); }
-};  // class CCC_SetDemoPlaySpeed
+}; // class CCC_SetDemoPlaySpeed
 
 class DemoPlayControlArgParser
 {
@@ -608,7 +608,7 @@ protected:
     {
         return "<roundstart,kill,die,artefacttake,artefactdrop,artefactdeliver> [player name]";
     }
-};  // class DemoPlayControlArgParser
+}; // class DemoPlayControlArgParser
 
 class CCC_DemoPlayPauseOn : public IConsole_Command, public DemoPlayControlArgParser
 {
@@ -638,7 +638,7 @@ public:
             DemoPlayControlArgParser::GetInfoString());
         xr_strcpy(I, info_str);
     }
-};  // class CCC_DemoPlayPauseOn
+}; // class CCC_DemoPlayPauseOn
 
 class CCC_DemoPlayCancelPauseOn : public IConsole_Command
 {
@@ -656,7 +656,7 @@ public:
     };
 
     virtual void Info(TInfo& I) { xr_strcpy(I, "Cancels mpdemoplay_pause_on."); }
-};  // class CCC_DemoPlayCancelPauseOn
+}; // class CCC_DemoPlayCancelPauseOn
 
 class CCC_DemoPlayRewindUntil : public IConsole_Command, public DemoPlayControlArgParser
 {
@@ -686,7 +686,7 @@ public:
             DemoPlayControlArgParser::GetInfoString());
         xr_strcpy(I, info_str);
     }
-};  // class CCC_DemoPlayRewindUntil
+}; // class CCC_DemoPlayRewindUntil
 
 class CCC_DemoPlayStopRewind : public IConsole_Command
 {
@@ -704,7 +704,7 @@ public:
     };
 
     virtual void Info(TInfo& I) { xr_strcpy(I, "Stops rewinding (mpdemoplay_rewind_until)."); }
-};  // class CCC_DemoPlayStopRewind
+}; // class CCC_DemoPlayStopRewind
 
 class CCC_DemoPlayRestart : public IConsole_Command
 {
@@ -720,7 +720,7 @@ public:
     };
 
     virtual void Info(TInfo& I) { xr_strcpy(I, "Restarts playing demo."); }
-};  // class CCC_DemoPlayRestart
+}; // class CCC_DemoPlayRestart
 
 class CCC_MulDemoPlaySpeed : public IConsole_Command
 {
@@ -784,7 +784,7 @@ public:
         xr_strcpy(I, "Make screenshot of each player in the game. Format: \"screenshot_all");
     }
 
-};  // class CCC_ScreenshotAllPlayers
+}; // class CCC_ScreenshotAllPlayers
 
 class CCC_ConfigsDumpAll : public IConsole_Command
 {
@@ -810,7 +810,7 @@ public:
     {
         xr_strcpy(I, "Make config dump of each player in the game. Format: \"config_dump_all");
     }
-};  // class CCC_ConfigsDumpAll
+}; // class CCC_ConfigsDumpAll
 
 #ifdef DEBUG
 
@@ -824,9 +824,9 @@ public:
         ClientID server_id(Level().Server->GetServerClient()->ID);
         Level().Server->MakeScreenshot(server_id, server_id);
     }
-};  // CCC_DbgMakeScreenshot
+}; // CCC_DbgMakeScreenshot
 
-#endif  //#ifdef DEBUG
+#endif //#ifdef DEBUG
 
 class CCC_BanPlayerByCDKEY : public IConsole_Command
 {
@@ -839,7 +839,7 @@ public:
         if (!tmp_sv_game) return;
 
         u32 len = xr_strlen(args_);
-        if ((len == 0) || (len >= 256))  // two digits and raid:%u
+        if ((len == 0) || (len >= 256)) // two digits and raid:%u
             return;
 
         ClientID client_id = 0;
@@ -926,7 +926,7 @@ public:
         game_sv_mp* tmp_sv_game = smart_cast<game_sv_mp*>(Level().Server->GetGameState());
         if (!tmp_sv_game) return;
         u32 len = xr_strlen(args_);
-        if ((len == 0) || (len >= 64))  // one digit and raid:%u
+        if ((len == 0) || (len >= 64)) // one digit and raid:%u
             return;
 
         if (!strncmp(args_, LAST_PRINTED_PLAYER_BANNED_STR, sizeof(LAST_PRINTED_PLAYER_BANNED_STR) - 1)) {
@@ -1022,7 +1022,7 @@ public:
         if (!g_pGameLevel || !Level().Server) return;
         //-----------
         string4096 buff;
-        exclude_raid_from_args(args_, buff, sizeof(buff));  // xr_strcpy(buff, args_);
+        exclude_raid_from_args(args_, buff, sizeof(buff)); // xr_strcpy(buff, args_);
 
         u32 len = xr_strlen(buff);
         if (0 == len) return;
@@ -1072,7 +1072,7 @@ public:
         if (!xr_strlen(args)) return;
 
         string4096 buff;
-        exclude_raid_from_args(args, buff, sizeof(buff));  // xr_strcpy(buff, args_);
+        exclude_raid_from_args(args, buff, sizeof(buff)); // xr_strcpy(buff, args_);
         if (!xr_strlen(buff)) return;
 
         ip_address Address;
@@ -1743,7 +1743,7 @@ public:
             P.w_stringZ("logoff");
 
             Level().Send(P, net_flags(TRUE, TRUE));
-        }  // logoff
+        } // logoff
         else
         {
             NET_Packet P;
@@ -1881,12 +1881,12 @@ void register_mp_console_commands()
 #ifdef DEBUG
     CMD3(CCC_Mask, "net_dump_size", &psNET_Flags, NETFLAG_DBG_DUMPSIZE);
     CMD1(CCC_Dbg_NumObjects, "net_dbg_objects");
-#endif  // DEBUG
+#endif // DEBUG
     CMD3(CCC_GSCDKey, "cdkey", gsCDKey, sizeof(gsCDKey));
     CMD4(CCC_Integer, "g_eventdelay", &g_dwEventDelay, 0, 1000);
     CMD4(CCC_Integer, "g_corpsenum", (int*)&g_dwMaxCorpses, 0, 100);
 
-    CMD1(CCC_KickPlayerByName, "sv_kick");  // saved for backward compatibility
+    CMD1(CCC_KickPlayerByName, "sv_kick"); // saved for backward compatibility
     CMD1(CCC_KickPlayerByID, "sv_kick_id");
 
     // CMD1(CCC_BanPlayerByName,	"sv_banplayer"				);
@@ -1949,7 +1949,7 @@ void register_mp_console_commands()
 //	CMD4(CCC_Integer,		"sv_statistic_save_auto", &g_bStatisticSaveAuto, 0, 1);
 #ifndef MASTER_GOLD
     CMD4(CCC_AuthCheck, "sv_no_auth_check", &g_SV_Disable_Auth_Check, 0, 1);
-#endif  // MASTER_GOLD
+#endif // MASTER_GOLD
 
     CMD4(CCC_Integer, "sv_artefact_spawn_force", &g_SV_Force_Artefact_Spawn, 0, 1);
 
@@ -1986,15 +1986,15 @@ void register_mp_console_commands()
     CMD4(CCC_SV_Float, "sv_vote_quota", &g_sv_mp_fVoteQuota, 0.0f, 1.0f);
     CMD4(CCC_SV_Float, "sv_vote_time", &g_sv_mp_fVoteTime, 0.5f, 10.0f);
 
-    CMD4(CCC_SV_Integer, "sv_forcerespawn", (int*)&g_sv_dm_dwForceRespawn, 0, 3600);  // sec
+    CMD4(CCC_SV_Integer, "sv_forcerespawn", (int*)&g_sv_dm_dwForceRespawn, 0, 3600); // sec
     CMD4(CCC_SV_Integer, "sv_fraglimit", &g_sv_dm_dwFragLimit, 0, 1000);
-    CMD4(CCC_SV_Integer, "sv_timelimit", &g_sv_dm_dwTimeLimit, 0, 180);  // min
+    CMD4(CCC_SV_Integer, "sv_timelimit", &g_sv_dm_dwTimeLimit, 0, 180); // min
     CMD4(CCC_SV_Integer, "sv_dmgblockindicator", (int*)&g_sv_dm_bDamageBlockIndicators, 0, 1);
-    CMD4(CCC_SV_Integer, "sv_dmgblocktime", (int*)&g_sv_dm_dwDamageBlockTime, 0, 600);  // sec
+    CMD4(CCC_SV_Integer, "sv_dmgblocktime", (int*)&g_sv_dm_dwDamageBlockTime, 0, 600); // sec
     CMD4(CCC_SV_Integer, "sv_anomalies_enabled", (int*)&g_sv_dm_bAnomaliesEnabled, 0, 1);
-    CMD4(CCC_SV_Integer, "sv_anomalies_length", (int*)&g_sv_dm_dwAnomalySetLengthTime, 0, 180);  // min
+    CMD4(CCC_SV_Integer, "sv_anomalies_length", (int*)&g_sv_dm_dwAnomalySetLengthTime, 0, 180); // min
     CMD4(CCC_SV_Integer, "sv_pda_hunt", (int*)&g_sv_dm_bPDAHunt, 0, 1);
-    CMD4(CCC_SV_Integer, "sv_warm_up", (int*)&g_sv_dm_dwWarmUp_MaxTime, 0, 3600);  // sec
+    CMD4(CCC_SV_Integer, "sv_warm_up", (int*)&g_sv_dm_dwWarmUp_MaxTime, 0, 3600); // sec
 
     CMD4(CCC_Integer, "sv_max_ping_limit", (int*)&g_sv_dwMaxClientPing, 1, 2000);
 
@@ -2006,10 +2006,10 @@ void register_mp_console_commands()
     CMD4(CCC_SV_Integer, "sv_teamkill_limit", &g_sv_tdm_iTeamKillLimit, 0, 100);
     CMD4(CCC_SV_Integer, "sv_teamkill_punish", (int*)&g_sv_tdm_bTeamKillPunishment, 0, 1);
 
-    CMD4(CCC_SV_Integer, "sv_artefact_respawn_delta", (int*)&g_sv_ah_dwArtefactRespawnDelta, 0, 600);  // sec
+    CMD4(CCC_SV_Integer, "sv_artefact_respawn_delta", (int*)&g_sv_ah_dwArtefactRespawnDelta, 0, 600); // sec
     CMD4(CCC_SV_Integer, "sv_artefacts_count", (int*)&g_sv_ah_dwArtefactsNum, 1, 100);
-    CMD4(CCC_SV_Integer, "sv_artefact_stay_time", (int*)&g_sv_ah_dwArtefactStayTime, 0, 180);    // min
-    CMD4(CCC_SV_Integer, "sv_reinforcement_time", (int*)&g_sv_ah_iReinforcementTime, -1, 3600);  // sec
+    CMD4(CCC_SV_Integer, "sv_artefact_stay_time", (int*)&g_sv_ah_dwArtefactStayTime, 0, 180);   // min
+    CMD4(CCC_SV_Integer, "sv_reinforcement_time", (int*)&g_sv_ah_iReinforcementTime, -1, 3600); // sec
     CMD4(CCC_SV_Integer, "sv_bearercantsprint", (int*)&g_sv_ah_bBearerCantSprint, 0, 1);
     CMD4(CCC_SV_Integer, "sv_shieldedbases", (int*)&g_sv_ah_bShildedBases, 0, 1);
     CMD4(CCC_SV_Integer, "sv_returnplayers", (int*)&g_sv_ah_bAfReturnPlayersToBases, 0, 1);
@@ -2024,20 +2024,20 @@ void register_mp_console_commands()
     CMD1(CCC_SvChat, "chat");
 
     //-----------------
-    CMD3(CCC_Token, "sv_adm_menu_ban_time", &g_sv_adm_menu_ban_time, g_ban_times);  // min
+    CMD3(CCC_Token, "sv_adm_menu_ban_time", &g_sv_adm_menu_ban_time, g_ban_times); // min
     //	CMD4(CCC_Integer,		"sv_adm_menu_ban_time",			(int*)&g_sv_adm_menu_ban_time, 1, 60); //min
-    CMD4(CCC_Integer, "sv_adm_menu_ping_limit", (int*)&g_sv_adm_menu_ping_limit, 1, 200);  // min
+    CMD4(CCC_Integer, "sv_adm_menu_ping_limit", (int*)&g_sv_adm_menu_ping_limit, 1, 200); // min
 
-    CMD4(CCC_Integer, "sv_invincible_time", (int*)&g_sv_cta_dwInvincibleTime, 0, 60);                   // sec
-    CMD4(CCC_Integer, "sv_artefact_returning_time", (int*)&g_sv_cta_artefactReturningTime, 0, 5 * 60);  // sec
+    CMD4(CCC_Integer, "sv_invincible_time", (int*)&g_sv_cta_dwInvincibleTime, 0, 60);                  // sec
+    CMD4(CCC_Integer, "sv_artefact_returning_time", (int*)&g_sv_cta_artefactReturningTime, 0, 5 * 60); // sec
     CMD4(CCC_Integer, "sv_activated_return", (int*)&g_sv_cta_activatedArtefactRet, 0, 1)
-    CMD4(CCC_Integer, "sv_show_player_scores_time", (int*)&g_sv_cta_PlayerScoresDelayTime, 1, 20);  // sec
+    CMD4(CCC_Integer, "sv_show_player_scores_time", (int*)&g_sv_cta_PlayerScoresDelayTime, 1, 20); // sec
     CMD4(CCC_Integer, "sv_cta_runkup_to_arts_div", (int*)&g_sv_cta_rankUpToArtsCountDiv, 0, 10);
     CMD1(CCC_CompressorStatus, "net_compressor_status");
     CMD4(CCC_SV_Integer, "net_compressor_enabled", (int*)&g_net_compressor_enabled, 0, 1);
     CMD4(CCC_SV_Integer, "net_compressor_gather_stats", (int*)&g_net_compressor_gather_stats, 0, 1);
     CMD1(CCC_MpStatistics, "sv_dump_online_statistics");
-    CMD4(CCC_SV_Integer, "sv_dump_online_statistics_period", (int*)&g_sv_mp_iDumpStatsPeriod, 0, 60);  // min
+    CMD4(CCC_SV_Integer, "sv_dump_online_statistics_period", (int*)&g_sv_mp_iDumpStatsPeriod, 0, 60); // min
 #ifdef DEBUG
     CMD4(CCC_SV_Integer, "cl_dbg_min_ping", (int*)&lag_simmulator_min_ping, 0, 1000);
     CMD4(CCC_SV_Integer, "cl_dbg_max_ping", (int*)&lag_simmulator_max_ping, 0, 1000);

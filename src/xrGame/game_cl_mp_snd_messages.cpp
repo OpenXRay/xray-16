@@ -35,7 +35,7 @@ struct sound_ptr_search_predicate
         return false;
     }
     u32 m_search_id;
-};  // struct sound_ptr_search_predicate
+}; // struct sound_ptr_search_predicate
 
 void game_cl_mp::PlaySndMessage(u32 ID)
 {

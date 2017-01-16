@@ -56,7 +56,7 @@ void CLocatorAPI::auth_runtime(void* params)
 #ifdef DEBUG
     bool b_extern_auth = !!strstr(Core.Params, "asdf");
     if (!b_extern_auth)
-#endif  // DEBUG
+#endif // DEBUG
     {
         for (files_it it = m_files.begin(); it != m_files.end(); ++it)
         {
@@ -85,7 +85,7 @@ void CLocatorAPI::auth_runtime(void* params)
 
 #ifdef DEBUG
                     if (strstr(Core.Params, "auth_debug")) Msg("auth %s = 0x%08x", f.name, crc);
-#endif  // DEBUG
+#endif // DEBUG
 
                     FS.r_close(r);
                     m_auth_code ^= u64(crc);
@@ -96,7 +96,7 @@ void CLocatorAPI::auth_runtime(void* params)
         }
 #ifdef DEBUG
         Msg("auth_code = %d", m_auth_code);
-#endif  // DEBUG
+#endif // DEBUG
     }
 #ifdef DEBUG
     else
@@ -105,7 +105,7 @@ void CLocatorAPI::auth_runtime(void* params)
         sscanf(strstr(Core.Params, "asdf ") + 5, "%[^ ] ", c_auth_code);
         m_auth_code = _atoi64(c_auth_code);
     }
-#endif  // DEBUG
+#endif // DEBUG
     xr_delete(_o);
 
     m_auth_lock.Leave();

@@ -12,9 +12,9 @@ Please see the GameSpy Presence SDK documentation for more information
 **********************************************************************/
 
 #ifdef XRAY_DISABLE_GAMESPY_WARNINGS
-#pragma warning(disable : 4312)  // lines: 1164, 1186, 1265
-#pragma warning(disable : 4311)  // lines: 1231
-#endif                           //#ifdef XRAY_DISABLE_GAMESPY_WARNINGS
+#pragma warning(disable : 4312) // lines: 1164, 1186, 1265
+#pragma warning(disable : 4311) // lines: 1231
+#endif                          //#ifdef XRAY_DISABLE_GAMESPY_WARNINGS
 
 // INCLUDES
 //////////

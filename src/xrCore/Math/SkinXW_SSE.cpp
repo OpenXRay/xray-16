@@ -88,22 +88,22 @@ void Skin4W_SSE(vertRender* D, vertBoned4W* S, u32 vCount, CBoneInstance* Bones)
                                    // ------------------------------------------------------------------
 	movlps		xmm1, MMWORD PTR [esi]S.u	; xmm1 = ?? | ?? | v | u
 	movaps		xmm5, xmm4					; xmm5 = 00 | Pz | Py | Px
-	add			edi,TYPE vertRender			;  // advance dest
+	add			edi,TYPE vertRender			; // advance dest
 	movss		xmm5, xmm0					; xmm5 = 00 | Pz | Py | Nx
 	prefetchnta BYTE PTR [esi+4*(TYPE vertBoned4W)];		one cache line ahead
-	add			esi,TYPE vertBoned4W		;  // advance source
+	add			esi,TYPE vertBoned4W		; // advance source
 
 	shufps		xmm4, xmm5, _MM_SHUFFLE(0,2,1,0)	; xmm4 = Nx | Pz | Py | Px
 	shufps		xmm0, xmm1, _MM_SHUFFLE(1,0,2,1)	; xmm0 = v | u | Nz | Ny
                // ------------------------------------------------------------------
-	dec			ecx								;                                  // vCount--
+	dec			ecx								;                                 // vCount--
         // ------------------------------------------------------------------
         //	writing data
         // ------------------------------------------------------------------
 	movntps		XMMWORD PTR [edi-(TYPE vertRender)],xmm4		; 
 	movntps		XMMWORD PTR [edi+16-(TYPE vertRender)],xmm0		;
         // ------------------------------------------------------------------
-	jnz			new_vert						;  // vCount == 0 ? exit : goto new_vert
+	jnz			new_vert						; // vCount == 0 ? exit : goto new_vert
         // ------------------------------------------------------------------
 	sfence										;	write back cache
         // ------------------------------------------------------------------
@@ -165,22 +165,22 @@ void Skin3W_SSE(vertRender* D, vertBoned3W* S, u32 vCount, CBoneInstance* Bones)
                // ------------------------------------------------------------------
 	movlps		xmm1, MMWORD PTR [esi]S.u	; xmm1 = ?? | ?? | v | u
 	movaps		xmm5, xmm4					; xmm5 = 00 | Pz | Py | Px
-	add			edi,TYPE vertRender			;  // advance dest
+	add			edi,TYPE vertRender			; // advance dest
 	movss		xmm5, xmm0					; xmm5 = 00 | Pz | Py | Nx
 	prefetchnta BYTE PTR [esi+8*(TYPE vertBoned3W)];		one cache line ahead
-	add			esi,TYPE vertBoned3W		;  // advance source
+	add			esi,TYPE vertBoned3W		; // advance source
 
 	shufps		xmm4, xmm5, _MM_SHUFFLE(0,2,1,0)	; xmm4 = Nx | Pz | Py | Px
 	shufps		xmm0, xmm1, _MM_SHUFFLE(1,0,2,1)	; xmm0 = v | u | Nz | Ny
                // ------------------------------------------------------------------
-	dec			ecx								;                                  // vCount--
+	dec			ecx								;                                 // vCount--
         // ------------------------------------------------------------------
         //	writing data
         // ------------------------------------------------------------------
 	movntps		XMMWORD PTR [edi-(TYPE vertRender)],xmm4		; 
 	movntps		XMMWORD PTR [edi+16-(TYPE vertRender)],xmm0		;
         // ------------------------------------------------------------------
-	jnz			new_vert						;  // vCount == 0 ? exit : goto new_vert
+	jnz			new_vert						; // vCount == 0 ? exit : goto new_vert
         // ------------------------------------------------------------------
 	sfence										;	write back cache
         // ------------------------------------------------------------------
@@ -232,22 +232,22 @@ void Skin2W_SSE(vertRender* D, vertBoned2W* S, u32 vCount, CBoneInstance* Bones)
 
 	movlps		xmm7, MMWORD PTR [esi]S.u				; xmm7 = ?? | ?? | v | u
 	movaps		xmm5, xmm0								; xmm5 = 00 | Pz | Py | Px
-	add			edi,TYPE vertRender						;  // advance dest
+	add			edi,TYPE vertRender						; // advance dest
 	movss		xmm5, xmm2								; xmm5 = 00 | Pz | Py | Nx
 	prefetchnta BYTE PTR [esi+12*(TYPE vertBoned2W)];		one cache line ahead
-	add			esi,TYPE vertBoned2W					;  // advance source
+	add			esi,TYPE vertBoned2W					; // advance source
 
 	shufps		xmm0, xmm5, _MM_SHUFFLE(0,2,1,0)		; xmm0 = Nx | Pz | Py | Px
 	shufps		xmm2, xmm7, _MM_SHUFFLE(1,0,2,1)		; xmm2 = v | u | Nz | Ny
                // ------------------------------------------------------------------
-	dec			ecx										;                                  // vCount--
+	dec			ecx										;                                 // vCount--
         // ------------------------------------------------------------------
         //	writing data
         // ------------------------------------------------------------------
 	movntps		XMMWORD PTR [edi-(TYPE vertRender)],xmm0		; 
 	movntps		XMMWORD PTR [edi+16-(TYPE vertRender)],xmm2		;
         // ------------------------------------------------------------------
-	jnz			new_vert						;  // vCount == 0 ? exit : goto new_vert
+	jnz			new_vert						; // vCount == 0 ? exit : goto new_vert
         // ------------------------------------------------------------------
 	sfence										;	write back cache
         // ------------------------------------------------------------------
@@ -302,27 +302,27 @@ void Skin1W_SSE(vertRender* D, vertBoned1W* S, u32 vCount, CBoneInstance* Bones)
 
 	movlps		xmm1, MMWORD PTR [esi]S.u				; xmm1 = ?? | ?? | v | u
 	movaps		xmm4, xmm0								; xmm4 = 00 | Pz | Py | Px
-	add			edi,TYPE vertRender						;  // advance dest
+	add			edi,TYPE vertRender						; // advance dest
 	movss		xmm4, xmm3								; xmm4 = 00 | Pz | Py | Nx
 	prefetchnta BYTE PTR [esi+16*(TYPE vertBoned1W)];		one cache line ahead
-	add			esi,TYPE vertBoned1W					;  // advance source
+	add			esi,TYPE vertBoned1W					; // advance source
 
 	shufps		xmm0, xmm4, _MM_SHUFFLE(0,2,1,0)		; xmm0 = Nx | Pz | Py | Px
 	shufps		xmm3, xmm1, _MM_SHUFFLE(1,0,2,1)		; xmm3 = v | u | Nz | Ny
                // ------------------------------------------------------------------
-	dec			ecx								;                                  // vCount--
+	dec			ecx								;                                 // vCount--
         // ------------------------------------------------------------------
         //	writing data
         // ------------------------------------------------------------------
 	movntps		XMMWORD PTR [edi-(TYPE vertRender)],xmm0		; 
 	movntps		XMMWORD PTR [edi+16-(TYPE vertRender)],xmm3		;
         // ------------------------------------------------------------------
-	jnz			new_vert						;  // vCount == 0 ? exit : goto new_vert
+	jnz			new_vert						; // vCount == 0 ? exit : goto new_vert
         // ------------------------------------------------------------------
 	sfence										;	write back cache
         // ------------------------------------------------------------------
     }
 }
 
-}  // namespace Util3D
-}  // namespace XRay
+} // namespace Util3D
+} // namespace XRay

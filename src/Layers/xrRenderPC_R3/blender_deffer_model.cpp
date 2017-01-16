@@ -75,8 +75,8 @@ void CBlender_deffer_model::Compile(CBlender_Compile& C)
         LPCSTR vsname, psname;
         switch (C.iElement)
         {
-        case 0:  //
-        case 1:  //
+        case 0: //
+        case 1: //
             vsname = psname = "model_def_lq";
             C.r_Pass(
                 vsname, psname, TRUE, TRUE, FALSE, TRUE, D3DBLEND_SRCALPHA, D3DBLEND_INVSRCALPHA, TRUE, oAREF.value);
@@ -98,7 +98,7 @@ void CBlender_deffer_model::Compile(CBlender_Compile& C)
 
         switch (C.iElement)
         {
-        case SE_R2_NORMAL_HQ:  // deffer
+        case SE_R2_NORMAL_HQ: // deffer
             if (bUseATOC) {
                 uber_deffer(C, true, "model", "base_atoc", bAref, 0, true);
                 C.r_Stencil(
@@ -117,7 +117,7 @@ void CBlender_deffer_model::Compile(CBlender_Compile& C)
             if (bUseATOC) C.RS.SetRS(D3DRS_ZFUNC, D3DCMP_EQUAL);
             C.r_End();
             break;
-        case SE_R2_NORMAL_LQ:  // deffer
+        case SE_R2_NORMAL_LQ: // deffer
             if (bUseATOC) {
                 uber_deffer(C, false, "model", "base_atoc", bAref, 0, true);
                 C.r_Stencil(
@@ -135,7 +135,7 @@ void CBlender_deffer_model::Compile(CBlender_Compile& C)
             if (bUseATOC) C.RS.SetRS(D3DRS_ZFUNC, D3DCMP_EQUAL);
             C.r_End();
             break;
-        case SE_R2_SHADOW:  // smap
+        case SE_R2_SHADOW: // smap
             if (bAref) {
                 // if (RImplementation.o.HW_smap)	C.r_Pass	("shadow_direct_model_aref","shadow_direct_base_aref",
                 // FALSE,TRUE,TRUE,FALSE,D3DBLEND_ZERO,D3DBLEND_ONE,TRUE,220);

@@ -129,7 +129,7 @@ GHIConnection* ghiNewConnection(void)
     connection->throttle = GHTTPFalse;
     connection->lastThrottleRecv = 0;
     connection->post = NULL;
-    connection->maxRecvTime = 500;  // Prevent blocking in async mode with systems that never generate WSAEWOULDBLOCK
+    connection->maxRecvTime = 500; // Prevent blocking in async mode with systems that never generate WSAEWOULDBLOCK
     connection->proxyOverridePort = GHI_DEFAULT_PORT;
     connection->proxyOverrideServer = NULL;
     connection->encryptor.mInterface = NULL;

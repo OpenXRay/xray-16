@@ -28,8 +28,8 @@ void CPHContactBodyEffector::Apply()
     dReal effect = 10000.f * m_recip_flotation * m_recip_flotation;
     dMass mass;
     dBodyGetMass(m_body, &mass);
-    dReal l_air = linear_velocity_mag * effect;                          // force/velocity !!!
-    if (l_air > mass.mass / fixed_step) l_air = mass.mass / fixed_step;  // validate
+    dReal l_air = linear_velocity_mag * effect;                         // force/velocity !!!
+    if (l_air > mass.mass / fixed_step) l_air = mass.mass / fixed_step; // validate
 
     if (!fis_zero(l_air)) {
         dVector3 force = {-linear_velocity[0] * l_air, -linear_velocity[1] * l_air, -linear_velocity[2] * l_air, 0.f};
@@ -39,7 +39,7 @@ void CPHContactBodyEffector::Apply()
             accurate_normalize(norm);
             dMass m;
             dBodyGetMass(m_body, &m);
-            dReal prg = 1.f * dDOT(force, norm);  //+dDOT(linear_velocity,norm)*m.mass/fixed_step
+            dReal prg = 1.f * dDOT(force, norm); //+dDOT(linear_velocity,norm)*m.mass/fixed_step
             force[0] -= prg * norm[0];
             force[1] -= prg * norm[1];
             force[2] -= prg * norm[2];

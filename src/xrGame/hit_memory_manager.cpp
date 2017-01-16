@@ -26,7 +26,7 @@
 #ifndef MASTER_GOLD
 #include "actor.h"
 #include "ai_debug.h"
-#endif  // MASTER_GOLD
+#endif // MASTER_GOLD
 
 struct CHitObjectPredicate
 {
@@ -89,7 +89,7 @@ void CHitMemoryManager::add(float amount, const Fvector& vLocalDir, const IGameO
 {
 #ifndef MASTER_GOLD
     if (who && smart_cast<CActor const*>(who) && psAI_Flags.test(aiIgnoreActor)) return;
-#endif  // MASTER_GOLD
+#endif // MASTER_GOLD
 
     VERIFY(m_hits);
     if (!object().g_Alive()) return;
@@ -147,7 +147,7 @@ void CHitMemoryManager::add(const CHitObject& _hit_object)
 #ifndef MASTER_GOLD
     if (_hit_object.m_object && smart_cast<CActor const*>(_hit_object.m_object) && psAI_Flags.test(aiIgnoreActor))
         return;
-#endif  // MASTER_GOLD
+#endif // MASTER_GOLD
 
     VERIFY(m_hits);
     if (!object().g_Alive()) return;
@@ -257,7 +257,7 @@ void CHitMemoryManager::save(NET_Packet& packet) const
         packet.w_float((*I).m_object_params.m_orientation.yaw);
         packet.w_float((*I).m_object_params.m_orientation.pitch);
         packet.w_float((*I).m_object_params.m_orientation.roll);
-#endif  // USE_ORIENTATION
+#endif // USE_ORIENTATION
         // self params
         packet.w_u32((*I).m_self_params.m_level_vertex_id);
         packet.w_vec3((*I).m_self_params.m_position);
@@ -265,16 +265,16 @@ void CHitMemoryManager::save(NET_Packet& packet) const
         packet.w_float((*I).m_self_params.m_orientation.yaw);
         packet.w_float((*I).m_self_params.m_orientation.pitch);
         packet.w_float((*I).m_self_params.m_orientation.roll);
-#endif  // USE_ORIENTATION
+#endif // USE_ORIENTATION
 #ifdef USE_LEVEL_TIME
         packet.w_u32((Device.dwTimeGlobal >= (*I).m_level_time) ? (Device.dwTimeGlobal - (*I).m_level_time) : 0);
-#endif  // USE_LAST_LEVEL_TIME
+#endif // USE_LAST_LEVEL_TIME
 #ifdef USE_LEVEL_TIME
         packet.w_u32((Device.dwTimeGlobal >= (*I).m_level_time) ? (Device.dwTimeGlobal - (*I).m_last_level_time) : 0);
-#endif  // USE_LAST_LEVEL_TIME
+#endif // USE_LAST_LEVEL_TIME
 #ifdef USE_FIRST_LEVEL_TIME
         packet.w_u32((Device.dwTimeGlobal >= (*I).m_level_time) ? (Device.dwTimeGlobal - (*I).m_first_level_time) : 0);
-#endif  // USE_FIRST_LEVEL_TIME
+#endif // USE_FIRST_LEVEL_TIME
         packet.w_vec3((*I).m_direction);
         packet.w_u16((*I).m_bone_index);
         packet.w_float((*I).m_amount);
@@ -317,17 +317,17 @@ void CHitMemoryManager::load(IReader& packet)
         VERIFY(Device.dwTimeGlobal >= object.m_level_time);
         object.m_level_time = packet.r_u32();
         object.m_level_time += Device.dwTimeGlobal;
-#endif  // USE_LEVEL_TIME
+#endif // USE_LEVEL_TIME
 #ifdef USE_LAST_LEVEL_TIME
         VERIFY(Device.dwTimeGlobal >= object.m_last_level_time);
         object.m_last_level_time = packet.r_u32();
         object.m_last_level_time += Device.dwTimeGlobal;
-#endif  // USE_LAST_LEVEL_TIME
+#endif // USE_LAST_LEVEL_TIME
 #ifdef USE_FIRST_LEVEL_TIME
         VERIFY(Device.dwTimeGlobal >= (*I).m_first_level_time);
         object.m_first_level_time = packet.r_u32();
         object.m_first_level_time += Device.dwTimeGlobal;
-#endif  // USE_FIRST_LEVEL_TIME
+#endif // USE_FIRST_LEVEL_TIME
         packet.r_fvector3(object.m_direction);
         object.m_bone_index = packet.r_u16();
         object.m_amount = packet.r_float();
@@ -351,7 +351,7 @@ void CHitMemoryManager::load(IReader& packet)
                     VERIFY(spawn_callback->m_object_callback == callback);
                 }
             }
-#endif  // DEBUG
+#endif // DEBUG
     }
 }
 

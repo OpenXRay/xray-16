@@ -71,7 +71,7 @@ CALifeUpdateManager::~CALifeUpdateManager()
 
 float CALifeUpdateManager::shedule_Scale()
 {
-    return (.5f);  // (schedule_min + schedule_max)*0.5f
+    return (.5f); // (schedule_min + schedule_max)*0.5f
 }
 
 void CALifeUpdateManager::update_switch()
@@ -234,7 +234,7 @@ void CALifeUpdateManager::new_game(LPCSTR save_name)
 
 #ifdef DEBUG
     save(save_name);
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 
     Msg("* New game is successfully created!");
 }
@@ -324,7 +324,7 @@ void CALifeUpdateManager::jump_to_level(LPCSTR level_name) const
     if (failed) {
 #ifndef MASTER_GOLD
         Msg("! Cannot build path via game graph from the current level to the level %s!", level_name);
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
         float min_dist = flt_max;
         Fvector current = ai().game_graph().vertex(graph().actor()->m_tGraphID)->game_point();
         GameGraph::_GRAPH_ID n = ai().game_graph().header().vertex_count();

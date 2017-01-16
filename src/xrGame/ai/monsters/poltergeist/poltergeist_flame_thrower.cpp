@@ -171,19 +171,19 @@ void CPolterFlame::update_schedule()
 
                             NET_Packet P;
                             SHit HS;
-                            HS.GenHeader(GE_HIT, elem->target_object->ID());  //					u_EventGen
-                                                                              //(P,GE_HIT,
-                                                                              //element->target_object->ID());
-                            HS.whoID = (m_object->ID());                      //					P.w_u16			(ID());
-                            HS.weaponID = (m_object->ID());                   //					P.w_u16			(ID());
-                            HS.dir = (elem->target_dir);                      //					P.w_dir			(element->target_dir);
-                            HS.power = (hit_value);                           //					P.w_float		(m_flame_hit_value);
-                            HS.boneID = (BI_NONE);                            //					P.w_s16			(BI_NONE);
+                            HS.GenHeader(GE_HIT, elem->target_object->ID()); //					u_EventGen
+                                                                             //(P,GE_HIT,
+                                                                             // element->target_object->ID());
+                            HS.whoID = (m_object->ID());                     //					P.w_u16			(ID());
+                            HS.weaponID = (m_object->ID());                  //					P.w_u16			(ID());
+                            HS.dir = (elem->target_dir);                     //					P.w_dir			(element->target_dir);
+                            HS.power = (hit_value);                          //					P.w_float		(m_flame_hit_value);
+                            HS.boneID = (BI_NONE);                           //					P.w_s16			(BI_NONE);
                             HS.p_in_bone_space = (Fvector().set(
-                                0.f, 0.f, 0.f));  //					P.w_vec3		(Fvector().set(0.f,0.f,0.f));
-                            HS.impulse = (0.f);   //					P.w_float		(0.f);
+                                0.f, 0.f, 0.f)); //					P.w_vec3		(Fvector().set(0.f,0.f,0.f));
+                            HS.impulse = (0.f);  //					P.w_float		(0.f);
                             HS.hit_type =
-                                (ALife::eHitTypeBurn);  //					P.w_u16			(u16(ALife::eHitTypeBurn));
+                                (ALife::eHitTypeBurn); //					P.w_u16			(u16(ALife::eHitTypeBurn));
 
                             HS.Write_Packet(P);
                             m_object->u_EventSend(P);

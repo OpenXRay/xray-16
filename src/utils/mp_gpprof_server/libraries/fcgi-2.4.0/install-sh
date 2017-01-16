@@ -161,7 +161,7 @@ do
 #Make a temp file name in the proper directory.
 
                 dsttmp = $dstdir /
-                             #inst.$$ #
+#inst.$$ #
 
 #Move or copy the file name to the temp name
 

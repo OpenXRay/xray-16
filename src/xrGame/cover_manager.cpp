@@ -145,7 +145,7 @@ struct predicate
         return (!m_object->inside(cover->position()));
     }
 };
-}  // namespace smart_cover
+} // namespace smart_cover
 
 void CCoverManager::remove_nearby_covers(smart_cover::cover const& cover, smart_cover::object const& object) const
 {

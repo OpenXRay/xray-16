@@ -23,7 +23,7 @@ int CALLBACK BrowseCallbackProc(HWND hWnd, UINT uMsg, LPARAM lParam, LPARAM lpDa
 
 bool EFS_Utils::GetOpenName(LPCSTR initial, xr_string& buffer, bool bMulti, LPCSTR offset, int start_flt_ext)
 {
-    char buf[255 * 255];  // max files to select
+    char buf[255 * 255]; // max files to select
     xr_strcpy(buf, buffer.c_str());
 
     /*

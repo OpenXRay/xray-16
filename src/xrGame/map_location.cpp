@@ -286,7 +286,7 @@ void CMapLocation::CalcLevelName()
     }
 }
 
-bool CMapLocation::Update()  // returns actual
+bool CMapLocation::Update() // returns actual
 {
     R_ASSERT(m_cached.m_updatedFrame != Device.dwFrame);
 
@@ -350,7 +350,7 @@ void CMapLocation::UpdateSpot(CUICustomMap* map, CMapSpot* sp)
         Fvector2 position = GetPosition();
 
         m_position_on_map =
-            map->ConvertRealToLocal(position, (map->Heading()) ? false : true);  // for visibility calculating
+            map->ConvertRealToLocal(position, (map->Heading()) ? false : true); // for visibility calculating
 
         sp->SetWndPos(m_position_on_map);
 
@@ -378,7 +378,7 @@ void CMapLocation::UpdateSpot(CUICustomMap* map, CMapSpot* sp)
         bool b_pointer = (GetSpotPointer(sp) && map->NeedShowPointer(wnd_rect));
 
         if (map->Heading()) {
-            m_position_on_map = map->ConvertRealToLocal(position, true);  // for drawing
+            m_position_on_map = map->ConvertRealToLocal(position, true); // for drawing
             sp->SetWndPos(m_position_on_map);
         }
 
@@ -472,7 +472,7 @@ void CMapLocation::UpdateSpot(CUICustomMap* map, CMapSpot* sp)
 
 void CMapLocation::UpdateSpotPointer(CUICustomMap* map, CMapSpotPointer* sp)
 {
-    if (sp->GetParent()) return;  // already is child
+    if (sp->GetParent()) return; // already is child
     float heading;
     Fvector2 pointer_pos;
     if (map->GetPointerTo(m_position_on_map, sp->GetWidth() / 2, pointer_pos, heading)) {
@@ -615,7 +615,7 @@ CMapSpot* CMapLocation::GetSpotBorder(CMapSpot* sp)
         }
     }
     else
-    {  // inactive state
+    { // inactive state
         if (sp == m_level_spot) {
             if (NULL == m_level_map_spot_border_na && m_spot_border_names[1].size()) {
                 m_level_map_spot_border_na = new CMapSpot(this);
@@ -677,7 +677,7 @@ bool CRelationMapLocation::Update()
 
         m_last_relation = RELATION_REGISTRY().GetRelationType(pEnt, pAct);
         CSE_ALifeCreatureAbstract* pCreature = smart_cast<CSE_ALifeCreatureAbstract*>(m_owner_se_object);
-        if (pCreature)  // maybe trader ?
+        if (pCreature) // maybe trader ?
             bAlive = pCreature->g_Alive();
     }
     else

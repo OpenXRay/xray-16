@@ -40,8 +40,8 @@ static struct PPM_CONTEXT
 } * MinContext, *MaxContext;
 #pragma pack()
 
-static BYTE QTable[260];                // constants
-static PPM_CONTEXT::STATE* FoundState;  // found next state transition
+static BYTE QTable[260];               // constants
+static PPM_CONTEXT::STATE* FoundState; // found next state transition
 static int NumMasked, OrderFall, MaxOrder;
 static BYTE CharMask[256];
 

@@ -95,7 +95,7 @@ void CCameraLook2::OnActivate(CCameraBase* old_cam)
 
 void CCameraLook2::Update(Fvector& point, Fvector&)
 {
-    if (!m_locked_enemy) {  // autoaim
+    if (!m_locked_enemy) { // autoaim
         if (pInput->iGetAsyncKeyState(cam_dik)) {
             const CVisualMemoryManager::VISIBLES& vVisibles = Actor()->memory().visual().objects();
             CVisualMemoryManager::VISIBLES::const_iterator v_it = vVisibles.begin();
@@ -206,7 +206,7 @@ void CCameraFixedLook::Move(int cmd, float val, float factor)
 void CCameraFixedLook::Update(Fvector& point, Fvector& noise_dangle)
 {
     Fquaternion new_dir;
-    new_dir.slerp(m_current_dir, m_final_dir, Device.fTimeDelta);  // 1 sec
+    new_dir.slerp(m_current_dir, m_final_dir, Device.fTimeDelta); // 1 sec
     m_current_dir.set(new_dir);
 
     Fmatrix rm;

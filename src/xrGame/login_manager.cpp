@@ -60,9 +60,9 @@ void login_manager::login_raw(login_params_t const& login_args, login_operation_
         return;
     }
 
-    m_last_email = login_args.m_t1;     // email;
-    m_last_nick = login_args.m_t2;      // nick;
-    m_last_password = login_args.m_t3;  // password;
+    m_last_email = login_args.m_t1;    // email;
+    m_last_nick = login_args.m_t2;     // nick;
+    m_last_password = login_args.m_t3; // password;
     m_login_operation_cb = logincb;
 
     GPResult tmp_res =
@@ -351,7 +351,7 @@ char const* login_manager::get_password_from_registry()
 {
     using namespace secure_messaging;
     xr_strcpy(m_reg_password, "");
-    u8 tmp_password_dest[128];  // max password length is 30 symbols...
+    u8 tmp_password_dest[128]; // max password length is 30 symbols...
 
     u32 pass_size = ReadRegistry_BinaryValue(REGISTRY_VALUE_USERPASSWORD, tmp_password_dest, sizeof(tmp_password_dest));
 
@@ -398,4 +398,4 @@ void login_manager::forgot_password(char const* url)
     ShellExecute(0, "open", "cmd.exe", params, NULL, SW_SHOW);
 }
 
-}  // namespace gamespy_gp
+} // namespace gamespy_gp

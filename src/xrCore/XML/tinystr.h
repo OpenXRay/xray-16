@@ -70,7 +70,7 @@ public:
     typedef size_t size_type;
 
     // Error value for find primitive
-    static const size_type npos;  // = -1;
+    static const size_type npos; // = -1;
 
     // TiXmlString empty constructor
     TiXmlString() : rep_(&nullrep_) {}
@@ -220,8 +220,8 @@ private:
 
 inline bool operator==(const TiXmlString& a, const TiXmlString& b)
 {
-    return (a.length() == b.length())                  // optimization on some platforms
-           && (xr_strcmp(a.c_str(), b.c_str()) == 0);  // actual compare
+    return (a.length() == b.length())                 // optimization on some platforms
+           && (xr_strcmp(a.c_str(), b.c_str()) == 0); // actual compare
 }
 inline bool operator<(const TiXmlString& a, const TiXmlString& b)
 {
@@ -288,5 +288,5 @@ public:
     }
 };
 
-#endif  // TIXML_STRING_INCLUDED
-#endif  // TIXML_USE_STL
+#endif // TIXML_STRING_INCLUDED
+#endif // TIXML_USE_STL

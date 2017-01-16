@@ -25,7 +25,7 @@ IC CGameLevelCrossTable::CGameLevelCrossTable(LPCSTR fName)
     R_ASSERT2(m_chunk, "Cross table is corrupted!");
     m_tpaCrossTable = (CCell*)m_chunk->pointer();
 }
-#endif  // AI_COMPILER
+#endif // AI_COMPILER
 
 IC CGameLevelCrossTable::CGameLevelCrossTable(const void* buffer, const u32& buffer_size)
 {

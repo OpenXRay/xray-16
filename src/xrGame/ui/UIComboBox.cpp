@@ -43,7 +43,7 @@ void CUIComboBox::InitComboBox(Fvector2 pos, float width)
 
     m_frameLine.InitIB(Fvector2().set(0, 0), Fvector2().set(width, CB_HEIGHT));
 
-    m_frameLine.InitState(S_Enabled, "ui_inGame2_combobox_linetext");  // horizontal by default
+    m_frameLine.InitState(S_Enabled, "ui_inGame2_combobox_linetext"); // horizontal by default
     m_frameLine.InitState(S_Highlighted, "ui_inGame2_combobox_linetext");
 
     // Edit Box on left side of frame line
@@ -136,7 +136,7 @@ void CUIComboBox::SetCurrentOptValue()
     if (itm)
         m_itoken_id = (int)(__int64)itm->GetData();
     else
-        m_itoken_id = 1;  // first
+        m_itoken_id = 1; // first
 }
 
 void CUIComboBox::SaveBackUpOptValue()

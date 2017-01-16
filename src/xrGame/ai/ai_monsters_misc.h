@@ -32,7 +32,7 @@ typedef xr_vector<CEntity*> MEMBER_REGISTRY;
         vfUpdateDynamicObjects();                                                                                      \
         m_bStopThinking = true;                                                                                        \
     }
-#define WRITE_QUERY_TO_LOG(S) ;  // Msg(S);
+#define WRITE_QUERY_TO_LOG(S) ; // Msg(S);
 //	Msg("%d",Level().Teams[g_Team()].Squads[g_Squad()].Groups[g_Group()].m_tpaSuspiciousNodes.size());\
 
 #else

@@ -45,7 +45,7 @@ inline u32 stream::tell() const
     return (u32(m_pointer - m_buffer));
 }
 
-}  // namespace ppmd
-}  // namespace compression
+} // namespace ppmd
+} // namespace compression
 
-#endif  // COMPRESSION_PPMD_STREAM_INLINE_H
+#endif // COMPRESSION_PPMD_STREAM_INLINE_H

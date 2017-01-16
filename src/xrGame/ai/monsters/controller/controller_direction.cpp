@@ -33,7 +33,7 @@ void CControllerDirection::assign_bones()
     m_bone_spine = &kinematics->LL_GetBoneInstance(kinematics->LL_BoneID("bip01_spine"));
     m_bone_head = &kinematics->LL_GetBoneInstance(kinematics->LL_BoneID("bip01_head"));
 
-    if (!m_controller->PPhysicsShell()) {  //нельзя ставить колбеки, если создан физ шел - у него стоят свои колбеки!!!
+    if (!m_controller->PPhysicsShell()) { //нельзя ставить колбеки, если создан физ шел - у него стоят свои колбеки!!!
         m_bone_spine->set_callback(bctCustom, bone_callback, this);
         m_bone_head->set_callback(bctCustom, bone_callback, this);
     }
@@ -81,7 +81,7 @@ void CControllerDirection::head_look_point(const Fvector& look_point)
 
     // установить параметры вращения по heading
     float cur_yaw = m_man->direction().get_heading_current();
-    float dy = _abs(angle_normalize_signed(dir_yaw - cur_yaw));  // дельта, на которую нужно поворачиваться
+    float dy = _abs(angle_normalize_signed(dir_yaw - cur_yaw)); // дельта, на которую нужно поворачиваться
 
     bone_angle_head = _pmt_head_bone_limit / (_pmt_head_bone_limit + _pmt_torso_bone_limit) * dy;
     bone_angle_torso = _pmt_torso_bone_limit / (_pmt_head_bone_limit + _pmt_torso_bone_limit) * dy;

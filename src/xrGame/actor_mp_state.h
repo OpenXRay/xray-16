@@ -11,15 +11,15 @@ struct actor_mp_state
     Fvector physics_force;
     Fvector physics_torque;
     Fvector physics_position;
-    Fvector position;  // should be removed in future(?)
+    Fvector position; // should be removed in future(?)
     Fvector logic_acceleration;
 
     float model_yaw;
-    float camera_yaw;    // should be removed in future
-    float camera_pitch;  // should be removed in future
-    float camera_roll;   // should be removed in future
+    float camera_yaw;   // should be removed in future
+    float camera_pitch; // should be removed in future
+    float camera_roll;  // should be removed in future
 
-    u32 time;  // should be removed
+    u32 time; // should be removed
 
     float health;
     float radiation;
@@ -34,7 +34,7 @@ class actor_mp_state_holder
 private:
 #ifdef USE_DIFFERENCES
     u32 m_mask;
-#endif  // USE_DIFFERENCES
+#endif // USE_DIFFERENCES
     actor_mp_state m_state;
 
 private:
@@ -50,4 +50,4 @@ public:
 
 #include "actor_mp_state_inline.h"
 
-#endif  // ACTOR_MP_STATE_H
+#endif // ACTOR_MP_STATE_H

@@ -1,6 +1,6 @@
-#define KEY_LENGTH 8              // 64 bit
-#define CHECK_LENGTH 2            // 16 bit
-#define MAX_EXTRA_DATA_LENGTH 16  // 16 bytes of data
+#define KEY_LENGTH 8             // 64 bit
+#define CHECK_LENGTH 2           // 16 bit
+#define MAX_EXTRA_DATA_LENGTH 16 // 16 bytes of data
 #define MAX_ENCODED_KEY (((MAX_EXTRA_DATA_LENGTH + KEY_LENGTH + CHECK_LENGTH) * 8 + 4) / 5)
 #include <string.h>
 #include "base32.h"
@@ -15,7 +15,7 @@ int DecodeKeyData(const char* key, unsigned char* extradata)
 
     if (!CleanForBase32(cleankey, key, MAX_ENCODED_KEY + 1)) return 0;
     keybytes = ConvertFromBase32((char*)keyandcheck, cleankey, (int)strlen(cleankey));
-    if (keybytes <= 0) return 0;  // decoded incorrectly
+    if (keybytes <= 0) return 0; // decoded incorrectly
     extradatalen = keybytes - KEY_LENGTH - CHECK_LENGTH;
     if (extradatalen <= 0) return 0;
     for (i = 0; i < extradatalen; i++)
@@ -45,7 +45,7 @@ int VerifyClientCheck(const char* key, unsigned short cskey)
 
     if (!CleanForBase32(cleankey, key, MAX_ENCODED_KEY + 1)) return 0;
     keybytes = ConvertFromBase32((char*)keyandcheck, cleankey, (int)strlen(cleankey));
-    if (keybytes <= 0) return 0;  // decoded incorrectly
+    if (keybytes <= 0) return 0; // decoded incorrectly
     extradatalen = keybytes - KEY_LENGTH - CHECK_LENGTH;
 
     correctcheck = CreateCheck(keyandcheck, KEY_LENGTH + extradatalen, cskey);

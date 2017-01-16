@@ -23,12 +23,12 @@ namespace environment
 namespace effects
 {
 class manager;
-}  // namespace effects
+} // namespace effects
 
 namespace sound_channels
 {
 class manager;
-}  // namespace sound_channels
+} // namespace sound_channels
 
 namespace ambients
 {
@@ -86,11 +86,11 @@ private:
 
     sound_collection_type* m_sounds_collection;
     sound_container_type m_sound_channels_ids;
-};  // class ambient
-}  // namespace ambients
-}  // namespace environment
-}  // namespace editor
+}; // class ambient
+} // namespace ambients
+} // namespace environment
+} // namespace editor
 
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR
 
-#endif  // ifndef EDITOR_WEATHER_AMBIENTS_AMBIENT_HPP_INCLUDED
+#endif // ifndef EDITOR_WEATHER_AMBIENTS_AMBIENT_HPP_INCLUDED

@@ -54,7 +54,7 @@ game_sv_mp::game_sv_mp() : inherited()
     //	g_pGamePersistent->Environment().SetWeather("mp_weather");
     m_aRanks.clear();
     //------------------------------------------------------
-    round_end_reason = eRoundEnd_Force;  // unknown
+    round_end_reason = eRoundEnd_Force; // unknown
     m_async_stats_request_time = 0;
     round_statistics_dump_fn[0] = 0;
 }
@@ -233,12 +233,12 @@ void game_sv_mp::KillPlayer(ClientID id_who, u16 GameID)
     xrClientData* xrCData = m_server->ID_to_client(id_who);
 #ifdef DEBUG
     if (xrCData && xrCData->ps && xrCData->ps->getName()) Msg("--- Killing player [%s]", xrCData->ps->getName());
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 
     if (xrCData && xrCData->ps && xrCData->ps->testFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD)) {
 #ifdef DEBUG
         Msg("--- Killing dead player [%s]", xrCData->ps->getName());
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
         return;
     }
     if (xrCData) {
@@ -279,12 +279,12 @@ void game_sv_mp::OnEvent(NET_Packet& P, u16 type, u32 time, ClientID sender)
 {
     switch (type)
     {
-    case GAME_EVENT_PLAYER_KILLED:  // playerKillPlayer
+    case GAME_EVENT_PLAYER_KILLED: // playerKillPlayer
     {
 #ifdef DEBUG
         xrClientData* l_pC = m_server->ID_to_client(sender);
         if (l_pC && l_pC->ps) Msg("--- GAME_EVENT_PLAYER_KILLED: sender [%d][0x%08x]", l_pC->ps->GameID, sender);
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
         OnPlayerKilled(P);
     }
     break;
@@ -292,11 +292,11 @@ void game_sv_mp::OnEvent(NET_Packet& P, u16 type, u32 time, ClientID sender)
 #ifdef DEBUG
         xrClientData* l_pC = m_server->ID_to_client(sender);
         if (l_pC && l_pC->ps) Msg("--- GAME_EVENT_PLAYER_HITTED: sender [%d][0x%08x]", l_pC->ps->GameID, sender);
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
         OnPlayerHitted(P);
     }
     break;
-    case GAME_EVENT_PLAYER_READY:  // cs & dm
+    case GAME_EVENT_PLAYER_READY: // cs & dm
     {
         xrClientData* l_pC = m_server->ID_to_client(sender);
         if (!l_pC) break;
@@ -352,7 +352,7 @@ void game_sv_mp::OnEvent(NET_Packet& P, u16 type, u32 time, ClientID sender)
     case GAME_EVENT_PLAYER_STARTED: {
 #ifdef DEBUG
         Msg("--- Player 0x%08x started.", sender);
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
         if (CheckPlayerMapName(sender, P)) {
             m_event_queue->SetIgnoreEventsFor(false, sender);
         }
@@ -372,7 +372,7 @@ void game_sv_mp::OnEvent(NET_Packet& P, u16 type, u32 time, ClientID sender)
                     .c_str());
 #ifndef MASTER_GOLD
             Msg("! ERROR: unknown client [0x%08x] opens buy menu", sender.value());
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
         }
     }
     break;
@@ -389,12 +389,12 @@ void game_sv_mp::OnEvent(NET_Packet& P, u16 type, u32 time, ClientID sender)
                     .c_str());
 #ifndef MASTER_GOLD
             Msg("! ERROR: unknown client [0x%08x] opens buy menu", sender.value());
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
         }
     }
     break;
     default: inherited::OnEvent(P, type, time, sender);
-    };  // switch
+    }; // switch
 }
 
 bool game_sv_mp::CheckPlayerMapName(ClientID const& clientID, NET_Packet& P)
@@ -417,7 +417,7 @@ void game_sv_mp::ReconnectPlayer(ClientID const& clientID)
 {
 #ifdef DEBUG
     Msg("--- Reconnecting player 0x%08x", clientID);
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
     NET_Packet P;
     P.w_begin(M_CHANGE_LEVEL_GAME);
     P.w_stringZ(Level().name().c_str());
@@ -533,11 +533,11 @@ void game_sv_mp::SpawnPlayer(ClientID id, LPCSTR N)
     ps_who->setFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD);
 
     // Spawn "actor"
-    CSE_Abstract* E = spawn_begin(N);  // create SE
+    CSE_Abstract* E = spawn_begin(N); // create SE
 
-    E->set_name_replace(get_name_id(id));  // name
+    E->set_name_replace(get_name_id(id)); // name
 
-    E->s_flags.assign(M_SPAWN_OBJECT_LOCAL | M_SPAWN_OBJECT_ASPLAYER);  // flags
+    E->s_flags.assign(M_SPAWN_OBJECT_LOCAL | M_SPAWN_OBJECT_ASPLAYER); // flags
 
     CSE_ALifeCreatureActor* pA = smart_cast<CSE_ALifeCreatureActor*>(E);
     CSE_Spectator* pS = smart_cast<CSE_Spectator*>(E);
@@ -826,7 +826,7 @@ void game_sv_mp::SpawnWeapon4Actor(u16 actorId, LPCSTR N, u8 Addons, game_Player
     E->ID_Parent = actorId;
 
     ammo_diff_t ammo_diff;
-    E->s_flags.assign(M_SPAWN_OBJECT_LOCAL);  // flags
+    E->s_flags.assign(M_SPAWN_OBJECT_LOCAL); // flags
     /////////////////////////////////////////////////////////////////////////////////
     CSE_ALifeItemWeapon* pWeapon = smart_cast<CSE_ALifeItemWeapon*>(E);
     if (pWeapon) {
@@ -955,7 +955,7 @@ void game_sv_mp::OnVoteStart(LPCSTR VoteCommand, ClientID sender)
     string1024 resVoteCommand = "";
 
     sscanf(VoteCommand, "%255s ", CommandName);
-    u32 tmp_command_len = xr_strlen(CommandName) + 1;  // + ' '
+    u32 tmp_command_len = xr_strlen(CommandName) + 1; // + ' '
     if ((tmp_command_len < 256) && (tmp_command_len < xr_strlen(VoteCommand))) {
         strncpy_s(CommandParams, VoteCommand + xr_strlen(CommandName) + 1, 255);
         CommandParams[255] = 0;
@@ -996,7 +996,7 @@ void game_sv_mp::OnVoteStart(LPCSTR VoteCommand, ClientID sender)
             sscanf_s(CommandParams, "%255s %255s", LevelName, sizeof(LevelName), LevelVersion, sizeof(LevelVersion));
 #ifdef DEBUG
             Msg("--- Starting vote for changing level to: %s[%s]", LevelName, LevelVersion);
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
             LevelName[255] = 0;
             LevelVersion[255] = 0;
 
@@ -1014,7 +1014,7 @@ void game_sv_mp::OnVoteStart(LPCSTR VoteCommand, ClientID sender)
             }
             else
             {
-                m_pVoteCommand.printf("%s %s", votecommands[i].command, CommandParams);  // backward compatibility
+                m_pVoteCommand.printf("%s %s", votecommands[i].command, CommandParams); // backward compatibility
             }
             xr_strcpy(resVoteCommand, VoteCommand);
         }
@@ -1336,7 +1336,7 @@ void game_sv_mp::OnPlayerKilled(NET_Packet P)
         Msg("! ERROR:  killed entity is null ! (entitty [%d][%s]), killer id [%d][%s], Frame [%d]", KilledID,
             entity ? entity->cName().c_str() : "unknown", KillerID, ps_killer ? ps_killer->getName() : "unknown",
             Device.dwFrame);
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
         return;
     }
 #ifdef MP_LOGGING
@@ -1375,7 +1375,7 @@ void game_sv_mp::SendPlayerKilledMessage(
 {
 #ifndef MASTER_GOLD
     Msg("---Server: sending player [%d] killed message...", KillerID);
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
     NET_Packet P;
     GenerateGameMessage(P);
     P.w_u32(GAME_EVENT_PLAYER_KILLED);
@@ -1680,18 +1680,18 @@ void game_sv_mp::RenewAllActorsHealth()
             if (l_pC->ps->testFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD)) {
 #ifdef DEBUG
                 Msg("--- Actor has dead flag in player state");
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
                 return;
             }
             // this hack (client objects on server) must be deleted !!!
             CActor* pActor = smart_cast<CActor*>(Level().Objects.net_Find(l_pC->ps->GameID));
-            if (!pActor)  // if player is spectator
+            if (!pActor) // if player is spectator
                 return;
 
             if (!pActor->g_Alive()) {
 #ifndef MASTER_GOLD
                 Msg("! ERROR: dead actor !!!");
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
                 return;
             }
 
@@ -1742,7 +1742,7 @@ void game_sv_mp::RejectGameItem(CSE_Abstract* entity)
     CSE_Abstract* e_parent = get_entity_from_eid(entity->ID_Parent);
 
     //	R_ASSERT2( e_parent, make_string( "RejectGameItem: parent not found. entity_id = [%d], parent_id = [%d]",
-    //entity->ID, entity->ID_Parent ).c_str() );
+    // entity->ID, entity->ID_Parent ).c_str() );
     VERIFY2(e_parent, make_string("RejectGameItem: parent not found. entity_id = [%d], parent_id = [%d]", entity->ID,
                           entity->ID_Parent)
                           .c_str());
@@ -2012,7 +2012,7 @@ void game_sv_mp::DumpRoundStatistics()
     // Game().m_WeaponUsageStatistic->Clear();
 }
 
-void game_sv_mp::DestroyAllPlayerItems(ClientID id_who)  // except rukzak
+void game_sv_mp::DestroyAllPlayerItems(ClientID id_who) // except rukzak
 {
     xrClientData* xrCData = m_server->ID_to_client(id_who);
 
@@ -2021,7 +2021,7 @@ void game_sv_mp::DestroyAllPlayerItems(ClientID id_who)  // except rukzak
     game_PlayerState* ps = xrCData->ps;
 #ifndef MASTER_GOLD
     Msg("---Destroying player [%s] items before spawning new bought items.", ps->getName());
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
 
     CActor* pActor = smart_cast<CActor*>(Level().Objects.net_Find(ps->GameID));
     if (!pActor) return;
@@ -2037,7 +2037,7 @@ void game_sv_mp::DestroyAllPlayerItems(ClientID id_who)  // except rukzak
         CSE_Abstract* tempEntity = m_server->ID_to_entity(object_id);
 
         //		R_ASSERT2( tempEntity, make_string("entity not found [%d]. Destroy all items of actor[%d]", object_id,
-        //ps->GameID).c_str() );
+        // ps->GameID).c_str() );
         VERIFY2(tempEntity,
             make_string("entity not found [%d]. Destroy all items of actor[%d]", object_id, ps->GameID).c_str());
         if (!tempEntity) {

@@ -266,8 +266,8 @@ protected:
 
     //ориентаци€ модели
     float r_model_yaw_dest;
-    float r_model_yaw;        // orientation of model
-    float r_model_yaw_delta;  // effect on multiple "strafe"+"something"
+    float r_model_yaw;       // orientation of model
+    float r_model_yaw_delta; // effect on multiple "strafe"+"something"
 
 public:
     SActorMotions* m_anims;
@@ -363,7 +363,7 @@ protected:
     bool m_bPickupMode;
     //рассто€ние (в метрах) на котором актер чувствует гранату (любую)
     float m_fFeelGrenadeRadius;
-    float m_fFeelGrenadeTime;  //врем€ гранаты (сек) после которого актер чувствует гранату
+    float m_fFeelGrenadeTime; //врем€ гранаты (сек) после которого актер чувствует гранату
     //рассто€ние подсветки предметов
     float m_fPickupInfoRadius;
 
@@ -482,11 +482,11 @@ protected:
 
 public:
     virtual BOOL net_Spawn(CSE_Abstract* DC);
-    virtual void net_Export(NET_Packet& P);  // export to server
-    virtual void net_Import(NET_Packet& P);  // import from server
+    virtual void net_Export(NET_Packet& P); // export to server
+    virtual void net_Import(NET_Packet& P); // import from server
     virtual void net_Destroy();
-    virtual BOOL net_Relevant();               //	{ return getSVU() | getLocal(); };		// relevant for export to server
-    virtual void net_Relcase(IGameObject* O);  //
+    virtual BOOL net_Relevant();              //	{ return getSVU() | getLocal(); };		// relevant for export to server
+    virtual void net_Relcase(IGameObject* O); //
     virtual void xr_stdcall on_requested_spawn(IGameObject* object);
     // object serialization
     virtual void save(NET_Packet& output_packet);
@@ -498,8 +498,8 @@ protected:
     xr_deque<net_update> NET;
     Fvector NET_SavedAccel;
     net_update NET_Last;
-    BOOL NET_WasInterpolating;  // previous update was by interpolation or by extrapolation
-    u32 NET_Time;               // server time of last update
+    BOOL NET_WasInterpolating; // previous update was by interpolation or by extrapolation
+    u32 NET_Time;              // server time of last update
 
     //---------------------------------------------
     void net_Import_Base(NET_Packet& P);
@@ -517,9 +517,9 @@ protected:
     //---------------------------------------------
     //	bool					m_bHasUpdate;
     /// spline coeff /////////////////////
-    float SCoeff[3][4];           //коэффициэнты дл€ сплайна Ѕизье
-    float HCoeff[3][4];           //коэффициэнты дл€ сплайна Ёрмита
-    Fvector IPosS, IPosH, IPosL;  //положение актера после интерпол€ции Ѕизье, Ёрмита, линейной
+    float SCoeff[3][4];          //коэффициэнты дл€ сплайна Ѕизье
+    float HCoeff[3][4];          //коэффициэнты дл€ сплайна Ёрмита
+    Fvector IPosS, IPosH, IPosL; //положение актера после интерпол€ции Ѕизье, Ёрмита, линейной
 
 #ifdef DEBUG
     DEF_DEQUE(VIS_POSITION, Fvector);
@@ -566,10 +566,10 @@ public:
     void g_Physics(Fvector& accel, float jump, float dt);
     virtual void ForceTransform(const Fmatrix& m);
     void SetPhPosition(const Fmatrix& pos);
-    virtual void PH_B_CrPr();  // actions & operations before physic correction-prediction steps
-    virtual void PH_I_CrPr();  // actions & operations after correction before prediction steps
-    virtual void PH_A_CrPr();  // actions & operations after phisic correction-prediction steps
-                               //	virtual void			UpdatePosStack	( u32 Time0, u32 Time1 );
+    virtual void PH_B_CrPr(); // actions & operations before physic correction-prediction steps
+    virtual void PH_I_CrPr(); // actions & operations after correction before prediction steps
+    virtual void PH_A_CrPr(); // actions & operations after phisic correction-prediction steps
+                              //	virtual void			UpdatePosStack	( u32 Time0, u32 Time1 );
     virtual void MoveActor(Fvector NewPos, Fvector NewDir);
 
     virtual void SpawnAmmoForWeapon(CInventoryItem* pIItem);
@@ -619,7 +619,7 @@ protected:
 public:
     void SetWeaponHideState(u16 State, bool bSet);
 
-private:  // IPhysicsShellHolder
+private: // IPhysicsShellHolder
     virtual void HideAllWeapons(bool v) { SetWeaponHideState(INV_STATE_BLOCK_ALL, v); }
 public:
     void SetCantRunState(bool bSet);
@@ -664,7 +664,7 @@ public:
     void SwitchTorch();
 #ifdef DEBUG
     void NoClipFly(int cmd);
-#endif  // DEBUG
+#endif // DEBUG
 
 public:
     virtual void on_weapon_shot_start(CWeapon* weapon);

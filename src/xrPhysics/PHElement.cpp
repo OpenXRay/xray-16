@@ -16,7 +16,7 @@
 #ifdef DEBUG
 #include "debug_output.h"
 
-#endif  // DEBUG
+#endif // DEBUG
 
 ///////////////////////////////////////////////////////////////
 #pragma warning(disable : 4995)
@@ -35,7 +35,7 @@ extern CPHWorld* ph_world;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////Implementation for CPhysicsElement
-CPHElement::CPHElement()  // aux
+CPHElement::CPHElement() // aux
 {
     m_w_limit = default_w_limit;
     m_l_limit = default_l_limit;
@@ -55,7 +55,7 @@ CPHElement::CPHElement()  // aux
     m_shell = NULL;
 
     k_w = default_k_w;
-    k_l = default_k_l;  // 1.8f;
+    k_l = default_k_l; // 1.8f;
     m_fratures_holder = NULL;
     // b_enabled_onstep=false;
     // m_flags.set(flEnabledOnStep,FALSE);
@@ -83,7 +83,7 @@ void CPHElement::add_Cylinder(const Fcylinder& V)
 
 void CPHElement::build()
 {
-    m_body = dBodyCreate(0);  // phWorld
+    m_body = dBodyCreate(0); // phWorld
     // m_saved_contacts=dJointGroupCreate (0);
     // b_contacts_saved=false;
     dBodyDisable(m_body);
@@ -129,7 +129,7 @@ void CPHElement::destroy()
 {
     // dJointGroupDestroy(m_saved_contacts);
     CPHGeometryOwner::destroy();
-    if (m_body)  //&&m_body->world
+    if (m_body) //&&m_body->world
     {
         if (m_body->world) m_shell->Island().RemoveBody(m_body);
         dBodyDestroy(m_body);
@@ -444,7 +444,7 @@ void CPHElement::PhDataUpdate(dReal step)
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     ////////////////limit linear
-    ///vel////////////////////////////////////////////////////////////////////////////////////////
+    /// vel////////////////////////////////////////////////////////////////////////////////////////
 
     VERIFY(dV_valid(linear_velocity));
     if (linear_velocity_mag > m_l_limit) {
@@ -460,7 +460,7 @@ void CPHElement::PhDataUpdate(dReal step)
     const dReal* position = dBodyGetPosition(m_body);
     VERIFY(dV_valid(position));
     /////////////////limit & secure angular
-    ///vel///////////////////////////////////////////////////////////////////////////////
+    /// vel///////////////////////////////////////////////////////////////////////////////
     VERIFY(dV_valid(angular_velocity));
 
     if (angular_velocity_mag > m_w_limit) {
@@ -472,7 +472,7 @@ void CPHElement::PhDataUpdate(dReal step)
     }
 
     ////////////////secure
-    ///rotation////////////////////////////////////////////////////////////////////////////////////////
+    /// rotation////////////////////////////////////////////////////////////////////////////////////////
     {
         VERIFY(dQ_valid(dBodyGetQuaternion(m_body)));
     }
@@ -484,7 +484,7 @@ void CPHElement::PhDataUpdate(dReal step)
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////position
-    ///update///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// update///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     VERIFY(dBodyStateValide(m_body));
     VERIFY2(dV_valid(dBodyGetPosition(m_body)), "invalid body position");
@@ -505,7 +505,7 @@ void CPHElement::PhDataUpdate(dReal step)
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //////////////////air
-    ///resistance/////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// resistance/////////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     if (!fis_zero(k_w))
@@ -513,8 +513,8 @@ void CPHElement::PhDataUpdate(dReal step)
 
     dMass mass;
     dBodyGetMass(m_body, &mass);
-    dReal l_air = linear_velocity_mag * k_l;                             // force/velocity !!!
-    if (l_air > mass.mass / fixed_step) l_air = mass.mass / fixed_step;  // validate
+    dReal l_air = linear_velocity_mag * k_l;                            // force/velocity !!!
+    if (l_air > mass.mass / fixed_step) l_air = mass.mass / fixed_step; // validate
 
     if (!fis_zero(l_air))
         dBodyAddForce(m_body, -linear_velocity[0] * l_air, -linear_velocity[1] * l_air, -linear_velocity[2] * l_air);
@@ -803,7 +803,7 @@ void CPHElement::GetAnimBonePos(Fmatrix& bp)
     // IKinematicsAnimated *ak = pK->dcast_PKinematicsAnimated();
     // VERIFY(ak);
     CBoneInstance* BI = &pK->LL_GetBoneInstance(m_SelfID);
-    if (!BI->callback())  //.
+    if (!BI->callback()) //.
     {
         bp.set(BI->mTransform);
         return;
@@ -969,7 +969,7 @@ void CPHElement::SetMaterial(u16 m)
     CPHGeometryOwner::SetMaterial(m);
 }
 
-dMass* CPHElement::getMassTensor()  // aux
+dMass* CPHElement::getMassTensor() // aux
 {
     return &m_mass;
 }
@@ -1063,14 +1063,14 @@ void CPHElement::setTorque(const Fvector& torque)
     VERIFY(dBodyStateValide(m_body));
 }
 
-void CPHElement::applyForce(const Fvector& dir, float val)  // aux
+void CPHElement::applyForce(const Fvector& dir, float val) // aux
 {
     applyForce(dir.x * val, dir.y * val, dir.z * val);
 }
-void CPHElement::applyForce(float x, float y, float z)  // called anywhere ph state influent
+void CPHElement::applyForce(float x, float y, float z) // called anywhere ph state influent
 {
     VERIFY(_valid(x) && _valid(y) && _valid(z));
-    if (!isActive()) return;  // hack??
+    if (!isActive()) return; // hack??
     if (m_flags.test(flFixed)) return;
     if (!dBodyIsEnabled(m_body)) dBodyEnable(m_body);
     m_shell->EnableObject(0);
@@ -1079,7 +1079,7 @@ void CPHElement::applyForce(float x, float y, float z)  // called anywhere ph st
     VERIFY(dBodyStateValide(m_body));
 }
 
-void CPHElement::applyImpulse(const Fvector& dir, float val)  // aux
+void CPHElement::applyImpulse(const Fvector& dir, float val) // aux
 {
     applyForce(dir.x * val / fixed_step, dir.y * val / fixed_step, dir.z * val / fixed_step);
 }

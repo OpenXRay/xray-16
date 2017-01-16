@@ -14,7 +14,7 @@ void XRCORE_API set_add_profile_portion(add_profile_portion_callback callback);
 #define CONCATENIZE(a, b) CONCATENIZE_HELPER(a, b)
 #define MUTEX_PROFILE_PREFIX_ID #mutexes /
 #define MUTEX_PROFILE_ID(a) STRINGIZER(CONCATENIZE(MUTEX_PROFILE_PREFIX_ID, a))
-#endif  // CONFIG_PROFILE_LOCKS
+#endif // CONFIG_PROFILE_LOCKS
 
 class XRCORE_API Lock
 {

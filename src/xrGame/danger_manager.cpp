@@ -159,42 +159,42 @@ float CDangerManager::do_evaluate(const CDangerObject& object) const
     switch (object.type())
     {
     case CDangerObject::eDangerTypeBulletRicochet:
-    {  // I perceived bullet(knife) ricochet
+    { // I perceived bullet(knife) ricochet
         result += 3000.f;
         break;
     }
     case CDangerObject::eDangerTypeAttackSound:
-    {  // someone is shooting
+    { // someone is shooting
         result += 2500.f;
         break;
     }
     case CDangerObject::eDangerTypeEntityAttacked:
-    {  // someone is hit
+    { // someone is hit
         result += 2000.f;
         break;
     }
     case CDangerObject::eDangerTypeEntityDeath:
-    {  // someone becomes dead
+    { // someone becomes dead
         result += 3000.f;
         break;
     }
     case CDangerObject::eDangerTypeFreshEntityCorpse:
-    {  // I see a corpse
+    { // I see a corpse
         result += 2250.f;
         break;
     }
     case CDangerObject::eDangerTypeAttacked:
-    {  // someone is attacked
+    { // someone is attacked
         result += 2000.f;
         break;
     }
     case CDangerObject::eDangerTypeGrenade:
-    {  // grenade to explode nearby
+    { // grenade to explode nearby
         result += 1000.f;
         break;
     }
     case CDangerObject::eDangerTypeEnemySound:
-    {  // grenade to explode nearby
+    { // grenade to explode nearby
         result += 1000.f;
         break;
     }
@@ -277,7 +277,7 @@ void CDangerManager::add(const CHitObject& object)
 
 void CDangerManager::add(const CDangerObject& object)
 {
-    if (m_object->memory().enemy().selected() && object.object())  // && !object.object()->g_Alive())
+    if (m_object->memory().enemy().selected() && object.object()) // && !object.object()->g_Alive())
         ignore(object.object());
 
     if (!is_useful(object)) return;

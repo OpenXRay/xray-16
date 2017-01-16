@@ -38,7 +38,7 @@ typedef enum {
 typedef void (*GSTaskExecuteFunc)(void* theTaskData);
 typedef void (*GSTaskCallbackFunc)(void* theTaskData, GSTaskResult theResult);
 typedef void (*GSTaskCancelFunc)(void* theTaskData);
-typedef gsi_bool (*GSTaskCleanupFunc)(void* theTaskData);  // post run cleanup
+typedef gsi_bool (*GSTaskCleanupFunc)(void* theTaskData); // post run cleanup
 typedef GSTaskResult (*GSTaskThinkFunc)(void* theTaskData);
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -57,7 +57,7 @@ typedef struct
     gsi_i32 mIsStarted;
     gsi_i32 mIsRunning;
     gsi_i32 mIsCanceled;
-    gsi_i32 mIsCallbackPending;  // does the task require a callback?
+    gsi_i32 mIsCallbackPending; // does the task require a callback?
 
     // delegates
     void* mTaskData;
@@ -74,9 +74,9 @@ typedef struct
 {
     gsi_u32 mRefCount;
 
-    gsi_bool volatile mIsStaticInitComplete;  // once per application init
-    gsi_bool volatile mIsInitialized;         // gsi_true when ready to use
-    gsi_bool volatile mIsShuttingDown;        // gsi_true when shutting down
+    gsi_bool volatile mIsStaticInitComplete; // once per application init
+    gsi_bool volatile mIsInitialized;        // gsi_true when ready to use
+    gsi_bool volatile mIsShuttingDown;       // gsi_true when shutting down
 
     GSICriticalSection mQueueCrit;
 #ifdef GSICORE_DYNAMIC_TASK_LIST
@@ -108,4 +108,4 @@ GSTask* gsiCoreCreateTask(void);
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
-#endif  // __CORE_H__
+#endif // __CORE_H__

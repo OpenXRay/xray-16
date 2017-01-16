@@ -76,4 +76,4 @@ u32 const player_multichampion::get_u32_param()
     return 0;
 }
 
-}  // namespace award_system
+} // namespace award_system

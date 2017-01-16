@@ -117,7 +117,7 @@ BOOL CSE_ALifeInventoryItem::Net_Relevant()
 #endif
 
     if (!prev_freezed) {
-        prev_freezed = true;  // i.e. freezed
+        prev_freezed = true; // i.e. freezed
         return TRUE;
     }
 
@@ -174,7 +174,7 @@ void CSE_ALifeInventoryItem::UPDATE_Write(NET_Packet& tNetPacket)
             tNetPacket.w_float(State.linear_vel.z);
         }
     }
-    tNetPacket.w_u8(1);  // not freezed - doesn't mean anything...
+    tNetPacket.w_u8(1); // not freezed - doesn't mean anything...
 };
 
 void CSE_ALifeInventoryItem::UPDATE_Read(NET_Packet& tNetPacket)
@@ -206,7 +206,7 @@ void CSE_ALifeInventoryItem::UPDATE_Read(NET_Packet& tNetPacket)
         tNetPacket.r_vec3(State.torque);
 
         tNetPacket.r_vec3(State.position);
-        base()->o_Position.set(State.position);  // this is very important because many functions use this o_Position..
+        base()->o_Position.set(State.position); // this is very important because many functions use this o_Position..
 
         tNetPacket.r_float(State.quaternion.x);
         tNetPacket.r_float(State.quaternion.y);
@@ -237,7 +237,7 @@ void CSE_ALifeInventoryItem::UPDATE_Read(NET_Packet& tNetPacket)
         }*/
     }
     prev_freezed = freezed;
-    if (tNetPacket.r_eof())  // in case spawn + update
+    if (tNetPacket.r_eof()) // in case spawn + update
     {
         freezed = false;
         return;
@@ -268,7 +268,7 @@ void CSE_ALifeInventoryItem::FillProps(LPCSTR pref, PropItemVec& values)
     PHelper().CreateFlag32(values, PrepareKey(pref, *base()->s_name, "ALife\\Visible for AI"), &alife_object->m_flags,
         CSE_ALifeObject::flVisibleForAI);
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
 bool CSE_ALifeInventoryItem::bfUseful()
 {
@@ -348,7 +348,7 @@ void CSE_ALifeItem::UPDATE_Write(NET_Packet& tNetPacket)
 
 #ifdef XRGAME_EXPORTS
     m_last_update_time = Device.dwTimeGlobal;
-#endif  // XRGAME_EXPORTS
+#endif // XRGAME_EXPORTS
 };
 
 void CSE_ALifeItem::UPDATE_Read(NET_Packet& tNetPacket)
@@ -365,7 +365,7 @@ void CSE_ALifeItem::FillProps(LPCSTR pref, PropItemVec& values)
     inherited1::FillProps(pref, values);
     inherited2::FillProps(pref, values);
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
 BOOL CSE_ALifeItem::Net_Relevant()
 {
@@ -380,7 +380,7 @@ BOOL CSE_ALifeItem::Net_Relevant()
 #ifdef XRGAME_EXPORTS
 //	if (Device.dwTimeGlobal < (m_last_update_time + update_rate()))
 //		return					(FALSE);
-#endif  // XRGAME_EXPORTS
+#endif // XRGAME_EXPORTS
 
     return (FALSE);
 }
@@ -451,7 +451,7 @@ void CSE_ALifeItemTorch::FillProps(LPCSTR pref, PropItemVec& values)
 {
     inherited::FillProps(pref, values);
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifeItemWeapon
@@ -626,7 +626,7 @@ void CSE_ALifeItemWeapon::FillProps(LPCSTR pref, PropItemVec& items)
         PHelper().CreateFlag8(
             items, PrepareKey(pref, *s_name, "Addons\\Podstvolnik"), &m_addon_flags, eWeaponAddonGrenadeLauncher);
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifeItemWeaponShotGun
@@ -675,7 +675,7 @@ void CSE_ALifeItemWeaponShotGun::FillProps(LPCSTR pref, PropItemVec& items)
 {
     inherited::FillProps(pref, items);
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifeItemWeaponAutoShotGun
 ////////////////////////////////////////////////////////////////////////////
@@ -708,7 +708,7 @@ void CSE_ALifeItemWeaponAutoShotGun::FillProps(LPCSTR pref, PropItemVec& items)
 {
     inherited::FillProps(pref, items);
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifeItemWeaponMagazined
 ////////////////////////////////////////////////////////////////////////////
@@ -747,7 +747,7 @@ void CSE_ALifeItemWeaponMagazined::FillProps(LPCSTR pref, PropItemVec& items)
 {
     inherited::FillProps(pref, items);
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifeItemWeaponMagazinedWGL
@@ -786,7 +786,7 @@ void CSE_ALifeItemWeaponMagazinedWGL::FillProps(LPCSTR pref, PropItemVec& items)
 {
     inherited::FillProps(pref, items);
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifeItemAmmo
@@ -834,7 +834,7 @@ void CSE_ALifeItemAmmo::FillProps(LPCSTR pref, PropItemVec& values)
     inherited::FillProps(pref, values);
     PHelper().CreateU16(values, PrepareKey(pref, *s_name, "Ammo: left"), &a_elapsed, 0, m_boxSize, m_boxSize);
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
 bool CSE_ALifeItemAmmo::can_switch_online() const
 {
@@ -888,7 +888,7 @@ void CSE_ALifeItemDetector::FillProps(LPCSTR pref, PropItemVec& items)
 {
     inherited::FillProps(pref, items);
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifeItemDetector
@@ -928,7 +928,7 @@ void CSE_ALifeItemArtefact::FillProps(LPCSTR pref, PropItemVec& items)
     inherited::FillProps(pref, items);
     PHelper().CreateFloat(items, PrepareKey(pref, *s_name, "Anomaly value:"), &m_fAnomalyValue, 0.f, 200.f);
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
 BOOL CSE_ALifeItemArtefact::Net_Relevant()
 {
@@ -1003,7 +1003,7 @@ void CSE_ALifeItemPDA::FillProps(LPCSTR pref, PropItemVec& items)
 {
     inherited::FillProps(pref, items);
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifeItemDocument
@@ -1053,7 +1053,7 @@ void CSE_ALifeItemDocument::FillProps(LPCSTR pref, PropItemVec& items)
     //	PHelper().CreateU16			(items, PrepareKey(pref, *s_name, "Document index :"), &m_wDocIndex, 0, 65535);
     PHelper().CreateRText(items, PrepareKey(pref, *s_name, "Info portion :"), &m_wDoc);
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifeItemGrenade
@@ -1098,7 +1098,7 @@ void CSE_ALifeItemGrenade::FillProps(LPCSTR pref, PropItemVec& items)
 {
     inherited::FillProps(pref, items);
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifeItemExplosive
@@ -1136,7 +1136,7 @@ void CSE_ALifeItemExplosive::FillProps(LPCSTR pref, PropItemVec& items)
 {
     inherited::FillProps(pref, items);
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifeItemBolt
@@ -1180,7 +1180,7 @@ void CSE_ALifeItemBolt::UPDATE_Read(NET_Packet& tNetPacket)
 
 bool CSE_ALifeItemBolt::can_save() const
 {
-    return (false);  //! attached());
+    return (false); //! attached());
 }
 bool CSE_ALifeItemBolt::used_ai_locations() const
 {
@@ -1192,7 +1192,7 @@ void CSE_ALifeItemBolt::FillProps(LPCSTR pref, PropItemVec& values)
 {
     inherited::FillProps(pref, values);
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifeItemCustomOutfit
@@ -1238,7 +1238,7 @@ void CSE_ALifeItemCustomOutfit::FillProps(LPCSTR pref, PropItemVec& items)
 {
     inherited::FillProps(pref, items);
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
 BOOL CSE_ALifeItemCustomOutfit::Net_Relevant()
 {
@@ -1283,7 +1283,7 @@ void CSE_ALifeItemHelmet::FillProps(LPCSTR pref, PropItemVec& items)
 {
     inherited::FillProps(pref, items);
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
 BOOL CSE_ALifeItemHelmet::Net_Relevant()
 {

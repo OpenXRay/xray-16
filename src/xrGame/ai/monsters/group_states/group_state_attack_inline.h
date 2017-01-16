@@ -339,8 +339,8 @@ void CStateGroupAttackAbstract::setup_substates()
         data.vertex = 0;
         data.point = object->EnemyMan.get_enemy()->Position();
         data.action.action = ACT_RUN;
-        data.action.time_out = 0;                        // do not use time out
-        data.completion_dist = 15.f + m_delta_distance;  // get exactly to the point
+        data.action.time_out = 0;                       // do not use time out
+        data.completion_dist = 15.f + m_delta_distance; // get exactly to the point
         data.time_to_rebuild = object->get_attack_rebuild_time();
         data.accelerated = true;
         data.braking = false;
@@ -359,8 +359,8 @@ void CStateGroupAttackAbstract::setup_substates()
         data.vertex = 0;
         data.point = object->EnemyMan.get_enemy()->Position();
         data.action.action = ACT_WALK_FWD;
-        data.action.time_out = 0;                        // do not use time out
-        data.completion_dist = 10.f + m_delta_distance;  // get exactly to the point
+        data.action.time_out = 0;                       // do not use time out
+        data.completion_dist = 10.f + m_delta_distance; // get exactly to the point
         data.time_to_rebuild = object->get_attack_rebuild_time();
         data.accelerated = true;
         data.braking = false;
@@ -379,14 +379,14 @@ void CStateGroupAttackAbstract::setup_substates()
         data.vertex = 0;
         data.point = object->EnemyMan.get_enemy()->Position();
         data.action.action = ACT_HOME_WALK_GROWL;
-        data.action.time_out = 0;  // do not use time out
+        data.action.time_out = 0; // do not use time out
 
         if (m_drive_out) {
-            data.completion_dist = 1.f;  // get exactly to the point
+            data.completion_dist = 1.f; // get exactly to the point
         }
         else
         {
-            data.completion_dist = 6.f + m_delta_distance;  // get exactly to the point
+            data.completion_dist = 6.f + m_delta_distance; // get exactly to the point
         }
         data.time_to_rebuild = object->get_attack_rebuild_time();
         data.accelerated = true;

@@ -337,7 +337,7 @@ void LevelGraphDebugRender::DrawGameGraph()
     Fvector center = {0.f, 5.f, 0.f};
     Fvector bounds = {3.f, 0.f, 3.f};
 // draw back plane
-#if 0  // XXX: disabled in original, reenable?
+#if 0 // XXX: disabled in original, reenable?
     Fvector vertices[4];
 	xform.transform_tiny(vertices[0], {center.x-bounds.x, center.y+bounds.y, center.z+bounds.z});
 	xform.transform_tiny(vertices[1], {center.x+bounds.x, center.y+bounds.y, center.z+bounds.z});
@@ -365,7 +365,7 @@ void LevelGraphDebugRender::DrawGameGraph()
         if (psAI_Flags.test(aiDrawGameGraphStalkers)) DrawStalkers(i);
         if (psAI_Flags.test(aiDrawGameGraphObjects)) DrawObjects(i);
     }
-#if 0  // XXX: update/delete
+#if 0 // XXX: update/delete
     for (int i = 0; i<(int)ai().game_graph().header().vertex_count(); i++)
     {
         Fvector t1 = ai().game_graph().vertex(i)->game_point();
@@ -620,10 +620,10 @@ void LevelGraphDebugRender::DrawNodes()
                 result.mad(result, pl.n, tt);
                 return result;
             };
-            Fvector v1 = createVertex(PL, {vertexPos.x - st, vertexPos.y, vertexPos.z - st});  // minX, minZ
-            Fvector v2 = createVertex(PL, {vertexPos.x + st, vertexPos.y, vertexPos.z - st});  // maxX, minZ
-            Fvector v3 = createVertex(PL, {vertexPos.x + st, vertexPos.y, vertexPos.z + st});  // maxX, maxZ
-            Fvector v4 = createVertex(PL, {vertexPos.x - st, vertexPos.y, vertexPos.z + st});  // minX, maxZ
+            Fvector v1 = createVertex(PL, {vertexPos.x - st, vertexPos.y, vertexPos.z - st}); // minX, minZ
+            Fvector v2 = createVertex(PL, {vertexPos.x + st, vertexPos.y, vertexPos.z - st}); // maxX, minZ
+            Fvector v3 = createVertex(PL, {vertexPos.x + st, vertexPos.y, vertexPos.z + st}); // maxX, maxZ
+            Fvector v4 = createVertex(PL, {vertexPos.x - st, vertexPos.y, vertexPos.z + st}); // minX, maxZ
             // render quad
             GlobalEnv.DRender->dbg_DrawTRI(Fidentity, v3, v2, v1, colorT);
             GlobalEnv.DRender->dbg_DrawTRI(Fidentity, v1, v4, v3, colorT);
@@ -819,4 +819,4 @@ void LevelGraphDebugRender::DrawDebugNode()
     }
 }
 
-#endif  // DEBUG
+#endif // DEBUG

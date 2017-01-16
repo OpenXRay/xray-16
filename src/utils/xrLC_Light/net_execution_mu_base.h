@@ -33,4 +33,4 @@ struct add_global<et_mu_base_light, gl_base_cl_data>
 // execution_lightmaps
 };
 
-#endif  // #ifndef NET_EXECUTION_MU_BASE_H_INCLUDED
+#endif // #ifndef NET_EXECUTION_MU_BASE_H_INCLUDED

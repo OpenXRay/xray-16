@@ -90,7 +90,7 @@ bool ip_filter::is_ip_present(u32 ip_address)
 
 void ip_filter::unload()
 {
-    for (subnets_coll_t::iterator i = m_all_subnets.begin(),  // delete_data(m_all_subnets);
+    for (subnets_coll_t::iterator i = m_all_subnets.begin(), // delete_data(m_all_subnets);
          ie = m_all_subnets.end();
          i != ie; ++i)
     {

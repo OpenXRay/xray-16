@@ -63,4 +63,4 @@ void split_received_to_buffers(u8* data_ptr, u32 data_size, buffer_vector<const_
     }
 }
 
-};  // namespace file_transfer
+}; // namespace file_transfer

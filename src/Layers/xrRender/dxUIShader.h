@@ -22,4 +22,4 @@ private:
     ref_shader hShader;
 };
 
-#endif  //	dxUIShader_included
+#endif //	dxUIShader_included

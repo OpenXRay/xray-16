@@ -61,7 +61,7 @@ void CRender::Calculate()
         ISpatial* spatial = lstRenderables[_it];
         spatial->spatial_updatesector();
         CSector* sector = (CSector*)spatial->GetSpatialData().sector;
-        if (0 == sector) continue;  // disassociated from S/P structure
+        if (0 == sector) continue; // disassociated from S/P structure
 
         VERIFY(spatial->GetSpatialData().type & STYPE_LIGHTSOURCE);
         // lightsource

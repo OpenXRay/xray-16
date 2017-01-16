@@ -6,7 +6,7 @@
 
 // ToDo: Move this to PS3 implemenation
 HOSTENT* getlocalhost(void)
-{  // Global storage
+{ // Global storage
 
 #define MAX_IPS 10
     static HOSTENT localhost;

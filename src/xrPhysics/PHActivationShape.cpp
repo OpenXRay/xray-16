@@ -15,7 +15,7 @@
 
 #ifdef DEBUG
 #include "debug_output.h"
-#endif  // DEBUG
+#endif // DEBUG
 
 #include "PHDynamicData.h"
 #include "xrServerEntities/PHSynchronize.h"

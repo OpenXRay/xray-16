@@ -8,7 +8,7 @@
 
 #pragma once
 
-#define OUT_MESSAGE(s1, s2)  // Msg(s1,s2);
+#define OUT_MESSAGE(s1, s2) // Msg(s1,s2);
 
 class CEntityAlive;
 class CSE_ALifeObject;

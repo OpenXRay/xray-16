@@ -56,7 +56,7 @@ void CLevel::remove_objects()
             Objects.Update(false);
 #ifdef DEBUG
             Msg("Update objects list...");
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
             Objects.dump_all_objects();
         }
 
@@ -90,7 +90,7 @@ void CLevel::remove_objects()
 #ifdef DEBUG
     if (!g_dedicated_server)
         if (!client_spawn_manager().registry().empty()) client_spawn_manager().dump();
-#endif  // DEBUG
+#endif // DEBUG
     if (!g_dedicated_server) {
         VERIFY(client_spawn_manager().registry().empty());
         client_spawn_manager().clear();
@@ -105,7 +105,7 @@ void CLevel::remove_objects()
 
 #ifdef DEBUG
 extern void show_animation_stats();
-#endif  // DEBUG
+#endif // DEBUG
 
 extern CUISequencer* g_tutorial;
 extern CUISequencer* g_tutorial2;
@@ -128,10 +128,10 @@ void CLevel::net_Stop()
 
     if (m_file_transfer) xr_delete(m_file_transfer);
 
-    if (IsDemoPlay() && m_current_spectator)  // destroying demo spectator ...
+    if (IsDemoPlay() && m_current_spectator) // destroying demo spectator ...
     {
         m_current_spectator->setDestroy(TRUE);
-        SetControlEntity(NULL);  // m_current_spectator == CurrentControlEntity()
+        SetControlEntity(NULL); // m_current_spectator == CurrentControlEntity()
         m_current_spectator = NULL;
     }
     else if (IsDemoSave() && !IsDemoInfoSaved())
@@ -154,7 +154,7 @@ void CLevel::net_Stop()
 
 #ifdef DEBUG
     show_animation_stats();
-#endif  // DEBUG
+#endif // DEBUG
 }
 
 void CLevel::ClientSend()
@@ -175,7 +175,7 @@ void CLevel::ClientSend()
                 P.w_begin(M_CL_UPDATE);
 
                 P.w_u16(u16(pObj->ID()));
-                P.w_u32(0);  // reserved place for client's ping
+                P.w_u32(0); // reserved place for client's ping
 
                 pObj->net_Export(P);
 
@@ -309,7 +309,7 @@ struct _NetworkProcessor : public pureFrame
 
 pureFrame* g_pNetProcessor = &NET_processor;
 
-const int ConnectionTimeOut = 60000;  // 1 min
+const int ConnectionTimeOut = 60000; // 1 min
 
 bool CLevel::Connect2Server(const char* options)
 {
@@ -396,7 +396,7 @@ void CLevel::OnBuildVersionChallenge()
     Msg("* Sending auth value ...");
 #else
     u64 auth = FS.auth_get();
-#endif  //#ifdef DEBUG
+#endif //#ifdef DEBUG
     P.w_u64(auth);
     SecureSend(P, net_flags(TRUE, TRUE, TRUE, TRUE));
 };
@@ -416,23 +416,23 @@ void CLevel::OnConnectResult(NET_Packet* P)
         m_bConnectResult = false;
         switch (res1)
         {
-        case ecr_data_verification_failed:  // Standart error
+        case ecr_data_verification_failed: // Standart error
         {
             if (strstr(ResultStr, "Data verification failed. Cheater?"))
                 MainMenu()->SetErrorDialog(CMainMenu::ErrDifferentVersion);
         }
         break;
-        case ecr_cdkey_validation_failed:  // GameSpy CDKey
+        case ecr_cdkey_validation_failed: // GameSpy CDKey
         {
             if (!xr_strcmp(ResultStr, "Invalid CD Key"))
-                MainMenu()->SetErrorDialog(CMainMenu::ErrCDKeyInvalid);  //, ResultStr);
+                MainMenu()->SetErrorDialog(CMainMenu::ErrCDKeyInvalid); //, ResultStr);
             if (!xr_strcmp(ResultStr, "CD Key in use"))
-                MainMenu()->SetErrorDialog(CMainMenu::ErrCDKeyInUse);  //, ResultStr);
+                MainMenu()->SetErrorDialog(CMainMenu::ErrCDKeyInUse); //, ResultStr);
             if (!xr_strcmp(ResultStr, "Your CD Key is disabled. Contact customer service."))
-                MainMenu()->SetErrorDialog(CMainMenu::ErrCDKeyDisabled);  //, ResultStr);
+                MainMenu()->SetErrorDialog(CMainMenu::ErrCDKeyDisabled); //, ResultStr);
         }
         break;
-        case ecr_password_verification_failed:  // login+password
+        case ecr_password_verification_failed: // login+password
         {
             MainMenu()->SetErrorDialog(CMainMenu::ErrInvalidPassword);
         }
@@ -462,7 +462,7 @@ void CLevel::OnConnectResult(NET_Packet* P)
     };
     m_sConnectResult = ResultStr;
     if (IsDemoSave() && result) {
-        P->r_u8();  // server client or not
+        P->r_u8(); // server client or not
         shared_str server_options;
         P->r_stringZ(server_options);
         StartSaveDemo(server_options);

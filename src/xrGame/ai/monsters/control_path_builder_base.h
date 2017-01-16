@@ -56,13 +56,13 @@ class CControlPathBuilderBase : public CControl_ComBase
         IC void set_position(const Fvector& p) { _position.set(p); }
     } m_target_set, m_target_found;
 
-    u32 m_time;  // время перестроения пути
+    u32 m_time; // время перестроения пути
     u32 m_last_time_target_set;
     float m_distance_to_path_end;
     bool m_failed;
     u32 m_last_time_dir_set;
 
-    bool m_target_actual;  // устанавливаемый таргет соответствует предыдущему
+    bool m_target_actual; // устанавливаемый таргет соответствует предыдущему
 
     struct
     {
@@ -162,9 +162,9 @@ private:
     void find_target_point_set();
     void find_target_point_failed();
 
-    void select_target();  // выбрать
+    void select_target(); // выбрать
 
-    void set_path_builder_params();  // set params to control
+    void set_path_builder_params(); // set params to control
 
     void reset();
 

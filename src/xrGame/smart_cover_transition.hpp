@@ -12,7 +12,7 @@
 namespace MonsterSpace
 {
 enum EBodyState;
-};  // namespace MonsterSpace
+}; // namespace MonsterSpace
 
 namespace smart_cover
 {
@@ -41,7 +41,7 @@ private:
     void load_animations(luabind::object const& table);
 };
 
-}  // namespace transitions
-}  // namespace smart_cover
+} // namespace transitions
+} // namespace smart_cover
 
-#endif  // SMART_COVER_TRANSITION_HPP_INCLUDED
+#endif // SMART_COVER_TRANSITION_HPP_INCLUDED

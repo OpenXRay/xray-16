@@ -30,10 +30,10 @@ float color_intensity(Fcolor& c)
 class base_color
 {
 public:
-    Fvector rgb;  // - all static lighting
-    float hemi;   // - hemisphere
-    float sun;    // - sun
-    float _tmp_;  // ???
+    Fvector rgb; // - all static lighting
+    float hemi;  // - hemisphere
+    float sun;   // - sun
+    float _tmp_; // ???
     base_color()
     {
         rgb.set(0, 0, 0);
@@ -118,7 +118,7 @@ IC bool RayPick(CDB::COLLIDER& DB, Fvector& P, Fvector& D, float r, R_Light& L)
     }
 }
 
-float getLastRP_Scale(CDB::COLLIDER* DB, R_Light& L)  //, Face* skip)
+float getLastRP_Scale(CDB::COLLIDER* DB, R_Light& L) //, Face* skip)
 {
     u32 tris_count = DB->r_count();
     float scale = 1.f;
@@ -140,8 +140,9 @@ float getLastRP_Scale(CDB::COLLIDER* DB, R_Light& L)  //, Face* skip)
 
             const Shader_xrLC& SH = shader(F.dwMaterial, *(gl_data.g_shaders_xrlc), gl_data.g_materials);
             //			Shader_xrLCVec&	LIB = 		gl_data.g_shaders_xrlc->Library	();
-            //			if (M.shader_xrlc>=LIB.size()) return		0;		//. hack - vy gonite rebyata - eto ne hack - eto
-            //sledy zamesti - shader_xrlc - index ne togo masiva !!
+            //			if (M.shader_xrlc>=LIB.size()) return		0;		//. hack - vy gonite rebyata - eto ne hack -
+            //eto
+            // sledy zamesti - shader_xrlc - index ne togo masiva !!
             //			Shader_xrLC& SH	= LIB						[M.shader_xrlc];
 
             if (!SH.flags.bLIGHT_CastShadow) continue;
@@ -192,7 +193,7 @@ float getLastRP_Scale(CDB::COLLIDER* DB, R_Light& L)  //, Face* skip)
     return scale;
 }
 
-float rayTrace(CDB::COLLIDER* DB, R_Light& L, Fvector& P, Fvector& D, float R)  //, Face* skip)
+float rayTrace(CDB::COLLIDER* DB, R_Light& L, Fvector& P, Fvector& D, float R) //, Face* skip)
 {
     R_ASSERT(DB);
 
@@ -212,7 +213,7 @@ float rayTrace(CDB::COLLIDER* DB, R_Light& L, Fvector& P, Fvector& D, float R)  
     }
     else
     {
-        return getLastRP_Scale(DB, L);  //,skip);
+        return getLastRP_Scale(DB, L); //,skip);
     }
     return 0;
 }

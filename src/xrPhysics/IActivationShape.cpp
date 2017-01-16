@@ -7,7 +7,7 @@
 void ActivateShapeExplosive(IPhysicsShellHolder* self_obj, const Fvector& size, Fvector& out_size, Fvector& in_out_pos)
 {
     //////////////
-    CPHActivationShape activation_shape;  // Fvector start_box;m_PhysicMovementControl.Box().getsize(start_box);
+    CPHActivationShape activation_shape; // Fvector start_box;m_PhysicMovementControl.Box().getsize(start_box);
     activation_shape.Create(in_out_pos, size, self_obj);
 
     CPHCollideValidator::SetCharacterClassNotCollide(activation_shape);
@@ -44,7 +44,7 @@ void ActivateShapePhysShellHolder(
         Msg("Visual: %s", obj->ObjectNameVisual());
         // Msg("Object	pos	%f,%f,%f",Position().x,Position().y,Position().z);
     }
-#endif  // DEBUG
+#endif // DEBUG
 }
 
 bool ActivateShapeCharacterPhysicsSupport(Fvector& out_pos, const Fvector& vbox, const Fvector& activation_pos,

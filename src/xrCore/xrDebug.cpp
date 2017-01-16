@@ -5,7 +5,7 @@
 #include "os_clipboard.h"
 #include "xrDebug.h"
 #pragma warning(push)
-#pragma warning(disable : 4091)  // 'typedef ': ignored on left of '' when no variable is declared
+#pragma warning(disable : 4091) // 'typedef ': ignored on left of '' when no variable is declared
 #include "Debug/MiniDump.h"
 #include "Debug/StackTrace.h"
 #pragma warning(pop)
@@ -34,9 +34,9 @@ static BOOL bException = FALSE;
 #pragma comment(lib, "BugTrap.lib")
 #endif
 
-#include <errorrep.h>  // ReportFault
-#include <new.h>       // for _set_new_mode
-#include <signal.h>    // for signals
+#include <errorrep.h> // ReportFault
+#include <new.h>      // for _set_new_mode
+#include <signal.h>   // for signals
 #pragma comment(lib, "FaultRep.lib")
 
 #ifdef DEBUG
@@ -152,19 +152,19 @@ void xrDebug::GatherInfo(char* assertionInfo, const ErrorLocation& loc, const ch
 #ifdef USE_MEMORY_MONITOR
     memory_monitor::flush_each_time(true);
     memory_monitor::flush_each_time(false);
-#endif  // USE_MEMORY_MONITOR
+#endif // USE_MEMORY_MONITOR
     if (IsDebuggerPresent() || !strstr(GetCommandLine(), "-no_call_stack_assert")) return;
     if (shared_str_initialized) Log("stack trace:\n");
 #ifdef USE_OWN_ERROR_MESSAGE_WINDOW
     buffer += sprintf(buffer, "stack trace:\n\n");
-#endif  // USE_OWN_ERROR_MESSAGE_WINDOW
+#endif // USE_OWN_ERROR_MESSAGE_WINDOW
     BuildStackTrace(StackTrace.Frames, StackTrace.Capacity, StackTrace.LineCapacity);
     for (size_t i = 2; i < StackTrace.Count; i++)
     {
         if (shared_str_initialized) Log(StackTrace[i]);
 #ifdef USE_OWN_ERROR_MESSAGE_WINDOW
         buffer += sprintf(buffer, "%s\n", StackTrace[i]);
-#endif  // USE_OWN_ERROR_MESSAGE_WINDOW
+#endif // USE_OWN_ERROR_MESSAGE_WINDOW
     }
     if (shared_str_initialized) FlushLog();
     os_clipboard::copy_to_clipboard(assertionInfo);
@@ -231,7 +231,7 @@ void xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* exp
             break;
         default: DEBUG_BREAK;
         }
-#else  // !USE_OWN_ERROR_MESSAGE_WINDOW
+#else // !USE_OWN_ERROR_MESSAGE_WINDOW
 #ifdef USE_BUG_TRAP
         BT_SetUserMessage(assertionInfo);
 #endif
@@ -334,15 +334,15 @@ void xrDebug::SetupExceptionHandler(const bool& dedicated)
     BT_SetReportFormat(BTRF_TEXT);
     BT_SetFlags(BTF_DETAILEDMODE | BTF_ATTACHREPORT);
 #ifdef MASTER_GOLD
-#ifdef _EDITOR  // MASTER_GOLD && EDITOR
+#ifdef _EDITOR // MASTER_GOLD && EDITOR
     auto minidumpFlags = !dedicated ? MiniDumpNoDump : MiniDumpWithDataSegs;
-#else  // MASTER_GOLD && !EDITOR
+#else // MASTER_GOLD && !EDITOR
     auto minidumpFlags = !dedicated ? MiniDumpNoDump : MiniDumpWithDataSegs | MiniDumpWithIndirectlyReferencedMemory;
 #endif
 #else
-#ifdef EDITOR  // !MASTER_GOLD && EDITOR
+#ifdef EDITOR // !MASTER_GOLD && EDITOR
     auto minidumpFlags = MiniDumpWithDataSegs;
-#else  // !MASTER_GOLD && !EDITOR
+#else // !MASTER_GOLD && !EDITOR
     auto minidumpFlags = MiniDumpWithDataSegs | MiniDumpWithIndirectlyReferencedMemory;
 #endif
 #endif
@@ -350,7 +350,7 @@ void xrDebug::SetupExceptionHandler(const bool& dedicated)
     // XXX nitrocaster: use some other email?
     BT_SetSupportEMail("cop-crash-report@stalker-game.com");
 }
-#endif  // USE_BUG_TRAP
+#endif // USE_BUG_TRAP
 
 #ifdef USE_OWN_MINI_DUMP
 void xrDebug::SaveMiniDump(EXCEPTION_POINTERS* exPtrs)
@@ -446,7 +446,7 @@ void _terminate()
     MessageBox(GetTopWindow(NULL), assertionInfo, "Fatal Error", MB_OK | MB_ICONERROR | MB_SYSTEMMODAL);
     exit(-1);
 }
-#endif  // USE_BUG_TRAP
+#endif // USE_BUG_TRAP
 
 static void handler_base(const char* reason)
 {
@@ -530,7 +530,7 @@ void xrDebug::OnThreadSpawn()
     _set_new_mode(1);
     _set_new_handler(&out_of_memory_handler);
     _set_purecall_handler(&pure_call_handler);
-#if 0  // should be if we use exceptions
+#if 0 // should be if we use exceptions
     std::set_unexpected(_terminate);
 #endif
 }

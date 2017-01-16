@@ -11,13 +11,13 @@
 
 #ifdef _DEBUG
 #include <dinput.h>
-#include "xrAICore/Navigation/ai_object_location.h"
-#include "level_debug.h"
-#include "xrAICore/Navigation/level_graph.h"
 #include "ai_space.h"
 #include "alife_simulator.h"
-#include "xrServerEntities/xrServer_Object_Base.h"
+#include "level_debug.h"
+#include "xrAICore/Navigation/ai_object_location.h"
+#include "xrAICore/Navigation/level_graph.h"
 #include "xrServer.h"
+#include "xrServerEntities/xrServer_Object_Base.h"
 #endif
 
 CAI_PseudoDog::CAI_PseudoDog()

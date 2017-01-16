@@ -228,7 +228,7 @@ void CUIScrollView::Draw()
             Frect item_rect;
             (*it)->GetAbsoluteRect(item_rect);
             if (visible_rect.intersected(item_rect)) {
-                if (m_visible_rgn.x == -1)  // first visible
+                if (m_visible_rgn.x == -1) // first visible
                     m_visible_rgn.x = idx;
 
                 m_visible_rgn.y = idx;

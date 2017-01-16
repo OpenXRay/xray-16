@@ -39,7 +39,7 @@ public:
         m_bUseTextColor[state] = true;
     }
     u32 m_dwTextColor[4];
-    bool m_bUseTextColor[4];  // note: 0 index will be ignored
+    bool m_bUseTextColor[4]; // note: 0 index will be ignored
 
     bool m_frameline_mode;
     bool vertical;
@@ -53,4 +53,4 @@ private:
     ref_sound m_sound_h;
     ref_sound m_sound_t;
 
-};  // class CUI3tButton
+}; // class CUI3tButton

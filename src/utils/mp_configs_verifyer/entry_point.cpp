@@ -73,7 +73,7 @@ void create_unpack_name(string_path& dst_src_path)
     xr_strcat(dst_src_path, ".ltx");
 };
 
-static u32 const max_uncompressed_size = 0x100000;  // 1 Mb
+static u32 const max_uncompressed_size = 0x100000; // 1 Mb
 void unpack_file(LPCSTR file_name)
 {
     mp_anticheat::configs_verifyer tmp_verifyer;
@@ -93,7 +93,7 @@ void unpack_file(LPCSTR file_name)
     }
     create_unpack_name(new_file_name);
 
-    u32 data_size = tmp_reader->length() - sizeof(u32);  // first word is unpacket size ...
+    u32 data_size = tmp_reader->length() - sizeof(u32); // first word is unpacket size ...
     u8* data = static_cast<u8*>(xr_malloc(data_size));
     u32 uncomp_size = tmp_reader->r_u32();
     tmp_reader->r(data, data_size);

@@ -76,7 +76,7 @@ void CActor::detach_Vehicle()
     // if(sh)
     //	sh->Activate();
     car->PPhysicsShell()->SplitterHolderActivate();
-    m_holder->detach_Actor();  //
+    m_holder->detach_Actor(); //
 
     character_physics_support()->movement()->SetPosition(m_holder->ExitPosition());
     character_physics_support()->movement()->SetVelocity(m_holder->ExitVelocity());

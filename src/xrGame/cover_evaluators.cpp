@@ -72,7 +72,7 @@ void CCoverEvaluatorBase::evaluate(CCoverPoint const* cover_point, float weight)
 
 #ifndef MASTER_GOLD
     if (!psAI_Flags.test(aiUseSmartCovers)) return;
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
 
     smart_cover::cover const* tmp = static_cast<smart_cover::cover const*>(cover_point);
     if (tmp->is_combat_cover()) evaluate_smart_cover(tmp, weight);
@@ -224,7 +224,7 @@ void CCoverEvaluatorBest::evaluate_smart_cover(smart_cover::cover const* smart_c
     m_selected = smart_cover;
     m_loophole = best_loophole;
 //	Msg								("Loophole is NULL CCoverEvaluatorBest::evaluate_cover");
-#endif  // #if 1
+#endif // #if 1
 }
 
 //////////////////////////////////////////////////////////////////////////

@@ -103,7 +103,7 @@ typedef enum _GPEnum {
     GP_CONNECTIONSPEED,
     GP_HASNETWORK,
     GP_OSSTRING,
-    GP_AIMNAME,  // PANTS|03.20.01
+    GP_AIMNAME, // PANTS|03.20.01
     GP_PIC,
     GP_OCCUPATIONID,
     GP_INDUSTRYID,
@@ -171,22 +171,22 @@ typedef enum _GPEnum {
     // Transfer callback type.
     // *** the transfer is ended when these types are received
     //////////////////////////
-    GP_TRANSFER_SEND_REQUEST = 0x800,  // arg->num == numFiles
+    GP_TRANSFER_SEND_REQUEST = 0x800, // arg->num == numFiles
     GP_TRANSFER_ACCEPTED,
-    GP_TRANSFER_REJECTED,         // ***
-    GP_TRANSFER_NOT_ACCEPTING,    // ***
-    GP_TRANSFER_NO_CONNECTION,    // ***
-    GP_TRANSFER_DONE,             // ***
-    GP_TRANSFER_CANCELLED,        // ***
-    GP_TRANSFER_LOST_CONNECTION,  // ***
-    GP_TRANSFER_ERROR,            // ***
-    GP_TRANSFER_THROTTLE,         // arg->num == Bps
+    GP_TRANSFER_REJECTED,        // ***
+    GP_TRANSFER_NOT_ACCEPTING,   // ***
+    GP_TRANSFER_NO_CONNECTION,   // ***
+    GP_TRANSFER_DONE,            // ***
+    GP_TRANSFER_CANCELLED,       // ***
+    GP_TRANSFER_LOST_CONNECTION, // ***
+    GP_TRANSFER_ERROR,           // ***
+    GP_TRANSFER_THROTTLE,        // arg->num == Bps
     GP_FILE_BEGIN,
-    GP_FILE_PROGRESS,  // arg->num == numBytes
+    GP_FILE_PROGRESS, // arg->num == numBytes
     GP_FILE_END,
     GP_FILE_DIRECTORY,
     GP_FILE_SKIP,
-    GP_FILE_FAILED,  // arg->num == error
+    GP_FILE_FAILED, // arg->num == error
 
     // GP_FILE_FAILED error
     ///////////////////////
@@ -201,14 +201,14 @@ typedef enum _GPEnum {
 
     // UTM send options.
     ////////////////////
-    GP_DONT_ROUTE = 0xB00,  // only send direct
+    GP_DONT_ROUTE = 0xB00, // only send direct
 
     // Quiet mode flags.
     ////////////////////
     GP_SILENCE_NONE = 0x00000000,
     GP_SILENCE_MESSAGES = 0x00000001,
     GP_SILENCE_UTMS = 0x00000002,
-    GP_SILENCE_LIST = 0x00000004,  // includes requests, auths, and revokes
+    GP_SILENCE_LIST = 0x00000004, // includes requests, auths, and revokes
     GP_SILENCE_ALL = 0xFFFFFFFF,
 
     // Flags for checking if newer version of status info is supported
@@ -396,7 +396,7 @@ typedef enum _GPErrorCode {
 // Random number seed for PASSWORDENC and CDKEYENC
 //   MUST MATCH SERVER - If you change this, you'll have to
 //                       release an updated server
-#define GP_XOR_SEED 0x79707367  // "gspy"
+#define GP_XOR_SEED 0x79707367 // "gspy"
 
 // Well known values for partner ID.
 #define GP_PARTNERID_GAMESPY 0
@@ -538,9 +538,9 @@ typedef struct
     int icquin;
     gsi_char zipcode[GP_ZIPCODE_LEN];
     gsi_char countrycode[GP_COUNTRYCODE_LEN];
-    float longitude;               // negative is west, positive is east.  (0, 0) means unknown.
-    float latitude;                // negative is south, positive is north.  (0, 0) means unknown.
-    gsi_char place[GP_PLACE_LEN];  // e.g., "USA|California|Irvine", "South Korea|Seoul", "Turkey"
+    float longitude;              // negative is west, positive is east.  (0, 0) means unknown.
+    float latitude;               // negative is south, positive is north.  (0, 0) means unknown.
+    gsi_char place[GP_PLACE_LEN]; // e.g., "USA|California|Irvine", "South Korea|Seoul", "Turkey"
     int birthday;
     int birthmonth;
     int birthyear;
@@ -676,7 +676,7 @@ typedef struct
 {
     GPResult result;
     gsi_char email[GP_EMAIL_LEN];
-    int numNicks;  // If 0, then the email/password did not match.
+    int numNicks; // If 0, then the email/password did not match.
     gsi_char** nicks;
     gsi_char** uniquenicks;
 } GPGetUserNicksResponseArg;
@@ -705,7 +705,7 @@ typedef struct
 typedef struct
 {
     GPResult result;
-    int productID;  // PANTS|06.06.00 - added by request for JED
+    int productID; // PANTS|06.06.00 - added by request for JED
     int numMatches;
     GPFindPlayerMatch* matches;
 } GPFindPlayersResponseArg;
@@ -833,12 +833,12 @@ extern char GPSearchManagerHostname[64];
 // gpInitialize
 ///////////////
 GPResult gpInitialize(GPConnection* connection,
-    int productID,    // The productID is a unique ID that identifies your product
-    int namespaceID,  // The namespaceID identified which namespace to login under. A namespaceID of 0 indicates that no
-                      // namespace should be used. A namespaceID of 1 represents the default GameSpy namespace
-    int partnerID     // The partnerID identifies the account system being used.
-                      // Use GP_PARTNERID_GAMESPY for GSID accounts.
-                      // Use GP_PARTNERID_IGN for IGN accounts.
+    int productID,   // The productID is a unique ID that identifies your product
+    int namespaceID, // The namespaceID identified which namespace to login under. A namespaceID of 0 indicates that no
+                     // namespace should be used. A namespaceID of 1 represents the default GameSpy namespace
+    int partnerID    // The partnerID identifies the account system being used.
+                     // Use GP_PARTNERID_GAMESPY for GSID accounts.
+                     // Use GP_PARTNERID_IGN for IGN accounts.
     );
 
 // gpDestroy
@@ -1084,7 +1084,7 @@ GPResult gpSendBuddyMessage(GPConnection* connection, GPProfile profile, const g
 // gpSendBuddyUTM
 /////////////////////
 GPResult gpSendBuddyUTM(GPConnection* connection, GPProfile profile, const gsi_char* message,
-    int sendOption  // GP_DONT_ROUTE
+    int sendOption // GP_DONT_ROUTE
     );
 
 // PANTS|02.15.00

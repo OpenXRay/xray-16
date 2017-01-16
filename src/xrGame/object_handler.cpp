@@ -195,14 +195,14 @@ void CObjectHandler::actualize_strap_mode(CWeapon* weapon) const
 
     if (!planner().m_storage.property(ObjectHandlerSpace::eWorldPropertyStrapped)) {
         //		Msg						( "[%6d][%s] actualizing: weapon_strapped = false", Device.dwTimeGlobal,
-        //planner().object().cName().c_str() );
+        // planner().object().cName().c_str() );
         weapon->strapped_mode(false);
         return;
     }
 
     THROW3(weapon->can_be_strapped(), "Cannot strap weapon", *weapon->cName());
     //	Msg							( "[%6d][%s] actualizing: weapon_strapped = true", Device.dwTimeGlobal,
-    //planner().object().cName().c_str() );
+    // planner().object().cName().c_str() );
     weapon->strapped_mode(true);
 }
 
@@ -212,7 +212,7 @@ bool CObjectHandler::weapon_strapped(CWeapon* weapon) const
 
     if (!weapon->can_be_strapped()) {
         //		Msg						( "[%6d][%s] weapon_strapped = false0", Device.dwTimeGlobal,
-        //planner().object().cName().c_str() );
+        // planner().object().cName().c_str() );
         return (false);
     }
 
@@ -223,8 +223,8 @@ bool CObjectHandler::weapon_strapped(CWeapon* weapon) const
         (planner().current_action_state_id() == ObjectHandlerSpace::eWorldOperatorUnstrapping))
     {
         //		Msg						( "[%6d][%s] weapon_strapped = %s1", Device.dwTimeGlobal,
-        //planner().object().cName().c_str(), almost_strapped &&
-        //!planner().m_storage.property(ObjectHandlerSpace::eWorldPropertyStrapped2Idle) ? "true" : "false" );
+        // planner().object().cName().c_str(), almost_strapped &&
+        //! planner().m_storage.property(ObjectHandlerSpace::eWorldPropertyStrapped2Idle) ? "true" : "false" );
 
         if (!almost_strapped || planner().m_storage.property(ObjectHandlerSpace::eWorldPropertyStrapped2Idle))
             return (false);
@@ -240,8 +240,8 @@ bool CObjectHandler::weapon_unstrapped() const
     CWeapon* weapon = smart_cast<CWeapon*>(inventory().ActiveItem());
     if (!weapon) {
         //		Msg						( "[%6d][%s] no active item!!(%d)(%s)", Device.dwTimeGlobal,
-        //planner().object().cName().c_str(), inventory().GetActiveSlot(), inventory().ItemFromSlot(3) ?
-        //inventory().ItemFromSlot(3)->object().cName().c_str() : "<no_item>" );
+        // planner().object().cName().c_str(), inventory().GetActiveSlot(), inventory().ItemFromSlot(3) ?
+        // inventory().ItemFromSlot(3)->object().cName().c_str() : "<no_item>" );
         return (true);
     }
 
@@ -254,7 +254,7 @@ bool CObjectHandler::weapon_unstrapped(CWeapon* weapon) const
 
     if (!weapon->can_be_strapped()) {
         //		Msg						( "[%6d][%s] weapon_unstrapped = true0", Device.dwTimeGlobal,
-        //planner().object().cName().c_str() );
+        // planner().object().cName().c_str() );
         return (true);
     }
 
@@ -266,8 +266,8 @@ bool CObjectHandler::weapon_unstrapped(CWeapon* weapon) const
         (planner().current_action_state_id() == ObjectHandlerSpace::eWorldOperatorUnstrapping))
     {
         //		Msg						( "[%6d][%s] weapon_unstrapped = %s1", Device.dwTimeGlobal,
-        //planner().object().cName().c_str(), almost_unstrapped &&
-        //!planner().m_storage.property(ObjectHandlerSpace::eWorldPropertyStrapped2Idle) ? "true" : "false" );
+        // planner().object().cName().c_str(), almost_unstrapped &&
+        //! planner().m_storage.property(ObjectHandlerSpace::eWorldPropertyStrapped2Idle) ? "true" : "false" );
 
         if (!almost_unstrapped || planner().m_storage.property(ObjectHandlerSpace::eWorldPropertyStrapped2Idle))
             return (false);

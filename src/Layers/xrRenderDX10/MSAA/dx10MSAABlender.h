@@ -10,4 +10,4 @@ public:
     virtual void Compile(CBlender_Compile& C);
 };
 
-#endif  //	dx10RainBlender_included
+#endif //	dx10RainBlender_included

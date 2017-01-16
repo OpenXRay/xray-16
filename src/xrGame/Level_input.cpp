@@ -49,7 +49,7 @@ void CLevel::IR_OnMouseWheel(int direction)
     if (Device.Paused()
 #ifdef DEBUG
         && !psActorFlags.test(AF_NO_CLIP)
-#endif  // DEBUG
+#endif // DEBUG
             )
         return;
 
@@ -81,7 +81,7 @@ void CLevel::IR_OnMouseMove(int dx, int dy)
     if (Device.Paused() && !IsDemoPlay()
 #ifdef DEBUG
         && !psActorFlags.test(AF_NO_CLIP)
-#endif  // DEBUG
+#endif // DEBUG
             )
         return;
     if (CURRENT_ENTITY()) {
@@ -106,7 +106,7 @@ void CLevel::IR_OnKeyboardPress(int key)
 
 #ifdef INGAME_EDITOR
     if (Device.editor() && (pInput->iGetAsyncKeyState(DIK_LALT) || pInput->iGetAsyncKeyState(DIK_RALT))) return;
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR
 
     bool b_ui_exist = (!!CurrentGameUI());
 
@@ -115,14 +115,14 @@ void CLevel::IR_OnKeyboardPress(int key)
     if (_curr == kPAUSE) {
 #ifdef INGAME_EDITOR
         if (Device.editor()) return;
-#endif  // INGAME_EDITOR
+#endif // INGAME_EDITOR
 
         if (!g_block_pause && (IsGameTypeSingle() || IsDemoPlay())) {
 #ifdef DEBUG
             if (psActorFlags.test(AF_NO_CLIP))
                 Device.Pause(!Device.Paused(), TRUE, TRUE, "li_pause_key_no_clip");
             else
-#endif  // DEBUG
+#endif // DEBUG
                 Device.Pause(!Device.Paused(), TRUE, TRUE, "li_pause_key");
         }
         return;
@@ -145,7 +145,7 @@ void CLevel::IR_OnKeyboardPress(int key)
     case kQUIT:
     {
         if (b_ui_exist && CurrentGameUI()->TopInputReceiver()) {
-            if (CurrentGameUI()->IR_UIOnKeyboardPress(key)) return;  // special case for mp and main_menu
+            if (CurrentGameUI()->IR_UIOnKeyboardPress(key)) return; // special case for mp and main_menu
             CurrentGameUI()->TopInputReceiver()->HideDialog();
         }
         else
@@ -164,7 +164,7 @@ void CLevel::IR_OnKeyboardPress(int key)
     if (Device.Paused() && !IsDemoPlay()
 #ifdef DEBUG
         && !psActorFlags.test(AF_NO_CLIP)
-#endif  // DEBUG
+#endif // DEBUG
             )
         return;
 
@@ -179,7 +179,7 @@ void CLevel::IR_OnKeyboardPress(int key)
         FS.get_path("$game_config$")->m_Flags.set(FS_Path::flNeedRescan, TRUE);
         FS.get_path("$game_scripts$")->m_Flags.set(FS_Path::flNeedRescan, TRUE);
         FS.rescan_pathes();
-#endif  // DEBUG
+#endif // DEBUG
         string_path saved_game, command;
         strconcat(sizeof(saved_game), saved_game, Core.UserName, " - ", "quicksave");
         if (!CSavedGameWrapper::valid_saved_game(saved_game)) return;
@@ -211,9 +211,9 @@ void CLevel::IR_OnKeyboardPress(int key)
 
 #ifdef DEBUG
         if (!m_bEnvPaused) SetEnvironmentGameTimeFactor(GetEnvironmentGameTime(), g_fTimeFactor);
-#else   // DEBUG
+#else  // DEBUG
         SetEnvironmentGameTimeFactor(GetEnvironmentGameTime(), g_fTimeFactor);
-#endif  // DEBUG
+#endif // DEBUG
 
         break;
     }
@@ -224,9 +224,9 @@ void CLevel::IR_OnKeyboardPress(int key)
         SetGameTimeFactor(1000.f);
 #ifdef DEBUG
         if (!m_bEnvPaused) SetEnvironmentGameTimeFactor(GetEnvironmentGameTime(), 1000.f);
-#else   // DEBUG
+#else  // DEBUG
         SetEnvironmentGameTimeFactor(GetEnvironmentGameTime(), 1000.f);
-#endif  // DEBUG
+#endif // DEBUG
 
         break;
     }
@@ -242,7 +242,7 @@ void CLevel::IR_OnKeyboardPress(int key)
         m_bEnvPaused = !m_bEnvPaused;
         break;
     }
-#endif  // DEBUG
+#endif // DEBUG
     case DIK_NUMPAD5:
     {
         if (GameID() != eGameIDSingle) {
@@ -416,9 +416,9 @@ void CLevel::IR_OnKeyboardPress(int key)
 //			m_bSynchronization	= false;
 //		}
 //		return;
-#endif  // DEBUG
+#endif // DEBUG
     }
-#endif  // MASTER_GOLD
+#endif // MASTER_GOLD
 
     if (bindConsoleCmds.execute(key)) return;
 
@@ -444,7 +444,7 @@ void CLevel::IR_OnKeyboardRelease(int key)
     if (Device.Paused()
 #ifdef DEBUG
         && !psActorFlags.test(AF_NO_CLIP)
-#endif  // DEBUG
+#endif // DEBUG
             )
         return;
 
@@ -480,13 +480,13 @@ void CLevel::IR_OnKeyboardHold(int key)
         }
     }
 
-#endif  // DEBUG
+#endif // DEBUG
 
     if (CurrentGameUI() && CurrentGameUI()->IR_UIOnKeyboardHold(key)) return;
     if (Device.Paused() && !Level().IsDemoPlay()
 #ifdef DEBUG
         && !psActorFlags.test(AF_NO_CLIP)
-#endif  // DEBUG
+#endif // DEBUG
             )
         return;
     if (CURRENT_ENTITY()) {

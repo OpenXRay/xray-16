@@ -16,8 +16,8 @@ enum
 class dcTriListCollider;
 class dcTriListCollider
 {
-    dxGeom* Geometry;     // The geom object
-    dxTriList* GeomData;  // Buffered pointer to classdata
+    dxGeom* Geometry;    // The geom object
+    dxTriList* GeomData; // Buffered pointer to classdata
 
     xr_vector<Triangle> pos_tries;
     xr_vector<Triangle> neg_tries;
@@ -119,4 +119,4 @@ IC void dcTriListCollider::SideToGlClTriState(u32 v0, u32 v1, CDB::TRI* T_array)
     }
 }
 
-#endif  //__DCTRILISTCOLLIDER_INCLUDED__(
+#endif //__DCTRILISTCOLLIDER_INCLUDED__(

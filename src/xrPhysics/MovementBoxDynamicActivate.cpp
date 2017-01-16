@@ -134,7 +134,7 @@ public:
             dReal mag;
             Fvector vlinear_velocity;
             vlinear_velocity.set(cast_fv(linear_velocity));
-            mag = _sqrt(linear_velocity[0] * linear_velocity[0] + linear_velocity[2] * linear_velocity[2]);  //
+            mag = _sqrt(linear_velocity[0] * linear_velocity[0] + linear_velocity[2] * linear_velocity[2]); //
             if (mag > l_limit) {
                 dReal f = mag / l_limit;
                 // dBodySetLinearVel(m_body,linear_velocity[0]/f,linear_velocity[1],linear_velocity[2]/f);///f

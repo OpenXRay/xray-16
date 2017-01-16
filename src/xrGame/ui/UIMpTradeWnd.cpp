@@ -122,7 +122,7 @@ void CUIMpTradeWnd::OnBtnSave3PresetClicked(CUIWindow* w, void* d)
 void CUIMpTradeWnd::OnBtnResetClicked(CUIWindow* w, void* d)
 {
     CheckDragItemToDestroy();
-    ApplyPreset(_preset_idx_origin);  // origin
+    ApplyPreset(_preset_idx_origin); // origin
 }
 
 void CUIMpTradeWnd::OnRootTabChanged(CUIWindow* w, void* d)
@@ -156,15 +156,15 @@ void CUIMpTradeWnd::UpdateShop()
 
 #ifdef DEBUG
     Msg("current level=[%s]", m_store_hierarchy->CurrentLevel().m_name.c_str());
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
     SetCurrentItem(NULL);
     if (m_store_hierarchy->CurrentIsRoot()) return;
 
-    if (m_store_hierarchy->CurrentLevel().HasSubLevels()) {  // show sub-levels
+    if (m_store_hierarchy->CurrentLevel().HasSubLevels()) { // show sub-levels
         FillUpSubLevelButtons();
     }
     else
-    {  // show items
+    { // show items
         FillUpSubLevelItems();
     }
 }

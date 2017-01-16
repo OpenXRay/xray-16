@@ -30,10 +30,10 @@ struct v_filter
 // Gauss filtering coeffs
 // Samples:			0-central, -1, -2,..., -7, 1, 2,... 7
 //
-void CalcGauss_k7(Fvector4& w0,  // weight
-    Fvector4& w1,                // weight
-    float r = 3.3f,              // gaussian radius
-    float s_out = 1.f            // resulting magnitude
+void CalcGauss_k7(Fvector4& w0, // weight
+    Fvector4& w1,               // weight
+    float r = 3.3f,             // gaussian radius
+    float s_out = 1.f           // resulting magnitude
     )
 {
     float W[8];
@@ -41,21 +41,21 @@ void CalcGauss_k7(Fvector4& w0,  // weight
     // calculate
     float mag = 0;
     for (int i = -7; i <= 0; i++)
-        W[-i] = expf(-float(i * i) / (2 * r * r));  // weight
+        W[-i] = expf(-float(i * i) / (2 * r * r)); // weight
     for (int i = 0; i < 8; i++)
-        mag += i ? 2 * W[i] : W[i];  // symmetrical weight
+        mag += i ? 2 * W[i] : W[i]; // symmetrical weight
     for (int i = 0; i < 8; i++)
         W[i] = s_out * W[i] / mag;
 
     // W[0]=0, W[7]=-7
-    w0.set(W[1], W[2], W[3], W[4]);  // -1, -2, -3, -4
-    w1.set(W[5], W[6], W[7], W[0]);  // -5, -6, -7, 0
+    w0.set(W[1], W[2], W[3], W[4]); // -1, -2, -3, -4
+    w1.set(W[5], W[6], W[7], W[0]); // -5, -6, -7, 0
 }
-void CalcGauss_wave(Fvector4& w0,  // weight
-    Fvector4& w1,                  // weight
-    float r_base = 3.3f,           // gaussian radius
-    float r_detail = 1.0f,         // gaussian radius
-    float s_out = 1.f              // resulting magnitude
+void CalcGauss_wave(Fvector4& w0, // weight
+    Fvector4& w1,                 // weight
+    float r_base = 3.3f,          // gaussian radius
+    float r_detail = 1.0f,        // gaussian radius
+    float s_out = 1.f             // resulting magnitude
     )
 {
     Fvector4 t0, t1;
@@ -71,7 +71,7 @@ void CRenderTarget::phase_bloom()
     u32 Offset;
 
     // Targets
-    u_setrt(rt_Bloom_1, NULL, NULL, NULL);  // No need for ZBuffer at all
+    u_setrt(rt_Bloom_1, NULL, NULL, NULL); // No need for ZBuffer at all
     // RImplementation.rmNormal();
 
     // Clear	- don't clear - it's stupid here :)
@@ -132,8 +132,8 @@ void CRenderTarget::phase_bloom()
         RCache.Vertex.Unlock(4, g_bloom_build->vb_stride);
 
         // Perform combine (all scalers must account for 4 samples + final diffuse multiply);
-        float s = ps_r2_ls_bloom_threshold;                                                      // scale
-        f_bloom_factor = .9f * f_bloom_factor + .1f * ps_r2_ls_bloom_speed * Device.fTimeDelta;  // speed
+        float s = ps_r2_ls_bloom_threshold;                                                     // scale
+        f_bloom_factor = .9f * f_bloom_factor + .1f * ps_r2_ls_bloom_speed * Device.fTimeDelta; // speed
         if (!RImplementation.o.dx10_msaa)
             RCache.set_Element(s_bloom->E[0]);
         else
@@ -186,12 +186,12 @@ void CRenderTarget::phase_bloom()
         RCache.set_Geometry(g_bloom_build);
 
         // P0
-        u_setrt(rt_Bloom_2, NULL, NULL, NULL);  // No need for ZBuffer at all
+        u_setrt(rt_Bloom_2, NULL, NULL, NULL); // No need for ZBuffer at all
         RCache.set_Element(s_bloom->E[3]);
         RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
 
         // P1
-        u_setrt(rt_Bloom_1, NULL, NULL, NULL);  // No need for ZBuffer at all
+        u_setrt(rt_Bloom_1, NULL, NULL, NULL); // No need for ZBuffer at all
         RCache.set_Element(s_bloom->E[4]);
         RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
     }
@@ -205,14 +205,14 @@ void CRenderTarget::phase_bloom()
             Fvector2 two = {2.f / _w, 2.f / _h};
             Fvector2 one = {1.f / _w, 1.f / _h};
             Fvector2 half = {.5f / _w, .5f / _h};
-            Fvector4 a_0 = {half.x, half.y, half.y, half.x};                                  // center
-            Fvector4 a_1 = {a_0.x - one.x - half.x, half.y, half.y, a_0.w + one.x + half.x};  // -1,+1i
-            Fvector4 a_2 = {a_1.x - two.x, half.y, half.y, a_1.w + two.x};                    // -2,+2i
-            Fvector4 a_3 = {a_2.x - two.x, half.y, half.y, a_2.w + two.x};                    // -3,+3i
-            Fvector4 a_4 = {a_3.x - two.x, half.y, half.y, a_3.w + two.x};                    // -4,+4i
-            Fvector4 a_5 = {a_4.x - two.x, half.y, half.y, a_4.w + two.x};                    // -5,+5i
-            Fvector4 a_6 = {a_5.x - two.x, half.y, half.y, a_5.w + two.x};                    // -6,+6i
-            Fvector4 a_7 = {a_6.x - two.x, half.y, half.y, a_6.w + two.x};                    // -7,+7i
+            Fvector4 a_0 = {half.x, half.y, half.y, half.x};                                 // center
+            Fvector4 a_1 = {a_0.x - one.x - half.x, half.y, half.y, a_0.w + one.x + half.x}; // -1,+1i
+            Fvector4 a_2 = {a_1.x - two.x, half.y, half.y, a_1.w + two.x};                   // -2,+2i
+            Fvector4 a_3 = {a_2.x - two.x, half.y, half.y, a_2.w + two.x};                   // -3,+3i
+            Fvector4 a_4 = {a_3.x - two.x, half.y, half.y, a_3.w + two.x};                   // -4,+4i
+            Fvector4 a_5 = {a_4.x - two.x, half.y, half.y, a_4.w + two.x};                   // -5,+5i
+            Fvector4 a_6 = {a_5.x - two.x, half.y, half.y, a_5.w + two.x};                   // -6,+6i
+            Fvector4 a_7 = {a_6.x - two.x, half.y, half.y, a_6.w + two.x};                   // -7,+7i
 
             // Fill vertex buffer
             v_filter* pv = (v_filter*)RCache.Vertex.Lock(4, g_bloom_filter->vb_stride, Offset);
@@ -270,7 +270,7 @@ void CRenderTarget::phase_bloom()
             Fvector4 w0, w1;
             float kernel = ps_r2_ls_bloom_kernel_g;
             CalcGauss_wave(w0, w1, kernel, kernel / 3.f, ps_r2_ls_bloom_kernel_scale);
-            u_setrt(rt_Bloom_2, NULL, NULL, NULL);  // No need for ZBuffer at all
+            u_setrt(rt_Bloom_2, NULL, NULL, NULL); // No need for ZBuffer at all
             RCache.set_Element(s_bloom->E[1]);
             RCache.set_ca("weight", 0, w0);
             RCache.set_ca("weight", 1, w1);
@@ -285,14 +285,14 @@ void CRenderTarget::phase_bloom()
             Fvector2 two = {2.f / _w, 2.f / _h};
             Fvector2 one = {1.f / _w, 1.f / _h};
             Fvector2 half = {.5f / _w, .5f / _h};
-            Fvector4 a_0 = {half.x, half.y, half.y, half.x};                                  // center
-            Fvector4 a_1 = {half.x, a_0.y - one.y - half.y, half.y + one.y + a_0.z, half.x};  // -1,+1i
-            Fvector4 a_2 = {half.x, a_1.y - two.y, two.y + a_1.z, half.x};                    // -2,+2i
-            Fvector4 a_3 = {half.x, a_2.y - two.y, two.y + a_2.z, half.x};                    // -3,+3i
-            Fvector4 a_4 = {half.x, a_3.y - two.y, two.y + a_3.z, half.x};                    // -4,+4i
-            Fvector4 a_5 = {half.x, a_4.y - two.y, two.y + a_4.z, half.x};                    // -5,+5i
-            Fvector4 a_6 = {half.x, a_5.y - two.y, two.y + a_5.z, half.x};                    // -6,+6i
-            Fvector4 a_7 = {half.x, a_6.y - two.y, two.y + a_6.z, half.x};                    // -7,+7i
+            Fvector4 a_0 = {half.x, half.y, half.y, half.x};                                 // center
+            Fvector4 a_1 = {half.x, a_0.y - one.y - half.y, half.y + one.y + a_0.z, half.x}; // -1,+1i
+            Fvector4 a_2 = {half.x, a_1.y - two.y, two.y + a_1.z, half.x};                   // -2,+2i
+            Fvector4 a_3 = {half.x, a_2.y - two.y, two.y + a_2.z, half.x};                   // -3,+3i
+            Fvector4 a_4 = {half.x, a_3.y - two.y, two.y + a_3.z, half.x};                   // -4,+4i
+            Fvector4 a_5 = {half.x, a_4.y - two.y, two.y + a_4.z, half.x};                   // -5,+5i
+            Fvector4 a_6 = {half.x, a_5.y - two.y, two.y + a_5.z, half.x};                   // -6,+6i
+            Fvector4 a_7 = {half.x, a_6.y - two.y, two.y + a_6.z, half.x};                   // -7,+7i
 
             // Fill vertex buffer
             v_filter* pv = (v_filter*)RCache.Vertex.Lock(4, g_bloom_filter->vb_stride, Offset);
@@ -350,7 +350,7 @@ void CRenderTarget::phase_bloom()
             Fvector4 w0, w1;
             float kernel = ps_r2_ls_bloom_kernel_g * float(Device.dwHeight) / float(Device.dwWidth);
             CalcGauss_wave(w0, w1, kernel, kernel / 3.f, ps_r2_ls_bloom_kernel_scale);
-            u_setrt(rt_Bloom_1, NULL, NULL, NULL);  // No need for ZBuffer at all
+            u_setrt(rt_Bloom_1, NULL, NULL, NULL); // No need for ZBuffer at all
             RCache.set_Element(s_bloom->E[2]);
             RCache.set_ca("weight", 0, w0);
             RCache.set_ca("weight", 1, w1);

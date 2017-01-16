@@ -70,7 +70,7 @@ struct functor3<void> : public functor2<void>
     IC void operator()() const { functr(parameter, parameter2, parameter3); }
 };
 
-}  // namespace detail
+} // namespace detail
 
 enum EMaxProps
 {
@@ -102,7 +102,7 @@ public:
 
 #ifdef DEBUG
     virtual void log_hierarchy(LPCSTR nest);
-#endif  // DEBUG
+#endif // DEBUG
 
     virtual void fill_root_container(Root* root);
 
@@ -143,9 +143,9 @@ protected:
     bool m_highlight;
 };
 
-}  // namespace upgrade
-}  // namespace inventory
+} // namespace upgrade
+} // namespace inventory
 
 #include "inventory_upgrade_inline.h"
 
-#endif  // INVENTORY_UPGRADE_H_INCLUDED
+#endif // INVENTORY_UPGRADE_H_INCLUDED

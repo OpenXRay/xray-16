@@ -23,7 +23,7 @@
 #ifdef DEBUG
 #include "Level.h"
 #include "space_restrictor.h"
-#endif  // DEBUG
+#endif // DEBUG
 
 int g_restriction_checker = 0;
 
@@ -202,4 +202,4 @@ void CSpaceRestrictionComposition::check_restrictor_type()
     VERIFY2(restrictor->restrictor_type() != RestrictionSpace::eRestrictorTypeNone,
         "impossible situation: wrong net_Spawn branch used");
 }
-#endif  // DEBUG
+#endif // DEBUG

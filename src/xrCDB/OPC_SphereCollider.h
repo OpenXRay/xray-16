@@ -24,10 +24,10 @@ struct OPCODE_API SphereCache : VolumeCache
 {
     SphereCache() : Center(0.0f, 0.0f, 0.0f), FatRadius2(0.0f), FatCoeff(1.1f) {}
     // Cached faces signature
-    Point Center;      //!< Sphere used when performing the query resulting in cached faces
-    float FatRadius2;  //!< Sphere used when performing the query resulting in cached faces
+    Point Center;     //!< Sphere used when performing the query resulting in cached faces
+    float FatRadius2; //!< Sphere used when performing the query resulting in cached faces
     // User settings
-    float FatCoeff;  //!< mRadius2 multiplier used to create a fat sphere
+    float FatCoeff; //!< mRadius2 multiplier used to create a fat sphere
 };
 
 class OPCODE_API SphereCollider : public VolumeCollider
@@ -79,9 +79,9 @@ public:
 
 protected:
     // Sphere in model space
-    Point mCenter;   //!< Sphere center
-    float mRadius2;  //!< Sphere radius squared
-                     // Internal methods
+    Point mCenter;  //!< Sphere center
+    float mRadius2; //!< Sphere radius squared
+                    // Internal methods
     void _Collide(const AABBCollisionNode* node);
     void _Collide(const AABBNoLeafNode* node);
     void _Collide(const AABBQuantizedNode* node);
@@ -96,4 +96,4 @@ protected:
         SphereCache& cache, const Sphere& sphere, const Matrix4x4* worlds = null, const Matrix4x4* worldm = null);
 };
 
-#endif  // __OPC_SPHERECOLLIDER_H__
+#endif // __OPC_SPHERECOLLIDER_H__

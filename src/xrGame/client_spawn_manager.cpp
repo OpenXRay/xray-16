@@ -190,7 +190,7 @@ void CClientSpawnManager::dump(ALife::_OBJECT_ID requesting_id) const
             Msg("! CClientSpawnManager::dump[id %d waits for %d]", requesting_id, (*i).first);
     }
 }
-#endif  // DEBUG
+#endif // DEBUG
 
 void CClientSpawnManager::clear()
 {

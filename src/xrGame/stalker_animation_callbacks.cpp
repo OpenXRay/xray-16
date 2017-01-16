@@ -66,7 +66,7 @@ static void callback_rotation_blend(CBoneInstance* const bone)
     VERIFY(parameter->m_object);
     VERIFY(parameter->m_blend);
     //	VERIFY2							( *parameter->m_blend, make_string( "%d %s[%s]", Device.dwTimeGlobal,
-    //parameter->m_object->cName().c_str(), parameter->m_object->g_Alive() ? "+" : "-") );
+    // parameter->m_object->cName().c_str(), parameter->m_object->g_Alive() ? "+" : "-") );
 
     float multiplier = 1.f;
     if (*parameter->m_blend) {
@@ -84,7 +84,7 @@ static void callback_rotation_blend(CBoneInstance* const bone)
 	rotation.getXYZ					(angles);
 	angles.mul						(multiplier);
 	rotation.setXYZ					(angles);
-#else   // #if 0
+#else  // #if 0
     Fquaternion left;
     left.set(Fidentity);
 
@@ -96,7 +96,7 @@ static void callback_rotation_blend(CBoneInstance* const bone)
 
     Fmatrix rotation;
     rotation.rotation(result);
-#endif  // #if 0
+#endif // #if 0
 
     Fvector position = bone->mTransform.c;
     R_ASSERT(_valid(rotation));
@@ -114,7 +114,7 @@ void CStalkerAnimationManager::assign_bone_callbacks()
     m_head_params.invalidate();
     m_shoulder_params.invalidate();
     m_spine_params.invalidate();
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 
     LPCSTR section = *object().cNameSect();
 
@@ -154,7 +154,7 @@ void CStalkerAnimationManager::assign_bone_blend_callbacks(bool const& forward_d
     m_head_params.invalidate();
     m_shoulder_params.invalidate();
     m_spine_params.invalidate();
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 
     LPCSTR section = *object().cNameSect();
 
@@ -195,7 +195,7 @@ void CStalkerAnimationManager::remove_bone_callbacks()
     m_head_params.invalidate();
     m_shoulder_params.invalidate();
     m_spine_params.invalidate();
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 
     LPCSTR section = *object().cNameSect();
 

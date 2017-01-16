@@ -75,7 +75,7 @@ public:
         // g_pSharedMemoryContainer->dump ();
     }
 };
-#endif  // DEBUG_MEMORY_MANAGER
+#endif // DEBUG_MEMORY_MANAGER
 
 #ifdef DEBUG_MEMORY_MANAGER
 class CCC_DbgMemCheck : public IConsole_Command
@@ -93,7 +93,7 @@ public:
         }
     }
 };
-#endif  // DEBUG_MEMORY_MANAGER
+#endif // DEBUG_MEMORY_MANAGER
 
 class CCC_DbgStrCheck : public IConsole_Command
 {
@@ -334,9 +334,9 @@ public:
         op_server[0] = 0;
         op_client[0] = 0;
 
-        parse(op_server, args, "server");  // 1. server
-        parse(op_client, args, "client");  // 2. client
-        parse(op_demo, args, "demo");      // 3. demo
+        parse(op_server, args, "server"); // 1. server
+        parse(op_client, args, "client"); // 2. client
+        parse(op_demo, args, "demo");     // 3. demo
 
         strlwr(op_server);
         protect_Name_strlwr(op_client);
@@ -505,7 +505,7 @@ virtual void Save (IWriter *F) {};
 */
 
 ENGINE_API BOOL r2_sun_static = TRUE;
-ENGINE_API BOOL r2_advanced_pp = FALSE;  // advanced post process and effects
+ENGINE_API BOOL r2_advanced_pp = FALSE; // advanced post process and effects
 
 u32 renderer_value = 3;
 
@@ -655,12 +655,12 @@ void CCC_Register()
 #ifdef DEBUG
     CMD1(CCC_MotionsStat, "stat_motions");
     CMD1(CCC_TexturesStat, "stat_textures");
-#endif  // DEBUG
+#endif // DEBUG
 
 #ifdef DEBUG_MEMORY_MANAGER
     CMD1(CCC_MemStat, "dbg_mem_dump");
     CMD1(CCC_DbgMemCheck, "dbg_mem_check");
-#endif  // DEBUG_MEMORY_MANAGER
+#endif // DEBUG_MEMORY_MANAGER
 
 #ifdef DEBUG
     CMD3(CCC_Mask, "mt_particles", &psDeviceFlags, mtParticles);
@@ -703,7 +703,7 @@ void CCC_Register()
     CMD3(CCC_Mask, "rs_occ_draw", &psDeviceFlags, rsOcclusionDraw);
     CMD3(CCC_Mask, "rs_occ_stats", &psDeviceFlags, rsOcclusionStats);
 // CMD4(CCC_Integer, "rs_skeleton_update", &psSkeletonUpdate, 2, 128 );
-#endif  // DEBUG
+#endif // DEBUG
 
     CMD2(CCC_Gamma, "rs_c_gamma", &ps_gamma);
     CMD2(CCC_Gamma, "rs_c_brightness", &ps_brightness);
@@ -720,7 +720,7 @@ void CCC_Register()
 
 #ifdef DEBUG
     CMD3(CCC_Token, "vid_bpp", &psCurrentBPP, vid_bpp_token);
-#endif  // DEBUG
+#endif // DEBUG
 
     CMD1(CCC_VID_Reset, "vid_restart");
 
@@ -742,7 +742,7 @@ void CCC_Register()
     CMD3(CCC_Mask, "snd_stats_info_object", &g_stats_flags, st_sound_info_object);
 
     CMD4(CCC_Integer, "error_line_count", &g_ErrorLineCount, 6, 1024);
-#endif  // DEBUG
+#endif // DEBUG
 
     // Mouse
     CMD3(CCC_Mask, "mouse_invert", &psMouseInvert, 1);

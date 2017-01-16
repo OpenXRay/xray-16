@@ -75,4 +75,4 @@ protected:
 };
 
 //==============================================================================
-#endif  // _INCDEF_NETCOMMON_H_
+#endif // _INCDEF_NETCOMMON_H_

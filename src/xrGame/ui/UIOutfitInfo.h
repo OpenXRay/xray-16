@@ -19,12 +19,12 @@ public:
     void SetProgressValue(float cur, float comp);
 
 protected:
-    CUIStatic m_name;  // texture + name
+    CUIStatic m_name; // texture + name
     CUIDoubleProgressBar m_progress;
-    CUITextWnd m_value;  // 100%
+    CUITextWnd m_value; // 100%
     float m_magnitude;
 
-};  // class CUIOutfitImmunity
+}; // class CUIOutfitImmunity
 
 // -------------------------------------------------------------------------------------
 
@@ -48,4 +48,4 @@ protected:
     CUIStatic* m_Prop_line;
     CUIOutfitImmunity* m_items[max_count];
 
-};  // class CUIOutfitInfo
+}; // class CUIOutfitInfo

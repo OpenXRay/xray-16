@@ -34,7 +34,7 @@ typedef struct MenuScreen
     struct MenuScreenConfiguration* configuration;
     char extraText[MAX_EXTRA_TEXT_STRINGS][MAX_EXTRA_TEXT_STRING_LEN + 1];
     char list[MAX_LIST_STRINGS][MAX_LIST_STRING_LEN + 1];
-    int listSelection;  // default -1, no selection
+    int listSelection; // default -1, no selection
     char keyboardText[MAX_KEYBOARD_TEXT_LEN + 1];
     int numChoices;
 } MenuScreen;

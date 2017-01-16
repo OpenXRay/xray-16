@@ -91,10 +91,10 @@ void CMovementManager::process_patrol_path()
         else if (detail().completed(object().Position(), !detail().state_patrol_path()))
         {
             //							Msg				("[%6d][%s] detail path is
-            //completed",Device.dwFrame,*object().cName());
+            // completed",Device.dwFrame,*object().cName());
             //							Msg				(
             //								"[path_size=%d][curr_id=%d][last_pp=%d] start_position=[%f][%f][%f]
-            //stop_position=[%f][%f][%f] position=[%f][%f][%f]",
+            // stop_position=[%f][%f][%f] position=[%f][%f][%f]",
             //								detail().path().size(),
             //								detail().curr_travel_point_index(),
             //								detail().last_patrol_point(),

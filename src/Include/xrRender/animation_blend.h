@@ -30,15 +30,15 @@ public:
     float timeCurrent;
     float timeTotal;
     MotionID motionID;
-    u16 bone_or_part;  // startup parameters
+    u16 bone_or_part; // startup parameters
     u8 channel;
 
 private:
     ECurvature blend;
 
 public:
-    float blendAccrue;   // increasing
-    float blendFalloff;  // decreasing
+    float blendAccrue;  // increasing
+    float blendFalloff; // decreasing
     float blendPower;
     float speed;
 
@@ -116,10 +116,10 @@ IC void CBlend::update_play(float dt, PlayCallback _Callback)
 
     clamp(blendAmount, 0.f, blendPower);
 
-    if (!update_time(dt))  // reached end
+    if (!update_time(dt)) // reached end
         return;
 
-    if (_Callback && stop_at_end_callback) _Callback(this);  // callback only once
+    if (_Callback && stop_at_end_callback) _Callback(this); // callback only once
 
     stop_at_end_callback = FALSE;
 
@@ -135,7 +135,7 @@ IC bool CBlend::update_time(float dt)
 {
     if (!playing) return false;
     float quant = dt * speed;
-    timeCurrent += quant;  // stop@end - time is not going
+    timeCurrent += quant; // stop@end - time is not going
 
     bool running_fwrd = (quant > 0);
     float const END_EPS = SAMPLE_SPF + EPS;
@@ -151,7 +151,7 @@ IC bool CBlend::update_time(float dt)
     if (!at_end && !at_begin) return false;
 
     if (at_end) {
-        timeCurrent = timeTotal - END_EPS;  // stop@end - time frozen at the end
+        timeCurrent = timeTotal - END_EPS; // stop@end - time frozen at the end
         if (timeCurrent < 0.f) timeCurrent = 0.f;
     }
     else

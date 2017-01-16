@@ -19,14 +19,14 @@ static void ApplyTexgen(const Fmatrix& mVP)
 #if defined(USE_DX10) || defined(USE_DX11)
     Fmatrix mTexelAdjust = {
         0.5f, 0.0f, 0.0f, 0.0f, 0.0f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.5f, 0.5f, 0.0f, 1.0f};
-#else   //	USE_DX10
+#else  //	USE_DX10
     float _w = float(RDEVICE.dwWidth);
     float _h = float(RDEVICE.dwHeight);
     float o_w = (.5f / _w);
     float o_h = (.5f / _h);
     Fmatrix mTexelAdjust = {
         0.5f, 0.0f, 0.0f, 0.0f, 0.0f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.5f + o_w, 0.5f + o_h, 0.0f, 1.0f};
-#endif  //	USE_DX10
+#endif //	USE_DX10
 
     mTexgen.mul(mTexelAdjust, mVP);
     RCache.set_c("mVPTexgen", mTexgen);
@@ -286,7 +286,7 @@ IC void FillSprite(FVF::LIT*& pv, const Fvector& T, const Fvector& R, const Fvec
 {
 #ifdef _GPA_ENABLED
     TAL_SCOPED_TASK_NAMED("FillSprite()");
-#endif  // _GPA_ENABLED
+#endif // _GPA_ENABLED
 
     __m128 Vr, Vt, _T, _R, _pos, _zz, _sa, _ca, a, b, c, d;
 
@@ -347,7 +347,7 @@ IC void FillSprite(FVF::LIT*& pv, const Fvector& pos, const Fvector& dir, const 
 {
 #ifdef _GPA_ENABLED
     TAL_SCOPED_TASK_NAMED("FillSpriteTransform()");
-#endif  // _GPA_ENABLED
+#endif // _GPA_ENABLED
 
     const Fvector& T = dir;
     Fvector R;
@@ -373,15 +373,15 @@ IC void FillSprite(FVF::LIT*& pv, const Fvector& pos, const Fvector& dir, const 
     _t1 = _mm_mul_ps(_t1, _r1);
     _t2 = _mm_mul_ps(_t2, _r2);
 
-    _t1 = _mm_sub_ps(_t1, _t2);  // z | y | 0 | x
+    _t1 = _mm_sub_ps(_t1, _t2); // z | y | 0 | x
 
     // normalize_safe
 
-    _t2 = _mm_mul_ps(_t1, _t1);                               // zz | yy | 00 | xx
-    _r1 = _mm_movehl_ps(_t2, _t2);                            // zz | yy | zz | yy
-    _t2 = _mm_add_ss(_t2, _r1);                               // zz | yy | 00 | xx + yy
-    _r1 = _mm_shuffle_ps(_r1, _r1, _MM_SHUFFLE(1, 1, 1, 1));  // zz | zz | zz | zz
-    _t2 = _mm_add_ss(_t2, _r1);                               // zz | yy | 00 | xx + yy + zz
+    _t2 = _mm_mul_ps(_t1, _t1);                              // zz | yy | 00 | xx
+    _r1 = _mm_movehl_ps(_t2, _t2);                           // zz | yy | zz | yy
+    _t2 = _mm_add_ss(_t2, _r1);                              // zz | yy | 00 | xx + yy
+    _r1 = _mm_shuffle_ps(_r1, _r1, _MM_SHUFFLE(1, 1, 1, 1)); // zz | zz | zz | zz
+    _t2 = _mm_add_ss(_t2, _r1);                              // zz | yy | 00 | xx + yy + zz
 
     _r1 = _mm_set_ss(std::numeric_limits<float>::min());
 
@@ -412,14 +412,14 @@ __forceinline void magnitude_sse(Fvector& vec, float& res)
 {
     __m128 tv, tu;
 
-    tv = _mm_load_ss((float*)&vec.x);                      // tv = 0 | 0 | 0 | x
-    tv = _mm_loadh_pi(tv, (__m64*)&vec.y);                 // tv = z | y | 0 | x
-    tv = _mm_mul_ps(tv, tv);                               // tv = zz | yy | 0 | xx
-    tu = _mm_movehl_ps(tv, tv);                            // tu = zz | yy | zz | yy
-    tv = _mm_add_ss(tv, tu);                               // tv = zz | yy | 0 | xx + yy
-    tu = _mm_shuffle_ps(tu, tu, _MM_SHUFFLE(1, 1, 1, 1));  // tu = zz | zz | zz | zz
-    tv = _mm_add_ss(tv, tu);                               // tv = zz | yy | 0 | xx + yy + zz
-    tv = _mm_sqrt_ss(tv);                                  // tv = zz | yy | 0 | sqrt( xx + yy + zz )
+    tv = _mm_load_ss((float*)&vec.x);                     // tv = 0 | 0 | 0 | x
+    tv = _mm_loadh_pi(tv, (__m64*)&vec.y);                // tv = z | y | 0 | x
+    tv = _mm_mul_ps(tv, tv);                              // tv = zz | yy | 0 | xx
+    tu = _mm_movehl_ps(tv, tv);                           // tu = zz | yy | zz | yy
+    tv = _mm_add_ss(tv, tu);                              // tv = zz | yy | 0 | xx + yy
+    tu = _mm_shuffle_ps(tu, tu, _MM_SHUFFLE(1, 1, 1, 1)); // tu = zz | zz | zz | zz
+    tv = _mm_add_ss(tv, tu);                              // tv = zz | yy | 0 | xx + yy + zz
+    tv = _mm_sqrt_ss(tv);                                 // tv = zz | yy | 0 | sqrt( xx + yy + zz )
     _mm_store_ss((float*)&res, tv);
 }
 
@@ -430,7 +430,7 @@ void ParticleRenderStream(LPVOID lpvParams)
 
     TAL_ID rtID = TAL_MakeID(1, Core.dwFrame, 0);
     TAL_AddRelationThis(TAL_RELATION_IS_CHILD_OF, rtID);
-#endif  // _GPA_ENABLED
+#endif // _GPA_ENABLED
 
     float sina = 0.0f, cosa = 0.0f;
     DWORD angle = 0xFFFFFFFF;
@@ -555,7 +555,7 @@ void CParticleEffect::Render(float)
 {
 #ifdef _GPA_ENABLED
     TAL_SCOPED_TASK_NAMED("CParticleEffect::Render()");
-#endif  // _GPA_ENABLED
+#endif // _GPA_ENABLED
 
     u32 dwOffset, dwCount;
     // Get a pointer to the particles in gp memory
@@ -837,4 +837,4 @@ void CParticleEffect::Render(float)
     }
 }
 
-#endif  // _EDITOR
+#endif // _EDITOR

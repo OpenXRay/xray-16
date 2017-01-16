@@ -3,4 +3,4 @@
 
 LPCSTR modify_player_name(LPCSTR src_name, string256& dest);
 
-#endif  //#ifndef PLAYER_NAME_MODIFYER_INCLUDED
+#endif //#ifndef PLAYER_NAME_MODIFYER_INCLUDED

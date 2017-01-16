@@ -24,12 +24,12 @@ public:
 
 protected:
     u32 m_no_demag_time;
-};  // class faster_than_bullets_time
+}; // class faster_than_bullets_time
 
 ADD_ACCUMULATIVE_STATE(acpv_faster_than_bullets_time, faster_than_bullets_time);
 #undef ACCUMULATIVE_STATE_LIST
 #define ACCUMULATIVE_STATE_LIST SAVE_TYPE_LIST(acpv_faster_than_bullets_time, faster_than_bullets_time)
 
-}  // namespace award_system
+} // namespace award_system
 
-#endif  //#ifndef FASTER_THAN_BULLETS_INCLUDED
+#endif //#ifndef FASTER_THAN_BULLETS_INCLUDED

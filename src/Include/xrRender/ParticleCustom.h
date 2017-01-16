@@ -25,4 +25,4 @@ public:
     virtual BOOL GetHudMode() = 0;
 };
 
-#endif  //	ParticleCustom_included
+#endif //	ParticleCustom_included

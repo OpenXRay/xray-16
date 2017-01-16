@@ -10,12 +10,12 @@
 
 namespace text_editor
 {
-void remove_spaces(PSTR str);  // in & out
+void remove_spaces(PSTR str); // in & out
 void split_cmd(PSTR first, PSTR second, LPCSTR str);
 
 class base;
 
-enum key_state  // Flags32
+enum key_state // Flags32
 {
     ks_free = u32(0),
     ks_LShift = u32(1) << 0,
@@ -32,17 +32,17 @@ enum key_state  // Flags32
 
     ks_force = u32(-1)
 
-};  // enum key_state
+}; // enum key_state
 
 enum init_mode
 {
     im_standart = 0,
     im_number_only,
     im_read_only,
-    im_file_name_mode,  // not "/\\:*?\"<>|^()[]%"
+    im_file_name_mode, // not "/\\:*?\"<>|^()[]%"
 
     im_count
-};  // init_mode
+}; // init_mode
 
 class ENGINE_API line_edit_control
 {
@@ -161,8 +161,8 @@ private:
     bool m_cursor_view;
     bool m_need_update;
     bool m_unselected_mode;
-};  // class line_edit_control
+}; // class line_edit_control
 
-}  // namespace text_editor
+} // namespace text_editor
 
-#endif  // ##ifndef LINE_EDIT_CONTROL_H_INCLUDED
+#endif // ##ifndef LINE_EDIT_CONTROL_H_INCLUDED

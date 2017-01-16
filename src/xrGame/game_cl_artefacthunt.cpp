@@ -173,7 +173,7 @@ void game_cl_ArtefactHunt::TranslateGameMessage(u32 msg, NET_Packet& P)
     switch (msg)
     {
     //-------------------UI MESSAGES
-    case GAME_EVENT_ARTEFACT_TAKEN:  // ahunt
+    case GAME_EVENT_ARTEFACT_TAKEN: // ahunt
     {
         u16 PlayerID, Team;
         P.r_u16(PlayerID);
@@ -199,7 +199,7 @@ void game_cl_ArtefactHunt::TranslateGameMessage(u32 msg, NET_Packet& P)
             PlaySndMessage(ID_AF_TEAM1_TAKE_ENEMY + ModifyTeam(Game().local_player->team));
     }
     break;
-    case GAME_EVENT_ARTEFACT_DROPPED:  // ahunt
+    case GAME_EVENT_ARTEFACT_DROPPED: // ahunt
     {
         u16 PlayerID, Team;
         P.r_u16(PlayerID);
@@ -219,7 +219,7 @@ void game_cl_ArtefactHunt::TranslateGameMessage(u32 msg, NET_Packet& P)
         PlaySndMessage(ID_AF_LOST);
     }
     break;
-    case GAME_EVENT_ARTEFACT_ONBASE:  // ahunt
+    case GAME_EVENT_ARTEFACT_ONBASE: // ahunt
     {
         u16 PlayerID, Team;
         P.r_u16(PlayerID);
@@ -244,7 +244,7 @@ void game_cl_ArtefactHunt::TranslateGameMessage(u32 msg, NET_Packet& P)
             PlaySndMessage(ID_AF_TEAM1_ONBASE_ENEMY + ModifyTeam(Game().local_player->team));
     }
     break;
-    case GAME_EVENT_ARTEFACT_SPAWNED:  // ahunt
+    case GAME_EVENT_ARTEFACT_SPAWNED: // ahunt
     {
         xr_sprintf(Text, "%s%s", Color_Main, *st.translate("mp_art_spowned"));
         if (CurrentGameUI()) CurrentGameUI()->CommonMessageOut(Text);
@@ -253,7 +253,7 @@ void game_cl_ArtefactHunt::TranslateGameMessage(u32 msg, NET_Packet& P)
         PlaySndMessage(ID_NEW_AF);
     }
     break;
-    case GAME_EVENT_ARTEFACT_DESTROYED:  // ahunt
+    case GAME_EVENT_ARTEFACT_DESTROYED: // ahunt
     {
         xr_sprintf(Text, "%s%s", Color_Main, *st.translate("mp_art_destroyed"));
         u16 ArtefactID = P.r_u16();
@@ -306,7 +306,7 @@ void game_cl_ArtefactHunt::GetMapEntities(xr_vector<SZoneMapEntityData>& dst)
     VERIFY(pArtefact);
 
     IGameObject* pParent = pArtefact->H_Parent();
-    if (!pParent) {  // Artefact alone
+    if (!pParent) { // Artefact alone
         D.color = color_artefact;
         D.pos = pArtefact->Position();
         dst.push_back(D);

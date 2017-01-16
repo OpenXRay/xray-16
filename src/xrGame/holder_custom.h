@@ -21,7 +21,7 @@ public:
         m_ownerActor = NULL;
     }
     virtual ~CHolderCustom() { ; }
-    virtual void UpdateEx(float fov){};  // called by owner
+    virtual void UpdateEx(float fov){}; // called by owner
     virtual CHolderCustom* cast_holder_custom() { return this; }
     bool Engaged() { return m_owner != NULL; }
     virtual void OnMouseMove(int x, int y) = 0;

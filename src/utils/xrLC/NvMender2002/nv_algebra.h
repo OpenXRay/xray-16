@@ -53,13 +53,13 @@ struct DECLSPEC_NV_MATH vec2
     {
         struct
         {
-            nv_scalar x, y;  // standard names for components
+            nv_scalar x, y; // standard names for components
         };
         struct
         {
-            nv_scalar s, t;  // standard names for components
+            nv_scalar s, t; // standard names for components
         };
-        nv_scalar vec_array[2];  // array access
+        nv_scalar vec_array[2]; // array access
     };
 };
 
@@ -143,13 +143,13 @@ struct vec3t
     {
         struct
         {
-            _T x, y, z;  // standard names for components
+            _T x, y, z; // standard names for components
         };
         struct
         {
-            _T s, t, r;  // standard names for components
+            _T s, t, r; // standard names for components
         };
-        _T vec_array[3];  // array access
+        _T vec_array[3]; // array access
     };
 
     const _T operator[](int i) const { return vec_array[i]; }
@@ -241,13 +241,13 @@ struct DECLSPEC_NV_MATH vec4
     {
         struct
         {
-            nv_scalar x, y, z, w;  // standard names for components
+            nv_scalar x, y, z, w; // standard names for components
         };
         struct
         {
-            nv_scalar s, t, r, q;  // standard names for components
+            nv_scalar s, t, r, q; // standard names for components
         };
-        nv_scalar vec_array[4];  // array access
+        nv_scalar vec_array[4]; // array access
     };
 };
 
@@ -330,11 +330,11 @@ struct DECLSPEC_NV_MATH mat3
     {
         struct
         {
-            nv_scalar a00, a10, a20;  // standard names for components
-            nv_scalar a01, a11, a21;  // standard names for components
-            nv_scalar a02, a12, a22;  // standard names for components
+            nv_scalar a00, a10, a20; // standard names for components
+            nv_scalar a01, a11, a21; // standard names for components
+            nv_scalar a02, a12, a22; // standard names for components
         };
-        nv_scalar mat_array[9];  // array access
+        nv_scalar mat_array[9]; // array access
     };
 };
 
@@ -396,29 +396,29 @@ struct DECLSPEC_NV_MATH mat4
     {
         struct
         {
-            nv_scalar a00, a10, a20, a30;  // standard names for components
-            nv_scalar a01, a11, a21, a31;  // standard names for components
-            nv_scalar a02, a12, a22, a32;  // standard names for components
-            nv_scalar a03, a13, a23, a33;  // standard names for components
+            nv_scalar a00, a10, a20, a30; // standard names for components
+            nv_scalar a01, a11, a21, a31; // standard names for components
+            nv_scalar a02, a12, a22, a32; // standard names for components
+            nv_scalar a03, a13, a23, a33; // standard names for components
         };
         struct
         {
-            nv_scalar _11, _12, _13, _14;  // standard names for components
-            nv_scalar _21, _22, _23, _24;  // standard names for components
-            nv_scalar _31, _32, _33, _34;  // standard names for components
-            nv_scalar _41, _42, _43, _44;  // standard names for components
+            nv_scalar _11, _12, _13, _14; // standard names for components
+            nv_scalar _21, _22, _23, _24; // standard names for components
+            nv_scalar _31, _32, _33, _34; // standard names for components
+            nv_scalar _41, _42, _43, _44; // standard names for components
         };
         union
         {
             struct
             {
-                nv_scalar b00, b10, b20, p;  // standard names for components
-                nv_scalar b01, b11, b21, q;  // standard names for components
-                nv_scalar b02, b12, b22, r;  // standard names for components
-                nv_scalar x, y, z, w;        // standard names for components
+                nv_scalar b00, b10, b20, p; // standard names for components
+                nv_scalar b01, b11, b21, q; // standard names for components
+                nv_scalar b02, b12, b22, r; // standard names for components
+                nv_scalar x, y, z, w;       // standard names for components
             };
         };
-        nv_scalar mat_array[16];  // array access
+        nv_scalar mat_array[16]; // array access
     };
 };
 
@@ -696,4 +696,4 @@ nv_scalar det(const mat3& A);
 extern void nv_is_valid(const vec3& v);
 extern void nv_is_valid(nv_scalar lambda);
 
-#endif  // nv_algebraH
+#endif // nv_algebraH

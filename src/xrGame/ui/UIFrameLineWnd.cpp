@@ -82,7 +82,7 @@ void CUIFrameLineWnd::DrawElements()
     UI().ClientToScreenScaled(rect.rb);
 
     float back_len = 0.0f;
-    u32 prim_count = 6 * 2;  // first&second
+    u32 prim_count = 6 * 2; // first&second
     if (bHorizontal) {
         back_len = rect.width() - m_tex_rect[flFirst].width() - m_tex_rect[flSecond].width();
         if (back_len < 0.0f) rect.x2 -= back_len;
@@ -129,7 +129,7 @@ bool CUIFrameLineWnd::inc_pos(
         RBp.x += m_tex_rect[i].width();
         RBp.y += m_tex_rect[i].height();
     }
-    else  // i==flBack
+    else // i==flBack
     {
         if ((bHorizontal && rect.lt.x + m_tex_rect[flSecond].width() + EPS_L >= rect.rb.x) ||
             (!bHorizontal && rect.lt.y + m_tex_rect[flSecond].height() + EPS_L >= rect.rb.y))
@@ -141,7 +141,7 @@ bool CUIFrameLineWnd::inc_pos(
         bool b_draw_reminder =
             (bHorizontal) ? (rect.lt.x + m_tex_rect[flBack].width() > rect.rb.x - m_tex_rect[flSecond].width()) :
                             (rect.lt.y + m_tex_rect[flBack].height() > rect.rb.y - m_tex_rect[flSecond].height());
-        if (b_draw_reminder) {  // draw reminder
+        if (b_draw_reminder) { // draw reminder
             float rem_len = (bHorizontal) ? rect.rb.x - m_tex_rect[flSecond].width() - rect.lt.x :
                                             rect.rb.y - m_tex_rect[flSecond].height() - rect.lt.y;
 
@@ -164,7 +164,7 @@ bool CUIFrameLineWnd::inc_pos(
             }
         }
         else
-        {  // draw full element
+        { // draw full element
             RBt = m_tex_rect[i].rb;
 
             RBp = rect.lt;

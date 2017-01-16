@@ -91,11 +91,11 @@ void dxFontRender::OnRender(CGameFont& owner)
                 }
 
 #if defined(USE_DX10) || defined(USE_DX11) ||                                                                          \
-    defined(USE_OGL)  //	Vertex shader will cancel a DX9 correction, so make fake offset
+    defined(USE_OGL) //	Vertex shader will cancel a DX9 correction, so make fake offset
                 X -= 0.5f;
                 Y -= 0.5f;
                 Y2 -= 0.5f;
-#endif  //	USE_DX10
+#endif //	USE_DX10
 
                 float tu, tv;
                 for (int j = 0; j < len; j++)
@@ -117,7 +117,7 @@ void dxFontRender::OnRender(CGameFont& owner)
                         //	Make half pixel offset for 1 to 1 mapping
                         tu += (0.5f / owner.vTS.x);
                         tv += (0.5f / owner.vTS.y);
-#endif  //	USE_DX10
+#endif //	USE_DX10
 
                         v->set(X, Y2, clr2, tu, tv + owner.fTCHeight);
                         v++;

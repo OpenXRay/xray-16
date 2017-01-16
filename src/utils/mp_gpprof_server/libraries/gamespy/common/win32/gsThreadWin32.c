@@ -26,9 +26,9 @@ gsi_u32 gsiHasThreadShutdown(GSIThreadID theThreadID)
 {
     DWORD result = WaitForSingleObject(theThreadID, 0);
     if (result == WAIT_ABANDONED || result == WAIT_OBJECT_0)
-        return 1;  // thread is dead
+        return 1; // thread is dead
     else
-        return 0;  // keep waiting
+        return 0; // keep waiting
 }
 
 GSISemaphoreID gsiCreateSemaphore(gsi_i32 theInitialCount, gsi_i32 theMaxCount, char* theName)

@@ -67,7 +67,7 @@ public:
 
 #ifndef DEDICATED_SERVER
     void InitializeNotDedicated();
-#endif  // DEDICATED_SERVER
+#endif // DEDICATED_SERVER
 
     void Destroy();
 
@@ -86,4 +86,4 @@ ENGINE_API bool is_enough_address_space_available();
         a = NULL;                                                                                                      \
     }
 
-#endif  // !defined(AFX_ENGINEAPI_H__CF21372B_C8B8_4891_82FC_D872C84E1DD4__INCLUDED_)
+#endif // !defined(AFX_ENGINEAPI_H__CF21372B_C8B8_4891_82FC_D872C84E1DD4__INCLUDED_)

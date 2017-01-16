@@ -40,9 +40,9 @@ IC void moving_object::action(const action_type& action)
     m_action = action;
     m_action_position = Fvector().set(flt_max, flt_max, flt_max);
     m_action_time = Device.dwTimeGlobal;
-#if 0   // def DEBUG
+#if 0  // def DEBUG
 	Msg					("%6d %s %s",Device.dwFrame,*object().cName(),action == moving_object::action_wait ? "wait" : "move");
-#endif  // DEBUG
+#endif // DEBUG
 }
 
 IC void moving_object::action(const action_type& action, const Fvector& action_position)
@@ -54,9 +54,9 @@ IC void moving_object::action(const action_type& action, const Fvector& action_p
     m_action = action;
     m_action_position = action_position;
     m_action_time = Device.dwTimeGlobal;
-#if 0   // def DEBUG
+#if 0  // def DEBUG
 	Msg					("%6d %s %s",Device.dwFrame,*object().cName(),action == moving_object::action_wait ? "wait" : "move");
-#endif  // DEBUG
+#endif // DEBUG
 }
 
 IC const moving_object::action_type& moving_object::action() const
@@ -89,4 +89,4 @@ IC obstacles_query& moving_object::dynamic_query()
     return (m_dynamic_query);
 }
 
-#endif  // MOVING_OBJECT_INLINE_H
+#endif // MOVING_OBJECT_INLINE_H

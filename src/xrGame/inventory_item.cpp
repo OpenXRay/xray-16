@@ -77,7 +77,7 @@ CInventoryItem::~CInventoryItem()
         Msg("! ERROR item_id[%d] H_Parent=[%s][%d] [%d]", object().ID(), p ? p->cName().c_str() : "none",
             p ? p->ID() : -1, Device.dwFrame);
     }
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
 }
 
 void CInventoryItem::Load(LPCSTR section)
@@ -280,8 +280,8 @@ bool CInventoryItem::Detach(const char* item_section_name, bool b_spawn_item)
         if (GameID() == eGameIDSingle) {
             D->ID_Parent = u16(object().H_Parent()->ID());
         }
-        else  // i'm not sure this is right
-        {     // but it is simpliest way to avoid exception in MP BuyWnd... [Satan]
+        else // i'm not sure this is right
+        {    // but it is simpliest way to avoid exception in MP BuyWnd... [Satan]
             if (object().H_Parent())
                 D->ID_Parent = u16(object().H_Parent()->ID());
             else
@@ -385,7 +385,7 @@ void CInventoryItem::net_Import(NET_Packet& P)
 
     net_Import_PH_Params(P, N, num_items);
     ////////////////////////////////////////////
-    P.r_u8();  // active (not freezed ot not)
+    P.r_u8(); // active (not freezed ot not)
 
     if (this->cast_game_object()->Local()) {
         return;
@@ -412,7 +412,7 @@ void CInventoryItem::net_Import(NET_Packet& P)
     if (!m_activated) {
 #ifdef DEBUG
         Msg("Activating object [%d] before interpolation starts", object().ID());
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
         object().processing_activate();
         m_activated = true;
     }
@@ -621,7 +621,7 @@ void CInventoryItem::net_Export(NET_Packet& P)
     if (!num_items.common) {
 #ifdef DEBUG
         Msg("--- Number of sync items of inv item object is 0");
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
         return;
     }
 
@@ -632,11 +632,11 @@ void CInventoryItem::net_Export(NET_Packet& P)
     net_Export_PH_Params(P, State, num_items);
 
     if (object().PPhysicsShell() && object().PPhysicsShell()->isEnabled()) {
-        P.w_u8(1);  // not freezed
+        P.w_u8(1); // not freezed
     }
     else
     {
-        P.w_u8(0);  // freezed
+        P.w_u8(0); // freezed
     }
 
     /*if (object().H_Parent() || IsGameTypeSingle())
@@ -776,7 +776,7 @@ void CInventoryItem::PH_B_CrPr(){
     ///////////////////////////////////////////////
 };
 
-void CInventoryItem::PH_I_CrPr()  // actions & operations between two phisic prediction steps
+void CInventoryItem::PH_I_CrPr() // actions & operations between two phisic prediction steps
     {
         /*net_updateData* p					= NetSync();
         //store recalculated data, then we able to restore it after small future prediction
@@ -1113,7 +1113,7 @@ void CInventoryItem::Interpolate()
                 if (m_activated) {
 #ifdef DEBUG
                     Msg("Deactivating object [%d] after interpolation finish", object().ID());
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
                     object().processing_deactivate();
                     m_activated = false;
                 }
@@ -1447,7 +1447,7 @@ void CInventoryItem::SetDropManual(BOOL val)
             Msg("! WARNING: trying to set drop manual flag to item [%d][%s] to %d", object_id(), m_name.c_str(), val);
         }
     }
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
     if (!IsGameTypeSingle()) {
         if (val == TRUE)
             DenyTrade();

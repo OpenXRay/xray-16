@@ -193,7 +193,7 @@ void moving_objects::resolve_collision(boxes& current, moving_object* object0, c
 		}
 		Msg						("%6d Eng of \"Oooooooops\"",Device.dwFrame);
 	}
-#endif  // 0
+#endif // 0
     VERIFY2(
         object0->action_frame() != Device.dwFrame, make_string("%d %s", Device.dwFrame, *object0->object().cName()));
     VERIFY2(object0->action_frame() < Device.dwFrame, make_string("%d %s", Device.dwFrame, *object0->object().cName()));
@@ -250,7 +250,7 @@ bool moving_objects::collided_dynamic(moving_object* object0, const Fvector& pos
         VERIFY(!already_wait(object0));
         VERIFY(!already_wait(object1));
     }
-#endif  // DEBUG
+#endif // DEBUG
 
     boxes current;
     if (!collided_dynamic(object0, position0, object1, position1, current)) return (false);

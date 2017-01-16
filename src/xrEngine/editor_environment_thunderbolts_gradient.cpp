@@ -103,4 +103,4 @@ void gradient::fill(
         detail::real_path("$game_textures$", "").c_str(), "Select texture...",
         editor::property_holder::cannot_enter_text, editor::property_holder::remove_extension);
 }
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR

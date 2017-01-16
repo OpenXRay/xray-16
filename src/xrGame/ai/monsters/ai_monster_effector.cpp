@@ -75,7 +75,7 @@ BOOL CMonsterEffectorHit::ProcessCam(SCamEffectorInfo& info)
     Mdef.i.crossproduct(info.n, info.d);
     Mdef.c.set(info.p);
 
-    float period_all = period_number * PI_MUL_2;  // макс. значение цикла
+    float period_all = period_number * PI_MUL_2; // макс. значение цикла
     float cur_amp = max_amp * (PI / 180) * time_left_perc;
 
     Fvector dangle;

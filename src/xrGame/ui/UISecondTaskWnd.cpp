@@ -141,7 +141,7 @@ void UITaskListWnd::UpdateList()
                 ++count_for_check;
             }
         }
-    }  // for
+    } // for
     m_list->SetScrollPos(prev_scroll_pos);
 }
 
@@ -321,7 +321,7 @@ bool UITaskListWndItem::OnMouseAction(float x, float y, EUIMessages mouse_action
         hide_hint();
         break;
     }
-    }  // switch
+    } // switch
 
     return true;
 }

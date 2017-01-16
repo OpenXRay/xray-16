@@ -183,4 +183,4 @@ void rewarding_event_handlers::init()
 {
 }
 
-}  // namespace award_system
+} // namespace award_system

@@ -51,11 +51,11 @@ private:
     property_holder_type* m_property_holder;
     collection_type* m_collection;
     mutable bool m_changed;
-};  // class manager
-}  // namespace sound_channels
-}  // namespace environment
-}  // namespace editor
+}; // class manager
+} // namespace sound_channels
+} // namespace environment
+} // namespace editor
 
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR
 
-#endif  // ifndef EDITOR_WEATHER_SOUND_CHANNELS_MANAGER_HPP_INCLUDED
+#endif // ifndef EDITOR_WEATHER_SOUND_CHANNELS_MANAGER_HPP_INCLUDED

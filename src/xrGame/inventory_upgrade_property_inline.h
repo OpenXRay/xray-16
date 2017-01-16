@@ -38,7 +38,7 @@ IC Property::FunctorParams_type const& Property::functor_params() const
     return m_functor_params;
 }
 
-}  // namespace upgrade
-}  // namespace inventory
+} // namespace upgrade
+} // namespace inventory
 
-#endif  // INVENTORY_UPGRADE_PROPERTY_INLINE_H_INCLUDED
+#endif // INVENTORY_UPGRADE_PROPERTY_INLINE_H_INCLUDED

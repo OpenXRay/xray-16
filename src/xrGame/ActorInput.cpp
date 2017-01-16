@@ -81,7 +81,7 @@ void CActor::IR_OnKeyboardPress(int cmd)
         NoClipFly(cmd);
         return;
     }
-#endif  // DEBUG
+#endif // DEBUG
     switch (cmd)
     {
     case kJUMP: { mstate_wishful |= mcJump;
@@ -244,7 +244,7 @@ void CActor::IR_OnKeyboardHold(int cmd)
         NoClipFly(cmd);
         return;
     }
-#endif  // DEBUG
+#endif // DEBUG
     float LookFactor = GetLookFactor();
     switch (cmd)
     {
@@ -329,7 +329,7 @@ bool CActor::use_Holder(CHolderCustom* holder)
 
         if (holderGO->CLS_ID == CLSID_OBJECT_W_STATMGUN) b = use_MountedWeapon(holder);
 
-        if (b) {  // used succesfully
+        if (b) { // used succesfully
             // switch off torch...
             CAttachableItem* I = CAttachmentOwner::attachedItem(CLSID_DEVICE_TORCH);
             if (I) {
@@ -367,7 +367,7 @@ void CActor::ActorUse()
 
     if (m_pInvBoxWeLookingAt && m_pInvBoxWeLookingAt->nonscript_usable()) {
         CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(CurrentGameUI());
-        if (pGameSP)  // single
+        if (pGameSP) // single
         {
             if (!m_pInvBoxWeLookingAt->closed()) {
                 pGameSP->StartCarBody(this, m_pInvBoxWeLookingAt);
@@ -433,11 +433,11 @@ BOOL CActor::HUDview() const
 }
 
 static u16 SlotsToCheck[] = {
-    KNIFE_SLOT,     // 0
-    INV_SLOT_2,     // 1
-    INV_SLOT_3,     // 2
-    GRENADE_SLOT,   // 3
-    ARTEFACT_SLOT,  // 10
+    KNIFE_SLOT,    // 0
+    INV_SLOT_2,    // 1
+    INV_SLOT_3,    // 2
+    GRENADE_SLOT,  // 3
+    ARTEFACT_SLOT, // 10
 };
 
 void CActor::OnNextWeaponSlot()
@@ -485,7 +485,7 @@ void CActor::OnPrevWeaponSlot()
         if (SlotsToCheck[CurSlot] == ActiveSlot) break;
     };
 
-    if (CurSlot >= NumSlotsToCheck) CurSlot = NumSlotsToCheck - 1;  // last in row
+    if (CurSlot >= NumSlotsToCheck) CurSlot = NumSlotsToCheck - 1; // last in row
 
     for (s32 i = s32(CurSlot - 1); i >= 0; i--)
     {
@@ -570,7 +570,7 @@ void CActor::SwitchTorch()
 #ifdef DEBUG
 void CActor::NoClipFly(int cmd)
 {
-    Fvector cur_pos;  // = Position();
+    Fvector cur_pos; // = Position();
     cur_pos.set(0, 0, 0);
     float scale = 1.0f;
     if (pInput->iGetAsyncKeyState(DIK_LSHIFT))
@@ -610,4 +610,4 @@ void CActor::NoClipFly(int cmd)
     Position().add(cur_pos);
     character_physics_support()->movement()->SetPosition(Position());
 }
-#endif  // DEBUG
+#endif // DEBUG

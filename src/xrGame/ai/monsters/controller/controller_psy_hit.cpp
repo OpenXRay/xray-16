@@ -153,7 +153,7 @@ bool check_actor_visibility(const Fvector trace_from, const Fvector trace_to, IG
     return l_rq.O == Actor() || (l_rq.range >= dist - 0.1f);
 }
 
-}  // namespace detail
+} // namespace detail
 
 extern CActor* g_actor;
 

@@ -2,9 +2,9 @@
 
 #include "Restrictions.h"
 #ifdef DEBUG
-#include "xrEngine/xr_ioconsole.h"
 #include "xrEngine/xr_ioc_cmd.h"
-#endif  //#ifdef DEBUG
+#include "xrEngine/xr_ioconsole.h"
+#endif //#ifdef DEBUG
 #include "string_table.h"
 CRestrictions g_mp_restrictions;
 
@@ -13,7 +13,7 @@ shared_str g_ranks[_RANK_COUNT];
 u32 get_rank(const shared_str& section)
 {
     int res = -1;
-    if (g_ranks[0].size() == 0) {  // load
+    if (g_ranks[0].size() == 0) { // load
         string32 buff;
         for (int i = 0; i < _RANK_COUNT; i++)
         {
@@ -73,7 +73,7 @@ void CRestrictions::InitGroups()
 
 #ifndef MASTER_GOLD
     Dump();
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
 
 #ifdef DEBUG
     CMD4(CCC_Integer, "rank_for_buymenu", (int*)&m_rank, 0, 4);
@@ -81,7 +81,7 @@ void CRestrictions::InitGroups()
 }
 
 void CRestrictions::AddRestriction4rank(u32 rank, const shared_str& lst)
-{  // private
+{ // private
     VERIFY(m_bInited);
 
     rank_rest_vec& rest = m_restrictions[rank];
@@ -113,7 +113,7 @@ bool CRestrictions::IsAvailable(const shared_str& itm)
 }
 
 void CRestrictions::AddGroup(LPCSTR group, LPCSTR lst)
-{  // private
+{ // private
     VERIFY(m_bInited);
 
     VERIFY(m_goups.find(group) == m_goups.end());
@@ -138,7 +138,7 @@ bool CRestrictions::IsGroupExist(const shared_str& group) const
 }
 
 RESTR CRestrictions::GetRestr(const shared_str& item)
-{  // private function
+{ // private function
     VERIFY(m_bInited);
     RESTR ret;
     string512 _name;
@@ -156,7 +156,7 @@ RESTR CRestrictions::GetRestr(const shared_str& item)
 }
 
 shared_str CRestrictions::GetItemGroup(const shared_str& item) const
-{  // private function
+{ // private function
     VERIFY(m_bInited);
     Groups::const_iterator it;
     group_items::const_iterator IT;
@@ -249,5 +249,5 @@ void CRestrictions::Dump() const
         }
         Msg("-----------------------------------------");
     }
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
 }

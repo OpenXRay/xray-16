@@ -53,7 +53,7 @@ extern "C" {
 #define dlmalloc_footprint pt3malloc_footprint
 #define dlindependent_calloc pt3independent_calloc
 #define dlindependent_comalloc pt3independent_comalloc
-#elif !defined(USE_DL_PREFIX)  // #ifdef USE_PT3_PREFIX
+#elif !defined(USE_DL_PREFIX) // #ifdef USE_PT3_PREFIX
 #define dlcalloc calloc
 #define dlfree free
 #define dlmalloc malloc
@@ -69,7 +69,7 @@ extern "C" {
 #define dlmalloc_footprint malloc_footprint
 #define dlindependent_calloc independent_calloc
 #define dlindependent_comalloc independent_comalloc
-#endif  // #if defined(USE_DL_PREFIX)
+#endif // #if defined(USE_DL_PREFIX)
 
 /*
   malloc(size_t n)
@@ -438,9 +438,9 @@ typedef void(__stdcall* out_of_memory_handler_type)(mspace, out_of_memory_handle
 
 mspace create_mspace(
     size_t capacity, int locked, out_of_memory_handler_type handler, out_of_memory_handler_parameter_type parameter);
-#else   // #ifdef USE_OUT_OF_MEMORY_HANDLER
+#else  // #ifdef USE_OUT_OF_MEMORY_HANDLER
 mspace create_mspace(size_t capacity, int locked);
-#endif  // #ifdef USE_OUT_OF_MEMORY_HANDLER
+#endif // #ifdef USE_OUT_OF_MEMORY_HANDLER
 
 /*
   destroy_mspace destroys the given space, and attempts to return all
@@ -463,9 +463,9 @@ size_t destroy_mspace(mspace msp);
 mspace create_mspace_with_base(void* base, size_t capacity, int locked, out_of_memory_handler_type handler,
     out_of_memory_handler_parameter_type parameter);
 void const* out_of_memory_handler_parameter(void* arena);
-#else   // #ifdef USE_OUT_OF_MEMORY_HANDLER
+#else  // #ifdef USE_OUT_OF_MEMORY_HANDLER
 mspace create_mspace_with_base(void* base, size_t capacity, int locked);
-#endif  // #ifdef USE_OUT_OF_MEMORY_HANDLER
+#endif // #ifdef USE_OUT_OF_MEMORY_HANDLER
 
 /*
   mspace_malloc behaves as malloc, but operates within

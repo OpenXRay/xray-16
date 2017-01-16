@@ -1,4 +1,4 @@
-#ifndef MXVECTOR_INCLUDED  // -*- C++ -*-
+#ifndef MXVECTOR_INCLUDED // -*- C++ -*-
 #define MXVECTOR_INCLUDED
 #if !defined(__GNUC__)
 #pragma once

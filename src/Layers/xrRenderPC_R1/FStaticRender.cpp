@@ -360,7 +360,7 @@ void CRender::add_Occluder(Fbox2& bb_screenspace)
 void CRender::set_Object(IRenderable* O)
 {
     VERIFY(g_bRendering);
-    val_pObject = O;  // NULL is OK, trust me :)
+    val_pObject = O; // NULL is OK, trust me :)
     if (val_pObject) {
         VERIFY(dynamic_cast<IGameObject*>(O) || dynamic_cast<CPS_Instance*>(O));
         if (O->GetRenderData().pROS) {
@@ -438,7 +438,7 @@ void CRender::Calculate()
 {
 #ifdef _GPA_ENABLED
     TAL_SCOPED_TASK_NAMED("CRender::Calculate()");
-#endif  // _GPA_ENABLED
+#endif // _GPA_ENABLED
 
     BasicStats.Culling.Begin();
 
@@ -518,7 +518,7 @@ void CRender::Calculate()
 
             // Determine visibility for dynamic part of scene
             set_Object(0);
-            g_hud->Render_First();  // R1 shadows
+            g_hud->Render_First(); // R1 shadows
             g_hud->Render_Last();
             u32 uID_LTRACK = 0xffffffff;
             if (phase == PHASE_NORMAL) {
@@ -537,11 +537,11 @@ void CRender::Calculate()
                 ISpatial* spatial = lstRenderables[o_it];
                 spatial->spatial_updatesector();
                 CSector* sector = (CSector*)spatial->GetSpatialData().sector;
-                if (0 == sector) continue;  // disassociated from S/P structure
+                if (0 == sector) continue; // disassociated from S/P structure
 
                 // Filter only not light spatial
                 if (PortalTraverser.i_marker != sector->r_marker && (spatial->GetSpatialData().type & STYPE_RENDERABLE))
-                    continue;  // inactive (untouched) sector
+                    continue; // inactive (untouched) sector
 
                 if (spatial->GetSpatialData().type & STYPE_RENDERABLE) {
                     for (u32 v_it = 0; v_it < sector->r_frustums.size(); v_it++)
@@ -576,7 +576,7 @@ void CRender::Calculate()
                             v_orig.marker = v_copy.marker;
                             v_orig.hom_frame = v_copy.hom_frame;
                             v_orig.hom_tested = v_copy.hom_tested;
-                            if (!bVisible) break;  // exit loop on frustums
+                            if (!bVisible) break; // exit loop on frustums
 
                             // rendering
                             if (o_it == uID_LTRACK && renderable->renderable_ROS()) {
@@ -586,9 +586,9 @@ void CRender::Calculate()
                             }
                             set_Object(renderable);
                             renderable->renderable_Render();
-                            set_Object(0);  //? is it needed at all
+                            set_Object(0); //? is it needed at all
                         }
-                        break;  // exit loop on frustums
+                        break; // exit loop on frustums
                     }
                 }
                 else
@@ -650,7 +650,7 @@ void CRender::Render()
 {
 #ifdef _GPA_ENABLED
     TAL_SCOPED_TASK_NAMED("CRender::Render()");
-#endif  // _GPA_ENABLED
+#endif // _GPA_ENABLED
 
     if (m_bFirstFrameAfterReset) {
         m_bFirstFrameAfterReset = false;
@@ -663,39 +663,39 @@ void CRender::Render()
     Target->Begin();
     o.vis_intersect = FALSE;
     phase = PHASE_NORMAL;
-    r_dsgraph_render_hud();              // hud
-    r_dsgraph_render_graph(0);           // normal level
-    if (Details) Details->Render();      // grass / details
-    r_dsgraph_render_lods(true, false);  // lods - FB
+    r_dsgraph_render_hud();             // hud
+    r_dsgraph_render_graph(0);          // normal level
+    if (Details) Details->Render();     // grass / details
+    r_dsgraph_render_lods(true, false); // lods - FB
 
-    g_pGamePersistent->Environment().RenderSky();     // sky / sun
-    g_pGamePersistent->Environment().RenderClouds();  // clouds
+    g_pGamePersistent->Environment().RenderSky();    // sky / sun
+    g_pGamePersistent->Environment().RenderClouds(); // clouds
 
-    r_pmask(true, false);  // disable priority "1"
+    r_pmask(true, false); // disable priority "1"
     o.vis_intersect = TRUE;
     HOM.Disable();
-    L_Dynamic->render(0);  // addititional light sources
+    L_Dynamic->render(0); // addititional light sources
     if (Wallmarks) {
         g_r = 0;
-        Wallmarks->Render();  // wallmarks has priority as normal geometry
+        Wallmarks->Render(); // wallmarks has priority as normal geometry
     }
     HOM.Enable();
     o.vis_intersect = FALSE;
     phase = PHASE_NORMAL;
-    r_pmask(true, true);  // enable priority "0" and "1"
+    r_pmask(true, true); // enable priority "0" and "1"
     BasicStats.ShadowsRender.Begin();
-    if (L_Shadows) L_Shadows->render();  // ... and shadows
+    if (L_Shadows) L_Shadows->render(); // ... and shadows
     BasicStats.ShadowsRender.End();
-    r_dsgraph_render_lods(false, true);  // lods - FB
-    r_dsgraph_render_graph(1);           // normal level, secondary priority
-    L_Dynamic->render(1);                // addititional light sources, secondary priority
-    PortalTraverser.fade_render();       // faded-portals
-    r_dsgraph_render_sorted();           // strict-sorted geoms
+    r_dsgraph_render_lods(false, true); // lods - FB
+    r_dsgraph_render_graph(1);          // normal level, secondary priority
+    L_Dynamic->render(1);               // addititional light sources, secondary priority
+    PortalTraverser.fade_render();      // faded-portals
+    r_dsgraph_render_sorted();          // strict-sorted geoms
     BasicStats.Glows.Begin();
-    if (L_Glows) L_Glows->Render();  // glows
+    if (L_Glows) L_Glows->Render(); // glows
     BasicStats.Glows.End();
-    g_pGamePersistent->Environment().RenderFlares();  // lens-flares
-    g_pGamePersistent->Environment().RenderLast();    // rain/thunder-bolts
+    g_pGamePersistent->Environment().RenderFlares(); // lens-flares
+    g_pGamePersistent->Environment().RenderLast();   // rain/thunder-bolts
 
 #if DEBUG
     for (int _priority = 0; _priority < 2; ++_priority)
@@ -1047,7 +1047,7 @@ static inline bool match_shader_id(
 #if 0
 	strcpy_s					( result, "" );
 	return						false;
-#else  // #if 1
+#else // #if 1
 #ifdef DEBUG
     LPCSTR temp = "";
     bool found = false;
@@ -1064,7 +1064,7 @@ static inline bool match_shader_id(
 
     xr_strcpy(result, temp);
     return found;
-#else   // #ifdef DEBUG
+#else  // #ifdef DEBUG
     FS_FileSet::const_iterator i = file_set.begin();
     FS_FileSet::const_iterator const e = file_set.end();
     for (; i != e; ++i)
@@ -1076,6 +1076,6 @@ static inline bool match_shader_id(
     }
 
     return false;
-#endif  // #ifdef DEBUG
-#endif  // #if 1
+#endif // #ifdef DEBUG
+#endif // #if 1
 }

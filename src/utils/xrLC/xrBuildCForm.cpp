@@ -142,7 +142,7 @@ void CBuild::BuildCForm()
 
         CL.add_face(
             T->v[0]->P, T->v[1]->P, T->v[2]->P, T->dwMaterialGame, materials()[T->dwMaterial].sector, T->sm_group);
-        Logger.Progress(p_total += p_cost);  // progress
+        Logger.Progress(p_total += p_cost); // progress
     }
     if (bCriticalErrCnt) {
         err_save();

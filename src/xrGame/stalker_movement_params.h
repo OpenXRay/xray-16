@@ -119,8 +119,8 @@ private:
     mutable loophole_type const* m_cover_selected_loophole;
     mutable u32 m_last_selection_time;
     mutable bool m_selected_loophole_actual;
-};  // class stalker_movement_params
+}; // class stalker_movement_params
 
 #include "stalker_movement_params_inline.h"
 
-#endif  // #ifndef STALKER_MOVEMENT_PARAMS_H_INCLUDED
+#endif // #ifndef STALKER_MOVEMENT_PARAMS_H_INCLUDED

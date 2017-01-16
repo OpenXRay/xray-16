@@ -74,7 +74,7 @@ IPHStaticGeomShell* P_BuildStaticGeomShell(IPhysicsShellHolder* obj, ObjectConta
     // R_ASSERT2(V,"need visual to build");
     IKinematics* K = obj->ObjectKinematics();
     R_ASSERT2(K, "need visual to build");
-    K->CalculateBones(TRUE);  //. bForce - was TRUE
+    K->CalculateBones(TRUE); //. bForce - was TRUE
 
     // V->getVisData().box.getradius	(b.m_halfsize);
     K->GetBox().getradius(b.m_halfsize);

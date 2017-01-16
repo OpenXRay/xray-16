@@ -54,18 +54,18 @@ IC void FillSprite_Circle(const Fvector& pos, const float width, const float len
     //	TODO: return code back to indexed rendering since we use quads
     //	Tri 1
     GlobalEnv.UIRender->PushPoint(
-        d.x + pos.x, d.y + pos.y, d.z + pos.z, color, t_crcl.min.x, t_crcl.max.y);  // 0.f,1.f);
+        d.x + pos.x, d.y + pos.y, d.z + pos.z, color, t_crcl.min.x, t_crcl.max.y); // 0.f,1.f);
     GlobalEnv.UIRender->PushPoint(
-        a.x + pos.x, a.y + pos.y, a.z + pos.z, color, t_crcl.min.x, t_crcl.min.y);  // 0.f,0.f);
+        a.x + pos.x, a.y + pos.y, a.z + pos.z, color, t_crcl.min.x, t_crcl.min.y); // 0.f,0.f);
     GlobalEnv.UIRender->PushPoint(
-        c.x + pos.x, c.y + pos.y, c.z + pos.z, color, t_crcl.max.x, t_crcl.max.y);  // 1.f,1.f);
+        c.x + pos.x, c.y + pos.y, c.z + pos.z, color, t_crcl.max.x, t_crcl.max.y); // 1.f,1.f);
     //	Tri 2
     GlobalEnv.UIRender->PushPoint(
-        c.x + pos.x, c.y + pos.y, c.z + pos.z, color, t_crcl.max.x, t_crcl.max.y);  // 1.f,1.f);
+        c.x + pos.x, c.y + pos.y, c.z + pos.z, color, t_crcl.max.x, t_crcl.max.y); // 1.f,1.f);
     GlobalEnv.UIRender->PushPoint(
-        a.x + pos.x, a.y + pos.y, a.z + pos.z, color, t_crcl.min.x, t_crcl.min.y);  // 0.f,0.f);
+        a.x + pos.x, a.y + pos.y, a.z + pos.z, color, t_crcl.min.x, t_crcl.min.y); // 0.f,0.f);
     GlobalEnv.UIRender->PushPoint(
-        b.x + pos.x, b.y + pos.y, b.z + pos.z, color, t_crcl.max.x, t_crcl.min.y);  // 1.f,0.f);
+        b.x + pos.x, b.y + pos.y, b.z + pos.z, color, t_crcl.max.x, t_crcl.min.y); // 1.f,0.f);
 
     // pv->set         (d.x+pos.x,d.y+pos.y,d.z+pos.z, color, 0.f,1.f);        pv++;
     // pv->set         (a.x+pos.x,a.y+pos.y,a.z+pos.z, color, 0.f,0.f);        pv++;

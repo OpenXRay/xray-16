@@ -25,6 +25,6 @@ private:
     float m_temp_pos;
     float m_pos;
 
-};  // class UI_Arrow
+}; // class UI_Arrow
 
-#endif  // UI_ARROW_H_INCLUDED
+#endif // UI_ARROW_H_INCLUDED

@@ -27,7 +27,7 @@ public:
     void UpdateMissileVisibility();
     virtual void UnloadMagazine(bool spawn_ammo = true);
 
-    virtual void net_Import(NET_Packet& P);  // import from server
+    virtual void net_Import(NET_Packet& P); // import from server
 protected:
     virtual bool AllowBore();
     virtual void PlayAnimReload();

@@ -16,4 +16,4 @@ public:
     virtual ~CWeaponHPSA();
 };
 
-#endif  //__XR_WEAPON_HPSA_H__
+#endif //__XR_WEAPON_HPSA_H__

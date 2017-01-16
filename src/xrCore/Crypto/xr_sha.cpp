@@ -39,4 +39,4 @@ bool xr_sha256::continue_calculate()
     return false;
 }
 
-}  // namespace crypto
+} // namespace crypto

@@ -10,9 +10,9 @@
 #if defined(USE_DX10) || defined(USE_DX11)
 #include "Layers/xrRenderDX10/StateManager/dx10State.h"
 #include "Layers/xrRenderDX10/dx10R_Backend_Runtime.h"
-#else  //	USE_DX10
+#else //	USE_DX10
 #include "Layers/xrRenderDX9/dx9R_Backend_Runtime.h"
-#endif  //	USE_DX10
+#endif //	USE_DX10
 
 IC void R_xforms::set_c_w(R_constant* C)
 {
@@ -92,7 +92,7 @@ ICF void CBackend::set_States(ID3DState* _state)
 //	DX10 Manages states using it's own algorithm. Don't mess with it.
 #if !defined(USE_DX10) && !defined(USE_DX11)
     if (state != _state)
-#endif  //	USE_DX10
+#endif //	USE_DX10
     {
         PGO(Msg("PGO:state_block"));
 #ifdef DEBUG
@@ -137,7 +137,7 @@ IC void CBackend::set_Element(ShaderElement* S, u32 pass)
     set_DS(P.ds);
     set_CS(P.cs);
 #endif
-#endif  //	USE_DX10
+#endif //	USE_DX10
     set_Constants(P.constants);
     set_Textures(P.T);
 #ifdef _EDITOR

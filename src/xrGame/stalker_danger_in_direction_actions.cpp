@@ -93,11 +93,9 @@ void CStalkerActionDangerInDirectionTakeCover::execute()
         //		object().brain().affect_cover				(true);
     }
 
-    if (object()
-            .movement()
-            .path_completed())  // &&
-                                // (object().memory().enemy().selected()->Position().distance_to_sqr(object().Position())
-                                // >= 10.f))
+    if (object().movement().path_completed()) // &&
+        // (object().memory().enemy().selected()->Position().distance_to_sqr(object().Position())
+        // >= 10.f))
         m_storage->set_property(eWorldPropertyInCover, true);
 }
 
@@ -147,7 +145,7 @@ void CStalkerActionDangerInDirectionLookOut::execute()
     inherited::execute();
 
     //	CMemoryInfo							mem_object =
-    //object().memory().memory(object().memory().danger().selected()->object());
+    // object().memory().memory(object().memory().danger().selected()->object());
     //
     //	if (!mem_object.m_object)
     //		return;
@@ -227,7 +225,7 @@ void CStalkerActionDangerInDirectionHoldPosition::execute()
     inherited::execute();
 
     //	CMemoryInfo							mem_object =
-    //object().memory().memory(object().memory().danger().selected()->object());
+    // object().memory().memory(object().memory().danger().selected()->object());
     //
     //	if (!mem_object.m_object)
     //		return;

@@ -4,7 +4,7 @@
 
 #if defined(USE_DX11) || defined(USE_DX10)
 #include "Layers/xrRenderDX10/DXCommonTypes.h"
-#else  //	USE_DX10
+#else //	USE_DX10
 
 typedef IDirect3DVertexShader9 ID3DVertexShader;
 typedef IDirect3DPixelShader9 ID3DPixelShader;
@@ -28,6 +28,6 @@ typedef IDirect3DStateBlock9 ID3DState;
     {                                                                                                                  \
     } while (0)
 
-#endif  //	USE_DX10
+#endif //	USE_DX10
 
-#endif  //	xrD3DDefs_included
+#endif //	xrD3DDefs_included

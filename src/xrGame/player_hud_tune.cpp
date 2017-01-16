@@ -30,19 +30,19 @@ void tune_remap(const Ivector& in_values, Ivector& out_values)
         out_values = in_values;
     }
     else if (pInput->iGetAsyncKeyState(DIK_Z))
-    {  // strict by X
+    { // strict by X
         out_values.x = in_values.y;
         out_values.y = 0;
         out_values.z = 0;
     }
     else if (pInput->iGetAsyncKeyState(DIK_X))
-    {  // strict by Y
+    { // strict by Y
         out_values.x = 0;
         out_values.y = in_values.y;
         out_values.z = 0;
     }
     else if (pInput->iGetAsyncKeyState(DIK_C))
-    {  // strict by Z
+    { // strict by Z
         out_values.x = 0;
         out_values.y = 0;
         out_values.z = in_values.y;
@@ -170,7 +170,7 @@ void attachable_hud_item::tune(Ivector values)
             Log("-----------");
         }
     }
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
 }
 
 void attachable_hud_item::debug_draw_firedeps()
@@ -190,7 +190,7 @@ void attachable_hud_item::debug_draw_firedeps()
 
         if (hud_adj_mode == 7) render.draw_aabb(fd.vLastSP, 0.005f, 0.005f, 0.005f, color_xrgb(0, 255, 0));
     }
-#endif  // DEBUG
+#endif // DEBUG
 }
 
 void player_hud::tune(Ivector _values)
@@ -265,7 +265,7 @@ void player_hud::tune(Ivector _values)
         if (!hi) return;
         hi->tune(values);
     }
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
 }
 
 void hud_draw_adjust_mode()

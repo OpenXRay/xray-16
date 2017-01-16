@@ -4,7 +4,7 @@
 #ifdef DEBUG
 
 #include "PHDebug.h"
-#endif  // DEBUG
+#endif // DEBUG
 #include "ActorEffector.h"
 #include "CameraFirstEye.h"
 #include "CameraLook.h"
@@ -444,7 +444,7 @@ struct playing_pred
 
 void CActor::Hit(SHit* pHDS)
 {
-    bool b_initiated = pHDS->aim_bullet;  // physics strike by poltergeist
+    bool b_initiated = pHDS->aim_bullet; // physics strike by poltergeist
 
     pHDS->aim_bullet = false;
 
@@ -462,7 +462,7 @@ void CActor::Hit(SHit* pHDS)
         DBG_DrawLine(Position(), to, color_xrgb(124, 124, 0));
         DBG_ClosedCashedDraw(500);
     }
-#endif  // DEBUG
+#endif // DEBUG
 
     bool bPlaySound = true;
     if (!g_Alive()) bPlaySound = false;
@@ -655,7 +655,7 @@ void CActor::HitMark(float P, Fvector dir, IGameObject* who_object, s16 element,
         xr_sprintf(sect_name, "effector_fire_hit_%d", id);
         AddEffector(this, effFireHit, sect_name, P * 0.001f);
 
-    }  // if hit_type
+    } // if hit_type
 }
 
 void CActor::HitSignal(float perc, Fvector& vLocalDir, IGameObject* who, s16 element)
@@ -687,7 +687,7 @@ void CActor::Die(IGameObject* who)
 {
 #ifdef DEBUG
     Msg("--- Actor [%s] dies !", this->Name());
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
     inherited::Die(who);
 
     if (OnServer()) {
@@ -808,9 +808,9 @@ void CActor::g_Physics(Fvector& _accel, float jump, float dt)
         }
 #ifdef DEBUG
         if (!psActorFlags.test(AF_NO_CLIP)) character_physics_support()->movement()->GetPosition(Position());
-#else   // DEBUG
+#else  // DEBUG
         character_physics_support()->movement()->GetPosition(Position());
-#endif  // DEBUG
+#endif // DEBUG
         character_physics_support()->movement()->bSleep = false;
     }
 
@@ -1226,7 +1226,7 @@ void CActor::shedule_Update(u32 DT)
                         {
                             m_sDefaultObjAction = m_sDeadCharacterUseAction;
                         }
-                    }  // m_pPersonWeLookingAt
+                    } // m_pPersonWeLookingAt
                 }
                 else if (m_pVehicleWeLookingAt)
                 {
@@ -1308,7 +1308,7 @@ float CActor::missile_throw_force()
 
 #ifdef DEBUG
 extern BOOL g_ShowAnimationInfo;
-#endif  // DEBUG
+#endif // DEBUG
 // HUD
 
 void CActor::OnHUDDraw(CCustomHUD*)
@@ -1316,7 +1316,7 @@ void CActor::OnHUDDraw(CCustomHUD*)
     R_ASSERT(IsFocused());
     if (!((mstate_real & mcLookout) && !IsGameTypeSingle())) g_player_hud->render_hud();
 
-#if 0  // ndef NDEBUG
+#if 0 // ndef NDEBUG
 	if (Level().CurrentControlEntity() == this && g_ShowAnimationInfo)
 	{
 		string128 buf;
@@ -1793,7 +1793,7 @@ bool CActor::is_on_ground()
 
 bool CActor::is_ai_obstacle() const
 {
-    return (false);  // true);
+    return (false); // true);
 }
 
 float CActor::GetRestoreSpeed(ALife::EConditionRestoreType const& type)
@@ -1899,7 +1899,7 @@ float CActor::GetRestoreSpeed(ALife::EConditionRestoreType const& type)
         }
         break;
     }
-    }  // switch
+    } // switch
 
     return res;
 }

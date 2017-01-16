@@ -45,7 +45,7 @@ typedef enum {
 void* gsimalloc(size_t size);
 void* gsirealloc(void* ptr, size_t size);
 void gsifree(void* ptr);
-void* gsimemalign(size_t boundary, size_t size);  // TODO
+void* gsimemalign(size_t boundary, size_t size); // TODO
 
 //--------------------------------------------------------------------------
 // Customer supplied memory manager customization interface
@@ -76,7 +76,7 @@ void gsiMemoryCallbacksSet(gsMallocCB p_malloc, gsFreeCB p_free, gsReallocCB p_r
 typedef enum {
     gsMemMgrContext_Invalid = -1,
     gsMemMgrContext_Default = 0,
-    gsMemMgrContext_Count = 16  // max number of mempools
+    gsMemMgrContext_Count = 16 // max number of mempools
 } gsMemMgrContext;
 
 // call this to enable GameSpy's provided memory manager
@@ -125,7 +125,7 @@ void gsMemMgrDestroy(gsMemMgrContext context);
 // These functions all run on the current mempool context.
 void gsMemMgrDumpStats();
 void gsMemMgrDumpAllocations();
-void gsMemMgrValidateMemoryPool();  // walk heap and check integrity
+void gsMemMgrValidateMemoryPool(); // walk heap and check integrity
 
 // -------------Tool use	------------------------
 // find which mempool context this ptr is part of, if any.
@@ -164,4 +164,4 @@ void gsMemMgrSelfText();
 }
 #endif
 
-#endif  // __GSIMEMORY_H__
+#endif // __GSIMEMORY_H__

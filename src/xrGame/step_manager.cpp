@@ -44,7 +44,7 @@ void CStepManager::reload(LPCSTR section)
     VERIFY((m_legs_count >= MIN_LEGS_COUNT) && (m_legs_count <= MAX_LEGS_COUNT));
 
     SStepParam param;
-    param.step[0].time = 0.1f;  // avoid warning
+    param.step[0].time = 0.1f; // avoid warning
 
     LPCSTR anim_name, val;
     string16 cur_elem;
@@ -140,7 +140,7 @@ void CStepManager::on_animation_start(MotionID motion_id, CBlend* blend)
 
     m_step_info.disable = false;
     m_step_info.params = it->second;
-    m_step_info.cur_cycle = 1;  // all cycles are 1-based
+    m_step_info.cur_cycle = 1; // all cycles are 1-based
 
     for (u32 i = 0; i < m_legs_count; i++)
     {
@@ -159,7 +159,7 @@ void CStepManager::update(bool b_hud_view)
     if (!m_blend) return;
 
     float dist_sqr = m_object->Position().distance_to_sqr(Device.vCameraPosition);
-    bool b_play = dist_sqr < 400.0f;  // 20m
+    bool b_play = dist_sqr < 400.0f; // 20m
 
     // получить параметры шага
     SStepParam& step = m_step_info.params;
@@ -229,7 +229,7 @@ void CStepManager::update(bool b_hud_view)
         m_step_info.cur_cycle = 1 + u8(float(cur_time - m_time_anim_started) / (1000.f * cycle_anim_time));
 
     // если анимация циклическая...
-    u32 time_anim_end = m_time_anim_started + u32(get_blend_time() * 1000);  // время завершения работы анимации
+    u32 time_anim_end = m_time_anim_started + u32(get_blend_time() * 1000); // время завершения работы анимации
     if (!m_blend->stop_at_end && (time_anim_end < cur_time)) {
         m_time_anim_started = time_anim_end;
         m_step_info.cur_cycle = 1;

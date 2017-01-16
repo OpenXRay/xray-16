@@ -73,7 +73,7 @@ bool BattlEyeSystem::ReloadServerDLL(xrServer* xr_server)
     }
 
     server = xr_new<BattlEyeServer>(xr_server);
-    if (server->IsLoaded())  // (1) if loaded from BEServer.dll (new version)
+    if (server->IsLoaded()) // (1) if loaded from BEServer.dll (new version)
     {
         server->AddConnectedPlayers();
         if (!DeleteFile(old_file_name)) {
@@ -96,7 +96,7 @@ bool BattlEyeSystem::ReloadServerDLL(xrServer* xr_server)
     }
 
     server = xr_new<BattlEyeServer>(xr_server);
-    if (server->IsLoaded())  // (2) if loaded from BEServer.dll (prev version)
+    if (server->IsLoaded()) // (2) if loaded from BEServer.dll (prev version)
     {
         server->AddConnectedPlayers();
         return true;
@@ -130,7 +130,7 @@ bool BattlEyeSystem::ReloadClientDLL()
     }
 
     client = xr_new<BattlEyeClient>();
-    if (client->IsLoaded())  // (1) if loaded from BEClient.dll (new version)
+    if (client->IsLoaded()) // (1) if loaded from BEClient.dll (new version)
     {
         if (!DeleteFile(old_file_name)) {
             Msg("! Could not delete old %s", old_file_name);
@@ -152,7 +152,7 @@ bool BattlEyeSystem::ReloadClientDLL()
     }
 
     client = xr_new<BattlEyeClient>();
-    if (client->IsLoaded())  // (2) if loaded from BEClient.dll (prev version)
+    if (client->IsLoaded()) // (2) if loaded from BEClient.dll (prev version)
     {
         return true;
     }
@@ -252,10 +252,10 @@ bool BattlEyeSystem::TestLoadClient()
 {
     m_test_load_client = false;
     if (g_dedicated_server) {
-        return true;  // false = Error
+        return true; // false = Error
     }
 
-    if (LoadClient())  // test load
+    if (LoadClient()) // test load
     {
         xr_delete(client);
         client = NULL;
@@ -332,4 +332,4 @@ bool BattlEyeSystem::InitDLL(LPCSTR dll_name, string_path& out_file)
     return true;
 }
 
-#endif  // BATTLEYE
+#endif // BATTLEYE

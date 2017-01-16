@@ -17,7 +17,7 @@ static pcstr const s_anti_aim_max_angle_string = "anti_aim_max_angle";
 static pcstr const s_anti_aim_detection_gain_speed_string = "anti_aim_detection_gain_speed";
 static pcstr const s_anti_aim_detection_loose_speed_string = "anti_aim_detection_loose_speed";
 
-}  // namespace detail
+} // namespace detail
 
 anti_aim_ability::anti_aim_ability(CBaseMonster* const object) : m_object(object)
 {
@@ -183,7 +183,7 @@ void anti_aim_ability::start_camera_effector()
 void anti_aim_ability::do_deactivate()
 {
     if (is_active()) {
-        if (m_object->Visual())  // when m_object is destroying, visual might be dead already
+        if (m_object->Visual()) // when m_object is destroying, visual might be dead already
         {
             m_man->deactivate(this);
         }
@@ -260,7 +260,7 @@ void anti_aim_ability::update_schedule()
     DBG().get_text_tree().clear();
     debug::text_tree& text_tree = DBG().get_text_tree().find_or_add("ActorView");
     text_tree.add_line("detection_level", m_detection_level);
-#endif  // #ifdef DEBUG_STATE
+#endif // #ifdef DEBUG_STATE
 
     if (!check_update_condition()) {
         do_deactivate();
@@ -274,7 +274,7 @@ void anti_aim_ability::update_schedule()
     if (is_active()) {
 #ifdef DEBUG_STATE
         text_tree.add_line("state", "activated");
-#endif  // #ifdef DEBUG_STATE
+#endif // #ifdef DEBUG_STATE
 
         if (Device.dwTimeGlobal < m_animation_hit_tick) {
             return;
@@ -291,13 +291,13 @@ void anti_aim_ability::update_schedule()
     if (Device.dwTimeGlobal < m_last_activated_tick + (TTime)(m_timeout * 1000)) {
 #ifdef DEBUG_STATE
         text_tree.add_line("state", "colddown");
-#endif  // #ifdef DEBUG_STATE
+#endif // #ifdef DEBUG_STATE
         return;
     }
 
 #ifdef DEBUG_STATE
     text_tree.add_line("state", "deactivated");
-#endif  // #ifdef DEBUG_STATE
+#endif // #ifdef DEBUG_STATE
 
     if (m_last_detection_tick == 0) {
         m_last_detection_tick = Device.dwTimeGlobal;

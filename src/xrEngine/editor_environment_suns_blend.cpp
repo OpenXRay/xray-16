@@ -39,4 +39,4 @@ void blend::fill(
     properties->add_property("time", "blend", "this option is resposible for the blend time", m_time, m_time);
 }
 
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR

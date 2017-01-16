@@ -49,7 +49,7 @@ void CResourceManager::_DeleteCS(const SCS* CS)
 {
     DestroyShader(CS);
 }
-#endif  //	USE_DX10
+#endif //	USE_DX10
 
 void fix_texture_name(LPSTR fn);
 
@@ -83,9 +83,9 @@ SState* CResourceManager::_CreateState(SimulatorStates& state_code)
     v_states.back()->dwFlags |= xr_resource_flagged::RF_REGISTERED;
 #if defined(USE_DX10) || defined(USE_DX11)
     v_states.back()->state = ID3DState::Create(state_code);
-#else   //	USE_DX10
+#else  //	USE_DX10
     v_states.back()->state = state_code.record();
-#endif  //	USE_DX10
+#endif //	USE_DX10
     v_states.back()->state_code = state_code;
     return v_states.back();
 }
@@ -600,7 +600,7 @@ CTexture* CResourceManager::_CreateTexture(LPCSTR _Name)
     if (0 == xr_strcmp(_Name, "null")) return 0;
     R_ASSERT(_Name && _Name[0]);
     string_path Name;
-    xr_strcpy(Name, _Name);  //. andy if (strext(Name)) *strext(Name)=0;
+    xr_strcpy(Name, _Name); //. andy if (strext(Name)) *strext(Name)=0;
     fix_texture_name(Name);
     // ***** first pass - search already loaded texture
     LPSTR N = LPSTR(Name);

@@ -1,4 +1,4 @@
-#ifndef MXBLOCK_INCLUDED  // -*- C++ -*-
+#ifndef MXBLOCK_INCLUDED // -*- C++ -*-
 #define MXBLOCK_INCLUDED
 #if !defined(__GNUC__)
 #pragma once
@@ -106,11 +106,11 @@ public:
     // Primitive methods for altering the data block
     //
     void resize(int n) { resize_block(n); }
-    void bitcopy(const T* a, int n)  // copy bits directly
+    void bitcopy(const T* a, int n) // copy bits directly
     {
         CopyMemory(block, a, _min(n, N) * sizeof(T));
     }
-    void copy(const T* a, const int n)  // copy using assignment operator
+    void copy(const T* a, const int n) // copy using assignment operator
     {
         for (int i = 0; i < _min(n, N); i++)
             block[i] = a[i];

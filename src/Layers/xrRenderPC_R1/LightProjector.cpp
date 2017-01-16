@@ -15,7 +15,7 @@
 // tir2.xrdemo      -> 45.2
 // tir2.xrdemo      -> 61.8
 
-const float P_distance = 50;  // switch distance between LOW-q light and HIGH-q light
+const float P_distance = 50; // switch distance between LOW-q light and HIGH-q light
 const float P_cam_dist = 200;
 const float P_cam_range = 7.f;
 const D3DFORMAT P_rtf = D3DFMT_A8R8G8B8;
@@ -137,7 +137,7 @@ void CLightProjector::calculate()
 {
 #ifdef _GPA_ENABLED
     TAL_SCOPED_TASK_NAMED("CLightProjector::calculate()");
-#endif  // _GPA_ENABLED
+#endif // _GPA_ENABLED
 
     if (receivers.empty()) return;
 
@@ -150,9 +150,9 @@ void CLightProjector::calculate()
         CROS_impl* LT = (CROS_impl*)O->renderable_ROS();
         int slot = LT->shadow_recv_slot;
         if (slot < 0 || slot >= P_o_count)
-            bValid = FALSE;  // invalid slot
+            bValid = FALSE; // invalid slot
         else if (cache[slot].O != O)
-            bValid = FALSE;  // not the same object
+            bValid = FALSE; // not the same object
         else
         {
             // seems to be valid
@@ -160,10 +160,10 @@ void CLightProjector::calculate()
             bb.xform(O->GetRenderData().visual->getVisData().box, O->GetRenderData().xform);
             if (cache[slot].BB.contains(bb)) {
                 // inside, but maybe timelimit exceeded?
-                if (Device.dwTimeGlobal > cache[slot].dwTimeValid) bValid = FALSE;  // timeout
+                if (Device.dwTimeGlobal > cache[slot].dwTimeValid) bValid = FALSE; // timeout
             }
             else
-                bValid = FALSE;  // out of bounds
+                bValid = FALSE; // out of bounds
         }
 
         //
@@ -204,7 +204,7 @@ void CLightProjector::calculate()
         O->GetRenderData().xform.transform_tiny(C, vis.sphere.P);
         R.O = O;
         R.C = C;
-        R.C.y += vis.sphere.R * 0.1f;  //. YURA: 0.1 can be more
+        R.C.y += vis.sphere.R * 0.1f; //. YURA: 0.1 can be more
         R.BB.xform(vis.box, O->GetRenderData().xform).scale(0.1f);
         R.dwTimeValid = Device.dwTimeGlobal + ::Random.randI(time_min, time_max);
         LT->shadow_recv_slot = c_it;
@@ -310,8 +310,8 @@ void CLightProjector::calculate()
         min.set(R.C.x - p_R, R.C.y - (p_R + P_cam_range), R.C.z - p_R);
         max.set(R.C.x + p_R, R.C.y + 0, R.C.z + p_R);
         BB.set(min, max);
-        R.UVclamp_min.set(min).add(.05f);  // shrink a little
-        R.UVclamp_max.set(max).sub(.05f);  // shrink a little
+        R.UVclamp_min.set(min).add(.05f); // shrink a little
+        R.UVclamp_max.set(max).sub(.05f); // shrink a little
         ISpatial* spatial = dynamic_cast<ISpatial*>(O);
         if (spatial) {
             spatial->spatial_updatesector();

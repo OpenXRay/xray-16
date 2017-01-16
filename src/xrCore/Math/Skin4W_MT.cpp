@@ -61,5 +61,5 @@ void Skin4W_MT(vertRender* dst, vertBoned4W* src, u32 vCount, CBoneInstance* bon
     ttapi_Run();
 }
 
-}  // namespace Util3D
-}  // namespace XRay
+} // namespace Util3D
+} // namespace XRay

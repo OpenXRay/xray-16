@@ -11,31 +11,31 @@ class IKinematics;
 class CPHGeometryOwner
 {
 protected:
-    GEOM_STORAGE m_geoms;  // e
+    GEOM_STORAGE m_geoms; // e
     // bl
     bool b_builded;
 
 private:
-    dSpaceID m_group;  // e					//bl
+    dSpaceID m_group; // e					//bl
 protected:
-    Fvector m_mass_center;                              // e ??				//bl
-    IPhysicsShellHolder* m_phys_ref_object;             //->to shell ??		//bl
-    float m_volume;                                     // e ??				//bl
-    u16 ul_material;                                    // e ??				//bl
-    ContactCallbackFun* contact_callback;               //->to shell ??		//bt
-    ObjectContactCallbackFun* object_contact_callback;  //->to shell ??		//st
+    Fvector m_mass_center;                             // e ??				//bl
+    IPhysicsShellHolder* m_phys_ref_object;            //->to shell ??		//bl
+    float m_volume;                                    // e ??				//bl
+    u16 ul_material;                                   // e ??				//bl
+    ContactCallbackFun* contact_callback;              //->to shell ??		//bt
+    ObjectContactCallbackFun* object_contact_callback; //->to shell ??		//st
 public:
     ///
-    void add_Sphere(const Fsphere& V);                               // aux
-    void add_Box(const Fobb& V);                                     // aux
-    void add_Cylinder(const Fcylinder& V);                           // aux
-    void add_Shape(const SBoneShape& shape);                         // aux
-    void add_Shape(const SBoneShape& shape, const Fmatrix& offset);  // aux
+    void add_Sphere(const Fsphere& V);                              // aux
+    void add_Box(const Fobb& V);                                    // aux
+    void add_Cylinder(const Fcylinder& V);                          // aux
+    void add_Shape(const SBoneShape& shape);                        // aux
+    void add_Shape(const SBoneShape& shape, const Fmatrix& offset); // aux
     CODEGeom* last_geom()
     {
         if (m_geoms.empty()) return NULL;
         return m_geoms.back();
-    }  // aux
+    } // aux
     bool has_geoms() { return !m_geoms.empty(); }
     void add_geom(CODEGeom* g);
     void remove_geom(CODEGeom* g);
@@ -45,21 +45,21 @@ protected:
     void group_remove(CODEGeom& g);
 
 public:
-    void set_ContactCallback(ContactCallbackFun* callback);                 // aux (may not be)
-    void set_ObjectContactCallback(ObjectContactCallbackFun* callback);     // called anywhere ph state influent
-    void add_ObjectContactCallback(ObjectContactCallbackFun* callback);     // called anywhere ph state influent
-    void remove_ObjectContactCallback(ObjectContactCallbackFun* callback);  // called anywhere ph state influent
+    void set_ContactCallback(ContactCallbackFun* callback);                // aux (may not be)
+    void set_ObjectContactCallback(ObjectContactCallbackFun* callback);    // called anywhere ph state influent
+    void add_ObjectContactCallback(ObjectContactCallbackFun* callback);    // called anywhere ph state influent
+    void remove_ObjectContactCallback(ObjectContactCallbackFun* callback); // called anywhere ph state influent
     void set_CallbackData(void* cd);
     void* get_CallbackData();
     ObjectContactCallbackFun* get_ObjectContactCallback();
-    void set_PhysicsRefObject(IPhysicsShellHolder* ref_object);            // aux
-    IPhysicsShellHolder* PhysicsRefObject() { return m_phys_ref_object; }  // aux
+    void set_PhysicsRefObject(IPhysicsShellHolder* ref_object);           // aux
+    IPhysicsShellHolder* PhysicsRefObject() { return m_phys_ref_object; } // aux
     void SetPhObjectInGeomData(CPHObject* O);
 #ifdef DEBUG
     void dbg_draw(float scale, u32 color, Flags32 flags) const;
 #endif
     void SetMaterial(u16 m);
-    void SetMaterial(LPCSTR m) { SetMaterial(GMLibrary().GetMaterialIdx(m)); }  // aux
+    void SetMaterial(LPCSTR m) { SetMaterial(GMLibrary().GetMaterialIdx(m)); } // aux
     IC CODEGeom* Geom(u16 num)
     {
         R_ASSERT2(num < m_geoms.size(), "out of range");
@@ -71,23 +71,23 @@ public:
         return m_geoms[num];
     }
     CODEGeom* GeomByBoneID(u16 bone_id);
-    u16 numberOfGeoms() const;  // aux
+    u16 numberOfGeoms() const; // aux
     dGeomID dSpacedGeometry();
 
 protected:
     IC dSpaceID group_space() { return m_group; }
 public:
-    Fvector get_mc_data();   // aux
-    Fvector get_mc_geoms();  // aux
+    Fvector get_mc_data();  // aux
+    Fvector get_mc_geoms(); // aux
     void get_mc_kinematics(IKinematics* K, Fvector& mc, float& mass);
-    void calc_volume_data();                                      // aux
-    const Fvector& local_mass_Center() { return m_mass_center; }  // aux
+    void calc_volume_data();                                     // aux
+    const Fvector& local_mass_Center() { return m_mass_center; } // aux
     float get_volume()
     {
         calc_volume_data();
         return m_volume;
-    };                                                                                               // aux
-    void get_Extensions(const Fvector& axis, float center_prg, float& lo_ext, float& hi_ext) const;  // aux
+    };                                                                                              // aux
+    void get_Extensions(const Fvector& axis, float center_prg, float& lo_ext, float& hi_ext) const; // aux
     void get_MaxAreaDir(Fvector& dir);
     float getRadius();
     void setStaticForm(const Fmatrix& form);
@@ -101,7 +101,7 @@ protected:
     void CreateGroupSpace();
     void DestroyGroupSpace();
     void destroy();
-    void build_Geom(CODEGeom& V);  // aux
+    void build_Geom(CODEGeom& V); // aux
     void build_Geom(u16 i);
     void set_body(dBodyID body);
 

@@ -13,11 +13,11 @@ bool MagicBox3::intersects(const MagicBox3& rkBox1) const
     // compute difference of box centers, D = C1-C0
     Fvector kD = Fvector().sub(rkBox1.Center(), rkBox0.Center());
 
-    float aafC[3][3];     // matrix C = A^T B, c_{ij} = dotproduct(A_i,B_j)
-    float aafAbsC[3][3];  // |c_{ij}|
-    float afAD[3];        // dotproduct(A_i,D)
-    float fR0, fR1, fR;   // interval radii and distance between centers
-    float fR01;           // = R0 + R1
+    float aafC[3][3];    // matrix C = A^T B, c_{ij} = dotproduct(A_i,B_j)
+    float aafAbsC[3][3]; // |c_{ij}|
+    float afAD[3];       // dotproduct(A_i,D)
+    float fR0, fR1, fR;  // interval radii and distance between centers
+    float fR01;          // = R0 + R1
 
     // axis C0+t*A0
     aafC[0][0] = akA[0].dotproduct(akB[0]);

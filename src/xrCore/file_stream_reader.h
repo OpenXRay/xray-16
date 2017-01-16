@@ -16,4 +16,4 @@ public:
     virtual void destroy();
 };
 
-#endif  // FILE_STREAM_READER_H
+#endif // FILE_STREAM_READER_H

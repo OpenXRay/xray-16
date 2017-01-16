@@ -92,7 +92,7 @@ public:
     virtual void add_to_LRU(shared_str const& arg);
     void add_LRU_to_tips(vecTips& tips);
 
-};  // class IConsole_Command
+}; // class IConsole_Command
 
 class ENGINE_API CCC_Mask : public IConsole_Command
 {

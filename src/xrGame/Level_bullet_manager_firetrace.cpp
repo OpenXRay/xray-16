@@ -107,8 +107,8 @@ BOOL CBulletManager::test_callback(const collide::ray_defs& rd, IGameObject* obj
                         }
 #endif
                         if (Random.randF(0.f, 1.f) > (ahp * hpf)) {
-                            bRes = FALSE;       // don't hit actor
-                            play_whine = true;  // play whine sound
+                            bRes = FALSE;      // don't hit actor
+                            play_whine = true; // play whine sound
                         }
                         else
                         {
@@ -116,13 +116,13 @@ BOOL CBulletManager::test_callback(const collide::ray_defs& rd, IGameObject* obj
                             Level().BulletManager().m_rq_results.r_clear();
 
                             if (cform->_RayQuery(rd, Level().BulletManager().m_rq_results)) {
-                                bRes = TRUE;         // hit actor
-                                play_whine = false;  // don't play whine sound
+                                bRes = TRUE;        // hit actor
+                                play_whine = false; // don't play whine sound
                             }
                             else
                             {
-                                bRes = FALSE;       // don't hit actor
-                                play_whine = true;  // play whine sound
+                                bRes = FALSE;      // don't hit actor
+                                play_whine = true; // play whine sound
                             }
                         }
                     }
@@ -255,7 +255,7 @@ void CBulletManager::DynamicObjectHit(CBulletManager::_event& E)
 
     if (g_clear) E.Repeated = false;
     if (GameID() == eGameIDSingle) E.Repeated = false;
-    bool NeedShootmark = true;  //! E.Repeated;
+    bool NeedShootmark = true; //! E.Repeated;
 
     if (smart_cast<CActor*>(E.R.O)) {
         game_PlayerState* ps = Game().GetPlayerByGameID(E.R.O->ID());
@@ -307,7 +307,7 @@ void CBulletManager::DynamicObjectHit(CBulletManager::_event& E)
             Game().m_WeaponUsageStatistic->CollectData())
         {
             CActor* pActor = smart_cast<CActor*>(E.R.O);
-            if (pActor)  // && pActor->g_Alive())
+            if (pActor) // && pActor->g_Alive())
             {
                 Game().m_WeaponUsageStatistic->OnBullet_Hit(&E.bullet, E.R.O->ID(), (s16)E.R.element, E.point);
                 AddStatistic = true;
@@ -370,8 +370,9 @@ bool CBulletManager::ObjectHit(SBullet_Hit* hit_res, SBullet* bullet, const Fvec
         }
         if (DOT(hit_normal, bullet->dir) < 0) {
             if (bullet->density_mode) {
-                //				Log("WARNING: Material in material found while bullet tracing. Incorrect behaviour of shooting
-                //is possible.");
+                //				Log("WARNING: Material in material found while bullet tracing. Incorrect behaviour of
+                //shooting
+                // is possible.");
             }
             bullet->density_mode = true;
             SGameMtl* mtl = GMLib.GetMaterialByIdx(target_material);
@@ -389,7 +390,7 @@ bool CBulletManager::ObjectHit(SBullet_Hit* hit_res, SBullet* bullet, const Fvec
     //коэффициент уменьшение силы с падением скорости
     float speed_factor = bullet->speed / bullet->max_speed;
     //получить силу хита выстрела с учетом патрона
-    *hit_res = bullet->hit_param;  // default param
+    *hit_res = bullet->hit_param; // default param
 
     hit_res->power = bullet->hit_param.power * speed_factor;
 
@@ -398,7 +399,7 @@ bool CBulletManager::ObjectHit(SBullet_Hit* hit_res, SBullet* bullet, const Fvec
 
     SGameMtl* mtl = GMLib.GetMaterialByIdx(target_material);
     float mtl_ap = mtl->fShootFactor;
-    float shoot_factor = 0.0f;  // default >> пуля НЕ пробила материал!
+    float shoot_factor = 0.0f; // default >> пуля НЕ пробила материал!
     float ap = bullet->armor_piercing;
 
     if (ap > EPS && ap >= mtl_ap) {
@@ -415,7 +416,7 @@ bool CBulletManager::ObjectHit(SBullet_Hit* hit_res, SBullet* bullet, const Fvec
     int bullet_state = 0;
 #endif
 
-    if (fsimilar(mtl_ap, 0.0f))  //Если материал полностью простреливаемый (кусты)
+    if (fsimilar(mtl_ap, 0.0f)) //Если материал полностью простреливаемый (кусты)
     {
 #ifdef DEBUG
         bullet_state = 2;
@@ -439,7 +440,7 @@ bool CBulletManager::ObjectHit(SBullet_Hit* hit_res, SBullet* bullet, const Fvec
     random_dir(tgt_dir, new_dir, deg2rad(10.0f));
     float ricoshet_factor = bullet->dir.dotproduct(tgt_dir);
 
-    float f = Random.randF(0.5f, 0.8f);  //(0.5f,1.f);
+    float f = Random.randF(0.5f, 0.8f); //(0.5f,1.f);
     if ((f < ricoshet_factor) && !mtl->Flags.test(SGameMtl::flNoRicoshet) && bullet->flags.allow_ricochet) {
         // уменьшение скорости полета в зависимости от угла падения пули (чем прямее угол, тем больше потеря)
         bullet->flags.allow_ricochet = 0;
@@ -468,9 +469,9 @@ bool CBulletManager::ObjectHit(SBullet_Hit* hit_res, SBullet* bullet, const Fvec
     else
     {
         //пробивание материала
-        speed_scale = shoot_factor;  // mtl->fShootFactor;
+        speed_scale = shoot_factor; // mtl->fShootFactor;
 
-        bullet->bullet_pos.mad(bullet->bullet_pos, bullet->dir, EPS);  // fake
+        bullet->bullet_pos.mad(bullet->bullet_pos, bullet->dir, EPS); // fake
         //ввести коэффициент случайности при простреливании
         Fvector rand_normal;
         rand_normal.random_dir(bullet->dir, deg2rad(2.0f), Random);

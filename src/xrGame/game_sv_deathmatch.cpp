@@ -481,7 +481,7 @@ void game_sv_Deathmatch::Update()
     case GAME_PHASE_PLAYER_SCORES:
     {
         if (m_delayedRoundEnd && m_roundEndDelay < Device.TimerAsync()) {
-            OnRoundEnd();  // eRoundEnd_Finish
+            OnRoundEnd(); // eRoundEnd_Finish
         }
     }
     break;
@@ -493,7 +493,7 @@ INT g_sv_Wait_For_Players_Ready = 1;
 
 bool game_sv_Deathmatch::checkForRoundStart()
 {
-    if (!Level().m_bGameConfigStarted)  // in case of starting server stage (net_start 1..6) we can't do restart ....
+    if (!Level().m_bGameConfigStarted) // in case of starting server stage (net_start 1..6) we can't do restart ....
         return false;
 
     if (m_bFastRestart ||
@@ -747,7 +747,7 @@ void game_sv_Deathmatch::assign_RP(CSE_Abstract* E, game_PlayerState* ps_who)
     u32 Team = RP_2_Use(E);
 #ifdef DEBUG
     Msg("--- Deathmatch RPoint for %s uses team %d", ps_who->getName(), Team);
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
     VERIFY(rpoints[Team].size());
 
     CSE_Spectator* pSpectator = smart_cast<CSE_Spectator*>(E);
@@ -1021,7 +1021,7 @@ void game_sv_Deathmatch::SpawnWeaponsForActor(CSE_Abstract* pE, game_PlayerState
         u16 ItemID = ps->pItemList.front();
 #ifdef DEBUG
         Msg("--- Server: spawning item [%d] for actor [%s]", ItemID, ps->getName());
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
         SpawnWeapon4Actor(
             pA->ID, *m_strWeaponsData->GetItemName(ItemID & 0x00FF), u8((ItemID & 0xFF00) >> 0x08), ps->pItemList);
         // Game().m_WeaponUsageStatistic->OnWeaponBought(ps, *m_strWeaponsData->GetItemName(ItemID& 0x00FF));
@@ -1192,7 +1192,7 @@ void game_sv_Deathmatch::LoadTeamData(const shared_str& caSection)
     LoadSkinsForTeam(caSection, &NewTeam.aSkins);
     LoadDefItemsForTeam(caSection, /*&NewTeam.aWeapons, */ &NewTeam.aDefaultItems);
     //-------------------------------------------------------------
-    if (pSettings->section_exist(caSection))  // money
+    if (pSettings->section_exist(caSection)) // money
     {
         NewTeam.m_iM_Start = GetMoneyAmount(caSection, "money_start");
         NewTeam.m_iM_OnRespawn = GetMoneyAmount(caSection, "money_respawn");
@@ -1457,7 +1457,7 @@ void game_sv_Deathmatch::Send_EventPack_for_AnomalySet(u32 AnomalySet, u8 Event)
         //-----------------------------------
         NET_Packet P;
         u_EventGen(P, GE_ZONE_STATE_CHANGE, ID);
-        P.w_u8(u8(Event));  // eZoneStateDisabled
+        P.w_u8(u8(Event)); // eZoneStateDisabled
         //-----------------------------------
         EventPack.w_u8(u8(P.B.count));
         EventPack.w(&P.B.data, P.B.count);
@@ -1486,7 +1486,7 @@ void game_sv_Deathmatch::StartAnomalies(int AnomalySet)
     ASetID.erase(ASetID.begin() + ID);
     ///////////////////////////////////////////////////
     if (m_dwLastAnomalySetID < m_AnomalySetsList.size()) {
-        Send_EventPack_for_AnomalySet(m_dwLastAnomalySetID, CCustomZone::eZoneStateDisabled);  // Disable
+        Send_EventPack_for_AnomalySet(m_dwLastAnomalySetID, CCustomZone::eZoneStateDisabled); // Disable
     };
     ///////////////////////////////////////////////////
     if (AnomalySet != -1 && AnomalySet < (int)m_AnomalySetsList.size()) {
@@ -1496,7 +1496,7 @@ void game_sv_Deathmatch::StartAnomalies(int AnomalySet)
     else
         m_dwLastAnomalySetID = NewAnomalySetID;
 
-    if (IsAnomaliesEnabled()) Send_EventPack_for_AnomalySet(m_dwLastAnomalySetID, CCustomZone::eZoneStateIdle);  // Idle
+    if (IsAnomaliesEnabled()) Send_EventPack_for_AnomalySet(m_dwLastAnomalySetID, CCustomZone::eZoneStateIdle); // Idle
     m_dwLastAnomalyStartTime = Level().timeServer();
 #ifdef DEBUG
     Msg("Anomaly Set %d Activated", m_dwLastAnomalySetID);
@@ -1602,7 +1602,7 @@ BOOL game_sv_Deathmatch::OnTouch(u16 eid_who, u16 eid_what, BOOL bForced)
                 NET_Packet P;
                 u_EventGen(P, GE_DESTROY, e_what->ID);
                 m_server->OnMessageSync(
-                    P, m_server->GetServerClient()->ID);  // m_server->OnMessage(P, m_server->GetServerClient()->ID);
+                    P, m_server->GetServerClient()->ID); // m_server->OnMessage(P, m_server->GetServerClient()->ID);
                 //-------------------------------
 
                 game_PlayerState* pKiller = get_eid(eid_who);
@@ -1938,7 +1938,7 @@ void game_sv_Deathmatch::OnPostCreate(u16 eid_who)
             //-----------------------------------------------------------------------------
             NET_Packet P;
             u_EventGen(P, GE_ZONE_STATE_CHANGE, eid_who);
-            P.w_u8(u8(CCustomZone::eZoneStateDisabled));  // eZoneStateDisabled
+            P.w_u8(u8(CCustomZone::eZoneStateDisabled)); // eZoneStateDisabled
             u_EventSend(P);
             //-----------------------------------------------------------------------------
             return;
@@ -2005,13 +2005,13 @@ void game_sv_Deathmatch::ReadOptions(shared_str& options)
     //-------------------------------
     g_sv_dm_dwForceRespawn = get_option_i(*options, "frcrspwn", g_sv_dm_dwForceRespawn);
     g_sv_dm_dwFragLimit = get_option_i(*options, "fraglimit", g_sv_dm_dwFragLimit);
-    g_sv_dm_dwTimeLimit = get_option_i(*options, "timelimit", g_sv_dm_dwTimeLimit);             // in (min)
-    g_sv_dm_dwDamageBlockTime = get_option_i(*options, "dmgblock", g_sv_dm_dwDamageBlockTime);  // in (sec)
+    g_sv_dm_dwTimeLimit = get_option_i(*options, "timelimit", g_sv_dm_dwTimeLimit);            // in (min)
+    g_sv_dm_dwDamageBlockTime = get_option_i(*options, "dmgblock", g_sv_dm_dwDamageBlockTime); // in (sec)
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     g_sv_dm_bDamageBlockIndicators = (get_option_i(*options, "dmbi", (g_sv_dm_bDamageBlockIndicators ? 1 : 0)) != 0);
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     g_sv_dm_bAnomaliesEnabled = (get_option_i(*options, "ans", (IsAnomaliesEnabled() ? 1 : 0)) != 0);
-    g_sv_dm_dwAnomalySetLengthTime = get_option_i(*options, "anslen", g_sv_dm_dwAnomalySetLengthTime);  // in (min)
+    g_sv_dm_dwAnomalySetLengthTime = get_option_i(*options, "anslen", g_sv_dm_dwAnomalySetLengthTime); // in (min)
     //-----------------------------------------------------------------------
     m_bSpectatorMode = false;
     if (!g_dedicated_server && (get_option_i(*options, "spectr", -1) != -1)) {
@@ -2148,14 +2148,14 @@ void game_sv_Deathmatch::FillDeathActorRejectItems(CSE_ActorMP* actor, xr_vector
         if (!item) {
 #ifndef MASTER_GOLD
             Msg("! ERROR: item from slot[%d] is NULL", active_slot);
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
             return;
         }
         CSE_Abstract* server_item = m_server->ID_to_entity(item->object_id());
         if (!server_item) {
 #ifndef MASTER_GOLD
             Msg("! ERROR: server entity is NULL, object_id = [%d]", item->object_id());
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
             return;
         }
 

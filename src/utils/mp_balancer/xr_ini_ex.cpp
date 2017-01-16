@@ -209,7 +209,7 @@ void CInifileEx::Load(IReader* F, LPCSTR path)
             }
         }
 
-        if (str[0] && (str[0] == '#') && strstr(str, "#include"))  // handle includes
+        if (str[0] && (str[0] == '#') && strstr(str, "#include")) // handle includes
         {
             string_path inc_name;
             R_ASSERT(path && path[0]);
@@ -224,7 +224,7 @@ void CInifileEx::Load(IReader* F, LPCSTR path)
                 FS.r_close(I);
             }
         }
-        else if (str[0] && (str[0] == '['))  // new section ?
+        else if (str[0] && (str[0] == '[')) // new section ?
         {
             // insert previous filled section
             if (Current) {
@@ -259,7 +259,7 @@ void CInifileEx::Load(IReader* F, LPCSTR path)
             *strchr(str, ']') = 0;
             Current->Name = strlwr(str + 1);
         }
-        else  // name = value
+        else // name = value
         {
             if (Current) {
                 string4096 value_raw;
@@ -271,7 +271,7 @@ void CInifileEx::Load(IReader* F, LPCSTR path)
                     ++t;
                     strcpy_s(value_raw, sizeof(value_raw), t);
                     bInsideSTR = _parse(str2, value_raw);
-                    if (bInsideSTR)  // multiline str value
+                    if (bInsideSTR) // multiline str value
                     {
                         while (bInsideSTR)
                         {
@@ -300,7 +300,7 @@ void CInifileEx::Load(IReader* F, LPCSTR path)
                 I.first = (name[0] ? name : NULL);
                 I.second = (str2[0] ? str2 : NULL);
 #ifdef DEBUG
-                I.comment = m_flags.test(eReadOnly) ? comment : 0;  //:comment;
+                I.comment = m_flags.test(eReadOnly) ? comment : 0; //:comment;
 #endif
 
                 if (m_flags.test(eReadOnly)) {
@@ -474,8 +474,8 @@ shared_str CInifileEx::r_string_wb(LPCSTR S, LPCSTR L)
     strcpy_s(_original, _base);
     u32 _len = xr_strlen(_original);
     if (0 == _len) return shared_str("");
-    if ('"' == _original[_len - 1]) _original[_len - 1] = 0;        // skip end
-    if ('"' == _original[0]) return shared_str(&_original[0] + 1);  // skip begin
+    if ('"' == _original[_len - 1]) _original[_len - 1] = 0;       // skip end
+    if ('"' == _original[0]) return shared_str(&_original[0] + 1); // skip begin
     return shared_str(_original);
 }
 

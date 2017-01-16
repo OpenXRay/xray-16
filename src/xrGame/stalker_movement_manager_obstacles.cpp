@@ -22,7 +22,7 @@
 
 #ifndef MASTER_GOLD
 #include "ai_debug.h"
-#endif  // MASTER_GOLD
+#endif // MASTER_GOLD
 
 static const u32 fail_check_time = 1000;
 
@@ -123,7 +123,7 @@ void stalker_movement_manager_obstacles::move_along_path_impl(
 {
 #ifndef MASTER_GOLD
     if (psAI_Flags.test(aiObstaclesAvoidingStatic))
-#endif  // MASTER_GOLD
+#endif // MASTER_GOLD
     {
         m_dynamic_obstacles.update();
         if (!m_dynamic_obstacles.movement_enabled()) {
@@ -142,7 +142,7 @@ void stalker_movement_manager_obstacles::move_along_path_impl(
     if (
 #ifndef MASTER_GOLD
         (!psAI_Flags.test(aiObstaclesAvoidingStatic) && m_dynamic_obstacles.need_path_to_rebuild()) ||
-#endif  // MASTER_GOLD
+#endif // MASTER_GOLD
         m_static_obstacles.need_path_to_rebuild())
         rebuild_path();
 
@@ -155,8 +155,9 @@ void stalker_movement_manager_obstacles::move_along_path(
     VERIFY(m_doors_actor);
 
     if (!ai().doors().actualize_doors_state(*m_doors_actor, old_desirable_speed())) {
-        //		Msg							( "%6d stalker %s waits for the some door to be open/closed", Device.dwTimeGlobal,
-        //object().cName().c_str() );
+        //		Msg							( "%6d stalker %s waits for the some door to be open/closed",
+        //Device.dwTimeGlobal,
+        // object().cName().c_str() );
         float desirable_speed = old_desirable_speed();
         set_desirable_speed(0.f);
 
@@ -173,7 +174,7 @@ void stalker_movement_manager_obstacles::move_along_path(
         inherited::move_along_path(movement_control, dest_position, time_delta);
         return;
     }
-#endif  // MASTER_GOLD
+#endif // MASTER_GOLD
 
     if (Device.dwTimeGlobal < (m_last_fail_time + fail_check_time)) {
         inherited::move_along_path(movement_control, dest_position, time_delta);
@@ -232,7 +233,7 @@ static float get_distance(Fvector const& a_first, Fvector const& a_second, Fvect
 
 #ifdef DEBUG
     return -1.f;
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 }
 
 float stalker_movement_manager_obstacles::is_going_through(

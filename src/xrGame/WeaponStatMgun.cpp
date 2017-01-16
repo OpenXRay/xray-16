@@ -131,14 +131,14 @@ void CWeaponStatMgun::net_Destroy()
     processing_deactivate();
 }
 
-void CWeaponStatMgun::net_Export(NET_Packet& P)  // export to server
+void CWeaponStatMgun::net_Export(NET_Packet& P) // export to server
 {
     inheritedPH::net_Export(P);
     P.w_u8(IsWorking() ? 1 : 0);
     save_data(m_destEnemyDir, P);
 }
 
-void CWeaponStatMgun::net_Import(NET_Packet& P)  // import from server
+void CWeaponStatMgun::net_Import(NET_Packet& P) // import from server
 {
     inheritedPH::net_Import(P);
     u8 state = P.r_u8();
@@ -187,7 +187,7 @@ void CWeaponStatMgun::UpdateBarrelDir()
     XFi.invert(XFORM());
     Fvector dep;
     XFi.transform_dir(dep, m_destEnemyDir);
-    {  // x angle
+    { // x angle
         m_i_bind_x_xform.transform_dir(dep);
         dep.normalize();
         m_tgt_x_rot = angle_normalize_signed(m_bind_x_rot - dep.getP());
@@ -196,7 +196,7 @@ void CWeaponStatMgun::UpdateBarrelDir()
         clamp(m_tgt_x_rot, -m_lim_x_rot.y, -m_lim_x_rot.x);
         if (!fsimilar(sv_x, m_tgt_x_rot, EPS_L)) m_allow_fire = FALSE;
     }
-    {  // y angle
+    { // y angle
         m_i_bind_y_xform.transform_dir(dep);
         dep.normalize();
         m_tgt_y_rot = angle_normalize_signed(m_bind_y_rot - dep.getH());

@@ -93,4 +93,4 @@ typedef _flags<u32> flags32;
 typedef _flags<u64> Flags64;
 typedef _flags<u64> flags64;
 
-#endif  //__FLAGS_H__
+#endif //__FLAGS_H__

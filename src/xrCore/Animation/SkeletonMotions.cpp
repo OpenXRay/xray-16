@@ -161,7 +161,7 @@ BOOL motions_value::load(LPCSTR N, IReader* data, vecBones* bones)
 
     u32 dwCNT = 0;
     MS->r_chunk_safe(0, &dwCNT, sizeof(dwCNT));
-    VERIFY(dwCNT < 0x3FFF);  // MotionID 2 bit - slot, 14 bit - motion index
+    VERIFY(dwCNT < 0x3FFF); // MotionID 2 bit - slot, 14 bit - motion index
 
     // set per bone motion size
     for (u32 i = 0; i < bones->size(); i++)
@@ -325,8 +325,8 @@ void motions_container::dump()
 void CMotionDef::Load(IReader* MP, u32 fl, u16 version)
 {
     // params
-    bone_or_part = MP->r_u16();  // bCycle?part_id:bone_id;
-    motion = MP->r_u16();        // motion_id
+    bone_or_part = MP->r_u16(); // bCycle?part_id:bone_id;
+    motion = MP->r_u16();       // motion_id
     speed = Quantize(MP->r_float());
     power = Quantize(MP->r_float());
     accrue = Quantize(MP->r_float());

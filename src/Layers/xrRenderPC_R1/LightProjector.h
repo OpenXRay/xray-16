@@ -32,7 +32,7 @@ private:
 
 private:
     IRenderable* current;
-    xr_vector<recv> cache;  // same as number of slots
+    xr_vector<recv> cache; // same as number of slots
     xr_vector<IRenderable*> receivers;
     xr_vector<int> taskid;
 
@@ -62,4 +62,4 @@ public:
     ~CLightProjector();
 };
 
-#endif  // !defined(AFX_LIGHTPRJ_H__CFA216D9_CACB_4515_9FBE_7C531649168F__INCLUDED_)
+#endif // !defined(AFX_LIGHTPRJ_H__CFA216D9_CACB_4515_9FBE_7C531649168F__INCLUDED_)

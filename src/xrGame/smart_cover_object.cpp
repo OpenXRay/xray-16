@@ -151,7 +151,7 @@ void object::OnRender()
         dbg_draw_frustum(loophole->fov() * 180.f / PI, loophole->range(), 1.f, position, direction, up);
     }
 }
-#endif  // DEBUG
+#endif // DEBUG
 
 bool object::inside(Fvector const& position) const
 {

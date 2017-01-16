@@ -119,8 +119,8 @@ bool ChimeraAttackState<Object>::jump(Fvector const& target, bool attack_jump)
 
     m_allow_jump = true;
     bool const jumped = object->com_man().jump_if_possible(target, (CEntityAlive*)object->EnemyMan.get_enemy(),
-        attack_jump,  // use_direction_to_target
-        true,         // use velocity bounce
+        attack_jump, // use_direction_to_target
+        true,        // use velocity bounce
         true);
 
     m_allow_jump = false;
@@ -284,7 +284,7 @@ void ChimeraAttackState<Object>::execute()
 #ifdef DEBUG_STATE
     DBG().get_text_tree().clear();
     debug::text_tree& text_tree = DBG().get_text_tree().find_or_add("ActorView");
-#endif  // DEBUG_STATE
+#endif // DEBUG_STATE
 
     CEntityAlive* enemy = const_cast<CEntityAlive*>(object->EnemyMan.get_enemy());
     Fvector const enemy_pos = enemy->Position();
@@ -454,7 +454,7 @@ void ChimeraAttackState<Object>::execute()
 #ifdef DEBUG_STATE
     text_tree.add_line("num_prepare_jumps", m_num_prepare_jumps);
     text_tree.add_line("num_attack_jumps", m_num_attack_jumps);
-#endif  // #ifdef DEBUG_STATE
+#endif // #ifdef DEBUG_STATE
 
     object->set_action(ACT_RUN);
     object->path().set_use_dest_orient(false);
@@ -466,4 +466,4 @@ void ChimeraAttackState<Object>::execute()
     object->path().set_target_point(m_target, m_target_vertex);
 }
 
-#endif  // #ifdef CHIMERA_ATTACK_STATE_INLINE_H_INCLUDED
+#endif // #ifdef CHIMERA_ATTACK_STATE_INLINE_H_INCLUDED

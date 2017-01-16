@@ -1,6 +1,6 @@
-#ifndef MIXVOPS_INCLUDED  // -*- C++ -*-
-#define MIXVOPS_INCLUDED  //
-#endif                    // WARNING:  Multiple inclusions allowed
+#ifndef MIXVOPS_INCLUDED // -*- C++ -*-
+#define MIXVOPS_INCLUDED //
+#endif                   // WARNING:  Multiple inclusions allowed
 
 /************************************************************************
 

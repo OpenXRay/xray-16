@@ -39,7 +39,7 @@ protected:
 
     shared_str m_sBaseWeaponCostSection;
 
-    xr_vector<game_TeamState> teams;  // dm,tdm,ah
+    xr_vector<game_TeamState> teams; // dm,tdm,ah
 
     LPCSTR pWinnigPlayerName;
 
@@ -108,16 +108,16 @@ public:
 
     virtual void OnEvent(NET_Packet& tNetPacket, u16 type, u32 time, ClientID sender);
 
-    virtual void OnTeamScore(u32 /**team/**/, bool);  // команда выиграла
-    virtual void OnTeamsInDraw(){};                   // ничья
+    virtual void OnTeamScore(u32 /**team/**/, bool); // команда выиграла
+    virtual void OnTeamsInDraw(){};                  // ничья
 
     // Events
-    virtual void OnRoundStart();  // старт раунда
-    virtual void OnRoundEnd();    // round_end_reason							// конец раунда
+    virtual void OnRoundStart(); // старт раунда
+    virtual void OnRoundEnd();   // round_end_reason							// конец раунда
     virtual void OnDelayedRoundEnd(ERoundEnd_Result reason);
     virtual void OnDelayedTeamEliminated();
 
-    virtual void OnPlayerHitPlayer(u16 id_hitter, u16 id_hitted, NET_Packet& P);  //игрок получил Hit
+    virtual void OnPlayerHitPlayer(u16 id_hitter, u16 id_hitted, NET_Packet& P); //игрок получил Hit
     virtual void OnPlayerHitPlayer_Case(game_PlayerState* ps_hitter, game_PlayerState* ps_hitted, SHit* pHitS);
 
     virtual BOOL OnTouch(u16 eid_who, u16 eid_what, BOOL bForced = FALSE);
@@ -162,7 +162,7 @@ public:
     virtual void OnRender();
 #endif
 
-    virtual void SetSkin(CSE_Abstract* E, u16 Team, u16 ID);  //	{};
+    virtual void SetSkin(CSE_Abstract* E, u16 Team, u16 ID); //	{};
 
     virtual void SpawnWeaponsForActor(CSE_Abstract* pE, game_PlayerState* ps);
 

@@ -60,22 +60,22 @@ const unsigned char TIXML_UTF_LEAD_2 = 0xbfU;
 
 const int TiXmlBase::utf8ByteTable[256] = {
     //	0	1	2	3	4	5	6	7	8	9	a	b	c	d	e	f
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,  // 0x00
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,  // 0x10
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,  // 0x20
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,  // 0x30
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,  // 0x40
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,  // 0x50
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,  // 0x60
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,  // 0x70	End of ASCII range
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,  // 0x80 0x80 to 0xc1 invalid
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,  // 0x90
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,  // 0xa0
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,  // 0xb0
-    1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,  // 0xc0 0xc2 to 0xdf 2 byte
-    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,  // 0xd0
-    3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,  // 0xe0 0xe0 to 0xef 3 byte
-    4, 4, 4, 4, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1   // 0xf0 0xf0 to 0xf4 4 byte, 0xf5 and higher invalid
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, // 0x00
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, // 0x10
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, // 0x20
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, // 0x30
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, // 0x40
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, // 0x50
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, // 0x60
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, // 0x70	End of ASCII range
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, // 0x80 0x80 to 0xc1 invalid
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, // 0x90
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, // 0xa0
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, // 0xb0
+    1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, // 0xc0 0xc2 to 0xdf 2 byte
+    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, // 0xd0
+    3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, // 0xe0 0xe0 to 0xef 3 byte
+    4, 4, 4, 4, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1  // 0xf0 0xf0 to 0xf4 4 byte, 0xf5 and higher invalid
 };
 
 void TiXmlBase::ConvertUTF32ToUTF8(unsigned long input, char* output, int* length)
@@ -96,7 +96,7 @@ void TiXmlBase::ConvertUTF32ToUTF8(unsigned long input, char* output, int* lengt
     {
         *length = 0;
         return;
-    }  // This code won't covert this correctly anyway.
+    } // This code won't covert this correctly anyway.
 
     output += *length;
 
@@ -131,7 +131,7 @@ void TiXmlBase::ConvertUTF32ToUTF8(unsigned long input, char* output, int* lengt
     if (anyByte < 127)
         return isalpha(anyByte);
     else
-        return 1;  // What else to do? The unicode set is huge...get the english ones right.
+        return 1; // What else to do? The unicode set is huge...get the english ones right.
     //	}
     //	else
     //	{
@@ -151,7 +151,7 @@ void TiXmlBase::ConvertUTF32ToUTF8(unsigned long input, char* output, int* lengt
     if (anyByte < 127)
         return isalnum(anyByte);
     else
-        return 1;  // What else to do? The unicode set is huge...get the english ones right.
+        return 1; // What else to do? The unicode set is huge...get the english ones right.
     //	}
     //	else
     //	{
@@ -263,7 +263,7 @@ void TiXmlParsingData::Stamp(const char* now, TiXmlEncoding encoding)
                     {
                         p += 3;
                         ++col;
-                    }  // A normal character.
+                    } // A normal character.
                 }
             }
             else
@@ -277,7 +277,7 @@ void TiXmlParsingData::Stamp(const char* now, TiXmlEncoding encoding)
             if (encoding == TIXML_ENCODING_UTF8) {
                 // Eat the 1 to 4 byte utf8 character.
                 int step = TiXmlBase::utf8ByteTable[*((const unsigned char*)p)];
-                if (step == 0) step = 1;  // Error case from bad encoding, but handle gracefully.
+                if (step == 0) step = 1; // Error case from bad encoding, but handle gracefully.
                 p += step;
 
                 // Just advance one column, of course.
@@ -325,7 +325,7 @@ const char* TiXmlBase::SkipWhiteSpace(const char* p, TiXmlEncoding encoding)
                 continue;
             }
 
-            if (IsWhiteSpace(*p) || *p == '\n' || *p == '\r')  // Still using old rules for white space.
+            if (IsWhiteSpace(*p) || *p == '\n' || *p == '\r') // Still using old rules for white space.
                 ++p;
             else
                 break;
@@ -492,7 +492,7 @@ const char* TiXmlBase::GetEntity(const char* p, char* value, int* length, TiXmlE
     }
 
     // So it wasn't an entity, its unrecognized, or something like that.
-    *value = *p;  // Don't put back the last one, since we return it!
+    *value = *p; // Don't put back the last one, since we return it!
     //*length = 1;	// Leave unrecognized entities - this doesn't really work.
     // Just writes strange XML.
     return p + 1;
@@ -526,7 +526,7 @@ bool TiXmlBase::StringEqual(const char* p, const char* tag, bool ignoreCase, TiX
             ++tag;
         }
 
-        if (*tag == 0)  // Have we found the end of the tag, and everything equal?
+        if (*tag == 0) // Have we found the end of the tag, and everything equal?
             return true;
     }
     return false;
@@ -536,8 +536,8 @@ const char* TiXmlBase::ReadText(const char* p, TIXML_STRING* text, bool trimWhit
     bool caseInsensitive, TiXmlEncoding encoding)
 {
     *text = "";
-    if (!trimWhiteSpace          // certain tags always keep whitespace
-        || !condenseWhiteSpace)  // if true, whitespace is always kept
+    if (!trimWhiteSpace         // certain tags always keep whitespace
+        || !condenseWhiteSpace) // if true, whitespace is always kept
     {
         // Keep all the white space.
         while (p && *p && !StringEqual(p, endTag, caseInsensitive, encoding))
@@ -577,7 +577,7 @@ const char* TiXmlBase::ReadText(const char* p, TIXML_STRING* text, bool trimWhit
                 char cArr[4] = {0, 0, 0, 0};
                 p = GetChar(p, cArr, &len, encoding);
                 if (len == 1)
-                    (*text) += cArr[0];  // more efficient
+                    (*text) += cArr[0]; // more efficient
                 else
                     text->append(cArr, len);
             }
@@ -720,7 +720,7 @@ const char* TiXmlDocument::Parse(TiXmlDocument*, const char* p, TiXmlParsingData
             else if (StringEqual(enc, "UTF-8", true, TIXML_ENCODING_UNKNOWN))
                 encoding = TIXML_ENCODING_UTF8;
             else if (StringEqual(enc, "UTF8", true, TIXML_ENCODING_UNKNOWN))
-                encoding = TIXML_ENCODING_UTF8;  // incorrect, but be nice
+                encoding = TIXML_ENCODING_UTF8; // incorrect, but be nice
             else
                 encoding = TIXML_ENCODING_LEGACY;
         }
@@ -1039,7 +1039,7 @@ const char* TiXmlElement::Parse(TiXmlDocument* document, const char* p, TiXmlPar
             // Read the value -- which can include other
             // elements -- read the end tag, and return.
             ++p;
-            p = ReadValue(p, data, encoding);  // Note this is an Element method, and will set the error if one happens.
+            p = ReadValue(p, data, encoding); // Note this is an Element method, and will set the error if one happens.
             if (!p || !*p) {
                 // We were looking for the end tag, but found nothing.
                 // Fix for [ 1663758 ] Failure to report error on bad XML
@@ -1263,7 +1263,7 @@ const char* TiXmlAttribute::Parse(
         return 0;
     }
 
-    ++p;  // skip '='
+    ++p; // skip '='
     p = SkipWhiteSpace(p, encoding);
     if (!p || !*p) {
         if (document) document->SetError(TIXML_ERROR_READING_ATTRIBUTES, p, data, encoding);
@@ -1276,13 +1276,13 @@ const char* TiXmlAttribute::Parse(
 
     if (*p == SINGLE_QUOTE) {
         ++p;
-        end = "\'";  // single quote in string
+        end = "\'"; // single quote in string
         p = ReadText(p, &value, false, end, false, encoding);
     }
     else if (*p == DOUBLE_QUOTE)
     {
         ++p;
-        end = "\"";  // double quote in string
+        end = "\""; // double quote in string
         p = ReadText(p, &value, false, end, false, encoding);
     }
     else
@@ -1291,9 +1291,9 @@ const char* TiXmlAttribute::Parse(
         // But this is such a common error that the parser will try
         // its best, even without them.
         value = "";
-        while (p && *p                                           // existence
-               && !IsWhiteSpace(*p) && *p != '\n' && *p != '\r'  // whitespace
-               && *p != '/' && *p != '>')                        // tag end
+        while (p && *p                                          // existence
+               && !IsWhiteSpace(*p) && *p != '\n' && *p != '\r' // whitespace
+               && *p != '/' && *p != '>')                       // tag end
         {
             if (*p == SINGLE_QUOTE || *p == DOUBLE_QUOTE) {
                 // [ 1451649 ] Attribute values with trailing quotes not handled correctly
@@ -1347,7 +1347,7 @@ const char* TiXmlText::Parse(TiXmlDocument* document, const char* p, TiXmlParsin
 
         const char* end = "<";
         p = ReadText(p, &value, ignoreWhite, end, false, encoding);
-        if (p) return p - 1;  // don't truncate the '<'
+        if (p) return p - 1; // don't truncate the '<'
         return 0;
     }
 }

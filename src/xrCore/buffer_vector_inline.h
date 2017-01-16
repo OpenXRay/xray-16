@@ -128,8 +128,8 @@ inline void buffer_vector_specialized::insert(iterator const& where, input_itera
     difference_type count = end - begin;
     VERIFY(m_end + count <= m_max_end);
 
-    iterator j = m_end + count - 1;  // new end
-    iterator i = m_end - 1;          // old end
+    iterator j = m_end + count - 1; // new end
+    iterator i = m_end - 1;         // old end
     iterator e = where - 1;
     for (; i != e; --i, --j)
     {
@@ -149,8 +149,8 @@ inline void buffer_vector_specialized::insert(iterator const& where, size_type c
     VERIFY(where >= m_begin);
     VERIFY(m_end + count <= m_max_end);
 
-    iterator j = m_end + count - 1;  // new end
-    iterator i = m_end - 1;          // old end
+    iterator j = m_end + count - 1; // new end
+    iterator i = m_end - 1;         // old end
     iterator e = where - 1;
     for (; i != e; --i, --j)
     {
@@ -389,4 +389,4 @@ inline void swap(buffer_vector_specialized& left, buffer_vector_specialized& rig
 #undef TEMPLATE_SPECIALIZATION
 #undef buffer_vector_specialized
 
-#endif  // BUFFER_VECTOR_INLINE_H_INCLUDED
+#endif // BUFFER_VECTOR_INLINE_H_INCLUDED

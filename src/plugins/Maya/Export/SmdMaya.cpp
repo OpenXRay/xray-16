@@ -85,7 +85,7 @@ void* CXRaySkinExport::creator_skin_motion()
 MStatus CXRaySkinExport::writer(const MFileObject& file, const MString& options, FileAccessMode mode)
 {
     MStatus status;
-    clearData();  // initialize all data structures
+    clearData(); // initialize all data structures
 
     bool b_ogf = false;
     MString locator_name;
@@ -94,7 +94,7 @@ MStatus CXRaySkinExport::writer(const MFileObject& file, const MString& options,
         // Start parsing.
         MStringArray optionList;
         MStringArray theOption;
-        options.split(';', optionList);  // break out all the options.
+        options.split(';', optionList); // break out all the options.
 
         length = optionList.length();
         for (i = 0; i < length; ++i)
@@ -162,8 +162,8 @@ MStatus CXRaySkinExport::writer(const MFileObject& file, const MString& options,
             aptTypePtr = obj.apiTypeStr();
             //-------------------------------
             MStatus stat;
-            MFnDagNode dagNode(DagPath);     // path to the visible mesh
-            MFnMesh meshFn(DagPath, &stat);  // this is the visible mesh
+            MFnDagNode dagNode(DagPath);    // path to the visible mesh
+            MFnMesh meshFn(DagPath, &stat); // this is the visible mesh
             MObject inObj;
             MObject dataObj1;
 
@@ -452,7 +452,7 @@ MStatus CXRaySkinExport::exportObject(LPCSTR fn, bool b_ogf)
         BONE->SetWMap((*boneIt)->name);
         BONE->SetName((*boneIt)->name);
         BONE->SetParentName(
-            (*boneIt)->parentId > -1 ? m_boneList[(*boneIt)->parentId]->name : 0);  //. need convert space
+            (*boneIt)->parentId > -1 ? m_boneList[(*boneIt)->parentId]->name : 0); //. need convert space
         BONE->SetRestParams(length, offset, rotate);
     }
 
@@ -1260,7 +1260,7 @@ MStatus CXRaySkinExport::parseBoneGeometry()
                 MItMeshPolygon piter(path, MObject::kNullObj, &status);
                 parsePolySet(piter, rgShaders, rgFaces, (*itBones)->id);
 
-                destroyEdgeTable();  // Free up the edge table
+                destroyEdgeTable(); // Free up the edge table
             }
         }
     }
@@ -1307,7 +1307,7 @@ MStatus CXRaySkinExport::parseShape(MDagPath path)
     MItMeshPolygon piter(path, MObject::kNullObj, &status);
     parsePolySet(piter, rgShaders, rgFaces);
 
-    destroyEdgeTable();  // Free up the edge table
+    destroyEdgeTable(); // Free up the edge table
 
     return MStatus::kSuccess;
 }
@@ -1345,7 +1345,7 @@ void CXRaySkinExport::CreateSMGFacegroups(MFnMesh& fnMesh)
     // Now create a polyId->smoothingGroup table
     //
     int numPolygons = fnMesh.numPolygons();
-    polySmoothingGroups = xr_alloc<int>(numPolygons);  //(int*)malloc( sizeof(int) *  numPolygons );
+    polySmoothingGroups = xr_alloc<int>(numPolygons); //(int*)malloc( sizeof(int) *  numPolygons );
     for (int i = 0; i < numPolygons; i++)
     {
         polySmoothingGroups[i] = NO_SMOOTHING_GROUP;
@@ -1448,7 +1448,7 @@ bool CXRaySkinExport::smoothingAlgorithm(int polyId, MFnMesh& fnMesh)
             //       halfEdge polygons get a smoothing group of
             //       NO_SMOOTHING_GROUP which is equivalent to "s off"
             //
-            if (NO_SMOOTHING_GROUP != elem->polyIds[1]) {  // Edge not a border
+            if (NO_SMOOTHING_GROUP != elem->polyIds[1]) { // Edge not a border
 
                 // We are starting a new smoothing group
                 //
@@ -1472,7 +1472,7 @@ bool CXRaySkinExport::smoothingAlgorithm(int polyId, MFnMesh& fnMesh)
                     smoothEdgeFound = true;
                 }
                 else
-                {  // Hard edge so ignore this polygon
+                { // Hard edge so ignore this polygon
                     continue;
                 }
 
@@ -1512,7 +1512,7 @@ void CXRaySkinExport::addEdgeInfo(int v1, int v2, bool smooth)
     SXREdgeInfoPtr element = NULL;
 
     if (NULL == edgeTable[v1]) {
-        edgeTable[v1] = xr_alloc<SXREdgeInfo>(1);  //(EdgeInfoPtr)malloc( sizeof(struct EdgeInfo) );
+        edgeTable[v1] = xr_alloc<SXREdgeInfo>(1); //(EdgeInfoPtr)malloc( sizeof(struct EdgeInfo) );
         element = edgeTable[v1];
     }
     else
@@ -1522,7 +1522,7 @@ void CXRaySkinExport::addEdgeInfo(int v1, int v2, bool smooth)
         {
             element = element->next;
         }
-        element->next = xr_alloc<SXREdgeInfo>(1);  //(EdgeInfoPtr)malloc( sizeof(struct EdgeInfo) );
+        element->next = xr_alloc<SXREdgeInfo>(1); //(EdgeInfoPtr)malloc( sizeof(struct EdgeInfo) );
         element = element->next;
     }
 

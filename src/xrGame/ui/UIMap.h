@@ -10,7 +10,7 @@ class CUICustomMap : public CUIStatic, public CUIWndCallback
 protected:
     shared_str m_name;
 
-    Frect m_BoundRect_;  // real map size (meters)
+    Frect m_BoundRect_; // real map size (meters)
     Flags16 m_flags;
     enum EFlags
     {
@@ -32,13 +32,13 @@ public:
 
     void Initialize(shared_str name, LPCSTR sh_name);
     virtual Fvector2 ConvertRealToLocal(
-        const Fvector2& src, bool for_drawing);  // meters->pixels (relatively own left-top pos)
+        const Fvector2& src, bool for_drawing); // meters->pixels (relatively own left-top pos)
     Fvector2 ConvertLocalToReal(const Fvector2& src, Frect const& bound_rect);
     Fvector2 ConvertRealToLocalNoTransform(
-        const Fvector2& src, Frect const& bound_rect);  // meters->pixels (relatively own left-top pos)
+        const Fvector2& src, Frect const& bound_rect); // meters->pixels (relatively own left-top pos)
 
     virtual bool GetPointerTo(const Fvector2& src, float item_radius, Fvector2& pos,
-        float& heading);  // position and heading for drawing pointer to src pos
+        float& heading); // position and heading for drawing pointer to src pos
 
     void FitToWidth(float width);
     void FitToHeight(float height);
@@ -76,7 +76,7 @@ class CUIGlobalMap : public CUICustomMap
 
 public:
     virtual Fvector2 ConvertRealToLocal(
-        const Fvector2& src, bool for_drawing);  // pixels->pixels (relatively own left-top pos)
+        const Fvector2& src, bool for_drawing); // pixels->pixels (relatively own left-top pos)
 
     CUIGlobalMap(CUIMapWnd* pMapWnd);
     virtual ~CUIGlobalMap();
@@ -105,7 +105,7 @@ class CUILevelMap : public CUICustomMap
     typedef CUICustomMap inherited;
 
     CUIMapWnd* m_mapWnd;
-    Frect m_GlobalRect;  // virtual map size (meters)
+    Frect m_GlobalRect; // virtual map size (meters)
     CUILevelMap(const CUILevelMap& obj) {}
     CUILevelMap& operator=(const CUILevelMap& obj) {}
 public:
@@ -136,7 +136,7 @@ public:
     virtual ~CUIMiniMap();
     virtual void Draw();
     virtual bool GetPointerTo(const Fvector2& src, float item_radius, Fvector2& pos,
-        float& heading);  // position and heading for drawing pointer to src pos
+        float& heading); // position and heading for drawing pointer to src pos
     virtual bool NeedShowPointer(Frect r);
     virtual bool IsRectVisible(Frect r);
 

@@ -125,7 +125,7 @@ static int solve_R_angle(const float g[3], const float s[3], const float t[3], c
         else
         {
             n = 1;
-            r_angle = temp[1];  //?
+            r_angle = temp[1]; //?
         }
     }
     else if (n == 1)

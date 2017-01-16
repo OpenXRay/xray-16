@@ -6,7 +6,7 @@ BOOL m_DemoSave = false;
 BOOL m_DemoSaveStarted = false;
 u32 m_StartGlobalTime;
 // XXX nitrocaster: why not CurrentControlEntity* ?
-IGameObject* m_current_spectator = nullptr;  // in real, this is CurrentControlEntity
+IGameObject* m_current_spectator = nullptr; // in real, this is CurrentControlEntity
 message_filter* m_msg_filter = nullptr;
 demoplay_control* m_demoplay_control = nullptr;
 
@@ -43,8 +43,8 @@ void RestartPlayDemo();
 void StopPlayDemo();
 float GetDemoPlayPos() const;
 // void SetDemoPlayPos(float const pos);
-float GetDemoPlaySpeed() const;                  // Device.time_factor()
-void SetDemoPlaySpeed(float const time_factor);  // Device.time_factor(
+float GetDemoPlaySpeed() const;                 // Device.time_factor()
+void SetDemoPlaySpeed(float const time_factor); // Device.time_factor(
 message_filter* GetMessageFilter();
 demoplay_control* GetDemoPlayControl();
 BOOL IsDemoPlay()

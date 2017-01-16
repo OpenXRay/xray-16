@@ -32,7 +32,7 @@ public:
 class adopt_dx10sampler
 {
     CBlender_Compile* m_pC;
-    u32 m_SI;  //	Sampler index
+    u32 m_SI; //	Sampler index
 public:
     adopt_dx10sampler(CBlender_Compile* C, u32 SamplerIndex) : m_pC(C), m_SI(SamplerIndex)
     {
@@ -44,45 +44,52 @@ public:
     }
 
     //	adopt_sampler&			_texture		(LPCSTR texture)		{ if (C) C->i_Texture	(stage,texture);
-    //return *this;	}
+    // return *this;	}
     //	adopt_sampler&			_projective		(bool _b)				{ if (C) C->i_Projective(stage,_b);
-    //return *this;	}
-    //	adopt_sampler&			_clamp			()						{ if (C) C->i_Address	(stage,D3DTADDRESS_CLAMP);
-    //return *this;	}
-    //	adopt_sampler&			_wrap			()						{ if (C) C->i_Address	(stage,D3DTADDRESS_WRAP);
-    //return *this;	}
-    //	adopt_sampler&			_mirror			()						{ if (C) C->i_Address	(stage,D3DTADDRESS_MIRROR);
-    //return *this;	}
+    // return *this;	}
+    //	adopt_sampler&			_clamp			()						{ if (C) C->i_Address
+    //(stage,D3DTADDRESS_CLAMP);
+    // return *this;	}
+    //	adopt_sampler&			_wrap			()						{ if (C) C->i_Address
+    //(stage,D3DTADDRESS_WRAP);
+    // return *this;	}
+    //	adopt_sampler&			_mirror			()						{ if (C) C->i_Address
+    //(stage,D3DTADDRESS_MIRROR);
+    // return *this;	}
     //	adopt_sampler&			_f_anisotropic	()						{ if (C) C->i_Filter
     //(stage,D3DTEXF_ANISOTROPIC,D3DTEXF_LINEAR,D3DTEXF_ANISOTROPIC);	return *this;	}
     //	adopt_sampler&			_f_trilinear	()						{ if (C) C->i_Filter
     //(stage,D3DTEXF_LINEAR,D3DTEXF_LINEAR,D3DTEXF_LINEAR);		return *this;	}
-    //	adopt_sampler&			_f_bilinear		()						{ if (C) C->i_Filter	(stage,D3DTEXF_LINEAR,D3DTEXF_POINT,
-    //D3DTEXF_LINEAR);		return *this;	}
-    //	adopt_sampler&			_f_linear		()						{ if (C) C->i_Filter	(stage,D3DTEXF_LINEAR,D3DTEXF_NONE,
-    //D3DTEXF_LINEAR);		return *this;	}
-    //	adopt_sampler&			_f_none			()						{ if (C) C->i_Filter	(stage,D3DTEXF_POINT, D3DTEXF_NONE,
-    //D3DTEXF_POINT);		return *this;	}
+    //	adopt_sampler&			_f_bilinear		()						{ if (C) C->i_Filter
+    //(stage,D3DTEXF_LINEAR,D3DTEXF_POINT,
+    // D3DTEXF_LINEAR);		return *this;	}
+    //	adopt_sampler&			_f_linear		()						{ if (C) C->i_Filter
+    //(stage,D3DTEXF_LINEAR,D3DTEXF_NONE,
+    // D3DTEXF_LINEAR);		return *this;	}
+    //	adopt_sampler&			_f_none			()						{ if (C) C->i_Filter	(stage,D3DTEXF_POINT,
+    //D3DTEXF_NONE,
+    // D3DTEXF_POINT);		return *this;	}
     //	adopt_sampler&			_fmin_none		()						{ if (C) C->i_Filter_Min(stage,D3DTEXF_NONE);
-    //return *this;	}
+    // return *this;	}
     //	adopt_sampler&			_fmin_point		()						{ if (C) C->i_Filter_Min(stage,D3DTEXF_POINT);
-    //return *this;	}
+    // return *this;	}
     //	adopt_sampler&			_fmin_linear	()						{ if (C) C->i_Filter_Min(stage,D3DTEXF_LINEAR);
-    //return *this;	}
-    //	adopt_sampler&			_fmin_aniso		()						{ if (C) C->i_Filter_Min(stage,D3DTEXF_ANISOTROPIC);
-    //return *this;	}
+    // return *this;	}
+    //	adopt_sampler&			_fmin_aniso		()						{ if (C)
+    //C->i_Filter_Min(stage,D3DTEXF_ANISOTROPIC);
+    // return *this;	}
     //	adopt_sampler&			_fmip_none		()						{ if (C) C->i_Filter_Mip(stage,D3DTEXF_NONE);
-    //return *this;	}
+    // return *this;	}
     //	adopt_sampler&			_fmip_point		()						{ if (C) C->i_Filter_Mip(stage,D3DTEXF_POINT);
-    //return *this;	}
+    // return *this;	}
     //	adopt_sampler&			_fmip_linear	()						{ if (C) C->i_Filter_Mip(stage,D3DTEXF_LINEAR);
-    //return *this;	}
+    // return *this;	}
     //	adopt_sampler&			_fmag_none		()						{ if (C) C->i_Filter_Mag(stage,D3DTEXF_NONE);
-    //return *this;	}
+    // return *this;	}
     //	adopt_sampler&			_fmag_point		()						{ if (C) C->i_Filter_Mag(stage,D3DTEXF_POINT);
-    //return *this;	}
+    // return *this;	}
     //	adopt_sampler&			_fmag_linear	()						{ if (C) C->i_Filter_Mag(stage,D3DTEXF_LINEAR);
-    //return *this;	}
+    // return *this;	}
 };
 /*
 class	adopt_dx10texture
@@ -203,7 +210,8 @@ public:
         C->RS.SetRS(D3DRS_ZFUNC, Func);
         return *this;
     }
-    // adopt_dx10texture		_dx10texture	(LPCSTR _name)							{	u32 s = C->r_dx10Texture(_name,0);			return
+    // adopt_dx10texture		_dx10texture	(LPCSTR _name)							{	u32 s = C->r_dx10Texture(_name,0);
+    // return
     // adopt_dx10sampler(C,s);	}
 
     adopt_dx10options _dx10Options() { return adopt_dx10options(); };
@@ -278,8 +286,8 @@ void CResourceManager::LS_Load()
                 .def("dx10atoc", &adopt_compiler::_dx10ATOC, return_reference_to<1>())
                 .def("dx10zfunc", &adopt_compiler::_dx10ZFunc, return_reference_to<1>())
 
-                .def("dx10sampler", &adopt_compiler::_dx10sampler)   // returns sampler-object
-                .def("dx10Options", &adopt_compiler::_dx10Options),  // returns options-object
+                .def("dx10sampler", &adopt_compiler::_dx10sampler)  // returns sampler-object
+                .def("dx10Options", &adopt_compiler::_dx10Options), // returns options-object
 
             class_<adopt_blend>("blend").enum_("blend")[value("zero", int(D3DBLEND_ZERO)),
                 value("one", int(D3DBLEND_ONE)), value("srccolor", int(D3DBLEND_SRCCOLOR)),

@@ -10,7 +10,7 @@ bool xrServer::Process_event_reject(
     CSE_Abstract* e_entity = game->get_entity_from_eid(id_entity);
 
     //	R_ASSERT2( e_entity, make_string( "entity not found. parent_id = [%d], entity_id = [%d], frame = [%d]",
-    //id_parent, id_entity, Device.dwFrame ).c_str() );
+    // id_parent, id_entity, Device.dwFrame ).c_str() );
     VERIFY2(e_entity, make_string("entity not found. parent_id = [%d], entity_id = [%d], frame = [%d]", id_parent,
                           id_entity, Device.dwFrame)
                           .c_str());
@@ -21,7 +21,7 @@ bool xrServer::Process_event_reject(
     }
 
     //	R_ASSERT2( e_parent, make_string( "parent not found. parent_id = [%d], entity_id = [%d], frame = [%d]",
-    //id_parent, id_entity, Device.dwFrame ).c_str() );
+    // id_parent, id_entity, Device.dwFrame ).c_str() );
     VERIFY2(e_parent, make_string("parent not found. parent_id = [%d], entity_id = [%d], frame = [%d]", id_parent,
                           id_entity, Device.dwFrame)
                           .c_str());
@@ -34,7 +34,7 @@ bool xrServer::Process_event_reject(
 #ifdef MP_LOGGING
     Msg("--- SV: Process reject: parent[%d][%s], item[%d][%s]", id_parent, e_parent->name_replace(), id_entity,
         e_entity->name());
-#endif  // MP_LOGGING
+#endif // MP_LOGGING
 
     xr_vector<u16>& C = e_parent->children;
     xr_vector<u16>::iterator c = std::find(C.begin(), C.end(), id_entity);
@@ -47,7 +47,7 @@ bool xrServer::Process_event_reject(
 #ifndef MASTER_GOLD
         Msg("! ERROR: can't detach independant object. entity[%s][%d], parent[%s][%d], section[%s]",
             e_entity->name_replace(), id_entity, e_parent->name_replace(), id_parent, e_entity->s_name.c_str());
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
         return (false);
     }
 

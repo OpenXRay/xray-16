@@ -30,8 +30,8 @@ protected:
 private:
     line_edit_control m_control;
 
-};  // class line_editor
+}; // class line_editor
 
-}  // namespace text_editor
+} // namespace text_editor
 
-#endif  // LINE_EDITOR_H_INCLUDED
+#endif // LINE_EDITOR_H_INCLUDED

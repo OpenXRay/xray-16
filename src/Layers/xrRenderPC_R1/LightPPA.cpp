@@ -268,7 +268,7 @@ void CLightR_Manager::render_spot(u32 _priority)
         if (_priority == 1) RImplementation.r_pmask(false, true);
 
         RImplementation.r_dsgraph_render_subspace(L->spatial.sector, L_combine, L_pos, TRUE,
-            TRUE  // precise portals
+            TRUE // precise portals
             );
 
         if (_priority == 1) RImplementation.r_pmask(true, true);

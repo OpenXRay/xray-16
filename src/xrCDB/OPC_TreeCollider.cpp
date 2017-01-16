@@ -170,7 +170,7 @@ bool AABBTreeCollider::Collide(BVTCache& cache, const Matrix4x4* world0, const M
 
     // Here, hulls collide
     cache.HullTest = false;
-#endif  // __MESHMERIZER_H__
+#endif // __MESHMERIZER_H__
 
     // Simple double-dispatch
     bool Status;
@@ -478,7 +478,7 @@ bool AABBTreeCollider::Collide(const AABBQuantizedNoLeafTree* tree0, const AABBQ
 
 // The normal AABB tree can use 2 different descent rules (with different performances)
 //#define ORIGINAL_CODE			//!< UNC-like descent rules
-#define ALTERNATIVE_CODE  //!< Alternative descent rules
+#define ALTERNATIVE_CODE //!< Alternative descent rules
 
 #ifdef ORIGINAL_CODE
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

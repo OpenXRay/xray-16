@@ -101,7 +101,7 @@ int CleanForBase32(char* newstr, const char* oldstr, int maxoutput)
             continue;
         }
         ch = *oldstr;
-        if (numout + 1 == maxoutput)  // see if we will overflow
+        if (numout + 1 == maxoutput) // see if we will overflow
             return 0;
         *newstr++ = islower(ch) ? ch - ('a' - 'A') : ch;
         numout++;

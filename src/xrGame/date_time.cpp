@@ -35,7 +35,7 @@
 	CHECK_YEAR		(2013);
 
 #undef CHECK_YEAR
-#endif  // #if 0
+#endif // #if 0
 
 static u64 generate_time_impl(u32 years, u32 months, u32 days, u32 hours, u32 minutes, u32 seconds, u32 milliseconds)
 {
@@ -150,7 +150,7 @@ u64 generate_time(u32 years, u32 months, u32 days, u32 hours, u32 minutes, u32 s
 		split_time_impl			(result + milliseconds_in_day, l_years, l_months, l_days, l_hours, l_minutes, l_seconds, l_milliseconds);
 		split_time_impl			(result, l_years, l_months, l_days, l_hours, l_minutes, l_seconds, l_milliseconds);
 	}
-#endif  // #if 0
+#endif // #if 0
     u32 l_years, l_months, l_days, l_hours, l_minutes, l_seconds, l_milliseconds;
     split_time_impl(result, l_years, l_months, l_days, l_hours, l_minutes, l_seconds, l_milliseconds);
     u64 const new_result = generate_time_impl(l_years, l_months, l_days, l_hours, l_minutes, l_seconds, l_milliseconds);
@@ -163,7 +163,7 @@ u64 generate_time(u32 years, u32 months, u32 days, u32 hours, u32 minutes, u32 s
     VERIFY(minutes == l_minutes);
     VERIFY(seconds == l_seconds);
     VERIFY(milliseconds == l_milliseconds);
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
     return (result);
 }
 
@@ -173,5 +173,5 @@ void split_time(u64 time, u32& years, u32& months, u32& days, u32& hours, u32& m
 #ifdef DEBUG
     u64 const test_time = generate_time_impl(years, months, days, hours, minutes, seconds, milliseconds);
     VERIFY(test_time == time);
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 }

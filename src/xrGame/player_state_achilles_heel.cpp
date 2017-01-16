@@ -52,4 +52,4 @@ void achilles_heel_kill::OnPlayerKilled(
     }
 }
 
-}  // namespace award_system
+} // namespace award_system

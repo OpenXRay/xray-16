@@ -87,7 +87,7 @@ void CAttachmentOwner::attach(CInventoryItem* inventory_item)
     for (; I != E; ++I)
     {
         if ((*I)->item().object().ID() == inventory_item->object().ID())
-            return;  // already attached, fake, I'll repair It
+            return; // already attached, fake, I'll repair It
         //		VERIFY								((*I)->ID() != inventory_item->object().ID());
     }
 

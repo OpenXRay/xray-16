@@ -79,7 +79,7 @@ public:
     void InitWndOrigin();
     void ScaleOrigin(float k);
 
-};  // class CUIStaticOrig
+}; // class CUIStaticOrig
 
 class CComplexMapSpot : public CMapSpot
 {
@@ -116,9 +116,9 @@ public:
         VERIFY2(m_top_icon, texture_name);
         m_top_icon->InitTexture(texture_name);
     }
-    void SetTimerFinish(ALife::_TIME_ID time);  // ms game_time
+    void SetTimerFinish(ALife::_TIME_ID time); // ms game_time
     ALife::_TIME_ID GetTimerFinish() const { return m_timer_finish; }
 protected:
     CUIStaticOrig* CreateStaticOrig(CUIXml& xml, LPCSTR ui_path);
 
-};  // class CComplexMapSpot
+}; // class CComplexMapSpot

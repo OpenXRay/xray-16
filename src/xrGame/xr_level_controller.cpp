@@ -24,7 +24,7 @@ _action actions[] = {{"left", kLEFT, _both}, {"right", kRIGHT, _both}, {"up", kU
 
     {"wpn_1", kWPN_1, _both}, {"wpn_2", kWPN_2, _both}, {"wpn_3", kWPN_3, _both}, {"wpn_4", kWPN_4, _both},
     {"wpn_5", kWPN_5, _both}, {"wpn_6", kWPN_6, _both}, {"artefact", kARTEFACT, _both /*_mp*/},
-    {"wpn_next", kWPN_NEXT, _both},  // means next ammo type
+    {"wpn_next", kWPN_NEXT, _both}, // means next ammo type
     {"wpn_fire", kWPN_FIRE, _both}, {"wpn_zoom", kWPN_ZOOM, _both}, {"wpn_zoom_inc", kWPN_ZOOM_INC, _both},
     {"wpn_zoom_dec", kWPN_ZOOM_DEC, _both}, {"wpn_reload", kWPN_RELOAD, _both}, {"wpn_func", kWPN_FUNC, _both},
     {"wpn_firemode_prev", kWPN_FIREMODE_PREV, _both}, {"wpn_firemode_next", kWPN_FIREMODE_NEXT, _both},

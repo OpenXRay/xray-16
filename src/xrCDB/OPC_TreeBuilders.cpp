@@ -45,7 +45,7 @@
 namespace Opcode
 {
 #include "OPC_TreeBuilders.h"
-}  // namespace Opcode
+} // namespace Opcode
 
 using namespace Opcode;
 

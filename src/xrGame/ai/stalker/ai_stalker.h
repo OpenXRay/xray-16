@@ -212,14 +212,14 @@ public:
 
     // PDA && Dialogs
     //	virtual void						ReceivePdaMessage					(u16 who, EPdaMsg msg, shared_str
-    //info_id);
+    // info_id);
     virtual void UpdateAvailableDialogs(CPhraseDialogManager* partner);
 
     // scripts
     virtual CWeapon* GetCurrentWeapon() const;
     virtual u32 GetWeaponAmmo() const;
     //	virtual CInventoryItem				*GetCurrentEquipment	() const; <- moved to
-    //InventoryOwner::GetCurrentOutfit
+    // InventoryOwner::GetCurrentOutfit
     virtual CInventoryItem* GetMedikit() const;
     virtual CInventoryItem* GetFood() const;
     virtual bool bfAssignMovement(CScriptEntityAction* tpEntityAction);
@@ -402,7 +402,7 @@ public:
     virtual void UpdateCamera();
     virtual bool can_attach(const CInventoryItem* inventory_item) const;
     // because we don't want to use this feature for stalkers
-    virtual bool use_simplified_visual() const { return false; }  //(already_dead());};
+    virtual bool use_simplified_visual() const { return false; } //(already_dead());};
 #ifdef DEBUG
     void debug_planner(const script_planner* planner);
 #endif
@@ -667,7 +667,7 @@ private:
 #ifdef DEBUG
     xr_vector<trajectory_pick> m_throw_picks;
     xr_vector<Fvector> m_throw_collide_tris;
-#endif  // DEBUG
+#endif // DEBUG
 
 public:
     IC const bool& throw_enabled();

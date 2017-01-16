@@ -43,7 +43,7 @@ protected:
     bool m_visible;
     float m_border;
     Frect m_rect;
-};  // class UIHint
+}; // class UIHint
 
 // =================================================================================================
 // UIHintWindow = Owner of UIHint
@@ -74,6 +74,6 @@ private:
     u32 m_hint_delay;
     shared_str m_hint_text;
     bool m_enable;
-};  // class UIHintWindow
+}; // class UIHintWindow
 
-#endif  // UI_HINT_H_INCLUDED
+#endif // UI_HINT_H_INCLUDED

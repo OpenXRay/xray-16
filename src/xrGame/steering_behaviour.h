@@ -28,7 +28,7 @@ namespace detail
 {
 vec random_vec();
 
-}  // namespace detail
+} // namespace detail
 
 //----------------------------------------------------------
 // base
@@ -82,7 +82,7 @@ public:
         vec pos;
         vec dest;
         float max_evade_range;
-        vec (*pf_random_dir)();  // randomizer func in case we're in 0 dist from dest
+        vec (*pf_random_dir)(); // randomizer func in case we're in 0 dist from dest
 
         params(float max_evade_range, vec_arg factor, float min_factor_dist = base::s_min_factor_dist,
             vec (*pf_random_dir)() = &detail::random_vec)
@@ -184,8 +184,8 @@ public:
             yz_plane
         } plane;
 
-        float conservativeness;  // how much we're taking current dir into account?
-        float angle_change;      // how big angle changes can be? (radians)
+        float conservativeness; // how much we're taking current dir into account?
+        float angle_change;     // how big angle changes can be? (radians)
         vec dir;
 
         params(plane_t plane, float conservativeness, float angle_change, float factor)
@@ -228,7 +228,7 @@ public:
         vec thrust_factor;
 
         typedef std::vector<vec> Probes;
-        Probes probes;  // obstacle-scanners (vectors in local (dir,up) space)
+        Probes probes; // obstacle-scanners (vectors in local (dir,up) space)
 
         params(float turn_factor, vec_arg thrust_factor, float min_factor_dist = base::s_min_factor_dist)
             : base::params(thrust_factor, min_factor_dist), turn_factor(turn_factor), thrust_factor(thrust_factor)
@@ -273,9 +273,9 @@ public:
         }
 
         // this function should supply nearest object to group with
-        virtual void first_nearest(vec& v) = 0;  // start supplying nearest
+        virtual void first_nearest(vec& v) = 0; // start supplying nearest
         virtual bool nomore_nearest() = 0;
-        virtual void next_nearest(vec& v) = 0;  // next nearest, false if finished
+        virtual void next_nearest(vec& v) = 0; // next nearest, false if finished
 
         virtual bool update() = 0;
         virtual ~params() {}
@@ -312,6 +312,6 @@ protected:
     Behaviours m_schedule_remove;
 };
 
-}  // namespace steering_behaviour
+} // namespace steering_behaviour
 
 #endif

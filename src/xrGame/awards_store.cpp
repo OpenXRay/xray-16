@@ -90,7 +90,7 @@ all_awards_t& awards_store::get_player_awards()
 bool awards_store::is_sake_equal_to_file() const
 {
     VERIFY(!m_ltx_awards_result.empty());
-    if (m_ltx_awards_result.empty()) return true;  // unknown
+    if (m_ltx_awards_result.empty()) return true; // unknown
 
     for (all_awards_t::const_iterator i = m_ltx_awards_result.begin(), ie = m_ltx_awards_result.end(); i != ie; ++i)
     {
@@ -118,7 +118,7 @@ void awards_store::process_award(SAKEField* award_params)
 
 void awards_store::process_aw_out_response(SAKEGetMyRecordsOutput* tmp_out, int const out_fields_count)
 {
-    VERIFY(tmp_out->mNumRecords <= 1);  // one raw
+    VERIFY(tmp_out->mNumRecords <= 1); // one raw
     if (tmp_out->mNumRecords == 0) return;
 
     for (int i = 0; i < out_fields_count; ++i)
@@ -147,4 +147,4 @@ void __cdecl awards_store::get_my_awards_cb(
     my_inst->m_award_operation_cb.clear();
 }
 
-}  // namespace gamespy_profile
+} // namespace gamespy_profile

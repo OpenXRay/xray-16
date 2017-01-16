@@ -44,7 +44,7 @@ IC float getLastRP_Scale(CDB::COLLIDER* DB, RayCache& C)
             b_material& M = g_materials[F.dwMaterial];
             b_texture& T = g_textures[M.surfidx];
             Shader_xrLCVec& LIB = g_shaders_xrlc->Library();
-            if (M.shader_xrlc >= LIB.size()) return 0;  //. hack
+            if (M.shader_xrlc >= LIB.size()) return 0; //. hack
             Shader_xrLC& SH = LIB[M.shader_xrlc];
             if (!SH.flags.bLIGHT_CastShadow) continue;
 
@@ -263,7 +263,7 @@ public:
             // raytrace
             int sector = calcSphereSector(Dir);
             c_total[sector] += 1.f;
-            c_passed[sector] += rayTrace(&DB, TestPos, Dir, range, cache[ID].C);  //
+            c_passed[sector] += rayTrace(&DB, TestPos, Dir, range, cache[ID].C); //
         }
         Q.Clear();
 
@@ -284,13 +284,13 @@ public:
         }
 
         cover[0] = (value[2] + value[3] + value[4] + value[5]) / 4.f;
-        clamp(cover[0], 0.f, 1.f);  // left
+        clamp(cover[0], 0.f, 1.f); // left
         cover[1] = (value[0] + value[1] + value[2] + value[3]) / 4.f;
-        clamp(cover[1], 0.f, 1.f);  // forward
+        clamp(cover[1], 0.f, 1.f); // forward
         cover[2] = (value[6] + value[7] + value[0] + value[1]) / 4.f;
-        clamp(cover[2], 0.f, 1.f);  // right
+        clamp(cover[2], 0.f, 1.f); // right
         cover[3] = (value[4] + value[5] + value[6] + value[7]) / 4.f;
-        clamp(cover[3], 0.f, 1.f);  // back
+        clamp(cover[3], 0.f, 1.f); // back
     }
 
     virtual void Execute()

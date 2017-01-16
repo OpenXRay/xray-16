@@ -90,8 +90,8 @@ private:
     //
     // Stores angle of R joint
     //
-    float upper_len;  // Len of T pos vector
-    float lower_len;  // Len of S pos vector
+    float upper_len; // Len of T pos vector
+    float lower_len; // Len of S pos vector
     float reciprocal_upper_len;
 
     float r_angle;

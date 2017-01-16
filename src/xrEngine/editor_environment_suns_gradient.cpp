@@ -75,4 +75,4 @@ void gradient::fill(manager const& manager, property_holder* holder, property_ho
         "Select texture...", editor::property_holder::cannot_enter_text, editor::property_holder::remove_extension);
 }
 
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR

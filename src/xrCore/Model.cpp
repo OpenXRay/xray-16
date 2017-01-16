@@ -66,23 +66,23 @@ SEE2_CONTEXT _PACK_ATTR SEE2Cont[24][32], DummySEE2Cont;
 //==============================================================================
 
 struct PPM_CONTEXT
-{                          // Notes:
-    BYTE NumStats, Flags;  // 1. NumStats & NumMasked contain
-    WORD SummFreq;         //  number of symbols minus 1
+{                         // Notes:
+    BYTE NumStats, Flags; // 1. NumStats & NumMasked contain
+    WORD SummFreq;        //  number of symbols minus 1
     struct STATE
-    {                            // 2. sizeof(WORD) > sizeof(BYTE)
-        BYTE Symbol, Freq;       // 3. contexts example:
-        PPM_CONTEXT* Successor;  // MaxOrder:
+    {                           // 2. sizeof(WORD) > sizeof(BYTE)
+        BYTE Symbol, Freq;      // 3. contexts example:
+        PPM_CONTEXT* Successor; // MaxOrder:
     };
 
-    STATE _PACK_ATTR* Stats;  //  ABCD    context
-    PPM_CONTEXT* Suffix;      //   BCD    suffix
+    STATE _PACK_ATTR* Stats; //  ABCD    context
+    PPM_CONTEXT* Suffix;     //   BCD    suffix
 
-    inline void encodeBinSymbol(int symbol);  //   BCDE   successor
-    inline void encodeSymbol1(int symbol);    // other orders:
-    inline void encodeSymbol2(int symbol);    //   BCD    context
-    inline void decodeBinSymbol() const;      //    CD    suffix
-    inline void decodeSymbol1();              //   BCDE   successor
+    inline void encodeBinSymbol(int symbol); //   BCDE   successor
+    inline void encodeSymbol1(int symbol);   // other orders:
+    inline void encodeSymbol2(int symbol);   //   BCD    context
+    inline void decodeBinSymbol() const;     //    CD    suffix
+    inline void decodeSymbol1();             //   BCDE   successor
     inline void decodeSymbol2();
     inline void update1(STATE* p);
     inline void update2(STATE* p);
@@ -98,11 +98,11 @@ struct PPM_CONTEXT
 PPM_CONTEXT _PACK_ATTR* MaxContext;
 #pragma pack()
 
-static BYTE NS2BSIndx[256], QTable[260];  // constants
-static PPM_CONTEXT::STATE* FoundState;    // found next state transition
+static BYTE NS2BSIndx[256], QTable[260]; // constants
+static PPM_CONTEXT::STATE* FoundState;   // found next state transition
 static int InitEsc, OrderFall, RunLength, InitRL, MaxOrder;
 static BYTE CharMask[256], NumMasked, PrevSuccess, EscCount, PrintCount;
-static WORD BinSumm[25][64];  // binary SEE-contexts
+static WORD BinSumm[25][64]; // binary SEE-contexts
 static MR_METHOD MRMethod;
 
 static void _STDCALL StartModelRare(int MaxOrder, MR_METHOD MRMethod);
@@ -125,7 +125,7 @@ struct PPMD_STARTUP
 {
     inline PPMD_STARTUP();
 } PPMd_StartUp;
-inline PPMD_STARTUP::PPMD_STARTUP()  // constants initialization
+inline PPMD_STARTUP::PPMD_STARTUP() // constants initialization
 {
     UINT i, k, m, Step;
     for (i = 0, k = 1; i < N1; i++, k += 1)
@@ -1034,7 +1034,7 @@ void _STDCALL EncodeFile(_PPMD_FILE* EncodedFile, _PPMD_FILE* DecodedFile, int M
             if (EscCount == 0) ClearMask(EncodedFile, DecodedFile);
         }
         rcEncNormalize(EncodedFile);
-    }  // for (PPM_CONTEXT* MinContext; ; )
+    } // for (PPM_CONTEXT* MinContext; ; )
 
 STOP_ENCODING:
     rcFlushEncoder(EncodedFile);
@@ -1099,7 +1099,7 @@ static void _STDCALL StartModelRare(int MaxOrder, MR_METHOD MRMethod)
 
         memset(CharMask, 0, sizeof(CharMask));
         EscCount = PrintCount = 1;
-        if (MaxOrder < 2)  // we are in solid mode
+        if (MaxOrder < 2) // we are in solid mode
         {
             OrderFall = ::MaxOrder;
             for (PPM_CONTEXT* pc = MaxContext; pc && pc->Suffix; pc = pc->Suffix)

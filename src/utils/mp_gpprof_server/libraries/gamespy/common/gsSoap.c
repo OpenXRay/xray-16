@@ -32,7 +32,7 @@ GSSoapTask* gsiExecuteSoap(const char* theURL, const char* theService, GSXmlStre
     GSTask* aCoreTask = NULL;
 
     aSoapTask = (GSSoapTask*)gsimalloc(sizeof(GSSoapTask));
-    if (aSoapTask == NULL) return NULL;  // out of memory
+    if (aSoapTask == NULL) return NULL; // out of memory
 
     aSoapTask->mCallbackFunc = theCallbackFunc;
     aSoapTask->mCustomFunc = NULL;
@@ -49,7 +49,7 @@ GSSoapTask* gsiExecuteSoap(const char* theURL, const char* theService, GSXmlStre
     aCoreTask = gsiCoreCreateTask();
     if (aCoreTask == NULL) {
         gsifree(aSoapTask);
-        return NULL;  // out of memory
+        return NULL; // out of memory
     }
 
     aCoreTask->mCallbackFunc = gsiSoapTaskCallback;
@@ -152,7 +152,7 @@ static GHTTPBool gsiSoapTaskHttpCompletedCallback(
 
     GSI_UNUSED(request);
 
-    return GHTTPFalse;  // don't let http free the buffer
+    return GHTTPFalse; // don't let http free the buffer
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -242,7 +242,7 @@ static gsi_bool gsiSoapTaskCleanup(void* theTask)
 
     if (aSoapTask->mResponseSoap != NULL) gsXmlFreeReader(aSoapTask->mResponseSoap);
     if (aSoapTask->mResponseBuffer != NULL) gsifree(aSoapTask->mResponseBuffer);
-    if (aSoapTask->mPostData != NULL) ghttpFreePost(aSoapTask->mPostData);  // this also frees the request soap xml
+    if (aSoapTask->mPostData != NULL) ghttpFreePost(aSoapTask->mPostData); // this also frees the request soap xml
     gsifree(aSoapTask);
 
     return gsi_true;

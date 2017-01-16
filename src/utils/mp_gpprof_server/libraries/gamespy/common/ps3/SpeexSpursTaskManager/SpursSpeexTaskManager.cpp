@@ -72,7 +72,7 @@ int SpursSpeexTaskManager::initialize()
 {
 #ifdef DEBUG_SPU_TASK_SCHEDULING
     printf("SpuSampleTaskProcess::initialize()\n");
-#endif  // DEBUG_SPU_TASK_SCHEDULING
+#endif // DEBUG_SPU_TASK_SCHEDULING
 
     for (int i = 0; (unsigned int)i < m_maxNumOutstandingTasks; i++)
     {
@@ -184,7 +184,7 @@ int SpursSpeexTaskManager::issueTask(SpursSpeexTaskDesc& taskDesc, uint32_t uiCo
 {
 #ifdef DEBUG_SPU_TASK_SCHEDULING
     printf("SpuSampleTaskProcess::issueTask (m_currentTask= %d\)n", m_currentTask);
-#endif  // DEBUG_SPU_TASK_SCHEDULING
+#endif // DEBUG_SPU_TASK_SCHEDULING
 
     // some bookkeeping to recognize finished tasks
     taskDesc.mTaskId = m_currentTask;
@@ -231,7 +231,7 @@ int SpursSpeexTaskManager::flush()
 {
 #ifdef DEBUG_SPU_TASK_SCHEDULING
     printf("\nSpuCollisionTaskProcess::flush()\n");
-#endif  // DEBUG_SPU_TASK_SCHEDULING
+#endif // DEBUG_SPU_TASK_SCHEDULING
 
     // all tasks are issued, wait for all tasks to be complete
     while (m_numBusyTasks > 0)
@@ -248,4 +248,4 @@ int SpursSpeexTaskManager::flush()
     }
     return 0;
 }
-#endif  // USE_SAMPLE_PROCESS
+#endif // USE_SAMPLE_PROCESS

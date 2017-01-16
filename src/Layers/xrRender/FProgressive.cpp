@@ -38,7 +38,7 @@ void FProgressive::Load(const char* N, IReader* data, u32 dwFlags)
 
     // normal SWI
     destructor<IReader> lods(data->open_chunk(OGF_SWIDATA));
-    nSWI.reserved[0] = lods().r_u32();  // reserved 16 bytes
+    nSWI.reserved[0] = lods().r_u32(); // reserved 16 bytes
     nSWI.reserved[1] = lods().r_u32();
     nSWI.reserved[2] = lods().r_u32();
     nSWI.reserved[3] = lods().r_u32();
@@ -54,7 +54,7 @@ void FProgressive::Load(const char* N, IReader* data, u32 dwFlags)
         destructor<IReader> def(geomdef().open_chunk(OGF_SWIDATA));
 
         xSWI = new FSlideWindowItem();
-        xSWI->reserved[0] = def().r_u32();  // reserved 16 bytes
+        xSWI->reserved[0] = def().r_u32(); // reserved 16 bytes
         xSWI->reserved[1] = def().r_u32();
         xSWI->reserved[2] = def().r_u32();
         xSWI->reserved[3] = def().r_u32();

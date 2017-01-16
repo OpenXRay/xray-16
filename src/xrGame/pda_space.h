@@ -3,7 +3,7 @@
 //типы сообщений PDA
 enum EPdaMsg
 {
-    ePdaMsgDialog,  //диалог
-    ePdaMsgInfo,    //сообщение передает некоторую информацию
+    ePdaMsgDialog, //диалог
+    ePdaMsgInfo,   //сообщение передает некоторую информацию
     ePdaMsgMax
 };

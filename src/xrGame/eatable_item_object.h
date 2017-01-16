@@ -40,8 +40,8 @@ public:
     virtual void OnEvent(NET_Packet& P, u16 type);
     virtual BOOL net_Spawn(CSE_Abstract* DC);
     virtual void net_Destroy();
-    virtual void net_Import(NET_Packet& P);  // import from server
-    virtual void net_Export(NET_Packet& P);  // export to server
+    virtual void net_Import(NET_Packet& P); // import from server
+    virtual void net_Export(NET_Packet& P); // export to server
     virtual void save(NET_Packet& output_packet);
     virtual void load(IReader& input_packet);
     virtual BOOL net_SaveRelevant() { return TRUE; }
@@ -54,12 +54,12 @@ public:
 public:
     ////////// network //////////////////////////////////////////////////
     virtual void make_Interpolation();
-    virtual void PH_B_CrPr();  // actions & operations before physic correction-prediction steps
-    virtual void PH_I_CrPr();  // actions & operations after correction before prediction steps
+    virtual void PH_B_CrPr(); // actions & operations before physic correction-prediction steps
+    virtual void PH_I_CrPr(); // actions & operations after correction before prediction steps
 #ifdef DEBUG
-    virtual void PH_Ch_CrPr();  //
+    virtual void PH_Ch_CrPr(); //
 #endif
-    virtual void PH_A_CrPr();  // actions & operations after phisic correction-prediction steps
+    virtual void PH_A_CrPr(); // actions & operations after phisic correction-prediction steps
     virtual bool NeedToDestroyObject() const;
 
 protected:

@@ -21,18 +21,18 @@ public:
     virtual void OnPlayerKilled(
         u16 killer_id, u16 target_id, u16 weapon_id, std::pair<KILL_TYPE, SPECIAL_KILL_TYPE> kill_type);
 
-    static u32 const mad_time_period = 20000;  // 20 seconds
+    static u32 const mad_time_period = 20000; // 20 seconds
 protected:
     typedef xr_vector<u32> kill_times_t;
 
     kill_times_t m_kill_times;
     void clear_old_kills();
-};  // class player_state_mad
+}; // class player_state_mad
 
 ADD_ACCUMULATIVE_STATE(acpv_mad, player_state_mad);
 #undef ACCUMULATIVE_STATE_LIST
 #define ACCUMULATIVE_STATE_LIST SAVE_TYPE_LIST(acpv_mad, player_state_mad)
 
-}  // namespace award_system
+} // namespace award_system
 
-#endif  //#ifndef PLAYER_STATE_MAD_INCLUDED
+#endif //#ifndef PLAYER_STATE_MAD_INCLUDED

@@ -68,7 +68,7 @@ IC bool dcTriListCollider::FragmentonSphereTest(
     dVector3 L = {pt1[0] - center[0], pt1[1] - center[1], pt1[2] - center[2]};
     dReal sq_mag_V = dDOT(V, V);
     dReal dot_L_V = dDOT(L, V);
-    dReal t = -dot_L_V / sq_mag_V;  // t
+    dReal t = -dot_L_V / sq_mag_V; // t
     if (t < 0.f || t > 1.f) return false;
     dVector3 Pc = {pt1[0] + t * V[0], pt1[1] + t * V[1], pt1[2] + t * V[2]};
     dVector3 Dc = {center[0] - Pc[0], center[1] - Pc[1], center[2] - Pc[2]};
@@ -127,7 +127,7 @@ int dcTriListCollider::dSortedTriSphere(const dReal* /**v1/**/, const dReal* /**
     const float SphereRadius = dGeomSphereGetRadius(Sphere);
 
     //	dNormalize3(triAx);
-    const dReal* ContactNormal = triAx;  //{triAx[0],triAx[1],triAx[2]};
+    const dReal* ContactNormal = triAx; //{triAx[0],triAx[1],triAx[2]};
     dVector3 ContactPos = {SphereCenter[0] - triAx[0] * SphereRadius, SphereCenter[1] - triAx[1] * SphereRadius,
         SphereCenter[2] - triAx[2] * SphereRadius};
 

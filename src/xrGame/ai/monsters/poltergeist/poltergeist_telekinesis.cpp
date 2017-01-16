@@ -239,7 +239,7 @@ bool CPolterTele::tele_raise_objects()
     //	bool	rotate = false;
 
     //	CTelekinesis::activate		(obj, m_pmt_tele_raise_speed, m_pmt_tele_object_height, m_pmt_tele_time_object_keep,
-    //rotate);
+    // rotate);
     //}
 
     if (!tele_objects.empty()) {
@@ -274,7 +274,7 @@ struct SCollisionHitCallback : public ICollisionHitCallback
         if (cs > min_cs * 0.5f) hl = m_pmt_object_collision_damage;
         VERIFY(m_object);
         di->SetInitiated();
-        m_object->set_collision_hit_callback(0);  // delete this!!
+        m_object->set_collision_hit_callback(0); // delete this!!
     }
 };
 

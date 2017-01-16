@@ -46,7 +46,7 @@ void gsCoreInitialize()
 
     // Is someone else shutting down the core?
     while (gsi_is_true(aCore->mIsShuttingDown))
-        msleep(GSI_CORE_INIT_YIELD_MS);  // yield to other thread
+        msleep(GSI_CORE_INIT_YIELD_MS); // yield to other thread
 
     // If we're the first reference, initialize the core
     if (gsiInterlockedIncrement(&aCore->mRefCount) == 1) {
@@ -360,7 +360,7 @@ void gsiCoreExecuteTask(GSTask* theTask, gsi_time theTimeoutMs)
                 break;
             }
         }
-        GS_ASSERT(anInsertPos != -1);  // make sure it got in
+        GS_ASSERT(anInsertPos != -1); // make sure it got in
         aCore->mTaskArray[anInsertPos] = theTask;
     }
 #endif

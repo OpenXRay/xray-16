@@ -49,21 +49,21 @@ class MeshTri
 
 private:
     DlinkDefine(MeshTri, List);
-    DWORD dwListId;  // For use when doing consistency checks.
+    DWORD dwListId; // For use when doing consistency checks.
 
     void InternalDelete(BOOL bBinUnusedEdges);
 
 public:
-    MeshPt* pPt1;  // Points.
+    MeshPt* pPt1; // Points.
     MeshPt* pPt2;
     MeshPt* pPt3;
-    MeshEdge* pEdge12;  // Edges between point numbers.
+    MeshEdge* pEdge12; // Edges between point numbers.
     MeshEdge* pEdge23;
     MeshEdge* pEdge31;
 
     DlinkMethods(MeshTri, List);
 
-    MESHTRI_APP_DEFINED  // App-defined data.
+    MESHTRI_APP_DEFINED // App-defined data.
 
         MeshTri(void);
     // Set pEdgeListRoot to non-NULL to autocreate edges.
@@ -113,19 +113,19 @@ class MeshEdge
 
 private:
     DlinkDefine(MeshEdge, List);
-    DWORD dwListId;  // For use when doing consistency checks.
+    DWORD dwListId; // For use when doing consistency checks.
 
 public:
     MeshPt* pPt1;
     MeshPt* pPt2;
-    MeshTri* pTri12;  // Tri that numbers pt1, pt2 in that order.
-    MeshTri* pTri21;  // Tri that numbers pt2, pt1 in that order.
+    MeshTri* pTri12; // Tri that numbers pt1, pt2 in that order.
+    MeshTri* pTri21; // Tri that numbers pt2, pt1 in that order.
 
-    MeshEdge* pEdgeProx;  // The edge that this is close to, if any.
+    MeshEdge* pEdgeProx; // The edge that this is close to, if any.
 
     DlinkMethods(MeshEdge, List);
 
-    MESHEDGE_APP_DEFINED  // App-defined data.
+    MESHEDGE_APP_DEFINED // App-defined data.
 
         //	BINARY_HEAP_VARS();			// Helper stuff.
 
@@ -177,19 +177,19 @@ class MeshPt
     friend class MeshTri;
 
 private:
-    ArbitraryList<MeshEdge*> EdgeList;  // The list of edges that use this point (in no order).
-    ArbitraryList<MeshTri*> TriList;    // The list of tris that use this point (in no order).
-    ArbitraryList<MeshPt*> ProxPtList;  // The list of prox pts (in no order).
+    ArbitraryList<MeshEdge*> EdgeList; // The list of edges that use this point (in no order).
+    ArbitraryList<MeshTri*> TriList;   // The list of tris that use this point (in no order).
+    ArbitraryList<MeshPt*> ProxPtList; // The list of prox pts (in no order).
 
-    int iCurTriNum;   // Used with First/NextTri.
-    int iCurEdgeNum;  // Used with First/NextEdge.
-    int iCurProxNum;  // Used with First/NextProx.
+    int iCurTriNum;  // Used with First/NextTri.
+    int iCurEdgeNum; // Used with First/NextEdge.
+    int iCurProxNum; // Used with First/NextProx.
 
     DlinkDefine(MeshPt, List);
-    DWORD dwListId;  // For use when doing consistency checks.
+    DWORD dwListId; // For use when doing consistency checks.
 
 public:
-    MESHPT_APP_DEFINED  // App-defined data.
+    MESHPT_APP_DEFINED // App-defined data.
 
         DlinkMethods(MeshPt, List);
 

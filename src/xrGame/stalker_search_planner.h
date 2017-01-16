@@ -30,4 +30,4 @@ public:
     virtual void finalize();
 };
 
-#endif  // STALKER_SEARCH_PLANNER_H_INCLUDED
+#endif // STALKER_SEARCH_PLANNER_H_INCLUDED

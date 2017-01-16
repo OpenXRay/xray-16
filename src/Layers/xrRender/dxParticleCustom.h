@@ -17,4 +17,4 @@ public:
 };
 
 //---------------------------------------------------------------------------
-#endif  // ParticleCustomH
+#endif // ParticleCustomH

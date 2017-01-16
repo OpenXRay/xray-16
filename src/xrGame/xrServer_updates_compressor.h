@@ -28,7 +28,7 @@ private:
 
     last_updates_cache_t m_cache;
 
-};  // class last_updates_cache
+}; // class last_updates_cache
 
 class server_updates_compressor
 {
@@ -75,6 +75,6 @@ private:
 
     IWriter* dbg_update_bins_writer;
     void create_update_bin_writer();
-};  // class server_updates_compressor
+}; // class server_updates_compressor
 
-#endif  //#ifndef XRSERVER_UPDATES_COMPRESSOR_INCLUDED
+#endif //#ifndef XRSERVER_UPDATES_COMPRESSOR_INCLUDED

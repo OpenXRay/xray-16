@@ -27,15 +27,15 @@ struct MIPMapData
     size_t mipLevel;
     size_t width;
     size_t height;
-    int faceNumber;  // current face number for this image
-    int numFaces;    // total number of faces (depth for volume textures, 6 for cube maps)
+    int faceNumber; // current face number for this image
+    int numFaces;   // total number of faces (depth for volume textures, 6 for cube maps)
 };
 
 // Write callback function.
 typedef NV_ERROR_CODE (*DXTReadCallback)(void* buffer, size_t count, void* userData);
 
 typedef NV_ERROR_CODE (*DXTWriteCallback)(const void* buffer, size_t count,
-    const MIPMapData* mipMapData,  // if nz, this is MIP data
+    const MIPMapData* mipMapData, // if nz, this is MIP data
     void* userData);
 
 // Compresses an image with a user supplied callback with the data for each MIP level created
@@ -44,35 +44,35 @@ typedef enum nvPixelOrder {
     nvBGRA,
     nvRGB,
     nvBGR,
-    nvGREY,  // one plance copied to RGB
+    nvGREY, // one plance copied to RGB
 };
 
 namespace nvDDS
 {
 DXTLIB_API NV_ERROR_CODE nvDXTcompress(const nvImageContainer& imageContainer, nvCompressionOptions* options,
-    DXTWriteCallback fileWriteRoutine,  // call to .dds write routine
+    DXTWriteCallback fileWriteRoutine, // call to .dds write routine
     const RECT* rect = 0);
 
 DXTLIB_API NV_ERROR_CODE nvDXTcompress(const RGBAImage& srcImage, nvCompressionOptions* options,
-    DXTWriteCallback fileWriteRoutine,  // call to .dds write routine
+    DXTWriteCallback fileWriteRoutine, // call to .dds write routine
     const RECT* rect = 0);
 
 DXTLIB_API NV_ERROR_CODE nvDXTcompress(const unsigned char* srcImage, size_t width, size_t height, size_t byte_pitch,
     nvPixelOrder pixelOrder, nvCompressionOptions* options,
-    DXTWriteCallback fileWriteRoutine,  // call to .dds write routine
+    DXTWriteCallback fileWriteRoutine, // call to .dds write routine
     const RECT* rect = 0);
 
 // image with MIP maps
 DXTLIB_API NV_ERROR_CODE nvDXTcompress(const RGBAMipMappedImage& srcMIPImage, nvCompressionOptions* options,
-    DXTWriteCallback fileWriteRoutine,  // call to .dds write routine
+    DXTWriteCallback fileWriteRoutine, // call to .dds write routine
     const RECT* rect = 0);
 
 DXTLIB_API NV_ERROR_CODE nvDXTcompress(const RGBAMipMappedCubeMap& srcMIPCubeMap, nvCompressionOptions* options,
-    DXTWriteCallback fileWriteRoutine,  // call to .dds write routine
+    DXTWriteCallback fileWriteRoutine, // call to .dds write routine
     const RECT* rect = 0);
 
 DXTLIB_API NV_ERROR_CODE nvDXTcompress(const RGBAMipMappedVolumeMap& srcMIPVolumeMap, nvCompressionOptions* options,
-    DXTWriteCallback fileWriteRoutine,  // call to .dds write routine
+    DXTWriteCallback fileWriteRoutine, // call to .dds write routine
     const RECT* rect = 0);
 
 DXTLIB_API NV_ERROR_CODE nvDXTcompress(

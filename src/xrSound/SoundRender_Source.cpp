@@ -71,7 +71,7 @@ void CSoundRender_Source::i_decompress_fr(OggVorbis_File* ovf, char* _dest, u32 
         // if end of file or read limit exceeded
         if (ret == 0)
             break;
-        else if (ret < 0)  // Error in bitstream
+        else if (ret < 0) // Error in bitstream
         {
             //
         }

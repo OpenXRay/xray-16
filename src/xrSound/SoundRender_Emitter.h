@@ -43,7 +43,7 @@ public:
 
     float priority_scale;
     float smooth_volume;
-    float occluder_volume;  // USER
+    float occluder_volume; // USER
     float fade_volume;
     Fvector occluder[3];
 
@@ -59,8 +59,8 @@ public:
     BOOL b2D;
     BOOL bStopping;
     BOOL bRewind;
-    float fTimeStarted;  // time of "Start"
-    float fTimeToStop;   // time to "Stop"
+    float fTimeStarted; // time of "Start"
+    float fTimeToStop;  // time to "Stop"
     float fTimeToPropagade;
 
     u32 marker;
@@ -101,7 +101,7 @@ public:
 
     float priority();
     void start(ref_sound* _owner, BOOL _loop, float delay);
-    void cancel();  // manager forces out of rendering
+    void cancel(); // manager forces out of rendering
     void update(float dt);
     BOOL update_culling(float dt);
     void update_environment(float dt);

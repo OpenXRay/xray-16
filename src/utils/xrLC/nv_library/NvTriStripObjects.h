@@ -41,9 +41,9 @@ public:
 
     // data members are left public
     int m_v0, m_v1, m_v2;
-    int m_stripId;       // real strip Id
-    int m_testStripId;   // strip Id in an experiment
-    int m_experimentId;  // in what experiment was it given an experiment Id?
+    int m_stripId;      // real strip Id
+    int m_testStripId;  // strip Id in an experiment
+    int m_experimentId; // in what experiment was it given an experiment Id?
 };
 
 // nice and dumb edge class that points knows its

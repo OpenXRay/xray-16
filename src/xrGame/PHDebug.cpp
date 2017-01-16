@@ -865,7 +865,7 @@ void DBG_PhysBones(IGameObject& O)
     {
         CPhysicsElement* e = shell->get_ElementByStoreOrder(i);
 
-        DBG_DrawMatrix(e->XFORM(), 0.1f);  // Fmatrix().mul_43( O.XFORM(),e->XFORM())
+        DBG_DrawMatrix(e->XFORM(), 0.1f); // Fmatrix().mul_43( O.XFORM(),e->XFORM())
         CPhysicsElement* pE = (e)->parent_element();
         if (pE) DBG_DrawLine(e->XFORM().c, pE->XFORM().c, color_xrgb(255, 100, 0));
     }
@@ -992,11 +992,14 @@ class CPHDebugOutput : public IDebugOutput
     virtual void DBG_DrawOBB(const Fmatrix& m, const Fvector h, u32 c) { ::DBG_DrawOBB(m, h, c); }
     virtual void DBG_DrawPoint(const Fvector& p, float size, u32 c) { ::DBG_DrawPoint(p, size, c); }
     virtual void DBG_DrawMatrix(const Fmatrix& m, float size, u8 a = 255) { ::DBG_DrawMatrix(m, size, a); }
-    // virtual	void DBG_DrawRotationX( const Fmatrix &m, float ang0, float ang1, float size, u32 ac, bool solid = false,
+    // virtual	void DBG_DrawRotationX( const Fmatrix &m, float ang0, float ang1, float size, u32 ac, bool solid =
+    // false,
     // u32 tessel = 7 ) = 0;
-    // virtual	void DBG_DrawRotationY( const Fmatrix &m, float ang0, float ang1, float size, u32 ac, bool solid = false,
+    // virtual	void DBG_DrawRotationY( const Fmatrix &m, float ang0, float ang1, float size, u32 ac, bool solid =
+    // false,
     // u32 tessel = 7 ) = 0;
-    // virtual	void DBG_DrawRotationZ( const Fmatrix &m, float ang0, float ang1, float size, u32 ac, bool solid = false,
+    // virtual	void DBG_DrawRotationZ( const Fmatrix &m, float ang0, float ang1, float size, u32 ac, bool solid =
+    // false,
     // u32 tessel = 7 ) = 0;
     virtual void _cdecl DBG_OutText(LPCSTR s, ...)
     {
@@ -1021,13 +1024,13 @@ class CPHDebugOutput : public IDebugOutput
     {
         return ::dbg_tries_num;
         //	make_string( "%s, _14_=%f \n", dump_string( make_string( "%s.i, ", name ).c_str(), form.i ).c_str( ) ,
-        //form._14_ )	+
+        // form._14_ )	+
         //	make_string( "%s, _24_=%f \n", dump_string( make_string( "%s.j, ", name ).c_str(), form.j ).c_str( ) ,
-        //form._24_ )	+
+        // form._24_ )	+
         //	make_string( "%s, _34_=%f \n", dump_string( make_string( "%s.k, ", name ).c_str(), form.k ).c_str( ) ,
-        //form._34_  ) +
+        // form._34_  ) +
         //	make_string( "%s, _44_=%f \n", dump_string( make_string( "%s.c, ", name ).c_str(), form.c ).c_str( ) ,
-        //form._44_ );
+        // form._44_ );
     }
     virtual u32& dbg_saved_tries_for_active_objects() { return ::dbg_saved_tries_for_active_objects; }
     virtual u32& dbg_total_saved_tries() { return ::dbg_total_saved_tries; }

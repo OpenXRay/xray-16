@@ -23,7 +23,7 @@ extern CRenderDevice Device;
 
 #ifdef MASTER_GOLD
 #define NO_MULTI_INSTANCES
-#endif  // #ifdef MASTER_GOLD
+#endif // #ifdef MASTER_GOLD
 
 //////////////////////////////////////////////////////////////////////////
 struct _SoundProcessor : public pureFrame
@@ -38,7 +38,7 @@ struct _SoundProcessor : public pureFrame
 LPCSTR _GetFontTexName(LPCSTR section)
 {
     static const char* tex_names[] = {"texture800", "texture", "texture1600"};
-    int def_idx = 1;  // default 1024x768
+    int def_idx = 1; // default 1024x768
     int idx = def_idx;
 
 #if 0
@@ -230,7 +230,7 @@ void CApplication::OnEvent(EVENT E, u64 P1, u64 P2)
         //-----------------------------------------------------------
 
         LoadBegin();
-        g_pGamePersistent->Start("");  // server_options.c_str()); - no prefetch !
+        g_pGamePersistent->Start(""); // server_options.c_str()); - no prefetch !
         g_pGameLevel->net_StartPlayDemo();
         LoadEnd();
 

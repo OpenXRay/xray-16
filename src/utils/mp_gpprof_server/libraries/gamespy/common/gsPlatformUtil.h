@@ -50,8 +50,8 @@ unsigned int gsiGetResolvedIP(GSIResolveHostnameHandle handle);
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 // Cross platform random number generator
-void Util_RandSeed(unsigned long seed);  // to seed it
-int Util_RandInt(int low, int high);     // retrieve a random int
+void Util_RandSeed(unsigned long seed); // to seed it
+int Util_RandInt(int low, int high);    // retrieve a random int
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
@@ -95,14 +95,14 @@ void gsiCheckStack(void);
 ///////////////////////////////////////////////////////////////////////////////
 // time functions
 
-gsi_time current_time();        // milliseconds
-gsi_time current_time_hires();  // microseconds
-void msleep(gsi_time msec);     // milliseconds
+gsi_time current_time();       // milliseconds
+gsi_time current_time_hires(); // microseconds
+void msleep(gsi_time msec);    // milliseconds
 
 // GSI equivalent of common C-lib time functions
-struct tm* gsiSecondsToDate(const time_t* timp);  // gmtime
-time_t gsiDateToSeconds(struct tm* tb);           // mktime
-char* gsiSecondsToString(const time_t* timp);     // ctime
+struct tm* gsiSecondsToDate(const time_t* timp); // gmtime
+time_t gsiDateToSeconds(struct tm* tb);          // mktime
+char* gsiSecondsToString(const time_t* timp);    // ctime
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
@@ -147,4 +147,4 @@ void gsiInt64ToString(char theNumberStr[33], gsi_i64 theNumber);
 }
 #endif
 
-#endif  //__GSUTILITY_H__
+#endif //__GSUTILITY_H__

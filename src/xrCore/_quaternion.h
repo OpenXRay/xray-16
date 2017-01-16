@@ -165,7 +165,7 @@ private:
 public:
     T x, y, z, w;
 
-    IC SelfRef set(T W, T X, T Y, T Z)  // don't normalize
+    IC SelfRef set(T W, T X, T Y, T Z) // don't normalize
     {
         x = X;
         y = Y;
@@ -173,7 +173,7 @@ public:
         w = W;
         return *this;
     }
-    IC SelfRef set(SelfCRef Q)  // don't normalize
+    IC SelfRef set(SelfCRef Q) // don't normalize
     {
         set(Q.w, Q.x, Q.y, Q.z);
         return *this;
@@ -392,9 +392,9 @@ public:
     // return TRUE if quaternions differ elementwise by less than Tolerance.
     IC BOOL cmp(SelfCRef Q, T Tolerance = 0.0001f)
     {
-        if (  // they are the same but with opposite signs
+        if ( // they are the same but with opposite signs
             ((_abs(x + Q.x) <= Tolerance) && (_abs(y + Q.y) <= Tolerance) && (_abs(z + Q.z) <= Tolerance) &&
-                (_abs(w + Q.w) <= Tolerance)) ||  // they are the same with same signs
+                (_abs(w + Q.w) <= Tolerance)) || // they are the same with same signs
             ((_abs(x - Q.x) <= Tolerance) && (_abs(y - Q.y) <= Tolerance) && (_abs(z - Q.z) <= Tolerance) &&
                 (_abs(w - Q.w) <= Tolerance)))
             return true;

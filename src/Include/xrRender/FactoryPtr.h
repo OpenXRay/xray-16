@@ -57,10 +57,10 @@ FACTORY_PTR_INSTANCIATE(StatGraphRender)
 FACTORY_PTR_INSTANCIATE(ConsoleRender)
 #ifdef DEBUG
 FACTORY_PTR_INSTANCIATE(ObjectSpaceRender)
-#endif  // DEBUG
+#endif // DEBUG
 FACTORY_PTR_INSTANCIATE(ApplicationRender)
 FACTORY_PTR_INSTANCIATE(WallMarkArray)
-#endif  // _EDITOR
+#endif // _EDITOR
 
 #ifndef _EDITOR
 FACTORY_PTR_INSTANCIATE(FlareRender)
@@ -71,7 +71,7 @@ FACTORY_PTR_INSTANCIATE(RainRender)
 FACTORY_PTR_INSTANCIATE(EnvironmentRender)
 FACTORY_PTR_INSTANCIATE(EnvDescriptorRender)
 FACTORY_PTR_INSTANCIATE(EnvDescriptorMixerRender)
-#endif  // _EDITOR
+#endif // _EDITOR
 FACTORY_PTR_INSTANCIATE(FontRender)
 /*
 void FactoryPtr<IStatsRender>::CreateObject(void)
@@ -86,4 +86,4 @@ void FactoryPtr<IStatsRender>::DestroyObject(void)
 }
 */
 
-#endif  //	FactoryPtr_included
+#endif //	FactoryPtr_included

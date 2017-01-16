@@ -13,7 +13,7 @@ using namespace Opcode;
 // can you say "barebone"?
 #ifndef _MM_ALIGN16
 #define _MM_ALIGN16 __declspec(align(16))
-#endif  // _MM_ALIGN16
+#endif // _MM_ALIGN16
 
 struct _MM_ALIGN16 vec_t : public Fvector3
 {
@@ -52,40 +52,40 @@ ICF BOOL isect_fpu(const Fvector& min, const Fvector& max, const ray_t& ray, Fve
         coord[0] = min[0];
         Inside = FALSE;
         if (uf(ray.inv_dir[0]))
-            MaxT[0] = (min[0] - ray.pos[0]) * ray.inv_dir[0];  // Calculate T distances to candidate planes
+            MaxT[0] = (min[0] - ray.pos[0]) * ray.inv_dir[0]; // Calculate T distances to candidate planes
     }
     else if (ray.pos[0] > max[0])
     {
         coord[0] = max[0];
         Inside = FALSE;
         if (uf(ray.inv_dir[0]))
-            MaxT[0] = (max[0] - ray.pos[0]) * ray.inv_dir[0];  // Calculate T distances to candidate planes
+            MaxT[0] = (max[0] - ray.pos[0]) * ray.inv_dir[0]; // Calculate T distances to candidate planes
     }
     if (ray.pos[1] < min[1]) {
         coord[1] = min[1];
         Inside = FALSE;
         if (uf(ray.inv_dir[1]))
-            MaxT[1] = (min[1] - ray.pos[1]) * ray.inv_dir[1];  // Calculate T distances to candidate planes
+            MaxT[1] = (min[1] - ray.pos[1]) * ray.inv_dir[1]; // Calculate T distances to candidate planes
     }
     else if (ray.pos[1] > max[1])
     {
         coord[1] = max[1];
         Inside = FALSE;
         if (uf(ray.inv_dir[1]))
-            MaxT[1] = (max[1] - ray.pos[1]) * ray.inv_dir[1];  // Calculate T distances to candidate planes
+            MaxT[1] = (max[1] - ray.pos[1]) * ray.inv_dir[1]; // Calculate T distances to candidate planes
     }
     if (ray.pos[2] < min[2]) {
         coord[2] = min[2];
         Inside = FALSE;
         if (uf(ray.inv_dir[2]))
-            MaxT[2] = (min[2] - ray.pos[2]) * ray.inv_dir[2];  // Calculate T distances to candidate planes
+            MaxT[2] = (min[2] - ray.pos[2]) * ray.inv_dir[2]; // Calculate T distances to candidate planes
     }
     else if (ray.pos[2] > max[2])
     {
         coord[2] = max[2];
         Inside = FALSE;
         if (uf(ray.inv_dir[2]))
-            MaxT[2] = (max[2] - ray.pos[2]) * ray.inv_dir[2];  // Calculate T distances to candidate planes
+            MaxT[2] = (max[2] - ray.pos[2]) * ray.inv_dir[2]; // Calculate T distances to candidate planes
     }
 
     // Ray ray.pos inside bounding box
@@ -102,21 +102,21 @@ ICF BOOL isect_fpu(const Fvector& min, const Fvector& max, const ray_t& ray, Fve
     // Check final candidate actually inside box (if max < 0)
     if (uf(MaxT[WhichPlane]) & 0x80000000) return false;
 
-    if (0 == WhichPlane) {  // 1 & 2
+    if (0 == WhichPlane) { // 1 & 2
         coord[1] = ray.pos[1] + MaxT[0] * ray.fwd_dir[1];
         if ((coord[1] < min[1]) || (coord[1] > max[1])) return false;
         coord[2] = ray.pos[2] + MaxT[0] * ray.fwd_dir[2];
         if ((coord[2] < min[2]) || (coord[2] > max[2])) return false;
         return true;
     }
-    if (1 == WhichPlane) {  // 0 & 2
+    if (1 == WhichPlane) { // 0 & 2
         coord[0] = ray.pos[0] + MaxT[1] * ray.fwd_dir[0];
         if ((coord[0] < min[0]) || (coord[0] > max[0])) return false;
         coord[2] = ray.pos[2] + MaxT[1] * ray.fwd_dir[2];
         if ((coord[2] < min[2]) || (coord[2] > max[2])) return false;
         return true;
     }
-    if (2 == WhichPlane) {  // 0 & 1
+    if (2 == WhichPlane) { // 0 & 1
         coord[0] = ray.pos[0] + MaxT[2] * ray.fwd_dir[0];
         if ((coord[0] < min[0]) || (coord[0] > max[0])) return false;
         coord[1] = ray.pos[1] + MaxT[2] * ray.fwd_dir[1];
@@ -135,10 +135,10 @@ ICF BOOL isect_fpu(const Fvector& min, const Fvector& max, const ray_t& ray, Fve
 #define maxps _mm_max_ps
 #define mulps _mm_mul_ps
 #define subps _mm_sub_ps
-#define rotatelps(ps) _mm_shuffle_ps((ps), (ps), 0x39)  // a,b,c,d -> b,c,d,a
-#define muxhps(low, high) _mm_movehl_ps((low), (high))  // low{a,b,c,d}|high{e,f,g,h} = {c,d,g,h}
+#define rotatelps(ps) _mm_shuffle_ps((ps), (ps), 0x39) // a,b,c,d -> b,c,d,a
+#define muxhps(low, high) _mm_movehl_ps((low), (high)) // low{a,b,c,d}|high{e,f,g,h} = {c,d,g,h}
 
-static const float flt_plus_inf = -logf(0);  // let's keep C and C++ compilers happy.
+static const float flt_plus_inf = -logf(0); // let's keep C and C++ compilers happy.
 static const float _MM_ALIGN16 ps_cst_plus_inf[4] = {flt_plus_inf, flt_plus_inf, flt_plus_inf, flt_plus_inf},
                                ps_cst_minus_inf[4] = {-flt_plus_inf, -flt_plus_inf, -flt_plus_inf, -flt_plus_inf};
 
@@ -270,13 +270,13 @@ public:
         det = edge1.dotproduct(pvec);
         if (bCull) {
             if (det < EPS) return false;
-            tvec.sub(ray.pos, p0);      // calculate distance from vert0 to ray origin
-            u = tvec.dotproduct(pvec);  // calculate U parameter and test bounds
+            tvec.sub(ray.pos, p0);     // calculate distance from vert0 to ray origin
+            u = tvec.dotproduct(pvec); // calculate U parameter and test bounds
             if (u < 0.f || u > det) return false;
-            qvec.crossproduct(tvec, edge1);    // prepare to test V parameter
-            v = ray.fwd_dir.dotproduct(qvec);  // calculate V parameter and test bounds
+            qvec.crossproduct(tvec, edge1);   // prepare to test V parameter
+            v = ray.fwd_dir.dotproduct(qvec); // calculate V parameter and test bounds
             if (v < 0.f || u + v > det) return false;
-            range = edge2.dotproduct(qvec);  // calculate t, scale parameters, ray intersects triangle
+            range = edge2.dotproduct(qvec); // calculate t, scale parameters, ray intersects triangle
             inv_det = 1.0f / det;
             range *= inv_det;
             u *= inv_det;
@@ -286,13 +286,13 @@ public:
         {
             if (det > -EPS && det < EPS) return false;
             inv_det = 1.0f / det;
-            tvec.sub(ray.pos, p0);                // calculate distance from vert0 to ray origin
-            u = tvec.dotproduct(pvec) * inv_det;  // calculate U parameter and test bounds
+            tvec.sub(ray.pos, p0);               // calculate distance from vert0 to ray origin
+            u = tvec.dotproduct(pvec) * inv_det; // calculate U parameter and test bounds
             if (u < 0.0f || u > 1.0f) return false;
-            qvec.crossproduct(tvec, edge1);              // prepare to test V parameter
-            v = ray.fwd_dir.dotproduct(qvec) * inv_det;  // calculate V parameter and test bounds
+            qvec.crossproduct(tvec, edge1);             // prepare to test V parameter
+            v = ray.fwd_dir.dotproduct(qvec) * inv_det; // calculate V parameter and test bounds
             if (v < 0.0f || u + v > 1.0f) return false;
-            range = edge2.dotproduct(qvec) * inv_det;  // calculate t, ray intersects triangle
+            range = edge2.dotproduct(qvec) * inv_det; // calculate t, ray intersects triangle
         }
         return true;
     }

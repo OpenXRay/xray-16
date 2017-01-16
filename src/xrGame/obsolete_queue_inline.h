@@ -33,4 +33,4 @@ public:
 private:
     container_type m_sequence;
     T m_sequence_store[MaxCount];
-};  // class obsolete_queue<buffer_vector<T>, MaxCount>
+}; // class obsolete_queue<buffer_vector<T>, MaxCount>

@@ -126,7 +126,7 @@ void CTexture::apply_avi(u32 dwStage)
 void CTexture::apply_seq(u32 dwStage)
 {
     // SEQ
-    u32 frame = RDEVICE.dwTimeContinual / seqMSPF;  // RDEVICE.dwTimeGlobal
+    u32 frame = RDEVICE.dwTimeContinual / seqMSPF; // RDEVICE.dwTimeGlobal
     u32 frame_data = seqDATA.size();
     if (flags.seqCycles) {
         u32 frame_id = frame % (frame_data * 2);
@@ -286,7 +286,7 @@ void CTexture::Unload()
 #ifdef DEBUG
     string_path msg_buff;
     xr_sprintf(msg_buff, sizeof(msg_buff), "* Unloading texture [%s] pSurface RefCount=", cName.c_str());
-#endif  // DEBUG
+#endif // DEBUG
 
     //.	if (flags.bLoaded)		Msg		("* Unloaded: %s",cName.c_str());
 
@@ -303,7 +303,7 @@ void CTexture::Unload()
 
 #ifdef DEBUG
     _SHOW_REF(msg_buff, pSurface);
-#endif  // DEBUG
+#endif // DEBUG
 
     _RELEASE(pSurface);
 

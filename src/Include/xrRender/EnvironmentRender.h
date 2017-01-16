@@ -5,7 +5,7 @@
 namespace particles_systems
 {
 class library_interface;
-}  // namespace particle_systems
+} // namespace particle_systems
 
 class CEnvironment;
 class CEnvDescriptor;
@@ -46,4 +46,4 @@ public:
     virtual particles_systems::library_interface const& particles_systems_library() = 0;
 };
 
-#endif  //	EnvironmentRender_included
+#endif //	EnvironmentRender_included

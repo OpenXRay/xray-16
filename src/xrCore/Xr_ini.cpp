@@ -233,7 +233,7 @@ void CInifile::Load(IReader* F, LPCSTR path
             }
         }
 
-        if (str[0] && (str[0] == '#') && strstr(str, "#include"))  // handle includes
+        if (str[0] && (str[0] == '#') && strstr(str, "#include")) // handle includes
         {
             string_path inc_name;
             R_ASSERT(path && path[0]);
@@ -257,7 +257,7 @@ void CInifile::Load(IReader* F, LPCSTR path
                 }
             }
         }
-        else if (str[0] && (str[0] == '['))  // new section ?
+        else if (str[0] && (str[0] == '[')) // new section ?
         {
             // insert previous filled section
             if (Current) {
@@ -300,7 +300,7 @@ void CInifile::Load(IReader* F, LPCSTR path
             *strchr(str, ']') = 0;
             Current->Name = xr_strlwr(str + 1);
         }
-        else  // name = value
+        else // name = value
         {
             if (Current) {
                 string4096 value_raw;
@@ -312,7 +312,7 @@ void CInifile::Load(IReader* F, LPCSTR path
                     ++t;
                     xr_strcpy(value_raw, sizeof(value_raw), t);
                     bInsideSTR = _parse(str2, value_raw);
-                    if (bInsideSTR)  // multiline str value
+                    if (bInsideSTR) // multiline str value
                     {
                         while (bInsideSTR)
                         {
@@ -516,8 +516,8 @@ shared_str CInifile::r_string_wb(LPCSTR S, LPCSTR L) const
     xr_strcpy(_original, sizeof(_original), _base);
     u32 _len = xr_strlen(_original);
     if (0 == _len) return shared_str("");
-    if ('"' == _original[_len - 1]) _original[_len - 1] = 0;        // skip end
-    if ('"' == _original[0]) return shared_str(&_original[0] + 1);  // skip begin
+    if ('"' == _original[_len - 1]) _original[_len - 1] = 0;       // skip end
+    if ('"' == _original[0]) return shared_str(&_original[0] + 1); // skip begin
     return shared_str(_original);
 }
 

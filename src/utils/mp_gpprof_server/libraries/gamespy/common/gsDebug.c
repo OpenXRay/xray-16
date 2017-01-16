@@ -18,7 +18,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 // Static debug data
-static struct GSIDebugInstance gGSIDebugInstance;  // simple singleton "class"
+static struct GSIDebugInstance gGSIDebugInstance; // simple singleton "class"
 
 // Line prefixes, e.g. "[ cat][type][ lev] text"
 char* gGSIDebugCatStrings[GSIDebugCat_Count] = {
@@ -117,7 +117,7 @@ void gsDebugVaList(GSIDebugCategory theCat, GSIDebugType theType, GSIDebugLevel 
 
     // Are we currently logging this type and level?
     aCurLevel = gGSIDebugInstance.mGSIDebugLevel[theCat][theType];
-    if (aCurLevel & theLevel)  // check the flag
+    if (aCurLevel & theLevel) // check the flag
     {
 #if !defined(_NITRO)
         // Output line prefix
@@ -168,11 +168,11 @@ void gsDebugFormat(GSIDebugCategory theCat, GSIDebugType theType, GSIDebugLevel 
 //    0000 0000 0000 0000 0000 0000 0000 0000  ................
 static void HexEncode16(const char* theInStream, char* theOutStream, unsigned int theInLen)
 {
-    const int aRowWidth = 64;                             // width of the output
-    const char aReplaceChar = '.';                        // Replace non print characters
-    const int aTextOffSet = 41;                           // text comes after hex bytes
-    char* aTextOutStream = (theOutStream + aTextOffSet);  // set the write ptr
-    const unsigned int aWriteBit = theInLen & 1;          // write on odd or even bytes?
+    const int aRowWidth = 64;                            // width of the output
+    const char aReplaceChar = '.';                       // Replace non print characters
+    const int aTextOffSet = 41;                          // text comes after hex bytes
+    char* aTextOutStream = (theOutStream + aTextOffSet); // set the write ptr
+    const unsigned int aWriteBit = theInLen & 1;         // write on odd or even bytes?
 
     assert(theInLen <= 16);
 
@@ -336,4 +336,4 @@ void gsSetDebugCallback(GSIDebugCallback theCallback)
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
-#endif  // GSI_COMMON_DEBUG
+#endif // GSI_COMMON_DEBUG

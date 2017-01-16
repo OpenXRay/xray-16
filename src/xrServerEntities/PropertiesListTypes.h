@@ -19,7 +19,7 @@ enum EPropType
     PROP_SHORTCUT,
     PROP_BUTTON,
     PROP_CHOOSE,
-    PROP_NUMERIC,  // {u8,u16,u32,s8,s16,s32,f32}
+    PROP_NUMERIC, // {u8,u16,u32,s8,s16,s32,f32}
     PROP_BOOLEAN,
     PROP_FLAG,
     PROP_VECTOR,

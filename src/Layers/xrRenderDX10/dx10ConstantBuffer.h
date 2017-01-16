@@ -40,7 +40,7 @@ private:
     xr_vector<shared_str> m_MembersNames;
 
     ID3DBuffer* m_pBuffer;
-    u32 m_uiBufferSize;  //	Cache buffer size for debug validation
+    u32 m_uiBufferSize; //	Cache buffer size for debug validation
     void* m_pBufferData;
     bool m_bChanged;
 
@@ -53,4 +53,4 @@ private:
 
 typedef resptr_core<dx10ConstantBuffer, resptr_base<dx10ConstantBuffer>> ref_cbuffer;
 
-#endif  //	dx10ConstantBuffer_included
+#endif //	dx10ConstantBuffer_included

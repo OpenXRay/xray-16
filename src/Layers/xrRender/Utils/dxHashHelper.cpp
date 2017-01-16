@@ -2,7 +2,7 @@
 #include "stdafx.h"
 
 bool dxHashHelper::m_bTableReady = false;
-u32 dxHashHelper::m_CrcTable[256];  // Lookup table array
+u32 dxHashHelper::m_CrcTable[256]; // Lookup table array
 
 dxHashHelper::dxHashHelper() : m_uiCrcValue(0xffffffff)
 {

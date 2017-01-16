@@ -648,7 +648,7 @@ BOOL __stdcall rms_test(lm_layer& lm, u32 w, u32 h, u32 rms)
     for (u32 y = 0; y < lm.height; y++)
     {
         u32 offset = y * lm.width;
-        u8* scan_mark = (u8*)&*(lm.marker.begin() + offset);  //.
+        u8* scan_mark = (u8*)&*(lm.marker.begin() + offset); //.
         u32* scan_lmap_base = (u32*)&*(pOriginal_base.begin() + offset);
         u32* scan_rest_base = (u32*)&*(pRestored_base.begin() + offset);
         u32* scan_lmap_hemi = (u32*)&*(pOriginal_hemi.begin() + offset);
@@ -727,7 +727,7 @@ BOOL compress_Zero(lm_layer& lm, u32 rms)
         _c.scale(_count);
 
     // Compress if needed
-    u8 _r = u8_clr(_c.rgb.x);  //.
+    u8 _r = u8_clr(_c.rgb.x); //.
     u8 _g = u8_clr(_c.rgb.y);
     u8 _b = u8_clr(_c.rgb.z);
     u8 _s = u8_clr(_c.sun);
@@ -821,7 +821,7 @@ void CDeflector::Light(CDB::COLLIDER* DB, base_lighting* LightsSelected, HASH& H
     {
         u32 w, h;
         if (compress_Zero(layer, rms_zero))
-            return;  // already with borders
+            return; // already with borders
         else if (compress_RMS(layer, rms_shrink, w, h))
         {
             // Reacalculate lightmap at lower resolution

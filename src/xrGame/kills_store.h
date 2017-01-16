@@ -21,7 +21,7 @@ public:
         u16 m_weapon_id;
         KILL_TYPE m_kill_type;
         SPECIAL_KILL_TYPE m_spec_kill_type;
-    };  // struct kill
+    }; // struct kill
 
     static unsigned int const max_kills_count = 10;
     typedef obsolete_queue<buffer_vector<kill>, max_kills_count> kills_t;
@@ -36,10 +36,10 @@ public:
 
 private:
     kills_map_t m_kills;
-};  // class kills_store
+}; // class kills_store
 
-}  // namespace award_system
+} // namespace award_system
 
 #include "kills_store_inline.h"
 
-#endif  //#ifndef KILLS_STORE_INCLUDED
+#endif //#ifndef KILLS_STORE_INCLUDED

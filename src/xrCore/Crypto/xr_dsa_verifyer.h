@@ -20,6 +20,6 @@ protected:
 private:
     crypto::xr_dsa m_dsa;
     crypto::xr_sha256 m_sha;
-};  // class xr_dsa_verifyer
+}; // class xr_dsa_verifyer
 
-#endif  //#ifndef XR_DSA_VERIFYER_INCLUDED
+#endif //#ifndef XR_DSA_VERIFYER_INCLUDED

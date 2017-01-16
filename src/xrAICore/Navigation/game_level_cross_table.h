@@ -23,7 +23,7 @@ class CGameLevelCrossTable
     friend class CCrossTableBuilder;
     friend class CRenumbererConverter;
     friend class CGameGraphBuilder;
-#endif  // AI_COMPILER
+#endif // AI_COMPILER
 
 public:
 #pragma pack(push, 2)
@@ -47,7 +47,7 @@ public:
         friend class CCrossTableBuilder;
         friend class CRenumbererConverter;
         friend class CGameGraphBuilder;
-#endif  // AI_COMPILER
+#endif // AI_COMPILER
     };
 
     class CCell
@@ -63,7 +63,7 @@ public:
         friend class CCrossTableBuilder;
         friend class CRenumbererConverter;
         friend class CGameGraphBuilder;
-#endif  // AI_COMPILER
+#endif // AI_COMPILER
     };
 #pragma pack(pop)
 
@@ -75,13 +75,13 @@ private:
 private:
     IReader* m_tpCrossTableVFS;
     IReader* m_chunk;
-#endif  // AI_COMPILER
+#endif // AI_COMPILER
 
 public:
     IC CGameLevelCrossTable(const void* buffer, const u32& buffer_size);
 #ifdef AI_COMPILER
     IC CGameLevelCrossTable(LPCSTR fName);
-#endif  // AI_COMPILER
+#endif // AI_COMPILER
 
 public:
     IC virtual ~CGameLevelCrossTable();

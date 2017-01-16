@@ -26,4 +26,4 @@ protected:
 };
 }
 
-#endif  // #ifndef GL_BASE_CL_DATA_H_INCLUDED
+#endif // #ifndef GL_BASE_CL_DATA_H_INCLUDED

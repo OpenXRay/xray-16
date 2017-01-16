@@ -32,9 +32,9 @@ CUISkinSelectorWnd::CUISkinSelectorWnd(const char* strSectionName, s16 team)
     //	m_pAnims[0]		= new CUIAnimatedStatic(); m_pFrames->AttachChild(m_pAnims[0]);
     //	m_pAnims[1]		= new CUIAnimatedStatic(); m_pFrames->AttachChild(m_pAnims[1]);
     //	m_pButtons[0]	= new CUI3tButton();	m_pFrames->AttachChild(m_pButtons[0]);
-    //m_pButtons[0]->SetMessageTarget(this);
+    // m_pButtons[0]->SetMessageTarget(this);
     //	m_pButtons[1]	= new CUI3tButton();	m_pFrames->AttachChild(m_pButtons[1]);
-    //m_pButtons[1]->SetMessageTarget(this);
+    // m_pButtons[1]->SetMessageTarget(this);
 
     m_pBtnAutoSelect = new CUI3tButton();
     AttachChild(m_pBtnAutoSelect);
@@ -269,7 +269,7 @@ bool CUISkinSelectorWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
     switch (dik)
     {
     case DIK_ESCAPE: OnBtnCancel(); return true;
-    case DIK_SPACE:  // do autoselect
+    case DIK_SPACE: // do autoselect
         m_iActiveIndex = -1;
     case DIK_RETURN: OnBtnOK(); return true;
     case DIK_LEFT: OnKeyLeft(); return true;

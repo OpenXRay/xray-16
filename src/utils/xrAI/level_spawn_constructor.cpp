@@ -161,7 +161,8 @@ void CLevelSpawnConstructor::add_free_object(CSE_Abstract* abstract)
     m_game_spawn_constructor->add_object(abstract);
 }
 
-// void CLevelSpawnConstructor::add_group_object					(CSE_Abstract			*abstract, shared_str group_section,
+// void CLevelSpawnConstructor::add_group_object					(CSE_Abstract			*abstract, shared_str
+// group_section,
 // bool)
 //{
 //	SPAWN_GRPOUP_OBJECTS::iterator	I = m_spawn_objects.find(group_section);
@@ -275,7 +276,7 @@ void CLevelSpawnConstructor::load_objects()
 //		if (J == m_spawn_groups.end())
 //			clMsg								("! ERROR (spawn group not found!) : %s",*(*I).first);
 //		R_ASSERT3								(J != m_spawn_groups.end(),"Specified group control not
-//found!",(*(*I).second)[0]->name_replace());
+// found!",(*(*I).second)[0]->name_replace());
 //
 //		GROUP_OBJECTS::iterator					i = (*I).second->begin();
 //		GROUP_OBJECTS::iterator					e = (*I).second->end();
@@ -510,7 +511,7 @@ void CLevelSpawnConstructor::generate_artefact_spawn_positions()
         m_level_points.resize(zone->m_artefact_position_offset + zone->m_artefact_spawn_count);
 
         //		Msg								("%s  %f [%f][%f][%f] : artefact spawn
-        //positions",zone->name_replace(),zone->m_fRadius,VPUSH(zone->o_Position));
+        // positions",zone->name_replace(),zone->m_fRadius,VPUSH(zone->o_Position));
 
         LEVEL_POINT_STORAGE::iterator I = m_level_points.begin() + zone->m_artefact_position_offset;
         LEVEL_POINT_STORAGE::iterator E = m_level_points.end();
@@ -586,7 +587,8 @@ void CLevelSpawnConstructor::update_artefact_spawn_positions()
     {
         CSE_Abstract* abstract = *I;
         CSE_ALifeObject* alife_object = smart_cast<CSE_ALifeObject*>(abstract);
-        //		R_ASSERT3						(level_graph().valid_vertex_id(alife_object->m_tNodeID),"Invalid node for object
+        //		R_ASSERT3						(level_graph().valid_vertex_id(alife_object->m_tNodeID),"Invalid node for
+        //object
         //",alife_object->name_replace());
         R_ASSERT2(alife_object, "Non-ALife object!");
         VERIFY(game_graph().vertex(alife_object->m_tGraphID)->level_id() == m_level.id());
@@ -596,7 +598,7 @@ void CLevelSpawnConstructor::update_artefact_spawn_positions()
             zone->m_artefact_position_offset = level_point_count;
             level_point_count += zone->m_artefact_spawn_count;
             //			Msg							("%s  %f [%f][%f][%f] : artefact spawn
-            //positions",zone->name_replace(),zone->m_fRadius,VPUSH(zone->o_Position));
+            // positions",zone->name_replace(),zone->m_fRadius,VPUSH(zone->o_Position));
             //			for (u32 i=zone->m_artefact_position_offset; i<level_point_count; ++i)
             //				Msg						("    [%f][%f][%f] :
             //%f",VPUSH(m_level_points[i].tPoint),zone->o_Position.distance_to(m_level_points[i].tPoint));

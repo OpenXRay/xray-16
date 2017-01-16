@@ -2,8 +2,8 @@
 #include "stdafx.h"
 #include "xrGameSpy/GameSpy_GP.h"
 
-#include "MainMenu.h"       //for accesssing to login_manager, if there's deleting profile
-#include "login_manager.h"  //for deleting profile (verifying) and deleting profile class instance
+#include "MainMenu.h"      //for accesssing to login_manager, if there's deleting profile
+#include "login_manager.h" //for deleting profile (verifying) and deleting profile class instance
 
 #define GP_UNIQUENICK_MIN_LEN 3
 
@@ -466,4 +466,4 @@ void __cdecl account_manager::search_profile_cb(GPConnection* connection, void* 
     tmp_cb(true, first_match->nick);
 }
 
-}  // namespace gamespy_gp
+} // namespace gamespy_gp

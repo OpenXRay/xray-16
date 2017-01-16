@@ -64,22 +64,22 @@ struct DXGI_RGBA;
 
 //--------------------------------------------------------------------------------------
 #define CHK_ERR_W(hrchk, strOut)                                                                                       \
-    case hrchk: return L##strOut; #define CHK_ERRA_W(hrchk)                                                            \
-    case hrchk: return L#hrchk; #define CHK_ERR_A(hrchk, strOut)                                                       \
-    case hrchk: return strOut; #define CHK_ERRA_A(hrchk)                                                               \
     case hrchk:                                                                                                        \
-        return #hrchk;
+        return L##strOut;                                                                                              \
+        #define CHK_ERRA_W(hrchk) case hrchk : return L#hrchk;                                                         \
+        #define CHK_ERR_A(hrchk, strOut) case hrchk : return strOut;                                                   \
+        #define CHK_ERRA_A(hrchk) case hrchk : return #hrchk;
 
 #define HRESULT_FROM_WIN32b(x)                                                                                         \
     ((HRESULT)(x) <= 0 ? ((HRESULT)(x)) : ((HRESULT)(((x)&0x0000FFFF) | (FACILITY_WIN32 << 16) | 0x80000000)))
 
 #define CHK_ERR_WIN32A_W(hrchk)                                                                                        \
     case HRESULT_FROM_WIN32b(hrchk):                                                                                   \
-    case hrchk: return L#hrchk; #define CHK_ERR_WIN32_ONLY_W(hrchk, strOut)                                            \
-    case HRESULT_FROM_WIN32b(hrchk): return L##strOut; #define CHK_ERR_WIN32A_A(hrchk)                                 \
-    case HRESULT_FROM_WIN32b(hrchk):                                                                                   \
-    case hrchk: return #hrchk; #define CHK_ERR_WIN32_ONLY_A(hrchk, strOut)                                             \
-    case HRESULT_FROM_WIN32b(hrchk): return strOut;
+    case hrchk:                                                                                                        \
+        return L#hrchk;                                                                                                \
+        #define CHK_ERR_WIN32_ONLY_W(hrchk, strOut) case HRESULT_FROM_WIN32b(hrchk) : return L##strOut;                \
+        #define CHK_ERR_WIN32A_A(hrchk) case HRESULT_FROM_WIN32b(hrchk) : case hrchk : return #hrchk;                  \
+        #define CHK_ERR_WIN32_ONLY_A(hrchk, strOut) case HRESULT_FROM_WIN32b(hrchk) : return strOut;
 
 //-----------------------------------------------------
 const WCHAR* WINAPI DXGetErrorStringW(_In_ HRESULT hr)
@@ -125,10 +125,11 @@ const CHAR* WINAPI DXGetErrorStringA(_In_ HRESULT hr)
 #undef CHK_ERR_A
 
 #define CHK_ERRA_W(hrchk)                                                                                              \
-    case hrchk: wcscpy_s(desc, count, L#hrchk); #define CHK_ERR_W(hrchk, strOut)                                       \
-    case hrchk: wcscpy_s(desc, count, L##strOut); #define CHK_ERRA_A(hrchk)                                            \
-    case hrchk: strcpy_s(desc, count, #hrchk); #define CHK_ERR_A(hrchk, strOut)                                        \
-    case hrchk: strcpy_s(desc, count, strOut);
+    case hrchk:                                                                                                        \
+        wcscpy_s(desc, count, L#hrchk);                                                                                \
+        #define CHK_ERR_W(hrchk, strOut) case hrchk : wcscpy_s(desc, count, L##strOut);                                \
+        #define CHK_ERRA_A(hrchk) case hrchk : strcpy_s(desc, count, #hrchk);                                          \
+        #define CHK_ERR_A(hrchk, strOut) case hrchk : strcpy_s(desc, count, strOut);
 
 //--------------------------------------------------------------------------------------
 void WINAPI DXGetErrorDescriptionW(_In_ HRESULT hr, _Out_cap_(count) WCHAR* desc, _In_ size_t count)

@@ -12,11 +12,11 @@ devsupport@gamespy.com
 
 // Disable compiler warnings for issues that are unavoidable.
 /////////////////////////////////////////////////////////////
-#if defined(_MSC_VER)  // DevStudio
+#if defined(_MSC_VER) // DevStudio
 // Level4, "conditional expression is constant".
 // Occurs with use of the MS provided macro FD_SET
 #pragma warning(disable : 4127)
-#endif  // _MSC_VER
+#endif // _MSC_VER
 
 #ifdef WIN32
 // A lock.
@@ -191,14 +191,14 @@ GHTTPBool ghiDecryptReceivedData(struct GHIConnection* connection)
             aReadPos = connection->decodeBuffer.data + connection->decodeBuffer.pos;
             aReadLen = connection->decodeBuffer.len - connection->decodeBuffer.pos;
             aWritePos = connection->recvBuffer.data + connection->recvBuffer.len;
-            aWriteLen = connection->recvBuffer.size - connection->recvBuffer.len;  // the amount of room in recvbuffer
+            aWriteLen = connection->recvBuffer.size - connection->recvBuffer.len; // the amount of room in recvbuffer
 
             aResult = (connection->encryptor.mDecryptFunc)(
                 connection, &connection->encryptor, aReadPos, &aReadLen, aWritePos, &aWriteLen);
             if (aResult == GHIEncryptionResult_BufferTooSmall) {
                 // Make some more room
                 if (GHTTPFalse == ghiResizeBuffer(&connection->recvBuffer, connection->recvBuffer.sizeIncrement))
-                    return GHTTPFalse;  // error
+                    return GHTTPFalse; // error
             }
             else if (aResult == GHIEncryptionResult_Error)
             {
@@ -279,7 +279,7 @@ GHIRecvResult ghiDoReceive(GHIConnection* connection, char buffer[], int* buffer
         if (result == GHIEncryptionResult_Success)
             rcode = recvLength;
         else
-            rcode = -1;  // signal termination of connection
+            rcode = -1; // signal termination of connection
     }
     else
     {
@@ -354,7 +354,7 @@ int ghiDoSend(struct GHIConnection* connection, const char* buffer, int len)
         // Check for an error.
         //////////////////////
         if (result != GHIEncryptionResult_Success)
-            rcode = -1;  // signal termination of connection
+            rcode = -1; // signal termination of connection
         else
             rcode = bytesSent;
     }
@@ -404,7 +404,7 @@ GHITrySendResult ghiTrySendThenBuffer(GHIConnection* connection, const char* buf
         if (ghiSendBufferedData(connection) == GHTTPFalse) return GHITrySendError;
         if (connection->sendBuffer.pos >= connection->sendBuffer.len) {
             ghiResetBuffer(&connection->sendBuffer);
-            return GHITrySendSent;  // everything sent
+            return GHITrySendSent; // everything sent
         }
         return GHITrySendBuffered;
     }
@@ -431,8 +431,8 @@ GHITrySendResult ghiTrySendThenBuffer(GHIConnection* connection, const char* buf
 }
 
 static GHTTPBool ghiParseProxyServer(const char* server,
-    char** proxyAddress,       // [out] the proxy address
-    unsigned short* proxyPort  // [out] the proxy port
+    char** proxyAddress,      // [out] the proxy address
+    unsigned short* proxyPort // [out] the proxy port
     )
 {
     char* strPort;
@@ -517,4 +517,4 @@ void ghiThrottleSettings(int bufferSize, gsi_time timeDelay)
 ///////////////////////////////////////////////////
 #if defined(_MSC_VER)
 #pragma warning(default : 4127)
-#endif  // _MSC_VER
+#endif // _MSC_VER

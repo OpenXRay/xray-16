@@ -85,14 +85,14 @@
     {                                                                                                                  \
         return ptr->self_type::inherited::v_func_name(p1);                                                             \
     }
-#else  // DEBUG
+#else // DEBUG
 #define DEFINE_LUA_WRAPPER_CONST_METHOD_1(v_func_name, ret_type, t1)                                                   \
     virtual ret_type v_func_name(t1 p1) const { return call_member<ret_type>(this, #v_func_name, p1); }                \
     static ret_type v_func_name##_static(const inherited* ptr, t1 p1)                                                  \
     {                                                                                                                  \
         return ptr->self_type::inherited::v_func_name(p1);                                                             \
     }
-#endif  // DEBUG
+#endif // DEBUG
 
 #define DEFINE_LUA_WRAPPER_METHOD_V0(v_func_name)                                                                      \
     virtual void v_func_name()                                                                                         \

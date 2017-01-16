@@ -49,13 +49,13 @@ static void ghiHandleStatus(GHIConnection* connection)
     /////////////////////////
     switch (connection->statusCode / 100)
     {
-    case 1:  // Informational.
+    case 1: // Informational.
         return;
-    case 2:  // Successful.
+    case 2: // Successful.
         return;
-    case 3:  // Redirection.
+    case 3: // Redirection.
         return;
-    case 4:  // Client Error.
+    case 4: // Client Error.
         switch (connection->statusCode)
         {
         case 401: connection->result = GHTTPUnauthorized; break;
@@ -65,7 +65,7 @@ static void ghiHandleStatus(GHIConnection* connection)
         default: connection->result = GHTTPRequestRejected; break;
         }
         return;
-    case 5:  // Internal Server Error.
+    case 5: // Internal Server Error.
         connection->result = GHTTPServerError;
         return;
     }

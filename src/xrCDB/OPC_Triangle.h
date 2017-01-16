@@ -41,4 +41,4 @@ public:
     bool IsDegenerate() const;
 };
 
-#endif  // __ICETRIANGLE_H__
+#endif // __ICETRIANGLE_H__

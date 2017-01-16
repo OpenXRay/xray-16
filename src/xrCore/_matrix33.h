@@ -13,7 +13,7 @@ public:
 public:
     union
     {
-        struct  // Direct definition
+        struct // Direct definition
         {
             T _11, _12, _13;
             T _21, _22, _23;
@@ -25,7 +25,7 @@ public:
             Tvector j;
             Tvector k;
         };
-        float m[3][3];  // Array
+        float m[3][3]; // Array
     };
     // Class members
     IC SelfRef set_rapid(const _matrix<T>& a)
@@ -73,7 +73,7 @@ public:
         return *this;
     }
 
-    IC SelfRef transpose(SelfCRef matSource)  // faster version of transpose
+    IC SelfRef transpose(SelfCRef matSource) // faster version of transpose
     {
         _11 = matSource._11;
         _12 = matSource._21;
@@ -86,7 +86,7 @@ public:
         _33 = matSource._33;
         return *this;
     }
-    IC SelfRef transpose(const _matrix<T>& matSource)  // faster version of transpose
+    IC SelfRef transpose(const _matrix<T>& matSource) // faster version of transpose
     {
         _11 = matSource._11;
         _12 = matSource._21;
@@ -99,10 +99,10 @@ public:
         _33 = matSource._33;
         return *this;
     }
-    IC SelfRef transpose(void)  // self transpose - slower
+    IC SelfRef transpose(void) // self transpose - slower
     {
         _matrix33 a;
-        CopyMemory(&a, this, 9 * sizeof(float));  // save matrix
+        CopyMemory(&a, this, 9 * sizeof(float)); // save matrix
         transpose(a);
         return *this;
     }
@@ -381,7 +381,7 @@ public:
         R.z = (m[2][0] * V1.x + m[2][1] * V1.y + m[2][2] * V1.z);
         return *this;
     }
-    IC void transform_dir(_vector2<T>& dest, const _vector2<T>& v) const  // preferred to use
+    IC void transform_dir(_vector2<T>& dest, const _vector2<T>& v) const // preferred to use
     {
         dest.x = v.x * _11 + v.y * _21;
         dest.y = v.x * _12 + v.y * _22;

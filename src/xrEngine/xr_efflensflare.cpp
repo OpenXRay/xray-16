@@ -245,7 +245,7 @@ static LPCSTR state_to_string(const CLensFlare::LFState& state)
     }
 #ifdef DEBUG
     return (0);
-#endif  // DEBUG
+#endif // DEBUG
 }
 #endif
 

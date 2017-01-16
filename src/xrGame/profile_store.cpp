@@ -49,7 +49,7 @@ void profile_store::shedule_Update(u32 dt)
 #ifdef DEBUG
     Msg("--- GameSpy core (SAKE) thinking ...");
 #endif
-    m_fullgs_obj->CoreThink(10);  // 10 milliseconds on update
+    m_fullgs_obj->CoreThink(10); // 10 milliseconds on update
 }
 
 void profile_store::set_current_profile(int profileId, char const* loginTicket)
@@ -243,7 +243,7 @@ void __stdcall profile_store::onlylog_completion(bool const result, char const* 
 static u32 const actuality_update_time = 120;
 #else
 static u32 const actuality_update_time = 3600;
-#endif  //#ifdef DEBUG
+#endif //#ifdef DEBUG
 
 void profile_store::check_sake_actuality()
 {
@@ -261,4 +261,4 @@ void profile_store::check_sake_actuality()
     }
 }
 
-}  // namespace gamespy_profile
+} // namespace gamespy_profile

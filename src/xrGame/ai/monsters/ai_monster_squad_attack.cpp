@@ -211,14 +211,14 @@ void CMonsterSquad::Attack_AssignTargetDir(ENTITY_VEC& members, const CEntity* e
 
         bool b_add_left = false;
 
-        if (angle_normalize_signed(h2 - h1) > 0) {  // right
+        if (angle_normalize_signed(h2 - h1) > 0) { // right
             if ((next_right_yaw < PI) && !fsimilar(next_right_yaw, PI, PI / 60.f))
                 b_add_left = false;
             else
                 b_add_left = true;
         }
         else
-        {  // left
+        { // left
             if ((next_left_yaw < PI) && !fsimilar(next_left_yaw, PI, PI / 60.f))
                 b_add_left = true;
             else
@@ -274,7 +274,7 @@ Fvector CMonsterSquad::calc_monster_target_dir(CBaseMonster* monster, const CEnt
         // monster pos == enemy pos?
         if (enemy2monster_mag < near_zero) {
             VERIFY2(false, "Enemy and Monster should not have same pos!");
-            Fvector dir = {1.f, 0.f, 0.f};  // happy with random dir then :)
+            Fvector dir = {1.f, 0.f, 0.f}; // happy with random dir then :)
             return dir;
         }
 

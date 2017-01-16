@@ -56,7 +56,7 @@ protected:
 
     typedef xr_vector<CUILine> LinesVector;
     typedef LinesVector::iterator LinesVector_it;
-    LinesVector m_lines;  // parsed text
+    LinesVector m_lines; // parsed text
 
     shared_str m_text;
 

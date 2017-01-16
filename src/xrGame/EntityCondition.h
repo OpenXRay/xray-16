@@ -166,10 +166,10 @@ protected:
     //очистка массива ран
 
     //все величины от 0 до 1
-    float m_fPower;         //сила
-    float m_fRadiation;     //доза радиактивного облучения
-    float m_fPsyHealth;     //здоровье
-    float m_fEntityMorale;  //мораль
+    float m_fPower;        //сила
+    float m_fRadiation;    //доза радиактивного облучения
+    float m_fPsyHealth;    //здоровье
+    float m_fEntityMorale; //мораль
 
     //максимальные величины
     //	float m_fSatietyMax;
@@ -204,7 +204,7 @@ protected:
     SConditionChangeV m_change_v;
 
     float m_fMinWoundSize;
-    bool m_bIsBleeding;  //есть кровотечение
+    bool m_bIsBleeding; //есть кровотечение
 
     //части хита, затрачиваемые на уменьшение здоровья и силы
     float m_fHealthHitPart;

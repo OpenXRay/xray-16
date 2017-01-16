@@ -24,7 +24,7 @@ void CStateBurerShield<Object>::initialize()
 template <class Object>
 void CStateBurerShield<Object>::execute()
 {
-    if (!m_started)  // && current_time() > m_last_shield_started + TTime(m_shield_start_anim_length_sec*1000) )
+    if (!m_started) // && current_time() > m_last_shield_started + TTime(m_shield_start_anim_length_sec*1000) )
     {
         m_started = true;
         object->ActivateShield();

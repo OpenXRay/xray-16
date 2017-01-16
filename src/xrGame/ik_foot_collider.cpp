@@ -43,8 +43,8 @@ bool ignore_tri(CDB::TRI& tri)
     SGameMtl* material = GMLib.GetMaterialByIdx(tri.material);
 
     return (material->Flags.test(SGameMtl::flPassable) && !material->Flags.test(SGameMtl::flActorObstacle)) ||
-           material->Flags.test(SGameMtl::flClimable);  // ||
-                                                        // material->Flags.test( SGameMtl::flActorObstacle );
+           material->Flags.test(SGameMtl::flClimable); // ||
+                                                       // material->Flags.test( SGameMtl::flActorObstacle );
 }
 
 bool ignore_static_tri(int tri)
@@ -112,7 +112,7 @@ IC bool get_plane_static(ik_pick_result& r, Fvector& next_pos, float& next_range
 #ifdef DEBUG
         float u, v, d;
         VERIFY(!(CDB::TestRayTri(next_pos, pick_v, r.triangle, u, v, d, true) && d > 0.f));
-#endif  // DEBUG
+#endif // DEBUG
         return false;
     }
     r.range = R.range;

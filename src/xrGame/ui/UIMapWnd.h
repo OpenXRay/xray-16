@@ -49,7 +49,7 @@ private:
 #ifdef DEBUG
 //	CUIStatic*					m_dbg_text_hint;
 //	CUIStatic*					m_dbg_info;
-#endif  // DEBUG
+#endif // DEBUG
 
     enum EBtnPos
     {

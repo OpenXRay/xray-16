@@ -21,7 +21,7 @@ static const char* GetMAC(void)
     r = cellNetCtlGetInfo(CELL_NET_CTL_INFO_ETHER_ADDR, &gCellNetInfo);
     if (r == CELL_OK) {
         return (const char*)&gCellNetInfo.ether_addr;
-    }  // else error
+    } // else error
     return NULL;
 }
 
@@ -64,4 +64,4 @@ void gsiInt64ToString(char theNumberStr[33], gsi_i64 theNumber)
 }
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
-#endif  // _PS3 only
+#endif // _PS3 only

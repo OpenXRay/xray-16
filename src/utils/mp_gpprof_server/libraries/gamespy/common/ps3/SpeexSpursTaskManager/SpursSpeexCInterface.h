@@ -51,4 +51,4 @@ int shutdownSpursTask();
 }
 #endif
 
-#endif  // SPU_TASK_C_INTERFACE_H
+#endif // SPU_TASK_C_INTERFACE_H

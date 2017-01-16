@@ -21,8 +21,8 @@ public:
     {
         CParticlesObject* ps;
         Fvector angles;
-        u16 sender_id;  // id - объекта, который запустил партиклы
-        u32 life_time;  //время жизни партикла (-1) - бесконечно
+        u16 sender_id; // id - объекта, который запустил партиклы
+        u32 life_time; //время жизни партикла (-1) - бесконечно
     };
     DEFINE_VECTOR(SParticlesInfo, ParticlesInfoList, ParticlesInfoListIt);
 
@@ -44,12 +44,12 @@ public:
 
 private:
     // список костей
-    u64 bone_mask;  // используемые кости
+    u64 bone_mask; // используемые кости
     BoneInfoVec m_Bones;
     IGameObject* m_self_object;
 
 protected:
-    bool m_bActiveBones;  //есть ли косточки на которых играются партиклы
+    bool m_bActiveBones; //есть ли косточки на которых играются партиклы
 
 public:
     IC SBoneInfo* get_bone_info(u16 bone_index)

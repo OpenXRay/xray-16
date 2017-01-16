@@ -2,7 +2,7 @@
 
 typedef enum NV_ERROR_CODE {
     NV_OK = 0,
-    NV_FAIL = -1,  // generic
+    NV_FAIL = -1, // generic
     NV_CANT_OPEN_INPUT_FILE = -2,
     NV_CANT_OPEN_OUTPUT_FILE = -3,
     NV_BAD_OPTION = -4,
@@ -13,7 +13,7 @@ typedef enum NV_ERROR_CODE {
     NV_BAD_LIST_FILE_CONTENTS = -9,
     NV_IMAGE_NOT_SQUARE = -10,
     NV_IMAGES_NOT_SAME_SIZE = -11,
-    NV_UNKNOWN_CONVERSION = -12,  // for normal map generation
+    NV_UNKNOWN_CONVERSION = -12, // for normal map generation
     NV_CANT_OPEN_PROFILE = -13,
     NV_IMAGE_NOT_MULT4 = -14,
     NV_OUTPUT_FILE_IS_READ_ONLY = -15,

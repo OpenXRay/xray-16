@@ -5,7 +5,7 @@
 #include "stdafx.h"
 #include "weapon.h"
 
-float const CFireDispertionController::default_inertion = 5.91f;  // time to pass value of dispertion = 1
+float const CFireDispertionController::default_inertion = 5.91f; // time to pass value of dispertion = 1
 
 CFireDispertionController::CFireDispertionController()
 {

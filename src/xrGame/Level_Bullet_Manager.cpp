@@ -28,9 +28,9 @@ float const CBulletManager::parent_ignore_distance = 3.f;
 
 #ifdef DEBUG
 float air_resistance_epsilon = .1f;
-#else   // #ifdef DEBUG
+#else  // #ifdef DEBUG
 static float const air_resistance_epsilon = .1f;
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 float g_bullet_time_factor = 1.f;
 
 SBullet::SBullet()
@@ -92,16 +92,16 @@ void SBullet::Init(const Fvector& position, const Fvector& direction, float star
 }
 
 CBulletManager::CBulletManager()
-#if 0  // def CONFIG_PROFILE_LOCKS
+#if 0 // def CONFIG_PROFILE_LOCKS
 	: m_Lock(MUTEX_PROFILE_ID(CBulletManager))
 #ifdef DEBUG
 		,m_thread_id(GetCurrentThreadId())
-#endif  // #ifdef DEBUG
-#else   // #ifdef CONFIG_PROFILE_LOCKS
+#endif // #ifdef DEBUG
+#else  // #ifdef CONFIG_PROFILE_LOCKS
 #ifdef DEBUG
     : m_thread_id(GetCurrentThreadId())
-#endif  // #ifdef DEBUG
-#endif  // #ifdef CONFIG_PROFILE_LOCKS
+#endif // #ifdef DEBUG
+#endif // #ifdef CONFIG_PROFILE_LOCKS
 {
     m_Bullets.clear();
     m_Bullets.reserve(100);
@@ -279,11 +279,11 @@ static Fvector trajectory_position(Fvector const& start_position, Fvector const&
     Fvector const& base_gravity, float base_air_resistance, float const base_time)
 {
     Fvector const& gravity =
-        base_gravity;  // g_use_new_ballistics ? Fvector(base_gravity).mul(_sqr(factor)) : base_gravity;
+        base_gravity; // g_use_new_ballistics ? Fvector(base_gravity).mul(_sqr(factor)) : base_gravity;
     float const& air_resistance =
-        base_air_resistance;  // g_use_new_ballistics ? base_air_resistance*factor : base_air_resistance;
-    Fvector const& start_velocity = base_start_velocity;  // g_use_new_ballistics ? Fvector(base_start_velocity).mul(
-                                                          // factor ) : base_start_velocity;
+        base_air_resistance; // g_use_new_ballistics ? base_air_resistance*factor : base_air_resistance;
+    Fvector const& start_velocity = base_start_velocity; // g_use_new_ballistics ? Fvector(base_start_velocity).mul(
+                                                         // factor ) : base_start_velocity;
     float const time = base_time;
 
     float const parabolic_time = _max(0.f, 1.f / air_resistance - air_resistance_epsilon);
@@ -446,7 +446,7 @@ void CBulletManager::add_bullet_point(Fvector const& start_position, Fvector& pr
     m_bullet_points.push_back(previous_position);
     m_bullet_points.push_back(temp);
     previous_position = temp;
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 }
 
 static void update_bullet_parabolic(
@@ -596,9 +596,9 @@ bool CBulletManager::trajectory_check_error(Fvector& previous_position, collide:
 
     bullet_test_callback_data data;
     data.pBullet = &bullet;
-#if 1  // def DEBUG
+#if 1 // def DEBUG
     data.high_time = high;
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
     bullet.flags.ricochet_was = 0;
     bullet.dir = start_to_target;
 
@@ -662,7 +662,7 @@ bool CBulletManager::process_bullet(collide::rq_results& storage, SBullet& bulle
     float const air_resistance = (GameID() == eGameIDSingle) ? m_fAirResistanceK : bullet.air_resistance;
     bullet.tracer_start_position = bullet.bullet_pos;
 
-#if 0  // def DEBUG
+#if 0 // def DEBUG
 	extern BOOL g_bDrawBulletHit;
 	if (g_bDrawBulletHit)
 	{
@@ -851,7 +851,7 @@ void CBulletManager::Render()
     GlobalEnv.UIRender->CacheSetCullMode(IUIRender::cmCCW);
 }
 
-void CBulletManager::CommitRenderSet()  // @ the end of frame
+void CBulletManager::CommitRenderSet() // @ the end of frame
 {
     m_BulletsRendered = m_Bullets;
     if (g_mt_config.test(mtBullets)) {
@@ -862,7 +862,7 @@ void CBulletManager::CommitRenderSet()  // @ the end of frame
         UpdateWorkload();
     }
 }
-void CBulletManager::CommitEvents()  // @ the start of frame
+void CBulletManager::CommitEvents() // @ the start of frame
 {
     if (m_Events.size() > 1000) Msg("! too many bullets during single frame: %d", m_Events.size());
 
@@ -901,7 +901,7 @@ void CBulletManager::RegisterEvent(
 		if (breakpoint)
 			DEBUG_BREAK;
 	}
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 
     m_Events.push_back(_event());
     _event& E = m_Events.back();

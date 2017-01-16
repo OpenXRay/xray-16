@@ -25,11 +25,11 @@ extern CPHWorld* ph_world;
 // union dInfBytes dInfinityValue = {{0,0,0x80,0x7f}};
 // PhysicsStepTimeCallback		*physics_step_time_callback				= 0;
 
-const float default_w_limit = 9.8174770f;  //(M_PI/16.f/(fixed_step=0.02f));
-const float default_l_limit = 150.f;       //(3.f/fixed_step=0.02f);
+const float default_w_limit = 9.8174770f; //(M_PI/16.f/(fixed_step=0.02f));
+const float default_l_limit = 150.f;      //(3.f/fixed_step=0.02f);
 const float default_l_scale = 1.01f;
 const float default_w_scale = 1.01f;
-const float default_k_l = 0.0002f;  // square resistance !!
+const float default_k_l = 0.0002f; // square resistance !!
 const float default_k_w = 0.05f;
 
 extern const u16 max_joint_allowed_for_exeact_integration = 30;
@@ -117,11 +117,11 @@ IC static int CollideIntoGroup(
         u16 material_idx_1 = 0;
         u16 material_idx_2 = 0;
 
-        surface.mu = 1.f;           // 5000.f;
-        surface.soft_erp = 1.f;     // ERP(world_spring,world_damping);
-        surface.soft_cfm = 1.f;     // CFM(world_spring,world_damping);
-        surface.bounce = 0.01f;     // 0.1f;
-        surface.bounce_vel = 1.5f;  // 0.005f;
+        surface.mu = 1.f;          // 5000.f;
+        surface.soft_erp = 1.f;    // ERP(world_spring,world_damping);
+        surface.soft_cfm = 1.f;    // CFM(world_spring,world_damping);
+        surface.bounce = 0.01f;    // 0.1f;
+        surface.bounce_vel = 1.5f; // 0.005f;
         usr_data_1 = retrieveGeomUserData(g1);
         usr_data_2 = retrieveGeomUserData(g2);
         ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -135,7 +135,7 @@ IC static int CollideIntoGroup(
         SGameMtl* material_1 = GMLibrary().GetMaterialByIdx(material_idx_1);
         SGameMtl* material_2 = GMLibrary().GetMaterialByIdx(material_idx_2);
         ////////////////params can be changed in
-        ///callbacks//////////////////////////////////////////////////////////////////////////
+        /// callbacks//////////////////////////////////////////////////////////////////////////
         surface.mode = dContactApprox1 | dContactSoftERP | dContactSoftCFM;
         float spring = material_2->fPHSpring * material_1->fPHSpring * world_spring;
         float damping = material_2->fPHDamping * material_1->fPHDamping * world_damping;
@@ -435,8 +435,8 @@ void dMassSub(dMass* a, const dMass* b)
 
 ////Energy of non Elastic collision;
 // body - static case
-float E_NlS(dBodyID body, const dReal* norm, float norm_sign)  // if body c.geom.g1 norm_sign + else -
-{                                                              // norm*norm_sign - to body
+float E_NlS(dBodyID body, const dReal* norm, float norm_sign) // if body c.geom.g1 norm_sign + else -
+{                                                             // norm*norm_sign - to body
     const dReal* vel = dBodyGetLinearVel(body);
     dReal prg = -dDOT(vel, norm) * norm_sign;
     prg = prg < 0.f ? prg = 0.f : prg;
@@ -446,7 +446,7 @@ float E_NlS(dBodyID body, const dReal* norm, float norm_sign)  // if body c.geom
 }
 
 // body - body case
-float E_NLD(dBodyID b1, dBodyID b2, const dReal* norm)  // norm - from 2 to 1
+float E_NLD(dBodyID b1, dBodyID b2, const dReal* norm) // norm - from 2 to 1
 {
     dMass m1, m2;
     dBodyGetMass(b1, &m1);
@@ -457,7 +457,7 @@ float E_NLD(dBodyID b1, dBodyID b2, const dReal* norm)  // norm - from 2 to 1
     dReal vel_pr1 = dDOT(vel1, norm);
     dReal vel_pr2 = dDOT(vel2, norm);
 
-    if (vel_pr1 > vel_pr2) return 0.f;  // exit if the bodies are departing
+    if (vel_pr1 > vel_pr2) return 0.f; // exit if the bodies are departing
 
     dVector3 impuls1 = {vel1[0] * m1.mass, vel1[1] * m1.mass, vel1[2] * m1.mass};
     dVector3 impuls2 = {vel2[0] * m2.mass, vel2[1] * m2.mass, vel2[2] * m2.mass};

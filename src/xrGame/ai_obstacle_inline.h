@@ -50,4 +50,4 @@ IC const MagicBox3 ai_obstacle::min_box()
     return (m_min_box);
 }
 
-#endif  // AI_OBSTACLE_INLINE_H
+#endif // AI_OBSTACLE_INLINE_H

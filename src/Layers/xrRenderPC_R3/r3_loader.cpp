@@ -34,7 +34,7 @@ void CRender::level_Load(IReader* fs)
         R_ASSERT2(chunk, "Level doesn't builded correctly.");
         u32 count = chunk->r_u32();
         Shaders.resize(count);
-        for (u32 i = 0; i < count; i++)  // skip first shader as "reserved" one
+        for (u32 i = 0; i < count; i++) // skip first shader as "reserved" one
         {
             string512 n_sh, n_tlist;
             LPCSTR n = LPCSTR(chunk->pointer());

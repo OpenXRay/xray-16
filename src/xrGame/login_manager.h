@@ -33,7 +33,7 @@ struct profile
     bool const online() const { return m_online; };
     GPProfile const profile_id() const { return m_profile_id; };
     // copy constructor is valid
-};  // struct profile
+}; // struct profile
 
 // typedef fastdelegate::FastDelegate<void (profile const *, shared_str const &)>	login_operation_cb;
 typedef mixed_delegate<void(profile const*, char const*), mdut_login_operation_cb_tag> login_operation_cb;
@@ -68,7 +68,7 @@ public:
     void stop_setting_unique_nick();
 
     profile const* get_current_profile() const { return m_current_profile; };
-    void delete_profile_obj();  // deletes m_current_profile and clears m_login_operation_cb
+    void delete_profile_obj(); // deletes m_current_profile and clears m_login_operation_cb
     void forgot_password(char const* url);
 
 private:
@@ -109,11 +109,11 @@ private:
 
     static void __cdecl wslogin_cb(GHTTPResult httpResult, WSLoginResponse* response, void* userData);
     static void __cdecl setunick_cb(GPConnection* connection, void* arg, void* param);
-};  // class login_manager
-}  // namespace gamespy_gp
+}; // class login_manager
+} // namespace gamespy_gp
 
 typedef gamespy_gp::profile gamespy_gp_profile;
 typedef gamespy_gp::login_operation_cb gamespy_gp_login_operation_cb;
 typedef gamespy_gp::login_manager gamespy_gp_login_manager;
 
-#endif  //#ifndef LOGIN_MANAGER
+#endif //#ifndef LOGIN_MANAGER

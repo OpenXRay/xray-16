@@ -17,7 +17,7 @@ extern "C" {
 
 // for simplicity, set the binary size to a value > gsCrypt.h binary size
 #ifndef GS_LARGEINT_BINARY_SIZE
-#define GS_LARGEINT_BINARY_SIZE (2048)  // *BIT* size (divide by 8 for byte size)
+#define GS_LARGEINT_BINARY_SIZE (2048) // *BIT* size (divide by 8 for byte size)
 #endif
 
 //  !!!!!!WARNING!!!!!!  Encryption is fastest when digit type is the default system type, (ex: gsi_u32 on 32bit
@@ -83,4 +83,4 @@ gsi_bool gsLargeIntWriteToMemoryStream(const gsLargeInt_t* lint, gsi_u8* data);
 }
 #endif
 
-#endif  // __GSLARGEINT_H__
+#endif // __GSLARGEINT_H__

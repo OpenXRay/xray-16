@@ -41,9 +41,9 @@ CCarWeapon::CCarWeapon(CPhysicsShellHolder* obj)
     m_fire_bone = K->LL_BoneID(pUserData->r_string("mounted_weapon_definition", "fire_bone"));
     m_min_gun_speed = pUserData->r_float("mounted_weapon_definition", "min_gun_speed");
     m_max_gun_speed = pUserData->r_float("mounted_weapon_definition", "max_gun_speed");
-    CBoneData& bdX = K->LL_GetData(m_rotate_x_bone);  // VERIFY(bdX.IK_data.type==jtJoint);
+    CBoneData& bdX = K->LL_GetData(m_rotate_x_bone); // VERIFY(bdX.IK_data.type==jtJoint);
     m_lim_x_rot.set(bdX.IK_data.limits[0].limit.x, bdX.IK_data.limits[0].limit.y);
-    CBoneData& bdY = K->LL_GetData(m_rotate_y_bone);  // VERIFY(bdY.IK_data.type==jtJoint);
+    CBoneData& bdY = K->LL_GetData(m_rotate_y_bone); // VERIFY(bdY.IK_data.type==jtJoint);
     m_lim_y_rot.set(bdY.IK_data.limits[1].limit.x, bdY.IK_data.limits[1].limit.y);
 
     xr_vector<Fmatrix> matrices;
@@ -163,13 +163,13 @@ void CCarWeapon::UpdateBarrelDir()
     XFi.invert(m_object->XFORM());
     Fvector dep;
     XFi.transform_dir(dep, m_destEnemyDir);
-    {  // x angle
+    { // x angle
         m_i_bind_x_xform.transform_dir(dep);
         dep.normalize();
         m_tgt_x_rot = angle_normalize_signed(m_bind_x_rot - dep.getP());
         clamp(m_tgt_x_rot, -m_lim_x_rot.y, -m_lim_x_rot.x);
     }
-    {  // y angle
+    { // y angle
         m_i_bind_y_xform.transform_dir(dep);
         dep.normalize();
         m_tgt_y_rot = angle_normalize_signed(m_bind_y_rot - dep.getH());

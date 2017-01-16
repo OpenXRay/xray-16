@@ -70,10 +70,12 @@ protected:
     void add_story_object(CSE_ALifeDynamicObject* dynamic_object);
     void add_space_restrictor(CSE_ALifeDynamicObject* dynamic_object);
     void add_free_object(CSE_Abstract* abstract);
-    //			void						add_group_object					(CSE_Abstract			*abstract, shared_str group_section,
-    //bool);
     //			void						add_group_object					(CSE_Abstract			*abstract, shared_str
-    //group_section);
+    //group_section,
+    // bool);
+    //			void						add_group_object					(CSE_Abstract			*abstract,
+    //shared_str
+    // group_section);
     void add_level_changer(CSE_Abstract* abstract);
     void update_artefact_spawn_positions();
     //	IC		void						normalize_probability				(CSE_ALifeAnomalousZone *zone);

@@ -41,4 +41,4 @@ void black_list::OnPlayerSpawned(game_PlayerState const* ps)
     }
 }
 
-}  // namespace award_system
+} // namespace award_system

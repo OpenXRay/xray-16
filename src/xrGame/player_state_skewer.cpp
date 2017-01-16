@@ -52,4 +52,4 @@ void player_state_skewer::OnPlayerKilled(
     }
 }
 
-}  // namespace award_system
+} // namespace award_system

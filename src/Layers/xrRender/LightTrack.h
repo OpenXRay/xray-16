@@ -26,11 +26,11 @@ public:
 
     struct Item
     {
-        u32 frame_touched;         // to track creation & removal
-        light* source;             //
-        collide::ray_cache cache;  //
-        float test;                // note range: (-1[no]..1[yes])
-        float energy;              //
+        u32 frame_touched;        // to track creation & removal
+        light* source;            //
+        collide::ray_cache cache; //
+        float test;               // note range: (-1[no]..1[yes])
+        float energy;             //
     };
     struct Light
     {
@@ -46,8 +46,8 @@ public:
     u32 dwFrameSmooth;
 
     //
-    xr_vector<Item> track;    // everything what touches
-    xr_vector<Light> lights;  //
+    xr_vector<Item> track;   // everything what touches
+    xr_vector<Light> lights; //
 
     bool result[lt_hemisamples];
     collide::ray_cache cache[lt_hemisamples];
@@ -77,7 +77,7 @@ private:
     Fvector last_position;
     s32 ticks_to_update;
     s32 sky_rays_uptodate;
-#endif  // RENDER!=R_R1
+#endif // RENDER!=R_R1
 public:
     virtual void force_mode(u32 mode) { MODE = mode; };
     virtual float get_luminocity()
@@ -135,7 +135,7 @@ private:
 #if RENDER != R_R1
     //	Updates only if makes a desizion that update is necessary
     void smart_update(IRenderable* O);
-#endif  //	RENDER!=R_R1
+#endif //	RENDER!=R_R1
 };
 
-#endif  // !defined(AFX_LIGHTTRACK_H__89914D61_AC0B_4C7C_BA8C_D7D810738CE7__INCLUDED_)
+#endif // !defined(AFX_LIGHTTRACK_H__89914D61_AC0B_4C7C_BA8C_D7D810738CE7__INCLUDED_)

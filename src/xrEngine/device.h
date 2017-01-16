@@ -35,9 +35,9 @@ class ENGINE_API IRenderDevice
 public:
     struct RenderDeviceStatictics
     {
-        CStatTimer RenderTotal;   // pureRender
-        CStatTimer EngineTotal;   // pureFrame
-        float fFPS, fRFPS, fTPS;  // FPS, RenderFPS, TPS
+        CStatTimer RenderTotal;  // pureRender
+        CStatTimer EngineTotal;  // pureFrame
+        float fFPS, fRFPS, fTPS; // FPS, RenderFPS, TPS
 
         RenderDeviceStatictics()
         {
@@ -181,7 +181,7 @@ public:
 #ifdef INGAME_EDITOR
           ,
           m_editor_module(0), m_editor_initialize(0), m_editor_finalize(0), m_editor(0), m_engine(0)
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR
     {
         m_hWnd = NULL;
         b_is_Active = FALSE;
@@ -277,7 +277,7 @@ private:
     finalize_function_ptr m_editor_finalize;
     editor::ide* m_editor;
     engine_impl* m_engine;
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR
 };
 
 extern ENGINE_API CRenderDevice Device;

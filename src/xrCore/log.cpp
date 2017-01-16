@@ -14,9 +14,9 @@ static string_path log_file_name = "engine.log";
 static BOOL no_log = TRUE;
 #ifdef CONFIG_PROFILE_LOCKS
 static Lock logCS(MUTEX_PROFILE_ID(log));
-#else   // CONFIG_PROFILE_LOCKS
+#else  // CONFIG_PROFILE_LOCKS
 static Lock logCS;
-#endif  // CONFIG_PROFILE_LOCKS
+#endif // CONFIG_PROFILE_LOCKS
 xr_vector<shared_str>* LogFile = NULL;
 static LogCallback LogCB = 0;
 
@@ -74,7 +74,7 @@ void Log(const char* s)
     for (i = 0, j = 0; s[i] != 0; i++)
     {
         if (s[i] == '\n') {
-            split[j] = 0;  // end of line
+            split[j] = 0; // end of line
             if (split[0] == 0) {
                 split[0] = ' ';
                 split[1] = 0;

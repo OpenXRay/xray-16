@@ -71,7 +71,7 @@ BOOL CPhantom::net_Spawn(CSE_Abstract* DC)
         u_EventSend(P);
     }
 
-    SwitchToState(stBirth);  // initial state (changed on load method in inherited::)
+    SwitchToState(stBirth); // initial state (changed on load method in inherited::)
 
     // inherited
     if (!inherited::net_Spawn(DC)) return FALSE;
@@ -322,15 +322,15 @@ void CPhantom::PsyHit(const IGameObject* object, float value)
 {
     NET_Packet P;
     SHit HS;
-    HS.GenHeader(GE_HIT, object->ID());                   //				//	u_EventGen		(P,GE_HIT, object->ID());
-    HS.whoID = (ID());                                    // own			//	P.w_u16			(object->ID());
-    HS.weaponID = (ID());                                 // own			//	P.w_u16			(object->ID());
-    HS.dir = (Fvector().set(0.f, 1.f, 0.f));              // direction	//	P.w_dir			(Fvector().set(0.f,1.f,0.f));
-    HS.power = (value);                                   // hit value	//	P.w_float		(value);
-    HS.boneID = (BI_NONE);                                // bone			//	P.w_s16			(BI_NONE);
-    HS.p_in_bone_space = (Fvector().set(0.f, 0.f, 0.f));  //	P.w_vec3		(Fvector().set(0.f,0.f,0.f));
-    HS.impulse = (0.f);                                   //	P.w_float		(0.f);
-    HS.hit_type = (ALife::eHitTypeTelepatic);             //	P.w_u16			(u16(ALife::eHitTypeTelepatic));
+    HS.GenHeader(GE_HIT, object->ID());                  //				//	u_EventGen		(P,GE_HIT, object->ID());
+    HS.whoID = (ID());                                   // own			//	P.w_u16			(object->ID());
+    HS.weaponID = (ID());                                // own			//	P.w_u16			(object->ID());
+    HS.dir = (Fvector().set(0.f, 1.f, 0.f));             // direction	//	P.w_dir			(Fvector().set(0.f,1.f,0.f));
+    HS.power = (value);                                  // hit value	//	P.w_float		(value);
+    HS.boneID = (BI_NONE);                               // bone			//	P.w_s16			(BI_NONE);
+    HS.p_in_bone_space = (Fvector().set(0.f, 0.f, 0.f)); //	P.w_vec3		(Fvector().set(0.f,0.f,0.f));
+    HS.impulse = (0.f);                                  //	P.w_float		(0.f);
+    HS.hit_type = (ALife::eHitTypeTelepatic);            //	P.w_u16			(u16(ALife::eHitTypeTelepatic));
     HS.Write_Packet(P);
 
     u_EventSend(P);
@@ -346,7 +346,7 @@ void CPhantom::load(IReader& input_packet)
 {
     SwitchToState(EState(input_packet.r_s32()));
 }
-void CPhantom::net_Export(NET_Packet& P)  // export to server
+void CPhantom::net_Export(NET_Packet& P) // export to server
 {
     // export
     R_ASSERT(Local());

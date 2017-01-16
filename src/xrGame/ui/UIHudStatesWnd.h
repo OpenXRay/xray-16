@@ -107,4 +107,4 @@ protected:
     void UpdateIndicatorType(CActor* actor, ALife::EInfluenceType type);
     //			void	SwitchLA			( bool state, ALife::EInfluenceType type );
 
-};  // class CUIHudStatesWnd
+}; // class CUIHudStatesWnd

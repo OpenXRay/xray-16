@@ -17,4 +17,4 @@ public:
     }
     virtual void Execute();
 };
-#endif  //__LIGHTTHREAD_H__
+#endif //__LIGHTTHREAD_H__

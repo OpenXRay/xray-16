@@ -25,4 +25,4 @@ public:
     virtual ~CBlender_default_aref();
 };
 
-#endif  // !defined(AFX_BLENDER_DEFAULT_AREF_H__E17F011F_C371_4464_B75A_01D68F55FC4E__INCLUDED_)
+#endif // !defined(AFX_BLENDER_DEFAULT_AREF_H__E17F011F_C371_4464_B75A_01D68F55FC4E__INCLUDED_)

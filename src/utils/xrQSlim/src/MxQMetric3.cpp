@@ -77,11 +77,11 @@ void MxQuadric3::point_constraint(const float* p)
     // of any point v to the given point p.
 
     a2 = b2 = c2 = 1.0;
-    ab = ac = bc = 0.0;  // A = I
+    ab = ac = bc = 0.0; // A = I
     ad = -p[0];
     bd = -p[1];
-    cd = -p[2];                                    // b = -p
-    d2 = p[0] * p[0] + p[1] * p[1] + p[2] * p[2];  // c = p*p
+    cd = -p[2];                                   // b = -p
+    d2 = p[0] * p[0] + p[1] * p[1] + p[2] * p[2]; // c = p*p
 }
 
 MxQuadric3& MxQuadric3::operator=(const MxQuadric3& Q)

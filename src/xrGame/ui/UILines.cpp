@@ -168,7 +168,7 @@ void CUILines::ParseText(bool force)
         fTargetWidth = m_wndSize.x / fTargetWidth;
         int vsz = line->m_subLines.size();
         VERIFY(vsz);
-        if ((vsz > 1) && (!bNewLines)) {  // only colored line, pizdets
+        if ((vsz > 1) && (!bNewLines)) { // only colored line, pizdets
             for (int i = 0; i < vsz; i++)
             {
                 const char* pszText = line->m_subLines[i].m_text.c_str();
@@ -217,7 +217,7 @@ void CUILines::ParseText(bool force)
         string4096 buff;
         float curr_width = 0.0f;
         bool bnew_line = false;
-        float __eps = get_str_width(m_pFont, 'o');  // hack -(
+        float __eps = get_str_width(m_pFont, 'o'); // hack -(
         for (u32 sbl_idx = 0; sbl_idx < sbl_cnt; ++sbl_idx)
         {
             bool b_last_subl = (sbl_idx == sbl_cnt - 1);

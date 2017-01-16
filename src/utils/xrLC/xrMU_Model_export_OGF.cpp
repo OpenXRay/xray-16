@@ -25,7 +25,7 @@ void export_ogf(xrMU_Reference& mu_reference)
         for (xrMU_Model::v_subdivs_it it = model->m_subdivs.begin(); it != model->m_subdivs.end(); it++)
         {
             OGF_Reference* pOGF = new OGF_Reference();
-            b_material* M = &(pBuild->materials()[it->material]);  // and it's material
+            b_material* M = &(pBuild->materials()[it->material]); // and it's material
             R_ASSERT(M);
 
             // Common data

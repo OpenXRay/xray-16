@@ -67,10 +67,10 @@ void ghiLogToFile(const char* buffer, int len, const char* fileName);
 // Possible results from ghiDoReceive.
 //////////////////////////////////////
 typedef enum {
-    GHIRecvData,    // Data was received.
-    GHINoData,      // No data was available.
-    GHIConnClosed,  // The connection was closed.
-    GHIError        // There was a socket error.
+    GHIRecvData,   // Data was received.
+    GHINoData,     // No data was available.
+    GHIConnClosed, // The connection was closed.
+    GHIError       // There was a socket error.
 } GHIRecvResult;
 
 // Receive some data.
@@ -86,9 +86,9 @@ int ghiDoSend(GHIConnection* connection, const char* buffer, int len);
 // Results for ghtTrySendThenBuffer.
 ////////////////////////////////////
 typedef enum {
-    GHITrySendError,    // There was an error sending.
-    GHITrySendSent,     // Everything was sent.
-    GHITrySendBuffered  // Some or all of the data was buffered.
+    GHITrySendError,   // There was an error sending.
+    GHITrySendSent,    // Everything was sent.
+    GHITrySendBuffered // Some or all of the data was buffered.
 } GHITrySendResult;
 
 // Sends whatever it can on the socket.

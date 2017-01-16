@@ -72,7 +72,7 @@ void CStalkerActionReachEnemyLocation::execute()
 {
 #ifdef TEST_MENTAL_STATE
     VERIFY((start_level_time() == Device.dwTimeGlobal) || (object().movement().mental_state() == eMentalStateDanger));
-#endif  // TEST_MENTAL_STATE
+#endif // TEST_MENTAL_STATE
 
     inherited::execute();
 
@@ -125,7 +125,7 @@ void CStalkerActionReachEnemyLocation::execute()
 
 #ifndef SILENT_COMBAT
             play_start_search_sound(0, 0, 10000, 10000);
-#endif  // SILENT_COMBAT
+#endif // SILENT_COMBAT
         }
     }
     else
@@ -198,7 +198,7 @@ void CStalkerActionReachAmbushLocation::execute()
     if (!object().movement().path_completed()) {
 #ifndef SILENT_COMBAT
         play_enemy_lost_sound(0, 0, 10000, 10000);
-#endif  // SILENT_COMBAT
+#endif // SILENT_COMBAT
         return;
     }
 

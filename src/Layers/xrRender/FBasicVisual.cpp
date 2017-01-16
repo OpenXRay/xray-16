@@ -7,7 +7,7 @@
 
 #ifndef _EDITOR
 #include "xrEngine/Render.h"
-#endif  // #ifndef _EDITOR
+#endif // #ifndef _EDITOR
 
 #include "FBasicVisual.h"
 #include "xrCore/FMesh.hpp"

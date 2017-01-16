@@ -9,8 +9,8 @@
 #include "stdafx.h"
 
 #ifdef DEBUG
-#include "stalker_animation_manager.h"
 #include "ai/stalker/ai_stalker.h"
+#include "stalker_animation_manager.h"
 
 #pragma warning(push)
 #pragma warning(disable : 4995)
@@ -45,7 +45,7 @@ struct animation_stats
     u32 m_start_count;
 
     IC animation_stats(const shared_str& visual_id, const u32& frame_count, const u32& start_count)
-        :  //		m_visual_id		(visual_id),
+        : //		m_visual_id		(visual_id),
           m_frame_count(frame_count),
           m_start_count(start_count)
     {
@@ -214,4 +214,4 @@ void CStalkerAnimationManager::add_animation_stats()
     add_animation_stats(m_skeleton_animated->LL_MotionDefName_dbg(legs().animation()),
         legs().blend_id(m_skeleton_animated, blend), legs().m_just_started);
 }
-#endif  // DEBUG
+#endif // DEBUG

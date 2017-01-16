@@ -128,7 +128,7 @@ public:
     }
     static u32 get_id(const type* f, const xr_vector<type*>& vec)
     {
-        if (f == 0) return id_none;  //??
+        if (f == 0) return id_none; //??
         u32 idx = f->self_index();
         VERIFY(vec[idx] == f);
         return idx;

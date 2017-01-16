@@ -74,7 +74,7 @@ void CPhysicsSkeletonObject::net_Save(NET_Packet& P)
 
 BOOL CPhysicsSkeletonObject::net_SaveRelevant()
 {
-    return TRUE;  //! m_flags.test(CSE_ALifeObjectPhysic::flSpawnCopy);
+    return TRUE; //! m_flags.test(CSE_ALifeObjectPhysic::flSpawnCopy);
 }
 
 BOOL CPhysicsSkeletonObject::UsedAI_Locations()

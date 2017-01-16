@@ -61,7 +61,7 @@ void D3DXRenderBase::r_dsgraph_insert_dynamic(dxRender_Visual* pVisual, Fvector&
         N->val.pObject = RI.val_pObject;
         N->val.pVisual = pVisual;
         N->val.Matrix = *RI.val_pTransform;
-        N->val.se = sh_d;  // 4=L_special
+        N->val.se = sh_d; // 4=L_special
     }
 
     // Select shader
@@ -99,9 +99,9 @@ void D3DXRenderBase::r_dsgraph_insert_dynamic(dxRender_Visual* pVisual, Fvector&
                 N->val.pObject = RI.val_pObject;
                 N->val.pVisual = pVisual;
                 N->val.Matrix = *RI.val_pTransform;
-                N->val.se = &*pVisual->shader->E[4];  // 4=L_special
+                N->val.se = &*pVisual->shader->E[4]; // 4=L_special
             }
-#endif  //	RENDER!=R_R1
+#endif //	RENDER!=R_R1
             return;
         }
     }
@@ -135,7 +135,7 @@ void D3DXRenderBase::r_dsgraph_insert_dynamic(dxRender_Visual* pVisual, Fvector&
         N->val.pObject = RI.val_pObject;
         N->val.pVisual = pVisual;
         N->val.Matrix = *RI.val_pTransform;
-        N->val.se = &*pVisual->shader->E[4];  // 4=L_special
+        N->val.se = &*pVisual->shader->E[4]; // 4=L_special
     }
     if (sh->flags.bWmark && pmask_wmark) {
         mapSorted_Node* N = mapWmark.insertInAnyWay(distSQ);
@@ -161,19 +161,19 @@ void D3DXRenderBase::r_dsgraph_insert_dynamic(dxRender_Visual* pVisual, Fvector&
         mapMatrixVS::TNode* Nvs = map.insert(pass.vs);
         mapMatrixGS::TNode* Ngs = Nvs->val.insert(pass.gs);
         mapMatrixPS::TNode* Nps = Ngs->val.insert(pass.ps);
-#else   //	USE_DX10
+#else  //	USE_DX10
         mapMatrixVS::TNode* Nvs = map.insert(pass.vs);
         mapMatrixPS::TNode* Nps = Nvs->val.insert(pass.ps);
-#endif  //	USE_DX10
+#endif //	USE_DX10
 #else
 #if defined(USE_DX10) || defined(USE_DX11)
         mapMatrixVS::TNode* Nvs = map.insert(&*pass.vs);
         mapMatrixGS::TNode* Ngs = Nvs->val.insert(pass.gs->gs);
         mapMatrixPS::TNode* Nps = Ngs->val.insert(pass.ps->ps);
-#else   //	USE_DX10
+#else  //	USE_DX10
         mapMatrixVS::TNode* Nvs = map.insert(pass.vs->vs);
         mapMatrixPS::TNode* Nps = Nvs->val.insert(pass.ps->ps);
-#endif  //	USE_DX10
+#endif //	USE_DX10
 #endif
 
 #ifdef USE_DX11
@@ -211,7 +211,7 @@ void D3DXRenderBase::r_dsgraph_insert_dynamic(dxRender_Visual* pVisual, Fvector&
 #if defined(USE_DX10) || defined(USE_DX11)
                         if (SSA > Ngs->val.ssa) {
                             Ngs->val.ssa = SSA;
-#endif  //	USE_DX10
+#endif //	USE_DX10
                             if (SSA > Nvs->val.ssa) {
                                 Nvs->val.ssa = SSA;
 #if defined(USE_DX10) || defined(USE_DX11)
@@ -221,13 +221,13 @@ void D3DXRenderBase::r_dsgraph_insert_dynamic(dxRender_Visual* pVisual, Fvector&
                 }
             }
         }
-#else   //	USE_DX10
+#else  //	USE_DX10
                         }
                     }
                 }
             }
         }
-#endif  //	USE_DX10
+#endif //	USE_DX10
     }
 
 #if RENDER != R_R1
@@ -267,7 +267,7 @@ void D3DXRenderBase::r_dsgraph_insert_static(dxRender_Visual* pVisual)
         N->val.pObject = NULL;
         N->val.pVisual = pVisual;
         N->val.Matrix = Fidentity;
-        N->val.se = &*pVisual->shader->E[4];  // 4=L_special
+        N->val.se = &*pVisual->shader->E[4]; // 4=L_special
     }
 
     // Select shader
@@ -297,7 +297,7 @@ void D3DXRenderBase::r_dsgraph_insert_static(dxRender_Visual* pVisual)
         N->val.pObject = NULL;
         N->val.pVisual = pVisual;
         N->val.Matrix = Fidentity;
-        N->val.se = &*pVisual->shader->E[4];  // 4=L_special
+        N->val.se = &*pVisual->shader->E[4]; // 4=L_special
     }
     if (sh->flags.bWmark && pmask_wmark) {
         mapSorted_Node* N = mapWmark.insertInAnyWay(distSQ);
@@ -338,20 +338,20 @@ void D3DXRenderBase::r_dsgraph_insert_static(dxRender_Visual* pVisual)
         mapNormalVS::TNode* Nvs = map.insert(pass.vs);
         mapNormalGS::TNode* Ngs = Nvs->val.insert(pass.gs);
         mapNormalPS::TNode* Nps = Ngs->val.insert(pass.ps);
-#else   //	USE_DX10
+#else  //	USE_DX10
         mapNormalVS::TNode* Nvs = map.insert(pass.vs);
         mapNormalPS::TNode* Nps = Nvs->val.insert(pass.ps);
-#endif  //	USE_DX10
-#else   // USE_RESOURCE_DEBUGGER
+#endif //	USE_DX10
+#else  // USE_RESOURCE_DEBUGGER
 #if defined(USE_DX10) || defined(USE_DX11)
         mapNormalVS::TNode* Nvs = map.insert(&*pass.vs);
         mapNormalGS::TNode* Ngs = Nvs->val.insert(pass.gs->gs);
         mapNormalPS::TNode* Nps = Ngs->val.insert(pass.ps->ps);
-#else   //	USE_DX10
+#else  //	USE_DX10
         mapNormalVS::TNode* Nvs = map.insert(pass.vs->vs);
         mapNormalPS::TNode* Nps = Nvs->val.insert(pass.ps->ps);
-#endif  //	USE_DX10
-#endif  // USE_RESOURCE_DEBUGGER
+#endif //	USE_DX10
+#endif // USE_RESOURCE_DEBUGGER
 
 #ifdef USE_DX11
 #ifdef USE_RESOURCE_DEBUGGER
@@ -391,7 +391,7 @@ void D3DXRenderBase::r_dsgraph_insert_static(dxRender_Visual* pVisual)
 #if defined(USE_DX10) || defined(USE_DX11)
                         if (SSA > Ngs->val.ssa) {
                             Ngs->val.ssa = SSA;
-#endif  //	USE_DX10
+#endif //	USE_DX10
                             if (SSA > Nvs->val.ssa) {
                                 Nvs->val.ssa = SSA;
 #if defined(USE_DX10) || defined(USE_DX11)
@@ -401,13 +401,13 @@ void D3DXRenderBase::r_dsgraph_insert_static(dxRender_Visual* pVisual)
                 }
             }
         }
-#else   //	USE_DX10
+#else  //	USE_DX10
                         }
                     }
                 }
             }
         }
-#endif  //	USE_DX10
+#endif //	USE_DX10
     }
 
 #if RENDER != R_R1
@@ -425,7 +425,7 @@ void CRender::add_leafs_Dynamic(dxRender_Visual* pVisual)
     if (0 == pVisual) return;
 
     // Visual is 100% visible - simply add it
-    xr_vector<dxRender_Visual *>::iterator I, E;  // it may be useful for 'hierrarhy' visual
+    xr_vector<dxRender_Visual *>::iterator I, E; // it may be useful for 'hierrarhy' visual
 
     switch (pVisual->Type)
     {
@@ -466,7 +466,7 @@ void CRender::add_leafs_Dynamic(dxRender_Visual* pVisual)
             Fvector Tpos;
             float D;
             val_pTransform->transform_tiny(Tpos, pV->vis.sphere.P);
-            float ssa = CalcSSA(D, Tpos, pV->vis.sphere.R / 2.f);  // assume dynamics never consume full sphere
+            float ssa = CalcSSA(D, Tpos, pV->vis.sphere.R / 2.f); // assume dynamics never consume full sphere
             if (ssa < r_ssaLOD_A) _use_lod = TRUE;
         }
         if (_use_lod) {
@@ -475,7 +475,7 @@ void CRender::add_leafs_Dynamic(dxRender_Visual* pVisual)
         else
         {
             pV->CalculateBones(TRUE);
-            pV->CalculateWallmarks();  //. bug?
+            pV->CalculateWallmarks(); //. bug?
             I = pV->children.begin();
             E = pV->children.end();
             for (; I != E; I++)
@@ -500,7 +500,7 @@ void CRender::add_leafs_Static(dxRender_Visual* pVisual)
     if (!HOM.visible(pVisual->vis)) return;
 
     // Visual is 100% visible - simply add it
-    xr_vector<dxRender_Visual *>::iterator I, E;  // it may be usefull for 'hierrarhy' visuals
+    xr_vector<dxRender_Visual *>::iterator I, E; // it may be usefull for 'hierrarhy' visuals
 
     switch (pVisual->Type)
     {
@@ -591,7 +591,7 @@ void CRender::add_leafs_Static(dxRender_Visual* pVisual)
 BOOL CRender::add_Dynamic(dxRender_Visual* pVisual, u32 planes)
 {
     // Check frustum visibility and calculate distance to visual's center
-    Fvector Tpos;  // transformed position
+    Fvector Tpos; // transformed position
     EFC_Visible VIS;
 
     val_pTransform->transform_tiny(Tpos, pVisual->vis.sphere.P);
@@ -599,7 +599,7 @@ BOOL CRender::add_Dynamic(dxRender_Visual* pVisual, u32 planes)
     if (fcvNone == VIS) return FALSE;
 
     // If we get here visual is visible or partially visible
-    xr_vector<dxRender_Visual *>::iterator I, E;  // it may be usefull for 'hierrarhy' visuals
+    xr_vector<dxRender_Visual *>::iterator I, E; // it may be usefull for 'hierrarhy' visuals
 
     switch (pVisual->Type)
     {
@@ -659,7 +659,7 @@ BOOL CRender::add_Dynamic(dxRender_Visual* pVisual, u32 planes)
             Fvector Tpos;
             float D;
             val_pTransform->transform_tiny(Tpos, pV->vis.sphere.P);
-            float ssa = CalcSSA(D, Tpos, pV->vis.sphere.R / 2.f);  // assume dynamics never consume full sphere
+            float ssa = CalcSSA(D, Tpos, pV->vis.sphere.R / 2.f); // assume dynamics never consume full sphere
             if (ssa < r_ssaLOD_A) _use_lod = TRUE;
         }
         if (_use_lod) {
@@ -668,7 +668,7 @@ BOOL CRender::add_Dynamic(dxRender_Visual* pVisual, u32 planes)
         else
         {
             pV->CalculateBones(TRUE);
-            pV->CalculateWallmarks();  //. bug?
+            pV->CalculateWallmarks(); //. bug?
             I = pV->children.begin();
             E = pV->children.end();
             for (; I != E; I++)
@@ -706,7 +706,7 @@ void CRender::add_Static(dxRender_Visual* pVisual, u32 planes)
     if (!HOM.visible(vis)) return;
 
     // If we get here visual is visible or partially visible
-    xr_vector<dxRender_Visual *>::iterator I, E;  // it may be usefull for 'hierrarhy' visuals
+    xr_vector<dxRender_Visual *>::iterator I, E; // it may be usefull for 'hierrarhy' visuals
 
     switch (pVisual->Type)
     {
@@ -883,7 +883,7 @@ void D3DXRenderBase::Reset(HWND hWnd, u32& dwWidth, u32& dwHeight, float& fWidth
 {
 #ifdef DEBUG
     _SHOW_REF("*ref -CRenderDevice::ResetTotal: DeviceREF:", HW.pDevice);
-#endif  // DEBUG
+#endif // DEBUG
 
     Resources->reset_begin();
     Memory.mem_compact();
@@ -892,10 +892,10 @@ void D3DXRenderBase::Reset(HWND hWnd, u32& dwWidth, u32& dwHeight, float& fWidth
 #if defined(USE_DX10) || defined(USE_DX11)
     dwWidth = HW.m_ChainDesc.BufferDesc.Width;
     dwHeight = HW.m_ChainDesc.BufferDesc.Height;
-#else   //	USE_DX10
+#else  //	USE_DX10
     dwWidth = HW.DevPP.BackBufferWidth;
     dwHeight = HW.DevPP.BackBufferHeight;
-#endif  //	USE_DX10
+#endif //	USE_DX10
 
     fWidth_2 = float(dwWidth / 2);
     fHeight_2 = float(dwHeight / 2);
@@ -903,7 +903,7 @@ void D3DXRenderBase::Reset(HWND hWnd, u32& dwWidth, u32& dwHeight, float& fWidth
 
 #ifdef DEBUG
     _SHOW_REF("*ref +CRenderDevice::ResetTotal: DeviceREF:", HW.pDevice);
-#endif  // DEBUG
+#endif // DEBUG
 }
 
 void D3DXRenderBase::SetupStates()
@@ -912,7 +912,7 @@ void D3DXRenderBase::SetupStates()
 #if defined(USE_DX10) || defined(USE_DX11)
 //	TODO: DX10: Implement Resetting of render states into default mode
 // VERIFY(!"D3DXRenderBase::SetupStates not implemented.");
-#else   //	USE_DX10
+#else  //	USE_DX10
     for (u32 i = 0; i < HW.Caps.raster.dwStages; i++)
     {
         float fBias = -.5f;
@@ -951,7 +951,7 @@ void D3DXRenderBase::SetupStates()
         CHK_DX(HW.pDevice->SetRenderState(D3DRS_FOGTABLEMODE, D3DFOG_NONE));
         CHK_DX(HW.pDevice->SetRenderState(D3DRS_FOGVERTEXMODE, D3DFOG_LINEAR));
     }
-#endif  // USE_DX10
+#endif // USE_DX10
 }
 
 void D3DXRenderBase::OnDeviceCreate(const char* shName)
@@ -1006,9 +1006,9 @@ void D3DXRenderBase::overdrawBegin()
     CHK_DX(HW.pDevice->SetRenderState(D3DRS_STENCILFAIL, D3DSTENCILOP_KEEP));
     CHK_DX(HW.pDevice->SetRenderState(D3DRS_STENCILPASS, D3DSTENCILOP_INCRSAT));
     if (1 == HW.Caps.SceneMode)
-        CHK_DX(HW.pDevice->SetRenderState(D3DRS_STENCILZFAIL, D3DSTENCILOP_KEEP));  // Overdraw
+        CHK_DX(HW.pDevice->SetRenderState(D3DRS_STENCILZFAIL, D3DSTENCILOP_KEEP)); // Overdraw
     else
-        CHK_DX(HW.pDevice->SetRenderState(D3DRS_STENCILZFAIL, D3DSTENCILOP_INCRSAT));  // ZB access
+        CHK_DX(HW.pDevice->SetRenderState(D3DRS_STENCILZFAIL, D3DSTENCILOP_INCRSAT)); // ZB access
 #endif
 }
 
@@ -1043,7 +1043,7 @@ void D3DXRenderBase::overdrawEnd()
         CHK_DX(HW.pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, pv, sizeof(FVF::TL)));
     }
     CHK_DX(HW.pDevice->SetRenderState(D3DRS_STENCILENABLE, FALSE));
-#endif  // USE_DX10
+#endif // USE_DX10
 }
 
 void D3DXRenderBase::DeferredLoad(bool E)
@@ -1078,7 +1078,7 @@ DeviceState D3DXRenderBase::GetDeviceState()
 //	TODO: DX10: Implement GetDeviceState
 //	TODO: DX10: Implement DXGI_PRESENT_TEST testing
 // VERIFY(!"D3DXRenderBase::overdrawBegin not implemented.");
-#else   // USE_DX10
+#else  // USE_DX10
     HRESULT _hr = HW.pDevice->TestCooperativeLevel();
     if (FAILED(_hr)) {
         // If the device was lost, do not render until we get it back
@@ -1086,7 +1086,7 @@ DeviceState D3DXRenderBase::GetDeviceState()
         // Check if the device is ready to be reset
         if (D3DERR_DEVICENOTRESET == _hr) return DeviceState::NeedReset;
     }
-#endif  // USE_DX10
+#endif // USE_DX10
     return DeviceState::Normal;
 }
 

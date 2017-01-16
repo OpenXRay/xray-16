@@ -70,9 +70,9 @@ void CRenderTarget::phase_scene_end()
     // transfer from "rt_Accumulator" into "rt_Color"
     u_setrt(rt_Color, 0, 0, HW.pBaseZB);
     RCache.set_CullMode(CULL_NONE);
-    RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0x00);  // stencil should be >= 1
+    RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0x00); // stencil should be >= 1
     if (RImplementation.o.nvstencil) u_stencil_optimize(FALSE);
-    RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0x00);  // stencil should be >= 1
+    RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0x00); // stencil should be >= 1
     RCache.set_ColorWriteEnable();
 
     // common calc for quad-rendering
@@ -98,7 +98,7 @@ void CRenderTarget::phase_scene_end()
     RCache.Vertex.Unlock(4, g_combine->vb_stride);
 
     // if (stencil>=1 && aref_pass)	stencil = light_id
-    RCache.set_Element(s_accum_mask->E[SE_MASK_ALBEDO]);  // masker
+    RCache.set_Element(s_accum_mask->E[SE_MASK_ALBEDO]); // masker
     RCache.set_Geometry(g_combine);
     RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
 }

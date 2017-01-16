@@ -187,7 +187,7 @@ public:
     // respectExistingSplits - DONT_RESPECT_SPLITS means that neighboring triangles for smoothing will be determined
     //						  based on position and not on indices.
     //						  RESPECT_SPLITS means that neighboring triangles will be determined based on the indices of
-    //the
+    // the
     //						  triangle and not the positions of the vertices.
     //						  you can usually get better smoothing by not respecting existing splits
     //						  only respect them if you know they should be respected.
@@ -247,7 +247,7 @@ protected:
         NeighborhoodID group;
         void Reset();
 
-        TriID myID;  // a global id used to keep track of tris'
+        TriID myID; // a global id used to keep track of tris'
     };
 
     xr_vector<Triangle> m_Triangles;
@@ -270,9 +270,9 @@ protected:
 
     // function responsible for growing the neighbor hood groups
     // arround a vertex
-    void BuildGroups(Triangle* tri,         // the tri of interest
-        TriangleList& possibleNeighbors,    // all tris arround a vertex
-        NeighborGroupList& neighborGroups,  // the neighbor groups to be updated
+    void BuildGroups(Triangle* tri,        // the tri of interest
+        TriangleList& possibleNeighbors,   // all tris arround a vertex
+        NeighborGroupList& neighborGroups, // the neighbor groups to be updated
         xr_vector<Vertex>& theVerts, CanSmoothChecker* smoothChecker, const float& minCreaseAngle);
 
     // given 2 triangles, fill the two neighbor pointers with either

@@ -13,7 +13,7 @@
 
 #ifdef DEBUG
 extern BOOL death_anim_debug;
-#endif  // DEBUG
+#endif // DEBUG
 
 character_shell_control::character_shell_control()
     : m_shot_up_factor(0.f), m_after_death_velocity_factor(1.f), m_was_wounded(false), m_Pred_Time(0.0)

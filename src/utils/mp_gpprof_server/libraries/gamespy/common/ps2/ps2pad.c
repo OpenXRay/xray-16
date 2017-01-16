@@ -95,13 +95,13 @@ int PadInit(void)
     if (0 >= sceSifLoadModule(ROOT_DIR "padman.irx", 0, NULL)) return 0;
 
     // Misc init
-    sceDmaReset(1);       // reset DMA
-    sceGsResetPath();     // reset GS
-    sceGsSyncPath(0, 0);  // wait for completion
+    sceDmaReset(1);      // reset DMA
+    sceGsResetPath();    // reset GS
+    sceGsSyncPath(0, 0); // wait for completion
 
     // Open the pad port
     scePadInit(0);
-    if (0 == scePadPortOpen(0, 0, mPadDMABuf)) return 0;  // couldn't initialize pad
+    if (0 == scePadPortOpen(0, 0, mPadDMABuf)) return 0; // couldn't initialize pad
 
     return 1;
 }
@@ -119,7 +119,7 @@ void PadReadInput(int events[NumPadEvents])
     mPadState = scePadGetState(0, 0);
     // if (mPadState >= 0 && state <= 7)
     //	scePadStateIntToStr(state, buf); // get error string
-    if (mPadState == scePadStateDiscon) mPadPhase = 0;  // lost pad
+    if (mPadState == scePadStateDiscon) mPadPhase = 0; // lost pad
 
     switch (mPadPhase)
     {
@@ -162,14 +162,14 @@ void PadReadInput(int events[NumPadEvents])
 
     // 2nd step special processing for "standard" controller
     case 41:
-        if (scePadGetReqState(0, 0) == scePadReqStateFaild) mPadPhase--;  // failed, go back a phase
+        if (scePadGetReqState(0, 0) == scePadReqStateFaild) mPadPhase--; // failed, go back a phase
         if (scePadGetReqState(0, 0) == scePadReqStateComplete)
-            mPadPhase = 0;  // completed, go back to beginning to try again
+            mPadPhase = 0; // completed, go back to beginning to try again
         break;
 
     // 1st step special processing for "analog" controller
     case 70:
-        if (scePadInfoAct(0, 0, -1, 0) == 0) mPadPhase = 99;  // done
+        if (scePadInfoAct(0, 0, -1, 0) == 0) mPadPhase = 99; // done
         mActAlign[0] = 0;
         mActAlign[1] = 1;
         for (i = 2; i < 6; i++)
@@ -180,7 +180,7 @@ void PadReadInput(int events[NumPadEvents])
     // 2nd step special processing for "analog" controller
     case 71:
         if (scePadGetReqState(0, 0) == scePadReqStateFaild) mPadPhase--;
-        if (scePadGetReqState(0, 0) == scePadReqStateComplete) mPadPhase = 99;  // finished, jump to end
+        if (scePadGetReqState(0, 0) == scePadReqStateComplete) mPadPhase = 99; // finished, jump to end
 
     case 99:
     default:

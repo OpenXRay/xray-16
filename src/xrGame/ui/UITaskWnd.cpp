@@ -420,7 +420,7 @@ bool CUITaskItem::OnMouseAction(float x, float y, EUIMessages mouse_action)
         show_hint_can = false;
         show_hint = false;
         break;
-    }  // switch
+    } // switch
 
     return true;
 }

@@ -16,13 +16,13 @@ enum clientdata_event_t
 class clientdata_proxy : Noncopyable
 {
 private:
-    ClientID m_admin_id;    // for file transfer
-    ClientID m_chearer_id;  // for file receiving
+    ClientID m_admin_id;   // for file transfer
+    ClientID m_chearer_id; // for file receiving
     shared_str m_cheater_name;
     shared_str m_cheater_digest;
     CMemoryWriter my_proxy_mem_file;
     void save_proxy_screenshot();
-    void save_proxy_config();  // compressed
+    void save_proxy_config(); // compressed
     bool m_first_receive;
     file_transfer::filereceiver_node* m_receiver;
 
@@ -43,6 +43,6 @@ public:
     void __stdcall download_screenshot_callback(file_transfer::receiving_status_t status, u32 downloaded, u32 total);
     void __stdcall download_config_callback(file_transfer::receiving_status_t status, u32 downloaded, u32 total);
     void __stdcall upload_file_callback(file_transfer::sending_status_t status, u32 uploaded, u32 total);
-};  // class clientdata_proxy
+}; // class clientdata_proxy
 
-#endif  //#ifndef SCREENSHOT_SERVER
+#endif //#ifndef SCREENSHOT_SERVER

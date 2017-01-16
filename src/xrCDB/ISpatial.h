@@ -79,13 +79,13 @@ class IRender_Light;
 class SpatialData
 {
 public:
-    u32 type = 0;  // STYPE_
+    u32 type = 0; // STYPE_
     Fsphere sphere;
-    Fvector node_center;      // Cached node center for TBV optimization
-    float node_radius;        // Cached node bounds for TBV optimization
-    ISpatial_NODE* node_ptr;  // Cached parent node for "empty-members" optimization
+    Fvector node_center;     // Cached node center for TBV optimization
+    float node_radius;       // Cached node bounds for TBV optimization
+    ISpatial_NODE* node_ptr; // Cached parent node for "empty-members" optimization
     IRender_Sector* sector;
-    ISpatial_DB* space;  // allow different spaces
+    ISpatial_DB* space; // allow different spaces
 };
 
 class ISpatial
@@ -147,9 +147,9 @@ public:
     typedef _W64 unsigned ptrt;
 
 public:
-    ISpatial_NODE* parent;       // parent node for "empty-members" optimization
-    ISpatial_NODE* children[8];  // children nodes
-    xr_vector<ISpatial*> items;  // own items
+    ISpatial_NODE* parent;      // parent node for "empty-members" optimization
+    ISpatial_NODE* children[8]; // children nodes
+    xr_vector<ISpatial*> items; // own items
 public:
     void _init(ISpatial_NODE* _parent);
     void _remove(ISpatial* _S);
@@ -167,7 +167,7 @@ public:
 // class	poolSS;
 #ifndef DLL_API
 #define DLL_API XR_IMPORT
-#endif  // #ifndef	DLL_API
+#endif // #ifndef	DLL_API
 
 //////////////////////////////////////////////////////////////////////////
 class XRCDB_API ISpatial_DB
@@ -178,8 +178,8 @@ public:
         u32 NodeCount;
         u32 ObjectCount;
 #ifdef DEBUG
-        CStatTimer Insert;  // debug only
-        CStatTimer Remove;  // debug only
+        CStatTimer Insert; // debug only
+        CStatTimer Remove; // debug only
 #endif
         CStatTimer Query;
 
@@ -277,4 +277,4 @@ XRCDB_API extern ISpatial_DB* g_SpatialSpacePhysic;
 
 #pragma pack(pop)
 
-#endif  // #ifndef XRENGINE_ISPATIAL_H_INCLUDED
+#endif // #ifndef XRENGINE_ISPATIAL_H_INCLUDED

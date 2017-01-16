@@ -153,8 +153,8 @@ void CCF_Skeleton::BuildState()
 
             I->b_hsize.set(B.m_halfsize);
             // prepare matrix World to Element
-            T.mul_43(Mbone, ME);  // model space
-            TW.mul_43(L2W, T);    // world space
+            T.mul_43(Mbone, ME); // model space
+            TW.mul_43(L2W, T);   // world space
             bool b = I->b_IM.invert_b(TW);
             // check matrix validity
             if (!b) {
@@ -164,8 +164,8 @@ void CCF_Skeleton::BuildState()
                 Msg("object name %s", owner->cName().c_str());
 #ifdef DEBUG
                 Msg(dbg_object_full_dump_string(owner).c_str());
-#endif                                 //#ifdef DEBUG
-                I->elem_id = u16(-1);  //. hack - disable invalid bone
+#endif                                //#ifdef DEBUG
+                I->elem_id = u16(-1); //. hack - disable invalid bone
             }
         }
         break;
@@ -358,7 +358,7 @@ BOOL CCF_Shape::_RayQuery(const collide::ray_defs& Q, collide::rq_results& R)
             }
         }
         break;
-        case 1:  // box
+        case 1: // box
         {
             Fbox box;
             box.identity();
@@ -410,7 +410,7 @@ void CCF_Shape::ComputeBounds()
     {
         switch (shapes[el].type)
         {
-        case 0:  // sphere
+        case 0: // sphere
         {
             Fsphere T = shapes[el].data.sphere;
             Fvector P;
@@ -423,7 +423,7 @@ void CCF_Shape::ComputeBounds()
             bv_sphere = T;
         }
         break;
-        case 1:  // box
+        case 1: // box
         {
             Fvector A, B;
             Fmatrix& T = shapes[el].data.box;
@@ -486,7 +486,7 @@ BOOL CCF_Shape::Contact(IGameObject* O)
     {
         switch (shapes[el].type)
         {
-        case 0:  // sphere
+        case 0: // sphere
         {
             Fsphere Q;
             Fsphere& T = shapes[el].data.sphere;
@@ -495,7 +495,7 @@ BOOL CCF_Shape::Contact(IGameObject* O)
             if (S.intersect(Q)) return TRUE;
         }
         break;
-        case 1:  // box
+        case 1: // box
         {
             Fmatrix Q;
             Fmatrix& T = shapes[el].data.box;

@@ -12,7 +12,7 @@ class CSoundRender_Core : public CSound_manager_interface
 protected:
     struct SoundStatistics
     {
-        CStatTimer Update;  // total time taken by sound subsystem (accurate only in single-threaded mode)
+        CStatTimer Update; // total time taken by sound subsystem (accurate only in single-threaded mode)
 
         SoundStatistics() { FrameStart(); }
         void FrameStart() { Update.FrameStart(); }
@@ -40,7 +40,7 @@ public:
 public:
     BOOL bPresent;
     BOOL bUserEnvironment;
-    BOOL bEAX;  // Boolean variable to indicate presence of EAX Extension
+    BOOL bEAX; // Boolean variable to indicate presence of EAX Extension
     BOOL bDeferredEAX;
     BOOL bReady;
 
@@ -61,10 +61,10 @@ protected:
     // Containers
     xr_vector<CSoundRender_Source*> s_sources;
     xr_vector<CSoundRender_Emitter*> s_emitters;
-    u32 s_emitters_u;  // emitter update marker
+    u32 s_emitters_u; // emitter update marker
     xr_vector<CSoundRender_Target*> s_targets;
     xr_vector<CSoundRender_Target*> s_targets_defer;
-    u32 s_targets_pu;  // parameters update
+    u32 s_targets_pu; // parameters update
     SoundEnvironment_LIB* s_environment;
     CSoundRender_Environment s_user_environment;
 

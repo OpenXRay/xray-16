@@ -253,7 +253,7 @@ void CUITalkWnd::ToTopicMode()
 
 void CUITalkWnd::AskQuestion()
 {
-    if (m_bNeedToUpdateQuestions) return;  // quick dblclick:(
+    if (m_bNeedToUpdateQuestions) return; // quick dblclick:(
     shared_str phrase_id;
 
     //игрок выбрал тему разговора
@@ -318,7 +318,7 @@ void CUITalkWnd::SwitchToTrade()
                             pGameSP->MainInputReceiver()->HideDialog();
                         }*/
             pGameSP->StartTrade(m_pOurInvOwner, m_pOthersInvOwner);
-        }  // pGameSP
+        } // pGameSP
     }
 }
 

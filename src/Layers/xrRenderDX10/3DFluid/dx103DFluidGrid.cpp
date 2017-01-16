@@ -4,12 +4,12 @@
 
 struct VS_INPUT_FLUIDSIM_STRUCT
 {
-    D3DXVECTOR3 Pos;  // Clip space position for slice vertices
-    D3DXVECTOR3 Tex;  // Cell coordinates in 0-"texture dimension" range
+    D3DXVECTOR3 Pos; // Clip space position for slice vertices
+    D3DXVECTOR3 Tex; // Cell coordinates in 0-"texture dimension" range
 };
 
 namespace
-{  //	namespace start
+{ //	namespace start
 
 inline void ComputeRowColsForFlat3DTexture(int depth, int* outCols, int* outRows)
 {
@@ -26,7 +26,7 @@ inline void ComputeRowColsForFlat3DTexture(int depth, int* outCols, int* outRows
     *outCols = m_iCols;
     *outRows = m_iRows;
 }
-}  //	namespace end
+} //	namespace end
 
 #define VERTICES_PER_SLICE 6
 #define VERTICES_PER_LINE 2

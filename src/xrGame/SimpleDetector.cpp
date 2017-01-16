@@ -37,7 +37,7 @@ void CSimpleDetector::UpdateAf()
 
     Fvector detector_pos = Position();
 
-    for (; it_b != it_e; ++it_b)  // only nearest
+    for (; it_b != it_e; ++it_b) // only nearest
     {
         CArtefact* pAf = it_b->first;
         if (pAf->H_Parent()) continue;

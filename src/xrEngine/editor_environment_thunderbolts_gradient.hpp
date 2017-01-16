@@ -44,12 +44,12 @@ private:
 
 private:
     property_holder* m_property_holder;
-};  // class gradient
+}; // class gradient
 
-}  // namespace thunderbolts
-}  // namespace environment
-}  // namespace editor
+} // namespace thunderbolts
+} // namespace environment
+} // namespace editor
 
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR
 
-#endif  // ifndef EDITOR_WEATHER_THUNDERBOLTS_GRADIENT_HPP_INCLUDED
+#endif // ifndef EDITOR_WEATHER_THUNDERBOLTS_GRADIENT_HPP_INCLUDED

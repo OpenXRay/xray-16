@@ -37,7 +37,7 @@ private:
     bool haveGotUpdate;
     // bool sendedSpawnMe;
 
-    u16 greenArtefactOwner;  // GameID, if 0, then no body took the artefact
+    u16 greenArtefactOwner; // GameID, if 0, then no body took the artefact
     u16 blueArtefactOwner;
 
     const shared_str& GetLocalPlayerTeamSection() const;

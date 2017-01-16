@@ -47,7 +47,7 @@ void animation_planner::setup(CAI_Stalker* object, CPropertyStorage* storage)
     inherited::setup(object);
 #ifdef DEBUG
 //	inherited::m_use_log	= true;
-#endif  // DEBUG
+#endif // DEBUG
 
     add_evaluators();
     add_actions();
@@ -289,7 +289,7 @@ bool animation_planner::hit_callback(SHit const* hit)
 
 #ifndef MASTER_GOLD
     if (hit->who && smart_cast<CActor*>(hit->who) && psAI_Flags.test(aiIgnoreActor)) return (false);
-#endif  // MASTER_GOLD
+#endif // MASTER_GOLD
 
     if (!object().g_Alive()) return (false);
 

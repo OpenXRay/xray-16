@@ -45,7 +45,7 @@ void CRenderTarget::accum_point(light* L)
     // *** similar to "Carmack's reverse", but assumes convex, non intersecting objects,
     // *** thus can cope without stencil clear with 127 lights
     // *** in practice, 'cause we "clear" it back to 0x1 it usually allows us to > 200 lights :)
-    RCache.set_Element(s_accum_mask->E[SE_MASK_POINT]);  // masker
+    RCache.set_Element(s_accum_mask->E[SE_MASK_POINT]); // masker
     RCache.set_ColorWriteEnable(FALSE);
 
     // backfaces: if (stencil>=1 && zfail)	stencil = light_id
@@ -66,7 +66,7 @@ void CRenderTarget::accum_point(light* L)
     // *****************************	Minimize overdraw	*************************************
     // Select shader (front or back-faces), *** back, if intersect near plane
     RCache.set_ColorWriteEnable();
-    RCache.set_CullMode(CULL_CW);  // back
+    RCache.set_CullMode(CULL_CW); // back
     /*
     if (bIntersect)	RCache.set_CullMode		(CULL_CW);		// back
     else			RCache.set_CullMode		(CULL_CCW);		// front

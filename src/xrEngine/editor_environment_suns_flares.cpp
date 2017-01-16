@@ -60,9 +60,9 @@ void flares::load(CInifile& config, shared_str const& section)
         READ_IF_EXISTS(&config, r_string, section, "flare_position", "1.300, 1.000, 0.500, -0.300, -0.600, -1.000");
     shared_str flare_radius =
         READ_IF_EXISTS(&config, r_string, section, "flare_radius", "0.080, 0.120, 0.040, 0.080, 0.120, 0.300");
-    shared_str flare_textures = READ_IF_EXISTS(
-        &config, r_string, section, "flare_textures", "fx\\fx_flare1.tga, fx\\fx_flare2.tga, fx\\fx_flare2.tga, "
-                                                      "fx\\fx_flare2.tga, fx\\fx_flare3.tga, fx\\fx_flare1.tga");
+    shared_str flare_textures = READ_IF_EXISTS(&config, r_string, section, "flare_textures",
+        "fx\\fx_flare1.tga, fx\\fx_flare2.tga, fx\\fx_flare2.tga, "
+        "fx\\fx_flare2.tga, fx\\fx_flare3.tga, fx\\fx_flare1.tga");
 
     u32 opacity_count = _GetItemCount(flare_opacity.c_str());
     u32 position_count = _GetItemCount(flare_position.c_str());
@@ -106,4 +106,4 @@ void flares::fill(
     properties->add_property("flares", "flares", "this option is resposible for flares", m_collection);
 }
 
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR

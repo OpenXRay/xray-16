@@ -88,9 +88,9 @@ void CUICustomSpin::Enable(bool status)
     m_pBtnUp->Enable(status);
 
     if (!status)
-        m_pLines->SetTextColor(m_textColor[0]);  // enabled color
+        m_pLines->SetTextColor(m_textColor[0]); // enabled color
     else
-        m_pLines->SetTextColor(m_textColor[1]);  // disabled color
+        m_pLines->SetTextColor(m_textColor[1]); // disabled color
 }
 
 void CUICustomSpin::OnBtnUpClick()

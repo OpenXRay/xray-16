@@ -177,19 +177,22 @@ ChooseValue* CScriptPropertiesListHelper::CreateChoose(
     return (PHelper().CreateChoose(*items, key, wrap_value<shared_str>(object, name), mode, 0));
 }
 
-// S8Value* CScriptPropertiesListHelper::CreateS8		(PropItemVec* items, LPCSTR key, luabind::object object, LPCSTR name,
+// S8Value* CScriptPropertiesListHelper::CreateS8		(PropItemVec* items, LPCSTR key, luabind::object object, LPCSTR
+// name,
 // s8 mn,  s8 mx,  s8 inc)
 //{
 //	return		(PHelper().CreateS8(*items,key,wrap_value<s8>(object,name),mn,mx,inc));
 //}
 //
-// S8Value* CScriptPropertiesListHelper::CreateS8		(PropItemVec* items, LPCSTR key, luabind::object object, LPCSTR name,
+// S8Value* CScriptPropertiesListHelper::CreateS8		(PropItemVec* items, LPCSTR key, luabind::object object, LPCSTR
+// name,
 // s8 mn,  s8 mx)
 //{
 //	return		(PHelper().CreateS8(*items,key,wrap_value<s8>(object,name),mn,mx));
 //}
 //
-// S8Value* CScriptPropertiesListHelper::CreateS8		(PropItemVec* items, LPCSTR key, luabind::object object, LPCSTR name,
+// S8Value* CScriptPropertiesListHelper::CreateS8		(PropItemVec* items, LPCSTR key, luabind::object object, LPCSTR
+// name,
 // s8 mn)
 //{
 //	return		(PHelper().CreateS8(*items,key,wrap_value<s8>(object,name),mn));

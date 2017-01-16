@@ -43,4 +43,4 @@ void spritnter_stopper::OnPlayerKilled(
     m_sprinter_victim_velocity = state.fVelocity;
 }
 
-}  // namespace award_system
+} // namespace award_system

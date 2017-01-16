@@ -21,7 +21,7 @@ void CRenderTarget::accum_spot(light* L)
         if (!shader) shader = s_accum_spot;
     }
 
-    BOOL bIntersect = FALSE;  // enable_scissor(L);
+    BOOL bIntersect = FALSE; // enable_scissor(L);
     {
         // setup xform
         L->xform_calc();
@@ -35,7 +35,7 @@ void CRenderTarget::accum_spot(light* L)
         // *** thus can cope without stencil clear with 127 lights
         // *** in practice, 'cause we "clear" it back to 0x1 it usually allows us to > 200 lights :)
         RCache.set_ColorWriteEnable(FALSE);
-        RCache.set_Element(s_accum_mask->E[SE_MASK_SPOT]);  // masker
+        RCache.set_Element(s_accum_mask->E[SE_MASK_SPOT]); // masker
 
         // backfaces: if (stencil>=1 && zfail)			stencil = light_id
         RCache.set_CullMode(CULL_CW);
@@ -56,7 +56,7 @@ void CRenderTarget::accum_spot(light* L)
     // *****************************	Minimize overdraw	*************************************
     // Select shader (front or back-faces), *** back, if intersect near plane
     RCache.set_ColorWriteEnable();
-    RCache.set_CullMode(CULL_CW);  // back
+    RCache.set_CullMode(CULL_CW); // back
 
     // 2D texgens
     Fmatrix m_Texgen;
@@ -186,7 +186,7 @@ void CRenderTarget::accum_volumetric(light* L)
 
     // *** assume accumulator setted up ***
     // *****************************	Mask by stencil		*************************************
-    BOOL bIntersect = FALSE;  // enable_scissor(L);
+    BOOL bIntersect = FALSE; // enable_scissor(L);
     {
         // setup xform
         L->xform_calc();
@@ -199,7 +199,7 @@ void CRenderTarget::accum_volumetric(light* L)
     }
 
     RCache.set_ColorWriteEnable();
-    RCache.set_CullMode(CULL_NONE);  // back
+    RCache.set_CullMode(CULL_NONE); // back
 
     // 2D texgens
     Fmatrix m_Texgen;

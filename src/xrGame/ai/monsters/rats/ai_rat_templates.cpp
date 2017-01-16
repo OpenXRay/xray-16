@@ -179,7 +179,7 @@ void CAI_Rat::make_turn()
     m_tHPB.x = -movement().m_body.current.yaw;
     m_tHPB.y = -movement().m_body.current.pitch;
 
-    XFORM().setHPB(m_tHPB.x, m_tHPB.y, 0.f);  // m_tHPB.z);
+    XFORM().setHPB(m_tHPB.x, m_tHPB.y, 0.f); // m_tHPB.z);
     Position() = tSavedPosition;
 }
 
@@ -225,16 +225,16 @@ Fvector CAI_Rat::calc_position()
     tOffset.sub(m_tGoalDir, Position());
 
     if (!m_bStraightForward) {
-        if (tOffset.y > 1.0) {  // We're too low
+        if (tOffset.y > 1.0) { // We're too low
             m_tHPB.y += fAT;
             if (m_tHPB.y > 0.8f) m_tHPB.y = 0.8f;
         }
         else if (tOffset.y < -1.0)
-        {  // We're too high
+        { // We're too high
             m_tHPB.y -= fAT;
             if (m_tHPB.y < -0.8f) m_tHPB.y = -0.8f;
         }
-        else  // Add damping
+        else // Add damping
             m_tHPB.y *= 0.95f;
     }
 

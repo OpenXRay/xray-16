@@ -10,14 +10,14 @@ class vec_float4
 __attribute__((aligned(16)));
 #else
 __declspec(align(16));
-#endif  // __GNUC__
-#endif  // __CELLOS_LV2__
+#endif // __GNUC__
+#endif // __CELLOS_LV2__
 
 #ifdef __CELLOS_LV2__
 #include "vectormath_soa.h"
 #else
 #include "vectormath_scalar/vectormath_aos.h"
-#endif  // __CELLOS_LV2__
+#endif // __CELLOS_LV2__
 
 using namespace Vectormath;
 using namespace Vectormath::Aos;

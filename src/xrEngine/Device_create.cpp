@@ -20,7 +20,7 @@ void CRenderDevice::_SetupStates()
 
 void CRenderDevice::Create()
 {
-    if (b_is_Ready) return;  // prevent double call
+    if (b_is_Ready) return; // prevent double call
     Statistic = new CStats();
     bool gpuSW = !!strstr(Core.Params, "-gpu_sw");
     bool gpuNonPure = !!strstr(Core.Params, "-gpu_nopure");

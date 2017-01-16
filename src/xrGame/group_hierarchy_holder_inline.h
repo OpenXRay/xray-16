@@ -14,7 +14,7 @@ IC CGroupHierarchyHolder::CGroupHierarchyHolder(CSquadHierarchyHolder* squad)
     m_squad = squad;
 #ifdef SQUAD_HIERARCHY_HOLDER_USE_LEADER
     m_leader = 0;
-#endif  // SQUAD_HIERARCHY_HOLDER_USE_LEADER
+#endif // SQUAD_HIERARCHY_HOLDER_USE_LEADER
     m_visible_objects = 0;
     m_sound_objects = 0;
     m_hit_objects = 0;
@@ -53,7 +53,7 @@ IC CEntity* CGroupHierarchyHolder::leader() const
 {
     return (m_leader);
 }
-#endif  // SQUAD_HIERARCHY_HOLDER_USE_LEADER
+#endif // SQUAD_HIERARCHY_HOLDER_USE_LEADER
 
 IC GroupHierarchyHolder::VISIBLE_OBJECTS& CGroupHierarchyHolder::visible_objects() const
 {

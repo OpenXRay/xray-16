@@ -594,7 +594,7 @@ void CSE_ALifeTrader::FillProps(LPCSTR _pref, PropItemVec& items)
     inherited1::FillProps(_pref, items);
     inherited2::FillProps(_pref, items);
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifeCustomZone
@@ -674,7 +674,7 @@ void CSE_ALifeCustomZone::FillProps(LPCSTR pref, PropItemVec& items)
     PHelper().CreateU32(
         items, PrepareKey(pref, *s_name, "on/off mode\\Disabled time (sec)"), &m_disabled_time, 0, 100000);
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifeAnomalousZone
@@ -759,7 +759,7 @@ void CSE_ALifeAnomalousZone::STATE_Read(NET_Packet& tNetPacket, u16 size)
         tNetPacket.r_float();
         tNetPacket.r_float();
     }
-    if ((m_wVersion == 102)) {  // fuck
+    if ((m_wVersion == 102)) { // fuck
         u32 dummy;
         tNetPacket.r_u32(dummy);
     }
@@ -793,7 +793,7 @@ void CSE_ALifeAnomalousZone::FillProps(LPCSTR pref, PropItemVec& items)
         items, PrepareKey(pref, *s_name, "ALife\\Artefact spawn places count"), &m_artefact_spawn_count, 32, 256);
     PHelper().CreateFlag32(items, PrepareKey(pref, *s_name, "ALife\\Visible for AI"), &m_flags, flVisibleForAI);
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
 //////////////////////////////////////////////////////////////////////////
 // SE_ALifeTorridZone
@@ -840,7 +840,7 @@ void CSE_ALifeTorridZone::FillProps(LPCSTR pref, PropItemVec& values)
     inherited1::FillProps(pref, values);
     inherited2::FillProps(pref, values);
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
 //////////////////////////////////////////////////////////////////////////
 // CSE_ALifeZoneVisual
@@ -896,7 +896,7 @@ void CSE_ALifeZoneVisual::FillProps(LPCSTR pref, PropItemVec& values)
     PHelper().CreateChoose(values, PrepareKey(pref, abstract->name(), "Attack animation"), &attack_animation,
         smSkeletonAnims, 0, (void*)*visual_name);
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 //-------------------------------------------------------------------------
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifeCreatureAbstract
@@ -955,7 +955,7 @@ void CSE_ALifeCreatureAbstract::on_death(CSE_Abstract* killer)
     m_game_death_time = ai().get_alife() ? alife().time_manager().game_time() : Level().GetGameTime();
     fHealth = -1.f;
 }
-#endif  // XRGAME_EXPORTS
+#endif // XRGAME_EXPORTS
 
 void CSE_ALifeCreatureAbstract::STATE_Write(NET_Packet& tNetPacket)
 {
@@ -1057,7 +1057,7 @@ void CSE_ALifeCreatureAbstract::FillProps(LPCSTR pref, PropItemVec& items)
     PHelper().CreateU8(items, PrepareKey(pref, *s_name, "Group"), &s_group, 0, 64, 1);
     PHelper().CreateFloat(items, PrepareKey(pref, *s_name, "Personal", "Health"), &fHealth, 0, 2, 5);
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
 bool CSE_ALifeCreatureAbstract::used_ai_locations() const
 {
@@ -1150,7 +1150,7 @@ CSE_ALifeMonsterAbstract::CSE_ALifeMonsterAbstract(LPCSTR caSection)
 #ifdef XRGAME_EXPORTS
     m_stay_after_death_time_interval =
         generate_time(1, 1, 1, pSettings->r_u32("monsters_common", "stay_after_death_time_interval"), 0, 0);
-#endif  // XRGAME_EXPORTS
+#endif // XRGAME_EXPORTS
 }
 
 CSE_ALifeMonsterAbstract::~CSE_ALifeMonsterAbstract()
@@ -1271,7 +1271,7 @@ void CSE_ALifeMonsterAbstract::FillProps(LPCSTR pref, PropItemVec& items)
             smSpawnItem, 0, (void*)gcs, 16);
     }
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
 bool CSE_ALifeMonsterAbstract::need_update(CSE_ALifeDynamicObject* object)
 {
@@ -1295,7 +1295,7 @@ bool CSE_ALifeMonsterAbstract::has_detector()
     return false;
 }
 
-#endif  // #ifdef XRGAME_EXPORTS
+#endif // #ifdef XRGAME_EXPORTS
 
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifeCreatureActor
@@ -1384,7 +1384,7 @@ void CSE_ALifeCreatureActor::load(NET_Packet& tNetPacket)
 
 BOOL CSE_ALifeCreatureActor::Net_Relevant()
 {
-    return TRUE;  // this is a big question ;)
+    return TRUE; // this is a big question ;)
 }
 
 void CSE_ALifeCreatureActor::UPDATE_Read(NET_Packet& tNetPacket)
@@ -1472,7 +1472,7 @@ void CSE_ALifeCreatureActor::FillProps(LPCSTR pref, PropItemVec& items)
     inherited1::FillProps(pref, items);
     inherited2::FillProps(pref, items);
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
 #ifdef XRGAME_EXPORTS
 void CSE_ALifeCreatureActor::spawn_supplies()
@@ -1525,7 +1525,7 @@ void CSE_ALifeCreatureCrow::FillProps(LPCSTR pref, PropItemVec& values)
 {
     inherited::FillProps(pref, values);
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
 bool CSE_ALifeCreatureCrow::used_ai_locations() const
 {
@@ -1572,7 +1572,7 @@ void CSE_ALifeCreaturePhantom::FillProps(LPCSTR pref, PropItemVec& values)
 {
     inherited::FillProps(pref, values);
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
 bool CSE_ALifeCreaturePhantom::used_ai_locations() const
 {
@@ -1590,7 +1590,7 @@ CSE_ALifeMonsterRat::CSE_ALifeMonsterRat(LPCSTR caSection)
     // personal charactersitics
     fEyeFov = 120;
     fEyeRange = 10;
-    set_health(5);  // fHealth                       = 5;
+    set_health(5); // fHealth                       = 5;
     fMinSpeed = .5;
     fMaxSpeed = 1.5;
     fAttackSpeed = 4.0;
@@ -1739,7 +1739,7 @@ void CSE_ALifeMonsterRat::FillProps(LPCSTR pref, PropItemVec& items)
     PHelper().CreateFloat(
         items, PrepareKey(pref, *s_name, "Attack", "Success probability"), &fAttackSuccessProbability, 0, 100, 1);
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
 bool CSE_ALifeMonsterRat::bfUseful()
 {
@@ -1756,7 +1756,7 @@ CSE_ALifeMonsterZombie::CSE_ALifeMonsterZombie(LPCSTR caSection) : CSE_ALifeMons
     // personal charactersitics
     fEyeFov = 120;
     fEyeRange = 30;
-    set_health(200);  // fHealth                       = 200;
+    set_health(200); // fHealth                       = 200;
     fMinSpeed = 1.5;
     fMaxSpeed = 1.75;
     fAttackSpeed = 2.0;
@@ -1842,7 +1842,7 @@ void CSE_ALifeMonsterZombie::FillProps(LPCSTR pref, PropItemVec& items)
     PHelper().CreateFloat(items, PrepareKey(pref, *s_name, "Attack", "Distance"), &fAttackDistance, 0, 300, 10);
     PHelper().CreateFloat(items, PrepareKey(pref, *s_name, "Attack", "Maximum angle"), &fAttackAngle, 0, 100, 1);
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
 //////////////////////////////////////////////////////////////////////////
 // CSE_ALifeMonsterBase
@@ -1898,7 +1898,7 @@ void CSE_ALifeMonsterBase::FillProps(LPCSTR pref, PropItemVec& values)
     inherited1::FillProps(pref, values);
     inherited2::FillProps(pref, values);
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
 //////////////////////////////////////////////////////////////////////////
 // CSE_ALifePsyDogPhantom
@@ -1936,7 +1936,7 @@ void CSE_ALifePsyDogPhantom::FillProps(LPCSTR pref, PropItemVec& values)
 {
     inherited::FillProps(pref, values);
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
 //////////////////////////////////////////////////////////////////////////
 // CSE_ALifeHumanAbstract
@@ -2014,7 +2014,7 @@ void CSE_ALifeHumanAbstract::FillProps(LPCSTR pref, PropItemVec& items)
     inherited2::FillProps(pref, items);
     PHelper().CreateFlag32(items, PrepareKey(pref, *s_name, "Group behaviour"), &m_flags, flGroupBehaviour);
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
 //////////////////////////////////////////////////////////////////////////
 // CSE_ALifeHumanStalker
@@ -2071,7 +2071,7 @@ void CSE_ALifeHumanStalker::FillProps(LPCSTR pref, PropItemVec& values)
     inherited1::FillProps(pref, values);
     inherited2::FillProps(pref, values);
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
 //////////////////////////////////////////////////////////////////////////
 // CSE_ALifeOnlineOfflineGroup
@@ -2121,9 +2121,9 @@ CALifeSmartTerrainTask* CSE_ALifeOnlineOfflineGroup::get_current_task()
     NODEFAULT;
 #ifdef DEBUG
     return 0;
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 }
-#endif  // #ifdef XRGAME_EXPORTS
+#endif // #ifdef XRGAME_EXPORTS
 
 void CSE_ALifeOnlineOfflineGroup::STATE_Write(NET_Packet& tNetPacket)
 {
@@ -2170,4 +2170,4 @@ void CSE_ALifeOnlineOfflineGroup::FillProps(LPCSTR pref, PropItemVec& values)
 {
     inherited1::FillProps(pref, values);
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS

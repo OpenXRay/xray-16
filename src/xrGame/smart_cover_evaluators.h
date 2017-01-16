@@ -224,8 +224,8 @@ public:
     virtual _value_type evaluate();
 };
 
-}  // namespace evaluators
+} // namespace evaluators
 
-}  // namespace smart_covers
+} // namespace smart_covers
 
-#endif  // SMART_COVER_EVALUATORS_H_INCLUDED
+#endif // SMART_COVER_EVALUATORS_H_INCLUDED

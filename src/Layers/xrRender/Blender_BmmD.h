@@ -9,12 +9,12 @@
 class CBlender_BmmD : public IBlender
 {
 public:
-    string64 oT2_Name;   // name of secondary texture
-    string64 oT2_xform;  // xform for secondary texture
-    string64 oR_Name;    //. задел на будущее
-    string64 oG_Name;    //. задел на будущее
-    string64 oB_Name;    //. задел на будущее
-    string64 oA_Name;    //. задел на будущее
+    string64 oT2_Name;  // name of secondary texture
+    string64 oT2_xform; // xform for secondary texture
+    string64 oR_Name;   //. задел на будущее
+    string64 oG_Name;   //. задел на будущее
+    string64 oB_Name;   //. задел на будущее
+    string64 oA_Name;   //. задел на будущее
 public:
     virtual LPCSTR getComment() { return "LEVEL: Implicit**detail"; }
     virtual BOOL canBeDetailed() { return TRUE; }
@@ -28,4 +28,4 @@ public:
     virtual ~CBlender_BmmD();
 };
 
-#endif  // !defined(AFX_BLENDERDEFAULT_H__C12F64EE_43E7_4483_9AC3_29272E0401E7__INCLUDED_BmmD)
+#endif // !defined(AFX_BLENDERDEFAULT_H__C12F64EE_43E7_4483_9AC3_29272E0401E7__INCLUDED_BmmD)

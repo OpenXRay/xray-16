@@ -41,4 +41,4 @@ bool bone_group::is_bone_in_group(u16 bone_id, enum_group_id gid) const
     return (tmp_iter->second == gid);
 }
 
-}  // namespace award_system
+} // namespace award_system

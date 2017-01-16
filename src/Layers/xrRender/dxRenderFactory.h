@@ -17,10 +17,10 @@ class dxRenderFactory : public IRenderFactory
     RENDER_FACTORY_DECLARE(ConsoleRender)
 #ifdef DEBUG
     RENDER_FACTORY_DECLARE(ObjectSpaceRender)
-#endif  // DEBUG
+#endif // DEBUG
     RENDER_FACTORY_DECLARE(ApplicationRender)
     RENDER_FACTORY_DECLARE(WallMarkArray)
-#endif  // _EDITOR
+#endif // _EDITOR
 
 #ifndef _EDITOR
     RENDER_FACTORY_DECLARE(FlareRender)
@@ -37,4 +37,4 @@ class dxRenderFactory : public IRenderFactory
 
 extern dxRenderFactory RenderFactoryImpl;
 
-#endif  //	RenderFactory_included
+#endif //	RenderFactory_included

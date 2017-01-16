@@ -96,5 +96,5 @@ BOOL xrRender_test_hw()
     // hr = _HW.m_pAdapter->CheckInterfaceSupport(__uuidof(ID3DDevice), 0);
     //_HW.DestroyD3D				()		;
 
-    return TestDX11Present();  // SUCCEEDED(hr);
+    return TestDX11Present(); // SUCCEEDED(hr);
 }

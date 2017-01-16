@@ -44,4 +44,4 @@ extern dx10StateCache<ID3DBlendState, D3D_BLEND_DESC> BSManager;
 
 #include "dx10StateCacheImpl.h"
 
-#endif  //	dx10StateCache_included
+#endif //	dx10StateCache_included

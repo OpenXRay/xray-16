@@ -303,12 +303,12 @@ unsigned int MxPropSlim::check_local_validity(unsigned int v, const float* vnew)
             unsigned int y = f[(k + 2) % 3];
 
             float d_yx[3], d_vx[3], d_vnew[3], f_n[3], n[3];
-            mxv_sub(d_yx, m->vertex(y), m->vertex(x), 3);  // d_yx = y-x
-            mxv_sub(d_vx, m->vertex(v), m->vertex(x), 3);  // d_vx = v-x
-            mxv_sub(d_vnew, vnew, m->vertex(x), 3);        // d_vnew = vnew-x
+            mxv_sub(d_yx, m->vertex(y), m->vertex(x), 3); // d_yx = y-x
+            mxv_sub(d_vx, m->vertex(v), m->vertex(x), 3); // d_vx = v-x
+            mxv_sub(d_vnew, vnew, m->vertex(x), 3);       // d_vnew = vnew-x
 
             mxv_cross3(f_n, d_yx, d_vx);
-            mxv_cross3(n, f_n, d_yx);  // n = ((y-x)^(v-x))^(y-x)
+            mxv_cross3(n, f_n, d_yx); // n = ((y-x)^(v-x))^(y-x)
             mxv_unitize(n, 3);
 
             // assert( mxv_dot(d_vx, n, 3) > -FEQ_EPS );
@@ -572,7 +572,7 @@ void MxPropSlim::collect_edges()
         m->collect_vertex_star(i, star);
 
         for (unsigned int j = 0; j < (unsigned int)star.length(); j++)
-            if (i < star(j))  // Only add particular edge once
+            if (i < star(j)) // Only add particular edge once
                 create_edge(i, star(j));
     }
 }
@@ -645,7 +645,7 @@ void MxPropSlim::update_pre_contract(const MxPairContraction& conx)
             VERIFY(found);
             edge_links(u).remove(j);
             heap.remove(e);
-            if (u != v1) xr_delete(e);  // (v1,v2) will be deleted later
+            if (u != v1) xr_delete(e); // (v1,v2) will be deleted later
         }
         else
         {

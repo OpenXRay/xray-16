@@ -30,7 +30,7 @@ public:
         QueryPerformanceCounter(&t);
         return ((t.QuadPart - _start_time.QuadPart) * 1000.0) / _freq.QuadPart;
     }
-    double time() const  // in milliseconds
+    double time() const // in milliseconds
     {
         return ((_stop_time.QuadPart - _start_time.QuadPart) * 1000.0) / _freq.QuadPart;
     }
@@ -261,7 +261,7 @@ static bool _ProcessFile_PPMd(const char* file_name)
         delete[] uncomp_data;
         delete[] comp_data;
         delete[] src_data;
-    }  // if file open
+    } // if file open
 
     return success;
 }
@@ -362,7 +362,7 @@ static bool _ProcessFile_LZO(const char* file_name)
         delete[] uncomp_data;
         delete[] comp_data;
         delete[] src_data;
-    }  // if file open
+    } // if file open
 
     return success;
 }
@@ -489,7 +489,7 @@ int main(int argc, char* argv[])
         printf("LZO  :  %2.1f%%  %u -> %u\n", 100.0f * float(_LZO_TotalCompressed) / float(_LZO_TotalUncompressed),
             _LZO_TotalUncompressed, _LZO_TotalCompressed);
 
-    }  // if( argc > 1 )
+    } // if( argc > 1 )
 
     return 0;
 }

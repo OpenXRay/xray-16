@@ -18,9 +18,9 @@ class XRCDB_API xrXRC
 public:
     struct ColliderStatistics
     {
-        CStatTimer RayQuery;      // total: ray-testing
-        CStatTimer BoxQuery;      // total: box query
-        CStatTimer FrustumQuery;  // total: frustum query
+        CStatTimer RayQuery;     // total: ray-testing
+        CStatTimer BoxQuery;     // total: box query
+        CStatTimer FrustumQuery; // total: frustum query
         float RayPs = 0;
         float BoxPs = 0;
 
@@ -83,4 +83,4 @@ public:
 };
 XRCDB_API extern xrXRC XRC;
 
-#endif  // !defined(AFX_XRXRC_H__9AA25268_621F_4FCA_BD75_AF2E9822B8E3__INCLUDED_)
+#endif // !defined(AFX_XRXRC_H__9AA25268_621F_4FCA_BD75_AF2E9822B8E3__INCLUDED_)

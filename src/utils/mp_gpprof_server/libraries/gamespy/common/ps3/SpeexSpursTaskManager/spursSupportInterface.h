@@ -19,12 +19,12 @@
 #if CELL_SDK_VERSION < 0x081000
 #define CELL_SPURS_TASK_ERROR_AGAIN CELL_SPURS_EAGAIN
 #define CELL_SPURS_TASK_ERROR_BUSY CELL_SPURS_EBUSY
-#endif  // CELL_SDK_VERSION < 0x081000
+#endif // CELL_SDK_VERSION < 0x081000
 
-#else  // __SPU__
+#else // __SPU__
 #include <cell/spurs/task.h>
 
-#endif  // __SPU__
+#endif // __SPU__
 
 #define CELL_SPURS_RESPONSE_QUEUE_SIZE 128
 
@@ -104,7 +104,7 @@ static inline void sendResponseToPPUAndExit(
 
     cellSpursExit();
 }
-#elif __PPU__  // not __SPU__
+#elif __PPU__ // not __SPU__
 
 class SpursSupportInterface : public spursThreadSupportInterface
 {
@@ -124,6 +124,6 @@ protected:
 
     bool m_bQueueInitialized;
 };
-#endif         // __SPU__ / __PPU__
+#endif        // __SPU__ / __PPU__
 
-#endif  // CELL_SPURS_SUPPORT_H
+#endif // CELL_SPURS_SUPPORT_H

@@ -51,7 +51,7 @@ public:
         s.calc_time = Device.dwTimeGlobal;
         s.blending =
             valide() &&
-            (state.blending || state.foot_step != s.foot_step);  // prev_state.state !=calculate_state::not_definite &&
+            (state.blending || state.foot_step != s.foot_step); // prev_state.state !=calculate_state::not_definite &&
 
         s.collide_pos = state.collide_pos;
         Fmatrix cl_pos = state.collide_pos.get();

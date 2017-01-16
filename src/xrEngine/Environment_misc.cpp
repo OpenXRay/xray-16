@@ -33,7 +33,7 @@ float CEnvModifier::sum(CEnvModifier& M, Fvector3& view)
     float _dist_sq = view.distance_to_sqr(M.position);
     if (_dist_sq >= (M.radius * M.radius)) return 0;
 
-    float _att = 1 - _sqrt(_dist_sq) / M.radius;  //[0..1];
+    float _att = 1 - _sqrt(_dist_sq) / M.radius; //[0..1];
     float _power = M.power * _att;
 
     if (M.use_flags.test(eViewDist)) {
@@ -373,7 +373,7 @@ void CEnvDescriptorMixer::clear()
 void CEnvDescriptorMixer::lerp(
     CEnvironment*, CEnvDescriptor& A, CEnvDescriptor& B, float f, CEnvModifier& Mdf, float modifier_power)
 {
-    float modif_power = 1.f / (modifier_power + 1);  // the environment itself
+    float modif_power = 1.f / (modifier_power + 1); // the environment itself
     float fi = 1 - f;
 
     m_pDescriptorMixer->lerp(&*A.m_pDescriptor, &*B.m_pDescriptor);
@@ -670,7 +670,7 @@ void CEnvironment::load_weather_effects()
             env.back()->exec_time_loaded = DAY_LENGTH;
         }
     }
-#endif  // #if 0
+#endif // #if 0
 
     // sorting weather envs
     EnvsMapIt _I = WeatherFXs.begin();

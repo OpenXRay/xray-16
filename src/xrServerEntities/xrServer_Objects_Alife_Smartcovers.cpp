@@ -24,7 +24,7 @@
 
 #pragma comment(lib, "shlwapi.lib")
 static SFillPropData fp_data;
-#endif  // XRSE_FACTORY_EXPORTS
+#endif // XRSE_FACTORY_EXPORTS
 
 #ifdef XRSE_FACTORY_EXPORTS
 bool parse_bool(luabind::object const& table, LPCSTR identifier)
@@ -61,13 +61,13 @@ BOOL is_combat_cover(shared_str const& table_id)
 
     return (parse_bool(table, "is_combat_cover") ? TRUE : FALSE);
 }
-#endif  // XRSE_FACTORY_EXPORTS
+#endif // XRSE_FACTORY_EXPORTS
 
 CSE_SmartCover::CSE_SmartCover(LPCSTR section) : CSE_ALifeDynamicObject(section)
 {
 #ifdef XRSE_FACTORY_EXPORTS
     fp_data.inc();
-#endif  // XRSE_FACTORY_EXPORTS
+#endif // XRSE_FACTORY_EXPORTS
 
     m_enter_min_enemy_distance = pSettings->r_float(section, "enter_min_enemy_distance");
     m_exit_min_enemy_distance = pSettings->r_float(section, "exit_min_enemy_distance");
@@ -80,7 +80,7 @@ CSE_SmartCover::~CSE_SmartCover()
 {
 #ifdef XRSE_FACTORY_EXPORTS
     fp_data.dec();
-#endif  // XRSE_FACTORY_EXPORTS
+#endif // XRSE_FACTORY_EXPORTS
 }
 
 IServerEntityShape* CSE_SmartCover::shape()
@@ -123,7 +123,7 @@ void CSE_SmartCover::set_available_loopholes(luabind::object table)
 {
     m_available_loopholes = table;
 }
-#endif  // #ifndef AI_COMPILER
+#endif // #ifndef AI_COMPILER
 
 void CSE_SmartCover::STATE_Read(NET_Packet& tNetPacket, u16 size)
 {
@@ -180,9 +180,9 @@ void CSE_SmartCover::FillProps(LPCSTR pref, PropItemVec& items)
         PHelper().CreateBOOL(items, PrepareKey(pref, *s_name, "is combat cover"), &m_is_combat_cover);
         PHelper().CreateBOOL(items, PrepareKey(pref, *s_name, "can fire"), &m_can_fire);
     }
-#endif  // #ifdef XRSE_FACTORY_EXPORTS
+#endif // #ifdef XRSE_FACTORY_EXPORTS
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
 #ifdef XRSE_FACTORY_EXPORTS
 void CSE_SmartCover::set_loopholes_table_checker(BOOLValue* value)
@@ -258,7 +258,7 @@ shared_str parse_vertex(luabind::object const& table, LPCSTR identifier, bool co
 {
     return (transform_vertex(parse_string(table, identifier), in));
 }
-}  // namespace smart_cover
+} // namespace smart_cover
 
 void CSE_SmartCover::set_enterable(shared_str const& id)
 {
@@ -310,7 +310,7 @@ class CSE_SmartVisual : public CSE_Visual
 {
 public:
     virtual CSE_Visual* __stdcall visual() { return (this); }
-};  // class CSE_SmartVisual
+}; // class CSE_SmartVisual
 
 void CSE_SmartCover::fill_visuals()
 {
@@ -363,7 +363,7 @@ void draw_frustum(CDUInterface* du, float FOV, float _FAR, float A, Fvector& P, 
     COP.set(P);
 
     // calculate the corner vertices of the window
-    Fvector sPts[4];  // silhouette points (corners of window)
+    Fvector sPts[4]; // silhouette points (corners of window)
     Fvector Offset, T;
     Offset.add(D, COP);
 
@@ -556,4 +556,4 @@ void CSE_SmartCover::on_render(
         draw_frustum(du, H.fov, H.range, 1.f, pos, dir, up, color_rgba(255, 0, 0, 255));
     }
 }
-#endif  // #ifdef XRSE_FACTORY_EXPORTS
+#endif // #ifdef XRSE_FACTORY_EXPORTS

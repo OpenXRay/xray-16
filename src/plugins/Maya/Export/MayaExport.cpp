@@ -96,10 +96,10 @@ MStatus CXRayObjectExport::ExportAll(CEditableObject* O)
                 if (status != MS::kSuccess) {
                     fprintf(stderr, "Error: exporting geom failed.\n");
                     freeLookupTables();
-                    destroyEdgeTable();  // Free up the edge table
+                    destroyEdgeTable(); // Free up the edge table
                     return MS::kFailure;
                 }
-                destroyEdgeTable();  // Free up the edge table
+                destroyEdgeTable(); // Free up the edge table
             }
         }
     }
@@ -187,10 +187,10 @@ MStatus CXRayObjectExport::ExportSelected(CEditableObject* O)
                         if (status != MS::kSuccess) {
                             fprintf(stderr, "Error: exporting geom failed, check your selection.\n");
                             freeLookupTables();
-                            destroyEdgeTable();  // Free up the edge table
+                            destroyEdgeTable(); // Free up the edge table
                             return MS::kFailure;
                         }
-                        destroyEdgeTable();  // Free up the edge table
+                        destroyEdgeTable(); // Free up the edge table
                     }
                 }
             }
@@ -229,7 +229,7 @@ int AppendUV(st_VMap*& VM, Fvector2& _uv)
 }
 
 MStatus CXRayObjectExport::set_smoth_flags(
-    u32& flags, const MIntArray& tri_vert_indeces)  //  const MFnMesh &fnMesh, const MItMeshPolygon &meshPoly,
+    u32& flags, const MIntArray& tri_vert_indeces) //  const MFnMesh &fnMesh, const MItMeshPolygon &meshPoly,
 {
     return t_set_smoth_flags(*this, flags, tri_vert_indeces);
 }
@@ -405,8 +405,8 @@ MStatus CXRayObjectExport::ExportPart(CEditableObject* O, MDagPath& mdagPath, MO
             for (int i = 0; i < cTri; i++)
             {
                 // for each triangle, first get the triangle data
-                rgpt.clear();   // triangle vertices
-                rgint.clear();  // triangle vertex indices
+                rgpt.clear();  // triangle vertices
+                rgint.clear(); // triangle vertex indices
 
                 // triangles that come from object are retrieved in world space
                 status = meshPoly.getTriangle(i, rgpt, rgint, MSpace::kWorld);

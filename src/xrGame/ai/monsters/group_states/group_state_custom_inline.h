@@ -35,7 +35,7 @@ void CStateCustomGroupAbstract::setup_substates()
         SStateDataAction data;
 
         data.action = ACT_STAND_IDLE;
-        data.time_out = 0;  // do not use time out
+        data.time_out = 0; // do not use time out
         switch (object->get_number_animation())
         {
         case u32(5): data.sound_type = MonsterSound::eMonsterSoundSteal; break;

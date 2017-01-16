@@ -336,7 +336,7 @@ void CLevel::ProcessGameEvents()
             }
             case M_FILE_TRANSFER:
             {
-                if (m_file_transfer)  // in case of net_Stop
+                if (m_file_transfer) // in case of net_Stop
                     m_file_transfer->on_message(&P);
                 break;
             }
@@ -476,7 +476,7 @@ void CLevel::OnFrame()
                         F->OutNext("0x%08x: P(%d), BPS(%2.1fK), MRR(%2d), MSR(%2d), Retried(%2d), Blocked(%2d)",
                             // Server->game->get_option_s(*C->Name,"name",*C->Name),
                             C->ID.value(), C->stats.getPing(),
-                            float(C->stats.getBPS()),  // /1024,
+                            float(C->stats.getBPS()), // /1024,
                             C->stats.getMPS_Receive(), C->stats.getMPS_Send(), C->stats.getRetriedCount(),
                             C->stats.dwTimesBlocked);
                     }
@@ -609,7 +609,7 @@ void CLevel::OnRender()
                 CInventoryItem* pIItem = smart_cast<CInventoryItem*>(_O);
                 if (pIItem) pIItem->OnRender();
             }
-            if (dbg_net_Draw_Flags.test(dbg_draw_skeleton))  // draw skeleton
+            if (dbg_net_Draw_Flags.test(dbg_draw_skeleton)) // draw skeleton
             {
                 CGameObject* pGO = smart_cast<CGameObject*>(_O);
                 if (pGO && pGO != Level().CurrentViewEntity() && !pGO->H_Parent()) {
@@ -789,7 +789,7 @@ void CLevel::make_NetCorrectionPrediction()
         obj->PH_I_CrPr();
     }
     if (!InterpolationDisabled()) {
-        for (u32 i = 0; i < lvInterpSteps; i++)  // second prediction "real current" to "future" position
+        for (u32 i = 0; i < lvInterpSteps; i++) // second prediction "real current" to "future" position
         {
             physics_world()->Step();
         }

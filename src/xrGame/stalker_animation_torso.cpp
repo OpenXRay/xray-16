@@ -28,12 +28,12 @@ MotionID CStalkerAnimationManager::aim_animation(
 
     if (slot != 2) return (animation[6].A[index]);
 
-#if 1  // def DEBUG
+#if 1 // def DEBUG
     if (animation[6].A.size() < 7) {
         Msg("! cannot find special danger animations for object with visual %s", object().cNameVisual().c_str());
         return (animation[6].A[index]);
     }
-#endif  // DEBUG
+#endif // DEBUG
 
     switch (index)
     {
@@ -45,7 +45,7 @@ MotionID CStalkerAnimationManager::aim_animation(
 
 #ifdef DEBUG
     return (MotionID());
-#endif  // DEBUG
+#endif // DEBUG
 }
 
 void CStalkerAnimationManager::torso_play_callback(CBlend* blend)
@@ -209,7 +209,7 @@ MotionID CStalkerAnimationManager::missile_animation(u32 slot, const EBodyState&
 
     const xr_vector<CAniVector>& animation = m_data_storage->m_part_animations.A[body_state].m_torso.A[slot].A;
     //	const xr_vector<CAniVector>		&animation =
-    //m_data_storage->m_part_animations.A[eBodyStateStand].m_torso.A[slot].A;
+    // m_data_storage->m_part_animations.A[eBodyStateStand].m_torso.A[slot].A;
 
     switch (m_missile->GetState())
     {
@@ -218,7 +218,7 @@ MotionID CStalkerAnimationManager::missile_animation(u32 slot, const EBodyState&
         if (animation[0].A.empty()) {
             Msg("! visual %s", object().cNameVisual().c_str());
         }
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
         return (torso().select(animation[0].A));
     }
     case CMissile::eHiding: {
@@ -226,7 +226,7 @@ MotionID CStalkerAnimationManager::missile_animation(u32 slot, const EBodyState&
         if (animation[3].A.empty()) {
             Msg("! visual %s", object().cNameVisual().c_str());
         }
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
         return (torso().select(animation[3].A));
     }
     case CMissile::eThrowStart:
@@ -236,7 +236,7 @@ MotionID CStalkerAnimationManager::missile_animation(u32 slot, const EBodyState&
         if (animation[1].A.empty()) {
             Msg("! visual %s", object().cNameVisual().c_str());
         }
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
         return (animation[1].A[0]);
     }
     case CMissile::eReady:
@@ -246,7 +246,7 @@ MotionID CStalkerAnimationManager::missile_animation(u32 slot, const EBodyState&
         if (animation[1].A.size() < 2) {
             Msg("! visual %s", object().cNameVisual().c_str());
         }
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
         return (animation[1].A[1]);
     }
     case CMissile::eThrow:
@@ -256,7 +256,7 @@ MotionID CStalkerAnimationManager::missile_animation(u32 slot, const EBodyState&
         if (animation[1].A.size() < 3) {
             Msg("! visual %s", object().cNameVisual().c_str());
         }
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
         return (animation[1].A[2]);
     }
     case CMissile::eThrowEnd: {
@@ -264,7 +264,7 @@ MotionID CStalkerAnimationManager::missile_animation(u32 slot, const EBodyState&
         if (animation[6].A.empty()) {
             Msg("! visual %s", object().cNameVisual().c_str());
         }
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
         //			Msg						("CMissile::eThrowEnd");
         return (animation[6].A[0]);
     }
@@ -273,7 +273,7 @@ MotionID CStalkerAnimationManager::missile_animation(u32 slot, const EBodyState&
         if (animation[1].A.size() < 2) {
             Msg("! visual %s", object().cNameVisual().c_str());
         }
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
         return (animation[1].A[1]);
     }
     case CMissile::eHidden: {
@@ -281,7 +281,7 @@ MotionID CStalkerAnimationManager::missile_animation(u32 slot, const EBodyState&
         if (animation[6].A.empty()) {
             Msg("! visual %s", object().cNameVisual().c_str());
         }
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
         return (animation[6].A[0]);
     }
     case CMissile::eIdle:
@@ -294,7 +294,7 @@ MotionID CStalkerAnimationManager::missile_animation(u32 slot, const EBodyState&
             if (animation[6].A.empty()) {
                 Msg("! visual %s", object().cNameVisual().c_str());
             }
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
             return (animation[6].A[0]);
         }
 
@@ -303,7 +303,7 @@ MotionID CStalkerAnimationManager::missile_animation(u32 slot, const EBodyState&
             if (animation[6].A.size() < 3) {
                 Msg("! visual %s", object().cNameVisual().c_str());
             }
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
             return (animation[6].A[2]);
         }
 
@@ -311,7 +311,7 @@ MotionID CStalkerAnimationManager::missile_animation(u32 slot, const EBodyState&
         if (animation[6].A.size() < 4) {
             Msg("! visual %s", object().cNameVisual().c_str());
         }
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
         return (animation[6].A[3]);
     }
     }

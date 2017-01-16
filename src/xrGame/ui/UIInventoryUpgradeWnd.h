@@ -23,7 +23,7 @@ class Manager;
 class Upgrade;
 class Property;
 }
-}  // namespace upgrade, inventory
+} // namespace upgrade, inventory
 
 class UIUpgrade;
 class CInventoryItem;
@@ -41,7 +41,7 @@ private:
     typedef inventory::upgrade::Property Property_type;
     typedef xr_vector<UIUpgrade*> UI_Upgrades_type;
 
-private:  // sub-classes
+private: // sub-classes
     struct Scheme
     {
         shared_str name;
@@ -111,6 +111,6 @@ public:
     ui_shader* m_WeaponIconsShader;
     ui_shader* m_OutfitIconsShader;
 
-};  // class CUIInventoryUpgradeWnd
+}; // class CUIInventoryUpgradeWnd
 
-#endif  // UI_INVENTORY_UPGRADE_WND_H_INCLUDED
+#endif // UI_INVENTORY_UPGRADE_WND_H_INCLUDED

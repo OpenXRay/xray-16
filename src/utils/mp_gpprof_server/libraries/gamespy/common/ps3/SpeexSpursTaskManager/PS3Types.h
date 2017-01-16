@@ -3,4 +3,4 @@
 
 //#include "CellVectorMath.h"
 
-#endif  // PS3_TYPES_H
+#endif // PS3_TYPES_H

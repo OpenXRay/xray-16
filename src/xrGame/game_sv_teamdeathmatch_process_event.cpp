@@ -24,5 +24,5 @@ void game_sv_TeamDeathmatch::OnEvent(NET_Packet& P, u16 type, u32 time, ClientID
     break;
     default: { inherited::OnEvent(P, type, time, sender);
     }
-    };  // switch (type)
+    }; // switch (type)
 }

@@ -55,7 +55,7 @@ private:
         ert_set_award = 0x00,
         ert_set_best_scores,
         ert_synchronize_profile
-    };  // enum enum_report_type
+    }; // enum enum_report_type
 
     enum_report_type m_report_type;
     enum_awards_t m_last_award_id;
@@ -91,6 +91,6 @@ private:
         const SCInterfacePtr theInterface, GHTTPResult theHttpResult, SCResult theResult, void* theUserData);
 };
 
-}  // namespace gamespy_profile
+} // namespace gamespy_profile
 
-#endif  //#ifndef STATS_SUBMITTER_INCLUDED
+#endif //#ifndef STATS_SUBMITTER_INCLUDED

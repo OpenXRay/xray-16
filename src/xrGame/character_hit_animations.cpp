@@ -39,10 +39,10 @@ void character_hit_animation_controller::SetupHitMotions(IKinematicsAnimated& ca
 */
     if (tune_hit_anims) g_params = ghit_anims_params;
 
-    bkhit_motion = ca.LL_MotionID("hitback17");  // hitback2.skl
+    bkhit_motion = ca.LL_MotionID("hitback17"); // hitback2.skl
     fvhit_motion = ca.LL_MotionID("hitfront17");
-    rthit_motion = ca.LL_MotionID("hitf_right17");  // hitright
-    lthit_motion = ca.LL_MotionID("hitf_left17");   // hitleft
+    rthit_motion = ca.LL_MotionID("hitf_right17"); // hitright
+    lthit_motion = ca.LL_MotionID("hitf_left17");  // hitleft
 
     turn_right = ca.LL_MotionID("hit_right_shoulder17");
     turn_left = ca.LL_MotionID("hit_left_shoulder17");
@@ -51,7 +51,7 @@ void character_hit_animation_controller::SetupHitMotions(IKinematicsAnimated& ca
     hit_downl = ca.LL_MotionID("hit_downl");
     hit_downr = ca.LL_MotionID("hit_downr");
 
-    base_bone = smart_cast<IKinematics*>(&ca)->LL_BoneID("bip01_spine1");  // bip01_spine1
+    base_bone = smart_cast<IKinematics*>(&ca)->LL_BoneID("bip01_spine1"); // bip01_spine1
     for (u16 i = 0; num_anims > i; ++i)
         block_blends[i] = 0;
 }
@@ -115,7 +115,7 @@ void character_hit_animation_controller::PlayHitMotion(
     hit_point.x = 0;
 
     float rotational_ammount =
-        hit_point.magnitude() * g_params.power_factor * g_params.rotational_power_factor;  //_abs(torqu.x)
+        hit_point.magnitude() * g_params.power_factor * g_params.rotational_power_factor; //_abs(torqu.x)
 
     if (torqu.x < 0)
         play_cycle(CA, hit_downr, 3, block_blends[7], 1);

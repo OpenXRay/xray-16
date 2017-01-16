@@ -29,10 +29,10 @@ enum NVI_PIXEL_FORMAT
     IMAGE_NOT_INITIALIZED,
     NVI_A8,
     //@	NVI_R8_G8_B8_A8, // unsigned integer - A is most sig byte
-    NVI_A8_R8_G8_B8,  // unsigned integer - A is most sig byte (0xAARRGGBB)
+    NVI_A8_R8_G8_B8, // unsigned integer - A is most sig byte (0xAARRGGBB)
     NVI_A1_R5_G5_B5,
     NVI_R5_G6_B5,
-    NVI_A16,  // 16-bit unsigned integer
+    NVI_A16, // 16-bit unsigned integer
     //@	NVI_R16_G16_B16,
     NVI_R16_G16_B16_A16,
     NVI_FMT_FORCEDWORD = 0xFFFFFFFF
@@ -62,7 +62,7 @@ public:
     BYTE* GetImageDataPointer() { return m_pArray; }
     bool IsDataValid();
     void FlipTopToBottom();
-    void AverageRGBToAlpha();  // write each pixels' avg r,g,b to alpha
+    void AverageRGBToAlpha(); // write each pixels' avg r,g,b to alpha
     void ABGR8_To_ARGB8();
 
 private:
@@ -120,16 +120,16 @@ __forceinline void NVI_Image::SetPixel_ARGB8(UINT index, DWORD pix)
 class NVI_ImageBordered : public NVI_Image
 {
 private:
-    int m_nBorderXLow;  // ** Negative or zero **
+    int m_nBorderXLow; // ** Negative or zero **
     // This is the offset from source images' 0,0
     //   that marks the left border.
     //	 Border width on the left = -m_nBorderXLow;
     //   x = 0 that pixels can be addressed
-    int m_nBorderXHigh;  // Size of border to 'right' of image.  >= 0
-    int m_nBorderYLow;   // Same thing for Y borders
+    int m_nBorderXHigh; // Size of border to 'right' of image.  >= 0
+    int m_nBorderYLow;  // Same thing for Y borders
     int m_nBorderYHigh;
-    NVI_Image** m_hSrcImage;  // Image from which this was created
-    bool m_bWrap;             // Wrap or clamp the border pixels
+    NVI_Image** m_hSrcImage; // Image from which this was created
+    bool m_bWrap;            // Wrap or clamp the border pixels
 
     void CopyDataFromSource();
 
@@ -154,4 +154,4 @@ __forceinline void NVI_ImageBordered::GetPixel(DWORD* outColor, int i, int j)
 }
 };
 
-#endif  // __NVIMAGELIB_NVI_IMAGE_H
+#endif // __NVIMAGELIB_NVI_IMAGE_H

@@ -47,9 +47,9 @@ const float aom_attack_radius = 0.6f;
 const float aom_update_side_period = 4000;
 const float aom_prediction_factor = 1.3f;
 
-}  // namespace base_monster
+} // namespace base_monster
 
-}  // namespace detail
+} // namespace detail
 
 void CBaseMonster::Load(LPCSTR section)
 {
@@ -332,7 +332,7 @@ BOOL CBaseMonster::net_Spawn(CSE_Abstract* DC)
     //	if (ai().get_alife()) {
     //
     //		CSE_ALifeMonsterBase					*se_monster =
-    //smart_cast<CSE_ALifeMonsterBase*>(ai().alife().objects().object(ID()));
+    // smart_cast<CSE_ALifeMonsterBase*>(ai().alife().objects().object(ID()));
     //		VERIFY									(se_monster);
     //
     //		if (se_monster->m_flags.is(CSE_ALifeMonsterBase::flNeedCheckSpawnItem)) {

@@ -48,4 +48,4 @@ class cl_light_XFORM : public R_constant_setup
     virtual void setup(R_constant* C);
 };
 
-#endif  // !defined(AFX_LIGHTPPA_H__E5B97AC9_84A6_4773_9FEF_3BC5D1CEF8B6__INCLUDED_)
+#endif // !defined(AFX_LIGHTPPA_H__E5B97AC9_84A6_4773_9FEF_3BC5D1CEF8B6__INCLUDED_)

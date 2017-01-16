@@ -25,11 +25,11 @@
 #include "xrAICore/Navigation/ai_object_location.h"
 
 #ifdef DEBUG
-#include "stalker_decision_space.h"
-#include "stalker_planner.h"
 #include "script_game_object.h"
 #include "stalker_combat_planner.h"
-#endif  // DEBUG
+#include "stalker_decision_space.h"
+#include "stalker_planner.h"
+#endif // DEBUG
 
 using namespace StalkerMovement;
 
@@ -53,7 +53,7 @@ public:
 
         m_manager.enable(m_value);
     }
-};  // struct sight_manager_enable_guard
+}; // struct sight_manager_enable_guard
 
 stalker_movement_manager_base::stalker_movement_manager_base(CAI_Stalker* object)
     : inherited(object), m_last_query_object(0), m_last_query_position(Fvector().set(flt_max, flt_max, flt_max)),
@@ -464,7 +464,7 @@ void stalker_movement_manager_base::parse_velocity_mask(stalker_movement_params&
                 Msg("~ stalker %s is doing bad thing (action %s)", *m_object->cName(),
                     planner.current_action().m_action_name);
         }
-#endif  // DEBUG
+#endif // DEBUG
         movement_params.m_mental_state = eMentalStateFree;
         break;
     }
@@ -731,7 +731,7 @@ void stalker_movement_manager_base::check_for_bad_path(stalker_movement_params& 
         if (angle > BAD_PATH_ANGLE) {
 #ifdef DEBUG
             Msg("bad path check changed movement type from RUN to WALK");
-#endif  // DEBUG
+#endif // DEBUG
             movement_params.m_movement_type = eMovementTypeWalk;
             return;
         }

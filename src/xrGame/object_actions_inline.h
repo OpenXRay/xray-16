@@ -49,7 +49,8 @@ void CObjectActionBase<_item_type>::prevent_weapon_state_switch_ugly()
 {
     // smart_cast<CHudItem&>(object().inventory().ActiveItem()->object()).SetState		( CHUDState::eIdle );
     // smart_cast<CHudItem&>(object().inventory().ActiveItem()->object()).SetNextState	( CHUDState::eIdle );
-    // object().inventory().SetActiveSlot												( object().inventory().GetActiveSlot()
+    // object().inventory().SetActiveSlot												(
+    // object().inventory().GetActiveSlot()
     // );
 }
 

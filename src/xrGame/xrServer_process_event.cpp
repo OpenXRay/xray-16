@@ -112,13 +112,13 @@ void xrServer::Process_event(NET_Packet& P, ClientID sender)
     {
         u16 id_entity;
         P.r_u16(id_entity);
-        CSE_Abstract* e_parent = receiver;                              // кто забирает (для своих нужд)
-        CSE_Abstract* e_entity = game->get_entity_from_eid(id_entity);  // кто отдает
+        CSE_Abstract* e_parent = receiver;                             // кто забирает (для своих нужд)
+        CSE_Abstract* e_entity = game->get_entity_from_eid(id_entity); // кто отдает
         if (!e_entity) break;
-        if (0xffff != e_entity->ID_Parent) break;  // this item already taken
+        if (0xffff != e_entity->ID_Parent) break; // this item already taken
         xrClientData* c_parent = e_parent->owner;
         xrClientData* c_from = ID_to_client(sender);
-        R_ASSERT(c_from == c_parent);  // assure client ownership of event
+        R_ASSERT(c_from == c_parent); // assure client ownership of event
 
         // Signal to everyone (including sender)
         SendBroadcast(BroadcastCID, P, MODE);
@@ -144,7 +144,7 @@ void xrServer::Process_event(NET_Packet& P, ClientID sender)
         u16 id_src;
         P.r_u16(id_src);
 
-        CSE_Abstract* e_dest = receiver;  // кто умер
+        CSE_Abstract* e_dest = receiver; // кто умер
         // this is possible when hit event is sent before destroy event
         if (!e_dest) break;
 
@@ -152,7 +152,7 @@ void xrServer::Process_event(NET_Packet& P, ClientID sender)
         if (creature) creature->set_killer_id(id_src);
 
         //		Msg							("[%d][%s] killed [%d][%s]",id_src,id_src==u16(-1) ? "UNKNOWN" :
-        //game->get_entity_from_eid(id_src)->name_replace(),id_dest,e_dest->name_replace());
+        // game->get_entity_from_eid(id_src)->name_replace(),id_dest,e_dest->name_replace());
 
         break;
     }
@@ -177,17 +177,17 @@ void xrServer::Process_event(NET_Packet& P, ClientID sender)
         if ((game->Type() != eGameIDSingle) && l_pC && l_pC->owner) {
             Msg("* [%2d] killed by [%2d] - sended by [0x%08x]", id_dest, id_src, l_pC->ID.value());
         }
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
 
-        CSE_Abstract* e_dest = receiver;  // кто умер
+        CSE_Abstract* e_dest = receiver; // кто умер
         // this is possible when hit event is sent before destroy event
         if (!e_dest) break;
 
 #ifndef MASTER_GOLD
         if (game->Type() != eGameIDSingle) Msg("* [%2d] is [%s:%s]", id_dest, *e_dest->s_name, e_dest->name_replace());
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
 
-        CSE_Abstract* e_src = game->get_entity_from_eid(id_src);  // кто убил
+        CSE_Abstract* e_src = game->get_entity_from_eid(id_src); // кто убил
         if (!e_src) {
             xrClientData* C = (xrClientData*)game->get_client(id_src);
             if (C) e_src = C->owner;
@@ -200,11 +200,11 @@ void xrServer::Process_event(NET_Packet& P, ClientID sender)
 //			R_ASSERT2			(e_dest && e_src, "Killer or/and being killed are offline or not exist at all :(");
 #ifndef MASTER_GOLD
         if (game->Type() != eGameIDSingle) Msg("* [%2d] is [%s:%s]", id_src, *e_src->s_name, e_src->name_replace());
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
 
         game->on_death(e_dest, e_src);
 
-        xrClientData* c_src = e_src->owner;  // клиент, чей юнит убил
+        xrClientData* c_src = e_src->owner; // клиент, чей юнит убил
 
         if (c_src->owner->ID == id_src) {
             // Main unit

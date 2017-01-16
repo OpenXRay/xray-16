@@ -56,7 +56,7 @@ void CTelekineticObject::set_sound(const ref_sound& snd_hold, const ref_sound& s
 
 void CTelekineticObject::raise_update()
 {
-    if (check_height() || check_raise_time_out()) prepare_keep();  // начать удержание предмета
+    if (check_height() || check_raise_time_out()) prepare_keep(); // начать удержание предмета
     // else if (check_raise_time_out()) release();
     else
     {

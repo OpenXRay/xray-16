@@ -66,7 +66,7 @@ static void dsa_genparams_cb(int p, int n, void* arg)
 static unsigned char rnd_seed[] = "S.T.A.L.K.E.R. 4ever Rulezz !!!";
 void print_big_number(BIGNUM* big_num, u32 max_columns = 8)
 {
-    u8 bin_buff[xr_dsa::public_key_length];  // public_key_length is the max
+    u8 bin_buff[xr_dsa::public_key_length]; // public_key_length is the max
     int bin_size = 0;
 
     string4096 result_buffer;
@@ -161,6 +161,6 @@ void xr_dsa::generate_params()
     DSA_free(tmp_dsa_params);
 }
 
-#endif  //#ifdef DEBUG
+#endif //#ifdef DEBUG
 
-}  // namespace crypto
+} // namespace crypto

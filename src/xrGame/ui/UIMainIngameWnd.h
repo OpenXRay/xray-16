@@ -57,7 +57,7 @@ public:
 
     void DrawMainIndicatorsForInventory();
 
-    CUIHudStatesWnd* get_hud_states() { return m_ui_hud_states; }  // temp
+    CUIHudStatesWnd* get_hud_states() { return m_ui_hud_states; } // temp
     void OnSectorChanged(int sector);
 
     xr_vector<CUIStatic*> m_quick_slots_icons;

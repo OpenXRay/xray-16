@@ -449,12 +449,12 @@ CTexture* CResourceManager::_CreateTexture(LPCSTR _Name)
     if (0 == xr_strcmp(_Name, "null")) return 0;
     R_ASSERT(_Name && _Name[0]);
     string_path Name;
-    xr_strcpy(Name, _Name);  //. andy if (strext(Name)) *strext(Name)=0;
+    xr_strcpy(Name, _Name); //. andy if (strext(Name)) *strext(Name)=0;
     fix_texture_name(Name);
 
 #ifdef DEBUG
     simplify_texture(Name);
-#endif  //	DEBUG
+#endif //	DEBUG
 
     // ***** first pass - search already loaded texture
     LPSTR N = LPSTR(Name);
@@ -753,7 +753,7 @@ SVS* CResourceManager::_CreateVS(LPCSTR _name)
             c_target, D3DXSHADER_DEBUG | D3DXSHADER_PACKMATRIX_ROWMAJOR /*| D3DXSHADER_PREFER_FLOW_CONTROL*/,
             &pShaderBuf, &pErrorBuf, NULL);
         //		_hr = D3DXCompileShader		(LPCSTR(fs->pointer()),fs->length(), NULL, &Includer, "main", target,
-        //D3DXSHADER_DEBUG | D3DXSHADER_PACKMATRIX_ROWMAJOR, &pShaderBuf, &pErrorBuf, NULL);
+        // D3DXSHADER_DEBUG | D3DXSHADER_PACKMATRIX_ROWMAJOR, &pShaderBuf, &pErrorBuf, NULL);
         FS.r_close(fs);
 
         if (SUCCEEDED(_hr)) {
@@ -872,7 +872,7 @@ SPS* CResourceManager::_CreatePS(LPCSTR name)
         _hr = GlobalEnv.Render->shader_compile(name, data, size, NULL, &Includer, c_entry, c_target,
             D3DXSHADER_DEBUG | D3DXSHADER_PACKMATRIX_ROWMAJOR, &pShaderBuf, &pErrorBuf, NULL);
         //_hr = D3DXCompileShader		(text,text_size, NULL, &Includer, c_entry, c_target, D3DXSHADER_DEBUG |
-        //D3DXSHADER_PACKMATRIX_ROWMAJOR, &pShaderBuf, &pErrorBuf, NULL);
+        // D3DXSHADER_PACKMATRIX_ROWMAJOR, &pShaderBuf, &pErrorBuf, NULL);
         xr_free(data);
 
         if (SUCCEEDED(_hr)) {

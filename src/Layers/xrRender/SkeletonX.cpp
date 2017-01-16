@@ -51,7 +51,7 @@ void CSkeletonX::_Copy(CSkeletonX* B)
 
 #if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
     m_Indices = B->m_Indices;
-#endif  //	USE_DX10
+#endif //	USE_DX10
 }
 //////////////////////////////////////////////////////////////////////
 void CSkeletonX::_Render(ref_geom& hGeom, u32 vCount, u32 iOffset, u32 pCount)
@@ -118,34 +118,34 @@ void CSkeletonX::_Render_soft(ref_geom& hGeom, u32 vCount, u32 iOffset, u32 pCou
 
         RImplementation.BasicStats.Skinning.Begin();
         if (*Vertices1W) {
-            Skin1W(Dest,                // dest
-                *Vertices1W,            // source
-                vCount,                 // count
-                Parent->bone_instances  // bones
+            Skin1W(Dest,               // dest
+                *Vertices1W,           // source
+                vCount,                // count
+                Parent->bone_instances // bones
                 );
         }
         else if (*Vertices2W)
         {
-            Skin2W(Dest,                // dest
-                *Vertices2W,            // source
-                vCount,                 // count
-                Parent->bone_instances  // bones
+            Skin2W(Dest,               // dest
+                *Vertices2W,           // source
+                vCount,                // count
+                Parent->bone_instances // bones
                 );
         }
         else if (*Vertices3W)
         {
-            Skin3W(Dest,                // dest
-                *Vertices3W,            // source
-                vCount,                 // count
-                Parent->bone_instances  // bones
+            Skin3W(Dest,               // dest
+                *Vertices3W,           // source
+                vCount,                // count
+                Parent->bone_instances // bones
                 );
         }
         else if (*Vertices4W)
         {
-            Skin4W(Dest,                // dest
-                *Vertices4W,            // source
-                vCount,                 // count
-                Parent->bone_instances  // bones
+            Skin4W(Dest,               // dest
+                *Vertices4W,           // source
+                vCount,                // count
+                Parent->bone_instances // bones
                 );
         }
         else
@@ -173,7 +173,7 @@ void CSkeletonX::_Load(const char* N, IReader* data, u32& dwVertCount)
 
 #if RENDER == R_R1
     if (ps_r1_SoftwareSkinning == 1) hw_bones_cnt = 0;
-#endif  // RENDER == R_R1
+#endif // RENDER == R_R1
 
     u16 sw_bones_cnt = 0;
 #ifdef _EDITOR
@@ -189,7 +189,7 @@ void CSkeletonX::_Load(const char* N, IReader* data, u32& dwVertCount)
 
     switch (dwVertType)
     {
-    case OGF_VERTEXFORMAT_FVF_1L:  // 1-Link
+    case OGF_VERTEXFORMAT_FVF_1L: // 1-Link
     case 1:
     {
         size = dwVertCount * sizeof(vertBoned1W);
@@ -232,7 +232,7 @@ void CSkeletonX::_Load(const char* N, IReader* data, u32& dwVertCount)
 #endif
     }
     break;
-    case OGF_VERTEXFORMAT_FVF_2L:  // 2-Link
+    case OGF_VERTEXFORMAT_FVF_2L: // 2-Link
     case 2:
     {
         size = dwVertCount * sizeof(vertBoned2W);
@@ -264,7 +264,7 @@ void CSkeletonX::_Load(const char* N, IReader* data, u32& dwVertCount)
         }
     }
     break;
-    case OGF_VERTEXFORMAT_FVF_3L:  // 3-Link
+    case OGF_VERTEXFORMAT_FVF_3L: // 3-Link
     case 3:
     {
         size = dwVertCount * sizeof(vertBoned3W);
@@ -294,7 +294,7 @@ void CSkeletonX::_Load(const char* N, IReader* data, u32& dwVertCount)
         }
     }
     break;
-    case OGF_VERTEXFORMAT_FVF_4L:  // 4-Link
+    case OGF_VERTEXFORMAT_FVF_4L: // 4-Link
     case 4:
     {
         size = dwVertCount * sizeof(vertBoned4W);
@@ -573,4 +573,4 @@ void CSkeletonX::_DuplicateIndices(const char* N, IReader* data)
     u32 crc = crc32(data->pointer(), size);
     m_Indices.create(crc, iCount, (u16*)data->pointer());
 }
-#endif  //	USE_DX10
+#endif //	USE_DX10

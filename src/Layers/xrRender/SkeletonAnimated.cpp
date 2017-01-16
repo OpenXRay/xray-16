@@ -229,7 +229,7 @@ void CKinematicsAnimated::LL_FadeCycle(u16 part, float falloff, u8 mask_channel 
         B.set_falloff_state();
         B.blendFalloff = falloff;
         // B.blendAccrue		= B.timeCurrent;
-        if (B.stop_at_end) B.stop_at_end_callback = FALSE;  // callback не должен приходить!
+        if (B.stop_at_end) B.stop_at_end_callback = FALSE; // callback не должен приходить!
     }
 }
 void CKinematicsAnimated::LL_CloseCycle(u16 part, u8 mask_channel /*= (1<<0)*/)
@@ -250,7 +250,7 @@ void CKinematicsAnimated::LL_CloseCycle(u16 part, u8 mask_channel /*= (1<<0)*/)
         for (u32 i = 0; i < P.bones.size(); i++)
             Bone_Motion_Stop_IM((*bones)[P.bones[i]], *I);
 
-        blend_cycles[part].erase(I);  // ?
+        blend_cycles[part].erase(I); // ?
         E = blend_cycles[part].end();
         I--;
     }
@@ -294,7 +294,7 @@ void CKinematicsAnimated::IBlendSetup(CBlend& B, u16 part, u8 channel, MotionID 
         B.blendAmount = 1;
     }
     B.blendAccrue = blendAccrue;
-    B.blendFalloff = 0;  // blendFalloff used for previous cycles
+    B.blendFalloff = 0; // blendFalloff used for previous cycles
     B.blendPower = 1;
     B.speed = Speed;
     B.motionID = motion_ID;
@@ -723,7 +723,7 @@ void CKinematicsAnimated::Load(const char* N, IReader* data, u32 dwFlags)
             // Check compatibility
             m_Motions.push_back(SMotionsSlot());
             bool create_res = true;
-            if (!g_pMotionsContainer->has(nm))  // optimize fs operations
+            if (!g_pMotionsContainer->has(nm)) // optimize fs operations
             {
                 IReader* MS = FS.r_open(fn);
                 create_res = m_Motions.back().motions.create(nm, MS, bones);
@@ -761,7 +761,7 @@ void CKinematicsAnimated::Load(const char* N, IReader* data, u32 dwFlags)
             // Check compatibility
             m_Motions.push_back(SMotionsSlot());
             bool create_res = true;
-            if (!g_pMotionsContainer->has(nm))  // optimize fs operations
+            if (!g_pMotionsContainer->has(nm)) // optimize fs operations
             {
                 IReader* MS = FS.r_open(fn);
                 create_res = m_Motions.back().motions.create(nm, MS, bones);
@@ -813,7 +813,7 @@ void CKinematicsAnimated::LL_BuldBoneMatrixDequatize(const CBoneData* bd, u8 cha
     u16 SelfID = bd->GetSelfID();
     CBlendInstance& BLEND_INST = LL_GetBlendInstance(SelfID);
     const CBlendInstance::BlendSVec& Blend = BLEND_INST.blend_vector();
-    CKey BK[MAX_CHANNELS][MAX_BLENDED];  // base keys
+    CKey BK[MAX_CHANNELS][MAX_BLENDED]; // base keys
     BlendSVecCIt BI;
     for (BI = Blend.begin(); BI != Blend.end(); BI++)
     {

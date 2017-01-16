@@ -134,7 +134,7 @@ bool game_sv_TeamDeathmatch::TeamSizeEqual()
     return GetPlayersCountInTeams(1) == GetPlayersCountInTeams(2);
 }
 
-struct lowest_player_functor  // for autoteam balance
+struct lowest_player_functor // for autoteam balance
 {
     s16 lowest_score;
     s16 MaxTeam;
@@ -244,7 +244,7 @@ void game_sv_TeamDeathmatch::OnPlayerConnect(ClientID id_who)
     xrClientData* xrCData = m_server->ID_to_client(id_who);
     game_PlayerState* ps_who = get_id(id_who);
     //	LPCSTR	options				=	get_name_id	(id_who);
-    ps_who->team = AutoTeam();  // u8(get_option_i(options,"team",AutoTeam()));
+    ps_who->team = AutoTeam(); // u8(get_option_i(options,"team",AutoTeam()));
 
     if (ps_who->IsSkip()) return;
 
@@ -509,7 +509,7 @@ void game_sv_TeamDeathmatch::Update()
     case GAME_PHASE_TEAMS_IN_A_DRAW:
     {
         if (m_delayedRoundEnd && m_roundEndDelay < Device.TimerAsync()) {
-            OnRoundEnd();  // eRoundEnd_Finish
+            OnRoundEnd(); // eRoundEnd_Finish
         }
     }
     break;
@@ -528,7 +528,7 @@ void game_sv_TeamDeathmatch::OnTimelimitExceed()
     m_phase = u16((winning_team) ? GAME_PHASE_TEAM2_SCORES : GAME_PHASE_TEAM1_SCORES);
     switch_Phase(m_phase);
 
-    OnDelayedRoundEnd(eRoundEnd_TimeLimit);  //"TIME_limit"
+    OnDelayedRoundEnd(eRoundEnd_TimeLimit); //"TIME_limit"
 }
 void game_sv_TeamDeathmatch::OnFraglimitExceed()
 {
@@ -537,7 +537,7 @@ void game_sv_TeamDeathmatch::OnFraglimitExceed()
     m_phase = u16((winning_team) ? GAME_PHASE_TEAM2_SCORES : GAME_PHASE_TEAM1_SCORES);
     switch_Phase(m_phase);
 
-    OnDelayedRoundEnd(eRoundEnd_FragLimit);  //"FRAG_limit"
+    OnDelayedRoundEnd(eRoundEnd_FragLimit); //"FRAG_limit"
 }
 //-----------------------------------------------
 void game_sv_TeamDeathmatch::ReadOptions(shared_str& options)

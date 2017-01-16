@@ -95,4 +95,4 @@ XRCORE_API HRESULT WINAPI DXTraceA(
 
 #ifdef __cplusplus
 }
-#endif  //__cplusplus
+#endif //__cplusplus

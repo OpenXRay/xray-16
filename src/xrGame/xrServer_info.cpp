@@ -13,7 +13,7 @@ server_info_uploader& xrServer::GetServerInfoUploader()
     struct free_info_searcher
     {
         bool operator()(server_info_uploader const* uplinfo) { return !uplinfo->is_active(); };
-    };  // struct free_info_searcher
+    }; // struct free_info_searcher
 
     info_uploaders_t::iterator tmp_iter =
         std::find_if(m_info_uploaders.begin(), m_info_uploaders.end(), free_info_searcher());
@@ -30,7 +30,7 @@ server_info_uploader& xrServer::GetServerInfoUploader()
     return *result;
 }
 
-void xrServer::SendServerInfoToClient(ClientID const& new_client)  // WARNING ! this function is thread unsafe !!!
+void xrServer::SendServerInfoToClient(ClientID const& new_client) // WARNING ! this function is thread unsafe !!!
 {
     if (IsGameTypeSingle()) {
         SendConfigFinished(new_client);

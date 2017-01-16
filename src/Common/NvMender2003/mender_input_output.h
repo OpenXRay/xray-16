@@ -36,15 +36,15 @@ static void fill_mender_input(const xr_vector<type_vertex>& vertices, const xr_v
 }
 
 template <typename type_vertex, typename type_face>
-static void retrive_data_from_mender_otput(xr_vector<type_vertex>& vertices,  // in-out
+static void retrive_data_from_mender_otput(xr_vector<type_vertex>& vertices, // in-out
     xr_vector<type_face>& faces, const xr_vector<MeshMender::Vertex>& theVerts,
     const xr_vector<unsigned int>& theIndices, const xr_vector<unsigned int>& mappingNewToOldVert)
 {
     xr_vector<type_vertex> old_vertices;
     {
         old_vertices.clear();
-        old_vertices = vertices;  // save old vertices to retrive through mappingNewToOldVert data that missing in
-                                  // MeshMender::Vertex
+        old_vertices = vertices; // save old vertices to retrive through mappingNewToOldVert data that missing in
+                                 // MeshMender::Vertex
         // retriving data
         const u32 face_count = faces.size();
         for (u32 i = 0; i < face_count; ++i)

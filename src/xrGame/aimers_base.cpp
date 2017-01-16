@@ -54,7 +54,7 @@ void base::aim_at_position(
 		VPUSH(object_position),
 		VPUSH(object_direction)
 	);
-#endif  // #if 0
+#endif // #if 0
 
     VERIFY2(_valid(bone_position), make_string("[%f][%f][%f]", VPUSH(bone_position)));
     VERIFY2(_valid(object_position), make_string("[%f][%f][%f]", VPUSH(object_position)));

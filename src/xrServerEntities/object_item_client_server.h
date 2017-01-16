@@ -43,7 +43,7 @@ public:
     virtual ObjectFactory::ClientObjectBaseClass* client_object() const;
     virtual ObjectFactory::ServerObjectBaseClass* server_object(LPCSTR section) const;
 };
-#endif  // NO_XR_GAME
+#endif // NO_XR_GAME
 
 #include "object_item_client_server_inline.h"
 

@@ -40,7 +40,7 @@ void light::vis_prepare()
     // skiptest	= true;
 
     if (skiptest || Device.vCameraPosition.distance_to(spatial.sphere.P) <= (spatial.sphere.R * 1.01f + safe_area))
-    {  // small error
+    { // small error
         vis.visible = true;
         vis.pending = false;
         vis.frame2test = frame + ::Random.randI(delay_small_min, delay_small_max);

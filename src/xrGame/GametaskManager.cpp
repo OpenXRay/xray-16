@@ -41,7 +41,7 @@ bool task_prio_pred(const SGameTaskKey& k1, const SGameTaskKey& k2)
 CGameTaskManager::CGameTaskManager()
 {
     m_gametasks_wrapper = new CGameTaskWrapper();
-    m_gametasks_wrapper->registry().init(0);  // actor's id
+    m_gametasks_wrapper->registry().init(0); // actor's id
     m_flags.zero();
     m_flags.set(eChanged, TRUE);
     m_gametasks = NULL;
@@ -66,7 +66,7 @@ vGameTasks& CGameTaskManager::GetGameTasks()
         m_gametasks = &m_gametasks_wrapper->registry().objects();
 #ifdef DEBUG
         Msg("m_gametasks size=%d", m_gametasks->size());
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
     }
 
     return *m_gametasks;
@@ -95,8 +95,8 @@ CGameTask* CGameTaskManager::GiveGameTaskToActor(CGameTask* t, u32 timeToComplet
     GetGameTasks().push_back(SGameTaskKey(t->m_ID));
     GetGameTasks().back().game_task = t;
     t->m_ReceiveTime = Level().GetGameTime();
-    t->m_TimeToComplete = t->m_ReceiveTime + timeToComplete * 1000;  // ms
-    t->m_timer_finish = t->m_ReceiveTime + timer_ttl * 1000;         // ms
+    t->m_TimeToComplete = t->m_ReceiveTime + timeToComplete * 1000; // ms
+    t->m_timer_finish = t->m_ReceiveTime + timer_ttl * 1000;        // ms
 
     std::stable_sort(GetGameTasks().begin(), GetGameTasks().end(), task_prio_pred);
 

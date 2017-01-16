@@ -35,7 +35,7 @@ void CStateAbstract::initialize()
 {
     time_state_started = Device.dwTimeGlobal;
 
-    current_substate = u32(-1);  // means need reselect state
+    current_substate = u32(-1); // means need reselect state
     prev_substate = u32(-1);
 }
 

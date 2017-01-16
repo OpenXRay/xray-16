@@ -60,4 +60,4 @@ private:
     void start_camera_effector();
 };
 
-#endif  // ANTI_AIM_ABILITY_H_INCLUDED
+#endif // ANTI_AIM_ABILITY_H_INCLUDED

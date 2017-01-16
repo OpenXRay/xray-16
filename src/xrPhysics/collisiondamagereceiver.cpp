@@ -42,7 +42,7 @@ void DamageReceiverCollisionCallback(bool& do_colide, bool bo1, dContact& c, SGa
     dir.set(*(Fvector*)c.geom.normal);
     Fvector pos;
     pos.sub(*(Fvector*)c.geom.pos,
-        *(Fvector*)dGeomGetPosition(bo1 ? c.geom.g1 : c.geom.g2));  // it is not true pos in bone space
+        *(Fvector*)dGeomGetPosition(bo1 ? c.geom.g1 : c.geom.g2)); // it is not true pos in bone space
 
     dr->CollisionHit(
         source_id, ud_self->bone_id, E_NL(b1, b2, c.geom.normal) * damager_material_factor / dfs, dir, pos);

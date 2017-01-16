@@ -74,9 +74,9 @@ static void retrive_data_from_mender_otput(
     for (u32 f = 0; f < lc_global_data()->g_faces().size(); f++)
     {
         Face* F = lc_global_data()->g_faces()[f];
-        u32 id0 = theIndices[f * 3 + 0];  // vertex index
-        u32 id1 = theIndices[f * 3 + 1];  // vertex index
-        u32 id2 = theIndices[f * 3 + 2];  // vertex index
+        u32 id0 = theIndices[f * 3 + 0]; // vertex index
+        u32 id1 = theIndices[f * 3 + 1]; // vertex index
+        u32 id2 = theIndices[f * 3 + 2]; // vertex index
         R_ASSERT(id0 < theVerts.size());
         R_ASSERT(id1 < theVerts.size());
         R_ASSERT(id2 < theVerts.size());

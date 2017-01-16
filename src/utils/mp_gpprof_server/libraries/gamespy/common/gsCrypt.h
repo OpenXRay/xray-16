@@ -31,7 +31,7 @@ extern "C" {
 #define GS_CRYPT_RSA_BINARY_SIZE 1024
 #endif
 
-#define GS_CRYPT_RSA_BYTE_SIZE (GS_CRYPT_RSA_BINARY_SIZE / 8)  // 1024/8 = 128
+#define GS_CRYPT_RSA_BYTE_SIZE (GS_CRYPT_RSA_BINARY_SIZE / 8) // 1024/8 = 128
 
 #define GS_CRYPT_RSA_DATABLOCKSIZE (GS_CRYPT_RSA_BYTE_SIZE - GS_CRYPT_HASHSIZE - 1)
 
@@ -45,15 +45,15 @@ typedef struct
 
 typedef struct
 {
-    gsi_u8 headerByte;                              // always 0x00
-    gsi_u8 maskedSeed[GS_CRYPT_HASHSIZE];           // not a MD5 hash, but must be same size
-    gsi_u8 maskedData[GS_CRYPT_RSA_DATABLOCKSIZE];  // data block xor'd
+    gsi_u8 headerByte;                             // always 0x00
+    gsi_u8 maskedSeed[GS_CRYPT_HASHSIZE];          // not a MD5 hash, but must be same size
+    gsi_u8 maskedData[GS_CRYPT_RSA_DATABLOCKSIZE]; // data block xor'd
 } gsCryptRSAOAEPPacket;
 
 typedef struct
 {
-    gsi_u8 headerByte[2];                     // always 0x00 0x02
-    gsi_u8 data[GS_CRYPT_RSA_BYTE_SIZE - 2];  // data block xor'd
+    gsi_u8 headerByte[2];                    // always 0x00 0x02
+    gsi_u8 data[GS_CRYPT_RSA_BYTE_SIZE - 2]; // data block xor'd
 } gsCryptRSAPKCS1Packet;
 
 // The cipherText must be equal to GS_CRYPT_RSA_BYTE_SIZE
@@ -85,4 +85,4 @@ gsi_i32 gsCryptRSASignHash(const gsCryptRSAKey* privateKey, const unsigned char*
 }
 #endif
 
-#endif  //__GS_CRYPT_H__
+#endif //__GS_CRYPT_H__

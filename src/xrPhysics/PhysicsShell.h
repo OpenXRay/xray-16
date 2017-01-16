@@ -54,7 +54,7 @@ extern XRPHYSICS_API void get_box(const CPhysicsBase* shell, const Fmatrix& form
 class XRPHYSICS_API CPhysicsBase : public iphysics_scripted_class
 {
 public:
-    Fmatrix mXFORM;  // In parent space
+    Fmatrix mXFORM; // In parent space
 public:
     virtual void Activate(const Fmatrix& m0, float dt01, const Fmatrix& m2, bool disable = false) = 0;
     virtual void Activate(
@@ -182,12 +182,15 @@ public:
     virtual bool isFixed() = 0;
     ////////////////////////////////////////////////////////////////IPhysicsElement////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     virtual const Fmatrix& XFORM() const { return CPhysicsBase::XFORM(); }
-    // virtual		void						CalculateBoneTransform					( Fmatrix &bone_transform )const																=
+    // virtual		void						CalculateBoneTransform					( Fmatrix &bone_transform )const
+    // =
     // 0;
     virtual void GetPointVel(Fvector& res_vel, const Fvector& point) const = 0;
-    //	virtual			void						get_LinearVel							( Fvector& velocity )		const
+    //	virtual			void						get_LinearVel							( Fvector& velocity )
+    //const
     //{ get_LinearVel( velocity ); }
-    //	virtual			void						get_AngularVel							( Fvector& velocity )		const
+    //	virtual			void						get_AngularVel							( Fvector& velocity )
+    //const
     //{ get_AngularVel( velocity ); }
     virtual void get_Box(Fvector& sz, Fvector& c) const { return CPhysicsBase::get_Box(sz, c); }
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -195,7 +198,7 @@ public:
 };
 
 XRPHYSICS_API float NonElasticCollisionEnergy(
-    CPhysicsElement* e1, CPhysicsElement* e2, const Fvector& norm);  // norm - from 2 to 1
+    CPhysicsElement* e1, CPhysicsElement* e2, const Fvector& norm); // norm - from 2 to 1
 
 // ABSTRACT:
 // Joint between two elements
@@ -205,21 +208,21 @@ class XRPHYSICS_API CPhysicsJoint : public iphysics_scripted_class
 public:
     bool bActive;
     enum eVs
-    {               // coordinate system
-        vs_first,   // in first local
-        vs_second,  // in second local
-        vs_global   // in global
+    {              // coordinate system
+        vs_first,  // in first local
+        vs_second, // in second local
+        vs_global  // in global
     };
     enum enumType
-    {                  // joint type
-        ball,          // ball-socket
-        hinge,         // standart hinge 1 - axis
-        hinge2,        // for car wheels 2-axes
-        full_control,  // 3 - axes control (eiler - angles)
+    {                 // joint type
+        ball,         // ball-socket
+        hinge,        // standart hinge 1 - axis
+        hinge2,       // for car wheels 2-axes
+        full_control, // 3 - axes control (eiler - angles)
         slider
     };
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    enumType eType;  // type of the joint
+    enumType eType; // type of the joint
 public:
     virtual ~CPhysicsJoint(){};
     virtual u16 BoneID() = 0;
@@ -299,7 +302,8 @@ public:
     virtual const Fmatrix& XFORM() const { return CPhysicsBase::XFORM(); }
     virtual const IPhysicsElement& Element(u16 index) const { return *get_ElementByStoreOrder(index); };
     virtual void GetGlobalTransformDynamic(Fmatrix* m) = 0;
-    // virtual			u16							get_ElementsNumber							( )																const	=
+    // virtual			u16							get_ElementsNumber							( )																const
+    // =
     // 0;
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -322,8 +326,9 @@ public:
     virtual const _flags<CLClassBits>& collide_class_bits() const = 0;
     virtual void CreateShellAnimator(CInifile const* ini, LPCSTR section) = 0;
     virtual void SetIgnoreAnimated() = 0;
-    //	virtual			bool						Animated									()																							=
-    //0;
+    //	virtual			bool						Animated									()
+    //=
+    // 0;
     virtual void AnimatorOnFrame() = 0;
     virtual void SetSmall() = 0;
     virtual void SetIgnoreSmall() = 0;
@@ -444,4 +449,4 @@ bool has_physics_collision_shapes(IKinematics& K);
 XRPHYSICS_API void phys_shell_verify_object_model(IPhysicsShellHolder& O);
 
 void phys_shell_verify_model(IKinematics& K);
-#endif  // PhysicsShellH
+#endif // PhysicsShellH

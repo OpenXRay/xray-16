@@ -38,4 +38,4 @@ void line_editor::IR_OnKeyboardRelease(int dik)
     m_control.on_key_release(dik);
 }
 
-}  // namespace text_editor
+} // namespace text_editor

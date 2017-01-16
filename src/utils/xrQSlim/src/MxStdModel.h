@@ -1,4 +1,4 @@
-#ifndef MXSTDMODEL_INCLUDED  // -*- C++ -*-
+#ifndef MXSTDMODEL_INCLUDED // -*- C++ -*-
 #define MXSTDMODEL_INCLUDED
 #if !defined(__GNUC__)
 #pragma once
@@ -28,7 +28,7 @@ public:
     MxPairContraction& operator=(const MxPairContraction& c);
 
     MxVertexID v1, v2;
-    float dv1[3], dv2[3];  // dv2 is not really necessary
+    float dv1[3], dv2[3]; // dv2 is not really necessary
 
     unsigned int delta_pivot;
     MxFaceList delta_faces;
@@ -58,13 +58,13 @@ class MxStdModel : public MxBlockModel
 private:
     struct vertex_data
     {
-        unsigned char mark, tag;            // Internal tag bits
-        unsigned char user_mark, user_tag;  // External tag bits
+        unsigned char mark, tag;           // Internal tag bits
+        unsigned char user_mark, user_tag; // External tag bits
     };
     struct face_data
     {
-        unsigned char mark, tag;            // Internal tag bits
-        unsigned char user_mark, user_tag;  // External tag bits
+        unsigned char mark, tag;           // Internal tag bits
+        unsigned char user_mark, user_tag; // External tag bits
     };
 
     MxDynBlock<vertex_data> v_data;

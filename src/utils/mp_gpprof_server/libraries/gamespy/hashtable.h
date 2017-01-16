@@ -215,4 +215,4 @@ void TableClear(HashTable table);
 }
 #endif
 
-#endif  //_HASHTABLE_H
+#endif //_HASHTABLE_H

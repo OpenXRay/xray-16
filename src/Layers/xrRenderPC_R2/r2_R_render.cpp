@@ -79,7 +79,7 @@ void CRender::render_main(Fmatrix& m_ViewProjection, bool _fportals)
             ISpatial* spatial = lstRenderables[o_it];
             spatial->spatial_updatesector();
             CSector* sector = (CSector*)spatial->GetSpatialData().sector;
-            if (0 == sector) continue;  // disassociated from S/P structure
+            if (0 == sector) continue; // disassociated from S/P structure
 
             if (spatial->GetSpatialData().type & STYPE_LIGHTSOURCE) {
                 // lightsource
@@ -93,7 +93,7 @@ void CRender::render_main(Fmatrix& m_ViewProjection, bool _fportals)
                 continue;
             }
 
-            if (PortalTraverser.i_marker != sector->r_marker) continue;  // inactive (untouched) sector
+            if (PortalTraverser.i_marker != sector->r_marker) continue; // inactive (untouched) sector
             for (u32 v_it = 0; v_it < sector->r_frustums.size(); v_it++)
             {
                 CFrustum& view = sector->r_frustums[v_it];
@@ -115,22 +115,22 @@ void CRender::render_main(Fmatrix& m_ViewProjection, bool _fportals)
                     v_orig.accept_frame = v_copy.accept_frame;
                     v_orig.hom_frame = v_copy.hom_frame;
                     v_orig.hom_tested = v_copy.hom_tested;
-                    if (!bVisible) break;  // exit loop on frustums
+                    if (!bVisible) break; // exit loop on frustums
 
                     // Rendering
                     set_Object(renderable);
                     renderable->renderable_Render();
                     set_Object(0);
                 }
-                break;  // exit loop on frustums
+                break; // exit loop on frustums
             }
         }
-        if (g_pGameLevel && (phase == PHASE_NORMAL)) g_hud->Render_Last();  // HUD
+        if (g_pGameLevel && (phase == PHASE_NORMAL)) g_hud->Render_Last(); // HUD
     }
     else
     {
         set_Object(0);
-        if (g_pGameLevel && (phase == PHASE_NORMAL)) g_hud->Render_Last();  // HUD
+        if (g_pGameLevel && (phase == PHASE_NORMAL)) g_hud->Render_Last(); // HUD
     }
 }
 
@@ -143,14 +143,14 @@ void CRender::render_menu()
 
     // Main Render
     {
-        Target->u_setrt(Target->rt_Generic_0, 0, 0, HW.pBaseZB);  // LDR RT
-        g_pGamePersistent->OnRenderPPUI_main();                   // PP-UI
+        Target->u_setrt(Target->rt_Generic_0, 0, 0, HW.pBaseZB); // LDR RT
+        g_pGamePersistent->OnRenderPPUI_main();                  // PP-UI
     }
     // Distort
     {
-        Target->u_setrt(Target->rt_Generic_1, 0, 0, HW.pBaseZB);  // Now RT is a distortion mask
+        Target->u_setrt(Target->rt_Generic_1, 0, 0, HW.pBaseZB); // Now RT is a distortion mask
         CHK_DX(HW.pDevice->Clear(0L, NULL, D3DCLEAR_TARGET, color_rgba(127, 127, 0, 127), 1.0f, 0L));
-        g_pGamePersistent->OnRenderPPUI_PP();  // PP-UI
+        g_pGamePersistent->OnRenderPPUI_PP(); // PP-UI
     }
 
     // Actual Display
@@ -206,7 +206,7 @@ void CRender::Render()
     //.	VERIFY					(g_pGameLevel && g_pGameLevel->pHUD);
 
     // Configure
-    RImplementation.o.distortion = FALSE;  // disable distorion
+    RImplementation.o.distortion = FALSE; // disable distorion
     Fcolor sun_color = ((light*)Lights.sun_adapted._get())->color;
     BOOL bSUN = ps_r2_ls_flags.test(R2FLAG_SUN) && (u_diffuse2s(sun_color.r, sun_color.g, sun_color.b) > EPS);
     if (o.sunstatic) bSUN = FALSE;
@@ -228,11 +228,11 @@ void CRender::Render()
         m_project.build_projection(deg2rad(Device.fFOV /* *Device.fASPECT*/), Device.fASPECT, VIEWPORT_NEAR,
             z_distance * g_pGamePersistent->Environment().CurrentEnv->far_plane);
         m_zfill.mul(m_project, Device.mView);
-        r_pmask(true, false);  // enable priority "0"
+        r_pmask(true, false); // enable priority "0"
         set_Recorder(NULL);
         phase = PHASE_SMAP;
         render_main(m_zfill, false);
-        r_pmask(true, false);  // disable priority "1"
+        r_pmask(true, false); // disable priority "1"
         BasicStats.Culling.End();
 
         // flush
@@ -270,7 +270,7 @@ void CRender::Render()
     //******* Main calc - DEFERRER RENDERER
     // Main calc
     BasicStats.Culling.Begin();
-    r_pmask(true, false, true);  // enable priority "0",+ capture wmarks
+    r_pmask(true, false, true); // enable priority "0",+ capture wmarks
     if (bSUN)
         set_Recorder(&main_coarse_structure);
     else
@@ -278,7 +278,7 @@ void CRender::Render()
     phase = PHASE_NORMAL;
     render_main(Device.mFullTransform, true);
     set_Recorder(NULL);
-    r_pmask(true, false);  // disable priority "1"
+    r_pmask(true, false); // disable priority "1"
     BasicStats.Culling.End();
 
     BOOL split_the_scene_to_minimize_wait = FALSE;
@@ -383,7 +383,7 @@ void CRender::Render()
     if (Wallmarks) {
         Target->phase_wallmarks();
         g_r = 0;
-        Wallmarks->Render();  // wallmarks has priority as normal geometry
+        Wallmarks->Render(); // wallmarks has priority as normal geometry
     }
 
     // Update incremental shadowmap-visibility solver
@@ -455,22 +455,22 @@ void CRender::Render()
 void CRender::render_forward()
 {
     VERIFY(0 == mapDistort.size());
-    RImplementation.o.distortion = RImplementation.o.distortion_enabled;  // enable distorion
+    RImplementation.o.distortion = RImplementation.o.distortion_enabled; // enable distorion
 
     //******* Main render - second order geometry (the one, that doesn't support deffering)
     //.todo: should be done inside "combine" with estimation of of luminance, tone-mapping, etc.
     {
         // level
-        r_pmask(false, true);  // enable priority "1"
+        r_pmask(false, true); // enable priority "1"
         phase = PHASE_NORMAL;
-        render_main(Device.mFullTransform, false);  //
+        render_main(Device.mFullTransform, false); //
         //	Igor: we don't want to render old lods on next frame.
         mapLOD.clear();
-        r_dsgraph_render_graph(1);                      // normal level, secondary priority
-        PortalTraverser.fade_render();                  // faded-portals
-        r_dsgraph_render_sorted();                      // strict-sorted geoms
-        g_pGamePersistent->Environment().RenderLast();  // rain/thunder-bolts
+        r_dsgraph_render_graph(1);                     // normal level, secondary priority
+        PortalTraverser.fade_render();                 // faded-portals
+        r_dsgraph_render_sorted();                     // strict-sorted geoms
+        g_pGamePersistent->Environment().RenderLast(); // rain/thunder-bolts
     }
 
-    RImplementation.o.distortion = FALSE;  // disable distorion
+    RImplementation.o.distortion = FALSE; // disable distorion
 }

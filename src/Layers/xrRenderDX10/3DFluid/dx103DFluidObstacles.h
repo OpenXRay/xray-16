@@ -53,4 +53,4 @@ private:
     xr_vector<const IPhysicsElement*> m_lstElements;
 };
 
-#endif  //	dx103DFluidObstacles_included
+#endif //	dx103DFluidObstacles_included

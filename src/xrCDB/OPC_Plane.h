@@ -68,8 +68,8 @@ public:
 
 public:
     // Members
-    Point n;  //!< The normal to the plane
-    float d;  //!< The distance from the origin
+    Point n; //!< The normal to the plane
+    float d; //!< The distance from the origin
 
     // Cast operators
     inline_ operator Point() const { return n; }
@@ -137,4 +137,4 @@ inline_ void TransformPlane(Plane& plane, const Matrix4x4& transform)
     plane.d = (plane.d * plane.n - Trans) | plane.n;
 }
 
-#endif  // __ICEPLANE_H__
+#endif // __ICEPLANE_H__

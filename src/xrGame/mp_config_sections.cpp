@@ -98,4 +98,4 @@ void mp_active_params::load_to(LPCSTR sect_name, CInifile& dest_dumper)
     }
 }
 
-}  // namespace mp_anticheat
+} // namespace mp_anticheat

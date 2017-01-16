@@ -57,7 +57,7 @@ r_aabb_ssa r_pixel_calculator::calculate(dxRender_Visual* V)
         RCache.set_xform_project(mProject);
 
         // render-0
-        Device.Clear();  // clear-ZB
+        Device.Clear(); // clear-ZB
         RCache.set_Shader(V->shader);
         V->Render(1.f);
 
@@ -90,4 +90,4 @@ void r_pixel_calculator::run()
     }
     end();
 }
-#endif  //	USE_DX10
+#endif //	USE_DX10

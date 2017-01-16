@@ -68,7 +68,7 @@ bool gsc_dsigned_ltx_reader::load_and_verify(u8* buffer, u32 const size)
     char* dsign_section = search_dsign_section(buffer, size);
     if (dsign_section == NULL) return false;
 
-    dsign_section -= 3;  // \r\n[
+    dsign_section -= 3; // \r\n[
     u32 const dsign_sect_size = size - static_cast<u32>((u8*)dsign_section - buffer);
 
     IReader sign_reader(dsign_section, dsign_sect_size);
@@ -79,7 +79,7 @@ bool gsc_dsigned_ltx_reader::load_and_verify(u8* buffer, u32 const size)
 
     *dsign_section = 0;
     xr_strcat(dsign_section, dsign_sect_size, ltx_date.c_str());
-    u32 new_size = size - dsign_sect_size + ltx_date.size() + 1;  // xr_strlen(buffer)
+    u32 new_size = size - dsign_sect_size + ltx_date.size() + 1; // xr_strlen(buffer)
     if (!verify(buffer, new_size, ltx_dsign)) {
         return false;
     }

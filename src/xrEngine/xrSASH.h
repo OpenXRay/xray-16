@@ -67,7 +67,7 @@ private:
     bool m_bBenchmarkRunning;
     bool m_bReinitEngine;
     // Guards
-    bool m_bExecutingConsoleCommand;  // Guard to pass to OA only those command that were issued by OA
+    bool m_bExecutingConsoleCommand; // Guard to pass to OA only those command that were issued by OA
     // Native benchmarking
     string64 m_strBenchCfgName;
     CTimer m_FrameTimer;
@@ -76,4 +76,4 @@ private:
 
 extern xrSASH ENGINE_API g_SASH;
 
-#endif  // xrSASH_included
+#endif // xrSASH_included

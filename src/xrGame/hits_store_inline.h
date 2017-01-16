@@ -19,4 +19,4 @@ u32 const hits_store::fetch_hits(Predicate& predicate, buffer_vector<bullet_hit>
     return ret_count;
 }
 
-}  // namespace award_system
+} // namespace award_system

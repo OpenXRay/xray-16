@@ -19,7 +19,7 @@
 
 #ifdef DEBUG
 #include "moving_objects.h"
-#endif  // DEBUG
+#endif // DEBUG
 
 LPCSTR alife_section = "alife";
 
@@ -37,7 +37,7 @@ CALifeSimulator::CALifeSimulator(IPureServer* server, shared_str* command_line)
         ai().SetupScriptEngine();
 #ifdef DEBUG
         ai().moving_objects().clear();
-#endif  // DEBUG
+#endif // DEBUG
     }
 
     ai().set_alife(this);
@@ -104,7 +104,7 @@ struct string_prdicate
     {
         return !xr_strcmp(m_value, value.first);
     }
-};  // struct string_prdicate
+}; // struct string_prdicate
 
 IReader const* CALifeSimulator::get_config(shared_str config) const
 {
@@ -135,4 +135,4 @@ bool object_exists_in_alife_registry(u32 id)
     return false;
 }
 
-}  // detail
+} // detail

@@ -34,13 +34,13 @@ void CUIDoubleProgressBar::InitFromXml(CUIXml& xml_doc, LPCSTR path)
 
 void CUIDoubleProgressBar::SetTwoPos(float cur_value, float compare_value)
 {
-    if (cur_value < compare_value)  // red
+    if (cur_value < compare_value) // red
     {
         m_progress_one.m_UIProgressItem.SetTextureColor(m_less_color);
         m_progress_one.SetProgressPos(compare_value);
         m_progress_two.SetProgressPos(cur_value);
     }
-    else if (cur_value > compare_value)  // green
+    else if (cur_value > compare_value) // green
     {
         m_progress_one.m_UIProgressItem.SetTextureColor(m_more_color);
         m_progress_one.SetProgressPos(cur_value);

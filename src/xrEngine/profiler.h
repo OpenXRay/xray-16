@@ -135,7 +135,7 @@ inline CProfileStats::CProfileStats()
     m_call_count = 0;
 }
 
-#else  // !USE_PROFILER
+#else // !USE_PROFILER
 #define START_PROFILE(a) {
 #define STOP_PROFILE }
 #endif

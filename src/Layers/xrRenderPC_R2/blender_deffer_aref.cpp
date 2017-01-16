@@ -65,19 +65,19 @@ void CBlender_deffer_aref::Compile(CBlender_Compile& C)
     }
     else
     {
-        C.SetParams(1, false);  //.
+        C.SetParams(1, false); //.
 
         // codepath is the same, only the shaders differ
         // ***only pixel shaders differ***
         switch (C.iElement)
         {
-        case SE_R2_NORMAL_HQ:  // deffer
+        case SE_R2_NORMAL_HQ: // deffer
             uber_deffer(C, true, "base", "base", true);
             break;
-        case SE_R2_NORMAL_LQ:  // deffer
+        case SE_R2_NORMAL_LQ: // deffer
             uber_deffer(C, false, "base", "base", true);
             break;
-        case SE_R2_SHADOW:  // smap
+        case SE_R2_SHADOW: // smap
             if (RImplementation.o.HW_smap)
                 C.r_Pass("shadow_direct_base_aref", "shadow_direct_base_aref", FALSE, TRUE, TRUE, FALSE, D3DBLEND_ZERO,
                     D3DBLEND_ONE, TRUE, 220);

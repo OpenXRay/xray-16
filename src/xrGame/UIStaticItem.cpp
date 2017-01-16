@@ -77,10 +77,10 @@ void CUIStaticItem::RenderInternal(const Fvector2& in_pos)
     RBp.x += offset;
     RBp.y += offset;
 
-    S[0].set(LTp.x, LTp.y, LTt.x, LTt.y);  // LT
-    S[1].set(RBp.x, LTp.y, RBt.x, LTt.y);  // RT
-    S[2].set(RBp.x, RBp.y, RBt.x, RBt.y);  // RB
-    S[3].set(LTp.x, RBp.y, LTt.x, RBt.y);  // LB
+    S[0].set(LTp.x, LTp.y, LTt.x, LTt.y); // LT
+    S[1].set(RBp.x, LTp.y, RBt.x, LTt.y); // RT
+    S[2].set(RBp.x, RBp.y, RBt.x, RBt.y); // RB
+    S[3].set(LTp.x, RBp.y, LTt.x, RBt.y); // LB
 
     sPoly2D D;
     sPoly2D* R = NULL;

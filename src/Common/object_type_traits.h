@@ -249,4 +249,4 @@ struct is_stl_container
 //  	};
 //  };
 };
-#endif  //	object_type_traits_h_included
+#endif //	object_type_traits_h_included

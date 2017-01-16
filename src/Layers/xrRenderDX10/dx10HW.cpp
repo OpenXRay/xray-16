@@ -45,7 +45,7 @@ IDirect3DStateBlock9*	dwDebugSB = 0;
 */
 
 CHW::CHW()
-    :  //	hD3D(NULL),
+    : //	hD3D(NULL),
       // pD3D(NULL),
       m_pAdapter(0),
       pDevice(NULL), m_move_window(true)
@@ -111,7 +111,7 @@ void CHW::CreateD3D()
         }
         ++i;
     }
-#endif  //	MASTER_GOLD
+#endif //	MASTER_GOLD
 
     if (!m_pAdapter) pFactory->EnumAdapters(0, &m_pAdapter);
 
@@ -226,7 +226,7 @@ void CHW::CreateDevice(HWND m_hWnd, bool move_window)
     D3DFORMAT& fDepth = Caps.fDepth;
 
     //	HACK: DX10: Embed hard target format.
-    fTarget = D3DFMT_X8R8G8B8;  //	No match in DX10. D3DFMT_A8B8G8R8->DXGI_FORMAT_R8G8B8A8_UNORM
+    fTarget = D3DFMT_X8R8G8B8; //	No match in DX10. D3DFMT_A8B8G8R8->DXGI_FORMAT_R8G8B8A8_UNORM
     fDepth = selectDepthStencil(fTarget);
     /*
     if (bWindowed)
@@ -341,7 +341,7 @@ void CHW::CreateDevice(HWND m_hWnd, bool move_window)
     };
 
     R = D3D11CreateDeviceAndSwapChain(
-        0,  // m_pAdapter,//What wrong with adapter??? We should use another version of DXGI?????
+        0, // m_pAdapter,//What wrong with adapter??? We should use another version of DXGI?????
         m_DriverType, NULL, createDeviceFlags, pFeatureLevels, sizeof(pFeatureLevels) / sizeof(pFeatureLevels[0]),
         D3D11_SDK_VERSION, &sd, &m_pSwapChain, &pDevice, &FeatureLevel, &pContext);
 #else
@@ -578,13 +578,13 @@ void CHW::selectResolution(u32& dwWidth, u32& dwHeight, BOOL bWindowed)
         dwWidth = psCurrentVidMode[0];
         dwHeight = psCurrentVidMode[1];
     }
-    else  // check
+    else // check
     {
         string64 buff;
         xr_sprintf(buff, sizeof(buff), "%dx%d", psCurrentVidMode[0], psCurrentVidMode[1]);
 
-        if (_ParseItem(buff, GlobalEnv.vid_mode_token) == u32(-1))  // not found
-        {                                                           // select safe
+        if (_ParseItem(buff, GlobalEnv.vid_mode_token) == u32(-1)) // not found
+        {                                                          // select safe
             xr_sprintf(buff, sizeof(buff), "vid_mode %s", GlobalEnv.vid_mode_token[0].name);
             Console->Execute(buff);
         }
@@ -821,14 +821,14 @@ void fill_vid_mode_list(CHW* _hw)
 
 #ifdef DEBUG
     Msg("Available video modes[%d]:", _tmp.size());
-#endif  // DEBUG
+#endif // DEBUG
     for (u32 i = 0; i < _tmp.size(); ++i)
     {
         GlobalEnv.vid_mode_token[i].id = i;
         GlobalEnv.vid_mode_token[i].name = _tmp[i];
 #ifdef DEBUG
         Msg("[%s]", _tmp[i]);
-#endif  // DEBUG
+#endif // DEBUG
     }
 }
 
@@ -863,9 +863,9 @@ void CHW::UpdateViews()
     descDepth.BindFlags = D3D_BIND_DEPTH_STENCIL;
     descDepth.CPUAccessFlags = 0;
     descDepth.MiscFlags = 0;
-    R = pDevice->CreateTexture2D(&descDepth,  // Texture desc
-        NULL,                                 // Initial data
-        &pDepthStencil);                      // [out] Texture
+    R = pDevice->CreateTexture2D(&descDepth, // Texture desc
+        NULL,                                // Initial data
+        &pDepthStencil);                     // [out] Texture
     R_CHK(R);
 
     //	Create Depth/stencil view

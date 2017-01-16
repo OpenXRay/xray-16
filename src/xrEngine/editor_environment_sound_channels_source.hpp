@@ -38,11 +38,11 @@ public:
 private:
     property_holder_type* m_property_holder;
     shared_str m_source;
-};  // class source
-}  // namespace sound_channels
-}  // namespace environment
-}  // namespace editor
+}; // class source
+} // namespace sound_channels
+} // namespace environment
+} // namespace editor
 
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR
 
-#endif  // ifndef EDITOR_WEATHER_SOUND_CHANNELS_SOURCE_HPP_INCLUDED
+#endif // ifndef EDITOR_WEATHER_SOUND_CHANNELS_SOURCE_HPP_INCLUDED

@@ -122,8 +122,8 @@ void CBuild::SaveTREE(IWriter& fs)
         100.f * float(g_batch_1000) / float(g_batch_count), 100.f * float(g_batch_5000) / float(g_batch_count));
     mem_Compact();
 
-    SaveGEOMs("level.geom", g_VB, g_IB, g_SWI);   // Normal
-    SaveGEOMs("level.geomx", x_VB, x_IB, x_SWI);  // Fast-Path
+    SaveGEOMs("level.geom", g_VB, g_IB, g_SWI);  // Normal
+    SaveGEOMs("level.geomx", x_VB, x_IB, x_SWI); // Fast-Path
 
     Logger.Status("Shader table...");
     fs.open_chunk(fsL_SHADERS);

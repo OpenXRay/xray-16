@@ -4,10 +4,10 @@
 //----------------------------------------------------
 struct SAIParams
 {
-    float fPatchSize;   // patch size
-    float fTestHeight;  // test height (center of the "tester")
-    float fCanUP;       // can reach point in up (dist)
-    float fCanDOWN;     // can reach point down  (dist)
+    float fPatchSize;  // patch size
+    float fTestHeight; // test height (center of the "tester")
+    float fCanUP;      // can reach point in up (dist)
+    float fCanDOWN;    // can reach point down  (dist)
 
     SAIParams()
     {

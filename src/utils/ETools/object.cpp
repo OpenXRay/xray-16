@@ -123,7 +123,7 @@ void Object::CreateEdgeCollapse(MeshPt* pptBinned, MeshPt* pptKept)
     pGCI->pptBin = pptBinned;
     pGCI->pptKeep = pptKept;
 
-    const int c_iMaxNumTris = 100;  // Grow as needed.
+    const int c_iMaxNumTris = 100; // Grow as needed.
     MeshTri* pBinnedTris[c_iMaxNumTris];
 
     MeshTri* ptri;
@@ -131,7 +131,7 @@ void Object::CreateEdgeCollapse(MeshPt* pptBinned, MeshPt* pptKept)
     long bNeedNewLevel = FALSE;
     for (ptri = pptBinned->FirstTri(); ptri != NULL; ptri = pptBinned->NextTri())
     {
-        VERIFY(iNumTrisCollapsed < c_iMaxNumTris);  // Grow c_iMaxNumTris as needed.
+        VERIFY(iNumTrisCollapsed < c_iMaxNumTris); // Grow c_iMaxNumTris as needed.
         pBinnedTris[iNumTrisCollapsed++] = ptri;
         if (ptri->mytri.iSlidingWindowLevel != iCurSlidingWindowLevel) {
             VERIFY(ptri->mytri.iSlidingWindowLevel == iCurSlidingWindowLevel + 1);

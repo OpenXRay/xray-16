@@ -65,9 +65,9 @@ CPhysicsShell* __stdcall P_build_Shell(
 
     pPhysicsShell->set_PhysicsRefObject(obj);
     pPhysicsShell->mXFORM.set(obj->ObjectXFORM());
-    pPhysicsShell->Activate(not_active_state, not_set_bone_callbacks);  //,
+    pPhysicsShell->Activate(not_active_state, not_set_bone_callbacks); //,
     // m_pPhysicsShell->SmoothElementsInertia(0.3f);
-    pPhysicsShell->SetAirResistance();  // 0.0014f,1.5f
+    pPhysicsShell->SetAirResistance(); // 0.0014f,1.5f
 
     return pPhysicsShell;
 }
@@ -327,7 +327,7 @@ bool __stdcall can_create_phys_shell(string1024& reason, IPhysicsShellHolder& O)
     return result;
 }
 
-float NonElasticCollisionEnergy(CPhysicsElement* e1, CPhysicsElement* e2, const Fvector& norm)  // norm - from 2 to 1
+float NonElasticCollisionEnergy(CPhysicsElement* e1, CPhysicsElement* e2, const Fvector& norm) // norm - from 2 to 1
 {
     VERIFY(e1);
     VERIFY(e2);

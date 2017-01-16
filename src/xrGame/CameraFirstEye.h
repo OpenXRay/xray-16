@@ -29,4 +29,4 @@ public:
     }
 };
 
-#endif  // __CAMERALOOK_H__
+#endif // __CAMERALOOK_H__

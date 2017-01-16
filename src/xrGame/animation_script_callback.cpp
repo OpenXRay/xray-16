@@ -70,7 +70,7 @@ void anim_script_callback::anim_callback(CBlend* B)
 
     ////////////////////BLEND UPDATE//////////////////////////////////////////////
 
-    if (B->timeTotal - B->timeCurrent - END_EPS < B->timeCurrent)  // this cool expression sims to work for all cases!
+    if (B->timeTotal - B->timeCurrent - END_EPS < B->timeCurrent) // this cool expression sims to work for all cases!
     {
         VERIFY(B->speed > 0.f);
         ths->on_end = true;

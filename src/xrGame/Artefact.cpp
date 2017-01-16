@@ -21,7 +21,7 @@
 #include "xrAICore/Navigation/PatrolPath/patrol_path.h"
 #include "xrAICore/Navigation/PatrolPath/patrol_path_storage.h"
 
-#define FASTMODE_DISTANCE (50.f)  // distance to camera from sphere, when zone switches to fast update sequence
+#define FASTMODE_DISTANCE (50.f) // distance to camera from sphere, when zone switches to fast update sequence
 
 #define CHOOSE_MAX(x, inst_x, y, inst_y, z, inst_z)                                                                    \
     if (x > y)                                                                                                         \
@@ -95,7 +95,7 @@ BOOL CArtefact::net_Spawn(CSE_Abstract* DC)
     IKinematicsAnimated* K = smart_cast<IKinematicsAnimated*>(Visual());
     if (K) K->PlayCycle("idle");
 
-    o_fastmode = FALSE;  // start initially with fast-mode enabled
+    o_fastmode = FALSE; // start initially with fast-mode enabled
     o_render_frame = 0;
     SetState(eHidden);
 
@@ -173,14 +173,14 @@ void CArtefact::Interpolate()
     if (OnServer()) return;
 
     net_updateInvData* p = NetSync();
-    while (p->NET_IItem.size() > 1)  // in real no interpolation, just get latest state
+    while (p->NET_IItem.size() > 1) // in real no interpolation, just get latest state
     {
         p->NET_IItem.pop_front();
     }
     inherited::Interpolate();
 
     if (p->NET_IItem.size()) {
-        p->NET_IItem.clear();  // same as p->NET_IItem.pop_front();
+        p->NET_IItem.clear(); // same as p->NET_IItem.pop_front();
     }
 }
 
@@ -460,7 +460,7 @@ void CArtefact::ForceTransform(const Fmatrix& m)
 {
     VERIFY(PPhysicsShell());
     XFORM().set(m);
-    PPhysicsShell()->SetGlTransformDynamic(m);  // XFORM().set(m);
+    PPhysicsShell()->SetGlTransformDynamic(m); // XFORM().set(m);
 }
 
 void CArtefact::CreateArtefactActivation()
@@ -555,7 +555,7 @@ void SArtefactDetectorsSupport::UpdateOnFrame()
     if (m_parent->getVisible() && m_parent->GetAfRank() != 0 && m_switchVisTime + 5000 < Device.dwTimeGlobal)
         SetVisible(false);
 
-    u32 dwDt = 2 * 3600 * 1000 / 10;  // 2 hour of game time
+    u32 dwDt = 2 * 3600 * 1000 / 10; // 2 hour of game time
     if (!m_parent->getVisible() && m_switchVisTime + dwDt < Device.dwTimeGlobal) {
         m_switchVisTime = Device.dwTimeGlobal;
         if (m_parent->Position().distance_to(Device.vCameraPosition) > 40.0f) Blink();

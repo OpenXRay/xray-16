@@ -58,4 +58,4 @@ void dxObjectSpaceRender::SetShader()
     RCache.set_Shader(m_shDebug);
 }
 
-#endif  // DEBUG
+#endif // DEBUG

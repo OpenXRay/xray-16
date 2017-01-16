@@ -135,7 +135,7 @@ bool EFS_Utils::GetOpenNameInternal(
 
     if (xr_strlen(buffer)) {
         string_path dr;
-        if (!(buffer[0] == '\\' && buffer[1] == '\\'))  // if !network
+        if (!(buffer[0] == '\\' && buffer[1] == '\\')) // if !network
         {
             _splitpath(buffer, dr, 0, 0, 0);
 
@@ -216,7 +216,7 @@ bool EFS_Utils::GetSaveName(LPCSTR initial, string_path& buffer, LPCSTR offset, 
     string1024 flt;
 
     LPCSTR def_ext = P.m_DefExt;
-    if (false)  //&& dwWindowsMajorVersion == 6 )
+    if (false) //&& dwWindowsMajorVersion == 6 )
     {
         if (strstr(P.m_DefExt, "*.")) def_ext = strstr(P.m_DefExt, "*.") + 2;
     }
@@ -226,7 +226,7 @@ bool EFS_Utils::GetSaveName(LPCSTR initial, string_path& buffer, LPCSTR offset, 
     memset(&ofn, 0, sizeof(ofn));
     if (xr_strlen(buffer)) {
         string_path dr;
-        if (!(buffer[0] == '\\' && buffer[1] == '\\'))  // if !network
+        if (!(buffer[0] == '\\' && buffer[1] == '\\')) // if !network
         {
             _splitpath(buffer, dr, 0, 0, 0);
             if (0 == dr[0]) P._update(buffer, buffer);

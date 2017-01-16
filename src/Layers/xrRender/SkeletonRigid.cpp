@@ -15,10 +15,10 @@ void CKinematics::CalculateBones(BOOL bForceExact)
     // early out.
     // check if the info is still relevant
     // skip all the computations - assume nothing changes in a small period of time :)
-    if (RDEVICE.dwTimeGlobal == UCalc_Time) return;  // early out for "fast" update
+    if (RDEVICE.dwTimeGlobal == UCalc_Time) return; // early out for "fast" update
     UCalc_mtlock lock;
     OnCalculateBones();
-    if (!bForceExact && (RDEVICE.dwTimeGlobal < (UCalc_Time + UCalc_Interval))) return;  // early out for "slow" update
+    if (!bForceExact && (RDEVICE.dwTimeGlobal < (UCalc_Time + UCalc_Interval))) return; // early out for "slow" update
     if (Update_Visibility) Visibility_Update();
 
     _DBG_SINGLE_USE_MARKER;
@@ -153,12 +153,12 @@ void CKinematics::CLBone(const CBoneData* bd, CBoneInstance& bi, const Fmatrix* 
             BuildBoneMatrix(bd, bi, parent, channel_mask);
 #ifndef MASTER_GOLD
             R_ASSERT2(_valid(bi.mTransform), "anim kils bone matrix");
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
             if (bi.callback()) {
                 bi.callback()(&bi);
 #ifndef MASTER_GOLD
                 R_ASSERT2(_valid(bi.mTransform), make_string("callback kils bone matrix bone: %s ", bd->name.c_str()));
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
             }
         }
         bi.mRenderTransform.mul_43(bi.mTransform, bd->m2b_transform);

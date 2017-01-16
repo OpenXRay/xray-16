@@ -36,8 +36,8 @@ class CSoundRender_CoreD : public CSoundRender_Core
 
 public:
     // DSound interface
-    IDirectSound8* pDevice;       // The device itself
-    IDirectSoundBuffer* pBuffer;  // The primary buffer (mixer destination)
+    IDirectSound8* pDevice;      // The device itself
+    IDirectSoundBuffer* pBuffer; // The primary buffer (mixer destination)
     IDirectSound3DListener8* pListener;
     LPKSPROPERTYSET pExtensions;
     DSCAPS dsCaps;

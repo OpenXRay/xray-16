@@ -68,7 +68,7 @@ u16 OGF::_BuildVertex(OGF_Vertex& V1)
 }
 void OGF::x_BuildFace(OGF_Vertex& V1, OGF_Vertex& V2, OGF_Vertex& V3, bool _tc_)
 {
-    if (_tc_) return;  // make empty-list for stuff that has relevant TCs
+    if (_tc_) return; // make empty-list for stuff that has relevant TCs
     x_face F;
     u32 VertCount = (u32)fast_path_data.vertices.size();
     F.v[0] = x_BuildVertex(x_vertex(V1));
@@ -117,7 +117,7 @@ void OGF::adjacent_select(xr_vector<u32>& dest, xr_vector<bool>& vmark, xr_vecto
     for (u32 fit = 0; fit < data.faces.size(); fit++)
     {
         OGF_Face& F = data.faces[fit];
-        if (fmark[fit]) continue;  // already registered
+        if (fmark[fit]) continue; // already registered
 
         // new face - if empty - just put it in, else check connectivity
         if (dest.empty()) {
@@ -135,11 +135,11 @@ void OGF::adjacent_select(xr_vector<u32>& dest, xr_vector<bool>& vmark, xr_vecto
             BOOL bConnected = FALSE;
             for (u32 vid = 0; vid < 3; vid++)
             {
-                u32 id = F.v[vid];  // search in already registered verts
+                u32 id = F.v[vid]; // search in already registered verts
                 for (u32 sid = 0; sid < dest.size(); sid++)
                 {
                     if (id == dest[sid]) {
-                        bConnected = TRUE;  // this face shares at least one vertex with already selected faces
+                        bConnected = TRUE; // this face shares at least one vertex with already selected faces
                         break;
                     }
                 }
@@ -258,7 +258,7 @@ void OGF::Optimize()
             u32 _old = selection.size();
             adjacent_select(selection, vmarker, fmarker);
             u32 _new = selection.size();
-            if (_old == _new) break;  // group selected !
+            if (_old == _new) break; // group selected !
         }
         if (selection.empty()) break;
 
@@ -301,7 +301,7 @@ void OGF::Optimize()
 Lock progressive_cs
 #ifdef CONFIG_PROFILE_LOCKS
     (MUTEX_PROFILE_ID(progressive_cs))
-#endif  // CONFIG_PROFILE_LOCKS
+#endif // CONFIG_PROFILE_LOCKS
         ;
 void OGF::MakeProgressive(float metric_limit)
 {

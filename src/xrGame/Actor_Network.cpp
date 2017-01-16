@@ -85,7 +85,7 @@ void CActor::ConvState(u32 mstate_rl, string128* buf)
     if (m_bJumpKeyPressed) xr_strcat(*buf, "+Jumping ");
 };
 //--------------------------------------------------------------------
-void CActor::net_Export(NET_Packet& P)  // export to server
+void CActor::net_Export(NET_Packet& P) // export to server
 {
     // CSE_ALifeCreatureAbstract
     u8 flags = 0;
@@ -93,12 +93,12 @@ void CActor::net_Export(NET_Packet& P)  // export to server
     P.w_u32(Level().timeServer());
     P.w_u8(flags);
     Fvector p = Position();
-    P.w_vec3(p);  // Position());
+    P.w_vec3(p); // Position());
 
-    P.w_float /*w_angle8*/ (angle_normalize(r_model_yaw));               // Device.vCameraDirection.getH());//
-    P.w_float /*w_angle8*/ (angle_normalize(unaffected_r_torso.yaw));    //(r_torso.yaw);
-    P.w_float /*w_angle8*/ (angle_normalize(unaffected_r_torso.pitch));  //(r_torso.pitch);
-    P.w_float /*w_angle8*/ (angle_normalize(unaffected_r_torso.roll));   //(r_torso.roll);
+    P.w_float /*w_angle8*/ (angle_normalize(r_model_yaw));              // Device.vCameraDirection.getH());//
+    P.w_float /*w_angle8*/ (angle_normalize(unaffected_r_torso.yaw));   //(r_torso.yaw);
+    P.w_float /*w_angle8*/ (angle_normalize(unaffected_r_torso.pitch)); //(r_torso.pitch);
+    P.w_float /*w_angle8*/ (angle_normalize(unaffected_r_torso.roll));  //(r_torso.roll);
     P.w_u8(u8(g_Team()));
     P.w_u8(u8(g_Squad()));
     P.w_u8(u8(g_Group()));
@@ -113,7 +113,7 @@ void CActor::net_Export(NET_Packet& P)  // export to server
     P.w_u16(u16(ms));
     P.w_sdir(NET_SavedAccel);
     Fvector v = character_physics_support()->movement()->GetVelocity();
-    P.w_sdir(v);  // m_PhysicMovementControl.GetVelocity());
+    P.w_sdir(v); // m_PhysicMovementControl.GetVelocity());
     //	P.w_float_q16		(fArmor,-500,1000);
     P.w_float(g_Radiation());
 
@@ -279,7 +279,7 @@ void CActor::net_ExportDeadBody(NET_Packet& P)
     };
 };
 
-void CActor::net_Import(NET_Packet& P)  // import from server
+void CActor::net_Import(NET_Packet& P) // import from server
 {
     //-----------------------------------------------
     net_Import_Base(P);
@@ -554,7 +554,7 @@ BOOL CActor::net_Spawn(CSE_Abstract* DC)
     r_model_yaw = E->o_torso.yaw;
     r_torso.yaw = E->o_torso.yaw;
     r_torso.pitch = E->o_torso.pitch;
-    r_torso.roll = 0.0f;  // E->o_Angle.z;
+    r_torso.roll = 0.0f; // E->o_Angle.z;
 
     unaffected_r_torso.yaw = r_torso.yaw;
     unaffected_r_torso.pitch = r_torso.pitch;
@@ -565,7 +565,7 @@ BOOL CActor::net_Spawn(CSE_Abstract* DC)
     else
         cam_Set(eacFirstEye);
 
-    cam_Active()->Set(-E->o_torso.yaw, E->o_torso.pitch, 0);  // E->o_Angle.z);
+    cam_Active()->Set(-E->o_torso.yaw, E->o_torso.pitch, 0); // E->o_Angle.z);
 
     // *** movement state - respawn
     // mstate_wishful			= 0;
@@ -748,7 +748,7 @@ void CActor::net_Relcase(IGameObject* O)
     HUD().net_Relcase(O);
 }
 
-BOOL CActor::net_Relevant()  // relevant for export to server
+BOOL CActor::net_Relevant() // relevant for export to server
 {
     if (OnServer()) {
         return getSVU() | getLocal();
@@ -869,7 +869,7 @@ InterpData IStartT;
 InterpData IRecT;
 InterpData IEndT;
 
-void CActor::PH_B_CrPr()  // actions & operations before physic correction-prediction steps
+void CActor::PH_B_CrPr() // actions & operations before physic correction-prediction steps
 {
     // just set last update data for now
     //	if (!m_bHasUpdate) return;
@@ -912,7 +912,7 @@ void CActor::PH_B_CrPr()  // actions & operations before physic correction-predi
             NET_Last = N;
             ///////////////////////////////////////////////
             cam_Active()->Set(-unaffected_r_torso.yaw, unaffected_r_torso.pitch,
-                0);  //, unaffected_r_torso.roll);		// set's camera orientation
+                0); //, unaffected_r_torso.roll);		// set's camera orientation
             if (!N_A.State.enabled) {
                 pSyncObj->set_State(N_A.State);
             }
@@ -952,7 +952,7 @@ void CActor::PH_B_CrPr()  // actions & operations before physic correction-predi
     };
 };
 
-void CActor::PH_I_CrPr()  // actions & operations between two phisic prediction steps
+void CActor::PH_I_CrPr() // actions & operations between two phisic prediction steps
 {
     // store recalculated data, then we able to restore it after small future prediction
     //	if (!m_bHasUpdate) return;
@@ -1041,10 +1041,10 @@ void CActor::CalculateInterpolationParams()
         for (u32 k = 0; k < 3; k++)
         {
             SP0[k] = c * (c * (c * SCoeff[k][0] + SCoeff[k][1]) + SCoeff[k][2]) + SCoeff[k][3];
-            SP1[k] = (c * c * SCoeff[k][0] * 3 + c * SCoeff[k][1] * 2 + SCoeff[k][2]) / 3;  //     3       !!!!
+            SP1[k] = (c * c * SCoeff[k][0] * 3 + c * SCoeff[k][1] * 2 + SCoeff[k][2]) / 3; //     3       !!!!
 
             HP0[k] = c * (c * (c * HCoeff[k][0] + HCoeff[k][1]) + HCoeff[k][2]) + HCoeff[k][3];
-            HP1[k] = (c * c * HCoeff[k][0] * 3 + c * HCoeff[k][1] * 2 + HCoeff[k][2]) / 3;  //     3       !!!!
+            HP1[k] = (c * c * HCoeff[k][0] * 3 + c * HCoeff[k][1] * 2 + HCoeff[k][2]) / 3; //     3       !!!!
         };
 
         SP1.add(SP0);
@@ -1170,7 +1170,7 @@ void CActor::make_Interpolation()
             CPHSynchronize* pSyncObj = NULL;
             pSyncObj = PHGetSyncItem(0);
             if (!pSyncObj) return;
-            pSyncObj->set_State(PredictedState);  //, PredictedState.enabled);
+            pSyncObj->set_State(PredictedState); //, PredictedState.enabled);
             VERIFY2(_valid(renderable.xform), *cName());
         }
         else
@@ -1211,7 +1211,7 @@ void CActor::make_Interpolation()
             {
                 for (int k = 0; k < 3; k++)
                     SpeedVector[k] = (factor * factor * SCoeff[k][0] * 3 + factor * SCoeff[k][1] * 2 + SCoeff[k][2]) /
-                                     3;  //     3       !!!!
+                                     3; //     3       !!!!
 
                 ResPosition.set(IPosS);
             }
@@ -1229,7 +1229,7 @@ void CActor::make_Interpolation()
             }
             character_physics_support()->movement()->SetPosition(ResPosition);
             character_physics_support()->movement()->SetVelocity(SpeedVector);
-            cam_Active()->Set(-unaffected_r_torso.yaw, unaffected_r_torso.pitch, 0);  //, unaffected_r_torso.roll);
+            cam_Active()->Set(-unaffected_r_torso.yaw, unaffected_r_torso.pitch, 0); //, unaffected_r_torso.roll);
         };
     }
     else
@@ -1405,7 +1405,7 @@ void CActor::OnRender_Network()
     float size = 0.2f;
 
     //	dbg_draw_piramid(Position(), m_PhysicMovementControl->GetVelocity(), size/2, -r_model_yaw, color_rgba(255, 255,
-    //255, 255));
+    // 255, 255));
     //-----------------------------------------------------------------------------------------------------
     if (g_Alive()) {
         if (dbg_net_Draw_Flags.test(dbg_draw_autopickupbox)) {
@@ -1480,7 +1480,7 @@ void CActor::OnRender_Network()
         dbg_draw_piramid(IStart.Pos, IStart.Vel, size, -IStart.o_model, color_rgba(255, 0, 0, 255));
         //		Fvector tmp, tmp1; tmp1.set(0, .1f, 0);
         //		dbg_draw_piramid(tmp.add(IStartT.Pos, tmp1), IStartT.Vel, size, -IStartT.o_model, color_rgba(155, 0, 0,
-        //155));
+        // 155));
         dbg_draw_piramid(IRec.Pos, IRec.Vel, size, -IRec.o_model, color_rgba(0, 0, 255, 255));
         //		dbg_draw_piramid(tmp.add(IRecT.Pos, tmp1), IRecT.Vel, size, -IRecT.o_model, color_rgba(0, 0, 155, 155));
         dbg_draw_piramid(IEnd.Pos, IEnd.Vel, size, -IEnd.o_model, color_rgba(0, 255, 0, 255));
@@ -1554,7 +1554,7 @@ void CActor::OnRender_Network()
                 point1S[k] = c * (c * (c * SCoeff[k][0] + SCoeff[k][1]) + SCoeff[k][2]) + SCoeff[k][3];
                 point1H[k] = c * (c * (c * HCoeff[k][0] + HCoeff[k][1]) + HCoeff[k][2]) + HCoeff[k][3];
 
-                tS[k] = (c * c * SCoeff[k][0] * 3 + c * SCoeff[k][1] * 2 + SCoeff[k][2]) / 3;  //     3       !!!!
+                tS[k] = (c * c * SCoeff[k][0] * 3 + c * SCoeff[k][1] * 2 + SCoeff[k][2]) / 3; //     3       !!!!
                 tH[k] = (c * c * HCoeff[k][0] * 3 + c * HCoeff[k][1] * 2 + HCoeff[k][2]);
             };
 
@@ -1645,7 +1645,7 @@ void CActor::OnRender_Network()
                 u16 NumBones = PHGetSyncItemsNumber();
                 for (u16 i = 0; i < NumBones; i++)
                 {
-                    SPHNetState state;  // = m_States[i];
+                    SPHNetState state; // = m_States[i];
                     PHGetSyncItem(i)->get_State(state);
 
                     Fmatrix M;
@@ -1772,7 +1772,7 @@ void CActor::OnHitHealthLoss(float NewHealth)
     if (m_iLastHitterID != u16(-1)) {
 #ifndef MASTER_GOLD
         Msg("On hit health loss of actor[%d], last hitter[%d]", ID(), m_iLastHitterID);
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
         NET_Packet P;
         u_EventGen(P, GE_GAME_EVENT, ID());
         P.w_u16(GAME_EVENT_PLAYER_HITTED);
@@ -1798,7 +1798,7 @@ void CActor::OnCriticalHitHealthLoss()
     if (m_iLastHitterID != u16(-1)) {
 #ifndef MASTER_GOLD
         Msg("On hit of actor[%d], last hitter[%d]", ID(), m_iLastHitterID);
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
         NET_Packet P;
         u_EventGen(P, GE_GAME_EVENT, ID());
         P.w_u16(GAME_EVENT_PLAYER_HITTED);
@@ -1890,7 +1890,7 @@ void CActor::OnCriticalWoundHealthLoss()
     if (GameID() == eGameIDSingle || !OnServer()) return;
 #ifdef DEBUG
     Msg("--- %s is bleed out", *cName());
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
     //-------------------------------
     NET_Packet P;
     u_EventGen(P, GE_GAME_EVENT, ID());
@@ -1969,6 +1969,6 @@ void CActor::On_B_NotCurrentEntity()
 {
 #ifndef MASTER_GOLD
     Msg("CActor::On_B_NotCurrentEntity");
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
     inventory().Items_SetCurrentEntityHud(false);
 };

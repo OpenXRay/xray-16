@@ -26,8 +26,8 @@ typedef struct
     // A critical section is a re-entrant semaphore
     GSISemaphoreID mSemaphore;
     GSIThreadID mOwnerThread;
-    gsi_u32 mEntryCount;  // track re-entry
-    gsi_u32 mPad;         // make 16bytes
+    gsi_u32 mEntryCount; // track re-entry
+    gsi_u32 mPad;        // make 16bytes
 } GSICriticalSection;
 typedef void (*GSThreadFunc)(void* arg);
 
@@ -66,8 +66,8 @@ typedef struct
     // A critical section is a re-entrant semaphore
     GSISemaphoreID mSemaphore;
     GSIThreadID mOwnerThread;
-    gsi_u32 mEntryCount;  // track re-entry
-    gsi_u32 mPad;         // make 16bytes
+    gsi_u32 mEntryCount; // track re-entry
+    gsi_u32 mPad;        // make 16bytes
 } GSICriticalSection;
 typedef void (*GSThreadFunc)(void* arg);
 
@@ -81,12 +81,12 @@ typedef struct
     // A critical section is a re-entrant semaphore
     GSISemaphoreID mSemaphore;
     GSIThreadID mOwnerThread;
-    gsi_u32 mEntryCount;  // track re-entry
-    gsi_u32 mPad;         // make 16bytes
+    gsi_u32 mEntryCount; // track re-entry
+    gsi_u32 mPad;        // make 16bytes
 } GSICriticalSection;
 typedef void (*GSThreadFunc)(void* arg);
 
-#elif defined(_UNIX)  //_LINUX || _MACOSX
+#elif defined(_UNIX) //_LINUX || _MACOSX
 typedef pthread_mutex_t GSICriticalSection;
 typedef struct
 {
@@ -163,12 +163,12 @@ void gsiCloseSemaphore(GSISemaphoreID theSemaphore);
 
 #else
 // NO THREADS - stub everything to unused
-#define gsiStartThread(a, b, c, d) (-1)  // must return something
+#define gsiStartThread(a, b, c, d) (-1) // must return something
 #define gsiCancelThread(a)
 #define gsiExitThread(a)
 #define gsiCleanupThread(a)
 
-#define gsiHasThreadShutdown(a) (1)  // must return something
+#define gsiHasThreadShutdown(a) (1) // must return something
 
 #define gsiInitializeCriticalSection(a)
 #define gsiEnterCriticalSection(a)
@@ -180,7 +180,7 @@ void gsiCloseSemaphore(GSISemaphoreID theSemaphore);
 #define gsiReleaseSemaphore(a, b)
 #define gsiCloseSemaphore(a)
 
-#endif  // GSI_NO_THREADS
+#endif // GSI_NO_THREADS
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
@@ -188,4 +188,4 @@ void gsiCloseSemaphore(GSISemaphoreID theSemaphore);
 }
 #endif
 
-#endif  // __GSPLATFORMTHREAD_H__
+#endif // __GSPLATFORMTHREAD_H__

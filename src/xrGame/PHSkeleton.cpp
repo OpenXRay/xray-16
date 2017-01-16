@@ -131,7 +131,7 @@ void CPHSkeleton::Update(u32 dt)
 {
     CPhysicsShellHolder* obj = PPhysicsShellHolder();
     CPhysicsShell* pPhysicsShell = obj->PPhysicsShell();
-    if (pPhysicsShell && pPhysicsShell->isFractured())  //! ai().get_alife() &&
+    if (pPhysicsShell && pPhysicsShell->isFractured()) //! ai().get_alife() &&
     {
         PHSplit();
     }
@@ -263,7 +263,7 @@ void CPHSkeleton::ClearUnsplited()
 void CPHSkeleton::SpawnCopy()
 {
     if (PPhysicsShellHolder()->Local()) {
-        CSE_Abstract* D = F_entity_Create("ph_skeleton_object");  //*cNameSect()
+        CSE_Abstract* D = F_entity_Create("ph_skeleton_object"); //*cNameSect()
         R_ASSERT(D);
         /////////////////////////////////////////////////////////////////////////////////////////////
         CSE_ALifePHSkeletonObject* l_tpALifePhysicObject = smart_cast<CSE_ALifePHSkeletonObject*>(D);
@@ -294,7 +294,7 @@ void CPHSkeleton::PHSplit()
 void CPHSkeleton::UnsplitSingle(CPHSkeleton* SO)
 {
     // Msg("%o,received has %d,",this,m_unsplited_shels.size());
-    if (0 == m_unsplited_shels.size()) return;  //. hack
+    if (0 == m_unsplited_shels.size()) return; //. hack
     CPhysicsShellHolder* obj = PPhysicsShellHolder();
     CPhysicsShellHolder* O = SO->PPhysicsShellHolder();
     VERIFY2(m_unsplited_shels.size(), "NO_SHELLS !!");
@@ -307,16 +307,16 @@ void CPHSkeleton::UnsplitSingle(CPHSkeleton* SO)
 
     Flags64 mask0, mask1;
     u16 split_bone = m_unsplited_shels.front().second;
-    mask1.assign(pKinematics->LL_GetBonesVisible());  // source bones mask
+    mask1.assign(pKinematics->LL_GetBonesVisible()); // source bones mask
     pKinematics->LL_SetBoneVisible(split_bone, FALSE, TRUE);
 
     pKinematics->CalculateBones_Invalidate();
     pKinematics->CalculateBones(TRUE);
 
-    mask0.assign(pKinematics->LL_GetBonesVisible());  // first part mask
+    mask0.assign(pKinematics->LL_GetBonesVisible()); // first part mask
     VERIFY2(mask0.flags, "mask0 -Zero");
     mask0.invert();
-    mask1.and (mask0.flags);  // second part mask
+    mask1.and (mask0.flags); // second part mask
 
     newKinematics->LL_SetBoneRoot(split_bone);
     VERIFY2(mask1.flags, "mask1 -Zero");
@@ -358,7 +358,7 @@ void CPHSkeleton::SetAutoRemove(u32 time /*=CSE_PHSkeleton::existence_time*/)
     PPhysicsShellHolder()->SheduleRegister();
 }
 
-static bool removable;  // for RecursiveBonesCheck
+static bool removable; // for RecursiveBonesCheck
 void CPHSkeleton::RecursiveBonesCheck(u16 id)
 {
     if (!removable) return;
@@ -400,12 +400,12 @@ void CPHSkeleton::InitServerObject(CSE_Abstract* D)
 
     l_tpALifePhysicObject->source_id = u16(obj->ID());
     l_tpALifePhysicObject->startup_animation = m_startup_anim;
-    D->s_name = "ph_skeleton_object";  //*cNameSect()
+    D->s_name = "ph_skeleton_object"; //*cNameSect()
     D->set_name_replace("");
     //.	D->s_gameid			=	u8(GameID());
     D->s_RP = 0xff;
     D->ID = 0xffff;
-    D->ID_Parent = 0xffff;  // u16(ID());//
+    D->ID_Parent = 0xffff; // u16(ID());//
     D->ID_Phantom = 0xffff;
     D->o_Position = obj->Position();
     if (ai().get_alife())

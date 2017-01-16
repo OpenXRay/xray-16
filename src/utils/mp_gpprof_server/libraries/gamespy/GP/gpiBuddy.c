@@ -12,9 +12,9 @@ Please see the GameSpy Presence SDK documentation for more information
 **********************************************************************/
 
 #ifdef XRAY_DISABLE_GAMESPY_WARNINGS
-#pragma warning(disable : 4311)  // lines: 977
-#pragma warning(disable : 4312)  // lines: 1039, 1064
-#endif                           //#ifdef XRAY_DISABLE_GAMESPY_WARNINGS
+#pragma warning(disable : 4311) // lines: 977
+#pragma warning(disable : 4312) // lines: 1039, 1064
+#endif                          //#ifdef XRAY_DISABLE_GAMESPY_WARNINGS
 
 // INCLUDES
 //////////
@@ -339,7 +339,7 @@ GPResult gpiProcessRecvBuddyMessage(GPConnection* connection, const char* input)
         if (str != NULL)
             strzcpy(strTemp, (str + 3), sizeof(strTemp));
         else
-            strTemp[0] = '\0';  // no location, set to empty string
+            strTemp[0] = '\0'; // no location, set to empty string
 
         // Call the callback.
         /////////////////////

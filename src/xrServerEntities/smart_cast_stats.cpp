@@ -170,4 +170,4 @@ void release_smart_cast_stats()
 #endif
 }
 
-#endif  // DEBUG
+#endif // DEBUG

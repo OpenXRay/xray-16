@@ -30,7 +30,7 @@ private:
     struct cache_item_less_p
     {
         bool const operator()(cache_item const& left, cache_item const& right) const;
-    };  // struct cache_item_less_predicate
+    }; // struct cache_item_less_predicate
     struct cache_item_expired_p
     {
         cache_item_expired_p(){};
@@ -48,6 +48,6 @@ private:
     cache_t::size_type m_items_allowed;
 
     cache_t::size_type get_free_space();
-};  // class profiles_cache
+}; // class profiles_cache
 
-#endif  //#ifndef PROFILES_CACHE_INCLUDED
+#endif //#ifndef PROFILES_CACHE_INCLUDED

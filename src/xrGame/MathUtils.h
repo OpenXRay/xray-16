@@ -47,7 +47,7 @@ ICF void accurate_normalize(float* a)
             goto aa2_largest;
         }
         else
-        {  // aa1 is largest
+        { // aa1 is largest
             a0 /= aa1;
             a2 /= aa1;
             l = dRecipSqrt(a0 * a0 + a2 * a2 + 1);
@@ -59,7 +59,7 @@ ICF void accurate_normalize(float* a)
     else
     {
         if (aa2 > aa0) {
-        aa2_largest:  // aa2 is largest
+        aa2_largest: // aa2 is largest
             a0 /= aa2;
             a1 /= aa2;
             l = dRecipSqrt(a0 * a0 + a1 * a1 + 1);
@@ -68,11 +68,11 @@ ICF void accurate_normalize(float* a)
             a[2] = (float)_copysign(l, a2);
         }
         else
-        {  // aa0 is largest
+        { // aa0 is largest
             if (aa0 <= 0) {
                 // dDEBUGMSG ("vector has zero size"); ... this messace is annoying
-                a[0] = 1;  // if all a's are zero, this is where we'll end up.
-                a[1] = 0;  // return a default unit length vector.
+                a[0] = 1; // if all a's are zero, this is where we'll end up.
+                a[1] = 0; // return a default unit length vector.
                 a[2] = 0;
                 return;
             }
@@ -201,13 +201,13 @@ IC void dVectorMul(dReal* res, const dReal* av, float mt)
     res[1] = av[1] * mt;
     res[2] = av[2] * mt;
 }
-IC void dVectorInterpolate(dReal* v, dReal* to, float k)  // changes to
+IC void dVectorInterpolate(dReal* v, dReal* to, float k) // changes to
 {
     dVectorMul(v, 1.f - k);
     dVectorMul(to, k);
     dVectorAdd(v, to);
 }
-IC void dVectorInterpolate(dReal* res, const dReal* from, const dReal* to, float k)  // changes to
+IC void dVectorInterpolate(dReal* res, const dReal* from, const dReal* to, float k) // changes to
 {
     dVector3 tov;
     dVectorSet(res, from);
@@ -266,7 +266,7 @@ IC void twoq_2w(const Fquaternion& q1, const Fquaternion& q2, float dt, Fvector&
     Fvector v1, v2;
     v1.set(q1.x, q1.y, q1.z);
     v2.set(q2.x, q2.y, q2.z);
-    float cosinus = q1.w * q2.w + v1.dotproduct(v2);  // q1.w*q2.w+ q1.v.dotproduct(q2.v)
+    float cosinus = q1.w * q2.w + v1.dotproduct(v2); // q1.w*q2.w+ q1.v.dotproduct(q2.v)
     w.crossproduct(v1, v2);
     //								  //the signum must be inverted ?
     v1.mul(q2.w);
@@ -570,7 +570,7 @@ IC bool valid_pos(const Fvector& P, const Fbox& B)
 }
 
 #ifdef DEBUG
-const float DET_CHECK_EPS = 0.15f;  // scale -35%  !? ;)
+const float DET_CHECK_EPS = 0.15f; // scale -35%  !? ;)
 #define VERIFY_RMATRIX(M)                                                                                              \
     {                                                                                                                  \
         float d = DET(M);                                                                                              \

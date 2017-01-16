@@ -131,7 +131,7 @@ CUIGameCTA::~CUIGameCTA()
 bool CUIGameCTA::IsTeamPanelsShown()
 {
     VERIFY(teamPanels);
-    return m_team_panels_shown;  // teamPanels->IsShown();
+    return m_team_panels_shown; // teamPanels->IsShown();
 }
 void CUIGameCTA::ShowTeamPanels(bool bShow)
 {
@@ -551,7 +551,7 @@ void CUIGameCTA::GetPurchaseItems(BuyMenuItemsCollection& dest, s32& moneyDif)
     R_ASSERT(m_pCurBuyMenu);
     preset_items const* tmpPresItems = &(m_pCurBuyMenu->GetPreset(_preset_idx_last));
     if (tmpPresItems->size() == 0) {
-        tmpPresItems = &(m_pCurBuyMenu->GetPreset(_preset_idx_default));  //_preset_idx_origin));
+        tmpPresItems = &(m_pCurBuyMenu->GetPreset(_preset_idx_default)); //_preset_idx_origin));
     }
     preset_items::const_iterator pie = tmpPresItems->end();
     for (preset_items::const_iterator pi = tmpPresItems->begin(); pi != pie; ++pi)
@@ -882,7 +882,7 @@ void CUIGameCTA::LoadDefItemsForRank()
         {
             //			s16* pItemID = &(PlayerDefItems[it]);
             //			char* ItemName = pBuyMenu->GetWeaponNameByIndex(u8(((*pItemID)&0xff00)>>0x08),
-            //u8((*pItemID)&0x00ff));
+            // u8((*pItemID)&0x00ff));
             PresetItem* pDefItem = &(PlayerDefItems[it]);
             const shared_str& ItemName = m_pCurBuyMenu->GetWeaponNameByIndex(pDefItem->SlotID, pDefItem->ItemID);
             if (!ItemName.size()) continue;

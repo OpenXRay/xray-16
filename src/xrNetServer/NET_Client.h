@@ -36,7 +36,7 @@ class XRNETSERVER_API IPureClient : private MultipacketReciever, private Multipa
     friend void sync_thread(void*);
 
 protected:
-    struct HOST_NODE  // deprecated...
+    struct HOST_NODE // deprecated...
     {
         DPN_APPLICATION_DESC dpAppDesc;
         IDirectPlay8Address* pHostAddress;
@@ -89,10 +89,10 @@ public:
     IC GameDescriptionData const& get_net_DescriptionData() const { return m_game_description; }
     LPCSTR net_SessionName() { return *(net_Hosts.front().dpSessionName); }
     // receive
-    IC void StartProcessQueue() { net_Queue.Lock(); };  // WARNING ! after Start mast be End !!! <-
-    IC virtual NET_Packet* net_msg_Retreive() { return net_Queue.Retreive(); };  //							|
-    IC void net_msg_Release() { net_Queue.Release(); };                          //							|
-    IC void EndProcessQueue() { net_Queue.Unlock(); };                           //							<-
+    IC void StartProcessQueue() { net_Queue.Lock(); }; // WARNING ! after Start mast be End !!! <-
+    IC virtual NET_Packet* net_msg_Retreive() { return net_Queue.Retreive(); }; //							|
+    IC void net_msg_Release() { net_Queue.Release(); };                         //							|
+    IC void EndProcessQueue() { net_Queue.Unlock(); };                          //							<-
     // send
     virtual void Send(NET_Packet& P, u32 dwFlags = DPNSEND_GUARANTEED, u32 dwTimeout = 0);
     virtual void Flush_Send_Buffer();

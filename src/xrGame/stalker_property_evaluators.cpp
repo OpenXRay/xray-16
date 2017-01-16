@@ -423,7 +423,7 @@ _value_type CStalkerPropertyEvaluatorShouldThrowGrenade::evaluate()
 {
 #if 0
 	return						(false);
-#else   // #if 1
+#else  // #if 1
 
     if (m_storage->property(eWorldPropertyStartedToThrowGrenade)) return (true);
 
@@ -467,7 +467,7 @@ _value_type CStalkerPropertyEvaluatorShouldThrowGrenade::evaluate()
 
     // do throw grenade
     return (true);
-#endif  // #if 1
+#endif // #if 1
 }
 
 //////////////////////////////////////////////////////////////////////////

@@ -99,7 +99,7 @@ public:
     {
         w_u32(type);
         chunk_pos.push(tell());
-        w_u32(0);  // the place for 'size'
+        w_u32(0); // the place for 'size'
     }
     IC void close_chunk()
     {
@@ -116,7 +116,7 @@ public:
     {
         w_u32(type);
         subchunk_pos.push((u16)tell());
-        w_u16(0);  // the place for 'size'
+        w_u16(0); // the place for 'size'
     }
     IC void close_subchunk()
     {
@@ -210,9 +210,9 @@ public:
     IC void w_layer(u16 number, LPCSTR name)
     {
         open_chunk(ID_LAYR);
-        w_u16(number);  // num
+        w_u16(number); // num
         w_u16(0);
-        w_float(0);  // pivot
+        w_float(0); // pivot
         w_float(0);
         w_float(0);
         w_stringZ(name);

@@ -27,7 +27,7 @@ void game_sv_CaptureTheArtefact::OnEvent(NET_Packet& tNetPacket, u16 type, u32 t
         u16 pl_id = tNetPacket.r_u16();
         // warning, in editor green team zone has 1 id, blue team zone has id 2
         u8 z_t_id = tNetPacket.r_u8();
-        z_t_id--;  // :( !!!
+        z_t_id--; // :( !!!
         OnObjectEnterTeamBase(pl_id, z_t_id);
     }
     break;
@@ -36,10 +36,10 @@ void game_sv_CaptureTheArtefact::OnEvent(NET_Packet& tNetPacket, u16 type, u32 t
     {
         u16 pl_id = tNetPacket.r_u16();
         u8 z_t_id = tNetPacket.r_u8();
-        z_t_id--;  // :( !!!
+        z_t_id--; // :( !!!
         OnObjectLeaveTeamBase(pl_id, z_t_id);
     }
     break;
     default: inherited::OnEvent(tNetPacket, type, time, sender);
-    };  // switch
+    }; // switch
 }

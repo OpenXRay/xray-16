@@ -17,10 +17,10 @@ void Detach(vecFace* S)
         {
             Vertex* V = (*F)->v[i];
             Vertex* VC;
-            map_v2v_it W = verts.find(V);  // iterator
+            map_v2v_it W = verts.find(V); // iterator
 
-            if (W == verts.end()) {                                        // where is no such-vertex
-                VC = V->CreateCopy_NOADJ(lc_global_data()->g_vertices());  // make copy
+            if (W == verts.end()) {                                       // where is no such-vertex
+                VC = V->CreateCopy_NOADJ(lc_global_data()->g_vertices()); // make copy
                 verts.insert(mk_pair(V, VC));
             }
             else
@@ -58,9 +58,9 @@ void CBuild::xrPhase_UVmap()
         // Detect vertex-lighting and avoid this subdivision
         R_ASSERT(!g_XSplit[SP]->empty());
         Face* Fvl = g_XSplit[SP]->front();
-        if (Fvl->Shader().flags.bLIGHT_Vertex) continue;  // do-not touch (skip)
-        if (!Fvl->Shader().flags.bRendering) continue;    // do-not touch (skip)
-        if (Fvl->hasImplicitLighting()) continue;         // do-not touch (skip)
+        if (Fvl->Shader().flags.bLIGHT_Vertex) continue; // do-not touch (skip)
+        if (!Fvl->Shader().flags.bRendering) continue;   // do-not touch (skip)
+        if (Fvl->hasImplicitLighting()) continue;        // do-not touch (skip)
 
         //   find first poly that doesn't has mapping and start recursion
         while (TRUE)

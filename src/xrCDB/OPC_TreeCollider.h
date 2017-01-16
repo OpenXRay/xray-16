@@ -190,42 +190,42 @@ public:
 
 protected:
     // Colliding pairs
-    Container mPairs;  //!< Pairs of colliding primitives
+    Container mPairs; //!< Pairs of colliding primitives
 #ifdef OPC_USE_CALLBACKS
     // User callback
-    udword mUserData0;           //!< User-defined data sent to callbacks
-    udword mUserData1;           //!< User-defined data sent to callbacks
-    OPC_CALLBACK mObjCallback0;  //!< Callback for object 0
-    OPC_CALLBACK mObjCallback1;  //!< Callback for object 1
+    udword mUserData0;          //!< User-defined data sent to callbacks
+    udword mUserData1;          //!< User-defined data sent to callbacks
+    OPC_CALLBACK mObjCallback0; //!< Callback for object 0
+    OPC_CALLBACK mObjCallback1; //!< Callback for object 1
 #else
     // User pointers
-    const IndexedTriangle* mFaces0;  //!< User-defined faces
-    const IndexedTriangle* mFaces1;  //!< User-defined faces
-    const Point* mVerts0;            //!< User-defined vertices
-    const Point* mVerts1;            //!< User-defined vertices
+    const IndexedTriangle* mFaces0; //!< User-defined faces
+    const IndexedTriangle* mFaces1; //!< User-defined faces
+    const Point* mVerts0;           //!< User-defined vertices
+    const Point* mVerts1;           //!< User-defined vertices
 #endif
     // Stats
-    udword mNbBVBVTests;      //!< Number of BV-BV tests
-    udword mNbPrimPrimTests;  //!< Number of Primitive-Primitive tests
-    udword mNbBVPrimTests;    //!< Number of BV-Primitive tests
-                              // Precomputed data
-    Matrix3x3 mAR;            //!< Absolute rotation matrix
-    Matrix3x3 mR0to1;         //!< Rotation from object0 to object1
-    Matrix3x3 mR1to0;         //!< Rotation from object1 to object0
-    Point mT0to1;             //!< Translation from object0 to object1
-    Point mT1to0;             //!< Translation from object1 to object0
-                              // Dequantization coeffs
+    udword mNbBVBVTests;     //!< Number of BV-BV tests
+    udword mNbPrimPrimTests; //!< Number of Primitive-Primitive tests
+    udword mNbBVPrimTests;   //!< Number of BV-Primitive tests
+                             // Precomputed data
+    Matrix3x3 mAR;           //!< Absolute rotation matrix
+    Matrix3x3 mR0to1;        //!< Rotation from object0 to object1
+    Matrix3x3 mR1to0;        //!< Rotation from object1 to object0
+    Point mT0to1;            //!< Translation from object0 to object1
+    Point mT1to0;            //!< Translation from object1 to object0
+                             // Dequantization coeffs
     Point mCenterCoeff0;
     Point mExtentsCoeff0;
     Point mCenterCoeff1;
     Point mExtentsCoeff1;
     // Leaf description
-    Point mLeafVerts[3];    //!< Triangle vertices
-    udword mLeafIndex;      //!< Triangle index
-                            // Settings
-    bool mFullBoxBoxTest;   //!< Perform full BV-BV tests (true) or SAT-lite tests (false)
-    bool mFullPrimBoxTest;  //!< Perform full Primitive-BV tests (true) or SAT-lite tests (false)
-                            // Internal methods
+    Point mLeafVerts[3];   //!< Triangle vertices
+    udword mLeafIndex;     //!< Triangle index
+                           // Settings
+    bool mFullBoxBoxTest;  //!< Perform full BV-BV tests (true) or SAT-lite tests (false)
+    bool mFullPrimBoxTest; //!< Perform full Primitive-BV tests (true) or SAT-lite tests (false)
+                           // Internal methods
 
     // Standard AABB trees
     void _Collide(const AABBCollisionNode* b0, const AABBCollisionNode* b1);
@@ -254,4 +254,4 @@ protected:
     bool CheckTemporalCoherence(Pair* cache);
 };
 
-#endif  // __OPC_TREECOLLIDER_H__
+#endif // __OPC_TREECOLLIDER_H__

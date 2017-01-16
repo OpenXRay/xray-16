@@ -8,11 +8,11 @@
 #include "xrEngine/xr_object.h"
 
 #ifdef _EDITOR
-#include "IGame_Persistent.h"
 #include "Environment.h"
+#include "IGame_Persistent.h"
 #else
-#include "xrEngine/IGame_Persistent.h"
 #include "xrEngine/Environment.h"
+#include "xrEngine/IGame_Persistent.h"
 #endif
 
 //////////////////////////////////////////////////////////////////////
@@ -38,7 +38,7 @@ CROS_impl::CROS_impl()
     last_position.set(0.0f, 0.0f, 0.0f);
     ticks_to_update = 0;
     sky_rays_uptodate = 0;
-#endif  // RENDER!=R_R1
+#endif // RENDER!=R_R1
 
     //#if RENDER==R_R1
     MODE = IRender_ObjectSpecific::TRACE_ALL;
@@ -146,17 +146,17 @@ inline void CROS_impl::accum_hemi(float* hemi_cube, Fvector3& dir, float scale)
     if (dir.x > 0)
         hemi_cube[CUBE_FACE_POS_X] += dir.x * scale;
     else
-        hemi_cube[CUBE_FACE_NEG_X] -= dir.x * scale;  //	dir.x <= 0
+        hemi_cube[CUBE_FACE_NEG_X] -= dir.x * scale; //	dir.x <= 0
 
     if (dir.y > 0)
         hemi_cube[CUBE_FACE_POS_Y] += dir.y * scale;
     else
-        hemi_cube[CUBE_FACE_NEG_Y] -= dir.y * scale;  //	dir.y <= 0
+        hemi_cube[CUBE_FACE_NEG_Y] -= dir.y * scale; //	dir.y <= 0
 
     if (dir.z > 0)
         hemi_cube[CUBE_FACE_POS_Z] += dir.z * scale;
     else
-        hemi_cube[CUBE_FACE_NEG_Z] -= dir.z * scale;  //	dir.z <= 0
+        hemi_cube[CUBE_FACE_NEG_Z] -= dir.z * scale; //	dir.z <= 0
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -326,7 +326,7 @@ void CROS_impl::smart_update(IRenderable* O)
     }
 }
 
-#endif  //	#if RENDER!=R_R1
+#endif //	#if RENDER!=R_R1
 
 extern float ps_r2_lt_smooth;
 
@@ -338,10 +338,10 @@ void CROS_impl::update_smooth(IRenderable* O)
     dwFrameSmooth = Device.dwFrame;
 
 #if RENDER == R_R1
-    if (O && (0 == result_count)) update(O);  // First time only
-#else                                         //	RENDER!=R_R1
+    if (O && (0 == result_count)) update(O); // First time only
+#else                                        //	RENDER!=R_R1
     smart_update(O);
-#endif                                        //	RENDER!=R_R1
+#endif                                       //	RENDER!=R_R1
 
     float l_f = Device.fTimeDelta * ps_r2_lt_smooth;
     clamp(l_f, 0.f, 1.f);
@@ -381,10 +381,10 @@ void CROS_impl::calc_sky_hemi_value(Fvector& position, IGameObject* _object)
 #if RENDER != R_R1
         sky_rays_uptodate += ps_r2_dhemi_count;
         sky_rays_uptodate = _min(sky_rays_uptodate, lt_hemisamples);
-#endif  //	RENDER!=R_R1
+#endif //	RENDER!=R_R1
 
         for (u32 it = 0; it < (u32)ps_r2_dhemi_count; it++)
-        {  // five samples per one frame
+        { // five samples per one frame
             u32 sample = 0;
             if (result_count < lt_hemisamples) {
                 sample = result_count;
@@ -400,7 +400,7 @@ void CROS_impl::calc_sky_hemi_value(Fvector& position, IGameObject* _object)
             Fvector direction;
             direction.set(hdir[sample][0], hdir[sample][1], hdir[sample][2]).normalize();
             //.			result[sample]	=
-            //!g_pGameLevel->ObjectSpace.RayTest(position,direction,50.f,collide::rqtBoth,&cache[sample],_object);
+            //! g_pGameLevel->ObjectSpace.RayTest(position,direction,50.f,collide::rqtBoth,&cache[sample],_object);
             result[sample] = !g_pGameLevel->ObjectSpace.RayTest(
                 position, direction, 50.f, collide::rqtStatic, &cache[sample], _object);
             //	Msg				("%d:-- %s",sample,result[sample]?"true":"false");
@@ -447,7 +447,7 @@ void CROS_impl::prepare_lights(Fvector& position, IRenderable* O)
         {
             ISpatial* spatial = RImplementation.lstSpatial[o_it];
             light* source = (light*)(spatial->dcast_Light());
-            VERIFY(source);  // sanity check
+            VERIFY(source); // sanity check
             float R = radius + source->range;
             if (position.distance_to(source->position) < R
 #if RENDER != R_R1
@@ -478,7 +478,7 @@ void CROS_impl::prepare_lights(Fvector& position, IRenderable* O)
             light* xrL = I->source;
             Fvector& LP = xrL->position;
 #if RENDER == R_R1
-            P.mad(position, P.random_dir(), traceR);  // Random point inside range
+            P.mad(position, P.random_dir(), traceR); // Random point inside range
 #else
             P = position;
 #endif

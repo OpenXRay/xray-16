@@ -108,4 +108,4 @@ private:
     xr_vector<ISpatial*> m_lstRenderables;
 };
 
-#endif  //	dx103DFluidRenderer_included
+#endif //	dx103DFluidRenderer_included

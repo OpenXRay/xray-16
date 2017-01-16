@@ -29,6 +29,6 @@ private:
 
     void* worker_thread();
     static bool thread_stopper(void*, sake_processor*) { return false; };
-};  // class sake_worker
+}; // class sake_worker
 
-#endif  //#ifndef SAKE_WORKER_INCLUDED
+#endif //#ifndef SAKE_WORKER_INCLUDED

@@ -21,7 +21,7 @@ struct ConsistantKey
     }
 };
 
-IC bool operator<(const ConsistantKey& A, const ConsistantKey& B)  // note: inverse operator
+IC bool operator<(const ConsistantKey& A, const ConsistantKey& B) // note: inverse operator
 {
     return A.w > B.w;
 }
@@ -168,7 +168,7 @@ IC void Dequantize(CKey& K, const CBlend& BD, const CMotion& M)
 
         }
         */
-    }  // if (M.test_flag(flTKeyPresent))
+    } // if (M.test_flag(flTKeyPresent))
     else
     {
         D->T.set(M._initT);
@@ -209,7 +209,8 @@ IC void MixInterlerp(CKey& Result, const CKey* R, const CBlend* const BA[MAX_BLE
             w = w1 / ws;
 #ifdef DEBUG
 //.					if (fis_zero(w0+w1) || (!_valid(w))){
-//.						xrDebug::Fatal		(DEBUG_INFO,"TO ALEXMX VERY IMPORTANT: (TOTAL: %f) w: %f, w0: %f, w1: %f, ws:%f, BIS:
+//.						xrDebug::Fatal		(DEBUG_INFO,"TO ALEXMX VERY IMPORTANT: (TOTAL: %f) w: %f, w0: %f, w1: %f, ws:%f,
+//BIS:
 //%d",w0+w1,w,w0,w1,ws,BLEND_INST.Blend.size());
 //.					}
 #endif
@@ -252,8 +253,9 @@ IC void MixInterlerp(CKey& Result, const CKey* R, const CBlend* const BA[MAX_BLE
 
 #ifdef DEBUG
 //.						if ((total==0) || (!_valid(S[cnt].w/total))){
-//.							xrDebug::Fatal		(DEBUG_INFO,"TO ALEXMX VERY IMPORTANT: (TOTAL: %f) w: %f, total: %f, count: %d, real
-//count: %d",total,S[cnt].w,total,count,BLEND_INST.Blend.size());
+//.							xrDebug::Fatal		(DEBUG_INFO,"TO ALEXMX VERY IMPORTANT: (TOTAL: %f) w: %f, total: %f, count: %d,
+//real
+// count: %d",total,S[cnt].w,total,count,BLEND_INST.Blend.size());
 //.						}
 #endif
 
@@ -265,7 +267,7 @@ IC void MixInterlerp(CKey& Result, const CKey* R, const CBlend* const BA[MAX_BLE
     }
 }
 
-IC void key_sub(CKey& rk, const CKey& k0, const CKey& k1)  // sub right
+IC void key_sub(CKey& rk, const CKey& k0, const CKey& k1) // sub right
 {
     Fquaternion q;
     q.inverse(k1.Q);
@@ -279,7 +281,7 @@ IC void key_identity(CKey& k)
     k.Q.identity();
     k.T.set(0, 0, 0);
 }
-IC void key_add(CKey& res, const CKey& k0, const CKey& k1)  // add right
+IC void key_add(CKey& res, const CKey& k0, const CKey& k1) // add right
 {
     res.Q.set(Fquaternion().mul(k0.Q, k1.Q));
     // res.Q.normalize();

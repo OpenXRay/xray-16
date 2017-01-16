@@ -113,21 +113,21 @@ void initialize()
 
     _control87(_PC_24, MCW_PC);
     _control87(_RC_CHOP, MCW_RC);
-    _24 = getFPUsw();  // 24, chop
+    _24 = getFPUsw(); // 24, chop
     _control87(_RC_NEAR, MCW_RC);
-    _24r = getFPUsw();  // 24, rounding
+    _24r = getFPUsw(); // 24, rounding
 
     _control87(_PC_53, MCW_PC);
     _control87(_RC_CHOP, MCW_RC);
-    _53 = getFPUsw();  // 53, chop
+    _53 = getFPUsw(); // 53, chop
     _control87(_RC_NEAR, MCW_RC);
-    _53r = getFPUsw();  // 53, rounding
+    _53r = getFPUsw(); // 53, rounding
 
     _control87(_PC_64, MCW_PC);
     _control87(_RC_CHOP, MCW_RC);
-    _64 = getFPUsw();  // 64, chop
+    _64 = getFPUsw(); // 64, chop
     _control87(_RC_NEAR, MCW_RC);
-    _64r = getFPUsw();  // 64, rounding
+    _64r = getFPUsw(); // 64, rounding
 
     if (!Core.PluginMode) m24r();
     ::Random.seed(u32(CPU::GetCLK() % (1i64 << 32i64)));
@@ -270,9 +270,9 @@ void _initialize_cpu(void)
     Msg("* CPU features: %s", features);
     Msg("* CPU cores/threads: %d/%d\n", CPU::ID.n_cores, CPU::ID.n_threads);
 
-    Fidentity.identity();   // Identity matrix
-    Didentity.identity();   // Identity matrix
-    pvInitializeStatics();  // Lookup table for compressed normals
+    Fidentity.identity();  // Identity matrix
+    Didentity.identity();  // Identity matrix
+    pvInitializeStatics(); // Lookup table for compressed normals
     FPU::initialize();
     _initialize_cpu_thread();
 

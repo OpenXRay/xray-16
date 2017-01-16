@@ -32,7 +32,7 @@ static const u32 ENEMY_INERTIA_TIME_FROM_ACTOR = 6000;
 
 #ifdef _DEBUG
 bool g_enemy_manager_second_update = false;
-#endif  // _DEBUG
+#endif // _DEBUG
 
 #define USE_EVALUATOR
 
@@ -129,10 +129,10 @@ float CEnemyManager::evaluate(const CEntityAlive* object) const
 
     float distance = m_object->Position().distance_to_sqr(object->Position());
     return (penalty + distance / 100.f + ai().ef_storage().m_pfVictoryProbability->ffGetValue() / 100.f);
-#else   // USE_EVALUATOR
+#else  // USE_EVALUATOR
     float distance = m_object->Position().distance_to_sqr(object->Position());
     return (1000.f * (visible ? 0.f : 1.f) + distance);
-#endif  // USE_EVALUATOR
+#endif // USE_EVALUATOR
 }
 
 bool CEnemyManager::expedient(const CEntityAlive* object) const
@@ -299,10 +299,10 @@ void CEnemyManager::process_wounded(bool& only_wounded)
     }
 
     if (only_wounded) {
-#if 0   // def _DEBUG
+#if 0  // def _DEBUG
 		if (g_enemy_manager_second_update)
 			Msg					("%6d ONLY WOUNDED LEFT %s",Device.dwTimeGlobal,*m_object->cName());
-#endif  // _DEBUG
+#endif // _DEBUG
         return;
     }
 
@@ -385,10 +385,10 @@ void CEnemyManager::update()
         Level().autosave_manager().inc_not_ready();
     }
 
-#if 0   // def _DEBUG
+#if 0  // def _DEBUG
 	if (g_enemy_manager_second_update && selected() && smart_cast<const CAI_Stalker*>(selected()) && smart_cast<const CAI_Stalker*>(selected())->wounded())
 		Msg						("%6d WOUNDED CHOOSED %s",Device.dwTimeGlobal,*m_object->cName());
-#endif  // _DEBUG
+#endif // _DEBUG
 
     STOP_PROFILE
 }

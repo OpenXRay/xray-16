@@ -5,10 +5,10 @@
 #include "map_manager.h"
 #include "map_spot.h"
 #include "stdafx.h"
-#include "xrEngine/xr_input.h"  //remove me !!!
+#include "xrEngine/xr_input.h" //remove me !!!
 
-const u32 activeLocalMapColor = 0xffffffff;    // 0xffc80000;
-const u32 inactiveLocalMapColor = 0xffffffff;  // 0xff438cd1;
+const u32 activeLocalMapColor = 0xffffffff;   // 0xffc80000;
+const u32 inactiveLocalMapColor = 0xffffffff; // 0xff438cd1;
 const u32 ourLevelMapColor = 0xffffffff;
 
 CUICustomMap::CUICustomMap()
@@ -108,7 +108,7 @@ Fvector2 CUICustomMap::ConvertLocalToReal(const Fvector2& src, Frect const& boun
 }
 
 Fvector2 CUICustomMap::ConvertRealToLocal(
-    const Fvector2& src, bool for_drawing)  // meters->pixels (relatively own left-top pos)
+    const Fvector2& src, bool for_drawing) // meters->pixels (relatively own left-top pos)
 {
     Fvector2 res;
     if (!Heading()) {
@@ -132,7 +132,7 @@ Fvector2 CUICustomMap::ConvertRealToLocal(
 }
 
 Fvector2 CUICustomMap::ConvertRealToLocalNoTransform(
-    const Fvector2& src, Frect const& bound_rect)  // meters->pixels (relatively own left-top pos)
+    const Fvector2& src, Frect const& bound_rect) // meters->pixels (relatively own left-top pos)
 {
     Fvector2 res;
     res.x = (src.x - bound_rect.lt.x) * GetCurrentZoom().x;
@@ -144,7 +144,7 @@ Fvector2 CUICustomMap::ConvertRealToLocalNoTransform(
 // position and heading for drawing pointer to src pos
 bool CUICustomMap::GetPointerTo(const Fvector2& src, float item_radius, Fvector2& pos, float& heading)
 {
-    Frect clip_rect_abs = WorkingArea();  // absolute rect coords
+    Frect clip_rect_abs = WorkingArea(); // absolute rect coords
     Frect map_rect_abs;
     GetAbsoluteRect(map_rect_abs);
 
@@ -309,7 +309,7 @@ void CUIGlobalMap::ClipByVisRect()
 }
 
 Fvector2 CUIGlobalMap::ConvertRealToLocal(
-    const Fvector2& src, bool for_drawing)  // pixels->pixels (relatively own left-top pos)
+    const Fvector2& src, bool for_drawing) // pixels->pixels (relatively own left-top pos)
 {
     Fvector2 res;
     res.x = (src.x - BoundRect().lt.x) * GetCurrentZoom().x;
@@ -611,7 +611,7 @@ void CUIMiniMap::Draw()
     GlobalEnv.UIRender->FlushPrimitive();
 
     //------------
-    CUIWindow::Draw();  // draw childs
+    CUIWindow::Draw(); // draw childs
 }
 
 bool CUIMiniMap::GetPointerTo(const Fvector2& src, float item_radius, Fvector2& pos, float& heading)
@@ -651,5 +651,5 @@ bool CUIMiniMap::IsRectVisible(Frect r)
     r.getcenter(rect_center);
     float spot_radius = r.width() / 2.0f;
     return clip_center.distance_to(rect_center) + spot_radius <
-           vis_radius;  // assume that all minimap spots are circular
+           vis_radius; // assume that all minimap spots are circular
 }

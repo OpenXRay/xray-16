@@ -38,7 +38,7 @@ u32 const generate_key(s32 const seed, key_t& result_key)
     return result_key.m_key_length;
 }
 
-enum enum_xray_crypt_action  // do not add any, identifier !
+enum enum_xray_crypt_action // do not add any, identifier !
 {
     xr_encrypt = 0x00,
     xr_decrypt
@@ -106,4 +106,4 @@ u32 const decrypt(void* buffer, u32 buffer_size, key_t const& sec_key)
     return xray_crypt(buffer, buffer_size, sec_key, xr_decrypt);
 }
 
-}  // namespace secure_messaging
+} // namespace secure_messaging

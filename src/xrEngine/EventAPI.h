@@ -29,7 +29,7 @@ private:
 public:
 #ifdef CONFIG_PROFILE_LOCKS
     CEventAPI() : CS(MUTEX_PROFILE_ID(CEventAPI)) {}
-#endif  // CONFIG_PROFILE_LOCKS
+#endif // CONFIG_PROFILE_LOCKS
     EVENT Create(const char* N);
     void Destroy(EVENT& E);
 

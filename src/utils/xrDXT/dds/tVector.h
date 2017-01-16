@@ -333,10 +333,10 @@ public:
         // Destruct old elements (if we're shrinking).
         for (size_t i = new_size; i < old_size; i++)
         {
-            (m_buffer + i)->~T();  // Explicit call to the destructor
+            (m_buffer + i)->~T(); // Explicit call to the destructor
         }
         if (m_size == 0) {
-            if (false)  // Don't shrink automatically.
+            if (false) // Don't shrink automatically.
             {
                 allocate(0);
             }
@@ -364,7 +364,7 @@ public:
         // Call default constructors
         for (size_t i = old_size; i < new_size; i++)
         {
-            new (m_buffer + i) T();  // placement new
+            new (m_buffer + i) T(); // placement new
         }
     }
 
@@ -377,11 +377,11 @@ public:
         // Destruct old elements (if we're shrinking).
         for (size_t i = new_size; i < old_size; i++)
         {
-            (m_buffer + i)->~T();  // Explicit call to the destructor
+            (m_buffer + i)->~T(); // Explicit call to the destructor
         }
 
         if (m_size == 0) {
-            if (false)  // Don't shrink automatically.
+            if (false) // Don't shrink automatically.
             {
                 allocate(0);
             }
@@ -408,7 +408,7 @@ public:
         // Call copy constructors
         for (size_t i = old_size; i < new_size; i++)
         {
-            new (m_buffer + i) T(elem);  // placement new
+            new (m_buffer + i) T(elem); // placement new
         }
     }
 
@@ -444,7 +444,7 @@ private:
                 m_buffer = NULL;
             }
         }
-        else  // realloc the buffer
+        else // realloc the buffer
         {
             m_buffer = (T*)::realloc(m_buffer, sizeof(T) * m_buffer_size);
         }

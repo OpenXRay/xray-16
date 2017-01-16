@@ -106,7 +106,7 @@ extern XRLC_LIGHT_API void DumpDeflctor(const CDeflector& d);
 extern XRLC_LIGHT_API void DeflectorsStats();
 extern XRLC_LIGHT_API void DumpDeflctor(u32 id);
 
-static const u32 c_LMAP_size = 1024;  // pixels
+static const u32 c_LMAP_size = 1024; // pixels
 
 #define rms_zero ((4 + g_params().m_lm_rms_zero) / 2)
 #define rms_shrink ((8 + g_params().m_lm_rms) / 2)

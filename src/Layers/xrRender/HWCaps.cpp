@@ -5,8 +5,8 @@
 #include "hwcaps.h"
 
 #ifndef _EDITOR
-#include <nvapi.h>
 #include <ags_lib/inc/amd_ags.h>
+#include <nvapi.h>
 #endif
 
 namespace
@@ -167,13 +167,13 @@ void CHWCaps::Update()
     Msg("* GPU vertex cache: %s, %d", (1 == vc.OptMethod) ? "recognized" : "unrecognized", u32(geometry.dwVertexCache));
 
     // *******1********** Compatibility : vertex shader
-    if (0 == raster_major) geometry_major = 0;  // Disable VS if no PS
+    if (0 == raster_major) geometry_major = 0; // Disable VS if no PS
 #ifdef _EDITOR
     geometry_major = 0;
 #endif
 
     //
-    bTableFog = FALSE;  // BOOL	(caps.RasterCaps&D3DPRASTERCAPS_FOGTABLE);
+    bTableFog = FALSE; // BOOL	(caps.RasterCaps&D3DPRASTERCAPS_FOGTABLE);
 
     // Detect if stencil available
     bStencil = FALSE;
@@ -217,7 +217,7 @@ void CHWCaps::Update()
 
     iGPUNum = GetGpuNum();
 }
-#else   //	USE_DX10
+#else  //	USE_DX10
 void CHWCaps::Update()
 {
     // ***************** GEOMETRY
@@ -255,10 +255,10 @@ void CHWCaps::Update()
     Msg("* GPU vertex cache: %s, %d", "unrecognized", u32(geometry.dwVertexCache));
 
     // *******1********** Compatibility : vertex shader
-    if (0 == raster_major) geometry_major = 0;  // Disable VS if no PS
+    if (0 == raster_major) geometry_major = 0; // Disable VS if no PS
 
     //
-    bTableFog = FALSE;  // BOOL	(caps.RasterCaps&D3DPRASTERCAPS_FOGTABLE);
+    bTableFog = FALSE; // BOOL	(caps.RasterCaps&D3DPRASTERCAPS_FOGTABLE);
 
     // Detect if stencil available
     bStencil = TRUE;
@@ -275,4 +275,4 @@ void CHWCaps::Update()
 
     iGPUNum = GetGpuNum();
 }
-#endif  //	USE_DX10
+#endif //	USE_DX10

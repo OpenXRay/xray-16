@@ -1,14 +1,14 @@
 #include "MbHelpers.h"
 #include "stdafx.h"
 
-#define BITS1_MASK 0x80  // 10000000b
-#define BITS2_MASK 0xC0  // 11000000b
-#define BITS3_MASK 0xE0  // 11100000b
-#define BITS4_MASK 0xF0  // 11110000b
-#define BITS1_EXP 0x00   // 00000000b
-#define BITS2_EXP 0x80   // 10000000b
-#define BITS3_EXP 0xC0   // 11000000b
-#define BITS4_EXP 0xE0   // 11100000b
+#define BITS1_MASK 0x80 // 10000000b
+#define BITS2_MASK 0xC0 // 11000000b
+#define BITS3_MASK 0xE0 // 11100000b
+#define BITS4_MASK 0xF0 // 11110000b
+#define BITS1_EXP 0x00  // 00000000b
+#define BITS2_EXP 0x80  // 10000000b
+#define BITS3_EXP 0xC0  // 11000000b
+#define BITS4_EXP 0xE0  // 11100000b
 
 // MB_DUMB_CONVERSION - ignore non UTF-8 compliant sequences, as-is conversion
 #define MB_DUMB_CONVERSION
@@ -43,7 +43,7 @@ u16 mbhMulti2WideDumb(wchar_t* WideStr, wchar_t* WidePos, u16 WideStrSize, const
     return dpos;
 }
 
-#endif  // MB_DUMB_CONVERSION
+#endif // MB_DUMB_CONVERSION
 
 u16 mbhMulti2Wide(wchar_t* WideStr, wchar_t* WidePos, u16 WideStrSize, const char* MultiStr)
 {

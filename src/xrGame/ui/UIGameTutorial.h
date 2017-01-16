@@ -27,7 +27,7 @@ public:
     void Stop();
     void Next();
 
-    void Destroy();  // be careful
+    void Destroy(); // be careful
 
     virtual void OnFrame();
     virtual void OnRender();

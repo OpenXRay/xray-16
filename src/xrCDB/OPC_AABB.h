@@ -12,7 +12,7 @@
 #ifndef __ICEAABB_H__
 #define __ICEAABB_H__
 
-#define USE_MINMAX  // if defined, use (Min, Max) AABBs, else use (Center, Extents) ones.
+#define USE_MINMAX // if defined, use (Min, Max) AABBs, else use (Center, Extents) ones.
 
 //! Declarations of type-independent methods (implemented in the .cpp)
 #define AABB_COMMON_METHODS                                                                                            \
@@ -22,8 +22,8 @@
 
 enum AABBType
 {
-    AABB_RENDER = 0,  //!< AABB used for rendering. Not visible == not rendered.
-    AABB_UPDATE = 1,  //!< AABB used for dynamic updates. Not visible == not updated.
+    AABB_RENDER = 0, //!< AABB used for rendering. Not visible == not rendered.
+    AABB_UPDATE = 1, //!< AABB used for dynamic updates. Not visible == not updated.
     AABB_FORCE_DWORD = 0x7fffffff,
 };
 
@@ -287,8 +287,8 @@ public:
     }
 
 private:
-    Point mMin;  //!< Min point
-    Point mMax;  //!< Max point
+    Point mMin; //!< Min point
+    Point mMax; //!< Max point
 };
 
 #else
@@ -436,7 +436,7 @@ public:
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     inline_ bool GomezIntersect(const AABB& a)
     {
-        Point T = mCenter - a.mCenter;  // Vector from A to B
+        Point T = mCenter - a.mCenter; // Vector from A to B
         return ((fabsf(T.x) <= (a.mExtents.x + mExtents.x)) && (fabsf(T.y) <= (a.mExtents.y + mExtents.y)) &&
                 (fabsf(T.z) <= (a.mExtents.z + mExtents.z)));
     }
@@ -527,8 +527,8 @@ public:
     }
 
 private:
-    Point mCenter;   //!< AABB Center
-    Point mExtents;  //!< x, y and z extents
+    Point mCenter;  //!< AABB Center
+    Point mExtents; //!< x, y and z extents
 };
 
 #endif
@@ -558,4 +558,4 @@ inline_ void ComputeAABB(AABB& aabb, const Point* list, udword nbpts)
     }
 }
 
-#endif  // __ICEAABB_H__
+#endif // __ICEAABB_H__

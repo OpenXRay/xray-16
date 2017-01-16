@@ -81,6 +81,6 @@ int SHA1Result(SHA1Context*, uint8_t Message_Digest[SHA1HashSize]);
 
 #if defined(__cplusplus)
 }
-#endif  // extern "C"
+#endif // extern "C"
 
 #endif

@@ -43,7 +43,7 @@
 #include "reward_manager.h"
 #include "stats_submitter.h"
 
-#include "xrServer_info.h"  //for enum_server_info_type
+#include "xrServer_info.h" //for enum_server_info_type
 
 #define KILLEVENT_ICONS "ui\\ui_hud_mp_icon_death"
 #define RADIATION_ICONS "ui\\ui_mn_radiations_hard"
@@ -93,7 +93,7 @@ game_cl_mp::game_cl_mp()
 	xr_sprintf(BuySpawnText, "You can buy a spawn for %d $. Press Yes to pay.", 
 		abs(m_iSpawn_Cost));
 	pBuySpawnMsgBox->SetText(BuySpawnText);
-*/  //-----------------------------------------------------------
+*/ //-----------------------------------------------------------
     m_reward_generator = NULL;
     m_ready_to_open_buy_menu = true;
     m_reward_manager = NULL;
@@ -192,7 +192,7 @@ bool game_cl_mp::OnKeyboardPress(int key)
             CGameObject* GO = smart_cast<CGameObject*>(curr);
 #ifdef DEBUG
             Msg("---I'm ready (ID = %d) sending player ready packet !!!", GO->ID());
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
             NET_Packet P;
             GO->u_EventGen(P, GE_GAME_EVENT, GO->ID());
             P.w_u16(GAME_EVENT_PLAYER_READY);
@@ -203,7 +203,7 @@ bool game_cl_mp::OnKeyboardPress(int key)
         {
 #ifdef DEBUG
             Msg("---I'm not ready, is_actor = %d, is_spectator = %d", is_actor, is_spectator);
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
             return false;
         }
     };
@@ -342,7 +342,7 @@ void game_cl_mp::TranslateGameMessage(u32 msg, NET_Packet& P)
 
     switch (msg)
     {
-    case GAME_EVENT_PLAYER_KILLED:  // dm
+    case GAME_EVENT_PLAYER_KILLED: // dm
     {
         OnPlayerKilled(P);
     }
@@ -386,7 +386,7 @@ void game_cl_mp::TranslateGameMessage(u32 msg, NET_Packet& P)
     case GAME_EVENT_ROUND_STARTED: { OnGameRoundStarted();
 #ifdef DEBUG
         Msg("--- On round started !!!");
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
     }
     break;
     case GAME_EVENT_ROUND_END:
@@ -395,7 +395,7 @@ void game_cl_mp::TranslateGameMessage(u32 msg, NET_Packet& P)
         P.r_stringZ(reason);
 #ifdef DEBUG
         Msg("--- On round end !!!");
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
     }
     break;
     case GAME_EVENT_SERVER_STRING_MESSAGE:
@@ -477,7 +477,7 @@ void game_cl_mp::ChatSay(LPCSTR phrase, bool bAll)
 
     NET_Packet P;
     P.w_begin(M_CHAT_MESSAGE);
-    P.w_s16((bAll) ? -1 : local_player->team);  // -1 = all, 0 = green, 1 = blue
+    P.w_s16((bAll) ? -1 : local_player->team); // -1 = all, 0 = green, 1 = blue
     P.w_stringZ(local_player->getName());
     P.w_stringZ(phrase);
     P.w_s16(team);
@@ -595,7 +595,7 @@ void game_cl_mp::shedule_Update(u32 dt)
         if (m_pMessageBox && m_pMessageBox->IsShown()) {
             m_pMessageBox->HideDialog();
         }
-        if (m_pVoteRespondWindow && m_pVoteRespondWindow->IsShown())  // && IsVotingActive())
+        if (m_pVoteRespondWindow && m_pVoteRespondWindow->IsShown()) // && IsVotingActive())
         {
             m_pVoteRespondWindow->HideDialog();
         }
@@ -800,7 +800,7 @@ void game_cl_mp::OnPlayerKilled(NET_Packet& P)
     if (!pPlayer) {
 #ifndef MASTER_GOLD
         Msg("! Non existant player[%d] killed by [%d] with [%d]", KilledID, KillerID, WeaponID);
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
         return;
     }
     R_ASSERT(pPlayer);
@@ -817,7 +817,7 @@ void game_cl_mp::OnPlayerKilled(NET_Packet& P)
     switch (KillType)
     {
     //-----------------------------------------------------------
-    case KT_HIT:  // from hit
+    case KT_HIT: // from hit
     {
         string1024 sWeapon = "", sSpecial = "";
         if (pWeapon) {
@@ -875,7 +875,7 @@ void game_cl_mp::OnPlayerKilled(NET_Packet& P)
         //-------------------------------------------
         switch (SpecialKill)
         {
-        case SKT_NONE:  // not special
+        case SKT_NONE: // not special
         {
             if (pOKiller && pOKiller == Level().CurrentViewEntity()) {
                 // if (pWeapon && pWeapon->CLS_ID == CLSID_OBJECT_W_KNIFE)
@@ -885,7 +885,7 @@ void game_cl_mp::OnPlayerKilled(NET_Packet& P)
             };
         }
         break;
-        case SKT_HEADSHOT:  // Head Shot
+        case SKT_HEADSHOT: // Head Shot
         {
             BONUSES_it it = std::find(m_pBonusList.begin(), m_pBonusList.end(), "headshot");
             if (it != m_pBonusList.end() && (*it == "headshot")) {
@@ -919,7 +919,7 @@ void game_cl_mp::OnPlayerKilled(NET_Packet& P)
             if (pOKiller && pOKiller == Level().CurrentViewEntity()) PlaySndMessage(ID_ASSASSIN);
         }
         break;
-        case SKT_BACKSTAB:  // BackStab
+        case SKT_BACKSTAB: // BackStab
         {
             BONUSES_it it = std::find(m_pBonusList.begin(), m_pBonusList.end(), "backstab");
             if (it != m_pBonusList.end() && (*it == "backstab")) {
@@ -957,7 +957,7 @@ void game_cl_mp::OnPlayerKilled(NET_Packet& P)
     }
     break;
     //-----------------------------------------------------------
-    case KT_BLEEDING:  // from bleeding
+    case KT_BLEEDING: // from bleeding
     {
         KMS.m_initiator.m_shader = GetBloodLossIconsShader();
         KMS.m_initiator.m_rect.x1 = 238;
@@ -993,7 +993,7 @@ void game_cl_mp::OnPlayerKilled(NET_Packet& P)
     }
     break;
     //-----------------------------------------------------------
-    case KT_RADIATION:  // from radiation
+    case KT_RADIATION: // from radiation
     {
         KMS.m_initiator.m_shader = GetRadiationIconsShader();
         KMS.m_initiator.m_rect.x1 = 215;
@@ -1105,7 +1105,7 @@ void game_cl_mp::net_import_state(NET_Packet& P)
 
 bool game_cl_mp::Is_Spectator_Camera_Allowed(CSpectator::EActorCameras Camera)
 {
-    if (Level().IsDemoPlay())  // all cameras allowed in demo play mode
+    if (Level().IsDemoPlay()) // all cameras allowed in demo play mode
         return true;
     /*
     switch (Camera)
@@ -1483,8 +1483,8 @@ void game_cl_mp::start_receive_server_info(ClientID const& svclient_id)
     tmp_binder->m_file_name = "";
     tmp_binder->m_owner = this;
     tmp_binder->m_active = true;
-    tmp_binder->m_downloaded_size = 0;  // initial value for rendering
-    tmp_binder->m_max_size = 1;         // avoiding division by zero
+    tmp_binder->m_downloaded_size = 0; // initial value for rendering
+    tmp_binder->m_max_size = 1;        // avoiding division by zero
 
     file_transfer::receiving_state_callback_t receiving_cb_info =
         fastdelegate::MakeDelegate(tmp_binder, &game_cl_mp::fr_callback_binder::receiving_serverinfo_callback);
@@ -1522,8 +1522,8 @@ void game_cl_mp::PrepareToReceiveFile(
     tmp_binder->m_file_name = screen_shot_fn;
     tmp_binder->m_owner = this;
     tmp_binder->m_active = true;
-    tmp_binder->m_downloaded_size = 0;  // initial value for rendering
-    tmp_binder->m_max_size = 1;         // avoiding division by zero
+    tmp_binder->m_downloaded_size = 0; // initial value for rendering
+    tmp_binder->m_max_size = 1;        // avoiding division by zero
     tmp_binder->m_response_type = response_event;
 
     file_transfer::receiving_state_callback_t receiving_cb =
@@ -1591,7 +1591,7 @@ void __stdcall game_cl_mp::fr_callback_binder::receiving_file_callback(
         }
         break;
         default: NODEFAULT;
-        };  // switch (m_response_type)
+        }; // switch (m_response_type)
 
         m_active = false;
     }

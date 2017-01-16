@@ -5,9 +5,9 @@
 #include "ParticlesObject.h"
 
 #ifdef DEBUG
-#include "xrEngine/StatGraph.h"
 #include "PHDebug.h"
-#endif  // DEBUG
+#include "xrEngine/StatGraph.h"
+#endif // DEBUG
 
 #include "PHDestroyable.h"
 
@@ -198,13 +198,13 @@ void CCar::SpawnInitPhysics(CSE_Abstract* D)
 {
     CSE_PHSkeleton* so = smart_cast<CSE_PHSkeleton*>(D);
     R_ASSERT(so);
-    ParseDefinitions();  // parse ini filling in m_driving_wheels,m_steering_wheels,m_breaking_wheels
-    CreateSkeleton(D);   // creates m_pPhysicsShell & fill in bone_map
+    ParseDefinitions(); // parse ini filling in m_driving_wheels,m_steering_wheels,m_breaking_wheels
+    CreateSkeleton(D);  // creates m_pPhysicsShell & fill in bone_map
     IKinematics* K = smart_cast<IKinematics*>(Visual());
-    K->CalculateBones_Invalidate();  // this need to call callbacks
+    K->CalculateBones_Invalidate(); // this need to call callbacks
     K->CalculateBones(TRUE);
-    Init();  // inits m_driving_wheels,m_steering_wheels,m_breaking_wheels values using recieved in ParceDefinitions &
-             // from bone_map
+    Init(); // inits m_driving_wheels,m_steering_wheels,m_breaking_wheels values using recieved in ParceDefinitions &
+            // from bone_map
     // PPhysicsShell()->add_ObjectContactCallback(ActorObstacleCallback);
     SetDefaultNetState(so);
     CPHUpdateObject::Activate();
@@ -376,7 +376,7 @@ void CCar::shedule_Update(u32 dt)
     if (CDelayedActionFuse::isActive() && CDelayedActionFuse::Update(GetfHealth())) {
         // CarExplode();
     }
-    if (b_exploded && !m_explosion_flags.test(flExploding) && !getEnabled())  //! m_bExploding
+    if (b_exploded && !m_explosion_flags.test(flExploding) && !getEnabled()) //! m_bExploding
         setEnabled(TRUE);
 #ifdef DEBUG
     DbgSheduleUpdate();
@@ -634,7 +634,7 @@ bool CCar::is_Door(u16 id, xr_map<u16, SDoor>::iterator& i)
     }
     else
     {
-        if (i->second.joint)  // temp for fake doors
+        if (i->second.joint) // temp for fake doors
             return true;
         else
             return false;
@@ -712,10 +712,10 @@ void CCar::ParseDefinitions()
     m_min_rpm *= (1.f / 60.f * 2.f * M_PI);
 
     m_power_rpm = ini->r_float("car_definition", "max_power_rpm");
-    m_power_rpm *= (1.f / 60.f * 2.f * M_PI);  //
+    m_power_rpm *= (1.f / 60.f * 2.f * M_PI); //
 
     m_torque_rpm = ini->r_float("car_definition", "max_torque_rpm");
-    m_torque_rpm *= (1.f / 60.f * 2.f * M_PI);  //
+    m_torque_rpm *= (1.f / 60.f * 2.f * M_PI); //
 
     m_power_increment_factor =
         READ_IF_EXISTS(ini, r_float, "car_definition", "power_increment_factor", m_power_increment_factor);
@@ -830,7 +830,7 @@ void CCar::Init()
     }
     m_steer_angle = 0.f;
     // ref_wheel.Init();
-    m_ref_radius = ini->r_float("car_definition", "reference_radius");  // ref_wheel.radius;
+    m_ref_radius = ini->r_float("car_definition", "reference_radius"); // ref_wheel.radius;
     b_exploded = false;
     b_engine_on = false;
     b_clutch = false;
@@ -980,9 +980,9 @@ void CCar::StopEngine()
     // StopExhausts();
     AscCall(ascSndStall);
     AscCall(ascExhoustStop);
-    NeutralDrive();  // set zero speed
+    NeutralDrive(); // set zero speed
     b_engine_on = false;
-    UpdatePower();  // set engine friction;
+    UpdatePower(); // set engine friction;
     m_current_rpm = 0.f;
 }
 
@@ -992,16 +992,16 @@ void CCar::Stall()
     // StopExhausts();
     AscCall(ascSndStall);
     AscCall(ascExhoustStop);
-    NeutralDrive();  // set zero speed
+    NeutralDrive(); // set zero speed
     b_engine_on = false;
-    UpdatePower();  // set engine friction;
+    UpdatePower(); // set engine friction;
     m_current_rpm = 0.f;
 }
 void CCar::ReleasePedals()
 {
     Clutch();
-    NeutralDrive();  // set zero speed
-    UpdatePower();   // set engine friction;
+    NeutralDrive(); // set zero speed
+    UpdatePower();  // set engine friction;
 }
 
 void CCar::SwitchEngine()
@@ -1045,7 +1045,7 @@ void CCar::UpdatePower()
 
 void CCar::SteerRight()
 {
-    b_wheels_limited = true;  // no need to limit wheels when stiring
+    b_wheels_limited = true; // no need to limit wheels when stiring
     m_pPhysicsShell->Enable();
     xr_vector<SWheelSteer>::iterator i, e;
     i = m_steering_wheels.begin();
@@ -1056,7 +1056,7 @@ void CCar::SteerRight()
 }
 void CCar::SteerLeft()
 {
-    b_wheels_limited = true;  // no need to limit wheels when stiring
+    b_wheels_limited = true; // no need to limit wheels when stiring
     m_pPhysicsShell->Enable();
     xr_vector<SWheelSteer>::iterator i, e;
     i = m_steering_wheels.begin();
@@ -1375,7 +1375,7 @@ bool CCar::Use(const Fvector& pos, const Fvector& dir, const Fvector& foot_pos)
     }
 
     RQR.r_clear();
-    collide::ray_defs Q(pos, dir, 3.f, CDB::OPT_CULL, collide::rqtObject);  // CDB::OPT_ONLYFIRST CDB::OPT_ONLYNEAREST
+    collide::ray_defs Q(pos, dir, 3.f, CDB::OPT_CULL, collide::rqtObject); // CDB::OPT_ONLYFIRST CDB::OPT_ONLYNEAREST
     VERIFY(!fis_zero(Q.dir.square_magnitude()));
     if (g_pGameLevel->ObjectSpace.RayQuery(RQR, CForm, Q)) {
         collide::rq_results& R = RQR;

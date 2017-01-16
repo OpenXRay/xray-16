@@ -115,4 +115,4 @@ void manager::fill()
     ::ide().environment_levels(m_property_holder);
 }
 
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR

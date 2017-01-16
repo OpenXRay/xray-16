@@ -320,7 +320,7 @@ void RELATION_REGISTRY::Action(CEntityAlive* from, CEntityAlive* to, ERelationAc
                 }
 
                 //*					ChangeCommunityGoodwill(stalker->Community(), from->ID(), (CHARACTER_GOODWILL)(
-                //stalker->Sympathy() * (float)delta_goodwill ));
+                // stalker->Sympathy() * (float)delta_goodwill ));
                 CHARACTER_GOODWILL community_goodwill =
                     (CHARACTER_GOODWILL)(stalker->Sympathy() * (float)(community_member_fight_help_goodwill));
                 if (community_goodwill) {

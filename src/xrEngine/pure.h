@@ -18,7 +18,7 @@ typedef void __fastcall RP_FUNC(void* obj);
 
 #define DECLARE_RP(name)                                                                                               \
     void __fastcall rp_##name(void* p) { ((pure##name*)p)->On##name(); }
-DECLARE_MESSAGE(Frame);  // XXX: rename to FrameStart
+DECLARE_MESSAGE(Frame); // XXX: rename to FrameStart
 DECLARE_MESSAGE(FrameEnd);
 DECLARE_MESSAGE(Render);
 DECLARE_MESSAGE(AppActivate);
@@ -39,7 +39,7 @@ struct _REG_INFO
 // ENGINE_API extern int __cdecl _REG_Compare(const void *, const void *);
 
 template <class T>
-class CRegistrator  // the registrator itself
+class CRegistrator // the registrator itself
 {
     // friend ENGINE_API int __cdecl _REG_Compare(const void *, const void *);
     static int __cdecl _REG_Compare(const void* e1, const void* e2)

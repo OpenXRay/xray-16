@@ -73,7 +73,7 @@ void xrServer::SLS_Clear()
             Perform_destroy((*I).second, mode);
             break;
         }
-        if (!found)  // R_ASSERT(found);
+        if (!found) // R_ASSERT(found);
         {
             I = entities.begin();
             E = entities.end();

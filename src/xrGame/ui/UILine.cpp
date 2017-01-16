@@ -137,7 +137,7 @@ void CUILine::Draw(CGameFont* pFont, float x, float y) const
     for (int i = 0; i < size; i++)
     {
         m_subLines[i].Draw(pFont, x + length, y);
-        float ll = pFont->SizeOf_(m_subLines[i].m_text.c_str());  //. all ok
+        float ll = pFont->SizeOf_(m_subLines[i].m_text.c_str()); //. all ok
         UI().ClientToScreenScaledWidth(ll);
         length += ll;
     }
@@ -177,7 +177,7 @@ const CUILine* CUILine::Cut2Pos(Position& pos, bool to_first)
     {
         m_tmpLine->AddSubLine(&m_subLines[i]);
 
-        if (m_subLines[i].m_last_in_line)  // check if this subline must be last in line
+        if (m_subLines[i].m_last_in_line) // check if this subline must be last in line
         {
             for (int j = 0; j <= i; j++)
                 m_subLines.erase(m_subLines.begin());

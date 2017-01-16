@@ -49,7 +49,7 @@ void dx10StateCache<ID3DRasterizerState, D3D_RASTERIZER_DESC>::CreateState(
 //	TODO: DX10: Remove this.
 #ifdef DEBUG
     Msg("ID3DRasterizerState #%d created.", m_StateArray.size());
-#endif  //	DEBUG
+#endif //	DEBUG
 }
 
 template <>
@@ -61,7 +61,7 @@ void dx10StateCache<ID3DDepthStencilState, D3D_DEPTH_STENCIL_DESC>::CreateState(
 //	TODO: DX10: Remove this.
 #ifdef DEBUG
     Msg("ID3DDepthStencilState #%d created.", m_StateArray.size());
-#endif  //	DEBUG
+#endif //	DEBUG
 }
 
 template <>
@@ -72,7 +72,7 @@ void dx10StateCache<ID3DBlendState, D3D_BLEND_DESC>::CreateState(D3D_BLEND_DESC 
 //	TODO: DX10: Remove this.
 #ifdef DEBUG
     Msg("ID3DBlendState #%d created.", m_StateArray.size());
-#endif  //	DEBUG
+#endif //	DEBUG
 }
 
 /*

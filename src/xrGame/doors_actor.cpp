@@ -55,7 +55,7 @@ void actor::revert_states(doors_type& doors, door_state const state)
         (*i)->change_state(this, state);
 #ifdef DEBUG
         VERIFY(!(*i)->check_initiator(this));
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
     }
 
     doors.clear_not_free();
@@ -110,7 +110,7 @@ private:
     actor* m_actor;
     door_state m_state;
     float m_danger_distance;
-};  // class passed_doors_predicate
+}; // class passed_doors_predicate
 
 void actor::process_doors(float const average_speed, doors_type& processed_doors, temp_doors_type const& new_doors,
     door_state const start_state, door_state const stop_state)
@@ -134,7 +134,7 @@ void actor::process_doors(float const average_speed, doors_type& processed_doors
 
 #ifdef DEBUG
 BOOL g_debug_doors = 1;
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 
 bool actor::add_new_door(float const average_speed, door* const door, doors_type const& processed_doors,
     doors_type& locked_doors, temp_doors_type& new_doors, door_state const state)
@@ -142,7 +142,7 @@ bool actor::add_new_door(float const average_speed, door* const door, doors_type
     if (door->is_locked(state)) {
 #ifdef DEBUG
         if (g_debug_doors) Msg("actor[%s] is waiting for the locked door[%s]", get_name(), door->get_name());
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
         return false;
     }
 
@@ -153,7 +153,7 @@ bool actor::add_new_door(float const average_speed, door* const door, doors_type
             if (g_debug_doors)
                 Msg("actor[%s] is waiting for the door[%s] blocked by %s", get_name(), door->get_name(),
                     door->get_initiators_ids().c_str());
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
             return false;
         }
 
@@ -165,7 +165,7 @@ bool actor::add_new_door(float const average_speed, door* const door, doors_type
             if (g_debug_doors)
                 Msg("actor[%s] is waiting for the door[%s] blocked by %s", get_name(), door->get_name(),
                     door->get_initiators_ids().c_str());
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
             return false;
         }
     }
@@ -208,7 +208,7 @@ bool actor::update_doors(doors_type const& detected_doors, float const average_s
 
 #ifdef DEBUG
     m_detected_doors = detected_doors;
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 
     stalker_movement_manager_smart_cover const& movement = m_object.movement();
 
@@ -281,4 +281,4 @@ void actor::render() const
         renderer.draw_line(Fidentity, matrix.c, temp, color_xrgb(255, 0, 0));
     }
 }
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG

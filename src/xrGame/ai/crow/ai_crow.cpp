@@ -202,16 +202,16 @@ void CAI_Crow::state_Flying(float fdt)
     vOffset.sub(vGoalDir, Position());
 
     // First, tweak the pitch
-    if (vOffset.y > 1.0) {  // We're too low
+    if (vOffset.y > 1.0) { // We're too low
         vHPB.y += fAT;
         if (vHPB.y > 0.8f) vHPB.y = 0.8f;
     }
     else if (vOffset.y < -1.0)
-    {  // We're too high
+    { // We're too high
         vHPB.y -= fAT;
         if (vHPB.y < -0.8f) vHPB.y = -0.8f;
     }
-    else  // Add damping
+    else // Add damping
         vHPB.y *= 0.95f;
 
     // Now figure out yaw changes
@@ -264,7 +264,7 @@ void CAI_Crow::state_DeathFall()
 void CAI_Crow::Die(IGameObject* who)
 {
     inherited::Die(who);
-    processing_activate();  // enable UpdateCL for dead crows - especially for physics support
+    processing_activate(); // enable UpdateCL for dead crows - especially for physics support
     // and do it especially before Creating physics shell or it definitely throws processing enable/disable calls:
     // underflow
     CreateSkeleton();
@@ -356,7 +356,7 @@ void CAI_Crow::shedule_Update(u32 DT)
 }
 
 // Core events
-void CAI_Crow::net_Export(NET_Packet& P)  // export to server
+void CAI_Crow::net_Export(NET_Packet& P) // export to server
 {
     R_ASSERT(Local());
 
@@ -430,7 +430,7 @@ void CAI_Crow::HitImpulse(float /**amount/**/, Fvector& /**vWorldDir/**/, Fvecto
 //---------------------------------------------------------------------
 void CAI_Crow::CreateSkeleton()
 {
-    m_pPhysicsShell = P_build_Shell(this, false, (BONE_P_MAP*)0);  // P_build_SimpleShell(this,0.3f,false);
+    m_pPhysicsShell = P_build_Shell(this, false, (BONE_P_MAP*)0); // P_build_SimpleShell(this,0.3f,false);
     m_pPhysicsShell->SetMaterial(smart_cast<IKinematics*>(
         Visual())->LL_GetData(smart_cast<IKinematics*>(Visual())->LL_GetBoneRoot())
                                      .game_mtl_idx);

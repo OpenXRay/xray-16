@@ -38,4 +38,4 @@ public:
     void set_camera(const Fvector& position, const Fvector& direction, const Fvector& normal);
 };
 
-#endif  // CAR_MEMORY_H
+#endif // CAR_MEMORY_H

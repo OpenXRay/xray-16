@@ -23,7 +23,7 @@ private:
 
     IClimableObject* m_ladder;
     CPHCharacter* m_character;
-    Fvector m_start_position;  // for depart state
+    Fvector m_start_position; // for depart state
     u32 m_start_time;
 
 public:

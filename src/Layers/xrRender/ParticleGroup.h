@@ -164,7 +164,7 @@ public:
 #define PGD_CHUNK_VERSION 0x0001
 #define PGD_CHUNK_NAME 0x0002
 #define PGD_CHUNK_FLAGS 0x0003
-#define PGD_CHUNK_EFFECTS 0x0004  // obsolete
+#define PGD_CHUNK_EFFECTS 0x0004 // obsolete
 #define PGD_CHUNK_TIME_LIMIT 0x0005
 #define PGD_CHUNK_EFFECTS2 0x0007
 

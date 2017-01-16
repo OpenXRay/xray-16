@@ -44,12 +44,12 @@ static inline void process(LPSTR& i, LPCSTR e, u32 const index, LPCSTR (&strings
 
 #ifndef MASTER_GOLD
     process(index, count, strings);
-#else   // #ifndef MASTER_GOLD
+#else  // #ifndef MASTER_GOLD
     --i;
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
 }
 
-}  // namespace strconcat_error
+} // namespace strconcat_error
 
 int stack_overflow_exception_filter(int exception_code)
 {
@@ -99,11 +99,11 @@ void string_tupples::error_process() const
     strconcat_error::process(overrun_string_index, m_count, strings);
 }
 
-}  // namespace detail
+} // namespace detail
 
-}  // namespace core
+} // namespace core
 
-}  // namespace xray
+} // namespace xray
 
 using namespace xray::core::detail;
 

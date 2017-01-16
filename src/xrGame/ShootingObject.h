@@ -42,7 +42,7 @@ protected:
     // Fire Params
     //////////////////////////////////////////////////////////////////////////
 protected:
-    virtual void LoadFireParams(LPCSTR section);  //сила выстрела
+    virtual void LoadFireParams(LPCSTR section); //сила выстрела
     virtual bool SendHitAllowed(IGameObject* pUser);
     virtual void FireBullet(const Fvector& pos, const Fvector& dir, float fire_disp, const CCartridge& cartridge,
         u16 parent_id, u16 weapon_id, bool send_hit);
@@ -75,7 +75,7 @@ protected:
     //счетчик времени, затрачиваемого на выстрел
     float fShotTimeCounter;
 
-    struct SilencerKoeffs  // value *= koef;
+    struct SilencerKoeffs // value *= koef;
     {
         float hit_power;
         float hit_impulse;
@@ -94,7 +94,7 @@ protected:
             cam_dispersion = 1.0f;
             cam_disper_inc = 1.0f;
         }
-    };  // SilencerKoeffs
+    }; // SilencerKoeffs
     SilencerKoeffs m_silencer_koef;
 
 public:

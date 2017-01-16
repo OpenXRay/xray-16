@@ -34,4 +34,4 @@ public:
     void load(LPCSTR section);
 };
 
-#endif  // STALKER_ANIMATION_OFFSETS_HPP_INCLUDED
+#endif // STALKER_ANIMATION_OFFSETS_HPP_INCLUDED

@@ -144,7 +144,7 @@ void __cdecl SaveObject(GlobalFunc* global)
                 }
                 if (!bErr) {
                     LPCSTR lwo_nm = g_objinfo->filename(object);
-                    {  // append path
+                    { // append path
                         string_path path, dr, di;
                         _splitpath(lwo_nm, dr, di, 0, 0);
                         strconcat(sizeof(path), path, dr, di);

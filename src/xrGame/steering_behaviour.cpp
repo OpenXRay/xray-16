@@ -41,7 +41,7 @@ ICF float max(float a, float b)
     return a < b ? a : b;
 }
 
-}  // namespace detail
+} // namespace detail
 
 //----------------------------------------------------------
 // base
@@ -329,4 +329,4 @@ void manager::deleter(base* p)
     delete (p);
 }
 
-}  // namespace steering_behaviour
+} // namespace steering_behaviour

@@ -89,11 +89,11 @@ public:
     void clear_last_critical_hit_tick() { m_last_critical_hit_tick = 0; }
 private:
     TTime m_last_critical_hit_tick;
-    float m_critical_hit_chance;  // 0..1
+    float m_critical_hit_chance; // 0..1
     float m_critical_hit_camera_effector_angle;
 
     float m_vampire_want_value;
-    float m_vampire_want_speed;  // load from ltx
+    float m_vampire_want_speed; // load from ltx
     float m_vampire_wound;
     float m_vampire_gain_health;
     float m_vampire_distance;

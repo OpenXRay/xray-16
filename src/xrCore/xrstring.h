@@ -53,7 +53,7 @@ public:
     u32 stat_economy();
 #ifdef CONFIG_PROFILE_LOCKS
     str_container() : cs(MUTEX_PROFILE_ID(str_container)) {}
-#endif  // CONFIG_PROFILE_LOCKS
+#endif // CONFIG_PROFILE_LOCKS
 };
 XRCORE_API extern str_container* g_pStringContainer;
 

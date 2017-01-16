@@ -351,7 +351,7 @@ static int gtiDecodeSingle(char elemType, char* inBuffer, int inLength, va_list*
         if (inLength < sizeof(*len)) return -1;
         holdlen = *len;
         memcpy(len, inBuffer, sizeof(*len));
-        if (*len > holdlen)  // there isn't enough room in their dest!
+        if (*len > holdlen) // there isn't enough room in their dest!
             return -1;
         if (inLength < (int)sizeof(*len) + *len) return -1;
         memcpy(data, inBuffer + sizeof(*len), (unsigned int)*len);
@@ -368,7 +368,7 @@ static int gtiDecodeSingle(char elemType, char* inBuffer, int inLength, va_list*
     }
         // break;
     }
-    return -1;  // bad type!
+    return -1; // bad type!
 }
 
 static int gtiEncodeSingle(char elemType, char* outBuffer, int outLength, va_list* args)
@@ -393,7 +393,7 @@ static int gtiEncodeSingle(char elemType, char* outBuffer, int outLength, va_lis
     case GT_UCHAR:
         GT_ENCODE_ELEM(GT_UCHAR_TYPE, outBuffer, outLength, args);
     // break;
-    case GT_FLOAT:  // floats are promoted to double in varargs, need to demote
+    case GT_FLOAT: // floats are promoted to double in varargs, need to demote
     {
         double temp;
         float f;
@@ -470,7 +470,7 @@ static int gtiEncodeSingle(char elemType, char* outBuffer, int outLength, va_lis
         return len + (int)sizeof(len);
     }
     }
-    return -1;  // bad type!
+    return -1; // bad type!
 }
 
 static int gtInternalEncodeV(
@@ -491,7 +491,7 @@ static int gtInternalEncodeV(
     }
     while (*fmtString)
     {
-        if (*fmtString == GT_BIT)  // see how many
+        if (*fmtString == GT_BIT) // see how many
         {
             for (bitCounter = fmtString; *bitCounter == GT_BIT && bitCounter - fmtString <= 8; bitCounter++)
             {
@@ -501,7 +501,7 @@ static int gtInternalEncodeV(
         }
         else
             elemSize = gtiEncodeSingle(*fmtString, outBuffer, outLength, args);
-        if (elemSize < 0) return -1;  // out of space
+        if (elemSize < 0) return -1; // out of space
         outBuffer += elemSize;
         outLength -= elemSize;
         fmtString++;
@@ -559,7 +559,7 @@ static int gtDecodeInternalV(int usetype, const char* fmtString, char* inBuffer,
 
     while (*fmtString)
     {
-        if (*fmtString == GT_BIT)  // see how many
+        if (*fmtString == GT_BIT) // see how many
         {
             for (bitCounter = fmtString; *bitCounter == GT_BIT && bitCounter - fmtString <= 8; bitCounter++)
             {
@@ -569,7 +569,7 @@ static int gtDecodeInternalV(int usetype, const char* fmtString, char* inBuffer,
         }
         else
             elemSize = gtiDecodeSingle(*fmtString, inBuffer, inLength, args);
-        if (elemSize < 0) return -1;  // out of space
+        if (elemSize < 0) return -1; // out of space
         inBuffer += elemSize;
         inLength -= elemSize;
         fmtString++;

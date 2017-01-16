@@ -76,7 +76,7 @@ void CLevel::g_cl_Spawn(LPCSTR name, u8 rp, u16 flags, Fvector pos)
 extern Flags32 psAI_Flags;
 extern float debug_on_frame_gather_stats_frequency;
 #include "ai_debug.h"
-#endif  // DEBUG
+#endif // DEBUG
 
 void CLevel::g_sv_Spawn(CSE_Abstract* E)
 {
@@ -88,8 +88,8 @@ void CLevel::g_sv_Spawn(CSE_Abstract* E)
         E_mem = Memory.mem_usage();
         Memory.stat_calls = 0;
     }
-#endif  // DEBUG_MEMORY_MANAGER
-        //-----------------------------------------------------------------
+#endif // DEBUG_MEMORY_MANAGER
+       //-----------------------------------------------------------------
 //	CTimer		T(false);
 
 #ifdef DEBUG
@@ -110,7 +110,7 @@ void CLevel::g_sv_Spawn(CSE_Abstract* E)
 //	T.Start		();
 #ifdef DEBUG_MEMORY_MANAGER
     mem_alloc_gather_stats(false);
-#endif  // DEBUG_MEMORY_MANAGER
+#endif // DEBUG_MEMORY_MANAGER
     if (0 == O || (!O->net_Spawn(E))) {
         O->net_Destroy();
         if (!g_dedicated_server) client_spawn_manager().clear(O->ID());
@@ -118,13 +118,13 @@ void CLevel::g_sv_Spawn(CSE_Abstract* E)
         Msg("! Failed to spawn entity '%s'", *E->s_name);
 #ifdef DEBUG_MEMORY_MANAGER
         mem_alloc_gather_stats(!!psAI_Flags.test(aiDebugOnFrameAllocs));
-#endif  // DEBUG_MEMORY_MANAGER
+#endif // DEBUG_MEMORY_MANAGER
     }
     else
     {
 #ifdef DEBUG_MEMORY_MANAGER
         mem_alloc_gather_stats(!!psAI_Flags.test(aiDebugOnFrameAllocs));
-#endif  // DEBUG_MEMORY_MANAGER
+#endif // DEBUG_MEMORY_MANAGER
         if (!g_dedicated_server) client_spawn_manager().callback(O);
         // Msg			("--spawn--SPAWN: %f ms",1000.f*T.GetAsync());
 
@@ -132,7 +132,7 @@ void CLevel::g_sv_Spawn(CSE_Abstract* E)
             if (IsDemoPlayStarted()) {
                 if (E->s_flags.is(M_SPAWN_OBJECT_PHANTOM)) {
                     SetControlEntity(O);
-                    SetEntity(O);  // do not switch !!!
+                    SetEntity(O); // do not switch !!!
                     SetDemoSpectator(O);
                 }
             }
@@ -143,7 +143,7 @@ void CLevel::g_sv_Spawn(CSE_Abstract* E)
                     if (pGO) pGO->On_B_NotCurrentEntity();
                 }
                 SetControlEntity(O);
-                SetEntity(O);  // do not switch !!!
+                SetEntity(O); // do not switch !!!
             }
         }
 
@@ -176,7 +176,7 @@ void CLevel::g_sv_Spawn(CSE_Abstract* E)
 			temp.r_seek				(0);
 			O->net_Import			(temp);
 		}
-		}*/  //:(
+		}*/ //:(
 
     //---------------------------------------------------------
     Game().OnSpawn(O);
@@ -187,7 +187,7 @@ void CLevel::g_sv_Spawn(CSE_Abstract* E)
         lua_gc(ai().script_engine().lua(), LUA_GCCOLLECT, 0);
         Msg("* %20s : %d bytes, %d ops", *E->s_name, Memory.mem_usage() - E_mem, Memory.stat_calls);
     }
-#endif  // DEBUG_MEMORY_MANAGER
+#endif // DEBUG_MEMORY_MANAGER
 }
 
 CSE_Abstract* CLevel::spawn_item(

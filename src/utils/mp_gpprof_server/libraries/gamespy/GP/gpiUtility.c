@@ -12,9 +12,9 @@ Please see the GameSpy Presence SDK documentation for more information
 **********************************************************************/
 
 #ifdef XRAY_DISABLE_GAMESPY_WARNINGS
-#pragma warning(disable : 4244)  // lines: 333
-#pragma warning(disable : 4267)  // lines: 142
-#endif                           //#ifdef XRAY_DISABLE_GAMESPY_WARNINGS
+#pragma warning(disable : 4244) // lines: 333
+#pragma warning(disable : 4267) // lines: 142
+#endif                          //#ifdef XRAY_DISABLE_GAMESPY_WARNINGS
 
 // INCLUDES
 //////////
@@ -30,11 +30,11 @@ Please see the GameSpy Presence SDK documentation for more information
 
 // Disable compiler warnings for issues that are unavoidable.
 /////////////////////////////////////////////////////////////
-#if defined(_MSC_VER)  // DevStudio
+#if defined(_MSC_VER) // DevStudio
 // Level4, "conditional expression is constant".
 // Occurs with use of the MS provided macro FD_SET
 #pragma warning(disable : 4127)
-#endif  // _MSC_VER
+#endif // _MSC_VER
 
 // FUNCTIONS
 ///////////
@@ -340,4 +340,4 @@ void gpiEncodeString(const char* unencodedString, char* encodedString)
 ///////////////////////////////////////////////////
 #if defined(_MSC_VER)
 #pragma warning(default : 4127)
-#endif  // _MSC_VER
+#endif // _MSC_VER

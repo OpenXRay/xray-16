@@ -37,4 +37,4 @@ void CSquadHierarchyHolder::update_leader()
             break;
         }
 }
-#endif  // SQUAD_HIERARCHY_HOLDER_USE_LEADER
+#endif // SQUAD_HIERARCHY_HOLDER_USE_LEADER

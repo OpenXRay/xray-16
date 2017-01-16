@@ -225,7 +225,7 @@ bool CControl_Manager::is_locked(CControl_Com* com)
 }
 
 // capture
-void CControl_Manager::capture(CControl_Com* com, ControlCom::EControlType type)  // who, type
+void CControl_Manager::capture(CControl_Com* com, ControlCom::EControlType type) // who, type
 {
     CControl_Com* target = m_control_elems[type];
 
@@ -283,7 +283,7 @@ CControl_Com* CControl_Manager::get_capturer(ControlCom::EControlType type)
     return target->ced()->capturer();
 }
 
-void CControl_Manager::release(CControl_Com* com, ControlCom::EControlType type)  // who, type
+void CControl_Manager::release(CControl_Com* com, ControlCom::EControlType type) // who, type
 {
     CControl_Com* target = m_control_elems[type];
     CControl_Com* capturer = target->ced()->capturer();
@@ -423,7 +423,7 @@ void CControl_Manager::check_active_com(CControl_Com* com, bool b_add)
     else
     {
         COM_VEC_IT it = std::find(m_active_elems.begin(), m_active_elems.end(), com);
-        if (it != m_active_elems.end()) (*it) = 0;  // do not remove just mark
+        if (it != m_active_elems.end()) (*it) = 0; // do not remove just mark
     }
 }
 
@@ -450,4 +450,4 @@ void CControl_Manager::add_debug_info(debug::text_tree& root_s)
         }
     }
 }
-#endif  // DEBUG
+#endif // DEBUG

@@ -210,4 +210,4 @@ public:
         if (a_pixel.b_dirty || a_vertex.b_dirty) flush_cache();
     }
 };
-#endif  //	dx9r_constants_cacheH
+#endif //	dx9r_constants_cacheH

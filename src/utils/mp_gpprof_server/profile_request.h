@@ -32,6 +32,6 @@ private:
     fcgi_istream m_in;
     fcgi_ostream m_out;
     fcgi_ostream m_err;
-};  // class fetch_profile_request
+}; // class fetch_profile_request
 
-#endif  //#ifndef PROFILE_REQUEST_INCLUDED
+#endif //#ifndef PROFILE_REQUEST_INCLUDED

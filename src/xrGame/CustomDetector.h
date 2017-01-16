@@ -11,7 +11,7 @@ class CInventoryOwner;
 
 struct ITEM_TYPE
 {
-    Fvector2 freq;  // min,max
+    Fvector2 freq; // min,max
     HUD_SOUND_ITEM detect_snds;
 
     shared_str zone_map_location;
@@ -177,4 +177,4 @@ protected:
 public:
     CZoneList();
     virtual ~CZoneList();
-};  // class CZoneList
+}; // class CZoneList

@@ -156,7 +156,7 @@ CScriptDebugger::~CScriptDebugger()
 
 void CScriptDebugger::UnPrepareLua(lua_State* l, int idx)
 {
-    if (idx == -1) return;  // !Active()
+    if (idx == -1) return; // !Active()
     m_lua->UnPrepareLua(l, idx);
 }
 
@@ -319,7 +319,7 @@ void CScriptDebugger::CheckNewMessages()
     }
 }
 
-void CScriptDebugger::WaitForReply(bool bWaitForModalResult)  // UINT nMsg)
+void CScriptDebugger::WaitForReply(bool bWaitForModalResult) // UINT nMsg)
 {
     bool mr = false;
     do
@@ -331,7 +331,7 @@ void CScriptDebugger::WaitForReply(bool bWaitForModalResult)  // UINT nMsg)
             Sleep(10);
         }
         R_ASSERT(msg.GetLen());
-        mr = TranslateIdeMessage(&msg);  // mr--is this an ide modalResult ?
+        mr = TranslateIdeMessage(&msg); // mr--is this an ide modalResult ?
     } while (bWaitForModalResult && !mr);
 }
 

@@ -18,23 +18,23 @@ Copyright 2000 GameSpy Industries, Inc
 
 #define CLIENT_THINK_TIME 30
 
-static GT2Socket Socket;                       // The socket used to connect to the server
-static GT2Connection Connection;               // The connection to the server.
-float localRotation;                           // The local rotation, >=0, <360.
-char serverAddress[128];                       // Address of the server.
-int localMotion;                               // STILL, FORWARD, BACKWARD.
-int localTurning;                              // STILL, LEFT, RIGHT.
-Player players[MAX_PLAYERS];                   // The list of players.
-GT2Bool connected;                             // True once we received the start message.
-int localIndex = -1;                           // The local player's index into the players table.
-unsigned long lastServerUpdate;                // The last time we received an update from the server.
-char localNick[MAX_NICK] = "Player";           // The local player's nick.
-CObject cObjects[MAX_OBJECTS];                 // The list of objects.
-UpdateInfo updateHistory[UPDATE_HISTORY_LEN];  // Time diff for past updates
-int updateHistoryStart;                        // The starting index of the history.
-int ClientNumAsteroids;                        // The number of asteroids we're holding.
-static unsigned short nextServerUpdateID;      // The expected ID of the next update.
-static unsigned short nextClientUpdateID;      // The ID of our next update.
+static GT2Socket Socket;                      // The socket used to connect to the server
+static GT2Connection Connection;              // The connection to the server.
+float localRotation;                          // The local rotation, >=0, <360.
+char serverAddress[128];                      // Address of the server.
+int localMotion;                              // STILL, FORWARD, BACKWARD.
+int localTurning;                             // STILL, LEFT, RIGHT.
+Player players[MAX_PLAYERS];                  // The list of players.
+GT2Bool connected;                            // True once we received the start message.
+int localIndex = -1;                          // The local player's index into the players table.
+unsigned long lastServerUpdate;               // The last time we received an update from the server.
+char localNick[MAX_NICK] = "Player";          // The local player's nick.
+CObject cObjects[MAX_OBJECTS];                // The list of objects.
+UpdateInfo updateHistory[UPDATE_HISTORY_LEN]; // Time diff for past updates
+int updateHistoryStart;                       // The starting index of the history.
+int ClientNumAsteroids;                       // The number of asteroids we're holding.
+static unsigned short nextServerUpdateID;     // The expected ID of the next update.
+static unsigned short nextClientUpdateID;     // The ID of our next update.
 
 // Stats.
 /////////

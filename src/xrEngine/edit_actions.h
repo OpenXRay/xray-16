@@ -26,7 +26,7 @@ public:
 protected:
     base* m_previous_action;
 
-};  // class base
+}; // class base
 
 // -------------------------------------------------------------------------------------------------
 
@@ -44,7 +44,7 @@ protected:
     key_state m_run_state;
     Callback m_callback;
 
-};  // class callback_base
+}; // class callback_base
 
 // -------------------------------------------------------------------------------------------------
 
@@ -62,7 +62,7 @@ private:
     char m_char;
     char m_char_shift;
 
-};  // class type_pair
+}; // class type_pair
 
 // -------------------------------------------------------------------------------------------------
 
@@ -76,8 +76,8 @@ public:
 private:
     key_state m_state;
     base* m_type_pair;
-};  // class key_state_base
+}; // class key_state_base
 
-}  // namespace text_editor
+} // namespace text_editor
 
-#endif  // EDIT_ACTIONS_H_INCLUDED
+#endif // EDIT_ACTIONS_H_INCLUDED

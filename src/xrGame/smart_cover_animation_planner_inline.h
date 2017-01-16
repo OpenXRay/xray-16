@@ -125,6 +125,6 @@ IC void animation_planner::last_lookout_time(u32 const& value)
     m_last_lookout_time = value;
 }
 
-}  // namespace smart_cover
+} // namespace smart_cover
 
-#endif  // SMART_COVER_ANIMATION_PLANNER_INLINE_H_INCLUDED
+#endif // SMART_COVER_ANIMATION_PLANNER_INLINE_H_INCLUDED

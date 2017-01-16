@@ -24,11 +24,14 @@ static class DebugOutputEmptyImpl : public IDebugOutput
     virtual void DBG_DrawOBB(const Fmatrix& m, const Fvector h, u32 c) {}
     virtual void DBG_DrawPoint(const Fvector& p, float size, u32 c) {}
     virtual void DBG_DrawMatrix(const Fmatrix& m, float size, u8 a = 255) {}
-    // virtual	void DBG_DrawRotationX( const Fmatrix &m, float ang0, float ang1, float size, u32 ac, bool solid = false,
+    // virtual	void DBG_DrawRotationX( const Fmatrix &m, float ang0, float ang1, float size, u32 ac, bool solid =
+    // false,
     // u32 tessel = 7 ) = 0;
-    // virtual	void DBG_DrawRotationY( const Fmatrix &m, float ang0, float ang1, float size, u32 ac, bool solid = false,
+    // virtual	void DBG_DrawRotationY( const Fmatrix &m, float ang0, float ang1, float size, u32 ac, bool solid =
+    // false,
     // u32 tessel = 7 ) = 0;
-    // virtual	void DBG_DrawRotationZ( const Fmatrix &m, float ang0, float ang1, float size, u32 ac, bool solid = false,
+    // virtual	void DBG_DrawRotationZ( const Fmatrix &m, float ang0, float ang1, float size, u32 ac, bool solid =
+    // false,
     // u32 tessel = 7 ) = 0;
     virtual void _cdecl DBG_OutText(LPCSTR s, ...) {}
     // virtual	void DBG_TextOutSet( float x, float y )									=0;

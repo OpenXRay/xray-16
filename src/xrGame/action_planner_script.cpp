@@ -56,7 +56,7 @@ IC static void CScriptActionPlanner_Export(lua_State* luaState)
                       .def("clear", &CScriptActionPlanner::clear)
 #ifdef LOG_ACTION
                       .def("show", &CScriptActionPlanner::show)
-#endif  // LOG_ACTION
+#endif // LOG_ACTION
 
                       ,
         def("cast_planner", &cast_planner)];

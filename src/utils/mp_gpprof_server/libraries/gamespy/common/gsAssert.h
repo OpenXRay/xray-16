@@ -45,8 +45,8 @@ extern void gsDebugAssert(const char* format, const char* szError, const char* s
 // be ignored.
 // ex// BAD:  GS_ASSERT( i== FN())		// FN() will never be called, i will never be set in release builds
 
-#define GS_ASSERT(x) {};         // ex// GS_ASSERT(		result == GS_OK )
-#define GS_ASSERT_STR(x, t) {};  // ex// GS_ASSERT_STR(	result == GS_OK ,"GSFunction failed")
+#define GS_ASSERT(x) {};        // ex// GS_ASSERT(		result == GS_OK )
+#define GS_ASSERT_STR(x, t) {}; // ex// GS_ASSERT_STR(	result == GS_OK ,"GSFunction failed")
 #define GS_ASSERT_ALIGN_16(x) {};
 #define GS_FAIL()
 #define GS_FAIL_STR(x)
@@ -82,7 +82,7 @@ extern void gsDebugAssert(const char* format, const char* szError, const char* s
         gsDebugAssert("FAIL  [%s] ln %s line:%d\n", t, __FILE__, __LINE__);                                            \
     };
 
-#endif  // GSI_COMMON_DEBUG
+#endif // GSI_COMMON_DEBUG
 
 // This is the default assert condition handler
 typedef void (*gsDebugAssertCallback)(const char* string);
@@ -104,4 +104,4 @@ void gsDebugAssertCallbackSet(gsDebugAssertCallback theCallback);
 }
 #endif
 
-#endif  // __GSIDEBUG_H__
+#endif // __GSIDEBUG_H__

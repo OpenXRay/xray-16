@@ -4,8 +4,8 @@
 #include "ParticleEffect.h"
 #include "ParticleEffectDef.h"
 #ifdef _EDITOR
-#include "UI_ToolsCustom.h"
 #include "ParticleEffectActions.h"
+#include "UI_ToolsCustom.h"
 #else
 
 #endif
@@ -159,8 +159,8 @@ void CPEDef::ExecuteCollision(
                     {
                         // Compute tangential and normal components of velocity
                         float nmag = m.vel * n;
-                        pVector vn(n * nmag);    // Normal Vn = (V.N)N
-                        pVector vt(m.vel - vn);  // Tangent Vt = V - Vn
+                        pVector vn(n * nmag);   // Normal Vn = (V.N)N
+                        pVector vt(m.vel - vn); // Tangent Vt = V - Vn
 
                         // Compute _new velocity heading out:
                         // Don't apply friction if tangential velocity < cutoff

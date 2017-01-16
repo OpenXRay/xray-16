@@ -52,7 +52,7 @@ IC void stalker_movement_manager_base::set_mental_state(EMentalState mental_stat
     THROW((m_target.m_body_state != eBodyStateCrouch) || (mental_state != eMentalStateFree));
     m_target.m_mental_state = mental_state;
     //#pragma todo("Dima to Dima: this is correct, commented just because of the October presentation, no time right now
-    //to fix it correctly, should be fixed sometimes later")
+    // to fix it correctly, should be fixed sometimes later")
     //.	m_path_actuality			= m_path_actuality && (m_target.m_mental_state == m_current.m_mental_state);
 }
 
@@ -137,4 +137,4 @@ IC stalker_movement_params& stalker_movement_manager_base::target_params()
     return (m_target);
 }
 
-#endif  // #ifndef STALKER_MOVEMENT_MANAGER_BASE_INLINE_H_INCLUDED
+#endif // #ifndef STALKER_MOVEMENT_MANAGER_BASE_INLINE_H_INCLUDED

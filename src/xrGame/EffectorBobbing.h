@@ -32,4 +32,4 @@ public:
     void SetState(u32 st, bool limping, bool ZoomMode);
 };
 
-#endif  //_EFFECTOR_BOBBING_H
+#endif //_EFFECTOR_BOBBING_H

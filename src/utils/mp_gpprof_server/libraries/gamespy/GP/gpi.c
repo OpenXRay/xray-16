@@ -15,8 +15,8 @@ Please see the GameSpy Presence SDK documentation for more information
 //////////
 
 #ifdef XRAY_DISABLE_GAMESPY_WARNINGS
-#pragma warning(disable : 4244)  // lines: 345, 362
-#endif                           //#ifdef XRAY_DISABLE_GAMESPY_WARNINGS
+#pragma warning(disable : 4244) // lines: 345, 362
+#endif                          //#ifdef XRAY_DISABLE_GAMESPY_WARNINGS
 
 #include "gpi.h"
 #include <stdlib.h>
@@ -281,7 +281,7 @@ GPResult gpiProcessConnectionManager(GPConnection* connection)
         // Send anything that needs to be sent.
         ///////////////////////////////////////
         if (iconnection->outputBuffer.len > 0)
-            iconnection->kaTransmit = now;  // data already being transmitted. We don't need to send keep alives
+            iconnection->kaTransmit = now; // data already being transmitted. We don't need to send keep alives
         CHECK_RESULT(gpiSendFromBuffer(
             connection, iconnection->cmSocket, &iconnection->outputBuffer, &connClosed, GPITrue, "CM"));
 

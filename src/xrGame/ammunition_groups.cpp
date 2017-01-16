@@ -82,4 +82,4 @@ bool ammunition_group::is_item_in_group(u16 item_id, enum_group_id gid) const
     return true;
 }
 
-}  // namespace award_system
+} // namespace award_system

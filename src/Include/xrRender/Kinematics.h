@@ -70,7 +70,7 @@ public:
     virtual void LL_SetBonesVisible(u64 mask) = 0;
 
     // Main functionality
-    virtual void CalculateBones(BOOL bForceExact = FALSE) = 0;  // Recalculate skeleton
+    virtual void CalculateBones(BOOL bForceExact = FALSE) = 0; // Recalculate skeleton
     virtual void CalculateBones_Invalidate() = 0;
     virtual void Callback(UpdateCallback C, void* Param) = 0;
 
@@ -97,4 +97,4 @@ IC IKinematics* PKinematics(IRenderVisual* V)
     return V ? V->dcast_PKinematics() : 0;
 }
 
-#endif  //	Kinematics_included
+#endif //	Kinematics_included

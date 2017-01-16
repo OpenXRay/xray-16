@@ -68,7 +68,7 @@ float object_shift::delta_shift(float delta_time) const
     return speed * (delta_time) + accel * sq_time / 2.f + aaccel * sq_time * delta_time / 6.f;
 }
 
-bool square_equation(float a, float b, float c, float& x0, float& x1)  // returns true if has real roots
+bool square_equation(float a, float b, float c, float& x0, float& x1) // returns true if has real roots
 {
     float d = b * b - 4.f * a * c;
     if (d < 0.f) return false;

@@ -26,7 +26,7 @@ void CMPPlayersBag::OnEvent(NET_Packet& P, u16 type)
 
 #ifdef MP_LOGGING
         Msg("--- Rukzak [%d] takes [%d][%s]", ID(), O->ID(), O->cNameSect().c_str());
-#endif  // MP_LOGGING
+#endif // MP_LOGGING
 
         O->H_SetParent(this);
         O->Position().set(Position());
@@ -39,7 +39,7 @@ void CMPPlayersBag::OnEvent(NET_Packet& P, u16 type)
 
 #ifdef MP_LOGGING
         Msg("--- Rukzak [%d] rejects [%d][%s]", ID(), O->ID(), O->cNameSect().c_str());
-#endif  // MP_LOGGING
+#endif // MP_LOGGING
 
         O->H_SetParent(0, !P.r_eof() && P.r_u8());
     }

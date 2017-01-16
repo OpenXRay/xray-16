@@ -236,7 +236,7 @@ void CUIPdaWnd::Draw()
     inherited::Draw();
     //.	DrawUpdatedSections();
     DrawHint();
-    UINoice->Draw();  // over all
+    UINoice->Draw(); // over all
 }
 
 void CUIPdaWnd::DrawHint()

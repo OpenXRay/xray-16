@@ -35,7 +35,7 @@ public:
     virtual void SetAligment(EAligment aligment) = 0;
     virtual float SizeOf_(LPCSTR s) = 0;
     virtual float SizeOf_(const wchar_t* wsStr) = 0;
-    virtual float SizeOf_(const char cChar) = 0;  // only ANSII
+    virtual float SizeOf_(const char cChar) = 0; // only ANSII
     virtual float CurrentHeight_() = 0;
     virtual void OutSetI(float x, float y) = 0;
     virtual void OutSet(float x, float y) = 0;

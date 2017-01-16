@@ -43,7 +43,7 @@ static gsi_char* resultStrings[] = {_T("GHTTPSuccess"), _T("GHTTPOutOfMemory"), 
     _T("GHTTPFileNotFound"), _T("GHTTPServerError"), _T("GHTTPFileWriteFailed"), _T("GHTTPFileReadFailed"),
     _T("GHTTPFileIncomplete"), _T("GHTTPFileToBig"), _T("GHTTPEncryptionError"), _T("GHTTPRequestCancelled")};
 
-#ifdef __MWERKS__  // CodeWarrior will warn if function not prototyped
+#ifdef __MWERKS__ // CodeWarrior will warn if function not prototyped
 int test_main(int argc, char** argv);
 #endif
 

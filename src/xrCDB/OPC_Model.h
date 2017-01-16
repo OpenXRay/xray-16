@@ -26,17 +26,17 @@ struct OPCODE_API OPCODECREATE
     //! Constructor
     OPCODECREATE();
 
-    udword NbTris;       //!< Number of triangles in the input model
-    udword NbVerts;      //!< Number of vertices in the input model
-    const udword* Tris;  //!< List of indexed triangles
-    const Point* Verts;  //!< List of points
-    udword Rules;        //!< Splitting rules (SPLIT_COMPLETE is mandatory in OPCODE)
-    bool NoLeaf;         //!< true => discard leaf nodes (else use a normal tree)
-    bool Quantized;      //!< true => quantize the tree (else use a normal tree)
+    udword NbTris;      //!< Number of triangles in the input model
+    udword NbVerts;     //!< Number of vertices in the input model
+    const udword* Tris; //!< List of indexed triangles
+    const Point* Verts; //!< List of points
+    udword Rules;       //!< Splitting rules (SPLIT_COMPLETE is mandatory in OPCODE)
+    bool NoLeaf;        //!< true => discard leaf nodes (else use a normal tree)
+    bool Quantized;     //!< true => quantize the tree (else use a normal tree)
 #ifdef __MESHMERIZER_H__
-    bool CollisionHull;  //!< true => use convex hull + GJK
-#endif                   // __MESHMERIZER_H__
-    bool KeepOriginal;   //!< true => keep a copy of the original tree (debug purpose)
+    bool CollisionHull; //!< true => use convex hull + GJK
+#endif                  // __MESHMERIZER_H__
+    bool KeepOriginal;  //!< true => keep a copy of the original tree (debug purpose)
 };
 
 class OPCODE_API OPCODE_Model
@@ -77,7 +77,7 @@ public:
      */
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     inline_ const CollisionHull* GetHull() const { return mHull; }
-#endif  // __MESHMERIZER_H__
+#endif // __MESHMERIZER_H__
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /**
@@ -109,13 +109,13 @@ public:
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     udword GetUsedBytes() const { return mTree->GetUsedBytes(); }
 private:
-    AABBTree* mSource;         //!< Original source tree
-    AABBOptimizedTree* mTree;  //!< Optimized tree
+    AABBTree* mSource;        //!< Original source tree
+    AABBOptimizedTree* mTree; //!< Optimized tree
 #ifdef __MESHMERIZER_H__
-    CollisionHull* mHull;  //!< Possible convex hull
-#endif                     // __MESHMERIZER_H__
-    bool mNoLeaf;          //!< Leaf/NoLeaf tree
-    bool mQuantized;       //!< Compressed/uncompressed tree
+    CollisionHull* mHull; //!< Possible convex hull
+#endif                    // __MESHMERIZER_H__
+    bool mNoLeaf;         //!< Leaf/NoLeaf tree
+    bool mQuantized;      //!< Compressed/uncompressed tree
 };
 
-#endif  //__OPC_MODEL_H__
+#endif //__OPC_MODEL_H__

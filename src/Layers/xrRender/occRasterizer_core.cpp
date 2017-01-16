@@ -16,7 +16,7 @@ void i_order(float* A, float* B, float* C)
             mid = B;
             max = C;
         }
-        else  // C < B
+        else // C < B
             if (A[1] <= C[1])
         {
             min = A;
@@ -30,14 +30,14 @@ void i_order(float* A, float* B, float* C)
             max = B;
         }
     }
-    else  // B < A
+    else // B < A
     {
         if (A[1] <= C[1]) {
             min = B;
             mid = A;
             max = C;
         }
-        else  // C < A
+        else // C < A
             if (B[1] <= C[1])
         {
             min = B;
@@ -132,9 +132,9 @@ void i_scan(int curY, float leftX, float lhx, float rightX, float rhx, float sta
     // interpolate
     float lenR = endR - startR;
     float Zlen = endZ - startZ;
-    float Z = startZ + (minT - startR) / lenR * Zlen;     // interpolate Z to the start
-    float Zend = startZ + (maxT - startR) / lenR * Zlen;  // interpolate Z to the end
-    float dZ = (Zend - Z) / (maxT - minT);                // increment in Z / pixel wrt dX
+    float Z = startZ + (minT - startR) / lenR * Zlen;    // interpolate Z to the start
+    float Zend = startZ + (maxT - startR) / lenR * Zlen; // interpolate Z to the end
+    float dZ = (Zend - Z) / (maxT - minT);               // increment in Z / pixel wrt dX
 
     // Move to far my dz/5 to place the pixel at the center of face that it covers.
     // This will make sure that objects will not be clipped for just standing next to the home from outside.
@@ -334,14 +334,14 @@ IC void i_section(int Sect, BOOL bMiddle)
     if (((mE1 < mE2) && (Sect == BOTTOM)) || ((mE1 > mE2) && (Sect == TOP))) {
         // E1 is on the Left
         // Initial Starting values for left (from E1)
-        t = e1_init_dY / E1[1];  // Initial fraction of offset
+        t = e1_init_dY / E1[1]; // Initial fraction of offset
         leftX = startp1[0] + E1[0] * t;
         left_dX = mE1;
         leftZ = startp1[2] + E1[2] * t;
         left_dZ = E1[2] / E1[1];
 
         // Initial Ending values for right	(from E2)
-        t = e2_init_dY / E2[1];  // Initial fraction of offset
+        t = e2_init_dY / E2[1]; // Initial fraction of offset
         rightX = startp2[0] + E2[0] * t;
         right_dX = mE2;
         rightZ = startp2[2] + E2[2] * t;
@@ -351,14 +351,14 @@ IC void i_section(int Sect, BOOL bMiddle)
     {
         // E2 is on left
         // Initial Starting values for left (from E2)
-        t = e2_init_dY / E2[1];  // Initial fraction of offset
+        t = e2_init_dY / E2[1]; // Initial fraction of offset
         leftX = startp2[0] + E2[0] * t;
         left_dX = mE2;
         leftZ = startp2[2] + E2[2] * t;
         left_dZ = E2[2] / E2[1];
 
         // Initial Ending values for right	(from E1)
-        t = e1_init_dY / E1[1];  // Initial fraction of offset
+        t = e1_init_dY / E1[1]; // Initial fraction of offset
         rightX = startp1[0] + E1[0] * t;
         right_dX = mE1;
         rightZ = startp1[2] + E1[2] * t;
@@ -367,9 +367,9 @@ IC void i_section(int Sect, BOOL bMiddle)
 
     // Now scan all lines in this section
     float lhx = left_dX / 2;
-    leftX += lhx;  // half pixel
+    leftX += lhx; // half pixel
     float rhx = right_dX / 2;
-    rightX += rhx;  // half pixel
+    rightX += rhx; // half pixel
     for (; startY <= endY; startY++)
     {
         i_scan(startY, leftX, lhx, rightX, rhx, leftZ, rightZ);
@@ -406,13 +406,13 @@ u32 occRasterizer::rasterize(occTri* T)
 
     // Rasterize sections
     if (currentB[1] - iFloor(currentB[1]) > .5f) {
-        i_section_b1();  // Rasterise First Section
-        i_section_t0();  // Rasterise Second Section
+        i_section_b1(); // Rasterise First Section
+        i_section_t0(); // Rasterise Second Section
     }
     else
     {
-        i_section_b0();  // Rasterise First Section
-        i_section_t1();  // Rasterise Second Section
+        i_section_b0(); // Rasterise First Section
+        i_section_t1(); // Rasterise Second Section
     }
     return dwPixels;
 }

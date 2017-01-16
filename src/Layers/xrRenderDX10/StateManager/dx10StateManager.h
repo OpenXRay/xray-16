@@ -52,9 +52,9 @@ private:
 
 private:
     //	All states are supposed to live along all application lifetime
-    ID3DRasterizerState* m_pRState;               //	Weak link
-    ID3DDepthStencilState* m_pDepthStencilState;  //	Weak link
-    ID3DBlendState* m_pBlendState;                //	Weak link
+    ID3DRasterizerState* m_pRState;              //	Weak link
+    ID3DDepthStencilState* m_pDepthStencilState; //	Weak link
+    ID3DBlendState* m_pBlendState;               //	Weak link
 
     UINT m_uiStencilRef;
     UINT m_uiAlphaRef;
@@ -92,4 +92,4 @@ private:
 
 extern dx10StateManager StateManager;
 
-#endif  //	dx10StateManager_included
+#endif //	dx10StateManager_included

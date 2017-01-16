@@ -75,6 +75,6 @@ ObjectFactory::ServerObjectBaseClass* CSObjectItemClientServerSingleMp::server_o
 #undef TEMPLATE_SPECIALIZATION
 #undef CSObjectItemClientServerSingleMp
 
-#endif  // NO_XR_GAME
+#endif // NO_XR_GAME
 
 #endif

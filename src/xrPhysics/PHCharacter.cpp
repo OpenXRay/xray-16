@@ -77,7 +77,7 @@ void CPHCharacter::get_State(SPHNetState& state)
         state.enabled = false;
         return;
     }
-    state.enabled = CPHObject::is_active();  //!!dBodyIsEnabled(m_body);
+    state.enabled = CPHObject::is_active(); //!!dBodyIsEnabled(m_body);
 }
 void CPHCharacter::set_State(const SPHNetState& state)
 {
@@ -140,7 +140,7 @@ void CPHCharacter::CutVelocity(float l_limit, float /*a_limit*/)
 
 const Fmatrix& CPHCharacter::XFORM() const
 {
-    return m_phys_ref_object->ObjectXFORM();  //>renderable.xform;
+    return m_phys_ref_object->ObjectXFORM(); //>renderable.xform;
 }
 void CPHCharacter::get_LinearVel(Fvector& velocity) const
 {
@@ -183,7 +183,7 @@ void virtual_move_collide_callback(bool& do_collide, bool bo1, dContact& c, SGam
     c.surface.mu = 0;
     c.surface.soft_cfm = 0.01f;
     dJointID contact_joint =
-        dJointCreateContact(0, ContactGroup, &c);  // dJointCreateContactSpecial(0, ContactGroup, &c);
+        dJointCreateContact(0, ContactGroup, &c); // dJointCreateContactSpecial(0, ContactGroup, &c);
     CPHObject* obj = (CPHObject*)my_data->callback_data;
     VERIFY(obj);
 
@@ -197,7 +197,7 @@ void virtual_move_collide_callback(bool& do_collide, bool bo1, dContact& c, SGam
 
 void CPHCharacter::fix_body_rotation()
 {
-    dBodyID b = get_body();  // GetBody();
+    dBodyID b = get_body(); // GetBody();
     if (b) {
         dMatrix3 R;
         dRSetIdentity(R);

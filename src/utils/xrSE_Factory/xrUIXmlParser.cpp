@@ -3,7 +3,7 @@
 
 #ifdef XRGAME_EXPORTS
 #include "xrGame/ui_base.h"
-#endif  // XRGAME_EXPORTS
+#endif // XRGAME_EXPORTS
 
 shared_str CUIXml::correct_file_name(LPCSTR path, LPCSTR fn)
 {

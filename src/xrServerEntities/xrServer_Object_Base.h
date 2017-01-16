@@ -71,15 +71,15 @@ private:
 
 public:
     BOOL net_Ready;
-    BOOL net_Processed;  // Internal flag for connectivity-graph
+    BOOL net_Processed; // Internal flag for connectivity-graph
 
     u16 m_wVersion;
     u16 m_script_version;
     u16 RespawnTime;
 
-    u16 ID;          // internal ID
-    u16 ID_Parent;   // internal ParentID, 0xffff means no parent
-    u16 ID_Phantom;  // internal PhantomID, 0xffff means no phantom
+    u16 ID;         // internal ID
+    u16 ID_Parent;  // internal ParentID, 0xffff means no parent
+    u16 ID_Phantom; // internal PhantomID, 0xffff means no phantom
     xrClientData* owner;
 
     // spawn data
@@ -87,7 +87,7 @@ public:
     //. u8                              s_gameid;
     GameTypeChooser m_gameType;
     u8 s_RP;
-    Flags16 s_flags;  // state flags
+    Flags16 s_flags; // state flags
     xr_vector<u16> children;
 
     // update data
@@ -125,8 +125,8 @@ public:
     virtual visual_data* __stdcall visual_collection() const { return 0; }
     virtual u32 __stdcall visual_collection_size() const { return 0; }
     virtual void __stdcall set_additional_info(void* info){};
-#endif                                              // #ifndef XRGAME_EXPORTS
-    virtual BOOL Net_Relevant() { return FALSE; };  // !!!! WARNING!!!
+#endif                                             // #ifndef XRGAME_EXPORTS
+    virtual BOOL Net_Relevant() { return FALSE; }; // !!!! WARNING!!!
     //
     virtual void __stdcall Spawn_Write(NET_Packet& tNetPacket, BOOL bLocal);
     virtual BOOL __stdcall Spawn_Read(NET_Packet& tNetPacket);

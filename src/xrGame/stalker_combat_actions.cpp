@@ -42,9 +42,9 @@
 
 #define DISABLE_COVER_BEFORE_DETOUR
 
-#if 0  // def DEBUG
+#if 0 // def DEBUG
 #define TEST_MENTAL_STATE
-#endif  // DEBUG
+#endif // DEBUG
 
 const float TEMP_DANGER_DISTANCE = 5.f;
 const u32 TEMP_DANGER_INTERVAL = 120000;
@@ -101,7 +101,7 @@ void CStalkerActionGetItemToKill::execute()
 {
 #ifdef TEST_MENTAL_STATE
     VERIFY((start_level_time() == Device.dwTimeGlobal) || (object().movement().mental_state() == eMentalStateDanger));
-#endif  // TEST_MENTAL_STATE
+#endif // TEST_MENTAL_STATE
 
     inherited::execute();
 
@@ -160,7 +160,7 @@ void CStalkerActionMakeItemKilling::execute()
 {
 #ifdef TEST_MENTAL_STATE
     VERIFY((start_level_time() == Device.dwTimeGlobal) || (object().movement().mental_state() == eMentalStateDanger));
-#endif  // TEST_MENTAL_STATE
+#endif // TEST_MENTAL_STATE
 
     inherited::execute();
 
@@ -237,14 +237,17 @@ void CStalkerActionRetreatFromEnemy::execute()
     {
         if (object().memory().visual().visible_now(object().memory().enemy().selected())) {
             object().movement().set_mental_state(eMentalStateDanger);
-            //			u32												min_queue_size, max_queue_size, min_queue_interval,
-            //max_queue_interval;
+            //			u32												min_queue_size, max_queue_size,
+            //min_queue_interval,
+            // max_queue_interval;
             //			float											distance =
-            //object().memory().enemy().selected()->Position().distance_to(object().Position());
-            //			select_queue_params								(distance,min_queue_size, max_queue_size, min_queue_interval,
-            //max_queue_interval);
-            //			object().CObjectHandler::set_goal				(eObjectActionFire1,object().best_weapon(),min_queue_size,
-            //max_queue_size, min_queue_interval, max_queue_interval);
+            // object().memory().enemy().selected()->Position().distance_to(object().Position());
+            //			select_queue_params								(distance,min_queue_size, max_queue_size,
+            //min_queue_interval,
+            // max_queue_interval);
+            //			object().CObjectHandler::set_goal
+            //(eObjectActionFire1,object().best_weapon(),min_queue_size,
+            // max_queue_size, min_queue_interval, max_queue_interval);
             fire();
             object().sight().setup(CSightAction(object().memory().enemy().selected(), true, true));
         }
@@ -315,7 +318,7 @@ void CStalkerActionGetReadyToKill::execute()
 {
 #ifdef TEST_MENTAL_STATE
     VERIFY((start_level_time() == Device.dwTimeGlobal) || (object().movement().mental_state() == eMentalStateDanger));
-#endif  // TEST_MENTAL_STATE
+#endif // TEST_MENTAL_STATE
 
     inherited::execute();
 
@@ -399,7 +402,7 @@ void CStalkerActionKillEnemy::initialize()
     object().movement().set_nearest_accessible_position();
     object().movement().set_mental_state(eMentalStateDanger);
     //	object().movement().set_body_state			(m_storage->property(eWorldPropertyUseCrouchToLookOut) ?
-    //eBodyStateCrouch : eBodyStateStand);
+    // eBodyStateCrouch : eBodyStateStand);
     object().movement().set_movement_type(eMovementTypeStand);
     m_storage->set_property(eWorldPropertyLookedOut, false);
     m_storage->set_property(eWorldPropertyPositionHolded, false);
@@ -419,7 +422,7 @@ void CStalkerActionKillEnemy::execute()
 {
 #ifdef TEST_MENTAL_STATE
     VERIFY((start_level_time() == Device.dwTimeGlobal) || (object().movement().mental_state() == eMentalStateDanger));
-#endif  // TEST_MENTAL_STATE
+#endif // TEST_MENTAL_STATE
 
     inherited::execute();
 
@@ -427,11 +430,11 @@ void CStalkerActionKillEnemy::execute()
 
     //	u32									min_queue_size, max_queue_size, min_queue_interval, max_queue_interval;
     //	float								distance =
-    //object().memory().enemy().selected()->Position().distance_to(object().Position());
+    // object().memory().enemy().selected()->Position().distance_to(object().Position());
     //	select_queue_params					(distance,min_queue_size, max_queue_size, min_queue_interval,
-    //max_queue_interval);
+    // max_queue_interval);
     //	object().CObjectHandler::set_goal	(eObjectActionFire1,object().best_weapon(),min_queue_size, max_queue_size,
-    //min_queue_interval, max_queue_interval);
+    // min_queue_interval, max_queue_interval);
     fire();
 
     if (object().memory().enemy().selected()) {
@@ -490,7 +493,7 @@ void CStalkerActionTakeCover::execute()
 {
 #ifdef TEST_MENTAL_STATE
     VERIFY((start_level_time() == Device.dwTimeGlobal) || (object().movement().mental_state() == eMentalStateDanger));
-#endif  // TEST_MENTAL_STATE
+#endif // TEST_MENTAL_STATE
 
     inherited::execute();
 
@@ -531,7 +534,7 @@ void CStalkerActionTakeCover::execute()
     }
 
     if (object().movement().path_completed())
-    {  // && (object().memory().enemy().selected()->Position().distance_to_sqr(object().Position()) >= 10.f))
+    { // && (object().memory().enemy().selected()->Position().distance_to_sqr(object().Position()) >= 10.f))
         object().best_cover_can_try_advance();
         m_storage->set_property(eWorldPropertyInCover, true);
     }
@@ -606,7 +609,7 @@ void CStalkerActionLookOut::execute()
 {
 #ifdef TEST_MENTAL_STATE
     VERIFY((start_level_time() == Device.dwTimeGlobal) || (object().movement().mental_state() == eMentalStateDanger));
-#endif  // TEST_MENTAL_STATE
+#endif // TEST_MENTAL_STATE
 
     inherited::execute();
 
@@ -625,11 +628,11 @@ void CStalkerActionLookOut::execute()
     Fvector position = mem_object.m_object_params.m_position;
     object().m_ce_close->setup(position, 0.f, 170.f, 10.f);
     const CCoverPoint* point = ai().cover_manager().best_cover(
-        object().Position(), 10.f, *object().m_ce_close);  //,CStalkerMovementRestrictor(m_object,true,false));
+        object().Position(), 10.f, *object().m_ce_close); //,CStalkerMovementRestrictor(m_object,true,false));
     if (!point || (point->position().similar(object().Position()) && object().movement().path_completed())) {
         object().m_ce_close->setup(position, 0.f, 170.f, 10.f);
         point = ai().cover_manager().best_cover(
-            object().Position(), 30.f, *object().m_ce_close);  //,CStalkerMovementRestrictor(m_object,true,false));
+            object().Position(), 30.f, *object().m_ce_close); //,CStalkerMovementRestrictor(m_object,true,false));
     }
 
     if (point) {
@@ -689,7 +692,7 @@ void CStalkerActionHoldPosition::execute()
 {
 #ifdef TEST_MENTAL_STATE
     VERIFY((start_level_time() == Device.dwTimeGlobal) || (object().movement().mental_state() == eMentalStateDanger));
-#endif  // TEST_MENTAL_STATE
+#endif // TEST_MENTAL_STATE
 
     inherited::execute();
 
@@ -778,7 +781,7 @@ void CStalkerActionDetourEnemy::execute()
 {
 #ifdef TEST_MENTAL_STATE
     VERIFY((start_level_time() == Device.dwTimeGlobal) || (object().movement().mental_state() == eMentalStateDanger));
-#endif  // TEST_MENTAL_STATE
+#endif // TEST_MENTAL_STATE
 
     inherited::execute();
 
@@ -895,7 +898,7 @@ void CStalkerActionHideFromGrenade::execute()
 {
 #ifdef TEST_MENTAL_STATE
     VERIFY((start_level_time() == Device.dwTimeGlobal) || (object().movement().mental_state() == eMentalStateDanger));
-#endif  // TEST_MENTAL_STATE
+#endif // TEST_MENTAL_STATE
 
     inherited::execute();
 
@@ -982,7 +985,7 @@ void CStalkerActionSuddenAttack::execute()
 {
 #ifdef TEST_MENTAL_STATE
     VERIFY((start_level_time() == Device.dwTimeGlobal) || (object().movement().mental_state() == eMentalStateDanger));
-#endif  // TEST_MENTAL_STATE
+#endif // TEST_MENTAL_STATE
 
     inherited::execute();
 
@@ -1097,7 +1100,7 @@ void CStalkerActionKillEnemyIfPlayerOnThePath::execute()
 {
 #ifdef TEST_MENTAL_STATE
     VERIFY((start_level_time() == Device.dwTimeGlobal) || (object().movement().mental_state() == eMentalStateDanger));
-#endif  // TEST_MENTAL_STATE
+#endif // TEST_MENTAL_STATE
 
     inherited::execute();
 

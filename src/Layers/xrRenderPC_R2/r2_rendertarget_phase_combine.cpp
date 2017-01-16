@@ -73,7 +73,7 @@ void CRenderTarget::phase_combine()
 
     //
     // if (RImplementation.o.bug)	{
-    RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0x00);  // stencil should be >= 1
+    RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0x00); // stencil should be >= 1
     if (RImplementation.o.nvstencil) {
         u_stencil_optimize(FALSE);
         RCache.set_ColorWriteEnable();
@@ -108,7 +108,7 @@ void CRenderTarget::phase_combine()
         ambclr.mul(ps_r2_sun_lumscale_amb);
 
         //.		Fvector4	envclr			= { envdesc.sky_color.x*2+EPS,	envdesc.sky_color.y*2+EPS,
-        //envdesc.sky_color.z*2+EPS,	envdesc.weight					};
+        // envdesc.sky_color.z*2+EPS,	envdesc.weight					};
         Fvector4 envclr = {envdesc.hemi_color.x * 2 + EPS, envdesc.hemi_color.y * 2 + EPS,
             envdesc.hemi_color.z * 2 + EPS, envdesc.weight};
 
@@ -198,13 +198,13 @@ void CRenderTarget::phase_combine()
 
     // Forward rendering
     {
-        u_setrt(rt_Generic_0, 0, 0, HW.pBaseZB);  // LDR RT
+        u_setrt(rt_Generic_0, 0, 0, HW.pBaseZB); // LDR RT
         RCache.set_CullMode(CULL_CCW);
         RCache.set_Stencil(FALSE);
         RCache.set_ColorWriteEnable();
         // g_pGamePersistent->Environment().RenderClouds	();
         RImplementation.render_forward();
-        if (g_pGamePersistent) g_pGamePersistent->OnRenderPPUI_main();  // PP-UI
+        if (g_pGamePersistent) g_pGamePersistent->OnRenderPPUI_main(); // PP-UI
     }
 
     //	Igor: for volumetric lights
@@ -213,20 +213,20 @@ void CRenderTarget::phase_combine()
 
     // Perform blooming filter and distortion if needed
     RCache.set_Stencil(FALSE);
-    phase_bloom();  // HDR RT invalidated here
+    phase_bloom(); // HDR RT invalidated here
 
     // Distortion filter
-    BOOL bDistort = RImplementation.o.distortion_enabled;  // This can be modified
+    BOOL bDistort = RImplementation.o.distortion_enabled; // This can be modified
     {
         if ((0 == RImplementation.mapDistort.size()) && !_menu_pp) bDistort = FALSE;
         if (bDistort) {
-            u_setrt(rt_Generic_1, 0, 0, HW.pBaseZB);  // Now RT is a distortion mask
+            u_setrt(rt_Generic_1, 0, 0, HW.pBaseZB); // Now RT is a distortion mask
             RCache.set_CullMode(CULL_CCW);
             RCache.set_Stencil(FALSE);
             RCache.set_ColorWriteEnable();
             CHK_DX(HW.pDevice->Clear(0L, NULL, D3DCLEAR_TARGET, color_rgba(127, 127, 0, 127), 1.0f, 0L));
             RImplementation.r_dsgraph_render_distort();
-            if (g_pGamePersistent) g_pGamePersistent->OnRenderPPUI_PP();  // PP-UI
+            if (g_pGamePersistent) g_pGamePersistent->OnRenderPPUI_PP(); // PP-UI
         }
     }
 
@@ -237,7 +237,7 @@ void CRenderTarget::phase_combine()
 
     // Combine everything + perform AA
     if (PP_Complex)
-        u_setrt(rt_Color, 0, 0, HW.pBaseZB);  // LDR RT
+        u_setrt(rt_Color, 0, 0, HW.pBaseZB); // LDR RT
     else
         u_setrt(Device.dwWidth, Device.dwHeight, HW.pBaseRT, NULL, NULL, HW.pBaseZB);
     //. u_setrt				( Device.dwWidth,Device.dwHeight,HW.pBaseRT,NULL,NULL,HW.pBaseZB);
@@ -311,9 +311,9 @@ void CRenderTarget::phase_combine()
 
         // Draw COLOR
         if (ps_r2_ls_flags.test(R2FLAG_AA))
-            RCache.set_Element(s_combine->E[bDistort ? 3 : 1]);  // look at blender_combine.cpp
+            RCache.set_Element(s_combine->E[bDistort ? 3 : 1]); // look at blender_combine.cpp
         else
-            RCache.set_Element(s_combine->E[bDistort ? 4 : 2]);  // look at blender_combine.cpp
+            RCache.set_Element(s_combine->E[bDistort ? 4 : 2]); // look at blender_combine.cpp
         RCache.set_c("e_barrier", ps_r2_aa_barier.x, ps_r2_aa_barier.y, ps_r2_aa_barier.z, 0);
         RCache.set_c("e_weights", ps_r2_aa_weight.x, ps_r2_aa_weight.y, ps_r2_aa_weight.z, 0);
         RCache.set_c("e_kernel", ps_r2_aa_kernel, ps_r2_aa_kernel, ps_r2_aa_kernel, 0);
@@ -332,7 +332,7 @@ void CRenderTarget::phase_combine()
     RCache.set_Stencil(FALSE);
 
     //	if FP16-BLEND !not! supported - draw flares here, overwise they are already in the bloom target
-    /* if (!RImplementation.o.fp16_blend)*/ g_pGamePersistent->Environment().RenderFlares();  // lens-flares
+    /* if (!RImplementation.o.fp16_blend)*/ g_pGamePersistent->Environment().RenderFlares(); // lens-flares
 
     //	Igor: screenshot will not have postprocess applied.
     //	TODO: fox that later
@@ -503,7 +503,7 @@ void CRenderTarget::phase_combine_volumetric()
         ambclr.mul(ps_r2_sun_lumscale_amb);
 
         //.		Fvector4	envclr			= { envdesc.sky_color.x*2+EPS,	envdesc.sky_color.y*2+EPS,
-        //envdesc.sky_color.z*2+EPS,	envdesc.weight					};
+        // envdesc.sky_color.z*2+EPS,	envdesc.weight					};
         Fvector4 envclr = {envdesc.hemi_color.x * 2 + EPS, envdesc.hemi_color.y * 2 + EPS,
             envdesc.hemi_color.z * 2 + EPS, envdesc.weight};
 

@@ -36,4 +36,4 @@ void kills_store::add_kill(shared_str const& killer, shared_str const& victim, u
     tmp_iter->second->push_obsolete(new_kill);
 }
 
-}  // namespace award_system
+} // namespace award_system

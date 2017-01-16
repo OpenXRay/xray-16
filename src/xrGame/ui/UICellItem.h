@@ -58,7 +58,7 @@ public:
     CUICellItem* Child(u32 idx) { return m_childs[idx]; };
     bool HasChild(CUICellItem* item);
     virtual bool EqualTo(CUICellItem* itm);
-    IC const Ivector2& GetGridSize() { return m_grid_size; };  // size in grid
+    IC const Ivector2& GetGridSize() { return m_grid_size; }; // size in grid
     IC void SetAccelerator(int dik) { m_accelerator = dik; };
     IC int GetAccelerator() const { return m_accelerator; };
     virtual CUIDragItem* CreateDragItem();

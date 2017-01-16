@@ -41,7 +41,7 @@ private:
     {
         left = 0,
         right = 1
-    };  // coupled
+    }; // coupled
     aim_side m_attack_side;
     aim_side m_prepare_side;
     TTime m_prepare_side_chosen_time;
@@ -88,4 +88,4 @@ inline bool is_valid_point_to_move(Fvector const& point);
 
 #include "monster_state_attack_on_run_inline.h"
 
-#endif  // MONSTER_STATE_ATTACK_ON_RUN_H
+#endif // MONSTER_STATE_ATTACK_ON_RUN_H

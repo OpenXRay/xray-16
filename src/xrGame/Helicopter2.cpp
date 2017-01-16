@@ -85,7 +85,7 @@ void CHelicopter::UpdateHeliParticles()
 
         if (m_lanim) {
             int frame;
-            u32 clr = m_lanim->CalculateBGR(Device.fTimeGlobal, frame);  // тючтЁр•рхЄ т ЇюЁьрЄх BGR
+            u32 clr = m_lanim->CalculateBGR(Device.fTimeGlobal, frame); // тючтЁр•рхЄ т ЇюЁьрЄх BGR
             Fcolor fclr;
             fclr.set((float)color_get_B(clr), (float)color_get_G(clr), (float)color_get_R(clr), 1.f);
             fclr.mul_rgb(m_light_brightness / 255.f);
@@ -113,7 +113,7 @@ void CHelicopter::SetDestPosition(Fvector* pos)
     m_movement.SetDestPosition(pos);
 #ifndef MASTER_GOLD
     if (bDebug) Msg("---SetDestPosition %f %f %f", pos->x, pos->y, pos->z);
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
 }
 
 float CHelicopter::GetDistanceToDestPosition()
@@ -154,8 +154,8 @@ float CHelicopter::GetMaxVelocity()
 //////////////////////Start By JoHnY///////////////////////
 void CHelicopter::SetLinearAcc(float LAcc_fw, float LAcc_bw)
 {
-    m_movement.LinearAcc_fw = LAcc_fw;  //ускорение разгона
-    m_movement.LinearAcc_bk = LAcc_bw;  //ускорение торможения
+    m_movement.LinearAcc_fw = LAcc_fw; //ускорение разгона
+    m_movement.LinearAcc_bk = LAcc_bw; //ускорение торможения
 }
 //////////////////////End By JoHnY/////////////////////////
 void CHelicopter::SetSpeedInDestPoint(float sp)
@@ -163,7 +163,7 @@ void CHelicopter::SetSpeedInDestPoint(float sp)
     m_movement.SetSpeedInDestPoint(sp);
 #ifndef MASTER_GOLD
     if (bDebug) Msg("---SetSpeedInDestPoint %f", sp);
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
 }
 
 float CHelicopter::GetSpeedInDestPoint(float sp)
@@ -175,7 +175,7 @@ void CHelicopter::SetOnPointRangeDist(float d)
     m_movement.onPointRangeDist = d;
 #ifndef MASTER_GOLD
     if (bDebug) Msg("---SetOnPointRangeDist %f", d);
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
 }
 
 float CHelicopter::GetOnPointRangeDist()

@@ -27,7 +27,7 @@ CSE_Abstract* xrServer::Process_spawn(
         {
 #ifndef MASTER_GOLD
             Msg("- SERVER: Entity [%s] incompatible with current game type.", *E->s_name);
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
             F_entity_Destroy(E);
             return NULL;
         }
@@ -52,7 +52,7 @@ CSE_Abstract* xrServer::Process_spawn(
         if (!e_parent) {
             R_ASSERT(!tpExistedEntity);
             //			VERIFY3			(smart_cast<CSE_ALifeItemBolt*>(E) ||
-            //smart_cast<CSE_ALifeItemGrenade*>(E),*E->s_name,E->name_replace());
+            // smart_cast<CSE_ALifeItemGrenade*>(E),*E->s_name,E->name_replace());
             F_entity_Destroy(E);
             return NULL;
         }
@@ -70,7 +70,7 @@ CSE_Abstract* xrServer::Process_spawn(
         R_ASSERT(Phantom);
         Phantom->Spawn_Read(P);
         Phantom->ID = PerformIDgen(0xffff);
-        Phantom->ID_Phantom = Phantom->ID;  // Self-linked to avoid phantom-breeding
+        Phantom->ID_Phantom = Phantom->ID; // Self-linked to avoid phantom-breeding
         Phantom->owner = NULL;
         entities.insert(mk_pair(Phantom->ID, Phantom));
 
@@ -87,7 +87,7 @@ CSE_Abstract* xrServer::Process_spawn(
         if (E->s_flags.is(M_SPAWN_OBJECT_PHANTOM)) {
             // Clone from Phantom
             E->ID = PerformIDgen(0xffff);
-            E->owner = CL;  //		= SelectBestClientToMigrateTo	(E);
+            E->owner = CL; //		= SelectBestClientToMigrateTo	(E);
             E->s_flags.set(M_SPAWN_OBJECT_PHANTOM, FALSE);
             entities.insert(mk_pair(E->ID, E));
         }
@@ -114,7 +114,7 @@ CSE_Abstract* xrServer::Process_spawn(
 
     // PROCESS RP;	 3D position/orientation
     PerformRP(E);
-    E->s_RP = 0xFE;  // Use supplied
+    E->s_RP = 0xFE; // Use supplied
 
     // Parent-Connect
     if (!tpExistedEntity) {

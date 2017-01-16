@@ -26,7 +26,7 @@ void _rect_register(L_rect& R, lm_layer* D, BOOL bRotate)
         // Normal (and fastest way)
         for (u32 y = 0; y < s_y; y++)
         {
-            BYTE* P = surface + (y + R.a.y) * c_LMAP_size + R.a.x;  // destination scan-line
+            BYTE* P = surface + (y + R.a.y) * c_LMAP_size + R.a.x; // destination scan-line
             u8* S = lm + y * s_x;
             for (u32 x = 0; x < s_x; x++, P++, S++)
                 if (*S >= alpha_ref) *P = 255;
@@ -37,7 +37,7 @@ void _rect_register(L_rect& R, lm_layer* D, BOOL bRotate)
         // Rotated :(
         for (u32 y = 0; y < s_x; y++)
         {
-            BYTE* P = surface + (y + R.a.y) * c_LMAP_size + R.a.x;  // destination scan-line
+            BYTE* P = surface + (y + R.a.y) * c_LMAP_size + R.a.x; // destination scan-line
             for (u32 x = 0; x < s_y; x++, P++)
                 if (lm[x * s_x + y] >= alpha_ref) *P = 255;
         }
@@ -59,7 +59,7 @@ bool Place_Perpixel(L_rect& R, lm_layer* D, BOOL bRotate)
         // Normal (and fastest way)
         for (int y = 0; y < s_y; y++)
         {
-            BYTE* P = surface + (y + R.a.y) * c_LMAP_size + R.a.x;  // destination scan-line
+            BYTE* P = surface + (y + R.a.y) * c_LMAP_size + R.a.x; // destination scan-line
             u8* S = lm + y * s_x;
             // accelerated part
             for (x = 0; x < s_x - 8; x += 8, P += 8, S += 8)
@@ -87,7 +87,7 @@ bool Place_Perpixel(L_rect& R, lm_layer* D, BOOL bRotate)
         // Rotated :(
         for (int y = 0; y < s_x; y++)
         {
-            BYTE* P = surface + (y + R.a.y) * c_LMAP_size + R.a.x;  // destination scan-line
+            BYTE* P = surface + (y + R.a.y) * c_LMAP_size + R.a.x; // destination scan-line
             for (x = 0; x < s_y; x++, P++)
                 if ((*P) && (lm[x * s_x + y] >= alpha_ref)) {
                     _mm_empty();

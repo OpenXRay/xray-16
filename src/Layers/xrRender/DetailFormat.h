@@ -122,19 +122,19 @@ struct DetailPalette
     u16 a2 : 4;
     u16 a3 : 4;
 };
-struct DetailSlot  // was(4+4+3*4+2 = 22b), now(8+2*4=16b)
+struct DetailSlot // was(4+4+3*4+2 = 22b), now(8+2*4=16b)
 {
-    u32 y_base : 12;   // 11 // 1 unit = 20 cm, low = -200m, high = 4096*20cm - 200 = 619.2m
-    u32 y_height : 8;  // 20 // 1 unit = 10 cm, low = 0, high = 256*10 ~= 25.6m
-    u32 id0 : 6;       // 26 // 0x3F(63) = empty
-    u32 id1 : 6;       // 32 // 0x3F(63) = empty
-    u32 id2 : 6;       // 38 // 0x3F(63) = empty
-    u32 id3 : 6;       // 42 // 0x3F(63) = empty
-    u32 c_dir : 4;     // 48 // 0..1 q
-    u32 c_hemi : 4;    // 52 // 0..1 q
-    u32 c_r : 4;       // 56 // rgb = 4.4.4
-    u32 c_g : 4;       // 60 // rgb = 4.4.4
-    u32 c_b : 4;       // 64 // rgb = 4.4.4
+    u32 y_base : 12;  // 11 // 1 unit = 20 cm, low = -200m, high = 4096*20cm - 200 = 619.2m
+    u32 y_height : 8; // 20 // 1 unit = 10 cm, low = 0, high = 256*10 ~= 25.6m
+    u32 id0 : 6;      // 26 // 0x3F(63) = empty
+    u32 id1 : 6;      // 32 // 0x3F(63) = empty
+    u32 id2 : 6;      // 38 // 0x3F(63) = empty
+    u32 id3 : 6;      // 42 // 0x3F(63) = empty
+    u32 c_dir : 4;    // 48 // 0..1 q
+    u32 c_hemi : 4;   // 52 // 0..1 q
+    u32 c_r : 4;      // 56 // rgb = 4.4.4
+    u32 c_g : 4;      // 60 // rgb = 4.4.4
+    u32 c_b : 4;      // 64 // rgb = 4.4.4
     DetailPalette palette[4];
 
 public:

@@ -20,7 +20,7 @@ public:
         : dtH(_dtH), calculation_rect(Frect().invalidate()), recalculate(false), partial_calculate(false),
           force_recalculate(false), dtFS(0), slots_flags(0)
     {
-    }  //
+    } //
     IC bool recalculating() const { return recalculate; }
     IC bool skip_slot(int x, int z) const
     {
@@ -56,4 +56,4 @@ private:
     void check_files(u32 check_sum);
 };
 
-#endif  //__RECALCULATION_PARAMS_H__
+#endif //__RECALCULATION_PARAMS_H__

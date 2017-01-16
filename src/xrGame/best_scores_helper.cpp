@@ -125,10 +125,10 @@ bool best_scores_helper::OnPlayerKilled(
     case SKT_EYESHOT: { ++m_eyeshots_kills_in_row;
     }
     break;
-    };  // switch (kill_type.second)
+    }; // switch (kill_type.second)
 
     ++m_kills_in_row;
     return false;
 }
 
-}  // namespace award_system
+} // namespace award_system

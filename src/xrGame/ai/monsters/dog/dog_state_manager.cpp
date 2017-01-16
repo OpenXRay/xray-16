@@ -21,9 +21,9 @@ namespace dog
 {
 const float atack_decision_maxdist = 6.f;
 
-}  // dog
+} // dog
 
-}  // detail
+} // detail
 
 CStateManagerDog::CStateManagerDog(CAI_Dog* monster) : inherited(monster)
 {

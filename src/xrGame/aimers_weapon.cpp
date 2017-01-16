@@ -49,9 +49,9 @@ weapon::weapon(CGameObject* object, LPCSTR animation_id, bool animation_start, F
     compute_bone(bone_id1);
 
     bone.set_callback(bctCustom, old_callback, old_callback_param);
-#else   // #if 0
+#else  // #if 0
     m_result[bone_id1] = Fidentity;
-#endif  // #if 0
+#endif // #if 0
 }
 
 void weapon::compute_bone(u32 const bone_id)

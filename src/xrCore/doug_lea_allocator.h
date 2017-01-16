@@ -32,6 +32,6 @@ public:
 private:
     LPCSTR m_arena_id;
     void* m_dl_arena;
-};  // class doug_lea_allocator
+}; // class doug_lea_allocator
 
-#endif  // #ifndef DOUG_LEA_ALLOCATOR_H_INCLUDED
+#endif // #ifndef DOUG_LEA_ALLOCATOR_H_INCLUDED

@@ -57,9 +57,9 @@ void game_cl_mp::AddMessageMenu(LPCSTR menu_section, LPCSTR snd_path, LPCSTR tea
                     pNewTeamSound->push_back(cl_Message_Sound());
                     cl_Message_Sound* pMsgSound = &(pNewTeamSound->back());
                     pMsgSound->mSound_Voice.create(
-                        FileName_Voice, st_Effect, sg_SourceType);  // Msg("-- %s Loaded", FileName_Voice);
+                        FileName_Voice, st_Effect, sg_SourceType); // Msg("-- %s Loaded", FileName_Voice);
                     pMsgSound->mSound_Radio.create(
-                        FileName_Radio, st_Effect, sg_SourceType);  // Msg("-- %s Loaded", FileName_Radio);
+                        FileName_Radio, st_Effect, sg_SourceType); // Msg("-- %s Loaded", FileName_Radio);
                 }
                 else
                 {

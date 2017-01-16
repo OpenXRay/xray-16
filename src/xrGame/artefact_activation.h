@@ -60,6 +60,6 @@ public:
 
 private:
     bool m_in_process;
-};  // class SArtefactActivation
+}; // class SArtefactActivation
 
-#endif  // ARTEFACT_ACTIVATION
+#endif // ARTEFACT_ACTIVATION

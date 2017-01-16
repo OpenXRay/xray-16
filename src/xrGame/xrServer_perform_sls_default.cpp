@@ -2,7 +2,7 @@
 #include "xrmessages.h"
 #include "xrserver.h"
 
-#if 1  // def DEBUG
+#if 1 // def DEBUG
 #define USE_DESIGNER_KEY
 #endif
 

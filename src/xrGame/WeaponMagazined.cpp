@@ -140,7 +140,7 @@ void CWeaponMagazined::FireStart()
         }
     }
     else
-    {  // misfire
+    { // misfire
         if (smart_cast<CActor*>(this->H_Parent()) && (Level().CurrentViewEntity() == H_Parent()))
             CurrentGameUI()->AddCustomStatic("gun_jammed", true);
 
@@ -556,16 +556,16 @@ void CWeaponMagazined::OnAnimationEnd(u32 state)
     case eReload:
         ReloadMagazine();
         SwitchState(eIdle);
-        break;  // End of reload animation
+        break; // End of reload animation
     case eHiding:
         SwitchState(eHidden);
-        break;  // End of Hide
+        break; // End of Hide
     case eShowing:
         SwitchState(eIdle);
-        break;  // End of Show
+        break; // End of Show
     case eIdle:
         switch2_Idle();
-        break;  // Keep showing idle
+        break; // Keep showing idle
     }
     inherited::OnAnimationEnd(state);
 }
@@ -605,7 +605,7 @@ void CWeaponMagazined::switch2_Fire()
     }
 #else
     if (!io) return;
-#endif  // DEBUG
+#endif // DEBUG
 
     //
     //	VERIFY2(
@@ -1099,7 +1099,7 @@ float CWeaponMagazined::GetWeaponDeterioration()
 {
     // modified by Peacemaker [17.10.08]
     //	if (!m_bHasDifferentFireModes || m_iPrefferedFireMode == -1 || u32(GetCurrentFireMode()) <=
-    //u32(m_iPrefferedFireMode))
+    // u32(m_iPrefferedFireMode))
     //		return inherited::GetWeaponDeterioration();
     //	return m_iShotNum*conditionDecreasePerShot;
     return (m_iShotNum == 1) ? conditionDecreasePerShot : conditionDecreasePerQueueShot;
@@ -1163,7 +1163,7 @@ bool CWeaponMagazined::GetBriefInfo(II_BriefInfo& info)
     if (m_pInventory->ModifyFrame() <= m_BriefInfo_CalcFrame) {
         return false;
     }
-    GetSuitableAmmoTotal();  // update m_BriefInfo_CalcFrame
+    GetSuitableAmmoTotal(); // update m_BriefInfo_CalcFrame
     info.grenade = "";
 
     u32 at_size = m_ammoTypes.size();
@@ -1175,7 +1175,7 @@ bool CWeaponMagazined::GetBriefInfo(II_BriefInfo& info)
     {
         // GetSuitableAmmoTotal(); //mp = all type
 
-        xr_sprintf(int_str, "%d", GetAmmoCount(0));  // !!!!!!!!!!! == 0 temp
+        xr_sprintf(int_str, "%d", GetAmmoCount(0)); // !!!!!!!!!!! == 0 temp
         if (m_ammoType == 0)
             info.fmj_ammo = int_str;
         else

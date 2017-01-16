@@ -31,4 +31,4 @@ XRCORE_API void xr_crypto_init()
     #endif*/
 }
 
-}  // namespace crypto
+} // namespace crypto

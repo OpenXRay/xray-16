@@ -20,7 +20,7 @@
 #ifdef DEBUG
 #include "debug_renderer.h"
 extern BOOL g_bDrawBulletHit;
-#endif  //#ifdef DEBUG
+#endif //#ifdef DEBUG
 
 CWeaponKnife::CWeaponKnife()
 {
@@ -246,7 +246,7 @@ void CWeaponKnife::switch2_Attacking(u32 state)
 
     if (state == eFire)
         PlayHUDMotion("anm_attack", FALSE, this, state);
-    else  // eFire2
+    else // eFire2
         PlayHUDMotion("anm_attack2", FALSE, this, state);
 
     SetPending(TRUE);
@@ -321,47 +321,47 @@ void CWeaponKnife::LoadFireParams(LPCSTR section)
     s_sHitPowerCritical_2 = pSettings->r_string_wb(section, "hit_power_critical_2");
 
     fvHitPower_2[egdMaster] =
-        (float)atof(_GetItem(*s_sHitPower_2, 0, buffer));  //первый параметр - это хит для уровня игры мастер
+        (float)atof(_GetItem(*s_sHitPower_2, 0, buffer)); //первый параметр - это хит для уровня игры мастер
     fvHitPowerCritical_2[egdMaster] =
-        (float)atof(_GetItem(*s_sHitPowerCritical_2, 0, buffer));  //первый параметр - это хит для уровня игры мастер
+        (float)atof(_GetItem(*s_sHitPowerCritical_2, 0, buffer)); //первый параметр - это хит для уровня игры мастер
 
     fvHitPower_2[egdNovice] = fvHitPower_2[egdStalker] = fvHitPower_2[egdVeteran] =
-        fvHitPower_2[egdMaster];  //изначально параметры для других уровней сложности такие же
+        fvHitPower_2[egdMaster]; //изначально параметры для других уровней сложности такие же
     fvHitPowerCritical_2[egdNovice] = fvHitPowerCritical_2[egdStalker] = fvHitPowerCritical_2[egdVeteran] =
-        fvHitPowerCritical_2[egdMaster];  //изначально параметры для других уровней сложности такие же
+        fvHitPowerCritical_2[egdMaster]; //изначально параметры для других уровней сложности такие же
 
-    int num_game_diff_param = _GetItemCount(*s_sHitPower_2);  //узнаём колличество параметров для хитов
-    if (num_game_diff_param > 1)                              //если задан второй параметр хита
+    int num_game_diff_param = _GetItemCount(*s_sHitPower_2); //узнаём колличество параметров для хитов
+    if (num_game_diff_param > 1)                             //если задан второй параметр хита
     {
         fvHitPower_2[egdVeteran] =
-            (float)atof(_GetItem(*s_sHitPower_2, 1, buffer));  //то вычитываем его для уровня ветерана
+            (float)atof(_GetItem(*s_sHitPower_2, 1, buffer)); //то вычитываем его для уровня ветерана
     }
-    if (num_game_diff_param > 2)  //если задан третий параметр хита
+    if (num_game_diff_param > 2) //если задан третий параметр хита
     {
         fvHitPower_2[egdStalker] =
-            (float)atof(_GetItem(*s_sHitPower_2, 2, buffer));  //то вычитываем его для уровня сталкера
+            (float)atof(_GetItem(*s_sHitPower_2, 2, buffer)); //то вычитываем его для уровня сталкера
     }
-    if (num_game_diff_param > 3)  //если задан четвёртый параметр хита
+    if (num_game_diff_param > 3) //если задан четвёртый параметр хита
     {
         fvHitPower_2[egdNovice] =
-            (float)atof(_GetItem(*s_sHitPower_2, 3, buffer));  //то вычитываем его для уровня новичка
+            (float)atof(_GetItem(*s_sHitPower_2, 3, buffer)); //то вычитываем его для уровня новичка
     }
 
-    num_game_diff_param = _GetItemCount(*s_sHitPowerCritical_2);  //узнаём колличество параметров
-    if (num_game_diff_param > 1)                                  //если задан второй параметр хита
+    num_game_diff_param = _GetItemCount(*s_sHitPowerCritical_2); //узнаём колличество параметров
+    if (num_game_diff_param > 1)                                 //если задан второй параметр хита
     {
         fvHitPowerCritical_2[egdVeteran] =
-            (float)atof(_GetItem(*s_sHitPowerCritical_2, 1, buffer));  //то вычитываем его для уровня ветерана
+            (float)atof(_GetItem(*s_sHitPowerCritical_2, 1, buffer)); //то вычитываем его для уровня ветерана
     }
-    if (num_game_diff_param > 2)  //если задан третий параметр хита
+    if (num_game_diff_param > 2) //если задан третий параметр хита
     {
         fvHitPowerCritical_2[egdStalker] =
-            (float)atof(_GetItem(*s_sHitPowerCritical_2, 2, buffer));  //то вычитываем его для уровня сталкера
+            (float)atof(_GetItem(*s_sHitPowerCritical_2, 2, buffer)); //то вычитываем его для уровня сталкера
     }
-    if (num_game_diff_param > 3)  //если задан четвёртый параметр хита
+    if (num_game_diff_param > 3) //если задан четвёртый параметр хита
     {
         fvHitPowerCritical_2[egdNovice] =
-            (float)atof(_GetItem(*s_sHitPowerCritical_2, 3, buffer));  //то вычитываем его для уровня новичка
+            (float)atof(_GetItem(*s_sHitPowerCritical_2, 3, buffer)); //то вычитываем его для уровня новичка
     }
 
     fHitImpulse_2 = pSettings->r_float(section, "hit_impulse_2");
@@ -604,7 +604,7 @@ void CWeaponKnife::fill_shots_list(
             break;
         }
         break;
-        };  // switch (tmp_bone_data.shape.type)*/
+        }; // switch (tmp_bone_data.shape.type)*/
         if (intersect_res) {
             victims_hits_count_t::iterator tmp_vhits_iter = m_victims_hits_count.find(curr_bone.m_victim_id);
             if (m_perv_hits_count && (tmp_vhits_iter == m_victims_hits_count.end())) {
@@ -645,7 +645,7 @@ void CWeaponKnife::make_hit_sort_vectors(Fvector& basis_hit_specific, float& max
         basis_hit_specific.set(0.f, 1.f, 0.f);
         max_dist = 0.2;
     }
-    else  // if (m_eHitType == m_eHitType_2)
+    else // if (m_eHitType == m_eHitType_2)
     {
         // basis_hit_specific1.set(0.f, -1.f, 0.f);
         basis_hit_specific.set(1.f, 0.f, 0.f);
@@ -686,7 +686,7 @@ u32 CWeaponKnife::SelectHitsToShot(shot_targets_t& dst_dirs, Fvector const& f_po
     if (m_eHitType == m_eHitType_1) {
         basis_vector.set(hit1_basis_vector);
     }
-    else  // if (m_eHitType == m_eHitType_2)
+    else // if (m_eHitType == m_eHitType_2)
     {
         basis_vector.set(hit2_basis_vector);
     }
@@ -748,7 +748,7 @@ BOOL CWeaponKnife::RayQueryCallback(collide::rq_result& result, LPVOID this_ptr)
     CWeaponKnife* me = static_cast<CWeaponKnife*>(this_ptr);
     if (result.O && (result.O->ID() != me->m_except_id)) {
         me->m_last_picked_obj = result.O;
-        return FALSE;  // first hit
+        return FALSE; // first hit
     }
     return TRUE;
 }

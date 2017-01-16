@@ -12,4 +12,4 @@ public:
     virtual void OnRender(CGameFont& owner) = 0;
 };
 
-#endif  //	FontRender_included
+#endif //	FontRender_included

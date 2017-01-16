@@ -56,8 +56,8 @@ CWallmarksEngine::CWallmarksEngine()
     :
 #ifdef CONFIG_PROFILE_LOCKS
       lock(MUTEX_PROFILE_ID(CWallmarksEngine)),
-#endif                  // CONFIG_PROFILE_LOCKS
-      xrc("wallmarks")  // XXX stats: add to statistics
+#endif                 // CONFIG_PROFILE_LOCKS
+      xrc("wallmarks") // XXX stats: add to statistics
 {
     static_pool.reserve(256);
     marks.reserve(256);
@@ -178,7 +178,7 @@ void CWallmarksEngine::RecurseTri(u32 t, Fmatrix& mView, CWallmarksEngine::stati
             Fvector test_normal;
             test_normal.mknormal(v_data[v_ids[0]], v_data[v_ids[1]], v_data[v_ids[2]]);
             float cosa = test_normal.dotproduct(sml_normal);
-            if (cosa < 0.034899f) continue;  // cos(88)
+            if (cosa < 0.034899f) continue; // cos(88)
             RecurseTri(adj, mView, W);
         }
     }
@@ -270,7 +270,7 @@ void CWallmarksEngine::AddWallmark_internal(
             for (; it != end; it++)
             {
                 static_wallmark* wm = *it;
-                if (wm->bounds.P.similar(W->bounds.P, 0.02f)) {  // replace
+                if (wm->bounds.P.similar(W->bounds.P, 0.02f)) { // replace
                     static_wm_destroy(wm);
                     *it = W;
                     return;
@@ -379,7 +379,7 @@ void CWallmarksEngine::Render()
 
     float ssaCLIP = r_ssaDISCARD / 4;
 
-    lock.Enter();  // Physics may add wallmarks in parallel with rendering
+    lock.Enter(); // Physics may add wallmarks in parallel with rendering
 
     for (WMSlotVecIt slot_it = marks.begin(); slot_it != marks.end(); slot_it++)
     {
@@ -404,7 +404,7 @@ void CWallmarksEngine::Render()
                     }
                     static_wm_render(W, w_verts);
                 }
-                W->ttl -= 0.1f * Device.fTimeDelta;  // visible wallmarks fade much slower
+                W->ttl -= 0.1f * Device.fTimeDelta; // visible wallmarks fade much slower
             }
             else
             {
@@ -422,7 +422,7 @@ void CWallmarksEngine::Render()
         }
         // Flush stream
         RImplementation.BasicStats.WMTriCount += FlushStream(
-            hGeom, slot->shader, w_offset, w_verts, w_start, FALSE);  //. remove line if !(suppress cull needed)
+            hGeom, slot->shader, w_offset, w_verts, w_start, FALSE); //. remove line if !(suppress cull needed)
         BeginStream(hGeom, w_offset, w_verts, w_start);
 
         // dynamic wallmarks
@@ -473,7 +473,7 @@ void CWallmarksEngine::Render()
         RImplementation.BasicStats.WMTriCount += FlushStream(hGeom, slot->shader, w_offset, w_verts, w_start, TRUE);
     }
 
-    lock.Leave();  // Physics may add wallmarks in parallel with rendering
+    lock.Leave(); // Physics may add wallmarks in parallel with rendering
 
     // Level-wmarks
     RImplementation.r_dsgraph_render_wmarks();

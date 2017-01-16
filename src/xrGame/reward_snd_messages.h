@@ -8,4 +8,4 @@ enum
     ID_forcedword = u32(-1)
 };
 
-#endif  //#ifndef REWARD_SND_MESSAGES_INCLUDED
+#endif //#ifndef REWARD_SND_MESSAGES_INCLUDED

@@ -91,7 +91,7 @@ void SpatialBase::spatial_move()
         spatial.type |= STYPEFLAG_INVALIDSECTOR;
 
         //*** check if we are supposed to correct it's spatial location
-        if (spatial_inside()) return;  // ???
+        if (spatial_inside()) return; // ???
         spatial.space->remove(this);
         spatial.space->insert(this);
     }
@@ -139,7 +139,7 @@ void ISpatial_NODE::_remove(ISpatial* S)
 ISpatial_DB::ISpatial_DB(const char* name)
 #ifdef CONFIG_PROFILE_LOCKS
     : cs(MUTEX_PROFILE_ID(ISpatial_DB))
-#endif  // CONFIG_PROFILE_LOCKS
+#endif // CONFIG_PROFILE_LOCKS
 {
     m_root = NULL;
     xr_strcpy(Name, name);
@@ -165,8 +165,8 @@ void ISpatial_DB::initialize(Fbox& BB)
         Fvector bbc, bbd;
         BB.get_CD(bbc, bbd);
 
-        bbc.set(0, 0, 0);           // generic
-        bbd.set(1024, 1024, 1024);  // generic
+        bbc.set(0, 0, 0);          // generic
+        bbd.set(1024, 1024, 1024); // generic
 
         allocator_pool.reserve(128);
         m_center.set(bbc);
@@ -208,20 +208,20 @@ void ISpatial_DB::_insert(ISpatial_NODE* N, Fvector& n_C, float n_R)
         // this is leaf node
         N->_insert(rt_insert_object);
         rt_insert_object->GetSpatialData().node_center.set(n_C);
-        rt_insert_object->GetSpatialData().node_radius = n_vR;  // vR
+        rt_insert_object->GetSpatialData().node_radius = n_vR; // vR
         return;
     }
 
     // we have to check if it can be putted further down
-    float s_R = rt_insert_object->GetSpatialData().sphere.R;  // spatial bounds
-    float c_R = n_R / 2;                                      // children bounds
+    float s_R = rt_insert_object->GetSpatialData().sphere.R; // spatial bounds
+    float c_R = n_R / 2;                                     // children bounds
     if (s_R < c_R) {
         // object can be pushed further down - select "octant", calc node position
         Fvector& s_C = rt_insert_object->GetSpatialData().sphere.P;
         u32 octant = _octant(n_C, s_C);
         Fvector c_C;
         c_C.mad(n_C, c_spatial_offset[octant], c_R);
-        VERIFY(octant == _octant(n_C, c_C));  // check table assosiations
+        VERIFY(octant == _octant(n_C, c_C)); // check table assosiations
         ISpatial_NODE*& chield = N->children[octant];
 
         if (0 == chield) {

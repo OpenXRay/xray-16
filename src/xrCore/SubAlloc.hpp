@@ -42,7 +42,7 @@ struct MEM_BLK : public BLK_NODE
 } _PACK_ATTR;
 #pragma pack()
 
-static BYTE Indx2Units[N_INDEXES], Units2Indx[128];  // constants
+static BYTE Indx2Units[N_INDEXES], Units2Indx[128]; // constants
 static DWORD GlueCount, SubAllocatorSize = 0;
 static BYTE *HeapStart, *pText, *UnitsStart, *LoUnit, *HiUnit;
 

@@ -92,4 +92,4 @@ public:
     void OnFrame();
 };
 
-#endif  // RainH
+#endif // RainH

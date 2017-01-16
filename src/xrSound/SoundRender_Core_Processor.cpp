@@ -42,7 +42,7 @@ void CSoundRender_Core::update(const Fvector& P, const Fvector& D, const Fvector
         if (E) {
             E->update(dt_sec);
             E->marker = s_emitters_u;
-            E = T->get_emitter();  // update can stop itself
+            E = T->get_emitter(); // update can stop itself
             if (E)
                 T->priority = E->priority();
             else

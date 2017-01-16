@@ -156,8 +156,8 @@ BOOL CHangingLamp::net_Spawn(CSE_Abstract* DC)
         TurnOn();
     else
     {
-        processing_activate();  // temporal enable
-        TurnOff();              // -> and here is disable :)
+        processing_activate(); // temporal enable
+        TurnOff();             // -> and here is disable :)
     }
 
     setVisible((BOOL) !!Visual());
@@ -254,7 +254,7 @@ void CHangingLamp::UpdateCL()
 
         if (lanim) {
             int frame;
-            u32 clr = lanim->CalculateBGR(Device.fTimeGlobal, frame);  // возвращает в формате BGR
+            u32 clr = lanim->CalculateBGR(Device.fTimeGlobal, frame); // возвращает в формате BGR
             Fcolor fclr;
             fclr.set((float)color_get_B(clr), (float)color_get_G(clr), (float)color_get_R(clr), 1.f);
             fclr.mul_rgb(fBrightness / 255.f);
@@ -288,7 +288,7 @@ void CHangingLamp::TurnOn()
         K->LL_SetBoneVisible(light_bone, TRUE, TRUE);
         K->CalculateBones_Invalidate();
         K->CalculateBones(TRUE);
-        K->LL_SetBoneVisible(light_bone, TRUE, TRUE);  // hack
+        K->LL_SetBoneVisible(light_bone, TRUE, TRUE); // hack
     }
     processing_activate();
     m_bState = 1;
@@ -309,7 +309,7 @@ void CHangingLamp::TurnOff()
             make_string("can not Turn Off lamp: %s, visual %s - because all bones become invisible",
                 cNameVisual().c_str(), cName().c_str()));
     }
-    if (!PPhysicsShell())  // if we have physiccs_shell it will call processing deactivate when disable
+    if (!PPhysicsShell()) // if we have physiccs_shell it will call processing deactivate when disable
         processing_deactivate();
     m_bState = 0;
 }
@@ -367,9 +367,9 @@ void CHangingLamp::CreateBody(CSE_ALifeObjectHangingLamp* lamp)
     m_pPhysicsShell->build_FromKinematics(pKinematics, &bone_map);
     m_pPhysicsShell->set_PhysicsRefObject(this);
     m_pPhysicsShell->mXFORM.set(XFORM());
-    m_pPhysicsShell->Activate(true);  //,
+    m_pPhysicsShell->Activate(true); //,
     // m_pPhysicsShell->SmoothElementsInertia(0.3f);
-    m_pPhysicsShell->SetAirResistance();  // 0.0014f,1.5f
+    m_pPhysicsShell->SetAirResistance(); // 0.0014f,1.5f
 
     /////////////////////////////////////////////////////////////////////////////
     BONE_P_PAIR_IT i = bone_map.begin(), e = bone_map.end();

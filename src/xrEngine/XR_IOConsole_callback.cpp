@@ -40,7 +40,7 @@ void CConsole::Register_callbacks()
     ec().assign_callback(DIK_GRAVE, text_editor::ks_free, Callback(this, &CConsole::Hide_cmd));
 }
 
-void CConsole::Prev_log()  // DIK_PRIOR=PAGE_UP
+void CConsole::Prev_log() // DIK_PRIOR=PAGE_UP
 {
     scroll_delta++;
     if (scroll_delta > int(LogFile->size()) - 1) {
@@ -48,7 +48,7 @@ void CConsole::Prev_log()  // DIK_PRIOR=PAGE_UP
     }
 }
 
-void CConsole::Next_log()  // DIK_NEXT=PAGE_DOWN
+void CConsole::Next_log() // DIK_NEXT=PAGE_DOWN
 {
     scroll_delta--;
     if (scroll_delta < 0) {
@@ -56,17 +56,17 @@ void CConsole::Next_log()  // DIK_NEXT=PAGE_DOWN
     }
 }
 
-void CConsole::Begin_log()  // PAGE_UP+Ctrl
+void CConsole::Begin_log() // PAGE_UP+Ctrl
 {
     scroll_delta = LogFile->size() - 1;
 }
 
-void CConsole::End_log()  // PAGE_DOWN+Ctrl
+void CConsole::End_log() // PAGE_DOWN+Ctrl
 {
     scroll_delta = 0;
 }
 
-void CConsole::Find_cmd()  // DIK_TAB
+void CConsole::Find_cmd() // DIK_TAB
 {
     shared_str out_str;
 
@@ -76,7 +76,7 @@ void CConsole::Find_cmd()  // DIK_TAB
     }
 }
 
-void CConsole::Find_cmd_back()  // DIK_TAB+shift
+void CConsole::Find_cmd_back() // DIK_TAB+shift
 {
     LPCSTR edt = ec().str_edit();
     LPCSTR radmin_cmd_name = "ra ";
@@ -97,19 +97,19 @@ void CConsole::Find_cmd_back()  // DIK_TAB+shift
     }
 }
 
-void CConsole::Prev_cmd()  // DIK_UP + Ctrl
+void CConsole::Prev_cmd() // DIK_UP + Ctrl
 {
     prev_cmd_history_idx();
     SelectCommand();
 }
 
-void CConsole::Next_cmd()  // DIK_DOWN + Ctrl
+void CConsole::Next_cmd() // DIK_DOWN + Ctrl
 {
     next_cmd_history_idx();
     SelectCommand();
 }
 
-void CConsole::Prev_tip()  // DIK_UP
+void CConsole::Prev_tip() // DIK_UP
 {
     if (xr_strlen(ec().str_edit()) == 0) {
         prev_cmd_history_idx();
@@ -119,7 +119,7 @@ void CConsole::Prev_tip()  // DIK_UP
     prev_selected_tip();
 }
 
-void CConsole::Next_tip()  // DIK_DOWN + Ctrl
+void CConsole::Next_tip() // DIK_DOWN + Ctrl
 {
     if (xr_strlen(ec().str_edit()) == 0) {
         next_cmd_history_idx();
@@ -154,7 +154,7 @@ void CConsole::PageDown_tips()
     check_next_selected_tip();
 }
 
-void CConsole::Execute_cmd()  // DIK_RETURN, DIK_NUMPADENTER
+void CConsole::Execute_cmd() // DIK_RETURN, DIK_NUMPADENTER
 {
     if (0 <= m_select_tip && m_select_tip < (int)m_tips.size()) {
         shared_str const& str = m_tips[m_select_tip].text;

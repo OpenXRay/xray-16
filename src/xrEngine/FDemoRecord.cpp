@@ -72,7 +72,7 @@ CDemoRecord::CDemoRecord(const char* name, float life_time) : CEffectorCam(cefDe
     file = FS.w_open(name);
     if (file) {
         g_position.set_position = false;
-        IR_Capture();  // capture input
+        IR_Capture(); // capture input
         m_Camera.invert(Device.mView);
 
         // parse yaw
@@ -120,7 +120,7 @@ CDemoRecord::CDemoRecord(const char* name, float life_time) : CEffectorCam(cefDe
 CDemoRecord::~CDemoRecord()
 {
     if (file) {
-        IR_Release();  // release input
+        IR_Release(); // release input
         FS.w_close(file);
     }
     g_bDisableRedText = stored_red_text;
@@ -409,7 +409,7 @@ void CDemoRecord::IR_OnKeyboardPress(int dik)
             fLifeTime = -1;
         }
     }
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
 
     if (dik == DIK_PAUSE) Device.Pause(!Device.Paused(), TRUE, TRUE, "demo_record");
 }
@@ -436,39 +436,39 @@ void CDemoRecord::IR_OnKeyboardHold(int dik)
     case DIK_NUMPAD1:
     case DIK_LEFT:
         vT_delta.x -= 1.0f;
-        break;  // Slide Left
+        break; // Slide Left
     case DIK_D:
     case DIK_NUMPAD3:
     case DIK_RIGHT:
         vT_delta.x += 1.0f;
-        break;  // Slide Right
+        break; // Slide Right
     case DIK_S:
         vT_delta.y -= 1.0f;
-        break;  // Slide Down
+        break; // Slide Down
     case DIK_W:
         vT_delta.y += 1.0f;
-        break;  // Slide Up
+        break; // Slide Up
     // rotate
     case DIK_NUMPAD2:
         vR_delta.x -= 1.0f;
-        break;  // Pitch Down
+        break; // Pitch Down
     case DIK_NUMPAD8:
         vR_delta.x += 1.0f;
-        break;  // Pitch Up
+        break; // Pitch Up
     case DIK_E:
     case DIK_NUMPAD6:
         vR_delta.y += 1.0f;
-        break;  // Turn Left
+        break; // Turn Left
     case DIK_Q:
     case DIK_NUMPAD4:
         vR_delta.y -= 1.0f;
-        break;  // Turn Right
+        break; // Turn Right
     case DIK_NUMPAD9:
         vR_delta.z -= 2.0f;
-        break;  // Turn Right
+        break; // Turn Right
     case DIK_NUMPAD7:
         vR_delta.z += 2.0f;
-        break;  // Turn Right
+        break; // Turn Right
     }
 
     update_whith_timescale(m_vT, vT_delta);
@@ -484,10 +484,10 @@ void CDemoRecord::IR_OnMouseMove(int dx, int dy)
 
     Fvector vR_delta = Fvector().set(0, 0, 0);
 
-    float scale = .5f;  // psMouseSens;
+    float scale = .5f; // psMouseSens;
     if (dx || dy) {
-        vR_delta.y += float(dx) * scale;                                                     // heading
-        vR_delta.x += ((psMouseInvert.test(1)) ? -1 : 1) * float(dy) * scale * (3.f / 4.f);  // pitch
+        vR_delta.y += float(dx) * scale;                                                    // heading
+        vR_delta.x += ((psMouseInvert.test(1)) ? -1 : 1) * float(dy) * scale * (3.f / 4.f); // pitch
     }
     update_whith_timescale(m_vR, vR_delta);
 }
@@ -503,10 +503,10 @@ void CDemoRecord::IR_OnMouseHold(int btn)
     {
     case 0:
         vT_delta.z += 1.0f;
-        break;  // Move Backward
+        break; // Move Backward
     case 1:
         vT_delta.z -= 1.0f;
-        break;  // Move Forward
+        break; // Move Forward
     }
     update_whith_timescale(m_vT, vT_delta);
 }

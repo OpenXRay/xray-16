@@ -32,7 +32,7 @@ extern const float MIN_SUITABLE_ENEMY_DISTANCE = 3.f;
 static int g_advance_search_count = 0;
 static int g_near_cover_search_count = 0;
 static int g_far_cover_search_count = 0;
-#endif  // _DEBUG
+#endif // _DEBUG
 
 void CAI_Stalker::subscribe_on_best_cover_changed(const on_best_cover_changed_delegate& delegate)
 {
@@ -189,7 +189,7 @@ void CAI_Stalker::update_best_cover_actuality(const Fvector& position_to_cover_f
 
     if (m_best_cover->position().distance_to_sqr(position_to_cover_from) < _sqr(MIN_SUITABLE_ENEMY_DISTANCE)) {
         m_best_cover_actual = false;
-#if 0  // def _DEBUG
+#if 0 // def _DEBUG
 		Msg								("* [%6d][%s] enemy too close",Device.dwTimeGlobal,*cName());
 #endif
         return;
@@ -198,7 +198,7 @@ void CAI_Stalker::update_best_cover_actuality(const Fvector& position_to_cover_f
     float cover_value = best_cover_value(position_to_cover_from);
     if (cover_value >= m_best_cover_value + 1.f) {
         m_best_cover_actual = false;
-#if 0  // def _DEBUG
+#if 0 // def _DEBUG
 		Msg								("* [%6d][%s] cover became too bad",Device.dwTimeGlobal,*cName());
 #endif
         return;
@@ -210,7 +210,7 @@ void CAI_Stalker::update_best_cover_actuality(const Fvector& position_to_cover_f
     //		return;
     //	}
 
-    if (false)  //! m_best_cover_can_try_advance)
+    if (false) //! m_best_cover_can_try_advance)
         return;
 
     if (m_best_cover_advance_cover == m_best_cover) return;

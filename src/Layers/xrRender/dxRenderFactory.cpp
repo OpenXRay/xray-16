@@ -7,13 +7,13 @@
 #endif
 #include "dxConsoleRender.h"
 #ifndef _EDITOR
-#include "dxThunderboltRender.h"
-#include "dxThunderboltDescRender.h"
-#include "dxRainRender.h"
-#include "dxLensFlareRender.h"
 #include "dxEnvironmentRender.h"
+#include "dxLensFlareRender.h"
 #include "dxObjectSpaceRender.h"
-#endif  // _EDITOR
+#include "dxRainRender.h"
+#include "dxThunderboltDescRender.h"
+#include "dxThunderboltRender.h"
+#endif // _EDITOR
 
 #include "dxApplicationRender.h"
 #include "dxFontRender.h"
@@ -33,10 +33,10 @@ RENDER_FACTORY_IMPLEMENT(StatGraphRender)
 RENDER_FACTORY_IMPLEMENT(ConsoleRender)
 #ifdef DEBUG
 RENDER_FACTORY_IMPLEMENT(ObjectSpaceRender)
-#endif  // DEBUG
+#endif // DEBUG
 RENDER_FACTORY_IMPLEMENT(ApplicationRender)
 RENDER_FACTORY_IMPLEMENT(WallMarkArray)
-#endif  // _EDITOR
+#endif // _EDITOR
 
 #ifndef _EDITOR
 RENDER_FACTORY_IMPLEMENT(ThunderboltRender)

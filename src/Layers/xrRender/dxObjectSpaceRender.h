@@ -19,10 +19,10 @@ public:
 
 private:
     ref_shader m_shDebug;
-    clQueryCollision q_debug;                  // MT: dangerous
-    xr_vector<std::pair<Fsphere, u32>> dbg_S;  // MT: dangerous
+    clQueryCollision q_debug;                 // MT: dangerous
+    xr_vector<std::pair<Fsphere, u32>> dbg_S; // MT: dangerous
 };
 
-#endif  // DEBUG
+#endif // DEBUG
 
-#endif  //	ObjectSpaceRender_included
+#endif //	ObjectSpaceRender_included

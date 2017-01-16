@@ -21,4 +21,4 @@ private:
     CTexture* m_texture;
 };
 
-#endif  //	dxUISequenceVideoItem_included
+#endif //	dxUISequenceVideoItem_included

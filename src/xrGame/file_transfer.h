@@ -89,6 +89,6 @@ public:
     };
 };
 
-};  // namespace file_transfer
+}; // namespace file_transfer
 
-#endif  //#ifndef FILETRANSFER
+#endif //#ifndef FILETRANSFER

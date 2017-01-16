@@ -49,7 +49,7 @@ void CActorMP::net_Import(NET_Packet& P)
     if (OnClient() && (inventory().GetActiveSlot() != ActiveSlot)) {
 #ifdef DEBUG
         Msg("Client-SetActiveSlot[%d][%d]", ActiveSlot, Device.dwFrame);
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
         inventory().SetActiveSlot(ActiveSlot);
     }
 

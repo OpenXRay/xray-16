@@ -84,7 +84,7 @@ protected:
     dVector3 m_depart_position;
     dVector3 m_wall_contact_position;
     dVector3 m_ground_contact_position;
-    dReal jump_up_velocity;  //=6.0f;//5.6f;
+    dReal jump_up_velocity; //=6.0f;//5.6f;
     dReal m_collision_damage_factor;
     dReal m_max_velocity;
 

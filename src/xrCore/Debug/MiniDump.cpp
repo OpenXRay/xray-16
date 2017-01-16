@@ -5,7 +5,7 @@ Copyright (c) 1997-2001 John Robbins -- All rights reserved.
 
 #include "stdafx.h"
 #pragma warning(push)
-#pragma warning(disable : 4091)  // 'typedef ': ignored on left of '' when no variable is declared
+#pragma warning(disable : 4091) // 'typedef ': ignored on left of '' when no variable is declared
 #include "MiniDump.h"
 #include "StackTrace.h"
 #pragma warning(pop)
@@ -46,13 +46,13 @@ unsigned __stdcall DumpThread(LPVOID pData)
         if (bRet == TRUE) {
             pParams->eReturnValue = WriteMiniDumpResult::DumpSucceeded;
         }
-        else  // Oops.
+        else // Oops.
         {
             pParams->eReturnValue = WriteMiniDumpResult::MiniDumpWriteDumpFailed;
         }
         CloseHandle(hFile);
     }
-    else  // Could not open the file!
+    else // Could not open the file!
     {
         pParams->eReturnValue = WriteMiniDumpResult::OpenDumpFailed;
     }

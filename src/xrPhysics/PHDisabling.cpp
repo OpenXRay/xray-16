@@ -90,7 +90,7 @@ void CBaseDisableData::Disabling()
 
     CheckState(m_stateL1);
 
-    if (m_count == 0)  // ph_world->disable_count==dis_frames//m_count==m_frames
+    if (m_count == 0) // ph_world->disable_count==dis_frames//m_count==m_frames
     {
         UpdateL2();
         CheckState(m_stateL2);
@@ -105,7 +105,7 @@ void CBaseDisableData::Disabling()
             m_count = m_frames + ph_world->disable_count;
         }
     }
-    if (m_disabled) Disable();  // dBodyDisable(body);
+    if (m_disabled) Disable(); // dBodyDisable(body);
 }
 
 void CPHDisablingBase::Reinit()

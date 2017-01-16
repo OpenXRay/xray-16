@@ -140,7 +140,7 @@ void CTorch::SwitchNightVision(bool vision_on, bool use_sounds)
                 m_night_vision->Start(pOutfit->m_NightVisionSect, pA, use_sounds);
                 return;
             }
-            m_bNightVisionOn = false;  // in case if there is no nightvision in helmet and outfit
+            m_bNightVisionOn = false; // in case if there is no nightvision in helmet and outfit
         }
     }
     else
@@ -314,7 +314,7 @@ void CTorch::UpdateCL()
                     offset.mad(M.k, OMNI_OFFSET.z);
                     light_omni->set_position(offset);
                 }
-            }  // if (true)
+            } // if (true)
             glow_render->set_position(M.c);
 
             if (true) {
@@ -323,10 +323,10 @@ void CTorch::UpdateCL()
                 if (true /*false*/) {
                     light_omni->set_rotation(dir, right);
                 }
-            }  // if (true)
+            } // if (true)
             glow_render->set_direction(dir);
 
-        }  // if(actor)
+        } // if(actor)
         else
         {
             if (can_use_dynamic_lights()) {
@@ -339,12 +339,12 @@ void CTorch::UpdateCL()
                 offset.mad(M.k, OMNI_OFFSET.z);
                 light_omni->set_position(M.c);
                 light_omni->set_rotation(M.k, M.i);
-            }  // if (can_use_dynamic_lights())
+            } // if (can_use_dynamic_lights())
 
             glow_render->set_position(M.c);
             glow_render->set_direction(M.k);
         }
-    }  // if(HParent())
+    } // if(HParent())
     else
     {
         if (getVisible() && m_pPhysicsShell) {
@@ -354,7 +354,7 @@ void CTorch::UpdateCL()
             light_render->set_active(false);
             light_omni->set_active(false);
             glow_render->set_active(false);
-        }  // if (getVisible() && m_pPhysicsShell)
+        } // if (getVisible() && m_pPhysicsShell)
     }
 
     if (!m_switched_on) return;

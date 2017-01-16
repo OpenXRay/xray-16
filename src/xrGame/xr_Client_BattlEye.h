@@ -42,8 +42,8 @@ public:
     ~BattlEyeClient();
     bool IsLoaded();
 
-};  // class BattlEyeClient
+}; // class BattlEyeClient
 
-#endif  // BATTLEYE
+#endif // BATTLEYE
 
-#endif  // __XR_CLIENT_BATTLEYE_H__
+#endif // __XR_CLIENT_BATTLEYE_H__

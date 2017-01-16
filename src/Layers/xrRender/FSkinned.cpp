@@ -50,17 +50,17 @@ float errN(Fvector3 v, u8* qv)
 }
 #endif
 
-static D3DVERTEXELEMENT9 dwDecl_01W[] =  // 24bytes
+static D3DVERTEXELEMENT9 dwDecl_01W[] = // 24bytes
     {{0, 0, D3DDECLTYPE_SHORT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION,
-         0},  // : P						: 2	: -12..+12
+         0}, // : P						: 2	: -12..+12
         {0, 8, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL,
-            0},  // : N, w=index(RC, 0..1)	: 1	:  -1..+1
+            0}, // : N, w=index(RC, 0..1)	: 1	:  -1..+1
         {0, 12, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TANGENT,
-            0},  // : T						: 1	:  -1..+1
+            0}, // : T						: 1	:  -1..+1
         {0, 16, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_BINORMAL,
-            0},  // : B						: 1	:  -1..+1
+            0}, // : B						: 1	:  -1..+1
         {0, 20, D3DDECLTYPE_SHORT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD,
-            0},  // : tc						: 1	: -16..+16
+            0}, // : tc						: 1	: -16..+16
         D3DDECL_END()};
 struct vertHW_1W
 {
@@ -99,17 +99,17 @@ struct vertHW_1W
     }
 };
 
-static D3DVERTEXELEMENT9 dwDecl_2W[] =  // 28bytes
+static D3DVERTEXELEMENT9 dwDecl_2W[] = // 28bytes
     {{0, 0, D3DDECLTYPE_SHORT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION,
-         0},  // : p					: 2	: -12..+12
+         0}, // : p					: 2	: -12..+12
         {0, 8, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL,
-            0},  // : n.xyz, w = weight	: 1	:  -1..+1, w=0..1
+            0}, // : n.xyz, w = weight	: 1	:  -1..+1, w=0..1
         {0, 12, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TANGENT,
-            0},  // : T						: 1	:  -1..+1
+            0}, // : T						: 1	:  -1..+1
         {0, 16, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_BINORMAL,
-            0},  // : B						: 1	:  -1..+1
+            0}, // : B						: 1	:  -1..+1
         {0, 20, D3DDECLTYPE_SHORT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD,
-            0},  // : xy(tc), zw(indices): 2	: -16..+16, zw[0..32767]
+            0}, // : xy(tc), zw(indices): 2	: -16..+16, zw[0..32767]
         D3DDECL_END()};
 struct vertHW_2W
 {
@@ -155,17 +155,17 @@ struct vertHW_2W
         p.lerp(P0, P1, get_weight());
     }
 };
-static D3DVERTEXELEMENT9 dwDecl_3W[] =  // 28bytes
+static D3DVERTEXELEMENT9 dwDecl_3W[] = // 28bytes
     {{0, 0, D3DDECLTYPE_SHORT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION,
-         0},  // : p					: 2	: -12..+12
+         0}, // : p					: 2	: -12..+12
         {0, 8, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL,
-            0},  // : n.xyz, w = weight0	: 1	:  -1..+1, w=0..1
+            0}, // : n.xyz, w = weight0	: 1	:  -1..+1, w=0..1
         {0, 12, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TANGENT,
-            0},  // : T.xyz, w = weight1	: 1	:  -1..+1, w=0..1
+            0}, // : T.xyz, w = weight1	: 1	:  -1..+1, w=0..1
         {0, 16, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_BINORMAL,
-            0},  // : B.xyz,	w = index2	: 1	:  -1..+1, w=0..255
+            0}, // : B.xyz,	w = index2	: 1	:  -1..+1, w=0..255
         {0, 20, D3DDECLTYPE_SHORT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD,
-            0},  // : xy(tc), zw(indices): 2	: -16..+16, zw[0..32767]
+            0}, // : xy(tc), zw(indices): 2	: -16..+16, zw[0..32767]
         D3DDECL_END()};
 struct vertHW_3W
 {
@@ -234,19 +234,19 @@ struct vertHW_3W
     }
 };
 
-static D3DVERTEXELEMENT9 dwDecl_4W[] =  // 28bytes
+static D3DVERTEXELEMENT9 dwDecl_4W[] = // 28bytes
     {{0, 0, D3DDECLTYPE_SHORT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION,
-         0},  // : p					: 2	: -12..+12
+         0}, // : p					: 2	: -12..+12
         {0, 8, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL,
-            0},  // : n.xyz, w = weight0	: 1	:  -1..+1, w=0..1
+            0}, // : n.xyz, w = weight0	: 1	:  -1..+1, w=0..1
         {0, 12, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TANGENT,
-            0},  // : T.xyz, w = weight1	: 1	:  -1..+1, w=0..1
+            0}, // : T.xyz, w = weight1	: 1	:  -1..+1, w=0..1
         {0, 16, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_BINORMAL,
-            0},  // : B.xyz,	w = weight2	: 1	:  -1..+1, w=0..1
+            0}, // : B.xyz,	w = weight2	: 1	:  -1..+1, w=0..1
         {0, 20, D3DDECLTYPE_SHORT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD,
-            0},  // : xy(tc)				: 2	: -16..+16
+            0}, // : xy(tc)				: 2	: -16..+16
         {0, 24, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD,
-            1},  // : indices			: 1	:  0..255
+            1}, // : indices			: 1	:  0..255
         D3DDECL_END()};
 struct vertHW_4W
 {
@@ -372,7 +372,7 @@ void CSkeletonX_PM::Load(const char* N, IReader* data, u32 dwFlags)
     GlobalEnv.Render->shader_option_skinning(-1);
 #if defined(USE_DX10) || defined(USE_DX11)
     _DuplicateIndices(N, data);
-#endif  //	USE_DX10
+#endif //	USE_DX10
     vBase = 0;
     _Load_hw(*this, _verts_);
 }
@@ -384,7 +384,7 @@ void CSkeletonX_ST::Load(const char* N, IReader* data, u32 dwFlags)
     GlobalEnv.Render->shader_option_skinning(-1);
 #if defined(USE_DX10) || defined(USE_DX11)
     _DuplicateIndices(N, data);
-#endif  //	USE_DX10
+#endif //	USE_DX10
     vBase = 0;
     _Load_hw(*this, _verts_);
 }
@@ -395,8 +395,9 @@ void CSkeletonX_ext::_Load_hw(Fvisual& V, void* _verts_)
 {
     // Create HW VB in case this is possible
     //	BOOL	bSoft				= HW.Caps.geometry.bSoftware;
-    //	u32		dwUsage				= /*D3DUSAGE_WRITEONLY |*/ (bSoft?D3DUSAGE_SOFTWAREPROCESSING:0);	// VB may be read by
-    //wallmarks code
+    //	u32		dwUsage				= /*D3DUSAGE_WRITEONLY |*/ (bSoft?D3DUSAGE_SOFTWAREPROCESSING:0);	// VB may be read
+    //by
+    // wallmarks code
     switch (RenderMode)
     {
     case RM_SKINNING_SOFT:
@@ -406,7 +407,7 @@ void CSkeletonX_ext::_Load_hw(Fvisual& V, void* _verts_)
     case RM_SINGLE:
     case RM_SKINNING_1B:
     {
-        {  //	Back up vertex data since we can't read vertex buffer in DX10
+        { //	Back up vertex data since we can't read vertex buffer in DX10
             u32 size = V.vCount * sizeof(vertBoned1W);
             u32 crc = crc32(_verts_, size);
             Vertices1W.create(crc, V.vCount, (vertBoned1W*)_verts_);
@@ -452,7 +453,7 @@ void CSkeletonX_ext::_Load_hw(Fvisual& V, void* _verts_)
     break;
     case RM_SKINNING_2B:
     {
-        {  //	Back up vertex data since we can't read vertex buffer in DX10
+        { //	Back up vertex data since we can't read vertex buffer in DX10
             u32 size = V.vCount * sizeof(vertBoned2W);
             u32 crc = crc32(_verts_, size);
             Vertices2W.create(crc, V.vCount, (vertBoned2W*)_verts_);
@@ -498,7 +499,7 @@ void CSkeletonX_ext::_Load_hw(Fvisual& V, void* _verts_)
     break;
     case RM_SKINNING_3B:
     {
-        {  //	Back up vertex data since we can't read vertex buffer in DX10
+        { //	Back up vertex data since we can't read vertex buffer in DX10
             u32 size = V.vCount * sizeof(vertBoned3W);
             u32 crc = crc32(_verts_, size);
             Vertices3W.create(crc, V.vCount, (vertBoned3W*)_verts_);
@@ -547,7 +548,7 @@ void CSkeletonX_ext::_Load_hw(Fvisual& V, void* _verts_)
     break;
     case RM_SKINNING_4B:
     {
-        {  //	Back up vertex data since we can't read vertex buffer in DX10
+        { //	Back up vertex data since we can't read vertex buffer in DX10
             u32 size = V.vCount * sizeof(vertBoned4W);
             u32 crc = crc32(_verts_, size);
             Vertices4W.create(crc, V.vCount, (vertBoned4W*)_verts_);
@@ -597,14 +598,14 @@ void CSkeletonX_ext::_Load_hw(Fvisual& V, void* _verts_)
     }
 }
 
-#else   //	USE_DX10
+#else  //	USE_DX10
 
 void CSkeletonX_ext::_Load_hw(Fvisual& V, void* _verts_)
 {
     // Create HW VB in case this is possible
     BOOL bSoft = HW.Caps.geometry.bSoftware;
     u32 dwUsage =
-        /*D3DUSAGE_WRITEONLY |*/ (bSoft ? D3DUSAGE_SOFTWAREPROCESSING : 0);  // VB may be read by wallmarks code
+        /*D3DUSAGE_WRITEONLY |*/ (bSoft ? D3DUSAGE_SOFTWAREPROCESSING : 0); // VB may be read by wallmarks code
     switch (RenderMode)
     {
     case RM_SKINNING_SOFT:
@@ -711,7 +712,7 @@ void CSkeletonX_ext::_Load_hw(Fvisual& V, void* _verts_)
     break;
     }
 }
-#endif  //	USE_DX10
+#endif //	USE_DX10
 
 //-----------------------------------------------------------------------------------------------------
 // Wallmarks
@@ -749,17 +750,17 @@ void CSkeletonX_ext::_CollectBoneFaces(Fvisual* V, u32 iBase, u32 iCount)
 
 #if defined(USE_DX10) || defined(USE_DX11)
     indices = *m_Indices;
-#else   //	USE_DX10
+#else  //	USE_DX10
     R_CHK(V->p_rm_Indices->Lock(0, V->dwPrimitives * 3, (void**)&indices, D3DLOCK_READONLY));
-#endif  //	USE_DX10
+#endif //	USE_DX10
 
     indices += iBase;
 
-#if !defined(USE_DX10) && !defined(USE_DX11)  //	Don't use hardware buffers in DX10 since we can't read them
+#if !defined(USE_DX10) && !defined(USE_DX11) //	Don't use hardware buffers in DX10 since we can't read them
     switch (RenderMode)
     {
     case RM_SKINNING_SOFT:
-#endif  //	USE_DX10
+#endif //	USE_DX10
     {
         if (*Vertices1W) {
             vertBoned1W* vertices = *Vertices1W;
@@ -828,7 +829,7 @@ void CSkeletonX_ext::_CollectBoneFaces(Fvisual* V, u32 iBase, u32 iCount)
             R_ASSERT2(0, "not implemented yet");
     }
 
-#if !defined(USE_DX10) && !defined(USE_DX11)  //	Don't use hardware buffers in DX10 since we can't read them
+#if !defined(USE_DX10) && !defined(USE_DX11) //	Don't use hardware buffers in DX10 since we can't read them
     break;
     case RM_SINGLE:
     case RM_SKINNING_1B:
@@ -900,7 +901,7 @@ void CSkeletonX_ext::_CollectBoneFaces(Fvisual* V, u32 iBase, u32 iCount)
     break;
     }
     R_CHK(V->p_rm_Indices->Unlock());
-#endif  // USE_DX10	//	Don't use hardware buffers in DX10 since we can't read them
+#endif // USE_DX10	//	Don't use hardware buffers in DX10 since we can't read them
 }
 
 void CSkeletonX_ST::AfterLoad(CKinematics* parent, u16 child_idx)
@@ -912,7 +913,7 @@ void CSkeletonX_ST::AfterLoad(CKinematics* parent, u16 child_idx)
 void CSkeletonX_PM::AfterLoad(CKinematics* parent, u16 child_idx)
 {
     inherited2::AfterLoad(parent, child_idx);
-    FSlideWindow& SW = nSWI.sw[0];  // max LOD
+    FSlideWindow& SW = nSWI.sw[0]; // max LOD
     inherited2::_CollectBoneFaces(this, iBase + SW.offset, SW.num_tris * 3);
 }
 
@@ -1058,13 +1059,13 @@ BOOL CSkeletonX_ext::_PickBone(IKinematics::pick_result& r, float dist, const Fv
     u16* indices = 0;
 #if defined(USE_DX10) || defined(USE_DX11)
     indices = *m_Indices;
-#else   //	USE_DX10
+#else  //	USE_DX10
     CHK_DX(V->p_rm_Indices->Lock(0, V->dwPrimitives * 3, (void**)&indices, D3DLOCK_READONLY));
     // fill vertices
     switch (RenderMode)
     {
     case RM_SKINNING_SOFT:
-#endif  //	USE_DX10
+#endif //	USE_DX10
 
     if (*Vertices1W)
         result = _PickBoneSoft1W(r, dist, start, dir, indices + iBase, *faces);
@@ -1140,7 +1141,7 @@ void CSkeletonX_ext::_FillVerticesHW4W(const Fmatrix& view, CSkeletonWallmark& w
     R_ASSERT2(0, "CSkeletonX_ext::_FillVerticesHW4W not implemented");
 }
 
-#else   //	USE_DX10
+#else  //	USE_DX10
 
     void CSkeletonX_ext::_FillVerticesHW1W(const Fmatrix& view, CSkeletonWallmark& wm, const Fvector& normal,
         float size, Fvisual* V, u16* indices, CBoneData::FacesVec& faces)
@@ -1237,7 +1238,7 @@ void CSkeletonX_ext::_FillVerticesHW4W(const Fmatrix& view, CSkeletonWallmark& w
     {
         R_ASSERT2(0, "CSkeletonX_ext::_FillVerticesHW4W not implemented");
     }
-#endif  //	USE_DX10
+#endif //	USE_DX10
 
 void CSkeletonX_ext::_FillVertices(const Fmatrix& view, CSkeletonWallmark& wm, const Fvector& normal, float size,
     Fvisual* V, u16 bone_id, u32 iBase, u32 iCount)
@@ -1376,7 +1377,7 @@ void CSkeletonX_ext::_EnumBoneVertices(SEnumVerticesCallback& C, Fvisual* V, u16
         switch (RenderMode)
         {
         case RM_SKINNING_SOFT:
-#endif  //	USE_DX10
+#endif //	USE_DX10
     if (*Vertices1W)
         TEnumBoneVertices(Vertices1W, indices + iBase, *faces, C);
     else if (*Vertices2W)
@@ -1399,5 +1400,5 @@ default: NODEFAULT;
 }
 if (RenderMode != RM_SKINNING_SOFT) CHK_DX(V->p_rm_Vertices->Unlock());
 CHK_DX(V->p_rm_Indices->Unlock());
-#endif  //	USE_DX10
+#endif //	USE_DX10
 }

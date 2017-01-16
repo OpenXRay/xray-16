@@ -35,7 +35,7 @@ PERFORMANCE OF THIS SOFTWARE.
  */
 #if defined(WIN32) || defined(_XBOX)
 #define LACKS_SYS_MMAN_H
-#endif  // #if defined(WIN32) || defined(_XBOX)
+#endif // #if defined(WIN32) || defined(_XBOX)
 
 #ifndef __STD_C
 #if defined(__STDC__) || defined(__cplusplus)
@@ -713,7 +713,7 @@ static
     /*if ((s = getenv("MALLOC_MMAP_MAX_"))) this is no longer available
       public_mALLOPt(M_MMAP_MAX, atoi(s));*/
   }
-#endif  // #if 0
+#endif // #if 0
 #endif
     //  if (!_dupenv_s(&s,&length,"MALLOC_CHECK_")) {
     /*if(s[0]) mALLOPt(M_CHECK_ACTION, (int)(s[0] - '0'));

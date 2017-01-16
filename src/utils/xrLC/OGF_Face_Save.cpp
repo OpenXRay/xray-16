@@ -26,7 +26,7 @@ u32 u8_vec4(base_basis N, u8 A = 0)
 {
     return color_rgba(N.x, N.y, N.z, A);
 }
-std::pair<s16, u8> s24_tc_base(float uv)  // [-32 .. +32]
+std::pair<s16, u8> s24_tc_base(float uv) // [-32 .. +32]
 {
     const u32 max_tile = 32;
     const s32 quant = 32768 / max_tile;
@@ -39,7 +39,7 @@ std::pair<s16, u8> s24_tc_base(float uv)  // [-32 .. +32]
     return mk_pair(s16(_primary), u8(_secondary));
 }
 
-s16 s16_tc_lmap(float uv)  // [-1 .. +1]
+s16 s16_tc_lmap(float uv) // [-1 .. +1]
 {
     const u32 max_tile = 1;
     const s32 quant = 32768 / max_tile;
@@ -49,21 +49,21 @@ s16 s16_tc_lmap(float uv)  // [-1 .. +1]
     return s16(t);
 }
 
-D3DVERTEXELEMENT9 r1_decl_lmap[] =  // 12+4+4+4+4+4	= 32
+D3DVERTEXELEMENT9 r1_decl_lmap[] = // 12+4+4+4+4+4	= 32
     {{0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
         {0, 12, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 0},
         {0, 16, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TANGENT, 0},
         {0, 20, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_BINORMAL, 0},
         {0, 24, D3DDECLTYPE_SHORT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0},
         {0, 28, D3DDECLTYPE_SHORT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 1}, D3DDECL_END()};
-D3DVERTEXELEMENT9 r1_decl_vert[] =  // 12+4+4+4+4+4 = 32
+D3DVERTEXELEMENT9 r1_decl_vert[] = // 12+4+4+4+4+4 = 32
     {{0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
         {0, 12, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 0},
         {0, 16, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TANGENT, 0},
         {0, 20, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_BINORMAL, 0},
         {0, 24, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 0},
         {0, 28, D3DDECLTYPE_SHORT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0}, D3DDECL_END()};
-D3DVERTEXELEMENT9 x_decl_vert[] =  // 12
+D3DVERTEXELEMENT9 x_decl_vert[] = // 12
     {{0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0}, D3DDECL_END()};
 #pragma pack(push, 1)
 struct x_vert
@@ -312,8 +312,8 @@ void read_ogf_container(IReader& fs_, const ogf_data_type& ogf_cnt)
 
     ogf_cnt.ib_id = fs.r_u32();
     ogf_cnt.ib_start = fs.r_u32();
-    u32 faces_size = fs.r_u32();  //(u32)ogf_cnt.faces.size()*3
-                                  // ogf_cnt.faces.resize( vertises_size );
+    u32 faces_size = fs.r_u32(); //(u32)ogf_cnt.faces.size()*3
+                                 // ogf_cnt.faces.resize( vertises_size );
     // fs.close_chunk	( );
 }
 
@@ -352,7 +352,7 @@ void write_ogf_fastpath(IWriter& fs, const OGF& ogf, BOOL progresive)
         write_ogf_container(fs, ogf.fast_path_data);
 
         // progressive-data, if need it
-        if (progresive)  // H.type == MT_PROGRESSIVE
+        if (progresive) // H.type == MT_PROGRESSIVE
             write_ogf_swidata(fs, ogf.fast_path_data.m_SWI);
     }
     fs.close_chunk();
@@ -366,7 +366,7 @@ void OGF::Save_Normal_PM(IWriter& fs, ogf_header& H, BOOL bVertexColored)
     write_ogf_container(fs, data);
 
     // progressive-data, if need it
-    if (H.type == MT_PROGRESSIVE) write_ogf_swidata(fs, data.m_SWI);  // SW
+    if (H.type == MT_PROGRESSIVE) write_ogf_swidata(fs, data.m_SWI); // SW
 
     // if has x-vertices/x-faces
     if (!fast_path_data.vertices.empty() && !fast_path_data.faces.empty())

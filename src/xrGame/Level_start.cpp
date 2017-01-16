@@ -250,7 +250,7 @@ bool CLevel::net_start6()
             MainMenu()->SwitchToMultiplayerMenu();
         }
         else if (!map_data.m_map_loaded && map_data.m_name.size() &&
-                 m_bConnectResult)  // if (map_data.m_name == "") - level not loaded, see CLevel::net_start_client3
+                 m_bConnectResult) // if (map_data.m_name == "") - level not loaded, see CLevel::net_start_client3
         {
             LPCSTR level_id_string = NULL;
             LPCSTR dialog_string = NULL;
@@ -313,7 +313,7 @@ void CLevel::InitializeClientGame(NET_Packet& P)
     xr_delete(game);
 #ifdef DEBUG
     Msg("- Game configuring : Started ");
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
     CLASS_ID clsid = game_GameState::getCLASS_ID(game_type_name, false);
     game = smart_cast<game_cl_GameState*>(NEW_INSTANCE(clsid));
     game->set_type_name(game_type_name);

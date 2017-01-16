@@ -577,7 +577,7 @@ static GT2Bool gti2HandleReliableMessage(GT2Connection connection, GTI2MessageTy
 
     // check if it's long enough
     if (len <
-        (connection->socket->protocolOffset + GTI2_MAGIC_STRING_LEN + 1 + 2 + 2))  // magic string + type + SN + ESN
+        (connection->socket->protocolOffset + GTI2_MAGIC_STRING_LEN + 1 + 2 + 2)) // magic string + type + SN + ESN
     {
         if (!gti2ConnectionCommunicationError(connection)) return GT2False;
 
@@ -957,7 +957,7 @@ GT2Bool gti2HandleHostUnreachable(GT2Socket socket, unsigned int ip, unsigned sh
 // return length if successful
 // <=0 on error
 gsi_bool _NetworkAdHocSocketRecv(int socket_id, char* buf, int bufferlen, int flags,
-    char* saddr,  // struct SceNetEtherAddr  = char[6];
+    char* saddr, // struct SceNetEtherAddr  = char[6];
     gsi_u16* sport);
 
 // return 0 if no data, -1 if error,  >0 if data to read
@@ -967,19 +967,19 @@ GT2Bool gti2ReceiveAdHocMessages(GT2Socket socket, char* buffer, int buffersize)
 {
     int rcode;
     SOCKADDR_IN address;
-    int addressLen;  //, datasize;
+    int addressLen; //, datasize;
 
     // check for messages
     while (1)
     {
         int datasize = _NetworkAdHocCanReceiveOnSocket(socket->socket);
-        if (datasize < 0)  // error
+        if (datasize < 0) // error
         {
             gti2SocketError(socket);
             return GT2False;
         }
 
-        if (datasize == 0) break;  // no data
+        if (datasize == 0) break; // no data
         {
             // We have data to recv
             // receive the message
@@ -990,10 +990,10 @@ GT2Bool gti2ReceiveAdHocMessages(GT2Socket socket, char* buffer, int buffersize)
             addressLen = sizeof(address);
 
             rcode = _NetworkAdHocSocketRecv(socket->socket, buffer, buffersize, 0, mac, &port);
-            if (rcode < 0)  // fatal socket error
+            if (rcode < 0) // fatal socket error
             {
-#if (0)                 // notes
-                if (0)  // rcode == WSAECONNRESET)
+#if (0)                // notes
+                if (0) // rcode == WSAECONNRESET)
                 {
                     // handle the reset
                     if (!gti2HandleConnectionReset(socket, address.sin_addr.s_addr, ntohs(address.sin_port)))
@@ -1011,7 +1011,7 @@ GT2Bool gti2ReceiveAdHocMessages(GT2Socket socket, char* buffer, int buffersize)
                     return GT2False;
                 }
             }
-            if (rcode == 0)  // no data
+            if (rcode == 0) // no data
             {
                 return GT2False;
             }

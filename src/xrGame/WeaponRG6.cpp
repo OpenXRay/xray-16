@@ -100,7 +100,7 @@ void CWeaponRG6::FireStart()
                 #endif*/
                 if (canfire0 != 0) {
                     //					Msg ("d[%f,%f,%f] - res [%f,%f,%f]", d.x, d.y, d.z, res[0].x, res[0].y,
-                    //res[0].z);
+                    // res[0].z);
                     d = res[0];
                 };
             }

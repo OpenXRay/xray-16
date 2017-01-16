@@ -70,7 +70,7 @@ void reward_manager::load_reward_item(CInifile& reward_config, u32 const index, 
         {
             return item.second->m_award_name == m_award_name;
         }
-    };  // struct award_name_searcher
+    }; // struct award_name_searcher
 #endif
     VERIFY2(m_rewards_map.find(index) == m_rewards_map.end(),
         make_string("reward with id=%d already loaded", index).c_str());
@@ -116,4 +116,4 @@ void reward_manager::process_reward(u32 const award_id)
     m_last_reward_time = Device.dwTimeGlobal;
 }
 
-}  // namespace award_system
+} // namespace award_system

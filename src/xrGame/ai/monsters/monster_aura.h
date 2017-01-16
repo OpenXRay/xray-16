@@ -42,4 +42,4 @@ private:
     float xr_stdcall get_post_process_factor() const;
 };
 
-#endif  // MONSTER_AURA_H_INCLUDED
+#endif // MONSTER_AURA_H_INCLUDED

@@ -61,7 +61,7 @@ public:
     virtual void OnH_A_Chield();
     virtual void OnH_B_Independent(bool just_before_destroy);
     virtual void OnH_A_Independent();
-    virtual void OnEvent(NET_Packet& P, u16 type);  // {inherited::OnEvent(P,type);}
+    virtual void OnEvent(NET_Packet& P, u16 type); // {inherited::OnEvent(P,type);}
 
     virtual void Hit(SHit* pHDS);
 
@@ -75,7 +75,7 @@ public:
 
     virtual void OnActiveItem();
     virtual void OnHiddenItem();
-    virtual void SendHiddenItem();  // same as OnHiddenItem but for client... (sends message to a server)...
+    virtual void SendHiddenItem(); // same as OnHiddenItem but for client... (sends message to a server)...
 
 public:
     virtual bool can_kill() const;
@@ -166,7 +166,7 @@ public:
     const shared_str& GetSilencerName() const { return m_sSilencerName; }
     IC void ForceUpdateAmmo() { m_BriefInfo_CalcFrame = 0; }
     u8 GetAddonsState() const { return m_flagsAddOnState; };
-    void SetAddonsState(u8 st) { m_flagsAddOnState = st; }  // dont use!!! for buy menu only!!!
+    void SetAddonsState(u8 st) { m_flagsAddOnState = st; } // dont use!!! for buy menu only!!!
 protected:
     //состояние подключенных аддонов
     u8 m_flagsAddOnState;
@@ -189,16 +189,16 @@ protected:
 protected:
     struct SZoomParams
     {
-        bool m_bZoomEnabled;  //разрешение режима приближения
+        bool m_bZoomEnabled; //разрешение режима приближения
         bool m_bHideCrosshairInZoom;
         //		bool			m_bZoomDofEnabled;
 
-        bool m_bIsZoomModeNow;       //когда режим приближения включен
-        float m_fCurrentZoomFactor;  //текущий фактор приближения
-        float m_fZoomRotateTime;     //время приближения
+        bool m_bIsZoomModeNow;      //когда режим приближения включен
+        float m_fCurrentZoomFactor; //текущий фактор приближения
+        float m_fZoomRotateTime;    //время приближения
 
-        float m_fIronSightZoomFactor;  //коэффициент увеличения прицеливания
-        float m_fScopeZoomFactor;      //коэффициент увеличения прицела
+        float m_fIronSightZoomFactor; //коэффициент увеличения прицеливания
+        float m_fScopeZoomFactor;     //коэффициент увеличения прицела
 
         float m_fZoomRotationFactor;
 
@@ -212,7 +212,7 @@ protected:
 
     } m_zoom_params;
 
-    float m_fRTZoomFactor;  // run-time zoom factor
+    float m_fRTZoomFactor; // run-time zoom factor
     CUIWindow* m_UIScope;
 
 public:
@@ -265,7 +265,7 @@ private:
 
 protected:
     virtual void UpdateFireDependencies_internal();
-    virtual void UpdatePosition(const Fmatrix& transform);  //.
+    virtual void UpdatePosition(const Fmatrix& transform); //.
     virtual void UpdateXForm();
     virtual void UpdateHudAdditonal(Fmatrix&);
     IC void UpdateFireDependencies()
@@ -344,8 +344,8 @@ public:
     virtual float GetConditionToShow() const;
 
 public:
-    CameraRecoil cam_recoil;       // simple mode (walk, run)
-    CameraRecoil zoom_cam_recoil;  // using zoom =(ironsight or scope)
+    CameraRecoil cam_recoil;      // simple mode (walk, run)
+    CameraRecoil zoom_cam_recoil; // using zoom =(ironsight or scope)
 
 protected:
     //фактор увеличения дисперсии при максимальной изношености
@@ -356,12 +356,12 @@ protected:
     // modified by Peacemaker [17.10.08]
     //	float					misfireProbability;
     //	float					misfireConditionK;
-    float misfireStartCondition;          //изношенность, при которой появляется шанс осечки
-    float misfireEndCondition;            //изношеность при которой шанс осечки становится константным
-    float misfireStartProbability;        //шанс осечки при изношености больше чем misfireStartCondition
-    float misfireEndProbability;          //шанс осечки при изношености больше чем misfireEndCondition
-    float conditionDecreasePerQueueShot;  //увеличение изношености при выстреле очередью
-    float conditionDecreasePerShot;       //увеличение изношености при одиночном выстреле
+    float misfireStartCondition;         //изношенность, при которой появляется шанс осечки
+    float misfireEndCondition;           //изношеность при которой шанс осечки становится константным
+    float misfireStartProbability;       //шанс осечки при изношености больше чем misfireStartCondition
+    float misfireEndProbability;         //шанс осечки при изношености больше чем misfireEndCondition
+    float conditionDecreasePerQueueShot; //увеличение изношености при выстреле очередью
+    float conditionDecreasePerShot;      //увеличение изношености при одиночном выстреле
 
 public:
     float GetMisfireStartCondition() const { return misfireStartCondition; };
@@ -423,12 +423,12 @@ public:
     virtual float GetCrosshairInertion() const { return m_crosshair_inertion; };
     float GetFirstBulletDisp() const { return m_first_bullet_controller.get_fire_dispertion(); };
 protected:
-    int iAmmoElapsed;   // ammo in magazine, currently
-    int iMagazineSize;  // size (in bullets) of magazine
+    int iAmmoElapsed;  // ammo in magazine, currently
+    int iMagazineSize; // size (in bullets) of magazine
 
     //для подсчета в GetSuitableAmmoTotal
     mutable int m_iAmmoCurrentTotal;
-    mutable u32 m_BriefInfo_CalcFrame;  //кадр на котором просчитали кол-во патронов
+    mutable u32 m_BriefInfo_CalcFrame; //кадр на котором просчитали кол-во патронов
     bool m_bAmmoWasSpawned;
 
     virtual bool IsNecessaryItem(const shared_str& item_sect);

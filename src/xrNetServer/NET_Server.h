@@ -68,7 +68,7 @@ public:
     shared_str name;
     shared_str pass;
 
-    Flags flags;  // local/host/normal
+    Flags flags; // local/host/normal
     u32 dwTime_LastUpdate;
 
     ip_address m_cAddress;
@@ -217,13 +217,13 @@ public:
     void UpdateClientStatistic(IClient* C);
 
     // extended functionality
-    virtual u32 OnMessage(NET_Packet& P, ClientID sender);  // Non-Zero means broadcasting with "flags" as returned
+    virtual u32 OnMessage(NET_Packet& P, ClientID sender); // Non-Zero means broadcasting with "flags" as returned
     virtual void OnCL_Connected(IClient* C);
     virtual void OnCL_Disconnected(IClient* C);
     virtual bool OnCL_QueryHost() { return true; };
-    virtual IClient* client_Create() = 0;         // create client info
-    virtual void client_Replicate() = 0;          // replicate current state to client
-    virtual void client_Destroy(IClient* C) = 0;  // destroy client info
+    virtual IClient* client_Create() = 0;        // create client info
+    virtual void client_Replicate() = 0;         // replicate current state to client
+    virtual void client_Destroy(IClient* C) = 0; // destroy client info
 
     // IC u32					client_Count		()			{ return net_Players.size(); }
     // IC IClient*				client_Get			(u32 num)	{ return net_Players[num]; }
@@ -265,15 +265,16 @@ public:
         csMessage.Enter();
 #ifdef DEBUG
         sender_functor_invoked = true;
-#endif  //#ifdef DEBUG
+#endif //#ifdef DEBUG
         net_players.ForEachClientDo(action);
 #ifdef DEBUG
         sender_functor_invoked = false;
-#endif  //#ifdef DEBUG
+#endif //#ifdef DEBUG
         csMessage.Leave();
     }
 // template<typename ActionFunctor>
-// void					ForEachDisconnectedClientDo(ActionFunctor & action) { net_players.ForEachDisconnectedClientDo(action);
+// void					ForEachDisconnectedClientDo(ActionFunctor & action) {
+// net_players.ForEachDisconnectedClientDo(action);
 // };
 #ifdef DEBUG
     bool IsPlayersMonitorLockedByMe() const

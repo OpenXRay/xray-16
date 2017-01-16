@@ -83,7 +83,7 @@ BOOL CPhysicsShellHolder::net_Spawn(CSE_Abstract* DC)
     CParticlesPlayer::net_SpawnParticles();
     st_enable_state = (u8)stNotDefitnite;
     b_sheduled = true;
-    BOOL ret = inherited::net_Spawn(DC);  // load
+    BOOL ret = inherited::net_Spawn(DC); // load
     // create_physic_shell			();
     if (PPhysicsShell() && PPhysicsShell()->isFullActive()) {
         PPhysicsShell()->GetGlobalTransformDynamic(&XFORM());
@@ -472,7 +472,7 @@ u16 CPhysicsShellHolder::ObjectID() const
 }
 ICollisionForm* CPhysicsShellHolder::ObjectCollisionModel()
 {
-    return CForm;  // XXX: use ICollidable::GetCForm() instead
+    return CForm; // XXX: use ICollidable::GetCForm() instead
 }
 
 IKinematics* CPhysicsShellHolder::ObjectKinematics()

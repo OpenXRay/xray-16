@@ -17,7 +17,7 @@ enum SPECIAL_KILL_TYPE
     SKT_KNIFEKILL,
     SKT_PDA,
 
-    SKT_KIR,  // Kill in Row
+    SKT_KIR, // Kill in Row
 
     SKT_NEWRANK,
     SKT_EYESHOT,

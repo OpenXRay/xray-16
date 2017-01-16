@@ -92,7 +92,7 @@ public:
 public:
     virtual void Load(LPCSTR section);
 
-    LPCSTR NameItem();  // remove <virtual> by sea
+    LPCSTR NameItem(); // remove <virtual> by sea
     LPCSTR NameShort();
     shared_str ItemDescription() { return m_Description; }
     virtual bool GetBriefInfo(II_BriefInfo& info)
@@ -103,7 +103,7 @@ public:
 
     virtual void OnEvent(NET_Packet& P, u16 type);
 
-    virtual bool Useful() const;  // !!! Переопределить. (см. в Inventory.cpp)
+    virtual bool Useful() const; // !!! Переопределить. (см. в Inventory.cpp)
     virtual bool Attach(PIItem pIItem, bool b_send_event) { return false; }
     virtual bool Detach(PIItem pIItem) { return false; }
     //при детаче спаунится новая вещь при заданно названии секции
@@ -112,9 +112,9 @@ public:
     virtual bool CanDetach(LPCSTR item_section_name) { return false; }
     virtual EHandDependence HandDependence() const { return hd1Hand; };
     virtual bool IsSingleHanded() const { return true; };
-    virtual bool ActivateItem();                               // !!! Переопределить. (см. в Inventory.cpp)
-    virtual void DeactivateItem();                             // !!! Переопределить. (см. в Inventory.cpp)
-    virtual bool Action(u16 cmd, u32 flags) { return false; }  // true если известная команда, иначе false
+    virtual bool ActivateItem();                              // !!! Переопределить. (см. в Inventory.cpp)
+    virtual void DeactivateItem();                            // !!! Переопределить. (см. в Inventory.cpp)
+    virtual bool Action(u16 cmd, u32 flags) { return false; } // true если известная команда, иначе false
     virtual void DiscardState(){};
 
     virtual void OnH_B_Chield();
@@ -125,8 +125,8 @@ public:
     virtual void save(NET_Packet& output_packet);
     virtual void load(IReader& input_packet);
     virtual BOOL net_SaveRelevant() { return TRUE; }
-    virtual void render_item_ui(){};                        // when in slot & query return TRUE
-    virtual bool render_item_ui_query() { return false; };  // when in slot
+    virtual void render_item_ui(){};                       // when in slot & query return TRUE
+    virtual bool render_item_ui_query() { return false; }; // when in slot
     virtual void UpdateCL();
 
     virtual void Hit(SHit* pHDS);
@@ -191,15 +191,15 @@ protected:
 
 public:
     virtual void make_Interpolation(){};
-    virtual void PH_B_CrPr();  // actions & operations before physic correction-prediction steps
-    virtual void PH_I_CrPr();  // actions & operations after correction before prediction steps
+    virtual void PH_B_CrPr(); // actions & operations before physic correction-prediction steps
+    virtual void PH_I_CrPr(); // actions & operations after correction before prediction steps
 #ifdef DEBUG
-    virtual void PH_Ch_CrPr();  //
+    virtual void PH_Ch_CrPr(); //
 #endif
-    virtual void PH_A_CrPr();  // actions & operations after phisic correction-prediction steps
+    virtual void PH_A_CrPr(); // actions & operations after phisic correction-prediction steps
 
-    virtual void net_Import(NET_Packet& P);  // import from server
-    virtual void net_Export(NET_Packet& P);  // export to server
+    virtual void net_Import(NET_Packet& P); // import from server
+    virtual void net_Export(NET_Packet& P); // export to server
 
 public:
     virtual void activate_physic_shell();
@@ -288,7 +288,7 @@ public:
 
 #ifdef DEBUG
     void log_upgrades();
-#endif  // DEBUG
+#endif // DEBUG
 
     IC Upgrades_type const& upgardes() const;
     virtual void Interpolate();
@@ -315,6 +315,6 @@ protected:
 public:
     IC bool is_helper_item() { return !!m_flags.test(FIsHelperItem); }
     IC void set_is_helper(bool is_helper) { m_flags.set(FIsHelperItem, is_helper); }
-};  // class CInventoryItem
+}; // class CInventoryItem
 
 #include "inventory_item_inline.h"

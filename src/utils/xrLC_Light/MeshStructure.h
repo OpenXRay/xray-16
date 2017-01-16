@@ -346,4 +346,4 @@ IC void isolate_vertices(BOOL bProgress, xr_vector<typeVertex*>& vertices)
     if (_count) Logger.clMsg("::compact:: %d verts removed", _count);
 }
 
-#endif  //__MESHSTRUCTURE_H__
+#endif //__MESHSTRUCTURE_H__

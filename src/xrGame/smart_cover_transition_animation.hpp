@@ -33,10 +33,10 @@ public:
     IC MonsterSpace::EMovementType const& movement_type() const;
 };
 
-}  // namespace transitions
+} // namespace transitions
 
-}  // namespace smart_cover
+} // namespace smart_cover
 
 #include "smart_cover_transition_animation_inline.hpp"
 
-#endif  // SMART_COVER_TRANSITION_ANIMATION_HPP_INCLUDED
+#endif // SMART_COVER_TRANSITION_ANIMATION_HPP_INCLUDED

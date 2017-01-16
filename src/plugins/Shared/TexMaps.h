@@ -9,8 +9,8 @@ class TexmapSlot
 {
 public:
     float amount;
-    Control* amtCtrl;  // ref to controller
-    Texmap* map;       // ref to map
+    Control* amtCtrl; // ref to controller
+    Texmap* map;      // ref to map
     BOOL mapOn;
     TSTR name;
 
@@ -36,7 +36,7 @@ public:
     }
 
     // begin - ke/mjm - 03.16.00 - merge reshading code
-    float LerpMono(float origVal, float texVal)  // for reShading, no eval
+    float LerpMono(float origVal, float texVal) // for reShading, no eval
     {
         if (amount < 0.0f) {
             float b = 1.0f + amount;
@@ -90,7 +90,7 @@ public:
     BOOL InvisibleProperty()
     {
         return TRUE;
-    }  // maps are made visible in scripter by pb_maps paramblock in the material so don't expose them as a subanim
+    } // maps are made visible in scripter by pb_maps paramblock in the material so don't expose them as a subanim
 
     //		int NumRefs() { return STD2_NMAX_TEXMAPS*2; }
     int NumRefs();

@@ -28,10 +28,10 @@ const u32 direction_switch_interval = 500;
 const u32 need_look_back_time_delay = 0;
 
 const float direction_angles[] = {
-    0.f,       //	eMovementDirectionForward
-    PI,        //	eMovementDirectionBackward
-    PI_DIV_2,  //	eMovementDirectionLeft
-    -PI_DIV_2  //	eMovementDirectionRight
+    0.f,      //	eMovementDirectionForward
+    PI,       //	eMovementDirectionBackward
+    PI_DIV_2, //	eMovementDirectionLeft
+    -PI_DIV_2 //	eMovementDirectionRight
 };
 
 void CStalkerAnimationManager::legs_play_callback(CBlend* blend)

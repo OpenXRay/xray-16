@@ -32,4 +32,4 @@ protected:
 // template<> struct global_add_global<gl_detail_cl_data, gl_lm_data>{};
 }
 
-#endif  // #ifndef DETAIL_NET_GLOBAL_DATA_H_INCLUDED
+#endif // #ifndef DETAIL_NET_GLOBAL_DATA_H_INCLUDED

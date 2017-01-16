@@ -156,9 +156,9 @@ void CTexture::ProcessStaging()
 
         T = 0;
 
-        CHK_DX(HW.pDevice->CreateTexture2D(&TexDesc,  // Texture desc
-            NULL,                                     // Initial data
-            &T));                                     // [out] Texture
+        CHK_DX(HW.pDevice->CreateTexture2D(&TexDesc, // Texture desc
+            NULL,                                    // Initial data
+            &T));                                    // [out] Texture
 
         pTargetSurface = T;
     }
@@ -174,9 +174,9 @@ void CTexture::ProcessStaging()
 
         T = 0;
 
-        CHK_DX(HW.pDevice->CreateTexture3D(&TexDesc,  // Texture desc
-            NULL,                                     // Initial data
-            &T));                                     // [out] Texture
+        CHK_DX(HW.pDevice->CreateTexture3D(&TexDesc, // Texture desc
+            NULL,                                    // Initial data
+            &T));                                    // [out] Texture
 
         pTargetSurface = T;
     }
@@ -226,31 +226,31 @@ void CTexture::Apply(u32 dwStage)
     //   return;
     //}
 
-    if (dwStage < rstVertex)  //	Pixel shader stage resources
+    if (dwStage < rstVertex) //	Pixel shader stage resources
     {
         // HW.pDevice->PSSetShaderResources(dwStage, 1, &m_pSRView);
         SRVSManager.SetPSResource(dwStage, m_pSRView);
     }
-    else if (dwStage < rstGeometry)  //	Vertex shader stage resources
+    else if (dwStage < rstGeometry) //	Vertex shader stage resources
     {
         // HW.pDevice->VSSetShaderResources(dwStage-rstVertex, 1, &m_pSRView);
         SRVSManager.SetVSResource(dwStage - rstVertex, m_pSRView);
     }
-    else if (dwStage < rstHull)  //	Geometry shader stage resources
+    else if (dwStage < rstHull) //	Geometry shader stage resources
     {
         // HW.pDevice->GSSetShaderResources(dwStage-rstGeometry, 1, &m_pSRView);
         SRVSManager.SetGSResource(dwStage - rstGeometry, m_pSRView);
     }
 #ifdef USE_DX11
-    else if (dwStage < rstDomain)  //	Geometry shader stage resources
+    else if (dwStage < rstDomain) //	Geometry shader stage resources
     {
         SRVSManager.SetHSResource(dwStage - rstHull, m_pSRView);
     }
-    else if (dwStage < rstCompute)  //	Geometry shader stage resources
+    else if (dwStage < rstCompute) //	Geometry shader stage resources
     {
         SRVSManager.SetDSResource(dwStage - rstDomain, m_pSRView);
     }
-    else if (dwStage < rstInvalid)  //	Geometry shader stage resources
+    else if (dwStage < rstInvalid) //	Geometry shader stage resources
     {
         SRVSManager.SetCSResource(dwStage - rstCompute, m_pSRView);
     }
@@ -329,7 +329,7 @@ void CTexture::apply_avi(u32 dwStage)
 void CTexture::apply_seq(u32 dwStage)
 {
     // SEQ
-    u32 frame = Device.dwTimeContinual / seqMSPF;  // Device.dwTimeGlobal
+    u32 frame = Device.dwTimeContinual / seqMSPF; // Device.dwTimeGlobal
     u32 frame_data = seqDATA.size();
     if (flags.seqCycles) {
         u32 frame_id = frame % (frame_data * 2);
@@ -537,7 +537,7 @@ void CTexture::Unload()
 #ifdef DEBUG
     string_path msg_buff;
     xr_sprintf(msg_buff, sizeof(msg_buff), "* Unloading texture [%s] pSurface RefCount=", cName.c_str());
-#endif  // DEBUG
+#endif // DEBUG
 
     //.	if (flags.bLoaded)		Msg		("* Unloaded: %s",cName.c_str());
 
@@ -557,7 +557,7 @@ void CTexture::Unload()
 
 #ifdef DEBUG
     _SHOW_REF(msg_buff, pSurface);
-#endif  // DEBUG
+#endif // DEBUG
     _RELEASE(pSurface);
     _RELEASE(m_pSRView);
 

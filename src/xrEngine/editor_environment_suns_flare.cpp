@@ -49,4 +49,4 @@ void flare::fill(editor::property_holder_collection* collection)
     properties->add_property("radius", "flare", "this option is resposible for gradient radius", m_radius, m_radius);
 }
 
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR

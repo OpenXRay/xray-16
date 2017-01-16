@@ -30,4 +30,4 @@ struct SpursSpeexTaskOutput
 }
 #endif
 
-#endif  //__SPEEX_TASK_OUTPUT_H
+#endif //__SPEEX_TASK_OUTPUT_H

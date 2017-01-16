@@ -35,7 +35,7 @@ public:
     static float ExplosionEffect(collide::rq_results& storage, CExplosive* exp_obj, CPhysicsShellHolder* blasted_obj,
         const Fvector& expl_centre, const float expl_radius);
 
-    virtual void OnEvent(NET_Packet& P, u16 type);  //{inherited::OnEvent( P, type);}
+    virtual void OnEvent(NET_Packet& P, u16 type); //{inherited::OnEvent( P, type);}
     virtual void OnAfterExplosion();
     virtual void OnBeforeExplosion();
     virtual void SetCurrentParentID(u16 parent_id) { m_iCurrentParentID = parent_id; }

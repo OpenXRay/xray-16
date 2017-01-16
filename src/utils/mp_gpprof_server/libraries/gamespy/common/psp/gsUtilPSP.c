@@ -11,7 +11,7 @@ static void gsiResolveHostnameThread(void* arg)
 {
     int result = 0;
     int resolverID = 0;
-    char buf[1024];  // PSP documentation recommends 1024
+    char buf[1024]; // PSP documentation recommends 1024
     in_addr addr;
     GSIResolveHostnameHandle* info = (GSIResolveHostnameHandle)arg;
 
@@ -65,7 +65,7 @@ int gsiStartResolvingHostname(const char* hostname, GSIResolveHostnameHandle* ha
 void gsiCancelResolvingHostname(GSIResolveHostnameHandle handle)
 {
     if (0 == handle->finishedResolving) {
-        sceNetResolverStop(handle->resolverID);  // safe to call from separate thread
+        sceNetResolverStop(handle->resolverID); // safe to call from separate thread
         gsiCancelThread(handle->threadID);
     }
 }
@@ -75,7 +75,7 @@ unsigned int gsiGetResolvedIP(GSIResolveHostnameHandle handle)
     return handle->ip;
 }
 
-#endif  // (GSI_NO_THREADS)
+#endif // (GSI_NO_THREADS)
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
@@ -139,8 +139,8 @@ gsi_i64 gsiStringToInt64(const char* theNumberStr)
     // Added for compatibility reasons
     int ibase = 10;
 
-    p = theNumberStr;  // p is our scanning pointer
-    number = 0;        // start with zero
+    p = theNumberStr; // p is our scanning pointer
+    number = 0;       // start with zero
 
     // read char
     c = *p++;
@@ -150,7 +150,7 @@ gsi_i64 gsiStringToInt64(const char* theNumberStr)
         c = *p++;
 
     if (c == '-') {
-        flags |= FL_NEG;  // remember minus sign
+        flags |= FL_NEG; // remember minus sign
         c = *p++;
     }
     // skip sign
@@ -248,4 +248,4 @@ void gsiInt64ToString(char theNumberStr[33], gsi_i64 theNumber)
 }
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
-#endif  // _PSP only
+#endif // _PSP only

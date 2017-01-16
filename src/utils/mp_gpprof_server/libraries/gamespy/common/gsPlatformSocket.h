@@ -133,9 +133,9 @@ gsiSocketGethostbyaddr(a, l, t) SOC_GetHostByAddr(a, l, t) gsiSocketGethostbynam
 #define SO_KEEPALIVE SCE_NET_INET_SO_KEEPALIVE
 #define SO_REUSEADDR SCE_NET_INET_SO_REUSEADDR
 
-#define IPPROTO_TCP SCE_NET_INET_IPPROTO_TCP    // protocol defined by SOCK_STREAM
-#define IPPROTO_UDP SCE_NET_INET_IPPROTO_UDP    // protocol defined by SOCK_DGRAM
-#define IPPROTO_ICMP SCE_NET_INET_IPPROTO_ICMP  // protocol for ICMP pings
+#define IPPROTO_TCP SCE_NET_INET_IPPROTO_TCP   // protocol defined by SOCK_STREAM
+#define IPPROTO_UDP SCE_NET_INET_IPPROTO_UDP   // protocol defined by SOCK_DGRAM
+#define IPPROTO_ICMP SCE_NET_INET_IPPROTO_ICMP // protocol for ICMP pings
 
 // structures
 #define in_addr SceNetInetInAddr
@@ -186,7 +186,7 @@ gsiSocketGethostbyaddr(a, l, t) SOC_GetHostByAddr(a, l, t) gsiSocketGethostbynam
 #define inet_addr sceNetInetInetAddr
 // This is not the correct function for gethostname, it should get the string name of the local host
 // not the sockaddr_in struct
-#define gethostname  // sceNetInetGetsockname
+#define gethostname // sceNetInetGetsockname
 #define getsockname(s, n, l) sceNetInetGetsockname(s, n, (SceNetInetSocklen_t*)l)
 
 #define GOAGetLastError(s) sceNetInetGetErrno()
@@ -196,7 +196,7 @@ gsiSocketGethostbyaddr(a, l, t) SOC_GetHostByAddr(a, l, t) gsiSocketGethostbynam
 {
     char* h_name;
     char** h_aliases;
-    gsi_u16 h_addrtype;  // AF_INET
+    gsi_u16 h_addrtype; // AF_INET
     gsi_u16 h_length;
     char** h_addr_list;
 };
@@ -204,13 +204,13 @@ gsiSocketGethostbyaddr(a, l, t) SOC_GetHostByAddr(a, l, t) gsiSocketGethostbynam
 #define gethostbyname gsSocketGetHostByName
 #define inet_ntoa gsSocketInetNtoa
 
-#define GSI_RESOLVER_TIMEOUT (5 * 1000 * 1000)  // 5 seconds
+#define GSI_RESOLVER_TIMEOUT (5 * 1000 * 1000) // 5 seconds
 #define GSI_RESOLVER_RETRY (2)
 
-struct hostent* gsSocketGetHostByName(const char* name);  // gsSocketPSP.c
+struct hostent* gsSocketGetHostByName(const char* name); // gsSocketPSP.c
 const char* gsSocketInetNtoa(struct in_addr in);
 
-#endif  // _PSP
+#endif // _PSP
 
 // XBOX doesn't have host lookup
 #if defined(_XBOX)
@@ -220,7 +220,7 @@ struct hostent
 {
     char* h_name;
     char** h_aliases;
-    gsi_u16 h_addrtype;  // AF_INET
+    gsi_u16 h_addrtype; // AF_INET
     gsi_u16 h_length;
     char** h_addr_list;
 };
@@ -241,7 +241,7 @@ char* inet_ntoa(IN_ADDR in_addr);
 #endif
 
 // SOCKET ERROR CODES
-#if defined(_REVOLUTION)  // not sure if Wii uses this or _REV
+#if defined(_REVOLUTION) // not sure if Wii uses this or _REV
 #define WSAEWOULDBLOCK SO_EWOULDBLOCK
 #define WSAEINPROGRESS SO_EINPROGRESS
 #define WSAEALREADY SO_EALREADY
@@ -305,7 +305,7 @@ char* inet_ntoa(IN_ADDR in_addr);
 #define WSAEINVAL SOC_EINVAL
 #elif defined(_PS3)
 #define WSAEWOULDBLOCK SYS_NET_EWOULDBLOCK
-#define WSAEINPROGRESS SYS_NET_EINPROGRESS  // SYS_NET_ERROR_EINPROGRESS
+#define WSAEINPROGRESS SYS_NET_EINPROGRESS // SYS_NET_ERROR_EINPROGRESS
 #define WSAEALREADY SYS_NET_EALREADY
 #define WSAENOTSOCK SYS_NET_ENOTSOCK
 #define WSAEDESTADDRREQ SYS_NET_EDESTADDRREQ
@@ -323,8 +323,8 @@ char* inet_ntoa(IN_ADDR in_addr);
 #define WSAENETUNREACH SYS_NET_ENETUNREACH
 #define WSAENETRESET SYS_NET_ENETRESET
 #define WSAECONNABORTED SYS_NET_ECONNABORTED
-#define WSAECONNRESET SYS_NET_ECONNRESET  // SYS_NET_ERROR_ECONNRESET
-#define WSAENOBUFS SYS_NET_ENOBUFS        // SYS_NET_ERROR_ENOBUFS
+#define WSAECONNRESET SYS_NET_ECONNRESET // SYS_NET_ERROR_ECONNRESET
+#define WSAENOBUFS SYS_NET_ENOBUFS       // SYS_NET_ERROR_ENOBUFS
 #define WSAEISCONN SYS_NET_EISCONN
 #define WSAENOTCONN SYS_NET_ENOTCONN
 #define WSAESHUTDOWN SYS_NET_ESHUTDOWN
@@ -384,7 +384,7 @@ char* inet_ntoa(IN_ADDR in_addr);
 #endif
 
 // make caps types interchangeable on all platforms
-#if !defined(_WIN32) && !defined(_NITRO) && !defined(_REVOLUTION)  // necessary for Wii??
+#if !defined(_WIN32) && !defined(_NITRO) && !defined(_REVOLUTION) // necessary for Wii??
 typedef int SOCKET;
 typedef struct sockaddr SOCKADDR;
 typedef struct sockaddr_in SOCKADDR_IN;
@@ -400,12 +400,12 @@ typedef struct timeval TIMEVAL;
 
 #ifdef INSOCK
 //#define NETBUFSIZE (sceLIBNET_BUFFERSIZE)
-#define NETBUFSIZE (32768)  // buffer size for our samples
+#define NETBUFSIZE (32768) // buffer size for our samples
 
 // used in place of shutdown function to avoid blocking shutdown call
 int gsiShutdown(SOCKET s, int how);
 
-#define GOAGetLastError(s) sceInsockErrno  // not implemented
+#define GOAGetLastError(s) sceInsockErrno // not implemented
 #define closesocket(s) gsiShutdown(s, SCE_INSOCK_SHUT_RDWR)
 #undef shutdown
 #define shutdown(s, h) gsiShutdown(s, h)
@@ -413,7 +413,7 @@ int gsiShutdown(SOCKET s, int how);
 
 #ifdef _UNIX
 #define GOAGetLastError(s) errno
-#define closesocket close  // on unix
+#define closesocket close // on unix
 #endif
 
 #if !defined(_WIN32)
@@ -632,4 +632,4 @@ gsi_u32 gsiGetBroadcastIP(void);
 }
 #endif
 
-#endif  // __GSSOCKET_H__
+#endif // __GSSOCKET_H__

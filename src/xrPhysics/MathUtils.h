@@ -138,7 +138,7 @@ IC void dVectorMul(float* res, const float* av, float mt)
     res[1] = av[1] * mt;
     res[2] = av[2] * mt;
 }
-IC void dVectorInterpolate(float* v, float* to, float k)  // changes to
+IC void dVectorInterpolate(float* v, float* to, float k) // changes to
 {
     dVectorMul(v, 1.f - k);
     dVectorMul(to, k);
@@ -181,7 +181,7 @@ IC void twoq_2w(const Fquaternion& q1, const Fquaternion& q2, float dt, Fvector&
     Fvector v1, v2;
     v1.set(q1.x, q1.y, q1.z);
     v2.set(q2.x, q2.y, q2.z);
-    float cosinus = q1.w * q2.w + v1.dotproduct(v2);  // q1.w*q2.w+ q1.v.dotproduct(q2.v)
+    float cosinus = q1.w * q2.w + v1.dotproduct(v2); // q1.w*q2.w+ q1.v.dotproduct(q2.v)
     w.crossproduct(v1, v2);
     //								  //the signum must be inverted ?
     v1.mul(q2.w);
@@ -485,8 +485,8 @@ IC bool valid_pos(const Fvector& P, const Fbox& B)
 }
 
 #ifdef DEBUG
-const float DET_CHECK_EPS = 0.15f;       // scale -35%  !? ;)
-const float DET_CHECK_FATAL_EPS = 0.8f;  // scale -35%  !? ;)
+const float DET_CHECK_EPS = 0.15f;      // scale -35%  !? ;)
+const float DET_CHECK_FATAL_EPS = 0.8f; // scale -35%  !? ;)
 #define VERIFY_RMATRIX(M)                                                                                              \
     {                                                                                                                  \
         float d = DET(M);                                                                                              \

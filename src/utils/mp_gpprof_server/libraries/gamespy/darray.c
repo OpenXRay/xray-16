@@ -12,8 +12,8 @@
 #include <string.h>
 
 #ifdef XRAY_DISABLE_GAMESPY_WARNINGS
-#pragma warning(disable : 4244)  // lines: 202, 260
-#endif                           //#ifdef XRAY_DISABLE_GAMESPY_WARNINGS
+#pragma warning(disable : 4244) // lines: 202, 260
+#endif                          //#ifdef XRAY_DISABLE_GAMESPY_WARNINGS
 
 #ifdef _MFC_MEM_DEBUG
 #define _CRTDBG_MAP_ALLOC 1
@@ -28,7 +28,7 @@
 #define gsirealloc realloc
 #include "common/gsAssert.h"
 #else
-#include "nonport.h"  //for gsimalloc/realloc/free/GS_ASSERT
+#include "nonport.h" //for gsimalloc/realloc/free/GS_ASSERT
 #endif
 
 // STRUCTURES
@@ -38,7 +38,7 @@ struct DArrayImplementation
     int elemsize;
     int growby;
     ArrayElementFreeFn elemfreefn;
-    void* list;  // array of elements
+    void* list; // array of elements
 };
 
 // PROTOTYPES
@@ -59,7 +59,7 @@ static void FreeElement(DArray array, int n)
  */
 static void ArrayGrow(DArray array)
 {
-    GS_ASSERT(array->elemsize)  // sanity check -mj Oct 31st
+    GS_ASSERT(array->elemsize) // sanity check -mj Oct 31st
     array->capacity += array->growby;
     array->list = gsirealloc(array->list, (size_t)array->capacity * array->elemsize);
     GS_ASSERT(array->list);
@@ -70,7 +70,7 @@ static void ArrayGrow(DArray array)
  */
 static void SetElement(DArray array, const void* elem, int pos)
 {
-    GS_ASSERT(array)  // safety check -mj Oct 31st
+    GS_ASSERT(array) // safety check -mj Oct 31st
     GS_ASSERT(elem)
     GS_ASSERT(array->elemsize)
 
@@ -171,7 +171,7 @@ void ArrayInsertAt(DArray array, const void* newElem, int n)
 
     if (array->count == array->capacity) ArrayGrow(array);
     array->count++;
-    if (n < array->count - 1)  // if we aren't appending
+    if (n < array->count - 1) // if we aren't appending
         memmove(ArrayNth(array, n + 1), ArrayNth(array, n), (size_t)(array->count - 1 - n) * array->elemsize);
     SetElement(array, newElem, n);
 }
@@ -195,7 +195,7 @@ void ArrayRemoveAt(DArray array, int n)
     GS_ASSERT(array)
     GS_ASSERT((n >= 0) && (n < array->count));
 
-    if (n < array->count - 1)  // if not last element
+    if (n < array->count - 1) // if not last element
         memmove(ArrayNth(array, n), ArrayNth(array, n + 1), (size_t)(array->count - 1 - n) * array->elemsize);
     array->count--;
 }

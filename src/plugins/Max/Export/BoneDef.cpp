@@ -37,12 +37,12 @@ BOOL CBoneDef::SetInitTM(IPhysiqueExport* pExport, const Matrix3& matMesh)
         if (bErr) tmp.IdentityMatrix();
     }
 
-    if (1) {  //! bErr){
+    if (1) { //! bErr){
         Helper::ConvertMatrix(tmp, matInit);
         matOffset.invert(matInit);
         // S matMesh
         //		pBone->matOffset = matMesh * Inverse(pBone->matInit);
     }
 
-    return 1;  //! bErr;
+    return 1; //! bErr;
 }

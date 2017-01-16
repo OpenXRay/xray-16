@@ -14,11 +14,11 @@ namespace detail
 {
 namespace dog
 {
-const float scare_distance2enemy = 20.f;  // distance on which dog can be scared of enemy
+const float scare_distance2enemy = 20.f; // distance on which dog can be scared of enemy
 
-}  // namespace dog
+} // namespace dog
 
-}  // namespace detail
+} // namespace detail
 
 //////////////////////////////////////////////////////////////////////////
 // Construct Substates
@@ -198,9 +198,9 @@ void CStateGroupAttackMoveToHomePointAbstract::setup_substates()
         data.vertex = m_target_node;
         data.point = ai().level_graph().vertex_position(data.vertex);
         data.action.action = ACT_RUN;
-        data.action.time_out = 0;  // do not use time out
+        data.action.time_out = 0; // do not use time out
         data.completion_dist = 1.f;
-        data.time_to_rebuild = 0;  // do not rebuild
+        data.time_to_rebuild = 0; // do not rebuild
         data.accelerated = true;
         data.braking = true;
         data.accel_type = eAT_Aggressive;

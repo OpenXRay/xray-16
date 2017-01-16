@@ -209,7 +209,7 @@ static SAKERequestResult SAKE_CALL sakeiReadOutputRecords(
                     boolval = (strcmp(value, "true") == 0) ? gsi_true : gsi_false;
                 }
                 else
-                    boolval = gsi_false;  // if returned a NULL value, set bool to false
+                    boolval = gsi_false; // if returned a NULL value, set bool to false
                 outputField->mType = SAKEFieldType_BOOLEAN;
                 outputField->mValue.mBoolean = boolval;
             }

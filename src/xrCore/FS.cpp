@@ -12,7 +12,7 @@
 
 #ifdef M_BORLAND
 #define O_SEQUENTIAL 0
-#endif  // M_BORLAND
+#endif // M_BORLAND
 
 #ifdef FS_DEBUG
 XRCORE_API u32 g_file_mapped_memory = 0;
@@ -35,7 +35,7 @@ void register_file_mapping(void* address, const u32& size, LPCSTR file_name)
     string512 temp;
     xr_sprintf(temp, sizeof(temp), "file mapping: %s", file_name);
     memory_monitor::monitor_alloc(address, size, temp);
-#endif  // USE_MEMORY_MONITOR
+#endif // USE_MEMORY_MONITOR
 }
 
 void unregister_file_mapping(void* address, const u32& size)
@@ -54,7 +54,7 @@ void unregister_file_mapping(void* address, const u32& size)
 
 #ifdef USE_MEMORY_MONITOR
     memory_monitor::monitor_free(address);
-#endif  // USE_MEMORY_MONITOR
+#endif // USE_MEMORY_MONITOR
 }
 
 XRCORE_API void dump_file_mappings()
@@ -66,7 +66,7 @@ XRCORE_API void dump_file_mappings()
     for (; I != E; ++I)
         Msg("* [0x%08x][%d][%s]", (*I).first, (*I).second.first, (*I).second.second.c_str());
 }
-#endif  // DEBUG
+#endif // DEBUG
 //////////////////////////////////////////////////////////////////////
 // Tools
 //////////////////////////////////////////////////////////////////////
@@ -96,7 +96,7 @@ bool file_handle_internal(LPCSTR file_name, u32& size, int& hFile)
     size = filelength(hFile);
     return (true);
 }
-#else   // EDITOR
+#else  // EDITOR
 static int open_internal(LPCSTR fn, int& handle)
 {
     return (_sopen_s(&handle, fn, _O_RDONLY | _O_BINARY, _SH_DENYNO, _S_IREAD));
@@ -112,7 +112,7 @@ bool file_handle_internal(LPCSTR file_name, u32& size, int& file_handle)
     size = _filelength(file_handle);
     return (true);
 }
-#endif  // EDITOR
+#endif // EDITOR
 
 void* FileDownload(LPCSTR file_name, const int& file_handle, u32& file_size)
 {
@@ -120,7 +120,7 @@ void* FileDownload(LPCSTR file_name, const int& file_handle, u32& file_size)
 #ifdef DEBUG_MEMORY_NAME
         ,
         "FILE in memory"
-#endif  // DEBUG_MEMORY_NAME
+#endif // DEBUG_MEMORY_NAME
         );
 
     int r_bytes = _read(file_handle, buffer, file_size);
@@ -206,14 +206,14 @@ void CMemoryWriter::w(const void* ptr, u32 count)
 #ifdef DEBUG_MEMORY_NAME
                 ,
                 "CMemoryWriter - storage"
-#endif  // DEBUG_MEMORY_NAME
+#endif // DEBUG_MEMORY_NAME
                 );
         else
             data = (BYTE*)Memory.mem_realloc(data, mem_size
 #ifdef DEBUG_MEMORY_NAME
                 ,
                 "CMemoryWriter - storage"
-#endif  // DEBUG_MEMORY_NAME
+#endif // DEBUG_MEMORY_NAME
                 );
     }
     CopyMemory(data + position, ptr, count);
@@ -237,7 +237,7 @@ void IWriter::open_chunk(u32 type)
 {
     w_u32(type);
     chunk_pos.push(tell());
-    w_u32(0);  // the place for 'size'
+    w_u32(0); // the place for 'size'
 }
 void IWriter::close_chunk()
 {
@@ -249,7 +249,7 @@ void IWriter::close_chunk()
     seek(pos);
     chunk_pos.pop();
 }
-u32 IWriter::chunk_size()  // returns size of currently opened chunk, 0 otherwise
+u32 IWriter::chunk_size() // returns size of currently opened chunk, 0 otherwise
 {
     if (chunk_pos.empty()) return 0;
     return tell() - chunk_pos.top() - 4;
@@ -343,11 +343,11 @@ IReaderTestPolicy::~IReaderTestPolicy()
 {
     xr_delete(m_test);
 };
-#endif  // TESTING_IREADER
+#endif // TESTING_IREADER
 
 #ifdef FIND_CHUNK_BENCHMARK_ENABLE
 find_chunk_counter g_find_chunk_counter;
-#endif  // FIND_CHUNK_BENCHMARK_ENABLE
+#endif // FIND_CHUNK_BENCHMARK_ENABLE
 
 u32 IReader::find_chunk(u32 ID, BOOL* bCompressed)
 {
@@ -481,7 +481,7 @@ CPackReader::~CPackReader()
 {
 #ifdef FS_DEBUG
     unregister_file_mapping(base_address, Size);
-#endif  // DEBUG
+#endif // DEBUG
 
     UnmapViewOfFile(base_address);
 };
@@ -524,14 +524,14 @@ CVirtualFileRW::CVirtualFileRW(const char* cFileName)
 
 #ifdef FS_DEBUG
     register_file_mapping(data, Size, cFileName);
-#endif  // DEBUG
+#endif // DEBUG
 }
 
 CVirtualFileRW::~CVirtualFileRW()
 {
 #ifdef FS_DEBUG
     unregister_file_mapping(data, Size);
-#endif  // DEBUG
+#endif // DEBUG
 
     UnmapViewOfFile((void*)data);
     CloseHandle(hSrcMap);
@@ -554,14 +554,14 @@ CVirtualFileReader::CVirtualFileReader(const char* cFileName)
 
 #ifdef FS_DEBUG
     register_file_mapping(data, Size, cFileName);
-#endif  // DEBUG
+#endif // DEBUG
 }
 
 CVirtualFileReader::~CVirtualFileReader()
 {
 #ifdef FS_DEBUG
     unregister_file_mapping(data, Size);
-#endif  // DEBUG
+#endif // DEBUG
 
     UnmapViewOfFile((void*)data);
     CloseHandle(hSrcMap);

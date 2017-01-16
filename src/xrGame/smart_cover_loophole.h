@@ -76,8 +76,8 @@ private:
     void fill_transitions(luabind::adl::object const& transitions_table);
 };
 
-}  // namespace smart_cover
+} // namespace smart_cover
 
 #include "smart_cover_loophole_inline.h"
 
-#endif  // SMART_COVER_LOOPHOLE_H_INCLUDED
+#endif // SMART_COVER_LOOPHOLE_H_INCLUDED

@@ -153,4 +153,4 @@ CEnvAmbient::SSndChannel::sounds_type& channel::sounds()
     return (inherited::sounds());
 }
 
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR

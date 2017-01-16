@@ -182,4 +182,4 @@ private:
     void UpdateCollisionActivatingDellay();
     void SpawnCharacterCreate();
 };
-#endif  // CHARACTER_PHYSICS_SUPPORT
+#endif // CHARACTER_PHYSICS_SUPPORT

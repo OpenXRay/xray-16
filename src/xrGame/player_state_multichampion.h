@@ -23,12 +23,12 @@ public:
 
 protected:
     bool m_can_be_multichampion;
-};  // class player_multichampion
+}; // class player_multichampion
 
 ADD_ACCUMULATIVE_STATE(acpv_multi_champion, player_multichampion);
 #undef ACCUMULATIVE_STATE_LIST
 #define ACCUMULATIVE_STATE_LIST SAVE_TYPE_LIST(acpv_multi_champion, player_multichampion)
 
-}  // namespace award_system
+} // namespace award_system
 
-#endif  //#ifndef PLAYER_STATE_MULTICHAMPION_INCLUDED
+#endif //#ifndef PLAYER_STATE_MULTICHAMPION_INCLUDED

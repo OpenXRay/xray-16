@@ -45,11 +45,11 @@ private:
     property_holder_type* m_property_holder;
     manager const& m_manager;
     shared_str m_id;
-};  // class thunderbolt_id
-}  // namespace thunderbolts
-}  // namespace environment
-}  // namespace editor
+}; // class thunderbolt_id
+} // namespace thunderbolts
+} // namespace environment
+} // namespace editor
 
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR
 
-#endif  // ifndef EDITOR_WEATHER_THUNDERBOLTS_THUNDERBOLT_ID_HPP_INCLUDED
+#endif // ifndef EDITOR_WEATHER_THUNDERBOLTS_THUNDERBOLT_ID_HPP_INCLUDED

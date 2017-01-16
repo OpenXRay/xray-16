@@ -145,7 +145,7 @@ inline_ float ComputeFloatEpsilon()
 {
     float f = 1.0f;
     ((udword&)f) ^= 1;
-    return f - 1.0f;  // You can check it's the same as FLT_EPSILON
+    return f - 1.0f; // You can check it's the same as FLT_EPSILON
 }
 
 inline_ bool IsFloatZero(float x, float epsilon = 1e-6f)
@@ -237,4 +237,4 @@ FUNCTION ICECORE_API int intChop(const float& f);
 FUNCTION ICECORE_API int intFloor(const float& f);
 FUNCTION ICECORE_API int intCeil(const float& f);
 
-#endif  // __ICEFPU_H__
+#endif // __ICEFPU_H__

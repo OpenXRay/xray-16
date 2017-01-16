@@ -47,10 +47,10 @@ CPHDestroyable::CPHDestroyable()
     m_depended_objects = 0;
 }
 /////////spawn object representing destroyed
-///item//////////////////////////////////////////////////////////////////////////////////
+/// item//////////////////////////////////////////////////////////////////////////////////
 void CPHDestroyable::GenSpawnReplace(u16 ref_id, LPCSTR section, shared_str visual_name)
 {
-    CSE_Abstract* D = F_entity_Create(section);  //*cNameSect()
+    CSE_Abstract* D = F_entity_Create(section); //*cNameSect()
     VERIFY(D);
     CSE_Visual* V = smart_cast<CSE_Visual*>(D);
     V->set_visual(*visual_name);
@@ -60,7 +60,7 @@ void CPHDestroyable::GenSpawnReplace(u16 ref_id, LPCSTR section, shared_str visu
     // init
 
     // Send
-    D->s_name = section;  //*cNameSect()
+    D->s_name = section; //*cNameSect()
     D->ID_Parent = u16(-1);
     InitServerObject(D);
     if (OnServer()) {
@@ -300,7 +300,7 @@ void CPHDestroyable::NotificatePart(CPHDestroyableNotificate* dn)
     dn->PPhysicsShellHolder()->setVisible(TRUE);
     dn->PPhysicsShellHolder()->setEnabled(TRUE);
 
-    if (own_shell->IsGroupObject()) new_shell->RegisterToCLGroup(own_shell->GetCLGroup());  // CollideBits
+    if (own_shell->IsGroupObject()) new_shell->RegisterToCLGroup(own_shell->GetCLGroup()); // CollideBits
     CPHSkeleton* ps = dn->PPhysicsShellHolder()->PHSkeleton();
     if (ps) {
         if (own_ini && own_ini->section_exist("autoremove_parts")) {

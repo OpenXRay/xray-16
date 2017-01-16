@@ -28,4 +28,4 @@ void RC4Encrypt(RC4Context* context, const unsigned char* src, unsigned char* de
 #if defined(__cplusplus)
 }
 #endif
-#endif  // __GSRC4_H__
+#endif // __GSRC4_H__

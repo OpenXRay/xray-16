@@ -33,7 +33,7 @@ void CUIFrags2::Init(CUIXml& xml_doc, LPCSTR path, LPCSTR backgrnd_path)
     float x = xml_doc.ReadAttribFlt(path, 0, "x2");
     R_ASSERT(x);
     pos = m_pStats2->GetWndPos();
-    pos.x = x;  //
+    pos.x = x; //
     pos.y += 3;
     m_pStats2->SetWndPos(pos);
     // team2 statas

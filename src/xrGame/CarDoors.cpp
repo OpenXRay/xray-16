@@ -460,7 +460,7 @@ void CCar::SDoor::GetExitPosition(Fvector& pos)
         // CBoneInstance bi=K->LL_GetBoneInstance(bone_id);
         CBoneData& bd = K->LL_GetData(bone_id);
         K->LL_GetBindTransform(bones_bind_forms);
-        Fobb bb;  //=bd.obb;
+        Fobb bb; //=bd.obb;
 
         Fmatrix pf;
         pf.mul(pcar->XFORM(), bones_bind_forms[bone_id]);
@@ -585,7 +585,7 @@ bool CCar::SDoor::TestPass(const Fvector& pos, const Fvector& dir)
 bool CCar::SDoor::CanEnter(const Fvector& pos, const Fvector& dir, const Fvector& foot_pos)
 {
     // if(!joint) return true;//temp for fake doors
-    return (state == opened || state == broken || !joint) && TestPass(foot_pos, dir) && IsInArea(pos, dir);  //
+    return (state == opened || state == broken || !joint) && TestPass(foot_pos, dir) && IsInArea(pos, dir); //
 }
 
 void CCar::SDoor::SaveNetState(NET_Packet& P)
@@ -689,15 +689,15 @@ void CCar::SDoor::SDoorway::Init(SDoor* adoor)
     if (_abs(door_axis_in_door.x) > _abs(door_axis_in_door.y)) {
         if (_abs(door_axis_in_door.x) > _abs(door_axis_in_door.z)) {
             // door axis aligned along x
-            door_plane_axes.y = 0;  // door axis is x (door_plane_axes.y stores door axis direction (i,j,k)=(0,1,2)
+            door_plane_axes.y = 0; // door axis is x (door_plane_axes.y stores door axis direction (i,j,k)=(0,1,2)
             door->joint->PSecond_element()->get_Extensions(
                 door_transform.i, janchor.dotproduct(door_transform.i), lo_ext, hi_ext);
-            door->door_plane_ext.y = hi_ext - lo_ext;  // door extension along door axis
+            door->door_plane_ext.y = hi_ext - lo_ext; // door extension along door axis
 
             door->joint->PSecond_element()->get_Extensions(
                 door_transform.j, janchor.dotproduct(door_transform.j), lo_ext, hi_ext);
-            door_plane_ext.x = hi_ext - lo_ext;  // door extensions
-            door_plane_axes.x = 1;  // door_plane_axes.x stores door direction it may be j or k in this point
+            door_plane_ext.x = hi_ext - lo_ext; // door extensions
+            door_plane_axes.x = 1; // door_plane_axes.x stores door direction it may be j or k in this point
 
             door->joint->PSecond_element()->get_Extensions(
                 door_transform.k, janchor.dotproduct(door_transform.k), lo_ext, hi_ext);

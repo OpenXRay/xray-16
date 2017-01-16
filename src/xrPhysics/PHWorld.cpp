@@ -47,9 +47,9 @@ IPHWorld* __stdcall physics_world()
 }
 
 void __stdcall create_physics_world(
-    bool mt, CObjectSpace* os, CObjectList* lo, CRenderDeviceBase* dv)  // IPHWorldUpdateCallbck &commander,
+    bool mt, CObjectSpace* os, CObjectList* lo, CRenderDeviceBase* dv) // IPHWorldUpdateCallbck &commander,
 {
-    ph_world = new CPHWorld();  //&commander
+    ph_world = new CPHWorld(); //&commander
     VERIFY(os);
     //		VERIFY( lo );
     VERIFY(dv);
@@ -129,7 +129,7 @@ static struct sempty_update_callback : public IPHWorldUpdateCallbck
 } empty_update_callback;
 
 CPHWorld::CPHWorld()
-    :  // IPHWorldUpdateCallbck		*_update_callback
+    : // IPHWorldUpdateCallbck		*_update_callback
       m_update_callback(&empty_update_callback),
       m_default_contact_shotmark(0), m_default_character_contact_shotmark(0), physics_step_time_callback(0),
       m_object_space(0), m_level_objects(0), m_device(0)
@@ -194,7 +194,7 @@ dVector3 center			=	{level_center.x,0.f,level_center.z};
 
 #endif
     ContactGroup = dJointGroupCreate(0);
-    dWorldSetGravity(phWorld, 0, -Gravity(), 0);  //-2.f*9.81f
+    dWorldSetGravity(phWorld, 0, -Gravity(), 0); //-2.f*9.81f
     Mesh.Create(0, phWorld);
 #ifdef PH_PLAIN
     plane = dCreatePlane(Space, 0, 1, 0, 0.3f);
@@ -245,7 +245,7 @@ void CPHWorld::SetGravity(float g)
 {
     m_gravity = g;
     dWorldID phWorld = 0;
-    dWorldSetGravity(phWorld, 0, -m_gravity, 0);  //-2.f*9.81f
+    dWorldSetGravity(phWorld, 0, -m_gravity, 0); //-2.f*9.81f
 }
 
 void CPHWorld::OnFrame()
@@ -428,7 +428,7 @@ void CPHWorld::Step()
 #ifdef DEBUG
     debug_output().dbg_contacts_num() = ContactGroup->num;
 #endif
-    dJointGroupEmpty(ContactGroup);  // this is to be called after PhDataUpdate!!!-the order is critical!!!
+    dJointGroupEmpty(ContactGroup); // this is to be called after PhDataUpdate!!!-the order is critical!!!
     ContactFeedBacks.empty();
     ContactEffectors.empty();
 
@@ -520,7 +520,7 @@ void CPHWorld::FrameStep(dReal step)
 #endif
     b_processing = true;
 
-    start_time = Device().dwTimeGlobal;  // - u32(m_frame_time*1000);
+    start_time = Device().dwTimeGlobal; // - u32(m_frame_time*1000);
     if (ph_console::g_bDebugDumpPhysicsStep && it_number > 20)
         Msg("!!!TOO MANY PHYSICS STEPS PER FRAME = %d !!!", it_number);
     for (UINT i = 0; i < it_number; ++i)

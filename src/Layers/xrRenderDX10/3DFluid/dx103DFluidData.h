@@ -11,7 +11,7 @@ public:
     {
         VP_VELOCITY0 = 0,
         VP_PRESSURE,
-        VP_COLOR,  //	Swap with global after update
+        VP_COLOR, //	Swap with global after update
         VP_NUM_TARGETS
     };
 
@@ -66,7 +66,7 @@ public:
 //	Allow real-time config reload
 #ifdef DEBUG
     void ReparseProfile(const xr_string& Profile);
-#endif  //	DEBUG
+#endif //	DEBUG
 
 private:
     typedef dx103DFluidEmitters::CEmitter CEmitter;
@@ -91,4 +91,4 @@ private:
     ID3DTexture3D* m_pRTTextures[VP_NUM_TARGETS];
 };
 
-#endif  //	dx103DFluidData_included
+#endif //	dx103DFluidData_included

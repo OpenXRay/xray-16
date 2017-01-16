@@ -165,4 +165,4 @@ public:
     Point mExtentsCoeff;
 };
 
-#endif  // __OPC_OPTIMIZEDTREE_H__
+#endif // __OPC_OPTIMIZEDTREE_H__

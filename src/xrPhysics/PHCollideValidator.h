@@ -19,8 +19,8 @@ class CPHCollideValidator
         cbNCClassSmall = 1 << 7,
         cbClassRagDoll = 1 << 8,
         cbNCClassRagDoll = 1 << 9,
-        cbClassAnimated = 1 << 10,    //класс анимированного физического объекта
-        cbNCClassAnimated = 1 << 11,  //свойство игнорирования класса анимированного физического объекта
+        cbClassAnimated = 1 << 10,   //класс анимированного физического объекта
+        cbNCClassAnimated = 1 << 11, //свойство игнорирования класса анимированного физического объекта
         cbNone = 1 << 12
 
     };

@@ -46,14 +46,14 @@ void dxApplicationRender::load_draw_internal(CApplication& owner)
     RImplementation.rmNormal();
     RCache.set_RT(HW.pBaseRT);
     RCache.set_ZB(HW.pBaseZB);
-#endif  //	USE_DX10
+#endif //	USE_DX10
 
 #if defined(USE_DX10) || defined(USE_DX11)
     FLOAT ColorRGBA[4] = {0.0f, 0.0f, 0.0f, 0.0f};
     HW.pContext->ClearRenderTargetView(RCache.get_RT(), ColorRGBA);
-#else   //	USE_DX10
+#else  //	USE_DX10
     CHK_DX(HW.pDevice->Clear(0, 0, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0, 0, 0, 0), 1, 0));
-#endif  //	USE_DX10
+#endif //	USE_DX10
 
     if (!sh_progress) {
         return;
@@ -64,13 +64,13 @@ void dxApplicationRender::load_draw_internal(CApplication& owner)
 //	FLOAT ColorRGBA[4] = {0.0f, 0.0f, 1.0f, 0.0f};
 //	HW.pContext->ClearRenderTargetView( RCache.get_RT(), ColorRGBA);
 //	HW.pContext->ClearDepthStencilView( RCache.get_ZB(), D3D_CLEAR_DEPTH|D3D_CLEAR_STENCIL, 1.0f, 0);
-#endif  //	USE_DX10
+#endif //	USE_DX10
 
     float _w = (float)Device.dwWidth;
     float _h = (float)Device.dwHeight;
     bool b_ws = (_w / _h) > 1.34f;
     bool b_16x9 = b_ws && ((_w / _h) > 1.77f);
-    float ws_k = (b_16x9) ? 0.75f : 0.8333f;  // 16:9 or 16:10
+    float ws_k = (b_16x9) ? 0.75f : 0.8333f; // 16:9 or 16:10
     float ws_w = b_ws ? (b_16x9 ? 171.0f : 102.6f) : 0.0f;
 
     float bw = 1024.0f;
@@ -89,7 +89,7 @@ void dxApplicationRender::load_draw_internal(CApplication& owner)
 
     Fvector2 back_offset;
     if (b_ws)
-        back_offset.set(ws_w * ws_k, 0.0f);  // ws_w == 171
+        back_offset.set(ws_w * ws_k, 0.0f); // ws_w == 171
     else
         back_offset.set(0.0f, 0.0f);
 
@@ -97,7 +97,7 @@ void dxApplicationRender::load_draw_internal(CApplication& owner)
 
     back_tex_size.set(506, 4);
     back_size.set(506, 4);
-    if (b_ws) back_size.x *= ws_k;  // ws
+    if (b_ws) back_size.x *= ws_k; // ws
 
     back_tex_coords.lt.set(0, 772);
     back_tex_coords.rb.add(back_tex_coords.lt, back_tex_size);
@@ -146,7 +146,7 @@ void dxApplicationRender::load_draw_internal(CApplication& owner)
 
     back_tex_size.set(1024, 768);
     back_size.set(1024, 768);
-    if (b_ws) back_size.x *= ws_k;  // ws
+    if (b_ws) back_size.x *= ws_k; // ws
 
     back_tex_coords.lt.set(0, 0);
     back_tex_coords.rb.add(back_tex_coords.lt, back_tex_size);
@@ -159,7 +159,7 @@ void dxApplicationRender::load_draw_internal(CApplication& owner)
     back_coords.rb.mul(k);
     draw_face(sh_progress, back_coords, back_tex_coords, tsz);
 
-    if (b_ws)  // draw additional frames (left&right)
+    if (b_ws) // draw additional frames (left&right)
     {
         // left
         back_size.set(ws_w * ws_k, 768.0f);
@@ -227,7 +227,7 @@ void dxApplicationRender::load_draw_internal(CApplication& owner)
         r.lt.y += offs;
         back_size.set(1024, 399);
 
-        if (b_ws) back_size.x *= ws_k;  // ws 0.625
+        if (b_ws) back_size.x *= ws_k; // ws 0.625
 
         r.rb.add(r.lt, back_size);
         r.lt.mul(k);
@@ -316,7 +316,7 @@ void draw_multiline_text(CGameFont* F, float fTargetWidth, LPCSTR pszText)
             strncpy_s(buff + xr_strlen(buff), sizeof(buff) - xr_strlen(buff), ch, next_word - ch);
             ch = next_word;
         }
-        if (0 == *next_word)  // end of text
+        if (0 == *next_word) // end of text
         {
             strncpy_s(buff + xr_strlen(buff), sizeof(buff) - xr_strlen(buff), ch, next_word - ch);
             F->OutNext(buff);

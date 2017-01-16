@@ -17,7 +17,7 @@
 
 #ifndef MASTER_GOLD
 #include "ai_debug.h"
-#endif  // MASTER_GOLD
+#endif // MASTER_GOLD
 
 #pragma warning(push)
 #pragma warning(disable : 4995)
@@ -119,7 +119,7 @@ void moving_objects::fill_nearest_moving(moving_object* object)
 			Msg					("    %s",(*I)->object().cName().c_str());
 		}
 	}
-#endif  // 0
+#endif // 0
 
     if (m_nearest_moving.empty()) return;
 
@@ -165,7 +165,7 @@ void moving_objects::generate_emitters()
             VERIFY(*I < *J);
         }
     }
-#endif  // DEBUG
+#endif // DEBUG
 
     u32 size = m_collision_emitters.size();
     m_collision_emitters.resize(size + m_nearest_moving.size());
@@ -481,9 +481,9 @@ void moving_objects::query_action_dynamic(moving_object* object)
             (*I)->dynamic_query().clear();
     }
 
-#if 0   // def DEBUG
+#if 0  // def DEBUG
 	Msg							("%6d end of iteration", Device.dwFrame);
-#endif  // DEBUG
+#endif // DEBUG
 
     if (!m_collisions.empty()) {
         resolve_collisions();
@@ -492,7 +492,7 @@ void moving_objects::query_action_dynamic(moving_object* object)
 
     m_previous_collisions = m_collisions;
 
-#if 0   // def DEBUG
+#if 0  // def DEBUG
 	{
 		Msg							("Frame[%d], collisions[%d]",Device.dwFrame, m_visited_emitters.size());
 		NEAREST_MOVING::iterator	I = m_visited_emitters.begin();
@@ -500,12 +500,12 @@ void moving_objects::query_action_dynamic(moving_object* object)
 		for ( ; I != E; ++I)
 			Msg						("  %s",*(*I)->object().cName());
 	}
-#endif  // DEBUG
+#endif // DEBUG
 
     NEAREST_MOVING::iterator I = m_visited_emitters.begin();
     NEAREST_MOVING::iterator E = m_visited_emitters.end();
     for (; I != E; ++I)
         (*I)->action(moving_object::action_move);
 
-#endif  // MASTER_GOLD
+#endif // MASTER_GOLD
 }

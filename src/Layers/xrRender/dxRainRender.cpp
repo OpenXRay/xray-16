@@ -117,18 +117,18 @@ void dxRainRender::Render(CEffect_Rain& owner)
                     float height = max_distance;
                     if (owner.RayPick(src_p, one.D, height, collide::rqtBoth)) {
                         if (_sqr(height) <= dist_sqr) {
-                            one.invalidate();  // need born
-                                               //							Log("1");
+                            one.invalidate(); // need born
+                                              //							Log("1");
                         }
                         else
                         {
-                            owner.RenewItem(one, height - _sqrt(dist_sqr), TRUE);  // fly to point
-                                                                                   //							Log("2",height-dist);
+                            owner.RenewItem(one, height - _sqrt(dist_sqr), TRUE); // fly to point
+                                                                                  //							Log("2",height-dist);
                         }
                     }
                     else
                     {
-                        owner.RenewItem(one, max_distance - _sqrt(dist_sqr), FALSE);  // fly ...
+                        owner.RenewItem(one, max_distance - _sqrt(dist_sqr), FALSE); // fly ...
                         //						Log("3",1.5f*b_height-dist);
                     }
                 }

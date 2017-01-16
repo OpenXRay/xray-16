@@ -33,7 +33,7 @@ const shared_str game_cl_TeamDeathmatch::GetTeamMenu(s16 team)
     };
 #ifdef DEBUG
     return NULL;
-#endif  // DEBUG
+#endif // DEBUG
 }
 
 game_cl_TeamDeathmatch::game_cl_TeamDeathmatch()
@@ -111,7 +111,7 @@ void game_cl_TeamDeathmatch::TranslateGameMessage(u32 msg, NET_Packet& P)
 
     switch (msg)
     {
-    case GAME_EVENT_PLAYER_JOIN_TEAM:  // tdm
+    case GAME_EVENT_PLAYER_JOIN_TEAM: // tdm
     {
         string64 PlayerName;
         P.r_stringZ(PlayerName);
@@ -119,7 +119,7 @@ void game_cl_TeamDeathmatch::TranslateGameMessage(u32 msg, NET_Packet& P)
         P.r_u16(Team);
 
         xr_sprintf(Text, "%s%s %s%s %s%s",
-            "",  // no color
+            "", // no color
             PlayerName, Color_Main, *st.translate("mp_joined"), CTeamInfo::GetTeam_color_tag(int(Team)),
             CTeamInfo::GetTeam_name(int(Team)));
         if (CurrentGameUI()) CurrentGameUI()->CommonMessageOut(Text);
@@ -128,7 +128,7 @@ void game_cl_TeamDeathmatch::TranslateGameMessage(u32 msg, NET_Packet& P)
     }
     break;
 
-    case PLAYER_CHANGE_TEAM:  // tdm
+    case PLAYER_CHANGE_TEAM: // tdm
     {
         u16 PlayerID, OldTeam, NewTeam;
         P.r_u16(PlayerID);

@@ -61,7 +61,7 @@ IC Ivector2 const& Upgrade::get_scheme_index() const
     return m_scheme_index;
 }
 
-}  // namespace upgrade
-}  // namespace inventory
+} // namespace upgrade
+} // namespace inventory
 
-#endif  // INVENTORY_UPGRADE_INLINE_H_INCLUDED
+#endif // INVENTORY_UPGRADE_INLINE_H_INCLUDED

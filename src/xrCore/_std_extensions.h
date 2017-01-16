@@ -311,7 +311,7 @@ inline int __cdecl xr_sprintf(char (&destination)[count], LPCSTR format_string, 
     va_start(args, format_string);
     return vsprintf_s(destination, count, format_string, args);
 }
-#else   // #ifndef MASTER_GOLD
+#else  // #ifndef MASTER_GOLD
 
 inline int xr_strcpy(LPSTR destination, size_t const destination_size, LPCSTR source)
 {
@@ -346,7 +346,7 @@ inline int __cdecl xr_sprintf(char (&destination)[count], LPCSTR format_string, 
     va_start(args, format_string);
     return vsnprintf_s(destination, count, count - 1, format_string, args);
 }
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
 
 template <int count>
 inline int xr_strcpy(char (&destination)[count], LPCSTR source)
@@ -359,7 +359,7 @@ inline int xr_strcat(char (&destination)[count], LPCSTR source)
 {
     return xr_strcat(destination, count, source);
 }
-#endif  // #ifndef _EDITOR
+#endif // #ifndef _EDITOR
 
 inline void MemFill32(void* dst, u32 value, size_t dstSize)
 {
@@ -373,6 +373,6 @@ XRCORE_API char* timestamp(string64& dest);
 
 extern XRCORE_API u32 crc32(const void* P, u32 len);
 extern XRCORE_API u32 crc32(const void* P, u32 len, u32 starting_crc);
-extern XRCORE_API u32 path_crc32(const char* path, u32 len);  // ignores '/' and '\'
+extern XRCORE_API u32 path_crc32(const char* path, u32 len); // ignores '/' and '\'
 
-#endif  // _STD_EXT_internal
+#endif // _STD_EXT_internal

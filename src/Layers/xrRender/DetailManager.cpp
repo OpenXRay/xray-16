@@ -10,14 +10,14 @@
 
 #ifdef _EDITOR
 #include "ESceneClassList.h"
+#include "Environment.h"
+#include "IGame_Persistent.h"
 #include "Scene.h"
 #include "SceneObject.h"
-#include "IGame_Persistent.h"
-#include "Environment.h"
 #else
-#include "xrEngine/IGame_Persistent.h"
-#include "xrEngine/Environment.h"
 #include <xmmintrin.h>
+#include "xrEngine/Environment.h"
+#include "xrEngine/IGame_Persistent.h"
 #endif
 
 const float dbgOffset = 0.f;
@@ -213,7 +213,7 @@ void CDetailManager::UpdateVisibleM()
             u32 mask = 0xff;
             u32 res = View.testSAABB(MS.vis.sphere.P, MS.vis.sphere.R, MS.vis.box.data(), mask);
             if (fcvNone == res) {
-                continue;  // invisible-view frustum
+                continue; // invisible-view frustum
             }
             // test slots
 
@@ -237,12 +237,12 @@ void CDetailManager::UpdateVisibleM()
                     u32 _mask = mask;
                     u32 _res = View.testSAABB(S.vis.sphere.P, S.vis.sphere.R, S.vis.box.data(), _mask);
                     if (fcvNone == _res) {
-                        continue;  // invisible-view frustum
+                        continue; // invisible-view frustum
                     }
                 }
 #ifndef _EDITOR
                 if (!RImplementation.HOM.visible(S.vis)) {
-                    continue;  // invisible-occlusion
+                    continue; // invisible-occlusion
                 }
 #endif
                 // Add to visibility structures
@@ -265,7 +265,7 @@ void CDetailManager::UpdateVisibleM()
                         sp.r_items[2].clear_not_free();
 
                         float R = objects[sp.id]->bv_sphere.R;
-                        float Rq_drcp = R * R * dist_sq_rcp;  // reordered expression for 'ssa' calc
+                        float Rq_drcp = R * R * dist_sq_rcp; // reordered expression for 'ssa' calc
 
                         SlotItem **siIT = &(*sp.items.begin()), **siEND = &(*sp.items.end());
                         for (; siIT != siEND; siIT++)
@@ -338,14 +338,14 @@ void CDetailManager::Render()
 void __stdcall CDetailManager::MT_CALC()
 {
 #ifndef _EDITOR
-    if (0 == RImplementation.Details) return;  // possibly deleted
+    if (0 == RImplementation.Details) return; // possibly deleted
     if (0 == dtFS) return;
     if (!psDeviceFlags.is(rsDetails)) return;
 #endif
 
     MT.Enter();
     if (m_frame_calc != RDEVICE.dwFrame)
-        if ((m_frame_rendered + 1) == RDEVICE.dwFrame)  // already rendered
+        if ((m_frame_rendered + 1) == RDEVICE.dwFrame) // already rendered
         {
             Fvector EYE = RDEVICE.vCameraPosition_saved;
 

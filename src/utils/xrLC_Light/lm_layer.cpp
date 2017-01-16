@@ -20,7 +20,7 @@ void lm_layer::Pack(xr_vector<u32>& dest) const
         *W++ = color_rgba(_r, _g, _b, _d);
     }
 }
-void lm_layer::Pack_hemi(xr_vector<u32>& dest) const  //.
+void lm_layer::Pack_hemi(xr_vector<u32>& dest) const //.
 {
     dest.resize(width * height);
     xr_vector<base_color>::const_iterator I = surface.begin();

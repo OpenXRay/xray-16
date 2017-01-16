@@ -15,6 +15,6 @@ IC target_selector::callback_type const& target_selector::callback() const
     return (m_script_callback);
 }
 
-}  // namespace smart_cover
+} // namespace smart_cover
 
-#endif  // SMART_COVER_PLANNER_TARGET_SELECTOR_INLINE_H_INCLUDED
+#endif // SMART_COVER_PLANNER_TARGET_SELECTOR_INLINE_H_INCLUDED

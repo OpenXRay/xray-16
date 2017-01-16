@@ -60,4 +60,4 @@ u32 const player_blitzkrieg::get_u32_param()
     return m_deliver_time;
 };
 
-}  // namespace award_system
+} // namespace award_system

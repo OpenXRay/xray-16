@@ -73,7 +73,7 @@ bool CPHMovementControl::ActivateBoxDynamic(
         trying_times[id] = Device.dwTimeGlobal;
 
         // trying_poses[id].set(cast_fv(dBodyGetPosition(m_character->get_body())));
-        m_character->GetBodyPosition(trying_poses[id]);  //.set(cast_fv(dBodyGetPosition(m_character->get_body())));
+        m_character->GetBodyPosition(trying_poses[id]); //.set(cast_fv(dBodyGetPosition(m_character->get_body())));
     }
     else
     {

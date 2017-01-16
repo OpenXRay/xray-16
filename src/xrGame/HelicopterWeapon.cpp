@@ -165,7 +165,7 @@ void CHelicopter::MGunFireStart()
                 m_enemy.fire_trail_length_curr = half_trail * 2.0f;
                 clamp(m_enemy.fire_trail_length_curr, 0.0f, m_enemy.fire_trail_length_des);
                 //				Msg("Start fire. Desired length=%f,
-                //cur_length=%f",m_enemy.fire_trail_length_des,m_enemy.fire_trail_length_curr);
+                // cur_length=%f",m_enemy.fire_trail_length_des,m_enemy.fire_trail_length_curr);
             }
             else
                 m_enemy.fire_trail_length_curr = m_enemy.fire_trail_length_des;
@@ -265,7 +265,7 @@ void CHelicopter::UpdateMGunDir()
     XFi.invert(XFORM());
     Fvector dep;
     XFi.transform_tiny(dep, m_enemy.destEnemyPos);
-    {  // x angle
+    { // x angle
         Fvector A_;
         A_.sub(dep, m_bind_x);
         m_i_bind_x_xform.transform_dir(A_);
@@ -275,7 +275,7 @@ void CHelicopter::UpdateMGunDir()
         clamp(m_tgt_rot.x, -m_lim_x_rot.y, -m_lim_x_rot.x);
         if (!fsimilar(sv_x, m_tgt_rot.x, EPS_L)) m_allow_fire = FALSE;
     }
-    {  // y angle
+    { // y angle
         Fvector A_;
         A_.sub(dep, m_bind_y);
         m_i_bind_y_xform.transform_dir(A_);

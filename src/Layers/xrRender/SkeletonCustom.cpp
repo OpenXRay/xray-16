@@ -12,7 +12,7 @@ int psSkeletonUpdate = 32;
 Lock UCalc_Mutex
 #ifdef CONFIG_PROFILE_LOCKS
     (MUTEX_PROFILE_ID(UCalc_Mutex))
-#endif  // CONFIG_PROFILE_LOCKS
+#endif // CONFIG_PROFILE_LOCKS
         ;
 
 #ifndef _EDITOR
@@ -188,7 +188,7 @@ void CKinematics::Load(const char* N, IReader* data, u32 dwFlags)
 
             VERIFY3(m_lod, "Cant create LOD model for", N);
             //.			VERIFY2			(m_lod->Type==MT_HIERRARHY || m_lod->Type==MT_PROGRESSIVE ||
-            //m_lod->Type==MT_NORMAL,lod_name.c_str());
+            // m_lod->Type==MT_NORMAL,lod_name.c_str());
             /*
                         strconcat		(name_load, short_name, ":lod:1");
                         m_lod 			= GlobalEnv.Render->model_CreateChild(name_load,LD);
@@ -441,7 +441,7 @@ void CKinematics::Depart()
         u32 count = bones->size();
 #ifdef DEBUG
         if (count > 64) Msg("ahtung !!! %d", count);
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
         for (u32 b = 0; b < count; b++)
             visimask.set((u64(1) << b), TRUE);
     }
@@ -583,7 +583,7 @@ DEFINE_VECTOR(Fobb, OBBVec, OBBVecIt);
 bool CKinematics::PickBone(const Fmatrix& parent_xform, IKinematics::pick_result& r, float dist, const Fvector& start,
     const Fvector& dir, u16 bone_id)
 {
-    Fvector S, D;  // normal		= {0,0,0}
+    Fvector S, D; // normal		= {0,0,0}
     // transform ray from world to model
     Fmatrix P;
     P.invert(parent_xform);

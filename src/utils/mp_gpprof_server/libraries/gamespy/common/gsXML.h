@@ -3,7 +3,7 @@
 #ifndef __GSXML_H__
 #define __GSXML_H__
 
-#include "gsLargeInt.h"  // so that it can write large ints
+#include "gsLargeInt.h" // so that it can write large ints
 #include "gsPlatform.h"
 
 #if defined(__cplusplus)
@@ -39,7 +39,7 @@ extern "C" {
 typedef void* GSXmlStreamReader;
 typedef void* GSXmlStreamWriter;
 
-struct gsLargeInt_s;  // forward declare in case of header order problems
+struct gsLargeInt_s; // forward declare in case of header order problems
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
@@ -48,7 +48,7 @@ GSXmlStreamReader gsXmlCreateStreamReader();
 void gsXmlFreeReader(GSXmlStreamReader stream);
 void gsXmlFreeWriter(GSXmlStreamWriter stream);
 
-void gsXmlResetReader(GSXmlStreamReader stream);  // prepare reader for re-use
+void gsXmlResetReader(GSXmlStreamReader stream); // prepare reader for re-use
 
 // Write utilities
 const char* gsXmlWriterGetData(GSXmlStreamWriter stream);
@@ -93,7 +93,7 @@ gsi_bool gsXmlReadChildAsInt64(GSXmlStreamReader stream, const char* matchtag, g
 gsi_bool gsXmlReadChildAsFloat(GSXmlStreamReader stream, const char* matchtag, float* valueOut);
 gsi_bool gsXmlReadChildAsDateTimeElement(GSXmlStreamReader stream, const char* matchtag, time_t* valueOut);
 gsi_bool gsXmlResetChildReadPosition(
-    GSXmlStreamReader stream);  // reset child read position to first child of current element
+    GSXmlStreamReader stream); // reset child read position to first child of current element
 
 // NOTE:  HexStrings are BIG-endian, the valueout will also be BIG-endian.
 // NOTE:  Call with NULL valueOut to get the lenOut.  Doing this will not move read position.
@@ -123,7 +123,7 @@ int gsXmlCountChildren(GSXmlStreamReader stream, const char* matchtag);
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 #if defined(__cplusplus)
-}  // extern "C"
+} // extern "C"
 #endif
 
-#endif  // __GSXML_H__
+#endif // __GSXML_H__

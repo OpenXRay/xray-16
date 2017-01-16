@@ -74,7 +74,7 @@ void dxDebugRender::NextSceneMode()
 //	This mode is not supported in DX10
 #ifndef USE_DX10
     HW.Caps.SceneMode = (HW.Caps.SceneMode + 1) % 3;
-#endif  //	USE_DX10
+#endif //	USE_DX10
 }
 
 void dxDebugRender::ZEnable(bool bEnable)
@@ -108,9 +108,9 @@ void dxDebugRender::SetAmbient(u32 colour)
 #if defined(USE_DX10) || defined(USE_DX11)
     //	TODO: DX10: Check if need this for DX10
     VERIFY(!"Not implemented for DX10");
-#else   //	USE_DX10
+#else  //	USE_DX10
     CHK_DX(HW.pDevice->SetRenderState(D3DRS_AMBIENT, colour));
-#endif  //	USE_DX10
+#endif //	USE_DX10
 }
 
 void dxDebugRender::SetDebugShader(dbgShaderHandle shdHandle)
@@ -118,7 +118,7 @@ void dxDebugRender::SetDebugShader(dbgShaderHandle shdHandle)
     R_ASSERT(shdHandle < dbgShaderCount);
 
     static const LPCSTR dbgShaderParams[][2] = {
-        {"hud\\default", "ui\\ui_pop_up_active_back"},  // dbgShaderWindow
+        {"hud\\default", "ui\\ui_pop_up_active_back"}, // dbgShaderWindow
     };
 
     if (!m_dbgShaders[shdHandle])
@@ -172,4 +172,4 @@ public:
 } rdebug_render_impl;
 dxDebugRender* rdebug_render = &rdebug_render_impl;
 
-#endif  //	DEBUG
+#endif //	DEBUG

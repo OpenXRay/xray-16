@@ -51,7 +51,7 @@ private:
     {
         ds_not_active = 0x00,
         ds_active = 0x01
-    };  // enum_dumper_state
+    }; // enum_dumper_state
 
     void realloc_compress_buffer(u32 need_size);
     u8* m_buffer_for_compress;
@@ -80,8 +80,8 @@ private:
     inline void timer_begin(LPCSTR comment) {}
     inline void timer_end() {}
 #endif
-};  // class configs_dumper
+}; // class configs_dumper
 
-}  // namespace mp_anticheat
+} // namespace mp_anticheat
 
 #endif

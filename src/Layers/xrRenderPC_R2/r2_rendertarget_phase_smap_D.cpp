@@ -36,7 +36,7 @@ void CRenderTarget::phase_smap_direct(light* L, u32 sub_phase)
     }
     */
     //	Cull always CCW. If you want to revert to previouse solution, please, revert bias setup/
-    RCache.set_CullMode(CULL_CCW);  // near
+    RCache.set_CullMode(CULL_CCW); // near
     if (RImplementation.o.HW_smap)
         RCache.set_ColorWriteEnable(FALSE);
     else
@@ -46,7 +46,7 @@ void CRenderTarget::phase_smap_direct(light* L, u32 sub_phase)
 void CRenderTarget::phase_smap_direct_tsh(light* L, u32 sub_phase)
 {
     VERIFY(RImplementation.o.Tshadows);
-    u32 _clr = 0xffffffff;  // color_rgba(127,127,12,12);
+    u32 _clr = 0xffffffff; // color_rgba(127,127,12,12);
     RCache.set_ColorWriteEnable();
     CHK_DX(HW.pDevice->Clear(0L, NULL, D3DCLEAR_TARGET, _clr, 1.0f, 0L));
 }

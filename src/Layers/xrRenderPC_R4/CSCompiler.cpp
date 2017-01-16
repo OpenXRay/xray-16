@@ -127,7 +127,7 @@ CSCompiler& CSCompiler::defOutput(LPCSTR ResourceName, ref_rt rt)
 
     if (stage >= m_Textures.size()) m_Textures.resize(stage + 1);
 
-    m_Outputs[stage] = rt->pUAView;  //!!!dangerous view can be deleted
+    m_Outputs[stage] = rt->pUAView; //!!!dangerous view can be deleted
 
     return *this;
 }
@@ -146,7 +146,7 @@ CSCompiler& CSCompiler::defTexture(LPCSTR ResourceName, ref_texture texture)
 
     if (stage >= m_Textures.size()) m_Textures.resize(stage + 1);
 
-    m_Textures[stage] = texture->get_SRView();  //!!!dangerous view can be deleted
+    m_Textures[stage] = texture->get_SRView(); //!!!dangerous view can be deleted
 
     return *this;
 }

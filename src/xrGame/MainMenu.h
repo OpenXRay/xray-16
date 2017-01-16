@@ -21,12 +21,12 @@ namespace gamespy_gp
 class account_manager;
 class login_manager;
 
-}  // namespace gamespy_gp
+} // namespace gamespy_gp
 namespace gamespy_profile
 {
 class profile_store;
 class stats_submitter;
-}  // namespace gamespy_profile
+} // namespace gamespy_profile
 
 class atlas_submit_queue;
 

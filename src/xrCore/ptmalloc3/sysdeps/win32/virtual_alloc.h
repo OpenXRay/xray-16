@@ -3,7 +3,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif  // #ifdef __cplusplus
+#endif // #ifdef __cplusplus
 
 typedef void const* out_of_memory_handler_parameter_type;
 typedef void(__stdcall* out_of_memory_handler_type)(void*, out_of_memory_handler_parameter_type, int);
@@ -37,7 +37,7 @@ void initialize_virtual_alloc_arena(struct virtual_alloc_arena* result, void* bu
 void finalize_virtual_alloc_arena(struct virtual_alloc_arena* arena);
 
 #ifdef __cplusplus
-}  // extern "C"
-#endif  // #ifdef __cplusplus
+} // extern "C"
+#endif // #ifdef __cplusplus
 
-#endif  // #ifndef VIRTUAL_ALLOC_H_INCLUDED
+#endif // #ifndef VIRTUAL_ALLOC_H_INCLUDED

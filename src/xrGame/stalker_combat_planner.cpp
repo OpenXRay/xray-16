@@ -116,7 +116,7 @@ void CStalkerCombatPlanner::initialize()
 
 #ifdef DEBUG
 //	inherited_planner::m_use_log = true;
-#endif  // DEBUG
+#endif // DEBUG
 
     if (!m_loaded) {
         CScriptActionPlanner::m_storage.set_property(eWorldPropertyInCover, false);

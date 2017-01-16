@@ -81,10 +81,10 @@ void demo_player_info::load_from_player(game_PlayerState* player_state)
     R_ASSERT(tmp_game);
     s16 tmp_team = tmp_game->ModifyTeam(player_state->team);
     if (tmp_team < 0) {
-        tmp_team = 2;  // spectator
+        tmp_team = 2; // spectator
     }
     if ((tmp_game->Type() == eGameIDDeathmatch) && (tmp_team != 2)) {
-        tmp_team = 0;  // in deathmatch if player is not spectator, he is in green team
+        tmp_team = 0; // in deathmatch if player is not spectator, he is in green team
     }
     m_team = static_cast<u8>(tmp_team);
 }

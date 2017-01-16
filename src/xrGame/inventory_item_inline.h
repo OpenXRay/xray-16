@@ -31,7 +31,7 @@ IC bool CInventoryItem::process_if_exists(
     }
 
     if (!test) {
-        value = value + (pSettings->*method)(section, name);  // add
+        value = value + (pSettings->*method)(section, name); // add
     }
     return true;
 }
@@ -49,7 +49,7 @@ IC bool CInventoryItem::process_if_exists_set(
     }
 
     if (!test) {
-        value = (pSettings->*method)(section, name);  // set
+        value = (pSettings->*method)(section, name); // set
     }
     return true;
 }

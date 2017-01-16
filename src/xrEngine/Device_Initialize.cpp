@@ -29,7 +29,7 @@ void CRenderDevice::initialize_editor()
     m_hWnd = m_editor->view_handle();
     VERIFY(m_hWnd != INVALID_HANDLE_VALUE);
 }
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR
 
 void CRenderDevice::Initialize()
 {

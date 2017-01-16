@@ -16,7 +16,7 @@ static pcstr const s_sound_string = "_sound";
 static pcstr const s_detect_sound_string = "_detect_sound";
 static pcstr const s_enable_for_dead_string = "_enable_for_dead";
 
-}  // namespace detail
+} // namespace detail
 
 monster_aura::monster_aura(CBaseMonster* const object, pcstr const name)
     : m_object(object), m_pp_effector_name(NULL), m_pp_index(0)
@@ -39,10 +39,10 @@ float monster_aura::override_if_debug(pcstr var_name, float const value) const
     STRCONCAT(full_var_name, m_name, var_name);
 
     return m_object->override_if_debug(full_var_name, value);
-#else   // DEBUG
-    var_name;  // prevent warning
+#else  // DEBUG
+    var_name; // prevent warning
     return value;
-#endif  // DEBUG
+#endif // DEBUG
 }
 
 float monster_aura::calculate() const

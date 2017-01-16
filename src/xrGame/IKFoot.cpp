@@ -28,16 +28,16 @@ void CIKFoot::Create(IKinematics* K, LPCSTR section, u16 bones[4])
     /// defaults
     m_ref_bone = 2;
     if (m_ref_bone == 2) {
-        m_foot_normal.v.set(1, 0, 0);  // 2
+        m_foot_normal.v.set(1, 0, 0); // 2
         m_foot_normal.bone = 2;
-        m_foot_direction.v.set(0, 0, 1);  // 2
+        m_foot_direction.v.set(0, 0, 1); // 2
         m_foot_direction.bone = 2;
     }
     else
     {
-        m_foot_normal.v.set(0, 0, -1);  // 3
+        m_foot_normal.v.set(0, 0, -1); // 3
         m_foot_normal.bone = 3;
-        m_foot_direction.v.set(1, 0, 0);  // 3
+        m_foot_direction.v.set(1, 0, 0); // 3
         m_foot_direction.bone = 3;
     }
 
@@ -208,13 +208,13 @@ int ik_allign_free_foot = 0;
 ik_goal_matrix::e_collide_state CIKFoot::CollideFoot(float angle, float& out_angle, const Fvector& global_toe,
     const Fvector& foot_normal, const Fvector& global_bone_pos, const Fplane& p, const Fvector& ax) const
 {
-    float dfoot_tri = -p.d - p.n.dotproduct(global_bone_pos);  // dist from foot bone pos to tri plain
+    float dfoot_tri = -p.d - p.n.dotproduct(global_bone_pos); // dist from foot bone pos to tri plain
     Fvector axp;
     axp.sub(global_toe, global_bone_pos);
     float dfoot_toe = p.n.dotproduct(axp);
     out_angle = angle;
     if (dfoot_tri < m_foot_width * _abs(foot_normal.dotproduct(p.n))) return ik_goal_matrix::cl_aligned;
-    axp.sub(Fvector().mul(ax, axp.dotproduct(ax)));  // vector from nc_toe to ax
+    axp.sub(Fvector().mul(ax, axp.dotproduct(ax))); // vector from nc_toe to ax
     float dtoe_ax = axp.magnitude();
 
     out_angle = 0.f;
@@ -229,7 +229,7 @@ ik_goal_matrix::e_collide_state CIKFoot::CollideFoot(float angle, float& out_ang
     return ik_goal_matrix::cl_rotational;
 }
 
-static const float min_dot = 0.9f;  // M_SQRT1_2;//M_SQRT1_2;
+static const float min_dot = 0.9f; // M_SQRT1_2;//M_SQRT1_2;
 
 bool CIKFoot::make_shift(
     Fmatrix& xm, const Fvector& cl_point, bool collide, const Fplane& p, const Fvector& pick_dir) const
@@ -297,9 +297,9 @@ bool CIKFoot::GetFootStepMatrix(ik_goal_matrix& m, const Fmatrix& g_anim, const 
 {
     const Fmatrix global_anim = g_anim;
     Fvector local_point;
-    ToePosition(local_point);  // toe position in bone[2] space
+    ToePosition(local_point); // toe position in bone[2] space
     Fvector global_point;
-    global_anim.transform_tiny(global_point, local_point);  // non collided toe in global space
+    global_anim.transform_tiny(global_point, local_point); // non collided toe in global space
     Fvector foot_normal;
     FootNormal(foot_normal);
     global_anim.transform_dir(foot_normal);
@@ -332,7 +332,7 @@ bool CIKFoot::GetFootStepMatrix(ik_goal_matrix& m, const Fmatrix& g_anim, const 
     Fmatrix xm;
     xm.set(global_anim);
     ik_goal_matrix::e_collide_state cl_state = ik_goal_matrix::cl_undefined;
-    if (rotation)  //! collide || ik_allign_free_foot
+    if (rotation) //! collide || ik_allign_free_foot
         cl_state = rotate(xm, p, foot_normal, global_point, collide);
 
     if (b_make_shift && make_shift(xm, local_point, collide, p, cld.m_pick_dir)) switch (cl_state)

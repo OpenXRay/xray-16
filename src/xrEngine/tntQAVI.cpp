@@ -6,7 +6,7 @@
 CAviPlayerCustom::CAviPlayerCustom()
 {
     ZeroMemory(this, sizeof(*this));
-    m_dwFrameCurrent = 0xfffffffd;  // страхуемся от 0xffffffff + 1 == 0
+    m_dwFrameCurrent = 0xfffffffd; // страхуемся от 0xffffffff + 1 == 0
     m_dwFirstFrameOffset = 0;
 }
 
@@ -130,7 +130,7 @@ BOOL CAviPlayerCustom::Load(char* fname)
     m_biOutFormat.biSizeImage = m_dwWidth * m_dwHeight * 4;
 
     // Найти подходящий декомпрессор
-    m_aviIC = ICLocate(ICTYPE_VIDEO, NULL, &m_biInFormat, &m_biOutFormat,  // ICMODE_DECOMPRESS
+    m_aviIC = ICLocate(ICTYPE_VIDEO, NULL, &m_biInFormat, &m_biOutFormat, // ICMODE_DECOMPRESS
         ICMODE_FASTDECOMPRESS);
     if (m_aviIC == 0) {
         return FALSE;
@@ -298,7 +298,7 @@ BOOL CAviPlayerCustom::GetFrame(BYTE** pDest)
         // Если заданный кадр это Предидущий кадр + 1
         if (dwCurrFrame == m_dwFrameCurrent + 1)
     {
-        ++m_dwFrameCurrent;  // dwCurrFrame == m_dwFrameCurrent + 1
+        ++m_dwFrameCurrent; // dwCurrFrame == m_dwFrameCurrent + 1
 
         *pDest = m_pDecompressedBuf;
 
@@ -360,11 +360,11 @@ VOID CAviPlayerCustom::PreRoll(DWORD dwFrameNum)
                     R_ASSERT(0);
                 }
 
-            }  // for(...
+            } // for(...
 
             return;
-        }  // if( (int)m_dwFrameCurrent == i )...
-    }      // for( i=(int)dwFrameNum-1 ; i>0 ; i-- )...
+        } // if( (int)m_dwFrameCurrent == i )...
+    }     // for( i=(int)dwFrameNum-1 ; i>0 ; i-- )...
 
     // получаем элемент индекса
     pCurrFrameIndex = &m_pMovieIndex[i];
@@ -396,7 +396,7 @@ VOID CAviPlayerCustom::PreRoll(DWORD dwFrameNum)
 
             R_ASSERT(0);
         }
-    }  // for(...
+    } // for(...
 }
 
 VOID CAviPlayerCustom::GetSize(DWORD* dwWidth, DWORD* dwHeight)

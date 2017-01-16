@@ -104,7 +104,7 @@ Matrix4x4& Matrix4x4::Invert()
     float Det = Determinant();
     Matrix4x4 Temp;
 
-    if (_abs(Det) < MATRIX4X4_EPSILON) return *this;  // The matrix is not invertible! Singular case!
+    if (_abs(Det) < MATRIX4X4_EPSILON) return *this; // The matrix is not invertible! Singular case!
 
     float IDet = 1.0f / Det;
 
@@ -456,7 +456,7 @@ Matrix::operator PRS() const
     float ScaleFactor;
     Point Scale, Row, NormalizedRow;
 
-    if (IsIdentity()) {  // The special case of the identity matrix
+    if (IsIdentity()) { // The special case of the identity matrix
         Cast.SetScale(1.0f, 1.0f, 1.0f).SetQuaternion((Quat)(*this));
     }
     else

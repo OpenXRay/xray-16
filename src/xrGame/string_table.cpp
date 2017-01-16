@@ -50,8 +50,8 @@ void CStringTable::Init()
     }
 #ifdef DEBUG
     Msg("StringTable: loaded %d files", fset.size());
-#endif  // #ifdef DEBUG
-        //---
+#endif // #ifdef DEBUG
+    //---
     ReparseKeyBindings();
 }
 

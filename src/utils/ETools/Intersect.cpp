@@ -70,7 +70,7 @@ static bool intersect(const Fvector& start, const Fvector& dir, const Fvector& e
                                clip(+dir.z, -start.z - extent[2], rfT0, rfT1, ax0, ax1, a_nz) &&
                                clip(-dir.z, +start.z - extent[2], rfT0, rfT1, ax0, ax1, a_pz);
 
-    return bNotEntirelyClipped && (ax0 != a_none || ax1 != a_none);  //( rfT0 != fSaveT0 || rfT1 != fSaveT1 );
+    return bNotEntirelyClipped && (ax0 != a_none || ax1 != a_none); //( rfT0 != fSaveT0 || rfT1 != fSaveT1 );
 }
 
 bool intersect(const Fobb& box, const Fvector& origin, const Fvector& direction, float& dist, Fvector& norm)

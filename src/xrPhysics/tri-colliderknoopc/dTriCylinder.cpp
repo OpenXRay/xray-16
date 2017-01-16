@@ -79,7 +79,7 @@ int dcTriListCollider::dSortedTriCyl(const dReal* triSideAx0, const dReal* triSi
     // find number of contacts requested
     int maxc = flags & NUMC_MASK;
     if (maxc < 1) maxc = 1;
-    if (maxc > 3) maxc = 3;  // no more than 3 contacts per box allowed
+    if (maxc > 3) maxc = 3; // no more than 3 contacts per box allowed
 
     dReal signum, outDepth, cos1, sin1;
     ////////////////////////////////////////////////////////////////////////////
@@ -94,7 +94,7 @@ int dcTriListCollider::dSortedTriCyl(const dReal* triSideAx0, const dReal* triSi
 
     ////////////////////////
     // another way //////////
-    cos1 = cos1 < REAL(1.) ? cos1 : REAL(1.);  // cos1 may slightly exeed 1.f
+    cos1 = cos1 < REAL(1.) ? cos1 : REAL(1.); // cos1 may slightly exeed 1.f
     sin1 = _sqrt(REAL(1.) - cos1 * cos1);
     //////////////////////////////
 
@@ -121,7 +121,7 @@ int dcTriListCollider::dSortedTriCyl(const dReal* triSideAx0, const dReal* triSi
         dReal Q3 = signum * dDOT14(triAx, R + 2);
         dReal factor = _sqrt(Q1 * Q1 + Q3 * Q3);
         dReal C1, C3;
-        dReal centerDepth;  // depth in the cirle centre
+        dReal centerDepth; // depth in the cirle centre
         if (factor > 0.f) {
             C1 = Q1 / factor;
             C3 = Q3 / factor;
@@ -132,9 +132,9 @@ int dcTriListCollider::dSortedTriCyl(const dReal* triSideAx0, const dReal* triSi
             C3 = 0.f;
         }
 
-        dReal A1 = radius * C1;  // cosinus
+        dReal A1 = radius * C1; // cosinus
         dReal A2 = hlz * Q2;
-        dReal A3 = radius * C3;  // sinus
+        dReal A3 = radius * C3; // sinus
 
         if (factor > 0.f)
             centerDepth = outDepth - A1 * Q1 - A3 * Q3;
@@ -267,11 +267,11 @@ int dcTriListCollider::dTriCyl(const dReal* v0, const dReal* v1, const dReal* v2
     // find number of contacts requested
     int maxc = flags & NUMC_MASK;
     if (maxc < 1) maxc = 1;
-    if (maxc > 3) maxc = 3;  // no more than 3 contacts per box allowed
+    if (maxc > 3) maxc = 3; // no more than 3 contacts per box allowed
 
     const dVector3& triAx = T->norm;
-    dVector3 triSideAx0 = {T->side0[0], T->side0[1], T->side0[2]};  //{v1[0]-v0[0],v1[1]-v0[1],v1[2]-v0[2]};
-    dVector3 triSideAx1 = {T->side1[0], T->side1[1], T->side1[2]};  //{v2[0]-v1[0],v2[1]-v1[1],v2[2]-v1[2]};
+    dVector3 triSideAx0 = {T->side0[0], T->side0[1], T->side0[2]}; //{v1[0]-v0[0],v1[1]-v0[1],v1[2]-v0[2]};
+    dVector3 triSideAx1 = {T->side1[0], T->side1[1], T->side1[2]}; //{v2[0]-v1[0],v2[1]-v1[1],v2[2]-v1[2]};
     dVector3 triSideAx2 = {v0[0] - v2[0], v0[1] - v2[1], v0[2] - v2[2]};
     // dCROSS(triAx,=,triSideAx0,triSideAx1);
     int code = 0;
@@ -289,13 +289,13 @@ int dcTriListCollider::dTriCyl(const dReal* v0, const dReal* v1, const dReal* v2
 
     ////////////////////////
     // another way //////////
-    cos1 = cos1 < REAL(1.) ? cos1 : REAL(1.);  // cos1 may slightly exeed 1.f
+    cos1 = cos1 < REAL(1.) ? cos1 : REAL(1.); // cos1 may slightly exeed 1.f
     sin1 = _sqrt(REAL(1.) - cos1 * cos1);
     //////////////////////////////
 
     dReal sidePr = cos1 * hlz + sin1 * radius;
 
-    dReal dist = -T->dist;  // dDOT(triAx,v0)-dDOT(triAx,p);
+    dReal dist = -T->dist; // dDOT(triAx,v0)-dDOT(triAx,p);
     if (dist > 0.f) RETURN0;
     dReal depth = sidePr - dFabs(dist);
     outDepth = depth;
@@ -331,7 +331,7 @@ int dcTriListCollider::dTriCyl(const dReal* v0, const dReal* v1, const dReal* v2
     testV2 = depth2 > 0.f;
 
     if (isPdist0 == isPdist1 &&
-        isPdist1 == isPdist2)  //(here and lower) check the tryangle is on one side of the cylinder
+        isPdist1 == isPdist2) //(here and lower) check the tryangle is on one side of the cylinder
 
     {
         if (depth0 > depth1)
@@ -434,7 +434,7 @@ int dcTriListCollider::dTriCyl(const dReal* v0, const dReal* v1, const dReal* v2
 #undef TEST
 
     dVector3 tpos, pos;
-    if (code > 3) outDepth = pointDepth;  // deepest vertex axis used if its depth less than outDepth
+    if (code > 3) outDepth = pointDepth; // deepest vertex axis used if its depth less than outDepth
     // else{
     // bool outV0=!(testV0&&sideTestV00&&sideTestV10&&sideTestV20);
     // bool outV1=!(testV1&&sideTestV01&&sideTestV11&&sideTestV21);
@@ -589,7 +589,7 @@ int dcTriListCollider::dTriCyl(const dReal* v0, const dReal* v1, const dReal* v2
         dReal Q3 = dDOT14(norm, R + 2);
         dReal factor = _sqrt(Q1 * Q1 + Q3 * Q3);
         dReal C1, C3;
-        dReal centerDepth;  // depth in the cirle centre
+        dReal centerDepth; // depth in the cirle centre
         if (factor > 0.f) {
             C1 = Q1 / factor;
             C3 = Q3 / factor;
@@ -600,9 +600,9 @@ int dcTriListCollider::dTriCyl(const dReal* v0, const dReal* v1, const dReal* v2
             C3 = 0.f;
         }
 
-        dReal A1 = radius * C1;  // cosinus
-        dReal A2 = hlz;          // Q2
-        dReal A3 = radius * C3;  // sinus
+        dReal A1 = radius * C1; // cosinus
+        dReal A2 = hlz;         // Q2
+        dReal A3 = radius * C3; // sinus
 
         if (factor > 0.f)
             centerDepth = outDepth - A1 * Q1 - A3 * Q3;
@@ -682,7 +682,7 @@ int dcTriListCollider::dTriCyl(const dReal* v0, const dReal* v1, const dReal* v2
                     ++ret;
         }
     }
-    else if (code < 7)  // 1-6
+    else if (code < 7) // 1-6
     {
         ret = 1;
         contact->depth = outDepth;
@@ -711,7 +711,7 @@ int dcTriListCollider::dTriCyl(const dReal* v0, const dReal* v1, const dReal* v2
             break;
         }
 
-        if (code < 4) {  // 1-3
+        if (code < 4) { // 1-3
             norm[0] = R[1] * signum;
             norm[1] = R[5] * signum;
             norm[2] = R[9] * signum;
@@ -725,7 +725,7 @@ int dcTriListCollider::dTriCyl(const dReal* v0, const dReal* v1, const dReal* v2
     }
 
     else
-    {  // 7-12
+    { // 7-12
         ret = 1;
         int iv0 = (code - 7) % 3;
         int iv1 = (iv0 + 1) % 3;

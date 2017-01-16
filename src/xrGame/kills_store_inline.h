@@ -19,4 +19,4 @@ u32 const kills_store::fetch_kills(Predicate& predicate, buffer_vector<kill>& de
     return ret_count;
 }
 
-}  // namespace award_system
+} // namespace award_system

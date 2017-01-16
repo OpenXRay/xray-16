@@ -25,8 +25,8 @@ bool parse_bool(luabind::adl::object const& table, LPCSTR identifier);
 int parse_int(luabind::adl::object const& table, LPCSTR identifier);
 Fvector parse_fvector(luabind::adl::object const& table, LPCSTR identifier);
 
-};  // namespace detail
+}; // namespace detail
 
-}  // namespace smart_cover
+} // namespace smart_cover
 
-#endif  // SMART_COVER_DETAIL_H_INCLUDED
+#endif // SMART_COVER_DETAIL_H_INCLUDED

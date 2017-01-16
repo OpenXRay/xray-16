@@ -86,8 +86,7 @@ bool CWeapon::install_upgrade_disp(LPCSTR section, bool test)
     VERIFY(!fis_zero(cam_recoil.MaxAngleVert));
     VERIFY(!fis_zero(cam_recoil.MaxAngleHorz));
 
-    result |=
-        process_if_exists_deg2rad(section, "zoom_cam_relax_speed", zoom_cam_recoil.RelaxSpeed, test);  // zoom_ ...
+    result |= process_if_exists_deg2rad(section, "zoom_cam_relax_speed", zoom_cam_recoil.RelaxSpeed, test); // zoom_ ...
     result |= process_if_exists_deg2rad(section, "zoom_cam_relax_speed_ai", zoom_cam_recoil.RelaxSpeed_AI, test);
     result |= process_if_exists_deg2rad(section, "zoom_cam_dispersion", zoom_cam_recoil.Dispersion, test);
     result |= process_if_exists_deg2rad(section, "zoom_cam_dispersion_inc", zoom_cam_recoil.DispersionInc, test);
@@ -190,13 +189,13 @@ bool CWeapon::install_upgrade_hit(LPCSTR section, bool test)
     */
 
     result |= process_if_exists_set(section, "use_aim_bullet", &CInifile::r_bool, m_bUseAimBullet, test);
-    if (m_bUseAimBullet)  // first super bullet
+    if (m_bUseAimBullet) // first super bullet
     {
         result |= process_if_exists(section, "time_to_aim", &CInifile::r_float, m_fTimeToAim, test);
     }
 
     //	LPCSTR weapon_section = cNameSect().c_str();
-    float rpm = 60.0f / fOneShotTime;  // pSettings->r_float( weapon_section, "rpm" ); // fOneShotTime * 60.0f;
+    float rpm = 60.0f / fOneShotTime; // pSettings->r_float( weapon_section, "rpm" ); // fOneShotTime * 60.0f;
     result2 = process_if_exists(section, "rpm", &CInifile::r_float, rpm, test);
     if (result2 && !test) {
         VERIFY(rpm > 0.0f);

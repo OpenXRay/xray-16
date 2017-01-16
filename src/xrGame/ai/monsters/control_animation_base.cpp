@@ -256,7 +256,7 @@ bool CControlAnimationBase::CheckTransition(EMotionAnim from, EMotionAnim to)
     bool bVectEmpty = m_tTransitions.empty();
 
     while (!bVectEmpty)
-    {  // вход в цикл, если вектор переходов не пустой
+    { // вход в цикл, если вектор переходов не пустой
 
         bool from_is_good = ((I->from.state_used) ? (I->from.state == state_from) : (I->from.anim == cur_from));
         bool target_is_good = ((I->target.state_used) ? (I->target.state == state_to) : (I->target.anim == to));
@@ -275,7 +275,7 @@ bool CControlAnimationBase::CheckTransition(EMotionAnim from, EMotionAnim to)
             if (I->chain) {
                 cur_from = I->anim_transition;
                 state_from = GetState(cur_from);
-                I = m_tTransitions.begin();  // начать сначала
+                I = m_tTransitions.begin(); // начать сначала
                 continue;
             }
             else

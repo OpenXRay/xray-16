@@ -16,7 +16,7 @@ class CControlAnimationBase : public CControl_ComBase
     typedef CControl_ComBase inherited;
 
 protected:
-    REPLACED_ANIM m_tReplacedAnims;  // анимации подмены
+    REPLACED_ANIM m_tReplacedAnims; // анимации подмены
 
     // сохранённые анимации
     EMotionAnim prev_motion;
@@ -25,10 +25,10 @@ protected:
     TTime time_start_stand;
 
     // работа с анимациями атаки
-    TTime aa_time_last_attack;  // время последнего нанесения хита
+    TTime aa_time_last_attack; // время последнего нанесения хита
 
     // -------------------------------------------------------------------------
-    u32 spec_params;  // дополнительные параметры
+    u32 spec_params; // дополнительные параметры
 
     TTime fx_time_last_play;
 
@@ -38,7 +38,7 @@ protected:
     struct
     {
         bool active;
-        bool enable_braking;  // не использовать при торможении
+        bool enable_braking; // не использовать при торможении
 
         EAccelType type;
 
@@ -52,8 +52,8 @@ protected:
 
     EMotionAnim spec_anim;
 
-    MOTION_ITEM_MAP m_tMotions;             // карта соответсвий EAction к SMotionItem
-    TRANSITION_ANIM_VECTOR m_tTransitions;  // вектор переходов из одной анимации в другую
+    MOTION_ITEM_MAP m_tMotions;            // карта соответсвий EAction к SMotionItem
+    TRANSITION_ANIM_VECTOR m_tTransitions; // вектор переходов из одной анимации в другую
 
     t_fx_index default_fx_indexes;
     FX_MAP_STRING fx_map_string;
@@ -218,7 +218,7 @@ public:
 
     void check_hit(MotionID motion, float time_perc);
 
-    float get_animation_length(EMotionAnim anim, u32 index) const;  // anim must exist
+    float get_animation_length(EMotionAnim anim, u32 index) const; // anim must exist
     bool get_animation_info(EMotionAnim anim, u32 index, MotionID& motion, float& length) const;
     float get_animation_hit_time(EMotionAnim anim, u32 index) const;
     u32 get_animation_variants_count(EMotionAnim anim) const;
@@ -229,6 +229,6 @@ public:
     EMotionAnim get_override_animation() const { return m_override_animation; }
     bool has_override_animation() const { return get_override_animation() != eAnimUndefined; }
 private:
-    u32 m_override_animation_index;    // used if != -1
-    EMotionAnim m_override_animation;  // used if != eAnimUndefined
+    u32 m_override_animation_index;   // used if != -1
+    EMotionAnim m_override_animation; // used if != eAnimUndefined
 };

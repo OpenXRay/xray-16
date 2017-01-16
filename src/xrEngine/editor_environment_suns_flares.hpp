@@ -47,12 +47,12 @@ private:
     shared_str m_shader;
     collection_type* m_collection;
     bool m_use;
-};  // class flares
+}; // class flares
 
-}  // namespace suns
-}  // namespace environment
-}  // namespace editor
+} // namespace suns
+} // namespace environment
+} // namespace editor
 
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR
 
-#endif  // ifndef EDITOR_WEATHER_SUNS_FLARES_HPP_INCLUDED
+#endif // ifndef EDITOR_WEATHER_SUNS_FLARES_HPP_INCLUDED

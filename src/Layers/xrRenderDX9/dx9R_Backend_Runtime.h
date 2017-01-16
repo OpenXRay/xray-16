@@ -247,4 +247,4 @@ IC void CBackend::set_Constants(R_constant_table* C)
     }
 }
 
-#endif  //	dx9R_Backend_Runtime_included
+#endif //	dx9R_Backend_Runtime_included

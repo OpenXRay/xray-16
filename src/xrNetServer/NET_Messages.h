@@ -11,14 +11,14 @@ IC u32 net_flags(
 }
 struct MSYS_CONFIG
 {
-    u32 sign1;  // 0x12071980;
-    u32 sign2;  // 0x26111975;
+    u32 sign1; // 0x12071980;
+    u32 sign2; // 0x26111975;
 };
 
 struct MSYS_PING
 {
-    u32 sign1;  // 0x12071980;
-    u32 sign2;  // 0x26111975;
+    u32 sign1; // 0x12071980;
+    u32 sign2; // 0x26111975;
     u32 dwTime_ClientSend;
     u32 dwTime_Server;
     u32 dwTime_ClientReceive;

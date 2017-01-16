@@ -42,8 +42,8 @@ private:
     u32 m_lookout_time;
 };
 
-}  // namespace smart_cover
+} // namespace smart_cover
 
 #include "smart_cover_default_behaviour_planner_inline.hpp"
 
-#endif  // SMART_COVER_DEFAULT_BEHAVIOUR_PLANNER_HPP_INCLUDED
+#endif // SMART_COVER_DEFAULT_BEHAVIOUR_PLANNER_HPP_INCLUDED

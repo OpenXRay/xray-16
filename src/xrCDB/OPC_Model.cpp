@@ -133,7 +133,7 @@
 namespace Opcode
 {
 #include "OPC_TreeBuilders.h"
-}  // namespace Opcode
+} // namespace Opcode
 
 using namespace Opcode;
 
@@ -148,7 +148,7 @@ OPCODECREATE::OPCODECREATE()
     Quantized = true;
 #ifdef __MESHMERIZER_H__
     CollisionHull = false;
-#endif  // __MESHMERIZER_H__
+#endif // __MESHMERIZER_H__
     KeepOriginal = false;
 }
 
@@ -159,9 +159,9 @@ OPCODECREATE::OPCODECREATE()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 OPCODE_Model::OPCODE_Model() : mSource(null), mTree(null), mNoLeaf(false), mQuantized(false)
 {
-#ifdef __MESHMERIZER_H__  // Collision hulls only supported within ICE !
+#ifdef __MESHMERIZER_H__ // Collision hulls only supported within ICE !
     mHull = null;
-#endif  // __MESHMERIZER_H__
+#endif // __MESHMERIZER_H__
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -173,9 +173,9 @@ OPCODE_Model::~OPCODE_Model()
 {
     CDELETE(mSource);
     CDELETE(mTree);
-#ifdef __MESHMERIZER_H__  // Collision hulls only supported within ICE !
+#ifdef __MESHMERIZER_H__ // Collision hulls only supported within ICE !
     CDELETE(mHull);
-#endif  // __MESHMERIZER_H__
+#endif // __MESHMERIZER_H__
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -192,7 +192,7 @@ bool OPCODE_Model::Build(const OPCODECREATE& create)
 
     // In this lib, we only support complete trees
     if (!(create.Rules & SPLIT_COMPLETE))
-        return SetIceError;  //("OPCODE WARNING: supports complete trees only! Use SPLIT_COMPLETE.\n");
+        return SetIceError; //("OPCODE WARNING: supports complete trees only! Use SPLIT_COMPLETE.\n");
 
     // Check topology. If the model contains degenerate faces, collision report can be wrong in some cases.
     // e.g. it happens with the standard MAX teapot. So clean your meshes first... If you don't have a mesh cleaner
@@ -264,6 +264,6 @@ bool OPCODE_Model::Build(const OPCODECREATE& create)
         CHC.WordFaces = false;
         mHull->Compute(CHC);
     }
-#endif  // __MESHMERIZER_H__
+#endif // __MESHMERIZER_H__
     return true;
 }

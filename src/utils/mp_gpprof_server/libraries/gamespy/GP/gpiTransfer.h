@@ -77,7 +77,7 @@ typedef struct
     char* name;
 
 #ifdef GSI_UNICODE
-    unsigned short* name_W;  // must have this since developers are given pointers to internal memory
+    unsigned short* name_W; // must have this since developers are given pointers to internal memory
     unsigned short* path_W;
 #endif
 

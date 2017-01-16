@@ -75,8 +75,8 @@ EFC_Visible CFrustum::testSphere(Fvector& c, float r, u32& test_mask) const
             if (cls > r) {
                 test_mask = 0;
                 return fcvNone;
-            }                                       // none  - return
-            if (_abs(cls) >= r) test_mask &= ~bit;  // fully - no need to test this plane
+            }                                      // none  - return
+            if (_abs(cls) >= r) test_mask &= ~bit; // fully - no need to test this plane
         }
     }
     return test_mask ? fcvPartial : fcvFully;
@@ -126,12 +126,12 @@ EFC_Visible CFrustum::testAABB(const float* mM, u32& test_mask) const
         if (test_mask & bit) {
             EFC_Visible r = AABB_OverlapPlane(planes[i], mM);
             if (fcvFully == r)
-                test_mask &= ~bit;  // fully - no need to test this plane
+                test_mask &= ~bit; // fully - no need to test this plane
             else if (fcvNone == r)
             {
                 test_mask = 0;
                 return fcvNone;
-            }  // none - return
+            } // none - return
         }
     }
     return test_mask ? fcvPartial : fcvFully;
@@ -147,19 +147,19 @@ EFC_Visible CFrustum::testSAABB(Fvector& c, float r, const float* mM, u32& test_
             if (cls > r) {
                 test_mask = 0;
                 return fcvNone;
-            }  // none  - return
+            } // none  - return
             if (_abs(cls) >= r)
-                test_mask &= ~bit;  // fully - no need to test this plane
+                test_mask &= ~bit; // fully - no need to test this plane
             else
             {
                 EFC_Visible r = AABB_OverlapPlane(planes[i], mM);
                 if (fcvFully == r)
-                    test_mask &= ~bit;  // fully - no need to test this plane
+                    test_mask &= ~bit; // fully - no need to test this plane
                 else if (fcvNone == r)
                 {
                     test_mask = 0;
                     return fcvNone;
-                }  // none - return
+                } // none - return
             }
         }
     }
@@ -197,7 +197,7 @@ void CFrustum::CreateFromPlanes(Fplane* p, int count)
 
     for (int i = 0; i < count; i++)
     {
-        float denom = 1.0f / planes[i].n.magnitude();  // Get magnitude of Vector
+        float denom = 1.0f / planes[i].n.magnitude(); // Get magnitude of Vector
         planes[i].n.x *= denom;
         planes[i].n.y *= denom;
         planes[i].n.z *= denom;
@@ -316,7 +316,7 @@ void CFrustum::CreateOccluder(Fvector* p, int count, Fvector& vBase, CFrustum& c
 
     // here we have all edges marked accordenly to 'open' / 'closed' classification
     _clear();
-    _add(p[0], p[1], p[2]);  // main plane
+    _add(p[0], p[1], p[2]); // main plane
     for (int i = 0; i < count; i++)
     {
         if (!edge[i]) {
@@ -359,7 +359,7 @@ sPoly* CFrustum::ClipPoly(sPoly& S, sPoly& D) const
                     D.sub((*src)[j + 1], (*src)[j]);
                     denum = P.n.dotproduct(D);
                     if (denum != 0) {
-                        t = -cls[j] / denum;  // VERIFY(t<=1.f && t>=0);
+                        t = -cls[j] / denum; // VERIFY(t<=1.f && t>=0);
                         dest->last().mad((*src)[j], D, t);
                         dest->inc();
                     }
@@ -374,7 +374,7 @@ sPoly* CFrustum::ClipPoly(sPoly& S, sPoly& D) const
                     D.sub((*src)[j + 1], (*src)[j]);
                     denum = P.n.dotproduct(D);
                     if (denum != 0) {
-                        t = -cls[j] / denum;  // VERIFY(t<=1.f && t>=0);
+                        t = -cls[j] / denum; // VERIFY(t<=1.f && t>=0);
                         dest->last().mad((*src)[j], D, t);
                         dest->inc();
                     }
@@ -465,7 +465,7 @@ void CFrustum::CreateFromMatrix(Fmatrix& M, u32 mask)
 
     for (int i = 0; i < p_count; i++)
     {
-        float denom = 1.0f / planes[i].n.magnitude();  // Get magnitude of Vector
+        float denom = 1.0f / planes[i].n.magnitude(); // Get magnitude of Vector
         planes[i].n.x *= denom;
         planes[i].n.y *= denom;
         planes[i].n.z *= denom;

@@ -12,13 +12,13 @@ public:
     dxPixEventWrapper(LPCWSTR wszName) { D3DPERF_BeginEvent(D3DCOLOR_RGBA(127, 0, 0, 255), wszName); }
     ~dxPixEventWrapper() { D3DPERF_EndEvent(); }
 };
-#else  //	DEBUG
+#else //	DEBUG
 
 #define PIX_EVENT(Name)                                                                                                \
     {                                                                                                                  \
         ;                                                                                                              \
     }
 
-#endif  //	DEBUG
+#endif //	DEBUG
 
-#endif  //	dxPixEventWrapper_included
+#endif //	dxPixEventWrapper_included

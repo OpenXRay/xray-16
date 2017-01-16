@@ -48,8 +48,8 @@ void Touch::feel_touch_update(Fvector& C, float R)
         for (xr_vector<IGameObject*>::iterator it = n_begin; it != n_end; it++)
         {
             IGameObject* O = *it;
-            if (O->getDestroy()) continue;         // Don't touch candidates for destroy
-            if (!feel_touch_contact(O)) continue;  // Actual contact
+            if (O->getDestroy()) continue;        // Don't touch candidates for destroy
+            if (!feel_touch_contact(O)) continue; // Actual contact
 
             if (std::find(feel_touch.begin(), feel_touch.end(), O) == feel_touch.end()) {
                 // check for deny
@@ -74,7 +74,7 @@ void Touch::feel_touch_update(Fvector& C, float R)
     {
         IGameObject* O = feel_touch[d];
         if (O->getDestroy() || !feel_touch_contact(O) ||
-            (std::find(n_begin, n_end, O) == n_end))  // Don't touch candidates for destroy
+            (std::find(n_begin, n_end, O) == n_end)) // Don't touch candidates for destroy
         {
             // _delete_
             feel_touch.erase(feel_touch.begin() + d);

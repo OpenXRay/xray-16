@@ -21,7 +21,7 @@ CSoundRender_Cache::~CSoundRender_Cache()
 void CSoundRender_Cache::move2top(cache_line* line)
 {
     VERIFY(line);
-    if (line == c_begin) return;  // already at top
+    if (line == c_begin) return; // already at top
 
     // track end
     if (line == c_end) c_end = c_end->prev;
@@ -128,8 +128,8 @@ void CSoundRender_Cache::format()
 
 void CSoundRender_Cache::purge()
 {
-    disconnect();  // disconnect from CATs
-    format();      // format
+    disconnect(); // disconnect from CATs
+    format();     // format
 }
 
 void CSoundRender_Cache::destroy()

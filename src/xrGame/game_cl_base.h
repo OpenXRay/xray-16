@@ -67,7 +67,7 @@ public:
     virtual void Init(){};
     virtual void net_import_state(NET_Packet& P);
     virtual void net_import_update(NET_Packet& P);
-    virtual void net_import_GameTime(NET_Packet& P);  // update GameTime only for remote clients
+    virtual void net_import_GameTime(NET_Packet& P); // update GameTime only for remote clients
     virtual void net_signal(NET_Packet& P);
 
     virtual bool OnKeyboardPress(int key);

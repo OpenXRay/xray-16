@@ -28,7 +28,7 @@ IC bool UpgradeBase::is_known() const
     return (m_known);
 }
 
-}  // namespace upgrade
-}  // namespace inventory
+} // namespace upgrade
+} // namespace inventory
 
-#endif  // INVENTORY_UPGRADE_BASE_INLINE_H_INCLUDED
+#endif // INVENTORY_UPGRADE_BASE_INLINE_H_INCLUDED

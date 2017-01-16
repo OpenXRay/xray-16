@@ -42,7 +42,7 @@ char* extract_username(char const* uri, char const* root_path, user_name_t& dst_
 {
     typedef char url_string_t[256];
     url_string_t tmp_format;
-    sprintf(tmp_format, "%s/%%255s", root_path);  // for url_string_t[256];
+    sprintf(tmp_format, "%s/%%255s", root_path); // for url_string_t[256];
     url_string_t tmp_uname;
     strcpy(tmp_uname, "");
 

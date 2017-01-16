@@ -38,13 +38,13 @@ LRESULT CALLBACK TextConsole_LogWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPA
     switch (uMsg)
     {
     case WM_ERASEBKGND:
-        return (LRESULT)1;  // Say we handled it.
+        return (LRESULT)1; // Say we handled it.
 
     case WM_PAINT:
     {
         CTextConsole* pTextConsole = (CTextConsole*)Console;
         pTextConsole->OnPaint();
-        return (LRESULT)0;  // Say we handled it.
+        return (LRESULT)0; // Say we handled it.
     }
     break;
     default: break;

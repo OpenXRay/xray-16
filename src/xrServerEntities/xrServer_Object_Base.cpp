@@ -36,7 +36,7 @@ IPropHelper& PHelper()
 #ifdef XRGAME_EXPORTS
 #include "ai_space.h"
 #include "alife_simulator.h"
-#endif  // #ifdef XRGAME_EXPORTS
+#endif // #ifdef XRGAME_EXPORTS
 #endif
 
 LPCSTR script_section = "script";
@@ -88,10 +88,10 @@ CSE_Abstract::CSE_Abstract(LPCSTR caSection)
     owner = 0;
     m_gameType.SetDefaults();
     //.	s_gameid					= 0;
-    s_RP = 0xFE;  // Use supplied coords
+    s_RP = 0xFE; // Use supplied coords
     s_flags.assign(0);
     s_name = caSection;
-    s_name_replace = 0;  // xr_strdup("");
+    s_name_replace = 0; // xr_strdup("");
     o_Angle.set(0.f, 0.f, 0.f);
     o_Position.set(0.f, 0.f, 0.f);
     m_bALifeControl = false;
@@ -122,7 +122,7 @@ CSE_Abstract::CSE_Abstract(LPCSTR caSection)
         if (ai().get_alife())
             config = ai().alife().get_config(raw_file_name);
         else
-#endif  // #ifdef XRGAME_EXPORTS
+#endif // #ifdef XRGAME_EXPORTS
         {
             string_path file_name;
             FS.update_path(file_name, "$game_config$", raw_file_name);
@@ -138,7 +138,7 @@ CSE_Abstract::CSE_Abstract(LPCSTR caSection)
 
 #ifdef XRGAME_EXPORTS
             if (NULL == ai().get_alife())
-#endif  // #ifdef XRGAME_EXPORTS
+#endif // #ifdef XRGAME_EXPORTS
             {
                 IReader* _r = (IReader*)config;
                 FS.r_close(_r);
@@ -213,9 +213,10 @@ void CSE_Abstract::Spawn_Write(NET_Packet& tNetPacket, BOOL bLocal)
     tNetPacket.w_u16(script_server_object_version());
 
     // client object custom data serialization SAVE
-    u16 client_data_size = (u16)client_data.size();  //не может быть больше 256 байт
+    u16 client_data_size = (u16)client_data.size(); //не может быть больше 256 байт
     tNetPacket.w_u16(client_data_size);
-    //	Msg							("SERVER:saving:save:%d bytes:%d:%s",client_data_size,ID,s_name_replace ? s_name_replace :
+    //	Msg							("SERVER:saving:save:%d bytes:%d:%s",client_data_size,ID,s_name_replace ? s_name_replace
+    //:
     //"");
     if (client_data_size > 0) {
         tNetPacket.w(&*client_data.begin(), client_data_size);
@@ -257,7 +258,7 @@ static enum EGameTypes {
     GAME_CAPTURETHEARTEFACT = 8,
 
     // identifiers in range [100...254] are registered for script game type
-    GAME_DUMMY = 255  // temporary game type
+    GAME_DUMMY = 255 // temporary game type
 };
 
 BOOL CSE_Abstract::Spawn_Read(NET_Packet& tNetPacket)
@@ -307,10 +308,10 @@ BOOL CSE_Abstract::Spawn_Read(NET_Packet& tNetPacket)
     // client object custom data serialization LOAD
     if (m_wVersion > 70) {
         u16 client_data_size =
-            (m_wVersion > 93) ? tNetPacket.r_u16() : tNetPacket.r_u8();  //не может быть больше 256 байт
+            (m_wVersion > 93) ? tNetPacket.r_u16() : tNetPacket.r_u8(); //не может быть больше 256 байт
         if (client_data_size > 0) {
             //			Msg					("SERVER:loading:load:%d bytes:%d:%s",client_data_size,ID,s_name_replace ?
-            //s_name_replace : "");
+            // s_name_replace : "");
             client_data.resize(client_data_size);
             tNetPacket.r(&*client_data.begin(), client_data_size);
         }
@@ -323,26 +324,26 @@ BOOL CSE_Abstract::Spawn_Read(NET_Packet& tNetPacket)
     if (m_wVersion > 79) tNetPacket.r_u16(m_tSpawnID);
 
     if (m_wVersion < 112) {
-        if (m_wVersion > 82) tNetPacket.r_float();  // m_spawn_probability);
+        if (m_wVersion > 82) tNetPacket.r_float(); // m_spawn_probability);
 
         if (m_wVersion > 83) {
-            tNetPacket.r_u32();  // m_spawn_flags.assign(tNetPacket.r_u32());
+            tNetPacket.r_u32(); // m_spawn_flags.assign(tNetPacket.r_u32());
             xr_string temp;
-            tNetPacket.r_stringZ(temp);  // tNetPacket.r_stringZ(m_spawn_control);
-            tNetPacket.r_u32();          // m_max_spawn_count);
+            tNetPacket.r_stringZ(temp); // tNetPacket.r_stringZ(m_spawn_control);
+            tNetPacket.r_u32();         // m_max_spawn_count);
             // this stuff we do not need even in case of uncomment
-            tNetPacket.r_u32();  // m_spawn_count);
-            tNetPacket.r_u64();  // m_last_spawn_time);
+            tNetPacket.r_u32(); // m_spawn_count);
+            tNetPacket.r_u64(); // m_last_spawn_time);
         }
 
         if (m_wVersion > 84) {
-            tNetPacket.r_u64();  // m_min_spawn_interval);
-            tNetPacket.r_u64();  // m_max_spawn_interval);
+            tNetPacket.r_u64(); // m_min_spawn_interval);
+            tNetPacket.r_u64(); // m_max_spawn_interval);
         }
     }
 
     u16 size;
-    tNetPacket.r_u16(size);  // size
+    tNetPacket.r_u16(size); // size
     bool b1 = (m_tClassID == CLSID_SPECTATOR);
     bool b2 = (size > sizeof(size)) || (tNetPacket.inistream != NULL);
     R_ASSERT3((b1 || b2), "cannot read object, which is not successfully saved :(", name_replace());
@@ -353,12 +354,13 @@ BOOL CSE_Abstract::Spawn_Read(NET_Packet& tNetPacket)
 void CSE_Abstract::load(NET_Packet& tNetPacket)
 {
     CPureServerObject::load(tNetPacket);
-    u16 client_data_size = (m_wVersion > 93) ? tNetPacket.r_u16() : tNetPacket.r_u8();  //не может быть больше 256 байт
+    u16 client_data_size = (m_wVersion > 93) ? tNetPacket.r_u16() : tNetPacket.r_u8(); //не может быть больше 256 байт
     if (client_data_size > 0) {
 #ifdef DEBUG
-//		Msg						("SERVER:loading:load:%d bytes:%d:%s",client_data_size,ID,s_name_replace ? s_name_replace :
+//		Msg						("SERVER:loading:load:%d bytes:%d:%s",client_data_size,ID,s_name_replace ? s_name_replace
+//:
 //"");
-#endif  // DEBUG
+#endif // DEBUG
         client_data.resize(client_data_size);
         tNetPacket.r(&*client_data.begin(), client_data_size);
     }
@@ -366,7 +368,7 @@ void CSE_Abstract::load(NET_Packet& tNetPacket)
     {
 #ifdef DEBUG
         if (!client_data.empty()) Msg("CSE_Abstract::load: client_data is cleared for [%d][%s]", ID, name_replace());
-#endif  // DEBUG
+#endif // DEBUG
         client_data.clear();
     }
 }
@@ -423,7 +425,7 @@ void CSE_Abstract::FillProps(LPCSTR pref, PropItemVec& items)
 {
 #ifdef XRSE_FACTORY_EXPORTS
     m_gameType.FillProp(pref, items);
-#endif  // #ifdef XRSE_FACTORY_EXPORTS
+#endif // #ifdef XRSE_FACTORY_EXPORTS
     /*
     #ifdef XRGAME_EXPORTS
     #	ifdef DEBUG
@@ -439,7 +441,7 @@ void CSE_Abstract::FillProp(LPCSTR pref, PropItemVec& items)
     CScriptValueContainer::clear();
     FillProps(pref, items);
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
 bool CSE_Abstract::validate()
 {

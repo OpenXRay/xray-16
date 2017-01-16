@@ -11,11 +11,11 @@ class ENGINE_API CInifile;
 const u32 clGET_TRIS = (1 << 0);
 const u32 clGET_BOXES = (1 << 1);
 const u32 clGET_SPHERES = (1 << 2);
-const u32 clQUERY_ONLYFIRST = (1 << 3);  // stop if was any collision
-const u32 clQUERY_TOPLEVEL = (1 << 4);   // get only top level of model box/sphere
-const u32 clQUERY_STATIC = (1 << 5);     // static
-const u32 clQUERY_DYNAMIC = (1 << 6);    // dynamic
-const u32 clCOARSE = (1 << 7);           // coarse test (triangles vs obb)
+const u32 clQUERY_ONLYFIRST = (1 << 3); // stop if was any collision
+const u32 clQUERY_TOPLEVEL = (1 << 4);  // get only top level of model box/sphere
+const u32 clQUERY_STATIC = (1 << 5);    // static
+const u32 clQUERY_DYNAMIC = (1 << 6);   // dynamic
+const u32 clCOARSE = (1 << 7);          // coarse test (triangles vs obb)
 
 struct clQueryTri
 {
@@ -25,10 +25,10 @@ struct clQueryTri
 
 struct clQueryCollision
 {
-    xr_vector<IGameObject*> objects;  // affected objects
-    xr_vector<clQueryTri> tris;       // triangles (if queried)
-    xr_vector<Fobb> boxes;            // boxes/ellipsoids (if queried)
-    xr_vector<Fvector4> spheres;      // spheres (if queried)
+    xr_vector<IGameObject*> objects; // affected objects
+    xr_vector<clQueryTri> tris;      // triangles (if queried)
+    xr_vector<Fobb> boxes;           // boxes/ellipsoids (if queried)
+    xr_vector<Fvector4> spheres;     // spheres (if queried)
 
     IC void Clear()
     {
@@ -83,12 +83,12 @@ class ENGINE_API ICollisionForm
     friend class CObjectSpace;
 
 protected:
-    IGameObject* owner;  // владелец
+    IGameObject* owner; // владелец
     u32 dwQueryID;
 
 protected:
-    Fbox bv_box;        // (Local) BBox объекта
-    Fsphere bv_sphere;  // (Local) Sphere
+    Fbox bv_box;       // (Local) BBox объекта
+    Fsphere bv_sphere; // (Local) Sphere
 private:
     ECollisionFormType m_type;
 
@@ -115,7 +115,7 @@ public:
         {
             struct
             {
-                Fmatrix b_IM;  // world 2 bone xform
+                Fmatrix b_IM; // world 2 bone xform
                 Fvector b_hsize;
             };
             struct
@@ -142,8 +142,8 @@ private:
     u64 vis_mask;
     ElementVec elements;
 
-    u32 dwFrame;    // The model itself
-    u32 dwFrameTL;  // Top level
+    u32 dwFrame;   // The model itself
+    u32 dwFrameTL; // Top level
 
     void BuildState();
     void BuildTopLevel();
@@ -209,4 +209,4 @@ public:
     xr_vector<shape_def>& Shapes() { return shapes; }
 };
 
-#endif  //__XR_COLLIDE_FORM_H__
+#endif //__XR_COLLIDE_FORM_H__

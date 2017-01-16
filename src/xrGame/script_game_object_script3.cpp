@@ -92,8 +92,9 @@ class_<CScriptGameObject>& script_register_game_object2(class_<CScriptGameObject
                               bool fire_object))(&CScriptGameObject::set_sight))
         .def("set_sight", (void (CScriptGameObject::*)(CScriptGameObject * object_to_look, bool torso_look,
                               bool fire_object, bool no_pitch))(&CScriptGameObject::set_sight))
-        //		.def("set_sight",					(void (CScriptGameObject::*)(const MemorySpace::CMemoryInfo *memory_object,
-        //bool	torso_look))(&CScriptGameObject::set_sight))
+        //		.def("set_sight",					(void (CScriptGameObject::*)(const MemorySpace::CMemoryInfo
+        //*memory_object,
+        // bool	torso_look))(&CScriptGameObject::set_sight))
 
         // object handler
         .def("set_item", (void (CScriptGameObject::*)(MonsterSpace::EObjectAction))(&CScriptGameObject::set_item))
@@ -148,7 +149,7 @@ class_<CScriptGameObject>& script_register_game_object2(class_<CScriptGameObject
             (void (CScriptGameObject::*)(LPCSTR, LPCSTR, LPCSTR, int, int, int))(&CScriptGameObject::GiveGameNews))
 
         .def("give_talk_message", (void (CScriptGameObject::*)(LPCSTR, LPCSTR, LPCSTR))(
-                                      &CScriptGameObject::AddIconedTalkMessage_old))  // old version, must remove!
+                                      &CScriptGameObject::AddIconedTalkMessage_old)) // old version, must remove!
         .def("give_talk_message2",
             (void (CScriptGameObject::*)(LPCSTR, LPCSTR, LPCSTR, LPCSTR))(&CScriptGameObject::AddIconedTalkMessage))
 

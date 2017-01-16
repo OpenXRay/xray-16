@@ -43,7 +43,7 @@ void* g_SpursTaskElfStart = _binary_spu_SpeexSpursTaskDebug_elf_start;
 #else
 extern char _binary_spu_SpeexSpursTaskRelease_elf_start[];
 void* g_SpursTaskElfStart = _binary_spu_SpeexSpursTaskRelease_elf_start;
-#endif  //#ifdef _DEBUG
+#endif //#ifdef _DEBUG
 
 /*
 BulletSpursElf _g_aSPURSElfs[]={

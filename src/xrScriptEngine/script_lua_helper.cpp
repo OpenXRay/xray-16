@@ -50,8 +50,8 @@ int CDbgLuaHelper::OutputTop(lua_State* l)
     return 0;
 }
 
-#define LEVELS1 12  // size of the first part of the stack
-#define LEVELS2 10  // size of the second part of the stack
+#define LEVELS1 12 // size of the first part of the stack
+#define LEVELS2 10 // size of the second part of the stack
 
 void CDbgLuaHelper::errormessageLuaBind(lua_State* l)
 {
@@ -69,8 +69,8 @@ int CDbgLuaHelper::errormessageLua(lua_State* l)
 {
     if (!m_pThis) return 0;
     L = l;
-    int level = 1;      // skip level 0 (it's this function)
-    int firstpart = 1;  // still before eventual `...'
+    int level = 1;     // skip level 0 (it's this function)
+    int firstpart = 1; // still before eventual `...'
     lua_Debug ar;
     if (!lua_isstring(L, 1)) return lua_gettop(L);
     lua_settop(L, 1);
@@ -82,11 +82,11 @@ int CDbgLuaHelper::errormessageLua(lua_State* l)
         if (level > LEVELS1 && firstpart) {
             // no more than `LEVELS2' more levels?
             if (!lua_getstack(L, level + LEVELS2, &ar))
-                level--;  // keep going
+                level--; // keep going
             else
             {
-                lua_pushliteral(L, "       ...\n");            // too many levels
-                while (lua_getstack(L, level + LEVELS2, &ar))  // find last levels
+                lua_pushliteral(L, "       ...\n");           // too many levels
+                while (lua_getstack(L, level + LEVELS2, &ar)) // find last levels
                     level++;
             }
             firstpart = 0;
@@ -99,17 +99,17 @@ int CDbgLuaHelper::errormessageLua(lua_State* l)
         if (ar.currentline > 0) lua_pushfstring(L, "%d:", ar.currentline);
         switch (*ar.namewhat)
         {
-        case 'g':  // global
-        case 'l':  // local
-        case 'f':  // field
-        case 'm':  // method
+        case 'g': // global
+        case 'l': // local
+        case 'f': // field
+        case 'm': // method
             lua_pushfstring(L, " in function `%s'", ar.name);
             break;
         default:
         {
-            if (*ar.what == 'm')  // main?
+            if (*ar.what == 'm') // main?
                 lua_pushfstring(L, " in main chunk");
-            else if (*ar.what == 'C')  // C function?
+            else if (*ar.what == 'C') // C function?
                 lua_pushfstring(L, "%s", ar.short_src);
             else
                 lua_pushfstring(L, " in function <%s:%d>", ar.short_src, ar.linedefined);
@@ -249,7 +249,7 @@ void CDbgLuaHelper::DrawLocalVariables()
         while (name = lua_getlocal(L, &ar, i++), name)
         {
             DrawVariable(L, name, true);
-            lua_pop(L, 1);  // remove variable value
+            lua_pop(L, 1); // remove variable value
         }
     }
 }
@@ -258,7 +258,7 @@ void CDbgLuaHelper::DrawGlobalVariables()
 {
     debugger()->ClearGlobalVariables();
     lua_pushvalue(L, LUA_GLOBALSINDEX);
-    lua_pushnil(L);  // first key
+    lua_pushnil(L); // first key
     string1024 var;
     var[0] = 0;
     while (lua_next(L, -2))
@@ -266,9 +266,9 @@ void CDbgLuaHelper::DrawGlobalVariables()
         //!!!!	TRACE2("%s - %s\n",	lua_typename(L, lua_type(L, -2)), lua_typename(L, lua_type(L, -1)));
         //		xr_sprintf(var, "%s-%s",	lua_typename(L, lua_type(L, -2)), lua_typename(L, lua_type(L, -1)) );
         //		CScriptDebugger::GetDebugger()->AddLocalVariable(var, "global", "_g_");
-        lua_pop(L, 1);  // pop value, keep key for next iteration;
+        lua_pop(L, 1); // pop value, keep key for next iteration;
     }
-    lua_pop(L, 1);  // pop table of globals;
+    lua_pop(L, 1); // pop table of globals;
 }
 
 bool CDbgLuaHelper::GetCalltip(const char* szWord, char* szCalltip, int sz_calltip)
@@ -284,14 +284,14 @@ bool CDbgLuaHelper::GetCalltip(const char* szWord, char* szCalltip, int sz_callt
                 char szRet[64];
                 Describe(szRet, -1, sizeof(szRet));
                 xr_sprintf(szCalltip, sz_calltip, "local %s : %s ", name, szRet);
-                lua_pop(L, 1);  // remove variable value
+                lua_pop(L, 1); // remove variable value
                 return true;
             }
-            lua_pop(L, 1);  // remove variable value
+            lua_pop(L, 1); // remove variable value
         }
     }
     lua_pushvalue(L, LUA_GLOBALSINDEX);
-    lua_pushnil(L);  // first key
+    lua_pushnil(L); // first key
     while (lua_next(L, -2))
     {
         const char* name = lua_tostring(L, -2);
@@ -299,12 +299,12 @@ bool CDbgLuaHelper::GetCalltip(const char* szWord, char* szCalltip, int sz_callt
             char szRet[64];
             Describe(szRet, -1, sizeof(szRet));
             xr_sprintf(szCalltip, sz_calltip, "global %s : %s ", name, szRet);
-            lua_pop(L, 3);  // remove table, key, value
+            lua_pop(L, 3); // remove table, key, value
             return true;
         }
-        lua_pop(L, 1);  // pop value, keep key for next iteration
+        lua_pop(L, 1); // pop value, keep key for next iteration
     }
-    lua_pop(L, 1);  // pop table of globals
+    lua_pop(L, 1); // pop table of globals
     return false;
 }
 
@@ -317,7 +317,7 @@ bool CDbgLuaHelper::Eval(const char* szCode, char* szRet, int szret_size)
         xr_sprintf(szRet, szret_size, "%s", luaL_checkstring(L, -1));
     else
     {
-        status = lua_pcall(L, 0, LUA_MULTRET, 0);  // call main
+        status = lua_pcall(L, 0, LUA_MULTRET, 0); // call main
         if (status) {
             const char* szErr = luaL_checkstring(L, -1);
             const char* szErr2 = strstr(szErr, ": ");
@@ -348,22 +348,22 @@ void CDbgLuaHelper::Describe(char* szRet, int nIndex, int szRet_size)
 
 void CDbgLuaHelper::CoverGlobals()
 {
-    lua_newtable(L);  // save there globals covered by locals
+    lua_newtable(L); // save there globals covered by locals
     int nLevel = debugger()->GetStackTraceLevel();
     lua_Debug ar;
     if (lua_getstack(L, nLevel, &ar)) {
         int i = 1;
         const char* name;
         while (name = lua_getlocal(L, &ar, i++), name)
-        {                                     // SAVE lvalue
-            lua_pushstring(L, name);          // SAVE lvalue name
-            lua_pushvalue(L, -1);             // SAVE lvalue name name
-            lua_pushvalue(L, -1);             // SAVE lvalue name name name
-            lua_insert(L, -4);                // SAVE name lvalue name name
-            lua_rawget(L, LUA_GLOBALSINDEX);  // SAVE name lvalue name gvalue
-            lua_rawset(L, -5);                // save global value in local table
+        {                                    // SAVE lvalue
+            lua_pushstring(L, name);         // SAVE lvalue name
+            lua_pushvalue(L, -1);            // SAVE lvalue name name
+            lua_pushvalue(L, -1);            // SAVE lvalue name name name
+            lua_insert(L, -4);               // SAVE name lvalue name name
+            lua_rawget(L, LUA_GLOBALSINDEX); // SAVE name lvalue name gvalue
+            lua_rawset(L, -5);               // save global value in local table
             // SAVE name lvalue
-            lua_rawset(L, LUA_GLOBALSINDEX);  // SAVE
+            lua_rawset(L, LUA_GLOBALSINDEX); // SAVE
         }
     }
 }
@@ -371,16 +371,16 @@ void CDbgLuaHelper::CoverGlobals()
 void CDbgLuaHelper::RestoreGlobals()
 {
     // there is table of covered globals on top
-    lua_pushnil(L);  // first key
+    lua_pushnil(L); // first key
     // SAVE nil
-    while (lua_next(L, -2))  // SAVE key value
+    while (lua_next(L, -2)) // SAVE key value
     {
-        lua_pushvalue(L, -2);             // SAVE key value key
-        lua_insert(L, -2);                // SAVE key key value
-        lua_rawset(L, LUA_GLOBALSINDEX);  // restore global
+        lua_pushvalue(L, -2);            // SAVE key value key
+        lua_insert(L, -2);               // SAVE key key value
+        lua_rawset(L, LUA_GLOBALSINDEX); // restore global
         // SAVE key
     }
-    lua_pop(L, 1);  // pop table of covered globals;
+    lua_pop(L, 1); // pop table of covered globals;
 }
 
 void CDbgLuaHelper::DrawVariable(lua_State* l, const char* name, bool bOpenTable)
@@ -431,7 +431,7 @@ void CDbgLuaHelper::DrawTable(lua_State* l, LPCSTR S, bool bRecursive)
 {
     // char str[1024];
     if (!lua_istable(l, -1)) return;
-    lua_pushnil(l);  // first key
+    lua_pushnil(l); // first key
     while (lua_next(l, -2))
     {
         char stype[256];
@@ -441,7 +441,7 @@ void CDbgLuaHelper::DrawTable(lua_State* l, LPCSTR S, bool bRecursive)
         xr_sprintf(sname, "%s", lua_tostring(l, -2));
         xr_sprintf(sFullName, "%s.%s", S, sname);
         DrawVariable(l, sFullName, false);
-        lua_pop(l, 1);  // removes `value'; keeps `key' for next iteration
+        lua_pop(l, 1); // removes `value'; keeps `key' for next iteration
     }
 }
 

@@ -490,21 +490,21 @@ bool NVMeshMender::Munge(const NVMeshMender::VAVector& input, NVMeshMender::VAVe
                             // No new indices are created, just vertex attributes
                             if (output[att].Name_ != "indices") {
                                 if (output[att].Name_ == "tex0") {
-                                    output[att].floatVector_.push_back((float)newS);  // y
+                                    output[att].floatVector_.push_back((float)newS); // y
                                     output[att].floatVector_.push_back(
-                                        output[att].floatVector_[indices[theOneToChange] * 3 + 1]);  // x
+                                        output[att].floatVector_[indices[theOneToChange] * 3 + 1]); // x
                                     output[att].floatVector_.push_back(
-                                        output[att].floatVector_[indices[theOneToChange] * 3 + 2]);  // z
+                                        output[att].floatVector_[indices[theOneToChange] * 3 + 2]); // z
                                 }
                                 else
                                 {
                                     // *3 b/c we are looking up 3vectors in an array of floats
                                     output[att].floatVector_.push_back(
-                                        output[att].floatVector_[indices[theOneToChange] * 3 + 0]);  // x
+                                        output[att].floatVector_[indices[theOneToChange] * 3 + 0]); // x
                                     output[att].floatVector_.push_back(
-                                        output[att].floatVector_[indices[theOneToChange] * 3 + 1]);  // y
+                                        output[att].floatVector_[indices[theOneToChange] * 3 + 1]); // y
                                     output[att].floatVector_.push_back(
-                                        output[att].floatVector_[indices[theOneToChange] * 3 + 2]);  // z
+                                        output[att].floatVector_[indices[theOneToChange] * 3 + 2]); // z
                                 }
                             }
                         }
@@ -518,7 +518,7 @@ bool NVMeshMender::Munge(const NVMeshMender::VAVector& input, NVMeshMender::VAVe
                         indices[theOneToChange] = theNewIndex;
                     }
 
-                }  // for v
+                } // for v
 
                 {
                     for (int v = 0; v < 3; ++v)
@@ -559,20 +559,20 @@ bool NVMeshMender::Munge(const NVMeshMender::VAVector& input, NVMeshMender::VAVe
                                 if (output[att].Name_ != "indices") {
                                     if (output[att].Name_ == "tex0") {
                                         output[att].floatVector_.push_back(
-                                            output[att].floatVector_[indices[theOneToChange] * 3 + 0]);  // x
-                                        output[att].floatVector_.push_back((float)newT);                 // y
+                                            output[att].floatVector_[indices[theOneToChange] * 3 + 0]); // x
+                                        output[att].floatVector_.push_back((float)newT);                // y
                                         output[att].floatVector_.push_back(
-                                            output[att].floatVector_[indices[theOneToChange] * 3 + 2]);  // z
+                                            output[att].floatVector_[indices[theOneToChange] * 3 + 2]); // z
                                     }
                                     else
                                     {
                                         // *3 b/c we are looking up 3vectors in an array of floats
                                         output[att].floatVector_.push_back(
-                                            output[att].floatVector_[indices[theOneToChange] * 3 + 0]);  // x
+                                            output[att].floatVector_[indices[theOneToChange] * 3 + 0]); // x
                                         output[att].floatVector_.push_back(
-                                            output[att].floatVector_[indices[theOneToChange] * 3 + 1]);  // y
+                                            output[att].floatVector_[indices[theOneToChange] * 3 + 1]); // y
                                         output[att].floatVector_.push_back(
-                                            output[att].floatVector_[indices[theOneToChange] * 3 + 2]);  // z
+                                            output[att].floatVector_[indices[theOneToChange] * 3 + 2]); // z
                                     }
                                 }
                             }
@@ -587,10 +587,10 @@ bool NVMeshMender::Munge(const NVMeshMender::VAVector& input, NVMeshMender::VAVe
                         }
                     }
 
-                }  // for v
+                } // for v
 
-            }  // for f
-        }      // if fix texgen
+            } // for f
+        }     // if fix texgen
         if (pTextureMatrix) {
             const mat4 M(pTextureMatrix[0], pTextureMatrix[1], pTextureMatrix[2], pTextureMatrix[3], pTextureMatrix[4],
                 pTextureMatrix[5], pTextureMatrix[6], pTextureMatrix[7], pTextureMatrix[8], pTextureMatrix[9],
@@ -779,18 +779,18 @@ bool NVMeshMender::Munge(const NVMeshMender::VAVector& input, NVMeshMender::VAVe
                                 if (output[att].Name_ != "indices") {
                                     // *3 b/c we are looking up 3vectors in an array of floats
                                     output[att].floatVector_.push_back(
-                                        output[att].floatVector_[indices[start] * 3 + 0]);  // x
+                                        output[att].floatVector_[indices[start] * 3 + 0]); // x
                                     output[att].floatVector_.push_back(
-                                        output[att].floatVector_[indices[start] * 3 + 1]);  // y
+                                        output[att].floatVector_[indices[start] * 3 + 1]); // y
                                     output[att].floatVector_.push_back(
-                                        output[att].floatVector_[indices[start] * 3 + 2]);  // z
+                                        output[att].floatVector_[indices[start] * 3 + 2]); // z
 
                                     output[att].floatVector_.push_back(
-                                        output[att].floatVector_[indices[end] * 3 + 0]);  // x
+                                        output[att].floatVector_[indices[end] * 3 + 0]); // x
                                     output[att].floatVector_.push_back(
-                                        output[att].floatVector_[indices[end] * 3 + 1]);  // y
+                                        output[att].floatVector_[indices[end] * 3 + 1]); // y
                                     output[att].floatVector_.push_back(
-                                        output[att].floatVector_[indices[end] * 3 + 2]);  // z
+                                        output[att].floatVector_[indices[end] * 3 + 2]); // z
                                 }
                             }
 
@@ -806,7 +806,7 @@ bool NVMeshMender::Munge(const NVMeshMender::VAVector& input, NVMeshMender::VAVe
                         //  because the two faces will sum their tangent basis vectors into separate indices
                     }
                 }
-            }  // if fixtangents
+            } // if fixtangents
         }
 
         // Allocate std::vector & Zero out average basis for tangent space smoothing
@@ -815,8 +815,8 @@ bool NVMeshMender::Munge(const NVMeshMender::VAVector& input, NVMeshMender::VAVe
 
         for (unsigned int p = 0; p < positions.size(); p += 3)
         {
-            avgS.push_back(vec3_null);  // do S
-            avgT.push_back(vec3_null);  // now t
+            avgS.push_back(vec3_null); // do S
+            avgT.push_back(vec3_null); // now t
         }
 
         //  go through faces and add up the bases for each vertex
@@ -854,8 +854,8 @@ bool NVMeshMender::Munge(const NVMeshMender::VAVector& input, NVMeshMender::VAVe
         // now renormalize
         for (unsigned int b = 0; b < positions.size(); b += 3)
         {
-            *reinterpret_cast<vec3*>(&output[(*tangent).second].floatVector_[b]) = normalize(avgS[b / 3]);   // s
-            *reinterpret_cast<vec3*>(&output[(*binormal).second].floatVector_[b]) = normalize(avgT[b / 3]);  // T
+            *reinterpret_cast<vec3*>(&output[(*tangent).second].floatVector_[b]) = normalize(avgS[b / 3]);  // s
+            *reinterpret_cast<vec3*>(&output[(*binormal).second].floatVector_[b]) = normalize(avgT[b / 3]); // T
         }
     }
 

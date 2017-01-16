@@ -5,7 +5,7 @@
 #include "xrServer_Objects_Abstract.h"
 // old
 enum ERPGameType
-{  // [0..255]
+{ // [0..255]
     rpgtGameAny = u8(0),
     rpgtGameDeathmatch,
     rpgtGameTeamDeathmatch,
@@ -77,4 +77,4 @@ void GameTypeChooser::FillProp(LPCSTR pref, PropItemVec& items)
        eGameIDTeamDominationZone);
     */
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS

@@ -92,7 +92,7 @@ void CTelekinesis<_Object>::UpdateSched()
         switch (cur_obj->get_state())
         {
         case TS_Raise:
-            if (cur_obj->check_height()) cur_obj->prepare_keep();  // начать удержание предмета
+            if (cur_obj->check_height()) cur_obj->prepare_keep(); // начать удержание предмета
             break;
         case TS_Keep:
             if (cur_obj->time_keep_elapsed()) {

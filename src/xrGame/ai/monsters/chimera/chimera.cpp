@@ -129,10 +129,10 @@ void CChimera::reinit()
 
     move().load_velocity(*cNameSect(), "Velocity_JumpGround", MonsterMovement::eChimeraVelocityParameterJumpGround);
 
-    com_man().load_jump_data(0,  //"jump_attack_0",
-        0,                       //"jump_attack_0",
+    com_man().load_jump_data(0, //"jump_attack_0",
+        0,                      //"jump_attack_0",
         "jump_attack_1", "jump_attack_2",
-        u32(-1),  // MonsterMovement::eVelocityParameterRunNormal,
+        u32(-1), // MonsterMovement::eVelocityParameterRunNormal,
         MonsterMovement::eChimeraVelocityParameterJumpGround, 0);
 }
 

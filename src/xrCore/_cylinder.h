@@ -99,13 +99,13 @@ public:
                 afT[1] = (-fB + fRoot) * fTmp0;
                 code[0] = cyl_wall;
                 code[1] = cyl_wall;
-                return 2;  // wall
+                return 2; // wall
             }
             else
             {
                 afT[0] = -fB * fInvDLength / fA;
                 code[0] = cyl_wall;
-                return 1;  // wall
+                return 1; // wall
             }
         }
 
@@ -130,7 +130,7 @@ public:
 
         if (iQuantity == 2) {
             // line intersects both top and bottom
-            return 2;  // both caps
+            return 2; // both caps
         }
 
         // If iQuantity == 1, then line must intersect cylinder wall
@@ -252,4 +252,4 @@ BOOL _valid(const _cylinder<T>& c)
     return _valid(c.m_center) && _valid(c.m_direction) && _valid(c.m_height) && _valid(c.m_radius);
 }
 
-#endif  // _DEBUG
+#endif // _DEBUG

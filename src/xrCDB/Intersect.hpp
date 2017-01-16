@@ -40,13 +40,13 @@ IC bool TestRayTri(const Fvector& C, const Fvector& D, Fvector** p, float& u, fl
     if (bCull) {
         // define TEST_CULL if culling is desired
         if (det < EPS) return false;
-        tvec.sub(C, *p[0]);         // calculate distance from vert0 to ray origin
-        u = tvec.dotproduct(pvec);  // calculate U parameter and test bounds
+        tvec.sub(C, *p[0]);        // calculate distance from vert0 to ray origin
+        u = tvec.dotproduct(pvec); // calculate U parameter and test bounds
         if (u < 0.0 || u > det) return false;
-        qvec.crossproduct(tvec, edge1);  // prepare to test V parameter
-        v = D.dotproduct(qvec);          // calculate V parameter and test bounds
+        qvec.crossproduct(tvec, edge1); // prepare to test V parameter
+        v = D.dotproduct(qvec);         // calculate V parameter and test bounds
         if (v < 0.0 || u + v > det) return false;
-        range = edge2.dotproduct(qvec);  // calculate t, scale parameters, ray intersects triangle
+        range = edge2.dotproduct(qvec); // calculate t, scale parameters, ray intersects triangle
         inv_det = 1.0f / det;
         range *= inv_det;
         u *= inv_det;
@@ -57,13 +57,13 @@ IC bool TestRayTri(const Fvector& C, const Fvector& D, Fvector** p, float& u, fl
         // the non-culling branch
         if (det > -EPS && det < EPS) return false;
         inv_det = 1.0f / det;
-        tvec.sub(C, *p[0]);                   // calculate distance from vert0 to ray origin
-        u = tvec.dotproduct(pvec) * inv_det;  // calculate U parameter and test bounds
+        tvec.sub(C, *p[0]);                  // calculate distance from vert0 to ray origin
+        u = tvec.dotproduct(pvec) * inv_det; // calculate U parameter and test bounds
         if (u < 0.0f || u > 1.0f) return false;
-        qvec.crossproduct(tvec, edge1);    // prepare to test V parameter
-        v = D.dotproduct(qvec) * inv_det;  // calculate V parameter and test bounds
+        qvec.crossproduct(tvec, edge1);   // prepare to test V parameter
+        v = D.dotproduct(qvec) * inv_det; // calculate V parameter and test bounds
         if (v < 0.0f || u + v > 1.0f) return false;
-        range = edge2.dotproduct(qvec) * inv_det;  // calculate t, ray intersects triangle
+        range = edge2.dotproduct(qvec) * inv_det; // calculate t, ray intersects triangle
     }
     return true;
 }
@@ -82,13 +82,13 @@ IC bool TestRayTri(const Fvector& C, const Fvector& D, Fvector* p, float& u, flo
     if (bCull) {
         // define TEST_CULL if culling is desired
         if (det < EPS) return false;
-        tvec.sub(C, p[0]);          // calculate distance from vert0 to ray origin
-        u = tvec.dotproduct(pvec);  // calculate U parameter and test bounds
+        tvec.sub(C, p[0]);         // calculate distance from vert0 to ray origin
+        u = tvec.dotproduct(pvec); // calculate U parameter and test bounds
         if (u < 0.0f || u > det) return false;
-        qvec.crossproduct(tvec, edge1);  // prepare to test V parameter
-        v = D.dotproduct(qvec);          // calculate V parameter and test bounds
+        qvec.crossproduct(tvec, edge1); // prepare to test V parameter
+        v = D.dotproduct(qvec);         // calculate V parameter and test bounds
         if (v < 0.0f || u + v > det) return false;
-        range = edge2.dotproduct(qvec);  // calculate t, scale parameters, ray intersects triangle
+        range = edge2.dotproduct(qvec); // calculate t, scale parameters, ray intersects triangle
         inv_det = 1.0f / det;
         range *= inv_det;
         u *= inv_det;
@@ -99,13 +99,13 @@ IC bool TestRayTri(const Fvector& C, const Fvector& D, Fvector* p, float& u, flo
         // the non-culling branch
         if (det > -EPS && det < EPS) return false;
         inv_det = 1.0f / det;
-        tvec.sub(C, p[0]);                    // calculate distance from vert0 to ray origin
-        u = tvec.dotproduct(pvec) * inv_det;  // calculate U parameter and test bounds
+        tvec.sub(C, p[0]);                   // calculate distance from vert0 to ray origin
+        u = tvec.dotproduct(pvec) * inv_det; // calculate U parameter and test bounds
         if (u < 0.0f || u > 1.0f) return false;
-        qvec.crossproduct(tvec, edge1);    // prepare to test V parameter
-        v = D.dotproduct(qvec) * inv_det;  // calculate V parameter and test bounds
+        qvec.crossproduct(tvec, edge1);   // prepare to test V parameter
+        v = D.dotproduct(qvec) * inv_det; // calculate V parameter and test bounds
         if (v < 0.0f || u + v > 1.0f) return false;
-        range = edge2.dotproduct(qvec) * inv_det;  // calculate t, ray intersects triangle
+        range = edge2.dotproduct(qvec) * inv_det; // calculate t, ray intersects triangle
     }
     return true;
 }
@@ -129,12 +129,12 @@ IC bool TestRayTri2(const Fvector& C, const Fvector& D, Fvector* p, float& range
         return false;
     }
     inv_det = 1.0f / det;
-    tvec.sub(C, p[0]);                         // calculate distance from vert0 to ray origin
-    u = tvec.dotproduct(pvec) * inv_det;       // calculate U parameter and test bounds
-    qvec.crossproduct(tvec, edge1);            // prepare to test V parameter
-    range = edge2.dotproduct(qvec) * inv_det;  // calculate t, ray intersects plane
+    tvec.sub(C, p[0]);                        // calculate distance from vert0 to ray origin
+    u = tvec.dotproduct(pvec) * inv_det;      // calculate U parameter and test bounds
+    qvec.crossproduct(tvec, edge1);           // prepare to test V parameter
+    range = edge2.dotproduct(qvec) * inv_det; // calculate t, ray intersects plane
     if (u < 0.0f || u > 1.0f) return false;
-    v = D.dotproduct(qvec) * inv_det;  // calculate V parameter and test bounds
+    v = D.dotproduct(qvec) * inv_det; // calculate V parameter and test bounds
     if (v < 0.0f || u + v > 1.0f) return false;
     return true;
 }
@@ -156,12 +156,12 @@ IC bool TestRayTri2(const Fvector& C, const Fvector& D, Fvector** p, float& rang
         return false;
     }
     inv_det = 1.0f / det;
-    tvec.sub(C, *p[0]);                        // calculate distance from vert0 to ray origin
-    u = tvec.dotproduct(pvec) * inv_det;       // calculate U parameter and test bounds
-    qvec.crossproduct(tvec, edge1);            // prepare to test V parameter
-    range = edge2.dotproduct(qvec) * inv_det;  // calculate t, ray intersects plane
+    tvec.sub(C, *p[0]);                       // calculate distance from vert0 to ray origin
+    u = tvec.dotproduct(pvec) * inv_det;      // calculate U parameter and test bounds
+    qvec.crossproduct(tvec, edge1);           // prepare to test V parameter
+    range = edge2.dotproduct(qvec) * inv_det; // calculate t, ray intersects plane
     if (u < 0.0f || u > 1.0f) return false;
-    v = D.dotproduct(qvec) * inv_det;  // calculate V parameter and test bounds
+    v = D.dotproduct(qvec) * inv_det; // calculate V parameter and test bounds
     if (v < 0.0f || u + v > 1.0f) return false;
     return true;
 }
@@ -263,85 +263,85 @@ IC bool TestBBoxTri(const Fmatrix33& A, const Fvector& T, const Fvector& extA, F
     float A2dN = A.k.dotproduct(N);
     float R = _abs(extA.x * A0dN) + _abs(extA.y * A1dN) + _abs(extA.z * A2dN);
     float NdD = N.dotproduct(D);
-    TESTV0(NdD, R);  // AXIS_N
+    TESTV0(NdD, R); // AXIS_N
 
     // axis C+t*A0
     float A0dD = A.i.dotproduct(D);
     float A0dE0 = A.i.dotproduct(E[0]);
     float A0dE1 = A.i.dotproduct(E[1]);
-    TESTV1(A0dD, A0dE0, A0dE1, extA.x);  // AXIS_A0
+    TESTV1(A0dD, A0dE0, A0dE1, extA.x); // AXIS_A0
 
     // axis C+t*A1
     float A1dD = A.j.dotproduct(D);
     float A1dE0 = A.j.dotproduct(E[0]);
     float A1dE1 = A.j.dotproduct(E[1]);
-    TESTV1(A1dD, A1dE0, A1dE1, extA.y);  // AXIS_A1
+    TESTV1(A1dD, A1dE0, A1dE1, extA.y); // AXIS_A1
 
     // axis C+t*A2
     float A2dD = A.k.dotproduct(D);
     float A2dE0 = A.k.dotproduct(E[0]);
     float A2dE1 = A.k.dotproduct(E[1]);
-    TESTV1(A2dD, A2dE0, A2dE1, extA.z);  // AXIS_A2
+    TESTV1(A2dD, A2dE0, A2dE1, extA.z); // AXIS_A2
 
     // axis C+t*A0xE0
     Fvector A0xE0;
     A0xE0.crossproduct(A.i, E[0]);
     float A0xE0dD = A0xE0.dotproduct(D);
     R = _abs(extA.y * A2dE0) + _abs(extA.z * A1dE0);
-    TESTV2(A0xE0dD, A0dN, R);  // AXIS_A0xE0
+    TESTV2(A0xE0dD, A0dN, R); // AXIS_A0xE0
 
     // axis C+t*A0xE1
     Fvector A0xE1;
     A0xE1.crossproduct(A.i, E[1]);
     float A0xE1dD = A0xE1.dotproduct(D);
     R = _abs(extA.y * A2dE1) + _abs(extA.z * A1dE1);
-    TESTV2(A0xE1dD, -A0dN, R);  // AXIS_A0xE1
+    TESTV2(A0xE1dD, -A0dN, R); // AXIS_A0xE1
 
     // axis C+t*A0xE2
     float A1dE2 = A1dE1 - A1dE0;
     float A2dE2 = A2dE1 - A2dE0;
     float A0xE2dD = A0xE1dD - A0xE0dD;
     R = _abs(extA.y * A2dE2) + _abs(extA.z * A1dE2);
-    TESTV2(A0xE2dD, -A0dN, R);  // AXIS_A0xE2
+    TESTV2(A0xE2dD, -A0dN, R); // AXIS_A0xE2
 
     // axis C+t*A1xE0
     Fvector A1xE0;
     A1xE0.crossproduct(A.j, E[0]);
     float A1xE0dD = A1xE0.dotproduct(D);
     R = _abs(extA.x * A2dE0) + _abs(extA.z * A0dE0);
-    TESTV2(A1xE0dD, A1dN, R);  // AXIS_A1xE0
+    TESTV2(A1xE0dD, A1dN, R); // AXIS_A1xE0
 
     // axis C+t*A1xE1
     Fvector A1xE1;
     A1xE1.crossproduct(A.j, E[1]);
     float A1xE1dD = A1xE1.dotproduct(D);
     R = _abs(extA.x * A2dE1) + _abs(extA.z * A0dE1);
-    TESTV2(A1xE1dD, -A1dN, R);  // AXIS_A1xE1
+    TESTV2(A1xE1dD, -A1dN, R); // AXIS_A1xE1
 
     // axis C+t*A1xE2
     float A0dE2 = A0dE1 - A0dE0;
     float A1xE2dD = A1xE1dD - A1xE0dD;
     R = _abs(extA.x * A2dE2) + _abs(extA.z * A0dE2);
-    TESTV2(A1xE2dD, -A1dN, R);  // AXIS_A1xE2
+    TESTV2(A1xE2dD, -A1dN, R); // AXIS_A1xE2
 
     // axis C+t*A2xE0
     Fvector A2xE0;
     A2xE0.crossproduct(A.k, E[0]);
     float A2xE0dD = A2xE0.dotproduct(D);
     R = _abs(extA.x * A1dE0) + _abs(extA.y * A0dE0);
-    TESTV2(A2xE0dD, A2dN, R);  // AXIS_A2xE0
+    TESTV2(A2xE0dD, A2dN, R); // AXIS_A2xE0
 
     // axis C+t*A2xE1
     Fvector A2xE1;
     A2xE1.crossproduct(A.k, E[1]);
     float A2xE1dD = A2xE1.dotproduct(D);
     R = _abs(extA.x * A1dE1) + _abs(extA.y * A0dE1);
-    TESTV2(A2xE1dD, -A2dN, R);  // AXIS_A2xE1
+    TESTV2(A2xE1dD, -A2dN, R); // AXIS_A2xE1
 
     // axis C+t*A2xE2
     float A2xE2dD = A2xE1dD - A2xE0dD;
     R = _abs(extA.x * A1dE2) + _abs(extA.y * A0dE2);
-    TESTV2(A2xE2dD, -A2dN, R);  // AXIS_A2xE2
+    TESTV2(A2xE2dD, -A2dN, R); // AXIS_A2xE2
 
     // intersection occurs
     return true;
@@ -364,85 +364,85 @@ IC bool TestBBoxTri(const Fmatrix33& A, const Fvector& T, const Fvector& extA, F
     float A2dN = A.k.dotproduct(N);
     float R = _abs(extA.x * A0dN) + _abs(extA.y * A1dN) + _abs(extA.z * A2dN);
     float NdD = N.dotproduct(D);
-    TESTV0(NdD, R);  // AXIS_N
+    TESTV0(NdD, R); // AXIS_N
 
     // axis C+t*A0
     float A0dD = A.i.dotproduct(D);
     float A0dE0 = A.i.dotproduct(E[0]);
     float A0dE1 = A.i.dotproduct(E[1]);
-    TESTV1(A0dD, A0dE0, A0dE1, extA.x);  // AXIS_A0
+    TESTV1(A0dD, A0dE0, A0dE1, extA.x); // AXIS_A0
 
     // axis C+t*A1
     float A1dD = A.j.dotproduct(D);
     float A1dE0 = A.j.dotproduct(E[0]);
     float A1dE1 = A.j.dotproduct(E[1]);
-    TESTV1(A1dD, A1dE0, A1dE1, extA.y);  // AXIS_A1
+    TESTV1(A1dD, A1dE0, A1dE1, extA.y); // AXIS_A1
 
     // axis C+t*A2
     float A2dD = A.k.dotproduct(D);
     float A2dE0 = A.k.dotproduct(E[0]);
     float A2dE1 = A.k.dotproduct(E[1]);
-    TESTV1(A2dD, A2dE0, A2dE1, extA.z);  // AXIS_A2
+    TESTV1(A2dD, A2dE0, A2dE1, extA.z); // AXIS_A2
 
     // axis C+t*A0xE0
     Fvector A0xE0;
     A0xE0.crossproduct(A.i, E[0]);
     float A0xE0dD = A0xE0.dotproduct(D);
     R = _abs(extA.y * A2dE0) + _abs(extA.z * A1dE0);
-    TESTV2(A0xE0dD, A0dN, R);  // AXIS_A0xE0
+    TESTV2(A0xE0dD, A0dN, R); // AXIS_A0xE0
 
     // axis C+t*A0xE1
     Fvector A0xE1;
     A0xE1.crossproduct(A.i, E[1]);
     float A0xE1dD = A0xE1.dotproduct(D);
     R = _abs(extA.y * A2dE1) + _abs(extA.z * A1dE1);
-    TESTV2(A0xE1dD, -A0dN, R);  // AXIS_A0xE1
+    TESTV2(A0xE1dD, -A0dN, R); // AXIS_A0xE1
 
     // axis C+t*A0xE2
     float A1dE2 = A1dE1 - A1dE0;
     float A2dE2 = A2dE1 - A2dE0;
     float A0xE2dD = A0xE1dD - A0xE0dD;
     R = _abs(extA.y * A2dE2) + _abs(extA.z * A1dE2);
-    TESTV2(A0xE2dD, -A0dN, R);  // AXIS_A0xE2
+    TESTV2(A0xE2dD, -A0dN, R); // AXIS_A0xE2
 
     // axis C+t*A1xE0
     Fvector A1xE0;
     A1xE0.crossproduct(A.j, E[0]);
     float A1xE0dD = A1xE0.dotproduct(D);
     R = _abs(extA.x * A2dE0) + _abs(extA.z * A0dE0);
-    TESTV2(A1xE0dD, A1dN, R);  // AXIS_A1xE0
+    TESTV2(A1xE0dD, A1dN, R); // AXIS_A1xE0
 
     // axis C+t*A1xE1
     Fvector A1xE1;
     A1xE1.crossproduct(A.j, E[1]);
     float A1xE1dD = A1xE1.dotproduct(D);
     R = _abs(extA.x * A2dE1) + _abs(extA.z * A0dE1);
-    TESTV2(A1xE1dD, -A1dN, R);  // AXIS_A1xE1
+    TESTV2(A1xE1dD, -A1dN, R); // AXIS_A1xE1
 
     // axis C+t*A1xE2
     float A0dE2 = A0dE1 - A0dE0;
     float A1xE2dD = A1xE1dD - A1xE0dD;
     R = _abs(extA.x * A2dE2) + _abs(extA.z * A0dE2);
-    TESTV2(A1xE2dD, -A1dN, R);  // AXIS_A1xE2
+    TESTV2(A1xE2dD, -A1dN, R); // AXIS_A1xE2
 
     // axis C+t*A2xE0
     Fvector A2xE0;
     A2xE0.crossproduct(A.k, E[0]);
     float A2xE0dD = A2xE0.dotproduct(D);
     R = _abs(extA.x * A1dE0) + _abs(extA.y * A0dE0);
-    TESTV2(A2xE0dD, A2dN, R);  // AXIS_A2xE0
+    TESTV2(A2xE0dD, A2dN, R); // AXIS_A2xE0
 
     // axis C+t*A2xE1
     Fvector A2xE1;
     A2xE1.crossproduct(A.k, E[1]);
     float A2xE1dD = A2xE1.dotproduct(D);
     R = _abs(extA.x * A1dE1) + _abs(extA.y * A0dE1);
-    TESTV2(A2xE1dD, -A2dN, R);  // AXIS_A2xE1
+    TESTV2(A2xE1dD, -A2dN, R); // AXIS_A2xE1
 
     // axis C+t*A2xE2
     float A2xE2dD = A2xE1dD - A2xE0dD;
     R = _abs(extA.x * A1dE2) + _abs(extA.y * A0dE2);
-    TESTV2(A2xE2dD, -A2dN, R);  // AXIS_A2xE2
+    TESTV2(A2xE2dD, -A2dN, R); // AXIS_A2xE2
 
     // intersection occurs
     return true;

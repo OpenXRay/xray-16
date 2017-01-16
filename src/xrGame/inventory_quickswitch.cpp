@@ -65,9 +65,9 @@ private:
     u32 m_best_fit_cost;
     u32 m_best_fit_ammo_elapsed;
     bool m_ignore_ammo;
-};  // class next_weapon_searcher
+}; // class next_weapon_searcher
 
-static u32 const exception_items_clear_time = 2000;  // 2 seconds
+static u32 const exception_items_clear_time = 2000; // 2 seconds
 PIItem CInventory::GetNextItemInActiveSlot(u8 const priority_value, bool ignore_ammo)
 {
     if (m_next_item_iteration_time + exception_items_clear_time <= Device.dwTimeGlobal) {
@@ -111,7 +111,7 @@ bool CInventory::ActivateNextItemInActiveSlot()
     PIItem new_item = GetNextItemInActiveSlot(0, false);
 
     if (new_item == NULL) {
-        return false;  // only 1 item for this slot
+        return false; // only 1 item for this slot
     }
 
     m_activ_last_items.push_back(new_item);
@@ -177,7 +177,7 @@ u32 g_slot2_assault_switch_priority = 2;
 u32 g_slot2_sniper_switch_priority = 4;
 u32 g_slot2_heavy_switch_priority = 3;
 
-u32 g_slot3_pistol_switch_priority = 4;  // not switch
+u32 g_slot3_pistol_switch_priority = 4; // not switch
 u32 g_slot3_shotgun_switch_priority = 2;
 u32 g_slot3_assault_switch_priority = 0;
 u32 g_slot3_sniper_switch_priority = 1;
@@ -199,7 +199,7 @@ void CInventory::InitPriorityGroupsForQSwitch()
     m_slot2_priorities[g_slot2_sniper_switch_priority] = &m_groups[epg_sniper_rifels];
     m_slot2_priorities[g_slot2_heavy_switch_priority] = &m_groups[epg_heavy_weapons];
 
-    m_slot3_priorities[g_slot3_pistol_switch_priority] = &m_groups[epg_assault];  //&m_groups[epg_pistols];
+    m_slot3_priorities[g_slot3_pistol_switch_priority] = &m_groups[epg_assault]; //&m_groups[epg_pistols];
     m_slot3_priorities[g_slot3_shotgun_switch_priority] = &m_groups[epg_shotgun];
     m_slot3_priorities[g_slot3_assault_switch_priority] = &m_groups[epg_assault];
     m_slot3_priorities[g_slot3_sniper_switch_priority] = &m_groups[epg_sniper_rifels];

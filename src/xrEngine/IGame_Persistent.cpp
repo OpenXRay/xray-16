@@ -21,7 +21,7 @@ bool g_dedicated_server = false;
 
 #ifdef INGAME_EDITOR
 #include "editor_environment_manager.hpp"
-#endif  // INGAME_EDITOR
+#endif // INGAME_EDITOR
 
 ENGINE_API IGame_Persistent* g_pGamePersistent = NULL;
 
@@ -39,12 +39,12 @@ IGame_Persistent::IGame_Persistent()
 #ifndef _EDITOR
     pEnvironment = new CEnvironment();
 #endif
-#else   // #ifdef INGAME_EDITOR
+#else  // #ifdef INGAME_EDITOR
     if (RDEVICE.editor())
         pEnvironment = new editor::environment::manager();
     else
         pEnvironment = new CEnvironment();
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR
 }
 
 IGame_Persistent::~IGame_Persistent()

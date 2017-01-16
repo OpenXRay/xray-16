@@ -36,7 +36,7 @@ void clean_wnd_rects()
 {
 #ifdef DEBUG
     GlobalEnv.DRender->DestroyDebugShader(IDebugRender::dbgShaderWindow);
-#endif  // DEBUG
+#endif // DEBUG
 }
 
 void add_rect_to_draw(Frect r)
@@ -61,7 +61,7 @@ void draw_rect(Frect& r, u32 color)
     //.	GlobalEnv.UIRender->FlushLineStrip();
     GlobalEnv.UIRender->FlushPrimitive();
 
-#endif  // DEBUG
+#endif // DEBUG
 }
 void draw_wnds_rects()
 {
@@ -545,12 +545,12 @@ void CUIWindow::ShowChildren(bool show)
         (*it)->Show(show);
 }
 
-static bool is_in(Frect const& a, Frect const& b)  // b in a
+static bool is_in(Frect const& a, Frect const& b) // b in a
 {
     return (a.x1 < b.x1) && (a.x2 > b.x2) && (a.y1 < b.y1) && (a.y2 > b.y2);
 }
 
-bool fit_in_rect(CUIWindow* w, Frect const& vis_rect, float border, float dx16pos)  // this = hint wnd
+bool fit_in_rect(CUIWindow* w, Frect const& vis_rect, float border, float dx16pos) // this = hint wnd
 {
     float const cursor_height = 43.0f;
     Fvector2 cursor_pos = GetUICursor().GetCursorPosition();

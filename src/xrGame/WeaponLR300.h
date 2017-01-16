@@ -22,4 +22,4 @@ public:
     virtual ~CWeaponLR300();
 };
 
-#endif  //__XR_WEAPON_LR300_H__
+#endif //__XR_WEAPON_LR300_H__

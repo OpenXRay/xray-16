@@ -64,9 +64,9 @@
 // WIN32
 #elif defined(_WIN32)
 #define WIN32_LEAN_AND_MEAN
-#include <windows.h>
 #include <limits.h>
 #include <time.h>
+#include <windows.h>
 
 #if defined(GSI_WINSOCK2)
 #include <winsock2.h>
@@ -81,30 +81,30 @@
 #elif defined(_PS2)
 // EENet headers must be included before common PS2 headers
 #ifdef EENET
-#include <libeenet.h>
+#include <arpa/inet.h>
 #include <eenetctl.h>
 #include <ifaddrs.h>
-#include <sys/socket.h>
-#include <sys/errno.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <net/if.h>
-#include <sys/select.h>
+#include <libeenet.h>
 #include <malloc.h>
+#include <net/if.h>
+#include <netinet/in.h>
+#include <sys/errno.h>
+#include <sys/select.h>
+#include <sys/socket.h>
 
-#endif  // EENET
+#endif // EENET
 
 // Common PS2 headers
 #include <eekernel.h>
-#include <stdio.h>
-#include <malloc.h>
-#include <sifdev.h>
-#include <sifrpc.h>
-#include <sifcmd.h>
 #include <ilink.h>
 #include <ilsock.h>
 #include <ilsocksf.h>
 #include <limits.h>
+#include <malloc.h>
+#include <sifcmd.h>
+#include <sifdev.h>
+#include <sifrpc.h>
+#include <stdio.h>
 
 #ifdef SN_SYSTEMS
 // undefine socket defines from sys/types.h
@@ -117,30 +117,30 @@
 #undef FD_ISSET
 #undef FD_SETSIZE
 #undef fd_set
-#include "snskdefs.h"
-#include "sntypes.h"
-#include "snsocket.h"
 #include "sneeutil.h"
+#include "snskdefs.h"
+#include "snsocket.h"
 #include "sntcutil.h"
-#endif  // SN_SYSTEMS
+#include "sntypes.h"
+#endif // SN_SYSTEMS
 
 #ifdef INSOCK
 #include "libinsck.h"
 #include "libnet.h"
 #include "sys/errno.h"
 //#include "libmrpc.h"
-#endif  // INSOCK
+#endif // INSOCK
 
 // LINUX and MACOSX
 #elif defined(_UNIX)
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <stdio.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <sys/ioctl.h>
 #include <netinet/in.h>
+#include <stdio.h>
+#include <sys/ioctl.h>
+#include <sys/socket.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 // MACOSX Warning!! netdb.h has it's own NOFILE define.
 // GameSpy uses NOFILE to determine if an HD is available
@@ -155,8 +155,8 @@
 
 #include <arpa/inet.h>
 #include <errno.h>
-#include <sys/time.h>
 #include <limits.h>
+#include <sys/time.h>
 //#include <sys/syslimits.h>
 #include <netinet/tcp.h>
 
@@ -166,59 +166,59 @@
 // Nintendo DS
 #elif defined(_NITRO)
 #include <nitro.h>
-#define NINET_NWBASE_MD5_H_  // resolves md5 conflicts
-#include <nitroWiFi.h>
-#include <extras.h>  // mwerks
+#define NINET_NWBASE_MD5_H_ // resolves md5 conflicts
+#include <extras.h>         // mwerks
 #include <limits.h>
+#include <nitroWiFi.h>
 
 // Raw sockets are undefined on Nitro
 #define SB_NO_ICMP_SUPPORT
 
 // Sony PSP
 #elif defined(_PSP)
+#include <errno.h>
 #include <kernel.h>
 #include <pspnet.h>
+#include <pspnet/sys/select.h>
+#include <pspnet_ap_dialog_dummy.h>
+#include <pspnet_apctl.h>
 #include <pspnet_error.h>
 #include <pspnet_inet.h>
-#include <pspnet/sys/select.h>
 #include <pspnet_resolver.h>
-#include <pspnet_apctl.h>
-#include <pspnet_ap_dialog_dummy.h>
 #include <rtcsvc.h>
-#include <errno.h>
 #include <wlan.h>
 
-#include <pspnet/sys/socket.h>
 #include <pspnet/netinet/in.h>
+#include <pspnet/sys/socket.h>
 #include <utility\utility_common.h>
-#include <utility\utility_netconf.h>
 #include <utility\utility_module.h>
+#include <utility\utility_netconf.h>
 // PS3
 #elif defined(_PS3)
+#include <arpa/inet.h>
+#include <errno.h>
+#include <netdb.h>
 #include <netex/errno.h>
+#include <netex/ifctl.h>
+#include <netex/net.h>
+#include <netinet/in.h>
 #include <sys/process.h>
-#include <sys/time.h>
-#include <sys/types.h>
 #include <sys/select.h>
 #include <sys/socket.h>
 #include <sys/sys_time.h>
+#include <sys/time.h>
 #include <sys/timer.h>
-#include <errno.h>
-#include <netdb.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <netex/net.h>
-#include <netex/ifctl.h>
+#include <sys/types.h>
 //	#include <netex/netset.h>
 #include <limits.h>
 #include <time.h>
 
 // Nintendo Wii
 #elif defined(_REVOLUTION)
-#include <revolution.h>
-#include <revolution/soex.h>
-#include <revolution/ncd.h>
 #include <limits.h>
+#include <revolution.h>
+#include <revolution/ncd.h>
+#include <revolution/soex.h>
 
 // Raw sockets are undefined on Revolution
 #define SB_NO_ICMP_SUPPORT
@@ -227,7 +227,7 @@
 #else
 #error "The GameSpy SDKs do not support this operating system"
 
-#endif  //(platform switch)
+#endif //(platform switch)
 
 //---------- __cdecl fix for __fastcall conventions ----------
 #if defined(_WIN32)
@@ -237,7 +237,7 @@
 #endif
 
 //---------- Handle Endianess ----------------------
-#if defined(_PS3) || defined(_REVOLUTION) || defined(_X360)  // defined(_MACOSX)
+#if defined(_PS3) || defined(_REVOLUTION) || defined(_X360) // defined(_MACOSX)
 #define GSI_BIG_ENDIAN
 #endif
 #ifndef GSI_BIG_ENDIAN
@@ -275,11 +275,11 @@ typedef short gsi_i16;
 typedef unsigned short gsi_u16;
 typedef int gsi_i32;
 typedef unsigned int gsi_u32;
-typedef unsigned int gsi_time;  // must be 32 bits
+typedef unsigned int gsi_time; // must be 32 bits
 
 // decprecated
-typedef gsi_i32 goa_int32;   // 2003.Oct.04.JED - typename deprecated
-typedef gsi_u32 goa_uint32;  //  these types will be removed once all SDK's are updated
+typedef gsi_i32 goa_int32;  // 2003.Oct.04.JED - typename deprecated
+typedef gsi_u32 goa_uint32; //  these types will be removed once all SDK's are updated
 
 typedef int gsi_bool;
 #define gsi_false ((gsi_bool)0)
@@ -315,16 +315,16 @@ typedef uint64_t gsi_u64;
 #elif defined(_REVOLUTION)
 typedef signed long long gsi_i64;
 typedef unsigned long long gsi_u64;
-#else   /* _UNIX */
+#else  /* _UNIX */
 typedef long long gsi_i64;
 typedef unsigned long long gsi_u64;
-#endif  // 64 bit types
+#endif // 64 bit types
 
 #ifndef GSI_UNICODE
 #define gsi_char char
 #else
 #define gsi_char unsigned short
-#endif  // goa_char
+#endif // goa_char
 
 // expected ranges for integer types
 #define GSI_MIN_I8 CHAR_MIN
@@ -412,11 +412,11 @@ extern "C" {
 #else
 #define _tsnprintf snprintf
 #endif
-#endif  // GSI_UNICODE
+#endif // GSI_UNICODE
 
 #if defined(_WIN32)
 #define snprintf _snprintf
-#endif  // _WIN32
+#endif // _WIN32
 
 #if defined(_WIN32)
 #define strcasecmp _stricmp
@@ -444,18 +444,18 @@ static char _mempool[MEMPOOL_SIZE]	POST_ALIGN(16);
 
 */
 #if defined _WIN32
-#define PRE_ALIGN(x) __declspec(align(x))  // ignore Win32 directive
-#define POST_ALIGN(x)                      // ignore
+#define PRE_ALIGN(x) __declspec(align(x)) // ignore Win32 directive
+#define POST_ALIGN(x)                     // ignore
 #elif defined(_PS2) || defined(_PSP) || defined(_PS3)
-#define PRE_ALIGN(x)                               // ignored this on psp/ps2
-#define POST_ALIGN(x) __attribute__((aligned(x)))  //
+#define PRE_ALIGN(x)                              // ignored this on psp/ps2
+#define POST_ALIGN(x) __attribute__((aligned(x))) //
 #elif defined(_REVOLUTION)
-#define PRE_ALIGN(x)  // not needed
+#define PRE_ALIGN(x) // not needed
 #define POST_ALIGN(x) __attribute__((aligned(32)))
 #else
 // #warning "Platform not supported"
-#define PRE_ALIGN(x)   // ignore
-#define POST_ALIGN(x)  // ignore
+#define PRE_ALIGN(x)  // ignore
+#define POST_ALIGN(x) // ignore
 #endif
 
 #define DIM(x) (sizeof(x) / sizeof((x)[0]))
@@ -472,4 +472,4 @@ extern gsi_u64 gsiByteOrderSwap64(gsi_u64);
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
-#endif  // __GSPLATFORM_H__
+#endif // __GSPLATFORM_H__

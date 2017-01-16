@@ -27,7 +27,7 @@ BOOL CPseudogigantStepEffector::ProcessCam(SCamEffectorInfo& info)
     Mdef.i.crossproduct(info.n, info.d);
     Mdef.c.set(info.p);
 
-    float period_all = period_number * PI_MUL_2;  // макс. значение цикла
+    float period_all = period_number * PI_MUL_2; // макс. значение цикла
     float k = 1 - time_left_perc + EPS_L + (1 - power);
     float cur_amp = max_amp * (PI / 180) / (10 * k * k);
 

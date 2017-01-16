@@ -74,7 +74,7 @@ void CUIProgressBar::Update()
 {
     inherited::Update();
     if (!fsimilar(m_ProgressPos.x, m_ProgressPos.y)) {
-        if (fsimilar(m_MaxPos, m_MinPos)) m_MaxPos += EPS;  // hack ^(
+        if (fsimilar(m_MaxPos, m_MinPos)) m_MaxPos += EPS; // hack ^(
         float _diff = m_ProgressPos.y - m_ProgressPos.x;
 
         float _length = (m_MaxPos - m_MinPos);

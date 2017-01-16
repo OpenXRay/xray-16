@@ -67,7 +67,7 @@ void CSE_ALifeTraderAbstract::vfInitInventory()
     //	m_iCumulativeItemVolume		= 0;
 }
 
-#if 0  // def DEBUG
+#if 0 // def DEBUG
 bool CSE_ALifeTraderAbstract::check_inventory_consistency	()
 {
 	int							volume = 0;
@@ -175,8 +175,9 @@ void add_online_impl(CSE_ALifeDynamicObject* object, const bool& update_registri
             object->name_replace(), "*SERVER*");
 #endif
 
-        //		R_ASSERT3								(ai().level_graph().valid_vertex_id(l_tpALifeDynamicObject->m_tNodeID),"Invalid
-        //vertex for object ",l_tpALifeInventoryItem->name_replace());
+        //		R_ASSERT3
+        //(ai().level_graph().valid_vertex_id(l_tpALifeDynamicObject->m_tNodeID),"Invalid
+        // vertex for object ",l_tpALifeInventoryItem->name_replace());
         l_tpALifeDynamicObject->o_Position = object->o_Position;
         l_tpALifeDynamicObject->m_tNodeID = object->m_tNodeID;
         object->alife().server().Process_spawn(tNetPacket, clientID, FALSE, l_tpALifeInventoryItem->base());

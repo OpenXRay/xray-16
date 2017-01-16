@@ -15,7 +15,7 @@ private:
     } eDimensions;
 
     // data members
-    int m, s;  // size and number of support vectors
+    int m, s; // size and number of support vectors
 
     Fvector q0;
 
@@ -26,7 +26,7 @@ private:
     Fvector c[d + 1];
     float sqr_r[d + 1];
 
-    Fvector* current_c;  // vectors to some c[j]
+    Fvector* current_c; // vectors to some c[j]
     float current_sqr_r;
 
 public:
@@ -40,7 +40,7 @@ public:
     float excess(const Fvector& p) const;
 
     // modification
-    void reset();  // generates empty sphere with m=s=0
+    void reset(); // generates empty sphere with m=s=0
     bool push(const Fvector& p);
     void pop();
 };
@@ -57,9 +57,9 @@ public:
 
 private:
     // data members
-    VectorList L;    // STL list keeping the gVectors
-    Basis B;         // basis keeping the current ball
-    It support_end;  // past-the-end iterator of support set
+    VectorList L;   // STL list keeping the gVectors
+    Basis B;        // basis keeping the current ball
+    It support_end; // past-the-end iterator of support set
 
     // private methods
     void mtf_mb(It k);

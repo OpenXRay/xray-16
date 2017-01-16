@@ -8,7 +8,7 @@
 struct Triangle;
 struct dxBox
 {
-    dVector3 side;  // side lengths (x,y,z)
+    dVector3 side; // side lengths (x,y,z)
 };
 
 IC float dcTriListCollider::dBoxProj(dxGeom* box, const dReal* normal)
@@ -85,7 +85,7 @@ IC bool dcTriListCollider::CrossProjLine14(
 
     dReal t2 = (ac_vc1 * vc1_vc2 - ac_vc2 * vc1_2) / factor;
 
-    dReal nt2 = t2;  //*_sqrt(vc2_2);
+    dReal nt2 = t2; //*_sqrt(vc2_2);
     if (nt2 > hside || nt2 < -hside) return false;
 
     proj[0] = pt1[0] + vc1[0] * t1;

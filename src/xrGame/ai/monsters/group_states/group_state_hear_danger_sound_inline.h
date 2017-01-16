@@ -121,8 +121,8 @@ void CStateGroupHearDangerousSoundAbstract::setup_substates()
         }
 
         data.action.action = ACT_RUN;
-        data.action.time_out = 0;    // do not use time out
-        data.completion_dist = 3.f;  // get exactly to the point
+        data.action.time_out = 0;   // do not use time out
+        data.completion_dist = 3.f; // get exactly to the point
         data.time_to_rebuild = 0;
         data.accelerated = true;
         data.braking = true;

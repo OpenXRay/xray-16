@@ -68,5 +68,5 @@ void PLCCalc_SSE(int& c0, int& c1, int& c2, const Fvector& camPos, const Fvector
     c2 = iCeil_SSE(255.f * a);
 }
 
-}  // namespace Math
-}  // namespace XRay
+} // namespace Math
+} // namespace XRay

@@ -78,7 +78,7 @@ xrGameSpyServer::EConnect xrGameSpyServer::Connect(shared_str& session_name, Gam
     string4096 tMapName = "";
     const char* SName = *session_name;
     strncpy_s(tMapName, *session_name, strchr(SName, '/') - SName);
-    MapName = tMapName;  // = (session_name);
+    MapName = tMapName; // = (session_name);
 
     m_iReportToMasterServer = game->get_option_i(*session_name, "public", 0);
     m_iMaxPlayers = game->get_option_i(*session_name, "maxplayers", 32);
@@ -106,7 +106,7 @@ xrGameSpyServer::EConnect xrGameSpyServer::Connect(shared_str& session_name, Gam
 #endif
 
             CDKey_Init();
-#endif  // DEBUG
+#endif // DEBUG
     };
 
     return res;
@@ -153,7 +153,7 @@ void xrGameSpyServer::OnCL_Disconnected(IClient* _CL)
     };
 }
 
-u32 xrGameSpyServer::OnMessage(NET_Packet& P, ClientID sender)  // Non-Zero means broadcasting with "flags" as returned
+u32 xrGameSpyServer::OnMessage(NET_Packet& P, ClientID sender) // Non-Zero means broadcasting with "flags" as returned
 {
     u16 type;
     P.r_begin(type);
@@ -178,7 +178,7 @@ u32 xrGameSpyServer::OnMessage(NET_Packet& P, ClientID sender)  // Non-Zero mean
         if (!CL->m_bCDKeyAuth) {
 #ifndef MASTER_GOLD
             Msg("Server : Respond accepted, Authenticate client.");
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
             CGameSpy_GCD_Server::ClientAuthCallback authCb;
             authCb.bind(this, &xrGameSpyServer::OnCDKey_Validation);
             CGameSpy_GCD_Server::ClientReauthCallback reauthCb;
@@ -237,7 +237,7 @@ void xrGameSpyServer::Assign_ServerType(string512& res)
     else
     {
         xr_strcpy(res, "File <server_users.ltx> not found in folder <$app_data_root$>.");
-    }  // if FS.exist(fn)
+    } // if FS.exist(fn)
 
     Msg(res);
     ServerFlags.set(server_flag_protected, 0);

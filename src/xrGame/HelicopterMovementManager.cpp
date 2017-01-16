@@ -112,7 +112,7 @@ void SHeliMovementState::UpdatePatrolPath()
         currPatrolPath->begin(currPatrolVertex, b, e);
         if (b != e) {
             if (need_to_del_path &&
-                currPatrolVertex->data().flags())  // fake flags that signals entrypoint for round path
+                currPatrolVertex->data().flags()) // fake flags that signals entrypoint for round path
                 SetPointFlags(currPatrolVertex->vertex_id(), 0);
 
             currPatrolVertex = currPatrolPath->vertex((*b).vertex_id());
@@ -182,8 +182,7 @@ void SHeliMovementState::getPathAltitude(Fvector& point, float base_altitude)
 
     VERIFY(_valid(point));
 
-    float minY =
-        boundingVolume.min.y;  //+(m_boundingVolume.max.y-m_boundingVolume.min.y)*m_heli->m_data.m_alt_korridor;
+    float minY = boundingVolume.min.y; //+(m_boundingVolume.max.y-m_boundingVolume.min.y)*m_heli->m_data.m_alt_korridor;
     float maxY = boundingVolume.max.y + base_altitude;
     clamp(point.y, minY, maxY);
     VERIFY(_valid(point));
@@ -306,7 +305,7 @@ void SHeliMovementState::CreateRoundPoints(
     float height = center.y;
 
     float round_len = 2 * PI * radius;
-    static float dist = 30.0f;  // dist between points
+    static float dist = 30.0f; // dist between points
     float td = 2 * PI * dist / round_len;
     float dir_h = 0.0f;
 
@@ -330,7 +329,7 @@ void SHeliMovementState::goByRoundPath(Fvector center_, float radius_, bool cloc
     if (r_verify > radius_) {
 #ifndef MASTER_GOLD
         Msg("! Helicopter: cannot build round path R=%f. Min R=%f", radius_, r_verify);
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
         return;
     }
 

@@ -60,7 +60,7 @@ void CBackend::CreateQuadIB()
     HW.stats_manager.increment_stats_ib(QuadIB);
 }
 
-#else  //	USE_DX10
+#else //	USE_DX10
 
 // Igor: is used to test bug with rain, particles corruption
 void CBackend::RestoreQuadIBData()
@@ -117,14 +117,14 @@ void CBackend::CreateQuadIB()
     R_CHK(QuadIB->Unlock());
 }
 
-#endif  //	USE_DX10
+#endif //	USE_DX10
 
 // Device dependance
 void CBackend::OnDeviceCreate()
 {
 #if defined(USE_DX10) || defined(USE_DX11)
 // CreateConstantBuffers();
-#endif  //	USE_DX10
+#endif //	USE_DX10
 
     CreateQuadIB();
 
@@ -148,7 +148,7 @@ void CBackend::OnDeviceDestroy()
 
 #if defined(USE_DX10) || defined(USE_DX11)
 // DestroyConstantBuffers();
-#endif  //	USE_DX10
+#endif //	USE_DX10
 }
 
 #if defined(USE_DX10) || defined(USE_DX11)

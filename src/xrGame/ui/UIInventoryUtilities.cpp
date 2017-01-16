@@ -26,7 +26,7 @@ const LPCSTR ratingField = "rating_names";
 const LPCSTR reputationgField = "reputation_names";
 const LPCSTR goodwillField = "goodwill_names";
 
-const LPCSTR st_months[12] =  // StringTable for GetDateAsString()
+const LPCSTR st_months[12] = // StringTable for GetDateAsString()
     {"month_january", "month_february", "month_march", "month_april", "month_may", "month_june", "month_july",
         "month_august", "month_september", "month_october", "month_november", "month_december"};
 
@@ -487,13 +487,13 @@ void InventoryUtilities::SendInfoToLuaScripts(shared_str info)
 {
     if (GameID() != eGameIDSingle) return;
     if (info == shared_str("ui_talk_show")) {
-        int mode = 10;  // now Menu is Talk Dialog (show)
+        int mode = 10; // now Menu is Talk Dialog (show)
         luabind::functor<void> funct;
         R_ASSERT(ai().script_engine().functor("pda.actor_menu_mode", funct));
         funct(mode);
     }
     if (info == shared_str("ui_talk_hide")) {
-        int mode = 11;  // Talk Dialog hide
+        int mode = 11; // Talk Dialog hide
         luabind::functor<void> funct;
         R_ASSERT(ai().script_engine().functor("pda.actor_menu_mode", funct));
         funct(mode);

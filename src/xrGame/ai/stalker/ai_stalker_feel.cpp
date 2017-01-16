@@ -18,7 +18,7 @@
 #ifdef DEBUG
 #include "ai_debug.h"
 extern Flags32 psAI_Flags;
-#endif  // DEBUG
+#endif // DEBUG
 
 bool CAI_Stalker::feel_vision_isRelevant(IGameObject* O)
 {
@@ -40,7 +40,7 @@ void CAI_Stalker::renderable_Render()
     if (g_Alive()) {
         if (psAI_Flags.test(aiAnimationStats)) animation().add_animation_stats();
     }
-#endif  // DEBUG
+#endif // DEBUG
 }
 
 void CAI_Stalker::Exec_Look(float dt)

@@ -18,4 +18,4 @@ u32 const player_state_ammo_elapsed::get_u32_param()
     return static_cast<u32>(tmp_active_weapon->GetAmmoElapsed());
 }
 
-}  // namespace award_system
+} // namespace award_system

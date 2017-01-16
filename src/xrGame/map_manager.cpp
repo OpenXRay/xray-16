@@ -91,7 +91,7 @@ CMapManager::CMapManager()
 
 CMapManager::~CMapManager()
 {
-    delete_data(m_deffered_destroy_queue);  // from prev frame
+    delete_data(m_deffered_destroy_queue); // from prev frame
     delete_data(m_locations_wrapper);
 }
 
@@ -141,7 +141,7 @@ void CMapManager::RemoveMapLocation(const shared_str& spot_type, u16 id)
     }
 }
 
-void CMapManager::RemoveMapLocationByObjectID(u16 id)  // call on destroy object
+void CMapManager::RemoveMapLocationByObjectID(u16 id) // call on destroy object
 {
     FindLocationByID key(id);
     Locations_it it = std::find_if(Locations().begin(), Locations().end(), key);
@@ -211,7 +211,7 @@ void CMapManager::GetMapLocations(const shared_str& spot_type, u16 id, xr_vector
 
 void CMapManager::Update()
 {
-    delete_data(m_deffered_destroy_queue);  // from prev frame
+    delete_data(m_deffered_destroy_queue); // from prev frame
 
     Locations_it it = Locations().begin();
     Locations_it it_e = Locations().end();
@@ -249,7 +249,7 @@ Locations& CMapManager::Locations()
         m_locations = &m_locations_wrapper->registry().objects();
 #ifdef DEBUG
         Msg("m_locations size=%d", m_locations->size());
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
     }
     return *m_locations;
 }

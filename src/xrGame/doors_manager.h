@@ -47,8 +47,8 @@ private:
 private:
     doors_tree_type m_doors;
     doors_type m_nearest_doors;
-};  // class manager
+}; // class manager
 
-}  // namespace doors
+} // namespace doors
 
-#endif  // #ifndef DOORS_MANAGER_H_INCLUDED
+#endif // #ifndef DOORS_MANAGER_H_INCLUDED

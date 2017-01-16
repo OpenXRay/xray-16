@@ -309,7 +309,7 @@ void SndShockEffector::Start(CActor* A, float snd_length, float power)
     m_cur_length = 0;
     psSoundVFactor = m_stored_volume * SND_MIN_VOLUME_FACTOR;
 
-    static float xxx = 6.0f / 1.50f;  // 6sec on max power(1.5)
+    static float xxx = 6.0f / 1.50f; // 6sec on max power(1.5)
 
     m_life_time = power * xxx;
     m_end_time = Device.fTimeGlobal + m_life_time;
@@ -454,7 +454,7 @@ bool CActorCameraManager::ProcessCameraEffector(CEffectorCam* eff)
 
             cam_effector_sub(affected, prev, diff);
 
-            cam_effector_add(diff, m_cam_info_hud);  // m_cam_info_hud += difference
+            cam_effector_add(diff, m_cam_info_hud); // m_cam_info_hud += difference
         }
 
         m_cam_info_hud.fFov = m_cam_info.fFov;

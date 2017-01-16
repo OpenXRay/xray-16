@@ -254,6 +254,6 @@ public:
         csPlayers.Leave();
         return ret_client;
     }*/
-};  // class PlayersMonitor
+}; // class PlayersMonitor
 
-#endif  //#ifndef NET_PLAYERS_MONITOR
+#endif //#ifndef NET_PLAYERS_MONITOR

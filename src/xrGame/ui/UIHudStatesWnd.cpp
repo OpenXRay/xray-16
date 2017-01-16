@@ -66,7 +66,7 @@ ALife::EInfluenceType CUIHudStatesWnd::get_indik_type(ALife::EHitType hit_type)
     case ALife::eHitTypeTelepatic: iz_type = ALife::infl_psi; break;
     case ALife::eHitTypeShock:
         iz_type = ALife::infl_electra;
-        break;  // it hasnt CStatic
+        break; // it hasnt CStatic
 
     case ALife::eHitTypeStrike:
     case ALife::eHitTypeWound:
@@ -182,7 +182,7 @@ void CUIHudStatesWnd::Load_section()
     Load_section_type(ALife::infl_fire, "fire_zone_detector");
     Load_section_type(ALife::infl_acid, "acid_zone_detector");
     Load_section_type(ALife::infl_psi, "psi_zone_detector");
-    Load_section_type(ALife::infl_electra, "electra_zone_detector");  // no uistatic
+    Load_section_type(ALife::infl_electra, "electra_zone_detector"); // no uistatic
 }
 
 void CUIHudStatesWnd::Load_section_type(ALife::EInfluenceType type, LPCSTR section)
@@ -465,7 +465,7 @@ void CUIHudStatesWnd::UpdateZones()
         // power = power / zone_max_power;
         clamp(power, 0.0f, 1.1f);
 
-        if ((z_type != ALife::infl_max_count) && (m_zone_cur_power[z_type] < power))  // max
+        if ((z_type != ALife::infl_max_count) && (m_zone_cur_power[z_type] < power)) // max
         {
             m_zone_cur_power[z_type] = power;
         }
@@ -474,7 +474,7 @@ void CUIHudStatesWnd::UpdateZones()
             fRelPow *= 0.6f;
             if (dist_to_zone < rad_zone) {
                 fRelPow *= 0.3f;
-                fRelPow *= (2.5f - 2.0f * power);  // звук зависит от силы зоны
+                fRelPow *= (2.5f - 2.0f * power); // звук зависит от силы зоны
             }
         }
         clamp(fRelPow, 0.0f, 1.0f);
@@ -493,14 +493,14 @@ void CUIHudStatesWnd::UpdateZones()
         {
             zone_info.snd_time += Device.fTimeDelta;
         }
-    }  // for itb
+    } // for itb
 }
 
 void CUIHudStatesWnd::UpdateIndicators(CActor* actor)
 {
     if (m_fake_indicators_update) return;
 
-    for (int i = 0; i < it_max; ++i)  // it_max = ALife::infl_max_count-1
+    for (int i = 0; i < it_max; ++i) // it_max = ALife::infl_max_count-1
     {
         UpdateIndicatorType(actor, (ALife::EInfluenceType)i);
     }
@@ -686,7 +686,7 @@ void CUIHudStatesWnd::FakeUpdateIndicatorType(u8 t, float power)
     }
 
     float max_power = actor->conditions().GetZoneMaxPower(hit_type);
-    protect = protect / max_power;  // = 0..1
+    protect = protect / max_power; // = 0..1
 
     if (hit_power < EPS) {
         m_indik[type]->Show(false);

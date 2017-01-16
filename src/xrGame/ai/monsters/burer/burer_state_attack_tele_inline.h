@@ -185,7 +185,7 @@ void CStateBurerAttackTele<Object>::FindFreeObjects(xr_vector<IGameObject*>& tpO
         CCustomMonster* custom_monster = smart_cast<CCustomMonster*>(tpObjects[i]);
         CGrenade* grenade = smart_cast<CGrenade*>(tpObjects[i]);
 
-        if (grenade ||  // grenades are handled by HandleGrenades function
+        if (grenade || // grenades are handled by HandleGrenades function
             !obj || !obj->PPhysicsShell() || !obj->PPhysicsShell()->isActive() || custom_monster ||
             (obj->spawn_ini() && obj->spawn_ini()->section_exist("ph_heavy")) ||
             (obj->m_pPhysicsShell->getMass() < object->m_tele_object_min_mass) ||

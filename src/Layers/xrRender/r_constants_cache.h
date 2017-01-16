@@ -6,9 +6,9 @@
 
 #if defined(USE_DX10) || defined(USE_DX11)
 #include "Layers/xrRenderDX10/dx10r_constants_cache.h"
-#else  //	USE_DX10
+#else //	USE_DX10
 #include "Layers/xrRenderDX9/dx9r_constants_cache.h"
-#endif  //	USE_DX10
+#endif //	USE_DX10
 
 /*
 template <class T, u32 limit>

@@ -46,7 +46,7 @@ public:
     virtual void display_name(u32 const& item_index, char* const& buffer, u32 const& buffer_size) = 0;
     virtual property_holder* create() = 0;
     virtual void destroy(property_holder* holder) = 0;
-};  // class propery_holder_collection
+}; // class propery_holder_collection
 
 class property_value;
 
@@ -81,43 +81,43 @@ public:
     {
         can_enter_text = int(0),
         cannot_enter_text = int(1),
-    };  // enum can_enter_text_enum
+    }; // enum can_enter_text_enum
 
     enum extension_action_enum
     {
         remove_extension = int(0),
         keep_extension = int(1),
-    };  // enum remove_extension_enum
+    }; // enum remove_extension_enum
 
     enum value_editor_enum
     {
         value_editor_combo_box = int(0),
         value_editor_tree_view = int(1),
-    };  // enum value_editor_enum
+    }; // enum value_editor_enum
 
     enum readonly_enum
     {
         property_read_only = int(0),
         property_read_write = int(1),
-    };  // enum value_editor_enum
+    }; // enum value_editor_enum
 
     enum notify_parent_on_change_enum
     {
         notify_parent_on_change = int(0),
         do_not_notify_parent_on_change = int(1),
-    };  // enum value_editor_enum
+    }; // enum value_editor_enum
 
     enum password_char_enum
     {
         password_char = int(0),
         no_password_char = int(1),
-    };  // enum value_editor_enum
+    }; // enum value_editor_enum
 
     enum refresh_grid_on_change_enum
     {
         refresh_grid_on_change = int(0),
         do_not_refresh_grid_on_change = int(1),
-    };  // enum value_editor_enum
+    }; // enum value_editor_enum
 
 public:
     virtual property_holder_holder* holder() = 0;
@@ -252,10 +252,10 @@ public:
         refresh_grid_on_change_enum const& refresh_grid = do_not_refresh_grid_on_change) = 0;
     virtual property_value* add_property(LPCSTR identifier, LPCSTR category, LPCSTR description, LPCSTR default_value,
         string_getter_type const& getter, string_setter_type const& setter,
-        LPCSTR default_extension,  // ".dds",
-        LPCSTR file_mask,          // "Texture files (*.dds)|*.dds",
-        LPCSTR default_folder,     // "R:\\development\\priquel\\resources\\gamedata\\textures\\sky",
-        LPCSTR caption,            // "Select texture..."
+        LPCSTR default_extension, // ".dds",
+        LPCSTR file_mask,         // "Texture files (*.dds)|*.dds",
+        LPCSTR default_folder,    // "R:\\development\\priquel\\resources\\gamedata\\textures\\sky",
+        LPCSTR caption,           // "Select texture..."
         enter_text_enum const& can_enter_text, extension_action_enum const& remove_extension,
         readonly_enum const& read_only = property_read_write,
         notify_parent_on_change_enum const& notify_parent = do_not_notify_parent_on_change,
@@ -263,10 +263,10 @@ public:
         refresh_grid_on_change_enum const& refresh_grid = do_not_refresh_grid_on_change) = 0;
     virtual property_value* add_property(LPCSTR identifier, LPCSTR category, LPCSTR description, LPCSTR default_value,
         shared_str& value,
-        LPCSTR default_extension,  // ".dds",
-        LPCSTR file_mask,          // "Texture files (*.dds)|*.dds",
-        LPCSTR default_folder,     // "R:\\development\\priquel\\resources\\gamedata\\textures\\sky",
-        LPCSTR caption,            // "Select texture..."
+        LPCSTR default_extension, // ".dds",
+        LPCSTR file_mask,         // "Texture files (*.dds)|*.dds",
+        LPCSTR default_folder,    // "R:\\development\\priquel\\resources\\gamedata\\textures\\sky",
+        LPCSTR caption,           // "Select texture..."
         enter_text_enum const& can_enter_text, extension_action_enum const& remove_extension,
         readonly_enum const& read_only = property_read_write,
         notify_parent_on_change_enum const& notify_parent = do_not_notify_parent_on_change,
@@ -337,7 +337,7 @@ public:
         notify_parent_on_change_enum const& notify_parent = do_not_notify_parent_on_change,
         password_char_enum const& password = no_password_char,
         refresh_grid_on_change_enum const& refresh_grid = do_not_refresh_grid_on_change) = 0;
-};  // class property_holder
+}; // class property_holder
 
 class property_value
 {
@@ -346,8 +346,8 @@ public:
     virtual void attribute(property_holder::notify_parent_on_change_enum const& notify_parent) = 0;
     virtual void attribute(property_holder::password_char_enum const& password_char) = 0;
     virtual void attribute(property_holder::refresh_grid_on_change_enum const& refresh_grid) = 0;
-};  // class property_value
+}; // class property_value
 
-}  // namespace editor
+} // namespace editor
 
-#endif  // ifndef EDITOR_PROPERTY_HOLDER_HPP_INCLUDED
+#endif // ifndef EDITOR_PROPERTY_HOLDER_HPP_INCLUDED

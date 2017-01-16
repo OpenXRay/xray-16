@@ -44,4 +44,4 @@ public:
 
 #include "rat_state_manager_inline.h"
 
-#endif  // RAT_STATE_MANAGER_H_INCLUDED
+#endif // RAT_STATE_MANAGER_H_INCLUDED

@@ -181,7 +181,7 @@ public:
     virtual void ForceFinalAnimation() {}
     virtual void LookPosition(Fvector to_point,
         float angular_speed =
-            PI_DIV_3);  // каждый монстр может по-разному реализвать эту функ (e.g. кровосос с поворотом головы и т.п.)
+            PI_DIV_3); // каждый монстр может по-разному реализвать эту функ (e.g. кровосос с поворотом головы и т.п.)
 
     // Team
     virtual void ChangeTeam(int team, int squad, int group);
@@ -444,7 +444,7 @@ public:
         }
     };
 
-    u8 m_show_debug_info;  // 0 - none, 1 - first column, 2 - second column
+    u8 m_show_debug_info; // 0 - none, 1 - first column, 2 - second column
     void set_show_debug_info(u8 show = 1) { m_show_debug_info = show; }
     virtual SDebugInfo show_debug_info();
     virtual void add_debug_info(debug::text_tree& root_s);
@@ -476,7 +476,7 @@ public:
     virtual bool can_use_agressive_jump(const IGameObject*) { return false; }
 private:
     steering_behaviour::manager* m_steer_manager;
-    squad_grouping_behaviour* m_grouping_behaviour;  // freed by manager
+    squad_grouping_behaviour* m_grouping_behaviour; // freed by manager
 
     void update_enemy_accessible_and_at_home_info();
     // updates position by applying little "pushing" force
@@ -597,7 +597,7 @@ bool CBaseMonster::get_debug_var(pcstr var_name, OUT Type& result)
     STRCONCAT(full_var_name, get_monster_class_name(), "_", var_name);
     return ai_dbg::get_var(full_var_name, result);
 }
-#endif  // DEBUG
+#endif // DEBUG
 
 template <class Type>
 Type CBaseMonster::override_if_debug(pcstr var_name, Type value)
@@ -605,9 +605,9 @@ Type CBaseMonster::override_if_debug(pcstr var_name, Type value)
 #ifdef DEBUG
     Type debug_value;
     return get_debug_var(var_name, debug_value) ? debug_value : value;
-#else   // DEBUG
+#else  // DEBUG
     return value;
-#endif  // DEBUG
+#endif // DEBUG
 }
 
 #include "base_monster_inline.h"

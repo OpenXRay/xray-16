@@ -35,7 +35,7 @@ void moving_objects::register_object(moving_object* moving_object)
 
 #ifdef DEBUG
     m_objects.insert(moving_object);
-#endif  // DEBUG
+#endif // DEBUG
 
     VERIFY(m_tree);
     m_tree->insert(moving_object);
@@ -48,7 +48,7 @@ void moving_objects::unregister_object(moving_object* moving_object)
 
 #ifdef DEBUG
     m_objects.erase(m_objects.find(moving_object));
-#endif  // DEBUG
+#endif // DEBUG
 
     VERIFY(m_tree);
     m_tree->remove(moving_object);

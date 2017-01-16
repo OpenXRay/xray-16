@@ -14,8 +14,8 @@ static const float start_climbing_dist = 0.f;
 static const float stop_climbing_dist = 0.1f;
 static const float out_dist = 1.5f;
 
-static const float look_angle_cosine = 0.9238795f;   // 22.5
-static const float lookup_angle_sine = 0.34202014f;  // 20
+static const float look_angle_cosine = 0.9238795f;  // 22.5
+static const float lookup_angle_sine = 0.34202014f; // 20
 extern class CPHWorld* ph_world;
 CElevatorState::CElevatorState()
 {
@@ -218,7 +218,7 @@ void CElevatorState::UpdateClimbingCommon(const Fvector& d_to_ax, float to_ax, c
             //.			Msg("force applied");
         }
 #endif
-        m_character->ApplyForce(d_to_ax, m_character->Mass() * ph_world->Gravity());  //
+        m_character->ApplyForce(d_to_ax, m_character->Mass() * ph_world->Gravity()); //
     }
 }
 bool CElevatorState::GetControlDir(Fvector& dir)
@@ -342,14 +342,14 @@ void CElevatorState::Deactivate()
 
 CElevatorState::SEnertionState CElevatorState::m_etable[CElevatorState::clbNoState][CElevatorState::clbNoState] = {
     //						clbNone			clbNearUp		clbNearDown		clbClimbingUp	clbClimbingDown	clbDepart
-    //clbNoLadder
-    /*clbNone			*/ {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}},     // clbNone
-    /*clbNearUp			*/ {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}},     // clbNearUp
-    /*clbNearDown		*/ {{0, 0}, {0.0f, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}},  // clbNearDown
-    /*clbClimbingUp		*/ {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}},     // clbClimbingUp
-    /*clbClimbingDown	*/ {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}},     // clbClimbingDown
-    /*clbDepart			*/ {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {depart_dist, depart_time}},  // clbDepart
-    /*clbNoLadder		*/ {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}}                       // clbNoLadder
+    // clbNoLadder
+    /*clbNone			*/ {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}},    // clbNone
+    /*clbNearUp			*/ {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}},    // clbNearUp
+    /*clbNearDown		*/ {{0, 0}, {0.0f, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}}, // clbNearDown
+    /*clbClimbingUp		*/ {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}},    // clbClimbingUp
+    /*clbClimbingDown	*/ {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}},    // clbClimbingDown
+    /*clbDepart			*/ {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {depart_dist, depart_time}}, // clbDepart
+    /*clbNoLadder		*/ {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}}                      // clbNoLadder
 };
 
 bool CElevatorState::StateSwitchInertion(Estate new_state)

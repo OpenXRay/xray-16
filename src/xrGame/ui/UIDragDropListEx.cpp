@@ -414,7 +414,7 @@ int CUIDragDropListEx::ScrollPos()
     return m_vScrollBar->GetScrollPos();
 }
 
-void CUIDragDropListEx::SetItem(CUICellItem* itm)  // auto
+void CUIDragDropListEx::SetItem(CUICellItem* itm) // auto
 {
     if (m_container->AddSimilar(itm)) {
         return;
@@ -425,7 +425,7 @@ void CUIDragDropListEx::SetItem(CUICellItem* itm)  // auto
     SetItem(itm, dest_cell_pos);
 }
 
-void CUIDragDropListEx::SetItem(CUICellItem* itm, Fvector2 abs_pos)  // start at cursor pos
+void CUIDragDropListEx::SetItem(CUICellItem* itm, Fvector2 abs_pos) // start at cursor pos
 {
     if (m_container->AddSimilar(itm)) return;
 
@@ -437,7 +437,7 @@ void CUIDragDropListEx::SetItem(CUICellItem* itm, Fvector2 abs_pos)  // start at
         SetItem(itm);
 }
 
-void CUIDragDropListEx::SetItem(CUICellItem* itm, Ivector2 cell_pos)  // start at cell
+void CUIDragDropListEx::SetItem(CUICellItem* itm, Ivector2 cell_pos) // start at cell
 {
     if (m_container->AddSimilar(itm)) return;
     R_ASSERT(m_container->IsRoomFree(cell_pos, itm->GetGridSize()));
@@ -916,9 +916,9 @@ void CUICellContainer::Draw()
                 GlobalEnv.UIRender->PushPoint(iFloor(rect_offset.x + p.x * (f_len.x)) - 0.5f,
                     iFloor(rect_offset.y + p.y * (f_len.y)) - 0.5f, 0, m_pParentDragDropList->back_color, tp.x + uv.x,
                     tp.y + uv.y);
-            }  // for k
-        }      // for y
-    }          // for x
+            } // for k
+        }     // for y
+    }         // for x
     UI().PushScissor(clientArea);
 
     GlobalEnv.UIRender->SetShader(*hShader);
@@ -927,7 +927,7 @@ void CUICellContainer::Draw()
     // draw shown items in range
     if (m_cells_to_draw.size()) {
         UI_CELLS_VEC_IT it = m_cells_to_draw.begin();
-        for (; it != m_cells_to_draw.end(); ++it)  // all cells
+        for (; it != m_cells_to_draw.end(); ++it) // all cells
         {
             CUICell& cell = (*it);
             if (!cell.Empty() && (cell.m_item->m_drawn_frame != Device.dwFrame)) {

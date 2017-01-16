@@ -135,7 +135,7 @@ BOOL CAI_Trader::net_Spawn(CSE_Abstract* DC)
     bone_head->set_callback(bctCustom, BoneCallback, this);
 
     shedule.t_min = 100;
-    shedule.t_max = 2500;  // This equaltiy is broken by Dima :-( // 30 * NET_Latency / 4;
+    shedule.t_max = 2500; // This equaltiy is broken by Dima :-( // 30 * NET_Latency / 4;
 
     return (TRUE);
 }

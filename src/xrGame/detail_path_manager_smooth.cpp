@@ -769,7 +769,7 @@ void CDetailPathManager::add_patrol_point()
 void CDetailPathManager::build_smooth_path(const xr_vector<u32>& level_path, u32 intermediate_index)
 {
     //	Msg									("[%6d][%s] started to build detail
-    //path",Device.dwFrame,*m_restricted_object->object().cName());
+    // path",Device.dwFrame,*m_restricted_object->object().cName());
     START_PROFILE("Build Path/Detail Path");
 
     m_failed = true;

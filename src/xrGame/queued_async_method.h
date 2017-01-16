@@ -72,7 +72,7 @@ private:
     DelegateType current_delegate;
 
     DelegateType pending_proxy_exec;
-};  // class queued_async_method
+}; // class queued_async_method
 
 struct parameters_tuple0
 {
@@ -81,7 +81,7 @@ struct parameters_tuple0
 
     parameters_tuple0& operator=(parameters_tuple0 const& copy) { return *this; }
     bool operator==(parameters_tuple0 const& right) const { return true; }
-};  // class parameters_tuple0
+}; // class parameters_tuple0
 
 template <typename T1>
 struct parameters_tuple1
@@ -97,7 +97,7 @@ struct parameters_tuple1
 
     bool operator==(parameters_tuple1 const& right) const { return m_t1 == right.m_t1; }
     T1 m_t1;
-};  // class parameters_tuple1
+}; // class parameters_tuple1
 
 template <typename T1, typename T2>
 struct parameters_tuple2
@@ -116,7 +116,7 @@ struct parameters_tuple2
     bool operator==(parameters_tuple2 const& right) const { return (m_t1 == right.m_t1) && (m_t2 == right.m_t2); }
     T1 m_t1;
     T2 m_t2;
-};  // class parameters_tuple2
+}; // class parameters_tuple2
 
 template <typename T1, typename T2, typename T3>
 struct parameters_tuple3
@@ -141,7 +141,7 @@ struct parameters_tuple3
     T1 m_t1;
     T2 m_t2;
     T3 m_t3;
-};  // class parameters_tuple3
+}; // class parameters_tuple3
 
 template <typename T1, typename T2, typename T3, typename T4>
 struct parameters_tuple4
@@ -169,6 +169,6 @@ struct parameters_tuple4
     T2 m_t2;
     T3 m_t3;
     T4 m_t4;
-};  // class parameters_tuple4
+}; // class parameters_tuple4
 
-#endif  //#ifndef QUEUED_ASYNC_METHOD_FACADE_H_INCLUDED
+#endif //#ifndef QUEUED_ASYNC_METHOD_FACADE_H_INCLUDED

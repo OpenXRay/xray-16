@@ -65,7 +65,7 @@ screenshot_manager::~screenshot_manager()
     xr_free(m_buffer_for_compress);
     if (m_make_start_event) {
         SetEvent(m_make_start_event);
-        WaitForSingleObject(m_make_done_event, INFINITE);  // thread stoped
+        WaitForSingleObject(m_make_done_event, INFINITE); // thread stoped
         CloseHandle(m_make_done_event);
         CloseHandle(m_make_start_event);
     }
@@ -92,10 +92,10 @@ void screenshot_manager::prepare_image()
 #pragma pack(pop)
     typedef rgb24color rgb24map[RESULT_HEIGHT][RESULT_WIDTH];
     u32* sizes = reinterpret_cast<u32*>(m_result_writer.pointer());
-    u32* width = sizes;                                  // first dword is width
-    u32* height = ++sizes;                               // second dword is height
-    u32* rgba = reinterpret_cast<u32*>(++sizes);         // then RGBA data
-    rgb24map* dest = reinterpret_cast<rgb24map*>(rgba);  // WARNING sorce and dest stored in one place ...
+    u32* width = sizes;                                 // first dword is width
+    u32* height = ++sizes;                              // second dword is height
+    u32* rgba = reinterpret_cast<u32*>(++sizes);        // then RGBA data
+    rgb24map* dest = reinterpret_cast<rgb24map*>(rgba); // WARNING sorce and dest stored in one place ...
 
     float dx = float(*width) / RESULT_WIDTH;
     float dy = float(*height) / RESULT_HEIGHT;
@@ -125,8 +125,8 @@ void screenshot_manager::make_jpeg_file()
     CxImage jpg_image;
 
     jpg_image.CreateFromArray(rgb24data,
-        width,   // width
-        height,  // height
+        width,  // width
+        height, // height
         24, width * 3, true);
 
     jpg_image.SetJpegQuality(30);

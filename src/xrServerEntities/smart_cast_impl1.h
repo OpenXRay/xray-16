@@ -17,9 +17,9 @@ void add_smart_cast_stats_all(LPCSTR, LPCSTR);
 
 #ifdef MASTER_GOLD
 #define MAX_SEQUENCE_LENGTH 1
-#else  // #ifdef MASTER_GOLD
+#else // #ifdef MASTER_GOLD
 #define MAX_SEQUENCE_LENGTH 1
-#endif  // #ifdef MASTER_GOLD
+#endif // #ifdef MASTER_GOLD
 
 //#define SHOW_SMART_CAST_UNOPTIMIZED_CASES
 

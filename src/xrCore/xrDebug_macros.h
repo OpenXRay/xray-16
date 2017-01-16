@@ -98,7 +98,7 @@
         GLenum err = glGetError();                                                                                     \
         if (!ignoreAlways && err != GL_NO_ERROR) xrDebug::Fail(ignoreAlways, DEBUG_INFO, #expr, (long)err);            \
     } while (false)
-#else  // DEBUG
+#else // DEBUG
 #ifdef __BORLANDC__
 #define NODEFAULT
 #else
@@ -122,7 +122,7 @@
     } while (false)
 #define CHK_DX(expr) expr
 #define CHK_GL(expr) expr
-#endif  // DEBUG
+#endif // DEBUG
 //---------------------------------------------------------------------------------------------
 // FIXMEs / TODOs / NOTE macros
 //---------------------------------------------------------------------------------------------
@@ -158,4 +158,4 @@ struct CompileTimeError<true>
         CompileTimeError<((expr) != 0)> ERROR_##msg;                                                                   \
         (void)ERROR_##msg;                                                                                             \
     }
-#endif  // xrDebug_macrosH
+#endif // xrDebug_macrosH

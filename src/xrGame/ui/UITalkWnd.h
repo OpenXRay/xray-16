@@ -39,7 +39,7 @@ public:
 
     virtual void Show(bool status);
 
-    void Stop();  // deffered
+    void Stop(); // deffered
     void StopTalk();
 
     void UpdateQuestions();

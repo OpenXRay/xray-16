@@ -138,12 +138,12 @@ void CUIOutfitInfo::UpdateInfo(CCustomOutfit* cur_outfit, CCustomOutfit* slot_ou
         float max_power = actor->conditions().GetZoneMaxPower(hit_type);
 
         float cur = cur_outfit->GetDefHitTypeProtection(hit_type);
-        cur /= max_power;  // = 0..1
+        cur /= max_power; // = 0..1
         float slot = cur;
 
         if (slot_outfit) {
             slot = slot_outfit->GetDefHitTypeProtection(hit_type);
-            slot /= max_power;  //  = 0..1
+            slot /= max_power; //  = 0..1
         }
         m_items[i]->SetProgressValue(cur, slot);
     }
@@ -193,12 +193,12 @@ void CUIOutfitInfo::UpdateInfo(CHelmet* cur_helmet, CHelmet* slot_helmet)
         float max_power = actor->conditions().GetZoneMaxPower(hit_type);
 
         float cur = cur_helmet->GetDefHitTypeProtection(hit_type);
-        cur /= max_power;  // = 0..1
+        cur /= max_power; // = 0..1
         float slot = cur;
 
         if (slot_helmet) {
             slot = slot_helmet->GetDefHitTypeProtection(hit_type);
-            slot /= max_power;  //  = 0..1
+            slot /= max_power; //  = 0..1
         }
         m_items[i]->SetProgressValue(cur, slot);
     }

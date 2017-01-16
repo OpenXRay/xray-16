@@ -87,7 +87,7 @@ public:
     virtual void get_body_position(Fvector& p);
     virtual void Disable();
     virtual void ReEnable() { ; }
-    virtual void Enable();  //!!
+    virtual void Enable(); //!!
     virtual void SwitchOFFInitContact() = 0;
     virtual void SwitchInInitContact() = 0;
     virtual bool IsEnabled() = 0;
@@ -103,9 +103,9 @@ public:
     virtual bool TouchRestrictor(ERestrictionType rttype) = 0;
     virtual void SetElevator(IClimableObject* climable){};
     virtual void SetMaterial(u16 material) = 0;
-    virtual void SetMaximumVelocity(dReal /**vel/**/) {}  //!!
+    virtual void SetMaximumVelocity(dReal /**vel/**/) {} //!!
     virtual dReal GetMaximumVelocity() { return 0; }
-    virtual void SetJupmUpVelocity(dReal /**velocity/**/) {}  //!!
+    virtual void SetJupmUpVelocity(dReal /**velocity/**/) {} //!!
     virtual void IPosition(Fvector& /**pos/**/) {}
     virtual u16 ContactBone() { return 0; }
     virtual void DeathPosition(Fvector& /**deathPos/**/) {}
@@ -176,11 +176,11 @@ public:
     virtual CElevatorState* ElevatorState() = 0;
 
 public:
-    virtual void Freeze() = 0;             //{ Freeze();		}
-    virtual void UnFreeze() = 0;           //{ UnFreeze();	}
-    virtual void step(float dt) = 0;       //{ step( dt ); }
-    virtual void collision_disable() = 0;  //{ collision_disable(); }
-    virtual void collision_enable() = 0;   //{ collision_enable(); }
+    virtual void Freeze() = 0;            //{ Freeze();		}
+    virtual void UnFreeze() = 0;          //{ UnFreeze();	}
+    virtual void step(float dt) = 0;      //{ step( dt ); }
+    virtual void collision_disable() = 0; //{ collision_disable(); }
+    virtual void collision_enable() = 0;  //{ collision_enable(); }
 protected:
     virtual const Fmatrix& XFORM() const;
     virtual void get_LinearVel(Fvector& velocity) const;

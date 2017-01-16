@@ -148,14 +148,14 @@ void CUIInventoryUpgradeWnd::LoadSchemes(CUIXml& uiXml)
                 item->attach_point(item_point);
 
                 scheme->cells.push_back(item);
-            }  // for i_cell
+            } // for i_cell
 
             uiXml.SetLocalRoot(tmpl_node);
-        }  // for i_clm
+        } // for i_clm
 
         m_schemes.push_back(scheme);
         uiXml.SetLocalRoot(tmpl_root);
-    }  // for i_tmpl
+    } // for i_tmpl
 
     uiXml.SetLocalRoot(stored_root);
 }

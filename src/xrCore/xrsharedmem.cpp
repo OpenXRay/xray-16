@@ -41,7 +41,7 @@ smem_value* smem_container::dock(u32 dwCRC, u32 dwLength, void* ptr)
 #ifdef DEBUG_MEMORY_NAME
             ,
             "storage: smem"
-#endif  // DEBUG_MEMORY_NAME
+#endif // DEBUG_MEMORY_NAME
             );
         result->dwReference = 0;
         result->dwCRC = dwCRC;

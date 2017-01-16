@@ -15,4 +15,4 @@ public:
     void Merge(const dContact& contact, SGameMtl* material);
     void Apply();
 };
-#endif  // PH_CONTACT_BODY_EFFECTOR_H
+#endif // PH_CONTACT_BODY_EFFECTOR_H

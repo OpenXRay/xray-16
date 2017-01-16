@@ -191,7 +191,7 @@ bool CEditableObject::Import_LWO(st_ObjectDB* I)
                                     if (Ipv.vm[vm_i].vmap->type != LWVMAP_TXUV) continue;
                                     vm_lst.push_back(st_VMapPt());
                                     st_VMapPt& pt = vm_lst.back();
-                                    pt.vmap_index = VMIndices[Ipv.vm[vm_i].vmap];  // номер моей VMap
+                                    pt.vmap_index = VMIndices[Ipv.vm[vm_i].vmap]; // номер моей VMap
                                     pt.index = Ipv.vm[vm_i].index;
                                 }
                             }
@@ -210,7 +210,7 @@ bool CEditableObject::Import_LWO(st_ObjectDB* I)
                                     if (Ipt.vm[vm_i].vmap->type != LWVMAP_TXUV) continue;
                                     vm_lst.push_back(st_VMapPt());
                                     st_VMapPt& pt = vm_lst.back();
-                                    pt.vmap_index = VMIndices[Ipt.vm[vm_i].vmap];  // номер моей VMap
+                                    pt.vmap_index = VMIndices[Ipt.vm[vm_i].vmap]; // номер моей VMap
                                     pt.index = Ipt.vm[vm_i].index;
                                 }
                             }
@@ -223,7 +223,7 @@ bool CEditableObject::Import_LWO(st_ObjectDB* I)
                                 if (Ipt.vm[vm_i].vmap->type != LWVMAP_WGHT) continue;
                                 vm_lst.push_back(st_VMapPt());
                                 st_VMapPt& pt = vm_lst.back();
-                                pt.vmap_index = VMIndices[Ipt.vm[vm_i].vmap];  // номер моей VMap
+                                pt.vmap_index = VMIndices[Ipt.vm[vm_i].vmap]; // номер моей VMap
                                 pt.index = Ipt.vm[vm_i].index;
                             }
                         }

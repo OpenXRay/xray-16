@@ -42,7 +42,7 @@ manager::~manager()
 //	door const* const found	= m_doors.find( game_object->lua_game_object()->m_door->position() );
 //	if ( !found ) {
 //		Msg					( "object[\"shkaf_work_01_door_0000\"] has been unregistered already[0x%08x]?",
-//game_object->lua_game_object()->m_door );
+// game_object->lua_game_object()->m_door );
 //		return;
 //	}
 //

@@ -57,7 +57,7 @@ BOOL CTheoraSurface::Update(u32 _time)
     VERIFY(Valid());
     BOOL redraw = FALSE;
 
-    if (prefetch < 0)  // fake. first updated frame is data loading
+    if (prefetch < 0) // fake. first updated frame is data loading
     {
         ++prefetch;
         if (prefetch == 0) tm_start = _time;
@@ -141,9 +141,9 @@ BOOL CTheoraSurface::Load(const char* fname)
 #ifndef _EDITOR
         R_ASSERT(GlobalEnv.Render);
         bShaderYUV2RGB = GlobalEnv.Render->HWSupportsShaderYUV2RGB();
-#else   // _EDITOR
+#else  // _EDITOR
         bShaderYUV2RGB = false;
-#endif  // _EDITOR
+#endif // _EDITOR
     }
     return res;
 }

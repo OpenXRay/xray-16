@@ -270,7 +270,7 @@ void CStateGroupEatAbstract::setup_substates()
             debug::log_text_tree(tree);
             FATAL("Debug info has been added, plz save log");
         }
-#endif  //#ifdef DEBUG
+#endif //#ifdef DEBUG
 
         if ((corpse->m_pPhysicsShell == NULL) || (!corpse->m_pPhysicsShell->isActive())) {
             nearest_bone_pos = corpse->Position();

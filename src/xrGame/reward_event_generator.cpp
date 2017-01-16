@@ -209,4 +209,4 @@ void reward_event_generator::CommitBestResults()
     m_submit_queue->submit_best_results();
 }
 
-}  // namespace award_system
+} // namespace award_system

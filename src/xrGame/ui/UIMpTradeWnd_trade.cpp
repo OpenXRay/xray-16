@@ -30,7 +30,7 @@ bool CUIMpTradeWnd::TryToSellItem(SBuyItemInfo* sell_itm, bool do_destroy, SBuyI
     else
         _itm = sell_itm->m_cell_item;
 
-    SBuyItemInfo* iinfo = FindItem(_itm);  // just detached
+    SBuyItemInfo* iinfo = FindItem(_itm); // just detached
     itm_res = iinfo;
 
     u32 cnt_in_shop = GetItemCount(sell_itm->m_name_sect, SBuyItemInfo::e_shop);
@@ -43,7 +43,7 @@ bool CUIMpTradeWnd::TryToSellItem(SBuyItemInfo* sell_itm, bool do_destroy, SBuyI
         if (do_destroy) DestroyItem(iinfo);
     }
     else
-    {  // return to shop
+    { // return to shop
 
         if (m_store_hierarchy->CurrentLevel().HasItem(iinfo->m_name_sect)) {
             CUIDragDropListEx* _new_owner = m_list[e_shop];
@@ -87,14 +87,14 @@ bool CUIMpTradeWnd::BuyItemAction(SBuyItemInfo* itm)
             bool b_res = TryToBuyItem(itm, bf_normal, NULL);
 
             if (!b_res) {
-                to_sell->SetState(SBuyItemInfo::e_undefined);  // hack
+                to_sell->SetState(SBuyItemInfo::e_undefined); // hack
                 bool b_res2 = TryToBuyItem(to_sell, bf_check_money | bf_ignore_team | bf_own_itm, NULL);
                 R_ASSERT(b_res2);
-                to_sell->SetState(SBuyItemInfo::e_undefined);  // hack
-                to_sell->SetState(_stored_state);              // hack
+                to_sell->SetState(SBuyItemInfo::e_undefined); // hack
+                to_sell->SetState(_stored_state);             // hack
             }
             else if (to_sell->GetState() == SBuyItemInfo::e_sold ||
-                     to_sell->GetState() == SBuyItemInfo::e_undefined)  // maybe in shop now
+                     to_sell->GetState() == SBuyItemInfo::e_undefined) // maybe in shop now
                 DestroyItem(to_sell);
 
             return b_res;
@@ -142,12 +142,12 @@ bool CUIMpTradeWnd::TryToBuyItem(SBuyItemInfo* buy_itm, u32 buy_flags, SBuyItemI
 
     CUICellItem* cell_itm = NULL;
     bool b_alone = true;
-    if (iinfo->m_cell_item->OwnerList())  // just from shop
+    if (iinfo->m_cell_item->OwnerList()) // just from shop
     {
         cell_itm = iinfo->m_cell_item->OwnerList()->RemoveItem(iinfo->m_cell_item, false);
         b_alone = false;
     }
-    else  // new created
+    else // new created
     {
         cell_itm = iinfo->m_cell_item;
         b_alone = true;

@@ -14,7 +14,7 @@
 #ifdef USE_OUT_OF_MEMORY_HANDLER
 typedef void const* out_of_memory_handler_parameter_type;
 typedef void(__stdcall* out_of_memory_handler_type)(void*, out_of_memory_handler_parameter_type, int);
-#endif  // #ifdef USE_OUT_OF_MEMORY_HANDLER
+#endif // #ifdef USE_OUT_OF_MEMORY_HANDLER
 
 #ifndef MALLOC_ALIGNMENT
 #define MALLOC_ALIGNMENT ((size_t)8U)
@@ -108,7 +108,7 @@ struct malloc_state
 #ifdef USE_OUT_OF_MEMORY_HANDLER
     out_of_memory_handler_type out_of_memory_handler;
     out_of_memory_handler_parameter_type out_of_memory_parameter;
-#endif  // #ifdef USE_OUT_OF_MEMORY_HANDLER
+#endif // #ifdef USE_OUT_OF_MEMORY_HANDLER
 };
 
 /*

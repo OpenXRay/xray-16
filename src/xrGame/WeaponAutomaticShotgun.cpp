@@ -38,7 +38,7 @@ bool CWeaponAutomaticShotgun::Action(u16 cmd, u32 flags)
     if (inherited::Action(cmd, flags)) return true;
 
     if (m_bTriStateReload && GetState() == eReload && cmd == kWPN_FIRE && flags & CMD_START &&
-        m_sub_state == eSubstateReloadInProcess)  //остановить перезагрузку
+        m_sub_state == eSubstateReloadInProcess) //остановить перезагрузку
     {
         AddCartridge(1);
         m_sub_state = eSubstateReloadEnd;

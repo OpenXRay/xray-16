@@ -28,7 +28,7 @@ static void ode_free(void* ptr, size_t size)
 {
     return xr_free(ptr);
 }
-#else   // DEBUG_MEMORY_MANAGER
+#else  // DEBUG_MEMORY_MANAGER
 static void* ode_alloc(size_t size)
 {
     return xr_malloc(size);
@@ -41,7 +41,7 @@ static void ode_free(void* ptr, size_t size)
 {
     return xr_free(ptr);
 }
-#endif  // DEBUG_MEMORY_MANAGER
+#endif // DEBUG_MEMORY_MANAGER
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
 {

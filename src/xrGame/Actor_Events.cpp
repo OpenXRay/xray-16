@@ -57,7 +57,7 @@ void CActor::OnEvent(NET_Packet& P, u16 type)
             string64 act;
             xr_strcpy(act, (type == GE_TRADE_BUY) ? "buys" : "takes");
             Msg("--- Actor [%d][%s]  %s  [%d][%s]", ID(), Name(), act, _GO->ID(), _GO->cNameSect().c_str());
-#endif  // MP_LOGGING
+#endif // MP_LOGGING
 
             inventory().Take(_GO, false, true);
 
@@ -102,7 +102,7 @@ void CActor::OnEvent(NET_Packet& P, u16 type)
         string64 act;
         xr_strcpy(act, (type == GE_TRADE_SELL) ? "sells" : "rejects");
         Msg("--- Actor [%d][%s]  %s  [%d][%s]", ID(), Name(), act, GO->ID(), GO->cNameSect().c_str());
-#endif  // MP_LOGGING
+#endif // MP_LOGGING
 
         VERIFY(GO->H_Parent());
         if (!GO->H_Parent()) {
@@ -176,7 +176,8 @@ void CActor::OnEvent(NET_Packet& P, u16 type)
         P.r_u16(id);
         IGameObject* Obj = Level().Objects.net_Find(id);
 
-        //			R_ASSERT2( Obj, make_string("GEG_PLAYER_ITEM_EAT(use): Object not found. object_id = [%d]", id).c_str()
+        //			R_ASSERT2( Obj, make_string("GEG_PLAYER_ITEM_EAT(use): Object not found. object_id = [%d]",
+        //id).c_str()
         //);
         VERIFY2(Obj, make_string("GEG_PLAYER_ITEM_EAT(use): Object not found. object_id = [%d]", id).c_str());
         if (!Obj) {
@@ -185,12 +186,14 @@ void CActor::OnEvent(NET_Packet& P, u16 type)
             break;
         }
 
-        //			R_ASSERT2( !Obj->getDestroy(), make_string("GEG_PLAYER_ITEM_EAT(use): Object is destroying. object_id =
+        //			R_ASSERT2( !Obj->getDestroy(), make_string("GEG_PLAYER_ITEM_EAT(use): Object is destroying. object_id
+        //=
         //[%d]", id).c_str() );
         VERIFY2(!Obj->getDestroy(),
             make_string("GEG_PLAYER_ITEM_EAT(use): Object is destroying. object_id = [%d]", id).c_str());
         if (Obj->getDestroy()) {
-            //				Msg                                ( "! GEG_PLAYER_ITEM_EAT(use): Object is destroying. object_id
+            //				Msg                                ( "! GEG_PLAYER_ITEM_EAT(use): Object is destroying.
+            //object_id
             //= [%d]", id );
             break;
         }
@@ -203,17 +206,18 @@ void CActor::OnEvent(NET_Packet& P, u16 type)
 
         if (type == GEG_PLAYER_ACTIVATEARTEFACT) {
             CArtefact* pArtefact = smart_cast<CArtefact*>(Obj);
-            //			R_ASSERT2( pArtefact, make_string("GEG_PLAYER_ACTIVATEARTEFACT: Artefact not found. artefact_id =
+            //			R_ASSERT2( pArtefact, make_string("GEG_PLAYER_ACTIVATEARTEFACT: Artefact not found. artefact_id
+            //=
             //[%d]", id).c_str() );
             VERIFY2(pArtefact,
                 make_string("GEG_PLAYER_ACTIVATEARTEFACT: Artefact not found. artefact_id = [%d]", id).c_str());
             if (!pArtefact) {
                 Msg("! GEG_PLAYER_ACTIVATEARTEFACT: Artefact not found. artefact_id = [%d]", id);
-                break;  // 1
+                break; // 1
             }
 
             pArtefact->ActivateArtefact();
-            break;  // 1
+            break; // 1
         }
 
         PIItem iitem = smart_cast<CInventoryItem*>(Obj);
@@ -226,19 +230,19 @@ void CActor::OnEvent(NET_Packet& P, u16 type)
             u16 slot_id = P.r_u16();
             inventory().Slot(slot_id, iitem);
         }
-        break;  // 2
+        break; // 2
         case GEG_PLAYER_ITEM2BELT:
             inventory().Belt(iitem);
-            break;  // 2
+            break; // 2
         case GEG_PLAYER_ITEM2RUCK:
             inventory().Ruck(iitem);
-            break;  // 2
+            break; // 2
         case GEG_PLAYER_ITEM_EAT:
             inventory().Eat(iitem);
-            break;  // 2
-        }           // switch
+            break; // 2
+        }          // switch
     }
-    break;  // 1
+    break; // 1
     case GEG_PLAYER_ACTIVATE_SLOT:
     {
         u16 slot_id;
@@ -336,7 +340,7 @@ void CActor::MoveActor(Fvector NewPos, Fvector NewDir)
     r_torso.pitch = -NewDir.x;
     unaffected_r_torso.yaw = r_torso.yaw;
     unaffected_r_torso.pitch = r_torso.pitch;
-    unaffected_r_torso.roll = 0;  // r_torso.roll;
+    unaffected_r_torso.roll = 0; // r_torso.roll;
 
     r_torso_tgt_roll = 0;
     cam_Active()->Set(-unaffected_r_torso.yaw, unaffected_r_torso.pitch, unaffected_r_torso.roll);

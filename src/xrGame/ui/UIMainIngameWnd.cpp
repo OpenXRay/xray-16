@@ -111,7 +111,7 @@ void CUIMainIngameWnd::Init()
 	xml_init.InitStatic			(uiXml, "static_wpn_icon", 0, &UIWeaponIcon);
 	UIWeaponIcon.SetShader		(GetEquipmentIconsShader());
 	UIWeaponIcon_rect			= UIWeaponIcon.GetWndRect();
-*/  //---------------------------------------------------------
+*/ //---------------------------------------------------------
     UIPickUpItemIcon = UIHelper::CreateStatic(uiXml, "pick_up_item", this);
     UIPickUpItemIcon->SetShader(GetEquipmentIconsShader());
 
@@ -360,7 +360,7 @@ void CUIMainIngameWnd::Update()
         {
             SetWarningIconColor(ewiArtefact, 0xffff0000);
         }
-        else if (pActor->inventory().ItemFromSlot(ARTEFACT_SLOT))  // own artefact
+        else if (pActor->inventory().ItemFromSlot(ARTEFACT_SLOT)) // own artefact
         {
             SetWarningIconColor(ewiArtefact, 0xff00ff00);
         }
@@ -369,7 +369,7 @@ void CUIMainIngameWnd::Update()
             SetWarningIconColor(ewiArtefact, 0x00ffffff);
         }
     }
-}  // update
+} // update
 
 void CUIMainIngameWnd::RenderQuickInfos()
 {

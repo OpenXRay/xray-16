@@ -568,7 +568,7 @@ void CScriptGameObject::set_mental_state(EMentalState mental_state)
         ai().script_engine().script_log(LuaMessageType::Error, "CAI_Stalker : cannot access class member movement!");
     else
     {
-#if 0   // def DEBUG
+#if 0  // def DEBUG
 		if (mental_state != eMentalStateDanger) {
 			if (stalker->brain().initialized()) {
 				if (stalker->brain().current_action_id() == StalkerDecisionSpace::eWorldOperatorCombatPlanner) {
@@ -577,7 +577,7 @@ void CScriptGameObject::set_mental_state(EMentalState mental_state)
 				}
 			}
 		}
-#endif  // DEBUG
+#endif // DEBUG
         stalker->movement().set_mental_state(mental_state);
     }
 }
@@ -898,7 +898,8 @@ bool CScriptGameObject::weapon_strapped() const
     }
 
     bool const result = stalker->weapon_strapped();
-    //	Msg					( "[%6d][%s] weapon_strapped = %s", Device.dwTimeGlobal, stalker->cName().c_str(), result ? "true"
+    //	Msg					( "[%6d][%s] weapon_strapped = %s", Device.dwTimeGlobal, stalker->cName().c_str(), result ?
+    //"true"
     //: "false" );
     return (result);
 }
@@ -912,7 +913,8 @@ bool CScriptGameObject::weapon_unstrapped() const
         return (false);
     }
     bool const result = stalker->weapon_unstrapped();
-    //	Msg					( "[%6d][%s] weapon_unstrapped = %s", Device.dwTimeGlobal, stalker->cName().c_str(), result ?
+    //	Msg					( "[%6d][%s] weapon_unstrapped = %s", Device.dwTimeGlobal, stalker->cName().c_str(), result
+    //?
     //"true" : "false" );
     return (result);
 }

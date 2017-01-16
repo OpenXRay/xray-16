@@ -44,4 +44,4 @@ extern "C" {
 }
 #endif
 
-#endif  // GSI_NO_THREADS
+#endif // GSI_NO_THREADS

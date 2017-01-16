@@ -302,7 +302,7 @@ void CActorCondition::AffectDamage_InjuriousMaterialAndMonstersInfluence()
 
     float psy_influence = 0;
     float fire_influence = 0;
-    float radiation_influence = GetInjuriousMaterialDamage();  // Get Radiation from Material
+    float radiation_influence = GetInjuriousMaterialDamage(); // Get Radiation from Material
 
     // Add Radiation and Psy Level from Monsters
     CPda* const pda = m_object->GetPDA();
@@ -350,9 +350,9 @@ void CActorCondition::AffectDamage_InjuriousMaterialAndMonstersInfluence()
                 CGameObject::u_EventSend(np);
             }
 
-        }  // for
+        } // for
 
-    }  // while
+    } // while
 }
 
 #include "CharacterPhysicsSupport.h"
@@ -780,7 +780,7 @@ bool CActorCondition::PlayHitSound(SHit* pHDS)
     case ALife::eHitTypeBurn:
     case ALife::eHitTypeLightBurn:
     case ALife::eHitTypeChemicalBurn:
-        return (pHDS->damage() > 0.017f);  // field zone threshold
+        return (pHDS->damage() > 0.017f); // field zone threshold
         break;
     default: return true;
     }
@@ -846,7 +846,7 @@ void enable_input();
 void hide_indicators();
 void show_indicators();
 
-CActorDeathEffector::CActorDeathEffector(CActorCondition* parent, LPCSTR sect)  // -((
+CActorDeathEffector::CActorDeathEffector(CActorCondition* parent, LPCSTR sect) // -((
     : m_pParent(parent)
 {
     Actor()->SetWeaponHideState(INV_STATE_BLOCK_ALL, true);

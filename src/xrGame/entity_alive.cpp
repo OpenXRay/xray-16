@@ -320,7 +320,7 @@ float CEntityAlive::CalcCondition(float /**hit/**/)
     conditions().UpdateCondition();
 
     // dont call inherited::CalcCondition it will be meaningless
-    return conditions().GetHealthLost();  //*100.f;
+    return conditions().GetHealthLost(); //*100.f;
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -718,7 +718,7 @@ struct element_predicate
     {
         return element.elem_id < element_id;
     }
-};  // struct element_predicate
+}; // struct element_predicate
 
 struct sort_surface_area_predicate
 {
@@ -726,7 +726,7 @@ struct sort_surface_area_predicate
     {
         return left.second > right.second;
     }
-};  // struct sort_surface_area_predicate
+}; // struct sort_surface_area_predicate
 
 void CEntityAlive::OnChangeVisual()
 {
@@ -858,7 +858,7 @@ Fvector CEntityAlive::get_new_local_point_on_mesh(u16& bone_id) const
     }
     case SBoneShape::stCylinder:
     {
-        float const total_square = (shape.cylinder.m_height + shape.cylinder.m_radius);  // *2*PI*c_cylinder.m_radius
+        float const total_square = (shape.cylinder.m_height + shape.cylinder.m_radius); // *2*PI*c_cylinder.m_radius
         float const random_value = ::Random.randF(total_square);
         float const angle = ::Random.randF(2.f * PI);
 

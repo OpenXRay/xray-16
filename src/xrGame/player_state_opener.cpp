@@ -41,4 +41,4 @@ void player_state_opener::OnPlayerKilled(
     }
 }
 
-}  // namespace award_system
+} // namespace award_system

@@ -23,12 +23,12 @@ void CPHAICharacter::Create(dVector3 sizes)
 {
     inherited::Create(sizes);
 
-    m_forced_physics_control = false;  //.
+    m_forced_physics_control = false; //.
 }
 bool CPHAICharacter::TryPosition(Fvector pos, bool exact_state)
 {
     if (!b_exist) return false;
-    if (m_forced_physics_control || JumpState()) return false;  // b_was_on_object||b_on_object||
+    if (m_forced_physics_control || JumpState()) return false; // b_was_on_object||b_on_object||
     if (DoCollideObj()) return false;
     Fvector current_pos;
     GetPosition(current_pos);

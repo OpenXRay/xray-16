@@ -1,4 +1,4 @@
-#ifndef MXQSLIM_INCLUDED  // -*- C++ -*-
+#ifndef MXQSLIM_INCLUDED // -*- C++ -*-
 #define MXQSLIM_INCLUDED
 #if !defined(__GNUC__)
 #pragma once

@@ -14,7 +14,7 @@ void game_cl_CaptureTheArtefact::OnBuyMenu_Ok()
 {
 #ifdef DEBUG
     Msg("--- CTA: Buy menu OK...");
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
     typedef CUIGameCTA::BuyMenuItemsCollection TBuyCol;
 
     VERIFY2(m_game_ui, "game ui not initialized");

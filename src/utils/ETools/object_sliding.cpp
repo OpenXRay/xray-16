@@ -66,7 +66,7 @@ BOOL CalculateSW(Object* object, VIPM_Result* result, u32 optimize_vertex_order)
     int iNumTris = 0;
     for (tri = object->CurTriRoot.ListNext(); tri != NULL; tri = tri->ListNext())
     {
-        tri->mytri.dwNewIndex = INVALID_INDEX;  // Mark them as not being in a collapse.
+        tri->mytri.dwNewIndex = INVALID_INDEX; // Mark them as not being in a collapse.
         iNumTris++;
     }
     // A lot of cards have this annoying limit - see D3DCAPS8.MaxPrimitiveCount, which is
@@ -126,7 +126,7 @@ BOOL CalculateSW(Object* object, VIPM_Result* result, u32 optimize_vertex_order)
     // Reserve space for the collapse table - this is stored so that
     // "number of collapses" is the index. So we'll be adding from the
     // back.
-    iCurCollapse++;  // Implicit "last collapse" is state after last collapse.
+    iCurCollapse++; // Implicit "last collapse" is state after last collapse.
     result->swr_records.resize(iCurCollapse);
     // And add the last one.
     iCurCollapse--;
@@ -164,7 +164,7 @@ BOOL CalculateSW(Object* object, VIPM_Result* result, u32 optimize_vertex_order)
         int iJustCheckingNumTris = 0;
         for (tri = object->CurTriRoot.ListNext(); tri != NULL; tri = tri->ListNext())
         {
-            tri->mytri.dwNewIndex = INVALID_INDEX;  // Mark them as not being in a collapse.
+            tri->mytri.dwNewIndex = INVALID_INDEX; // Mark them as not being in a collapse.
             iJustCheckingNumTris++;
         }
         R_ASSERT(iJustCheckingNumTris == iCurNumTris);
@@ -191,7 +191,7 @@ BOOL CalculateSW(Object* object, VIPM_Result* result, u32 optimize_vertex_order)
                         MeshTri* tri = pTriInfo->ppt[0]->FindTri(pTriInfo->ppt[1], pTriInfo->ppt[2]);
                         R_ASSERT(tri != NULL);
                         R_ASSERT(
-                            tri->mytri.dwNewIndex == INVALID_INDEX);  // Should not have been in a collapse this level.
+                            tri->mytri.dwNewIndex == INVALID_INDEX); // Should not have been in a collapse this level.
 
                         R_ASSERT(pTriInfo->ppt[0]->mypt.dwNewIndex < wCurIndex);
                         R_ASSERT(pTriInfo->ppt[1]->mypt.dwNewIndex < wCurIndex);
@@ -246,7 +246,7 @@ BOOL CalculateSW(Object* object, VIPM_Result* result, u32 optimize_vertex_order)
                     GeneralTriInfo* pTriInfo = pCollapse->TriOriginal.item(i);
                     MeshTri* tri = pTriInfo->ppt[0]->FindTri(pTriInfo->ppt[1], pTriInfo->ppt[2]);
                     R_ASSERT(tri != NULL);
-                    tri->mytri.dwNewIndex = 1;  // Mark it has having been in a collapse.
+                    tri->mytri.dwNewIndex = 1; // Mark it has having been in a collapse.
 
                     R_ASSERT(pTriInfo->ppt[0]->mypt.dwNewIndex < wCurIndex);
                     R_ASSERT(pTriInfo->ppt[1]->mypt.dwNewIndex < wCurIndex);
@@ -360,7 +360,7 @@ BOOL CalculateSW(Object* object, VIPM_Result* result, u32 optimize_vertex_order)
         {
             R_ASSERT((j + swr->offset) < result->indices.size());
             swr->num_verts =
-                _max(swr->num_verts, *(result->indices.item(j + swr->offset)));  // fignya index ne doljen bit bolshe!!!
+                _max(swr->num_verts, *(result->indices.item(j + swr->offset))); // fignya index ne doljen bit bolshe!!!
             //.			R_ASSERT ( *(result->indices.item(j+swr->offset)) < swr->num_verts );
             if (*(result->indices.item(j + swr->offset)) >= swr->num_verts) {
                 bRes = FALSE;

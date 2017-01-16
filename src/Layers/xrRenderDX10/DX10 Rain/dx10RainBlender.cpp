@@ -7,12 +7,12 @@ void CBlender_rain::Compile(CBlender_Compile& C)
 
     switch (C.iElement)
     {
-    case 0:  // Test
+    case 0: // Test
         // C.r_Pass	("stub_notransform_2uv", "rain_layer", false,	TRUE,	FALSE, TRUE, D3DBLEND_ONE, D3DBLEND_ONE);
         // C.r_Pass	("stub_notransform_2uv", "rain_layer", false,	TRUE,	FALSE, TRUE, D3DBLEND_SRCALPHA,
         // D3DBLEND_INVSRCALPHA);
         C.r_Pass("stub_notransform_2uv", "rain_layer", false, TRUE, FALSE, FALSE);
-        C.PassSET_ZB(TRUE, FALSE, TRUE);  // force inverted Z-Buffer
+        C.PassSET_ZB(TRUE, FALSE, TRUE); // force inverted Z-Buffer
 
         C.r_dx10Texture("s_position", r2_RT_P);
         C.r_dx10Texture("s_normal", r2_RT_N);
@@ -36,12 +36,12 @@ void CBlender_rain::Compile(CBlender_Compile& C)
 
         break;
 
-    case 1:  // Patch normals
+    case 1: // Patch normals
         // C.r_Pass	("stub_notransform_2uv", "rain_layer", false,	TRUE,	FALSE, TRUE, D3DBLEND_ONE, D3DBLEND_ONE);
         // C.r_Pass	("stub_notransform_2uv", "rain_layer", false,	TRUE,	FALSE, TRUE, D3DBLEND_SRCALPHA,
         // D3DBLEND_INVSRCALPHA);
         C.r_Pass("stub_notransform_2uv", "rain_patch_normal_nomsaa", false, TRUE, FALSE, FALSE);
-        C.PassSET_ZB(TRUE, FALSE, TRUE);  // force inverted Z-Buffer
+        C.PassSET_ZB(TRUE, FALSE, TRUE); // force inverted Z-Buffer
 
         C.r_dx10Texture("s_position", r2_RT_P);
         C.r_dx10Texture("s_normal", r2_RT_N);
@@ -72,12 +72,12 @@ void CBlender_rain::Compile(CBlender_Compile& C)
 
         break;
 
-    case 2:  // Apply normals
+    case 2: // Apply normals
         // C.r_Pass	("stub_notransform_2uv", "rain_layer", false,	TRUE,	FALSE, TRUE, D3DBLEND_ONE, D3DBLEND_ONE);
         // C.r_Pass	("stub_notransform_2uv", "rain_layer", false,	TRUE,	FALSE, TRUE, D3DBLEND_SRCALPHA,
         // D3DBLEND_INVSRCALPHA);
         C.r_Pass("stub_notransform_2uv", "rain_apply_normal_nomsaa", false, TRUE, FALSE, FALSE);
-        C.PassSET_ZB(TRUE, FALSE, TRUE);  // force inverted Z-Buffer
+        C.PassSET_ZB(TRUE, FALSE, TRUE); // force inverted Z-Buffer
 
         C.r_dx10Texture("s_position", r2_RT_P);
         // C.r_dx10Texture		("s_normal",		r2_RT_N);
@@ -107,13 +107,13 @@ void CBlender_rain::Compile(CBlender_Compile& C)
 
         break;
 
-    case 3:  // Apply gloss
+    case 3: // Apply gloss
         // C.r_Pass	("stub_notransform_2uv", "rain_layer", false,	TRUE,	FALSE, TRUE, D3DBLEND_ONE, D3DBLEND_ONE);
         // C.r_Pass	("stub_notransform_2uv", "rain_layer", false,	TRUE,	FALSE, TRUE, D3DBLEND_SRCALPHA,
         // D3DBLEND_INVSRCALPHA);
         C.r_Pass(
             "stub_notransform_2uv", "rain_apply_gloss_nomsaa", false, TRUE, FALSE, TRUE, D3DBLEND_ONE, D3DBLEND_ONE);
-        C.PassSET_ZB(TRUE, FALSE, TRUE);  // force inverted Z-Buffer
+        C.PassSET_ZB(TRUE, FALSE, TRUE); // force inverted Z-Buffer
 
         C.r_dx10Texture("s_position", r2_RT_P);
         // C.r_dx10Texture		("s_normal",		r2_RT_N);
@@ -161,12 +161,12 @@ void CBlender_rain_msaa::Compile(CBlender_Compile& C)
 
     switch (C.iElement)
     {
-    case 0:  // Patch normals
+    case 0: // Patch normals
         // C.r_Pass	("stub_notransform_2uv", "rain_layer", false,	TRUE,	FALSE, TRUE, D3DBLEND_ONE, D3DBLEND_ONE);
         // C.r_Pass	("stub_notransform_2uv", "rain_layer", false,	TRUE,	FALSE, TRUE, D3DBLEND_SRCALPHA,
         // D3DBLEND_INVSRCALPHA);
         C.r_Pass("stub_notransform_2uv", "rain_patch_normal_msaa", false, TRUE, FALSE, FALSE);
-        C.PassSET_ZB(TRUE, FALSE, TRUE);  // force inverted Z-Buffer
+        C.PassSET_ZB(TRUE, FALSE, TRUE); // force inverted Z-Buffer
 
         C.r_dx10Texture("s_position", r2_RT_P);
         C.r_dx10Texture("s_normal", r2_RT_N);
@@ -197,12 +197,12 @@ void CBlender_rain_msaa::Compile(CBlender_Compile& C)
 
         break;
 
-    case 1:  // Apply normals
+    case 1: // Apply normals
         // C.r_Pass	("stub_notransform_2uv", "rain_layer", false,	TRUE,	FALSE, TRUE, D3DBLEND_ONE, D3DBLEND_ONE);
         // C.r_Pass	("stub_notransform_2uv", "rain_layer", false,	TRUE,	FALSE, TRUE, D3DBLEND_SRCALPHA,
         // D3DBLEND_INVSRCALPHA);
         C.r_Pass("stub_notransform_2uv", "rain_apply_normal_msaa", false, TRUE, FALSE, FALSE);
-        C.PassSET_ZB(TRUE, FALSE, TRUE);  // force inverted Z-Buffer
+        C.PassSET_ZB(TRUE, FALSE, TRUE); // force inverted Z-Buffer
 
         C.r_dx10Texture("s_position", r2_RT_P);
         // C.r_dx10Texture		("s_normal",		r2_RT_N);
@@ -232,12 +232,12 @@ void CBlender_rain_msaa::Compile(CBlender_Compile& C)
 
         break;
 
-    case 2:  // Apply gloss
+    case 2: // Apply gloss
         // C.r_Pass	("stub_notransform_2uv", "rain_layer", false,	TRUE,	FALSE, TRUE, D3DBLEND_ONE, D3DBLEND_ONE);
         // C.r_Pass	("stub_notransform_2uv", "rain_layer", false,	TRUE,	FALSE, TRUE, D3DBLEND_SRCALPHA,
         // D3DBLEND_INVSRCALPHA);
         C.r_Pass("stub_notransform_2uv", "rain_apply_gloss_msaa", false, TRUE, FALSE, TRUE, D3DBLEND_ONE, D3DBLEND_ONE);
-        C.PassSET_ZB(TRUE, FALSE, TRUE);  // force inverted Z-Buffer
+        C.PassSET_ZB(TRUE, FALSE, TRUE); // force inverted Z-Buffer
 
         C.r_dx10Texture("s_position", r2_RT_P);
         // C.r_dx10Texture		("s_normal",		r2_RT_N);

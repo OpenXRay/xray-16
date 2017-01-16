@@ -5,22 +5,22 @@ namespace ControlCom
 enum EControlType
 {
     // 1st level
-    eControlMovement = u32(0),  // linear velocity
-    eControlPath,               // path builder
-    eControlDir,                // model direction
-    eControlAnimation,          // animation manager
-                                //		eControlSound,					// sound manager
+    eControlMovement = u32(0), // linear velocity
+    eControlPath,              // path builder
+    eControlDir,               // model direction
+    eControlAnimation,         // animation manager
+                               //		eControlSound,					// sound manager
 
     // 2nd level
-    eControlSequencer,        // capture: anim
-    eControlTripleAnimation,  // capture: anim
+    eControlSequencer,       // capture: anim
+    eControlTripleAnimation, // capture: anim
 
     //// 3rd level
-    eControlJump,          // capture: path, movement, triple_anim     disable : fsm, dir
-    eControlRotationJump,  // capture: path, movement, sequencer, dir
-    eControlRunAttack,     // capture: path, movement, sequencer
+    eControlJump,         // capture: path, movement, triple_anim     disable : fsm, dir
+    eControlRotationJump, // capture: path, movement, sequencer, dir
+    eControlRunAttack,    // capture: path, movement, sequencer
     eControlThreaten,
-    eControlMeleeJump,  // capture: path, movement, sequencer, dir
+    eControlMeleeJump, // capture: path, movement, sequencer, dir
 
     eControlAnimationBase,
     eControlMovementBase,

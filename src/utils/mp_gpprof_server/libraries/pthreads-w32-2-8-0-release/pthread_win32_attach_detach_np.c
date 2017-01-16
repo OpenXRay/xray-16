@@ -244,7 +244,7 @@ BOOL pthread_win32_thread_detach_np()
          */
         ptw32_thread_t* sp = (ptw32_thread_t*)pthread_getspecific(ptw32_selfThreadKey);
 
-        if (sp != NULL)  // otherwise Win32 thread with no implicit POSIX handle.
+        if (sp != NULL) // otherwise Win32 thread with no implicit POSIX handle.
         {
             ptw32_callUserDestroyRoutines(sp->ptHandle);
 

@@ -55,7 +55,7 @@ void SStatSectionData::load(IReader& stream)
         case 0: key = "foo"; break;
         }
         s32 tmp2;
-        load_data(tmp2, stream);  // old total_points
+        load_data(tmp2, stream); // old total_points
     }
     else
         load_data(key, stream);
@@ -146,7 +146,7 @@ s32 CActorStatisticMgr::GetSectionPoints(const shared_str& key)
     if (key != "total")
         return GetSection(key).GetTotalPoints();
     else
-    {  // total
+    { // total
         s32 _total = -1;
         vStatSectionData& d = GetStorage();
         vStatSectionData::iterator it = d.begin();

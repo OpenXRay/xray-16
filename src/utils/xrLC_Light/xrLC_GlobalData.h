@@ -52,7 +52,7 @@ private:
 
 public:
 public:
-    xrLC_GlobalData();  //:_RCAST_Model (0), _b_nosun(false),_gl_linear(false){}
+    xrLC_GlobalData(); //:_RCAST_Model (0), _b_nosun(false),_gl_linear(false){}
     ~xrLC_GlobalData();
     IC xr_vector<b_BuildTexture>& textures() { return _cl_globs._textures; }
     IC xr_vector<CLightmap*>& lightmaps() { return _g_lightmaps; }

@@ -251,34 +251,34 @@ static void soFree(u32 name, void* ptr, s32 size)
 }
 
 SOConfig SocketsConfig = {
-    SOC_VENDOR_NINTENDO,  // vendor
-    SOC_VERSION,          // version
+    SOC_VENDOR_NINTENDO, // vendor
+    SOC_VERSION,         // version
 
-    soAlloc,  // alloc
-    soFree,   // free
+    soAlloc, // alloc
+    soFree,  // free
 
 #if defined(USE_DHCP)
-    SOC_FLAG_DHCP,              // flag
-    SOC_HtoNl(SOC_INADDR_ANY),  // addr
-    SOC_HtoNl(SOC_INADDR_ANY),  // netmask
-    SOC_HtoNl(SOC_INADDR_ANY),  // router
-    SOC_HtoNl(SOC_INADDR_ANY),  // dns1
-    SOC_HtoNl(SOC_INADDR_ANY),  // dns2
+    SOC_FLAG_DHCP,             // flag
+    SOC_HtoNl(SOC_INADDR_ANY), // addr
+    SOC_HtoNl(SOC_INADDR_ANY), // netmask
+    SOC_HtoNl(SOC_INADDR_ANY), // router
+    SOC_HtoNl(SOC_INADDR_ANY), // dns1
+    SOC_HtoNl(SOC_INADDR_ANY), // dns2
 #else
-    0,                          // flag
-    SOC_HtoNl(0xC0A8000C),      // addr         192.168.  0. 12
-    SOC_HtoNl(0xFFFFFF00),      // netmask      255.255.255.  0
-    SOC_HtoNl(0xC0A80001),      // router       192.168.  0.  1
-    SOC_HtoNl(0xC0A80001),      // dns1         192.168.  0.  1
-    SOC_HtoNl(SOC_INADDR_ANY),  // dns2
+    0,                         // flag
+    SOC_HtoNl(0xC0A8000C),     // addr         192.168.  0. 12
+    SOC_HtoNl(0xFFFFFF00),     // netmask      255.255.255.  0
+    SOC_HtoNl(0xC0A80001),     // router       192.168.  0.  1
+    SOC_HtoNl(0xC0A80001),     // dns1         192.168.  0.  1
+    SOC_HtoNl(SOC_INADDR_ANY), // dns2
 #endif
-    4096,  // timeWaitBuffer
-    4096,  // reassemblyBuffer
-    0,     // maximum transmission unit size
+    4096, // timeWaitBuffer
+    4096, // reassemblyBuffer
+    0,    // maximum transmission unit size
 
     // TCP
-    0,  // default TCP receive window size (default 2 x MSS)
-    0,  // default TCP total retransmit timeout value (default 100 sec)
+    0, // default TCP receive window size (default 2 x MSS)
+    0, // default TCP total retransmit timeout value (default 100 sec)
 
     // PPP
     NULL, NULL,
@@ -287,12 +287,12 @@ SOConfig SocketsConfig = {
     NULL,
 
     // DHCP
-    "NintendoDS",  // DHCP host name
-    50,            // TCP total retransmit times (default 4)
+    "NintendoDS", // DHCP host name
+    50,           // TCP total retransmit times (default 4)
 
     // UDP
-    0,  // default UDP send buffer size (default 1472)
-    0   // defualt UDP receive buffer size (default 4416)
+    0, // default UDP send buffer size (default 1472)
+    0  // defualt UDP receive buffer size (default 4416)
 };
 
 static const char* IWResultToString(int result)

@@ -90,4 +90,4 @@ IDeviceState* dx10StateCache<IDeviceState, StateDecs>::FindState(const StateDecs
         */
 }
 
-#endif  //	dx10StateCacheImpl_included
+#endif //	dx10StateCacheImpl_included

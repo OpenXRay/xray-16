@@ -71,7 +71,7 @@ typedef enum {
     OpSetInfo,
     OpBuddyRequest,
     OpDeleteBuddy,
-    OpSetStatus1,  // Do setstatus 5x as often as other ops
+    OpSetStatus1, // Do setstatus 5x as often as other ops
     OpSetStatus2,
     OpSetStatus3,
     OpSetStatus4,
@@ -102,19 +102,19 @@ typedef struct
 
     // GP stuff.
     ////////////
-    GPConnection gp;               // The profile's GP object.
-    bool gpInitialized;            // False until gpInitialize is called for this profile.
-    unsigned long disconnectTime;  // Disconnect at this time.
-    GPProfile others[MAX_OTHERS];  // Remote profiles that this profile knows about.
-    int numOthers;                 // The number of others.
-    unsigned long connectTime;     // When the connect attempt was made.
-    bool connected;                // True when gpConnect finished successfully.
+    GPConnection gp;              // The profile's GP object.
+    bool gpInitialized;           // False until gpInitialize is called for this profile.
+    unsigned long disconnectTime; // Disconnect at this time.
+    GPProfile others[MAX_OTHERS]; // Remote profiles that this profile knows about.
+    int numOthers;                // The number of others.
+    unsigned long connectTime;    // When the connect attempt was made.
+    bool connected;               // True when gpConnect finished successfully.
 
     // Op data.
     ///////////
-    Op activeOp;               // The active operation, OpNull between operations.
-    unsigned long nextOpTime;  // At this time, pick a new random operation.
-    int completedOps;          // Total number of operations completed.
+    Op activeOp;              // The active operation, OpNull between operations.
+    unsigned long nextOpTime; // At this time, pick a new random operation.
+    int completedOps;         // Total number of operations completed.
 } Profile;
 
 typedef struct
@@ -128,21 +128,21 @@ typedef struct
 /************
 ** GLOBALS **
 ************/
-char profilesFile[MAX_PATH];      // The file from which to load the profiles.
-Profile profiles[PROFILES_MAX];   // All of the loaded profiles.
-int numProfiles;                  // The number of loaded profiles.
-int numConnections;               // The number of profiles that are initialized/connected.
-int maxConnections;               // The maximum number of connected profiles.
-int highestConnections;           // The highest number of connections.
-int totalConnections;             // The total number of connections.
-int numConnected;                 // The number of profiles that are actually logged in.
-int highestConnected;             // The highest simultaneous connected.
-int totalConnected;               // The total number connected over the entire run.
-int connectsPerSecond;            // Number of connection attempts per second.
-unsigned long lastConnectTime;    // The last time there was a connect.
-unsigned long startShutdownTime;  // When to start shutting down.
-bool shuttingDown;                // True if we're in the process of shutting down.
-unsigned long runTime;            // How long to run for.
+char profilesFile[MAX_PATH];     // The file from which to load the profiles.
+Profile profiles[PROFILES_MAX];  // All of the loaded profiles.
+int numProfiles;                 // The number of loaded profiles.
+int numConnections;              // The number of profiles that are initialized/connected.
+int maxConnections;              // The maximum number of connected profiles.
+int highestConnections;          // The highest number of connections.
+int totalConnections;            // The total number of connections.
+int numConnected;                // The number of profiles that are actually logged in.
+int highestConnected;            // The highest simultaneous connected.
+int totalConnected;              // The total number connected over the entire run.
+int connectsPerSecond;           // Number of connection attempts per second.
+unsigned long lastConnectTime;   // The last time there was a connect.
+unsigned long startShutdownTime; // When to start shutting down.
+bool shuttingDown;               // True if we're in the process of shutting down.
+unsigned long runTime;           // How long to run for.
 
 /********************
 ** PROFILE LOADING **
@@ -355,9 +355,9 @@ void MessageOther(Profile* profile, GPProfile other)
     gpIDFromProfile(&profile->gp, other, &pid);
     switch (pid)
     {
-    case 100001:  // Mr. Pants@dan@gamespy.com
-    case 100002:  // walla@bryan@gamespy.com
-    case 100013:  // lumberjack@jason@gamespy.com
+    case 100001: // Mr. Pants@dan@gamespy.com
+    case 100002: // walla@bryan@gamespy.com
+    case 100013: // lumberjack@jason@gamespy.com
         return;
     }
 

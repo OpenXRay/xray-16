@@ -169,7 +169,7 @@ void CUIGameSP::StartTalk(bool disable_break)
     TalkMenu->ShowDialog(true);
 }
 
-void CUIGameSP::StartCarBody(CInventoryOwner* pActorInv, CInventoryOwner* pOtherOwner)  // Deadbody search
+void CUIGameSP::StartCarBody(CInventoryOwner* pActorInv, CInventoryOwner* pOtherOwner) // Deadbody search
 {
     if (TopInputReceiver()) return;
 
@@ -180,7 +180,7 @@ void CUIGameSP::StartCarBody(CInventoryOwner* pActorInv, CInventoryOwner* pOther
     ActorMenu->ShowDialog(true);
 }
 
-void CUIGameSP::StartCarBody(CInventoryOwner* pActorInv, CInventoryBox* pBox)  // Deadbody search
+void CUIGameSP::StartCarBody(CInventoryOwner* pActorInv, CInventoryBox* pBox) // Deadbody search
 {
     if (TopInputReceiver()) return;
 

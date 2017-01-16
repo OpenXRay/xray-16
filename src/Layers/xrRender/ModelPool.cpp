@@ -4,27 +4,27 @@
 #include "ModelPool.h"
 
 #ifndef _EDITOR
-#include "xrEngine/IGame_Persistent.h"
 #include "FHierrarhyVisual.h"
+#include "FLOD.h"
+#include "FProgressive.h"
+#include "FSkinned.h"
+#include "FTreeVisual.h"
+#include "FVisual.h"
+#include "ParticleEffect.h"
+#include "ParticleGroup.h"
 #include "SkeletonAnimated.h"
 #include "xrCore/FMesh.hpp"
-#include "FVisual.h"
-#include "FProgressive.h"
-#include "FSkinned.h"
-#include "FLOD.h"
-#include "FTreeVisual.h"
-#include "ParticleEffect.h"
-#include "ParticleGroup.h"
+#include "xrEngine/IGame_Persistent.h"
 #else
+#include "FHierrarhyVisual.h"
 #include "FMesh.h"
 #include "FProgressive.h"
+#include "FSkinned.h"
 #include "FVisual.h"
+#include "IGame_Persistent.h"
 #include "ParticleEffect.h"
 #include "ParticleGroup.h"
-#include "FSkinned.h"
-#include "FHierrarhyVisual.h"
 #include "SkeletonAnimated.h"
-#include "IGame_Persistent.h"
 #endif
 
 dxRender_Visual* CModelPool::Instance_Create(u32 type)
@@ -34,11 +34,11 @@ dxRender_Visual* CModelPool::Instance_Create(u32 type)
     // Check types
     switch (type)
     {
-    case MT_NORMAL:  // our base visual
+    case MT_NORMAL: // our base visual
         V = new Fvisual();
         break;
     case MT_HIERRARHY: V = new FHierrarhyVisual(); break;
-    case MT_PROGRESSIVE:  // dynamic-resolution visual
+    case MT_PROGRESSIVE: // dynamic-resolution visual
         V = new FProgressive();
         break;
     case MT_SKELETON_ANIM: V = new CKinematicsAnimated(); break;
@@ -106,7 +106,7 @@ dxRender_Visual* CModelPool::Instance_Load(const char* N, BOOL allow_register)
 // Actual loading
 #ifdef DEBUG
     if (bLogging) Msg("- Uncached model loading: %s", fn);
-#endif  // DEBUG
+#endif // DEBUG
 
     IReader* data = FS.r_open(fn);
     ogf_header H;

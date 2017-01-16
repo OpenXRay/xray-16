@@ -214,23 +214,23 @@ void CUICustomEdit::Draw()
             for (int i = 0; i < sz; i++)
                 passText[i] = '*';
             passText[sz] = 0;
-            m_dx_cur = font->SizeOf_(passText);  // cursor_str
+            m_dx_cur = font->SizeOf_(passText); // cursor_str
         }
         else
-            m_dx_cur = font->SizeOf_(istr);  // cursor_str
+            m_dx_cur = font->SizeOf_(istr); // cursor_str
 
         m_force_update = false;
     }
 
     inherited::Draw();
 
-    if (m_bInputFocus)  // draw cursor here
+    if (m_bInputFocus) // draw cursor here
     {
         out.x = pos.x + 0.0f + TextItemControl()->m_TextOffset.x + TextItemControl()->GetIndentByAlign();
         out.y = pos.y + 2.0f + TextItemControl()->m_TextOffset.y + TextItemControl()->GetVIndentByAlign();
         UI().ClientToScreenScaled(out);
 
-        out.x += m_dx_cur;  // cursor_str
+        out.x += m_dx_cur; // cursor_str
 
         font->Out(out.x, out.y, "_");
     }

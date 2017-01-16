@@ -36,7 +36,7 @@
 #ifdef DEBUG
 #include "PHDebug.h"
 extern BOOL death_anim_debug;
-#endif  // DEBUG
+#endif // DEBUG
 
 #include "xrEngine/device.h"
 
@@ -49,7 +49,7 @@ extern BOOL death_anim_debug;
 //	dBodyID body1=dGeomGetBody( c.geom.g1 );
 //	dBodyID body2=dGeomGetBody( c.geom.g2 );
 //	if( !body1 || !body2 || ( dGeomUserDataHasCallback( c.geom.g1,NodynamicsCollide )&& dGeomUserDataHasCallback(
-//c.geom.g2, NodynamicsCollide ) ) )
+// c.geom.g2, NodynamicsCollide ) ) )
 //		return;
 //	do_colide = false;
 //}
@@ -64,7 +64,7 @@ CCharacterPhysicsSupport::~CCharacterPhysicsSupport()
     set_collision_hit_callback(0);
     if (m_flags.test(fl_skeleton_in_shell)) {
         if (m_physics_skeleton) m_physics_skeleton->Deactivate();
-        xr_delete(m_physics_skeleton);  //! b_skeleton_in_shell
+        xr_delete(m_physics_skeleton); //! b_skeleton_in_shell
     }
     xr_delete(m_PhysicMovementControl);
     xr_delete(m_collision_activating_delay);
@@ -164,7 +164,7 @@ void CCharacterPhysicsSupport::in_NetSpawn(CSE_Abstract* e)
         ka->CalculateBones(TRUE);
         return;
     }
-    CPHDestroyable::Init();  // this zerows colbacks !!;
+    CPHDestroyable::Init(); // this zerows colbacks !!;
     IRenderVisual* pVisual = m_EntityAlife.Visual();
     IKinematicsAnimated* ka = smart_cast<IKinematicsAnimated*>(pVisual);
     IKinematics* pK = smart_cast<IKinematics*>(pVisual);
@@ -180,9 +180,9 @@ void CCharacterPhysicsSupport::in_NetSpawn(CSE_Abstract* e)
             ka->PlayCycle("death_init");
     }
     else if (!m_EntityAlife.animation_movement_controlled())
-        ka->PlayCycle("death_init");  ///непонятно зачем это вообще надо запускать
-                                      ///этот хак нужен, потому что некоторым монстрам
-                                      ///анимация после спона, может быть вообще не назначена
+        ka->PlayCycle("death_init"); ///непонятно зачем это вообще надо запускать
+                                     ///этот хак нужен, потому что некоторым монстрам
+                                     ///анимация после спона, может быть вообще не назначена
     pK->CalculateBones_Invalidate();
     pK->CalculateBones(TRUE);
 
@@ -284,7 +284,7 @@ void CCharacterPhysicsSupport::SpawnInitPhysics(CSE_Abstract* e)
 }
 void CCharacterPhysicsSupport::SpawnCharacterCreate()
 {
-    if (HACK_TERRIBLE_DONOT_COLLIDE_ON_SPAWN(m_EntityAlife))  //||  m_EntityAlife.animation_movement_controlled( )
+    if (HACK_TERRIBLE_DONOT_COLLIDE_ON_SPAWN(m_EntityAlife)) //||  m_EntityAlife.animation_movement_controlled( )
         return;
     CreateCharacterSafe();
     // if( m_eType != etStalker )
@@ -441,7 +441,7 @@ void CCharacterPhysicsSupport::KillHit(SHit& H)
     CAI_Stalker* const holder = m_EntityAlife.cast_stalker();
     if (holder && (holder->wounded() || holder->movement().current_params().cover())) m = MotionID();
 
-    if (m.valid())  //&& cmp( prev_pose, mXFORM )
+    if (m.valid()) //&& cmp( prev_pose, mXFORM )
     {
         destroy(m_interactive_motion);
         if (false && b_death_anim_velocity)
@@ -494,7 +494,7 @@ void CCharacterPhysicsSupport::in_Hit(SHit& H, bool is_killing)
     if (!m_pPhysicsShell && is_killing) KillHit(H);
 
     if (m_flags.test(fl_use_hit_anims) && Type() != etBitting &&
-        !m_flags.test(fl_death_anim_on))  //&& Type() == etStalker
+        !m_flags.test(fl_death_anim_on)) //&& Type() == etStalker
     {
         m_hit_animations.PlayHitMotion(H.direction(), H.bone_space_position(), H.bone(), m_EntityAlife);
     }
@@ -521,7 +521,7 @@ IC void CCharacterPhysicsSupport::UpdateDeathAnims()
 
     if (!m_flags.test(fl_death_anim_on) &&
         !is_imotion(
-            m_interactive_motion))  //! m_flags.test(fl_use_death_motion)//!b_death_anim_on&&m_pPhysicsShell->isFullActive()
+            m_interactive_motion)) //! m_flags.test(fl_use_death_motion)//!b_death_anim_on&&m_pPhysicsShell->isFullActive()
     {
         DestroyIKController();
         smart_cast<IKinematicsAnimated*>(m_EntityAlife.Visual())->PlayCycle("death_init");
@@ -570,9 +570,9 @@ void CCharacterPhysicsSupport::in_UpdateCL()
     m_character_shell_control.CalculateTimeDelta();
     if (m_pPhysicsShell) {
         VERIFY(m_pPhysicsShell->isFullActive());
-        m_pPhysicsShell->SetRagDoll();  //Теперь шела относиться к классу объектов cbClassRagDoll
+        m_pPhysicsShell->SetRagDoll(); //Теперь шела относиться к классу объектов cbClassRagDoll
 
-        if (!is_imotion(m_interactive_motion))  //! m_flags.test(fl_use_death_motion)
+        if (!is_imotion(m_interactive_motion)) //! m_flags.test(fl_use_death_motion)
             m_pPhysicsShell->InterpolateGlobalTransform(&mXFORM);
         else
             m_interactive_motion->update();
@@ -1020,7 +1020,7 @@ void CCharacterPhysicsSupport::CreateShell(IGameObject* who, Fvector& dp, Fvecto
     for (u16 I = K->LL_BoneCount() - 1; I != u16(-1); --I)
         K->LL_GetBoneInstance(I).reset_callback();
     //
-    if (anim_mov_ctrl)  // we do not whant to move by long animation in root
+    if (anim_mov_ctrl) // we do not whant to move by long animation in root
         BR.set_callback_overwrite(TRUE);
     //
     K->CalculateBones_Invalidate();
@@ -1048,7 +1048,7 @@ void CCharacterPhysicsSupport::CreateShell(IGameObject* who, Fvector& dp, Fvecto
     m_pPhysicsShell->SetCallbacks();
     //
 
-    if (anim_mov_ctrl)  // we do not whant to move by long animation in root
+    if (anim_mov_ctrl) // we do not whant to move by long animation in root
         BR.set_callback_overwrite(TRUE);
 
     if (!DoCharacterShellCollide()) m_pPhysicsShell->DisableCharacterCollision();
@@ -1066,7 +1066,7 @@ void CCharacterPhysicsSupport::CreateShell(IGameObject* who, Fvector& dp, Fvecto
     m_flags.set(fl_skeleton_in_shell, TRUE);
 
     if (IsGameTypeSingle()) {
-        m_pPhysicsShell->SetPrefereExactIntegration();  // use exact integration for ragdolls in single
+        m_pPhysicsShell->SetPrefereExactIntegration(); // use exact integration for ragdolls in single
         m_pPhysicsShell->SetRemoveCharacterCollLADisable();
     }
     else

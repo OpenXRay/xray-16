@@ -148,7 +148,7 @@ void CALifeGraphRegistry::detach(CSE_Abstract& object, CSE_ALifeInventoryItem* i
                 item->base()->name_replace(), item->base()->ID, object.name_replace(), object.ID,
                 *item->base()->s_name);
         }
-#endif  // DEBUG
+#endif // DEBUG
         //		R_ASSERT2				(value,"Can't detach an item which is not on my own");
     }
 }

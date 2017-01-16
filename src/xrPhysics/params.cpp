@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
 #include "params.h"
-float object_damage_factor = 1.f;  // times increace damage from object collision
+float object_damage_factor = 1.f; // times increace damage from object collision
 void LoadParams()
 {
     if (!pSettings) return;

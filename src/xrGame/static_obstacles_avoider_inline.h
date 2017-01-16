@@ -13,7 +13,7 @@ IC static_obstacles_avoider::static_obstacles_avoider() : m_need_path_to_rebuild
 #ifdef DEBUG
     m_movement_manager = 0;
     m_failed_to_build_path = 0;
-#endif  // DEBUG
+#endif // DEBUG
 }
 
 IC void static_obstacles_avoider::construct(

@@ -41,7 +41,7 @@ GHTTPBool ghttpSetRequestEncryptionEngine(GHTTPRequest request, GHTTPEncryptionE
 
     if (engine == GHTTPEncryptionEngine_None) {
         connection->encryptor.mInterface = NULL;
-        return GHTTPTrue;  // this is the default, just return
+        return GHTTPTrue; // this is the default, just return
     }
     else
     {
@@ -125,10 +125,10 @@ GHIEncryptionResult ghiEncryptorSslInitFunc(struct GHIConnection* connection, st
     helloWrapper.buf = connection->sendBuffer.data;
     helloWrapper.size = connection->sendBuffer.size;
     helloWrapper.start = connection->sendBuffer.data + connection->sendBuffer.pos;
-    helloWrapper.end = helloWrapper.start;  // start writing here
+    helloWrapper.end = helloWrapper.start; // start writing here
 
-    ecodeResult = matrixSslEncodeClientHello((ssl_t*)theEncryptor->mInterface, &helloWrapper, 0);  // 0 = cipher
-    if (ecodeResult != 0) return GHIEncryptionResult_Error;                                        // error!
+    ecodeResult = matrixSslEncodeClientHello((ssl_t*)theEncryptor->mInterface, &helloWrapper, 0); // 0 = cipher
+    if (ecodeResult != 0) return GHIEncryptionResult_Error;                                       // error!
 
     // Adjust the sendBuffer to account for the new data
     connection->sendBuffer.len += (int)(helloWrapper.end - helloWrapper.start);
@@ -153,10 +153,10 @@ GHIEncryptionResult ghiEncryptorSslEncryptFunc(struct GHIConnection* connection,
     // SSL buffer wrapper
     // Append to theDecryptedBuffer
     sslBuf_t encryptedBuf;
-    encryptedBuf.buf = theEncryptedBuffer;    // buf starts here
-    encryptedBuf.start = theEncryptedBuffer;  // readpos,  set to start
-    encryptedBuf.end = theEncryptedBuffer;    // writepos, set to start
-    encryptedBuf.size = *theEncryptedLength;  // total size of buf
+    encryptedBuf.buf = theEncryptedBuffer;   // buf starts here
+    encryptedBuf.start = theEncryptedBuffer; // readpos,  set to start
+    encryptedBuf.end = theEncryptedBuffer;   // writepos, set to start
+    encryptedBuf.size = *theEncryptedLength; // total size of buf
 
     // perform the encryption
     encodeResult = matrixSslEncode(
@@ -197,10 +197,10 @@ GHIEncryptionResult ghiEncryptorSslDecryptFunc(struct GHIConnection* connection,
     inBuf.size = *theEncryptedLength;
 
     // Append to theDecryptedBuffer
-    decryptedBuf.buf = theDecryptedBuffer;    // buf starts here
-    decryptedBuf.start = theDecryptedBuffer;  // readpos,  set to start
-    decryptedBuf.end = theDecryptedBuffer;    // writepos, set to start
-    decryptedBuf.size = *theDecryptedLength;  // total size of buf
+    decryptedBuf.buf = theDecryptedBuffer;   // buf starts here
+    decryptedBuf.start = theDecryptedBuffer; // readpos,  set to start
+    decryptedBuf.end = theDecryptedBuffer;   // writepos, set to start
+    decryptedBuf.size = *theDecryptedLength; // total size of buf
 
     // Perform the decode operation
     //     - may require multiple tries
@@ -240,7 +240,7 @@ GHIEncryptionResult ghiEncryptorSslDecryptFunc(struct GHIConnection* connection,
             theEncryptor->mSessionEstablished = GHTTPTrue;
 
             // Remove the bytes from the decrypted buffer (we don't want to return them to the app)
-            decryptedBuf.end = decryptedBuf.start;  // bug?
+            decryptedBuf.end = decryptedBuf.start; // bug?
             break;
         }
 
@@ -296,7 +296,7 @@ typedef struct gsRevoExInterface
     SSLId mId;
     SSLClientCertId mClientCertId;
     SSLRootCAId mRootCAId;
-    GHTTPBool mConnected;  // means "connected to socket", not "connected to remote machine"
+    GHTTPBool mConnected; // means "connected to socket", not "connected to remote machine"
 } gsRevoExInterface;
 
 // Init the engine
@@ -590,7 +590,7 @@ GHIEncryptionResult ghiEncryptorSslDecryptRecv(struct GHIConnection* connection,
 GHIEncryptionResult ghiEncryptorSslEncryptFunc(struct GHIConnection* connection, struct GHIEncryptor* theEncryptor,
     const char* thePlainTextBuffer, int thePlainTextLength, char* theEncryptedBuffer, int* theEncryptedLength)
 {
-    GS_FAIL();  // Should never call this for RevoEx SSL!  It uses encrypt on send
+    GS_FAIL(); // Should never call this for RevoEx SSL!  It uses encrypt on send
 
     GSI_UNUSED(connection);
     GSI_UNUSED(theEncryptor);
@@ -605,7 +605,7 @@ GHIEncryptionResult ghiEncryptorSslEncryptFunc(struct GHIConnection* connection,
 GHIEncryptionResult ghiEncryptorSslDecryptFunc(struct GHIConnection* connection, struct GHIEncryptor* theEncryptor,
     const char* theEncryptedBuffer, int* theEncryptedLength, char* theDecryptedBuffer, int* theDecryptedLength)
 {
-    GS_FAIL();  // Should never call this for RevoEx SSL!  It uses decrypt on recv
+    GS_FAIL(); // Should never call this for RevoEx SSL!  It uses decrypt on recv
 
     GSI_UNUSED(connection);
     GSI_UNUSED(theEncryptor);
@@ -643,7 +643,7 @@ static void ghiEncryptorWriteNBOLength(unsigned char* buf, int value, int size)
     unsigned char* NBOData = (unsigned char*)&NBO;
 
     assert(size <= sizeof(NBO));
-    if (size > sizeof(NBO)) return;  // can't write more than 4 bytes!
+    if (size > sizeof(NBO)) return; // can't write more than 4 bytes!
 
     // this won't work if NBO ever changes from big-endian
     memcpy(buf, NBOData + (sizeof(int) - size), (size_t)size);
@@ -663,7 +663,7 @@ static GHTTPBool ghiEncryptorParseASN1Sequence(GHIBuffer* data, int* lenOut)
     char tempChar = '\0';
 
     if (GHTTPFalse == ghiReadDataFromBufferFixed(data, &tempChar, 1)) return GHTTPFalse;
-    if (tempChar != 0x30)  // sequence start byte
+    if (tempChar != 0x30) // sequence start byte
         return GHTTPFalse;
 
     if (GHTTPFalse == ghiReadDataFromBufferFixed(data, &tempChar, 1)) return GHTTPFalse;
@@ -708,7 +708,7 @@ static void ghiEncryptorGenerateEncryptionKeys(gsSSL* sslInterface)
     unsigned char temp[SHA1HashSize];
 
     unsigned int randomSize = 32;
-    unsigned char keyblock[64];  // todo: support different key sizes
+    unsigned char keyblock[64]; // todo: support different key sizes
 
     // master_secret "A"
     SHA1Reset(&sha1);
@@ -905,7 +905,7 @@ GHIEncryptionResult ghiEncryptorSslStartFunc(struct GHIConnection* connection, s
     ghiEncryptorWriteNBOLength(helloMsg.lengthNBO, sizeof(gsSSLClientHelloMsg) - sizeof(gsSSLRecordHeaderMsg) - 4, 3);
     // ghttpEncryptorSetNBOBytesFromHBOInt(helloMsg.time, (gsi_u32)current_time(), 4); // 4 byte time value (for
     // randomness)
-    ghiEncryptorWriteNBOLength(helloMsg.time, 0, 4);  // test code: no randomness
+    ghiEncryptorWriteNBOLength(helloMsg.time, 0, 4); // test code: no randomness
 
     // fill in the [rest of the] random
     //   Security Note: If a hacker is able to discern the current_time() they may be able to
@@ -915,7 +915,7 @@ GHIEncryptionResult ghiEncryptorSslStartFunc(struct GHIConnection* connection, s
     {
 #if defined(GS_CRYPT_NO_RANDOM)
 #pragma message("!!!WARNING: SSL Random disable for debug purposes.  SSL not secured!!!")
-        helloMsg.random[i] = 0;  // test code: no randomness
+        helloMsg.random[i] = 0; // test code: no randomness
 #else
         helloMsg.random[i] = (unsigned char)Util_RandInt(0, 0xff);
 #endif
@@ -970,7 +970,7 @@ GHIEncryptionResult ghiEncryptorSslEncryptFunc(struct GHIConnection* connection,
             // not secured yet, send as plain text
             if (thePlainTextLength > *theEncryptedLength) return GHIEncryptionResult_BufferTooSmall;
             memcpy(theEncryptedBuffer, thePlainTextBuffer, (size_t)thePlainTextLength);
-            *theEncryptedLength += thePlainTextLength;  // number of bytes written
+            *theEncryptedLength += thePlainTextLength; // number of bytes written
         }
         else
         {
@@ -1002,17 +1002,17 @@ GHIEncryptionResult ghiEncryptorSslEncryptFunc(struct GHIConnection* connection,
             MD5Update(&md5, sslInterface->clientWriteMACSecret, (unsigned int)sslInterface->clientWriteMACLen);
             MD5Update(&md5, (unsigned char*)GS_SSL_PAD_ONE, GS_SSL_MD5_PAD_LEN);
             MD5Update(&md5, sslInterface->sendSeqNBO, sizeof(sslInterface->sendSeqNBO));
-            MD5Update(&md5, (unsigned char*)"\x17", 1);  // content type application data
+            MD5Update(&md5, (unsigned char*)"\x17", 1); // content type application data
             MD5Update(&md5, (unsigned char*)&lengthNBO, sizeof(lengthNBO));
             MD5Update(
-                &md5, (unsigned char*)thePlainTextBuffer, (unsigned int)thePlainTextLength);  // **cast-away const**
-            MD5Final(MAC, &md5);                                                              // first half of MAC
+                &md5, (unsigned char*)thePlainTextBuffer, (unsigned int)thePlainTextLength); // **cast-away const**
+            MD5Final(MAC, &md5);                                                             // first half of MAC
 
             MD5Init(&md5);
             MD5Update(&md5, sslInterface->clientWriteMACSecret, (unsigned int)sslInterface->clientWriteMACLen);
             MD5Update(&md5, (unsigned char*)GS_SSL_PAD_TWO, GS_SSL_MD5_PAD_LEN);
             MD5Update(&md5, MAC, GS_CRYPT_MD5_HASHSIZE);
-            MD5Final(MAC, &md5);  // complete MAC
+            MD5Final(MAC, &md5); // complete MAC
 
             // apply stream cipher to data + MAC
             RC4Encrypt(&sslInterface->sendRC4, (const unsigned char*)thePlainTextBuffer,
@@ -1028,11 +1028,11 @@ GHIEncryptionResult ghiEncryptorSslEncryptFunc(struct GHIConnection* connection,
             *theEncryptedLength -= pos;
 
             // Update the sequence number for the next message (8-byte, NBO)
-            pos = 7;  // **changing the semantic of variable "pos"
+            pos = 7; // **changing the semantic of variable "pos"
             do
             {
                 // int carry = 0;
-                if (sslInterface->sendSeqNBO[pos] == 0xFF)  // wraparound means carry
+                if (sslInterface->sendSeqNBO[pos] == 0xFF) // wraparound means carry
                 {
                     // carry = 1;
                     sslInterface->sendSeqNBO[pos] = 0;
@@ -1041,7 +1041,7 @@ GHIEncryptionResult ghiEncryptorSslEncryptFunc(struct GHIConnection* connection,
                 else
                 {
                     sslInterface->sendSeqNBO[pos] += 1;
-                    pos = 0;  // end addition
+                    pos = 0; // end addition
                 }
             } while (pos >= 0);
         }
@@ -1070,7 +1070,7 @@ GHIEncryptionResult ghiEncryptorSslDecryptFunc(struct GHIConnection* connection,
         // no encryption set? copy as plain text
         memcpy(theDecryptedBuffer, theEncryptedBuffer, (size_t)(*theEncryptedLength));
         *theDecryptedLength = *theEncryptedLength;
-        *theEncryptedLength = 0;  // no bytes remaining
+        *theEncryptedLength = 0; // no bytes remaining
         return GHIEncryptionResult_Success;
     }
 
@@ -1094,13 +1094,13 @@ GHIEncryptionResult ghiEncryptorSslDecryptFunc(struct GHIConnection* connection,
         // length = (unsigned short)(header->lengthNBO[0] | (header->lengthNBO[1] << 8));
         memcpy(&length, &header->lengthNBO[0], sizeof(length));
         length = ntohs(length);
-        if (*theEncryptedLength < (readPos + length + (int)sizeof(gsSSLRecordHeaderMsg))) break;  // wait for more data
+        if (*theEncryptedLength < (readPos + length + (int)sizeof(gsSSLRecordHeaderMsg))) break; // wait for more data
 
         // if we have to decrypt, make sure there is room in the decrypt buffer
         if (connection->encryptor.mSessionEstablished) {
             if ((*theDecryptedLength - writePos) < length) {
-                *theEncryptedLength = readPos;   // bytes read *NOT* bytes remaining
-                *theDecryptedLength = writePos;  // bytes written
+                *theEncryptedLength = readPos;  // bytes read *NOT* bytes remaining
+                *theDecryptedLength = writePos; // bytes written
 
                 if (*theDecryptedLength > 0)
                     return GHIEncryptionResult_Success;
@@ -1130,7 +1130,7 @@ GHIEncryptionResult ghiEncryptorSslDecryptFunc(struct GHIConnection* connection,
                 GSIDebugCat_HTTP, GSIDebugType_Misc, GSIDebugLevel_Debug, "SSL handshake message received\r\n");
 
             result = ghiEncryptorProcessSSLHandshake(connection, theEncryptor, &data);
-            if (result != GHIEncryptionResult_Success) return result;  // error!
+            if (result != GHIEncryptionResult_Success) return result; // error!
 
             break;
         }
@@ -1180,15 +1180,15 @@ GHIEncryptionResult ghiEncryptorSslDecryptFunc(struct GHIConnection* connection,
 
         default:
             readPos += sizeof(gsSSLRecordHeaderMsg);
-            return GHIEncryptionResult_Error;  // unhandled content type
+            return GHIEncryptionResult_Error; // unhandled content type
         };
 
         readPos += length;
     };
 
     // remove read bytes from the stream
-    *theEncryptedLength = readPos;   // bytes read *NOT* bytes remaining
-    *theDecryptedLength = writePos;  // bytes written
+    *theEncryptedLength = readPos;  // bytes read *NOT* bytes remaining
+    *theDecryptedLength = writePos; // bytes written
 
     if (*theEncryptedLength < 0)
         return GHIEncryptionResult_Error;
@@ -1227,18 +1227,18 @@ GHIEncryptionResult ghiEncryptorProcessSSLHandshake(
         CHECK(ghiReadDataFromBufferFixed(data, &messageType, 1));
 
         if (messageType == GS_SSL_HANDSHAKE_SERVERHELLO) {
-            int totalMsgLen = 0;  // length of header + data
-            int msgDataLen = 0;   // length of data
+            int totalMsgLen = 0; // length of header + data
+            int msgDataLen = 0;  // length of data
             int tempInt = 0;
             char tempChar = '\0';
 
             // make sure we don't have a session already (e.g. dupe hello message)
-            if (sslInterface->sessionLen != 0) return GHIEncryptionResult_Error;  // abort connection
+            if (sslInterface->sessionLen != 0) return GHIEncryptionResult_Error; // abort connection
 
             CHECK(ghiEncryptorReadNBOLength(data, &msgDataLen, 3));
 
             // check reported size against the actual bytes remaining
-            if (msgDataLen > (data->len - data->pos)) return GHIEncryptionResult_Error;  // abort connection
+            if (msgDataLen > (data->len - data->pos)) return GHIEncryptionResult_Error; // abort connection
 
             // skip SSL version
             //    (length check not required because we did that above)
@@ -1269,9 +1269,9 @@ GHIEncryptionResult ghiEncryptorProcessSSLHandshake(
         }
         else if (messageType == GS_SSL_HANDSHAKE_CERTIFICATE)
         {
-            int msgLength = 0;    // combined length of the message (size in SSL message header)
-            int certListLen = 0;  // combined length of all certificates
-            int totalMsgLen = 0;  // our calculated msg length (for handshake hashing)
+            int msgLength = 0;   // combined length of the message (size in SSL message header)
+            int certListLen = 0; // combined length of all certificates
+            int totalMsgLen = 0; // our calculated msg length (for handshake hashing)
 
             int certCount = 0;
             int certListEndPos = 0;
@@ -1301,13 +1301,13 @@ GHIEncryptionResult ghiEncryptorProcessSSLHandshake(
                 CHECK(ghiEncryptorReadNBOLength(data, &certLength, 3));
 
                 // Make sure we have enough data to cover this certificate
-                if (certLength > (data->len - data->pos)) return GHIEncryptionResult_Error;  // certificate too big
+                if (certLength > (data->len - data->pos)) return GHIEncryptionResult_Error; // certificate too big
 
                 // 0xFFFF is max message size in SSL v3.0, we don't currently support
                 // split messages
                 if (certLength > 0xFFFF) return GHIEncryptionResult_Error;
 
-                certStartPos = data->pos;  // remember this for a shortcut later
+                certStartPos = data->pos; // remember this for a shortcut later
                 certCount++;
 
                 // make a copy of the certificate data
@@ -1350,25 +1350,25 @@ GHIEncryptionResult ghiEncryptorProcessSSLHandshake(
 
                     // Serial Number (variable length, with 2-byte length field)
                     if ((unsigned char)data->data[data->pos++] != 0x02) return GHIEncryptionResult_Error;
-                    temp = (unsigned char)data->data[data->pos++];  // len of serial number
+                    temp = (unsigned char)data->data[data->pos++]; // len of serial number
                     if (data->pos + temp > certListEndPos) return GHIEncryptionResult_Error;
-                    data->pos += temp;  // skip the serial number
+                    data->pos += temp; // skip the serial number
 
                     // Signature algorithm identifier SEQUENCE
                     CHECK(ghiEncryptorParseASN1Sequence(data, &seqLen));
-                    data->pos += seqLen;  // skip algorithm ID (todo: verify signatures)
+                    data->pos += seqLen; // skip algorithm ID (todo: verify signatures)
 
                     // Issuer Name
                     CHECK(ghiEncryptorParseASN1Sequence(data, &seqLen));
-                    data->pos += seqLen;  // skip the issuer name sequence
+                    data->pos += seqLen; // skip the issuer name sequence
 
                     // Validity
                     CHECK(ghiEncryptorParseASN1Sequence(data, &seqLen));
-                    data->pos += seqLen;  // skip the validity sequence
+                    data->pos += seqLen; // skip the validity sequence
 
                     // Subject Name
                     CHECK(ghiEncryptorParseASN1Sequence(data, &seqLen));
-                    data->pos += seqLen;  // skip the subject name sequence
+                    data->pos += seqLen; // skip the subject name sequence
 
                     // Subject Public Key Info
                     CHECK(ghiEncryptorParseASN1Sequence(data, &seqLen));
@@ -1378,18 +1378,18 @@ GHIEncryptionResult ghiEncryptorProcessSSLHandshake(
                     if ((unsigned char)data->data[data->pos++] != 0x06) return GHIEncryptionResult_Error;
                     if ((unsigned char)data->data[data->pos++] != 0x09) return GHIEncryptionResult_Error;
                     if (0 != memcmp(&data->data[data->pos], gsSslRsaOid, sizeof(gsSslRsaOid)))
-                        return GHIEncryptionResult_Error;  // only RSA certs are supported
+                        return GHIEncryptionResult_Error; // only RSA certs are supported
                     data->pos += sizeof(gsSslRsaOid);
                     if ((unsigned char)data->data[data->pos++] != 0x05) return GHIEncryptionResult_Error;
                     if ((unsigned char)data->data[data->pos++] != 0x00) return GHIEncryptionResult_Error;
 
                     //     Bitstring (subject public key)
                     if (2 > (certListEndPos - data->pos)) return GHIEncryptionResult_Error;
-                    if ((unsigned char)data->data[data->pos++] != 0x03) return GHIEncryptionResult_Error;  // bitstring
+                    if ((unsigned char)data->data[data->pos++] != 0x03) return GHIEncryptionResult_Error; // bitstring
                     if ((unsigned char)data->data[data->pos++] != 0x81)
-                        return GHIEncryptionResult_Error;  // 1 byte len field
+                        return GHIEncryptionResult_Error; // 1 byte len field
                     if (temp > (certListEndPos - data->pos)) return GHIEncryptionResult_Error;
-                    temp = (unsigned char)data->data[data->pos++];  // remaining data size (check or ignore)
+                    temp = (unsigned char)data->data[data->pos++]; // remaining data size (check or ignore)
 
                     if ((unsigned char)data->data[data->pos++] != 0x00) return GHIEncryptionResult_Error;
 
@@ -1397,8 +1397,8 @@ GHIEncryptionResult ghiEncryptorProcessSSLHandshake(
                     CHECK(ghiEncryptorParseASN1Sequence(data, &seqLen));
 
                     // Read out the public key modulus
-                    if (data->data[data->pos++] != 0x02) return GHIEncryptionResult_Error;  // integer tag
-                    if ((data->data[data->pos] & 0x80) == 0x80)  // ASN1 variable length field
+                    if (data->data[data->pos++] != 0x02) return GHIEncryptionResult_Error; // integer tag
+                    if ((data->data[data->pos] & 0x80) == 0x80)                            // ASN1 variable length field
                     {
                         int lensize = data->data[data->pos++] & 0x7f;
                         if (lensize > 4) return GHIEncryptionResult_Error;
@@ -1411,17 +1411,17 @@ GHIEncryptionResult ghiEncryptorProcessSSLHandshake(
                         temp = (unsigned char)data->data[data->pos++];
                     }
                     if (data->pos + temp > certListEndPos) return GHIEncryptionResult_Error;
-                    if (data->data[data->pos++] != 0x00) return GHIEncryptionResult_Error;  // ignore bits must be 0x00
+                    if (data->data[data->pos++] != 0x00) return GHIEncryptionResult_Error; // ignore bits must be 0x00
                     if (temp - 1 > GS_LARGEINT_BINARY_SIZE / sizeof(char)) return GHIEncryptionResult_Error;
                     sslInterface->serverpub.modulus.mLength =
                         (unsigned int)((temp - 1) /
-                                       GS_LARGEINT_DIGIT_SIZE_BYTES);  //-1 to subtract the previous 0x00 byte
+                                       GS_LARGEINT_DIGIT_SIZE_BYTES); //-1 to subtract the previous 0x00 byte
                     gsLargeIntSetFromMemoryStream(
                         &sslInterface->serverpub.modulus, (const gsi_u8*)&data->data[data->pos], (gsi_u32)temp - 1);
                     data->pos += temp - 1;
 
                     // Read out the public key exponent
-                    if (data->data[data->pos++] != 0x02) return GHIEncryptionResult_Error;  // integer
+                    if (data->data[data->pos++] != 0x02) return GHIEncryptionResult_Error; // integer
                     if ((data->data[data->pos] & 0x80) == 0x80) {
                         int lensize = data->data[data->pos++] & 0x7f;
                         if (lensize > 4) return GHIEncryptionResult_Error;
@@ -1434,10 +1434,10 @@ GHIEncryptionResult ghiEncryptorProcessSSLHandshake(
                         temp = (unsigned char)data->data[data->pos++];
                     }
                     if (data->pos + temp > certListEndPos) return GHIEncryptionResult_Error;
-                    if (temp == 0) return GHIEncryptionResult_Error;  // no exponent?
+                    if (temp == 0) return GHIEncryptionResult_Error; // no exponent?
                     if (temp > GS_LARGEINT_BINARY_SIZE / sizeof(char)) return GHIEncryptionResult_Error;
                     sslInterface->serverpub.exponent.mLength =
-                        (unsigned int)(((temp - 1) / GS_LARGEINT_DIGIT_SIZE_BYTES) + 1);  // ceiling of temp/4
+                        (unsigned int)(((temp - 1) / GS_LARGEINT_DIGIT_SIZE_BYTES) + 1); // ceiling of temp/4
                     gsLargeIntSetFromMemoryStream(
                         &sslInterface->serverpub.exponent, (const gsi_u8*)&data->data[data->pos], (gsi_u32)temp);
                     data->pos += temp;
@@ -1448,7 +1448,7 @@ GHIEncryptionResult ghiEncryptorProcessSSLHandshake(
 
                 GSI_UNUSED(version);
             }
-            if (data->pos != certListEndPos) return GHIEncryptionResult_Error;  // bytes hanging off the end!
+            if (data->pos != certListEndPos) return GHIEncryptionResult_Error; // bytes hanging off the end!
 
             // todo: verify certificate chain
             //       first certificate is the server's, the rest likely belong to CA
@@ -1509,10 +1509,10 @@ GHIEncryptionResult ghiEncryptorProcessSSLHandshake(
 #pragma message("!!!WARNING: SSL Random disable for debug purposes.  SSL not secured!!!")
                 // Use zero as the random so we can packet sniff for debug
                 //   warning! : this compromises the SSL security
-                sslInterface->premastersecret[i] = 0;  // rand()
+                sslInterface->premastersecret[i] = 0; // rand()
 #else
                 Util_RandSeed(current_time());
-                sslInterface->premastersecret[i] = (unsigned char)(Util_RandInt(0, 0x0100));  // range = [0...FF]
+                sslInterface->premastersecret[i] = (unsigned char)(Util_RandInt(0, 0x0100)); // range = [0...FF]
 #endif
             }
 
@@ -1545,9 +1545,9 @@ GHIEncryptionResult ghiEncryptorProcessSSLHandshake(
             changeCipherSpec->versionMajor = GS_SSL_VERSION_MAJOR;
             changeCipherSpec->versionMinor = GS_SSL_VERSION_MINOR;
             changeCipherSpec->lengthNBO[0] = 0;
-            changeCipherSpec->lengthNBO[1] = 1;  // always one byte length
+            changeCipherSpec->lengthNBO[1] = 1; // always one byte length
             connection->sendBuffer.len += sizeof(gsSSLRecordHeaderMsg);
-            connection->sendBuffer.data[connection->sendBuffer.len++] = 0x01;  // always set to 0x01
+            connection->sendBuffer.data[connection->sendBuffer.len++] = 0x01; // always set to 0x01
             // DO NOT add it to the running handshake hash (its content is not GS_SSL_CONTENT_HANDSHAKE)
 
             // Calculate the encryption keys
@@ -1559,7 +1559,7 @@ GHIEncryptionResult ghiEncryptorProcessSSLHandshake(
             finalHandshake->versionMajor = GS_SSL_VERSION_MAJOR;
             finalHandshake->versionMinor = GS_SSL_VERSION_MINOR;
             finalHandshake->lengthNBO[0] = 0;
-            finalHandshake->lengthNBO[1] = 56;  // handshake type(1)+handshake lenNBO(3)+SHA1(20)+MD5(16)+MAC(16)
+            finalHandshake->lengthNBO[1] = 56; // handshake type(1)+handshake lenNBO(3)+SHA1(20)+MD5(16)+MAC(16)
             connection->sendBuffer.len += sizeof(gsSSLRecordHeaderMsg);
             connection->sendBuffer.data[connection->sendBuffer.len++] = GS_SSL_HANDSHAKE_FINISHED;
             ghiEncryptorWriteNBOLength((unsigned char*)&connection->sendBuffer.data[connection->sendBuffer.len], 36, 3);
@@ -1614,15 +1614,15 @@ GHIEncryptionResult ghiEncryptorProcessSSLHandshake(
             temp[2] = (unsigned char)((GS_CRYPT_MD5_HASHSIZE + GS_CRYPT_SHA1_HASHSIZE + 4));
             // temp[1] = (unsigned char)(htons(GS_CRYPT_MD5_HASHSIZE+GS_CRYPT_SHA1_HASHSIZE));
             // temp[2] = (unsigned char)(htons(GS_CRYPT_MD5_HASHSIZE+GS_CRYPT_SHA1_HASHSIZE+4)>>8);
-            temp[3] = 0x14;  // 20-bytes of data (MD5+SHA1)
-            temp[4] = 0x00;  // 3-byte length NBO
-            temp[5] = 0x00;  // ..
-            temp[6] = 0x24;  // ..
+            temp[3] = 0x14; // 20-bytes of data (MD5+SHA1)
+            temp[4] = 0x00; // 3-byte length NBO
+            temp[5] = 0x00; // ..
+            temp[6] = 0x24; // ..
             MD5Update(&sslInterface->finishHashMD5, (unsigned char*)&temp, 7);
-            MD5Update(&sslInterface->finishHashMD5, hashTempMD5, GS_CRYPT_MD5_HASHSIZE);    // content part 1
-            MD5Update(&sslInterface->finishHashMD5, hashTempSHA1, GS_CRYPT_SHA1_HASHSIZE);  // content part 2
+            MD5Update(&sslInterface->finishHashMD5, hashTempMD5, GS_CRYPT_MD5_HASHSIZE);   // content part 1
+            MD5Update(&sslInterface->finishHashMD5, hashTempSHA1, GS_CRYPT_SHA1_HASHSIZE); // content part 2
             MD5Final(hashTempMD5, &sslInterface->finishHashMD5);
-            MD5Init(&sslInterface->finishHashMD5);  // reset for outer hash
+            MD5Init(&sslInterface->finishHashMD5); // reset for outer hash
             MD5Update(&sslInterface->finishHashMD5, (unsigned char*)sslInterface->clientWriteMACSecret,
                 GS_CRYPT_MD5_HASHSIZE);
             MD5Update(&sslInterface->finishHashMD5, (unsigned char*)GS_SSL_PAD_TWO, GS_SSL_MD5_PAD_LEN);
@@ -1652,7 +1652,7 @@ GHIEncryptionResult ghiEncryptorProcessSSLHandshake(
         {
             gsDebugFormat(GSIDebugCat_HTTP, GSIDebugType_Network, GSIDebugLevel_WarmError,
                 "SSL received unexpected handshake message type: %d\r\n", messageType);
-            return GHIEncryptionResult_Error;  // abort connection
+            return GHIEncryptionResult_Error; // abort connection
         }
     }
 
@@ -1661,13 +1661,13 @@ GHIEncryptionResult ghiEncryptorProcessSSLHandshake(
     if (data->pos == data->len)
         return GHIEncryptionResult_Success;
     else
-        return GHIEncryptionResult_Error;  // too many or too few bytes, protocol error!
+        return GHIEncryptionResult_Error; // too many or too few bytes, protocol error!
 }
 
 GHIEncryptionResult ghiEncryptorSslEncryptSend(struct GHIConnection* connection, struct GHIEncryptor* theEncryptor,
     const char* thePlainTextBuffer, int thePlainTextLength, int* theBytesSentOut)
 {
-    GS_FAIL();  // Should never call this for GameSpy SSL!  It uses encrypt on buffer
+    GS_FAIL(); // Should never call this for GameSpy SSL!  It uses encrypt on buffer
 
     GSI_UNUSED(connection);
     GSI_UNUSED(theEncryptor);
@@ -1681,7 +1681,7 @@ GHIEncryptionResult ghiEncryptorSslEncryptSend(struct GHIConnection* connection,
 GHIEncryptionResult ghiEncryptorSslDecryptRecv(struct GHIConnection* connection, struct GHIEncryptor* theEncryptor,
     char* theDecryptedBuffer, int* theDecryptedLength)
 {
-    GS_FAIL();  // Should never call this for GameSpy SSL!  It uses decrypt on buffer
+    GS_FAIL(); // Should never call this for GameSpy SSL!  It uses decrypt on buffer
 
     GSI_UNUSED(connection);
     GSI_UNUSED(theEncryptor);
@@ -1693,4 +1693,4 @@ GHIEncryptionResult ghiEncryptorSslDecryptRecv(struct GHIConnection* connection,
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
-#endif  // encryption engine switch
+#endif // encryption engine switch

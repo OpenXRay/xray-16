@@ -90,7 +90,7 @@ u16 game_sv_GameState::get_id_2_eid(ClientID id)
     return E->ID;
 }
 
-game_PlayerState* game_sv_GameState::get_eid(u16 id)  // if exist
+game_PlayerState* game_sv_GameState::get_eid(u16 id) // if exist
 {
     CSE_Abstract* entity = get_entity_from_eid(id);
 
@@ -119,7 +119,7 @@ game_PlayerState* game_sv_GameState::get_eid(u16 id)  // if exist
     return NULL;
 }
 
-void* game_sv_GameState::get_client(u16 id)  // if exist
+void* game_sv_GameState::get_client(u16 id) // if exist
 {
     CSE_Abstract* entity = get_entity_from_eid(id);
     if (entity && entity->owner && entity->owner->ps && entity->owner->ps->GameID == id) return entity->owner;
@@ -479,7 +479,7 @@ void game_sv_GameState::assign_RP(CSE_Abstract* E, game_PlayerState* ps_who)
         l_uc_team = tpSpectator->g_team();
 #ifdef DEBUG
         Msg("--- game_sv_GameState RPoint for Spectators uses team [%d]", l_uc_team);
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
     }
     else
     {
@@ -488,7 +488,7 @@ void game_sv_GameState::assign_RP(CSE_Abstract* E, game_PlayerState* ps_who)
             l_uc_team = tpTeamed->g_team();
 #ifdef DEBUG
             Msg("--- game_sv_GameState RPoint for AlifeCreature uses team [%d]", l_uc_team);
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
         }
         else
         {
@@ -502,7 +502,7 @@ void game_sv_GameState::assign_RP(CSE_Abstract* E, game_PlayerState* ps_who)
     Msg("---Size of rpoints of team [%d] is [%d]", l_uc_team, rp.size());
 #endif
     //-----------------------------------------------------------
-    xr_vector<u32> xrp;  //	= rpoints[l_uc_team];
+    xr_vector<u32> xrp; //	= rpoints[l_uc_team];
     for (u32 i = 0; i < rp.size(); i++)
     {
         if (rp[i].TimeToUnfreeze < Level().timeServer()) xrp.push_back(i);
@@ -524,7 +524,7 @@ void game_sv_GameState::assign_RP(CSE_Abstract* E, game_PlayerState* ps_who)
 //-----------------------------------------------------------
 #ifdef DEBUG
     Msg("--- Result rpoint is [%d]", rpoint);
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
     RPoint& r = rp[rpoint];
     if (!tpSpectator) {
         r.TimeToUnfreeze = Level().timeServer() + g_sv_base_dwRPointFreezeTime;
@@ -547,14 +547,14 @@ void game_sv_GameState::SetPointFreezed(RPoint* rp)
 CSE_Abstract* game_sv_GameState::spawn_begin(LPCSTR N)
 {
     CSE_Abstract* A = F_entity_Create(N);
-    R_ASSERT(A);             // create SE
-    A->s_name = N;           // ltx-def
-                             //.	A->s_gameid			=	u8(m_type);							// game-type
-    A->s_RP = 0xFE;          // use supplied
-    A->ID = 0xffff;          // server must generate ID
-    A->ID_Parent = 0xffff;   // no-parent
-    A->ID_Phantom = 0xffff;  // no-phantom
-    A->RespawnTime = 0;      // no-respawn
+    R_ASSERT(A);            // create SE
+    A->s_name = N;          // ltx-def
+                            //.	A->s_gameid			=	u8(m_type);							// game-type
+    A->s_RP = 0xFE;         // use supplied
+    A->ID = 0xffff;         // server must generate ID
+    A->ID_Parent = 0xffff;  // no-parent
+    A->ID_Phantom = 0xffff; // no-phantom
+    A->RespawnTime = 0;     // no-respawn
     return A;
 }
 
@@ -578,7 +578,7 @@ void game_sv_GameState::GenerateGameMessage(NET_Packet& P)
 void game_sv_GameState::u_EventGen(NET_Packet& P, u16 type, u16 dest)
 {
     P.w_begin(M_EVENT);
-    P.w_u32(Level().timeServer());  // Device.TimerAsync());
+    P.w_u32(Level().timeServer()); // Device.TimerAsync());
     P.w_u16(type);
     P.w_u16(dest);
 }
@@ -715,7 +715,7 @@ void game_sv_GameState::OnEvent(NET_Packet& tNetPacket, u16 type, u32 time, Clie
         u16 id_src = tNetPacket.r_u16();
         CSE_Abstract* e_src = get_entity_from_eid(id_src);
 
-        if (!e_src)  // && !IsGameTypeSingle() added by andy because of Phantom does not have server entity
+        if (!e_src) // && !IsGameTypeSingle() added by andy because of Phantom does not have server entity
         {
             if (IsGameTypeSingle()) break;
 
@@ -754,7 +754,7 @@ void game_sv_GameState::OnEvent(NET_Packet& tNetPacket, u16 type, u32 time, Clie
         CL->ps->m_online_time = Level().timeServer();
         CL->ps->DeathTime = Device.dwTimeGlobal;
 
-        if (psNET_direct_connect)  // IsGameTypeSingle())
+        if (psNET_direct_connect) // IsGameTypeSingle())
             break;
 
         if (Level().IsDemoPlay()) break;
@@ -804,7 +804,7 @@ bool game_sv_GameState::CheckNewPlayer(xrClientData* CL)
 
     if (error_msg) {
         m_server->SendProfileCreationError(CL, error_msg);
-        if (CL != m_server->GetServerClient())  // CL can be NULL
+        if (CL != m_server->GetServerClient()) // CL can be NULL
             CleanDelayedEventFor(tmp_client_id);
         return false;
     }
@@ -906,7 +906,7 @@ public:
 private:
     EventDeleteForClientPredicate& operator=(EventDeleteForClientPredicate const& copy) {}
     ClientID const m_client_id;
-};  // class EventDeleteForClientPredicate
+}; // class EventDeleteForClientPredicate
 
 void game_sv_GameState::CleanDelayedEventFor(ClientID const& clientId)
 {
@@ -998,7 +998,7 @@ void game_sv_GameState::OnRoundStart()
         }
     };
     rpointsBlocked.clear();
-}  // старт раунда
+} // старт раунда
 
 void game_sv_GameState::OnRoundEnd()
 {
@@ -1014,7 +1014,7 @@ void game_sv_GameState::OnRoundEnd()
     if (round_end_reason == eRoundEnd_GameRestartedFast) {
         m_bFastRestart = true;
     }
-}  // конец раунда
+} // конец раунда
 
 void game_sv_GameState::SaveMapList()
 {
@@ -1188,7 +1188,7 @@ public:
 private:
     char const* m_name;
     IClient const* m_exclude;
-};  // class NameSearcherPredicate
+}; // class NameSearcherPredicate
 
 bool game_sv_GameState::FindPlayerName(char const* name, IClient const* to_exclude)
 {
@@ -1231,7 +1231,7 @@ void game_sv_GameState::CheckPlayerName(xrClientData* CL)
     R_ASSERT(!CL->ps->m_account.is_online());
 
     char const* current_name = NULL;
-    if (CL->ps->m_account.name().size())  // in case of logging from gamespy login page
+    if (CL->ps->m_account.name().size()) // in case of logging from gamespy login page
     {
         current_name = CL->ps->getName();
     }

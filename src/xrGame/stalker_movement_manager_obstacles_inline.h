@@ -15,4 +15,4 @@ IC CRestrictedObjectObstacle& stalker_movement_manager_obstacles::restricted_obj
     return (*m_restricted_object);
 }
 
-#endif  // #ifndef STALKER_MOVEMENT_MANAGER_OBSTACLES_INLINE_H_INCLUDED
+#endif // #ifndef STALKER_MOVEMENT_MANAGER_OBSTACLES_INLINE_H_INCLUDED

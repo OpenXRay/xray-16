@@ -55,31 +55,31 @@ inline_ BOOL AABBTreeCollider::BoxBoxOverlap(const Point& ea, const Point& ca, c
     if (mFullBoxBoxTest || mNbBVBVTests == 1) {
         t = Tz * mR1to0.m[0][1] - Ty * mR1to0.m[0][2];
         t2 = ea.y * mAR.m[0][2] + ea.z * mAR.m[0][1] + eb.y * mAR.m[2][0] + eb.z * mAR.m[1][0];
-        if (GREATER(t, t2)) return FALSE;  // L = A0 x B0
+        if (GREATER(t, t2)) return FALSE; // L = A0 x B0
         t = Tz * mR1to0.m[1][1] - Ty * mR1to0.m[1][2];
         t2 = ea.y * mAR.m[1][2] + ea.z * mAR.m[1][1] + eb.x * mAR.m[2][0] + eb.z * mAR.m[0][0];
-        if (GREATER(t, t2)) return FALSE;  // L = A0 x B1
+        if (GREATER(t, t2)) return FALSE; // L = A0 x B1
         t = Tz * mR1to0.m[2][1] - Ty * mR1to0.m[2][2];
         t2 = ea.y * mAR.m[2][2] + ea.z * mAR.m[2][1] + eb.x * mAR.m[1][0] + eb.y * mAR.m[0][0];
-        if (GREATER(t, t2)) return FALSE;  // L = A0 x B2
+        if (GREATER(t, t2)) return FALSE; // L = A0 x B2
         t = Tx * mR1to0.m[0][2] - Tz * mR1to0.m[0][0];
         t2 = ea.x * mAR.m[0][2] + ea.z * mAR.m[0][0] + eb.y * mAR.m[2][1] + eb.z * mAR.m[1][1];
-        if (GREATER(t, t2)) return FALSE;  // L = A1 x B0
+        if (GREATER(t, t2)) return FALSE; // L = A1 x B0
         t = Tx * mR1to0.m[1][2] - Tz * mR1to0.m[1][0];
         t2 = ea.x * mAR.m[1][2] + ea.z * mAR.m[1][0] + eb.x * mAR.m[2][1] + eb.z * mAR.m[0][1];
-        if (GREATER(t, t2)) return FALSE;  // L = A1 x B1
+        if (GREATER(t, t2)) return FALSE; // L = A1 x B1
         t = Tx * mR1to0.m[2][2] - Tz * mR1to0.m[2][0];
         t2 = ea.x * mAR.m[2][2] + ea.z * mAR.m[2][0] + eb.x * mAR.m[1][1] + eb.y * mAR.m[0][1];
-        if (GREATER(t, t2)) return FALSE;  // L = A1 x B2
+        if (GREATER(t, t2)) return FALSE; // L = A1 x B2
         t = Ty * mR1to0.m[0][0] - Tx * mR1to0.m[0][1];
         t2 = ea.x * mAR.m[0][1] + ea.y * mAR.m[0][0] + eb.y * mAR.m[2][2] + eb.z * mAR.m[1][2];
-        if (GREATER(t, t2)) return FALSE;  // L = A2 x B0
+        if (GREATER(t, t2)) return FALSE; // L = A2 x B0
         t = Ty * mR1to0.m[1][0] - Tx * mR1to0.m[1][1];
         t2 = ea.x * mAR.m[1][1] + ea.y * mAR.m[1][0] + eb.x * mAR.m[2][2] + eb.z * mAR.m[0][2];
-        if (GREATER(t, t2)) return FALSE;  // L = A2 x B1
+        if (GREATER(t, t2)) return FALSE; // L = A2 x B1
         t = Ty * mR1to0.m[2][0] - Tx * mR1to0.m[2][1];
         t2 = ea.x * mAR.m[2][1] + ea.y * mAR.m[2][0] + eb.x * mAR.m[1][2] + eb.y * mAR.m[0][2];
-        if (GREATER(t, t2)) return FALSE;  // L = A2 x B2
+        if (GREATER(t, t2)) return FALSE; // L = A2 x B2
     }
     return TRUE;
 }
@@ -122,31 +122,31 @@ inline_ BOOL OBBCollider::BoxBoxOverlap(const Point& extents, const Point& cente
     if (mFullBoxBoxTest || mNbVolumeBVTests == 1) {
         t = Tz * mRBoxToModel.m[0][1] - Ty * mRBoxToModel.m[0][2];
         t2 = extents.y * mAR.m[0][2] + extents.z * mAR.m[0][1] + mBB_1;
-        if (GREATER(t, t2)) return FALSE;  // L = A0 x B0
+        if (GREATER(t, t2)) return FALSE; // L = A0 x B0
         t = Tz * mRBoxToModel.m[1][1] - Ty * mRBoxToModel.m[1][2];
         t2 = extents.y * mAR.m[1][2] + extents.z * mAR.m[1][1] + mBB_2;
-        if (GREATER(t, t2)) return FALSE;  // L = A0 x B1
+        if (GREATER(t, t2)) return FALSE; // L = A0 x B1
         t = Tz * mRBoxToModel.m[2][1] - Ty * mRBoxToModel.m[2][2];
         t2 = extents.y * mAR.m[2][2] + extents.z * mAR.m[2][1] + mBB_3;
-        if (GREATER(t, t2)) return FALSE;  // L = A0 x B2
+        if (GREATER(t, t2)) return FALSE; // L = A0 x B2
         t = Tx * mRBoxToModel.m[0][2] - Tz * mRBoxToModel.m[0][0];
         t2 = extents.x * mAR.m[0][2] + extents.z * mAR.m[0][0] + mBB_4;
-        if (GREATER(t, t2)) return FALSE;  // L = A1 x B0
+        if (GREATER(t, t2)) return FALSE; // L = A1 x B0
         t = Tx * mRBoxToModel.m[1][2] - Tz * mRBoxToModel.m[1][0];
         t2 = extents.x * mAR.m[1][2] + extents.z * mAR.m[1][0] + mBB_5;
-        if (GREATER(t, t2)) return FALSE;  // L = A1 x B1
+        if (GREATER(t, t2)) return FALSE; // L = A1 x B1
         t = Tx * mRBoxToModel.m[2][2] - Tz * mRBoxToModel.m[2][0];
         t2 = extents.x * mAR.m[2][2] + extents.z * mAR.m[2][0] + mBB_6;
-        if (GREATER(t, t2)) return FALSE;  // L = A1 x B2
+        if (GREATER(t, t2)) return FALSE; // L = A1 x B2
         t = Ty * mRBoxToModel.m[0][0] - Tx * mRBoxToModel.m[0][1];
         t2 = extents.x * mAR.m[0][1] + extents.y * mAR.m[0][0] + mBB_7;
-        if (GREATER(t, t2)) return FALSE;  // L = A2 x B0
+        if (GREATER(t, t2)) return FALSE; // L = A2 x B0
         t = Ty * mRBoxToModel.m[1][0] - Tx * mRBoxToModel.m[1][1];
         t2 = extents.x * mAR.m[1][1] + extents.y * mAR.m[1][0] + mBB_8;
-        if (GREATER(t, t2)) return FALSE;  // L = A2 x B1
+        if (GREATER(t, t2)) return FALSE; // L = A2 x B1
         t = Ty * mRBoxToModel.m[2][0] - Tx * mRBoxToModel.m[2][1];
         t2 = extents.x * mAR.m[2][1] + extents.y * mAR.m[2][0] + mBB_9;
-        if (GREATER(t, t2)) return FALSE;  // L = A2 x B2
+        if (GREATER(t, t2)) return FALSE; // L = A2 x B2
     }
     return TRUE;
 }

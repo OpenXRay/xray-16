@@ -116,9 +116,9 @@ static inline bool get_caps_lock_state()
     if (is_windows_vista_or_later)
         return !!(GetKeyState(VK_CAPITAL) & 1);
     else
-#else   // #if 0
+#else  // #if 0
     return false;
-#endif  // #if 0
+#endif // #if 0
 }
 
 void line_edit_control::update_key_states()
@@ -240,7 +240,7 @@ void line_edit_control::init(u32 str_buffer_size, init_mode mode)
         assign_callback(DIK_LSHIFT, ks_Ctrl, Callback(this, &line_edit_control::SwitchKL));
         assign_callback(DIK_LSHIFT, ks_Alt, Callback(this, &line_edit_control::SwitchKL));
 
-    }  // if mode
+    } // if mode
 
     create_key_state(DIK_LSHIFT, ks_LShift);
     create_key_state(DIK_RSHIFT, ks_RShift);
@@ -511,7 +511,7 @@ void line_edit_control::on_frame()
     }
 
     m_rep_time += dt * m_accel;
-    if (m_rep_time > g_console_sensitive)  // 0.2
+    if (m_rep_time > g_console_sensitive) // 0.2
     {
         m_rep_time = 0.0f;
         m_repeat_mode = true;
@@ -566,7 +566,7 @@ void line_edit_control::add_inserted_text()
 
     PSTR buf = (PSTR)_alloca((m_buffer_size + 1) * sizeof(char));
 
-    strncpy_s(buf, m_buffer_size, m_edit_str, m_p1);  // part 1
+    strncpy_s(buf, m_buffer_size, m_edit_str, m_p1); // part 1
     strncpy_s(m_undo_buf, m_buffer_size, m_edit_str + m_p1, m_p2 - m_p1);
 
     int new_size = (int)xr_strlen(m_inserted);
@@ -574,16 +574,16 @@ void line_edit_control::add_inserted_text()
         m_inserted[m_buffer_size - 1 - m_p1] = 0;
         new_size = xr_strlen(m_inserted);
     }
-    strncpy_s(buf + m_p1, m_buffer_size, m_inserted, _min(new_size, m_buffer_size - m_p1));  // part 2
+    strncpy_s(buf + m_p1, m_buffer_size, m_inserted, _min(new_size, m_buffer_size - m_p1)); // part 2
 
     u8 ds = (m_insert_mode && m_p2 < old_edit_size) ? 1 : 0;
     strncpy_s(buf + m_p1 + new_size, m_buffer_size, m_edit_str + m_p2 + ds,
-        _min(old_edit_size - m_p2 - ds, m_buffer_size - m_p1 - new_size));  // part 3
+        _min(old_edit_size - m_p2 - ds, m_buffer_size - m_p1 - new_size)); // part 3
     buf[m_buffer_size] = 0;
 
     int szn = m_p1 + new_size + old_edit_size - m_p2 - ds;
     if (szn < m_buffer_size) {
-        strncpy_s(m_edit_str, m_buffer_size, buf, szn);  // part 1+2+3
+        strncpy_s(m_edit_str, m_buffer_size, buf, szn); // part 1+2+3
         m_edit_str[m_buffer_size - 1] = 0;
         m_cur_pos = m_p1 + new_size;
     }
@@ -774,7 +774,7 @@ void line_edit_control::SwitchKL()
 
 // -------------------------------------------------------------------------------------------------
 
-void remove_spaces(PSTR str)  // in & out
+void remove_spaces(PSTR str) // in & out
 {
     u32 str_size = xr_strlen(str);
     if (str_size < 1) {
@@ -840,4 +840,4 @@ void split_cmd(PSTR first, PSTR second, LPCSTR str)
     }
 }
 
-}  // namespace text_editor
+} // namespace text_editor

@@ -23,7 +23,7 @@ protected:
 
     CUIStatic* m_Prop_line;
 
-};  // class CUIBoosterInfo
+}; // class CUIBoosterInfo
 
 // -----------------------------------
 
@@ -46,4 +46,4 @@ private:
     shared_str m_texture_minus;
     shared_str m_texture_plus;
 
-};  // class UIBoosterInfoItem
+}; // class UIBoosterInfoItem

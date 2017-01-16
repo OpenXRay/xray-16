@@ -140,7 +140,7 @@ void __cdecl GetDataCallback(const char* dataDesc, IGenericStream** stream)
     time.Start();
     // R_ASSERT(gl_data_write);
 
-    *stream = new CGenStreamOnFile(g_net_data);  // CreateGenericStream();
+    *stream = new CGenStreamOnFile(g_net_data); // CreateGenericStream();
     //*stream = gl_data_write->net_stream();
 
     // gl_data_write->send_not_clear(*stream);

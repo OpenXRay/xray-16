@@ -23,7 +23,7 @@ software.
 #define BT_OBJECT_ARRAY__
 
 #include "spursAlignedAllocator.h"
-#include "spursScalar.h"  // has definitions like SIMD_FORCE_INLINE
+#include "spursScalar.h" // has definitions like SIMD_FORCE_INLINE
 
 /// If the platform doesn't support placement new, you can disable BT_USE_PLACEMENT_NEW
 /// then the btAlignedObjectArray doesn't support objects with virtual methods, and non-trivial constructors/destructors
@@ -33,16 +33,16 @@ software.
 
 #define BT_USE_PLACEMENT_NEW 1
 //#define BT_USE_MEMCPY 1 //disable, because it is cumbersome to find out for each platform where memcpy is defined. It
-//can be in <memory.h> or <string.h> or otherwise...
+// can be in <memory.h> or <string.h> or otherwise...
 
 #ifdef BT_USE_MEMCPY
 #include <memory.h>
 #include <string.h>
-#endif  // BT_USE_MEMCPY
+#endif // BT_USE_MEMCPY
 
 #ifdef BT_USE_PLACEMENT_NEW
-#include <new>  //for placement new
-#endif          // BT_USE_PLACEMENT_NEW
+#include <new> //for placement new
+#endif         // BT_USE_PLACEMENT_NEW
 
 /// btAlignedObjectArray uses a subset of the stl::vector interface for its methods
 /// It is developed to replace stl::vector to avoid STL alignment issues to add SIMD/SSE data
@@ -66,7 +66,7 @@ protected:
             new (&dest[i]) T(m_data[i]);
 #else
             dest[i] = m_data[i];
-#endif  // BT_USE_PLACEMENT_NEW
+#endif // BT_USE_PLACEMENT_NEW
     }
 
     SIMD_FORCE_INLINE void init()
@@ -102,12 +102,12 @@ public:
     spursAlignedObjectArray() { init(); }
     ~spursAlignedObjectArray() { clear(); }
     SIMD_FORCE_INLINE int capacity() const
-    {  // return current length of allocated storage
+    { // return current length of allocated storage
         return m_capacity;
     }
 
     SIMD_FORCE_INLINE int size() const
-    {  // return length of sequence
+    { // return length of sequence
         return m_size;
     }
 
@@ -148,7 +148,7 @@ public:
             {
                 new (&m_data[i]) T(fillData);
             }
-#endif  // BT_USE_PLACEMENT_NEW
+#endif // BT_USE_PLACEMENT_NEW
         }
 
         m_size = newsize;
@@ -162,7 +162,7 @@ public:
         }
         m_size++;
 #ifdef BT_USE_PLACEMENT_NEW
-        new (&m_data[sz]) T(fillValue);  // use the in-place new (not really allocating heap memory)
+        new (&m_data[sz]) T(fillValue); // use the in-place new (not really allocating heap memory)
 #endif
 
         return m_data[sz];
@@ -179,14 +179,14 @@ public:
         new (&m_data[m_size]) T(_Val);
 #else
         m_data[size()] = _Val;
-#endif  // BT_USE_PLACEMENT_NEW
+#endif // BT_USE_PLACEMENT_NEW
 
         m_size++;
     }
 
     SIMD_FORCE_INLINE void reserve(int _Count)
-    {                               // determine new minimum length of allocated storage
-        if (capacity() < _Count) {  // not enough room, reallocate
+    {                              // determine new minimum length of allocated storage
+        if (capacity() < _Count) { // not enough room, reallocate
             T* s = (T*)allocate(_Count);
 
             copy(0, size(), s);
@@ -248,7 +248,7 @@ public:
         T temp = m_data[index0];
         m_data[index0] = m_data[index1];
         m_data[index1] = temp;
-#endif  // BT_USE_PLACEMENT_NEW
+#endif // BT_USE_PLACEMENT_NEW
     }
 
     template <typename L>
@@ -282,15 +282,15 @@ public:
         // assume sorted array
         while (first <= last)
         {
-            int mid = (first + last) / 2;  // compute mid point.
+            int mid = (first + last) / 2; // compute mid point.
             if (key > m_data[mid])
-                first = mid + 1;  // repeat search in top half.
+                first = mid + 1; // repeat search in top half.
             else if (key < m_data[mid])
-                last = mid - 1;  // repeat search in bottom half.
+                last = mid - 1; // repeat search in bottom half.
             else
-                return mid;  // found it. return position /////
+                return mid; // found it. return position /////
         }
-        return size();  // failed to find key
+        return size(); // failed to find key
     }
 
     int findLinearSearch(const T& key) const
@@ -318,4 +318,4 @@ public:
     }
 };
 
-#endif  // BT_OBJECT_ARRAY__
+#endif // BT_OBJECT_ARRAY__

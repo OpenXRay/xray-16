@@ -18,9 +18,9 @@ int ik_blend_free_foot = 1;
 int ik_local_blending = 0;
 int ik_collide_blend = 0;
 
-const Matrix Midentity = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0};  //. in XGlobal
+const Matrix Midentity = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0}; //. in XGlobal
 
-const Matrix IKLocalJoint = {0, 0, 1, 0, -1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 1};  //. in XGlobal
+const Matrix IKLocalJoint = {0, 0, 1, 0, -1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 1}; //. in XGlobal
 const Fmatrix XLocalJoint = {0, -1, 0, 0, -1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1};
 
 const Fmatrix xm2im = {0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1};
@@ -35,7 +35,7 @@ typedef float IVektor[3];
 const IVektor lproj_vector = {0, 0, 1};
 const IVektor lpos_vector = {-1, 0, 0};
 
-const IVektor gproj_vector = {0, 0, 1};  //. in XGlobal
+const IVektor gproj_vector = {0, 0, 1}; //. in XGlobal
 const IVektor gpos_vector = {1, 0, 0};
 
 // const float		ik_timedelta_eps = EPS;
@@ -194,7 +194,7 @@ Fmatrix& CIKLimb::transform(Fmatrix& m, u16 bone0, u16 bone1) const
 float CIKLimb::SwivelAngle(const Fmatrix& ihip, const SCalculateData& cd)
 {
     Fvector foot;
-    foot.set(Kinematics()->LL_GetTransform(m_bones[2]).c);  // use "0" channal only?
+    foot.set(Kinematics()->LL_GetTransform(m_bones[2]).c); // use "0" channal only?
     ihip.transform_tiny(foot);
     xm2im.transform_tiny(foot);
 
@@ -232,7 +232,7 @@ void CIKLimb::GetKnee(Fvector& knee, const SCalculateData& cd) const
     Fvector b2;
     b2.sub(knee, b1);
     Fvector bb1;
-    bb1.mul(p1, 1.f / mp0 * dot);  // mp1
+    bb1.mul(p1, 1.f / mp0 * dot); // mp1
     knee.add(bb1, b2);
     knee.add(hip);
 }
@@ -475,7 +475,7 @@ IC void get_blend_speed_limits(float& l, float& a, const SCalculateData& cd, con
 {
     Fmatrix m;
     get_diff_value(sv_state.anim_pos(m), cd.state.anim_pos, l, a);
-    l *= 1.5f;  // a*=1.5;
+    l *= 1.5f; // a*=1.5;
     // l*=0.3f;a*=0.3f;
     // clamp(l,0.f,0.1f);
     // clamp(a,0.f,0.03f);
@@ -512,8 +512,8 @@ IC void blend_speed_accel(SCalculateData& cd)
         return;
     }
 
-    cd.state.speed_blend_l += blend_accel_l * Device.fTimeDelta;  // / Device.fTimeDelta;
-    cd.state.speed_blend_a += blend_accel_a * Device.fTimeDelta;  // / Device.fTimeDelta;
+    cd.state.speed_blend_l += blend_accel_l * Device.fTimeDelta; // / Device.fTimeDelta;
+    cd.state.speed_blend_a += blend_accel_a * Device.fTimeDelta; // / Device.fTimeDelta;
     cd.l = cd.state.speed_blend_l * Device.fTimeDelta;
     cd.a = cd.state.speed_blend_a * Device.fTimeDelta;
 }
@@ -530,7 +530,7 @@ void CIKLimb::SetNewGoal(const SIKCollideData& cld, SCalculateData& cd)
 
     cd.state.blend_to = cd.state.goal;
     sv_state.get_calculate_state(cd.state);
-    if (cd.state.foot_step)  // the foot in animation on ground
+    if (cd.state.foot_step) // the foot in animation on ground
         SetNewStepGoal(cld, cd);
     else if (ik_blend_free_foot)
     {
@@ -695,7 +695,7 @@ void CIKLimb::Blending(SCalculateData& cd)
     VERIFY(state_valide(sv_state));
 
     if (sv_state.foot_step() != cd.state.foot_step) reset_blend_speed(cd);
-    if (ik_local_blending && sv_state.blending() && !sv_state.foot_step() && !cd.state.foot_step)  //.
+    if (ik_local_blending && sv_state.blending() && !sv_state.foot_step() && !cd.state.foot_step) //.
     {
         blend_speed_accel(cd);
         ik_goal_matrix m;
@@ -707,9 +707,9 @@ void CIKLimb::Blending(SCalculateData& cd)
 
         VERIFY(fsimilar(1.f, DET(diff), det_tolerance));
 
-        Fmatrix blend = Fidentity;  // cd.state.blend_to;
+        Fmatrix blend = Fidentity; // cd.state.blend_to;
         cd.state.blending =
-            !clamp_change(blend, diff, cd.l, cd.a, linear_tolerance, angualar_tolerance);  // 0.01f //0.005f
+            !clamp_change(blend, diff, cd.l, cd.a, linear_tolerance, angualar_tolerance); // 0.01f //0.005f
 
         VERIFY(fsimilar(1.f, DET(blend), det_tolerance));
         VERIFY(fsimilar(1.f, DET(cd.state.blend_to.get()), det_tolerance));
@@ -723,12 +723,12 @@ void CIKLimb::Blending(SCalculateData& cd)
     }
     else
     {
-        if (!ik_collide_blend)  // cd.state.foot_step ||
+        if (!ik_collide_blend) // cd.state.foot_step ||
         {
             Fmatrix blend = cd.state.blend_to.get();
             ik_goal_matrix m;
             cd.state.blending = !clamp_change(
-                blend, sv_state.goal(m).get(), cd.l, cd.a, linear_tolerance, angualar_tolerance);  // 0.01f //0.005f
+                blend, sv_state.goal(m).get(), cd.l, cd.a, linear_tolerance, angualar_tolerance); // 0.01f //0.005f
             cd.state.goal.set(blend, cd.state.blend_to.collide_state());
         }
         else
@@ -760,7 +760,7 @@ void CIKLimb::SetNewStepGoal(const SIKCollideData& cld, SCalculateData& cd)
     }
     if (!sv_state.foot_step() || !anim_state.glue()) {
         ik_goal_matrix foot;
-        m_foot.GetFootStepMatrix(foot, cd /*cl*/, cld, false, true);  // find where we can place the foot
+        m_foot.GetFootStepMatrix(foot, cd /*cl*/, cld, false, true); // find where we can place the foot
         new_foot_matrix(foot, cd);
         // reset_blend_speed( cd );
         // cd.state.blending = true; ?
@@ -1040,7 +1040,7 @@ u16 CIKLimb::foot_matrix_predict(Fmatrix& foot, Fmatrix& toe, float time, IKinem
     return ref_b;
 }
 void CIKLimb::step_predict(CGameObject* O, const CBlend* b, ik_limb_state_predict& state,
-    const extrapolation::points& object_pose_extrapolation)  // const
+    const extrapolation::points& object_pose_extrapolation) // const
 {
     if (!b) return;
     state.time_to_footstep = get_time_to_step_begin(*b);
@@ -1159,7 +1159,7 @@ void DBG_DrawRotationLimitsY(const Fmatrix& start, float ang, float l, float h)
 #ifdef DEBUG
     DBG_DrawRotationY(start, ang - EPS, ang + EPS, 0.15f, color_xrgb(0, 255, 0), false, 1);
     DBG_DrawRotationY(start, l, h, 0.15f, color_argb(50, 0, 250, 0), true);
-#endif  // DEBUG
+#endif // DEBUG
 }
 
 void DBG_DrawRotationLimitsZ(const Fmatrix& start, float ang, float l, float h)
@@ -1167,7 +1167,7 @@ void DBG_DrawRotationLimitsZ(const Fmatrix& start, float ang, float l, float h)
 #ifdef DEBUG
     DBG_DrawRotationZ(start, ang - EPS, ang + EPS, 0.15f, color_xrgb(0, 0, 255), false, 1);
     DBG_DrawRotationZ(start, l, h, 0.15f, color_argb(50, 0, 0, 250), true);
-#endif  // DEBUG
+#endif // DEBUG
 }
 
 void DBG_DrawRotationLimitsX(const Fmatrix& start, float ang, float l, float h)
@@ -1175,7 +1175,7 @@ void DBG_DrawRotationLimitsX(const Fmatrix& start, float ang, float l, float h)
 #ifdef DEBUG
     DBG_DrawRotationX(start, ang + EPS, ang - EPS, 0.15f, color_xrgb(255, 0, 0), false, 1);
     DBG_DrawRotationX(start, l, h, 0.15f, color_argb(50, 255, 0, 0), true);
-#endif  // DEBUG
+#endif // DEBUG
 }
 
 void DBG_DrawRotation3(const Fmatrix& start, const float angs[7], const AngleInt limits[7], u16 y, u16 z, u16 x)

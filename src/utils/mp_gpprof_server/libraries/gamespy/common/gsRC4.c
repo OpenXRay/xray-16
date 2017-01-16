@@ -47,8 +47,8 @@ void RC4Encrypt(RC4Context* context, const unsigned char* src, unsigned char* de
     int i = 0;
     for (i = 0; i < len; i++)
     {
-        context->x = (unsigned char)(context->x + 1);                           // ok to wrap around from overflow
-        context->y = (unsigned char)(context->y + context->state[context->x]);  // ditto
+        context->x = (unsigned char)(context->x + 1);                          // ok to wrap around from overflow
+        context->y = (unsigned char)(context->y + context->state[context->x]); // ditto
         swap_byte(&context->state[context->x], &context->state[context->y]);
         dest[i] =
             (unsigned char)(src[i] ^

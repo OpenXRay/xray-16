@@ -175,9 +175,9 @@ void stats_manager::decrement_stats(u32 size, enum_stats_buffer_type type, _D3DP
             break;
         }
     }
-    R_ASSERT(find);  //  "Specified buffer not fount in the buffers list.
-                     //	The buffer may not incremented to stats or it already was removed"
-#endif               // DEBUG
+    R_ASSERT(find); //  "Specified buffer not fount in the buffers list.
+                    //	The buffer may not incremented to stats or it already was removed"
+#endif              // DEBUG
 
     memory_usage_summary[type][location] -= size;
 }

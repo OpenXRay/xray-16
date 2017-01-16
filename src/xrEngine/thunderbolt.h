@@ -17,9 +17,9 @@ class ENGINE_API CLAItem;
 
 #ifdef INGAME_EDITOR
 #define INGAME_EDITOR_VIRTUAL virtual
-#else  // #ifdef INGAME_EDITOR
+#else // #ifdef INGAME_EDITOR
 #define INGAME_EDITOR_VIRTUAL
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR
 
 class CEnvironment;
 
@@ -136,4 +136,4 @@ public:
     shared_str AppendDef(CEnvironment& environment, CInifile* pIni, CInifile* thunderbolts, LPCSTR sect);
 };
 
-#endif  // ThunderboltH
+#endif // ThunderboltH

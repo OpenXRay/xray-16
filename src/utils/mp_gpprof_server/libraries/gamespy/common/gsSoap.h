@@ -32,8 +32,8 @@ typedef struct
     GSXmlStreamWriter mRequestSoap;
     GSXmlStreamReader mResponseSoap;
 
-    char* mResponseBuffer;  // so we can free it later
-    GHTTPPost mPostData;    // so we can free it later
+    char* mResponseBuffer; // so we can free it later
+    GHTTPPost mPostData;   // so we can free it later
 
     void* mUserData;
     GSTask* mCoreTask;
@@ -59,7 +59,7 @@ void gsiCancelSoap(GSSoapTask* theTask);
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 #if defined(__cplusplus)
-}  // extern "C"
+} // extern "C"
 #endif
 
-#endif  // __SOAP_H__
+#endif // __SOAP_H__

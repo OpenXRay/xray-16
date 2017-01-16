@@ -56,7 +56,7 @@ Fvector CDangerObject__position(const CDangerObject* self)
 IC static void CMemoryInfo_Export(lua_State* luaState)
 {
     module(luaState)[
-#if 1  // def USE_ORIENTATION
+#if 1 // def USE_ORIENTATION
         class_<SRotation>("rotation").def_readwrite("yaw", &SRotation::yaw).def_readwrite("pitch", &SRotation::pitch),
 #endif
 

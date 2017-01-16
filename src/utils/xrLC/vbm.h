@@ -3,7 +3,7 @@
 #include "xrCore/FMesh.hpp"
 #include "xrCore/fs.h"
 
-static const u32 c_VB_maxSize = 4096 * 1024;  // bytes
+static const u32 c_VB_maxSize = 4096 * 1024; // bytes
 // Vertex containers
 class VBContainer
 {
@@ -88,8 +88,8 @@ public:
 
             R_ASSERT(dwVertCount * dwOneSize == dwTotalSize);
 
-            fs.w(vDcl[i].begin(), vDcl[i].size() * sizeof(D3DVERTEXELEMENT9));  // Vertex format
-            fs.w_u32(dwVertCount);                                              // Number of vertices
+            fs.w(vDcl[i].begin(), vDcl[i].size() * sizeof(D3DVERTEXELEMENT9)); // Vertex format
+            fs.w_u32(dwVertCount);                                             // Number of vertices
             fs.w(&*vContainers[i].begin(), dwTotalSize);
         }
         vDcl.clear();

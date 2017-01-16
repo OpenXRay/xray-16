@@ -27,7 +27,7 @@ struct SBinocVisibleObj
     bool operator<(const SBinocVisibleObj& other) const
     {
         return m_flags.test(flVisObjNotValid) < other.m_flags.test(flVisObjNotValid);
-    }  // move non-actual to tail
+    } // move non-actual to tail
 };
 
 class CBinocularsVision

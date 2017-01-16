@@ -14,4 +14,4 @@ public:
     void set_LOD(float LOD);
 };
 
-#endif  // #ifndef R_BACKEND_LOD_H_INCLUDED
+#endif // #ifndef R_BACKEND_LOD_H_INCLUDED

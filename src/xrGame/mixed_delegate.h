@@ -73,6 +73,6 @@ public:
 private:
     fastdelegate_type m_cpp_delegate;
     lua_delegate_type m_lua_delegate;
-};  // class mixed_delegate
+}; // class mixed_delegate
 
-#endif  //#ifndef MIXED_DELEGATE_INCLUDED
+#endif //#ifndef MIXED_DELEGATE_INCLUDED

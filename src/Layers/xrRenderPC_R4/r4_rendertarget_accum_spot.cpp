@@ -30,7 +30,7 @@ void CRenderTarget::accum_spot(light* L)
         }
     }
 
-    BOOL bIntersect = FALSE;  // enable_scissor(L);
+    BOOL bIntersect = FALSE; // enable_scissor(L);
     {
         // setup xform
         L->xform_calc();
@@ -45,7 +45,7 @@ void CRenderTarget::accum_spot(light* L)
         // *** in practice, 'cause we "clear" it back to 0x1 it usually allows us to > 200 lights :)
         //	Done in blender!
         // RCache.set_ColorWriteEnable		(FALSE);
-        RCache.set_Element(s_accum_mask->E[SE_MASK_SPOT]);  // masker
+        RCache.set_Element(s_accum_mask->E[SE_MASK_SPOT]); // masker
 
         // backfaces: if (stencil>=1 && zfail)			stencil = light_id
         RCache.set_CullMode(CULL_CW);
@@ -74,7 +74,7 @@ void CRenderTarget::accum_spot(light* L)
     // *****************************	Minimize overdraw	*************************************
     // Select shader (front or back-faces), *** back, if intersect near plane
     RCache.set_ColorWriteEnable();
-    RCache.set_CullMode(CULL_CW);  // back
+    RCache.set_CullMode(CULL_CW); // back
 
     // 2D texgens
     Fmatrix m_Texgen;
@@ -147,7 +147,7 @@ void CRenderTarget::accum_spot(light* L)
         }
         RCache.set_Element(shader->E[_id]);
 
-        RCache.set_CullMode(CULL_CW);  // back
+        RCache.set_CullMode(CULL_CW); // back
 
         // Constants
         float att_R = L->range * .95f;
@@ -185,7 +185,7 @@ void CRenderTarget::accum_spot(light* L)
                 RCache.set_CullMode(D3DCULL_CW);
                 draw_volume(L);
             }
-            else  // checked Holger
+            else // checked Holger
             {
                 for (u32 i = 0; i < RImplementation.o.dx10_msaa_samples; ++i)
                 {
@@ -221,7 +221,7 @@ void CRenderTarget::accum_spot(light* L)
             RCache.set_Stencil(TRUE, D3DCMP_EQUAL, dwLightMarkerID, 0xff, 0x00);
             draw_volume(L);
         }
-        else  // checked Holger
+        else // checked Holger
         {
             // per pixel
             RCache.set_Element(s_accum_mask->E[SE_MASK_ACCUM_VOL]);
@@ -233,7 +233,7 @@ void CRenderTarget::accum_spot(light* L)
                 RCache.set_Stencil(TRUE, D3DCMP_EQUAL, dwLightMarkerID | 0x80, 0xff, 0x00);
                 draw_volume(L);
             }
-            else  // checked Holger
+            else // checked Holger
             {
                 for (u32 i = 0; i < RImplementation.o.dx10_msaa_samples; ++i)
                 {
@@ -275,7 +275,7 @@ void CRenderTarget::accum_volumetric(light* L)
 
     // *** assume accumulator setted up ***
     // *****************************	Mask by stencil		*************************************
-    BOOL bIntersect = FALSE;  // enable_scissor(L);
+    BOOL bIntersect = FALSE; // enable_scissor(L);
     {
         // setup xform
         L->xform_calc();
@@ -288,7 +288,7 @@ void CRenderTarget::accum_volumetric(light* L)
     }
 
     RCache.set_ColorWriteEnable();
-    RCache.set_CullMode(CULL_NONE);  // back
+    RCache.set_CullMode(CULL_NONE); // back
 
     // 2D texgens
     Fmatrix m_Texgen;

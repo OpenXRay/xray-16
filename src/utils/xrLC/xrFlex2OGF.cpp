@@ -86,8 +86,8 @@ void CBuild::Flex2OGF()
         u32 MODEL_ID = u32(it - g_XSplit.begin());
 
         OGF* pOGF = new OGF();
-        Face* F = *((*it)->begin());                    // first face
-        b_material* M = &(materials()[F->dwMaterial]);  // and it's material
+        Face* F = *((*it)->begin());                   // first face
+        b_material* M = &(materials()[F->dwMaterial]); // and it's material
         R_ASSERT(F && M);
 
         try
@@ -112,7 +112,7 @@ void CBuild::Flex2OGF()
                     string_path tn;
                     strconcat(sizeof(tn), tn, *T.name, "_lm.dds");
                     T.name = tn;
-                    T.pBuildSurface = T.pBuildSurface;  // Leave surface intact
+                    T.pBuildSurface = T.pBuildSurface; // Leave surface intact
                     R_ASSERT(pOGF);
                     pOGF->textures.push_back(T);
                 }
@@ -127,7 +127,7 @@ void CBuild::Flex2OGF()
                         T.pBuildSurface = &(LM->lm_texture);
                         R_ASSERT(T.pBuildSurface);
                         R_ASSERT(pOGF);
-                        pOGF->textures.push_back(T);  //.
+                        pOGF->textures.push_back(T); //.
                         xr_sprintf(fn, "%s_2", LM->lm_texture.name);
                         T.name = fn;
                         pOGF->textures.push_back(T);

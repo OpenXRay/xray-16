@@ -3,7 +3,7 @@
 #include <windows.h>
 
 #if defined(WIN32_LEAN_AND_MEAN)
-#include <mmsystem.h>  // MAKEFOURCC
+#include <mmsystem.h> // MAKEFOURCC
 #endif
 
 #include <dds/nvErrorCodes.h>
@@ -82,13 +82,13 @@ typedef enum nvD3DFORMAT {
 } nvD3DFORMAT;
 
 typedef enum nvRescaleTypes {
-    kRescaleNone,                // no rescale
-    kRescaleNearestPower2,       // rescale to nearest power of two
-    kRescaleBiggestPower2,       // rescale to next bigger power of 2
-    kRescaleSmallestPower2,      // rescale to smaller power of 2
-    kRescaleNextSmallestPower2,  // rescale to next smaller power of 2
-    kRescalePreScale,            // rescale to this size
-    kRescaleRelScale,            // relative rescale
+    kRescaleNone,               // no rescale
+    kRescaleNearestPower2,      // rescale to nearest power of two
+    kRescaleBiggestPower2,      // rescale to next bigger power of 2
+    kRescaleSmallestPower2,     // rescale to smaller power of 2
+    kRescaleNextSmallestPower2, // rescale to next smaller power of 2
+    kRescalePreScale,           // rescale to this size
+    kRescaleRelScale,           // relative rescale
 } RescaleTypes;
 
 typedef enum nvSharpenFilterTypes {
@@ -118,7 +118,7 @@ typedef enum nvMipMapGeneration {
     kGenerateMipMaps = 30,
     kUseExistingMipMaps = 31,
     kNoMipMaps = 32,
-    kCompleteMipMapChain = 33,  // fill in missing MIP maps
+    kCompleteMipMapChain = 33, // fill in missing MIP maps
 };
 
 typedef enum nvMipFilterTypes {
@@ -141,31 +141,31 @@ typedef enum nvMipFilterTypes {
 enum nvTextureFormats
 {
     kDXT1,
-    kDXT1a,   // DXT1 with one bit alpha
-    kDXT3,    // explicit alpha
-    kDXT5,    // interpolated alpha
-    k4444,    // a4 r4 g4 b4
-    k1555,    // a1 r5 g5 b5
-    k565,     // a0 r5 g6 b5
-    k8888,    // a8 r8 g8 b8
-    k888,     // a0 r8 g8 b8
-    k555,     // a0 r5 g5 b5
-    kP8c,     // paletted color only
-    kV8U8,    // DuDv
-    kCxV8U8,  // normal map
-    kA8,      // alpha only
-    kP4c,     // 16 bit color palette
+    kDXT1a,  // DXT1 with one bit alpha
+    kDXT3,   // explicit alpha
+    kDXT5,   // interpolated alpha
+    k4444,   // a4 r4 g4 b4
+    k1555,   // a1 r5 g5 b5
+    k565,    // a0 r5 g6 b5
+    k8888,   // a8 r8 g8 b8
+    k888,    // a0 r8 g8 b8
+    k555,    // a0 r5 g5 b5
+    kP8c,    // paletted color only
+    kV8U8,   // DuDv
+    kCxV8U8, // normal map
+    kA8,     // alpha only
+    kP4c,    // 16 bit color palette
     kQ8W8V8U8,
     kA8L8,
     kR32F,
     kA32B32G32R32F,
     kA16B16G16R16F,
-    kL8,       // luminance
-    kP8a,      // paletted with alpha
-    kP4a,      // 16 bit color palette with alpha
-    kR16F,     // single component fp16
-    kDXT5_NM,  // normal map compression. G = Y, A = X
-    kX888,     // aX r8 g8 b8
+    kL8,      // luminance
+    kP8a,     // paletted with alpha
+    kP4a,     // 16 bit color palette with alpha
+    kR16F,    // single component fp16
+    kDXT5_NM, // normal map compression. G = Y, A = X
+    kX888,    // aX r8 g8 b8
     kV16U16,
     kG16R16,
     kG16R16F,
@@ -187,7 +187,7 @@ enum nvCompressionWeighting
     kGreyScaleWeighting,
     kTangentSpaceNormalMapWeighting,
     kObjectSpaceNormalMapWeighting,
-    kUserDefinedWeighting,  // used values stored in 'weight'
+    kUserDefinedWeighting, // used values stored in 'weight'
 };
 
 enum nvNormalMapFilters
@@ -226,7 +226,7 @@ enum nvQualitySetting
 {
     kQualityFastest = 68,
     kQualityNormal = 69,
-    kQualityProduction = 71,  // typical value
+    kQualityProduction = 71, // typical value
     kQualityHighest = 72,
 };
 
@@ -255,20 +255,20 @@ public:
     // loaded directly from the .dds header
     DDS_PIXELFORMAT m_ddpfPixelFormat;
     // in file read
-    size_t width;   // of MIP 0
-    size_t height;  // of MIP 0
-    size_t depth;   // for volume maps
+    size_t width;  // of MIP 0
+    size_t height; // of MIP 0
+    size_t depth;  // for volume maps
     size_t actualMipMapCount;
     size_t nMIPMapsToLoad;
-    bool bFoundAlphaInRead;  // is alpha field present and non-zero
+    bool bFoundAlphaInRead; // is alpha field present and non-zero
     // in the input file
     DWORD dwCubeMapFlags;
     size_t bits_per_component;
-    size_t nPlanes;      // number of planes in the file format
-    bool bCompressed;    // is file a compressed format
-    size_t paletteSize;  // 16 or 256 entries
+    size_t nPlanes;     // number of planes in the file format
+    bool bCompressed;   // is file a compressed format
+    size_t paletteSize; // 16 or 256 entries
     rgba_t palette[256];
-    DWORD fmt;  // D3DFORMAT specified in .dds file
+    DWORD fmt; // D3DFORMAT specified in .dds file
     nvTextureFormats textureFormat;
     nvTextureTypes textureType;
     fpMipMappedImage fpMIPImage;
@@ -280,11 +280,11 @@ public:
 
     nvImageContainer()
     {
-        bits_per_component = 0;  // image's resolution in bits per pixel per plane
+        bits_per_component = 0; // image's resolution in bits per pixel per plane
         paletteSize = 0;
         bFoundAlphaInRead = false;
         bCompressed = false;
-        fmt = 0;  // nvD3DFMT_UNKNOWN
+        fmt = 0; // nvD3DFMT_UNKNOWN
         dwCubeMapFlags = 0;
         actualMipMapCount = 1;
         nMIPMapsToLoad = 1;

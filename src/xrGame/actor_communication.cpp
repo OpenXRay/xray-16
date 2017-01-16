@@ -205,4 +205,4 @@ void CActor::DumpTasks()
 {
     Level().GameTaskManager().DumpTasks();
 }
-#endif  // DEBUG
+#endif // DEBUG

@@ -1099,7 +1099,7 @@ static Fmatrix aim_on_actor(Fvector const& bone_position, Fvector const& weapon_
             Fvector().mad(weapon_position, weapon_direction, weapon_position.distance_to(target));
         renderer.draw_line(Fidentity, weapon_position, weapon_position_target, color_xrgb(255, 0, 255));
     }
-#endif  // #ifdef DEBUG_RENDER
+#endif // #ifdef DEBUG_RENDER
 
     Fvector const weapon2bone = Fvector().sub(bone_position, weapon_position);
     float const offset = weapon2bone.dotproduct(weapon_direction);
@@ -1110,7 +1110,7 @@ static Fmatrix aim_on_actor(Fvector const& bone_position, Fvector const& weapon_
         temp.c = current_point;
         renderer.draw_ellipse(temp, color_xrgb(0, 0, 255));
     }
-#endif  // #ifdef DEBUG_RENDER
+#endif // #ifdef DEBUG_RENDER
 
     Fvector const bone2current = Fvector().sub(current_point, bone_position);
     float const sphere_radius_sqr = bone2current.square_magnitude();
@@ -1143,7 +1143,7 @@ static Fmatrix aim_on_actor(Fvector const& bone_position, Fvector const& weapon_
         temp.c = bone_position;
         renderer.draw_ellipse(temp, color_xrgb(255, 255, 0));
     }
-#endif  // #ifdef DEBUG_RENDER
+#endif // #ifdef DEBUG_RENDER
 
     Fmatrix transform0;
     {
@@ -1201,7 +1201,7 @@ static Fmatrix aim_on_actor(Fvector const& bone_position, Fvector const& weapon_
         temp.c.add(bone_position);
         renderer.draw_ellipse(temp, color_xrgb(0, 255, 255));
     }
-#endif  // #ifdef DEBUG_RENDER
+#endif // #ifdef DEBUG_RENDER
 
     return (transform);
 }
@@ -1226,7 +1226,7 @@ static void fill_bones(CAI_Stalker& self, Fmatrix const& transform, IKinematicsA
 		CBlend* const blend				= kinematics_animated->LL_PlayCycle(i, animation, 0, 0, 0, 1);
 		if (blend)
 			blend->timeCurrent			= 0.f;//blend->timeTotal - (SAMPLE_SPF + EPS);
-#else   // #if 0
+#else  // #if 0
         u32 const blend_count = kinematics_animated->LL_PartBlendsCount(i);
         for (u32 j = 0; j < blend_count; ++j)
         {
@@ -1236,7 +1236,7 @@ static void fill_bones(CAI_Stalker& self, Fmatrix const& transform, IKinematicsA
             *new_blend = *blend;
             new_blend->channel = 1;
         }
-#endif  // #if 0
+#endif // #if 0
     }
 
     animation_movement_controller const* controller = self.animation_movement();
@@ -1312,7 +1312,7 @@ static void draw_bones(IKinematics& kinematics, Fvector const& box_size, u32 con
         renderer.draw_line(Fidentity, temp2.c, temp.c, line_color);
     }
 }
-#endif  // #ifdef DEBUG_RENDER
+#endif // #ifdef DEBUG_RENDER
 
 static void draw_animation_bones(
     CAI_Stalker& self, Fmatrix const& transform, IKinematicsAnimated* kinematics_animated, LPCSTR animation_id)
@@ -1344,9 +1344,9 @@ static void draw_animation_bones(
 	actor_kinematics->Bone_GetAnimPos	(player_head, actor_kinematics->LL_BoneID("bip01_head"), 1, false);
 	player_head.mulA_43					(Actor()->XFORM());
 	Fvector								target = player_head.c;
-#else   // #if 0
+#else  // #if 0
     Fvector target = self.sight().aiming_position();
-#endif  // #if 0
+#endif // #if 0
 
     Fmatrix spine_offset;
     Fmatrix shoulder_offset;
@@ -1358,7 +1358,7 @@ static void draw_animation_bones(
 
     draw_bones(
         *kinematics, Fvector().set(.011f, .011f, .011f), color_xrgb(0, 255, 0), color_xrgb(0, 255, 255), &transform);
-#endif  // #ifdef DEBUG_RENDER
+#endif // #ifdef DEBUG_RENDER
 
     Fmatrix weapon_bone_0;
 
@@ -1532,7 +1532,7 @@ static void draw_animation_bones(
     renderer.draw_obb(g_stalker_skeleton[weapon_bone_id1], Fvector().set(.01f, .01f, .01f), color_xrgb(255, 0, 0));
     renderer.draw_line(
         Fidentity, g_stalker_skeleton[weapon_bone_id0].c, g_stalker_skeleton[weapon_bone_id1].c, color_xrgb(255, 0, 0));
-#endif  // #ifdef DEBUG_RENDER
+#endif // #ifdef DEBUG_RENDER
 }
 
 Fvector g_debug_position_0 = Fvector().set(0.f, 0.f, 0.f);
@@ -1556,7 +1556,7 @@ void CAI_Stalker::OnRender()
 
 	draw_animation_bones		(*this, m_start_transform, kinematics, "loophole_3_attack_idle_0");
 //	draw_animation_bones		(*this, XFORM(), kinematics, "loophole_3_attack_in_0");
-#else  // #if 0
+#else // #if 0
     if (inventory().ActiveItem()) {
         Fvector position, direction, temp;
         g_fireParams(0, position, direction);
@@ -1604,7 +1604,7 @@ void CAI_Stalker::OnRender()
 		direction.setHP		(yaw,pitch + safety_fire_angle);
 		Level().debug_renderer().draw_line(Fidentity, position, Fvector().mad(position, direction, 20.f), color_xrgb(0,255,0));
 	}
-#endif  // #if 0
+#endif // #if 0
 
     inherited::OnRender();
 
@@ -1737,7 +1737,7 @@ void CAI_Stalker::OnRender()
 
     if (g_Alive()) movement().get_doors_actor().render();
 
-#endif  // #if 0
+#endif // #if 0
 }
 
-#endif  // DEBUG
+#endif // DEBUG

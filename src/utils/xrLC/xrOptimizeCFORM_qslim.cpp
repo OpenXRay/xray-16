@@ -110,8 +110,8 @@ void SimplifyCFORM(CDB::CollectorPacked& CL)
     slim->boundary_weight = 1000000.f;
     slim->compactness_ratio = COMPACTNESS_RATIO;
     slim->meshing_penalty = 1000000.f;
-    slim->placement_policy = MX_PLACE_ENDPOINTS;  // MX_PLACE_ENDPOINTS;//MX_PLACE_ENDORMID;//MX_PLACE_OPTIMAL;
-    slim->weighting_policy = MX_WEIGHT_UNIFORM;   // MX_WEIGHT_UNIFORM;//MX_WEIGHT_AREA;
+    slim->placement_policy = MX_PLACE_ENDPOINTS; // MX_PLACE_ENDPOINTS;//MX_PLACE_ENDORMID;//MX_PLACE_OPTIMAL;
+    slim->weighting_policy = MX_WEIGHT_UNIFORM;  // MX_WEIGHT_UNIFORM;//MX_WEIGHT_AREA;
     slim->initialize();
 
     // constraint material&sector vertex

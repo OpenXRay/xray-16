@@ -100,7 +100,7 @@ bool CGameSpy_QR2::Init(int PortID, int Public, Context& ctx)
         ctx.OnKeyList, ctx.OnCount, ctx.OnError, &ctx);
 #ifndef MASTER_GOLD
     Msg("xrGS::xrGS_qr2_initA returned code is [%d]", err);
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
 
     if (err != e_qrnoerror) {
         //		_tprintf(_T("Error starting query sockets\n"));
@@ -122,7 +122,7 @@ bool CGameSpy_QR2::Init(int PortID, int Public, Context& ctx)
 
 #ifndef MASTER_GOLD
     Msg("xrGS::QR2 : Initialized");
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
     return true;
 };
 

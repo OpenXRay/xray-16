@@ -51,8 +51,8 @@ const u32 default_tube_condition_min_delay = 10000;
 const float default_tube_condition_min_distance = 10;
 const float default_stamina_hit = 0.2f;
 
-}  // namespace controller
-}  // namespace detail
+} // namespace controller
+} // namespace detail
 
 CController::CController()
 {

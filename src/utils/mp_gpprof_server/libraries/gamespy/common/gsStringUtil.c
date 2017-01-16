@@ -43,7 +43,7 @@ int _ReadUCS2CharFromUTF8String(const UTF8String theUTF8String, UCS2Char* theUni
     if (theMaxLength == 0) {
         // assert?
         *theUnicodeChar = (UCS2Char)REPLACE_INVALID_CHAR;
-        return 0;  // not enough data
+        return 0; // not enough data
     }
 
     // Check for normal ascii range (includes NULL terminator)
@@ -58,7 +58,7 @@ int _ReadUCS2CharFromUTF8String(const UTF8String theUTF8String, UCS2Char* theUni
     {
         if (theMaxLength < 2) {
             *theUnicodeChar = (UCS2Char)REPLACE_INVALID_CHAR;
-            return 0;  // not enough data
+            return 0; // not enough data
         }
 
         // Make sure the second byte is valid
@@ -78,7 +78,7 @@ int _ReadUCS2CharFromUTF8String(const UTF8String theUTF8String, UCS2Char* theUni
     {
         if (theMaxLength < 3) {
             *theUnicodeChar = (UCS2Char)REPLACE_INVALID_CHAR;
-            return 0;  // not enough data
+            return 0; // not enough data
         }
 
         // Make sure the second and third bytes are valid
@@ -133,9 +133,9 @@ int _UCS2CharToUTF8String(UCS2Char theUCS2Char, UTF8String theUTF8String)
         // :00000ABC DEFGHIJK
         // :110ABCDE 10FGHIJK
         theUTF8String[0] =
-            (char)(UTF8ByteType)(UTF8_TWO_BYTE_TAG | (theUCS2Char >> 6));  // Store the upper 5/11 bits as 0x110xxxxx
+            (char)(UTF8ByteType)(UTF8_TWO_BYTE_TAG | (theUCS2Char >> 6)); // Store the upper 5/11 bits as 0x110xxxxx
         theUTF8String[1] = (char)(UTF8ByteType)(
-            UTF8_FOLLOW_BYTE_TAG | (theUCS2Char & UTF8_FOLLOW_BYTE_MASK));  // Store the lower 6 bits as 0x10xxxxxx
+            UTF8_FOLLOW_BYTE_TAG | (theUCS2Char & UTF8_FOLLOW_BYTE_MASK)); // Store the lower 6 bits as 0x10xxxxxx
         return 2;
     }
     else
@@ -144,12 +144,12 @@ int _UCS2CharToUTF8String(UCS2Char theUCS2Char, UTF8String theUTF8String)
         // :ABCDEFGH IJKLMNOP
         // :1110ABCD 10EFGHIJ 10KLMNOP
         theUTF8String[0] =
-            (char)(UTF8ByteType)(UTF8_THREE_BYTE_TAG | (theUCS2Char >> 12));  // Store the upper 4/16 bits as 0x1110xxxx
-        theUTF8String[1] = (char)(UTF8ByteType)(
-            UTF8_FOLLOW_BYTE_TAG |
-            ((theUCS2Char >> 6) & UTF8_FOLLOW_BYTE_MASK));  // Store the 5th-10th bits as 0x10xxxxxx
+            (char)(UTF8ByteType)(UTF8_THREE_BYTE_TAG | (theUCS2Char >> 12)); // Store the upper 4/16 bits as 0x1110xxxx
+        theUTF8String[1] =
+            (char)(UTF8ByteType)(UTF8_FOLLOW_BYTE_TAG |
+                                 ((theUCS2Char >> 6) & UTF8_FOLLOW_BYTE_MASK)); // Store the 5th-10th bits as 0x10xxxxxx
         theUTF8String[2] = (char)(UTF8ByteType)(
-            UTF8_FOLLOW_BYTE_TAG | ((theUCS2Char)&UTF8_FOLLOW_BYTE_MASK));  // Store the last 6 bits as 0x10xxxxxx
+            UTF8_FOLLOW_BYTE_TAG | ((theUCS2Char)&UTF8_FOLLOW_BYTE_MASK)); // Store the last 6 bits as 0x10xxxxxx
         return 3;
     }
 }
@@ -561,7 +561,7 @@ int AsciiToUCS2String(const char* theAsciiString, UCS2String theUCS2String)
     // Convert each character until a '\0' is reached
     while (*aReadPos != '\0')
     {
-        (*aWritePos++) = (unsigned short)(0x00FF & (*aReadPos++));  // copy and strip extra byte
+        (*aWritePos++) = (unsigned short)(0x00FF & (*aReadPos++)); // copy and strip extra byte
         length++;
     }
 
@@ -650,5 +650,5 @@ int UTF8ToUCS2StringLen(const UTF8String theUTF8String, UCS2String theUCS2String
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 #ifdef __cplusplus
-}  // extern "C"
+} // extern "C"
 #endif

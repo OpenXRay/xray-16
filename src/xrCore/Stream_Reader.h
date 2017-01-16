@@ -63,4 +63,4 @@ private:
 
 #include "stream_reader_inline.h"
 
-#endif  // STREAM_READER_H
+#endif // STREAM_READER_H

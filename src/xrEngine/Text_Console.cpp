@@ -47,7 +47,7 @@ void CTextConsole::CreateConsoleWnd()
     RegisterClass(&wndClass);
 
     // Set the window's initial style
-    u32 dwWindowStyle = WS_OVERLAPPED | WS_CHILD | WS_VISIBLE;  // | WS_CLIPSIBLINGS;// | WS_CLIPCHILDREN;
+    u32 dwWindowStyle = WS_OVERLAPPED | WS_CHILD | WS_VISIBLE; // | WS_CLIPSIBLINGS;// | WS_CLIPCHILDREN;
 
     // Set the window's initial width
     RECT rc;
@@ -81,7 +81,7 @@ void CTextConsole::CreateLogWnd()
     RegisterClass(&wndClass);
 
     // Set the window's initial style
-    u32 dwWindowStyle = WS_OVERLAPPED | WS_CHILD | WS_VISIBLE;  // | WS_CLIPSIBLINGS;
+    u32 dwWindowStyle = WS_OVERLAPPED | WS_CHILD | WS_VISIBLE; // | WS_CLIPSIBLINGS;
     // u32 dwWindowStyleEx = WS_EX_CLIENTEDGE;
 
     // Set the window's initial width
@@ -179,7 +179,7 @@ void CTextConsole::Destroy()
 
 void CTextConsole::OnRender()
 {
-}  // disable ÑConsole::OnRender()
+} // disable ÑConsole::OnRender()
 
 void CTextConsole::OnPaint()
 {
@@ -201,7 +201,7 @@ void CTextConsole::OnPaint()
 
     BitBlt(m_hDC_LogWnd, wRC.left, wRC.top, wRC.right - wRC.left, wRC.bottom - wRC.top, m_hDC_LogWnd_BackBuffer,
         wRC.left, wRC.top,
-        SRCCOPY);  //(FullUpdate) ? SRCCOPY : NOTSRCCOPY);
+        SRCCOPY); //(FullUpdate) ? SRCCOPY : NOTSRCCOPY);
     /*
      Msg ("URect - %d:%d - %d:%d", ps.rcPaint.left, ps.rcPaint.top, ps.rcPaint.right, ps.rcPaint.bottom);
      */
@@ -244,7 +244,7 @@ void CTextConsole::DrawLog(HDC hDC, RECT* pRect)
     TextOut(hDC, xb, Height - tm.tmHeight - 1, buf, cur0_len);
 
     SetTextColor(hDC, RGB(255, 255, 255));
-    TextOut(hDC, 0, Height - tm.tmHeight - 3, ioc_prompt, xr_strlen(ioc_prompt));  // ">>> "
+    TextOut(hDC, 0, Height - tm.tmHeight - 3, ioc_prompt, xr_strlen(ioc_prompt)); // ">>> "
 
     SetTextColor(hDC, (COLORREF)bgr2rgb(get_mark_color(mark11)));
     TextOut(hDC, xb, Height - tm.tmHeight - 3, s_edt, xr_strlen(s_edt));

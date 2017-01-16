@@ -1,5 +1,5 @@
 #include "dTriCollideK.h"
-#include "dcTriListCollider.cpp"  // Allow inlining
+#include "dcTriListCollider.cpp" // Allow inlining
 #include "dcTriListCollider.h"
 #include "dxTriList.h"
 #include "stdafx.h"

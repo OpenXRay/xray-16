@@ -437,13 +437,13 @@ public:
     }
 
     // DotProduct
-    ICF T dotproduct(const Self& v) const  // v1*v2
+    ICF T dotproduct(const Self& v) const // v1*v2
     {
         return x * v.x + y * v.y + z * v.z;
     }
 
     // CrossProduct
-    ICF SelfRef crossproduct(const Self& v1, const Self& v2)  // (v1,v2) -> this
+    ICF SelfRef crossproduct(const Self& v1, const Self& v2) // (v1,v2) -> this
     {
         x = v1.y * v2.z - v1.z * v2.y;
         y = v1.z * v2.x - v1.x * v2.z;
@@ -590,7 +590,7 @@ public:
             up.z = -dir.y * fInvLength;
         }
 
-        right.crossproduct(up, dir);  //. <->
+        right.crossproduct(up, dir); //. <->
     }
     IC static void generate_orthonormal_basis_normalized(_vector3<T>& dir, _vector3<T>& up, _vector3<T>& right)
     {
@@ -665,7 +665,7 @@ IC BOOL exact_normalize(float* a)
         if (aa2 > aa1) {
             goto aa2_largest;
         }
-        else  // aa1 is largest
+        else // aa1 is largest
         {
             a0 /= aa1;
             a2 /= aa1;
@@ -678,7 +678,7 @@ IC BOOL exact_normalize(float* a)
     else
     {
         if (aa2 > aa0) {
-        aa2_largest:  // aa2 is largest
+        aa2_largest: // aa2 is largest
             a0 /= aa2;
             a1 /= aa2;
             l = rsqrt(a0 * a0 + a1 * a1 + 1);
@@ -686,12 +686,12 @@ IC BOOL exact_normalize(float* a)
             a[1] = a1 * l;
             a[2] = (double)_copysign(l, a2);
         }
-        else  // aa0 is largest
+        else // aa0 is largest
         {
             if (aa0 <= 0) {
                 // dDEBUGMSG ("vector has zero size"); ... this messace is annoying
-                a[0] = 0;  // if all a's are zero, this is where we'll end up.
-                a[1] = 1;  // return a default unit length vector.
+                a[0] = 0; // if all a's are zero, this is where we'll end up.
+                a[1] = 1; // return a default unit length vector.
                 a[2] = 0;
                 return FALSE;
             }

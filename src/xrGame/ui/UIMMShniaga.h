@@ -29,7 +29,7 @@ public:
         epi_new_game,
         epi_new_network_game,
         epi_none
-    };  // enum	enum_page_id
+    }; // enum	enum_page_id
     void SetPage(enum_page_id page_id, LPCSTR xml_file, LPCSTR xml_path);
     void ShowPage(enum_page_id page_id);
 

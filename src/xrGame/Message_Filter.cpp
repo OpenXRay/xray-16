@@ -46,7 +46,7 @@ void message_filter::msg_type_subtype_t::import(NET_Packet& packet)
     case M_GAMEMESSAGE: { packet.r_u32(msg_subtype);
     }
     break;
-    };  // switch (msg_type)
+    }; // switch (msg_type)
 }
 
 void message_filter::check_new_data(NET_Packet& packet)
@@ -129,7 +129,7 @@ void message_filter::dbg_print_msg(NET_Packet& packet, msg_type_subtype_t const&
             xr_sprintf(tmp_string, "--- CL_EVENT [%7u][%5u]: EVENT_ID=[%d]", msg_type.msg_receive_time,
                 msg_type.dest_obj_id, msg_type.msg_subtype);
         };
-        };  // switch (mtype.msg_subtype)
+        }; // switch (mtype.msg_subtype)
     }
     break;
     case M_EVENT_PACK: { FATAL("can't print M_EVENT_PACK message");
@@ -181,7 +181,7 @@ void message_filter::dbg_print_msg(NET_Packet& packet, msg_type_subtype_t const&
     break;
     default: { xr_sprintf(tmp_string, "--- MESSAGE_ID[%u]         [%7u]", msg_type.msg_type, msg_type.msg_receive_time);
     };
-    };  // switch (m_type)
+    }; // switch (m_type)
     if (!xr_strcmp(tmp_string, m_last_string)) {
         ++m_strrepeat_count;
         return;

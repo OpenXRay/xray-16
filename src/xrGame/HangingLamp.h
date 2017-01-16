@@ -16,7 +16,7 @@ class CPhysicsElement;
 class CSE_ALifeObjectHangingLamp;
 class CPHElement;
 class CHangingLamp : public CPhysicsShellHolder, public CPHSkeleton
-{  // need m_pPhysicShell
+{ // need m_pPhysicShell
     typedef CPhysicsShellHolder inherited;
 
 private:
@@ -45,8 +45,8 @@ public:
     virtual void Load(LPCSTR section);
     virtual BOOL net_Spawn(CSE_Abstract* DC);
     virtual void net_Destroy();
-    virtual void shedule_Update(u32 dt);  // Called by sheduler
-    virtual void UpdateCL();              // Called each frame, so no need for dt
+    virtual void shedule_Update(u32 dt); // Called by sheduler
+    virtual void UpdateCL();             // Called each frame, so no need for dt
 
     virtual void SpawnInitPhysics(CSE_Abstract* D);
     virtual CPhysicsShellHolder* PPhysicsShellHolder() { return PhysicsShellHolder(); };
@@ -67,4 +67,4 @@ public:
     virtual float Radius() const;
 };
 
-#endif  // HangingLampH
+#endif // HangingLampH

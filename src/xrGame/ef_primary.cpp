@@ -267,7 +267,7 @@ float CEnemyRukzakWeightFunction::ffGetValue()
     else
     {
         //		CSE_ALifeHumanAbstract *l_tpALifeHumanAbstract =
-        //smart_cast<CSE_ALifeHumanAbstract*>(ef_storage().alife().member());
+        // smart_cast<CSE_ALifeHumanAbstract*>(ef_storage().alife().member());
         //		if (l_tpALifeHumanAbstract)
         //			m_fLastValue	= l_tpALifeHumanAbstract->m_fCumulativeItemMass;
         //		else

@@ -33,7 +33,7 @@ public:
     u32 dwMode;
     union
     {
-        u32 tcm;  // mask for tc-modifiers
+        u32 tcm; // mask for tc-modifiers
         Flags32 tcm_flags;
     };
     WaveForm scaleU, scaleV;
@@ -49,7 +49,7 @@ public:
     }
     void Calculate();
 
-    IC BOOL Similar(CMatrix& M)  // comare by modes and params
+    IC BOOL Similar(CMatrix& M) // comare by modes and params
     {
         if (dwMode != M.dwMode) return FALSE;
         if (tcm != M.tcm) return FALSE;

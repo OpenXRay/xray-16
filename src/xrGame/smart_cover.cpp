@@ -23,12 +23,12 @@ IC u32 to_u32(shared_str const& string)
     return (*(u32 const*)&get);
 }
 
-}  // namespace hash_fixed_vertex_manager
+} // namespace hash_fixed_vertex_manager
 
 namespace smart_cover
 {
 shared_str transform_vertex(shared_str const& vertex_id, bool const& in);
-}  // namespace smart_cover
+} // namespace smart_cover
 
 using smart_cover::cover;
 using smart_cover::description;
@@ -76,7 +76,7 @@ cover::cover(smart_cover::object const& object, DescriptionPtr description, bool
 
 #ifdef DEBUG
     check_loopholes_connectivity();
-#endif  // DEBUG
+#endif // DEBUG
 }
 
 cover::~cover()
@@ -262,7 +262,7 @@ void cover::check_loopholes_connectivity() const
                                                enter.c_str(), lhs.c_str(), m_description->table_id().c_str()));
     }
 }
-#endif  // DEBUG
+#endif // DEBUG
 
 static bool in_fov(
     Fvector const& position, Fvector const& fov_position, Fvector const& fov_direction, float const fov_angle)

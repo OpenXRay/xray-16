@@ -29,9 +29,9 @@ void check_path(const CBaseMonster* monster, const CPatrolPath* path)
                  .level(ai().game_graph().vertex(path->vertices().begin()->second->data().game_vertex_id())->level_id())
                  .name()));
 }
-#else  // DEBUG
+#else // DEBUG
 #define check_path(a, b)
-#endif  // DEBUG
+#endif // DEBUG
 
 void CMonsterHome::load(LPCSTR line)
 {

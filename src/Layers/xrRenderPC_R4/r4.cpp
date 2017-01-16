@@ -115,7 +115,7 @@ static class cl_alpha_ref : public R_constant_setup
 } binder_alpha_ref;
 
 extern ENGINE_API BOOL r2_sun_static;
-extern ENGINE_API BOOL r2_advanced_pp;  //	advanced post process and effects
+extern ENGINE_API BOOL r2_advanced_pp; //	advanced post process and effects
 //////////////////////////////////////////////////////////////////////////
 // Just two static storage
 void CRender::create()
@@ -160,7 +160,7 @@ void CRender::create()
             case 0x19D:
             case 0x19E:
             {
-                disable_nullrt = true;  // G80
+                disable_nullrt = true; // G80
                 break;
             }
             case 0x400:
@@ -172,7 +172,7 @@ void CRender::create()
             case 0x40E:
             case 0x40F:
             {
-                disable_nullrt = true;  // G84
+                disable_nullrt = true; // G84
                 break;
             }
             case 0x420:
@@ -184,7 +184,7 @@ void CRender::create()
             case 0x42E:
             case 0x42F:
             {
-                disable_nullrt = true;  // G86
+                disable_nullrt = true; // G86
                 break;
             }
             }
@@ -384,7 +384,7 @@ void CRender::create()
 
     m_bMakeAsyncSS = false;
 
-    Target = new CRenderTarget();  // Main target
+    Target = new CRenderTarget(); // Main target
 
     Models = new CModelPool();
     PSLibrary.OnCreate();
@@ -841,9 +841,9 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
         SPS* sps_result = (SPS*)result;
 #ifdef USE_DX11
         _result = HW.pDevice->CreatePixelShader(buffer, buffer_size, 0, &sps_result->ps);
-#else   // #ifdef USE_DX11
+#else  // #ifdef USE_DX11
         _result = HW.pDevice->CreatePixelShader(buffer, buffer_size, &sps_result->ps);
-#endif  // #ifdef USE_DX11
+#endif // #ifdef USE_DX11
         if (!SUCCEEDED(_result)) {
             Log("! PS: ", file_name);
             Msg("! CreatePixelShader hr == 0x%08x", _result);
@@ -877,9 +877,9 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
         SVS* svs_result = (SVS*)result;
 #ifdef USE_DX11
         _result = HW.pDevice->CreateVertexShader(buffer, buffer_size, 0, &svs_result->vs);
-#else   // #ifdef USE_DX11
+#else  // #ifdef USE_DX11
         _result = HW.pDevice->CreateVertexShader(buffer, buffer_size, &svs_result->vs);
-#endif  // #ifdef USE_DX11
+#endif // #ifdef USE_DX11
 
         if (!SUCCEEDED(_result)) {
             Log("! VS: ", file_name);
@@ -926,9 +926,9 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
         SGS* sgs_result = (SGS*)result;
 #ifdef USE_DX11
         _result = HW.pDevice->CreateGeometryShader(buffer, buffer_size, 0, &sgs_result->gs);
-#else   // #ifdef USE_DX11
+#else  // #ifdef USE_DX11
         _result = HW.pDevice->CreateGeometryShader(buffer, buffer_size, &sgs_result->gs);
-#endif  // #ifdef USE_DX11
+#endif // #ifdef USE_DX11
         if (!SUCCEEDED(_result)) {
             Log("! GS: ", file_name);
             Msg("! CreateGeometryShaderhr == 0x%08x", _result);
@@ -1633,7 +1633,7 @@ HRESULT CRender::shader_compile(LPCSTR name, DWORD const* pSrcData, UINT SrcData
         LPD3DBLOB pShaderBuf = NULL;
         LPD3DBLOB pErrorBuf = NULL;
         _result = D3DCompile(pSrcData, SrcDataLen,
-            "",  // NULL, //LPCSTR pFileName,	//	NVPerfHUD bug workaround.
+            "", // NULL, //LPCSTR pFileName,	//	NVPerfHUD bug workaround.
             defines, &Includer, pFunctionName, pTarget, Flags, 0, &pShaderBuf, &pErrorBuf);
 
         if (SUCCEEDED(_result)) {
@@ -1687,7 +1687,7 @@ static inline bool match_shader_id(
 #if 0
 	strcpy_s					( result, "" );
 	return						false;
-#else  // #if 1
+#else // #if 1
 #ifdef DEBUG
     LPCSTR temp = "";
     bool found = false;
@@ -1704,7 +1704,7 @@ static inline bool match_shader_id(
 
     xr_strcpy(result, temp);
     return found;
-#else   // #ifdef DEBUG
+#else  // #ifdef DEBUG
     FS_FileSet::const_iterator i = file_set.begin();
     FS_FileSet::const_iterator const e = file_set.end();
     for (; i != e; ++i)
@@ -1716,6 +1716,6 @@ static inline bool match_shader_id(
     }
 
     return false;
-#endif  // #ifdef DEBUG
-#endif  // #if 1
+#endif // #ifdef DEBUG
+#endif // #if 1
 }

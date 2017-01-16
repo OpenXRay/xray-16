@@ -101,7 +101,7 @@ void CFlare::OnAnimationEnd(u32 state)
 
 void CFlare::SwitchOn()
 {
-    static int lt = 1;  // IRender_Light::POINT
+    static int lt = 1; // IRender_Light::POINT
     static bool ls = true;
     light_render = GlobalEnv.Render->light_create();
     light_render->set_type((IRender_Light::LT)lt);
@@ -137,7 +137,7 @@ void CFlare::UpdateCL()
             SwitchOff();
             return;
         }
-        if (_c + 2.0f > m_work_time_sec)  // 2sec
+        if (_c + 2.0f > m_work_time_sec) // 2sec
         {
             DropFlare();
         }

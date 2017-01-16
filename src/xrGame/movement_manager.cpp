@@ -235,7 +235,7 @@ void CMovementManager::update_path()
 
 #ifdef USE_FREE_IN_RESTRICTIONS
     if (restrictions().accessible(object().Position())) verify_detail_path();
-#endif  // USE_FREE_IN_RESTRICTIONS
+#endif // USE_FREE_IN_RESTRICTIONS
 
     m_build_at_once = false;
 
@@ -312,7 +312,7 @@ void CMovementManager::verify_detail_path()
         if (distance >= verify_distance) break;
     }
 }
-#endif  // USE_FREE_IN_RESTRICTIONS
+#endif // USE_FREE_IN_RESTRICTIONS
 
 void CMovementManager::on_restrictions_change()
 {
@@ -372,7 +372,7 @@ void CMovementManager::build_level_path()
     level_path_builder().process_impl();
     //	static int i=0;
     //	Msg									("[%6d][%6d][%4d][%f]
-    //build_level_path",Device.dwTimeGlobal,Device.dwFrame,++i,timer.GetElapsed_sec()*1000.f);
+    // build_level_path",Device.dwTimeGlobal,Device.dwFrame,++i,timer.GetElapsed_sec()*1000.f);
 }
 
 Fvector CMovementManager::predict_position(

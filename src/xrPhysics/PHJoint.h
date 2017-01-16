@@ -19,20 +19,20 @@ class CPHJoint : public CPhysicsJoint, public cphysics_scripted
     dJointID m_joint1;
     CPhysicsJoint** m_back_ref;
     CPHJointDestroyInfo* m_destroy_info;
-    float m_erp;  // joint erp
-    float m_cfm;  // joint cfm
+    float m_erp; // joint erp
+    float m_cfm; // joint cfm
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
     struct SPHAxis
     {
-        float high;         // high limit
-        float low;          // law limit
-        float zero;         // zero angle position
-        float erp;          // limit erp
-        float cfm;          // limit cfm
-        eVs vs;             // coordinate system
-        float force;        // max force
-        float velocity;     // velocity to achieve
-        Fvector direction;  // axis direction
+        float high;        // high limit
+        float low;         // law limit
+        float zero;        // zero angle position
+        float erp;         // limit erp
+        float cfm;         // limit cfm
+        eVs vs;            // coordinate system
+        float force;       // max force
+        float velocity;    // velocity to achieve
+        Fvector direction; // axis direction
         IC void set_limits(float h, float l)
         {
             high = h;

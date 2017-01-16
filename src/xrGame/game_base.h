@@ -7,7 +7,7 @@
 
 #pragma pack(push, 1)
 
-struct game_PlayerState;  // fw
+struct game_PlayerState; // fw
 class NET_Packet;
 
 struct RPoint

@@ -11,4 +11,4 @@ console_output clog;
 char const* endl = "\n";
 }
 
-#endif  //#ifdef _STLP_NO_IOSTREAMS
+#endif //#ifdef _STLP_NO_IOSTREAMS

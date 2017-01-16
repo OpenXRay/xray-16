@@ -43,7 +43,7 @@ using namespace StalkerDecisionSpace;
 namespace smart_cover
 {
 shared_str transform_vertex(shared_str const& vertex_id, bool const& in);
-}  // namespace smart_cover
+} // namespace smart_cover
 
 //////////////////////////////////////////////////////////////////////////
 // action_base
@@ -140,7 +140,7 @@ void non_animated_change_loophole::initialize()
 {
     inherited::initialize();
 
-    object().sight().enable(false);  // to force adjust_orientation
+    object().sight().enable(false); // to force adjust_orientation
     setup_orientation();
 
     object().movement().set_movement_type(eMovementTypeRun);

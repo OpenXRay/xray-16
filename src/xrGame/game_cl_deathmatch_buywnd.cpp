@@ -42,7 +42,7 @@ void game_cl_Deathmatch::OnBuyMenu_Ok()
     PRESET_ITEMS tmpItems;
     tmpItems.clear();
 
-    const preset_items* _p = &(pCurBuyMenu->GetPreset(_preset_idx_last));  //_preset_idx_last : _preset_idx_origin);
+    const preset_items* _p = &(pCurBuyMenu->GetPreset(_preset_idx_last)); //_preset_idx_last : _preset_idx_origin);
     if (_p->size() == 0) {
         if (!pActor || !pActor->g_Alive()) _p = &(pCurBuyMenu->GetPreset(_preset_idx_origin));
     }
@@ -117,7 +117,7 @@ void game_cl_Deathmatch::OnBuyMenu_DefaultItems()
 
 		pCurBuyMenu->SectionToSlot(u8((ItemID&0xff00)>>0x08), u8(ItemID&0x00ff), false);
 	};
-*/  //---------------------------------------------------------
+*/ //---------------------------------------------------------
     SetBuyMenuItems(&PlayerDefItems, TRUE);
 };
 
@@ -371,7 +371,7 @@ void game_cl_Deathmatch::LoadDefItemsForRank(IBuyWnd* pBuyMenu)
         {
             //			s16* pItemID = &(PlayerDefItems[it]);
             //			char* ItemName = pBuyMenu->GetWeaponNameByIndex(u8(((*pItemID)&0xff00)>>0x08),
-            //u8((*pItemID)&0x00ff));
+            // u8((*pItemID)&0x00ff));
             PresetItem* pDefItem = &(PlayerDefItems[it]);
             const shared_str& ItemName = pBuyMenu->GetWeaponNameByIndex(pDefItem->SlotID, pDefItem->ItemID);
             if (!ItemName.size()) continue;

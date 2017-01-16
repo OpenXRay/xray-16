@@ -60,11 +60,11 @@ inline_ BOOL RayCollider::RayAABBOverlap(const Point& center, const Point& exten
     if (GREATER(Dz, extents.z) && Dz * mDir.z >= 0.0f) return FALSE;
 
     //	float Dx = mOrigin.x - center.x;	if(GREATER(Dx, extents.x) && ((SIR(Dx)-1)^SIR(mDir.x))>=0.0f)	return
-    //FALSE;
+    // FALSE;
     //	float Dy = mOrigin.y - center.y;	if(GREATER(Dy, extents.y) && ((SIR(Dy)-1)^SIR(mDir.y))>=0.0f)	return
-    //FALSE;
+    // FALSE;
     //	float Dz = mOrigin.z - center.z;	if(GREATER(Dz, extents.z) && ((SIR(Dz)-1)^SIR(mDir.z))>=0.0f)	return
-    //FALSE;
+    // FALSE;
 
     float f;
     f = mDir.y * Dz - mDir.z * Dy;

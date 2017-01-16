@@ -439,7 +439,7 @@ DEFAULT_MMAP_THRESHOLD       default: 256K
 */
 #ifdef DEBUG
 #undef DEBUG
-#endif  // DEBUG
+#endif // DEBUG
 
 #ifndef WIN32
 #ifdef _WIN32
@@ -1413,7 +1413,7 @@ static int win32_acquire_lock(MLOCK_T* sl)
     {
 #ifdef InterlockedCompareExchangePointer
         if (!InterlockedCompareExchange(sl, 1, 0)) return 0;
-#else /* Use older void* version */
+#else  /* Use older void* version */
         if (!InterlockedCompareExchange((void**)sl, (void*)1, (void*)0)) return 0;
 #endif /* InterlockedCompareExchangePointer */
         Sleep(0);

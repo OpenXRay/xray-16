@@ -52,7 +52,7 @@ protected:
 public:
     UIHint* hint_wnd;
 
-private:  // m_
+private: // m_
     CUIFrameWindow* m_background;
     CUIScrollView* m_list;
 
@@ -63,7 +63,7 @@ private:  // m_
     //	u32					m_activ_task_count;
     float m_orig_h;
 
-};  // class UITaskListWnd
+}; // class UITaskListWnd
 
 // -------------------------------------------------------------------------------------------------
 
@@ -94,7 +94,7 @@ public:
     bool show_hint_can;
     bool show_hint;
 
-private:  // m_
+private: // m_
     CGameTask* m_task;
     CUI3tButton* m_name;
     //	CUICheckButton*	m_bt_view;
@@ -110,6 +110,6 @@ private:  // m_
     };
     u32 m_color_states[stt_count];
 
-};  // class UITaskListWndItem
+}; // class UITaskListWndItem
 
-#endif  // UI_SECOND_TASK_WND_H_INCLUDED
+#endif // UI_SECOND_TASK_WND_H_INCLUDED

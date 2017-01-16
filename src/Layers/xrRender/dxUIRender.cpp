@@ -142,9 +142,9 @@ void dxUIRender::SetScissor(Irect* rect)
 #if (RENDER == R_R3) || (RENDER == R_R4)
     RCache.set_Scissor(rect);
     StateManager.OverrideScissoring(rect ? true : false, TRUE);
-#else   //	(RENDER == R_R3) || (RENDER == R_R4)
+#else  //	(RENDER == R_R3) || (RENDER == R_R4)
     RCache.set_Scissor(rect);
-#endif  //	(RENDER == R_R3) || (RENDER == R_R4)
+#endif //	(RENDER == R_R3) || (RENDER == R_R4)
 }
 
 void dxUIRender::GetActiveTextureResolution(Fvector2& res)

@@ -30,7 +30,7 @@ shared_str CGameSpy_GP::TryToTranslate(GPResult const& res)
 
 CGameSpy_GP::CGameSpy_GP()
 {
-    m_GPConnection = NULL;  // GPConnection type is: void*
+    m_GPConnection = NULL; // GPConnection type is: void*
     Init();
 }
 

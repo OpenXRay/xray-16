@@ -103,7 +103,7 @@ void demoplay_control::activate_filer(EAction const action, shared_str const& pa
     break;
     default: { FATAL("unknown action to filter");
     }
-    };  // switch (action)
+    }; // switch (action)
 }
 void demoplay_control::deactivate_filter()
 {
@@ -132,7 +132,7 @@ void demoplay_control::deactivate_filter()
     break;
     default: { FATAL("unknown action to remove filter");
     }
-    };  // switch (action)
+    }; // switch (action)
 }
 void demoplay_control::process_action()
 {
@@ -163,8 +163,8 @@ void __stdcall demoplay_control::on_kill_impl(u32 message, u32 subtype, NET_Pack
         process_action();
         return;
     }
-    packet.r_u8();   // kill type
-    packet.r_u16();  // killed_id
+    packet.r_u8();  // kill type
+    packet.r_u16(); // killed_id
     u16 killer_id = packet.r_u16();
     game_PlayerState* killerps = Game().GetPlayerByGameID(killer_id);
     if (!killerps) return;
@@ -187,7 +187,7 @@ void __stdcall demoplay_control::on_die_impl(u32 message, u32 subtype, NET_Packe
         process_action();
         return;
     }
-    packet.r_u8();  // kill type
+    packet.r_u8(); // kill type
     u16 killed_id = packet.r_u16();
     game_PlayerState* killedps = Game().GetPlayerByGameID(killed_id);
     if (!killedps) return;
@@ -211,7 +211,7 @@ void __stdcall demoplay_control::on_artefactdelivering_impl(u32 message, u32 sub
         return;
     }
     EGameIDs current_game_type = static_cast<EGameIDs>(GameID());
-    u16 deliverer_id = 0;  // who deliver the artefact
+    u16 deliverer_id = 0; // who deliver the artefact
     if (current_game_type == eGameIDCaptureTheArtefact) {
         u8 delivererTeam;
         packet.r_u8(delivererTeam);

@@ -104,34 +104,34 @@ void CUIActorMenu::SetMenuMode(EMenuMode mode)
         case mmUndefined:
 #ifdef DEBUG
             Msg("* now is Undefined mode");
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
             ResetMode();
             break;
         case mmInventory: InitInventoryMode();
 #ifdef DEBUG
             Msg("* now is Inventory mode");
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
             break;
         case mmTrade: InitTradeMode();
 #ifdef DEBUG
             Msg("* now is Trade mode");
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
             break;
         case mmUpgrade: InitUpgradeMode();
 #ifdef DEBUG
             Msg("* now is Upgrade mode");
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
             break;
         case mmDeadBodySearch: InitDeadBodySearchMode();
 #ifdef DEBUG
             Msg("* now is DeadBodySearch mode");
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
             break;
         default: R_ASSERT(0); break;
         }
         UpdateConditionProgressBars();
         CurModeToScript();
-    }  // if
+    } // if
 
     if (m_pActorInvOwner) {
         UpdateOutfit();
@@ -178,7 +178,7 @@ void CUIActorMenu::Draw()
 
 void CUIActorMenu::Update()
 {
-    {  // all mode
+    { // all mode
         m_last_time = Device.dwTimeGlobal;
         m_ActorStateInfo->UpdateActorInfo(m_pActorInvOwner);
     }
@@ -189,7 +189,7 @@ void CUIActorMenu::Update()
     case mmInventory:
     {
         //			m_clock_value->TextItemControl()->SetText( InventoryUtilities::GetGameTimeAsString(
-        //InventoryUtilities::etpTimeToMinutes ).c_str() );
+        // InventoryUtilities::etpTimeToMinutes ).c_str() );
         CurrentGameUI()->UIMainIngameWnd->UpdateZoneMap();
         break;
     }
@@ -219,7 +219,7 @@ void CUIActorMenu::Update()
     m_hint_wnd->Update();
 }
 
-bool CUIActorMenu::StopAnyMove()  // true = актёр не идёт при открытом меню
+bool CUIActorMenu::StopAnyMove() // true = актёр не идёт при открытом меню
 {
     switch (m_currMenuMode)
     {
@@ -247,7 +247,7 @@ void CUIActorMenu::CheckDistance()
             HideDialog();
         }
     }
-    else  // pBoxGO
+    else // pBoxGO
     {
         VERIFY(pBoxGO);
         if (pActorGO->Position().distance_to(pBoxGO->Position()) > 3.0f) {
@@ -567,7 +567,7 @@ void CUIActorMenu::highlight_ammo_for_weapon(PIItem weapon_item, CUIDragDropList
         CWeaponAmmo* ammo = smart_cast<CWeaponAmmo*>(item);
         if (!ammo) {
             highlight_addons_for_weapon(weapon_item, ci);
-            continue;  // for i
+            continue; // for i
         }
         shared_str const& ammo_name = item->object().cNameSect();
 
@@ -576,10 +576,10 @@ void CUIActorMenu::highlight_ammo_for_weapon(PIItem weapon_item, CUIDragDropList
         {
             if (ammo_name._get() == (*itb)._get()) {
                 ci->m_select_armament = true;
-                break;  // itb
+                break; // itb
             }
         }
-    }  // for i
+    } // for i
 }
 
 void CUIActorMenu::highlight_weapons_for_ammo(PIItem ammo_item, CUIDragDropListEx* ddlist)
@@ -612,13 +612,13 @@ void CUIActorMenu::highlight_weapons_for_ammo(PIItem ammo_item, CUIDragDropListE
         {
             if (ammo_name._get() == (*itb)._get()) {
                 ci->m_select_armament = true;
-                break;  // for itb
+                break; // for itb
             }
         }
 
         CWeaponMagazinedWGrenade* wg = smart_cast<CWeaponMagazinedWGrenade*>(item);
         if (!wg || !wg->IsGrenadeLauncherAttached() || !wg->m_ammoTypes2.size()) {
-            continue;  // for i
+            continue; // for i
         }
         itb = wg->m_ammoTypes2.begin();
         ite = wg->m_ammoTypes2.end();
@@ -626,10 +626,10 @@ void CUIActorMenu::highlight_weapons_for_ammo(PIItem ammo_item, CUIDragDropListE
         {
             if (ammo_name._get() == (*itb)._get()) {
                 ci->m_select_armament = true;
-                break;  // for itb
+                break; // for itb
             }
         }
-    }  // for i
+    } // for i
 }
 
 bool CUIActorMenu::highlight_addons_for_weapon(PIItem weapon_item, CUICellItem* ci)
@@ -698,7 +698,7 @@ void CUIActorMenu::highlight_weapons_for_addon(PIItem addon_item, CUIDragDropLis
             continue;
         }
 
-    }  // for i
+    } // for i
 }
 
 // -------------------------------------------------------------------

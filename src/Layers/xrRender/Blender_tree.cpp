@@ -173,14 +173,14 @@ void CBlender_Tree::Compile(CBlender_Compile& C)
     }
     switch (C.iElement)
     {
-    case SE_R2_NORMAL_HQ:  // deffer
+    case SE_R2_NORMAL_HQ: // deffer
         uber_deffer(C, true, tvs, "base", oBlend.value);
         break;
-    case SE_R2_NORMAL_LQ:  // deffer
+    case SE_R2_NORMAL_LQ: // deffer
         uber_deffer(C, false, tvs, "base", oBlend.value);
         break;
-    case SE_R2_SHADOW:  // smap-spot
-                        //	TODO: DX10: Use dumb shader for shadowmap since shadows are drawn using hardware PCF
+    case SE_R2_SHADOW: // smap-spot
+                       //	TODO: DX10: Use dumb shader for shadowmap since shadows are drawn using hardware PCF
         if (oBlend.value)
             C.r_Pass(tvs_s, "shadow_direct_base_aref", FALSE, TRUE, TRUE, TRUE, D3DBLEND_ZERO, D3DBLEND_ONE, TRUE, 200);
         else
@@ -222,7 +222,7 @@ void CBlender_Tree::Compile(CBlender_Compile& C)
 
     switch (C.iElement)
     {
-    case SE_R2_NORMAL_HQ:  // deffer
+    case SE_R2_NORMAL_HQ: // deffer
         if (bUseATOC) {
             uber_deffer(C, true, tvs, "base_atoc", oBlend.value, 0, true);
             C.r_Stencil(TRUE, D3DCMP_ALWAYS, 0xff, 0x7f, D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
@@ -242,7 +242,7 @@ void CBlender_Tree::Compile(CBlender_Compile& C)
         C.r_End();
 
         break;
-    case SE_R2_NORMAL_LQ:  // deffer
+    case SE_R2_NORMAL_LQ: // deffer
         if (bUseATOC) {
             uber_deffer(C, false, tvs, "base_atoc", oBlend.value, 0, true);
             C.r_Stencil(TRUE, D3DCMP_ALWAYS, 0xff, 0x7f, D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
@@ -260,7 +260,7 @@ void CBlender_Tree::Compile(CBlender_Compile& C)
         if (bUseATOC) C.RS.SetRS(D3DRS_ZFUNC, D3DCMP_EQUAL);
         C.r_End();
         break;
-    case SE_R2_SHADOW:  // smap-spot
+    case SE_R2_SHADOW: // smap-spot
         //	TODO: DX10: Use dumb shader for shadowmap since shadows are drawn using hardware PCF
         if (oBlend.value)
             C.r_Pass(tvs_s, "shadow_direct_base_aref", FALSE, TRUE, TRUE, TRUE, D3DBLEND_ZERO, D3DBLEND_ONE, TRUE, 200);

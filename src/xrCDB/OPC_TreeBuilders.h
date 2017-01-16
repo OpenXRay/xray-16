@@ -27,15 +27,15 @@
 enum SplittingRules
 {
     // Tree
-    SPLIT_COMPLETE = (1 << 0),  //!< Build a complete tree (2*N-1 nodes)
+    SPLIT_COMPLETE = (1 << 0), //!< Build a complete tree (2*N-1 nodes)
     // Primitive split
-    SPLIT_LARGESTAXIS = (1 << 1),     //!< Split along the largest axis
-    SPLIT_SPLATTERPOINTS = (1 << 2),  //!< Splatter primitive centers (QuickCD-style)
-    SPLIT_BESTAXIS = (1 << 3),        //!< Try largest axis, then second, then last
-    SPLIT_BALANCED = (1 << 4),        //!< Try to keep a well-balanced tree
-    SPLIT_FIFTY = (1 << 5),           //!< Arbitrary 50-50 split
+    SPLIT_LARGESTAXIS = (1 << 1),    //!< Split along the largest axis
+    SPLIT_SPLATTERPOINTS = (1 << 2), //!< Splatter primitive centers (QuickCD-style)
+    SPLIT_BESTAXIS = (1 << 3),       //!< Try largest axis, then second, then last
+    SPLIT_BALANCED = (1 << 4),       //!< Try to keep a well-balanced tree
+    SPLIT_FIFTY = (1 << 5),          //!< Arbitrary 50-50 split
     // Node split
-    SPLIT_GEOMCENTER = (1 << 6),  //!< Split at geometric center (else split in the middle)
+    SPLIT_GEOMCENTER = (1 << 6), //!< Split at geometric center (else split in the middle)
     //
     SPLIT_FORCE_DWORD = 0x7fffffff
 };
@@ -85,9 +85,9 @@ public:
         return global_box.GetCenter(axis);
     }
 
-    udword mLimit;         //!< Limit number of primitives / node
-    udword mRules;         //!< Building/Splitting rules (a combination of flags)
-    udword mNbPrimitives;  //!< Total number of primitives.
+    udword mLimit;        //!< Limit number of primitives / node
+    udword mRules;        //!< Building/Splitting rules (a combination of flags)
+    udword mNbPrimitives; //!< Total number of primitives.
     // Stats
     inline_ void SetCount(udword nb) { mCount = nb; }
     inline_ void IncreaseCount(udword nb) { mCount += nb; }
@@ -96,8 +96,8 @@ public:
     inline_ void IncreaseNbInvalidSplits() { mNbInvalidSplits++; }
     inline_ udword GetNbInvalidSplits() const { return mNbInvalidSplits; }
 private:
-    udword mCount;            //!< Stats: number of nodes created
-    udword mNbInvalidSplits;  //!< Stats: number of invalid splits
+    udword mCount;           //!< Stats: number of nodes created
+    udword mNbInvalidSplits; //!< Stats: number of invalid splits
 public:
     poolSS<AABBTreeNode, 16 * 1024> mPOOL;
     inline_ AABBTreeNode* node_alloc() { return mPOOL.create(); }
@@ -114,7 +114,7 @@ public:
     override(AABBTreeBuilder) bool ComputeGlobalBox(const udword* primitives, udword nb_prims, AABB& global_box) const;
     virtual float GetSplittingValue(udword index, udword axis) const;
 
-    const AABB* mAABBList;  //!< Shortcut to an app-controlled list of AABBs.
+    const AABB* mAABBList; //!< Shortcut to an app-controlled list of AABBs.
 };
 
 #pragma warning(disable : 4512)
@@ -130,10 +130,10 @@ public:
     override(AABBTreeBuilder) float GetSplittingValue(
         const udword* primitives, udword nb_prims, const AABB& global_box, udword axis) const;
 
-    const IndexedTriangle* mTriList;  //!< Shortcut to an app-controlled list of triangles.
-    const Point* mVerts;              //!< Shortcut to an app-controlled list of vertices.
-    const udword mNbTriangles;        //!< Total number of triangles.
+    const IndexedTriangle* mTriList; //!< Shortcut to an app-controlled list of triangles.
+    const Point* mVerts;             //!< Shortcut to an app-controlled list of vertices.
+    const udword mNbTriangles;       //!< Total number of triangles.
 };
 #pragma warning(default : 4512)
 
-#endif  // __OPC_TREEBUILDERS_H__
+#endif // __OPC_TREEBUILDERS_H__

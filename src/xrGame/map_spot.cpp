@@ -272,7 +272,7 @@ CUIStaticOrig* CComplexMapSpot::CreateStaticOrig(CUIXml& xml, LPCSTR ui_path)
     return ui;
 }
 
-void CComplexMapSpot::Load(CUIXml* xml, LPCSTR path)  // complex_spot_template
+void CComplexMapSpot::Load(CUIXml* xml, LPCSTR path) // complex_spot_template
 {
     inherited::Load(xml, path);
 
@@ -288,7 +288,7 @@ void CComplexMapSpot::Load(CUIXml* xml, LPCSTR path)  // complex_spot_template
     xml->SetLocalRoot(stored_root);
 }
 
-void CComplexMapSpot::SetTimerFinish(ALife::_TIME_ID time)  // ms
+void CComplexMapSpot::SetTimerFinish(ALife::_TIME_ID time) // ms
 {
     if (time <= 0) {
         m_timer_finish = 0;

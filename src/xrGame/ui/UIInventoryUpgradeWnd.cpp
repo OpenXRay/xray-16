@@ -213,7 +213,7 @@ bool CUIInventoryUpgradeWnd::install_item(CInventoryItem& inv_item, bool can_upg
     if (!can_upgrade) {
 #ifdef DEBUG
         Msg("Inventory item <%s> cannot upgrade - Mechanic say.", inv_item.m_section_id.c_str());
-#endif  // DEBUG
+#endif // DEBUG
         m_current_scheme = NULL;
         return false;
     }
@@ -222,7 +222,7 @@ bool CUIInventoryUpgradeWnd::install_item(CInventoryItem& inv_item, bool can_upg
     if (!scheme_name) {
 #ifdef DEBUG
         Msg("Inventory item <%s> does not contain upgrade scheme.", inv_item.m_section_id.c_str());
-#endif  // DEBUG
+#endif // DEBUG
         m_current_scheme = NULL;
         return false;
     }
@@ -253,8 +253,8 @@ bool CUIInventoryUpgradeWnd::install_item(CInventoryItem& inv_item, bool can_upg
         }
 
         ui_item->set_texture(UIUpgrade::LAYER_ITEM, upgrade_p->icon_name());
-        ui_item->set_texture(UIUpgrade::LAYER_POINT, m_point_textures[UIUpgrade::STATE_ENABLED].c_str());  // default
-        ui_item->set_texture(UIUpgrade::LAYER_COLOR, m_cell_textures[UIUpgrade::STATE_ENABLED].c_str());   // default
+        ui_item->set_texture(UIUpgrade::LAYER_POINT, m_point_textures[UIUpgrade::STATE_ENABLED].c_str()); // default
+        ui_item->set_texture(UIUpgrade::LAYER_COLOR, m_cell_textures[UIUpgrade::STATE_ENABLED].c_str());  // default
     }
 
     m_scheme_wnd->Show(true);
@@ -339,7 +339,7 @@ void CUIInventoryUpgradeWnd::set_info_cur_upgrade(Upgrade_type* upgrade)
     UIUpgrade* uiu = FindUIUpgrade(upgrade);
     if (uiu) {
         if (Device.dwTimeGlobal < uiu->FocusReceiveTime()) {
-            upgrade = NULL;  // visible = false
+            upgrade = NULL; // visible = false
         }
     }
     else

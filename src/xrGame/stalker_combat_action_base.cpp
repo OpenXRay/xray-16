@@ -254,7 +254,7 @@ void CStalkerActionCombatBase::play_attack_sound(
         Msg("! I am in combat, but there is no combat members at all (including me), "
             "npc[%s],team[%d],squad[%d],group[%d]",
             *object().cName(), object().g_Team(), object().g_Squad(), object().g_Group());
-#endif  // DEBUG
+#endif // DEBUG
 
     if (object().agent_manager().member().combat_members().size() > 1) {
         if (object().agent_manager().enemy().enemies().size() > 1)
@@ -278,7 +278,7 @@ void CStalkerActionCombatBase::play_start_search_sound(
         Msg("! I am in combat, but there is no combat members at all (including me), "
             "npc[%s],team[%d],squad[%d],group[%d]",
             *object().cName(), object().g_Team(), object().g_Squad(), object().g_Group());
-#endif  // DEBUG
+#endif // DEBUG
 
     bool search_with_allies = object().agent_manager().member().combat_members().size() > 1;
 
@@ -296,7 +296,7 @@ void CStalkerActionCombatBase::play_enemy_lost_sound(
         Msg("! I am in combat, but there is no combat members at all (including me), "
             "npc[%s],team[%d],squad[%d],group[%d]",
             *object().cName(), object().g_Team(), object().g_Squad(), object().g_Group());
-#endif  // DEBUG
+#endif // DEBUG
 
     bool search_with_allies = object().agent_manager().member().combat_members().size() > 1;
 

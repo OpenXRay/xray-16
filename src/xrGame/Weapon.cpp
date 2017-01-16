@@ -185,7 +185,7 @@ void CWeapon::UpdateFireDependencies_internal()
 
 void CWeapon::ForceUpdateFireParticles()
 {
-    if (!GetHUDmode()) {  // update particlesXFORM real bullet direction
+    if (!GetHUDmode()) { // update particlesXFORM real bullet direction
 
         if (!H_Parent()) return;
 
@@ -423,11 +423,11 @@ void CWeapon::Load(LPCSTR section)
     Fvector def_dof;
     def_dof.set(-1, -1, -1);
     //	m_zoom_params.m_ZoomDof		= READ_IF_EXISTS(pSettings, r_fvector3, section, "zoom_dof",
-    //Fvector().set(-1,-1,-1));
+    // Fvector().set(-1,-1,-1));
     //	m_zoom_params.m_bZoomDofEnabled	= !def_dof.similar(m_zoom_params.m_ZoomDof);
 
     //	m_zoom_params.m_ReloadDof	= READ_IF_EXISTS(pSettings, r_fvector4, section, "reload_dof",
-    //Fvector4().set(-1,-1,-1,-1));
+    // Fvector4().set(-1,-1,-1,-1));
 
     m_bHasTracers = !!READ_IF_EXISTS(pSettings, r_bool, section, "tracers", true);
     m_u8TracerColorID = READ_IF_EXISTS(pSettings, r_u8, section, "tracers_color_ID", u8(-1));
@@ -515,7 +515,7 @@ void CWeapon::net_Destroy()
 BOOL CWeapon::IsUpdating()
 {
     bool bIsActiveItem = m_pInventory && m_pInventory->ActiveItem() == this;
-    return bIsActiveItem || bWorking;  // || IsPending() || getVisible();
+    return bIsActiveItem || bWorking; // || IsPending() || getVisible();
 }
 
 void CWeapon::net_Export(NET_Packet& P)
@@ -1077,9 +1077,9 @@ float CWeapon::GetConditionMisfireProbability() const
     if (GetCondition() < misfireEndCondition) return misfireEndProbability;
     //	float mis = misfireProbability+powf(1.f-GetCondition(), 3.f)*misfireConditionK;
     float mis = misfireStartProbability +
-                ((misfireStartCondition - GetCondition()) *              // condition goes from 1.f to 0.f
-                    (misfireEndProbability - misfireStartProbability) /  // probability goes from 0.f to 1.f
-                    ((misfireStartCondition == misfireEndCondition) ?    // !!!say "No" to devision by zero
+                ((misfireStartCondition - GetCondition()) *             // condition goes from 1.f to 0.f
+                    (misfireEndProbability - misfireStartProbability) / // probability goes from 0.f to 1.f
+                    ((misfireStartCondition == misfireEndCondition) ?   // !!!say "No" to devision by zero
                             misfireStartCondition :
                             (misfireStartCondition - misfireEndCondition)));
     clamp(mis, 0.0f, 0.99f);
@@ -1154,7 +1154,7 @@ shared_str wpn_silencer = "wpn_silencer";
 shared_str wpn_grenade_launcher = "wpn_launcher";
 
 void CWeapon::UpdateHUDAddonsVisibility()
-{  // actor only
+{ // actor only
     if (!GetHUDmode()) return;
 
     //.	return;
@@ -1289,7 +1289,7 @@ void CWeapon::OnZoomIn()
 void CWeapon::OnZoomOut()
 {
     m_zoom_params.m_bIsZoomModeNow = false;
-    m_fRTZoomFactor = GetZoomFactor();  // store current
+    m_fRTZoomFactor = GetZoomFactor(); // store current
     m_zoom_params.m_fCurrentZoomFactor = g_fov;
     EnableHudInertion(TRUE);
 
@@ -1323,7 +1323,7 @@ void CWeapon::SwitchState(u32 S)
         Msg("---Server is going to send GE_WPN_STATE_CHANGE to [%d], weapon_section[%s], parent[%s]", S,
             cNameSect().c_str(), H_Parent() ? H_Parent()->cName().c_str() : "NULL Parent");
     }
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
 
     SetNextState(S);
     if (CHudItem::object().Local() && !CHudItem::object().getDestroy() && m_pInventory && OnServer()) {
@@ -1530,8 +1530,8 @@ void CWeapon::UpdateHudAdditonal(Fmatrix& trans)
         attachable_hud_item* hi = HudItemData();
         R_ASSERT(hi);
         Fvector curr_offs, curr_rot;
-        curr_offs = hi->m_measures.m_hands_offset[0][idx];  // pos,aim
-        curr_rot = hi->m_measures.m_hands_offset[1][idx];   // rot,aim
+        curr_offs = hi->m_measures.m_hands_offset[0][idx]; // pos,aim
+        curr_rot = hi->m_measures.m_hands_offset[1][idx];  // rot,aim
         curr_offs.mul(m_zoom_params.m_fZoomRotationFactor);
         curr_rot.mul(m_zoom_params.m_fZoomRotationFactor);
 
@@ -1670,7 +1670,7 @@ bool CWeapon::show_indicators()
 
 float CWeapon::GetConditionToShow() const
 {
-    return (GetCondition());  // powf(GetCondition(),4.0f));
+    return (GetCondition()); // powf(GetCondition(),4.0f));
 }
 
 BOOL CWeapon::ParentMayHaveAimBullet()
@@ -1705,7 +1705,7 @@ void CWeapon::debug_draw_firedeps()
 
         if (hud_adj_mode == 7) render.draw_aabb(get_LastSP(), 0.005f, 0.005f, 0.005f, color_xrgb(0, 255, 0));
     }
-#endif  // DEBUG
+#endif // DEBUG
 }
 
 const float& CWeapon::hit_probability() const

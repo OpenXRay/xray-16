@@ -178,7 +178,7 @@ class CActorDeathEffector
     void xr_stdcall OnPPEffectorReleased();
 
 public:
-    CActorDeathEffector(CActorCondition* parent, LPCSTR sect);  // -((
+    CActorDeathEffector(CActorCondition* parent, LPCSTR sect); // -((
     ~CActorDeathEffector();
     void UpdateCL();
     IC bool IsActual() { return m_b_actual; }

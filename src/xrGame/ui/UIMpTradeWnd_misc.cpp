@@ -113,7 +113,7 @@ void CUIMpTradeWnd::SetInfoString(LPCSTR str)
     m_static_information->ResetColorAnimation();
 #ifndef MASTER_GOLD
     Msg("Buy menu message:%s", str);
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
 }
 
 void CUIMpTradeWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
@@ -147,7 +147,7 @@ void CUIMpTradeWnd::SetCurrentItem(CUICellItem* itm)
         string64 tex_name;
         string64 team;
 
-        if (m_store_hierarchy->FindItem(current_sect_name)) {  // our team
+        if (m_store_hierarchy->FindItem(current_sect_name)) { // our team
             xr_strcpy(team, _team_names[m_store_hierarchy->TeamIdx()]);
         }
         else
@@ -458,7 +458,7 @@ void CUIMpTradeWnd::ResetItems()
 {
 #ifdef DEBUG
     Msg("--ResetItems");
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
     ResetToOrigin();
     CleanUserItems();
     m_store_hierarchy->Reset();

@@ -44,4 +44,4 @@ void silent_shots::OnWeapon_Fire(u16 sender, u16 sender_weapon_id)
     ++m_thunder_count;
 }
 
-}  // namespace award_system
+} // namespace award_system

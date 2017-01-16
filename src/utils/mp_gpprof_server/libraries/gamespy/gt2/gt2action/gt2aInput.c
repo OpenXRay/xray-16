@@ -43,7 +43,7 @@ static void KeyboardPress(unsigned char key, int x, int y)
 
     switch (key)
     {
-    case 0x1B:  // esc
+    case 0x1B: // esc
         ShutdownDisplay();
         exit(1);
 
@@ -189,14 +189,14 @@ static void ChatKeyboardPress(unsigned char key, int x, int y)
 {
     switch (key)
     {
-    case 0x1B:  // esc
+    case 0x1B: // esc
         // Back to normal keyboard handling.
         ////////////////////////////////////
         SetKeyboardNormal();
 
         return;
 
-    case 0x0D:  // enter
+    case 0x0D: // enter
         // Send the current chat message.
         /////////////////////////////////
         ChatSend();
@@ -207,8 +207,8 @@ static void ChatKeyboardPress(unsigned char key, int x, int y)
 
         return;
 
-    case 0x08:  // backspace
-    case 0x7F:  // delete
+    case 0x08: // backspace
+    case 0x7F: // delete
         ChatBackspace();
         break;
     }

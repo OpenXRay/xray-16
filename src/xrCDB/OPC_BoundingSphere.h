@@ -116,8 +116,8 @@ public:
     }
 
 public:
-    Point mCenter;  //!< Sphere center
-    float mRadius;  //!< Sphere radius
+    Point mCenter; //!< Sphere center
+    float mRadius; //!< Sphere radius
 #ifdef OLD
 private:
     Sphere PlanarCircumscribe3(const Point& p0, const Point& p1, const Point& p2);
@@ -134,4 +134,4 @@ private:
 #endif
 };
 
-#endif  // __ICEBOUNDINGSPHERE_H__
+#endif // __ICEBOUNDINGSPHERE_H__

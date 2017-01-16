@@ -120,7 +120,7 @@ private:
             VERIFY(cstr);
             self.m_strings[index] = std::make_pair(cstr, length(p));
         }
-    };  // struct helper
+    }; // struct helper
 
 private:
     typedef std::pair<LPCSTR, u32> StringPair;
@@ -132,8 +132,8 @@ private:
 
 void XRCORE_API check_stack_overflow(u32 stack_increment);
 
-}  // namespace detail
+} // namespace detail
 
-}  // namespace core
+} // namespace core
 
-}  // namespace xray
+} // namespace xray

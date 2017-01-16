@@ -175,7 +175,7 @@ u32 CTAGameClCaptionsManager::SetWarmupTime(u32 current_warmup_time, u32 current
     CStringTable st;
     ConvertTime2String(time_str, time_remains);
 
-    warmup_message[0] = 0;  // bad style
+    warmup_message[0] = 0; // bad style
     if (time_remains > 10000) {
         strconcat(sizeof(warmup_message), warmup_message, *st.translate("mp_time2start"), " ", time_str);
     }

@@ -16,7 +16,7 @@
 namespace doors
 {
 class actor;
-}  // namespace doors
+} // namespace doors
 
 class CRestrictedObjectObstacle;
 
@@ -72,7 +72,7 @@ public:
     virtual const float& prediction_speed() const;
 #ifdef DEBUG
     inline doors::actor const& get_doors_actor() const { return *m_doors_actor; }
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 
 #ifdef DEBUG
 private:
@@ -81,7 +81,7 @@ private:
 
 private:
     KEY_POINTS m_detail_key_points;
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 
 private:
     bool m_saved_state;
@@ -101,8 +101,8 @@ private:
     u32 m_last_fail_time;
     xr_vector<u32> m_temp_path;
     bool m_failed_to_build_path;
-};  // class stalker_movement_manager_obstacles
+}; // class stalker_movement_manager_obstacles
 
 #include "stalker_movement_manager_obstacles_inline.h"
 
-#endif  // #ifndef STALKER_MOVEMENT_MANAGER_OBSTACLES_H_INCLUDED
+#endif // #ifndef STALKER_MOVEMENT_MANAGER_OBSTACLES_H_INCLUDED

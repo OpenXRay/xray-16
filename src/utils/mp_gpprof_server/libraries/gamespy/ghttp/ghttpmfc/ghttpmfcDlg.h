@@ -6,7 +6,7 @@
 
 #if _MSC_VER > 1000
 #pragma once
-#endif  // _MSC_VER > 1000
+#endif // _MSC_VER > 1000
 
 /////////////////////////////////////////////////////////////////////////////
 // CGhttpmfcDlg dialog
@@ -15,7 +15,7 @@ class CGhttpmfcDlg : public CDialog
 {
     // Construction
 public:
-    CGhttpmfcDlg(CWnd* pParent = NULL);  // standard constructor
+    CGhttpmfcDlg(CWnd* pParent = NULL); // standard constructor
 
     // Dialog Data
     //{{AFX_DATA(CGhttpmfcDlg)
@@ -52,8 +52,8 @@ public:
     // ClassWizard generated virtual function overrides
     //{{AFX_VIRTUAL(CGhttpmfcDlg)
 protected:
-    virtual void DoDataExchange(CDataExchange* pDX);  // DDX/DDV support
-                                                      //}}AFX_VIRTUAL
+    virtual void DoDataExchange(CDataExchange* pDX); // DDX/DDV support
+                                                     //}}AFX_VIRTUAL
 
     // Implementation
 protected:
@@ -79,4 +79,4 @@ protected:
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.
 
-#endif  // !defined(AFX_GHTTPMFCDLG_H__14B35CAF_3960_4669_972D_59B741AA032C__INCLUDED_)
+#endif // !defined(AFX_GHTTPMFCDLG_H__14B35CAF_3960_4669_972D_59B741AA032C__INCLUDED_)

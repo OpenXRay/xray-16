@@ -44,12 +44,12 @@ protected:
     virtual void SaveNetState(NET_Packet& P);
     virtual void RestoreNetState(CSE_PHSkeleton* po);
 
-    virtual void InitServerObject(CSE_Abstract* D);  //
+    virtual void InitServerObject(CSE_Abstract* D); //
     virtual void CopySpawnInit();
-    void RespawnInit();           // net_Destroy
-    bool Spawn(CSE_Abstract* D);  // net_spawn
-    void Update(u32 dt);          // shedule update
-    void Load(LPCSTR section);    // client load
+    void RespawnInit();          // net_Destroy
+    bool Spawn(CSE_Abstract* D); // net_spawn
+    void Update(u32 dt);         // shedule update
+    void Load(LPCSTR section);   // client load
 public:
     void SetAutoRemove(u32 time = existence_time);
     void SetNotNeedSave();

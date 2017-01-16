@@ -86,7 +86,7 @@ void CControlAnimation::play()
     // speed only for global
     if (m_data.global.blend) {
         if (m_data.get_speed() > 0) {
-            m_data.global.blend->speed = m_data.get_speed();  // TODO: make factor
+            m_data.global.blend->speed = m_data.get_speed(); // TODO: make factor
         }
         else
         {
@@ -117,7 +117,7 @@ void CControlAnimation::play_part(SAnimationPart& part, PlayCallback callback)
     ///////////////////////////////////////////////////////////////////////////////
     //#ifdef _DEBUG
     //	Msg("Monster[%s] Time[%u] Anim[%s]",*(m_object->cName()),
-    //Device.dwTimeGlobal,*(m_object->anim().GetAnimTranslation(part.motion)));
+    // Device.dwTimeGlobal,*(m_object->anim().GetAnimTranslation(part.motion)));
     //#endif
     ///////////////////////////////////////////////////////////////////////////////
 

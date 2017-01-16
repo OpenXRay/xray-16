@@ -117,4 +117,4 @@ shared_str manager::unique_id(shared_str const& id) const
     return (m_collection->generate_unique_id(id.c_str()));
 }
 
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR

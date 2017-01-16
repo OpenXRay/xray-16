@@ -399,7 +399,7 @@ XML_NODE* XMLDocument::SearchForAttribute(
     return NULL;
 }
 
-#ifdef DEBUG  // debug & mixed
+#ifdef DEBUG // debug & mixed
 
 LPCSTR XMLDocument::CheckUniqueAttrib(XML_NODE* start_node, LPCSTR tag_name, LPCSTR attrib_name)
 {

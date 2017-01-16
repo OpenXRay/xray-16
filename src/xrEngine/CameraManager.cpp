@@ -167,10 +167,10 @@ void CCameraManager::Update(const Fvector& P, const Fvector& D, const Fvector& N
 {
 #ifdef DEBUG
     if (!Device.Paused()) {
-        VERIFY(dbg_upd_frame != Device.dwFrame);  // already updated !!!
+        VERIFY(dbg_upd_frame != Device.dwFrame); // already updated !!!
         dbg_upd_frame = Device.dwFrame;
     }
-#endif  // DEBUG
+#endif // DEBUG
     // camera
     if (flags & CCameraBase::flPositionRigid)
         m_cam_info.p.set(P);

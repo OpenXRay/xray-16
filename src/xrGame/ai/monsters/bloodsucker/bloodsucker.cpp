@@ -23,7 +23,7 @@
 #include "xr_level_controller.h"
 #ifdef DEBUG
 #include <dinput.h>
-#endif  // DEBUG
+#endif // DEBUG
 
 namespace detail
 {
@@ -45,8 +45,8 @@ char const* const full_visibility_radius_string = "full_visibility_radius";
 char const* const partial_visibility_radius_string = "partial_visibility_radius";
 char const* const visibility_state_change_min_delay_string = "visibility_state_change_min_delay";
 
-}  // namespace bloodsucker
-}  // namespace detail
+} // namespace bloodsucker
+} // namespace detail
 
 u32 CAI_Bloodsucker::m_time_last_vampire = 0;
 
@@ -284,7 +284,7 @@ void CAI_Bloodsucker::reinit()
     Bones.Reset();
 
     com_man().ta_fill_data(anim_triple_vampire, "vampire_0", "vampire_1", "vampire_2", TA_EXECUTE_LOOPED,
-        TA_DONT_SKIP_PREPARE, 0);  // ControlCom::eCapturePath | ControlCom::eCaptureMovement);
+        TA_DONT_SKIP_PREPARE, 0); // ControlCom::eCapturePath | ControlCom::eCaptureMovement);
 
     m_alien_control.reinit();
 
@@ -364,7 +364,7 @@ void CAI_Bloodsucker::vfAssignBones()
         smart_cast<IKinematics*>(Visual())->LL_BoneID("bip01_spine"));
     bone_head = &smart_cast<IKinematics*>(Visual())->LL_GetBoneInstance(
         smart_cast<IKinematics*>(Visual())->LL_BoneID("bip01_head"));
-    if (!PPhysicsShell())  //нельзя ставить колбеки, если создан физ шел - у него стоят свои колбеки!!!
+    if (!PPhysicsShell()) //нельзя ставить колбеки, если создан физ шел - у него стоят свои колбеки!!!
     {
         bone_spine->set_callback(bctCustom, BoneCallback, this);
         bone_head->set_callback(bctCustom, BoneCallback, this);
@@ -396,7 +396,7 @@ void CAI_Bloodsucker::LookDirection(Fvector to_dir, float bone_turn_speed)
     //	bone_angle = dy;
     //} else {													// torso & bone turn
     //	if (movement().IsMoveAlongPathFinished() || !movement().enabled()) movement().m_body.target.yaw =
-    //angle_normalize(-yaw);
+    // angle_normalize(-yaw);
     //	if (dy / 2 < MAX_BONE_ANGLE) bone_angle = dy / 2;
     //	else bone_angle = MAX_BONE_ANGLE;
     //}
@@ -881,6 +881,6 @@ void CAI_Bloodsucker::debug_on_key(int key)
         break;
     }
 }
-#endif  //_DEBUG
+#endif //_DEBUG
 
-#endif  // DEBUG
+#endif // DEBUG

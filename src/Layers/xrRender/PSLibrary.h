@@ -13,7 +13,7 @@ DEFINE_VECTOR(CPEDef*, PEDVec, PEDIt);
 
 class CPGDef;
 DEFINE_VECTOR(CPGDef*, PGDVec, PGDIt);
-}  // namespace PS
+} // namespace PS
 
 class ECORE_API CPSLibrary : public particles_systems::library_interface
 {

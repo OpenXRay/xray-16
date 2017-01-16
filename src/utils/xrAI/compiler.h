@@ -14,26 +14,26 @@ const u32 InvalidNode = (1 << 24) - 1;
 const u32 UnkonnectedNode = 0xfffffff0;
 const WORD InvalidSector = 0xff;
 
-struct vertex  // definition of "patch" or "node"
+struct vertex // definition of "patch" or "node"
 {
     union
     {
         struct
         {
-            u32 n1, n2, n3, n4;  // neighbourh patches (Left,Forward,Right,Backward)
+            u32 n1, n2, n3, n4; // neighbourh patches (Left,Forward,Right,Backward)
         };
         u32 n[4];
     };
-    Fplane Plane;  // plane of patch
-    Fvector Pos;   // position of patch center
-    WORD Sector;   //
+    Fplane Plane; // plane of patch
+    Fvector Pos;  // position of patch center
+    WORD Sector;  //
 
     u32 Group;
 
     float LightLevel;
 
-    float high_cover[4];  // cover in four directions
-    float low_cover[4];   // cover in four directions
+    float high_cover[4]; // cover in four directions
+    float low_cover[4];  // cover in four directions
 
     vertex()
     {
@@ -63,17 +63,17 @@ void Compress(CLevelGraph::CVertex& Dest, vertex& Src);
 
 struct R_Light
 {
-    u32 type;            // Type of light source
-    float amount;        // Diffuse color of light
-    Fvector position;    // Position in world space
-    Fvector direction;   // Direction in world space
-    float range;         // Cutoff range
-    float range2;        // ^2
-    float attenuation0;  // Constant attenuation
-    float attenuation1;  // Linear attenuation
-    float attenuation2;  // Quadratic attenuation
+    u32 type;           // Type of light source
+    float amount;       // Diffuse color of light
+    Fvector position;   // Position in world space
+    Fvector direction;  // Direction in world space
+    float range;        // Cutoff range
+    float range2;       // ^2
+    float attenuation0; // Constant attenuation
+    float attenuation1; // Linear attenuation
+    float attenuation2; // Quadratic attenuation
 
-    Fvector tri[3];  // Cached triangle for ray-testing
+    Fvector tri[3]; // Cached triangle for ray-testing
 };
 
 struct SCover

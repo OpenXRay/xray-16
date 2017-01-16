@@ -26,8 +26,8 @@ public:
     virtual void OnPlayerRankChanged() = 0;
     virtual void OnRoundEnd() = 0;
     virtual void OnRoundStart() = 0;
-};  // class game_events_handler
+}; // class game_events_handler
 
-}  // namespace award_system
+} // namespace award_system
 
-#endif  //#ifndef GAME_EVENTS_HANDLER_INCLUDED
+#endif //#ifndef GAME_EVENTS_HANDLER_INCLUDED

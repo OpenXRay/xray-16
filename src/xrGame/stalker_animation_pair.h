@@ -24,7 +24,7 @@ public:
     {
         all_bone_parts = u16(0xf),
     };
-#endif  // USE_HEAD_BONE_PART_FAKE
+#endif // USE_HEAD_BONE_PART_FAKE
 
 public:
     typedef xr_vector<float> ANIMATION_WEIGHTS;
@@ -55,17 +55,17 @@ public:
 private:
     LPCSTR m_object_name;
     LPCSTR m_animation_type_name;
-#endif  // DEBUG
+#endif // DEBUG
 
 private:
     void select_animation(const ANIM_VECTOR& array, const ANIMATION_WEIGHTS* weights);
 #ifndef USE_HEAD_BONE_PART_FAKE
     void play_global_animation(IKinematicsAnimated* skeleton_animated, PlayCallback callback,
         const bool& use_animation_movement_control, const bool& local_animation, bool mix_animations);
-#else   // USE_HEAD_BONE_PART_FAKE
+#else  // USE_HEAD_BONE_PART_FAKE
     void play_global_animation(IKinematicsAnimated* skeleton_animated, PlayCallback callback, const u32& bone_part,
         const bool& use_animation_movement_control, const bool& local_animation, bool mix_animations);
-#endif  // USE_HEAD_BONE_PART_FAKE
+#endif // USE_HEAD_BONE_PART_FAKE
 
 public:
     IC CStalkerAnimationPair(CAI_Stalker* object);
@@ -86,17 +86,17 @@ public:
 #ifndef USE_HEAD_BONE_PART_FAKE
     void play(IKinematicsAnimated* skeleton_animated, PlayCallback callback, const bool& use_animation_movement_control,
         const bool& local_animation, bool continue_interrupted_animation = true, bool mix_animations = true);
-#else   // USE_HEAD_BONE_PART_FAKE
+#else  // USE_HEAD_BONE_PART_FAKE
     void play(IKinematicsAnimated* skeleton_animated, PlayCallback callback, const bool& use_animation_movement_control,
         const bool& local_animation, bool continue_interrupted_animation = true, const u32& bone_part = all_bone_parts,
         bool mix_animations = true);
-#endif  // USE_HEAD_BONE_PART_FAKE
+#endif // USE_HEAD_BONE_PART_FAKE
 
 #ifdef DEBUG
 public:
     IC void set_dbg_info(LPCSTR object_name, LPCSTR animation_type_name);
     BLEND_ID* blend_id(IKinematicsAnimated* skeleton_animated, BLEND_ID& result) const;
-#endif  // DEBUG
+#endif // DEBUG
 
 public:
     IC const CALLBACK_ID* callback(const CALLBACK_ID& callback) const;

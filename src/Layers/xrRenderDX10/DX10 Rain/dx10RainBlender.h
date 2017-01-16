@@ -28,4 +28,4 @@ public:
     LPCSTR Definition;
 };
 
-#endif  //	dx10RainBlender_included
+#endif //	dx10RainBlender_included

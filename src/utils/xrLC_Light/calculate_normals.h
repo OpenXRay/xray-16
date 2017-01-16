@@ -56,7 +56,7 @@ public:
             {
                 vecFace new_adj;
                 itterate_adjacents_type::recurse_tri_params p(pTestVertex, new_adj, sm_cos);
-                itterate_adjacents_type::RecurseTri(0, p);  // pTestVertex, new_adj, sm_cos );
+                itterate_adjacents_type::RecurseTri(0, p); // pTestVertex, new_adj, sm_cos );
                 VERIFY(!new_adj.empty());
 
                 type_vertex* pNewVertex = pTestVertex->CreateCopy_NOADJ(vertices);
@@ -88,4 +88,4 @@ public:
             (*it)->flags.bSplitted = false;
     }
 };
-#endif  //__CALCULATE_NORMALS_H__
+#endif //__CALCULATE_NORMALS_H__

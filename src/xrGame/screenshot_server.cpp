@@ -41,10 +41,10 @@ void clientdata_proxy::make_screenshot(ClientID const& admin_id, ClientID const&
     NET_Packet ssr_packet;
     ssr_packet.w_begin(M_GAMEMESSAGE);
     ssr_packet.w_u32(GAME_EVENT_MAKE_DATA);
-    ssr_packet.w_u8(e_screenshot_request);  // make screenshot
+    ssr_packet.w_u8(e_screenshot_request); // make screenshot
 
     // alligning size to GAME_EVENT_PLAYER_KILLED message size
-    ssr_packet.w_u16(u16(Random.randI(2)));  // food for thought for crackers :)
+    ssr_packet.w_u16(u16(Random.randI(2))); // food for thought for crackers :)
     ssr_packet.w_u16(u16(Random.randI(2)));
     ssr_packet.w_u16(u16(Random.randI(2)));
     ssr_packet.w_u8(u8(Random.randI(2)));
@@ -76,10 +76,10 @@ void clientdata_proxy::make_config_dump(ClientID const& admin_id, ClientID const
     NET_Packet ssr_packet;
     ssr_packet.w_begin(M_GAMEMESSAGE);
     ssr_packet.w_u32(GAME_EVENT_MAKE_DATA);
-    ssr_packet.w_u8(e_configs_request);  // make screenshot
+    ssr_packet.w_u8(e_configs_request); // make screenshot
 
     // alligning size to GAME_EVENT_PLAYER_KILLED message size
-    ssr_packet.w_u16(u16(Random.randI(2)));  // food for thought for crackers :)
+    ssr_packet.w_u16(u16(Random.randI(2))); // food for thought for crackers :)
     ssr_packet.w_u16(u16(Random.randI(2)));
     ssr_packet.w_u16(u16(Random.randI(2)));
     ssr_packet.w_u8(u8(Random.randI(2)));
@@ -104,7 +104,7 @@ void clientdata_proxy::notify_admin(clientdata_event_t event_for_admin, char con
     NET_Packet ssr_packet;
     ssr_packet.w_begin(M_GAMEMESSAGE);
     ssr_packet.w_u32(GAME_EVENT_MAKE_DATA);
-    ssr_packet.w_u8(static_cast<u8>(event_for_admin));  // receive data
+    ssr_packet.w_u8(static_cast<u8>(event_for_admin)); // receive data
     ssr_packet.w_u32(m_chearer_id.value());
 
     if ((event_for_admin == e_screenshot_response) || (event_for_admin == e_configs_response)) {
@@ -152,7 +152,7 @@ void clientdata_proxy::save_proxy_config()
     clgame->generate_file_name(dest_file_name, fn_suffix, date_time);
     IWriter* tmp_writer = FS.w_open("$screenshots$", dest_file_name);
     if (!tmp_writer) return;
-    tmp_writer->w_u32(m_receiver->get_user_param());  // unpacked size
+    tmp_writer->w_u32(m_receiver->get_user_param()); // unpacked size
     tmp_writer->w(my_proxy_mem_file.pointer(), my_proxy_mem_file.size());
     FS.w_close(tmp_writer);
 }

@@ -19,7 +19,7 @@ namespace PS
 class CParticleEffect;
 
 typedef BOOL (*CollisionCallback)(
-    CParticleEffect* E, PAPI::Particle& P, const Fvector& pt, const Fvector& norm);  // TRUE-continue collision exec
+    CParticleEffect* E, PAPI::Particle& P, const Fvector& pt, const Fvector& norm); // TRUE-continue collision exec
 typedef void (*DestroyCallback)(CParticleEffect* E, PAPI::Particle& P);
 
 class PFunction;
@@ -82,11 +82,11 @@ public:
     // compiled actions
     CMemoryWriter m_Actions;
     // def
-    float m_fTimeLimit;           // time limit
-    int m_MaxParticles;           // max particle count
-    Fvector m_VelocityScale;      // velocity scale
-    Fvector m_APDefaultRotation;  // align to path
-                                  // collision
+    float m_fTimeLimit;          // time limit
+    int m_MaxParticles;          // max particle count
+    Fvector m_VelocityScale;     // velocity scale
+    Fvector m_APDefaultRotation; // align to path
+                                 // collision
     float m_fCollideOneMinusFriction;
     float m_fCollideResilience;
     float m_fCollideSqrCutoff;
@@ -156,7 +156,7 @@ public:
 #define PED_CHUNK_SPRITE 0x0007
 #define PED_CHUNK_TIMELIMIT 0x0008
 #define PED_CHUNK_TIMELIMIT2 0x0009
-#define PED_CHUNK_SOURCETEXT_ 0x0020  // obsolete
+#define PED_CHUNK_SOURCETEXT_ 0x0020 // obsolete
 #define PED_CHUNK_COLLISION 0x0021
 #define PED_CHUNK_VEL_SCALE 0x0022
 #define PED_CHUNK_EDATA 0x0024

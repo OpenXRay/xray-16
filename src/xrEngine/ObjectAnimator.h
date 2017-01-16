@@ -44,4 +44,4 @@ public:
     void DrawPath();
 };
 
-#endif  // ObjectAnimatorH
+#endif // ObjectAnimatorH

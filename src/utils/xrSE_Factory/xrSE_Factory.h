@@ -9,4 +9,4 @@
 #ifndef XRSE_FACTORY_H
 #define XRSE_FACTORY_H
 
-#endif  // XRSE_FACTORY_H
+#endif // XRSE_FACTORY_H

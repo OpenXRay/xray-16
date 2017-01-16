@@ -70,4 +70,4 @@ private:
     NodeMonitorManager* fManager;
 };
 
-#endif  // MAYA_ShadingConnection
+#endif // MAYA_ShadingConnection

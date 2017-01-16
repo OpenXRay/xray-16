@@ -94,11 +94,11 @@ bool net_execution_vertex_light::execute(net_task_callback& net_callback)
             (lc_global_data()->b_nosun() ? LP_dont_sun : 0) | LP_dont_hemi, 0);
         // vC._tmp_			= v_trans; //we olready have it in V->C.t
         vC.mul(.5f);
-        vC.hemi = old.hemi;  // preserve pre-calculated hemisphere
+        vC.hemi = old.hemi; // preserve pre-calculated hemisphere
         V->C._set(vC.rgb, vC.hemi, vC.sun);
     }
 
-    return true;  //! net_callback.break_all();
+    return true; //! net_callback.break_all();
 }
 
 void net_execution_vertex_light::construct(u32 _start, u32 _end)

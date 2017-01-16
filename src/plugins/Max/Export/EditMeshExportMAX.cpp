@@ -257,7 +257,7 @@ bool CEditableMesh::Convert(CExporter* E)
     }
     if (bResult) {
         RecomputeBBox();
-        OptimizeMesh(true);  // false);
+        OptimizeMesh(true); // false);
         RebuildVMaps();
     }
     return bResult;

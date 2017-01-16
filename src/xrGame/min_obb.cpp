@@ -48,7 +48,7 @@ static Fvector GetColumn(Fmatrix& self, const u32& index)
     }
 #ifdef DEBUG
     return (Fvector().set(flt_max, flt_max, flt_max));
-#endif  // DEBUG
+#endif // DEBUG
 }
 
 //----------------------------------------------------------------------------

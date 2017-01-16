@@ -21,7 +21,7 @@ public:
     virtual ~reward_event_generator();
 
     void init_player(
-        game_PlayerState* local_player);  // must be called when buy menu and local_player will be initialized
+        game_PlayerState* local_player); // must be called when buy menu and local_player will be initialized
     void init_bone_groups(CActor* first_spawned_actor);
     void update();
 
@@ -54,8 +54,8 @@ private:
     u32 const m_max_rewards;
     u32 m_rewarded;
     void __stdcall AddRewardTask(u32 award_id);
-};  // class reward_event_generator
+}; // class reward_event_generator
 
-}  // namespace award_system
+} // namespace award_system
 
-#endif  //#ifndef REWARD_EVENT_GENERATOR_INCLUDED
+#endif //#ifndef REWARD_EVENT_GENERATOR_INCLUDED

@@ -37,7 +37,7 @@ void player_state_avenger::OnPlayerKilled(
         shared_str m_killer_name;
         u32 m_killer_spawn_time;
         buffer_vector<shared_str> m_my_team_players;
-    };  // struct need_revenge
+    }; // struct need_revenge
 
     game_PlayerState const* tmp_local_player = m_owner->get_local_player();
     if (!tmp_local_player || tmp_local_player->GameID != killer_id) return;
@@ -87,4 +87,4 @@ void player_state_avenger::OnPlayerSpawned(game_PlayerState const* ps)
     }
 }
 
-}  // namespace award_system
+} // namespace award_system

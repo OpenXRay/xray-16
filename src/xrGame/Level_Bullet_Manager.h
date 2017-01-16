@@ -10,40 +10,40 @@
 //коэфициенты и параметры патрона
 struct SBullet_Hit
 {
-    float power;    // power          * cartridge
-    float impulse;  // impulse        * cartridge
+    float power;   // power          * cartridge
+    float impulse; // impulse        * cartridge
 };
 
 //структура, описывающая пулю и ее свойства в полете
 struct SBullet
 {
-    u32 init_frame_num;  //номер кадра на котором была запущена пуля
+    u32 init_frame_num; //номер кадра на котором была запущена пуля
     union
     {
         struct
         {
-            u16 ricochet_was : 1;  //пуля срикошетила
-            u16 explosive : 1;     // special explosive mode for particles
+            u16 ricochet_was : 1; //пуля срикошетила
+            u16 explosive : 1;    // special explosive mode for particles
             u16 allow_tracer : 1;
-            u16 allow_ricochet : 1;  //разрешить рикошет
-            u16 allow_sendhit : 1;   // statistics
+            u16 allow_ricochet : 1; //разрешить рикошет
+            u16 allow_sendhit : 1;  // statistics
             //.			u16			skipped_frame	: 1	;			//пропуск первой отрисовки
-            u16 aim_bullet : 1;     //прицеленная пуля( вылетевшая первой после длительного молчания оружия (1-3 сек.))
-            u16 magnetic_beam : 1;  //магнитный луч (нет отклонения после пробивания, не падает скорость после
-                                    //пробивания)
+            u16 aim_bullet : 1;    //прицеленная пуля( вылетевшая первой после длительного молчания оружия (1-3 сек.))
+            u16 magnetic_beam : 1; //магнитный луч (нет отклонения после пробивания, не падает скорость после
+                                   //пробивания)
         };
         u16 _storage;
     } flags;
     u16 bullet_material_idx;
 
-    Fvector bullet_pos;  //текущая позиция
+    Fvector bullet_pos; //текущая позиция
     Fvector dir;
-    float speed;  //текущая скорость
+    float speed; //текущая скорость
 
-    u16 parent_id;  // ID персонажа который иницировал действие
-    u16 weapon_id;  // ID оружия из которого была выпущены пуля
+    u16 parent_id; // ID персонажа который иницировал действие
+    u16 weapon_id; // ID оружия из которого была выпущены пуля
 
-    float fly_dist;  //дистанция которую пуля пролетела
+    float fly_dist; //дистанция которую пуля пролетела
     Fvector tracer_start_position;
 
     Fvector start_position;
@@ -57,9 +57,9 @@ struct SBullet
     //-------------------------------------------------------------------
     float air_resistance;
     //-------------------------------------------------------------------
-    float max_speed;       // maxspeed*cartridge
-    float max_dist;        // maxdist*cartridge
-    float armor_piercing;  // ap
+    float max_speed;      // maxspeed*cartridge
+    float max_dist;       // maxdist*cartridge
+    float armor_piercing; // ap
     float wallmark_size;
     //-------------------------------------------------------------------
     u8 m_u8ColorID;
@@ -115,7 +115,7 @@ private:
     {
         EventType Type;
         BOOL dynamic;
-        BOOL Repeated;  // последовательное повторное попадание в динамический объект
+        BOOL Repeated; // последовательное повторное попадание в динамический объект
         SBullet_Hit hit_result;
         SBullet bullet;
         Fvector normal;
@@ -132,8 +132,8 @@ protected:
     //список пуль находящихся в данный момент на уровне
     //.	Lock		m_Lock				;
 
-    BulletVec m_Bullets;          // working set, locked
-    BulletVec m_BulletsRendered;  // copy for rendering
+    BulletVec m_Bullets;         // working set, locked
+    BulletVec m_BulletsRendered; // copy for rendering
     xr_vector<_event> m_Events;
 
 #ifdef DEBUG
@@ -141,7 +141,7 @@ protected:
 
     typedef xr_vector<Fvector> BulletPoints;
     BulletPoints m_bullet_points;
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 
     //отрисовка трассеров от пуль
     CTracer tracers;
@@ -212,8 +212,8 @@ public:
         float maximum_distance, const CCartridge& cartridge, float const air_resistance_factor, bool SendHit,
         bool AimBullet = false);
 
-    void CommitEvents();     // @ the start of frame
-    void CommitRenderSet();  // @ the end of frame
+    void CommitEvents();    // @ the start of frame
+    void CommitRenderSet(); // @ the end of frame
     void Render();
 };
 
@@ -222,7 +222,7 @@ struct bullet_test_callback_data
     Fvector collide_position;
     SBullet* pBullet;
     float collide_time;
-#if 1  // def DEBUG
+#if 1 // def DEBUG
     float high_time;
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 };

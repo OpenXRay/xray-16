@@ -40,9 +40,9 @@ struct find_chunk_counter
 
 #ifdef INCLUDE_FROM_ENGINE
 extern XR_IMPORT find_chunk_counter g_find_chunk_counter;
-#else   // INCLUDE_FROM_ENGINE
+#else  // INCLUDE_FROM_ENGINE
 extern XR_EXPORT find_chunk_counter g_find_chunk_counter;
-#endif  // INCLUDE_FROM_ENGINE
+#endif // INCLUDE_FROM_ENGINE
 
 extern bool g_initialize_cpu_called;
 
@@ -63,7 +63,7 @@ struct find_chunk_auto_timer
     }
 };
 
-#endif  // FIND_CHUNK_BENCHMARK_ENABLE
+#endif // FIND_CHUNK_BENCHMARK_ENABLE
 
 #ifdef FIND_CHUNK_STD
 
@@ -76,7 +76,7 @@ IC u32 IReaderBase<T>::find_chunk(u32 ID, BOOL* bCompressed)
 {
 #ifdef FIND_CHUNK_BENCHMARK_ENABLE
     find_chunk_auto_timer timer;
-#endif  // FIND_CHUNK_BENCHMARK_ENABLE
+#endif // FIND_CHUNK_BENCHMARK_ENABLE
 
     u32 dwSize, dwType;
 
@@ -97,7 +97,7 @@ IC u32 IReaderBase<T>::find_chunk(u32 ID, BOOL* bCompressed)
     return 0;
 }
 
-#endif  // #ifdef FIND_CHUNK_STD
+#endif // #ifdef FIND_CHUNK_STD
 
 #ifdef FIND_CHUNK_HEU
 
@@ -111,7 +111,7 @@ IC u32 IReaderBase<T>::find_chunk(u32 ID, BOOL* bCompressed)
 {
 #ifdef FIND_CHUNK_BENCHMARK_ENABLE
     find_chunk_auto_timer timer;
-#endif  // FIND_CHUNK_BENCHMARK_ENABLE
+#endif // FIND_CHUNK_BENCHMARK_ENABLE
 
     u32 dwSize, dwType;
 
@@ -166,7 +166,7 @@ IC u32 IReaderBase<T>::find_chunk(u32 ID, BOOL* bCompressed)
 
 #pragma warning(default : 4701)
 
-#endif  // #ifdef FIND_CHUNK_HEU
+#endif // #ifdef FIND_CHUNK_HEU
 
 #ifdef FIND_CHUNK_VEC
 
@@ -183,7 +183,7 @@ IC u32 IReaderBase<T>::find_chunk(u32 ID, BOOL* bCompressed)
 {
 #ifdef FIND_CHUNK_BENCHMARK_ENABLE
     find_chunk_auto_timer timer;
-#endif  // FIND_CHUNK_BENCHMARK_ENABLE
+#endif // FIND_CHUNK_BENCHMARK_ENABLE
 
     u32 dwSize, dwType;
 
@@ -233,7 +233,7 @@ IC u32 IReaderBase<T>::find_chunk(u32 ID, BOOL* bCompressed)
     return 0;
 }
 
-#endif  // #ifdef FIND_CHUNK_VEC
+#endif // #ifdef FIND_CHUNK_VEC
 
 #ifdef FIND_CHUNK_MAP
 
@@ -252,7 +252,7 @@ IC u32 IReaderBase<T>::find_chunk(u32 ID, BOOL* bCompressed)
 {
 #ifdef FIND_CHUNK_BENCHMARK_ENABLE
     find_chunk_auto_timer timer;
-#endif  // FIND_CHUNK_BENCHMARK_ENABLE
+#endif // FIND_CHUNK_BENCHMARK_ENABLE
 
     u32 dwSize, dwType;
 
@@ -303,6 +303,6 @@ IC u32 IReaderBase<T>::find_chunk(u32 ID, BOOL* bCompressed)
     return 0;
 }
 
-#endif  // #ifdef FIND_CHUNK_MAP
+#endif // #ifdef FIND_CHUNK_MAP
 
-#endif  // #ifndef FS_IMPL_H_INCLUDED
+#endif // #ifndef FS_IMPL_H_INCLUDED

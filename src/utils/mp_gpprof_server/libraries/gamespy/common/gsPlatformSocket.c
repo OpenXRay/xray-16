@@ -24,8 +24,8 @@
 #elif defined(_PS2)
 #include "ps2/gsSocketPs2.c"
 #elif defined(_PS3)
-#include "ps3/gsSocketPs3.c"
 #include <sys/select.h>
+#include "ps3/gsSocketPs3.c"
 #elif defined(_PSP)
 #include "psp/gsSocketPSP.c"
 #elif defined(_REVOLUTION)
@@ -36,11 +36,11 @@
 
 // Disable compiler warnings for issues that are unavoidable.
 /////////////////////////////////////////////////////////////
-#if defined(_MSC_VER)  // DevStudio
+#if defined(_MSC_VER) // DevStudio
 // Level4, "conditional expression is constant".
 // Occurs with use of the MS provided macro FD_SET
 #pragma warning(disable : 4127)
-#endif  // _MSC_VER
+#endif // _MSC_VER
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
@@ -99,7 +99,7 @@ int SetSockBlocking(SOCKET sock, int isblocking)
     if (isblocking)
         argp = -1;
     else
-        argp = 5;  // added longer timeout to 5ms
+        argp = 5; // added longer timeout to 5ms
     sceInsockSetRecvTimeout(sock, argp);
     sceInsockSetSendTimeout(sock, argp);
     sceInsockSetShutdownTimeout(sock, argp);
@@ -152,7 +152,7 @@ int DisableNagle(SOCKET sock)
 
     // not supported
     return 0;
-#endif  // moved this to here to silence VC warning
+#endif // moved this to here to silence VC warning
 }
 
 #ifndef INSOCK
@@ -285,9 +285,9 @@ int GSISocketSelect(SOCKET theSocket, int* theReadFlag, int* theWriteFlag, int* 
         else
             *theExceptFlag = 0;
     }
-    return aResult;  // 0 or 1 at this point
+    return aResult; // 0 or 1 at this point
 }
-#endif  // !nitro && !revolution && !insock
+#endif // !nitro && !revolution && !insock
 
 // Return 1 for immediate recv, otherwise 0
 int CanReceiveOnSocket(SOCKET sock)
@@ -413,7 +413,7 @@ HOSTENT* getlocalhost(void)
     localhost.h_addr_list = ipPtrs;
 
     // Look up each address and copy into the HOSTENT structure
-    aCount = 0;  // count of valid interfaces
+    aCount = 0; // count of valid interfaces
     for (aInterfaceNum = 0; aInterfaceNum < aNumInterfaces; aInterfaceNum++)
     {
         sceInetAddress_t anAddr;
@@ -627,4 +627,4 @@ gsi_u32 gsiGetBroadcastIP(void)
 ///////////////////////////////////////////////////
 #if defined(_MSC_VER)
 #pragma warning(default : 4127)
-#endif  // _MSC_VER
+#endif // _MSC_VER

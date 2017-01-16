@@ -35,17 +35,17 @@
 
 #ifndef MASTER_GOLD
 #include "custommonster.h"
-#endif  // MASTER_GOLD
+#endif // MASTER_GOLD
 
 #ifndef _EDITOR
 #include "ai_debug.h"
-#endif  // _EDITOR
+#endif // _EDITOR
 
 //#ifdef DEBUG_MEMORY_MANAGER
 //	static	void *	ode_alloc	(size_t size)								{ return Memory.mem_alloc(size,"ODE");
 //}
 //	static	void *	ode_realloc	(void *ptr, size_t oldsize, size_t newsize)	{ return
-//Memory.mem_realloc(ptr,newsize,"ODE");	}
+// Memory.mem_realloc(ptr,newsize,"ODE");	}
 //	static	void	ode_free	(void *ptr, size_t size)					{ return xr_free(ptr); }
 //#else // DEBUG_MEMORY_MANAGER
 //	static	void *	ode_alloc	(size_t size)								{ return xr_malloc(size);			}
@@ -256,7 +256,7 @@ void CGamePersistent::WeathersUpdate()
             {
                 CEnvAmbient::SSndChannel& ch = **I;
                 R_ASSERT(idx < 20);
-                if (ambient_sound_next_time[idx] == 0)  // first
+                if (ambient_sound_next_time[idx] == 0) // first
                 {
                     ambient_sound_next_time[idx] = Device.dwTimeGlobal + ch.get_rnd_sound_first_time();
                 }
@@ -275,13 +275,13 @@ void CGamePersistent::WeathersUpdate()
 
 #ifdef DEBUG
                     if (!snd._handle() && strstr(Core.Params, "-nosound")) continue;
-#endif  // DEBUG
+#endif // DEBUG
 
                     VERIFY(snd._handle());
                     u32 _length_ms = iFloor(snd.get_length_sec() * 1000.0f);
                     ambient_sound_next_time[idx] = Device.dwTimeGlobal + _length_ms + ch.get_rnd_sound_time();
                     //					Msg("- Playing ambient sound channel [%s]
-                    //file[%s]",ch.m_load_section.c_str(),snd._handle()->file_name());
+                    // file[%s]",ch.m_load_section.c_str(),snd._handle()->file_name());
                 }
             }
             /*
@@ -404,9 +404,9 @@ bool allow_intro()
 {
 #ifdef MASTER_GOLD
     if (g_SASH.IsRunning())
-#else   // #ifdef MASTER_GOLD
+#else  // #ifdef MASTER_GOLD
     if ((0 != strstr(Core.Params, "-nointro")) || g_SASH.IsRunning())
-#endif  // #ifdef MASTER_GOLD
+#endif // #ifdef MASTER_GOLD
     {
         return false;
     }
@@ -533,14 +533,14 @@ void CGamePersistent::OnFrame()
         if (Level().IsDemoPlay()) {
             CSpectator* tmp_spectr = smart_cast<CSpectator*>(Level().CurrentControlEntity());
             if (tmp_spectr) {
-                tmp_spectr->UpdateCL();  // updating spectator in pause (pause ability of demo play)
+                tmp_spectr->UpdateCL(); // updating spectator in pause (pause ability of demo play)
             }
         }
 #ifndef MASTER_GOLD
         if (Level().CurrentViewEntity() && IsGameTypeSingle()) {
             if (!g_actor || (g_actor->ID() != Level().CurrentViewEntity()->ID())) {
                 CCustomMonster* custom_monster = smart_cast<CCustomMonster*>(Level().CurrentViewEntity());
-                if (custom_monster)  // can be spectator in multiplayer
+                if (custom_monster) // can be spectator in multiplayer
                     custom_monster->UpdateCamera();
             }
             else
@@ -583,11 +583,11 @@ void CGamePersistent::OnFrame()
                             }
                         }
                     }
-#endif  // DEBUG
+#endif // DEBUG
                 }
             }
         }
-#else   // MASTER_GOLD
+#else  // MASTER_GOLD
         if (g_actor && IsGameTypeSingle()) {
             CCameraBase* C = NULL;
             if (!Actor()->Holder())
@@ -598,7 +598,7 @@ void CGamePersistent::OnFrame()
             Actor()->Cameras().UpdateFromCamera(C);
             Actor()->Cameras().ApplyDevice(VIEWPORT_NEAR);
         }
-#endif  // MASTER_GOLD
+#endif // MASTER_GOLD
     }
     __super ::OnFrame();
 
@@ -610,7 +610,7 @@ void CGamePersistent::OnFrame()
     if (0 != pDemoFile) {
         if (Device.dwTimeGlobal > uTime2Change) {
             // Change level + play demo
-            if (pDemoFile->elapsed() < 3) pDemoFile->seek(0);  // cycle
+            if (pDemoFile->elapsed() < 3) pDemoFile->seek(0); // cycle
 
             // Read params
             string512 params;
@@ -623,7 +623,7 @@ void CGamePersistent::OnFrame()
             Engine.Event.Defer("KERNEL:disconnect");
             Engine.Event.Defer("KERNEL:start", size_t(xr_strdup(_Trim(o_server))), size_t(xr_strdup(_Trim(o_client))));
             Engine.Event.Defer("GAME:demo", size_t(xr_strdup(_Trim(o_demo))), u64(o_time));
-            uTime2Change = 0xffffffff;  // Block changer until Event received
+            uTime2Change = 0xffffffff; // Block changer until Event received
         }
     }
 
@@ -806,7 +806,7 @@ void CGamePersistent::SetEffectorDOF(const Fvector& needed_dof)
 {
     if (m_bPickableDOF) return;
     m_dof[0] = needed_dof;
-    m_dof[2] = m_dof[1];  // current
+    m_dof[2] = m_dof[1]; // current
 }
 
 void CGamePersistent::RestoreEffectorDOF()
@@ -818,8 +818,8 @@ void CGamePersistent::RestoreEffectorDOF()
 //	m_dof		[4];	// 0-dest 1-current 2-from 3-original
 void CGamePersistent::UpdateDof()
 {
-    static float diff_far = pSettings->r_float("zone_pick_dof", "far");    // 70.0f;
-    static float diff_near = pSettings->r_float("zone_pick_dof", "near");  //-70.0f;
+    static float diff_far = pSettings->r_float("zone_pick_dof", "far");   // 70.0f;
+    static float diff_near = pSettings->r_float("zone_pick_dof", "near"); //-70.0f;
 
     if (m_bPickableDOF) {
         Fvector pick_dof;
@@ -827,14 +827,14 @@ void CGamePersistent::UpdateDof()
         pick_dof.x = pick_dof.y + diff_near;
         pick_dof.z = pick_dof.y + diff_far;
         m_dof[0] = pick_dof;
-        m_dof[2] = m_dof[1];  // current
+        m_dof[2] = m_dof[1]; // current
     }
     if (m_dof[1].similar(m_dof[0])) return;
 
     float td = Device.fTimeDelta;
     Fvector diff;
     diff.sub(m_dof[0], m_dof[2]);
-    diff.mul(td / 0.2f);  // 0.2 sec
+    diff.mul(td / 0.2f); // 0.2 sec
     m_dof[1].add(diff);
     (m_dof[0].x < m_dof[2].x) ? clamp(m_dof[1].x, m_dof[0].x, m_dof[2].x) : clamp(m_dof[1].x, m_dof[2].x, m_dof[0].x);
     (m_dof[0].y < m_dof[2].y) ? clamp(m_dof[1].y, m_dof[0].y, m_dof[2].y) : clamp(m_dof[1].y, m_dof[2].y, m_dof[0].y);

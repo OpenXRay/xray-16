@@ -31,8 +31,8 @@ void CPoltergeisMovementManager::move_along_path(
     // Вычислить пройденную дистанцию, определить целевую позицию на маршруте,
     //			 изменить detail().curr_travel_point_index()
 
-    float desirable_speed = old_desirable_speed();  // желаемая скорость объекта
-    float dist = desirable_speed * time_delta;      // пройденное расстояние в соостветствие с желаемой скоростью
+    float desirable_speed = old_desirable_speed(); // желаемая скорость объекта
+    float dist = desirable_speed * time_delta;     // пройденное расстояние в соостветствие с желаемой скоростью
     float desirable_dist = dist;
 
     // определить целевую точку

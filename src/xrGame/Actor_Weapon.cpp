@@ -107,10 +107,10 @@ void CActor::SetWeaponHideState(u16 State, bool bSet)
     };
 }
 static u16 BestWeaponSlots[] = {
-    INV_SLOT_3,    // 2
-    INV_SLOT_2,    // 1
-    GRENADE_SLOT,  // 3
-    KNIFE_SLOT,    // 0
+    INV_SLOT_3,   // 2
+    INV_SLOT_2,   // 1
+    GRENADE_SLOT, // 3
+    KNIFE_SLOT,   // 0
 };
 void CActor::SelectBestWeapon(IGameObject* O)
 {
@@ -125,12 +125,12 @@ void CActor::SelectBestWeapon(IGameObject* O)
     CInventoryItem* pIItem = smart_cast<CInventoryItem*>(O);
     bool NeedToSelectBestWeapon = false;
 
-    if (pArtefact && pArtefact->H_Parent())  // just take an artefact
+    if (pArtefact && pArtefact->H_Parent()) // just take an artefact
         return;
 
     if ((pWeapon || pGrenade || pArtefact) && pIItem) {
         NeedToSelectBestWeapon = true;
-        if ((GameID() == eGameIDArtefactHunt) || (GameID() == eGameIDCaptureTheArtefact))  // only for test...
+        if ((GameID() == eGameIDArtefactHunt) || (GameID() == eGameIDCaptureTheArtefact)) // only for test...
         {
             if (pIItem->BaseSlot() == INV_SLOT_2 || pIItem->BaseSlot() == INV_SLOT_3) {
                 CInventoryItem* pIItemInSlot = inventory().ItemFromSlot(pIItem->BaseSlot());
@@ -148,14 +148,14 @@ void CActor::SelectBestWeapon(IGameObject* O)
                 if (best_item && best_item->can_kill()) {
 #ifdef DEBUG
                     Msg("--- Selecting best weapon [%d], Frame[%d]", BestWeaponSlots[i], Device.dwFrame);
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
                     inventory().Activate(BestWeaponSlots[i]);
                 }
                 else
                 {
 #ifdef DEBUG
                     Msg("--- Weapon is not best...");
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
                 }
             }
             return;

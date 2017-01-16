@@ -11,7 +11,7 @@
 #include "Include/xrAPI/xrAPI.h"
 #include "PCH.hpp"
 #include "patrol_path_storage.h"
-#include "xrScriptEngine/DebugMacros.hpp"  // for THROW3 // XXX: move debug macros to xrCore
+#include "xrScriptEngine/DebugMacros.hpp" // for THROW3 // XXX: move debug macros to xrCore
 #include "xrScriptEngine/script_engine.hpp"
 
 CPatrolPathParams::CPatrolPathParams(LPCSTR caPatrolPathToGo, EPatrolStartType tPatrolPathStart,

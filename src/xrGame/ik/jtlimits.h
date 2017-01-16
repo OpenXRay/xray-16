@@ -143,8 +143,8 @@ public:
 
     AngleInt& Limit() { return limits; }
     // Given psi calcuate joint variable. Two solns
-    float theta1(float psi) const;  // family 1
-    float theta2(float psi) const;  // family 2
+    float theta1(float psi) const; // family 1
+    float theta2(float psi) const; // family 2
     float theta(int family, float psi) const;
 
     // Derivatives of theta
@@ -208,11 +208,11 @@ public:
 class ComplexJtLimit
 {
 private:
-    PsiEquation cos_eq;  // cos(theta) equation
-    PsiEquation sin_eq;  // sin(theta) equation
-    PsiEquation eq;      // gamma equation
-    int type;            // Whether eq is a sin or cos of gamma
-    PsiEquation deriv;   // Derivative of sin_eq/cos_eq without denom
+    PsiEquation cos_eq; // cos(theta) equation
+    PsiEquation sin_eq; // sin(theta) equation
+    PsiEquation eq;     // gamma equation
+    int type;           // Whether eq is a sin or cos of gamma
+    PsiEquation deriv;  // Derivative of sin_eq/cos_eq without denom
     AngleInt limits;
     float tan_low, tan_high;
 
@@ -255,8 +255,8 @@ public:
 
     // Given psi calcuate joint variable. Two solns
 
-    float theta1(float psi) const;  // family 1
-    float theta2(float psi) const;  // family 2
+    float theta1(float psi) const; // family 1
+    float theta2(float psi) const; // family 2
     float theta(int, float psi) const;
 
     // Derivatives of theta wrt to psi

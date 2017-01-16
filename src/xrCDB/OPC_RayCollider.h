@@ -163,35 +163,35 @@ public:
 
 protected:
     // Ray in local space
-    Point mOrigin;  //!< Ray origin
-    Point mDir;     //!< Ray direction (normalized)
-    Point mFDir;    //!< fabsf(mDir)
+    Point mOrigin; //!< Ray origin
+    Point mDir;    //!< Ray direction (normalized)
+    Point mFDir;   //!< fabsf(mDir)
     Point mData, mData2;
     // Stabbed faces
-    CollisionFace mStabbedFace;     //!< Current stabbed face
-    CollisionFaces* mStabbedFaces;  //!< List of stabbed faces
+    CollisionFace mStabbedFace;    //!< Current stabbed face
+    CollisionFaces* mStabbedFaces; //!< List of stabbed faces
 #ifdef OPC_USE_CALLBACKS
     // User callback
-    udword mUserData;           //!< User-defined data sent to callback
-    OPC_CALLBACK mObjCallback;  //!< Object callback
+    udword mUserData;          //!< User-defined data sent to callback
+    OPC_CALLBACK mObjCallback; //!< Object callback
 #else
     // User pointers
-    const IndexedTriangle* mFaces;  //!< User-defined faces
-    const Point* mVerts;            //!< User-defined vertices
+    const IndexedTriangle* mFaces; //!< User-defined faces
+    const Point* mVerts;           //!< User-defined vertices
 #endif
     // Stats
-    udword mNbRayBVTests;     //!< Number of Ray-BV tests
-    udword mNbRayPrimTests;   //!< Number of Ray-Primitive tests
-                              // In-out test
-    udword mNbIntersections;  //!< Number of valid intersections
-                              // Dequantization coeffs
+    udword mNbRayBVTests;    //!< Number of Ray-BV tests
+    udword mNbRayPrimTests;  //!< Number of Ray-Primitive tests
+                             // In-out test
+    udword mNbIntersections; //!< Number of valid intersections
+                             // Dequantization coeffs
     Point mCenterCoeff;
     Point mExtentsCoeff;
     // Settings
-    float mMaxDist;    //!< Valid segment on the ray
-    bool mClosestHit;  //!< Report closest hit only
-    bool mCulling;     //!< Stab culled faces or not
-                       // Internal methods
+    float mMaxDist;   //!< Valid segment on the ray
+    bool mClosestHit; //!< Report closest hit only
+    bool mCulling;    //!< Stab culled faces or not
+                      // Internal methods
     void _Stab(const AABBCollisionNode* node);
     void _Stab(const AABBNoLeafNode* node);
     void _Stab(const AABBQuantizedNode* node);
@@ -210,4 +210,4 @@ protected:
     BOOL InitQuery(const Ray& world_ray, const Matrix4x4* world = null, udword* faceid = null);
 };
 
-#endif  // __OPC_RAYCOLLIDER_H__
+#endif // __OPC_RAYCOLLIDER_H__

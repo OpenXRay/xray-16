@@ -64,4 +64,4 @@ public:
 
 #include "moving_object_inline.h"
 
-#endif  // MOVING_OBJECT_H
+#endif // MOVING_OBJECT_H

@@ -22,7 +22,7 @@ ScheduledBase::~ScheduledBase()
 // we need this to become MASTER_GOLD
 #ifndef DEBUG
     Engine.Sheduler.Unregister(this);
-#endif  // DEBUG
+#endif // DEBUG
 }
 
 void ScheduledBase::shedule_register()

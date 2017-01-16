@@ -150,24 +150,24 @@ void game_PlayerState::skip_Import(NET_Packet& P)
 {
     BOOL bFullUpdate = !!P.r_u8();
 
-    P.r_u8();  //	team	);
+    P.r_u8(); //	team	);
 
-    P.r_s16();  //	m_iRivalKills	);
-    P.r_s16();  //	m_iSelfKills	);
-    P.r_s16();  //	m_iTeamKills	);
-    P.r_s16();  //	m_iDeaths		);
+    P.r_s16(); //	m_iRivalKills	);
+    P.r_s16(); //	m_iSelfKills	);
+    P.r_s16(); //	m_iTeamKills	);
+    P.r_s16(); //	m_iDeaths		);
 
-    P.r_s32();  //	money_for_round	);
-    P.r_u8();   //	rank		);
-    P.r_u8();   //	af_count	);
-    P.r_u16();  //	flags__	);
-    P.r_u16();  //	ping	);
+    P.r_s32(); //	money_for_round	);
+    P.r_u8();  //	rank		);
+    P.r_u8();  //	af_count	);
+    P.r_u16(); //	flags__	);
+    P.r_u16(); //	ping	);
 
-    P.r_u16();  //	GameID	);
-    P.r_s8();   //	skin	);
-    P.r_u8();   //	m_bCurrentVoteAgreed	);
+    P.r_u16(); //	GameID	);
+    P.r_s8();  //	skin	);
+    P.r_u8();  //	m_bCurrentVoteAgreed	);
 
-    P.r_u32();  // DeathTime
+    P.r_u32(); // DeathTime
     if (bFullUpdate) {
         player_account::skip_Import(P);
     }

@@ -104,7 +104,7 @@ IC float DistToFragmenton(const dReal* point, const dReal* pt1, const dReal* pt2
     dVector3 L = {pt1[0] - point[0], pt1[1] - point[1], pt1[2] - point[2]};
     dReal sq_mag_V = dDOT(V, V);
     dReal dot_L_V = dDOT(L, V);
-    dReal t = -dot_L_V / sq_mag_V;  // t
+    dReal t = -dot_L_V / sq_mag_V; // t
     if (t < 0.f) {
         c = 1;
         dVectorSet(p, pt1);

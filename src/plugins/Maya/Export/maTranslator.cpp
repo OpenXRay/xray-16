@@ -34,7 +34,7 @@ MStatus CXRayObjectExport::writer(const MFileObject& file, const MString& option
         // Start parsing.
         MStringArray optionList;
         MStringArray theOption;
-        options.split(';', optionList);  // break out all the options.
+        options.split(';', optionList); // break out all the options.
 
         length = optionList.length();
         for (i = 0; i < length; ++i)
@@ -355,7 +355,7 @@ bool CXRayObjectExport::initializeSetsAndLookupTables(bool exportAll)
         }
 
         if (transformNodeNameArray.length() > 0) {
-            objectGroupsTablePtr = xr_alloc<bool*>(objectCount);  // (bool**) malloc( sizeof(bool*)*objectCount );
+            objectGroupsTablePtr = xr_alloc<bool*>(objectCount); // (bool**) malloc( sizeof(bool*)*objectCount );
             length = transformNodeNameArray.length();
             for (i = 0; i < objectCount; i++)
             {
@@ -378,8 +378,8 @@ bool CXRayObjectExport::initializeSetsAndLookupTables(bool exportAll)
     // Create the vertex/polygon look-up tables.
     //
     if (objectCount > 0) {
-        vertexTablePtr = xr_alloc<bool*>(objectCount);   //(bool**) malloc( sizeof(bool*)*objectCount );
-        polygonTablePtr = xr_alloc<bool*>(objectCount);  //(bool**) malloc( sizeof(bool*)*objectCount );
+        vertexTablePtr = xr_alloc<bool*>(objectCount);  //(bool**) malloc( sizeof(bool*)*objectCount );
+        polygonTablePtr = xr_alloc<bool*>(objectCount); //(bool**) malloc( sizeof(bool*)*objectCount );
 
         for (i = 0; i < objectCount; i++)
         {
@@ -541,12 +541,12 @@ bool CXRayObjectExport::initializeSetsAndLookupTables(bool exportAll)
                                     break;
                                 }
                             }
-                        }  // end of piter.next() loop
-                    }      // end of condition if (object.hasFn(MFn::kMesh))
-                }          // end of else condifion if (!component.isNull())
-            }              // end of memberList.getDagPath(m,object,component)
-        }                  // end of memberList loop
-    }                      // end of for-loop for sets
+                        } // end of piter.next() loop
+                    }     // end of condition if (object.hasFn(MFn::kMesh))
+                }         // end of else condifion if (!component.isNull())
+            }             // end of memberList.getDagPath(m,object,component)
+        }                 // end of memberList loop
+    }                     // end of for-loop for sets
 
     // Go through all of the group members and mark in the
     // lookup-table, the group that each shape belongs to.
@@ -699,7 +699,7 @@ void CXRayObjectExport::CreateSmoothingGroups(MFnMesh& fnMesh)
     // Now create a polyId->smoothingGroup table
     //
     int numPolygons = fnMesh.numPolygons();
-    polySmoothingGroups = xr_alloc<int>(numPolygons);  //(int*)malloc( sizeof(int) *  numPolygons );
+    polySmoothingGroups = xr_alloc<int>(numPolygons); //(int*)malloc( sizeof(int) *  numPolygons );
     for (int i = 0; i < numPolygons; i++)
     {
         polySmoothingGroups[i] = NO_SMOOTHING_GROUP;
@@ -789,7 +789,7 @@ bool CXRayObjectExport::smoothingAlgorithm(int polyId, MFnMesh& fnMesh)
             //       halfEdge polygons get a smoothing group of
             //       NO_SMOOTHING_GROUP which is equivalent to "s off"
             //
-            if (NO_SMOOTHING_GROUP != elem->polyIds[1]) {  // Edge not a border
+            if (NO_SMOOTHING_GROUP != elem->polyIds[1]) { // Edge not a border
 
                 // We are starting a new smoothing group
                 //
@@ -813,7 +813,7 @@ bool CXRayObjectExport::smoothingAlgorithm(int polyId, MFnMesh& fnMesh)
                     smoothEdgeFound = true;
                 }
                 else
-                {  // Hard edge so ignore this polygon
+                { // Hard edge so ignore this polygon
                     continue;
                 }
 
@@ -853,7 +853,7 @@ void CXRayObjectExport::addEdgeInfo(int v1, int v2, bool smooth)
     SXREdgeInfoPtr element = NULL;
 
     if (NULL == edgeTable[v1]) {
-        edgeTable[v1] = xr_alloc<SXREdgeInfo>(1);  //(EdgeInfoPtr)malloc( sizeof(struct EdgeInfo) );
+        edgeTable[v1] = xr_alloc<SXREdgeInfo>(1); //(EdgeInfoPtr)malloc( sizeof(struct EdgeInfo) );
         element = edgeTable[v1];
     }
     else
@@ -863,7 +863,7 @@ void CXRayObjectExport::addEdgeInfo(int v1, int v2, bool smooth)
         {
             element = element->next;
         }
-        element->next = xr_alloc<SXREdgeInfo>(1);  //(EdgeInfoPtr)malloc( sizeof(struct EdgeInfo) );
+        element->next = xr_alloc<SXREdgeInfo>(1); //(EdgeInfoPtr)malloc( sizeof(struct EdgeInfo) );
         element = element->next;
     }
 

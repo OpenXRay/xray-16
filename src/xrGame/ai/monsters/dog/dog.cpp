@@ -345,39 +345,39 @@ LPCSTR CAI_Dog::get_current_animation()
     switch (current_anim)
     {
     case 1:
-        return "stand_idle_smelling_up_0";  //Нюхает вверх
+        return "stand_idle_smelling_up_0"; //Нюхает вверх
     case 2:
-        return "stand_idle_smelling_down_0";  //Нюхает вниз
+        return "stand_idle_smelling_down_0"; //Нюхает вниз
     case 3:
-        return "stand_idle_smelling_look_around_0";  //Нюхает по кругу
+        return "stand_idle_smelling_look_around_0"; //Нюхает по кругу
     case 4:
-        return "stand_idle_dig_ground_0";  //Обнюховает и роет землю
+        return "stand_idle_dig_ground_0"; //Обнюховает и роет землю
     case 5:
-        return "stand_idle_howl_0";  //Воет
+        return "stand_idle_howl_0"; //Воет
     case 6:
-        return "stand_growl_idle_0";  //Рычит стоя
+        return "stand_growl_idle_0"; //Рычит стоя
     case 7:
-        return "stand_idle_shake_0";  //Отряхивается !!!!!
+        return "stand_idle_shake_0"; //Отряхивается !!!!!
     case 8:
-        return "stand_sit_down_0";  //Садиться
+        return "stand_sit_down_0"; //Садиться
     case 9:
-        return "sit_idle_0";  // Cидит
+        return "sit_idle_0"; // Cидит
     case 10:
-        return "sit_idle_1";  //Чухается сидя
+        return "sit_idle_1"; //Чухается сидя
     case 11:
-        return "sit_idle_2";  //Оглядывается сидя
+        return "sit_idle_2"; //Оглядывается сидя
     case 12:
-        return "sit_stand_up_0";  //Встает
+        return "sit_stand_up_0"; //Встает
     case 13:
-        return "sit_lie_down_0";  //Ложится
+        return "sit_lie_down_0"; //Ложится
     case 14:
-        return "lie_to_sit_0";  //Подымается
+        return "lie_to_sit_0"; //Подымается
     case 15:
-        return "stand_eat_0";  //Отрывает куски
+        return "stand_eat_0"; //Отрывает куски
     case 16:
-        return "stand_threaten_0";  //Лает
+        return "stand_threaten_0"; //Лает
     default:
-        return "stand_idle_1";  //Нюхает вперед
+        return "stand_idle_1"; //Нюхает вперед
     }
 }
 

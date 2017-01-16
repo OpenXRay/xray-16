@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
 #ifndef DEBUG_MEMORY_MANAGER
-#include <malloc.h>  // _alloca
+#include <malloc.h> // _alloca
 
 namespace
 {
@@ -98,4 +98,4 @@ NO_INLINE void save_stack_trace()
     }
     stats.insert({crc, {stackTrace, 1}});
 }
-#endif  // DEBUG_MEMORY_MANAGER
+#endif // DEBUG_MEMORY_MANAGER

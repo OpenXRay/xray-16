@@ -45,4 +45,4 @@ public:
     virtual BOOL renderable_ShadowReceive() override { return FALSE; }
 };
 
-#endif  // IRENDERABLE_H_INCLUDED
+#endif // IRENDERABLE_H_INCLUDED

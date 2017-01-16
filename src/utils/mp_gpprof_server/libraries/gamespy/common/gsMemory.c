@@ -36,7 +36,7 @@ typedef gsi_u32 gsi_uint;
 // Small block optimization using fixed size mempool.
 // add multi-threaded support
 
-#define MEM_PROFILE (1)  // if on additional memprofiling code will be enabled for such things as high water mark calcs
+#define MEM_PROFILE (1) // if on additional memprofiling code will be enabled for such things as high water mark calcs
 #if defined(MEM_PROFILE)
 #define IF_MEM_PROFILE_ISON(a) a
 #else
@@ -45,12 +45,12 @@ typedef gsi_u32 gsi_uint;
 
 // Disable compiler warnings for issues that are unavoidable.
 /////////////////////////////////////////////////////////////
-#if defined(_MSC_VER)  // DevStudio
+#if defined(_MSC_VER) // DevStudio
 // Level4, "conditional expression is constant".
 // Occurs with use of the MS provided macro FD_SET
 #pragma warning(disable : 4127)
 #include <malloc.h>
-#endif  // _MSC_VER
+#endif // _MSC_VER
 
 #ifdef _WIN32
 #define MEM_MANAGER_CALL _cdecl
@@ -114,9 +114,9 @@ static MemManagerCallbacks memmanagercallbacks = {
 #ifdef MEM_MANAGER_DIRECT
     &malloc, &free, &realloc,
 #if defined(_PS2) || defined(_PSP) || defined(_PS3)
-    &memalign,  // a version already exists on this platform
+    &memalign, // a version already exists on this platform
 #else
-    &_gsi_memalign,  // wrote our own
+    &_gsi_memalign, // wrote our own
 #endif
 #else
     &_gsi_malloc, &_gsi_free, &_gsi_realloc, &_gsi_memalign
@@ -161,13 +161,13 @@ void* gsimemalign(size_t boundary, size_t size)
 /***************************************************************************/
 
 // Context Stack
-#define MEM_CONTEXT_STACK_MAX 10  // max stack depth
+#define MEM_CONTEXT_STACK_MAX 10 // max stack depth
 static gsMemMgrContext MemTypeStack[MEM_CONTEXT_STACK_MAX] = {gsMemMgrContext_Default};
 static gsi_u32 MemTypeStackIndex = 0;
 extern gsMemMgrContext gsMemMgrContextCurrent;
 
 // Memtype Tag stack
-#define MEM_TAG_STACK_MAX 10  // max stack depth
+#define MEM_TAG_STACK_MAX 10 // max stack depth
 static gsi_u8 MemTagStack[MEM_TAG_STACK_MAX] = {0};
 static gsi_u32 MemTagStackIndex = 0;
 
@@ -180,7 +180,7 @@ static gsi_u32 MemTagStackIndex = 0;
 #define MEM_IS_POWER_OF_2(x) (((x) & ((x)-1)) == 0)
 #define MEMALIGN_POWEROF2(x, a) (((gsi_uint)(x) + (a - 1)) & ~(((gsi_uint)(a)) - 1))
 
-#if (1)  // enable assert, otherwise this runs faster
+#if (1) // enable assert, otherwise this runs faster
 #define MP_ASSERT(x) GS_ASSERT(x)
 #else
 #define MP_ASSERT(x)
@@ -194,14 +194,14 @@ typedef struct
     gsi_u32 MemAvail;
     gsi_u32 MemUsed;
     gsi_u32 MemUsed_At_HighWater;
-    gsi_u32 MemWasted;  // overhead memory + memory lost due to fragmentation.
+    gsi_u32 MemWasted; // overhead memory + memory lost due to fragmentation.
 
-    gsi_u32 ChunksCount;      // number of ChunkHeaders in linked list.
-    gsi_u32 ChunksFreeCount;  // number of free ChunkHeaders in linked list.
+    gsi_u32 ChunksCount;     // number of ChunkHeaders in linked list.
+    gsi_u32 ChunksFreeCount; // number of free ChunkHeaders in linked list.
     gsi_u32 ChunksFreeLargestAvail;
     // these are the same as handles
-    gsi_u32 ChunksUsedCount;               // number of ChunkHeaders which are in use.
-    gsi_u32 ChunksUsedCount_At_HighWater;  // the most handles used at any one time
+    gsi_u32 ChunksUsedCount;              // number of ChunkHeaders which are in use.
+    gsi_u32 ChunksUsedCount_At_HighWater; // the most handles used at any one time
 
     // memtype specifics
     gsi_u32 MemType_ChunksCount[MEM_TYPES_MAX];
@@ -221,7 +221,7 @@ typedef struct tMEM_CHUNK
     // private
     union
     {
-        gsi_uint MemUsed;  // size used by application.  ex// malloc(size)
+        gsi_uint MemUsed; // size used by application.  ex// malloc(size)
 #ifdef GS_BIG_ENDIAN
         struct
         {
@@ -246,16 +246,16 @@ typedef struct tMEM_CHUNK
     // public:
     // double linked list of all chunks
     struct tMEM_CHUNK* prev;
-    struct tMEM_CHUNK* next;  // next chunk
+    struct tMEM_CHUNK* next; // next chunk
     // single linked list of free chunks
-    struct tMEM_CHUNK* NextFree;  // next free chunk
+    struct tMEM_CHUNK* NextFree; // next free chunk
 } MEM_CHUNK;
 
 /***************************************/
 // flag as in use, set size, memtype
 void MEM_CHUNKAlloc(MEM_CHUNK* _this, gsi_u8 _MemType, size_t _UsedSize)
 {
-    _UsedSize = MEMALIGN_POWEROF2(_UsedSize, 4);  // The lower 2 bits are zero, so we don't store them.
+    _UsedSize = MEMALIGN_POWEROF2(_UsedSize, 4); // The lower 2 bits are zero, so we don't store them.
     GS_ASSERT_STR(_UsedSize < 0x3FFFFFC, "Alloc Memory size is too big.");
     _this->MEM_UsageStat.MemUsed = _UsedSize << 6;
     _this->MEM_UsageStat.MEM_TypeStruct.MemType = _MemType;
@@ -332,7 +332,7 @@ void* MEM_CHUNKMemPtrGet(MEM_CHUNK* _this)
 typedef struct MEM_CHUNK_POOL
 {
     // public:
-    char Name[20];  // name of this pool.  Used for debug purposes
+    char Name[20]; // name of this pool.  Used for debug purposes
     // private:
     MEM_CHUNK* HeaderStart;
     MEM_CHUNK* HeaderEnd;
@@ -350,7 +350,7 @@ MEM_CHUNK* MEM_CHUNK_POOLFindNextFreeChunk(MEM_CHUNK_POOL* _this, MEM_CHUNK* hea
 void MEM_CHUNK_POOLSplitChunk(MEM_CHUNK_POOL* _this, MEM_CHUNK* header, gsi_bool ReAlloc);
 void MEM_CHUNK_POOLFreeChunk(MEM_CHUNK_POOL* _this, MEM_CHUNK* header);
 MEM_CHUNK* MEM_CHUNK_POOLAllocChunk(MEM_CHUNK_POOL* _this, size_t Size, int Alignment,
-    gsi_bool Backwards);  // int Alignment = PTR_ALIGNMENT, gsi_bool Backwards = gsi_false);
+    gsi_bool Backwards); // int Alignment = PTR_ALIGNMENT, gsi_bool Backwards = gsi_false);
 
 // move a chunk within the limits of prev + prev_size and next - this_size
 void MEM_CHUNK_POOLChunkMove(MEM_CHUNK_POOL* _this, MEM_CHUNK* oldpos, MEM_CHUNK* newpos);
@@ -365,9 +365,9 @@ gsi_bool MEM_CHUNK_POOLIsValid(MEM_CHUNK_POOL* _this)
 }
 
 /***************************************/
-void* MEM_CHUNK_POOLmalloc(MEM_CHUNK_POOL* _this, size_t Size, gsi_i32 Alignment);  //= PTR_ALIGNMENT);
+void* MEM_CHUNK_POOLmalloc(MEM_CHUNK_POOL* _this, size_t Size, gsi_i32 Alignment); //= PTR_ALIGNMENT);
 // allocated backwards from top of heap
-void* MEM_CHUNK_POOLmalloc_backwards(MEM_CHUNK_POOL* _this, size_t Size, gsi_i32 Alignment);  //= PTR_ALIGNMENT);
+void* MEM_CHUNK_POOLmalloc_backwards(MEM_CHUNK_POOL* _this, size_t Size, gsi_i32 Alignment); //= PTR_ALIGNMENT);
 void* MEM_CHUNK_POOLrealloc(MEM_CHUNK_POOL* _this, void* oldmem, size_t newSize);
 void MEM_CHUNK_POOLfree(MEM_CHUNK_POOL* _this, void* mem);
 
@@ -494,13 +494,13 @@ void MEM_CHUNK_POOLCreate(MEM_CHUNK_POOL* _this, const char* szNameIn, char* ptr
 {
     int len;
     MEM_CHUNK* HeaderMid;
-    MP_ASSERT(((gsi_uint)ptr & 15) == 0)  // ensure 16 byte alignment
+    MP_ASSERT(((gsi_uint)ptr & 15) == 0) // ensure 16 byte alignment
 
     // Copy limited length name
     len = strlen(szNameIn) + 1;
     if (len > 20) len = 20;
     memcpy(_this->Name, szNameIn, len);
-    _this->Name[19] = '\0';  // in case str is too long.
+    _this->Name[19] = '\0'; // in case str is too long.
 
     // create two nubs, at start, and end, with a chunk in between
     MP_ASSERT(size > 48 + 3 * sizeof(MEM_CHUNK))
@@ -513,7 +513,7 @@ void MEM_CHUNK_POOLCreate(MEM_CHUNK_POOL* _this, const char* szNameIn, char* ptr
     _this->HeaderStart->prev = NULL;
     _this->HeaderStart->next = HeaderMid;
     _this->HeaderStart->NextFree = HeaderMid;
-    MEM_CHUNKAlloc(_this->HeaderStart, 0, sizeof(MEM_CHUNK));  // don't mark as free
+    MEM_CHUNKAlloc(_this->HeaderStart, 0, sizeof(MEM_CHUNK)); // don't mark as free
 
     // Here is our real heap, after before and after overhead
     HeaderMid->prev = _this->HeaderStart;
@@ -525,7 +525,7 @@ void MEM_CHUNK_POOLCreate(MEM_CHUNK_POOL* _this, const char* szNameIn, char* ptr
     _this->HeaderEnd->prev = HeaderMid;
     _this->HeaderEnd->next = NULL;
     _this->HeaderEnd->NextFree = NULL;
-    MEM_CHUNKAlloc(_this->HeaderEnd, 0, sizeof(MEM_CHUNK));  // don't mark as free
+    MEM_CHUNKAlloc(_this->HeaderEnd, 0, sizeof(MEM_CHUNK)); // don't mark as free
 
     _this->HeapSize = size;
     _this->pFirstFree = HeaderMid;
@@ -692,10 +692,10 @@ MEM_CHUNK* MEM_CHUNK_POOLAllocChunk(MEM_CHUNK_POOL* _this, size_t Size, gsi_i32 
 
     MEM_CHUNK* header;
     gsi_u32 SizeNeeded = Size + sizeof(MEM_CHUNK);
-    SizeNeeded = MEMALIGN_POWEROF2(SizeNeeded, sizeof(MEM_CHUNK));  // must be aligned to this at least!!!
+    SizeNeeded = MEMALIGN_POWEROF2(SizeNeeded, sizeof(MEM_CHUNK)); // must be aligned to this at least!!!
 
     MP_ASSERT(Size)
-    MP_ASSERT(MEM_IS_POWER_OF_2(Alignment))  // must be power of two!!!
+    MP_ASSERT(MEM_IS_POWER_OF_2(Alignment)) // must be power of two!!!
     MP_ASSERT(Alignment >= PTR_ALIGNMENT)
 
     //	Backwards = gsi_false;
@@ -781,7 +781,7 @@ MEM_CHUNK* MEM_CHUNK_POOLAllocChunk(MEM_CHUNK_POOL* _this, size_t Size, gsi_i32 
     }
     // not crashing here.
     gsDebugFormat(GSIDebugCat_App, GSIDebugType_Misc, GSIDebugLevel_Notice, " Could not allocate %i bytes\n", Size);
-    GS_ASSERT_STR(0, "Out of memory");  //(_this->Name);
+    GS_ASSERT_STR(0, "Out of memory"); //(_this->Name);
 
     return NULL;
 }
@@ -965,12 +965,12 @@ gsi_u32 MEM_CHUNK_POOLWalkForType(MEM_CHUNK_POOL* _this, int type, gsi_bool _Log
     while (header)
     {
         MP_ASSERT(
-            (header->next == NULL) || ((gsi_uint)header < (gsi_uint)header->next))  // infinite loop or out of place
+            (header->next == NULL) || ((gsi_uint)header < (gsi_uint)header->next)) // infinite loop or out of place
         MP_ASSERT(
-            (header->prev == NULL) || ((gsi_uint)header->prev < (gsi_uint)header))  // infinite loop or out of place
-        MP_ASSERT((header->prev == NULL) || (header->prev->next == header))         // previous linked correctly to us
-        MP_ASSERT((header->next == NULL) || (header->next->prev == header))         // next		linked correctly to us
-        MP_ASSERT(MEM_CHUNKMemUsedGet(header) <= MEM_CHUNKChunkSizeGet(header))     // using too much mem
+            (header->prev == NULL) || ((gsi_uint)header->prev < (gsi_uint)header)) // infinite loop or out of place
+        MP_ASSERT((header->prev == NULL) || (header->prev->next == header))        // previous linked correctly to us
+        MP_ASSERT((header->next == NULL) || (header->next->prev == header))        // next		linked correctly to us
+        MP_ASSERT(MEM_CHUNKMemUsedGet(header) <= MEM_CHUNKChunkSizeGet(header))    // using too much mem
 
         if (!MEM_CHUNKIsFree(header) && (MEM_CHUNKMemTypeGet(header) == type)) {
             // Don't log a message for the HeaderStart and HeaderEnd blocks.
@@ -1009,12 +1009,12 @@ void MEM_CHUNK_POOLMemStatsGet(MEM_CHUNK_POOL* _this, MEM_STATS* pS)
     while (header)
     {
         MP_ASSERT(
-            (header->next == NULL) || ((gsi_uint)header < (gsi_uint)header->next))  // infinite loop or out of place
+            (header->next == NULL) || ((gsi_uint)header < (gsi_uint)header->next)) // infinite loop or out of place
         MP_ASSERT(
-            (header->prev == NULL) || ((gsi_uint)header->prev < (gsi_uint)header))  // infinite loop or out of place
-        MP_ASSERT((header->prev == NULL) || (header->prev->next == header))         // previous linked correctly to us
-        MP_ASSERT((header->next == NULL) || (header->next->prev == header))         // next		linked correctly to us
-        MP_ASSERT(MEM_CHUNKMemUsedGet(header) <= MEM_CHUNKChunkSizeGet(header))     // using too much mem
+            (header->prev == NULL) || ((gsi_uint)header->prev < (gsi_uint)header)) // infinite loop or out of place
+        MP_ASSERT((header->prev == NULL) || (header->prev->next == header))        // previous linked correctly to us
+        MP_ASSERT((header->next == NULL) || (header->next->prev == header))        // next		linked correctly to us
+        MP_ASSERT(MEM_CHUNKMemUsedGet(header) <= MEM_CHUNKChunkSizeGet(header))    // using too much mem
 
         pS->MemTotal += MEM_CHUNKTotalSizeGet(header);
         if (!MEM_CHUNKIsFree(header)) {
@@ -1035,11 +1035,11 @@ void MEM_CHUNK_POOLMemStatsGet(MEM_CHUNK_POOL* _this, MEM_STATS* pS)
         {
             // free chunk
             MP_ASSERT((header->NextFree == NULL) ||
-                      ((gsi_uint)header < (gsi_uint)header->NextFree))  // infinite loop or out of place
+                      ((gsi_uint)header < (gsi_uint)header->NextFree)) // infinite loop or out of place
 
             // make sure we aren't fragmented, as this ruins some algorithm assumptions
-            MP_ASSERT((header->next == NULL) || (!MEM_CHUNKIsFree(header->next)))  // infinite loop or out of place
-            MP_ASSERT((header->prev == NULL) || (!MEM_CHUNKIsFree(header->prev)))  // infinite loop or out of place
+            MP_ASSERT((header->next == NULL) || (!MEM_CHUNKIsFree(header->next))) // infinite loop or out of place
+            MP_ASSERT((header->prev == NULL) || (!MEM_CHUNKIsFree(header->prev))) // infinite loop or out of place
 
             // previous free chunk linked correctly to us, we aren't a lost chunk
             MP_ASSERT(header == NextFree)
@@ -1090,7 +1090,7 @@ void MEM_CHUNK_POOLMemStatsGet(MEM_CHUNK_POOL* _this, MEM_STATS* pS)
             pS->MemType_MemUsed_At_HighWater[i] = pS->MemType_MemUsed[i];
     }
 
-    MP_ASSERT(ChunksFreeLostCount == 0)  // lost free blocks
+    MP_ASSERT(ChunksFreeLostCount == 0) // lost free blocks
 }
 
 //--------------------------------------------------------------------------
@@ -1253,7 +1253,7 @@ gsMemMgrContext gsMemMgrCreate(gsMemMgrContext context, const char* PoolName, vo
         // Warn!!!!
         gsDebugFormat(GSIDebugCat_App, GSIDebugType_Memory, GSIDebugLevel_Comment, "Out of memory context handles!\n");
         GS_ASSERT(0);
-        return gsMemMgrContext_Invalid;  // ran out of context slots
+        return gsMemMgrContext_Invalid; // ran out of context slots
     }
 
     MEM_CHUNK_POOLCreate(&gChunkPool[context], PoolName, ptr, thePoolSize);
@@ -1501,11 +1501,11 @@ void gsMemMgrDumpAllocations()
 
     gsiLeaveCriticalSection(&gMemCrit);
 
-    GSI_UNUSED(aStartTime);  // may be unused if common debug is not defined
+    GSI_UNUSED(aStartTime); // may be unused if common debug is not defined
 #endif
 }
 
-#if (1)  // test stuff
+#if (1) // test stuff
 
 #define PTR_TABLE_SIZE 2048
 static int PtrTableCount = 0;
@@ -1582,7 +1582,7 @@ void gsMemMgrSelfText()
             }
         }
         else
-            continue;  // skip count
+            continue; // skip count
 
         c++;
         MEM_CHUNK_POOLCheckValidity(&gChunkPool);
@@ -1593,4 +1593,4 @@ void gsMemMgrSelfText()
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
-#endif  // GSI_MEM_MANAGED
+#endif // GSI_MEM_MANAGED

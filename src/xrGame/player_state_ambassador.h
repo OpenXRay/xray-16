@@ -28,12 +28,12 @@ protected:
     u32 m_shots_count;
     u32 m_art_drop_count;
     bool m_delivered;
-};  // class player_state_ambassador
+}; // class player_state_ambassador
 
 ADD_ACCUMULATIVE_STATE(acpv_ambassador, player_state_ambassador);
 #undef ACCUMULATIVE_STATE_LIST
 #define ACCUMULATIVE_STATE_LIST SAVE_TYPE_LIST(acpv_ambassador, player_state_ambassador)
 
-}  // namespace award_system
+} // namespace award_system
 
-#endif  //#ifndef PLAYER_STATE_AMBASSADOR_INCLUDED
+#endif //#ifndef PLAYER_STATE_AMBASSADOR_INCLUDED

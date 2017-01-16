@@ -18,8 +18,8 @@
 #include "xrserver_objects_alife_monsters.h"
 #include "zone_effector.h"
 
-#define WIND_RADIUS (4 * Radius())  //расстояние до актера, когда появляется ветер
-#define FASTMODE_DISTANCE (50.f)    // distance to camera from sphere, when zone switches to fast update sequence
+#define WIND_RADIUS (4 * Radius()) //расстояние до актера, когда появляется ветер
+#define FASTMODE_DISTANCE (50.f)   // distance to camera from sphere, when zone switches to fast update sequence
 
 CCustomZone::CCustomZone(void)
 {
@@ -170,7 +170,7 @@ void CCustomZone::Load(LPCSTR section)
             m_dwBlowoutParticlesTime = m_StateTime[eZoneStateBlowout];
 #ifndef MASTER_GOLD
             Msg("! ERROR: invalid 'blowout_particles_time' in '%s'", section);
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
         }
     }
     else
@@ -182,7 +182,7 @@ void CCustomZone::Load(LPCSTR section)
             m_dwBlowoutLightTime = m_StateTime[eZoneStateBlowout];
 #ifndef MASTER_GOLD
             Msg("! ERROR: invalid 'blowout_light_time' in '%s'", section);
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
         }
     }
     else
@@ -194,7 +194,7 @@ void CCustomZone::Load(LPCSTR section)
             m_dwBlowoutSoundTime = m_StateTime[eZoneStateBlowout];
 #ifndef MASTER_GOLD
             Msg("! ERROR: invalid 'blowout_sound_time' in '%s'", section);
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
         }
     }
     else
@@ -206,7 +206,7 @@ void CCustomZone::Load(LPCSTR section)
             m_dwBlowoutExplosionTime = m_StateTime[eZoneStateBlowout];
 #ifndef MASTER_GOLD
             Msg("! ERROR: invalid 'blowout_explosion_time' in '%s'", section);
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
         }
     }
     else
@@ -224,7 +224,7 @@ void CCustomZone::Load(LPCSTR section)
             m_dwBlowoutWindTimeEnd = u32(m_StateTime[eZoneStateBlowout] - 1);
 #ifndef MASTER_GOLD
             Msg("! ERROR: invalid 'blowout_wind_time_end' in '%s'", section);
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
         }
 
         m_fBlowoutWindPowerMax = pSettings->r_float(section, "blowout_wind_power");
@@ -276,7 +276,7 @@ BOOL CCustomZone::net_Spawn(CSE_Abstract* DC)
     m_fAttenuation = pSettings->r_float(cNameSect(), "attenuation");
     m_owner_id = Z->m_owner_id;
     if (m_owner_id != u32(-1))
-        m_ttl = Device.dwTimeGlobal + 40000;  // 40 sec
+        m_ttl = Device.dwTimeGlobal + 40000; // 40 sec
     else
         m_ttl = u32(-1);
 
@@ -644,7 +644,7 @@ void CCustomZone::UpdateIdleLight()
     VERIFY(m_pIdleLAnim);
 
     int frame = 0;
-    u32 clr = m_pIdleLAnim->CalculateBGR(Device.fTimeGlobal, frame);  // возвращает в формате BGR
+    u32 clr = m_pIdleLAnim->CalculateBGR(Device.fTimeGlobal, frame); // возвращает в формате BGR
     Fcolor fclr;
     fclr.set((float)color_get_B(clr) / 255.f, (float)color_get_G(clr) / 255.f, (float)color_get_R(clr) / 255.f, 1.f);
 
@@ -760,7 +760,7 @@ void CCustomZone::PlayBoltEntranceParticles()
         CCF_Shape::shape_def& s = *it;
         switch (s.type)
         {
-        case 0:  // sphere
+        case 0: // sphere
         {
             sP0 = s.data.sphere.P;
             XF.transform_tiny(sP0);
@@ -791,7 +791,7 @@ void CCustomZone::PlayBoltEntranceParticles()
             }
         }
         break;
-        case 1:  // box
+        case 1: // box
             break;
         }
     }
@@ -1310,10 +1310,10 @@ void CCustomZone::CalcDistanceTo(const Fvector& P, float& dist, float& radius)
         float d = 0.0f;
         switch (s.type)
         {
-        case 0:  // sphere
+        case 0: // sphere
             sP = s.data.sphere.P;
             break;
-        case 1:  // box
+        case 1: // box
             sP = s.data.box.c;
             break;
         }

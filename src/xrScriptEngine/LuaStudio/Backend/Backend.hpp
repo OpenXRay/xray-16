@@ -58,5 +58,5 @@ struct DECLSPEC_NOVTABLE value_to_expand
     virtual void CS_LUA_STUDIO_BACKEND_CALL add_value(
         char const* id, char const* type, char const* value, icon_type icon_type) = 0;
 };
-}  // namespace lua_studio
-}  // namespace cs
+} // namespace lua_studio
+} // namespace cs

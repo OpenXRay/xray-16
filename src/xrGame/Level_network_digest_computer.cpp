@@ -7,7 +7,7 @@ char const* ComputeClientDigest(string128& dest)
 {
     string128 cd_key;
     string128 md5hash;
-    GetCDKey_FromRegistry(cd_key);  // cd_key is not longer than 64 bytes !
+    GetCDKey_FromRegistry(cd_key); // cd_key is not longer than 64 bytes !
     int cd_keylen = xr_strlen(cd_key);
     if (!cd_keylen) {
         dest[0] = 0;

@@ -16,4 +16,4 @@ public:
     virtual ~CBlender_Blur();
 };
 
-#endif  // BLENDER_BLUR_H
+#endif // BLENDER_BLUR_H

@@ -29,7 +29,7 @@
 namespace smart_cover
 {
 shared_str transform_vertex(shared_str const& vertex_id, bool const& in);
-}  // namespace smart_cover
+} // namespace smart_cover
 
 stalker_movement_manager_smart_cover::stalker_movement_manager_smart_cover(CAI_Stalker* object)
     : inherited(object), m_property_storage(0), m_current_transition(0), m_current_transition_animation(0),
@@ -103,7 +103,7 @@ void stalker_movement_manager_smart_cover::enter_smart_cover()
     {
 #ifdef DEBUG
         Msg("setting up cover: %s (%s)", m_enter_cover_id.c_str(), m_enter_cover_id.c_str());
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
         m_current.cover_id(m_enter_cover_id);
         m_current.cover_loophole_id(m_enter_loophole_id);
     }
@@ -275,7 +275,7 @@ void stalker_movement_manager_smart_cover::reach_enter_location(u32 const& time_
 #ifdef DEBUG
     animation.global_modifier(
         CStalkerAnimationManager::AnimationModifier(this, &stalker_movement_manager_smart_cover::modify_animation));
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 }
 
 void stalker_movement_manager_smart_cover::enter_smart_cover(u32 const& time_delta)
@@ -307,7 +307,7 @@ void stalker_movement_manager_smart_cover::on_smart_cover_exit()
     unbind_global_selector();
 #ifdef DEBUG
     Msg("exiting from cover: %s", m_current.cover_id().c_str());
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
     m_current.cover_id("");
     inherited::update(m_current);
 }
@@ -329,7 +329,7 @@ IC u32 to_u32(shared_str const& string)
     return (*(u32 const*)&get);
 }
 
-}  // namespace hash_fixed_vertex_manager
+} // namespace hash_fixed_vertex_manager
 
 void stalker_movement_manager_smart_cover::loophole_path(smart_cover::cover const& cover, shared_str const& source_raw,
     shared_str const& target_raw, LoopholePath& path) const
@@ -368,7 +368,7 @@ void stalker_movement_manager_smart_cover::bind_global_selector()
 #ifdef DEBUG
     animation.global_modifier(CStalkerAnimationManager::AnimationModifier(
         &animation_selector(), &smart_cover::animation_selector::modify_animation));
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 
     if (!m_current.cover()) return;
 
@@ -385,7 +385,7 @@ void stalker_movement_manager_smart_cover::unbind_global_selector()
     animation.global_callback(CStalkerAnimationManager::AnimationCallback());
 #ifdef DEBUG
     animation.global_modifier(CStalkerAnimationManager::AnimationModifier());
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 
     object().animation().global().target_matrix();
 }
@@ -399,7 +399,7 @@ stalker_movement_manager_smart_cover::current_transition()
         m_current.cover() ? m_current.cover_loophole()->id().c_str() : "<no loophole>",
         m_target.cover() ? m_target.cover()->id().c_str() : "<world>",
         m_target.cover() ? m_target.cover_loophole()->id().c_str() : "<no loophole>", m_path.size());
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 
     VERIFY((m_current.cover() != m_target.cover()) || !m_current.cover() ||
            (m_current.cover_loophole() != m_target.cover_loophole()));

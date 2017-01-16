@@ -48,9 +48,9 @@ const u32 encircle_time = 3000;
 const float loose_health_diff = 0.15f;
 const u32 change_behaviour_time = 1000;
 
-}  // namespace bloodsucker
+} // namespace bloodsucker
 
-}  // namespace detail
+} // namespace detail
 
 TEMPLATE_SPECIALIZATION
 void CBloodsuckerStateAttackAbstract::execute()
@@ -180,7 +180,7 @@ void CBloodsuckerStateAttackAbstract::setup_substates()
 
         data.action.action = ACT_RUN;
         data.action.time_out = 0;
-        data.completion_dist = 1.f;  // get exactly to the point
+        data.completion_dist = 1.f; // get exactly to the point
         data.time_to_rebuild = 200;
         data.accelerated = true;
         data.braking = false;

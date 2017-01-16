@@ -33,9 +33,9 @@ typedef struct
     int icquin;
     char zipcode[GP_ZIPCODE_LEN];
     char countrycode[GP_COUNTRYCODE_LEN];
-    float longitude;           // negative is west, positive is east.  (0, 0) means unknown.
-    float latitude;            // negative is south, positive is north.  (0, 0) means unknown.
-    char place[GP_PLACE_LEN];  // e.g., "USA|California|Irvine", "South Korea|Seoul", "Turkey"
+    float longitude;          // negative is west, positive is east.  (0, 0) means unknown.
+    float latitude;           // negative is south, positive is north.  (0, 0) means unknown.
+    char place[GP_PLACE_LEN]; // e.g., "USA|California|Irvine", "South Korea|Seoul", "Turkey"
     int birthday;
     int birthmonth;
     int birthyear;

@@ -19,9 +19,9 @@
 template <class T>
 class ArbitraryList
 {
-    T* pT;              // The list.
-    u32 iSize;          // The current size of the list.
-    u32 iReservedSize;  // The current reserved size of the list.
+    T* pT;             // The list.
+    u32 iSize;         // The current size of the list.
+    u32 iReservedSize; // The current reserved size of the list.
 public:
     // Constructor, with optional initial size setting.
     ArbitraryList(u32 iInitialSize = 0)
@@ -160,4 +160,4 @@ public:
     }
 };
 
-#endif  //#ifndef ArbitraryListH
+#endif //#ifndef ArbitraryListH

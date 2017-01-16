@@ -282,8 +282,8 @@ bool CUIActorMenu::CanMoveToPartner(PIItem pItem)
 
     if (pItem->GetCondition() < m_pPartnerInvOwner->trade_parameters().buy_item_condition_factor) return false;
 
-    float r1 = CalcItemsWeight(m_pTradeActorList);    // actor
-    float r2 = CalcItemsWeight(m_pTradePartnerList);  // partner
+    float r1 = CalcItemsWeight(m_pTradeActorList);   // actor
+    float r2 = CalcItemsWeight(m_pTradePartnerList); // partner
     float itmWeight = pItem->Weight();
     float partner_inv_weight = m_pPartnerInvOwner->inventory().CalcTotalWeight();
     float partner_max_weight = m_pPartnerInvOwner->MaxCarryWeight();
@@ -312,7 +312,7 @@ void CUIActorMenu::UpdateActor()
         if (wp) {
             wp->ForceUpdateAmmo();
         }
-    }  // actor
+    } // actor
 
     InventoryUtilities::UpdateWeightStr(*m_ActorWeight, *m_ActorWeightMax, m_pActorInvOwner);
 
@@ -404,7 +404,7 @@ void CUIActorMenu::OnBtnPerformTradeBuy(CUIWindow* w, void* d)
 
     int actor_money = (int)m_pActorInvOwner->get_money();
     int partner_money = (int)m_pPartnerInvOwner->get_money();
-    int actor_price = 0;  //(int)CalcItemsPrice( m_pTradeActorList,   m_partner_trade, true  );
+    int actor_price = 0; //(int)CalcItemsPrice( m_pTradeActorList,   m_partner_trade, true  );
     int partner_price = (int)CalcItemsPrice(m_pTradePartnerList, m_partner_trade, false);
 
     int delta_price = actor_price - partner_price;
@@ -444,7 +444,7 @@ void CUIActorMenu::OnBtnPerformTradeSell(CUIWindow* w, void* d)
     int actor_money = (int)m_pActorInvOwner->get_money();
     int partner_money = (int)m_pPartnerInvOwner->get_money();
     int actor_price = (int)CalcItemsPrice(m_pTradeActorList, m_partner_trade, true);
-    int partner_price = 0;  //(int)CalcItemsPrice( m_pTradePartnerList, m_partner_trade, false );
+    int partner_price = 0; //(int)CalcItemsPrice( m_pTradePartnerList, m_partner_trade, false );
 
     int delta_price = actor_price - partner_price;
     actor_money += delta_price;

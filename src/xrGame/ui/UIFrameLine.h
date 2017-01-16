@@ -7,9 +7,9 @@ class CUIFrameLine : public CUICustomItem
     friend class CUIFrameLineWnd;
     enum
     {
-        flFirst = 0,  // Left or top
-        flSecond,     // Right or bottom
-        flBack,       // Center texture
+        flFirst = 0, // Left or top
+        flSecond,    // Right or bottom
+        flBack,      // Center texture
         flMax
     };
 

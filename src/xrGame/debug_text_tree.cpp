@@ -74,13 +74,13 @@ struct texttree_log_helper
     void operator()(const char* s, int num_siblings) { Msg(s); }
 };
 
-}  // namespace detail
+} // namespace detail
 
 void draw_text_tree(text_tree& tree,
-    int indent,  // in spaces
+    int indent, // in spaces
     int ori_x, int ori_y,
-    int offs,         // skip offs lines
-    int column_size,  // in pixels
+    int offs,        // skip offs lines
+    int column_size, // in pixels
     int max_rows, u32 color1, u32 color2)
 {
     detail::texttree_draw_helper::s_params.color1 = color1;
@@ -152,7 +152,7 @@ void text_tree::clear()
 
 void text_tree::prepare(int current_indent, int indent, Columns& columns)
 {
-    num_siblings = 1;  // including ourselves
+    num_siblings = 1; // including ourselves
 
     for (Children::iterator i = children.begin(); i != children.end(); ++i)
     {
@@ -181,4 +181,4 @@ void text_tree::prepare(int current_indent, int indent, Columns& columns)
     }
 }
 
-}  // namespace debug
+} // namespace debug

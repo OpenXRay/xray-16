@@ -45,6 +45,6 @@ private:
     SCInterfacePtr m_interface;
 
     void Init();
-};  // class CGameSpy_ATLAS
+}; // class CGameSpy_ATLAS
 
-#endif  //#ifndef GAMESPY_ATLAS_INCLUDED
+#endif //#ifndef GAMESPY_ATLAS_INCLUDED

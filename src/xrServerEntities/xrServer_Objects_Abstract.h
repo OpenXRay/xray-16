@@ -66,7 +66,7 @@ public:
     LPCSTR get_visual() const { return *visual_name; };
 #ifndef XRGAME_EXPORTS
     virtual void FillProps(LPCSTR pref, PropItemVec& items);
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
     virtual CSE_Visual* __stdcall visual() = 0;
 };
@@ -90,7 +90,7 @@ public:
     LPCSTR get_motion() const { return *motion_name; };
 #ifndef XRGAME_EXPORTS
     virtual void FillProps(LPCSTR pref, PropItemVec& items);
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
     virtual CSE_Motion* __stdcall motion() = 0;
 };
@@ -141,7 +141,7 @@ public:
     virtual visual_data* __stdcall visual_collection() const = 0;
     virtual u32 __stdcall visual_collection_size() const = 0;
     virtual void __stdcall set_additional_info(void* info) = 0;
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
     virtual LPCSTR __stdcall name() const = 0;
     virtual void __stdcall set_name(LPCSTR) = 0;
     virtual LPCSTR __stdcall name_replace() const = 0;
@@ -162,4 +162,4 @@ IC IServerEntity::~IServerEntity()
 #pragma warning(pop)
 
 #pragma pack(pop)
-#endif  // xrServer_Objects_AbstractH
+#endif // xrServer_Objects_AbstractH

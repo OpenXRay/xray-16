@@ -239,13 +239,13 @@ public:
         C.z = (min.z + max.z) * 0.5f;
         return *this;
     };
-    IC SelfCRef get_CD(Tvector& bc, Tvector& bd) const  // center + dimensions
+    IC SelfCRef get_CD(Tvector& bc, Tvector& bd) const // center + dimensions
     {
         bd.sub(max, min).mul(.5f);
         bc.add(min, bd);
         return *this;
     }
-    IC SelfRef scale(float s)  // 0.1 means make 110%, -0.1 means make 90%
+    IC SelfRef scale(float s) // 0.1 means make 110%, -0.1 means make 90%
     {
         Fvector bd;
         bd.sub(max, min).mul(s);
@@ -346,39 +346,39 @@ public:
             if (origin[0] < min[0]) {
                 coord[0] = min[0];
                 Inside = FALSE;
-                if (IR(dir[0])) MaxT[0] = (min[0] - origin[0]) / dir[0];  // Calculate T distances to candidate planes
+                if (IR(dir[0])) MaxT[0] = (min[0] - origin[0]) / dir[0]; // Calculate T distances to candidate planes
             }
             else if (origin[0] > max[0])
             {
                 coord[0] = max[0];
                 Inside = FALSE;
-                if (IR(dir[0])) MaxT[0] = (max[0] - origin[0]) / dir[0];  // Calculate T distances to candidate planes
+                if (IR(dir[0])) MaxT[0] = (max[0] - origin[0]) / dir[0]; // Calculate T distances to candidate planes
             }
         }
         {
             if (origin[1] < min[1]) {
                 coord[1] = min[1];
                 Inside = FALSE;
-                if (IR(dir[1])) MaxT[1] = (min[1] - origin[1]) / dir[1];  // Calculate T distances to candidate planes
+                if (IR(dir[1])) MaxT[1] = (min[1] - origin[1]) / dir[1]; // Calculate T distances to candidate planes
             }
             else if (origin[1] > max[1])
             {
                 coord[1] = max[1];
                 Inside = FALSE;
-                if (IR(dir[1])) MaxT[1] = (max[1] - origin[1]) / dir[1];  // Calculate T distances to candidate planes
+                if (IR(dir[1])) MaxT[1] = (max[1] - origin[1]) / dir[1]; // Calculate T distances to candidate planes
             }
         }
         {
             if (origin[2] < min[2]) {
                 coord[2] = min[2];
                 Inside = FALSE;
-                if (IR(dir[2])) MaxT[2] = (min[2] - origin[2]) / dir[2];  // Calculate T distances to candidate planes
+                if (IR(dir[2])) MaxT[2] = (min[2] - origin[2]) / dir[2]; // Calculate T distances to candidate planes
             }
             else if (origin[2] > max[2])
             {
                 coord[2] = max[2];
                 Inside = FALSE;
-                if (IR(dir[2])) MaxT[2] = (max[2] - origin[2]) / dir[2];  // Calculate T distances to candidate planes
+                if (IR(dir[2])) MaxT[2] = (max[2] - origin[2]) / dir[2]; // Calculate T distances to candidate planes
             }
         }
 

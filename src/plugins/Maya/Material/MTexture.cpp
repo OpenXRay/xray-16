@@ -49,7 +49,7 @@ bool MTexture::load(
 
 bool MTexture::set(MImage& image, Type type, bool mipmapped /* = true */, GLenum target /* = GL_TEXTURE_2D) */)
 {
-    unsigned int i;  // used as a temporary index.
+    unsigned int i; // used as a temporary index.
 
     // Store the type of texture, and derive other parameters.
     // (Depth is assumed to be 4 bytes per pixel RGBA.

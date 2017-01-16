@@ -20,6 +20,6 @@ IC animation_planner& animation_selector::planner()
     return (*m_planner);
 }
 
-}  // namespace smart_cover
+} // namespace smart_cover
 
-#endif  // SMART_COVER_ANIMATION_SELECTOR_INLINE_H_INCLUDED
+#endif // SMART_COVER_ANIMATION_SELECTOR_INLINE_H_INCLUDED

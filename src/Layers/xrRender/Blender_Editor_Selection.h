@@ -18,4 +18,4 @@ public:
     virtual ~CBlender_Editor_Selection();
 };
 
-#endif  // BLENDER_EDITOR_SELECTION_H
+#endif // BLENDER_EDITOR_SELECTION_H

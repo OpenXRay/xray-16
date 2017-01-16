@@ -25,9 +25,9 @@ class CLensFlareDescriptor;
 
 #ifdef INGAME_EDITOR
 #define INGAME_EDITOR_VIRTUAL virtual
-#else  // #ifdef INGAME_EDITOR
+#else // #ifdef INGAME_EDITOR
 #define INGAME_EDITOR_VIRTUAL
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR
 
 // t-defs
 class ENGINE_API CEnvModifier
@@ -159,7 +159,7 @@ public:
     float wind_direction;
 
     Fvector3 ambient;
-    Fvector4 hemi_color;  // w = R2 correction
+    Fvector4 hemi_color; // w = R2 correction
     Fvector3 sun_color;
     Fvector3 sun_dir;
     float m_fSunShaftsIntensity;
@@ -338,13 +338,13 @@ public:
 public:
     void ED_Reload();
     float GetGameTime() { return fGameTime; }
-#else  // #ifdef _EDITOR
+#else // #ifdef _EDITOR
 #ifdef INGAME_EDITOR
     float GetGameTime() { return fGameTime; }
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR
 
     bool m_paused;
-#endif  // #ifdef _EDITOR
+#endif // #ifdef _EDITOR
 
     CInifile* m_ambients_config;
     CInifile* m_sound_channels_config;
@@ -387,4 +387,4 @@ public:
 ENGINE_API extern Flags32 psEnvFlags;
 ENGINE_API extern float psVisDistance;
 
-#endif  // EnvironmentH
+#endif // EnvironmentH

@@ -100,7 +100,7 @@ bool CInventoryItem::equal_upgrades(Upgrades_type const& other_upgrades) const
         {
             if (name1.equal((*ib2))) {
                 upg_equal = true;
-                break;  // from for2, in for1
+                break; // from for2, in for1
             }
         }
         if (!upg_equal) {
@@ -122,9 +122,9 @@ void CInventoryItem::log_upgrades()
     }
     Msg("* finish - upgrades of item = %s", m_section_id.c_str());
 }
-#endif  // DEBUG
+#endif // DEBUG
 
-void CInventoryItem::net_Spawn_install_upgrades(Upgrades_type saved_upgrades)  // net_Spawn
+void CInventoryItem::net_Spawn_install_upgrades(Upgrades_type saved_upgrades) // net_Spawn
 {
     m_upgrades.clear_not_free();
 
@@ -132,7 +132,7 @@ void CInventoryItem::net_Spawn_install_upgrades(Upgrades_type saved_upgrades)  /
         return;
     }
 
-    ai().alife().inventory_upgrade_manager().init_install(*this);  // from pSettings
+    ai().alife().inventory_upgrade_manager().init_install(*this); // from pSettings
 
     Upgrades_type::iterator ib = saved_upgrades.begin();
     Upgrades_type::iterator ie = saved_upgrades.end();
@@ -198,7 +198,7 @@ void CInventoryItem::pre_install_upgrade()
             if (wg->IsGrenadeLauncherAttached()) {
                 wg->PerformSwitchGL();
                 wg->UnloadMagazine();
-                wg->PerformSwitchGL();  // restore state
+                wg->PerformSwitchGL(); // restore state
             }
         }
     }

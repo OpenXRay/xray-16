@@ -132,9 +132,9 @@ void CStateGroupRestIdleAbstract::setup_substates()
             }
         }
         data.action.action = m_move_type ? ACT_WALK_FWD : ACT_HOME_WALK_SMELLING;
-        data.action.time_out = 0;    // do not use time out
-        data.completion_dist = 0.f;  // get exactly to the point
-        data.time_to_rebuild = 0;    // do not rebuild
+        data.action.time_out = 0;   // do not use time out
+        data.completion_dist = 0.f; // get exactly to the point
+        data.time_to_rebuild = 0;   // do not rebuild
         data.accelerated = true;
         data.braking = true;
         data.accel_type = eAT_Calm;
@@ -169,9 +169,9 @@ void CStateGroupRestIdleAbstract::setup_substates()
             }
         }
         data.action.action = m_move_type ? ACT_WALK_FWD : ACT_HOME_WALK_SMELLING;
-        data.action.time_out = 0;    // do not use time out
-        data.completion_dist = 0.f;  // get exactly to the point
-        data.time_to_rebuild = 0;    // do not rebuild
+        data.action.time_out = 0;   // do not use time out
+        data.completion_dist = 0.f; // get exactly to the point
+        data.time_to_rebuild = 0;   // do not rebuild
         data.accelerated = true;
         data.braking = true;
         data.accel_type = eAT_Calm;
@@ -202,7 +202,7 @@ void CStateGroupRestIdleAbstract::setup_substates()
         SStateDataAction data;
 
         data.action = ACT_STAND_IDLE;
-        data.time_out = 0;  // do not use time out
+        data.time_out = 0; // do not use time out
         if (object->get_number_animation() == u32(6)) {
             data.sound_type = MonsterSound::eMonsterSoundThreaten;
         }

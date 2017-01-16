@@ -7,4 +7,4 @@ class IRenderDetailModel
 public:
 };
 
-#endif  //	RenderDetailModel_included
+#endif //	RenderDetailModel_included

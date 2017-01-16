@@ -41,4 +41,4 @@ void XRCORE_API mem_alloc_gather_stats(const bool& value);
 void XRCORE_API mem_alloc_gather_stats_frequency(const float& value);
 void XRCORE_API mem_alloc_show_stats();
 void XRCORE_API mem_alloc_clear_stats();
-#endif  // DEBUG_MEMORY_MANAGER
+#endif // DEBUG_MEMORY_MANAGER

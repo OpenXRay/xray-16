@@ -178,7 +178,7 @@ void MxStdModel::collect_vertex_star(unsigned int v, MxVertexList& verts)
     const MxFaceList& N = neighbors(v);
 
     mark_corners(N, 0);
-    vmark(v, 1);  // Don't want to include v in the star
+    vmark(v, 1); // Don't want to include v in the star
     collect_unmarked_corners(N, verts);
 }
 
@@ -282,7 +282,7 @@ void MxStdModel::remap_vertex(unsigned int from, unsigned int to)
     collect_unmarked_neighbors(from, neighbors(to));
 
     vertex_mark_invalid(from);
-    neighbors(from).reset();  // remove links in old vertex
+    neighbors(from).reset(); // remove links in old vertex
 }
 
 unsigned int MxStdModel::split_edge(unsigned int a, unsigned int b)
@@ -598,7 +598,7 @@ void MxStdModel::compute_contraction(MxFaceID fid, MxFaceContraction* conx)
     mark_neighborhood_delta(f[1], +1);
     mark_neighborhood_delta(f[2], +1);
 
-    fmark(fid, 0);  // don't include f in dead_faces
+    fmark(fid, 0); // don't include f in dead_faces
 
     partition_marked_neighbors(f[0], 2, conx->delta_faces, conx->dead_faces);
     partition_marked_neighbors(f[1], 2, conx->delta_faces, conx->dead_faces);
@@ -685,7 +685,7 @@ MxVertexID& MxStdModel::vertex_proxy_parent(MxVertexID v)
 
 MxVertexID MxStdModel::add_proxy_vertex(MxVertexID parent)
 {
-    MxVertexID v = alloc_vertex(0, 0, 0);  // position will be ignored
+    MxVertexID v = alloc_vertex(0, 0, 0); // position will be ignored
 
     vertex_mark_proxy(v);
     vertex_proxy_parent(v) = parent;

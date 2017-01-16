@@ -68,7 +68,7 @@ void xrGameSpyServer::OnCDKey_Validation(int LocalID, int res, char* errormsg)
         CL->m_bCDKeyAuth = true;
 #ifndef MASTER_GOLD
         Msg("xrGS::CDKey: Validation successful - <%s>", errormsg);
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
         Check_GameSpy_CDKey_Success(CL);
     }
     else

@@ -65,4 +65,4 @@ public:
 
 #include "ai_obstacle_inline.h"
 
-#endif  // AI_OBSTACLE_H
+#endif // AI_OBSTACLE_H

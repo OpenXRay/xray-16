@@ -110,7 +110,7 @@ int pthread_key_delete(pthread_key_t key)
             /* A thread could be holding the keyLock */
             while (EBUSY == pthread_mutex_destroy(&(key->keyLock)))
             {
-                Sleep(1);  // Ugly.
+                Sleep(1); // Ugly.
             }
         }
 

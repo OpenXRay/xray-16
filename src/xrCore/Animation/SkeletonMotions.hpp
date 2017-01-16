@@ -22,12 +22,12 @@ enum
 #pragma pack(push, 2)
 struct CKey
 {
-    Fquaternion Q;  // rotation
-    Fvector T;      // translation
+    Fquaternion Q; // rotation
+    Fvector T;     // translation
 };
 struct CKeyQR
 {
-    s16 x, y, z, w;  // rotation
+    s16 x, y, z, w; // rotation
 };
 struct CKeyQT8
 {
@@ -120,10 +120,10 @@ class XRCORE_API CMotionDef
 public:
     u16 bone_or_part;
     u16 motion;
-    u16 speed;    // quantized: 0..10
-    u16 power;    // quantized: 0..10
-    u16 accrue;   // quantized: 0..10
-    u16 falloff;  // quantized: 0..10
+    u16 speed;   // quantized: 0..10
+    u16 power;   // quantized: 0..10
+    u16 accrue;  // quantized: 0..10
+    u16 falloff; // quantized: 0..10
     u16 flags;
     xr_vector<motion_marks> marks;
 
@@ -186,10 +186,10 @@ public:
 // shared motions
 struct XRCORE_API motions_value
 {
-    accel_map m_motion_map;  // motion associations
-    accel_map m_cycle;       // motion data itself (shared)
-    accel_map m_fx;          // motion data itself (shared)
-    CPartition m_partition;  // partition
+    accel_map m_motion_map; // motion associations
+    accel_map m_cycle;      // motion data itself (shared)
+    accel_map m_fx;         // motion data itself (shared)
+    CPartition m_partition; // partition
     u32 m_dwReference;
     BoneMotionMap m_motions;
     MotionDefVec m_mdefs;
@@ -242,11 +242,11 @@ protected:
     }
 
 public:
-    bool create(shared_str key, IReader* data, vecBones* bones);  //{ motions_value* v =
-                                                                  //g_pMotionsContainer->dock(key,data,bones); if (0!=v)
-                                                                  //v->m_dwReference++; destroy(); p_ = v; }
+    bool create(shared_str key, IReader* data, vecBones* bones); //{ motions_value* v =
+                                                                 // g_pMotionsContainer->dock(key,data,bones); if (0!=v)
+    // v->m_dwReference++; destroy(); p_ = v; }
     bool create(
-        shared_motions const& rhs);  // { motions_value* v = rhs.p_; if (0!=v) v->m_dwReference++; destroy(); p_ = v; }
+        shared_motions const& rhs); // { motions_value* v = rhs.p_; if (0!=v) v->m_dwReference++; destroy(); p_ = v; }
 public:
     // construction
     shared_motions() { p_ = 0; }

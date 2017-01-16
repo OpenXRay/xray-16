@@ -107,8 +107,9 @@ public:
         m[3][2] = p.z;
     }
     //! Sets the translation part of the matrix, from a HPoint.
-    //		inline_	void				SetTrans(const HPoint& p)					{ m[3][0]=p.x;	m[3][1]=p.y;	m[3][2]=p.z;
-    //m[3][3]=p.w;	}
+    //		inline_	void				SetTrans(const HPoint& p)					{ m[3][0]=p.x;	m[3][1]=p.y;
+    //m[3][2]=p.z;
+    // m[3][3]=p.w;	}
     //! Sets the translation part of the matrix, from floats.
     inline_ void SetTrans(float tx, float ty, float tz)
     {
@@ -163,8 +164,9 @@ public:
     inline_ void Copy(const Matrix4x4& source) { CopyMemory(m, source.m, 16 * sizeof(float)); }
     // Row-column access
     //! Returns a row.
-    //		inline_	void				GetRow(const udword r, HPoint& p)	const	{ p.x=m[r][0];	p.y=m[r][1];	p.z=m[r][2];
-    //p.w=m[r][3];		}
+    //		inline_	void				GetRow(const udword r, HPoint& p)	const	{ p.x=m[r][0];	p.y=m[r][1];
+    //p.z=m[r][2];
+    // p.w=m[r][3];		}
     //! Returns a row.
     inline_ void GetRow(const udword r, Point& p) const
     {
@@ -173,8 +175,9 @@ public:
         p.z = m[r][2];
     }
     //! Sets a row.
-    //		inline_	void				SetRow(const udword r, const HPoint& p)		{ m[r][0]=p.x;	m[r][1]=p.y;	m[r][2]=p.z;
-    //m[r][3]=p.w;		}
+    //		inline_	void				SetRow(const udword r, const HPoint& p)		{ m[r][0]=p.x;	m[r][1]=p.y;
+    //m[r][2]=p.z;
+    // m[r][3]=p.w;		}
     //! Sets a row.
     inline_ void SetRow(const udword r, const Point& p)
     {
@@ -184,8 +187,9 @@ public:
         m[r][3] = (r != 3) ? 0.0f : 1.0f;
     }
     //! Returns a column.
-    //		inline_	void				GetCol(const udword c, HPoint& p)	const	{ p.x=m[0][c];	p.y=m[1][c];	p.z=m[2][c];
-    //p.w=m[3][c];		}
+    //		inline_	void				GetCol(const udword c, HPoint& p)	const	{ p.x=m[0][c];	p.y=m[1][c];
+    //p.z=m[2][c];
+    // p.w=m[3][c];		}
     //! Returns a column.
     inline_ void GetCol(const udword c, Point& p) const
     {
@@ -194,8 +198,9 @@ public:
         p.z = m[2][c];
     }
     //! Sets a column.
-    //		inline_	void				SetCol(const udword c, const HPoint& p)		{ m[0][c]=p.x;	m[1][c]=p.y;	m[2][c]=p.z;
-    //m[3][c]=p.w;		}
+    //		inline_	void				SetCol(const udword c, const HPoint& p)		{ m[0][c]=p.x;	m[1][c]=p.y;
+    //m[2][c]=p.z;
+    // m[3][c]=p.w;		}
     //! Sets a column.
     inline_ void SetCol(const udword c, const Point& p)
     {
@@ -420,8 +425,9 @@ public:
     }
 
     //! Operator for HPoint Mul = Matrix4x4 * HPoint;
-    //		inline_	HPoint				operator*(const HPoint& v)		const	{ return HPoint(ROW[0]|v, ROW[1]|v, ROW[2]|v,
-    //ROW[3]|v); }
+    //		inline_	HPoint				operator*(const HPoint& v)		const	{ return HPoint(ROW[0]|v, ROW[1]|v,
+    //ROW[2]|v,
+    // ROW[3]|v); }
 
     //! Operator for Point Mul = Matrix4x4 * Point;
     inline_ Point operator*(const Point& v) const
@@ -626,4 +632,4 @@ inline_ void TransformPoint3x3(Point& dest, const Point& source, const Matrix4x4
 
 ICEMATHS_API void InvertPRMatrix(Matrix4x4& dest, const Matrix4x4& src);
 
-#endif  // __ICEMATRIX4X4_H__
+#endif // __ICEMATRIX4X4_H__

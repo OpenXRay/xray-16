@@ -26,7 +26,7 @@ void CCar::SCarSound::Init()
     if (ini->section_exist("car_sound") && ini->line_exist("car_sound", "snd_volume")) {
         volume = ini->r_float("car_sound", "snd_volume");
 
-        snd_engine.create(ini->r_string("car_sound", "snd_name"), st_Effect, sg_SourceType);  //
+        snd_engine.create(ini->r_string("car_sound", "snd_name"), st_Effect, sg_SourceType); //
         snd_engine_start.create(READ_IF_EXISTS(ini, r_string, "car_sound", "engine_start", "car\\test_car_start"),
             st_Effect, sg_SourceType);
         snd_engine_stop.create(

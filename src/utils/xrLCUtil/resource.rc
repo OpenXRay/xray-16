@@ -63,9 +63,9 @@ LANGUAGE LANG_RUSSIAN, SUBLANG_DEFAULT
 
                                                     IDD_STEP,
     DIALOG BEGIN LEFTMARGIN, 7 RIGHTMARGIN, 93 TOPMARGIN, 7 BOTTOMMARGIN, 8 END END
-#endif  // APSTUDIO_INVOKED
+#endif // APSTUDIO_INVOKED
 
-#endif  // Russian (Russia) resources
+#endif // Russian (Russia) resources
 /////////////////////////////////////////////////////////////////////////////
 
 /////////////////////////////////////////////////////////////////////////////
@@ -92,9 +92,9 @@ LANGUAGE LANG_RUSSIAN, SUBLANG_DEFAULT
     3 TEXTINCLUDE BEGIN "\r\n"
                         "\0" END
 
-#endif  // APSTUDIO_INVOKED
+#endif // APSTUDIO_INVOKED
 
-#endif  // Ukrainian (Ukraine) resources
+#endif // Ukrainian (Ukraine) resources
 /////////////////////////////////////////////////////////////////////////////
 
 #ifndef APSTUDIO_INVOKED
@@ -104,4 +104,4 @@ LANGUAGE LANG_RUSSIAN, SUBLANG_DEFAULT
 //
 
 /////////////////////////////////////////////////////////////////////////////
-#endif  // not APSTUDIO_INVOKED
+#endif // not APSTUDIO_INVOKED

@@ -6,7 +6,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // INSOCK
 #if defined(INSOCK)
-#define INSOCK_MAX_UDP_BUFSIZE 8000000  // default max
+#define INSOCK_MAX_UDP_BUFSIZE 8000000 // default max
 #define INSOCK_MAX_TCP_BUFSIZE 32000
 
 extern sceSifMClientData gGSIInsockClientData;
@@ -52,9 +52,9 @@ int GSISocketSelect(SOCKET theSocket, int* theReadFlag, int* theWriteFlag, int* 
     if ((theExceptFlag != NULL)) *theExceptFlag = 0;
 
     // Setup the fd set
-    aPollFdSet.cid = theSocket;  // the socket
-    aPollFdSet.events = 0;       // events in
-    aPollFdSet.revents = 0;      // events out
+    aPollFdSet.cid = theSocket; // the socket
+    aPollFdSet.events = 0;      // events in
+    aPollFdSet.revents = 0;     // events out
 
     if (theReadFlag != NULL) aPollFdSet.events |= sceINET_POLLIN;
     if (theWriteFlag != NULL) aPollFdSet.events |= sceINET_POLLOUT;

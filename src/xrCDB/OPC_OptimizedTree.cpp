@@ -113,8 +113,8 @@ static void _BuildCollisionTree(
     else
     {
         // To make the negative one implicit, we must store P and N in successive order
-        udword PosID = curid++;  // Get a _new_ id for positive child
-        udword NegID = curid++;  // Get a _new_ id for negative child
+        udword PosID = curid++; // Get a _new_ id for positive child
+        udword NegID = curid++; // Get a _new_ id for negative child
         // Setup box data as the forthcoming _new_ P pointer
         linear[boxid].mData = (uintptr_t)&linear[PosID];
         // Make sure it's not marked as leaf

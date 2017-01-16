@@ -64,8 +64,8 @@ void CLight_DB::Load(IReader* fs)
             else
             {
                 Fvector tmp_D, tmp_R;
-                tmp_D.set(0, 0, -1);  // forward
-                tmp_R.set(1, 0, 0);   // right
+                tmp_D.set(0, 0, -1); // forward
+                tmp_R.set(1, 0, 0);  // right
 
                 // point
                 v_static.push_back(L);
@@ -108,7 +108,7 @@ void CLight_DB::LoadHemi()
         IReader* F = FS.r_open(fn_game);
 
         {
-            IReader* chunk = F->open_chunk(1);  // Hemispheric light chunk
+            IReader* chunk = F->open_chunk(1); // Hemispheric light chunk
 
             if (chunk) {
                 u32 size = chunk->length();
@@ -130,8 +130,8 @@ void CLight_DB::LoadHemi()
                         L->set_type(IRender_Light::POINT);
 
                         Fvector tmp_D, tmp_R;
-                        tmp_D.set(0, 0, -1);  // forward
-                        tmp_R.set(1, 0, 0);   // right
+                        tmp_D.set(0, 0, -1); // forward
+                        tmp_R.set(1, 0, 0);  // right
 
                         // point
                         v_hemi.push_back(L);
@@ -178,7 +178,7 @@ void CLight_DB::add_light(light* L)
 {
     if (Device.dwFrame == L->frame_render) return;
     L->frame_render = Device.dwFrame;
-    if (L->flags.bStatic) return;  // skip static lighting, 'cause they are in lmaps
+    if (L->flags.bStatic) return; // skip static lighting, 'cause they are in lmaps
     if (ps_r1_flags.test(R1FLAG_DLIGHTS)) RImplementation.L_Dynamic->add(L);
 }
 #endif
@@ -192,7 +192,7 @@ void CLight_DB::add_light(light* L)
     if (L->flags.bStatic && !ps_r2_ls_flags.test(R2FLAG_R1LIGHTS)) return;
     L->Export(package);
 }
-#endif  // (RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4)
+#endif // (RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4)
 
 void CLight_DB::Update()
 {

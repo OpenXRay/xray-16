@@ -13,9 +13,9 @@ namespace detail
 struct is_helper_pred
 {
     bool operator()(CUICellItem* child) { return child->IsHelper(); }
-};  // struct is_helper_pred
+}; // struct is_helper_pred
 
-}  // namespace detail
+} // namespace detail
 
 CUIInventoryCellItem::CUIInventoryCellItem(CInventoryItem* itm)
 {

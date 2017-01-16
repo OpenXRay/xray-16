@@ -4,9 +4,9 @@ extern void LogOut_File(const char* format, ...);
 #ifdef _DEBUG
 #define APIDEBUG(str)                                                                                                  \
     LogOut("---------------------" #str                                                                                \
-           "-------------------------\n")  //; LogOut_File("---------------------"#str"-------------------------\n")
+           "-------------------------\n") //; LogOut_File("---------------------"#str"-------------------------\n")
 
 #else
-#define APIDEBUG(str)  // LogOut_File("---------------------"#str"-------------------------\n")
+#define APIDEBUG(str) // LogOut_File("---------------------"#str"-------------------------\n")
 
 #endif

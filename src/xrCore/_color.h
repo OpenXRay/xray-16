@@ -110,14 +110,14 @@ public:
         r = f * (T)(BYTE)(dw >> 0);
         return *this;
     };
-    IC SelfRef adjust_contrast(T f)  // >1 - contrast will be increased
+    IC SelfRef adjust_contrast(T f) // >1 - contrast will be increased
     {
         r = 0.5f + f * (r - 0.5f);
         g = 0.5f + f * (g - 0.5f);
         b = 0.5f + f * (b - 0.5f);
         return *this;
     };
-    IC SelfRef adjust_contrast(SelfCRef in, T f)  // >1 - contrast will be increased
+    IC SelfRef adjust_contrast(SelfCRef in, T f) // >1 - contrast will be increased
     {
         r = 0.5f + f * (in.r - 0.5f);
         g = 0.5f + f * (in.g - 0.5f);

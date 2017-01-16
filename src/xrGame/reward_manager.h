@@ -26,7 +26,7 @@ private:
         u32 m_height;
         ref_sound m_play_sound;
         u32 m_process_time;
-    };  // struct reward_descriptor
+    }; // struct reward_descriptor
 
     typedef AssociativeVector<u32, reward_descriptor*> rewards_map_t;
     typedef xr_deque<u32> reward_tasks_queue_t;
@@ -40,8 +40,8 @@ private:
     void load_rewards();
     void load_reward_item(CInifile& reward_config, u32 const index, shared_str const& section);
     void process_reward(u32 const award_id);
-};  // class reward_manager
+}; // class reward_manager
 
-}  // namespace award_system
+} // namespace award_system
 
-#endif  //#ifndef REWARD_MANAGER_INCLUDED
+#endif //#ifndef REWARD_MANAGER_INCLUDED

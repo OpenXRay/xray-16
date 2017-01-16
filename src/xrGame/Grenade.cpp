@@ -116,7 +116,7 @@ void CGrenade::State(u32 state)
             if (Local()) {
 #ifndef MASTER_GOLD
                 Msg("Destroying local grenade[%d][%d]", ID(), Device.dwFrame);
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
                 DestroyObject();
             }
         };
@@ -170,7 +170,7 @@ void CGrenade::Throw()
         pGrenade->SetInitiator(H_Parent()->ID());
     }
     inherited::Throw();
-    m_fake_missile->processing_activate();  //@sliph
+    m_fake_missile->processing_activate(); //@sliph
     m_thrown = true;
 }
 
@@ -313,7 +313,7 @@ BOOL CGrenade::UsedAI_Locations()
 {
 #pragma todo(                                                                                                          \
     "Dima to Yura : It crashes, because on net_Spawn object doesn't use AI locations, but on net_Destroy it does use them")
-    return inherited::UsedAI_Locations();  // m_dwDestroyTime == 0xffffffff;
+    return inherited::UsedAI_Locations(); // m_dwDestroyTime == 0xffffffff;
 }
 
 void CGrenade::net_Relcase(IGameObject* O)

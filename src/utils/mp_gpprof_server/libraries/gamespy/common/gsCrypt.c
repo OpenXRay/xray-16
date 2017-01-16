@@ -52,7 +52,7 @@ gsi_bool gsiCryptRSAMaskData(unsigned char* data, gsi_u32 dataLen, const unsigne
     int k = 0;
 
     // The datablock may be used as the seed
-    unsigned char hashValue[GS_CRYPT_HASHSIZE];  // in integer form, NOT HEXSTRING
+    unsigned char hashValue[GS_CRYPT_HASHSIZE]; // in integer form, NOT HEXSTRING
 
     // seed should never be larger than the data block size (but it may be less)
     if (seedLen > GS_CRYPT_RSA_DATABLOCKSIZE) return gsi_false;
@@ -65,8 +65,8 @@ gsi_bool gsiCryptRSAMaskData(unsigned char* data, gsi_u32 dataLen, const unsigne
             gsi_u32 temp = 0;
 
             // concatenate byte value of i onto seed
-            char seedPlusIter[GS_CRYPT_RSA_DATABLOCKSIZE + 4];    // seed||i
-            char hashHexStr[GS_CRYPT_RSA_DATABLOCKSIZE * 2 + 1];  // hexstr of hash "A1" rather than 0xA1
+            char seedPlusIter[GS_CRYPT_RSA_DATABLOCKSIZE + 4];   // seed||i
+            char hashHexStr[GS_CRYPT_RSA_DATABLOCKSIZE * 2 + 1]; // hexstr of hash "A1" rather than 0xA1
             memcpy(&seedPlusIter[0], seed, seedLen);
             seedPlusIter[GS_CRYPT_RSA_DATABLOCKSIZE + 0] = 0x00;
             seedPlusIter[GS_CRYPT_RSA_DATABLOCKSIZE + 1] = 0x00;
@@ -86,7 +86,7 @@ gsi_bool gsiCryptRSAMaskData(unsigned char* data, gsi_u32 dataLen, const unsigne
         {
             gsi_u8 counter[4] = {0x00, 0x00, 0x00, 0x00};
             SHA1Context sha;
-            counter[3] = (gsi_u8)(i / GS_CRYPT_HASHSIZE);  // ensure little endian int
+            counter[3] = (gsi_u8)(i / GS_CRYPT_HASHSIZE); // ensure little endian int
             SHA1Reset(&sha);
             SHA1Input(&sha, (const unsigned char*)seed, seedLen);
             SHA1Input(&sha, counter, 4);
@@ -149,10 +149,10 @@ gsi_i32 gsCryptRSAOAEPEncryptBuffer(const gsCryptRSAKey* publicKey, const unsign
 
 #if (GS_CRYPT_HASHSIZE == GS_CRYPT_MD5_HASHSIZE)
     const gsi_u8 lhash[GS_CRYPT_HASHSIZE] = {0xd4, 0x1d, 0xd4, 0x1d, 0x8c, 0xd9, 0x8f, 0x00, 0xb2, 0x04, 0xe9, 0x80,
-        0x09, 0x98, 0xec, 0xf8, 0x42, 0x7e};  // hash of ""
+        0x09, 0x98, 0xec, 0xf8, 0x42, 0x7e}; // hash of ""
 #else
     const gsi_u8 lhash[GS_CRYPT_HASHSIZE] = {0xda, 0x39, 0xa3, 0xee, 0x5e, 0x6b, 0x4b, 0x0d, 0x32, 0x55, 0xbf, 0xef,
-        0x95, 0x60, 0x18, 0x90, 0xaf, 0xd8, 0x07, 0x09};  // hash of ""
+        0x95, 0x60, 0x18, 0x90, 0xaf, 0xd8, 0x07, 0x09}; // hash of ""
 #endif
     const unsigned int maxPlainTextLen = GS_CRYPT_RSA_BYTE_SIZE - 2 * GS_CRYPT_HASHSIZE - 2;
     const unsigned int padSize = maxPlainTextLen - len;
@@ -167,8 +167,8 @@ gsi_i32 gsCryptRSAOAEPEncryptBuffer(const gsCryptRSAKey* publicKey, const unsign
     //       b. create pad
     //       c. concatenate hash+pad+0x01+plainText
     memcpy(packet->maskedData, lhash, GS_CRYPT_HASHSIZE);
-    memset(&packet->maskedData[GS_CRYPT_HASHSIZE], 0, padSize);  // pad with zero bytes
-    packet->maskedData[GS_CRYPT_HASHSIZE + padSize] = 0x01;      // RSA encoding format ID (EME-OAEP)
+    memset(&packet->maskedData[GS_CRYPT_HASHSIZE], 0, padSize); // pad with zero bytes
+    packet->maskedData[GS_CRYPT_HASHSIZE + padSize] = 0x01;     // RSA encoding format ID (EME-OAEP)
     memcpy(&packet->maskedData[GS_CRYPT_HASHSIZE + padSize + 1], plainText, len);
 
     //       d. generate random seed (seed isn't masked until h.)
@@ -195,7 +195,7 @@ gsi_i32 gsCryptRSAOAEPEncryptBuffer(const gsCryptRSAKey* publicKey, const unsign
     // 4. return cipher text
     memcpy(buffer, lintRSAPacket.mData, GS_CRYPT_RSA_BYTE_SIZE);
     */
-    GS_ASSERT(0);  // Section above needs revision due to byte order issues
+    GS_ASSERT(0); // Section above needs revision due to byte order issues
 
     return 0;
 }
@@ -207,7 +207,7 @@ gsi_i32 gsCryptRSAPKCS1EncryptBuffer(const gsCryptRSAKey* publicKey, const unsig
     gsCryptRSAPKCS1Packet* packet = (gsCryptRSAPKCS1Packet*)buf;
     gsLargeInt_t lintRSAPacket;
 
-    if (len > (GS_CRYPT_RSA_BYTE_SIZE - 11))  // 2 byte header, 8 byte pad minimum, 1 byte separator
+    if (len > (GS_CRYPT_RSA_BYTE_SIZE - 11)) // 2 byte header, 8 byte pad minimum, 1 byte separator
         return -1;
 
     // form the packet
@@ -215,7 +215,7 @@ gsi_i32 gsCryptRSAPKCS1EncryptBuffer(const gsCryptRSAKey* publicKey, const unsig
     packet->headerByte[1] = 0x02;
 
     gsiCryptRSAGeneratePad(packet->data, GS_CRYPT_RSA_BYTE_SIZE - len - 3);
-    packet->data[GS_CRYPT_RSA_BYTE_SIZE - len - 3] = 0x00;  // separator
+    packet->data[GS_CRYPT_RSA_BYTE_SIZE - len - 3] = 0x00; // separator
     memcpy(&packet->data[GS_CRYPT_RSA_BYTE_SIZE - len - 3 + 1], plainText, len);
 
     if (gsi_is_false(gsLargeIntSetFromMemoryStream(&lintRSAPacket, (const gsi_u8*)buf, GS_CRYPT_RSA_BYTE_SIZE)) ||
@@ -254,9 +254,9 @@ static gsi_i32 gsCryptRSAPKCS1DecryptBuffer(const gsCryptRSAKey* privateKey,
     lintRSAPacket.mLength = GS_CRYPT_RSA_BYTE_SIZE / GS_LARGEINT_DIGIT_SIZE_BYTES;
     memcpy(lintRSAPacket.mData, cipherText, GS_CRYPT_RSA_BYTE_SIZE);
 
-    if (gsi_is_false(gsLargeIntReverseBytes(&lintRSAPacket)) ||  // reverse from bytebuffer to lint format
+    if (gsi_is_false(gsLargeIntReverseBytes(&lintRSAPacket)) || // reverse from bytebuffer to lint format
         gsi_is_false(gsLargeIntPowerMod(&lintRSAPacket, &privateKey->exponent, &privateKey->modulus, &lintRSAPacket)) ||
-        gsi_is_false(gsLargeIntReverseBytes(&lintRSAPacket))  // reverse back into a bytebuffer
+        gsi_is_false(gsLargeIntReverseBytes(&lintRSAPacket)) // reverse back into a bytebuffer
         )
     {
         return -1;
@@ -280,13 +280,13 @@ static gsi_i32 gsCryptRSAPKCS1DecryptBuffer(const gsCryptRSAKey* privateKey,
     {
         if (temp[i] == 0) break;
     }
-    if (i < (2 + 8))                             // 2 byte header, 8 byte minimum pad
-        return -3;                               // pad too small
-    if (i == GS_CRYPT_RSA_BYTE_SIZE) return -4;  // no payload
+    if (i < (2 + 8))                            // 2 byte header, 8 byte minimum pad
+        return -3;                              // pad too small
+    if (i == GS_CRYPT_RSA_BYTE_SIZE) return -4; // no payload
 
     // the rest is the msg
-    memcpy(plainText, (temp + i + 1), GS_CRYPT_RSA_BYTE_SIZE);  // +1 to skip the 0x00
-    *lenout = (gsi_u32)(GS_CRYPT_RSA_BYTE_SIZE - (i + 1));      // +1 to skip the 0x00
+    memcpy(plainText, (temp + i + 1), GS_CRYPT_RSA_BYTE_SIZE); // +1 to skip the 0x00
+    *lenout = (gsi_u32)(GS_CRYPT_RSA_BYTE_SIZE - (i + 1));     // +1 to skip the 0x00
 
     return 0;
 }
@@ -300,18 +300,18 @@ static gsi_i32 gsCryptRSAOAEPDecryptBuffer(const gsCryptRSAKey* privateKey,
 
 #if (GS_CRYPT_HASHSIZE == GS_CRYPT_MD5_HASHSIZE)
     const gsi_u8 lhash[GS_CRYPT_HASHSIZE] = {0xd4, 0x1d, 0xd4, 0x1d, 0x8c, 0xd9, 0x8f, 0x00, 0xb2, 0x04, 0xe9, 0x80,
-        0x09, 0x98, 0xec, 0xf8, 0x42, 0x7e};  // hash of ""
+        0x09, 0x98, 0xec, 0xf8, 0x42, 0x7e}; // hash of ""
 #else
     const gsi_u8 lhash[GS_CRYPT_HASHSIZE] = {0xda, 0x39, 0xa3, 0xee, 0x5e, 0x6b, 0x4b, 0x0d, 0x32, 0x55, 0xbf, 0xef,
-        0x95, 0x60, 0x18, 0x90, 0xaf, 0xd8, 0x07, 0x09};  // hash of ""
+        0x95, 0x60, 0x18, 0x90, 0xaf, 0xd8, 0x07, 0x09}; // hash of ""
 #endif
 
     lintRSAPacket.mLength = GS_CRYPT_RSA_BYTE_SIZE / 4;
     memcpy(lintRSAPacket.mData, cipherText, GS_CRYPT_RSA_BYTE_SIZE);
 
-    gsLargeIntReverseBytes(&lintRSAPacket);  // reverse from bytebuffer to lint format
+    gsLargeIntReverseBytes(&lintRSAPacket); // reverse from bytebuffer to lint format
     gsLargeIntPowerMod(&lintRSAPacket, &privateKey->exponent, &privateKey->modulus, &lintRSAPacket);
-    gsLargeIntReverseBytes(&lintRSAPacket);  // reverse back into a bytebuffer
+    gsLargeIntReverseBytes(&lintRSAPacket); // reverse back into a bytebuffer
 
     // check post exponentiation length
     if (lintRSAPacket.mLength < (GS_CRYPT_RSA_BYTE_SIZE / 4)) return -1;
@@ -323,16 +323,16 @@ static gsi_i32 gsCryptRSAOAEPDecryptBuffer(const gsCryptRSAKey* privateKey,
     gsiCryptRSAMaskData(packet->maskedData, GS_CRYPT_RSA_DATABLOCKSIZE, packet->maskedSeed, GS_CRYPT_HASHSIZE);
     // 3. datablock = [lhash][0x00...][0x01][M]
     if (0 != memcmp(packet->maskedData, lhash, GS_CRYPT_HASHSIZE))
-        return -2;  // label has doesn't match (mismatched hash algorithms?)
+        return -2; // label has doesn't match (mismatched hash algorithms?)
     i = 33;
     while (i < GS_CRYPT_RSA_BYTE_SIZE && packet->maskedData[i] == 0x00)
-        i++;                                                                      // may be zero bytes pad
-    if (i == GS_CRYPT_RSA_BYTE_SIZE || packet->maskedData[i] != 0x01) return -3;  // must be a 0x01 following the pad
+        i++;                                                                     // may be zero bytes pad
+    if (i == GS_CRYPT_RSA_BYTE_SIZE || packet->maskedData[i] != 0x01) return -3; // must be a 0x01 following the pad
     i++;
-    if (i == GS_CRYPT_RSA_BYTE_SIZE) return -4;  // founnd the separator, but no message!
+    if (i == GS_CRYPT_RSA_BYTE_SIZE) return -4; // founnd the separator, but no message!
 
     memcpy(plainText, &packet->maskedData[i], (size_t)(GS_CRYPT_RSA_DATABLOCKSIZE - i));
-    *lenout = (gsi_u32)(GS_CRYPT_RSA_DATABLOCKSIZE - i);  // final length = blocksize - pad
+    *lenout = (gsi_u32)(GS_CRYPT_RSA_DATABLOCKSIZE - i); // final length = blocksize - pad
     return 0;
 }
 #endif
@@ -366,7 +366,7 @@ gsi_i32 gsCryptRSASignHash(const gsCryptRSAKey* privateKey, const unsigned char*
     unsigned char* signedDataOut, gsi_u32* lenOut)
 {
     // Encode to PKCS1 signature form
-    gsi_u32 aKeyByteLength = privateKey->modulus.mLength * GS_LARGEINT_DIGIT_SIZE_BYTES;  // key length in bytes
+    gsi_u32 aKeyByteLength = privateKey->modulus.mLength * GS_LARGEINT_DIGIT_SIZE_BYTES; // key length in bytes
     gsi_u32 aReservedLength = 3;
     gsi_u32 anOidLen;
 
@@ -383,11 +383,11 @@ gsi_i32 gsCryptRSASignHash(const gsCryptRSAKey* privateKey, const unsigned char*
     else if (hashLen == GS_CRYPT_SHA1_HASHSIZE)
         anOidLen = sizeof(sha1Header);
     else
-        return -1;  // hash algorithm could not be identified from hashLen
+        return -1; // hash algorithm could not be identified from hashLen
 
     // Make sure the key is large enough to sign this hash
     GS_ASSERT(hashLen + anOidLen + aReservedLength <= aKeyByteLength);
-    if (hashLen + anOidLen + aReservedLength > aKeyByteLength) return -2;  // key is too small or hash is too large
+    if (hashLen + anOidLen + aReservedLength > aKeyByteLength) return -2; // key is too small or hash is too large
 
     // fill in header bytes
     writeBuf[0] = 0x00;
@@ -405,7 +405,7 @@ gsi_i32 gsCryptRSASignHash(const gsCryptRSAKey* privateKey, const unsigned char*
     else if (hashLen == GS_CRYPT_SHA1_HASHSIZE)
         memcpy(&writeBuf[aKeyByteLength - hashLen - anOidLen], sha1Header, sizeof(sha1Header));
     else
-        return -1;  // should probably assert here
+        return -1; // should probably assert here
 
     // copy in the hash
     memcpy(&writeBuf[aKeyByteLength - hashLen], hash, hashLen);
@@ -419,7 +419,7 @@ gsi_i32 gsCryptRSASignHash(const gsCryptRSAKey* privateKey, const unsigned char*
 
     // length of output data is always the length of the private key's modulus
     GS_ASSERT(dataToSign.mLength == privateKey->modulus.mLength);
-    gsLargeIntReverseBytes(&dataToSign);  // switch back to rawbuffer byte order
+    gsLargeIntReverseBytes(&dataToSign); // switch back to rawbuffer byte order
     memcpy(signedDataOut, dataToSign.mData, aKeyByteLength);
     *lenOut = aKeyByteLength;
 
@@ -447,7 +447,7 @@ gsi_i32 gsCryptRSAVerifySignedHash(const gsCryptRSAKey* publicKey, const unsigne
     // check parameters for common errors
     if (hash == NULL || sig == NULL) return -1;
     if (sigLen != publicKey->modulus.mLength * GS_LARGEINT_DIGIT_SIZE_BYTES) return -1;
-    if (hashLen != GS_CRYPT_MD5_HASHSIZE && hashLen != GS_CRYPT_SHA1_HASHSIZE) return -1;  // invalid hashsize
+    if (hashLen != GS_CRYPT_MD5_HASHSIZE && hashLen != GS_CRYPT_SHA1_HASHSIZE) return -1; // invalid hashsize
 
     // "decrypt" the signature
     lintRSASignature.mLength = (l_word)(sigLen / GS_LARGEINT_DIGIT_SIZE_BYTES);
@@ -465,7 +465,7 @@ gsi_i32 gsCryptRSAVerifySignedHash(const gsCryptRSAKey* publicKey, const unsigne
         if (packet[i] == 0x00) break;
         if (packet[i] != 0xFF) return -3;
     }
-    i++;  // skip the 0x00 seperator byte
+    i++; // skip the 0x00 seperator byte
 
     // Next should be the hash header (but we don't know which one!)
     if ((i + sizeof(md5Header) + GS_CRYPT_MD5_HASHSIZE) == (lintRSASignature.mLength * GS_LARGEINT_DIGIT_SIZE_BYTES)) {
@@ -489,7 +489,7 @@ gsi_i32 gsCryptRSAVerifySignedHash(const gsCryptRSAKey* publicKey, const unsigne
         if (0 != memcmp(&packet[i], hash, GS_CRYPT_SHA1_HASHSIZE)) return -5;
     }
     else
-        return -4;  // unsupported hash
+        return -4; // unsupported hash
 
     // Signature valid!
     return 0;

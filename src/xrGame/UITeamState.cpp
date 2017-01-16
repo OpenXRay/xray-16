@@ -65,7 +65,7 @@ bool UITeamState::SortingLessFunction(CUIWindow* left, CUIWindow* right)
 void UITeamState::Init(CUIXml& uiXml, LPCSTR teamNodeName, int index)
 {
     VERIFY(teamNodeName);
-    mainUiXml = &uiXml;  // warning !
+    mainUiXml = &uiXml; // warning !
     teamXmlNode = uiXml.NavigateToNode(teamNodeName, index);
     VERIFY2(teamXmlNode, make_string("team xml node (%s) not found", teamNodeName).c_str());
 
@@ -172,7 +172,7 @@ void UITeamState::AddPlayer(ClientID const& clientId)
 
 #ifdef DEBUG
     Msg("--- UITeamState: adding player (ClientID = 0x%08x) to %d team (0x%08x)", clientId.value(), myTeam, this);
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 
     UIPlayerItem* tempPlayerItem = new UIPlayerItem(static_cast<ETeam>(ps->team), clientId, this, m_teamPanels);
 
@@ -228,7 +228,7 @@ bool UITeamState::UpdatePlayer(ClientID const& clientId)
         }*/
         if (Game().IsPlayerInTeam(ps, myTeam) == false) {
             RemovePlayer(clientId);
-            retVal = false;  // tricky step :) player will be added by UITeamPanels::UpdatePlayer method :)
+            retVal = false; // tricky step :) player will be added by UITeamPanels::UpdatePlayer method :)
         }
         // warning ! after this Update tempIter will be not valid !!!
         Update();
@@ -287,13 +287,13 @@ void UITeamState::Update()
             VERIFY2(tempIter != myPlayers.end(), "player not found while deleting");
 #ifdef DEBUG
             Msg("--- UITeamState: deleting player (ClientID = 0x%08x) from %d team (0x%08x)", i->value(), myTeam, this);
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
             VERIFY(m_scroll_panels.size() > tempIter->second.m_panel_number);
             m_scroll_panels[tempIter->second.m_panel_number].first->RemoveWindow(tempIter->second.m_player_wnd);
             xr_delete(tempIter->second.m_player_wnd);
             myPlayers.erase(tempIter);
         }
-        ReStoreAllPlayers();  // warning ! uses myPlayers
+        ReStoreAllPlayers(); // warning ! uses myPlayers
         toDeletePlayers.clear();
     }
     TScrollPanels::iterator ite = m_scroll_panels.end();

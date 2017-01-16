@@ -103,10 +103,10 @@ public:
     virtual void SendDeactivateItem();
     virtual void OnActiveItem(){};
     virtual void OnHiddenItem(){};
-    virtual void SendHiddenItem();  // same as OnHiddenItem but for client... (sends message to a server)...
+    virtual void SendHiddenItem(); // same as OnHiddenItem but for client... (sends message to a server)...
     virtual void OnMoveToRuck(const SInvItemPlace& prev);
 
-    bool IsHidden() const { return GetState() == eHidden; }  // Does weapon is in hidden state
+    bool IsHidden() const { return GetState() == eHidden; } // Does weapon is in hidden state
     bool IsHiding() const { return GetState() == eHiding; }
     bool IsShowing() const { return GetState() == eShowing; }
     virtual void SwitchState(u32 S);

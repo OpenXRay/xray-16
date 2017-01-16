@@ -184,7 +184,7 @@ void CTeleWhirlwindObject::raise(float step)
     CPhysicsElement* maxE = p->get_ElementByStoreOrder(0);
     for (u16 element = 0; element < element_number; ++element)
     {
-        float k = strength;  // 600.f;
+        float k = strength; // 600.f;
         float predict_v_eps = 0.1f;
         float mag_eps = .01f;
 
@@ -203,7 +203,7 @@ void CTeleWhirlwindObject::raise(float step)
         }
         diff.sub(lc, pos);
         mag = diff.magnitude();
-        float accel = k / mag / mag / mag;  //*E->getMass()
+        float accel = k / mag / mag / mag; //*E->getMass()
         Fvector dir;
         if (mag < mag_eps) {
             accel = 0.f;
@@ -246,7 +246,7 @@ void CTeleWhirlwindObject::raise(float step)
             needed_diff.set(motion_dir);
             needed_diff.mul(needed_d);
             Fvector nearest_p;
-            nearest_p.add(pos, needed_diff);  //
+            nearest_p.add(pos, needed_diff); //
             Fvector needed_vel;
             needed_vel.set(needed_diff);
             needed_vel.mul(1.f / fixed_step);

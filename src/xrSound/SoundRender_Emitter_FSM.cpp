@@ -10,9 +10,9 @@ XRSOUND_API extern float psSoundCull;
 inline u32 calc_cursor(const float& fTimeStarted, float& fTime, const float& fTimeTotal, const WAVEFORMATEX& wfx)
 {
     if (fTime < fTimeStarted)
-        fTime = fTimeStarted;  // Андрюха посоветовал, ассерт что ниже вылетел из за паузы как то хитро
+        fTime = fTimeStarted; // Андрюха посоветовал, ассерт что ниже вылетел из за паузы как то хитро
     R_ASSERT((fTime - fTimeStarted) >= 0.0f);
-    while ((fTime - fTimeStarted) > fTimeTotal)  // looped
+    while ((fTime - fTimeStarted) > fTimeTotal) // looped
     {
         fTime -= fTimeTotal;
     }
@@ -104,7 +104,7 @@ void CSoundRender_Emitter::update(float dt)
         {
             if (!update_culling(dt)) {
                 // switch to: SIMULATE
-                m_current_state = stSimulating;  // switch state
+                m_current_state = stSimulating; // switch state
                 SoundRender->i_stop(this);
             }
             else
@@ -156,7 +156,7 @@ void CSoundRender_Emitter::update(float dt)
         }
         if (!update_culling(dt)) {
             // switch to: SIMULATE
-            m_current_state = stSimulatingLooped;  // switch state
+            m_current_state = stSimulatingLooped; // switch state
             SoundRender->i_stop(this);
         }
         else
@@ -173,7 +173,7 @@ void CSoundRender_Emitter::update(float dt)
         }
         if (update_culling(dt)) {
             // switch to: PLAY
-            m_current_state = stPlayingLooped;  // switch state
+            m_current_state = stPlayingLooped; // switch state
             u32 ptr = calc_cursor(fTimeStarted, fTime, get_length_sec(), source()->m_wformat);
             set_cursor(ptr);
 
@@ -252,7 +252,7 @@ BOOL CSoundRender_Emitter::update_culling(float dt)
                     .1f * (p_source.base_volume * p_source.volume *
                               (owner_data->s_type == st_Effect ? psSoundVEffects * psSoundVFactor : psSoundVMusic) *
                               occluder_volume * fade_volume);
-    if (smooth_volume < psSoundCull) return FALSE;  // allow volume to go up
+    if (smooth_volume < psSoundCull) return FALSE; // allow volume to go up
     // Here we has enought "PRIORITY" to be soundable
     // If we are playing already, return OK
     // --- else check availability of resources

@@ -12,7 +12,7 @@ void xrMemory::dbg_check()
 {
 }
 
-#else  // DEBUG_MEMORY_MANAGER
+#else // DEBUG_MEMORY_MANAGER
 #if 0
 #define DEBUG_MEMORY_LEAK
 #define MEMORY_LEAK_DESCRIPTION "C++ NEW"
@@ -183,4 +183,4 @@ XRCORE_API void dbg_dump_str_leaks()
 {
     g_pStringContainer->dump();
 }
-#endif  // DEBUG_MEMORY_MANAGER
+#endif // DEBUG_MEMORY_MANAGER

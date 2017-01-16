@@ -96,7 +96,7 @@ enum enum_hit_params_args
     hpa_bfunc,
     hpa_hit_distance,
     hpa_args_count
-};  // enum enum_hit_params_args
+}; // enum enum_hit_params_args
 
 bool event_conditions_collection::hit_params(arguments_t& arguments)
 {
@@ -122,7 +122,7 @@ enum enum_kill_params_args
     kpa_kill_spec_kill_type,
     kpa_kill_time_period,
     kpa_args_count
-};  // enum enum_kill_params_args
+}; // enum enum_kill_params_args
 
 bool event_conditions_collection::kill_params(arguments_t& arguments)
 {
@@ -146,7 +146,7 @@ enum enum_accumul_params_args
     cpa_bfunc,
     cpa_value,
     cpa_args_count
-};  // enum enum_accumul_params_args
+}; // enum enum_accumul_params_args
 
 bool event_conditions_collection::accumul_params(arguments_t& arguments)
 {
@@ -178,7 +178,7 @@ bool event_conditions_collection::execute_condition(event_condition_t* cond)
     case eo_hit_params: result = hit_params(cond->m_arguments); break;
     case eo_kill_params: result = kill_params(cond->m_arguments); break;
     case eo_accumul_value_params: result = accumul_params(cond->m_arguments); break;
-    };  // switch (cond->m_operation)
+    }; // switch (cond->m_operation)
     return result;
 }
 
@@ -327,4 +327,4 @@ event_condition_t* event_conditions_collection::add_accumm_value_condition(
     return add_condition(eo_accumul_value_params, args_buffer);
 }
 
-}  // namespace award_system
+} // namespace award_system

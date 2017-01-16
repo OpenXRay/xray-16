@@ -67,7 +67,7 @@ void smapvis::end()
             RImplementation.r_dsgraph_insert_static(testQ_V);
             RImplementation.r_dsgraph_render_graph(0);
             RImplementation.occq_end(testQ_id);
-            testQ_frame = Device.dwFrame + 1;  // get result on next frame
+            testQ_frame = Device.dwFrame + 1; // get result on next frame
         }
         break;
     case state_usingTC:
@@ -110,9 +110,9 @@ void smapvis::resetoccq()
 void smapvis::mark()
 {
     RImplementation.Stats.ic_culled += invisible.size();
-    u32 marker = RImplementation.marker + 1;  // we are called befor marker increment
+    u32 marker = RImplementation.marker + 1; // we are called befor marker increment
     for (u32 it = 0; it < invisible.size(); it++)
-        invisible[it]->vis.marker = marker;  // this effectively disables processing
+        invisible[it]->vis.marker = marker; // this effectively disables processing
 }
 
 void smapvis::rfeedback_static(dxRender_Visual* V)

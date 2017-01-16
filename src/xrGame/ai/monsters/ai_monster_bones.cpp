@@ -32,7 +32,7 @@ void bonesBone::Turn(u32 dt)
         params.r_speed * _cos(PI_DIV_2m - PIm * _abs(params.target_yaw - params.cur_yaw) / params.dist_yaw);
 
     float dy;
-    dy = cur_speed * dt / 1000;  // учитываем милисек и радианную меры
+    dy = cur_speed * dt / 1000; // учитываем милисек и радианную меры
 
     if (_abs(params.target_yaw - params.cur_yaw) < dy)
         params.cur_yaw = params.target_yaw;
@@ -134,11 +134,11 @@ void bonesManipulation::Update(CBoneInstance* bone, u32 cur_time)
 
     // если выполняется наращивание угла и ни одна кость не повернулась (достигли таргета...)
     if (!bones_were_turned && !in_return_state) {
-        if ((0 == time_started) && (freeze_time > 0)) {  // начинаем ждать
+        if ((0 == time_started) && (freeze_time > 0)) { // начинаем ждать
             time_started = cur_time;
         }
 
-        if ((0 != time_started) && (time_started + freeze_time < cur_time)) {  // время вышло?
+        if ((0 != time_started) && (time_started + freeze_time < cur_time)) { // время вышло?
             time_started = 0;
 
             // делаем возврат

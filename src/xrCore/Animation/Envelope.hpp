@@ -66,7 +66,7 @@ struct st_Key
         F.w_float(value);
         F.w_float(time);
         F.w_u8(shape);
-        if (shape != 4)  // ! Stepped
+        if (shape != 4) // ! Stepped
         {
             F.w_float_q16(tension, -32.f, 32.f);
             F.w_float_q16(continuity, -32.f, 32.f);
@@ -92,7 +92,7 @@ struct st_Key
         value = F.r_float();
         time = F.r_float();
         shape = F.r_u8();
-        if (shape != 4)  // ! Stepped
+        if (shape != 4) // ! Stepped
         {
             tension = F.r_float_q16(-32.f, 32.f);
             continuity = F.r_float_q16(-32.f, 32.f);
@@ -148,4 +148,4 @@ public:
     void Optimize();
 };
 
-#endif  //_ENVELOPE_H_
+#endif //_ENVELOPE_H_

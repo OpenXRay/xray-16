@@ -28,7 +28,7 @@ IC BOOL ValidateMerge(Fbox& bb_base, Fbox& bb, float& volume, float SLimit)
     Fvector sz;
     merge.getsize(sz);
     sz.add(EPS_L);
-    if (sz.x > SLimit) return FALSE;  // Don't exceed limits (4/3 GEOM)
+    if (sz.x > SLimit) return FALSE; // Don't exceed limits (4/3 GEOM)
     if (sz.y > SLimit) return FALSE;
     if (sz.z > SLimit) return FALSE;
 
@@ -60,7 +60,7 @@ void CSector::BuildHierrarhy()
     int iLevel = 2;
     float SizeLimit = c_SS_maxsize / 4.f;
     if (SizeLimit < 4.f) SizeLimit = 4.f;
-    if (delimiter <= SizeLimit) delimiter *= 2;  // just very small level
+    if (delimiter <= SizeLimit) delimiter *= 2; // just very small level
 
     for (; SizeLimit <= delimiter; SizeLimit *= 2)
     {

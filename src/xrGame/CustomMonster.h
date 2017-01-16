@@ -85,14 +85,14 @@ public:
     u32 m_dwLastUpdateTime;
     //	Fmatrix				m_tServerTransform;
 
-    u32 m_dwCurrentTime;  // time updated in UpdateCL
+    u32 m_dwCurrentTime; // time updated in UpdateCL
 
     struct net_update
     {
-        u32 dwTimeStamp;    // server(game) timestamp
-        float o_model;      // model yaw
-        SRotation o_torso;  // torso in world coords
-        Fvector p_pos;      // in world coords
+        u32 dwTimeStamp;   // server(game) timestamp
+        float o_model;     // model yaw
+        SRotation o_torso; // torso in world coords
+        Fvector p_pos;     // in world coords
         float fHealth;
 
         // non-exported (temporal)
@@ -110,9 +110,9 @@ public:
     };
     xr_deque<net_update> NET;
     net_update NET_Last;
-    BOOL NET_WasInterpolating;  // previous update was by interpolation or by extrapolation
-    u32 NET_Time;               // server time of last update
-                                //------------------------------
+    BOOL NET_WasInterpolating; // previous update was by interpolation or by extrapolation
+    u32 NET_Time;              // server time of last update
+                               //------------------------------
 
     virtual bool feel_touch_on_contact(IGameObject*);
     virtual bool feel_touch_contact(IGameObject*);
@@ -148,8 +148,8 @@ public:
     virtual void UpdateCL();
 
     // Network
-    virtual void net_Export(NET_Packet& P);  // export to server
-    virtual void net_Import(NET_Packet& P);  // import from server
+    virtual void net_Export(NET_Packet& P); // export to server
+    virtual void net_Import(NET_Packet& P); // import from server
     virtual void net_Relcase(IGameObject* O);
 
     virtual void SelectAnimation(const Fvector& _view, const Fvector& _move, float speed) = 0;
@@ -257,7 +257,7 @@ private:
 
 public:
     IC const bool& already_dead() const { return (m_already_dead); };
-    virtual bool use_simplified_visual() const { return false; }  //(already_dead());};
+    virtual bool use_simplified_visual() const { return false; } //(already_dead());};
     virtual void on_enemy_change(const CEntityAlive* enemy);
     virtual CVisualMemoryManager* visual_memory() const;
 
@@ -330,7 +330,7 @@ public:
 #ifdef DEBUG
     xr_vector<trajectory_pick> m_jump_picks;
     xr_vector<Fvector> m_jump_collide_tris;
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 };
 
 #include "custommonster_inline.h"

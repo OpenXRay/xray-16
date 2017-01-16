@@ -17,8 +17,8 @@ u32 Collector::VPack(const Fvector& V, float eps)
     return verts.size() - 1;
 }
 
-void Collector::add_face_D(const Fvector& v0, const Fvector& v1, const Fvector& v2,  // vertices
-    u32 dummy                                                                        // misc
+void Collector::add_face_D(const Fvector& v0, const Fvector& v1, const Fvector& v2, // vertices
+    u32 dummy                                                                       // misc
     )
 {
     TRI T;
@@ -48,8 +48,8 @@ void Collector::add_face(const Fvector& v0, const Fvector& v1, const Fvector& v2
     faces.push_back(T);
 }
 
-void Collector::add_face_packed(const Fvector& v0, const Fvector& v1, const Fvector& v2,  // vertices
-    u16 material, u16 sector,                                                             // misc
+void Collector::add_face_packed(const Fvector& v0, const Fvector& v1, const Fvector& v2, // vertices
+    u16 material, u16 sector,                                                            // misc
     float eps)
 {
     TRI T;
@@ -61,7 +61,7 @@ void Collector::add_face_packed(const Fvector& v0, const Fvector& v1, const Fvec
     faces.push_back(T);
 }
 
-void Collector::add_face_packed_D(const Fvector& v0, const Fvector& v1, const Fvector& v2,  // vertices
+void Collector::add_face_packed_D(const Fvector& v0, const Fvector& v1, const Fvector& v2, // vertices
     u32 dummy, float eps)
 {
     TRI T;
@@ -304,8 +304,8 @@ CollectorPacked::CollectorPacked(const Fbox& bb, int apx_vertices, int apx_faces
                 VM[ix][iy][iz].reserve(_average);
 }
 
-void CollectorPacked::add_face(const Fvector& v0, const Fvector& v1, const Fvector& v2,  // vertices
-    u16 material, u16 sector, u32 _flags                                                 // misc
+void CollectorPacked::add_face(const Fvector& v0, const Fvector& v1, const Fvector& v2, // vertices
+    u16 material, u16 sector, u32 _flags                                                // misc
     )
 {
     TRI T;
@@ -318,8 +318,8 @@ void CollectorPacked::add_face(const Fvector& v0, const Fvector& v1, const Fvect
     faces.push_back(T);
 }
 
-void CollectorPacked::add_face_D(const Fvector& v0, const Fvector& v1, const Fvector& v2,  // vertices
-    u32 dummy, u32 _flags                                                                  // misc
+void CollectorPacked::add_face_D(const Fvector& v0, const Fvector& v1, const Fvector& v2, // vertices
+    u32 dummy, u32 _flags                                                                 // misc
     )
 {
     TRI T;

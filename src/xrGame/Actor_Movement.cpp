@@ -20,15 +20,15 @@
 #ifdef DEBUG
 #include "phdebug.h"
 #endif
-static const float s_fLandingTime1 = 0.1f;  // через сколько снять флаг Landing1 (т.е. включить следующую анимацию)
-static const float s_fLandingTime2 = 0.3f;  // через сколько снять флаг Landing2 (т.е. включить следующую анимацию)
+static const float s_fLandingTime1 = 0.1f; // через сколько снять флаг Landing1 (т.е. включить следующую анимацию)
+static const float s_fLandingTime2 = 0.3f; // через сколько снять флаг Landing2 (т.е. включить следующую анимацию)
 static const float s_fJumpTime = 0.3f;
-static const float s_fJumpGroundTime = 0.1f;  // для снятия флажка Jump если на земле
+static const float s_fJumpGroundTime = 0.1f; // для снятия флажка Jump если на земле
 const float s_fFallTime = 0.2f;
 
 IC static void generate_orthonormal_basis1(const Fvector& dir, Fvector& updir, Fvector& right)
 {
-    right.crossproduct(dir, updir);  //. <->
+    right.crossproduct(dir, updir); //. <->
     right.normalize();
     updir.crossproduct(right, dir);
 }
@@ -255,9 +255,9 @@ void CActor::g_cl_CheckControls(u32 mstate_wf, Fvector& vControlAccel, float& Ju
 
                 vControlAccel.mul(scale);
                 cam_eff_factor = scale;
-            }  // scale>EPS
-        }      //(mstate_real&mcAnyMove)
-    }          // peOnGround || peAtWall
+            } // scale>EPS
+        }     //(mstate_real&mcAnyMove)
+    }         // peOnGround || peAtWall
 
     if (IsGameTypeSingle() && cam_eff_factor > EPS) {
         LPCSTR state_anm = NULL;
@@ -273,7 +273,7 @@ void CActor::g_cl_CheckControls(u32 mstate_wf, Fvector& vControlAccel, float& Ju
         else if (mstate_real & mcBack && !(mstate_old & mcBack))
             state_anm = "move_back";
 
-        if (state_anm) {  // play moving cam effect
+        if (state_anm) { // play moving cam effect
             CActor* control_entity = smart_cast<CActor*>(Level().CurrentControlEntity());
             R_ASSERT2(control_entity, "current control entity is NULL");
             CEffectorCam* ec = control_entity->Cameras().GetCamEffector(eCEActorMoving);
@@ -326,22 +326,22 @@ void CActor::g_Orientate(u32 mstate_rl, float dt)
     switch (mstate_rl & mcAnyMove)
     {
     case mcFwd + mcLStrafe:
-        calc_yaw = +fwd_l_strafe_yaw;  //+PI_DIV_4;
+        calc_yaw = +fwd_l_strafe_yaw; //+PI_DIV_4;
         break;
     case mcBack + mcRStrafe:
-        calc_yaw = +back_r_strafe_yaw;  //+PI_DIV_4;
+        calc_yaw = +back_r_strafe_yaw; //+PI_DIV_4;
         break;
     case mcFwd + mcRStrafe:
-        calc_yaw = -fwd_r_strafe_yaw;  //-PI_DIV_4;
+        calc_yaw = -fwd_r_strafe_yaw; //-PI_DIV_4;
         break;
     case mcBack + mcLStrafe:
-        calc_yaw = -back_l_strafe_yaw;  //-PI_DIV_4;
+        calc_yaw = -back_l_strafe_yaw; //-PI_DIV_4;
         break;
     case mcLStrafe:
-        calc_yaw = +l_strafe_yaw;  //+PI_DIV_3-EPS_L;
+        calc_yaw = +l_strafe_yaw; //+PI_DIV_3-EPS_L;
         break;
     case mcRStrafe:
-        calc_yaw = -r_strafe_yaw;  //-PI_DIV_4+EPS_L;
+        calc_yaw = -r_strafe_yaw; //-PI_DIV_4+EPS_L;
         break;
     }
 

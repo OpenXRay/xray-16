@@ -20,133 +20,133 @@
 
 #include <windows.h>
 
-#pragma pack(1)  // Align the structure on byte boundries...
+#pragma pack(1) // Align the structure on byte boundries...
 
 // Possible Image Types
-#define TGA_NOIMAGETYPE 0      // No Image Data Included in Image
-#define TGA_MAPRGBTYPE 1       // Colormapped Image Data - No Compression
-#define TGA_RAWRGBTYPE 2       // Truecolor Image Data - No Compression
-#define TGA_RAWMONOTYPE 3      // Monochrome Image Data - No Compression
-#define TGA_MAPENCODETYPE 9    // Colormapped Image Data - Compressed RLE
-#define TGA_RAWENCODETYPE 10   // Truecolor Image Data - Compressed RLE
-#define TGA_MONOENCODETYPE 11  // Monochrome Image Data - Compressed RLE
+#define TGA_NOIMAGETYPE 0     // No Image Data Included in Image
+#define TGA_MAPRGBTYPE 1      // Colormapped Image Data - No Compression
+#define TGA_RAWRGBTYPE 2      // Truecolor Image Data - No Compression
+#define TGA_RAWMONOTYPE 3     // Monochrome Image Data - No Compression
+#define TGA_MAPENCODETYPE 9   // Colormapped Image Data - Compressed RLE
+#define TGA_RAWENCODETYPE 10  // Truecolor Image Data - Compressed RLE
+#define TGA_MONOENCODETYPE 11 // Monochrome Image Data - Compressed RLE
 // Version Macro
-#define TGA_VERSIONONE 1  // Version 1 File Format
-#define TGA_VERSIONTWO 2  // Version 2 File Format
+#define TGA_VERSIONONE 1 // Version 1 File Format
+#define TGA_VERSIONTWO 2 // Version 2 File Format
 // File Read Write Modes
-const int GREYSC = 0;  // Image is Greyscale
-const int COLOUR = 1;  // Image is Color
-const int MAPPED = 2;  // Image has a Color Map
-const int RLENCO = 4;  // Image is RLE Encoded
+const int GREYSC = 0; // Image is Greyscale
+const int COLOUR = 1; // Image is Color
+const int MAPPED = 2; // Image has a Color Map
+const int RLENCO = 4; // Image is RLE Encoded
 
 // 18 Byte Sturcture representin the basic definitions of
 // the image
 typedef struct _aTGAHEADER
 {
-    BYTE IDLength;         // 00h Size of ID Field
-    BYTE ColorMapType;     // 01h Color Map Type
-    BYTE ImageType;        // 02h Image Type Code
-    WORD CMapStart;        // 03h Color Map Origin
-    WORD CMapLength;       // 05h Color Map Length
-    BYTE CMapDepth;        // 07h Color Map Depth
-    WORD XOffset;          // 08h X origin of Image
-    WORD YOffset;          // 0Ah Y origin of Image
-    WORD Width;            // 0Ch Width of Image
-    WORD Height;           // 0Eh Height of Image
-    BYTE PixelDepth;       // 10h Image Pixel Size
-    BYTE ImageDescriptor;  // 11h Image Description Byte
+    BYTE IDLength;        // 00h Size of ID Field
+    BYTE ColorMapType;    // 01h Color Map Type
+    BYTE ImageType;       // 02h Image Type Code
+    WORD CMapStart;       // 03h Color Map Origin
+    WORD CMapLength;      // 05h Color Map Length
+    BYTE CMapDepth;       // 07h Color Map Depth
+    WORD XOffset;         // 08h X origin of Image
+    WORD YOffset;         // 0Ah Y origin of Image
+    WORD Width;           // 0Ch Width of Image
+    WORD Height;          // 0Eh Height of Image
+    BYTE PixelDepth;      // 10h Image Pixel Size
+    BYTE ImageDescriptor; // 11h Image Description Byte
 } TGAHEADER;
 
 // The footer is 26 Bytes in length and is always at the end of a
 // TGA v2.0 file.
 typedef struct _aTGAFOOTER
 {
-    DWORD ExtensionOffset;  // Extension Area Offset
-    DWORD DeveloperOffset;  // Developer Directory Offset
-    CHAR Signature[18];     // TGA Signature
+    DWORD ExtensionOffset; // Extension Area Offset
+    DWORD DeveloperOffset; // Developer Directory Offset
+    CHAR Signature[18];    // TGA Signature
 } TGAFOOTER;
 
 typedef struct _aTGATAG
 {
-    WORD TagNumber;    // ID Number of the Tag
-    DWORD DataOffset;  // Offset Location of the Tag
-    DWORD DataSize;    // Size of the Tag Data in Bytes
+    WORD TagNumber;   // ID Number of the Tag
+    DWORD DataOffset; // Offset Location of the Tag
+    DWORD DataSize;   // Size of the Tag Data in Bytes
 } TGATAG;
 
 // The extension area is basically the second header in the TGA v2.0
 // file format.
 typedef struct _aTGAEXTENSION
 {
-    WORD Size;                // Extension Size
-    CHAR AuthorName[41];      // Author Name
-    CHAR AuthorComment[324];  // Author Comment
-    WORD StampMonth;          // Date/Time Stamp: Month
-    WORD StampDay;            // Date/Time Stamp: Day
-    WORD StampYear;           // Date/Time Stamp: Year
-    WORD StampHour;           // Date/Time Stamp: Hour
-    WORD StampMinute;         // Date/Time Stamp: Minute
-    WORD StampSecond;         // Date/Time Stamp: Second
-    CHAR JobName[41];         // Job Name/ID
-    WORD JobHour;             // Job Time: Hours
-    WORD JobMinute;           // Job Time: Minutes
-    WORD JobSecond;           // Job Time: Seconds
-    CHAR SoftwareId[41];      // Software ID
-    WORD VersionNumber;       // Version Number of Software
-    BYTE VersionLetter;       // Version Letter of Software
-    DWORD KeyColor;           // Key Color
-    WORD PixelNumerator;      // Pixel Aspect Ratio
-    WORD PixelDenominator;    // Pixel Aspect Ratio
-    WORD GammaNumerator;      // Gamma Value
-    WORD GammaDenominator;    // Gamma Value
-    DWORD ColorOffset;        // Color Correction Offset
-    DWORD StampOffset;        // Postage Stamp Offset
-    DWORD ScanOffset;         // Scanline Table Offset
-    BYTE AttributesType;      // Attributes Type
+    WORD Size;               // Extension Size
+    CHAR AuthorName[41];     // Author Name
+    CHAR AuthorComment[324]; // Author Comment
+    WORD StampMonth;         // Date/Time Stamp: Month
+    WORD StampDay;           // Date/Time Stamp: Day
+    WORD StampYear;          // Date/Time Stamp: Year
+    WORD StampHour;          // Date/Time Stamp: Hour
+    WORD StampMinute;        // Date/Time Stamp: Minute
+    WORD StampSecond;        // Date/Time Stamp: Second
+    CHAR JobName[41];        // Job Name/ID
+    WORD JobHour;            // Job Time: Hours
+    WORD JobMinute;          // Job Time: Minutes
+    WORD JobSecond;          // Job Time: Seconds
+    CHAR SoftwareId[41];     // Software ID
+    WORD VersionNumber;      // Version Number of Software
+    BYTE VersionLetter;      // Version Letter of Software
+    DWORD KeyColor;          // Key Color
+    WORD PixelNumerator;     // Pixel Aspect Ratio
+    WORD PixelDenominator;   // Pixel Aspect Ratio
+    WORD GammaNumerator;     // Gamma Value
+    WORD GammaDenominator;   // Gamma Value
+    DWORD ColorOffset;       // Color Correction Offset
+    DWORD StampOffset;       // Postage Stamp Offset
+    DWORD ScanOffset;        // Scanline Table Offset
+    BYTE AttributesType;     // Attributes Type
 } TGAEXTENSION;
 
 // The Color Correction Table is an array of 2048 Bytes in length, which
 // contians 256 entries used to store the values used for color remapping.
 typedef struct _aTGACOLORCORRECTIONTABLE
 {
-    SHORT Alpha;  // Alpha Channel Seldom Used
-    SHORT Red;    // Red Value of Correction
-    SHORT Green;  // Green Value of Correction
-    SHORT Blue;   // Green Value of Correction
+    SHORT Alpha; // Alpha Channel Seldom Used
+    SHORT Red;   // Red Value of Correction
+    SHORT Green; // Green Value of Correction
+    SHORT Blue;  // Green Value of Correction
 } TGACOLORCORRECTIONTABLE;
 
-#define TRIALVERSION -1  // LIB was not initialized with a registered key
+#define TRIALVERSION -1 // LIB was not initialized with a registered key
 
-#define IMGOK 0                 // no err
-#define MEMERR 1                // out of mem
-#define FILEOPENERR 2           // error on file open
-#define FILEREADERR 3           // error on file read
-#define FILEWRITEERR 4          // error on file write
-#define BADPARAMERR 5           // bad user param
-#define INVALIDBMPERR 6         // bad BMP file
-#define BMPRLEERR 7             // we don't do compressed (RLE) BMP files
-#define INVALIDGIFERR 8         // bad GIF file
-#define INVALIDJPGERR 9         // bad JPG file
-#define IMGDCERR 10             // error with device context
-#define IMGDIBERR 11            // problem with a GetDIBits call
-#define NOGIFERR 12             // GIF support disabled
-#define IMGNORESOURCE 13        // resource not found
-#define CALLBACKCANCEL 14       // callback returned FALSE - operation aborted
-#define INVALIDPNGERR 15        // bad PNG file
-#define PNGCREATEERR 16         // internal PNG lib behavior - contact smaller animals s.w.
-#define IMGDLLINTERNAL 17       // misc unexpected behavior error - contact smaller animals s.w.
-#define IMGFONTERR 18           // trouble creating a font object
-#define INTTIFFERR 19           // misc internal TIFF error
-#define INVALIDTIFFERR 20       // invalid TIFF file
-#define TIFFLZWNOTSUPPORTED 21  // this will not read TIFF-LZW iamges
-#define INVALIDPCXERR 22        // invalid PCX image
-#define CREATEBMPERR 23         // a call to the fn CreateCompatibleBitmap failed
-#define IMGNOLINES 24           // end of an image while using single-line de/compression
-#define GETDIBERR 25            // error during a call to GetDIBits
-#define DEVOPNOSUPPORT 26       // device does not support an operation required by this function
-#define INVALIDWMF 27           // invalid windows metafile
-#define DEPTHMISMATCHERR 28     // the file was not of the requested bit-depth
-#define INVALIDTGAERR 35        // Invalid TGA File
-#define NOTGATHUMBNAIL 36       // No TGA Thumbnail in the file
+#define IMGOK 0                // no err
+#define MEMERR 1               // out of mem
+#define FILEOPENERR 2          // error on file open
+#define FILEREADERR 3          // error on file read
+#define FILEWRITEERR 4         // error on file write
+#define BADPARAMERR 5          // bad user param
+#define INVALIDBMPERR 6        // bad BMP file
+#define BMPRLEERR 7            // we don't do compressed (RLE) BMP files
+#define INVALIDGIFERR 8        // bad GIF file
+#define INVALIDJPGERR 9        // bad JPG file
+#define IMGDCERR 10            // error with device context
+#define IMGDIBERR 11           // problem with a GetDIBits call
+#define NOGIFERR 12            // GIF support disabled
+#define IMGNORESOURCE 13       // resource not found
+#define CALLBACKCANCEL 14      // callback returned FALSE - operation aborted
+#define INVALIDPNGERR 15       // bad PNG file
+#define PNGCREATEERR 16        // internal PNG lib behavior - contact smaller animals s.w.
+#define IMGDLLINTERNAL 17      // misc unexpected behavior error - contact smaller animals s.w.
+#define IMGFONTERR 18          // trouble creating a font object
+#define INTTIFFERR 19          // misc internal TIFF error
+#define INVALIDTIFFERR 20      // invalid TIFF file
+#define TIFFLZWNOTSUPPORTED 21 // this will not read TIFF-LZW iamges
+#define INVALIDPCXERR 22       // invalid PCX image
+#define CREATEBMPERR 23        // a call to the fn CreateCompatibleBitmap failed
+#define IMGNOLINES 24          // end of an image while using single-line de/compression
+#define GETDIBERR 25           // error during a call to GetDIBits
+#define DEVOPNOSUPPORT 26      // device does not support an operation required by this function
+#define INVALIDWMF 27          // invalid windows metafile
+#define DEPTHMISMATCHERR 28    // the file was not of the requested bit-depth
+#define INVALIDTGAERR 35       // Invalid TGA File
+#define NOTGATHUMBNAIL 36      // No TGA Thumbnail in the file
 
 #pragma pack()
 
@@ -165,71 +165,71 @@ public:
 
     BOOL IsFileTGA(const char* fileName);
 
-    LPVOID LoadTGA(const char* fileName,  // Name of file
-        UINT32* width,                    // Width in Pixel
-        UINT32* height);                  // Height
+    LPVOID LoadTGA(const char* fileName, // Name of file
+        UINT32* width,                   // Width in Pixel
+        UINT32* height);                 // Height
 
-    HGLOBAL LoadTGA8Bit(const char* fileName,  // Name of File
-        UINT32* width,                         // Width in pixels
-        UINT32* height,                        // Height
-        RGBQUAD* pal);                         // Palette of RGBQUADS
+    HGLOBAL LoadTGA8Bit(const char* fileName, // Name of File
+        UINT32* width,                        // Width in pixels
+        UINT32* height,                       // Height
+        RGBQUAD* pal);                        // Palette of RGBQUADS
 
     BOOL GetTGADims(const char* fileName, UINT32* width, UINT32* height);
 
-    BOOL SaveTGA32(const char* fileName,  // output path
-        BYTE* inBuf,                      // RGB buffer
-        UINT32 width,                     // size
+    BOOL SaveTGA32(const char* fileName, // output path
+        BYTE* inBuf,                     // RGB buffer
+        UINT32 width,                    // size
         UINT32 height);
 
-    BOOL Save8BitTGA(const char* fileName,  // output path
-        BYTE* colormappedbuffer,            // one BYTE per pixel colomapped image
-        UINT32 width,                       // Width of image
-        UINT32 height,                      // Height of image
-        __int32 colors,                     // number of colors (number of RGBQUADs)
-        RGBQUAD* colormap);                 // array of RGBQUADs
+    BOOL Save8BitTGA(const char* fileName, // output path
+        BYTE* colormappedbuffer,           // one BYTE per pixel colomapped image
+        UINT32 width,                      // Width of image
+        UINT32 height,                     // Height of image
+        __int32 colors,                    // number of colors (number of RGBQUADs)
+        RGBQUAD* colormap);                // array of RGBQUADs
 
-    HGLOBAL LoadTGAThumbnail(const char* fileName,  // Name of file
-        UINT32* width,                              // Width in Pixel
-        UINT32* height);                            // Height
+    HGLOBAL LoadTGAThumbnail(const char* fileName, // Name of file
+        UINT32* width,                             // Width in Pixel
+        UINT32* height);                           // Height
 
 private:
     // Parameters
 
-    char TGA_ImageIDFeild[256];  // Text in file
-    BYTE TGA_Attribute;          // Number of attribute bytes per pixel
-                                 // i.e. 1 for T16 and 8 for T32
-    UINT32 mode;                 // Mode of current Read or Write
+    char TGA_ImageIDFeild[256]; // Text in file
+    BYTE TGA_Attribute;         // Number of attribute bytes per pixel
+                                // i.e. 1 for T16 and 8 for T32
+    UINT32 mode;                // Mode of current Read or Write
 
     // RLE Decompression Variables
-    BYTE Red,  // Stores pixel value for
-        Grn,   // RLE series of oixels
+    BYTE Red, // Stores pixel value for
+        Grn,  // RLE series of oixels
         Blu, Alpha;
-    UINT32 l;                   // Used when 8 bit files use RLE
-    __int32 RLECount, RLEFlag;  // Indicates whether the RLE series
-                                // is still going or is finished
+    UINT32 l;                  // Used when 8 bit files use RLE
+    __int32 RLECount, RLEFlag; // Indicates whether the RLE series
+                               // is still going or is finished
 
 private:
     // Operations
 
-    __int32 TGA_GetFileVersion(FILE* fp);  // Determines whether this is a V1.0
-                                           // or V2.0 TGA File
-    BOOL TGA_GetMapEntry(BYTE* Red,        // Get the Color Values out of the
-        BYTE* Green,                       // Color map in the TGA File
-        BYTE* Blue,                        // Return TRUE on Success
+    __int32 TGA_GetFileVersion(FILE* fp); // Determines whether this is a V1.0
+                                          // or V2.0 TGA File
+    BOOL TGA_GetMapEntry(BYTE* Red,       // Get the Color Values out of the
+        BYTE* Green,                      // Color map in the TGA File
+        BYTE* Blue,                       // Return TRUE on Success
         BYTE* Alpha, FILE* fp, UINT32 Depth);
 
     // version that takes a file ptr
-    BOOL TGA_GetPixelValue(BYTE* Red,  // Get and parse a single pixel value
-        BYTE* Grn,                     // from the TGA file. Handles Unencoding
-        BYTE* Blu,                     // of RLE encoded files.
-        BYTE* Alp,                     // plus Alpha (08jan00/bgw)
+    BOOL TGA_GetPixelValue(BYTE* Red, // Get and parse a single pixel value
+        BYTE* Grn,                    // from the TGA file. Handles Unencoding
+        BYTE* Blu,                    // of RLE encoded files.
+        BYTE* Alp,                    // plus Alpha (08jan00/bgw)
         FILE* fp, UINT32 PixelDepth, RGBQUAD* CMap);
 
     // version that takes a buffer ptr
-    BOOL TGA_GetPixelValue(BYTE* Red,  // Get and parse a single pixel value
-        BYTE* Grn,                     // from the TGA file. Handles Unencoding
-        BYTE* Blu,                     // of RLE encoded files.
-        BYTE* Alp,                     // plus Alpha (08jan00/bgw)
+    BOOL TGA_GetPixelValue(BYTE* Red, // Get and parse a single pixel value
+        BYTE* Grn,                    // from the TGA file. Handles Unencoding
+        BYTE* Blu,                    // of RLE encoded files.
+        BYTE* Alp,                    // plus Alpha (08jan00/bgw)
         BYTE** ppTGAData, UINT32 PixelDepth, RGBQUAD* CMap);
 };
 
@@ -345,9 +345,9 @@ BOOL TGAFile::IsFileTGA(const char* fileName)
     long rc = fread(&tgahd, 1, sizeof(TGAHEADER), fp);
     fclose(fp);
 
-    if ((rc == sizeof(TGAHEADER)) &&          // must be big enough for a header...
-        (tgahd.PixelDepth == 32) &&           // 32-bit TGAs only
-        (tgahd.ImageType == TGA_RAWRGBTYPE))  // Raw RGBA format only
+    if ((rc == sizeof(TGAHEADER)) &&         // must be big enough for a header...
+        (tgahd.PixelDepth == 32) &&          // 32-bit TGAs only
+        (tgahd.ImageType == TGA_RAWRGBTYPE)) // Raw RGBA format only
         return (TRUE);
 
     return (FALSE);
@@ -580,7 +580,7 @@ TGAFile::LoadTGA(const char* fileName, UINT32* width, UINT32* height)
 				*(pRGB + destOffset + 3) = Alp;
 				destOffset += 4;
 				}
-#if 0  // even faster!
+#if 0 // even faster!
 	//				Red = *(gpImageReadBufPos++);
 	//				Grn = *(gpImageReadBufPos++);
 	//				Blu = *(gpImageReadBufPos++);
@@ -623,10 +623,10 @@ TGAFile::LoadTGA(const char* fileName, UINT32* width, UINT32* height)
 //		associated with that buffer, if the image is 8 Bit, else
 //		it sets global error to DEPTHMISMATCHERR
 HGLOBAL
-TGAFile::LoadTGA8Bit(const char* fileName,  // Name of File
-    UINT32* width,                          // Width in pixels
-    UINT32* height,                         // Height
-    RGBQUAD* pal)                           // Palette of RGBQUADS
+TGAFile::LoadTGA8Bit(const char* fileName, // Name of File
+    UINT32* width,                         // Width in pixels
+    UINT32* height,                        // Height
+    RGBQUAD* pal)                          // Palette of RGBQUADS
 {
     HGLOBAL hNew = NULL;
     BYTE* pRGB = NULL;
@@ -767,12 +767,12 @@ TGAFile::LoadTGA8Bit(const char* fileName,  // Name of File
                 TGA_GetPixelValue(&Red, &Grn, &Blu, &Alp, fp, tgahd.PixelDepth, pal);
 
                 // Invert if the image origin is in Bottom left
-                if (TGA_Origin == 0) {  // Bottom Left Origin
+                if (TGA_Origin == 0) { // Bottom Left Origin
                     *(pRGB + destOffset) = Red;
                     destOffset = ((tgahd.Height - 1) - row) * tgahd.Width + col;
                 }
                 else
-                {  // Top Left Origin
+                { // Top Left Origin
                     *(pRGB + destOffset) = Red;
                     destOffset++;
                 }
@@ -797,9 +797,9 @@ TGAFile::LoadTGA8Bit(const char* fileName,  // Name of File
 //		Reads and returns it in a 24 Bit RGB Buffer if a thumbnail
 //		exists. Returns NULL if there isn't one sets TGANOTHUMBNAIL
 HGLOBAL
-TGAFile::LoadTGAThumbnail(const char* fileName,  // Name of file
-    UINT32* width,                               // Width in Pixel
-    UINT32* height                               // Height
+TGAFile::LoadTGAThumbnail(const char* fileName, // Name of file
+    UINT32* width,                              // Width in Pixel
+    UINT32* height                              // Height
     )
 {
     HGLOBAL hNew = NULL;
@@ -958,9 +958,9 @@ TGAFile::LoadTGAThumbnail(const char* fileName,  // Name of file
 ///////////////////////////////////////////////////////////////////////////////////
 //		SaveTGA32
 //		Saves the buffer as a 32 bit True Color Image in TGA format
-BOOL TGAFile::SaveTGA32(const char* fileName,  // output path
-    BYTE* inBuf,                               // BGR buffer
-    UINT32 width,                              // size in pixels
+BOOL TGAFile::SaveTGA32(const char* fileName, // output path
+    BYTE* inBuf,                              // BGR buffer
+    UINT32 width,                             // size in pixels
     UINT32 height)
 {
     long lResult = 0;
@@ -1063,12 +1063,12 @@ BOOL TGAFile::SaveTGA32(const char* fileName,  // output path
 //		Save8BitTGA
 //		Save's to an 8 Bit Color mapped file using the Palette
 //		passed in to the function.
-BOOL TGAFile::Save8BitTGA(const char* fileName,  // output path
-    BYTE* inBuf,                                 // one BYTE per pixel colomapped image
-    UINT32 width,                                // Width of Image
-    UINT32 height,                               // Height of Image
-    __int32 colors,                              // number of colors (number of RGBQUADs)
-    RGBQUAD* colormap)                           // array of RGBQUADs
+BOOL TGAFile::Save8BitTGA(const char* fileName, // output path
+    BYTE* inBuf,                                // one BYTE per pixel colomapped image
+    UINT32 width,                               // Width of Image
+    UINT32 height,                              // Height of Image
+    __int32 colors,                             // number of colors (number of RGBQUADs)
+    RGBQUAD* colormap)                          // array of RGBQUADs
 {
     long lResult = 0;
 
@@ -1170,7 +1170,7 @@ BOOL TGAFile::TGA_GetMapEntry(BYTE* Red, BYTE* Green, BYTE* Blue, BYTE* Alpha, F
 
     switch (Depth)
     {
-    case 8:  // Greyscale Read and Triplicate
+    case 8: // Greyscale Read and Triplicate
         lResult = fread(&i, 1, 1, fp);
 
         // Check for error
@@ -1185,9 +1185,9 @@ BOOL TGAFile::TGA_GetMapEntry(BYTE* Red, BYTE* Green, BYTE* Blue, BYTE* Alpha, F
         b = i;
         break;
 
-    case 16:  // 5 bits each of Red, Green, and Blue
+    case 16: // 5 bits each of Red, Green, and Blue
 
-    case 15:  // Watch for the Byte order
+    case 15: // Watch for the Byte order
         lResult = fread(&j, 1, 1, fp);
         lResult = lResult + fread(&k, 1, 1, fp);
 
@@ -1202,9 +1202,9 @@ BOOL TGAFile::TGA_GetMapEntry(BYTE* Red, BYTE* Green, BYTE* Blue, BYTE* Alpha, F
         r = (BYTE)((l & 31) << 3);
         break;
 
-    case 32:  // Read the Alpha bit a Throw it away
+    case 32: // Read the Alpha bit a Throw it away
 
-    case 24:  // Eight bits for each Red, Green and Blue
+    case 24: // Eight bits for each Red, Green and Blue
         lResult = fread(&i, 1, 1, fp);
         r = i;
         lResult = lResult + fread(&i, 1, 1, fp);
@@ -1328,7 +1328,7 @@ BOOL TGAFile::TGA_GetPixelValue(
 
     // Check for Run Length Encoding
     if ((mode & RLENCO) != 0) {
-        if (RLECount == 0) {  // Restrat the rum
+        if (RLECount == 0) { // Restrat the rum
             lResult = fread(&i, 1, 1, fp);
 
             if (lResult != 1) {
@@ -1337,14 +1337,14 @@ BOOL TGAFile::TGA_GetPixelValue(
             }
             RLEFlag = (i & 0x80) >> 7;
 
-            if (RLEFlag == 0) {  // Stream of unencoded pixels
+            if (RLEFlag == 0) { // Stream of unencoded pixels
                 RLECount = i + 1;
             }
             else
-            {  // Single Pixel Replicated
+            { // Single Pixel Replicated
                 RLECount = i - 127;
             }
-            RLECount--;  // ecrement count and get pixel
+            RLECount--; // ecrement count and get pixel
         }
         else
         {
@@ -1361,7 +1361,7 @@ BOOL TGAFile::TGA_GetPixelValue(
     // Rea the appropiate number of BYTES and break into RGB
     switch (PixelDepth)
     {
-    case 8:  // Greyscale Read 1 Byte and Triplicate
+    case 8: // Greyscale Read 1 Byte and Triplicate
         lResult = fread(&i, 1, 1, fp);
 
         if (lResult != 1) {
@@ -1374,9 +1374,9 @@ BOOL TGAFile::TGA_GetPixelValue(
         l = i;
         break;
 
-    case 16:  // 1 Bit alpha not used
+    case 16: // 1 Bit alpha not used
 
-    case 15:  // Five bits each for RGB watch byte ordering
+    case 15: // Five bits each for RGB watch byte ordering
         lResult = fread(&j, 1, 1, fp);
         lResult = lResult + fread(&k, 1, 1, fp);
 
@@ -1391,7 +1391,7 @@ BOOL TGAFile::TGA_GetPixelValue(
         Red = (BYTE)((l & 31) << 3);
         break;
 
-    case 24:  // Eight bits each for RGB
+    case 24: // Eight bits each for RGB
         lResult = fread(&i, 1, 1, fp);
         Red = i;
         lResult = lResult + fread(&i, 1, 1, fp);
@@ -1409,7 +1409,7 @@ BOOL TGAFile::TGA_GetPixelValue(
         }
         break;
 
-    case 32:  // With alpha (08jan00/bgw)
+    case 32: // With alpha (08jan00/bgw)
         lResult = fread(&i, 1, 1, fp);
         Red = i;
         lResult = lResult + fread(&i, 1, 1, fp);
@@ -1426,19 +1426,19 @@ BOOL TGAFile::TGA_GetPixelValue(
         }
         break;
 
-    default:  // Unknown number of bis per pixel
+    default: // Unknown number of bis per pixel
         m_error = INVALIDTGAERR;
         return NULL;
     }
 
-PixelEncode:  // Set the actual pixel values
+PixelEncode: // Set the actual pixel values
 
     if ((mode & MAPPED) == MAPPED) {
         // Remap Color Mapped Pixels
         *rRed = CColMap[l].rgbRed;
         *rGrn = CColMap[l].rgbGreen;
         *rBlu = CColMap[l].rgbBlue;
-        *rAlp = 0xFF;  // opaque always (08jan00/bgw)
+        *rAlp = 0xFF; // opaque always (08jan00/bgw)
     }
     else
     {

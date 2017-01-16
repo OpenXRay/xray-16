@@ -117,7 +117,7 @@ IC bool cmp_gs_mat(mapMatrixGS::TNode* N1, mapMatrixGS::TNode* N2)
 {
     return (N1->val.ssa > N2->val.ssa);
 }
-#endif  //	USE_DX10
+#endif //	USE_DX10
 
 IC bool cmp_cs_nrm(mapNormalCS::TNode* N1, mapNormalCS::TNode* N2)
 {
@@ -341,10 +341,10 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority, bool _clear)
 
                     mapNormalPS& ps = Ngs->val;
                     ps.ssa = 0;
-#else   //	USE_DX10
+#else  //	USE_DX10
                 mapNormalPS& ps = Nvs->val;
                 ps.ssa = 0;
-#endif  //	USE_DX10
+#endif //	USE_DX10
 
                     ps.getANY_P(nrmPS);
                     std::sort(nrmPS.begin(), nrmPS.end(), cmp_ps_nrm);
@@ -407,7 +407,7 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority, bool _clear)
                 }
                 nrmGS.clear();
                 if (_clear) gs.clear();
-#endif  //	USE_DX10
+#endif //	USE_DX10
             }
             nrmVS.clear();
             if (_clear) vs.clear();
@@ -442,10 +442,10 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority, bool _clear)
 
                 mapMatrixPS& ps = Ngs->val;
                 ps.ssa = 0;
-#else   //	USE_DX10
+#else  //	USE_DX10
             mapMatrixPS& ps = Nvs->val;
             ps.ssa = 0;
-#endif  //	USE_DX10
+#endif //	USE_DX10
 
                 ps.getANY_P(matPS);
                 std::sort(matPS.begin(), matPS.end(), cmp_ps_mat);
@@ -508,7 +508,7 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority, bool _clear)
             }
             matGS.clear();
             if (_clear) gs.clear();
-#endif  //	USE_DX10
+#endif //	USE_DX10
         }
         matVS.clear();
         if (_clear) vs.clear();
@@ -540,7 +540,7 @@ void D3DXRenderBase::r_dsgraph_render_hud()
     mapHUD.clear();
 
 #if RENDER == R_R1
-    if (g_hud && g_hud->RenderActiveItemUIQuery()) r_dsgraph_render_hud_ui();  // hud ui
+    if (g_hud && g_hud->RenderActiveItemUIQuery()) r_dsgraph_render_hud_ui(); // hud ui
 #endif
     /*
     if(g_hud && g_hud->RenderActiveItemUIQuery())
@@ -618,13 +618,13 @@ void D3DXRenderBase::r_dsgraph_render_hud_ui()
             RImplementation.Target->u_setrt(
                 RImplementation.Target->rt_Color, rt_null, rt_null, RImplementation.Target->rt_MSAADepth->pZRT);
     }
-#else   // (RENDER==R_R3) || (RENDER==R_R4)
+#else  // (RENDER==R_R3) || (RENDER==R_R4)
     if (RImplementation.o.albedo_wo)
         RImplementation.Target->u_setrt(RImplementation.Target->rt_Accumulator, rt_null, rt_null, HW.pBaseZB);
     else
         RImplementation.Target->u_setrt(RImplementation.Target->rt_Color, rt_null, rt_null, HW.pBaseZB);
-#endif  // (RENDER==R_R3) || (RENDER==R_R4)
-#endif  // RENDER!=R_R1
+#endif // (RENDER==R_R3) || (RENDER==R_R4)
+#endif // RENDER!=R_R1
 
     rmNear();
     g_hud->RenderActiveItemUI();
@@ -717,7 +717,7 @@ void D3DXRenderBase::r_dsgraph_render_subspace(IRender_Sector* _sector, CFrustum
     Fvector& _cop, BOOL _dynamic, BOOL _precise_portals)
 {
     VERIFY(_sector);
-    RImplementation.marker++;  // !!! critical here
+    RImplementation.marker++; // !!! critical here
 
     // Save and build new frustum, disable HOM
     CFrustum ViewSave = ViewBase;
@@ -765,8 +765,8 @@ void D3DXRenderBase::r_dsgraph_render_subspace(IRender_Sector* _sector, CFrustum
         {
             ISpatial* spatial = lstRenderables[o_it];
             CSector* sector = (CSector*)spatial->GetSpatialData().sector;
-            if (0 == sector) continue;                                   // disassociated from S/P structure
-            if (PortalTraverser.i_marker != sector->r_marker) continue;  // inactive (untouched) sector
+            if (0 == sector) continue;                                  // disassociated from S/P structure
+            if (PortalTraverser.i_marker != sector->r_marker) continue; // inactive (untouched) sector
             for (u32 v_it = 0; v_it < sector->r_frustums.size(); v_it++)
             {
                 set_Frustum(&(sector->r_frustums[v_it]));
@@ -775,7 +775,7 @@ void D3DXRenderBase::r_dsgraph_render_subspace(IRender_Sector* _sector, CFrustum
 
                 // renderable
                 IRenderable* renderable = spatial->dcast_Renderable();
-                if (0 == renderable) continue;  // unknown, but renderable object (r1_glow???)
+                if (0 == renderable) continue; // unknown, but renderable object (r1_glow???)
 
                 renderable->renderable_Render();
             }
@@ -803,7 +803,7 @@ void D3DXRenderBase::r_dsgraph_render_R1_box(IRender_Sector* _S, Fbox& BB, int s
         dxRender_Visual* V = lstVisuals[test];
 
         // Visual is 100% visible - simply add it
-        xr_vector<dxRender_Visual *>::iterator I, E;  // it may be usefull for 'hierrarhy' visuals
+        xr_vector<dxRender_Visual *>::iterator I, E; // it may be usefull for 'hierrarhy' visuals
 
         switch (V->Type)
         {

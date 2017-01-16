@@ -283,7 +283,7 @@ void CControlManagerCustom::load_jump_data(
 {
     IKinematicsAnimated* skel_animated = smart_cast<IKinematicsAnimated*>(m_object->Visual());
     if (!skel_animated) {
-        return;  // monster is dead, so no skeleton (early return due to bug: 18755)
+        return; // monster is dead, so no skeleton (early return due to bug: 18755)
     }
 
     m_jump->setup_data().flags.assign(flags);

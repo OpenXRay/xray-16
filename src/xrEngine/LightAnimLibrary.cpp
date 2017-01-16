@@ -110,19 +110,19 @@ u32 CLAItem::InterpolateRGB(int frame)
 
     KeyPairIt A = Keys.find(frame);
     KeyPairIt B;
-    if (A != Keys.end())  // ключ - возвращаем цвет ключа
+    if (A != Keys.end()) // ключ - возвращаем цвет ключа
     {
         return A->second;
     }
-    else  // не ключ
+    else // не ключ
     {
-        B = Keys.upper_bound(frame);  // ищем следующий ключ
-        if (B == Keys.end())          // если его нет вернем цвет последнего ключа
+        B = Keys.upper_bound(frame); // ищем следующий ключ
+        if (B == Keys.end())         // если его нет вернем цвет последнего ключа
         {
             B--;
             return B->second;
         }
-        A = B;  // иначе в A занесем предыдущий ключ
+        A = B; // иначе в A занесем предыдущий ключ
         A--;
     }
 

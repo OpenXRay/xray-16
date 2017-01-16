@@ -6,7 +6,7 @@
 
 #ifndef _STLP_NO_IOSTREAMS
 #include <iostream>
-#else  //#ifdef _STLP_NO_IOSTREAMS
+#else //#ifdef _STLP_NO_IOSTREAMS
 
 namespace std
 {
@@ -21,15 +21,15 @@ public:
         printf(str);
         return *this;
     }
-};  // class console_output
+}; // class console_output
 
 extern console_output cout;
 extern console_output cerr;
 extern console_output clog;
 extern char const* endl;
 
-};  // namespace std
+}; // namespace std
 
-#endif  //#ifndef _STLP_NO_IOSTREAMS
+#endif //#ifndef _STLP_NO_IOSTREAMS
 
-#endif  //#ifndef IOSTREAMS_PROXY_INCLUDED
+#endif //#ifndef IOSTREAMS_PROXY_INCLUDED

@@ -379,7 +379,7 @@ int RunApplication(const char* commandLine)
 #else
     Console->Execute("renderer renderer_r1");
 #endif
-    InitEngineExt();  // load xrRender and xrGame
+    InitEngineExt(); // load xrRender and xrGame
     Startup();
     Core._destroy();
     // check for need to execute something external

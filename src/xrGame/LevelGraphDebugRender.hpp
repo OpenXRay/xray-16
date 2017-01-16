@@ -40,4 +40,4 @@ public:
     void Render(CGameGraph& gameGraph, CLevelGraph& levelGraph);
 };
 
-#endif  // DEBUG
+#endif // DEBUG

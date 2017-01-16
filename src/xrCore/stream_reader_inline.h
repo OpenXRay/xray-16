@@ -65,4 +65,4 @@ IC void CStreamReader::close()
     xr_delete(self);
 }
 
-#endif  // STREAM_READER_INLINE_H
+#endif // STREAM_READER_INLINE_H

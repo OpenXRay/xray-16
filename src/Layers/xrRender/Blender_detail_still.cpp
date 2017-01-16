@@ -90,10 +90,10 @@ void CBlender_Detail_Still::Compile(CBlender_Compile& C)
 
     switch (C.iElement)
     {
-    case SE_R2_NORMAL_HQ:  // deffer wave
+    case SE_R2_NORMAL_HQ: // deffer wave
         uber_deffer(C, false, "detail_w", "base", true);
         break;
-    case SE_R2_NORMAL_LQ:  // deffer still
+    case SE_R2_NORMAL_LQ: // deffer still
         uber_deffer(C, false, "detail_s", "base", true);
         break;
     }
@@ -111,7 +111,7 @@ void CBlender_Detail_Still::Compile(CBlender_Compile& C)
 
     switch (C.iElement)
     {
-    case SE_R2_NORMAL_HQ:  // deffer wave
+    case SE_R2_NORMAL_HQ: // deffer wave
         if (bUseATOC) {
             uber_deffer(C, false, "detail_w", "base_atoc", true, 0, true);
             C.r_Stencil(TRUE, D3DCMP_ALWAYS, 0xff, 0x7f, D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
@@ -130,7 +130,7 @@ void CBlender_Detail_Still::Compile(CBlender_Compile& C)
         if (bUseATOC) C.RS.SetRS(D3DRS_ZFUNC, D3DCMP_EQUAL);
         C.r_End();
         break;
-    case SE_R2_NORMAL_LQ:  // deffer still
+    case SE_R2_NORMAL_LQ: // deffer still
         if (bUseATOC) {
             uber_deffer(C, false, "detail_s", "base_atoc", true, 0, true);
             C.r_Stencil(TRUE, D3DCMP_ALWAYS, 0xff, 0x7f, D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);

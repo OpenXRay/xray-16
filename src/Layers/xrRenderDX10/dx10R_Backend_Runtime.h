@@ -201,13 +201,13 @@ ICF void CBackend::set_Indices(ID3DIndexBuffer* _ib)
 IC D3D_PRIMITIVE_TOPOLOGY TranslateTopology(D3DPRIMITIVETYPE T)
 {
     static D3D_PRIMITIVE_TOPOLOGY translateTable[] = {
-        D3D_PRIMITIVE_TOPOLOGY_UNDEFINED,      //	None
-        D3D_PRIMITIVE_TOPOLOGY_POINTLIST,      //	D3DPT_POINTLIST = 1,
-        D3D_PRIMITIVE_TOPOLOGY_LINELIST,       //	D3DPT_LINELIST = 2,
-        D3D_PRIMITIVE_TOPOLOGY_LINESTRIP,      //	D3DPT_LINESTRIP = 3,
-        D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST,   //	D3DPT_TRIANGLELIST = 4,
-        D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP,  //	D3DPT_TRIANGLESTRIP = 5,
-        D3D_PRIMITIVE_TOPOLOGY_UNDEFINED,      //	D3DPT_TRIANGLEFAN = 6,
+        D3D_PRIMITIVE_TOPOLOGY_UNDEFINED,     //	None
+        D3D_PRIMITIVE_TOPOLOGY_POINTLIST,     //	D3DPT_POINTLIST = 1,
+        D3D_PRIMITIVE_TOPOLOGY_LINELIST,      //	D3DPT_LINELIST = 2,
+        D3D_PRIMITIVE_TOPOLOGY_LINESTRIP,     //	D3DPT_LINESTRIP = 3,
+        D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST,  //	D3DPT_TRIANGLELIST = 4,
+        D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP, //	D3DPT_TRIANGLESTRIP = 5,
+        D3D_PRIMITIVE_TOPOLOGY_UNDEFINED,     //	D3DPT_TRIANGLEFAN = 6,
     };
 
     VERIFY(T < sizeof(translateTable) / sizeof(translateTable[0]));
@@ -232,7 +232,7 @@ IC u32 GetIndexCount(D3DPRIMITIVETYPE T, u32 iPrimitiveCount)
     default: NODEFAULT;
 #ifdef DEBUG
         return 0;
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
     }
 }
 
@@ -367,19 +367,25 @@ IC void CBackend::set_Stencil(
     // if (stencil_enable		!= _enable)		{ stencil_enable=_enable;		CHK_DX(HW.pDevice->SetRenderState	(
     // D3DRS_STENCILENABLE,		_enable				)); }
     // if (!stencil_enable)					return;
-    // if (stencil_func		!= _func)		{ stencil_func=_func;			CHK_DX(HW.pDevice->SetRenderState	( D3DRS_STENCILFUNC,
+    // if (stencil_func		!= _func)		{ stencil_func=_func;			CHK_DX(HW.pDevice->SetRenderState	(
+    // D3DRS_STENCILFUNC,
     // _func				)); }
-    // if (stencil_ref			!= _ref)		{ stencil_ref=_ref;				CHK_DX(HW.pDevice->SetRenderState	( D3DRS_STENCILREF,			_ref
+    // if (stencil_ref			!= _ref)		{ stencil_ref=_ref;				CHK_DX(HW.pDevice->SetRenderState	( D3DRS_STENCILREF,
+    // _ref
     // )); }
-    // if (stencil_mask		!= _mask)		{ stencil_mask=_mask;			CHK_DX(HW.pDevice->SetRenderState	( D3DRS_STENCILMASK,
+    // if (stencil_mask		!= _mask)		{ stencil_mask=_mask;			CHK_DX(HW.pDevice->SetRenderState	(
+    // D3DRS_STENCILMASK,
     // _mask				)); }
     // if (stencil_writemask	!= _writemask)	{ stencil_writemask=_writemask;	CHK_DX(HW.pDevice->SetRenderState	(
     // D3DRS_STENCILWRITEMASK,	_writemask			)); }
-    // if (stencil_fail		!= _fail)		{ stencil_fail=_fail;			CHK_DX(HW.pDevice->SetRenderState	( D3DRS_STENCILFAIL,
+    // if (stencil_fail		!= _fail)		{ stencil_fail=_fail;			CHK_DX(HW.pDevice->SetRenderState	(
+    // D3DRS_STENCILFAIL,
     // _fail				)); }
-    // if (stencil_pass		!= _pass)		{ stencil_pass=_pass;			CHK_DX(HW.pDevice->SetRenderState	( D3DRS_STENCILPASS,
+    // if (stencil_pass		!= _pass)		{ stencil_pass=_pass;			CHK_DX(HW.pDevice->SetRenderState	(
+    // D3DRS_STENCILPASS,
     // _pass				)); }
-    // if (stencil_zfail		!= _zfail)		{ stencil_zfail=_zfail;			CHK_DX(HW.pDevice->SetRenderState	( D3DRS_STENCILZFAIL,
+    // if (stencil_zfail		!= _zfail)		{ stencil_zfail=_zfail;			CHK_DX(HW.pDevice->SetRenderState	(
+    // D3DRS_STENCILZFAIL,
     // _zfail				)); }
 }
 
@@ -428,7 +434,8 @@ IC void CBackend::set_ColorWriteEnable(u32 _mask)
 ICF void CBackend::set_CullMode(u32 _mode)
 {
     StateManager.SetCullMode(_mode);
-    // if (cull_mode		!= _mode)		{ cull_mode = _mode;			CHK_DX(HW.pDevice->SetRenderState	( D3DRS_CULLMODE,			_mode
+    // if (cull_mode		!= _mode)		{ cull_mode = _mode;			CHK_DX(HW.pDevice->SetRenderState	( D3DRS_CULLMODE,
+    // _mode
     // )); }
 }
 
@@ -729,4 +736,4 @@ IC void CBackend::get_ConstantDirect(shared_str& n, u32 DataSize, void** pVData,
     }
 }
 
-#endif  //	dx10R_Backend_Runtime_included
+#endif //	dx10R_Backend_Runtime_included

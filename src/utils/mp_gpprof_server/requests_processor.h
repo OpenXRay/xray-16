@@ -33,6 +33,6 @@ private:
     requests_t m_active_requests;
     profiles_cache m_profiles_cache;
     sake_worker m_sake_worker;
-};  // class requests_poll
+}; // class requests_poll
 
-#endif  //#ifndef REQUESTS_PROCESSOR_INCLUDED
+#endif //#ifndef REQUESTS_PROCESSOR_INCLUDED

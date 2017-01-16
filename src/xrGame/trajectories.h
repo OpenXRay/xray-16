@@ -17,6 +17,6 @@ bool trajectory_intersects_geometry(float trajectory_time, Fvector const& trajec
     Fvector const& trajectory_end, Fvector const& trajectory_velocity, Fvector& collide_position,
     IGameObject* const self_object, IGameObject* const ignored_object, collide::rq_results& temp_rq_results,
     xr_vector<trajectory_pick>* const out_trajectory_picks, xr_vector<Fvector>* const out_collide_tris,
-    Fvector const& box_size);  // can be zero - ray is traced then
+    Fvector const& box_size); // can be zero - ray is traced then
 
-#endif  // #ifndef TRAJECTORIES_H
+#endif // #ifndef TRAJECTORIES_H

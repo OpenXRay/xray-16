@@ -173,7 +173,7 @@ void CSpaceRestrictionShape::test_correctness()
 
     //		if (!b_found) {
     //			Msg("Node%u :: index[%u]:: position[%f,%f,%f]", index, (*I),
-    //VPUSH(ai().level_graph().vertex_position((*I))));
+    // VPUSH(ai().level_graph().vertex_position((*I))));
     //			index ++;
     //		}
 

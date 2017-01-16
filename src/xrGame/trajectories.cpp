@@ -162,7 +162,7 @@ bool trajectory_intersects_geometry(float trajectory_time, Fvector const& trajec
 #ifdef DEBUG
     if (out_trajectory_picks) out_trajectory_picks->resize(0);
     if (out_collide_tris) out_collide_tris->resize(0);
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 
     const Fvector gravity = Fvector().set(0.f, -physics_world()->Gravity(), 0.f);
     const float epsilon = .1f;

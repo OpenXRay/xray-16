@@ -105,7 +105,7 @@ R_occlusion::occq_result R_occlusion::occq_get(u32& ID)
         if (!SwitchToThread()) Sleep(ps_r2_wait_sleep);
 
         if (T.GetElapsed_ms() > 500) {
-            fragments = (occq_result)-1;  // 0xffffffff;
+            fragments = (occq_result)-1; // 0xffffffff;
             break;
         }
     }

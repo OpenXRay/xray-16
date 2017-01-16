@@ -5,8 +5,8 @@
 #include "xrEngine/IRenderable.h"
 
 const float tweak_COP_initial_offs = 1200.f;
-const float tweak_ortho_xform_initial_offs = 1000.f;  //. ?
-const float tweak_guaranteed_range = 20.f;            //. ?
+const float tweak_ortho_xform_initial_offs = 1000.f; //. ?
+const float tweak_guaranteed_range = 20.f;           //. ?
 
 // float			OLES_SUN_LIMIT_27_01_07			= 180.f		;
 float OLES_SUN_LIMIT_27_01_07 = 100.f;
@@ -153,17 +153,17 @@ Frustum::Frustum(const D3DXMATRIX* matrix)
     D3DXVECTOR4 column3(matrix->_13, matrix->_23, matrix->_33, matrix->_43);
 
     D3DXVECTOR4 planes[6];
-    planes[0] = column4 - column1;  // left
-    planes[1] = column4 + column1;  // right
-    planes[2] = column4 - column2;  // bottom
-    planes[3] = column4 + column2;  // top
-    planes[4] = column4 - column3;  // near
-    planes[5] = column4 + column3;  // far
+    planes[0] = column4 - column1; // left
+    planes[1] = column4 + column1; // right
+    planes[2] = column4 - column2; // bottom
+    planes[3] = column4 + column2; // top
+    planes[4] = column4 - column3; // near
+    planes[5] = column4 + column3; // far
     // ignore near & far plane
 
     int p;
 
-    for (p = 0; p < 6; p++)  // normalize the planes
+    for (p = 0; p < 6; p++) // normalize the planes
     {
         float dot = planes[p].x * planes[p].x + planes[p].y * planes[p].y + planes[p].z * planes[p].z;
         dot = 1.f / _sqrt(dot);
@@ -177,7 +177,7 @@ Frustum::Frustum(const D3DXMATRIX* matrix)
     for (int i = 0; i < 6; i++)
         nVertexLUT[i] = ((planes[i].x < 0.f) ? 1 : 0) | ((planes[i].y < 0.f) ? 2 : 0) | ((planes[i].z < 0.f) ? 4 : 0);
 
-    for (int i = 0; i < 8; i++)  // compute extrema
+    for (int i = 0; i < 8; i++) // compute extrema
     {
         const D3DXPLANE& p0 = (i & 1) ? camPlanes[4] : camPlanes[5];
         const D3DXPLANE& p1 = (i & 2) ? camPlanes[3] : camPlanes[2];
@@ -209,7 +209,7 @@ struct DumbClipper
 {
     CFrustum frustum;
     xr_vector<D3DXPLANE> planes;
-    BOOL clip(D3DXVECTOR3& p0, D3DXVECTOR3& p1)  // returns TRUE if result meaningfull
+    BOOL clip(D3DXVECTOR3& p0, D3DXVECTOR3& p1) // returns TRUE if result meaningfull
     {
         float denum;
         D3DXVECTOR3 D;
@@ -218,7 +218,7 @@ struct DumbClipper
             D3DXPLANE& P = planes[it];
             float cls0 = D3DXPlaneDotCoord(&P, &p0);
             float cls1 = D3DXPlaneDotCoord(&P, &p1);
-            if (cls0 > 0 && cls1 > 0) return false;  // fully outside
+            if (cls0 > 0 && cls1 > 0) return false; // fully outside
 
             if (cls0 > 0) {
                 // clip p0
@@ -449,12 +449,12 @@ void CRender::render_sun()
         //  get the near and the far plane (points) in eye space.
         D3DXVECTOR3 frustumPnts[8];
 
-        Frustum eyeFrustum(&m_Projection);  // autocomputes all the extrema points
+        Frustum eyeFrustum(&m_Projection); // autocomputes all the extrema points
 
         for (int i = 0; i < 4; i++)
         {
-            frustumPnts[i] = eyeFrustum.pntList[(i << 1)];            // far plane
-            frustumPnts[i + 4] = eyeFrustum.pntList[(i << 1) | 0x1];  // near plane
+            frustumPnts[i] = eyeFrustum.pntList[(i << 1)];           // far plane
+            frustumPnts[i + 4] = eyeFrustum.pntList[(i << 1) | 0x1]; // near plane
         }
 
         //   we need to transform the eye into the light's post-projective space.
@@ -463,10 +463,10 @@ void CRender::render_sun()
         //   this matrix is a variant of "light space" from LSPSMs, with the Y and Z axes permuted
 
         D3DXVECTOR3 leftVector, upVector, viewVector;
-        const D3DXVECTOR3 eyeVector(0.f, 0.f, -1.f);  //  eye is always -Z in eye space
+        const D3DXVECTOR3 eyeVector(0.f, 0.f, -1.f); //  eye is always -Z in eye space
 
         //  code copied straight from BuildLSPSMProjectionMatrix
-        D3DXVec3TransformNormal(&upVector, &m_lightDir, &m_View);  // lightDir is defined in eye space, so xform it
+        D3DXVec3TransformNormal(&upVector, &m_lightDir, &m_View); // lightDir is defined in eye space, so xform it
         D3DXVec3Cross(&leftVector, &upVector, &eyeVector);
         D3DXVec3Normalize(&leftVector, &leftVector);
         D3DXVec3Cross(&viewVector, &upVector, &leftVector);
@@ -504,7 +504,7 @@ void CRender::render_sun()
         float min_z = std::min(depthbounds.x, frustumBox.minPt.z);
         float max_z = std::max(depthbounds.y, frustumBox.maxPt.z);
 
-        if (min_z <= 1.f)  //?
+        if (min_z <= 1.f) //?
         {
             D3DXMATRIX lightSpaceTranslate;
             D3DXMatrixTranslation(&lightSpaceTranslate, 0.f, 0.f, -min_z + 1.f);
@@ -578,8 +578,8 @@ void CRender::render_sun()
 
         //  compute eta.
         float lambda = frustumAABB2D.maxPt.x - frustumAABB2D.minPt.x;
-        float delta_proj = m_fTSM_Delta * lambda;  // focusPt.x - frustumAABB2D.minPt.x;
-        const float xi = -0.6f;                    // - 0.6f;  // 80% line
+        float delta_proj = m_fTSM_Delta * lambda; // focusPt.x - frustumAABB2D.minPt.x;
+        const float xi = -0.6f;                   // - 0.6f;  // 80% line
         float eta = (lambda * delta_proj * (1.f + xi)) / (lambda * (1.f - xi) - 2.f * delta_proj);
 
         //  compute the projection point a distance eta from the top line.  this point is on the center line, y=0
@@ -683,8 +683,8 @@ void CRender::render_sun()
         }
         for (int e = 0; e < 8; e++)
         {
-            pt = wform(x_full_inverse, corners[e]);  // world space
-            pt = wform(xform, pt);                   // trapezoid space
+            pt = wform(x_full_inverse, corners[e]); // world space
+            pt = wform(xform, pt);                  // trapezoid space
             b_receivers.modify(pt);
         }
 
@@ -742,8 +742,8 @@ void CRender::render_sun()
             if (bSpecial) {
                 fuckingsun->X.D.transluent = TRUE;
                 Target->phase_smap_direct_tsh(fuckingsun, SE_SUN_FAR);
-                r_dsgraph_render_graph(1);  // normal level, secondary priority
-                r_dsgraph_render_sorted();  // strict-sorted geoms
+                r_dsgraph_render_graph(1); // normal level, secondary priority
+                r_dsgraph_render_sorted(); // strict-sorted geoms
             }
         }
     }
@@ -962,7 +962,7 @@ void CRender::render_sun_near()
     r_dsgraph_render_subspace(cull_sector, &cull_frustum, cull_xform, cull_COP, TRUE);
 
     // Finalize & Cleanup
-    fuckingsun->X.D.combine = cull_xform;  //*((Fmatrix*)&m_LightViewProj);
+    fuckingsun->X.D.combine = cull_xform; //*((Fmatrix*)&m_LightViewProj);
 
     // Render shadow-map
     //. !!! We should clip based on shrinked frustum (again)
@@ -980,8 +980,8 @@ void CRender::render_sun_near()
             if (bSpecial) {
                 fuckingsun->X.D.transluent = TRUE;
                 Target->phase_smap_direct_tsh(fuckingsun, SE_SUN_NEAR);
-                r_dsgraph_render_graph(1);  // normal level, secondary priority
-                r_dsgraph_render_sorted();  // strict-sorted geoms
+                r_dsgraph_render_graph(1); // normal level, secondary priority
+                r_dsgraph_render_sorted(); // strict-sorted geoms
             }
         }
     }
@@ -1291,7 +1291,7 @@ void CRender::render_sun_cascade(u32 cascade_ind)
     r_dsgraph_render_subspace(cull_sector, &cull_frustum, cull_xform, cull_COP, TRUE);
 
     // Finalize & Cleanup
-    fuckingsun->X.D.combine = cull_xform;  //*((Fmatrix*)&m_LightViewProj);
+    fuckingsun->X.D.combine = cull_xform; //*((Fmatrix*)&m_LightViewProj);
 
     // Render shadow-map
     //. !!! We should clip based on shrinked frustum (again)
@@ -1309,8 +1309,8 @@ void CRender::render_sun_cascade(u32 cascade_ind)
             if (bSpecial) {
                 fuckingsun->X.D.transluent = TRUE;
                 Target->phase_smap_direct_tsh(fuckingsun, SE_SUN_FAR);
-                r_dsgraph_render_graph(1);  // normal level, secondary priority
-                r_dsgraph_render_sorted();  // strict-sorted geoms
+                r_dsgraph_render_graph(1); // normal level, secondary priority
+                r_dsgraph_render_sorted(); // strict-sorted geoms
             }
         }
     }

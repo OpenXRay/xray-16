@@ -62,7 +62,7 @@ public:
     //торговля и общение с персонажем
 
     virtual bool AllowItemToTrade(CInventoryItem const* item, const SInvItemPlace& place) const;
-    virtual void OnFollowerCmd(int cmd){};  // redefine for CAI_Stalkker
+    virtual void OnFollowerCmd(int cmd){}; // redefine for CAI_Stalkker
     bool bDisableBreakDialog;
     //инициализация объекта торговли
     CTrade* GetTrade();

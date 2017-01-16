@@ -31,4 +31,4 @@ IC void dxHashHelper::AddData(const void* P, u32 len)
     }
 }
 
-#endif  //	dxHashHelper_included
+#endif //	dxHashHelper_included

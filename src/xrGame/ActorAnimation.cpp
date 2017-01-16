@@ -167,7 +167,7 @@ void SActorState::CreateClimb(IKinematicsAnimated* K)
     m_torso[11].Create(K, base, "_12");
     m_torso[12].Create(K, base, "_13");
 
-    m_head_idle.invalidate();  /// K->ID_Cycle("head_idle_0");
+    m_head_idle.invalidate(); /// K->ID_Cycle("head_idle_0");
     jump_begin = K->ID_Cycle(strconcat(sizeof(buf), buf, base, "_jump_begin"));
     jump_idle = K->ID_Cycle(strconcat(sizeof(buf), buf, base, "_jump_idle"));
     landing[0] = K->ID_Cycle(strconcat(sizeof(buf), buf, base, "_jump_end"));
@@ -312,7 +312,7 @@ CMotion* FindMotionKeys(MotionID motion_ID, IRenderVisual* V)
 
 #ifdef DEBUG
 BOOL g_ShowAnimationInfo = TRUE;
-#endif  // DEBUG
+#endif // DEBUG
 char* mov_state[] = {
     "idle", "walk", "run", "sprint",
 };
@@ -544,7 +544,7 @@ void CActor::g_SetAnimation(u32 mstate_rl)
     MotionID mid = smart_cast<IKinematicsAnimated*>(Visual())->ID_Cycle("norm_idle_0");
 
     if (!M_legs) {
-        if ((mstate_rl & mcCrouch) && !isActorAccelerated(mstate_rl, IsZoomAimingMode()))  //!(mstate_rl&mcAccel))
+        if ((mstate_rl & mcCrouch) && !isActorAccelerated(mstate_rl, IsZoomAimingMode())) //!(mstate_rl&mcAccel))
         {
             M_legs = smart_cast<IKinematicsAnimated*>(Visual())->ID_Cycle("cr_idle_1");
         }
@@ -587,10 +587,10 @@ void CActor::g_SetAnimation(u32 mstate_rl)
         IKinematicsAnimated* ka = smart_cast<IKinematicsAnimated*>(Visual());
         m_current_legs_blend = PlayMotionByParts(ka, M_legs, TRUE, legs_play_callback, this);
         //		m_current_legs_blend		=
-        //smart_cast<IKinematicsAnimated*>(Visual())->PlayCycle(M_legs,TRUE,legs_play_callback,this);
+        // smart_cast<IKinematicsAnimated*>(Visual())->PlayCycle(M_legs,TRUE,legs_play_callback,this);
 
         if ((!(mstate_old & mcAnyMove)) && (mstate_real & mcAnyMove)) {
-            pos = 0.5f;  // 0.5f*Random.randI(2);
+            pos = 0.5f; // 0.5f*Random.randI(2);
         }
         if (m_current_legs_blend) m_current_legs_blend->timeCurrent = m_current_legs_blend->timeTotal * pos;
 

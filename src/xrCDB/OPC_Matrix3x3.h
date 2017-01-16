@@ -425,7 +425,7 @@ public:
     //! Invert the matrix. Determinant must be different from zero, else matrix can't be inverted.
     Matrix3x3& Invert()
     {
-        float Det = Determinant();  // Must be !=0
+        float Det = Determinant(); // Must be !=0
         Matrix3x3 Temp;
 
         float OneOverDet = 1.0f / Det;
@@ -467,7 +467,7 @@ public:
     Matrix3x3& Exp(const Matrix3x3& a)
     {
         const int NbTerms = 100;
-        Matrix3x3 Term;  // next term in series
+        Matrix3x3 Term; // next term in series
         Matrix3x3 Temp;
 
         Identity();
@@ -645,4 +645,4 @@ public:
     float m[3][3];
 };
 
-#endif  // __ICEMATRIX3X3_H__
+#endif // __ICEMATRIX3X3_H__

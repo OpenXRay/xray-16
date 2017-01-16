@@ -216,4 +216,4 @@ public:
         const Option _WeightNormalsByFaceSize = WeightNormalsByFaceSize);
 };
 
-#endif  //_NVMeshMender_H_
+#endif //_NVMeshMender_H_

@@ -50,7 +50,7 @@ void CStoreHierarchy::LoadLevel(CUIXml& xml, int index, item* _item, int depth_l
         xr_strcat(buff, "-");
 #ifndef MASTER_GOLD
     Msg("%s%s", buff, _item->m_name.c_str());
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
 
     int cnt = xml.GetNodesNum("level", index, "level");
     for (int i = 0; i < cnt; ++i)
@@ -102,7 +102,7 @@ void CStoreHierarchy::InitItemsInGroup(const shared_str& sect, item* _itm)
         Msg("group[%s]", _itm->m_name.c_str());
         Msg("items[%s]", v.c_str());
         Msg("");
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
     }
     else
         for (u32 i = 0; i < cnt; ++i)
@@ -148,7 +148,7 @@ CStoreHierarchy::item* CStoreHierarchy::FindItem(const shared_str& name_sect, CS
 {
     if (!recurse_from) recurse_from = m_root;
 
-    if (recurse_from->HasSubLevels()) {  // recurse
+    if (recurse_from->HasSubLevels()) { // recurse
         VERIFY(recurse_from->m_items_in_group.size() == 0);
         xr_vector<CStoreHierarchy::item*>::const_iterator it = recurse_from->m_childs.begin();
         xr_vector<CStoreHierarchy::item*>::const_iterator it_e = recurse_from->m_childs.end();

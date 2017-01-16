@@ -66,7 +66,7 @@ public:
 
     virtual void postConstructor();
 
-    static MTypeId id;  // The IFF type id
+    static MTypeId id; // The IFF type id
 
 protected:
     // Translucence coefficient
@@ -323,7 +323,7 @@ MStatus CXRayMtl::initialize()
     MFnEnumAttribute eAttr;
     MFnTypedAttribute tAttr;
 
-    MStatus status;  // Status will be used to hold the MStatus value
+    MStatus status; // Status will be used to hold the MStatus value
     // returned by each api function call. It is important
     // to check the status returned by a call to aid in
     // debugging. Failed API calls can result in subtle
@@ -870,8 +870,8 @@ MStatus CXRayMtl::compute(const MPlug& plug, MDataBlock& block)
             CHECK_MSTATUS(status);
             MFloatVector& outColor = outColorHandle.asFloatVector();
 
-            outColor = resultColor;     // Set the output value
-            outColorHandle.setClean();  // Mark the output value as clean
+            outColor = resultColor;    // Set the output value
+            outColorHandle.setClean(); // Mark the output value as clean
         }
 
         // Set ouput transparency
@@ -886,13 +886,13 @@ MStatus CXRayMtl::compute(const MPlug& plug, MDataBlock& block)
             CHECK_MSTATUS(status);
             MFloatVector& outTrans = outTransHandle.asFloatVector();
 
-            outTrans = transparency;    // Set the output value
-            outTransHandle.setClean();  // Mark the output value as clean
+            outTrans = transparency;   // Set the output value
+            outTransHandle.setClean(); // Mark the output value as clean
         }
     }
     else
     {
-        return (MS::kUnknownParameter);  // We got an unexpected plug
+        return (MS::kUnknownParameter); // We got an unexpected plug
     }
 
     return (MS::kSuccess);

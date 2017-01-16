@@ -21,8 +21,8 @@ struct tri
 };
 struct elipsoid
 {
-    Fmatrix mL2W;  // convertion from sphere(000,1) to real space
-    Fmatrix mW2L;  // convertion from real space to sphere(000,1)
+    Fmatrix mL2W; // convertion from sphere(000,1) to real space
+    Fmatrix mW2L; // convertion from real space to sphere(000,1)
 };
 struct ray_cache
 {
@@ -87,9 +87,9 @@ struct ray_defs
 };
 struct rq_result
 {
-    IGameObject* O;  // if NULL - static
-    float range;     // range to intersection
-    int element;     // номер кости/номер треугольника
+    IGameObject* O; // if NULL - static
+    float range;    // range to intersection
+    int element;    // номер кости/номер треугольника
     IC rq_result& set(IGameObject* _O, float _range, int _element)
     {
         O = _O;

@@ -234,7 +234,7 @@ static void do_shutdown(void)
     // deregister this thread with the socket API
     sockAPIderegthr();
 }
-#endif  // SN_SYSTEMS
+#endif // SN_SYSTEMS
 
 #ifdef EENET
 
@@ -776,10 +776,10 @@ static void do_shutdown(void)
     sceSifMExitRpc();
 }
 
-#endif  // INSOCK
+#endif // INSOCK
 
 #ifdef GSI_VOICE
-void load_voice_modules(void);  // prototype so codewarrior will be happy
+void load_voice_modules(void); // prototype so codewarrior will be happy
 void load_voice_modules(void)
 {
     // this is the maximum size of a raw frame, in bytes

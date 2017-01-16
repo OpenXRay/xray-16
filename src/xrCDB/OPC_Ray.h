@@ -23,8 +23,8 @@ public:
     inline_ Ray(const Ray& ray) : mOrig(ray.mOrig), mDir(ray.mDir) {}
     //! Destructor
     inline_ ~Ray() {}
-    Point mOrig;  //!< Ray origin
-    Point mDir;   //!< Normalized direction
+    Point mOrig; //!< Ray origin
+    Point mDir;  //!< Normalized direction
 };
 
 class ICEMATHS_API Segment
@@ -54,8 +54,8 @@ public:
      */
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     inline_ void ComputePoint(Point& pt, float t) const { pt = mP0 + t * (mP1 - mP0); }
-    Point mP0;  //!< Start of segment
-    Point mP1;  //!< End of segment
+    Point mP0; //!< Start of segment
+    Point mP1; //!< End of segment
 };
 
-#endif  // __ICERAY_H__
+#endif // __ICERAY_H__

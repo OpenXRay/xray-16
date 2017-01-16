@@ -66,7 +66,7 @@ u32 const player_spots_with_top_enemy_divider::get_top_enemy_player_score()
     }
     break;
     default: return 0;
-    };  // switch (Game().Type())
+    }; // switch (Game().Type())
 
     s32 max_score = 0;
 
@@ -94,4 +94,4 @@ float const player_spots_with_top_enemy_divider::get_float_param()
     return my_spots_count / top_enemy;
 }
 
-}  // namespace award_system
+} // namespace award_system

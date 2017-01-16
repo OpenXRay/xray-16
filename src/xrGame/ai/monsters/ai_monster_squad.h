@@ -11,12 +11,12 @@ class CBaseMonster;
 //////////////////////////////////////////////////////////////////////////
 enum EMemberGoalType
 {
-    MG_AttackEnemy,       // entity
-    MG_PanicFromEnemy,    // entity
-    MG_InterestingSound,  // position
-    MG_DangerousSound,    // position
-    MG_WalkGraph,         // node
-    MG_Rest,              // node, position
+    MG_AttackEnemy,      // entity
+    MG_PanicFromEnemy,   // entity
+    MG_InterestingSound, // position
+    MG_DangerousSound,   // position
+    MG_WalkGraph,        // node
+    MG_Rest,             // node, position
     MG_None,
 };
 
@@ -52,7 +52,7 @@ enum ESquadCommandType
 
 struct SSquadCommand
 {
-    ESquadCommandType type;  // тип команды
+    ESquadCommandType type; // тип команды
 
     const CEntity* entity;
     Fvector position;

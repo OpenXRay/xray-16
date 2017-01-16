@@ -84,13 +84,13 @@ void CMemoryManager::reload(LPCSTR section)
 
 #ifdef _DEBUG
 extern bool g_enemy_manager_second_update;
-#endif  // _DEBUG
+#endif // _DEBUG
 
 void CMemoryManager::update_enemies(const bool& registered_in_combat)
 {
 #ifdef _DEBUG
     g_enemy_manager_second_update = false;
-#endif  // _DEBUG
+#endif // _DEBUG
     enemy().update();
 
     if (m_stalker && (!enemy().selected() || (smart_cast<const CAI_Stalker*>(enemy().selected()) &&
@@ -106,7 +106,7 @@ void CMemoryManager::update_enemies(const bool& registered_in_combat)
 
 #ifdef _DEBUG
         g_enemy_manager_second_update = true;
-#endif  // _DEBUG
+#endif // _DEBUG
         enemy().update();
     }
 }

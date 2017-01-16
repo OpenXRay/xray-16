@@ -10,4 +10,4 @@ namespace lc_net
 {
 void xrNetDOLight();
 }
-#endif  // #ifndef XRLIGHTDONET_H_INCLUDED
+#endif // #ifndef XRLIGHTDONET_H_INCLUDED

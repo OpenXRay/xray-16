@@ -94,4 +94,4 @@ bool spursConfiguration_isSpursInitialized();
 }
 #endif
 
-#endif  //__CELL_SPU_CONFIG
+#endif //__CELL_SPU_CONFIG

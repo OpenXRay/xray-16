@@ -124,7 +124,7 @@ void ptw32_callUserDestroyRoutines(pthread_t thread)
                      */
                     if (pthread_mutex_trylock(&(assoc->key->keyLock)) == EBUSY) {
                         pthread_mutex_unlock(&(sp->threadLock));
-                        Sleep(1);  // Ugly but necessary to avoid priority effects.
+                        Sleep(1); // Ugly but necessary to avoid priority effects.
                         /*
                          * Go around again.
                          * If pthread_key_delete has removed this assoc in the meantime,

@@ -774,7 +774,7 @@ GPResult gpiSetInfos(GPConnection* connection, GPEnum info, const char* value)
         strzcpy(buffer, value, GP_NICK_LEN);
         strzcpy(iconnection->nick, buffer, GP_NICK_LEN);
 #ifdef GSI_UNICODE
-        UTF8ToUCS2StringLen(iconnection->nick, iconnection->nick_W, GP_NICK_LEN);  // update the UCS2 version
+        UTF8ToUCS2StringLen(iconnection->nick, iconnection->nick_W, GP_NICK_LEN); // update the UCS2 version
 #endif
         CHECK_RESULT(gpiSendLocalInfo(connection, "\\nick\\", buffer));
         break;

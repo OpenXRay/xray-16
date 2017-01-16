@@ -7,9 +7,9 @@
 #include "xrPhysics/extendedgeom.h"
 #include "xrServer_Objects_ALife.h"
 #ifdef DEBUG
-#include "debug_renderer.h"
 #include "Level.h"
 #include "PHDebug.h"
+#include "debug_renderer.h"
 #endif
 
 #ifdef DEBUG
@@ -118,11 +118,11 @@ void CClimableObject::net_Destroy()
     // m_pStaticShell->Deactivate();
     // xr_delete(m_pStaticShell);
 }
-void CClimableObject::shedule_Update(u32 dt)  // Called by shedule
+void CClimableObject::shedule_Update(u32 dt) // Called by shedule
 {
     inherited::shedule_Update(dt);
 }
-void CClimableObject::UpdateCL()  // Called each frame, so no need for d
+void CClimableObject::UpdateCL() // Called each frame, so no need for d
 {
     inherited::UpdateCL();
 }

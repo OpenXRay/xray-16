@@ -24,4 +24,4 @@ inline void get_string_from_collection(xr_vector<shared_str> const& src_collecti
     }
 }
 
-#endif  //#ifndef TOOLS_HPP
+#endif //#ifndef TOOLS_HPP

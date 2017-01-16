@@ -43,14 +43,14 @@ enum enum_awards_t
     at_award_silent_death,
     // at_award_okulist	=	0x00,
     at_awards_count
-};  // enum enum_awards_t
+}; // enum enum_awards_t
 
 enum enum_award_params
 {
     ap_award_id = 0x00,
     ap_award_rdate,
     ap_award_params_count
-};  // enum enum_award_params
+}; // enum enum_award_params
 
 struct award_data
 {
@@ -76,7 +76,7 @@ enum enum_best_score_type
     bst_bleed_kills_in_row,
     bst_explosive_kills_in_row,
     bst_score_types_count
-};  // enum enum_best_score_type
+}; // enum enum_best_score_type
 
 char const* get_best_score_name(enum_best_score_type bst);
 unsigned short get_best_score_id_stat(enum_best_score_type bst);
@@ -98,6 +98,6 @@ struct profile_data
     bestscores_map_t m_best_scores;
 };
 
-}  // namespace gamespy_profile
+} // namespace gamespy_profile
 
-#endif  //#ifndef PLAYER_AWARDS
+#endif //#ifndef PLAYER_AWARDS

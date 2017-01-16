@@ -9,7 +9,7 @@
 // global
 #ifdef DEBUG
 #include "debug_output.h"
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 
 static void computeFinalTx(dGeomID geom_transform, dReal* final_pos, dReal* final_R)
 {
@@ -123,7 +123,7 @@ void CODEGeom::add_self_mass(dMass& m, const Fvector& ref_point)
 void CODEGeom::get_local_center_bt(Fvector& center)
 {
     if (!m_geom_transform) return;
-    if (!geom())  // geom is not transformed
+    if (!geom()) // geom is not transformed
     {
         center.set(0.f, 0.f, 0.f);
     }
@@ -456,13 +456,13 @@ void CBoxGeom::get_max_area_dir_bt(Fvector& dir)
         if (S1 > S3) {
             ddir[0] = R[2];
             ddir[1] = R[6];
-            ddir[2] = R[10];  // S1
+            ddir[2] = R[10]; // S1
         }
         else
         {
             ddir[0] = R[0];
             ddir[1] = R[4];
-            ddir[2] = R[8];  // S3
+            ddir[2] = R[8]; // S3
         }
     }
     else
@@ -470,13 +470,13 @@ void CBoxGeom::get_max_area_dir_bt(Fvector& dir)
         if (S2 > S3) {
             ddir[0] = R[1];
             ddir[1] = R[5];
-            ddir[2] = R[9];  // S2
+            ddir[2] = R[9]; // S2
         }
         else
         {
             ddir[0] = R[0];
             ddir[1] = R[4];
-            ddir[2] = R[8];  // S3
+            ddir[2] = R[8]; // S3
         }
     }
 

@@ -52,4 +52,4 @@ void player_state_remembrance::OnPlayerKilled(
     }
 }
 
-}  // namespace award_system
+} // namespace award_system

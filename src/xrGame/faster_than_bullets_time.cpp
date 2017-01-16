@@ -75,4 +75,4 @@ void faster_than_bullets_time::OnPlayerKilled(
     }
 }
 
-}  // namespace award_system
+} // namespace award_system

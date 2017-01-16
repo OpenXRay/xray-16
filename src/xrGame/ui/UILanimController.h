@@ -79,7 +79,7 @@ public:
 
         float t = Device.dwTimeContinual / 1000.0f;
 
-        if (t < m_lanim_clr.m_lanim_start_time)  // consider animation delay
+        if (t < m_lanim_clr.m_lanim_start_time) // consider animation delay
             return;
 
         if (m_lanim_clr.m_lanimFlags.test(LA_CYCLIC) ||

@@ -42,7 +42,7 @@ static void SetDefaultIpConfig(NCDIpConfig* theIpConfig)
 
     theIpConfig->useDhcp = TRUE;
 
-    theIpConfig->adjust.maxTransferUnit = 1300;  // Value can be 1460 depending on network library
+    theIpConfig->adjust.maxTransferUnit = 1300; // Value can be 1460 depending on network library
     theIpConfig->adjust.tcpRetransTimeout = 100;
     theIpConfig->adjust.dhcpRetransCount = 4;
 }
@@ -189,7 +189,7 @@ void main(int argc, char** argv)
     void* arenaLo;
     void* arenaHi;
 
-    DEMOInit(NULL);  // Init the OS, game pad, graphics and video.
+    DEMOInit(NULL); // Init the OS, game pad, graphics and video.
 
     // Initialize heap for socket allocations
     //     Nintendo samples say this must be in MEM2

@@ -27,7 +27,7 @@ extern BOOL g_sv_tdm_bAutoTeamSwap;
 u32 g_sv_ah_dwArtefactRespawnDelta = 30;
 int g_sv_ah_dwArtefactsNum = 10;
 u32 g_sv_ah_dwArtefactStayTime = 3;
-int g_sv_ah_iReinforcementTime = 15;  // 0 - Immediate, -1 - after artefact spawn , other - reinforcement
+int g_sv_ah_iReinforcementTime = 15; // 0 - Immediate, -1 - after artefact spawn , other - reinforcement
 BOOL g_sv_ah_bBearerCantSprint = FALSE;
 BOOL g_sv_ah_bShildedBases = TRUE;
 BOOL g_sv_ah_bAfReturnPlayersToBases = TRUE;
@@ -359,7 +359,7 @@ void game_sv_ArtefactHunt::assign_RP(CSE_Abstract* E, game_PlayerState* ps_who)
     u32 Team = RP_2_Use(E);
 #ifdef DEBUG
     Msg("--- ArtefactHunt RPoint for %s uses team %d", ps_who->getName(), Team);
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
     R_ASSERT(rpoints[Team].size());
 
     xr_vector<RPoint>& rps = rpoints[Team];
@@ -370,7 +370,7 @@ void game_sv_ArtefactHunt::assign_RP(CSE_Abstract* E, game_PlayerState* ps_who)
     if (!assign_rp_tmp(ps_who, rps, rpID, rpIDEnemy, EnemyIt, true)) {
 #ifdef DEBUG
         Msg("--- No free Arthfacthunt rpoints found, trying to find rpoints with enemies!");
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
         assign_rp_tmp(ps_who, rps, rpID, rpIDEnemy, EnemyIt, false);
     }
 
@@ -733,7 +733,7 @@ void game_sv_ArtefactHunt::SpawnArtefact()
     else
         return;
 
-    E->s_flags.assign(M_SPAWN_OBJECT_LOCAL);  // flags
+    E->s_flags.assign(M_SPAWN_OBJECT_LOCAL); // flags
 
     Assign_Artefact_RPoint(E);
 
@@ -903,7 +903,7 @@ void game_sv_ArtefactHunt::Assign_Artefact_RPoint(CSE_Abstract* E)
     u32 ID = ArtefactChooserRandom.randI((int)rp.size());
 #ifndef MASTER_GOLD
     Msg("---select artefact RPoint [%d]", ID);
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
     r = rp[ID];
     E->o_Position.set(r.P);
     E->o_Angle.set(r.A);
@@ -917,7 +917,7 @@ void game_sv_ArtefactHunt::OnTimelimitExceed()
     m_phase = u16((winning_team) ? GAME_PHASE_TEAM2_SCORES : GAME_PHASE_TEAM1_SCORES);
     switch_Phase(m_phase);
 
-    OnDelayedRoundEnd(eRoundEnd_TimeLimit);  // "Team Final Score"
+    OnDelayedRoundEnd(eRoundEnd_TimeLimit); // "Team Final Score"
 };
 
 void game_sv_ArtefactHunt::net_Export_State(NET_Packet& P, ClientID id_to)
@@ -1260,7 +1260,7 @@ void game_sv_ArtefactHunt::CheckForTeamElimination()
     m_phase = u16((WinTeam == 1) ? GAME_PHASE_TEAM2_ELIMINATED : GAME_PHASE_TEAM1_ELIMINATED);
     switch_Phase(m_phase);
 
-    OnDelayedTeamEliminated();  // OnDelayedRoundEnd( eRoundEnd_FragLimit ); //??   "Team Eliminated"
+    OnDelayedTeamEliminated(); // OnDelayedRoundEnd( eRoundEnd_FragLimit ); //??   "Team Eliminated"
     RemoveArtefact();
 }
 
@@ -1298,7 +1298,7 @@ void game_sv_ArtefactHunt::CheckForTeamWin()
     m_phase = u16((WinTeam == 2) ? GAME_PHASE_TEAM2_SCORES : GAME_PHASE_TEAM1_SCORES);
     switch_Phase(m_phase);
 
-    OnDelayedRoundEnd(eRoundEnd_ArtrefactLimit);  //"Team Final Score"
+    OnDelayedRoundEnd(eRoundEnd_ArtrefactLimit); //"Team Final Score"
 }
 
 void game_sv_ArtefactHunt::check_Player_for_Invincibility(game_PlayerState* ps)
@@ -1328,7 +1328,7 @@ void game_sv_ArtefactHunt::ReadOptions(shared_str& options)
 {
     inherited::ReadOptions(options);
     //-------------------------------
-    g_sv_ah_dwArtefactRespawnDelta = get_option_i(*options, "ardelta", g_sv_ah_dwArtefactRespawnDelta);  // sec
+    g_sv_ah_dwArtefactRespawnDelta = get_option_i(*options, "ardelta", g_sv_ah_dwArtefactRespawnDelta); // sec
     g_sv_ah_dwArtefactsNum = get_option_i(*options, "anum", g_sv_ah_dwArtefactsNum);
     g_sv_ah_dwArtefactStayTime = get_option_i(*options, "astime", g_sv_ah_dwArtefactStayTime);
     g_sv_dm_dwFragLimit = 0;

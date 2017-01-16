@@ -41,4 +41,4 @@ source::property_holder_type* source::object()
     return (m_property_holder);
 }
 
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR

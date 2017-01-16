@@ -66,7 +66,7 @@ void CRadioactiveZone::Affect(SZoneObjectInfo* O)
 ///		Msg( "Zone hit ___   damage = %.4f    Frame=%d ", send_power, Device.dwFrame );
 #endif
         O->f_time_affected += one;
-    }  // while
+    } // while
 }
 
 void CRadioactiveZone::feel_touch_new(IGameObject* O)
@@ -75,7 +75,7 @@ void CRadioactiveZone::feel_touch_new(IGameObject* O)
     if (GameID() != eGameIDSingle) {
         if (smart_cast<CActor*>(O)) {
             CreateHit(O->ID(), ID(), Fvector().set(0, 0, 0), 0.0f, BI_NONE, Fvector().set(0, 0, 0), 0.0f,
-                m_eHitTypeBlowout);  // ALife::eHitTypeRadiation
+                m_eHitTypeBlowout); // ALife::eHitTypeRadiation
         }
     };
 };

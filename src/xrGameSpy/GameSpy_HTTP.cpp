@@ -28,25 +28,25 @@ void CGameSpy_HTTP::Think()
 }
 
 string128 GHTTPResultStr[] = {
-    "GHTTPSuccess",           // 0:  Successfully retrieved file.
-    "GHTTPOutOfMemory",       // 1:  A memory allocation failed.
-    "GHTTPBufferOverflow",    // 2:  The user-supplied buffer was too small to hold the file.
-    "GHTTPParseURLFailed",    // 3:  There was an error parsing the URL.
-    "GHTTPHostLookupFailed",  // 4:  Failed looking up the hostname.
-    "GHTTPSocketFailed",      // 5:  Failed to create/initialize/read/write a socket.
-    "GHTTPConnectFailed",     // 6:  Failed connecting to the http server.
-    "GHTTPBadResponse",       // 7:  Error understanding a response from the server.
-    "GHTTPRequestRejected",   // 8:  The request has been rejected by the server.
-    "GHTTPUnauthorized",      // 9:  Not authorized to get the file.
-    "GHTTPForbidden",         // 10: The server has refused to send the file.
-    "GHTTPFileNotFound",      // 11: Failed to find the file on the server.
-    "GHTTPServerError",       // 12: The server has encountered an internal error.
-    "GHTTPFileWriteFailed",   // 13: An error occured writing to the local file (for ghttpSaveFile[Ex]).
-    "GHTTPFileReadFailed",    // 14: There was an error reading from a local file (for posting files from disk).
-    "GHTTPFileIncomplete",    // 15: Download started but was interrupted.  Only reported if file size is known.
-    "GHTTPFileToBig",         // 16: The file is to big to be downloaded (size exceeds range of interal data types)
-    "GHTTPEncryptionError",   // 17: Error with encryption engine.
-    "GHTTPRequestCancelled"   // 18: User requested cancel and/or graceful close.
+    "GHTTPSuccess",          // 0:  Successfully retrieved file.
+    "GHTTPOutOfMemory",      // 1:  A memory allocation failed.
+    "GHTTPBufferOverflow",   // 2:  The user-supplied buffer was too small to hold the file.
+    "GHTTPParseURLFailed",   // 3:  There was an error parsing the URL.
+    "GHTTPHostLookupFailed", // 4:  Failed looking up the hostname.
+    "GHTTPSocketFailed",     // 5:  Failed to create/initialize/read/write a socket.
+    "GHTTPConnectFailed",    // 6:  Failed connecting to the http server.
+    "GHTTPBadResponse",      // 7:  Error understanding a response from the server.
+    "GHTTPRequestRejected",  // 8:  The request has been rejected by the server.
+    "GHTTPUnauthorized",     // 9:  Not authorized to get the file.
+    "GHTTPForbidden",        // 10: The server has refused to send the file.
+    "GHTTPFileNotFound",     // 11: Failed to find the file on the server.
+    "GHTTPServerError",      // 12: The server has encountered an internal error.
+    "GHTTPFileWriteFailed",  // 13: An error occured writing to the local file (for ghttpSaveFile[Ex]).
+    "GHTTPFileReadFailed",   // 14: There was an error reading from a local file (for posting files from disk).
+    "GHTTPFileIncomplete",   // 15: Download started but was interrupted.  Only reported if file size is known.
+    "GHTTPFileToBig",        // 16: The file is to big to be downloaded (size exceeds range of interal data types)
+    "GHTTPEncryptionError",  // 17: Error with encryption engine.
+    "GHTTPRequestCancelled"  // 18: User requested cancel and/or graceful close.
 };
 
 class DownloadContext

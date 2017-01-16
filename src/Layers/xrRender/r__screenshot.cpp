@@ -4,7 +4,7 @@
 #include "xr_effgamma.h"
 #if defined(USE_DX10) || defined(USE_DX11)
 #include "d3dx10tex.h"
-#endif  //	USE_DX10
+#endif //	USE_DX10
 
 using namespace XRay::Media;
 
@@ -163,7 +163,7 @@ void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* me
         FS.w_close(fs);
         _RELEASE(saved);
 
-        if (strstr(Core.Params, "-ss_tga")) {  // hq
+        if (strstr(Core.Params, "-ss_tga")) { // hq
             xr_sprintf(buf, sizeof(buf), "ssq_%s_%s_(%s).tga", Core.UserName, timestamp(t_stemp),
                 (g_pGameLevel) ? g_pGameLevel->name().c_str() : "mainmenu");
             ID3DBlob* saved = 0;
@@ -222,7 +222,7 @@ void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* me
     _RELEASE(pSrcTexture);
 }
 
-#else  //	USE_DX10
+#else //	USE_DX10
 
 void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* memory_writer)
 {
@@ -370,7 +370,7 @@ void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* me
         fs->w(saved->GetBufferPointer(), saved->GetBufferSize());
         FS.w_close(fs);
         _RELEASE(saved);
-        if (strstr(Core.Params, "-ss_tga")) {  // hq
+        if (strstr(Core.Params, "-ss_tga")) { // hq
             xr_sprintf(buf, sizeof(buf), "ssq_%s_%s_(%s).tga", Core.UserName, timestamp(t_stemp),
                 (g_pGameLevel) ? g_pGameLevel->name().c_str() : "mainmenu");
             ID3DBlob* saved = 0;
@@ -416,7 +416,7 @@ _end_:
     _RELEASE(pFB);
 }
 
-#endif  //	USE_DX10
+#endif //	USE_DX10
 
 void CRender::Screenshot(ScreenshotMode mode, LPCSTR name)
 {
@@ -478,7 +478,7 @@ void CRender::ScreenshotAsyncEnd(CMemoryWriter& memory_writer)
 #endif
 }
 
-#else  //	USE_DX10
+#else //	USE_DX10
 
 void CRender::ScreenshotAsyncEnd(CMemoryWriter& memory_writer)
 {
@@ -498,10 +498,10 @@ void CRender::ScreenshotAsyncEnd(CMemoryWriter& memory_writer)
 #if RENDER == R_R1
     u32 rtWidth = Target->get_rtwidth();
     u32 rtHeight = Target->get_rtheight();
-#else   //	RENDER != R_R1
+#else  //	RENDER != R_R1
     u32 rtWidth = Device.dwWidth;
     u32 rtHeight = Device.dwHeight;
-#endif  //	RENDER != R_R1
+#endif //	RENDER != R_R1
 
     // Image processing (gamma-correct)
     u32* pPixel = (u32*)D.pBits;
@@ -532,7 +532,7 @@ void CRender::ScreenshotAsyncEnd(CMemoryWriter& memory_writer)
         }
     }
     else
-#endif  //	RENDER != R_R1
+#endif //	RENDER != R_R1
     {
         for (; pPixel != pEnd; pPixel++)
         {
@@ -550,7 +550,7 @@ void CRender::ScreenshotAsyncEnd(CMemoryWriter& memory_writer)
     hr = pFB->UnlockRect();
 }
 
-#endif  //	USE_DX10
+#endif //	USE_DX10
 
 void DoAsyncScreenshot()
 {

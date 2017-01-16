@@ -31,7 +31,7 @@ private:
 void RunNetCompileDataPrepare()
 {
     cl_data_prepare.start(new NetCompileDetaPrepare());
-    SartupNetTaskManager();  //.
+    SartupNetTaskManager(); //.
 }
 
 void WaitNetCompileDataPrepare()
@@ -47,7 +47,7 @@ void WaitNetCompileDataPrepare()
         if (inited) break;
     }
 }
-void WaitNetBaseCompileDataPrepare()  // to do refactoring
+void WaitNetBaseCompileDataPrepare() // to do refactoring
 {
     for (;;)
     {

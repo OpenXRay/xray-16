@@ -65,7 +65,7 @@ void player_team_win_score::save_round_scores()
         }
     }
     break;
-    };  // switch (Game().Type())
+    }; // switch (Game().Type())
     if (static_cast<ETeam>(m_player_team) == etGreenTeam) {
         m_win_score = (m_green_team_score > m_blue_team_score) ? m_green_team_score : 0;
     }
@@ -134,4 +134,4 @@ void player_runtime_enemy_team_score::OnPlayerBringArtefact(game_PlayerState con
     save_round_scores();
 }
 
-}  // namespace award_system
+} // namespace award_system

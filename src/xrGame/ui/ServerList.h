@@ -27,7 +27,7 @@ enum enum_connect_error
 {
     ece_unique_nick_not_registred = 0x01,
     ece_unique_nick_expired
-};  // enum enum_connect_errors
+}; // enum enum_connect_errors
 
 typedef mixed_delegate<void(enum_connect_error, char const*)> connect_error_cb;
 

@@ -159,8 +159,8 @@ you set)
 #define GT_CSTR_ARRAY_PTR 'A'
 #define GT_CSTR_ARRAY_PTR_ "A"
 #define GT_CSTR_ARRAY_PTR_TYPE char**
-#define GT_RAW 'r'   // two parameters! (data, then length)
-#define GT_RAW_ "r"  // two parameters!
+#define GT_RAW 'r'  // two parameters! (data, then length)
+#define GT_RAW_ "r" // two parameters!
 #define GT_RAW_TYPE char*
 #define GT_RAW_PTR 'R'
 #define GT_RAW_PTR_ "R"

@@ -61,7 +61,7 @@ private:
 
     static unsigned int const merged_fields_count =
         (gamespy_profile::at_awards_count * gamespy_profile::ap_award_params_count) +
-        gamespy_profile::bst_score_types_count + 1;  //+1 = STAT_PlayerName
+        gamespy_profile::bst_score_types_count + 1; //+1 = STAT_PlayerName
     static int const max_request_records = 128;
     typedef char* merged_fields_names_t[merged_fields_count];
     typedef std::map<std::string, gamespy_profile::profile_data> players_map_t;
@@ -82,6 +82,6 @@ private:
         std::string& dest_name);
     static void request_callback(
         SAKE sake, SAKERequest request, SAKERequestResult result, void* inputData, void* outputData, void* userData);
-};  // class sake_processor
+}; // class sake_processor
 
-#endif  //#ifndef GAMESPY_SAKE_INCLUDED
+#endif //#ifndef GAMESPY_SAKE_INCLUDED

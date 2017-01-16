@@ -24,4 +24,4 @@ public:
     spawn_patcher(LPCSTR new_spawn_id, LPCSTR previous_spawn_id);
 };
 
-#endif  // SPAWN_PATCHER_H
+#endif // SPAWN_PATCHER_H

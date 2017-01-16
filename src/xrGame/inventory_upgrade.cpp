@@ -67,9 +67,9 @@ void Upgrade::construct(const shared_str& upgrade_id, Group& parental_group, Man
     m_effects();
 
     // prereq_functor (1,2) : m_prerequisites, m_tooltip
-    LPCSTR prereq_functor_str = pSettings->r_string(id(), "prereq_functor");  // prerequisites_functor
+    LPCSTR prereq_functor_str = pSettings->r_string(id(), "prereq_functor"); // prerequisites_functor
     //	LPCSTR tooltip_functor_str	= pSettings->r_string( id(), "prereq_tooltip_functor" );
-    m_prerequisites.parameter = pSettings->r_string(id(), "prereq_params");  // prerequisites_params
+    m_prerequisites.parameter = pSettings->r_string(id(), "prereq_params"); // prerequisites_params
     m_prerequisites.parameter2 = m_section.c_str();
     //	m_tooltip.parameter			= pSettings->r_string( id(), "prereq_params" );
     R_ASSERT2(ai().script_engine().functor(prereq_functor_str, m_prerequisites.functr),
@@ -111,7 +111,7 @@ void Upgrade::construct(const shared_str& upgrade_id, Group& parental_group, Man
     m_scheme_index = pSettings->r_ivector2(id(), "scheme_index");
 
     m_highlight = false;
-}  // Upgrade()
+} // Upgrade()
 
 #ifdef DEBUG
 
@@ -126,7 +126,7 @@ void Upgrade::log_hierarchy(LPCSTR nest)
     inherited::log_hierarchy(nest2);
 }
 
-#endif  // DEBUG
+#endif // DEBUG
 
 void Upgrade::fill_root_container(Root* root)
 {
@@ -148,7 +148,7 @@ UpgradeStateResult Upgrade::can_install(CInventoryItem& item, bool loading)
     }
 
     if (loading) {
-        return result_ok;  // later script check
+        return result_ok; // later script check
     }
 
     int res_prec = m_preconditions();
@@ -223,5 +223,5 @@ void Upgrade::highlight_down()
     m_parent_group->highlight_down();
 }
 
-}  // namespace upgrade
-}  // namespace inventory
+} // namespace upgrade
+} // namespace inventory

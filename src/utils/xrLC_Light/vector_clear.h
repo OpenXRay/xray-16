@@ -21,4 +21,4 @@ void vec_clear(xr_vector<T*>& v, TDestruct& destruct)
     v.clear();
 }
 
-#endif  // #ifndef VECTOR_CLEAR_H_INCLUDED
+#endif // #ifndef VECTOR_CLEAR_H_INCLUDED

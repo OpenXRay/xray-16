@@ -33,7 +33,7 @@ BattlEyeServer::BattlEyeServer(xrServer* Server)
     }
     m_pServer = Server;
 
-    m_module = LoadLibrary(Level().battleye_system.GetServerPath());  //=
+    m_module = LoadLibrary(Level().battleye_system.GetServerPath()); //=
     if (!m_module) {
         Msg("! Error LoadLibrary %s", BATTLEYE_SERVER_DLL);
         return;
@@ -42,7 +42,7 @@ BattlEyeServer::BattlEyeServer(xrServer* Server)
     //	GetModuleFileName( m_module, path_dll, sizeof(path_dll) );
     //	Level().battleye_system.SetServerPath( path_dll );
 
-    Init = (InitSrv_t)(GetProcAddress(m_module, "Init"));  //=
+    Init = (InitSrv_t)(GetProcAddress(m_module, "Init")); //=
     if (!Init) {
         Msg("! Error GetProcAddress <Init> from %s", BATTLEYE_SERVER_DLL);
         if (!FreeLibrary(m_module)) {
@@ -75,7 +75,7 @@ BattlEyeServer::BattlEyeServer(xrServer* Server)
     }
 }
 
-void BattlEyeServer::AddConnectedPlayers()  // if net_Ready
+void BattlEyeServer::AddConnectedPlayers() // if net_Ready
 {
     struct ready_adder
     {
@@ -116,7 +116,7 @@ void BattlEyeServer::PrintMessage(char* message)
         sprintf_s(text, sizeof(text), "BattlEye Server: %s", message);
         Msg("%s", text);
 
-        if (g_be_message_out)  //==2
+        if (g_be_message_out) //==2
         {
             if (Level().game) {
                 Level().game->CommonMessageOut(text);
@@ -147,7 +147,7 @@ void BattlEyeServer::KickPlayer(int player, char* reason)
         CStringTable().translate("ui_st_kicked_by_battleye").c_str(), " ", reason);
 
     Msg(reason2);
-    if (g_be_message_out)  // self
+    if (g_be_message_out) // self
     {
         if (Level().game) {
             Level().game->CommonMessageOut(reason2 + 1);
@@ -160,9 +160,9 @@ void BattlEyeServer::KickPlayer(int player, char* reason)
         P.w_begin(M_GAMEMESSAGE);
         P.w_u32(GAME_EVENT_SERVER_DIALOG_MESSAGE);
         P.w_stringZ(reason2);
-        Level().Server->SendBroadcast(tmp_client->ID, P);  // to all, except self
+        Level().Server->SendBroadcast(tmp_client->ID, P); // to all, except self
 
-        Level().OnSessionTerminate(reason2);  // to self
+        Level().OnSessionTerminate(reason2); // to self
         Engine.Event.Defer("KERNEL:disconnect");
         return;
     }
@@ -235,4 +235,4 @@ void BattlEyeServer::ReleaseDLL()
     pfnNewPacket = NULL;
 }
 
-#endif  // BATTLEYE
+#endif // BATTLEYE

@@ -33,7 +33,7 @@ void CHelmet::Load(LPCSTR section)
     m_HitTypeProtection[ALife::eHitTypeTelepatic] = pSettings->r_float(section, "telepatic_protection");
     m_HitTypeProtection[ALife::eHitTypeChemicalBurn] = pSettings->r_float(section, "chemical_burn_protection");
     m_HitTypeProtection[ALife::eHitTypeExplosion] = pSettings->r_float(section, "explosion_protection");
-    m_HitTypeProtection[ALife::eHitTypeFireWound] = 0.0f;  // pSettings->r_float(section,"fire_wound_protection");
+    m_HitTypeProtection[ALife::eHitTypeFireWound] = 0.0f; // pSettings->r_float(section,"fire_wound_protection");
     //	m_HitTypeProtection[ALife::eHitTypePhysicStrike]= pSettings->r_float(section,"physic_strike_protection");
     m_HitTypeProtection[ALife::eHitTypeLightBurn] = m_HitTypeProtection[ALife::eHitTypeBurn];
     m_boneProtection->m_fHitFracActor = pSettings->r_float(section, "hit_fraction_actor");
@@ -225,7 +225,7 @@ float CHelmet::HitThroughArmor(float hit_power, s16 element, float ap, bool& add
         {
             //пуля НЕ пробила бронь
             NewHitPower *= m_boneProtection->m_fHitFracActor;
-            add_wound = false;  //раны нет
+            add_wound = false; //раны нет
         }
     }
     else

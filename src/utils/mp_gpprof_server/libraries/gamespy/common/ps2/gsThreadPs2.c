@@ -73,9 +73,9 @@ gsi_u32 gsiHasThreadShutdown(GSIThreadID theThreadID)
     struct ThreadParam aStatus;
     ReferThreadStatus(theThreadID, &aStatus);
     if (aStatus.status == THS_DORMANT)
-        return 1;  // dead
+        return 1; // dead
     else
-        return 0;  // still kicking;
+        return 0; // still kicking;
 }
 
 GSISemaphoreID gsiCreateSemaphore(gsi_i32 theInitialCount, gsi_i32 theMaxCount, char* theName)

@@ -46,7 +46,7 @@ void debug_sign_screenshot(IReader* screenshot)
 
 void screenshot_info(IReader* screenshot)
 {
-    using namespace screenshots;  // for reader
+    using namespace screenshots; // for reader
     reader tmp_reader(screenshot);
     if (!tmp_reader.is_valid()) {
         Msg("ERROR: screenshot not valid or corrupted.");

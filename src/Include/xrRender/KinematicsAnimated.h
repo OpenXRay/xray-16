@@ -25,9 +25,9 @@ struct IUpdateTracksCallback
 
 struct SKeyTable
 {
-    CKey keys[MAX_CHANNELS][MAX_BLENDED];       // all keys
-    CBlend* blends[MAX_CHANNELS][MAX_BLENDED];  // blend pointers
-    int chanel_blend_conts[MAX_CHANNELS];       // channel counts
+    CKey keys[MAX_CHANNELS][MAX_BLENDED];      // all keys
+    CBlend* blends[MAX_CHANNELS][MAX_BLENDED]; // blend pointers
+    int chanel_blend_conts[MAX_CHANNELS];      // channel counts
     SKeyTable() { std::fill_n(chanel_blend_conts, MAX_CHANNELS, 0); }
 };
 
@@ -72,8 +72,9 @@ public:
     virtual MotionID LL_MotionID(LPCSTR B) = 0;
     virtual u16 LL_PartID(LPCSTR B) = 0;
 
-    //	CBlend*						LL_PlayFX		(u16 bone,		MotionID motion, float blendAccrue,	float blendFalloff, float
-    //Speed, float Power);
+    //	CBlend*						LL_PlayFX		(u16 bone,		MotionID motion, float blendAccrue,	float blendFalloff,
+    //float
+    // Speed, float Power);
     virtual CBlend* LL_PlayCycle(u16 partition, MotionID motion, BOOL bMixing, float blendAccrue, float blendFalloff,
         float Speed, BOOL noloop, PlayCallback Callback, LPVOID CallbackParam, u8 channel = 0) = 0;
     virtual CBlend* LL_PlayCycle(
@@ -84,8 +85,8 @@ public:
     //	virtual CBlendInstance&				LL_GetBlendInstance	(u16 bone_id) = 0;
 
     // Main functionality
-    virtual void UpdateTracks() = 0;                                              // Update motions
-    virtual void LL_UpdateTracks(float dt, bool b_force, bool leave_blends) = 0;  // Update motions
+    virtual void UpdateTracks() = 0;                                             // Update motions
+    virtual void LL_UpdateTracks(float dt, bool b_force, bool leave_blends) = 0; // Update motions
     // void						DestroyCycle	(CBlend &B);
 
     // cycles
@@ -116,4 +117,4 @@ public:
     //#endif //	DEBUG
 };
 
-#endif  //	KinematicsAnimated_included
+#endif //	KinematicsAnimated_included

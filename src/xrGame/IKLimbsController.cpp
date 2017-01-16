@@ -14,7 +14,7 @@
 #include "xrCore/Animation/Motion.hpp"
 #ifdef DEBUG
 #include "PHDebug.h"
-#endif  // DEBUG
+#endif // DEBUG
 
 CIKLimbsController::CIKLimbsController() : m_object(0), m_legs_blend(0)
 {
@@ -55,7 +55,7 @@ void CIKLimbsController::LimbCalculate(SCalculateData& cd)
 {
     cd.do_collide =
         m_legs_blend &&
-        !cd.m_limb->KinematicsAnimated()->LL_GetMotionDef(m_legs_blend->motionID)->marks.empty();  // m_legs_blend->;
+        !cd.m_limb->KinematicsAnimated()->LL_GetMotionDef(m_legs_blend->motionID)->marks.empty(); // m_legs_blend->;
     cd.m_limb->ApplyState(cd);
 }
 
@@ -187,9 +187,9 @@ void CIKLimbsController::ObjectShift(float static_shift, const SCalculateData cd
     CPhysicsShellHolder* sh = smart_cast<CPhysicsShellHolder*>(m_object);
     VERIFY(sh);
     // CCharacterPhysicsSupport *ch = sh->character_physics_support();
-    _object_shift.freeze(!!Device.Paused());  // ch->interactive_motion() ||
+    _object_shift.freeze(!!Device.Paused()); // ch->interactive_motion() ||
 
-    if (cnt_in_step != sz && PredictObjectShift(cd))  // cnt_in_step > 0 &&
+    if (cnt_in_step != sz && PredictObjectShift(cd)) // cnt_in_step > 0 &&
         return;
     StaticObjectShift(cd);
 }
@@ -246,7 +246,7 @@ void CIKLimbsController::Calculate()
 
     root_bi.set_callback(root_bi.callback_type(), 0, root_bi.callback_param(), TRUE);
 
-    if (ik_shift_object)  //&& ! m_object->animation_movement_controlled( )
+    if (ik_shift_object) //&& ! m_object->animation_movement_controlled( )
     {
         ShiftObject(cd);
     }

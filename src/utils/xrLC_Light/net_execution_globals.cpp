@@ -69,7 +69,7 @@ struct list_glob
     static const e_net_globals next_ii = (e_net_globals)(i + 1);
     typedef list_glob<next_ii, e> next;
     next n;
-    add_enum<e, i> remove;  //
+    add_enum<e, i> remove; //
 };
 
 template <class e>

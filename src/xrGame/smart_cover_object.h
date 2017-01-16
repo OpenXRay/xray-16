@@ -43,7 +43,7 @@ public:
     virtual float Radius() const;
 #ifdef DEBUG
     virtual void OnRender();
-#endif  // DEBUG
+#endif // DEBUG
     bool inside(Fvector const& position) const;
 
     IC float const& enter_min_enemy_distance() const;
@@ -51,10 +51,10 @@ public:
     IC cover const& cover() const;
 };
 
-}  // namespace smart_cover
+} // namespace smart_cover
 
 typedef smart_cover::object smart_cover__object;
 
 #include "smart_cover_object_inline.h"
 
-#endif  // SMART_COVER_OBJECT_H_INCLUDED
+#endif // SMART_COVER_OBJECT_H_INCLUDED

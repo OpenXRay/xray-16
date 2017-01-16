@@ -12,9 +12,9 @@ class ECORE_API CTexture : public xr_resource_named
 public:
     //	Since DX10 allows up to 128 unique textures,
     //	distance between enum values should be at leas 128
-    enum ResourceShaderType  //	Don't change this since it's hardware-dependent
+    enum ResourceShaderType //	Don't change this since it's hardware-dependent
     {
-        rstPixel = 0,  //	Default texture offset
+        rstPixel = 0, //	Default texture offset
         rstVertex = D3DVERTEXTEXTURESAMPLER0,
         rstGeometry = rstVertex + 256,
         rstHull = rstGeometry + 256,
@@ -62,7 +62,7 @@ public:
 
 #if defined(USE_DX10) || defined(USE_DX11)
     ID3DShaderResourceView* get_SRView() { return m_pSRView; }
-#endif  //	USE_DX10
+#endif //	USE_DX10
 
 private:
     IC BOOL desc_valid() { return pSurface == desc_cache; }
@@ -75,10 +75,10 @@ private:
     void Apply(u32 dwStage);
     void ProcessStaging();
     D3D_USAGE GetUsage();
-#endif  //	USE_DX10
+#endif //	USE_DX10
 
     //	Class data
-public:  //	Public class members (must be encapsulated furthur)
+public: //	Public class members (must be encapsulated furthur)
     struct
     {
         u32 bLoaded : 1;
@@ -87,7 +87,7 @@ public:  //	Public class members (must be encapsulated furthur)
         u32 MemoryUsage : 28;
 #if defined(USE_DX10) || defined(USE_DX11)
         u32 bLoadedAsStaging : 1;
-#endif  //	USE_DX10
+#endif //	USE_DX10
     } flags;
     fastdelegate::FastDelegate1<u32> bind;
 
@@ -98,8 +98,8 @@ public:  //	Public class members (must be encapsulated furthur)
 
     union
     {
-        u32 m_play_time;  // sync theora time
-        u32 seqMSPF;      // Sequence data milliseconds per frame
+        u32 m_play_time; // sync theora time
+        u32 seqMSPF;     // Sequence data milliseconds per frame
     };
 
 private:
@@ -115,7 +115,7 @@ private:
     ID3DShaderResourceView* m_pSRView;
     // Sequence view data
     xr_vector<ID3DShaderResourceView*> m_seqSRView;
-#endif  //	USE_DX10
+#endif //	USE_DX10
 };
 struct resptrcode_texture : public resptr_base<CTexture>
 {

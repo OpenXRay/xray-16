@@ -24,16 +24,16 @@ struct SMAP_Rect
     }
     void get_cp(Ivector2& p0, Ivector2& p1)
     {
-        p0.set(max.x + 1, min.y);  // right
-        p1.set(min.x, max.y + 1);  // down
+        p0.set(max.x + 1, min.y); // right
+        p1.set(min.x, max.y + 1); // down
     }
 };
 
 class SMAP_Allocator
 {
-    u32 psize;                   // pool size
-    xr_vector<SMAP_Rect> stack;  //
-    xr_vector<Ivector2> cpoint;  // critical points
+    u32 psize;                  // pool size
+    xr_vector<SMAP_Rect> stack; //
+    xr_vector<Ivector2> cpoint; // critical points
 private:
     void _add(SMAP_Rect& R)
     {
@@ -41,8 +41,8 @@ private:
         Ivector2 p0, p1;
         R.get_cp(p0, p1);
         s32 ps = s32(psize);
-        if ((p0.x < ps) && (p0.y < ps)) cpoint.push_back(p0);  // 1st
-        if ((p1.x < ps) && (p1.y < ps)) cpoint.push_back(p1);  // 2nd
+        if ((p0.x < ps) && (p0.y < ps)) cpoint.push_back(p0); // 1st
+        if ((p1.x < ps) && (p1.y < ps)) cpoint.push_back(p1); // 2nd
     }
 
 public:

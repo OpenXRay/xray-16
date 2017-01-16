@@ -102,13 +102,13 @@ public:
     {
 #ifndef _EDITOR
         FPU::m64r();
-#endif  // _EDITOR
+#endif // _EDITOR
 
         u64 result = GetElapsed_ticks(inherited::GetElapsed_ticks());
 
 #ifndef _EDITOR
         FPU::m24r();
-#endif  // _EDITOR
+#endif // _EDITOR
 
         return (result);
     }
@@ -202,4 +202,4 @@ public:
     }
 };
 
-#endif  // FTimerH
+#endif // FTimerH

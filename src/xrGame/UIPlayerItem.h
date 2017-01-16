@@ -11,7 +11,7 @@
 #include "xrCore/Containers/AssociativeVector.hpp"
 
 class UITeamState;
-class UITeamPanels;  // for switching teams
+class UITeamPanels; // for switching teams
 class CUIStatsIcon;
 
 class UIPlayerItem : public CUIWindow

@@ -10,4 +10,4 @@ public:
     virtual void OnRender(bool bGame) = 0;
 };
 
-#endif  //	ConsoleRender_included
+#endif //	ConsoleRender_included

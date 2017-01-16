@@ -16,7 +16,7 @@ CObjectSpace::CObjectSpace()
 #ifdef CONFIG_PROFILE_LOCKS
       ,
       Lock(MUTEX_PROFILE_ID(CObjectSpace::Lock))
-#endif  // CONFIG_PROFILE_LOCKS
+#endif // CONFIG_PROFILE_LOCKS
 #ifdef DEBUG
       ,
       m_pRender(0)
@@ -96,7 +96,7 @@ void CObjectSpace::Load(LPCSTR path, LPCSTR fname, CDB::build_callback build_cal
 #ifdef USE_ARENA_ALLOCATOR
     Msg("CObjectSpace::Load, g_collision_allocator.get_allocated_size() - %d",
         int(g_collision_allocator.get_allocated_size() / 1024.0 / 1024));
-#endif  // #ifdef USE_ARENA_ALLOCATOR
+#endif // #ifdef USE_ARENA_ALLOCATOR
     IReader* F = FS.r_open(path, fname);
     R_ASSERT(F);
     Load(F, build_callback);

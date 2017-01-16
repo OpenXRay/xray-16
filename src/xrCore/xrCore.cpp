@@ -13,7 +13,7 @@
 
 #ifdef DEBUG
 #include <malloc.h>
-#endif  // DEBUG
+#endif // DEBUG
 
 XRCORE_API xrCore Core;
 
@@ -91,10 +91,10 @@ void xrCore::_initialize(LPCSTR _ApplicationName, LogCallback cb, BOOL init_fs, 
             flags |= CLocatorAPI::flCacheFiles;
         else
             flags &= ~CLocatorAPI::flCacheFiles;
-#endif          // DEBUG
-#ifdef _EDITOR  // for EDITORS - no cache
+#endif         // DEBUG
+#ifdef _EDITOR // for EDITORS - no cache
         flags &= ~CLocatorAPI::flCacheFiles;
-#endif  // _EDITOR
+#endif // _EDITOR
         flags |= CLocatorAPI::flScanAppRoot;
 
 #ifndef _EDITOR
@@ -110,7 +110,7 @@ void xrCore::_initialize(LPCSTR _ApplicationName, LogCallback cb, BOOL init_fs, 
 #ifndef _EDITOR
         Msg("Process heap 0x%08x", GetProcessHeap());
 #endif
-#endif  // DEBUG
+#endif // DEBUG
     }
     SetLogCB(cb);
     init_counter++;
@@ -197,7 +197,7 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD ul_reason_for_call, LPVOID lpvRese
     case DLL_PROCESS_DETACH:
 #ifdef USE_MEMORY_MONITOR
         memory_monitor::flush_each_time(true);
-#endif  // USE_MEMORY_MONITOR
+#endif // USE_MEMORY_MONITOR
         break;
     }
     return TRUE;

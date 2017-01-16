@@ -14,7 +14,7 @@
 #include "cover_point.h"
 #include "stdafx.h"
 
-const float MIN_SUITABLE_ENEMY_DISTANCE = 3.f;  // 10.f;
+const float MIN_SUITABLE_ENEMY_DISTANCE = 3.f; // 10.f;
 
 struct CRemoveOldDangerCover
 {
@@ -84,7 +84,7 @@ bool CAgentLocationManager::suitable(CAI_Stalker* object, const CCoverPoint* loc
         if ((*I)->cover()->m_position.distance_to_sqr(location->position()) <= _sqr(5.f))
             // so member cover is too close
             //			if ((*I)->object().Position().distance_to_sqr(location->position()) <=
-            //object->Position().distance_to_sqr(location->position()))
+            // object->Position().distance_to_sqr(location->position()))
             // check if member to its cover is more close than we to our cover
             if ((*I)->object().Position().distance_to_sqr((*I)->cover()->m_position) <=
                 object->Position().distance_to_sqr(location->position()) + 2.f)

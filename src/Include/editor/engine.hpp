@@ -69,8 +69,8 @@ public:
 
     virtual char const* weather_current_time() const = 0;
     virtual void weather_current_time(char const*) = 0;
-};  // class engine
+}; // class engine
 
-}  // namespace editor
+} // namespace editor
 
-#endif  // ifndef EDITOR_ENGINE_HPP_INCLUDED
+#endif // ifndef EDITOR_ENGINE_HPP_INCLUDED

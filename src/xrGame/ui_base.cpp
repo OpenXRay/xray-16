@@ -76,7 +76,7 @@ sPoly2D* C2DFrustum::ClipPoly(sPoly2D& S, sPoly2D& D) const
                     dir_uv.sub((*src)[j + 1].uv, (*src)[j].uv);
                     denum = P.n.dotproduct(dir_pt);
                     if (denum != 0) {
-                        t = -cls[j] / denum;  // VERIFY(t<=1.f && t>=0);
+                        t = -cls[j] / denum; // VERIFY(t<=1.f && t>=0);
                         dest->last().pt.mad((*src)[j].pt, dir_pt, t);
                         dest->last().uv.mad((*src)[j].uv, dir_uv, t);
                         dest->inc();
@@ -93,7 +93,7 @@ sPoly2D* C2DFrustum::ClipPoly(sPoly2D& S, sPoly2D& D) const
                     dir_uv.sub((*src)[j + 1].uv, (*src)[j].uv);
                     denum = P.n.dotproduct(dir_pt);
                     if (denum != 0) {
-                        t = -cls[j] / denum;  // VERIFY(t<=1.f && t>=0);
+                        t = -cls[j] / denum; // VERIFY(t<=1.f && t>=0);
                         dest->last().pt.mad((*src)[j].pt, dir_pt, t);
                         dest->last().uv.mad((*src)[j].uv, dir_uv, t);
                         dest->inc();

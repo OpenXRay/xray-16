@@ -30,7 +30,7 @@ void CPHIsland::Repair()
         if (!dV_valid(dBodyGetLinearVel(body))) dBodySetLinearVel(body, 0.f, 0.f, 0.f);
         if (!dV_valid(dBodyGetPosition(body))) dBodySetPosition(body, 0.f, 0.f, 0.f);
         if (!dQ_valid(dBodyGetQuaternion(body))) {
-            dQuaternion q = {1.f, 0.f, 0.f, 0.f};  // dQSetIdentity(q);
+            dQuaternion q = {1.f, 0.f, 0.f, 0.f}; // dQSetIdentity(q);
             dBodySetQuaternion(body, q);
         }
     }

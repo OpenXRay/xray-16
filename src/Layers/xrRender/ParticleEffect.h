@@ -4,10 +4,10 @@
 #ifdef _EDITOR
 #include "Layers/xrRender/FBasicVisual.h"
 #include "Layers/xrRender/dxParticleCustom.h"
-#else  // _EDITOR
+#else // _EDITOR
 #include "Layers/xrRender/FBasicVisual.h"
 #include "Layers/xrRender/dxParticleCustom.h"
-#endif  // _EDITOR
+#endif // _EDITOR
 
 namespace PS
 {

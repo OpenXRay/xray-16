@@ -52,7 +52,7 @@ void CPHShell::Activate(const Fmatrix& m0, float dt01, const Fmatrix& m2, bool d
 
     Fmatrix m;
     {
-        Fmatrix old_m = mXFORM;  //+GetGlobalTransformDynamic update mXFORM;
+        Fmatrix old_m = mXFORM; //+GetGlobalTransformDynamic update mXFORM;
         GetGlobalTransformDynamic(&m);
         mXFORM = old_m;
     }

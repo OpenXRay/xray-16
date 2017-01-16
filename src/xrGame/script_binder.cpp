@@ -53,7 +53,7 @@ void CScriptBinder::reinit()
 #ifdef DEBUG_MEMORY_MANAGER
     u32 start = 0;
     if (g_bMEMO) start = Memory.mem_usage();
-#endif  // DEBUG_MEMORY_MANAGER
+#endif // DEBUG_MEMORY_MANAGER
     if (m_object) {
         try
         {
@@ -70,7 +70,7 @@ void CScriptBinder::reinit()
         //		lua_gc				(ai().script_engine().lua(),LUA_GCCOLLECT,0);
         Msg("CScriptBinder::reinit() : %d", Memory.mem_usage() - start);
     }
-#endif  // DEBUG_MEMORY_MANAGER
+#endif // DEBUG_MEMORY_MANAGER
 }
 
 void CScriptBinder::reload(LPCSTR section)
@@ -78,7 +78,7 @@ void CScriptBinder::reload(LPCSTR section)
 #ifdef DEBUG_MEMORY_MANAGER
     u32 start = 0;
     if (g_bMEMO) start = Memory.mem_usage();
-#endif  // DEBUG_MEMORY_MANAGER
+#endif // DEBUG_MEMORY_MANAGER
 #ifndef DBG_DISABLE_SCRIPTS
     VERIFY(!m_object);
     if (!pSettings->line_exist(section, "script_binding")) return;
@@ -117,7 +117,7 @@ void CScriptBinder::reload(LPCSTR section)
         //		lua_gc				(ai().script_engine().lua(),LUA_GCCOLLECT,0);
         Msg("CScriptBinder::reload() : %d", Memory.mem_usage() - start);
     }
-#endif  // DEBUG_MEMORY_MANAGER
+#endif // DEBUG_MEMORY_MANAGER
 }
 
 BOOL CScriptBinder::net_Spawn(CSE_Abstract* DC)
@@ -125,7 +125,7 @@ BOOL CScriptBinder::net_Spawn(CSE_Abstract* DC)
 #ifdef DEBUG_MEMORY_MANAGER
     u32 start = 0;
     if (g_bMEMO) start = Memory.mem_usage();
-#endif  // DEBUG_MEMORY_MANAGER
+#endif // DEBUG_MEMORY_MANAGER
     CSE_Abstract* abstract = (CSE_Abstract*)DC;
     CSE_ALifeObject* object = smart_cast<CSE_ALifeObject*>(abstract);
     if (object && m_object) {
@@ -145,7 +145,7 @@ BOOL CScriptBinder::net_Spawn(CSE_Abstract* DC)
         //		lua_gc				(ai().script_engine().lua(),LUA_GCCOLLECT,0);
         Msg("CScriptBinder::net_Spawn() : %d", Memory.mem_usage() - start);
     }
-#endif  // DEBUG_MEMORY_MANAGER
+#endif // DEBUG_MEMORY_MANAGER
 
     return (TRUE);
 }
@@ -155,7 +155,7 @@ void CScriptBinder::net_Destroy()
     if (m_object) {
 #ifdef _DEBUG
         Msg("* Core object %s is UNbinded from the script object", owner->cName());
-#endif  // _DEBUG
+#endif // _DEBUG
         try
         {
             m_object->net_Destroy();
@@ -174,7 +174,7 @@ void CScriptBinder::set_object(CScriptBinderObject* object)
         VERIFY2(!m_object, "Cannot bind to the object twice!");
 #ifdef _DEBUG
         Msg("* Core object %s is binded with the script object", owner->cName());
-#endif  // _DEBUG
+#endif // _DEBUG
         m_object = object;
     }
     else

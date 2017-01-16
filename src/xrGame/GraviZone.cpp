@@ -23,14 +23,14 @@ void CBaseGraviZone::Load(LPCSTR section)
 {
     inherited::Load(section);
 
-    m_fThrowInImpulse = pSettings->r_float(section, "throw_in_impulse");             // 800.f;
-    m_fThrowInImpulseAlive = pSettings->r_float(section, "throw_in_impulse_alive");  // 800.f;
+    m_fThrowInImpulse = pSettings->r_float(section, "throw_in_impulse");            // 800.f;
+    m_fThrowInImpulseAlive = pSettings->r_float(section, "throw_in_impulse_alive"); // 800.f;
     m_fThrowInAtten = pSettings->r_float(section, "throw_in_atten");
-    m_fBlowoutRadiusPercent = pSettings->r_float(section, "blowout_radius_percent");  // 0.3f;
+    m_fBlowoutRadiusPercent = pSettings->r_float(section, "blowout_radius_percent"); // 0.3f;
 
-    m_fTeleHeight = pSettings->r_float(section, "tele_height");  // 1.5f;
-    m_dwTimeToTele = pSettings->r_u32(section, "time_to_tele");  // 7000;
-    m_dwTelePause = pSettings->r_u32(section, "tele_pause");     // 1000
+    m_fTeleHeight = pSettings->r_float(section, "tele_height"); // 1.5f;
+    m_dwTimeToTele = pSettings->r_u32(section, "time_to_tele"); // 7000;
+    m_dwTelePause = pSettings->r_u32(section, "tele_pause");    // 1000
 
     if (pSettings->line_exist(section, "tele_particles_big"))
         m_sTeleParticlesBig = pSettings->r_string(section, "tele_particles_big");
@@ -192,7 +192,7 @@ void CBaseGraviZone::AffectThrow(SZoneObjectInfo* O, CPhysicsShellHolder* GO, co
 {
     Fvector position_in_bone_space;
 
-    float power = Power(dist, Radius());  // Power(GO->Position().distance_to(zone_center));
+    float power = Power(dist, Radius()); // Power(GO->Position().distance_to(zone_center));
     float impulse = m_fHitImpulseScale * power * GO->GetMass();
 
     if (power > 0.01f) {

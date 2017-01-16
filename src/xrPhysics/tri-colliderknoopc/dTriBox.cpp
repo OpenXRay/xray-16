@@ -22,18 +22,18 @@ int dcTriListCollider::dSortedTriBox(const dReal* triSideAx0, const dReal* triSi
     // find number of contacts requested
     int maxc = flags & NUMC_MASK;
     if (maxc < 1) maxc = 1;
-    if (maxc > 3) maxc = 3;  // no more than 3 contacts per box allowed
+    if (maxc > 3) maxc = 3; // no more than 3 contacts per box allowed
 
     int code = 0;
     dReal outDepth;
-    char signum;  //,sn;
+    char signum; //,sn;
 
     dReal sidePr = dFabs(dDOT14(triAx, R + 0) * hside[0]) + dFabs(dDOT14(triAx, R + 1) * hside[1]) +
                    dFabs(dDOT14(triAx, R + 2) * hside[2]);
 
-    dReal depth = sidePr - dist;  // dFabs(dist);
+    dReal depth = sidePr - dist; // dFabs(dist);
     outDepth = depth;
-    signum = -1;  // dist<0.f ? -1 : 1;
+    signum = -1; // dist<0.f ? -1 : 1;
     code = 0;
 
     if (depth < 0.f) return 0;
@@ -122,7 +122,7 @@ int dcTriListCollider::dSortedTriBox(const dReal* triSideAx0, const dReal* triSi
                 goto use_side_3;
             else
             {
-                BAR(1, 0, 1);  // use side 1
+                BAR(1, 0, 1); // use side 1
                 if (maxc == 2) goto done;
                 if (B2 < B3)
                     goto contact2_2;
@@ -133,7 +133,7 @@ int dcTriListCollider::dSortedTriBox(const dReal* triSideAx0, const dReal* triSi
         else
         {
             if (B3 < B2) {
-            use_side_3:  // use side 3
+            use_side_3: // use side 3
                 BAR(1, 2, 3);
                 if (maxc == 2) goto done;
                 if (B1 < B2)
@@ -143,7 +143,7 @@ int dcTriListCollider::dSortedTriBox(const dReal* triSideAx0, const dReal* triSi
             }
             else
             {
-                BAR(1, 1, 2);  // use side 2
+                BAR(1, 1, 2); // use side 2
                 if (maxc == 2) goto done;
                 if (B1 < B3)
                     goto contact2_1;
@@ -268,11 +268,11 @@ int dcTriListCollider::dTriBox(const dReal* v0, const dReal* v1, const dReal* v2
     // find number of contacts requested
     int maxc = flags & NUMC_MASK;
     if (maxc < 1) maxc = 1;
-    if (maxc > 3) maxc = 3;  // no more than 3 contacts per box allowed
+    if (maxc > 3) maxc = 3; // no more than 3 contacts per box allowed
 
     // dVector3 triAx;
-    const dReal* triSideAx0 = T->side0;  //{v1[0]-v0[0],v1[1]-v0[1],v1[2]-v0[2]};
-    const dReal* triSideAx1 = T->side1;  //{v2[0]-v1[0],v2[1]-v1[1],v2[2]-v1[2]};
+    const dReal* triSideAx0 = T->side0; //{v1[0]-v0[0],v1[1]-v0[1],v1[2]-v0[2]};
+    const dReal* triSideAx1 = T->side1; //{v2[0]-v1[0],v2[1]-v1[1],v2[2]-v1[2]};
     dVector3 triSideAx2 = {v0[0] - v2[0], v0[1] - v2[1], v0[2] - v2[2]};
     // dCROSS(triAx,=,triSideAx0,triSideAx1);
     int code = 0;

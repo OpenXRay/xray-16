@@ -18,7 +18,7 @@ namespace upgrade
 {
 class Upgrade;
 }
-}  // namespace upgrade, inventory
+} // namespace upgrade, inventory
 
 class CUITextWnd;
 class CUIFrameWindow;
@@ -52,6 +52,6 @@ protected:
     CUITextWnd* m_desc;
     CUITextWnd* m_prereq;
 
-};  // class UIInvUpgradeInfo
+}; // class UIInvUpgradeInfo
 
-#endif  // UI_INVENTORY_UPGRADE_INFO_H_INCLUDED
+#endif // UI_INVENTORY_UPGRADE_INFO_H_INCLUDED

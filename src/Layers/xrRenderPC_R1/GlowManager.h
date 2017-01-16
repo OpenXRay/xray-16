@@ -52,9 +52,9 @@ class CGlowManager
 {
     xr_vector<ref_glow> Glows;
     xr_vector<ref_glow> Selected;
-    xr_vector<ref_glow> SelectedToTest_2;  // 2-frames behind
-    xr_vector<ref_glow> SelectedToTest_1;  // 1-frames behind
-    xr_vector<ref_glow> SelectedToTest_0;  // 0-frames behind
+    xr_vector<ref_glow> SelectedToTest_2; // 2-frames behind
+    xr_vector<ref_glow> SelectedToTest_1; // 1-frames behind
+    xr_vector<ref_glow> SelectedToTest_0; // 0-frames behind
     ref_geom hGeom;
 
     BOOL b_hardware;
@@ -75,4 +75,4 @@ public:
     ~CGlowManager();
 };
 
-#endif  // !defined(AFX_GLOWMANAGER_H__EC35911F_479B_469A_845C_1A64D81D0326__INCLUDED_)
+#endif // !defined(AFX_GLOWMANAGER_H__EC35911F_479B_469A_845C_1A64D81D0326__INCLUDED_)

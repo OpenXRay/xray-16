@@ -103,7 +103,7 @@ void CControlPathBuilder::update_schedule()
             // set target
             // TODO: make it VERIFY
             //			VERIFY3(m_data.target_node != u32(-1), "Error: Object set wrong path params! Object
-            //name:",*inherited_com::m_object->cName());
+            // name:",*inherited_com::m_object->cName());
             if (m_data.target_node == u32(-1)) return;
 
             detail().set_dest_position(m_data.target_position);

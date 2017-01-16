@@ -16,7 +16,7 @@ void __cdecl SBCallback(ServerBrowser sb, SBCallbackReason reason, SBServer serv
     if (!pGSBrowser) return;
     switch (reason)
     {
-    case sbc_serveradded:  // a server was added to the list, may just have an IP & port at this point
+    case sbc_serveradded: // a server was added to the list, may just have an IP & port at this point
     {
 #ifdef _DEBUG
 //.			Msg("sbc_serveradded");
@@ -25,28 +25,28 @@ void __cdecl SBCallback(ServerBrowser sb, SBCallbackReason reason, SBServer serv
         //			pGSBrowser->UpdateServerList();
     }
     break;
-    case sbc_serverupdated:  // server information has been updated - either basic or full information is now available
-                             // about this server
-    {
+    case sbc_serverupdated: // server information has been updated - either basic or full information is now available
+                            // about this server
+        {
 #ifdef _DEBUG
 //.			Msg("sbc_serverupdated");
 #endif
-        //			pGSBrowser->SortBrowserByPing();
-        pGSBrowser->UpdateServerList();
-    }
-    break;
-    case sbc_serverupdatefailed:  // an attempt to retrieve information about this server, either directly or from the
-                                  // master, failed
-    {
+            //			pGSBrowser->SortBrowserByPing();
+            pGSBrowser->UpdateServerList();
+        }
+        break;
+    case sbc_serverupdatefailed: // an attempt to retrieve information about this server, either directly or from the
+                                 // master, failed
+        {
 #ifdef _DEBUG
 //.			Msg("sbc_serverupdatefailed");
 #endif
-        //			pGSBrowser->OnUpdateFailed(server);
-        //			pGSBrowser->SortBrowserByPing();
-        pGSBrowser->UpdateServerList();
-    }
-    break;
-    case sbc_serverdeleted:  // a server was removed from the list
+            //			pGSBrowser->OnUpdateFailed(server);
+            //			pGSBrowser->SortBrowserByPing();
+            pGSBrowser->UpdateServerList();
+        }
+        break;
+    case sbc_serverdeleted: // a server was removed from the list
     {
 #ifdef _DEBUG
         Msg("sbc_serverdeleted");
@@ -55,7 +55,7 @@ void __cdecl SBCallback(ServerBrowser sb, SBCallbackReason reason, SBServer serv
         pGSBrowser->UpdateServerList();
     }
     break;
-    case sbc_updatecomplete:  // the server query engine is now idle
+    case sbc_updatecomplete: // the server query engine is now idle
     {
 #ifdef _DEBUG
 //.			Msg("sbc_updatecomplete");
@@ -64,7 +64,7 @@ void __cdecl SBCallback(ServerBrowser sb, SBCallbackReason reason, SBServer serv
         pGSBrowser->UpdateServerList();
     }
     break;
-    case sbc_queryerror:  // the master returned an error string for the provided query
+    case sbc_queryerror: // the master returned an error string for the provided query
     {
 #ifdef _DEBUG
         Msg("sbc_queryerror");
@@ -87,7 +87,7 @@ void __cdecl SBCallback(ServerBrowser sb, SBCallbackReason reason, SBServer serv
 CGameSpy_Browser::CGameSpy_Browser()
 #ifdef CONFIG_PROFILE_LOCKS
     : m_refresh_lock(MUTEX_PROFILE_ID(CGameSpy_Browser::m_refresh_lock))
-#endif  // CONFIG_PROFILE_LOCKS
+#endif // CONFIG_PROFILE_LOCKS
 {
     m_pQR2 = NULL;
     m_pGSBrowser = NULL;

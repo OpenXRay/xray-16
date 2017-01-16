@@ -26,7 +26,7 @@
 #define gsirealloc realloc
 #include <assert.h>
 #else
-#include "nonport.h"  //for gsimalloc/realloc/free/assert
+#include "nonport.h" //for gsimalloc/realloc/free/assert
 #endif
 
 struct HashImplementation
@@ -58,7 +58,7 @@ HashTable TableNew2(
 
     table->buckets = (DArray*)gsimalloc(nBuckets * sizeof(DArray));
     assert(table->buckets);
-    for (i = 0; i < nBuckets; i++)  // ArrayNew will assert if allocation fails
+    for (i = 0; i < nBuckets; i++) // ArrayNew will assert if allocation fails
         table->buckets[i] = ArrayNew(elemSize, nChains, freeFn);
     table->nbuckets = nBuckets;
     table->freefn = freeFn;

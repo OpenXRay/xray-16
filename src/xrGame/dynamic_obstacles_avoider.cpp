@@ -33,7 +33,7 @@ bool dynamic_obstacles_avoider::movement_enabled() const
     }
 #ifdef DEBUG
     return (false);
-#endif  // DEBUG
+#endif // DEBUG
 }
 
 bool dynamic_obstacles_avoider::process_query(const bool& change_path_state)

@@ -97,7 +97,7 @@ private:
         {
             return self.estimate_edge_weight_impl(vertex_index);
         }
-    };  // struct helper
+    }; // struct helper
 
     template <>
     struct helper<true>
@@ -106,7 +106,7 @@ private:
         {
             return self.estimate_edge_weight_impl(vertex_index, true);
         }
-    };  // struct helper
+    }; // struct helper
 
 protected:
 #ifdef DEBUG

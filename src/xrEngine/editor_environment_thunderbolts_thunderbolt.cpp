@@ -113,4 +113,4 @@ thunderbolt::property_holder_type* thunderbolt::object()
     return (m_property_holder);
 }
 
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR

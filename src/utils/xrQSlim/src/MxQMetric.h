@@ -1,4 +1,4 @@
-#ifndef MXQMETRIC_INCLUDED  // -*- C++ -*-
+#ifndef MXQMETRIC_INCLUDED // -*- C++ -*-
 #define MXQMETRIC_INCLUDED
 #if !defined(__GNUC__)
 #pragma once

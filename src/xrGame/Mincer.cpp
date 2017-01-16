@@ -113,7 +113,7 @@ void CMincer::Center(Fvector& C) const
 void CMincer::NotificateDestroy(CPHDestroyableNotificate* dn)
 {
     Fvector dir;
-    float power = 0.0f;  // can change
+    float power = 0.0f; // can change
     float impulse;
     // if(!m_telekinetics.has_impacts()) return;
 

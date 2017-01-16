@@ -27,7 +27,7 @@ BOOL NeedMerge(vecFace& subdiv, Fbox& bb_base)
         bb_base.modify(F->v[1]->P);
         bb_base.modify(F->v[2]->P);
     }
-    bb_base.grow(EPS_S);  // Enshure non-zero volume
+    bb_base.grow(EPS_S); // Enshure non-zero volume
 
     Fvector sz_base;
     bb_base.getsize(sz_base);
@@ -74,7 +74,7 @@ IC BOOL ValidateMergeLinearSize(const Fvector& merged, const Fvector& orig1, con
 IC BOOL ValidateMerge(u32 f1, const Fbox& bb_base, const Fbox& bb_base_orig, u32 f2, const Fbox& bb, float& volume)
 {
     // Polygons
-    if ((f1 + f2) > u32(4 * c_SS_HighVertLimit / 3)) return FALSE;  // Don't exceed limits (4/3 max POLY)
+    if ((f1 + f2) > u32(4 * c_SS_HighVertLimit / 3)) return FALSE; // Don't exceed limits (4/3 max POLY)
 
     // Size
     Fbox merge;
@@ -89,7 +89,7 @@ IC BOOL ValidateMerge(u32 f1, const Fbox& bb_base, const Fbox& bb_base_orig, u32
     //	if (sz.y>(4*c_SS_maxsize/3))			return FALSE;
     //	if (sz.z>(4*c_SS_maxsize/3))			return FALSE;
 
-    if (!ValidateMergeLinearSize(sz, orig1, orig2, 0)) return FALSE;  // Don't exceed limits (4/3 GEOM)
+    if (!ValidateMergeLinearSize(sz, orig1, orig2, 0)) return FALSE; // Don't exceed limits (4/3 GEOM)
     if (!ValidateMergeLinearSize(sz, orig1, orig2, 1)) return FALSE;
     if (!ValidateMergeLinearSize(sz, orig1, orig2, 2)) return FALSE;
 
@@ -99,8 +99,8 @@ IC BOOL ValidateMerge(u32 f1, const Fbox& bb_base, const Fbox& bb_base_orig, u32
     float v1 = bb0.getvolume();
     MakeCube(bb1, bb);
     float v2 = bb1.getvolume();
-    volume = merge.getvolume();                        // / Cuboid(merge);
-    if (volume > 2 * 2 * 2 * (v1 + v2)) return FALSE;  // Don't merge too distant groups (8 vol)
+    volume = merge.getvolume();                       // / Cuboid(merge);
+    if (volume > 2 * 2 * 2 * (v1 + v2)) return FALSE; // Don't merge too distant groups (8 vol)
 
     // OK
     return TRUE;
@@ -118,7 +118,7 @@ typedef struct MERGEGM_PARAMS
     vecFace* subdiv;
     Fbox* bb_base_orig;
     Fbox* bb_base;
-    HANDLE hEvents[3];  // 0=start,1=terminate,2=ready
+    HANDLE hEvents[3]; // 0=start,1=terminate,2=ready
 } * LP_MERGEGM_PARAMS;
 
 static CRITICAL_SECTION mergegm_cs;
@@ -148,8 +148,8 @@ DWORD WINAPI MergeGmThreadProc(LPVOID lpParameter)
             // Error ?
             ExitThread(1);
             break;
-        }  // switch
-    }      // while
+        } // switch
+    }     // while
 
     return 0;
 }
@@ -236,7 +236,7 @@ void FindBestMergeCandidate_threads(u32* selected, float* selected_volume, u32 s
         mergegm_params[i].bb_base = bb_base;
 
         SetEvent(mergegm_params[i].hEvents[0]);
-    }  // for
+    } // for
 
     // Wait for result
     WaitForMultipleObjects(mergegm_threads_count, mergegm_ready_events, TRUE, INFINITE);
@@ -296,7 +296,7 @@ void CBuild::xrPhase_MergeGeometry()
             u32 selected = split;
             float selected_volume = flt_max;
 
-            if ((g_XSplit.size() - split) < 200) {  // may need adjustment
+            if ((g_XSplit.size() - split) < 200) { // may need adjustment
                 // single thread
                 FindBestMergeCandidate(
                     &selected, &selected_volume, split + 1, g_XSplit.size(), &subdiv, &bb_base_orig, &bb_base);
@@ -308,7 +308,7 @@ void CBuild::xrPhase_MergeGeometry()
                     &selected, &selected_volume, split + 1, g_XSplit.size(), &subdiv, &bb_base_orig, &bb_base);
             }
 
-            if (selected == split) break;  // No candidates for merge
+            if (selected == split) break; // No candidates for merge
 
             // **OK**. Perform merge
             subdiv.insert(subdiv.begin(), g_XSplit[selected]->begin(), g_XSplit[selected]->end());

@@ -147,7 +147,7 @@ static void door_ignore(bool& do_collide, bool bo1, dContact& c, SGameMtl* /*mat
 
     CPhysicsShell* ph_shell = collide_obj->PPhysicsShell();
     if (!ph_shell) {
-        do_collide = false;  //? must be AI
+        do_collide = false; //? must be AI
         return;
     }
     VERIFY(ph_shell);
@@ -427,7 +427,7 @@ void CPhysicObject::CreateBody(CSE_ALifeObjectPhysic* po)
 
 BOOL CPhysicObject::net_SaveRelevant()
 {
-    return TRUE;  //! m_flags.test(CSE_ALifeObjectPhysic::flSpawnCopy);
+    return TRUE; //! m_flags.test(CSE_ALifeObjectPhysic::flSpawnCopy);
 }
 
 BOOL CPhysicObject::UsedAI_Locations()
@@ -526,11 +526,11 @@ void CPhysicObject::net_Export(NET_Packet& P)
     net_Export_PH_Params(P, State, num_items);
 
     if (PPhysicsShell()->isEnabled()) {
-        P.w_u8(1);  // not freezed
+        P.w_u8(1); // not freezed
     }
     else
     {
-        P.w_u8(0);  // freezed
+        P.w_u8(0); // freezed
     }
 };
 
@@ -619,7 +619,7 @@ void CPhysicObject::net_Import(NET_Packet& P)
 
     net_Import_PH_Params(P, N, num_items);
     ////////////////////////////////////////////
-    P.r_u8();  // freezed or not..
+    P.r_u8(); // freezed or not..
 
     if (this->cast_game_object()->Local()) {
         return;
@@ -646,7 +646,7 @@ void CPhysicObject::net_Import(NET_Packet& P)
     if (!m_activated) {
 #ifdef DEBUG
         Msg("Activating object [%d] before interpolation starts", ID());
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
         processing_activate();
         m_activated = true;
     }
@@ -695,7 +695,7 @@ void CPhysicObject::net_Import_PH_Params(NET_Packet& P, net_update_PItem& N, mas
 //-----------
 
 void CPhysicObject::PH_B_CrPr(){};
-void CPhysicObject::PH_I_CrPr()  // actions & operations between two phisic prediction steps
+void CPhysicObject::PH_I_CrPr() // actions & operations between two phisic prediction steps
     {};
 void CPhysicObject::PH_A_CrPr()
 {

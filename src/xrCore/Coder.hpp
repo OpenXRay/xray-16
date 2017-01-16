@@ -164,4 +164,4 @@ static inline void rcBinCorrect1(UINT tmp, UINT f1)
     range *= f1;
 }
 
-}  // namespace ppmd
+} // namespace ppmd

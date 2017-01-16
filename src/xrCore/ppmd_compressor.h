@@ -26,4 +26,4 @@ XRCORE_API u32 ppmd_compress_mt(void* dest_buffer, const u32& dest_buffer_size, 
 XRCORE_API u32 ppmd_decompress_mt(void* dest_buffer, const u32& dest_buffer_size, const void* source_buffer,
     const u32& source_buffer_size, ppmd_yield_callback_t ycb);
 
-#endif  // PPMD_COMPRESSOR_H
+#endif // PPMD_COMPRESSOR_H

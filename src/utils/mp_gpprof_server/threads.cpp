@@ -58,4 +58,4 @@ void sleep(unsigned int const ms)
     nanosleep(&tmp_ts, &tmp_tsrem);
 }
 
-}  // namespace xray
+} // namespace xray

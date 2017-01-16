@@ -34,7 +34,7 @@ void CRenderTarget::accum_point(light* L)
     // *** similar to "Carmack's reverse", but assumes convex, non intersecting objects,
     // *** thus can cope without stencil clear with 127 lights
     // *** in practice, 'cause we "clear" it back to 0x1 it usually allows us to > 200 lights :)
-    RCache.set_Element(s_accum_mask->E[SE_MASK_POINT]);  // masker
+    RCache.set_Element(s_accum_mask->E[SE_MASK_POINT]); // masker
     //	Done in blender!
     // RCache.set_ColorWriteEnable		(FALSE);
 
@@ -64,7 +64,7 @@ void CRenderTarget::accum_point(light* L)
     // *****************************	Minimize overdraw	*************************************
     // Select shader (front or back-faces), *** back, if intersect near plane
     RCache.set_ColorWriteEnable();
-    RCache.set_CullMode(CULL_CW);  // back
+    RCache.set_CullMode(CULL_CW); // back
     /*
     if (bIntersect)	RCache.set_CullMode		(CULL_CW);		// back
     else			RCache.set_CullMode		(CULL_CCW);		// front
@@ -108,13 +108,13 @@ void CRenderTarget::accum_point(light* L)
         //			HW.pDevice->SetSamplerState	( 0, D3DSAMP_MIPMAPLODBIAS, FOURCC_GET4 );
         //		}
 
-        RCache.set_CullMode(CULL_CW);  // back
-                                       // Render if (light_id <= stencil && z-pass)
+        RCache.set_CullMode(CULL_CW); // back
+                                      // Render if (light_id <= stencil && z-pass)
         if (!RImplementation.o.dx10_msaa) {
             RCache.set_Stencil(TRUE, D3DCMP_EQUAL, dwLightMarkerID, 0xff, 0x00);
             draw_volume(L);
         }
-        else  // checked Holger
+        else // checked Holger
         {
             // per pixel
             RCache.set_Stencil(TRUE, D3DCMP_EQUAL, dwLightMarkerID, 0xff, 0x00);
@@ -127,7 +127,7 @@ void CRenderTarget::accum_point(light* L)
                 RCache.set_CullMode(D3DCULL_CW);
                 draw_volume(L);
             }
-            else  // checked Holger
+            else // checked Holger
             {
                 for (u32 i = 0; i < RImplementation.o.dx10_msaa_samples; ++i)
                 {
@@ -162,7 +162,7 @@ void CRenderTarget::accum_point(light* L)
             RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, dwLightMarkerID, 0xff, 0x00);
             draw_volume(L);
         }
-        else  // checked Holger
+        else // checked Holger
         {
             // per pixel
             RCache.set_CullMode(D3DCULL_CW);
@@ -175,7 +175,7 @@ void CRenderTarget::accum_point(light* L)
                 RCache.set_Stencil(TRUE, D3DCMP_EQUAL, dwLightMarkerID | 0x80, 0xff, 0x00);
                 draw_volume(L);
             }
-            else  // checked Holger
+            else // checked Holger
             {
                 for (u32 i = 0; i < RImplementation.o.dx10_msaa_samples; ++i)
                 {

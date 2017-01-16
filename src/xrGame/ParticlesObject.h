@@ -14,8 +14,8 @@ class CParticlesObject : public CPS_Instance
     void UpdateSpatial();
 
 protected:
-    bool m_bLooped;    //флаг, что система зациклена
-    bool m_bStopping;  //вызвана функция Stop()
+    bool m_bLooped;   //флаг, что система зациклена
+    bool m_bStopping; //вызвана функция Stop()
 
 protected:
     u32 mt_dt;

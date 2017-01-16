@@ -13,7 +13,7 @@ struct PARTICLES_API ParticleAction
         ALLOW_ROTATE = (1 << 1)
     };
     Flags32 m_Flags;
-    PActionEnum type;  // Type field
+    PActionEnum type; // Type field
     ParticleAction() { m_Flags.zero(); }
     virtual void Execute(ParticleEffect* pe, const float dt, float& m_max) = 0;
     virtual void Transform(const Fmatrix& m) = 0;

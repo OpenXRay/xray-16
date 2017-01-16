@@ -147,7 +147,7 @@ str_value* str_container::dock(str_c value)
 
 #ifdef DEBUG_MEMORY_MANAGER
     Memory.stat_strdock++;
-#endif  // DEBUG_MEMORY_MANAGER
+#endif // DEBUG_MEMORY_MANAGER
 
     str_value* result = 0;
 
@@ -168,20 +168,20 @@ str_value* str_container::dock(str_c value)
 
 #ifdef DEBUG
     bool is_leaked_string = !xr_strcmp(value, "enter leaked string here");
-#endif  // DEBUG
+#endif // DEBUG
 
     // it may be the case, string is not found or has "non-exact" match
     if (0 == result
 #ifdef DEBUG
         || is_leaked_string
-#endif  // DEBUG
+#endif // DEBUG
         )
     {
         result = (str_value*)Memory.mem_alloc(sizeof(str_value) + s_len_with_zero
 #ifdef DEBUG_MEMORY_NAME
             ,
             "storage: sstring"
-#endif  // DEBUG_MEMORY_NAME
+#endif // DEBUG_MEMORY_NAME
             );
 
 #ifdef DEBUG
@@ -190,7 +190,7 @@ str_value* str_container::dock(str_c value)
             ++num_leaked_string;
             Msg("leaked_string: %d 0x%08x", num_leaked_string, result);
         }
-#endif  // DEBUG
+#endif // DEBUG
 
         result->dwReference = 0;
         result->dwLength = sv->dwLength;
@@ -285,7 +285,7 @@ str_value* str_container::dock(str_c value)
 
 #ifdef DEBUG_MEMORY_MANAGER
     Memory.stat_strdock++;
-#endif  // DEBUG_MEMORY_MANAGER
+#endif // DEBUG_MEMORY_MANAGER
 
     str_value* result = 0;
 
@@ -303,7 +303,7 @@ str_value* str_container::dock(str_c value)
     sv->next = NULL;
 
     // search
-    str_container_impl::cdb::iterator I = impl->container.find(sv);  // only integer compares :)
+    str_container_impl::cdb::iterator I = impl->container.find(sv); // only integer compares :)
     if (I != impl->container.end()) {
         // something found - verify, it is exactly our string
         str_container_impl::cdb::iterator save = I;
@@ -312,7 +312,7 @@ str_value* str_container::dock(str_c value)
             str_value* V = (*I);
             if (V->dwLength != sv->dwLength) continue;
             if (0 != memcmp(V->value, value, s_len)) continue;
-            result = V;  // found
+            result = V; // found
             break;
         }
     }
@@ -328,7 +328,7 @@ str_value* str_container::dock(str_c value)
 #ifdef DEBUG_MEMORY_NAME
             ,
             "storage: sstring"
-#endif  // DEBUG_MEMORY_NAME
+#endif // DEBUG_MEMORY_NAME
             );
 
         static int num11 = 0;

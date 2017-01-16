@@ -37,7 +37,7 @@ IC MonsterSpace::EMovementType const& animation_action::movement_type() const
     return (m_movement_type);
 }
 
-}  // namespace transitions
-}  // nmaespace smart_cover
+} // namespace transitions
+} // nmaespace smart_cover
 
-#endif  // SMART_COVER_TRANSITION_ANIMATION_INLINE_HPP_INCLUDED
+#endif // SMART_COVER_TRANSITION_ANIMATION_INLINE_HPP_INCLUDED

@@ -13,11 +13,11 @@ public:
     virtual LPCSTR GetText();
 
     // CUIOptionsItem
-    virtual void SetCurrentOptValue();       // opt->current
-    virtual void SaveBackUpOptValue();       // current->backup
-    virtual void SaveOptValue();             // current->opt
-    virtual void UndoOptValue();             // backup->current
-    virtual bool IsChangedOptValue() const;  // backup!=current
+    virtual void SetCurrentOptValue();      // opt->current
+    virtual void SaveBackUpOptValue();      // current->backup
+    virtual void SaveOptValue();            // current->opt
+    virtual void UndoOptValue();            // backup->current
+    virtual bool IsChangedOptValue() const; // backup!=current
 
     void CreateCDKeyEntry();
     void assign_callbacks();
@@ -32,7 +32,7 @@ private:
 private:
     string512 m_opt_backup_value;
     bool m_view_access;
-};  // class CUICDkey
+}; // class CUICDkey
 
 class CUIMPPlayerName : public CUIEditBox
 {
@@ -51,7 +51,7 @@ public:
 
     virtual void OnFocusLost();
 
-};  // class CUIMPPlayerName
+}; // class CUIMPPlayerName
 
 extern void GetCDKey_FromRegistry(char* cdkey);
 extern void WriteCDKey_ToRegistry(LPSTR cdkey);

@@ -26,4 +26,4 @@ private:
     void draw_face(ref_shader& sh, Frect& coords, Frect& tex_coords, const Fvector2& tex_size);
 };
 
-#endif  //	ApplicationRender_included
+#endif //	ApplicationRender_included

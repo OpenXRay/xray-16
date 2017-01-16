@@ -1260,8 +1260,8 @@ nv_scalar tb_project_to_sphere(nv_scalar r, nv_scalar x, nv_scalar y)
  */
 quat& trackball(quat& q, vec2& pt1, vec2& pt2, nv_scalar trackballsize)
 {
-    vec3 a;         // Axis of rotation
-    nv_scalar phi;  // how much to rotate about axis
+    vec3 a;        // Axis of rotation
+    nv_scalar phi; // how much to rotate about axis
     vec3 d;
     nv_scalar t;
 

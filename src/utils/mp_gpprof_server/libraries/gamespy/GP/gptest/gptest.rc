@@ -19,7 +19,7 @@
 #ifdef _WIN32
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
-#endif  //_WIN32
+#endif //_WIN32
 
 #ifdef APSTUDIO_INVOKED
     /////////////////////////////////////////////////////////////////////////////
@@ -53,7 +53,7 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
                         "#endif\r\n"
                         "\0" END
 
-#endif  // APSTUDIO_INVOKED
+#endif // APSTUDIO_INVOKED
 
     /////////////////////////////////////////////////////////////////////////////
     //
@@ -214,7 +214,7 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #ifdef APSTUDIO_INVOKED
                GUIDELINES DESIGNINFO BEGIN IDD_GPTEST_DIALOG,
     DIALOG BEGIN LEFTMARGIN, 7 RIGHTMARGIN, 603 TOPMARGIN, 7 BOTTOMMARGIN, 450 END END
-#endif  // APSTUDIO_INVOKED
+#endif // APSTUDIO_INVOKED
 
     /////////////////////////////////////////////////////////////////////////////
     //
@@ -234,7 +234,7 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 
     STRINGTABLE BEGIN IDP_SOCKETS_INIT_FAILED "Windows sockets initialization failed." END
 
-#endif  // English (U.S.) resources
+#endif // English (U.S.) resources
 /////////////////////////////////////////////////////////////////////////////
 
 #ifndef APSTUDIO_INVOKED
@@ -252,10 +252,10 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
         LANGUAGE 9,
     1
 #pragma code_page(1252)
-#endif                     //_WIN32
-#include "afxres.rc"       // Standard components
-#include "res\gptest.rc2"  // non-Microsoft Visual C++ edited resources
+#endif                    //_WIN32
+#include "afxres.rc"      // Standard components
+#include "res\gptest.rc2" // non-Microsoft Visual C++ edited resources
 #endif
 
 /////////////////////////////////////////////////////////////////////////////
-#endif  // not APSTUDIO_INVOKED
+#endif // not APSTUDIO_INVOKED

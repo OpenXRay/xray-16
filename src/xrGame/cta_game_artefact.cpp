@@ -73,7 +73,7 @@ void CtaGameArtefact::OnAnimationEnd(u32 state)
     if (!H_Parent()) {
 #ifndef MASTER_GOLD
         Msg("! ERROR: enemy artefact activation, H_Parent is NULL.");
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
         return;
     }
     inherited::OnAnimationEnd(state);
@@ -89,7 +89,7 @@ void CtaGameArtefact::UpdateCLChild()
     if (!m_artefact_rpoint) {
 #ifdef DEBUG
         Msg("--- Waiting for sync packet, for artefact rpoint.");
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
         return;
     }
 
@@ -125,7 +125,7 @@ void CtaGameArtefact::CreateArtefactActivation()
         P.w_u8(0);
         P.w_vec3(*m_artefact_rpoint);
         CGameObject::u_EventSend(P);
-        MoveTo(*m_artefact_rpoint);  // for server net_Import
+        MoveTo(*m_artefact_rpoint); // for server net_Import
     }
     // deactivate_physics_shell();
 }

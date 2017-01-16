@@ -37,5 +37,5 @@ public:
     AISpaceBase* AISpace;
 };
 
-extern XRAPI_API EngineGlobalEnvironment GlobalEnv;  // XXX: rename to GEnv
-extern XRAPI_API bool g_dedicated_server;            // XXX: move to EngineGlobalEnvironment
+extern XRAPI_API EngineGlobalEnvironment GlobalEnv; // XXX: rename to GEnv
+extern XRAPI_API bool g_dedicated_server;           // XXX: move to EngineGlobalEnvironment

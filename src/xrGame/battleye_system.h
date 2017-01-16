@@ -57,8 +57,8 @@ public:
 
     //-	int					auto_update;
 
-};  // class BattlEyeSystem
+}; // class BattlEyeSystem
 
-#endif  // BATTLEYE
+#endif // BATTLEYE
 
-#endif  // XR_BATTLEYE_H_INCLUDED
+#endif // XR_BATTLEYE_H_INCLUDED

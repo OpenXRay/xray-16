@@ -23,7 +23,7 @@ namespace environment
 namespace sound_channels
 {
 class manager;
-}  // namespace sound_channels
+} // namespace sound_channels
 
 namespace ambients
 {
@@ -48,11 +48,11 @@ private:
     property_holder_type* m_property_holder;
     sound_channels::manager const& m_manager;
     shared_str m_id;
-};  // class sound_id
-}  // namespace ambients
-}  // namespace environment
-}  // namespace editor
+}; // class sound_id
+} // namespace ambients
+} // namespace environment
+} // namespace editor
 
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR
 
-#endif  // ifndef EDITOR_WEATHER_AMBIENTS_SOUND_HPP_INCLUDED
+#endif // ifndef EDITOR_WEATHER_AMBIENTS_SOUND_HPP_INCLUDED

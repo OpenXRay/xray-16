@@ -573,8 +573,8 @@ GSUdpErrorCode gsUdpEngineStartTalkingToPeer(
         return GS_UDP_PARAMETER_ERROR;
     }
 
-    aRemotePeer.mAddr = theIp;    // In Network Byte Order for GT2
-    aRemotePeer.mPort = thePort;  // In Host Byte Order for GT2
+    aRemotePeer.mAddr = theIp;   // In Network Byte Order for GT2
+    aRemotePeer.mPort = thePort; // In Host Byte Order for GT2
 
     index = ArraySearch(aUdp->mRemotePeers, &aRemotePeer, gsUdpRemotePeerCompare, 0, 0);
     if (index != NOT_FOUND) {

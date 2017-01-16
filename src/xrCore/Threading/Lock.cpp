@@ -32,16 +32,16 @@ struct profiler
 
 void Lock::Enter()
 {
-#if 0   // def DEBUG
+#if 0  // def DEBUG
     static bool show_call_stack = false;
     if (show_call_stack)
         OutputDebugStackTrace("----------------------------------------------------");
-#endif  // DEBUG
+#endif // DEBUG
     profiler temp(id);
     mutex.lock();
     isLocked = true;
 }
-#endif  // CONFIG_PROFILE_LOCKS
+#endif // CONFIG_PROFILE_LOCKS
 
 #ifdef DEBUG
 extern void OutputDebugStackTrace(const char* header);

@@ -65,4 +65,4 @@ IC void MulSprDmp(float& cfm, float& erp, float mul_spring, float mul_damping)
     erp *= (factor * mul_spring);
 }
 
-#endif  // PHYSICS_COMMON_H
+#endif // PHYSICS_COMMON_H

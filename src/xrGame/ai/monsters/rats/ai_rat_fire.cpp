@@ -24,7 +24,7 @@ void CAI_Rat::Exec_Action(float /**dt/**/)
     case eRatActionAttackBegin:
     {
         u32 dwTime = Device.dwTimeGlobal;
-        sound().play(eRatSoundAttack);  //,0,0,m_dwHitInterval+1,m_dwHitInterval);
+        sound().play(eRatSoundAttack); //,0,0,m_dwHitInterval+1,m_dwHitInterval);
         if (memory().enemy().selected() && memory().enemy().selected()->g_Alive() &&
             (dwTime - m_dwStartAttackTime > m_dwHitInterval))
         {
@@ -45,16 +45,16 @@ void CAI_Rat::Exec_Action(float /**dt/**/)
                 u16 id_from = ID();
                 NET_Packet l_P;
                 SHit HS;
-                HS.GenHeader(GE_HIT, id_to);  //					u_EventGen	(l_P,GE_HIT, id_to);
-                HS.whoID = (id_from);         //					l_P.w_u16	(id_from);
-                HS.weaponID = (id_from);      //					l_P.w_u16	(id_from);
-                HS.dir = (tDirection);        //					l_P.w_dir	(tDirection);
-                HS.power = (m_fHitPower);     //					l_P.w_float	(m_fHitPower);
-                HS.boneID = (0);              //					l_P.w_s16	(0);
+                HS.GenHeader(GE_HIT, id_to); //					u_EventGen	(l_P,GE_HIT, id_to);
+                HS.whoID = (id_from);        //					l_P.w_u16	(id_from);
+                HS.weaponID = (id_from);     //					l_P.w_u16	(id_from);
+                HS.dir = (tDirection);       //					l_P.w_dir	(tDirection);
+                HS.power = (m_fHitPower);    //					l_P.w_float	(m_fHitPower);
+                HS.boneID = (0);             //					l_P.w_s16	(0);
                 HS.p_in_bone_space =
-                    (position_in_bone_space);          //					l_P.w_vec3	(position_in_bone_space);
-                HS.impulse = (0.f);                    //					l_P.w_float	(0.f);
-                HS.hit_type = (ALife::eHitTypeWound);  //					l_P.w_u16	((u16)ALife::eHitTypeWound);
+                    (position_in_bone_space);         //					l_P.w_vec3	(position_in_bone_space);
+                HS.impulse = (0.f);                   //					l_P.w_float	(0.f);
+                HS.hit_type = (ALife::eHitTypeWound); //					l_P.w_u16	((u16)ALife::eHitTypeWound);
                 HS.Write_Packet(l_P);
                 u_EventSend(l_P);
             }
@@ -130,12 +130,12 @@ void CAI_Rat::update_morale()
     case aiRatFreePassive:
     {
         if (m_fMorale < m_fMoraleNormalValue) {
-            m_fMorale += m_fMoraleRestoreQuant;  //*(1.f - fDistance/m_fMoraleNullRadius);
+            m_fMorale += m_fMoraleRestoreQuant; //*(1.f - fDistance/m_fMoraleNullRadius);
             if (m_fMorale > m_fMoraleNormalValue) m_fMorale = m_fMoraleNormalValue;
         }
         else if (m_fMorale > m_fMoraleNormalValue)
         {
-            m_fMorale -= m_fMoraleRestoreQuant;  //*(fDistance/m_fMoraleNullRadius);
+            m_fMorale -= m_fMoraleRestoreQuant; //*(fDistance/m_fMoraleNullRadius);
             if (m_fMorale < m_fMoraleNormalValue) m_fMorale = m_fMoraleNormalValue;
         }
         break;

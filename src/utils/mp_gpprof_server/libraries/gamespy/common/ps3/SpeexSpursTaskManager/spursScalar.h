@@ -168,4 +168,4 @@ SIMD_FORCE_INLINE btScalar btFsel(btScalar a, btScalar b, btScalar c)
 #define btFsels(a,b,c) (btScalar)btFsel(a,b,c)
 */
 
-#endif  // SIMD___SCALAR_H
+#endif // SIMD___SCALAR_H

@@ -14,7 +14,7 @@
 Lock task_CS
 #ifdef CONFIG_PROFILE_LOCKS
     (MUTEX_PROFILE_ID(task_C_S))
-#endif  // CONFIG_PROFILE_LOCKS
+#endif // CONFIG_PROFILE_LOCKS
         ;
 
 xr_vector<int> task_pool;

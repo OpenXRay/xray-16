@@ -41,7 +41,7 @@ struct inappropriate_characters
 
         return true;
     }
-};  // struct inappropriate_characters
+}; // struct inappropriate_characters
 
 void CUICDkey::paste_from_clipboard()
 {
@@ -167,12 +167,12 @@ void CUICDkey::SaveOptValue()
     if (MainMenu()->IsCDKeyIsValid()) m_view_access = false;
 }
 
-void CUICDkey::SaveBackUpOptValue()  // current->backup
+void CUICDkey::SaveBackUpOptValue() // current->backup
 {
     xr_strcpy(m_opt_backup_value, inherited::GetText());
 }
 
-void CUICDkey::UndoOptValue()  // backup->current
+void CUICDkey::UndoOptValue() // backup->current
 {
     inherited::SetText(m_opt_backup_value);
 }

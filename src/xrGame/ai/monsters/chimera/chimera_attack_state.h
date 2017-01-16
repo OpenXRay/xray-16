@@ -73,8 +73,8 @@ private:
 
     float m_min_run_distance;
 
-};  // ChimeraAttackState
+}; // ChimeraAttackState
 
 #include "chimera_attack_state_inline.h"
 
-#endif  // #ifdef CHIMERA_ATTACK_STATE_H_INCLUDED
+#endif // #ifdef CHIMERA_ATTACK_STATE_H_INCLUDED

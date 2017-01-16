@@ -233,7 +233,7 @@ void CSightAction::execute_cover_look_over()
     case 2: {
 #ifndef DEBUG
     fall_back:
-#endif  // #ifndef DEBUG
+#endif // #ifndef DEBUG
         if ((m_start_state_time + m_stop_state_time < Device.dwTimeGlobal) && target_reached()) {
             m_start_state_time = Device.dwTimeGlobal;
             m_stop_state_time = 3500;
@@ -254,10 +254,10 @@ void CSightAction::execute_cover_look_over()
     default: {
 #ifdef DEBUG
         FATAL(make_string("m_internal_state = %d, object[0x%08x]", m_internal_state, this).c_str());
-#else   // #ifdef DEBUG
+#else  // #ifdef DEBUG
         m_internal_state = 0;
         goto fall_back;
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
     }
     }
 }
@@ -353,7 +353,7 @@ void CSightAction::predict_object_position(bool use_exact_position)
                 Fvector const velocity =
                     Fvector(offset).div(float(current_position.dwTime - previous_position.dwTime) / 1000.f);
                 extern float g_aim_predict_time;
-                float const predict_time = g_aim_predict_time;  //*Device.fTimeDelta;
+                float const predict_time = g_aim_predict_time; //*Device.fTimeDelta;
                 m_vector3d.mad(velocity, predict_time);
             }
         }
@@ -395,16 +395,18 @@ void CSightAction::execute_fire_object()
                 if (!m_holder_start_position.similar(m_object->Position(), .05f)) {
                     m_vector3d = m_object->sight().object_position();
                     m_already_switched = false;
-                    //						Msg					("%6d switch to mode 0 (reson: holder position changed)",
-                    //Device.dwTimeGlobal);
+                    //						Msg					("%6d switch to mode 0 (reson: holder position
+                    //changed)",
+                    // Device.dwTimeGlobal);
                     m_state_fire_object = 0;
                     break;
                 }
 
                 if (!m_object_start_position.similar(m_object_to_look->Position(), .05f)) {
                     m_vector3d = m_object->sight().object_position();
-                    //						Msg					("%6d switch to mode 0 (reson: object position changed)",
-                    //Device.dwTimeGlobal);
+                    //						Msg					("%6d switch to mode 0 (reson: object position
+                    //changed)",
+                    // Device.dwTimeGlobal);
                     m_already_switched = false;
                     m_state_fire_object = 0;
                     break;
@@ -414,7 +416,7 @@ void CSightAction::execute_fire_object()
             if (!m_already_switched) {
                 m_vector3d = m_object->sight().object_position();
                 //					Msg						("%6d switch to mode 0 (reson: time interval)",
-                //Device.dwTimeGlobal);
+                // Device.dwTimeGlobal);
                 m_already_switched = true;
                 m_state_fire_object = 0;
                 break;

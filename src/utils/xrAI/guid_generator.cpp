@@ -11,8 +11,8 @@
 #include "guid_generator.h"
 
 #ifdef WINVER
-#include <rpcdce.h>
 #include <rpc.h>
+#include <rpcdce.h>
 #pragma comment(lib, "rpcrt4.lib")
 #endif
 
@@ -59,5 +59,5 @@ LPCSTR generate_guid(const xrGUID& guid, LPSTR buffer, const u32& buffer_size)
     return (buffer);
 #else
     NODEFAULT;
-#endif  // WINVER
+#endif // WINVER
 }

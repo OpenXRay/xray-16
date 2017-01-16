@@ -25,4 +25,4 @@ IC smart_cover::cover const& smart_cover::object::cover() const
     return (*m_cover);
 }
 
-#endif  // SMART_COVER_OBJECT_INLINE_H_INCLUDED
+#endif // SMART_COVER_OBJECT_INLINE_H_INCLUDED

@@ -93,7 +93,7 @@ static class cl_sun_shafts_intensity : public R_constant_setup
 } binder_sun_shafts_intensity;
 
 extern ENGINE_API BOOL r2_sun_static;
-extern ENGINE_API BOOL r2_advanced_pp;  //	advanced post process and effects
+extern ENGINE_API BOOL r2_advanced_pp; //	advanced post process and effects
 //////////////////////////////////////////////////////////////////////////
 // Just two static storage
 void CRender::create()
@@ -135,7 +135,7 @@ void CRender::create()
             case 0x19D:
             case 0x19E:
             {
-                disable_nullrt = true;  // G80
+                disable_nullrt = true; // G80
                 break;
             }
             case 0x400:
@@ -147,7 +147,7 @@ void CRender::create()
             case 0x40E:
             case 0x40F:
             {
-                disable_nullrt = true;  // G84
+                disable_nullrt = true; // G84
                 break;
             }
             case 0x420:
@@ -159,7 +159,7 @@ void CRender::create()
             case 0x42E:
             case 0x42F:
             {
-                disable_nullrt = true;  // G86
+                disable_nullrt = true; // G86
                 break;
             }
             }
@@ -278,7 +278,7 @@ void CRender::create()
 
     m_bMakeAsyncSS = false;
 
-    Target = new CRenderTarget();  // Main target
+    Target = new CRenderTarget(); // Main target
 
     Models = new CModelPool();
     PSLibrary.OnCreate();
@@ -1132,9 +1132,9 @@ HRESULT CRender::shader_compile(LPCSTR name, DWORD const* pSrcData, UINT SrcData
         //
         if (0 == xr_strcmp(pFunctionName, "main")) {
             if ('v' == pTarget[0])
-                pTarget = D3DXGetVertexShaderProfile(HW.pDevice);  // vertex	"vs_2_a"; //
+                pTarget = D3DXGetVertexShaderProfile(HW.pDevice); // vertex	"vs_2_a"; //
             else
-                pTarget = D3DXGetPixelShaderProfile(HW.pDevice);  // pixel	"ps_2_a"; //
+                pTarget = D3DXGetPixelShaderProfile(HW.pDevice); // pixel	"ps_2_a"; //
         }
 
         includer Includer;
@@ -1200,7 +1200,7 @@ static inline bool match_shader_id(
 #if 0
 	strcpy_s					( result, "" );
 	return						false;
-#else  // #if 1
+#else // #if 1
 #ifdef DEBUG
     LPCSTR temp = "";
     bool found = false;
@@ -1217,7 +1217,7 @@ static inline bool match_shader_id(
 
     xr_strcpy(result, temp);
     return found;
-#else   // #ifdef DEBUG
+#else  // #ifdef DEBUG
     FS_FileSet::const_iterator i = file_set.begin();
     FS_FileSet::const_iterator const e = file_set.end();
     for (; i != e; ++i)
@@ -1229,6 +1229,6 @@ static inline bool match_shader_id(
     }
 
     return false;
-#endif  // #ifdef DEBUG
-#endif  // #if 1
+#endif // #ifdef DEBUG
+#endif // #if 1
 }

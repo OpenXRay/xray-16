@@ -117,14 +117,14 @@ BOOL CGhttpmfcDlg::OnInitDialog()
 
     // Set the icon for this dialog.  The framework does this automatically
     //  when the application's main window is not a dialog
-    SetIcon(m_hIcon, TRUE);   // Set big icon
-    SetIcon(m_hIcon, FALSE);  // Set small icon
+    SetIcon(m_hIcon, TRUE);  // Set big icon
+    SetIcon(m_hIcon, FALSE); // Set small icon
 
     m_request = -1;
     m_memFile = NULL;
     SetTimer(50, 50, NULL);
 
-    return TRUE;  // return TRUE  unless you set the focus to a control
+    return TRUE; // return TRUE  unless you set the focus to a control
 }
 
 // If you add a minimize button to your dialog, you will need the code below
@@ -134,7 +134,7 @@ BOOL CGhttpmfcDlg::OnInitDialog()
 void CGhttpmfcDlg::OnPaint()
 {
     if (IsIconic()) {
-        CPaintDC dc(this);  // device context for painting
+        CPaintDC dc(this); // device context for painting
 
         SendMessage(WM_ICONERASEBKGND, (WPARAM)dc.GetSafeHdc(), 0);
 
@@ -447,7 +447,7 @@ void CGhttpmfcDlg::OnIeSettings()
                 else
                 {
                     nStart = -1;
-                    nEnd = 0;  // won't be used; need to initialize to prevent compiler warning
+                    nEnd = 0; // won't be used; need to initialize to prevent compiler warning
                 }
 
                 if ((nStart != -1) && (nStart != nEnd))

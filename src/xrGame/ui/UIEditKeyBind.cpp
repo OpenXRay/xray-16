@@ -221,7 +221,7 @@ void CUIEditKeyBind::OnMessage(LPCSTR message)
     xr_strcpy(command, message);
     command[eq] = 0;
 
-    if (0 == xr_strcmp(m_action->action_name, command)) return;  // fuck
+    if (0 == xr_strcmp(m_action->action_name, command)) return; // fuck
 
     _action* other_action = action_name_to_ptr(command);
     if (is_group_not_conflicted(m_action->key_group, other_action->key_group)) return;

@@ -200,4 +200,4 @@ resptr_core<T, D> dynamic_pointer_cast(resptr_core<U, D> const& p)
     return dynamic_cast<T*>(p.get());
 }
 
-#endif  // xr_resourceH
+#endif // xr_resourceH

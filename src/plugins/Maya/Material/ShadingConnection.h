@@ -83,4 +83,4 @@ private:
     bool m_directConnection;
 };
 
-#endif  // MAYA_ShadingConnection
+#endif // MAYA_ShadingConnection

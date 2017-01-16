@@ -94,7 +94,8 @@ float CEntity::CalcCondition(float hit)
     return hit;
 }
 
-// void CEntity::Hit			(float perc, Fvector &dir, IGameObject* who, s16 element,Fvector position_in_object_space, float
+// void CEntity::Hit			(float perc, Fvector &dir, IGameObject* who, s16 element,Fvector position_in_object_space,
+// float
 // impulse, ALife::EHitType hit_type)
 void CEntity::Hit(SHit* pHDS)
 {
@@ -113,7 +114,7 @@ void CEntity::Hit(SHit* pHDS)
     vLocalDir.invert();
 
     // hit impulse
-    if (pHDS->impulse) HitImpulse(pHDS->impulse, pHDS->dir, vLocalDir);  // @@@: WT
+    if (pHDS->impulse) HitImpulse(pHDS->impulse, pHDS->dir, vLocalDir); // @@@: WT
 
     // Calc amount (correct only on local player)
     float lost_health = CalcCondition(pHDS->damage());

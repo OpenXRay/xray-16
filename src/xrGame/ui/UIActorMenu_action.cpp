@@ -145,7 +145,7 @@ bool CUIActorMenu::OnItemDrop(CUICellItem* itm)
 bool CUIActorMenu::OnItemStartDrag(CUICellItem* itm)
 {
     InfoCurItem(NULL);
-    return false;  // default behaviour
+    return false; // default behaviour
 }
 
 bool CUIActorMenu::OnItemDbClick(CUICellItem* itm)
@@ -218,7 +218,7 @@ bool CUIActorMenu::OnItemDbClick(CUICellItem* itm)
     }
     break;
 
-    };  // switch
+    }; // switch
 
     UpdateItemsPlace();
     UpdateConditionProgressBars();
@@ -274,7 +274,7 @@ bool CUIActorMenu::OnItemFocusedUpdate(CUICellItem* itm)
     }
     VERIFY(m_ItemInfo);
     if (Device.dwTimeGlobal < itm->FocusReceiveTime() + m_ItemInfo->delay) {
-        return true;  // false
+        return true; // false
     }
     if (CUIDragDropListEx::m_drag_item || m_UIPropertiesBox->IsShown() || !m_item_info_view) {
         return true;
@@ -287,7 +287,7 @@ bool CUIActorMenu::OnItemFocusedUpdate(CUICellItem* itm)
 bool CUIActorMenu::OnMouseAction(float x, float y, EUIMessages mouse_action)
 {
     inherited::OnMouseAction(x, y, mouse_action);
-    return true;  // no click`s
+    return true; // no click`s
 }
 
 bool CUIActorMenu::OnKeyboardAction(int dik, EUIMessages keyboard_action)

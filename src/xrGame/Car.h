@@ -31,8 +31,8 @@ struct dSurfaceParameters;
 // defs
 
 #ifdef DEBUG
-#include "xrEngine/StatGraph.h"
 #include "PHDebug.h"
+#include "xrEngine/StatGraph.h"
 #endif
 
 class CScriptEntityAction;
@@ -81,7 +81,7 @@ private:
     ////////////////////////////////////////////////////////////////////////////////////////
     virtual bool CanRemoveObject();
     ////////////////////////////////////////////////////////////////////////
-    static BONE_P_MAP bone_map;  // interface for PhysicsShell
+    static BONE_P_MAP bone_map; // interface for PhysicsShell
     static void ActorObstacleCallback(
         bool& do_colide, bool bo1, dContact& c, SGameMtl* material_1, SGameMtl* material_2);
     virtual void PhDataUpdate(float step);
@@ -144,7 +144,7 @@ public:
     float m_break_start;
     float m_break_time;
     float m_breaks_to_back_rate;
-    float m_power_neutral_factor;  // multiplier for power when accelerator is not pressed (0-1,0.25)
+    float m_power_neutral_factor; // multiplier for power when accelerator is not pressed (0-1,0.25)
     bool b_exploded;
 
     struct SWheel : public CDamagableHealthItem
@@ -168,7 +168,7 @@ public:
         static void WheellCollisionCallback(
             bool& do_colide, bool bo1, dContact& c, SGameMtl* material_1, SGameMtl* material_2);
 
-        void Init();  // asumptions: bone_map is 1. ini parsed 2. filled in 3. bone_id is set
+        void Init(); // asumptions: bone_map is 1. ini parsed 2. filled in 3. bone_id is set
         void Load(LPCSTR section);
         void RestoreNetState(const CSE_ALifeCar::SWheelState& a_state);
         void SaveNetState(NET_Packet& P);
@@ -211,7 +211,7 @@ public:
         float hi_limit;
         float steering_velocity;
         float steering_torque;
-        bool limited;  // zero limited for idle steering drive
+        bool limited; // zero limited for idle steering drive
         float GetSteerAngle();
 
         void Init();
@@ -367,7 +367,7 @@ public:
         ~SCarSound();
         Fvector relative_pos;
         float volume;
-        u32 engine_start_delay;  // snd_engine starts after engine_start_delay ms by snd_engine_start
+        u32 engine_start_delay; // snd_engine starts after engine_start_delay ms by snd_engine_start
         u32 time_state_start;
         CCar* pcar;
     } * m_car_sound;
@@ -398,7 +398,7 @@ private:
     xr_map<u16, SDoor> m_doors;
     xr_vector<SDoor*> m_doors_update;
     xr_vector<Fvector> m_gear_ratious;
-    xr_vector<Fmatrix> m_sits_transforms;  // m_sits_transforms[0] - driver_place
+    xr_vector<Fmatrix> m_sits_transforms; // m_sits_transforms[0] - driver_place
     float m_current_gear_ratio;
 
     /////////////////////////////////////////////////////////////
@@ -408,7 +408,7 @@ private:
     float m_doors_torque_factor;
     /////////////////////////////////////////////////////////////
 
-    float m_max_power;  // best rpm
+    float m_max_power; // best rpm
     float m_power_increment_factor;
     float m_power_decrement_factor;
     float m_rpm_increment_factor;
@@ -424,8 +424,8 @@ private:
     float m_fSaveMaxRPM;
     float m_max_rpm;
     float m_min_rpm;
-    float m_power_rpm;   // max power
-    float m_torque_rpm;  // max torque
+    float m_power_rpm;  // max power
+    float m_torque_rpm; // max torque
 
     float m_steering_speed;
     float m_ref_radius;
@@ -492,7 +492,7 @@ private:
     void DriveForward();
     void DriveBack();
     void ParseDefinitions();
-    void CreateSkeleton(CSE_Abstract* po);  // creates m_pPhysicsShell
+    void CreateSkeleton(CSE_Abstract* po); // creates m_pPhysicsShell
     void Init();
 
     void PlayExhausts();
@@ -500,7 +500,7 @@ private:
     void UpdateExhausts();
     void ClearExhausts();
     void UpdateFuel(float time_delta);
-    float AddFuel(float ammount);  // ammount - fuel to load, ret - fuel loaded
+    float AddFuel(float ammount); // ammount - fuel to load, ret - fuel loaded
 public:
     void CarExplode();
 
@@ -540,7 +540,7 @@ public:
     virtual BOOL net_Spawn(CSE_Abstract* DC);
     virtual void net_Destroy();
     virtual void UpdateCL();
-    virtual void UpdateEx(float fov);  // called by owner
+    virtual void UpdateEx(float fov); // called by owner
 
     virtual void shedule_Update(u32 dt);
     virtual void renderable_Render();
@@ -548,9 +548,9 @@ public:
     virtual bool bfAssignObject(CScriptEntityAction* tpEntityAction);
 
     // Network
-    virtual void net_Export(NET_Packet& P);              // export to server
-    virtual void net_Import(NET_Packet& P);              // import from server
-    virtual BOOL net_Relevant() { return getLocal(); };  // relevant for export to server
+    virtual void net_Export(NET_Packet& P);             // export to server
+    virtual void net_Import(NET_Packet& P);             // import from server
+    virtual BOOL net_Relevant() { return getLocal(); }; // relevant for export to server
     virtual BOOL UsedAI_Locations();
     virtual void net_Relcase(IGameObject* O);
     // Input

@@ -28,7 +28,7 @@ public:
 
 private:
     xr_set<shared_str> m_sections;
-};  // class priority_group
+}; // class priority_group
 
 typedef xr_vector<CInventorySlot> TISlotArr;
 
@@ -47,7 +47,7 @@ public:
     void Clear();
 
     IC u16 FirstSlot() const { return KNIFE_SLOT; }
-    IC u16 LastSlot() const { return LAST_SLOT; }  // not "end"
+    IC u16 LastSlot() const { return LAST_SLOT; } // not "end"
     IC bool SlotIsPersistent(u16 slot_id) const { return m_slots[slot_id].m_bPersistent; }
     bool Slot(u16 slot_id, PIItem pIItem, bool bNotActivate = false, bool strict_placement = false);
     bool Belt(PIItem pIItem, bool strict_placement = false);
@@ -87,7 +87,7 @@ public:
     PIItem Get(const u16 id, bool bSearchRuck) const;
     // Ищет на поясе или в рюкзаке IItem с указанным CLS_ID
     PIItem Get(CLASS_ID cls_id, bool bSearchRuck) const;
-    PIItem GetAny(LPCSTR name) const;  // search both (ruck and belt)
+    PIItem GetAny(LPCSTR name) const; // search both (ruck and belt)
     PIItem item(CLASS_ID cls_id) const;
 
     // get all the items with the same section name

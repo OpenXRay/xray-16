@@ -250,7 +250,7 @@ void game_cl_CaptureTheArtefact::TranslateGameMessage(u32 msg, NET_Packet& P)
     //-------------------UI MESSAGES
     case GAME_EVENT_ARTEFACT_TAKEN:
     {
-        ClientID clientId;  // who took the artefact
+        ClientID clientId; // who took the artefact
         u8 artefactOwnerTeam;
         P.r_u8(artefactOwnerTeam);
         P.r_clientID(clientId);
@@ -305,9 +305,9 @@ void game_cl_CaptureTheArtefact::TranslateGameMessage(u32 msg, NET_Packet& P)
         // Update UI statistics
     }
     break;
-    case GAME_EVENT_ARTEFACT_DROPPED:  // ahunt
+    case GAME_EVENT_ARTEFACT_DROPPED: // ahunt
     {
-        ClientID clientId;  // who dropped the artefact
+        ClientID clientId; // who dropped the artefact
         u8 artefactOwnerTeam;
         P.r_u8(artefactOwnerTeam);
         P.r_clientID(clientId);
@@ -334,7 +334,7 @@ void game_cl_CaptureTheArtefact::TranslateGameMessage(u32 msg, NET_Packet& P)
         if (ps) {
             xr_sprintf(Text, "%s%s %s%s", CTeamInfo::GetTeam_color_tag(ModifyTeam(ps->team) + 1), ps->getName(),
                 Color_Main,
-                st.translate("mp_has_dropped_artefact").c_str());  // need translate
+                st.translate("mp_has_dropped_artefact").c_str()); // need translate
 
             if (m_reward_generator) m_reward_generator->OnPlayerDropArtefact(ps);
         }
@@ -350,11 +350,11 @@ void game_cl_CaptureTheArtefact::TranslateGameMessage(u32 msg, NET_Packet& P)
     {
         u8 delivererTeam;
         P.r_u8(delivererTeam);
-        u16 deliverer_id;  // who deliver the artefact
+        u16 deliverer_id; // who deliver the artefact
         P.r_u16(deliverer_id);
         game_PlayerState const* ps = GetPlayerByGameID(deliverer_id);
 
-        if (!local_player)  // can be NULL, because not actor or spectator spawned yet...
+        if (!local_player) // can be NULL, because not actor or spectator spawned yet...
             return;
 
         if (m_reward_generator) m_reward_generator->OnPlayerBringArtefact(ps);
@@ -981,7 +981,7 @@ bool game_cl_CaptureTheArtefact::CanBeReady()
     }
 #ifndef MASTER_GOLD
     Msg("---CanBeReady = true: [%s][%d]", local_player->getName(), local_player->GameID);
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
     return true;
 }
 
@@ -1061,10 +1061,10 @@ void game_cl_CaptureTheArtefact::OnGameRoundStarted()
 {
     inherited::OnGameRoundStarted();
     if (local_player && IsLocalPlayerInitialized()) {
-        OnTeamChanged();  // updates buy menu...
+        OnTeamChanged(); // updates buy menu...
 #ifdef DEBUG
         Msg("--- CTA: Round started !!!");
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
     }
     if (m_reward_generator) m_reward_generator->OnRoundStart();
 }
@@ -1101,7 +1101,7 @@ void game_cl_CaptureTheArtefact::PlayRankChangedSnd()
 {
     if (!local_player) return;
 
-    if (local_player->rank >= 4)  // need to add new sound
+    if (local_player->rank >= 4) // need to add new sound
         return;
 
     ETeam my_team = static_cast<ETeam>(local_player->team);

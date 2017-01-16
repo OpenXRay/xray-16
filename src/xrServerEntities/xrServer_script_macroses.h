@@ -15,7 +15,7 @@
 #include "xrScriptEngine/script_engine.hpp"
 #ifdef XRGAME_EXPORTS
 #include "alife_smart_terrain_task.h"
-#endif  //#ifdef XRGAME_EXPORTS
+#endif //#ifdef XRGAME_EXPORTS
 
 //#define USE_WRITER_READER
 class CSE_Abstract;
@@ -23,7 +23,7 @@ class NET_Packet;
 class CSE_ALifeMonsterAbstract;
 #ifdef XRGAME_EXPORTS
 class CALifeSmartTerrainTask;
-#endif  //#ifdef XRGAME_EXPORTS
+#endif //#ifdef XRGAME_EXPORTS
 
 #define INHERIT_PURE
 
@@ -46,13 +46,13 @@ class CALifeSmartTerrainTask;
     DEFINE_LUA_WRAPPER_METHOD_R2P1_V2(STATE_Read, NET_Packet, u16)                                                     \
     DEFINE_LUA_WRAPPER_METHOD_R2P2_V2(FillProps, LPCSTR, PropItemVec)                                                  \
     DEFINE_LUA_WRAPPER_METHOD_0(init, CSE_Abstract*)
-#else  // #ifndef XRGAME_EXPORTS
+#else // #ifndef XRGAME_EXPORTS
 #define INHERIT_ABSTRACT                                                                                               \
     INHERIT_PURE                                                                                                       \
     DEFINE_LUA_WRAPPER_METHOD_R2P1_V1(STATE_Write, NET_Packet)                                                         \
     DEFINE_LUA_WRAPPER_METHOD_R2P1_V2(STATE_Read, NET_Packet, u16)                                                     \
     DEFINE_LUA_WRAPPER_METHOD_0(init, CSE_Abstract*)
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
 #define INHERIT_ALIFE                                                                                                  \
     INHERIT_ABSTRACT                                                                                                   \
@@ -111,13 +111,13 @@ class CALifeSmartTerrainTask;
     DEFINE_LUA_WRAPPER_METHOD_0(g_squad, u8)                                                                           \
     DEFINE_LUA_WRAPPER_METHOD_0(g_group, u8)                                                                           \
     DEFINE_LUA_WRAPPER_METHOD_V1(on_death, CSE_Abstract*)
-#else  // XRGAME_EXPORTS
+#else // XRGAME_EXPORTS
 #define INHERIT_CREATURE                                                                                               \
     INHERIT_DYNAMIC_ALIFE                                                                                              \
     DEFINE_LUA_WRAPPER_METHOD_0(g_team, u8)                                                                            \
     DEFINE_LUA_WRAPPER_METHOD_0(g_squad, u8)                                                                           \
     DEFINE_LUA_WRAPPER_METHOD_0(g_group, u8)
-#endif  // XRGAME_EXPORTS
+#endif // XRGAME_EXPORTS
 
 #define INHERIT_MONSTER                                                                                                \
     INHERIT_CREATURE                                                                                                   \
@@ -231,12 +231,12 @@ struct CWrapperAbstractItem : public T, public luabind::wrap_base
     DEFINE_LUABIND_VIRTUAL_FUNCTION(a, b, STATE_Write)                                                                 \
     DEFINE_LUABIND_VIRTUAL_FUNCTION(a, b, STATE_Read)                                                                  \
     DEFINE_LUABIND_VIRTUAL_FUNCTION(a, b, init)
-#else  // #ifndef XRGAME_EXPORTS
+#else // #ifndef XRGAME_EXPORTS
 #define luabind_virtual_abstract(a, b)                                                                                 \
     DEFINE_LUABIND_VIRTUAL_FUNCTION(a, b, STATE_Write)                                                                 \
     DEFINE_LUABIND_VIRTUAL_FUNCTION(a, b, STATE_Read)                                                                  \
     DEFINE_LUABIND_VIRTUAL_FUNCTION(a, b, init)
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
 #define luabind_virtual_alife(a, b)                                                                                    \
     DEFINE_LUABIND_VIRTUAL_FUNCTION_EXPLICIT_CONST_0(a, b, can_switch_online, bool)                                    \
@@ -264,12 +264,12 @@ struct CWrapperAbstractItem : public T, public luabind::wrap_base
     DEFINE_LUABIND_VIRTUAL_FUNCTION(a, b, g_squad)                                                                     \
     DEFINE_LUABIND_VIRTUAL_FUNCTION(a, b, g_group)                                                                     \
     DEFINE_LUABIND_VIRTUAL_FUNCTION(a, b, on_death)
-#else  // XRGAME_EXPORTS
+#else // XRGAME_EXPORTS
 #define luabind_virtual_creature(a, b)                                                                                 \
     DEFINE_LUABIND_VIRTUAL_FUNCTION(a, b, g_team)                                                                      \
     DEFINE_LUABIND_VIRTUAL_FUNCTION(a, b, g_squad)                                                                     \
     DEFINE_LUABIND_VIRTUAL_FUNCTION(a, b, g_group)
-#endif  // XRGAME_EXPORTS
+#endif // XRGAME_EXPORTS
 
 #ifdef XRGAME_EXPORTS
 #define luabind_virtual_zone(a, b)                                                                                     \
@@ -293,7 +293,7 @@ struct CWrapperAbstractItem : public T, public luabind::wrap_base
     DEFINE_LUABIND_VIRTUAL_FUNCTION(a, b, get_current_task)
 #else
 #define luabind_virtual_online_offline_group(a, b) DEFINE_LUABIND_VIRTUAL_FUNCTION(a, b, update)
-#endif  //#ifdef XRGAME_EXPORTS
+#endif //#ifdef XRGAME_EXPORTS
 
 #define luabind_virtual_monster(a, b) DEFINE_LUABIND_VIRTUAL_FUNCTION(a, b, update)
 

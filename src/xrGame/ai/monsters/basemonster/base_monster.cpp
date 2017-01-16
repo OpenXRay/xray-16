@@ -142,7 +142,7 @@ void CBaseMonster::update_pos_by_grouping_behaviour()
 
     Fvector acc = get_steer_manager()->calc_acceleration();
 
-    acc.y = 0;  // remove vertical component
+    acc.y = 0; // remove vertical component
 
     if (!m_last_grouping_behaviour_update_tick) {
         m_last_grouping_behaviour_update_tick = Device.dwTimeGlobal;
@@ -406,7 +406,7 @@ void CBaseMonster::Hit(SHit* pHDS)
         else
         {
             hit_power *= m_fHitFracMonster;
-            pHDS->add_wound = false;  //раны нет
+            pHDS->add_wound = false; //раны нет
         }
     }
     inherited::Hit(pHDS);
@@ -473,7 +473,7 @@ void CBaseMonster::ChangeTeam(int team, int squad, int group)
         ai().script_engine().print_stack();
         VERIFY2(g_Alive(), "you are trying to change team of a dead entity");
     }
-#endif  // DEBUG
+#endif // DEBUG
 
     // remove from current team
     monster_squad().remove_member((u8)g_Team(), (u8)g_Squad(), (u8)g_Group(), this);
@@ -1002,4 +1002,4 @@ bool CBaseMonster::is_paused() const
     return ai_dbg::get_var(id_paused_var_name, monster_result) ? monster_result : monsters_result;
 }
 
-#endif  // DEBUG
+#endif // DEBUG

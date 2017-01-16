@@ -49,9 +49,9 @@
 #define FASTDELEGATE_H
 #if _MSC_VER > 1000
 #pragma once
-#endif  // _MSC_VER > 1000
+#endif // _MSC_VER > 1000
 
-#include <memory.h>  // to allow <,> comparisons
+#include <memory.h> // to allow <,> comparisons
 
 //////////////////////////////////////////////////
 #define xr_stdcall __stdcall
@@ -84,9 +84,9 @@
 #if defined(_MSC_VER) && !defined(__MWERKS__) && !defined(__VECTOR_C) && !defined(__ICL) && !defined(__BORLANDC__)
 #define FASTDLGT_ISMSVC
 
-#if (_MSC_VER < 1300)  // Many workarounds are required for VC6.
+#if (_MSC_VER < 1300) // Many workarounds are required for VC6.
 #define FASTDLGT_VC6
-#pragma warning(disable : 4786)  // disable this ridiculous warning
+#pragma warning(disable : 4786) // disable this ridiculous warning
 #endif
 
 #endif
@@ -105,7 +105,7 @@
 #endif
 
 // Does it allow function declarator syntax? The following compilers are known to work:
-#if defined(FASTDLGT_ISMSVC) && (_MSC_VER >= 1310)  // VC 7.1
+#if defined(FASTDLGT_ISMSVC) && (_MSC_VER >= 1310) // VC 7.1
 #define FASTDELEGATE_ALLOW_FUNCTION_TYPE_SYNTAX
 #endif
 
@@ -119,8 +119,8 @@
 #define FASTDELEGATE_ALLOW_FUNCTION_TYPE_SYNTAX
 #endif
 
-#ifdef __GNUC__  // Workaround GCC bug #8271
-                 // At present, GCC doesn't recognize constness of MFPs in templates
+#ifdef __GNUC__ // Workaround GCC bug #8271
+                // At present, GCC doesn't recognize constness of MFPs in templates
 #define FASTDELEGATE_GCC_BUG_8271
 #endif
 
@@ -143,7 +143,7 @@
 namespace fastdelegate
 {
 namespace detail
-{  // we'll hide the implementation details in a nested namespace.
+{ // we'll hide the implementation details in a nested namespace.
 
 //  implicit_cast< >
 // I believe this was originally going to be in the C++ standard but
@@ -367,8 +367,8 @@ struct SimplifyMemFunc<SINGLE_MEMFUNCPTR_SIZE + sizeof(int)>
             XFuncType func;
             struct
             {
-                GenericMemFuncType funcaddress;  // points to the actual member function
-                int delta;                       // #BYTES to be added to the 'this' pointer
+                GenericMemFuncType funcaddress; // points to the actual member function
+                int delta;                      // #BYTES to be added to the 'this' pointer
             } s;
         } u;
         // Check that the horrible_cast will work
@@ -391,9 +391,9 @@ struct SimplifyMemFunc<SINGLE_MEMFUNCPTR_SIZE + sizeof(int)>
 // is internally defined as:
 struct MicrosoftVirtualMFP
 {
-    void (GenericClass::*codeptr)();  // points to the actual member function
-    int delta;                        // #bytes to be added to the 'this' pointer
-    int vtable_index;                 // or 0 if no virtual inheritance
+    void (GenericClass::*codeptr)(); // points to the actual member function
+    int delta;                       // #bytes to be added to the 'this' pointer
+    int vtable_index;                // or 0 if no virtual inheritance
 };
 // The CRUCIAL feature of Microsoft/Intel MFPs which we exploit is that the
 // m_codeptr member is *always* called, regardless of the values of the other
@@ -509,10 +509,10 @@ struct SimplifyMemFunc<SINGLE_MEMFUNCPTR_SIZE + 3 * sizeof(int)>
             // is internally defined as:
             struct
             {
-                GenericMemFuncType m_funcaddress;  // points to the actual member function
-                int delta;                         // #bytes to be added to the 'this' pointer
-                int vtordisp;                      // #bytes to add to 'this' to find the vtable
-                int vtable_index;                  // or 0 if no virtual inheritance
+                GenericMemFuncType m_funcaddress; // points to the actual member function
+                int delta;                        // #bytes to be added to the 'this' pointer
+                int vtordisp;                     // #bytes to add to 'this' to find the vtable
+                int vtable_index;                 // or 0 if no virtual inheritance
             } s;
         } u;
         // Check that the horrible_cast will work
@@ -520,7 +520,7 @@ struct SimplifyMemFunc<SINGLE_MEMFUNCPTR_SIZE + 3 * sizeof(int)>
         u.func = function_to_bind;
         bound_func = u.s.funcaddress;
         int virtual_delta = 0;
-        if (u.s.vtable_index) {  // Virtual inheritance is used
+        if (u.s.vtable_index) { // Virtual inheritance is used
             // First, get to the vtable.
             // It is 'vtordisp' bytes from the start of the class.
             const int* vtable =
@@ -535,11 +535,11 @@ struct SimplifyMemFunc<SINGLE_MEMFUNCPTR_SIZE + 3 * sizeof(int)>
         return reinterpret_cast<GenericClass*>(reinterpret_cast<char*>(pthis) + u.s.delta + virtual_delta);
     };
 };
-#endif  // MSVC 7 and greater
+#endif // MSVC 7 and greater
 
-#endif  // MS/Intel hacks
+#endif // MS/Intel hacks
 
-}  // namespace detail
+} // namespace detail
 
 ////////////////////////////////////////////////////////////////////////////////
 //      Fast Delegates, part 2:
@@ -592,12 +592,12 @@ class DelegateMemento
 protected:
     // the data is protected, not private, because many
     // compilers have problems with template friends.
-    typedef void (detail::GenericClass::*GenericMemFuncType)();  // arbitrary MFP.
+    typedef void (detail::GenericClass::*GenericMemFuncType)(); // arbitrary MFP.
     detail::GenericClass* m_pthis;
     GenericMemFuncType m_pFunction;
 
 #if !defined(FASTDELEGATE_USESTATICFUNCTIONHACK)
-    typedef void(xr_stdcall* GenericFuncPtr)();  // arbitrary code pointer
+    typedef void(xr_stdcall* GenericFuncPtr)(); // arbitrary code pointer
     GenericFuncPtr m_pStaticFunction;
 #endif
 
@@ -631,7 +631,7 @@ public:
         else
             return true;
     }
-#else  // Evil Method
+#else // Evil Method
     inline bool IsEqual(const DelegateMemento& x) const { return m_pthis == x.m_pthis && m_pFunction == x.m_pFunction; }
 #endif
     // Provide a strict weak ordering for DelegateMementos.
@@ -650,11 +650,11 @@ public:
     // BUGFIX (Mar 2005):
     // We can't just compare m_pFunction because on Metrowerks,
     // m_pFunction can be zero even if the delegate is not empty!
-    inline bool operator!() const  // Is it bound to anything?
+    inline bool operator!() const // Is it bound to anything?
     {
         return m_pthis == 0 && m_pFunction == 0;
     }
-    inline bool empty() const  // Is it bound to anything?
+    inline bool empty() const // Is it bound to anything?
     {
         return m_pthis == 0 && m_pFunction == 0;
     }
@@ -734,7 +734,7 @@ public:
         m_pStaticFunction = 0;
 #endif
     }
-#ifdef FASTDELEGATE_GCC_BUG_8271  // At present, GCC doesn't recognize constness of MFPs in templates
+#ifdef FASTDELEGATE_GCC_BUG_8271 // At present, GCC doesn't recognize constness of MFPs in templates
     template <class X, class XMemFunc>
     inline void bindmemfunc(const X* pthis, XMemFunc function_to_bind)
     {
@@ -781,7 +781,7 @@ public:
     inline void bindstaticfunc(
         DerivedClass* pParent, ParentInvokerSig static_function_invoker, StaticFuncPtr function_to_bind)
     {
-        if (function_to_bind == 0) {  // cope with assignment to 0
+        if (function_to_bind == 0) { // cope with assignment to 0
             m_pFunction = 0;
         }
         else
@@ -819,7 +819,7 @@ public:
     inline void bindstaticfunc(
         DerivedClass* pParent, ParentInvokerSig static_function_invoker, StaticFuncPtr function_to_bind)
     {
-        if (function_to_bind == 0) {  // cope with assignment to 0
+        if (function_to_bind == 0) { // cope with assignment to 0
             m_pFunction = 0;
         }
         else
@@ -852,7 +852,7 @@ public:
         typedef int ERROR_CantUseEvilMethod[sizeof(UnvoidStaticFuncPtr) == sizeof(this) ? 1 : -1];
         return horrible_cast<UnvoidStaticFuncPtr>(this);
     }
-#endif  // !defined(FASTDELEGATE_USESTATICFUNCTIONHACK)
+#endif // !defined(FASTDELEGATE_USESTATICFUNCTIONHACK)
 
     // Does the closure contain this static function?
     inline bool IsEqualToStaticFuncPtr(StaticFuncPtr funcptr)
@@ -865,7 +865,7 @@ public:
     }
 };
 
-}  // namespace detail
+} // namespace detail
 
 ////////////////////////////////////////////////////////////////////////////////
 //      Fast Delegates, part 3:
@@ -977,7 +977,7 @@ public:
     inline bool operator==(StaticFunctionPtr funcptr) { return m_Closure.IsEqualToStaticFuncPtr(funcptr); }
     inline bool operator!=(StaticFunctionPtr funcptr) { return !m_Closure.IsEqualToStaticFuncPtr(funcptr); }
     inline bool operator!() const
-    {  // Is it bound to anything?
+    { // Is it bound to anything?
         return !m_Closure;
     }
     inline bool empty() const { return !m_Closure; }
@@ -985,7 +985,7 @@ public:
     // Conversion to and from the DelegateMemento storage class
     const DelegateMemento& GetMemento() { return m_Closure; }
     void SetMemento(const DelegateMemento& any) { m_Closure.CopyFrom(this, any); }
-private:  // Invoker for static functions
+private: // Invoker for static functions
     RetType xr_stdcall InvokeStaticFunction() const { return (*(m_Closure.GetStaticFunction()))(); }
 };
 
@@ -1061,7 +1061,7 @@ public:
     inline bool operator==(StaticFunctionPtr funcptr) { return m_Closure.IsEqualToStaticFuncPtr(funcptr); }
     inline bool operator!=(StaticFunctionPtr funcptr) { return !m_Closure.IsEqualToStaticFuncPtr(funcptr); }
     inline bool operator!() const
-    {  // Is it bound to anything?
+    { // Is it bound to anything?
         return !m_Closure;
     }
     inline bool empty() const { return !m_Closure; }
@@ -1069,7 +1069,7 @@ public:
     // Conversion to and from the DelegateMemento storage class
     const DelegateMemento& GetMemento() { return m_Closure; }
     void SetMemento(const DelegateMemento& any) { m_Closure.CopyFrom(this, any); }
-private:  // Invoker for static functions
+private: // Invoker for static functions
     // this -- parameter, function
     // p1 - function,     parameter
     RetType xr_stdcall InvokeStaticFunction(Param1 p1) const { return (*(m_Closure.GetStaticFunction()))(p1); }
@@ -1150,7 +1150,7 @@ public:
     inline bool operator==(StaticFunctionPtr funcptr) { return m_Closure.IsEqualToStaticFuncPtr(funcptr); }
     inline bool operator!=(StaticFunctionPtr funcptr) { return !m_Closure.IsEqualToStaticFuncPtr(funcptr); }
     inline bool operator!() const
-    {  // Is it bound to anything?
+    { // Is it bound to anything?
         return !m_Closure;
     }
     inline bool empty() const { return !m_Closure; }
@@ -1158,7 +1158,7 @@ public:
     // Conversion to and from the DelegateMemento storage class
     const DelegateMemento& GetMemento() { return m_Closure; }
     void SetMemento(const DelegateMemento& any) { m_Closure.CopyFrom(this, any); }
-private:  // Invoker for static functions
+private: // Invoker for static functions
     RetType xr_stdcall InvokeStaticFunction(Param1 p1, Param2 p2) const
     {
         return (*(m_Closure.GetStaticFunction()))(p1, p2);
@@ -1248,7 +1248,7 @@ public:
     inline bool operator==(StaticFunctionPtr funcptr) { return m_Closure.IsEqualToStaticFuncPtr(funcptr); }
     inline bool operator!=(StaticFunctionPtr funcptr) { return !m_Closure.IsEqualToStaticFuncPtr(funcptr); }
     inline bool operator!() const
-    {  // Is it bound to anything?
+    { // Is it bound to anything?
         return !m_Closure;
     }
     inline bool empty() const { return !m_Closure; }
@@ -1256,7 +1256,7 @@ public:
     // Conversion to and from the DelegateMemento storage class
     const DelegateMemento& GetMemento() { return m_Closure; }
     void SetMemento(const DelegateMemento& any) { m_Closure.CopyFrom(this, any); }
-private:  // Invoker for static functions
+private: // Invoker for static functions
     RetType xr_stdcall InvokeStaticFunction(Param1 p1, Param2 p2, Param3 p3) const
     {
         return (*(m_Closure.GetStaticFunction()))(p1, p2, p3);
@@ -1348,7 +1348,7 @@ public:
     inline bool operator==(StaticFunctionPtr funcptr) { return m_Closure.IsEqualToStaticFuncPtr(funcptr); }
     inline bool operator!=(StaticFunctionPtr funcptr) { return !m_Closure.IsEqualToStaticFuncPtr(funcptr); }
     inline bool operator!() const
-    {  // Is it bound to anything?
+    { // Is it bound to anything?
         return !m_Closure;
     }
     inline bool empty() const { return !m_Closure; }
@@ -1356,7 +1356,7 @@ public:
     // Conversion to and from the DelegateMemento storage class
     const DelegateMemento& GetMemento() { return m_Closure; }
     void SetMemento(const DelegateMemento& any) { m_Closure.CopyFrom(this, any); }
-private:  // Invoker for static functions
+private: // Invoker for static functions
     RetType xr_stdcall InvokeStaticFunction(Param1 p1, Param2 p2, Param3 p3, Param4 p4) const
     {
         return (*(m_Closure.GetStaticFunction()))(p1, p2, p3, p4);
@@ -1450,7 +1450,7 @@ public:
     inline bool operator==(StaticFunctionPtr funcptr) { return m_Closure.IsEqualToStaticFuncPtr(funcptr); }
     inline bool operator!=(StaticFunctionPtr funcptr) { return !m_Closure.IsEqualToStaticFuncPtr(funcptr); }
     inline bool operator!() const
-    {  // Is it bound to anything?
+    { // Is it bound to anything?
         return !m_Closure;
     }
     inline bool empty() const { return !m_Closure; }
@@ -1458,7 +1458,7 @@ public:
     // Conversion to and from the DelegateMemento storage class
     const DelegateMemento& GetMemento() { return m_Closure; }
     void SetMemento(const DelegateMemento& any) { m_Closure.CopyFrom(this, any); }
-private:  // Invoker for static functions
+private: // Invoker for static functions
     RetType xr_stdcall InvokeStaticFunction(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5) const
     {
         return (*(m_Closure.GetStaticFunction()))(p1, p2, p3, p4, p5);
@@ -1557,7 +1557,7 @@ public:
     inline bool operator==(StaticFunctionPtr funcptr) { return m_Closure.IsEqualToStaticFuncPtr(funcptr); }
     inline bool operator!=(StaticFunctionPtr funcptr) { return !m_Closure.IsEqualToStaticFuncPtr(funcptr); }
     inline bool operator!() const
-    {  // Is it bound to anything?
+    { // Is it bound to anything?
         return !m_Closure;
     }
     inline bool empty() const { return !m_Closure; }
@@ -1565,7 +1565,7 @@ public:
     // Conversion to and from the DelegateMemento storage class
     const DelegateMemento& GetMemento() { return m_Closure; }
     void SetMemento(const DelegateMemento& any) { m_Closure.CopyFrom(this, any); }
-private:  // Invoker for static functions
+private: // Invoker for static functions
     RetType xr_stdcall InvokeStaticFunction(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5, Param6 p6) const
     {
         return (*(m_Closure.GetStaticFunction()))(p1, p2, p3, p4, p5, p6);
@@ -1664,7 +1664,7 @@ public:
     inline bool operator==(StaticFunctionPtr funcptr) { return m_Closure.IsEqualToStaticFuncPtr(funcptr); }
     inline bool operator!=(StaticFunctionPtr funcptr) { return !m_Closure.IsEqualToStaticFuncPtr(funcptr); }
     inline bool operator!() const
-    {  // Is it bound to anything?
+    { // Is it bound to anything?
         return !m_Closure;
     }
     inline bool empty() const { return !m_Closure; }
@@ -1672,7 +1672,7 @@ public:
     // Conversion to and from the DelegateMemento storage class
     const DelegateMemento& GetMemento() { return m_Closure; }
     void SetMemento(const DelegateMemento& any) { m_Closure.CopyFrom(this, any); }
-private:  // Invoker for static functions
+private: // Invoker for static functions
     RetType xr_stdcall InvokeStaticFunction(
         Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5, Param6 p6, Param7 p7) const
     {
@@ -1772,7 +1772,7 @@ public:
     inline bool operator==(StaticFunctionPtr funcptr) { return m_Closure.IsEqualToStaticFuncPtr(funcptr); }
     inline bool operator!=(StaticFunctionPtr funcptr) { return !m_Closure.IsEqualToStaticFuncPtr(funcptr); }
     inline bool operator!() const
-    {  // Is it bound to anything?
+    { // Is it bound to anything?
         return !m_Closure;
     }
     inline bool empty() const { return !m_Closure; }
@@ -1780,7 +1780,7 @@ public:
     // Conversion to and from the DelegateMemento storage class
     const DelegateMemento& GetMemento() { return m_Closure; }
     void SetMemento(const DelegateMemento& any) { m_Closure.CopyFrom(this, any); }
-private:  // Invoker for static functions
+private: // Invoker for static functions
     RetType xr_stdcall InvokeStaticFunction(
         Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5, Param6 p6, Param7 p7, Param8 p8) const
     {
@@ -2143,7 +2143,7 @@ public:
     void operator=(const BaseType& x) { *static_cast<BaseType*>(this) = x; }
 };
 
-#endif  // FASTDELEGATE_ALLOW_FUNCTION_TYPE_SYNTAX
+#endif // FASTDELEGATE_ALLOW_FUNCTION_TYPE_SYNTAX
 
 ////////////////////////////////////////////////////////////////////////////////
 //      Fast Delegates, part 5:
@@ -2331,6 +2331,6 @@ A bind(B b, C c)
 // clean up after ourselves...
 #undef FASTDLGT_RETTYPE
 
-}  // namespace fastdelegate
+} // namespace fastdelegate
 
-#endif  // !defined(FASTDELEGATE_H)
+#endif // !defined(FASTDELEGATE_H)

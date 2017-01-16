@@ -275,7 +275,7 @@ bool game_state_accumulator::check_hit_params(u32 count, ammunition_group::enum_
         bone_group::enum_group_id m_bone_gid;
         float_binary_function* m_func;
         float m_right_arg;
-    };  // struct hit_fetcher
+    }; // struct hit_fetcher
 
     if (!m_local_player) return false;
 
@@ -322,7 +322,7 @@ bool game_state_accumulator::check_kill_params(u32 count, ammunition_group::enum
         KILL_TYPE m_kill_type;
         SPECIAL_KILL_TYPE m_spec_kill;
         ammunition_group::enum_group_id m_weapon_gid;
-    };  // struct kills_fetcher
+    }; // struct kills_fetcher
 
     if (!m_local_player) return false;
 
@@ -459,4 +459,4 @@ bool game_state_accumulator::is_enemies(game_PlayerState const* left_player, gam
     return false;
 }
 
-}  // namespace award_system
+} // namespace award_system

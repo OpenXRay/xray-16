@@ -19,7 +19,7 @@
 #ifdef _WIN32
 LANGUAGE LANG_RUSSIAN, SUBLANG_DEFAULT
 #pragma code_page(1251)
-#endif  //_WIN32
+#endif //_WIN32
 
     /////////////////////////////////////////////////////////////////////////////
     //
@@ -57,7 +57,7 @@ LANGUAGE LANG_RUSSIAN, SUBLANG_DEFAULT
 
                                                                                IDD_CONSOLE,
     DIALOG BEGIN RIGHTMARGIN, 310 BOTTOMMARGIN, 163 END END
-#endif  // APSTUDIO_INVOKED
+#endif // APSTUDIO_INVOKED
 
 #ifdef APSTUDIO_INVOKED
     /////////////////////////////////////////////////////////////////////////////
@@ -75,9 +75,9 @@ LANGUAGE LANG_RUSSIAN, SUBLANG_DEFAULT
     3 TEXTINCLUDE BEGIN "\r\n"
                         "\0" END
 
-#endif  // APSTUDIO_INVOKED
+#endif // APSTUDIO_INVOKED
 
-#endif  // Russian resources
+#endif // Russian resources
 /////////////////////////////////////////////////////////////////////////////
 
 /////////////////////////////////////////////////////////////////////////////
@@ -88,7 +88,7 @@ LANGUAGE LANG_RUSSIAN, SUBLANG_DEFAULT
                             LANGUAGE LANG_UKRAINIAN,
     SUBLANG_DEFAULT
 #pragma code_page(1251)
-#endif  //_WIN32
+#endif //_WIN32
 
     /////////////////////////////////////////////////////////////////////////////
     //
@@ -111,9 +111,9 @@ LANGUAGE LANG_RUSSIAN, SUBLANG_DEFAULT
 #ifdef APSTUDIO_INVOKED
                                  GUIDELINES DESIGNINFO BEGIN IDD_SHADERDIALOG,
     DIALOG BEGIN LEFTMARGIN, 3 RIGHTMARGIN, 224 TOPMARGIN, 4 BOTTOMMARGIN, 92 END END
-#endif  // APSTUDIO_INVOKED
+#endif // APSTUDIO_INVOKED
 
-#endif  // Ukrainian resources
+#endif // Ukrainian resources
 /////////////////////////////////////////////////////////////////////////////
 
 #ifndef APSTUDIO_INVOKED
@@ -123,4 +123,4 @@ LANGUAGE LANG_RUSSIAN, SUBLANG_DEFAULT
 //
 
 /////////////////////////////////////////////////////////////////////////////
-#endif  // not APSTUDIO_INVOKED
+#endif // not APSTUDIO_INVOKED

@@ -87,7 +87,7 @@ IClient* xrServer::new_client(SClientConnectData* cl_data)
     // copy entity
     CL->ID = cl_data->clientID;
     CL->process_id = cl_data->process_id;
-    CL->name = cl_data->name;  // only for offline mode
+    CL->name = cl_data->name; // only for offline mode
     CL->pass._set(cl_data->pass);
 
     NET_Packet P;
@@ -105,7 +105,7 @@ void xrServer::AttachNewClient(IClient* CL)
     msgConfig.sign1 = 0x12071980;
     msgConfig.sign2 = 0x26111975;
 
-    if (psNET_direct_connect)  // single_game
+    if (psNET_direct_connect) // single_game
     {
         SV_Client = CL;
         CL->flags.bLocal = 1;

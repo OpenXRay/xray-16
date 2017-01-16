@@ -42,5 +42,5 @@ void Initialize()
     initialized = true;
 }
 
-}  // namespace Math
-}  // namespace XRay
+} // namespace Math
+} // namespace XRay

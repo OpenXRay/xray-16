@@ -72,11 +72,11 @@ public:
     //к группировке
     enum ERelationAction
     {
-        KILL = 0x00,                //убийство персонажа
-        ATTACK = 0x01,              //атака персонажа
-        FIGHT_HELP_HUMAN = 0x02,    //помощь в драке персонажу с другим персонажем
-        FIGHT_HELP_MONSTER = 0x04,  //помощь в драке персонажу c монстром
-        SOS_HELP = 0x08             //приход на помощь по сигналу SOS
+        KILL = 0x00,               //убийство персонажа
+        ATTACK = 0x01,             //атака персонажа
+        FIGHT_HELP_HUMAN = 0x02,   //помощь в драке персонажу с другим персонажем
+        FIGHT_HELP_MONSTER = 0x04, //помощь в драке персонажу c монстром
+        SOS_HELP = 0x08            //приход на помощь по сигналу SOS
     };
     void Action(CEntityAlive* from, CEntityAlive* to, ERelationAction action);
 
@@ -90,8 +90,8 @@ public:
         u32 time;
         u32 time_old;
 
-        u32 attack_time;                            //время фиксирования события "атака"
-        ALife::ERelationType defender_to_attacker;  //как относился атакованый к нападавшему во время начальной атаки
+        u32 attack_time;                           //время фиксирования события "атака"
+        ALife::ERelationType defender_to_attacker; //как относился атакованый к нападавшему во время начальной атаки
     };
 
     struct RELATION_MAP_SPOTS

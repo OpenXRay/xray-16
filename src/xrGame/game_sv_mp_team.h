@@ -9,9 +9,9 @@ DEF_VECTOR(DEF_ITEMS_LIST, u16);
 //структура данных по команде
 struct TeamStruct
 {
-    shared_str caSection;          // имя секции комманды
-    TEAM_SKINS_NAMES aSkins;       // список скинов для команды
-    DEF_ITEMS_LIST aDefaultItems;  // список предметов по умолчанию
+    shared_str caSection;         // имя секции комманды
+    TEAM_SKINS_NAMES aSkins;      // список скинов для команды
+    DEF_ITEMS_LIST aDefaultItems; // список предметов по умолчанию
 
     //---- Money -------------------
     s32 m_iM_Start;

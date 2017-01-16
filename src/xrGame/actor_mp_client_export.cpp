@@ -40,7 +40,8 @@ void CActorMP::fill_state(actor_mp_state& state)
 {
     if (OnClient()) {
         // R_ASSERT						(g_Alive());
-        // R_ASSERT2						(PHGetSyncItemsNumber() == 1,make_string("PHGetSyncItemsNumber() returned %d, health =
+        // R_ASSERT2						(PHGetSyncItemsNumber() == 1,make_string("PHGetSyncItemsNumber() returned %d, health
+        // =
         // %.2f",PHGetSyncItemsNumber(),GetfHealth()));
     }
 
@@ -62,7 +63,7 @@ void CActorMP::fill_state(actor_mp_state& state)
 //		Msg							("camera_pitch : [%f]",angle_normalize(unaffected_r_torso.pitch));
 //		Msg							("camera_roll  : [%f]",angle_normalize(unaffected_r_torso.roll));
 //	}
-#endif  // 0
+#endif // 0
 
     state.physics_quaternion = State.quaternion;
     state.physics_angular_velocity = State.angular_vel;

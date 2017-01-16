@@ -22,7 +22,7 @@ void dump_URL(LPCSTR p, IDirectPlay8Address* A);
 
 LPCSTR nameTraffic = "traffic.net";
 
-XRNETSERVER_API int psNET_ServerUpdate = 30;  // FPS
+XRNETSERVER_API int psNET_ServerUpdate = 30; // FPS
 XRNETSERVER_API int psNET_ServerPending = 3;
 
 XRNETSERVER_API ClientID BroadcastCID(0xffffffff);
@@ -188,7 +188,7 @@ IPureServer::IPureServer(CTimer* timer, BOOL Dedicated)
 #ifdef CONFIG_PROFILE_LOCKS
       ,
       csPlayers(MUTEX_PROFILE_ID(IPureServer::csPlayers)), csMessage(MUTEX_PROFILE_ID(IPureServer::csMessage))
-#endif  // CONFIG_PROFILE_LOCKS
+#endif // CONFIG_PROFILE_LOCKS
 {
     device_timer = timer;
     stats.clear();
@@ -196,7 +196,7 @@ IPureServer::IPureServer(CTimer* timer, BOOL Dedicated)
     SV_Client = NULL;
     NET = NULL;
     net_Address_device = NULL;
-    pSvNetLog = NULL;  // new INetLog("logs\\net_sv_log.log", TimeGlobal(device_timer));
+    pSvNetLog = NULL; // new INetLog("logs\\net_sv_log.log", TimeGlobal(device_timer));
 #ifdef DEBUG
     sender_functor_invoked = false;
 #endif
@@ -253,7 +253,7 @@ IPureServer::EConnect IPureServer::Connect(LPCSTR options, GameDescriptionData& 
     if (dwMaxPlayers > 32 || dwMaxPlayers < 1) dwMaxPlayers = 32;
 #ifdef DEBUG
     Msg("MaxPlayers = %d", dwMaxPlayers);
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 
     //-------------------------------------------------------------------
     BOOL bPortWasSet = FALSE;
@@ -267,7 +267,7 @@ IPureServer::EConnect IPureServer::Connect(LPCSTR options, GameDescriptionData& 
             strncpy_s(tmpStr, ServerPort, 63);
         dwServerPort = atol(tmpStr);
         clamp(dwServerPort, u32(START_PORT), u32(END_PORT));
-        bPortWasSet = TRUE;  // this is not casual game
+        bPortWasSet = TRUE; // this is not casual game
     }
     //-------------------------------------------------------------------
 
@@ -275,7 +275,7 @@ IPureServer::EConnect IPureServer::Connect(LPCSTR options, GameDescriptionData& 
 //---------------------------
 #ifdef DEBUG
         string1024 tmp;
-#endif  // DEBUG
+#endif // DEBUG
         //	HRESULT CoInitializeExRes = CoInitializeEx(NULL, 0);
         //	if (CoInitializeExRes != S_OK && CoInitializeExRes != S_FALSE)
         //	{
@@ -360,11 +360,11 @@ IPureServer::EConnect IPureServer::Connect(LPCSTR options, GameDescriptionData& 
             CHK_DX(
                 net_Address_device->AddComponent(DPNA_KEY_PORT, &psNET_Port, sizeof(psNET_Port), DPNA_DATATYPE_DWORD));
 
-            HostSuccess = NET->Host(&dpAppDesc,  // AppDesc
-                &net_Address_device, 1,          // Device Address
-                NULL, NULL,                      // Reserved
-                NULL,                            // Player Context
-                0);                              // dwFlags
+            HostSuccess = NET->Host(&dpAppDesc, // AppDesc
+                &net_Address_device, 1,         // Device Address
+                NULL, NULL,                     // Reserved
+                NULL,                           // Player Context
+                0);                             // dwFlags
             if (HostSuccess != S_OK) {
                 //			xr_string res = xrDebug::ErrorToString(HostSuccess);
                 if (bPortWasSet) {
@@ -389,7 +389,7 @@ IPureServer::EConnect IPureServer::Connect(LPCSTR options, GameDescriptionData& 
 
         CHK_DX(HostSuccess);
 
-    }  // psNET_direct_connect
+    } // psNET_direct_connect
 
     //.	config_Load		();
 
@@ -447,8 +447,8 @@ HRESULT IPureServer::net_Handler(u32 dwMessageType, PVOID pMessage)
         Pinfo->dwSize = sizeof(DPN_PLAYER_INFO);
         HRESULT _hr = NET->GetClientInfo(msg->dpnidPlayer, Pinfo, &bufferSize, 0);
         if (_hr == DPNERR_INVALIDPLAYER) {
-            Assign_ServerType(res);  // once
-            break;                   // server player
+            Assign_ServerType(res); // once
+            break;                  // server player
         }
 
         CHK_DX(_hr);
@@ -630,7 +630,7 @@ void IPureServer::SendBroadcast(ClientID exclude, NET_Packet& P, u32 dwFlags)
     SendBroadcast_LL(exclude, P.B.data, P.B.count, dwFlags);
 }
 
-u32 IPureServer::OnMessage(NET_Packet& P, ClientID sender)  // Non-Zero means broadcasting with "flags" as returned
+u32 IPureServer::OnMessage(NET_Packet& P, ClientID sender) // Non-Zero means broadcasting with "flags" as returned
 {
     /*
     u16 m_type;
@@ -672,7 +672,7 @@ BOOL IPureServer::HasBandwidth(IClient* C)
     }
 
     if (psNET_ServerUpdate != 0) dwInterval = 1000 / psNET_ServerUpdate;
-    if (psNET_Flags.test(NETFLAG_MINIMIZEUPDATES)) dwInterval = 1000;  // approx 2 times per second
+    if (psNET_Flags.test(NETFLAG_MINIMIZEUPDATES)) dwInterval = 1000; // approx 2 times per second
 
     HRESULT hr;
     if (psNET_ServerUpdate != 0 && (dwTime - C->dwTime_LastUpdate) > dwInterval) {

@@ -178,7 +178,7 @@ SCRIPT_EXPORT(CStalkerPlanner, (CScriptActionPlanner), {
 
                     luabind::value("sound_running_in_danger", StalkerSpace::eStalkerSoundRunningInDanger),
                     //				luabind::value("sound_walking_in_danger",
-                    //StalkerSpace::eStalkerSoundWalkingInDanger),
+                    // StalkerSpace::eStalkerSoundWalkingInDanger),
                     luabind::value("sound_kill_wounded", StalkerSpace::eStalkerSoundKillWounded),
                     luabind::value("sound_enemy_critically_wounded", StalkerSpace::eStalkerSoundEnemyCriticallyWounded),
                     luabind::value(

@@ -10,7 +10,7 @@
 
 //*** Bone Instance *******************************************************************************
 #pragma pack(push, 8)
-class CBlendInstance  // Bone Instance Blend List (per-bone data)
+class CBlendInstance // Bone Instance Blend List (per-bone data)
 {
 public:
     typedef svector<CBlend*, MAX_BLENDED> BlendSVec;
@@ -49,8 +49,8 @@ class ECORE_API CKinematicsAnimated : public CKinematics, public IKinematicsAnim
 
 private:
     // Motion control
-    void Bone_Motion_Start(CBoneData* bd, CBlend* handle);  // with recursion
-    void Bone_Motion_Stop(CBoneData* bd, CBlend* handle);   // with recursion
+    void Bone_Motion_Start(CBoneData* bd, CBlend* handle); // with recursion
+    void Bone_Motion_Stop(CBoneData* bd, CBlend* handle);  // with recursion
 
     void Bone_Motion_Start_IM(CBoneData* bd, CBlend* handle);
     void Bone_Motion_Stop_IM(CBoneData* bd, CBlend* handle);
@@ -166,8 +166,8 @@ public:
     }
 
     // Main functionality
-    void UpdateTracks();                                              // Update motions
-    void LL_UpdateTracks(float dt, bool b_force, bool leave_blends);  // Update motions
+    void UpdateTracks();                                             // Update motions
+    void LL_UpdateTracks(float dt, bool b_force, bool leave_blends); // Update motions
     void LL_UpdateFxTracks(float dt);
     void DestroyCycle(CBlend& B);
 

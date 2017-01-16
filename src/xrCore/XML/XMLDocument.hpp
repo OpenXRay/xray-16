@@ -56,7 +56,7 @@ public:
     int GetNodesNum(LPCSTR path, int index, LPCSTR tag_name);
     int GetNodesNum(XML_NODE* node, LPCSTR tag_name);
 
-#ifdef DEBUG  // debug & mixed
+#ifdef DEBUG // debug & mixed
     //проверка того, что аттрибуты у тегов уникальны
     //(если не NULL, то уникальность нарушена и возврашаетс€ им€
     //повтор€ющегос€ атрибута)
@@ -77,7 +77,7 @@ protected:
     XML_NODE* m_root;
     XML_NODE* m_pLocalRoot;
 
-#ifdef DEBUG  // debug & mixed
+#ifdef DEBUG // debug & mixed
     //буфферный вектор дл€ проверки уникальность аттрибутов
     xr_vector<shared_str> m_AttribValues;
 #endif
@@ -91,4 +91,4 @@ private:
     TiXmlDocument m_Doc;
 };
 
-#endif  // xrXMLParserH
+#endif // xrXMLParserH

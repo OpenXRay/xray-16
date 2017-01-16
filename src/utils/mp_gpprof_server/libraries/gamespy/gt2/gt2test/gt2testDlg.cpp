@@ -584,7 +584,7 @@ void CGt2testDlg::SetActiveConnection(GT2Connection connection, int nIndex)
 void CGt2testDlg::SetActiveConnection(GT2Connection connection)
 {
     int nIndex = GetConnectionIndex(connection);
-    ASSERT(nIndex != -1);  // tried to activate a bad connection
+    ASSERT(nIndex != -1); // tried to activate a bad connection
     if (nIndex == -1) return;
 
     SetActiveConnection(connection, nIndex);

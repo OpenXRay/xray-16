@@ -141,7 +141,7 @@ struct predicate
 
     IC predicate(shared_str const& id) : m_id(id) {}
     IC bool operator()(sun* const& sun) const { return (sun->id()._get() == m_id._get()); }
-};  // struct predicate
+}; // struct predicate
 
 CLensFlareDescriptor* manager::get_flare(shared_str const& id) const
 {
@@ -151,4 +151,4 @@ CLensFlareDescriptor* manager::get_flare(shared_str const& id) const
     return (0);
 }
 
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR

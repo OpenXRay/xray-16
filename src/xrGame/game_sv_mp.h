@@ -51,7 +51,7 @@ protected:
     bool m_bVotingReal;
     u32 m_uVoteStartTime;
     shared_str m_pVoteCommand;
-    shared_str m_voting_string;  // for sending to clients...
+    shared_str m_voting_string; // for sending to clients...
     shared_str m_started_player;
 
     virtual void LoadRanks();
@@ -60,7 +60,7 @@ protected:
     virtual bool Player_RankUp_Allowed() { return m_bRankUp_Allowed; };
     virtual void Set_RankUp_Allowed(bool RUA) { m_bRankUp_Allowed = RUA; };
     virtual void UpdatePlayersMoney();
-    virtual void DestroyAllPlayerItems(ClientID id_who);  // except rukzak and artefact :)
+    virtual void DestroyAllPlayerItems(ClientID id_who); // except rukzak and artefact :)
 
     u8 m_u8SpectatorModes;
 
@@ -91,9 +91,9 @@ protected:
     // ----------------
 
     //	virtual		bool				GetTeamItem_ByID		(WeaponDataStruct** pRes, TEAM_WPN_LIST* pWpnList, u16
-    //ItemID);
+    // ItemID);
     //	virtual		bool				GetTeamItem_ByName		(WeaponDataStruct** pRes,TEAM_WPN_LIST* pWpnList, LPCSTR
-    //ItemName);
+    // ItemName);
 
     virtual void Player_AddBonusMoney(game_PlayerState* ps, s32 MoneyAmount, SPECIAL_KILL_TYPE Reason, u8 Kill = 0);
 
@@ -116,7 +116,7 @@ public:
     virtual BOOL OnTouch(u16 eid_who, u16 eid_target, BOOL bForced = FALSE)
     {
         return true;
-    };  // TRUE=allow ownership, FALSE=denied
+    }; // TRUE=allow ownership, FALSE=denied
     virtual void OnDetach(u16 eid_who, u16 eid_target){};
     virtual void OnPlayerKillPlayer(game_PlayerState* ps_killer, game_PlayerState* ps_killed, KILL_TYPE KillType,
         SPECIAL_KILL_TYPE SpecialKillType, CSE_Abstract* pWeaponA){};
@@ -129,8 +129,8 @@ public:
 
     virtual void net_Export_State(NET_Packet& P, ClientID id_to);
 
-    virtual void OnRoundStart();  // старт раунда
-    virtual void OnRoundEnd();    // round_end_reason							// конец раунда
+    virtual void OnRoundStart(); // старт раунда
+    virtual void OnRoundEnd();   // round_end_reason							// конец раунда
     virtual bool OnNextMap();
     virtual void OnPrevMap();
 
@@ -177,10 +177,10 @@ public:
     bool CheckStatisticsReady();
     void DumpRoundStatistics();
 
-    void StartToDumpStatistics();  // creates file name for statistics..
+    void StartToDumpStatistics(); // creates file name for statistics..
     string_path round_statistics_dump_fn;
     void FinishToDumpStatistics();
-    void StopToDumpStatistics();  // removes file
+    void StopToDumpStatistics(); // removes file
     void AskAllToUpdateStatistics();
 
     struct async_statistics_collector
@@ -206,9 +206,9 @@ protected:
     bool CheckPlayerMapName(ClientID const& clientID, NET_Packet& P);
     void ReconnectPlayer(ClientID const& clientID);
 
-    virtual void OnPlayerOpenBuyMenu(xrClientData const* pclient){};  // this method invokes only if player dead
+    virtual void OnPlayerOpenBuyMenu(xrClientData const* pclient){}; // this method invokes only if player dead
     virtual void OnPlayerCloseBuyMenu(
-        xrClientData const* pclient){};  // if client state buyMenuPlayerReadyToSpawn respawn player
+        xrClientData const* pclient){}; // if client state buyMenuPlayerReadyToSpawn respawn player
 
     s32 ExcludeBanTimeFromVoteStr(char const* vote_string, char* new_vote_str, u32 new_vote_str_size);
 

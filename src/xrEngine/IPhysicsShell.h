@@ -23,4 +23,4 @@ public:
     virtual u16 get_ElementsNumber() const = 0;
 };
 
-#endif  //__IPHYSICSSHELL_H__
+#endif //__IPHYSICSSHELL_H__

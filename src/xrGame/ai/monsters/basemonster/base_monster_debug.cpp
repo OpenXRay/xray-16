@@ -500,7 +500,7 @@ void add_debug_info(debug::text_tree& root_s, const SRotation& rot)
     root_s.add_line("roll", rot.roll);
 }
 
-}  // namespace detail
+} // namespace detail
 
 void CBaseMonster::add_debug_info(debug::text_tree& root_s)
 {

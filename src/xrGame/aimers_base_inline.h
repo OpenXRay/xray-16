@@ -70,4 +70,4 @@ inline void aimers::base::fill_bones(u32 const (&bones)[bone_count0], u16 const 
     root_bone.set_callback(bctCustom, callback, callback_params);
 }
 
-#endif  // #ifndef AIMERS_BASE_INLINE_H_INCLUDED
+#endif // #ifndef AIMERS_BASE_INLINE_H_INCLUDED

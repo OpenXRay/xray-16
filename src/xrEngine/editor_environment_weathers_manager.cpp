@@ -108,7 +108,7 @@ struct predicate
 
     inline predicate(LPCSTR const& value_) : value(value_) {}
     inline bool operator()(weather const* weather) const { return (value._get() == weather->id()._get()); }
-};  // struct predicate
+}; // struct predicate
 
 LPCSTR const* manager::frames_getter(LPCSTR weather_id) const
 {
@@ -309,4 +309,4 @@ void manager::reload()
     load();
 }
 
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR

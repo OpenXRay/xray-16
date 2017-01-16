@@ -114,4 +114,4 @@ struct Quad3
     }
 };
 
-#endif  // quadH
+#endif // quadH

@@ -9,7 +9,7 @@ IDirect3DStateBlock9* SimulatorStates::record()
 #if defined(USE_DX10) || defined(USE_DX11)
     // VERIFY(!"SimulatorStates::record not implemented!");
     return 0;
-#else   //	USE_DX10
+#else  //	USE_DX10
     CHK_DX(HW.pDevice->BeginStateBlock());
     for (u32 it = 0; it < States.size(); it++)
     {
@@ -30,7 +30,7 @@ IDirect3DStateBlock9* SimulatorStates::record()
     IDirect3DStateBlock9* SB = 0;
     CHK_DX(HW.pDevice->EndStateBlock(&SB));
     return SB;
-#endif  //	USE_DX10
+#endif //	USE_DX10
 }
 
 void SimulatorStates::set_RS(u32 a, u32 b)
@@ -507,4 +507,4 @@ void SimulatorStates::UpdateDesc(D3D_SAMPLER_DESC descArray[D3D_COMMONSHADER_SAM
     }
 }
 
-#endif  //	USE_DX10
+#endif //	USE_DX10

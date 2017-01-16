@@ -44,7 +44,7 @@ void light::gi_generate()
         LI.D.reflect(dir, TN);
         LI.E = dot * (1 - R->range / range);
         if (LI.E < ps_r2_GI_clip) continue;
-        LI.S = spatial.sector;  //. BUG
+        LI.S = spatial.sector; //. BUG
 
         indirect.push_back(LI);
     }

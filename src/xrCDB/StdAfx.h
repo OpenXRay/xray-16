@@ -20,13 +20,13 @@ extern doug_lea_allocator g_collision_allocator;
 #define CFREE(ptr) g_collision_allocator.free_impl(ptr)
 #define CMALLOC(size) g_collision_allocator.malloc_impl(size)
 #define CALLOC(type, count) g_collision_allocator.alloc_impl<type>(count)
-#else  // #ifdef USE_ARENA_ALLOCATOR
+#else // #ifdef USE_ARENA_ALLOCATOR
 #define CNEW(type) new (xr_alloc<type>(1)) type
 #define CDELETE(ptr) xr_delete(ptr)
 #define CFREE(ptr) xr_free(ptr)
 #define CMALLOC(size) xr_malloc(size)
 #define CALLOC(type, count) xr_alloc<type>(count)
-#endif  // #ifdef USE_ARENA_ALLOCATOR
+#endif // #ifdef USE_ARENA_ALLOCATOR
 
 template <bool _is_pm, typename T>
 struct cspecial_free
@@ -66,4 +66,4 @@ IC void cdelete(T*& ptr)
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.
 
-#endif  // stdafxH
+#endif // stdafxH

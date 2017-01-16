@@ -5,13 +5,17 @@
 #include "sh_atomic.h"
 
 // Atomic
-// SVS::~SVS								()			{	_RELEASE(vs);		dxRenderDeviceRender::Instance().Resources->_DeleteVS			(this);
+// SVS::~SVS								()			{	_RELEASE(vs);		dxRenderDeviceRender::Instance().Resources->_DeleteVS
+// (this);
 // }
-// SPS::~SPS								()			{	_RELEASE(ps);		dxRenderDeviceRender::Instance().Resources->_DeletePS			(this);
+// SPS::~SPS								()			{	_RELEASE(ps);		dxRenderDeviceRender::Instance().Resources->_DeletePS
+// (this);
 // }
-// SState::~SState							()			{	_RELEASE(state);	dxRenderDeviceRender::Instance().Resources->_DeleteState		(this);
+// SState::~SState							()			{	_RELEASE(state);	dxRenderDeviceRender::Instance().Resources->_DeleteState
+// (this);
 // }
-// SDeclaration::~SDeclaration				()			{	_RELEASE(dcl);		dxRenderDeviceRender::Instance().Resources->_DeleteDecl
+// SDeclaration::~SDeclaration				()			{	_RELEASE(dcl);
+// dxRenderDeviceRender::Instance().Resources->_DeleteDecl
 // (this);	}
 
 ///////////////////////////////////////////////////////////////////////
@@ -19,7 +23,7 @@
 SVS::SVS() : vs(0)
 #if defined(USE_DX10) || defined(USE_DX11)
 //	,signature(0)
-#endif  //	USE_DX10
+#endif //	USE_DX10
 {
     ;
 }
@@ -30,7 +34,7 @@ SVS::~SVS()
 #if defined(USE_DX10) || defined(USE_DX11)
 //_RELEASE(signature);
 //	Now it is release automatically
-#endif  //	USE_DX10
+#endif //	USE_DX10
     _RELEASE(vs);
 }
 
@@ -82,7 +86,7 @@ SInputSignature::~SInputSignature()
     _RELEASE(signature);
     RImplementation.Resources->_DeleteInputSignature(this);
 }
-#endif  //	USE_DX10
+#endif //	USE_DX10
 
 ///////////////////////////////////////////////////////////////////////
 //	SState
@@ -105,8 +109,8 @@ SDeclaration::~SDeclaration()
         //	Release vertex layout
         _RELEASE(iLayout->second);
     }
-#else   //	USE_DX10
+#else  //	USE_DX10
     //	Release vertex layout
     _RELEASE(dcl);
-#endif  //	USE_DX10
+#endif //	USE_DX10
 }

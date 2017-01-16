@@ -8,7 +8,7 @@
 
 #if _MSC_VER > 1000
 #pragma once
-#endif  // _MSC_VER > 1000
+#endif // _MSC_VER > 1000
 
 /////////////////////////////////////////////////////////////////////////////
 // CGptestDlg dialog
@@ -17,7 +17,7 @@ class CGptestDlg : public CDialog
 {
     // Construction
 public:
-    CGptestDlg(CWnd* pParent = NULL);  // standard constructor
+    CGptestDlg(CWnd* pParent = NULL); // standard constructor
 
     // Dialog Data
     //{{AFX_DATA(CGptestDlg)
@@ -103,8 +103,8 @@ public:
     // ClassWizard generated virtual function overrides
     //{{AFX_VIRTUAL(CGptestDlg)
 protected:
-    virtual void DoDataExchange(CDataExchange* pDX);  // DDX/DDV support
-                                                      //}}AFX_VIRTUAL
+    virtual void DoDataExchange(CDataExchange* pDX); // DDX/DDV support
+                                                     //}}AFX_VIRTUAL
 
     // Implementation
 protected:
@@ -187,4 +187,4 @@ public:
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.
 
-#endif  // !defined(AFX_GPTESTDLG_H__AA6A1E3F_9C28_4A6C_902F_328A8707E479__INCLUDED_)
+#endif // !defined(AFX_GPTESTDLG_H__AA6A1E3F_9C28_4A6C_902F_328A8707E479__INCLUDED_)

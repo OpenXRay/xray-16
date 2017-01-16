@@ -143,7 +143,7 @@ bool CControlAnimationBase::accel_check_braking(float before_interval, float nom
     if (m_man->path_builder().is_path_end(braking_dist)) return (braking_mode = true);
 
     // проверить точки пути, где необходимо остановиться
-    float dist = 0.f;  // дистанция до найденной точки
+    float dist = 0.f; // дистанция до найденной точки
     for (u32 i = m_man->path_builder().detail().curr_travel_point_index() + 1;
          i < m_man->path_builder().detail().path().size(); i++)
     {

@@ -72,7 +72,7 @@ static DWORD WINAPI ttapiThreadProc(void* lpParameter)
 
         _InterlockedDecrement(&ttapi_queue_size.size);
 
-    }  // while
+    } // while
 
     return 0;
 }

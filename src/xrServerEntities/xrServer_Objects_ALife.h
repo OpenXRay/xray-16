@@ -14,7 +14,7 @@
 #include "xrServer_Objects.h"
 #ifdef XRGAME_EXPORTS
 #include "alife_smart_terrain_task.h"
-#endif  //#ifdef XRGAME_EXPORTS
+#endif //#ifdef XRGAME_EXPORTS
 
 #pragma warning(push)
 #pragma warning(disable : 4005)
@@ -28,7 +28,7 @@ class CSE_ALifeDynamicObject;
 class CSE_ALifeObject;
 #ifdef XRGAME_EXPORTS
 class CALifeSmartTerrainTask;
-#endif  //#ifdef XRGAME_EXPORTS
+#endif //#ifdef XRGAME_EXPORTS
 class CALifeMonsterAbstract;
 
 struct SFillPropData
@@ -265,7 +265,7 @@ public:
         inherited1::FillProps(pref, items);
         inherited2::FillProps(pref, items);
     };
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
     virtual CSE_Abstract* cast_abstract() { return (this); }
     virtual CSE_ALifeGroupAbstract* cast_group_abstract() { return (this); }
@@ -452,7 +452,7 @@ public:
 private:
     u32 m_freeze_time;
     static const u32 m_freeze_delta_time;
-#ifdef DEBUG  // only for testing interpolation
+#ifdef DEBUG // only for testing interpolation
     u32 m_last_update_time;
     static const u32 m_update_delta_time;
 #endif
@@ -464,7 +464,7 @@ public:
     {
         inventory_item_state_enabled = u8(1) << 0,
         inventory_item_angular_null = u8(1) << 1,
-        inventory_item_linear_null = u8(1) << 2  //,
+        inventory_item_linear_null = u8(1) << 2 //,
         // animated                      = u8(1) << 3
     };
     union mask_num_items
@@ -548,7 +548,7 @@ public:
 #ifndef XRGAME_EXPORTS
     virtual void __stdcall on_render(CDUInterface* du, IServerEntityLEOwner* owner, bool bSelected,
         const Fmatrix& parent, int priority, bool strictB2F);
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
     virtual CSE_Abstract* cast_abstract() { return this; }
     virtual void UPDATE_Read(NET_Packet& P);
     virtual void UPDATE_Write(NET_Packet& P);

@@ -24,10 +24,10 @@ extern "C" {
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 // SSL content types
-#define GS_SSL_CONTENT_CHANGECIPHERSPEC (0x14)  // 20
-#define GS_SSL_CONTENT_ALERT (0x15)             // 21  Not sure if this is the correct value
-#define GS_SSL_CONTENT_HANDSHAKE (0x16)         // 22
-#define GS_SSL_CONTENT_APPLICATIONDATA (0x17)   // 23
+#define GS_SSL_CONTENT_CHANGECIPHERSPEC (0x14) // 20
+#define GS_SSL_CONTENT_ALERT (0x15)            // 21  Not sure if this is the correct value
+#define GS_SSL_CONTENT_HANDSHAKE (0x16)        // 22
+#define GS_SSL_CONTENT_APPLICATIONDATA (0x17)  // 23
 
 // SSL handshake message types
 //#define GS_SSL_HANDSHAKE_HELLOREQUEST       (0)
@@ -64,13 +64,13 @@ extern "C" {
 #define GS_SSL_MAX_MAC_SECRET_SIZE (20)
 #define GS_SSL_MAX_SYMMETRIC_KEY_SIZE (16)
 #define GS_SSL_MAX_IV_SIZE (16)
-#define GS_SSL_NUM_CIPHER_SUITES (1)  // cipher suite list defined in gsSSL.c
+#define GS_SSL_NUM_CIPHER_SUITES (1) // cipher suite list defined in gsSSL.c
 #define GS_SSL_MASTERSECRET_LEN (48)
-#define GS_SSL_PAD_ONE "666666666666666666666666666666666666666666666666"  // 48 bytes
+#define GS_SSL_PAD_ONE "666666666666666666666666666666666666666666666666" // 48 bytes
 #define GS_SSL_PAD_TWO                                                                                                 \
-    "\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"  // 48 bytes
+    "\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\" // 48 bytes
 #define GS_SSL_MD5_PAD_LEN (48)
-#define GS_SSL_SHA1_PAD_LEN (40)  // use only 40 of the 48 bytes
+#define GS_SSL_SHA1_PAD_LEN (40) // use only 40 of the 48 bytes
 #define GS_SSL_CLIENT_FINISH_VALUE "CLNT"
 #define GS_SSL_SERVER_FINISH_VALUE "SRVR"
 
@@ -80,13 +80,13 @@ extern "C" {
 typedef struct gsSSL
 {
     int sessionLen;
-    unsigned char sessionData[255];  // up to 256 bytes
+    unsigned char sessionData[255]; // up to 256 bytes
     unsigned short cipherSuite;
 
     // DArray certificateArray;
     gsCryptRSAKey serverpub;
-    unsigned char sendSeqNBO[8];     // incrementing sequence number (for messages sent)
-    unsigned char receiveSeqNBO[8];  // ditto (for messages received)
+    unsigned char sendSeqNBO[8];    // incrementing sequence number (for messages sent)
+    unsigned char receiveSeqNBO[8]; // ditto (for messages received)
 
     // Key buffers
     //   Actual data may be smaller than array size
@@ -105,17 +105,17 @@ typedef struct gsSSL
     int clientWriteIVLen;
     int clientReadIVLen;
 
-    RC4Context sendRC4;  // initialized ONCE per key exchange
-    RC4Context recvRC4;  // initialized ONCE per key exchange
+    RC4Context sendRC4; // initialized ONCE per key exchange
+    RC4Context recvRC4; // initialized ONCE per key exchange
 
     // these are unused once the handshake is complete
     //   todo: dynamically allocate or remove to free space
     MD5_CTX finishHashMD5;
     SHA1Context finishHashSHA1;
-    unsigned char serverRandom[32];  // server random for key generation, sent plain text
-    unsigned char clientRandom[32];  // client random for key generation, sent plain text
+    unsigned char serverRandom[32]; // server random for key generation, sent plain text
+    unsigned char clientRandom[32]; // client random for key generation, sent plain text
     unsigned char
-        premastersecret[GS_SSL_MASTERSECRET_LEN];  // client random for key generation, sent encrypted with serverpub
+        premastersecret[GS_SSL_MASTERSECRET_LEN]; // client random for key generation, sent encrypted with serverpub
     unsigned char mastersecret[GS_SSL_MASTERSECRET_LEN];
 
 } gsSSL;
@@ -123,10 +123,10 @@ typedef struct gsSSL
 // SSL messages (like the ClientHello) are wrapped in a "record" struct
 typedef struct gsSSLRecordHeaderMsg
 {
-    unsigned char contentType;   // = GS_SSL_CONTENT_HANDSHAKE;
-    unsigned char versionMajor;  // = GS_SSL_VERSION_MAJOR;
-    unsigned char versionMinor;  // = GS_SSL_VERSION_MINOR;
-    unsigned char lengthNBO[2];  // length of msg, limited to 2^14
+    unsigned char contentType;  // = GS_SSL_CONTENT_HANDSHAKE;
+    unsigned char versionMajor; // = GS_SSL_VERSION_MAJOR;
+    unsigned char versionMinor; // = GS_SSL_VERSION_MINOR;
+    unsigned char lengthNBO[2]; // length of msg, limited to 2^14
 
     // WARNING: lengthNBO can NOT be an unsigned short
     //          This would create alignment issues from the previous 3 parameters
@@ -135,26 +135,26 @@ typedef struct gsSSLRecordHeaderMsg
 
 typedef struct gsSSLClientHelloMsg
 {
-    gsSSLRecordHeaderMsg header;  // include the header for easier packing
-    unsigned char handshakeType;  // 0x01
-    unsigned char lengthNBO[3];   // 3 byte length, NBO integer! 61 = 0x00 00 3d
-    unsigned char versionMajor;   // = GS_SSL_VERSION_MAJOR;
-    unsigned char versionMinor;   // = GS_SSL_VERSION_MINOR;
-    unsigned char time[4];        // 4 byte random (spec says set to current unix-time)
-    unsigned char random[28];     // 28 byte random, total of 32 random bytes
-    unsigned char sessionIdLen;   // how many of the bytes that follow are session info? (def:0)
+    gsSSLRecordHeaderMsg header; // include the header for easier packing
+    unsigned char handshakeType; // 0x01
+    unsigned char lengthNBO[3];  // 3 byte length, NBO integer! 61 = 0x00 00 3d
+    unsigned char versionMajor;  // = GS_SSL_VERSION_MAJOR;
+    unsigned char versionMinor;  // = GS_SSL_VERSION_MINOR;
+    unsigned char time[4];       // 4 byte random (spec says set to current unix-time)
+    unsigned char random[28];    // 28 byte random, total of 32 random bytes
+    unsigned char sessionIdLen;  // how many of the bytes that follow are session info? (def:0)
 
     // ALIGNMENT: 44 bytes prior to this, alignment should be OK
-    unsigned short cipherSuitesLength;  // 2* number of cipher suites
+    unsigned short cipherSuitesLength; // 2* number of cipher suites
     unsigned short cipherSuites[GS_SSL_NUM_CIPHER_SUITES];
-    unsigned char compressionMethodLen;   // no standard methods, set to 1
-    unsigned char compressionMethodList;  // set to 0
+    unsigned char compressionMethodLen;  // no standard methods, set to 1
+    unsigned char compressionMethodList; // set to 0
 } gsSSLClientHelloMsg;
 
 typedef struct gsSSLClientKeyExchangeMsg
 {
-    gsSSLRecordHeaderMsg header;  // included here for easier packing
-    unsigned char handshakeType;  // 0x10
+    gsSSLRecordHeaderMsg header; // included here for easier packing
+    unsigned char handshakeType; // 0x10
     unsigned char lengthNBO[3];
     //   The next lengthNBO bytes are the client contribution to the key
 } gsSSLClientKeyExchangeMsg;
@@ -176,7 +176,7 @@ extern const unsigned char gsSslRsaOid[9];
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 #if defined(__cplusplus)
-}  // extern "C"
+} // extern "C"
 #endif
 
-#endif  // __GSSSL_H__
+#endif // __GSSSL_H__

@@ -46,7 +46,7 @@ void CDeflector::L_Direct_Edge(CDB::COLLIDER* DB, base_lighting* LightsSelected,
         VERIFY(inlc_global_data()->RCAST_Model());
 
         LightPoint(DB, inlc_global_data()->RCAST_Model(), C, P, N, *LightsSelected,
-            (inlc_global_data()->b_nosun() ? LP_dont_sun : 0) | LP_DEFAULT, skip);  //.
+            (inlc_global_data()->b_nosun() ? LP_dont_sun : 0) | LP_DEFAULT, skip); //.
 
         C.mul(.5f);
         lm.surface[_y * lm.width + _x]._set(C);
@@ -122,7 +122,7 @@ void CDeflector::L_Direct(CDB::COLLIDER* DB, base_lighting* LightsSelected, HASH
                                 VERIFY(inlc_global_data());
                                 VERIFY(inlc_global_data()->RCAST_Model());
                                 LightPoint(DB, inlc_global_data()->RCAST_Model(), C, wP, wN, *LightsSelected,
-                                    (inlc_global_data()->b_nosun() ? LP_dont_sun : 0) | LP_UseFaceDisable, F);  //.
+                                    (inlc_global_data()->b_nosun() ? LP_dont_sun : 0) | LP_UseFaceDisable, F); //.
                                 Fcount += 1;
                             }
                             catch (...)
@@ -147,7 +147,7 @@ void CDeflector::L_Direct(CDB::COLLIDER* DB, base_lighting* LightsSelected, HASH
             }
             else
             {
-                lm.surface[V * lm.width + U]._set(C);  // 0-0-0-0-0
+                lm.surface[V * lm.width + U]._set(C); // 0-0-0-0-0
                 lm.marker[V * lm.width + U] = 0;
             }
         }

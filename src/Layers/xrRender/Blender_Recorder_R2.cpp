@@ -35,7 +35,7 @@ void CBlender_Compile::r_Pass(LPCSTR _vs, LPCSTR _ps, bool bFog, BOOL bZtest, BO
     dest.ds = RImplementation.Resources->_CreateDS("null");
     dest.cs = RImplementation.Resources->_CreateCS("null");
 #endif
-#endif  //	USE_DX10
+#endif //	USE_DX10
     ctable.merge(&ps->constants);
     ctable.merge(&vs->constants);
 
@@ -140,10 +140,10 @@ u32 CBlender_Compile::r_Sampler(
         }
 
         if (0 == xr_strcmp(_name, "s_base_hud")) {
-            fmin = D3DTEXF_GAUSSIANQUAD;  // D3DTEXF_PYRAMIDALQUAD; //D3DTEXF_ANISOTROPIC; //D3DTEXF_LINEAR;
-                                          // //D3DTEXF_POINT; //D3DTEXF_NONE
-            fmag = D3DTEXF_GAUSSIANQUAD;  // D3DTEXF_PYRAMIDALQUAD; //D3DTEXF_ANISOTROPIC; //D3DTEXF_LINEAR;
-                                          // //D3DTEXF_POINT; //D3DTEXF_NONE;
+            fmin = D3DTEXF_GAUSSIANQUAD; // D3DTEXF_PYRAMIDALQUAD; //D3DTEXF_ANISOTROPIC; //D3DTEXF_LINEAR;
+                                         // //D3DTEXF_POINT; //D3DTEXF_NONE
+            fmag = D3DTEXF_GAUSSIANQUAD; // D3DTEXF_PYRAMIDALQUAD; //D3DTEXF_ANISOTROPIC; //D3DTEXF_LINEAR;
+                                         // //D3DTEXF_POINT; //D3DTEXF_NONE;
         }
 
         if ((0 == xr_strcmp(_name, "s_detail")) && (fmin == D3DTEXF_LINEAR)) {
@@ -187,4 +187,4 @@ void CBlender_Compile::r_End()
 #endif
     SH->passes.push_back(RImplementation.Resources->_CreatePass(dest));
 }
-#endif  //	USE_DX10
+#endif //	USE_DX10

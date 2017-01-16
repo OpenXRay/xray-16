@@ -28,6 +28,6 @@ IC action::Animations const& action::animations(shared_str const& cover_id, shar
     return (*found->second);
 }
 
-}  // namespace smart_cover
+} // namespace smart_cover
 
-#endif  // SMART_COVER_ACTION_INLINE_H_INCLUDED
+#endif // SMART_COVER_ACTION_INLINE_H_INCLUDED

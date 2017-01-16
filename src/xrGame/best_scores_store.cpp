@@ -121,7 +121,7 @@ void __cdecl best_scores_store::get_my_player_scores_cb(
 
 void best_scores_store::process_scores_out_response(SAKEGetMyRecordsOutput* tmp_out, int const out_fields_count)
 {
-    VERIFY(tmp_out->mNumRecords <= 1);  // one raw
+    VERIFY(tmp_out->mNumRecords <= 1); // one raw
     if (tmp_out->mNumRecords == 0) {
         for (int i = 0; i < bst_score_types_count; ++i)
         {
@@ -134,9 +134,9 @@ void best_scores_store::process_scores_out_response(SAKEGetMyRecordsOutput* tmp_
     {
         enum_best_score_type bst = get_best_score_type_by_sname(tmp_out->mRecords[0][i].mName);
         if (bst == bst_score_types_count) continue;
-        s32 bs_value = tmp_out->mRecords[0][i].mValue.mInt;  // one raw
+        s32 bs_value = tmp_out->mRecords[0][i].mValue.mInt; // one raw
         m_result_scores.insert(std::make_pair(bst, bs_value));
     };
 }
 
-}  // namespace gamespy_profile
+} // namespace gamespy_profile

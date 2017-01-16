@@ -1022,7 +1022,7 @@ static void LoginAndAuthenticate(SAKE sake)
 #include <crtdbg.h>
 #endif
 
-int test_main(int argc, char* argv[]);  // CW needs this prototyped
+int test_main(int argc, char* argv[]); // CW needs this prototyped
 
 int test_main(int argc, char* argv[])
 {

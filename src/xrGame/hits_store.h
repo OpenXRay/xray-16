@@ -20,7 +20,7 @@ public:
         float m_dist;
         u16 m_weapon_id;
         u16 m_bone_id;
-    };  // struct bullet_hit
+    }; // struct bullet_hit
 
     static unsigned int const max_hits_count = 10;
     typedef obsolete_queue<buffer_vector<bullet_hit>, max_hits_count> bullet_hits_t;
@@ -34,10 +34,10 @@ public:
 
 private:
     bullet_hits_map_t m_bullet_hits;
-};  // class hits_store
+}; // class hits_store
 
-}  // namespace award_system
+} // namespace award_system
 
 #include "hits_store_inline.h"
 
-#endif  //#ifndef HITS_STORE_INCLUDED
+#endif //#ifndef HITS_STORE_INCLUDED

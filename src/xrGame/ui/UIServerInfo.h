@@ -39,6 +39,6 @@ private:
     CUIStatic* m_image;
     CUI3tButton* m_btn_spectator;
     CUI3tButton* m_btn_next;
-};  // class CUIServerInfo
+}; // class CUIServerInfo
 
-#endif  //#ifndef UISERVER_INFO_INCLUDED
+#endif //#ifndef UISERVER_INFO_INCLUDED

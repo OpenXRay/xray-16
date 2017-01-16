@@ -9,7 +9,7 @@ CUIScrollBox::CUIScrollBox()
 bool CUIScrollBox::OnMouseAction(float x, float y, EUIMessages mouse_action)
 {
     Fvector2 border;
-    border.x = 512.0f;  // :)
+    border.x = 512.0f; // :)
     border.y = 512.0f;
 
     bool over_x = (x >= -border.x && x < (GetWidth() + border.x));

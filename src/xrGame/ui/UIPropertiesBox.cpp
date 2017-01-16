@@ -50,10 +50,10 @@ void CUIPropertiesBox::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
     if (pWnd == &m_UIListWnd) {
         if (msg == LIST_ITEM_CLICKED) {
             GetMessageTarget()->SendMessage(this, PROPERTY_CLICKED);
-            if (!m_sub_property_box)  // i'm the last sub menu
+            if (!m_sub_property_box) // i'm the last sub menu
             {
                 Hide();
-                if (m_parent_sub_menu)  // if i have a parent sub menu, close it
+                if (m_parent_sub_menu) // if i have a parent sub menu, close it
                     m_parent_sub_menu->Hide();
             }
         }

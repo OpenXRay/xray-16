@@ -898,7 +898,7 @@ GPResult gpProfileSearchW(GPConnection* connection, const unsigned short nick[GP
     char firstname_A[GP_NICK_LEN];
     char lastname_A[GP_NICK_LEN];
 
-    UCS2ToAsciiString(nick, nick_A);  // nicknames are ascii
+    UCS2ToAsciiString(nick, nick_A); // nicknames are ascii
     UCS2ToAsciiString(uniquenick, uniquenick_A);
     UCS2ToAsciiString(email, email_A);
     UCS2ToAsciiString(firstname, firstname_A);
@@ -1524,9 +1524,9 @@ int gpIsBuddyConnectionOpen(GPConnection* connection, GPProfile profile)
     aPeer = gpiGetPeerByProfile(connection, profile);
 
     if (aPeer == NULL || !gpiIsPeerConnected(aPeer))
-        return 0;  // not connected
+        return 0; // not connected
     else
-        return 1;  // connected
+        return 1; // connected
 }
 
 GPResult gpDeleteBuddy(GPConnection* connection, GPProfile profile)
@@ -2206,9 +2206,9 @@ GPResult gpSendBuddyMessageW(GPConnection* connection, GPProfile profile, const 
     GPResult result;
 
     assert(message != NULL);
-    message_A = UCS2ToUTF8StringAlloc(message);                    // convert to UTF8
-    result = gpSendBuddyMessageA(connection, profile, message_A);  // send
-    gsifree(message_A);                                            // free the converted string
+    message_A = UCS2ToUTF8StringAlloc(message);                   // convert to UTF8
+    result = gpSendBuddyMessageA(connection, profile, message_A); // send
+    gsifree(message_A);                                           // free the converted string
     return result;
 }
 #endif
@@ -2248,9 +2248,9 @@ GPResult gpSendBuddyUTMW(GPConnection* connection, GPProfile profile, const unsi
     GPResult result;
 
     assert(message != NULL);
-    message_A = UCS2ToUTF8StringAlloc(message);                            // convert to UTF8
-    result = gpSendBuddyUTMA(connection, profile, message_A, sendOption);  // send
-    gsifree(message_A);                                                    // free the converted string
+    message_A = UCS2ToUTF8StringAlloc(message);                           // convert to UTF8
+    result = gpSendBuddyUTMA(connection, profile, message_A, sendOption); // send
+    gsifree(message_A);                                                   // free the converted string
     return result;
 }
 #endif

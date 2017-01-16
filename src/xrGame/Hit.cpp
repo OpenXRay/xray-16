@@ -94,7 +94,7 @@ void SHit::Read_Packet_Cont(NET_Packet Packet)
         aim_bullet = Packet.r_u16() != 0;
     else
         aim_bullet = false;
-    hit_type = (ALife::EHitType)Packet.r_u16();  // hit type
+    hit_type = (ALife::EHitType)Packet.r_u16(); // hit type
 
     if (hit_type == ALife::eHitTypeFireWound) {
         Packet.r_float(armor_piercing);

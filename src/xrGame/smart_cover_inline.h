@@ -80,4 +80,4 @@ IC bool cover::can_fire() const
 
 #undef cover
 
-#endif  // SMART_COVER_H_INLINE_INCLUDED
+#endif // SMART_COVER_H_INLINE_INCLUDED

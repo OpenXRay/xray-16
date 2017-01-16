@@ -19,4 +19,4 @@ IC CAI_Rat& rat_state_base::object() const
     return (*m_object);
 }
 
-#endif  // RAT_STATE_BASE_INLINE_H_INCLUDED
+#endif // RAT_STATE_BASE_INLINE_H_INCLUDED

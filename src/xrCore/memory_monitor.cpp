@@ -152,4 +152,4 @@ void memory_monitor::make_checkpoint(LPCSTR checkpoint_name)
     Msg("Done");
 }
 
-#endif  // USE_MEMORY_MONITOR
+#endif // USE_MEMORY_MONITOR

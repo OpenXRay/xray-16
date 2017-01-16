@@ -316,7 +316,7 @@ ID3DBaseTexture* CRender::texture_load(LPCSTR fRName, u32& ret_msize, bool bStag
 
     // make file name
     string_path fname;
-    xr_strcpy(fname, fRName);  //. andy if (strext(fname)) *strext(fname)=0;
+    xr_strcpy(fname, fRName); //. andy if (strext(fname)) *strext(fname)=0;
     fix_texture_name(fname);
     IReader* S = NULL;
     if (!FS.exist(fn, "$game_textures$", fname, ".dds") && strstr(fname, "_bump")) goto _BUMP_from_base;
@@ -344,7 +344,7 @@ _DDS:
     S = FS.r_open(fn);
 #ifdef DEBUG
     Msg("* Loaded: %s[%d]", fn, S->length());
-#endif  // DEBUG
+#endif // DEBUG
     img_size = S->length();
     R_ASSERT(S);
 // R_CHK2					(D3DXGetImageInfoFromFileInMemory	(S->pointer(),S->length(),&IMG), fn);

@@ -22,7 +22,7 @@ BOOL SphereCollider::SphereTriOverlap(const Point& vert0, const Point& vert1, co
 
     if (u + v <= fDet) {
         if (u < 0.0f) {
-            if (v < 0.0f)  // region 4
+            if (v < 0.0f) // region 4
             {
                 if (fB0 < 0.0f) {
                     v = 0.0f;
@@ -55,7 +55,7 @@ BOOL SphereCollider::SphereTriOverlap(const Point& vert0, const Point& vert1, co
                     }
                 }
             }
-            else  // region 3
+            else // region 3
             {
                 u = 0.0f;
                 if (fB1 >= 0.0f) {
@@ -74,7 +74,7 @@ BOOL SphereCollider::SphereTriOverlap(const Point& vert0, const Point& vert1, co
                 }
             }
         }
-        else if (v < 0.0f)  // region 5
+        else if (v < 0.0f) // region 5
         {
             v = 0.0f;
             if (fB0 >= 0.0f) {
@@ -92,7 +92,7 @@ BOOL SphereCollider::SphereTriOverlap(const Point& vert0, const Point& vert1, co
                 SqrDist = fB0 * u + fC;
             }
         }
-        else  // region 0
+        else // region 0
         {
             // minimum at interior point
             if (fDet == 0.0f) {
@@ -113,7 +113,7 @@ BOOL SphereCollider::SphereTriOverlap(const Point& vert0, const Point& vert1, co
     {
         float fTmp0, fTmp1, fNumer, fDenom;
 
-        if (u < 0.0f)  // region 2
+        if (u < 0.0f) // region 2
         {
             fTmp0 = fA01 + fB0;
             fTmp1 = fA11 + fB1;
@@ -151,7 +151,7 @@ BOOL SphereCollider::SphereTriOverlap(const Point& vert0, const Point& vert1, co
                 }
             }
         }
-        else if (v < 0.0f)  // region 6
+        else if (v < 0.0f) // region 6
         {
             fTmp0 = fA01 + fB1;
             fTmp1 = fA00 + fB0;
@@ -189,7 +189,7 @@ BOOL SphereCollider::SphereTriOverlap(const Point& vert0, const Point& vert1, co
                 }
             }
         }
-        else  // region 1
+        else // region 1
         {
             fNumer = fA11 + fB1 - fA01 - fB0;
             if (fNumer <= 0.0f) {

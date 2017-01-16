@@ -40,7 +40,7 @@ void CGroupHierarchyHolder::update_leader()
             break;
         }
 }
-#endif  // SQUAD_HIERARCHY_HOLDER_USE_LEADER
+#endif // SQUAD_HIERARCHY_HOLDER_USE_LEADER
 
 void CGroupHierarchyHolder::register_in_group(CEntity* member)
 {
@@ -68,7 +68,7 @@ void CGroupHierarchyHolder::register_in_squad(CEntity* member)
         m_leader = member;
         if (!squad().leader()) squad().leader(member);
     }
-#endif  // SQUAD_HIERARCHY_HOLDER_USE_LEADER
+#endif // SQUAD_HIERARCHY_HOLDER_USE_LEADER
 }
 
 void CGroupHierarchyHolder::register_in_agent_manager(CEntity* member)
@@ -112,7 +112,7 @@ void CGroupHierarchyHolder::unregister_in_squad(CEntity* member)
             else
                 squad().update_leader();
     }
-#endif  // SQUAD_HIERARCHY_HOLDER_USE_LEADER
+#endif // SQUAD_HIERARCHY_HOLDER_USE_LEADER
 }
 
 void CGroupHierarchyHolder::unregister_in_agent_manager(CEntity* member)

@@ -485,7 +485,7 @@ MAX_RELEASE_CHECK_RATE   default: 255 unless not HAVE_MMAP
 
 #ifdef DEBUG
 #undef DEBUG
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 
 #define USE_DL_PREFIX
 #define MSPACES 1
@@ -1126,9 +1126,9 @@ typedef void const* out_of_memory_handler_parameter_type;
 typedef void(__stdcall* out_of_memory_handler_type)(mspace, out_of_memory_handler_parameter_type, int);
 mspace create_mspace(
     size_t capacity, int locked, out_of_memory_handler_type handler, out_of_memory_handler_parameter_type parameter);
-#else   // #ifdef USE_OUT_OF_MEMORY_HANDLER
+#else  // #ifdef USE_OUT_OF_MEMORY_HANDLER
 mspace create_mspace(size_t capacity, int locked);
-#endif  // #ifdef USE_OUT_OF_MEMORY_HANDLER
+#endif // #ifdef USE_OUT_OF_MEMORY_HANDLER
 
 /*
   destroy_mspace destroys the given space, and attempts to return all
@@ -1150,9 +1150,9 @@ size_t destroy_mspace(mspace msp);
 #ifdef USE_OUT_OF_MEMORY_HANDLER
 mspace create_mspace_with_base(void* base, size_t capacity, int locked, out_of_memory_handler_type handler,
     out_of_memory_handler_parameter_type parameter);
-#else   // #ifdef USE_OUT_OF_MEMORY_HANDLER
+#else  // #ifdef USE_OUT_OF_MEMORY_HANDLER
 mspace create_mspace_with_base(void* base, size_t capacity, int locked);
-#endif  // #ifdef USE_OUT_OF_MEMORY_HANDLER
+#endif // #ifdef USE_OUT_OF_MEMORY_HANDLER
 
 /*
   mspace_malloc behaves as malloc, but operates within
@@ -1355,7 +1355,7 @@ unsigned char _BitScanReverse(unsigned long* index, unsigned long mask);
 #ifdef XRAY_PLATFORM_WINDOWS_32
 #pragma intrinsic(_BitScanForward)
 #pragma intrinsic(_BitScanReverse)
-#endif  // #ifdef XRAY_PLATFORM_WINDOWS_32
+#endif // #ifdef XRAY_PLATFORM_WINDOWS_32
 
 #endif /* BitScanForward */
 #endif /* defined(_MSC_VER) && _MSC_VER>=1300 */
@@ -1514,7 +1514,7 @@ static FORCEINLINE int win32munmap(void* ptr, size_t size) {
   }
   return 0;
 }
-#endif  // #if 0
+#endif // #if 0
 
 #define MAP_PRIVATE 1
 #define MAP_ANONYMOUS 2
@@ -2401,7 +2401,7 @@ struct malloc_state
 #ifdef USE_OUT_OF_MEMORY_HANDLER
     out_of_memory_handler_type out_of_memory_handler;
     out_of_memory_handler_parameter_type out_of_memory_parameter;
-#endif  // #ifdef USE_OUT_OF_MEMORY_HANDLER
+#endif // #ifdef USE_OUT_OF_MEMORY_HANDLER
 };
 
 typedef struct malloc_state* mstate;
@@ -4898,7 +4898,7 @@ static mstate init_user_mstate(char* tbase, size_t tsize)
 #ifdef USE_OUT_OF_MEMORY_HANDLER
     m->out_of_memory_handler = 0;
     m->out_of_memory_parameter = 0;
-#endif  // #ifdef USE_OUT_OF_MEMORY_HANDLER
+#endif // #ifdef USE_OUT_OF_MEMORY_HANDLER
     m->extp = 0;
     m->exts = 0;
     disable_contiguous(m);
@@ -4912,9 +4912,9 @@ static mstate init_user_mstate(char* tbase, size_t tsize)
 #ifdef USE_OUT_OF_MEMORY_HANDLER
 mspace create_mspace(
     size_t capacity, int locked, out_of_memory_handler_type handler, out_of_memory_handler_parameter_type parameter)
-#else   // #ifdef USE_OUT_OF_MEMORY_HANDLER
+#else  // #ifdef USE_OUT_OF_MEMORY_HANDLER
 mspace create_mspace(size_t capacity, int locked)
-#endif  // #ifdef USE_OUT_OF_MEMORY_HANDLER
+#endif // #ifdef USE_OUT_OF_MEMORY_HANDLER
 {
     mstate m = 0;
     size_t msize = pad_request(sizeof(struct malloc_state));
@@ -4931,7 +4931,7 @@ mspace create_mspace(size_t capacity, int locked)
 #ifdef USE_OUT_OF_MEMORY_HANDLER
             m->out_of_memory_handler = handler;
             m->out_of_memory_parameter = parameter;
-#endif  // #ifdef USE_OUT_OF_MEMORY_HANDLER
+#endif // #ifdef USE_OUT_OF_MEMORY_HANDLER
         }
     }
     return (mspace)m;
@@ -4942,14 +4942,14 @@ void const* out_of_memory_handler_parameter(mspace arena)
 {
     return ((mstate)(arena))->out_of_memory_parameter;
 }
-#endif  // #ifdef USE_OUT_OF_MEMORY_HANDLER
+#endif // #ifdef USE_OUT_OF_MEMORY_HANDLER
 
 #ifdef USE_OUT_OF_MEMORY_HANDLER
 mspace create_mspace_with_base(void* base, size_t capacity, int locked, out_of_memory_handler_type handler,
     out_of_memory_handler_parameter_type parameter)
-#else   // #ifdef USE_OUT_OF_MEMORY_HANDLER
+#else  // #ifdef USE_OUT_OF_MEMORY_HANDLER
 mspace create_mspace_with_base(void* base, size_t capacity, int locked)
-#endif  // #ifdef USE_OUT_OF_MEMORY_HANDLER
+#endif // #ifdef USE_OUT_OF_MEMORY_HANDLER
 {
     mstate m = 0;
     size_t msize = pad_request(sizeof(struct malloc_state));
@@ -4962,7 +4962,7 @@ mspace create_mspace_with_base(void* base, size_t capacity, int locked)
 #ifdef USE_OUT_OF_MEMORY_HANDLER
         m->out_of_memory_handler = handler;
         m->out_of_memory_parameter = parameter;
-#endif  // #ifdef USE_OUT_OF_MEMORY_HANDLER
+#endif // #ifdef USE_OUT_OF_MEMORY_HANDLER
     }
     return (mspace)m;
 }
@@ -5122,9 +5122,9 @@ once_again:
         }
 
         mem = sys_alloc(ms, nb);
-#else   // #ifdef USE_OUT_OF_MEMORY_HANDLER
+#else  // #ifdef USE_OUT_OF_MEMORY_HANDLER
         mem = sys_alloc(ms, nb);
-#endif  // #ifdef USE_OUT_OF_MEMORY_HANDLER
+#endif // #ifdef USE_OUT_OF_MEMORY_HANDLER
     postaction:
         POSTACTION(ms);
         return mem;
@@ -5692,7 +5692,7 @@ unsigned char _BitScanForward(unsigned long* index, unsigned long mask)
 
 unsigned char _BitScanReverse(unsigned long* index, unsigned long mask)
 {
-    mask |= mask >> 1;  // first round down to power of 2
+    mask |= mask >> 1; // first round down to power of 2
     mask |= mask >> 2;
     mask |= mask >> 4;
     mask |= mask >> 8;
@@ -5702,4 +5702,4 @@ unsigned char _BitScanReverse(unsigned long* index, unsigned long mask)
     return (_BitScanForward(index, 1 << MultiplyDeBruijnBitPosition[(mask * 0x077CB531UL) >> 27]));
 }
 
-#endif  // #ifndef XRAY_PLATFORM_WINDOWS_32
+#endif // #ifndef XRAY_PLATFORM_WINDOWS_32

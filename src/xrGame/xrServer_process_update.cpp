@@ -11,7 +11,7 @@ void xrServer::Process_update(NET_Packet& P, ClientID sender)
 
 #ifndef MASTER_GOLD
     if (g_Dump_Update_Read) Msg("---- UPDATE_Read --- ");
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
 
     R_ASSERT(CL->flags.bLocal);
     // while has information
@@ -46,7 +46,7 @@ void xrServer::Process_update(NET_Packet& P, ClientID sender)
     }
 #ifndef MASTER_GOLD
     if (g_Dump_Update_Read) Msg("-------------------- ");
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
 }
 
 void xrServer::Process_save(NET_Packet& P, ClientID sender)

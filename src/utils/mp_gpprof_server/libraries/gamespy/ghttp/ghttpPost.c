@@ -9,8 +9,8 @@ devsupport@gamespy.com
 */
 
 #ifdef XRAY_DISABLE_GAMESPY_WARNINGS
-#pragma warning(disable : 4267)  // lines: 1334, 1344, 1400, 1410
-#endif                           //#ifdef XRAY_DISABLE_GAMESPY_WARNINGS
+#pragma warning(disable : 4267) // lines: 1334, 1344, 1400, 1410
+#endif                          //#ifdef XRAY_DISABLE_GAMESPY_WARNINGS
 
 #include "ghttpPost.h"
 #include "ghttpCommon.h"
@@ -34,7 +34,7 @@ devsupport@gamespy.com
 
 // DIME header settings
 // first byte is a combination of VERSION + first/last/chunked
-#define GHI_DIME_VERSION (0x1 << 3)  // 5th bit (from the left)
+#define GHI_DIME_VERSION (0x1 << 3) // 5th bit (from the left)
 #define GHI_DIMEFLAG_FIRSTRECORD (1 << 2)
 #define GHI_DIMEFLAG_LASTRECORD (1 << 1)
 #define GHI_DIMEFLAG_CHUNKED (1 << 0)
@@ -43,7 +43,7 @@ devsupport@gamespy.com
 #define GHI_DIMETYPE_T_MEDIA (0x1 << 4)
 #define GHI_DIMETYPE_T_URI (0x2 << 4)
 #define GHI_DIMETYPE_T_UNKNOWN (0x3 << 4)
-#define GHI_DIMETYPE_T_EMPTY (0x4 << 4)  // lengths must be set to 0
+#define GHI_DIMETYPE_T_EMPTY (0x4 << 4) // lengths must be set to 0
 
 //#define GHI_DIME_SOAPID "gsi:soap"
 #define GHI_DIME_SOAPID "cid:id0"
@@ -66,10 +66,10 @@ typedef struct GSIDimeHeader
 // POST TYPES.
 //////////////
 typedef enum {
-    GHIString,      // A regular string.
-    GHIFileDisk,    // A file from disk.
-    GHIFileMemory,  // A file from memory.
-    GHIXmlData      // XML Soap. (long string)
+    GHIString,     // A regular string.
+    GHIFileDisk,   // A file from disk.
+    GHIFileMemory, // A file from memory.
+    GHIXmlData     // XML Soap. (long string)
 } GHIPostDataType;
 
 // POST OBJECT.
@@ -472,17 +472,17 @@ static int ghiPostGetNoFilesContentLength(struct GHIConnection* connection)
             total += (int)strlen(data->name);
             total += data->data.string.len;
             total += (data->data.string.extendedChars * 2);
-            total++;  // '='
+            total++; // '='
         }
         else if (data->type == GHIXmlData)
         {
-            GS_ASSERT(foundSoapAlready == 0);  // only support one soap object per request
+            GS_ASSERT(foundSoapAlready == 0); // only support one soap object per request
             foundSoapAlready = 1;
             total += gsXmlWriterGetDataLength(data->data.xml.xml);
         }
     }
 
-    total += (num - 1);  // '&'
+    total += (num - 1); // '&'
 
     GSI_UNUSED(foundSoapAlready);
     return total;
@@ -516,9 +516,9 @@ static int ghiPostGetHasFilesContentLength(struct GHIConnection* connection)
         {
             GS_ASSERT(!post->hasSoap);
             boundaryLen = (int)strlen(GHI_MULTIPART_BOUNDARY_BASE);
-            stringBaseLen = (boundaryLen + 47);  // + name + string
-            fileBaseLen = (boundaryLen + 76);    // + name + filename + content-type + file
-            xmlBaseLen = 0;                      // no boundaries for text/xml type soap
+            stringBaseLen = (boundaryLen + 47); // + name + string
+            fileBaseLen = (boundaryLen + 76);   // + name + filename + content-type + file
+            xmlBaseLen = 0;                     // no boundaries for text/xml type soap
             endLen = (boundaryLen + 4);
         }
     }
@@ -584,8 +584,8 @@ static int ghiPostGetHasFilesContentLength(struct GHIConnection* connection)
         {
             int padBytes = 0;
 
-            GS_ASSERT(foundSoapAlready == 0);  // only one soap envelope per request
-            GS_ASSERT(post->useDIME);          // soap+file = use DIME
+            GS_ASSERT(foundSoapAlready == 0); // only one soap envelope per request
+            GS_ASSERT(post->useDIME);         // soap+file = use DIME
             foundSoapAlready = 1;
             total += xmlBaseLen;
             total += gsXmlWriterGetDataLength(data->data.xml.xml);
@@ -924,7 +924,7 @@ static GHIPostingResult ghiPostXmlStateDoPosting(GHIPostState* state, GHIConnect
         connection->encryptor.mEncryptOnBuffer == GHTTPTrue)
     {
         // Copy to encode buffer before encrypting
-        GS_ASSERT(connection->encodeBuffer.len >= 0);  // there must be a header for this soap data!
+        GS_ASSERT(connection->encodeBuffer.len >= 0); // there must be a header for this soap data!
         if (!ghiAppendDataToBuffer(&connection->encodeBuffer, gsXmlWriterGetData(xml), gsXmlWriterGetDataLength(xml)) ||
             !ghiAppendDataToBuffer(&connection->encodeBuffer, pad, padlen) ||
             !ghiEncryptDataToBuffer(
@@ -1056,7 +1056,7 @@ static GHIPostingResult ghiPostFileMemoryStateDoPosting(GHIPostState* state, GHI
                 return GHIPostingDone;
             }
         } while (rcode);
-        return GHIPostingPosting;  // (rcode == 0) ?
+        return GHIPostingPosting; // (rcode == 0) ?
     }
     else
     {
@@ -1401,7 +1401,7 @@ GHIPostingResult ghiPostDoPosting(struct GHIConnection* connection)
     //   -- for example, when posting string data we don't encrypt until we have the entire string (for efficiency only)
     if (connection->encryptor.mEngine != GHTTPEncryptionEngine_None) {
         if (connection->encodeBuffer.len > 0) {
-            GS_ASSERT(connection->encodeBuffer.pos == 0);  // if you hit this, it means you forgot the clear the buffer
+            GS_ASSERT(connection->encodeBuffer.pos == 0); // if you hit this, it means you forgot the clear the buffer
             if (GHTTPFalse == ghiEncryptDataToBuffer(
                                   &connection->sendBuffer, connection->encodeBuffer.data, connection->encodeBuffer.len))
             {

@@ -24,7 +24,7 @@ typedef enum {
 } ScreenColor;
 
 // can be combined
-#define PRINT_TO_SCREEN 1  // default
+#define PRINT_TO_SCREEN 1 // default
 #define PRINT_TO_DEBUGGER 2
 
 void ScreenInit(void);

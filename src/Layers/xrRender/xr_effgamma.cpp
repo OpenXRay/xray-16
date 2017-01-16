@@ -48,7 +48,7 @@ void CGammaControl::GenLUT(const DXGI_GAMMA_CONTROL_CAPABILITIES& GC, DXGI_GAMMA
     }
 }
 
-#else  //	USE_DX10
+#else //	USE_DX10
 
 IC u16 clr2gamma(float c)
 {
@@ -80,4 +80,4 @@ void CGammaControl::GenLUT(D3DGAMMARAMP& G)
     }
 }
 
-#endif  //	USE_DX10
+#endif //	USE_DX10

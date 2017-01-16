@@ -72,8 +72,8 @@ BOOL SPass::equal(const SPass& other)
     if (ds != other.ds) return FALSE;
     if (cs != other.cs) return FALSE;
 #endif
-#endif                                               //	USE_DX10
-    if (constants != other.constants) return FALSE;  // is this nessesary??? (ps+vs already combines)
+#endif                                              //	USE_DX10
+    if (constants != other.constants) return FALSE; // is this nessesary??? (ps+vs already combines)
 
     if (T != other.T) return FALSE;
     if (C != other.C) return FALSE;

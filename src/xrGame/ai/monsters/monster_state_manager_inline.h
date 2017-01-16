@@ -11,9 +11,9 @@ void CMonsterStateManagerAbstract::reinit()
 }
 
 namespace detail
-{  // helper function implemented in file alife_simulator.cpp
+{ // helper function implemented in file alife_simulator.cpp
 bool object_exists_in_alife_registry(u32 id);
-}  // namespace detail
+} // namespace detail
 
 TEMPLATE_SPECIALIZATION
 void CMonsterStateManagerAbstract::update()

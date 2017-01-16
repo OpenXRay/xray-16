@@ -44,8 +44,8 @@ private:
 
     CInifile m_info_data;
     signer m_signer;
-};  // class writer
+}; // class writer
 
-}  // namespace screenshots
+} // namespace screenshots
 
-#endif  //#ifndef SCREENSHOT_WRITER_INCLUDED
+#endif //#ifndef SCREENSHOT_WRITER_INCLUDED

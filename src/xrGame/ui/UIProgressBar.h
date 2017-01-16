@@ -19,7 +19,7 @@ protected:
         om_count
     } m_orient_mode;
 
-    Fvector2 m_ProgressPos;  // x-current y-dest
+    Fvector2 m_ProgressPos; // x-current y-dest
     float m_MinPos;
     float m_MaxPos;
 
@@ -35,7 +35,7 @@ public:
     Fcolor m_minColor;
     Fcolor m_middleColor;
     Fcolor m_maxColor;
-    float m_inertion;  //
+    float m_inertion; //
 public:
     CUIStatic m_UIProgressItem;
     CUIStatic m_UIBackgroundItem;

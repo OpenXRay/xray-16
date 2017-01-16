@@ -60,7 +60,7 @@ private:
     string128 pass_ds;
     string128 pass_cs;
 #endif
-#endif  //	USE_DX10
+#endif //	USE_DX10
 
     u32 BC(BOOL v) { return v ? 0x01 : 0; }
 public:
@@ -112,7 +112,7 @@ public:
     void Stage_Texture(LPCSTR name, u32 address = D3DTADDRESS_WRAP, u32 fmin = D3DTEXF_LINEAR,
         u32 fmip = D3DTEXF_LINEAR, u32 fmag = D3DTEXF_LINEAR);
     void StageTemplate_LMAP0();
-#endif  //	USE_DX10
+#endif //	USE_DX10
     void Stage_Matrix(LPCSTR name, int UVW_channel);
     void Stage_Constant(LPCSTR name);
     void StageEnd();
@@ -126,7 +126,7 @@ public:
     void i_dx10FilterAnizo(u32 s, BOOL value);
     void i_dx10Filter(u32 s, u32 _min, u32 _mip, u32 _mag);
     void i_dx10BorderColor(u32 s, u32 color);
-#else   //	USE_DX10
+#else  //	USE_DX10
     u32 i_Sampler(LPCSTR name);
     void i_Texture(u32 s, LPCSTR name);
     void i_Projective(u32 s, bool b);
@@ -136,7 +136,7 @@ public:
     void i_Filter_Mag(u32 s, u32 f);
     void i_Filter(u32 s, u32 _min, u32 _mip, u32 _mag);
     void i_BorderColor(u32 s, u32 color);
-#endif  //	USE_DX10
+#endif //	USE_DX10
 
     // R1/R2-compiler	[programmable]		- templates
     void r_Pass(LPCSTR vs, LPCSTR ps, bool bFog, BOOL bZtest = TRUE, BOOL bZwrite = TRUE, BOOL bABlend = FALSE,
@@ -163,7 +163,7 @@ public:
         return r_dx10Texture(ResourceName, texture.c_str());
     };
     u32 r_dx10Sampler(LPCSTR ResourceName);
-#else   //	USE_DX10
+#else  //	USE_DX10
     u32 r_Sampler(LPCSTR name, LPCSTR texture, bool b_ps1x_ProjectiveDivide = false, u32 address = D3DTADDRESS_WRAP,
         u32 fmin = D3DTEXF_LINEAR, u32 fmip = D3DTEXF_LINEAR, u32 fmag = D3DTEXF_LINEAR);
     u32 r_Sampler(LPCSTR name, shared_str texture, bool b_ps1x_ProjectiveDivide = false, u32 address = D3DTADDRESS_WRAP,
@@ -174,7 +174,7 @@ public:
     void r_Sampler_rtf(LPCSTR name, LPCSTR texture, bool b_ps1x_ProjectiveDivide = false);
     void r_Sampler_clf(LPCSTR name, LPCSTR texture, bool b_ps1x_ProjectiveDivide = false);
     void r_Sampler_clw(LPCSTR name, LPCSTR texture, bool b_ps1x_ProjectiveDivide = false);
-#endif  //	USE_DX10
+#endif //	USE_DX10
     void r_ColorWriteEnable(bool cR = true, bool cG = true, bool cB = true, bool cA = true);
     void r_End();
 
@@ -188,4 +188,4 @@ public:
 };
 #pragma pack(pop)
 
-#endif  // !defined(AFX_BLENDER_RECORDER_H__1F549674_8674_4EB2_95E6_E6BC19218A6C__INCLUDED_)
+#endif // !defined(AFX_BLENDER_RECORDER_H__1F549674_8674_4EB2_95E6_E6BC19218A6C__INCLUDED_)

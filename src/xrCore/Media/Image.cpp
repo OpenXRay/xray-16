@@ -46,7 +46,7 @@ void Image::SaveTGA(TWriter& writerFunc, ImageFormat format, bool align)
     R_ASSERT(width);
     R_ASSERT(height);
     TGAHeader hdr = {};
-    hdr.ImageType = 2;  // uncompressed true-color image
+    hdr.ImageType = 2; // uncompressed true-color image
     hdr.Width = width;
     hdr.Height = height;
     int scanLength = width * channelCount;

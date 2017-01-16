@@ -143,7 +143,7 @@ struct Player_Statistic
     u32 m_dwNumRespawned[STAT_TEAM_COUNT];
     u8 m_dwArtefacts[STAT_TEAM_COUNT];
 
-    u32 m_dwSpecialKills[4];  // headshot, backstab, knifekill, eyeshot
+    u32 m_dwSpecialKills[4]; // headshot, backstab, knifekill, eyeshot
 
     u8 m_dwCurrentTeam;
 
@@ -168,8 +168,8 @@ struct Player_Statistic
     void Write(FILE* pFile);
     void WriteLtx(CInifile& ini, LPCSTR sect);
 
-    u32 create_victims_table(victims_table& victims_table);  // retutns size in bytes of table
-    u32 create_bone_table(bone_table& bone_table);           // retutns size in bytes of table
+    u32 create_victims_table(victims_table& victims_table); // retutns size in bytes of table
+    u32 create_bone_table(bone_table& bone_table);          // retutns size in bytes of table
 };
 
 DEF_VECTOR(PLAYERS_STATS, Player_Statistic);

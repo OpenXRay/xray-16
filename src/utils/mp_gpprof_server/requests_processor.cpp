@@ -5,8 +5,8 @@ extern char const* root_path;
 
 static gsi_time const gamespy_think_time = 100;
 static unsigned int wait_train_time_ms = 100;
-static unsigned int profiles_cache_size = 1024 * 1024 * 32;  // 32 Mb
-unsigned int cache_expire_time = 1000 * 60 * 5;              // 5 min
+static unsigned int profiles_cache_size = 1024 * 1024 * 32; // 32 Mb
+unsigned int cache_expire_time = 1000 * 60 * 5;             // 5 min
 
 requests_poll::requests_poll() : m_profiles_cache(profiles_cache_size)
 {

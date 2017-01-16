@@ -151,4 +151,4 @@ editor::property_holder* effect::object()
     return (m_property_holder);
 }
 
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR

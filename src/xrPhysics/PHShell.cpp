@@ -172,7 +172,7 @@ void CPHShell::setMass1(float M)
 void CPHShell::MassAddBox(float mass, const Fvector& full_size)
 {
     dMass m;
-    dMassSetBox(&m, mass, full_size.x, full_size.y, full_size.z);  // mass = m_Shell->getMass()/100.f, full_size (1,1,1)
+    dMassSetBox(&m, mass, full_size.x, full_size.y, full_size.z); // mass = m_Shell->getMass()/100.f, full_size (1,1,1)
     addEquelInertiaToEls(m);
 }
 
@@ -713,7 +713,7 @@ void CPHShell::AddElementRecursive(
     lvis_check = (check_obb_sise(bone_data.get_obb()));
 
     bool* arg_check = vis_check;
-    if (breakable || !root_e)  //.
+    if (breakable || !root_e) //.
     {
         arg_check = &lvis_check;
     }
@@ -723,13 +723,13 @@ void CPHShell::AddElementRecursive(
     }
     /////////////////////////////////////////////////////////////////////
 
-    bool element_added = false;  // set true when if elemen created and added by this call
+    bool element_added = false; // set true when if elemen created and added by this call
     u16 splitter_position = 0;
     u16 fracture_num = u16(-1);
 
-    if (!no_physics_shape(bone_data.get_shape()) || !root_e)  //
+    if (!no_physics_shape(bone_data.get_shape()) || !root_e) //
     {
-        if (joint_data.type == jtRigid && root_e)  //
+        if (joint_data.type == jtRigid && root_e) //
         {
             Fmatrix vs_root_position;
             vs_root_position.set(root_e->mXFORM);
@@ -766,7 +766,7 @@ void CPHShell::AddElementRecursive(
             // B.Callback_Param=root_e;
             // B.Callback=NULL;
         }
-        else  //
+        else //
         {
             E = P_create_Element();
             E->m_SelfID = id;
@@ -845,8 +845,8 @@ void CPHShell::AddElementRecursive(
             CPHFracture& fracture = E->Fracture(fracture_num);
             fracture.m_bone_id = id;
             fracture.m_end_geom_num = E->numberOfGeoms();
-            fracture.m_end_el_num = u16(elements.size());  // just after this el = current+1
-            fracture.m_end_jt_num = u16(joints.size());    // current+1
+            fracture.m_end_el_num = u16(elements.size()); // just after this el = current+1
+            fracture.m_end_jt_num = u16(joints.size());   // current+1
         }
         else
         {
@@ -876,7 +876,7 @@ void CPHShell::AddElementRecursive(
         Log("end-------");
     }
 
-    VERIFY3(bbb, dbg_obj->ObjectNameVisual(), "has breaking parts with no vertexes or size less than 1mm");  //
+    VERIFY3(bbb, dbg_obj->ObjectNameVisual(), "has breaking parts with no vertexes or size less than 1mm"); //
 #endif
 }
 
@@ -1183,7 +1183,7 @@ void CPHShell::PassEndElements(u16 from, u16 to, CPHShell* dest)
     for (ELEMENT_I i = i_from; i != e; ++i)
     {
         dGeomID spaced_geom = (*i)->dSpacedGeometry();
-        if (spaced_geom)  // for active elems
+        if (spaced_geom) // for active elems
         {
             dSpaceRemove(m_space, spaced_geom);
             dSpaceAdd(dest->m_space, spaced_geom);
@@ -1222,8 +1222,8 @@ void CPHShell::DeleteJoint(u16 joint)
 
 void CPHShell::setEndElementSplitter()
 {
-    if (!elements.back()->FracturesHolder())  // adding fracture for element supposed before adding splitter. Need only
-                                              // one splitter for an element
+    if (!elements.back()->FracturesHolder()) // adding fracture for element supposed before adding splitter. Need only
+                                             // one splitter for an element
         AddSplitter(CPHShellSplitter::splElement, u16(elements.size() - 1), u16(joints.size() - 1));
 }
 
@@ -1244,8 +1244,8 @@ void CPHShell::AddSplitter(CPHShellSplitter::EType type, u16 element, u16 joint,
 }
 void CPHShell::setEndJointSplitter()
 {
-    if (!joints.back()->JointDestroyInfo())  // setting joint breacable supposed before adding splitter. Need only one
-                                             // splitter for a joint
+    if (!joints.back()->JointDestroyInfo()) // setting joint breacable supposed before adding splitter. Need only one
+                                            // splitter for a joint
         AddSplitter(CPHShellSplitter::splJoint, u16(elements.size() - 1), u16(joints.size() - 1));
 }
 

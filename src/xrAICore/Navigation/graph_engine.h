@@ -68,7 +68,7 @@ public:
     using StringAlgorithmDistance = float;
     using CStringAlgorithm = CAStar<StringAlgorithmDistance, CStringPriorityQueue, CStringVertexManager,
         CStringVertexAllocator, true, StringAlgorithmStorage>;
-#endif  // AI_COMPILER
+#endif // AI_COMPILER
 
     CAlgorithm* m_algorithm;
 

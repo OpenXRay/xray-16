@@ -277,14 +277,14 @@ void filetransfer_node::calculate_chunk_size(u32 peak_throughput, u32 current_th
 {
     if ((Device.dwTimeGlobal - m_last_chunksize_update_time) < 1000) return;
 
-    if (m_last_peak_throughput < peak_throughput)  // peak throughput is increasing, so we can increase upload size :)
+    if (m_last_peak_throughput < peak_throughput) // peak throughput is increasing, so we can increase upload size :)
     {
         m_chunk_size += data_min_chunk_size;
 #ifdef MP_LOGGING
         Msg("* peak throughout is not reached - increasing upload rate : (m_chunk_size: %d)", m_chunk_size);
 #endif
     }
-    else  // peak is reached
+    else // peak is reached
     {
         if (OnServer()) {
             m_chunk_size = data_max_chunk_size;

@@ -75,7 +75,7 @@ private:
 #ifdef USE_HEAD_BONE_PART_FAKE
 private:
     u32 m_script_bone_part_mask;
-#endif  // USE_HEAD_BONE_PART_FAKE
+#endif // USE_HEAD_BONE_PART_FAKE
 
 private:
     float m_previous_speed;
@@ -109,7 +109,7 @@ public:
             m_blend = 0;
             m_forward = false;
         }
-    };  // struct callback_params
+    }; // struct callback_params
 
 private:
     callback_params m_spine_params;
@@ -217,7 +217,7 @@ private:
 
 public:
     void add_animation_stats();
-#endif  // DEBUG
+#endif // DEBUG
 
 public:
     IC AnimationSelector const& global_selector() const;

@@ -136,7 +136,7 @@ void MultipacketSender::_FlushSendBuffer(u32 timeout, Buffer* buf)
 #if NET_LOG_PACKETS
         Msg("#send %smulti-packet %u    flags= %08X", (buf->last_flags & DPNSEND_IMMEDIATELLY) ? "IMMEDIATE " : "",
             buf->buffer.B.count, buf->last_flags);
-#endif  // NET_LOG_PACKETS
+#endif // NET_LOG_PACKETS
 
         if (strstr(Core.Params, "-dump_traffic")) {
             static bool first_time = true;
@@ -158,7 +158,7 @@ void MultipacketSender::_FlushSendBuffer(u32 timeout, Buffer* buf)
 
         _SendTo_LL(packet_data, comp_sz + sizeof(MultipacketHeader), buf->last_flags, timeout);
         buf->buffer.B.count = 0;
-    }  // if buffer not empty
+    } // if buffer not empty
 }
 
 //------------------------------------------------------------------------------

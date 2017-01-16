@@ -56,11 +56,11 @@ bool MNormalMapConverter::convertToNormalMap_InPlace(unsigned char* inImagePtr, 
     bool isOK = true;
 
     if (outputPixelFormat == RGBA) {
-        bumpScale /= 255.0f;  // will be used on unsignedChar
+        bumpScale /= 255.0f; // will be used on unsignedChar
 
         unsigned int widthMinus1 = width - 1;
         unsigned int heightMinus1 = height - 1;
-        unsigned int offset = (4 * width);  // = sizeof(rgba) * width
+        unsigned int offset = (4 * width); // = sizeof(rgba) * width
 
         // ==================
         // Process the texels

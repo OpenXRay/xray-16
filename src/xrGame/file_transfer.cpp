@@ -44,7 +44,7 @@ server_site::~server_site()
 }
 
 void server_site::stop_transfer_sessions(
-    buffer_vector<dst_src_pair_t> const& tsessions)  // notifies sending_rejected_by_peer
+    buffer_vector<dst_src_pair_t> const& tsessions) // notifies sending_rejected_by_peer
 {
     for (buffer_vector<dst_src_pair_t>::const_iterator i = tsessions.begin(), ie = tsessions.end(); i != ie; ++i)
     {
@@ -52,7 +52,7 @@ void server_site::stop_transfer_sessions(
     }
 }
 
-void server_site::stop_receiving_sessions(buffer_vector<ClientID> const& rsessions)  // notifies receiving_timeout
+void server_site::stop_receiving_sessions(buffer_vector<ClientID> const& rsessions) // notifies receiving_timeout
 {
     for (buffer_vector<ClientID>::const_iterator i = rsessions.begin(), ie = rsessions.end(); i != ie; ++i)
     {
@@ -69,7 +69,7 @@ void server_site::update_transfer()
 
     for (transfer_sessions_t::iterator ti = m_transfers.begin(), tie = m_transfers.end(); ti != tie; ++ti)
     {
-        IClient* tmp_client = Level().Server->GetClientByID(ti->first.first);  // dst
+        IClient* tmp_client = Level().Server->GetClientByID(ti->first.first); // dst
         if (!tmp_client) {
             Msg("! ERROR: SV: client [%u] not found for transfering file", ti->first);
             to_stop_transfers.push_back(ti->first);
@@ -85,7 +85,7 @@ void server_site::update_transfer()
         NET_Packet tmp_packet;
         tmp_packet.w_begin(M_FILE_TRANSFER);
         tmp_packet.w_u8(receive_data);
-        tmp_packet.w_u32(ti->first.second.value());  // src
+        tmp_packet.w_u32(ti->first.second.value()); // src
         bool complete = tmp_ftnode->make_data_packet(tmp_packet);
         Level().Server->SendTo(tmp_client->ID, tmp_packet, net_flags(TRUE, TRUE, TRUE));
         if (complete) {
@@ -561,4 +561,4 @@ void client_site::dbg_update_statgraph()
 }
 #endif
 
-}  // namespace file_transfer
+} // namespace file_transfer

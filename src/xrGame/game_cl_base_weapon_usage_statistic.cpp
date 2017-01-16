@@ -36,7 +36,7 @@ void HitData::net_save(NET_Packet* P, victims_table const& vt, bone_table const&
 {
     P->w_vec3(Pos0);
     P->w_vec3(Pos1);
-    P->w_u8(vt.get_id_by_name(TargetName));  // P->w_stringZ(TargetName);
+    P->w_u8(vt.get_id_by_name(TargetName)); // P->w_stringZ(TargetName);
     // P->w_stringZ(BoneName);
     P->w_s16(BoneID);
     P->w_u8(Deadly ? 1 : 0);
@@ -46,9 +46,9 @@ void HitData::net_load(NET_Packet* P, victims_table const& vt, bone_table const&
 {
     P->r_vec3(Pos0);
     P->r_vec3(Pos1);
-    TargetName = vt.get_name_by_id(P->r_u8());  // P->r_stringZ(TargetName);
+    TargetName = vt.get_name_by_id(P->r_u8()); // P->r_stringZ(TargetName);
     P->r_s16(BoneID);
-    BoneName = bt.get_name_by_id(BoneID);  // P->r_stringZ(BoneName);
+    BoneName = bt.get_name_by_id(BoneID); // P->r_stringZ(BoneName);
     Deadly = !!P->r_u8();
     count = P->r_u8();
     Completed = true;
@@ -82,7 +82,7 @@ void Weapon_Statistic::net_save(NET_Packet* P, victims_table const& vt, bone_tab
         victims_table const& vtable;
         bone_table const& btable;
 
-        CompleteFilter& operator=(CompleteFilter& copy) { return *this; };  // C4512
+        CompleteFilter& operator=(CompleteFilter& copy) { return *this; }; // C4512
     public:
         CompleteFilter(u32& hits_count_result, NET_Packet* P, victims_table const& vt, bone_table const& bt)
             : complete_hits_count(hits_count_result), packet_to_write(P), vtable(vt), btable(bt){};
@@ -109,7 +109,7 @@ void Weapon_Statistic::net_save(NET_Packet* P, victims_table const& vt, bone_tab
 
     u32 hit_count_position = P->w_tell();
     u32 complete_hits = 0;
-    P->w_u32(0);  // <- complete_hits_count
+    P->w_u32(0); // <- complete_hits_count
 
     // P->w_u16(m_explosion_kills);
     // P->w_u16(m_bleed_kills);
@@ -364,10 +364,10 @@ WeaponUsageStatistic::WeaponUsageStatistic()
     : m_mutex(MUTEX_PROFILE_ID(WeaponUsageStatistic))
 {
 }
-#endif  // CONFIG_PROFILE_LOCKS
+#endif // CONFIG_PROFILE_LOCKS
 {
     Clear();
-    m_dwUpdateTimeDelta = 30000;  // 30 seconds
+    m_dwUpdateTimeDelta = 30000; // 30 seconds
     m_bCollectStatistic = false;
 };
 
@@ -407,7 +407,7 @@ PLAYERS_STATS_it WeaponUsageStatistic::FindPlayer(LPCSTR PlayerName)
     if (!GetPlayer(PlayerName, pPlayerI)) {
 #ifdef DEBUG
         Msg("--- Adding new player [%s] to statistics", PlayerName);
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
         aPlayersStatistic.push_back(Player_Statistic(PlayerName));
         pPlayerI = aPlayersStatistic.end() - 1;
     };
@@ -432,7 +432,7 @@ WEAPON_STATS_it Player_Statistic::FindPlayersWeapon(LPCSTR WeaponName)
         pWeaponI->InvName = pSettings->r_string_wb(WeaponName, "inv_name");
 #ifdef DEBUG
         Msg("--- Just added weapon %s to statistics", WeaponName);
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
     }
     return pWeaponI;
 };
@@ -903,7 +903,7 @@ void WeaponUsageStatistic::SVUpdateAliveTimes()
 void WeaponUsageStatistic::Update()
 {
     if (!CollectData()) return;
-    SVUpdateAliveTimes();  // update client alive time and servers total alive times
+    SVUpdateAliveTimes(); // update client alive time and servers total alive times
     if (!OnServer()) return;
     if (Level().timeServer() > (m_dwLastUpdateTime + m_dwUpdateTimeDelta)) {
         //---------------------------------------------
