@@ -14,10 +14,7 @@ private:
         ISheduled* Object;
         u32 dwPadding; // for align-issues
 
-        IC bool operator < (Item& I)
-        {
-            return dwTimeForExecute > I.dwTimeForExecute;
-        }
+        IC bool operator<(Item& I) { return dwTimeForExecute > I.dwTimeForExecute; }
     };
     struct ItemReg
     {
@@ -25,14 +22,13 @@ private:
         BOOL RT;
         ISheduled* Object;
     };
-    
+
     struct SchedulerStatistics
     {
         float Load;
         CStatTimer Update;
 
         SchedulerStatistics() { FrameStart(); }
-
         void FrameStart()
         {
             Load = 0.0f;
@@ -41,6 +37,7 @@ private:
 
         void FrameEnd() { Update.FrameEnd(); }
     };
+
 private:
     xr_vector<Item> ItemsRT;
     xr_vector<Item> Items;
@@ -52,16 +49,15 @@ private:
 
     IC void Push(Item& I);
     IC void Pop();
-    IC Item& Top()
-    {
-        return Items.front();
-    }
+    IC Item& Top() { return Items.front(); }
     void internal_Register(ISheduled* A, BOOL RT = FALSE);
     bool internal_Unregister(ISheduled* A, BOOL RT, bool warn_on_not_found = true);
     void internal_Registration();
+
 public:
     u64 cycles_start;
     u64 cycles_limit;
+
 public:
     void ProcessStep();
     void Process();
@@ -76,8 +72,8 @@ public:
 
     void Initialize();
     void Destroy();
-    void DumpStatistics(class IGameFont &font, class IPerformanceAlert *alert);
-    const CStatTimer &GetUpdateTime()
+    void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert);
+    const CStatTimer& GetUpdateTime()
     {
         stats.FrameEnd();
         return stats.Update;

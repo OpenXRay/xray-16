@@ -5,7 +5,6 @@ namespace compression
 {
 namespace ppmd
 {
-
 class stream
 {
 private:

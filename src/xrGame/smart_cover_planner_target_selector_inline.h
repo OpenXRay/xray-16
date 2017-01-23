@@ -8,11 +8,11 @@
 #ifndef SMART_COVER_PLANNER_TARGET_SELECTOR_INLINE_H_INCLUDED
 #define SMART_COVER_PLANNER_TARGET_SELECTOR_INLINE_H_INCLUDED
 
-namespace smart_cover {
-
-IC target_selector::callback_type const& target_selector::callback	() const
+namespace smart_cover
 {
-	return	(m_script_callback);
+IC target_selector::callback_type const& target_selector::callback() const
+{
+    return (m_script_callback);
 }
 
 } // namespace smart_cover

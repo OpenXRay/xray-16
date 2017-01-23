@@ -19,12 +19,12 @@ programs that, for example, read scene or object files and must store
 the envelopes.
 ====================================================================== */
 
-#define SHAPE_TCB   0
-#define SHAPE_HERM  1
-#define SHAPE_BEZI  2
-#define SHAPE_LINE  3
-#define SHAPE_STEP  4
-#define SHAPE_BEZ2  5
+#define SHAPE_TCB 0
+#define SHAPE_HERM 1
+#define SHAPE_BEZI 2
+#define SHAPE_LINE 3
+#define SHAPE_STEP 4
+#define SHAPE_BEZ2 5
 
 #define BEH_RESET 0
 #define BEH_CONSTANT 1
@@ -33,8 +33,7 @@ the envelopes.
 #define BEH_OFFSET 4
 #define BEH_LINEAR 5
 
-
-#pragma pack( push,1 )
+#pragma pack(push, 1)
 struct st_Key
 {
     enum
@@ -67,7 +66,7 @@ struct st_Key
         F.w_float(value);
         F.w_float(time);
         F.w_u8(shape);
-        if (shape != 4)  // ! Stepped
+        if (shape != 4) // ! Stepped
         {
             F.w_float_q16(tension, -32.f, 32.f);
             F.w_float_q16(continuity, -32.f, 32.f);
@@ -93,7 +92,7 @@ struct st_Key
         value = F.r_float();
         time = F.r_float();
         shape = F.r_u8();
-        if (shape != 4)  // ! Stepped
+        if (shape != 4) // ! Stepped
         {
             tension = F.r_float_q16(-32.f, 32.f);
             continuity = F.r_float_q16(-32.f, 32.f);
@@ -105,7 +104,7 @@ struct st_Key
         }
     }
 };
-#pragma pack( pop )
+#pragma pack(pop)
 
 DEFINE_VECTOR(st_Key*, KeyVec, KeyIt);
 
@@ -117,8 +116,13 @@ class XRCORE_API CEnvelope
 public:
     KeyVec keys;
     int behavior[2];
+
 public:
-    CEnvelope() { behavior[0] = 1; behavior[1] = 1; }
+    CEnvelope()
+    {
+        behavior[0] = 1;
+        behavior[1] = 1;
+    }
     CEnvelope(CEnvelope* source);
     virtual ~CEnvelope();
 

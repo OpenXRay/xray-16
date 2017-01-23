@@ -16,26 +16,21 @@
 
 namespace editor
 {
-
 class property_holder_collection;
 
 namespace environment
 {
 namespace thunderbolts
 {
-
 class manager;
 
-class thunderbolt_id :
-    public editor::property_holder_holder,
-    private Noncopyable
+class thunderbolt_id : public editor::property_holder_holder, private Noncopyable
 {
 public:
     thunderbolt_id(manager const& manager, shared_str const& thunderbolt);
     virtual ~thunderbolt_id();
     void fill(editor::property_holder_collection* collection);
     inline LPCSTR id() const { return m_id.c_str(); }
-
 private:
     typedef editor::property_holder property_holder_type;
 

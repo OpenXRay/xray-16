@@ -12,6 +12,8 @@
 
 typedef GraphEngineSpace::CWorldProperty CScriptWorldProperty;
 
-class CScriptWorldPropertyWrapper {};
+class CScriptWorldPropertyWrapper
+{
+};
 
 #include "xrAICore/Components/script_world_property_inline.h"

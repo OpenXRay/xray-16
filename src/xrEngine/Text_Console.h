@@ -1,6 +1,6 @@
 #pragma once
-#include "XR_IOConsole.h"
 #include "IGame_Level.h"
+#include "XR_IOConsole.h"
 
 class ENGINE_API CTextConsole : public CConsole
 {
@@ -43,13 +43,13 @@ public:
     virtual void Destroy();
 
     virtual void OnRender();
-    virtual void  OnFrame();
+    virtual void OnFrame();
 
     // virtual void IR_OnKeyboardPress (int dik);
 
     void AddString(LPCSTR string);
     void OnPaint();
 
-};// class TextConsole
+}; // class TextConsole
 
-//extern ENGINE_API CTextConsole* TextConsole;
+// extern ENGINE_API CTextConsole* TextConsole;

@@ -21,8 +21,8 @@ called inside the process space.  Any version of DBGHELP.DLL from WinDBG
 ----------------------------------------------------------------------*/
 #pragma once
 
-#include <windows.h>
 #include <DbgHelp.h>
+#include <windows.h>
 
 /*//////////////////////////////////////////////////////////////////////
                          Typedefs and Structures
@@ -65,8 +65,10 @@ RETURNS         :
     FALSE - Mini dump functions are not available.
     TRUE  - Mini dump functions are there.
 ----------------------------------------------------------------------*/
-WriteMiniDumpResult __stdcall WriteMiniDumpA(MINIDUMP_TYPE eType, char* szFileName, DWORD dwThread, EXCEPTION_POINTERS* pExceptInfo);
-WriteMiniDumpResult __stdcall WriteMiniDumpW(MINIDUMP_TYPE eType, wchar_t* szFileName, DWORD dwThread, EXCEPTION_POINTERS* pExceptInfo);
+WriteMiniDumpResult __stdcall WriteMiniDumpA(
+    MINIDUMP_TYPE eType, char* szFileName, DWORD dwThread, EXCEPTION_POINTERS* pExceptInfo);
+WriteMiniDumpResult __stdcall WriteMiniDumpW(
+    MINIDUMP_TYPE eType, wchar_t* szFileName, DWORD dwThread, EXCEPTION_POINTERS* pExceptInfo);
 
 #ifdef UNICODE
 #define WriteMiniDump WriteMiniDumpW

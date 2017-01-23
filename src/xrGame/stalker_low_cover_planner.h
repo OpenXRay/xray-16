@@ -13,21 +13,22 @@
 
 class CAI_Stalker;
 
-class stalker_low_cover_planner : public CActionPlannerActionScript<CAI_Stalker> {
+class stalker_low_cover_planner : public CActionPlannerActionScript<CAI_Stalker>
+{
 private:
-	typedef CActionPlannerActionScript<CAI_Stalker>	inherited;
+    typedef CActionPlannerActionScript<CAI_Stalker> inherited;
 
 private:
-			void	add_evaluators				();
-			void	add_actions					();
+    void add_evaluators();
+    void add_actions();
 
 public:
-					stalker_low_cover_planner	(CAI_Stalker *object = 0, LPCSTR action_name = "");
-	virtual	void	setup						(CAI_Stalker *object, CPropertyStorage *storage);
-	virtual void	update						();
-	virtual void	initialize					();
-	virtual void	execute						();
-	virtual void	finalize					();
+    stalker_low_cover_planner(CAI_Stalker* object = 0, LPCSTR action_name = "");
+    virtual void setup(CAI_Stalker* object, CPropertyStorage* storage);
+    virtual void update();
+    virtual void initialize();
+    virtual void execute();
+    virtual void finalize();
 };
 
 #endif // STALKER_LOW_COVER_PLANNER_H_INCLUDED

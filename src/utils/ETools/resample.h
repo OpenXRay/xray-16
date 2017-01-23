@@ -1,6 +1,6 @@
 /* This program is licensed under the GNU Library General Public License,
  * version 2, a copy of which is included with this program (LICENCE.LGPL).
- *   
+ *
  * (c) 2002 Simon Hosie <gumboot@clear.net.nz>
  *
  *
@@ -24,25 +24,24 @@ typedef float SAMPLE;
 
 typedef struct
 {
-	unsigned int channels, infreq, outfreq, taps;
-	float *table;
-	SAMPLE *pool;
+    unsigned int channels, infreq, outfreq, taps;
+    float* table;
+    SAMPLE* pool;
 
-	/* dynamic bits */
-	int poolfill;
-	int offset;
+    /* dynamic bits */
+    int poolfill;
+    int offset;
 } res_state;
 
-typedef enum
-{
-	RES_END,
-	RES_GAIN,	/* (double)1.0 */
-	RES_CUTOFF,	/* (double)0.80 */ 
-	RES_TAPS,	/* (int)45 */
-	RES_BETA	/* (double)16.0 */
+typedef enum {
+    RES_END,
+    RES_GAIN,   /* (double)1.0 */
+    RES_CUTOFF, /* (double)0.80 */
+    RES_TAPS,   /* (int)45 */
+    RES_BETA    /* (double)16.0 */
 } res_parameter;
 
-int res_init(res_state *state, int channels, int outfreq, int infreq, res_parameter op1, ...);
+int res_init(res_state* state, int channels, int outfreq, int infreq, res_parameter op1, ...);
 /*
  * Configure *state to manage a data stream with the specified parameters.  The
  * string 'params' is currently unspecified, but will configure the parameters
@@ -57,24 +56,21 @@ int res_init(res_state *state, int channels, int outfreq, int infreq, res_parame
  * functionality will be mirrored across as many channels as specified here.
  */
 
-
-int res_push_max_input(res_state const *state, size_t maxoutput);
+int res_push_max_input(res_state const* state, size_t maxoutput);
 /*
  *  Returns the maximum number of input elements that may be provided without
  *  risk of flooding an output buffer of size maxoutput.  maxoutput is
  *  specified in counts of elements, NOT in bytes.
  */
 
-
-int res_push_check(res_state const *state, size_t srclen);
+int res_push_check(res_state const* state, size_t srclen);
 /*
  * Returns the number of elements that will be returned if the given srclen
  * is used in the next call to res_push().
  */
 
-
-int res_push(res_state *state, SAMPLE **dstlist, SAMPLE const **srclist, size_t srclen);
-int res_push_interleaved(res_state *state, SAMPLE *dest, SAMPLE const *source, size_t srclen);
+int res_push(res_state* state, SAMPLE** dstlist, SAMPLE const** srclist, size_t srclen);
+int res_push_interleaved(res_state* state, SAMPLE* dest, SAMPLE const* source, size_t srclen);
 /*
  * Pushes srclen samples into the front end of the filter, and returns the
  * number of resulting samples.
@@ -86,9 +82,8 @@ int res_push_interleaved(res_state *state, SAMPLE *dest, SAMPLE const *source, s
  * interleaved samples.
  */
 
-
-int res_drain(res_state *state, SAMPLE **dstlist);
-int res_drain_interleaved(res_state *state, SAMPLE *dest);
+int res_drain(res_state* state, SAMPLE** dstlist);
+int res_drain_interleaved(res_state* state, SAMPLE* dest);
 /*
  * Recover the remaining elements by flushing the internal pool with 0 values,
  * and storing the resulting samples.
@@ -97,11 +92,9 @@ int res_drain_interleaved(res_state *state, SAMPLE *dest);
  * final call to res_clear().
  */
 
-
-void res_clear(res_state *state);
+void res_clear(res_state* state);
 /*
  * Free allocated buffers, etc.
  */
 
 #endif
-

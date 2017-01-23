@@ -1,5 +1,5 @@
-#include "stdafx.h"
 #include "Render.h"
+#include "stdafx.h"
 
 void CRenderDevice::overdrawBegin()
 {

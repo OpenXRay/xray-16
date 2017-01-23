@@ -4,11 +4,5 @@
 
 using namespace luabind;
 
-SCRIPT_EXPORT(CTushkano, (CGameObject),
-{
-	module(luaState)
-	[
-		class_<CTushkano,CGameObject>("CTushkano")
-		.def(constructor<>())
-	];
-});
+SCRIPT_EXPORT(
+    CTushkano, (CGameObject), { module(luaState)[class_<CTushkano, CGameObject>("CTushkano").def(constructor<>())]; });

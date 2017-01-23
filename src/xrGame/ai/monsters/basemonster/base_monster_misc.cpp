@@ -6,42 +6,37 @@
 //	Description : Miscellanious functions for all the biting monsters
 ////////////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
-#include "base_monster.h"
 #include "EntityCondition.h"
+#include "base_monster.h"
+#include "stdafx.h"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Входные воздействия 
+// Входные воздействия
 // Зрение, слух, вероятность победы, выгодность противника
 void CBaseMonster::UpdateMemory()
 {
-	// Обновить память
-	EnemyMemory.update			();
-	SoundMemory.UpdateHearing	();	
-	CorpseMemory.update			();
-	HitMemory.update			();
-	
-	// обновить менеджеры врагов и трупов
-	EnemyMan.update				();	
-	CorpseMan.update			();
-		
-	// remove hit info from objects that are corpses
-	
+    // Обновить память
+    EnemyMemory.update();
+    SoundMemory.UpdateHearing();
+    CorpseMemory.update();
+    HitMemory.update();
 
-	hear_dangerous_sound = hear_interesting_sound = false;
-	SoundElem se;
-	
-	if (SoundMemory.IsRememberSound()) {
-		SoundMemory.GetSound(se,hear_dangerous_sound);
-		hear_interesting_sound = !hear_dangerous_sound;
-	}
+    // обновить менеджеры врагов и трупов
+    EnemyMan.update();
+    CorpseMan.update();
 
-	// Setup is own additional flags
-	m_bDamaged		= ((conditions().GetHealth() < db().m_fDamagedThreshold) ? true : false);
-	
-	m_bAggressive	=	hear_dangerous_sound || (EnemyMan.get_enemies_count() > 0) || 
-						HitMemory.is_hit();
+    // remove hit info from objects that are corpses
 
+    hear_dangerous_sound = hear_interesting_sound = false;
+    SoundElem se;
+
+    if (SoundMemory.IsRememberSound()) {
+        SoundMemory.GetSound(se, hear_dangerous_sound);
+        hear_interesting_sound = !hear_dangerous_sound;
+    }
+
+    // Setup is own additional flags
+    m_bDamaged = ((conditions().GetHealth() < db().m_fDamagedThreshold) ? true : false);
+
+    m_bAggressive = hear_dangerous_sound || (EnemyMan.get_enemies_count() > 0) || HitMemory.is_hit();
 }
-
-

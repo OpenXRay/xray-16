@@ -16,13 +16,10 @@ ScheduledBase::ScheduledBase()
 extern BOOL g_bSheduleInProgress;
 ScheduledBase::~ScheduledBase()
 {
-    VERIFY2(
-        !Engine.Sheduler.Registered(this),
-        make_string("0x%08x : %s", this, *shedule_Name())
-        );
+    VERIFY2(!Engine.Sheduler.Registered(this), make_string("0x%08x : %s", this, *shedule_Name()));
 
-    // sad, but true
-    // we need this to become MASTER_GOLD
+// sad, but true
+// we need this to become MASTER_GOLD
 #ifndef DEBUG
     Engine.Sheduler.Unregister(this);
 #endif // DEBUG
@@ -41,10 +38,9 @@ void ScheduledBase::shedule_unregister()
 void ScheduledBase::shedule_Update(u32 dt)
 {
 #ifdef DEBUG
-    if (shedule.dbg_startframe == shedule.dbg_update_shedule)
-    {
+    if (shedule.dbg_startframe == shedule.dbg_update_shedule) {
         LPCSTR name = "unknown";
-        IGameObject* O = dynamic_cast<IGameObject*> (this);
+        IGameObject* O = dynamic_cast<IGameObject*>(this);
         if (O) name = *O->cName();
         xrDebug::Fatal(DEBUG_INFO, "'shedule_Update' called twice per frame for %s", name);
     }

@@ -4,11 +4,11 @@
 
 #include <OpenAutomate.h>
 
-//struct oaOptionDependencyStruct;
-//typedef struct oaOptionDependencyStruct oaOptionDependency;
+// struct oaOptionDependencyStruct;
+// typedef struct oaOptionDependencyStruct oaOptionDependency;
 
-//struct oaNamedOptionStruct;
-//typedef struct oaNamedOptionStruct oaNamedOption;
+// struct oaNamedOptionStruct;
+// typedef struct oaNamedOptionStruct oaNamedOption;
 
 class ENGINE_API xrSASH
 {
@@ -22,7 +22,6 @@ public:
 
     bool IsRunning() { return m_bRunning; }
     bool IsBenchmarkRunning() { return m_bBenchmarkRunning; }
-
     // Event handlers
     void StartBenchmark();
     void DisplayFrame(float t);
@@ -52,8 +51,7 @@ private:
 
     // OA option handling
     void DescribeOption(char* pszOptionName, const oaOptionDependency& Dependency);
-    oaOptionDataType
-    GetOptionType(char* pszOptionName);
+    oaOptionDataType GetOptionType(char* pszOptionName);
     void GetOption(char* pszOptionName);
     void SetOption(oaNamedOption* pOption);
 

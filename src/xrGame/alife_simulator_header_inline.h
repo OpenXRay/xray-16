@@ -8,12 +8,11 @@
 
 #pragma once
 
-IC	CALifeSimulatorHeader::CALifeSimulatorHeader(LPCSTR	section) :
-	m_version	(ALIFE_VERSION)
+IC CALifeSimulatorHeader::CALifeSimulatorHeader(LPCSTR section) : m_version(ALIFE_VERSION)
 {
 }
 
-IC	u32 CALifeSimulatorHeader::version			() const
+IC u32 CALifeSimulatorHeader::version() const
 {
-	return		(m_version);
+    return (m_version);
 }

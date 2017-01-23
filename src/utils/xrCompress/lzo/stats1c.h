@@ -24,20 +24,18 @@
    <markus@oberhumer.com>
  */
 
-
 /* WARNING: this file should *not* be used by applications. It is
    part of the implementation of the library and is subject
    to change.
  */
 
-
 #ifndef __LZO_STATS1C_H
 #define __LZO_STATS1C_H
 
-#define lzo1b_stats_t		lzo1c_stats_t
-#define lzo1b_stats			lzo1c_stats
-#define _lzo1b_stats_init	_lzo1c_stats_init
-#define _lzo1b_stats_calc	_lzo1c_stats_calc
+#define lzo1b_stats_t lzo1c_stats_t
+#define lzo1b_stats lzo1c_stats
+#define _lzo1b_stats_init _lzo1c_stats_init
+#define _lzo1b_stats_calc _lzo1c_stats_calc
 
 #include "stats1b.h"
 

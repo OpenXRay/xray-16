@@ -6,7 +6,7 @@
 #define ThunderboltH
 #pragma once
 
-//refs
+// refs
 class ENGINE_API IRender_DetailModel;
 class ENGINE_API CLAItem;
 
@@ -16,9 +16,9 @@ class ENGINE_API CLAItem;
 #include "Include/xrRender/ThunderboltRender.h"
 
 #ifdef INGAME_EDITOR
-# define INGAME_EDITOR_VIRTUAL virtual
+#define INGAME_EDITOR_VIRTUAL virtual
 #else // #ifdef INGAME_EDITOR
-# define INGAME_EDITOR_VIRTUAL
+#define INGAME_EDITOR_VIRTUAL
 #endif // #ifdef INGAME_EDITOR
 
 class CEnvironment;
@@ -26,7 +26,7 @@ class CEnvironment;
 struct SThunderboltDesc
 {
     // geom
-    //IRender_DetailModel* l_model;
+    // IRender_DetailModel* l_model;
     FactoryPtr<IThunderboltDescRender> m_pRender;
     // sound
     ref_sound snd;
@@ -37,14 +37,19 @@ struct SThunderboltDesc
         Fvector2 fRadius;
         shared_str texture;
         shared_str shader;
-        //ref_shader hShader;
+        // ref_shader hShader;
         FactoryPtr<IFlareRender> m_pFlare;
-        SFlare() { fOpacity = 0; fRadius.set(0.f, 0.f); }
+        SFlare()
+        {
+            fOpacity = 0;
+            fRadius.set(0.f, 0.f);
+        }
     };
     SFlare* m_GradientTop;
     SFlare* m_GradientCenter;
     shared_str name;
     CLAItem* color_anim;
+
 public:
     SThunderboltDesc();
     INGAME_EDITOR_VIRTUAL ~SThunderboltDesc();
@@ -60,11 +65,16 @@ struct SThunderboltCollection
     DEFINE_VECTOR(SThunderboltDesc*, DescVec, DescIt);
     DescVec palette;
     shared_str section;
+
 public:
     SThunderboltCollection();
     ~SThunderboltCollection();
     void load(CInifile* pIni, CInifile* thunderbolts, LPCSTR sect);
-    SThunderboltDesc* GetRandomDesc() { VERIFY(palette.size() > 0); return palette[Random.randI(palette.size())]; }
+    SThunderboltDesc* GetRandomDesc()
+    {
+        VERIFY(palette.size() > 0);
+        return palette[Random.randI(palette.size())];
+    }
 };
 
 #define THUNDERBOLT_CACHE_SIZE 8
@@ -72,16 +82,18 @@ public:
 class ENGINE_API CEffect_Thunderbolt
 {
     friend class dxThunderboltRender;
+
 protected:
     DEFINE_VECTOR(SThunderboltCollection*, CollectionVec, CollectionVecIt);
     CollectionVec collection;
     SThunderboltDesc* current;
+
 private:
     Fmatrix current_xform;
     Fvector3 current_direction;
 
     FactoryPtr<IThunderboltRender> m_pRender;
-    //ref_geom hGeom_model;
+    // ref_geom hGeom_model;
     // states
     enum EState
     {
@@ -90,7 +102,7 @@ private:
     };
     EState state;
 
-    //ref_geom hGeom_gradient;
+    // ref_geom hGeom_gradient;
 
     Fvector lightning_center;
     float lightning_size;
@@ -113,6 +125,7 @@ private:
 private:
     BOOL RayPick(const Fvector& s, const Fvector& d, float& range);
     void Bolt(shared_str id, float period, float life_time);
+
 public:
     CEffect_Thunderbolt();
     ~CEffect_Thunderbolt();
@@ -123,4 +136,4 @@ public:
     shared_str AppendDef(CEnvironment& environment, CInifile* pIni, CInifile* thunderbolts, LPCSTR sect);
 };
 
-#endif //ThunderboltH
+#endif // ThunderboltH

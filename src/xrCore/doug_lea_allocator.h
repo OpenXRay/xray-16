@@ -17,17 +17,16 @@ public:
     void free_impl(void*& pointer);
     u32 get_allocated_size() const;
     inline LPCSTR get_arena_id() const { return m_arena_id; }
-
     template <typename T>
     inline void free_impl(T*& pointer)
     {
         free_impl(reinterpret_cast<void*&>(pointer));
     }
 
-    template < typename T >
+    template <typename T>
     inline T* alloc_impl(u32 const count)
     {
-        return (T*)malloc_impl(count*sizeof(T));
+        return (T*)malloc_impl(count * sizeof(T));
     }
 
 private:

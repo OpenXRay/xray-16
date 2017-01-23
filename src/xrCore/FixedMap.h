@@ -2,19 +2,20 @@
 #define _FIXEDMAP_H
 #pragma once
 
-template<class K, class T, class allocator = xr_allocator>
+template <class K, class T, class allocator = xr_allocator>
 class FixedMAP
 {
     enum
     {
         SG_REALLOC_ADVANCE = 64
     };
+
 public:
     struct TNode
     {
         K key;
         T val;
-        TNode* left, *right;
+        TNode *left, *right;
     };
     typedef void __fastcall callback(TNode*);
     typedef bool __fastcall callback_cmp(TNode& N1, TNode& N2);
@@ -24,16 +25,12 @@ private:
     u32 pool;
     u32 limit;
 
-    IC u32 Size(u32 Count)
-    {
-        return Count*sizeof(TNode);
-    }
-
+    IC u32 Size(u32 Count) { return Count * sizeof(TNode); }
     void Realloc()
     {
         u32 newLimit = limit + SG_REALLOC_ADVANCE;
-        VERIFY(newLimit%SG_REALLOC_ADVANCE == 0);
-        TNode* newNodes = (TNode*)allocator::alloc(sizeof(TNode)*newLimit);
+        VERIFY(newLimit % SG_REALLOC_ADVANCE == 0);
+        TNode* newNodes = (TNode*)allocator::alloc(sizeof(TNode) * newLimit);
         VERIFY(newNodes);
 
         ZeroMemory(newNodes, Size(newLimit));
@@ -45,13 +42,11 @@ private:
             TNode* Nold = nodes + I;
             TNode* Nnew = newNodes + I;
 
-            if (Nold->left)
-            {
+            if (Nold->left) {
                 size_t Lid = Nold->left - nodes;
                 Nnew->left = newNodes + Lid;
             }
-            if (Nold->right)
-            {
+            if (Nold->right) {
                 size_t Rid = Nold->right - nodes;
                 Nnew->right = newNodes + Rid;
             }
@@ -115,6 +110,7 @@ private:
         D.push_back(N);
         if (N->left) getRL_P(N->left, D);
     }
+
 public:
     FixedMAP()
     {
@@ -122,14 +118,10 @@ public:
         limit = 0;
         nodes = 0;
     }
-    ~FixedMAP()
-    {
-        destroy();
-    }
+    ~FixedMAP() { destroy(); }
     void destroy()
     {
-        if (nodes)
-        {
+        if (nodes) {
             for (TNode* cur = begin(); cur != last(); cur++)
                 cur->~TNode();
             allocator::dealloc(nodes);
@@ -137,15 +129,12 @@ public:
     }
     IC TNode* insert(const K& k)
     {
-        if (pool)
-        {
+        if (pool) {
             TNode* node = nodes;
 
         once_more:
-            if (k < node->key)
-            {
-                if (node->left)
-                {
+            if (k < node->key) {
+                if (node->left) {
                     node = node->left;
                     goto once_more;
                 }
@@ -158,8 +147,7 @@ public:
             }
             else if (k > node->key)
             {
-                if (node->right)
-                {
+                if (node->right) {
                     node = node->right;
                     goto once_more;
                 }
@@ -170,8 +158,8 @@ public:
                     return N;
                 }
             }
-            else return node;
-
+            else
+                return node;
         }
         else
         {
@@ -180,15 +168,12 @@ public:
     }
     IC TNode* insertInAnyWay(const K& k)
     {
-        if (pool)
-        {
+        if (pool) {
             TNode* node = nodes;
 
         once_more:
-            if (k <= node->key)
-            {
-                if (node->left)
-                {
+            if (k <= node->key) {
+                if (node->left) {
                     node = node->left;
                     goto once_more;
                 }
@@ -201,8 +186,7 @@ public:
             }
             else
             {
-                if (node->right)
-                {
+                if (node->right) {
                     node = node->right;
                     goto once_more;
                 }
@@ -231,15 +215,20 @@ public:
         N->val = v;
         return N;
     }
-    IC void discard() { if (nodes) allocator::dealloc(nodes); nodes = 0; pool = 0; limit = 0; }
+    IC void discard()
+    {
+        if (nodes) allocator::dealloc(nodes);
+        nodes = 0;
+        pool = 0;
+        limit = 0;
+    }
     IC u32 allocated() { return this->limit; }
     IC void clear() { pool = 0; }
     IC TNode* begin() { return nodes; }
     IC TNode* end() { return nodes + pool; }
     IC TNode* last() { return nodes + limit; } // for setup only
     IC u32 size() { return pool; }
-    IC TNode& operator[] (int v) { return nodes[v]; }
-
+    IC TNode& operator[](int v) { return nodes[v]; }
     IC void traverseLR(callback CB)
     {
         if (pool) recurseLR(nodes, CB);
@@ -274,21 +263,24 @@ public:
     IC void getANY(xr_vector<T, typename allocator::template helper<T>::result>& D)
     {
         TNode* _end = end();
-        for (TNode* cur = begin(); cur != _end; cur++) D.push_back(cur->val);
+        for (TNode* cur = begin(); cur != _end; cur++)
+            D.push_back(cur->val);
     }
     IC void getANY_P(xr_vector<TNode*, typename allocator::template helper<TNode*>::result>& D)
     {
         D.resize(size());
         TNode** _it = &*D.begin();
         TNode* _end = end();
-        for (TNode* cur = begin(); cur != _end; cur++, _it++) *_it = cur;
+        for (TNode *cur = begin(); cur != _end; cur++, _it++)
+            *_it = cur;
     }
     IC void getANY_P(xr_vector<void*, typename allocator::template helper<void*>::result>& D)
     {
         D.resize(size());
         void** _it = &*D.begin();
         TNode* _end = end();
-        for (TNode* cur = begin(); cur != _end; cur++, _it++) *_it = cur;
+        for (TNode *cur = begin(); cur != _end; cur++, _it++)
+            *_it = cur;
     }
     IC void setup(callback CB)
     {

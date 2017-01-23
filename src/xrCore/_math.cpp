@@ -17,7 +17,10 @@ XRCORE_API Dmatrix Didentity;
 XRCORE_API CRandom Random;
 
 #ifdef _M_AMD64
-u16 getFPUsw() { return 0; }
+u16 getFPUsw()
+{
+    return 0;
+}
 
 namespace FPU
 {
@@ -52,7 +55,9 @@ XRCORE_API void m64r(void)
     _control87(_RC_NEAR, MCW_RC);
 }
 
-void initialize() {}
+void initialize()
+{
+}
 };
 #else
 u16 getFPUsw()
@@ -124,8 +129,7 @@ void initialize()
     _control87(_RC_NEAR, MCW_RC);
     _64r = getFPUsw(); // 64, rounding
 
-    if (!Core.PluginMode)
-        m24r();
+    if (!Core.PluginMode) m24r();
     ::Random.seed(u32(CPU::GetCLK() % (1i64 << 32i64)));
 }
 };
@@ -165,8 +169,7 @@ u64 __fastcall GetCLK(void)
 void Detect()
 {
     // General CPU identification
-    if (!_cpuid(&ID))
-    {
+    if (!_cpuid(&ID)) {
         // Core.Fatal ("Fatal error: can't detect CPU/FPU.");
         abort();
     }
@@ -179,10 +182,13 @@ void Detect()
 
     // Detect Freq
     dwTest = timeGetTime();
-    do { dwStart = timeGetTime(); }
-    while (dwTest == dwStart);
+    do
+    {
+        dwStart = timeGetTime();
+    } while (dwTest == dwStart);
     start = GetCLK();
-    while (timeGetTime() - dwStart < 1000);
+    while (timeGetTime() - dwStart < 1000)
+        ;
     end = GetCLK();
     clk_per_second = end - start;
 
@@ -232,17 +238,13 @@ bool g_initialize_cpu_called = false;
 //------------------------------------------------------------------------------------
 void _initialize_cpu(void)
 {
-    Msg("* Detected CPU: %s [%s], F%d/M%d/S%d, %.2f mhz, %d-clk 'rdtsc'",
-        CPU::ID.model_name, CPU::ID.v_name,
-        CPU::ID.family, CPU::ID.model, CPU::ID.stepping,
-        float(CPU::clk_per_second / u64(1000000)),
-        u32(CPU::clk_overhead)
-       );
+    Msg("* Detected CPU: %s [%s], F%d/M%d/S%d, %.2f mhz, %d-clk 'rdtsc'", CPU::ID.model_name, CPU::ID.v_name,
+        CPU::ID.family, CPU::ID.model, CPU::ID.stepping, float(CPU::clk_per_second / u64(1000000)),
+        u32(CPU::clk_overhead));
 
     // DUMP_PHASE;
 
-    if (strstr(Core.Params, "-x86"))
-    {
+    if (strstr(Core.Params, "-x86")) {
         CPU::ID.feature &= ~_CPU_FEATURE_MMX;
         CPU::ID.feature &= ~_CPU_FEATURE_3DNOW;
         CPU::ID.feature &= ~_CPU_FEATURE_SSE;
@@ -255,21 +257,21 @@ void _initialize_cpu(void)
 
     string256 features;
     xr_strcpy(features, sizeof(features), "RDTSC");
-    if (CPU::ID.feature&_CPU_FEATURE_MMX) xr_strcat(features, ", MMX");
-    if (CPU::ID.feature&_CPU_FEATURE_3DNOW) xr_strcat(features, ", 3DNow!");
-    if (CPU::ID.feature&_CPU_FEATURE_SSE) xr_strcat(features, ", SSE");
-    if (CPU::ID.feature&_CPU_FEATURE_SSE2) xr_strcat(features, ", SSE2");
-    if (CPU::ID.feature&_CPU_FEATURE_SSE3) xr_strcat(features, ", SSE3");
-    if (CPU::ID.feature&_CPU_FEATURE_SSSE3) xr_strcat(features, ", SSSE3");
-    if (CPU::ID.feature&_CPU_FEATURE_SSE4_1)xr_strcat(features, ", SSE4.1");
-    if (CPU::ID.feature&_CPU_FEATURE_SSE4_2)xr_strcat(features, ", SSE4.2");
-    if (CPU::ID.feature&_CPU_FEATURE_HTT) xr_strcat(features, ", HTT");
+    if (CPU::ID.feature & _CPU_FEATURE_MMX) xr_strcat(features, ", MMX");
+    if (CPU::ID.feature & _CPU_FEATURE_3DNOW) xr_strcat(features, ", 3DNow!");
+    if (CPU::ID.feature & _CPU_FEATURE_SSE) xr_strcat(features, ", SSE");
+    if (CPU::ID.feature & _CPU_FEATURE_SSE2) xr_strcat(features, ", SSE2");
+    if (CPU::ID.feature & _CPU_FEATURE_SSE3) xr_strcat(features, ", SSE3");
+    if (CPU::ID.feature & _CPU_FEATURE_SSSE3) xr_strcat(features, ", SSSE3");
+    if (CPU::ID.feature & _CPU_FEATURE_SSE4_1) xr_strcat(features, ", SSE4.1");
+    if (CPU::ID.feature & _CPU_FEATURE_SSE4_2) xr_strcat(features, ", SSE4.2");
+    if (CPU::ID.feature & _CPU_FEATURE_HTT) xr_strcat(features, ", HTT");
 
     Msg("* CPU features: %s", features);
     Msg("* CPU cores/threads: %d/%d\n", CPU::ID.n_cores, CPU::ID.n_threads);
 
-    Fidentity.identity(); // Identity matrix
-    Didentity.identity(); // Identity matrix
+    Fidentity.identity();  // Identity matrix
+    Didentity.identity();  // Identity matrix
     pvInitializeStatics(); // Lookup table for compressed normals
     FPU::initialize();
     _initialize_cpu_thread();
@@ -296,14 +298,11 @@ extern void __cdecl _terminate();
 void _initialize_cpu_thread()
 {
     xrDebug::OnThreadSpawn();
-    if (!Core.PluginMode)
-        FPU::m24r();
-    if (CPU::ID.feature&_CPU_FEATURE_SSE)
-    {
+    if (!Core.PluginMode) FPU::m24r();
+    if (CPU::ID.feature & _CPU_FEATURE_SSE) {
         //_mm_setcsr ( _mm_getcsr() | (_MM_FLUSH_ZERO_ON+_MM_DENORMALS_ZERO_ON) );
         _MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
-        if (_denormals_are_zero_supported)
-        {
+        if (_denormals_are_zero_supported) {
             __try
             {
                 _MM_SET_DENORMALS_ZERO_MODE(_MM_DENORMALS_ZERO_ON);
@@ -317,7 +316,7 @@ void _initialize_cpu_thread()
 }
 #endif
 // threading API
-#pragma pack(push,8)
+#pragma pack(push, 8)
 struct THREAD_NAME
 {
     DWORD dwType;
@@ -402,14 +401,14 @@ void spline2(float t, Fvector* p, Fvector* ret)
     float t3 = t2 * t;
     float m[4];
 
-    m[0] = s*s*s;
-    m[1] = 3.0f*t3 - 6.0f*t2 + 4.0f;
-    m[2] = -3.0f*t3 + 3.0f*t2 + 3.0f*t + 1;
+    m[0] = s * s * s;
+    m[1] = 3.0f * t3 - 6.0f * t2 + 4.0f;
+    m[2] = -3.0f * t3 + 3.0f * t2 + 3.0f * t + 1;
     m[3] = t3;
 
-    ret->x = (p[0].x*m[0] + p[1].x*m[1] + p[2].x*m[2] + p[3].x*m[3]) / 6.0f;
-    ret->y = (p[0].y*m[0] + p[1].y*m[1] + p[2].y*m[2] + p[3].y*m[3]) / 6.0f;
-    ret->z = (p[0].z*m[0] + p[1].z*m[1] + p[2].z*m[2] + p[3].z*m[3]) / 6.0f;
+    ret->x = (p[0].x * m[0] + p[1].x * m[1] + p[2].x * m[2] + p[3].x * m[3]) / 6.0f;
+    ret->y = (p[0].y * m[0] + p[1].y * m[1] + p[2].y * m[2] + p[3].y * m[3]) / 6.0f;
+    ret->z = (p[0].z * m[0] + p[1].z * m[1] + p[2].z * m[2] + p[3].z * m[3]) / 6.0f;
 }
 
 #define beta1 1.0f
@@ -420,16 +419,17 @@ void spline3(float t, Fvector* p, Fvector* ret)
     float s = 1.0f - t;
     float t2 = t * t;
     float t3 = t2 * t;
-    float b12 = beta1*beta2;
-    float b13 = b12*beta1;
-    float delta = 2.0f - b13 + 4.0f*b12 + 4.0f*beta1 + beta2 + 2.0f;
+    float b12 = beta1 * beta2;
+    float b13 = b12 * beta1;
+    float delta = 2.0f - b13 + 4.0f * b12 + 4.0f * beta1 + beta2 + 2.0f;
     float d = 1.0f / delta;
-    float b0 = 2.0f*b13*d*s*s*s;
-    float b3 = 2.0f*t3*d;
-    float b1 = d*(2 * b13*t*(t2 - 3 * t + 3) + 2 * b12*(t3 - 3 * t2 + 2) + 2 * beta1*(t3 - 3 * t + 2) + beta2*(2 * t3 - 3 * t2 + 1));
-    float b2 = d*(2 * b12*t2*(-t + 3) + 2 * beta1*t*(-t2 + 3) + beta2*t2*(-2 * t + 3) + 2 * (-t3 + 1));
+    float b0 = 2.0f * b13 * d * s * s * s;
+    float b3 = 2.0f * t3 * d;
+    float b1 = d * (2 * b13 * t * (t2 - 3 * t + 3) + 2 * b12 * (t3 - 3 * t2 + 2) + 2 * beta1 * (t3 - 3 * t + 2) +
+                       beta2 * (2 * t3 - 3 * t2 + 1));
+    float b2 = d * (2 * b12 * t2 * (-t + 3) + 2 * beta1 * t * (-t2 + 3) + beta2 * t2 * (-2 * t + 3) + 2 * (-t3 + 1));
 
-    ret->x = p[0].x*b0 + p[1].x*b1 + p[2].x*b2 + p[3].x*b3;
-    ret->y = p[0].y*b0 + p[1].y*b1 + p[2].y*b2 + p[3].y*b3;
-    ret->z = p[0].z*b0 + p[1].z*b1 + p[2].z*b2 + p[3].z*b3;
+    ret->x = p[0].x * b0 + p[1].x * b1 + p[2].x * b2 + p[3].x * b3;
+    ret->y = p[0].y * b0 + p[1].y * b1 + p[2].y * b2 + p[3].y * b3;
+    ret->z = p[0].z * b0 + p[1].z * b1 + p[2].z * b2 + p[3].z * b3;
 }

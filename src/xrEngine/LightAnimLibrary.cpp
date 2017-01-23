@@ -80,8 +80,7 @@ void CLAItem::MoveKey(int from, int to)
     R_ASSERT(from <= iFrameCount);
     R_ASSERT(to <= iFrameCount);
     KeyPairIt it = Keys.find(from);
-    if (it != Keys.end())
-    {
+    if (it != Keys.end()) {
         Keys[to] = it->second;
         Keys.erase(it);
     }
@@ -90,10 +89,8 @@ void CLAItem::MoveKey(int from, int to)
 void CLAItem::Resize(int new_len)
 {
     VERIFY((new_len >= 1));
-    if (new_len != iFrameCount)
-    {
-        if (new_len > iFrameCount)
-        {
+    if (new_len != iFrameCount) {
+        if (new_len > iFrameCount) {
             int old_len = iFrameCount;
             iFrameCount = new_len;
             MoveKey(old_len, new_len);
@@ -113,14 +110,14 @@ u32 CLAItem::InterpolateRGB(int frame)
 
     KeyPairIt A = Keys.find(frame);
     KeyPairIt B;
-    if (A != Keys.end())  // ключ - возвращаем цвет ключа
+    if (A != Keys.end()) // ключ - возвращаем цвет ключа
     {
         return A->second;
     }
-    else   // не ключ
+    else // не ключ
     {
         B = Keys.upper_bound(frame); // ищем следующий ключ
-        if (B == Keys.end())  // если его нет вернем цвет последнего ключа
+        if (B == Keys.end())         // если его нет вернем цвет последнего ключа
         {
             B--;
             return B->second;
@@ -149,21 +146,20 @@ u32 CLAItem::InterpolateBGR(int frame)
 
 u32 CLAItem::CalculateRGB(float T, int& frame)
 {
-    frame = iFloor(fmodf(T, float(iFrameCount) / fFPS)*fFPS);
+    frame = iFloor(fmodf(T, float(iFrameCount) / fFPS) * fFPS);
     return InterpolateRGB(frame);
 }
 
 u32 CLAItem::CalculateBGR(float T, int& frame)
 {
-    frame = iFloor(fmodf(T, float(iFrameCount) / fFPS)*fFPS);
+    frame = iFloor(fmodf(T, float(iFrameCount) / fFPS) * fFPS);
     return InterpolateBGR(frame);
 }
 
 int CLAItem::PrevKeyFrame(int frame)
 {
     KeyPairIt A = Keys.lower_bound(frame);
-    if (A != Keys.end())
-    {
+    if (A != Keys.end()) {
         KeyPairIt B = A;
         B--;
         if (B != Keys.end()) return B->first;
@@ -178,8 +174,7 @@ int CLAItem::PrevKeyFrame(int frame)
 int CLAItem::NextKeyFrame(int frame)
 {
     KeyPairIt A = Keys.upper_bound(frame);
-    if (A != Keys.end())
-    {
+    if (A != Keys.end()) {
         return A->first;
     }
     else
@@ -221,23 +216,19 @@ XR_EXPORT void ELightAnimLibrary::Load()
     string_path fn;
     FS.update_path(fn, _game_data_, "lanims.xr");
     IReader* fs = FS.r_open(fn);
-    if (fs)
-    {
+    if (fs) {
         u16 version = 0;
-        if (fs->find_chunk(CHUNK_VERSION))
-        {
+        if (fs->find_chunk(CHUNK_VERSION)) {
             version = fs->r_u16();
         }
         IReader* OBJ = fs->open_chunk(CHUNK_ITEM_LIST);
-        if (OBJ)
-        {
+        if (OBJ) {
             IReader* O = OBJ->open_chunk(0);
             for (int count = 1; O; count++)
             {
                 CLAItem* I = new CLAItem();
                 I->Load(*O);
-                if (version == 0)
-                {
+                if (version == 0) {
                     for (CLAItem::KeyPairIt it = I->Keys.begin(); it != I->Keys.end(); it++)
                         it->second = subst_alpha(bgr2rgb(it->second), color_get_A(it->second));
                 }
@@ -271,8 +262,7 @@ void ELightAnimLibrary::Save()
     string_path fn;
     FS.update_path(fn, _game_data_, "lanims.xr");
 
-    if (!F.save_to(fn))
-        Log("!Can't save color animations:", fn);
+    if (!F.save_to(fn)) Log("!Can't save color animations:", fn);
 }
 
 void ELightAnimLibrary::Reload()
@@ -283,57 +273,57 @@ void ELightAnimLibrary::Reload()
 
 LAItemIt ELightAnimLibrary::FindItemI(LPCSTR name)
 {
-    if (name&&name[0])
-        for (LAItemIt it=Items.begin(); it!=Items.end(); it++)
-            if (0==xr_strcmp((*it)->cName,name)) return it;
+    if (name && name[0])
+        for (LAItemIt it = Items.begin(); it != Items.end(); it++)
+            if (0 == xr_strcmp((*it)->cName, name)) return it;
     return Items.end();
 }
 
 CLAItem* ELightAnimLibrary::FindItem(LPCSTR name)
 {
-    LAItemIt it=FindItemI(name);
-    return (it!=Items.end())?*it:0;
+    LAItemIt it = FindItemI(name);
+    return (it != Items.end()) ? *it : 0;
 }
 
 CLAItem* ELightAnimLibrary::AppendItem(LPCSTR name, CLAItem* src)
 {
-    VERIFY2 (FindItem(name)==0,"Duplicate name found.");
+    VERIFY2(FindItem(name) == 0, "Duplicate name found.");
     CLAItem* I = new CLAItem();
-    if (src) *I = *src;
-    else I->InitDefault();
+    if (src)
+        *I = *src;
+    else
+        I->InitDefault();
     I->cName = name;
-    Items.push_back (I);
+    Items.push_back(I);
     return I;
 }
 
 #ifdef _EDITOR
 void ELightAnimLibrary::RemoveObject(LPCSTR _fname, EItemType type, bool& res)
 {
-    if (TYPE_FOLDER == type)
-    {
+    if (TYPE_FOLDER == type) {
         res = true;
         return;
     }
     else if (TYPE_OBJECT == type)
     {
         LAItemIt it = FindItemI(_fname);
-        if (it != Items.end())
-        {
+        if (it != Items.end()) {
             xr_delete(*it);
             Items.erase(it);
             res = true;
             return;
         }
     }
-    else THROW;
+    else
+        THROW;
     res = false;
 }
 //---------------------------------------------------------------------------
 
 void ELightAnimLibrary::RenameObject(LPCSTR nm0, LPCSTR nm1, EItemType type)
 {
-    if (TYPE_FOLDER == type)
-    {
+    if (TYPE_FOLDER == type) {
     }
     else if (TYPE_OBJECT == type)
     {

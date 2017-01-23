@@ -3,7 +3,7 @@
 //////////////////////////////////////////////////////////////////////
 
 #pragma once
-# error using of unused old header
+#error using of unused old header
 
 /*
 #include "CameraBase.h"

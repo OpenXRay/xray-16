@@ -24,9 +24,7 @@
    <markus@oberhumer.com>
  */
 
-
 #include "lzo_conf.h"
-
 
 /***********************************************************************
 //
@@ -35,7 +33,7 @@
 LZO_PUBLIC(lzo_ptr_t)
 __lzo_ptr_linear(const lzo_voidp ptr)
 {
-	lzo_ptr_t p;
+    lzo_ptr_t p;
 
 #if defined(__LZO_DOS16) || defined(__LZO_WIN16)
     p = (((lzo_ptr_t)(_FP_SEG(ptr))) << (16 - __LZO_HShift)) + (_FP_OFF(ptr));
@@ -43,9 +41,8 @@ __lzo_ptr_linear(const lzo_voidp ptr)
     p = PTR_LINEAR(ptr);
 #endif
 
-	return p;
+    return p;
 }
-
 
 /***********************************************************************
 //
@@ -54,26 +51,24 @@ __lzo_ptr_linear(const lzo_voidp ptr)
 LZO_PUBLIC(unsigned)
 __lzo_align_gap(const lzo_voidp ptr, lzo_uint size)
 {
-	lzo_ptr_t p, s, n;
+    lzo_ptr_t p, s, n;
 
-	assert(size > 0);
+    assert(size > 0);
 
     p = __lzo_ptr_linear(ptr);
-	s = (lzo_ptr_t) (size - 1);
+    s = (lzo_ptr_t)(size - 1);
 #if 0
 	assert((size & (size - 1)) == 0);
     n = ((p + s) & ~s) - p;
 #else
-	n = (((p + s) / size) * size) - p;
+    n = (((p + s) / size) * size) - p;
 #endif
 
-	assert((long)n >= 0);
-	assert(n <= s);
+    assert((long)n >= 0);
+    assert(n <= s);
 
-	return (unsigned)n;
+    return (unsigned)n;
 }
-
-
 
 /*
 vi:ts=4:et

@@ -16,16 +16,16 @@
 
 struct _processor_info
 {
-    char v_name[13]; // vendor name
+    char v_name[13];     // vendor name
     char model_name[49]; // Name of model eg. Intel_Pentium_Pro
 
-    unsigned char family; // family of the processor, eg. Intel_Pentium_Pro is family 6 processor
-    unsigned char model; // model of processor, eg. Intel_Pentium_Pro is model 1 of family 6 processor
+    unsigned char family;   // family of the processor, eg. Intel_Pentium_Pro is family 6 processor
+    unsigned char model;    // model of processor, eg. Intel_Pentium_Pro is model 1 of family 6 processor
     unsigned char stepping; // Processor revision number
 
     unsigned int feature; // processor Feature ( same as return value).
 
-    unsigned int n_cores; // number of available physical cores
+    unsigned int n_cores;   // number of available physical cores
     unsigned int n_threads; // number of available logical threads
 
     unsigned int affinity_mask; // recommended affinity mask

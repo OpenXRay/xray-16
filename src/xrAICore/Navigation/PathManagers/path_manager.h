@@ -10,22 +10,10 @@
 
 #include "xrAICore/Navigation/PathManagers/path_manager_generic.h"
 
-template <
-	typename _Graph,
-	typename _DataStorage,
-	typename _Parameters,
-	typename _dist_type,
-	typename _index_type,
-	typename _iteration_type
->	class CPathManager : 
-		public CPathManagerGeneric <
-			_Graph,
-			_DataStorage,
-			_Parameters,
-			_dist_type,
-			_index_type,
-			_iteration_type
-		>
+template <typename _Graph, typename _DataStorage, typename _Parameters, typename _dist_type, typename _index_type,
+    typename _iteration_type>
+class CPathManager
+    : public CPathManagerGeneric<_Graph, _DataStorage, _Parameters, _dist_type, _index_type, _iteration_type>
 {
 };
 
@@ -34,14 +22,14 @@ template <
 #include "xrAICore/Navigation/PathManagers/path_manager_params_flooder.h"
 #include "xrAICore/Navigation/PathManagers/path_manager_params_straight_line.h"
 #ifndef AI_COMPILER
-#	include "xrAICore/Navigation/PathManagers/path_manager_params_nearest_vertex.h"
+#include "xrAICore/Navigation/PathManagers/path_manager_params_nearest_vertex.h"
 #endif
 
 //		path manager specializations
 #include "xrAICore/Navigation/PathManagers/path_manager_game.h"
 
 #ifndef AI_COMPILER
-#	include "xrAICore/Navigation/PathManagers/path_manager_game_vertex.h"
+#include "xrAICore/Navigation/PathManagers/path_manager_game_vertex.h"
 #endif
 
 #include "xrAICore/Navigation/PathManagers/path_manager_game_level.h"
@@ -49,8 +37,8 @@ template <
 #include "xrAICore/Navigation/PathManagers/path_manager_level_flooder.h"
 
 #ifdef AI_COMPILER
-#	include "xrAICore/Navigation/PathManagers/path_manager_level_straight_line.h"
+#include "xrAICore/Navigation/PathManagers/path_manager_level_straight_line.h"
 #else
-#	include "xrAICore/Navigation/PathManagers/path_manager_level_nearest_vertex.h"
-#	include "xrAICore/Navigation/PathManagers/path_manager_solver.h"
+#include "xrAICore/Navigation/PathManagers/path_manager_level_nearest_vertex.h"
+#include "xrAICore/Navigation/PathManagers/path_manager_solver.h"
 #endif

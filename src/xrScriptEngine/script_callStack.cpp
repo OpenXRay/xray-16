@@ -1,14 +1,16 @@
-#include "pch.hpp"
 #include "script_callStack.hpp"
+#include "pch.hpp"
 #include "script_debugger.hpp"
 
-CScriptCallStack::CScriptCallStack(CScriptDebugger *d)
+CScriptCallStack::CScriptCallStack(CScriptDebugger* d)
 {
     m_debugger = d;
     m_nCurrentLevel = -1;
 }
 
-CScriptCallStack::~CScriptCallStack() {}
+CScriptCallStack::~CScriptCallStack()
+{
+}
 
 void CScriptCallStack::Clear()
 {
@@ -17,7 +19,7 @@ void CScriptCallStack::Clear()
     m_files.clear();
 }
 
-void CScriptCallStack::Add(const char *szDesc, const char *szFile, int nLine)
+void CScriptCallStack::Add(const char* szDesc, const char* szFile, int nLine)
 {
     m_lines.push_back(nLine);
     SPath sp;
@@ -29,14 +31,13 @@ void CScriptCallStack::Add(const char *szDesc, const char *szFile, int nLine)
 void CScriptCallStack::SetStackTraceLevel(int nLevel)
 {
     m_nCurrentLevel = nLevel;
-    VERIFY(nLevel>=0 || (u32)nLevel<m_files.size());
+    VERIFY(nLevel >= 0 || (u32)nLevel < m_files.size());
 }
 
 void CScriptCallStack::GotoStackTraceLevel(int nLevel)
 {
-    if (nLevel<0 || (u32)nLevel>=m_files.size())
-        return;
+    if (nLevel < 0 || (u32)nLevel >= m_files.size()) return;
     m_nCurrentLevel = nLevel;
-    char *ppath = m_files[nLevel].path;
+    char* ppath = m_files[nLevel].path;
     m_debugger->_SendMessage(DMSG_GOTO_FILELINE, (WPARAM)ppath, (LPARAM)m_lines[nLevel]);
 }

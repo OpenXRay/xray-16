@@ -7,15 +7,15 @@
 class dxFontRender : public IFontRender
 {
 public:
-	dxFontRender();
-	virtual ~dxFontRender();
+    dxFontRender();
+    virtual ~dxFontRender();
 
-	virtual void Initialize(LPCSTR cShader, LPCSTR cTexture);
-	virtual void OnRender(CGameFont &owner);
+    virtual void Initialize(LPCSTR cShader, LPCSTR cTexture);
+    virtual void OnRender(CGameFont& owner);
 
 private:
-	ref_shader				pShader;
-	ref_geom				pGeom;
+    ref_shader pShader;
+    ref_geom pGeom;
 };
 
-#endif	//	FontRender_included
+#endif //	FontRender_included

@@ -24,14 +24,13 @@
    <markus@oberhumer.com>
  */
 
-
 #define LZO_NEED_DICT_H
-#define D_BITS			12
-#define D_INDEX1(d,p)		d = DM((0x21*DX2(p,4,5)) >> 5)
-#define D_INDEX2(d,p)		d = d ^ D_MASK
+#define D_BITS 12
+#define D_INDEX1(d, p) d = DM((0x21 * DX2(p, 4, 5)) >> 5)
+#define D_INDEX2(d, p) d = d ^ D_MASK
 
 #include "config1x.h"
 
-#define DO_COMPRESS		lzo1x_1_12_compress
+#define DO_COMPRESS lzo1x_1_12_compress
 
 #include "lzo1x_c.ch"

@@ -9,21 +9,22 @@
 #include "stdafx.h"
 
 #ifdef INGAME_EDITOR
-#include "editor_environment_suns_manager.hpp"
-#include "editor_environment_suns_sun.hpp"
+#include "Common/object_broker.h"
 #include "Include/editor/ide.hpp"
 #include "Include/editor/property_holder.hpp"
-#include "Common/object_broker.h"
+#include "editor_environment_detail.hpp"
+#include "editor_environment_suns_manager.hpp"
+#include "editor_environment_suns_sun.hpp"
 #include "ide.hpp"
 #include "property_collection.hpp"
-#include "editor_environment_detail.hpp"
 
 using editor::environment::suns::manager;
 using editor::environment::suns::sun;
 using editor::environment::detail::logical_string_predicate;
 
 template <>
-void property_collection<manager::container_type, manager>::display_name(u32 const& item_index, LPSTR const& buffer, u32 const& buffer_size)
+void property_collection<manager::container_type, manager>::display_name(
+    u32 const& item_index, LPSTR const& buffer, u32 const& buffer_size)
 {
     xr_strcpy(buffer, buffer_size, m_container[item_index]->id().c_str());
 }
@@ -36,10 +37,8 @@ editor::property_holder* property_collection<manager::container_type, manager>::
     return (object->object());
 }
 
-manager::manager(::editor::environment::manager* environment) :
-    m_environment(*environment),
-    m_collection(0),
-    m_changed(true)
+manager::manager(::editor::environment::manager* environment)
+    : m_environment(*environment), m_collection(0), m_changed(true)
 {
     m_collection = new collection_type(&m_suns, this, &m_changed);
 }
@@ -56,16 +55,7 @@ void manager::load()
 {
     string_path file_name;
     CInifile* config =
-        new CInifile(
-            FS.update_path(
-                file_name,
-                "$game_config$",
-                "environment\\suns.ltx"
-            ),
-            TRUE,
-            TRUE,
-            FALSE
-        );
+        new CInifile(FS.update_path(file_name, "$game_config$", "environment\\suns.ltx"), TRUE, TRUE, FALSE);
 
     typedef CInifile::Root sections_type;
     sections_type& sections = config->sections();
@@ -82,16 +72,7 @@ void manager::save()
 {
     string_path file_name;
     CInifile* config =
-        new CInifile(
-            FS.update_path(
-                file_name,
-                "$game_config$",
-                "environment\\suns.ltx"
-            ),
-            FALSE,
-            FALSE,
-            TRUE
-        );
+        new CInifile(FS.update_path(file_name, "$game_config$", "environment\\suns.ltx"), FALSE, FALSE, TRUE);
 
     container_type::const_iterator i = m_suns.begin();
     container_type::const_iterator e = m_suns.end();
@@ -107,25 +88,11 @@ void manager::add(CInifile& config, shared_str const& section)
     {
         shared_str m_id;
 
-        inline predicate(shared_str const& id) :
-            m_id(id)
-        {
-        }
-
-        inline bool operator() (sun const* const& object) const
-        {
-            return (object->id()._get() == m_id._get());
-        }
+        inline predicate(shared_str const& id) : m_id(id) {}
+        inline bool operator()(sun const* const& object) const { return (object->id()._get() == m_id._get()); }
     };
 
-    VERIFY(
-        std::find_if(
-            m_suns.begin(),
-            m_suns.end(),
-            predicate(section)
-        ) ==
-        m_suns.end()
-    );
+    VERIFY(std::find_if(m_suns.begin(), m_suns.end(), predicate(section)) == m_suns.end());
 
     sun* object = new sun(*this, section);
     object->load(config);
@@ -136,26 +103,19 @@ void manager::add(CInifile& config, shared_str const& section)
 void manager::fill(editor::property_holder* holder)
 {
     VERIFY(holder);
-    holder->add_property(
-        "suns",
-        "suns",
-        "this option is resposible for sound channels",
-        m_collection
-    );
+    holder->add_property("suns", "suns", "this option is resposible for sound channels", m_collection);
 }
 
 shared_str manager::unique_id(shared_str const& id) const
 {
-    if (m_collection->unique_id(id.c_str()))
-        return (id);
+    if (m_collection->unique_id(id.c_str())) return (id);
 
     return (m_collection->generate_unique_id(id.c_str()));
 }
 
 manager::suns_ids_type const& manager::suns_ids() const
 {
-    if (!m_changed)
-        return (m_suns_ids);
+    if (!m_changed) return (m_suns_ids);
 
     m_changed = false;
 
@@ -179,15 +139,8 @@ struct predicate
 {
     shared_str m_id;
 
-    IC predicate(shared_str const& id) :
-        m_id(id)
-    {
-    }
-
-    IC bool operator() (sun* const& sun) const
-    {
-        return (sun->id()._get() == m_id._get());
-    }
+    IC predicate(shared_str const& id) : m_id(id) {}
+    IC bool operator()(sun* const& sun) const { return (sun->id()._get() == m_id._get()); }
 }; // struct predicate
 
 CLensFlareDescriptor* manager::get_flare(shared_str const& id) const

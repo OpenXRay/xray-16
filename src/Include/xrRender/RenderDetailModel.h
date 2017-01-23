@@ -1,5 +1,5 @@
-#ifndef	RenderDetailModel_included
-#define	RenderDetailModel_included
+#ifndef RenderDetailModel_included
+#define RenderDetailModel_included
 #pragma once
 
 class IRenderDetailModel
@@ -7,4 +7,4 @@ class IRenderDetailModel
 public:
 };
 
-#endif	//	RenderDetailModel_included
+#endif //	RenderDetailModel_included

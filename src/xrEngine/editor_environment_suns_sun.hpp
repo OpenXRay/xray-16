@@ -17,7 +17,6 @@
 
 namespace editor
 {
-
 class property_holder;
 class property_holder_collection;
 
@@ -25,14 +24,10 @@ namespace environment
 {
 namespace suns
 {
-
 class flare;
 class manager;
 
-class sun :
-    public CLensFlare,
-    public editor::property_holder_holder,
-    private Noncopyable
+class sun : public CLensFlare, public editor::property_holder_holder, private Noncopyable
 {
 public:
     sun(manager const& manager, shared_str const& section);
@@ -44,12 +39,12 @@ public:
 private:
     LPCSTR xr_stdcall id_getter() const;
     void xr_stdcall id_setter(LPCSTR value);
+
 public:
     inline shared_str const& id() const { return m_id; }
     virtual property_holder* object();
 
 private:
-
     shared_str m_id;
     shared_str m_shader;
     shared_str m_texture;

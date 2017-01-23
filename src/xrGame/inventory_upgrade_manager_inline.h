@@ -13,7 +13,6 @@ namespace inventory
 {
 namespace upgrade
 {
-
 } // namespace upgrade
 } // namespace inventory
 

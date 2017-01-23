@@ -12,8 +12,8 @@
 // Includes                                                                   //
 //----------------------------------------------------------------------------//
 
-#include "StdAfx.h"
 #include "Helper.h"
+#include "StdAfx.h"
 
 //----------------------------------------------------------------------------//
 // Constructors                                                               //
@@ -34,103 +34,106 @@ Helper::~Helper()
 //----------------------------------------------------------------------------//
 // Get the transformation matrix of a bone node                               //
 //----------------------------------------------------------------------------//
-Matrix3 Helper::GetBoneTM(INode *pNode, TimeValue t)
+Matrix3 Helper::GetBoneTM(INode* pNode, TimeValue t)
 {
-	// get node transformation
-	Matrix3 tm;
-	tm = pNode->GetNodeTM(t);
+    // get node transformation
+    Matrix3 tm;
+    tm = pNode->GetNodeTM(t);
 
-	// make transformation uniform
-	tm.NoScale();
+    // make transformation uniform
+    tm.NoScale();
 
-	return tm;
+    return tm;
 }
 
 //----------------------------------------------------------------------------//
 // Check if the given node is a biped bone                                    //
 //----------------------------------------------------------------------------//
-BOOL Helper::IsBipedBone(INode *pNode)
+BOOL Helper::IsBipedBone(INode* pNode)
 {
-	// check for invalid and root nodes
-	if((pNode == 0) || pNode->IsRootNode()) return false;
+    // check for invalid and root nodes
+    if ((pNode == 0) || pNode->IsRootNode()) return false;
 
-	// check for biped nodes
-	Control *pControl;
-	pControl = pNode->GetTMController();
-	if((pControl->ClassID() == BIPSLAVE_CONTROL_CLASS_ID) || (pControl->ClassID() == BIPBODY_CONTROL_CLASS_ID)) return true;
+    // check for biped nodes
+    Control* pControl;
+    pControl = pNode->GetTMController();
+    if ((pControl->ClassID() == BIPSLAVE_CONTROL_CLASS_ID) || (pControl->ClassID() == BIPBODY_CONTROL_CLASS_ID))
+        return true;
 
-	return false;
+    return false;
 }
 
 //----------------------------------------------------------------------------//
 // Check if the given node is a bone                                          //
 //----------------------------------------------------------------------------//
-BOOL Helper::IsBone	(INode *pNode, BOOL bAllowDummy)
+BOOL Helper::IsBone(INode* pNode, BOOL bAllowDummy)
 {
-	// check for invalid nodes
-	if(pNode == 0) return false;
+    // check for invalid nodes
+    if (pNode == 0) return false;
 
-	// check for root node
-	if(pNode->IsRootNode()) return false;
+    // check for root node
+    if (pNode->IsRootNode()) return false;
 
-	// check for bone node
-	ObjectState os;
-	os = pNode->EvalWorldState(0);
-	if(os.obj->ClassID() == Class_ID(BONE_CLASS_ID, 0)) return true;
-	if(os.obj->ClassID() == BONE_OBJ_CLASSID) return true;
-	if(os.obj->ClassID() == Class_ID(DUMMY_CLASS_ID, 0)) 
-		return bAllowDummy;
+    // check for bone node
+    ObjectState os;
+    os = pNode->EvalWorldState(0);
+    if (os.obj->ClassID() == Class_ID(BONE_CLASS_ID, 0)) return true;
+    if (os.obj->ClassID() == BONE_OBJ_CLASSID) return true;
+    if (os.obj->ClassID() == Class_ID(DUMMY_CLASS_ID, 0)) return bAllowDummy;
 
-	// check for biped node
-	Control *pControl;
-	pControl = pNode->GetTMController();
-	if((pControl->ClassID() == BIPSLAVE_CONTROL_CLASS_ID) || (pControl->ClassID() == BIPBODY_CONTROL_CLASS_ID)) return true;
-	return false;
+    // check for biped node
+    Control* pControl;
+    pControl = pNode->GetTMController();
+    if ((pControl->ClassID() == BIPSLAVE_CONTROL_CLASS_ID) || (pControl->ClassID() == BIPBODY_CONTROL_CLASS_ID))
+        return true;
+    return false;
 }
 
 //----------------------------------------------------------------------------//
 // Check if the given node is a mesh                                          //
 //----------------------------------------------------------------------------//
-BOOL Helper::IsMesh(INode *pNode)
+BOOL Helper::IsMesh(INode* pNode)
 {
-	// check for invalid and root nodes
-	if((pNode == 0) || pNode->IsRootNode()) return false;
+    // check for invalid and root nodes
+    if ((pNode == 0) || pNode->IsRootNode()) return false;
 
-	// check for mesh
-	ObjectState os;
-	os = pNode->EvalWorldState(0);
-	if(os.obj->SuperClassID() == GEOMOBJECT_CLASS_ID) return true;
+    // check for mesh
+    ObjectState os;
+    os = pNode->EvalWorldState(0);
+    if (os.obj->SuperClassID() == GEOMOBJECT_CLASS_ID) return true;
 
-	return false;
+    return false;
 }
 
 //----------------------------------------------------------------------------//
 // Set/Unset biped uniform scale                                              //
 //----------------------------------------------------------------------------//
 
-void Helper::SetBipedUniform(INode *pNode, BOOL bUniform, BOOL bFigure)
+void Helper::SetBipedUniform(INode* pNode, BOOL bUniform, BOOL bFigure)
 {
-	if(IsBipedBone(pNode)){
-		// get the TM controller of the node
-		Control *pControl;
-		pControl = pNode->GetTMController();
+    if (IsBipedBone(pNode)) {
+        // get the TM controller of the node
+        Control* pControl;
+        pControl = pNode->GetTMController();
 
-		// get the biped export interface
-		IBipedExport *pBipedExport;
-		pBipedExport = (IBipedExport *)pControl->GetInterface(I_BIPINTERFACE);
+        // get the biped export interface
+        IBipedExport* pBipedExport;
+        pBipedExport = (IBipedExport*)pControl->GetInterface(I_BIPINTERFACE);
 
-		// remove/add uniform scale
-		pBipedExport->RemoveNonUniformScale			(bUniform);
-		if (bFigure) pBipedExport->BeginFigureMode	(0);
-		else		 pBipedExport->EndFigureMode	(0);
+        // remove/add uniform scale
+        pBipedExport->RemoveNonUniformScale(bUniform);
+        if (bFigure)
+            pBipedExport->BeginFigureMode(0);
+        else
+            pBipedExport->EndFigureMode(0);
 
-		// notify all dependents
-		Control *pMasterControl;
-		pMasterControl = (Control *)pControl->GetInterface(I_MASTER);
-		pMasterControl->NotifyDependents(FOREVER, PART_TM, REFMSG_CHANGE);
-		pControl->ReleaseInterface(I_MASTER, pMasterControl);
+        // notify all dependents
+        Control* pMasterControl;
+        pMasterControl = (Control*)pControl->GetInterface(I_MASTER);
+        pMasterControl->NotifyDependents(FOREVER, PART_TM, REFMSG_CHANGE);
+        pControl->ReleaseInterface(I_MASTER, pMasterControl);
 
-		// release the biped export interface
-		pControl->ReleaseInterface(I_BIPINTERFACE, pBipedExport);
-	}
+        // release the biped export interface
+        pControl->ReleaseInterface(I_BIPINTERFACE, pBipedExport);
+    }
 }

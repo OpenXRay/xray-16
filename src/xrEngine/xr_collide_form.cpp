@@ -1,23 +1,20 @@
-#include "stdafx.h"
-#include "IGame_Level.h"
 #include "xr_collide_form.h"
-#include "xr_object.h"
-#include "xrCDB/xr_area.h"
-#include "x_ray.h"
 #include "Common/LevelStructure.hpp"
-#include "xrCore/FMesh.hpp"
+#include "IGame_Level.h"
+#include "stdafx.h"
+#include "x_ray.h"
 #include "xrCDB/Frustum.h"
-
+#include "xrCDB/xr_area.h"
+#include "xrCore/FMesh.hpp"
+#include "xr_object.h"
 
 #include "Include/xrRender/Kinematics.h"
 #include "xrCore/Animation/Bone.hpp"
 #ifdef DEBUG
 IC float DET(const Fmatrix& a)
 {
-    return
-        ((a._11 * (a._22 * a._33 - a._23 * a._32) -
-          a._12 * (a._21 * a._33 - a._23 * a._31) +
-          a._13 * (a._21 * a._32 - a._22 * a._31)));
+    return ((a._11 * (a._22 * a._33 - a._23 * a._32) - a._12 * (a._21 * a._33 - a._23 * a._31) +
+             a._13 * (a._21 * a._32 - a._22 * a._31)));
 }
 #include "objectdump.h"
 #endif
@@ -43,18 +40,11 @@ void CCF_Skeleton::SElement::center(Fvector& center) const
     switch (type)
     {
     case SBoneShape::stBox:
-        center.set(-b_IM.c.dotproduct(b_IM.i),
-                   -b_IM.c.dotproduct(b_IM.j),
-                   -b_IM.c.dotproduct(b_IM.k));
+        center.set(-b_IM.c.dotproduct(b_IM.i), -b_IM.c.dotproduct(b_IM.j), -b_IM.c.dotproduct(b_IM.k));
         break;
-    case SBoneShape::stSphere:
-        center.set(s_sphere.P);
-        break;
-    case SBoneShape::stCylinder:
-        center.set(c_cylinder.m_center);
-        break;
-    default:
-        NODEFAULT;
+    case SBoneShape::stSphere: center.set(s_sphere.P); break;
+    case SBoneShape::stCylinder: center.set(c_cylinder.m_center); break;
+    default: NODEFAULT;
     }
 }
 bool pred_find_elem(const CCF_Skeleton::SElement& E, u16 elem)
@@ -64,8 +54,7 @@ bool pred_find_elem(const CCF_Skeleton::SElement& E, u16 elem)
 bool CCF_Skeleton::_ElementCenter(u16 elem_id, Fvector& e_center)
 {
     ElementVecIt it = std::lower_bound(elements.begin(), elements.end(), elem_id, pred_find_elem);
-    if (it->elem_id == elem_id)
-    {
+    if (it->elem_id == elem_id) {
         it->center(e_center);
         return true;
     }
@@ -82,11 +71,9 @@ IC bool RAYvsOBB(const Fmatrix& IM, const Fvector& b_hsize, const Fvector& S, co
 
     // Actual test
     Fbox::ERP_Result rp_res = E.Pick2(SL, DL, PL);
-    if ((rp_res == Fbox::rpOriginOutside) || (!bCull && (rp_res == Fbox::rpOriginInside)))
-    {
+    if ((rp_res == Fbox::rpOriginOutside) || (!bCull && (rp_res == Fbox::rpOriginInside))) {
         float d = PL.distance_to_sqr(SL);
-        if (d < R*R)
-        {
+        if (d < R * R) {
             R = _sqrt(d);
             VERIFY(R >= 0.f);
             return true;
@@ -110,12 +97,12 @@ IC bool RAYvsCYLINDER(const Fcylinder& c_cylinder, const Fvector& S, const Fvect
 
 CCF_Skeleton::CCF_Skeleton(IGameObject* O) : ICollisionForm(O, cftObject)
 {
-    //getVisData
+    // getVisData
     IRenderVisual* pVisual = O->Visual();
-    //IKinematics* K = PKinematics(pVisual); VERIFY3(K,"Can't create skeleton without Kinematics.",*O->cNameVisual());
+    // IKinematics* K = PKinematics(pVisual); VERIFY3(K,"Can't create skeleton without Kinematics.",*O->cNameVisual());
     IKinematics* K = PKinematics(pVisual);
     VERIFY3(K, "Can't create skeleton without Kinematics.", *O->cNameVisual());
-    //bv_box.set (K->vis.box);
+    // bv_box.set (K->vis.box);
     bv_box.set(pVisual->getVisData().box);
     bv_box.getsphere(bv_sphere.P, bv_sphere.R);
     vis_mask = 0;
@@ -129,13 +116,12 @@ void CCF_Skeleton::BuildState()
     K->CalculateBones();
     const Fmatrix& L2W = owner->XFORM();
 
-    if (vis_mask != K->LL_GetBonesVisible())
-    {
+    if (vis_mask != K->LL_GetBonesVisible()) {
         vis_mask = K->LL_GetBonesVisible();
         elements.clear_not_free();
         bv_box.set(pVisual->getVisData().box);
         bv_box.getsphere(bv_sphere.P, bv_sphere.R);
-        for (u16 i = 0; i<K->LL_BoneCount(); i++)
+        for (u16 i = 0; i < K->LL_BoneCount(); i++)
         {
             if (!K->LL_GetBoneVisible(i)) continue;
             SBoneShape& shape = K->LL_GetData(i).shape;
@@ -152,7 +138,8 @@ void CCF_Skeleton::BuildState()
         Fmatrix ME, T, TW;
         const Fmatrix& Mbone = K->LL_GetTransform(I->elem_id);
 
-        VERIFY2(DET(Mbone)>EPS, (make_string("0 scale bone matrix, %d \n", I->elem_id) + dbg_object_full_dump_string(owner)).c_str());
+        VERIFY2(DET(Mbone) > EPS,
+            (make_string("0 scale bone matrix, %d \n", I->elem_id) + dbg_object_full_dump_string(owner)).c_str());
 
         switch (I->type)
         {
@@ -161,23 +148,23 @@ void CCF_Skeleton::BuildState()
             const Fobb& B = shape.box;
             B.xform_get(ME);
 
-            //VERIFY2( DET(ME)>EPS, ( make_string("0 scale bone matrix, %d \n", I->elem_id ) + dbg_object_full_dump_string( owner ) ).c_str() );
+            // VERIFY2( DET(ME)>EPS, ( make_string("0 scale bone matrix, %d \n", I->elem_id ) +
+            // dbg_object_full_dump_string( owner ) ).c_str() );
 
             I->b_hsize.set(B.m_halfsize);
             // prepare matrix World to Element
             T.mul_43(Mbone, ME); // model space
-            TW.mul_43(L2W, T); // world space
+            TW.mul_43(L2W, T);   // world space
             bool b = I->b_IM.invert_b(TW);
             // check matrix validity
-            if (!b)
-            {
+            if (!b) {
                 Msg("! ERROR: invalid bone xform . Bone disabled.");
                 Msg("! ERROR: bone_id=[%d], world_pos[%f,%f,%f]", I->elem_id, VPUSH(TW.c));
                 Msg("visual name %s", owner->cNameVisual().c_str());
                 Msg("object name %s", owner->cName().c_str());
 #ifdef DEBUG
                 Msg(dbg_object_full_dump_string(owner).c_str());
-#endif //#ifdef DEBUG
+#endif                                //#ifdef DEBUG
                 I->elem_id = u16(-1); //. hack - disable invalid bone
             }
         }
@@ -224,7 +211,6 @@ BOOL CCF_Skeleton::_RayQuery(const collide::ray_defs& Q, collide::rq_results& R)
 {
     if (dwFrameTL != Device.dwFrame) BuildTopLevel();
 
-
     Fsphere w_bv_sphere;
     owner->XFORM().transform_tiny(w_bv_sphere.P, bv_sphere.P);
     w_bv_sphere.R = bv_sphere.R;
@@ -236,12 +222,12 @@ BOOL CCF_Skeleton::_RayQuery(const collide::ray_defs& Q, collide::rq_results& R)
     Fsphere::ERP_Result res = w_bv_sphere.intersect(Q.start, Q.dir, tgt_dist, quant, aft);
     if ((Fsphere::rpNone == res) || ((Fsphere::rpOriginOutside == res) && (aft[0] > tgt_dist))) return FALSE;
 
-    if (dwFrame != Device.dwFrame) BuildState();
+    if (dwFrame != Device.dwFrame)
+        BuildState();
     else
     {
         IKinematics* K = PKinematics(owner->Visual());
-        if (K->LL_GetBonesVisible() != vis_mask)
-        {
+        if (K->LL_GetBonesVisible() != vis_mask) {
             // Model changed between ray-picks
             dwFrame = Device.dwFrame - 1;
             BuildState();
@@ -251,27 +237,26 @@ BOOL CCF_Skeleton::_RayQuery(const collide::ray_defs& Q, collide::rq_results& R)
     BOOL bHIT = FALSE;
     for (ElementVecIt I = elements.begin(); I != elements.end(); I++)
     {
-        if (!I->valid())continue;
+        if (!I->valid()) continue;
         bool res = false;
         float range = Q.range;
         switch (I->type)
         {
         case SBoneShape::stBox:
-            res = RAYvsOBB(I->b_IM, I->b_hsize, Q.start, Q.dir, range, Q.flags&CDB::OPT_CULL);
+            res = RAYvsOBB(I->b_IM, I->b_hsize, Q.start, Q.dir, range, Q.flags & CDB::OPT_CULL);
             break;
         case SBoneShape::stSphere:
-            res = RAYvsSPHERE(I->s_sphere, Q.start, Q.dir, range, Q.flags&CDB::OPT_CULL);
+            res = RAYvsSPHERE(I->s_sphere, Q.start, Q.dir, range, Q.flags & CDB::OPT_CULL);
 
             break;
         case SBoneShape::stCylinder:
-            res = RAYvsCYLINDER(I->c_cylinder, Q.start, Q.dir, range, Q.flags&CDB::OPT_CULL);
+            res = RAYvsCYLINDER(I->c_cylinder, Q.start, Q.dir, range, Q.flags & CDB::OPT_CULL);
             break;
         }
-        if (res)
-        {
+        if (res) {
             bHIT = TRUE;
-            R.append_result(owner, range, I->elem_id, Q.flags&CDB::OPT_ONLYNEAREST);
-            if (Q.flags&CDB::OPT_ONLYFIRST) break;
+            R.append_result(owner, range, I->elem_id, Q.flags & CDB::OPT_ONLYNEAREST);
+            if (Q.flags & CDB::OPT_ONLYFIRST) break;
         }
     }
     return bHIT;
@@ -364,11 +349,12 @@ BOOL CCF_Shape::_RayQuery(const collide::ray_defs& Q, collide::rq_results& R)
         {
             // sphere
             Fsphere::ERP_Result rp_res = shape.data.sphere.intersect(dS, dD, range);
-            if ((rp_res == Fsphere::rpOriginOutside) || (!(Q.flags&CDB::OPT_CULL) && (rp_res == Fsphere::rpOriginInside)))
+            if ((rp_res == Fsphere::rpOriginOutside) ||
+                (!(Q.flags & CDB::OPT_CULL) && (rp_res == Fsphere::rpOriginInside)))
             {
                 bHIT = TRUE;
-                R.append_result(owner, range, el, Q.flags&CDB::OPT_ONLYNEAREST);
-                if (Q.flags&CDB::OPT_ONLYFIRST) return TRUE;
+                R.append_result(owner, range, el, Q.flags & CDB::OPT_ONLYNEAREST);
+                if (Q.flags & CDB::OPT_ONLYFIRST) return TRUE;
             }
         }
         break;
@@ -381,15 +367,13 @@ BOOL CCF_Shape::_RayQuery(const collide::ray_defs& Q, collide::rq_results& R)
             B.transform_tiny(S1, dS);
             B.transform_dir(D1, dD);
             Fbox::ERP_Result rp_res = box.Pick2(S1, D1, P);
-            if ((rp_res == Fbox::rpOriginOutside) || (!(Q.flags&CDB::OPT_CULL) && (rp_res == Fbox::rpOriginInside)))
-            {
+            if ((rp_res == Fbox::rpOriginOutside) || (!(Q.flags & CDB::OPT_CULL) && (rp_res == Fbox::rpOriginInside))) {
                 float d = P.distance_to_sqr(dS);
-                if (d < range*range)
-                {
+                if (d < range * range) {
                     range = _sqrt(d);
                     bHIT = TRUE;
-                    R.append_result(owner, range, el, Q.flags&CDB::OPT_ONLYNEAREST);
-                    if (Q.flags&CDB::OPT_ONLYFIRST) return TRUE;
+                    R.append_result(owner, range, el, Q.flags & CDB::OPT_ONLYNEAREST);
+                    if (Q.flags & CDB::OPT_ONLYFIRST) return TRUE;
                 }
             }
         }
@@ -482,8 +466,7 @@ BOOL CCF_Shape::Contact(IGameObject* O)
 {
     // Build object-sphere in World-Space
     Fsphere S;
-    if (O->Visual())
-    {
+    if (O->Visual()) {
         O->Center(S.P);
         S.R = O->Radius();
     }
@@ -492,7 +475,8 @@ BOOL CCF_Shape::Contact(IGameObject* O)
         S = O->GetCForm()->getSphere();
         O->XFORM().transform_tiny(S.P);
     }
-    else return FALSE;
+    else
+        return FALSE;
 
     // Get our matrix
     const Fmatrix& XF = Owner()->XFORM();

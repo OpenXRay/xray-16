@@ -16,17 +16,14 @@
 
 namespace editor
 {
-
 class property_holder;
 
 namespace environment
 {
-
 class manager;
 
 namespace weathers
 {
-
 class weather;
 
 class manager : private Noncopyable
@@ -57,10 +54,7 @@ public:
 
 private:
     typedef editor::property_holder property_holder_type;
-    typedef property_collection <
-    weather_container_type,
-    manager
-    > collection_type;
+    typedef property_collection<weather_container_type, manager> collection_type;
 
 private:
     LPCSTR const* xr_stdcall weathers_getter() const;

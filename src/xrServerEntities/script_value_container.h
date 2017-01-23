@@ -9,18 +9,23 @@
 #pragma once
 
 #ifdef XRSE_FACTORY_EXPORTS
-	class CScriptValue;
+class CScriptValue;
 #else
-	class CScriptValue {public: virtual ~CScriptValue(){}};
+class CScriptValue
+{
+public:
+    virtual ~CScriptValue() {}
+};
 #endif
 
-class CScriptValueContainer {
+class CScriptValueContainer
+{
 protected:
-	xr_vector<CScriptValue*>				m_values;
+    xr_vector<CScriptValue*> m_values;
 
 public:
-	virtual			~CScriptValueContainer	();
-	IC		void	assign					();
-	IC		void	clear					();
-	IC		void	add						(CScriptValue *value);
+    virtual ~CScriptValueContainer();
+    IC void assign();
+    IC void clear();
+    IC void add(CScriptValue* value);
 };

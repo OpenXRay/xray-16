@@ -1,5 +1,5 @@
-#include "stdafx.h"
 #include "Lock.hpp"
+#include "stdafx.h"
 
 #ifdef CONFIG_PROFILE_LOCKS
 static add_profile_portion_callback add_profile_portion = 0;
@@ -15,8 +15,7 @@ struct profiler
 
     IC profiler::profiler(LPCSTR timer_id)
     {
-        if (!add_profile_portion)
-            return;
+        if (!add_profile_portion) return;
 
         m_timer_id = timer_id;
         m_time = CPU::QPC();
@@ -24,8 +23,7 @@ struct profiler
 
     IC profiler::~profiler()
     {
-        if (!add_profile_portion)
-            return;
+        if (!add_profile_portion) return;
 
         u64 time = CPU::QPC();
         (*add_profile_portion)(m_timer_id, time - m_time);
@@ -34,11 +32,11 @@ struct profiler
 
 void Lock::Enter()
 {
-# if 0//def DEBUG
+#if 0  // def DEBUG
     static bool show_call_stack = false;
     if (show_call_stack)
         OutputDebugStackTrace("----------------------------------------------------");
-# endif // DEBUG
+#endif // DEBUG
     profiler temp(id);
     mutex.lock();
     isLocked = true;
@@ -46,5 +44,5 @@ void Lock::Enter()
 #endif // CONFIG_PROFILE_LOCKS
 
 #ifdef DEBUG
-extern void OutputDebugStackTrace(const char *header);
+extern void OutputDebugStackTrace(const char* header);
 #endif

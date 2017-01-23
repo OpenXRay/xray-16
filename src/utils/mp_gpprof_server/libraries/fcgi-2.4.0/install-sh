@@ -1,60 +1,44 @@
-#!/bin/sh
+#!/ bin / sh
 #
-# install - install a program, script, or datafile
-# This comes from X11R5 (mit/util/scripts/install.sh).
+#install - install a program, script, or datafile
+#This comes from X11R5(mit / util / scripts / install.sh).
 #
-# Copyright 1991 by the Massachusetts Institute of Technology
+#Copyright 1991 by the Massachusetts Institute of Technology
 #
-# Permission to use, copy, modify, distribute, and sell this software and its
-# documentation for any purpose is hereby granted without fee, provided that
-# the above copyright notice appear in all copies and that both that
-# copyright notice and this permission notice appear in supporting
-# documentation, and that the name of M.I.T. not be used in advertising or
-# publicity pertaining to distribution of the software without specific,
-# written prior permission.  M.I.T. makes no representations about the
-# suitability of this software for any purpose.  It is provided "as is"
-# without express or implied warranty.
+#Permission to use, copy, modify, distribute, and sell this software and its
+#documentation for any purpose is hereby granted without fee, provided that
+#the above copyright notice appear in all copies and that both that
+#copyright notice and this permission notice appear in supporting
+#documentation, and that the name of M.I.T.not be used in advertising or
+#publicity pertaining to distribution of the software without specific,
+#written prior permission.M.I.T.makes no representations about the
+#suitability of this software for any purpose.It is provided "as is"
+#without express or implied warranty.
 #
-# Calling this script install-sh is preferred over install.sh, to prevent
+#Calling this script install - sh is preferred over install.sh, to prevent
 # `make' implicit rules from creating a file called install from it
-# when there is no Makefile.
+#when there is no Makefile.
 #
-# This script is compatible with the BSD install script, but was written
-# from scratch.  It can only install one file at a time, a restriction
-# shared with many OS's install programs.
+#This script is compatible with the BSD install script, but was written
+#from scratch.It can only install one file at a time, a restriction
+#shared with many OS's install programs.
 
+#set DOITPROG to echo to test this script
 
-# set DOITPROG to echo to test this script
+#Don 't use :- since 4.3BSD and earlier shells don' t like it.
+doit = "${DOITPROG-}"
 
-# Don't use :- since 4.3BSD and earlier shells don't like it.
-doit="${DOITPROG-}"
+#put in absolute paths if you don't have them in your path; or use env. vars.
 
+    mvprog = "${MVPROG-mv}" cpprog = "${CPPROG-cp}" chmodprog = "${CHMODPROG-chmod}" chownprog =
+        "${CHOWNPROG-chown}" chgrpprog = "${CHGRPPROG-chgrp}" stripprog = "${STRIPPROG-strip}" rmprog =
+            "${RMPROG-rm}" mkdirprog = "${MKDIRPROG-mkdir}"
 
-# put in absolute paths if you don't have them in your path; or use env. vars.
+    transformbasename = "" transform_arg = "" instcmd = "$mvprog" chmodcmd = "$chmodprog 0755" chowncmd = "" chgrpcmd =
+        "" stripcmd = "" rmcmd = "$rmprog -f" mvcmd = "$mvprog" src = "" dst = "" dir_arg = ""
 
-mvprog="${MVPROG-mv}"
-cpprog="${CPPROG-cp}"
-chmodprog="${CHMODPROG-chmod}"
-chownprog="${CHOWNPROG-chown}"
-chgrpprog="${CHGRPPROG-chgrp}"
-stripprog="${STRIPPROG-strip}"
-rmprog="${RMPROG-rm}"
-mkdirprog="${MKDIRPROG-mkdir}"
-
-transformbasename=""
-transform_arg=""
-instcmd="$mvprog"
-chmodcmd="$chmodprog 0755"
-chowncmd=""
-chgrpcmd=""
-stripcmd=""
-rmcmd="$rmprog -f"
-mvcmd="$mvprog"
-src=""
-dst=""
-dir_arg=""
-
-while [ x"$1" != x ]; do
+    while[x "$1" != x];
+do
     case $1 in
 	-c) instcmd="$cpprog"
 	    shift
@@ -95,157 +79,121 @@ while [ x"$1" != x ]; do
 	    then
 		src=$1
 	    else
-		# this colon is to work around a 386BSD /bin/sh bug
+#this colon is to work around a 386BSD / bin / sh bug
 		:
-		dst=$1
-	    fi
-	    shift
-	    continue;;
-    esac
-done
+        dst = $1 fi shift continue;
+    ;
+    esac done
 
-if [ x"$src" = x ]
-then
-	echo "install:	no input file specified"
-	exit 1
-else
-	true
-fi
+        if[x "$src" = x] then echo "install:	no input file specified" exit 1 else true fi
 
-if [ x"$dir_arg" != x ]; then
-	dst=$src
-	src=""
-	
-	if [ -d $dst ]; then
-		instcmd=:
-		chmodcmd=""
-	else
-		instcmd=mkdir
-	fi
-else
+        if[x "$dir_arg" != x];
+    then dst = $src src = ""
 
-# Waiting for this to be detected by the "$instcmd $src $dsttmp" command
-# might cause directories to be created, which would be especially bad 
-# if $src (and thus $dsttmp) contains '*'.
+        if[-d $dst];
+    then instcmd = : chmodcmd = "" else instcmd = mkdir fi else
 
-	if [ -f $src -o -d $src ]
-	then
-		true
-	else
-		echo "install:  $src does not exist"
-		exit 1
-	fi
-	
-	if [ x"$dst" = x ]
-	then
-		echo "install:	no destination specified"
-		exit 1
-	else
-		true
-	fi
+#Waiting for this to be detected by the "$instcmd $src $dsttmp" command
+#might cause directories to be created, which would be especially bad
+#if $src(and thus $dsttmp) contains '*'.
 
-# If destination is a directory, append the input filename; if your system
-# does not like double slashes in filenames, you may need to add some logic
+                     if[-f $src - o - d $src] then true else echo "install:  $src does not exist" exit 1 fi
 
-	if [ -d $dst ]
-	then
-		dst="$dst"/`basename $src`
-	else
-		true
-	fi
-fi
+                     if[x "$dst" = x] then echo "install:	no destination specified" exit 1 else true fi
 
-## this sed command emulates the dirname command
-dstdir=`echo $dst | sed -e 's,[^/]*$,,;s,/$,,;s,^$,.,'`
+#If destination is a directory, append the input filename; if your system
+#does not like double slashes in filenames, you may need to add some logic
 
-# Make sure that the destination directory exists.
-#  this part is taken from Noah Friedman's mkinstalldirs script
+                     if[-d $dst] then dst =
+                         "$dst" /`basename $src` else true fi fi
 
-# Skip lots of stat calls in the usual case.
-if [ ! -d "$dstdir" ]; then
-defaultIFS='	
-'
-IFS="${IFS-${defaultIFS}}"
+                         ##this sed command emulates the dirname command dstdir =`echo $dst |
+                                                                                 sed - e 's,[^/]*$,,;s,/$,,;s,^$,.,'`
 
-oIFS="${IFS}"
-# Some sh's can't handle IFS=/ for some reason.
-IFS='%'
-set - `echo ${dstdir} | sed -e 's@/@%@g' -e 's@^%@/@'`
-IFS="${oIFS}"
+#Make sure that the destination directory exists.
+#this part is taken from Noah Friedman's mkinstalldirs script
 
-pathcomp=''
+#Skip lots of stat calls in the usual case.
+                                                                                     if[! - d "$dstdir"];
+    then defaultIFS ='	
+' IFS = "${IFS-${defaultIFS}}"
 
-while [ $# -ne 0 ] ; do
-	pathcomp="${pathcomp}${1}"
-	shift
+        oIFS = "${IFS}"
+#Some sh 's can' t handle IFS = / for some reason.
+        IFS = '%' set - `echo ${dstdir} | sed - e 's@/@%@g' - e 's@^%@/@'` IFS = "${oIFS}"
 
-	if [ ! -d "${pathcomp}" ] ;
-        then
-		$mkdirprog "${pathcomp}"
-	else
-		true
-	fi
+        pathcomp =''
 
-	pathcomp="${pathcomp}/"
-done
-fi
+        while[$ # - ne 0];
+    do
+        pathcomp = "${pathcomp}${1}" shift
 
-if [ x"$dir_arg" != x ]
-then
-	$doit $instcmd $dst &&
+            if[! - d "${pathcomp}"];
+    then $mkdirprog "${pathcomp}" else true fi
 
-	if [ x"$chowncmd" != x ]; then $doit $chowncmd $dst; else true ; fi &&
-	if [ x"$chgrpcmd" != x ]; then $doit $chgrpcmd $dst; else true ; fi &&
-	if [ x"$stripcmd" != x ]; then $doit $stripcmd $dst; else true ; fi &&
-	if [ x"$chmodcmd" != x ]; then $doit $chmodcmd $dst; else true ; fi
-else
+        pathcomp = "${pathcomp}/" done fi
 
-# If we're going to rename the final executable, determine the name now.
+                   if[x "$dir_arg" != x] then $doit $instcmd $dst &&
 
-	if [ x"$transformarg" = x ] 
-	then
-		dstfile=`basename $dst`
-	else
-		dstfile=`basename $dst $transformbasename | 
-			sed $transformarg`$transformbasename
-	fi
+                   if[x "$chowncmd" != x];
+    then $doit $chowncmd $dst;
+    else true;
+    fi&& if[x "$chgrpcmd" != x];
+    then $doit $chgrpcmd $dst;
+    else true;
+    fi&& if[x "$stripcmd" != x];
+    then $doit $stripcmd $dst;
+    else true;
+    fi&& if[x "$chmodcmd" != x];
+    then $doit $chmodcmd $dst;
+    else true;
+    fi else
 
-# don't allow the sed command to completely eliminate the filename
+#If we're going to rename the final executable, determine the name now.
 
-	if [ x"$dstfile" = x ] 
-	then
-		dstfile=`basename $dst`
-	else
-		true
-	fi
+        if[x "$transformarg" = x] then dstfile =`basename
+            $dst` else dstfile =`basename $dst $transformbasename | sed $transformarg`$transformbasename fi
 
-# Make a temp file name in the proper directory.
+#don't allow the sed command to completely eliminate the filename
 
-	dsttmp=$dstdir/#inst.$$#
+                                if[x "$dstfile" = x] then dstfile =`basename $dst` else true fi
 
-# Move or copy the file name to the temp name
+#Make a temp file name in the proper directory.
 
-	$doit $instcmd $src $dsttmp &&
+                dsttmp = $dstdir /
+#inst.$$ #
 
-	trap "rm -f ${dsttmp}" 0 &&
+#Move or copy the file name to the temp name
 
-# and set any options; do chmod last to preserve setuid bits
+                             $doit $instcmd $src $dsttmp &&
 
-# If any of these fail, we abort the whole thing.  If we want to
-# ignore errors from any of these, just make sure not to ignore
-# errors from the above "$doit $instcmd $src $dsttmp" command.
+                         trap "rm -f ${dsttmp}" 0 &&
 
-	if [ x"$chowncmd" != x ]; then $doit $chowncmd $dsttmp; else true;fi &&
-	if [ x"$chgrpcmd" != x ]; then $doit $chgrpcmd $dsttmp; else true;fi &&
-	if [ x"$stripcmd" != x ]; then $doit $stripcmd $dsttmp; else true;fi &&
-	if [ x"$chmodcmd" != x ]; then $doit $chmodcmd $dsttmp; else true;fi &&
+#and set any options; do chmod last to preserve setuid bits
 
-# Now rename the file to the real destination.
+#If any of these fail, we abort the whole thing.If we want to
+#ignore errors from any of these, just make sure not to ignore
+#errors from the above "$doit $instcmd $src $dsttmp" command.
 
-	$doit $rmcmd -f $dstdir/$dstfile &&
-	$doit $mvcmd $dsttmp $dstdir/$dstfile 
+                         if[x "$chowncmd" != x];
+    then $doit $chowncmd $dsttmp;
+    else true;
+    fi&& if[x "$chgrpcmd" != x];
+    then $doit $chgrpcmd $dsttmp;
+    else true;
+    fi&& if[x "$stripcmd" != x];
+    then $doit $stripcmd $dsttmp;
+    else true;
+    fi&& if[x "$chmodcmd" != x];
+    then $doit $chmodcmd $dsttmp;
+    else true;
+    fi&&
 
-fi &&
+#Now rename the file to the real destination.
 
+            $doit $rmcmd -
+        f $dstdir / $dstfile&& $doit $mvcmd $dsttmp $dstdir / $dstfile
 
-exit 0
+                                                                  fi&&
+
+                                                                      exit 0

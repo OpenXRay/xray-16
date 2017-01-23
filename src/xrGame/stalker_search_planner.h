@@ -13,20 +13,21 @@
 
 class CAI_Stalker;
 
-class CStalkerSearchPlanner : public CActionPlannerActionScript<CAI_Stalker> {
+class CStalkerSearchPlanner : public CActionPlannerActionScript<CAI_Stalker>
+{
 private:
-	typedef CActionPlannerActionScript<CAI_Stalker>	inherited;
+    typedef CActionPlannerActionScript<CAI_Stalker> inherited;
 
 private:
-			void	add_evaluators			();
-			void	add_actions				();
+    void add_evaluators();
+    void add_actions();
 
 public:
-					CStalkerSearchPlanner	(CAI_Stalker *object = 0, LPCSTR action_name = "");
-	virtual	void	setup					(CAI_Stalker *object, CPropertyStorage *storage);
-	virtual void	update					();
-	virtual void	initialize				();
-	virtual void	finalize				();
+    CStalkerSearchPlanner(CAI_Stalker* object = 0, LPCSTR action_name = "");
+    virtual void setup(CAI_Stalker* object, CPropertyStorage* storage);
+    virtual void update();
+    virtual void initialize();
+    virtual void finalize();
 };
 
 #endif // STALKER_SEARCH_PLANNER_H_INCLUDED

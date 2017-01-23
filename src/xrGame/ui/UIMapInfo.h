@@ -2,18 +2,18 @@
 
 #include "UIWindow.h"
 
-
 class CUIScrollView;
 
-class CUIMapInfo : public CUIWindow 
+class CUIMapInfo : public CUIWindow
 {
 public:
-				CUIMapInfo			();
-				~CUIMapInfo			();
-			void InitMapInfo		(Fvector2 pos,Fvector2 size);
-			void InitMap			(LPCSTR map_name, LPCSTR map_ver);
-		LPCSTR	 GetLargeDesc		();
+    CUIMapInfo();
+    ~CUIMapInfo();
+    void InitMapInfo(Fvector2 pos, Fvector2 size);
+    void InitMap(LPCSTR map_name, LPCSTR map_ver);
+    LPCSTR GetLargeDesc();
+
 protected:
-	CUIScrollView*	m_view;
-	shared_str		m_large_desc;
+    CUIScrollView* m_view;
+    shared_str m_large_desc;
 };

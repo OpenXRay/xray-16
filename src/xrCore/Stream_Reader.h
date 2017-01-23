@@ -1,7 +1,7 @@
 #ifndef STREAM_READER_H
 #define STREAM_READER_H
 
-class XRCORE_API CStreamReader : public IReaderBase < CStreamReader >
+class XRCORE_API CStreamReader : public IReaderBase<CStreamReader>
 {
 private:
     HANDLE m_file_mapping_handle;
@@ -25,19 +25,14 @@ private:
 private:
     // should not be called
     IC CStreamReader(const CStreamReader& object);
-    IC CStreamReader& operator= (const CStreamReader&);
+    IC CStreamReader& operator=(const CStreamReader&);
 
 public:
     IC CStreamReader();
 
 public:
-    virtual void construct(
-        const HANDLE& file_mapping_handle,
-        const u32& start_offset,
-        const u32& file_size,
-        const u32& archive_size,
-        const u32& window_size
-    );
+    virtual void construct(const HANDLE& file_mapping_handle, const u32& start_offset, const u32& file_size,
+        const u32& archive_size, const u32& window_size);
     virtual void destroy();
 
 public:

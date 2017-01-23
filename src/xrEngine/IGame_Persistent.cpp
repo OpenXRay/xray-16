@@ -1,18 +1,18 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include "IGame_Persistent.h"
 #include "GameFont.h"
+#include "IGame_Persistent.h"
 #include "PerformanceAlert.hpp"
 
 #ifndef _EDITOR
+#include "CustomHUD.h"
 #include "Environment.h"
-# include "x_ray.h"
-# include "IGame_Level.h"
-# include "XR_IOConsole.h"
-# include "Render.h"
-# include "PS_instance.h"
-# include "CustomHUD.h"
+#include "IGame_Level.h"
+#include "PS_instance.h"
+#include "Render.h"
+#include "XR_IOConsole.h"
+#include "x_ray.h"
 #endif
 
 #ifdef _EDITOR
@@ -20,7 +20,7 @@ bool g_dedicated_server = false;
 #endif
 
 #ifdef INGAME_EDITOR
-# include "editor_environment_manager.hpp"
+#include "editor_environment_manager.hpp"
 #endif // INGAME_EDITOR
 
 ENGINE_API IGame_Persistent* g_pGamePersistent = NULL;
@@ -39,7 +39,7 @@ IGame_Persistent::IGame_Persistent()
 #ifndef _EDITOR
     pEnvironment = new CEnvironment();
 #endif
-#else // #ifdef INGAME_EDITOR
+#else  // #ifdef INGAME_EDITOR
     if (RDEVICE.editor())
         pEnvironment = new editor::environment::manager();
     else
@@ -86,7 +86,6 @@ void IGame_Persistent::OnAppEnd()
 #endif
 }
 
-
 void IGame_Persistent::PreStart(LPCSTR op)
 {
     string256 prev_type;
@@ -95,8 +94,7 @@ void IGame_Persistent::PreStart(LPCSTR op)
     new_game_params.parse_cmd_line(op);
 
     // change game type
-    if (0 != xr_strcmp(prev_type, new_game_params.m_game_type))
-    {
+    if (0 != xr_strcmp(prev_type, new_game_params.m_game_type)) {
         OnGameEnd();
     }
 }
@@ -106,16 +104,14 @@ void IGame_Persistent::Start(LPCSTR op)
     xr_strcpy(prev_type, m_game_params.m_game_type);
     m_game_params.parse_cmd_line(op);
     // change game type
-    if ((0 != xr_strcmp(prev_type, m_game_params.m_game_type)))
-    {
-        if (*m_game_params.m_game_type)
-            OnGameStart();
+    if ((0 != xr_strcmp(prev_type, m_game_params.m_game_type))) {
+        if (*m_game_params.m_game_type) OnGameStart();
 #ifndef _EDITOR
-        if (g_hud)
-            DEL_INSTANCE(g_hud);
+        if (g_hud) DEL_INSTANCE(g_hud);
 #endif
     }
-    else UpdateGameType();
+    else
+        UpdateGameType();
 
     VERIFY(ps_destroy.empty());
 }
@@ -126,9 +122,8 @@ void IGame_Persistent::Disconnect()
     // clear "need to play" particles
     destroy_particles(true);
 
-    if (g_hud)
-        DEL_INSTANCE(g_hud);
-    //. g_hud->OnDisconnected ();
+    if (g_hud) DEL_INSTANCE(g_hud);
+//. g_hud->OnDisconnected ();
 #endif
 }
 
@@ -137,8 +132,7 @@ void IGame_Persistent::OnGameStart()
 #ifndef _EDITOR
     // LoadTitle("st_prefetching_objects");
     LoadTitle();
-    if (!strstr(Core.Params, "-noprefetch"))
-        Prefetch();
+    if (!strstr(Core.Params, "-noprefetch")) Prefetch();
 #endif
 }
 
@@ -146,7 +140,7 @@ void IGame_Persistent::OnGameStart()
 void IGame_Persistent::Prefetch()
 {
     // prefetch game objects & models
-    float p_time = 1000.f*Device.GetTimerGlobal()->GetElapsed_sec();
+    float p_time = 1000.f * Device.GetTimerGlobal()->GetElapsed_sec();
     u32 mem_0 = Memory.mem_usage();
 
     Log("Loading objects...");
@@ -155,14 +149,13 @@ void IGame_Persistent::Prefetch()
     GlobalEnv.Render->models_Prefetch();
     GlobalEnv.Render->ResourcesDeferredUpload();
 
-    p_time = 1000.f*Device.GetTimerGlobal()->GetElapsed_sec() - p_time;
+    p_time = 1000.f * Device.GetTimerGlobal()->GetElapsed_sec() - p_time;
     u32 p_mem = Memory.mem_usage() - mem_0;
 
     Msg("* [prefetch] time:   %d ms", iFloor(p_time));
     Msg("* [prefetch] memory: %dKb", p_mem / 1024);
 }
 #endif
-
 
 void IGame_Persistent::OnGameEnd()
 {
@@ -175,8 +168,7 @@ void IGame_Persistent::OnGameEnd()
 void IGame_Persistent::OnFrame()
 {
 #ifndef _EDITOR
-    if (!Device.Paused() || Device.dwPrecacheFrame)
-        Environment().OnFrame();
+    if (!Device.Paused() || Device.dwPrecacheFrame) Environment().OnFrame();
 
     stats.Starting = ps_needtoplay.size();
     stats.Active = ps_active.size();
@@ -194,14 +186,13 @@ void IGame_Persistent::OnFrame()
         // u32 cnt = ps_destroy.size();
         CPS_Instance* psi = ps_destroy.back();
         VERIFY(psi);
-        if (psi->Locked())
-        {
+        if (psi->Locked()) {
             Log("--locked");
             break;
         }
         ps_destroy.pop_back();
         psi->PSI_internal_delete();
-    }    
+    }
 #endif
 }
 
@@ -220,23 +211,19 @@ void IGame_Persistent::destroy_particles(const bool& all_particles)
     }
 
     // delete active particles
-    if (all_particles)
-    {
+    if (all_particles) {
         for (; !ps_active.empty();)
             (*ps_active.begin())->PSI_internal_delete();
     }
     else
     {
         u32 active_size = ps_active.size();
-        CPS_Instance** I = (CPS_Instance**)_alloca(active_size*sizeof(CPS_Instance*));
+        CPS_Instance** I = (CPS_Instance**)_alloca(active_size * sizeof(CPS_Instance*));
         std::copy(ps_active.begin(), ps_active.end(), I);
 
         struct destroy_on_game_load
         {
-            static IC bool predicate(CPS_Instance* const& object)
-            {
-                return (!object->destroy_on_game_load());
-            }
+            static IC bool predicate(CPS_Instance* const& object) { return (!object->destroy_on_game_load()); }
         };
 
         CPS_Instance** E = std::remove_if(I, I + active_size, &destroy_on_game_load::predicate);
@@ -255,7 +242,7 @@ void IGame_Persistent::OnAssetsChanged()
 #endif
 }
 
-void IGame_Persistent::DumpStatistics(IGameFont &font, IPerformanceAlert *alert)
+void IGame_Persistent::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
 {
     // XXX: move to particle engine
     stats.FrameEnd();

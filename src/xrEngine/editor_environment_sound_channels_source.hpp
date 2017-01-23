@@ -16,24 +16,19 @@
 
 namespace editor
 {
-
 class property_holder_collection;
 
 namespace environment
 {
 namespace sound_channels
 {
-
-class source :
-    public editor::property_holder_holder,
-    private Noncopyable
+class source : public editor::property_holder_holder, private Noncopyable
 {
 public:
     source(shared_str const& source);
     ~source();
     void fill(editor::property_holder_collection* collection);
     inline LPCSTR id() const { return m_source.c_str(); }
-
 private:
     typedef editor::property_holder property_holder_type;
 

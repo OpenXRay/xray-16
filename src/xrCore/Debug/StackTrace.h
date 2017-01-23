@@ -5,14 +5,14 @@ Copyright (c) 1997-2000 John Robbins -- All rights reserved.
 
 #pragma once
 
-#include <windows.h>
 #include <DbgHelp.h>
+#include <windows.h>
 
 /*//////////////////////////////////////////////////////////////////////
 Type Definitions
 //////////////////////////////////////////////////////////////////////*/
 // The type for the filter function called by the Crash Handler API.
-typedef LONG(__stdcall *PFNCHFILTFN) (EXCEPTION_POINTERS* pExPtrs);
+typedef LONG(__stdcall* PFNCHFILTFN)(EXCEPTION_POINTERS* pExPtrs);
 
 /*//////////////////////////////////////////////////////////////////////
 Crash Handler Function Definitions
@@ -42,10 +42,10 @@ RETURNS         :
 !NULL - The requested stack trace string.
 NULL  - There was a problem.
 ----------------------------------------------------------------------*/
-#define GSTSO_PARAMS    0x01
-#define GSTSO_MODULE    0x02
-#define GSTSO_SYMBOL    0x04
-#define GSTSO_SRCLINE   0x08
+#define GSTSO_PARAMS 0x01
+#define GSTSO_MODULE 0x02
+#define GSTSO_SYMBOL 0x04
+#define GSTSO_SRCLINE 0x08
 LPCTSTR __stdcall GetFirstStackTraceString(DWORD dwOpts, EXCEPTION_POINTERS* pExPtrs);
 LPCTSTR __stdcall GetNextStackTraceString(DWORD dwOpts, EXCEPTION_POINTERS* pExPtrs);
 
@@ -74,4 +74,4 @@ TRUE  - The string was copied into szBuff.
 FALSE - There was a problem.
 ----------------------------------------------------------------------*/
 BOOL __stdcall GetFirstStackTraceStringVB(DWORD dwOpts, EXCEPTION_POINTERS* pExPtrs, LPTSTR szBuff, UINT uiSize);
-BOOL __stdcall GetNextStackTraceStringVB(DWORD dwOpts, EXCEPTION_POINTERS * pExPtrs, LPTSTR szBuff, UINT uiSize);
+BOOL __stdcall GetNextStackTraceStringVB(DWORD dwOpts, EXCEPTION_POINTERS* pExPtrs, LPTSTR szBuff, UINT uiSize);

@@ -8,19 +8,18 @@
 
 #pragma once
 
-IC	refreshable_obstacles_query::refreshable_obstacles_query()
+IC refreshable_obstacles_query::refreshable_obstacles_query()
 {
-	m_last_update_time	= 0;
+    m_last_update_time = 0;
 }
 
-IC	const float &refreshable_obstacles_query::refresh_radius()
+IC const float& refreshable_obstacles_query::refresh_radius()
 {
-	static const float	m_update_objects_radius			= 2.f;
-	static const float	m_large_update_objects_radius	= 100.f;
+    static const float m_update_objects_radius = 2.f;
+    static const float m_large_update_objects_radius = 100.f;
 
-	if (Device.dwTimeGlobal < (m_update_objects_radius + m_large_update_check_time))
-		return			(m_update_objects_radius);
+    if (Device.dwTimeGlobal < (m_update_objects_radius + m_large_update_check_time)) return (m_update_objects_radius);
 
-	m_last_update_time	= Device.dwTimeGlobal;
-	return				(m_large_update_objects_radius);
+    m_last_update_time = Device.dwTimeGlobal;
+    return (m_large_update_objects_radius);
 }

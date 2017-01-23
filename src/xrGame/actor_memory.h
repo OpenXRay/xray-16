@@ -12,23 +12,17 @@
 
 class CActor;
 
-class CActorMemory : public vision_client {
+class CActorMemory : public vision_client
+{
 private:
-	typedef vision_client					inherited;
+    typedef vision_client inherited;
 
 private:
-	CActor			*m_actor;
+    CActor* m_actor;
 
 public:
-					CActorMemory			(CActor *actor);
-	virtual	bool	feel_vision_isRelevant	(IGameObject *object);
-	virtual	void	camera					(
-						Fvector &position,
-						Fvector &direction,
-						Fvector &normal,
-						float &field_of_view,
-						float &aspect_ratio,
-						float &near_plane,
-						float &far_plane
-					);
+    CActorMemory(CActor* actor);
+    virtual bool feel_vision_isRelevant(IGameObject* object);
+    virtual void camera(Fvector& position, Fvector& direction, Fvector& normal, float& field_of_view,
+        float& aspect_ratio, float& near_plane, float& far_plane);
 };

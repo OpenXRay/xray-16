@@ -12,50 +12,44 @@
 
 using namespace luabind;
 
-SCRIPT_EXPORT(CScriptSoundAction, (),
-{
-	module(luaState)
-	[
-		class_<CScriptSoundAction>("sound")
-			.enum_("type")
-			[
-				value("idle",					int(MonsterSound::eMonsterSoundIdle)),
-				value("eat",					int(MonsterSound::eMonsterSoundEat)),
-				value("attack",					int(MonsterSound::eMonsterSoundAggressive)),
-				value("attack_hit",				int(MonsterSound::eMonsterSoundAttackHit)),
-				value("take_damage",			int(MonsterSound::eMonsterSoundTakeDamage)),
-				value("die",					int(MonsterSound::eMonsterSoundDie)),
-				value("threaten",				int(MonsterSound::eMonsterSoundThreaten)),
-				value("steal",					int(MonsterSound::eMonsterSoundSteal)),
-				value("panic",					int(MonsterSound::eMonsterSoundPanic))
-			]
+SCRIPT_EXPORT(CScriptSoundAction, (), {
+    module(luaState)[class_<CScriptSoundAction>("sound")
+                         .enum_("type")[value("idle", int(MonsterSound::eMonsterSoundIdle)),
+                             value("eat", int(MonsterSound::eMonsterSoundEat)),
+                             value("attack", int(MonsterSound::eMonsterSoundAggressive)),
+                             value("attack_hit", int(MonsterSound::eMonsterSoundAttackHit)),
+                             value("take_damage", int(MonsterSound::eMonsterSoundTakeDamage)),
+                             value("die", int(MonsterSound::eMonsterSoundDie)),
+                             value("threaten", int(MonsterSound::eMonsterSoundThreaten)),
+                             value("steal", int(MonsterSound::eMonsterSoundSteal)),
+                             value("panic", int(MonsterSound::eMonsterSoundPanic))]
 
-			.def(								constructor<>())
-			.def(								constructor<LPCSTR,LPCSTR>())
-			.def(								constructor<LPCSTR,LPCSTR,const Fvector &>())
-			.def(								constructor<LPCSTR,LPCSTR,const Fvector &,const Fvector &>())
-			.def(								constructor<LPCSTR,LPCSTR,const Fvector &,const Fvector &,bool>())
-			.def(								constructor<LPCSTR,Fvector *>())
-			.def(								constructor<LPCSTR,Fvector *,const Fvector &>())
-			.def(								constructor<LPCSTR,Fvector *,const Fvector &,bool>())
-			.def(								constructor<CScriptSound*,LPCSTR,const Fvector &>())
-			.def(								constructor<CScriptSound*,LPCSTR,const Fvector &,const Fvector &>())
-			.def(								constructor<CScriptSound*,LPCSTR,const Fvector &,const Fvector &,bool>())
-			.def(								constructor<CScriptSound*,Fvector *>())
-			.def(								constructor<CScriptSound*,Fvector *,const Fvector &>())
-			.def(								constructor<CScriptSound*,Fvector *,const Fvector &,bool>())
-			// monster specific
-			.def(								constructor<MonsterSound::EType>())
-			.def(								constructor<MonsterSound::EType,int>())
-			// trader specific
-			.def(								constructor<LPCSTR,LPCSTR,MonsterSpace::EMonsterHeadAnimType>())
+                         .def(constructor<>())
+                         .def(constructor<LPCSTR, LPCSTR>())
+                         .def(constructor<LPCSTR, LPCSTR, const Fvector&>())
+                         .def(constructor<LPCSTR, LPCSTR, const Fvector&, const Fvector&>())
+                         .def(constructor<LPCSTR, LPCSTR, const Fvector&, const Fvector&, bool>())
+                         .def(constructor<LPCSTR, Fvector*>())
+                         .def(constructor<LPCSTR, Fvector*, const Fvector&>())
+                         .def(constructor<LPCSTR, Fvector*, const Fvector&, bool>())
+                         .def(constructor<CScriptSound*, LPCSTR, const Fvector&>())
+                         .def(constructor<CScriptSound*, LPCSTR, const Fvector&, const Fvector&>())
+                         .def(constructor<CScriptSound*, LPCSTR, const Fvector&, const Fvector&, bool>())
+                         .def(constructor<CScriptSound*, Fvector*>())
+                         .def(constructor<CScriptSound*, Fvector*, const Fvector&>())
+                         .def(constructor<CScriptSound*, Fvector*, const Fvector&, bool>())
+                         // monster specific
+                         .def(constructor<MonsterSound::EType>())
+                         .def(constructor<MonsterSound::EType, int>())
+                         // trader specific
+                         .def(constructor<LPCSTR, LPCSTR, MonsterSpace::EMonsterHeadAnimType>())
 
-			.def("set_sound",					(void (CScriptSoundAction::*)(LPCSTR))(&CScriptSoundAction::SetSound))
-			.def("set_sound",					(void (CScriptSoundAction::*)(const CScriptSound &))(&CScriptSoundAction::SetSound))
-			.def("set_sound_type",				&CScriptSoundAction::SetSoundType)
-			.def("set_bone",					&CScriptSoundAction::SetBone)
-			.def("set_position",				&CScriptSoundAction::SetPosition)
-			.def("set_angles",					&CScriptSoundAction::SetAngles)
-			.def("completed",					(bool (CScriptSoundAction::*)())(&CScriptSoundAction::completed))
-	];
+                         .def("set_sound", (void (CScriptSoundAction::*)(LPCSTR))(&CScriptSoundAction::SetSound))
+                         .def("set_sound",
+                             (void (CScriptSoundAction::*)(const CScriptSound&))(&CScriptSoundAction::SetSound))
+                         .def("set_sound_type", &CScriptSoundAction::SetSoundType)
+                         .def("set_bone", &CScriptSoundAction::SetBone)
+                         .def("set_position", &CScriptSoundAction::SetPosition)
+                         .def("set_angles", &CScriptSoundAction::SetAngles)
+                         .def("completed", (bool (CScriptSoundAction::*)())(&CScriptSoundAction::completed))];
 });

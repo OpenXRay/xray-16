@@ -1,15 +1,14 @@
 #pragma once
-#include "xrCore/xrCore.h"
 #include "xrCore/Animation/Envelope.hpp"
 #include "xrCore/PostProcess/PPInfo.hpp"
+#include "xrCore/xrCore.h"
 
 #define POSTPROCESS_PARAMS_COUNT 11
 //.#define POSTPROCESS_FILE_VERSION 0x0001
 #define POSTPROCESS_FILE_VERSION 0x0002
 #define POSTPROCESS_FILE_EXTENSION ".ppe"
 
-typedef enum _pp_params
-{
+typedef enum _pp_params {
     pp_unknown = -1,
     pp_base_color = 0,
     pp_add_color = 1,
@@ -30,84 +29,85 @@ class XRCORE_API CPostProcessParam
 {
 protected:
 public:
-    virtual void    update(float dt) = 0;
-    virtual void    load(IReader &pReader) = 0;
-    virtual void    save(IWriter &pWriter) = 0;
-    virtual float   get_length() = 0;
-    virtual size_t  get_keys_count() = 0;
+    virtual void update(float dt) = 0;
+    virtual void load(IReader& pReader) = 0;
+    virtual void save(IWriter& pWriter) = 0;
+    virtual float get_length() = 0;
+    virtual size_t get_keys_count() = 0;
     virtual ~CPostProcessParam() {}
-    virtual void    add_value(float time, float value, int index = 0) = 0;
-    virtual void    delete_value(float time) = 0;
-    virtual void    update_value(float time, float value, int index = 0) = 0;
-    virtual void    get_value(float time, float &value, int index = 0) = 0;
-    virtual float   get_key_time(size_t index) = 0;
-    virtual void   clear_all_keys() = 0;
+    virtual void add_value(float time, float value, int index = 0) = 0;
+    virtual void delete_value(float time) = 0;
+    virtual void update_value(float time, float value, int index = 0) = 0;
+    virtual void get_value(float time, float& value, int index = 0) = 0;
+    virtual float get_key_time(size_t index) = 0;
+    virtual void clear_all_keys() = 0;
 };
 
 class XRCORE_API CPostProcessValue : public CPostProcessParam
 {
 protected:
-    CEnvelope       m_Value;
-    float          *m_pfParam;
+    CEnvelope m_Value;
+    float* m_pfParam;
+
 public:
-    CPostProcessValue(float *pfparam) 		{ m_pfParam = pfparam; }
-    virtual void    update(float dt)
+    CPostProcessValue(float* pfparam) { m_pfParam = pfparam; }
+    virtual void update(float dt) { *m_pfParam = m_Value.Evaluate(dt); }
+    virtual void load(IReader& pReader);
+    virtual void save(IWriter& pWriter);
+    virtual float get_length()
     {
-        *m_pfParam = m_Value.Evaluate(dt);
+        float mn, mx;
+        return m_Value.GetLength(&mn, &mx);
     }
-    virtual void    load(IReader &pReader);
-    virtual void    save(IWriter &pWriter);
-    virtual float   get_length()                    	{ float mn, mx; return m_Value.GetLength(&mn, &mx); }
-    virtual size_t  get_keys_count() 						{ return m_Value.keys.size(); }
-    virtual void    add_value(float time, float value, int index = 0);
-    virtual void    delete_value(float time);
-    virtual void    update_value(float time, float value, int index = 0);
-    virtual void    get_value(float time, float &valueb, int index = 0);
-    virtual float   get_key_time(size_t index)  { VERIFY(index < get_keys_count()); return m_Value.keys[index]->time; }
-    virtual void   clear_all_keys();
+    virtual size_t get_keys_count() { return m_Value.keys.size(); }
+    virtual void add_value(float time, float value, int index = 0);
+    virtual void delete_value(float time);
+    virtual void update_value(float time, float value, int index = 0);
+    virtual void get_value(float time, float& valueb, int index = 0);
+    virtual float get_key_time(size_t index)
+    {
+        VERIFY(index < get_keys_count());
+        return m_Value.keys[index]->time;
+    }
+    virtual void clear_all_keys();
 };
 
 class XRCORE_API CPostProcessColor : public CPostProcessParam
 {
 protected:
-    float           m_fBase;
-    CEnvelope       m_Red;
-    CEnvelope       m_Green;
-    CEnvelope       m_Blue;
-    SPPInfo::SColor *m_pColor;
+    float m_fBase;
+    CEnvelope m_Red;
+    CEnvelope m_Green;
+    CEnvelope m_Blue;
+    SPPInfo::SColor* m_pColor;
+
 public:
-    CPostProcessColor(SPPInfo::SColor *pcolor) { m_pColor = pcolor; }
-    virtual void    update(float dt)
+    CPostProcessColor(SPPInfo::SColor* pcolor) { m_pColor = pcolor; }
+    virtual void update(float dt)
     {
         m_pColor->r = m_Red.Evaluate(dt);
         m_pColor->g = m_Green.Evaluate(dt);
         m_pColor->b = m_Blue.Evaluate(dt);
     }
-    virtual void    load(IReader &pReader);
-    virtual void    save(IWriter &pWriter);
-    virtual float   get_length()
+    virtual void load(IReader& pReader);
+    virtual void save(IWriter& pWriter);
+    virtual float get_length()
     {
-        float mn, mx,
-            r = m_Red.GetLength(&mn, &mx),
-            g = m_Green.GetLength(&mn, &mx),
-            b = m_Blue.GetLength(&mn, &mx);
+        float mn, mx, r = m_Red.GetLength(&mn, &mx), g = m_Green.GetLength(&mn, &mx), b = m_Blue.GetLength(&mn, &mx);
         mn = (r > g ? r : g);
         return mn > b ? mn : b;
     }
-    virtual size_t  get_keys_count()
-    {
-        return m_Red.keys.size();
-    }
-    virtual void    add_value(float time, float value, int index = 0);
-    virtual void    delete_value(float time);
-    virtual void    update_value(float time, float value, int index = 0);
-    virtual void    get_value(float time, float &value, int index = 0);
-    virtual float   get_key_time(size_t index)
+    virtual size_t get_keys_count() { return m_Red.keys.size(); }
+    virtual void add_value(float time, float value, int index = 0);
+    virtual void delete_value(float time);
+    virtual void update_value(float time, float value, int index = 0);
+    virtual void get_value(float time, float& value, int index = 0);
+    virtual float get_key_time(size_t index)
     {
         VERIFY(index < get_keys_count());
         return m_Red.keys[index]->time;
     }
-    virtual void   clear_all_keys();
+    virtual void clear_all_keys();
 };
 
 class XRCORE_API BasicPostProcessAnimator
@@ -126,6 +126,7 @@ protected:
 
 protected:
     void Update(float tm);
+
 public:
     BasicPostProcessAnimator(int id, bool cyclic);
     BasicPostProcessAnimator();
@@ -139,7 +140,7 @@ public:
     void SetCyclic(bool b) { m_bCyclic = b; }
     float GetLength();
     SPPInfo& PPinfo() { return m_EffectorParams; }
-    virtual	BOOL Process(float dt, SPPInfo& PPInfo);
+    virtual BOOL Process(float dt, SPPInfo& PPInfo);
     void Create();
     CPostProcessParam* GetParam(pp_params param);
     void ResetParam(pp_params param);

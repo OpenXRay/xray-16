@@ -6,9 +6,7 @@
  */
 #include <lwsdk/lwserver.h>
 
-
-    void *
-Startup (void)
+void* Startup(void)
 {
-    return (void *) 4;
+    return (void*)4;
 }

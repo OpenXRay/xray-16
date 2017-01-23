@@ -8,9 +8,9 @@
 
 #pragma once
 
-#include "xrAICore/Navigation/vertex_path.h"
 #include "xrAICore/Navigation/data_storage_constructor.h"
 #include "xrAICore/Navigation/dijkstra.h"
+#include "xrAICore/Navigation/vertex_path.h"
 
 template <typename TDistance, typename TVertexData>
 struct AStarVertexData
@@ -23,55 +23,32 @@ struct AStarVertexData
         Distance _g;
         Distance _h;
 
-        Distance &g() { return _g; }
-        Distance &h() { return _h; }
+        Distance& g() { return _g; }
+        Distance& h() { return _h; }
     };
 };
 
-template <
-    typename TDistance,
-    typename TPriorityQueue,
-    typename TVertexManager,
-    typename TVertexAllocator,
-    bool EuclidianHeuristics = true,
-    typename TPathBuilder = CVertexPath<EuclidianHeuristics>,
-    typename TIteration = u32,
-    typename TVertexData = EmptyVertexData
->
-class CAStar : public CDijkstra<
-    TDistance,
-    TPriorityQueue,
-    TVertexManager,
-    TVertexAllocator,
-    EuclidianHeuristics,
-    TPathBuilder,
-    TIteration,
-    AStarVertexData<TDistance, TVertexData>
->
+template <typename TDistance, typename TPriorityQueue, typename TVertexManager, typename TVertexAllocator,
+    bool EuclidianHeuristics = true, typename TPathBuilder = CVertexPath<EuclidianHeuristics>,
+    typename TIteration = u32, typename TVertexData = EmptyVertexData>
+class CAStar : public CDijkstra<TDistance, TPriorityQueue, TVertexManager, TVertexAllocator, EuclidianHeuristics,
+                   TPathBuilder, TIteration, AStarVertexData<TDistance, TVertexData>>
 {
 protected:
-    using Inherited = CDijkstra<
-        TDistance,
-        TPriorityQueue,
-        TVertexManager,
-        TVertexAllocator,
-        EuclidianHeuristics,
-        TPathBuilder,
-        TIteration,
-        AStarVertexData<TDistance, TVertexData>
-    >;
+    using Inherited = CDijkstra<TDistance, TPriorityQueue, TVertexManager, TVertexAllocator, EuclidianHeuristics,
+        TPathBuilder, TIteration, AStarVertexData<TDistance, TVertexData>>;
 
 protected:
     template <typename TPathManager>
-    inline void initialize(TPathManager &path_manager);
+    inline void initialize(TPathManager& path_manager);
     template <typename TPathManager>
-    inline bool step(TPathManager &path_manager);
+    inline bool step(TPathManager& path_manager);
 
 public:
     inline CAStar(const u32 max_vertex_count);
     inline virtual ~CAStar();
     template <typename TPathManager>
-    inline bool find(TPathManager &path_manager);
+    inline bool find(TPathManager& path_manager);
 };
 
 #include "xrAICore/Navigation/a_star_inline.h"

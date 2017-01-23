@@ -8,9 +8,9 @@ extern "C" {
 #endif
 
 #ifndef GSI_UNICODE
-#define GSIStartAvailableCheck   GSIStartAvailableCheckA
+#define GSIStartAvailableCheck GSIStartAvailableCheckA
 #else
-#define GSIStartAvailableCheck   GSIStartAvailableCheckW
+#define GSIStartAvailableCheck GSIStartAvailableCheckW
 #endif
 
 // the available check contacts a backend server at "<gamename>.available.gamespy.com"
@@ -18,17 +18,16 @@ extern "C" {
 extern char GSIACHostname[64];
 
 // these are possible return types for GSIAvailableCheckThink
-typedef enum
-{
-	GSIACWaiting,                 // still waiting for a response from the backend
-	GSIACAvailable,               // the game's backend services are available
-	GSIACUnavailable,             // the game's backend services are unavailable
-	GSIACTemporarilyUnavailable   // the game's backend services are temporarily unavailable
+typedef enum {
+    GSIACWaiting,               // still waiting for a response from the backend
+    GSIACAvailable,             // the game's backend services are available
+    GSIACUnavailable,           // the game's backend services are unavailable
+    GSIACTemporarilyUnavailable // the game's backend services are temporarily unavailable
 } GSIACResult;
 
 // start an available check for a particular game
 // return 0 if no error starting up, non-zero if there's an error
-void GSIStartAvailableCheck(const gsi_char * gamename);
+void GSIStartAvailableCheck(const gsi_char* gamename);
 
 // let the available check think
 // continue to call this while it returns GSIACWaiting

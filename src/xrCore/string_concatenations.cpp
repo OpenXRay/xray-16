@@ -1,22 +1,18 @@
-#include "stdafx.h"
 #include "string_concatenations.h"
+#include "stdafx.h"
 
 namespace xray
 {
-
 namespace core
 {
-
 namespace detail
 {
-
 namespace strconcat_error
 {
-
 void process(u32 const index, u32 const count, LPCSTR* strings)
 {
     u32 const max_string_size = 1024;
-    LPSTR temp = (LPSTR)_alloca((count*(max_string_size + 4) + 1)*sizeof(**strings));
+    LPSTR temp = (LPSTR)_alloca((count * (max_string_size + 4) + 1) * sizeof(**strings));
     LPSTR k = temp;
     *k++ = '[';
     for (u32 i = 0; i < count; ++i)
@@ -26,8 +22,7 @@ void process(u32 const index, u32 const count, LPCSTR* strings)
 
         *k++ = ']';
 
-        if (i + 1 >= count)
-            continue;
+        if (i + 1 >= count) continue;
 
         *k++ = '[';
         *k++ = '\r';
@@ -36,27 +31,20 @@ void process(u32 const index, u32 const count, LPCSTR* strings)
     *k = 0;
 
     xrDebug::Fatal(
-        DEBUG_INFO,
-        make_string(
-            "buffer overflow: cannot concatenate strings(%d):\r\n%s",
-            index,
-            temp
-        ).c_str()
-    );
+        DEBUG_INFO, make_string("buffer overflow: cannot concatenate strings(%d):\r\n%s", index, temp).c_str());
 }
 
 template <u32 count>
-static inline void process(LPSTR& i, LPCSTR e, u32 const index, LPCSTR(&strings)[count])
+static inline void process(LPSTR& i, LPCSTR e, u32 const index, LPCSTR (&strings)[count])
 {
     VERIFY(i <= e);
     VERIFY(index < count);
 
-    if (i != e)
-        return;
+    if (i != e) return;
 
 #ifndef MASTER_GOLD
     process(index, count, strings);
-#else // #ifndef MASTER_GOLD
+#else  // #ifndef MASTER_GOLD
     --i;
 #endif // #ifndef MASTER_GOLD
 }
@@ -65,8 +53,7 @@ static inline void process(LPSTR& i, LPCSTR e, u32 const index, LPCSTR(&strings)
 
 int stack_overflow_exception_filter(int exception_code)
 {
-    if (exception_code == EXCEPTION_STACK_OVERFLOW)
-    {
+    if (exception_code == EXCEPTION_STACK_OVERFLOW) {
         // Do not call _resetstkoflw here, because
         // at this point, the stack is not yet unwound.
         // Instead, signal that the handler (the __except block)
@@ -100,11 +87,9 @@ void string_tupples::error_process() const
     {
         strings[i] = m_strings[i].first;
 
-        if (overrun_string_index == (u32)-1)
-        {
+        if (overrun_string_index == (u32)-1) {
             part_size += m_strings[i].second;
-            if (part_size > max_concat_result_size)
-            {
+            if (part_size > max_concat_result_size) {
                 overrun_string_index = i;
             }
         }
@@ -267,7 +252,8 @@ LPSTR strconcat(int dest_sz, char* dest, const char* S1, const char* S2, const c
 }
 
 // dest = S1+S2+S3+S4+S5+S6
-LPSTR strconcat(int dest_sz, char* dest, const char* S1, const char* S2, const char* S3, const char* S4, const char* S5, const char* S6)
+LPSTR strconcat(int dest_sz, char* dest, const char* S1, const char* S2, const char* S3, const char* S4, const char* S5,
+    const char* S6)
 {
     VERIFY(dest);
     VERIFY(S1);
@@ -316,4 +302,3 @@ LPSTR strconcat(int dest_sz, char* dest, const char* S1, const char* S2, const c
 
     return (dest);
 }
-

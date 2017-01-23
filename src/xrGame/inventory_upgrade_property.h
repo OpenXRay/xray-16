@@ -15,43 +15,39 @@ namespace inventory
 {
 namespace upgrade
 {
-
-
 class Property : private Noncopyable
 {
 public:
-	typedef xr_vector<shared_str>		FunctorParams_type;
+    typedef xr_vector<shared_str> FunctorParams_type;
 
 private:
-	typedef detail::functor2<LPCSTR>		StrFunctor;
+    typedef detail::functor2<LPCSTR> StrFunctor;
 
 public:
-					Property();
-	virtual			~Property();
+    Property();
+    virtual ~Property();
 
-			void	construct( const shared_str& property_id, Manager& manager_r );
-	IC shared_str const& id() const;
-	IC LPCSTR		id_str() const;
-	IC LPCSTR		icon_name() const;
-	IC LPCSTR		name() const;
+    void construct(const shared_str& property_id, Manager& manager_r);
+    IC shared_str const& id() const;
+    IC LPCSTR id_str() const;
+    IC LPCSTR icon_name() const;
+    IC LPCSTR name() const;
 
-	IC FunctorParams_type const&	functor_params() const;
+    IC FunctorParams_type const& functor_params() const;
 
-		bool		run_functor( LPCSTR parameter, string256& result );
+    bool run_functor(LPCSTR parameter, string256& result);
 
 public:
-	
 protected:
-	shared_str		m_id;
+    shared_str m_id;
 
-	shared_str		m_name;
-	shared_str		m_icon;
+    shared_str m_name;
+    shared_str m_icon;
 
-	StrFunctor			m_desc;
-	FunctorParams_type	m_functor_params;
+    StrFunctor m_desc;
+    FunctorParams_type m_functor_params;
 
 }; // class Property
-
 
 } // namespace upgrade
 } // namespace inventory
@@ -59,4 +55,3 @@ protected:
 #include "inventory_upgrade_property_inline.h"
 
 #endif // INVENTORY_UPGRADE_PROPERTY_H_INCLUDED
-

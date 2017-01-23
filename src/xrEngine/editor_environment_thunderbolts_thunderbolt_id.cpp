@@ -9,24 +9,21 @@
 #include "stdafx.h"
 
 #ifdef INGAME_EDITOR
+#include "editor_environment_thunderbolts_manager.hpp"
 #include "editor_environment_thunderbolts_thunderbolt_id.hpp"
 #include "ide.hpp"
-#include "editor_environment_thunderbolts_manager.hpp"
 
 using editor::environment::thunderbolts::thunderbolt_id;
 using editor::environment::thunderbolts::manager;
 
-thunderbolt_id::thunderbolt_id(manager const& manager, shared_str const& id) :
-    m_manager(manager),
-    m_id(id),
-    m_property_holder(0)
+thunderbolt_id::thunderbolt_id(manager const& manager, shared_str const& id)
+    : m_manager(manager), m_id(id), m_property_holder(0)
 {
 }
 
 thunderbolt_id::~thunderbolt_id()
 {
-    if (!Device.editor())
-        return;
+    if (!Device.editor()) return;
 
     ::ide().destroy(m_property_holder);
 }
@@ -54,17 +51,9 @@ void thunderbolt_id::fill(editor::property_holder_collection* collection)
     collection_size_getter_type collection_size_getter;
     collection_size_getter.bind(this, &thunderbolt_id::collection_size);
 
-    m_property_holder->add_property(
-        "thunderbolt",
-        "properties",
-        "this option is resposible for thunderbolt",
-        m_id.c_str(),
-        m_id,
-        collection_getter,
-        collection_size_getter,
-        editor::property_holder::value_editor_combo_box,
-        editor::property_holder::cannot_enter_text
-    );
+    m_property_holder->add_property("thunderbolt", "properties", "this option is resposible for thunderbolt",
+        m_id.c_str(), m_id, collection_getter, collection_size_getter, editor::property_holder::value_editor_combo_box,
+        editor::property_holder::cannot_enter_text);
 }
 
 thunderbolt_id::property_holder_type* thunderbolt_id::object()

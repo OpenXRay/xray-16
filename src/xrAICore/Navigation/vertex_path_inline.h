@@ -8,43 +8,53 @@
 
 #pragma once
 
-#define TEMPLATE_SPECIALIZATION\
-    template <bool EuclidianHeuristics>\
+#define TEMPLATE_SPECIALIZATION                                                                                        \
+    template <bool EuclidianHeuristics>                                                                                \
     template <typename TCompoundVertex>
 
 #define CVertexPathBuilder CVertexPath<EuclidianHeuristics>::CDataStorage<TCompoundVertex>
 
 TEMPLATE_SPECIALIZATION
 inline CVertexPathBuilder::CDataStorage(const u32 /*vertex_count*/)
-{}
+{
+}
 
 TEMPLATE_SPECIALIZATION
 inline CVertexPathBuilder::~CDataStorage()
-{}
+{
+}
 
 TEMPLATE_SPECIALIZATION
 inline void CVertexPathBuilder::init()
-{}
+{
+}
 
 TEMPLATE_SPECIALIZATION
-inline void CVertexPathBuilder::assign_parent(Vertex &neighbour, Vertex *parent)
-{ neighbour.back() = parent; }
+inline void CVertexPathBuilder::assign_parent(Vertex& neighbour, Vertex* parent)
+{
+    neighbour.back() = parent;
+}
 
 TEMPLATE_SPECIALIZATION
 template <typename T>
-inline void CVertexPathBuilder::assign_parent(Vertex &neighbour, Vertex *parent, const T&)
-{ assign_parent(neighbour, parent); }
+inline void CVertexPathBuilder::assign_parent(Vertex& neighbour, Vertex* parent, const T&)
+{
+    assign_parent(neighbour, parent);
+}
 
 TEMPLATE_SPECIALIZATION
-inline void CVertexPathBuilder::update_successors(Vertex &/*tpNeighbour*/)
-{ NODEFAULT; }
+inline void CVertexPathBuilder::update_successors(Vertex& /*tpNeighbour*/)
+{
+    NODEFAULT;
+}
 
 TEMPLATE_SPECIALIZATION
-inline void CVertexPathBuilder::get_node_path(xr_vector<Index> &path, Vertex *best)
+inline void CVertexPathBuilder::get_node_path(xr_vector<Index>& path, Vertex* best)
 {
     Vertex *t1 = best, *t2 = best->back();
     u32 i;
-    for (i = 1; t2; t1 = t2, t2 = t2->back(), i++);
+    for (i = 1; t2; t1 = t2, t2 = t2->back(), i++)
+        ;
     path.resize(i);
     t1 = best;
     path[--i] = best->index();

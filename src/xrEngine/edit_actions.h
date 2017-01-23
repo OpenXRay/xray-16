@@ -12,7 +12,6 @@
 
 namespace text_editor
 {
-
 enum key_state;
 class line_edit_control;
 

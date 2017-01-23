@@ -15,6 +15,7 @@ public:
     DEFINE_MAP(int, u32, KeyMap, KeyPairIt);
     KeyMap Keys;
     int iFrameCount;
+
 public:
     CLAItem();
 
@@ -22,7 +23,7 @@ public:
     void Load(IReader& F);
     void Save(IWriter& F);
     float Length_sec() { return float(iFrameCount) / fFPS; }
-    u32 Length_ms() { return iFloor(Length_sec()*1000.f); }
+    u32 Length_ms() { return iFloor(Length_sec() * 1000.f); }
     u32 InterpolateRGB(int frame);
     u32 InterpolateBGR(int frame);
     u32 CalculateRGB(float T, int& frame);
@@ -36,7 +37,11 @@ public:
     int NextKeyFrame(int frame);
     int FirstKeyFrame() { return Keys.rend()->first; }
     int LastKeyFrame() { return Keys.rbegin()->first; }
-    u32* GetKey(int frame) { KeyPairIt it = Keys.find(frame); return (it != Keys.end()) ? &(it->second) : 0; }
+    u32* GetKey(int frame)
+    {
+        KeyPairIt it = Keys.find(frame);
+        return (it != Keys.end()) ? &(it->second) : 0;
+    }
 };
 DEFINE_VECTOR(CLAItem*, LAItemVec, LAItemIt);
 
@@ -46,9 +51,10 @@ public:
     LAItemVec Items;
     LAItemIt FindItemI(LPCSTR name);
     CLAItem* FindItem(LPCSTR name);
+
 public:
-    ELightAnimLibrary ();
-    ~ELightAnimLibrary ();
+    ELightAnimLibrary();
+    ~ELightAnimLibrary();
 #ifdef _EDITOR
     void RemoveObject(LPCSTR fname, EItemType type, bool& res);
     void RenameObject(LPCSTR fn0, LPCSTR fn1, EItemType type);

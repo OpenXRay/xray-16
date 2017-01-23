@@ -29,22 +29,31 @@ PERFORMANCE OF THIS SOFTWARE.
 
 typedef thread_t thread_id;
 
-#define MUTEX_INITIALIZER          { 0 }
-#define mutex_init(m)              mutex_init(m, USYNC_THREAD, NULL)
+#define MUTEX_INITIALIZER                                                                                              \
+    {                                                                                                                  \
+        0                                                                                                              \
+    }
+#define mutex_init(m) mutex_init(m, USYNC_THREAD, NULL)
 
 /*
  * Hack for thread-specific data on Solaris.  We can't use thr_setspecific
  * because that function calls malloc() itself.
  */
-typedef void *tsd_key_t[256];
-#define tsd_key_create(key, destr) do { \
-  int i; \
-  for(i=0; i<256; i++) (*key)[i] = 0; \
-} while(0)
+typedef void* tsd_key_t[256];
+#define tsd_key_create(key, destr)                                                                                     \
+    do                                                                                                                 \
+    {                                                                                                                  \
+        int i;                                                                                                         \
+        for (i = 0; i < 256; i++)                                                                                      \
+            (*key)[i] = 0;                                                                                             \
+    } while (0)
 #define tsd_setspecific(key, data) (key[(unsigned)thr_self() % 256] = (data))
 #define tsd_getspecific(key, vptr) (vptr = key[(unsigned)thr_self() % 256])
 
-#define thread_atfork(prepare, parent, child) do {} while(0)
+#define thread_atfork(prepare, parent, child)                                                                          \
+    do                                                                                                                 \
+    {                                                                                                                  \
+    } while (0)
 
 #include <sysdeps/generic/malloc-machine.h>
 

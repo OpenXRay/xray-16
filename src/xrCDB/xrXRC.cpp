@@ -2,14 +2,14 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
 #include "xrXRC.h"
+#include "stdafx.h"
 #include "xrEngine/IGameFont.hpp"
 #include "xrEngine/IPerformanceAlert.hpp"
 
 XRCDB_API xrXRC XRC("global");
 
-void xrXRC::DumpStatistics(IGameFont &font, IPerformanceAlert *alert)
+void xrXRC::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
 {
     Stats.FrameEnd();
     font.OutNext("XRC (%s):", name);

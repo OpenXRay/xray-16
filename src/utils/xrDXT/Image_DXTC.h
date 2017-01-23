@@ -23,7 +23,7 @@ function is called.  Output of timing test is saved to a local .txt file.
 #include <dds\ddsTypes.h>
 #include "dds.h"
 
-//struct TimingInfo; // defined in Image_DXTC.cpp
+// struct TimingInfo; // defined in Image_DXTC.cpp
 
 enum PixFormat
 {
@@ -44,9 +44,9 @@ class Image_DXTC
     int m_nCompLineSz;
     string256 m_strFormat;
     PixFormat m_CompFormat;
-    DDS_HEADER m_DDSD; // read from dds file
+    DDS_HEADER m_DDSD;  // read from dds file
     bool m_bMipTexture; // texture has mipmaps?
-    int m_nWidth; // in pixels of uncompressed image 
+    int m_nWidth;       // in pixels of uncompressed image
     int m_nHeight;
 
 private:

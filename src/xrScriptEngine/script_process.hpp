@@ -15,6 +15,7 @@ class CScriptThread;
 class XRSCRIPTENGINE_API CScriptProcess
 {
     friend class CScriptEngine;
+
 public:
     typedef xr_vector<CScriptThread*> SCRIPT_REGISTRY;
 
@@ -32,7 +33,7 @@ private:
             m_reload = reload;
         }
 
-        CScriptToRun(const CScriptToRun &script)
+        CScriptToRun(const CScriptToRun& script)
         {
             m_script_name = xr_strdup(script.m_script_name);
             m_do_string = script.m_do_string;
@@ -46,7 +47,7 @@ public:
     typedef xr_vector<CScriptToRun> SCRIPTS_TO_RUN;
 
 protected:
-    CScriptEngine *scriptEngine;
+    CScriptEngine* scriptEngine;
     SCRIPT_REGISTRY m_scripts;
     SCRIPTS_TO_RUN m_scripts_to_run;
     shared_str m_name;
@@ -56,11 +57,12 @@ protected:
     void run_scripts();
 
 private:
-    CScriptProcess(CScriptEngine *scriptEngine, shared_str name, shared_str scripts);
+    CScriptProcess(CScriptEngine* scriptEngine, shared_str name, shared_str scripts);
+
 public:
     virtual ~CScriptProcess();
     void update();
     void add_script(LPCSTR script_name, bool string, bool reload);
-    const SCRIPT_REGISTRY &scripts() const { return m_scripts; }
+    const SCRIPT_REGISTRY& scripts() const { return m_scripts; }
     shared_str name() const { return m_name; }
 };

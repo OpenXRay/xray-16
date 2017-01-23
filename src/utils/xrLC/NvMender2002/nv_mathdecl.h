@@ -18,14 +18,14 @@ Comments:
 
 #ifdef NV_MATH_DLL
 
-    #ifdef NV_MATH_EXPORTS
-        #define DECLSPEC_NV_MATH __declspec(dllexport)
-    #else
-        #define DECLSPEC_NV_MATH __declspec(dllimport)
-    #endif
-
+#ifdef NV_MATH_EXPORTS
+#define DECLSPEC_NV_MATH __declspec(dllexport)
 #else
-    #define DECLSPEC_NV_MATH
+#define DECLSPEC_NV_MATH __declspec(dllimport)
 #endif
 
-#endif  // _nv_mathdecl_h_
+#else
+#define DECLSPEC_NV_MATH
+#endif
+
+#endif // _nv_mathdecl_h_

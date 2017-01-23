@@ -2,8 +2,8 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
 #include "Engine.h"
+#include "stdafx.h"
 
 CEngine Engine;
 
@@ -13,12 +13,10 @@ CEngine Engine;
 
 CEngine::CEngine()
 {
-
 }
 
 CEngine::~CEngine()
 {
-
 }
 
 extern void msCreate(LPCSTR name);

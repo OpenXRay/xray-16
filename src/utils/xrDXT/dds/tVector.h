@@ -1,7 +1,7 @@
 #pragma once
 #include <assert.h>
 
-template<class _Type>
+template <class _Type>
 class nvMatrix
 {
 private:
@@ -37,11 +37,7 @@ public:
         resize(width, height);
     }
 
-    ~nvMatrix()
-    {
-        tvfree();
-    }
-
+    ~nvMatrix() { tvfree(); }
     _Type& operator[](size_t i)
     {
         size_t r = i / cols;
@@ -99,7 +95,7 @@ public:
 #endif
         return &m[y][x];
     }
-    
+
     _Type* pixelsYX(size_t y, size_t x)
     {
 #if _DEBUG
@@ -108,7 +104,7 @@ public:
 #endif
         return &m[y][x];
     }
-    
+
     _Type* pixelsXY_wrapped(int x, int y)
     {
         y = iModulo(y, (int)rows);
@@ -116,20 +112,11 @@ public:
         return &m[y][x];
     }
 
-    size_t width() const
-    {
-        return cols;
-    }
-
-    size_t height() const
-    {
-        return rows;
-    }
-
+    size_t width() const { return cols; }
+    size_t height() const { return rows; }
     void tvfree()
     {
-        if (m)
-        {
+        if (m) {
             for (size_t i = 0; i < rows; i++)
                 delete[] m[i];
             delete[] m;
@@ -144,8 +131,7 @@ public:
         assert(m == NULL);
         rows = r;
         cols = c;
-        if (r == 0 || c == 0)
-            return;
+        if (r == 0 || c == 0) return;
         m = new _Type*[r];
         for (size_t i = 0; i < r; i++)
         {
@@ -163,7 +149,7 @@ public:
         }
         return *this;
     }
-    
+
     void SetToZero()
     {
         for (size_t i = 0; i < rows; i++)
@@ -172,32 +158,19 @@ public:
                 m[i][j].SetToZero();
         }
     }
-    
+
     // destructive
     void resize(size_t width, size_t height)
     {
-        if (height != rows || width != cols)
-        {
+        if (height != rows || width != cols) {
             tvfree();
             tvallocate(height, width);
         }
     }
-    
-    void Release()
-    {
-        tvfree();
-    }
 
-    void clear()
-    {
-        tvfree();
-    }
-
-    size_t size() const
-    {
-        return rows * cols;
-    }
-    
+    void Release() { tvfree(); }
+    void clear() { tvfree(); }
+    size_t size() const { return rows * cols; }
     void FlipTopToBottom()
     {
         _Type* swap = new _Type[cols];
@@ -270,29 +243,16 @@ public:
 
 #include <new>
 
-template<typename T>
+template <typename T>
 class nvVector
 {
 public:
     // Ctor.
-    nvVector() :
-        m_buffer(NULL), m_size(0), m_buffer_size(0)
-    {}
-
+    nvVector() : m_buffer(NULL), m_size(0), m_buffer_size(0) {}
     // Copy ctor.
-    nvVector(const nvVector& a) :
-        m_buffer(NULL), m_size(0), m_buffer_size(0)
-    {
-        copy(a.m_buffer, a.m_size);
-    }
-
+    nvVector(const nvVector& a) : m_buffer(NULL), m_size(0), m_buffer_size(0) { copy(a.m_buffer, a.m_size); }
     // Ctor that initializes the array with the given elements.
-    nvVector(const T* ptr, size_t num) :
-        m_buffer(NULL), m_size(0), m_buffer_size(0)
-    {
-        copy(ptr, num);
-    }
-
+    nvVector(const T* ptr, size_t num) : m_buffer(NULL), m_size(0), m_buffer_size(0) { copy(ptr, num); }
     // Dtor.
     ~nvVector()
     {
@@ -308,7 +268,7 @@ public:
     }
 
     // Safe array access.
-    T& operator[] (size_t index)
+    T& operator[](size_t index)
     {
         assert(index < m_size);
         return m_buffer[index];
@@ -316,7 +276,6 @@ public:
 
     // Get array size.
     size_t size() const { return m_size; }
-
     // Push an element at the end of the array.
     void push_back(const T& val)
     {
@@ -324,7 +283,7 @@ public:
         // push_back()!  Since we're using references,
         // resize() may munge the element storage!
         assert(&val < &m_buffer[0] || &val > &m_buffer[m_size]);
-        int	new_size = m_size + 1;
+        int new_size = m_size + 1;
         resize(new_size);
         m_buffer[new_size - 1] = val;
     }
@@ -365,11 +324,7 @@ public:
     }
 
     // nvVector semantics: realloc preserves contents, resize does not.
-    void realloc(size_t new_size)
-    {
-        resize(new_size);
-    }
-
+    void realloc(size_t new_size) { resize(new_size); }
     // Resize the array preserving existing elements.
     void resize(size_t new_size)
     {
@@ -380,8 +335,7 @@ public:
         {
             (m_buffer + i)->~T(); // Explicit call to the destructor
         }
-        if (m_size == 0)
-        {
+        if (m_size == 0) {
             if (false) // Don't shrink automatically.
             {
                 allocate(0);
@@ -395,8 +349,7 @@ public:
         else
         {
             size_t new_buffer_size;
-            if (m_buffer_size == 0)
-            {
+            if (m_buffer_size == 0) {
                 // first allocation
                 new_buffer_size = m_size;
             }
@@ -411,12 +364,12 @@ public:
         // Call default constructors
         for (size_t i = old_size; i < new_size; i++)
         {
-            new(m_buffer + i) T(); // placement new
+            new (m_buffer + i) T(); // placement new
         }
     }
 
     // Resize the array preserving existing elements and initializing the
-    // new ones with the given value.    
+    // new ones with the given value.
     void resize(size_t new_size, const T& elem)
     {
         size_t old_size = m_size;
@@ -427,8 +380,7 @@ public:
             (m_buffer + i)->~T(); // Explicit call to the destructor
         }
 
-        if (m_size == 0)
-        {
+        if (m_size == 0) {
             if (false) // Don't shrink automatically.
             {
                 allocate(0);
@@ -442,8 +394,7 @@ public:
         else
         {
             size_t new_buffer_size;
-            if (m_buffer_size == 0)
-            {
+            if (m_buffer_size == 0) {
                 // first allocation
                 new_buffer_size = m_size;
             }
@@ -457,21 +408,16 @@ public:
         // Call copy constructors
         for (size_t i = old_size; i < new_size; i++)
         {
-            new(m_buffer + i) T(elem); // placement new
+            new (m_buffer + i) T(elem); // placement new
         }
     }
 
     // Clear the buffer.
-    void clear()
-    {
-        resize(0);
-    }
-
+    void clear() { resize(0); }
     // Shrink the allocated array.
     void shrink()
     {
-        if (m_size < m_buffer_size)
-        {
+        if (m_size < m_buffer_size) {
             allocate(m_size);
         }
     }
@@ -479,28 +425,21 @@ public:
     // Preallocate space.
     void reserve(size_t desired_size)
     {
-        if (desired_size > m_buffer_size)
-        {
+        if (desired_size > m_buffer_size) {
             allocate(desired_size);
         }
     }
 
     // Assignment operator.
-    void operator=(const nvVector& a)
-    {
-        copy(a.m_buffer, a.m_size);
-    }
-
+    void operator=(const nvVector& a) { copy(a.m_buffer, a.m_size); }
 private:
     // Change buffer size.
     void allocate(size_t rsize)
     {
         m_buffer_size = rsize;
         // free the buffer.
-        if (m_buffer_size == 0)
-        {
-            if (m_buffer)
-            {
+        if (m_buffer_size == 0) {
+            if (m_buffer) {
                 free(m_buffer);
                 m_buffer = NULL;
             }

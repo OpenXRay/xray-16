@@ -21,28 +21,29 @@ Comments:
 
 #include <assert.h>
 
-typedef f32						nv_scalar;
+typedef f32 nv_scalar;
 
-#define nv_zero					nv_scalar(0)
-#define nv_zero_5				nv_scalar(0.5)
-#define nv_one					nv_scalar(1.0)
-#define nv_two					nv_scalar(2)
-#define nv_half_pi				nv_scalar(3.14159265358979323846264338327950288419716939937510582 * 0.5)
-#define nv_quarter_pi			nv_scalar(3.14159265358979323846264338327950288419716939937510582 * 0.25)
-#define nv_pi					nv_scalar(3.14159265358979323846264338327950288419716939937510582)
-#define nv_two_pi				nv_scalar(3.14159265358979323846264338327950288419716939937510582 * 2.0)
-#define nv_oo_pi				nv_one / nv_pi
-#define nv_oo_two_pi			nv_one / nv_two_pi
-#define nv_oo_255   			nv_one / nv_scalar(255)
-#define nv_oo_128   			nv_one / nv_scalar(128)
-#define nv_to_rad				nv_pi / nv_scalar(180)
-#define nv_to_deg				nv_scalar(180) / nv_pi
-#define nv_eps					nv_scalar(10e-6)
-#define nv_double_eps			nv_scalar(10e-6) * nv_two
-#define nv_big_eps				nv_scalar(10e-6)
-#define nv_small_eps			nv_scalar(10e-2)
+#define nv_zero nv_scalar(0)
+#define nv_zero_5 nv_scalar(0.5)
+#define nv_one nv_scalar(1.0)
+#define nv_two nv_scalar(2)
+#define nv_half_pi nv_scalar(3.14159265358979323846264338327950288419716939937510582 * 0.5)
+#define nv_quarter_pi nv_scalar(3.14159265358979323846264338327950288419716939937510582 * 0.25)
+#define nv_pi nv_scalar(3.14159265358979323846264338327950288419716939937510582)
+#define nv_two_pi nv_scalar(3.14159265358979323846264338327950288419716939937510582 * 2.0)
+#define nv_oo_pi nv_one / nv_pi
+#define nv_oo_two_pi nv_one / nv_two_pi
+#define nv_oo_255 nv_one / nv_scalar(255)
+#define nv_oo_128 nv_one / nv_scalar(128)
+#define nv_to_rad nv_pi / nv_scalar(180)
+#define nv_to_deg nv_scalar(180) / nv_pi
+#define nv_eps nv_scalar(10e-6)
+#define nv_double_eps nv_scalar(10e-6) * nv_two
+#define nv_big_eps nv_scalar(10e-6)
+#define nv_small_eps nv_scalar(10e-2)
 
-template<class _T>				struct vec3t;
+template <class _T>
+struct vec3t;
 struct vec2;
 struct vec4;
 

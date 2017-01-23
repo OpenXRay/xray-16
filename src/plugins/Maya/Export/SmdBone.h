@@ -16,19 +16,20 @@
 #include <maya/MDagPath.h>
 #include <stdio.h>
 
-class SmdBone  
+class SmdBone
 {
 public:
-	Fvector		trans;
-	Fvector		orient;
+    Fvector trans;
+    Fvector orient;
 
-	int			id;
-	int			parentId;
-	LPSTR		name;
-	MDagPath	path;
+    int id;
+    int parentId;
+    LPSTR name;
+    MDagPath path;
+
 public:
-				SmdBone();
-	virtual		~SmdBone();
+    SmdBone();
+    virtual ~SmdBone();
 };
 
 #endif // !defined(AFX_SMDBONE_H__27691F7E_CEE4_422A_9FDE_7972C7C13819__INCLUDED_)

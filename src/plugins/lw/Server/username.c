@@ -7,9 +7,4 @@
  */
 #include <lwsdk/lwserver.h>
 
-
-    ServerUserName
-UserNames[] = {
-    { 0 }
-};
-
+ServerUserName UserNames[] = {{0}};

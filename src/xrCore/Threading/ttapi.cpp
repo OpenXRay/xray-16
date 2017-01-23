@@ -1,6 +1,6 @@
-#include "stdafx.h"
 #include "ttapi.h"
 #include <windows.h>
+#include "stdafx.h"
 #ifdef _GPA_ENABLED
 #include <tal.h>
 #endif
@@ -8,10 +8,10 @@
 typedef struct TTAPI_WORKER_PARAMS
 {
     volatile LONG vlFlag;
-    TTAPIWorkerFunc	lpWorkerFunc;
+    TTAPIWorkerFunc lpWorkerFunc;
     LPVOID lpvWorkerFuncParams;
     DWORD dwPadding[13];
-} *PTTAPI_WORKER_PARAMS;
+} * PTTAPI_WORKER_PARAMS;
 
 typedef PTTAPI_WORKER_PARAMS LPTTAPI_WORKER_PARAMS;
 
@@ -30,7 +30,7 @@ struct
     DWORD dwPadding[15];
 } ttapi_queue_size;
 
-static DWORD WINAPI ttapiThreadProc(void *lpParameter)
+static DWORD WINAPI ttapiThreadProc(void* lpParameter)
 {
     LPTTAPI_WORKER_PARAMS pParams = (LPTTAPI_WORKER_PARAMS)lpParameter;
     DWORD i, dwFastIter = ttapi_dwFastIter, dwSlowIter = ttapi_dwSlowIter;
@@ -42,8 +42,7 @@ static DWORD WINAPI ttapiThreadProc(void *lpParameter)
         // Fast
         for (i = 0; i < dwFastIter; ++i)
         {
-            if (pParams->vlFlag == 0)
-            {
+            if (pParams->vlFlag == 0) {
                 // Msg( "0x%8.8X Fast %u" , dwId , i );
                 goto process;
             }
@@ -53,8 +52,7 @@ static DWORD WINAPI ttapiThreadProc(void *lpParameter)
         // Moderate
         for (i = 0; i < dwSlowIter; ++i)
         {
-            if (pParams->vlFlag == 0)
-            {
+            if (pParams->vlFlag == 0) {
                 // Msg( "0x%8.8X Moderate %u" , dwId , i );
                 goto process;
             }
@@ -99,15 +97,15 @@ void SetThreadName(DWORD dwThreadID, LPCSTR szThreadName)
     __try
     {
         RaiseException(0x406D1388, 0, sizeof(info) / sizeof(DWORD), (DWORD*)&info);
-    } __except (EXCEPTION_CONTINUE_EXECUTION)
+    }
+    __except (EXCEPTION_CONTINUE_EXECUTION)
     {
     }
 }
 
-int ttapi_Init(const _processor_info &pi)
+int ttapi_Init(const _processor_info& pi)
 {
-    if (ttapi_initialized)
-        return ttapi_worker_count;
+    if (ttapi_initialized) return ttapi_worker_count;
 
     // System Info
     ttapi_worker_count = pi.n_cores;
@@ -121,8 +119,7 @@ int ttapi_Init(const _processor_info &pi)
     QueryPerformanceCounter(&liStart);
     for (DWORD i = 0; i < dwNumIter; ++i)
     {
-        if (!dwDummy)
-            goto process1;
+        if (!dwDummy) goto process1;
         __asm pause;
     }
 process1:
@@ -134,8 +131,7 @@ process1:
     QueryPerformanceCounter(&liStart);
     for (DWORD i = 0; i < dwNumIter; ++i)
     {
-        if (!dwDummy)
-            goto process2;
+        if (!dwDummy) goto process2;
         SwitchToThread();
     }
 process2:
@@ -147,18 +143,15 @@ process2:
     char szSearchFor[] = "-max-threads";
     char* pszTemp = strstr(GetCommandLine(), szSearchFor);
     DWORD dwOverride = 0;
-    if (pszTemp && sscanf_s(pszTemp + strlen(szSearchFor), "%u", &dwOverride))
-    {
-        if (dwOverride >= 1 && dwOverride < ttapi_worker_count)
-            ttapi_worker_count = dwOverride;
+    if (pszTemp && sscanf_s(pszTemp + strlen(szSearchFor), "%u", &dwOverride)) {
+        if (dwOverride >= 1 && dwOverride < ttapi_worker_count) ttapi_worker_count = dwOverride;
     }
     // Number of helper threads
     ttapi_thread_count = ttapi_worker_count - 1;
 
     // Creating control structures
-    if ((ttapi_threads_handles = (LPHANDLE)malloc(sizeof(HANDLE)*ttapi_thread_count)) == NULL)
-        return 0;
-    if ((ttapi_worker_params = (PTTAPI_WORKER_PARAMS)malloc(sizeof(TTAPI_WORKER_PARAMS)*ttapi_worker_count)) == NULL)
+    if ((ttapi_threads_handles = (LPHANDLE)malloc(sizeof(HANDLE) * ttapi_thread_count)) == NULL) return 0;
+    if ((ttapi_worker_params = (PTTAPI_WORKER_PARAMS)malloc(sizeof(TTAPI_WORKER_PARAMS) * ttapi_worker_count)) == NULL)
         return 0;
     // Clearing params
     for (DWORD i = 0; i < ttapi_worker_count; i++)
@@ -177,8 +170,7 @@ process2:
         // Initializing "enter" "critical section"
         ttapi_worker_params[i].vlFlag = 1;
         ttapi_threads_handles[i] = CreateThread(NULL, 0, &ttapiThreadProc, &ttapi_worker_params[i], 0, &dwThreadId);
-        if (!ttapi_threads_handles[i])
-            return 0;
+        if (!ttapi_threads_handles[i]) return 0;
         // Setting affinity
         do
         {
@@ -194,11 +186,13 @@ process2:
 }
 
 int ttapi_GetWorkerCount()
-{ return ttapi_worker_count; }
+{
+    return ttapi_worker_count;
+}
 
 // We do not check for overflow here to be faster
 // Assume that caller is smart enough to use ttapi_GetWorkersCount() to get number of available slots
-void ttapi_AddWorker(TTAPIWorkerFunc lpWorkerFunc, void *lpvWorkerFuncParams)
+void ttapi_AddWorker(TTAPIWorkerFunc lpWorkerFunc, void* lpvWorkerFuncParams)
 {
     // Assigning parameters
     ttapi_worker_params[ttapi_assigned_workers].lpWorkerFunc = lpWorkerFunc;
@@ -209,8 +203,7 @@ void ttapi_AddWorker(TTAPIWorkerFunc lpWorkerFunc, void *lpvWorkerFuncParams)
 void ttapi_Run()
 {
     DWORD workerCount = (ttapi_assigned_workers - 1);
-    if (workerCount)
-    {
+    if (workerCount) {
         // Setting queue size
         ttapi_queue_size.size = workerCount;
         // Starting all workers except the last
@@ -219,11 +212,11 @@ void ttapi_Run()
         // Running last worker in current thread
         ttapi_worker_params[workerCount].lpWorkerFunc(ttapi_worker_params[workerCount].lpvWorkerFuncParams);
         // Waiting task queue to become empty
-        //Start = __rdtsc();
+        // Start = __rdtsc();
         while (ttapi_queue_size.size)
             __asm pause;
-        //Stop = __rdtsc();
-        //Msg( "Wait: %u ticks" , Stop - Start );
+        // Stop = __rdtsc();
+        // Msg( "Wait: %u ticks" , Stop - Start );
     }
     else
         // Running the only worker in current thread
@@ -234,8 +227,7 @@ void ttapi_Run()
 
 void ttapi_Done()
 {
-    if (!ttapi_initialized)
-        return;
+    if (!ttapi_initialized) return;
     // Asking helper threads to terminate
     for (DWORD i = 0; i < ttapi_thread_count; i++)
     {

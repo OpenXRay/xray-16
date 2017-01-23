@@ -17,27 +17,27 @@
   $NoKeywords: $
  *---------------------------------------------------------------------------*/
 
-#ifndef	FONT_H_
-#define	FONT_H_
+#ifndef FONT_H_
+#define FONT_H_
 
-#ifdef	__cplusplus
+#ifdef __cplusplus
 extern "C" {
 #endif
 
 /*===========================================================================*/
 
-#include	<nitro/types.h>
+#include <nitro/types.h>
 
-extern const u32	d_CharData[ 8 * 256 ];
-extern const u32	d_PaletteData[ 8 * 16 ];
+extern const u32 d_CharData[8 * 256];
+extern const u32 d_PaletteData[8 * 16];
 
 /*===========================================================================*/
 
-#ifdef	__cplusplus
-}		/* extern "C" */
+#ifdef __cplusplus
+} /* extern "C" */
 #endif
 
-#endif	/* FONT_H_ */
+#endif /* FONT_H_ */
 
 /*---------------------------------------------------------------------------*
   End of file

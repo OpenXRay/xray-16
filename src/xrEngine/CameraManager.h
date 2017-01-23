@@ -29,6 +29,7 @@ protected:
     virtual void UpdatePPEffectors();
     virtual bool ProcessCameraEffector(CEffectorCam* eff);
     void OnEffectorReleased(SBaseEffector* e);
+
 public:
 #ifdef DEBUG
     u32 dbg_upd_frame;
@@ -54,9 +55,9 @@ public:
     IC Fvector Right() const { return m_cam_info.r; }
     IC float Fov() const { return m_cam_info.fFov; }
     IC float Aspect() const { return m_cam_info.fAspect; }
-
     IC void camera_Matrix(Fmatrix& M) { M.set(m_cam_info.r, m_cam_info.n, m_cam_info.d, m_cam_info.p); }
-    void Update(const Fvector& P, const Fvector& D, const Fvector& N, float fFOV_Dest, float fASPECT_Dest, float fFAR_Dest, u32 flags);
+    void Update(const Fvector& P, const Fvector& D, const Fvector& N, float fFOV_Dest, float fASPECT_Dest,
+        float fFAR_Dest, u32 flags);
     void UpdateFromCamera(const CCameraBase* C);
 
     void ApplyDevice(float _viewport_near);

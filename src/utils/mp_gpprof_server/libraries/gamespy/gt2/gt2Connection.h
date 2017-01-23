@@ -13,22 +13,17 @@ devsupport@gamespy.com
 
 #include "gt2Main.h"
 
-GT2Result gti2NewOutgoingConnection(GT2Socket socket, GT2Connection * connection, unsigned int ip, unsigned short port);
-GT2Result gti2NewIncomingConnection(GT2Socket socket, GT2Connection * connection, unsigned int ip, unsigned short port);
+GT2Result gti2NewOutgoingConnection(GT2Socket socket, GT2Connection* connection, unsigned int ip, unsigned short port);
+GT2Result gti2NewIncomingConnection(GT2Socket socket, GT2Connection* connection, unsigned int ip, unsigned short port);
 
-GT2Result gti2StartConnectionAttempt
-(
-	GT2Connection connection,
-	const GT2Byte * message,
-	int len,
-	GT2ConnectionCallbacks * callbacks
-);
+GT2Result gti2StartConnectionAttempt(
+    GT2Connection connection, const GT2Byte* message, int len, GT2ConnectionCallbacks* callbacks);
 
-GT2Bool gti2AcceptConnection(GT2Connection connection, GT2ConnectionCallbacks * callbacks);
+GT2Bool gti2AcceptConnection(GT2Connection connection, GT2ConnectionCallbacks* callbacks);
 
-void gti2RejectConnection(GT2Connection connection, const GT2Byte * message, int len);
+void gti2RejectConnection(GT2Connection connection, const GT2Byte* message, int len);
 
-GT2Bool gti2ConnectionSendData(GT2Connection connection, const GT2Byte * message, int len);
+GT2Bool gti2ConnectionSendData(GT2Connection connection, const GT2Byte* message, int len);
 
 GT2Bool gti2ConnectionThink(GT2Connection connection, gsi_time now);
 

@@ -8,53 +8,56 @@
 
 #pragma once
 
-IC	Fvector	CSpaceRestrictionShape::position		(const CCF_Shape::shape_def &data) const
+IC Fvector CSpaceRestrictionShape::position(const CCF_Shape::shape_def& data) const
 {
-	switch (data.type) {
-		case 0	: return(data.data.sphere.P);
-		case 1	: return(data.data.box.c);
-		default : NODEFAULT;
-	}
+    switch (data.type)
+    {
+    case 0: return (data.data.sphere.P);
+    case 1: return (data.data.box.c);
+    default: NODEFAULT;
+    }
 #ifdef DEBUG
-	return	(Fvector().set(0.f,0.f,0.f));
+    return (Fvector().set(0.f, 0.f, 0.f));
 #endif
 }
 
-IC	float CSpaceRestrictionShape::radius			(const CCF_Shape::shape_def &data) const
+IC float CSpaceRestrictionShape::radius(const CCF_Shape::shape_def& data) const
 {
-	switch (data.type) {
-		case 0	: return(data.data.sphere.R);
-		case 1	: return(Fbox().set(Fvector().set(-.5f,-.5f,-.5f),Fvector().set(.5f,.5f,.5f)).xform(data.data.box).getradius());
-		default : NODEFAULT;
-	}
+    switch (data.type)
+    {
+    case 0: return (data.data.sphere.R);
+    case 1:
+        return (
+            Fbox().set(Fvector().set(-.5f, -.5f, -.5f), Fvector().set(.5f, .5f, .5f)).xform(data.data.box).getradius());
+    default: NODEFAULT;
+    }
 #ifdef DEBUG
-	return	(0.f);
+    return (0.f);
 #endif
 }
 
-IC	CSpaceRestrictionShape::CSpaceRestrictionShape	(CSpaceRestrictor *space_restrictor, bool default_restrictor)
+IC CSpaceRestrictionShape::CSpaceRestrictionShape(CSpaceRestrictor* space_restrictor, bool default_restrictor)
 {
-	m_default					= default_restrictor;
-	m_initialized				= true;
-	
+    m_default = default_restrictor;
+    m_initialized = true;
 
-	VERIFY						(space_restrictor);
-	m_restrictor				= space_restrictor;
-	
-	build_border				();
+    VERIFY(space_restrictor);
+    m_restrictor = space_restrictor;
+
+    build_border();
 }
 
-IC	void CSpaceRestrictionShape::initialize			()
+IC void CSpaceRestrictionShape::initialize()
 {
-	VERIFY						(m_initialized);
+    VERIFY(m_initialized);
 }
 
-IC	bool CSpaceRestrictionShape::shape				() const
+IC bool CSpaceRestrictionShape::shape() const
 {
-	return						(true);
+    return (true);
 }
 
-IC	bool CSpaceRestrictionShape::default_restrictor	() const
+IC bool CSpaceRestrictionShape::default_restrictor() const
 {
-	return						(m_default);
+    return (m_default);
 }

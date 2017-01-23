@@ -2,8 +2,7 @@
 #define DTROCOLLIDERH
 
 #include "dTriBox.h"
-#include "dTriSphere.h"
 #include "dTriCylinder.h"
-
+#include "dTriSphere.h"
 
 #endif

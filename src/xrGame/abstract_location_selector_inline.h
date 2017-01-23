@@ -10,142 +10,133 @@
 
 #include "xrEngine/profiler.h"
 
-#define TEMPLATE_SPECIALIZATION template <\
-	typename _Graph,\
-	typename _VertexEvaluator,\
-	typename _vertex_id_type\
->
+#define TEMPLATE_SPECIALIZATION template <typename _Graph, typename _VertexEvaluator, typename _vertex_id_type>
 
-#define CSelectorTemplate CAbstractLocationSelector<_Graph,_VertexEvaluator,_vertex_id_type>
+#define CSelectorTemplate CAbstractLocationSelector<_Graph, _VertexEvaluator, _vertex_id_type>
 
 TEMPLATE_SPECIALIZATION
-IC	CSelectorTemplate::CAbstractLocationSelector	(CRestrictedObject *object)
+IC CSelectorTemplate::CAbstractLocationSelector(CRestrictedObject* object)
 {
-	m_restricted_object		= object;
-	VERIFY					(m_restricted_object);
+    m_restricted_object = object;
+    VERIFY(m_restricted_object);
 }
 
 TEMPLATE_SPECIALIZATION
-IC	CSelectorTemplate::~CAbstractLocationSelector	()
+IC CSelectorTemplate::~CAbstractLocationSelector()
 {
 }
 
 TEMPLATE_SPECIALIZATION
-IC	void CSelectorTemplate::reinit					(const _Graph *graph)
+IC void CSelectorTemplate::reinit(const _Graph* graph)
 {
-	m_failed				= false;
-	m_selected_vertex_id	= _vertex_id_type(-1);
-	m_evaluator				= 0;
-	m_last_query_time		= 0;
-	m_query_interval		= 0;
-	m_graph					= graph;
-	m_path					= 0;
-	dest_vertex_id			= 0;
-}	
-
-TEMPLATE_SPECIALIZATION
-IC	_vertex_id_type CSelectorTemplate::get_selected_vertex_id() const
-{
-	VERIFY					(m_graph->valid_vertex_id(m_selected_vertex_id));
-	return					(m_selected_vertex_id);
+    m_failed = false;
+    m_selected_vertex_id = _vertex_id_type(-1);
+    m_evaluator = 0;
+    m_last_query_time = 0;
+    m_query_interval = 0;
+    m_graph = graph;
+    m_path = 0;
+    dest_vertex_id = 0;
 }
 
 TEMPLATE_SPECIALIZATION
-IC	void CSelectorTemplate::set_evaluator	(_VertexEvaluator *evaluator)
+IC _vertex_id_type CSelectorTemplate::get_selected_vertex_id() const
 {
-	m_evaluator				= evaluator;
+    VERIFY(m_graph->valid_vertex_id(m_selected_vertex_id));
+    return (m_selected_vertex_id);
 }
 
 TEMPLATE_SPECIALIZATION
-IC	void CSelectorTemplate::set_query_interval(const u32 query_interval)
+IC void CSelectorTemplate::set_evaluator(_VertexEvaluator* evaluator)
 {
-	m_query_interval		= query_interval;
+    m_evaluator = evaluator;
 }
 
 TEMPLATE_SPECIALIZATION
-IC	bool CSelectorTemplate::actual(const _vertex_id_type start_vertex_id, bool path_completed)
+IC void CSelectorTemplate::set_query_interval(const u32 query_interval)
 {
-	if (!used() || (((m_last_query_time + m_query_interval) > Device.dwTimeGlobal) && !path_completed))
-		return				(true);
-
-	perform_search			(start_vertex_id);
-	if (!failed() && dest_vertex_id)
-		*dest_vertex_id		= m_selected_vertex_id;
-	
-	return					(failed());
+    m_query_interval = query_interval;
 }
 
 TEMPLATE_SPECIALIZATION
-IC	bool CSelectorTemplate::failed() const
+IC bool CSelectorTemplate::actual(const _vertex_id_type start_vertex_id, bool path_completed)
 {
-	return					(m_failed);
+    if (!used() || (((m_last_query_time + m_query_interval) > Device.dwTimeGlobal) && !path_completed)) return (true);
+
+    perform_search(start_vertex_id);
+    if (!failed() && dest_vertex_id) *dest_vertex_id = m_selected_vertex_id;
+
+    return (failed());
 }
 
 TEMPLATE_SPECIALIZATION
-IC	bool CSelectorTemplate::used() const
+IC bool CSelectorTemplate::failed() const
 {
-	return					(m_evaluator && m_graph);
+    return (m_failed);
 }
 
 TEMPLATE_SPECIALIZATION
-IC	void CSelectorTemplate::select_location	(const _vertex_id_type start_vertex_id, bool path_completed)
+IC bool CSelectorTemplate::used() const
 {
-	if (used() && (((m_last_query_time + m_query_interval) <= Device.dwTimeGlobal) || path_completed)) {
-		perform_search		(start_vertex_id);
-		if (!failed() && dest_vertex_id) 
-			*dest_vertex_id	= m_selected_vertex_id;
-	}
-	else m_failed			= false;
+    return (m_evaluator && m_graph);
 }
 
 TEMPLATE_SPECIALIZATION
-IC	void CSelectorTemplate::perform_search		(const _vertex_id_type vertex_id)
+IC void CSelectorTemplate::select_location(const _vertex_id_type start_vertex_id, bool path_completed)
 {
-	START_PROFILE("Build Path/Selector Path");
-	
-	VERIFY						(m_evaluator && m_graph);
-
-	_vertex_id_type				start_vertex_id = vertex_id;
-	before_search				(start_vertex_id);
-
-	m_last_query_time			= Device.dwTimeGlobal;
-	
-	m_evaluator->m_path			= m_path;
-	ai().graph_engine().search	(*m_graph,start_vertex_id,start_vertex_id,0,*m_evaluator);
-	m_failed	= 
-		!m_graph->valid_vertex_id(m_evaluator->selected_vertex_id()) || 
-		(m_evaluator->selected_vertex_id() == m_selected_vertex_id);
-	
-	if (!failed())
-		m_selected_vertex_id	= m_evaluator->selected_vertex_id();
-
-	after_search				();
-
-	STOP_PROFILE;
+    if (used() && (((m_last_query_time + m_query_interval) <= Device.dwTimeGlobal) || path_completed)) {
+        perform_search(start_vertex_id);
+        if (!failed() && dest_vertex_id) *dest_vertex_id = m_selected_vertex_id;
+    }
+    else
+        m_failed = false;
 }
 
 TEMPLATE_SPECIALIZATION
-IC	void CSelectorTemplate::set_dest_path		(xr_vector<_vertex_id_type> &path)
+IC void CSelectorTemplate::perform_search(const _vertex_id_type vertex_id)
 {
-	m_path						= &path;
+    START_PROFILE("Build Path/Selector Path");
+
+    VERIFY(m_evaluator && m_graph);
+
+    _vertex_id_type start_vertex_id = vertex_id;
+    before_search(start_vertex_id);
+
+    m_last_query_time = Device.dwTimeGlobal;
+
+    m_evaluator->m_path = m_path;
+    ai().graph_engine().search(*m_graph, start_vertex_id, start_vertex_id, 0, *m_evaluator);
+    m_failed = !m_graph->valid_vertex_id(m_evaluator->selected_vertex_id()) ||
+               (m_evaluator->selected_vertex_id() == m_selected_vertex_id);
+
+    if (!failed()) m_selected_vertex_id = m_evaluator->selected_vertex_id();
+
+    after_search();
+
+    STOP_PROFILE;
 }
 
 TEMPLATE_SPECIALIZATION
-IC	void CSelectorTemplate::set_dest_vertex		(_vertex_id_type &vertex_id)
+IC void CSelectorTemplate::set_dest_path(xr_vector<_vertex_id_type>& path)
 {
-	dest_vertex_id				= &vertex_id;
+    m_path = &path;
 }
 
 TEMPLATE_SPECIALIZATION
-IC	void CSelectorTemplate::before_search		(_vertex_id_type &vertex_id)
+IC void CSelectorTemplate::set_dest_vertex(_vertex_id_type& vertex_id)
+{
+    dest_vertex_id = &vertex_id;
+}
+
+TEMPLATE_SPECIALIZATION
+IC void CSelectorTemplate::before_search(_vertex_id_type& vertex_id)
 {
 }
 
 TEMPLATE_SPECIALIZATION
-IC	void CSelectorTemplate::after_search		()
+IC void CSelectorTemplate::after_search()
 {
 }
-
 
 #undef CSelectorTemplate
 #undef TEMPLATE_SPECIALIZATION

@@ -11,34 +11,38 @@
 
 #pragma once
 
+#include "object_factory.h"
 #include "object_factory_space.h"
 #include "object_item_abstract.h"
-#include "object_factory.h"
 
 template <typename _client_type, typename _server_type>
-class CObjectItemClientServer : public CObjectItemAbstract {
+class CObjectItemClientServer : public CObjectItemAbstract
+{
 protected:
-	typedef CObjectItemAbstract	inherited;
-	typedef _client_type		CLIENT_TYPE;
-	typedef _server_type		SERVER_TYPE;
+    typedef CObjectItemAbstract inherited;
+    typedef _client_type CLIENT_TYPE;
+    typedef _server_type SERVER_TYPE;
 
 public:
-	IC											CObjectItemClientServer		(const CLASS_ID &clsid, LPCSTR script_clsid);
+    IC CObjectItemClientServer(const CLASS_ID& clsid, LPCSTR script_clsid);
 #ifndef NO_XR_GAME
-    virtual ObjectFactory::ClientObjectBaseClass *client_object() const;
+    virtual ObjectFactory::ClientObjectBaseClass* client_object() const;
 #endif
-    virtual ObjectFactory::ServerObjectBaseClass *server_object(LPCSTR section) const;
+    virtual ObjectFactory::ServerObjectBaseClass* server_object(LPCSTR section) const;
 };
 
 #ifndef NO_XR_GAME
-	template <typename _client_type_single, typename _client_type_mp, typename _server_type_single, typename _server_type_mp>
-	class CObjectItemClientServerSingleMp : public CObjectItemAbstract {
-	typedef CObjectItemAbstract	inherited;
-	public:
-		IC											CObjectItemClientServerSingleMp	(const CLASS_ID &clsid, LPCSTR script_clsid);
-        virtual ObjectFactory::ClientObjectBaseClass *client_object() const;
-        virtual ObjectFactory::ServerObjectBaseClass *server_object(LPCSTR section) const;
-	};
+template <typename _client_type_single, typename _client_type_mp, typename _server_type_single,
+    typename _server_type_mp>
+class CObjectItemClientServerSingleMp : public CObjectItemAbstract
+{
+    typedef CObjectItemAbstract inherited;
+
+public:
+    IC CObjectItemClientServerSingleMp(const CLASS_ID& clsid, LPCSTR script_clsid);
+    virtual ObjectFactory::ClientObjectBaseClass* client_object() const;
+    virtual ObjectFactory::ServerObjectBaseClass* server_object(LPCSTR section) const;
+};
 #endif // NO_XR_GAME
 
 #include "object_item_client_server_inline.h"

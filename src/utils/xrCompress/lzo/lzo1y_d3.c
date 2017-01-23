@@ -24,9 +24,8 @@
    <markus@oberhumer.com>
  */
 
-
 #include "config1y.h"
 
-#define lzo1x_decompress_dict_safe	lzo1y_decompress_dict_safe
+#define lzo1x_decompress_dict_safe lzo1y_decompress_dict_safe
 
 #include "lzo1x_d3.c"

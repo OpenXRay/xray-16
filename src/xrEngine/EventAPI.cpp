@@ -1,6 +1,6 @@
-#include "stdafx.h"
 #include "EventAPI.h"
 #include "XR_IOConsole.h"
+#include "stdafx.h"
 
 extern void msRead();
 extern void msCreate(LPCSTR name);
@@ -9,38 +9,27 @@ extern void msCreate(LPCSTR name);
 class ENGINE_API CEvent
 {
     friend class CEventAPI;
+
 private:
     char* Name;
     xr_vector<IEventReceiver*> Handlers;
     u32 dwRefCount;
+
 public:
     CEvent(const char* S);
     ~CEvent();
 
-    LPCSTR GetFull()
-    {
-        return Name;
-    }
-    u32 RefCount()
-    {
-        return dwRefCount;
-    }
-
-    BOOL Equal(CEvent& E)
-    {
-        return stricmp(Name, E.Name) == 0;
-    }
-
+    LPCSTR GetFull() { return Name; }
+    u32 RefCount() { return dwRefCount; }
+    BOOL Equal(CEvent& E) { return stricmp(Name, E.Name) == 0; }
     void Attach(IEventReceiver* H)
     {
-        if (std::find(Handlers.begin(), Handlers.end(), H) == Handlers.end())
-            Handlers.push_back(H);
+        if (std::find(Handlers.begin(), Handlers.end(), H) == Handlers.end()) Handlers.push_back(H);
     }
     void Detach(IEventReceiver* H)
     {
         xr_vector<IEventReceiver*>::iterator I = std::find(Handlers.begin(), Handlers.end(), H);
-        if (I != Handlers.end())
-            Handlers.erase(I);
+        if (I != Handlers.end()) Handlers.erase(I);
     }
     void Signal(u64 P1, u64 P2)
     {
@@ -79,8 +68,7 @@ EVENT CEventAPI::Create(const char* N)
     CEvent E(N);
     for (xr_vector<CEvent*>::iterator I = Events.begin(); I != Events.end(); I++)
     {
-        if ((*I)->Equal(E))
-        {
+        if ((*I)->Equal(E)) {
             EVENT F = *I;
             F->dwRefCount++;
             CS.Leave();
@@ -97,8 +85,7 @@ void CEventAPI::Destroy(EVENT& E)
 {
     CS.Enter();
     E->dwRefCount--;
-    if (E->dwRefCount == 0)
-    {
+    if (E->dwRefCount == 0) {
         xr_vector<CEvent*>::iterator I = std::find(Events.begin(), Events.end(), E);
         R_ASSERT(I != Events.end());
         Events.erase(I);
@@ -160,12 +147,10 @@ void CEventAPI::Defer(LPCSTR N, u64 P1, u64 P2)
 #ifdef DEBUG
 void msParse(LPCSTR c)
 {
-    if (0 == stricmp(c, "exit"))
-    {
+    if (0 == stricmp(c, "exit")) {
         Console->Execute("quit");
     }
-    if (0 == stricmp(c, "quit"))
-    {
+    if (0 == stricmp(c, "quit")) {
         TerminateProcess(GetCurrentProcess(), 0);
         Console->Execute("quit");
     }
@@ -178,7 +163,10 @@ void CEventAPI::OnFrame()
     msRead();
 #endif
     CS.Enter();
-    if (Events_Deferred.empty()) { CS.Leave(); return; }
+    if (Events_Deferred.empty()) {
+        CS.Leave();
+        return;
+    }
     for (u32 I = 0; I < Events_Deferred.size(); I++)
     {
         Deferred& DEF = Events_Deferred[I];
@@ -192,16 +180,17 @@ void CEventAPI::OnFrame()
 BOOL CEventAPI::Peek(LPCSTR EName)
 {
     CS.Enter();
-    if (Events_Deferred.empty()) { CS.Leave(); return FALSE; }
+    if (Events_Deferred.empty()) {
+        CS.Leave();
+        return FALSE;
+    }
     for (u32 I = 0; I < Events_Deferred.size(); I++)
     {
         Deferred& DEF = Events_Deferred[I];
-        if (stricmp(DEF.E->GetFull(), EName) == 0)
-        {
+        if (stricmp(DEF.E->GetFull(), EName) == 0) {
             CS.Leave();
             return TRUE;
         }
-
     }
     CS.Leave();
     return FALSE;

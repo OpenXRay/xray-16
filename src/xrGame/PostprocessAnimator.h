@@ -9,36 +9,39 @@ public:
     CPostprocessAnimator();
     virtual void Stop(float speed) override;
     virtual void Load(LPCSTR name, bool internalFs = true) override;
-    virtual	BOOL Valid();
-    virtual	BOOL Process(SPPInfo& PPInfo);
+    virtual BOOL Valid();
+    virtual BOOL Process(SPPInfo& PPInfo);
 };
 
-class CPostprocessAnimatorLerp :public CPostprocessAnimator
+class CPostprocessAnimatorLerp : public CPostprocessAnimator
 {
 protected:
-    fastdelegate::FastDelegate0<float>	m_get_factor_func;
+    fastdelegate::FastDelegate0<float> m_get_factor_func;
+
 public:
-    void			SetFactorFunc(fastdelegate::FastDelegate0<float> f)	{ m_get_factor_func = f; }
-    virtual	BOOL		Process(SPPInfo &PPInfo);
+    void SetFactorFunc(fastdelegate::FastDelegate0<float> f) { m_get_factor_func = f; }
+    virtual BOOL Process(SPPInfo& PPInfo);
 };
 
-class CPostprocessAnimatorLerpConst :public CPostprocessAnimator
+class CPostprocessAnimatorLerpConst : public CPostprocessAnimator
 {
 protected:
-    float		m_power;
+    float m_power;
+
 public:
-    CPostprocessAnimatorLerpConst()					{ m_power = 1.0f; }
-    void		SetPower(float val)			{ m_power = val; }
-    virtual	BOOL		Process(SPPInfo &PPInfo);
+    CPostprocessAnimatorLerpConst() { m_power = 1.0f; }
+    void SetPower(float val) { m_power = val; }
+    virtual BOOL Process(SPPInfo& PPInfo);
 };
 
 class CEffectorController;
 
-class CPostprocessAnimatorControlled :public CPostprocessAnimatorLerp
+class CPostprocessAnimatorControlled : public CPostprocessAnimatorLerp
 {
-    CEffectorController*		m_controller;
+    CEffectorController* m_controller;
+
 public:
-    virtual				~CPostprocessAnimatorControlled();
+    virtual ~CPostprocessAnimatorControlled();
     CPostprocessAnimatorControlled(CEffectorController* c);
-    virtual BOOL		Valid();
+    virtual BOOL Valid();
 };

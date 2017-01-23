@@ -1,15 +1,2 @@
-#include "stdafx.h"
 #include "dTriCollideK.h"
-
-
-
-
-
-
-
-
-
-
-
-
-
+#include "stdafx.h"

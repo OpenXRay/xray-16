@@ -24,15 +24,12 @@
    <markus@oberhumer.com>
  */
 
-
 /* WARNING: this file should *not* be used by applications. It is
    part of the implementation of the library and is subject
    to change.
  */
 
-
 #include "lzo1a_cm.ch"
-
 
 /*
 vi:ts=4:et

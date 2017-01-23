@@ -8,18 +8,18 @@
 
 #pragma once
 
-IC	CSpaceRestrictionHolder::CSpaceRestrictionHolder		()
+IC CSpaceRestrictionHolder::CSpaceRestrictionHolder()
 {
-	m_default_out_restrictions	= "";
-	m_default_in_restrictions	= "";
+    m_default_out_restrictions = "";
+    m_default_in_restrictions = "";
 }
 
-IC	shared_str	CSpaceRestrictionHolder::default_out_restrictions	() const
+IC shared_str CSpaceRestrictionHolder::default_out_restrictions() const
 {
-	return					(m_default_out_restrictions);
+    return (m_default_out_restrictions);
 }
 
-IC	shared_str	CSpaceRestrictionHolder::default_in_restrictions	() const
+IC shared_str CSpaceRestrictionHolder::default_in_restrictions() const
 {
-	return					(m_default_in_restrictions);
+    return (m_default_in_restrictions);
 }

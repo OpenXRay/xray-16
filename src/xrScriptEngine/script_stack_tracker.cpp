@@ -6,47 +6,43 @@
 //	Description : Script stack tracker
 ////////////////////////////////////////////////////////////////////////////
 
-#include "pch.hpp"
 #include "script_stack_tracker.hpp"
-#include "script_engine.hpp"
 #include "Include/xrAPI/xrAPI.h"
+#include "pch.hpp"
+#include "script_engine.hpp"
 
-CScriptStackTracker::CScriptStackTracker(CScriptEngine *scriptEngine)
+CScriptStackTracker::CScriptStackTracker(CScriptEngine* scriptEngine)
 {
     this->scriptEngine = scriptEngine;
     m_current_stack_level = 0;
-    for (int i = 0; i<max_stack_size; i++)
+    for (int i = 0; i < max_stack_size; i++)
         m_stack[i] = new lua_Debug();
 }
 
 CScriptStackTracker::~CScriptStackTracker()
 {
-    for (int i = 0; i<max_stack_size; i++)
+    for (int i = 0; i < max_stack_size; i++)
         xr_delete(m_stack[i]);
 }
 
-void CScriptStackTracker::script_hook(lua_State *L, lua_Debug *dbg)
+void CScriptStackTracker::script_hook(lua_State* L, lua_Debug* dbg)
 {
-    VERIFY(L);// && (m_virtual_machine == L));
+    VERIFY(L); // && (m_virtual_machine == L));
     switch (dbg->event)
     {
     case LUA_HOOKCALL:
-        if (m_current_stack_level>=max_stack_size)
-            return;
-        if (!lua_getstack(L, 0, m_stack[m_current_stack_level]))
-            break;
+        if (m_current_stack_level >= max_stack_size) return;
+        if (!lua_getstack(L, 0, m_stack[m_current_stack_level])) break;
         lua_getinfo(L, "nSlu", m_stack[m_current_stack_level]);
-        if (m_current_stack_level && lua_getstack(L, 1, m_stack[m_current_stack_level-1]))
-            lua_getinfo(L, "nSlu", m_stack[m_current_stack_level-1]);
+        if (m_current_stack_level && lua_getstack(L, 1, m_stack[m_current_stack_level - 1]))
+            lua_getinfo(L, "nSlu", m_stack[m_current_stack_level - 1]);
         m_current_stack_level++;
         break;
     case LUA_HOOKRET:
-        if (m_current_stack_level>0)
-            m_current_stack_level--;
+        if (m_current_stack_level > 0) m_current_stack_level--;
         break;
     case LUA_HOOKTAILRET:
-        if (m_current_stack_level>0)
-            m_current_stack_level--;
+        if (m_current_stack_level > 0) m_current_stack_level--;
         break;
     case LUA_HOOKLINE:
         lua_getinfo(L, "l", dbg);
@@ -56,28 +52,26 @@ void CScriptStackTracker::script_hook(lua_State *L, lua_Debug *dbg)
         lua_getinfo(L, "l", dbg);
         m_stack[m_current_stack_level]->currentline = dbg->currentline;
         break;
-    default:
-        NODEFAULT;
+    default: NODEFAULT;
     }
 }
 
-void CScriptStackTracker::print_stack(lua_State *L)
+void CScriptStackTracker::print_stack(lua_State* L)
 {
-    VERIFY(L);// && (m_virtual_machine == L));
-    for (int j = m_current_stack_level-1, k = 0; j>=0; j--, k++)
+    VERIFY(L); // && (m_virtual_machine == L));
+    for (int j = m_current_stack_level - 1, k = 0; j >= 0; j--, k++)
     {
         lua_Debug l_tDebugInfo = *m_stack[j];
-        if (!l_tDebugInfo.name)
-        {
-            scriptEngine->script_log(LuaMessageType::Error, "%2d : [%s] %s(%d) : %s",
-                k, l_tDebugInfo.what, l_tDebugInfo.short_src, l_tDebugInfo.currentline, "");
+        if (!l_tDebugInfo.name) {
+            scriptEngine->script_log(LuaMessageType::Error, "%2d : [%s] %s(%d) : %s", k, l_tDebugInfo.what,
+                l_tDebugInfo.short_src, l_tDebugInfo.currentline, "");
         }
         else if (!xr_strcmp(l_tDebugInfo.what, "C"))
             scriptEngine->script_log(LuaMessageType::Error, "%2d : [C  ] %s", k, l_tDebugInfo.name);
         else
         {
-            scriptEngine->script_log(LuaMessageType::Error, "%2d : [%s] %s(%d) : %s",
-                k, l_tDebugInfo.what, l_tDebugInfo.short_src, l_tDebugInfo.currentline, l_tDebugInfo.name);
+            scriptEngine->script_log(LuaMessageType::Error, "%2d : [%s] %s(%d) : %s", k, l_tDebugInfo.what,
+                l_tDebugInfo.short_src, l_tDebugInfo.currentline, l_tDebugInfo.name);
         }
     }
     m_current_stack_level = 0;

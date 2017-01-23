@@ -17,10 +17,6 @@ Copyright 2000 GameSpy Industries, Inc
 // If key is NULL, returns the first key
 // in input, or NULL if there's an error.
 /////////////////////////////////////////
-char * ParseKeyValue
-(
-	char * input,
-	const char * key
-);
+char* ParseKeyValue(char* input, const char* key);
 
 #endif

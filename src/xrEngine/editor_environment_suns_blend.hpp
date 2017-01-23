@@ -15,7 +15,6 @@
 
 namespace editor
 {
-
 class property_holder;
 class property_holder_collection;
 
@@ -23,7 +22,6 @@ namespace environment
 {
 namespace suns
 {
-
 class manager;
 
 class blend : private Noncopyable

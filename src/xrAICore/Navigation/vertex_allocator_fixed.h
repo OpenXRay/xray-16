@@ -11,9 +11,10 @@
 template <u32 ReserveSize>
 struct CVertexAllocatorFixed
 {
-    template<typename TCompoundVertex>
+    template <typename TCompoundVertex>
     struct VertexData
-    {};
+    {
+    };
 
     template <typename TCompoundVertex>
     class CDataStorage
@@ -32,7 +33,7 @@ struct CVertexAllocatorFixed
         inline virtual ~CDataStorage();
         inline void init();
         inline u32 get_visited_node_count() const;
-        inline Vertex &create_vertex();
+        inline Vertex& create_vertex();
     };
 };
 

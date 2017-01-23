@@ -1,5 +1,5 @@
-#include "stdafx.h"
 #include "Text_Console.h"
+#include "stdafx.h"
 
 LRESULT CALLBACK TextConsole_WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
@@ -8,7 +8,8 @@ LRESULT CALLBACK TextConsole_WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
     case WM_PAINT:
     {
         // return 0;
-    } break;
+    }
+    break;
     case WM_ERASEBKGND:
     {
         int x = 0;
@@ -27,8 +28,7 @@ LRESULT CALLBACK TextConsole_WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
         // return 0;
     }
     break;
-    default:
-        break;
+    default: break;
     }
     return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }
@@ -47,8 +47,7 @@ LRESULT CALLBACK TextConsole_LogWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPA
         return (LRESULT)0; // Say we handled it.
     }
     break;
-    default:
-        break;
+    default: break;
     }
     return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }

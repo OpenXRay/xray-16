@@ -5,18 +5,14 @@
 
 ENGINE_API std::string dbg_object_base_dump_string(const IGameObject* obj)
 {
-    if (!obj)
-        return make_string("object: NULL ptr");
-    return make_string("object name: %s, section name: %s, visual name: %s \n",
-        obj->cName().c_str(),
-        obj->cNameSect().c_str(),
-        obj->Visual() ? obj->cNameVisual().c_str() : "none");
+    if (!obj) return make_string("object: NULL ptr");
+    return make_string("object name: %s, section name: %s, visual name: %s \n", obj->cName().c_str(),
+        obj->cNameSect().c_str(), obj->Visual() ? obj->cNameVisual().c_str() : "none");
 }
 
 ENGINE_API std::string dbg_object_poses_dump_string(const IGameObject* obj)
 {
-    if (!obj)
-        return std::string("");
+    if (!obj) return std::string("");
 
     u32 ps_size = obj->ps_Size();
     std::string buf("");
@@ -31,14 +27,13 @@ ENGINE_API std::string dbg_object_poses_dump_string(const IGameObject* obj)
 
 ENGINE_API std::string dbg_object_visual_geom_dump_string(const IGameObject* obj)
 {
-    if (!obj || !obj->Visual())
-        return std::string("");
+    if (!obj || !obj->Visual()) return std::string("");
     const Fbox& box = obj->BoundingBox();
     Fvector c;
     obj->Center(c);
 
-    return make_string("\n visual box: %s \n visual center: %s \n visual radius: %f ",
-        get_string(box).c_str(), get_string(c).c_str(), obj->Radius());
+    return make_string("\n visual box: %s \n visual center: %s \n visual radius: %f ", get_string(box).c_str(),
+        get_string(c).c_str(), obj->Radius());
 }
 
 /*
@@ -62,11 +57,11 @@ ENGINE_API std::string dbg_object_visual_geom_dump_string(const IGameObject* obj
  */
 ENGINE_API std::string dbg_object_props_dump_string(const IGameObject* obj)
 {
-    if (!obj)
-        return std::string("");
+    if (!obj) return std::string("");
     GameObjectProperties props;
     obj->DBGGetProps(props);
-    const char *format = " "
+    const char* format =
+        " "
         "net_ID :%d, bActiveCounter :%d, bEnabled :%s, bVisible :%s, bDestroy :%s, \n "
         "net_Local %s, net_Ready :%s, net_SV_Update :%s, crow :%s, bPreDestroy : %s \n "
         "dbg_update_cl: %d, dwFrame_UpdateCL: %d, dwFrame_AsCrow :%d, Device.dwFrame :%d, Device.dwTimeGlobal: %d \n";
@@ -81,22 +76,17 @@ ENGINE_API std::string dbg_object_props_dump_string(const IGameObject* obj)
     auto updateFrameDbg = obj->GetDbgUpdateFrame();
     auto updateFrame = obj->GetUpdateFrame();
     auto updateFrameCrow = obj->GetCrowUpdateFrame();
-    return make_string(format,
-        props.net_ID, props.bActiveCounter, enabled, visible, destroy,
-        netLocal, netReady, netSvUpdate, crow, preDestroy,
-        updateFrameDbg, updateFrame, updateFrameCrow, Device.dwFrame, Device.dwTimeGlobal);
+    return make_string(format, props.net_ID, props.bActiveCounter, enabled, visible, destroy, netLocal, netReady,
+        netSvUpdate, crow, preDestroy, updateFrameDbg, updateFrame, updateFrameCrow, Device.dwFrame,
+        Device.dwTimeGlobal);
 }
 ENGINE_API std::string dbg_object_full_dump_string(const IGameObject* obj)
 {
-    return dbg_object_base_dump_string(obj) +
-        dbg_object_props_dump_string(obj) +
-        dbg_object_poses_dump_string(obj) +
-        dbg_object_visual_geom_dump_string(obj);
-
+    return dbg_object_base_dump_string(obj) + dbg_object_props_dump_string(obj) + dbg_object_poses_dump_string(obj) +
+           dbg_object_visual_geom_dump_string(obj);
 }
 ENGINE_API std::string dbg_object_full_capped_dump_string(const IGameObject* obj)
 {
-    return std::string("\n object dump: \n") +
-        dbg_object_full_dump_string(obj);
+    return std::string("\n object dump: \n") + dbg_object_full_dump_string(obj);
 }
 #endif

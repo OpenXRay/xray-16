@@ -12,21 +12,25 @@
 
 class CTeamHierarchyHolder;
 
-class CSeniorityHierarchyHolder {
+class CSeniorityHierarchyHolder
+{
 private:
-	enum {max_team_count = 64};
+    enum
+    {
+        max_team_count = 64
+    };
 
 private:
-	typedef svector<CTeamHierarchyHolder*,max_team_count> TEAM_REGISTRY;
+    typedef svector<CTeamHierarchyHolder*, max_team_count> TEAM_REGISTRY;
 
 private:
-	TEAM_REGISTRY					m_teams;
+    TEAM_REGISTRY m_teams;
 
 public:
-	IC								CSeniorityHierarchyHolder	();
-	virtual							~CSeniorityHierarchyHolder	();
-			CTeamHierarchyHolder	&team						(u32 team_id);
-	IC		const TEAM_REGISTRY		&teams						() const;
+    IC CSeniorityHierarchyHolder();
+    virtual ~CSeniorityHierarchyHolder();
+    CTeamHierarchyHolder& team(u32 team_id);
+    IC const TEAM_REGISTRY& teams() const;
 };
 
 #include "seniority_hierarchy_holder_inline.h"

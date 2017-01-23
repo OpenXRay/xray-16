@@ -19,7 +19,7 @@ void CLocatorAPI::auth_generate(xr_vector<shared_str>& ignore, xr_vector<shared_
     _o->important = important;
 
 #if 1
-    FS.auth_runtime (_o);
+    FS.auth_runtime(_o);
 #else
     thread_spawn(auth_entry, "checksum", 0, _o);
 #endif
@@ -42,8 +42,7 @@ void CLocatorAPI::auth_runtime(void* params)
     m_auth_code = crc32(writer.pointer(), writer.size());
 
 #ifdef DEBUG
-    if (strstr(Core.Params, "auth_debug"))
-    {
+    if (strstr(Core.Params, "auth_debug")) {
         string_path tmp_path;
         update_path(tmp_path, "$app_data_root$", "auth_psettings.ltx");
         IWriter* tmp_dst = w_open(tmp_path);
@@ -67,30 +66,25 @@ void CLocatorAPI::auth_runtime(void* params)
             BOOL bSkip = FALSE;
             for (u32 s = 0; s < _o->ignore.size(); s++)
             {
-                if (strstr(f.name, _o->ignore[s].c_str()))
-                    bSkip = TRUE;
+                if (strstr(f.name, _o->ignore[s].c_str())) bSkip = TRUE;
             }
 
-            if (bSkip)
-                continue;
+            if (bSkip) continue;
 
             // test for important
             for (u32 s = 0; s < _o->important.size(); s++)
             {
-                if ((f.size_real != 0) && strstr(f.name, _o->important[s].c_str()))
-                {
+                if ((f.size_real != 0) && strstr(f.name, _o->important[s].c_str())) {
                     // crc for file
                     IReader* r = FS.r_open(f.name);
-                    if (!r)
-                    {
+                    if (!r) {
                         do_break = true;
                         break;
                     }
                     u32 crc = crc32(r->pointer(), r->length());
 
 #ifdef DEBUG
-                    if (strstr(Core.Params, "auth_debug"))
-                        Msg("auth %s = 0x%08x", f.name, crc);
+                    if (strstr(Core.Params, "auth_debug")) Msg("auth %s = 0x%08x", f.name, crc);
 #endif // DEBUG
 
                     FS.r_close(r);
@@ -98,8 +92,7 @@ void CLocatorAPI::auth_runtime(void* params)
                 }
             }
 
-            if (do_break)
-                break;
+            if (do_break) break;
         }
 #ifdef DEBUG
         Msg("auth_code = %d", m_auth_code);
