@@ -3,13 +3,14 @@
 // Antirad - таблетки выводящие радиацию
 ///////////////////////////////////////////////////////////////
 
+
 #pragma once
 
 #include "eatable_item_object.h"
 
-class CAntirad : public CEatableItemObject
-{
+class CAntirad: public CEatableItemObject {
+
 public:
-    CAntirad();
-    virtual ~CAntirad();
+				 CAntirad			();
+	virtual		 ~CAntirad			();
 };

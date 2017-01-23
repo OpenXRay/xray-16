@@ -1,6 +1,6 @@
 #include "stdafx.h"
-#include "xrtheora_stream.h"
 #include "xrtheora_surface.h"
+#include "xrtheora_stream.h"
 
 CTheoraSurface::CTheoraSurface()
 {
@@ -11,7 +11,7 @@ CTheoraSurface::CTheoraSurface()
     // timing
     tm_play = 0;
     tm_total = 0;
-// sdl
+    // sdl
 #ifdef SDL_OUTPUT
     sdl_screen = 0;
     sdl_yuv_overlay = 0;
@@ -28,7 +28,7 @@ CTheoraSurface::~CTheoraSurface()
     xr_delete(m_rgb);
     xr_delete(m_alpha);
 #ifdef SDL_OUTPUT
-    SDL_Quit();
+    SDL_Quit ();
 #endif
 }
 
@@ -57,20 +57,25 @@ BOOL CTheoraSurface::Update(u32 _time)
     VERIFY(Valid());
     BOOL redraw = FALSE;
 
-    if (prefetch < 0) // fake. first updated frame is data loading
+    if (prefetch < 0) //fake. first updated frame is data loading
     {
         ++prefetch;
-        if (prefetch == 0) tm_start = _time;
+        if (prefetch == 0)
+            tm_start = _time;
 
         tm_play = 0;
     }
     else
     {
-        if (playing) tm_play = _time - tm_start;
+        if (playing)
+            tm_play = _time - tm_start;
     }
-    if (playing) {
-        if (tm_play >= tm_total) {
-            if (looped) {
+    if (playing)
+    {
+        if (tm_play >= tm_total)
+        {
+            if (looped)
+            {
                 tm_start = tm_start + tm_total;
                 Reset();
             }
@@ -92,23 +97,28 @@ BOOL CTheoraSurface::Load(const char* fname)
     VERIFY(FALSE == ready);
     m_rgb = new CTheoraStream();
     BOOL res = m_rgb->Load(fname);
-    if (res) {
+    if (res)
+    {
         string_path alpha, ext;
         xr_strcpy(alpha, fname);
         pstr pext = strext(alpha);
-        if (pext) {
+        if (pext)
+        {
             xr_strcpy(ext, pext);
             *pext = 0;
         }
         strconcat(sizeof(alpha), alpha, alpha, "#alpha", ext);
-        if (FS.exist(alpha)) {
+        if (FS.exist(alpha))
+        {
             m_alpha = new CTheoraStream();
             if (!m_alpha->Load(alpha)) res = FALSE;
         }
     }
-    if (res) {
+    if (res)
+    {
 #ifdef DEBUG
-        if (m_alpha) {
+        if (m_alpha)
+        {
             VERIFY(m_rgb->tm_total == m_alpha->tm_total);
             VERIFY(m_rgb->t_info.frame_width == m_alpha->t_info.frame_width);
             VERIFY(m_rgb->t_info.frame_height == m_alpha->t_info.frame_height);
@@ -120,9 +130,9 @@ BOOL CTheoraSurface::Load(const char* fname)
         VERIFY(0 != tm_total);
         // reset playback
         Reset();
-// open SDL video
+        // open SDL video
 #ifdef SDL_OUTPUT
-        open_sdl_video();
+        open_sdl_video ();
 #endif
         ready = TRUE;
     }
@@ -131,19 +141,21 @@ BOOL CTheoraSurface::Load(const char* fname)
         xr_delete(m_rgb);
         xr_delete(m_alpha);
     }
-    if (res) {
-// TODO: get shader version here for theora surface
-// VERIFY(0);
+    if (res)
+    {
+        // TODO: get shader version here for theora surface
+        //VERIFY(0);
 
-// u32 v_dev = CAP_VERSION(HW.Caps.raster_major, HW.Caps.raster_minor);
-// u32 v_need = CAP_VERSION(2,0);
-// bShaderYUV2RGB = (v_dev>=v_need);
+        //u32 v_dev = CAP_VERSION(HW.Caps.raster_major, HW.Caps.raster_minor);
+        //u32 v_need = CAP_VERSION(2,0);
+        //bShaderYUV2RGB = (v_dev>=v_need);
 #ifndef _EDITOR
         R_ASSERT(GlobalEnv.Render);
         bShaderYUV2RGB = GlobalEnv.Render->HWSupportsShaderYUV2RGB();
-#else  // _EDITOR
+#else // _EDITOR
         bShaderYUV2RGB = false;
 #endif // _EDITOR
+
     }
     return res;
 }
@@ -156,6 +168,7 @@ u32 CTheoraSurface::Width(bool bRealSize)
         return m_rgb->t_info.frame_width;
     else
         return btwPow2_Ceil((u32)m_rgb->t_info.frame_width);
+
 }
 
 u32 CTheoraSurface::Height(bool bRealSize)
@@ -165,8 +178,8 @@ u32 CTheoraSurface::Height(bool bRealSize)
     if (bRealSize)
         return m_rgb->t_info.frame_height;
     else
-        return btwPow2_Ceil((u32)m_rgb->t_info.frame_height);
-    ;
+        return btwPow2_Ceil((u32)m_rgb->t_info.frame_height);;
+
 }
 
 void CTheoraSurface::DecompressFrame(u32* data, u32 _width, int& _pos)
@@ -184,14 +197,17 @@ void CTheoraSurface::DecompressFrame(u32* data, u32 _width, int& _pos)
     // u32 pixelformat = m_rgb->t_info.pixelformat;
 
     // rgb
-    if (yuv_rgb) {
+    if (yuv_rgb)
+    {
         yuv_buffer& yuv = *yuv_rgb;
 
         u32 pos = 0;
 
-        if (!bShaderYUV2RGB) {
+        if (!bShaderYUV2RGB)
+        {
             for (u32 h = 0; h < height; ++h)
             {
+
                 u32 uv_stride_add = yuv.uv_stride * (h >> 1);
                 u8* Y = yuv.y + yuv.y_stride * h;
                 u8* U = yuv.u + uv_stride_add;
@@ -199,6 +215,7 @@ void CTheoraSurface::DecompressFrame(u32* data, u32 _width, int& _pos)
 
                 for (u32 w = 0; w < width; ++w)
                 {
+
                     u32 uv_idx = w >> 1;
                     u8 y = Y[w];
                     u8 u = U[uv_idx];
@@ -221,11 +238,13 @@ void CTheoraSurface::DecompressFrame(u32* data, u32 _width, int& _pos)
         }
         else
         {
+
             u32 buff_step = width + _width;
             u32 buff_double_step = buff_step << 1;
 
             for (u32 y_h = 0, uv_h = 0; y_h < height; y_h += 2, ++uv_h, pos += buff_double_step)
             {
+
                 u32 uv_stride_add = yuv.uv_stride * uv_h;
                 u8* Y0 = yuv.y + yuv.y_stride * y_h;
                 u8* U = yuv.u + uv_stride_add;
@@ -234,6 +253,7 @@ void CTheoraSurface::DecompressFrame(u32* data, u32 _width, int& _pos)
 
                 for (u32 y_w = 0, uv_w = 0; y_w < width; y_w += 2, ++uv_w)
                 {
+
                     u32 y00 = Y0[y_w] << 16;
                     u32 y01 = Y0[y_w + 1] << 16;
 
@@ -261,12 +281,13 @@ void CTheoraSurface::DecompressFrame(u32* data, u32 _width, int& _pos)
     }
 
     // alpha
-    if (yuv_alpha) {
+    if (yuv_alpha)
+    {
         yuv_buffer& yuv = *yuv_alpha;
         u32 pos = 0;
         for (u32 h = 0; h < height; ++h)
         {
-            u8* Y = yuv.y + yuv.y_stride * h;
+            u8* Y = yuv.y + yuv.y_stride*h;
             for (u32 w = 0; w < width; ++w)
             {
                 u8 y = Y[w];
@@ -283,20 +304,23 @@ void CTheoraSurface::open_sdl_video()
     VERIFY(m_rgb);
     theora_info& t_info = m_rgb->t_info;
 
-    if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-        msg("Unable to init SDL: %s", SDL_GetError());
+    if ( SDL_Init(SDL_INIT_VIDEO) < 0 )
+    {
+        msg ("Unable to init SDL: %s", SDL_GetError());
         return;
     }
 
     sdl_screen = SDL_SetVideoMode(t_info.frame_width, t_info.frame_height, 0, SDL_SWSURFACE);
-    if (sdl_screen == NULL) {
-        msg("Unable to set %dx%d video: %s", t_info.frame_width, t_info.frame_height, SDL_GetError());
+    if ( sdl_screen == NULL )
+    {
+        msg ("Unable to set %dx%d video: %s", t_info.frame_width,t_info.frame_height,SDL_GetError());
         return;
     }
 
     sdl_yuv_overlay = SDL_CreateYUVOverlay(t_info.frame_width, t_info.frame_height, SDL_YV12_OVERLAY, sdl_screen);
-    if (sdl_yuv_overlay == NULL) {
-        msg("SDL: Couldn't create SDL_yuv_overlay: %s", SDL_GetError());
+    if ( sdl_yuv_overlay == NULL )
+    {
+        msg ("SDL: Couldn't create SDL_yuv_overlay: %s", SDL_GetError());
         return;
     }
     sdl_rect.x = 0;
@@ -304,38 +328,35 @@ void CTheoraSurface::open_sdl_video()
     sdl_rect.w = t_info.frame_width;
     sdl_rect.h = t_info.frame_height;
 
-    SDL_DisplayYUVOverlay(sdl_yuv_overlay, &sdl_rect);
+    SDL_DisplayYUVOverlay (sdl_yuv_overlay, &sdl_rect);
 }
 
 void CTheoraSurface::write_sdl_video()
 {
     VERIFY(m_rgb);
     theora_info& t_info = m_rgb->t_info;
-    yuv_buffer& t_yuv_buffer = *m_rgb->current_yuv_buffer();
+    yuv_buffer& t_yuv_buffer= *m_rgb->current_yuv_buffer();
     int i;
     int crop_offset;
     // Lock SDL_yuv_overlay
-    if (SDL_MUSTLOCK(sdl_screen))
-        if (SDL_LockSurface(sdl_screen) < 0) return;
+    if ( SDL_MUSTLOCK(sdl_screen) )
+        if ( SDL_LockSurface(sdl_screen) < 0 ) return;
     if (SDL_LockYUVOverlay(sdl_yuv_overlay) < 0) return;
     // let's draw the data (*yuv[3]) on a SDL screen (*screen)
     // deal with border stride
     // reverse u and v for SDL
     // and crop input properly, respecting the encoded frame rect
-    crop_offset = t_info.offset_x + t_yuv_buffer.y_stride * t_info.offset_y;
-    for (i = 0; i < sdl_yuv_overlay->h; i++)
-        mem_copy(sdl_yuv_overlay->pixels[0] + sdl_yuv_overlay->pitches[0] * i,
-            t_yuv_buffer.y + crop_offset + t_yuv_buffer.y_stride * i, sdl_yuv_overlay->w);
-    crop_offset = (t_info.offset_x / 2) + (t_yuv_buffer.uv_stride) * (t_info.offset_y / 2);
-    for (i = 0; i < sdl_yuv_overlay->h / 2; i++)
+    crop_offset=t_info.offset_x+t_yuv_buffer.y_stride*t_info.offset_y;
+    for(i=0; i<sdl_yuv_overlay->h; i++)
+        mem_copy(sdl_yuv_overlay->pixels[0]+sdl_yuv_overlay->pitches[0]*i, t_yuv_buffer.y+crop_offset+t_yuv_buffer.y_stride*i, sdl_yuv_overlay->w);
+    crop_offset=(t_info.offset_x/2)+(t_yuv_buffer.uv_stride)*(t_info.offset_y/2);
+    for(i=0; i<sdl_yuv_overlay->h/2; i++)
     {
-        mem_copy(sdl_yuv_overlay->pixels[1] + sdl_yuv_overlay->pitches[1] * i,
-            t_yuv_buffer.v + crop_offset + t_yuv_buffer.uv_stride * i, sdl_yuv_overlay->w / 2);
-        mem_copy(sdl_yuv_overlay->pixels[2] + sdl_yuv_overlay->pitches[2] * i,
-            t_yuv_buffer.u + crop_offset + t_yuv_buffer.uv_stride * i, sdl_yuv_overlay->w / 2);
+        mem_copy(sdl_yuv_overlay->pixels[1]+sdl_yuv_overlay->pitches[1]*i, t_yuv_buffer.v+crop_offset+t_yuv_buffer.uv_stride*i, sdl_yuv_overlay->w/2);
+        mem_copy(sdl_yuv_overlay->pixels[2]+sdl_yuv_overlay->pitches[2]*i, t_yuv_buffer.u+crop_offset+t_yuv_buffer.uv_stride*i, sdl_yuv_overlay->w/2);
     }
     // Unlock SDL_yuv_overlay
-    if (SDL_MUSTLOCK(sdl_screen)) SDL_UnlockSurface(sdl_screen);
+    if ( SDL_MUSTLOCK(sdl_screen) ) SDL_UnlockSurface(sdl_screen);
     SDL_UnlockYUVOverlay(sdl_yuv_overlay);
     // Show, baby, show!
     SDL_DisplayYUVOverlay(sdl_yuv_overlay, &sdl_rect);

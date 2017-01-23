@@ -10,25 +10,25 @@
  *      Pthreads-win32 - POSIX Threads Library for Win32
  *      Copyright(C) 1998 John E. Bossom
  *      Copyright(C) 1999,2005 Pthreads-win32 contributors
- *
+ * 
  *      Contact Email: rpj@callisto.canberra.edu.au
- *
+ * 
  *      The current list of contributors is contained
  *      in the file CONTRIBUTORS included with the source
  *      code distribution. The list can also be seen at the
  *      following World Wide Web location:
  *      http://sources.redhat.com/pthreads-win32/contributors.html
- *
+ * 
  *      This library is free software; you can redistribute it and/or
  *      modify it under the terms of the GNU Lesser General Public
  *      License as published by the Free Software Foundation; either
  *      version 2 of the License, or (at your option) any later version.
- *
+ * 
  *      This library is distributed in the hope that it will be useful,
  *      but WITHOUT ANY WARRANTY; without even the implied warranty of
  *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *      Lesser General Public License for more details.
- *
+ * 
  *      You should have received a copy of the GNU Lesser General Public
  *      License along with this library in the file COPYING.LIB;
  *      if not, write to the Free Software Foundation, Inc.,
@@ -37,8 +37,8 @@
 
 #if defined(NEED_ERRNO)
 
-#include "implement.h"
 #include "pthread.h"
+#include "implement.h"
 
 static int reallyBad = ENOMEM;
 
@@ -68,25 +68,27 @@ static int reallyBad = ENOMEM;
  *
  */
 
-int* _errno(void)
+int *
+_errno (void)
 {
-    pthread_t self;
-    int* result;
+  pthread_t self;
+  int *result;
 
-    if ((self = pthread_self()) == NULL) {
-        /*
-         * Yikes! unable to allocate a thread!
-         * Throw an exception? return an error?
-         */
-        result = &reallyBad;
-    }
-    else
+  if ((self = pthread_self ()) == NULL)
     {
-        result = &(self->ptErrno);
+      /*
+       * Yikes! unable to allocate a thread!
+       * Throw an exception? return an error?
+       */
+      result = &reallyBad;
+    }
+  else
+    {
+      result = &(self->ptErrno);
     }
 
-    return (result);
+  return (result);
 
-} /* _errno */
+}				/* _errno */
 
 #endif /* (NEED_ERRNO) */

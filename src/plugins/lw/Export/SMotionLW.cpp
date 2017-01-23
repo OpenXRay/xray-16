@@ -1,6 +1,6 @@
+#include "StdAfx.h"
 #include "SMotionLW.hpp"
 #include "Globals.hpp"
-#include "StdAfx.h"
 #include "Util.hpp"
 
 // XXX: locate and include
@@ -19,7 +19,7 @@ void SMotionLW::ParseBoneMotion(LWItemID bone)
     LWItemID goal, goal_parent;
 
     bone_mots.push_back(st_BoneMotion());
-    st_BoneMotion& bm = bone_mots.back();
+    st_BoneMotion&	bm = bone_mots.back();
 
     group = g_iteminfo->chanGroup(bone);
     chan = g_chinfo->nextChannel(group, NULL);
@@ -30,8 +30,9 @@ void SMotionLW::ParseBoneMotion(LWItemID bone)
 
     goal_parent = g_iteminfo->parent(goal);
     bool bParent = !(goal_parent == LWITEM_NULL);
-    bool bGoalOrient = !!(g_iteminfo->flags(bone) & LWITEMF_GOAL_ORIENT);
-    if (bGoalOrient) {
+    bool bGoalOrient = !!(g_iteminfo->flags(bone)&LWITEMF_GOAL_ORIENT);
+    if (bGoalOrient)
+    {
         group_goal = g_iteminfo->chanGroup(goal);
         chan_goal = g_chinfo->nextChannel(group_goal, NULL);
         // flag
@@ -41,8 +42,10 @@ void SMotionLW::ParseBoneMotion(LWItemID bone)
     while (chan)
     {
         EChannelType t = GetChannelType(chan);
-        if (t != ctUnsupported) {
-            if (!bGoalOrient || (bGoalOrient && ((t == ctPositionX) || (t == ctPositionY) || (t == ctPositionZ)))) {
+        if (t != ctUnsupported)
+        {
+            if (!bGoalOrient || (bGoalOrient && ((t == ctPositionX) || (t == ctPositionY) || (t == ctPositionZ))))
+            {
                 CEnvelope* env = CreateEnvelope(chan);
                 bm.envs[t] = env;
             }
@@ -50,14 +53,18 @@ void SMotionLW::ParseBoneMotion(LWItemID bone)
         chan = g_chinfo->nextChannel(group, chan);
     }
     // goal orientation
-    if (bGoalOrient) {
+    if (bGoalOrient)
+    {
         while (chan_goal)
         {
             EChannelType t = GetChannelType(chan_goal);
-            if (t != ctUnsupported) {
-                if ((t == ctRotationH) || (t == ctRotationP) || (t == ctRotationB)) {
+            if (t != ctUnsupported)
+            {
+                if ((t == ctRotationH) || (t == ctRotationP) || (t == ctRotationB))
+                {
                     // parent (if exist)
-                    if (bParent) {
+                    if (bParent)
+                    {
                         group_goal_parent = g_iteminfo->chanGroup(goal_parent);
                         chan_goal_parent = g_chinfo->nextChannel(group_goal_parent, NULL);
                         while (chan_goal_parent)

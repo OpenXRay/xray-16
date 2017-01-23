@@ -1,11 +1,17 @@
-#include "RadioactiveZone.h"
-#include "mincer.h"
 #include "pch_script.h"
+#include "mincer.h"
+#include "RadioactiveZone.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
-SCRIPT_EXPORT(CMincer, (CGameObject), {
-    module(luaState)[class_<CMincer, CGameObject>("CMincer").def(constructor<>()),
-        class_<CRadioactiveZone, CGameObject>("CRadioactiveZone").def(constructor<>())];
+SCRIPT_EXPORT(CMincer, (CGameObject),
+{
+	module(luaState)
+	[
+		class_<CMincer,CGameObject>("CMincer")
+			.def(constructor<>()),
+		class_<CRadioactiveZone,CGameObject>("CRadioactiveZone")
+			.def(constructor<>())
+	];
 });

@@ -10,7 +10,6 @@ public:
     typedef const Self& SelfCRef;
     typedef _vector3<T> Tvector;
     typedef _matrix<T> Tmatrix;
-
 protected:
     static bool clip(T fDenom, T fNumer, T& rfT0, T& rfT1)
     {
@@ -18,15 +17,16 @@ protected:
         // plane. Otherwise 'false' is returned in which case the line segment
         // is entirely clipped.
 
-        if (fDenom > 0.0f) {
-            if (fNumer > fDenom * rfT1) return false;
-            if (fNumer > fDenom * rfT0) rfT0 = fNumer / fDenom;
+        if (fDenom > 0.0f)
+        {
+            if (fNumer > fDenom*rfT1) return false;
+            if (fNumer > fDenom*rfT0) rfT0 = fNumer / fDenom;
             return true;
         }
         else if (fDenom < 0.0f)
         {
-            if (fNumer > fDenom * rfT0) return false;
-            if (fNumer > fDenom * rfT1) rfT1 = fNumer / fDenom;
+            if (fNumer > fDenom*rfT0) return false;
+            if (fNumer > fDenom*rfT1) rfT1 = fNumer / fDenom;
             return true;
         }
         else
@@ -39,13 +39,15 @@ protected:
         T fSaveT0 = rfT0, fSaveT1 = rfT1;
 
         bool bNotEntirelyClipped =
-            clip(+dir.x, -start.x - extent[0], rfT0, rfT1) && clip(-dir.x, +start.x - extent[0], rfT0, rfT1) &&
-            clip(+dir.y, -start.y - extent[1], rfT0, rfT1) && clip(-dir.y, +start.y - extent[1], rfT0, rfT1) &&
-            clip(+dir.z, -start.z - extent[2], rfT0, rfT1) && clip(-dir.z, +start.z - extent[2], rfT0, rfT1);
+            clip(+dir.x, -start.x - extent[0], rfT0, rfT1) &&
+            clip(-dir.x, +start.x - extent[0], rfT0, rfT1) &&
+            clip(+dir.y, -start.y - extent[1], rfT0, rfT1) &&
+            clip(-dir.y, +start.y - extent[1], rfT0, rfT1) &&
+            clip(+dir.z, -start.z - extent[2], rfT0, rfT1) &&
+            clip(-dir.z, +start.z - extent[2], rfT0, rfT1);
 
         return bNotEntirelyClipped && (rfT0 != fSaveT0 || rfT1 != fSaveT1);
     }
-
 public:
     _matrix33<T> m_rotate;
     Tvector m_translate;
@@ -114,24 +116,17 @@ public:
         kDirection.set(dir.dotproduct(m_rotate.i), dir.dotproduct(m_rotate.j), dir.dotproduct(m_rotate.k));
 
         T fT0 = 0.0f, fT1 = type_max(T);
-        if (intersect(kOrigin, kDirection, m_halfsize, fT0, fT1)) {
+        if (intersect(kOrigin, kDirection, m_halfsize, fT0, fT1))
+        {
             bool bPick = false;
-            if (fT0 > 0.0f) {
-                if (fT0 < dist) {
-                    dist = fT0;
-                    bPick = true;
-                }
-                if (fT1 < dist) {
-                    dist = fT1;
-                    bPick = true;
-                }
+            if (fT0 > 0.0f)
+            {
+                if (fT0 < dist) { dist = fT0; bPick = true; }
+                if (fT1 < dist) { dist = fT1; bPick = true; }
             }
             else
             {
-                if (fT1 < dist) {
-                    dist = fT1;
-                    bPick = true;
-                }
+                if (fT1 < dist) { dist = fT1; bPick = true; }
             }
             return bPick;
         }

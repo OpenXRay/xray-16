@@ -28,7 +28,7 @@ class IGameFont;
 extern void add_profile_portion(LPCSTR id, const u64 &time);
 #endif
 
-#pragma pack(push, 4)
+#pragma pack(push,4)
 struct ENGINE_API CProfileResultPortion
 {
     u64 m_time;
@@ -95,9 +95,7 @@ extern ENGINE_API CProfiler *g_profiler;
 
 inline CProfiler &profiler();
 
-#define START_PROFILE(...)                                                                                             \
-    {                                                                                                                  \
-        CProfilePortion __profile_portion__(__VA_ARGS__);
+#define START_PROFILE(...) { CProfilePortion __profile_portion__(__VA_ARGS__);
 #define STOP_PROFILE }
 
 inline CProfilePortion::CProfilePortion(const char *id, bool enableIf)

@@ -22,7 +22,13 @@ public:
     virtual ~engine_impl();
 
 private:
-    virtual bool on_message(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& result);
+    virtual bool on_message(
+        HWND hWnd,
+        UINT uMsg,
+        WPARAM wParam,
+        LPARAM lParam,
+        LRESULT& result
+        );
     virtual void on_idle();
     virtual void on_resize();
     virtual void pause(bool const& value);

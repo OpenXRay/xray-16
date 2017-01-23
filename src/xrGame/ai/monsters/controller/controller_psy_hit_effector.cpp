@@ -1,7 +1,8 @@
-#include "controller_psy_hit_effector.h"
 #include "stdafx.h"
+#include "controller_psy_hit_effector.h"
 
-// void CPsyHitEffectorPP::load(LPCSTR section)
+
+//void CPsyHitEffectorPP::load(LPCSTR section)
 //{
 //	inherited::load(section);
 //
@@ -9,17 +10,17 @@
 //	m_release_perc	= pSettings->r_float(section,"release");
 //}
 //
-// bool CPsyHitEffectorPP::check_completion()
+//bool CPsyHitEffectorPP::check_completion()
 //{
 //	return (smth);
 //}
 //
-// bool CPsyHitEffectorPP::check_start_conditions()
+//bool CPsyHitEffectorPP::check_start_conditions()
 //{
 //	return (m_dist < m_radius * m_r_max_perc);
-//}
+//}	
 //
-// void CPsyHitEffectorPP::update_factor()
+//void CPsyHitEffectorPP::update_factor()
 //{
 //	float factor;
 //	factor = (m_radius * m_r_max_perc - m_dist) / (m_radius * m_r_max_perc - m_radius * m_r_min_perc);
@@ -29,11 +30,15 @@
 //}
 //
 //
-// CPPEffectorControlled *CPsyHitEffectorPP::create_effector()
+//CPPEffectorControlled *CPsyHitEffectorPP::create_effector()
 //{
 //	return new CPPEffectorControlled(this,m_state);
 //}
 
+
+
 //////////////////////////////////////////////////////////////////////////
 // Alien Camera Effector
 //////////////////////////////////////////////////////////////////////////
+
+

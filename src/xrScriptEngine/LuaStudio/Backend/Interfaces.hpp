@@ -18,7 +18,7 @@
 #define CS_LUA_STUDIO_BACKEND_API XR_IMPORT
 #endif
 
-#define CS_LUA_STUDIO_BACKEND_FILE_NAME CS_LIBRARY_NAME(lua_studio_backend, dll)
+#define CS_LUA_STUDIO_BACKEND_FILE_NAME	CS_LIBRARY_NAME(lua_studio_backend, dll)
 
 #include "xrScriptEngine/LuaStudio/Backend/Backend.hpp"
 #include "xrScriptEngine/LuaStudio/Backend/Engine.hpp"

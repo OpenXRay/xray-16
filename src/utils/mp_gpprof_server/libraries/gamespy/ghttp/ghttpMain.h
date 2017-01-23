@@ -1,5 +1,5 @@
-/*
-GameSpy GHTTP SDK
+ /*
+GameSpy GHTTP SDK 
 Dan "Mr. Pants" Schoenblum
 dan@gamespy.com
 
@@ -12,8 +12,8 @@ devsupport@gamespy.com
 #define _GHTTPMAIN_H_
 
 #include <stdio.h>
+#include "ghttp.h"
 #include "../common/gsCommon.h"
 #include "../common/gsStringUtil.h"
-#include "ghttp.h"
 
 #endif

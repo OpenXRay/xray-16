@@ -4,8 +4,8 @@
 // Copyright (C) GSC Game World - 2009
 ////////////////////////////////////////////////////////////////////////////
 
-#include "doug_lea_allocator.h"
 #include "stdafx.h"
+#include "doug_lea_allocator.h"
 
 #define USE_DL_PREFIX
 #define MSPACES 1
@@ -15,13 +15,15 @@
 
 static void __stdcall out_of_memory(mspace const space, void const* const parameter, int const first_time)
 {
-    if (first_time) return;
+    if (first_time)
+        return;
 
     doug_lea_allocator* const allocator = (doug_lea_allocator*)parameter;
     xrDebug::Fatal(DEBUG_INFO, "not enough memory for arena [%s]", allocator->get_arena_id());
 }
 
-doug_lea_allocator::doug_lea_allocator(void* arena, u32 arena_size, LPCSTR arena_id) : m_arena_id(arena_id)
+doug_lea_allocator::doug_lea_allocator(void* arena, u32 arena_size, LPCSTR arena_id) :
+m_arena_id(arena_id)
 {
     VERIFY(m_arena_id);
 

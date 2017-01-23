@@ -14,28 +14,27 @@ class IGameObject;
 class CAgentManager;
 class CMemberOrder;
 
-class CAgentExplosiveManager
-{
+class CAgentExplosiveManager {
 public:
-    typedef xr_vector<CDangerExplosive> EXPLOSIVES;
-    typedef xr_vector<u16> TO_BE_DESTROYED;
+	typedef xr_vector<CDangerExplosive>				EXPLOSIVES;
+	typedef xr_vector<u16>							TO_BE_DESTROYED;
 
 private:
-    CAgentManager* m_object;
-    EXPLOSIVES m_explosives;
-    TO_BE_DESTROYED m_explosives_to_remove;
+	CAgentManager			*m_object;
+	EXPLOSIVES				m_explosives;
+	TO_BE_DESTROYED			m_explosives_to_remove;
 
 protected:
-    IC CAgentManager& object() const;
-    IC EXPLOSIVES& explosives();
-    bool process_explosive(CMemberOrder& member);
+	IC		CAgentManager	&object					() const;
+	IC		EXPLOSIVES		&explosives				();
+			bool			process_explosive		(CMemberOrder &member);
 
 public:
-    IC CAgentExplosiveManager(CAgentManager* object);
-    void remove_links(IGameObject* object);
-    void register_explosive(const CExplosive* explosive, const CGameObject* game_object);
-    void react_on_explosives();
-    void update();
+	IC						CAgentExplosiveManager	(CAgentManager *object);
+			void			remove_links			(IGameObject *object);
+			void			register_explosive		(const CExplosive *explosive, const CGameObject *game_object);
+			void			react_on_explosives		();
+			void			update					();
 };
 
 #include "agent_explosive_manager_inline.h"

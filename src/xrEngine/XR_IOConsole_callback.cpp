@@ -5,12 +5,13 @@
 // Description : Console`s callback functions class implementation
 ////////////////////////////////////////////////////////////////////////////
 
-#include "XR_IOConsole.h"
 #include "stdafx.h"
+#include "XR_IOConsole.h"
 
 #include "line_editor.h"
 #include "xr_input.h"
 #include "xr_ioc_cmd.h"
+
 
 void CConsole::Register_callbacks()
 {
@@ -43,7 +44,8 @@ void CConsole::Register_callbacks()
 void CConsole::Prev_log() // DIK_PRIOR=PAGE_UP
 {
     scroll_delta++;
-    if (scroll_delta > int(LogFile->size()) - 1) {
+    if (scroll_delta > int(LogFile->size()) - 1)
+    {
         scroll_delta = LogFile->size() - 1;
     }
 }
@@ -51,7 +53,8 @@ void CConsole::Prev_log() // DIK_PRIOR=PAGE_UP
 void CConsole::Next_log() // DIK_NEXT=PAGE_DOWN
 {
     scroll_delta--;
-    if (scroll_delta < 0) {
+    if (scroll_delta < 0)
+    {
         scroll_delta = 0;
     }
 }
@@ -71,7 +74,8 @@ void CConsole::Find_cmd() // DIK_TAB
     shared_str out_str;
 
     IConsole_Command* cc = find_next_cmd(ec().str_edit(), out_str);
-    if (cc && out_str.size()) {
+    if (cc && out_str.size())
+    {
         ec().set_edit(out_str.c_str());
     }
 }
@@ -84,7 +88,8 @@ void CConsole::Find_cmd_back() // DIK_TAB+shift
     u32 offset = (b_ra) ? xr_strlen(radmin_cmd_name) : 0;
 
     vecCMD_IT it = Commands.lower_bound(edt + offset);
-    if (it != Commands.begin()) {
+    if (it != Commands.begin())
+    {
         --it;
         IConsole_Command& cc = *(it->second);
         LPCSTR name_cmd = cc.Name();
@@ -111,7 +116,8 @@ void CConsole::Next_cmd() // DIK_DOWN + Ctrl
 
 void CConsole::Prev_tip() // DIK_UP
 {
-    if (xr_strlen(ec().str_edit()) == 0) {
+    if (xr_strlen(ec().str_edit()) == 0)
+    {
         prev_cmd_history_idx();
         SelectCommand();
         return;
@@ -121,7 +127,8 @@ void CConsole::Prev_tip() // DIK_UP
 
 void CConsole::Next_tip() // DIK_DOWN + Ctrl
 {
-    if (xr_strlen(ec().str_edit()) == 0) {
+    if (xr_strlen(ec().str_edit()) == 0)
+    {
         next_cmd_history_idx();
         SelectCommand();
         return;
@@ -156,9 +163,11 @@ void CConsole::PageDown_tips()
 
 void CConsole::Execute_cmd() // DIK_RETURN, DIK_NUMPADENTER
 {
-    if (0 <= m_select_tip && m_select_tip < (int)m_tips.size()) {
+    if (0 <= m_select_tip && m_select_tip < (int)m_tips.size())
+    {
         shared_str const& str = m_tips[m_select_tip].text;
-        if (m_tips_mode == 1) {
+        if (m_tips_mode == 1)
+        {
             LPSTR buf;
             STRCONCAT(buf, str.c_str(), " ");
             ec().set_edit(buf);
@@ -190,7 +199,8 @@ void CConsole::Hide_cmd()
 
 void CConsole::Hide_cmd_esc()
 {
-    if (0 <= m_select_tip && m_select_tip < (int)m_tips.size()) {
+    if (0 <= m_select_tip && m_select_tip < (int)m_tips.size())
+    {
         m_disable_tips = true;
         return;
     }
@@ -199,4 +209,5 @@ void CConsole::Hide_cmd_esc()
 
 void CConsole::GamePause()
 {
+
 }

@@ -8,8 +8,8 @@
 #ifndef SMART_COVER_PLANNER_ACTIONS_INLINE_H_INCLUDED
 #define SMART_COVER_PLANNER_ACTIONS_INLINE_H_INCLUDED
 
-namespace smart_cover
-{
+namespace smart_cover {
+
 } // namespace smart_cover
 
 #endif // SMART_COVER_PLANNER_ACTIONS_INLINE_H_INCLUDED

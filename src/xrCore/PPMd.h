@@ -11,25 +11,20 @@
 
 #include "PPMdType.h"
 
-#ifdef __cplusplus
+#ifdef  __cplusplus
 extern "C" {
 #endif
 
-BOOL _STDCALL StartSubAllocator(UINT SubAllocatorSize);
-void _STDCALL StopSubAllocator(); /* it can be called once        */
-DWORD _STDCALL GetUsedMemory();   /* for information only         */
+BOOL  _STDCALL StartSubAllocator(UINT SubAllocatorSize);
+void  _STDCALL StopSubAllocator();          /* it can be called once        */
+DWORD _STDCALL GetUsedMemory();             /* for information only         */
 
 /****************************************************************************
  * Method of model restoration at memory insufficiency:                     *
  *     MRM_RESTART - restart model from scratch (default)                   *
  *     MRM_CUT_OFF - cut off model (nearly twice slower)                    *
  *     MRM_FREEZE  - freeze context tree (dangerous)                        */
-enum MR_METHOD
-{
-    MRM_RESTART,
-    MRM_CUT_OFF,
-    MRM_FREEZE
-};
+enum MR_METHOD { MRM_RESTART, MRM_CUT_OFF, MRM_FREEZE };
 
 /****************************************************************************
  * (MaxOrder == 1) parameter value has special meaning, it does not restart *
@@ -42,13 +37,15 @@ enum MR_METHOD
  *     EncodeFile(SolidArcFile,FileN,       1,MRM_RESTART);                 *
  *     StopSubAllocator();                                                  *
  ****************************************************************************/
-void _STDCALL EncodeFile(_PPMD_FILE* EncodedFile, _PPMD_FILE* DecodedFile, int MaxOrder, MR_METHOD MRMethod);
-void _STDCALL DecodeFile(_PPMD_FILE* DecodedFile, _PPMD_FILE* EncodedFile, int MaxOrder, MR_METHOD MRMethod);
+void _STDCALL EncodeFile(_PPMD_FILE* EncodedFile,_PPMD_FILE* DecodedFile,
+                        int MaxOrder,MR_METHOD MRMethod);
+void _STDCALL DecodeFile(_PPMD_FILE* DecodedFile,_PPMD_FILE* EncodedFile,
+                        int MaxOrder,MR_METHOD MRMethod);
 
 /*  imported function                                                       */
-void _STDCALL PrintInfo(_PPMD_FILE* DecodedFile, _PPMD_FILE* EncodedFile);
+void _STDCALL  PrintInfo(_PPMD_FILE* DecodedFile,_PPMD_FILE* EncodedFile);
 
-#ifdef __cplusplus
+#ifdef  __cplusplus
 }
 #endif
 

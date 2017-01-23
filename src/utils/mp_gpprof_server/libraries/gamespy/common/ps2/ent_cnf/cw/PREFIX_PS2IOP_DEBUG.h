@@ -4,8 +4,10 @@
 //
 //	07/18/2000	james combs,	for SDK1.6
 
+
 #include <PREFIX_PS2IOP.h>
 
-#pragma divbyzerocheck on /*	break if divided by zero	*/
+#pragma	divbyzerocheck		on	/*	break if divided by zero	*/
 
-#define DEBUG /*	just for debugging	*/
+#define	DEBUG					/*	just for debugging	*/
+

@@ -4,23 +4,23 @@
 
 enum fsL_Chunks
 {
-    fsL_HEADER = 1,        //*
-    fsL_SHADERS = 2,       //*
-    fsL_VISUALS = 3,       //*
-    fsL_PORTALS = 4,       //* - Portal polygons
+    fsL_HEADER = 1, //*
+    fsL_SHADERS = 2, //*
+    fsL_VISUALS = 3, //*
+    fsL_PORTALS = 4, //* - Portal polygons
     fsL_LIGHT_DYNAMIC = 6, //*
-    fsL_GLOWS = 7,         //* - All glows inside level
-    fsL_SECTORS = 8,       //* - All sectors on level
-    fsL_VB = 9,            //* - Static geometry
-    fsL_IB = 10,           //*
-    fsL_SWIS = 11,         //* - collapse info, usually for trees
+    fsL_GLOWS = 7, //* - All glows inside level
+    fsL_SECTORS = 8, //* - All sectors on level
+    fsL_VB = 9, //* - Static geometry
+    fsL_IB = 10, //*
+    fsL_SWIS = 11, //* - collapse info, usually for trees
     fsL_forcedword = 0xFFFFFFFF
 };
 
 enum fsESectorChunks
 {
     fsP_Portals = 1, // - portal polygons
-    fsP_Root = 2,    // - geometry root
+    fsP_Root = 2, // - geometry root
     fsP_forcedword = u32(-1)
 };
 
@@ -73,12 +73,27 @@ class NodePosition
     u8 data[5];
 
     ICF void xz(u32 value) { CopyMemory(data, &value, 3); }
-    ICF void y(u16 value) { CopyMemory(data + 3, &value, 2); }
+
+    ICF void y(u16 value) { CopyMemory(data+3, &value, 2); }
+
 public:
-    ICF u32 xz() const { return ((*((u32*)data)) & 0x00ffffff); }
-    ICF u32 x(u32 row) const { return (xz() / row); }
-    ICF u32 z(u32 row) const { return (xz() % row); }
-    ICF u32 y() const { return (*((u16*)(data + 3))); }
+    ICF u32 xz() const
+    {
+        return ((*((u32*)data)) & 0x00ffffff);
+    }
+    ICF u32 x(u32 row) const
+    {
+        return (xz() / row);
+    }
+    ICF u32 z(u32 row) const
+    {
+        return (xz() % row);
+    }
+    ICF u32 y() const
+    {
+        return (*((u16*)(data + 3)));
+    }
+
     friend class CLevelGraph;
     friend struct CNodePositionCompressor;
     friend struct CNodePositionConverter;
@@ -101,23 +116,25 @@ private:
             break;
         case 1:
             value <<= 7;
-            value |= *(u32*)(data + 2) & 0xc000007f;
-            CopyMemory(data + 2, &value, sizeof(u32));
+            value |= *(u32*)(data+2) & 0xc000007f;
+            CopyMemory(data+2, &value, sizeof(u32));
             break;
         case 2:
             value <<= 6;
-            value |= *(u32*)(data + 5) & 0xe000003f;
-            CopyMemory(data + 5, &value, sizeof(u32));
+            value |= *(u32*)(data+5) & 0xe000003f;
+            CopyMemory(data+5, &value, sizeof(u32));
             break;
         case 3:
             value <<= 5;
-            value |= *(u32*)(data + 8) & 0xf000001f;
-            CopyMemory(data + 8, &value, sizeof(u32));
+            value |= *(u32*)(data+8) & 0xf000001f;
+            CopyMemory(data+8, &value, sizeof(u32));
             break;
         }
     }
 
-    ICF void light(u8 value) { data[10] |= value << 4; }
+    ICF void light(u8 value)
+    { data[10] |= value << 4; }
+
 public:
     struct SCover
     {
@@ -152,11 +169,16 @@ public:
     {
         switch (index)
         {
-        case 0: return ((*(u32*)data) & 0x007fffff);
-        case 1: return (((*(u32*)(data + 2)) >> 7) & 0x007fffff);
-        case 2: return (((*(u32*)(data + 5)) >> 6) & 0x007fffff);
-        case 3: return (((*(u32*)(data + 8)) >> 5) & 0x007fffff);
-        default: NODEFAULT;
+        case 0:
+            return ((*(u32*)data) & 0x007fffff);
+        case 1:
+            return (((*(u32*)(data + 2)) >> 7) & 0x007fffff);
+        case 2:
+            return (((*(u32*)(data + 5)) >> 6) & 0x007fffff);
+        case 3:
+            return (((*(u32*)(data + 8)) >> 5) & 0x007fffff);
+        default:
+            NODEFAULT;
         }
 #ifdef DEBUG
         return (0);
@@ -188,23 +210,25 @@ private:
             break;
         case 1:
             value <<= 5;
-            value |= *(u32*)(data + 2) & 0xfc00001f;
-            CopyMemory(data + 2, &value, sizeof(u32));
+            value |= *(u32*)(data+2) & 0xfc00001f;
+            CopyMemory(data+2, &value, sizeof(u32));
             break;
         case 2:
             value <<= 2;
-            value |= *(u32*)(data + 5) & 0xff800003;
-            CopyMemory(data + 5, &value, sizeof(u32));
+            value |= *(u32*)(data+5) & 0xff800003;
+            CopyMemory(data+5, &value, sizeof(u32));
             break;
         case 3:
             value <<= 7;
-            value |= *(u32*)(data + 7) & 0xf000007f;
-            CopyMemory(data + 7, &value, sizeof(u32));
+            value |= *(u32*)(data+7) & 0xf000007f;
+            CopyMemory(data+7, &value, sizeof(u32));
             break;
         }
     }
 
-    ICF void light(u8 value) { data[10] |= value << 4; }
+    ICF void light(u8 value)
+    { data[10] |= value << 4; }
+
 public:
     u16 cover0 : 4;
     u16 cover1 : 4;
@@ -218,9 +242,9 @@ public:
         switch (index)
         {
         case 0: return *(u32*)data & 0x001fffff;
-        case 1: return (*(u32*)(data + 2) >> 5) & 0x001fffff;
-        case 2: return (*(u32*)(data + 5) >> 2) & 0x001fffff;
-        case 3: return (*(u32*)(data + 7) >> 7) & 0x001fffff;
+        case 1: return (*(u32*)(data+2) >> 5) & 0x001fffff;
+        case 2: return (*(u32*)(data+5) >> 2) & 0x001fffff;
+        case 3: return (*(u32*)(data+7) >> 7) & 0x001fffff;
         default: NODEFAULT;
         }
 #ifdef DEBUG
@@ -228,7 +252,9 @@ public:
 #endif
     }
 
-    ICF u8 light() const { return data[10] >> 4; }
+    ICF u8 light() const
+    { return data[10] >> 4; }
+
     ICF u16 cover(u8 index) const
     {
         switch (index)
@@ -264,7 +290,7 @@ typedef SNodePositionOld NodePosition;
 
 const char LEVEL_GRAPH_NAME[] = "level.ai";
 
-const u32 XRCL_CURRENT_VERSION = 18;    // input
+const u32 XRCL_CURRENT_VERSION = 18; // input
 const u32 XRCL_PRODUCTION_VERSION = 14; // output
 const u32 CFORM_CURRENT_VERSION = 4;
 const u32 MAX_NODE_BIT_COUNT = 23;

@@ -6,7 +6,7 @@
 
 //
 //////////////////////////////////////////////////////////////////////
-#include "stdafx.h"
+#include "stdafx.h" 
 
 #include "SmdBone.h"
 
@@ -14,14 +14,14 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-SmdBone::SmdBone()
+SmdBone::SmdBone() 
 {
-    id = -1;
-    parentId = -1;
-    name = NULL;
+	id			= -1;
+	parentId	= -1;
+	name		= NULL;
 }
 
 SmdBone::~SmdBone()
 {
-    xr_free(name);
+	xr_free(name);
 }

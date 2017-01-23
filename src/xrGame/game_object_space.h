@@ -1,59 +1,58 @@
 #pragma once
 
-namespace GameObject
-{
-enum ECallbackType
-{
-    eTradeStart = u32(0),
-    eTradeStop,
-    eTradeSellBuyItem,
-    eTradePerformTradeOperation,
+namespace GameObject {
+	enum ECallbackType {
+		eTradeStart = u32(0),
+		eTradeStop,
+		eTradeSellBuyItem,
+		eTradePerformTradeOperation,
 
-    eZoneEnter,
-    eZoneExit,
-    eExitLevelBorder,
-    eEnterLevelBorder,
-    eDeath,
+		eZoneEnter,
+		eZoneExit,
+		eExitLevelBorder,
+		eEnterLevelBorder,
+		eDeath,
 
-    ePatrolPathInPoint,
+		ePatrolPathInPoint,
 
-    eInventoryPda,
-    eInventoryInfo,
-    eArticleInfo,
-    eTaskStateChange,
-    eMapLocationAdded,
+		eInventoryPda,
+		eInventoryInfo,
+		eArticleInfo,
+		eTaskStateChange,
+		eMapLocationAdded,
 
-    eUseObject,
+		eUseObject,
 
-    eHit,
+		eHit,
 
-    eSound,
+		eSound,
 
-    eActionTypeMovement,
-    eActionTypeWatch,
-    eActionTypeRemoved,
-    eActionTypeAnimation,
-    eActionTypeSound,
-    eActionTypeParticle,
-    eActionTypeObject,
+		eActionTypeMovement,
+		eActionTypeWatch,
+		eActionTypeRemoved,
+		eActionTypeAnimation,
+		eActionTypeSound,
+		eActionTypeParticle,
+		eActionTypeObject,
 
-    eActorSleep,
+		eActorSleep,
 
-    eHelicopterOnPoint,
-    eHelicopterOnHit,
+		eHelicopterOnPoint,
+		eHelicopterOnHit,
 
-    eOnItemTake,
-    eOnItemDrop,
+		eOnItemTake,
+		eOnItemDrop,
 
-    eScriptAnimation,
+		eScriptAnimation,
+		
+		eTraderGlobalAnimationRequest,
+		eTraderHeadAnimationRequest,
+		eTraderSoundEnd,
 
-    eTraderGlobalAnimationRequest,
-    eTraderHeadAnimationRequest,
-    eTraderSoundEnd,
+		eInvBoxItemTake,
+		eWeaponNoAmmoAvailable,
 
-    eInvBoxItemTake,
-    eWeaponNoAmmoAvailable,
-
-    eDummy = u32(-1),
+		eDummy = u32(-1),
+	};
 };
-};
+

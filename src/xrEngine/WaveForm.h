@@ -2,7 +2,7 @@
 #define WAVEFORM_H
 #pragma once
 
-#pragma pack(push, 4)
+#pragma pack(push,4)
 struct WaveForm
 {
     enum EFunction
@@ -20,16 +20,21 @@ struct WaveForm
     {
         switch (F)
         {
-        case fCONSTANT: return 0;
-        case fSIN: return _sin(t * PI_MUL_2);
-        case fTRIANGLE: return asinf(_sin((t - 0.25f) * PI_MUL_2)) / PI_DIV_2;
-        case fSQUARE: return signf(_cos(t * PI));
-        case fSAWTOOTH: return atanf(tanf((t + 0.5f) * PI)) / PI_DIV_2;
-        case fINVSAWTOOTH: return -(atanf(tanf((t + 0.5f) * PI)) / PI_DIV_2);
+        case fCONSTANT:
+            return 0;
+        case fSIN:
+            return _sin(t*PI_MUL_2);
+        case fTRIANGLE:
+            return asinf(_sin((t - 0.25f)*PI_MUL_2)) / PI_DIV_2;
+        case fSQUARE:
+            return signf(_cos(t*PI));
+        case fSAWTOOTH:
+            return atanf(tanf((t + 0.5f)*PI)) / PI_DIV_2;
+        case fINVSAWTOOTH:
+            return -(atanf(tanf((t + 0.5f)*PI)) / PI_DIV_2);
         }
         return 0.f;
     }
-
 public:
     EFunction F;
     float arg[4];
@@ -37,7 +42,7 @@ public:
     IC float Calculate(float t)
     {
         // y = arg0 + arg1*func( (time+arg2)*arg3 )
-        float x = (t + arg[2]) * arg[3];
+        float x = (t + arg[2])*arg[3];
         return arg[0] + arg[1] * Func(x - floorf(x));
     }
 

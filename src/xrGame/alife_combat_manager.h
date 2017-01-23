@@ -10,46 +10,40 @@
 
 #include "alife_simulator_base.h"
 
-class CALifeCombatManager : public virtual CALifeSimulatorBase, CRandom
-{
-    /**
-    protected:
-        typedef CALifeSimulatorBase inherited;
 
-    protected:
-        u32								m_dwMaxCombatIterationCount;
-        ALife::ECombatType				m_combat_type;
+class CALifeCombatManager : public virtual CALifeSimulatorBase, CRandom {
+/**
+protected:
+	typedef CALifeSimulatorBase inherited;
 
-        // temporary buffers for combats
-        CSE_ALifeSchedulable			*m_tpaCombatObjects[2];
-        ALife::D_OBJECT_P_MAP			m_tpGraphPointObjects;
+protected:
+	u32								m_dwMaxCombatIterationCount;
+	ALife::ECombatType				m_combat_type;
 
-    public:
-        ALife::ITEM_P_VECTOR			m_tpTempItemBuffer;
+	// temporary buffers for combats
+	CSE_ALifeSchedulable			*m_tpaCombatObjects[2];
+	ALife::D_OBJECT_P_MAP			m_tpGraphPointObjects;
 
-    protected:
-                void					vfFillCombatGroup			(CSE_ALifeSchedulable		*tpALifeSchedulable,
-    int						iGroupIndex);
-                bool					bfCheckObjectDetection		(CSE_ALifeSchedulable		*tpALifeSchedulable1,
-    CSE_ALifeSchedulable	*tpALifeSchedulable2);
-                bool					bfCheckForInteraction		(CSE_ALifeSchedulable		*tpALifeSchedulable1,
-    CSE_ALifeSchedulable	*tpALifeSchedulable2,			int				&iCombatGroupIndex,			bool
-    &bMutualDetection);
-                void					vfPerformAttackAction		(int						iCombatGroupIndex);
-                bool					bfCheckIfRetreated			(int						iCombatGroupIndex);
-                void					vfFinishCombat				(ALife::ECombatResult		tCombatResult);
-    /**/
 public:
-    CALifeCombatManager(IPureServer* server, LPCSTR section);
-    /**
-        virtual							~CALifeCombatManager		();
-        IC		ALife::ECombatType		combat_type					() const;
-                ALife::ECombatAction	choose_combat_action		(int						iCombatGroupIndex);
-                ALife::ERelationType	relation_type				(CSE_ALifeMonsterAbstract
-    *tpALifeMonsterAbstract1,	CSE_ALifeMonsterAbstract*tpALifeMonsterAbstract2) const;
-    /**/
-    void kill_entity(CSE_ALifeMonsterAbstract* l_tpALifeMonsterAbstract, const GameGraph::_GRAPH_ID& l_tGraphID,
-        CSE_ALifeSchedulable* schedulable);
+	ALife::ITEM_P_VECTOR			m_tpTempItemBuffer;
+
+protected:
+			void					vfFillCombatGroup			(CSE_ALifeSchedulable		*tpALifeSchedulable,		int						iGroupIndex);
+			bool					bfCheckObjectDetection		(CSE_ALifeSchedulable		*tpALifeSchedulable1,		CSE_ALifeSchedulable	*tpALifeSchedulable2);
+			bool					bfCheckForInteraction		(CSE_ALifeSchedulable		*tpALifeSchedulable1,		CSE_ALifeSchedulable	*tpALifeSchedulable2,			int				&iCombatGroupIndex,			bool					&bMutualDetection);
+			void					vfPerformAttackAction		(int						iCombatGroupIndex);
+			bool					bfCheckIfRetreated			(int						iCombatGroupIndex);
+			void					vfFinishCombat				(ALife::ECombatResult		tCombatResult);
+/**/
+public:
+									CALifeCombatManager			(IPureServer *server, LPCSTR section);
+/**
+	virtual							~CALifeCombatManager		();
+	IC		ALife::ECombatType		combat_type					() const;
+			ALife::ECombatAction	choose_combat_action		(int						iCombatGroupIndex);
+			ALife::ERelationType	relation_type				(CSE_ALifeMonsterAbstract	*tpALifeMonsterAbstract1,	CSE_ALifeMonsterAbstract*tpALifeMonsterAbstract2) const;
+/**/
+			void					kill_entity					(CSE_ALifeMonsterAbstract	*l_tpALifeMonsterAbstract,	const GameGraph::_GRAPH_ID &l_tGraphID,					CSE_ALifeSchedulable *schedulable);
 };
 
 #include "alife_combat_manager_inline.h"

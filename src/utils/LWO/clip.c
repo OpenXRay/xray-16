@@ -11,6 +11,7 @@ Ernie Wright  17 Sep 00
 #include <stdlib.h>
 #include "lwo2.h"
 
+
 /*
 ======================================================================
 lwFreeClip()
@@ -18,14 +19,15 @@ lwFreeClip()
 Free memory used by an lwClip.
 ====================================================================== */
 
-void lwFreeClip(lwClip* clip)
+void lwFreeClip( lwClip *clip )
 {
-    if (clip) {
-        lwListFree(clip->ifilter, lwFreePlugin);
-        lwListFree(clip->pfilter, lwFreePlugin);
-        free(clip);
-    }
+   if ( clip ) {
+      lwListFree( clip->ifilter, lwFreePlugin );
+      lwListFree( clip->pfilter, lwFreePlugin );
+      free( clip );
+   }
 }
+
 
 /*
 ======================================================================
@@ -34,191 +36,198 @@ lwGetClip()
 Read image references from a CLIP chunk in an LWO2 file.
 ====================================================================== */
 
-lwClip* lwGetClip(FILE* fp, int cksize)
+lwClip *lwGetClip( FILE *fp, int cksize )
 {
-    lwClip* clip;
-    lwPlugin* filt;
-    unsigned int id;
-    unsigned short sz;
-    int pos, rlen;
+   lwClip *clip;
+   lwPlugin *filt;
+   unsigned int id;
+   unsigned short sz;
+   int pos, rlen;
 
-    /* allocate the Clip structure */
 
-    clip = calloc(1, sizeof(lwClip));
-    if (!clip) goto Fail;
+   /* allocate the Clip structure */
 
-    clip->contrast.val = 1.0f;
-    clip->brightness.val = 1.0f;
-    clip->saturation.val = 1.0f;
-    clip->gamma.val = 1.0f;
+   clip = calloc( 1, sizeof( lwClip ));
+   if ( !clip ) goto Fail;
 
-    /* remember where we started */
+   clip->contrast.val = 1.0f;
+   clip->brightness.val = 1.0f;
+   clip->saturation.val = 1.0f;
+   clip->gamma.val = 1.0f;
 
-    set_flen(0);
-    pos = ftell(fp);
+   /* remember where we started */
 
-    /* index */
+   set_flen( 0 );
+   pos = ftell( fp );
 
-    clip->index = getI4(fp);
+   /* index */
 
-    /* first subchunk header */
+   clip->index = getI4( fp );
 
-    clip->type = getU4(fp);
-    sz = getU2(fp);
-    if (0 > get_flen()) goto Fail;
+   /* first subchunk header */
 
-    sz += sz & 1;
-    set_flen(0);
+   clip->type = getU4( fp );
+   sz = getU2( fp );
+   if ( 0 > get_flen() ) goto Fail;
 
-    switch (clip->type)
-    {
-    case ID_STIL: clip->source.still.name = getS0(fp); break;
+   sz += sz & 1;
+   set_flen( 0 );
 
-    case ID_ISEQ:
-        clip->source.seq.digits = getU1(fp);
-        clip->source.seq.flags = getU1(fp);
-        clip->source.seq.offset = getI2(fp);
-        clip->source.seq.start = getI2(fp);
-        clip->source.seq.end = getI2(fp);
-        clip->source.seq.prefix = getS0(fp);
-        clip->source.seq.suffix = getS0(fp);
-        break;
+   switch ( clip->type ) {
+      case ID_STIL:
+         clip->source.still.name = getS0( fp );
+         break;
 
-    case ID_ANIM:
-        clip->source.anim.name = getS0(fp);
-        clip->source.anim.server = getS0(fp);
-        rlen = get_flen();
-        clip->source.anim.data = getbytes(fp, sz - rlen);
-        break;
+      case ID_ISEQ:
+         clip->source.seq.digits  = getU1( fp );
+         clip->source.seq.flags   = getU1( fp );
+         clip->source.seq.offset  = getI2( fp );
+         clip->source.seq.start   = getI2( fp );
+         clip->source.seq.end     = getI2( fp );
+         clip->source.seq.prefix  = getS0( fp );
+         clip->source.seq.suffix  = getS0( fp );
+         break;
 
-    case ID_XREF:
-        clip->source.xref.index = getI4(fp);
-        clip->source.xref.string = getS0(fp);
-        break;
+      case ID_ANIM:
+         clip->source.anim.name   = getS0( fp );
+         clip->source.anim.server = getS0( fp );
+         rlen = get_flen();
+         clip->source.anim.data   = getbytes( fp, sz - rlen );
+         break;
 
-    case ID_STCC:
-        clip->source.cycle.lo = getI2(fp);
-        clip->source.cycle.hi = getI2(fp);
-        clip->source.cycle.name = getS0(fp);
-        break;
+      case ID_XREF:
+         clip->source.xref.index  = getI4( fp );
+         clip->source.xref.string = getS0( fp );
+         break;
 
-    default: break;
-    }
+      case ID_STCC:
+         clip->source.cycle.lo   = getI2( fp );
+         clip->source.cycle.hi   = getI2( fp );
+         clip->source.cycle.name = getS0( fp );
+         break;
 
-    /* error while reading current subchunk? */
+      default:
+         break;
+   }
 
-    rlen = get_flen();
-    if (rlen < 0 || rlen > sz) goto Fail;
+   /* error while reading current subchunk? */
 
-    /* skip unread parts of the current subchunk */
+   rlen = get_flen();
+   if ( rlen < 0 || rlen > sz ) goto Fail;
 
-    if (rlen < sz) fseek(fp, sz - rlen, SEEK_CUR);
+   /* skip unread parts of the current subchunk */
 
-    /* end of the CLIP chunk? */
+   if ( rlen < sz )
+      fseek( fp, sz - rlen, SEEK_CUR );
 
-    rlen = ftell(fp) - pos;
-    if (cksize < rlen) goto Fail;
-    if (cksize == rlen) return clip;
+   /* end of the CLIP chunk? */
 
-    /* process subchunks as they're encountered */
+   rlen = ftell( fp ) - pos;
+   if ( cksize < rlen ) goto Fail;
+   if ( cksize == rlen )
+      return clip;
 
-    id = getU4(fp);
-    sz = getU2(fp);
-    if (0 > get_flen()) goto Fail;
+   /* process subchunks as they're encountered */
 
-    while (1)
-    {
-        sz += sz & 1;
-        set_flen(0);
+   id = getU4( fp );
+   sz = getU2( fp );
+   if ( 0 > get_flen() ) goto Fail;
 
-        switch (id)
-        {
-        case ID_TIME:
-            clip->start_time = getF4(fp);
-            clip->duration = getF4(fp);
-            clip->frame_rate = getF4(fp);
+   while ( 1 ) {
+      sz += sz & 1;
+      set_flen( 0 );
+
+      switch ( id ) {
+         case ID_TIME:
+            clip->start_time = getF4( fp );
+            clip->duration = getF4( fp );
+            clip->frame_rate = getF4( fp );
             break;
 
-        case ID_CONT:
-            clip->contrast.val = getF4(fp);
-            clip->contrast.eindex = getVX(fp);
+         case ID_CONT:
+            clip->contrast.val = getF4( fp );
+            clip->contrast.eindex = getVX( fp );
             break;
 
-        case ID_BRIT:
-            clip->brightness.val = getF4(fp);
-            clip->brightness.eindex = getVX(fp);
+         case ID_BRIT:
+            clip->brightness.val = getF4( fp );
+            clip->brightness.eindex = getVX( fp );
             break;
 
-        case ID_SATR:
-            clip->saturation.val = getF4(fp);
-            clip->saturation.eindex = getVX(fp);
+         case ID_SATR:
+            clip->saturation.val = getF4( fp );
+            clip->saturation.eindex = getVX( fp );
             break;
 
-        case ID_HUE:
-            clip->hue.val = getF4(fp);
-            clip->hue.eindex = getVX(fp);
+         case ID_HUE:
+            clip->hue.val = getF4( fp );
+            clip->hue.eindex = getVX( fp );
             break;
 
-        case ID_GAMM:
-            clip->gamma.val = getF4(fp);
-            clip->gamma.eindex = getVX(fp);
+         case ID_GAMM:
+            clip->gamma.val = getF4( fp );
+            clip->gamma.eindex = getVX( fp );
             break;
 
-        case ID_NEGA: clip->negative = getU2(fp); break;
+         case ID_NEGA:
+            clip->negative = getU2( fp );
+            break;
 
-        case ID_IFLT:
-        case ID_PFLT:
-            filt = calloc(1, sizeof(lwPlugin));
-            if (!filt) goto Fail;
+         case ID_IFLT:
+         case ID_PFLT:
+            filt = calloc( 1, sizeof( lwPlugin ));
+            if ( !filt ) goto Fail;
 
-            filt->name = getS0(fp);
-            filt->flags = getU2(fp);
+            filt->name = getS0( fp );
+            filt->flags = getU2( fp );
             rlen = get_flen();
-            filt->data = getbytes(fp, sz - rlen);
+            filt->data = getbytes( fp, sz - rlen );
 
-            if (id == ID_IFLT) {
-                lwListAdd(&clip->ifilter, filt);
-                clip->nifilters++;
+            if ( id == ID_IFLT ) {
+               lwListAdd( &clip->ifilter, filt );
+               clip->nifilters++;
             }
-            else
-            {
-                lwListAdd(&clip->pfilter, filt);
-                clip->npfilters++;
+            else {
+               lwListAdd( &clip->pfilter, filt );
+               clip->npfilters++;
             }
             break;
 
-        default: break;
-        }
+         default:
+            break;
+      }
 
-        /* error while reading current subchunk? */
+      /* error while reading current subchunk? */
 
-        rlen = get_flen();
-        if (rlen < 0 || rlen > sz) goto Fail;
+      rlen = get_flen();
+      if ( rlen < 0 || rlen > sz ) goto Fail;
 
-        /* skip unread parts of the current subchunk */
+      /* skip unread parts of the current subchunk */
 
-        if (rlen < sz) fseek(fp, sz - rlen, SEEK_CUR);
+      if ( rlen < sz )
+         fseek( fp, sz - rlen, SEEK_CUR );
 
-        /* end of the CLIP chunk? */
+      /* end of the CLIP chunk? */
 
-        rlen = ftell(fp) - pos;
-        if (cksize < rlen) goto Fail;
-        if (cksize == rlen) break;
+      rlen = ftell( fp ) - pos;
+      if ( cksize < rlen ) goto Fail;
+      if ( cksize == rlen ) break;
 
-        /* get the next chunk header */
+      /* get the next chunk header */
 
-        set_flen(0);
-        id = getU4(fp);
-        sz = getU2(fp);
-        if (6 != get_flen()) goto Fail;
-    }
+      set_flen( 0 );
+      id = getU4( fp );
+      sz = getU2( fp );
+      if ( 6 != get_flen() ) goto Fail;
+   }
 
-    return clip;
+   return clip;
 
 Fail:
-    lwFreeClip(clip);
-    return NULL;
+   lwFreeClip( clip );
+   return NULL;
 }
+
 
 /*
 ======================================================================
@@ -227,15 +236,14 @@ lwFindClip()
 Returns an lwClip pointer, given a clip index.
 ====================================================================== */
 
-lwClip* lwFindClip(lwClip* list, int index)
+lwClip *lwFindClip( lwClip *list, int index )
 {
-    lwClip* clip;
+   lwClip *clip;
 
-    clip = list;
-    while (clip)
-    {
-        if (clip->index == index) break;
-        clip = clip->next;
-    }
-    return clip;
+   clip = list;
+   while ( clip ) {
+      if ( clip->index == index ) break;
+      clip = clip->next;
+   }
+   return clip;
 }

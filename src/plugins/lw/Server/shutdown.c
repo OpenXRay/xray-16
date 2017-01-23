@@ -6,6 +6,9 @@
  */
 #include <lwsdk/lwserver.h>
 
-void Shutdown(void* serverData)
+
+    void
+Shutdown (
+    void                    *serverData)
 {
 }

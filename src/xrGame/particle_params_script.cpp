@@ -6,16 +6,20 @@
 //	Description : Particle parameters class
 ////////////////////////////////////////////////////////////////////////////
 
-#include "particle_params.h"
 #include "pch_script.h"
+#include "particle_params.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
-SCRIPT_EXPORT(CParticleParams, (), {
-    module(luaState)[class_<CParticleParams>("particle_params")
-                         .def(constructor<>())
-                         .def(constructor<const Fvector&>())
-                         .def(constructor<const Fvector&, const Fvector&>())
-                         .def(constructor<const Fvector&, const Fvector&, const Fvector&>())];
+SCRIPT_EXPORT(CParticleParams, (),
+{
+	module(luaState)
+	[
+		class_<CParticleParams>("particle_params")
+			.def(								constructor<>())
+			.def(								constructor<const Fvector &>())
+			.def(								constructor<const Fvector &,const Fvector &>())
+			.def(								constructor<const Fvector &,const Fvector &,const Fvector &>())
+	];
 });

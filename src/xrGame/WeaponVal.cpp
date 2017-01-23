@@ -13,4 +13,10 @@ CWeaponVal::~CWeaponVal(void)
 using namespace luabind;
 
 SCRIPT_EXPORT(CWeaponVal, (CGameObject),
-    { module(luaState)[class_<CWeaponVal, CGameObject>("CWeaponVal").def(constructor<>())]; });
+{
+	module(luaState)
+	[
+		class_<CWeaponVal,CGameObject>("CWeaponVal")
+			.def(constructor<>())
+	];
+});

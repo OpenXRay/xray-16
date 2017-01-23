@@ -8,22 +8,22 @@
 
 #pragma once
 
-IC CScriptHit::CScriptHit()
+IC	CScriptHit::CScriptHit			()
 {
-    m_fPower = 100;
-    m_tDirection.set(1, 0, 0);
-    m_caBoneName = "";
-    m_tpDraftsman = 0;
-    m_fImpulse = 100;
-    m_tHitType = ALife::eHitTypeWound;
+	m_fPower			= 100;
+	m_tDirection.set	(1,0,0);
+	m_caBoneName		= "";
+	m_tpDraftsman		= 0;
+	m_fImpulse			= 100;
+	m_tHitType			= ALife::eHitTypeWound;
 }
 
-IC CScriptHit::CScriptHit(const CScriptHit* tpLuaHit)
+IC	CScriptHit::CScriptHit			(const CScriptHit *tpLuaHit)
 {
-    *this = *tpLuaHit;
+	*this				= *tpLuaHit;
 }
 
-IC void CScriptHit::set_bone_name(LPCSTR bone_name)
+IC	void CScriptHit::set_bone_name	(LPCSTR bone_name)
 {
-    m_caBoneName = bone_name;
+	m_caBoneName		= bone_name;
 }

@@ -164,7 +164,7 @@ void CProfiler::show_stats			(IGameFont &font, bool show)
 #endif // CONFIG_PROFILE_LOCKS
 
 	++m_call_count;
-
+		
 #ifdef CONFIG_PROFILE_LOCKS
 	while (InterlockedExchange(&critical_section_counter,1))
 		Sleep					(0);

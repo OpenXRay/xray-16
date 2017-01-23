@@ -38,3 +38,4 @@ char* timestamp(string64& dest)
     xr_strcat(dest, sizeof(dest), temp);
     return dest;
 }
+

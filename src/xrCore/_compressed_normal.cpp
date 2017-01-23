@@ -24,7 +24,8 @@ void pvInitializeStatics(void)
         long ybits = idx & pvBOTTOM_MASK;
 
         // map the numbers back to the triangle (0,0)-(0,127)-(127,0)
-        if ((xbits + ybits) >= 127) {
+        if ((xbits + ybits) >= 127)
+        {
             xbits = 127 - xbits;
             ybits = 127 - ybits;
         }
@@ -35,7 +36,7 @@ void pvInitializeStatics(void)
         float z = float(126 - xbits - ybits);
 
         // calculate the amount of normalization required
-        pvUVAdjustment[idx] = 1.0f / _sqrt(y * y + z * z + x * x);
+        pvUVAdjustment[idx] = 1.0f / _sqrt(y*y + z*z + x*x);
     }
 }
 
@@ -47,18 +48,9 @@ u16 pvCompress(const Fvector& vec)
     // input vector3 does not have to be unit length
     u16 mVec = 0;
 
-    if (negative(tmp.x)) {
-        mVec |= pvXSIGN_MASK;
-        set_positive(tmp.x);
-    }
-    if (negative(tmp.y)) {
-        mVec |= pvYSIGN_MASK;
-        set_positive(tmp.y);
-    }
-    if (negative(tmp.z)) {
-        mVec |= pvZSIGN_MASK;
-        set_positive(tmp.z);
-    }
+    if (negative(tmp.x)) { mVec |= pvXSIGN_MASK; set_positive(tmp.x); }
+    if (negative(tmp.y)) { mVec |= pvYSIGN_MASK; set_positive(tmp.y); }
+    if (negative(tmp.z)) { mVec |= pvZSIGN_MASK; set_positive(tmp.z); }
 
     // project the normal onto the plane that goes through
     // X0=(1,0,0),Y0=(0,1,0),Z0=(0,0,1).
@@ -83,7 +75,8 @@ u16 pvCompress(const Fvector& vec)
 
     // however for the sampling we want to transform this triangle
     // into a rectangle.
-    if (xbits >= 64) {
+    if (xbits >= 64)
+    {
         xbits = 127 - xbits;
         ybits = 127 - ybits;
     }
@@ -112,7 +105,8 @@ void pvDecompress(Fvector& vec, u16 mVec)
     int ybits = (mVec & pvBOTTOM_MASK);
 
     // map the numbers back to the triangle (0,0)-(0,126)-(126,0)
-    if ((xbits + ybits) >= 127) {
+    if ((xbits + ybits) >= 127)
+    {
         xbits = 127 - xbits;
         ybits = 127 - ybits;
     }

@@ -8,101 +8,105 @@
 
 #pragma once
 
-#define TEMPLATE_SPECIALIZATION template <typename T>
+#define TEMPLATE_SPECIALIZATION template <\
+	typename T\
+>
 
 #define CAbstractObjectManager CObjectManager<T>
 
 TEMPLATE_SPECIALIZATION
-CAbstractObjectManager::CObjectManager()
+CAbstractObjectManager::CObjectManager				()
 {
-    //	m_objects.reserve		(100);
+//	m_objects.reserve		(100);
 }
 
 TEMPLATE_SPECIALIZATION
-CAbstractObjectManager::~CObjectManager()
-{
-}
-
-TEMPLATE_SPECIALIZATION
-void CAbstractObjectManager::Load(LPCSTR section)
+CAbstractObjectManager::~CObjectManager				()
 {
 }
 
 TEMPLATE_SPECIALIZATION
-void CAbstractObjectManager::reinit()
-{
-    m_objects.clear();
-    m_selected = 0;
-}
-
-TEMPLATE_SPECIALIZATION
-void CAbstractObjectManager::reload(LPCSTR section)
+void CAbstractObjectManager::Load					(LPCSTR section)
 {
 }
 
 TEMPLATE_SPECIALIZATION
-void CAbstractObjectManager::update()
+void CAbstractObjectManager::reinit					()
 {
-    float result = flt_max;
-    m_selected = 0;
-    OBJECTS::const_iterator I = m_objects.begin();
-    OBJECTS::const_iterator E = m_objects.end();
-    for (; I != E; ++I)
-    {
-        float value = do_evaluate(*I);
-        if (result > value) {
-            result = value;
-            m_selected = *I;
-        }
-    }
+	m_objects.clear			();
+	m_selected				= 0;
 }
 
 TEMPLATE_SPECIALIZATION
-float CAbstractObjectManager::do_evaluate(T* object) const
+void CAbstractObjectManager::reload					(LPCSTR section)
 {
-    return (0.f);
 }
 
 TEMPLATE_SPECIALIZATION
-bool CAbstractObjectManager::is_useful(T* object) const
+void CAbstractObjectManager::update					()
 {
-    const ISpatial* self = (const ISpatial*)(object);
-    if (!self) return (false);
-
-    if ((object->spatial.type & STYPE_VISIBLEFORAI) != STYPE_VISIBLEFORAI) return (false);
-
-    return (true);
+	float					result = flt_max;
+	m_selected				= 0;
+	OBJECTS::const_iterator	I = m_objects.begin();
+	OBJECTS::const_iterator	E = m_objects.end();
+	for ( ; I != E; ++I) {
+		float				value = do_evaluate(*I);
+		if (result > value) {
+			result			= value;
+			m_selected		= *I;
+		}
+	}
 }
 
 TEMPLATE_SPECIALIZATION
-bool CAbstractObjectManager::add(T* object)
+float CAbstractObjectManager::do_evaluate			(T *object) const
 {
-    if (!is_useful(object)) return (false);
-
-    OBJECTS::const_iterator I = std::find(m_objects.begin(), m_objects.end(), object);
-    if (m_objects.end() == I) {
-        m_objects.push_back(object);
-        return (true);
-    }
-    return (true);
+	return					(0.f);
 }
 
 TEMPLATE_SPECIALIZATION
-IC T* CAbstractObjectManager::selected() const
+bool CAbstractObjectManager::is_useful				(T *object) const
 {
-    return (m_selected);
+	const ISpatial			*self = (const ISpatial*)(object);
+	if (!self)
+		return				(false);
+
+	if ((object->spatial.type & STYPE_VISIBLEFORAI) != STYPE_VISIBLEFORAI)
+		return				(false);
+
+	return					(true);
 }
 
 TEMPLATE_SPECIALIZATION
-void CAbstractObjectManager::reset()
+bool CAbstractObjectManager::add					(T *object)
 {
-    m_objects.clear();
+	if (!is_useful(object))
+		return				(false);
+
+	OBJECTS::const_iterator	I = std::find(m_objects.begin(),m_objects.end(),object);
+	if (m_objects.end() == I) {
+		m_objects.push_back	(object);
+		return				(true);
+	}
+	return					(true);
 }
 
 TEMPLATE_SPECIALIZATION
-IC const typename CAbstractObjectManager::OBJECTS& CAbstractObjectManager::objects() const
+IC	T *CAbstractObjectManager::selected		() const
 {
-    return (m_objects);
+	return					(m_selected);
+}
+
+TEMPLATE_SPECIALIZATION
+void CAbstractObjectManager::reset					()
+{
+	m_objects.clear			();
+}
+
+TEMPLATE_SPECIALIZATION
+IC	const typename CAbstractObjectManager::OBJECTS &CAbstractObjectManager::objects() const
+{
+	return					(m_objects);
 }
 
 #undef TEMPLATE_SPECIALIZATION

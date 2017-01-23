@@ -2,11 +2,11 @@
 
 #include "weaponmagazined.h"
 
-class CWeaponVintorez : public CWeaponMagazined
+class CWeaponVintorez :
+	public CWeaponMagazined
 {
-    typedef CWeaponMagazined inherited;
-
+	typedef CWeaponMagazined inherited;
 public:
-    CWeaponVintorez(void);
-    virtual ~CWeaponVintorez(void);
+	CWeaponVintorez(void);
+	virtual ~CWeaponVintorez(void);
 };

@@ -8,10 +8,10 @@
 #include "medkit.h"
 #include "xrPhysics/PhysicsShell.h"
 
-CMedkit::CMedkit()
+CMedkit::CMedkit() 
 {
 }
 
-CMedkit::~CMedkit()
+CMedkit::~CMedkit() 
 {
 }

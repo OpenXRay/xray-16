@@ -2,7 +2,7 @@
 #define xrPROPERTIES_H
 
 #pragma once
-#pragma pack(push, 4)
+#pragma pack(push,4)
 
 // Parameter/Property specifications
 
@@ -14,9 +14,9 @@
 enum xrProperties
 {
     xrPID_MARKER = 0,
-    xrPID_MATRIX,   // really only name(stringZ) is written into stream
+    xrPID_MATRIX, // really only name(stringZ) is written into stream
     xrPID_CONSTANT, // really only name(stringZ) is written into stream
-    xrPID_TEXTURE,  // really only name(stringZ) is written into stream
+    xrPID_TEXTURE, // really only name(stringZ) is written into stream
     xrPID_INTEGER,
     xrPID_FLOAT,
     xrPID_BOOL,
@@ -87,6 +87,7 @@ struct xrP_Template
 class CPropertyBase
 {
 protected:
+
 public:
     virtual LPCSTR getName() = 0;
     virtual LPCSTR getComment() = 0;
@@ -107,10 +108,10 @@ IC void xrPWRITE_MARKER(IWriter& fs, LPCSTR name)
     xrPWRITE(fs, xrPID_MARKER, name, 0, 0);
 }
 
-#define xrPWRITE_PROP(FS, name, ID, data)                                                                              \
-    {                                                                                                                  \
-        xrPWRITE(fs, ID, name, &data, sizeof(data));                                                                   \
-    }
+#define xrPWRITE_PROP(FS,name,ID,data)\
+{\
+ xrPWRITE (fs,ID,name,&data,sizeof(data));\
+}
 
 // Readers
 IC u32 xrPREAD(IReader& fs)
@@ -124,25 +125,24 @@ IC void xrPREAD_MARKER(IReader& fs)
     R_ASSERT(xrPID_MARKER == xrPREAD(fs));
 }
 
-#define xrPREAD_PROP(fs, ID, data)                                                                                     \
-    {                                                                                                                  \
-        R_ASSERT(ID == xrPREAD(fs));                                                                                   \
-        fs.r(&data, sizeof(data));                                                                                     \
-        switch (ID)                                                                                                    \
-        {                                                                                                              \
-        case xrPID_TOKEN: fs.advance(((xrP_TOKEN*)&data)->Count * sizeof(xrP_TOKEN::Item)); break;                     \
-        case xrPID_CLSID: fs.advance(((xrP_CLSID*)&data)->Count * sizeof(CLASS_ID)); break;                            \
-        };                                                                                                             \
-    }
+#define xrPREAD_PROP(fs,ID,data) \
+{ \
+ R_ASSERT(ID==xrPREAD(fs)); fs.r(&data,sizeof(data)); \
+ switch (ID) \
+ { \
+ case xrPID_TOKEN: fs.advance(((xrP_TOKEN*)&data)->Count * sizeof(xrP_TOKEN::Item)); break; \
+ case xrPID_CLSID: fs.advance(((xrP_CLSID*)&data)->Count * sizeof(CLASS_ID)); break; \
+ }; \
+}
 
-// template <class T>
-// IC void xrPWRITE_PROP (IWriter& FS, LPCSTR name, u32 ID, T& data)
+//template <class T>
+//IC void xrPWRITE_PROP (IWriter& FS, LPCSTR name, u32 ID, T& data)
 //{
 // xrPWRITE (FS,ID,name,&data,sizeof(data));
 //}
 
-// template <class T>
-// IC void xrPREAD_PROP (IReader& FS, u32 ID, T& data)
+//template <class T>
+//IC void xrPREAD_PROP (IReader& FS, u32 ID, T& data)
 //{
 // R_ASSERT(ID==xrPREAD(FS)); FS.Read(&data,sizeof(data));
 // switch (ID)

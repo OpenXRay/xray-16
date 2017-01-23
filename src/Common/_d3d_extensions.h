@@ -5,19 +5,19 @@
 struct Flight
 {
 public:
-    u32 type;           /* Type of light source */
-    Fcolor diffuse;     /* Diffuse color of light */
-    Fcolor specular;    /* Specular color of light */
-    Fcolor ambient;     /* Ambient color of light */
-    Fvector position;   /* Position in world space */
-    Fvector direction;  /* Direction in world space */
-    float range;        /* Cutoff range */
-    float falloff;      /* Falloff */
+    u32 type; /* Type of light source */
+    Fcolor diffuse; /* Diffuse color of light */
+    Fcolor specular; /* Specular color of light */
+    Fcolor ambient; /* Ambient color of light */
+    Fvector position; /* Position in world space */
+    Fvector direction; /* Direction in world space */
+    float range; /* Cutoff range */
+    float falloff; /* Falloff */
     float attenuation0; /* Constant attenuation */
     float attenuation1; /* Linear attenuation */
     float attenuation2; /* Quadratic attenuation */
-    float theta;        /* Inner angle of spotlight cone */
-    float phi;          /* Outer angle of spotlight cone */
+    float theta; /* Inner angle of spotlight cone */
+    float phi; /* Outer angle of spotlight cone */
 
     IC void set(u32 ltType, float x, float y, float z)
     {
@@ -50,11 +50,11 @@ public:
 struct Fmaterial
 {
 public:
-    Fcolor diffuse;  /* Diffuse color RGBA */
-    Fcolor ambient;  /* Ambient color RGB */
+    Fcolor diffuse; /* Diffuse color RGBA */
+    Fcolor ambient; /* Ambient color RGB */
     Fcolor specular; /* Specular 'shininess' */
     Fcolor emissive; /* Emissive color RGB */
-    float power;     /* Sharpness if specular highlight */
+    float power; /* Sharpness if specular highlight */
 
     IC void set(float r, float g, float b)
     {
@@ -94,7 +94,7 @@ public:
 #endif
 
 #ifndef NO_XR_VDECLARATOR
-struct VDeclarator : public svector<D3DVERTEXELEMENT9, MAXD3DDECLLENGTH + 1>
+struct VDeclarator : public svector < D3DVERTEXELEMENT9, MAXD3DDECLLENGTH + 1 >
 {
     void set(u32 FVF)
     {
@@ -104,16 +104,17 @@ struct VDeclarator : public svector<D3DVERTEXELEMENT9, MAXD3DDECLLENGTH + 1>
     void set(D3DVERTEXELEMENT9* dcl)
     {
         resize(D3DXGetDeclLength(dcl) + 1);
-        CopyMemory(begin(), dcl, size() * sizeof(D3DVERTEXELEMENT9));
+        CopyMemory(begin(), dcl, size()*sizeof(D3DVERTEXELEMENT9));
     }
-    void set(const VDeclarator& d) { *this = d; }
+    void set(const VDeclarator& d)
+    {
+        *this = d;
+    }
     u32 vertex() { return D3DXGetDeclVertexSize(begin(), 0); }
     BOOL equal(VDeclarator& d)
     {
-        if (size() != d.size())
-            return false;
-        else
-            return 0 == memcmp(begin(), d.begin(), size() * sizeof(D3DVERTEXELEMENT9));
+        if (size() != d.size()) return false;
+        else return 0 == memcmp(begin(), d.begin(), size()*sizeof(D3DVERTEXELEMENT9));
     }
 };
 #endif

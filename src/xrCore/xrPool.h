@@ -8,7 +8,6 @@ class poolSS
 private:
     T* list;
     xr_vector<T*> blocks;
-
 private:
     T** access(T* P) { return (T**)LPVOID(P); }
     void block_create()
@@ -26,9 +25,11 @@ private:
         }
         *access(list + granularity - 1) = NULL;
     }
-
 public:
-    poolSS() { list = 0; }
+    poolSS()
+    {
+        list = 0;
+    }
     ~poolSS()
     {
         for (u32 b = 0; b < blocks.size(); b++)
@@ -40,7 +41,7 @@ public:
 
         T* E = list;
         list = *access(list);
-        return new (E) T();
+        return new (E)T();
     }
     void destroy(T*& P)
     {

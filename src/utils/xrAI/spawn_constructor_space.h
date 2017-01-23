@@ -12,8 +12,7 @@
 
 class CSE_ALifeLevelChanger;
 
-namespace SpawnConstructorSpace
-{
-typedef xr_vector<CGameGraph::CLevelPoint> LEVEL_POINT_STORAGE;
-typedef xr_vector<CSE_ALifeLevelChanger*> LEVEL_CHANGER_STORAGE;
+namespace SpawnConstructorSpace {
+	typedef xr_vector<CGameGraph::CLevelPoint>	LEVEL_POINT_STORAGE;
+	typedef xr_vector<CSE_ALifeLevelChanger*>	LEVEL_CHANGER_STORAGE;
 };

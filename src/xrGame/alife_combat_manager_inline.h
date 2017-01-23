@@ -11,6 +11,6 @@
 /**
 IC	ALife::ECombatType		CALifeCombatManager::combat_type	() const
 {
-    return				(m_combat_type);
+	return				(m_combat_type);
 }
 /**/

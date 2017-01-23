@@ -1,17 +1,22 @@
-#include "utils/xrLC_Light/net_light.h"
 #include "xrlc_lightstab.h"
+#include "utils/xrLC_Light/net_light.h"
 
 #include "utils/xrLC_Light/lightstab_interface.h"
 
-#pragma comment(lib, "xrLC_Light.lib")
+#pragma comment(lib,"xrLC_Light.lib")
 
-extern "C" XRLC_LIGHT_STUB_API bool __cdecl RunTask(
-    IAgent* agent, DWORD sessionId, IGenericStream* inStream, IGenericStream* outStream)
+
+extern "C" XRLC_LIGHT_STUB_API  bool __cdecl RunTask(IAgent* agent,
+                 DWORD sessionId,
+                 IGenericStream* inStream,
+                 IGenericStream* outStream)
 {
-    if (lc_net::g_net_task_interface)
-        return lc_net::g_net_task_interface->run_task(agent, sessionId, inStream, outStream);
 
-    // if(g_net_task_interface)
-    // return g_net_task_interface->RunTask( agent, sessionId, inStream, outStream );
-    return false;
+	if(lc_net::g_net_task_interface)
+			return lc_net::g_net_task_interface->run_task( agent, sessionId, inStream, outStream );
+
+  //if(g_net_task_interface)
+	// return g_net_task_interface->RunTask( agent, sessionId, inStream, outStream );
+	 return false;
 }
+

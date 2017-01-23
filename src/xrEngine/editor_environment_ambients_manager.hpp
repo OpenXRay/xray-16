@@ -16,10 +16,12 @@
 
 namespace editor
 {
+
 class property_holder;
 
 namespace environment
 {
+
 class manager;
 
 namespace effects
@@ -34,6 +36,7 @@ class manager;
 
 namespace ambients
 {
+
 class ambient;
 
 class manager : private Noncopyable
@@ -60,7 +63,10 @@ public:
 
 private:
     typedef editor::property_holder property_holder_type;
-    typedef property_collection<ambient_container_type, manager> collection_type;
+    typedef property_collection <
+    ambient_container_type,
+    manager
+    > collection_type;
 
 private:
     ambient_container_type m_ambients;

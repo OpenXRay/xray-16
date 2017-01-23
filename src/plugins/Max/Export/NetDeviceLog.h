@@ -9,53 +9,55 @@
 #define NLOG_CONSOLE_OUT
 // -------
 
-class CExportConsole
-{
+class CExportConsole{
 protected:
-    bool m_Valid;
-    HANDLE m_hThread;
-    DWORD m_ThreadId;
+
+	bool m_Valid;
+	HANDLE m_hThread;
+	DWORD m_ThreadId;
+
 
 public:
-    HWND m_hParent;
-    HWND m_hWindow;
-    HINSTANCE m_hInstance;
 
-    CRITICAL_SECTION m_CSection;
+	HWND m_hParent;
+	HWND m_hWindow;
+	HINSTANCE m_hInstance;
 
-    bool m_Enter;
-    char m_EnterBuffer[256];
+	CRITICAL_SECTION m_CSection;
 
-    class _ConsoleMsg
-    {
-    public:
-        char buf[1024];
-        _ConsoleMsg(LPCSTR b) { strcpy(buf, b); }
-    };
+	bool m_Enter;
+	char m_EnterBuffer[256];
 
-    std::list<_ConsoleMsg> m_Messages;
+	class _ConsoleMsg{
+	public:
+		char buf[1024];
+		_ConsoleMsg(LPCSTR b){ strcpy(buf,b); }
+	};
+		
+	std::list<_ConsoleMsg> m_Messages;
 
-    float fMaxVal, fStatusProgress;
-
+	float fMaxVal, fStatusProgress;
 public:
-    bool Init(HINSTANCE _Inst, HWND _Window);
-    void Clear();
 
-    void print(TMsgDlgType mt, const char* buf);
+	bool Init( HINSTANCE _Inst, HWND _Window );
+	void Clear();
 
-    bool valid();
+	void print	(TMsgDlgType mt, const char *buf);
 
-    void ProgressStart(float max_val, const char* text = 0);
-    void ProgressEnd();
-    void ProgressInc();
-    void ProgressUpdate(float val);
+	bool valid();
 
-    void StayOnTop(BOOL flag);
+	void ProgressStart(float max_val, const char* text=0);
+	void ProgressEnd();
+	void ProgressInc();
+	void ProgressUpdate(float val);
 
-    CExportConsole();
-    ~CExportConsole();
+	void StayOnTop	(BOOL flag);
+
+	CExportConsole();
+	~CExportConsole();
 };
 
 extern CExportConsole EConsole;
 
 #endif /*_INCDEF_NETDEVICELOG_H_*/
+

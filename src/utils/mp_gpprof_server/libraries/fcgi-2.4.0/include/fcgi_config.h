@@ -1,4 +1,4 @@
-/*
+/* 
  *  Copied to fcgi_config.h when building on WinNT without cygwin,
  *  i.e. configure is not run.  See fcgi_config.h.in for details.
  */

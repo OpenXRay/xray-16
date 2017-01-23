@@ -8,21 +8,19 @@
 
 #pragma once
 
-class CScriptRTokenList
-{
+class CScriptRTokenList {
 public:
-    typedef xr_vector<shared_str> RTOKEN_LIST;
-
+	typedef xr_vector<shared_str> RTOKEN_LIST;
 protected:
-    RTOKEN_LIST m_values;
+	RTOKEN_LIST			m_values;
 
 public:
-    IC void add(LPCSTR value);
-    IC void remove(u32 index);
-    IC LPCSTR get(u32 index);
-    IC u32 size();
-    IC void clear();
-    IC RTOKEN_LIST& tokens();
+	IC		void		add		(LPCSTR value);
+	IC		void		remove	(u32 index);
+	IC		LPCSTR		get		(u32 index);
+	IC		u32			size	();
+	IC		void		clear	();
+	IC		RTOKEN_LIST	&tokens	();
 };
 
 #include "script_rtoken_list_inline.h"

@@ -2,13 +2,10 @@
 #pragma hdrstop
 #include "NET_utils.h"
 
+
 // ---NET_Packet
 // reading
-void NET_Packet::read_start()
-{
-    r_pos = 0;
-    INI_W(move_begin());
-}
+void NET_Packet::read_start() { r_pos = 0; INI_W(move_begin()); }
 
 u32 NET_Packet::r_begin(u16& type) // returns time of receiving
 {
@@ -245,7 +242,7 @@ void NET_Packet::r_float_q16(float& A, float min, float max)
 {
     u16 val;
     r_u16(val);
-    A = (float(val) * (max - min)) / 65535.f + min; // floating-point-error possible
+    A = (float(val)*(max - min)) / 65535.f + min; // floating-point-error possible
     VERIFY((A >= min - EPS_S) && (A <= max + EPS_S));
 }
 
@@ -253,7 +250,7 @@ void NET_Packet::r_float_q8(float& A, float min, float max)
 {
     u8 val;
     r_u8(val);
-    A = (float(val) / 255.0001f) * (max - min) + min; // floating-point-error possible
+    A = (float(val) / 255.0001f) *(max - min) + min; // floating-point-error possible
     VERIFY((A >= min) && (A <= max));
 }
 
@@ -286,20 +283,22 @@ void NET_Packet::r_sdir(Fvector& A)
 
 void NET_Packet::r_stringZ(LPSTR S)
 {
-    if (!inistream) {
+    if (!inistream)
+    {
         LPCSTR data = LPCSTR(&B.data[r_pos]);
         size_t len = xr_strlen(data);
         r(S, (u32)len + 1);
     }
     else
     {
-        inistream->r_string(S, 4096); //???
+        inistream->r_string(S, 4096);//???
     }
 }
 
 void NET_Packet::r_stringZ(xr_string& dest)
 {
-    if (!inistream) {
+    if (!inistream)
+    {
         dest = LPCSTR(&B.data[r_pos]);
         r_advance(u32(dest.size() + 1));
     }
@@ -313,7 +312,8 @@ void NET_Packet::r_stringZ(xr_string& dest)
 
 void NET_Packet::r_stringZ(shared_str& dest)
 {
-    if (!inistream) {
+    if (!inistream)
+    {
         dest = LPCSTR(&B.data[r_pos]);
         r_advance(dest.size() + 1);
     }
@@ -327,7 +327,8 @@ void NET_Packet::r_stringZ(shared_str& dest)
 
 void NET_Packet::skip_stringZ()
 {
-    if (!inistream) {
+    if (!inistream)
+    {
         LPCSTR data = LPCSTR(&B.data[r_pos]);
         u32 len = xr_strlen(data);
         r_advance(len + 1);
@@ -359,7 +360,8 @@ void NET_Packet::r_clientID(ClientID& C)
 
 void NET_Packet::r_stringZ_s(LPSTR string, u32 const size)
 {
-    if (inistream) {
+    if (inistream)
+    {
         inistream->r_string(string, size);
         return;
     }

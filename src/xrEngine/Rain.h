@@ -8,7 +8,7 @@
 
 #include "xrCDB/xr_collide_defs.h"
 
-// refs
+//refs
 class ENGINE_API IRender_DetailModel;
 
 #include "Include/xrRender/FactoryPtr.h"
@@ -17,7 +17,6 @@ class ENGINE_API IRender_DetailModel;
 class ENGINE_API CEffect_Rain
 {
     friend class dxRainRender;
-
 private:
     struct Item
     {
@@ -28,11 +27,14 @@ private:
         u32 dwTime_Life;
         u32 dwTime_Hit;
         u32 uv_set;
-        void invalidate() { dwTime_Life = 0; }
+        void invalidate()
+        {
+            dwTime_Life = 0;
+        }
     };
     struct Particle
     {
-        Particle *next, *prev;
+        Particle* next, *prev;
         Fmatrix mXForm;
         Fsphere bounds;
         float time;
@@ -42,7 +44,6 @@ private:
         stIdle = 0,
         stWorking
     };
-
 private:
     // Visualization (rain) and (drops)
     FactoryPtr<IRainRender> m_pRender;
@@ -83,7 +84,6 @@ private:
     void Hit(Fvector& pos);
     BOOL RayPick(const Fvector& s, const Fvector& d, float& range, collide::rq_target tgt);
     void RenewItem(Item& dest, float height, BOOL bHit);
-
 public:
     CEffect_Rain();
     ~CEffect_Rain();
@@ -92,4 +92,4 @@ public:
     void OnFrame();
 };
 
-#endif // RainH
+#endif //RainH

@@ -8,21 +8,21 @@
 
 #pragma once
 
-IC CScriptActionCondition::CScriptActionCondition()
+IC	CScriptActionCondition::CScriptActionCondition	()
 {
-    m_dwFlags = 0;
-    m_tLifeTime = ALife::_TIME_ID(-1);
-    m_tStartTime = ALife::_TIME_ID(-1);
+	m_dwFlags			= 0;
+	m_tLifeTime			= ALife::_TIME_ID(-1);
+	m_tStartTime		= ALife::_TIME_ID(-1);
 }
 
-IC CScriptActionCondition::CScriptActionCondition(u32 dwFlags, double dTime)
+IC	CScriptActionCondition::CScriptActionCondition	(u32 dwFlags, double dTime)
 {
-    m_dwFlags = dwFlags;
-    m_tLifeTime = ALife::_TIME_ID(dTime);
-    m_tStartTime = ALife::_TIME_ID(-1);
+	m_dwFlags			= dwFlags;
+	m_tLifeTime			= ALife::_TIME_ID(dTime);
+	m_tStartTime		= ALife::_TIME_ID(-1);
 }
 
-IC void CScriptActionCondition::initialize()
+IC	void CScriptActionCondition::initialize			()
 {
-    m_tStartTime = Device.dwTimeGlobal;
+	m_tStartTime		= Device.dwTimeGlobal;
 }

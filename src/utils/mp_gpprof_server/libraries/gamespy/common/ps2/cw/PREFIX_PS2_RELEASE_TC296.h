@@ -6,6 +6,6 @@
 
 #include <PREFIX_PS2_TC296.h>
 
-#define NDEBUG /*	just for debugging	*/
+#define	NDEBUG					/*	just for debugging	*/
 
-#pragma cats off
+#pragma	cats	off

@@ -10,18 +10,21 @@ CWeaponCustomPistol::CWeaponCustomPistol() : CWeaponMagazined(SOUND_TYPE_WEAPON_
 CWeaponCustomPistol::~CWeaponCustomPistol()
 {
 }
-void CWeaponCustomPistol::switch2_Fire()
+void CWeaponCustomPistol::switch2_Fire	()
 {
-    m_bFireSingleShot = true;
-    bWorking = false;
-    m_iShotNum = 0;
-    m_bStopedAfterQueueFired = false;
+	m_bFireSingleShot			= true;
+	bWorking					= false;
+	m_iShotNum					= 0;
+	m_bStopedAfterQueueFired	= false;
 }
 
-void CWeaponCustomPistol::FireEnd()
+
+
+void CWeaponCustomPistol::FireEnd() 
 {
-    if (fShotTimeCounter <= 0) {
-        SetPending(FALSE);
-        inherited::FireEnd();
-    }
+	if(fShotTimeCounter<=0) 
+	{
+		SetPending			(FALSE);
+		inherited::FireEnd	();
+	}
 }

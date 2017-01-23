@@ -9,10 +9,7 @@ class Basis;
 class Basis
 {
 private:
-    enum
-    {
-        d = 3
-    } eDimensions;
+    enum { d = 3 } eDimensions;
 
     // data members
     int m, s; // size and number of support vectors
@@ -28,7 +25,6 @@ private:
 
     Fvector* current_c; // vectors to some c[j]
     float current_sqr_r;
-
 public:
     Basis();
 
@@ -57,8 +53,8 @@ public:
 
 private:
     // data members
-    VectorList L;   // STL list keeping the gVectors
-    Basis B;        // basis keeping the current ball
+    VectorList L; // STL list keeping the gVectors
+    Basis B; // basis keeping the current ball
     It support_end; // past-the-end iterator of support set
 
     // private methods
@@ -67,7 +63,7 @@ private:
     void move_to_front(It j);
     float max_excess(It t, It i, It& pivot) const;
     float abs(float r) const { return (r > 0) ? r : (-r); }
-    float sqr(float r) const { return r * r; }
+    float sqr(float r) const { return r*r; }
 public:
     // construction
     Miniball() {}
@@ -109,13 +105,16 @@ void Miniball::mtf_mb(It i)
 {
     support_end = L.begin();
 
-    if ((B.size()) == 4) return;
+    if ((B.size()) == 4)
+        return;
 
     for (It k = L.begin(); k != i;)
     {
         It j = k++;
-        if (B.excess(*j) > 0) {
-            if (B.push(*j)) {
+        if (B.excess(*j) > 0)
+        {
+            if (B.push(*j))
+            {
                 mtf_mb(j);
                 B.pop();
                 move_to_front(j);
@@ -126,9 +125,11 @@ void Miniball::mtf_mb(It i)
 
 void Miniball::move_to_front(It j)
 {
-    if (support_end == j) support_end++;
+    if (support_end == j)
+        support_end++;
     L.splice(L.begin(), L, j);
 }
+
 
 void Miniball::pivot_mb(It i)
 {
@@ -139,7 +140,8 @@ void Miniball::pivot_mb(It i)
     {
         It pivot = L.begin();
         max_e = max_excess(t, i, pivot);
-        if (max_e > 0) {
+        if (max_e > 0)
+        {
             t = support_end;
             if (t == pivot) ++t;
             old_sqr_r = B.squared_radius();
@@ -165,7 +167,8 @@ float Miniball::max_excess(It t, It i, It& pivot) const
 
         e += point.distance_to_sqr(*pCenter);
 
-        if (e > max_e) {
+        if (e > max_e)
+        {
             max_e = e;
             pivot = k;
         }
@@ -214,6 +217,7 @@ Miniball::Cit Miniball::support_points_end() const
     return support_end;
 }
 
+
 //----------------------------------------------------------------------
 // Basis
 //---------------------------------------------------------------------
@@ -253,10 +257,12 @@ void Basis::reset()
     current_sqr_r = -1;
 }
 
+
 Basis::Basis()
 {
     reset();
 }
+
 
 void Basis::pop()
 {
@@ -265,7 +271,8 @@ void Basis::pop()
 
 bool Basis::push(const Fvector& p)
 {
-    if (m == 0) {
+    if (m == 0)
+    {
         q0 = p;
         c[0] = q0;
         sqr_r[0] = 0;
@@ -297,7 +304,8 @@ bool Basis::push(const Fvector& p)
         z[m] *= 2;
 
         // reject push if z_m too small
-        if (z[m] < eps * current_sqr_r) {
+        if (z[m] < eps*current_sqr_r)
+        {
             return false;
         }
 
@@ -309,7 +317,7 @@ bool Basis::push(const Fvector& p)
 
         c[m].mad(c[m - 1], v[m], f[m]);
 
-        sqr_r[m] = sqr_r[m - 1] + e * f[m] / 2;
+        sqr_r[m] = sqr_r[m - 1] + e*f[m] / 2;
     }
 
     current_c = c + m;

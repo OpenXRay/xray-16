@@ -1,6 +1,6 @@
+#include "stdafx.h"
 #include "Text_Console.h"
 #include "line_editor.h"
-#include "stdafx.h"
 
 extern char const* const ioc_prompt;
 extern char const* const ch_cursor;
@@ -42,12 +42,16 @@ void CTextConsole::CreateConsoleWnd()
     const char* wndclass = "TEXT_CONSOLE";
 
     // Register the windows class
-    WNDCLASS wndClass = {0, TextConsole_WndProc, 0, 0, hInstance, NULL, LoadCursor(hInstance, IDC_ARROW),
-        GetStockBrush(GRAY_BRUSH), NULL, wndclass};
+    WNDCLASS wndClass = {0, TextConsole_WndProc, 0, 0, hInstance,
+                         NULL,
+                         LoadCursor(hInstance, IDC_ARROW),
+                         GetStockBrush(GRAY_BRUSH),
+                         NULL, wndclass
+                        };
     RegisterClass(&wndClass);
 
     // Set the window's initial style
-    u32 dwWindowStyle = WS_OVERLAPPED | WS_CHILD | WS_VISIBLE; // | WS_CLIPSIBLINGS;// | WS_CLIPCHILDREN;
+    u32 dwWindowStyle = WS_OVERLAPPED | WS_CHILD | WS_VISIBLE;// | WS_CLIPSIBLINGS;// | WS_CLIPCHILDREN;
 
     // Set the window's initial width
     RECT rc;
@@ -55,8 +59,10 @@ void CTextConsole::CreateConsoleWnd()
     // AdjustWindowRect( &rc, dwWindowStyle, FALSE );
 
     // Create the render window
-    m_hConsoleWnd = CreateWindow(
-        wndclass, "XRAY Text Console", dwWindowStyle, lX, lY, lWidth, lHeight, *m_pMainWnd, 0, hInstance, 0L);
+    m_hConsoleWnd = CreateWindow(wndclass, "XRAY Text Console", dwWindowStyle,
+                                 lX, lY,
+                                 lWidth, lHeight, *m_pMainWnd,
+                                 0, hInstance, 0L);
     //---------------------------------------------------------------------------
     R_ASSERT2(m_hConsoleWnd, "Unable to Create TextConsole Window!");
 };
@@ -76,12 +82,16 @@ void CTextConsole::CreateLogWnd()
     const char* wndclass = "TEXT_CONSOLE_LOG_WND";
 
     // Register the windows class
-    WNDCLASS wndClass = {0, TextConsole_LogWndProc, 0, 0, hInstance, NULL, LoadCursor(NULL, IDC_ARROW),
-        GetStockBrush(BLACK_BRUSH), NULL, wndclass};
+    WNDCLASS wndClass = {0, TextConsole_LogWndProc, 0, 0, hInstance,
+                         NULL,
+                         LoadCursor(NULL, IDC_ARROW),
+                         GetStockBrush(BLACK_BRUSH),
+                         NULL, wndclass
+                        };
     RegisterClass(&wndClass);
 
     // Set the window's initial style
-    u32 dwWindowStyle = WS_OVERLAPPED | WS_CHILD | WS_VISIBLE; // | WS_CLIPSIBLINGS;
+    u32 dwWindowStyle = WS_OVERLAPPED | WS_CHILD | WS_VISIBLE;// | WS_CLIPSIBLINGS;
     // u32 dwWindowStyleEx = WS_EX_CLIENTEDGE;
 
     // Set the window's initial width
@@ -90,8 +100,10 @@ void CTextConsole::CreateLogWnd()
     // AdjustWindowRect( &rc, dwWindowStyle, FALSE );
 
     // Create the render window
-    m_hLogWnd = CreateWindow(
-        wndclass, "XRAY Text Console Log", dwWindowStyle, lX, lY, lWidth, lHeight, m_hConsoleWnd, 0, hInstance, 0L);
+    m_hLogWnd = CreateWindow(wndclass, "XRAY Text Console Log", dwWindowStyle,
+                             lX, lY,
+                             lWidth, lHeight, m_hConsoleWnd,
+                             0, hInstance, 0L);
     //---------------------------------------------------------------------------
     R_ASSERT2(m_hLogWnd, "Unable to Create TextConsole Window!");
     //---------------------------------------------------------------------------
@@ -177,9 +189,7 @@ void CTextConsole::Destroy()
     DestroyWindow(m_hConsoleWnd);
 }
 
-void CTextConsole::OnRender()
-{
-} // disable ÑConsole::OnRender()
+void CTextConsole::OnRender() {} //disable ÑConsole::OnRender()
 
 void CTextConsole::OnPaint()
 {
@@ -187,7 +197,8 @@ void CTextConsole::OnPaint()
     PAINTSTRUCT ps;
     BeginPaint(m_hLogWnd, &ps);
 
-    if (/*m_bNeedUpdate*/ Device.dwFrame % 2) {
+    if ( /*m_bNeedUpdate*/ Device.dwFrame % 2)
+    {
         // m_dwLastUpdateTime = Device.dwTimeGlobal;
         // m_bNeedUpdate = false;
 
@@ -199,9 +210,13 @@ void CTextConsole::OnPaint()
         wRC = ps.rcPaint;
     }
 
-    BitBlt(m_hDC_LogWnd, wRC.left, wRC.top, wRC.right - wRC.left, wRC.bottom - wRC.top, m_hDC_LogWnd_BackBuffer,
-        wRC.left, wRC.top,
-        SRCCOPY); //(FullUpdate) ? SRCCOPY : NOTSRCCOPY);
+
+    BitBlt(m_hDC_LogWnd,
+           wRC.left, wRC.top,
+           wRC.right - wRC.left, wRC.bottom - wRC.top,
+           m_hDC_LogWnd_BackBuffer,
+           wRC.left, wRC.top,
+           SRCCOPY); //(FullUpdate) ? SRCCOPY : NOTSRCCOPY);
     /*
      Msg ("URect - %d:%d - %d:%d", ps.rcPaint.left, ps.rcPaint.top, ps.rcPaint.right, ps.rcPaint.bottom);
      */
@@ -243,6 +258,7 @@ void CTextConsole::DrawLog(HDC hDC, RECT* pRect)
     SetTextColor(hDC, RGB(0, 0, 0));
     TextOut(hDC, xb, Height - tm.tmHeight - 1, buf, cur0_len);
 
+
     SetTextColor(hDC, RGB(255, 255, 255));
     TextOut(hDC, 0, Height - tm.tmHeight - 3, ioc_prompt, xr_strlen(ioc_prompt)); // ">>> "
 
@@ -264,12 +280,14 @@ void CTextConsole::DrawLog(HDC hDC, RECT* pRect)
     for (int i = LogFile->size() - 1 - scroll_delta; i >= 0; --i)
     {
         ypos -= tm.tmHeight;
-        if (ypos < y_top_max) {
+        if (ypos < y_top_max)
+        {
             break;
         }
         LPCSTR ls = ((*LogFile)[i]).c_str();
 
-        if (!ls) {
+        if (!ls)
+        {
             continue;
         }
         Console_mark cm = (Console_mark)ls[0];
@@ -279,12 +297,14 @@ void CTextConsole::DrawLog(HDC hDC, RECT* pRect)
         LPCSTR pOut = ls + b;
 
         BOOL res = TextOut(hDC, 10, ypos, pOut, xr_strlen(pOut));
-        if (!res) {
+        if (!res)
+        {
             R_ASSERT2(0, "TextOut(..) return NULL");
         }
     }
 
-    if (g_pGameLevel && (Device.dwTimeGlobal - m_last_time > 500)) {
+    if (g_pGameLevel && (Device.dwTimeGlobal - m_last_time > 500))
+    {
         m_last_time = Device.dwTimeGlobal;
 
         m_server_info.ResetData();
@@ -298,7 +318,8 @@ void CTextConsole::DrawLog(HDC hDC, RECT* pRect)
         TextOut(hDC, 10, ypos, m_server_info[i].name, xr_strlen(m_server_info[i].name));
 
         ypos += tm.tmHeight;
-        if (ypos > y_top_max) {
+        if (ypos > y_top_max)
+        {
             break;
         }
     }

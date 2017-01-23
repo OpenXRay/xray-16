@@ -5,14 +5,15 @@
 // Description : edit actions chars class implementation
 ////////////////////////////////////////////////////////////////////////////
 
-#include "edit_actions.h"
-#include <locale.h>
-#include "line_edit_control.h"
 #include "stdafx.h"
+#include "edit_actions.h"
+#include "line_edit_control.h"
 #include "xr_input.h"
+#include <locale.h>
 
 namespace text_editor
 {
+
 base::base() : m_previous_action(NULL)
 {
 }
@@ -29,7 +30,8 @@ void base::on_assign(base* const prev_action)
 
 void base::on_key_press(line_edit_control* const control)
 {
-    if (m_previous_action) {
+    if (m_previous_action)
+    {
         m_previous_action->on_key_press(control);
     }
 }
@@ -48,7 +50,8 @@ callback_base::~callback_base()
 
 void callback_base::on_key_press(line_edit_control* const control)
 {
-    if (control->get_key_state(m_run_state)) {
+    if (control->get_key_state(m_run_state))
+    {
         m_callback();
         return;
     }
@@ -74,10 +77,12 @@ void type_pair::init(u32 dik, char c, char c_shift, bool b_translate)
     m_char_shift = c_shift;
 }
 
+
 void type_pair::on_key_press(line_edit_control* const control)
 {
     char c = 0;
-    if (m_translate) {
+    if (m_translate)
+    {
         c = m_char;
         char c_shift = m_char_shift;
         string128 buff;
@@ -94,7 +99,8 @@ void type_pair::on_key_press(line_edit_control* const control)
 
         static _locale_t current_locale = _create_locale(LC_ALL, "");
 
-        if (pInput->get_dik_name(m_dik, buff, sizeof(buff))) {
+        if (pInput->get_dik_name(m_dik, buff, sizeof(buff)))
+        {
             if (_isalpha_l(buff[0], current_locale) || buff[0] == char(-1)) // "ÿ" = -1
             {
                 _strlwr_l(buff, current_locale);
@@ -104,16 +110,18 @@ void type_pair::on_key_press(line_edit_control* const control)
             }
         }
 
-        // setlocale( LC_ALL, "C" ); // restore to ANSI
+        //setlocale( LC_ALL, "C" ); // restore to ANSI
 
-        if (control->get_key_state(ks_Shift) != control->get_key_state(ks_CapsLock)) {
+        if (control->get_key_state(ks_Shift) != control->get_key_state(ks_CapsLock))
+        {
             c = c_shift;
         }
     }
     else
     {
         c = m_char;
-        if (control->get_key_state(ks_Shift) != control->get_key_state(ks_CapsLock)) {
+        if (control->get_key_state(ks_Shift) != control->get_key_state(ks_CapsLock))
+        {
             c = m_char_shift;
         }
     }
@@ -122,7 +130,8 @@ void type_pair::on_key_press(line_edit_control* const control)
 
 // -------------------------------------------------------------------------------------------------
 
-key_state_base::key_state_base(key_state state, base* type_pair) : m_type_pair(type_pair), m_state(state)
+key_state_base::key_state_base(key_state state, base* type_pair)
+    :m_type_pair(type_pair), m_state(state)
 {
 }
 
@@ -134,7 +143,8 @@ key_state_base::~key_state_base()
 void key_state_base::on_key_press(line_edit_control* const control)
 {
     control->set_key_state(m_state, true);
-    if (m_type_pair) m_type_pair->on_key_press(control);
+    if (m_type_pair)
+        m_type_pair->on_key_press(control);
 }
 
 } // namespace text_editor

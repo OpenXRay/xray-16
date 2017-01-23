@@ -5,65 +5,70 @@
 #include "alife_space.h"
 
 class CPhysicsShell;
-class CPHCallOnStepCondition : public CPHCondition
+class CPHCallOnStepCondition:
+	public CPHCondition
 {
-    u64 m_step;
-
+						u64					m_step																	;
 public:
-    CPHCallOnStepCondition();
-    virtual bool obsolete() const;
-    virtual bool is_true();
-    IC void set_step(u64 step) { m_step = step; }
-    void set_steps_interval(u64 steps);
-    void set_time_interval(u32 time);
-    void set_time_interval(float time);
-    void set_global_time(float time);
-    void set_global_time(u32 time);
+											CPHCallOnStepCondition		()											;
+	virtual				bool				obsolete					()					const					;
+	virtual				bool				is_true						()											;
+IC						void				set_step					(u64 step)									{m_step=step;}
+						void				set_steps_interval			(u64 steps)									;
+						void				set_time_interval			(u32 time)									;
+						void				set_time_interval			(float time)								;
+						void				set_global_time				(float time)								;
+						void				set_global_time				(u32 time)									;
 #ifdef DEBUG
-    u64 step() const { return m_step; }
+						u64					step						()const			{ return m_step; }
 #endif
-private:
-    IC bool time_out() const;
+private:				
+IC						bool				time_out					()				const						;
 };
 
-class CPHExpireOnStepCondition : public CPHCallOnStepCondition
+class CPHExpireOnStepCondition:
+	public CPHCallOnStepCondition
 {
+
 public:
-    virtual bool is_true() { return true; }
+									
+	virtual				bool				is_true						()											{return true;}
 };
 
-class CPHShellBasedAction : public CPHAction
+class CPHShellBasedAction:
+	public	CPHAction
 {
 protected:
-    CPhysicsShell* m_shell;
-
+				CPhysicsShell				*m_shell;
 public:
-    CPHShellBasedAction(CPhysicsShell* shell);
+											CPHShellBasedAction		(CPhysicsShell	*shell)							;
 
-    virtual bool compare(const CPhysicsShell* shl) const { return shl == m_shell; }
-    virtual bool obsolete() const;
+
+	virtual				bool				compare					(const	CPhysicsShell	* shl)			const	{return shl==m_shell;}
+	virtual				bool				obsolete				()										const	;
 };
 
-class CPHConstForceAction : public CPHShellBasedAction
+class CPHConstForceAction:
+	public CPHShellBasedAction
 {
-    Fvector m_force;
 
+						Fvector				m_force;
 public:
-    CPHConstForceAction(CPhysicsShell* shell, const Fvector& force);
-    virtual void run();
+											CPHConstForceAction		(CPhysicsShell	*shell,const Fvector &force)	;
+	virtual				void				run						()												;
 
-    virtual bool compare(const CPHReqComparerV* v) const { return v->compare(this); }
-    virtual bool compare(const CPhysicsShell* shl) const { return CPHShellBasedAction::compare(shl); }
-#ifdef DEBUG
-    const Fvector& force() const { return m_force; }
+	virtual				bool				compare					(const CPHReqComparerV	* v)		const		{return v->compare(this);}
+	virtual				bool				compare					(const	CPhysicsShell	* shl)		const		{return CPHShellBasedAction::compare(shl);}
+#ifdef	DEBUG
+		const			Fvector				&force					()const  { return	m_force;	}
 #endif
 };
 
-class CPHReqComparerHasShell : public CPHReqComparerV
+class CPHReqComparerHasShell	:
+	public CPHReqComparerV
 {
-    CPhysicsShell* m_shell;
-
+											CPhysicsShell			*m_shell																		;
 public:
-    CPHReqComparerHasShell(CPhysicsShell* shl);
-    virtual bool compare(const CPHConstForceAction* v) const { return v->compare(m_shell); }
+											CPHReqComparerHasShell	(CPhysicsShell		*shl)														;
+	virtual				bool				compare					(const	CPHConstForceAction* v)			const		{return v->compare(m_shell);}
 };

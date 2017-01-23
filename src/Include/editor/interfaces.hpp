@@ -9,13 +9,13 @@
 #ifndef EDITOR_INTERFACES_HPP_INCLUDED
 #define EDITOR_INTERFACES_HPP_INCLUDED
 
-namespace editor
-{
+namespace editor {
+
 class ide;
 class engine;
 
-typedef void(__cdecl* initialize_function_ptr)(ide*&, engine*);
-typedef void(__cdecl* finalize_function_ptr)(ide*&);
+typedef void (__cdecl *initialize_function_ptr)	(ide*&, engine*);
+typedef void (__cdecl *finalize_function_ptr)	(ide*&);
 
 } // namespace editor
 

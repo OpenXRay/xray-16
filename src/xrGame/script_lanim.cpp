@@ -14,32 +14,35 @@ using namespace luabind;
 
 struct lanim_wrapper
 {
-    CLAItem* item;
-
+	CLAItem* item;
 public:
-    lanim_wrapper(LPCSTR name) { load(name); }
-    void load(LPCSTR name)
-    {
-        item = LALib.FindItem(name);
-        R_ASSERT3(item, "Can't find color anim:", name);
-    }
-    u32 length()
-    {
-        VERIFY(item);
-        return item->Length_ms();
-    }
-    Fcolor calculate(float T)
-    {
-        int frame;
-        VERIFY(item);
-        return Fcolor().set(item->CalculateRGB(T, frame));
-    }
+			lanim_wrapper	(LPCSTR name){load(name);}
+	void	load			(LPCSTR name)
+	{
+		item				= LALib.FindItem(name);
+		R_ASSERT3			(item,"Can't find color anim:",name);
+	}
+	u32		length			()
+	{
+		VERIFY				(item);
+		return item->Length_ms();
+	}
+	Fcolor	calculate		(float T)
+	{
+		int frame;
+		VERIFY				(item);
+		return Fcolor().set(item->CalculateRGB(T,frame));
+	}
 };
 
-SCRIPT_EXPORT(lanim_wrapper, (), {
-    module(luaState)[class_<lanim_wrapper>("color_animator")
-                         .def(constructor<LPCSTR>())
-                         .def("load", &lanim_wrapper::load)
-                         .def("calculate", &lanim_wrapper::calculate)
-                         .def("length", &lanim_wrapper::length)];
+SCRIPT_EXPORT(lanim_wrapper, (),
+{
+	module(luaState)
+	[
+		class_<lanim_wrapper>("color_animator")
+		.def(					constructor<LPCSTR>())
+		.def("load",			&lanim_wrapper::load)
+		.def("calculate",		&lanim_wrapper::calculate)
+		.def("length",			&lanim_wrapper::length)
+	];
 });

@@ -2,22 +2,22 @@
 
 #include "ai/Monsters/state.h"
 
-template <typename _Object>
-class CStateMonsterRestIdle : public CState<_Object>
-{
-    typedef CState<_Object> inherited;
-    typedef CState<_Object>* state_ptr;
+template<typename _Object>
+class CStateMonsterRestIdle : public CState<_Object> {
+	typedef CState<_Object> inherited;
+	typedef CState<_Object> *state_ptr;
 
-    u32 m_target_node;
+	u32					m_target_node;
 
 public:
-    CStateMonsterRestIdle(_Object* obj);
-    virtual void initialize();
-    virtual void finalize();
-    virtual void critical_finalize();
-    virtual void remove_links(IGameObject* object) { inherited::remove_links(object); }
-    virtual void reselect_state();
-    virtual void setup_substates();
+						CStateMonsterRestIdle	(_Object *obj);
+	virtual void 		initialize				();
+	virtual void 		finalize				();
+	virtual void 		critical_finalize		();
+	virtual void		remove_links			(IGameObject* object) { inherited::remove_links(object);}
+
+	virtual	void		reselect_state			();
+	virtual	void		setup_substates			();
 };
 
 #include "monster_state_rest_idle_inline.h"

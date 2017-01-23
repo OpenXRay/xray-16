@@ -1,14 +1,14 @@
 /*
   Default header file for malloc-2.8.x, written by Doug Lea
   and released to the public domain, as explained at
-  http://creativecommons.org/licenses/publicdomain.
-
+  http://creativecommons.org/licenses/publicdomain. 
+ 
   last update: Mon Aug 15 08:55:52 2005  Doug Lea  (dl at gee)
 
   This header is for ANSI C/C++ only.  You can set any of
   the following #defines before including:
 
-  * If USE_DL_PREFIX is defined, it is assumed that malloc.c
+  * If USE_DL_PREFIX is defined, it is assumed that malloc.c 
     was also compiled with this option, so all routines
     have names starting with "dl".
 
@@ -29,29 +29,30 @@
 extern "C" {
 #endif
 
-#include <stddef.h> /* for size_t */
+#include <stddef.h>   /* for size_t */
 
 #if !ONLY_MSPACES
 
 #define USE_DL_PREFIX
 
 #ifndef USE_DL_PREFIX
-#define dlcalloc calloc
-#define dlfree free
-#define dlmalloc malloc
-#define dlmemalign memalign
-#define dlrealloc realloc
-#define dlvalloc valloc
-#define dlpvalloc pvalloc
-#define dlmallinfo mallinfo
-#define dlmallopt mallopt
-#define dlmalloc_trim malloc_trim
-#define dlmalloc_stats malloc_stats
-#define dlmalloc_usable_size malloc_usable_size
-#define dlmalloc_footprint malloc_footprint
-#define dlindependent_calloc independent_calloc
+#define dlcalloc               calloc
+#define dlfree                 free
+#define dlmalloc               malloc
+#define dlmemalign             memalign
+#define dlrealloc              realloc
+#define dlvalloc               valloc
+#define dlpvalloc              pvalloc
+#define dlmallinfo             mallinfo
+#define dlmallopt              mallopt
+#define dlmalloc_trim          malloc_trim
+#define dlmalloc_stats         malloc_stats
+#define dlmalloc_usable_size   malloc_usable_size
+#define dlmalloc_footprint     malloc_footprint
+#define dlindependent_calloc   independent_calloc
 #define dlindependent_comalloc independent_comalloc
 #endif /* USE_DL_PREFIX */
+
 
 /*
   malloc(size_t n)
@@ -76,7 +77,7 @@ void* dlmalloc(size_t);
   It has no effect if p is null. If p was not malloced or already
   freed, free(p) will by default cuase the current program to abort.
 */
-void dlfree(void*);
+void  dlfree(void*);
 
 /*
   calloc(size_t n_elements, size_t element_size);
@@ -149,9 +150,10 @@ void* dlvalloc(size_t);
 */
 int dlmallopt(int, int);
 
-#define M_TRIM_THRESHOLD (-1)
-#define M_GRANULARITY (-2)
-#define M_MMAP_THRESHOLD (-3)
+#define M_TRIM_THRESHOLD     (-1)
+#define M_GRANULARITY        (-2)
+#define M_MMAP_THRESHOLD     (-3)
+
 
 /*
   malloc_footprint();
@@ -187,29 +189,28 @@ size_t dlmalloc_footprint();
   be kept as longs, the reported values may wrap around zero and
   thus be inaccurate.
 */
-#if 1 // ndef HAVE_USR_INCLUDE_MALLOC_H
-#if 1 // ndef _MALLOC_H
+#if 1//ndef HAVE_USR_INCLUDE_MALLOC_H
+#if 1//ndef _MALLOC_H
 #ifndef MALLINFO_FIELD_TYPE
 #define MALLINFO_FIELD_TYPE size_t
 #endif /* MALLINFO_FIELD_TYPE */
-struct mallinfo
-{
-    MALLINFO_FIELD_TYPE arena;    /* non-mmapped space allocated from system */
-    MALLINFO_FIELD_TYPE ordblks;  /* number of free chunks */
-    MALLINFO_FIELD_TYPE smblks;   /* always 0 */
-    MALLINFO_FIELD_TYPE hblks;    /* always 0 */
-    MALLINFO_FIELD_TYPE hblkhd;   /* space in mmapped regions */
-    MALLINFO_FIELD_TYPE usmblks;  /* maximum total allocated space */
-    MALLINFO_FIELD_TYPE fsmblks;  /* always 0 */
-    MALLINFO_FIELD_TYPE uordblks; /* total allocated space */
-    MALLINFO_FIELD_TYPE fordblks; /* total free space */
-    MALLINFO_FIELD_TYPE keepcost; /* releasable (via malloc_trim) space */
+struct mallinfo {
+  MALLINFO_FIELD_TYPE arena;    /* non-mmapped space allocated from system */
+  MALLINFO_FIELD_TYPE ordblks;  /* number of free chunks */
+  MALLINFO_FIELD_TYPE smblks;   /* always 0 */
+  MALLINFO_FIELD_TYPE hblks;    /* always 0 */
+  MALLINFO_FIELD_TYPE hblkhd;   /* space in mmapped regions */
+  MALLINFO_FIELD_TYPE usmblks;  /* maximum total allocated space */
+  MALLINFO_FIELD_TYPE fsmblks;  /* always 0 */
+  MALLINFO_FIELD_TYPE uordblks; /* total allocated space */
+  MALLINFO_FIELD_TYPE fordblks; /* total free space */
+  MALLINFO_FIELD_TYPE keepcost; /* releasable (via malloc_trim) space */
 };
-#endif /* _MALLOC_H */
-#endif /* HAVE_USR_INCLUDE_MALLOC_H */
+#endif  /* _MALLOC_H */
+#endif  /* HAVE_USR_INCLUDE_MALLOC_H */
 
 struct mallinfo dlmallinfo(void);
-#endif /* NO_MALLINFO */
+#endif  /* NO_MALLINFO */
 
 /*
   independent_calloc(size_t n_elements, size_t element_size, void* chunks[]);
@@ -326,12 +327,13 @@ void** dlindependent_calloc(size_t, size_t, void**);
 */
 void** dlindependent_comalloc(size_t, size_t*, void**);
 
+
 /*
   pvalloc(size_t n);
   Equivalent to valloc(minimum-page-that-holds(n)), that is,
   round up n to nearest pagesize.
  */
-void* dlpvalloc(size_t);
+void*  dlpvalloc(size_t);
 
 /*
   malloc_trim(size_t pad);
@@ -354,7 +356,7 @@ void* dlpvalloc(size_t);
 
   Malloc_trim returns 1 if it actually released any memory, else 0.
 */
-int dlmalloc_trim(size_t);
+int  dlmalloc_trim(size_t);
 
 /*
   malloc_usable_size(void* p);
@@ -391,7 +393,7 @@ size_t dlmalloc_usable_size(void*);
   malloc_stats prints only the most commonly interesting statistics.
   More information can be obtained by calling mallinfo.
 */
-void dlmalloc_stats();
+void  dlmalloc_stats();
 
 #endif /* !ONLY_MSPACES */
 
@@ -478,19 +480,22 @@ void* mspace_memalign(mspace msp, size_t alignment, size_t bytes);
   mspace_independent_calloc behaves as independent_calloc, but
   operates within the given space.
 */
-void** mspace_independent_calloc(mspace msp, size_t n_elements, size_t elem_size, void* chunks[]);
+void** mspace_independent_calloc(mspace msp, size_t n_elements,
+                                 size_t elem_size, void* chunks[]);
 
 /*
   mspace_independent_comalloc behaves as independent_comalloc, but
   operates within the given space.
 */
-void** mspace_independent_comalloc(mspace msp, size_t n_elements, size_t sizes[], void* chunks[]);
+void** mspace_independent_comalloc(mspace msp, size_t n_elements,
+                                   size_t sizes[], void* chunks[]);
 
 /*
   mspace_footprint() returns the number of bytes obtained from the
   system for this space.
 */
 size_t mspace_footprint(mspace msp);
+
 
 #if !NO_MALLINFO
 /*
@@ -517,10 +522,10 @@ int mspace_trim(mspace msp, size_t pad);
 */
 int mspace_mallopt(int, int);
 
-#endif /* MSPACES */
+#endif  /* MSPACES */
 
 #ifdef __cplusplus
-}; /* end of extern "C" */
+};  /* end of extern "C" */
 #endif
 
 #endif /* MALLOC_280_H */

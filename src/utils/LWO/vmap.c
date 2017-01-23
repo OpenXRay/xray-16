@@ -11,6 +11,7 @@ Ernie Wright  17 Sep 00
 #include <stdlib.h>
 #include "lwo2.h"
 
+
 /*
 ======================================================================
 lwFreeVMap()
@@ -18,19 +19,20 @@ lwFreeVMap()
 Free memory used by an lwVMap.
 ====================================================================== */
 
-void lwFreeVMap(lwVMap* vmap)
+void lwFreeVMap( lwVMap *vmap )
 {
-    if (vmap) {
-        if (vmap->name) free(vmap->name);
-        if (vmap->vindex) free(vmap->vindex);
-        if (vmap->pindex) free(vmap->pindex);
-        if (vmap->val) {
-            if (vmap->val[0]) free(vmap->val[0]);
-            free(vmap->val);
-        }
-        free(vmap);
-    }
+   if ( vmap ) {
+      if ( vmap->name ) free( vmap->name );
+      if ( vmap->vindex ) free( vmap->vindex );
+      if ( vmap->pindex ) free( vmap->pindex );
+      if ( vmap->val ) {
+         if ( vmap->val[ 0 ] ) free( vmap->val[ 0 ] );
+         free( vmap->val );
+      }
+      free( vmap );
+   }
 }
+
 
 /*
 ======================================================================
@@ -39,85 +41,88 @@ lwGetVMap()
 Read an lwVMap from a VMAP or VMAD chunk in an LWO2.
 ====================================================================== */
 
-lwVMap* lwGetVMap(FILE* fp, int cksize, int ptoffset, int poloffset, int perpoly)
+lwVMap *lwGetVMap( FILE *fp, int cksize, int ptoffset, int poloffset,
+   int perpoly )
 {
-    unsigned char *buf, *bp;
-    lwVMap* vmap;
-    float* f;
-    int i, j, npts, rlen;
+   unsigned char *buf, *bp;
+   lwVMap *vmap;
+   float *f;
+   int i, j, npts, rlen;
 
-    /* read the whole chunk */
 
-    set_flen(0);
-    buf = getbytes(fp, cksize);
-    if (!buf) return NULL;
+   /* read the whole chunk */
 
-    vmap = calloc(1, sizeof(lwVMap));
-    if (!vmap) {
-        free(buf);
-        return NULL;
-    }
+   set_flen( 0 );
+   buf = getbytes( fp, cksize );
+   if ( !buf ) return NULL;
 
-    /* initialize the vmap */
+   vmap = calloc( 1, sizeof( lwVMap ));
+   if ( !vmap ) {
+      free( buf );
+      return NULL;
+   }
 
-    vmap->perpoly = perpoly;
+   /* initialize the vmap */
 
-    bp = buf;
-    set_flen(0);
-    vmap->type = sgetU4(&bp);
-    vmap->dim = sgetU2(&bp);
-    vmap->name = sgetS0(&bp);
-    rlen = get_flen();
+   vmap->perpoly = perpoly;
 
-    /* count the vmap records */
+   bp = buf;
+   set_flen( 0 );
+   vmap->type = sgetU4( &bp );
+   vmap->dim  = sgetU2( &bp );
+   vmap->name = sgetS0( &bp );
+   rlen = get_flen();
 
-    npts = 0;
-    while (bp < buf + cksize)
-    {
-        i = sgetVX(&bp);
-        if (perpoly) i = sgetVX(&bp);
-        bp += vmap->dim * sizeof(float);
-        ++npts;
-    }
+   /* count the vmap records */
 
-    /* allocate the vmap */
+   npts = 0;
+   while ( bp < buf + cksize ) {
+      i = sgetVX( &bp );
+      if ( perpoly )
+         i = sgetVX( &bp );
+      bp += vmap->dim * sizeof( float );
+      ++npts;
+   }
 
-    vmap->nverts = npts;
-    vmap->vindex = calloc(npts, sizeof(int));
-    if (!vmap->vindex) goto Fail;
-    if (perpoly) {
-        vmap->pindex = calloc(npts, sizeof(int));
-        if (!vmap->pindex) goto Fail;
-    }
+   /* allocate the vmap */
 
-    if (vmap->dim > 0) {
-        vmap->val = calloc(npts, sizeof(float*));
-        if (!vmap->val) goto Fail;
-        f = malloc(npts * vmap->dim * sizeof(float));
-        if (!f) goto Fail;
-        for (i = 0; i < npts; i++)
-            vmap->val[i] = f + i * vmap->dim;
-    }
+   vmap->nverts = npts;
+   vmap->vindex = calloc( npts, sizeof( int ));
+   if ( !vmap->vindex ) goto Fail;
+   if ( perpoly ) {
+      vmap->pindex = calloc( npts, sizeof( int ));
+      if ( !vmap->pindex ) goto Fail;
+   }
 
-    /* fill in the vmap values */
+   if ( vmap->dim > 0 ) {
+      vmap->val = calloc( npts, sizeof( float * ));
+      if ( !vmap->val ) goto Fail;
+      f = malloc( npts * vmap->dim * sizeof( float ));
+      if ( !f ) goto Fail;
+      for ( i = 0; i < npts; i++ )
+         vmap->val[ i ] = f + i * vmap->dim;
+   }
 
-    bp = buf + rlen;
-    for (i = 0; i < npts; i++)
-    {
-        vmap->vindex[i] = sgetVX(&bp);
-        if (perpoly) vmap->pindex[i] = sgetVX(&bp);
-        for (j = 0; j < vmap->dim; j++)
-            vmap->val[i][j] = sgetF4(&bp);
-    }
+   /* fill in the vmap values */
 
-    free(buf);
-    return vmap;
+   bp = buf + rlen;
+   for ( i = 0; i < npts; i++ ) {
+      vmap->vindex[ i ] = sgetVX( &bp );
+      if ( perpoly )
+         vmap->pindex[ i ] = sgetVX( &bp );
+      for ( j = 0; j < vmap->dim; j++ )
+         vmap->val[ i ][ j ] = sgetF4( &bp );
+   }
+
+   free( buf );
+   return vmap;
 
 Fail:
-    if (buf) free(buf);
-    lwFreeVMap(vmap);
-    return NULL;
+   if ( buf ) free( buf );
+   lwFreeVMap( vmap );
+   return NULL;
 }
+
 
 /*
 ======================================================================
@@ -126,53 +131,50 @@ lwGetPointVMaps()
 Fill in the lwVMapPt structure for each point.
 ====================================================================== */
 
-int lwGetPointVMaps(lwPointList* point, lwVMap* vmap)
+int lwGetPointVMaps( lwPointList *point, lwVMap *vmap )
 {
-    lwVMap* vm;
-    int i, j, n;
+   lwVMap *vm;
+   int i, j, n;
 
-    /* count the number of vmap values for each point */
+   /* count the number of vmap values for each point */
 
-    vm = vmap;
-    while (vm)
-    {
-        if (!vm->perpoly)
-            for (i = 0; i < vm->nverts; i++)
-                ++point->pt[vm->vindex[i]].nvmaps;
-        vm = vm->next;
-    }
+   vm = vmap;
+   while ( vm ) {
+      if ( !vm->perpoly )
+         for ( i = 0; i < vm->nverts; i++ )
+            ++point->pt[ vm->vindex[ i ]].nvmaps;
+      vm = vm->next;
+   }
 
-    /* allocate vmap references for each mapped point */
+   /* allocate vmap references for each mapped point */
 
-    for (i = 0; i < point->count; i++)
-    {
-        if (point->pt[i].nvmaps) {
-            point->pt[i].vm = calloc(point->pt[i].nvmaps, sizeof(lwVMapPt));
-            if (!point->pt[i].vm) return 0;
-            point->pt[i].nvmaps = 0;
-        }
-    }
+   for ( i = 0; i < point->count; i++ ) {
+      if ( point->pt[ i ].nvmaps ) {
+         point->pt[ i ].vm = calloc( point->pt[ i ].nvmaps, sizeof( lwVMapPt ));
+         if ( !point->pt[ i ].vm ) return 0;
+         point->pt[ i ].nvmaps = 0;
+      }
+   }
 
-    /* fill in vmap references for each mapped point */
+   /* fill in vmap references for each mapped point */
 
-    vm = vmap;
-    while (vm)
-    {
-        if (!vm->perpoly) {
-            for (i = 0; i < vm->nverts; i++)
-            {
-                j = vm->vindex[i];
-                n = point->pt[j].nvmaps;
-                point->pt[j].vm[n].vmap = vm;
-                point->pt[j].vm[n].index = i;
-                ++point->pt[j].nvmaps;
-            }
-        }
-        vm = vm->next;
-    }
+   vm = vmap;
+   while ( vm ) {
+      if ( !vm->perpoly ) {
+         for ( i = 0; i < vm->nverts; i++ ) {
+            j = vm->vindex[ i ];
+            n = point->pt[ j ].nvmaps;
+            point->pt[ j ].vm[ n ].vmap = vm;
+            point->pt[ j ].vm[ n ].index = i;
+            ++point->pt[ j ].nvmaps;
+         }
+      }
+      vm = vm->next;
+   }
 
-    return 1;
+   return 1;
 }
+
 
 /*
 ======================================================================
@@ -181,70 +183,62 @@ lwGetPolyVMaps()
 Fill in the lwVMapPt structure for each polygon vertex.
 ====================================================================== */
 
-int lwGetPolyVMaps(lwPolygonList* polygon, lwVMap* vmap)
+int lwGetPolyVMaps( lwPolygonList *polygon, lwVMap *vmap )
 {
-    lwVMap* vm;
-    lwPolVert* pv;
-    int i, j;
+   lwVMap *vm;
+   lwPolVert *pv;
+   int i, j;
 
-    /* count the number of vmap values for each polygon vertex */
+   /* count the number of vmap values for each polygon vertex */
 
-    vm = vmap;
-    while (vm)
-    {
-        if (vm->perpoly) {
-            for (i = 0; i < vm->nverts; i++)
-            {
-                for (j = 0; j < polygon->pol[vm->pindex[i]].nverts; j++)
-                {
-                    pv = &polygon->pol[vm->pindex[i]].v[j];
-                    if (vm->vindex[i] == pv->index) {
-                        ++pv->nvmaps;
-                        break;
-                    }
-                }
+   vm = vmap;
+   while ( vm ) {
+      if ( vm->perpoly ) {
+         for ( i = 0; i < vm->nverts; i++ ) {
+            for ( j = 0; j < polygon->pol[ vm->pindex[ i ]].nverts; j++ ) {
+               pv = &polygon->pol[ vm->pindex[ i ]].v[ j ];
+               if ( vm->vindex[ i ] == pv->index ) {
+                  ++pv->nvmaps;
+                  break;
+               }
             }
-        }
-        vm = vm->next;
-    }
+         }
+      }
+      vm = vm->next;
+   }
 
-    /* allocate vmap references for each mapped vertex */
+   /* allocate vmap references for each mapped vertex */
 
-    for (i = 0; i < polygon->count; i++)
-    {
-        for (j = 0; j < polygon->pol[i].nverts; j++)
-        {
-            pv = &polygon->pol[i].v[j];
-            if (pv->nvmaps) {
-                pv->vm = calloc(pv->nvmaps, sizeof(lwVMapPt));
-                if (!pv->vm) return 0;
-                pv->nvmaps = 0;
+   for ( i = 0; i < polygon->count; i++ ) {
+      for ( j = 0; j < polygon->pol[ i ].nverts; j++ ) {
+         pv = &polygon->pol[ i ].v[ j ];
+         if ( pv->nvmaps ) {
+            pv->vm = calloc( pv->nvmaps, sizeof( lwVMapPt ));
+            if ( !pv->vm ) return 0;
+            pv->nvmaps = 0;
+         }
+      }
+   }
+
+   /* fill in vmap references for each mapped point */
+
+   vm = vmap;
+   while ( vm ) {
+      if ( vm->perpoly ) {
+         for ( i = 0; i < vm->nverts; i++ ) {
+            for ( j = 0; j < polygon->pol[ vm->pindex[ i ]].nverts; j++ ) {
+               pv = &polygon->pol[ vm->pindex[ i ]].v[ j ];
+               if ( vm->vindex[ i ] == pv->index ) {
+                  pv->vm[ pv->nvmaps ].vmap = vm;
+                  pv->vm[ pv->nvmaps ].index = i;
+                  ++pv->nvmaps;
+                  break;
+               }
             }
-        }
-    }
+         }
+      }
+      vm = vm->next;
+   }
 
-    /* fill in vmap references for each mapped point */
-
-    vm = vmap;
-    while (vm)
-    {
-        if (vm->perpoly) {
-            for (i = 0; i < vm->nverts; i++)
-            {
-                for (j = 0; j < polygon->pol[vm->pindex[i]].nverts; j++)
-                {
-                    pv = &polygon->pol[vm->pindex[i]].v[j];
-                    if (vm->vindex[i] == pv->index) {
-                        pv->vm[pv->nvmaps].vmap = vm;
-                        pv->vm[pv->nvmaps].index = i;
-                        ++pv->nvmaps;
-                        break;
-                    }
-                }
-            }
-        }
-        vm = vm->next;
-    }
-
-    return 1;
+   return 1;
 }

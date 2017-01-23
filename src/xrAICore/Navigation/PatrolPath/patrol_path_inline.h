@@ -8,44 +8,45 @@
 
 #pragma once
 
-IC const CPatrolPath::CVertex* CPatrolPath::point(shared_str name) const
+IC	const CPatrolPath::CVertex *CPatrolPath::point	(shared_str name) const
 {
-    const_vertex_iterator I = vertices().begin();
-    const_vertex_iterator E = vertices().end();
-    for (; I != E; ++I)
-        if ((*I).second->data().name() == name) return ((*I).second);
-    return (0);
+	const_vertex_iterator		I = vertices().begin();
+	const_vertex_iterator		E = vertices().end();
+	for ( ; I != E; ++I)
+		if ((*I).second->data().name() == name)
+			return				((*I).second);
+	return						(0);
 }
 
 template <typename T>
-IC const CPatrolPath::CVertex* CPatrolPath::point(const Fvector& position, const T& evaluator) const
+IC	const CPatrolPath::CVertex *CPatrolPath::point	(const Fvector &position, const T &evaluator) const
 {
-    const CPatrolPath::CVertex* nearest = 0;
-    float best_distance = flt_max;
-    const_vertex_iterator I = vertices().begin();
-    const_vertex_iterator E = vertices().end();
-    for (; I != E; ++I)
-    {
-        if (!evaluator((*I).second->data().position())) continue;
-        float distance = (*I).second->data().position().distance_to_sqr(position);
-        if (distance < best_distance) {
-            best_distance = distance;
-            nearest = (*I).second;
-        }
-    }
-    return (nearest);
+	const CPatrolPath::CVertex	*nearest = 0;
+	float						best_distance = flt_max;
+	const_vertex_iterator		I = vertices().begin();
+	const_vertex_iterator		E = vertices().end();
+	for ( ; I != E; ++I) {
+		if (!evaluator((*I).second->data().position()))
+			continue;
+		float					distance = (*I).second->data().position().distance_to_sqr(position);
+		if (distance < best_distance) {
+			best_distance		= distance;
+			nearest				= (*I).second;
+		}
+	}
+	return						(nearest);
 }
 
-IC const CPatrolPath::CVertex* CPatrolPath::point(const Fvector& position) const
+IC	const CPatrolPath::CVertex *CPatrolPath::point	(const Fvector &position) const
 {
-    return (point(position, CAlwaysTrueEvaluator()));
+	return						(point(position,CAlwaysTrueEvaluator()));
 }
 
 #ifdef DEBUG
-IC void CPatrolPath::name(const shared_str& name)
+IC	void CPatrolPath::name							(const shared_str &name)
 {
-    VERIFY(!m_name.size());
-    VERIFY(name.size());
-    m_name = name;
+	VERIFY						(!m_name.size());
+	VERIFY						(name.size());
+	m_name						= name;
 }
 #endif

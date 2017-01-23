@@ -6,9 +6,9 @@
 //	Description : Script action condition class
 ////////////////////////////////////////////////////////////////////////////
 
-#include "script_action_condition.h"
 #include "stdafx.h"
+#include "script_action_condition.h"
 
-CScriptActionCondition::~CScriptActionCondition()
+CScriptActionCondition::~CScriptActionCondition	()
 {
 }

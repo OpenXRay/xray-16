@@ -4,7 +4,7 @@
 class XRCORE_API Event
 {
 private:
-    void* handle;
+    void *handle;
 
 public:
     Event();
@@ -16,8 +16,8 @@ public:
     void Set();
     // Wait indefinitely for the object to become signalled.
     void Wait() const;
-    // Wait, with a time limit, for the object to become signalled.
+    // Wait, with a time limit, for the object to become signalled. 
     bool Wait(u32 millisecondsTimeout) const;
 
-    void* GetHandle() const { return handle; }
+    void *GetHandle() const { return handle; }
 };

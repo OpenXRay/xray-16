@@ -8,74 +8,74 @@
 #ifndef SMART_COVER_H_INLINE_INCLUDED
 #define SMART_COVER_H_INLINE_INCLUDED
 
-#define cover smart_cover::cover
+#define cover			smart_cover::cover
 
-IC smart_cover::object const& cover::object() const
+IC	smart_cover::object const &cover::object		() const
 {
-    return (m_object);
+	return				(m_object);
 }
 
-IC cover::Loopholes const& cover::loopholes() const
+IC	cover::Loopholes const &cover::loopholes	() const
 {
-    return (m_loopholes);
+	return				( m_loopholes );
 }
 
-IC Fvector cover::fov_position(loophole const& loophole) const
+IC	Fvector cover::fov_position						(loophole const &loophole) const
 {
-    Fvector position;
-    m_object.XFORM().transform_tiny(position, loophole.fov_position());
-    return (position);
+	Fvector				position;
+	m_object.XFORM().transform_tiny(position, loophole.fov_position());
+	return				(position);
 }
 
-IC Fvector cover::fov_direction(loophole const& loophole) const
+IC	Fvector	cover::fov_direction					(loophole const &loophole) const
 {
-    Fvector direction;
-    m_object.XFORM().transform_dir(direction, loophole.fov_direction());
-    direction.normalize();
-    return (direction);
+	Fvector				direction;
+	m_object.XFORM().transform_dir	(direction, loophole.fov_direction());
+	direction.normalize	();
+	return				(direction);
 }
 
-IC Fvector cover::danger_fov_direction(loophole const& loophole) const
+IC	Fvector	cover::danger_fov_direction				(loophole const &loophole) const
 {
-    Fvector direction;
-    m_object.XFORM().transform_dir(direction, loophole.danger_fov_direction());
-    direction.normalize();
-    return (direction);
+	Fvector				direction;
+	m_object.XFORM().transform_dir	(direction, loophole.danger_fov_direction());
+	direction.normalize	();
+	return				(direction);
 }
 
-IC Fvector cover::enter_direction(loophole const& loophole) const
+IC	Fvector	cover::enter_direction					(loophole const &loophole) const
 {
-    Fvector direction;
-    m_object.XFORM().transform_dir(direction, loophole.enter_direction());
-    direction.normalize();
-    return (direction);
+	Fvector				direction;
+	m_object.XFORM().transform_dir	(direction, loophole.enter_direction());
+	direction.normalize	();
+	return				(direction);
 }
 
-IC Fvector cover::position(Fvector const& position) const
+IC	Fvector	cover::position							(Fvector const &position) const
 {
-    Fvector pos;
-    m_object.XFORM().transform_tiny(pos, position);
-    return (pos);
+	Fvector				pos;
+	m_object.XFORM().transform_tiny(pos, position);
+	return				(pos);
 }
 
-IC cover::DescriptionPtr const& cover::description() const
+IC	cover::DescriptionPtr const &cover::description	() const
 {
-    return (m_description);
+	return				(m_description);
 }
 
-IC shared_str const& cover::id() const
+IC	shared_str const &cover::id						() const
 {
-    return (m_id);
+	return	(m_id);
 }
 
-IC bool cover::is_combat_cover() const
+IC	bool cover::is_combat_cover						() const
 {
-    return (m_is_combat_cover);
+	return	(m_is_combat_cover);
 }
 
-IC bool cover::can_fire() const
+IC	bool cover::can_fire							() const
 {
-    return (m_is_combat_cover || m_can_fire);
+	return	(m_is_combat_cover || m_can_fire);
 }
 
 #undef cover

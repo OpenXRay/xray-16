@@ -1,6 +1,6 @@
 #pragma once
-#include "state.h"
 #include "state_manager.h"
+#include "state.h"
 
 // Lain: added
 #ifdef DEBUG
@@ -8,33 +8,31 @@
 #endif
 
 template <typename _Object>
-class CMonsterStateManager : public IStateManagerBase, public CState<_Object>
-{
-    typedef CState<_Object> inherited;
+class CMonsterStateManager : public IStateManagerBase, public CState<_Object> {
+	typedef CState<_Object> inherited;
 
 public:
-    CMonsterStateManager(_Object* obj) : inherited(obj) {}
-    virtual void reinit();
-    virtual void update();
-    virtual void force_script_state(EMonsterState state);
-    virtual void execute_script_state();
-    virtual void critical_finalize();
-    virtual void remove_links(IGameObject* object) = 0 { inherited::remove_links(object); }
-    virtual EMonsterState get_state_type();
+					CMonsterStateManager	(_Object *obj) : inherited(obj) {}
+	virtual void	reinit					();
+	virtual void	update					();
+	virtual void	force_script_state		(EMonsterState state);
+	virtual void	execute_script_state	();
+	virtual	void	critical_finalize		();
+	virtual	void	remove_links			(IGameObject* object) = 0 { inherited::remove_links(object); }
 
-    virtual bool check_control_start_conditions(ControlCom::EControlType type)
-    {
-        return inherited::check_control_start_conditions(type);
-    }
+	virtual	EMonsterState get_state_type	();
 
-// Lain: added
-#ifdef DEBUG
-    virtual void add_debug_info(debug::text_tree& root_s);
-#endif
+	virtual bool	check_control_start_conditions (ControlCom::EControlType type) 
+											{ return inherited::check_control_start_conditions(type); }
+
+	// Lain: added
+	#ifdef DEBUG
+	virtual void    add_debug_info          (debug::text_tree& root_s);
+	#endif
 
 protected:
-    bool can_eat();
-    bool check_state(u32 state_id);
+			bool	can_eat					();
+			bool	check_state				(u32 state_id);
 };
 
 #include "monster_state_manager_inline.h"

@@ -24,9 +24,10 @@
    <markus@oberhumer.com>
  */
 
+
 #include "config1y.h"
 
 #undef LZO_TEST_DECOMPRESS_OVERRUN
-#define DO_DECOMPRESS lzo1y_decompress
+#define DO_DECOMPRESS		lzo1y_decompress
 
 #include "lzo1x_d.ch"

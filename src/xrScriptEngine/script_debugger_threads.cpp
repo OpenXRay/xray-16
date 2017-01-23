@@ -1,26 +1,29 @@
-#include "script_debugger_threads.hpp"
-#include "Include/xrAPI/xrAPI.h"
 #include "pch.hpp"
-#include "script_debugger.hpp"
-#include "script_engine.hpp"
+#include "script_debugger_threads.hpp"
 #include "script_process.hpp"
+#include "script_engine.hpp"
 #include "script_thread.hpp"
+#include "script_debugger.hpp"
+#include "Include/xrAPI/xrAPI.h"
 
 u32 CDbgScriptThreads::Fill()
 {
     u32 res = 0;
-    if (!scriptEngine) return res;
+    if (!scriptEngine)
+        return res;
     CScriptProcess* sp = scriptEngine->script_process(ScriptProcessor::Game);
-    if (sp) res += FillFrom(sp);
+	if (sp)
+		res += FillFrom(sp);	
     sp = scriptEngine->script_process(ScriptProcessor::Level);
-    if (sp) res += FillFrom(sp);
-    return res;
+	if (sp)
+		res += FillFrom(sp);
+	return res;
 }
 
-u32 CDbgScriptThreads::FillFrom(CScriptProcess* sp)
+u32 CDbgScriptThreads::FillFrom(CScriptProcess *sp)
 {
     m_threads.clear();
-    for (auto& scriptThread : sp->scripts())
+    for (auto &scriptThread : sp->scripts())
     {
         SScriptThread th;
         // th.pScript = scriptThread;
@@ -34,20 +37,21 @@ u32 CDbgScriptThreads::FillFrom(CScriptProcess* sp)
     return m_threads.size();
 }
 
-lua_State* CDbgScriptThreads::FindScript(int nThreadID)
+lua_State *CDbgScriptThreads::FindScript(int nThreadID)
 {
-    for (auto& thread : m_threads)
+    for (auto &thread : m_threads)
     {
-        if (thread.scriptID == nThreadID) return thread.lua;
+        if (thread.scriptID==nThreadID)
+            return thread.lua;
     }
     return nullptr;
 }
 
 void CDbgScriptThreads::DrawThreads()
 {
-    // CScriptDebugger::GetDebugger()->ClearThreads();
+    //CScriptDebugger::GetDebugger()->ClearThreads();
     m_debugger->ClearThreads();
-    for (auto& scripThread : m_threads)
+    for (auto &scripThread : m_threads)
     {
         SScriptThread th;
         th = scripThread;

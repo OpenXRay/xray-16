@@ -21,9 +21,8 @@ class CScriptEngine;
 class CPatrolPathStorage;
 class moving_objects;
 
-namespace doors
-{
-class manager;
+namespace doors {
+    class manager;
 } // namespace doors
 
 class CAI_Space : public AISpaceBase
@@ -36,37 +35,37 @@ private:
     friend class CLevel;
 
 private:
-    CEF_Storage* m_ef_storage;
-    CALifeSimulator* m_alife_simulator;
-    CCoverManager* m_cover_manager;
-    moving_objects* m_moving_objects;
-    doors::manager* m_doors_manager;
+    CEF_Storage                         *m_ef_storage;
+    CALifeSimulator                     *m_alife_simulator;
+    CCoverManager                       *m_cover_manager;
+    moving_objects                      *m_moving_objects;
+    doors::manager                      *m_doors_manager;
 
 private:
-    void load(LPCSTR level_name);
-    void unload(bool reload = false);
-    void set_alife(CALifeSimulator* alife_simulator);
-    void LoadCommonScripts();
-    void RegisterScriptClasses();
+            void                        load                    (LPCSTR level_name);
+            void                        unload                  (bool reload = false);
+            void                        set_alife               (CALifeSimulator *alife_simulator);
+            void LoadCommonScripts();
+            void RegisterScriptClasses();
 
 public:
-    CAI_Space();
-    virtual ~CAI_Space();
-    void init();
-    void SetupScriptEngine();
-    IC CEF_Storage& ef_storage() const;
-
-    IC const CALifeSimulator& alife() const;
-    IC const CALifeSimulator* get_alife() const;
-    IC const CCoverManager& cover_manager() const;
+                                        CAI_Space               ();
+    virtual                             ~CAI_Space              ();
+            void                        init                    ();
+            void SetupScriptEngine();
+    IC      CEF_Storage                 &ef_storage             () const;
+    
+    IC      const CALifeSimulator       &alife                  () const;
+    IC      const CALifeSimulator       *get_alife              () const;
+    IC      const CCoverManager         &cover_manager          () const;
     // XXX: [ai] delete
-    IC CScriptEngine& script_engine() const;
-    IC moving_objects& moving_objects() const;
-    IC doors::manager& doors() const;
+    IC      CScriptEngine               &script_engine          () const;
+    IC      moving_objects              &moving_objects         () const;
+    IC      doors::manager&             doors                   () const;
 };
 
-IC CAI_Space& ai();
+IC  CAI_Space   &ai ();
 
-extern CAI_Space* g_ai_space;
+extern CAI_Space *g_ai_space;
 
 #include "ai_space_inline.h"

@@ -8,19 +8,17 @@
 
 #pragma once
 
-IC CAgentManagerPropertyEvaluatorItem::CAgentManagerPropertyEvaluatorItem(CAgentManager* object, LPCSTR evaluator_name)
-    : inherited(object, evaluator_name)
+IC	CAgentManagerPropertyEvaluatorItem::CAgentManagerPropertyEvaluatorItem		(CAgentManager *object, LPCSTR evaluator_name) :
+	inherited(object,evaluator_name)
 {
 }
 
-IC CAgentManagerPropertyEvaluatorEnemy::CAgentManagerPropertyEvaluatorEnemy(
-    CAgentManager* object, LPCSTR evaluator_name)
-    : inherited(object, evaluator_name)
+IC	CAgentManagerPropertyEvaluatorEnemy::CAgentManagerPropertyEvaluatorEnemy	(CAgentManager *object, LPCSTR evaluator_name) :
+	inherited(object,evaluator_name)
 {
 }
 
-IC CAgentManagerPropertyEvaluatorDanger::CAgentManagerPropertyEvaluatorDanger(
-    CAgentManager* object, LPCSTR evaluator_name)
-    : inherited(object, evaluator_name)
+IC	CAgentManagerPropertyEvaluatorDanger::CAgentManagerPropertyEvaluatorDanger	(CAgentManager *object, LPCSTR evaluator_name) :
+	inherited(object,evaluator_name)
 {
 }

@@ -13,10 +13,10 @@ void MEMPOOL::block_create()
     // Partition
     for (u32 it = 0; it < (s_count - 1); it++)
     {
-        u8* E = list + it * s_element;
+        u8* E = list + it*s_element;
         *access(E) = E + s_element;
     }
-    *access(list + (s_count - 1) * s_element) = NULL;
+    *access(list + (s_count - 1)*s_element) = NULL;
     block_count++;
 }
 

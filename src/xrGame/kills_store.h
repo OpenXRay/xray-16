@@ -1,44 +1,48 @@
 #ifndef KILLS_STORE_INCLUDED
 #define KILLS_STORE_INCLUDED
 
-#include "game_base_kill_type.h"
 #include "obsolete_queue.h"
+#include "game_base_kill_type.h"
 #include "xrCore/Containers/AssociativeVector.hpp"
 
 namespace award_system
 {
+
 class kills_store
 {
 public:
-    kills_store();
-    ~kills_store();
+				kills_store		();
+				~kills_store	();
+	
+	void		clear			();
 
-    void clear();
+	struct kill
+	{
+		u32					m_kill_time;
+		u16					m_weapon_id;
+		KILL_TYPE			m_kill_type;
+		SPECIAL_KILL_TYPE	m_spec_kill_type;
+	}; //struct kill
 
-    struct kill
-    {
-        u32 m_kill_time;
-        u16 m_weapon_id;
-        KILL_TYPE m_kill_type;
-        SPECIAL_KILL_TYPE m_spec_kill_type;
-    }; // struct kill
+	static unsigned int const max_kills_count = 10;
+	typedef obsolete_queue<buffer_vector<kill>, max_kills_count>				kills_t;
+	//key: (initiator, victim)
+	typedef AssociativeVector<std::pair<shared_str, shared_str>, kills_t*>		kills_map_t;
 
-    static unsigned int const max_kills_count = 10;
-    typedef obsolete_queue<buffer_vector<kill>, max_kills_count> kills_t;
-    // key: (initiator, victim)
-    typedef AssociativeVector<std::pair<shared_str, shared_str>, kills_t*> kills_map_t;
+	void		add_kill		(shared_str const & killer,
+								 shared_str const & victim,
+								 u16 weapon_id,
+								 KILL_TYPE const kill_type,
+								 SPECIAL_KILL_TYPE const spec_kill_type);
 
-    void add_kill(shared_str const& killer, shared_str const& victim, u16 weapon_id, KILL_TYPE const kill_type,
-        SPECIAL_KILL_TYPE const spec_kill_type);
-
-    template <typename Predicate>
-    u32 const fetch_kills(Predicate& predicate, buffer_vector<kill>& dest_kills);
-
+	template<typename Predicate>
+	u32	 const fetch_kills		(Predicate & predicate,
+								 buffer_vector<kill> & dest_kills);
 private:
-    kills_map_t m_kills;
-}; // class kills_store
+	kills_map_t				m_kills;
+};//class kills_store
 
-} // namespace award_system
+}//namespace award_system
 
 #include "kills_store_inline.h"
 

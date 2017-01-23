@@ -9,7 +9,6 @@
 class ENGINE_API CStatGraph : public pureRender
 {
     friend class dxStatGraphRender;
-
 public:
     enum EStyle
     {
@@ -20,7 +19,6 @@ public:
         stVert,
         stHor,
     };
-
 protected:
     struct SElement
     {
@@ -37,8 +35,14 @@ protected:
     {
         EStyle style;
         ElementsDeq elements;
-        SSubGraph(EStyle s) { style = s; };
-        void SetStyle(EStyle s) { style = s; };
+        SSubGraph(EStyle s)
+        {
+            style = s;
+        };
+        void SetStyle(EStyle s)
+        {
+            style = s;
+        };
     };
     DEFINE_VECTOR(SSubGraph, SubGraphVec, SubGraphVecIt);
     SubGraphVec subgraphs;
@@ -53,8 +57,9 @@ protected:
     u32 rect_color;
     u32 back_color;
     FactoryPtr<IStatGraphRender> m_pRender;
-    // ref_geom hGeomTri;
-    // ref_geom hGeomLine;
+    //ref_geom hGeomTri;
+    //ref_geom hGeomLine;
+
 
     struct SMarker
     {
@@ -109,8 +114,7 @@ public:
         max_item_count = item_count;
         for (SubGraphVecIt it = subgraphs.begin(); it != subgraphs.end(); it++)
         {
-            while (it->elements.size() > max_item_count)
-                it->elements.pop_front();
+            while (it->elements.size() > max_item_count) it->elements.pop_front();
         };
     }
     IC void AppendItem(float d, u32 clr, u32 SubGraphID = 0)
@@ -121,8 +125,7 @@ public:
 
         SubGraphVecIt it = subgraphs.begin() + SubGraphID;
         it->elements.push_back(SElement(d, clr));
-        while (it->elements.size() > max_item_count)
-            it->elements.pop_front();
+        while (it->elements.size() > max_item_count) it->elements.pop_front();
     };
     IC u32 AppendSubGraph(EStyle S)
     {
@@ -152,7 +155,11 @@ public:
         SMarker& pMarker = m_Markers[ID];
         pMarker.m_fPos = NewPos;
     };
-    IC void ClearMarkers() { m_Markers.clear(); }
+    IC void ClearMarkers()
+    {
+        m_Markers.clear();
+    }
+
     IC void RemoveMarker(u32 ID)
     {
         if (ID >= m_Markers.size()) return;

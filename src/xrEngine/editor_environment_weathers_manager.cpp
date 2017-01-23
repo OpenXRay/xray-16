@@ -9,23 +9,22 @@
 #include "stdafx.h"
 
 #ifdef INGAME_EDITOR
-#include "Common/object_broker.h"
-#include "Include/editor/property_holder.hpp"
-#include "editor_environment_detail.hpp"
-#include "editor_environment_manager.hpp"
 #include "editor_environment_weathers_manager.hpp"
-#include "editor_environment_weathers_time.hpp"
-#include "editor_environment_weathers_weather.hpp"
+#include "editor_environment_detail.hpp"
 #include "ide.hpp"
+#include "Include/editor/property_holder.hpp"
+#include "Common/object_broker.h"
+#include "editor_environment_weathers_weather.hpp"
+#include "editor_environment_weathers_time.hpp"
 #include "property_collection.hpp"
+#include "editor_environment_manager.hpp"
 
 using editor::environment::weathers::manager;
 using editor::environment::weathers::weather;
 using editor::environment::detail::logical_string_predicate;
 
 template <>
-void property_collection<manager::weather_container_type, manager>::display_name(
-    u32 const& item_index, LPSTR const& buffer, u32 const& buffer_size)
+void property_collection<manager::weather_container_type, manager>::display_name(u32 const& item_index, LPSTR const& buffer, u32 const& buffer_size)
 {
     xr_strcpy(buffer, buffer_size, m_container[item_index]->id().c_str());
 }
@@ -38,7 +37,10 @@ editor::property_holder* property_collection<manager::weather_container_type, ma
     return (object->object());
 }
 
-manager::manager(editor::environment::manager* manager) : m_manager(*manager), m_collection(0), m_changed(true)
+manager::manager(editor::environment::manager* manager) :
+    m_manager(*manager),
+    m_collection(0),
+    m_changed(true)
 {
     m_collection = new collection_type(&m_weathers, this, &m_changed);
 }
@@ -63,15 +65,20 @@ void manager::load()
     for (; i != e; ++i)
     {
         u32 length = xr_strlen(*i);
-        if (length <= 4) continue;
+        if (length <= 4)
+            continue;
 
-        if ((*i)[length - 4] != '.') continue;
+        if ((*i)[length - 4] != '.')
+            continue;
 
-        if ((*i)[length - 3] != 'l') continue;
+        if ((*i)[length - 3] != 'l')
+            continue;
 
-        if ((*i)[length - 2] != 't') continue;
+        if ((*i)[length - 2] != 't')
+            continue;
 
-        if ((*i)[length - 1] != 'x') continue;
+        if ((*i)[length - 1] != 'x')
+            continue;
 
         id = *i;
         id[length - 4] = 0;
@@ -106,8 +113,15 @@ struct predicate
 {
     shared_str value;
 
-    inline predicate(LPCSTR const& value_) : value(value_) {}
-    inline bool operator()(weather const* weather) const { return (value._get() == weather->id()._get()); }
+    inline predicate(LPCSTR const& value_) :
+        value(value_)
+    {
+    }
+
+    inline bool operator() (weather const* weather) const
+    {
+        return (value._get() == weather->id()._get());
+    }
 }; // struct predicate
 
 LPCSTR const* manager::frames_getter(LPCSTR weather_id) const
@@ -115,9 +129,14 @@ LPCSTR const* manager::frames_getter(LPCSTR weather_id) const
     delete_data(m_times_ids);
 
     weather_container_type::const_iterator found =
-        std::find_if(m_weathers.begin(), m_weathers.end(), predicate(weather_id));
+        std::find_if(
+            m_weathers.begin(),
+            m_weathers.end(),
+            predicate(weather_id)
+        );
 
-    if (found == m_weathers.end()) return (0);
+    if (found == m_weathers.end())
+        return (0);
 
     typedef weather::container_type container_type;
     container_type const& times = (*found)->times();
@@ -135,19 +154,28 @@ LPCSTR const* manager::frames_getter(LPCSTR weather_id) const
 u32 manager::frames_size_getter(LPCSTR weather_id) const
 {
     weather_container_type::const_iterator found =
-        std::find_if(m_weathers.begin(), m_weathers.end(), predicate(weather_id));
+        std::find_if(
+            m_weathers.begin(),
+            m_weathers.end(),
+            predicate(weather_id)
+        );
 
-    if (found == m_weathers.end()) return (0);
+    if (found == m_weathers.end())
+        return (0);
 
-#pragma todo(                                                                                                          \
-    "Dima to Dima: dangerous scheme: it depends on the call sequence (frames_getter should be called berfore frames_size_getter to get correct results)")
+#pragma todo("Dima to Dima: dangerous scheme: it depends on the call sequence (frames_getter should be called berfore frames_size_getter to get correct results)")
     return (m_times_ids.size());
 }
 
 void manager::fill(property_holder_type* holder)
 {
     VERIFY(holder);
-    holder->add_property("weathers", "weathers", "this option is resposible for weathers", m_collection);
+    holder->add_property(
+        "weathers",
+        "weathers",
+        "this option is resposible for weathers",
+        m_collection
+    );
 
     typedef ::editor::ide::weathers_getter_type weathers_getter_type;
     weathers_getter_type weathers_getter;
@@ -165,12 +193,18 @@ void manager::fill(property_holder_type* holder)
     frames_size_getter_type frames_size_getter;
     frames_size_getter.bind(this, &manager::frames_size_getter);
 
-    ::ide().weather_editor_setup(weathers_getter, weathers_size_getter, frames_getter, frames_size_getter);
+    ::ide().weather_editor_setup(
+        weathers_getter,
+        weathers_size_getter,
+        frames_getter,
+        frames_size_getter
+    );
 }
 
 manager::weather_ids_type const& manager::weather_ids() const
 {
-    if (!m_changed) return (m_weather_ids);
+    if (!m_changed)
+        return (m_weather_ids);
 
     m_changed = false;
 
@@ -191,7 +225,8 @@ manager::weather_ids_type const& manager::weather_ids() const
 
 shared_str manager::unique_id(shared_str const& id) const
 {
-    if (m_collection->unique_id(id.c_str())) return (id);
+    if (m_collection->unique_id(id.c_str()))
+        return (id);
 
     return (m_collection->generate_unique_id(id.c_str()));
 }
@@ -206,7 +241,8 @@ bool manager::save_current_blend(char* buffer, u32 const& buffer_size)
 
     CMemoryWriter writer;
     temp.save_as(writer);
-    if (writer.size() > buffer_size) return (false);
+    if (writer.size() > buffer_size)
+        return (false);
 
     writer.w_u8(0);
     writer.seek(0);
@@ -216,13 +252,15 @@ bool manager::save_current_blend(char* buffer, u32 const& buffer_size)
 
 bool manager::paste_current_time_frame(char const* buffer, u32 const& buffer_size)
 {
-    if (!m_manager.Current[0]) return (false);
+    if (!m_manager.Current[0])
+        return (false);
 
     weather_container_type::iterator i = m_weathers.begin();
     weather_container_type::iterator e = m_weathers.end();
     for (; i != e; ++i)
     {
-        if (m_manager.CurrentWeatherName._get() != (*i)->id()._get()) continue;
+        if (m_manager.CurrentWeatherName._get() != (*i)->id()._get())
+            continue;
 
         return ((*i)->paste_time_frame(m_manager.Current[0]->m_identifier, buffer, buffer_size));
     }
@@ -232,13 +270,15 @@ bool manager::paste_current_time_frame(char const* buffer, u32 const& buffer_siz
 
 bool manager::paste_target_time_frame(char const* buffer, u32 const& buffer_size)
 {
-    if (!m_manager.Current[1]) return (false);
+    if (!m_manager.Current[1])
+        return (false);
 
     weather_container_type::iterator i = m_weathers.begin();
     weather_container_type::iterator e = m_weathers.end();
     for (; i != e; ++i)
     {
-        if (m_manager.CurrentWeatherName._get() != (*i)->id()._get()) continue;
+        if (m_manager.CurrentWeatherName._get() != (*i)->id()._get())
+            continue;
 
         return ((*i)->paste_time_frame(m_manager.Current[1]->m_identifier, buffer, buffer_size));
     }
@@ -252,7 +292,8 @@ bool manager::add_time_frame(char const* buffer, u32 const& buffer_size)
     weather_container_type::iterator e = m_weathers.end();
     for (; i != e; ++i)
     {
-        if (m_manager.CurrentWeatherName._get() != (*i)->id()._get()) continue;
+        if (m_manager.CurrentWeatherName._get() != (*i)->id()._get())
+            continue;
 
         return ((*i)->add_time_frame(buffer, buffer_size));
     }
@@ -262,13 +303,15 @@ bool manager::add_time_frame(char const* buffer, u32 const& buffer_size)
 
 void manager::reload_current_time_frame()
 {
-    if (!m_manager.Current[0]) return;
+    if (!m_manager.Current[0])
+        return;
 
     weather_container_type::iterator i = m_weathers.begin();
     weather_container_type::iterator e = m_weathers.end();
     for (; i != e; ++i)
     {
-        if (m_manager.CurrentWeatherName._get() != (*i)->id()._get()) continue;
+        if (m_manager.CurrentWeatherName._get() != (*i)->id()._get())
+            continue;
 
         (*i)->reload_time_frame(m_manager.Current[0]->m_identifier);
         return;
@@ -277,13 +320,15 @@ void manager::reload_current_time_frame()
 
 void manager::reload_target_time_frame()
 {
-    if (!m_manager.Current[1]) return;
+    if (!m_manager.Current[1])
+        return;
 
     weather_container_type::iterator i = m_weathers.begin();
     weather_container_type::iterator e = m_weathers.end();
     for (; i != e; ++i)
     {
-        if (m_manager.CurrentWeatherName._get() != (*i)->id()._get()) continue;
+        if (m_manager.CurrentWeatherName._get() != (*i)->id()._get())
+            continue;
 
         (*i)->reload_time_frame(m_manager.Current[1]->m_identifier);
         return;
@@ -296,7 +341,8 @@ void manager::reload_current_weather()
     weather_container_type::iterator e = m_weathers.end();
     for (; i != e; ++i)
     {
-        if (m_manager.CurrentWeatherName._get() != (*i)->id()._get()) continue;
+        if (m_manager.CurrentWeatherName._get() != (*i)->id()._get())
+            continue;
 
         (*i)->reload();
         return;

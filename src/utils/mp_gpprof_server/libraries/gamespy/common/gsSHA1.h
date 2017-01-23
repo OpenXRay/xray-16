@@ -29,9 +29,9 @@
  *
  */
 #ifndef _PS3
-// these common types are defined in sony libs
-typedef gsi_u32 uint32_t;
-typedef gsi_u8 uint8_t;
+	// these common types are defined in sony libs
+	typedef gsi_u32 uint32_t;
+	typedef gsi_u8  uint8_t;
 #endif
 
 typedef gsi_i16 int_least16_t;
@@ -41,9 +41,9 @@ typedef gsi_i16 int_least16_t;
 enum
 {
     shaSuccess = 0,
-    shaNull,         /* Null pointer parameter */
-    shaInputTooLong, /* input data too long */
-    shaStateError    /* called Input after Result */
+    shaNull,            /* Null pointer parameter */
+    shaInputTooLong,    /* input data too long */
+    shaStateError       /* called Input after Result */
 };
 #endif
 #define SHA1HashSize 20
@@ -54,17 +54,17 @@ enum
  */
 typedef struct SHA1Context
 {
-    uint32_t Intermediate_Hash[SHA1HashSize / 4]; /* Message Digest  */
+    uint32_t Intermediate_Hash[SHA1HashSize/4]; /* Message Digest  */
 
-    uint32_t Length_Low;  /* Message length in bits      */
-    uint32_t Length_High; /* Message length in bits      */
+    uint32_t Length_Low;            /* Message length in bits      */
+    uint32_t Length_High;           /* Message length in bits      */
 
-    /* Index into message block array   */
+                               /* Index into message block array   */
     int_least16_t Message_Block_Index;
-    uint8_t Message_Block[64]; /* 512-bit message blocks      */
+    uint8_t Message_Block[64];      /* 512-bit message blocks      */
 
-    int Computed;  /* Is the digest computed?         */
-    int Corrupted; /* Is the message digest corrupted? */
+    int Computed;               /* Is the digest computed?         */
+    int Corrupted;             /* Is the message digest corrupted? */
 } SHA1Context;
 
 /*
@@ -72,15 +72,22 @@ typedef struct SHA1Context
  */
 
 #if defined(__cplusplus)
-extern "C" {
+extern "C"
+{
 #endif
 
-int SHA1Reset(SHA1Context*);
-int SHA1Input(SHA1Context*, const uint8_t*, unsigned int);
-int SHA1Result(SHA1Context*, uint8_t Message_Digest[SHA1HashSize]);
+
+int SHA1Reset(  SHA1Context *);
+int SHA1Input(  SHA1Context *,
+                const uint8_t *,
+                unsigned int);
+int SHA1Result( SHA1Context *,
+                uint8_t Message_Digest[SHA1HashSize]);
+
 
 #if defined(__cplusplus)
 }
 #endif // extern "C"
+
 
 #endif

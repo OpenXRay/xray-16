@@ -21,7 +21,6 @@ class ENGINE_API IGame_ObjectPool
     typedef xr_vector<IGameObject*> ObjectVec;
     typedef ObjectVec::iterator ObjectVecIt;
     ObjectVec m_PrefetchObjects;
-
 public:
     void prefetch();
     void clear();

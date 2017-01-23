@@ -13,14 +13,15 @@ namespace inventory
 {
 namespace upgrade
 {
+
 IC const shared_str& Group::id() const
 {
-    return (m_id);
+	return	( m_id );
 }
 
 IC LPCSTR Group::id_str() const
 {
-    return (m_id.c_str());
+	return	( m_id.c_str() );
 }
 
 } // namespace upgrade

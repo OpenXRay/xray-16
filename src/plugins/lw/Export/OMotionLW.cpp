@@ -1,6 +1,6 @@
+#include "StdAfx.h"
 #include "OMotionLW.hpp"
 #include "Globals.hpp"
-#include "StdAfx.h"
 #include "Util.hpp"
 
 void OMotionLW::ParseObjectMotion(LWItemID object)
@@ -12,7 +12,8 @@ void OMotionLW::ParseObjectMotion(LWItemID object)
     while (chan)
     {
         EChannelType t = GetChannelType(chan);
-        if (t != ctUnsupported) {
+        if (t != ctUnsupported)
+        {
             CEnvelope* env = CreateEnvelope(chan);
             envs[t] = env;
         }

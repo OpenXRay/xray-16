@@ -16,12 +16,14 @@
 
 namespace editor
 {
+
 class property_holder;
 
 namespace environment
 {
 namespace sound_channels
 {
+
 class channel;
 
 class manager : private Noncopyable
@@ -43,7 +45,10 @@ public:
 
 private:
     typedef editor::property_holder property_holder_type;
-    typedef property_collection<channel_container_type, manager> collection_type;
+    typedef property_collection <
+    channel_container_type,
+    manager
+    > collection_type;
 
 private:
     channel_container_type m_channels;

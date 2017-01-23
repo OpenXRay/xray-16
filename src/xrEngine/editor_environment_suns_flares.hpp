@@ -16,6 +16,7 @@
 
 namespace editor
 {
+
 class property_holder;
 class property_holder_collection;
 
@@ -23,6 +24,7 @@ namespace environment
 {
 namespace suns
 {
+
 class manager;
 class flare;
 
@@ -34,7 +36,6 @@ public:
     void load(CInifile& config, shared_str const& section);
     void save(CInifile& config, shared_str const& section);
     void fill(manager const& manager, editor::property_holder* holder, editor::property_holder_collection* collection);
-
 private:
     typedef xr_vector<flare*> flares_type;
     typedef editor::property_holder_collection property_holder_collection;

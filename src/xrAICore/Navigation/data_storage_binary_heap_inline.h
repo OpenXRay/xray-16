@@ -13,17 +13,16 @@
 #define CBinaryHeap CDataStorageBinaryHeap::CDataStorage<TManagerDataStorage>
 
 TEMPLATE_SPECIALIZATION
-inline CBinaryHeap::CDataStorage(const u32 vertex_count) : Inherited(vertex_count)
+inline CBinaryHeap::CDataStorage(const u32 vertex_count) :
+    Inherited(vertex_count)
 {
     m_heap = xr_alloc<Vertex*>(vertex_count);
-    ZeroMemory(m_heap, vertex_count * sizeof(Vertex*));
+    ZeroMemory(m_heap, vertex_count*sizeof(Vertex*));
 }
 
 TEMPLATE_SPECIALIZATION
 CBinaryHeap::~CDataStorage()
-{
-    xr_free(m_heap);
-}
+{ xr_free(m_heap); }
 
 TEMPLATE_SPECIALIZATION
 inline void CBinaryHeap::init()
@@ -35,16 +34,17 @@ inline void CBinaryHeap::init()
 TEMPLATE_SPECIALIZATION
 inline bool CBinaryHeap::is_opened_empty() const
 {
-    VERIFY(m_heap_head <= m_heap_tail);
-    return m_heap_head == m_heap_tail;
+    VERIFY(m_heap_head<=m_heap_tail);
+    return m_heap_head==m_heap_tail;
 }
 
 TEMPLATE_SPECIALIZATION
-inline void CBinaryHeap::add_opened(Vertex& vertex)
+inline void CBinaryHeap::add_opened(Vertex &vertex)
 {
-    VERIFY(m_heap_head <= m_heap_tail);
+    VERIFY(m_heap_head<=m_heap_tail);
     Inherited::add_opened(vertex);
-    if (!*m_heap_head || (*m_heap_head)->f() < vertex.f()) {
+    if (!*m_heap_head || (*m_heap_head)->f() < vertex.f())
+    {
         *m_heap_tail = &vertex;
     }
     else
@@ -56,13 +56,13 @@ inline void CBinaryHeap::add_opened(Vertex& vertex)
 }
 
 TEMPLATE_SPECIALIZATION
-inline void CBinaryHeap::decrease_opened(Vertex& vertex, const Distance value)
+inline void CBinaryHeap::decrease_opened(Vertex &vertex, const Distance value)
 {
     VERIFY(!is_opened_empty());
-    Vertex** i = m_heap_head;
-    while (*i != &vertex)
+    Vertex **i = m_heap_head;
+    while (*i!=&vertex)
         i++;
-    std::push_heap(m_heap_head, i + 1, VertexPredicate());
+    std::push_heap(m_heap_head, i+1, VertexPredicate());
 }
 
 TEMPLATE_SPECIALIZATION
@@ -80,7 +80,7 @@ inline void CBinaryHeap::add_best_closed()
 }
 
 TEMPLATE_SPECIALIZATION
-inline typename CBinaryHeap::Vertex& CBinaryHeap::get_best() const
+inline typename CBinaryHeap::Vertex &CBinaryHeap::get_best() const
 {
     VERIFY(!is_opened_empty());
     return **m_heap_head;

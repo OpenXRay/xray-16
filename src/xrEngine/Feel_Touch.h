@@ -8,14 +8,12 @@ namespace Feel
 class ENGINE_API Touch : private pure_relcase
 {
     friend class pure_relcase;
-
 public:
     struct DenyTouch
     {
         IGameObject* O;
         DWORD Expire;
     };
-
 protected:
     xr_vector<DenyTouch> feel_touch_disable;
 
@@ -33,7 +31,7 @@ public:
     virtual bool feel_touch_contact(IGameObject* O);
     virtual void feel_touch_update(Fvector& P, float R);
     virtual void feel_touch_deny(IGameObject* O, DWORD T);
-    virtual void feel_touch_new(IGameObject* O){};
-    virtual void feel_touch_delete(IGameObject* O){};
+    virtual void feel_touch_new(IGameObject* O) { };
+    virtual void feel_touch_delete(IGameObject* O) { };
 };
 };

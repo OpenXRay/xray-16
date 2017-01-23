@@ -24,17 +24,20 @@
    <markus@oberhumer.com>
  */
 
+
+
 #if defined(LZO_TEST_DECOMPRESS_OVERRUN)
-#if !defined(LZO_TEST_DECOMPRESS_OVERRUN_INPUT)
-#define LZO_TEST_DECOMPRESS_OVERRUN_INPUT 2
+#  if !defined(LZO_TEST_DECOMPRESS_OVERRUN_INPUT)
+#    define LZO_TEST_DECOMPRESS_OVERRUN_INPUT		2
+#  endif
+#  if !defined(LZO_TEST_DECOMPRESS_OVERRUN_OUTPUT)
+#    define LZO_TEST_DECOMPRESS_OVERRUN_OUTPUT		2
+#  endif
+#  if !defined(LZO_TEST_DECOMPRESS_OVERRUN_LOOKBEHIND)
+#    define LZO_TEST_DECOMPRESS_OVERRUN_LOOKBEHIND
+#  endif
 #endif
-#if !defined(LZO_TEST_DECOMPRESS_OVERRUN_OUTPUT)
-#define LZO_TEST_DECOMPRESS_OVERRUN_OUTPUT 2
-#endif
-#if !defined(LZO_TEST_DECOMPRESS_OVERRUN_LOOKBEHIND)
-#define LZO_TEST_DECOMPRESS_OVERRUN_LOOKBEHIND
-#endif
-#endif
+
 
 /***********************************************************************
 // Overrun detection is internally handled by these macros:
@@ -63,68 +66,74 @@
 #undef HAVE_ANY_IP
 #undef HAVE_ANY_OP
 
+
 #if defined(LZO_TEST_DECOMPRESS_OVERRUN_INPUT)
-#if (LZO_TEST_DECOMPRESS_OVERRUN_INPUT >= 1)
-#define TEST_IP (ip < ip_end)
-#endif
-#if (LZO_TEST_DECOMPRESS_OVERRUN_INPUT >= 2)
-#define NEED_IP(x)                                                                                                     \
-    if ((lzo_uint)(ip_end - ip) < (lzo_uint)(x)) goto input_overrun
-#endif
+#  if (LZO_TEST_DECOMPRESS_OVERRUN_INPUT >= 1)
+#    define TEST_IP				(ip < ip_end)
+#  endif
+#  if (LZO_TEST_DECOMPRESS_OVERRUN_INPUT >= 2)
+#    define NEED_IP(x) \
+			if ((lzo_uint)(ip_end - ip) < (lzo_uint)(x))  goto input_overrun
+#  endif
 #endif
 
 #if defined(LZO_TEST_DECOMPRESS_OVERRUN_OUTPUT)
-#if (LZO_TEST_DECOMPRESS_OVERRUN_OUTPUT >= 1)
-#define TEST_OP (op <= op_end)
-#endif
-#if (LZO_TEST_DECOMPRESS_OVERRUN_OUTPUT >= 2)
-#undef TEST_OP /* don't need both of the tests here */
-#define NEED_OP(x)                                                                                                     \
-    if ((lzo_uint)(op_end - op) < (lzo_uint)(x)) goto output_overrun
-#endif
+#  if (LZO_TEST_DECOMPRESS_OVERRUN_OUTPUT >= 1)
+#    define TEST_OP				(op <= op_end)
+#  endif
+#  if (LZO_TEST_DECOMPRESS_OVERRUN_OUTPUT >= 2)
+#    undef TEST_OP				/* don't need both of the tests here */
+#    define NEED_OP(x) \
+			if ((lzo_uint)(op_end - op) < (lzo_uint)(x))  goto output_overrun
+#  endif
 #endif
 
 #if defined(LZO_TEST_DECOMPRESS_OVERRUN_LOOKBEHIND)
-#define TEST_LOOKBEHIND(m_pos, out)                                                                                    \
-    if (m_pos < out) goto lookbehind_overrun
+#  define TEST_LOOKBEHIND(m_pos,out)	if (m_pos < out) goto lookbehind_overrun
 #else
-#define TEST_LOOKBEHIND(m_pos, op) ((void)0)
+#  define TEST_LOOKBEHIND(m_pos,op)		((void) 0)
 #endif
+
 
 #if !defined(LZO_EOF_CODE) && !defined(TEST_IP)
-/* if we have no EOF code, we have to test for the end of the input */
-#define TEST_IP (ip < ip_end)
+   /* if we have no EOF code, we have to test for the end of the input */
+#  define TEST_IP				(ip < ip_end)
 #endif
 
+
 #if defined(TEST_IP)
-#define HAVE_TEST_IP
+#  define HAVE_TEST_IP
 #else
-#define TEST_IP 1
+#  define TEST_IP				1
 #endif
 #if defined(TEST_OP)
-#define HAVE_TEST_OP
+#  define HAVE_TEST_OP
 #else
-#define TEST_OP 1
+#  define TEST_OP				1
 #endif
 
 #if defined(NEED_IP)
-#define HAVE_NEED_IP
+#  define HAVE_NEED_IP
 #else
-#define NEED_IP(x) ((void)0)
+#  define NEED_IP(x)			((void) 0)
 #endif
 #if defined(NEED_OP)
-#define HAVE_NEED_OP
+#  define HAVE_NEED_OP
 #else
-#define NEED_OP(x) ((void)0)
+#  define NEED_OP(x)			((void) 0)
 #endif
 
+
 #if defined(HAVE_TEST_IP) || defined(HAVE_NEED_IP)
-#define HAVE_ANY_IP
+#  define HAVE_ANY_IP
 #endif
 #if defined(HAVE_TEST_OP) || defined(HAVE_NEED_OP)
-#define HAVE_ANY_OP
+#  define HAVE_ANY_OP
 #endif
+
+
 
 /*
 vi:ts=4:et
 */
+

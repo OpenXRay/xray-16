@@ -9,11 +9,11 @@
 #ifdef __SPU__
 #define CELL_PPU_POINTER(x) CELL_PPU_PTR_TYPE
 #else // __SPU__
-#define CELL_PPU_POINTER(x) x*
+#define CELL_PPU_POINTER(x) x *
 
 // Hope we never switch away from 32 bits...
 // But this is here just in case...
-// NX_COMPILE_TIME_ASSERT(sizeof(void *)==sizeof(CELL_PPU_PTR_TYPE));
+//NX_COMPILE_TIME_ASSERT(sizeof(void *)==sizeof(CELL_PPU_PTR_TYPE));
 #endif // __SPU__
 #endif // CELL_PPU_POINTER
 

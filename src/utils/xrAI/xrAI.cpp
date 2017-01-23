@@ -1,180 +1,183 @@
 // xrAI.cpp : Defines the entry point for the application.
 //
 
-#include "xrAI.h"
-#include "process.h"
 #include "stdafx.h"
 #include "xrCore/xr_ini.h"
+#include "process.h"
+#include "xrAI.h"
 
+#include "xr_graph_merge.h"
 #include "game_spawn_constructor.h"
 #include "xrCrossTable.h"
-#include "xr_graph_merge.h"
 
-#include <mmsystem.h>
 #include "game_graph_builder.h"
+#include <mmsystem.h>
 #include "spawn_patcher.h"
 
-#pragma comment(linker, "/STACK:0x800000,0x400000")
+#pragma comment(linker,"/STACK:0x800000,0x400000")
 
-#pragma comment(lib, "comctl32.lib")
-#pragma comment(lib, "d3dx9.lib")
-#pragma comment(lib, "IMAGEHLP.LIB")
-#pragma comment(lib, "winmm.LIB")
-#pragma comment(lib, "xrcdb.LIB")
-#pragma comment(lib, "MagicFM.LIB")
-#pragma comment(lib, "xrCore.LIB")
+#pragma comment(lib,"comctl32.lib")
+#pragma comment(lib,"d3dx9.lib")
+#pragma comment(lib,"IMAGEHLP.LIB")
+#pragma comment(lib,"winmm.LIB")
+#pragma comment(lib,"xrcdb.LIB")
+#pragma comment(lib,"MagicFM.LIB")
+#pragma comment(lib,"xrCore.LIB")
 #pragma comment(lib, "xrLCUtil.lib")
 #pragma comment(lib, "xrAICore.lib")
 
 #include "utils/xrLCUtil/LevelCompilerLoggerWindow.hpp"
 #include "xrCore/cdecl_cast.hpp"
 
-LevelCompilerLoggerWindow& Logger = LevelCompilerLoggerWindow();
+LevelCompilerLoggerWindow &Logger = LevelCompilerLoggerWindow();
 
-CThread::LogFunc ProxyMsg = cdecl_cast([](const char* format, ...) {
-    va_list args;
-    va_start(args, format);
-    Logger.clMsgV(format, args);
-    va_end(args);
-});
+CThread::LogFunc ProxyMsg = cdecl_cast(
+    [](const char *format, ...)
+    {
+        va_list args;
+        va_start(args, format);
+        Logger.clMsgV(format, args);
+        va_end(args);    
+    }
+);
 
-CThreadManager::ReportStatusFunc ProxyStatus = cdecl_cast([](const char* format, ...) {
-    va_list args;
-    va_start(args, format);
-    Logger.StatusV(format, args);
-    va_end(args);
-});
+CThreadManager::ReportStatusFunc ProxyStatus = cdecl_cast(
+    [](const char *format, ...)
+    {
+        va_list args;
+        va_start(args, format);
+        Logger.StatusV(format, args);
+        va_end(args);    
+    }
+);
 
-CThreadManager::ReportProgressFunc ProxyProgress = cdecl_cast([](float progress) { Logger.Progress(progress); });
+CThreadManager::ReportProgressFunc ProxyProgress = cdecl_cast(
+    [](float progress)
+    { Logger.Progress(progress); }
+);
 
-extern void xrCompiler(LPCSTR name, bool draft_mode, bool pure_covers, LPCSTR out_name);
-extern void test_smooth_path(LPCSTR name);
-extern void test_hierarchy(LPCSTR name);
-extern void xrConvertMaps();
-extern void test_goap();
-extern void smart_cover(LPCSTR name);
-extern void verify_level_graph(LPCSTR name, bool verbose);
-extern void compare_graphs(LPCSTR level_name);
-extern void test_levels();
+extern void xrCompiler          (LPCSTR name, bool draft_mode, bool pure_covers, LPCSTR out_name);
+extern void test_smooth_path    (LPCSTR name);
+extern void test_hierarchy      (LPCSTR name);
+extern void xrConvertMaps       ();
+extern void test_goap           ();
+extern void smart_cover         (LPCSTR name);
+extern void verify_level_graph  (LPCSTR name, bool verbose);
+extern void compare_graphs      (LPCSTR level_name);
+extern void test_levels         ();
 
-static const char* h_str = "The following keys are supported / required:\n"
-                           "-? or -h   == this help\n"
-                           "-f<NAME>   == compile level in gamedata/levels/<NAME>/\n"
-                           "-o         == modify build options\n"
-                           "-s         == build game spawn data\n"
-                           "\n"
-                           "NOTE: The last key is required for any functionality\n";
+static const char* h_str = 
+    "The following keys are supported / required:\n"
+    "-? or -h   == this help\n"
+    "-f<NAME>   == compile level in gamedata/levels/<NAME>/\n"
+    "-o         == modify build options\n"
+    "-s         == build game spawn data\n"
+    "\n"
+    "NOTE: The last key is required for any functionality\n";
 
 void Help()
-{
-    MessageBox(0, h_str, "Command line options", MB_OK | MB_ICONINFORMATION);
-}
+{   MessageBox(0,h_str,"Command line options",MB_OK|MB_ICONINFORMATION); }
 
 string_path INI_FILE;
 
 extern LPCSTR GAME_CONFIG;
 
-extern void clear_temp_folder();
+extern void clear_temp_folder   ();
 
-void execute(LPSTR cmd)
+void execute    (LPSTR cmd)
 {
     // Load project
     string4096 name;
-    name[0] = 0;
-    if (strstr(cmd, "-f"))
-        sscanf(strstr(cmd, "-f") + 2, "%s", name);
-    else if (strstr(cmd, "-s"))
-        sscanf(strstr(cmd, "-s") + 2, "%s", name);
-    else if (strstr(cmd, "-t"))
-        sscanf(strstr(cmd, "-t") + 2, "%s", name);
-    else if (strstr(cmd, "-verify"))
-        sscanf(strstr(cmd, "-verify") + xr_strlen("-verify"), "%s", name);
+    name[0]=0; 
+    if (strstr(cmd,"-f"))
+        sscanf  (strstr(cmd,"-f")+2,"%s",name);
+    else
+        if (strstr(cmd,"-s"))
+            sscanf  (strstr(cmd,"-s")+2,"%s",name);
+        else
+            if (strstr(cmd,"-t"))
+                sscanf  (strstr(cmd,"-t")+2,"%s",name);
+            else
+                if (strstr(cmd,"-verify"))
+                    sscanf  (strstr(cmd,"-verify")+xr_strlen("-verify"),"%s",name);
 
-    if (xr_strlen(name)) xr_strcat(name, "\\");
+    if (xr_strlen(name))
+        xr_strcat           (name,"\\");
 
-    string_path prjName;
-    prjName[0] = 0;
-    bool can_use_name = false;
+    string_path         prjName;
+    prjName             [0] = 0;
+    bool                can_use_name = false;
     if (xr_strlen(name) < sizeof(string_path)) {
-        can_use_name = true;
-        FS.update_path(prjName, "$game_levels$", name);
+        can_use_name    = true;
+        FS.update_path  (prjName,"$game_levels$",name);
     }
 
-    FS.update_path(INI_FILE, "$game_config$", GAME_CONFIG);
-
-    if (strstr(cmd, "-f")) {
-        R_ASSERT3(can_use_name, "Too big level name", name);
-
-        char* output = strstr(cmd, "-out");
-        string256 temp0;
+    FS.update_path      (INI_FILE,"$game_config$",GAME_CONFIG);
+    
+    if (strstr(cmd,"-f")) {
+        R_ASSERT3       (can_use_name,"Too big level name",name);
+        
+        char            *output = strstr(cmd,"-out");
+        string256       temp0;
         if (output) {
-            output += xr_strlen("-out");
-            sscanf(output, "%s", temp0);
-            _TrimLeft(temp0);
-            output = temp0;
+            output      += xr_strlen("-out");
+            sscanf      (output,"%s",temp0);
+            _TrimLeft   (temp0);
+            output      = temp0;
         }
         else
-            output = (pstr)LEVEL_GRAPH_NAME;
+            output      = (pstr)LEVEL_GRAPH_NAME;
 
-        xrCompiler(prjName, !!strstr(cmd, "-draft"), !!strstr(cmd, "-pure_covers"), output);
+        xrCompiler      (prjName,!!strstr(cmd,"-draft"),!!strstr(cmd,"-pure_covers"),output);
     }
-    else
-    {
-        if (strstr(cmd, "-s")) {
-            if (xr_strlen(name)) name[xr_strlen(name) - 1] = 0;
-            char* output = strstr(cmd, "-out");
-            string256 temp0, temp1;
+    else {
+        if (strstr(cmd,"-s")) {
+            if (xr_strlen(name))
+                name[xr_strlen(name) - 1] = 0;
+            char                *output = strstr(cmd,"-out");
+            string256           temp0, temp1;
             if (output) {
-                output += xr_strlen("-out");
-                sscanf(output, "%s", temp0);
-                _TrimLeft(temp0);
-                output = temp0;
+                output          += xr_strlen("-out");
+                sscanf          (output,"%s",temp0);
+                _TrimLeft       (temp0);
+                output          = temp0;
             }
-            char* start = strstr(cmd, "-start");
+            char                *start = strstr(cmd,"-start");
             if (start) {
-                start += xr_strlen("-start");
-                sscanf(start, "%s", temp1);
-                _TrimLeft(temp1);
-                start = temp1;
+                start           += xr_strlen("-start");
+                sscanf          (start,"%s",temp1);
+                _TrimLeft       (temp1);
+                start           = temp1;
             }
-            char* no_separator_check = strstr(cmd, "-no_separator_check");
-            clear_temp_folder();
-            CGameSpawnConstructor(name, output, start, !!no_separator_check);
+            char                *no_separator_check = strstr(cmd,"-no_separator_check");
+            clear_temp_folder   ();
+            CGameSpawnConstructor(name,output,start,!!no_separator_check);
         }
-        else if (strstr(cmd, "-verify"))
-        {
-            R_ASSERT3(can_use_name, "Too big level name", name);
-            verify_level_graph(prjName, !strstr(cmd, "-noverbose"));
-        }
+        else
+            if (strstr(cmd,"-verify")) {
+                R_ASSERT3           (can_use_name,"Too big level name",name);
+                verify_level_graph  (prjName,!strstr(cmd,"-noverbose"));
+            }
     }
 }
 
-void Startup(LPSTR lpCmdLine)
+void Startup(LPSTR     lpCmdLine)
 {
     string4096 cmd;
-    BOOL bModifyOptions = FALSE;
+    BOOL bModifyOptions     = FALSE;
 
-    xr_strcpy(cmd, lpCmdLine);
+    xr_strcpy(cmd,lpCmdLine);
     strlwr(cmd);
-    if (strstr(cmd, "-?") || strstr(cmd, "-h")) {
-        Help();
-        return;
-    }
-    if ((strstr(cmd, "-f") == 0) && (strstr(cmd, "-g") == 0) && (strstr(cmd, "-m") == 0) && (strstr(cmd, "-s") == 0) &&
-        (strstr(cmd, "-t") == 0) && (strstr(cmd, "-c") == 0) && (strstr(cmd, "-verify") == 0) &&
-        (strstr(cmd, "-patch") == 0))
-    {
-        Help();
-        return;
-    }
-    if (strstr(cmd, "-o")) bModifyOptions = TRUE;
-    Logger.Initialize("xrAI");
-    u32 dwStartupTime = timeGetTime();
+    if (strstr(cmd,"-?") || strstr(cmd,"-h"))           { Help(); return; }
+    if ((strstr(cmd,"-f")==0) && (strstr(cmd,"-g")==0) && (strstr(cmd,"-m")==0) && (strstr(cmd,"-s")==0) && (strstr(cmd,"-t")==0) && (strstr(cmd,"-c")==0) && (strstr(cmd,"-verify")==0) && (strstr(cmd,"-patch")==0))  { Help(); return; }
+    if (strstr(cmd,"-o"))                               bModifyOptions = TRUE;
+    Logger.Initialize("xrAI");  
+    u32 dwStartupTime   = timeGetTime();
     execute(cmd);
     // Show statistic
     char stats[256];
     u32 dwEndTime = timeGetTime();
-    xr_sprintf(stats, "Time elapsed: %s", make_time((dwEndTime - dwStartupTime) / 1000).c_str());
+    xr_sprintf(stats,"Time elapsed: %s",make_time((dwEndTime-dwStartupTime)/1000).c_str());
     Logger.Success(stats);
     FlushLog();
     Logger.Destroy();
@@ -184,30 +187,31 @@ void Startup(LPSTR lpCmdLine)
 
 #include "xrGame/quadtree.h"
 
-Factory_Create* create_entity = 0;
-Factory_Destroy* destroy_entity = 0;
+Factory_Create  *create_entity  = 0;
+Factory_Destroy *destroy_entity = 0;
 
-int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
+int APIENTRY WinMain(HINSTANCE hInstance,
+                     HINSTANCE hPrevInstance,
+                     LPSTR     lpCmdLine,
+                     int       nCmdShow)
 {
-    xrDebug::Initialize(false);
-    Core._initialize("xrai", 0);
-    HMODULE hFactory;
-    LPCSTR g_name = "xrSE_Factory";
-    Log("Loading DLL:", g_name);
-    hFactory = LoadLibrary(g_name);
-    if (0 == hFactory) R_CHK(GetLastError());
-    R_ASSERT2(hFactory, "Factory DLL raised exception during loading or there is no factory DLL at all");
+    xrDebug::Initialize       (false);
+    Core._initialize        ("xrai",0);
+    HMODULE                 hFactory;
+    LPCSTR                  g_name  = "xrSE_Factory";
+    Log                     ("Loading DLL:",g_name);
+    hFactory                = LoadLibrary   (g_name);
+    if (0==hFactory)        R_CHK           (GetLastError());
+    R_ASSERT2               (hFactory,"Factory DLL raised exception during loading or there is no factory DLL at all");
 
-    create_entity = (Factory_Create*)GetProcAddress(hFactory, "_create_entity@4");
-    R_ASSERT(create_entity);
-    destroy_entity = (Factory_Destroy*)GetProcAddress(hFactory, "_destroy_entity@4");
-    R_ASSERT(destroy_entity);
+    create_entity           = (Factory_Create*)     GetProcAddress(hFactory,"_create_entity@4");    R_ASSERT(create_entity);
+    destroy_entity          = (Factory_Destroy*)    GetProcAddress(hFactory,"_destroy_entity@4");   R_ASSERT(destroy_entity);
 
-    Startup(lpCmdLine);
+    Startup                 (lpCmdLine);
 
-    FreeLibrary(hFactory);
+    FreeLibrary             (hFactory);
 
-    Core._destroy();
+    Core._destroy           ();
 
-    return (0);
+    return                  (0);
 }

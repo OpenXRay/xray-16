@@ -29,9 +29,9 @@ public:
             Total = 0;
         }
 
-        IC void FrameEnd() { Update.FrameEnd(); }
+        IC void FrameEnd()
+        { Update.FrameEnd(); }
     };
-
 private:
     IGameObject* map_NETID[0xffff];
     typedef xr_vector<IGameObject*> Objects;
@@ -49,8 +49,8 @@ public:
     {
         int* m_ID;
         RELCASE_CALLBACK m_Callback;
-        SRelcasePair(int* id, RELCASE_CALLBACK cb) : m_ID(id), m_Callback(cb) {}
-        bool operator==(RELCASE_CALLBACK cb) { return m_Callback == cb; }
+        SRelcasePair(int* id, RELCASE_CALLBACK cb) :m_ID(id), m_Callback(cb) {}
+        bool operator== (RELCASE_CALLBACK cb) { return m_Callback == cb; }
     };
     typedef xr_vector<SRelcasePair> RELCASE_CALLBACK_VEC;
     RELCASE_CALLBACK_VEC m_relcase_callbacks;
@@ -59,12 +59,12 @@ public:
     void relcase_unregister(int*);
 
 public:
-    const ObjectUpdateStatistics& GetStats()
+    const ObjectUpdateStatistics &GetStats()
     {
         stats.FrameEnd();
         return stats;
     }
-    void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert);
+    void DumpStatistics(class IGameFont &font, class IPerformanceAlert *alert);
     // methods
     CObjectList();
     ~CObjectList();
@@ -78,10 +78,8 @@ public:
 
     IGameObject* Create(LPCSTR name);
     void Destroy(IGameObject* O);
-
 private:
     void SingleUpdate(IGameObject* O);
-
 public:
     void Update(bool bForce);
 
@@ -93,7 +91,8 @@ public:
 
     ICF IGameObject* net_Find(u16 ID) const
     {
-        if (ID == u16(-1)) return (0);
+        if (ID == u16(-1))
+            return (0);
 
         return (map_NETID[ID]);
     }
@@ -105,10 +104,8 @@ public:
     IC u32 o_count() { return objects_active.size() + objects_sleeping.size(); };
     IC IGameObject* o_get_by_iterator(u32 _it)
     {
-        if (_it < objects_active.size())
-            return objects_active[_it];
-        else
-            return objects_sleeping[_it - objects_active.size()];
+        if (_it < objects_active.size()) return objects_active[_it];
+        else return objects_sleeping[_it - objects_active.size()];
     }
     bool dump_all_objects();
 
@@ -121,7 +118,8 @@ public:
 private:
     IC Objects& get_crows()
     {
-        if (GetCurrentThreadId() == m_owner_thread_id) return (m_crows[0]);
+        if (GetCurrentThreadId() == m_owner_thread_id)
+            return (m_crows[0]);
 
         return (m_crows[1]);
     }

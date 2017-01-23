@@ -13,7 +13,7 @@ DECLARE_MESSAGE(Stats);
 class ENGINE_API CStats : public pureRender
 {
 private:
-    CGameFont* statsFont;
+    CGameFont *statsFont;
     float fMem_calls;
     xr_vector<shared_str> errors;
 
@@ -27,7 +27,7 @@ public:
     void OnDeviceDestroy(void);
 
 private:
-    void FilteredLog(const char* s);
+    void FilteredLog(const char *s);
 };
 
 enum

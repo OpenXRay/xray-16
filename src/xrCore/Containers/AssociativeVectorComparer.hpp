@@ -7,10 +7,10 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #pragma once
-#include <utility>
 #include "xrCore/xrCore.h"
+#include <utility>
 
-template <typename TKey, typename TValue, typename TComparer>
+template<typename TKey, typename TValue, typename TComparer>
 class AssociativeVectorComparer : public TComparer
 {
 private:
@@ -20,49 +20,42 @@ public:
     typedef std::pair<TKey, TValue> TItem;
 
     IC AssociativeVectorComparer();
-    IC AssociativeVectorComparer(const TComparer& comparer);
-    IC bool operator()(const TKey& lhs, const TKey& rhs) const;
-    IC bool operator()(const TItem& lhs, const TItem& rhs) const;
-    IC bool operator()(const TItem& lhs, const TKey& rhs) const;
-    IC bool operator()(const TKey& lhs, const TItem& rhs) const;
+    IC AssociativeVectorComparer(const TComparer &comparer);
+    IC bool operator()(const TKey &lhs, const TKey &rhs) const;
+    IC bool operator()(const TItem &lhs, const TItem &rhs) const;
+    IC bool operator()(const TItem &lhs, const TKey &rhs) const;
+    IC bool operator()(const TKey &lhs, const TItem &rhs) const;
 };
 
-#define TEMPLATE_SPECIALIZATION template <typename TKey, typename TValue, typename TComparer>
-#define _associative_vector_compare_predicate AssociativeVectorComparer<TKey, TValue, TComparer>
+#define TEMPLATE_SPECIALIZATION	\
+	template <typename TKey, typename TValue, typename TComparer>
+#define _associative_vector_compare_predicate \
+	AssociativeVectorComparer<TKey, TValue, TComparer>
 
 TEMPLATE_SPECIALIZATION
-IC _associative_vector_compare_predicate::AssociativeVectorComparer()
-{
-}
+IC _associative_vector_compare_predicate::AssociativeVectorComparer	()
+{}
 
 TEMPLATE_SPECIALIZATION
-IC _associative_vector_compare_predicate::AssociativeVectorComparer(const TComparer& comparer) : inherited(comparer)
-{
-}
+IC _associative_vector_compare_predicate::AssociativeVectorComparer(const TComparer &comparer) :
+    inherited(comparer)
+{}
 
 TEMPLATE_SPECIALIZATION
-IC bool _associative_vector_compare_predicate::operator()(const TKey& lhs, const TKey& rhs) const
-{
-    return inherited::operator()(lhs, rhs);
-}
+IC bool _associative_vector_compare_predicate::operator() (const TKey &lhs, const TKey &rhs) const
+{ return inherited::operator()(lhs, rhs); }
 
 TEMPLATE_SPECIALIZATION
-IC bool _associative_vector_compare_predicate::operator()(const TItem& lhs, const TItem& rhs) const
-{
-    return operator()(lhs.first, rhs.first);
-}
+IC bool _associative_vector_compare_predicate::operator() (const TItem &lhs, const TItem &rhs) const
+{ return operator()(lhs.first, rhs.first); }
 
 TEMPLATE_SPECIALIZATION
-IC bool _associative_vector_compare_predicate::operator()(const TItem& lhs, const TKey& rhs) const
-{
-    return operator()(lhs.first, rhs);
-}
+IC bool _associative_vector_compare_predicate::operator() (const TItem &lhs, const TKey &rhs) const
+{ return operator()(lhs.first, rhs); }
 
 TEMPLATE_SPECIALIZATION
-IC bool _associative_vector_compare_predicate::operator()(const TKey& lhs, const TItem& rhs) const
-{
-    return operator()(lhs, rhs.first);
-}
+IC bool _associative_vector_compare_predicate::operator() (const TKey &lhs, const TItem &rhs) const
+{ return operator()(lhs, rhs.first); }
 
 #undef TEMPLATE_SPECIALIZATION
 #undef _associative_vector_compare_predicate
