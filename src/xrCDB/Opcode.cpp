@@ -16,19 +16,19 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /*
-    Finding a good name is difficult!
-    Here's the draft for this lib.... Spooky, uh?
+	Finding a good name is difficult!
+	Here's the draft for this lib.... Spooky, uh?
 
-    VOID?			Very Optimized Interference Detection
-    ZOID?			Zappy's Optimized Interference Detection
-    CID?			Custom/Clever Interference Detection
-    AID / ACID!		Accurate Interference Detection
-    QUID?			Quick Interference Detection
-    RIDE?			Realtime Interference DEtection
-    WIDE?			Wicked Interference DEtection (....)
-    GUID!
-    KID !			k-dop interference detection :)
-    OPCODE!			OPtimized COllision DEtection
+	VOID?			Very Optimized Interference Detection
+	ZOID?			Zappy's Optimized Interference Detection
+	CID?			Custom/Clever Interference Detection
+	AID / ACID!		Accurate Interference Detection
+	QUID?			Quick Interference Detection
+	RIDE?			Realtime Interference DEtection
+	WIDE?			Wicked Interference DEtection (....)
+	GUID!
+	KID !			k-dop interference detection :)
+	OPCODE!			OPtimized COllision DEtection
 */
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -40,12 +40,12 @@
 
 void ModuleAttach(udword hmod)
 {
-    Log("// Opening OPCODE\n\n");
+	Log("// Opening OPCODE\n\n");
 }
 
 void ModuleDetach()
 {
-    Log("// Closing OPCODE\n\n");
+	Log("// Closing OPCODE\n\n");
 }
 
 #endif

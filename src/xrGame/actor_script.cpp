@@ -6,22 +6,26 @@
 //	Description : actor script export
 ////////////////////////////////////////////////////////////////////////////
 
+#include "pch_script.h"
 #include "actor.h"
 #include "level_changer.h"
-#include "pch_script.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
-IC static void CActor_Export(lua_State* luaState)
+IC static void CActor_Export(lua_State *luaState)
 {
-    module(luaState)[class_<CActor, CGameObject>("CActor").def(constructor<>())
-
-#ifndef BENCHMARK_BUILD
-                         ,
-        class_<CLevelChanger, CGameObject>("CLevelChanger").def(constructor<>())
+	module(luaState)
+	[
+		class_<CActor,CGameObject>("CActor")
+			.def(constructor<>())
+			
+#ifndef	BENCHMARK_BUILD
+		,
+		class_<CLevelChanger,CGameObject>("CLevelChanger")
+			.def(constructor<>())
 #endif
-    ];
+	];
 };
 
 SCRIPT_EXPORT_FUNC(CActor, (CGameObject), CActor_Export);

@@ -1,14 +1,14 @@
+#include "stdafx.h"
 #include "GameMtlLib.h"
 #include "Common/FSMacros.hpp"
-#include "stdafx.h"
 
 CGameMtlLibrary GMLib;
 #ifdef _EDITOR
-CGameMtlLibrary* PGMLib = nullptr;
+CGameMtlLibrary *PGMLib = nullptr;
 #endif
 
 #ifdef DEBUG
-const char* SGameMtlPair::dbg_Name()
+const char *SGameMtlPair::dbg_Name()
 {
     static string256 nm;
     SGameMtl* M0 = GMLib.GetMaterialByID(GetMtl0());
@@ -24,7 +24,8 @@ void SGameMtl::Load(IReader& fs)
     ID = fs.r_u32();
     fs.r_stringZ(m_Name);
 
-    if (fs.find_chunk(GAMEMTL_CHUNK_DESC)) {
+    if (fs.find_chunk(GAMEMTL_CHUNK_DESC))
+    {
         fs.r_stringZ(m_Desc);
     }
 
@@ -44,16 +45,20 @@ void SGameMtl::Load(IReader& fs)
     fVisTransparencyFactor = fs.r_float();
     fSndOcclusionFactor = fs.r_float();
 
+
     if (fs.find_chunk(GAMEMTL_CHUNK_FACTORS_MP))
         fShootFactorMP = fs.r_float();
     else
         fShootFactorMP = fShootFactor;
 
-    if (fs.find_chunk(GAMEMTL_CHUNK_FLOTATION)) fFlotationFactor = fs.r_float();
+    if (fs.find_chunk(GAMEMTL_CHUNK_FLOTATION))
+        fFlotationFactor = fs.r_float();
 
-    if (fs.find_chunk(GAMEMTL_CHUNK_INJURIOUS)) fInjuriousSpeed = fs.r_float();
+    if (fs.find_chunk(GAMEMTL_CHUNK_INJURIOUS))
+        fInjuriousSpeed = fs.r_float();
 
-    if (fs.find_chunk(GAMEMTL_CHUNK_DENSITY)) fDensityFactor = fs.r_float();
+    if (fs.find_chunk(GAMEMTL_CHUNK_DENSITY))
+        fDensityFactor = fs.r_float();
 }
 
 CGameMtlLibrary::CGameMtlLibrary()
@@ -68,7 +73,8 @@ CGameMtlLibrary::CGameMtlLibrary()
 void CGameMtlLibrary::Load()
 {
     string_path name;
-    if (!FS.exist(name, _game_data_, GAMEMTL_FILENAME)) {
+    if (!FS.exist(name, _game_data_, GAMEMTL_FILENAME))
+    {
         Log("! Can't find game material file: ", name);
         return;
     }
@@ -81,7 +87,8 @@ void CGameMtlLibrary::Load()
 
     R_ASSERT(fs.find_chunk(GAMEMTLS_CHUNK_VERSION));
     u16 version = fs.r_u16();
-    if (GAMEMTL_CURRENT_VERSION != version) {
+    if (GAMEMTL_CURRENT_VERSION != version)
+    {
         Log("CGameMtlLibrary: invalid version. Library can't load.");
         FS.r_close(F);
         return;
@@ -95,7 +102,8 @@ void CGameMtlLibrary::Load()
     material_pairs.clear();
 
     IReader* OBJ = fs.open_chunk(GAMEMTLS_CHUNK_MTLS);
-    if (OBJ) {
+    if (OBJ)
+    {
         u32 count;
         for (IReader* O = OBJ->open_chunk_iterator(count); O; O = OBJ->open_chunk_iterator(count, O))
         {
@@ -107,7 +115,8 @@ void CGameMtlLibrary::Load()
     }
 
     OBJ = fs.open_chunk(GAMEMTLS_CHUNK_MTLS_PAIR);
-    if (OBJ) {
+    if (OBJ)
+    {
         u32 count;
         for (IReader* O = OBJ->open_chunk_iterator(count); O; O = OBJ->open_chunk_iterator(count, O))
         {
@@ -118,13 +127,13 @@ void CGameMtlLibrary::Load()
         OBJ->close();
     }
     u32 mtlCount = materials.size();
-    material_pairs_rt.resize(mtlCount * mtlCount, 0);
-    for (auto& mtlPair : material_pairs)
+    material_pairs_rt.resize(mtlCount*mtlCount, 0);
+    for (auto &mtlPair : material_pairs)
     {
-        int idx0 = GetMaterialIdx(mtlPair->mtl0) * mtlCount + GetMaterialIdx(mtlPair->mtl1);
-        int idx1 = GetMaterialIdx(mtlPair->mtl1) * mtlCount + GetMaterialIdx(mtlPair->mtl0);
+        int idx0 = GetMaterialIdx(mtlPair->mtl0)*mtlCount + GetMaterialIdx(mtlPair->mtl1);
+        int idx1 = GetMaterialIdx(mtlPair->mtl1)*mtlCount + GetMaterialIdx(mtlPair->mtl0);
         material_pairs_rt[idx0] = mtlPair;
         material_pairs_rt[idx1] = mtlPair;
     }
-    FS.r_close(F);
+    FS.r_close (F);
 }

@@ -9,8 +9,8 @@
 #include "stdafx.h"
 
 #ifdef INGAME_EDITOR
-#include <shlwapi.h>
 #include "editor_environment_detail.hpp"
+#include <shlwapi.h>
 
 #pragma comment(lib, "shlwapi.lib")
 
@@ -25,12 +25,13 @@ static HRESULT AnsiToUnicode(LPCSTR pszA, LPVOID buffer, u32 const& buffer_size)
     u32 cCharacters = xr_strlen(pszA) + 1;
     VERIFY(cCharacters * 2 <= buffer_size);
 
-    if (MultiByteToWideChar(CP_ACP, 0, pszA, cCharacters, (LPOLESTR)buffer, cCharacters)) return (NOERROR);
+    if (MultiByteToWideChar(CP_ACP, 0, pszA, cCharacters, (LPOLESTR)buffer, cCharacters))
+        return (NOERROR);
 
     return (HRESULT_FROM_WIN32(GetLastError()));
 }
 
-bool logical_string_predicate::operator()(LPCSTR const& first, LPCSTR const& second) const
+bool logical_string_predicate::operator() (LPCSTR const& first, LPCSTR const& second) const
 {
     u32 buffer_size0 = (xr_strlen(first) + 1) * 2;
     LPCWSTR buffer0 = (LPCWSTR)_alloca(buffer_size0);
@@ -43,7 +44,7 @@ bool logical_string_predicate::operator()(LPCSTR const& first, LPCSTR const& sec
     return (StrCmpLogicalW(buffer0, buffer1) < 0);
 }
 
-bool logical_string_predicate::operator()(shared_str const& first, shared_str const& second) const
+bool logical_string_predicate::operator() (shared_str const& first, shared_str const& second) const
 {
     u32 buffer_size0 = (first.size() + 1) * 2;
     LPCWSTR buffer0 = (LPCWSTR)_alloca(buffer_size0);

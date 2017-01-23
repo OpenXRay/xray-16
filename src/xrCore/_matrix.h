@@ -34,11 +34,10 @@ public:
     typedef Self& SelfRef;
     typedef const Self& SelfCRef;
     typedef _vector3<T> Tvector;
-
 public:
     union
     {
-        struct // Direct definition
+        struct   // Direct definition
         {
             T _11, _12, _13, _14;
             T _21, _22, _23, _24;
@@ -186,11 +185,12 @@ public:
         mul_43(A, B);
         return *this;
     };
-    IC SelfRef invert(const Self& a) // important: this is 4x3 invert, not the 4x4 one
+    IC SelfRef invert(const Self& a)   // important: this is 4x3 invert, not the 4x4 one
     {
         // faster than self-invert
-        T fDetInv = (a._11 * (a._22 * a._33 - a._23 * a._32) - a._12 * (a._21 * a._33 - a._23 * a._31) +
-                     a._13 * (a._21 * a._32 - a._22 * a._31));
+        T fDetInv = (a._11 * (a._22 * a._33 - a._23 * a._32) -
+            a._12 * (a._21 * a._33 - a._23 * a._31) +
+            a._13 * (a._21 * a._32 - a._22 * a._31));
 
         VERIFY(_abs(fDetInv) > flt_zero);
         fDetInv = 1.0f / fDetInv;
@@ -217,11 +217,12 @@ public:
         return *this;
     }
 
-    IC bool invert_b(const Self& a) // important: this is 4x3 invert, not the 4x4 one
+    IC bool invert_b(const Self& a)   // important: this is 4x3 invert, not the 4x4 one
     {
         // faster than self-invert
-        T fDetInv = (a._11 * (a._22 * a._33 - a._23 * a._32) - a._12 * (a._21 * a._33 - a._23 * a._31) +
-                     a._13 * (a._21 * a._32 - a._22 * a._31));
+        T fDetInv = (a._11 * (a._22 * a._33 - a._23 * a._32) -
+            a._12 * (a._21 * a._33 - a._23 * a._31) +
+            a._13 * (a._21 * a._32 - a._22 * a._31));
 
         if (_abs(fDetInv) <= flt_zero) return false;
         fDetInv = 1.0f / fDetInv;
@@ -388,78 +389,12 @@ public:
         return *this;
     }
 
-    IC SelfRef mapXYZ()
-    {
-        i.set(1, 0, 0);
-        _14 = 0;
-        j.set(0, 1, 0);
-        _24 = 0;
-        k.set(0, 0, 1);
-        _34 = 0;
-        c.set(0, 0, 0);
-        _44 = 1;
-        return *this;
-    }
-    IC SelfRef mapXZY()
-    {
-        i.set(1, 0, 0);
-        _14 = 0;
-        j.set(0, 0, 1);
-        _24 = 0;
-        k.set(0, 1, 0);
-        _34 = 0;
-        c.set(0, 0, 0);
-        _44 = 1;
-        return *this;
-    }
-    IC SelfRef mapYXZ()
-    {
-        i.set(0, 1, 0);
-        _14 = 0;
-        j.set(1, 0, 0);
-        _24 = 0;
-        k.set(0, 0, 1);
-        _34 = 0;
-        c.set(0, 0, 0);
-        _44 = 1;
-        return *this;
-    }
-    IC SelfRef mapYZX()
-    {
-        i.set(0, 1, 0);
-        _14 = 0;
-        j.set(0, 0, 1);
-        _24 = 0;
-        k.set(1, 0, 0);
-        _34 = 0;
-        c.set(0, 0, 0);
-        _44 = 1;
-        return *this;
-    }
-    IC SelfRef mapZXY()
-    {
-        i.set(0, 0, 1);
-        _14 = 0;
-        j.set(1, 0, 0);
-        _24 = 0;
-        k.set(0, 1, 0);
-        _34 = 0;
-        c.set(0, 0, 0);
-        _44 = 1;
-        return *this;
-    }
-    IC SelfRef mapZYX()
-    {
-        i.set(0, 0, 1);
-        _14 = 0;
-        j.set(0, 1, 0);
-        _24 = 0;
-        k.set(1, 0, 0);
-        _34 = 0;
-        c.set(0, 0, 0);
-        _44 = 1;
-        return *this;
-    }
+    IC SelfRef mapXYZ() { i.set(1, 0, 0); _14 = 0; j.set(0, 1, 0); _24 = 0; k.set(0, 0, 1); _34 = 0; c.set(0, 0, 0); _44 = 1; return *this; }
+    IC SelfRef mapXZY() { i.set(1, 0, 0); _14 = 0; j.set(0, 0, 1); _24 = 0; k.set(0, 1, 0); _34 = 0; c.set(0, 0, 0); _44 = 1; return *this; }
+    IC SelfRef mapYXZ() { i.set(0, 1, 0); _14 = 0; j.set(1, 0, 0); _24 = 0; k.set(0, 0, 1); _34 = 0; c.set(0, 0, 0); _44 = 1; return *this; }
+    IC SelfRef mapYZX() { i.set(0, 1, 0); _14 = 0; j.set(0, 0, 1); _24 = 0; k.set(1, 0, 0); _34 = 0; c.set(0, 0, 0); _44 = 1; return *this; }
+    IC SelfRef mapZXY() { i.set(0, 0, 1); _14 = 0; j.set(1, 0, 0); _24 = 0; k.set(0, 1, 0); _34 = 0; c.set(0, 0, 0); _44 = 1; return *this; }
+    IC SelfRef mapZYX() { i.set(0, 0, 1); _14 = 0; j.set(0, 1, 0); _24 = 0; k.set(1, 0, 0); _34 = 0; c.set(0, 0, 0); _44 = 1; return *this; }
 
     IC SelfRef rotation(const Tvector& axis, T Angle)
     {
@@ -617,7 +552,7 @@ public:
         _34 = 1.0f;
         _41 = 0;
         _42 = 0;
-        _43 = -Q * fNearPlane;
+        _43 = -Q*fNearPlane;
         _44 = 0;
         return *this;
     }
@@ -733,48 +668,48 @@ public:
     }
     ICF void transform_tiny(Tvector& dest, const Tvector& v) const // preferred to use
     {
-        dest.x = v.x * _11 + v.y * _21 + v.z * _31 + _41;
-        dest.y = v.x * _12 + v.y * _22 + v.z * _32 + _42;
-        dest.z = v.x * _13 + v.y * _23 + v.z * _33 + _43;
+        dest.x = v.x*_11 + v.y*_21 + v.z*_31 + _41;
+        dest.y = v.x*_12 + v.y*_22 + v.z*_32 + _42;
+        dest.z = v.x*_13 + v.y*_23 + v.z*_33 + _43;
     }
     ICF void transform_tiny32(Fvector2& dest, const Tvector& v) const // preferred to use
     {
-        dest.x = v.x * _11 + v.y * _21 + v.z * _31 + _41;
-        dest.y = v.x * _12 + v.y * _22 + v.z * _32 + _42;
+        dest.x = v.x*_11 + v.y*_21 + v.z*_31 + _41;
+        dest.y = v.x*_12 + v.y*_22 + v.z*_32 + _42;
     }
     ICF void transform_tiny23(Tvector& dest, const Fvector2& v) const // preferred to use
     {
-        dest.x = v.x * _11 + v.y * _21 + _41;
-        dest.y = v.x * _12 + v.y * _22 + _42;
-        dest.z = v.x * _13 + v.y * _23 + _43;
+        dest.x = v.x*_11 + v.y*_21 + _41;
+        dest.y = v.x*_12 + v.y*_22 + _42;
+        dest.z = v.x*_13 + v.y*_23 + _43;
     }
     ICF void transform_dir(Tvector& dest, const Tvector& v) const // preferred to use
     {
-        dest.x = v.x * _11 + v.y * _21 + v.z * _31;
-        dest.y = v.x * _12 + v.y * _22 + v.z * _32;
-        dest.z = v.x * _13 + v.y * _23 + v.z * _33;
+        dest.x = v.x*_11 + v.y*_21 + v.z*_31;
+        dest.y = v.x*_12 + v.y*_22 + v.z*_32;
+        dest.z = v.x*_13 + v.y*_23 + v.z*_33;
     }
     IC void transform(Fvector4& dest, const Tvector& v) const // preferred to use
     {
-        dest.w = v.x * _14 + v.y * _24 + v.z * _34 + _44;
-        dest.x = (v.x * _11 + v.y * _21 + v.z * _31 + _41) / dest.w;
-        dest.y = (v.x * _12 + v.y * _22 + v.z * _32 + _42) / dest.w;
-        dest.z = (v.x * _13 + v.y * _23 + v.z * _33 + _43) / dest.w;
+        dest.w = v.x*_14 + v.y*_24 + v.z*_34 + _44;
+        dest.x = (v.x*_11 + v.y*_21 + v.z*_31 + _41) / dest.w;
+        dest.y = (v.x*_12 + v.y*_22 + v.z*_32 + _42) / dest.w;
+        dest.z = (v.x*_13 + v.y*_23 + v.z*_33 + _43) / dest.w;
     }
     IC void transform(Tvector& dest, const Tvector& v) const // preferred to use
     {
-        T iw = 1.f / (v.x * _14 + v.y * _24 + v.z * _34 + _44);
-        dest.x = (v.x * _11 + v.y * _21 + v.z * _31 + _41) * iw;
-        dest.y = (v.x * _12 + v.y * _22 + v.z * _32 + _42) * iw;
-        dest.z = (v.x * _13 + v.y * _23 + v.z * _33 + _43) * iw;
+        T iw = 1.f / (v.x*_14 + v.y*_24 + v.z*_34 + _44);
+        dest.x = (v.x*_11 + v.y*_21 + v.z*_31 + _41)*iw;
+        dest.y = (v.x*_12 + v.y*_22 + v.z*_32 + _42)*iw;
+        dest.z = (v.x*_13 + v.y*_23 + v.z*_33 + _43)*iw;
     }
 
     IC void transform(Fvector4& dest, const Fvector4& v) const // preferred to use
     {
-        dest.w = v.x * _14 + v.y * _24 + v.z * _34 + v.w * _44;
-        dest.x = v.x * _11 + v.y * _21 + v.z * _31 + v.w * _41;
-        dest.y = v.x * _12 + v.y * _22 + v.z * _32 + v.w * _42;
-        dest.z = v.x * _13 + v.y * _23 + v.z * _33 + v.w * _43;
+        dest.w = v.x*_14 + v.y*_24 + v.z*_34 + v.w*_44;
+        dest.x = v.x*_11 + v.y*_21 + v.z*_31 + v.w*_41;
+        dest.y = v.x*_12 + v.y*_22 + v.z*_32 + v.w*_42;
+        dest.z = v.x*_13 + v.y*_23 + v.z*_33 + v.w*_43;
     }
 
     ICF void transform_tiny(Tvector& v) const
@@ -805,16 +740,16 @@ public:
         _cp = _cos(p);
         _sb = _sin(b);
         _cb = _cos(b);
-        _cc = _ch * _cb;
-        _cs = _ch * _sb;
-        _sc = _sh * _cb;
-        _ss = _sh * _sb;
+        _cc = _ch*_cb;
+        _cs = _ch*_sb;
+        _sc = _sh*_cb;
+        _ss = _sh*_sb;
 
-        i.set(_cc - _sp * _ss, -_cp * _sb, _sp * _cs + _sc);
+        i.set(_cc - _sp*_ss, -_cp*_sb, _sp*_cs + _sc);
         _14_ = 0;
-        j.set(_sp * _sc + _cs, _cp * _cb, _ss - _sp * _cc);
+        j.set(_sp*_sc + _cs, _cp*_cb, _ss - _sp*_cc);
         _24_ = 0;
-        k.set(-_cp * _sh, _sp, _cp * _ch);
+        k.set(-_cp*_sh, _sp, _cp*_ch);
         _34_ = 0;
         c.set(0, 0, 0);
         _44_ = 1;
@@ -827,8 +762,9 @@ public:
     //
     IC void getHPB(T& h, T& p, T& b) const
     {
-        T cy = _sqrt(j.y * j.y + i.y * i.y);
-        if (cy > 16.0f * type_epsilon(T)) {
+        T cy = _sqrt(j.y*j.y + i.y*i.y);
+        if (cy > 16.0f*type_epsilon(T))
+        {
             h = (T)-atan2(k.x, k.z);
             p = (T)-atan2(-k.y, cy);
             b = (T)-atan2(i.y, j.y);
@@ -843,18 +779,8 @@ public:
     IC void getHPB(Tvector& hpb) const { getHPB(hpb.x, hpb.y, hpb.z); }
     IC void getXYZ(T& x, T& y, T& z) const { getHPB(y, x, z); }
     IC void getXYZ(Tvector& xyz) const { getXYZ(xyz.x, xyz.y, xyz.z); }
-    IC void getXYZi(T& x, T& y, T& z) const
-    {
-        getHPB(y, x, z);
-        x *= -1.f;
-        y *= -1.f;
-        z *= -1.f;
-    }
-    IC void getXYZi(Tvector& xyz) const
-    {
-        getXYZ(xyz.x, xyz.y, xyz.z);
-        xyz.mul(-1.f);
-    }
+    IC void getXYZi(T& x, T& y, T& z) const { getHPB(y, x, z); x *= -1.f; y *= -1.f; z *= -1.f; }
+    IC void getXYZi(Tvector& xyz) const { getXYZ(xyz.x, xyz.y, xyz.z); xyz.mul(-1.f); }
 };
 
 typedef _matrix<float> Fmatrix;
@@ -863,8 +789,12 @@ typedef _matrix<double> Dmatrix;
 template <class T>
 BOOL _valid(const _matrix<T>& m)
 {
-    return _valid(m.i) && _valid(m._14_) && _valid(m.j) && _valid(m._24_) && _valid(m.k) && _valid(m._34_) &&
-           _valid(m.c) && _valid(m._44_);
+    return
+        _valid(m.i) && _valid(m._14_) &&
+        _valid(m.j) && _valid(m._24_) &&
+        _valid(m.k) && _valid(m._34_) &&
+        _valid(m.c) && _valid(m._44_)
+        ;
 }
 
 extern XRCORE_API Fmatrix Fidentity;

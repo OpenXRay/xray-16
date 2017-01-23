@@ -1,7 +1,7 @@
 #ifndef ETextureParamsH
 #define ETextureParamsH
 
-#pragma pack(push, 1)
+#pragma pack(push,1)
 struct ECORE_API STextureParams
 {
     enum ETType
@@ -49,7 +49,7 @@ struct ECORE_API STextureParams
         tmMetal_OrenNayar,
         tmForceU32 = u32(-1)
     };
-
+    
     enum
     {
         kMIPFilterAdvanced = 5,
@@ -103,7 +103,7 @@ struct ECORE_API STextureParams
     // material
     ETMaterial material;
     float material_weight;
-    // bump
+    // bump	
     float bump_virtual_height;
     ETBumpMode bump_mode;
     shared_str bump_name;
@@ -127,7 +127,7 @@ struct ECORE_API STextureParams
         // исходная текстура содержит альфа канал
         return flags.is(flHasAlpha);
     }
-
+    
     IC BOOL HasAlphaChannel() // игровая текстура содержит альфа канал
     {
         switch (fmt)
@@ -137,8 +137,10 @@ struct ECORE_API STextureParams
         case tfDXT5:
         case tf4444:
         case tf1555:
-        case tfRGBA: return TRUE;
-        default: return FALSE;
+        case tfRGBA:
+            return TRUE;
+        default:
+            return FALSE;
         }
     }
     void Load(IReader& F);
@@ -154,9 +156,9 @@ struct ECORE_API STextureParams
 #pragma pack(pop)
 
 struct xr_token;
-extern xr_token tparam_token[];
-extern xr_token tfmt_token[];
-extern xr_token ttype_token[];
+extern xr_token	tparam_token[];
+extern xr_token	tfmt_token[];
+extern xr_token	ttype_token[];
 
 #define THM_CHUNK_VERSION 0x0810
 #define THM_CHUNK_DATA 0x0811
@@ -170,6 +172,6 @@ extern xr_token ttype_token[];
 #define THM_CHUNK_FADE_DELAY 0x0819
 #define THUMB_WIDTH 128
 #define THUMB_HEIGHT 128
-#define THUMB_SIZE THUMB_HEIGHT* THUMB_WIDTH
+#define THUMB_SIZE THUMB_HEIGHT*THUMB_WIDTH
 
 #endif /*_INCDEF_TextureParams_H_*/

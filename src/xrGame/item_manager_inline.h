@@ -8,8 +8,8 @@
 
 #pragma once
 
-IC CItemManager::CItemManager(CCustomMonster* object)
+IC	CItemManager::CItemManager						(CCustomMonster *object)
 {
-    VERIFY(object);
-    m_object = object;
+	VERIFY					(object);
+	m_object				= object;
 }

@@ -1,12 +1,13 @@
-#include "IGame_Persistent.h"
+#include "stdafx.h"
 #include "Include/xrRender/DrawUtils.h"
 #include "Render.h"
-#include "stdafx.h"
+#include "IGame_Persistent.h"
 #include "xr_IOConsole.h"
 
 void CRenderDevice::Destroy(void)
 {
-    if (!b_is_Ready) return;
+    if (!b_is_Ready)
+        return;
     Log("Destroying Direct3D...");
     ShowCursor(TRUE);
     GlobalEnv.Render->ValidateHW();
@@ -29,8 +30,8 @@ void CRenderDevice::Destroy(void)
     xr_delete(Statistic);
 }
 
-#include "CustomHUD.h"
 #include "IGame_Level.h"
+#include "CustomHUD.h"
 extern BOOL bNeed_re_create_env;
 
 void CRenderDevice::Reset(bool precache)
@@ -40,9 +41,11 @@ void CRenderDevice::Reset(bool precache)
     ShowCursor(TRUE);
     u32 tm_start = TimerAsync();
     GlobalEnv.Render->Reset(m_hWnd, dwWidth, dwHeight, fWidth_2, fHeight_2);
-    if (g_pGamePersistent) g_pGamePersistent->Environment().bNeed_re_create_env = TRUE;
+    if (g_pGamePersistent)
+        g_pGamePersistent->Environment().bNeed_re_create_env = TRUE;
     _SetupStates();
-    if (precache) PreCache(20, true, false);
+    if (precache)
+        PreCache(20, true, false);
     u32 tm_end = TimerAsync();
     Msg("*** RESET [%d ms]", tm_end - tm_start);
     // TODO: Remove this! It may hide crash

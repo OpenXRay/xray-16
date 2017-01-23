@@ -5,29 +5,30 @@
 class CPhysicItem;
 class CEntityAlive;
 
-class CEatableItem : public CInventoryItem
-{
+class CEatableItem : public CInventoryItem {
 private:
-    typedef CInventoryItem inherited;
+	typedef CInventoryItem	inherited;
 
 protected:
-    CPhysicItem* m_physic_item;
+	CPhysicItem		*m_physic_item;
 
 public:
-    CEatableItem();
-    virtual ~CEatableItem();
-    virtual IFactoryObject* _construct();
-    virtual CEatableItem* cast_eatable_item() { return this; }
-    virtual void Load(LPCSTR section);
-    virtual bool Useful() const;
+							CEatableItem				();
+	virtual					~CEatableItem				();
+	virtual	IFactoryObject*		_construct					();
+	virtual CEatableItem	*cast_eatable_item			()	{return this;}
 
-    virtual BOOL net_Spawn(CSE_Abstract* DC);
+	virtual void			Load						(LPCSTR section);
+	virtual bool			Useful						() const;
 
-    virtual void OnH_B_Independent(bool just_before_destroy);
-    virtual void OnH_A_Independent();
-    virtual bool UseBy(CEntityAlive* npc);
-    virtual bool Empty() { return PortionsNum() == 0; };
-    int PortionsNum() const { return m_iPortionsNum; }
-protected:
-    int m_iPortionsNum;
+	virtual BOOL			net_Spawn					(CSE_Abstract* DC);
+
+	virtual void			OnH_B_Independent			(bool just_before_destroy);
+	virtual void			OnH_A_Independent			();
+	virtual	bool			UseBy						(CEntityAlive* npc);
+	virtual	bool			Empty						()						{return PortionsNum()==0;};
+			int				PortionsNum					()	const				{return m_iPortionsNum;}
+protected:	
+	int						m_iPortionsNum;
 };
+

@@ -8,17 +8,17 @@
 
 #pragma once
 
-IC bool CDangerLocation::operator==(const Fvector& position) const
+IC	bool CDangerLocation::operator==	(const Fvector &position) const
 {
-    return (!!this->position().similar(position));
+	return		(!!this->position().similar(position));
 }
 
-IC bool CDangerLocation::operator==(const IGameObject* object) const
+IC	bool CDangerLocation::operator==	(const IGameObject *object) const
 {
-    return (false);
+	return		(false);
 }
 
-IC const CDangerLocation::flags& CDangerLocation::mask() const
+IC	const CDangerLocation::flags &CDangerLocation::mask	() const
 {
-    return (m_mask);
+	return		(m_mask);
 }

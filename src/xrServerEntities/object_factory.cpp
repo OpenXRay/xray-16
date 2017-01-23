@@ -6,24 +6,24 @@
 //	Description : Object factory
 ////////////////////////////////////////////////////////////////////////////
 
+#include "stdafx.h"
 #include "object_factory.h"
 #include "Common/object_broker.h"
-#include "stdafx.h"
 
-CObjectFactory* g_object_factory = 0;
+CObjectFactory *g_object_factory = 0;
 
-CObjectFactory::CObjectFactory()
+CObjectFactory::CObjectFactory	()
 {
-    m_actual = false;
-    register_classes();
+	m_actual					= false;
+	register_classes			();
 }
 
-CObjectFactory::~CObjectFactory()
+CObjectFactory::~CObjectFactory	()
 {
-    delete_data(m_clsids);
+	delete_data					(m_clsids);
 }
 
-void CObjectFactory::init()
+void CObjectFactory::init		()
 {
-    register_script_classes();
+	register_script_classes		();
 }

@@ -1,15 +1,15 @@
-#include "IGame_Level.h"
 #include "stdafx.h"
+#include "IGame_Level.h"
 #include "x_ray.h"
 
-#include "CameraManager.h"
-#include "CustomHUD.h"
 #include "GameFont.h"
-#include "Render.h"
-#include "XR_IOConsole.h"
 #include "fDemoRecord.h"
+#include "XR_IOConsole.h"
 #include "xr_input.h"
 #include "xr_object.h"
+#include "Render.h"
+#include "CustomHUD.h"
+#include "CameraManager.h"
 
 extern BOOL g_bDisableRedText;
 static Flags32 s_hud_flag = {0};
@@ -38,13 +38,17 @@ void setup_lm_screenshot_matrices()
 
     bb.xform(Device.mView);
     // build project matrix
-    Device.mProject.build_projection_ortho(bb.max.x - bb.min.x, bb.max.y - bb.min.y, bb.min.z, bb.max.z);
+    Device.mProject.build_projection_ortho(bb.max.x - bb.min.x,
+        bb.max.y - bb.min.y,
+        bb.min.z,
+        bb.max.z);
 }
 
 Fbox get_level_screenshot_bound()
 {
     Fbox res = g_pGameLevel->ObjectSpace.GetBoundingVolume();
-    if (g_pGameLevel->pLevel->section_exist("level_map")) {
+    if (g_pGameLevel->pLevel->section_exist("level_map"))
+    {
         Fvector4 res2d = g_pGameLevel->pLevel->r_fvector4("level_map", "bound_rect");
         res.min.x = res2d.x;
         res.min.z = res2d.y;
@@ -56,7 +60,7 @@ Fbox get_level_screenshot_bound()
     return res;
 }
 void _InitializeFont(CGameFont*& F, LPCSTR section, u32 flags);
-CDemoRecord::CDemoRecord(const char* name, float life_time) : CEffectorCam(cefDemo, life_time /*,FALSE*/)
+CDemoRecord::CDemoRecord(const char* name, float life_time) : CEffectorCam(cefDemo, life_time/*,FALSE*/)
 {
     stored_red_text = g_bDisableRedText;
     g_bDisableRedText = TRUE;
@@ -70,7 +74,8 @@ CDemoRecord::CDemoRecord(const char* name, float life_time) : CEffectorCam(cefDe
     m_b_redirect_input_to_level = false;
     _unlink(name);
     file = FS.w_open(name);
-    if (file) {
+    if (file)
+    {
         g_position.set_position = false;
         IR_Capture(); // capture input
         m_Camera.invert(Device.mView);
@@ -80,10 +85,8 @@ CDemoRecord::CDemoRecord(const char* name, float life_time) : CEffectorCam(cefDe
         Fvector DYaw;
         DYaw.set(dir.x, 0.f, dir.z);
         DYaw.normalize_safe();
-        if (DYaw.x < 0)
-            m_HPB.x = acosf(DYaw.z);
-        else
-            m_HPB.x = 2 * PI - acosf(DYaw.z);
+        if (DYaw.x < 0) m_HPB.x = acosf(DYaw.z);
+        else m_HPB.x = 2 * PI - acosf(DYaw.z);
 
         // parse pitch
         dir.normalize_safe();
@@ -119,7 +122,8 @@ CDemoRecord::CDemoRecord(const char* name, float life_time) : CEffectorCam(cefDe
 
 CDemoRecord::~CDemoRecord()
 {
-    if (file) {
+    if (file)
+    {
         IR_Release(); // release input
         FS.w_close(file);
     }
@@ -129,10 +133,9 @@ CDemoRecord::~CDemoRecord()
 }
 
 // +X, -X, +Y, -Y, +Z, -Z
-static Fvector cmNorm[6] = {
-    {0.f, 1.f, 0.f}, {0.f, 1.f, 0.f}, {0.f, 0.f, -1.f}, {0.f, 0.f, 1.f}, {0.f, 1.f, 0.f}, {0.f, 1.f, 0.f}};
-static Fvector cmDir[6] = {
-    {1.f, 0.f, 0.f}, {-1.f, 0.f, 0.f}, {0.f, 1.f, 0.f}, {0.f, -1.f, 0.f}, {0.f, 0.f, 1.f}, {0.f, 0.f, -1.f}};
+static Fvector cmNorm[6] = {{0.f, 1.f, 0.f}, {0.f, 1.f, 0.f}, {0.f, 0.f, -1.f}, {0.f, 0.f, 1.f}, {0.f, 1.f, 0.f}, {0.f, 1.f, 0.f}};
+static Fvector cmDir[6] = {{1.f, 0.f, 0.f}, {-1.f, 0.f, 0.f}, {0.f, 1.f, 0.f}, {0.f, -1.f, 0.f}, {0.f, 0.f, 1.f}, {0.f, 0.f, -1.f}};
+
 
 void CDemoRecord::MakeScreenshotFace()
 {
@@ -151,6 +154,7 @@ void CDemoRecord::MakeScreenshotFace()
     m_Stage++;
 }
 
+
 void GetLM_BBox(Fbox& bb, INT Step)
 {
     float half_x = bb.min.x + (bb.max.x - bb.min.x) / 2;
@@ -162,28 +166,29 @@ void GetLM_BBox(Fbox& bb, INT Step)
         bb.max.x = half_x;
         bb.min.z = half_z;
     }
-    break;
+        break;
     case 1:
     {
         bb.min.x = half_x;
         bb.min.z = half_z;
     }
-    break;
+        break;
     case 2:
     {
         bb.max.x = half_x;
         bb.max.z = half_z;
     }
-    break;
+        break;
     case 3:
     {
         bb.min.x = half_x;
         bb.max.z = half_z;
     }
-    break;
-    default: {
-    }
-    break;
+        break;
+    default:
+    {
+    } break;
+
     }
 };
 
@@ -197,9 +202,11 @@ void CDemoRecord::MakeLevelMapProcess()
         s_hud_flag.assign(psHUD_Flags);
         psDeviceFlags.zero();
         psDeviceFlags.set(rsClearBB | rsFullscreen | rsDrawStatic, TRUE);
-        if (!psDeviceFlags.equal(s_dev_flags, rsFullscreen)) Device.Reset();
+        if (!psDeviceFlags.equal(s_dev_flags, rsFullscreen))
+            Device.Reset();
+
     }
-    break;
+        break;
 
     case DEVICE_RESET_PRECACHE_FRAME_COUNT + 30:
     {
@@ -211,10 +218,12 @@ void CDemoRecord::MakeLevelMapProcess()
         else
             xr_sprintf(tmp, sizeof(tmp), "map_%s#%d", *g_pGameLevel->name(), m_iLMScreenshotFragment);
 
-        if (m_iLMScreenshotFragment != -1) {
+        if (m_iLMScreenshotFragment != -1)
+        {
             ++m_iLMScreenshotFragment;
 
-            if (m_iLMScreenshotFragment != 4) {
+            if (m_iLMScreenshotFragment != 4)
+            {
                 curr_lm_fbox = get_level_screenshot_bound();
                 GetLM_BBox(curr_lm_fbox, m_iLMScreenshotFragment);
                 m_Stage -= 20;
@@ -223,7 +232,8 @@ void CDemoRecord::MakeLevelMapProcess()
 
         GlobalEnv.Render->Screenshot(IRender::SM_FOR_LEVELMAP, tmp);
 
-        if (m_iLMScreenshotFragment == -1 || m_iLMScreenshotFragment == 4) {
+        if (m_iLMScreenshotFragment == -1 || m_iLMScreenshotFragment == 4)
+        {
             psHUD_Flags.assign(s_hud_flag);
 
             BOOL bDevReset = !psDeviceFlags.equal(s_dev_flags, rsFullscreen);
@@ -233,10 +243,12 @@ void CDemoRecord::MakeLevelMapProcess()
             m_iLMScreenshotFragment = -1;
         }
     }
-    break;
-    default: { setup_lm_screenshot_matrices();
+        break;
+    default:
+    {
+        setup_lm_screenshot_matrices();
     }
-    break;
+        break;
     }
     m_Stage++;
 }
@@ -277,7 +289,8 @@ BOOL CDemoRecord::ProcessCam(SCamEffectorInfo& info)
     info.dont_apply = false;
     if (0 == file) return TRUE;
 
-    if (m_bMakeScreenshot) {
+    if (m_bMakeScreenshot)
+    {
         MakeScreenshotFace();
         // update camera
         info.n.set(m_Camera.j);
@@ -297,7 +310,9 @@ BOOL CDemoRecord::ProcessCam(SCamEffectorInfo& info)
     }
     else
     {
-        if (IR_GetKeyState(DIK_F1)) {
+        if (IR_GetKeyState(DIK_F1))
+        {
+
             pApp->pFontSystem->SetColor(color_rgba(255, 0, 0, 255));
             pApp->pFontSystem->SetAligment(CGameFont::alCenter);
             pApp->pFontSystem->OutSetI(0, -.05f);
@@ -319,6 +334,7 @@ BOOL CDemoRecord::ProcessCam(SCamEffectorInfo& info)
             pApp->pFontSystem->OutNext("= Level Map ScreenShot");
             pApp->pFontSystem->OutNext("= Level Map ScreenShot(High Quality)");
             pApp->pFontSystem->OutNext("= ScreenShot");
+
         }
 
         m_vVelocity.lerp(m_vVelocity, m_vT, 0.3f);
@@ -326,7 +342,8 @@ BOOL CDemoRecord::ProcessCam(SCamEffectorInfo& info)
 
         float speed = m_fSpeed1, ang_speed = m_fAngSpeed1;
 
-        if (IR_GetKeyState(DIK_LSHIFT)) {
+        if (IR_GetKeyState(DIK_LSHIFT))
+        {
             speed = m_fSpeed0;
             ang_speed = m_fAngSpeed0;
         }
@@ -347,7 +364,8 @@ BOOL CDemoRecord::ProcessCam(SCamEffectorInfo& info)
         m_HPB.x -= m_vR.y;
         m_HPB.y -= m_vR.x;
         m_HPB.z += m_vR.z;
-        if (g_position.set_position) {
+        if (g_position.set_position)
+        {
             m_Position.set(g_position.p);
             g_position.set_position = false;
         }
@@ -391,11 +409,13 @@ void CDemoRecord::IR_OnKeyboardPress(int dik)
 {
     if (dik == DIK_MULTIPLY) m_b_redirect_input_to_level = !m_b_redirect_input_to_level;
 
-    if (m_b_redirect_input_to_level) {
+    if (m_b_redirect_input_to_level)
+    {
         g_pGameLevel->IR_OnKeyboardPress(dik);
         return;
     }
-    if (dik == DIK_GRAVE) Console->Show();
+    if (dik == DIK_GRAVE)
+        Console->Show();
     if (dik == DIK_SPACE) RecordKey();
     if (dik == DIK_BACK) MakeCubemap();
     if (dik == DIK_F11) MakeLevelMapScreenshot(IR_GetKeyState(DIK_LCONTROL));
@@ -403,15 +423,18 @@ void CDemoRecord::IR_OnKeyboardPress(int dik)
     if (dik == DIK_ESCAPE) fLifeTime = -1;
 
 #ifndef MASTER_GOLD
-    if (dik == DIK_RETURN) {
-        if (g_pGameLevel->CurrentEntity()) {
+    if (dik == DIK_RETURN)
+    {
+        if (g_pGameLevel->CurrentEntity())
+        {
             g_pGameLevel->CurrentEntity()->ForceTransform(m_Camera);
             fLifeTime = -1;
         }
     }
 #endif // #ifndef MASTER_GOLD
 
-    if (dik == DIK_PAUSE) Device.Pause(!Device.Paused(), TRUE, TRUE, "demo_record");
+    if (dik == DIK_PAUSE)
+        Device.Pause(!Device.Paused(), TRUE, TRUE, "demo_record");
 }
 
 static void update_whith_timescale(Fvector& v, const Fvector& v_delta)
@@ -421,9 +444,12 @@ static void update_whith_timescale(Fvector& v, const Fvector& v_delta)
     v.mad(v, v_delta, scale);
 }
 
+
+
 void CDemoRecord::IR_OnKeyboardHold(int dik)
 {
-    if (m_b_redirect_input_to_level) {
+    if (m_b_redirect_input_to_level)
+    {
         g_pGameLevel->IR_OnKeyboardHold(dik);
         return;
     }
@@ -448,7 +474,7 @@ void CDemoRecord::IR_OnKeyboardHold(int dik)
     case DIK_W:
         vT_delta.y += 1.0f;
         break; // Slide Up
-    // rotate
+        // rotate
     case DIK_NUMPAD2:
         vR_delta.x -= 1.0f;
         break; // Pitch Down
@@ -473,28 +499,32 @@ void CDemoRecord::IR_OnKeyboardHold(int dik)
 
     update_whith_timescale(m_vT, vT_delta);
     update_whith_timescale(m_vR, vR_delta);
+
 }
 
 void CDemoRecord::IR_OnMouseMove(int dx, int dy)
 {
-    if (m_b_redirect_input_to_level) {
+    if (m_b_redirect_input_to_level)
+    {
         g_pGameLevel->IR_OnMouseMove(dx, dy);
         return;
     }
 
     Fvector vR_delta = Fvector().set(0, 0, 0);
 
-    float scale = .5f; // psMouseSens;
-    if (dx || dy) {
-        vR_delta.y += float(dx) * scale;                                                    // heading
-        vR_delta.x += ((psMouseInvert.test(1)) ? -1 : 1) * float(dy) * scale * (3.f / 4.f); // pitch
+    float scale = .5f;//psMouseSens;
+    if (dx || dy)
+    {
+        vR_delta.y += float(dx)*scale; // heading
+        vR_delta.x += ((psMouseInvert.test(1)) ? -1 : 1)*float(dy)*scale*(3.f / 4.f); // pitch
     }
     update_whith_timescale(m_vR, vR_delta);
 }
 
 void CDemoRecord::IR_OnMouseHold(int btn)
 {
-    if (m_b_redirect_input_to_level) {
+    if (m_b_redirect_input_to_level)
+    {
         g_pGameLevel->IR_OnMouseHold(btn);
         return;
     }

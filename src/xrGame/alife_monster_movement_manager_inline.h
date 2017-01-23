@@ -8,30 +8,30 @@
 
 #pragma once
 
-IC CALifeMonsterMovementManager::object_type& CALifeMonsterMovementManager::object() const
+IC	CALifeMonsterMovementManager::object_type &CALifeMonsterMovementManager::object			() const
 {
-    VERIFY(m_object);
-    return (*m_object);
+	VERIFY		(m_object);
+	return		(*m_object);
 }
 
-IC CALifeMonsterMovementManager::detail_path_type& CALifeMonsterMovementManager::detail() const
+IC	CALifeMonsterMovementManager::detail_path_type &CALifeMonsterMovementManager::detail	() const
 {
-    VERIFY(m_detail);
-    return (*m_detail);
+	VERIFY		(m_detail);
+	return		(*m_detail);
 }
 
-IC CALifeMonsterMovementManager::patrol_path_type& CALifeMonsterMovementManager::patrol() const
+IC	CALifeMonsterMovementManager::patrol_path_type &CALifeMonsterMovementManager::patrol	() const
 {
-    VERIFY(m_patrol);
-    return (*m_patrol);
+	VERIFY		(m_patrol);
+	return		(*m_patrol);
 }
 
-IC const CALifeMonsterMovementManager::EPathType& CALifeMonsterMovementManager::path_type() const
+IC	const CALifeMonsterMovementManager::EPathType &CALifeMonsterMovementManager::path_type	() const
 {
-    return (m_path_type);
+	return		(m_path_type);
 }
 
-IC void CALifeMonsterMovementManager::path_type(const EPathType& path_type)
+IC	void CALifeMonsterMovementManager::path_type	(const EPathType &path_type)
 {
-    m_path_type = path_type;
+	m_path_type	= path_type;
 }

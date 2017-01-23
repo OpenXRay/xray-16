@@ -8,45 +8,44 @@
 #define DOORS_MANAGER_H_INCLUDED
 
 #include "Common/Noncopyable.hpp"
-#include "doors.h"
 #include "quadtree.h"
+#include "doors.h"
 
 class CPhysicObject;
 
-namespace doors
-{
+namespace doors {
+
 class actor;
 class door;
 
-class manager : private Noncopyable
-{
+class manager : private Noncopyable {
 public:
-    manager(Fbox const& bounding_box);
-    ~manager();
-    door* register_door(CPhysicObject& object);
-    void unregister_door(door*& door);
-    void on_door_is_open(door* door);
-    void on_door_is_closed(door* door);
-    bool is_door_locked(door const* door) const;
-    void lock_door(door* door);
-    void unlock_door(door* door);
-    bool is_door_blocked(door* door) const;
+				manager					( Fbox const& bounding_box );
+				~manager				( );
+	door*		register_door			( CPhysicObject& object );
+	void		unregister_door			( door*& door );
+	void		on_door_is_open			( door* door );
+	void		on_door_is_closed		( door* door );
+	bool		is_door_locked			( door const* door ) const;
+	void		lock_door				( door* door );
+	void		unlock_door				( door* door );
+	bool		is_door_blocked			( door* door ) const;
 
 public:
-    bool actualize_doors_state(actor& npc, float average_speed);
+	bool		actualize_doors_state	( actor& npc, float average_speed );
 
 private:
-    friend class doors::actor;
-    void open_door(door* door);
-    void close_door(door* door);
-    //	void		check_bug_door			( ) const;
+	friend class doors::actor;
+	void		open_door				( door* door );
+	void		close_door				( door* door );
+//	void		check_bug_door			( ) const;
 
 private:
-    typedef CQuadTree<door> doors_tree_type;
+	typedef CQuadTree<door>				doors_tree_type;
 
 private:
-    doors_tree_type m_doors;
-    doors_type m_nearest_doors;
+	doors_tree_type	m_doors;
+	doors_type		m_nearest_doors;
 }; // class manager
 
 } // namespace doors

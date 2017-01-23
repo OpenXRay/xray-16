@@ -6,9 +6,10 @@
 #define XRPHYSICS_API XR_EXPORT
 #else
 #define XRPHYSICS_API XR_IMPORT
-#ifndef _EDITOR
-#pragma comment(lib, "xrPhysics.lib")
-#else
-#pragma comment(lib, "xrPhysicsB.lib")
+	#ifndef	_EDITOR
+		#pragma comment( lib, "xrPhysics.lib"	)
+	#else
+		#pragma comment( lib, "xrPhysicsB.lib"	)
+	#endif
 #endif
-#endif
+

@@ -38,49 +38,50 @@ struct SGameVertex;
 
 namespace GraphEngineSpace
 {
-using _dist_type = float;
-using _index_type = u32;
-using _iteration_type = u32;
-using _solver_dist_type = u16;
-using _solver_condition_type = u32;
-using _solver_value_type = bool;
+    using _dist_type = float;
+    using _index_type = u32;
+    using _iteration_type = u32;
+    using _solver_dist_type = u16;
+    using _solver_condition_type = u32;
+    using _solver_value_type = bool;
 
-struct CSolverConditionValue
-{
-    _solver_condition_type m_condition;
-    _solver_value_type m_value;
-
-    CSolverConditionValue(const _solver_condition_type& condition, const _solver_value_type& value)
+    struct CSolverConditionValue
     {
-        m_condition = condition;
-        m_value = value;
-    }
+        _solver_condition_type m_condition;
+        _solver_value_type m_value;
 
-    bool operator==(const _solver_condition_type& condition) const { return condition == m_condition; }
-};
+        CSolverConditionValue(const _solver_condition_type &condition, const _solver_value_type &value)
+        {
+            m_condition = condition;
+            m_value = value;
+        }
 
-using CSolverConditionStorage = xr_vector<CSolverConditionValue>;
+        bool operator==(const _solver_condition_type &condition) const
+        { return condition==m_condition; }
+    };
 
-using CWorldProperty = COperatorConditionAbstract<_solver_condition_type, _solver_value_type>;
+    using CSolverConditionStorage = xr_vector<CSolverConditionValue>;
 
-using CWorldState = CConditionState<CWorldProperty>;
+    using CWorldProperty = COperatorConditionAbstract<_solver_condition_type, _solver_value_type>;
 
-using CWorldOperator = COperatorAbstract<CWorldProperty, _solver_dist_type>;
+    using CWorldState = CConditionState<CWorldProperty>;
 
-using _solver_index_type = CWorldState;
-using _solver_edge_type = u32;
+    using CWorldOperator = COperatorAbstract<CWorldProperty, _solver_dist_type>;
 
-using CSolverBaseParameters = SBaseParameters<_solver_dist_type, _solver_index_type, _iteration_type>;
+    using _solver_index_type = CWorldState;
+    using _solver_edge_type = u32;
 
-using CBaseParameters = SBaseParameters<_dist_type, _index_type, _iteration_type>;
+    using CSolverBaseParameters = SBaseParameters<_solver_dist_type, _solver_index_type, _iteration_type>;
+    
+    using CBaseParameters = SBaseParameters<_dist_type, _index_type, _iteration_type>;
 
-using CFlooder = SFlooder<_dist_type, _index_type, _iteration_type>;
-
-using CStraightLineParams = SStraightLineParams<_dist_type, _index_type, _iteration_type>;
-
-using CNearestVertexParameters = SNearestVertex<_dist_type, _index_type, _iteration_type>;
-
-using CGameLevelParams = SGameLevel<_dist_type, _index_type, _iteration_type>;
-
-using CGameVertexParams = SGameVertex<_dist_type, _index_type, _iteration_type>;
+    using CFlooder = SFlooder<_dist_type, _index_type, _iteration_type>;
+    
+    using CStraightLineParams = SStraightLineParams<_dist_type, _index_type, _iteration_type>;
+    
+    using CNearestVertexParameters = SNearestVertex<_dist_type, _index_type, _iteration_type>;
+    
+    using CGameLevelParams = SGameLevel<_dist_type, _index_type, _iteration_type>;
+    
+    using CGameVertexParams = SGameVertex<_dist_type, _index_type, _iteration_type>;
 };

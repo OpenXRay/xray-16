@@ -13,93 +13,95 @@ Comments:
 
 ******************************************************************************/
 
-#ifndef __NV_COMMON_H
-#define __NV_COMMON_H
+#ifndef	__NV_COMMON_H
+#define	__NV_COMMON_H
 
-#include <assert.h>
 #include <windows.h>
+#include <assert.h>
 
 #ifndef ASSERT_IF_FAILED
-#define ASSERT_IF_FAILED(hres)                                                                                         \
-    {                                                                                                                  \
-        if (FAILED(hres)) assert(false);                                                                               \
-    }
+#define ASSERT_IF_FAILED(hres)  \
+{                               \
+    if (FAILED(hres))           \
+        assert(false);           \
+}
 #endif
 
-#ifndef ASSERT_AND_RET_IF_FAILED
-#define ASSERT_AND_RET_IF_FAILED(hres)                                                                                 \
-    {                                                                                                                  \
-        if (FAILED(hres)) {                                                                                            \
-            assert(false);                                                                                             \
-            return (hres);                                                                                             \
-        }                                                                                                              \
-    }
+#ifndef	ASSERT_AND_RET_IF_FAILED
+#define ASSERT_AND_RET_IF_FAILED(hres)  \
+{                                       \
+    if (FAILED(hres))	                \
+    {                                   \
+        assert(false);                  \
+        return (hres);                  \
+    }                                   \
+}
 #endif
 
 #ifndef FAIL_IF_NULL
-#define FAIL_IF_NULL(x)                                                                                                \
-    {                                                                                                                  \
-        if (x == NULL) {                                                                                               \
-            assert(false);                                                                                             \
-            return E_FAIL;                                                                                             \
-        }                                                                                                              \
-    }
+#define FAIL_IF_NULL(x) \
+{                       \
+    if (x == NULL)      \
+    {                   \
+        assert(false);  \
+        return E_FAIL;  \
+    }                   \
+}
 #endif
 
 // FDebug defined in NV_Error.h
 #ifndef ASSERT_MSG
-#define ASSERT_MSG(var, msg)                                                                                           \
-    {                                                                                                                  \
-        if (!(var)) {                                                                                                  \
-            FDebug(msg);                                                                                               \
-        }                                                                                                              \
-        assert(var);                                                                                                   \
-    }
+#define ASSERT_MSG(var, msg)\
+{                           \
+    if (!(var))             \
+    {                       \
+        FDebug(msg);        \
+    }                       \
+    assert(var);            \
+}
 #endif
 
 #ifndef SAFE_ARRAY_DELETE
-#define SAFE_ARRAY_DELETE(p)                                                                                           \
-    {                                                                                                                  \
-        if (p) {                                                                                                       \
-            delete[](p);                                                                                               \
-            p = NULL;                                                                                                  \
-        }                                                                                                              \
-    }
+#define SAFE_ARRAY_DELETE(p)\
+{                           \
+    if (p)                  \
+    {                       \
+        delete[] (p);       \
+        p = NULL;           \
+    }                       \
+}
 #endif
 
 #ifndef SAFE_DELETE
-#define SAFE_DELETE(p)                                                                                                 \
-    {                                                                                                                  \
-        if (p) {                                                                                                       \
-            delete (p);                                                                                                \
-            p = NULL;                                                                                                  \
-        }                                                                                                              \
-    }
+#define SAFE_DELETE(p)  \
+{                       \
+    if (p)              \
+    {                   \
+        delete (p);     \
+        p = NULL;       \
+    }                   \
+}
 #endif
 
 #ifndef SAFE_RELEASE
-#define SAFE_RELEASE(p)                                                                                                \
-    {                                                                                                                  \
-        if (p) {                                                                                                       \
-            (p)->Release();                                                                                            \
-            (p) = NULL;                                                                                                \
-        }                                                                                                              \
-    }
+#define SAFE_RELEASE(p) \
+{                       \
+    if (p)              \
+    {                   \
+        (p)->Release(); \
+        (p) = NULL;     \
+    }                   \
+}
 #endif
 
-#define ifnot(x) if (!(x))
-#define until(x) while (!(x))
-#define ever (;;)
-#define wait                                                                                                           \
-    do                                                                                                                 \
-    {                                                                                                                  \
-    }
-#define nothing                                                                                                        \
-    {                                                                                                                  \
-    }
+#define ifnot(x)    if (!(x))
+#define until(x)    while(!(x))
+#define ever        (;;)
+#define wait        do {}
+#define nothing     {}
 
 // @@ extract more of these from ulCommon.h
-typedef unsigned short USHORT;
-typedef unsigned short ushort;
+typedef unsigned short		USHORT;
+typedef unsigned short		ushort;
 
 #endif

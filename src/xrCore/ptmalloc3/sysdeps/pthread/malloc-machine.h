@@ -30,55 +30,55 @@ PERFORMANCE OF THIS SOFTWARE.
 #undef thread_atfork_static
 
 /* Use fast inline spinlocks with gcc.  */
-#if (defined __i386__ || defined __x86_64__) && defined __GNUC__ && !defined USE_NO_SPINLOCKS
+#if (defined __i386__ || defined __x86_64__) && defined __GNUC__ && \
+    !defined USE_NO_SPINLOCKS
 
-#include <sched.h>
 #include <time.h>
+#include <sched.h>
 
-typedef struct
-{
-    volatile unsigned int lock;
-    int pad0_;
+typedef struct {
+  volatile unsigned int lock;
+  int pad0_;
 } mutex_t;
 
-#define MUTEX_INITIALIZER                                                                                              \
-    {                                                                                                                  \
-        0                                                                                                              \
-    }
-#define mutex_init(m) ((m)->lock = 0)
-static inline int mutex_lock(mutex_t* m)
-{
-    int cnt = 0, r;
-    struct timespec tm;
+#define MUTEX_INITIALIZER          { 0 }
+#define mutex_init(m)              ((m)->lock = 0)
+static inline int mutex_lock(mutex_t *m) {
+  int cnt = 0, r;
+  struct timespec tm;
 
-    for (;;)
-    {
-        __asm__ __volatile__("xchgl %0, %1" : "=r"(r), "=m"(m->lock) : "0"(1), "m"(m->lock) : "memory");
-        if (!r) return 0;
-        if (cnt < 50) {
-            sched_yield();
-            cnt++;
-        }
-        else
-        {
-            tm.tv_sec = 0;
-            tm.tv_nsec = 2000001;
-            nanosleep(&tm, NULL);
-            cnt = 0;
-        }
+  for(;;) {
+    __asm__ __volatile__
+      ("xchgl %0, %1"
+       : "=r"(r), "=m"(m->lock)
+       : "0"(1), "m"(m->lock)
+       : "memory");
+    if(!r)
+      return 0;
+    if(cnt < 50) {
+      sched_yield();
+      cnt++;
+    } else {
+      tm.tv_sec = 0;
+      tm.tv_nsec = 2000001;
+      nanosleep(&tm, NULL);
+      cnt = 0;
     }
+  }
 }
-static inline int mutex_trylock(mutex_t* m)
-{
-    int r;
+static inline int mutex_trylock(mutex_t *m) {
+  int r;
 
-    __asm__ __volatile__("xchgl %0, %1" : "=r"(r), "=m"(m->lock) : "0"(1), "m"(m->lock) : "memory");
-    return r;
+  __asm__ __volatile__
+    ("xchgl %0, %1"
+     : "=r"(r), "=m"(m->lock)
+     : "0"(1), "m"(m->lock)
+     : "memory");
+  return r;
 }
-static inline int mutex_unlock(mutex_t* m)
-{
-    __asm__ __volatile__("movl %1, %0" : "=m"(m->lock) : "g"(0) : "memory");
-    return 0;
+static inline int mutex_unlock(mutex_t *m) {
+  __asm__ __volatile__ ("movl %1, %0" : "=m" (m->lock) : "g"(0) : "memory");
+  return 0;
 }
 
 #else
@@ -86,11 +86,11 @@ static inline int mutex_unlock(mutex_t* m)
 /* Normal pthread mutex.  */
 typedef pthread_mutex_t mutex_t;
 
-#define MUTEX_INITIALIZER PTHREAD_MUTEX_INITIALIZER
-#define mutex_init(m) pthread_mutex_init(m, NULL)
-#define mutex_lock(m) pthread_mutex_lock(m)
-#define mutex_trylock(m) pthread_mutex_trylock(m)
-#define mutex_unlock(m) pthread_mutex_unlock(m)
+#define MUTEX_INITIALIZER          PTHREAD_MUTEX_INITIALIZER
+#define mutex_init(m)              pthread_mutex_init(m, NULL)
+#define mutex_lock(m)              pthread_mutex_lock(m)
+#define mutex_trylock(m)           pthread_mutex_trylock(m)
+#define mutex_unlock(m)            pthread_mutex_unlock(m)
 
 #endif /* (__i386__ || __x86_64__) && __GNUC__ && !USE_NO_SPINLOCKS */
 
@@ -102,16 +102,15 @@ typedef pthread_mutex_t mutex_t;
    The hack only works when pthread_t can be converted to an integral
    type. */
 
-typedef void* tsd_key_t[256];
-#define tsd_key_create(key, destr)                                                                                     \
-    do                                                                                                                 \
-    {                                                                                                                  \
-        int i;                                                                                                         \
-        for (i = 0; i < 256; i++)                                                                                      \
-            (*key)[i] = 0;                                                                                             \
-    } while (0)
-#define tsd_setspecific(key, data) (key[(unsigned)pthread_self() % 256] = (data))
-#define tsd_getspecific(key, vptr) (vptr = key[(unsigned)pthread_self() % 256])
+typedef void *tsd_key_t[256];
+#define tsd_key_create(key, destr) do { \
+  int i; \
+  for(i=0; i<256; i++) (*key)[i] = 0; \
+} while(0)
+#define tsd_setspecific(key, data) \
+ (key[(unsigned)pthread_self() % 256] = (data))
+#define tsd_getspecific(key, vptr) \
+ (vptr = key[(unsigned)pthread_self() % 256])
 
 #else
 
@@ -124,7 +123,8 @@ typedef pthread_key_t tsd_key_t;
 #endif
 
 /* at fork */
-#define thread_atfork(prepare, parent, child) pthread_atfork(prepare, parent, child)
+#define thread_atfork(prepare, parent, child) \
+                                   pthread_atfork(prepare, parent, child)
 
 #include <sysdeps/generic/malloc-machine.h>
 

@@ -2,7 +2,7 @@
 #define _FIXEDSET_H
 #pragma once
 
-template <class K, class allocator = xr_allocator>
+template<class K, class allocator = xr_allocator>
 class FixedSET
 {
     enum
@@ -10,26 +10,28 @@ class FixedSET
         SG_REALLOC_ADVANCE = 64,
         SG_REALLOC_ALIGN = 64
     };
-
 public:
     struct TNode
     {
         K key;
-        TNode *left, *right;
+        TNode* left, *right;
     };
     typedef void __fastcall callback(TNode*);
-
 private:
     TNode* nodes;
     u32 pool;
     u32 limit;
 
-    IC u32 Size(u32 Count) { return Count * sizeof(TNode); }
+    IC u32 Size(u32 Count)
+    {
+        return Count*sizeof(TNode);
+    }
+
     void Realloc()
     {
         u32 newLimit = limit + SG_REALLOC_ADVANCE;
-        VERIFY(newLimit % SG_REALLOC_ADVANCE == 0);
-        TNode* newNodes = (TNode*)allocator::alloc(sizeof(TNode) * newLimit);
+        VERIFY(newLimit%SG_REALLOC_ADVANCE == 0);
+        TNode* newNodes = (TNode*)allocator::alloc(sizeof(TNode)*newLimit);
         VERIFY(newNodes);
 
         ZeroMemory(newNodes, Size(newLimit));
@@ -41,18 +43,19 @@ private:
             TNode* Nold = nodes + I;
             TNode* Nnew = newNodes + I;
 
-            if (Nold->left) {
+            if (Nold->left)
+            {
                 u32 Lid = u32(Nold->left - nodes);
                 Nnew->left = newNodes + Lid;
             }
-            if (Nold->right) {
+            if (Nold->right)
+            {
                 u32 Rid = u32(Nold->right - nodes);
                 Nnew->right = newNodes + Rid;
             }
         }
-        if (nodes)
-        allocator:
-            dealloc(nodes);
+        if (nodes) allocator:
+        dealloc(nodes);
 
         nodes = newNodes;
         limit = newLimit;
@@ -86,7 +89,6 @@ private:
         CB(N);
         if (N->left) recurseRL(N->left, CB);
     }
-
 public:
     FixedSET()
     {
@@ -101,12 +103,15 @@ public:
     }
     IC TNode* insert(const K& k)
     {
-        if (pool) {
+        if (pool)
+        {
             TNode* node = nodes;
 
         once_more:
-            if (k < node->key) {
-                if (node->left) {
+            if (k < node->key)
+            {
+                if (node->left)
+                {
                     node = node->left;
                     goto once_more;
                 }
@@ -119,7 +124,8 @@ public:
             }
             else if (k > node->key)
             {
-                if (node->right) {
+                if (node->right)
+                {
                     node = node->right;
                     goto once_more;
                 }
@@ -130,8 +136,8 @@ public:
                     return N;
                 }
             }
-            else
-                return node;
+            else return node;
+
         }
         else
         {
@@ -140,12 +146,15 @@ public:
     }
     IC TNode* insertInAnyWay(const K& k)
     {
-        if (pool) {
+        if (pool)
+        {
             TNode* node = nodes;
 
         once_more:
-            if (k <= node->key) {
-                if (node->left) {
+            if (k <= node->key)
+            {
+                if (node->left)
+                {
                     node = node->left;
                     goto once_more;
                 }
@@ -158,7 +167,8 @@ public:
             }
             else
             {
-                if (node->right) {
+                if (node->right)
+                {
                     node = node->right;
                     goto once_more;
                 }
@@ -180,7 +190,8 @@ public:
     IC TNode* end() { return nodes + pool; }
     IC TNode* last() { return nodes + limit; } // for setup only
     IC u32 size() { return pool; }
-    IC TNode& operator[](int v) { return nodes[v]; }
+    IC TNode& operator[] (int v) { return nodes[v]; }
+
     IC void traverseLR(callback CB)
     {
         if (pool) recurseLR(nodes, CB);

@@ -20,11 +20,11 @@
 *
 *******************************************************************************/
 
-#define IS_2_POW_N(X) (((X) & (X - 1)) == 0)
-#define PTR_SZ sizeof(void*)
+#define IS_2_POW_N(X) (((X)&(X-1)) == 0)
+#define PTR_SZ sizeof(void *)
 
 #ifdef __BORLANDC__
-typedef _W64 unsigned int uintptr_t;
+typedef _W64 unsigned int  uintptr_t;
 #endif
 /***
 *
@@ -81,24 +81,28 @@ void* __stdcall xr_aligned_malloc(size_t size, size_t alignment)
 *
 *******************************************************************************/
 
+
 void* __stdcall xr_aligned_offset_malloc(size_t size, size_t align, size_t offset)
 {
     uintptr_t ptr, retptr, gap;
 
-    if (!IS_2_POW_N(align)) {
+    if (!IS_2_POW_N(align))
+    {
         errno = EINVAL;
         return NULL;
     }
-    if (offset >= size && offset != 0) size = offset + 1;
+    if (offset >= size && offset != 0)
+        size = offset + 1;
 
     align = (align > PTR_SZ ? align : PTR_SZ) - 1;
 
     /* gap = number of bytes needed to round up offset to align with PTR_SZ*/
-    gap = (0 - offset) & (PTR_SZ - 1);
+    gap = (0 - offset)&(PTR_SZ - 1);
 
-    if ((ptr = (uintptr_t)malloc(PTR_SZ + gap + align + size)) == (uintptr_t)NULL) return NULL;
+    if ((ptr = (uintptr_t)malloc(PTR_SZ + gap + align + size)) == (uintptr_t)NULL)
+        return NULL;
 
-    retptr = ((ptr + PTR_SZ + gap + align + offset) & ~align) - offset;
+    retptr = ((ptr + PTR_SZ + gap + align + offset)&~align) - offset;
     ((uintptr_t*)(retptr - gap))[-1] = ptr;
 
     return (void*)retptr;
@@ -134,6 +138,7 @@ void* __stdcall xr_aligned_realloc(void* memblock, size_t size, size_t alignment
     return xr_aligned_offset_realloc(memblock, size, alignment, 0);
 }
 
+
 /***
 *
 * void *xr_aligned_offset_realloc (void * memblock, size_t size,
@@ -166,14 +171,17 @@ void* __stdcall xr_aligned_offset_realloc(void* memblock, size_t size, size_t al
     uintptr_t movsz, reqsz;
     int bFree = 0;
 
-    if (memblock == NULL) {
+    if (memblock == NULL)
+    {
         return xr_aligned_offset_malloc(size, align, offset);
     }
-    if (size == 0) {
+    if (size == 0)
+    {
         xr_aligned_free(memblock);
         return NULL;
     }
-    if (offset >= size && offset != 0) {
+    if (offset >= size && offset != 0)
+    {
         errno = EINVAL;
         return NULL;
     }
@@ -186,14 +194,15 @@ void* __stdcall xr_aligned_offset_realloc(void* memblock, size_t size, size_t al
     /* ptr is the pointer to the start of memory block*/
     stptr = *((uintptr_t*)stptr);
 
-    if (!IS_2_POW_N(align)) {
+    if (!IS_2_POW_N(align))
+    {
         errno = EINVAL;
         return NULL;
     }
 
     align = (align > PTR_SZ ? align : PTR_SZ) - 1;
     /* gap = number of bytes needed to round up offset to align with PTR_SZ*/
-    gap = (0 - offset) & (PTR_SZ - 1);
+    gap = (0 - offset)&(PTR_SZ - 1);
 
     diff = (uintptr_t)memblock - stptr;
     /* Mov size is min of the size of data available and sizw requested.
@@ -211,31 +220,40 @@ void* __stdcall xr_aligned_offset_realloc(void* memblock, size_t size, size_t al
     *
     * If yes, expand and then check if we need to move the data.
     */
-    if ((stptr + align + PTR_SZ + gap) < (uintptr_t)memblock) {
-        if ((ptr = (uintptr_t)malloc(reqsz)) == (uintptr_t)NULL) return NULL;
+    if ((stptr + align + PTR_SZ + gap) < (uintptr_t)memblock)
+    {
+        if ((ptr = (uintptr_t)malloc(reqsz)) == (uintptr_t)NULL)
+            return NULL;
         bFree = 1;
     }
     else
     {
-        if ((ptr = (uintptr_t)_expand((void*)stptr, reqsz)) == (uintptr_t)NULL) {
-            if ((ptr = (uintptr_t)malloc(reqsz)) == (uintptr_t)NULL) return NULL;
+        if ((ptr = (uintptr_t)_expand((void*)stptr, reqsz)) == (uintptr_t)NULL)
+        {
+            if ((ptr = (uintptr_t)malloc(reqsz)) == (uintptr_t)NULL)
+                return NULL;
             bFree = 1;
         }
         else
             stptr = ptr;
     }
 
-    if (ptr == ((uintptr_t)memblock - diff) && !(((size_t)memblock + gap + offset) & ~(align))) {
+
+    if (ptr == ((uintptr_t)memblock - diff)
+        && !(((size_t)memblock + gap + offset) & ~(align)))
+    {
         return memblock;
     }
 
-    retptr = ((ptr + PTR_SZ + gap + align + offset) & ~align) - offset;
+    retptr = ((ptr + PTR_SZ + gap + align + offset)&~align) - offset;
     memmove((void*)retptr, (void*)(stptr + diff), movsz);
-    if (bFree) free((void*)stptr);
+    if (bFree)
+        free((void*)stptr);
 
     ((uintptr_t*)(retptr - gap))[-1] = ptr;
     return (void*)retptr;
 }
+
 
 /***
 *
@@ -256,7 +274,8 @@ void __stdcall xr_aligned_free(void* memblock)
 {
     uintptr_t ptr;
 
-    if (memblock == NULL) return;
+    if (memblock == NULL)
+        return;
 
     ptr = (uintptr_t)memblock;
 
@@ -272,7 +291,8 @@ u32 __stdcall xr_aligned_msize(void* memblock)
 {
     uintptr_t ptr;
 
-    if (memblock == NULL) return 0;
+    if (memblock == NULL)
+        return 0;
 
     ptr = (uintptr_t)memblock;
 

@@ -12,24 +12,30 @@
 #include "object_item_abstract.h"
 #include "xrScriptEngine/Functor.hpp"
 
-class CObjectItemScript : public CObjectItemAbstract
-{
+class CObjectItemScript : public CObjectItemAbstract {
 protected:
-    typedef CObjectItemAbstract inherited;
+	typedef CObjectItemAbstract inherited;
 
 protected:
-    mutable luabind::functor<ObjectFactory::ClientObjectBaseClass*, luabind::policy::adopt<0>> m_client_creator;
-    mutable luabind::functor<ObjectFactory::ServerObjectBaseClass*, luabind::policy::adopt<0>> m_server_creator;
+	mutable luabind::functor<ObjectFactory::ClientObjectBaseClass *, luabind::policy::adopt<0>> m_client_creator;
+	mutable luabind::functor<ObjectFactory::ServerObjectBaseClass *, luabind::policy::adopt<0>> m_server_creator;
 
 public:
-    CObjectItemScript(
+												CObjectItemScript	(
 #ifndef NO_XR_GAME
-        luabind::object client_creator,
+													luabind::object client_creator, 
 #endif
-        luabind::object server_creator, const CLASS_ID& clsid, LPCSTR script_clsid);
+													luabind::object server_creator, 
+													const CLASS_ID &clsid, 
+													LPCSTR script_clsid
+												);
 #ifndef NO_XR_GAME
-    CObjectItemScript(luabind::object creator, const CLASS_ID& clsid, LPCSTR script_clsid);
-    virtual ObjectFactory::ClientObjectBaseClass* client_object() const;
+												CObjectItemScript	(
+													luabind::object creator, 
+													const CLASS_ID &clsid, 
+													LPCSTR script_clsid
+												);
+    virtual ObjectFactory::ClientObjectBaseClass *client_object() const;
 #endif
-    virtual ObjectFactory::ServerObjectBaseClass* server_object(LPCSTR section) const;
+    virtual ObjectFactory::ServerObjectBaseClass *server_object(LPCSTR section) const;
 };

@@ -7,12 +7,10 @@
 
 #include "inventory_item_object.h"
 
-class CScope : public CInventoryItemObject
-{
+class CScope : public CInventoryItemObject {
 private:
-    typedef CInventoryItemObject inherited;
-
+	typedef CInventoryItemObject inherited;
 public:
-    CScope();
-    virtual ~CScope();
+			CScope ();
+	virtual ~CScope();
 };

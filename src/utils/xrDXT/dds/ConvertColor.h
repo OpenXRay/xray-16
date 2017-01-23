@@ -1,18 +1,18 @@
 #pragma once
-#include "tPixel.h"
+#include "tPixel.h" 
 
 namespace nv
 {
-template <class T>
-inline T Min(const T& x, const T& y)
-{
-    return x < y ?: x : y;
-}
-template <class T>
-inline T Max(const T& x, const T& y)
-{
-    return x > y ? x : y;
-}
+    template<class T>
+    inline T Min(const T& x, const T& y)
+    {
+        return x < y ? : x : y;
+    }
+    template<class T>
+    inline T Max(const T& x, const T& y)
+    {
+        return x > y ? x : y;
+    }
 }
 
 typedef unsigned short nvhalf;
@@ -44,7 +44,7 @@ class nvColorConvert
 public:
     void RGBAToFloat(const RGBAImage& srcImage, fpImage& dstImage);
     void RGBAToFloat(const RGBAMipMappedImage& srcMIPImage, fpMipMappedImage& dstMIPImage);
-    void FloatToRGBA(const fpImage& srcImage, RGBAImage& dstImage);
+    void FloatToRGBA(const fpImage& srcImage, RGBAImage&  dstImage);
     void FloatToRGBA(const fpMipMappedImage& srcMIPImage, RGBAMipMappedImage& dstMIPImage);
     fpPixel RGBEtoFloat(int r, int g, int b, int e);
     // photoshop import export
@@ -53,9 +53,9 @@ public:
     int FloatToUnsignedPS(float pixel, int depth);
     int FloatToSignedPS(float pixel, int depth, int plane);
     // format to float
-    static float UnsignedToFloat(int channel);            // unsigned, 8 bits
+    static float UnsignedToFloat(int channel); // unsigned, 8 bits
     static float UnsignedToFloat(int channel, int nBits); // unsigned
-    static float SignedToFloat(int channel);              // 8 bits
+    static float SignedToFloat(int channel); // 8 bits
     static float SignedToFloat(int channel, int nBits);
 
     static void RGBAToFloat(int r, int g, int b, int a, fpPixel& fp)
@@ -75,17 +75,18 @@ public:
     }
 
     static void RGBEToFloat(fpPixel& fp, const rgba_t& rgbe);
-    static void RGBEToFloat(float& r, float& g, float& b, const rgba_t& rgbe);
+    static void RGBEToFloat(float &r, float& g, float& b, const rgba_t& rgbe);
 
     static float HalfToFloat(nvhalf val)
     {
         nv_half_data h;
-        // h.bits = val.value_bits;
+        //h.bits = val.value_bits;
         h.bits = val;
         nv_ieee_single sng;
         sng.ieee.s = h.ieee.s;
         // handle special cases
-        if (h.ieee.e == 0 && h.ieee.m == 0) {
+        if (h.ieee.e == 0 && h.ieee.m == 0)
+        {
             // zero
             sng.ieee.m = 0;
             sng.ieee.e = 0;
@@ -96,7 +97,7 @@ public:
             const float half_denorm = 1.0f / 16384.0f; // 2^-14
             float mantissa = (float)h.ieee.m / 1024.0f;
             float sgn = (h.ieee.s) ? -1.0f : 1.0f;
-            sng.f = sgn * mantissa * half_denorm;
+            sng.f = sgn*mantissa*half_denorm;
         }
         else if (h.ieee.e == 31 && h.ieee.m == 0)
         {
@@ -124,7 +125,11 @@ public:
     static long FloatToSigned(float channel); // 8 bits
     static long FloatToSigned(float channel, int nBits);
 
-    static unsigned long NormalToUnsigned(float inColor) { return FloatToUnsigned(inColor * 0.5f + 0.5f); }
+    static unsigned long NormalToUnsigned(float inColor)
+    {
+        return FloatToUnsigned(inColor * 0.5f + 0.5f);
+    }
+
     static unsigned long NormalToUnsigned(float inColor, int nBits)
     {
         return FloatToUnsigned(inColor * 0.5f + 0.5f, nBits);
@@ -164,7 +169,7 @@ public:
         outColor = ai << 24 | ri << 16 | gi << 8 | bi;
     }
 
-    static void FloatToQ8W8V8U8(const fpPixel& inColor, q8w8v8u8_t& outColor)
+    static void FloatToQ8W8V8U8(const fpPixel& inColor, q8w8v8u8_t & outColor)
     {
         outColor.q = (char)FloatToSigned(inColor.r);
         outColor.v = (char)FloatToSigned(inColor.g);
@@ -193,8 +198,8 @@ public:
     }
 
     static float FloatToRGBE_Alpha(const fpPixel& fp);
-    static void FloatToRGBE(rgba_t& rgbe, const float& r, const float& g, const float& b);
-    static void FloatToRGBE(rgba_t* rgbe, const float& r, const float& g, const float& b);
+    static void FloatToRGBE(rgba_t& rgbe, const float &r, const float& g, const float& b);
+    static void FloatToRGBE(rgba_t * rgbe, const float &r, const float& g, const float& b);
     static void FloatToRGBE(fpPixel& rgbe, const fpPixel& fp);
     static void FloatToRGBE(rgba_t& rgbe, const fpPixel& fp);
     static unsigned char FloatToRGBE_DXT3Alpha(const fpPixel& fp);
@@ -206,8 +211,9 @@ public:
         nv_half_data h;
         h.ieee.s = f.ieee.s;
         // handle special cases
-        // const float half_denorm = (1.0f/16384.0f);
-        if (f.ieee.e == 0 && f.ieee.m == 0) {
+        //const float half_denorm = (1.0f/16384.0f);
+        if (f.ieee.e == 0 && f.ieee.m == 0)
+        {
             // zero
             h.ieee.m = 0;
             h.ieee.e = 0;
@@ -234,18 +240,20 @@ public:
         {
             // regular number
             int new_exp = f.ieee.e - 127;
-            if (new_exp < -24) { // this maps to 0
+            if (new_exp < -24)
+            { // this maps to 0
                 h.ieee.m = 0;
                 h.ieee.e = 0;
             }
-            if (new_exp < -14) {
+            if (new_exp < -14)
+            {
                 // this maps to a denorm
                 h.ieee.e = 0;
                 unsigned int exp_val = (unsigned int)(-14 - new_exp); // 2^-exp_val
                 switch (exp_val)
                 {
                 case 0:
-                    // fprintf(stderr, "ftoh: logical error in denorm creation!\n");
+                    //fprintf(stderr, "ftoh: logical error in denorm creation!\n"); 
                     h.ieee.m = 0;
                     break;
                 case 1: h.ieee.m = 512 + (f.ieee.m >> 14); break;

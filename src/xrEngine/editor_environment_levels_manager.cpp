@@ -10,10 +10,10 @@
 
 #ifdef INGAME_EDITOR
 
-#include "Include/editor/ide.hpp"
-#include "Include/editor/property_holder.hpp"
 #include "editor_environment_levels_manager.hpp"
 #include "editor_environment_weathers_manager.hpp"
+#include "Include/editor/property_holder.hpp"
+#include "Include/editor/ide.hpp"
 #include "ide.hpp"
 
 using editor::environment::levels::manager;
@@ -21,7 +21,9 @@ using editor::environment::levels::manager;
 static LPCSTR s_default_weather_id = "[default]";
 static LPCSTR s_level_section_id = "levels";
 
-manager::manager(::editor::environment::weathers::manager* weathers) : m_weathers(*weathers), m_property_holder(0)
+manager::manager(::editor::environment::weathers::manager* weathers) :
+    m_weathers(*weathers),
+    m_property_holder(0)
 {
 }
 
@@ -35,7 +37,8 @@ manager::~manager()
     CInifile::Destroy(m_config_mp);
     m_config_mp = 0;
 
-    if (!Device.editor()) return;
+    if (!Device.editor())
+        return;
 
     ::ide().destroy(m_property_holder);
 }
@@ -51,16 +54,34 @@ void manager::fill_levels(CInifile& config, LPCSTR prefix, LPCSTR category)
     CInifile::Items::const_iterator e = section.end();
     for (; i != e; ++i)
     {
-        if (!(*i).first.size()) continue;
+        if (!(*i).first.size())
+            continue;
 
         VERIFY(config.section_exist((*i).first));
-        if (!config.line_exist((*i).first, "weathers")) {
-            m_levels.insert(std::make_pair((*i).first.c_str(), std::make_pair(category, s_default_weather_id)));
+        if (!config.line_exist((*i).first, "weathers"))
+        {
+            m_levels.insert(
+                std::make_pair(
+                    (*i).first.c_str(),
+                    std::make_pair(
+                        category,
+                        s_default_weather_id
+                    )
+                )
+            );
             continue;
         }
 
         LPCSTR weather_id = config.r_string((*i).first, "weathers");
-        m_levels.insert(std::make_pair((*i).first.c_str(), std::make_pair(category, weather_id)));
+        m_levels.insert(
+            std::make_pair(
+                (*i).first.c_str(),
+                std::make_pair(
+                    category,
+                    weather_id
+                )
+            )
+        );
     }
 }
 
@@ -68,9 +89,25 @@ void manager::load()
 {
     string_path file_name;
 
-    m_config_single = CInifile::Create(FS.update_path(file_name, "$game_config$", "game_maps_single.ltx"), false);
+    m_config_single =
+        CInifile::Create(
+            FS.update_path(
+                file_name,
+                "$game_config$",
+                "game_maps_single.ltx"
+            ),
+            false
+        );
 
-    m_config_mp = CInifile::Create(FS.update_path(file_name, "$game_config$", "game_maps_mp.ltx"), false);
+    m_config_mp =
+        CInifile::Create(
+            FS.update_path(
+                file_name,
+                "$game_config$",
+                "game_maps_mp.ltx"
+            ),
+            false
+        );
 
     VERIFY(m_levels.empty());
     fill_levels(*m_config_single, "single", "single");
@@ -107,9 +144,17 @@ void manager::fill()
         string_path description;
         xr_strcpy(description, "weather for level ");
         xr_strcat(description, (*i).first.c_str());
-        m_property_holder->add_property((*i).first.c_str(), (*i).second.first, description, (*i).second.second.c_str(),
-            (*i).second.second, collection_getter, collection_size_getter,
-            editor::property_holder::value_editor_combo_box, editor::property_holder::cannot_enter_text);
+        m_property_holder->add_property(
+            (*i).first.c_str(),
+            (*i).second.first,
+            description,
+            (*i).second.second.c_str(),
+            (*i).second.second,
+            collection_getter,
+            collection_size_getter,
+            editor::property_holder::value_editor_combo_box,
+            editor::property_holder::cannot_enter_text
+        );
     }
 
     ::ide().environment_levels(m_property_holder);

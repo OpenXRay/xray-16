@@ -12,10 +12,10 @@ const u32 clGET_TRIS = (1 << 0);
 const u32 clGET_BOXES = (1 << 1);
 const u32 clGET_SPHERES = (1 << 2);
 const u32 clQUERY_ONLYFIRST = (1 << 3); // stop if was any collision
-const u32 clQUERY_TOPLEVEL = (1 << 4);  // get only top level of model box/sphere
-const u32 clQUERY_STATIC = (1 << 5);    // static
-const u32 clQUERY_DYNAMIC = (1 << 6);   // dynamic
-const u32 clCOARSE = (1 << 7);          // coarse test (triangles vs obb)
+const u32 clQUERY_TOPLEVEL = (1 << 4); // get only top level of model box/sphere
+const u32 clQUERY_STATIC = (1 << 5); // static
+const u32 clQUERY_DYNAMIC = (1 << 6); // dynamic
+const u32 clCOARSE = (1 << 7); // coarse test (triangles vs obb)
 
 struct clQueryTri
 {
@@ -26,9 +26,9 @@ struct clQueryTri
 struct clQueryCollision
 {
     xr_vector<IGameObject*> objects; // affected objects
-    xr_vector<clQueryTri> tris;      // triangles (if queried)
-    xr_vector<Fobb> boxes;           // boxes/ellipsoids (if queried)
-    xr_vector<Fvector4> spheres;     // spheres (if queried)
+    xr_vector<clQueryTri> tris; // triangles (if queried)
+    xr_vector<Fobb> boxes; // boxes/ellipsoids (if queried)
+    xr_vector<Fvector4> spheres; // spheres (if queried)
 
     IC void Clear()
     {
@@ -69,7 +69,10 @@ struct clQueryCollision
         box.xform_set(R);
         boxes.push_back(box);
     }
-    IC void AddBox(const Fobb& B) { boxes.push_back(B); }
+    IC void AddBox(const Fobb& B)
+    {
+        boxes.push_back(B);
+    }
 };
 
 enum /*ENGINE_API*/ ECollisionFormType
@@ -81,23 +84,20 @@ enum /*ENGINE_API*/ ECollisionFormType
 class ENGINE_API ICollisionForm
 {
     friend class CObjectSpace;
-
 protected:
     IGameObject* owner; // владелец
     u32 dwQueryID;
-
 protected:
-    Fbox bv_box;       // (Local) BBox объекта
+    Fbox bv_box; // (Local) BBox объекта
     Fsphere bv_sphere; // (Local) Sphere
 private:
     ECollisionFormType m_type;
-
 public:
     ICollisionForm(IGameObject* _owner, ECollisionFormType tp);
     virtual ~ICollisionForm();
 
     virtual BOOL _RayQuery(const collide::ray_defs& Q, collide::rq_results& R) = 0;
-    // virtual void _BoxQuery ( const Fbox& B, const Fmatrix& M, u32 flags) = 0;
+    //virtual void _BoxQuery ( const Fbox& B, const Fmatrix& M, u32 flags) = 0;
 
     IC IGameObject* Owner() const { return owner; }
     const Fbox& getBBox() const { return bv_box; }
@@ -129,25 +129,22 @@ public:
         };
         u16 type;
         u16 elem_id;
-
     public:
-        SElement() : elem_id(u16(-1)), type(0) {}
-        SElement(u16 id, u16 t) : elem_id(id), type(t) {}
+        SElement() :elem_id(u16(-1)), type(0) {}
+        SElement(u16 id, u16 t) :elem_id(id), type(t) {}
         BOOL valid() const { return (elem_id != (u16(-1))) && (type != 0); }
         void center(Fvector& center) const;
     };
     DEFINE_VECTOR(SElement, ElementVec, ElementVecIt);
-
 private:
     u64 vis_mask;
     ElementVec elements;
 
-    u32 dwFrame;   // The model itself
+    u32 dwFrame; // The model itself
     u32 dwFrameTL; // Top level
 
     void BuildState();
     void BuildTopLevel();
-
 public:
     CCF_Skeleton(IGameObject* _owner);
 
@@ -155,11 +152,7 @@ public:
     bool _ElementCenter(u16 elem_id, Fvector& e_center);
     const ElementVec& _GetElements() { return elements; }
 #ifdef DEBUG
-    void _dbg_refresh()
-    {
-        BuildTopLevel();
-        BuildState();
-    }
+    void _dbg_refresh() { BuildTopLevel(); BuildState(); }
 #endif
 };
 
@@ -167,12 +160,11 @@ class ENGINE_API CCF_EventBox : public ICollisionForm
 {
 private:
     Fplane Planes[6];
-
 public:
     CCF_EventBox(IGameObject* _owner);
 
     virtual BOOL _RayQuery(const collide::ray_defs& Q, collide::rq_results& R);
-    // virtual void _BoxQuery ( const Fbox& B, const Fmatrix& M, u32 flags);
+    //virtual void _BoxQuery ( const Fbox& B, const Fmatrix& M, u32 flags);
 
     BOOL Contact(IGameObject* O);
 };
@@ -195,12 +187,11 @@ public:
         shape_data data;
     };
     xr_vector<shape_def> shapes;
-
 public:
     CCF_Shape(IGameObject* _owner);
 
     virtual BOOL _RayQuery(const collide::ray_defs& Q, collide::rq_results& R);
-    // virtual void _BoxQuery ( const Fbox& B, const Fmatrix& M, u32 flags);
+    //virtual void _BoxQuery ( const Fbox& B, const Fmatrix& M, u32 flags);
 
     void add_sphere(Fsphere& S);
     void add_box(Fmatrix& B);

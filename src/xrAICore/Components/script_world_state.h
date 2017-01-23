@@ -12,6 +12,4 @@
 
 typedef GraphEngineSpace::CWorldState CScriptWorldState;
 
-class CScriptWorldStateWrapper
-{
-};
+class CScriptWorldStateWrapper {};

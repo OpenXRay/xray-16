@@ -8,19 +8,28 @@
 
 #pragma once
 
-struct CLevelInfo
-{
-    u8 m_id;
-    shared_str m_name;
-    Fvector m_offset;
-    shared_str m_section;
+struct CLevelInfo {
+	u8				m_id;
+	shared_str		m_name;
+	Fvector			m_offset;
+	shared_str		m_section;
 
-    CLevelInfo(u8 id, shared_str name, const Fvector& offset, shared_str section)
-        : m_id(id), m_name(name), m_offset(offset), m_section(section)
-    {
-    }
+	CLevelInfo		(u8 id, shared_str name, const Fvector &offset, shared_str section) :
+		m_id		(id),
+		m_name		(name),
+		m_offset	(offset),
+		m_section	(section)
+	{
+	}
 
-    IC bool operator<(const CLevelInfo& info) const { return (m_id < info.m_id); }
+	IC	bool	operator< (const CLevelInfo &info) const
+	{
+		return		(m_id < info.m_id);
+	}
 };
 
-extern void xrMergeGraphs(LPCSTR game_graph_id, LPCSTR name, bool rebuild);
+extern void xrMergeGraphs(
+	LPCSTR game_graph_id,
+	LPCSTR name,
+	bool rebuild
+);

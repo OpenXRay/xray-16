@@ -1,15 +1,15 @@
-#include "PerformanceAlert.hpp"
 #include "stdafx.h"
+#include "PerformanceAlert.hpp"
 #include "xrEngine/GameFont.h"
 
-void PerformanceAlert::Print(IGameFont& font, const char* format, ...)
+void PerformanceAlert::Print(IGameFont &font, const char *format, ...)
 {
     u32 refColor = font.GetColor();
     Fvector2 refPos = font.GetPosition();
     float refHeight = font.GetHeight();
     font.SetColor(alertColor);
     font.OutSet(alertPos.x, alertPos.y);
-    font.SetHeight(fontBaseSize * 2);
+    font.SetHeight(fontBaseSize*2);
     va_list args;
     va_start(args, format);
     font.OutNextVA(format, args);

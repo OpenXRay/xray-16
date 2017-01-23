@@ -32,23 +32,23 @@ using namespace Meshmerizer;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool OBB::ContainsPoint(const Point& p) const
 {
-    // Point in OBB test using lazy evaluation and early exits
+	// Point in OBB test using lazy evaluation and early exits
 
-    // Translate to box space
-    Point RelPoint = p - mCenter;
+	// Translate to box space
+	Point RelPoint = p - mCenter;
 
-    // Point * mRot maps from box space to world space
-    // mRot * Point maps from world space to box space (what we need here)
+	// Point * mRot maps from box space to world space
+	// mRot * Point maps from world space to box space (what we need here)
 
-    float f = mRot2.m[0][0] * RelPoint.x + mRot2.m[0][1] * RelPoint.y + mRot2.m[0][2] * RelPoint.z;
-    if (f >= mExtents.x || f <= -mExtents.x) return false;
+	float f = mRot2.m[0][0] * RelPoint.x + mRot2.m[0][1] * RelPoint.y + mRot2.m[0][2] * RelPoint.z;
+	if(f >= mExtents.x || f <= -mExtents.x) return false;
 
-    f = mRot2.m[1][0] * RelPoint.x + mRot2.m[1][1] * RelPoint.y + mRot2.m[1][2] * RelPoint.z;
-    if (f >= mExtents.y || f <= -mExtents.y) return false;
+	f = mRot2.m[1][0] * RelPoint.x + mRot2.m[1][1] * RelPoint.y + mRot2.m[1][2] * RelPoint.z;
+	if(f >= mExtents.y || f <= -mExtents.y) return false;
 
-    f = mRot2.m[2][0] * RelPoint.x + mRot2.m[2][1] * RelPoint.y + mRot2.m[2][2] * RelPoint.z;
-    if (f >= mExtents.z || f <= -mExtents.z) return false;
-    return true;
+	f = mRot2.m[2][0] * RelPoint.x + mRot2.m[2][1] * RelPoint.y + mRot2.m[2][2] * RelPoint.z;
+	if(f >= mExtents.z || f <= -mExtents.z) return false;
+	return true;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -60,17 +60,17 @@ bool OBB::ContainsPoint(const Point& p) const
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void OBB::Create(const AABB& aabb, const Matrix4x4& mat)
 {
-    // Note: must be coherent with Rotate()
+	// Note: must be coherent with Rotate()
 
-    aabb.GetCenter(mCenter);
-    aabb.GetExtents(mExtents);
-    // Here we have the same as OBB::Rotate(mat) where the obb is (mCenter, mExtents, Identity).
+	aabb.GetCenter(mCenter);
+	aabb.GetExtents(mExtents);
+	// Here we have the same as OBB::Rotate(mat) where the obb is (mCenter, mExtents, Identity).
 
-    // So following what's done in Rotate:
-    // - x-form the center
-    mCenter *= mat;
-    // - combine rotation with identity, i.e. just use given matrix
-    mRot2 = mat;
+	// So following what's done in Rotate:
+	// - x-form the center
+	mCenter *= mat;
+	// - combine rotation with identity, i.e. just use given matrix
+	mRot2 = mat;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -80,40 +80,40 @@ void OBB::Create(const AABB& aabb, const Matrix4x4& mat)
  *	\return		true if success
  */
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool OBB::ComputePlanes(Plane* planes) const
+bool OBB::ComputePlanes(Plane* planes)	const
 {
-    // Checkings
-    if (!planes) return false;
+	// Checkings
+	if(!planes)	return false;
 
-    Point Axis0 = *mRot2[0];
-    Point Axis1 = *mRot2[1];
-    Point Axis2 = *mRot2[2];
+	Point Axis0 = *mRot2[0];
+	Point Axis1 = *mRot2[1];
+	Point Axis2 = *mRot2[2];
 
-    // Writes normals
-    planes[0].n = Axis0;
-    planes[1].n = -Axis0;
-    planes[2].n = Axis1;
-    planes[3].n = -Axis1;
-    planes[4].n = Axis2;
-    planes[5].n = -Axis2;
+	// Writes normals
+	planes[0].n = Axis0;
+	planes[1].n = -Axis0;
+	planes[2].n = Axis1;
+	planes[3].n = -Axis1;
+	planes[4].n = Axis2;
+	planes[5].n = -Axis2;
 
-    // Compute a point on each plane
-    Point p0 = mCenter + Axis0 * mExtents.x;
-    Point p1 = mCenter - Axis0 * mExtents.x;
-    Point p2 = mCenter + Axis1 * mExtents.y;
-    Point p3 = mCenter - Axis1 * mExtents.y;
-    Point p4 = mCenter + Axis2 * mExtents.z;
-    Point p5 = mCenter - Axis2 * mExtents.z;
+	// Compute a point on each plane
+	Point p0 = mCenter + Axis0 * mExtents.x;
+	Point p1 = mCenter - Axis0 * mExtents.x;
+	Point p2 = mCenter + Axis1 * mExtents.y;
+	Point p3 = mCenter - Axis1 * mExtents.y;
+	Point p4 = mCenter + Axis2 * mExtents.z;
+	Point p5 = mCenter - Axis2 * mExtents.z;
 
-    // Compute d
-    planes[0].d = -(planes[0].n | p0);
-    planes[1].d = -(planes[1].n | p1);
-    planes[2].d = -(planes[2].n | p2);
-    planes[3].d = -(planes[3].n | p3);
-    planes[4].d = -(planes[4].n | p4);
-    planes[5].d = -(planes[5].n | p5);
+	// Compute d
+	planes[0].d = -(planes[0].n|p0);
+	planes[1].d = -(planes[1].n|p1);
+	planes[2].d = -(planes[2].n|p2);
+	planes[3].d = -(planes[3].n|p3);
+	planes[4].d = -(planes[4].n|p4);
+	planes[5].d = -(planes[5].n|p5);
 
-    return true;
+	return true;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -123,25 +123,25 @@ bool OBB::ComputePlanes(Plane* planes) const
  *	\return		true if success
  */
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool OBB::ComputePoints(Point* pts) const
+bool OBB::ComputePoints(Point* pts)	const
 {
-    // Checkings
-    if (!pts) return false;
+	// Checkings
+	if(!pts)	return false;
 
-    Point Axis0 = *mRot2[0];
-    Point Axis1 = *mRot2[1];
-    Point Axis2 = *mRot2[2];
+	Point Axis0 = *mRot2[0];
+	Point Axis1 = *mRot2[1];
+	Point Axis2 = *mRot2[2];
 
-    pts[0] = mCenter - Axis0 * mExtents.x + Axis1 * mExtents.y + Axis2 * mExtents.z;
-    pts[1] = mCenter + Axis0 * mExtents.x + Axis1 * mExtents.y + Axis2 * mExtents.z;
-    pts[2] = mCenter + Axis0 * mExtents.x - Axis1 * mExtents.y + Axis2 * mExtents.z;
-    pts[3] = mCenter - Axis0 * mExtents.x - Axis1 * mExtents.y + Axis2 * mExtents.z;
-    pts[4] = mCenter - Axis0 * mExtents.x + Axis1 * mExtents.y - Axis2 * mExtents.z;
-    pts[5] = mCenter + Axis0 * mExtents.x + Axis1 * mExtents.y - Axis2 * mExtents.z;
-    pts[6] = mCenter + Axis0 * mExtents.x - Axis1 * mExtents.y - Axis2 * mExtents.z;
-    pts[7] = mCenter - Axis0 * mExtents.x - Axis1 * mExtents.y - Axis2 * mExtents.z;
+	pts[0] = mCenter - Axis0*mExtents.x + Axis1*mExtents.y + Axis2*mExtents.z;
+	pts[1] = mCenter + Axis0*mExtents.x + Axis1*mExtents.y + Axis2*mExtents.z;
+	pts[2] = mCenter + Axis0*mExtents.x - Axis1*mExtents.y + Axis2*mExtents.z;
+	pts[3] = mCenter - Axis0*mExtents.x - Axis1*mExtents.y + Axis2*mExtents.z;
+	pts[4] = mCenter - Axis0*mExtents.x + Axis1*mExtents.y - Axis2*mExtents.z;
+	pts[5] = mCenter + Axis0*mExtents.x + Axis1*mExtents.y - Axis2*mExtents.z;
+	pts[6] = mCenter + Axis0*mExtents.x - Axis1*mExtents.y - Axis2*mExtents.z;
+	pts[7] = mCenter - Axis0*mExtents.x - Axis1*mExtents.y - Axis2*mExtents.z;
 
-    return true;
+	return true;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -152,9 +152,14 @@ bool OBB::ComputePoints(Point* pts) const
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 const udword* OBB::GetLineIndices() const
 {
-    static udword Indices[] = {
-        0, 1, 1, 2, 2, 3, 3, 0, 1, 5, 5, 6, 6, 2, 2, 1, 7, 6, 6, 5, 5, 4, 4, 7, 3, 7, 7, 4, 4, 0, 0, 3, 4, 5, 5, 1, 1,
-        0, 0, 4, 3, 2, 2, 6, 6, 7, 7, 3,
-    };
-    return Indices;
+	static udword Indices[] = {
+	0, 1, 1, 2, 2, 3, 3, 0,
+	1, 5, 5, 6, 6, 2, 2, 1,
+	7, 6, 6, 5, 5, 4, 4, 7,
+	3, 7, 7, 4, 4, 0, 0, 3,
+	4, 5, 5, 1, 1, 0, 0, 4,
+	3, 2, 2, 6, 6, 7, 7, 3,
+	};
+	return Indices;
 }
+

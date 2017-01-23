@@ -5,7 +5,7 @@ void BackupInit(void);
 
 BOOL BackupExists(void);
 
-BOOL WriteToBackup(const void* src, int len);
-BOOL ReadFromBackup(void* dst, int len);
+BOOL WriteToBackup(const void * src, int len);
+BOOL ReadFromBackup(void * dst, int len);
 
 #endif

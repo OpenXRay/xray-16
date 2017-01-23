@@ -24,16 +24,20 @@
    <markus@oberhumer.com>
  */
 
+
 /* WARNING: this file should *not* be used by applications. It is
    part of the implementation of the library and is subject
    to change.
  */
+
 
 #include "lzo1.h"
 
 #define LZO_NO_R1
 #include "config1a.h"
 
+
 /*
 vi:ts=4:et
 */
+

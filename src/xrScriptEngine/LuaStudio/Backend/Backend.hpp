@@ -47,16 +47,13 @@ enum icon_type
 struct DECLSPEC_NOVTABLE backend
 {
 public:
-    virtual void CS_LUA_STUDIO_BACKEND_CALL type_to_string(
-        char* buffer, unsigned int size, lua_State* state, int index, bool& use_in_description) = 0;
-    virtual void CS_LUA_STUDIO_BACKEND_CALL value_to_string(
-        char* buffer, unsigned int size, lua_State* state, int index, icon_type& icon_type, bool full_description) = 0;
+    virtual void CS_LUA_STUDIO_BACKEND_CALL type_to_string(char *buffer, unsigned int size, lua_State *state, int index, bool &use_in_description) = 0;
+    virtual void CS_LUA_STUDIO_BACKEND_CALL value_to_string(char *buffer, unsigned int size, lua_State *state, int index, icon_type &icon_type, bool full_description) = 0;
 };
 
 struct DECLSPEC_NOVTABLE value_to_expand
 {
-    virtual void CS_LUA_STUDIO_BACKEND_CALL add_value(
-        char const* id, char const* type, char const* value, icon_type icon_type) = 0;
+    virtual void CS_LUA_STUDIO_BACKEND_CALL add_value(char const *id, char const *type, char const *value, icon_type icon_type) = 0;
 };
 } // namespace lua_studio
 } // namespace cs

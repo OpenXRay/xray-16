@@ -24,13 +24,13 @@ protected:
     };
 
 protected:
-    CScriptEngine* scriptEngine;
-    lua_Debug* m_stack[max_stack_size];
+    CScriptEngine *scriptEngine;
+    lua_Debug *m_stack[max_stack_size];
     int m_current_stack_level;
 
 public:
-    CScriptStackTracker(CScriptEngine* scriptEngine);
+    CScriptStackTracker(CScriptEngine *scriptEngine);
     virtual ~CScriptStackTracker();
-    void script_hook(lua_State* L, lua_Debug* dbg);
-    void print_stack(lua_State* L);
+    void script_hook(lua_State *L, lua_Debug *dbg);
+    void print_stack(lua_State *L);
 };

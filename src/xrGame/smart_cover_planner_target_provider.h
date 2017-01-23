@@ -9,43 +9,44 @@
 #define SMART_COVER_PLANNER_TARGET_PROVIDER_H_INCLUDED
 
 #include "Common/Noncopyable.hpp"
-#include "action_base.h"
 #include "smart_cover_detail.h"
+#include "action_base.h"
 #include "smart_cover_planner_target_selector.h"
 #include "stalker_decision_space.h"
 
-namespace smart_cover
-{
-class target_provider : public CActionBase<animation_planner>, private Noncopyable
+namespace smart_cover {
+
+class target_provider : 
+	public	CActionBase<animation_planner>,
+	private Noncopyable
 {
 private:
-    typedef CActionBase<animation_planner> inherited;
+	typedef CActionBase<animation_planner> inherited;
 
 public:
-    target_provider(animation_planner* object, LPCSTR name,
-        StalkerDecisionSpace::EWorldProperties const& world_property, u32 const& loophole_value);
-    virtual void setup(animation_planner* object, CPropertyStorage* storage);
-    virtual void initialize();
-    virtual void finalize();
+						target_provider					(animation_planner *object, LPCSTR name, StalkerDecisionSpace::EWorldProperties const &world_property, u32 const &loophole_value);
+	virtual	void		setup							(animation_planner *object, CPropertyStorage *storage);
+	virtual	void		initialize						();
+	virtual void		finalize						();
 
 private:
-    StalkerDecisionSpace::EWorldProperties m_world_property;
-    u32 m_loophole_value;
+	StalkerDecisionSpace::EWorldProperties m_world_property;
+	u32					m_loophole_value;
 };
 
 ////////////////////////////////////////////////////////////////////////////
 //	class target_idle
 ////////////////////////////////////////////////////////////////////////////
 
-class target_idle final : public target_provider
+class target_idle final :
+	public target_provider
 {
 private:
-    typedef target_provider inherited;
+	typedef target_provider inherited;
 
 public:
-    target_idle(animation_planner* object, LPCSTR name, StalkerDecisionSpace::EWorldProperties const& world_property,
-        u32 const& loophole_value);
-    virtual void execute();
+						target_idle						(animation_planner *object, LPCSTR name, StalkerDecisionSpace::EWorldProperties const &world_property, u32 const &loophole_value);
+	virtual	void		execute							();
 };
 
 ////////////////////////////////////////////////////////////////////////////
@@ -55,13 +56,12 @@ public:
 class target_fire final : public target_provider
 {
 private:
-    typedef target_provider inherited;
+	typedef target_provider inherited;
 
 public:
-    target_fire(animation_planner* object, LPCSTR name, StalkerDecisionSpace::EWorldProperties const& world_property,
-        u32 const& loophole_value);
-    virtual void initialize();
-    virtual void execute();
+						target_fire						(animation_planner *object, LPCSTR name, StalkerDecisionSpace::EWorldProperties const &world_property, u32 const &loophole_value);
+	virtual	void		initialize						();
+	virtual	void		execute							();
 };
 
 ////////////////////////////////////////////////////////////////////////////
@@ -71,16 +71,15 @@ public:
 class target_fire_no_lookout final : public target_provider
 {
 private:
-    typedef target_provider inherited;
+	typedef target_provider inherited;
 
 public:
-    target_fire_no_lookout(animation_planner* object, LPCSTR name,
-        StalkerDecisionSpace::EWorldProperties const& world_property, u32 const& loophole_value);
-    virtual void initialize();
+						target_fire_no_lookout			(animation_planner *object, LPCSTR name, StalkerDecisionSpace::EWorldProperties const &world_property, u32 const &loophole_value);
+	virtual	void		initialize						();
 
 private:
-    StalkerDecisionSpace::EWorldProperties m_world_property;
-    u32 m_loophole_value;
+	StalkerDecisionSpace::EWorldProperties m_world_property;
+	u32					m_loophole_value;
 };
 
 } // namespace smart_cover

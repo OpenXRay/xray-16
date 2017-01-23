@@ -7,15 +7,14 @@
 #ifndef DOORS_H_INCLUDED
 #define DOORS_H_INCLUDED
 
-namespace doors
-{
-class door;
-typedef xr_vector<door*> doors_type;
+namespace doors {
 
-enum door_state
-{
-    door_state_open,
-    door_state_closed,
+class door;
+typedef xr_vector<door*>	doors_type;
+
+enum door_state {
+	door_state_open,
+	door_state_closed,
 }; // enum door_state
 
 extern float const g_door_length;

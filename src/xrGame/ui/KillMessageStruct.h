@@ -11,20 +11,18 @@
 
 struct ColoredName
 {
-    shared_str m_name;
-    u32 m_color;
+    shared_str	m_name;
+	u32			m_color;
 };
 
-struct IconInfo
-{
-    Frect m_rect;
-    ui_shader m_shader;
+struct IconInfo{
+	Frect		m_rect;
+	ui_shader	m_shader;
 };
 
-struct KillMessageStruct
-{
-    ColoredName m_victim;
-    IconInfo m_initiator;
-    ColoredName m_killer;
-    IconInfo m_ext_info;
+struct KillMessageStruct{
+	ColoredName	m_victim;
+	IconInfo	m_initiator;
+	ColoredName	m_killer;
+	IconInfo	m_ext_info;
 };

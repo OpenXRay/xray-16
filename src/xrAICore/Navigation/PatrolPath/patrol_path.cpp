@@ -6,52 +6,50 @@
 //	Description : Patrol path
 ////////////////////////////////////////////////////////////////////////////
 
-#include "patrol_path.h"
-#include "Common/LevelGameDef.h"
 #include "PCH.hpp"
+#include "patrol_path.h"
 #include "xrCore/xrCore.h"
+#include "Common/LevelGameDef.h"
 
-LPCSTR TEST_PATROL_PATH_NAME = "val_dogs_nest4_centre";
+LPCSTR TEST_PATROL_PATH_NAME		= "val_dogs_nest4_centre";
 
-CPatrolPath::CPatrolPath(shared_str name)
+CPatrolPath::CPatrolPath			(shared_str name)
 {
 #ifdef DEBUG
-    m_name = name;
+	m_name			= name;
 #endif
 }
 
-CPatrolPath& CPatrolPath::load_raw(
-    const CLevelGraph* level_graph, const CGameLevelCrossTable* cross, const CGameGraph* game_graph, IReader& stream)
+CPatrolPath	&CPatrolPath::load_raw	(const CLevelGraph *level_graph, const CGameLevelCrossTable *cross, const CGameGraph *game_graph, IReader &stream)
 {
-    R_ASSERT(stream.find_chunk(WAYOBJECT_CHUNK_POINTS));
-    u32 vertex_count = stream.r_u16();
-    for (u32 i = 0; i < vertex_count; ++i)
-        add_vertex(CPatrolPoint(this).load_raw(level_graph, cross, game_graph, stream), i);
+	R_ASSERT		(stream.find_chunk(WAYOBJECT_CHUNK_POINTS));
+	u32				vertex_count = stream.r_u16();
+	for (u32 i=0; i<vertex_count; ++i)
+		add_vertex	(CPatrolPoint(this).load_raw(level_graph,cross,game_graph,stream),i);
 
-    R_ASSERT(stream.find_chunk(WAYOBJECT_CHUNK_LINKS));
-    u32 edge_count = stream.r_u16();
-    for (u32 i = 0; i < edge_count; ++i)
-    {
-        u16 vertex0 = stream.r_u16();
-        u16 vertex1 = stream.r_u16();
-        float probability = stream.r_float();
-        add_edge(vertex0, vertex1, probability);
-    }
+	R_ASSERT		(stream.find_chunk(WAYOBJECT_CHUNK_LINKS));
+	u32				edge_count = stream.r_u16();
+	for (u32 i=0; i < edge_count; ++i) {
+		u16			vertex0 = stream.r_u16();
+		u16			vertex1 = stream.r_u16();
+		float		probability = stream.r_float();
+		add_edge	(vertex0,vertex1,probability);
+	}
 
-    return (*this);
+	return			(*this);
 }
 
-CPatrolPath::~CPatrolPath()
+CPatrolPath::~CPatrolPath	()
 {
 }
 
 #ifdef DEBUG
-void CPatrolPath::load(IReader& stream)
+void CPatrolPath::load		(IReader &stream)
 {
-    inherited::load(stream);
-    vertex_iterator I = vertices().begin();
-    vertex_iterator E = vertices().end();
-    for (; I != E; ++I)
-        (*I).second->data().path(this);
+	inherited::load	(stream);
+	vertex_iterator	I = vertices().begin();
+	vertex_iterator	E = vertices().end();
+	for ( ; I != E; ++I)
+		(*I).second->data().path	(this);
 }
 #endif

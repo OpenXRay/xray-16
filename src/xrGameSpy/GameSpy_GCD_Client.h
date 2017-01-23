@@ -6,5 +6,5 @@
 class XRGAMESPY_API CGameSpy_GCD_Client
 {
 public:
-    void CreateRespond(char* cdkey, char* RespondStr, char* ChallengeStr, u8 Reauth);
+    void CreateRespond(char *cdkey, char *RespondStr, char *ChallengeStr, u8 Reauth);
 };

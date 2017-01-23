@@ -1,8 +1,8 @@
-#include "resource.h"
 #include "stdafx.h"
+#include "resource.h"
 #ifdef INGAME_EDITOR
-#include "Include/editor/ide.hpp"
-#include "engine_impl.hpp"
+# include "Include/editor/ide.hpp"
+# include "engine_impl.hpp"
 #endif
 #include "GameFont.h"
 #include "PerformanceAlert.hpp"
@@ -15,7 +15,8 @@ extern LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 void CRenderDevice::initialize_editor()
 {
     m_editor_module = XRay::LoadLibrary("xrWeatherEditor");
-    if (!m_editor_module) {
+    if (!m_editor_module)
+    {
         Msg("! cannot load library \"xrWeatherEditor\"");
         return;
     }
@@ -37,18 +38,24 @@ void CRenderDevice::Initialize()
     TimerGlobal.Start();
     TimerMM.Start();
 #ifdef INGAME_EDITOR
-    if (strstr(Core.Params, "-editor")) initialize_editor();
+    if (strstr(Core.Params, "-editor"))
+        initialize_editor();
 #endif
     // Unless a substitute hWnd has been specified, create a window to render into
-    if (!m_hWnd) {
+    if (!m_hWnd)
+    {
         const char* wndclass = "_XRAY_1.5";
         // Register the windows class
         HINSTANCE hInstance = (HINSTANCE)GetModuleHandle(0);
-        WNDCLASS wndClass = {0, WndProc, 0, 0, hInstance, LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1)),
-            LoadCursor(NULL, IDC_ARROW), (HBRUSH)GetStockObject(BLACK_BRUSH), NULL, wndclass};
+        WNDCLASS wndClass = {
+            0, WndProc, 0, 0, hInstance,
+            LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1)),
+            LoadCursor(NULL, IDC_ARROW),
+            (HBRUSH)GetStockObject(BLACK_BRUSH),
+            NULL, wndclass};
         RegisterClass(&wndClass);
         // Set the window's initial style
-        m_dwWindowStyle = WS_BORDER | WS_DLGFRAME;
+        m_dwWindowStyle = WS_BORDER|WS_DLGFRAME;
         // Set the window's initial width
         RECT rc;
         SetRect(&rc, 0, 0, 640, 480);
@@ -63,10 +70,11 @@ void CRenderDevice::Initialize()
     GetClientRect(m_hWnd, &m_rcWindowClient);
 }
 
-void CRenderDevice::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
+void CRenderDevice::DumpStatistics(IGameFont &font, IPerformanceAlert *alert)
 {
     font.OutNext("*** ENGINE:   %2.2fms", stats.EngineTotal.result);
     font.OutNext("FPS/RFPS:     %3.1f/%3.1f", stats.fFPS, stats.fRFPS);
     font.OutNext("TPS:          %2.2f M", stats.fTPS);
-    if (alert && stats.fFPS < 30) alert->Print(font, "FPS       < 30:   %3.1f", stats.fFPS);
+    if (alert && stats.fFPS<30)
+        alert->Print(font, "FPS       < 30:   %3.1f", stats.fFPS);
 }

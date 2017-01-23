@@ -2,230 +2,344 @@
 #define __DXTRILIST_INCLUDED__
 #include "Externals/ode/include/ode/common.h"
 
-struct dcVector3
-{
-    float x, y, z;
+struct dcVector3{
 
-    dcVector3() {}
-    dcVector3(dReal x, dReal y, dReal z)
-    {
-        this->x = (float)x;
+	float x, y, z;
 
-        this->y = (float)y;
 
-        this->z = (float)z;
-    }
 
-    dcVector3(const dReal* v)
-    {
-        x = (float)v[0];
+	dcVector3(){}
 
-        y = (float)v[1];
+	dcVector3(dReal x, dReal y, dReal z){
 
-        z = (float)v[2];
-    }
+		this->x = (float)x;
 
-    ~dcVector3() {}
-    operator float*()
-    { //&slipch
+		this->y = (float)y;
 
-        return reinterpret_cast<float*>(this);
-    }
-    /* Add */
+		this->z = (float)z;
 
-    dcVector3 operator+(const dcVector3& v) const
-    {
-        dcVector3 Out;
+	}
 
-        Out.x = x + v.x;
 
-        Out.y = y + v.y;
 
-        Out.z = z + v.z;
+	dcVector3(const dReal* v){
 
-        return Out;
-    }
+		x = (float)v[0];
 
-    dcVector3& operator+=(const dcVector3& v)
-    {
-        x += v.x;
+		y = (float)v[1];
 
-        y += v.y;
+		z = (float)v[2];
 
-        z += v.z;
+	}
 
-        return *this;
-    }
 
-    /* Sub */
 
-    dcVector3 operator-(const dcVector3& v) const
-    {
-        dcVector3 Out;
+	~dcVector3(){}
 
-        Out.x = x - v.x;
 
-        Out.y = y - v.y;
 
-        Out.z = z - v.z;
 
-        return Out;
-    }
+	operator float* (){  //&slipch
 
-    dcVector3& operator-=(const dcVector3& v)
-    {
-        x -= v.x;
+	return reinterpret_cast<float*>(this);
+	}
+	/* Add */
 
-        y -= v.y;
+	dcVector3 operator+(const dcVector3& v) const{
 
-        z -= v.z;
+		dcVector3 Out;
 
-        return *this;
-    }
+		Out.x = x + v.x;
 
-    /* Mul */
+		Out.y = y + v.y;
 
-    dcVector3 operator*(const dcVector3& v) const
-    {
-        dcVector3 Out;
+		Out.z = z + v.z;
 
-        Out.x = x * v.x;
+		return Out;
 
-        Out.y = y * v.y;
+	}
 
-        Out.z = z * v.z;
 
-        return Out;
-    }
 
-    dcVector3 operator*(float Scalar) const
-    {
-        dcVector3 Out;
+	dcVector3& operator+=(const dcVector3& v){
 
-        Out.x = x * Scalar;
+		x += v.x;
 
-        Out.y = y * Scalar;
+		y += v.y;
 
-        Out.z = z * Scalar;
+		z += v.z;
 
-        return Out;
-    }
+		return *this;
 
-    dcVector3& operator*=(const dcVector3& v)
-    {
-        x *= v.x;
+	}
 
-        y *= v.y;
 
-        z *= v.z;
 
-        return *this;
-    }
+	/* Sub */
 
-    dcVector3& operator*=(float Scalar)
-    {
-        x *= Scalar;
+	dcVector3 operator-(const dcVector3& v) const{
 
-        y *= Scalar;
+		dcVector3 Out;
 
-        z *= Scalar;
+		Out.x = x - v.x;
 
-        return *this;
-    }
+		Out.y = y - v.y;
 
-    /* Div */
+		Out.z = z - v.z;
 
-    dcVector3 operator/(const dcVector3& v) const
-    {
-        dcVector3 Out;
+		return Out;
 
-        Out.x = x / v.x;
+	}
 
-        Out.y = y / v.y;
 
-        Out.z = z / v.z;
 
-        return Out;
-    }
+	dcVector3& operator-=(const dcVector3& v){
 
-    dcVector3 operator/(float Scalar) const
-    {
-        dcVector3 Out;
+		x -= v.x;
 
-        Out.x = x / Scalar;
+		y -= v.y;
 
-        Out.y = y / Scalar;
+		z -= v.z;
 
-        Out.z = z / Scalar;
+		return *this;
 
-        return Out;
-    }
+	}
 
-    dcVector3& operator/=(const dcVector3& v)
-    {
-        x /= v.x;
 
-        y /= v.y;
 
-        z /= v.z;
+	/* Mul */
 
-        return *this;
-    }
+	dcVector3 operator*(const dcVector3& v) const{
 
-    dcVector3& operator/=(float Scalar)
-    {
-        x /= Scalar;
+		dcVector3 Out;
 
-        y /= Scalar;
+		Out.x = x * v.x;
 
-        z /= Scalar;
+		Out.y = y * v.y;
 
-        return *this;
-    }
+		Out.z = z * v.z;
 
-    /* Negative */
+		return Out;
 
-    dcVector3& operator-()
-    {
-        x = -x;
+	}
 
-        y = -y;
 
-        z = -z;
 
-        return *this;
-    }
+	dcVector3 operator*(float Scalar) const{
 
-    /* Comparison */
+		dcVector3 Out;
 
-    bool operator==(const dcVector3& v) const { return x == v.x && y == v.y && z == v.z; }
-    bool operator!=(const dcVector3& v) const { return v.x != x || v.y != y || v.z != z; }
-    float DotProduct(const dcVector3& v) const { return x * v.x + y * v.y + z * v.z; }
-    dcVector3 CrossProduct(const dcVector3& v) const
-    {
-        dcVector3 Out;
+		Out.x = x * Scalar;
 
-        Out.x = y * v.z - z * v.y;
+		Out.y = y * Scalar;
 
-        Out.y = z * v.x - x * v.z;
+		Out.z = z * Scalar;
 
-        Out.z = x * v.y - y * v.x;
+		return Out;
 
-        return Out;
-    }
+	}
 
-    float MagnitudeSq() const { return DotProduct(*this); }
-    float Magnitude() const { return _sqrt(MagnitudeSq()); }
-    void Normalize() { operator/=(Magnitude()); }
-    /* Member access */
 
-    float& operator[](int Index) { return *(&x + Index); }
-    float operator[](int Index) const { return *(&x + Index); }
+
+	dcVector3& operator*=(const dcVector3& v){
+
+		x *= v.x;
+
+		y *= v.y;
+
+		z *= v.z;
+
+		return *this;
+
+	}
+
+
+
+	dcVector3& operator*=(float Scalar){
+
+		x *= Scalar;
+
+		y *= Scalar;
+
+		z *= Scalar;
+
+		return *this;
+
+	}
+
+
+
+	/* Div */
+
+	dcVector3 operator/(const dcVector3& v) const{
+
+		dcVector3 Out;
+
+		Out.x = x / v.x;
+
+		Out.y = y / v.y;
+
+		Out.z = z / v.z;
+
+		return Out;
+
+	}
+
+
+
+	dcVector3 operator/(float Scalar) const{
+
+		dcVector3 Out;
+
+		Out.x = x / Scalar;
+
+		Out.y = y / Scalar;
+
+		Out.z = z / Scalar;
+
+		return Out;
+
+	}
+
+
+
+	dcVector3& operator/=(const dcVector3& v){
+
+		x /= v.x;
+
+		y /= v.y;
+
+		z /= v.z;
+
+		return *this;
+
+	}
+
+
+
+	dcVector3& operator/=(float Scalar){
+
+		x /= Scalar;
+
+		y /= Scalar;
+
+		z /= Scalar;
+
+		return *this;
+
+	}
+
+
+
+	/* Negative */
+
+	dcVector3& operator-(){
+
+		x = -x;
+
+		y = -y;
+
+		z = -z;
+
+		return *this;
+
+	}
+
+
+
+	/* Comparison */
+
+	bool operator==(const dcVector3& v) const{
+
+		return x == v.x && y == v.y && z == v.z;
+
+	}
+
+
+
+	bool operator!=(const dcVector3& v) const{
+
+		return v.x != x || v.y != y || v.z != z;
+
+	}
+
+
+
+	float DotProduct(const dcVector3& v) const{
+
+		return x * v.x + y * v.y + z * v.z;
+
+	}
+
+
+
+	dcVector3 CrossProduct(const dcVector3& v) const{
+
+		dcVector3 Out;
+
+		Out.x = y * v.z - z * v.y;
+
+		Out.y = z * v.x - x * v.z;
+
+		Out.z = x * v.y - y * v.x;
+
+		return Out;
+
+	}
+
+
+
+	float MagnitudeSq() const{
+
+		return DotProduct(*this);
+
+	}
+
+
+
+	float Magnitude() const{
+
+		return _sqrt(MagnitudeSq());
+
+	}
+
+
+
+	void Normalize(){
+
+		operator/=(Magnitude());
+
+	}
+
+
+
+	/* Member access */
+
+	float& operator[](int Index){
+
+		return *(&x + Index);
+
+	}
+
+
+
+	float operator[](int Index) const{
+
+		return *(&x + Index);
+
+	}
+
 };
+
+
+
+
 
 /* Class ID */
 
 extern int dTriListClass;
+
+
 
 /* Per triangle callback */
 
@@ -235,6 +349,8 @@ void dGeomTriListSetCallback(dGeomID g, dTriCallback* Callback);
 
 dTriCallback* dGeomTriListGetCallback(dGeomID g);
 
+
+
 /* Per object callback */
 
 typedef void dTriArrayCallback(dGeomID TriList, dGeomID RefObject, const int* TriIndices, int TriCount);
@@ -243,78 +359,110 @@ void dGeomTriListSetArrayCallback(dGeomID g, dTriArrayCallback* ArrayCallback);
 
 dTriArrayCallback* dGeomTriListGetArrayCallback(dGeomID g);
 
+
+
 /* Construction */
 
 dxGeom* dCreateTriList(dSpaceID space, dTriCallback* Callback, dTriArrayCallback* ArrayCallback);
+
+
 
 /* Setting data */
 
 void dGeomTriListBuild(dGeomID g, const dcVector3* Vertices, int VertexCount, const int* Indices, int IndexCount);
 
+
+
 /* Getting data */
 
 void dGeomTriListGetTriangle(dGeomID g, int Index, dVector3* v0, dVector3* v1, dVector3* v2);
+
+
 
 /* Internal types */
 
 class dcTriListCollider;
 
-struct dxTriList
-{
-    dReal p[4]; // dxPlane
 
-    dTriCallback* Callback;
 
-    dTriArrayCallback* ArrayCallback;
+struct dxTriList{
 
-    dcTriListCollider* Collider;
+	dReal p[4];						// dxPlane
+
+	dTriCallback* Callback;
+
+	dTriArrayCallback* ArrayCallback;
+
+	dcTriListCollider* Collider;
+
 };
 
-struct dcPlane
-{
-    dcVector3 Normal;
 
-    float Distance;
 
-    dcPlane() {}
-    dcPlane(const dcVector3& v0, const dcVector3& v1, const dcVector3& v2)
-    {
-        dcVector3 u = v1 - v0;
+struct dcPlane{
 
-        dcVector3 v = v2 - v0;
+	dcVector3 Normal;
 
-        Normal = u.CrossProduct(v);
+	float Distance;
 
-        Distance = v0.DotProduct(Normal);
 
-        Normalize();
-    }
 
-    void Normalize()
-    {
-        float Factor = 1.0f / Normal.Magnitude();
+	dcPlane(){}
 
-        Normal *= Factor;
+	dcPlane(const dcVector3& v0, const dcVector3& v1, const dcVector3& v2){
 
-        Distance *= Factor;
-    }
+		dcVector3 u = v1 - v0;
 
-    bool Contains(const dcVector3& RefObject, float Epsilon = 0.0f) const
-    {
-        return Normal.DotProduct(RefObject) - Distance >= -Epsilon; //@slipch ">=" instead ">"
-    }
+		dcVector3 v = v2 - v0;
+
+
+
+		Normal = u.CrossProduct(v);
+
+		Distance = v0.DotProduct(Normal);
+
+		Normalize();
+
+	}
+
+
+
+	void Normalize(){
+
+		float Factor = 1.0f / Normal.Magnitude();
+
+		Normal *= Factor;
+
+		Distance *= Factor;
+
+	}
+
+
+
+	bool Contains(const dcVector3& RefObject, float Epsilon = 0.0f) const{
+
+		return Normal.DotProduct(RefObject) - Distance >= - Epsilon; //@slipch ">=" instead ">"
+
+	}
+
 };
 
-template <class T>
-const T& dcMAX(const T& x, const T& y)
-{
-    return x > y ? x : y;
+
+
+template<class T> const T& dcMAX(const T& x, const T& y){
+
+	return x > y ? x : y;
+
 }
 
-template <class T>
-const T& dcMIN(const T& x, const T& y)
-{
-    return x < y ? x : y;
+
+
+template<class T> const T& dcMIN(const T& x, const T& y){
+
+	return x < y ? x : y;
+
 }
 
-#endif //__DXTRILIST_INCLUDED__
+
+
+#endif	//__DXTRILIST_INCLUDED__

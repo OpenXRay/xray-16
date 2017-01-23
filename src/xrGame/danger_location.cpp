@@ -6,10 +6,10 @@
 //	Description : Danger location
 ////////////////////////////////////////////////////////////////////////////
 
-#include "danger_location.h"
 #include "stdafx.h"
+#include "danger_location.h"
 
-bool CDangerLocation::useful() const
+bool CDangerLocation::useful	() const
 {
-    return (!(Device.dwTimeGlobal > m_level_time + m_interval));
+	return		(!(Device.dwTimeGlobal > m_level_time + m_interval));
 }

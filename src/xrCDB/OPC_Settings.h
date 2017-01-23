@@ -20,21 +20,21 @@
 #ifndef __OPC_SETTINGS_H__
 #define __OPC_SETTINGS_H__
 
-//! Use CPU comparisons (comment that line to use standard FPU compares)
-#define OPC_CPU_COMPARE
+	//! Use CPU comparisons (comment that line to use standard FPU compares)
+	#define OPC_CPU_COMPARE
 
-//! Use FCOMI / FCMOV on Pentium-Pro based processors (comment that line to use plain C++)
+	//! Use FCOMI / FCMOV on Pentium-Pro based processors (comment that line to use plain C++)
 //	#define OPC_USE_FCOMI
 
-//! Use epsilon value in tri-tri overlap test
-#define OPC_TRITRI_EPSILON_TEST
+	//! Use epsilon value in tri-tri overlap test
+	#define OPC_TRITRI_EPSILON_TEST
 
-//! Use tree-coherence or not [not implemented yet]
+	//! Use tree-coherence or not [not implemented yet]
 //	#define OPC_USE_TREE_COHERENCE
 
-//! Use callbacks or direct pointers
+	//! Use callbacks or direct pointers
 //	#define OPC_USE_CALLBACKS
 
-// NB: no compilation flag to enable/disable stats since they're actually needed in the box/box overlap test
+	// NB: no compilation flag to enable/disable stats since they're actually needed in the box/box overlap test
 
 #endif //__OPC_SETTINGS_H__

@@ -1,19 +1,18 @@
 #include "stdafx.h"
 
 #ifdef INGAME_EDITOR
-#include "Include/editor/property_holder.hpp"
-#include "editor_environment_detail.hpp"
-#include "editor_environment_effects_effect.hpp"
 #include "editor_environment_effects_manager.hpp"
+#include "Include/editor/property_holder.hpp"
 #include "property_collection.hpp"
+#include "editor_environment_effects_effect.hpp"
+#include "editor_environment_detail.hpp"
 
 using editor::environment::effects::manager;
 using editor::environment::effects::effect;
 using editor::environment::detail::logical_string_predicate;
 
 template <>
-void property_collection<manager::effect_container_type, manager>::display_name(
-    u32 const& item_index, LPSTR const& buffer, u32 const& buffer_size)
+void property_collection<manager::effect_container_type, manager>::display_name(u32 const& item_index, LPSTR const& buffer, u32 const& buffer_size)
 {
     xr_strcpy(buffer, buffer_size, m_container[item_index]->id());
 }
@@ -26,8 +25,10 @@ editor::property_holder* property_collection<manager::effect_container_type, man
     return (object->object());
 }
 
-manager::manager(::editor::environment::manager* environment)
-    : m_environment(*environment), m_collection(0), m_changed(true)
+manager::manager(::editor::environment::manager* environment) :
+    m_environment(*environment),
+    m_collection(0),
+    m_changed(true)
 {
     m_collection = new collection_type(&m_effects, this, &m_changed);
 }
@@ -42,7 +43,16 @@ void manager::load()
 {
     string_path file_name;
     CInifile* config =
-        new CInifile(FS.update_path(file_name, "$game_config$", "environment\\effects.ltx"), TRUE, TRUE, FALSE);
+        new CInifile(
+            FS.update_path(
+                file_name,
+                "$game_config$",
+                "environment\\effects.ltx"
+            ),
+            TRUE,
+            TRUE,
+            FALSE
+        );
 
     VERIFY(m_effects.empty());
 
@@ -66,7 +76,16 @@ void manager::save()
 {
     string_path file_name;
     CInifile* config =
-        new CInifile(FS.update_path(file_name, "$game_config$", "environment\\effects.ltx"), FALSE, FALSE, TRUE);
+        new CInifile(
+            FS.update_path(
+                file_name,
+                "$game_config$",
+                "environment\\effects.ltx"
+            ),
+            FALSE,
+            FALSE,
+            TRUE
+        );
 
     effect_container_type::iterator i = m_effects.begin();
     effect_container_type::iterator e = m_effects.end();
@@ -79,12 +98,18 @@ void manager::save()
 void manager::fill(editor::property_holder* holder)
 {
     VERIFY(holder);
-    holder->add_property("effects", "ambients", "this option is resposible for effects", m_collection);
+    holder->add_property(
+        "effects",
+        "ambients",
+        "this option is resposible for effects",
+        m_collection
+    );
 }
 
 manager::effects_ids_type const& manager::effects_ids() const
 {
-    if (!m_changed) return (m_effects_ids);
+    if (!m_changed)
+        return (m_effects_ids);
 
     m_changed = false;
 
@@ -105,7 +130,8 @@ manager::effects_ids_type const& manager::effects_ids() const
 
 shared_str manager::unique_id(shared_str const& id) const
 {
-    if (m_collection->unique_id(id.c_str())) return (id);
+    if (m_collection->unique_id(id.c_str()))
+        return (id);
 
     return (m_collection->generate_unique_id(id.c_str()));
 }

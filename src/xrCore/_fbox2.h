@@ -10,7 +10,6 @@ public:
     typedef Self& SelfRef;
     typedef const Self& SelfCRef;
     typedef _vector2<T> Tvector;
-
 public:
     union
     {
@@ -26,125 +25,36 @@ public:
         };
     };
 
-    IC SelfRef set(const Tvector& _min, const Tvector& _max)
-    {
-        min.set(_min);
-        max.set(_max);
-        return *this;
-    };
-    IC SelfRef set(T x1, T y1, T x2, T y2)
-    {
-        min.set(x1, y1);
-        max.set(x2, y2);
-        return *this;
-    };
-    IC SelfRef set(SelfCRef b)
-    {
-        min.set(b.min);
-        max.set(b.max);
-        return *this;
-    };
+    IC SelfRef set(const Tvector& _min, const Tvector& _max) { min.set(_min); max.set(_max); return *this; };
+    IC SelfRef set(T x1, T y1, T x2, T y2) { min.set(x1, y1); max.set(x2, y2); return *this; };
+    IC SelfRef set(SelfCRef b) { min.set(b.min); max.set(b.max); return *this; };
 
-    IC SelfRef null()
-    {
-        min.set(0.f, 0.f);
-        max.set(0.f, 0.f);
-        return *this;
-    };
-    IC SelfRef identity()
-    {
-        min.set(-0.5, -0.5, -0.5);
-        max.set(0.5, 0.5, 0.5);
-        return *this;
-    };
-    IC SelfRef invalidate()
-    {
-        min.set(type_max(T), type_max(T));
-        max.set(type_min(T), type_min(T));
-        return *this;
-    }
+    IC SelfRef null() { min.set(0.f, 0.f); max.set(0.f, 0.f); return *this; };
+    IC SelfRef identity() { min.set(-0.5, -0.5, -0.5); max.set(0.5, 0.5, 0.5); return *this; };
+    IC SelfRef invalidate() { min.set(type_max(T), type_max(T)); max.set(type_min(T), type_min(T)); return *this; }
 
-    IC SelfRef shrink(T s)
-    {
-        min.add(s);
-        max.sub(s);
-        return *this;
-    };
-    IC SelfRef shrink(const Tvector& s)
-    {
-        min.add(s);
-        max.sub(s);
-        return *this;
-    };
-    IC SelfRef grow(T s)
-    {
-        min.sub(s);
-        max.add(s);
-        return *this;
-    };
-    IC SelfRef grow(const Tvector& s)
-    {
-        min.sub(s);
-        max.add(s);
-        return *this;
-    };
+    IC SelfRef shrink(T s) { min.add(s); max.sub(s); return *this; };
+    IC SelfRef shrink(const Tvector& s) { min.add(s); max.sub(s); return *this; };
+    IC SelfRef grow(T s) { min.sub(s); max.add(s); return *this; };
+    IC SelfRef grow(const Tvector& s) { min.sub(s); max.add(s); return *this; };
 
-    IC SelfRef add(const Tvector& p)
-    {
-        min.add(p);
-        max.add(p);
-        return *this;
-    };
-    IC SelfRef offset(const Tvector& p)
-    {
-        min.add(p);
-        max.add(p);
-        return *this;
-    };
-    IC SelfRef add(SelfCRef b, const Tvector& p)
-    {
-        min.add(b.min, p);
-        max.add(b.max, p);
-        return *this;
-    };
+    IC SelfRef add(const Tvector& p) { min.add(p); max.add(p); return *this; };
+    IC SelfRef offset(const Tvector& p) { min.add(p); max.add(p); return *this; };
+    IC SelfRef add(SelfCRef b, const Tvector& p) { min.add(b.min, p); max.add(b.max, p); return *this; };
 
     IC BOOL contains(T x, T y) { return (x >= x1) && (x <= x2) && (y >= y1) && (y <= y2); };
     IC BOOL contains(const Tvector& p) { return contains(p.x, p.y); };
     IC BOOL contains(SelfCRef b) { return contains(b.min) && contains(b.max); };
+
     IC BOOL similar(SelfCRef b) { return min.similar(b.min) && max.similar(b.max); };
-    IC SelfRef modify(const Tvector& p)
-    {
-        min.min(p);
-        max.max(p);
-        return *this;
-    }
-    IC SelfRef merge(SelfCRef b)
-    {
-        modify(b.min);
-        modify(b.max);
-        return *this;
-    };
-    IC SelfRef merge(SelfCRef b1, SelfCRef b2)
-    {
-        invalidate();
-        merge(b1);
-        merge(b2);
-        return *this;
-    }
+
+    IC SelfRef modify(const Tvector& p) { min.min(p); max.max(p); return *this; }
+    IC SelfRef merge(SelfCRef b) { modify(b.min); modify(b.max); return *this; };
+    IC SelfRef merge(SelfCRef b1, SelfCRef b2) { invalidate(); merge(b1); merge(b2); return *this; }
 
     IC void getsize(Tvector& R) const { R.sub(max, min); };
-    IC void getradius(Tvector& R) const
-    {
-        getsize(R);
-        R.mul(0.5f);
-    };
-    IC T getradius() const
-    {
-        Tvector R;
-        getsize(R);
-        R.mul(0.5f);
-        return R.magnitude();
-    };
+    IC void getradius(Tvector& R) const { getsize(R); R.mul(0.5f); };
+    IC T getradius() const { Tvector R; getsize(R); R.mul(0.5f); return R.magnitude(); };
 
     IC void getcenter(Tvector& C) const
     {
@@ -171,16 +81,8 @@ public:
     IC SelfRef sort()
     {
         T tmp;
-        if (min.x > max.x) {
-            tmp = min.x;
-            min.x = max.x;
-            max.x = tmp;
-        }
-        if (min.y > max.y) {
-            tmp = min.y;
-            min.y = max.y;
-            max.y = tmp;
-        }
+        if (min.x > max.x) { tmp = min.x; min.x = max.x; max.x = tmp; }
+        if (min.y > max.y) { tmp = min.y; min.y = max.y; max.y = tmp; }
         return *this;
     };
 
@@ -193,22 +95,28 @@ public:
         rvmin.sub(min, start);
         rvmax.sub(max, start);
 
-        if (!fis_zero(dir.x)) {
+        if (!fis_zero(dir.x))
+        {
             alpha = rvmin.x / dir.x;
             yt = alpha * dir.y;
-            if (yt >= rvmin.y && yt <= rvmax.y) return true;
+            if (yt >= rvmin.y && yt <= rvmax.y)
+                return true;
             alpha = rvmax.x / dir.x;
             yt = alpha * dir.y;
-            if (yt >= rvmin.y && yt <= rvmax.y) return true;
+            if (yt >= rvmin.y && yt <= rvmax.y)
+                return true;
         }
 
-        if (!fis_zero(dir.y)) {
+        if (!fis_zero(dir.y))
+        {
             alpha = rvmin.y / dir.y;
             xt = alpha * dir.x;
-            if (xt >= rvmin.x && xt <= rvmax.x) return true;
+            if (xt >= rvmin.x && xt <= rvmax.x)
+                return true;
             alpha = rvmax.y / dir.y;
             xt = alpha * dir.x;
-            if (xt >= rvmin.x && xt <= rvmax.x) return true;
+            if (xt >= rvmin.x && xt <= rvmax.x)
+                return true;
         }
         return false;
     };
@@ -220,7 +128,8 @@ public:
         rvmin.sub(min, start);
         rvmax.sub(max, start);
 
-        if (_abs(dir.x) != 0) {
+        if (_abs(dir.x) != 0)
+        {
             alpha = rvmin.x / dir.x;
             yt = alpha * dir.y;
             if (yt >= rvmin.y - EPS && yt <= rvmax.y + EPS) return true;
@@ -228,7 +137,8 @@ public:
             yt = alpha * dir.y;
             if (yt >= rvmin.y - EPS && yt <= rvmax.y + EPS) return true;
         }
-        if (_abs(dir.y) != 0) {
+        if (_abs(dir.y) != 0)
+        {
             alpha = rvmin.y / dir.y;
             xt = alpha * dir.x;
             if (xt >= rvmin.x - EPS && xt <= rvmax.x + EPS) return true;
@@ -248,7 +158,8 @@ public:
 
         // Find candidate planes.
         {
-            if (origin[0] < min[0]) {
+            if (origin[0] < min[0])
+            {
                 coord[0] = min[0];
                 Inside = FALSE;
                 if (IR(dir[0])) MaxT[0] = (min[0] - origin[0]) / dir[0]; // Calculate T distances to candidate planes
@@ -261,7 +172,8 @@ public:
             }
         }
         {
-            if (origin[1] < min[1]) {
+            if (origin[1] < min[1])
+            {
                 coord[1] = min[1];
                 Inside = FALSE;
                 if (IR(dir[1])) MaxT[1] = (min[1] - origin[1]) / dir[1]; // Calculate T distances to candidate planes
@@ -275,7 +187,8 @@ public:
         }
 
         // Ray origin inside bounding box
-        if (Inside) {
+        if (Inside)
+        {
             coord = origin;
             return true;
         }
@@ -287,7 +200,8 @@ public:
         // Check final candidate actually inside box
         if (IR(MaxT[WhichPlane]) & 0x80000000) return false;
 
-        if (0 == WhichPlane) {
+        if (0 == WhichPlane)
+        {
             // 1
             coord[1] = origin[1] + MaxT[0] * dir[1];
             if ((coord[1] < min[1]) || (coord[1] > max[1])) return false;
@@ -306,11 +220,21 @@ public:
     {
         switch (index)
         {
-        case 0: result.set(min.x, min.y); break;
-        case 1: result.set(min.x, min.y); break;
-        case 2: result.set(max.x, min.y); break;
-        case 3: result.set(max.x, min.y); break;
-        default: result.set(0.f, 0.f); break;
+        case 0:
+            result.set(min.x, min.y);
+            break;
+        case 1:
+            result.set(min.x, min.y);
+            break;
+        case 2:
+            result.set(max.x, min.y);
+            break;
+        case 3:
+            result.set(max.x, min.y);
+            break;
+        default:
+            result.set(0.f, 0.f);
+            break;
         }
     };
     IC void getpoints(Tvector* result)
@@ -326,9 +250,6 @@ typedef _box2<float> Fbox2;
 typedef _box2<double> Dbox2;
 
 template <class T>
-BOOL _valid(const _box2<T>& c)
-{
-    return _valid(c.min) && _valid(c.max);
-}
+BOOL _valid(const _box2<T>& c) { return _valid(c.min) && _valid(c.max); }
 
 #endif

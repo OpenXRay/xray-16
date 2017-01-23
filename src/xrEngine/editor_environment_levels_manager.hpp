@@ -16,10 +16,12 @@
 
 namespace editor
 {
+
 class property_holder;
 
 namespace environment
 {
+
 namespace weathers
 {
 class manager;
@@ -27,6 +29,7 @@ class manager;
 
 namespace levels
 {
+
 class manager : private Noncopyable
 {
 public:
@@ -46,7 +49,7 @@ private:
 private:
     struct predicate
     {
-        inline bool operator()(shared_str const& left, shared_str const& right) const
+        inline bool operator() (shared_str const& left, shared_str const& right) const
         {
             return (xr_strcmp(left.c_str(), right.c_str()) < 0);
         }

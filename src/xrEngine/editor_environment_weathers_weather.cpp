@@ -9,20 +9,19 @@
 #include "stdafx.h"
 
 #ifdef INGAME_EDITOR
-#include "editor_environment_manager.hpp"
-#include "editor_environment_weathers_manager.hpp"
-#include "editor_environment_weathers_time.hpp"
 #include "editor_environment_weathers_weather.hpp"
 #include "ide.hpp"
+#include "editor_environment_weathers_manager.hpp"
 #include "property_collection.hpp"
+#include "editor_environment_weathers_time.hpp"
+#include "editor_environment_manager.hpp"
 
 using editor::environment::weathers::weather;
 using editor::environment::weathers::manager;
 using editor::environment::weathers::time;
 
 template <>
-void property_collection<weather::container_type, weather>::display_name(
-    u32 const& item_index, LPSTR const& buffer, u32 const& buffer_size)
+void property_collection<weather::container_type, weather>::display_name(u32 const& item_index, LPSTR const& buffer, u32 const& buffer_size)
 {
     xr_strcpy(buffer, buffer_size, m_container[item_index]->id().c_str());
 }
@@ -36,8 +35,14 @@ editor::property_holder* property_collection<weather::container_type, weather>::
     return (object->object());
 }
 
-weather::weather(editor::environment::manager* manager, shared_str const& id)
-    : m_manager(*manager), m_id(id), m_property_holder(0), m_collection(0)
+weather::weather(
+    editor::environment::manager* manager,
+    shared_str const& id
+) :
+    m_manager(*manager),
+    m_id(id),
+    m_property_holder(0),
+    m_collection(0)
 {
     m_collection = new collection_type(&m_times, this);
 }
@@ -47,7 +52,8 @@ weather::~weather()
     xr_delete(m_collection);
     delete_data(m_times);
 
-    if (!Device.editor()) return;
+    if (!Device.editor())
+        return;
 
     ::ide().destroy(m_property_holder);
 }
@@ -101,7 +107,8 @@ LPCSTR weather::id_getter() const
 void weather::id_setter(LPCSTR value_)
 {
     shared_str value = value_;
-    if (m_id._get() == value._get()) return;
+    if (m_id._get() == value._get())
+        return;
 
     m_id = m_manager.weathers().unique_id(value);
 }
@@ -119,16 +126,29 @@ void weather::fill(editor::property_holder_collection* collection)
     string_setter_type string_setter;
     string_setter.bind(this, &weather::id_setter);
 
-    m_property_holder->add_property("id", "properties", "this option is resposible for weather identifier",
-        m_id.c_str(), string_getter, string_setter);
-    m_property_holder->add_property("times", "properties", "this option is resposible for times", m_collection);
+    m_property_holder->add_property(
+        "id",
+        "properties",
+        "this option is resposible for weather identifier",
+        m_id.c_str(),
+        string_getter,
+        string_setter
+    );
+    m_property_holder->add_property(
+        "times",
+        "properties",
+        "this option is resposible for times",
+        m_collection
+    );
 }
 
 static inline bool is_digit(char const& test)
 {
-    if (test < '0') return (false);
+    if (test < '0')
+        return (false);
 
-    if (test > '9') return (false);
+    if (test > '9')
+        return (false);
 
     return (true);
 }
@@ -136,30 +156,40 @@ static inline bool is_digit(char const& test)
 bool weather::valid_id(shared_str const& id_) const
 {
     LPCSTR id = id_.c_str();
-    if (!is_digit(id[0])) return (false);
+    if (!is_digit(id[0]))
+        return (false);
 
-    if (!is_digit(id[1])) return (false);
+    if (!is_digit(id[1]))
+        return (false);
 
-    if (id[2] != ':') return (false);
+    if (id[2] != ':')
+        return (false);
 
-    if (!is_digit(id[3])) return (false);
+    if (!is_digit(id[3]))
+        return (false);
 
-    if (!is_digit(id[4])) return (false);
+    if (!is_digit(id[4]))
+        return (false);
 
-    if (id[5] != ':') return (false);
+    if (id[5] != ':')
+        return (false);
 
-    if (!is_digit(id[6])) return (false);
+    if (!is_digit(id[6]))
+        return (false);
 
-    if (!is_digit(id[7])) return (false);
+    if (!is_digit(id[7]))
+        return (false);
 
     return (true);
 }
 
 shared_str weather::unique_id(shared_str const& current, shared_str const& id) const
 {
-    if (!valid_id(id)) return (current);
+    if (!valid_id(id))
+        return (current);
 
-    if (m_collection->unique_id(id.c_str())) return (id);
+    if (m_collection->unique_id(id.c_str()))
+        return (id);
 
     return (generate_unique_id(id));
 }
@@ -170,7 +200,8 @@ bool weather::try_hours(u32& hours, u32& minutes, u32& seconds, shared_str& resu
     {
         string16 temp;
         xr_sprintf(temp, "%02d:%02d:%02d", i, minutes, seconds);
-        if (!m_collection->unique_id(temp)) continue;
+        if (!m_collection->unique_id(temp))
+            continue;
 
         result = temp;
         return (true);
@@ -185,7 +216,8 @@ bool weather::try_minutes(u32& hours, u32& minutes, u32& seconds, shared_str& re
     {
         string16 temp;
         xr_sprintf(temp, "%02d:%02d:%02d", hours, i, seconds);
-        if (!m_collection->unique_id(temp)) continue;
+        if (!m_collection->unique_id(temp))
+            continue;
 
         result = temp;
         return (true);
@@ -202,7 +234,8 @@ shared_str weather::try_all(u32& hours_, u32& minutes_, u32& seconds_) const
             {
                 string16 temp;
                 xr_sprintf(temp, "%02d:%02d:%02d", hours, minutes, seconds);
-                if (!m_collection->unique_id(temp)) continue;
+                if (!m_collection->unique_id(temp))
+                    continue;
 
                 return (temp);
             }
@@ -229,16 +262,19 @@ shared_str weather::generate_unique_id(shared_str const& start) const
 
     shared_str result;
 
-    if (try_hours(hours, minutes, seconds, result)) return (result);
+    if (try_hours(hours, minutes, seconds, result))
+        return (result);
 
-    if (try_minutes(hours, minutes, seconds, result)) return (result);
+    if (try_minutes(hours, minutes, seconds, result))
+        return (result);
 
     return (try_all(hours, minutes, seconds));
 }
 
 shared_str weather::generate_unique_id() const
 {
-    if (m_times.empty()) return ("00:00:00");
+    if (m_times.empty())
+        return ("00:00:00");
 
     return (generate_unique_id(m_times.back()->id()));
 }
@@ -249,14 +285,16 @@ bool weather::save_time_frame(shared_str const& frame_id, char* buffer, u32 cons
     container_type::iterator e = m_times.end();
     for (; i != e; ++i)
     {
-        if (frame_id._get() != (*i)->id()._get()) continue;
+        if (frame_id._get() != (*i)->id()._get())
+            continue;
 
         CInifile temp(0, FALSE, FALSE, FALSE);
         (*i)->save(temp);
 
         CMemoryWriter writer;
         temp.save_as(writer);
-        if (writer.size() > buffer_size) return (false);
+        if (writer.size() > buffer_size)
+            return (false);
 
         writer.seek(0);
         memcpy(buffer, writer.pointer(), writer.size());
@@ -272,11 +310,13 @@ bool weather::paste_time_frame(shared_str const& frame_id, char const* buffer, u
     container_type::iterator e = m_times.end();
     for (; i != e; ++i)
     {
-        if (frame_id._get() != (*i)->id()._get()) continue;
+        if (frame_id._get() != (*i)->id()._get())
+            continue;
 
         IReader reader(const_cast<char*>(buffer), buffer_size);
         CInifile temp(&reader);
-        if (temp.sections().empty()) return (false);
+        if (temp.sections().empty())
+            return (false);
 
         (*i)->load_from((*temp.sections().begin())->Name, temp, shared_str((*i)->id()));
         return (true);
@@ -289,13 +329,15 @@ bool weather::add_time_frame(char const* buffer, u32 const& buffer_size)
 {
     IReader reader(const_cast<char*>(buffer), buffer_size);
     CInifile temp(&reader);
-    if (temp.sections().empty()) return (false);
+    if (temp.sections().empty())
+        return (false);
 
     shared_str const& section = (*temp.sections().begin())->Name;
     container_type::const_iterator i = m_times.begin();
     container_type::const_iterator e = m_times.end();
     for (; i != e; ++i)
-        if (section._get() == (*i)->id()._get()) return (false);
+        if (section._get() == (*i)->id()._get())
+            return (false);
 
     time* object = new time(&m_manager, this, section);
     object->load(temp);
@@ -309,7 +351,13 @@ bool weather::add_time_frame(char const* buffer, u32 const& buffer_size)
         }
     }; // struct id
 
-    container_type::iterator found = std::lower_bound(m_times.begin(), m_times.end(), section, &id::predicate);
+    container_type::iterator found =
+        std::lower_bound(
+            m_times.begin(),
+            m_times.end(),
+            section,
+            &id::predicate
+        );
 
     u32 index = u32(found - m_times.begin());
     m_times.insert(found, object);
@@ -328,9 +376,11 @@ void weather::reload_time_frame(shared_str const& frame_id)
     container_type::iterator e = m_times.end();
     for (; i != e; ++i)
     {
-        if (frame_id._get() != (*i)->id()._get()) continue;
+        if (frame_id._get() != (*i)->id()._get())
+            continue;
 
-        if (!config->section_exist((*i)->id())) return;
+        if (!config->section_exist((*i)->id()))
+            return;
 
         (*i)->load_from((*i)->id(), *config, (*i)->id());
         CInifile::Destroy(config);

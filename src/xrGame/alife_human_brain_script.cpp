@@ -6,11 +6,16 @@
 //	Description : ALife human brain class script export
 ////////////////////////////////////////////////////////////////////////////
 
-#include "alife_human_brain.h"
 #include "pch_script.h"
+#include "alife_human_brain.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
 SCRIPT_EXPORT(CALifeHumanBrain, (CALifeMonsterBrain),
-    { module(luaState)[class_<CALifeHumanBrain, CALifeMonsterBrain>("CALifeHumanBrain")]; });
+{
+	module(luaState)
+	[
+		class_<CALifeHumanBrain,CALifeMonsterBrain>("CALifeHumanBrain")
+	];
+});

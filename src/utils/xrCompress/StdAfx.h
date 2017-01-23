@@ -4,16 +4,16 @@
 
 #include "xrCore/xrCore.h"
 
-#include <mmsystem.h>
 #include "lzo\lzo1x.h"
+#include <mmsystem.h>
 
-#pragma warning(disable : 4995)
+#pragma warning	(disable:4995)
+#include <io.h>
 #include <direct.h>
 #include <fcntl.h>
-#include <io.h>
-#include <malloc.h>
 #include <sys\stat.h>
-#pragma warning(default : 4995)
+#include <malloc.h>
+#pragma warning	(default:4995)
 
-#pragma comment(lib, "xrCore.lib")
-#pragma comment(lib, "winmm")
+#pragma comment	(lib,"xrCore.lib")
+#pragma comment	(lib,"winmm")

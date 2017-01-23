@@ -13,6 +13,7 @@
 
 namespace text_editor
 {
+
 class line_editor : public IInputReceiver
 {
 public:
@@ -20,6 +21,7 @@ public:
     virtual ~line_editor();
 
     IC line_edit_control& control() { return m_control; }
+
     void on_frame();
 
 protected:

@@ -11,11 +11,11 @@
 
 #include <maya/MFnDagNode.h>
 #include <maya/MFnDependencyNode.h>
+#include <maya/MString.h>
 #include <maya/MNodeMessage.h>
 #include <maya/MObject.h>
 #include <maya/MSelectionList.h>
 #include <maya/MStatus.h>
-#include <maya/MString.h>
 
 MObject getObjFromName(MString name, MStatus& stat);
 
@@ -27,47 +27,50 @@ MString getNameFromObj(MObject obj);
 class NodeMonitorManager
 {
 public:
-    virtual void onNodeRenamed(MObject& node, MString oldName, MString newName) = 0;
+	virtual void onNodeRenamed(MObject& node, MString oldName, MString newName) = 0;
 };
 
 class NodeMonitor
 {
 public:
-    NodeMonitor(NodeMonitorManager* manager = NULL);
+	NodeMonitor(NodeMonitorManager* manager = NULL);
 
-    ~NodeMonitor();
+	~NodeMonitor();
 
-    bool watch(MString nodeName);
-    bool watch(MObject nodeObj);
+	bool watch(MString nodeName);
+	bool watch(MObject nodeObj);
 
-    void stopWatching();
+	void stopWatching();
 
-    bool dirty();
+	bool dirty();
 
-    void cleanIt();
+	void cleanIt();
 
-    void setManager(NodeMonitorManager* manager) { fManager = manager; }
-private:
-    bool attachCallbacks();
-
-    void detachCallbacks();
-
-    void callbackOccured();
-
-    // Callback functions. Those are called, respectively, when a node is dirty (has changed substantially),
-    // or when a node is renamed.
-    static void watchedObjectDirtyCallback(void* clientData);
-
-    static void watchedObjectRenamedCallback(MObject& node, void* clientData);
+	void setManager(NodeMonitorManager* manager) { fManager = manager; }
 
 private:
-    MString fNodeName;
-    bool fIsDirty;
+	bool attachCallbacks();
 
-    MCallbackId fRenamedCallbackId;
-    MCallbackId fDirtyCallbackId;
+	void detachCallbacks();
 
-    NodeMonitorManager* fManager;
+	void callbackOccured();
+
+	// Callback functions. Those are called, respectively, when a node is dirty (has changed substantially),
+	// or when a node is renamed.
+	static void watchedObjectDirtyCallback(void* clientData);
+
+	static void watchedObjectRenamedCallback(MObject & node, void* clientData);
+
+
+private:
+	MString fNodeName;
+	bool fIsDirty;
+
+	MCallbackId fRenamedCallbackId;
+	MCallbackId fDirtyCallbackId;
+
+	NodeMonitorManager* fManager;
 };
+
 
 #endif // MAYA_ShadingConnection

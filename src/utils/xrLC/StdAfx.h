@@ -1,10 +1,10 @@
 #pragma once
 #include "utils/xrLC_Light/xrLC_Light.h"
 
-#define ENGINE_API // fake, to enable sharing with engine
-// comment - ne figa oni ne sharyatsya
+#define ENGINE_API				// fake, to enable sharing with engine
+//comment - ne figa oni ne sharyatsya
 
-#define ECORE_API // fake, to enable sharing with editors
+#define ECORE_API				// fake, to enable sharing with editors
 #define XR_EPROPS_API
 #include "xrCore/clsid.h"
 

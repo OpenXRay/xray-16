@@ -3,21 +3,21 @@
 
 #include "xr_efflensflare.h"
 
-#include "Environment.h"
 #include "IGame_Persistent.h"
+#include "Environment.h"
 
 // Instead of SkeletonCustom:
-#include "Common/object_broker.h"
+#include "xrCore/Animation/Bone.hpp"
 #include "Include/xrRender/Kinematics.h"
 #include "xrCDB/Intersect.hpp"
-#include "xrCore/Animation/Bone.hpp"
+#include "Common/object_broker.h"
 
 #ifdef _EDITOR
-#include "ui_main.h"
 #include "ui_toolscustom.h"
+#include "ui_main.h"
 #else
-#include "IGame_Level.h"
 #include "xr_object.h"
+#include "IGame_Level.h"
 #endif
 
 #define FAR_DIST g_pGamePersistent->Environment().CurrentEnv->far_plane
@@ -70,7 +70,8 @@ void CLensFlareDescriptor::load(CInifile* pIni, LPCSTR sect)
 {
     section = sect;
     m_Flags.set(flSource, pIni->r_bool(sect, "sun"));
-    if (m_Flags.is(flSource)) {
+    if (m_Flags.is(flSource))
+    {
         LPCSTR S = pIni->r_string(sect, "sun_shader");
         LPCSTR T = pIni->r_string(sect, "sun_texture");
         float r = pIni->r_float(sect, "sun_radius");
@@ -78,7 +79,8 @@ void CLensFlareDescriptor::load(CInifile* pIni, LPCSTR sect)
         SetSource(r, i, T, S);
     }
     m_Flags.set(flFlare, pIni->r_bool(sect, "flares"));
-    if (m_Flags.is(flFlare)) {
+    if (m_Flags.is(flFlare))
+    {
         LPCSTR S = pIni->r_string(sect, "flare_shader");
         LPCSTR T = pIni->r_string(sect, "flare_textures");
         LPCSTR R = pIni->r_string(sect, "flare_radius");
@@ -99,7 +101,8 @@ void CLensFlareDescriptor::load(CInifile* pIni, LPCSTR sect)
         }
     }
     m_Flags.set(flGradient, CInifile::IsBOOL(pIni->r_string(sect, "gradient")));
-    if (m_Flags.is(flGradient)) {
+    if (m_Flags.is(flGradient))
+    {
         LPCSTR S = pIni->r_string(sect, "gradient_shader");
         LPCSTR T = pIni->r_string(sect, "gradient_texture");
         float r = pIni->r_float(sect, "gradient_radius");
@@ -151,7 +154,7 @@ CLensFlare::CLensFlare()
     LightColor.set(0xFFFFFFFF);
     fGradientValue = 0.f;
 
-    // hGeom = 0;
+    //hGeom = 0;
     m_Current = 0;
 
     m_State = lfsNone;
@@ -181,20 +184,18 @@ struct STranspParam
     Fvector P;
     Fvector D;
     float f;
-    // CLensFlare* parent;
+    //CLensFlare* parent;
     collide::ray_cache* pray_cache;
     float vis;
     float vis_threshold;
-    STranspParam(collide::ray_cache* p, const Fvector& _P, const Fvector& _D, float _f, float _vis_threshold)
-        : P(_P), D(_D), f(_f), pray_cache(p), vis(1.f), vis_threshold(_vis_threshold)
-    {
-    }
+    STranspParam(collide::ray_cache* p, const Fvector& _P, const Fvector& _D, float _f, float _vis_threshold) :P(_P), D(_D), f(_f), pray_cache(p), vis(1.f), vis_threshold(_vis_threshold) {}
 };
 IC BOOL material_callback(collide::rq_result& result, LPVOID params)
 {
     STranspParam* fp = (STranspParam*)params;
     float vis = 1.f;
-    if (result.O) {
+    if (result.O)
+    {
         vis = 0.f;
         IKinematics* K = PKinematics(result.O->GetRenderData().visual);
         if (K && (result.element > 0))
@@ -204,7 +205,8 @@ IC BOOL material_callback(collide::rq_result& result, LPVOID params)
     {
         CDB::TRI* T = g_pGameLevel->ObjectSpace.GetStaticTris() + result.element;
         vis = g_pGamePersistent->MtlTransparent(T->material);
-        if (fis_zero(vis)) {
+        if (fis_zero(vis))
+        {
             Fvector* V = g_pGameLevel->ObjectSpace.GetStaticVerts();
             fp->pray_cache->set(fp->P, fp->D, fp->f, TRUE);
             fp->pray_cache->verts[0].set(V[T->verts[0]]);
@@ -222,9 +224,9 @@ IC void blend_lerp(float& cur, float tgt, float speed, float dt)
     float diff = tgt - cur;
     float diff_a = _abs(diff);
     if (diff_a < EPS_S) return;
-    float mot = speed * dt;
+    float mot = speed*dt;
     if (mot > diff_a) mot = diff_a;
-    cur += (diff / diff_a) * mot;
+    cur += (diff / diff_a)*mot;
 }
 
 #if 0
@@ -249,12 +251,17 @@ static LPCSTR state_to_string(const CLensFlare::LFState& state)
 }
 #endif
 
-static Fvector2 RayDeltas[CLensFlare::MAX_RAYS] = {
-    {0, 0}, {1, 0}, {-1, 0}, {0, -1}, {0, 1},
+static Fvector2 RayDeltas[CLensFlare::MAX_RAYS] =
+{
+    {0, 0},
+    {1, 0},
+    {-1, 0},
+    {0, -1},
+    {0, 1},
 };
 void CLensFlare::OnFrame(shared_str id)
 {
-    if (dwFrame == Device.dwFrame) return;
+    if (dwFrame == Device.dwFrame)return;
 #ifndef _EDITOR
     if (!g_pGameLevel) return;
 #endif
@@ -287,7 +294,8 @@ void CLensFlare::OnFrame(shared_str id)
         break;
     case lfsHide:
         m_StateBlend = m_Current ? (m_StateBlend - m_Current->m_StateBlendDnSpeed * Device.fTimeDelta * tf) : 0.f - EPS;
-        if (m_StateBlend <= 0.f) {
+        if (m_StateBlend <= 0.f)
+        {
             m_State = lfsShow;
             m_Current = desc;
             m_StateBlend = m_Current ? m_Current->m_StateBlendUpSpeed * Device.fTimeDelta * tf : 0;
@@ -297,10 +305,7 @@ void CLensFlare::OnFrame(shared_str id)
     // Msg ("%6d : [%s] -> [%s]", Device.dwFrame, state_to_string(previous_state), state_to_string(m_State));
     clamp(m_StateBlend, 0.f, 1.f);
 
-    if ((m_Current == 0) || (LightColor.magnitude_rgb() == 0.f)) {
-        bRender = false;
-        return;
-    }
+    if ((m_Current == 0) || (LightColor.magnitude_rgb() == 0.f)) { bRender = false; return; }
 
     //
     // Compute center and axis of flares
@@ -328,15 +333,11 @@ void CLensFlare::OnFrame(shared_str id)
 
     fDot = vecLight.dotproduct(vecDir);
 
-    if (fDot <= 0.01f) {
-        bRender = false;
-        return;
-    }
-    else
-        bRender = true;
+    if (fDot <= 0.01f) { bRender = false; return; }
+    else bRender = true;
 
     // Calculate the point directly in front of us, on the far clip plane
-    float fDistance = FAR_DIST * 0.75f;
+    float fDistance = FAR_DIST*0.75f;
     vecCenter.mul(vecDir, fDistance);
     vecCenter.add(vecPos);
     // Calculate position of light on the far clip plane
@@ -367,8 +368,8 @@ void CLensFlare::OnFrame(shared_str id)
     Fvector vecSx;
     Fvector vecSy;
 
-    // float fScale = m_Current->m_Source.fRadius * vSunDir.magnitude();
-    // float fScale = m_Current->m_Source.fRadius;
+    //float fScale = m_Current->m_Source.fRadius * vSunDir.magnitude();
+    //float fScale = m_Current->m_Source.fRadius;
     // HACK: it must be read from the weather!
     float fScale = 0.02f;
 
@@ -394,15 +395,15 @@ void CLensFlare::OnFrame(shared_str id)
         TP.vis = 1.0f;
         RD.dir = TP.D;
 
-        if (m_ray_cache[i].result && m_ray_cache[i].similar(TP.P, TP.D, TP.f)) {
+        if (m_ray_cache[i].result&&m_ray_cache[i].similar(TP.P, TP.D, TP.f))
+        {
             // similar with previous query == 0
             TP.vis = 0.f;
         }
         else
         {
             float _u, _v, _range;
-            if (CDB::TestRayTri(TP.P, TP.D, m_ray_cache[i].verts, _u, _v, _range, false) &&
-                (_range > 0 && _range < TP.f))
+            if (CDB::TestRayTri(TP.P, TP.D, m_ray_cache[i].verts, _u, _v, _range, false) && (_range > 0 && _range < TP.f))
             {
                 TP.vis = 0.f;
             }
@@ -420,55 +421,56 @@ void CLensFlare::OnFrame(shared_str id)
 
     fVisResult *= (1.0f / MAX_RAYS);
 
-    // blend_lerp(fBlend,TP.vis,BLEND_DEC_SPEED,Device.fTimeDelta);
+    //blend_lerp(fBlend,TP.vis,BLEND_DEC_SPEED,Device.fTimeDelta);
     blend_lerp(fBlend, fVisResult, BLEND_DEC_SPEED, Device.fTimeDelta);
 
-/*
-IGameObject* o_main = g_pGameLevel->CurrentViewEntity();
-STranspParam TP (&m_ray_cache,Device.vCameraPosition,vSunDir,1000.f,EPS_L);
-collide::ray_defs RD (TP.P,TP.D,TP.f,CDB::OPT_CULL,collide::rqtBoth);
-if (m_ray_cache.result&&m_ray_cache.similar(TP.P,TP.D,TP.f)){
-// similar with previous query == 0
-TP.vis = 0.f;
-}else{
-float _u,_v,_range;
-if (CDB::TestRayTri(TP.P,TP.D,m_ray_cache.verts,_u,_v,_range,false)&&(_range>0 && _range<TP.f)){
-TP.vis = 0.f;
-}else{
-// cache outdated. real query.
-r_dest.r_clear ();
-if (g_pGameLevel->ObjectSpace.RayQuery (r_dest,RD,material_callback,&TP,NULL,o_main))
-m_ray_cache.result = FALSE ;
-}
-}
+    /*
+    IGameObject* o_main = g_pGameLevel->CurrentViewEntity();
+    STranspParam TP (&m_ray_cache,Device.vCameraPosition,vSunDir,1000.f,EPS_L);
+    collide::ray_defs RD (TP.P,TP.D,TP.f,CDB::OPT_CULL,collide::rqtBoth);
+    if (m_ray_cache.result&&m_ray_cache.similar(TP.P,TP.D,TP.f)){
+    // similar with previous query == 0
+    TP.vis = 0.f;
+    }else{
+    float _u,_v,_range;
+    if (CDB::TestRayTri(TP.P,TP.D,m_ray_cache.verts,_u,_v,_range,false)&&(_range>0 && _range<TP.f)){
+    TP.vis = 0.f;
+    }else{
+    // cache outdated. real query.
+    r_dest.r_clear ();
+    if (g_pGameLevel->ObjectSpace.RayQuery (r_dest,RD,material_callback,&TP,NULL,o_main))
+    m_ray_cache.result = FALSE ;
+    }
+    }
 
-blend_lerp(fBlend,TP.vis,BLEND_DEC_SPEED,Device.fTimeDelta);
-*/
-/*
- IGameObject* o_main = g_pGameLevel->CurrentViewEntity();
- STranspParam TP (this,Device.vCameraPosition,vSunDir,1000.f,EPS_L);
- collide::ray_defs RD (TP.P,TP.D,TP.f,CDB::OPT_CULL,collide::rqtBoth);
- if (m_ray_cache.result&&m_ray_cache.similar(TP.P,TP.D,TP.f)){
- // similar with previous query == 0
- TP.vis = 0.f;
- }else{
- float _u,_v,_range;
- if (CDB::TestRayTri(TP.P,TP.D,m_ray_cache.verts,_u,_v,_range,false)&&(_range>0 && _range<TP.f)){
- TP.vis = 0.f;
- }else{
- // cache outdated. real query.
- r_dest.r_clear ();
- if (g_pGameLevel->ObjectSpace.RayQuery (r_dest,RD,material_callback,&TP,NULL,o_main))
- m_ray_cache.result = FALSE ;
- }
- }
- blend_lerp(fBlend,TP.vis,BLEND_DEC_SPEED,Device.fTimeDelta);
- */
+    blend_lerp(fBlend,TP.vis,BLEND_DEC_SPEED,Device.fTimeDelta);
+    */
+    /*
+     IGameObject* o_main = g_pGameLevel->CurrentViewEntity();
+     STranspParam TP (this,Device.vCameraPosition,vSunDir,1000.f,EPS_L);
+     collide::ray_defs RD (TP.P,TP.D,TP.f,CDB::OPT_CULL,collide::rqtBoth);
+     if (m_ray_cache.result&&m_ray_cache.similar(TP.P,TP.D,TP.f)){
+     // similar with previous query == 0
+     TP.vis = 0.f;
+     }else{
+     float _u,_v,_range;
+     if (CDB::TestRayTri(TP.P,TP.D,m_ray_cache.verts,_u,_v,_range,false)&&(_range>0 && _range<TP.f)){
+     TP.vis = 0.f;
+     }else{
+     // cache outdated. real query.
+     r_dest.r_clear ();
+     if (g_pGameLevel->ObjectSpace.RayQuery (r_dest,RD,material_callback,&TP,NULL,o_main))
+     m_ray_cache.result = FALSE ;
+     }
+     }
+     blend_lerp(fBlend,TP.vis,BLEND_DEC_SPEED,Device.fTimeDelta);
+     */
 #endif
     clamp(fBlend, 0.0f, 1.0f);
 
     // gradient
-    if (m_Current->m_Flags.is(CLensFlareDescriptor::flGradient)) {
+    if (m_Current->m_Flags.is(CLensFlareDescriptor::flGradient))
+    {
         Fvector scr_pos;
         Device.mFullTransform.transform(scr_pos, vecLight);
         float kx = 1, ky = 1;
@@ -479,8 +481,9 @@ blend_lerp(fBlend,TP.vis,BLEND_DEC_SPEED,Device.fTimeDelta);
         if (_abs(scr_pos.x) > sun_blend) kx = ((sun_max - (float)_abs(scr_pos.x))) / (sun_max - sun_blend);
         if (_abs(scr_pos.y) > sun_blend) ky = ((sun_max - (float)_abs(scr_pos.y))) / (sun_max - sun_blend);
 
-        if (!((_abs(scr_pos.x) > sun_max) || (_abs(scr_pos.y) > sun_max))) {
-            float op = m_StateBlend * m_Current->m_Gradient.fOpacity;
+        if (!((_abs(scr_pos.x) > sun_max) || (_abs(scr_pos.y) > sun_max)))
+        {
+            float op = m_StateBlend*m_Current->m_Gradient.fOpacity;
             fGradientValue = kx * ky * op * fBlend;
         }
         else
@@ -596,7 +599,7 @@ shared_str CLensFlare::AppendDef(CEnvironment& environment, CInifile* pIni, LPCS
 void CLensFlare::OnDeviceCreate()
 {
     // VS
-    // hGeom.create (FVF::F_LIT,RCache.Vertex.Buffer(),RCache.QuadIB);
+    //hGeom.create (FVF::F_LIT,RCache.Vertex.Buffer(),RCache.QuadIB);
     m_pRender->OnDeviceCreate();
 
     // palette
@@ -611,6 +614,7 @@ void CLensFlare::OnDeviceDestroy()
         (*it)->OnDeviceDestroy();
 
     // VS
-    // hGeom.destroy();
+    //hGeom.destroy();
     m_pRender->OnDeviceDestroy();
 }
+

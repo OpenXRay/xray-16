@@ -4,7 +4,6 @@
 class IGameFont
 {
     friend class dxFontRender;
-
 public:
     enum EAligment
     {
@@ -40,8 +39,8 @@ public:
     virtual void OutSetI(float x, float y) = 0;
     virtual void OutSet(float x, float y) = 0;
     virtual Fvector2 GetPosition() const = 0;
-    virtual void MasterOut(BOOL bCheckDevice, BOOL bUseCoords, BOOL bScaleCoords, BOOL bUseSkip, float _x, float _y,
-        float _skip, LPCSTR fmt, va_list p) = 0;
+    virtual void MasterOut(BOOL bCheckDevice, BOOL bUseCoords, BOOL bScaleCoords, BOOL bUseSkip,
+        float _x, float _y, float _skip, LPCSTR fmt, va_list p) = 0;
     virtual u32 smart_strlen(const char* S) = 0;
     virtual BOOL IsMultibyte() const = 0;
     virtual u16 SplitByWidth(u16* puBuffer, u16 uBufferSize, float fTargetWidth, const char* pszText) = 0;
@@ -49,12 +48,10 @@ public:
     virtual void OutI(float _x, float _y, LPCSTR fmt, ...) = 0;
     virtual void Out(float _x, float _y, LPCSTR fmt, ...) = 0;
     virtual void OutNext(LPCSTR fmt, ...) = 0;
-    virtual void OutNextVA(const char* format, va_list args) = 0;
+    virtual void OutNextVA(const char *format, va_list args) = 0;
     virtual void OutSkip(float val = 1.f) = 0;
     virtual void OnRender() = 0;
     virtual void Clear() = 0;
 };
 
-IC IGameFont::~IGameFont()
-{
-}
+IC IGameFont::~IGameFont() {}

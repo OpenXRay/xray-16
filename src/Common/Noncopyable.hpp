@@ -4,6 +4,6 @@ class Noncopyable
 {
 public:
     Noncopyable() = default;
-    Noncopyable(Noncopyable&) = delete;
-    Noncopyable& operator=(Noncopyable&) = delete;
+    Noncopyable(Noncopyable &) = delete;
+    Noncopyable &operator=(Noncopyable &) = delete;
 };

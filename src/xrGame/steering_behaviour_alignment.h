@@ -9,21 +9,23 @@
 #ifndef STEERING_BEHAVIOUR_ALIGNMENT_H_INCLUDED
 #define STEERING_BEHAVIOUR_ALIGNMENT_H_INCLUDED
 
-#include "smart_cover_detail.h"
 #include "steering_behaviour_base.h"
+#include "smart_cover_detail.h"
 
 class CAI_Rat;
 
-namespace steering_behaviour
-{
-class alignment final : public base, private Noncopyable
+namespace steering_behaviour {
+
+class alignment final :
+    public base,
+	private Noncopyable 
 {
 public:
-    alignment(CAI_Rat const* object);
-    virtual Fvector direction();
+						alignment	(CAI_Rat const *object);
+	virtual	Fvector		direction	();
 
 private:
-    typedef base inherited;
+	typedef base		inherited;
 };
 
 } // namespace steering_behaviour

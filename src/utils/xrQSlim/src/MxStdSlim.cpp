@@ -3,7 +3,7 @@
   Surface simplification using quadric error metrics
 
   Copyright (C) 1998 Michael Garland.  See "COPYING.txt" for details.
-
+  
   $Id: MxStdSlim.cxx,v 1.4 1999/01/08 18:56:30 garland Exp $
 
  ************************************************************************/
@@ -12,7 +12,8 @@
 
 #include "MxStdSlim.h"
 
-MxStdSlim::MxStdSlim(MxStdModel* m0) : heap(64)
+MxStdSlim::MxStdSlim(MxStdModel *m0)
+    : heap(64)
 {
     m = m0;
 
@@ -31,8 +32,6 @@ MxStdSlim::MxStdSlim(MxStdModel* m0) : heap(64)
     is_initialized = false;
 
     unsigned int i;
-    for (i = 0; i < m->face_count(); i++)
-        if (m->face_is_valid(i)) valid_faces++;
-    for (i = 0; i < m->vert_count(); i++)
-        if (m->vertex_is_valid(i)) valid_verts++;
+    for(i=0; i<m->face_count(); i++) if(m->face_is_valid(i))  valid_faces++;
+    for(i=0; i<m->vert_count(); i++) if(m->vertex_is_valid(i))  valid_verts++;
 }

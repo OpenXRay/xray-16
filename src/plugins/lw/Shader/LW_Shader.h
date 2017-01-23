@@ -6,10 +6,9 @@
 
 typedef char sh_name[64];
 
-typedef struct st_EShaderList
-{
-    int count;
-    sh_name Names[1024];
-} EShaderList;
+typedef struct st_EShaderList{
+	int			count;
+	sh_name		Names[1024];
+}EShaderList;
 
 #endif

@@ -8,49 +8,50 @@
 
 #pragma once
 
-#include <loki/hierarchygenerators.h>
-#include <loki/typelist.h>
-#include "ai_space.h"
-#include "entity.h"
-#include "xrCDB/ispatial.h"
 #include "xrEngine/engineapi.h"
-#include "xrEngine/icollidable.h"
-#include "xrEngine/irenderable.h"
+#include "xrCDB/ispatial.h"
 #include "xrEngine/isheduled.h"
+#include "xrEngine/irenderable.h"
+#include "xrEngine/icollidable.h"
 #include "xrEngine/xr_object.h"
+#include "entity.h"
+#include "ai_space.h"
 #include "xrScriptEngine/script_engine.hpp"
+#include <loki/typelist.h>
+#include <loki/hierarchygenerators.h>
 #include "xrServer_Object_Base.h"
 
 template <typename _1, typename _2>
-struct heritage
-{
-    template <typename _type, typename _base>
-    struct linear_registrator : public _base, public _type
-    {
-    };
+struct heritage {
+	template <typename _type, typename _base>
+	struct linear_registrator : public _base, public _type {};
 
-    template <typename _type>
-    struct linear_registrator<_type, Loki::EmptyType> : public _type
-    {
-    };
+	template <typename _type>
+	struct linear_registrator<_type,Loki::EmptyType> : public _type {};
 
-    typedef Loki::Typelist<_1, Loki::Typelist<_2, Loki::NullType>> tl;
-    typedef typename Loki::TL::Erase<tl, Loki::EmptyType>::Result pure_tl;
-    typedef typename Loki::GenLinearHierarchy<pure_tl, linear_registrator>::LinBase result;
+	typedef Loki::Typelist<_1,Loki::Typelist<_2, Loki::NullType> >					tl;
+	typedef typename Loki::TL::Erase<tl,Loki::EmptyType>::Result					pure_tl;
+	typedef typename Loki::GenLinearHierarchy<pure_tl,linear_registrator>::LinBase	result;
 };
 
 template <typename base>
-class FactoryObjectWrapperTpl : public heritage<base, luabind::wrap_base>::result
-{
+class FactoryObjectWrapperTpl : public heritage<base, luabind::wrap_base>::result {
 public:
-    IC FactoryObjectWrapperTpl(){};
-    virtual ~FactoryObjectWrapperTpl(){};
+	IC					FactoryObjectWrapperTpl() {};
+	virtual				~FactoryObjectWrapperTpl() {};
 
-    virtual IFactoryObject* _construct() { return (call_member<IFactoryObject*>(this, "_construct")); }
-    static IFactoryObject* _construct_static(base* self) { return (self->base::_construct()); }
+	virtual	IFactoryObject*	_construct			()
+	{
+		return			(call_member<IFactoryObject*>(this,"_construct"));
+	}
+
+	static	IFactoryObject*	_construct_static	(base *self)
+	{
+		return			(self->base::_construct());
+	}
 private:
     // not exported
-    virtual CLASS_ID& GetClassId() override
+    virtual	CLASS_ID &GetClassId() override
     {
         static CLASS_ID id = -1;
         return id;
@@ -59,171 +60,167 @@ private:
 
 typedef FactoryObjectWrapperTpl<IFactoryObject> FactoryObjectWrapper;
 
-/*
+/*	
 template <typename base, typename luabind_base = Loki::EmptyType>
 class ISpatialWrapper : public heritage<base,luabind_base>::result {
 public:
-    IC						ISpatialWrapper				() {};
-    virtual					~ISpatialWrapper			() {};
-    virtual	void			spatial_register			()
-    {
-        call_member<void>(this,"spatial_register");
-    }
+	IC						ISpatialWrapper				() {};
+	virtual					~ISpatialWrapper			() {};
+	virtual	void			spatial_register			()
+	{
+		call_member<void>(this,"spatial_register");
+	}
 
-    static	void			spatial_register_static		(base *self)
-    {
-        self->base::spatial_register();
-    }
+	static	void			spatial_register_static		(base *self)
+	{
+		self->base::spatial_register();
+	}
 
-    virtual	void			spatial_unregister			()
-    {
-        call_member<void>(this,"spatial_unregister");
-    }
+	virtual	void			spatial_unregister			()
+	{
+		call_member<void>(this,"spatial_unregister");
+	}
+	
+	static	void			spatial_unregister_static	(base *self)
+	{
+		self->base::spatial_unregister();
+	}
 
-    static	void			spatial_unregister_static	(base *self)
-    {
-        self->base::spatial_unregister();
-    }
+	virtual	void			spatial_move				()
+	{
+		call_member<void>(this,"spatial_move");
+	}
 
-    virtual	void			spatial_move				()
-    {
-        call_member<void>(this,"spatial_move");
-    }
+	static	void			spatial_move_static			(base *self)
+	{
+		self->base::spatial_move();
+	}
 
-    static	void			spatial_move_static			(base *self)
-    {
-        self->base::spatial_move();
-    }
+	virtual	Fvector			spatial_sector_point		()
+	{
+		return	(call_member<Fvector>(this,"spatial_sector_point"));
+	}
 
-    virtual	Fvector			spatial_sector_point		()
-    {
-        return	(call_member<Fvector>(this,"spatial_sector_point"));
-    }
+	static	Fvector			spatial_sector_point_static	(base *self)
+	{
+		return	(self->base::spatial_sector_point());
+	}
+	
+	virtual	IGameObject*		dcast_GameObject				()
+	{
+		return	(call_member<IGameObject*>(this,"dcast_GameObject"));
+	}
 
-    static	Fvector			spatial_sector_point_static	(base *self)
-    {
-        return	(self->base::spatial_sector_point());
-    }
+	static	IGameObject*		dcast_CObject_static		(base *self)
+	{
+		return	(self->base::dcast_GameObject());
+	}
 
-    virtual	IGameObject*		dcast_GameObject				()
-    {
-        return	(call_member<IGameObject*>(this,"dcast_GameObject"));
-    }
+	virtual	Feel::Sound*	dcast_FeelSound				()
+	{
+		return	(call_member<Feel::Sound*>(this,"dcast_FeelSound"));
+	}
 
-    static	IGameObject*		dcast_CObject_static		(base *self)
-    {
-        return	(self->base::dcast_GameObject());
-    }
+	static	Feel::Sound*	dcast_FeelSound_static		(base *self)
+	{
+		return	(self->base::dcast_FeelSound());
+	}
 
-    virtual	Feel::Sound*	dcast_FeelSound				()
-    {
-        return	(call_member<Feel::Sound*>(this,"dcast_FeelSound"));
-    }
+	virtual	IRenderable*	dcast_Renderable			()
+	{
+		return	(call_member<IRenderable*>(this,"dcast_Renderable"));
+	}
 
-    static	Feel::Sound*	dcast_FeelSound_static		(base *self)
-    {
-        return	(self->base::dcast_FeelSound());
-    }
-
-    virtual	IRenderable*	dcast_Renderable			()
-    {
-        return	(call_member<IRenderable*>(this,"dcast_Renderable"));
-    }
-
-    static	IRenderable*	dcast_Renderable_static		(base *self)
-    {
-        return	(self->base::dcast_Renderable());
-    }
+	static	IRenderable*	dcast_Renderable_static		(base *self)
+	{
+		return	(self->base::dcast_Renderable());
+	}
 };
 
 typedef ISpatialWrapper<ISpatial,luabind::wrap_base> CISpatialWrapper;
 */
 
 template <typename base, typename luabind_base = Loki::EmptyType>
-class ISheduledWrapper : public heritage<base, luabind_base>::result
-{
+class ISheduledWrapper : public heritage<base,luabind_base>::result {
 public:
-    IC ISheduledWrapper(){};
-    virtual ~ISheduledWrapper(){};
+	IC						ISheduledWrapper		() {};
+	virtual					~ISheduledWrapper		() {};
+	
+	virtual float			shedule_Scale			()
+	{
+		return 1;
+//		return	(call_member<float>(this,"shedule_Scale"));
+	}
 
-    virtual float shedule_Scale()
-    {
-        return 1;
-        //		return	(call_member<float>(this,"shedule_Scale"));
-    }
+/*	static float			shedule_Scale_static	(base *self)
+	{
+		ai().script_engine().script_log(LuaMessageType::Error,"You are trying to call a pure virtual function ISheduled::shedule_Scale!\nReturning default value 1000.0");
+		return	(1000.f);
+	}
+*/
+	virtual void			shedule_Update			(u32 dt)
+	{
+		base::shedule_Update			(dt);
+//		call_member<void>(this,"shedule_Update");
+	}
 
-    /*	static float			shedule_Scale_static	(base *self)
-        {
-            ai().script_engine().script_log(LuaMessageType::Error,"You are trying to call a pure virtual function
-       ISheduled::shedule_Scale!\nReturning default value 1000.0");
-            return	(1000.f);
-        }
-    */
-    virtual void shedule_Update(u32 dt)
-    {
-        base::shedule_Update(dt);
-        //		call_member<void>(this,"shedule_Update");
-    }
-
-    /*	static  void			shedule_Update_static	(base *self, u32 dt)
-        {
-            self->base::shedule_Update(dt);
-        }
-    */
+/*	static  void			shedule_Update_static	(base *self, u32 dt)
+	{
+		self->base::shedule_Update(dt);
+	}
+*/
 };
 
-typedef ISheduledWrapper<ISheduled, luabind::wrap_base> CISheduledWrapper;
+typedef ISheduledWrapper<ISheduled,luabind::wrap_base> CISheduledWrapper;
 
 template <typename base, typename luabind_base = Loki::EmptyType>
-class IRenderableWrapper : public heritage<base, luabind_base>::result
-{
+class IRenderableWrapper : public heritage<base,luabind_base>::result {
 public:
-    IC IRenderableWrapper(){};
-    virtual ~IRenderableWrapper(){};
+	IC				IRenderableWrapper				()  {};
+	virtual			~IRenderableWrapper				()  {};
+	
+/*
+	virtual	void	renderable_Render				()
+	{
+		call_member<void>(this,"renderable_Render");
+	}
 
-    /*
-        virtual	void	renderable_Render				()
-        {
-            call_member<void>(this,"renderable_Render");
-        }
+	static	void	renderable_Render_static		(IRenderable *self)
+	{
+		ai().script_engine().script_log(LuaMessageType::Error,"You are trying to call a pure virtual function IRenderable::renderable_Render!");
+	}
 
-        static	void	renderable_Render_static		(IRenderable *self)
-        {
-            ai().script_engine().script_log(LuaMessageType::Error,"You are trying to call a pure virtual function
-       IRenderable::renderable_Render!");
-        }
+	virtual	BOOL	renderable_ShadowGenerate		()
+	{
+		return		((BOOL)call_member<bool>(this,"renderable_ShadowGenerate"));
+	}
 
-        virtual	BOOL	renderable_ShadowGenerate		()
-        {
-            return		((BOOL)call_member<bool>(this,"renderable_ShadowGenerate"));
-        }
+	static	bool	renderable_ShadowGenerate_static(IRenderable *self)
+	{
+		return		(!!	self->IRenderable::renderable_ShadowGenerate());
+	}
+	
+	virtual	BOOL	renderable_ShadowReceive		()
+	{
+		return		((BOOL)call_member<bool>(this,"renderable_ShadowReceive"));
+	}
 
-        static	bool	renderable_ShadowGenerate_static(IRenderable *self)
-        {
-            return		(!!	self->IRenderable::renderable_ShadowGenerate());
-        }
-
-        virtual	BOOL	renderable_ShadowReceive		()
-        {
-            return		((BOOL)call_member<bool>(this,"renderable_ShadowReceive"));
-        }
-
-        static	bool	renderable_ShadowReceive_static	(IRenderable *self)
-        {
-            return		(!!	self->IRenderable::renderable_ShadowReceive());
-        }
-    */
+	static	bool	renderable_ShadowReceive_static	(IRenderable *self)
+	{
+		return		(!!	self->IRenderable::renderable_ShadowReceive());
+	}
+*/
 };
 
-using CIRenderableWrapper = IRenderableWrapper<IRenderable, luabind::wrap_base>;
+using CIRenderableWrapper = IRenderableWrapper<IRenderable,luabind::wrap_base>;
 
-// typedef FactoryObjectWrapperTpl<IGameObject,luabind::wrap_base> CObjectDLL_Pure;
-// typedef ISpatialWrapper<CObjectDLL_Pure>			CObjectISpatial;
-// typedef ISheduledWrapper<CObjectDLL_Pure>			CObjectISheduled;
-// typedef IRenderableWrapper<CObjectISheduled>		CObjectIRenderable;
+//typedef FactoryObjectWrapperTpl<IGameObject,luabind::wrap_base> CObjectDLL_Pure;
+//typedef ISpatialWrapper<CObjectDLL_Pure>			CObjectISpatial;
+//typedef ISheduledWrapper<CObjectDLL_Pure>			CObjectISheduled;
+//typedef IRenderableWrapper<CObjectISheduled>		CObjectIRenderable;
 
-// class CObjectWrapper : public CObjectIRenderable {
-// public:
+//class CObjectWrapper : public CObjectIRenderable {
+//public:
 //	IC						CObjectWrapper		() {};
 //	virtual					~CObjectWrapper		() {};
 ///**
@@ -253,54 +250,81 @@ using CIRenderableWrapper = IRenderableWrapper<IRenderable, luabind::wrap_base>;
 ///**/
 //};
 
+
 using CGameObjectIFactoryObject = FactoryObjectWrapperTpl<CGameObject>;
-// using CGameObjectISpatial = ISpatialWrapper<CGameObjectIFactoryObject>;
+//using CGameObjectISpatial = ISpatialWrapper<CGameObjectIFactoryObject>;
 using CGameObjectISheduled = ISheduledWrapper<CGameObjectIFactoryObject>;
 using CGameObjectIRenderable = IRenderableWrapper<ISheduledWrapper<FactoryObjectWrapperTpl<CGameObject>>>;
-// using CGameObjectIRenderable = IRenderableWrapper<CGameObjectISheduled>; // original
+//using CGameObjectIRenderable = IRenderableWrapper<CGameObjectISheduled>; // original
 
-class CGameObjectWrapper : public CGameObjectIRenderable
-{
+class CGameObjectWrapper : public CGameObjectIRenderable {
 public:
-    IC CGameObjectWrapper(){};
-    virtual ~CGameObjectWrapper(){};
-    virtual bool use(CGameObject* who_use) { return call<bool>("use", who_use); }
-    static bool use_static(CGameObject* self, CGameObject* who_use) { return self->CGameObject::use(who_use); }
-    virtual void net_Import(NET_Packet& packet) { call<void>("net_Import", &packet); }
-    static void net_Import_static(CGameObject* self, NET_Packet* packet) { self->CGameObject::net_Import(*packet); }
-    virtual void net_Export(NET_Packet& packet) { call<void>("net_Export", &packet); }
-    static void net_Export_static(CGameObject* self, NET_Packet* packet) { self->CGameObject::net_Export(*packet); }
-    virtual BOOL net_Spawn(CSE_Abstract* data) { return (luabind::call_member<bool>(this, "net_Spawn", data)); }
-    static bool net_Spawn_static(CGameObject* self, CSE_Abstract* abstract)
-    {
-        return (!!self->CGameObject::net_Spawn(abstract));
-    }
+	IC						CGameObjectWrapper	() {};
+	virtual					~CGameObjectWrapper	() {};
+	virtual bool			use					(CGameObject* who_use)
+	{
+		return call<bool>("use",who_use);
+	}
+
+	static bool			use_static			(CGameObject *self, CGameObject* who_use)
+	{
+		return self->CGameObject::use(who_use);
+	}
+
+
+	virtual void			net_Import			(NET_Packet &packet)
+	{
+		call<void>("net_Import",&packet);
+	}
+
+	static	void			net_Import_static	(CGameObject *self, NET_Packet *packet)
+	{
+		self->CGameObject::net_Import(*packet);
+	}
+
+	virtual void			net_Export			(NET_Packet &packet)
+	{
+		call<void>("net_Export",&packet);
+	}
+
+	static	void			net_Export_static	(CGameObject *self, NET_Packet *packet)
+	{
+		self->CGameObject::net_Export(*packet);
+	}
+
+	virtual BOOL			net_Spawn			(CSE_Abstract* data)
+	{
+		return			(luabind::call_member<bool>(this,"net_Spawn",data));
+	}
+
+	static	bool			net_Spawn_static	(CGameObject *self, CSE_Abstract *abstract)
+	{
+		return			(!!self->CGameObject::net_Spawn(abstract));
+	}
 };
 
-class CEntityWrapper : public CEntity, public luabind::wrap_base
-{
+class CEntityWrapper : public CEntity, public luabind::wrap_base {
 public:
-    IC CEntityWrapper() {}
-    virtual ~CEntityWrapper() {}
-    virtual void HitSignal(float P, Fvector& local_dir, IGameObject* who, s16 element)
-    {
-        luabind::call_member<void>(this, "HitSignal", P, local_dir, who, element);
-    }
+	IC						CEntityWrapper		() {}
+	virtual					~CEntityWrapper		() {}
 
-    static void HitSignal_static(CEntity* self, float P, Fvector& local_dir, IGameObject* who, s16 element)
-    {
-        ai().script_engine().script_log(
-            LuaMessageType::Error, "You are trying to call a pure virtual function CEntity::HitSignal!");
-    }
+	virtual void			HitSignal			(float P, Fvector &local_dir,	IGameObject* who, s16 element)
+	{
+		luabind::call_member<void>(this,"HitSignal",P,local_dir,who,element);
+	}
 
-    virtual void HitImpulse(float P, Fvector& vWorldDir, Fvector& vLocalDir)
-    {
-        luabind::call_member<void>(this, "HitImpulse", P, vWorldDir, vLocalDir);
-    }
+	static	void			HitSignal_static	(CEntity *self, float P, Fvector &local_dir,	IGameObject* who, s16 element)
+	{
+		ai().script_engine().script_log(LuaMessageType::Error,"You are trying to call a pure virtual function CEntity::HitSignal!");
+	}
 
-    static void HitImpulse_static(float P, Fvector& vWorldDir, Fvector& vLocalDir)
-    {
-        ai().script_engine().script_log(
-            LuaMessageType::Error, "You are trying to call a pure virtual function CEntity::HitImpulse!");
-    }
+	virtual void			HitImpulse			(float P, Fvector &vWorldDir, 	Fvector& vLocalDir)
+	{
+		luabind::call_member<void>(this,"HitImpulse",P,vWorldDir,vLocalDir);
+	}
+
+	static	void			HitImpulse_static	(float P, Fvector &vWorldDir, 	Fvector& vLocalDir)
+	{
+		ai().script_engine().script_log(LuaMessageType::Error,"You are trying to call a pure virtual function CEntity::HitImpulse!");
+	}
 };

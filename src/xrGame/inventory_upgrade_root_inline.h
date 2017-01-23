@@ -13,9 +13,10 @@ namespace inventory
 {
 namespace upgrade
 {
+
 IC LPCSTR Root::scheme() const
 {
-    return m_upgrade_scheme.c_str();
+	return	m_upgrade_scheme.c_str();
 }
 
 } // namespace upgrade

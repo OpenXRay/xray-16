@@ -3,19 +3,21 @@
 // DummyArtefact - артефакт пустышка
 ///////////////////////////////////////////////////////////////
 
-#include "DummyArtifact.h"
 #include "stdafx.h"
+#include "DummyArtifact.h"
 #include "xrPhysics/PhysicsShell.h"
 
-CDummyArtefact::CDummyArtefact(void)
+
+CDummyArtefact::CDummyArtefact(void) 
 {
 }
 
-CDummyArtefact::~CDummyArtefact(void)
+CDummyArtefact::~CDummyArtefact(void) 
 {
 }
 
-void CDummyArtefact::Load(LPCSTR section)
+void CDummyArtefact::Load(LPCSTR section) 
 {
-    inherited::Load(section);
+	inherited::Load(section);
 }
+

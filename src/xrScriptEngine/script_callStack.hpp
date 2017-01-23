@@ -12,16 +12,16 @@ struct SPath
 class XRSCRIPTENGINE_API CScriptCallStack
 {
 public:
-    CScriptDebugger* m_debugger;
+    CScriptDebugger *m_debugger;
     void GotoStackTraceLevel(int nLevel);
-    void Add(const char* szDesc, const char* szFile, int nLine);
+    void Add(const char *szDesc, const char *szFile, int nLine);
     void Clear();
-    CScriptCallStack(CScriptDebugger* d);
+    CScriptCallStack(CScriptDebugger *d);
     ~CScriptCallStack();
 
     int GetLevel() { return m_nCurrentLevel; }
-    void SetStackTraceLevel(int);
 
+    void SetStackTraceLevel(int);
 protected:
     int m_nCurrentLevel;
     xr_vector<u32> m_levels;

@@ -9,11 +9,9 @@ public:
     typedef _plane<T> Self;
     typedef Self& SelfRef;
     typedef const Self& SelfCRef;
-
 public:
     _vector3<T> n;
     T d;
-
 public:
     IC SelfRef set(Self& P)
     {
@@ -61,7 +59,10 @@ public:
         pdest.mad(psrc, n, -classify(psrc));
         return *this;
     }
-    ICF T classify(const _vector3<T>& v) const { return n.dotproduct(v) + d; }
+    ICF T classify(const _vector3<T>& v) const
+    {
+        return n.dotproduct(v) + d;
+    }
     IC SelfRef normalize()
     {
         T denom = 1.f / n.magnitude();
@@ -69,7 +70,10 @@ public:
         d *= denom;
         return *this;
     }
-    IC T distance(const _vector3<T>& v) { return _abs(classify(v)); }
+    IC T distance(const _vector3<T>& v)
+    {
+        return _abs(classify(v));
+    }
     IC BOOL intersectRayDist(const _vector3<T>& P, const _vector3<T>& D, T& dist)
     {
         T numer = classify(P);
@@ -86,8 +90,7 @@ public:
         T numer = classify(P);
         T denom = n.dotproduct(D);
 
-        if (_abs(denom) < EPS_S)
-            return FALSE; // normal is orthogonal to vector3, cant intersect
+        if (_abs(denom) < EPS_S) return FALSE; // normal is orthogonal to vector3, cant intersect
         else
         {
             float dist = -(numer / denom);
@@ -95,8 +98,9 @@ public:
             return ((dist > 0.f) || fis_zero(dist));
         }
     }
-    IC BOOL intersect(const _vector3<T>& u, const _vector3<T>& v, // segment
-        _vector3<T>& isect)                                       // intersection point
+    IC BOOL intersect(
+        const _vector3<T>& u, const _vector3<T>& v, // segment
+        _vector3<T>& isect) // intersection point
     {
         T denom, dist;
         _vector3<T> t;
@@ -111,8 +115,9 @@ public:
         return true;
     }
 
-    IC BOOL intersect_2(const _vector3<T>& u, const _vector3<T>& v, // segment
-        _vector3<T>& isect)                                         // intersection point
+    IC BOOL intersect_2(
+        const _vector3<T>& u, const _vector3<T>& v, // segment
+        _vector3<T>& isect) // intersection point
     {
         T dist1, dist2;
         _vector3<T> t;
@@ -120,7 +125,8 @@ public:
         dist1 = n.dotproduct(u) + d;
         dist2 = n.dotproduct(v) + d;
 
-        if (dist1 * dist2 < 0.0f) return false;
+        if (dist1*dist2 < 0.0f)
+            return false;
 
         t.sub(v, u);
         isect.mad(u, t, dist1 / _abs(dist1 - dist2));
@@ -141,9 +147,6 @@ typedef _plane<float> Fplane;
 typedef _plane<double> Dplane;
 
 template <class T>
-BOOL _valid(const _plane<T>& s)
-{
-    return _valid(s.n) && _valid(s.d);
-}
+BOOL _valid(const _plane<T>& s) { return _valid(s.n) && _valid(s.d); }
 
 #endif

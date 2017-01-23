@@ -20,15 +20,13 @@ class ENGINE_API CEventAPI
         u64 P1;
         u64 P2;
     };
-
 private:
     xr_vector<EVENT> Events;
     xr_vector<Deferred> Events_Deferred;
     Lock CS;
-
 public:
 #ifdef CONFIG_PROFILE_LOCKS
-    CEventAPI() : CS(MUTEX_PROFILE_ID(CEventAPI)) {}
+    CEventAPI () : CS(MUTEX_PROFILE_ID(CEventAPI)) {}
 #endif // CONFIG_PROFILE_LOCKS
     EVENT Create(const char* N);
     void Destroy(EVENT& E);

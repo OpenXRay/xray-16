@@ -32,8 +32,8 @@ struct lua_State;
 
 struct SScriptThread
 {
-    // void *pScript;
-    lua_State* lua;
+    //void *pScript;
+    lua_State *lua;
     int scriptID;
     bool active;
     char name[255];
@@ -48,10 +48,11 @@ struct SScriptThread
         *process = 0;
     }
 
-    SScriptThread(const SScriptThread& other) { operator=(other); }
-    SScriptThread& operator=(const SScriptThread& other)
+    SScriptThread(const SScriptThread &other) { operator=(other); }
+
+    SScriptThread &operator =(const SScriptThread &other)
     {
-        // pScript = other.pScript;
+        //pScript = other.pScript;
         lua = other.lua;
         scriptID = other.scriptID;
         active = other.active;
@@ -68,7 +69,7 @@ struct SScriptThread
 
 enum dbg_messages
 {
-    _DMSG_FIRST_MSG = WM_USER + 1,
+    _DMSG_FIRST_MSG = WM_USER+1,
     DMSG_WRITE_DEBUG,
     DMSG_HAS_BREAKPOINT,
     DMSG_GOTO_FILELINE,

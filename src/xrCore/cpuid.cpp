@@ -6,7 +6,7 @@
 /***
 *
 * int _cpuid (_p_info *pinfo)
-*
+* 
 * Entry:
 *
 *   pinfo: pointer to _p_info, NULL is not allowed!
@@ -17,7 +17,7 @@
 *
 ****************************************************/
 #ifdef _EDITOR
-int _cpuid(_processor_info* pinfo)
+int _cpuid ( _processor_info *pinfo )
 {
     ZeroMemory(pinfo, sizeof(_processor_info));
 
@@ -28,18 +28,18 @@ int _cpuid(_processor_info* pinfo)
 
 #undef _CPUID_DEBUG
 
-int _cpuid(_processor_info* pinfo)
-{
-    unsigned int lpid_width, mlpp;
-#ifdef _CPUID_DEBUG
-    unsigned int mlpc, mcc;
-#endif // _CPUID_DEBUG
-    __asm {
+int _cpuid ( _processor_info *pinfo )
+{	
+	unsigned int lpid_width , mlpp;
+	#ifdef _CPUID_DEBUG
+		unsigned int mlpc , mcc;
+	#endif // _CPUID_DEBUG
+__asm {
 
-        // set pointers
+	// set pointers
 	mov			edi , DWORD PTR [pinfo]
 
-            // zero structure
+	// zero structure
 	xor			eax, eax
 	mov			ecx, TYPE _processor_info
 	mov			esi, edi
@@ -50,13 +50,13 @@ NZ:
 	inc			ecx
 	jnz			NZ
 
-            // zero result mask
+	// zero result mask
 	xor			esi , esi
 
-        // zero bit width
+	// zero bit width
 	mov			DWORD PTR [lpid_width] , esi
 
-        // test for CPUID presence
+	// test for CPUID presence
 	pushfd
 	pop			eax
 	mov			ebx , eax
@@ -68,7 +68,7 @@ NZ:
 	cmp			eax , ebx
 	jz			NO_CPUID
 
-            // function 00h - query standard features
+	// function 00h - query standard features
 	xor			eax , eax
 	cpuid
 	
@@ -77,34 +77,34 @@ NZ:
 	mov			DWORD PTR [edi][_processor_info::v_name][8]  , ecx
 	mov			BYTE PTR  [edi][_processor_info::v_name][12] , 0
 
-        // check for greater function presence
+	// check for greater function presence
 	test		eax , eax
 	jz			CHECK_EXT
 
-        // Check for Intel signature
+	// Check for Intel signature
 	cmp			ecx , 0x6C65746E				; "ntel"
 	jnz			NO_HTT
 
-        // Check for HTT bit
+	// Check for HTT bit
 	mov			eax , 01h
 	cpuid
 	test		edx , 010000000h
 	jz			NO_HTT
 
-        // Max logical processors addressed in this package
+	// Max logical processors addressed in this package
 	shr			ebx , 16
 	and			ebx , 0FFh
 	mov			DWORD PTR [mlpp] , ebx
 
-            // How many cores we have?
+	// How many cores we have?
 
-            // Check for 04h leaf
+	// Check for 04h leaf
 	xor			eax , eax
 	cpuid
 	cmp			eax , 04h
 	jb			ONE_CORE						; undocumented old P4 ?
 
-        // Max addressable cores we have
+	// Max addressable cores we have
 	xor			ecx , ecx
 	mov			eax , 04h
 	cpuid
@@ -123,7 +123,7 @@ CALC_WIDTH:
 	mov			DWORD PTR [mcc] , eax
 #endif // _CPUID_DEBUG
 
-        // Addressable logical processors per core
+	// Addressable logical processors per core
 	mov			ebx , eax
 	xor			edx , edx
 	mov			eax , DWORD PTR [mlpp]
@@ -136,7 +136,7 @@ CALC_WIDTH:
 	cmp			eax , 01h
 	jbe			NO_HTT
 
-            // Calculate required bit width to address logical procesors
+	// Calculate required bit width to address logical procesors
 	xor			ecx , ecx
 	mov			edx , ecx
 	dec			eax
@@ -147,83 +147,83 @@ CALC_WIDTH:
 BW_READY:
 	mov			DWORD PTR [lpid_width] , edx
 
-            // We have some sort of HT
+	// We have some sort of HT
 	or			esi , _CPU_FEATURE_HTT
 
 NO_HTT:
-            // function 01h - feature sets
+	// function 01h - feature sets
 	mov			eax , 01h
 	cpuid
 
-        // stepping ID
+	// stepping ID
 	mov			ebx , eax
 	and			ebx , 0fh
 	mov			BYTE PTR [edi][_processor_info::stepping] , bl
 
-        // Model
+	// Model
 	mov			ebx , eax
 	shr			ebx , 04h
 	and			ebx , 0fh
 	mov			BYTE PTR [edi][_processor_info::model] , bl
 
-        // Family
+	// Family
 	mov			ebx , eax
 	shr			ebx , 08h
 	and			ebx , 0fh
 	mov			BYTE PTR [edi][_processor_info::family] , bl
 
-            // Standard features
+	// Standard features
 
-            // Against SSE3
+	// Against SSE3
 	xor			ebx , ebx
 	mov			eax , _CPU_FEATURE_SSE3
 	test		ecx , 01h
 	cmovnz		ebx , eax
 	or			esi , ebx
 
-            // Against MONITOR/MWAIT
+	// Against MONITOR/MWAIT
 	xor			ebx , ebx
 	mov			eax , _CPU_FEATURE_MWAIT
 	test		ecx , 08h
 	cmovnz		ebx , eax
 	or			esi , ebx
 
-            // Against SSSE3
+	// Against SSSE3
 	xor			ebx , ebx
 	mov			eax , _CPU_FEATURE_SSSE3
 	test		ecx , 0200h
 	cmovnz		ebx , eax
 	or			esi , ebx
 
-            // Against SSE4.1
+	// Against SSE4.1
 	xor			ebx , ebx
 	mov			eax , _CPU_FEATURE_SSE4_1
 	test		ecx , 080000h
 	cmovnz		ebx , eax
 	or			esi , ebx
 
-            // Against SSE4.2
+	// Against SSE4.2
 	xor			ebx , ebx
 	mov			eax , _CPU_FEATURE_SSE4_2
 	test		ecx , 0100000h
 	cmovnz		ebx , eax
 	or			esi , ebx
 
-            // Against MMX
+	// Against MMX
 	xor			ebx , ebx
 	mov			eax , _CPU_FEATURE_MMX
 	test		edx , 0800000h
 	cmovnz		ebx , eax
 	or			esi , ebx
 
-            // Against SSE
+	// Against SSE
 	xor			ebx , ebx
 	mov			eax , _CPU_FEATURE_SSE
 	test		edx , 02000000h
 	cmovnz		ebx , eax
 	or			esi , ebx
 
-            // Against SSE2
+	// Against SSE2
 	xor			ebx , ebx
 	mov			eax , _CPU_FEATURE_SSE2
 	test		edx , 04000000h
@@ -231,13 +231,13 @@ NO_HTT:
 	or			esi , ebx
 
 CHECK_EXT:
-            // test for extended functions
+	// test for extended functions
 	mov			eax , 80000000h
 	cpuid
 	cmp			eax , 80000004h
 	jb			NO_CPUID
 
-        // first 16 bytes
+	// first 16 bytes
 	mov			eax , 80000002h
 	cpuid
 
@@ -246,7 +246,7 @@ CHECK_EXT:
 	mov			DWORD PTR [edi][_processor_info::model_name][8]  , ecx
 	mov			DWORD PTR [edi][_processor_info::model_name][12] , edx
 
-        // second 16 bytes
+	// second 16 bytes
 	mov			eax , 80000003h
 	cpuid
 
@@ -255,7 +255,7 @@ CHECK_EXT:
 	mov			DWORD PTR [edi][_processor_info::model_name][24] , ecx
 	mov			DWORD PTR [edi][_processor_info::model_name][28] , edx
 
-        // third 16 bytes
+	// third 16 bytes
 	mov			eax , 80000004h
 	cpuid
 
@@ -264,13 +264,13 @@ CHECK_EXT:
 	mov			DWORD PTR [edi][_processor_info::model_name][40] , ecx
 	mov			DWORD PTR [edi][_processor_info::model_name][44] , edx
 
-        // trailing zero
-	mov			BYTE PTR  [edi][_processor_info::model_name][48] , 0
+	// trailing zero
+	mov			BYTE PTR  [edi][_processor_info::model_name][48] , 0	
 
-        // trimming initials
+	// trimming initials
 	mov			ax , 020h
 
-            // trailing spaces
+	// trailing spaces
 	xor			ebx , ebx
 
 TS_FIND_LOOP:
@@ -292,7 +292,7 @@ TS_MOVE_LOOP:
 
 TS_MOVE_EXIT:
 
-            // heading spaces
+	// heading spaces
 	xor			ebx , ebx
 
 HS_FIND_LOOP:
@@ -315,19 +315,19 @@ HS_MOVE_LOOP:
 	test		cl , cl
 	jnz			HS_MOVE_LOOP
 
-HS_MOVE_EXIT:
+HS_MOVE_EXIT:	
 
-            // many spaces
+	// many spaces
 	xor			ebx , ebx
 
 MS_FIND_LOOP:
-            // 1st character
+	// 1st character
 	mov			cl , BYTE PTR  [edi][ebx][_processor_info::model_name]
 	test		cl , cl
 	jz			MS_FIND_EXIT
 	cmp			cl , al
 	jnz			MS_FIND_NEXT
-        // 2nd character
+	// 2nd character
 	mov			edx , ebx
 	inc			ebx
 	mov			cl , BYTE PTR  [edi][ebx][_processor_info::model_name]
@@ -335,7 +335,7 @@ MS_FIND_LOOP:
 	jz			MS_FIND_EXIT
 	cmp			cl , al
 	jnz			MS_FIND_NEXT
-        // move
+	// move
 	jmp short	HS_MOVE_LOOP
 
 MS_FIND_NEXT:
@@ -346,93 +346,92 @@ MS_FIND_EXIT:
 NO_CPUID:
 	
 	mov		DWORD PTR [edi][_processor_info::feature] , esi
-    }
+}
 #ifdef _CPUID_DEBUG
-    printf("mlpp = %u\n", mlpp);
-    printf("mcc = %u\n", mcc);
-    printf("mlpc = %u\n", mlpc);
-    printf("\nlogical_id bit width = %u\n\n", lpid_width);
+	printf("mlpp = %u\n" , mlpp );
+	printf("mcc = %u\n" , mcc );
+	printf("mlpc = %u\n" , mlpc );
+	printf("\nlogical_id bit width = %u\n\n" , lpid_width );
 #endif // _CPUID_DEBUG
 
-    // Calculate available processors
-    DWORD pa_mask_save, sa_mask_stub, pa_mask_test, proc_count = 0;
+	// Calculate available processors
+	DWORD pa_mask_save, sa_mask_stub, pa_mask_test, proc_count = 0;
 
-    GetProcessAffinityMask(GetCurrentProcess(), &pa_mask_save, &sa_mask_stub);
+	GetProcessAffinityMask( GetCurrentProcess() , &pa_mask_save , &sa_mask_stub );
 
-    pa_mask_test = pa_mask_save;
-    while (pa_mask_test)
-    {
-        if (pa_mask_test & 0x01) ++proc_count;
-        pa_mask_test >>= 1;
-    }
+	pa_mask_test = pa_mask_save;
+	while ( pa_mask_test ) {
+		if ( pa_mask_test & 0x01 )
+			++proc_count;
+		pa_mask_test >>= 1;
+	}
 
-    // All logical processors
-    pinfo->n_threads = proc_count;
+	// All logical processors
+	pinfo->n_threads = proc_count;
 
-    // easy case, HT is not possible at all
-    if (lpid_width == 0) {
-        pinfo->affinity_mask = pa_mask_save;
-        pinfo->n_cores = proc_count;
-        return pinfo->feature;
-    }
+	// easy case, HT is not possible at all
+	if ( lpid_width == 0 ) {
+		pinfo->affinity_mask = pa_mask_save;
+		pinfo->n_cores = proc_count;
+		return pinfo->feature;
+	}
+	
+	// create APIC ID list
+	DWORD dwAPIC_IDS[256], dwNums[256], n_cpu = 0 , n_avail = 0 , dwAPIC_ID , ta_mask;
 
-    // create APIC ID list
-    DWORD dwAPIC_IDS[256], dwNums[256], n_cpu = 0, n_avail = 0, dwAPIC_ID, ta_mask;
-
-    pa_mask_test = pa_mask_save;
-    while (pa_mask_test)
-    {
-        if (pa_mask_test & 0x01) {
-            // Switch thread to specific CPU
-            ta_mask = (1 << n_cpu);
-            SetThreadAffinityMask(GetCurrentThread(), ta_mask);
-            Sleep(100);
-            // get APIC ID
-            __asm {
+	pa_mask_test = pa_mask_save;
+	while ( pa_mask_test ) {
+		if ( pa_mask_test & 0x01 ) {
+			// Switch thread to specific CPU
+			ta_mask = ( 1 << n_cpu );
+			SetThreadAffinityMask( GetCurrentThread() , ta_mask );
+			Sleep( 100 );
+			// get APIC ID
+			__asm {
 				mov		eax , 01h
 				cpuid
 				shr		ebx , 24
 				and		ebx , 0FFh
 				mov		DWORD PTR [dwAPIC_ID] , ebx
-            }
+			}
 
-#ifdef _CPUID_DEBUG
-            char mask[255];
-            _itoa_s(dwAPIC_ID, mask, 2);
-            printf("APID_ID #%2.2u = 0x%2.2X (%08.8sb)\n", n_avail, dwAPIC_ID, mask);
-#endif // _CPUID_DEBUG
+			#ifdef _CPUID_DEBUG
+				char mask[255];
+				_itoa_s( dwAPIC_ID , mask , 2 );
+				printf("APID_ID #%2.2u = 0x%2.2X (%08.8sb)\n" , n_avail , dwAPIC_ID , mask );
+			#endif // _CPUID_DEBUG
 
-            // search for the APIC_ID with the same base
-            BOOL bFound = FALSE;
-            for (DWORD i = 0; i < n_avail; ++i)
-                if ((dwAPIC_ID >> lpid_width) == (dwAPIC_IDS[i] >> lpid_width)) {
-                    bFound = TRUE;
-                    break;
-                }
-            if (!bFound) {
-                // add unique core
-                dwNums[n_avail] = n_cpu;
-                dwAPIC_IDS[n_avail] = dwAPIC_ID;
-                ++n_avail;
-            }
-        }
-        // pick the next logical processor
-        ++n_cpu;
-        pa_mask_test >>= 1;
-    }
+			// search for the APIC_ID with the same base
+			BOOL bFound = FALSE;
+			for ( DWORD i = 0 ; i < n_avail ; ++i )
+				if ( ( dwAPIC_ID >> lpid_width ) == ( dwAPIC_IDS[i] >> lpid_width ) ) {
+					bFound = TRUE;
+					break;
+				}
+			if ( ! bFound ) {
+				// add unique core
+				dwNums[n_avail] = n_cpu;
+				dwAPIC_IDS[n_avail] = dwAPIC_ID;
+				++n_avail;
+			}
+		}
+		// pick the next logical processor
+		++n_cpu;
+		pa_mask_test >>= 1;
+	}
 
-    // restore original saved affinity mask
-    SetThreadAffinityMask(GetCurrentThread(), pa_mask_save);
-    Sleep(100);
+	// restore original saved affinity mask
+	SetThreadAffinityMask( GetCurrentThread() , pa_mask_save );
+	Sleep( 100 );
 
-    // Create recommended mask
-    DWORD ta_rec_mask = 0;
-    for (DWORD i = 0; i < n_avail; ++i)
-        ta_rec_mask |= (1 << dwNums[i]);
+	// Create recommended mask
+	DWORD ta_rec_mask = 0;
+	for ( DWORD i = 0 ; i < n_avail ; ++i )
+		ta_rec_mask |= ( 1 << dwNums[i] );
 
-    pinfo->affinity_mask = ta_rec_mask;
-    pinfo->n_cores = n_avail;
+	pinfo->affinity_mask = ta_rec_mask;
+	pinfo->n_cores = n_avail;
 
-    return pinfo->feature;
+	return pinfo->feature;
 }
 #endif
