@@ -45,6 +45,8 @@ DerivePointerAlignment: false
 DisableFormat:   false
 ForEachMacros:   []
 IncludeCategories:
+  - Regex:           'stdafx.h'
+    Priority:        -1
   - Regex:           '^<'
     Priority:        1
   - Regex:           '^"'
@@ -68,7 +70,7 @@ PenaltyExcessCharacter: 1000000
 PenaltyReturnTypeOnItsOwnLine: 60
 PointerAlignment: Left
 ReflowComments:  true
-SortIncludes:    true
+SortIncludes:    false
 SpaceAfterCStyleCast: false
 SpaceBeforeAssignmentOperators: true
 SpaceBeforeParens: ControlStatements
