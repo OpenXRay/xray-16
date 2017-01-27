@@ -12,4 +12,4 @@
 #include "stdafx.h"
 #include "xrScriptEngine/xrScriptEngine.hpp"
 
-#endif // PCH_SCRIPT_H
+#endif  // PCH_SCRIPT_H

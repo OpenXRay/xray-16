@@ -9,6 +9,6 @@
 #include "stdafx.h"
 #include "script_entity_action.h"
 
-CScriptEntityAction::~CScriptEntityAction	()
+CScriptEntityAction::~CScriptEntityAction()
 {
 }

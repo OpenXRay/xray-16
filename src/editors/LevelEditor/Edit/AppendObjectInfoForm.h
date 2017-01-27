@@ -12,16 +12,17 @@ class CCustomObject;
 
 class TfrmAppendObjectInfo : public TForm
 {
-__published:	// IDE-managed Components
-    TStaticText *StaticText1;
-    TButton *btOverwrite;
-    TButton *btSkip;
-    TCheckBox *CheckBox1;
-    TButton *Button1;
-    TStaticText *StaticText2;
-    void __fastcall btOverwriteClick(TObject *Sender);
-private:	// User declarations
-public:		// User declarations
+    __published :  // IDE-managed Components
+                   TStaticText* StaticText1;
+    TButton* btOverwrite;
+    TButton* btSkip;
+    TCheckBox* CheckBox1;
+    TButton* Button1;
+    TStaticText* StaticText2;
+    void __fastcall btOverwriteClick(TObject* Sender);
+
+  private:  // User declarations
+  public:   // User declarations
     __fastcall TfrmAppendObjectInfo(TComponent* Owner);
 
     void Prepare();

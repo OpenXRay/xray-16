@@ -26,5 +26,3 @@ void ESceneAIMapTool::RemoveControls()
 }
 
 //----------------------------------------------------
-
-

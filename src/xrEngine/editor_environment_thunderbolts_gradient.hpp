@@ -17,20 +17,15 @@
 
 namespace editor
 {
-
 class property_holder;
 
 namespace environment
 {
-
 class manager;
 
 namespace thunderbolts
 {
-
-class gradient :
-    public SThunderboltDesc::SFlare,
-    private Noncopyable
+class gradient : public SThunderboltDesc::SFlare, private Noncopyable
 {
 public:
     gradient();
@@ -38,11 +33,7 @@ public:
     void load(CInifile& config, shared_str const& section_id, LPCSTR prefix);
     void save(CInifile& config, shared_str const& section_id, LPCSTR prefix);
     void fill(
-        ::editor::environment::manager& environment,
-        LPCSTR name,
-        LPCSTR description,
-        editor::property_holder& holder
-    );
+        ::editor::environment::manager& environment, LPCSTR name, LPCSTR description, editor::property_holder& holder);
 
 private:
     LPCSTR xr_stdcall shader_getter() const;
@@ -53,13 +44,12 @@ private:
 
 private:
     property_holder* m_property_holder;
-}; // class gradient
+};  // class gradient
 
+}  // namespace thunderbolts
+}  // namespace environment
+}  // namespace editor
 
-} // namespace thunderbolts
-} // namespace environment
-} // namespace editor
+#endif  // #ifdef INGAME_EDITOR
 
-#endif // #ifdef INGAME_EDITOR
-
-#endif // ifndef EDITOR_WEATHER_THUNDERBOLTS_GRADIENT_HPP_INCLUDED
+#endif  // ifndef EDITOR_WEATHER_THUNDERBOLTS_GRADIENT_HPP_INCLUDED

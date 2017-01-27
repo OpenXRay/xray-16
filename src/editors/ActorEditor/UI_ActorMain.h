@@ -6,7 +6,7 @@
 
 enum
 {
-    COMMAND_EXTFIRST_EXT = COMMAND_MAIN_LAST-1,
+    COMMAND_EXTFIRST_EXT = COMMAND_MAIN_LAST - 1,
 
     COMMAND_MAKE_PREVIEW,
     COMMAND_IMPORT,
@@ -29,13 +29,14 @@ enum
 
 //------------------------------------------------------------------------------
 
-class CActorMain: public TUI
+class CActorMain : public TUI
 {
     typedef TUI inherited;
 
     virtual void RealUpdateScene();
     virtual void RealQuit();
-public:
+
+  public:
     CActorMain();
     virtual ~CActorMain();
 
@@ -49,15 +50,9 @@ public:
     virtual void OutGridSize();
     virtual void OutInfo();
 
-    virtual LPCSTR EditorName()
-    {
-        return "actor";
-    }
+    virtual LPCSTR EditorName() { return "actor"; }
 
-    virtual LPCSTR EditorDesc()
-    {
-        return "Actor Editor";
-    }
+    virtual LPCSTR EditorDesc() { return "Actor Editor"; }
 
     virtual bool ApplyShortCut(WORD Key, TShiftState Shift);
     virtual bool ApplyGlobalShortCut(WORD Key, TShiftState Shift);
@@ -66,22 +61,22 @@ public:
     virtual void RegisterCommands();
 };
 
-extern CActorMain *&AUI;
+extern CActorMain*& AUI;
 
-class CAEPreferences :public CCustomPreferences
+class CAEPreferences : public CCustomPreferences
 {
     typedef CCustomPreferences inherited;
-public:
-    CAEPreferences(): bAlwaysShowKeyBar12(FALSE), bAlwaysShowKeyBar34(FALSE) {}
+
+  public:
+    CAEPreferences() : bAlwaysShowKeyBar12(FALSE), bAlwaysShowKeyBar34(FALSE) {}
 
     BOOL bAlwaysShowKeyBar12;
     BOOL bAlwaysShowKeyBar34;
 
-    virtual void Load(CInifile *);
-    virtual void Save(CInifile *);
-    virtual void FillProp(PropItemVec &items);
+    virtual void Load(CInifile*);
+    virtual void Save(CInifile*);
+    virtual void FillProp(PropItemVec& items);
 };
 
 //---------------------------------------------------------------------------
 #endif
-

@@ -8,18 +8,18 @@
 
 #pragma once
 
-IC	u16	CMaterialManager::last_material_idx		() const
+IC u16 CMaterialManager::last_material_idx() const
 {
-	return				(m_last_material_idx);
+    return (m_last_material_idx);
 }
 
-IC	u16	CMaterialManager::self_material_idx		() const
+IC u16 CMaterialManager::self_material_idx() const
 {
-	return				(m_my_material_idx);
+    return (m_my_material_idx);
 }
 
-IC SGameMtlPair	*CMaterialManager::get_current_pair()
+IC SGameMtlPair* CMaterialManager::get_current_pair()
 {
-	m_movement_control->update_last_material	();
+    m_movement_control->update_last_material();
     return GMLib.GetMaterialPairByIndices(m_my_material_idx, m_last_material_idx);
 }

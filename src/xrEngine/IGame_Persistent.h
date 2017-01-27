@@ -69,6 +69,7 @@ public:
         }
     };
     params m_game_params;
+
 public:
     xr_set<CPS_Instance*> ps_active;
     xr_vector<CPS_Instance*> ps_destroy;
@@ -93,10 +94,12 @@ public:
 
     const ParticleStatistics& GetStats() { return stats; }
 
-
-    virtual bool OnRenderPPUI_query() { return FALSE; }; // should return true if we want to have second function called
-    virtual void OnRenderPPUI_main() {};
-    virtual void OnRenderPPUI_PP() {};
+    virtual bool OnRenderPPUI_query()
+    {
+        return FALSE;
+    };  // should return true if we want to have second function called
+    virtual void OnRenderPPUI_main(){};
+    virtual void OnRenderPPUI_PP(){};
 
     virtual void OnAppStart();
     virtual void OnAppEnd();
@@ -108,30 +111,33 @@ public:
     virtual void OnGameStart();
     virtual void OnGameEnd();
 
-    virtual void UpdateGameType() {};
+    virtual void UpdateGameType(){};
     virtual void GetCurrentDof(Fvector3& dof) { dof.set(-1.4f, 0.0f, 250.f); };
-    virtual void SetBaseDof(const Fvector3& dof) {};
-    virtual void OnSectorChanged(int sector) {};
+    virtual void SetBaseDof(const Fvector3& dof){};
+    virtual void OnSectorChanged(int sector){};
     virtual void OnAssetsChanged();
 
     virtual void RegisterModel(IRenderVisual* V)
 #ifndef _EDITOR
         = 0;
 #else
-    {}
+    {
+    }
 #endif
     virtual float MtlTransparent(u32 mtl_idx)
 #ifndef _EDITOR
         = 0;
 #else
-    {return 1.f; }
+    {
+        return 1.f;
+    }
 #endif
 
     IGame_Persistent();
     virtual ~IGame_Persistent();
 
     ICF u32 GameType() { return m_game_params.m_e_game_type; };
-    virtual void DumpStatistics(class IGameFont &font, class IPerformanceAlert *alert);
+    virtual void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert);
     virtual void LoadTitle(bool change_tip = false, shared_str map_name = "") {}
     virtual bool CanBePaused() { return true; }
 };
@@ -139,7 +145,7 @@ public:
 class IMainMenu
 {
 public:
-    virtual ~IMainMenu() {};
+    virtual ~IMainMenu(){};
     virtual void Activate(bool bActive) = 0;
     virtual bool IsActive() = 0;
     virtual bool CanSkipSceneRendering() = 0;
@@ -147,5 +153,4 @@ public:
 };
 
 extern ENGINE_API IGame_Persistent* g_pGamePersistent;
-#endif //IGame_PersistentH
-
+#endif  // IGame_PersistentH

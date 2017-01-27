@@ -6,19 +6,18 @@
 #include "ui_particlemain.h"
 #include "UI_ParticleTools.h"
 //---------------------------------------------------------------------------
-USEFORM ("Splash.cpp", frmSplash);
-USEFORM ("main.cpp", frmMain);
-USEFORM ("BottomBar.cpp", fraBottomBar); /* TFrame: File Type */
-USEFORM ("TopBar.cpp", fraTopBar); /* TFrame: File Type */
-USEFORM ("LeftBar.cpp", fraLeftBar); /* TFrame: File Type */
-USEFORM ("ItemPropFormUnit.cpp", fmItemProp);
+USEFORM("Splash.cpp", frmSplash);
+USEFORM("main.cpp", frmMain);
+USEFORM("BottomBar.cpp", fraBottomBar); /* TFrame: File Type */
+USEFORM("TopBar.cpp", fraTopBar);       /* TFrame: File Type */
+USEFORM("LeftBar.cpp", fraLeftBar);     /* TFrame: File Type */
+USEFORM("ItemPropFormUnit.cpp", fmItemProp);
 
 //---------------------------------------------------------------------------
 WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR, int)
 {
     //    try{
-    if (!Application->Handle)
-    {
+    if (!Application->Handle) {
         Application->CreateHandle();
         Application->Icon->Handle = LoadIcon(MainInstance, "MAINICON");
         Application->Title = "Loading...";
@@ -65,5 +64,3 @@ WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR, int)
 }
 
 //---------------------------------------------------------------------------
-
-

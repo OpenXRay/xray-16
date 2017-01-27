@@ -7,18 +7,18 @@
 
 class ECORE_API CLog
 {
-    public:
+  public:
     bool in_use;
-    public:
-    CLog(){in_use = false;}
+
+  public:
+    CLog() { in_use = false; }
     void Msg(TMsgDlgType mt, LPCSTR _Format, ...);
     int DlgMsg(TMsgDlgType mt, LPCSTR _Format, ...);
     int DlgMsg(TMsgDlgType mt, TMsgDlgButtons btn, LPCSTR _Format, ...);
 };
 
-void ECORE_API ELogCallback(void *context, LPCSTR txt);
+void ECORE_API ELogCallback(void* context, LPCSTR txt);
 
 extern ECORE_API CLog ELog;
 
 #endif /*_INCDEF_NETDEVICELOG_H_*/
-

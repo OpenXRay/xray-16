@@ -11,17 +11,13 @@
 
 using System::Object;
 
-bool property_collection_converter::CanConvertTo(ITypeDescriptorContext^ context, Type^ type)
+bool property_collection_converter::CanConvertTo(ITypeDescriptorContext ^ context, Type ^ type)
 {
-	return	(type == System::String::typeid);
+    return (type == System::String::typeid);
 }
-	
-Object^ property_collection_converter::ConvertTo(
-		ITypeDescriptorContext^ context,
-		CultureInfo^ culture,
-		Object^ value,
-		Type^ type
-	)
+
+Object ^ property_collection_converter::ConvertTo(
+             ITypeDescriptorContext ^ context, CultureInfo ^ culture, Object ^ value, Type ^ type)
 {
-	return	("< ... >");
+    return ("< ... >");
 }

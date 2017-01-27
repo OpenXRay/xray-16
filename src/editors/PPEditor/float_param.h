@@ -19,22 +19,22 @@
 //---------------------------------------------------------------------------
 class TfrmTimeConstructor : public TForm
 {
-    __published: // IDE-managed Components
-    TPanel*Panel1;
-    TMultiObjSpinEdit *WorkTime;
-    TSpeedButton *AddButton;
-    TSpeedButton *DeleteButton;
-    TMxLabel *RxLabel2;
-    TMxLabel *MxLabel1;
-    TMultiObjSpinEdit *StartTime;
-private: // User declarations
-public: // User declarations
+    __published :  // IDE-managed Components
+                   TPanel* Panel1;
+    TMultiObjSpinEdit* WorkTime;
+    TSpeedButton* AddButton;
+    TSpeedButton* DeleteButton;
+    TMxLabel* RxLabel2;
+    TMxLabel* MxLabel1;
+    TMultiObjSpinEdit* StartTime;
+
+  private:  // User declarations
+  public:   // User declarations
     float t, c, b;
-    __fastcall TfrmTimeConstructor(TComponent *Owner);
+    __fastcall TfrmTimeConstructor(TComponent* Owner);
 };
 
 //---------------------------------------------------------------------------
-extern PACKAGE TfrmTimeConstructor * frmTimeConstructor;
+extern PACKAGE TfrmTimeConstructor* frmTimeConstructor;
 //---------------------------------------------------------------------------
 #endif
-

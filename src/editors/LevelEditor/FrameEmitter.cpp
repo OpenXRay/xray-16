@@ -11,15 +11,16 @@
 #pragma link "ElPgCtl"
 #pragma link "ElXPThemedControl"
 #pragma resource "*.dfm"
-TfraEmitter *fraEmitter;
+TfraEmitter* fraEmitter;
 
 //---------------------------------------------------------------------------
-__fastcall TfraEmitter::TfraEmitter(TComponent *Owner)
-    : TFrame(Owner) {}
+__fastcall TfraEmitter::TfraEmitter(TComponent* Owner) : TFrame(Owner)
+{
+}
 
 //---------------------------------------------------------------------------
 
-void TfraEmitter::GetInfoFirst(const PS::SEmitterDef &E)
+void TfraEmitter::GetInfoFirst(const PS::SEmitterDef& E)
 {
     pcEmitterType->ActivePageIndex = E.m_EmitterType;
     // cone
@@ -45,7 +46,7 @@ void TfraEmitter::GetInfoFirst(const PS::SEmitterDef &E)
 
 //---------------------------------------------------------------------------
 
-void TfraEmitter::GetInfoNext(const PS::SEmitterDef &E)
+void TfraEmitter::GetInfoNext(const PS::SEmitterDef& E)
 {
     pcEmitterType->ActivePageIndex = E.m_EmitterType;
     // cone
@@ -71,15 +72,14 @@ void TfraEmitter::GetInfoNext(const PS::SEmitterDef &E)
 
 //---------------------------------------------------------------------------
 
-void TfraEmitter::SetInfo(PS::SEmitterDef &E)
+void TfraEmitter::SetInfo(PS::SEmitterDef& E)
 {
     E.m_EmitterType = PS::SEmitter::EEmitterType(pcEmitterType->ActivePageIndex);
     // cone
     E.m_Flags.zero();
     E.m_Flags.set(PS_EM_BIRTHFUNC, ebBirthFunc->Down);
-    E.m_ConeHPB.set(float(deg2rad(seConeDirH->Value)),
-        float(deg2rad(seConeDirP->Value)),
-        float(deg2rad(seConeDirB->Value)));
+    E.m_ConeHPB.set(
+        float(deg2rad(seConeDirH->Value)), float(deg2rad(seConeDirP->Value)), float(deg2rad(seConeDirB->Value)));
     E.UpdateConeOrientation();
     E.m_ConeAngle = deg2rad(seConeAngle->Value);
     // sphere
@@ -98,5 +98,3 @@ void TfraEmitter::SetInfo(PS::SEmitterDef &E)
 }
 
 //---------------------------------------------------------------------------
-
-

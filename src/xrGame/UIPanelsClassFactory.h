@@ -10,10 +10,10 @@ class UIPanelsClassFactory
 {
 private:
 public:
-	UIPanelsClassFactory();
-	~UIPanelsClassFactory();
-	
-	UITeamState* CreateTeamPanel(shared_str const & teamName, UITeamPanels *teamPanels);
+    UIPanelsClassFactory();
+    ~UIPanelsClassFactory();
+
+    UITeamState* CreateTeamPanel(shared_str const& teamName, UITeamPanels* teamPanels);
 };
 
 #endif

@@ -12,11 +12,10 @@
 #include "Needles.h"
 #include "xrPhysics/PhysicsShell.h"
 
-
-CNeedles::CNeedles(void) 
+CNeedles::CNeedles(void)
 {
 }
 
-CNeedles::~CNeedles(void) 
+CNeedles::~CNeedles(void)
 {
 }

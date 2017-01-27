@@ -12,7 +12,10 @@ class ENGINE_API CCameraManager;
 class ENGINE_API CCursor;
 class ENGINE_API CCustomHUD;
 class ENGINE_API ISpatial;
-namespace Feel { class ENGINE_API Sound; }
+namespace Feel
+{
+class ENGINE_API Sound;
+}
 
 class ENGINE_API CServerInfo
 {
@@ -22,7 +25,10 @@ private:
         string128 name;
         u32 color;
     };
-    enum { max_item = 15 };
+    enum
+    {
+        max_item = 15
+    };
     svector<SItem_ServerInfo, max_item> data;
 
 public:
@@ -32,19 +38,22 @@ public:
     void AddItem(LPCSTR name_, LPCSTR value_, u32 color_ = RGB(255, 255, 255));
     void AddItem(shared_str& name_, LPCSTR value_, u32 color_ = RGB(255, 255, 255));
 
-    IC SItem_ServerInfo& operator[] (u32 id) { VERIFY(id < max_item); return data[id]; }
+    IC SItem_ServerInfo& operator[](u32 id)
+    {
+        VERIFY(id < max_item);
+        return data[id];
+    }
 
-    CServerInfo() {};
-    ~CServerInfo() {};
+    CServerInfo(){};
+    ~CServerInfo(){};
 };
 
 //-----------------------------------------------------------------------------------------------------------
-class ENGINE_API IGame_Level :
-    public FactoryObjectBase,
-    public IInputReceiver,
-    public pureRender,
-    public pureFrame,
-    public IEventReceiver
+class ENGINE_API IGame_Level : public FactoryObjectBase,
+                               public IInputReceiver,
+                               public pureRender,
+                               public pureFrame,
+                               public IEventReceiver
 {
 protected:
     // Network interface
@@ -59,6 +68,7 @@ protected:
 
     // temporary
     xr_vector<ISpatial*> snd_ER;
+
 public:
     CObjectList Objects;
     CObjectSpace ObjectSpace;
@@ -67,7 +77,8 @@ public:
     BOOL bReady;
 
     CInifile* pLevel;
-public: // deferred sound events
+
+public:  // deferred sound events
     struct _esound_delegate
     {
         Feel::Sound* dest;
@@ -75,6 +86,7 @@ public: // deferred sound events
         float power;
     };
     xr_vector<_esound_delegate> snd_Events;
+
 public:
     // Main, global functions
     IGame_Level();
@@ -90,13 +102,13 @@ public:
     virtual void net_Update() = 0;
 
     virtual bool Load(u32 dwNum);
-    virtual bool Load_GameSpecific_Before() { return TRUE; }; // before object loading
-    virtual bool Load_GameSpecific_After() { return TRUE; }; // after object loading
+    virtual bool Load_GameSpecific_Before() { return TRUE; };  // before object loading
+    virtual bool Load_GameSpecific_After() { return TRUE; };   // after object loading
     virtual void Load_GameSpecific_CFORM(CDB::TRI* T, u32 count) = 0;
 
     virtual void OnFrame(void);
     virtual void OnRender(void);
-    virtual void DumpStatistics(class IGameFont &font, class IPerformanceAlert *alert);
+    virtual void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert);
 
     virtual shared_str OpenDemoFile(const char* demo_file_name) = 0;
     virtual void net_StartPlayDemo() = 0;
@@ -104,15 +116,15 @@ public:
     // Main interface
     IGameObject* CurrentEntity(void) const { return pCurrentEntity; }
     IGameObject* CurrentViewEntity(void) const { return pCurrentViewEntity; }
-    void SetEntity(IGameObject* O);// { pCurrentEntity=pCurrentViewEntity=O; }
-    void SetViewEntity(IGameObject* O);// { pCurrentViewEntity=O; }
+    void SetEntity(IGameObject* O);      // { pCurrentEntity=pCurrentViewEntity=O; }
+    void SetViewEntity(IGameObject* O);  // { pCurrentViewEntity=O; }
 
     void SoundEvent_Register(ref_sound_data_ptr S, float range);
     void SoundEvent_Dispatch();
     void SoundEvent_OnDestDestroy(Feel::Sound*);
 
     // Loader interface
-    //ref_shader LL_CreateShader (int S, int T, int M, int C);
+    // ref_shader LL_CreateShader (int S, int T, int M, int C);
     void LL_CheckTextures();
     virtual void SetEnvironmentGameTimeFactor(u64 const& GameTime, float const& fTimeFactor) = 0;
 };

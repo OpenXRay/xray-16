@@ -14,19 +14,25 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 inline_ BOOL RayCollider::SegmentAABBOverlap(const Point& center, const Point& extents)
 {
-	// Stats
-	mNbRayBVTests++;
+    // Stats
+    mNbRayBVTests++;
 
-	float Dx = mData2.x - center.x;		if(_abs(Dx) > extents.x + mFDir.x)	return FALSE;
-	float Dy = mData2.y - center.y;		if(_abs(Dy) > extents.y + mFDir.y)	return FALSE;
-	float Dz = mData2.z - center.z;		if(_abs(Dz) > extents.z + mFDir.z)	return FALSE;
+    float Dx = mData2.x - center.x;
+    if (_abs(Dx) > extents.x + mFDir.x) return FALSE;
+    float Dy = mData2.y - center.y;
+    if (_abs(Dy) > extents.y + mFDir.y) return FALSE;
+    float Dz = mData2.z - center.z;
+    if (_abs(Dz) > extents.z + mFDir.z) return FALSE;
 
-	float f;
-	f = mData.y * Dz - mData.z * Dy;	if(_abs(f) > extents.y*mFDir.z + extents.z*mFDir.y)	return FALSE;
-	f = mData.z * Dx - mData.x * Dz;	if(_abs(f) > extents.x*mFDir.z + extents.z*mFDir.x)	return FALSE;
-	f = mData.x * Dy - mData.y * Dx;	if(_abs(f) > extents.x*mFDir.y + extents.y*mFDir.x)	return FALSE;
+    float f;
+    f = mData.y * Dz - mData.z * Dy;
+    if (_abs(f) > extents.y * mFDir.z + extents.z * mFDir.y) return FALSE;
+    f = mData.z * Dx - mData.x * Dz;
+    if (_abs(f) > extents.x * mFDir.z + extents.z * mFDir.x) return FALSE;
+    f = mData.x * Dy - mData.y * Dx;
+    if (_abs(f) > extents.x * mFDir.y + extents.y * mFDir.x) return FALSE;
 
-	return TRUE;
+    return TRUE;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -39,25 +45,34 @@ inline_ BOOL RayCollider::SegmentAABBOverlap(const Point& center, const Point& e
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 inline_ BOOL RayCollider::RayAABBOverlap(const Point& center, const Point& extents)
 {
-	// Stats
-	mNbRayBVTests++;
+    // Stats
+    mNbRayBVTests++;
 
-//	float Dx = mOrigin.x - center.x;	if(_abs(Dx) > extents.x && Dx*mDir.x>=0.0f)	return FALSE;
-//	float Dy = mOrigin.y - center.y;	if(_abs(Dy) > extents.y && Dy*mDir.y>=0.0f)	return FALSE;
-//	float Dz = mOrigin.z - center.z;	if(_abs(Dz) > extents.z && Dz*mDir.z>=0.0f)	return FALSE;
+    //	float Dx = mOrigin.x - center.x;	if(_abs(Dx) > extents.x && Dx*mDir.x>=0.0f)	return FALSE;
+    //	float Dy = mOrigin.y - center.y;	if(_abs(Dy) > extents.y && Dy*mDir.y>=0.0f)	return FALSE;
+    //	float Dz = mOrigin.z - center.z;	if(_abs(Dz) > extents.z && Dz*mDir.z>=0.0f)	return FALSE;
 
-	float Dx = mOrigin.x - center.x;	if(GREATER(Dx, extents.x) && Dx*mDir.x>=0.0f)	return FALSE;
-	float Dy = mOrigin.y - center.y;	if(GREATER(Dy, extents.y) && Dy*mDir.y>=0.0f)	return FALSE;
-	float Dz = mOrigin.z - center.z;	if(GREATER(Dz, extents.z) && Dz*mDir.z>=0.0f)	return FALSE;
+    float Dx = mOrigin.x - center.x;
+    if (GREATER(Dx, extents.x) && Dx * mDir.x >= 0.0f) return FALSE;
+    float Dy = mOrigin.y - center.y;
+    if (GREATER(Dy, extents.y) && Dy * mDir.y >= 0.0f) return FALSE;
+    float Dz = mOrigin.z - center.z;
+    if (GREATER(Dz, extents.z) && Dz * mDir.z >= 0.0f) return FALSE;
 
-//	float Dx = mOrigin.x - center.x;	if(GREATER(Dx, extents.x) && ((SIR(Dx)-1)^SIR(mDir.x))>=0.0f)	return FALSE;
-//	float Dy = mOrigin.y - center.y;	if(GREATER(Dy, extents.y) && ((SIR(Dy)-1)^SIR(mDir.y))>=0.0f)	return FALSE;
-//	float Dz = mOrigin.z - center.z;	if(GREATER(Dz, extents.z) && ((SIR(Dz)-1)^SIR(mDir.z))>=0.0f)	return FALSE;
+    //	float Dx = mOrigin.x - center.x;	if(GREATER(Dx, extents.x) && ((SIR(Dx)-1)^SIR(mDir.x))>=0.0f)	return
+    //FALSE;
+    //	float Dy = mOrigin.y - center.y;	if(GREATER(Dy, extents.y) && ((SIR(Dy)-1)^SIR(mDir.y))>=0.0f)	return
+    //FALSE;
+    //	float Dz = mOrigin.z - center.z;	if(GREATER(Dz, extents.z) && ((SIR(Dz)-1)^SIR(mDir.z))>=0.0f)	return
+    //FALSE;
 
-	float f;
-	f = mDir.y * Dz - mDir.z * Dy;		if(_abs(f) > extents.y*mFDir.z + extents.z*mFDir.y)	return FALSE;
-	f = mDir.z * Dx - mDir.x * Dz;		if(_abs(f) > extents.x*mFDir.z + extents.z*mFDir.x)	return FALSE;
-	f = mDir.x * Dy - mDir.y * Dx;		if(_abs(f) > extents.x*mFDir.y + extents.y*mFDir.x)	return FALSE;
+    float f;
+    f = mDir.y * Dz - mDir.z * Dy;
+    if (_abs(f) > extents.y * mFDir.z + extents.z * mFDir.y) return FALSE;
+    f = mDir.z * Dx - mDir.x * Dz;
+    if (_abs(f) > extents.x * mFDir.z + extents.z * mFDir.x) return FALSE;
+    f = mDir.x * Dy - mDir.y * Dx;
+    if (_abs(f) > extents.x * mFDir.y + extents.y * mFDir.x) return FALSE;
 
-	return TRUE;
+    return TRUE;
 }

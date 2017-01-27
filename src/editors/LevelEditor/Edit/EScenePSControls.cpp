@@ -12,20 +12,21 @@
 //----------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-__fastcall TUI_ControlPSAdd::TUI_ControlPSAdd(int st, int act, ESceneToolBase *parent): TUI_CustomControl(st, act, parent) {}
-
-bool __fastcall TUI_ControlPSAdd::AfterAppendCallback(TShiftState Shift, CCustomObject *obj)
+__fastcall TUI_ControlPSAdd::TUI_ControlPSAdd(int st, int act, ESceneToolBase* parent)
+    : TUI_CustomControl(st, act, parent)
 {
-    EParticlesObject *pg = dynamic_cast<EParticlesObject*>(obj);
+}
+
+bool __fastcall TUI_ControlPSAdd::AfterAppendCallback(TShiftState Shift, CCustomObject* obj)
+{
+    EParticlesObject* pg = dynamic_cast<EParticlesObject*>(obj);
     R_ASSERT(pg);
     LPCSTR ref_name = ((TfraPS*)parent_tool->pFrame)->Current();
-    if (!ref_name)
-    {
+    if (!ref_name) {
         ELog.DlgMsg(mtInformation, "Nothing selected.");
         return false;
     }
-    if (!pg->Compile(ref_name))
-    {
+    if (!pg->Compile(ref_name)) {
         ELog.DlgMsg(mtInformation, "Can't compile particle system '%s'.", ref_name);
         return false;
     }
@@ -38,10 +39,11 @@ bool __fastcall TUI_ControlPSAdd::Start(TShiftState Shift)
     return false;
 }
 
-void __fastcall TUI_ControlPSAdd::Move(TShiftState _Shift) {}
+void __fastcall TUI_ControlPSAdd::Move(TShiftState _Shift)
+{
+}
 
 bool __fastcall TUI_ControlPSAdd::End(TShiftState _Shift)
 {
     return true;
 }
-

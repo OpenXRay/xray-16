@@ -13,41 +13,51 @@
 #include "UIGameCustom.h"
 #include "UIDialogHolder.h"
 
-xr_token	game_types		[];
+xr_token game_types[];
 
 CUIChangeMap::CUIChangeMap()
 {
-	m_prev_upd_time = 0;
+    m_prev_upd_time = 0;
 
-	bkgrnd = new CUIStatic(); bkgrnd->SetAutoDelete(true);
-	AttachChild(bkgrnd);
+    bkgrnd = new CUIStatic();
+    bkgrnd->SetAutoDelete(true);
+    AttachChild(bkgrnd);
 
-	header = new CUITextWnd(); header->SetAutoDelete(true);
-	AttachChild(header);
+    header = new CUITextWnd();
+    header->SetAutoDelete(true);
+    AttachChild(header);
 
-	map_pic = new CUIStatic(); map_pic->SetAutoDelete(true);
-	AttachChild(map_pic);
+    map_pic = new CUIStatic();
+    map_pic->SetAutoDelete(true);
+    AttachChild(map_pic);
 
-	map_frame = new CUIStatic(); map_frame->SetAutoDelete(true);
-	AttachChild(map_frame);
-	
-	map_version = new CUITextWnd(); map_version->SetAutoDelete(true);
-	AttachChild(map_version);
+    map_frame = new CUIStatic();
+    map_frame->SetAutoDelete(true);
+    AttachChild(map_frame);
 
-	frame = new CUIFrameWindow(); frame->SetAutoDelete(true);
-	AttachChild(frame);
+    map_version = new CUITextWnd();
+    map_version->SetAutoDelete(true);
+    AttachChild(map_version);
 
-	lst_back = new CUIFrameWindow(); lst_back->SetAutoDelete(true);
-	AttachChild(lst_back);
+    frame = new CUIFrameWindow();
+    frame->SetAutoDelete(true);
+    AttachChild(frame);
 
-	lst = new CUIListBox(); lst->SetAutoDelete(true);
-	AttachChild(lst);
+    lst_back = new CUIFrameWindow();
+    lst_back->SetAutoDelete(true);
+    AttachChild(lst_back);
 
-	btn_ok = new CUI3tButton(); btn_ok->SetAutoDelete(true);
-	AttachChild(btn_ok);
+    lst = new CUIListBox();
+    lst->SetAutoDelete(true);
+    AttachChild(lst);
 
-	btn_cancel = new CUI3tButton(); btn_cancel->SetAutoDelete(true);
-	AttachChild(btn_cancel);
+    btn_ok = new CUI3tButton();
+    btn_ok->SetAutoDelete(true);
+    AttachChild(btn_ok);
+
+    btn_cancel = new CUI3tButton();
+    btn_cancel->SetAutoDelete(true);
+    AttachChild(btn_cancel);
 }
 
 CUIChangeMap::~CUIChangeMap()
@@ -56,105 +66,97 @@ CUIChangeMap::~CUIChangeMap()
 
 void CUIChangeMap::InitChangeMap(CUIXml& xml_doc)
 {
-	CUIXmlInit::InitWindow				(xml_doc,			"change_map", 0, this);
-	CUIXmlInit::InitTextWnd				(xml_doc,			"change_map:header", 0, header);
-	CUIXmlInit::InitStatic				(xml_doc,			"change_map:background", 0, bkgrnd);
-	CUIXmlInit::InitStatic				(xml_doc,			"change_map:map_frame", 0, map_frame);
-	CUIXmlInit::InitTextWnd				(xml_doc,			"change_map:map_ver_txt", 0, map_version);
-	CUIXmlInit::InitStatic				(xml_doc,			"change_map:map_pic", 0, map_pic); 
-//	CUIXmlInit::InitFrameWindow			(xml_doc,			"change_map:list_back", 0, lst_back);
-//	CUIXmlInit::InitFrameWindow			(xml_doc,			"change_map:frame", 0, frame);
-	CUIXmlInit::InitListBox				(xml_doc,			"change_map:list", 0, lst);
-	CUIXmlInit::Init3tButton			(xml_doc,			"change_map:btn_ok", 0, btn_ok);
-	CUIXmlInit::Init3tButton			(xml_doc,			"change_map:btn_cancel", 0, btn_cancel);
+    CUIXmlInit::InitWindow(xml_doc, "change_map", 0, this);
+    CUIXmlInit::InitTextWnd(xml_doc, "change_map:header", 0, header);
+    CUIXmlInit::InitStatic(xml_doc, "change_map:background", 0, bkgrnd);
+    CUIXmlInit::InitStatic(xml_doc, "change_map:map_frame", 0, map_frame);
+    CUIXmlInit::InitTextWnd(xml_doc, "change_map:map_ver_txt", 0, map_version);
+    CUIXmlInit::InitStatic(xml_doc, "change_map:map_pic", 0, map_pic);
+    //	CUIXmlInit::InitFrameWindow			(xml_doc,			"change_map:list_back", 0, lst_back);
+    //	CUIXmlInit::InitFrameWindow			(xml_doc,			"change_map:frame", 0, frame);
+    CUIXmlInit::InitListBox(xml_doc, "change_map:list", 0, lst);
+    CUIXmlInit::Init3tButton(xml_doc, "change_map:btn_ok", 0, btn_ok);
+    CUIXmlInit::Init3tButton(xml_doc, "change_map:btn_cancel", 0, btn_cancel);
 
-	FillUpList							();
+    FillUpList();
 }
 
 #include <dinput.h>
 bool CUIChangeMap::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
-	if (dik == DIK_ESCAPE)
-	{
-		OnBtnCancel();
-		return true;
-	}
-	return CUIDialogWnd::OnKeyboardAction(dik, keyboard_action);
+    if (dik == DIK_ESCAPE) {
+        OnBtnCancel();
+        return true;
+    }
+    return CUIDialogWnd::OnKeyboardAction(dik, keyboard_action);
 }
 
 void CUIChangeMap::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 {
-	if (LIST_ITEM_SELECT == msg && pWnd == lst)
-	{		
-		OnItemSelect();
-	}
-	else if (BUTTON_CLICKED == msg)
-	{
-		if (pWnd == btn_ok)
-			OnBtnOk();
-		else if (pWnd == btn_cancel)
-			OnBtnCancel();
-	}
+    if (LIST_ITEM_SELECT == msg && pWnd == lst) {
+        OnItemSelect();
+    }
+    else if (BUTTON_CLICKED == msg)
+    {
+        if (pWnd == btn_ok)
+            OnBtnOk();
+        else if (pWnd == btn_cancel)
+            OnBtnCancel();
+    }
 }
 
 void CUIChangeMap::OnItemSelect()
 {
-	u32 idx					= lst->GetSelectedIDX();
-	if(idx==u32(-1))		return;
+    u32 idx = lst->GetSelectedIDX();
+    if (idx == u32(-1)) return;
 
-	const SGameTypeMaps& M	= gMapListHelper.GetMapListFor( (EGameIDs)GameID() );
-	const shared_str& name	= M.m_map_names[idx].map_name;
-	LPSTR map_ver = NULL;
-	STRCONCAT(map_ver, 
-		"[",
-		M.m_map_names[idx].map_ver.c_str() ? M.m_map_names[idx].map_ver.c_str() : "unknown",
-		"]"
-	);
-	xr_string map_name		= "intro\\intro_map_pic_";
-	map_name				+=	name.c_str();
-	xr_string full_name		= map_name + ".dds";
+    const SGameTypeMaps& M = gMapListHelper.GetMapListFor((EGameIDs)GameID());
+    const shared_str& name = M.m_map_names[idx].map_name;
+    LPSTR map_ver = NULL;
+    STRCONCAT(map_ver, "[", M.m_map_names[idx].map_ver.c_str() ? M.m_map_names[idx].map_ver.c_str() : "unknown", "]");
+    xr_string map_name = "intro\\intro_map_pic_";
+    map_name += name.c_str();
+    xr_string full_name = map_name + ".dds";
 
-	Frect orig_rect = map_pic->GetTextureRect();
-	if (FS.exist("$game_textures$",full_name.c_str()))
-		map_pic->InitTexture(map_name.c_str());
-	else
-		map_pic->InitTexture("ui\\ui_noise");
-	
-	map_pic->SetTextureRect(orig_rect);
-	map_version->SetText(map_ver);
+    Frect orig_rect = map_pic->GetTextureRect();
+    if (FS.exist("$game_textures$", full_name.c_str()))
+        map_pic->InitTexture(map_name.c_str());
+    else
+        map_pic->InitTexture("ui\\ui_noise");
+
+    map_pic->SetTextureRect(orig_rect);
+    map_version->SetText(map_ver);
 }
 
 void CUIChangeMap::OnBtnOk()
 {
-	u32 idx						= lst->GetSelectedIDX();
-	const SGameTypeMaps& M		= gMapListHelper.GetMapListFor( (EGameIDs)GameID() );
-	if (idx>=0 && idx<M.m_map_names.size())
-	{	
-		const shared_str& name		= M.m_map_names[idx].map_name;
-		const shared_str& ver		= M.m_map_names[idx].map_ver;
+    u32 idx = lst->GetSelectedIDX();
+    const SGameTypeMaps& M = gMapListHelper.GetMapListFor((EGameIDs)GameID());
+    if (idx >= 0 && idx < M.m_map_names.size()) {
+        const shared_str& name = M.m_map_names[idx].map_name;
+        const shared_str& ver = M.m_map_names[idx].map_ver;
 
-		string512					command;
-		xr_sprintf					(command, "cl_votestart changemap %s %s", name.c_str(), ver.c_str());
-		Console->Execute			(command);
-		HideDialog					();
-	}
+        string512 command;
+        xr_sprintf(command, "cl_votestart changemap %s %s", name.c_str(), ver.c_str());
+        Console->Execute(command);
+        HideDialog();
+    }
 }
 #include "string_table.h"
 void CUIChangeMap::FillUpList()
 {
-	lst->Clear				();
+    lst->Clear();
 
-	const SGameTypeMaps& M		= gMapListHelper.GetMapListFor( (EGameIDs)GameID() );
-	u32 cnt						= M.m_map_names.size();
-	for (u32 i=0; i<cnt; ++i)
-	{
-		CUIListBoxItem* itm		= lst->AddTextItem( CStringTable().translate(M.m_map_names[i].map_name).c_str() );
-		itm->Enable				(true);//m_pExtraContentFilter->IsDataEnabled(M.m_map_names[i].map_name.c_str()));
-	}
-
+    const SGameTypeMaps& M = gMapListHelper.GetMapListFor((EGameIDs)GameID());
+    u32 cnt = M.m_map_names.size();
+    for (u32 i = 0; i < cnt; ++i)
+    {
+        CUIListBoxItem* itm = lst->AddTextItem(CStringTable().translate(M.m_map_names[i].map_name).c_str());
+        itm->Enable(true);  // m_pExtraContentFilter->IsDataEnabled(M.m_map_names[i].map_name.c_str()));
+    }
 }
 
 void CUIChangeMap::OnBtnCancel()
 {
-	HideDialog					();
+    HideDialog();
 }

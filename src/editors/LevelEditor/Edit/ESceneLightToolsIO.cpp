@@ -22,11 +22,10 @@ enum
 };
 
 //----------------------------------------------------
-bool ESceneLightTool::LoadLTX(CInifile &ini)
+bool ESceneLightTool::LoadLTX(CInifile& ini)
 {
     u32 version = ini.r_u32("main", "version");
-    if (version!=LIGHT_TOOLS_VERSION)
-    {
+    if (version != LIGHT_TOOLS_VERSION) {
         ELog.DlgMsg(mtError, "%s tools: Unsupported version.", ClassDesc());
         return false;
     }
@@ -41,7 +40,7 @@ bool ESceneLightTool::LoadLTX(CInifile &ini)
     CInifile::Sect S = ini.r_section("lcontrols");
     CInifile::SectCIt it = S.Data.begin();
     CInifile::SectCIt it_e = S.Data.end();
-    for (; it!=it_e; ++it)
+    for (; it != it_e; ++it)
     {
         u32 idx = ini.r_u32("lcontrols", it->first.c_str());
         AppendLightControl(it->first.c_str(), &idx);
@@ -49,7 +48,7 @@ bool ESceneLightTool::LoadLTX(CInifile &ini)
     return true;
 }
 
-void ESceneLightTool::SaveLTX(CInifile &ini, int id)
+void ESceneLightTool::SaveLTX(CInifile& ini, int id)
 {
     inherited::SaveLTX(ini, id);
 
@@ -63,40 +62,34 @@ void ESceneLightTool::SaveLTX(CInifile &ini, int id)
 
     RTokenVecIt _I = lcontrols.begin();
     RTokenVecIt _E = lcontrols.end();
-    for (; _I!=_E; ++_I)
+    for (; _I != _E; ++_I)
     {
         ini.w_u32("lcontrols", _I->name.c_str(), _I->id);
     }
 }
 
-bool ESceneLightTool::LoadStream(IReader &F)
+bool ESceneLightTool::LoadStream(IReader& F)
 {
     u16 version = 0;
     if (F.r_chunk(CHUNK_VERSION, &version))
-        if (version!=LIGHT_TOOLS_VERSION)
-        {
+        if (version != LIGHT_TOOLS_VERSION) {
             ELog.DlgMsg(mtError, "%s tools: Unsupported version.", ClassDesc());
             return false;
         }
 
-    if (!inherited::LoadStream(F))
-        return false;
+    if (!inherited::LoadStream(F)) return false;
 
-    if (F.find_chunk(CHUNK_FLAGS))
-        m_Flags.assign(F.r_u32());
+    if (F.find_chunk(CHUNK_FLAGS)) m_Flags.assign(F.r_u32());
 
-    if (F.find_chunk(CHUNK_SUN_SHADOW))
-    {
+    if (F.find_chunk(CHUNK_SUN_SHADOW)) {
         F.r_u8();
         F.r_fvector2(m_SunShadowDir);
     }
 
-    if (F.find_chunk(CHUNK_LCONTROLS_LAST))
-        lcontrol_last_idx = F.r_u32();
+    if (F.find_chunk(CHUNK_LCONTROLS_LAST)) lcontrol_last_idx = F.r_u32();
 
-    IReader *R = F.open_chunk(CHUNK_LCONTROLS);
-    if (R)
-    {
+    IReader* R = F.open_chunk(CHUNK_LCONTROLS);
+    if (R) {
         while (!R->eof())
         {
             shared_str l_name;
@@ -112,7 +105,7 @@ bool ESceneLightTool::LoadStream(IReader &F)
 
 //----------------------------------------------------
 
-void ESceneLightTool::SaveStream(IWriter &F)
+void ESceneLightTool::SaveStream(IWriter& F)
 {
     inherited::SaveStream(F);
 
@@ -134,7 +127,7 @@ void ESceneLightTool::SaveStream(IWriter &F)
     F.open_chunk(CHUNK_LCONTROLS);
     RTokenVecIt _I = lcontrols.begin();
     RTokenVecIt _E = lcontrols.end();
-    for (; _I!=_E; _I++)
+    for (; _I != _E; _I++)
     {
         F.w_stringZ(_I->name);
         F.w_u32(_I->id);
@@ -144,12 +137,11 @@ void ESceneLightTool::SaveStream(IWriter &F)
 
 //----------------------------------------------------
 
-bool ESceneLightTool::LoadSelection(IReader &F)
+bool ESceneLightTool::LoadSelection(IReader& F)
 {
     u16 version = 0;
     R_ASSERT(F.r_chunk(CHUNK_VERSION, &version));
-    if (version!=LIGHT_TOOLS_VERSION)
-    {
+    if (version != LIGHT_TOOLS_VERSION) {
         ELog.DlgMsg(mtError, "%s tools: Unsupported version.", ClassDesc());
         return false;
     }
@@ -159,7 +151,7 @@ bool ESceneLightTool::LoadSelection(IReader &F)
 
 //----------------------------------------------------
 
-void ESceneLightTool::SaveSelection(IWriter &F)
+void ESceneLightTool::SaveSelection(IWriter& F)
 {
     F.w_chunk(CHUNK_VERSION, (u16*)&LIGHT_TOOLS_VERSION, sizeof(LIGHT_TOOLS_VERSION));
 
@@ -167,5 +159,3 @@ void ESceneLightTool::SaveSelection(IWriter &F)
 }
 
 //----------------------------------------------------
-
-

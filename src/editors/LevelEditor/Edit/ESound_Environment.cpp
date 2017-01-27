@@ -21,8 +21,7 @@
 
 //----------------------------------------------------
 
-ESoundEnvironment::ESoundEnvironment(LPVOID data, LPCSTR name)
-    : CEditShape(data, name)
+ESoundEnvironment::ESoundEnvironment(LPVOID data, LPCSTR name) : CEditShape(data, name)
 {
     Construct(data);
 }
@@ -37,7 +36,9 @@ void ESoundEnvironment::Construct(LPVOID data)
     m_EnvOuter = "";
 }
 
-ESoundEnvironment::~ESoundEnvironment() {}
+ESoundEnvironment::~ESoundEnvironment()
+{
+}
 
 //----------------------------------------------------
 
@@ -48,12 +49,11 @@ void ESoundEnvironment::OnUpdateTransform()
 }
 
 //----------------------------------------------------
-bool ESoundEnvironment::LoadLTX(CInifile &ini, LPCSTR sect_name)
+bool ESoundEnvironment::LoadLTX(CInifile& ini, LPCSTR sect_name)
 {
     u32 version = ini.r_u32(sect_name, "version");
 
-    if (version!=SOUND_ENV_VERSION)
-    {
+    if (version != SOUND_ENV_VERSION) {
         ELog.DlgMsg(mtError, "ESoundSource: Unsupported version.");
         return false;
     }
@@ -62,7 +62,7 @@ bool ESoundEnvironment::LoadLTX(CInifile &ini, LPCSTR sect_name)
     return true;
 }
 
-void ESoundEnvironment::SaveLTX(CInifile &ini, LPCSTR sect_name)
+void ESoundEnvironment::SaveLTX(CInifile& ini, LPCSTR sect_name)
 {
     inherited::SaveLTX(ini, sect_name);
 
@@ -72,13 +72,12 @@ void ESoundEnvironment::SaveLTX(CInifile &ini, LPCSTR sect_name)
     ini.w_string(sect_name, "env_outer", m_EnvOuter.c_str());
 }
 
-bool ESoundEnvironment::LoadStream(IReader &F)
+bool ESoundEnvironment::LoadStream(IReader& F)
 {
     u16 version = 0;
 
     R_ASSERT(F.r_chunk(SOUND_CHUNK_VERSION, &version));
-    if (version!=SOUND_ENV_VERSION)
-    {
+    if (version != SOUND_ENV_VERSION) {
         ELog.DlgMsg(mtError, "ESoundSource: Unsupported version.");
         return false;
     }
@@ -91,7 +90,7 @@ bool ESoundEnvironment::LoadStream(IReader &F)
     return true;
 }
 
-void ESoundEnvironment::SaveStream(IWriter &F)
+void ESoundEnvironment::SaveStream(IWriter& F)
 {
     inherited::SaveStream(F);
 
@@ -107,17 +106,17 @@ void ESoundEnvironment::SaveStream(IWriter &F)
 
 //----------------------------------------------------
 
-void ESoundEnvironment::OnChangeEnvs(PropValue *prop)
+void ESoundEnvironment::OnChangeEnvs(PropValue* prop)
 {
     ExecCommand(COMMAND_REFRESH_SOUND_ENV_GEOMETRY);
 }
 
 //----------------------------------------------------
 
-void ESoundEnvironment::FillProp(LPCSTR pref, PropItemVec &values)
+void ESoundEnvironment::FillProp(LPCSTR pref, PropItemVec& values)
 {
     inherited::FillProp(pref, values);
-    PropValue *P;
+    PropValue* P;
     P = PHelper().CreateChoose(values, PrepareKey(pref, "Environment Inner"), &m_EnvInner, smSoundEnv);
     P->OnChangeEvent.bind(this, &ESoundEnvironment::OnChangeEnvs);
     P = PHelper().CreateChoose(values, PrepareKey(pref, "Environment Outer"), &m_EnvOuter, smSoundEnv);
@@ -126,16 +125,16 @@ void ESoundEnvironment::FillProp(LPCSTR pref, PropItemVec &values)
 
 //----------------------------------------------------
 
-bool ESoundEnvironment::GetSummaryInfo(SSceneSummary *inf)
+bool ESoundEnvironment::GetSummaryInfo(SSceneSummary* inf)
 {
     inherited::GetSummaryInfo(inf);
     return true;
 }
 
-void ESoundEnvironment::get_box(Fmatrix &m)
+void ESoundEnvironment::get_box(Fmatrix& m)
 {
     CShapeData::shape_def shape = get_shape(0);
-    R_ASSERT(shape.type==CShapeData::cfBox);
+    R_ASSERT(shape.type == CShapeData::cfBox);
     m.mul(_Transform(), shape.data.box);
 }
 
@@ -144,4 +143,3 @@ void ESoundEnvironment::OnSceneUpdate()
     inherited::OnSceneUpdate();
     ExecCommand(COMMAND_REFRESH_SOUND_ENV_GEOMETRY);
 }
-

@@ -12,14 +12,13 @@ USEFORM("KeyBar.cpp", frmKeyBar);
 USEFORM("LeftBar.cpp", fraLeftBar); /* TFrame: File Type */
 USEFORM("Splash.cpp", frmSplash);
 USEFORM("main.cpp", frmMain);
-USEFORM("TopBar.cpp", fraTopBar); /* TFrame: File Type */
+USEFORM("TopBar.cpp", fraTopBar);       /* TFrame: File Type */
 USEFORM("BottomBar.cpp", fraBottomBar); /* TFrame: File Type */
 //---------------------------------------------------------------------------
 WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR, int)
 {
     //    try{
-    if (!Application->Handle)
-    {
+    if (!Application->Handle) {
         Application->CreateHandle();
         Application->Icon->Handle = LoadIcon(MainInstance, "MAINICON");
         Application->Title = "Loading...";
@@ -67,5 +66,3 @@ WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR, int)
 }
 
 //---------------------------------------------------------------------------
-
-

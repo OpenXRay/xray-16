@@ -1,11 +1,11 @@
 #ifndef TLSpriteH
 #define TLSpriteH
 
-#define TO_REAL(_X_, _S_)	((_X_)+1.f)*float(_S_/2)
+#define TO_REAL(_X_, _S_) ((_X_) + 1.f) * float(_S_ / 2)
 
 typedef struct _TLpolygon
 {
-public:
+  public:
     union
     {
         struct
@@ -18,14 +18,16 @@ public:
 
     IC
 
-    void *d3d(void)
+        void*
+        d3d(void)
     {
         return this;
     }
 
     IC
 
-    void setpos(Frect &r)
+        void
+        setpos(Frect& r)
     {
         lb.p.x = r.x1;
         lb.p.y = r.y2;
@@ -39,7 +41,8 @@ public:
 
     IC
 
-    void setpos(float x1, float y1, float x2, float y2)
+        void
+        setpos(float x1, float y1, float x2, float y2)
     {
         lb.p.x = x1;
         lb.p.y = y2;
@@ -53,7 +56,8 @@ public:
 
     IC
 
-    void setdepth(float z = 0.f, float rhw = 1.f)
+        void
+        setdepth(float z = 0.f, float rhw = 1.f)
     {
         lb.p.z = z;
         rb.p.z = z;
@@ -67,7 +71,8 @@ public:
 
     IC
 
-    void setcolor(u32 c)
+        void
+        setcolor(u32 c)
     {
         lb.color = c;
         rb.color = c;
@@ -77,7 +82,8 @@ public:
 
     IC
 
-    void settex(Frect &r)
+        void
+        settex(Frect& r)
     {
         lb.uv.x = r.x1;
         lb.uv.y = r.y2;
@@ -91,7 +97,8 @@ public:
 
     IC
 
-    void settex(float x1, float y1, float x2, float y2)
+        void
+        settex(float x1, float y1, float x2, float y2)
     {
         lb.uv.x = x1;
         lb.uv.y = y2;
@@ -105,7 +112,8 @@ public:
 
     IC
 
-    void to_real(int w, int h)
+        void
+        to_real(int w, int h)
     {
         lt.p.x = lb.p.x = TO_REAL(lb.p.x, w);
         rb.p.x = rt.p.x = TO_REAL(rb.p.x, w);
@@ -115,7 +123,8 @@ public:
 
     IC
 
-    void to_real(Frect &r, int w, int h)
+        void
+        to_real(Frect& r, int w, int h)
     {
         lt.p.x = lb.p.x = TO_REAL(r.x1, w);
         lt.p.y = rt.p.y = TO_REAL(r.y1, h);
@@ -125,7 +134,8 @@ public:
 
     IC
 
-    void add(float dx, float dy)
+        void
+        add(float dx, float dy)
     {
         lb.p.x += dx;
         lb.p.y += dy;
@@ -139,21 +149,23 @@ public:
 
     IC
 
-    void add(Frect &r, float dx, float dy)
+        void
+        add(Frect& r, float dx, float dy)
     {
-        lb.p.x = r.x1+dx;
-        lb.p.y = r.y2+dy;
-        lt.p.x = r.x1+dx;
-        lt.p.y = r.y1+dy;
-        rb.p.x = r.x2+dx;
-        rb.p.y = r.y2+dy;
-        rt.p.x = r.x2+dx;
-        rt.p.y = r.y1+dy;
+        lb.p.x = r.x1 + dx;
+        lb.p.y = r.y2 + dy;
+        lt.p.x = r.x1 + dx;
+        lt.p.y = r.y1 + dy;
+        rb.p.x = r.x2 + dx;
+        rb.p.y = r.y2 + dy;
+        rt.p.x = r.x2 + dx;
+        rt.p.y = r.y1 + dy;
     }
 
     IC
 
-    void sub(float dx, float dy)
+        void
+        sub(float dx, float dy)
     {
         lb.p.x -= dx;
         lb.p.y -= dy;
@@ -167,38 +179,40 @@ public:
 
     IC
 
-    void sub(Frect &r, float dx, float dy)
+        void
+        sub(Frect& r, float dx, float dy)
     {
-        lb.p.x = r.x1-dx;
-        lb.p.y = r.y2-dy;
-        lt.p.x = r.x1-dx;
-        lt.p.y = r.y1-dy;
-        rb.p.x = r.x2-dx;
-        rb.p.y = r.y2-dy;
-        rt.p.x = r.x2-dx;
-        rt.p.y = r.y1-dy;
+        lb.p.x = r.x1 - dx;
+        lb.p.y = r.y2 - dy;
+        lt.p.x = r.x1 - dx;
+        lt.p.y = r.y1 - dy;
+        rb.p.x = r.x2 - dx;
+        rb.p.y = r.y2 - dy;
+        rt.p.x = r.x2 - dx;
+        rt.p.y = r.y1 - dy;
     }
 } FTLpolygon;
 
 class ECORE_API CTLSprite
 {
     FTLpolygon mesh;
-    public:
+
+  public:
     CTLSprite();
     virtual ~CTLSprite();
-    void Render(Fvector&pos, u32 color, float radius, float angle);
-    IC void Render(Fvector&pos, u32 color, float radius, float angle, const Fvector2&lt, const Fvector2&rb){
+    void Render(Fvector& pos, u32 color, float radius, float angle);
+    IC void Render(Fvector& pos, u32 color, float radius, float angle, const Fvector2& lt, const Fvector2& rb)
+    {
         mesh.settex(lt.x, lt.y, rb.x, rb.y);
         Render(pos, color, radius, angle);
     }
-    void Render(Fvector&pos, u32 color, float radius, const Fvector&D);
-    IC void Render(Fvector&pos, u32 color, float radius, const Fvector&D, const Fvector2&lt, const Fvector2&rb){
+    void Render(Fvector& pos, u32 color, float radius, const Fvector& D);
+    IC void Render(Fvector& pos, u32 color, float radius, const Fvector& D, const Fvector2& lt, const Fvector2& rb)
+    {
         mesh.settex(lt.x, lt.y, rb.x, rb.y);
         Render(pos, color, radius, D);
     }
-    void Render(Fvector&pos, float radius, bool bFixedSize, u32 clr = 0xffffffff);
+    void Render(Fvector& pos, float radius, bool bFixedSize, u32 clr = 0xffffffff);
 };
 
-#endif //__TLSPRITE_H__
-
-
+#endif  //__TLSPRITE_H__

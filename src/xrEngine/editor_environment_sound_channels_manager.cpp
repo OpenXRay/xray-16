@@ -19,7 +19,8 @@ using editor::environment::sound_channels::channel;
 using editor::environment::detail::logical_string_predicate;
 
 template <>
-void property_collection<manager::channel_container_type, manager>::display_name(u32 const& item_index, LPSTR const& buffer, u32 const& buffer_size)
+void property_collection<manager::channel_container_type, manager>::display_name(
+    u32 const& item_index, LPSTR const& buffer, u32 const& buffer_size)
 {
     xr_strcpy(buffer, buffer_size, m_container[item_index]->id());
 }
@@ -32,9 +33,7 @@ editor::property_holder* property_collection<manager::channel_container_type, ma
     return (object->object());
 }
 
-manager::manager() :
-    m_collection(0),
-    m_changed(true)
+manager::manager() : m_collection(0), m_changed(true)
 {
     m_collection = new collection_type(&m_channels, this, &m_changed);
 }
@@ -50,16 +49,7 @@ void manager::load()
 {
     string_path file_name;
     CInifile* config =
-        new CInifile(
-            FS.update_path(
-                file_name,
-                "$game_config$",
-                "environment\\sound_channels.ltx"
-            ),
-            TRUE,
-            TRUE,
-            FALSE
-        );
+        new CInifile(FS.update_path(file_name, "$game_config$", "environment\\sound_channels.ltx"), TRUE, TRUE, FALSE);
 
     VERIFY(m_channels.empty());
 
@@ -83,16 +73,7 @@ void manager::save()
 {
     string_path file_name;
     CInifile* config =
-        new CInifile(
-            FS.update_path(
-                file_name,
-                "$game_config$",
-                "environment\\sound_channels.ltx"
-            ),
-            FALSE,
-            FALSE,
-            TRUE
-        );
+        new CInifile(FS.update_path(file_name, "$game_config$", "environment\\sound_channels.ltx"), FALSE, FALSE, TRUE);
 
     channel_container_type::iterator i = m_channels.begin();
     channel_container_type::iterator e = m_channels.end();
@@ -105,18 +86,12 @@ void manager::save()
 void manager::fill(editor::property_holder* holder)
 {
     VERIFY(holder);
-    holder->add_property(
-        "sound channels",
-        "ambients",
-        "this option is resposible for sound channels",
-        m_collection
-    );
+    holder->add_property("sound channels", "ambients", "this option is resposible for sound channels", m_collection);
 }
 
 manager::channels_ids_type const& manager::channels_ids() const
 {
-    if (!m_changed)
-        return (m_channels_ids);
+    if (!m_changed) return (m_channels_ids);
 
     m_changed = false;
 
@@ -137,10 +112,9 @@ manager::channels_ids_type const& manager::channels_ids() const
 
 shared_str manager::unique_id(shared_str const& id) const
 {
-    if (m_collection->unique_id(id.c_str()))
-        return (id);
+    if (m_collection->unique_id(id.c_str())) return (id);
 
     return (m_collection->generate_unique_id(id.c_str()));
 }
 
-#endif // #ifdef INGAME_EDITOR
+#endif  // #ifdef INGAME_EDITOR

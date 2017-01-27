@@ -16,7 +16,7 @@ static const u32 CHUNK_FLAGS = 0x0004;
 
 //----------------------------------------------------
 
-bool ESceneCustomOTool::OnLoadSelectionAppendObject(CCustomObject *obj)
+bool ESceneCustomOTool::OnLoadSelectionAppendObject(CCustomObject* obj)
 {
     string256 buf;
     Scene->GenObjectName(obj->ClassID, buf, obj->Name);
@@ -27,7 +27,7 @@ bool ESceneCustomOTool::OnLoadSelectionAppendObject(CCustomObject *obj)
 
 //----------------------------------------------------
 
-bool ESceneCustomOTool::OnLoadAppendObject(CCustomObject *O)
+bool ESceneCustomOTool::OnLoadAppendObject(CCustomObject* O)
 {
     Scene->AppendObject(O, false);
     return true;
@@ -35,12 +35,12 @@ bool ESceneCustomOTool::OnLoadAppendObject(CCustomObject *O)
 
 //----------------------------------------------------
 
-bool ESceneCustomOTool::LoadSelection(IReader &F)
+bool ESceneCustomOTool::LoadSelection(IReader& F)
 {
     int count = 0;
     F.r_chunk(CHUNK_OBJECT_COUNT, &count);
 
-    SPBItem *pb = UI->ProgressStart(count, AnsiString().sprintf("Loading %s(stream)...", ClassDesc()).c_str());
+    SPBItem* pb = UI->ProgressStart(count, AnsiString().sprintf("Loading %s(stream)...", ClassDesc()).c_str());
     Scene->ReadObjectsStream(F, CHUNK_OBJECTS, OnLoadSelectionAppendObject, pb);
     UI->ProgressEnd(pb);
 
@@ -49,14 +49,13 @@ bool ESceneCustomOTool::LoadSelection(IReader &F)
 
 //----------------------------------------------------
 
-void ESceneCustomOTool::SaveSelection(IWriter &F)
+void ESceneCustomOTool::SaveSelection(IWriter& F)
 {
     F.open_chunk(CHUNK_OBJECTS);
     int count = 0;
-    for (ObjectIt it = m_Objects.begin(); it!=m_Objects.end(); ++it)
+    for (ObjectIt it = m_Objects.begin(); it != m_Objects.end(); ++it)
     {
-        if ((*it)->Selected()&&!(*it)->IsDeleted())
-        {
+        if ((*it)->Selected() && !(*it)->IsDeleted()) {
             F.open_chunk(count++);
             Scene->SaveObjectStream(*it, F);
             F.close_chunk();
@@ -68,25 +67,23 @@ void ESceneCustomOTool::SaveSelection(IWriter &F)
 }
 
 //----------------------------------------------------
-bool ESceneCustomOTool::LoadLTX(CInifile &ini)
+bool ESceneCustomOTool::LoadLTX(CInifile& ini)
 {
     inherited::LoadLTX(ini);
 
     u32 count = ini.r_u32("main", "objects_count");
 
-    SPBItem *pb = UI->ProgressStart(count, AnsiString().sprintf("Loading %s(ltx)...", ClassDesc()).c_str());
+    SPBItem* pb = UI->ProgressStart(count, AnsiString().sprintf("Loading %s(ltx)...", ClassDesc()).c_str());
 
     u32 i = 0;
     string128 buff;
 
-    for (i = 0; i<count; ++i)
+    for (i = 0; i < count; ++i)
     {
-        CCustomObject*obj = NULL;
+        CCustomObject* obj = NULL;
         sprintf(buff, "object_%d", i);
-        if (Scene->ReadObjectLTX(ini, buff, obj))
-        {
-            if (!OnLoadAppendObject(obj))
-                xr_delete(obj);
+        if (Scene->ReadObjectLTX(ini, buff, obj)) {
+            if (!OnLoadAppendObject(obj)) xr_delete(obj);
         }
         pb->Inc();
     }
@@ -96,14 +93,14 @@ bool ESceneCustomOTool::LoadLTX(CInifile &ini)
     return true;
 }
 
-bool ESceneCustomOTool::LoadStream(IReader &F)
+bool ESceneCustomOTool::LoadStream(IReader& F)
 {
     inherited::LoadStream(F);
 
     int count = 0;
     F.r_chunk(CHUNK_OBJECT_COUNT, &count);
 
-    SPBItem *pb = UI->ProgressStart(count, AnsiString().sprintf("Loading %s...", ClassDesc()).c_str());
+    SPBItem* pb = UI->ProgressStart(count, AnsiString().sprintf("Loading %s...", ClassDesc()).c_str());
     Scene->ReadObjectsStream(F, CHUNK_OBJECTS, OnLoadAppendObject, pb);
     UI->ProgressEnd(pb);
 
@@ -112,19 +109,17 @@ bool ESceneCustomOTool::LoadStream(IReader &F)
 
 //----------------------------------------------------
 
-void ESceneCustomOTool::SaveLTX(CInifile &ini, int id)
+void ESceneCustomOTool::SaveLTX(CInifile& ini, int id)
 {
     inherited::SaveLTX(ini, id);
 
     u32 count = 0;
-    for (ObjectIt it = m_Objects.begin(); it!=m_Objects.end(); ++it)
+    for (ObjectIt it = m_Objects.begin(); it != m_Objects.end(); ++it)
     {
-        CCustomObject*O = (*it);
-        if (O->save_id!=id)
-            continue;
+        CCustomObject* O = (*it);
+        if (O->save_id != id) continue;
 
-        if (O->IsDeleted()||O->m_CO_Flags.test(CCustomObject::flObjectInGroup))
-            continue;
+        if (O->IsDeleted() || O->m_CO_Flags.test(CCustomObject::flObjectInGroup)) continue;
 
         string128 buff;
         sprintf(buff, "object_%d", count);
@@ -135,7 +130,7 @@ void ESceneCustomOTool::SaveLTX(CInifile &ini, int id)
     ini.w_u32("main", "objects_count", count);
 }
 
-void ESceneCustomOTool::SaveStream(IWriter &F)
+void ESceneCustomOTool::SaveStream(IWriter& F)
 {
     inherited::SaveStream(F);
 
@@ -143,10 +138,9 @@ void ESceneCustomOTool::SaveStream(IWriter &F)
 
     F.open_chunk(CHUNK_OBJECTS);
     int count = 0;
-    for (ObjectIt it = m_Objects.begin(); it!=m_Objects.end(); ++it)
+    for (ObjectIt it = m_Objects.begin(); it != m_Objects.end(); ++it)
     {
-        if ((*it)->IsDeleted()||(*it)->m_CO_Flags.test(CCustomObject::flObjectInGroup))
-            continue;
+        if ((*it)->IsDeleted() || (*it)->m_CO_Flags.test(CCustomObject::flObjectInGroup)) continue;
 
         F.open_chunk(count++);
         Scene->SaveObjectStream(*it, F);
@@ -166,29 +160,27 @@ bool ESceneCustomOTool::Export(LPCSTR path)
 
 //----------------------------------------------------
 
-bool ESceneCustomOTool::ExportGame(SExportStreams *F)
+bool ESceneCustomOTool::ExportGame(SExportStreams* F)
 {
     bool bres = true;
-    for (ObjectIt it = m_Objects.begin(); it!=m_Objects.end(); it++)
-        if (!(*it)->ExportGame(F))
-            bres = false;
+    for (ObjectIt it = m_Objects.begin(); it != m_Objects.end(); it++)
+        if (!(*it)->ExportGame(F)) bres = false;
     return bres;
 }
 
 //----------------------------------------------------
 
-bool ESceneCustomOTool::ExportStatic(SceneBuilder *B, bool b_selected_only)
+bool ESceneCustomOTool::ExportStatic(SceneBuilder* B, bool b_selected_only)
 {
     return B->ParseStaticObjects(m_Objects, NULL, b_selected_only);
 }
 
-BOOL GetStaticCformData(ObjectList &lst, mesh_build_data &data, bool b_selected_only);
+BOOL GetStaticCformData(ObjectList& lst, mesh_build_data& data, bool b_selected_only);
 
-bool ESceneCustomOTool::GetStaticCformData(mesh_build_data &data, bool b_selected_only) //b_vertex* verts, int& vert_cnt, int& vert_it,b_face* faces, int& face_cnt, int& face_it,
+bool ESceneCustomOTool::GetStaticCformData(mesh_build_data& data,
+    bool b_selected_only)  // b_vertex* verts, int& vert_cnt, int& vert_it,b_face* faces, int& face_cnt, int& face_it,
 {
     return ::GetStaticCformData(m_Objects, data, b_selected_only);
 }
 
 //----------------------------------------------------
-
-

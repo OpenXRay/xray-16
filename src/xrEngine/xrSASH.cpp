@@ -6,10 +6,9 @@
 
 xrSASH ENGINE_API g_SASH;
 
-xrSASH::xrSASH() : m_bInited(false),
-    m_bOpenAutomate(false), m_bBenchmarkRunning(false),
-    m_bRunning(false), m_bReinitEngine(false),
-    m_bExecutingConsoleCommand(false)
+xrSASH::xrSASH()
+    : m_bInited(false), m_bOpenAutomate(false), m_bBenchmarkRunning(false), m_bRunning(false), m_bReinitEngine(false),
+      m_bExecutingConsoleCommand(false)
 {
     ;
 }
@@ -24,8 +23,7 @@ bool xrSASH::Init(const char* pszParam)
 {
     oaVersion ver;
     oaBool res = oaInit(pszParam, &ver);
-    if (res)
-    {
+    if (res) {
         m_bInited = true;
         m_bOpenAutomate = true;
 
@@ -48,8 +46,7 @@ void xrSASH::MainLoop()
     m_bRunning = true;
     m_bReinitEngine = false;
 
-    if (m_bOpenAutomate)
-    {
+    if (m_bOpenAutomate) {
         LoopOA();
     }
     else
@@ -81,8 +78,8 @@ void xrSASH::LoopOA()
 
         /* Run as normal */
         case OA_CMD_RUN:
-            //RunApp();
-            //Msg("SASH:: GetCurrentOptions.");
+            // RunApp();
+            // Msg("SASH:: GetCurrentOptions.");
             bExit = true;
             break;
 
@@ -107,9 +104,7 @@ void xrSASH::LoopOA()
             break;
 
         /* Run benchmark */
-        case OA_CMD_RUN_BENCHMARK:
-            RunBenchmark(Command.BenchmarkName);
-            break;
+        case OA_CMD_RUN_BENCHMARK: RunBenchmark(Command.BenchmarkName); break;
         }
     }
 }
@@ -122,8 +117,7 @@ void xrSASH::LoopNative()
     CInifile ini(in_file);
 
     IReader* R = FS.r_open(in_file);
-    if (R)
-    {
+    if (R) {
         FS.r_close(R);
 
         int test_count = ini.line_count("benchmark");
@@ -133,7 +127,7 @@ void xrSASH::LoopNative()
         for (int i = 0; i < test_count; ++i)
         {
             ini.r_line("benchmark", i, &test_name, &t);
-            //xr_strcpy(g_sBenchmarkName, test_name);
+            // xr_strcpy(g_sBenchmarkName, test_name);
 
             test_command = ini.r_string_wb("benchmark", test_name);
             u32 cmdSize = test_command.size() + 1;
@@ -166,8 +160,7 @@ void xrSASH::ReportNative(LPCSTR pszTestName)
 
     const u32 iWindowSize = 15;
 
-    if (m_aFrimeTimes.size() > iWindowSize * 4)
-    {
+    if (m_aFrimeTimes.size() > iWindowSize * 4) {
         for (u32 it = 0; it < m_aFrimeTimes.size() - iWindowSize; it++)
         {
             float fTime = 0;
@@ -190,10 +183,10 @@ void xrSASH::ReportNative(LPCSTR pszTestName)
         }
     }
 
-    //res.w_float ("general","test float", float(1.0f)/10.f, "dx-level required" );
-    //res.w_float ("general","renderer", float(GlobalEnv.Render->get_generation())/10.f, "dx-level required" );
-    //res.w_float ("general","average", rfps_average, "average for this run" );
-    //res.w_float ("general","middle", rfps_middlepoint, "per-frame middle-point");
+    // res.w_float ("general","test float", float(1.0f)/10.f, "dx-level required" );
+    // res.w_float ("general","renderer", float(GlobalEnv.Render->get_generation())/10.f, "dx-level required" );
+    // res.w_float ("general","average", rfps_average, "average for this run" );
+    // res.w_float ("general","middle", rfps_middlepoint, "per-frame middle-point");
     float fTotal = 0;
     float fNumFrames = 0;
     for (u32 it = 0; it < m_aFrimeTimes.size(); it++)
@@ -220,8 +213,7 @@ void xrSASH::StartBenchmark()
     m_bBenchmarkRunning = true;
     oaStartBenchmark();
 
-    if (!m_bOpenAutomate)
-    {
+    if (!m_bOpenAutomate) {
         m_aFrimeTimes.clear();
         m_aFrimeTimes.reserve(1024);
         m_FrameTimer.Start();
@@ -235,8 +227,7 @@ void xrSASH::DisplayFrame(float t)
     VERIFY(m_bBenchmarkRunning);
     oaDisplayFrame(t);
 
-    if (!m_bOpenAutomate)
-    {
+    if (!m_bOpenAutomate) {
         m_aFrimeTimes.push_back(m_FrameTimer.GetElapsed_sec());
         m_FrameTimer.Start();
     }
@@ -289,12 +280,12 @@ void xrSASH::GetAllOptions()
     }
 
     // >=r2
-    oaInitOption(&Option); // Reset dependency info
+    oaInitOption(&Option);  // Reset dependency info
     // Currently only equal/not equal works
-    //Option.Dependency.ParentName = TEXT("renderer");
-    //Option.Dependency.ComparisonOp = OA_COMP_OP_GREATER_OR_EQUAL;
-    //Option.Dependency.ComparisonVal.Enum = TEXT("renderer_r2");
-    //Option.Dependency.ComparisonValType = GetOptionType("renderer");
+    // Option.Dependency.ParentName = TEXT("renderer");
+    // Option.Dependency.ComparisonOp = OA_COMP_OP_GREATER_OR_EQUAL;
+    // Option.Dependency.ComparisonVal.Enum = TEXT("renderer_r2");
+    // Option.Dependency.ComparisonValType = GetOptionType("renderer");
     {
         DescribeOption("r2_sun", Option.Dependency);
         DescribeOption("r2_sun_quality", Option.Dependency);
@@ -304,10 +295,10 @@ void xrSASH::GetAllOptions()
     }
 
     // >=r2.5
-    //Option.Dependency.ParentName = TEXT("renderer");
-    //Option.Dependency.ComparisonOp = OA_COMP_OP_GREATER_OR_EQUAL;
-    //Option.Dependency.ComparisonVal.Enum = TEXT("renderer_r2.5");
-    //Option.Dependency.ComparisonValType = GetOptionType("renderer");
+    // Option.Dependency.ParentName = TEXT("renderer");
+    // Option.Dependency.ComparisonOp = OA_COMP_OP_GREATER_OR_EQUAL;
+    // Option.Dependency.ComparisonVal.Enum = TEXT("renderer_r2.5");
+    // Option.Dependency.ComparisonValType = GetOptionType("renderer");
     {
         DescribeOption("r2_sun_shafts", Option.Dependency);
         DescribeOption("r2_ssao", Option.Dependency);
@@ -322,10 +313,10 @@ void xrSASH::GetAllOptions()
     }
 
     // >=r3
-    //Option.Dependency.ParentName = TEXT("renderer");
-    //Option.Dependency.ComparisonOp = OA_COMP_OP_GREATER_OR_EQUAL;
-    //Option.Dependency.ComparisonVal.Enum = TEXT("renderer_r3");
-    //Option.Dependency.ComparisonValType = GetOptionType("renderer");
+    // Option.Dependency.ParentName = TEXT("renderer");
+    // Option.Dependency.ComparisonOp = OA_COMP_OP_GREATER_OR_EQUAL;
+    // Option.Dependency.ComparisonVal.Enum = TEXT("renderer_r3");
+    // Option.Dependency.ComparisonValType = GetOptionType("renderer");
     {
         DescribeOption("r3_dynamic_wet_surfaces", Option.Dependency);
         DescribeOption("r3_volumetric_smoke", Option.Dependency);
@@ -334,10 +325,10 @@ void xrSASH::GetAllOptions()
         DescribeOption("r3_minmax_sm", Option.Dependency);
         DescribeOption("r3_msaa", Option.Dependency);
         // >= 2x
-        //Option.Dependency.ParentName = TEXT("r3_msaa");
-        //Option.Dependency.ComparisonOp = OA_COMP_OP_GREATER_OR_EQUAL;
-        //Option.Dependency.ComparisonVal.Enum = TEXT("2x");
-        //Option.Dependency.ComparisonValType = GetOptionType("r3_msaa");
+        // Option.Dependency.ParentName = TEXT("r3_msaa");
+        // Option.Dependency.ComparisonOp = OA_COMP_OP_GREATER_OR_EQUAL;
+        // Option.Dependency.ComparisonVal.Enum = TEXT("2x");
+        // Option.Dependency.ComparisonValType = GetOptionType("r3_msaa");
         {
             DescribeOption("r3_msaa_opt", Option.Dependency);
             DescribeOption("r3_msaa_alphatest", Option.Dependency);
@@ -396,7 +387,6 @@ void xrSASH::GetCurrentOptions()
     GetOption("r3_msaa_alphatest");
     GetOption("r3_gbuff_opt");
 
-
     ReleaseEngine();
 }
 
@@ -410,7 +400,7 @@ void xrSASH::SetOptions()
     while ((Option = oaGetNextOption()) != NULL)
         SetOption(Option);
 
-    //Console->Save();
+    // Console->Save();
     Console->Execute("cfg_save");
 
     ReleaseEngine();
@@ -424,8 +414,8 @@ void xrSASH::GetBenchmarks()
         /* Set BenchmarkName to a unique string identifying the benchmark */
 
         oaAddBenchmark(TEXT("dummy"));
-        //sashAddBenchmark(TEXT("crates"));
-        //sashAddBenchmark(TEXT("map1"));
+        // sashAddBenchmark(TEXT("crates"));
+        // sashAddBenchmark(TEXT("map1"));
     }
 }
 
@@ -446,16 +436,14 @@ void xrSASH::RunBenchmark(LPCSTR pszName)
 
 void xrSASH::TryInitEngine(bool bNoRun)
 {
-    if (m_bReinitEngine)
-    {
+    if (m_bReinitEngine) {
         InitEngine();
         // It was destroyed on previous exit
         Console->Initialize();
     }
 
     xr_strcpy(Console->ConfigFile, "user.ltx");
-    if (strstr(Core.Params, "-ltx "))
-    {
+    if (strstr(Core.Params, "-ltx ")) {
         string64 c_name;
         sscanf(strstr(Core.Params, "-ltx ") + 5, "%[^ ] ", c_name);
         xr_strcpy(Console->ConfigFile, c_name);
@@ -479,22 +467,19 @@ void xrSASH::TryInitEngine(bool bNoRun)
     InitInput();
 
     Engine.External.Initialize();
-    
+
     Console->Execute("unbindall");
     Console->ExecuteScript(Console->ConfigFile);
-    if (m_bOpenAutomate)
-    {
+    if (m_bOpenAutomate) {
         // Overwrite setting using SASH.ltx if has any.
         xr_strcpy(Console->ConfigFile, "SASH.ltx");
         Console->ExecuteScript(Console->ConfigFile);
     }
 
-    if (bNoRun)
-    {
+    if (bNoRun) {
         InitSound();
         Device.Create();
     }
-
 }
 
 void xrSASH::ReleaseEngine()
@@ -510,8 +495,7 @@ void xrSASH::ReleaseEngine()
 oaOptionDataType xrSASH::GetOptionType(char* pszOptionName)
 {
     CConsole::vecCMD_IT I = Console->Commands.find(pszOptionName);
-    if (I == Console->Commands.end())
-    {
+    if (I == Console->Commands.end()) {
         Msg("SASH:: Option \"%s\" not found.", pszOptionName);
         VERIFY(I != Console->Commands.end());
         return OA_TYPE_BOOL;
@@ -536,7 +520,6 @@ oaOptionDataType xrSASH::GetOptionType(char* pszOptionName)
         VERIFY(!"Unsupported console command type.");
         return OA_TYPE_BOOL;
     }
-
 }
 
 void xrSASH::DescribeOption(char* pszOptionName, const oaOptionDependency& Dependency)
@@ -547,8 +530,7 @@ void xrSASH::DescribeOption(char* pszOptionName, const oaOptionDependency& Depen
     Option.Dependency = Dependency;
 
     CConsole::vecCMD_IT I = Console->Commands.find(pszOptionName);
-    if (I == Console->Commands.end())
-    {
+    if (I == Console->Commands.end()) {
         Msg("SASH:: Option \"%s\" not found.", pszOptionName);
         VERIFY(I != Console->Commands.end());
         return;
@@ -564,8 +546,7 @@ void xrSASH::DescribeOption(char* pszOptionName, const oaOptionDependency& Depen
 
     Msg("SASH:: Registering option \"%s\".", pszOptionName);
 
-    if (pMask)
-    {
+    if (pMask) {
         Option.DataType = OA_TYPE_BOOL;
         oaAddOption(&Option);
     }
@@ -612,13 +593,11 @@ void xrSASH::GetOption(char* pszOptionName)
     oaValue Val;
 
     CConsole::vecCMD_IT I = Console->Commands.find(pszOptionName);
-    if (I == Console->Commands.end())
-    {
+    if (I == Console->Commands.end()) {
         Msg("SASH:: Option \"%s\" not found.", pszOptionName);
         VERIFY(I != Console->Commands.end());
         return;
     }
-
 
     IConsole_Command* pCmd = I->second;
     CCC_Mask* pMask = dynamic_cast<CCC_Mask*>(pCmd);
@@ -628,8 +607,7 @@ void xrSASH::GetOption(char* pszOptionName)
 
     Msg("SASH:: Getting option \"%s\".", pszOptionName);
 
-    if (pMask)
-    {
+    if (pMask) {
         Val.Bool = pMask->GetValue() ? OA_TRUE : OA_FALSE;
         oaAddOptionValue(pszOptionName, OA_TYPE_BOOL, &Val);
     }
@@ -664,8 +642,7 @@ void xrSASH::SetOption(oaNamedOption* pOption)
     * and Option->Value will contain the appropriate value.
     */
     CConsole::vecCMD_IT I = Console->Commands.find(pOption->Name);
-    if (I == Console->Commands.end())
-    {
+    if (I == Console->Commands.end()) {
         Msg("SASH:: Option \"%s\" not found.", pOption->Name);
         VERIFY(I != Console->Commands.end());
         return;
@@ -681,8 +658,7 @@ void xrSASH::SetOption(oaNamedOption* pOption)
 
     string512 CmdBuf;
 
-    if (pMask)
-    {
+    if (pMask) {
         xr_sprintf(CmdBuf, "%s %s", pOption->Name, (pOption->Value.Bool ? "1" : "0"));
     }
     else if (pToken)
@@ -731,8 +707,7 @@ void xrSASH::Message(oaErrorType MessageType, const char* pszMsg, va_list& mark)
 
 void xrSASH::OnConsoleInvalidSyntax(bool bLastLine, const char* pszMsg, ...)
 {
-    if (m_bInited && m_bExecutingConsoleCommand)
-    {
+    if (m_bInited && m_bExecutingConsoleCommand) {
         va_list mark;
         va_start(mark, pszMsg);
 

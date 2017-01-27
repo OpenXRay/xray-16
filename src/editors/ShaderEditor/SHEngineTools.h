@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------
-#ifndef SHEngineToolsH 
+#ifndef SHEngineToolsH
 #define SHEngineToolsH
 
 #include "SHToolsInterface.h"
@@ -16,8 +16,8 @@ class CEditableObject;
 
 class CParseBlender
 {
-public:
-    virtual void Parse(CSHEngineTools *owner, DWORD type, LPCSTR key, LPVOID data) =0;
+  public:
+    virtual void Parse(CSHEngineTools* owner, DWORD type, LPCSTR key, LPVOID data) = 0;
 };
 
 enum EPreviewObj
@@ -31,12 +31,12 @@ enum EPreviewObj
     pvo_force_dword = u32(-1)
 };
 
-class CSHEngineTools: public ISHTools
+class CSHEngineTools : public ISHTools
 {
     SStringVec MCString;
 
     u32 m_PreviewObjectType;
-    CEditableObject *m_PreviewObject;
+    CEditableObject* m_PreviewObject;
     bool m_bCustomEditObject;
 
     BOOL m_bFreezeUpdate;
@@ -53,25 +53,22 @@ class CSHEngineTools: public ISHTools
     MatrixMap m_Matrices;
     BlenderMap m_Blenders;
 
-    void __stdcall ItemExist(LPCSTR name, bool &res)
-    {
-        res = !!FindItem(name);
-    }
+    void __stdcall ItemExist(LPCSTR name, bool& res) { res = !!FindItem(name); }
 
-    IBlender *FindItem(LPCSTR name);
+    IBlender* FindItem(LPCSTR name);
 
     void AddMatrixRef(LPSTR name);
-    CMatrix *FindMatrix(LPCSTR name);
-    CMatrix *AppendMatrix(LPSTR name);
+    CMatrix* FindMatrix(LPCSTR name);
+    CMatrix* AppendMatrix(LPSTR name);
     LPCSTR GenerateMatrixName(LPSTR name);
-    LPCSTR AppendMatrix(CMatrix *src = 0, CMatrix **dest = 0);
+    LPCSTR AppendMatrix(CMatrix* src = 0, CMatrix** dest = 0);
     void RemoveMatrix(LPCSTR name);
 
     void AddConstantRef(LPSTR name);
-    CConstant *FindConstant(LPCSTR name);
-    CConstant *AppendConstant(LPSTR name);
+    CConstant* FindConstant(LPCSTR name);
+    CConstant* AppendConstant(LPSTR name);
     LPCSTR GenerateConstantName(LPSTR name);
-    LPCSTR AppendConstant(CConstant *src = 0, CConstant **dest = 0);
+    LPCSTR AppendConstant(CConstant* src = 0, CConstant** dest = 0);
     void RemoveConstant(LPCSTR name);
 
     friend class CCollapseBlender;
@@ -85,47 +82,47 @@ class CSHEngineTools: public ISHTools
     void UpdateConstantRefs(LPSTR name);
     void UpdateRefCounters();
 
-    void ParseBlender(IBlender *B, CParseBlender &P);
+    void ParseBlender(IBlender* B, CParseBlender& P);
 
-    CMemoryWriter m_BlenderStream; // пользоваться функциями обновления стрима для синхронизации
-    bool m_bUpdateCurrent; // если менялся объект непосредственно  Update____From___()
+    CMemoryWriter m_BlenderStream;  // пользоваться функциями обновления стрима для синхронизации
+    bool m_bUpdateCurrent;          // если менялся объект непосредственно  Update____From___()
     bool m_bCurBlenderChanged;
 
-    void Save(CMemoryWriter &F);
+    void Save(CMemoryWriter& F);
     void PrepareRender();
 
     // template
-    void __stdcall FillChooseTemplate(ChooseItemVec &items, void *param);
-    // matrix props                                                
-    bool __stdcall MatrixOnAfterEdit(PropValue *sender, xr_string &edit_val);
-    void __stdcall FillMatrixProps(PropItemVec &items, LPCSTR pref, LPSTR name);
-    void __stdcall MCOnDraw(PropValue *sender, xr_string &draw_val);
+    void __stdcall FillChooseTemplate(ChooseItemVec& items, void* param);
+    // matrix props
+    bool __stdcall MatrixOnAfterEdit(PropValue* sender, xr_string& edit_val);
+    void __stdcall FillMatrixProps(PropItemVec& items, LPCSTR pref, LPSTR name);
+    void __stdcall MCOnDraw(PropValue* sender, xr_string& draw_val);
     // constant props
-    bool __stdcall ConstOnAfterEdit(PropValue *sender, xr_string &edit_val);
-    void __stdcall FillConstProps(PropItemVec &items, LPCSTR pref, LPSTR name);
-    // name                                 
-    bool __stdcall NameOnAfterEdit(PropValue *sender, xr_string &edit_val);
+    bool __stdcall ConstOnAfterEdit(PropValue* sender, xr_string& edit_val);
+    void __stdcall FillConstProps(PropItemVec& items, LPCSTR pref, LPSTR name);
+    // name
+    bool __stdcall NameOnAfterEdit(PropValue* sender, xr_string& edit_val);
 
     void RealResetShaders();
 
-    void __stdcall FillMatrix(PropItemVec &values, LPCSTR pref, CMatrix *m);
-    void __stdcall FillConst(PropItemVec &values, LPCSTR pref, CConstant *c);
+    void __stdcall FillMatrix(PropItemVec& values, LPCSTR pref, CMatrix* m);
+    void __stdcall FillConst(PropItemVec& values, LPCSTR pref, CConstant* c);
     void __stdcall RefreshProperties();
 
     void ResetShaders(bool bForced = false)
     {
         m_bNeedResetShaders = true;
-        if (bForced)
-            RealResetShaders();
+        if (bForced) RealResetShaders();
     }
 
     void UpdateObjectShader();
 
-    bool __stdcall OnPreviewObjectRefChange(PropValue *sender, u32 &edit_val);
-public:
+    bool __stdcall OnPreviewObjectRefChange(PropValue* sender, u32& edit_val);
+
+  public:
     CMemoryWriter m_RenderShaders;
 
-    IBlender *m_CurrentBlender;
+    IBlender* m_CurrentBlender;
 
     void RemoteRenameBlender(LPCSTR old_full_name, LPCSTR new_full_name)
     {
@@ -134,10 +131,10 @@ public:
         m_RenBlenderNewName = new_full_name;
     }
 
-    Shader_xrLC *m_Shader;
+    Shader_xrLC* m_Shader;
     virtual LPCSTR AppendItem(LPCSTR folder_name, LPCSTR parent = 0);
     virtual void RealRenameItem(LPCSTR old_full_name, LPCSTR new_full_name);
-    virtual void __stdcall OnRemoveItem(LPCSTR name, EItemType type, bool &res);
+    virtual void __stdcall OnRemoveItem(LPCSTR name, EItemType type, bool& res);
     virtual void __stdcall OnRenameItem(LPCSTR old_full_name, LPCSTR new_full_name, EItemType type);
     virtual void FillItemList();
 
@@ -145,14 +142,12 @@ public:
     void UpdateObjectFromStream();
 
     void ClearData();
-public:
-    CSHEngineTools(ISHInit &init);
+
+  public:
+    CSHEngineTools(ISHInit& init);
     virtual ~CSHEngineTools();
 
-    virtual LPCSTR ToolsName()
-    {
-        return "Engine Shader";
-    }
+    virtual LPCSTR ToolsName() { return "Engine Shader"; }
 
     virtual void Reload();
     virtual void Load();
@@ -176,15 +171,11 @@ public:
 
     virtual void OnDeviceCreate();
 
-    virtual void OnDeviceDestroy()
-    {
-        ;
-    }
+    virtual void OnDeviceDestroy() { ; }
 
     virtual void ZoomObject(bool bOnlySel);
-    virtual void OnShowHint(AStringVec &ss);
+    virtual void OnShowHint(AStringVec& ss);
 };
 
 //---------------------------------------------------------------------------
 #endif
-

@@ -4,15 +4,15 @@
 // Key input information
 typedef struct KeyInformation
 {
-    u16     cnt;    // Unprocessed input value
-    u16     trg;    // Pressing trigger input
-    u16     up;     // Releasing trigger input
-    u16     rep;    // Pressing hold repeat input
+    u16 cnt;  // Unprocessed input value
+    u16 trg;  // Pressing trigger input
+    u16 up;   // Releasing trigger input
+    u16 rep;  // Pressing hold repeat input
 } KeyInformation;
 
 void KeyInit(void);
 
-const KeyInformation * KeyRead(void);
+const KeyInformation* KeyRead(void);
 
 #define KEY_A_PRESSED(info) (((info)->trg | (info)->rep) & PAD_BUTTON_A)
 #define KEY_B_PRESSED(info) (((info)->trg | (info)->rep) & PAD_BUTTON_B)

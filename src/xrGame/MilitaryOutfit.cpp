@@ -12,6 +12,6 @@ CMilitaryOutfit::CMilitaryOutfit()
 {
 }
 
-CMilitaryOutfit::~CMilitaryOutfit() 
+CMilitaryOutfit::~CMilitaryOutfit()
 {
 }

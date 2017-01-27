@@ -11,11 +11,6 @@
 #define XRD3D9NULL_API XR_IMPORT
 #endif
 
-
-
 extern "C" {
-	 IDirect3D9* WINAPI  Direct3DCreate9(UINT SDKVersion);
+IDirect3D9* WINAPI Direct3DCreate9(UINT SDKVersion);
 };
-
-
-

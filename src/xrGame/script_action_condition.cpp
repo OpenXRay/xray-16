@@ -9,6 +9,6 @@
 #include "stdafx.h"
 #include "script_action_condition.h"
 
-CScriptActionCondition::~CScriptActionCondition	()
+CScriptActionCondition::~CScriptActionCondition()
 {
 }

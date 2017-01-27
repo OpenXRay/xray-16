@@ -6,7 +6,7 @@
 
 #pragma once
 
-#pragma warn -pck
+#pragma warn - pck
 
 #define sqrtf(a) sqrt(a)
 
@@ -42,7 +42,7 @@ __inline int _eof(int _a)
 #ifdef _access
 #undef _access
 #endif
-__inline int _access(const char *_a, int _b)
+__inline int _access(const char* _a, int _b)
 {
     return ::access(_a, _b);
 }
@@ -63,7 +63,7 @@ __inline int _dup(int handle)
     return ::dup(handle);
 }
 
-__inline float modff(float a, float *b)
+__inline float modff(float a, float* b)
 {
     double x, y;
     y = modf(double(a), &x);
@@ -79,31 +79,31 @@ __inline float expf(float val)
 #include "xrCore/Platform.h"
 
 #ifdef _ECOREB
-    #define ECORE_API XR_EXPORT
-    #define ENGINE_API XR_EXPORT
+#define ECORE_API XR_EXPORT
+#define ENGINE_API XR_EXPORT
 #else
 #define ECORE_API XR_IMPORT
-#define ENGINE_API	XR_IMPORT
+#define ENGINE_API XR_IMPORT
 #endif
 
 #define DLL_API XR_IMPORT
-#define PropertyGP(a,b)	__declspec( property( get=a, put=b ) )
-#define THROW			FATAL("THROW");
-#define THROW2(a)		FATAL(a);
+#define PropertyGP(a, b) __declspec(property(get = a, put = b))
+#define THROW FATAL("THROW");
+#define THROW2(a) FATAL(a);
 #define NO_XRC_STATS
 
-#define clMsg 			Msg
+#define clMsg Msg
 
 // core
 #include <xrCore/xrCore.h>
 
 #ifdef _EDITOR
-	class PropValue;
-	class PropItem;
-	DEFINE_VECTOR(PropItem*,PropItemVec,PropItemIt);
+class PropValue;
+class PropItem;
+DEFINE_VECTOR(PropItem*, PropItemVec, PropItemIt);
 
-	class ListItem;
-	DEFINE_VECTOR(ListItem*,ListItemsVec,ListItemsIt);
+class ListItem;
+DEFINE_VECTOR(ListItem*, ListItemsVec, ListItemsIt);
 #endif
 
 #include "xrCDB/xrCDB.h"
@@ -124,7 +124,7 @@ __inline float expf(float val)
 #include "editors/ECore/Editor/D3DX_Wrapper.h"
 
 DEFINE_VECTOR(AnsiString, AStringVec, AStringIt);
-DEFINE_VECTOR(AnsiString *, LPAStringVec, LPAStringIt);
+DEFINE_VECTOR(AnsiString*, LPAStringVec, LPAStringIt);
 
 #include "xrServerEntities/xrEProps.h"
 #include "xrCore/Log.h"
@@ -135,14 +135,14 @@ DEFINE_VECTOR(AnsiString *, LPAStringVec, LPAStringIt);
 #include "editors/xrEProps/ItemList.h"
 #include "editors/xrEProps/ChoseForm.h"
 
-
 struct str_pred : public std::binary_function<char*, char*, bool>
 {
     IC
 
-    bool operator()(LPCSTR x, LPCSTR y) const
+        bool
+        operator()(LPCSTR x, LPCSTR y) const
     {
-        return strcmp(x, y)<0;
+        return strcmp(x, y) < 0;
     }
 };
 
@@ -150,48 +150,56 @@ struct astr_pred : public std::binary_function<const AnsiString&, const AnsiStri
 {
     IC
 
-    bool operator()(const AnsiString &x, const AnsiString &y) const
+        bool
+        operator()(const AnsiString& x, const AnsiString& y) const
     {
-        return x<y;
+        return x < y;
     }
 };
 
 #ifdef _EDITOR
-	#include "editors/ECore/Editor/device.h"
-	#include "xrEngine/Properties.h"
-	#include "editors/ECore/Editor/render.h"
-	DEFINE_VECTOR(FVF::L,FLvertexVec,FLvertexIt);
-	DEFINE_VECTOR(FVF::TL,FTLvertexVec,FTLvertexIt);
-	DEFINE_VECTOR(FVF::LIT,FLITvertexVec,FLITvertexIt);
-	DEFINE_VECTOR(shared_str,RStrVec,RStrVecIt);
+#include "editors/ECore/Editor/device.h"
+#include "xrEngine/Properties.h"
+#include "editors/ECore/Editor/render.h"
+DEFINE_VECTOR(FVF::L, FLvertexVec, FLvertexIt);
+DEFINE_VECTOR(FVF::TL, FTLvertexVec, FTLvertexIt);
+DEFINE_VECTOR(FVF::LIT, FLITvertexVec, FLITvertexIt);
+DEFINE_VECTOR(shared_str, RStrVec, RStrVecIt);
 
-	#include "editors/ECore/Editor/EditorPreferences.h"
+#include "editors/ECore/Editor/EditorPreferences.h"
 #endif
 
-#define INI_NAME( buf ) { FS.update_path( buf, "$local_root$", EFS.ChangeFileExt( UI->EditorName(), ".ini" ).c_str() ); }
-#define DEFINE_INI(storage) { string_path buf; INI_NAME(buf); storage->IniFileName=buf; }
+#define INI_NAME(buf)                                                                                                  \
+    {                                                                                                                  \
+        FS.update_path(buf, "$local_root$", EFS.ChangeFileExt(UI->EditorName(), ".ini").c_str());                      \
+    }
+#define DEFINE_INI(storage)                                                                                            \
+    {                                                                                                                  \
+        string_path buf;                                                                                               \
+        INI_NAME(buf);                                                                                                 \
+        storage->IniFileName = buf;                                                                                    \
+    }
 #define NONE_CAPTION "<none>"
 #define MULTIPLESEL_CAPTION "<multiple selection>"
 
 // path definition
-#define _server_root_		"$server_root$"
-#define _server_data_root_	"$server_data_root$"
-#define _local_root_		"$local_root$"
-#define _import_			"$import$"
-#define _sounds_			"$sounds$"
-#define _textures_			"$textures$"
-#define _objects_			"$objects$"
-#define _maps_				"$maps$"
-#define _groups_			"$groups$"
-#define _temp_				"$temp$"
-#define _omotion_			"$omotion$"
-#define _omotions_			"$omotions$"
-#define _smotion_			"$smotion$"
-#define _detail_objects_	"$detail_objects$"
+#define _server_root_ "$server_root$"
+#define _server_data_root_ "$server_data_root$"
+#define _local_root_ "$local_root$"
+#define _import_ "$import$"
+#define _sounds_ "$sounds$"
+#define _textures_ "$textures$"
+#define _objects_ "$objects$"
+#define _maps_ "$maps$"
+#define _groups_ "$groups$"
+#define _temp_ "$temp$"
+#define _omotion_ "$omotion$"
+#define _omotions_ "$omotions$"
+#define _smotion_ "$smotion$"
+#define _detail_objects_ "$detail_objects$"
 #endif
 
 #define TEX_POINT_ATT "internal\\internal_light_attpoint"
 #define TEX_SPOT_ATT "internal\\internal_light_attclip"
 
 #pragma hdrstop
-

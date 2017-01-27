@@ -16,17 +16,17 @@
 //---------------------------------------------------------------------------
 class TfrmSplash : public TForm
 {
-    __published: // IDE-managed Components
-    TImage*Image1;
-    TMxLabel *lbStatus;
-private: // User declarations
-public: // User declarations
-    __fastcall TfrmSplash(TComponent *Owner);
+    __published :  // IDE-managed Components
+                   TImage* Image1;
+    TMxLabel* lbStatus;
+
+  private:  // User declarations
+  public:   // User declarations
+    __fastcall TfrmSplash(TComponent* Owner);
 
     void SetStatus(LPSTR log)
     {
-        if (log)
-        {
+        if (log) {
             lbStatus->Caption = log;
             lbStatus->Repaint();
         };
@@ -34,7 +34,6 @@ public: // User declarations
 };
 
 //---------------------------------------------------------------------------
-extern PACKAGE TfrmSplash * frmSplash;
+extern PACKAGE TfrmSplash* frmSplash;
 //---------------------------------------------------------------------------
 #endif
-

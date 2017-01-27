@@ -8,7 +8,7 @@ RenderableBase::RenderableBase()
     renderable.visual = NULL;
     renderable.pROS = NULL;
     renderable.pROS_Allowed = TRUE;
-    ISpatial* self = dynamic_cast<ISpatial*> (this);
+    ISpatial* self = dynamic_cast<ISpatial*>(this);
     if (self) self->GetSpatialData().type |= STYPE_RENDERABLE;
 }
 

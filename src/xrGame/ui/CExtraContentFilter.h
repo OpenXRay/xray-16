@@ -2,20 +2,20 @@
 
 class CExtraContentFilter
 {
+    struct PackData
+    {
+        shared_str sPackName;
+        bool bEnabled;
+        xr_vector<shared_str> aContent;
+    };
 
-	struct PackData
-	{
-		shared_str				sPackName;
-		bool					bEnabled;
-		xr_vector<shared_str>	aContent;
-	};
+    xr_vector<PackData*> aDataPacks;
 
-	xr_vector<PackData*>		aDataPacks;
+    bool CheckPackKey(LPCSTR KeyName);
 
-	bool	CheckPackKey(LPCSTR KeyName);
 public:
-				CExtraContentFilter				();
-	virtual		~CExtraContentFilter			();
+    CExtraContentFilter();
+    virtual ~CExtraContentFilter();
 
-		bool	IsDataEnabled(LPCSTR pData);		
+    bool IsDataEnabled(LPCSTR pData);
 };

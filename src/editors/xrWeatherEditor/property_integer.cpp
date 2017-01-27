@@ -9,32 +9,28 @@
 #include "pch.hpp"
 #include "property_integer.hpp"
 
-property_integer::property_integer			(
-		integer_getter_type const &getter,
-		integer_setter_type const &setter
-	) :
-	m_getter				(new integer_getter_type(getter)),
-	m_setter				(new integer_setter_type(setter))
+property_integer::property_integer(integer_getter_type const& getter, integer_setter_type const& setter)
+    : m_getter(new integer_getter_type(getter)), m_setter(new integer_setter_type(setter))
 {
 }
 
-property_integer::~property_integer			()
+property_integer::~property_integer()
 {
-	this->!property_integer	();
+    this->!property_integer();
 }
 
-property_integer::!property_integer			()
+property_integer::!property_integer()
 {
-	delete					(m_getter);
-	delete					(m_setter);
+    delete (m_getter);
+    delete (m_setter);
 }
 
-System::Object ^property_integer::GetValue	()
+System::Object ^ property_integer::GetValue()
 {
-	return					((*m_getter)());
+    return ((*m_getter)());
 }
 
-void property_integer::SetValue			(System::Object ^object)
+void property_integer::SetValue(System::Object ^ object)
 {
-	(*m_setter)				(safe_cast<int>(object));
+    (*m_setter)(safe_cast<int>(object));
 }

@@ -12,7 +12,7 @@ class CLibObject;
 class IBlender;
 class TProperties;
 
-class CShaderTool: public CToolCustom
+class CShaderTool : public CToolCustom
 {
     typedef CToolCustom inherited;
 
@@ -23,29 +23,28 @@ class CShaderTool: public CToolCustom
 
     enum
     {
-        flRefreshProps = (1ul<<0ul),
-        flRefreshList = (1ul<<1ul),
+        flRefreshProps = (1ul << 0ul),
+        flRefreshList = (1ul << 1ul),
     };
 
     Flags32 m_Flags;
 
     void PrepareLighting();
-public:
-    TItemList *m_Items;
-    TProperties *m_ItemProps;
-    TProperties *m_PreviewProps;
 
-    DEFINE_MAP(EToolsID, ISHTools *, ToolsMap, ToolsPairIt);
+  public:
+    TItemList* m_Items;
+    TProperties* m_ItemProps;
+    TProperties* m_PreviewProps;
+
+    DEFINE_MAP(EToolsID, ISHTools*, ToolsMap, ToolsPairIt);
     ToolsMap m_Tools;
-    ISHTools *m_Current;
+    ISHTools* m_Current;
 
-    ISHTools *Current()
-    {
-        return m_Current;
-    }
+    ISHTools* Current() { return m_Current; }
 
-    void __stdcall OnItemFocused(ListItemsVec &items);
-public:
+    void __stdcall OnItemFocused(ListItemsVec& items);
+
+  public:
     CShaderTool();
     virtual ~CShaderTool();
 
@@ -71,12 +70,9 @@ public:
     virtual void OnDeviceCreate();
     virtual void OnDeviceDestroy();
 
-    virtual void Clear()
-    {
-        inherited::Clear();
-    }
+    virtual void Clear() { inherited::Clear(); }
 
-    virtual void OnShowHint(AStringVec &SS);
+    virtual void OnShowHint(AStringVec& SS);
 
     virtual bool __fastcall MouseStart(TShiftState Shift)
     {
@@ -90,49 +86,38 @@ public:
         return false;
     }
 
-    virtual void __fastcall MouseMove(TShiftState Shift)
-    {
-        inherited::MouseMove(Shift);
-    }
+    virtual void __fastcall MouseMove(TShiftState Shift) { inherited::MouseMove(Shift); }
 
-    virtual bool Pick(TShiftState Shift)
-    {
-        return false;
-    }
+    virtual bool Pick(TShiftState Shift) { return false; }
 
-    virtual bool RayPick(const Fvector &start, const Fvector &dir, float &dist, Fvector *pt, Fvector *n);
+    virtual bool RayPick(const Fvector& start, const Fvector& dir, float& dist, Fvector* pt, Fvector* n);
 
     virtual void ShowProperties(LPCSTR focused_item);
 
     virtual void UpdateProperties(BOOL bForced = false)
     {
         m_Flags.set(flRefreshProps, TRUE);
-        if (bForced)
-            RealUpdateProperties();
+        if (bForced) RealUpdateProperties();
     }
 
-    virtual void RefreshProperties()
-    {
-        ;
-    }
+    virtual void RefreshProperties() { ; }
 
     virtual void UpdateList(bool bForced = false)
     {
         m_Flags.set(flRefreshList, TRUE);
-        if (bForced)
-            RealUpdateList();
+        if (bForced) RealUpdateList();
     }
 
-    virtual bool GetSelectionPosition(Fmatrix &result);
+    virtual bool GetSelectionPosition(Fmatrix& result);
 
     LPCSTR CurrentToolsName();
 
-    void OnChangeEditor(ISHTools *tools);
+    void OnChangeEditor(ISHTools* tools);
 
     void ApplyChanges();
 
-    ISHTools *FindTools(EToolsID id);
-    ISHTools *FindTools(TElTabSheet *sheet);
+    ISHTools* FindTools(EToolsID id);
+    ISHTools* FindTools(TElTabSheet* sheet);
 
     // commands
     CCommandVar CommandSave(CCommandVar p1, CCommandVar p2);
@@ -143,7 +128,6 @@ public:
     CCommandVar CommandUpdateList(CCommandVar p1, CCommandVar p2);
 };
 
-extern CShaderTool *&STools;
+extern CShaderTool*& STools;
 //---------------------------------------------------------------------------
 #endif
-

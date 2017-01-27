@@ -34,91 +34,87 @@
 
 namespace Wml
 {
-
 template <int N, class Real>
 class Matrix
 {
-public:
+  public:
     // Construction.  In the second constructor, if bZero is 'true', the
     // matrix is set to the zero matrix.  If bZero is 'false', the matrix
     // is set to the identity matrix.
-    Matrix ();
-    Matrix (bool bZero);
-    Matrix (const Matrix& rkM);
+    Matrix();
+    Matrix(bool bZero);
+    Matrix(const Matrix& rkM);
 
-    void MakeZero ();
-    void MakeIdentity ();
-    void MakeDiagonal (const Real* afDiag);
+    void MakeZero();
+    void MakeIdentity();
+    void MakeDiagonal(const Real* afDiag);
 
     // member access
-    operator const Real* () const;
-    operator Real* ();
-    const Real* operator[] (int iRow) const;
-    Real* operator[] (int iRow);
-    Real operator() (int iRow, int iCol) const;
-    Real& operator() (int iRow, int iCol);
-    void SetRow (int iRow, const Vector<N,Real>& rkV);
-    Vector<N,Real> GetRow (int iRow) const;
-    void SetColumn (int iCol, const Vector<N,Real>& rkV);
-    Vector<N,Real> GetColumn (int iCol) const;
-    void GetColumnMajor (Real* afCMajor) const;
+    operator const Real*() const;
+    operator Real*();
+    const Real* operator[](int iRow) const;
+    Real* operator[](int iRow);
+    Real operator()(int iRow, int iCol) const;
+    Real& operator()(int iRow, int iCol);
+    void SetRow(int iRow, const Vector<N, Real>& rkV);
+    Vector<N, Real> GetRow(int iRow) const;
+    void SetColumn(int iCol, const Vector<N, Real>& rkV);
+    Vector<N, Real> GetColumn(int iCol) const;
+    void GetColumnMajor(Real* afCMajor) const;
 
     // assignment
-    Matrix& operator= (const Matrix& rkM);
+    Matrix& operator=(const Matrix& rkM);
 
     // comparison
-    bool operator== (const Matrix& rkM) const;
-    bool operator!= (const Matrix& rkM) const;
-    bool operator<  (const Matrix& rkM) const;
-    bool operator<= (const Matrix& rkM) const;
-    bool operator>  (const Matrix& rkM) const;
-    bool operator>= (const Matrix& rkM) const;
+    bool operator==(const Matrix& rkM) const;
+    bool operator!=(const Matrix& rkM) const;
+    bool operator<(const Matrix& rkM) const;
+    bool operator<=(const Matrix& rkM) const;
+    bool operator>(const Matrix& rkM) const;
+    bool operator>=(const Matrix& rkM) const;
 
     // arithmetic operations
-    Matrix operator+ (const Matrix& rkM) const;
-    Matrix operator- (const Matrix& rkM) const;
-    Matrix operator* (const Matrix& rkM) const;
-    Matrix operator* (Real fScalar) const;
-    Matrix operator/ (Real fScalar) const;
-    Matrix operator- () const;
+    Matrix operator+(const Matrix& rkM) const;
+    Matrix operator-(const Matrix& rkM) const;
+    Matrix operator*(const Matrix& rkM) const;
+    Matrix operator*(Real fScalar) const;
+    Matrix operator/(Real fScalar) const;
+    Matrix operator-() const;
 
     // arithmetic updates
-    Matrix& operator+= (const Matrix& rkM);
-    Matrix& operator-= (const Matrix& rkM);
-    Matrix& operator*= (Real fScalar);
-    Matrix& operator/= (Real fScalar);
+    Matrix& operator+=(const Matrix& rkM);
+    Matrix& operator-=(const Matrix& rkM);
+    Matrix& operator*=(Real fScalar);
+    Matrix& operator/=(Real fScalar);
 
     // matrix products
-    Matrix Transpose () const;  // M^T
-    Matrix TransposeTimes (const Matrix& rkM) const;  // this^T * M
-    Matrix TimesTranspose (const Matrix& rkM) const;  // this * M^T
+    Matrix Transpose() const;                        // M^T
+    Matrix TransposeTimes(const Matrix& rkM) const;  // this^T * M
+    Matrix TimesTranspose(const Matrix& rkM) const;  // this * M^T
 
     // matrix-vector operations
-    Vector<N,Real> operator* (const Vector<N,Real>& rkV) const;  // M * v
-    Real QForm (const Vector<N,Real>& rkU, const Vector<N,Real>& rkV)
-        const;  // u^T*M*v
+    Vector<N, Real> operator*(const Vector<N, Real>& rkV) const;               // M * v
+    Real QForm(const Vector<N, Real>& rkU, const Vector<N, Real>& rkV) const;  // u^T*M*v
 
-protected:
+  protected:
     // for indexing into the 1D array of the matrix, iCol+N*iRow
-    static int I (int iRow, int iCol);
+    static int I(int iRow, int iCol);
 
     // support for comparisons
-    int CompareArrays (const Matrix& rkM) const;
+    int CompareArrays(const Matrix& rkM) const;
 
-    Real m_afEntry[N*N];
+    Real m_afEntry[N * N];
 };
 
 // c * M
 template <int N, class Real>
-Matrix<N,Real> operator* (Real fScalar, const Matrix<N,Real>& rkM);
+Matrix<N, Real> operator*(Real fScalar, const Matrix<N, Real>& rkM);
 
 // v^T * M
 template <int N, class Real>
-Vector<N,Real> operator* (const Vector<N,Real>& rkV,
-    const Matrix<N,Real>& rkM);
+Vector<N, Real> operator*(const Vector<N, Real>& rkV, const Matrix<N, Real>& rkM);
 
 #include "WmlMatrix.inl"
-
 }
 
 #endif

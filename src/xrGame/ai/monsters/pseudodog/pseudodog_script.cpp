@@ -6,28 +6,10 @@
 using namespace luabind;
 
 SCRIPT_EXPORT(CAI_PseudoDog, (CGameObject),
-{
-	module(luaState)
-	[
-		class_<CAI_PseudoDog,CGameObject>("CAI_PseudoDog")
-			.def(constructor<>())
-	];
-});
+    { module(luaState)[class_<CAI_PseudoDog, CGameObject>("CAI_PseudoDog").def(constructor<>())]; });
 
-SCRIPT_EXPORT(CPsyDog, (CGameObject),
-{
-	module(luaState)
-	[
-		class_<CPsyDog,CGameObject>("CPsyDog")
-		.def(constructor<>())
-	];
-});
+SCRIPT_EXPORT(
+    CPsyDog, (CGameObject), { module(luaState)[class_<CPsyDog, CGameObject>("CPsyDog").def(constructor<>())]; });
 
 SCRIPT_EXPORT(CPsyDogPhantom, (CGameObject),
-{
-	module(luaState)
-	[
-		class_<CPsyDogPhantom,CGameObject>("CPsyDogPhantom")
-		.def(constructor<>())
-	];
-});
+    { module(luaState)[class_<CPsyDogPhantom, CGameObject>("CPsyDogPhantom").def(constructor<>())]; });

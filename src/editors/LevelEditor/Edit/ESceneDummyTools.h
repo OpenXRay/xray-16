@@ -4,23 +4,19 @@
 
 #include "ESceneCustomOTools.h"
 
-class ESceneDummyTool: public ESceneCustomOTool
+class ESceneDummyTool : public ESceneCustomOTool
 {
     typedef ESceneCustomOTool inherited;
-protected:
+
+  protected:
     // controls
     virtual void CreateControls();
     virtual void RemoveControls();
-public:
-    ESceneDummyTool(): ESceneCustomOTool(OBJCLASS_DUMMY)
-    {
-        ;
-    }
 
-    virtual void Clear(bool bSpecific = false)
-    {
-        inherited::Clear(bSpecific);
-    }
+  public:
+    ESceneDummyTool() : ESceneCustomOTool(OBJCLASS_DUMMY) { ; }
+
+    virtual void Clear(bool bSpecific = false) { inherited::Clear(bSpecific); }
 
     // definition
     IC LPCSTR ClassName()
@@ -37,22 +33,16 @@ public:
 
     IC
 
-    int RenderPriority()
+        int
+        RenderPriority()
     {
         return -1;
     }
 
-    virtual bool IsNeedSave()
-    {
-        return false;
-    }
+    virtual bool IsNeedSave() { return false; }
 
-    virtual CCustomObject *CreateObject(LPVOID data, LPCSTR name)
-    {
-        return 0;
-    };
+    virtual CCustomObject* CreateObject(LPVOID data, LPCSTR name) { return 0; };
 };
 
 //---------------------------------------------------------------------------
 #endif
-

@@ -15,7 +15,6 @@
 
 namespace editor
 {
-
 class property_holder;
 class property_holder_collection;
 
@@ -23,7 +22,6 @@ namespace environment
 {
 namespace suns
 {
-
 class manager;
 
 class blend : private Noncopyable
@@ -38,12 +36,12 @@ private:
     float m_down_time;
     float m_rise_time;
     float m_time;
-}; // class blend
+};  // class blend
 
-} // namespace suns
-} // namespace environment
-} // namespace editor
+}  // namespace suns
+}  // namespace environment
+}  // namespace editor
 
-#endif // #ifdef INGAME_EDITOR
+#endif  // #ifdef INGAME_EDITOR
 
-#endif // ifndef EDITOR_WEATHER_SUNS_BLEND_HPP_INCLUDED
+#endif  // ifndef EDITOR_WEATHER_SUNS_BLEND_HPP_INCLUDED

@@ -7,21 +7,20 @@
 //---------------------------------------------------------------------------
 #pragma package(smart_init)
 #pragma resource "*.dfm"
-TNewEffectDialog *NewEffectDialog;
+TNewEffectDialog* NewEffectDialog;
 
 //---------------------------------------------------------------------------
-__fastcall TNewEffectDialog::TNewEffectDialog(TComponent *Owner)
-    : TForm(Owner) {}
-
-//---------------------------------------------------------------------------
-void __fastcall TNewEffectDialog::TimeChange(TObject *Sender)
+__fastcall TNewEffectDialog::TNewEffectDialog(TComponent* Owner) : TForm(Owner)
 {
-    if (Time->Value>0.0f)
+}
+
+//---------------------------------------------------------------------------
+void __fastcall TNewEffectDialog::TimeChange(TObject* Sender)
+{
+    if (Time->Value > 0.0f)
         Button1->Enabled = true;
     else
         Button1->Enabled = false;
 }
 
 //---------------------------------------------------------------------------
-
-

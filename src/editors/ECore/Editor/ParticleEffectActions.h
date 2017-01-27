@@ -6,14 +6,11 @@ struct PBool
 {
     BOOL val;
 
-    PBool(): val(FALSE) {}
+    PBool() : val(FALSE) {}
 
-    PBool(BOOL _val): val(_val) {}
+    PBool(BOOL _val) : val(_val) {}
 
-    void set(BOOL v)
-    {
-        val = v;
-    }
+    void set(BOOL v) { val = v; }
 };
 
 struct PFloat
@@ -29,12 +26,9 @@ struct PFloat
         mx = 0.f;
     }
 
-    PFloat(float _val, float _mn, float _mx): val(_val), mn(_mn), mx(_mx) {}
+    PFloat(float _val, float _mn, float _mx) : val(_val), mn(_mn), mx(_mx) {}
 
-    void set(float v)
-    {
-        val = v;
-    }
+    void set(float v) { val = v; }
 };
 
 struct PInt
@@ -50,12 +44,9 @@ struct PInt
         mx = 0;
     }
 
-    PInt(int _val, int _mn, int _mx): val(_val), mn(_mn), mx(_mx) {}
+    PInt(int _val, int _mn, int _mx) : val(_val), mn(_mn), mx(_mx) {}
 
-    void set(int v)
-    {
-        val = v;
-    }
+    void set(int v) { val = v; }
 };
 
 struct PVector
@@ -81,22 +72,16 @@ struct PVector
         mx = 0.f;
     }
 
-    PVector(EType t, Fvector _val, float _mn, float _mx): type(t), val(_val), mn(_mn), mx(_mx) {}
+    PVector(EType t, Fvector _val, float _mn, float _mx) : type(t), val(_val), mn(_mn), mx(_mx) {}
 
-    void set(const Fvector &v)
-    {
-        val.set(v);
-    }
+    void set(const Fvector& v) { val.set(v); }
 
-    void set(float x, float y, float z)
-    {
-        val.set(x, y, z);
-    }
+    void set(float x, float y, float z) { val.set(x, y, z); }
 };
 
 struct PDomain
 {
-public:
+  public:
     PAPI::PDomainEnum type;
 
     union
@@ -115,38 +100,39 @@ public:
 
     enum
     {
-        flRenderable = (1<<0)
+        flRenderable = (1 << 0)
     };
 
     EType e_type;
     Flags32 flags;
     u32 clr;
-protected:
-    void __stdcall PDomain::OnTypeChange(PropValue *sender);
-public:
+
+  protected:
+    void __stdcall PDomain::OnTypeChange(PropValue* sender);
+
+  public:
     PDomain() {}
 
     PDomain(EType et, BOOL renderable, u32 color = 0x00000000, PAPI::PDomainEnum type = PAPI::PDPoint,
-        float inA0 = 0.0f, float inA1 = 0.0f, float inA2 = 0.0f,
-        float inA3 = 0.0f, float inA4 = 0.0f, float inA5 = 0.0f,
-        float inA6 = 0.0f, float inA7 = 0.0f, float inA8 = 0.0f);
+        float inA0 = 0.0f, float inA1 = 0.0f, float inA2 = 0.0f, float inA3 = 0.0f, float inA4 = 0.0f,
+        float inA5 = 0.0f, float inA6 = 0.0f, float inA7 = 0.0f, float inA8 = 0.0f);
     ~PDomain();
-    PDomain(const PDomain &in);
+    PDomain(const PDomain& in);
 
     void MoveXYZ(float x, float y, float z);
     void RotateXYZ(float x, float y, float z);
     void ScaleXYZ(float x, float y, float z);
 
-    Fvector &GetCenter();
+    Fvector& GetCenter();
 
-    void Load(IReader &F);
-    void Save(IWriter &F);
+    void Load(IReader& F);
+    void Save(IWriter& F);
 
-    void Load2(CInifile &ini, const shared_str &sect);
-    void Save2(CInifile &ini, const shared_str &sect);
+    void Load2(CInifile& ini, const shared_str& sect);
+    void Save2(CInifile& ini, const shared_str& sect);
 
-    void Render(u32 color, const Fmatrix &parent);
-    void FillProp(PropItemVec &items, LPCSTR pref, u32 clr);
+    void Render(u32 color, const Fmatrix& parent);
+    void FillProp(PropItemVec& items, LPCSTR pref, u32 clr);
 };
 
 struct EParticleAction
@@ -163,8 +149,8 @@ struct EParticleAction
 
     enum
     {
-        flEnabled = (1<<0),
-        flDraw = (1<<1),
+        flEnabled = (1 << 0),
+        flDraw = (1 << 1),
     };
 
     Flags32 flags;
@@ -190,7 +176,7 @@ struct EParticleAction
         EValType type;
         AnsiString name;
 
-        SOrder(EValType _type, AnsiString _name): type(_type), name(_name) {}
+        SOrder(EValType _type, AnsiString _name) : type(_type), name(_name) {}
     };
 
     DEFINE_VECTOR(SOrder, OrderVec, OrderVecIt);
@@ -202,252 +188,254 @@ struct EParticleAction
         type = _type;
     }
 
-public:
+  public:
     void appendFloat(LPCSTR name, float v, float mn, float mx);
     void appendInt(LPCSTR name, int v, int mn = -P_MAXINT, int mx = P_MAXINT);
-    void appendVector(LPCSTR name, PVector::EType type, float vx, float vy, float vz, float mn = -P_MAXFLOAT, float mx = P_MAXFLOAT);
+    void appendVector(
+        LPCSTR name, PVector::EType type, float vx, float vy, float vz, float mn = -P_MAXFLOAT, float mx = P_MAXFLOAT);
     void appendDomain(LPCSTR name, PDomain v);
     void appendBool(LPCSTR name, BOOL b);
 
-    PFloat &_float(LPCSTR name)
+    PFloat& _float(LPCSTR name)
     {
         PFloatMapIt it = floats.find(name);
-        R_ASSERT2(it!=floats.end(), name);
+        R_ASSERT2(it != floats.end(), name);
         return it->second;
     }
 
-    PInt &_int(LPCSTR name)
+    PInt& _int(LPCSTR name)
     {
         PIntMapIt it = ints.find(name);
-        R_ASSERT2(it!=ints.end(), name);
+        R_ASSERT2(it != ints.end(), name);
         return it->second;
     }
 
-    PVector &_vector(LPCSTR name)
+    PVector& _vector(LPCSTR name)
     {
         PVectorMapIt it = vectors.find(name);
-        R_ASSERT2(it!=vectors.end(), name);
+        R_ASSERT2(it != vectors.end(), name);
         return it->second;
     }
 
-    PDomain &_domain(LPCSTR name)
+    PDomain& _domain(LPCSTR name)
     {
         PDomainMapIt it = domains.find(name);
-        R_ASSERT2(it!=domains.end(), name);
+        R_ASSERT2(it != domains.end(), name);
         return it->second;
     }
 
-    PBool &_bool(LPCSTR name)
+    PBool& _bool(LPCSTR name)
     {
         PBoolMapIt it = bools.find(name);
-        R_ASSERT2(it!=bools.end(), name);
+        R_ASSERT2(it != bools.end(), name);
         return it->second;
     }
 
-    PBool *_bool_safe(LPCSTR name)
+    PBool* _bool_safe(LPCSTR name)
     {
         PBoolMapIt it = bools.find(name);
-        return (it!=bools.end()) ? &it->second : 0;
+        return (it != bools.end()) ? &it->second : 0;
     }
 
-public:
-    virtual void Compile(IWriter &F) =0;
-    virtual void FillProp(PropItemVec &items, LPCSTR pref, u32 clr);
+  public:
+    virtual void Compile(IWriter& F) = 0;
+    virtual void FillProp(PropItemVec& items, LPCSTR pref, u32 clr);
 
-    virtual void Load(IReader &F);
-    virtual void Save(IWriter &F);
-    virtual void Load2(CInifile &ini, const shared_str &sect);
-    virtual void Save2(CInifile &ini, const shared_str &sect);
-    virtual void Render(const Fmatrix &parent);
+    virtual void Load(IReader& F);
+    virtual void Save(IWriter& F);
+    virtual void Load2(CInifile& ini, const shared_str& sect);
+    virtual void Save2(CInifile& ini, const shared_str& sect);
+    virtual void Render(const Fmatrix& parent);
 };
 
 struct EPAAvoid : public EParticleAction
 {
     EPAAvoid();
-    virtual void Compile(IWriter &F);
+    virtual void Compile(IWriter& F);
 };
 
 struct EPABounce : public EParticleAction
 {
     EPABounce();
-    virtual void Compile(IWriter &F);
+    virtual void Compile(IWriter& F);
 };
 
 struct EPACopyVertexB : public EParticleAction
 {
     EPACopyVertexB();
-    virtual void Compile(IWriter &F);
+    virtual void Compile(IWriter& F);
 };
 
 struct EPADamping : public EParticleAction
 {
     EPADamping();
-    virtual void Compile(IWriter &F);
+    virtual void Compile(IWriter& F);
 };
 
 struct EPAExplosion : public EParticleAction
 {
     EPAExplosion();
-    virtual void Compile(IWriter &F);
+    virtual void Compile(IWriter& F);
 };
 
 struct EPAFollow : public EParticleAction
 {
     EPAFollow();
-    virtual void Compile(IWriter &F);
+    virtual void Compile(IWriter& F);
 };
 
 struct EPAGravitate : public EParticleAction
 {
     EPAGravitate();
-    virtual void Compile(IWriter &F);
+    virtual void Compile(IWriter& F);
 };
 
 struct EPAGravity : public EParticleAction
 {
     EPAGravity();
-    virtual void Compile(IWriter &F);
+    virtual void Compile(IWriter& F);
 };
 
 struct EPAJet : public EParticleAction
 {
     EPAJet();
-    virtual void Compile(IWriter &F);
-    virtual void Render(const Fmatrix &parent);
+    virtual void Compile(IWriter& F);
+    virtual void Render(const Fmatrix& parent);
 };
 
 struct EPAKillOld : public EParticleAction
 {
     EPAKillOld();
-    virtual void Compile(IWriter &F);
+    virtual void Compile(IWriter& F);
 };
 
 struct EPAMatchVelocity : public EParticleAction
 {
     EPAMatchVelocity();
-    virtual void Compile(IWriter &F);
+    virtual void Compile(IWriter& F);
 };
 
 struct EPAMove : public EParticleAction
 {
     EPAMove();
-    virtual void Compile(IWriter &F);
+    virtual void Compile(IWriter& F);
 };
 
 struct EPAOrbitLine : public EParticleAction
 {
     EPAOrbitLine();
-    virtual void Compile(IWriter &F);
-    virtual void Render(const Fmatrix &parent);
+    virtual void Compile(IWriter& F);
+    virtual void Render(const Fmatrix& parent);
 };
 
 struct EPAOrbitPoint : public EParticleAction
 {
     EPAOrbitPoint();
-    virtual void Compile(IWriter &F);
-    virtual void Render(const Fmatrix &parent);
+    virtual void Compile(IWriter& F);
+    virtual void Render(const Fmatrix& parent);
 };
 
 struct EPARandomAccel : public EParticleAction
 {
     EPARandomAccel();
-    virtual void Compile(IWriter &F);
+    virtual void Compile(IWriter& F);
 };
 
 struct EPARandomDisplace : public EParticleAction
 {
     EPARandomDisplace();
-    virtual void Compile(IWriter &F);
+    virtual void Compile(IWriter& F);
 };
 
 struct EPARandomVelocity : public EParticleAction
 {
     EPARandomVelocity();
-    virtual void Compile(IWriter &F);
+    virtual void Compile(IWriter& F);
 };
 
 struct EPARestore : public EParticleAction
 {
     EPARestore();
-    virtual void Compile(IWriter &F);
+    virtual void Compile(IWriter& F);
 };
 
 struct EPAScatter : public EParticleAction
 {
     EPAScatter();
-    virtual void Compile(IWriter &F);
-    virtual void Render(const Fmatrix &parent);
+    virtual void Compile(IWriter& F);
+    virtual void Render(const Fmatrix& parent);
 };
 
 struct EPASink : public EParticleAction
 {
     EPASink();
-    virtual void Compile(IWriter &F);
+    virtual void Compile(IWriter& F);
 };
 
 struct EPASinkVelocity : public EParticleAction
 {
     EPASinkVelocity();
-    virtual void Compile(IWriter &F);
+    virtual void Compile(IWriter& F);
 };
 
 struct EPASpeedLimit : public EParticleAction
 {
     EPASpeedLimit();
-    virtual void Compile(IWriter &F);
+    virtual void Compile(IWriter& F);
 };
 
 struct EPASource : public EParticleAction
 {
     EPASource();
-    virtual void Compile(IWriter &F);
+    virtual void Compile(IWriter& F);
 };
 
 struct EPATargetColor : public EParticleAction
 {
     EPATargetColor();
-    virtual void Compile(IWriter &F);
+    virtual void Compile(IWriter& F);
 };
 
 struct EPATargetSize : public EParticleAction
 {
     EPATargetSize();
-    virtual void Compile(IWriter &F);
+    virtual void Compile(IWriter& F);
 };
 
 struct EPATargetRotate : public EParticleAction
 {
     EPATargetRotate();
-    virtual void Compile(IWriter &F);
+    virtual void Compile(IWriter& F);
 };
 
 struct EPATargetVelocity : public EParticleAction
 {
     EPATargetVelocity();
-    virtual void Compile(IWriter &F);
+    virtual void Compile(IWriter& F);
 };
 
 struct EPAVortex : public EParticleAction
 {
     EPAVortex();
-    virtual void Compile(IWriter &F);
-    virtual void Render(const Fmatrix &parent);
+    virtual void Compile(IWriter& F);
+    virtual void Render(const Fmatrix& parent);
 };
 
 struct EPATurbulence : public EParticleAction
 {
-    float ***nval;
+    float*** nval;
     float age;
-public:
+
+  public:
     EPATurbulence();
 
-    virtual void Compile(IWriter &F);
-    virtual void Render(const Fmatrix &parent);
+    virtual void Compile(IWriter& F);
+    virtual void Render(const Fmatrix& parent);
 };
 
 extern xr_token2 actions_token[];
 
-typedef EParticleAction * (*_CreateEAction)(PAPI::PActionEnum type);
+typedef EParticleAction* (*_CreateEAction)(PAPI::PActionEnum type);
 extern ECORE_API _CreateEAction pCreateEAction;
 //---------------------------------------------------------------------------
 #endif
@@ -463,4 +451,3 @@ extern ECORE_API _CreateEAction pCreateEAction;
 
 }
 */
-

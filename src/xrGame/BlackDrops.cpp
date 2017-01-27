@@ -7,16 +7,15 @@
 #include "BlackDrops.h"
 #include "xrPhysics/PhysicsShell.h"
 
-
 CBlackDrops::CBlackDrops(void)
 {
 }
 
-CBlackDrops::~CBlackDrops(void) 
+CBlackDrops::~CBlackDrops(void)
 {
 }
 
-void CBlackDrops::Load(LPCSTR section) 
+void CBlackDrops::Load(LPCSTR section)
 {
-	inherited::Load(section);
+    inherited::Load(section);
 }

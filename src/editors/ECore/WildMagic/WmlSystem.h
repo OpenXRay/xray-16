@@ -45,47 +45,43 @@
 
 namespace Wml
 {
-
 class WML_ITEM System
 {
-public:
+  public:
     // little/big endian support
-    static void SwapBytes (int iSize, void* pvValue);
-    static void SwapBytes (int iSize, int iQuantity, void* pvValue);
-    static void EndianCopy (int iSize, const void* pvSrc, void* pvDst);
-    static void EndianCopy (int iSize, int iQuantity, const void* pvSrc,
-        void* pvDst);
+    static void SwapBytes(int iSize, void* pvValue);
+    static void SwapBytes(int iSize, int iQuantity, void* pvValue);
+    static void EndianCopy(int iSize, const void* pvSrc, void* pvDst);
+    static void EndianCopy(int iSize, int iQuantity, const void* pvSrc, void* pvDst);
 
-    static unsigned int MakeRGB (unsigned char ucR, unsigned char ucG,
-        unsigned char ucB);
+    static unsigned int MakeRGB(unsigned char ucR, unsigned char ucG, unsigned char ucB);
 
-    static unsigned int MakeRGBA (unsigned char ucR, unsigned char ucG,
-        unsigned char ucB, unsigned char ucA);
+    static unsigned int MakeRGBA(unsigned char ucR, unsigned char ucG, unsigned char ucB, unsigned char ucA);
 
     // time utilities
-    static double GetTime ();
+    static double GetTime();
 
     // TO DO.  Pathname handling to access files in subdirectories.
-    static bool FileExists (const char* acFilename);
+    static bool FileExists(const char* acFilename);
 
     // convenient utilities
-    static bool IsPowerOfTwo (int iValue);
+    static bool IsPowerOfTwo(int iValue);
 };
 
 // allocation and deallocation of 2D arrays
-template <class T> void Allocate2D (int iCols, int iRows, T**& raatArray);
-template <class T> void Deallocate2D (T** aatArray);
+template <class T>
+void Allocate2D(int iCols, int iRows, T**& raatArray);
+template <class T>
+void Deallocate2D(T** aatArray);
 
 // allocation and deallocation of 3D arrays
-template <class T> void Allocate3D (int iCols, int iRows, int iSlices,
-    T***& raaatArray);
-template <class T> void Deallocate3D (int iRows, int iSlices,
-    T*** aaatArray);
+template <class T>
+void Allocate3D(int iCols, int iRows, int iSlices, T***& raaatArray);
+template <class T>
+void Deallocate3D(int iRows, int iSlices, T*** aaatArray);
 
 #include "WmlSystem.inl"
 #include "WmlSystem.mcr"
-
 }
 
 #endif
-

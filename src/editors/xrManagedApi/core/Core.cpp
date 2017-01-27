@@ -9,21 +9,18 @@ namespace ManagedApi
 {
 namespace Core
 {
-
 static void LogCallbackWrapper(void* context, const char* msg)
 {
-    if (!Core::ManagedLogCallback)
-        return;
-    String^ tmpMsg = msg ? gcnew String(msg) : nullptr;
+    if (!Core::ManagedLogCallback) return;
+    String ^ tmpMsg = msg ? gcnew String(msg) : nullptr;
     Core::ManagedLogCallback(tmpMsg);
 }
 
-void Core::Initialize(String^ appName, LogCallback^ logCallback, bool initFs, String^ fsFileName)
+void Core::Initialize(String ^ appName, LogCallback ^ logCallback, bool initFs, String ^ fsFileName)
 {
     ManagedLogCallback = logCallback;
     std::string appNameC = msclr::interop::marshal_as<std::string>(appName);
-    if (fsFileName)
-    {
+    if (fsFileName) {
         std::string fsFileNameC = msclr::interop::marshal_as<std::string>(fsFileName);
         ::Core._initialize(appNameC.c_str(), ::LogCallback(LogCallbackWrapper, nullptr), initFs, fsFileNameC.c_str());
     }
@@ -31,17 +28,17 @@ void Core::Initialize(String^ appName, LogCallback^ logCallback, bool initFs, St
         ::Core._initialize(appNameC.c_str(), ::LogCallback(LogCallbackWrapper, nullptr), initFs, nullptr);
 }
 
-void Core::Initialize(String^ appName, LogCallback^ logCallback, bool initFs)
+void Core::Initialize(String ^ appName, LogCallback ^ logCallback, bool initFs)
 {
     Core::Initialize(appName, logCallback, initFs, nullptr);
 }
 
-void Core::Initialize(String^ appName, LogCallback^ logCallback)
+void Core::Initialize(String ^ appName, LogCallback ^ logCallback)
 {
     Core::Initialize(appName, logCallback, false, nullptr);
 }
 
-void Core::Initialize(String^ appName)
+void Core::Initialize(String ^ appName)
 {
     Core::Initialize(appName, nullptr, false, nullptr);
 }
@@ -50,7 +47,6 @@ void Core::Destroy()
 {
     ::Core._destroy();
 }
-
 }
 }
 }

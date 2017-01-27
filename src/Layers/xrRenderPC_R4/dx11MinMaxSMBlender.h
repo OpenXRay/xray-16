@@ -1,15 +1,14 @@
-#ifndef	dx11MinMaxSMBlender_included
-#define	dx11MinMaxSMBlender_included
+#ifndef dx11MinMaxSMBlender_included
+#define dx11MinMaxSMBlender_included
 
-
-class CBlender_createminmax	: public IBlender  
+class CBlender_createminmax : public IBlender
 {
 public:
-	virtual		LPCSTR		getComment()	{ return "INTERNAL: DX10 minmax sm blender";	}
-	virtual		BOOL		canBeDetailed()	{ return FALSE;	}
-	virtual		BOOL		canBeLMAPped()	{ return FALSE;	}
+    virtual LPCSTR getComment() { return "INTERNAL: DX10 minmax sm blender"; }
+    virtual BOOL canBeDetailed() { return FALSE; }
+    virtual BOOL canBeLMAPped() { return FALSE; }
 
-	virtual		void		Compile			(CBlender_Compile& C);
+    virtual void Compile(CBlender_Compile& C);
 };
 
 #endif

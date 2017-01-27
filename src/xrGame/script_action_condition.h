@@ -10,29 +10,31 @@
 
 #include "alife_space.h"
 
-class CScriptActionCondition {
+class CScriptActionCondition
+{
 public:
-	enum EActionFlags {
-		MOVEMENT_FLAG	= u32(1 << 0),
-		WATCH_FLAG		= u32(1 << 1),
-		ANIMATION_FLAG	= u32(1 << 2),
-		SOUND_FLAG		= u32(1 << 3),
-		PARTICLE_FLAG	= u32(1 << 4),
-		OBJECT_FLAG		= u32(1 << 5),
-		TIME_FLAG		= u32(1 << 6),
-		ACT_FLAG		= u32(1 << 7)
-	};
+    enum EActionFlags
+    {
+        MOVEMENT_FLAG = u32(1 << 0),
+        WATCH_FLAG = u32(1 << 1),
+        ANIMATION_FLAG = u32(1 << 2),
+        SOUND_FLAG = u32(1 << 3),
+        PARTICLE_FLAG = u32(1 << 4),
+        OBJECT_FLAG = u32(1 << 5),
+        TIME_FLAG = u32(1 << 6),
+        ACT_FLAG = u32(1 << 7)
+    };
 
 public:
-	u32					m_dwFlags;
-	ALife::_TIME_ID		m_tLifeTime;
-	ALife::_TIME_ID		m_tStartTime;
+    u32 m_dwFlags;
+    ALife::_TIME_ID m_tLifeTime;
+    ALife::_TIME_ID m_tStartTime;
 
 public:
-	IC					CScriptActionCondition	();
-	IC					CScriptActionCondition	(u32 dwFlags, double dTime = -1);
-	virtual				~CScriptActionCondition	();
-	IC		void		initialize				();
+    IC CScriptActionCondition();
+    IC CScriptActionCondition(u32 dwFlags, double dTime = -1);
+    virtual ~CScriptActionCondition();
+    IC void initialize();
 };
 
 #include "script_action_condition_inline.h"

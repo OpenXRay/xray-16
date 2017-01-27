@@ -18,27 +18,27 @@
 //---------------------------------------------------------------------------
 class TForm7 : public TForm
 {
-    __published: // IDE-managed Components
-    TPanel*Panel1;
-    TMultiObjSpinEdit *WorkTime;
-    TPanel *ColorPanel;
-    TSpeedButton *AddButton;
-    TSpeedButton *DeleteButton;
-    TColorDialog *ColorDialog;
-    TImageList *ImageList;
-    void __fastcall ColorPanelClick(TObject *Sender);
-    void __fastcall LinearFuncButtonClick(TObject *Sender);
-private: // User declarations
-public: // User declarations
+    __published :  // IDE-managed Components
+                   TPanel* Panel1;
+    TMultiObjSpinEdit* WorkTime;
+    TPanel* ColorPanel;
+    TSpeedButton* AddButton;
+    TSpeedButton* DeleteButton;
+    TColorDialog* ColorDialog;
+    TImageList* ImageList;
+    void __fastcall ColorPanelClick(TObject* Sender);
+    void __fastcall LinearFuncButtonClick(TObject* Sender);
+
+  private:  // User declarations
+  public:   // User declarations
     int m_iFunction;
     float tr, cr, br;
     float tg, cg, bg;
     float tb, cb, bb;
-    __fastcall TForm7(TComponent *Owner);
+    __fastcall TForm7(TComponent* Owner);
 };
 
 //---------------------------------------------------------------------------
-extern PACKAGE TForm7 * Form7;
+extern PACKAGE TForm7* Form7;
 //---------------------------------------------------------------------------
 #endif
-

@@ -16,44 +16,50 @@
 //////////////////////////////////////////////////////////////////////////
 struct SArticleData : CSharedResource
 {
-	shared_str name;
-	shared_str group;
-	
-	//картинка
-	CUIStatic image;
+    shared_str name;
+    shared_str group;
 
-	//текст статьи
-	xr_string	text;
-	
-	//секция ltx, откуда читать данные
-//	shared_str ltx;
+    //картинка
+    CUIStatic image;
 
-	// Тип статьи
-	ARTICLE_DATA::EArticleType	articleType;
-	shared_str					ui_template_name;
+    //текст статьи
+    xr_string text;
+
+    //секция ltx, откуда читать данные
+    //	shared_str ltx;
+
+    // Тип статьи
+    ARTICLE_DATA::EArticleType articleType;
+    shared_str ui_template_name;
 };
 
 class CEncyclopediaArticle;
 
-class CEncyclopediaArticle : public CSharedClass<SArticleData, shared_str, false>
-							,public CXML_IdToIndex<CEncyclopediaArticle>
+class CEncyclopediaArticle : public CSharedClass<SArticleData, shared_str, false>,
+                             public CXML_IdToIndex<CEncyclopediaArticle>
 {
 private:
-	typedef CSharedClass<SArticleData, shared_str, false>					inherited_shared;
-	typedef CXML_IdToIndex<CEncyclopediaArticle>							id_to_index;
+    typedef CSharedClass<SArticleData, shared_str, false> inherited_shared;
+    typedef CXML_IdToIndex<CEncyclopediaArticle> id_to_index;
 
-	friend id_to_index;
+    friend id_to_index;
+
 public:
-						CEncyclopediaArticle		();
-	virtual				~CEncyclopediaArticle		();
+    CEncyclopediaArticle();
+    virtual ~CEncyclopediaArticle();
 
-	virtual void Load	(shared_str str_id);
+    virtual void Load(shared_str str_id);
 
 protected:
-	shared_str			m_ArticleId;
-	virtual	void		load_shared					(LPCSTR);
-	static  void		InitXmlIdToIndex			();
+    shared_str m_ArticleId;
+    virtual void load_shared(LPCSTR);
+    static void InitXmlIdToIndex();
+
 public:
-	const shared_str	Id							()						{return m_ArticleId;}
-	SArticleData*		data						()						{ VERIFY(inherited_shared::get_sd()); return inherited_shared::get_sd();}
+    const shared_str Id() { return m_ArticleId; }
+    SArticleData* data()
+    {
+        VERIFY(inherited_shared::get_sd());
+        return inherited_shared::get_sd();
+    }
 };

@@ -15,27 +15,25 @@
 
 namespace Wml
 {
-
 template <class Real>
 class WML_ITEM MinimizeN
 {
-public:
-    typedef Real (*Function)(const Real*,void*);
+  public:
+    typedef Real (*Function)(const Real*, void*);
 
-    MinimizeN (int iDimensions, Function oFunction, int iMaxLevel,
-        int iMaxBracket, int iMaxIterations, void* pvData = 0);
+    MinimizeN(
+        int iDimensions, Function oFunction, int iMaxLevel, int iMaxBracket, int iMaxIterations, void* pvData = 0);
 
-    ~MinimizeN ();
+    ~MinimizeN();
 
-    int& MaxLevel ();
-    int& MaxBracket ();
-    void*& UserData ();
+    int& MaxLevel();
+    int& MaxBracket();
+    void*& UserData();
 
     // find minimum on Cartesian-product domain
-    void GetMinimum (const Real* afT0, const Real* afT1,
-        const Real* afTInitial, Real* afTMin, Real& rfFMin);
+    void GetMinimum(const Real* afT0, const Real* afT1, const Real* afTInitial, Real* afTMin, Real& rfFMin);
 
-protected:
+  protected:
     int m_iDimensions;
     Function m_oFunction;
     int m_iMaxIterations;
@@ -50,15 +48,13 @@ protected:
     Real m_fFCurr;
     Real* m_afLineArg;
 
-    void ComputeDomain (const Real* afT0, const Real* afT1, Real& rfL0,
-        Real& rfL1);
+    void ComputeDomain(const Real* afT0, const Real* afT1, Real& rfL0, Real& rfL1);
 
-    static Real LineFunction (Real fT, void* pvData);
+    static Real LineFunction(Real fT, void* pvData);
 };
 
 typedef MinimizeN<float> MinimizeNf;
 typedef MinimizeN<double> MinimizeNd;
-
 }
 
 #endif

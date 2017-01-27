@@ -6,21 +6,22 @@
 #define LibraryH
 
 #include "pure.h"
-#include "editors/xrEProps/FolderLib.h" 
+#include "editors/xrEProps/FolderLib.h"
 //----------------------------------------------------
 class CEditableObject;
 
-DEFINE_MAP_PRED(AnsiString, CEditableObject *, EditObjMap, EditObjPairIt, astr_pred);
+DEFINE_MAP_PRED(AnsiString, CEditableObject*, EditObjMap, EditObjPairIt, astr_pred);
 //----------------------------------------------------
-class ECORE_API ELibrary//:	public pureDeviceCreate, public pureDeviceDestroy
+class ECORE_API ELibrary  //:	public pureDeviceCreate, public pureDeviceDestroy
 {
     bool m_bReady;
     friendclass TfrmChoseObject;
     EditObjMap m_EditObjects;
 
-    CEditableObject*LoadEditObject(LPCSTR full_name);
+    CEditableObject* LoadEditObject(LPCSTR full_name);
     void UnloadEditObject(LPCSTR full_name);
-    public:
+
+  public:
     ELibrary();
     virtual ~ELibrary();
 
@@ -29,17 +30,17 @@ class ECORE_API ELibrary//:	public pureDeviceCreate, public pureDeviceDestroy
 
     void OnCreate();
     void OnDestroy();
-    void Save(FS_FileSet*modif_map = 0);
+    void Save(FS_FileSet* modif_map = 0);
 
     void ReloadObjects();
     void CleanLibrary();
     void ReloadObject(LPCSTR name);
 
-    CEditableObject*CreateEditObject(LPCSTR name);
+    CEditableObject* CreateEditObject(LPCSTR name);
     void RemoveEditObject(CEditableObject*& object);
 
-    int GetObjects(FS_FileSet&files);
-    int ObjectCount(){return m_EditObjects.size();}
+    int GetObjects(FS_FileSet& files);
+    int ObjectCount() { return m_EditObjects.size(); }
 
     void EvictObjects();
 
@@ -50,4 +51,3 @@ class ECORE_API ELibrary//:	public pureDeviceCreate, public pureDeviceDestroy
 extern ECORE_API ELibrary Lib;
 //----------------------------------------------------
 #endif /*_INCDEF_Library_H_*/
-

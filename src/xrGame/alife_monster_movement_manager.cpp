@@ -13,64 +13,63 @@
 #include "Common/object_broker.h"
 #include "movement_manager_space.h"
 
-CALifeMonsterMovementManager::CALifeMonsterMovementManager	(object_type *object)
+CALifeMonsterMovementManager::CALifeMonsterMovementManager(object_type* object)
 {
-	VERIFY			(object);
-	m_object		= object;
-	m_detail		= new detail_path_type(object);
-	m_patrol		= new patrol_path_type(object);
-	m_path_type		= MovementManager::ePathTypeNoPath;
+    VERIFY(object);
+    m_object = object;
+    m_detail = new detail_path_type(object);
+    m_patrol = new patrol_path_type(object);
+    m_path_type = MovementManager::ePathTypeNoPath;
 }
 
-CALifeMonsterMovementManager::~CALifeMonsterMovementManager	()
+CALifeMonsterMovementManager::~CALifeMonsterMovementManager()
 {
-	delete_data		(m_detail);
-	delete_data		(m_patrol);
+    delete_data(m_detail);
+    delete_data(m_patrol);
 }
 
-bool CALifeMonsterMovementManager::completed				() const
+bool CALifeMonsterMovementManager::completed() const
 {
-	return			(true);
+    return (true);
 }
 
-bool CALifeMonsterMovementManager::actual					() const
+bool CALifeMonsterMovementManager::actual() const
 {
-	return			(true);
+    return (true);
 }
 
-void CALifeMonsterMovementManager::update					()
+void CALifeMonsterMovementManager::update()
 {
-	switch (path_type()) {
-		case MovementManager::ePathTypeGamePath : {
-			detail().update	();
-			break;
-		};
-		case MovementManager::ePathTypePatrolPath : {
-			patrol().update	();
+    switch (path_type())
+    {
+    case MovementManager::ePathTypeGamePath:
+    {
+        detail().update();
+        break;
+    };
+    case MovementManager::ePathTypePatrolPath:
+    {
+        patrol().update();
 
-			detail().target	(
-				patrol().target_game_vertex_id(),
-				patrol().target_level_vertex_id(),
-				patrol().target_position()
-			);
+        detail().target(
+            patrol().target_game_vertex_id(), patrol().target_level_vertex_id(), patrol().target_position());
 
-			detail().update	();
+        detail().update();
 
-			break;
-		};
-		case MovementManager::ePathTypeNoPath : {
-			break;
-		};
-		default : NODEFAULT;
-	};
+        break;
+    };
+    case MovementManager::ePathTypeNoPath: { break;
+    };
+    default: NODEFAULT;
+    };
 }
 
-void CALifeMonsterMovementManager::on_switch_online		()
+void CALifeMonsterMovementManager::on_switch_online()
 {
-	detail().on_switch_online	();
+    detail().on_switch_online();
 }
 
-void CALifeMonsterMovementManager::on_switch_offline	()
+void CALifeMonsterMovementManager::on_switch_offline()
 {
-	detail().on_switch_offline	();
+    detail().on_switch_offline();
 }

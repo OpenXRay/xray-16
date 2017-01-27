@@ -19,17 +19,13 @@
 using editor::environment::thunderbolts::thunderbolt;
 using editor::environment::thunderbolts::manager;
 
-thunderbolt::thunderbolt(manager* manager, shared_str const& id) :
-    m_manager(*manager),
-    m_id(id),
-    m_property_holder(0)
+thunderbolt::thunderbolt(manager* manager, shared_str const& id) : m_manager(*manager), m_id(id), m_property_holder(0)
 {
 }
 
 thunderbolt::~thunderbolt()
 {
-    if (!Device.editor())
-        return;
+    if (!Device.editor()) return;
 
     ::ide().destroy(m_property_holder);
 }
@@ -75,16 +71,12 @@ LPCSTR thunderbolt::id_getter() const
 void thunderbolt::id_setter(LPCSTR value_)
 {
     shared_str value = value_;
-    if (m_id._get() == value._get())
-        return;
+    if (m_id._get() == value._get()) return;
 
     m_id = m_manager.unique_thunderbolt_id(value);
 }
 
-void thunderbolt::fill(
-    ::editor::environment::manager& environment,
-    ::editor::property_holder_collection* collection
-)
+void thunderbolt::fill(::editor::environment::manager& environment, ::editor::property_holder_collection* collection)
 {
     VERIFY(!m_property_holder);
     m_property_holder = ::ide().create_property_holder(m_id.c_str(), collection, this);
@@ -98,63 +90,22 @@ void thunderbolt::fill(
     string_setter.bind(this, &thunderbolt::id_setter);
 
     m_property_holder->add_property(
-        "id",
-        "properties",
-        "this option is resposible for thunderbolt id",
-        m_id.c_str(),
-        string_getter,
-        string_setter
-    );
-    m_property_holder->add_property(
-        "color animator",
-        "properties",
-        "this option is resposible for thunderbolt color animator",
-        m_color_animator.c_str(),
-        m_color_animator,
-        &*environment.light_animator_ids().begin(),
-        environment.light_animator_ids().size(),
-        editor::property_holder::value_editor_tree_view,
-        editor::property_holder::cannot_enter_text
-    );
-    m_property_holder->add_property(
-        "lighting model",
-        "properties",
-        "this option is resposible for thunderbolt lighting model",
-        m_lighting_model.c_str(),
-        m_lighting_model,
-        ".dm",
-        "Lighting model files (*.dm)|*.dm",
-        detail::real_path("$game_meshes$", "").c_str(),
-        "Select lighting model...",
-        editor::property_holder::cannot_enter_text,
-        editor::property_holder::keep_extension
-    );
-    m_property_holder->add_property(
-        "sound",
-        "properties",
-        "this option is resposible for thunderbolt sound",
-        m_sound.c_str(),
-        m_sound,
-        ".ogg",
-        "Sound files (*.ogg)|*.ogg",
-        detail::real_path("$game_sounds$", "").c_str(),
-        "Select sound...",
-        editor::property_holder::cannot_enter_text,
-        editor::property_holder::remove_extension
-    );
+        "id", "properties", "this option is resposible for thunderbolt id", m_id.c_str(), string_getter, string_setter);
+    m_property_holder->add_property("color animator", "properties",
+        "this option is resposible for thunderbolt color animator", m_color_animator.c_str(), m_color_animator,
+        &*environment.light_animator_ids().begin(), environment.light_animator_ids().size(),
+        editor::property_holder::value_editor_tree_view, editor::property_holder::cannot_enter_text);
+    m_property_holder->add_property("lighting model", "properties",
+        "this option is resposible for thunderbolt lighting model", m_lighting_model.c_str(), m_lighting_model, ".dm",
+        "Lighting model files (*.dm)|*.dm", detail::real_path("$game_meshes$", "").c_str(), "Select lighting model...",
+        editor::property_holder::cannot_enter_text, editor::property_holder::keep_extension);
+    m_property_holder->add_property("sound", "properties", "this option is resposible for thunderbolt sound",
+        m_sound.c_str(), m_sound, ".ogg", "Sound files (*.ogg)|*.ogg", detail::real_path("$game_sounds$", "").c_str(),
+        "Select sound...", editor::property_holder::cannot_enter_text, editor::property_holder::remove_extension);
 
     m_center->fill(
-        environment,
-        "center",
-        "this option is resposible for thunderbolt gradient center",
-        *m_property_holder
-    );
-    m_top->fill(
-        environment,
-        "top",
-        "this option is resposible for thunderbolt gradient top",
-        *m_property_holder
-    );
+        environment, "center", "this option is resposible for thunderbolt gradient center", *m_property_holder);
+    m_top->fill(environment, "top", "this option is resposible for thunderbolt gradient top", *m_property_holder);
 }
 
 thunderbolt::property_holder_type* thunderbolt::object()
@@ -162,4 +113,4 @@ thunderbolt::property_holder_type* thunderbolt::object()
     return (m_property_holder);
 }
 
-#endif // #ifdef INGAME_EDITOR
+#endif  // #ifdef INGAME_EDITOR

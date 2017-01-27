@@ -5,17 +5,17 @@
 #include "Include/xrRender/ParticleCustom.h"
 #include "FBasicVisual.h"
 //---------------------------------------------------------------------------
-class 	dxParticleCustom		: public dxRender_Visual, public IParticleCustom
+class dxParticleCustom : public dxRender_Visual, public IParticleCustom
 {
 public:
-	// geometry-format
-	ref_geom		geom;
-public:
-	virtual 		~dxParticleCustom	(){;}
+    // geometry-format
+    ref_geom geom;
 
-	virtual IParticleCustom*	dcast_ParticleCustom	()				{ return this;	}
+public:
+    virtual ~dxParticleCustom() { ; }
+
+    virtual IParticleCustom* dcast_ParticleCustom() { return this; }
 };
 
 //---------------------------------------------------------------------------
-#endif //ParticleCustomH
- 
+#endif  // ParticleCustomH

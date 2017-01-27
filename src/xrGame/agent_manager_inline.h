@@ -8,49 +8,49 @@
 
 #pragma once
 
-IC	shared_str CAgentManager::cName						() const
+IC shared_str CAgentManager::cName() const
 {
-	return		("agent_manager");
+    return ("agent_manager");
 }
 
-IC	CAgentCorpseManager	&CAgentManager::corpse			() const
+IC CAgentCorpseManager& CAgentManager::corpse() const
 {
-	VERIFY		(m_corpse);
-	return		(*m_corpse);
+    VERIFY(m_corpse);
+    return (*m_corpse);
 }
 
-IC	CAgentEnemyManager &CAgentManager::enemy			() const
+IC CAgentEnemyManager& CAgentManager::enemy() const
 {
-	VERIFY		(m_enemy);
-	return		(*m_enemy);
+    VERIFY(m_enemy);
+    return (*m_enemy);
 }
 
-IC	CAgentExplosiveManager &CAgentManager::explosive	() const
+IC CAgentExplosiveManager& CAgentManager::explosive() const
 {
-	VERIFY		(m_explosive);
-	return		(*m_explosive);
+    VERIFY(m_explosive);
+    return (*m_explosive);
 }
 
-IC	CAgentLocationManager &CAgentManager::location		() const
+IC CAgentLocationManager& CAgentManager::location() const
 {
-	VERIFY		(m_location);
-	return		(*m_location);
+    VERIFY(m_location);
+    return (*m_location);
 }
 
-IC	CAgentMemberManager	&CAgentManager::member			() const
+IC CAgentMemberManager& CAgentManager::member() const
 {
-	VERIFY		(m_member);
-	return		(*m_member);
+    VERIFY(m_member);
+    return (*m_member);
 }
 
-IC	CAgentMemoryManager	&CAgentManager::memory			() const
+IC CAgentMemoryManager& CAgentManager::memory() const
 {
-	VERIFY		(m_memory);
-	return		(*m_memory);
+    VERIFY(m_memory);
+    return (*m_memory);
 }
 
-IC	CAgentManagerPlanner &CAgentManager::brain			() const
+IC CAgentManagerPlanner& CAgentManager::brain() const
 {
-	VERIFY		(m_brain);
-	return		(*m_brain);
+    VERIFY(m_brain);
+    return (*m_brain);
 }

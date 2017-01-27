@@ -11,12 +11,31 @@
 #pragma comment(lib, "xrCore.lib")
 
 #define _BCL
-#define ENGINE_API 
+#define ENGINE_API
 
-enum TMsgDlgType { mtWarning, mtError, mtInformation, mtConfirmation, mtCustom };
-enum TMsgDlgBtn { mbYes, mbNo, mbOK, mbCancel, mbAbort, mbRetry, mbIgnore, mbAll, mbNoToAll, mbYesToAll, mbHelp };
+enum TMsgDlgType
+{
+    mtWarning,
+    mtError,
+    mtInformation,
+    mtConfirmation,
+    mtCustom
+};
+enum TMsgDlgBtn
+{
+    mbYes,
+    mbNo,
+    mbOK,
+    mbCancel,
+    mbAbort,
+    mbRetry,
+    mbIgnore,
+    mbAll,
+    mbNoToAll,
+    mbYesToAll,
+    mbHelp
+};
 typedef TMsgDlgBtn TMsgDlgButtons[mbHelp];
-
 
 #define ECORE_API
 
@@ -33,23 +52,23 @@ typedef TMsgDlgBtn TMsgDlgButtons[mbHelp];
 
 #define AnsiString std::string
 
-DEFINE_VECTOR(AnsiString,AStringVec,AStringIt);
+DEFINE_VECTOR(AnsiString, AStringVec, AStringIt);
 
 #define THROW R_ASSERT(0)
 
 #ifdef _LW_SHADER
-	#define _EDITOR_FILE_NAME_ "lw_shader"
+#define _EDITOR_FILE_NAME_ "lw_shader"
 #else
-	#ifdef _LW_EXPORT
-		#define _EDITOR_FILE_NAME_ "lw_export"
-    #else
-		#ifdef _LW_IMPORT
-			#define _EDITOR_FILE_NAME_ "lw_import"
-		#endif
-	#endif
+#ifdef _LW_EXPORT
+#define _EDITOR_FILE_NAME_ "lw_export"
+#else
+#ifdef _LW_IMPORT
+#define _EDITOR_FILE_NAME_ "lw_import"
+#endif
+#endif
 #endif
 
-#define GAMEMTL_NONE		u32(-1)
+#define GAMEMTL_NONE u32(-1)
 #define _game_data_ "$game_data$"
 
-#endif // StdafxH
+#endif  // StdafxH

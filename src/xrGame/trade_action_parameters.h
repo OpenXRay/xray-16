@@ -11,22 +11,23 @@
 #include "trade_factor_parameters.h"
 #include "trade_bool_parameters.h"
 
-class CTradeActionParameters {
+class CTradeActionParameters
+{
 private:
-	CTradeFactorParameters	m_enabled;
-	CTradeBoolParameters	m_disabled;
-	CTradeFactors			m_default;
+    CTradeFactorParameters m_enabled;
+    CTradeBoolParameters m_disabled;
+    CTradeFactors m_default;
 
 public:
-	IC						CTradeActionParameters	(const CTradeFactors &default_factors = CTradeFactors());
-	IC	void				clear					();
-	IC	void				enable					(const shared_str &section, const CTradeFactors &trade_factors);
-	IC	void				disable					(const shared_str &section);
-	IC	bool				enabled					(const shared_str &section) const;
-	IC	bool				disabled				(const shared_str &section) const;
-	IC	const CTradeFactors	&factors				(const shared_str &section) const;
-	IC	const CTradeFactors	&default_factors		() const;
-	IC	void				default_factors			(const CTradeFactors &trade_factors);
+    IC CTradeActionParameters(const CTradeFactors& default_factors = CTradeFactors());
+    IC void clear();
+    IC void enable(const shared_str& section, const CTradeFactors& trade_factors);
+    IC void disable(const shared_str& section);
+    IC bool enabled(const shared_str& section) const;
+    IC bool disabled(const shared_str& section) const;
+    IC const CTradeFactors& factors(const shared_str& section) const;
+    IC const CTradeFactors& default_factors() const;
+    IC void default_factors(const CTradeFactors& trade_factors);
 };
 
 #include "trade_action_parameters_inline.h"

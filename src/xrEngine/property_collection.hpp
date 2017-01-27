@@ -14,9 +14,7 @@
 #include "Common/object_broker.h"
 
 template <typename container_type, typename holder_type>
-class property_collection :
-    public editor::property_holder_collection,
-    private Noncopyable
+class property_collection : public editor::property_holder_collection, private Noncopyable
 {
 public:
     typedef editor::property_holder property_holder;
@@ -52,7 +50,7 @@ private:
         property_holder* m_holder;
 
         inline predicate(property_holder* holder);
-        inline bool operator() (typename container_type::value_type const& value) const;
+        inline bool operator()(typename container_type::value_type const& value) const;
     };
 
 private:
@@ -61,15 +59,15 @@ private:
         LPCSTR m_id;
 
         inline unique_id_predicate(LPCSTR id);
-        inline bool operator() (typename container_type::value_type const& value) const;
+        inline bool operator()(typename container_type::value_type const& value) const;
     };
 
 private:
     container_type& m_container;
     holder_type& m_holder;
     bool* m_changed;
-}; // class property_collection
+};  // class property_collection
 
 #include "property_collection_inline.hpp"
 
-#endif // #ifndef PROPERTY_COLLECTION_HPP_INCLUDED
+#endif  // #ifndef PROPERTY_COLLECTION_HPP_INCLUDED

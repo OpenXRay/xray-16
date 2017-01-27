@@ -13,39 +13,33 @@ using System::String;
 using System::Object;
 using System::Collections::IList;
 
-property_integer_values_value_reference::property_integer_values_value_reference	(
-		int& value,
-		LPCSTR const* values,
-		u32 const &value_count
-	) :
-	inherited				(value),
-	m_collection			(gcnew collection_type())
+property_integer_values_value_reference::property_integer_values_value_reference(
+    int& value, LPCSTR const* values, u32 const& value_count)
+    : inherited(value), m_collection(gcnew collection_type())
 {
-	for (u32 i=0; i<value_count; ++i)
-		m_collection->Add	(to_string(values[i]));
+    for (u32 i = 0; i < value_count; ++i)
+        m_collection->Add(to_string(values[i]));
 }
 
-System::Object ^property_integer_values_value_reference::GetValue		()
+System::Object ^ property_integer_values_value_reference::GetValue()
 {
-	int						value = safe_cast<int>(inherited::GetValue());
-	if (value < 0)
-		value				= 0;
+    int value = safe_cast<int>(inherited::GetValue());
+    if (value < 0) value = 0;
 
-	if (value >= m_collection->Count)
-		value				= (int)m_collection->Count - 1;
+    if (value >= m_collection->Count) value = (int)m_collection->Count - 1;
 
-	return					(value);
+    return (value);
 }
 
-void property_integer_values_value_reference::SetValue					(Object ^object)
+void property_integer_values_value_reference::SetValue(Object ^ object)
 {
-	String^					string_value = dynamic_cast<String^>(object);
-	int						index = m_collection->IndexOf(string_value);
-	VERIFY					((index >= 0));
-	inherited::SetValue	(index);
+    String ^ string_value = dynamic_cast<String ^>(object);
+    int index = m_collection->IndexOf(string_value);
+    VERIFY((index >= 0));
+    inherited::SetValue(index);
 }
 
-IList^ property_integer_values_value_reference::collection				()
+IList ^ property_integer_values_value_reference::collection()
 {
-	return					(m_collection);
+    return (m_collection);
 }

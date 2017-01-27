@@ -14,32 +14,31 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-__fastcall TUI_ControlObjectAdd::TUI_ControlObjectAdd(int st, int act, ESceneToolBase *parent): TUI_CustomControl(st, act, parent) {}
+__fastcall TUI_ControlObjectAdd::TUI_ControlObjectAdd(int st, int act, ESceneToolBase* parent)
+    : TUI_CustomControl(st, act, parent)
+{
+}
 
 bool __fastcall TUI_ControlObjectAdd::Start(TShiftState Shift)
 {
-    if (Shift==ssRBOnly)
-    {
+    if (Shift == ssRBOnly) {
         ExecCommand(COMMAND_SHOWCONTEXTMENU, OBJCLASS_SCENEOBJECT);
         return false;
     }
-    TfraObject *fraObject = (TfraObject*)parent_tool->pFrame;
+    TfraObject* fraObject = (TfraObject*)parent_tool->pFrame;
     VERIFY(fraObject);
     Fvector p, n;
-    if (!LUI->PickGround(p, UI->m_CurrentRStart, UI->m_CurrentRDir, 1, &n))
-        return false;
-    { // pick already executed (see top)
-        ESceneObjectTool *ot = dynamic_cast<ESceneObjectTool*>(parent_tool);
+    if (!LUI->PickGround(p, UI->m_CurrentRStart, UI->m_CurrentRDir, 1, &n)) return false;
+    {  // pick already executed (see top)
+        ESceneObjectTool* ot = dynamic_cast<ESceneObjectTool*>(parent_tool);
         LPCSTR N;
-        if (ot->IsAppendRandomActive()&&ot->m_AppendRandomObjects.size())
-        {
+        if (ot->IsAppendRandomActive() && ot->m_AppendRandomObjects.size()) {
             N = ot->m_AppendRandomObjects[Random.randI(ot->m_AppendRandomObjects.size())].c_str();
         }
         else
         {
             N = ((TfraObject*)parent_tool->pFrame)->Current();
-            if (!N)
-            {
+            if (!N) {
                 ELog.DlgMsg(mtInformation, "Nothing selected.");
                 return false;
             }
@@ -47,10 +46,9 @@ bool __fastcall TUI_ControlObjectAdd::Start(TShiftState Shift)
 
         string256 namebuffer;
         Scene->GenObjectName(OBJCLASS_SCENEOBJECT, namebuffer, N);
-        CSceneObject *obj = new CSceneObject((LPVOID)0, namebuffer);
-        CEditableObject *ref = obj->SetReference(N);
-        if (!ref)
-        {
+        CSceneObject* obj = new CSceneObject((LPVOID)0, namebuffer);
+        CEditableObject* ref = obj->SetReference(N);
+        if (!ref) {
             ELog.DlgMsg(mtError, "TUI_ControlObjectAdd:: Can't load reference object.");
             xr_delete(obj);
             return false;
@@ -61,22 +59,18 @@ bool __fastcall TUI_ControlObjectAdd::Start(TShiftState Shift)
                     return false;
                 }
         */
-        if (ot->IsAppendRandomActive())
-        {
+        if (ot->IsAppendRandomActive()) {
             Fvector S;
-            if (ot->IsAppendRandomRotationActive())
-            {
+            if (ot->IsAppendRandomRotationActive()) {
                 Fvector p;
                 p.set(Random.randF(ot->m_AppendRandomMinRotation.x, ot->m_AppendRandomMaxRotation.x),
                     Random.randF(ot->m_AppendRandomMinRotation.y, ot->m_AppendRandomMaxRotation.y),
                     Random.randF(ot->m_AppendRandomMinRotation.z, ot->m_AppendRandomMaxRotation.z));
                 obj->PRotation = p;
             }
-            if (ot->IsAppendRandomScaleActive())
-            {
+            if (ot->IsAppendRandomScaleActive()) {
                 Fvector s;
-                if (ot->IsAppendRandomScaleProportional())
-                {
+                if (ot->IsAppendRandomScaleProportional()) {
                     s.x = Random.randF(ot->m_AppendRandomMinScale.x, ot->m_AppendRandomMaxScale.x);
                     s.set(s.x, s.x, s.x);
                 }
@@ -93,18 +87,17 @@ bool __fastcall TUI_ControlObjectAdd::Start(TShiftState Shift)
 
         Scene->SelectObjects(false, OBJCLASS_SCENEOBJECT);
         Scene->AppendObject(obj);
-        if (Shift.Contains(ssCtrl))
-            ExecCommand(COMMAND_SHOW_PROPERTIES);
-        if (!Shift.Contains(ssAlt))
-            ResetActionToSelect();
+        if (Shift.Contains(ssCtrl)) ExecCommand(COMMAND_SHOW_PROPERTIES);
+        if (!Shift.Contains(ssAlt)) ResetActionToSelect();
     }
     return false;
 }
 
-void __fastcall TUI_ControlObjectAdd::Move(TShiftState _Shift) {}
+void __fastcall TUI_ControlObjectAdd::Move(TShiftState _Shift)
+{
+}
 
 bool __fastcall TUI_ControlObjectAdd::End(TShiftState _Shift)
 {
     return true;
 }
-

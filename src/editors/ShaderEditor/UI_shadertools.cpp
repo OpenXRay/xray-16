@@ -13,7 +13,7 @@
 #include "editors/xrEProps/ItemList.h"
 
 //------------------------------------------------------------------------------
-CShaderTool *&STools = (CShaderTool*)Tools;
+CShaderTool*& STools = (CShaderTool*)Tools;
 //------------------------------------------------------------------------------
 
 CShaderTool::CShaderTool()
@@ -29,14 +29,15 @@ CShaderTool::CShaderTool()
 
 //---------------------------------------------------------------------------
 
-CShaderTool::~CShaderTool() {}
+CShaderTool::~CShaderTool()
+{
+}
 
 //---------------------------------------------------------------------------
 
-void CShaderTool::OnChangeEditor(ISHTools *tools)
+void CShaderTool::OnChangeEditor(ISHTools* tools)
 {
-    if (m_Current)
-        m_Current->OnDeactivate();
+    if (m_Current) m_Current->OnDeactivate();
     m_Current = tools;
     R_ASSERT(m_Current);
     m_Current->OnActivate();
@@ -48,17 +49,15 @@ void CShaderTool::OnChangeEditor(ISHTools *tools)
 
 bool CShaderTool::IfModified()
 {
-    for (ToolsPairIt it = m_Tools.begin(); it!=m_Tools.end(); it++)
-        if (!it->second->IfModified())
-            return false;
+    for (ToolsPairIt it = m_Tools.begin(); it != m_Tools.end(); it++)
+        if (!it->second->IfModified()) return false;
     return true;
 }
 
 bool CShaderTool::IsModified()
 {
-    for (ToolsPairIt it = m_Tools.begin(); it!=m_Tools.end(); it++)
-        if (it->second->IsModified())
-            return true;
+    for (ToolsPairIt it = m_Tools.begin(); it != m_Tools.end(); it++)
+        if (it->second->IsModified()) return true;
     return false;
 }
 
@@ -72,7 +71,8 @@ void CShaderTool::Modified()
 bool CShaderTool::OnCreate()
 {
     // create props
-    m_Items = TItemList::CreateForm("Items", fraLeftBar->paItemList, alClient, TItemList::ilEditMenu|TItemList::ilDragAllowed|TItemList::ilFolderStore);
+    m_Items = TItemList::CreateForm("Items", fraLeftBar->paItemList, alClient,
+        TItemList::ilEditMenu | TItemList::ilDragAllowed | TItemList::ilFolderStore);
     m_Items->SetOnItemsFocusedEvent(fastdelegate::bind<TOnILItemsFocused>(this, &CShaderTool::OnItemFocused));
     m_ItemProps = TProperties::CreateForm("Item Properties", fraLeftBar->paShaderProps, alClient);
     m_PreviewProps = TProperties::CreateForm("Preview Properties", fraLeftBar->paPreviewProps, alClient);
@@ -80,9 +80,8 @@ bool CShaderTool::OnCreate()
     // create tools
     RegisterTools();
 
-    for (ToolsPairIt it = m_Tools.begin(); it!=m_Tools.end(); it++)
-        if (!it->second->OnCreate())
-            return false;
+    for (ToolsPairIt it = m_Tools.begin(); it != m_Tools.end(); it++)
+        if (!it->second->OnCreate()) return false;
 
     return true;
 }
@@ -94,7 +93,7 @@ void CShaderTool::OnDestroy()
     TProperties::DestroyForm(m_ItemProps);
     TProperties::DestroyForm(m_PreviewProps);
     //
-    for (ToolsPairIt it = m_Tools.begin(); it!=m_Tools.end(); it++)
+    for (ToolsPairIt it = m_Tools.begin(); it != m_Tools.end(); it++)
         it->second->OnDestroy();
 
     UnregisterTools();
@@ -121,10 +120,8 @@ void CShaderTool::Render()
 
 void CShaderTool::OnFrame()
 {
-    if (m_Flags.is(flRefreshList))
-        RealUpdateList();
-    if (m_Flags.is(flRefreshProps))
-        RealUpdateProperties();
+    if (m_Flags.is(flRefreshList)) RealUpdateList();
+    if (m_Flags.is(flRefreshProps)) RealUpdateProperties();
     Current()->OnFrame();
 }
 
@@ -172,19 +169,17 @@ void CShaderTool::PrepareLighting()
 
 void CShaderTool::OnDeviceCreate()
 {
-    for (ToolsPairIt it = m_Tools.begin(); it!=m_Tools.end(); it++)
-        if (it->second)
-            it->second->OnDeviceCreate();
+    for (ToolsPairIt it = m_Tools.begin(); it != m_Tools.end(); it++)
+        if (it->second) it->second->OnDeviceCreate();
 }
 
 void CShaderTool::OnDeviceDestroy()
 {
-    for (ToolsPairIt it = m_Tools.begin(); it!=m_Tools.end(); it++)
-        if (it->second)
-            it->second->OnDeviceDestroy();
+    for (ToolsPairIt it = m_Tools.begin(); it != m_Tools.end(); it++)
+        if (it->second) it->second->OnDeviceDestroy();
 }
 
-void CShaderTool::OnShowHint(AStringVec &ss)
+void CShaderTool::OnShowHint(AStringVec& ss)
 {
     Current()->OnShowHint(ss);
 }
@@ -209,18 +204,17 @@ LPCSTR CShaderTool::GetInfo()
     return 0;
 }
 
-ISHTools *CShaderTool::FindTools(EToolsID id)
+ISHTools* CShaderTool::FindTools(EToolsID id)
 {
     ToolsPairIt it = m_Tools.find(id);
-    R_ASSERT(it!=m_Tools.end());
+    R_ASSERT(it != m_Tools.end());
     return it->second;
 }
 
-ISHTools *CShaderTool::FindTools(TElTabSheet *sheet)
+ISHTools* CShaderTool::FindTools(TElTabSheet* sheet)
 {
-    for (ToolsPairIt it = m_Tools.begin(); it!=m_Tools.end(); it++)
-        if (it->second->Sheet()==sheet)
-            return it->second;
+    for (ToolsPairIt it = m_Tools.begin(); it != m_Tools.end(); it++)
+        if (it->second->Sheet() == sheet) return it->second;
     return 0;
 }
 
@@ -232,18 +226,15 @@ bool CShaderTool::Load(LPCSTR name)
 bool CShaderTool::Save(LPCSTR name, bool bInternal)
 {
     bool bRes = true;
-    for (ToolsPairIt it = m_Tools.begin(); it!=m_Tools.end(); it++)
-        if (!it->second->Save())
-            bRes = false;
+    for (ToolsPairIt it = m_Tools.begin(); it != m_Tools.end(); it++)
+        if (!it->second->Save()) bRes = false;
     return bRes;
 }
 
 void CShaderTool::Reload()
 {
-    if (!Current()->IfModified())
-        return;
-    if (ELog.DlgMsg(mtConfirmation, "Reload current items?")==mrYes)
-        Current()->Reload();
+    if (!Current()->IfModified()) return;
+    if (ELog.DlgMsg(mtConfirmation, "Reload current items?") == mrYes) Current()->Reload();
 }
 
 #include "SHEngineTools.h"
@@ -254,21 +245,30 @@ void CShaderTool::Reload()
 
 void CShaderTool::RegisterTools()
 {
-    for (int k = aeFirstTool; k<aeMaxTools; k++)
+    for (int k = aeFirstTool; k < aeMaxTools; k++)
     {
-        ISHTools *tools = 0;
+        ISHTools* tools = 0;
         switch (k)
         {
-            case aeEngine: tools = new CSHEngineTools(ISHInit(EToolsID(k), m_Items, fraLeftBar->tsEngine, m_ItemProps, m_PreviewProps));
-                break;
-            case aeCompiler: tools = new CSHCompilerTools(ISHInit(EToolsID(k), m_Items, fraLeftBar->tsCompiler, m_ItemProps, m_PreviewProps));
-                break;
-            case aeMtl: tools = new CSHGameMtlTools(ISHInit(EToolsID(k), m_Items, fraLeftBar->tsMaterial, m_ItemProps, m_PreviewProps));
-                break;
-            case aeMtlPair: tools = new CSHGameMtlPairTools(ISHInit(EToolsID(k), m_Items, fraLeftBar->tsMaterialPair, m_ItemProps, m_PreviewProps));
-                break;
-            //case aeSoundEnv: tools = new CSHSoundEnvTools(ISHInit(EToolsID(k), m_Items, fraLeftBar->tsSoundEnv, m_ItemProps, m_PreviewProps));
-                break;
+        case aeEngine:
+            tools =
+                new CSHEngineTools(ISHInit(EToolsID(k), m_Items, fraLeftBar->tsEngine, m_ItemProps, m_PreviewProps));
+            break;
+        case aeCompiler:
+            tools = new CSHCompilerTools(
+                ISHInit(EToolsID(k), m_Items, fraLeftBar->tsCompiler, m_ItemProps, m_PreviewProps));
+            break;
+        case aeMtl:
+            tools =
+                new CSHGameMtlTools(ISHInit(EToolsID(k), m_Items, fraLeftBar->tsMaterial, m_ItemProps, m_PreviewProps));
+            break;
+        case aeMtlPair:
+            tools = new CSHGameMtlPairTools(
+                ISHInit(EToolsID(k), m_Items, fraLeftBar->tsMaterialPair, m_ItemProps, m_PreviewProps));
+            break;
+            // case aeSoundEnv: tools = new CSHSoundEnvTools(ISHInit(EToolsID(k), m_Items, fraLeftBar->tsSoundEnv,
+            // m_ItemProps, m_PreviewProps));
+            break;
         }
         R_ASSERT(tools);
         m_Tools.insert(mk_pair(k, tools));
@@ -277,21 +277,21 @@ void CShaderTool::RegisterTools()
 
 void CShaderTool::UnregisterTools()
 {
-    for (ToolsPairIt it = m_Tools.begin(); it!=m_Tools.end(); it++)
+    for (ToolsPairIt it = m_Tools.begin(); it != m_Tools.end(); it++)
         xr_delete(it->second);
 }
 
 #include "editors/ECore/Editor/EditMesh.h"
 
-bool CShaderTool::RayPick(const Fvector &start, const Fvector &dir, float &dist, Fvector *pt, Fvector *n)
+bool CShaderTool::RayPick(const Fvector& start, const Fvector& dir, float& dist, Fvector* pt, Fvector* n)
 {
     /*
         if (m_EditObject)
         {
             SRayPickInfo pinf;
             if (m_EditObject->RayPick(dist,start,dir,Fidentity,&pinf)){
-                if (pt) pt->set(pinf.pt); 
-                if (n){	
+                if (pt) pt->set(pinf.pt);
+                if (n){
                     const Fvector* PT[3];
                     pinf.e_mesh->GetFacePT(pinf.inf.id, PT);
                     n->mknormal(*PT[0],*PT[1],*PT[2]);
@@ -303,12 +303,9 @@ bool CShaderTool::RayPick(const Fvector &start, const Fvector &dir, float &dist,
     {
         Fvector np;
         np.mad(start, dir, dist);
-        if ((start.y>0)&&(np.y<0.f))
-        {
-            if (pt)
-                pt->set(start);
-            if (n)
-                n->set(0.f, 1.f, 0.f);
+        if ((start.y > 0) && (np.y < 0.f)) {
+            if (pt) pt->set(start);
+            if (n) n->set(0.f, 1.f, 0.f);
             return true;
         }
         else
@@ -328,14 +325,13 @@ void CShaderTool::RealUpdateList()
     m_Flags.set(flRefreshList, FALSE);
 }
 
-void __fastcall CShaderTool::OnItemFocused(ListItemsVec &items)
+void __fastcall CShaderTool::OnItemFocused(ListItemsVec& items)
 {
     LPCSTR name = 0;
     Current()->m_CurrentItem = 0;
 
-    if (!items.empty())
-    {
-        VERIFY(items.size()==1);
+    if (!items.empty()) {
+        VERIFY(items.size() == 1);
         Current()->m_CurrentItem = *items.begin();
         name = Current()->m_CurrentItem->Key();
     }
@@ -343,12 +339,10 @@ void __fastcall CShaderTool::OnItemFocused(ListItemsVec &items)
     ExecCommand(COMMAND_UPDATE_PROPERTIES);
 }
 
-bool CShaderTool::GetSelectionPosition(Fmatrix &result)
+bool CShaderTool::GetSelectionPosition(Fmatrix& result)
 {
     result = Fidentity;
     return true;
 }
 
 //------------------------------------------------------------------------------
-
-

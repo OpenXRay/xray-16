@@ -18,19 +18,12 @@ struct SBeforeAppendCallbackParams
     }
 };
 
-typedef bool __fastcall(__closure*TBeforeAppendCallback)(SBeforeAppendCallbackParams
-*
-p
-);
-typedef bool __fastcall(__closure*TAfterAppendCallback)(TShiftState
-_Shift
-,
-CCustomObject* obj
-);
+typedef bool __fastcall(__closure* TBeforeAppendCallback)(SBeforeAppendCallbackParams* p);
+typedef bool __fastcall(__closure* TAfterAppendCallback)(TShiftState _Shift, CCustomObject* obj);
 
 class TUI_CustomControl
 {
-protected:
+  protected:
     friend class ESceneToolBase;
     int sub_target;
     int action;
@@ -61,57 +54,39 @@ protected:
     bool RotateStart(TShiftState _Shift);
     void RotateProcess(TShiftState _Shift);
     bool RotateEnd(TShiftState _Shift);
-protected:
+
+  protected:
     bool CheckSnapList(TShiftState Shift);
 
-    CCustomObject *DefaultAddObject(TShiftState Shift, TBeforeAppendCallback before = 0, TAfterAppendCallback after = 0);
-    bool DefaultMovingProcess(TShiftState Shift, Fvector &amount);
-public:
-    ESceneToolBase *parent_tool;
-public:
-    TUI_CustomControl(int st, int act, ESceneToolBase *parent);
+    CCustomObject* DefaultAddObject(
+        TShiftState Shift, TBeforeAppendCallback before = 0, TAfterAppendCallback after = 0);
+    bool DefaultMovingProcess(TShiftState Shift, Fvector& amount);
 
-    virtual ~TUI_CustomControl()
-    {
-        ;
-    }
+  public:
+    ESceneToolBase* parent_tool;
+
+  public:
+    TUI_CustomControl(int st, int act, ESceneToolBase* parent);
+
+    virtual ~TUI_CustomControl() { ; }
 
     virtual bool Start(TShiftState _Shift);
     virtual bool End(TShiftState _Shift);
     virtual void Move(TShiftState _Shift);
     virtual bool HiddenMode();
 
-    virtual bool KeyDown(WORD Key, TShiftState Shift)
-    {
-        return false;
-    }
+    virtual bool KeyDown(WORD Key, TShiftState Shift) { return false; }
 
-    virtual bool KeyUp(WORD Key, TShiftState Shift)
-    {
-        return false;
-    }
+    virtual bool KeyUp(WORD Key, TShiftState Shift) { return false; }
 
-    virtual bool KeyPress(WORD Key, TShiftState Shift)
-    {
-        return false;
-    }
+    virtual bool KeyPress(WORD Key, TShiftState Shift) { return false; }
 
-    virtual void OnEnter()
-    {
-        ;
-    }
+    virtual void OnEnter() { ; }
 
-    virtual void OnExit()
-    {
-        ;
-    }
+    virtual void OnExit() { ; }
 
-    int Action()
-    {
-        return action;
-    }
+    int Action() { return action; }
 };
 
 //---------------------------------------------------------------------------
 #endif
-

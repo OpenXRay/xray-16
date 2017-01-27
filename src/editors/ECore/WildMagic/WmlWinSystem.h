@@ -39,7 +39,7 @@
 
 // Disable the warning about truncating the debug names to 255 characters.
 // This warning shows up often with STL code in MSVC6, but not MSVC7.
-#pragma warning( disable : 4786 )
+#pragma warning(disable : 4786)
 
 // This warning is disabled because MSVC6 warns about not finding
 // implementations for the pure virtual functions that occur in the template
@@ -47,14 +47,14 @@
 // NOTE:  If you create your own template classes that will be explicitly
 // instantiated, you should re-enable the warning to make sure that in fact
 // all your member data and functions have been defined and implemented.
-#pragma warning( disable : 4661 )
+#pragma warning(disable : 4661)
 
 #endif
 
 // TO DO.  What does this warning mean?
 // warning C4251:  class 'std::vector<_Ty,_Ax>' needs to have dll-interface
 //   to be used by clients of class 'foobar'
-#pragma warning( disable : 4251 )
+#pragma warning(disable : 4251)
 
 #endif
 

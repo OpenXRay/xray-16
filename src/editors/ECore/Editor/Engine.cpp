@@ -19,7 +19,9 @@ CEngine::CEngine()
     pSettings = 0;
 }
 
-CEngine::~CEngine() {}
+CEngine::~CEngine()
+{
+}
 
 LPCSTR CEngine::LastWindowsError()
 {
@@ -27,16 +29,15 @@ LPCSTR CEngine::LastWindowsError()
     LPCSTR err = 0;
 
     u32 hr = GetLastError();
-    if (hr!=0)
-    {
+    if (hr != 0) {
         FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, 0, hr, 0, errmsg_buf, 1024, 0);
         err = errmsg_buf;
     }
     return err;
 }
 
-extern void __stdcall xrSkin1W_x86(vertRender *D, vertBoned1W *S, u32 vCount, CBoneInstance *Bones);
-extern void __stdcall xrSkin2W_x86(vertRender *D, vertBoned2W *S, u32 vCount, CBoneInstance *Bones);
+extern void __stdcall xrSkin1W_x86(vertRender* D, vertBoned1W* S, u32 vCount, CBoneInstance* Bones);
+extern void __stdcall xrSkin2W_x86(vertRender* D, vertBoned2W* S, u32 vCount, CBoneInstance* Bones);
 
 void CEngine::Initialize(void)
 {
@@ -47,15 +48,16 @@ void CEngine::Initialize(void)
 
 #ifdef _EDITOR
     // Bind PSGP
-	ZeroMemory				(&PSGP,sizeof(PSGP));
-	hPSGP		            = LoadLibrary("xrCPU_Pipe");
-	R_ASSERT2	            (hPSGP,"Can't find 'xrCPU_Pipe'");
+    ZeroMemory(&PSGP, sizeof(PSGP));
+    hPSGP = LoadLibrary("xrCPU_Pipe");
+    R_ASSERT2(hPSGP, "Can't find 'xrCPU_Pipe'");
 
-	xrBinder* bindCPU	    = (xrBinder*)GetProcAddress(hPSGP,"xrBind_PSGP");	R_ASSERT(bindCPU);
-	bindCPU		            (&PSGP, CPU::ID.feature /*& CPU::ID.os_support*/);
+    xrBinder* bindCPU = (xrBinder*)GetProcAddress(hPSGP, "xrBind_PSGP");
+    R_ASSERT(bindCPU);
+    bindCPU(&PSGP, CPU::ID.feature /*& CPU::ID.os_support*/);
     // for compliance with editor
-    PSGP.skin1W				= xrSkin1W_x86;
-    PSGP.skin2W				= xrSkin2W_x86;
+    PSGP.skin1W = xrSkin1W_x86;
+    PSGP.skin2W = xrSkin2W_x86;
 #endif
 
     ReloadSettings();
@@ -67,16 +69,14 @@ void CEngine::ReloadSettings()
     // game configure
     string_path si_name;
     FS.update_path(si_name, "$game_config$", "system.ltx");
-    pSettings = new CInifile(si_name, TRUE);// FALSE,TRUE,TRUE);
+    pSettings = new CInifile(si_name, TRUE);  // FALSE,TRUE,TRUE);
 }
 
 void CEngine::Destroy()
 {
     xr_delete(pSettings);
-    if (hPSGP)
-    {
+    if (hPSGP) {
         FreeLibrary(hPSGP);
         hPSGP = 0;
     }
 }
-

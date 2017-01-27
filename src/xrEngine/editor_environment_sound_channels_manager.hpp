@@ -16,14 +16,12 @@
 
 namespace editor
 {
-
 class property_holder;
 
 namespace environment
 {
 namespace sound_channels
 {
-
 class channel;
 
 class manager : private Noncopyable
@@ -45,10 +43,7 @@ public:
 
 private:
     typedef editor::property_holder property_holder_type;
-    typedef property_collection <
-    channel_container_type,
-    manager
-    > collection_type;
+    typedef property_collection<channel_container_type, manager> collection_type;
 
 private:
     channel_container_type m_channels;
@@ -56,11 +51,11 @@ private:
     property_holder_type* m_property_holder;
     collection_type* m_collection;
     mutable bool m_changed;
-}; // class manager
-} // namespace sound_channels
-} // namespace environment
-} // namespace editor
+};  // class manager
+}  // namespace sound_channels
+}  // namespace environment
+}  // namespace editor
 
-#endif // #ifdef INGAME_EDITOR
+#endif  // #ifdef INGAME_EDITOR
 
-#endif // ifndef EDITOR_WEATHER_SOUND_CHANNELS_MANAGER_HPP_INCLUDED
+#endif  // ifndef EDITOR_WEATHER_SOUND_CHANNELS_MANAGER_HPP_INCLUDED

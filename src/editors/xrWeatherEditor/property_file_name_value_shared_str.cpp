@@ -11,45 +11,35 @@
 
 using System::String;
 
-property_file_name_value_shared_str::property_file_name_value_shared_str	(
-		editor::engine* engine,
-		shared_str& value,
-		System::String^	DefaultExt_,
-		System::String^	Filter_,
-		System::String^	InitialDirectory_,
-		System::String^	Title_,
-		bool			remove_extension
-	) :
-	inherited			(engine, value),
-	DefaultExt			(DefaultExt_),
-	Filter				(Filter_),
-	InitialDirectory	(InitialDirectory_),
-	Title				(Title_),
-	m_remove_extension	(remove_extension)
+property_file_name_value_shared_str::property_file_name_value_shared_str(editor::engine* engine, shared_str& value,
+    System::String ^ DefaultExt_, System::String ^ Filter_, System::String ^ InitialDirectory_, System::String ^ Title_,
+    bool remove_extension)
+    : inherited(engine, value), DefaultExt(DefaultExt_), Filter(Filter_), InitialDirectory(InitialDirectory_),
+      Title(Title_), m_remove_extension(remove_extension)
 {
 }
 
-String^ property_file_name_value_shared_str::default_extension				()
+String ^ property_file_name_value_shared_str::default_extension()
 {
-	return				(DefaultExt);
+    return (DefaultExt);
 }
 
-String^ property_file_name_value_shared_str::filter							()
+String ^ property_file_name_value_shared_str::filter()
 {
-	return				(Filter);
+    return (Filter);
 }
 
-String^ property_file_name_value_shared_str::initial_directory				()
+String ^ property_file_name_value_shared_str::initial_directory()
 {
-	return				(InitialDirectory);
+    return (InitialDirectory);
 }
 
-String^ property_file_name_value_shared_str::title							()
+String ^ property_file_name_value_shared_str::title()
 {
-	return				(Title);
+    return (Title);
 }
 
-bool property_file_name_value_shared_str::remove_extension					()
+bool property_file_name_value_shared_str::remove_extension()
 {
-	return				(m_remove_extension);
+    return (m_remove_extension);
 }

@@ -12,8 +12,7 @@ void OMotionLW::ParseObjectMotion(LWItemID object)
     while (chan)
     {
         EChannelType t = GetChannelType(chan);
-        if (t != ctUnsupported)
-        {
+        if (t != ctUnsupported) {
             CEnvelope* env = CreateEnvelope(chan);
             envs[t] = env;
         }

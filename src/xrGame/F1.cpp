@@ -9,34 +9,24 @@
 #include "InventoryBox.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
-CF1::CF1(void) {
+CF1::CF1(void)
+{
 }
 
-CF1::~CF1(void) {
+CF1::~CF1(void)
+{
 }
 
 using namespace luabind;
 
-SCRIPT_EXPORT(CF1, (CGameObject),
-{
-	module(luaState)
-	[
-		class_<CF1,CGameObject>("CF1")
-			.def(constructor<>()),
-			//new 14.10.08 peacemaker
-		class_<CWeaponAmmo,CGameObject>("CWeaponAmmo")
-			.def(constructor<>()),
-		class_<CMedkit,CGameObject>("CMedkit")
-			.def(constructor<>()),
-		class_<CAntirad,CGameObject>("CAntirad")
-			.def(constructor<>()),
-		class_<CFoodItem,CGameObject>("CFoodItem")
-			.def(constructor<>()),
-		class_<CBottleItem,CGameObject>("CBottleItem")
-			.def(constructor<>()),
-		class_<CInventoryBox,CGameObject>("CInventoryBox")
-			.def(constructor<>()),
-		class_<CExplosiveItem,CGameObject>("CExplosiveItem")
-			.def(constructor<>())
-	];
+SCRIPT_EXPORT(CF1, (CGameObject), {
+    module(luaState)[class_<CF1, CGameObject>("CF1").def(constructor<>()),
+        // new 14.10.08 peacemaker
+        class_<CWeaponAmmo, CGameObject>("CWeaponAmmo").def(constructor<>()),
+        class_<CMedkit, CGameObject>("CMedkit").def(constructor<>()),
+        class_<CAntirad, CGameObject>("CAntirad").def(constructor<>()),
+        class_<CFoodItem, CGameObject>("CFoodItem").def(constructor<>()),
+        class_<CBottleItem, CGameObject>("CBottleItem").def(constructor<>()),
+        class_<CInventoryBox, CGameObject>("CInventoryBox").def(constructor<>()),
+        class_<CExplosiveItem, CGameObject>("CExplosiveItem").def(constructor<>())];
 });

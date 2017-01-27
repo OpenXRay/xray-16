@@ -3,7 +3,7 @@
 
 #include "Common/LevelStructure.hpp"
 
-#pragma pack(push,4)
+#pragma pack(push, 4)
 
 const u32 XR_MAX_PORTAL_VERTS = 6;
 
@@ -12,7 +12,7 @@ struct b_rc_face
 {
     u16 dwMaterial;
     u32 dwMaterialGame;
-    Fvector2 t[3]; // TC
+    Fvector2 t[3];  // TC
     u16 reserved;
 };
 
@@ -21,20 +21,20 @@ typedef Fvector b_vertex;
 
 struct b_face
 {
-    u32 v[3]; // vertices
-    Fvector2 t[3]; // TC
-    u16 dwMaterial; // index of material
-    u32 dwMaterialGame; // unique-ID of game material
+    u32 v[3];            // vertices
+    Fvector2 t[3];       // TC
+    u16 dwMaterial;      // index of material
+    u32 dwMaterialGame;  // unique-ID of game material
 };
 
 struct b_material
 {
-    u16 surfidx; // indices of texture surface
-    u16 shader; // index of shader that combine them
-    u16 shader_xrlc; // compiler options
-    u16 sector; // ***
-    u16 reserved; //
-    u32 internal_max_area; //
+    u16 surfidx;            // indices of texture surface
+    u16 shader;             // index of shader that combine them
+    u16 shader_xrlc;        // compiler options
+    u16 sector;             // ***
+    u16 reserved;           //
+    u32 internal_max_area;  //
 };
 
 struct b_shader
@@ -48,26 +48,27 @@ struct b_texture
     u32 dwWidth;
     u32 dwHeight;
     BOOL bHasAlpha;
-    u32 *pSurface;
+    u32* pSurface;
 };
 
-struct b_light_control // controller or "layer", 30fps
+struct b_light_control  // controller or "layer", 30fps
 {
-    string64 name; // empty for base layer
-    u32 count; // 0 for base layer
+    string64 name;  // empty for base layer
+    u32 count;      // 0 for base layer
     // u32				data[];
 };
 
 struct b_light
 {
-    u32 controller_ID; // 0 = base layer
+    u32 controller_ID;  // 0 = base layer
     Flight data;
 };
 
-struct b_light_static : public b_light // For static lighting
-{};
+struct b_light_static : public b_light  // For static lighting
+{
+};
 
-struct b_light_dynamic : public b_light // For dynamic models
+struct b_light_dynamic : public b_light  // For dynamic models
 {
     svector<u16, 16> sectors;
 };
@@ -76,8 +77,8 @@ struct b_glow
 {
     Fvector P;
     float size;
-    u32 flags; // 0x01 = non scalable
-    u32 dwMaterial; // index of material
+    u32 flags;       // 0x01 = non scalable
+    u32 dwMaterial;  // index of material
 };
 
 struct b_portal
@@ -89,13 +90,13 @@ struct b_portal
 
 struct b_lod_face
 {
-    Fvector v [4];
-    Fvector2 t [4];
+    Fvector v[4];
+    Fvector2 t[4];
 };
 
 struct b_lod
 {
-    b_lod_face faces [8];
+    b_lod_face faces[8];
     u32 dwMaterial;
 };
 
@@ -113,11 +114,11 @@ struct b_mu_model
 {
     string128 name;
     int m_iVertexCount;
-    b_vertex *m_pVertices;
+    b_vertex* m_pVertices;
     int m_iFaceCount;
-    b_face *m_pFaces;
-    u32 *m_smgroups;
-    u16 lod_id; // u16(-1) = no lod, just static geometry
+    b_face* m_pFaces;
+    u32* m_smgroups;
+    u16 lod_id;  // u16(-1) = no lod, just static geometry
 };
 
 /*
@@ -129,20 +130,20 @@ struct b_mu_reference
     Fmatrix transform;
     Flags32 flags;
     u16 sector;
-    u32 reserved [8];
+    u32 reserved[8];
 };
 
 struct b_params
 {
     // Normals & optimization
-    float m_sm_angle; // normal smooth angle		- 89.0
-    float m_weld_distance; // by default 0.005f		- 5mm
+    float m_sm_angle;       // normal smooth angle		- 89.0
+    float m_weld_distance;  // by default 0.005f		- 5mm
 
     // Light maps
-    float m_lm_pixels_per_meter; // LM - by default: 4 ppm
-    u32 m_lm_jitter_samples; // 1/4/9 - by default		- 4
-    u32 m_lm_rms_zero; // RMS - after what the lightmap will be shrinked to ZERO pixels
-    u32 m_lm_rms; // RMS - shrink and recalc
+    float m_lm_pixels_per_meter;  // LM - by default: 4 ppm
+    u32 m_lm_jitter_samples;      // 1/4/9 - by default		- 4
+    u32 m_lm_rms_zero;            // RMS - after what the lightmap will be shrinked to ZERO pixels
+    u32 m_lm_rms;                 // RMS - shrink and recalc
 
     // build quality
     u16 m_quality;
@@ -151,7 +152,7 @@ struct b_params
     // Progressive
     float f_reserved[6];
 
-    void SaveLTX(CInifile &ini)
+    void SaveLTX(CInifile& ini)
     {
         LPCSTR section = "build_params";
         ini.w_float(section, "smooth_angle", m_sm_angle);
@@ -162,7 +163,7 @@ struct b_params
         ini.w_u32(section, "light_rms", m_lm_rms);
         ini.w_u16(section, "light_quality", m_quality);
         ini.w_u16(section, "light_quality_reserved", u_reserved);
-        for (u32 i = 0; i<6; ++i)
+        for (u32 i = 0; i < 6; ++i)
         {
             string128 buff;
             xr_sprintf(buff, sizeof(buff), "reserved_%d", i);
@@ -170,7 +171,7 @@ struct b_params
         }
     }
 
-    void LoadLTX(CInifile &ini)
+    void LoadLTX(CInifile& ini)
     {
         LPCSTR section = "build_params";
         m_sm_angle = ini.r_float(section, "smooth_angle");
@@ -181,7 +182,7 @@ struct b_params
         m_lm_rms = ini.r_u32(section, "light_rms");
         m_quality = ini.r_u16(section, "light_quality");
         u_reserved = ini.r_u16(section, "light_quality_reserved");
-        for (u32 i = 0; i<6; ++i)
+        for (u32 i = 0; i < 6; ++i)
         {
             string128 buff;
             xr_sprintf(buff, sizeof(buff), "reserved_%d", i);
@@ -220,7 +221,7 @@ struct b_params
 
 enum EBUILD_CHUNKS
 {
-    EB_Version = 0, // XRCLC_CURRENT_VERSION
+    EB_Version = 0,  // XRCLC_CURRENT_VERSION
     EB_Parameters,
     EB_Vertices,
     EB_Faces,
@@ -242,4 +243,3 @@ enum EBUILD_CHUNKS
 };
 
 #endif
-

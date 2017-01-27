@@ -13,18 +13,15 @@
 
 using namespace luabind;
 
-CALifeMonsterMovementManager *get_movement	(const CALifeMonsterBrain *brain)
+CALifeMonsterMovementManager* get_movement(const CALifeMonsterBrain* brain)
 {
-	return	(&brain->movement());
+    return (&brain->movement());
 }
 
-SCRIPT_EXPORT(CALifeMonsterBrain, (),
-{
-	module(luaState)
-	[
-		class_<CALifeMonsterBrain>("CALifeMonsterBrain")
-			.def("movement",				&get_movement)
-			.def("update",					&CALifeMonsterBrain::update)
-			.def("can_choose_alife_tasks",	(void (CALifeMonsterBrain::*)(bool))&CALifeMonsterBrain::can_choose_alife_tasks)
-	];
+SCRIPT_EXPORT(CALifeMonsterBrain, (), {
+    module(luaState)[class_<CALifeMonsterBrain>("CALifeMonsterBrain")
+                         .def("movement", &get_movement)
+                         .def("update", &CALifeMonsterBrain::update)
+                         .def("can_choose_alife_tasks",
+                             (void (CALifeMonsterBrain::*)(bool)) & CALifeMonsterBrain::can_choose_alife_tasks)];
 });

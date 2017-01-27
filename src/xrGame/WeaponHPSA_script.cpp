@@ -5,10 +5,4 @@
 using namespace luabind;
 
 SCRIPT_EXPORT(CWeaponHPSA, (CGameObject),
-{
-	module(luaState)
-	[
-		class_<CWeaponHPSA,CGameObject>("CWeaponHPSA")
-			.def(constructor<>())
-	];
-});
+    { module(luaState)[class_<CWeaponHPSA, CGameObject>("CWeaponHPSA").def(constructor<>())]; });

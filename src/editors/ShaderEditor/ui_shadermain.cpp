@@ -13,7 +13,7 @@
 #include "xr_input.h"
 
 //---------------------------------------------------------------------------
-CShaderMain *&PUI = (CShaderMain*)UI;
+CShaderMain*& PUI = (CShaderMain*)UI;
 
 //---------------------------------------------------------------------------
 
@@ -116,9 +116,9 @@ void CShaderMain::RegisterCommands()
     REGISTER_CMD_S(COMMAND_UPDATE_CAPTION, CommandUpdateCaption);
 }
 
-char *CShaderMain::GetCaption()
+char* CShaderMain::GetCaption()
 {
-    return (LPSTR)STools->CurrentToolsName();// "shaders&materials";
+    return (LPSTR)STools->CurrentToolsName();  // "shaders&materials";
 }
 
 bool __fastcall CShaderMain::ApplyShortCut(WORD Key, TShiftState Shift)
@@ -148,8 +148,7 @@ void CShaderMain::RealUpdateScene()
 void CShaderMain::ResetStatus()
 {
     VERIFY(m_bReady);
-    if (fraBottomBar->paStatus->Caption!="")
-    {
+    if (fraBottomBar->paStatus->Caption != "") {
         fraBottomBar->paStatus->Caption = "";
         fraBottomBar->paStatus->Repaint();
     }
@@ -158,12 +157,10 @@ void CShaderMain::ResetStatus()
 void CShaderMain::SetStatus(LPSTR s, bool bOutLog)
 {
     VERIFY(m_bReady);
-    if (fraBottomBar->paStatus->Caption!=s)
-    {
+    if (fraBottomBar->paStatus->Caption != s) {
         fraBottomBar->paStatus->Caption = s;
         fraBottomBar->paStatus->Repaint();
-        if (bOutLog&&s&&s[0])
-            ELog.Msg(mtInformation, s);
+        if (bOutLog && s && s[0]) ELog.Msg(mtInformation, s);
     }
 }
 
@@ -177,7 +174,7 @@ void CShaderMain::OutCameraPos()
 {
     VERIFY(m_bReady);
     AnsiString s;
-    const Fvector &c = EDevice.m_Camera.GetPosition();
+    const Fvector& c = EDevice.m_Camera.GetPosition();
     s.sprintf("C: %3.1f, %3.1f, %3.1f", c.x, c.y, c.z);
     //	const Fvector& hpb 	= EDevice.m_Camera.GetHPB();
     //	s.sprintf(" Cam: %3.1f°, %3.1f°, %3.1f°",rad2deg(hpb.y),rad2deg(hpb.x),rad2deg(hpb.z));
@@ -220,5 +217,3 @@ void CShaderMain::RealQuit()
 }
 
 //---------------------------------------------------------------------------
-
-

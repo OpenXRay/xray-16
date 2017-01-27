@@ -14,36 +14,33 @@
 using namespace Wml;
 
 //----------------------------------------------------------------------------
-void Wml::System::EndianCopy (int iSize, const void* pvSrc, void* pvDst)
+void Wml::System::EndianCopy(int iSize, const void* pvSrc, void* pvDst)
 {
-    memcpy(pvDst,pvSrc,iSize);
+    memcpy(pvDst, pvSrc, iSize);
 }
 //----------------------------------------------------------------------------
-void Wml::System::EndianCopy (int iSize, int iQuantity, const void* pvSrc,
-    void* pvDst)
+void Wml::System::EndianCopy(int iSize, int iQuantity, const void* pvSrc, void* pvDst)
 {
-    memcpy(pvDst,pvSrc,iSize*iQuantity);
+    memcpy(pvDst, pvSrc, iSize * iQuantity);
 }
 //----------------------------------------------------------------------------
-unsigned int Wml::System::MakeRGB (unsigned char ucR, unsigned char ucG,
-    unsigned char ucB)
+unsigned int Wml::System::MakeRGB(unsigned char ucR, unsigned char ucG, unsigned char ucB)
 {
     return (ucR | (ucG << 8) | (ucB << 16) | (0xFF << 24));
 }
 //----------------------------------------------------------------------------
-unsigned int Wml::System::MakeRGBA (unsigned char ucR, unsigned char ucG,
-    unsigned char ucB, unsigned char ucA)
+unsigned int Wml::System::MakeRGBA(unsigned char ucR, unsigned char ucG, unsigned char ucB, unsigned char ucA)
 {
     return (ucR | (ucG << 8) | (ucB << 16) | (ucA << 24));
 }
 //----------------------------------------------------------------------------
-double Wml::System::GetTime ()
+double Wml::System::GetTime()
 {
     // 64-bit quantities
     LARGE_INTEGER iFrequency, iCounter;
 
     QueryPerformanceFrequency(&iFrequency);
     QueryPerformanceCounter(&iCounter);
-    return ((double)iCounter.QuadPart)/((double)iFrequency.QuadPart);
+    return ((double)iCounter.QuadPart) / ((double)iFrequency.QuadPart);
 }
 //----------------------------------------------------------------------------

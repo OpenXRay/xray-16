@@ -9,39 +9,35 @@
 #include "pch.hpp"
 #include "property_float.hpp"
 
-property_float::property_float			(
-		float_getter_type const &getter,
-		float_setter_type const &setter,
-		float const% increment_factor
-	) :
-	m_getter				(new float_getter_type(getter)),
-	m_setter				(new float_setter_type(setter)),
-	m_increment_factor		(increment_factor)
+property_float::property_float(
+    float_getter_type const& getter, float_setter_type const& setter, float const % increment_factor)
+    : m_getter(new float_getter_type(getter)), m_setter(new float_setter_type(setter)),
+      m_increment_factor(increment_factor)
 {
 }
 
-property_float::~property_float			()
+property_float::~property_float()
 {
-	this->!property_float	();
+    this->!property_float();
 }
 
-property_float::!property_float			()
+property_float::!property_float()
 {
-	delete					(m_getter);
-	delete					(m_setter);
+    delete (m_getter);
+    delete (m_setter);
 }
 
-System::Object ^property_float::GetValue	()
+System::Object ^ property_float::GetValue()
 {
-	return					((*m_getter)());
+    return ((*m_getter)());
 }
 
-void property_float::SetValue			(System::Object ^object)
+void property_float::SetValue(System::Object ^ object)
 {
-	(*m_setter)				(safe_cast<float>(object));
+    (*m_setter)(safe_cast<float>(object));
 }
 
-void property_float::Increment			(float value)
+void property_float::Increment(float value)
 {
-	SetValue				(safe_cast<float>(GetValue()) + value*m_increment_factor);
+    SetValue(safe_cast<float>(GetValue()) + value * m_increment_factor);
 }

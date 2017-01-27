@@ -6,34 +6,29 @@
 
 class CTCD
 {
-public:
-    TColorDialog *cdColor;
-public:
+  public:
+    TColorDialog* cdColor;
+
+  public:
     CTCD()
     {
         cdColor = new TColorDialog((TComponent*)0);
-        cdColor->Options = TColorDialogOptions()<<cdFullOpen;
+        cdColor->Options = TColorDialogOptions() << cdFullOpen;
     }
 
-    ~CTCD()
-    {
-        xr_delete(cdColor);
-    }
+    ~CTCD() { xr_delete(cdColor); }
 };
 
 static CTCD TCD;
 
-extern "C" DLL_API
-bool FSColorPickerExecute(u32 *currentColor, LPDWORD originalColor, const int initialExpansionState);
+extern "C" DLL_API bool FSColorPickerExecute(u32* currentColor, LPDWORD originalColor, const int initialExpansionState);
 
-bool SelectColor(u32 *currentcolor, bool bDefaultPicker)
+bool SelectColor(u32* currentcolor, bool bDefaultPicker)
 {
     VERIFY(currentcolor);
-    if (bDefaultPicker)
-    {
+    if (bDefaultPicker) {
         TCD.cdColor->Color = TColor(rgb2bgr(*currentcolor));
-        if (TCD.cdColor->Execute())
-        {
+        if (TCD.cdColor->Execute()) {
             *currentcolor = bgr2rgb(TCD.cdColor->Color);
             return true;
         }
@@ -42,8 +37,7 @@ bool SelectColor(u32 *currentcolor, bool bDefaultPicker)
     else
     {
         u32 clr = *currentcolor;
-        if (FSColorPickerExecute(&clr, 0, 0))
-        {
+        if (FSColorPickerExecute(&clr, 0, 0)) {
             *currentcolor = clr;
             return true;
         }
@@ -51,14 +45,12 @@ bool SelectColor(u32 *currentcolor, bool bDefaultPicker)
     }
 }
 
-bool SelectColorWin(u32 *currentcolor, bool bDefaultPicker)
+bool SelectColorWin(u32* currentcolor, bool bDefaultPicker)
 {
     VERIFY(currentcolor);
-    if (bDefaultPicker)
-    {
+    if (bDefaultPicker) {
         TCD.cdColor->Color = TColor(*currentcolor);
-        if (TCD.cdColor->Execute())
-        {
+        if (TCD.cdColor->Execute()) {
             *currentcolor = TCD.cdColor->Color;
             return true;
         }
@@ -67,12 +59,10 @@ bool SelectColorWin(u32 *currentcolor, bool bDefaultPicker)
     else
     {
         u32 cur = bgr2rgb(*currentcolor);
-        if (FSColorPickerExecute(&cur, 0, 0))
-        {
+        if (FSColorPickerExecute(&cur, 0, 0)) {
             *currentcolor = rgb2bgr(cur);
             return true;
         }
         return false;
     }
 }
-

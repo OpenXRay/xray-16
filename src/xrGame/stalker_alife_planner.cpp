@@ -18,51 +18,51 @@
 
 using namespace StalkerDecisionSpace;
 
-CStalkerALifePlanner::CStalkerALifePlanner	(CAI_Stalker *object, LPCSTR action_name) :
-	inherited								(object,action_name)
+CStalkerALifePlanner::CStalkerALifePlanner(CAI_Stalker* object, LPCSTR action_name) : inherited(object, action_name)
 {
 }
 
-CStalkerALifePlanner::~CStalkerALifePlanner	()
+CStalkerALifePlanner::~CStalkerALifePlanner()
 {
 }
 
-void CStalkerALifePlanner::setup			(CAI_Stalker *object, CPropertyStorage *storage)
+void CStalkerALifePlanner::setup(CAI_Stalker* object, CPropertyStorage* storage)
 {
-	inherited::setup		(object,storage);
+    inherited::setup(object, storage);
 
-	clear					();
-	add_evaluators			();
-	add_actions				();
+    clear();
+    add_evaluators();
+    add_actions();
 }
 
-void CStalkerALifePlanner::add_evaluators	()
+void CStalkerALifePlanner::add_evaluators()
 {
-	add_evaluator			(eWorldPropertyPuzzleSolved				,new CStalkerPropertyEvaluatorConst						(false,"zone puzzle solved"));
-	add_evaluator			(eWorldPropertySmartTerrainTask			,new CStalkerPropertyEvaluatorSmartTerrainTask			(m_object,"under smart terrain"));
-	add_evaluator			(eWorldPropertyALife					,new CStalkerPropertyEvaluatorALife						(m_object,"ALife Simulator"));
+    add_evaluator(eWorldPropertyPuzzleSolved, new CStalkerPropertyEvaluatorConst(false, "zone puzzle solved"));
+    add_evaluator(
+        eWorldPropertySmartTerrainTask, new CStalkerPropertyEvaluatorSmartTerrainTask(m_object, "under smart terrain"));
+    add_evaluator(eWorldPropertyALife, new CStalkerPropertyEvaluatorALife(m_object, "ALife Simulator"));
 }
 
-void CStalkerALifePlanner::add_actions		()
+void CStalkerALifePlanner::add_actions()
 {
-	CStalkerActionBase		*action;
+    CStalkerActionBase* action;
 
-	action					= new CStalkerActionNoALife					(m_object,"free_no_alife");
-	add_condition			(action,eWorldPropertyALife,					false);
-	add_condition			(action,eWorldPropertyPuzzleSolved,				false);
-	add_effect				(action,eWorldPropertyPuzzleSolved,				true);
-	add_operator			(eWorldOperatorALifeEmulation,					action);
+    action = new CStalkerActionNoALife(m_object, "free_no_alife");
+    add_condition(action, eWorldPropertyALife, false);
+    add_condition(action, eWorldPropertyPuzzleSolved, false);
+    add_effect(action, eWorldPropertyPuzzleSolved, true);
+    add_operator(eWorldOperatorALifeEmulation, action);
 
-	action					= new CStalkerActionSmartTerrain			(m_object,"smart terrain : get task location");
-	add_condition			(action,eWorldPropertyALife,					true);
-	add_condition			(action,eWorldPropertySmartTerrainTask,			true);
-	add_effect				(action,eWorldPropertySmartTerrainTask,			false);
-	add_operator			(eWorldOperatorSmartTerrainTask,				action);
+    action = new CStalkerActionSmartTerrain(m_object, "smart terrain : get task location");
+    add_condition(action, eWorldPropertyALife, true);
+    add_condition(action, eWorldPropertySmartTerrainTask, true);
+    add_effect(action, eWorldPropertySmartTerrainTask, false);
+    add_operator(eWorldOperatorSmartTerrainTask, action);
 
-	action					= new CStalkerActionSolveZonePuzzle			(m_object,"solve_zone_puzzle");
-	add_condition			(action,eWorldPropertyALife,					true);
-	add_condition			(action,eWorldPropertySmartTerrainTask,			false);
-	add_condition			(action,eWorldPropertyPuzzleSolved,				false);
-	add_effect				(action,eWorldPropertyPuzzleSolved,				true);
-	add_operator			(eWorldOperatorSolveZonePuzzle,					action);
+    action = new CStalkerActionSolveZonePuzzle(m_object, "solve_zone_puzzle");
+    add_condition(action, eWorldPropertyALife, true);
+    add_condition(action, eWorldPropertySmartTerrainTask, false);
+    add_condition(action, eWorldPropertyPuzzleSolved, false);
+    add_effect(action, eWorldPropertyPuzzleSolved, true);
+    add_operator(eWorldOperatorSolveZonePuzzle, action);
 }

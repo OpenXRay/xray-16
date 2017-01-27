@@ -8,8 +8,7 @@
 
 #pragma once
 
-//IC	const CCoverPoint	*CStalkerActionCombatBase::last_cover	() const
+// IC	const CCoverPoint	*CStalkerActionCombatBase::last_cover	() const
 //{
 //	return					(*m_last_cover);
 //}
-

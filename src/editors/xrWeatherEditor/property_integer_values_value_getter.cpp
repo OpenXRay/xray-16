@@ -14,56 +14,50 @@ using System::Collections::ArrayList;
 using System::Object;
 using System::String;
 
-property_integer_values_value_getter::property_integer_values_value_getter	(
-		integer_getter_type const& getter,
-		integer_setter_type const& setter,
-		string_collection_getter_type const& collection_getter,
-		string_collection_size_getter_type const& collection_size_getter
-	) :
-	inherited				(getter, setter),
-	m_collection_getter		(new string_collection_getter_type(collection_getter)),
-	m_collection_size_getter(new string_collection_size_getter_type(collection_size_getter))
+property_integer_values_value_getter::property_integer_values_value_getter(integer_getter_type const& getter,
+    integer_setter_type const& setter, string_collection_getter_type const& collection_getter,
+    string_collection_size_getter_type const& collection_size_getter)
+    : inherited(getter, setter), m_collection_getter(new string_collection_getter_type(collection_getter)),
+      m_collection_size_getter(new string_collection_size_getter_type(collection_size_getter))
 {
 }
 
-property_integer_values_value_getter::~property_integer_values_value_getter	()
+property_integer_values_value_getter::~property_integer_values_value_getter()
 {
-	this->!property_integer_values_value_getter	();
+    this->!property_integer_values_value_getter();
 }
 
-property_integer_values_value_getter::!property_integer_values_value_getter	()
+property_integer_values_value_getter::!property_integer_values_value_getter()
 {
-	delete					(m_collection_getter);
-	delete					(m_collection_size_getter);
+    delete (m_collection_getter);
+    delete (m_collection_size_getter);
 }
 
-Object ^property_integer_values_value_getter::GetValue						()
+Object ^ property_integer_values_value_getter::GetValue()
 {
-	int						value = safe_cast<int>(inherited::GetValue());
-	if (value < 0)
-		value				= 0;
+    int value = safe_cast<int>(inherited::GetValue());
+    if (value < 0) value = 0;
 
-	int						count = collection()->Count;
-	if (value >= count)
-		value				= count - 1;
+    int count = collection()->Count;
+    if (value >= count) value = count - 1;
 
-	return					(value);
+    return (value);
 }
 
-void property_integer_values_value_getter::SetValue						(Object ^object)
+void property_integer_values_value_getter::SetValue(Object ^ object)
 {
-	String^					string_value = dynamic_cast<String^>(object);
-	int						index = collection()->IndexOf(string_value);
-	VERIFY					((index >= 0));
-	inherited::SetValue	(index);
+    String ^ string_value = dynamic_cast<String ^>(object);
+    int index = collection()->IndexOf(string_value);
+    VERIFY((index >= 0));
+    inherited::SetValue(index);
 }
 
-IList^ property_integer_values_value_getter::collection						()
+IList ^ property_integer_values_value_getter::collection()
 {
-	ArrayList^				collection = gcnew ArrayList();
-	LPCSTR const*			values = (*m_collection_getter)();
-	for (u32 i=0, n = (*m_collection_size_getter)(); i<n; ++i)
-		collection->Add		(to_string(values[i]));
+    ArrayList ^ collection = gcnew ArrayList();
+    LPCSTR const* values = (*m_collection_getter)();
+    for (u32 i = 0, n = (*m_collection_size_getter)(); i < n; ++i)
+        collection->Add(to_string(values[i]));
 
-	return					(collection);
+    return (collection);
 }

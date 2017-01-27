@@ -6,7 +6,7 @@
 #include "ui_main.h"
 #include "UI_ToolsCustom.h"
 //---------------------------------------------------------------------------
-CCustomPreferences *EPrefs = 0;
+CCustomPreferences* EPrefs = 0;
 
 //---------------------------------------------------------------------------
 
@@ -16,7 +16,7 @@ CCustomPreferences::CCustomPreferences()
     view_np = 0.1f;
     view_fp = 1500.f;
     view_fov = deg2rad(60.f);
-    // fog    
+    // fog
     fog_color = 0x00555555;
     fog_fogness = 0.9;
     // camera
@@ -50,7 +50,9 @@ CCustomPreferences::CCustomPreferences()
 
 //---------------------------------------------------------------------------
 
-CCustomPreferences::~CCustomPreferences() {}
+CCustomPreferences::~CCustomPreferences()
+{
+}
 
 void CCustomPreferences::ApplyValues()
 {
@@ -61,9 +63,9 @@ void CCustomPreferences::ApplyValues()
     EDevice.m_Camera.SetViewport(view_np, view_fp, rad2deg(view_fov));
     Tools->SetFog(fog_color, fog_fogness);
 
-    UI->m_MouseSM = 0.2f*tools_sens_move*tools_sens_move;
-    UI->m_MouseSR = 0.02f*tools_sens_rot*tools_sens_rot;
-    UI->m_MouseSS = 0.02f*tools_sens_scale*tools_sens_scale;
+    UI->m_MouseSM = 0.2f * tools_sens_move * tools_sens_move;
+    UI->m_MouseSR = 0.02f * tools_sens_rot * tools_sens_rot;
+    UI->m_MouseSS = 0.02f * tools_sens_scale * tools_sens_scale;
 
     EDevice.m_Camera.SetSensitivity(cam_sens_move, cam_sens_rot);
     EDevice.m_Camera.SetFlyParams(cam_fly_speed, cam_fly_alt);
@@ -80,22 +82,19 @@ void __stdcall CCustomPreferences::OnClose()
 
 //---------------------------------------------------------------------------
 
-
-void CheckValidate(ShortcutValue *, const xr_shortcut &new_val, bool &result)
+void CheckValidate(ShortcutValue*, const xr_shortcut& new_val, bool& result)
 {
     result = true;
-    ECommandVec&cmds = GetEditorCommands();
-    for (u32 cmd_idx = 0; cmd_idx<cmds.size(); cmd_idx++)
+    ECommandVec& cmds = GetEditorCommands();
+    for (u32 cmd_idx = 0; cmd_idx < cmds.size(); cmd_idx++)
     {
         SECommand*& CMD = cmds[cmd_idx];
-        if (CMD&&CMD->editable)
-        {
+        if (CMD && CMD->editable) {
             VERIFY(!CMD->sub_commands.empty());
-            for (u32 sub_cmd_idx = 0; sub_cmd_idx<CMD->sub_commands.size(); sub_cmd_idx++)
+            for (u32 sub_cmd_idx = 0; sub_cmd_idx < CMD->sub_commands.size(); sub_cmd_idx++)
             {
                 SESubCommand*& SUB_CMD = CMD->sub_commands[sub_cmd_idx];
-                if (SUB_CMD->shortcut.similar(new_val))
-                {
+                if (SUB_CMD->shortcut.similar(new_val)) {
                     result = false;
                     return;
                 }
@@ -104,33 +103,31 @@ void CheckValidate(ShortcutValue *, const xr_shortcut &new_val, bool &result)
     }
 }
 
-void CCustomPreferences::OnKeyboardCommonFileClick(ButtonValue *B, bool &bModif, bool &)
+void CCustomPreferences::OnKeyboardCommonFileClick(ButtonValue* B, bool& bModif, bool&)
 {
     bModif = false;
     xr_string fn;
     switch (B->btn_num)
     {
-        case 0:
-            if (EFS.GetOpenName("$import$", fn, false, NULL, 6))
-            {
-                CInifile *I = new CInifile(fn.c_str(), TRUE, TRUE, TRUE);
-                LoadShortcuts(I);
-                xr_delete(I);
-                m_ItemProps->RefreshForm();
-            }
-            break;
-        case 1:
-            if (EFS.GetSaveName("$import$", fn, NULL, 6))
-            {
-                CInifile *I = new CInifile(fn.c_str(), FALSE, TRUE, TRUE);
-                SaveShortcuts(I);
-                xr_delete(I);
-            }
-            break;
+    case 0:
+        if (EFS.GetOpenName("$import$", fn, false, NULL, 6)) {
+            CInifile* I = new CInifile(fn.c_str(), TRUE, TRUE, TRUE);
+            LoadShortcuts(I);
+            xr_delete(I);
+            m_ItemProps->RefreshForm();
+        }
+        break;
+    case 1:
+        if (EFS.GetSaveName("$import$", fn, NULL, 6)) {
+            CInifile* I = new CInifile(fn.c_str(), FALSE, TRUE, TRUE);
+            SaveShortcuts(I);
+            xr_delete(I);
+        }
+        break;
     }
 }
 
-void CCustomPreferences::FillProp(PropItemVec &props)
+void CCustomPreferences::FillProp(PropItemVec& props)
 {
     PHelper().CreateFlag32(props, "Objects\\Library\\Discard Instance", &object_flags, epoDiscardInstance);
     PHelper().CreateFlag32(props, "Objects\\Skeleton\\Draw Joints", &object_flags, epoDrawJoints);
@@ -162,7 +159,6 @@ void CCustomPreferences::FillProp(PropItemVec &props)
     PHelper().CreateFloat(props, "Tools\\Snap\\Move", &snap_move, 0.01f, 1000.f);
     PHelper().CreateFloat(props, "Tools\\Snap\\Move To", &snap_moveto, 0.01f, 1000.f);
 
-
     PHelper().CreateFloat(props, "Viewport\\Camera\\Move Sens", &cam_sens_move);
     PHelper().CreateFloat(props, "Viewport\\Camera\\Rotate Sens", &cam_sens_rot);
     PHelper().CreateFloat(props, "Viewport\\Camera\\Fly Speed", &cam_fly_speed, 0.01f, 100.f);
@@ -174,21 +170,21 @@ void CCustomPreferences::FillProp(PropItemVec &props)
     PHelper().CreateAngle(props, "Viewport\\FOV", &view_fov, deg2rad(0.1f), deg2rad(170.f));
     PHelper().CreateColor(props, "Viewport\\Clear Color", &scene_clear_color);
 
-    ButtonValue *B = PHelper().CreateButton(props, "Keyboard\\Common\\File", "Load,Save", 0);
+    ButtonValue* B = PHelper().CreateButton(props, "Keyboard\\Common\\File", "Load,Save", 0);
     B->OnBtnClickEvent.bind(this, &CCustomPreferences::OnKeyboardCommonFileClick);
-    ECommandVec&cmds = GetEditorCommands();
-    for (u32 cmd_idx = 0; cmd_idx<cmds.size(); cmd_idx++)
+    ECommandVec& cmds = GetEditorCommands();
+    for (u32 cmd_idx = 0; cmd_idx < cmds.size(); cmd_idx++)
     {
         SECommand*& CMD = cmds[cmd_idx];
-        if (CMD&&CMD->editable)
-        {
+        if (CMD && CMD->editable) {
             VERIFY(!CMD->sub_commands.empty());
-            for (u32 sub_cmd_idx = 0; sub_cmd_idx<CMD->sub_commands.size(); sub_cmd_idx++)
+            for (u32 sub_cmd_idx = 0; sub_cmd_idx < CMD->sub_commands.size(); sub_cmd_idx++)
             {
                 SESubCommand*& SUB_CMD = CMD->sub_commands[sub_cmd_idx];
                 string128 nm;
                 sprintf(nm, "%s%s%s", CMD->Desc(), !SUB_CMD->desc.empty() ? "\\" : "", SUB_CMD->desc.c_str());
-                ShortcutValue *V = PHelper().CreateShortcut(props, PrepareKey("Keyboard\\Shortcuts", nm), &SUB_CMD->shortcut);
+                ShortcutValue* V =
+                    PHelper().CreateShortcut(props, PrepareKey("Keyboard\\Shortcuts", nm), &SUB_CMD->shortcut);
                 V->OnValidateResultEvent.bind(CheckValidate);
             }
         }
@@ -211,12 +207,13 @@ void CCustomPreferences::Edit()
 
 //---------------------------------------------------------------------------
 
-void CCustomPreferences::Load(CInifile *I)
+void CCustomPreferences::Load(CInifile* I)
 {
     psDeviceFlags.flags = R_U32_SAFE("editor_prefs", "device_flags", psDeviceFlags.flags);
     psSoundFlags.flags = R_U32_SAFE("editor_prefs", "sound_flags", psSoundFlags.flags)
 
-    Tools->m_Settings.flags = R_U32_SAFE("editor_prefs", "tools_settings", Tools->m_Settings.flags);
+                             Tools->m_Settings.flags =
+        R_U32_SAFE("editor_prefs", "tools_settings", Tools->m_Settings.flags);
 
     view_np = R_FLOAT_SAFE("editor_prefs", "view_np", view_np);
     view_fp = R_FLOAT_SAFE("editor_prefs", "view_fp", view_fp);
@@ -252,15 +249,14 @@ void CCustomPreferences::Load(CInifile *I)
 
     object_flags.flags = R_U32_SAFE("editor_prefs", "object_flags", object_flags.flags);
 
-    // read recent list    
-    for (u32 i = 0; i<scene_recent_count; i++)
+    // read recent list
+    for (u32 i = 0; i < scene_recent_count; i++)
     {
-        shared_str fn = R_STRING_SAFE("editor_prefs", AnsiString().sprintf("recent_files_%d", i).c_str(), shared_str(""));
-        if (fn.size())
-        {
+        shared_str fn =
+            R_STRING_SAFE("editor_prefs", AnsiString().sprintf("recent_files_%d", i).c_str(), shared_str(""));
+        if (fn.size()) {
             AStringIt it = std::find(scene_recent_list.begin(), scene_recent_list.end(), fn.c_str());
-            if (it==scene_recent_list.end())
-                scene_recent_list.push_back(*fn);
+            if (it == scene_recent_list.end()) scene_recent_list.push_back(*fn);
         }
     }
     sWeather = R_STRING_SAFE("editor_prefs", "weather", shared_str(""));
@@ -270,7 +266,7 @@ void CCustomPreferences::Load(CInifile *I)
     UI->LoadSettings(I);
 }
 
-void CCustomPreferences::Save(CInifile *I)
+void CCustomPreferences::Save(CInifile* I)
 {
     I->w_u32("editor_prefs", "device_flags", psDeviceFlags.flags);
     I->w_u32("editor_prefs", "sound_flags", psSoundFlags.flags);
@@ -311,10 +307,10 @@ void CCustomPreferences::Save(CInifile *I)
 
     I->w_u32("editor_prefs", "object_flags", object_flags.flags);
 
-    for (AStringIt it = scene_recent_list.begin(); it!=scene_recent_list.end(); it++)
+    for (AStringIt it = scene_recent_list.begin(); it != scene_recent_list.end(); it++)
     {
         AnsiString L;
-        L.sprintf("recent_files_%d", it-scene_recent_list.begin());
+        L.sprintf("recent_files_%d", it - scene_recent_list.begin());
         AnsiString V;
         V.sprintf("\"%s\"", it->c_str());
         I->w_string("editor_prefs", L.c_str(), V.c_str());
@@ -329,7 +325,7 @@ void CCustomPreferences::Load()
 {
     string_path fn;
     INI_NAME(fn);
-    CInifile *I = new CInifile(fn, TRUE, TRUE, TRUE);
+    CInifile* I = new CInifile(fn, TRUE, TRUE, TRUE);
     Load(I);
     xr_delete(I);
     ApplyValues();
@@ -339,7 +335,7 @@ void CCustomPreferences::Save()
 {
     string_path fn;
     INI_NAME(fn);
-    CInifile *I = new CInifile(fn, FALSE, TRUE, TRUE);
+    CInifile* I = new CInifile(fn, FALSE, TRUE, TRUE);
     I->set_override_names(TRUE);
     Save(I);
     xr_delete(I);
@@ -347,16 +343,15 @@ void CCustomPreferences::Save()
 
 void CCustomPreferences::AppendRecentFile(LPCSTR name)
 {
-    for (AStringIt it = scene_recent_list.begin(); it!=scene_recent_list.end(); it++)
+    for (AStringIt it = scene_recent_list.begin(); it != scene_recent_list.end(); it++)
     {
-        if (*it==name)
-        {
+        if (*it == name) {
             scene_recent_list.erase(it);
             break;
         }
     }
     scene_recent_list.insert(scene_recent_list.begin(), name);
-    while (scene_recent_list.size()>=EPrefs->scene_recent_count)
+    while (scene_recent_list.size() >= EPrefs->scene_recent_count)
         scene_recent_list.pop_back();
 
     ExecCommand(COMMAND_REFRESH_UI_BAR);
@@ -367,7 +362,11 @@ void CCustomPreferences::AppendRecentFile(LPCSTR name)
 void CCustomPreferences::OnCreate()
 {
     Load();
-    m_ItemProps = TProperties::CreateModalForm("Editor Preferences", false, 0, 0, TOnCloseEvent(this, &CCustomPreferences::OnClose), TProperties::plItemFolders|TProperties::plFullSort); //TProperties::plFullExpand TProperties::plFullSort TProperties::plNoClearStore|TProperties::plFolderStore|
+    m_ItemProps = TProperties::CreateModalForm("Editor Preferences", false, 0, 0,
+        TOnCloseEvent(this, &CCustomPreferences::OnClose),
+        TProperties::plItemFolders |
+            TProperties::plFullSort);  // TProperties::plFullExpand TProperties::plFullSort
+                                       // TProperties::plNoClearStore|TProperties::plFolderStore|
 }
 
 //---------------------------------------------------------------------------
@@ -379,5 +378,3 @@ void CCustomPreferences::OnDestroy()
 }
 
 //---------------------------------------------------------------------------
-
-

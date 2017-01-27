@@ -245,7 +245,8 @@ LPCSTR CSHSoundEnvTools::AppendItem(LPCSTR folder_name, LPCSTR parent_name)
 {
     CSoundRender_Environment *parent = FindItem(parent_name);
     AnsiString pref = parent_name ? AnsiString(parent_name) : AnsiString(folder_name)+"env";
-    m_LastSelection = FHelper.GenerateName(pref.c_str(), 2, fastdelegate::bind<TFindObjectByName>(this, &CSHSoundEnvTools::ItemExist), false, true);
+    m_LastSelection = FHelper.GenerateName(pref.c_str(), 2, fastdelegate::bind<TFindObjectByName>(this,
+&CSHSoundEnvTools::ItemExist), false, true);
     CSoundRender_Environment *S = m_Library.Append(parent);
     if (!parent)
         S->set_default();
@@ -358,19 +359,31 @@ void CSHSoundEnvTools::RealUpdateProperties()
         PropValue *V = 0;
         V = PHelper().CreateToken32(items, "Environment\\Preset", &S.Environment, eax_environment);
         V->OnChangeEvent.bind(this, &CSHSoundEnvTools::OnEnvChange);
-        V = PHelper().CreateFloat(items, "Environment\\Size", &S.EnvironmentSize, EAXLISTENER_MINENVIRONMENTSIZE, EAXLISTENER_MAXENVIRONMENTSIZE, 0.01f, 3);
+        V = PHelper().CreateFloat(items, "Environment\\Size", &S.EnvironmentSize, EAXLISTENER_MINENVIRONMENTSIZE,
+EAXLISTENER_MAXENVIRONMENTSIZE, 0.01f, 3);
         V->OnChangeEvent.bind(this, &CSHSoundEnvTools::OnEnvSizeChange);
-        PHelper().CreateFloat(items, "Environment\\Diffusion", &S.EnvironmentDiffusion, EAXLISTENER_MINENVIRONMENTDIFFUSION, EAXLISTENER_MAXENVIRONMENTDIFFUSION, 0.01f, 3);
-        PHelper().CreateFloat(items, "Room\\Room", &S.Room, (float)EAXLISTENER_MINROOM, (float)EAXLISTENER_MAXROOM, 1.f, 0);
-        PHelper().CreateFloat(items, "Room\\RoomHF", &S.RoomHF, (float)EAXLISTENER_MINROOMHF, (float)EAXLISTENER_MAXROOMHF, 1.f, 0);
-        PHelper().CreateFloat(items, "Distance Effects\\RoomRolloffFactor", &S.RoomRolloffFactor, EAXLISTENER_MINROOMROLLOFFFACTOR, EAXLISTENER_MAXROOMROLLOFFFACTOR, 0.01f, 3);
-        PHelper().CreateFloat(items, "Distance Effects\\AirAbsorptionHF", &S.AirAbsorptionHF, EAXLISTENER_MINAIRABSORPTIONHF, EAXLISTENER_MAXAIRABSORPTIONHF, 0.01f, 3);
-        PHelper().CreateFloat(items, "Reflections\\Reflections", &S.Reflections, (float)EAXLISTENER_MINREFLECTIONS, (float)EAXLISTENER_MAXREFLECTIONS, 1.f, 0);
-        PHelper().CreateFloat(items, "Reflections\\ReflectionsDelay", &S.ReflectionsDelay, EAXLISTENER_MINREFLECTIONSDELAY, EAXLISTENER_MAXREFLECTIONSDELAY, 0.01f, 3);
-        PHelper().CreateFloat(items, "Reverb\\Reverb", &S.Reverb, (float)EAXLISTENER_MINREVERB, (float)EAXLISTENER_MAXREVERB, 1.f, 0);
-        PHelper().CreateFloat(items, "Reverb\\ReverbDelay", &S.ReverbDelay, EAXLISTENER_MINREVERBDELAY, EAXLISTENER_MAXREVERBDELAY, 0.01f, 3);
-        PHelper().CreateFloat(items, "Decay\\DecayTime", &S.DecayTime, EAXLISTENER_MINDECAYTIME, EAXLISTENER_MAXDECAYTIME, 0.01f, 3);
-        PHelper().CreateFloat(items, "Decay\\DecayHFRatio", &S.DecayHFRatio, EAXLISTENER_MINDECAYHFRATIO, EAXLISTENER_MAXDECAYHFRATIO, 0.01f, 3);
+        PHelper().CreateFloat(items, "Environment\\Diffusion", &S.EnvironmentDiffusion,
+EAXLISTENER_MINENVIRONMENTDIFFUSION, EAXLISTENER_MAXENVIRONMENTDIFFUSION, 0.01f, 3);
+        PHelper().CreateFloat(items, "Room\\Room", &S.Room, (float)EAXLISTENER_MINROOM, (float)EAXLISTENER_MAXROOM, 1.f,
+0);
+        PHelper().CreateFloat(items, "Room\\RoomHF", &S.RoomHF, (float)EAXLISTENER_MINROOMHF,
+(float)EAXLISTENER_MAXROOMHF, 1.f, 0);
+        PHelper().CreateFloat(items, "Distance Effects\\RoomRolloffFactor", &S.RoomRolloffFactor,
+EAXLISTENER_MINROOMROLLOFFFACTOR, EAXLISTENER_MAXROOMROLLOFFFACTOR, 0.01f, 3);
+        PHelper().CreateFloat(items, "Distance Effects\\AirAbsorptionHF", &S.AirAbsorptionHF,
+EAXLISTENER_MINAIRABSORPTIONHF, EAXLISTENER_MAXAIRABSORPTIONHF, 0.01f, 3);
+        PHelper().CreateFloat(items, "Reflections\\Reflections", &S.Reflections, (float)EAXLISTENER_MINREFLECTIONS,
+(float)EAXLISTENER_MAXREFLECTIONS, 1.f, 0);
+        PHelper().CreateFloat(items, "Reflections\\ReflectionsDelay", &S.ReflectionsDelay,
+EAXLISTENER_MINREFLECTIONSDELAY, EAXLISTENER_MAXREFLECTIONSDELAY, 0.01f, 3);
+        PHelper().CreateFloat(items, "Reverb\\Reverb", &S.Reverb, (float)EAXLISTENER_MINREVERB,
+(float)EAXLISTENER_MAXREVERB, 1.f, 0);
+        PHelper().CreateFloat(items, "Reverb\\ReverbDelay", &S.ReverbDelay, EAXLISTENER_MINREVERBDELAY,
+EAXLISTENER_MAXREVERBDELAY, 0.01f, 3);
+        PHelper().CreateFloat(items, "Decay\\DecayTime", &S.DecayTime, EAXLISTENER_MINDECAYTIME,
+EAXLISTENER_MAXDECAYTIME, 0.01f, 3);
+        PHelper().CreateFloat(items, "Decay\\DecayHFRatio", &S.DecayHFRatio, EAXLISTENER_MINDECAYHFRATIO,
+EAXLISTENER_MAXDECAYHFRATIO, 0.01f, 3);
     }
     Ext.m_ItemProps->AssignItems(items);
     Ext.m_ItemProps->SetModifiedEvent(fastdelegate::bind<TOnModifiedEvent>(this, &CSHSoundEnvTools::Modified));

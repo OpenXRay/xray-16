@@ -9,16 +9,9 @@
  */
 #include <lwsdk/lwserver.h>
 
+extern char ServerClass[];
+extern char ServerName[];
+extern ServerUserName UserNames[];
+extern XCALL_(int) Activate(long, GlobalFunc*, void*, void*);
 
-extern char             ServerClass[];
-extern char             ServerName[];
-extern ServerUserName   UserNames[];
-extern XCALL_(int)    Activate (long, GlobalFunc *, void *, void *);
-
-
-    ServerRecord
-ServerDesc[] = {
-    { ServerClass, ServerName, Activate, UserNames },
-    { 0 }
-};
-
+ServerRecord ServerDesc[] = {{ServerClass, ServerName, Activate, UserNames}, {0}};

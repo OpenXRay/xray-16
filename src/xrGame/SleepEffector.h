@@ -1,8 +1,7 @@
 //////////////////////////////////////////////////////////////////////
 // SleepEffector.h:		эффектор, который запускаетс€ во врем€ сна
-//						актера                           
+//						актера
 //////////////////////////////////////////////////////////////////////
-
 
 #pragma once
 
@@ -10,36 +9,38 @@
 #include "../xrEngine/effector.h"
 #include "../xrEngine/cameramanager.h"
 
-
 #define SLEEP_EFFECTOR_TYPE_ID 8
 
 #define FATIGUE_EFFECTOR_TYPE_ID 33
 
-class CSleepEffectorPP : public CEffectorPP {
-	typedef CEffectorPP inherited;	
+class CSleepEffectorPP : public CEffectorPP
+{
+    typedef CEffectorPP inherited;
 
-	SPPInfo state;			// current state
-	float	m_total;		// total PP time
-	float	m_attack;		// attack time in percents	[0..1]
-	float	m_release;		// release time in percents	[0..1]
+    SPPInfo state;    // current state
+    float m_total;    // total PP time
+    float m_attack;   // attack time in percents	[0..1]
+    float m_release;  // release time in percents	[0..1]
 
 public:
-	CSleepEffectorPP			(const SPPInfo &ppi, float life_time, float attack_time = 0.0f, float release_time = 0.0f);
-	virtual	BOOL	Process		(SPPInfo& pp);
+    CSleepEffectorPP(const SPPInfo& ppi, float life_time, float attack_time = 0.0f, float release_time = 0.0f);
+    virtual BOOL Process(SPPInfo& pp);
 
-	
-	//текущий статус сна
-	enum SLEEP_STATE { BEGIN_SLEEP,
-					   BEFORE_SLEEPING,
-					   SLEEPING,
-					   AWAKING};
-	SLEEP_STATE m_eSleepState;
+    //текущий статус сна
+    enum SLEEP_STATE
+    {
+        BEGIN_SLEEP,
+        BEFORE_SLEEPING,
+        SLEEPING,
+        AWAKING
+    };
+    SLEEP_STATE m_eSleepState;
 };
 
-
-struct SSleepEffector {
-	SPPInfo	ppi;
-	float	time;
-	float	time_attack;
-	float	time_release;
+struct SSleepEffector
+{
+    SPPInfo ppi;
+    float time;
+    float time_attack;
+    float time_release;
 };

@@ -12,54 +12,46 @@
 #include "property_container.hpp"
 
 using System::ComponentModel::TypeConverter;
-typedef TypeConverter::StandardValuesCollection	StandardValuesCollection;
+typedef TypeConverter::StandardValuesCollection StandardValuesCollection;
 using System::Object;
 
-bool property_converter_integer_values::GetStandardValuesSupported				(ITypeDescriptorContext^ context)
+bool property_converter_integer_values::GetStandardValuesSupported(ITypeDescriptorContext ^ context)
 {
-	return							(true);
+    return (true);
 }
 
-bool property_converter_integer_values::GetStandardValuesExclusive				(ITypeDescriptorContext^ context)
+bool property_converter_integer_values::GetStandardValuesExclusive(ITypeDescriptorContext ^ context)
 {
-	return							(true);
+    return (true);
 }
 
-StandardValuesCollection ^property_converter_integer_values::GetStandardValues	(ITypeDescriptorContext^ context)
+StandardValuesCollection ^ property_converter_integer_values::GetStandardValues(ITypeDescriptorContext ^ context)
 {
-	property_container^				container = safe_cast<property_container^>(context->Instance);
-	PropertySpecDescriptor^			descriptor = safe_cast<PropertySpecDescriptor^>(context->PropertyDescriptor);
-	IProperty^					raw_value = container->GetProperty(descriptor->item);
-	property_integer_values_value_base^	value = safe_cast<property_integer_values_value_base^>(raw_value);
-	return							(gcnew StandardValuesCollection(value->collection()));
+    property_container ^ container = safe_cast<property_container ^>(context->Instance);
+    PropertySpecDescriptor ^ descriptor = safe_cast<PropertySpecDescriptor ^>(context->PropertyDescriptor);
+    IProperty ^ raw_value = container->GetProperty(descriptor->item);
+    property_integer_values_value_base ^ value = safe_cast<property_integer_values_value_base ^>(raw_value);
+    return (gcnew StandardValuesCollection(value->collection()));
 }
 
-Object^	property_converter_integer_values::ConvertTo							(
-		ITypeDescriptorContext^ context,
-		CultureInfo^ culture,
-		Object^ value,
-		Type^ destination_type
-	)
+Object ^ property_converter_integer_values::ConvertTo(
+             ITypeDescriptorContext ^ context, CultureInfo ^ culture, Object ^ value, Type ^ destination_type)
 {
-	if (!context)
-		return						(inherited::ConvertTo(context, culture, value, destination_type));
+    if (!context) return (inherited::ConvertTo(context, culture, value, destination_type));
 
-	if (!context->Instance)
-		return						(inherited::ConvertTo(context, culture, value, destination_type));
+    if (!context->Instance) return (inherited::ConvertTo(context, culture, value, destination_type));
 
-	if (!context->PropertyDescriptor)
-		return						(inherited::ConvertTo(context, culture, value, destination_type));
+    if (!context->PropertyDescriptor) return (inherited::ConvertTo(context, culture, value, destination_type));
 
-	if (destination_type != System::String::typeid)
-		return						(inherited::ConvertTo(context, culture, value, destination_type));
+    if (destination_type != System::String::typeid)
+        return (inherited::ConvertTo(context, culture, value, destination_type));
 
-	if (dynamic_cast<System::String^>(value))
-		return						(value);
+    if (dynamic_cast<System::String ^>(value)) return (value);
 
-	property_container^				container = safe_cast<property_container^>(context->Instance);
-	PropertySpecDescriptor^			descriptor = safe_cast<PropertySpecDescriptor^>(context->PropertyDescriptor);
-	IProperty^					raw_value = container->GetProperty(descriptor->item);
-	property_integer_values_value_base^	real_value = safe_cast<property_integer_values_value_base^>(raw_value);
-	int								int_value = safe_cast<int>(value);
-	return							(real_value->collection()[int_value]);
+    property_container ^ container = safe_cast<property_container ^>(context->Instance);
+    PropertySpecDescriptor ^ descriptor = safe_cast<PropertySpecDescriptor ^>(context->PropertyDescriptor);
+    IProperty ^ raw_value = container->GetProperty(descriptor->item);
+    property_integer_values_value_base ^ real_value = safe_cast<property_integer_values_value_base ^>(raw_value);
+    int int_value = safe_cast<int>(value);
+    return (real_value->collection()[int_value]);
 }

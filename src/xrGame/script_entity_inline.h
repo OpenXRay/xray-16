@@ -8,8 +8,8 @@
 
 #pragma once
 
-IC	CGameObject	&CScriptEntity::object	() const
+IC CGameObject& CScriptEntity::object() const
 {
-	VERIFY			(m_object);
-	return			(*m_object);
+    VERIFY(m_object);
+    return (*m_object);
 }

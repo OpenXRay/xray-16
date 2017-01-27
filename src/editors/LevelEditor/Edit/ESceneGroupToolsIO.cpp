@@ -16,40 +16,36 @@ enum
 
 //----------------------------------------------------
 
-bool ESceneGroupTool::LoadStream(IReader &F)
+bool ESceneGroupTool::LoadStream(IReader& F)
 {
     u16 version = 0;
     if (F.r_chunk(CHUNK_VERSION, &version))
-        if (version!=GROUP_TOOLS_VERSION)
-        {
+        if (version != GROUP_TOOLS_VERSION) {
             ELog.DlgMsg(mtError, "%s tools: Unsupported version.", ClassDesc());
             return false;
         }
 
-    if (!inherited::LoadStream(F))
-        return false;
+    if (!inherited::LoadStream(F)) return false;
 
     return true;
 }
 
 //----------------------------------------------------
-bool ESceneGroupTool::LoadLTX(CInifile &ini)
+bool ESceneGroupTool::LoadLTX(CInifile& ini)
 {
     LPCSTR section = "main";
     u16 version = ini.r_u16(section, "version");
 
-    if (version!=GROUP_TOOLS_VERSION)
-    {
+    if (version != GROUP_TOOLS_VERSION) {
         ELog.DlgMsg(mtError, "%s tools: Unsupported version.", ClassDesc());
         return false;
     }
-    if (!inherited::LoadLTX(ini))
-        return false;
+    if (!inherited::LoadLTX(ini)) return false;
 
     return true;
 }
 
-void ESceneGroupTool::SaveLTX(CInifile &ini, int id)
+void ESceneGroupTool::SaveLTX(CInifile& ini, int id)
 {
     LPCSTR section = "main";
     ini.w_u16(section, "version", GROUP_TOOLS_VERSION);
@@ -57,7 +53,7 @@ void ESceneGroupTool::SaveLTX(CInifile &ini, int id)
     inherited::SaveLTX(ini, id);
 }
 
-void ESceneGroupTool::SaveStream(IWriter &F)
+void ESceneGroupTool::SaveStream(IWriter& F)
 {
     inherited::SaveStream(F);
 
@@ -66,12 +62,11 @@ void ESceneGroupTool::SaveStream(IWriter &F)
 
 //----------------------------------------------------
 
-bool ESceneGroupTool::LoadSelection(IReader &F)
+bool ESceneGroupTool::LoadSelection(IReader& F)
 {
     u16 version = 0;
     R_ASSERT(F.r_chunk(CHUNK_VERSION, &version));
-    if (version!=GROUP_TOOLS_VERSION)
-    {
+    if (version != GROUP_TOOLS_VERSION) {
         ELog.DlgMsg(mtError, "%s tools: Unsupported version.", ClassDesc());
         return false;
     }
@@ -81,10 +76,9 @@ bool ESceneGroupTool::LoadSelection(IReader &F)
 
 //----------------------------------------------------
 
-void ESceneGroupTool::SaveSelection(IWriter &F)
+void ESceneGroupTool::SaveSelection(IWriter& F)
 {
     F.w_chunk(CHUNK_VERSION, (u16*)&GROUP_TOOLS_VERSION, sizeof(GROUP_TOOLS_VERSION));
 
     inherited::SaveSelection(F);
 }
-

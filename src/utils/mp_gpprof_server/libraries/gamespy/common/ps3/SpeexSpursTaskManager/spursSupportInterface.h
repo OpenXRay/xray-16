@@ -4,7 +4,6 @@
  *                                                All Rights Reserved.
  */
 
-
 #ifndef __SPURS_SUPPORT_INTERFACE_H
 #define __SPURS_SUPPORT_INTERFACE_H
 
@@ -20,12 +19,12 @@
 #if CELL_SDK_VERSION < 0x081000
 #define CELL_SPURS_TASK_ERROR_AGAIN CELL_SPURS_EAGAIN
 #define CELL_SPURS_TASK_ERROR_BUSY CELL_SPURS_EBUSY
-#endif // CELL_SDK_VERSION < 0x081000
+#endif  // CELL_SDK_VERSION < 0x081000
 
-#else // __SPU__
+#else  // __SPU__
 #include <cell/spurs/task.h>
 
-#endif // __SPU__
+#endif  // __SPU__
 
 #define CELL_SPURS_RESPONSE_QUEUE_SIZE 128
 
@@ -38,7 +37,7 @@
  * solver may be asked to do a collision detection job.
  */
 //////////////////////////////////////////////////////////////////////////
-// only one type of SPURS Task ELF 
+// only one type of SPURS Task ELF
 // typedef enum {
 // //	SPU_ELF_MID_PHASE=0,
 // //	SPU_ELF_SOLVER,
@@ -46,20 +45,20 @@
 // 	SPU_ELF_LAST,
 // } CellSpursElfId_t;
 
-typedef union CellSPURSArgument 
+typedef union CellSPURSArgument
 {
-	struct 
-	{
-		CELL_PPU_POINTER(CellSpursQueue) ppuResponseQueue;
-		uint32_t uiCommand;
-		uint32_t uiArgument0;
-		uint32_t uiArgument1;
-	};
+    struct
+    {
+        CELL_PPU_POINTER(CellSpursQueue) ppuResponseQueue;
+        uint32_t uiCommand;
+        uint32_t uiArgument0;
+        uint32_t uiArgument1;
+    };
 
 #if __PPU__
-	CellSpursTaskArgument spursArgument;
+    CellSpursTaskArgument spursArgument;
 #elif __SPU__
-	vec_uint4 uiQWord;
+    vec_uint4 uiQWord;
 #endif
 } CellSPURSArgument __attribute__((aligned(16)));
 
@@ -67,67 +66,64 @@ typedef union CellSPURSArgument
 #include "SPUAssert.h"
 #include <cell/spurs/task.h>
 
-static inline void sendResponseToPPU(uint32_t ppuQueueEA, uint32_t uiArgument0,
-											uint32_t uiArgument1, int iTag=1) {
-	CellSPURSArgument response 
-		__attribute__ ((aligned(16)));
+static inline void sendResponseToPPU(uint32_t ppuQueueEA, uint32_t uiArgument0, uint32_t uiArgument1, int iTag = 1)
+{
+    CellSPURSArgument response __attribute__((aligned(16)));
 
-	response.uiArgument0=uiArgument0;
-	response.uiArgument1=uiArgument1;
+    response.uiArgument0 = uiArgument0;
+    response.uiArgument1 = uiArgument1;
 
-	int iReturn;
-	do {
-		iReturn=cellSpursQueueTryPushBegin(ppuQueueEA, &response, iTag);
-	} while (iReturn == CELL_SPURS_TASK_ERROR_AGAIN ||
-			 iReturn == CELL_SPURS_TASK_ERROR_BUSY);
+    int iReturn;
+    do
+    {
+        iReturn = cellSpursQueueTryPushBegin(ppuQueueEA, &response, iTag);
+    } while (iReturn == CELL_SPURS_TASK_ERROR_AGAIN || iReturn == CELL_SPURS_TASK_ERROR_BUSY);
 
-	SPU_ASSERT((iReturn == CELL_OK) && "Error writing to SPURS queue.");
+    SPU_ASSERT((iReturn == CELL_OK) && "Error writing to SPURS queue.");
 
-	cellSpursQueuePushEnd(ppuQueueEA, iTag);
-
+    cellSpursQueuePushEnd(ppuQueueEA, iTag);
 }
 
-static inline void sendResponseToPPUAndExit(uint32_t ppuQueueEA, uint32_t uiArgument0,
-											uint32_t uiArgument1, int iTag=1) {
-	CellSPURSArgument response 
-		__attribute__ ((aligned(16)));
+static inline void sendResponseToPPUAndExit(
+    uint32_t ppuQueueEA, uint32_t uiArgument0, uint32_t uiArgument1, int iTag = 1)
+{
+    CellSPURSArgument response __attribute__((aligned(16)));
 
-	response.uiArgument0=uiArgument0;
-	response.uiArgument1=uiArgument1;
+    response.uiArgument0 = uiArgument0;
+    response.uiArgument1 = uiArgument1;
 
-	int iReturn;
-	do {
-		iReturn=cellSpursQueueTryPushBegin(ppuQueueEA, &response, iTag);
-	} while (iReturn == CELL_SPURS_TASK_ERROR_AGAIN ||
-			 iReturn == CELL_SPURS_TASK_ERROR_BUSY);
+    int iReturn;
+    do
+    {
+        iReturn = cellSpursQueueTryPushBegin(ppuQueueEA, &response, iTag);
+    } while (iReturn == CELL_SPURS_TASK_ERROR_AGAIN || iReturn == CELL_SPURS_TASK_ERROR_BUSY);
 
-	SPU_ASSERT((iReturn == CELL_OK) && "Error writing to SPURS queue.");
+    SPU_ASSERT((iReturn == CELL_OK) && "Error writing to SPURS queue.");
 
-	cellSpursQueuePushEnd(ppuQueueEA, iTag);
+    cellSpursQueuePushEnd(ppuQueueEA, iTag);
 
-	cellSpursExit();
+    cellSpursExit();
 }
-#elif __PPU__ // not __SPU__
+#elif __PPU__  // not __SPU__
 
 class SpursSupportInterface : public spursThreadSupportInterface
 {
 public:
-	SpursSupportInterface();
-	~SpursSupportInterface();
-	int sendRequest(uint32_t uiCommand, uint32_t uiArgument0, uint32_t uiArgument1=0);
-	int waitForResponse(unsigned int *puiArgument0, unsigned int *puiArgument1);
-	int startSPU();
-	int stopSPU();
+    SpursSupportInterface();
+    ~SpursSupportInterface();
+    int sendRequest(uint32_t uiCommand, uint32_t uiArgument0, uint32_t uiArgument1 = 0);
+    int waitForResponse(unsigned int* puiArgument0, unsigned int* puiArgument1);
+    int startSPU();
+    int stopSPU();
 
 protected:
-	//CellSpursElfId_t m_elfId;
-	void *m_spursTaskAddress;
-	CellSpursQueue m_responseQueue __attribute__((aligned(128)));
-	CellSPURSArgument m_aResponseBuffer[CELL_SPURS_RESPONSE_QUEUE_SIZE] __attribute__((aligned(16)));
+    // CellSpursElfId_t m_elfId;
+    void* m_spursTaskAddress;
+    CellSpursQueue m_responseQueue __attribute__((aligned(128)));
+    CellSPURSArgument m_aResponseBuffer[CELL_SPURS_RESPONSE_QUEUE_SIZE] __attribute__((aligned(16)));
 
-	bool m_bQueueInitialized;
+    bool m_bQueueInitialized;
 };
-#endif // __SPU__ / __PPU__
+#endif         // __SPU__ / __PPU__
 
-
-#endif // CELL_SPURS_SUPPORT_H
+#endif  // CELL_SPURS_SUPPORT_H

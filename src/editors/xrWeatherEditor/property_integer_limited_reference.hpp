@@ -11,25 +11,23 @@
 
 #include "property_integer_reference.hpp"
 
-public ref class property_integer_limited_reference : public property_integer_reference {
-private:
-	typedef property_integer_reference					inherited;
+public
+ref class property_integer_limited_reference : public property_integer_reference
+{
+  private:
+    typedef property_integer_reference inherited;
 
-public:
-	typedef System::Object		Object;
+  public:
+    typedef System::Object Object;
 
-public:
-					property_integer_limited_reference	(
-								int& value,
-								int const %min,
-								int const %max
-							);
-	virtual Object	^GetValue							() override;
-	virtual void	SetValue							(System::Object ^object) override;
+  public:
+    property_integer_limited_reference(int& value, int const % min, int const % max);
+    virtual Object ^ GetValue() override;
+    virtual void SetValue(System::Object ^ object) override;
 
-private:
-	int				m_min;
-	int				m_max;
-}; // ref class property_integer_limited_reference
+  private:
+    int m_min;
+    int m_max;
+};  // ref class property_integer_limited_reference
 
-#endif // ifndef PROPERTY_INTEGER_LIMITED_REFERENCE_HPP_INCLUDED
+#endif  // ifndef PROPERTY_INTEGER_LIMITED_REFERENCE_HPP_INCLUDED

@@ -26,7 +26,8 @@ using editor::environment::thunderbolts::collection;
 using editor::environment::detail::logical_string_predicate;
 
 template <>
-void property_collection<manager::thunderbolt_container_type, manager>::display_name(u32 const& item_index, LPSTR const& buffer, u32 const& buffer_size)
+void property_collection<manager::thunderbolt_container_type, manager>::display_name(
+    u32 const& item_index, LPSTR const& buffer, u32 const& buffer_size)
 {
     xr_strcpy(buffer, buffer_size, m_container[item_index]->id());
 }
@@ -40,7 +41,8 @@ editor::property_holder* property_collection<manager::thunderbolt_container_type
 }
 
 template <>
-void property_collection<manager::collection_container_type, manager>::display_name(u32 const& item_index, LPSTR const& buffer, u32 const& buffer_size)
+void property_collection<manager::collection_container_type, manager>::display_name(
+    u32 const& item_index, LPSTR const& buffer, u32 const& buffer_size)
 {
     xr_strcpy(buffer, buffer_size, m_container[item_index]->id());
 }
@@ -53,13 +55,9 @@ editor::property_holder* property_collection<manager::collection_container_type,
     return (object->object());
 }
 
-manager::manager(::editor::environment::manager* environment) :
-    m_thunderbolt_collection(0),
-    m_thunderbolts_changed(true),
-    m_collections_collection(0),
-    m_collections_changed(true),
-    m_property_holder(0),
-    m_environment(*environment)
+manager::manager(::editor::environment::manager* environment)
+    : m_thunderbolt_collection(0), m_thunderbolts_changed(true), m_collections_collection(0),
+      m_collections_changed(true), m_property_holder(0), m_environment(*environment)
 {
     m_thunderbolt_collection = new thunderbolt_collection_type(&m_thunderbolts, this, &m_thunderbolts_changed);
     m_collections_collection = new collection_collection_type(&m_collections, this, &m_collections_changed);
@@ -76,8 +74,7 @@ manager::~manager()
     delete_data(m_thunderbolts_ids);
     delete_data(m_collections_ids);
 
-    if (!Device.editor() || !m_property_holder)
-        return;
+    if (!Device.editor() || !m_property_holder) return;
 
     ::ide().destroy(m_property_holder);
 }
@@ -88,16 +85,7 @@ void manager::load_thunderbolts()
 
     string_path file_name;
     CInifile* config =
-        new CInifile(
-            FS.update_path(
-                file_name,
-                "$game_config$",
-                "environment\\thunderbolts.ltx"
-            ),
-            TRUE,
-            TRUE,
-            FALSE
-        );
+        new CInifile(FS.update_path(file_name, "$game_config$", "environment\\thunderbolts.ltx"), TRUE, TRUE, FALSE);
 
     typedef CInifile::Root sections_type;
     sections_type& sections = config->sections();
@@ -119,16 +107,7 @@ void manager::save_thunderbolts()
 {
     string_path file_name;
     CInifile* config =
-        new CInifile(
-            FS.update_path(
-                file_name,
-                "$game_config$",
-                "environment\\thunderbolts.ltx"
-            ),
-            FALSE,
-            FALSE,
-            TRUE
-        );
+        new CInifile(FS.update_path(file_name, "$game_config$", "environment\\thunderbolts.ltx"), FALSE, FALSE, TRUE);
 
     thunderbolt_container_type::const_iterator i = m_thunderbolts.begin();
     thunderbolt_container_type::const_iterator e = m_thunderbolts.end();
@@ -143,17 +122,8 @@ void manager::load_collections()
     VERIFY(m_collections.empty());
 
     string_path file_name;
-    CInifile* config =
-        new CInifile(
-            FS.update_path(
-                file_name,
-                "$game_config$",
-                "environment\\thunderbolt_collections.ltx"
-            ),
-            TRUE,
-            TRUE,
-            FALSE
-        );
+    CInifile* config = new CInifile(
+        FS.update_path(file_name, "$game_config$", "environment\\thunderbolt_collections.ltx"), TRUE, TRUE, FALSE);
 
     typedef CInifile::Root sections_type;
     sections_type& sections = config->sections();
@@ -174,17 +144,8 @@ void manager::load_collections()
 void manager::save_collections()
 {
     string_path file_name;
-    CInifile* config =
-        new CInifile(
-            FS.update_path(
-                file_name,
-                "$game_config$",
-                "environment\\thunderbolt_collections.ltx"
-            ),
-            FALSE,
-            FALSE,
-            TRUE
-        );
+    CInifile* config = new CInifile(
+        FS.update_path(file_name, "$game_config$", "environment\\thunderbolt_collections.ltx"), FALSE, FALSE, TRUE);
 
     collection_container_type::const_iterator i = m_collections.begin();
     collection_container_type::const_iterator e = m_collections.end();
@@ -207,16 +168,7 @@ void manager::save()
 
     string_path file_name;
     CInifile* config =
-        new CInifile(
-            FS.update_path(
-                file_name,
-                "$game_config$",
-                "environment\\environment.ltx"
-            ),
-            FALSE,
-            FALSE,
-            TRUE
-        );
+        new CInifile(FS.update_path(file_name, "$game_config$", "environment\\environment.ltx"), FALSE, FALSE, TRUE);
 
     CEnvironment& environment = g_pGamePersistent->Environment();
 
@@ -274,105 +226,40 @@ void manager::fill(editor::property_holder* holder)
 
     float_getter.bind(this, &manager::altitude_getter);
     float_setter.bind(this, &manager::altitude_setter);
-    holder->add_property(
-        "altitude",
-        "thunderbolts",
-        "this option is resposible for thunderbolts altitude (in degrees)",
-        rad2deg(m_environment.p_var_alt),
-        float_getter,
-        float_setter,
-        -360.0f,
-        360.f
-    );
+    holder->add_property("altitude", "thunderbolts", "this option is resposible for thunderbolts altitude (in degrees)",
+        rad2deg(m_environment.p_var_alt), float_getter, float_setter, -360.0f, 360.f);
 
     float_getter.bind(this, &manager::longitude_getter);
     float_setter.bind(this, &manager::longitude_setter);
-    holder->add_property(
-        "delta longitude",
-        "thunderbolts",
-        "this option is resposible for thunderbolts delta longitude (in degrees)",
-        m_environment.p_var_long,
-        float_getter,
-        float_setter,
-        -360.0f,
-        360.f
-    );
-    holder->add_property(
-        "minimum distance factor",
-        "thunderbolts",
+    holder->add_property("delta longitude", "thunderbolts",
+        "this option is resposible for thunderbolts delta longitude (in degrees)", m_environment.p_var_long,
+        float_getter, float_setter, -360.0f, 360.f);
+    holder->add_property("minimum distance factor", "thunderbolts",
         "this option is resposible for thunderbolts minimum distance factor (distance from far plane)",
-        m_environment.p_min_dist,
-        m_environment.p_min_dist,
-        .0f,
-        .95f
-    );
+        m_environment.p_min_dist, m_environment.p_min_dist, .0f, .95f);
 
     float_getter.bind(this, &manager::tilt_getter);
     float_setter.bind(this, &manager::tilt_setter);
+    holder->add_property("tilt", "thunderbolts", "this option is resposible for thunderbolts tilt (in degrees)",
+        m_environment.p_tilt, float_getter, float_setter, 15.f, 30.f);
+    holder->add_property("second probability", "thunderbolts",
+        "this option is resposible for thunderbolts second probability (0..1)", m_environment.p_second_prop,
+        m_environment.p_second_prop, 0.f, 1.f);
+    holder->add_property("sky color", "thunderbolts", "this option is resposible for thunderbolts sky color (factor)",
+        m_environment.p_sky_color, m_environment.p_sky_color, 0.f, 1.f);
+    holder->add_property("sun color", "thunderbolts", "this option is resposible for thunderbolts sun color (factor)",
+        m_environment.p_sun_color, m_environment.p_sun_color, 0.f, 1.f);
+    holder->add_property("fog color", "thunderbolts", "this option is resposible for thunderbolts fog color (factor)",
+        m_environment.p_fog_color, m_environment.p_fog_color, 0.f, 1.f);
+    holder->add_property("thunderbolt collections", "thunderbolts",
+        "this option is resposible for thunderbolt collections", m_collections_collection);
     holder->add_property(
-        "tilt",
-        "thunderbolts",
-        "this option is resposible for thunderbolts tilt (in degrees)",
-        m_environment.p_tilt,
-        float_getter,
-        float_setter,
-        15.f,
-        30.f
-    );
-    holder->add_property(
-        "second probability",
-        "thunderbolts",
-        "this option is resposible for thunderbolts second probability (0..1)",
-        m_environment.p_second_prop,
-        m_environment.p_second_prop,
-        0.f,
-        1.f
-    );
-    holder->add_property(
-        "sky color",
-        "thunderbolts",
-        "this option is resposible for thunderbolts sky color (factor)",
-        m_environment.p_sky_color,
-        m_environment.p_sky_color,
-        0.f,
-        1.f
-    );
-    holder->add_property(
-        "sun color",
-        "thunderbolts",
-        "this option is resposible for thunderbolts sun color (factor)",
-        m_environment.p_sun_color,
-        m_environment.p_sun_color,
-        0.f,
-        1.f
-    );
-    holder->add_property(
-        "fog color",
-        "thunderbolts",
-        "this option is resposible for thunderbolts fog color (factor)",
-        m_environment.p_fog_color,
-        m_environment.p_fog_color,
-        0.f,
-        1.f
-    );
-    holder->add_property(
-        "thunderbolt collections",
-        "thunderbolts",
-        "this option is resposible for thunderbolt collections",
-        m_collections_collection
-    );
-    holder->add_property(
-        "thunderbolts",
-        "thunderbolts",
-        "this option is resposible for thunderbolts",
-        m_thunderbolt_collection
-    );
+        "thunderbolts", "thunderbolts", "this option is resposible for thunderbolts", m_thunderbolt_collection);
 }
 
 manager::thunderbolts_ids_type const& manager::thunderbolts_ids() const
 {
-    if (!m_thunderbolts_changed)
-        return (m_thunderbolts_ids);
+    if (!m_thunderbolts_changed) return (m_thunderbolts_ids);
 
     delete_data(m_thunderbolts_ids);
 
@@ -391,8 +278,7 @@ manager::thunderbolts_ids_type const& manager::thunderbolts_ids() const
 
 manager::thunderbolts_ids_type const& manager::collections_ids() const
 {
-    if (!m_collections_changed)
-        return (m_collections_ids);
+    if (!m_collections_changed) return (m_collections_ids);
 
     delete_data(m_collections_ids);
 
@@ -417,16 +303,14 @@ manager::thunderbolts_ids_type const& manager::collections_ids() const
 
 shared_str manager::unique_thunderbolt_id(shared_str const& id) const
 {
-    if (m_thunderbolt_collection->unique_id(id.c_str()))
-        return (id);
+    if (m_thunderbolt_collection->unique_id(id.c_str())) return (id);
 
     return (m_thunderbolt_collection->generate_unique_id(id.c_str()));
 }
 
 shared_str manager::unique_collection_id(shared_str const& id) const
 {
-    if (m_collections_collection->unique_id(id.c_str()))
-        return (id);
+    if (m_collections_collection->unique_id(id.c_str())) return (id);
 
     return (m_collections_collection->generate_unique_id(id.c_str()));
 }
@@ -436,13 +320,12 @@ SThunderboltDesc* manager::description(CInifile& config, shared_str const& secti
     thunderbolt_container_type::const_iterator i = m_thunderbolts.begin();
     thunderbolt_container_type::const_iterator e = m_thunderbolts.end();
     for (; i != e; ++i)
-        if ((*i)->id() == section)
-            return (*i);
+        if ((*i)->id() == section) return (*i);
 
     NODEFAULT;
 #ifdef DEBUG
     return (0);
-#endif // #ifdef DEBUG
+#endif  // #ifdef DEBUG
 }
 
 SThunderboltCollection* manager::get_collection(shared_str const& section)
@@ -450,13 +333,12 @@ SThunderboltCollection* manager::get_collection(shared_str const& section)
     collection_container_type::iterator i = m_collections.begin();
     collection_container_type::iterator e = m_collections.end();
     for (; i != e; ++i)
-        if ((*i)->id() == section)
-            return (*i);
+        if ((*i)->id() == section) return (*i);
 
     NODEFAULT;
 #ifdef DEBUG
     return (0);
-#endif // #ifdef DEBUG
+#endif  // #ifdef DEBUG
 }
 
-#endif // #ifdef INGAME_EDITOR
+#endif  // #ifdef INGAME_EDITOR

@@ -4,16 +4,14 @@
 #include "ESceneControlsCustom.h"
 
 //---------------------------------------------------------------------------
-class TUI_ControlPSAdd: public TUI_CustomControl
+class TUI_ControlPSAdd : public TUI_CustomControl
 {
-    bool __fastcall AfterAppendCallback(TShiftState Shift, CCustomObject *obj);
-public:
-    TUI_ControlPSAdd(int st, int act, ESceneToolBase *parent);
+    bool __fastcall AfterAppendCallback(TShiftState Shift, CCustomObject* obj);
 
-    virtual ~TUI_ControlPSAdd()
-    {
-        ;
-    }
+  public:
+    TUI_ControlPSAdd(int st, int act, ESceneToolBase* parent);
+
+    virtual ~TUI_ControlPSAdd() { ; }
 
     virtual bool Start(TShiftState _Shift);
     virtual bool End(TShiftState _Shift);
@@ -21,6 +19,4 @@ public:
 };
 
 //---------------------------------------------------------------------------
-#endif //UI_PSToolsH
-
-
+#endif  // UI_PSToolsH

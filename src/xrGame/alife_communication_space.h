@@ -12,12 +12,12 @@
 #include "xrServer_Objects_Alife_Items.h"
 
 namespace ALifeCommunication {
-	class CRemoveAttachedItemsPredicate {
-	public:
-		IC bool			operator()	(const CSE_ALifeInventoryItem *item)
-		{
-			return		(item->attached());
-		};
-	};
+    class CRemoveAttachedItemsPredicate {
+    public:
+        IC bool			operator()	(const CSE_ALifeInventoryItem *item)
+        {
+            return		(item->attached());
+        };
+    };
 }
 /**/

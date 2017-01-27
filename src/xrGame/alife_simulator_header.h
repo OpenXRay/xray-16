@@ -11,17 +11,18 @@
 #include "Common/object_interfaces.h"
 #include "alife_space.h"
 
-class CALifeSimulatorHeader {
+class CALifeSimulatorHeader
+{
 protected:
-	u32								m_version;
+    u32 m_version;
 
 public:
-	IC								CALifeSimulatorHeader	(LPCSTR section);
-	virtual							~CALifeSimulatorHeader	();
-	virtual void					save					(IWriter &tMemoryStream);
-	virtual void					load					(IReader &tFileStream);
-	IC		u32						version					() const;
-			bool					valid					(IReader &file_stream) const;
+    IC CALifeSimulatorHeader(LPCSTR section);
+    virtual ~CALifeSimulatorHeader();
+    virtual void save(IWriter& tMemoryStream);
+    virtual void load(IReader& tFileStream);
+    IC u32 version() const;
+    bool valid(IReader& file_stream) const;
 };
 
 #include "alife_simulator_header_inline.h"

@@ -24,23 +24,24 @@ private:
     typedef ISerializable inherited;
 
 public:
-	typedef AssociativeVector<shared_str,CPatrolPath*>	PATROL_REGISTRY;
-	typedef PATROL_REGISTRY::iterator					iterator;
-	typedef PATROL_REGISTRY::const_iterator				const_iterator;
+    typedef AssociativeVector<shared_str, CPatrolPath*> PATROL_REGISTRY;
+    typedef PATROL_REGISTRY::iterator iterator;
+    typedef PATROL_REGISTRY::const_iterator const_iterator;
 
 protected:
-	PATROL_REGISTRY					m_registry;
+    PATROL_REGISTRY m_registry;
 
 public:
-	IC								CPatrolPathStorage	();
-	virtual							~CPatrolPathStorage	();
-	virtual	void					load				(IReader &stream);
-	virtual	void					save				(IWriter &stream);
+    IC CPatrolPathStorage();
+    virtual ~CPatrolPathStorage();
+    virtual void load(IReader& stream);
+    virtual void save(IWriter& stream);
 
 public:
-			void					load_raw			(const CLevelGraph *level_graph, const CGameLevelCrossTable *cross, const CGameGraph *game_graph, IReader &stream);
-	IC		const CPatrolPath		*path				(shared_str patrol_name, bool no_assert = false) const;
-	IC		const PATROL_REGISTRY	&patrol_paths		() const;
+    void load_raw(const CLevelGraph* level_graph, const CGameLevelCrossTable* cross, const CGameGraph* game_graph,
+        IReader& stream);
+    IC const CPatrolPath* path(shared_str patrol_name, bool no_assert = false) const;
+    IC const PATROL_REGISTRY& patrol_paths() const;
 };
 
 #include "xrAICore/Navigation/PatrolPath/patrol_path_storage_inline.h"

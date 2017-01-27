@@ -19,13 +19,12 @@
 #pragma link "MXCtrls"
 #pragma resource "*.dfm"
 
-TfrmSoundLib *TfrmSoundLib::form = 0;
+TfrmSoundLib* TfrmSoundLib::form = 0;
 FS_FileSet TfrmSoundLib::modif_map;
 Flags32 TfrmSoundLib::m_Flags = {0};
 
 //---------------------------------------------------------------------------
-__fastcall TfrmSoundLib::TfrmSoundLib(TComponent *Owner)
-    : TForm(Owner)
+__fastcall TfrmSoundLib::TfrmSoundLib(TComponent* Owner) : TForm(Owner)
 {
     DEFINE_INI(fsStorage);
     bFormLocked = false;
@@ -33,11 +32,12 @@ __fastcall TfrmSoundLib::TfrmSoundLib(TComponent *Owner)
 
 //---------------------------------------------------------------------------
 
-void __fastcall TfrmSoundLib::FormCreate(TObject *Sender)
+void __fastcall TfrmSoundLib::FormCreate(TObject* Sender)
 {
     m_ItemProps = TProperties::CreateForm("SoundED", paProperties, alClient);
     m_ItemProps->SetModifiedEvent(fastdelegate::bind<TOnModifiedEvent>(this, &TfrmSoundLib::OnModified));
-    m_ItemList = TItemList::CreateForm("Items", paItems, alClient, TItemList::ilMultiSelect/*|TItemList::ilEditMenu|TItemList::ilDragAllowed*/);
+    m_ItemList = TItemList::CreateForm(
+        "Items", paItems, alClient, TItemList::ilMultiSelect /*|TItemList::ilEditMenu|TItemList::ilDragAllowed*/);
     m_ItemList->SetOnItemsFocusedEvent(fastdelegate::bind<TOnILItemsFocused>(this, &TfrmSoundLib::OnItemsFocused));
     TOnItemRemove on_remove;
     on_remove.bind(this, &TfrmSoundLib::RemoveSound);
@@ -51,7 +51,7 @@ void __fastcall TfrmSoundLib::FormCreate(TObject *Sender)
 
 //---------------------------------------------------------------------------
 
-void __fastcall TfrmSoundLib::FormDestroy(TObject *Sender)
+void __fastcall TfrmSoundLib::FormDestroy(TObject* Sender)
 {
     TProperties::DestroyForm(m_ItemProps);
     TItemList::DestroyForm(m_ItemList);
@@ -60,17 +60,15 @@ void __fastcall TfrmSoundLib::FormDestroy(TObject *Sender)
 
 //---------------------------------------------------------------------------
 
-void __fastcall TfrmSoundLib::EditLib(AnsiString &title)
+void __fastcall TfrmSoundLib::EditLib(AnsiString& title)
 {
-    if (!form)
-    {
+    if (!form) {
         form = new TfrmSoundLib((TComponent*)0);
         form->Caption = title;
         form->modif_map.clear();
         m_Flags.zero();
         form->InitItemsList();
-        if (!FS.can_write_to_alias(_sounds_))
-        {
+        if (!FS.can_write_to_alias(_sounds_)) {
             Log("#!You don't have permisions to modify sounds.");
             form->ebOk->Enabled = false;
             form->m_ItemProps->SetReadOnly(TRUE);
@@ -97,8 +95,7 @@ void __fastcall TfrmSoundLib::UpdateLib()
     RegisterModifiedTHM();
     SaveUsedTHM();
     // save game sounds
-    if (modif_map.size())
-    {
+    if (modif_map.size()) {
         AStringVec modif;
         LockForm();
         SndLib->SynchronizeSounds(true, true, true, &modif_map, 0);
@@ -111,8 +108,7 @@ void __fastcall TfrmSoundLib::UpdateLib()
 
 bool __fastcall TfrmSoundLib::HideLib()
 {
-    if (form)
-    {
+    if (form) {
         form->Close();
         modif_map.clear();
     }
@@ -133,12 +129,11 @@ void TfrmSoundLib::AppendModif(LPCSTR nm)
 
 //---------------------------------------------------------------------------
 
-void TfrmSoundLib::RemoveSound(LPCSTR fname, EItemType type, bool &res)
+void TfrmSoundLib::RemoveSound(LPCSTR fname, EItemType type, bool& res)
 {
     // delete it from modif map
     FS_FileSetIt it = modif_map.find(FS_File(fname));
-    if (it!=modif_map.end())
-        modif_map.erase(it);
+    if (it != modif_map.end()) modif_map.erase(it);
     // remove sound source
     res = SndLib->RemoveSound(fname, type);
 }
@@ -151,8 +146,7 @@ void TfrmSoundLib::RenameSound(LPCSTR p0, LPCSTR p1, EItemType type)
     SndLib->RenameSound(p0, p1, type);
     // delete old from map
     FS_FileSetIt old_it = modif_map.find(FS_File(p0));
-    if (old_it!=modif_map.end())
-    {
+    if (old_it != modif_map.end()) {
         modif_map.erase(old_it);
         AppendModif(p1);
     }
@@ -160,17 +154,16 @@ void TfrmSoundLib::RenameSound(LPCSTR p0, LPCSTR p1, EItemType type)
 
 //---------------------------------------------------------------------------
 
-void __fastcall TfrmSoundLib::FormShow(TObject *Sender)
+void __fastcall TfrmSoundLib::FormShow(TObject* Sender)
 {
     // check window position
     UI->CheckWindowPos(this);
 }
 
 //---------------------------------------------------------------------------
-void __fastcall TfrmSoundLib::FormClose(TObject *Sender, TCloseAction &Action)
+void __fastcall TfrmSoundLib::FormClose(TObject* Sender, TCloseAction& Action)
 {
-    if (!form)
-        return;
+    if (!form) return;
     form->Enabled = false;
     DestroyUsedTHM();
     form = 0;
@@ -188,39 +181,32 @@ void TfrmSoundLib::InitItemsList()
     // fill items
     FS_FileSetIt it = sound_map.begin();
     FS_FileSetIt _E = sound_map.end();
-    for (; it!=_E; it++)
+    for (; it != _E; it++)
         LHelper().CreateItem(items, it->name.c_str(), 0);
 
     m_ItemList->AssignItems(items, false, true);
 }
 
 //---------------------------------------------------------------------------
-void __fastcall TfrmSoundLib::FormKeyDown(TObject *Sender, WORD &Key,
-    TShiftState Shift)
+void __fastcall TfrmSoundLib::FormKeyDown(TObject* Sender, WORD& Key, TShiftState Shift)
 {
-    if (Shift.Contains(ssCtrl))
-    {
-        if (Key==VK_CANCEL)
-            ExecCommand(COMMAND_BREAK_LAST_OPERATION);
+    if (Shift.Contains(ssCtrl)) {
+        if (Key == VK_CANCEL) ExecCommand(COMMAND_BREAK_LAST_OPERATION);
     }
     else
     {
-        if (Key==VK_ESCAPE)
-        {
-            if (bFormLocked)
-                ExecCommand(COMMAND_BREAK_LAST_OPERATION);
-            Key = 0; // :-) нужно для того чтобы AccessVoilation не вылазил по ESCAPE
+        if (Key == VK_ESCAPE) {
+            if (bFormLocked) ExecCommand(COMMAND_BREAK_LAST_OPERATION);
+            Key = 0;  // :-) нужно для того чтобы AccessVoilation не вылазил по ESCAPE
         }
     }
 }
 
 //---------------------------------------------------------------------------
 
-
-void __fastcall TfrmSoundLib::ebOkClick(TObject *Sender)
+void __fastcall TfrmSoundLib::ebOkClick(TObject* Sender)
 {
-    if (bFormLocked)
-        return;
+    if (bFormLocked) return;
     m_Snd.destroy();
 
     UpdateLib();
@@ -229,10 +215,9 @@ void __fastcall TfrmSoundLib::ebOkClick(TObject *Sender)
 
 //---------------------------------------------------------------------------
 
-void __fastcall TfrmSoundLib::ebCancelClick(TObject *Sender)
+void __fastcall TfrmSoundLib::ebCancelClick(TObject* Sender)
 {
-    if (bFormLocked)
-    {
+    if (bFormLocked) {
         ExecCommand(COMMAND_BREAK_LAST_OPERATION);
         return;
     }
@@ -242,11 +227,10 @@ void __fastcall TfrmSoundLib::ebCancelClick(TObject *Sender)
 
 //---------------------------------------------------------------------------
 
-ESoundThumbnail *TfrmSoundLib::FindUsedTHM(LPCSTR name)
+ESoundThumbnail* TfrmSoundLib::FindUsedTHM(LPCSTR name)
 {
-    for (THMIt it = m_THM_Used.begin(); it!=m_THM_Used.end(); it++)
-        if (0==strcmp((*it)->SrcName(), name))
-            return *it;
+    for (THMIt it = m_THM_Used.begin(); it != m_THM_Used.end(); it++)
+        if (0 == strcmp((*it)->SrcName(), name)) return *it;
     return 0;
 }
 
@@ -255,7 +239,7 @@ ESoundThumbnail *TfrmSoundLib::FindUsedTHM(LPCSTR name)
 void TfrmSoundLib::SaveUsedTHM()
 {
     int m_age = time(NULL);
-    for (THMIt t_it = m_THM_Used.begin(); t_it!=m_THM_Used.end(); t_it++)
+    for (THMIt t_it = m_THM_Used.begin(); t_it != m_THM_Used.end(); t_it++)
         (*t_it)->Save(m_age, 0);
 }
 
@@ -263,9 +247,8 @@ void TfrmSoundLib::SaveUsedTHM()
 
 void __fastcall TfrmSoundLib::RegisterModifiedTHM()
 {
-    if (m_ItemProps->IsModified())
-    {
-        for (THMIt t_it = m_THM_Current.begin(); t_it!=m_THM_Current.end(); t_it++)
+    if (m_ItemProps->IsModified()) {
+        for (THMIt t_it = m_THM_Current.begin(); t_it != m_THM_Current.end(); t_it++)
         {
             //.            (*t_it)->Save	(0,0);
             AppendModif((*t_it)->SrcName());
@@ -273,60 +256,56 @@ void __fastcall TfrmSoundLib::RegisterModifiedTHM()
     }
 }
 
-void __fastcall TfrmSoundLib::fsStorageRestorePlacement(TObject *Sender)
+void __fastcall TfrmSoundLib::fsStorageRestorePlacement(TObject* Sender)
 {
     m_ItemProps->RestoreParams(fsStorage);
     m_ItemList->LoadParams(fsStorage);
-    if (!m_Flags.is(flReadOnly))
-    {
+    if (!m_Flags.is(flReadOnly)) {
         bAutoPlay = fsStorage->ReadInteger("auto_play", FALSE);
     }
 }
 
 //---------------------------------------------------------------------------
 
-void __fastcall TfrmSoundLib::fsStorageSavePlacement(TObject *Sender)
+void __fastcall TfrmSoundLib::fsStorageSavePlacement(TObject* Sender)
 {
     m_ItemProps->SaveParams(fsStorage);
     m_ItemList->SaveParams(fsStorage);
-    if (!m_Flags.is(flReadOnly))
-    {
+    if (!m_Flags.is(flReadOnly)) {
         fsStorage->WriteInteger("auto_play", bAutoPlay);
     }
 }
 
 //---------------------------------------------------------------------------
 
-void __fastcall TfrmSoundLib::OnControlClick(ButtonValue *V, bool &bModif, bool &bSafe)
+void __fastcall TfrmSoundLib::OnControlClick(ButtonValue* V, bool& bModif, bool& bSafe)
 {
     switch (V->btn_num)
     {
-        case 0: m_Snd.play(0, sm_2D);
-            break;
-        case 1: m_Snd.stop();
-            break;
-        case 2:
-        {
-            bAutoPlay = !bAutoPlay;
-            V->value[V->btn_num] = shared_str().printf("Auto (%s)", bAutoPlay ? "on" : "off");
-        }
-            break;
+    case 0: m_Snd.play(0, sm_2D); break;
+    case 1: m_Snd.stop(); break;
+    case 2:
+    {
+        bAutoPlay = !bAutoPlay;
+        V->value[V->btn_num] = shared_str().printf("Auto (%s)", bAutoPlay ? "on" : "off");
+    }
+    break;
     }
     bModif = false;
 }
 
 //------------------------------------------------------------------------------
 
-void __fastcall TfrmSoundLib::OnControl2Click(ButtonValue *V, bool &bModif, bool &bSafe)
+void __fastcall TfrmSoundLib::OnControl2Click(ButtonValue* V, bool& bModif, bool& bSafe)
 {
     switch (V->btn_num)
     {
-        case 0:
-        {
-            bAutoPlay = !bAutoPlay;
-            V->value[V->btn_num] = bAutoPlay ? "on" : "off";
-        }
-            break;
+    case 0:
+    {
+        bAutoPlay = !bAutoPlay;
+        V->value[V->btn_num] = bAutoPlay ? "on" : "off";
+    }
+    break;
     }
     bModif = false;
 }
@@ -335,7 +314,7 @@ void __fastcall TfrmSoundLib::OnControl2Click(ButtonValue *V, bool &bModif, bool
 
 void TfrmSoundLib::DestroyUsedTHM()
 {
-    for (THMIt it = m_THM_Used.begin(); it!=m_THM_Used.end(); it++)
+    for (THMIt it = m_THM_Used.begin(); it != m_THM_Used.end(); it++)
         xr_delete(*it);
     m_THM_Used.clear();
 }
@@ -345,10 +324,10 @@ void TfrmSoundLib::DestroyUsedTHM()
 #define X_GRID 10
 #define Y_GRID 5
 
-void TfrmSoundLib::OnAttenuationDraw(CanvasValue *sender, void *_canvas, const Irect &_rect)
+void TfrmSoundLib::OnAttenuationDraw(CanvasValue* sender, void* _canvas, const Irect& _rect)
 {
-    TCanvas *canvas = (TCanvas*)_canvas;
-    const TRect &rect = *((TRect*)&_rect);
+    TCanvas* canvas = (TCanvas*)_canvas;
+    const TRect& rect = *((TRect*)&_rect);
     //	canvas
     int w = rect.Width();
     int h = rect.Height();
@@ -359,64 +338,64 @@ void TfrmSoundLib::OnAttenuationDraw(CanvasValue *sender, void *_canvas, const I
     canvas->FillRect(rect);
     canvas->Pen->Color = TColor(0x00006600);
     canvas->MoveTo(x0, y0);
-    for (int i = 0; i<X_GRID+1; i++)
+    for (int i = 0; i < X_GRID + 1; i++)
     {
-        canvas->LineTo(x0+i*w/X_GRID, y0+h);
-        canvas->MoveTo(x0+(i+1)*w/X_GRID, y0+0);
+        canvas->LineTo(x0 + i * w / X_GRID, y0 + h);
+        canvas->MoveTo(x0 + (i + 1) * w / X_GRID, y0 + 0);
     }
-    canvas->MoveTo(x0+0, y0+0);
-    for (int j = 0; j<Y_GRID+1; j++)
+    canvas->MoveTo(x0 + 0, y0 + 0);
+    for (int j = 0; j < Y_GRID + 1; j++)
     {
-        canvas->LineTo(x0+w, y0+j*h/Y_GRID);
-        canvas->MoveTo(x0+0, y0+(j+1)*h/Y_GRID);
+        canvas->LineTo(x0 + w, y0 + j * h / Y_GRID);
+        canvas->MoveTo(x0 + 0, y0 + (j + 1) * h / Y_GRID);
     }
     canvas->Pen->Color = clYellow;
-    canvas->MoveTo(x0+0, y0+iFloor(float(h)-float(h)*0.01f)); // snd cull = 0.01f
-    canvas->LineTo(x0+w, y0+iFloor(float(h)-float(h)*0.01f));
+    canvas->MoveTo(x0 + 0, y0 + iFloor(float(h) - float(h) * 0.01f));  // snd cull = 0.01f
+    canvas->LineTo(x0 + w, y0 + iFloor(float(h) - float(h) * 0.01f));
 
-    ESoundThumbnail*thm = m_THM_Current.back();
-    float d_cost = thm->MaxDist()/w;
+    ESoundThumbnail* thm = m_THM_Current.back();
+    float d_cost = thm->MaxDist() / w;
     AnsiString temp;
     //    float v = m_D3D.range;
     //    temp.sprintf("Range = %.2f",v); lbRange->Caption = temp;
     canvas->Pen->Color = clLime;
-    for (int d = 1; d<w; d++)
+    for (int d = 1; d < w; d++)
     {
-        float R = d*d_cost;
-        float b = thm->MinDist()/(psSoundRolloff*R);
+        float R = d * d_cost;
+        float b = thm->MinDist() / (psSoundRolloff * R);
         //		float b = m_Brightness/(m_Attenuation0+m_Attenuation1*R+m_Attenuation2*R*R);
-        float bb = h-(h*b);
-        int y = iFloor(y0+bb);
+        float bb = h - (h * b);
+        int y = iFloor(y0 + bb);
         clamp(y, int(rect.Top), int(rect.Bottom));
-        if (1==d)
-            canvas->MoveTo(x0+d, y);
+        if (1 == d)
+            canvas->MoveTo(x0 + d, y);
         else
-            canvas->LineTo(x0+d, y);
+            canvas->LineTo(x0 + d, y);
     }
 }
 
-void __stdcall TfrmSoundLib::OnAttClick(ButtonValue *V, bool &bModif, bool &bSafe)
+void __stdcall TfrmSoundLib::OnAttClick(ButtonValue* V, bool& bModif, bool& bSafe)
 {
     bModif = true;
-    ESoundThumbnail*thm = m_THM_Current.back();
+    ESoundThumbnail* thm = m_THM_Current.back();
     switch (V->btn_num)
     {
-        case 0:
-        {
-            float dist = thm->MinDist()/(0.01f*psSoundRolloff);
-            thm->SetMaxDist(dist+0.1f*dist);
-        }
-            break;
-        case 1:
-        {
-            float dist = psSoundRolloff*(thm->MaxDist()-(0.1f/1.1f)*thm->MaxDist())*0.01f;
-            thm->SetMinDist(dist);
-        }
-            break;
+    case 0:
+    {
+        float dist = thm->MinDist() / (0.01f * psSoundRolloff);
+        thm->SetMaxDist(dist + 0.1f * dist);
+    }
+    break;
+    case 1:
+    {
+        float dist = psSoundRolloff * (thm->MaxDist() - (0.1f / 1.1f) * thm->MaxDist()) * 0.01f;
+        thm->SetMinDist(dist);
+    }
+    break;
     }
 }
 
-void __fastcall TfrmSoundLib::OnItemsFocused(ListItemsVec &items)
+void __fastcall TfrmSoundLib::OnItemsFocused(ListItemsVec& items)
 {
     PropItemVec props;
 
@@ -424,31 +403,27 @@ void __fastcall TfrmSoundLib::OnItemsFocused(ListItemsVec &items)
     m_Snd.destroy();
     m_THM_Current.clear();
 
-    if (!items.empty())
-    {
-        for (ListItemsIt it = items.begin(); it!=items.end(); it++)
+    if (!items.empty()) {
+        for (ListItemsIt it = items.begin(); it != items.end(); it++)
         {
-            ListItem *prop = *it;
-            if (prop)
-            {
-                ESoundThumbnail*thm = FindUsedTHM(prop->Key());
-                if (!thm)
-                    m_THM_Used.push_back(thm = new ESoundThumbnail(prop->Key()));
+            ListItem* prop = *it;
+            if (prop) {
+                ESoundThumbnail* thm = FindUsedTHM(prop->Key());
+                if (!thm) m_THM_Used.push_back(thm = new ESoundThumbnail(prop->Key()));
                 m_THM_Current.push_back(thm);
                 thm->FillProp(props);
             }
         }
     }
 
-    ButtonValue *B = 0;
-    if (m_THM_Current.size()==1)
-    {
-        ESoundThumbnail*thm = m_THM_Current.back();
+    ButtonValue* B = 0;
+    if (m_THM_Current.size() == 1) {
+        ESoundThumbnail* thm = m_THM_Current.back();
         u32 size = 0;
         u32 time = 0;
         PlaySound(thm->SrcName(), size, time);
 
-        CanvasValue *C = 0;
+        CanvasValue* C = 0;
         C = PHelper().CreateCanvas(props, "Attenuation", "", 64);
         C->tag = (int)this;
         C->OnDrawCanvasEvent.bind(this, &TfrmSoundLib::OnAttenuationDraw);
@@ -456,22 +431,19 @@ void __fastcall TfrmSoundLib::OnItemsFocused(ListItemsVec &items)
         B = PHelper().CreateButton(props, "Auto Att", "By Min,By Max", ButtonValue::flFirstOnly);
         B->OnBtnClickEvent.bind(this, &TfrmSoundLib::OnAttClick);
 
-        PHelper().CreateCaption(props, "File Length", shared_str().printf("%.2f Kb", float(size)/1024.f));
-        PHelper().CreateCaption(props, "Total Time", shared_str().printf("%.2f sec", float(time)/1000.f));
-        if (!m_Flags.is(flReadOnly))
-        {
+        PHelper().CreateCaption(props, "File Length", shared_str().printf("%.2f Kb", float(size) / 1024.f));
+        PHelper().CreateCaption(props, "Total Time", shared_str().printf("%.2f sec", float(time) / 1000.f));
+        if (!m_Flags.is(flReadOnly)) {
             B = PHelper().CreateButton(props, "Control", "Play,Stop", ButtonValue::flFirstOnly);
             B->OnBtnClickEvent.bind(this, &TfrmSoundLib::OnControlClick);
         }
     }
-    if (!m_Flags.is(flReadOnly))
-    {
+    if (!m_Flags.is(flReadOnly)) {
         B = PHelper().CreateButton(props, "Auto Play", bAutoPlay ? "on" : "off", ButtonValue::flFirstOnly);
         B->OnBtnClickEvent.bind(this, &TfrmSoundLib::OnControl2Click);
     }
 
-    if (!m_Flags.is(flReadOnly)&&m_THM_Current.size())
-    {
+    if (!m_Flags.is(flReadOnly) && m_THM_Current.size()) {
         B = PHelper().CreateButton(props, "MANAGE", "SyncCurrent", ButtonValue::flFirstOnly);
         B->OnBtnClickEvent.bind(this, &TfrmSoundLib::OnSyncCurrentClick);
     }
@@ -481,45 +453,41 @@ void __fastcall TfrmSoundLib::OnItemsFocused(ListItemsVec &items)
 
 //---------------------------------------------------------------------------
 
-void TfrmSoundLib::PlaySound(LPCSTR name, u32 &size, u32 &time)
+void TfrmSoundLib::PlaySound(LPCSTR name, u32& size, u32& time)
 {
     string_path fname;
     FS.update_path(fname, _game_sounds_, ChangeFileExt(name, ".ogg").c_str());
     FS_File F;
-    if (FS.file_find(fname, F))
-    {
+    if (FS.file_find(fname, F)) {
         m_Snd.create(name, st_Effect, sg_Undefined);
         m_Snd.play(0, sm_2D);
-        CSoundRender_Source *src = (CSoundRender_Source*)m_Snd._handle();
+        CSoundRender_Source* src = (CSoundRender_Source*)m_Snd._handle();
         VERIFY(src);
         size = F.size;
-        time = iFloor(src->fTimeTotal/1000.0f);
-        if (!bAutoPlay)
-            m_Snd.stop();
+        time = iFloor(src->fTimeTotal / 1000.0f);
+        if (!bAutoPlay) m_Snd.stop();
     }
 }
 
 void TfrmSoundLib::OnFrame()
 {
-    if (form)
-    {
-        if (m_Flags.is(flUpdateProperties))
-        {
+    if (form) {
+        if (m_Flags.is(flUpdateProperties)) {
             form->m_ItemList->FireOnItemFocused();
             m_Flags.set(flUpdateProperties, FALSE);
         }
     }
 }
 
-void __fastcall TfrmSoundLib::OnSyncCurrentClick(ButtonValue *V, bool &bModif, bool &bSafe)
+void __fastcall TfrmSoundLib::OnSyncCurrentClick(ButtonValue* V, bool& bModif, bool& bSafe)
 {
     //.
     THMIt it = m_THM_Current.begin();
     THMIt it_e = m_THM_Current.end();
 
-    for (; it!=it_e; ++it)
+    for (; it != it_e; ++it)
     {
-        ESoundThumbnail*pTHM = *it;
+        ESoundThumbnail* pTHM = *it;
 
         string_path src_name, game_name;
         FS.update_path(src_name, _sounds_, pTHM->SrcName());
@@ -533,4 +501,3 @@ void __fastcall TfrmSoundLib::OnSyncCurrentClick(ButtonValue *V, bool &bModif, b
     }
     Msg("Done.");
 }
-

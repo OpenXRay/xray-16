@@ -14,35 +14,28 @@
 
 using namespace luabind;
 
-SCRIPT_EXPORT(CScriptWatchAction, (),
-{
-	module(luaState)
-	[
-		class_<CScriptWatchAction>("look")
-			.enum_("look")
-			[
-				value("path_dir",				int(SightManager::eSightTypePathDirection)),
-				value("search",					int(SightManager::eSightTypeSearch)),
-				value("danger",					int(SightManager::eSightTypeCover)),
-				value("point",					int(SightManager::eSightTypePosition)),
-				value("fire_point",				int(SightManager::eSightTypeFirePosition)),
-				value("cur_dir",				int(SightManager::eSightTypeCurrentDirection)),
-				value("direction",				int(SightManager::eSightTypeDirection))
-			]
-			.def(								constructor<>())
-			.def(								constructor<SightManager::ESightType>())
-			.def(								constructor<SightManager::ESightType, Fvector &>())
-			.def(								constructor<SightManager::ESightType, CScriptGameObject*>())
-			.def(								constructor<SightManager::ESightType, CScriptGameObject*, LPCSTR>())
+SCRIPT_EXPORT(CScriptWatchAction, (), {
+    module(luaState)[class_<CScriptWatchAction>("look")
+                         .enum_("look")[value("path_dir", int(SightManager::eSightTypePathDirection)),
+                             value("search", int(SightManager::eSightTypeSearch)),
+                             value("danger", int(SightManager::eSightTypeCover)),
+                             value("point", int(SightManager::eSightTypePosition)),
+                             value("fire_point", int(SightManager::eSightTypeFirePosition)),
+                             value("cur_dir", int(SightManager::eSightTypeCurrentDirection)),
+                             value("direction", int(SightManager::eSightTypeDirection))]
+                         .def(constructor<>())
+                         .def(constructor<SightManager::ESightType>())
+                         .def(constructor<SightManager::ESightType, Fvector&>())
+                         .def(constructor<SightManager::ESightType, CScriptGameObject*>())
+                         .def(constructor<SightManager::ESightType, CScriptGameObject*, LPCSTR>())
 
-			// searchlight 
-			.def(								constructor<const Fvector &,float,float>())
-			.def(								constructor<CScriptGameObject*,float,float>())
+                         // searchlight
+                         .def(constructor<const Fvector&, float, float>())
+                         .def(constructor<CScriptGameObject*, float, float>())
 
-			.def("object",						&CScriptWatchAction::SetWatchObject)		// time
-			.def("direct",						&CScriptWatchAction::SetWatchDirection)		// time
-			.def("type",						&CScriptWatchAction::SetWatchType)
-			.def("bone",						&CScriptWatchAction::SetWatchBone)
-			.def("completed",					(bool (CScriptWatchAction::*)())(&CScriptWatchAction::completed))
-	];
+                         .def("object", &CScriptWatchAction::SetWatchObject)     // time
+                         .def("direct", &CScriptWatchAction::SetWatchDirection)  // time
+                         .def("type", &CScriptWatchAction::SetWatchType)
+                         .def("bone", &CScriptWatchAction::SetWatchBone)
+                         .def("completed", (bool (CScriptWatchAction::*)())(&CScriptWatchAction::completed))];
 });

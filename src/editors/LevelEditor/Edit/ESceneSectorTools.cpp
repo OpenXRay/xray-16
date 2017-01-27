@@ -28,45 +28,42 @@ void ESceneSectorTool::RemoveControls()
 }
 
 //----------------------------------------------------
-void ESceneSectorTool::_OnObjectRemove(CSceneObject *obj)
+void ESceneSectorTool::_OnObjectRemove(CSceneObject* obj)
 {
-    if (obj&&!m_Objects.empty())
-    {
-        EditMeshVec *meshes = obj->Meshes();
-        for (EditMeshIt m_it = meshes->begin(); m_it!=meshes->end(); ++m_it)
+    if (obj && !m_Objects.empty()) {
+        EditMeshVec* meshes = obj->Meshes();
+        for (EditMeshIt m_it = meshes->begin(); m_it != meshes->end(); ++m_it)
         {
-            for (ObjectIt _F = m_Objects.begin(); _F!=m_Objects.end(); ++_F)
+            for (ObjectIt _F = m_Objects.begin(); _F != m_Objects.end(); ++_F)
             {
-                CSector *sector = dynamic_cast<CSector*>(*_F);
+                CSector* sector = dynamic_cast<CSector*>(*_F);
                 VERIFY(sector);
-                if (sector->DelMesh(obj, *m_it))
-                    break;
+                if (sector->DelMesh(obj, *m_it)) break;
             }
         }
     }
 }
 
-void ESceneSectorTool::OnObjectRemove(CCustomObject *O, bool bDeleting)
+void ESceneSectorTool::OnObjectRemove(CCustomObject* O, bool bDeleting)
 {
     inherited::OnObjectRemove(O, bDeleting);
 
-    if (bDeleting)
-    {
-        CSceneObject *obj = dynamic_cast<CSceneObject*>(O);
+    if (bDeleting) {
+        CSceneObject* obj = dynamic_cast<CSceneObject*>(O);
         if (!obj)
         { /*
-			CGroupObject* go = dynamic_cast<CGroupObject*>(O);
+            CGroupObject* go = dynamic_cast<CGroupObject*>(O);
             if(go && !go->IsOpened())
             {
-            	ObjectList 					lst;
+                ObjectList 					lst;
                 go->GetObjects			(lst);
-                
+
                 ObjectList::iterator it 	= lst.begin();
                 ObjectList::iterator it_e 	= lst.end();
                 for(; it!=it_e; ++it)
                 {
-        			CSceneObject* obj2 	= dynamic_cast<CSceneObject*>(*it);
-					_OnObjectRemove(obj2);
+                    CSceneObject* obj2 	= dynamic_cast<CSceneObject*>(*it);
+                    _OnObjectRemove(obj2);
                 }
             } */
         }
@@ -75,22 +72,20 @@ void ESceneSectorTool::OnObjectRemove(CCustomObject *O, bool bDeleting)
     }
 }
 
-void ESceneSectorTool::OnBeforeObjectChange(CCustomObject *O)
+void ESceneSectorTool::OnBeforeObjectChange(CCustomObject* O)
 {
     inherited::OnBeforeObjectChange(O);
 
-    CSceneObject *obj = dynamic_cast<CSceneObject*>(O);
-    if (obj&&!m_Objects.empty())
-    {
-        EditMeshVec *meshes = obj->Meshes();
-        for (EditMeshIt m_it = meshes->begin(); m_it!=meshes->end(); m_it++)
+    CSceneObject* obj = dynamic_cast<CSceneObject*>(O);
+    if (obj && !m_Objects.empty()) {
+        EditMeshVec* meshes = obj->Meshes();
+        for (EditMeshIt m_it = meshes->begin(); m_it != meshes->end(); m_it++)
         {
-            for (ObjectIt _F = m_Objects.begin(); _F!=m_Objects.end(); _F++)
+            for (ObjectIt _F = m_Objects.begin(); _F != m_Objects.end(); _F++)
             {
-                CSector *sector = dynamic_cast<CSector*>(*_F);
+                CSector* sector = dynamic_cast<CSector*>(*_F);
                 VERIFY(sector);
-                if (sector->DelMesh(obj, *m_it))
-                    break;
+                if (sector->DelMesh(obj, *m_it)) break;
             }
         }
     }
@@ -98,7 +93,7 @@ void ESceneSectorTool::OnBeforeObjectChange(CCustomObject *O)
 
 //----------------------------------------------------
 
-void ESceneSectorTool::FillProp(LPCSTR pref, PropItemVec &items)
+void ESceneSectorTool::FillProp(LPCSTR pref, PropItemVec& items)
 {
     PHelper().CreateFlag32(items, PrepareKey(pref, "Common\\Draw Solid"), &m_Flags, flDrawSolid);
     inherited::FillProp(pref, items);
@@ -106,13 +101,11 @@ void ESceneSectorTool::FillProp(LPCSTR pref, PropItemVec &items)
 
 //----------------------------------------------------
 
-CCustomObject *ESceneSectorTool::CreateObject(LPVOID data, LPCSTR name)
+CCustomObject* ESceneSectorTool::CreateObject(LPVOID data, LPCSTR name)
 {
-    CCustomObject*O = new CSector(data, name);
+    CCustomObject* O = new CSector(data, name);
     O->ParentTool = this;
     return O;
 }
 
 //----------------------------------------------------
-
-

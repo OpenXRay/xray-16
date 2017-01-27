@@ -6,14 +6,14 @@
 #pragma package(smart_init)
 
 //------------------------------------------------------------------------------
-#define THM_SOUND_VERSION				0x0014
+#define THM_SOUND_VERSION 0x0014
 //------------------------------------------------------------------------------
-#define THM_CHUNK_SOUNDPARAM			0x1000
-#define THM_CHUNK_SOUNDPARAM2			0x1001
-#define THM_CHUNK_SOUND_AI_DIST			0x1002
+#define THM_CHUNK_SOUNDPARAM 0x1000
+#define THM_CHUNK_SOUNDPARAM2 0x1001
+#define THM_CHUNK_SOUND_AI_DIST 0x1002
 
 //------------------------------------------------------------------------------
-ESoundThumbnail::ESoundThumbnail(LPCSTR src_name, bool bLoad): ECustomThumbnail(src_name, ETSound)
+ESoundThumbnail::ESoundThumbnail(LPCSTR src_name, bool bLoad) : ECustomThumbnail(src_name, ETSound)
 {
     m_fQuality = 0.f;
     m_fMinDist = 1.f;
@@ -21,13 +21,14 @@ ESoundThumbnail::ESoundThumbnail(LPCSTR src_name, bool bLoad): ECustomThumbnail(
     m_fMaxAIDist = 300.f;
     m_fBaseVolume = 1.f;
     m_uGameType = 0;
-    if (bLoad)
-        Load();
+    if (bLoad) Load();
 }
 
 //------------------------------------------------------------------------------
 
-ESoundThumbnail::~ESoundThumbnail() {}
+ESoundThumbnail::~ESoundThumbnail()
+{
+}
 
 //------------------------------------------------------------------------------
 
@@ -39,22 +40,20 @@ bool ESoundThumbnail::Load(LPCSTR src_name, LPCSTR path)
         FS.update_path(fn, path, fn);
     else
         FS.update_path(fn, _sounds_, fn);
-    if (!FS.exist(fn))
-        return false;
+    if (!FS.exist(fn)) return false;
 
-    IReader *F = FS.r_open(fn);
+    IReader* F = FS.r_open(fn);
     u16 version = 0;
 
     R_ASSERT(F->r_chunk(THM_CHUNK_VERSION, &version));
-    if (version!=THM_SOUND_VERSION)
-    {
+    if (version != THM_SOUND_VERSION) {
         Msg("!Thumbnail: Unsupported version.");
         return false;
     }
 
     R_ASSERT(F->find_chunk(THM_CHUNK_TYPE));
     m_Type = THMType(F->r_u32());
-    R_ASSERT(m_Type==ETSound);
+    R_ASSERT(m_Type == ETSound);
 
     R_ASSERT(F->find_chunk(THM_CHUNK_SOUNDPARAM));
     m_fQuality = F->r_float();
@@ -62,8 +61,7 @@ bool ESoundThumbnail::Load(LPCSTR src_name, LPCSTR path)
     m_fMaxDist = F->r_float();
     m_uGameType = F->r_u32();
 
-    if (F->find_chunk(THM_CHUNK_SOUNDPARAM2))
-        m_fBaseVolume = F->r_float();
+    if (F->find_chunk(THM_CHUNK_SOUNDPARAM2)) m_fBaseVolume = F->r_float();
 
     if (F->find_chunk(THM_CHUNK_SOUND_AI_DIST))
         m_fMaxAIDist = F->r_float();
@@ -81,8 +79,7 @@ bool ESoundThumbnail::Load(LPCSTR src_name, LPCSTR path)
 
 void ESoundThumbnail::Save(int age, LPCSTR path)
 {
-    if (!Valid())
-        return;
+    if (!Valid()) return;
 
     CMemoryWriter F;
     F.open_chunk(THM_CHUNK_VERSION);
@@ -114,8 +111,7 @@ void ESoundThumbnail::Save(int age, LPCSTR path)
     else
         FS.update_path(fn, _sounds_, m_Name.c_str());
 
-    if (F.save_to(fn))
-    {
+    if (F.save_to(fn)) {
         FS.set_file_age(fn, age ? age : m_Age);
     }
     else
@@ -129,51 +125,48 @@ void ESoundThumbnail::Save(int age, LPCSTR path)
 #include "ai_sounds.h"
 #include "editors/xrEProps/PropertiesList.h"
 
-bool ESoundThumbnail::OnMaxAIDistAfterEdit(PropValue *sender, float &edit_val)
+bool ESoundThumbnail::OnMaxAIDistAfterEdit(PropValue* sender, float& edit_val)
 {
-    TProperties *P = sender->Owner()->Owner();
+    TProperties* P = sender->Owner()->Owner();
     VERIFY(P);
-    PropItem *S = P->FindItem("Max Dist");
+    PropItem* S = P->FindItem("Max Dist");
     VERIFY(S);
-    FloatValue *V = dynamic_cast<FloatValue*>(S->GetFrontValue());
+    FloatValue* V = dynamic_cast<FloatValue*>(S->GetFrontValue());
     VERIFY(V);
     float max_val = V->GetValue();
-    return edit_val<max_val;
+    return edit_val < max_val;
 }
 
-void ESoundThumbnail::OnMaxDistChange(PropValue *sender)
+void ESoundThumbnail::OnMaxDistChange(PropValue* sender)
 {
-    FloatValue *SV = dynamic_cast<FloatValue*>(sender);
+    FloatValue* SV = dynamic_cast<FloatValue*>(sender);
     VERIFY(SV);
-    TProperties *P = sender->Owner()->Owner();
+    TProperties* P = sender->Owner()->Owner();
     VERIFY(P);
-    PropItem *S = P->FindItem("Max AI Dist");
+    PropItem* S = P->FindItem("Max AI Dist");
     VERIFY(S);
     bool bChanged = false;
-    for (PropItem::PropValueIt it = S->Values().begin(); S->Values().end()!=it; ++it)
+    for (PropItem::PropValueIt it = S->Values().begin(); S->Values().end() != it; ++it)
     {
-        FloatValue *CV = dynamic_cast<FloatValue*>(*it);
+        FloatValue* CV = dynamic_cast<FloatValue*>(*it);
         VERIFY(CV);
         CV->lim_mx = *SV->value;
-        if (*CV->value>CV->lim_mx)
-        {
+        if (*CV->value > CV->lim_mx) {
             ELog.DlgMsg(mtInformation, "'Max AI Dist' <= 'Max Dist'. 'Max AI Dist' will be clamped.");
             bChanged = true;
             *CV->value = CV->lim_mx;
         }
-        if (!CV->Equal(S->Values().front()))
-            S->m_Flags.set(PropItem::flMixed, TRUE);
+        if (!CV->Equal(S->Values().front())) S->m_Flags.set(PropItem::flMixed, TRUE);
     }
-    if (bChanged)
-    {
+    if (bChanged) {
         P->Modified();
         P->RefreshForm();
     }
 }
 
-void ESoundThumbnail::FillProp(PropItemVec &items)
+void ESoundThumbnail::FillProp(PropItemVec& items)
 {
-    FloatValue *V = 0;
+    FloatValue* V = 0;
     PHelper().CreateFloat(items, "Quality", &m_fQuality);
     PHelper().CreateFloat(items, "Min Dist", &m_fMinDist, 0.01f, 1000.f);
     V = PHelper().CreateFloat(items, "Max Dist", &m_fMaxDist, 0.1f, 1000.f);
@@ -186,7 +179,7 @@ void ESoundThumbnail::FillProp(PropItemVec &items)
 
 //------------------------------------------------------------------------------
 
-void ESoundThumbnail::FillInfo(PropItemVec &items)
+void ESoundThumbnail::FillInfo(PropItemVec& items)
 {
     PHelper().CreateCaption(items, "Quality", AnsiString().sprintf("%3.2f", m_fQuality).c_str());
     PHelper().CreateCaption(items, "Min Dist", AnsiString().sprintf("%3.2f", m_fMinDist).c_str());
@@ -197,5 +190,3 @@ void ESoundThumbnail::FillInfo(PropItemVec &items)
 }
 
 //------------------------------------------------------------------------------
-
-

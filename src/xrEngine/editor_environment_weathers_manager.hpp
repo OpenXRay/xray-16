@@ -16,17 +16,14 @@
 
 namespace editor
 {
-
 class property_holder;
 
 namespace environment
 {
-
 class manager;
 
 namespace weathers
 {
-
 class weather;
 
 class manager : private Noncopyable
@@ -57,10 +54,7 @@ public:
 
 private:
     typedef editor::property_holder property_holder_type;
-    typedef property_collection <
-    weather_container_type,
-    manager
-    > collection_type;
+    typedef property_collection<weather_container_type, manager> collection_type;
 
 private:
     LPCSTR const* xr_stdcall weathers_getter() const;
@@ -77,11 +71,11 @@ private:
 public:
     environment::manager& m_manager;
     mutable bool m_changed;
-}; // class manager
-} // namespace weathers
-} // namespace environment
-} // namespace editor
+};  // class manager
+}  // namespace weathers
+}  // namespace environment
+}  // namespace editor
 
-#endif // #ifdef INGAME_EDITOR
+#endif  // #ifdef INGAME_EDITOR
 
-#endif // ifndef EDITOR_ENVIRONMENT_WEATHERS_MANAGER_HPP_INCLUDED
+#endif  // ifndef EDITOR_ENVIRONMENT_WEATHERS_MANAGER_HPP_INCLUDED

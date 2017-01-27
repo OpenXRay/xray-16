@@ -11,34 +11,29 @@
 
 using editor::color;
 
-property_color::property_color		(
-		color_getter_type const &getter,
-		color_setter_type const &setter,
-		array<System::Attribute^>^ attributes
-	) :
-	m_getter				(new color_getter_type(getter)),
-	m_setter				(new color_setter_type(setter)),
-	inherited				(getter(), attributes)
+property_color::property_color(
+    color_getter_type const& getter, color_setter_type const& setter, array<System::Attribute ^> ^ attributes)
+    : m_getter(new color_getter_type(getter)), m_setter(new color_setter_type(setter)), inherited(getter(), attributes)
 {
 }
 
-property_color::~property_color		()
+property_color::~property_color()
 {
-	this->!property_color	();
+    this->!property_color();
 }
 
-property_color::!property_color		()
+property_color::!property_color()
 {
-	delete					(m_getter);
-	delete					(m_setter);
+    delete (m_getter);
+    delete (m_setter);
 }
 
-color property_color::get_value_raw	()
+color property_color::get_value_raw()
 {
-	return					((*m_getter)());
+    return ((*m_getter)());
 }
 
-void property_color::set_value_raw	(color value)
+void property_color::set_value_raw(color value)
 {
-	(*m_setter)				(value);
+    (*m_setter)(value);
 }

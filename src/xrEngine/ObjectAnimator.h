@@ -9,6 +9,7 @@ class ENGINE_API CObjectAnimator
 {
 private:
     DEFINE_VECTOR(COMotion*, MotionVec, MotionIt);
+
 protected:
     bool bLoop;
 
@@ -23,6 +24,7 @@ protected:
     void LoadMotions(LPCSTR fname);
     void SetActiveMotion(COMotion* mot);
     COMotion* FindMotionByName(LPCSTR name);
+
 public:
     CObjectAnimator();
     virtual ~CObjectAnimator();
@@ -44,4 +46,4 @@ public:
     void DrawPath();
 };
 
-#endif //ObjectAnimatorH
+#endif  // ObjectAnimatorH

@@ -3,7 +3,7 @@
 #pragma once
 
 /* our instance data */
-#pragma pack(push,1)
+#pragma pack(push, 1)
 typedef struct st_XRShader
 {
     char en_name[64];
@@ -12,11 +12,10 @@ typedef struct st_XRShader
     int lc_idx;
     char gm_name[64];
     int gm_idx;
-    char *desc;
+    char* desc;
 } XRShader;
 #pragma pack(pop)
 
 #define SH_PLUGIN_NAME "!XRayShader"
 
 #endif
-

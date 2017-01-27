@@ -6,7 +6,7 @@
 
 enum
 {
-    COMMAND_EXTFIRST_EXT = COMMAND_MAIN_LAST-1,
+    COMMAND_EXTFIRST_EXT = COMMAND_MAIN_LAST - 1,
 
     COMMAND_CHANGE_TARGET,
     COMMAND_ENABLE_TARGET,
@@ -75,21 +75,23 @@ enum
 
 //------------------------------------------------------------------------------
 
-class CLevelMain: public TUI
+class CLevelMain : public TUI
 {
     typedef TUI inherited;
 
     virtual void RealUpdateScene();
     virtual void RealQuit();
-public:
-    CInifile *m_rt_object_props;
-    C3DCursor *m_Cursor;
-public:
+
+  public:
+    CInifile* m_rt_object_props;
+    C3DCursor* m_Cursor;
+
+  public:
     CLevelMain();
     virtual ~CLevelMain();
 
-    void store_rt_flags(const CCustomObject *CO);
-    void restore_rt_flags(CCustomObject *CO);
+    void store_rt_flags(const CCustomObject* CO);
+    void restore_rt_flags(CCustomObject* CO);
 
     virtual LPSTR GetCaption();
 
@@ -101,19 +103,14 @@ public:
     virtual void OutGridSize();
     virtual void OutInfo();
 
-    virtual LPCSTR EditorName()
-    {
-        return "level";
-    }
+    virtual LPCSTR EditorName() { return "level"; }
 
-    virtual LPCSTR EditorDesc()
-    {
-        return "Level Editor";
-    }
+    virtual LPCSTR EditorDesc() { return "Level Editor"; }
 
     void ShowContextMenu(int cls);
-    bool PickGround(Fvector &hitpoint, const Fvector &start, const Fvector &direction, int bSnap = 1, Fvector *hitnormal = 0);
-    bool SelectionFrustum(CFrustum &frustum);
+    bool PickGround(
+        Fvector& hitpoint, const Fvector& start, const Fvector& direction, int bSnap = 1, Fvector* hitnormal = 0);
+    bool SelectionFrustum(CFrustum& frustum);
 
     virtual bool ApplyShortCut(WORD Key, TShiftState Shift);
     virtual bool ApplyGlobalShortCut(WORD Key, TShiftState Shift);
@@ -121,12 +118,10 @@ public:
     // commands
     virtual void RegisterCommands();
 
-    virtual void SaveSettings(CInifile *);
-    virtual void LoadSettings(CInifile *);
+    virtual void SaveSettings(CInifile*);
+    virtual void LoadSettings(CInifile*);
 };
 
-extern CLevelMain *&LUI;
+extern CLevelMain*& LUI;
 
-#endif //UI_MainCommandH
-
-
+#endif  // UI_MainCommandH

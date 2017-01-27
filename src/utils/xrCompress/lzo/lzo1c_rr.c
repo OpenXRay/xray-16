@@ -24,7 +24,6 @@
    <markus@oberhumer.com>
  */
 
-
 #include "config1c.h"
 
 #include "lzo1b_r.ch"

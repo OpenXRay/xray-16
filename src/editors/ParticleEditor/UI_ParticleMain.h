@@ -5,7 +5,7 @@
 
 enum
 {
-    COMMAND_EXTFIRST_EXT = COMMAND_MAIN_LAST-1,
+    COMMAND_EXTFIRST_EXT = COMMAND_MAIN_LAST - 1,
 
     COMMAND_VALIDATE,
 
@@ -23,13 +23,14 @@ enum
 
 //------------------------------------------------------------------------------
 
-class CParticleMain: public TUI
+class CParticleMain : public TUI
 {
     typedef TUI inherited;
 
     virtual void RealUpdateScene();
     virtual void RealQuit();
-public:
+
+  public:
     CParticleMain();
     virtual ~CParticleMain();
 
@@ -43,15 +44,9 @@ public:
     virtual void OutGridSize();
     virtual void OutInfo();
 
-    virtual LPCSTR EditorName()
-    {
-        return "particle";
-    }
+    virtual LPCSTR EditorName() { return "particle"; }
 
-    virtual LPCSTR EditorDesc()
-    {
-        return "Particle Editor";
-    }
+    virtual LPCSTR EditorDesc() { return "Particle Editor"; }
 
     virtual bool ApplyShortCut(WORD Key, TShiftState Shift);
     virtual bool ApplyGlobalShortCut(WORD Key, TShiftState Shift);
@@ -60,8 +55,6 @@ public:
     virtual void RegisterCommands();
 };
 
-extern CParticleMain *&PUI;
+extern CParticleMain*& PUI;
 //---------------------------------------------------------------------------
-#endif //UI_MainCommandH
-
-
+#endif  // UI_MainCommandH

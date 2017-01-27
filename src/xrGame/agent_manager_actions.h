@@ -12,58 +12,62 @@
 
 class CAgentManager;
 
-typedef CActionBase<CAgentManager>	CAgentManagerActionBase;
+typedef CActionBase<CAgentManager> CAgentManagerActionBase;
 
 //////////////////////////////////////////////////////////////////////////
 // CAgentManagerActionNoOrders
 //////////////////////////////////////////////////////////////////////////
 
-class CAgentManagerActionNoOrders : public CAgentManagerActionBase {
+class CAgentManagerActionNoOrders : public CAgentManagerActionBase
+{
 protected:
-	typedef CAgentManagerActionBase inherited;
+    typedef CAgentManagerActionBase inherited;
 
 public:
-						CAgentManagerActionNoOrders	(CAgentManager *object, LPCSTR action_name = "");
-	virtual void		finalize					();
+    CAgentManagerActionNoOrders(CAgentManager* object, LPCSTR action_name = "");
+    virtual void finalize();
 };
 
 //////////////////////////////////////////////////////////////////////////
 // CAgentManagerActionGatherItems
 //////////////////////////////////////////////////////////////////////////
 
-class CAgentManagerActionGatherItems : public CAgentManagerActionBase {
+class CAgentManagerActionGatherItems : public CAgentManagerActionBase
+{
 protected:
-	typedef CAgentManagerActionBase inherited;
+    typedef CAgentManagerActionBase inherited;
 
 public:
-						CAgentManagerActionGatherItems	(CAgentManager *object, LPCSTR action_name = "");
+    CAgentManagerActionGatherItems(CAgentManager* object, LPCSTR action_name = "");
 };
 
 //////////////////////////////////////////////////////////////////////////
 // CAgentManagerActionKillEnemy
 //////////////////////////////////////////////////////////////////////////
 
-class CAgentManagerActionKillEnemy : public CAgentManagerActionBase {
+class CAgentManagerActionKillEnemy : public CAgentManagerActionBase
+{
 protected:
-	typedef CAgentManagerActionBase inherited;
+    typedef CAgentManagerActionBase inherited;
 
 public:
-						CAgentManagerActionKillEnemy(CAgentManager *object, LPCSTR action_name = "");
-	virtual void		initialize					();
-	virtual void		finalize					();
-	virtual void		execute						();
+    CAgentManagerActionKillEnemy(CAgentManager* object, LPCSTR action_name = "");
+    virtual void initialize();
+    virtual void finalize();
+    virtual void execute();
 };
 
 //////////////////////////////////////////////////////////////////////////
 // CAgentManagerActionReactOnDanger
 //////////////////////////////////////////////////////////////////////////
 
-class CAgentManagerActionReactOnDanger : public CAgentManagerActionBase {
+class CAgentManagerActionReactOnDanger : public CAgentManagerActionBase
+{
 protected:
-	typedef CAgentManagerActionBase inherited;
+    typedef CAgentManagerActionBase inherited;
 
 public:
-						CAgentManagerActionReactOnDanger(CAgentManager *object, LPCSTR action_name = "");
-	virtual void		initialize						();
-	virtual void		execute							();
+    CAgentManagerActionReactOnDanger(CAgentManager* object, LPCSTR action_name = "");
+    virtual void initialize();
+    virtual void execute();
 };

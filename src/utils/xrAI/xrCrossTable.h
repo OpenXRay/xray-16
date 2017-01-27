@@ -14,11 +14,11 @@
 #include "xrAICore/Navigation/game_graph.h"
 #include "xrAICore/Navigation/level_graph.h"
 
-#define CROSS_TABLE_NAME_RAW	"level.gct.raw"
+#define CROSS_TABLE_NAME_RAW "level.gct.raw"
 
-typedef	char FILE_NAME[_MAX_PATH];
+typedef char FILE_NAME[_MAX_PATH];
 
 extern LPCSTR GAME_LEVEL_GRAPH;
 
-extern void xrBuildCrossTable	(LPCSTR	caProjectName);
-extern void vfRecurseMark		(const CLevelGraph &tMap, xr_vector<bool> &tMarks, u32 dwStartNodeID);
+extern void xrBuildCrossTable(LPCSTR caProjectName);
+extern void vfRecurseMark(const CLevelGraph& tMap, xr_vector<bool>& tMarks, u32 dwStartNodeID);

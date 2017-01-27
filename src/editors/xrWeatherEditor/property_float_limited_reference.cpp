@@ -9,39 +9,29 @@
 #include "pch.hpp"
 #include "property_float_limited_reference.hpp"
 
-property_float_limited_reference::property_float_limited_reference			(
-		float& value,
-		float const% increment_factor,
-		float const %min,
-		float const %max
-	) :
-	inherited				(value, increment_factor),
-	m_min					(min),
-	m_max					(max)
+property_float_limited_reference::property_float_limited_reference(
+    float& value, float const % increment_factor, float const % min, float const % max)
+    : inherited(value, increment_factor), m_min(min), m_max(max)
 {
 }
 
-System::Object ^property_float_limited_reference::GetValue		()
+System::Object ^ property_float_limited_reference::GetValue()
 {
-	float					value = safe_cast<float>(inherited::GetValue());
-	if (value < m_min)
-		value				= m_min;
+    float value = safe_cast<float>(inherited::GetValue());
+    if (value < m_min) value = m_min;
 
-	if (value > m_max)
-		value				= m_max;
+    if (value > m_max) value = m_max;
 
-	return					(value);
+    return (value);
 }
 
-void property_float_limited_reference::SetValue			(System::Object ^object)
+void property_float_limited_reference::SetValue(System::Object ^ object)
 {
-	float					new_value = safe_cast<float>(object);
+    float new_value = safe_cast<float>(object);
 
-	if (new_value < m_min)
-		new_value			= m_min;
+    if (new_value < m_min) new_value = m_min;
 
-	if (new_value > m_max)
-		new_value			= m_max;
+    if (new_value > m_max) new_value = m_max;
 
-	inherited::SetValue	(new_value);
-}	
+    inherited::SetValue(new_value);
+}

@@ -1,6 +1,5 @@
 #include "stdafx.h"
 
-
 // *****************************************************************************************
 // Error handling
 
@@ -9,14 +8,8 @@ static struct _DF
 {
     char* name;
     u32 mask;
-} DF[] =
-{
-    {"rsFullscreen", rsFullscreen},
-    {"rsClearBB", rsClearBB},
-    {"rsVSync", rsVSync},
-    {"rsWireframe", rsWireframe},
-    {NULL, 0}
-};
+} DF[] = {{"rsFullscreen", rsFullscreen}, {"rsClearBB", rsClearBB}, {"rsVSync", rsVSync}, {"rsWireframe", rsWireframe},
+    {NULL, 0}};
 
 void CRenderDevice::DumpFlags()
 {

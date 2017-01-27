@@ -12,24 +12,23 @@
 #include "property_holder_include.hpp"
 using XRay::SdkControls::IProperty;
 
-public ref class property_boolean : public IProperty {
-public:
-	typedef editor::property_holder::boolean_getter_type	boolean_getter_type;
-	typedef editor::property_holder::boolean_setter_type	boolean_setter_type;
+public
+ref class property_boolean : public IProperty
+{
+  public:
+    typedef editor::property_holder::boolean_getter_type boolean_getter_type;
+    typedef editor::property_holder::boolean_setter_type boolean_setter_type;
 
-public:
-							property_boolean	(
-								boolean_getter_type const &getter,
-								boolean_setter_type const &setter
-							);
-	virtual					~property_boolean	();
-							!property_boolean	();
-	virtual System::Object	^GetValue			();
-	virtual void			SetValue			(System::Object ^object);
+  public:
+    property_boolean(boolean_getter_type const& getter, boolean_setter_type const& setter);
+    virtual ~property_boolean();
+    !property_boolean();
+    virtual System::Object ^ GetValue();
+    virtual void SetValue(System::Object ^ object);
 
-private:
-	boolean_getter_type		*m_getter;
-	boolean_setter_type		*m_setter;
-}; // ref class property_boolean
+  private:
+    boolean_getter_type* m_getter;
+    boolean_setter_type* m_setter;
+};  // ref class property_boolean
 
-#endif // ifndef PROPERTY_BOOLEAN_HPP_INCLUDED
+#endif  // ifndef PROPERTY_BOOLEAN_HPP_INCLUDED

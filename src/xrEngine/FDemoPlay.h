@@ -31,6 +31,7 @@ class ENGINE_API CDemoPlay : public CEffectorCam
 
     void stat_Start();
     void stat_Stop();
+
 public:
     virtual BOOL ProcessCam(SCamEffectorInfo& info);
 
@@ -38,4 +39,4 @@ public:
     virtual ~CDemoPlay();
 };
 
-#endif // !defined(AFX_FDEMOPLAY_H__9B07E6E0_FC3C_11D3_B4E3_4854E82A090D__INCLUDED_)
+#endif  // !defined(AFX_FDEMOPLAY_H__9B07E6E0_FC3C_11D3_B4E3_4854E82A090D__INCLUDED_)

@@ -5,10 +5,9 @@
 //---------------------------------------------------------------------------
 #pragma package(smart_init)
 #pragma resource "*.dfm"
-TfrmSplash *frmSplash;
+TfrmSplash* frmSplash;
 //---------------------------------------------------------------------------
-__fastcall TfrmSplash::TfrmSplash(TComponent *Owner)
-    : TForm(Owner) {}
+__fastcall TfrmSplash::TfrmSplash(TComponent* Owner) : TForm(Owner)
+{
+}
 //---------------------------------------------------------------------------
-
-

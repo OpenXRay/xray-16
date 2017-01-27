@@ -12,17 +12,16 @@
 
 using System::Object;
 
-property_property_container::property_property_container(property_holder* object) :
-	m_object	(object)
+property_property_container::property_property_container(property_holder* object) : m_object(object)
 {
 }
 
-Object^ property_property_container::GetValue			()
+Object ^ property_property_container::GetValue()
 {
-	return		(m_object->container());
+    return (m_object->container());
 }
 
-void property_property_container::SetValue				(Object ^object)
+void property_property_container::SetValue(Object ^ object)
 {
-	NODEFAULT;
+    NODEFAULT;
 }

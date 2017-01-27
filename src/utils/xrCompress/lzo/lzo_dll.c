@@ -24,11 +24,9 @@
    <markus@oberhumer.com>
  */
 
-
 #include "lzo_conf.h"
 
 #if defined(LZO_BUILD_DLL)
-
 
 /***********************************************************************
 // Windows 16 bit + Watcom C + DLL
@@ -41,20 +39,19 @@
 #include <windows.h>
 #endif
 
-#pragma off (unreferenced);
+#pragma off(unreferenced);
 #if 0 && defined(WINVER)
 BOOL FAR PASCAL LibMain ( HANDLE hInstance, WORD wDataSegment,
                           WORD wHeapSize, LPSTR lpszCmdLine )
 #else
-int __far __pascal LibMain ( int a, short b, short c, long d )
+int __far __pascal LibMain(int a, short b, short c, long d)
 #endif
-#pragma on (unreferenced);
+#pragma on(unreferenced);
 {
-	return 1;
+    return 1;
 }
 
 #endif
-
 
 #endif /* defined(LZO_BUILD_DLL) */
 

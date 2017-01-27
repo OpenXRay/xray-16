@@ -15,10 +15,9 @@ const int default_key = mouse_device_key | keyboard_device_key;
 
 class ENGINE_API CInput
 #ifndef M_BORLAND
-    :
-    public pureFrame,
-    public pureAppActivate,
-    public pureAppDeactivate
+    : public pureFrame,
+      public pureAppActivate,
+      public pureAppDeactivate
 #endif
 {
 public:
@@ -48,11 +47,12 @@ public:
         void FrameStart() { FrameTime.FrameStart(); }
         void FrameEnd() { FrameTime.FrameEnd(); }
     };
+
 private:
     BENCH_SEC_SCRAMBLEMEMBER1
-    LPDIRECTINPUT8 pDI; // The DInput object
-    LPDIRECTINPUTDEVICE8 pMouse; // The DIDevice7 interface
-    LPDIRECTINPUTDEVICE8 pKeyboard; // The DIDevice7 interface
+    LPDIRECTINPUT8 pDI;              // The DInput object
+    LPDIRECTINPUTDEVICE8 pMouse;     // The DIDevice7 interface
+    LPDIRECTINPUTDEVICE8 pKeyboard;  // The DIDevice7 interface
     //----------------------
     u32 timeStamp[COUNT_MOUSE_AXIS];
     u32 timeSave[COUNT_MOUSE_AXIS];
@@ -62,9 +62,8 @@ private:
     //----------------------
     BOOL KBState[COUNT_KB_BUTTONS];
 
-    HRESULT CreateInputDevice(LPDIRECTINPUTDEVICE8* device, GUID guidDevice,
-                              const DIDATAFORMAT* pdidDataFormat, u32 dwFlags,
-                              u32 buf_size);
+    HRESULT CreateInputDevice(
+        LPDIRECTINPUTDEVICE8* device, GUID guidDevice, const DIDATAFORMAT* pdidDataFormat, u32 dwFlags, u32 buf_size);
 
     // xr_stack<IInputReceiver*> cbStack;
     xr_vector<IInputReceiver*> cbStack;
@@ -79,8 +78,8 @@ public:
     sxr_key key_property;
     u32 dwCurTime;
 
-    const InputStatistics &GetStats() const { return stats; }
-    void DumpStatistics(class IGameFont &font, class IPerformanceAlert *alert);
+    const InputStatistics& GetStats() const { return stats; }
+    void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert);
     void SetAllAcquire(BOOL bAcquire = TRUE);
     void SetMouseAcquire(BOOL bAcquire);
     void SetKBDAcquire(BOOL bAcquire);
@@ -95,7 +94,7 @@ public:
     CInput(BOOL bExclusive = true, int deviceForInit = default_key);
     ~CInput();
 
-    virtual void  OnFrame(void);
+    virtual void OnFrame(void);
     virtual void OnAppActivate(void);
     virtual void OnAppDeactivate(void);
 
@@ -113,4 +112,4 @@ public:
 
 extern ENGINE_API CInput* pInput;
 
-#endif //__XR_INPUT__
+#endif  //__XR_INPUT__

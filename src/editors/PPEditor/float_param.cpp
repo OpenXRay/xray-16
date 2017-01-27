@@ -7,15 +7,12 @@
 #pragma link "multi_edit"
 #pragma link "MXCtrls"
 #pragma resource "*.dfm"
-TfrmTimeConstructor *frmTimeConstructor;
+TfrmTimeConstructor* frmTimeConstructor;
 
 //---------------------------------------------------------------------------
-__fastcall TfrmTimeConstructor::TfrmTimeConstructor(TComponent *Owner)
-    : TForm(Owner)
+__fastcall TfrmTimeConstructor::TfrmTimeConstructor(TComponent* Owner) : TForm(Owner)
 {
     ClientHeight = Panel1->Height;
 }
 
 //---------------------------------------------------------------------------
-
-

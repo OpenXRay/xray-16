@@ -28,7 +28,7 @@ void add_profile_portion				(LPCSTR id, const u64 &time)
 	
 	profiler().add_profile_portion	(temp);
 }
-#endif // CONFIG_PROFILE_LOCKS
+#endif  // CONFIG_PROFILE_LOCKS
 
 CProfiler	*g_profiler			= 0;
 LPCSTR		indent				= "  ";
@@ -44,7 +44,7 @@ struct CProfilePortionPredicate {
 CProfiler::CProfiler				()
 #ifdef CONFIG_PROFILE_LOCKS
 	:m_section("")
-#endif // CONFIG_PROFILE_LOCKS
+#endif  // CONFIG_PROFILE_LOCKS
 {
 	m_actual							= true;
 }
@@ -53,7 +53,7 @@ CProfiler::~CProfiler				()
 {
 #ifdef CONFIG_PROFILE_LOCKS
 	set_add_profile_portion		(0);
-#endif // CONFIG_PROFILE_LOCKS
+#endif  // CONFIG_PROFILE_LOCKS
 }
 
 IC	u32 compute_string_length		(LPCSTR str)
@@ -135,7 +135,7 @@ void CProfiler::clear				()
 #ifdef CONFIG_PROFILE_LOCKS
 	while (InterlockedExchange(&critical_section_counter,1))
 		Sleep					(0);
-#endif // CONFIG_PROFILE_LOCKS
+#endif  // CONFIG_PROFILE_LOCKS
 
 	m_section.Enter				();
 	m_portions.clear			();
@@ -146,7 +146,7 @@ void CProfiler::clear				()
 
 #ifdef CONFIG_PROFILE_LOCKS
 	InterlockedExchange			(&critical_section_counter,0);
-#endif // CONFIG_PROFILE_LOCKS
+#endif  // CONFIG_PROFILE_LOCKS
 }
 
 void CProfiler::show_stats			(IGameFont &font, bool show)
@@ -154,21 +154,21 @@ void CProfiler::show_stats			(IGameFont &font, bool show)
 	if (!show) {
 #ifdef CONFIG_PROFILE_LOCKS
 		set_add_profile_portion	(0);
-#endif // CONFIG_PROFILE_LOCKS
+#endif  // CONFIG_PROFILE_LOCKS
 		clear					();
 		return;
 	}
 
 #ifdef CONFIG_PROFILE_LOCKS
 	set_add_profile_portion		(&::add_profile_portion);
-#endif // CONFIG_PROFILE_LOCKS
+#endif  // CONFIG_PROFILE_LOCKS
 
 	++m_call_count;
-		
+
 #ifdef CONFIG_PROFILE_LOCKS
 	while (InterlockedExchange(&critical_section_counter,1))
 		Sleep					(0);
-#endif // CONFIG_PROFILE_LOCKS
+#endif  // CONFIG_PROFILE_LOCKS
 
 	m_section.Enter				();
 
@@ -215,7 +215,7 @@ void CProfiler::show_stats			(IGameFont &font, bool show)
 
 #ifdef CONFIG_PROFILE_LOCKS
 	InterlockedExchange			(&critical_section_counter,0);
-#endif // CONFIG_PROFILE_LOCKS
+#endif  // CONFIG_PROFILE_LOCKS
 
 	TIMERS::iterator			I = m_timers.begin();
 	TIMERS::iterator			E = m_timers.end();
@@ -258,7 +258,7 @@ void CProfiler::add_profile_portion	(const CProfileResultPortion &profile_portio
 		Sleep					(0);
 	}
 	while (!InterlockedExchange(&critical_section_counter,1));
-#endif // CONFIG_PROFILE_LOCKS
+#endif  // CONFIG_PROFILE_LOCKS
 
 	m_section.Enter				();
 	m_portions.push_back		(profile_portion);
@@ -266,6 +266,6 @@ void CProfiler::add_profile_portion	(const CProfileResultPortion &profile_portio
 
 #ifdef CONFIG_PROFILE_LOCKS
 	InterlockedExchange			(&critical_section_counter,0);
-#endif // CONFIG_PROFILE_LOCKS
+#endif  // CONFIG_PROFILE_LOCKS
 }
 #endif

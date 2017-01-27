@@ -6,13 +6,13 @@
 
 #pragma once
 
-#define ENGINE_API 
-#define _WIN32_WINNT 0x0500        
+#define ENGINE_API
+#define _WIN32_WINNT 0x0500
 #include "xrCore/xrCore.h"
 #pragma comment(lib, "xrCore.lib")
 
 #pragma warning(push)
-#pragma warning(disable:4995)
+#pragma warning(disable : 4995)
 #include <assert.h>
 
 #define REQUIRE_IOSTREAM
@@ -72,22 +72,42 @@
 #define ENGINE_API
 #define ECORE_API
 
-enum TMsgDlgType { mtWarning, mtError, mtInformation, mtConfirmation, mtCustom };
-enum TMsgDlgBtn { mbYes, mbNo, mbOK, mbCancel, mbAbort, mbRetry, mbIgnore, mbAll, mbNoToAll, mbYesToAll, mbHelp };
+enum TMsgDlgType
+{
+    mtWarning,
+    mtError,
+    mtInformation,
+    mtConfirmation,
+    mtCustom
+};
+enum TMsgDlgBtn
+{
+    mbYes,
+    mbNo,
+    mbOK,
+    mbCancel,
+    mbAbort,
+    mbRetry,
+    mbIgnore,
+    mbAll,
+    mbNoToAll,
+    mbYesToAll,
+    mbHelp
+};
 typedef TMsgDlgBtn TMsgDlgButtons[mbHelp];
 
 #pragma warning(push)
-#pragma warning(disable:4995)
+#pragma warning(disable : 4995)
 #include "plugins/Shared/ELog.h"
 #pragma warning(pop)
 
 #include "xrCore/Animation/Bone.hpp"
 
 #pragma warning(push)
-#pragma warning(disable:4995)
-#	include <d3d9.h>
-#	include <d3dx9.h>
-#	include <d3d9types.h>
+#pragma warning(disable : 4995)
+#include <d3d9.h>
+#include <d3dx9.h>
+#include <d3d9types.h>
 #pragma warning(pop)
 
 #include <time.h>
@@ -96,27 +116,22 @@ typedef TMsgDlgBtn TMsgDlgButtons[mbHelp];
 
 //#define AnsiString std::string
 #define AnsiString xr_string
-DEFINE_VECTOR(AnsiString,AStringVec,AStringIt);
+DEFINE_VECTOR(AnsiString, AStringVec, AStringIt);
 
 #define THROW R_ASSERT(0)
 
 #ifdef _MAYA_EXPORT
-	#define _EDITOR_FILE_NAME_ "maya_export"
+#define _EDITOR_FILE_NAME_ "maya_export"
 #else
-	#ifdef _MAYA_MATERIAL
-		#define _EDITOR_FILE_NAME_ "maya_material"
-	#endif
+#ifdef _MAYA_MATERIAL
+#define _EDITOR_FILE_NAME_ "maya_material"
+#endif
 #endif
 
-#define GAMEMTL_NONE		u32(-1)
+#define GAMEMTL_NONE u32(-1)
 #define _game_data_ "$game_data$"
 
-#pragma comment(lib,"d3dx9.lib")
-#pragma comment(lib,"xrQSlim.lib")
+#pragma comment(lib, "d3dx9.lib")
+#pragma comment(lib, "xrQSlim.lib")
 
 #endif /*_INCDEF_STDAFX_H_*/
-
-
-
-
-

@@ -2,17 +2,23 @@
 #pragma hdrstop
 
 #ifndef DEBUG_MEMORY_MANAGER
-void xrMemory::dbg_register(void* _p, size_t _size, const char* _name) { }
-void xrMemory::dbg_unregister(void* _p) { }
-void xrMemory::dbg_check() { }
+void xrMemory::dbg_register(void* _p, size_t _size, const char* _name)
+{
+}
+void xrMemory::dbg_unregister(void* _p)
+{
+}
+void xrMemory::dbg_check()
+{
+}
 
-#else // DEBUG_MEMORY_MANAGER
-# if 0
-# define DEBUG_MEMORY_LEAK
-# define MEMORY_LEAK_DESCRIPTION "C++ NEW"
+#else  // DEBUG_MEMORY_MANAGER
+#if 0
+#define DEBUG_MEMORY_LEAK
+#define MEMORY_LEAK_DESCRIPTION "C++ NEW"
 //# define MEMORY_LEAK_DESCRIPTION "class luabind::functor<bool>"
-# define MEMORY_LEAK_SIZE 12
-# endif
+#define MEMORY_LEAK_SIZE 12
+#endif
 
 #include <malloc.h>
 
@@ -35,8 +41,7 @@ void dbg_header(xrMemory::mdbg& dbg, bool _debug)
 void xrMemory::dbg_register(void* _p, size_t _size, const char* _name)
 {
 #ifdef DEBUG_MEMORY_LEAK
-    if ((_size == MEMORY_LEAK_SIZE) && _name &&!xr_strcmp(MEMORY_LEAK_DESCRIPTION, _name))
-    {
+    if ((_size == MEMORY_LEAK_SIZE) && _name && !xr_strcmp(MEMORY_LEAK_DESCRIPTION, _name)) {
         static int i = 0;
         string2048 temp;
         xr_sprintf(temp, sizeof(temp), "____[%s][%d] : 0x%8x [REGISTER][%d]\n", _name, _size, (u32)((size_t)_p), i++);
@@ -69,24 +74,27 @@ void xrMemory::dbg_unregister(void* _p)
     // search entry
     u32 _found = u32(-1);
 
-    if (!debug_info.empty())
-    {
+    if (!debug_info.empty()) {
         for (int it = int(debug_info.size() - 1); it >= 0; it--)
-            if (debug_info[it]._p == _p) { _found = it; break; }
+            if (debug_info[it]._p == _p) {
+                _found = it;
+                break;
+            }
     }
 
     // unregister entry
-    if (u32(-1) == _found)
-    {
+    if (u32(-1) == _found) {
         FATAL("Memory allocation error: double free() ?");
     }
     else
     {
 #ifdef DEBUG_MEMORY_LEAK
-        if ((debug_info[_found]._size == MEMORY_LEAK_SIZE) && debug_info[_found]._name && !xr_strcmp(MEMORY_LEAK_DESCRIPTION, debug_info[_found]._name))
+        if ((debug_info[_found]._size == MEMORY_LEAK_SIZE) && debug_info[_found]._name &&
+            !xr_strcmp(MEMORY_LEAK_DESCRIPTION, debug_info[_found]._name))
         {
             string2048 temp;
-            xr_sprintf(temp, sizeof(temp), "____[%s][%d] : 0x%8x [UNREGISTER]\n", debug_info[_found]._name, debug_info[_found]._size, (u32)((size_t)_p));
+            xr_sprintf(temp, sizeof(temp), "____[%s][%d] : 0x%8x [UNREGISTER]\n", debug_info[_found]._name,
+                debug_info[_found]._size, (u32)((size_t)_p));
             OutputDebugString(temp);
         }
 #endif
@@ -96,8 +104,7 @@ void xrMemory::dbg_unregister(void* _p)
         R_ASSERT2(u32(-1) == *_shred, "Memory overrun error");
 
         // fill free memory with random data
-        if (g_bDbgFillMemory)
-            memset(debug_info[_found]._p, 'C', debug_info[_found]._size);
+        if (g_bDbgFillMemory) memset(debug_info[_found]._p, 'C', debug_info[_found]._size);
 
         // clear record
         std::swap(debug_info[_found], debug_info.back());
@@ -106,8 +113,7 @@ void xrMemory::dbg_unregister(void* _p)
     }
 
     // perform cleanup
-    if (debug_info_update > 1024 * 100)
-    {
+    if (debug_info_update > 1024 * 100) {
         debug_info_update = 0;
         debug_info.erase(std::remove_if(debug_info.begin(), debug_info.end(), pred_mdbg), debug_info.end());
         dbg_check();
@@ -127,10 +133,9 @@ void xrMemory::dbg_check()
     // Check overrun
     debug_cs.Enter();
     debug_mode = FALSE;
-    for (int it = 0; it<int(debug_info.size()); it++)
+    for (int it = 0; it < int(debug_info.size()); it++)
     {
-        if (0 == debug_info[it]._p)
-            continue;
+        if (0 == debug_info[it]._p) continue;
 
         // check header
         dbg_header(debug_info[it], true);
@@ -178,4 +183,4 @@ XRCORE_API void dbg_dump_str_leaks()
 {
     g_pStringContainer->dump();
 }
-#endif // DEBUG_MEMORY_MANAGER
+#endif  // DEBUG_MEMORY_MANAGER

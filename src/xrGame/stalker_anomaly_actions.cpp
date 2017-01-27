@@ -38,128 +38,120 @@ using namespace StalkerDecisionSpace;
 // CStalkerActionGetOutOfAnomaly
 //////////////////////////////////////////////////////////////////////////
 
-CStalkerActionGetOutOfAnomaly::CStalkerActionGetOutOfAnomaly	(CAI_Stalker *object, LPCSTR action_name) :
-	inherited				(object,action_name)
+CStalkerActionGetOutOfAnomaly::CStalkerActionGetOutOfAnomaly(CAI_Stalker* object, LPCSTR action_name)
+    : inherited(object, action_name)
 {
 }
 
-void CStalkerActionGetOutOfAnomaly::initialize	()
+void CStalkerActionGetOutOfAnomaly::initialize()
 {
-	inherited::initialize				();
+    inherited::initialize();
 
-	object().sound().remove_active_sounds		(u32(eStalkerSoundMaskNoHumming));
+    object().sound().remove_active_sounds(u32(eStalkerSoundMaskNoHumming));
 
-	object().movement().set_desired_direction		(0);
-	object().movement().set_path_type				(MovementManager::ePathTypeLevelPath);
-	object().movement().set_detail_path_type		(DetailPathManager::eDetailPathTypeSmooth);
-	object().movement().set_body_state			(eBodyStateStand);
-	object().movement().set_movement_type			(eMovementTypeWalk);
-	object().movement().set_mental_state			(eMentalStateDanger);
-	object().sight().setup				(SightManager::eSightTypeCurrentDirection);
-	if	(	object().memory().enemy().selected() && 
-			object().inventory().ActiveItem() && 
-			object().best_weapon() && 
-			(object().inventory().ActiveItem()->object().ID() == object().best_weapon()->object().ID())
-		)
-		object().CObjectHandler::set_goal	(eObjectActionIdle,object().best_weapon());
-	else
-		object().CObjectHandler::set_goal	(eObjectActionIdle);
-	set_property						(eWorldPropertyAnomaly,true);
+    object().movement().set_desired_direction(0);
+    object().movement().set_path_type(MovementManager::ePathTypeLevelPath);
+    object().movement().set_detail_path_type(DetailPathManager::eDetailPathTypeSmooth);
+    object().movement().set_body_state(eBodyStateStand);
+    object().movement().set_movement_type(eMovementTypeWalk);
+    object().movement().set_mental_state(eMentalStateDanger);
+    object().sight().setup(SightManager::eSightTypeCurrentDirection);
+    if (object().memory().enemy().selected() && object().inventory().ActiveItem() && object().best_weapon() &&
+        (object().inventory().ActiveItem()->object().ID() == object().best_weapon()->object().ID()))
+        object().CObjectHandler::set_goal(eObjectActionIdle, object().best_weapon());
+    else
+        object().CObjectHandler::set_goal(eObjectActionIdle);
+    set_property(eWorldPropertyAnomaly, true);
 }
 
-void CStalkerActionGetOutOfAnomaly::finalize	()
+void CStalkerActionGetOutOfAnomaly::finalize()
 {
-	inherited::finalize					();
+    inherited::finalize();
 
-	if (!object().g_Alive())
-		return;
+    if (!object().g_Alive()) return;
 
-	object().sound().set_sound_mask			(0);
+    object().sound().set_sound_mask(0);
 }
 
-void CStalkerActionGetOutOfAnomaly::execute	()
+void CStalkerActionGetOutOfAnomaly::execute()
 {
-	inherited::execute					();
-//
-	object().movement().set_path_type				(MovementManager::ePathTypeLevelPath);
-	object().movement().set_detail_path_type		(DetailPathManager::eDetailPathTypeSmooth);
-	object().movement().set_body_state			(eBodyStateStand);
-	object().movement().set_movement_type			(eMovementTypeWalk);
-	object().movement().set_mental_state			(eMentalStateDanger);
-//
+    inherited::execute();
+    //
+    object().movement().set_path_type(MovementManager::ePathTypeLevelPath);
+    object().movement().set_detail_path_type(DetailPathManager::eDetailPathTypeSmooth);
+    object().movement().set_body_state(eBodyStateStand);
+    object().movement().set_movement_type(eMovementTypeWalk);
+    object().movement().set_mental_state(eMentalStateDanger);
+    //
 
-	m_temp0.clear						();
-	m_temp1.clear						();
+    m_temp0.clear();
+    m_temp1.clear();
 
-	CSE_ALifeDynamicObject const* const base_alife_object = ai().alife().objects().object(object().ID(), true);
-	if ( !base_alife_object )
-		return;
+    CSE_ALifeDynamicObject const* const base_alife_object = ai().alife().objects().object(object().ID(), true);
+    if (!base_alife_object) return;
 
-	CSE_ALifeHumanAbstract const* const alife_object = smart_cast<CSE_ALifeHumanAbstract const*>( base_alife_object );
-	if ( !alife_object )
-		return;
+    CSE_ALifeHumanAbstract const* const alife_object = smart_cast<CSE_ALifeHumanAbstract const*>(base_alife_object);
+    if (!alife_object) return;
 
-	typedef xr_vector<ALife::_OBJECT_ID>	ids_type;
-	ids_type const& restrictions		= alife_object->m_dynamic_in_restrictions;
+    typedef xr_vector<ALife::_OBJECT_ID> ids_type;
+    ids_type const& restrictions = alife_object->m_dynamic_in_restrictions;
 
-	xr_vector<IGameObject*>::const_iterator	I = object().feel_touch.begin();
-	xr_vector<IGameObject*>::const_iterator	E = object().feel_touch.end();
-	for ( ; I != E; ++I) {
-		CCustomZone						*zone = smart_cast<CCustomZone*>(*I);
-		if ( zone && (zone->restrictor_type() != RestrictionSpace::eRestrictorTypeNone) ) {
-			if (smart_cast<CRadioactiveZone*>(zone))
-				continue;
+    xr_vector<IGameObject*>::const_iterator I = object().feel_touch.begin();
+    xr_vector<IGameObject*>::const_iterator E = object().feel_touch.end();
+    for (; I != E; ++I)
+    {
+        CCustomZone* zone = smart_cast<CCustomZone*>(*I);
+        if (zone && (zone->restrictor_type() != RestrictionSpace::eRestrictorTypeNone)) {
+            if (smart_cast<CRadioactiveZone*>(zone)) continue;
 
-			if ( std::find( restrictions.begin(), restrictions.end(), zone->ID() ) != restrictions.end() )
-				continue;
+            if (std::find(restrictions.begin(), restrictions.end(), zone->ID()) != restrictions.end()) continue;
 
-			m_temp0.push_back			(zone->ID());
-		}
-	}
-	
-	object().movement().restrictions().add_restrictions	(m_temp1,m_temp0);
-	object().movement().set_nearest_accessible_position	();
+            m_temp0.push_back(zone->ID());
+        }
+    }
+
+    object().movement().restrictions().add_restrictions(m_temp1, m_temp0);
+    object().movement().set_nearest_accessible_position();
 }
 
 //////////////////////////////////////////////////////////////////////////
 // CStalkerActionDetectAnomaly
 //////////////////////////////////////////////////////////////////////////
 
-CStalkerActionDetectAnomaly::CStalkerActionDetectAnomaly	(CAI_Stalker *object, LPCSTR action_name) :
-	inherited				(object,action_name)
+CStalkerActionDetectAnomaly::CStalkerActionDetectAnomaly(CAI_Stalker* object, LPCSTR action_name)
+    : inherited(object, action_name)
 {
 }
 
-void CStalkerActionDetectAnomaly::initialize	()
+void CStalkerActionDetectAnomaly::initialize()
 {
-	inherited::initialize			();
-	object().sound().remove_active_sounds	(u32(eStalkerSoundMaskNoHumming));
-	m_inertia_time					= 15000 + ::Random32.random(5000);
+    inherited::initialize();
+    object().sound().remove_active_sounds(u32(eStalkerSoundMaskNoHumming));
+    m_inertia_time = 15000 + ::Random32.random(5000);
 
-	Fvector							result;
-	object().eye_matrix.transform_tiny	(result,Fvector().set(0.f,0.f,10.f));
-	object().throw_target			(result, 0);
+    Fvector result;
+    object().eye_matrix.transform_tiny(result, Fvector().set(0.f, 0.f, 10.f));
+    object().throw_target(result, 0);
 }
 
-void CStalkerActionDetectAnomaly::finalize	()
+void CStalkerActionDetectAnomaly::finalize()
 {
-	inherited::finalize				();
+    inherited::finalize();
 
-	if (!object().g_Alive())
-		return;
+    if (!object().g_Alive()) return;
 
-	object().CObjectHandler::set_goal	(eObjectActionIdle);
-	object().sound().set_sound_mask		(0);
+    object().CObjectHandler::set_goal(eObjectActionIdle);
+    object().sound().set_sound_mask(0);
 }
 
-void CStalkerActionDetectAnomaly::execute	()
+void CStalkerActionDetectAnomaly::execute()
 {
-	inherited::execute				();
+    inherited::execute();
 
-	if (completed() || object().memory().enemy().selected()) {
-		set_property				(eWorldPropertyAnomaly,false);
-		return;
-	}
-	
-	object().CObjectHandler::set_goal	(eObjectActionFire1,object().inventory().ItemFromSlot(BOLT_SLOT));
+    if (completed() || object().memory().enemy().selected()) {
+        set_property(eWorldPropertyAnomaly, false);
+        return;
+    }
+
+    object().CObjectHandler::set_goal(eObjectActionFire1, object().inventory().ItemFromSlot(BOLT_SLOT));
 }

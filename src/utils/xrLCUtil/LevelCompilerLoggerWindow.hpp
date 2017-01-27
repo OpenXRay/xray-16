@@ -17,7 +17,7 @@ private:
 #ifdef CONFIG_PROFILE_LOCKS
         (MUTEX_PROFILE_ID(csLog))
 #endif
-    ;
+            ;
     volatile bool close = false;
     char name[256];
     char status[1024];
@@ -27,22 +27,24 @@ private:
     bool bStatusChange = false;
     bool bPhaseChange = false;
     u32 phase_total_time = 0;
+
 public:
     LevelCompilerLoggerWindow();
-    virtual void Initialize(const char *name) override;
+    virtual void Initialize(const char* name) override;
     virtual void Destroy() override;
-    virtual void clMsg(const char *format, ...) override;
-    virtual void clMsgV(const char *format, va_list args) override;
-    virtual void clLog(const char *format, ...) override;
-    virtual void Status(const char *format, ...) override;
-    virtual void StatusV(const char *format, va_list args) override;
-    virtual	void Progress(float f) override;
-    virtual	void Phase(const char *phaseName) override;
-    virtual void Success(const char *msg) override;
-    virtual void Failure(const char *msg) override;
+    virtual void clMsg(const char* format, ...) override;
+    virtual void clMsgV(const char* format, va_list args) override;
+    virtual void clLog(const char* format, ...) override;
+    virtual void Status(const char* format, ...) override;
+    virtual void StatusV(const char* format, va_list args) override;
+    virtual void Progress(float f) override;
+    virtual void Phase(const char* phaseName) override;
+    virtual void Success(const char* msg) override;
+    virtual void Failure(const char* msg) override;
     HWND GetWindow() const;
+
 private:
-    static void LogThreadProc(void *context);
+    static void LogThreadProc(void* context);
     void LogThreadProc();
     void ProcessMessages();
 };

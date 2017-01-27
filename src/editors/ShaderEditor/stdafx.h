@@ -6,7 +6,7 @@
 
 #pragma once
 
-#pragma warn -pck
+#pragma warn - pck
 
 #define sqrtf(a) sqrt(a)
 
@@ -42,7 +42,7 @@ __inline int _eof(int _a)
 #ifdef _access
 #undef _access
 #endif
-__inline int _access(const char *_a, int _b)
+__inline int _access(const char* _a, int _b)
 {
     return ::access(_a, _b);
 }
@@ -61,7 +61,7 @@ __inline int _dup(int handle)
 {
     return ::dup(handle);
 }
-__inline float modff(float a, float *b)
+__inline float modff(float a, float* b)
 {
     double x, y;
     y = modf(double(a), &x);
@@ -74,7 +74,7 @@ __inline float expf(float val)
 }
 
 #include "xrCore/Platform.h"
-#ifdef  _ECOREB
+#ifdef _ECOREB
 #define ECORE_API XR_IMPORT
 #define ENGINE_API XR_EXPORT
 #else
@@ -83,7 +83,7 @@ __inline float expf(float val)
 #endif
 
 #define DLL_API XR_IMPORT
-#define PropertyGP(a,b) __declspec(property(get=a, put=b))
+#define PropertyGP(a, b) __declspec(property(get = a, put = b))
 #define THROW FATAL("THROW");
 #define THROW2(a) FATAL(a);
 #define NO_XRC_STATS
@@ -96,10 +96,10 @@ __inline float expf(float val)
 #ifdef _EDITOR
 class PropValue;
 class PropItem;
-DEFINE_VECTOR(PropItem *, PropItemVec, PropItemIt);
+DEFINE_VECTOR(PropItem*, PropItemVec, PropItemIt);
 
 class ListItem;
-DEFINE_VECTOR(ListItem *, ListItemsVec, ListItemsIt);
+DEFINE_VECTOR(ListItem*, ListItemsVec, ListItemsIt);
 #endif
 
 #include "xrCDB/xrCDB.h"
@@ -127,19 +127,13 @@ DEFINE_VECTOR(AnsiString*, LPAStringVec, LPAStringIt);
 #include "editors/ECore/Editor/engine.h"
 #include "xrEngine/defines.h"
 
-struct str_pred : public std::binary_function<char *, char *, bool>
+struct str_pred : public std::binary_function<char*, char*, bool>
 {
-    IC bool operator()(LPCSTR x, LPCSTR y) const
-    {
-        return strcmp(x, y) < 0;
-    }
+    IC bool operator()(LPCSTR x, LPCSTR y) const { return strcmp(x, y) < 0; }
 };
 struct astr_pred : public std::binary_function<const AnsiString&, const AnsiString&, bool>
 {
-    IC bool operator()(const AnsiString &x, const AnsiString &y) const
-    {
-        return x < y;
-    }
+    IC bool operator()(const AnsiString& x, const AnsiString& y) const { return x < y; }
 };
 
 #ifdef _EDITOR
@@ -158,27 +152,36 @@ DEFINE_VECTOR(shared_str, RStrVec, RStrVecIt);
 #include "net_utils.h"
 #endif
 
-#define INI_NAME(buf)       {FS.update_path(buf,"$local_root$",EFS.ChangeFileExt(UI->EditorName(),".ini").c_str());}
-//#define INI_NAME(buf)         {buf = buf+xr_string(Core.WorkingPath)+xr_string("\\")+EFS.ChangeFileExt(UI->EditorName(),".ini");}
-#define DEFINE_INI(storage) {string_path buf; INI_NAME(buf); storage->IniFileName=buf;}
+#define INI_NAME(buf)                                                                                                  \
+    {                                                                                                                  \
+        FS.update_path(buf, "$local_root$", EFS.ChangeFileExt(UI->EditorName(), ".ini").c_str());                      \
+    }
+//#define INI_NAME(buf)         {buf =
+//buf+xr_string(Core.WorkingPath)+xr_string("\\")+EFS.ChangeFileExt(UI->EditorName(),".ini");}
+#define DEFINE_INI(storage)                                                                                            \
+    {                                                                                                                  \
+        string_path buf;                                                                                               \
+        INI_NAME(buf);                                                                                                 \
+        storage->IniFileName = buf;                                                                                    \
+    }
 #define NONE_CAPTION "<none>"
 #define MULTIPLESEL_CAPTION "<multiple selection>"
 
 // path definition
-#define _server_root_       "$server_root$"
-#define _server_data_root_  "$server_data_root$"
-#define _local_root_        "$local_root$"
-#define _import_            "$import$"
-#define _sounds_            "$sounds$"
-#define _textures_          "$textures$"
-#define _objects_           "$objects$"
-#define _maps_              "$maps$"
-#define _groups_            "$groups$"
-#define _temp_              "$temp$"
-#define _omotion_           "$omotion$"
-#define _omotions_          "$omotions$"
-#define _smotion_           "$smotion$"
-#define _detail_objects_    "$detail_objects$"
+#define _server_root_ "$server_root$"
+#define _server_data_root_ "$server_data_root$"
+#define _local_root_ "$local_root$"
+#define _import_ "$import$"
+#define _sounds_ "$sounds$"
+#define _textures_ "$textures$"
+#define _objects_ "$objects$"
+#define _maps_ "$maps$"
+#define _groups_ "$groups$"
+#define _temp_ "$temp$"
+#define _omotion_ "$omotion$"
+#define _omotions_ "$omotions$"
+#define _smotion_ "$smotion$"
+#define _detail_objects_ "$detail_objects$"
 #endif
 
 #define TEX_POINT_ATT "internal\\internal_light_attpoint"

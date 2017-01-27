@@ -14,18 +14,19 @@
 
 class CAI_Stalker;
 
-class CStalkerMovementRestrictor {
+class CStalkerMovementRestrictor
+{
 private:
-	CAI_Stalker			*m_object;
-	const CAgentManager	*m_agent_manager;
-	bool				m_use_enemy_info;
-	bool				m_notify_agent_manager;
+    CAI_Stalker* m_object;
+    const CAgentManager* m_agent_manager;
+    bool m_use_enemy_info;
+    bool m_notify_agent_manager;
 
 public:
-	IC					CStalkerMovementRestrictor	(CAI_Stalker *object, bool use_enemy_info, bool notify_agent_manager = true);
-	IC		bool		operator()					(const CCoverPoint *cover) const;
-	IC		float		weight						(const CCoverPoint *cover) const;
-	IC		void		finalize					(const CCoverPoint *cover) const;
+    IC CStalkerMovementRestrictor(CAI_Stalker* object, bool use_enemy_info, bool notify_agent_manager = true);
+    IC bool operator()(const CCoverPoint* cover) const;
+    IC float weight(const CCoverPoint* cover) const;
+    IC void finalize(const CCoverPoint* cover) const;
 };
 
 #include "stalker_movement_restriction_inline.h"

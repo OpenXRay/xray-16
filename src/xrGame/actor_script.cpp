@@ -13,19 +13,15 @@
 
 using namespace luabind;
 
-IC static void CActor_Export(lua_State *luaState)
+IC static void CActor_Export(lua_State* luaState)
 {
-	module(luaState)
-	[
-		class_<CActor,CGameObject>("CActor")
-			.def(constructor<>())
-			
-#ifndef	BENCHMARK_BUILD
-		,
-		class_<CLevelChanger,CGameObject>("CLevelChanger")
-			.def(constructor<>())
+    module(luaState)[class_<CActor, CGameObject>("CActor").def(constructor<>())
+
+#ifndef BENCHMARK_BUILD
+                         ,
+        class_<CLevelChanger, CGameObject>("CLevelChanger").def(constructor<>())
 #endif
-	];
+    ];
 };
 
 SCRIPT_EXPORT_FUNC(CActor, (CGameObject), CActor_Export);

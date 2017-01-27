@@ -21,7 +21,9 @@ ELibrary::ELibrary()
 
 //----------------------------------------------------
 
-ELibrary::~ELibrary() {}
+ELibrary::~ELibrary()
+{
+}
 
 //----------------------------------------------------
 
@@ -44,10 +46,9 @@ void ELibrary::OnDestroy()
     // remove all instance CEditableObject
     EditObjPairIt O = m_EditObjects.begin();
     EditObjPairIt E = m_EditObjects.end();
-    for (; O!=E; O++)
+    for (; O != E; O++)
     {
-        if (0!=O->second->m_RefCount)
-        {
+        if (0 != O->second->m_RefCount) {
             //.        	ELog.DlgMsg(mtError,"Object '%s' still referenced.",O->first.c_str());
             //.	    	R_ASSERT(0==O->second->m_RefCount);
         }
@@ -62,10 +63,9 @@ void ELibrary::CleanLibrary()
 {
     VERIFY(m_bReady);
     // remove all unused instance CEditableObject
-    for (EditObjPairIt O = m_EditObjects.begin(); O!=m_EditObjects.end();)
+    for (EditObjPairIt O = m_EditObjects.begin(); O != m_EditObjects.end();)
     {
-        if (0==O->second->m_RefCount)
-        {
+        if (0 == O->second->m_RefCount) {
             EditObjPairIt D = O;
             O++;
             xr_delete(D->second);
@@ -80,13 +80,12 @@ void ELibrary::CleanLibrary()
 void ELibrary::ReloadObject(LPCSTR nm)
 {
     VERIFY(m_bReady);
-    R_ASSERT(nm&&nm[0]);
+    R_ASSERT(nm && nm[0]);
     string512 name;
     strcpy(name, nm);
     strlwr(name);
     EditObjPairIt it = m_EditObjects.find(name);
-    if (it!=m_EditObjects.end())
-        it->second->Reload();
+    if (it != m_EditObjects.end()) it->second->Reload();
 }
 
 //---------------------------------------------------------------------------
@@ -95,7 +94,7 @@ void ELibrary::ReloadObjects()
     VERIFY(m_bReady);
     EditObjPairIt O = m_EditObjects.begin();
     EditObjPairIt E = m_EditObjects.end();
-    for (; O!=E; O++)
+    for (; O != E; O++)
         O->second->Reload();
 }
 
@@ -106,7 +105,7 @@ void ELibrary::OnDeviceCreate()
     VERIFY(m_bReady);
     EditObjPairIt O = m_EditObjects.begin();
     EditObjPairIt E = m_EditObjects.end();
-    for (; O!=E; O++)
+    for (; O != E; O++)
         O->second->OnDeviceCreate();
 }
 
@@ -117,7 +116,7 @@ void ELibrary::OnDeviceDestroy()
     VERIFY(m_bReady);
     EditObjPairIt O = m_EditObjects.begin();
     EditObjPairIt E = m_EditObjects.end();
-    for (; O!=E; O++)
+    for (; O != E; O++)
         O->second->OnDeviceDestroy();
 }
 
@@ -127,22 +126,20 @@ void ELibrary::EvictObjects()
 {
     EditObjPairIt O = m_EditObjects.begin();
     EditObjPairIt E = m_EditObjects.end();
-    for (; O!=E; O++)
+    for (; O != E; O++)
         O->second->EvictObject();
 }
 
 //----------------------------------------------------
 
-CEditableObject *ELibrary::LoadEditObject(LPCSTR name)
+CEditableObject* ELibrary::LoadEditObject(LPCSTR name)
 {
     VERIFY(m_bReady);
-    CEditableObject*m_EditObject = new CEditableObject(name);
+    CEditableObject* m_EditObject = new CEditableObject(name);
     string_path fn;
     FS.update_path(fn, _objects_, EFS.ChangeFileExt(name, ".object").c_str());
-    if (FS.exist(fn))
-    {
-        if (m_EditObject->Load(fn))
-            return m_EditObject;
+    if (FS.exist(fn)) {
+        if (m_EditObject->Load(fn)) return m_EditObject;
     }
     else
     {
@@ -154,98 +151,88 @@ CEditableObject *ELibrary::LoadEditObject(LPCSTR name)
 
 //---------------------------------------------------------------------------
 
-CEditableObject *ELibrary::CreateEditObject(LPCSTR nm)
+CEditableObject* ELibrary::CreateEditObject(LPCSTR nm)
 {
     VERIFY(m_bReady);
-    R_ASSERT(nm&&nm[0]);
+    R_ASSERT(nm && nm[0]);
     //.    UI->ProgressInfo		(nm);
     AnsiString name = AnsiString(nm).LowerCase();
     // file exist - find in already loaded
-    CEditableObject*m_EditObject = 0;
+    CEditableObject* m_EditObject = 0;
     EditObjPairIt it = m_EditObjects.find(name);
-    if (it!=m_EditObjects.end())
+    if (it != m_EditObjects.end())
         m_EditObject = it->second;
-    else if (0!=(m_EditObject = LoadEditObject(name.c_str())))
+    else if (0 != (m_EditObject = LoadEditObject(name.c_str())))
         m_EditObjects[name] = m_EditObject;
-    if (m_EditObject)
-        m_EditObject->m_RefCount++;
+    if (m_EditObject) m_EditObject->m_RefCount++;
     return m_EditObject;
 }
 
 //---------------------------------------------------------------------------
 
-void ELibrary::RemoveEditObject(CEditableObject *&object)
+void ELibrary::RemoveEditObject(CEditableObject*& object)
 {
-    if (object)
-    {
+    if (object) {
         object->m_RefCount--;
-        R_ASSERT(object->m_RefCount>=0);
-        if ((object->m_RefCount==0)&&EPrefs->object_flags.is(epoDiscardInstance))
-            if (!object->IsModified())
-                UnloadEditObject(object->GetName());
+        R_ASSERT(object->m_RefCount >= 0);
+        if ((object->m_RefCount == 0) && EPrefs->object_flags.is(epoDiscardInstance))
+            if (!object->IsModified()) UnloadEditObject(object->GetName());
         object = 0;
     }
 }
 
 //---------------------------------------------------------------------------
 
-void ELibrary::Save(FS_FileSet *modif_map)
+void ELibrary::Save(FS_FileSet* modif_map)
 {
     VERIFY(m_bReady);
     EditObjPairIt O = m_EditObjects.begin();
     EditObjPairIt E = m_EditObjects.end();
-    if (modif_map)
-    {
-        for (; O!=E; O++)
-            if (modif_map->end()!=modif_map->find(FS_File(O->second->GetName())))
-            {
+    if (modif_map) {
+        for (; O != E; O++)
+            if (modif_map->end() != modif_map->find(FS_File(O->second->GetName()))) {
                 string_path nm;
                 FS.update_path(nm, _objects_, O->second->GetName());
                 strcpy(nm, EFS.ChangeFileExt(nm, ".object").c_str());
 
-                if (!O->second->Save(nm))
-                    Log("!Can't save object:", nm);
+                if (!O->second->Save(nm)) Log("!Can't save object:", nm);
             }
     }
     else
     {
-        for (; O!=E; O++)
-            if (O->second->IsModified())
-            {
+        for (; O != E; O++)
+            if (O->second->IsModified()) {
                 string_path nm;
                 FS.update_path(nm, _objects_, O->second->GetName());
                 strcpy(nm, EFS.ChangeFileExt(nm, ".object").c_str());
 
-                if (!O->second->Save(nm))
-                    Log("!Can't save object:", nm);
+                if (!O->second->Save(nm)) Log("!Can't save object:", nm);
             }
     }
 }
 
 //---------------------------------------------------------------------------
 
-int ELibrary::GetObjects(FS_FileSet &files)
+int ELibrary::GetObjects(FS_FileSet& files)
 {
-    return FS.file_list(files, _objects_, FS_ListFiles|FS_ClampExt, "*.object");
+    return FS.file_list(files, _objects_, FS_ListFiles | FS_ClampExt, "*.object");
 }
 
 //---------------------------------------------------------------------------
 
-void ELibrary::RemoveObject(LPCSTR _fname, EItemType type, bool &res)
+void ELibrary::RemoveObject(LPCSTR _fname, EItemType type, bool& res)
 {
-    if (TYPE_FOLDER==type)
-    {
+    if (TYPE_FOLDER == type) {
         FS.dir_delete(_objects_, _fname, FALSE);
         res = true;
         return;
     }
-    else if (TYPE_OBJECT==type)
+    else if (TYPE_OBJECT == type)
     {
         string_path fname, src_name;
         strcpy(fname, EFS.ChangeFileExt(_fname, ".object").c_str());
         FS.update_path(src_name, _objects_, fname);
-        if (FS.exist(src_name))
-        {
+        if (FS.exist(src_name)) {
             xr_string thm_name = EFS.ChangeFileExt(fname, ".thm");
             // source
             FS.file_delete(src_name);
@@ -267,11 +254,10 @@ void ELibrary::RemoveObject(LPCSTR _fname, EItemType type, bool &res)
 
 void ELibrary::RenameObject(LPCSTR nm0, LPCSTR nm1, EItemType type)
 {
-    if (TYPE_FOLDER==type)
-    {
+    if (TYPE_FOLDER == type) {
         FS.dir_delete(_objects_, nm0, FALSE);
     }
-    else if (TYPE_OBJECT==type)
+    else if (TYPE_OBJECT == type)
     {
         string_path fn0, fn1, temp;
         // rename base file
@@ -290,8 +276,7 @@ void ELibrary::RenameObject(LPCSTR nm0, LPCSTR nm1, EItemType type)
 
         // rename in cache
         EditObjPairIt it = m_EditObjects.find(nm0);
-        if (it!=m_EditObjects.end())
-        {
+        if (it != m_EditObjects.end()) {
             m_EditObjects[nm1] = it->second;
             m_EditObjects.erase(it);
         }
@@ -303,10 +288,8 @@ void ELibrary::RenameObject(LPCSTR nm0, LPCSTR nm1, EItemType type)
 void ELibrary::UnloadEditObject(LPCSTR full_name)
 {
     EditObjPairIt it = m_EditObjects.find(full_name);
-    if (it!=m_EditObjects.end())
-    {
-        if (0!=it->second->m_RefCount)
-        {
+    if (it != m_EditObjects.end()) {
+        if (0 != it->second->m_RefCount) {
             ELog.DlgMsg(mtError, "Object '%s' still referenced.", it->first.c_str());
             THROW;
         }
@@ -316,5 +299,3 @@ void ELibrary::UnloadEditObject(LPCSTR full_name)
 }
 
 //---------------------------------------------------------------------------
-
-

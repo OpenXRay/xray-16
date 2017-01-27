@@ -13,28 +13,28 @@
 
 using System::ComponentModel::ITypeDescriptorContext;
 using System::ComponentModel::TypeConverter;
-typedef TypeConverter::StandardValuesCollection	StandardValuesCollection;
+typedef TypeConverter::StandardValuesCollection StandardValuesCollection;
 
-bool property_converter_string_values::GetStandardValuesSupported				(ITypeDescriptorContext^ context)
+bool property_converter_string_values::GetStandardValuesSupported(ITypeDescriptorContext ^ context)
 {
-	return							(true);
+    return (true);
 }
 
-bool property_converter_string_values::GetStandardValuesExclusive				(ITypeDescriptorContext^ context)
+bool property_converter_string_values::GetStandardValuesExclusive(ITypeDescriptorContext ^ context)
 {
-	return							(true);
+    return (true);
 }
 
-StandardValuesCollection ^property_converter_string_values::GetStandardValues	(ITypeDescriptorContext^ context)
+StandardValuesCollection ^ property_converter_string_values::GetStandardValues(ITypeDescriptorContext ^ context)
 {
-	property_container^				container = safe_cast<property_container^>(context->Instance);
-	PropertySpecDescriptor^			descriptor = safe_cast<PropertySpecDescriptor^>(context->PropertyDescriptor);
-	IProperty^					raw_value = container->GetProperty(descriptor->item);
-	property_string_values_value_base^	value = safe_cast<property_string_values_value_base^>(raw_value);
-	return							(gcnew StandardValuesCollection(value->values()));
+    property_container ^ container = safe_cast<property_container ^>(context->Instance);
+    PropertySpecDescriptor ^ descriptor = safe_cast<PropertySpecDescriptor ^>(context->PropertyDescriptor);
+    IProperty ^ raw_value = container->GetProperty(descriptor->item);
+    property_string_values_value_base ^ value = safe_cast<property_string_values_value_base ^>(raw_value);
+    return (gcnew StandardValuesCollection(value->values()));
 }
 
-bool property_converter_string_values::CanConvertFrom							(ITypeDescriptorContext^ context, Type^ source_type)
+bool property_converter_string_values::CanConvertFrom(ITypeDescriptorContext ^ context, Type ^ source_type)
 {
-	return							(false);
+    return (false);
 }

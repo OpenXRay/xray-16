@@ -14,11 +14,10 @@ enum
 };
 
 //----------------------------------------------------
-bool ESceneSpawnTool::LoadLTX(CInifile &ini)
+bool ESceneSpawnTool::LoadLTX(CInifile& ini)
 {
     u32 version = ini.r_u32("main", "version");
-    if (version!=SPAWN_TOOLS_VERSION)
-    {
+    if (version != SPAWN_TOOLS_VERSION) {
         ELog.DlgMsg(mtError, "%s tools: Unsupported version.", ClassDesc());
         return false;
     }
@@ -30,7 +29,7 @@ bool ESceneSpawnTool::LoadLTX(CInifile &ini)
     return true;
 }
 
-void ESceneSpawnTool::SaveLTX(CInifile &ini, int id)
+void ESceneSpawnTool::SaveLTX(CInifile& ini, int id)
 {
     inherited::SaveLTX(ini, id);
 
@@ -39,28 +38,25 @@ void ESceneSpawnTool::SaveLTX(CInifile &ini, int id)
     ini.w_u32("main", "flags", m_Flags.get());
 }
 
-bool ESceneSpawnTool::LoadStream(IReader &F)
+bool ESceneSpawnTool::LoadStream(IReader& F)
 {
     u16 version = 0;
     if (F.r_chunk(CHUNK_VERSION, &version))
-        if (version!=SPAWN_TOOLS_VERSION)
-        {
+        if (version != SPAWN_TOOLS_VERSION) {
             ELog.DlgMsg(mtError, "%s tools: Unsupported version.", ClassDesc());
             return false;
         }
 
-    if (!inherited::LoadStream(F))
-        return false;
+    if (!inherited::LoadStream(F)) return false;
 
-    if (F.find_chunk(CHUNK_FLAGS))
-        m_Flags.assign(F.r_u32());
+    if (F.find_chunk(CHUNK_FLAGS)) m_Flags.assign(F.r_u32());
 
     return true;
 }
 
 //----------------------------------------------------
 
-void ESceneSpawnTool::SaveStream(IWriter &F)
+void ESceneSpawnTool::SaveStream(IWriter& F)
 {
     inherited::SaveStream(F);
 
@@ -73,12 +69,11 @@ void ESceneSpawnTool::SaveStream(IWriter &F)
 
 //----------------------------------------------------
 
-bool ESceneSpawnTool::LoadSelection(IReader &F)
+bool ESceneSpawnTool::LoadSelection(IReader& F)
 {
     u16 version = 0;
     R_ASSERT(F.r_chunk(CHUNK_VERSION, &version));
-    if (version!=SPAWN_TOOLS_VERSION)
-    {
+    if (version != SPAWN_TOOLS_VERSION) {
         ELog.DlgMsg(mtError, "%s tools: Unsupported version.", ClassDesc());
         return false;
     }
@@ -88,7 +83,7 @@ bool ESceneSpawnTool::LoadSelection(IReader &F)
 
 //----------------------------------------------------
 
-void ESceneSpawnTool::SaveSelection(IWriter &F)
+void ESceneSpawnTool::SaveSelection(IWriter& F)
 {
     F.w_chunk(CHUNK_VERSION, (u16*)&SPAWN_TOOLS_VERSION, sizeof(SPAWN_TOOLS_VERSION));
 
@@ -96,5 +91,3 @@ void ESceneSpawnTool::SaveSelection(IWriter &F)
 }
 
 //----------------------------------------------------
-
-

@@ -2,7 +2,7 @@
 //	Module 		: inventory_upgrade_group.h
 //	Created 	: 22.10.2007
 //  Modified 	: 27.11.2007
-//	Author		: Evgeniy Sokolov 
+//	Author		: Evgeniy Sokolov
 //	Description : inventory upgrade group class
 ////////////////////////////////////////////////////////////////////////////
 
@@ -15,43 +15,42 @@ namespace inventory
 {
 namespace upgrade
 {
-
 class Group : private Noncopyable
 {
 public:
-							Group();
-	virtual					~Group();
-				void		construct( const shared_str& group_id, UpgradeBase& parent_upgrade, Manager& manager_r );
-				void		add_parent_upgrade( UpgradeBase& parent_upgrade );
+    Group();
+    virtual ~Group();
+    void construct(const shared_str& group_id, UpgradeBase& parent_upgrade, Manager& manager_r);
+    void add_parent_upgrade(UpgradeBase& parent_upgrade);
 
-	IC	 const	shared_str& id() const;
-	IC			LPCSTR		id_str() const;
+    IC const shared_str& id() const;
+    IC LPCSTR id_str() const;
 
 #ifdef DEBUG
-				void		log_hierarchy( LPCSTR nesting );
-#endif // DEBUG
+    void log_hierarchy(LPCSTR nesting);
+#endif  // DEBUG
 
-				void		fill_root( Root* root );
+    void fill_root(Root* root);
 
-				UpgradeStateResult	can_install( CInventoryItem& item, UpgradeBase& test_upgrade, bool loading );
-				
-				void		highlight_up();
-				void		highlight_down();
+    UpgradeStateResult can_install(CInventoryItem& item, UpgradeBase& test_upgrade, bool loading);
 
-private:
-	typedef xr_vector<UpgradeBase*>		Upgrades_type;
+    void highlight_up();
+    void highlight_down();
 
 private:
-	shared_str				m_id;
+    typedef xr_vector<UpgradeBase*> Upgrades_type;
 
-	Upgrades_type			m_parent_upgrades;
-	Upgrades_type			m_included_upgrades;
+private:
+    shared_str m_id;
 
-}; // class group
+    Upgrades_type m_parent_upgrades;
+    Upgrades_type m_included_upgrades;
 
-} // namespace upgrade
-} // namespace inventory
+};  // class group
+
+}  // namespace upgrade
+}  // namespace inventory
 
 #include "inventory_upgrade_group_inline.h"
 
-#endif // INVENTORY_UPGRADE_GROUP_H_INCLUDED
+#endif  // INVENTORY_UPGRADE_GROUP_H_INCLUDED

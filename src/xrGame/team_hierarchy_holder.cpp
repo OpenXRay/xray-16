@@ -12,15 +12,14 @@
 #include "Common/object_broker.h"
 #include "seniority_hierarchy_space.h"
 
-CTeamHierarchyHolder::~CTeamHierarchyHolder			()
+CTeamHierarchyHolder::~CTeamHierarchyHolder()
 {
-	delete_data				(m_squads);
+    delete_data(m_squads);
 }
 
-CSquadHierarchyHolder &CTeamHierarchyHolder::squad	(u32 squad_id) const
+CSquadHierarchyHolder& CTeamHierarchyHolder::squad(u32 squad_id) const
 {
-	VERIFY3					(squad_id < max_squad_count,"Squad id is invalid : ",*SeniorityHierarchy::to_string(squad_id));
-	if (!m_squads[squad_id])
-		m_squads[squad_id]	= new CSquadHierarchyHolder(const_cast<CTeamHierarchyHolder*>(this));
-	return					(*m_squads[squad_id]);
+    VERIFY3(squad_id < max_squad_count, "Squad id is invalid : ", *SeniorityHierarchy::to_string(squad_id));
+    if (!m_squads[squad_id]) m_squads[squad_id] = new CSquadHierarchyHolder(const_cast<CTeamHierarchyHolder*>(this));
+    return (*m_squads[squad_id]);
 }

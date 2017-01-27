@@ -11,15 +11,16 @@
 
 class property_holder;
 
-public ref class property_property_container : public XRay::SdkControls::IProperty
+public
+ref class property_property_container : public XRay::SdkControls::IProperty
 {
-public:
-							property_property_container	(property_holder* object);
-	virtual System::Object	^GetValue					();
-	virtual void			SetValue					(System::Object ^object);
+  public:
+    property_property_container(property_holder* object);
+    virtual System::Object ^ GetValue();
+    virtual void SetValue(System::Object ^ object);
 
-private:
-	property_holder*		m_object;
-}; // ref class property_property_container
+  private:
+    property_holder* m_object;
+};  // ref class property_property_container
 
-#endif // ifndef PROPERTY_PROPERTY_CONTAINER_HPP_INCLUDED
+#endif  // ifndef PROPERTY_PROPERTY_CONTAINER_HPP_INCLUDED

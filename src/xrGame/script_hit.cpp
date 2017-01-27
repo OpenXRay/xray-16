@@ -9,6 +9,6 @@
 #include "stdafx.h"
 #include "script_hit.h"
 
-CScriptHit::~CScriptHit	()
+CScriptHit::~CScriptHit()
 {
 }

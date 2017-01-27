@@ -5,5 +5,4 @@
 #include "dTriSphere.h"
 #include "dTriCylinder.h"
 
-
 #endif

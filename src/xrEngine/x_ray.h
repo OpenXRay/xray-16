@@ -8,9 +8,7 @@ class ENGINE_API CGameFont;
 #include "Include/xrRender/ApplicationRender.h"
 
 // definition
-class ENGINE_API CApplication :
-    public pureFrame,
-    public IEventReceiver
+class ENGINE_API CApplication : public pureFrame, public IEventReceiver
 {
     friend class dxApplicationRender;
 
@@ -20,10 +18,12 @@ class ENGINE_API CApplication :
         char* folder;
         char* name;
     };
+
 public:
     string2048 ls_header;
     string2048 ls_tip_number;
     string2048 ls_tip;
+
 private:
     FactoryPtr<IApplicationRender> m_pRender;
 
@@ -33,6 +33,7 @@ private:
 
     u32 ll_dwReference;
     bool loaded;
+
 private:
     EVENT eQuit;
     EVENT eStart;
@@ -42,6 +43,7 @@ private:
     EVENT eStartMPDemo;
 
     void Level_Append(LPCSTR lname);
+
 public:
     CGameFont* pFontSystem;
 
@@ -70,11 +72,11 @@ public:
     CApplication();
     virtual ~CApplication();
 
-    virtual void  OnFrame();
+    virtual void OnFrame();
     void load_draw_internal();
     void destroy_loading_shaders();
 };
 
 extern ENGINE_API CApplication* pApp;
 
-#endif //__XR_BASE_H__
+#endif  //__XR_BASE_H__

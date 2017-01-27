@@ -5,10 +5,4 @@
 using namespace luabind;
 
 SCRIPT_EXPORT(CController, (CGameObject),
-{
-	module(luaState)
-	[
-		class_<CController,CGameObject>("CController")
-			.def(constructor<>())
-	];
-});
+    { module(luaState)[class_<CController, CGameObject>("CController").def(constructor<>())]; });

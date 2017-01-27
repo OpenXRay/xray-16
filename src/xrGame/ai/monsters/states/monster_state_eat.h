@@ -2,35 +2,34 @@
 
 #include "ai/Monsters/state.h"
 
-template<typename _Object>
-class	CStateMonsterEat : public CState<_Object> {
+template <typename _Object>
+class CStateMonsterEat : public CState<_Object>
+{
 protected:
-	typedef CState<_Object>		inherited;
-	typedef CState<_Object>*	state_ptr;
+    typedef CState<_Object> inherited;
+    typedef CState<_Object>* state_ptr;
 
-	const CEntityAlive			*corpse;
+    const CEntityAlive* corpse;
 
-	u32							m_time_last_eat;
+    u32 m_time_last_eat;
 
 public:
-						CStateMonsterEat		(_Object *obj);
-	virtual				~CStateMonsterEat		();
+    CStateMonsterEat(_Object* obj);
+    virtual ~CStateMonsterEat();
 
-	virtual	void		reinit					();
-	virtual void		initialize				();
-	virtual void		finalize				();
-	virtual void		critical_finalize		();
-	virtual void		remove_links			(IGameObject* object);
+    virtual void reinit();
+    virtual void initialize();
+    virtual void finalize();
+    virtual void critical_finalize();
+    virtual void remove_links(IGameObject* object);
 
-	virtual	void		reselect_state			();
-	virtual	void		setup_substates			();
-	virtual bool		check_completion		();
-	virtual bool		check_start_conditions	();
+    virtual void reselect_state();
+    virtual void setup_substates();
+    virtual bool check_completion();
+    virtual bool check_start_conditions();
 
 private:
-	
-			bool		hungry					();
-
+    bool hungry();
 };
 
 #include "monster_state_eat_inline.h"

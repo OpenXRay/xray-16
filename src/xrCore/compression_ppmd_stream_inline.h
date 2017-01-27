@@ -5,7 +5,6 @@ namespace compression
 {
 namespace ppmd
 {
-
 inline stream::stream(const void* buffer, const u32& buffer_size)
 {
     m_buffer_size = buffer_size;
@@ -24,8 +23,7 @@ inline void stream::put_char(const u8& object)
 inline int stream::get_char()
 {
     VERIFY(m_pointer >= m_buffer);
-    if (m_pointer < (m_buffer + m_buffer_size))
-        return (*m_pointer++);
+    if (m_pointer < (m_buffer + m_buffer_size)) return (*m_pointer++);
     return (EOF);
 }
 
@@ -42,11 +40,12 @@ inline u8* stream::buffer() const
 inline u32 stream::tell() const
 {
     VERIFY(m_pointer >= m_buffer);
-    VERIFY2(m_pointer <= (m_buffer + m_buffer_size), make_string("0x%08x <= 0x%08x + %d", m_pointer, m_buffer, m_buffer_size));
+    VERIFY2(m_pointer <= (m_buffer + m_buffer_size),
+        make_string("0x%08x <= 0x%08x + %d", m_pointer, m_buffer, m_buffer_size));
     return (u32(m_pointer - m_buffer));
 }
 
-} // namespace ppmd
-} // namespace compression
+}  // namespace ppmd
+}  // namespace compression
 
-#endif // COMPRESSION_PPMD_STREAM_INLINE_H
+#endif  // COMPRESSION_PPMD_STREAM_INLINE_H

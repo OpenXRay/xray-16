@@ -5,7 +5,7 @@ struct CShapeData
 {
     enum
     {
-        cfSphere=0,
+        cfSphere = 0,
         cfBox
     };
 
@@ -26,4 +26,3 @@ struct CShapeData
 };
 
 #endif
-

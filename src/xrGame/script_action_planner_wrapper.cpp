@@ -11,30 +11,30 @@
 #include "script_game_object.h"
 #include "ai_debug.h"
 
-void CScriptActionPlannerWrapper::setup			(CScriptGameObject *object)
+void CScriptActionPlannerWrapper::setup(CScriptGameObject* object)
 {
 #ifdef LOG_ACTION
-	set_use_log								(!!psAI_Flags.test(aiGOAPScript));
+    set_use_log(!!psAI_Flags.test(aiGOAPScript));
 #endif
-	luabind::call_member<void>				(this,"setup",object);
+    luabind::call_member<void>(this, "setup", object);
 }
 
-void CScriptActionPlannerWrapper::setup_static	(CScriptActionPlanner *planner, CScriptGameObject *object)
+void CScriptActionPlannerWrapper::setup_static(CScriptActionPlanner* planner, CScriptGameObject* object)
 {
-	planner->CScriptActionPlanner::setup	(object);
+    planner->CScriptActionPlanner::setup(object);
 }
 
-void CScriptActionPlannerWrapper::update		()
+void CScriptActionPlannerWrapper::update()
 {
 #ifdef LOG_ACTION
-	if ((psAI_Flags.test(aiGOAPScript) && !m_use_log) || (!psAI_Flags.test(aiGOAPScript) && m_use_log))
-		set_use_log							(!!psAI_Flags.test(aiGOAPScript));
+    if ((psAI_Flags.test(aiGOAPScript) && !m_use_log) || (!psAI_Flags.test(aiGOAPScript) && m_use_log))
+        set_use_log(!!psAI_Flags.test(aiGOAPScript));
 #endif
 
-	luabind::call_member<void>				(this,"update");
+    luabind::call_member<void>(this, "update");
 }
 
-void CScriptActionPlannerWrapper::update_static	(CScriptActionPlanner *planner)
+void CScriptActionPlannerWrapper::update_static(CScriptActionPlanner* planner)
 {
-	planner->CScriptActionPlanner::update	();
+    planner->CScriptActionPlanner::update();
 }

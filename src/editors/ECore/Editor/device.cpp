@@ -22,7 +22,7 @@ ENGINE_API BOOL g_bRendering = FALSE;
 //---------------------------------------------------------------------------
 CEditorRenderDevice::CEditorRenderDevice()
 {
-    psDeviceFlags.assign(rsStatistic|rsFilterLinear|rsFog|rsDrawGrid);
+    psDeviceFlags.assign(rsStatistic | rsFilterLinear | rsFog | rsDrawGrid);
     // dynamic buffer size
     rsDVB_Size = 2048;
     rsDIB_Size = 2048;
@@ -79,8 +79,7 @@ void CEditorRenderDevice::Initialize()
     // compiler shader
     string_path fn;
     FS.update_path(fn, _game_data_, "shaders_xrlc.xr");
-    if (FS.exist(fn))
-    {
+    if (FS.exist(fn)) {
         ShaderXRLC.Load(fn);
     }
     else
@@ -116,17 +115,18 @@ void CEditorRenderDevice::InitTimer()
     Timer_MM_Delta = 0;
     {
         u32 time_mm = timeGetTime();
-        while (timeGetTime()==time_mm); // wait for next tick
+        while (timeGetTime() == time_mm)
+            ;  // wait for next tick
         u32 time_system = timeGetTime();
         u32 time_local = TimerAsync();
-        Timer_MM_Delta = time_system-time_local;
+        Timer_MM_Delta = time_system - time_local;
     }
 }
 
 //---------------------------------------------------------------------------
 void CEditorRenderDevice::RenderNearer(float n)
 {
-    mProject._43 = m_fNearer-n;
+    mProject._43 = m_fNearer - n;
     RCache.set_xform_project(mProject);
 }
 
@@ -139,11 +139,9 @@ void CEditorRenderDevice::ResetNearer()
 //---------------------------------------------------------------------------
 bool CEditorRenderDevice::Create()
 {
-    if (b_is_Ready)
-        return false;
+    if (b_is_Ready) return false;
     Statistic = new CEStats();
     ELog.Msg(mtInformation, "Starting RENDER device...");
-
 
     HW.CreateDevice(m_hRenderWnd, false);
 
@@ -153,14 +151,12 @@ bool CEditorRenderDevice::Create()
     string_path sh;
     FS.update_path(sh, _game_data_, "shaders.xr");
 
-    IReader *F = 0;
-    if (FS.exist(sh))
-        F = FS.r_open(0, sh);
+    IReader* F = 0;
+    if (FS.exist(sh)) F = FS.r_open(0, sh);
     Resources = new CResourceManager();
 
     // if build options - load textures immediately
-    if (strstr(Core.Params, "-build")||strstr(Core.Params, "-ebuild"))
-        EDevice.Resources->DeferredLoad(FALSE);
+    if (strstr(Core.Params, "-build") || strstr(Core.Params, "-ebuild")) EDevice.Resources->DeferredLoad(FALSE);
 
     _Create(F);
     FS.r_close(F);
@@ -173,8 +169,7 @@ bool CEditorRenderDevice::Create()
 //---------------------------------------------------------------------------
 void CEditorRenderDevice::Destroy()
 {
-    if (!b_is_Ready)
-        return;
+    if (!b_is_Ready) return;
 
     ELog.Msg(mtInformation, "Destroying Direct3D...");
 
@@ -195,7 +190,7 @@ void CEditorRenderDevice::Destroy()
 void CEditorRenderDevice::_SetupStates()
 {
     HW.Caps.Update();
-    for (u32 i = 0; i<HW.Caps.raster.dwStages; i++)
+    for (u32 i = 0; i < HW.Caps.raster.dwStages; i++)
     {
         float fBias = -1.f;
         CHK_DX(HW.pDevice->SetSamplerState(i, D3DSAMP_MIPMAPLODBIAS, *((LPDWORD)(&fBias))));
@@ -219,7 +214,7 @@ void CEditorRenderDevice::_SetupStates()
 }
 
 //---------------------------------------------------------------------------
-void CEditorRenderDevice::_Create(IReader *F)
+void CEditorRenderDevice::_Create(IReader* F)
 {
     b_is_Ready = TRUE;
 
@@ -268,14 +263,14 @@ void __fastcall CEditorRenderDevice::Resize(int w, int h)
 {
     m_RealWidth = w;
     m_RealHeight = h;
-    m_RenderArea = w*h;
+    m_RenderArea = w * h;
 
-    dwWidth = m_RealWidth*m_ScreenQuality;
-    dwHeight = m_RealHeight*m_ScreenQuality;
-    m_RenderWidth_2 = dwWidth*0.5f;
-    m_RenderHeight_2 = dwHeight*0.5f;
+    dwWidth = m_RealWidth * m_ScreenQuality;
+    dwHeight = m_RealHeight * m_ScreenQuality;
+    m_RenderWidth_2 = dwWidth * 0.5f;
+    m_RenderHeight_2 = dwHeight * 0.5f;
 
-    fASPECT = (float)dwHeight/(float)dwWidth;
+    fASPECT = (float)dwHeight / (float)dwWidth;
     mProject.build_projection(deg2rad(fFOV), fASPECT, m_Camera.m_Znear, m_Camera.m_Zfar);
     m_fNearer = mProject._43;
 
@@ -297,14 +292,14 @@ void CEditorRenderDevice::Reset()
     HW.Reset(m_hRenderWnd);
     dwWidth = HW.DevPP.BackBufferWidth;
     dwHeight = HW.DevPP.BackBufferHeight;
-    m_RenderWidth_2 = dwWidth*0.5f;
-    m_RenderHeight_2 = dwHeight*0.5f;
+    m_RenderWidth_2 = dwWidth * 0.5f;
+    m_RenderHeight_2 = dwHeight * 0.5f;
     //		fWidth_2			= float(dwWidth/2);
     //		fHeight_2			= float(dwHeight/2);
     Resources->reset_end();
     _SetupStates();
     u32 tm_end = TimerAsync();
-    Msg("*** RESET [%d ms]", tm_end-tm_start);
+    Msg("*** RESET [%d ms]", tm_end - tm_start);
 }
 
 BOOL CEditorRenderDevice::Begin()
@@ -312,29 +307,23 @@ BOOL CEditorRenderDevice::Begin()
     VERIFY(b_is_Ready);
     HW.Validate();
     HRESULT _hr = HW.pDevice->TestCooperativeLevel();
-    if (FAILED(_hr))
-    {
+    if (FAILED(_hr)) {
         // If the device was lost, do not render until we get it back
-        if (D3DERR_DEVICELOST==_hr)
-        {
+        if (D3DERR_DEVICELOST == _hr) {
             Sleep(33);
             return FALSE;
         }
 
         // Check if the device is ready to be reset
-        if (D3DERR_DEVICENOTRESET==_hr)
-        {
+        if (D3DERR_DEVICENOTRESET == _hr) {
             Reset();
         }
     }
 
-    VERIFY(FALSE==g_bRendering);
+    VERIFY(FALSE == g_bRendering);
     CHK_DX(HW.pDevice->BeginScene());
-    CHK_DX(HW.pDevice->Clear(0, 0,
-        D3DCLEAR_ZBUFFER|D3DCLEAR_TARGET|
-        (HW.Caps.bStencil ? D3DCLEAR_STENCIL : 0),
-        EPrefs->scene_clear_color, 1, 0
-    ));
+    CHK_DX(HW.pDevice->Clear(0, 0, D3DCLEAR_ZBUFFER | D3DCLEAR_TARGET | (HW.Caps.bStencil ? D3DCLEAR_STENCIL : 0),
+        EPrefs->scene_clear_color, 1, 0));
     RCache.OnFrameBegin();
     g_bRendering = TRUE;
     return TRUE;
@@ -380,14 +369,13 @@ void CEditorRenderDevice::FrameMove()
 
     // Timer
     float fPreviousFrameTime = Timer.GetElapsed_sec();
-    Timer.Start(); // previous frame
-    fTimeDelta = 0.1f*fTimeDelta+0.9f*fPreviousFrameTime; // smooth random system activity - worst case ~7% error
-    if (fTimeDelta>.1f)
-        fTimeDelta = .1f; // limit to 15fps minimum
+    Timer.Start();                                               // previous frame
+    fTimeDelta = 0.1f * fTimeDelta + 0.9f * fPreviousFrameTime;  // smooth random system activity - worst case ~7% error
+    if (fTimeDelta > .1f) fTimeDelta = .1f;                      // limit to 15fps minimum
 
-    fTimeGlobal = TimerGlobal.GetElapsed_sec(); //float(qTime)*CPU::cycles2seconds;
-    dwTimeGlobal = TimerGlobal.GetElapsed_ms(); //u32((qTime*u64(1000))/CPU::cycles_per_second);
-    dwTimeDelta = iFloor(fTimeDelta*1000.f+0.5f);
+    fTimeGlobal = TimerGlobal.GetElapsed_sec();  // float(qTime)*CPU::cycles2seconds;
+    dwTimeGlobal = TimerGlobal.GetElapsed_ms();  // u32((qTime*u64(1000))/CPU::cycles_per_second);
+    dwTimeDelta = iFloor(fTimeDelta * 1000.f + 0.5f);
     dwTimeContinual = dwTimeGlobal;
 
     m_Camera.Update(fTimeDelta);
@@ -401,7 +389,7 @@ void CEditorRenderDevice::DP(D3DPRIMITIVETYPE pt, ref_geom geom, u32 vBase, u32 
     ref_shader S = m_CurrentShader ? m_CurrentShader : m_WireShader;
     u32 dwRequired = S->E[0]->passes.size();
     RCache.set_Geometry(geom);
-    for (u32 dwPass = 0; dwPass<dwRequired; dwPass++)
+    for (u32 dwPass = 0; dwPass < dwRequired; dwPass++)
     {
         RCache.set_Shader(S, dwPass);
         RCache.Render(pt, vBase, pc);
@@ -413,7 +401,7 @@ void CEditorRenderDevice::DIP(D3DPRIMITIVETYPE pt, ref_geom geom, u32 baseV, u32
     ref_shader S = m_CurrentShader ? m_CurrentShader : m_WireShader;
     u32 dwRequired = S->E[0]->passes.size();
     RCache.set_Geometry(geom);
-    for (u32 dwPass = 0; dwPass<dwRequired; dwPass++)
+    for (u32 dwPass = 0; dwPass < dwRequired; dwPass++)
     {
         RCache.set_Shader(S, dwPass);
         RCache.Render(pt, baseV, startV, countV, startI, PC);
@@ -431,10 +419,10 @@ void CEditorRenderDevice::UnloadTextures()
 {
 #ifndef _EDITOR
     Resources->DeferredUnload();
-#endif 
+#endif
 }
 
-void CEditorRenderDevice::Reset(IReader *F, BOOL bKeepTextures)
+void CEditorRenderDevice::Reset(IReader* F, BOOL bKeepTextures)
 {
     CTimer tm;
     tm.Start();
@@ -448,4 +436,3 @@ void CEditorRenderDevice::time_factor(float v)
     Timer.time_factor(v);
     TimerGlobal.time_factor(v);
 }
-

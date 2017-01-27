@@ -9,9 +9,9 @@ using namespace std;
 
 typedef struct _point
 {
-    float value; //значение функции
-    float deriv; //производная
-    float time; //время
+    float value;  //значение функции
+    float deriv;  //производная
+    float time;   //время
 } point;
 
 typedef vector<point> point_list;
@@ -19,11 +19,12 @@ typedef vector<point>::iterator point_list_i;
 
 class Spline
 {
-private:
-protected:
+  private:
+  protected:
     point_list m_list;
     size_t find_point(float time);
-public:
+
+  public:
     Spline();
     ~Spline();
     void add_point(float value, float deriv, float time);
@@ -38,12 +39,8 @@ public:
     void create_new(float time);
     float calculate_value(float time);
 
-    size_t get_points_count()
-    {
-        return m_list.size();
-    }
+    size_t get_points_count() { return m_list.size(); }
 
-    void get_point(size_t index, point &pt);
+    void get_point(size_t index, point& pt);
 };
 #endif
-

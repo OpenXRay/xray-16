@@ -13,19 +13,22 @@
 #include "alife_abstract_registry.h"
 
 template <typename _type, typename _base>
-struct CLinearRegistryType : public _base, public _type {};
+struct CLinearRegistryType : public _base, public _type
+{
+};
 
-class CALifeRegistryContainer : public Loki::GenLinearHierarchy<registry_type_list,CLinearRegistryType>::LinBase {
+class CALifeRegistryContainer : public Loki::GenLinearHierarchy<registry_type_list, CLinearRegistryType>::LinBase
+{
 private:
-	typedef registry_type_list TYPE_LIST;
+    typedef registry_type_list TYPE_LIST;
 
 public:
-	template <typename T>
-	IC		T		&operator()	(const T*);
-	template <typename T>
-	IC		const T &operator()	(const T*) const;
-	virtual	void	load		(IReader &file_stream);
-	virtual void	save		(IWriter &memory_stream);
+    template <typename T>
+    IC T& operator()(const T*);
+    template <typename T>
+    IC const T& operator()(const T*) const;
+    virtual void load(IReader& file_stream);
+    virtual void save(IWriter& memory_stream);
 };
 
 #include "alife_registry_container_inline.h"

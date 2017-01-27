@@ -4,31 +4,28 @@
 
 class CBaseMonster;
 
-class CPsyAura : public Feel::Touch, public CEnergyHolder {
-	
-	typedef CEnergyHolder inherited;
+class CPsyAura : public Feel::Touch, public CEnergyHolder
+{
+    typedef CEnergyHolder inherited;
 
-	// владелец поля
-	CBaseMonster	*m_object;
+    // владелец поля
+    CBaseMonster* m_object;
 
-	// радиус поля
-	float			m_radius;
+    // радиус поля
+    float m_radius;
 
 public:
-					CPsyAura				();
-	virtual			~CPsyAura				();
-	
-			void	init_external			(CBaseMonster *obj) {m_object = obj;}
-	virtual bool	feel_touch_contact		(IGameObject* O){return FALSE;}
-	virtual	void	schedule_update			();
-	virtual void	process_objects_in_aura	() {}
+    CPsyAura();
+    virtual ~CPsyAura();
 
-	// свойства поля
-			void	set_radius				(float R) {m_radius = R;}
-			float	get_radius				(){return m_radius;}
+    void init_external(CBaseMonster* obj) { m_object = obj; }
+    virtual bool feel_touch_contact(IGameObject* O) { return FALSE; }
+    virtual void schedule_update();
+    virtual void process_objects_in_aura() {}
 
-	CBaseMonster	*get_object				(){return m_object;}
+    // свойства поля
+    void set_radius(float R) { m_radius = R; }
+    float get_radius() { return m_radius; }
+
+    CBaseMonster* get_object() { return m_object; }
 };
-
-
-

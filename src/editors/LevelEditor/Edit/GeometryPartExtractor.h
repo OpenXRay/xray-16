@@ -7,7 +7,7 @@
 
 struct SBFace;
 class CSurface;
-DEFINE_VECTOR(SBFace *, SBFaceVec, SBFaceVecIt);
+DEFINE_VECTOR(SBFace*, SBFaceVec, SBFaceVecIt);
 
 struct SBFace
 {
@@ -20,9 +20,10 @@ struct SBFace
     Fvector n[3];
     Fvector2 uv[3];
     int bone_id;
-    CSurface *surf;
-public:
-    SBFace(CSurface *_surf, const Fvector2 *_uv[3]): surf(_surf), marked(false), bone_id(-1)
+    CSurface* surf;
+
+  public:
+    SBFace(CSurface* _surf, const Fvector2* _uv[3]) : surf(_surf), marked(false), bone_id(-1)
     {
         vert_id[0] = -1;
         vert_id[1] = -1;
@@ -42,7 +43,7 @@ public:
         V1.sub(o[2], o[0]);
         float sqm0 = V0.square_magnitude();
         float sqm1 = V1.square_magnitude();
-        return 0.5f*_sqrt(sqm0*sqm1-_sqr(V0.dotproduct(V1)));
+        return 0.5f * _sqrt(sqm0 * sqm1 - _sqr(V0.dotproduct(V1)));
     }
 };
 
@@ -65,7 +66,7 @@ struct SBBone
 DEFINE_VECTOR(SBBone, SBBoneVec, SBBoneVecIt);
 DEFINE_VECTOR(SBFaceVec, SBAdjVec, SBAdjVecIt);
 
-struct SBPart: public CExportSkeletonCustom
+struct SBPart : public CExportSkeletonCustom
 {
     SBFaceVec m_Faces;
     SBBoneVec m_Bones;
@@ -73,67 +74,58 @@ struct SBPart: public CExportSkeletonCustom
     Fbox m_BBox;
     Fobb m_OBB;
 
-    SBPart *m_Reference;
+    SBPart* m_Reference;
 
     Fvector m_RefOffset;
     Fvector m_RefRotate;
 
     bool m_bValid;
-public:
+
+  public:
     SBPart()
     {
         m_Reference = 0;
         m_bValid = true;
     }
 
-    bool Valid()
-    {
-        return m_bValid;
-    }
+    bool Valid() { return m_bValid; }
 
-    virtual bool Export(IWriter &F, u8 infl);
-    void append_face(SBFace *F);
-    void use_face(SBFace *F, u32 &cnt, u32 bone_id, float &area);
-    void recurse_fragment(SBFace *F, u32 &cnt, u32 bone_id, u32 max_faces, float &area);
-    bool prepare(SBAdjVec &adjs, u32 bone_face_min);
+    virtual bool Export(IWriter& F, u8 infl);
+    void append_face(SBFace* F);
+    void use_face(SBFace* F, u32& cnt, u32 bone_id, float& area);
+    void recurse_fragment(SBFace* F, u32& cnt, u32 bone_id, u32 max_faces, float& area);
+    bool prepare(SBAdjVec& adjs, u32 bone_face_min);
 };
 
-DEFINE_VECTOR(SBPart *, SBPartVec, SBPartVecIt);
+DEFINE_VECTOR(SBPart*, SBPartVec, SBPartVecIt);
 
 //----------------------------------------------------
 
 class CGeomPartExtractor
 {
-protected:
-    VCPacked *m_Verts;
+  protected:
+    VCPacked* m_Verts;
     SBFaceVec m_Faces;
     SBAdjVec m_Adjs;
     SBPartVec m_Parts;
 
     u32 m_PerBoneFaceCountMin;
-public:
+
+  public:
     CGeomPartExtractor();
 
-    ~CGeomPartExtractor()
-    {
-        Clear();
-    }
+    ~CGeomPartExtractor() { Clear(); }
 
     // init & clean up
-    void Initialize(const Fbox &bb, float eps, u32 per_bone_face_count_min);
+    void Initialize(const Fbox& bb, float eps, u32 per_bone_face_count_min);
     void Clear();
     // I/O routines
-    void AppendFace(CSurface *surf, const Fvector *v, const Fvector *n, const Fvector2 *uvs[3]);
+    void AppendFace(CSurface* surf, const Fvector* v, const Fvector* n, const Fvector2* uvs[3]);
 
-    SBPartVec &GetParts()
-    {
-        return m_Parts;
-    }
+    SBPartVec& GetParts() { return m_Parts; }
 
     // utilities
     BOOL Process();
 };
 
-#endif //GeometryPartExtractorH
-
-
+#endif  // GeometryPartExtractorH

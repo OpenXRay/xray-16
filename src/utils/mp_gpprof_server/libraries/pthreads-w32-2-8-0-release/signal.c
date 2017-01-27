@@ -9,25 +9,25 @@
  *      Pthreads-win32 - POSIX Threads Library for Win32
  *      Copyright(C) 1998 John E. Bossom
  *      Copyright(C) 1999,2005 Pthreads-win32 contributors
- * 
+ *
  *      Contact Email: rpj@callisto.canberra.edu.au
- * 
+ *
  *      The current list of contributors is contained
  *      in the file CONTRIBUTORS included with the source
  *      code distribution. The list can also be seen at the
  *      following World Wide Web location:
  *      http://sources.redhat.com/pthreads-win32/contributors.html
- * 
+ *
  *      This library is free software; you can redistribute it and/or
  *      modify it under the terms of the GNU Lesser General Public
  *      License as published by the Free Software Foundation; either
  *      version 2 of the License, or (at your option) any later version.
- * 
+ *
  *      This library is distributed in the hope that it will be useful,
  *      but WITHOUT ANY WARRANTY; without even the implied warranty of
  *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *      Lesser General Public License for more details.
- * 
+ *
  *      You should have received a copy of the GNU Lesser General Public
  *      License along with this library in the file COPYING.LIB;
  *      if not, write to the Free Software Foundation, Inc.,
@@ -86,93 +86,81 @@
 
 #if HAVE_SIGSET_T
 
-static void
-ptw32_signal_thread ()
+static void ptw32_signal_thread()
 {
 }
 
-static void
-ptw32_signal_callhandler ()
+static void ptw32_signal_callhandler()
 {
 }
 
-int
-pthread_sigmask (int how, sigset_t const *set, sigset_t * oset)
+int pthread_sigmask(int how, sigset_t const* set, sigset_t* oset)
 {
-  pthread_t thread = pthread_self ();
+    pthread_t thread = pthread_self();
 
-  if (thread.p == NULL)
-    {
-      return ENOENT;
+    if (thread.p == NULL) {
+        return ENOENT;
     }
 
-  /* Validate the `how' argument. */
-  if (set != NULL)
-    {
-      switch (how)
-	{
-	case SIG_BLOCK:
-	  break;
-	case SIG_UNBLOCK:
-	  break;
-	case SIG_SETMASK:
-	  break;
-	default:
-	  /* Invalid `how' argument. */
-	  return EINVAL;
-	}
+    /* Validate the `how' argument. */
+    if (set != NULL) {
+        switch (how)
+        {
+        case SIG_BLOCK: break;
+        case SIG_UNBLOCK: break;
+        case SIG_SETMASK: break;
+        default:
+            /* Invalid `how' argument. */
+            return EINVAL;
+        }
     }
 
-  /* Copy the old mask before modifying it. */
-  if (oset != NULL)
-    {
-      memcpy (oset, &(thread.p->sigmask), sizeof (sigset_t));
+    /* Copy the old mask before modifying it. */
+    if (oset != NULL) {
+        memcpy(oset, &(thread.p->sigmask), sizeof(sigset_t));
     }
 
-  if (set != NULL)
-    {
-      unsigned int i;
+    if (set != NULL) {
+        unsigned int i;
 
-      /* FIXME: this code assumes that sigmask is an even multiple of
-         the size of a long integer. */
+        /* FIXME: this code assumes that sigmask is an even multiple of
+           the size of a long integer. */
 
-      unsigned long *src = (unsigned long const *) set;
-      unsigned long *dest = (unsigned long *) &(thread.p->sigmask);
+        unsigned long* src = (unsigned long const*)set;
+        unsigned long* dest = (unsigned long*)&(thread.p->sigmask);
 
-      switch (how)
-	{
-	case SIG_BLOCK:
-	  for (i = 0; i < (sizeof (sigset_t) / sizeof (unsigned long)); i++)
-	    {
-	      /* OR the bit field longword-wise. */
-	      *dest++ |= *src++;
-	    }
-	  break;
-	case SIG_UNBLOCK:
-	  for (i = 0; i < (sizeof (sigset_t) / sizeof (unsigned long)); i++)
-	    {
-	      /* XOR the bitfield longword-wise. */
-	      *dest++ ^= *src++;
-	    }
-	case SIG_SETMASK:
-	  /* Replace the whole sigmask. */
-	  memcpy (&(thread.p->sigmask), set, sizeof (sigset_t));
-	  break;
-	}
+        switch (how)
+        {
+        case SIG_BLOCK:
+            for (i = 0; i < (sizeof(sigset_t) / sizeof(unsigned long)); i++)
+            {
+                /* OR the bit field longword-wise. */
+                *dest++ |= *src++;
+            }
+            break;
+        case SIG_UNBLOCK:
+            for (i = 0; i < (sizeof(sigset_t) / sizeof(unsigned long)); i++)
+            {
+                /* XOR the bitfield longword-wise. */
+                *dest++ ^= *src++;
+            }
+        case SIG_SETMASK:
+            /* Replace the whole sigmask. */
+            memcpy(&(thread.p->sigmask), set, sizeof(sigset_t));
+            break;
+        }
     }
 
-  return 0;
+    return 0;
 }
 
-int
-sigwait (const sigset_t * set, int *sig)
+int sigwait(const sigset_t* set, int* sig)
 {
-  /* This routine is a cancellation point */
-  pthread_test_cancel();
+    /* This routine is a cancellation point */
+    pthread_test_cancel();
 }
 
-int
-sigaction (int signum, const struct sigaction *act, struct sigaction *oldact)
+int sigaction(int signum, const struct sigaction* act, struct sigaction* oldact)
 {
 }
 

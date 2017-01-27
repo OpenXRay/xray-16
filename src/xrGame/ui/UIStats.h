@@ -6,9 +6,10 @@
 class CUIXml;
 class CUIFrameWindow;
 
-class CUIStats : public CUIScrollView {
+class CUIStats : public CUIScrollView
+{
 public:
-				CUIStats		();
-	virtual		~CUIStats		();
-	CUIWindow* InitStats		(CUIXml& xml_doc, LPCSTR path,int team);
+    CUIStats();
+    virtual ~CUIStats();
+    CUIWindow* InitStats(CUIXml& xml_doc, LPCSTR path, int team);
 };

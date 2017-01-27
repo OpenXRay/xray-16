@@ -10,15 +10,14 @@ xrMemory Memory;
 BOOL mem_initialized = FALSE;
 bool shared_str_initialized = false;
 
-//fake fix of memory corruptions in multiplayer game :(
+// fake fix of memory corruptions in multiplayer game :(
 // XXX nitrocaster: to be removed
 XRCORE_API bool g_allow_heap_min = true;
 
 #ifdef DEBUG_MEMORY_MANAGER
 XRCORE_API void dump_phase()
 {
-    if (!Memory.debug_mode)
-        return;
+    if (!Memory.debug_mode) return;
 
     static int phase_counter = 0;
 
@@ -26,38 +25,37 @@ XRCORE_API void dump_phase()
     xr_sprintf(temp, sizeof(temp), "x:\\$phase$%d.dump", ++phase_counter);
     Memory.mem_statistic(temp);
 }
-#endif // DEBUG_MEMORY_MANAGER
+#endif  // DEBUG_MEMORY_MANAGER
 
 xrMemory::xrMemory()
 #ifdef DEBUG_MEMORY_MANAGER
-# ifdef CONFIG_PROFILE_LOCKS
-    :debug_cs(MUTEX_PROFILE_ID(xrMemory))
-# endif // CONFIG_PROFILE_LOCKS
-#endif // DEBUG_MEMORY_MANAGER
+#ifdef CONFIG_PROFILE_LOCKS
+    : debug_cs(MUTEX_PROFILE_ID(xrMemory))
+#endif  // CONFIG_PROFILE_LOCKS
+#endif  // DEBUG_MEMORY_MANAGER
 {
 #ifdef DEBUG_MEMORY_MANAGER
 
     debug_mode = FALSE;
 
-#endif // DEBUG_MEMORY_MANAGER
+#endif  // DEBUG_MEMORY_MANAGER
 }
 
 #ifdef DEBUG_MEMORY_MANAGER
 BOOL g_bMEMO = FALSE;
-#endif // DEBUG_MEMORY_MANAGER
+#endif  // DEBUG_MEMORY_MANAGER
 
 void xrMemory::_initialize(BOOL bDebug)
 {
 #ifdef DEBUG_MEMORY_MANAGER
     debug_mode = bDebug;
     debug_info_update = 0;
-#endif // DEBUG_MEMORY_MANAGER
+#endif  // DEBUG_MEMORY_MANAGER
 
     stat_calls = 0;
     stat_counter = 0;
 #ifndef M_BORLAND
-    if (!strstr(Core.Params, "-pure_alloc"))
-    {
+    if (!strstr(Core.Params, "-pure_alloc")) {
         // initialize POOLs
         u32 element = mem_pools_ebase;
         u32 sector = mem_pools_ebase * 1024;
@@ -67,14 +65,16 @@ void xrMemory::_initialize(BOOL bDebug)
             element += mem_pools_ebase;
         }
     }
-#endif // M_BORLAND
+#endif  // M_BORLAND
 
 #ifdef DEBUG_MEMORY_MANAGER
-    if (0 == strstr(Core.Params, "-memo")) mem_initialized = TRUE;
-    else g_bMEMO = TRUE;
-#else // DEBUG_MEMORY_MANAGER
+    if (0 == strstr(Core.Params, "-memo"))
+        mem_initialized = TRUE;
+    else
+        g_bMEMO = TRUE;
+#else   // DEBUG_MEMORY_MANAGER
     mem_initialized = TRUE;
-#endif // DEBUG_MEMORY_MANAGER
+#endif  // DEBUG_MEMORY_MANAGER
 
     // DUMP_PHASE;
     g_pStringContainer = new str_container();
@@ -87,7 +87,7 @@ void xrMemory::_initialize(BOOL bDebug)
 #ifdef DEBUG_MEMORY_MANAGER
 extern void dbg_dump_leaks();
 extern void dbg_dump_str_leaks();
-#endif // DEBUG_MEMORY_MANAGER
+#endif  // DEBUG_MEMORY_MANAGER
 
 void xrMemory::_destroy()
 {
@@ -95,43 +95,48 @@ void xrMemory::_destroy()
     mem_alloc_gather_stats(false);
     mem_alloc_show_stats();
     mem_alloc_clear_stats();
-#endif // DEBUG
+#endif  // DEBUG
 
 #ifdef DEBUG_MEMORY_MANAGER
     if (debug_mode) dbg_dump_str_leaks();
-#endif // DEBUG_MEMORY_MANAGER
+#endif  // DEBUG_MEMORY_MANAGER
 
     xr_delete(g_pSharedMemoryContainer);
     xr_delete(g_pStringContainer);
 
 #ifndef M_BORLAND
-# ifdef DEBUG_MEMORY_MANAGER
+#ifdef DEBUG_MEMORY_MANAGER
     if (debug_mode) dbg_dump_leaks();
-# endif // DEBUG_MEMORY_MANAGER
-#endif // M_BORLAND
+#endif  // DEBUG_MEMORY_MANAGER
+#endif  // M_BORLAND
 
     mem_initialized = FALSE;
 #ifdef DEBUG_MEMORY_MANAGER
     debug_mode = FALSE;
-#endif // DEBUG_MEMORY_MANAGER
+#endif  // DEBUG_MEMORY_MANAGER
 }
 
 void xrMemory::mem_compact()
 {
     RegFlushKey(HKEY_CLASSES_ROOT);
     RegFlushKey(HKEY_CURRENT_USER);
-    if (g_allow_heap_min)
-        _heapmin();
+    if (g_allow_heap_min) _heapmin();
     HeapCompact(GetProcessHeap(), 0);
     if (g_pStringContainer) g_pStringContainer->clean();
     if (g_pSharedMemoryContainer) g_pSharedMemoryContainer->clean();
-    if (strstr(Core.Params, "-swap_on_compact"))
-        SetProcessWorkingSetSize(GetCurrentProcess(), size_t(-1), size_t(-1));
+    if (strstr(Core.Params, "-swap_on_compact")) SetProcessWorkingSetSize(GetCurrentProcess(), size_t(-1), size_t(-1));
 }
 
 #ifdef DEBUG_MEMORY_MANAGER
-ICF u8* acc_header(void* P) { u8* _P = (u8*)P; return _P - 1; }
-ICF u32 get_header(void* P) { return (u32)*acc_header(P); }
+ICF u8* acc_header(void* P)
+{
+    u8* _P = (u8*)P;
+    return _P - 1;
+}
+ICF u32 get_header(void* P)
+{
+    return (u32)*acc_header(P);
+}
 void xrMemory::mem_statistic(LPCSTR fn)
 {
     if (!debug_mode) return;
@@ -156,7 +161,8 @@ void xrMemory::mem_statistic(LPCSTR fn)
         u32 p_current = get_header(debug_info[it]._p);
         int pool_id = (mem_generic == p_current) ? -1 : p_current;
 
-        fprintf(Fa, "0x%08X[%2d]: %8d %s\n", *(u32*)(&debug_info[it]._p), pool_id, debug_info[it]._size, debug_info[it]._name);
+        fprintf(Fa, "0x%08X[%2d]: %8d %s\n", *(u32*)(&debug_info[it]._p), pool_id, debug_info[it]._size,
+            debug_info[it]._name);
     }
 
     {
@@ -168,8 +174,7 @@ void xrMemory::mem_statistic(LPCSTR fn)
             {
                 pool.cs.Enter();
                 u32 temp = *(u32*)(&list);
-                if (!temp)
-                    break;
+                if (!temp) break;
                 fprintf(Fa, "0x%08X[%2d]: %8d mempool\n", temp, k, pool.s_element);
                 list = (u8*)*pool.access(list);
                 pool.cs.Leave();
@@ -184,7 +189,8 @@ void xrMemory::mem_statistic(LPCSTR fn)
     if (0==debug_info[it]._p) continue ;
     try{
     if (0==strcmp(debug_info[it]._name,"storage: sstring"))
-    fprintf (Fa,"0x%08X: %8d %s %s\n",*(u32*)(&debug_info[it]._p),debug_info[it]._size,debug_info[it]._name,((str_value*)(*(u32*)(&debug_info[it]._p)))->value);
+    fprintf (Fa,"0x%08X: %8d %s
+    %s\n",*(u32*)(&debug_info[it]._p),debug_info[it]._size,debug_info[it]._name,((str_value*)(*(u32*)(&debug_info[it]._p)))->value);
     }catch(...){
     }
     }
@@ -202,7 +208,8 @@ void xrMemory::mem_statistic(LPCSTR fn)
     xr_map<u32,u32> stats;
 
     if (g_pStringContainer) Msg ("memstat: shared_str: economy: %d bytes",g_pStringContainer->stat_economy());
-    if (g_pSharedMemoryContainer) Msg ("memstat: shared_mem: economy: %d bytes",g_pSharedMemoryContainer->stat_economy());
+    if (g_pSharedMemoryContainer) Msg ("memstat: shared_mem: economy: %d
+    bytes",g_pSharedMemoryContainer->stat_economy());
 
     // Dump memory stats into file to avoid reallocation while traversing
     {
@@ -239,7 +246,7 @@ void xrMemory::mem_statistic(LPCSTR fn)
     }
     */
 }
-#endif // DEBUG_MEMORY_MANAGER
+#endif  // DEBUG_MEMORY_MANAGER
 
 // xr_strdup
 char* xr_strdup(const char* string)
@@ -248,9 +255,10 @@ char* xr_strdup(const char* string)
     u32 len = u32(xr_strlen(string)) + 1;
     char* memory = (char*)Memory.mem_alloc(len
 #ifdef DEBUG_MEMORY_NAME
-                                           , "strdup"
-#endif // DEBUG_MEMORY_NAME
-                                          );
+        ,
+        "strdup"
+#endif  // DEBUG_MEMORY_NAME
+        );
     CopyMemory(memory, string, len);
     return memory;
 }

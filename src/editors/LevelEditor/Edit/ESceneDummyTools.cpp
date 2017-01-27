@@ -17,5 +17,3 @@ void ESceneDummyTool::RemoveControls()
 }
 
 //----------------------------------------------------
-
-

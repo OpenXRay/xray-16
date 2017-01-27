@@ -5,7 +5,7 @@
 
 using editor::window_levels;
 
-Void window_levels::window_levels_Leave		(System::Object^  sender, System::EventArgs^  e)
+Void window_levels::window_levels_Leave(System::Object ^ sender, System::EventArgs ^ e)
 {
-	m_ide->view().property_grid		(PropertyGrid);
+    m_ide->view().property_grid(PropertyGrid);
 }

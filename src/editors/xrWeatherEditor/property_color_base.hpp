@@ -15,68 +15,71 @@
 ref class property_container;
 ref class property_color_base;
 
-class color_components {
-public:
-									color_components(property_color_base^ holder);
-
-			float	xr_stdcall		red_getter		();
-			void	xr_stdcall		red_setter		(float);
-
-			float	xr_stdcall		green_getter	();
-			void	xr_stdcall		green_setter	(float);
-
-			float	xr_stdcall		blue_getter		();
-			void	xr_stdcall		blue_setter		(float);
-
-private:
-	gcroot<property_color_base^>	m_holder;
-}; // class color_components
-
-public value struct Color {
-public:
-	inline					Color			(float red, float green, float blue)
-	{
-		r			= red;
-		g			= green;
-		b			= blue;
-	}
-
-	property float	r;
-	property float	g;
-	property float	b;
-}; // value struct Color
-
-public ref class property_color_base abstract :
-    public XRay::SdkControls::IProperty,
-	public property_container_holder,
-	public XRay::SdkControls::IMouseListener,
-    public XRay::SdkControls::IIncrementable
+class color_components
 {
-public:
-	typedef System::Attribute					Attribute;
+  public:
+    color_components(property_color_base ^ holder);
 
-public:
-							property_color_base	(editor::color const% color, array<System::Attribute^>^ attributes);
-	virtual					~property_color_base();
-							!property_color_base();
-			void			red					(float value);
-			void			green				(float value);
-			void			blue				(float value);
+    float xr_stdcall red_getter();
+    void xr_stdcall red_setter(float);
 
-public:
-	virtual System::Object	^GetValue			();
-	virtual void			SetValue			(System::Object ^object);
-	virtual	void			OnDoubleClick		(XRay::SdkControls::PropertyGrid^ property_grid);
-	virtual void			Increment			(float increment);
+    float xr_stdcall green_getter();
+    void xr_stdcall green_setter(float);
 
-public:
-	virtual editor::color	get_value_raw		() = 0;
-	virtual void			set_value_raw		(editor::color color) = 0;
+    float xr_stdcall blue_getter();
+    void xr_stdcall blue_setter(float);
 
-private:
-	property_container^							m_container;
-	color_components*							m_components;
-	array<System::Attribute^>^					m_attributes;
-}; // ref class property_color_base abstract
+  private:
+    gcroot<property_color_base ^> m_holder;
+};  // class color_components
 
-#endif // ifndef PROPERTY_COLOR_BASE_HPP_INCLUDED
+public
+value struct Color
+{
+  public:
+    inline Color(float red, float green, float blue)
+    {
+        r = red;
+        g = green;
+        b = blue;
+    }
+
+    property float r;
+    property float g;
+    property float b;
+};  // value struct Color
+
+public
+ref class property_color_base abstract : public XRay::SdkControls::IProperty,
+                                         public property_container_holder,
+                                         public XRay::SdkControls::IMouseListener,
+                                         public XRay::SdkControls::IIncrementable
+{
+  public:
+    typedef System::Attribute Attribute;
+
+  public:
+    property_color_base(editor::color const % color, array<System::Attribute ^> ^ attributes);
+    virtual ~property_color_base();
+    !property_color_base();
+    void red(float value);
+    void green(float value);
+    void blue(float value);
+
+  public:
+    virtual System::Object ^ GetValue();
+    virtual void SetValue(System::Object ^ object);
+    virtual void OnDoubleClick(XRay::SdkControls::PropertyGrid ^ property_grid);
+    virtual void Increment(float increment);
+
+  public:
+    virtual editor::color get_value_raw() = 0;
+    virtual void set_value_raw(editor::color color) = 0;
+
+  private:
+    property_container ^ m_container;
+    color_components* m_components;
+    array<System::Attribute ^> ^ m_attributes;
+};  // ref class property_color_base abstract
+
+#endif  // ifndef PROPERTY_COLOR_BASE_HPP_INCLUDED

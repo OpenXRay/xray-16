@@ -13,10 +13,4 @@ CWeaponFN2000::~CWeaponFN2000()
 using namespace luabind;
 
 SCRIPT_EXPORT(CWeaponFN2000, (CGameObject),
-{
-	module(luaState)
-	[
-		class_<CWeaponFN2000,CGameObject>("CWeaponFN2000")
-			.def(constructor<>())
-	];
-});
+    { module(luaState)[class_<CWeaponFN2000, CGameObject>("CWeaponFN2000").def(constructor<>())]; });

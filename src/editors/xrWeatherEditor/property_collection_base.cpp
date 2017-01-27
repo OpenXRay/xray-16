@@ -15,126 +15,127 @@
 using System::Object;
 using System::Collections::IEnumerator;
 
-property_collection_base::property_collection_base		()
+property_collection_base::property_collection_base()
 {
 }
 
-property_collection_base::~property_collection_base		()
+property_collection_base::~property_collection_base()
 {
-	this->!property_collection_base	();
+    this->!property_collection_base();
 }
 
-property_collection_base::!property_collection_base		()
-{
-}
-
-Object ^property_collection_base::GetValue				()
-{
-	return						(this);
-}
-
-void property_collection_base::SetValue				(Object ^object)
+property_collection_base::!property_collection_base()
 {
 }
 
-void property_collection_base::CopyTo					(Array^ items, int index)
+Object ^ property_collection_base::GetValue()
 {
-	collection_type*			collection = this->collection();
-	for (int i=index, n=collection->size(); i<n ; ++i) {
-		editor::property_holder*holder_raw = collection->item(i);
-		::property_holder*		holder = dynamic_cast<::property_holder*>(holder_raw);
-		VERIFY					(holder);
-		items->SetValue			(holder->container(), i);
-	}
+    return (this);
 }
 
-IEnumerator^ property_collection_base::GetEnumerator	()
+void property_collection_base::SetValue(Object ^ object)
 {
-	return						(gcnew property_collection_enumerator(collection()));
 }
 
-bool property_collection_base::IsSynchronized::get		()
+void property_collection_base::CopyTo(Array ^ items, int index)
 {
-	return						(false);
-}
-	
-Object^ property_collection_base::SyncRoot::get			()
-{
-	return						(this);
-}
-	
-int property_collection_base::Count::get				()
-{
-	return						(collection()->size());
+    collection_type* collection = this->collection();
+    for (int i = index, n = collection->size(); i < n; ++i)
+    {
+        editor::property_holder* holder_raw = collection->item(i);
+        ::property_holder* holder = dynamic_cast<::property_holder*>(holder_raw);
+        VERIFY(holder);
+        items->SetValue(holder->container(), i);
+    }
 }
 
-int property_collection_base::Add						(Object^ value)
+IEnumerator ^ property_collection_base::GetEnumerator()
 {
-	collection_type*			collection = this->collection();
-	u32							collection_size = collection->size();
-	property_container^			container = safe_cast<property_container^>(value);
-	collection->insert			(&container->holder(), collection_size);
-	return						(collection_size - 1);
+    return (gcnew property_collection_enumerator(collection()));
 }
 
-void property_collection_base::Clear					()
+bool property_collection_base::IsSynchronized::get()
 {
-	collection()->clear			();
+    return (false);
 }
 
-bool property_collection_base::Contains					(Object^ value)
+Object ^ property_collection_base::SyncRoot::get()
 {
-	return						(IndexOf(value) > -1);
+    return (this);
 }
 
-int property_collection_base::IndexOf					(Object^ value)
+int property_collection_base::Count::get()
 {
-	property_container^			container = safe_cast<property_container^>(value);
-	return						(collection()->index(&container->holder()));
+    return (collection()->size());
 }
 
-void property_collection_base::Insert					(int index, Object^ value)
+int property_collection_base::Add(Object ^ value)
 {
-	property_container^			container = safe_cast<property_container^>(value);
-	collection()->insert		(&container->holder(), index);
+    collection_type* collection = this->collection();
+    u32 collection_size = collection->size();
+    property_container ^ container = safe_cast<property_container ^>(value);
+    collection->insert(&container->holder(), collection_size);
+    return (collection_size - 1);
 }
 
-void property_collection_base::Remove					(Object^ value)
+void property_collection_base::Clear()
 {
-	RemoveAt					(IndexOf(value));
+    collection()->clear();
 }
 
-void property_collection_base::RemoveAt					(int index)
+bool property_collection_base::Contains(Object ^ value)
 {
-	collection()->erase			(index);
+    return (IndexOf(value) > -1);
 }
 
-bool property_collection_base::IsFixedSize::get			()
+int property_collection_base::IndexOf(Object ^ value)
 {
-	return						(false);
+    property_container ^ container = safe_cast<property_container ^>(value);
+    return (collection()->index(&container->holder()));
 }
 
-bool property_collection_base::IsReadOnly::get			()
+void property_collection_base::Insert(int index, Object ^ value)
 {
-	return						(false);
+    property_container ^ container = safe_cast<property_container ^>(value);
+    collection()->insert(&container->holder(), index);
 }
 
-Object^ property_collection_base::default::get			(int index)
+void property_collection_base::Remove(Object ^ value)
 {
-	editor::property_holder*	holder_raw = collection()->item(index);
-	::property_holder*			holder = dynamic_cast<::property_holder*>(holder_raw);
-	return						(holder->container());
+    RemoveAt(IndexOf(value));
 }
 
-void property_collection_base::default::set				(int index, Object^ value)
+void property_collection_base::RemoveAt(int index)
 {
-	RemoveAt					(index);
-	Insert						(index, value);
+    collection()->erase(index);
 }
 
-property_container^	property_collection_base::create	()
+bool property_collection_base::IsFixedSize::get()
 {
-	editor::property_holder*	holder_raw = collection()->create();
-	::property_holder*			holder = dynamic_cast<::property_holder*>(holder_raw);
-	return						(holder->container());
+    return (false);
+}
+
+bool property_collection_base::IsReadOnly::get()
+{
+    return (false);
+}
+
+Object ^ property_collection_base::default ::get(int index)
+{
+    editor::property_holder* holder_raw = collection()->item(index);
+    ::property_holder* holder = dynamic_cast<::property_holder*>(holder_raw);
+    return (holder->container());
+}
+
+void property_collection_base::default ::set(int index, Object ^ value)
+{
+    RemoveAt(index);
+    Insert(index, value);
+}
+
+property_container ^ property_collection_base::create()
+{
+    editor::property_holder* holder_raw = collection()->create();
+    ::property_holder* holder = dynamic_cast<::property_holder*>(holder_raw);
+    return (holder->container());
 }

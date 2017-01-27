@@ -31,24 +31,12 @@ extern GT2Bool ViewClippingOption;
 extern int screenWidth;
 extern int screenHeight;
 
-void InitializeDisplay
-(
-	void
-);
+void InitializeDisplay(void);
 
-void ShutdownDisplay
-(
-	void
-);
+void ShutdownDisplay(void);
 
-void DisplayThink
-(
-	unsigned long now
-);
+void DisplayThink(unsigned long now);
 
-void DisplayChat
-(
-	const char * message
-);
+void DisplayChat(const char* message);
 
 #endif

@@ -11,31 +11,27 @@
 
 using editor::color;
 
-property_color_reference::property_color_reference	(
-		color& value,
-		array<System::Attribute^>^ attributes
-	) :
-	m_value							(new value_holder<color>(value)),
-	inherited						(value, attributes)
+property_color_reference::property_color_reference(color& value, array<System::Attribute ^> ^ attributes)
+    : m_value(new value_holder<color>(value)), inherited(value, attributes)
 {
 }
 
-property_color_reference::~property_color_reference	()
+property_color_reference::~property_color_reference()
 {
-	this->!property_color_reference	();
+    this->!property_color_reference();
 }
 
-property_color_reference::!property_color_reference	()
+property_color_reference::!property_color_reference()
 {
-	delete							(m_value);
+    delete (m_value);
 }
 
-color property_color_reference::get_value_raw		()
+color property_color_reference::get_value_raw()
 {
-	return							(m_value->get());
+    return (m_value->get());
 }
 
-void property_color_reference::set_value_raw		(color value)
+void property_color_reference::set_value_raw(color value)
 {
-	m_value->set					(value);
+    m_value->set(value);
 }

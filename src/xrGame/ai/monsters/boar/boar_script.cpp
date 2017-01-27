@@ -4,11 +4,5 @@
 
 using namespace luabind;
 
-SCRIPT_EXPORT(CAI_Boar, (CGameObject),
-{
-	module(luaState)
-	[
-		class_<CAI_Boar,CGameObject>("CAI_Boar")
-			.def(constructor<>())
-	];
-});
+SCRIPT_EXPORT(
+    CAI_Boar, (CGameObject), { module(luaState)[class_<CAI_Boar, CGameObject>("CAI_Boar").def(constructor<>())]; });

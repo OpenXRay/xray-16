@@ -17,18 +17,16 @@
 
 namespace Wml
 {
-
 template <class Real>
 class WML_ITEM MinBox3
 {
-public:
-    MinBox3 (int iQuantity, const Vector3<Real>* akPoint, Box3<Real> &kBox);
+  public:
+    MinBox3(int iQuantity, const Vector3<Real>* akPoint, Box3<Real>& kBox);
 
-private:
-    static Real Volume (const Real* afAngle, void* pvData);
+  private:
+    static Real Volume(const Real* afAngle, void* pvData);
 
-    static void MinimalBoxForAngles (int iQuantity,
-        const Vector3<Real>* akPoint, Real afAngle[3], Box3<Real>& rkBox);
+    static void MinimalBoxForAngles(int iQuantity, const Vector3<Real>* akPoint, Real afAngle[3], Box3<Real>& rkBox);
 
     int m_iQuantity;
     const Vector3<Real>* m_akPoint;
@@ -36,7 +34,6 @@ private:
 
 typedef MinBox3<float> MinBox3f;
 typedef MinBox3<double> MinBox3d;
-
 }
 
 #endif

@@ -27,15 +27,15 @@ struct SCollisionData
     Fvector vVelocity;
     Fvector vSourcePoint;
 
-    // for error handling  
+    // for error handling
     Fvector vLastSafePosition;
     BOOL bStuck;
 
-    // data for collision response 
+    // data for collision response
     bool bFoundCollision;
-    float fNearestDistance; // nearest distance to hit
-    Fvector vNearestIntersectionPoint; // on sphere
-    Fvector vNearestPolygonIntersectionPoint; // on polygon
+    float fNearestDistance;                    // nearest distance to hit
+    Fvector vNearestIntersectionPoint;         // on sphere
+    Fvector vNearestPolygonIntersectionPoint;  // on polygon
 
     Fvector vRadius;
 };
@@ -49,15 +49,16 @@ static vecTris clContactedT;
 
 // ----------------------------------------------------------------------
 // Name  : classifyPoint()
-// Input : point - point we wish to classify 
+// Input : point - point we wish to classify
 //         pO - Origin of plane
-//         pN - Normal to plane 
-// Notes : 
+//         pN - Normal to plane
+// Notes :
 // Return: One of 3 classification codes
-// -----------------------------------------------------------------------  
+// -----------------------------------------------------------------------
 IC
 
-float classifyPoint(const Fvector &point, const Fvector &planeO, const Fvector &planeN)
+    float
+    classifyPoint(const Fvector& point, const Fvector& planeO, const Fvector& planeN)
 {
     Fvector dir;
     dir.sub(point, planeO);
@@ -68,37 +69,39 @@ float classifyPoint(const Fvector &point, const Fvector &planeO, const Fvector &
 // Name  : intersectRayPlane()
 // Input : rOrigin - origin of ray in world space
 //         rVector - vector describing direction of ray in world space
-//         pOrigin - Origin of plane 
+//         pOrigin - Origin of plane
 //         pNormal - Normal to plane
 // Notes : Normalized directional vectors expected
 // Return: distance to plane in world units, -1 if no intersection.
-// -----------------------------------------------------------------------  
+// -----------------------------------------------------------------------
 IC
 
-float intersectRayPlane(const Fvector &rayOrigin, const Fvector &rayDirection,
-    const Fvector &planeOrigin, const Fvector &planeNormal)
+    float
+    intersectRayPlane(
+        const Fvector& rayOrigin, const Fvector& rayDirection, const Fvector& planeOrigin, const Fvector& planeNormal)
 {
     float numer = classifyPoint(rayOrigin, planeOrigin, planeNormal);
     float denom = planeNormal.dotproduct(rayDirection);
 
-    if (denom==0) // normal is orthogonal to vector, cant intersect
+    if (denom == 0)  // normal is orthogonal to vector, cant intersect
         return (-1.0f);
 
-    return -(numer/denom);
+    return -(numer / denom);
 }
 
 // ----------------------------------------------------------------------
 // Name  : closestPointOnLine()
 // Input : a - first end of line segment
 //         b - second end of line segment
-//         p - point we wish to find closest point on line from 
+//         p - point we wish to find closest point on line from
 // Notes : Helper function for closestPointOnTriangle()
 // Return: closest point on line segment
-// -----------------------------------------------------------------------  
+// -----------------------------------------------------------------------
 
 IC
 
-void closestPointOnLine(Fvector &res, const Fvector &a, const Fvector &b, const Fvector &p)
+    void
+    closestPointOnLine(Fvector& res, const Fvector& a, const Fvector& b, const Fvector& p)
 {
     // Determine t (the length of the vector from ‘a’ to ‘p’)
     Fvector c;
@@ -112,13 +115,11 @@ void closestPointOnLine(Fvector &res, const Fvector &a, const Fvector &b, const 
     float t = V.dotproduct(c);
 
     // Check to see if ‘t’ is beyond the extents of the line segment
-    if (t<=0.0f)
-    {
+    if (t <= 0.0f) {
         res.set(a);
         return;
     }
-    if (t>=d)
-    {
+    if (t >= d) {
         res.set(b);
         return;
     }
@@ -130,10 +131,11 @@ void closestPointOnLine(Fvector &res, const Fvector &a, const Fvector &b, const 
 
 IC
 
-void closestPointOnEdge(Fvector &res, // result
-    const Fvector &a, const Fvector &b, // points
-    const Fvector &ED, float elen, // edge direction (b-a) and length
-    const Fvector &P) // query point
+    void
+    closestPointOnEdge(Fvector& res,         // result
+        const Fvector& a, const Fvector& b,  // points
+        const Fvector& ED, float elen,       // edge direction (b-a) and length
+        const Fvector& P)                    // query point
 {
     // Determine t (the length of the vector from ‘a’ to ‘p’)
     Fvector c;
@@ -141,13 +143,11 @@ void closestPointOnEdge(Fvector &res, // result
     float t = ED.dotproduct(c);
 
     // Check to see if ‘t’ is beyond the extents of the line segment
-    if (t<=0.0f)
-    {
+    if (t <= 0.0f) {
         res.set(a);
         return;
     }
-    if (t>=elen)
-    {
+    if (t >= elen) {
         res.set(b);
         return;
     }
@@ -158,13 +158,14 @@ void closestPointOnEdge(Fvector &res, // result
 
 // ----------------------------------------------------------------------
 // Name  : closestPointOnTriangle()
-//         p - point we wish to find closest point on triangle from 
+//         p - point we wish to find closest point on triangle from
 // Return: closest point on line triangle edge
-// -----------------------------------------------------------------------  
+// -----------------------------------------------------------------------
 
 IC
 
-void closestPointOnTriangle(Fvector &result, const Fvector *V, const Fvector &p)
+    void
+    closestPointOnTriangle(Fvector& result, const Fvector* V, const Fvector& p)
 {
     Fvector Rab;
     closestPointOnLine(Rab, V[0], V[1], p);
@@ -178,18 +179,17 @@ void closestPointOnTriangle(Fvector &result, const Fvector *V, const Fvector &p)
 
     float min = dAB;
     result.set(Rab);
-    if (dBC<min)
-    {
+    if (dBC < min) {
         min = dBC;
         result.set(Rbc);
     }
-    if (dCA<min)
-        result.set(Rca);
+    if (dCA < min) result.set(Rca);
 }
 
 IC
 
-void closestPointOnTriangle(Fvector &result, const cl_tri &T, const Fvector &P)
+    void
+    closestPointOnTriangle(Fvector& result, const cl_tri& T, const Fvector& P)
 {
     Fvector Rab;
     closestPointOnEdge(Rab, T.p[0], T.p[1], T.e10, T.e10s, P);
@@ -202,8 +202,7 @@ void closestPointOnTriangle(Fvector &result, const cl_tri &T, const Fvector &P)
     float dCA = P.distance_to_sqr(Rca);
 
     float min;
-    if (dBC<dAB)
-    {
+    if (dBC < dAB) {
         min = dBC;
         result.set(Rbc);
     }
@@ -212,84 +211,85 @@ void closestPointOnTriangle(Fvector &result, const cl_tri &T, const Fvector &P)
         min = dAB;
         result.set(Rab);
     }
-    if (dCA<min)
-        result.set(Rca);
+    if (dCA < min) result.set(Rca);
 }
 
 // ----------------------------------------------------------------------
 // Name  : intersectRaySphere()
 // Input : rO - origin of ray in world space
 //         rV - vector describing direction of ray in world space
-//         sO - Origin of sphere 
+//         sO - Origin of sphere
 //         sR - radius of sphere
 // Notes : Normalized directional vectors expected
 // Return: distance to sphere in world units, -1 if no intersection.
-// -----------------------------------------------------------------------  
+// -----------------------------------------------------------------------
 
 IC
 
-float intersectRaySphere(const Fvector &rO, const Fvector &rV, const Fvector &sO, float sR)
+    float
+    intersectRaySphere(const Fvector& rO, const Fvector& rV, const Fvector& sO, float sR)
 {
     Fvector Q;
     Q.sub(sO, rO);
 
     float c = Q.magnitude();
     float v = Q.dotproduct(rV);
-    float d = sR*sR-(c*c-v*v);
+    float d = sR * sR - (c * c - v * v);
 
     // If there was no intersection, return -1
-    if (d<0.0)
-        return (-1.0f);
+    if (d < 0.0) return (-1.0f);
 
     // Return the distance to the [first] intersecting point
-    return (v-_sqrt(d));
+    return (v - _sqrt(d));
 }
 
 IC
 
-float intersectRayIdentitySphere(const Fvector &rO, const Fvector &rV)
+    float
+    intersectRayIdentitySphere(const Fvector& rO, const Fvector& rV)
 {
     Fvector Q;
     Q.invert(rO);
 
     float c = Q.magnitude();
     float v = Q.dotproduct(rV);
-    float d = 1-(c*c-v*v);
+    float d = 1 - (c * c - v * v);
 
     // If there was no intersection, return -1
-    if (d<0.0)
-        return (-1.0f);
+    if (d < 0.0) return (-1.0f);
 
     // Return the distance to the [first] intersecting point
-    return (v-_sqrt(d));
+    return (v - _sqrt(d));
 }
 
 // ----------------------------------------------------------------------
 // Name  : CheckPointInSphere()
 // Input : point - point we wish to check for inclusion
 //         sO - Origin of sphere
-//         sR - radius of sphere 
-// Notes : 
+//         sR - radius of sphere
+// Notes :
 // Return: TRUE if point is in sphere, FALSE if not.
-// -----------------------------------------------------------------------  
+// -----------------------------------------------------------------------
 IC
 
-bool CheckPointInSphere(const Fvector &point, const Fvector &sO, float sR)
+    bool
+    CheckPointInSphere(const Fvector& point, const Fvector& sO, float sR)
 {
-    return (sO.distance_to_sqr(point)<sR*sR);
+    return (sO.distance_to_sqr(point) < sR * sR);
 }
 
 IC
 
-bool CheckPointInIdentitySphere(const Fvector &point)
+    bool
+    CheckPointInIdentitySphere(const Fvector& point)
 {
-    return (point.square_magnitude()<=1);
+    return (point.square_magnitude() <= 1);
 }
 
-// -----------------------------------------------------------------------  
+// -----------------------------------------------------------------------
 extern CStatTimer g_tm;
 
-void msimulator_CheckCollision(SCollisionData &cl)
+void msimulator_CheckCollision(SCollisionData& cl)
 {
     // from package
     Fvector source;
@@ -302,9 +302,9 @@ void msimulator_CheckCollision(SCollisionData &cl)
     normalizedVelocity.normalize_safe(cl.vVelocity);
 
     // intersection data
-    Fvector sIPoint; // sphere intersection point
-    Fvector pIPoint; // plane intersection point 	
-    Fvector polyIPoint; // polygon intersection point
+    Fvector sIPoint;     // sphere intersection point
+    Fvector pIPoint;     // plane intersection point
+    Fvector polyIPoint;  // polygon intersection point
 
     // how long is our velocity
     float distanceToTravel = velocity.magnitude();
@@ -312,13 +312,12 @@ void msimulator_CheckCollision(SCollisionData &cl)
     float distToPlaneIntersection;
     float distToEllipsoidIntersection;
 
-    for (DWORD i_t = 0; i_t!=clContactedT.size(); i_t++)
+    for (DWORD i_t = 0; i_t != clContactedT.size(); i_t++)
     {
-        cl_tri &T = clContactedT[i_t];
+        cl_tri& T = clContactedT[i_t];
 
-        //ignore backfaces. What we cannot see we cannot collide with ;)
-        if (T.N.dotproduct(normalizedVelocity)<0.0f)
-        {
+        // ignore backfaces. What we cannot see we cannot collide with ;)
+        if (T.N.dotproduct(normalizedVelocity) < 0.0f) {
             // calculate sphere intersection point (in future :)
             // OLES: 'cause our radius has unit length, this point lies exactly on sphere
             sIPoint.sub(source, T.N);
@@ -326,10 +325,9 @@ void msimulator_CheckCollision(SCollisionData &cl)
             // find the plane intersection point
             // classify point to determine if ellipsoid span the plane
             BOOL bInsideTri;
-            if ((sIPoint.dotproduct(T.N)+T.d)<-EPS_S)
-            {
+            if ((sIPoint.dotproduct(T.N) + T.d) < -EPS_S) {
                 // plane is embedded in ellipsoid / sphere
-                // find plane intersection point by shooting a ray from the 
+                // find plane intersection point by shooting a ray from the
                 // sphere intersection point along the planes normal.
                 bInsideTri = ETOOLS::TestRayTri2(sIPoint, T.N, T.p, distToPlaneIntersection);
 
@@ -345,15 +343,13 @@ void msimulator_CheckCollision(SCollisionData &cl)
                 pIPoint.mad(sIPoint, normalizedVelocity, distToPlaneIntersection);
             }
 
-
-            // find polygon intersection point. By default we assume its equal to the 
+            // find polygon intersection point. By default we assume its equal to the
             // plane intersection point
 
             polyIPoint.set(pIPoint);
             distToEllipsoidIntersection = distToPlaneIntersection;
 
-            if (!bInsideTri)
-            {
+            if (!bInsideTri) {
                 // if not in triangle
                 closestPointOnTriangle(polyIPoint, T, pIPoint);
 
@@ -361,24 +357,20 @@ void msimulator_CheckCollision(SCollisionData &cl)
                 _normalizedVelocity.invert(normalizedVelocity);
                 distToEllipsoidIntersection = intersectRaySphere(polyIPoint, _normalizedVelocity, source, 1.0f);
 
-                if (distToEllipsoidIntersection>=0)
-                {
+                if (distToEllipsoidIntersection >= 0) {
                     // calculate true sphere intersection point
                     sIPoint.mad(polyIPoint, normalizedVelocity, -distToEllipsoidIntersection);
                 }
             }
 
             // Here we do the error checking to see if we got ourself stuck last frame
-            if (CheckPointInSphere(polyIPoint, source, 1.0f))
-            {
+            if (CheckPointInSphere(polyIPoint, source, 1.0f)) {
                 cl.bStuck = TRUE;
             }
 
             // Ok, now we might update the collision data if we hit something
-            if ((distToEllipsoidIntersection>=0)&&(distToEllipsoidIntersection<=distanceToTravel))
-            {
-                if ((cl.bFoundCollision==FALSE)||(distToEllipsoidIntersection<cl.fNearestDistance))
-                {
+            if ((distToEllipsoidIntersection >= 0) && (distToEllipsoidIntersection <= distanceToTravel)) {
+                if ((cl.bFoundCollision == FALSE) || (distToEllipsoidIntersection < cl.fNearestDistance)) {
                     // if we are hit we have a closest hit so far. We save the information
                     cl.fNearestDistance = distToEllipsoidIntersection;
                     cl.vNearestIntersectionPoint.set(sIPoint);
@@ -386,38 +378,37 @@ void msimulator_CheckCollision(SCollisionData &cl)
                     cl.bFoundCollision = TRUE;
                 }
             }
-        } // if not backface
-    } // for all faces	
+        }  // if not backface
+    }      // for all faces
 }
 
 //-----------------------------------------------------------------------------
-void msimulator_ResolveStuck(SCollisionData &cl, Fvector &position)
+void msimulator_ResolveStuck(SCollisionData& cl, Fvector& position)
 {
     // intersection data
-    Fvector polyIPoint; // polygon intersection point
+    Fvector polyIPoint;  // polygon intersection point
     Fvector stuckDir;
     int stuckCount;
 
     float dist;
-    float safe_R = 1.f+EPS_L*2;//psSqueezeVelocity*EDevice.fTimeDelta;
+    float safe_R = 1.f + EPS_L * 2;  // psSqueezeVelocity*EDevice.fTimeDelta;
 
-    for (int passes = 0; passes<psCollideActStuckDepth; passes++)
+    for (int passes = 0; passes < psCollideActStuckDepth; passes++)
     {
         // initialize
         stuckDir.set(0, 0, 0);
         stuckCount = 0;
 
         // for all faces
-        for (DWORD i_t = 0; i_t!=clContactedT.size(); i_t++)
+        for (DWORD i_t = 0; i_t != clContactedT.size(); i_t++)
         {
-            cl_tri &T = clContactedT[i_t];
+            cl_tri& T = clContactedT[i_t];
             Fvector N_inv;
             N_inv.invert(T.N);
 
-            // find plane intersection point by shooting a ray from the 
+            // find plane intersection point by shooting a ray from the
             // sphere intersection point along the planes normal.
-            if (CDB::TestRayTri2(position, N_inv, T.p, dist))
-            {
+            if (CDB::TestRayTri2(position, N_inv, T.p, dist)) {
                 // calculate plane intersection point
                 polyIPoint.mad(position, N_inv, dist);
             }
@@ -428,23 +419,20 @@ void msimulator_ResolveStuck(SCollisionData &cl, Fvector &position)
                 tmp.mad(position, N_inv, dist);
                 closestPointOnTriangle(polyIPoint, T, tmp);
             }
-            if (CheckPointInSphere(polyIPoint, position, safe_R))
-            {
+            if (CheckPointInSphere(polyIPoint, position, safe_R)) {
                 Fvector dir;
                 dir.sub(position, polyIPoint);
                 float len = dir.magnitude();
-                dir.mul((safe_R-len)/len);
+                dir.mul((safe_R - len) / len);
                 stuckDir.add(dir);
                 stuckCount++;
             }
         }
 
-        if (stuckCount)
-        {
+        if (stuckCount) {
             stuckDir.div(float(stuckCount));
             position.add(stuckDir);
-            if (stuckDir.magnitude()<EPS)
-                break;
+            if (stuckDir.magnitude() < EPS) break;
         }
         else
             break;
@@ -456,26 +444,24 @@ void msimulator_ResolveStuck(SCollisionData &cl, Fvector &position)
 // Desc: Recursive part of the collision response. This function is the
 //       one who actually calls the collision check on the meshes
 //-----------------------------------------------------------------------------
-Fvector msimulator_CollideWithWorld(SCollisionData &cl, Fvector position, Fvector velocity, WORD cnt)
+Fvector msimulator_CollideWithWorld(SCollisionData& cl, Fvector position, Fvector velocity, WORD cnt)
 {
-    // 
+    //
     msimulator_ResolveStuck(cl, position);
 
     // do we need to worry ?
     //	if (fsimilar(position.x,target.x,EPS_L)&&fsimilar(position.z,target.z,EPS_L))
-    if (velocity.magnitude()<EPS_L)
-    {
+    if (velocity.magnitude() < EPS_L) {
         cl.vVelocity.set(0, 0, 0);
         return position;
     }
-    if (cnt>psCollideActDepth)
-        return cl.vLastSafePosition;
+    if (cnt > psCollideActDepth) return cl.vLastSafePosition;
 
     Fvector ret_pos;
     Fvector destinationPoint;
     destinationPoint.add(position, velocity);
 
-    // reset the collision package we send to the mesh 
+    // reset the collision package we send to the mesh
     cl.vVelocity.set(velocity);
     cl.vSourcePoint.set(position);
     cl.bFoundCollision = FALSE;
@@ -485,18 +471,17 @@ Fvector msimulator_CollideWithWorld(SCollisionData &cl, Fvector position, Fvecto
     // Check collision
     msimulator_CheckCollision(cl);
 
-    // check return value here, and possibly call recursively 	
-    if (cl.bFoundCollision==FALSE&&!cl.bStuck)
-    {
-        // if no collision move very close to the desired destination. 
+    // check return value here, and possibly call recursively
+    if (cl.bFoundCollision == FALSE && !cl.bStuck) {
+        // if no collision move very close to the desired destination.
         float l = velocity.magnitude();
         Fvector V;
-        V.mul(velocity, (l-cl_epsilon)/l);
+        V.mul(velocity, (l - cl_epsilon) / l);
 
         // return the final position
         ret_pos.add(position, V);
 
-        // update the last safe position for future error recovery	
+        // update the last safe position for future error recovery
         cl.vLastSafePosition.set(ret_pos);
         return ret_pos;
     }
@@ -507,17 +492,15 @@ Fvector msimulator_CollideWithWorld(SCollisionData &cl, Fvector position, Fvecto
         Fvector newSourcePoint;
 
         // If we are stuck, we just back up to last safe position
-        if (cl.bStuck)
-        {
+        if (cl.bStuck) {
             return cl.vLastSafePosition;
         }
 
         // only update if we are not already very close
-        if (cl.fNearestDistance>=cl_epsilon)
-        {
+        if (cl.fNearestDistance >= cl_epsilon) {
             Fvector V;
             V.set(velocity);
-            V.set_length(cl.fNearestDistance-cl_epsilon);
+            V.set_length(cl.fNearestDistance - cl_epsilon);
             newSourcePoint.add(cl.vSourcePoint, V);
         }
         else
@@ -543,23 +526,24 @@ Fvector msimulator_CollideWithWorld(SCollisionData &cl, Fvector position, Fvecto
         Fvector newVelocityVector;
         newVelocityVector.sub(newDestinationPoint, cl.vNearestPolygonIntersectionPoint);
 
-        // now we recursively call the function with the _new position and velocity 
+        // now we recursively call the function with the _new position and velocity
         cl.vLastSafePosition.set(position);
-        return msimulator_CollideWithWorld(cl, newSourcePoint, newVelocityVector, u16(cnt+1));
+        return msimulator_CollideWithWorld(cl, newSourcePoint, newVelocityVector, u16(cnt + 1));
     }
 }
 
 IC
 
-void create_bb(Fbox &B, Fvector &P, float r, float h)
+    void
+    create_bb(Fbox& B, Fvector& P, float r, float h)
 {
-    B.set(P.x-r, P.y, P.z-r, P.x+r, P.y+h, P.z+r);
+    B.set(P.x - r, P.y, P.z - r, P.x + r, P.y + h, P.z + r);
 }
 
-void ESceneAIMapTool::MotionSimulate(Fvector &result, Fvector &start, Fvector &end, float _radius, float _height)
+void ESceneAIMapTool::MotionSimulate(Fvector& result, Fvector& start, Fvector& end, float _radius, float _height)
 {
     SCollisionData cl_data;
-    float half_height = _height/2;
+    float half_height = _height / 2;
 
     // Calc BB
     Fbox b1, b2, bb;
@@ -579,7 +563,7 @@ void ESceneAIMapTool::MotionSimulate(Fvector &result, Fvector &start, Fvector &e
 
     // XForm everything to ellipsoid space
     Fvector xf;
-    xf.set(1/_radius, 1/half_height, 1/_radius);
+    xf.set(1 / _radius, 1 / half_height, 1 / _radius);
 
     Fvector Lposition;
     Lposition.set(start);
@@ -602,25 +586,22 @@ void ESceneAIMapTool::MotionSimulate(Fvector &result, Fvector &start, Fvector &e
     clContactedT.clear();
     //.	clContactedT.resize	(tri_count);
 
-    if (tri_count)
-    {
+    if (tri_count) {
         Fvector vel_dir;
         vel_dir.normalize_safe(Lvelocity);
-        for (int i_t = 0; i_t<tri_count; i_t++)
+        for (int i_t = 0; i_t < tri_count; i_t++)
         {
-            SPickQuery::SResult *R = PQ.r_begin()+i_t;
-            if (R->e_obj&&R->e_mesh)
-            {
-                CSurface *surf = R->e_mesh->GetSurfaceByFaceID(R->tag);
+            SPickQuery::SResult* R = PQ.r_begin() + i_t;
+            if (R->e_obj && R->e_mesh) {
+                CSurface* surf = R->e_mesh->GetSurfaceByFaceID(R->tag);
                 //.				SGameMtl* mtl 		= GMLib.GetMaterialByID(surf->_GameMtl());
                 //.				if (mtl->Flags.is(SGameMtl::flPassable))continue;
-                Shader_xrLC *c_sh = EDevice.ShaderXRLC.Get(surf->_ShaderXRLCName());
-                if (!c_sh->flags.bCollision)
-                    continue;
+                Shader_xrLC* c_sh = EDevice.ShaderXRLC.Get(surf->_ShaderXRLCName());
+                if (!c_sh->flags.bCollision) continue;
             }
             clContactedT.push_back(cl_tri());
-            cl_tri &T = clContactedT.back();
-            Fvector *V = R->verts;
+            cl_tri& T = clContactedT.back();
+            Fvector* V = R->verts;
 
             T.p[0].mul(V[0], xf);
             T.p[1].mul(V[1], xf);
@@ -640,14 +621,13 @@ void ESceneAIMapTool::MotionSimulate(Fvector &result, Fvector &start, Fvector &e
         }
     }
 
-    // call the recursive collision response function	
+    // call the recursive collision response function
     Fvector POS;
 
-    for (int i = 0; i<3; i++)
+    for (int i = 0; i < 3; i++)
     {
         POS.set(msimulator_CollideWithWorld(cl_data, Lposition, Lvelocity, 0));
-        if (fsimilar(POS.x, target.x)&&fsimilar(POS.z, target.z))
-            break;
+        if (fsimilar(POS.x, target.x) && fsimilar(POS.z, target.z)) break;
 
         Lposition.set(POS);
         Lvelocity.sub(target, POS);
@@ -657,4 +637,3 @@ void ESceneAIMapTool::MotionSimulate(Fvector &result, Fvector &start, Fvector &e
     result.div(POS, xf);
     result.y -= half_height;
 }
-

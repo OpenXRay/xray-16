@@ -10,8 +10,7 @@
 #pragma link "multi_edit"
 #pragma link "MXCtrls"
 #pragma resource "*.dfm"
-__fastcall TAddFloatForm::TAddFloatForm(TComponent *Owner, pp_params p)
-    : TForm(Owner), m_pp_params(p)
+__fastcall TAddFloatForm::TAddFloatForm(TComponent* Owner, pp_params p) : TForm(Owner), m_pp_params(p)
 {
     Value1->MinValue = -1;
     Value1->MaxValue = 1;
@@ -20,8 +19,7 @@ __fastcall TAddFloatForm::TAddFloatForm(TComponent *Owner, pp_params p)
     Value1->Increment = 0.01f;
     Value2->Increment = 0.01f;
     cmTextureName->Visible = false;
-    if (m_pp_params==pp_dual_h)
-    {
+    if (m_pp_params == pp_dual_h) {
         Label1->Caption = "Duality-H";
         Label2->Caption = "Duality-V";
         Label2->Visible = true;
@@ -36,7 +34,7 @@ __fastcall TAddFloatForm::TAddFloatForm(TComponent *Owner, pp_params p)
         Value2->Decimal = 3;
         Value2->Increment = 0.001f;
     }
-    else if (m_pp_params==pp_noise_i)
+    else if (m_pp_params == pp_noise_i)
     {
         Label1->Caption = "Noise Intensity";
         Label2->Caption = "Noise Grain";
@@ -47,14 +45,18 @@ __fastcall TAddFloatForm::TAddFloatForm(TComponent *Owner, pp_params p)
         Label3->Visible = true;
         Value3->Visible = true;
 
-        Value1->MinValue = 0.0f;;
-        Value1->MaxValue = 1.0f;;
+        Value1->MinValue = 0.0f;
+        ;
+        Value1->MaxValue = 1.0f;
+        ;
         Value2->MinValue = 0.01f;
         Value2->MaxValue = 1000.0f;
-        Value3->MinValue = 1.0f;;
-        Value3->MaxValue = 1000.0f;;
+        Value3->MinValue = 1.0f;
+        ;
+        Value3->MaxValue = 1000.0f;
+        ;
     }
-    else if (m_pp_params==pp_cm_influence)
+    else if (m_pp_params == pp_cm_influence)
     {
         Label1->Caption = "Influence";
 
@@ -63,8 +65,10 @@ __fastcall TAddFloatForm::TAddFloatForm(TComponent *Owner, pp_params p)
         Label3->Visible = false;
         Value3->Visible = false;
 
-        Value1->MinValue = 0.0f;;
-        Value1->MaxValue = 1.0f;;
+        Value1->MinValue = 0.0f;
+        ;
+        Value1->MaxValue = 1.0f;
+        ;
         cmTextureName->Visible = true;
     };
 }
@@ -83,23 +87,22 @@ void TAddFloatForm::Clear()
 
 void TAddFloatForm::ShowCurrent(u32 keyIdx)
 {
-    if (keyIdx==-1)
-    {
+    if (keyIdx == -1) {
         Clear();
         return;
     }
 
-    CPostProcessParam *cparam = MainForm->m_Animator->GetParam(GetTimeChannel());
+    CPostProcessParam* cparam = MainForm->m_Animator->GetParam(GetTimeChannel());
     float time = cparam->get_key_time(keyIdx);
     MainForm->SetMarkerPosition(time);
 
-    if (keyIdx>0)
-        TimeValue->MinValue = cparam->get_key_time(keyIdx-1)+0.02f;
+    if (keyIdx > 0)
+        TimeValue->MinValue = cparam->get_key_time(keyIdx - 1) + 0.02f;
     else
         TimeValue->MinValue = 0.0f;
 
-    if (cparam->get_keys_count()>keyIdx+1)
-        TimeValue->MaxValue = cparam->get_key_time(keyIdx+1)-0.02f;
+    if (cparam->get_keys_count() > keyIdx + 1)
+        TimeValue->MaxValue = cparam->get_key_time(keyIdx + 1) - 0.02f;
     else
         TimeValue->MaxValue = 1000.0f;
 
@@ -109,17 +112,15 @@ void TAddFloatForm::ShowCurrent(u32 keyIdx)
     cparam->get_value(time, val, 0);
     Value1->Value = val;
 
-    if (m_pp_params==pp_dual_h)
-    {
+    if (m_pp_params == pp_dual_h) {
         cparam = MainForm->m_Animator->GetParam(pp_dual_v);
 
         cparam->get_value(time, val, 0);
         Value2->Value = val;
     }
-    else if (m_pp_params==pp_noise_i)
+    else if (m_pp_params == pp_noise_i)
     {
         cparam = MainForm->m_Animator->GetParam(pp_noise_g);
-
 
         cparam->get_value(time, val, 0);
         Value2->Value = val;
@@ -129,7 +130,7 @@ void TAddFloatForm::ShowCurrent(u32 keyIdx)
         cparam->get_value(time, val, 0);
         Value3->Value = val;
     }
-    else if (m_pp_params==pp_cm_influence)
+    else if (m_pp_params == pp_cm_influence)
     {
         cmTextureName->Text = MainForm->m_Animator->PPinfo().cm_tex1.c_str();
     }
@@ -139,29 +140,24 @@ bool TAddFloatForm::DrawChannel(_pp_params p)
 {
     switch (m_pp_params)
     {
-        case pp_dual_h: return (p==pp_dual_h)||(p==pp_dual_v);
-        case pp_noise_i: return (p==pp_noise_i)||(p==pp_noise_g)||(p==pp_noise_f);
-        case pp_cm_influence: return (p==pp_cm_influence);
-        default: R_ASSERT(0);
+    case pp_dual_h: return (p == pp_dual_h) || (p == pp_dual_v);
+    case pp_noise_i: return (p == pp_noise_i) || (p == pp_noise_g) || (p == pp_noise_f);
+    case pp_cm_influence: return (p == pp_cm_influence);
+    default: R_ASSERT(0);
     }
     return false;
 }
 
-void __fastcall TAddFloatForm::TimeValueExit(TObject *Sender)
+void __fastcall TAddFloatForm::TimeValueExit(TObject* Sender)
 {
-    if (m_bLocked)
-        return;
-    if (MainForm->PointList->ItemIndex==-1)
-        return;
-    TMultiObjSpinEdit *spin = dynamic_cast<TMultiObjSpinEdit*>(Sender);
-    if (spin->Color==clLime)
-    {
-        if (TimeValue->Value<TimeValue->MinValue)
-            TimeValue->Value = TimeValue->MinValue;
-        if (TimeValue->Value>TimeValue->MaxValue)
-            TimeValue->Value = TimeValue->MaxValue;
+    if (m_bLocked) return;
+    if (MainForm->PointList->ItemIndex == -1) return;
+    TMultiObjSpinEdit* spin = dynamic_cast<TMultiObjSpinEdit*>(Sender);
+    if (spin->Color == clLime) {
+        if (TimeValue->Value < TimeValue->MinValue) TimeValue->Value = TimeValue->MinValue;
+        if (TimeValue->Value > TimeValue->MaxValue) TimeValue->Value = TimeValue->MaxValue;
 
-        CPostProcessParam *cparam = MainForm->m_Animator->GetParam(GetTimeChannel());
+        CPostProcessParam* cparam = MainForm->m_Animator->GetParam(GetTimeChannel());
 
         float time_prev = cparam->get_key_time(MainForm->PointList->ItemIndex);
         cparam->delete_value(time_prev);
@@ -169,14 +165,12 @@ void __fastcall TAddFloatForm::TimeValueExit(TObject *Sender)
         float time = TimeValue->Value;
         cparam->add_value(time, Value1->Value, 0);
 
-
-        if (m_pp_params==pp_dual_h)
-        {
+        if (m_pp_params == pp_dual_h) {
             cparam = MainForm->m_Animator->GetParam(pp_dual_v);
             cparam->delete_value(time_prev);
             cparam->add_value(time, Value2->Value, 0);
         }
-        else if (m_pp_params==pp_noise_i)
+        else if (m_pp_params == pp_noise_i)
         {
             cparam = MainForm->m_Animator->GetParam(pp_noise_g);
             cparam->delete_value(time_prev);
@@ -193,21 +187,19 @@ void __fastcall TAddFloatForm::TimeValueExit(TObject *Sender)
     }
 }
 
-void __fastcall TAddFloatForm::ChangeParam(TObject *Sender)
+void __fastcall TAddFloatForm::ChangeParam(TObject* Sender)
 {
-    if (m_bLocked)
-        return;
-    if (MainForm->PointList->ItemIndex==-1)
-        return;
-    TMultiObjSpinEdit *spin = dynamic_cast<TMultiObjSpinEdit*>(Sender);
+    if (m_bLocked) return;
+    if (MainForm->PointList->ItemIndex == -1) return;
+    TMultiObjSpinEdit* spin = dynamic_cast<TMultiObjSpinEdit*>(Sender);
     spin->Color = clLime;
 }
 
 void TAddFloatForm::AddNew(u32 keyIdx)
 {
-    CPostProcessParam *cparam = MainForm->m_Animator->GetParam(GetTimeChannel());
+    CPostProcessParam* cparam = MainForm->m_Animator->GetParam(GetTimeChannel());
 
-    float time = (keyIdx!=-1) ? cparam->get_key_time(keyIdx) : 0.0f;
+    float time = (keyIdx != -1) ? cparam->get_key_time(keyIdx) : 0.0f;
     MainForm->SetMarkerPosition(time);
     time += 0.01f;
     CreateKey(time);
@@ -215,21 +207,19 @@ void TAddFloatForm::AddNew(u32 keyIdx)
 
 void TAddFloatForm::Remove(u32 keyIdx)
 {
-    if (keyIdx==-1)
-        return;
+    if (keyIdx == -1) return;
 
-    CPostProcessParam *cparam = MainForm->m_Animator->GetParam(GetTimeChannel());
+    CPostProcessParam* cparam = MainForm->m_Animator->GetParam(GetTimeChannel());
 
     float time = cparam->get_key_time(keyIdx);
 
     cparam->delete_value(time);
 
-    if (m_pp_params==pp_dual_h)
-    {
+    if (m_pp_params == pp_dual_h) {
         cparam = MainForm->m_Animator->GetParam(pp_dual_v);
         cparam->delete_value(time);
     }
-    else if (m_pp_params==pp_noise_i)
+    else if (m_pp_params == pp_noise_i)
     {
         cparam = MainForm->m_Animator->GetParam(pp_noise_g);
         cparam->delete_value(time);
@@ -240,15 +230,14 @@ void TAddFloatForm::Remove(u32 keyIdx)
 
 void TAddFloatForm::RemoveAllKeys()
 {
-    CPostProcessParam *cparam = MainForm->m_Animator->GetParam(GetTimeChannel());
+    CPostProcessParam* cparam = MainForm->m_Animator->GetParam(GetTimeChannel());
     cparam->clear_all_keys();
 
-    if (m_pp_params==pp_dual_h)
-    {
+    if (m_pp_params == pp_dual_h) {
         cparam = MainForm->m_Animator->GetParam(pp_dual_h);
         cparam->clear_all_keys();
     }
-    else if (m_pp_params==pp_noise_i)
+    else if (m_pp_params == pp_noise_i)
     {
         cparam = MainForm->m_Animator->GetParam(pp_noise_g);
         cparam->clear_all_keys();
@@ -260,20 +249,17 @@ void TAddFloatForm::RemoveAllKeys()
 
 void TAddFloatForm::CreateKey(float time)
 {
-    CPostProcessParam *cparam = MainForm->m_Animator->GetParam(GetTimeChannel());
+    CPostProcessParam* cparam = MainForm->m_Animator->GetParam(GetTimeChannel());
 
     cparam->add_value(time, 0.0f, 0);
     cparam->update_value(time, 0.33f, 0);
 
-
-    if (m_pp_params==pp_dual_h)
-    {
+    if (m_pp_params == pp_dual_h) {
         cparam = MainForm->m_Animator->GetParam(pp_dual_v);
         cparam->add_value(time, 0.0f, 0);
         cparam->update_value(time, 0.44f, 0);
     }
-    if (m_pp_params==pp_noise_i)
-    {
+    if (m_pp_params == pp_noise_i) {
         cparam = MainForm->m_Animator->GetParam(pp_noise_g);
         cparam->add_value(time, 0.0f, 0);
         cparam->update_value(time, 0.11f, 0);
@@ -286,20 +272,16 @@ void TAddFloatForm::CreateKey(float time)
 
 //---------------------------------------------------------------------------
 
-void __fastcall TAddFloatForm::TimeValueKeyDown(TObject *Sender, WORD &Key,
-    TShiftState Shift)
+void __fastcall TAddFloatForm::TimeValueKeyDown(TObject* Sender, WORD& Key, TShiftState Shift)
 {
-    if (Key==VK_RETURN)
-        TimeValueExit(Sender);
+    if (Key == VK_RETURN) TimeValueExit(Sender);
 }
 
 //---------------------------------------------------------------------------
 
-void __fastcall TAddFloatForm::cmTextureNameChange(TObject *Sender)
+void __fastcall TAddFloatForm::cmTextureNameChange(TObject* Sender)
 {
     MainForm->m_Animator->PPinfo().cm_tex1 = cmTextureName->Text.c_str();
 }
 
 //---------------------------------------------------------------------------
-
-

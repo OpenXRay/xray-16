@@ -13,23 +13,24 @@
 class CInventoryOwner;
 class CGameObject;
 
-class CPurchaseList {
+class CPurchaseList
+{
 public:
-	typedef AssociativeVector<shared_str,float>	DEFICITS;
+    typedef AssociativeVector<shared_str, float> DEFICITS;
 
 private:
-	DEFICITS				m_deficits;
+    DEFICITS m_deficits;
 
 private:
-			void			process			(const CGameObject &owner, const shared_str &name, const u32 &count, const float &probability);
+    void process(const CGameObject& owner, const shared_str& name, const u32& count, const float& probability);
 
 public:
-			void			process			(CInifile &ini_file, LPCSTR section, CInventoryOwner &owner);
+    void process(CInifile& ini_file, LPCSTR section, CInventoryOwner& owner);
 
 public:
-	IC		void			deficit			(const shared_str &section, const float &deficit);
-	IC		float			deficit			(const shared_str &section) const;
-	IC		const DEFICITS	&deficits		() const;
+    IC void deficit(const shared_str& section, const float& deficit);
+    IC float deficit(const shared_str& section) const;
+    IC const DEFICITS& deficits() const;
 };
 
 #include "purchase_list_inline.h"

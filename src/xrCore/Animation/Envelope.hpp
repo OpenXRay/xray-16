@@ -19,12 +19,12 @@ programs that, for example, read scene or object files and must store
 the envelopes.
 ====================================================================== */
 
-#define SHAPE_TCB   0
-#define SHAPE_HERM  1
-#define SHAPE_BEZI  2
-#define SHAPE_LINE  3
-#define SHAPE_STEP  4
-#define SHAPE_BEZ2  5
+#define SHAPE_TCB 0
+#define SHAPE_HERM 1
+#define SHAPE_BEZI 2
+#define SHAPE_LINE 3
+#define SHAPE_STEP 4
+#define SHAPE_BEZ2 5
 
 #define BEH_RESET 0
 #define BEH_CONSTANT 1
@@ -33,8 +33,7 @@ the envelopes.
 #define BEH_OFFSET 4
 #define BEH_LINEAR 5
 
-
-#pragma pack( push,1 )
+#pragma pack(push, 1)
 struct st_Key
 {
     enum
@@ -105,7 +104,7 @@ struct st_Key
         }
     }
 };
-#pragma pack( pop )
+#pragma pack(pop)
 
 DEFINE_VECTOR(st_Key*, KeyVec, KeyIt);
 
@@ -117,8 +116,13 @@ class XRCORE_API CEnvelope
 public:
     KeyVec keys;
     int behavior[2];
+
 public:
-    CEnvelope() { behavior[0] = 1; behavior[1] = 1; }
+    CEnvelope()
+    {
+        behavior[0] = 1;
+        behavior[1] = 1;
+    }
     CEnvelope(CEnvelope* source);
     virtual ~CEnvelope();
 
@@ -144,4 +148,4 @@ public:
     void Optimize();
 };
 
-#endif //_ENVELOPE_H_
+#endif  //_ENVELOPE_H_

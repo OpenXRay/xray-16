@@ -24,16 +24,15 @@ void EScenePSTool::RemoveControls()
 
 //----------------------------------------------------
 
-CCustomObject *EScenePSTool::CreateObject(LPVOID data, LPCSTR name)
+CCustomObject* EScenePSTool::CreateObject(LPVOID data, LPCSTR name)
 {
-    CCustomObject*O = new EParticlesObject(data, name);
+    CCustomObject* O = new EParticlesObject(data, name);
     O->ParentTool = this;
     return O;
 }
 
 //----------------------------------------------------
-bool EScenePSTool::ExportGame(SExportStreams *F)
+bool EScenePSTool::ExportGame(SExportStreams* F)
 {
     return inherited::ExportGame(F);
 }
-

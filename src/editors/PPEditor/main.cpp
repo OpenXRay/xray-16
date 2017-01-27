@@ -9,12 +9,10 @@
 #pragma link "MXCtrls"
 #pragma resource "*.dfm"
 
-TMainForm *MainForm;
-
+TMainForm* MainForm;
 
 //---------------------------------------------------------------------------
-__fastcall TMainForm::TMainForm(TComponent *Owner)
-    : TForm(Owner)
+__fastcall TMainForm::TMainForm(TComponent* Owner) : TForm(Owner)
 {
     frmConstructor = new TfrmConstructor(this);
     Image->Picture->Bitmap->Width = Image->Width;
@@ -58,7 +56,7 @@ __fastcall TMainForm::TMainForm(TComponent *Owner)
 }
 
 //---------------------------------------------------------------------------
-void __fastcall TMainForm::FormDestroy(TObject *Sender)
+void __fastcall TMainForm::FormDestroy(TObject* Sender)
 {
     delete m_Animator;
     m_Animator = NULL;
@@ -66,7 +64,7 @@ void __fastcall TMainForm::FormDestroy(TObject *Sender)
 }
 
 //---------------------------------------------------------------------------
-void __fastcall TMainForm::FormResize(TObject *Sender)
+void __fastcall TMainForm::FormResize(TObject* Sender)
 {
     Image->Picture->Bitmap->Width = 0;
     Image->Picture->Bitmap->Height = 0;
@@ -76,9 +74,9 @@ void __fastcall TMainForm::FormResize(TObject *Sender)
 }
 
 //---------------------------------------------------------------------------
-void __fastcall TMainForm::NewEffectButtonClick(TObject *Sender)
+void __fastcall TMainForm::NewEffectButtonClick(TObject* Sender)
 {
-    if (Application->MessageBox("Do you wish to create a new effect ?", "Warning", MB_YESNO|MB_ICONSTOP)==IDNO)
+    if (Application->MessageBox("Do you wish to create a new effect ?", "Warning", MB_YESNO | MB_ICONSTOP) == IDNO)
         return;
 
     m_Animator->Create();
@@ -93,20 +91,19 @@ void __fastcall TMainForm::NewEffectButtonClick(TObject *Sender)
 }
 
 //---------------------------------------------------------------------------
-void __fastcall TMainForm::FormPaint(TObject *Sender)
+void __fastcall TMainForm::FormPaint(TObject* Sender)
 {
     UpdateGraph();
 }
 
 //---------------------------------------------------------------------------
-void __fastcall TMainForm::ImageMouseUp(TObject *Sender,
-    TMouseButton Button, TShiftState Shift, int X, int Y)
+void __fastcall TMainForm::ImageMouseUp(TObject* Sender, TMouseButton Button, TShiftState Shift, int X, int Y)
 {
     //    m_pEffect->add_point (X, Y);
 }
 
 //---------------------------------------------------------------------------
-void __fastcall TMainForm::GrayColorClick(TObject *Sender)
+void __fastcall TMainForm::GrayColorClick(TObject* Sender)
 {
     //    m_pEffect->get_add_color()->show_constructor ();
 }
@@ -122,20 +119,19 @@ void TMainForm::PointListSetTime(int idx, float time)
 void TMainForm::FillPointList()
 {
     PointList->Clear();
-    CPostProcessParam *cparam = MainForm->m_Animator->GetParam(m_ActiveShowForm->GetTimeChannel());
+    CPostProcessParam* cparam = MainForm->m_Animator->GetParam(m_ActiveShowForm->GetTimeChannel());
     u32 cnt = cparam->get_keys_count();
-    for (u32 i = 0; i<cnt; ++i)
+    for (u32 i = 0; i < cnt; ++i)
     {
         PointList->AddItem("", NULL);
         float t = cparam->get_key_time(i);
-        PointListSetTime(PointList->Count-1, t);
+        PointListSetTime(PointList->Count - 1, t);
     }
 }
 
-void __fastcall TMainForm::TabControlChange(TObject *Sender)
+void __fastcall TMainForm::TabControlChange(TObject* Sender)
 {
-    if (m_ActiveShowForm)
-    {
+    if (m_ActiveShowForm) {
         m_ActiveShowForm->GetForm()->Visible = false;
         m_ActiveShowForm = NULL;
     }
@@ -150,8 +146,7 @@ void __fastcall TMainForm::TabControlChange(TObject *Sender)
 
     FillPointList();
 
-    if (PointList->Count)
-        PointList->ItemIndex = 0;
+    if (PointList->Count) PointList->ItemIndex = 0;
 
     PointListClick(NULL);
     UpdateGraph();
@@ -165,15 +160,15 @@ void TMainForm::SetMarkerPosition(float time)
 }
 
 //---------------------------------------------------------------------------
-void __fastcall TMainForm::LoadButtonClick(TObject *Sender)
+void __fastcall TMainForm::LoadButtonClick(TObject* Sender)
 {
     /*
         if (m_Animator->GetLength() != 0.0f)
-           if (Application->MessageBox ("Do you wish to save current effect ?", "Warning", MB_YESNO | MB_ICONSTOP) == IDYES)
+           if (Application->MessageBox ("Do you wish to save current effect ?", "Warning", MB_YESNO | MB_ICONSTOP) ==
+       IDYES)
               SaveButtonClick (Sender);
     */
-    if (OpenDialog->Execute())
-    {
+    if (OpenDialog->Execute()) {
         m_Marker = 0.0f;
         m_Animator->Load(OpenDialog->FileName.c_str());
         Caption = OpenDialog->FileName.c_str();
@@ -183,12 +178,10 @@ void __fastcall TMainForm::LoadButtonClick(TObject *Sender)
     }
 }
 
-void __fastcall TMainForm::SaveButtonClick(TObject *Sender)
+void __fastcall TMainForm::SaveButtonClick(TObject* Sender)
 {
-    if (m_Animator->GetLength()==0.0f)
-        return;
-    if (SaveDialog->Execute())
-    {
+    if (m_Animator->GetLength() == 0.0f) return;
+    if (SaveDialog->Execute()) {
         m_Animator->Save(SaveDialog->FileName.c_str());
         Caption = SaveDialog->FileName.c_str();
     }
@@ -196,99 +189,83 @@ void __fastcall TMainForm::SaveButtonClick(TObject *Sender)
 
 void TMainForm::UpdateGraph()
 {
-    if (!m_Animator)
-        return;
-    TCanvas *canvas = Image->Picture->Bitmap->Canvas;
+    if (!m_Animator) return;
+    TCanvas* canvas = Image->Picture->Bitmap->Canvas;
     canvas->Brush->Color = clWhite;
     canvas->FillRect(TRect(0, 0, Image->Picture->Bitmap->Width, Image->Picture->Bitmap->Height));
     canvas->Pen->Color = clBlack;
-    canvas->MoveTo(0, Image->Picture->Bitmap->Height/2);
-    canvas->LineTo(Image->Picture->Bitmap->Width, Image->Picture->Bitmap->Height/2);
+    canvas->MoveTo(0, Image->Picture->Bitmap->Height / 2);
+    canvas->LineTo(Image->Picture->Bitmap->Width, Image->Picture->Bitmap->Height / 2);
     canvas->MoveTo(0, 0);
     canvas->LineTo(Image->Picture->Bitmap->Width, 0);
-    canvas->MoveTo(0, Image->Picture->Bitmap->Height-1);
-    canvas->LineTo(Image->Picture->Bitmap->Width, Image->Picture->Bitmap->Height-1);
-    canvas->TextOutA(0, Image->Picture->Bitmap->Height/2-14, "0.0");
-    canvas->TextOutA(0, Image->Picture->Bitmap->Height-14, "-1.0");
+    canvas->MoveTo(0, Image->Picture->Bitmap->Height - 1);
+    canvas->LineTo(Image->Picture->Bitmap->Width, Image->Picture->Bitmap->Height - 1);
+    canvas->TextOutA(0, Image->Picture->Bitmap->Height / 2 - 14, "0.0");
+    canvas->TextOutA(0, Image->Picture->Bitmap->Height - 14, "-1.0");
     canvas->TextOutA(0, 2, "1.0");
-
 
     float alltime = m_Animator->GetLength();
     string128 buf;
     sprintf(buf, "Effect time : %.3f", alltime);
     StatusBar->Panels->Items[0]->Text = buf;
-    if (alltime==0.0f)
-        return;
+    if (alltime == 0.0f) return;
 
-    float width = (float)Image->Picture->Bitmap->Width, height = (float)Image->Picture->Bitmap->Height*0.5f;
-    //draw marker
-    int left = (int)(width/alltime*m_Marker);
+    float width = (float)Image->Picture->Bitmap->Width, height = (float)Image->Picture->Bitmap->Height * 0.5f;
+    // draw marker
+    int left = (int)(width / alltime * m_Marker);
     canvas->MoveTo(left, 0);
     canvas->Pen->Style = psDot;
     canvas->LineTo(left, Image->Picture->Bitmap->Height);
     canvas->Pen->Style = psSolid;
 
     SPPInfo m_EffectorParams;
-    ZeroMemory(&m_EffectorParams, sizeof (SPPInfo));
+    ZeroMemory(&m_EffectorParams, sizeof(SPPInfo));
 
-    float increment = alltime/(float)Image->Width;
+    float increment = alltime / (float)Image->Width;
 
-    for (float t = 0.0f; t<alltime; t += increment)
+    for (float t = 0.0f; t < alltime; t += increment)
     {
         m_Animator->Process(t, m_EffectorParams);
-        int x = (int)(width/alltime*t);
+        int x = (int)(width / alltime * t);
 
-        for (u32 idx = pp_base_color; idx<pp_last; ++idx)
+        for (u32 idx = pp_base_color; idx < pp_last; ++idx)
         {
-            if (!m_ActiveShowForm->DrawChannel((_pp_params)idx))
-                continue;
+            if (!m_ActiveShowForm->DrawChannel((_pp_params)idx)) continue;
 
             switch (idx)
             {
-                case pp_base_color:
-                    canvas->Pixels[x][(int)(-m_EffectorParams.color_base.r*height+height)] = clRed;
-                    canvas->Pixels[x][(int)(-m_EffectorParams.color_base.g*height+height)] = clGreen;
-                    canvas->Pixels[x][(int)(-m_EffectorParams.color_base.b*height+height)] = clBlue;
-                    break;
-                case pp_add_color:
-                    canvas->Pixels[x][(int)(-m_EffectorParams.color_add.r*height+height)] = clRed;
-                    canvas->Pixels[x][(int)(-m_EffectorParams.color_add.g*height+height)] = clGreen;
-                    canvas->Pixels[x][(int)(-m_EffectorParams.color_add.b*height+height)] = clBlue;
-                    break;
-                case pp_gray_color:
-                    canvas->Pixels[x][(int)(-m_EffectorParams.color_gray.r*height+height)] = clRed;
-                    canvas->Pixels[x][(int)(-m_EffectorParams.color_gray.g*height+height)] = clGreen;
-                    canvas->Pixels[x][(int)(-m_EffectorParams.color_gray.b*height+height)] = clBlue;
-                    break;
-                case pp_gray_value:
-                    canvas->Pixels[x][(int)(-m_EffectorParams.blur*height+height)] = clBlack;
-                    break;
-                case pp_blur:
-                    canvas->Pixels[x][(int)(-m_EffectorParams.gray*height+height)] = clBlack;
-                    break;
-                case pp_dual_h:
-                    canvas->Pixels[x][(int)(-m_EffectorParams.duality.h*height+height)] = clRed;
-                    break;
-                case pp_dual_v:
-                    canvas->Pixels[x][(int)(-m_EffectorParams.duality.v*height+height)] = clGreen;
-                    break;
-                case pp_noise_i:
-                    canvas->Pixels[x][(int)(-m_EffectorParams.noise.intensity*height+height)] = clRed;
-                    break;
-                case pp_noise_g:
-                    canvas->Pixels[x][(int)(-m_EffectorParams.noise.grain*height+height)] = clGreen;
-                    break;
-                case pp_noise_f:
-                    canvas->Pixels[x][(int)(-m_EffectorParams.noise.fps*height+height)] = clBlue;
-                    break;
-            }//switch
-        }//channel
-    }//time
+            case pp_base_color:
+                canvas->Pixels[x][(int)(-m_EffectorParams.color_base.r * height + height)] = clRed;
+                canvas->Pixels[x][(int)(-m_EffectorParams.color_base.g * height + height)] = clGreen;
+                canvas->Pixels[x][(int)(-m_EffectorParams.color_base.b * height + height)] = clBlue;
+                break;
+            case pp_add_color:
+                canvas->Pixels[x][(int)(-m_EffectorParams.color_add.r * height + height)] = clRed;
+                canvas->Pixels[x][(int)(-m_EffectorParams.color_add.g * height + height)] = clGreen;
+                canvas->Pixels[x][(int)(-m_EffectorParams.color_add.b * height + height)] = clBlue;
+                break;
+            case pp_gray_color:
+                canvas->Pixels[x][(int)(-m_EffectorParams.color_gray.r * height + height)] = clRed;
+                canvas->Pixels[x][(int)(-m_EffectorParams.color_gray.g * height + height)] = clGreen;
+                canvas->Pixels[x][(int)(-m_EffectorParams.color_gray.b * height + height)] = clBlue;
+                break;
+            case pp_gray_value: canvas->Pixels[x][(int)(-m_EffectorParams.blur * height + height)] = clBlack; break;
+            case pp_blur: canvas->Pixels[x][(int)(-m_EffectorParams.gray * height + height)] = clBlack; break;
+            case pp_dual_h: canvas->Pixels[x][(int)(-m_EffectorParams.duality.h * height + height)] = clRed; break;
+            case pp_dual_v: canvas->Pixels[x][(int)(-m_EffectorParams.duality.v * height + height)] = clGreen; break;
+            case pp_noise_i:
+                canvas->Pixels[x][(int)(-m_EffectorParams.noise.intensity * height + height)] = clRed;
+                break;
+            case pp_noise_g: canvas->Pixels[x][(int)(-m_EffectorParams.noise.grain * height + height)] = clGreen; break;
+            case pp_noise_f: canvas->Pixels[x][(int)(-m_EffectorParams.noise.fps * height + height)] = clBlue; break;
+            }  // switch
+        }      // channel
+    }          // time
 }
 
 //---------------------------------------------------------------------------
 
-void __fastcall TMainForm::PointListClick(TObject *Sender)
+void __fastcall TMainForm::PointListClick(TObject* Sender)
 {
     m_ActiveShowForm->Lock(true);
     m_ActiveShowForm->ShowCurrent(PointList->ItemIndex);
@@ -297,7 +274,7 @@ void __fastcall TMainForm::PointListClick(TObject *Sender)
 
 //---------------------------------------------------------------------------
 
-void __fastcall TMainForm::btnAddKeyClick(TObject *Sender)
+void __fastcall TMainForm::btnAddKeyClick(TObject* Sender)
 {
     int idx = PointList->ItemIndex;
     m_ActiveShowForm->Lock(true);
@@ -305,13 +282,13 @@ void __fastcall TMainForm::btnAddKeyClick(TObject *Sender)
     m_ActiveShowForm->Lock(false);
 
     TabControlChange(TabControl);
-    PointList->ItemIndex = idx+1;
+    PointList->ItemIndex = idx + 1;
     PointListClick(NULL);
 }
 
 //---------------------------------------------------------------------------
 
-void __fastcall TMainForm::btnRemoveKeyClick(TObject *Sender)
+void __fastcall TMainForm::btnRemoveKeyClick(TObject* Sender)
 {
     int idx = PointList->ItemIndex;
     m_ActiveShowForm->Lock(true);
@@ -319,15 +296,15 @@ void __fastcall TMainForm::btnRemoveKeyClick(TObject *Sender)
     m_ActiveShowForm->Lock(false);
 
     TabControlChange(TabControl);
-    if (PointList->Count>idx)
+    if (PointList->Count > idx)
         PointList->ItemIndex = idx;
     else
-        PointList->ItemIndex = idx-1;
+        PointList->ItemIndex = idx - 1;
 }
 
 //---------------------------------------------------------------------------
 
-void __fastcall TMainForm::ClearAllClick(TObject *Sender)
+void __fastcall TMainForm::ClearAllClick(TObject* Sender)
 {
     m_ActiveShowForm->Lock(true);
     m_ActiveShowForm->RemoveAllKeys();
@@ -338,7 +315,7 @@ void __fastcall TMainForm::ClearAllClick(TObject *Sender)
 
 //---------------------------------------------------------------------------
 
-void __fastcall TMainForm::copyFromClick(TObject *Sender)
+void __fastcall TMainForm::copyFromClick(TObject* Sender)
 {
     TPoint P;
     P = Mouse->CursorPos;
@@ -347,27 +324,25 @@ void __fastcall TMainForm::copyFromClick(TObject *Sender)
 
 //---------------------------------------------------------------------------
 
-void __fastcall TMainForm::PopupCopyFromChange(TObject *Sender,
-    TMenuItem *Source, bool Rebuild)
+void __fastcall TMainForm::PopupCopyFromChange(TObject* Sender, TMenuItem* Source, bool Rebuild)
 {
-    //	
+    //
 }
 
 //---------------------------------------------------------------------------
 
-
-void __fastcall TMainForm::PopupClick(TObject *Sender)
+void __fastcall TMainForm::PopupClick(TObject* Sender)
 {
     //
-    TMenuItem *itm = dynamic_cast<TMenuItem*>(Sender);
+    TMenuItem* itm = dynamic_cast<TMenuItem*>(Sender);
 
     m_ActiveShowForm->Lock(true);
     m_ActiveShowForm->RemoveAllKeys();
 
-    CPostProcessParam *cparam = MainForm->m_Animator->GetParam(m_props[itm->Tag]->GetTimeChannel());
+    CPostProcessParam* cparam = MainForm->m_Animator->GetParam(m_props[itm->Tag]->GetTimeChannel());
     u32 cnt = cparam->get_keys_count();
     string256 str;
-    for (u32 i = 0; i<cnt; ++i)
+    for (u32 i = 0; i < cnt; ++i)
     {
         float t = cparam->get_key_time(i);
         m_ActiveShowForm->CreateKey(t);
@@ -378,5 +353,3 @@ void __fastcall TMainForm::PopupClick(TObject *Sender)
 }
 
 //---------------------------------------------------------------------------
-
-

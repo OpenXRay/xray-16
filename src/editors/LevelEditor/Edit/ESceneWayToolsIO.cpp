@@ -13,11 +13,10 @@ enum
 };
 
 //----------------------------------------------------
-bool ESceneWayTool::LoadLTX(CInifile &ini)
+bool ESceneWayTool::LoadLTX(CInifile& ini)
 {
     u32 version = ini.r_u32("main", "version");
-    if (version!=WAY_TOOLS_VERSION)
-    {
+    if (version != WAY_TOOLS_VERSION) {
         ELog.DlgMsg(mtError, "%s tools: Unsupported version.", ClassDesc());
         return false;
     }
@@ -26,32 +25,30 @@ bool ESceneWayTool::LoadLTX(CInifile &ini)
     return true;
 }
 
-void ESceneWayTool::SaveLTX(CInifile &ini, int id)
+void ESceneWayTool::SaveLTX(CInifile& ini, int id)
 {
     inherited::SaveLTX(ini, id);
 
     ini.w_u32("main", "version", WAY_TOOLS_VERSION);
 }
 
-bool ESceneWayTool::LoadStream(IReader &F)
+bool ESceneWayTool::LoadStream(IReader& F)
 {
     u16 version = 0;
     if (F.r_chunk(CHUNK_VERSION, &version))
-        if (version!=WAY_TOOLS_VERSION)
-        {
+        if (version != WAY_TOOLS_VERSION) {
             ELog.DlgMsg(mtError, "%s tools: Unsupported version.", ClassDesc());
             return false;
         }
 
-    if (!inherited::LoadStream(F))
-        return false;
+    if (!inherited::LoadStream(F)) return false;
 
     return true;
 }
 
 //----------------------------------------------------
 
-void ESceneWayTool::SaveStream(IWriter &F)
+void ESceneWayTool::SaveStream(IWriter& F)
 {
     inherited::SaveStream(F);
 
@@ -60,12 +57,11 @@ void ESceneWayTool::SaveStream(IWriter &F)
 
 //----------------------------------------------------
 
-bool ESceneWayTool::LoadSelection(IReader &F)
+bool ESceneWayTool::LoadSelection(IReader& F)
 {
     u16 version = 0;
     R_ASSERT(F.r_chunk(CHUNK_VERSION, &version));
-    if (version!=WAY_TOOLS_VERSION)
-    {
+    if (version != WAY_TOOLS_VERSION) {
         ELog.DlgMsg(mtError, "%s tools: Unsupported version.", ClassDesc());
         return false;
     }
@@ -75,7 +71,7 @@ bool ESceneWayTool::LoadSelection(IReader &F)
 
 //----------------------------------------------------
 
-void ESceneWayTool::SaveSelection(IWriter &F)
+void ESceneWayTool::SaveSelection(IWriter& F)
 {
     F.w_chunk(CHUNK_VERSION, (u16*)&WAY_TOOLS_VERSION, sizeof(WAY_TOOLS_VERSION));
 
@@ -83,5 +79,3 @@ void ESceneWayTool::SaveSelection(IWriter &F)
 }
 
 //----------------------------------------------------
-
-

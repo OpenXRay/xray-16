@@ -5,20 +5,20 @@
 #ifndef ELightDefH
 #define ELightDefH
 
-#define LCONTROL_HEMI			"$hemi"				// hemisphere
-#define LCONTROL_SUN			"$sun"				// sun
-#define LCONTROL_STATIC 		"$static"			// all other static lights
+#define LCONTROL_HEMI "$hemi"      // hemisphere
+#define LCONTROL_SUN "$sun"        // sun
+#define LCONTROL_STATIC "$static"  // all other static lights
 
 namespace ELight
 {
 enum EFlags
 {
-    flAffectStatic = (1<<0),
-    flAffectDynamic = (1<<1),
-    flProcedural = (1<<2),
-    flBreaking = (1<<3),
-    flPointFuzzy = (1<<4),
-    flCastShadow = (1<<5),
+    flAffectStatic = (1 << 0),
+    flAffectDynamic = (1 << 1),
+    flProcedural = (1 << 2),
+    flBreaking = (1 << 3),
+    flPointFuzzy = (1 << 4),
+    flCastShadow = (1 << 5),
 };
 
 enum EType
@@ -32,4 +32,3 @@ enum EType
 };
 
 #endif
-

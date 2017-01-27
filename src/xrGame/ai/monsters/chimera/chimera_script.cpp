@@ -4,11 +4,5 @@
 
 using namespace luabind;
 
-SCRIPT_EXPORT(CChimera, (CGameObject),
-{
-	module(luaState)
-	[
-		class_<CChimera,CGameObject>("CChimera")
-			.def(constructor<>())
-	];
-});
+SCRIPT_EXPORT(
+    CChimera, (CGameObject), { module(luaState)[class_<CChimera, CGameObject>("CChimera").def(constructor<>())]; });

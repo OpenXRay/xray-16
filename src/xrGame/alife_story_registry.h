@@ -12,19 +12,20 @@
 
 class CSE_ALifeDynamicObject;
 
-class CALifeStoryRegistry {
+class CALifeStoryRegistry
+{
 public:
-	typedef ALife::STORY_P_MAP		STORY_REGISTRY;
+    typedef ALife::STORY_P_MAP STORY_REGISTRY;
 
 protected:
-	STORY_REGISTRY					m_objects;
+    STORY_REGISTRY m_objects;
 
 public:
-	virtual							~CALifeStoryRegistry	();
-			void					add						(ALife::_STORY_ID id, CSE_ALifeDynamicObject *object, bool no_assert = false);
-	IC		void					remove					(ALife::_STORY_ID id, bool no_assert = false);
-	IC		const STORY_REGISTRY	&objects				() const;
-	IC		CSE_ALifeDynamicObject	*object					(ALife::_STORY_ID id, bool no_assert = false) const;
+    virtual ~CALifeStoryRegistry();
+    void add(ALife::_STORY_ID id, CSE_ALifeDynamicObject* object, bool no_assert = false);
+    IC void remove(ALife::_STORY_ID id, bool no_assert = false);
+    IC const STORY_REGISTRY& objects() const;
+    IC CSE_ALifeDynamicObject* object(ALife::_STORY_ID id, bool no_assert = false) const;
 };
 
 #include "alife_story_registry_inline.h"

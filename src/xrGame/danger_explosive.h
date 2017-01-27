@@ -15,17 +15,18 @@ class CExplosive;
 class CGameObject;
 class CAI_Stalker;
 
-class CDangerExplosive {
+class CDangerExplosive
+{
 public:
-	const CExplosive	*m_grenade;
-	const CGameObject	*m_game_object;
-	CAI_Stalker			*m_reactor;
-	u32					m_time;
+    const CExplosive* m_grenade;
+    const CGameObject* m_game_object;
+    CAI_Stalker* m_reactor;
+    u32 m_time;
 
 public:
-	IC					CDangerExplosive	(const CExplosive *grenade, const CGameObject *game_object, CAI_Stalker *reactor, u32 time);
-	IC	bool			operator==			(const CExplosive *grenade) const;
-		bool			operator==			(const u16 &id) const;
+    IC CDangerExplosive(const CExplosive* grenade, const CGameObject* game_object, CAI_Stalker* reactor, u32 time);
+    IC bool operator==(const CExplosive* grenade) const;
+    bool operator==(const u16& id) const;
 };
 
 #include "danger_explosive_inline.h"

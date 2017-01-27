@@ -6,18 +6,19 @@
 
 enum
 {
-    COMMAND_EXTFIRST_EXT = COMMAND_MAIN_LAST-1,
+    COMMAND_EXTFIRST_EXT = COMMAND_MAIN_LAST - 1,
     COMMAND_UPDATE_LIST,
 };
 
 //------------------------------------------------------------------------------
-class CShaderMain: public TUI
+class CShaderMain : public TUI
 {
     typedef TUI inherited;
 
     virtual void RealUpdateScene();
     virtual void RealQuit();
-public:
+
+  public:
     CShaderMain();
     virtual ~CShaderMain();
 
@@ -31,15 +32,9 @@ public:
     virtual void OutGridSize();
     virtual void OutInfo();
 
-    virtual LPCSTR EditorName()
-    {
-        return "shader";
-    }
+    virtual LPCSTR EditorName() { return "shader"; }
 
-    virtual LPCSTR EditorDesc()
-    {
-        return "Shader Editor";
-    }
+    virtual LPCSTR EditorDesc() { return "Shader Editor"; }
 
     virtual bool ApplyShortCut(WORD Key, TShiftState Shift);
     virtual bool ApplyGlobalShortCut(WORD Key, TShiftState Shift);
@@ -48,8 +43,6 @@ public:
     virtual void RegisterCommands();
 };
 
-extern CShaderMain *&PUI;
+extern CShaderMain*& PUI;
 
-#endif //UI_MainCommandH
-
-
+#endif  // UI_MainCommandH

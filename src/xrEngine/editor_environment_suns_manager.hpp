@@ -18,17 +18,14 @@ class CLensFlareDescriptor;
 
 namespace editor
 {
-
 class property_holder;
 
 namespace environment
 {
-
 class manager;
 
 namespace suns
 {
-
 class sun;
 
 class manager : private Noncopyable
@@ -53,11 +50,7 @@ public:
     suns_ids_type const& suns_ids() const;
 
 private:
-    typedef property_collection <
-    container_type,
-    manager
-    > collection_type;
-
+    typedef property_collection<container_type, manager> collection_type;
 
 private:
     container_type m_suns;
@@ -67,12 +60,12 @@ private:
 
 public:
     environment::manager const& m_environment;
-}; // class suns_manager
+};  // class suns_manager
 
-} // namespace suns
-} // namespace environment
-} // namespace editor
+}  // namespace suns
+}  // namespace environment
+}  // namespace editor
 
-#endif // #ifdef INGAME_EDITOR
+#endif  // #ifdef INGAME_EDITOR
 
-#endif // ifndef EDITOR_WEATHER_SUNS_MANAGER_HPP_INCLUDED
+#endif  // ifndef EDITOR_WEATHER_SUNS_MANAGER_HPP_INCLUDED

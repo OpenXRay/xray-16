@@ -8,18 +8,19 @@
 
 #pragma once
 
-class CTradeBoolParameters {
+class CTradeBoolParameters
+{
 public:
-	typedef xr_vector<shared_str>	SECTIONS;
+    typedef xr_vector<shared_str> SECTIONS;
 
 private:
-	SECTIONS	m_sections;
+    SECTIONS m_sections;
 
 public:
-	IC			CTradeBoolParameters	();
-	IC	void	clear					();
-	IC	void	disable					(const shared_str &section);
-	IC	bool	disabled				(const shared_str &section) const;
+    IC CTradeBoolParameters();
+    IC void clear();
+    IC void disable(const shared_str& section);
+    IC bool disabled(const shared_str& section) const;
 };
 
 #include "trade_bool_parameters_inline.h"

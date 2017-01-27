@@ -8,28 +8,26 @@
 #include "du_box.h"
 #include "Common/LevelStructure.hpp"
 
-CLevelSoundManager *&LSndLib = (CLevelSoundManager*)SndLib;
+CLevelSoundManager*& LSndLib = (CLevelSoundManager*)SndLib;
 
 bool CLevelSoundManager::Validate()
 {
-    ObjectList &snd_envs = Scene->ListObj(OBJCLASS_SOUND_ENV);
-    for (ObjectIt it = snd_envs.begin(); it!=snd_envs.end(); it++)
+    ObjectList& snd_envs = Scene->ListObj(OBJCLASS_SOUND_ENV);
+    for (ObjectIt it = snd_envs.begin(); it != snd_envs.end(); it++)
     {
-        ESoundEnvironment *E = dynamic_cast<ESoundEnvironment*>(*it);
+        ESoundEnvironment* E = dynamic_cast<ESoundEnvironment*>(*it);
         R_ASSERT(E);
-        if (E->m_EnvInner==E->m_EnvOuter)
-        {
+        if (E->m_EnvInner == E->m_EnvOuter) {
             ELog.DlgMsg(mtError, "SoundEnvironment: '%s' inner and outer environment must be different.", E->Name);
             return false;
         }
     }
-    ObjectList &snd_src = Scene->ListObj(OBJCLASS_SOUND_SRC);
-    for (it = snd_src.begin(); it!=snd_src.end(); it++)
+    ObjectList& snd_src = Scene->ListObj(OBJCLASS_SOUND_SRC);
+    for (it = snd_src.begin(); it != snd_src.end(); it++)
     {
-        ESoundSource *S = dynamic_cast<ESoundSource*>(*it);
+        ESoundSource* S = dynamic_cast<ESoundSource*>(*it);
         R_ASSERT(S);
-        if (!S->GetSourceWAV()||(0==strlen(S->GetSourceWAV())))
-        {
+        if (!S->GetSourceWAV() || (0 == strlen(S->GetSourceWAV()))) {
             ELog.DlgMsg(mtError, "SoundSource: '%s' hasn't wave.", S->Name);
             return false;
         }
@@ -52,11 +50,11 @@ bool CLevelSoundManager::MakeEnvGeometry(CMemoryWriter& F, bool bErrMsg)
 {
     ObjectList& snd_envs = Scene->ListObj(OBJCLASS_SOUND_ENV);
 
-    if (snd_envs.empty()){ 
+    if (snd_envs.empty()){
         if (bErrMsg) ELog.Msg(mtError,"Scene hasn't sound environment geometry.");
         return false;
     }
-    
+
     RStringVec env_names;
 
     CDB::Collector CP;
@@ -85,7 +83,7 @@ bool CLevelSoundManager::MakeEnvGeometry(CMemoryWriter& F, bool bErrMsg)
 
         // append to collector
         Fmatrix M;	E->get_box	(M);
-        
+
         Fvector bv[DU_BOX_NUMVERTEX];
         for (int k=0; k<DU_BOX_NUMVERTEX; k++) M.transform_tiny(bv[k],du_box_vertices[k]);
         for (k=0; k<DU_BOX_NUMFACES; k++)
@@ -93,13 +91,13 @@ bool CLevelSoundManager::MakeEnvGeometry(CMemoryWriter& F, bool bErrMsg)
     }
 
     if (env_names.empty()) return false;
-    
+
     // write names
     F.open_chunk	(0);
     for (RStringVecIt e_it=env_names.begin(); e_it!=env_names.end(); e_it++)
         F.w_stringZ	(e_it->c_str());
     F.close_chunk	();
-    
+
     // write geom
     F.open_chunk	(1);
     // write header
@@ -120,8 +118,7 @@ bool CLevelSoundManager::MakeEnvGeometry(CMemoryWriter& F, bool bErrMsg)
 void CLevelSoundManager::OnFrame()
 {
     inherited::OnFrame();
-    if (bNeedRefreshEnvGeom)
-    {
+    if (bNeedRefreshEnvGeom) {
         bNeedRefreshEnvGeom = false;
         //                RealRefreshEnvGeometry ();
     }
@@ -134,4 +131,3 @@ void CLevelSoundManager::RefreshEnvLibrary()
         RefreshEnvGeometry ();
 }
 */
-

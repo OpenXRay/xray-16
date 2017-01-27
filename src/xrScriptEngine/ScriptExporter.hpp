@@ -11,41 +11,41 @@ public:
     class XRSCRIPTENGINE_API Node
     {
     public:
-        using ExporterFunc = void(__cdecl*)(lua_State *luaState);
+        using ExporterFunc = void(__cdecl*)(lua_State* luaState);
 
     private:
-        const char *id;
+        const char* id;
         size_t depCount;
-        const char *const *deps;
+        const char* const* deps;
         ExporterFunc exporterFunc;
         bool done;
-        Node *prevNode;
-        Node *nextNode;
-        static Node *firstNode;
-        static Node *lastNode;
+        Node* prevNode;
+        Node* nextNode;
+        static Node* firstNode;
+        static Node* lastNode;
         static size_t nodeCount;
 
     public:
-        Node(const char *id, size_t depCount, const char *const *deps, ExporterFunc exporterFunc);
+        Node(const char* id, size_t depCount, const char* const* deps, ExporterFunc exporterFunc);
 
-        void Export(lua_State *luaState);
+        void Export(lua_State* luaState);
         void Reset() { done = false; }
-        const char *GetId() const { return id; }
+        const char* GetId() const { return id; }
         size_t GetDependencyCount() const { return depCount; }
-        const char *const *GetDependencyIds() const { return deps; }
-        Node *GetPrev() const { return prevNode; }
-        Node *GetNext() const { return nextNode; }
-        static Node *GetFirst() { return firstNode; }
-        static Node *GetLast() { return lastNode; }
+        const char* const* GetDependencyIds() const { return deps; }
+        Node* GetPrev() const { return prevNode; }
+        Node* GetNext() const { return nextNode; }
+        static Node* GetFirst() { return firstNode; }
+        static Node* GetLast() { return lastNode; }
         static size_t GetCount() { return nodeCount; }
 
     private:
-        bool HasDependency(const Node *node) const;
-        static void InsertAfter(Node *target, Node *node);
+        bool HasDependency(const Node* node) const;
+        static void InsertAfter(Node* target, Node* node);
     };
 
     ScriptExporter() = delete;
-    static void Export(lua_State *luaState);
+    static void Export(lua_State* luaState);
     static void Reset();
 };
 }
@@ -66,36 +66,45 @@ public:
 #define SCRIPT_INHERIT4(_1, _2, _3, _4) #_1, #_2, #_3, #_4
 #define SCRIPT_INHERIT(...) CALL_OVERLOAD(SCRIPT_INHERIT, __VA_ARGS__)
 
-#define SCRIPT_EXPORT_WRAP(id, dependencies, ...)\
-namespace XRay\
-{\
-namespace ScriptExportDetails\
-{\
-    __pragma(warning(push))\
-    __pragma(warning(disable:4003))\
-    static const char *const id##_Deps[] = {nullptr, SCRIPT_INHERIT(NOOP dependencies)};\
-    __pragma(warning(pop))\
-    __pragma(optimize("s", on))\
-    static void id##_ScriptExport(lua_State *luaState) __VA_ARGS__\
-    static const ScriptExporter::Node id##_ScriptExporterNode(#id,\
-        sizeof(id##_Deps)/sizeof(*id##_Deps)-1, id##_Deps+1, id##_ScriptExport);\
-}\
+#define SCRIPT_EXPORT_WRAP(id, dependencies, ...)                                                                      \
+    \
+namespace XRay                                                                                                         \
+    \
+{                                                                                                               \
+        \
+namespace ScriptExportDetails                                                                                          \
+        \
+{                                                                                                           \
+            __pragma(warning(push)) __pragma(warning(disable : 4003)) static const char* const id##_Deps[] = {         \
+                nullptr, SCRIPT_INHERIT(NOOP dependencies)};                                                           \
+            __pragma(warning(pop)) __pragma(optimize("s", on)) static void id##_ScriptExport(lua_State* luaState)      \
+                __VA_ARGS__ static const ScriptExporter::Node id##_ScriptExporterNode(                                 \
+                    #id, sizeof(id##_Deps) / sizeof(*id##_Deps) - 1, id##_Deps + 1, id##_ScriptExport);                \
+        \
+}                                                                                                           \
+    \
 }
 
-#define SCRIPT_EXPORT_FUNC_WRAP(id, dependencies, func)\
-namespace XRay\
-{\
-namespace ScriptExportDetails\
-{\
-    __pragma(warning(push))\
-    __pragma(warning(disable:4003))\
-    static const char *const id##_Deps[] = {nullptr, SCRIPT_INHERIT(NOOP dependencies)};\
-    __pragma(warning(pop))\
-    __pragma(optimize("s", on))\
-    static void id##_ScriptExport(lua_State *luaState) { func(luaState); }\
-    static const ScriptExporter::Node id##_ScriptExporterNode(#id,\
-        sizeof(id##_Deps)/sizeof(*id##_Deps)-1, id##_Deps+1, id##_ScriptExport);\
-}\
+#define SCRIPT_EXPORT_FUNC_WRAP(id, dependencies, func)                                                                \
+    \
+namespace XRay                                                                                                         \
+    \
+{                                                                                                               \
+        \
+namespace ScriptExportDetails                                                                                          \
+        \
+{                                                                                                           \
+            __pragma(warning(push)) __pragma(warning(disable : 4003)) static const char* const id##_Deps[] = {         \
+                nullptr, SCRIPT_INHERIT(NOOP dependencies)};                                                           \
+            __pragma(warning(pop)) __pragma(optimize("s", on)) static void id##_ScriptExport(lua_State* luaState)      \
+            {                                                                                                          \
+                func(luaState);                                                                                        \
+            }                                                                                                          \
+            static const ScriptExporter::Node id##_ScriptExporterNode(                                                 \
+                #id, sizeof(id##_Deps) / sizeof(*id##_Deps) - 1, id##_Deps + 1, id##_ScriptExport);                    \
+        \
+}                                                                                                           \
+    \
 }
 
 // register script exporter (accepts function body)

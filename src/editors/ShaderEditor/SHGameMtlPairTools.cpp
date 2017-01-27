@@ -12,13 +12,15 @@
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
-CSHGameMtlPairTools::CSHGameMtlPairTools(ISHInit &init): ISHTools(init)
+CSHGameMtlPairTools::CSHGameMtlPairTools(ISHInit& init) : ISHTools(init)
 {
     m_MtlPair = 0;
     m_GameMtlTools = 0;
 }
 
-CSHGameMtlPairTools::~CSHGameMtlPairTools() {}
+CSHGameMtlPairTools::~CSHGameMtlPairTools()
+{
+}
 
 //---------------------------------------------------------------------------
 
@@ -64,14 +66,14 @@ void CSHGameMtlPairTools::Reload()
 void CSHGameMtlPairTools::FillItemList()
 {
     ListItemsVec items;
-    for (GameMtlIt m0_it = GMLib.FirstMaterial(); m0_it!=GMLib.LastMaterial(); m0_it++)
+    for (GameMtlIt m0_it = GMLib.FirstMaterial(); m0_it != GMLib.LastMaterial(); m0_it++)
     {
-        SGameMtl *M0 = *m0_it;
-        for (GameMtlIt m1_it = GMLib.FirstMaterial(); m1_it!=GMLib.LastMaterial(); m1_it++)
+        SGameMtl* M0 = *m0_it;
+        for (GameMtlIt m1_it = GMLib.FirstMaterial(); m1_it != GMLib.LastMaterial(); m1_it++)
         {
-            SGameMtl *M1 = *m1_it;
+            SGameMtl* M1 = *m1_it;
             GameMtlPairIt p_it = GMLib.GetMaterialPairIt(M0->GetID(), M1->GetID());
-            if (p_it!=GMLib.LastMaterialPair())
+            if (p_it != GMLib.LastMaterialPair())
                 LHelper().CreateItem(items, GMLib.MtlPairToName(M0->GetID(), M1->GetID()), 0);
         }
     }
@@ -104,8 +106,7 @@ bool CSHGameMtlPairTools::Save()
     EFS.MarkFile(fn, false);
     bool bRes = GMLib.Save();
     m_bLockUpdate = FALSE;
-    if (bRes)
-        m_bModified = FALSE;
+    if (bRes) m_bModified = FALSE;
     return bRes;
 }
 
@@ -121,15 +122,16 @@ void CSHGameMtlPairTools::RealUpdateList()
 void CSHGameMtlPairTools::RealUpdateProperties()
 {
     PropItemVec items;
-    if (m_MtlPair)
-        m_MtlPair->FillProp(items);
+    if (m_MtlPair) m_MtlPair->FillProp(items);
     Ext.m_ItemProps->AssignItems(items);
     Ext.m_ItemProps->SetModifiedEvent(fastdelegate::bind<TOnModifiedEvent>(this, &CSHGameMtlPairTools::Modified));
 }
 
 //---------------------------------------------------------------------------
 
-void CSHGameMtlPairTools::ApplyChanges(bool bForced) {}
+void CSHGameMtlPairTools::ApplyChanges(bool bForced)
+{
+}
 
 //---------------------------------------------------------------------------
 
@@ -152,16 +154,13 @@ void CSHGameMtlPairTools::OnDeactivate()
 
 void CSHGameMtlPairTools::SetCurrentItem(LPCSTR name, bool bView)
 {
-    if (m_bLockUpdate)
-        return;
-    SGameMtlPair *S = GMLib.GetMaterialPair(name);
+    if (m_bLockUpdate) return;
+    SGameMtlPair* S = GMLib.GetMaterialPair(name);
     // set material
-    if (m_MtlPair!=S)
-    {
+    if (m_MtlPair != S) {
         m_MtlPair = S;
         ExecCommand(COMMAND_UPDATE_PROPERTIES);
-        if (bView)
-            ViewSetCurrentItem(name);
+        if (bView) ViewSetCurrentItem(name);
     }
 }
 
@@ -173,5 +172,3 @@ void CSHGameMtlPairTools::ResetCurrentItem()
 }
 
 //---------------------------------------------------------------------------
-
-

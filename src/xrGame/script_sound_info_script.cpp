@@ -5,15 +5,11 @@
 
 using namespace luabind;
 
-SCRIPT_EXPORT(CScriptSoundInfo, (),
-{
-	module(luaState)
-	[
-		class_<CScriptSoundInfo>("SoundInfo")
-			.def_readwrite("who",				&CScriptSoundInfo::who)
-			.def_readwrite("danger",			&CScriptSoundInfo::dangerous)
-			.def_readwrite("position",			&CScriptSoundInfo::position)
-			.def_readwrite("power",				&CScriptSoundInfo::power)
-			.def_readwrite("time",				&CScriptSoundInfo::time)
-	];
+SCRIPT_EXPORT(CScriptSoundInfo, (), {
+    module(luaState)[class_<CScriptSoundInfo>("SoundInfo")
+                         .def_readwrite("who", &CScriptSoundInfo::who)
+                         .def_readwrite("danger", &CScriptSoundInfo::dangerous)
+                         .def_readwrite("position", &CScriptSoundInfo::position)
+                         .def_readwrite("power", &CScriptSoundInfo::power)
+                         .def_readwrite("time", &CScriptSoundInfo::time)];
 });

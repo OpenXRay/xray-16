@@ -17,43 +17,43 @@
 
 using namespace StalkerDecisionSpace;
 
-CStalkerDeathPlanner::CStalkerDeathPlanner	(CAI_Stalker *object, LPCSTR action_name) :
-	inherited								(object,action_name)
+CStalkerDeathPlanner::CStalkerDeathPlanner(CAI_Stalker* object, LPCSTR action_name) : inherited(object, action_name)
 {
 }
 
-CStalkerDeathPlanner::~CStalkerDeathPlanner	()
+CStalkerDeathPlanner::~CStalkerDeathPlanner()
 {
 }
 
-void CStalkerDeathPlanner::setup			(CAI_Stalker *object, CPropertyStorage *storage)
+void CStalkerDeathPlanner::setup(CAI_Stalker* object, CPropertyStorage* storage)
 {
-	inherited::setup		(object,storage);
+    inherited::setup(object, storage);
 
-	CScriptActionPlanner::m_storage.set_property	(eWorldPropertyDead,false);
+    CScriptActionPlanner::m_storage.set_property(eWorldPropertyDead, false);
 
-	clear					();
-	add_evaluators			();
-	add_actions				();
+    clear();
+    add_evaluators();
+    add_actions();
 }
 
-void CStalkerDeathPlanner::add_evaluators	()
+void CStalkerDeathPlanner::add_evaluators()
 {
-	add_evaluator			(eWorldPropertyPuzzleSolved		,new CStalkerPropertyEvaluatorConst				(false,"resurrecting"));
-	add_evaluator			(eWorldPropertyDead				,new CStalkerPropertyEvaluatorMember			((CPropertyStorage*)0,eWorldPropertyDead,true,true,"completely dead"));
+    add_evaluator(eWorldPropertyPuzzleSolved, new CStalkerPropertyEvaluatorConst(false, "resurrecting"));
+    add_evaluator(eWorldPropertyDead,
+        new CStalkerPropertyEvaluatorMember((CPropertyStorage*)0, eWorldPropertyDead, true, true, "completely dead"));
 }
 
-void CStalkerDeathPlanner::add_actions		()
+void CStalkerDeathPlanner::add_actions()
 {
-	CStalkerActionBase		*action;
+    CStalkerActionBase* action;
 
-	action					= new CStalkerActionDead		(m_object,"dying");
-	add_condition			(action,eWorldPropertyDead,			false);
-	add_effect				(action,eWorldPropertyDead,			true);
-	add_operator			(eWorldOperatorDying,				action);
+    action = new CStalkerActionDead(m_object, "dying");
+    add_condition(action, eWorldPropertyDead, false);
+    add_effect(action, eWorldPropertyDead, true);
+    add_operator(eWorldOperatorDying, action);
 
-	action					= new CStalkerActionBase		(m_object,"dead");
-	add_condition			(action,eWorldPropertyDead,			true);
-	add_effect				(action,eWorldPropertyPuzzleSolved,	true);
-	add_operator			(eWorldOperatorDead,				action);
+    action = new CStalkerActionBase(m_object, "dead");
+    add_condition(action, eWorldPropertyDead, true);
+    add_effect(action, eWorldPropertyPuzzleSolved, true);
+    add_operator(eWorldOperatorDead, action);
 }

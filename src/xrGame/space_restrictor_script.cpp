@@ -5,10 +5,4 @@
 using namespace luabind;
 
 SCRIPT_EXPORT(CSpaceRestrictor, (CGameObject),
-{
-	module(luaState)
-	[
-		class_<CSpaceRestrictor,CGameObject>("CSpaceRestrictor")
-			.def(constructor<>())
-	];
-});
+    { module(luaState)[class_<CSpaceRestrictor, CGameObject>("CSpaceRestrictor").def(constructor<>())]; });

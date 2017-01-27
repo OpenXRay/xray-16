@@ -38,7 +38,7 @@ enum
 //----------------------------------------------------
 
 //------------------------------------------------------------------------------
-EDetailManager::EDetailManager(): ESceneToolBase(OBJCLASS_DO)
+EDetailManager::EDetailManager() : ESceneToolBase(OBJCLASS_DO)
 {
     dtSlots = 0;
     ZeroMemory(&dtH, sizeof(dtH));
@@ -95,9 +95,9 @@ void EDetailManager::Clear(bool bSpecific)
 void EDetailManager::InvalidateCache()
 {
     // resize visible
-    m_visibles[0].resize(objects.size()); // dump(visible[0]);
-    m_visibles[1].resize(objects.size()); // dump(visible[1]);
-    m_visibles[2].resize(objects.size()); // dump(visible[2]);
+    m_visibles[0].resize(objects.size());  // dump(visible[0]);
+    m_visibles[1].resize(objects.size());  // dump(visible[1]);
+    m_visibles[2].resize(objects.size());  // dump(visible[2]);
     // Initialize 'vis' and 'cache'
     cache_Initialize();
 }
@@ -118,14 +118,10 @@ void EDetailManager::InitRender()
 
 void EDetailManager::OnRender(int priority, bool strictB2F)
 {
-    if (dtSlots)
-    {
-        if (1==priority)
-        {
-            if (false==strictB2F)
-            {
-                if (m_Flags.is(flSlotBoxesDraw))
-                {
+    if (dtSlots) {
+        if (1 == priority) {
+            if (false == strictB2F) {
+                if (m_Flags.is(flSlotBoxesDraw)) {
                     RCache.set_xform_world(Fidentity);
                     EDevice.SetShader(EDevice.m_WireShader);
 
@@ -133,21 +129,21 @@ void EDetailManager::OnRender(int priority, bool strictB2F)
                     Fbox bbox;
                     u32 inactive = 0xff808080;
                     u32 selected = 0xffffffff;
-                    float dist_lim = 75.f*75.f;
-                    for (u32 z = 0; z<dtH.size_z; z++)
+                    float dist_lim = 75.f * 75.f;
+                    for (u32 z = 0; z < dtH.size_z; z++)
                     {
                         c.z = fromSlotZ(z);
-                        for (u32 x = 0; x<dtH.size_x; x++)
+                        for (u32 x = 0; x < dtH.size_x; x++)
                         {
-                            bool bSel = m_Selected[z*dtH.size_x+x];
-                            DetailSlot *slot = dtSlots+z*dtH.size_x+x;
+                            bool bSel = m_Selected[z * dtH.size_x + x];
+                            DetailSlot* slot = dtSlots + z * dtH.size_x + x;
                             c.x = fromSlotX(x);
-                            c.y = slot->r_ybase()+slot->r_yheight()*0.5f; //(slot->y_max+slot->y_min)*0.5f;
+                            c.y = slot->r_ybase() + slot->r_yheight() * 0.5f;  //(slot->y_max+slot->y_min)*0.5f;
                             float dist = EDevice.m_Camera.GetPosition().distance_to_sqr(c);
-                            if ((dist<dist_lim)&&::Render->ViewBase.testSphere_dirty(c,DETAIL_SLOT_SIZE_2))
-                            {
-                                bbox.min.set(c.x-DETAIL_SLOT_SIZE_2, slot->r_ybase(), c.z-DETAIL_SLOT_SIZE_2);
-                                bbox.max.set(c.x+DETAIL_SLOT_SIZE_2, slot->r_ybase()+slot->r_yheight(), c.z+DETAIL_SLOT_SIZE_2);
+                            if ((dist < dist_lim) && ::Render->ViewBase.testSphere_dirty(c, DETAIL_SLOT_SIZE_2)) {
+                                bbox.min.set(c.x - DETAIL_SLOT_SIZE_2, slot->r_ybase(), c.z - DETAIL_SLOT_SIZE_2);
+                                bbox.max.set(c.x + DETAIL_SLOT_SIZE_2, slot->r_ybase() + slot->r_yheight(),
+                                    c.z + DETAIL_SLOT_SIZE_2);
                                 bbox.shrink(0.05f);
                                 DU_impl.DrawSelectionBoxB(bbox, bSel ? &selected : &inactive);
                             }
@@ -158,10 +154,8 @@ void EDetailManager::OnRender(int priority, bool strictB2F)
             else
             {
                 RCache.set_xform_world(Fidentity);
-                if (m_Flags.is(flBaseTextureDraw))
-                    m_Base.Render(m_Flags.is(flBaseTextureBlended));
-                if (m_Flags.is(flObjectsDraw))
-                    CDetailManager::Render();
+                if (m_Flags.is(flBaseTextureDraw)) m_Base.Render(m_Flags.is(flBaseTextureBlended));
+                if (m_Flags.is(flObjectsDraw)) CDetailManager::Render();
             }
         }
     }
@@ -174,7 +168,7 @@ void EDetailManager::OnDeviceCreate()
     // base texture
     m_Base.CreateShader();
     // detail objects
-    for (DetailIt it = objects.begin(); it!=objects.end(); it++)
+    for (DetailIt it = objects.begin(); it != objects.end(); it++)
         ((EDetail*)(*it))->OnDeviceCreate();
     soft_Load();
 }
@@ -184,30 +178,31 @@ void EDetailManager::OnDeviceDestroy()
     // base texture
     m_Base.DestroyShader();
     // detail objects
-    for (DetailIt it = objects.begin(); it!=objects.end(); it++)
+    for (DetailIt it = objects.begin(); it != objects.end(); it++)
         ((EDetail*)(*it))->OnDeviceDestroy();
     soft_Unload();
 }
 
-
-void EDetailManager::OnObjectRemove(CCustomObject *O, bool bDeleting)
+void EDetailManager::OnObjectRemove(CCustomObject* O, bool bDeleting)
 {
     ObjectIt it = std::find(m_SnapObjects.begin(), m_SnapObjects.end(), O);
-    if (it!=m_SnapObjects.end())
-    {
+    if (it != m_SnapObjects.end()) {
         m_RTFlags.set(flRTGenerateBaseMesh, TRUE);
         m_SnapObjects.remove(O);
     }
 }
 
-void EDetailManager::OnSynchronize() {}
+void EDetailManager::OnSynchronize()
+{
+}
 
-void EDetailManager::OnSceneUpdate() {}
+void EDetailManager::OnSceneUpdate()
+{
+}
 
 void EDetailManager::OnFrame()
 {
-    if (m_RTFlags.is(flRTGenerateBaseMesh)&&m_Base.Valid())
-    {
+    if (m_RTFlags.is(flRTGenerateBaseMesh) && m_Base.Valid()) {
         m_RTFlags.set(flRTGenerateBaseMesh, FALSE);
         m_Base.CreateRMFromObjects(m_BBox, m_SnapObjects);
     }
@@ -215,9 +210,8 @@ void EDetailManager::OnFrame()
 
 void EDetailManager::ExportColorIndices(LPCSTR fname)
 {
-    IWriter *F = FS.w_open(fname);
-    if (F)
-    {
+    IWriter* F = FS.w_open(fname);
+    if (F) {
         SaveColorIndices(*F);
         FS.w_close(F);
     }
@@ -225,9 +219,8 @@ void EDetailManager::ExportColorIndices(LPCSTR fname)
 
 bool EDetailManager::ImportColorIndices(LPCSTR fname)
 {
-    IReader *F = FS.r_open(fname);
-    if (F)
-    {
+    IReader* F = FS.r_open(fname);
+    if (F) {
         ClearColorIndices();
         LoadColorIndices(*F);
         FS.r_close(F);
@@ -240,13 +233,13 @@ bool EDetailManager::ImportColorIndices(LPCSTR fname)
     }
 }
 
-void EDetailManager::SaveColorIndices(IWriter &F)
+void EDetailManager::SaveColorIndices(IWriter& F)
 {
     // objects
     F.open_chunk(DETMGR_CHUNK_OBJECTS);
-    for (DetailIt it = objects.begin(); it!=objects.end(); it++)
+    for (DetailIt it = objects.begin(); it != objects.end(); it++)
     {
-        F.open_chunk(it-objects.begin());
+        F.open_chunk(it - objects.begin());
         ((EDetail*)(*it))->Save(F);
         F.close_chunk();
     }
@@ -257,30 +250,29 @@ void EDetailManager::SaveColorIndices(IWriter &F)
     ColorIndexPairIt S = m_ColorIndices.begin();
     ColorIndexPairIt E = m_ColorIndices.end();
     ColorIndexPairIt i_it = S;
-    for (; i_it!=E; i_it++)
+    for (; i_it != E; i_it++)
     {
         F.w_u32(i_it->first);
         F.w_u8((u8)i_it->second.size());
-        for (DOIt d_it = i_it->second.begin(); d_it!=i_it->second.end(); d_it++)
+        for (DOIt d_it = i_it->second.begin(); d_it != i_it->second.end(); d_it++)
             F.w_stringZ((*d_it)->GetName());
     }
     F.close_chunk();
 }
 
-bool EDetailManager::LoadColorIndices(IReader &F)
+bool EDetailManager::LoadColorIndices(IReader& F)
 {
     VERIFY(objects.empty());
     VERIFY(m_ColorIndices.empty());
 
     bool bRes = true;
     // objects
-    IReader *OBJ = F.open_chunk(DETMGR_CHUNK_OBJECTS);
-    if (OBJ)
-    {
-        IReader *O = OBJ->open_chunk(0);
+    IReader* OBJ = F.open_chunk(DETMGR_CHUNK_OBJECTS);
+    if (OBJ) {
+        IReader* O = OBJ->open_chunk(0);
         for (int count = 1; O; count++)
         {
-            EDetail *DO = new EDetail();
+            EDetail* DO = new EDetail();
             if (DO->Load(*O))
                 objects.push_back(DO);
             else
@@ -296,14 +288,14 @@ bool EDetailManager::LoadColorIndices(IReader &F)
     string256 buf;
     u32 index;
     int ref_cnt;
-    for (int k = 0; k<cnt; k++)
+    for (int k = 0; k < cnt; k++)
     {
         index = F.r_u32();
         ref_cnt = F.r_u8();
-        for (int j = 0; j<ref_cnt; j++)
+        for (int j = 0; j < ref_cnt; j++)
         {
             F.r_stringZ(buf, sizeof(buf));
-            EDetail *DO = FindDOByName(buf);
+            EDetail* DO = FindDOByName(buf);
             if (DO)
                 m_ColorIndices[index].push_back(DO);
             else
@@ -315,57 +307,57 @@ bool EDetailManager::LoadColorIndices(IReader &F)
     return bRes;
 }
 
-bool EDetailManager::LoadLTX(CInifile &ini)
+bool EDetailManager::LoadLTX(CInifile& ini)
 {
     R_ASSERT2(0, "not_implemented");
     return true;
 }
 
-void EDetailManager::SaveLTX(CInifile &ini, int id)
+void EDetailManager::SaveLTX(CInifile& ini, int id)
 {
     R_ASSERT2(0, "not_implemented");
     /*
         inherited::SaveLTX(ini);
-    
+
         ini.w_u32		("main", "version", DETMGR_VERSION);
-    
+
         ini.w_u32		("main", "flags", m_Flags.get());
-    
+
         // header
-    
+
         ini.w_u32		("detail_header", "version", dtH.version);
         ini.w_u32		("detail_header", "object_count", dtH.object_count);
         ini.w_ivector2	("detail_header", "offset", Ivector2().set(dtH.offs_x, dtH.offs_z) );
         ini.w_ivector2	("detail_header", "size", Ivector2().set(dtH.size_x, dtH.size_z) );
-    
+
         // objects
         SaveColorIndicesLTX(F);
-    
+
         // slots
         F.open_chunk	(DETMGR_CHUNK_SLOTS);
         F.w_u32			(dtH.size_x*dtH.size_z);
         F.w				(dtSlots,dtH.size_x*dtH.size_z*sizeof(DetailSlot));
         F.close_chunk	();
-    
+
         // internal
         // bbox
         ini.w_fvector3	("main", "bbox_min", m_BBox.min);
         ini.w_fvector3	("main", "bbox_max", m_BBox.max);
-    
+
         // base texture
         if (m_Base.Valid())
         {
             ini.w_string("main", "base_texture", m_Base.GetName());
         }
         ini.w_float		("main", "detail_density", ps_r__Detail_density);
-    
+
         // snap objects
         for (ObjectIt o_it=m_SnapObjects.begin(); o_it!=m_SnapObjects.end(); ++o_it)
             ini.w_string("snap_objects", (*o_it)->Name, NULL);
     */
 }
 
-bool EDetailManager::LoadStream(IReader &F)
+bool EDetailManager::LoadStream(IReader& F)
 {
     inherited::LoadStream(F);
 
@@ -373,14 +365,12 @@ bool EDetailManager::LoadStream(IReader &F)
     R_ASSERT(F.find_chunk(DETMGR_CHUNK_VERSION));
     u32 version = F.r_u32();
 
-    if (version!=DETMGR_VERSION)
-    {
+    if (version != DETMGR_VERSION) {
         ELog.Msg(mtError, "EDetailManager: unsupported version.");
         return false;
     }
 
-    if (F.find_chunk(DETMGR_CHUNK_FLAGS))
-        m_Flags.assign(F.r_u32());
+    if (F.find_chunk(DETMGR_CHUNK_FLAGS)) m_Flags.assign(F.r_u32());
 
     // header
     R_ASSERT(F.r_chunk(DETMGR_CHUNK_HEADER, &dtH));
@@ -388,14 +378,12 @@ bool EDetailManager::LoadStream(IReader &F)
     // slots
     R_ASSERT(F.find_chunk(DETMGR_CHUNK_SLOTS));
     int slot_cnt = F.r_u32();
-    if (slot_cnt)
-        dtSlots = xr_alloc<DetailSlot>(slot_cnt);
+    if (slot_cnt) dtSlots = xr_alloc<DetailSlot>(slot_cnt);
     m_Selected.resize(slot_cnt);
-    F.r(dtSlots, slot_cnt*sizeof(DetailSlot));
+    F.r(dtSlots, slot_cnt * sizeof(DetailSlot));
 
     // objects
-    if (!LoadColorIndices(F))
-    {
+    if (!LoadColorIndices(F)) {
         ELog.DlgMsg(mtError, "EDetailManager: Some objects removed. Reinitialize objects.", buf);
         InvalidateSlots();
     }
@@ -405,15 +393,13 @@ bool EDetailManager::LoadStream(IReader &F)
     R_ASSERT(F.r_chunk(DETMGR_CHUNK_BBOX, &m_BBox));
 
     // snap objects
-    if (F.find_chunk(DETMGR_CHUNK_SNAP_OBJECTS))
-    {
+    if (F.find_chunk(DETMGR_CHUNK_SNAP_OBJECTS)) {
         int snap_cnt = F.r_u32();
-        if (snap_cnt)
-        {
-            for (int i = 0; i<snap_cnt; i++)
+        if (snap_cnt) {
+            for (int i = 0; i < snap_cnt; i++)
             {
                 F.r_stringZ(buf, sizeof(buf));
-                CCustomObject*O = Scene->FindObjectByName(buf, OBJCLASS_SCENEOBJECT);
+                CCustomObject* O = Scene->FindObjectByName(buf, OBJCLASS_SCENEOBJECT);
                 if (!O)
                     ELog.Msg(mtError, "EDetailManager: Can't find snap object '%s'.", buf);
                 else
@@ -422,15 +408,12 @@ bool EDetailManager::LoadStream(IReader &F)
         }
     }
 
-    if (F.find_chunk(DETMGR_CHUNK_DENSITY))
-        ps_r__Detail_density = F.r_float();
+    if (F.find_chunk(DETMGR_CHUNK_DENSITY)) ps_r__Detail_density = F.r_float();
 
     // base texture
-    if (F.find_chunk(DETMGR_CHUNK_BASE_TEXTURE))
-    {
+    if (F.find_chunk(DETMGR_CHUNK_BASE_TEXTURE)) {
         F.r_stringZ(buf, sizeof(buf));
-        if (m_Base.LoadImage(buf))
-        {
+        if (m_Base.LoadImage(buf)) {
             m_Base.CreateShader();
             m_RTFlags.set(flRTGenerateBaseMesh, TRUE);
         }
@@ -447,13 +430,13 @@ bool EDetailManager::LoadStream(IReader &F)
     return true;
 }
 
-bool EDetailManager::LoadSelection(IReader &F)
+bool EDetailManager::LoadSelection(IReader& F)
 {
     Clear();
     return LoadStream(F);
 }
 
-void EDetailManager::SaveStream(IWriter &F)
+void EDetailManager::SaveStream(IWriter& F)
 {
     inherited::SaveStream(F);
 
@@ -474,15 +457,14 @@ void EDetailManager::SaveStream(IWriter &F)
 
     // slots
     F.open_chunk(DETMGR_CHUNK_SLOTS);
-    F.w_u32(dtH.size_x*dtH.size_z);
-    F.w(dtSlots, dtH.size_x*dtH.size_z*sizeof(DetailSlot));
+    F.w_u32(dtH.size_x * dtH.size_z);
+    F.w(dtSlots, dtH.size_x * dtH.size_z * sizeof(DetailSlot));
     F.close_chunk();
     // internal
     // bbox
     F.w_chunk(DETMGR_CHUNK_BBOX, &m_BBox, sizeof(Fbox));
     // base texture
-    if (m_Base.Valid())
-    {
+    if (m_Base.Valid()) {
         F.open_chunk(DETMGR_CHUNK_BASE_TEXTURE);
         F.w_stringZ(m_Base.GetName());
         F.close_chunk();
@@ -493,22 +475,22 @@ void EDetailManager::SaveStream(IWriter &F)
     // snap objects
     F.open_chunk(DETMGR_CHUNK_SNAP_OBJECTS);
     F.w_u32(m_SnapObjects.size());
-    for (ObjectIt o_it = m_SnapObjects.begin(); o_it!=m_SnapObjects.end(); o_it++)
+    for (ObjectIt o_it = m_SnapObjects.begin(); o_it != m_SnapObjects.end(); o_it++)
         F.w_stringZ((*o_it)->Name);
     F.close_chunk();
 }
 
-void EDetailManager::SaveSelection(IWriter &F)
+void EDetailManager::SaveSelection(IWriter& F)
 {
     SaveStream(F);
 }
 
 bool EDetailManager::Export(LPCSTR path)
 {
-    AnsiString fn = AnsiString(path)+"build.details";
+    AnsiString fn = AnsiString(path) + "build.details";
     bool bRes = true;
 
-    SPBItem *pb = UI->ProgressStart(5, "Making details...");
+    SPBItem* pb = UI->ProgressStart(5, "Making details...");
     CMemoryWriter F;
 
     pb->Inc("merge textures");
@@ -520,15 +502,14 @@ bool EDetailManager::Export(LPCSTR path)
     U32Vec remap;
     U8Vec remap_object(objects.size(), u8(-1));
 
-    int slot_cnt = dtH.size_x*dtH.size_z;
-    for (int slot_idx = 0; slot_idx<slot_cnt; slot_idx++)
+    int slot_cnt = dtH.size_x * dtH.size_z;
+    for (int slot_idx = 0; slot_idx < slot_cnt; slot_idx++)
     {
-        DetailSlot *it = &dtSlots[slot_idx];
-        for (int part = 0; part<4; part++)
+        DetailSlot* it = &dtSlots[slot_idx];
+        for (int part = 0; part < 4; part++)
         {
             u8 id = it->r_id(part);
-            if (id!=DetailSlot::ID_Empty)
-            {
+            if (id != DetailSlot::ID_Empty) {
                 textures_set.insert(((EDetail*)(objects[id]))->GetTextureName());
                 remap_object[id] = 1;
             }
@@ -539,45 +520,40 @@ bool EDetailManager::Export(LPCSTR path)
     U8It remap_object_it = remap_object.begin();
 
     u32 new_idx = 0;
-    for (DetailIt d_it = objects.begin(); d_it!=objects.end(); d_it++,remap_object_it++)
-        if ((*remap_object_it==1)&&(textures_set.find(((EDetail*)(*d_it))->GetTextureName())!=textures_set.end()))
+    for (DetailIt d_it = objects.begin(); d_it != objects.end(); d_it++, remap_object_it++)
+        if ((*remap_object_it == 1) && (textures_set.find(((EDetail*)(*d_it))->GetTextureName()) != textures_set.end()))
             *remap_object_it = (u8)new_idx++;
 
     AnsiString do_tex_name = ChangeFileExt(fn, "_details");
-    int res = ImageLib.CreateMergedTexture(textures, do_tex_name.c_str(), STextureParams::tfADXT1, 256, 1024, 256, 1024, offsets, scales, rotated, remap);
-    if (1!=res)
-        bRes = FALSE;
+    int res = ImageLib.CreateMergedTexture(
+        textures, do_tex_name.c_str(), STextureParams::tfADXT1, 256, 1024, 256, 1024, offsets, scales, rotated, remap);
+    if (1 != res) bRes = FALSE;
 
     pb->Inc("export geometry");
     // objects
     int object_idx = 0;
-    if (bRes)
-    {
+    if (bRes) {
         do_tex_name = ExtractFileName(do_tex_name);
         F.open_chunk(DETMGR_CHUNK_OBJECTS);
-        for (DetailIt it = objects.begin(); it!=objects.end(); it++)
+        for (DetailIt it = objects.begin(); it != objects.end(); it++)
         {
-            if (remap_object[it-objects.begin()]!=u8(-1))
-            {
+            if (remap_object[it - objects.begin()] != u8(-1)) {
                 F.open_chunk(object_idx++);
-                if (!((EDetail*)(*it))->m_pRefs)
-                {
+                if (!((EDetail*)(*it))->m_pRefs) {
                     ELog.DlgMsg(mtError, "Bad object or object not found '%s'.", ((EDetail*)(*it))->m_sRefs.c_str());
                     bRes = false;
                 }
                 else
                 {
                     LPCSTR tex_name = ((EDetail*)(*it))->GetTextureName();
-                    for (u32 t_idx = 0; t_idx<textures.size(); t_idx++)
-                        if (textures[t_idx]==tex_name)
-                            break;
-                    VERIFY(t_idx<textures.size());
+                    for (u32 t_idx = 0; t_idx < textures.size(); t_idx++)
+                        if (textures[t_idx] == tex_name) break;
+                    VERIFY(t_idx < textures.size());
                     t_idx = remap[t_idx];
                     ((EDetail*)(*it))->Export(F, do_tex_name.c_str(), offsets[t_idx], scales[t_idx], rotated[t_idx]);
                 }
                 F.close_chunk();
-                if (!bRes)
-                    break;
+                if (!bRes) break;
             }
         }
         F.close_chunk();
@@ -585,28 +561,26 @@ bool EDetailManager::Export(LPCSTR path)
 
     pb->Inc("export slots");
     // slots
-    if (bRes)
-    {
+    if (bRes) {
         xr_vector<DetailSlot> dt_slots(slot_cnt);
-        dt_slots.assign(dtSlots, dtSlots+slot_cnt);
-        for (slot_idx = 0; slot_idx<slot_cnt; slot_idx++)
+        dt_slots.assign(dtSlots, dtSlots + slot_cnt);
+        for (slot_idx = 0; slot_idx < slot_cnt; slot_idx++)
         {
-            DetailSlot &it = dt_slots[slot_idx];
+            DetailSlot& it = dt_slots[slot_idx];
             // zero colors need lighting
             it.c_dir = 0;
             it.c_hemi = 0;
             it.c_r = 0;
             it.c_g = 0;
             it.c_b = 0;
-            for (int part = 0; part<4; part++)
+            for (int part = 0; part < 4; part++)
             {
                 u8 id = it.r_id(part);
-                if (id!=DetailSlot::ID_Empty)
-                    it.w_id(part, remap_object[id]);
+                if (id != DetailSlot::ID_Empty) it.w_id(part, remap_object[id]);
             }
         }
         F.open_chunk(DETMGR_CHUNK_SLOTS);
-        F.w(dt_slots.begin(), dtH.size_x*dtH.size_z*sizeof(DetailSlot));
+        F.w(dt_slots.begin(), dtH.size_x * dtH.size_z * sizeof(DetailSlot));
         F.close_chunk();
         pb->Inc();
 
@@ -624,22 +598,21 @@ bool EDetailManager::Export(LPCSTR path)
     return bRes;
 }
 
-void EDetailManager::OnDensityChange(PropValue *prop)
+void EDetailManager::OnDensityChange(PropValue* prop)
 {
     InvalidateCache();
 }
 
-
-void EDetailManager::OnBaseTextureChange(PropValue *prop)
+void EDetailManager::OnBaseTextureChange(PropValue* prop)
 {
     m_Base.OnImageChange(prop);
     InvalidateSlots();
     ELog.DlgMsg(mtInformation, "Texture changed. Reinitialize objects.");
 }
 
-void EDetailManager::FillProp(LPCSTR pref, PropItemVec &items)
+void EDetailManager::FillProp(LPCSTR pref, PropItemVec& items)
 {
-    PropValue *P;
+    PropValue* P;
     P = PHelper().CreateFloat(items, PrepareKey(pref, "Objects per square"), &ps_r__Detail_density);
     P->OnChangeEvent.bind(this, &EDetailManager::OnDensityChange);
     P = PHelper().CreateChoose(items, PrepareKey(pref, "Base Texture"), &m_Base.name, smTexture);
@@ -650,18 +623,16 @@ void EDetailManager::FillProp(LPCSTR pref, PropItemVec &items)
     PHelper().CreateFlag32(items, PrepareKey(pref, "Common\\Draw slot boxes"), &m_Flags, flSlotBoxesDraw);
 }
 
-bool EDetailManager::GetSummaryInfo(SSceneSummary *inf)
+bool EDetailManager::GetSummaryInfo(SSceneSummary* inf)
 {
-    for (DetailIt it = objects.begin(); it!=objects.end(); it++)
+    for (DetailIt it = objects.begin(); it != objects.end(); it++)
     {
         ((EDetail*)(*it))->OnDeviceCreate();
-        CEditableObject *E = ((EDetail*)(*it))->m_pRefs;
-        if (!E)
-            continue;
-        CSurface *surf = *E->FirstSurface();
+        CEditableObject* E = ((EDetail*)(*it))->m_pRefs;
+        if (!E) continue;
+        CSurface* surf = *E->FirstSurface();
         VERIFY(surf);
         inf->AppendTexture(surf->_Texture(), SSceneSummary::sttDO, 0, 0, "$DETAILS$");
     }
     return true;
 }
-

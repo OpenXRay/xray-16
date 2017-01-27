@@ -8,153 +8,40 @@
 #include "UI_LevelMain.h"
 #include "UI_LevelTools.h"
 //---------------------------------------------------------------------------
-USEFORM (
-"BottomBar.cpp"
-,
-fraBottomBar
-); /* TFrame: File Type */
-USEFORM (
-"main.cpp"
-,
-frmMain
-);
-USEFORM (
-"TopBar.cpp"
-,
-fraTopBar
-); /* TFrame: File Type */
-USEFORM (
-"DOOneColor.cpp"
-,
-frmOneColor
-);
-USEFORM (
-"DOShuffle.cpp"
-,
-frmDOShuffle
-);
-USEFORM (
-"EditLibrary.cpp"
-,
-frmEditLibrary
-);
-USEFORM (
-"EditLightAnim.cpp"
-,
-frmEditLightAnim
-);
-USEFORM (
-"FrameAIMap.cpp"
-,
-fraAIMap
-);
-USEFORM (
-"FrameDetObj.cpp"
-,
-fraDetailObject
-);
-USEFORM (
-"FrameGroup.cpp"
-,
-fraGroup
-);
-USEFORM (
-"FrameLight.cpp"
-,
-fraLight
-);
-USEFORM (
-"FrameObject.cpp"
-,
-fraObject
-);
-USEFORM (
-"FramePortal.cpp"
-,
-fraPortal
-);
-USEFORM (
-"FramePS.cpp"
-,
-fraPS
-);
-USEFORM (
-"FrameSector.cpp"
-,
-fraSector
-);
-USEFORM (
-"FrameShape.cpp"
-,
-fraShape
-);
-USEFORM (
-"FrameSpawn.cpp"
-,
-fraSpawn
-);
-USEFORM (
-"FrameWayPoint.cpp"
-,
-fraWayPoint
-);
-USEFORM (
-"LeftBar.cpp"
-,
-fraLeftBar
-); /* TFrame: File Type */
-USEFORM (
-"ObjectList.cpp"
-,
-frmObjectList
-);
-USEFORM (
-"previewimage.cpp"
-,
-frmPreviewImage
-);
-USEFORM (
-"PropertiesEObject.cpp"
-,
-frmPropertiesEObject
-);
-USEFORM (
-"Splash.cpp"
-,
-frmSplash
-);
-USEFORM (
-"FrmDBXpacker.cpp"
-,
-DB_packer
-);
-USEFORM (
-"RightForm.cpp"
-,
-frmRight
-);
-USEFORM (
-"FrameFogVol.cpp"
-,
-fraFogVol
-);
-USEFORM (
-"Edit\AppendObjectInfoForm.cpp"
-,
-frmAppendObjectInfo
-);
-USEFORM (
-"LEClipEditor.cpp"
-,
-ClipMaker
-);
+USEFORM("BottomBar.cpp", fraBottomBar); /* TFrame: File Type */
+USEFORM("main.cpp", frmMain);
+USEFORM("TopBar.cpp", fraTopBar); /* TFrame: File Type */
+USEFORM("DOOneColor.cpp", frmOneColor);
+USEFORM("DOShuffle.cpp", frmDOShuffle);
+USEFORM("EditLibrary.cpp", frmEditLibrary);
+USEFORM("EditLightAnim.cpp", frmEditLightAnim);
+USEFORM("FrameAIMap.cpp", fraAIMap);
+USEFORM("FrameDetObj.cpp", fraDetailObject);
+USEFORM("FrameGroup.cpp", fraGroup);
+USEFORM("FrameLight.cpp", fraLight);
+USEFORM("FrameObject.cpp", fraObject);
+USEFORM("FramePortal.cpp", fraPortal);
+USEFORM("FramePS.cpp", fraPS);
+USEFORM("FrameSector.cpp", fraSector);
+USEFORM("FrameShape.cpp", fraShape);
+USEFORM("FrameSpawn.cpp", fraSpawn);
+USEFORM("FrameWayPoint.cpp", fraWayPoint);
+USEFORM("LeftBar.cpp", fraLeftBar); /* TFrame: File Type */
+USEFORM("ObjectList.cpp", frmObjectList);
+USEFORM("previewimage.cpp", frmPreviewImage);
+USEFORM("PropertiesEObject.cpp", frmPropertiesEObject);
+USEFORM("Splash.cpp", frmSplash);
+USEFORM("FrmDBXpacker.cpp", DB_packer);
+USEFORM("RightForm.cpp", frmRight);
+USEFORM("FrameFogVol.cpp", fraFogVol);
+USEFORM("Edit\AppendObjectInfoForm.cpp", frmAppendObjectInfo);
+USEFORM("LEClipEditor.cpp", ClipMaker);
 
 //---------------------------------------------------------------------------
 WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR, int)
 {
     //    try{
-    if (!Application->Handle)
-    {
+    if (!Application->Handle) {
         Application->CreateHandle();
         Application->Icon->Handle = LoadIcon(MainInstance, "MAINICON");
         Application->Title = "Loading...";
@@ -185,7 +72,6 @@ WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR, int)
 
     Application->Run();
 
-
     TfrmLog::DestroyLog();
 
     UI->ClearCommands();
@@ -203,5 +89,3 @@ WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR, int)
 }
 
 //---------------------------------------------------------------------------
-
-

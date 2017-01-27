@@ -30,7 +30,7 @@
 #endif
 #endif
 
-#if defined (c_plusplus) || defined (__cplusplus)
+#if defined(c_plusplus) || defined(__cplusplus)
 extern "C" {
 #endif
 
@@ -50,30 +50,31 @@ extern "C" {
  * The state of a stream is private and should only be accessed
  * by the procedures defined below.
  */
-typedef struct FCGX_Stream {
-    unsigned char *rdNext;    /* reader: first valid byte
+typedef struct FCGX_Stream
+{
+    unsigned char* rdNext;    /* reader: first valid byte
                                * writer: equals stop */
-    unsigned char *wrNext;    /* writer: first free byte
+    unsigned char* wrNext;    /* writer: first free byte
                                * reader: equals stop */
-    unsigned char *stop;      /* reader: last valid byte + 1
+    unsigned char* stop;      /* reader: last valid byte + 1
                                * writer: last free byte + 1 */
-    unsigned char *stopUnget; /* reader: first byte of current buffer
+    unsigned char* stopUnget; /* reader: first byte of current buffer
                                * fragment, for ungetc
                                * writer: undefined */
     int isReader;
     int isClosed;
     int wasFCloseCalled;
-    int FCGI_errno;                /* error status */
-    void (*fillBuffProc) (struct FCGX_Stream *stream);
-    void (*emptyBuffProc) (struct FCGX_Stream *stream, int doClose);
-    void *data;
+    int FCGI_errno; /* error status */
+    void (*fillBuffProc)(struct FCGX_Stream* stream);
+    void (*emptyBuffProc)(struct FCGX_Stream* stream, int doClose);
+    void* data;
 } FCGX_Stream;
 
 /*
  * An environment (as defined by environ(7)): A NULL-terminated array
  * of strings, each string having the form name=value.
  */
-typedef char **FCGX_ParamArray;
+typedef char** FCGX_ParamArray;
 
 /*
  * FCGX_Request Flags
@@ -81,34 +82,34 @@ typedef char **FCGX_ParamArray;
  * Setting FCGI_FAIL_ACCEPT_ON_INTR prevents FCGX_Accept() from
  * restarting upon being interrupted.
  */
-#define FCGI_FAIL_ACCEPT_ON_INTR	1
+#define FCGI_FAIL_ACCEPT_ON_INTR 1
 
 /*
  * FCGX_Request -- State associated with a request.
  *
  * Its exposed for API simplicity, I expect parts of it to change!
  */
-typedef struct FCGX_Request {
-    int requestId;            /* valid if isBeginProcessed */
+typedef struct FCGX_Request
+{
+    int requestId; /* valid if isBeginProcessed */
     int role;
-    FCGX_Stream *in;
-    FCGX_Stream *out;
-    FCGX_Stream *err;
-	char **envp;
+    FCGX_Stream* in;
+    FCGX_Stream* out;
+    FCGX_Stream* err;
+    char** envp;
 
-	/* Don't use anything below here */
+    /* Don't use anything below here */
 
-    struct Params *paramsPtr;
-    int ipcFd;               /* < 0 means no connection */
-    int isBeginProcessed;     /* FCGI_BEGIN_REQUEST seen */
-    int keepConnection;       /* don't close ipcFd at end of request */
+    struct Params* paramsPtr;
+    int ipcFd;            /* < 0 means no connection */
+    int isBeginProcessed; /* FCGI_BEGIN_REQUEST seen */
+    int keepConnection;   /* don't close ipcFd at end of request */
     int appStatus;
-    int nWriters;             /* number of open writers (0..2) */
-	int flags;
-	int listen_sock;
+    int nWriters; /* number of open writers (0..2) */
+    int flags;
+    int listen_sock;
 } FCGX_Request;
 
-
 /*
  *======================================================================
  * Control
@@ -157,7 +158,7 @@ DLLAPI int FCGX_Init(void);
  *
  *----------------------------------------------------------------------
  */
-DLLAPI int FCGX_OpenSocket(const char *path, int backlog);
+DLLAPI int FCGX_OpenSocket(const char* path, int backlog);
 
 /*
  *----------------------------------------------------------------------
@@ -172,7 +173,7 @@ DLLAPI int FCGX_OpenSocket(const char *path, int backlog);
  * 	Returns 0 upon success.
  *----------------------------------------------------------------------
  */
-DLLAPI int FCGX_InitRequest(FCGX_Request *request, int sock, int flags);
+DLLAPI int FCGX_InitRequest(FCGX_Request* request, int sock, int flags);
 
 /*
  *----------------------------------------------------------------------
@@ -204,7 +205,7 @@ DLLAPI int FCGX_InitRequest(FCGX_Request *request, int sock, int flags);
  *
  *----------------------------------------------------------------------
  */
-DLLAPI int FCGX_Accept_r(FCGX_Request *request);
+DLLAPI int FCGX_Accept_r(FCGX_Request* request);
 
 /*
  *----------------------------------------------------------------------
@@ -225,19 +226,19 @@ DLLAPI int FCGX_Accept_r(FCGX_Request *request);
  *
  *----------------------------------------------------------------------
  */
-DLLAPI void FCGX_Finish_r(FCGX_Request *request);
+DLLAPI void FCGX_Finish_r(FCGX_Request* request);
 
 /*
  *----------------------------------------------------------------------
  *
  * FCGX_Free --
  *
- *      Free the memory and, if close is true, 
+ *      Free the memory and, if close is true,
  *	    IPC FD associated with the request (multi-thread safe).
  *
  *----------------------------------------------------------------------
  */
-DLLAPI void FCGX_Free(FCGX_Request * request, int close);
+DLLAPI void FCGX_Free(FCGX_Request* request, int close);
 
 /*
  *----------------------------------------------------------------------
@@ -266,11 +267,7 @@ DLLAPI void FCGX_Free(FCGX_Request * request, int close);
  *
  *----------------------------------------------------------------------
  */
-DLLAPI int FCGX_Accept(
-        FCGX_Stream **in,
-        FCGX_Stream **out,
-        FCGX_Stream **err,
-        FCGX_ParamArray *envp);
+DLLAPI int FCGX_Accept(FCGX_Stream** in, FCGX_Stream** out, FCGX_Stream** err, FCGX_ParamArray* envp);
 
 /*
  *----------------------------------------------------------------------
@@ -310,7 +307,7 @@ DLLAPI void FCGX_Finish(void);
  *
  *----------------------------------------------------------------------
  */
-DLLAPI int FCGX_StartFilterData(FCGX_Stream *stream);
+DLLAPI int FCGX_StartFilterData(FCGX_Stream* stream);
 
 /*
  *----------------------------------------------------------------------
@@ -325,8 +322,8 @@ DLLAPI int FCGX_StartFilterData(FCGX_Stream *stream);
  *
  *----------------------------------------------------------------------
  */
-DLLAPI void FCGX_SetExitStatus(int status, FCGX_Stream *stream);
-
+DLLAPI void FCGX_SetExitStatus(int status, FCGX_Stream* stream);
+
 /*
  *======================================================================
  * Parameters
@@ -346,8 +343,8 @@ DLLAPI void FCGX_SetExitStatus(int status, FCGX_Stream *stream);
  *
  *----------------------------------------------------------------------
  */
-DLLAPI char *FCGX_GetParam(const char *name, FCGX_ParamArray envp);
-
+DLLAPI char* FCGX_GetParam(const char* name, FCGX_ParamArray envp);
+
 /*
  *======================================================================
  * Readers
@@ -366,7 +363,7 @@ DLLAPI char *FCGX_GetParam(const char *name, FCGX_ParamArray envp);
  *
  *----------------------------------------------------------------------
  */
-DLLAPI int FCGX_GetChar(FCGX_Stream *stream);
+DLLAPI int FCGX_GetChar(FCGX_Stream* stream);
 
 /*
  *----------------------------------------------------------------------
@@ -382,7 +379,7 @@ DLLAPI int FCGX_GetChar(FCGX_Stream *stream);
  *
  *----------------------------------------------------------------------
  */
-DLLAPI int FCGX_UnGetChar(int c, FCGX_Stream *stream);
+DLLAPI int FCGX_UnGetChar(int c, FCGX_Stream* stream);
 
 /*
  *----------------------------------------------------------------------
@@ -399,7 +396,7 @@ DLLAPI int FCGX_UnGetChar(int c, FCGX_Stream *stream);
  *
  *----------------------------------------------------------------------
  */
-DLLAPI int FCGX_GetStr(char *str, int n, FCGX_Stream *stream);
+DLLAPI int FCGX_GetStr(char* str, int n, FCGX_Stream* stream);
 
 /*
  *----------------------------------------------------------------------
@@ -418,7 +415,7 @@ DLLAPI int FCGX_GetStr(char *str, int n, FCGX_Stream *stream);
  *
  *----------------------------------------------------------------------
  */
-DLLAPI char *FCGX_GetLine(char *str, int n, FCGX_Stream *stream);
+DLLAPI char* FCGX_GetLine(char* str, int n, FCGX_Stream* stream);
 
 /*
  *----------------------------------------------------------------------
@@ -439,8 +436,8 @@ DLLAPI char *FCGX_GetLine(char *str, int n, FCGX_Stream *stream);
  *----------------------------------------------------------------------
  */
 
-DLLAPI  int FCGX_HasSeenEOF(FCGX_Stream *stream);
-
+DLLAPI int FCGX_HasSeenEOF(FCGX_Stream* stream);
+
 /*
  *======================================================================
  * Writers
@@ -459,7 +456,7 @@ DLLAPI  int FCGX_HasSeenEOF(FCGX_Stream *stream);
  *
  *----------------------------------------------------------------------
  */
-DLLAPI int FCGX_PutChar(int c, FCGX_Stream *stream);
+DLLAPI int FCGX_PutChar(int c, FCGX_Stream* stream);
 
 /*
  *----------------------------------------------------------------------
@@ -476,7 +473,7 @@ DLLAPI int FCGX_PutChar(int c, FCGX_Stream *stream);
  *
  *----------------------------------------------------------------------
  */
-DLLAPI int FCGX_PutStr(const char *str, int n, FCGX_Stream *stream);
+DLLAPI int FCGX_PutStr(const char* str, int n, FCGX_Stream* stream);
 
 /*
  *----------------------------------------------------------------------
@@ -491,7 +488,7 @@ DLLAPI int FCGX_PutStr(const char *str, int n, FCGX_Stream *stream);
  *
  *----------------------------------------------------------------------
  */
-DLLAPI int FCGX_PutS(const char *str, FCGX_Stream *stream);
+DLLAPI int FCGX_PutS(const char* str, FCGX_Stream* stream);
 
 /*
  *----------------------------------------------------------------------
@@ -507,9 +504,9 @@ DLLAPI int FCGX_PutS(const char *str, FCGX_Stream *stream);
  *
  *----------------------------------------------------------------------
  */
-DLLAPI int FCGX_FPrintF(FCGX_Stream *stream, const char *format, ...);
+DLLAPI int FCGX_FPrintF(FCGX_Stream* stream, const char* format, ...);
 
-DLLAPI int FCGX_VFPrintF(FCGX_Stream *stream, const char *format, va_list arg);
+DLLAPI int FCGX_VFPrintF(FCGX_Stream* stream, const char* format, va_list arg);
 
 /*
  *----------------------------------------------------------------------
@@ -528,8 +525,8 @@ DLLAPI int FCGX_VFPrintF(FCGX_Stream *stream, const char *format, va_list arg);
  *
  *----------------------------------------------------------------------
  */
-DLLAPI int FCGX_FFlush(FCGX_Stream *stream);
-
+DLLAPI int FCGX_FFlush(FCGX_Stream* stream);
+
 /*
  *======================================================================
  * Both Readers and Writers
@@ -554,7 +551,7 @@ DLLAPI int FCGX_FFlush(FCGX_Stream *stream);
  *
  *----------------------------------------------------------------------
  */
-DLLAPI int FCGX_FClose(FCGX_Stream *stream);
+DLLAPI int FCGX_FClose(FCGX_Stream* stream);
 
 /*
  *----------------------------------------------------------------------
@@ -566,7 +563,7 @@ DLLAPI int FCGX_FClose(FCGX_Stream *stream);
  *
  *----------------------------------------------------------------------
  */
-DLLAPI int FCGX_GetError(FCGX_Stream *stream);
+DLLAPI int FCGX_GetError(FCGX_Stream* stream);
 
 /*
  *----------------------------------------------------------------------
@@ -577,35 +574,31 @@ DLLAPI int FCGX_GetError(FCGX_Stream *stream);
  *
  *----------------------------------------------------------------------
  */
-DLLAPI void FCGX_ClearError(FCGX_Stream *stream);
+DLLAPI void FCGX_ClearError(FCGX_Stream* stream);
 
 /*
  *----------------------------------------------------------------------
  *
  * FCGX_CreateWriter --
  *
- *      Create a FCGX_Stream (used by cgi-fcgi).  This shouldn't 
+ *      Create a FCGX_Stream (used by cgi-fcgi).  This shouldn't
  *      be needed by a FastCGI applictaion.
  *
  *----------------------------------------------------------------------
  */
-DLLAPI FCGX_Stream *FCGX_CreateWriter(
-        int socket,
-        int requestId,
-        int bufflen,
-        int streamType);
+DLLAPI FCGX_Stream* FCGX_CreateWriter(int socket, int requestId, int bufflen, int streamType);
 
 /*
  *----------------------------------------------------------------------
  *
  * FCGX_FreeStream --
  *
- *      Free a FCGX_Stream (used by cgi-fcgi).  This shouldn't 
+ *      Free a FCGX_Stream (used by cgi-fcgi).  This shouldn't
  *      be needed by a FastCGI applictaion.
  *
  *----------------------------------------------------------------------
  */
-DLLAPI void FCGX_FreeStream(FCGX_Stream **stream);
+DLLAPI void FCGX_FreeStream(FCGX_Stream** stream);
 
 /* ----------------------------------------------------------------------
  *
@@ -615,8 +608,8 @@ DLLAPI void FCGX_FreeStream(FCGX_Stream **stream);
  */
 DLLAPI void FCGX_ShutdownPending(void);
 
-#if defined (__cplusplus) || defined (c_plusplus)
+#if defined(__cplusplus) || defined(c_plusplus)
 } /* terminate extern "C" { */
 #endif
 
-#endif	/* _FCGIAPP_H */
+#endif /* _FCGIAPP_H */

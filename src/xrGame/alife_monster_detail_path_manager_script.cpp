@@ -13,18 +13,19 @@
 
 using namespace luabind;
 
-SCRIPT_EXPORT(CALifeMonsterDetailPathManager, (),
-{
-	module(luaState)
-	[
-		class_<CALifeMonsterDetailPathManager>("CALifeMonsterDetailPathManager")
-			.def("target",		(void (CALifeMonsterDetailPathManager::*)(const GameGraph::_GRAPH_ID &, const u32 &, const Fvector &))(&CALifeMonsterDetailPathManager::target))
-			.def("target",		(void (CALifeMonsterDetailPathManager::*)(const GameGraph::_GRAPH_ID &))(&CALifeMonsterDetailPathManager::target))
-			.def("target",		(void (CALifeMonsterDetailPathManager::*)(const CALifeSmartTerrainTask *))(&CALifeMonsterDetailPathManager::target))
-			.def("speed",		(void (CALifeMonsterDetailPathManager::*)(const float &))(&CALifeMonsterDetailPathManager::speed))
-			.def("speed",		(const float &(CALifeMonsterDetailPathManager::*)() const)(&CALifeMonsterDetailPathManager::speed))
-			.def("completed",	&CALifeMonsterDetailPathManager::completed)
-			.def("actual",		&CALifeMonsterDetailPathManager::actual)
-			.def("failed",		&CALifeMonsterDetailPathManager::failed)
-	];
+SCRIPT_EXPORT(CALifeMonsterDetailPathManager, (), {
+    module(luaState)[class_<CALifeMonsterDetailPathManager>("CALifeMonsterDetailPathManager")
+                         .def("target", (void (CALifeMonsterDetailPathManager::*)(const GameGraph::_GRAPH_ID&,
+                                            const u32&, const Fvector&))(&CALifeMonsterDetailPathManager::target))
+                         .def("target", (void (CALifeMonsterDetailPathManager::*)(const GameGraph::_GRAPH_ID&))(
+                                            &CALifeMonsterDetailPathManager::target))
+                         .def("target", (void (CALifeMonsterDetailPathManager::*)(const CALifeSmartTerrainTask*))(
+                                            &CALifeMonsterDetailPathManager::target))
+                         .def("speed", (void (CALifeMonsterDetailPathManager::*)(const float&))(
+                                           &CALifeMonsterDetailPathManager::speed))
+                         .def("speed", (const float& (CALifeMonsterDetailPathManager::*)() const)(
+                                           &CALifeMonsterDetailPathManager::speed))
+                         .def("completed", &CALifeMonsterDetailPathManager::completed)
+                         .def("actual", &CALifeMonsterDetailPathManager::actual)
+                         .def("failed", &CALifeMonsterDetailPathManager::failed)];
 });

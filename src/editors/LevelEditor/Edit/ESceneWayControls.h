@@ -13,10 +13,10 @@ enum
 };
 
 //---------------------------------------------------------------------------
-class TUI_ControlWayPointAdd: public TUI_CustomControl
+class TUI_ControlWayPointAdd : public TUI_CustomControl
 {
-public:
-    TUI_ControlWayPointAdd(int st, int act, ESceneToolBase *parent);
+  public:
+    TUI_ControlWayPointAdd(int st, int act, ESceneToolBase* parent);
 
     virtual ~TUI_ControlWayPointAdd() {}
 
@@ -24,6 +24,4 @@ public:
     virtual void OnEnter();
 };
 
-#endif //UI_WayPointToolsH
-
-
+#endif  // UI_WayPointToolsH

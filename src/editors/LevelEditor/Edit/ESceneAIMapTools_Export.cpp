@@ -1,28 +1,28 @@
 #include "stdafx.h"
-#pragma hdrstop 
+#pragma hdrstop
 
 #include "ESceneAIMapTools_Export.h"
 #include "ESceneAIMapTools.h"
 
-void ESceneAIMapTool::UnpackPosition(Fvector &Pdest, const NodePosition &Psrc, Fbox &bb, SAIParams &params)
+void ESceneAIMapTool::UnpackPosition(Fvector& Pdest, const NodePosition& Psrc, Fbox& bb, SAIParams& params)
 {
-    Pdest.x = float(Psrc.x)*params.fPatchSize;
-    Pdest.y = (float(Psrc.y)/65535)*(bb.max.y-bb.min.y)+bb.min.y;
-    Pdest.z = float(Psrc.z)*params.fPatchSize;
+    Pdest.x = float(Psrc.x) * params.fPatchSize;
+    Pdest.y = (float(Psrc.y) / 65535) * (bb.max.y - bb.min.y) + bb.min.y;
+    Pdest.z = float(Psrc.z) * params.fPatchSize;
 }
 
-u32 ESceneAIMapTool::UnpackLink(u32 &L)
+u32 ESceneAIMapTool::UnpackLink(u32& L)
 {
-    return L&0x00ffffff;
+    return L & 0x00ffffff;
 }
 
-void ESceneAIMapTool::PackPosition(NodePosition &Dest, Fvector &Src, Fbox &bb, SAIParams &params)
+void ESceneAIMapTool::PackPosition(NodePosition& Dest, Fvector& Src, Fbox& bb, SAIParams& params)
 {
-    float sp = 1/params.fPatchSize;
+    float sp = 1 / params.fPatchSize;
     int px, py, pz;
-    px = iFloor(Src.x*sp+EPS_L);
-    py = iFloor(65535.f*(Src.y-bb.min.y)/(bb.max.y-bb.min.y)+EPS_L);
-    pz = iFloor(Src.z*sp+EPS_L);
+    px = iFloor(Src.x * sp + EPS_L);
+    py = iFloor(65535.f * (Src.y - bb.min.y) / (bb.max.y - bb.min.y) + EPS_L);
+    pz = iFloor(Src.z * sp + EPS_L);
 
     clamp(px, -32767, 32767);
     Dest.x = s16(px);
@@ -35,20 +35,18 @@ void ESceneAIMapTool::PackPosition(NodePosition &Dest, Fvector &Src, Fbox &bb, S
 bool ESceneAIMapTool::Export(LPCSTR path)
 {
     //.?	if (!RealUpdateSnapList()) return false;
-    if (!Valid())
-        return false;
+    if (!Valid()) return false;
 
     // calculate bbox
     Fbox bb;
     CalculateNodesBBox(bb);
 
-    AnsiString fn = AnsiString(path)+"build.aimap";
+    AnsiString fn = AnsiString(path) + "build.aimap";
 
     // export
-    IWriter *F = FS.w_open(fn.c_str());
+    IWriter* F = FS.w_open(fn.c_str());
 
-    if (F)
-    {
+    if (F) {
         F->open_chunk(E_AIMAP_CHUNK_VERSION);
         F->w_u16(E_AIMAP_VERSION);
         F->close_chunk();
@@ -64,7 +62,7 @@ bool ESceneAIMapTool::Export(LPCSTR path)
         EnumerateNodes();
         F->open_chunk(E_AIMAP_CHUNK_NODES);
         F->w_u32(m_Nodes.size());
-        for (AINodeIt it = m_Nodes.begin(); it!=m_Nodes.end(); it++)
+        for (AINodeIt it = m_Nodes.begin(); it != m_Nodes.end(); it++)
         {
             u32 id;
             u16 pl;
@@ -103,4 +101,3 @@ bool ESceneAIMapTool::Export(LPCSTR path)
     F.r			(&np,sizeof(np)); 	tools->UnpackPosition(Pos,np,tools->m_BBox,tools->m_Params);
     Plane.build	(Pos,Plane.n);
 */
-

@@ -29,7 +29,7 @@
 //.    if (m_Cursor->GetVisible()) RedrawScene();
 #endif
 
-CLevelMain *&LUI = (CLevelMain*)UI;
+CLevelMain*& LUI = (CLevelMain*)UI;
 
 CLevelMain::CLevelMain()
 {
@@ -44,14 +44,12 @@ CLevelMain::~CLevelMain()
     TClipMaker::DestroyForm(g_clip_maker);
 }
 
-
 //------------------------------------------------------------------------------
 // Tools commands
 //------------------------------------------------------------------------------
 CCommandVar CLevelTool::CommandChangeTarget(CCommandVar p1, CCommandVar p2)
 {
-    if (Scene->GetTool(p1)->IsEnabled())
-    {
+    if (Scene->GetTool(p1)->IsEnabled()) {
         SetTarget(p1, p2);
         ExecCommand(COMMAND_UPDATE_PROPERTIES);
         return TRUE;
@@ -64,8 +62,7 @@ CCommandVar CLevelTool::CommandChangeTarget(CCommandVar p1, CCommandVar p2)
 
 CCommandVar CLevelTool::CommandShowObjectList(CCommandVar p1, CCommandVar p2)
 {
-    if (LUI->GetEState()==esEditScene)
-        ShowObjectList();
+    if (LUI->GetEState() == esEditScene) ShowObjectList();
     return TRUE;
 }
 
@@ -74,9 +71,8 @@ CCommandVar CLevelTool::CommandShowObjectList(CCommandVar p1, CCommandVar p2)
 //------------------------------------------------------------------------------
 CCommandVar CommandLibraryEditor(CCommandVar p1, CCommandVar p2)
 {
-    if (Scene->ObjCount()||(LUI->GetEState()!=esEditScene))
-    {
-        if (LUI->GetEState()==esEditLibrary)
+    if (Scene->ObjCount() || (LUI->GetEState() != esEditScene)) {
+        if (LUI->GetEState() == esEditLibrary)
             TfrmEditLibrary::ShowEditor();
         else
             ELog.DlgMsg(mtError, "Scene must be empty before editing library!");
@@ -102,30 +98,25 @@ CCommandVar CommandFileMenu(CCommandVar p1, CCommandVar p2)
 
 CCommandVar CLevelTool::CommandEnableTarget(CCommandVar p1, CCommandVar p2)
 {
-    ESceneToolBase *M = Scene->GetTool(p1);
+    ESceneToolBase* M = Scene->GetTool(p1);
     VERIFY(M);
     BOOL res = FALSE;
-    if (p2)
-    {
+    if (p2) {
         res = ExecCommand(COMMAND_LOAD_LEVEL_PART, M->ClassID, TRUE);
-        if (res)
-            M->m_EditFlags.set(ESceneToolBase::flEnable, TRUE);
+        if (res) M->m_EditFlags.set(ESceneToolBase::flEnable, TRUE);
     }
     else
     {
-        if (!Scene->IfModified())
-        {
+        if (!Scene->IfModified()) {
             M->m_EditFlags.set(ESceneToolBase::flEnable, TRUE);
             res = FALSE;
         }
         else
         {
             res = ExecCommand(COMMAND_UNLOAD_LEVEL_PART, M->ClassID, TRUE);
-            if (res)
-                M->m_EditFlags.set(ESceneToolBase::flEnable, FALSE);
+            if (res) M->m_EditFlags.set(ESceneToolBase::flEnable, FALSE);
         }
-        if (res)
-            ExecCommand(COMMAND_CHANGE_TARGET, OBJCLASS_SCENEOBJECT);
+        if (res) ExecCommand(COMMAND_CHANGE_TARGET, OBJCLASS_SCENEOBJECT);
     }
     ExecCommand(COMMAND_REFRESH_UI_BAR);
     return res;
@@ -133,7 +124,7 @@ CCommandVar CLevelTool::CommandEnableTarget(CCommandVar p1, CCommandVar p2)
 
 CCommandVar CLevelTool::CommandShowTarget(CCommandVar p1, CCommandVar p2)
 {
-    ESceneToolBase *M = Scene->GetTool(p1);
+    ESceneToolBase* M = Scene->GetTool(p1);
     if (p2)
         M->m_EditFlags.set(ESceneToolBase::flVisible, TRUE);
     else
@@ -144,13 +135,11 @@ CCommandVar CLevelTool::CommandShowTarget(CCommandVar p1, CCommandVar p2)
 
 CCommandVar CLevelTool::CommandReadonlyTarget(CCommandVar p1, CCommandVar p2)
 {
-    ESceneToolBase *M = Scene->GetTool(p1);
+    ESceneToolBase* M = Scene->GetTool(p1);
     VERIFY(M);
     BOOL res = TRUE;
-    if (p2)
-    {
-        if (!Scene->IfModified())
-        {
+    if (p2) {
+        if (!Scene->IfModified()) {
             M->m_EditFlags.set(ESceneToolBase::flForceReadonly, FALSE);
             res = FALSE;
         }
@@ -163,8 +152,7 @@ CCommandVar CLevelTool::CommandReadonlyTarget(CCommandVar p1, CCommandVar p2)
     {
         //.        xr_string pn		= Scene->LevelPartName(LTools->m_LastFileName.c_str(), M->ClassID);
     }
-    if (res)
-    {
+    if (res) {
         Reset();
         ExecCommand(COMMAND_REFRESH_UI_BAR);
     }
@@ -173,13 +161,12 @@ CCommandVar CLevelTool::CommandReadonlyTarget(CCommandVar p1, CCommandVar p2)
 
 CCommandVar CLevelTool::CommandMultiRenameObjects(CCommandVar p1, CCommandVar p2)
 {
-    if (!Scene->locked())
-    {
-        if (mrYes==ELog.DlgMsg(mtConfirmation, TMsgDlgButtons()<<mbYes<<mbNo, "Are you sure to rename selected objects?"))
+    if (!Scene->locked()) {
+        if (mrYes ==
+            ELog.DlgMsg(mtConfirmation, TMsgDlgButtons() << mbYes << mbNo, "Are you sure to rename selected objects?"))
         {
             int cnt = Scene->MultiRenameObjects();
-            if (cnt)
-            {
+            if (cnt) {
                 ExecCommand(COMMAND_UPDATE_PROPERTIES);
                 Scene->UndoSave();
             }
@@ -196,44 +183,38 @@ CCommandVar CLevelTool::CommandMultiRenameObjects(CCommandVar p1, CCommandVar p2
 CCommandVar CommandLoadLevelPart(CCommandVar p1, CCommandVar p2)
 {
     xr_string temp_fn = LTools->m_LastFileName.c_str();
-    if (!temp_fn.empty())
-        return Scene->LoadLevelPart(temp_fn.c_str(), p1);
+    if (!temp_fn.empty()) return Scene->LoadLevelPart(temp_fn.c_str(), p1);
     return TRUE;
 }
 
 CCommandVar CommandUnloadLevelPart(CCommandVar p1, CCommandVar p2)
 {
     xr_string temp_fn = LTools->m_LastFileName.c_str();
-    if (!temp_fn.empty())
-        return Scene->UnloadLevelPart(temp_fn.c_str(), p1);
+    if (!temp_fn.empty()) return Scene->UnloadLevelPart(temp_fn.c_str(), p1);
     return TRUE;
 }
 
 CCommandVar CommandLoad(CCommandVar p1, CCommandVar p2)
 {
-    if (!Scene->locked())
-    {
-        if (!p1.IsString())
-        {
+    if (!Scene->locked()) {
+        if (!p1.IsString()) {
             xr_string temp_fn = LTools->m_LastFileName.c_str();
-            if (EFS.GetOpenName(_maps_, temp_fn))
-                return ExecCommand(COMMAND_LOAD, temp_fn);
+            if (EFS.GetOpenName(_maps_, temp_fn)) return ExecCommand(COMMAND_LOAD, temp_fn);
         }
         else
         {
             xr_string temp_fn = p1;
             xr_strlwr(temp_fn);
 
-            if (!Scene->IfModified())
-                return FALSE;
+            if (!Scene->IfModified()) return FALSE;
 
             UI->SetStatus("Level loading...");
             ExecCommand(COMMAND_CLEAR);
 
-            IReader *R = FS.r_open(temp_fn.c_str());
+            IReader* R = FS.r_open(temp_fn.c_str());
             char ch;
             R->r(&ch, sizeof(ch));
-            bool is_ltx = (ch=='[');
+            bool is_ltx = (ch == '[');
             FS.r_close(R);
             bool res;
             LTools->m_LastFileName = temp_fn.c_str();
@@ -243,8 +224,7 @@ CCommandVar CommandLoad(CCommandVar p1, CCommandVar p2)
             else
                 res = Scene->Load(temp_fn.c_str(), false);
 
-            if (res)
-            {
+            if (res) {
                 UI->ResetStatus();
                 Scene->UndoClear();
 
@@ -289,10 +269,8 @@ CCommandVar CommandSaveBackup(CCommandVar p1, CCommandVar p2)
 
 CCommandVar CommandSave(CCommandVar p1, CCommandVar p2)
 {
-    if (!Scene->locked())
-    {
-        if (p2==1)
-        {
+    if (!Scene->locked()) {
+        if (p2 == 1) {
             xr_string temp_fn = LTools->m_LastFileName.c_str();
             if (EFS.GetSaveName(_maps_, temp_fn))
                 return ExecCommand(COMMAND_SAVE, temp_fn, 66);
@@ -301,12 +279,10 @@ CCommandVar CommandSave(CCommandVar p1, CCommandVar p2)
         }
         else
         {
-            if (p1.IsInteger())
-                return ExecCommand(COMMAND_SAVE, xr_string(LTools->m_LastFileName.c_str()), 0);
+            if (p1.IsInteger()) return ExecCommand(COMMAND_SAVE, xr_string(LTools->m_LastFileName.c_str()), 0);
 
             xr_string temp_fn = xr_string(p1);
-            if (temp_fn.empty())
-            {
+            if (temp_fn.empty()) {
                 return ExecCommand(COMMAND_SAVE, temp_fn, 1);
             }
             else
@@ -315,18 +291,16 @@ CCommandVar CommandSave(CCommandVar p1, CCommandVar p2)
 
                 UI->SetStatus("Level saving...");
 
-                if (LUI->m_rt_object_props->section_exist(temp_fn.c_str()))
-                {
-                    CInifile::Sect &S = LUI->m_rt_object_props->r_section(temp_fn.c_str());
+                if (LUI->m_rt_object_props->section_exist(temp_fn.c_str())) {
+                    CInifile::Sect& S = LUI->m_rt_object_props->r_section(temp_fn.c_str());
                     S.Data.clear();
                 }
 
-                Scene->SaveLTX(temp_fn.c_str(), false, (p2==66));
+                Scene->SaveLTX(temp_fn.c_str(), false, (p2 == 66));
 
                 UI->ResetStatus();
                 // set new name
-                if (0!=xr_strcmp(Tools->m_LastFileName.c_str(), temp_fn.c_str()))
-                {
+                if (0 != xr_strcmp(Tools->m_LastFileName.c_str(), temp_fn.c_str())) {
                     Tools->m_LastFileName = temp_fn.c_str();
                 }
                 ExecCommand(COMMAND_UPDATE_CAPTION);
@@ -344,10 +318,8 @@ CCommandVar CommandSave(CCommandVar p1, CCommandVar p2)
 
 CCommandVar CommandClear(CCommandVar p1, CCommandVar p2)
 {
-    if (!Scene->locked())
-    {
-        if (!Scene->IfModified())
-            return TRUE;
+    if (!Scene->locked()) {
+        if (!Scene->IfModified()) return TRUE;
         EDevice.m_Camera.Reset();
         Scene->Reset();
         Scene->m_LevelOp.Reset();
@@ -356,7 +328,7 @@ CCommandVar CommandClear(CCommandVar p1, CCommandVar p2)
         Scene->UndoClear();
         ExecCommand(COMMAND_UPDATE_CAPTION);
         ExecCommand(COMMAND_CHANGE_TARGET, OBJCLASS_SCENEOBJECT);
-        ExecCommand(COMMAND_CHANGE_ACTION, etaSelect,estDefault);
+        ExecCommand(COMMAND_CHANGE_ACTION, etaSelect, estDefault);
         ExecCommand(COMMAND_UPDATE_PROPERTIES);
         Scene->UndoSave();
         return TRUE;
@@ -370,8 +342,7 @@ CCommandVar CommandClear(CCommandVar p1, CCommandVar p2)
 
 CCommandVar CommandLoadFirstRecent(CCommandVar p1, CCommandVar p2)
 {
-    if (EPrefs->FirstRecentFile())
-        return ExecCommand(COMMAND_LOAD, xr_string(EPrefs->FirstRecentFile()));
+    if (EPrefs->FirstRecentFile()) return ExecCommand(COMMAND_LOAD, xr_string(EPrefs->FirstRecentFile()));
     return FALSE;
 }
 
@@ -386,33 +357,28 @@ CCommandVar CommandClearDebugDraw(CCommandVar p1, CCommandVar p2)
 
 CCommandVar CommandShowClipEditor(CCommandVar p1, CCommandVar p2)
 {
-    if (g_clip_maker==NULL)
-        g_clip_maker = TClipMaker::CreateForm();
+    if (g_clip_maker == NULL) g_clip_maker = TClipMaker::CreateForm();
 
-    if (!g_clip_maker->Visible)
-    {
-        ESceneCustomOTool *st = Scene->GetOTool(OBJCLASS_SPAWNPOINT);
+    if (!g_clip_maker->Visible) {
+        ESceneCustomOTool* st = Scene->GetOTool(OBJCLASS_SPAWNPOINT);
 
-        ObjectList &ol = st->GetObjects();
+        ObjectList& ol = st->GetObjects();
         ObjectList::iterator it = ol.begin();
         ObjectList::iterator it_e = ol.end();
 
-        CCustomObject*CO = NULL;
-        for (; it!=it_e; ++it)
+        CCustomObject* CO = NULL;
+        for (; it != it_e; ++it)
         {
-            if ((*it)->Selected()==true)
-            {
+            if ((*it)->Selected() == true) {
                 CO = *it;
                 break;
             }
         }
-        if (!CO)
-            return TRUE;
+        if (!CO) return TRUE;
 
-        CSpawnPoint *sp = dynamic_cast<CSpawnPoint*>(CO);
+        CSpawnPoint* sp = dynamic_cast<CSpawnPoint*>(CO);
 
-
-        CKinematicsAnimated *KA = PKinematicsAnimated(sp->m_SpawnData.m_Visual->visual);
+        CKinematicsAnimated* KA = PKinematicsAnimated(sp->m_SpawnData.m_Visual->visual);
         R_ASSERT(KA);
         g_clip_maker->ShowEditor(KA);
     }
@@ -422,8 +388,7 @@ CCommandVar CommandShowClipEditor(CCommandVar p1, CCommandVar p2)
 CCommandVar CommandImportCompilerError(CCommandVar p1, CCommandVar p2)
 {
     xr_string fn;
-    if (EFS.GetOpenName("$logs$", fn, false, NULL, 0))
-    {
+    if (EFS.GetOpenName("$logs$", fn, false, NULL, 0)) {
         Scene->LoadCompilerError(fn.c_str());
     }
     UI->RedrawScene();
@@ -433,8 +398,7 @@ CCommandVar CommandImportCompilerError(CCommandVar p1, CCommandVar p2)
 CCommandVar CommandExportCompilerError(CCommandVar p1, CCommandVar p2)
 {
     xr_string fn;
-    if (EFS.GetSaveName("$logs$", fn, NULL, 0))
-    {
+    if (EFS.GetSaveName("$logs$", fn, NULL, 0)) {
         Scene->SaveCompilerError(fn.c_str());
     }
     return TRUE;
@@ -442,8 +406,7 @@ CCommandVar CommandExportCompilerError(CCommandVar p1, CCommandVar p2)
 
 CCommandVar CommandValidateScene(CCommandVar p1, CCommandVar p2)
 {
-    if (!Scene->locked())
-    {
+    if (!Scene->locked()) {
         Scene->Validate(true, true, true, true, true, true);
         return TRUE;
     }
@@ -456,8 +419,7 @@ CCommandVar CommandValidateScene(CCommandVar p1, CCommandVar p2)
 
 CCommandVar CommandCleanLibrary(CCommandVar p1, CCommandVar p2)
 {
-    if (!Scene->locked())
-    {
+    if (!Scene->locked()) {
         Lib.CleanLibrary();
         return TRUE;
     }
@@ -476,8 +438,7 @@ CCommandVar CommandReloadObjects(CCommandVar p1, CCommandVar p2)
 
 CCommandVar CommandCut(CCommandVar p1, CCommandVar p2)
 {
-    if (!Scene->locked())
-    {
+    if (!Scene->locked()) {
         Scene->CutSelection(LTools->CurrentClassID());
         fraLeftBar->miPaste->Enabled = true;
         fraLeftBar->miPaste2->Enabled = true;
@@ -493,8 +454,7 @@ CCommandVar CommandCut(CCommandVar p1, CCommandVar p2)
 
 CCommandVar CommandCopy(CCommandVar p1, CCommandVar p2)
 {
-    if (!Scene->locked())
-    {
+    if (!Scene->locked()) {
         Scene->CopySelection(LTools->CurrentClassID());
         fraLeftBar->miPaste->Enabled = true;
         fraLeftBar->miPaste2->Enabled = true;
@@ -509,8 +469,7 @@ CCommandVar CommandCopy(CCommandVar p1, CCommandVar p2)
 
 CCommandVar CommandPaste(CCommandVar p1, CCommandVar p2)
 {
-    if (!Scene->locked())
-    {
+    if (!Scene->locked()) {
         Scene->PasteSelection();
         Scene->UndoSave();
         return TRUE;
@@ -526,19 +485,17 @@ CCommandVar CommandPaste(CCommandVar p1, CCommandVar p2)
 
 CCommandVar CommandLoadSelection(CCommandVar p1, CCommandVar p2)
 {
-    if (!Scene->locked())
-    {
+    if (!Scene->locked()) {
         xr_string fn = LTools->m_LastSelectionName;
-        if (EFS.GetOpenName(_maps_, fn))
-        {
+        if (EFS.GetOpenName(_maps_, fn)) {
             LPCSTR maps_path = FS.get_path(_maps_)->m_Path;
-            if (fn.c_str()==strstr(fn.c_str(), maps_path))
-                LTools->m_LastSelectionName = fn.c_str()+xr_strlen(maps_path);
+            if (fn.c_str() == strstr(fn.c_str(), maps_path))
+                LTools->m_LastSelectionName = fn.c_str() + xr_strlen(maps_path);
             UI->SetStatus("Fragment loading...");
 
             g_frmConflictLoadObject->m_result = 0;
             Scene->LoadSelection(fn.c_str());
-            g_frmConflictLoadObject->m_result = 4; //auto-rename
+            g_frmConflictLoadObject->m_result = 4;  // auto-rename
 
             UI->ResetStatus();
             Scene->UndoSave();
@@ -557,14 +514,12 @@ CCommandVar CommandLoadSelection(CCommandVar p1, CCommandVar p2)
 
 CCommandVar CommandSaveSelection(CCommandVar p1, CCommandVar p2)
 {
-    if (!Scene->locked())
-    {
+    if (!Scene->locked()) {
         xr_string fn = LTools->m_LastSelectionName;
-        if (EFS.GetSaveName(_maps_, fn))
-        {
+        if (EFS.GetSaveName(_maps_, fn)) {
             LPCSTR maps_path = FS.get_path(_maps_)->m_Path;
-            if (fn.c_str()==strstr(fn.c_str(), maps_path))
-                LTools->m_LastSelectionName = fn.c_str()+xr_strlen(maps_path);
+            if (fn.c_str() == strstr(fn.c_str(), maps_path))
+                LTools->m_LastSelectionName = fn.c_str() + xr_strlen(maps_path);
             UI->SetStatus("Fragment saving...");
             Scene->SaveSelection(LTools->CurrentClassID(), fn.c_str());
             UI->ResetStatus();
@@ -580,8 +535,7 @@ CCommandVar CommandSaveSelection(CCommandVar p1, CCommandVar p2)
 
 CCommandVar CommandUndo(CCommandVar p1, CCommandVar p2)
 {
-    if (!Scene->locked())
-    {
+    if (!Scene->locked()) {
         if (!Scene->Undo())
             ELog.DlgMsg(mtInformation, "Undo buffer empty");
         else
@@ -600,8 +554,7 @@ CCommandVar CommandUndo(CCommandVar p1, CCommandVar p2)
 
 CCommandVar CommandRedo(CCommandVar p1, CCommandVar p2)
 {
-    if (!Scene->locked())
-    {
+    if (!Scene->locked()) {
         if (!Scene->Redo())
             ELog.DlgMsg(mtInformation, "Redo buffer empty");
         else
@@ -620,8 +573,7 @@ CCommandVar CommandRedo(CCommandVar p1, CCommandVar p2)
 
 CCommandVar CommandClearSceneSummary(CCommandVar p1, CCommandVar p2)
 {
-    if (!Scene->locked())
-    {
+    if (!Scene->locked()) {
         Scene->ClearSummaryInfo();
         return TRUE;
     }
@@ -634,8 +586,7 @@ CCommandVar CommandClearSceneSummary(CCommandVar p1, CCommandVar p2)
 
 CCommandVar CommandCollectSceneSummary(CCommandVar p1, CCommandVar p2)
 {
-    if (!Scene->locked())
-    {
+    if (!Scene->locked()) {
         Scene->CollectSummaryInfo();
         return TRUE;
     }
@@ -648,8 +599,7 @@ CCommandVar CommandCollectSceneSummary(CCommandVar p1, CCommandVar p2)
 
 CCommandVar CommandShowSceneSummary(CCommandVar p1, CCommandVar p2)
 {
-    if (!Scene->locked())
-    {
+    if (!Scene->locked()) {
         Scene->ShowSummaryInfo();
         return TRUE;
     }
@@ -662,8 +612,7 @@ CCommandVar CommandShowSceneSummary(CCommandVar p1, CCommandVar p2)
 
 CCommandVar CommandExportSceneSummary(CCommandVar p1, CCommandVar p2)
 {
-    if (!Scene->locked())
-    {
+    if (!Scene->locked()) {
         Scene->ExportSummaryInfo(xr_string(p1).c_str());
         return TRUE;
     }
@@ -676,11 +625,9 @@ CCommandVar CommandExportSceneSummary(CCommandVar p1, CCommandVar p2)
 
 CCommandVar CommandSceneHighlightTexture(CCommandVar p1, CCommandVar p2)
 {
-    if (!Scene->locked())
-    {
+    if (!Scene->locked()) {
         LPCSTR new_val = 0;
-        if (TfrmChoseItem::SelectItem(smTexture, new_val, 1))
-        {
+        if (TfrmChoseItem::SelectItem(smTexture, new_val, 1)) {
             Scene->HighlightTexture(new_val, false, 0, 0, false);
             return TRUE;
         }
@@ -694,8 +641,7 @@ CCommandVar CommandSceneHighlightTexture(CCommandVar p1, CCommandVar p2)
 
 CCommandVar CommandOptions(CCommandVar p1, CCommandVar p2)
 {
-    if (!Scene->locked())
-    {
+    if (!Scene->locked()) {
         ExecCommand(COMMAND_SHOW_PROPERTIES, p1, p2);
         return TRUE;
     }
@@ -708,9 +654,8 @@ CCommandVar CommandOptions(CCommandVar p1, CCommandVar p2)
 
 CCommandVar CommandBuild(CCommandVar p1, CCommandVar p2)
 {
-    if (!Scene->locked())
-    {
-        if (mrYes==ELog.DlgMsg(mtConfirmation, TMsgDlgButtons()<<mbYes<<mbNo, "Are you sure to build level?"))
+    if (!Scene->locked()) {
+        if (mrYes == ELog.DlgMsg(mtConfirmation, TMsgDlgButtons() << mbYes << mbNo, "Are you sure to build level?"))
             return Builder.Compile(false);
     }
     else
@@ -722,9 +667,8 @@ CCommandVar CommandBuild(CCommandVar p1, CCommandVar p2)
 
 CCommandVar CommandMakeAIMap(CCommandVar p1, CCommandVar p2)
 {
-    if (!Scene->locked())
-    {
-        if (mrYes==ELog.DlgMsg(mtConfirmation, TMsgDlgButtons()<<mbYes<<mbNo, "Are you sure to export ai-map?"))
+    if (!Scene->locked()) {
+        if (mrYes == ELog.DlgMsg(mtConfirmation, TMsgDlgButtons() << mbYes << mbNo, "Are you sure to export ai-map?"))
             return Builder.MakeAIMap();
     }
     else
@@ -736,9 +680,8 @@ CCommandVar CommandMakeAIMap(CCommandVar p1, CCommandVar p2)
 
 CCommandVar CommandMakeGame(CCommandVar p1, CCommandVar p2)
 {
-    if (!Scene->locked())
-    {
-        if (mrYes==ELog.DlgMsg(mtConfirmation, TMsgDlgButtons()<<mbYes<<mbNo, "Are you sure to export game?"))
+    if (!Scene->locked()) {
+        if (mrYes == ELog.DlgMsg(mtConfirmation, TMsgDlgButtons() << mbYes << mbNo, "Are you sure to export game?"))
             return Builder.MakeGame();
     }
     else
@@ -750,9 +693,8 @@ CCommandVar CommandMakeGame(CCommandVar p1, CCommandVar p2)
 
 CCommandVar CommandMakeDetails(CCommandVar p1, CCommandVar p2)
 {
-    if (!Scene->locked())
-    {
-        if (mrYes==ELog.DlgMsg(mtConfirmation, TMsgDlgButtons()<<mbYes<<mbNo, "Are you sure to export details?"))
+    if (!Scene->locked()) {
+        if (mrYes == ELog.DlgMsg(mtConfirmation, TMsgDlgButtons() << mbYes << mbNo, "Are you sure to export details?"))
             return Builder.MakeDetails();
     }
     else
@@ -764,9 +706,8 @@ CCommandVar CommandMakeDetails(CCommandVar p1, CCommandVar p2)
 
 CCommandVar CommandMakeHOM(CCommandVar p1, CCommandVar p2)
 {
-    if (!Scene->locked())
-    {
-        if (mrYes==ELog.DlgMsg(mtConfirmation, TMsgDlgButtons()<<mbYes<<mbNo, "Are you sure to export HOM?"))
+    if (!Scene->locked()) {
+        if (mrYes == ELog.DlgMsg(mtConfirmation, TMsgDlgButtons() << mbYes << mbNo, "Are you sure to export HOM?"))
             return Builder.MakeHOM();
     }
     else
@@ -778,9 +719,10 @@ CCommandVar CommandMakeHOM(CCommandVar p1, CCommandVar p2)
 
 CCommandVar CommandMakeSOM(CCommandVar p1, CCommandVar p2)
 {
-    if (!Scene->locked())
-    {
-        if (mrYes==ELog.DlgMsg(mtConfirmation, TMsgDlgButtons()<<mbYes<<mbNo, "Are you sure to export Sound Occlusion Model?"))
+    if (!Scene->locked()) {
+        if (mrYes ==
+            ELog.DlgMsg(
+                mtConfirmation, TMsgDlgButtons() << mbYes << mbNo, "Are you sure to export Sound Occlusion Model?"))
             return Builder.MakeSOM();
     }
     else
@@ -792,8 +734,7 @@ CCommandVar CommandMakeSOM(CCommandVar p1, CCommandVar p2)
 
 CCommandVar CommandInvertSelectionAll(CCommandVar p1, CCommandVar p2)
 {
-    if (!Scene->locked())
-    {
+    if (!Scene->locked()) {
         Scene->InvertSelection(LTools->CurrentClassID());
         return TRUE;
     }
@@ -806,8 +747,7 @@ CCommandVar CommandInvertSelectionAll(CCommandVar p1, CCommandVar p2)
 
 CCommandVar CommandSelectAll(CCommandVar p1, CCommandVar p2)
 {
-    if (!Scene->locked())
-    {
+    if (!Scene->locked()) {
         Scene->SelectObjects(true, LTools->CurrentClassID());
         return TRUE;
     }
@@ -820,8 +760,7 @@ CCommandVar CommandSelectAll(CCommandVar p1, CCommandVar p2)
 
 CCommandVar CommandDeselectAll(CCommandVar p1, CCommandVar p2)
 {
-    if (!Scene->locked())
-    {
+    if (!Scene->locked()) {
         Scene->SelectObjects(false, LTools->CurrentClassID());
         return TRUE;
     }
@@ -834,8 +773,7 @@ CCommandVar CommandDeselectAll(CCommandVar p1, CCommandVar p2)
 
 CCommandVar CommandDeleteSelection(CCommandVar p1, CCommandVar p2)
 {
-    if (!Scene->locked())
-    {
+    if (!Scene->locked()) {
         Scene->RemoveSelection(LTools->CurrentClassID());
         Scene->UndoSave();
         return TRUE;
@@ -849,8 +787,7 @@ CCommandVar CommandDeleteSelection(CCommandVar p1, CCommandVar p2)
 
 CCommandVar CommandHideUnsel(CCommandVar p1, CCommandVar p2)
 {
-    if (!Scene->locked())
-    {
+    if (!Scene->locked()) {
         Scene->ShowObjects(false, LTools->CurrentClassID(), true, false);
         Scene->UndoSave();
         ExecCommand(COMMAND_UPDATE_PROPERTIES);
@@ -865,8 +802,7 @@ CCommandVar CommandHideUnsel(CCommandVar p1, CCommandVar p2)
 
 CCommandVar CommandHideSel(CCommandVar p1, CCommandVar p2)
 {
-    if (!Scene->locked())
-    {
+    if (!Scene->locked()) {
         Scene->ShowObjects(bool(p1), LTools->CurrentClassID(), true, true);
         Scene->UndoSave();
         ExecCommand(COMMAND_UPDATE_PROPERTIES);
@@ -881,8 +817,7 @@ CCommandVar CommandHideSel(CCommandVar p1, CCommandVar p2)
 
 CCommandVar CommandHideAll(CCommandVar p1, CCommandVar p2)
 {
-    if (!Scene->locked())
-    {
+    if (!Scene->locked()) {
         Scene->ShowObjects(bool(p1), LTools->CurrentClassID(), false);
         Scene->UndoSave();
         ExecCommand(COMMAND_UPDATE_PROPERTIES);
@@ -897,8 +832,7 @@ CCommandVar CommandHideAll(CCommandVar p1, CCommandVar p2)
 
 CCommandVar CommandSetSnapObjects(CCommandVar p1, CCommandVar p2)
 {
-    if (!Scene->locked())
-    {
+    if (!Scene->locked()) {
         Scene->SetSnapList();
         return TRUE;
     }
@@ -911,8 +845,7 @@ CCommandVar CommandSetSnapObjects(CCommandVar p1, CCommandVar p2)
 
 CCommandVar CommandAddSelSnapObjects(CCommandVar p1, CCommandVar p2)
 {
-    if (!Scene->locked())
-    {
+    if (!Scene->locked()) {
         Scene->AddSelToSnapList();
         return TRUE;
     }
@@ -925,8 +858,7 @@ CCommandVar CommandAddSelSnapObjects(CCommandVar p1, CCommandVar p2)
 
 CCommandVar CommandDelSelSnapObjects(CCommandVar p1, CCommandVar p2)
 {
-    if (!Scene->locked())
-    {
+    if (!Scene->locked()) {
         Scene->DelSelFromSnapList();
         return TRUE;
     }
@@ -939,8 +871,7 @@ CCommandVar CommandDelSelSnapObjects(CCommandVar p1, CCommandVar p2)
 
 CCommandVar CommandClearSnapObjects(CCommandVar p1, CCommandVar p2)
 {
-    if (!Scene->locked())
-    {
+    if (!Scene->locked()) {
         Scene->ClearSnapList(true);
         return TRUE;
     }
@@ -953,8 +884,7 @@ CCommandVar CommandClearSnapObjects(CCommandVar p1, CCommandVar p2)
 
 CCommandVar CommandSelectSnapObjects(CCommandVar p1, CCommandVar p2)
 {
-    if (!Scene->locked())
-    {
+    if (!Scene->locked()) {
         Scene->SelectSnapList();
         return TRUE;
     }
@@ -992,7 +922,7 @@ CCommandVar CommandShowContextMenu(CCommandVar p1, CCommandVar p2)
     return TRUE;
 }
 
-//------        
+//------
 CCommandVar CommandRefreshUIBar(CCommandVar p1, CCommandVar p2)
 {
     fraTopBar->RefreshBar();
@@ -1072,7 +1002,8 @@ void CLevelMain::RegisterCommands()
     REGISTER_CMD_C(COMMAND_READONLY_TARGET, LTools, CLevelTool::CommandReadonlyTarget);
     REGISTER_CMD_C(COMMAND_MULTI_RENAME_OBJECTS, LTools, CLevelTool::CommandMultiRenameObjects);
 
-    REGISTER_CMD_CE(COMMAND_SHOW_OBJECTLIST, "Scene\\Show Object List", LTools, CLevelTool::CommandShowObjectList, false);
+    REGISTER_CMD_CE(
+        COMMAND_SHOW_OBJECTLIST, "Scene\\Show Object List", LTools, CLevelTool::CommandShowObjectList, false);
     // common
     REGISTER_CMD_S(COMMAND_LIBRARY_EDITOR, CommandLibraryEditor);
     REGISTER_CMD_S(COMMAND_LANIM_EDITOR, CommandLAnimEditor);
@@ -1138,7 +1069,7 @@ void CLevelMain::RegisterCommands()
     REGISTER_CMD_S(COMMAND_SHOW_CLIP_EDITOR, CommandShowClipEditor);
 }
 
-char *CLevelMain::GetCaption()
+char* CLevelMain::GetCaption()
 {
     return Tools->m_LastFileName.IsEmpty() ? "noname" : Tools->m_LastFileName.c_str();
 }
@@ -1156,32 +1087,29 @@ bool __fastcall CLevelMain::ApplyGlobalShortCut(WORD Key, TShiftState Shift)
 }
 
 //---------------------------------------------------------------------------
-void RetrieveSceneObjPointAndNormal(Fvector &hitpoint, Fvector *hitnormal, const SRayPickInfo &pinf, int bSnap)
+void RetrieveSceneObjPointAndNormal(Fvector& hitpoint, Fvector* hitnormal, const SRayPickInfo& pinf, int bSnap)
 {
-    if (pinf.e_mesh==0)
-    {
+    if (pinf.e_mesh == 0) {
         hitpoint = pinf.pt;
-        if (hitnormal&&pinf.visual_inf.K)
-            *hitnormal = pinf.visual_inf.normal;
+        if (hitnormal && pinf.visual_inf.K) *hitnormal = pinf.visual_inf.normal;
         return;
     }
-    if (Tools->GetSettings(etfVSnap)&&bSnap)
-    {
+    if (Tools->GetSettings(etfVSnap) && bSnap) {
         Fvector pn;
         float u = pinf.inf.u;
         float v = pinf.inf.v;
-        float w = 1-(u+v);
+        float w = 1 - (u + v);
         Fvector verts[3];
         pinf.e_obj->GetFaceWorld(pinf.s_obj->_Transform(), pinf.e_mesh, pinf.inf.id, verts);
 
-        if ((w>u)&&(w>v))
+        if ((w > u) && (w > v))
             pn.set(verts[0]);
-        else if ((u>w)&&(u>v))
+        else if ((u > w) && (u > v))
             pn.set(verts[1]);
         else
             pn.set(verts[2]);
 
-        if (pn.distance_to(pinf.pt)<LTools->m_MoveSnap)
+        if (pn.distance_to(pinf.pt) < LTools->m_MoveSnap)
             hitpoint.set(pn);
         else
             hitpoint.set(pinf.pt);
@@ -1191,121 +1119,107 @@ void RetrieveSceneObjPointAndNormal(Fvector &hitpoint, Fvector *hitnormal, const
         hitpoint.set(pinf.pt);
     }
 
-    if (hitnormal)
-    {
+    if (hitnormal) {
         Fvector verts[3];
         pinf.e_obj->GetFaceWorld(pinf.s_obj->_Transform(), pinf.e_mesh, pinf.inf.id, verts);
         hitnormal->mknormal(verts[0], verts[1], verts[2]);
     }
 }
 
-
-bool EditLibPickObjectGeometry(Fvector &hitpoint, const Fvector &start, const Fvector &direction, int bSnap, Fvector *hitnormal)
+bool EditLibPickObjectGeometry(
+    Fvector& hitpoint, const Fvector& start, const Fvector& direction, int bSnap, Fvector* hitnormal)
 {
     SRayPickInfo pinf;
-    if (TfrmEditLibrary::RayPick(start, direction, &pinf))
-    {
+    if (TfrmEditLibrary::RayPick(start, direction, &pinf)) {
         RetrieveSceneObjPointAndNormal(hitpoint, hitnormal, pinf, bSnap);
         return true;
     }
     return false;
 }
 
-bool ScenePickObjectGeometry(Fvector &hitpoint, const Fvector &start, const Fvector &direction, int bSnap, Fvector *hitnormal)
+bool ScenePickObjectGeometry(
+    Fvector& hitpoint, const Fvector& start, const Fvector& direction, int bSnap, Fvector* hitnormal)
 {
     SRayPickInfo pinf;
-
 
     SRayPickInfo l_pinf;
     bool bResult = false;
 
     {
         SRayPickInfo l_pinf;
-        bool l_bres = Scene->RayPickObject(l_pinf.inf.range, start, direction, OBJCLASS_SPAWNPOINT, &l_pinf, Scene->GetSnapList(false));
+        bool l_bres = Scene->RayPickObject(
+            l_pinf.inf.range, start, direction, OBJCLASS_SPAWNPOINT, &l_pinf, Scene->GetSnapList(false));
 
-        if (l_bres)
-        {
+        if (l_bres) {
             pinf = l_pinf;
             bResult = true;
         }
     }
     {
         SRayPickInfo l_pinf;
-        bool l_bres = Scene->RayPickObject(l_pinf.inf.range, start, direction, OBJCLASS_SCENEOBJECT, &l_pinf, Scene->GetSnapList(false));
+        bool l_bres = Scene->RayPickObject(
+            l_pinf.inf.range, start, direction, OBJCLASS_SCENEOBJECT, &l_pinf, Scene->GetSnapList(false));
 
-        if (!bResult||(l_bres&&l_pinf.inf.range<pinf.inf.range))
-            pinf = l_pinf;
-        if (l_bres)
-            bResult = true;
+        if (!bResult || (l_bres && l_pinf.inf.range < pinf.inf.range)) pinf = l_pinf;
+        if (l_bres) bResult = true;
     }
 
-
-    if (bResult)
-        RetrieveSceneObjPointAndNormal(hitpoint, hitnormal, pinf, bSnap);
+    if (bResult) RetrieveSceneObjPointAndNormal(hitpoint, hitnormal, pinf, bSnap);
 
     return bResult;
 }
 
-
-bool PickObjectGeometry(EEditorState est, Fvector &hitpoint, const Fvector &start, const Fvector &direction, int bSnap, Fvector *hitnormal)
+bool PickObjectGeometry(
+    EEditorState est, Fvector& hitpoint, const Fvector& start, const Fvector& direction, int bSnap, Fvector* hitnormal)
 {
     switch (est)
     {
-        case esEditLibrary:
-            return EditLibPickObjectGeometry(hitpoint, start, direction, bSnap, hitnormal);
-        case esEditScene:
-            return ScenePickObjectGeometry(hitpoint, start, direction, bSnap, hitnormal);
-        default:
-            NODEFAULT;
+    case esEditLibrary: return EditLibPickObjectGeometry(hitpoint, start, direction, bSnap, hitnormal);
+    case esEditScene: return ScenePickObjectGeometry(hitpoint, start, direction, bSnap, hitnormal);
+    default: NODEFAULT;
     }
     return false;
 }
 
-bool PickGrid(Fvector &hitpoint, const Fvector &start, const Fvector &direction, int bSnap, Fvector *hitnormal)
+bool PickGrid(Fvector& hitpoint, const Fvector& start, const Fvector& direction, int bSnap, Fvector* hitnormal)
 {
     // pick grid
     Fvector normal;
     normal.set(0, 1, 0);
     float clcheck = direction.dotproduct(normal);
 
-    if (fis_zero(clcheck))
-        return false;
+    if (fis_zero(clcheck)) return false;
 
-    float alpha = - start.dotproduct(normal)/clcheck;
+    float alpha = -start.dotproduct(normal) / clcheck;
 
-    if (alpha<=0)
-        return false;
+    if (alpha <= 0) return false;
 
-    hitpoint.x = start.x+direction.x*alpha;
-    hitpoint.y = start.y+direction.y*alpha;
-    hitpoint.z = start.z+direction.z*alpha;
+    hitpoint.x = start.x + direction.x * alpha;
+    hitpoint.y = start.y + direction.y * alpha;
+    hitpoint.z = start.z + direction.z * alpha;
 
-    if (Tools->GetSettings(etfGSnap)&&bSnap)
-    {
+    if (Tools->GetSettings(etfGSnap) && bSnap) {
         hitpoint.x = snapto(hitpoint.x, LTools->m_MoveSnap);
         hitpoint.z = snapto(hitpoint.z, LTools->m_MoveSnap);
         hitpoint.y = 0.f;
     }
 
-    if (hitnormal)
-        hitnormal->set(0, 1, 0);
+    if (hitnormal) hitnormal->set(0, 1, 0);
     return true;
 }
 
-bool CLevelMain::PickGround(Fvector &hitpoint, const Fvector &start, const Fvector &direction, int bSnap, Fvector *hitnormal)
+bool CLevelMain::PickGround(
+    Fvector& hitpoint, const Fvector& start, const Fvector& direction, int bSnap, Fvector* hitnormal)
 {
     VERIFY(m_bReady);
 
     EEditorState est = GetEState();
-    if (est!=esEditLibrary&&est!=esEditScene)
-        return false;
+    if (est != esEditLibrary && est != esEditScene) return false;
 
     // pick object geometry
-    if ((bSnap==-1)||(Tools->GetSettings(etfOSnap)&&(bSnap==1)))
-    {
+    if ((bSnap == -1) || (Tools->GetSettings(etfOSnap) && (bSnap == 1))) {
         bool b = PickObjectGeometry(est, hitpoint, start, direction, bSnap, hitnormal);
-        if (b)
-            return true;
+        if (b) return true;
     }
 
     return PickGrid(hitpoint, start, direction, bSnap, hitnormal);
@@ -1313,7 +1227,7 @@ bool CLevelMain::PickGround(Fvector &hitpoint, const Fvector &start, const Fvect
 
 //----------------------------------------------------
 
-bool CLevelMain::SelectionFrustum(CFrustum &frustum)
+bool CLevelMain::SelectionFrustum(CFrustum& frustum)
 {
     VERIFY(m_bReady);
     Fvector st, d, p[4];
@@ -1324,8 +1238,7 @@ bool CLevelMain::SelectionFrustum(CFrustum &frustum)
     float x1 = m_StartCp.x, x2 = m_CurrentCp.x;
     float y1 = m_StartCp.y, y2 = m_CurrentCp.y;
 
-    if (!(x1!=x2&&y1!=y2))
-        return false;
+    if (!(x1 != x2 && y1 != y2)) return false;
 
     pt[0].set(_min(x1, x2), _min(y1, y2));
     pt[1].set(_max(x1, x2), _min(y1, y2));
@@ -1333,23 +1246,21 @@ bool CLevelMain::SelectionFrustum(CFrustum &frustum)
     pt[3].set(_min(x1, x2), _max(y1, y2));
 
     SRayPickInfo pinf;
-    for (int i = 0; i<4; i++)
+    for (int i = 0; i < 4; i++)
     {
         EDevice.m_Camera.MouseRayFromPoint(st, d, pt[i]);
-        if (EPrefs->bp_lim_depth)
-        {
-            pinf.inf.range = EDevice.m_Camera._Zfar(); // max pick range
+        if (EPrefs->bp_lim_depth) {
+            pinf.inf.range = EDevice.m_Camera._Zfar();  // max pick range
             if (Scene->RayPickObject(pinf.inf.range, st, d, OBJCLASS_SCENEOBJECT, &pinf, 0))
-                if (pinf.inf.range>depth)
-                    depth = pinf.inf.range;
+                if (pinf.inf.range > depth) depth = pinf.inf.range;
         }
     }
-    if (depth<EDevice.m_Camera._Znear())
+    if (depth < EDevice.m_Camera._Znear())
         depth = EDevice.m_Camera._Zfar();
     else
         depth += EPrefs->bp_depth_tolerance;
 
-    for (i = 0; i<4; i++)
+    for (i = 0; i < 4; i++)
     {
         EDevice.m_Camera.MouseRayFromPoint(st, d, pt[i]);
         p[i].mad(st, d, depth);
@@ -1360,8 +1271,7 @@ bool CLevelMain::SelectionFrustum(CFrustum &frustum)
 
     Fplane P;
     P.build(p[0], p[1], p[2]);
-    if (P.classify(st)>0)
-        P.build(p[2], p[1], p[0]);
+    if (P.classify(st) > 0) P.build(p[2], p[1], p[0]);
     frustum._add(P);
 
     return true;
@@ -1371,16 +1281,14 @@ bool CLevelMain::SelectionFrustum(CFrustum &frustum)
 void CLevelMain::RealUpdateScene()
 {
     inherited::RealUpdateScene();
-    if (GetEState()==esEditScene)
-    {
+    if (GetEState() == esEditScene) {
         Scene->OnObjectsUpdate();
-        LTools->OnObjectsUpdate(); // обновить все что как-то связано с объектами
+        LTools->OnObjectsUpdate();  // обновить все что как-то связано с объектами
         RedrawScene();
     }
 }
 
 //---------------------------------------------------------------------------
-
 
 void CLevelMain::ShowContextMenu(int cls)
 {
@@ -1388,8 +1296,7 @@ void CLevelMain::ShowContextMenu(int cls)
     POINT pt;
     GetCursorPos(&pt);
     fraLeftBar->miProperties->Enabled = false;
-    if (Scene->SelectionCount(true, cls))
-        fraLeftBar->miProperties->Enabled = true;
+    if (Scene->SelectionCount(true, cls)) fraLeftBar->miProperties->Enabled = true;
     RedrawScene(true);
     fraLeftBar->pmObjectContext->TrackButton = tbRightButton;
     fraLeftBar->pmObjectContext->Popup(pt.x, pt.y);
@@ -1397,15 +1304,13 @@ void CLevelMain::ShowContextMenu(int cls)
 
 //---------------------------------------------------------------------------
 
-
 //---------------------------------------------------------------------------
 // Common
 //---------------------------------------------------------------------------
 void CLevelMain::ResetStatus()
 {
     VERIFY(m_bReady);
-    if (fraBottomBar->paStatus->Caption!="")
-    {
+    if (fraBottomBar->paStatus->Caption != "") {
         fraBottomBar->paStatus->Caption = "";
         fraBottomBar->paStatus->Repaint();
     }
@@ -1414,12 +1319,10 @@ void CLevelMain::ResetStatus()
 void CLevelMain::SetStatus(LPSTR s, bool bOutLog)
 {
     VERIFY(m_bReady);
-    if (fraBottomBar->paStatus->Caption!=s)
-    {
+    if (fraBottomBar->paStatus->Caption != s) {
         fraBottomBar->paStatus->Caption = s;
         fraBottomBar->paStatus->Repaint();
-        if (bOutLog&&s&&s[0])
-            ELog.Msg(mtInformation, s);
+        if (bOutLog && s && s[0]) ELog.Msg(mtInformation, s);
     }
 }
 
@@ -1431,10 +1334,9 @@ void CLevelMain::ProgressDraw()
 //---------------------------------------------------------------------------
 void CLevelMain::OutCameraPos()
 {
-    if (m_bReady)
-    {
+    if (m_bReady) {
         AnsiString s;
-        const Fvector &c = EDevice.m_Camera.GetPosition();
+        const Fvector& c = EDevice.m_Camera.GetPosition();
         s.sprintf("C: %3.1f, %3.1f, %3.1f", c.x, c.y, c.z);
         //	const Fvector& hpb 	= EDevice.m_Camera.GetHPB();
         //	s.sprintf(" Cam: %3.1f°, %3.1f°, %3.1f°",rad2deg(hpb.y),rad2deg(hpb.x),rad2deg(hpb.z));
@@ -1479,9 +1381,12 @@ void CLevelMain::RealQuit()
 
 //---------------------------------------------------------------------------
 
-#define INI_RTP_NAME(buf) 		{FS.update_path(buf,"$local_root$","rt_object_props.ltx");}
+#define INI_RTP_NAME(buf)                                                                                              \
+    {                                                                                                                  \
+        FS.update_path(buf, "$local_root$", "rt_object_props.ltx");                                                    \
+    }
 
-void CLevelMain::SaveSettings(CInifile *I)
+void CLevelMain::SaveSettings(CInifile* I)
 {
     m_rt_object_props->save_as();
 
@@ -1489,10 +1394,10 @@ void CLevelMain::SaveSettings(CInifile *I)
     SSceneSummary::Save(I);
 }
 
-void CLevelMain::LoadSettings(CInifile *I)
+void CLevelMain::LoadSettings(CInifile* I)
 {
     string_path fn;
-    INI_RTP_NAME (fn);
+    INI_RTP_NAME(fn);
     m_rt_object_props = CInifile::Create(fn, FALSE);
     m_rt_object_props->save_at_end(FALSE);
 
@@ -1500,26 +1405,26 @@ void CLevelMain::LoadSettings(CInifile *I)
     SSceneSummary::Load(I);
 }
 
-void CLevelMain::store_rt_flags(const CCustomObject *CO)
+void CLevelMain::store_rt_flags(const CCustomObject* CO)
 {
-    if (LTools->m_LastFileName.Length()&&CO->Name&&xr_strlen(CO->Name))
-    {
+    if (LTools->m_LastFileName.Length() && CO->Name && xr_strlen(CO->Name)) {
         m_rt_object_props->remove_line(LTools->m_LastFileName.c_str(), CO->Name);
-        if (CO->Selected()||!CO->Visible())
-            m_rt_object_props->w_u32(LTools->m_LastFileName.c_str(), CO->Name, CO->m_RT_Flags.get()&(CCustomObject::flRT_Selected|CCustomObject::flRT_Visible));
+        if (CO->Selected() || !CO->Visible())
+            m_rt_object_props->w_u32(LTools->m_LastFileName.c_str(), CO->Name,
+                CO->m_RT_Flags.get() & (CCustomObject::flRT_Selected | CCustomObject::flRT_Visible));
     }
 }
 
-void CLevelMain::restore_rt_flags(CCustomObject *CO)
+void CLevelMain::restore_rt_flags(CCustomObject* CO)
 {
-    if (CO->Name&&LTools->m_LastFileName.Length()&&m_rt_object_props->line_exist(LTools->m_LastFileName.c_str(), CO->Name))
+    if (CO->Name && LTools->m_LastFileName.Length() &&
+        m_rt_object_props->line_exist(LTools->m_LastFileName.c_str(), CO->Name))
     {
         u32 fl = m_rt_object_props->r_u32(LTools->m_LastFileName.c_str(), CO->Name);
-        CO->m_RT_Flags.set(CCustomObject::flRT_Visible|CCustomObject::flRT_Selected|CCustomObject::flRT_SelectedLast, FALSE);
-        CO->m_RT_Flags.or(fl);
+        CO->m_RT_Flags.set(
+            CCustomObject::flRT_Visible | CCustomObject::flRT_Selected | CCustomObject::flRT_SelectedLast, FALSE);
+        CO->m_RT_Flags.or (fl);
     }
 }
 
 //---------------------------------------------------------------------------
-
-

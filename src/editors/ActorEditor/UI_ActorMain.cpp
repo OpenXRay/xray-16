@@ -13,7 +13,7 @@
 #include "../xrEProps/ChoseForm.h"
 
 //---------------------------------------------------------------------------
-CActorMain *&AUI = (CActorMain*)UI;
+CActorMain*& AUI = (CActorMain*)UI;
 
 //---------------------------------------------------------------------------
 
@@ -37,30 +37,23 @@ CActorMain::~CActorMain()
 CCommandVar CActorTools::CommandLoad(CCommandVar p1, CCommandVar p2)
 {
     xr_string temp_fn = p1.IsString() ? xr_string(p1) : xr_string("");
-    if (!p1.IsString())
-    {
+    if (!p1.IsString()) {
         temp_fn = ChangeFileExt(m_LastFileName, "").c_str();
-        if (!EFS.GetOpenName(_objects_, temp_fn))
-            return FALSE;
+        if (!EFS.GetOpenName(_objects_, temp_fn)) return FALSE;
     }
-    if (temp_fn.size())
-    {
+    if (temp_fn.size()) {
         xr_strlwr(temp_fn);
-        if (!IfModified())
-            return FALSE;
+        if (!IfModified()) return FALSE;
 
-        if (!FS.exist(temp_fn.c_str()))
-        {
+        if (!FS.exist(temp_fn.c_str())) {
             Msg("#!Can't load file: %s", temp_fn.c_str());
             return FALSE;
         }
-
 
         ExecCommand(COMMAND_CLEAR);
 
         BOOL bReadOnly = !FS.can_modify_file(temp_fn.c_str());
         m_Flags.set(flReadOnlyMode, bReadOnly);
-
 
         // set enable ...
         m_Props->SetReadOnly(bReadOnly);
@@ -69,12 +62,12 @@ CCommandVar CActorTools::CommandLoad(CCommandVar p1, CCommandVar p2)
 
         CTimer T;
         T.Start();
-        if (!Load(temp_fn.c_str()))
-        {
+        if (!Load(temp_fn.c_str())) {
             return FALSE;
         }
         m_LastFileName = temp_fn.c_str();
-        ELog.Msg(mtInformation, "Object '%s' successfully loaded. Loading time - %3.2f(s).", m_LastFileName.c_str(), T.GetElapsed_sec());
+        ELog.Msg(mtInformation, "Object '%s' successfully loaded. Loading time - %3.2f(s).", m_LastFileName.c_str(),
+            T.GetElapsed_sec());
         EPrefs->AppendRecentFile(m_LastFileName.c_str());
         ExecCommand(COMMAND_UPDATE_CAPTION);
         ExecCommand(COMMAND_UPDATE_PROPERTIES);
@@ -96,22 +89,18 @@ CCommandVar CActorTools::CommandSaveBackup(CCommandVar p1, CCommandVar p2)
 
 CCommandVar CActorTools::CommandSave(CCommandVar p1, CCommandVar p2)
 {
-    if (p2==1)
-    {
+    if (p2 == 1) {
         xr_string temp_fn = ATools->m_LastFileName.c_str();
-        if (EFS.GetSaveName(_objects_, temp_fn))
-        {
+        if (EFS.GetSaveName(_objects_, temp_fn)) {
             temp_fn = EFS.ChangeFileExt(temp_fn, ".object");
             return ExecCommand(COMMAND_SAVE, temp_fn, 0);
         }
     }
     else
     {
-        if (p1.IsInteger())
-            return ExecCommand(COMMAND_SAVE, xr_string(ATools->m_LastFileName.c_str()), 0);
+        if (p1.IsInteger()) return ExecCommand(COMMAND_SAVE, xr_string(ATools->m_LastFileName.c_str()), 0);
         xr_string temp_fn = xr_string(p1);
-        if (temp_fn.empty())
-        {
+        if (temp_fn.empty()) {
             return ExecCommand(COMMAND_SAVE, temp_fn, 1);
         }
         else
@@ -120,9 +109,9 @@ CCommandVar CActorTools::CommandSave(CCommandVar p1, CCommandVar p2)
             CTimer T;
             T.Start();
             CCommandVar res;
-            if (Tools->Save(temp_fn.c_str()))
-            {
-                ELog.Msg(mtInformation, "Object '%s' successfully saved. Saving time - %3.2f(s).", m_LastFileName.c_str(), T.GetElapsed_sec());
+            if (Tools->Save(temp_fn.c_str())) {
+                ELog.Msg(mtInformation, "Object '%s' successfully saved. Saving time - %3.2f(s).",
+                    m_LastFileName.c_str(), T.GetElapsed_sec());
                 m_LastFileName = temp_fn.c_str();
                 EPrefs->AppendRecentFile(m_LastFileName.c_str());
                 ExecCommand(COMMAND_UPDATE_CAPTION);
@@ -141,26 +130,22 @@ CCommandVar CActorTools::CommandSave(CCommandVar p1, CCommandVar p2)
 CCommandVar CActorTools::CommandImport(CCommandVar p1, CCommandVar p2)
 {
     xr_string temp_fn = p1.IsString() ? xr_string(p1) : xr_string("");
-    if (p1.IsString()||EFS.GetOpenName(_import_, temp_fn))
-    {
-        FS_Path *pp = FS.get_path(_import_);
+    if (p1.IsString() || EFS.GetOpenName(_import_, temp_fn)) {
+        FS_Path* pp = FS.get_path(_import_);
 
-        if (temp_fn.npos!=temp_fn.find(pp->m_Path))
-        {
+        if (temp_fn.npos != temp_fn.find(pp->m_Path)) {
             xr_strlwr(temp_fn);
-            if (!Tools->IfModified())
-                return FALSE;
+            if (!Tools->IfModified()) return FALSE;
 
             ExecCommand(COMMAND_CLEAR);
             CTimer T;
             T.Start();
-            if (!ATools->Import(NULL, temp_fn.c_str()))
-                return FALSE;
+            if (!ATools->Import(NULL, temp_fn.c_str())) return FALSE;
 
             m_LastFileName = temp_fn.c_str();
-            ELog.Msg(mtInformation, "Object '%s' successfully imported. Loading time - %3.2f(s).", m_LastFileName.c_str(), T.GetElapsed_sec());
-            if (ExecCommand(COMMAND_SAVE, temp_fn, 1))
-            {
+            ELog.Msg(mtInformation, "Object '%s' successfully imported. Loading time - %3.2f(s).",
+                m_LastFileName.c_str(), T.GetElapsed_sec());
+            if (ExecCommand(COMMAND_SAVE, temp_fn, 1)) {
                 xr_string mfn;
                 mfn = temp_fn;
                 EFS.MarkFile(mfn.c_str(), true);
@@ -183,9 +168,8 @@ CCommandVar CActorTools::CommandExportDM(CCommandVar p1, CCommandVar p2)
 {
     CCommandVar res = FALSE;
     xr_string fn = p1.IsString() ? xr_string(p1) : xr_string("");
-    if (p1.IsString()||EFS.GetSaveName("$game_dm$", fn))
-    {
-        if (0!=(res = ExportDM(fn.c_str())))
+    if (p1.IsString() || EFS.GetSaveName("$game_dm$", fn)) {
+        if (0 != (res = ExportDM(fn.c_str())))
             ELog.Msg(mtInformation, "Export complete.");
         else
             ELog.Msg(mtError, "Export failed.");
@@ -198,9 +182,8 @@ CCommandVar CActorTools::CommandExportOBJ(CCommandVar p1, CCommandVar p2)
     CCommandVar res = FALSE;
     xr_string fn = p1.IsString() ? xr_string(p1) : xr_string("");
 
-    if (p1.IsString()||EFS.GetSaveName("$import$", fn, 0, 5))
-    {
-        if (0!=(res = ExportOBJ(fn.c_str())))
+    if (p1.IsString() || EFS.GetSaveName("$import$", fn, 0, 5)) {
+        if (0 != (res = ExportOBJ(fn.c_str())))
             ELog.Msg(mtInformation, "Export complete.");
         else
             ELog.Msg(mtError, "Export failed.");
@@ -212,9 +195,8 @@ CCommandVar CActorTools::CommandExportOGF(CCommandVar p1, CCommandVar p2)
 {
     CCommandVar res = FALSE;
     xr_string fn = p1.IsString() ? xr_string(p1) : xr_string("");
-    if (p1.IsString()||EFS.GetSaveName("$game_meshes$", fn, 0, 0))
-    {
-        if (0!=(res = ATools->ExportOGF(fn.c_str())))
+    if (p1.IsString() || EFS.GetSaveName("$game_meshes$", fn, 0, 0)) {
+        if (0 != (res = ATools->ExportOGF(fn.c_str())))
             ELog.Msg(mtInformation, "Export complete.");
         else
             ELog.Msg(mtError, "Export failed.");
@@ -227,9 +209,8 @@ CCommandVar CActorTools::CommandExportOMF(CCommandVar p1, CCommandVar p2)
     CCommandVar res = FALSE;
     xr_string fn = p1.IsString() ? xr_string(p1) : xr_string("");
 
-    if (p1.IsString()||EFS.GetSaveName("$game_meshes$", fn, 0, 1))
-    {
-        if (0!=(res = ExportOMF(fn.c_str())))
+    if (p1.IsString() || EFS.GetSaveName("$game_meshes$", fn, 0, 1)) {
+        if (0 != (res = ExportOMF(fn.c_str())))
             ELog.Msg(mtInformation, "Export complete.");
         else
             ELog.Msg(mtError, "Export failed.");
@@ -241,9 +222,8 @@ CCommandVar CActorTools::CommandExportCPP(CCommandVar p1, CCommandVar p2)
 {
     CCommandVar res = FALSE;
     xr_string fn = p1.IsString() ? xr_string(p1) : xr_string("");
-    if (p1.IsString()||EFS.GetSaveName(_import_, fn, 0, 7))
-    {
-        if (0!=(res = ExportCPP(fn.c_str())))
+    if (p1.IsString() || EFS.GetSaveName(_import_, fn, 0, 7)) {
+        if (0 != (res = ExportCPP(fn.c_str())))
             ELog.Msg(mtInformation, "Export complete.");
         else
             ELog.Msg(mtError, "Export failed.");
@@ -253,8 +233,7 @@ CCommandVar CActorTools::CommandExportCPP(CCommandVar p1, CCommandVar p2)
 
 CCommandVar CActorTools::CommandClear(CCommandVar p1, CCommandVar p2)
 {
-    if (!IfModified())
-        return FALSE;
+    if (!IfModified()) return FALSE;
 
     m_LastFileName = "";
     EDevice.m_Camera.Reset();
@@ -301,9 +280,8 @@ CCommandVar CActorTools::CommandBatchConvert(CCommandVar p1, CCommandVar p2)
 {
     CCommandVar res = FALSE;
     xr_string fn;
-    if (EFS.GetOpenName("$import$", fn, false, 0, 6))
-    {
-        if (0!=(res = BatchConvert(fn.c_str())))
+    if (EFS.GetOpenName("$import$", fn, false, 0, 6)) {
+        if (0 != (res = BatchConvert(fn.c_str())))
             ELog.Msg(mtInformation, "Convert complete.");
         else
             ELog.Msg(mtError, "Convert failed.");
@@ -340,8 +318,7 @@ CCommandVar CommandSelectPreviewObj(CCommandVar p1, CCommandVar p2)
 
 CCommandVar CommandLoadFirstRecent(CCommandVar p1, CCommandVar p2)
 {
-    if (EPrefs->FirstRecentFile())
-        return ExecCommand(COMMAND_LOAD, xr_string(EPrefs->FirstRecentFile()));
+    if (EPrefs->FirstRecentFile()) return ExecCommand(COMMAND_LOAD, xr_string(EPrefs->FirstRecentFile()));
 
     return FALSE;
 }
@@ -390,22 +367,17 @@ CCommandVar CommandUpdateCaption(CCommandVar p1, CCommandVar p2)
 
 CCommandVar CommandChangeTarget(CCommandVar p1, CCommandVar p2)
 {
-    if (p1.IsString())
-    {
+    if (p1.IsString()) {
         ATools->SelectListItem(xr_string(p1).c_str(), 0, true, false, true);
     }
     else
     {
         switch (p1)
         {
-            case 0: ATools->SelectListItem(BONES_PREFIX, 0, true, false, true);
-                break;
-            case 1: ATools->SelectListItem(MOTIONS_PREFIX, 0, true, false, true);
-                break;
-            case 2: ATools->SelectListItem(OBJECT_PREFIX, 0, true, false, true);
-                break;
-            case 3: ATools->SelectListItem(SURFACES_PREFIX, 0, true, false, true);
-                break;
+        case 0: ATools->SelectListItem(BONES_PREFIX, 0, true, false, true); break;
+        case 1: ATools->SelectListItem(MOTIONS_PREFIX, 0, true, false, true); break;
+        case 2: ATools->SelectListItem(OBJECT_PREFIX, 0, true, false, true); break;
+        case 3: ATools->SelectListItem(SURFACES_PREFIX, 0, true, false, true); break;
         }
     }
     return TRUE;
@@ -453,7 +425,7 @@ void CActorMain::RegisterCommands()
     REGISTER_SUB_CMD_END;
 }
 
-char *CActorMain::GetCaption()
+char* CActorMain::GetCaption()
 {
     return ATools->GetEditFileName().IsEmpty() ? "noname" : ATools->GetEditFileName().c_str();
 }
@@ -482,8 +454,7 @@ void CActorMain::RealUpdateScene()
 void CActorMain::ResetStatus()
 {
     VERIFY(m_bReady);
-    if (fraBottomBar->paStatus->Caption!="")
-    {
+    if (fraBottomBar->paStatus->Caption != "") {
         fraBottomBar->paStatus->Caption = "";
         fraBottomBar->paStatus->Repaint();
     }
@@ -492,12 +463,10 @@ void CActorMain::ResetStatus()
 void CActorMain::SetStatus(LPSTR s, bool bOutLog)
 {
     VERIFY(m_bReady);
-    if (fraBottomBar->paStatus->Caption!=s)
-    {
+    if (fraBottomBar->paStatus->Caption != s) {
         fraBottomBar->paStatus->Caption = s;
         fraBottomBar->paStatus->Repaint();
-        if (bOutLog&&s&&s[0])
-            ELog.Msg(mtInformation, s);
+        if (bOutLog && s && s[0]) ELog.Msg(mtInformation, s);
     }
 }
 
@@ -511,7 +480,7 @@ void CActorMain::OutCameraPos()
 {
     VERIFY(m_bReady);
     AnsiString s;
-    const Fvector &c = EDevice.m_Camera.GetPosition();
+    const Fvector& c = EDevice.m_Camera.GetPosition();
     s.sprintf("C: %3.1f, %3.1f, %3.1f", c.x, c.y, c.z);
     //	const Fvector& hpb 	= EDevice.m_Camera.GetHPB();
     //	s.sprintf(" Cam: %3.1f°, %3.1f°, %3.1f°",rad2deg(hpb.y),rad2deg(hpb.x),rad2deg(hpb.z));
@@ -555,7 +524,7 @@ void CActorMain::RealQuit()
 
 //---------------------------------------------------------------------------
 
-void CAEPreferences::Load(CInifile *I)
+void CAEPreferences::Load(CInifile* I)
 {
     inherited::Load(I);
 
@@ -563,7 +532,7 @@ void CAEPreferences::Load(CInifile *I)
     bAlwaysShowKeyBar34 = R_BOOL_SAFE("ae_prefs", "always_show_keybar34", bAlwaysShowKeyBar34);
 }
 
-void CAEPreferences::Save(CInifile *I)
+void CAEPreferences::Save(CInifile* I)
 {
     inherited::Save(I);
 
@@ -573,7 +542,7 @@ void CAEPreferences::Save(CInifile *I)
 
 extern ECORE_API BOOL g_force16BitTransformQuant;
 
-void CAEPreferences::FillProp(PropItemVec &props)
+void CAEPreferences::FillProp(PropItemVec& props)
 {
     inherited::FillProp(props);
 
@@ -582,4 +551,3 @@ void CAEPreferences::FillProp(PropItemVec &props)
 
     PHelper().CreateBOOL(props, "Tools\\MotionExport\\Force 16bit MotionT", &g_force16BitTransformQuant);
 }
-

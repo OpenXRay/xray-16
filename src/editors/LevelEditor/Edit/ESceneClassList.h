@@ -1,7 +1,7 @@
 #ifndef ESceneClassListH
 #define ESceneClassListH
 
-// refs 
+// refs
 class CCustomObject;
 
 typedef u32 ObjClassID;
@@ -10,10 +10,10 @@ typedef u32 ObjClassID;
 enum
 {
     OBJCLASS_DUMMY = -1,
-    OBJCLASS_FIRST_CLASS= 0,
+    OBJCLASS_FIRST_CLASS = 0,
     OBJCLASS_GROUP = 0,
     OBJCLASS_GLOW = 1,
-    OBJCLASS_SCENEOBJECT= 2,
+    OBJCLASS_SCENEOBJECT = 2,
     OBJCLASS_LIGHT = 3,
     OBJCLASS_SHAPE = 4,
     OBJCLASS_SOUND_SRC = 5,
@@ -39,4 +39,3 @@ typedef xr_map<ObjClassID, ObjectList> ObjectMap;
 typedef ObjectMap::iterator ObjectPairIt;
 
 #endif
-

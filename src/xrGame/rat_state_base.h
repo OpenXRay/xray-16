@@ -13,19 +13,20 @@
 
 class CAI_Rat;
 
-class rat_state_base : private Noncopyable {
+class rat_state_base : private Noncopyable
+{
 private:
-	CAI_Rat	*m_object;
+    CAI_Rat* m_object;
 
 public:
-	IC				rat_state_base	();
-			void	construct		(CAI_Rat *object);
-	virtual	void	initialize		() = 0;
-	virtual	void	execute			() = 0;
-	virtual	void	finalize		() = 0;
-	IC		CAI_Rat &object			() const;
+    IC rat_state_base();
+    void construct(CAI_Rat* object);
+    virtual void initialize() = 0;
+    virtual void execute() = 0;
+    virtual void finalize() = 0;
+    IC CAI_Rat& object() const;
 };
 
 #include "rat_state_base_inline.h"
 
-#endif // RAT_STATE_BASE_H_INCLUDED
+#endif  // RAT_STATE_BASE_H_INCLUDED

@@ -19,15 +19,13 @@ Comments:
 #ifdef NV_MATH_DLL
 #include "xrCore/Platform.h"
 #ifdef NV_MATH_EXPORTS
-        #define DECLSPEC_NV_MATH XR_EXPORT
+#define DECLSPEC_NV_MATH XR_EXPORT
 #else
-        #define DECLSPEC_NV_MATH XR_IMPORT
+#define DECLSPEC_NV_MATH XR_IMPORT
 #endif
 
 #else
 #define DECLSPEC_NV_MATH
 #endif
 
-#endif // _nv_mathdecl_h_
-
-
+#endif  // _nv_mathdecl_h_

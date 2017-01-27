@@ -5,10 +5,4 @@
 using namespace luabind;
 
 SCRIPT_EXPORT(CWeaponRG6, (CGameObject),
-{
-	module(luaState)
-	[
-		class_<CWeaponRG6,CGameObject>("CWeaponRG6")
-			.def(constructor<>())
-	];
-});
+    { module(luaState)[class_<CWeaponRG6, CGameObject>("CWeaponRG6").def(constructor<>())]; });

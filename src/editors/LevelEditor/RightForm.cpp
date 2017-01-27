@@ -7,10 +7,9 @@
 //---------------------------------------------------------------------------
 #pragma package(smart_init)
 #pragma resource "*.dfm"
-TfrmRight *frmRight;
+TfrmRight* frmRight;
 //---------------------------------------------------------------------------
-__fastcall TfrmRight::TfrmRight(TComponent* Owner)
-	: TForm(Owner)
+__fastcall TfrmRight::TfrmRight(TComponent* Owner) : TForm(Owner)
 {
 }
 //---------------------------------------------------------------------------

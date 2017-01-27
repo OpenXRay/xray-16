@@ -8,15 +8,14 @@
 #pragma package(smart_init)
 
 //------------------------------------------------------------------------------
-#define THM_TEXTURE_VERSION				0x0012
+#define THM_TEXTURE_VERSION 0x0012
 
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
-ETextureThumbnail::ETextureThumbnail(LPCSTR src_name, bool bLoad): EImageThumbnail(src_name, ETTexture)
+ETextureThumbnail::ETextureThumbnail(LPCSTR src_name, bool bLoad) : EImageThumbnail(src_name, ETTexture)
 {
-    if (!strchr(src_name, '\\'))
-    {
+    if (!strchr(src_name, '\\')) {
         xr_string _name = src_name;
         ImageLib.UpdateFileName(_name);
         m_Name = _name.c_str();
@@ -25,10 +24,9 @@ ETextureThumbnail::ETextureThumbnail(LPCSTR src_name, bool bLoad): EImageThumbna
     m_bValid = false;
     if (bLoad)
 #ifdef XR_EPROPS_EXPORTS
-    	Load();
+        Load();
 #else
-        if (!Load())
-        {
+        if (!Load()) {
             ImageLib.CreateTextureThumbnail(this, src_name);
         }
 #endif
@@ -45,27 +43,23 @@ ETextureThumbnail::~ETextureThumbnail()
 
 int ETextureThumbnail::MemoryUsage()
 {
-    int mem_usage = _Width()*_Height()*4;
+    int mem_usage = _Width() * _Height() * 4;
     switch (m_TexParams.fmt)
     {
-        case STextureParams::tfDXT1:
-        case STextureParams::tfADXT1: mem_usage /= 6;
-            break;
-        case STextureParams::tfDXT3:
-        case STextureParams::tfDXT5: mem_usage /= 4;
-            break;
-        case STextureParams::tf4444:
-        case STextureParams::tf1555:
-        case STextureParams::tf565: mem_usage /= 2;
-            break;
-        case STextureParams::tfRGBA: break;
+    case STextureParams::tfDXT1:
+    case STextureParams::tfADXT1: mem_usage /= 6; break;
+    case STextureParams::tfDXT3:
+    case STextureParams::tfDXT5: mem_usage /= 4; break;
+    case STextureParams::tf4444:
+    case STextureParams::tf1555:
+    case STextureParams::tf565: mem_usage /= 2; break;
+    case STextureParams::tfRGBA: break;
     }
     string_path fn;
     FS.update_path(fn, _game_textures_, EFS.ChangeFileExt(m_Name.c_str(), ".seq").c_str());
-    if (FS.exist(fn))
-    {
+    if (FS.exist(fn)) {
         string128 buffer;
-        IReader *F = FS.r_open(0, fn);
+        IReader* F = FS.r_open(0, fn);
         F->r_string(buffer, sizeof(buffer));
         int cnt = 0;
         while (!F->eof())
@@ -81,7 +75,7 @@ int ETextureThumbnail::MemoryUsage()
 
 //------------------------------------------------------------------------------
 
-void ETextureThumbnail::CreateFromData(u32 *p, u32 w, u32 h)
+void ETextureThumbnail::CreateFromData(u32* p, u32 w, u32 h)
 {
     EImageThumbnail::CreatePixels(p, w, h);
     m_TexParams.width = w;
@@ -91,7 +85,7 @@ void ETextureThumbnail::CreateFromData(u32 *p, u32 w, u32 h)
 
 //------------------------------------------------------------------------------
 
-bool Surface_Load(LPCSTR full_name, U32Vec &data, u32 &w, u32 &h, u32 &a);
+bool Surface_Load(LPCSTR full_name, U32Vec& data, u32& w, u32& h, u32& a);
 
 bool ETextureThumbnail::Load(LPCSTR src_name, LPCSTR path)
 {
@@ -104,15 +98,13 @@ bool ETextureThumbnail::Load(LPCSTR src_name, LPCSTR path)
         FS.update_path(fn, _game_textures_, fn);
     }
 
-    if (!FS.exist(fn))
-        return false;
+    if (!FS.exist(fn)) return false;
 
-    IReader *F = FS.r_open(fn);
+    IReader* F = FS.r_open(fn);
     u16 version = 0;
 
     R_ASSERT(F->r_chunk(THM_CHUNK_VERSION, &version));
-    if (version!=THM_TEXTURE_VERSION)
-    {
+    if (version != THM_TEXTURE_VERSION) {
         Msg("!Thumbnail: Unsupported version.");
         return false;
     }
@@ -126,7 +118,7 @@ bool ETextureThumbnail::Load(LPCSTR src_name, LPCSTR path)
 
     R_ASSERT(F->find_chunk(THM_CHUNK_TYPE));
     m_Type = THMType(F->r_u32());
-    R_ASSERT(m_Type==ETTexture);
+    R_ASSERT(m_Type == ETTexture);
 
     m_TexParams.Load(*F);
     m_Age = FS.get_file_age(fn);
@@ -140,8 +132,7 @@ bool ETextureThumbnail::Load(LPCSTR src_name, LPCSTR path)
 
 void ETextureThumbnail::Save(int age, LPCSTR path)
 {
-    if (!Valid())
-        return;
+    if (!Valid()) return;
 
     CMemoryWriter F;
     F.open_chunk(THM_CHUNK_VERSION);
@@ -164,8 +155,7 @@ void ETextureThumbnail::Save(int age, LPCSTR path)
     else
         FS.update_path(fn, _game_textures_, m_Name.c_str());
 
-    if (F.save_to(fn))
-    {
+    if (F.save_to(fn)) {
         FS.set_file_age(fn, age ? age : m_Age);
     }
     else
@@ -176,16 +166,16 @@ void ETextureThumbnail::Save(int age, LPCSTR path)
 
 //------------------------------------------------------------------------------
 
-void ETextureThumbnail::FillProp(PropItemVec &items, PropValue::TOnChange on_type_change)
+void ETextureThumbnail::FillProp(PropItemVec& items, PropValue::TOnChange on_type_change)
 {
     m_TexParams.FillProp(m_SrcName.c_str(), items, on_type_change);
 }
 
 //------------------------------------------------------------------------------
 
-void ETextureThumbnail::FillInfo(PropItemVec &items)
+void ETextureThumbnail::FillInfo(PropItemVec& items)
 {
-    STextureParams &F = m_TexParams;
+    STextureParams& F = m_TexParams;
     PHelper().CreateCaption(items, "Format", get_token_name(tfmt_token, F.fmt));
     PHelper().CreateCaption(items, "Type", get_token_name(ttype_token, F.type));
     PHelper().CreateCaption(items, "Width", shared_str().printf("%d", _Width()));
@@ -193,7 +183,7 @@ void ETextureThumbnail::FillInfo(PropItemVec &items)
     PHelper().CreateCaption(items, "Alpha", _Alpha() ? "on" : "off");
 }
 
-BOOL ETextureThumbnail::similar(ETextureThumbnail *thm1, xr_vector<AnsiString> &sel_params)
+BOOL ETextureThumbnail::similar(ETextureThumbnail* thm1, xr_vector<AnsiString>& sel_params)
 {
     BOOL res = m_TexParams.similar(thm1->m_TexParams, sel_params);
     /*
@@ -201,7 +191,7 @@ BOOL ETextureThumbnail::similar(ETextureThumbnail *thm1, xr_vector<AnsiString> &
       {
           xr_vector<AnsiString>::iterator it = sel_params.begin();
           xr_vector<AnsiString>::iterator it_e = sel_params.end();
-  
+
           for(;it!=it_e;++it)
           {
              const AnsiString& par_name = *it;
@@ -240,22 +230,19 @@ LPCSTR ETextureThumbnail::FormatString()
 
 //------------------------------------------------------------------------------
 
-void ETextureThumbnail::Draw(HDC hdc, const Irect &R)
+void ETextureThumbnail::Draw(HDC hdc, const Irect& R)
 {
-    if (0==m_Pixels.size())
-    {
+    if (0 == m_Pixels.size()) {
         u32 image_w, image_h, image_a;
         xr_string fn_img = EFS.ChangeFileExt(m_Name.c_str(), ".tga");
         string_path fn;
         FS.update_path(fn, _textures_, fn_img.c_str());
 
-        if (!FS.exist(fn))
-        {
+        if (!FS.exist(fn)) {
             fn_img = EFS.ChangeFileExt(m_Name.c_str(), ".dds");
             FS.update_path(fn, _game_textures_, fn_img.c_str());
 
-            if (!FS.exist(fn))
-            {
+            if (!FS.exist(fn)) {
                 ELog.Msg(mtError, "Can't make preview for texture '%s'.", m_Name.c_str());
                 return;
             }
@@ -263,32 +250,27 @@ void ETextureThumbnail::Draw(HDC hdc, const Irect &R)
 
         U32Vec data;
         u32 w, h, a;
-        if (!Surface_Load(fn, data, image_w, image_h, image_a))
-        {
+        if (!Surface_Load(fn, data, image_w, image_h, image_a)) {
             ELog.Msg(mtError, "Can't make preview for texture '%s'.", m_Name.c_str());
             return;
         }
         ImageLib.MakeThumbnailImage(this, data.begin(), image_w, image_h, image_a);
     }
 
-    if (Valid())
-    {
+    if (Valid()) {
         Irect r;
-        r.x1 = R.x1+1;
-        r.y1 = R.y1+1;
-        r.x2 = R.x2-1;
-        r.y2 = R.y2-1;
-        if (_Width()!=_Height())
-            FHelper.FillRect(hdc, r, 0x00000000);
-        if (_Width()>_Height())
-        {
-            r.y2 -= r.height()-iFloor(r.height()*float(_Height())/float(_Width()));
+        r.x1 = R.x1 + 1;
+        r.y1 = R.y1 + 1;
+        r.x2 = R.x2 - 1;
+        r.y2 = R.y2 - 1;
+        if (_Width() != _Height()) FHelper.FillRect(hdc, r, 0x00000000);
+        if (_Width() > _Height()) {
+            r.y2 -= r.height() - iFloor(r.height() * float(_Height()) / float(_Width()));
         }
         else
         {
-            r.x2 -= r.width()-iFloor(r.width()*float(_Width())/float(_Height()));
+            r.x2 -= r.width() - iFloor(r.width() * float(_Width()) / float(_Height()));
         }
         inherited::Draw(hdc, r);
     }
 }
-

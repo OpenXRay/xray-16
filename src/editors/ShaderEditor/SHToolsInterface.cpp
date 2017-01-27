@@ -7,7 +7,7 @@
 #include "editors/ECore/Editor/ui_main.h"
 #include "editors/xrEProps/itemlist.h"
 
-ISHTools::ISHTools(ISHInit &init)
+ISHTools::ISHTools(ISHInit& init)
 {
     m_bModified = FALSE;
     m_bLockUpdate = FALSE;
@@ -18,8 +18,7 @@ ISHTools::ISHTools(ISHInit &init)
 
 void ISHTools::ViewSetCurrentItem(LPCSTR full_name)
 {
-    if (m_bLockUpdate)
-        return;
+    if (m_bLockUpdate) return;
 
     m_bLockUpdate = TRUE;
     Ext.m_Items->SelectItem(full_name, TRUE, false, true);
@@ -39,17 +38,17 @@ void ISHTools::Modified()
 
 bool ISHTools::IfModified()
 {
-    if (m_bModified)
-    {
-        int mr = ELog.DlgMsg(mtConfirmation, "The '%s' has been modified.\nDo you want to save your changes?", ToolsName());
+    if (m_bModified) {
+        int mr =
+            ELog.DlgMsg(mtConfirmation, "The '%s' has been modified.\nDo you want to save your changes?", ToolsName());
         switch (mr)
         {
-            case mrYes: Save();
-                m_bModified = FALSE;
-                break;
-            case mrNo: m_bModified = FALSE;
-                break;
-            case mrCancel: return false;
+        case mrYes:
+            Save();
+            m_bModified = FALSE;
+            break;
+        case mrNo: m_bModified = FALSE; break;
+        case mrCancel: return false;
         }
     }
     return true;
@@ -69,14 +68,14 @@ void ISHTools::ZoomObject(bool bOnlySel)
 AnsiString ISHTools::ViewGetCurrentItem(bool bFolderOnly)
 {
     AnsiString name;
-    TElTreeItem *item = Ext.m_Items->GetSelected();
+    TElTreeItem* item = Ext.m_Items->GetSelected();
     FHelper.MakeName(item, 0, name, bFolderOnly);
     return name;
 }
 
 //---------------------------------------------------------------------------
 
-TElTreeItem *ISHTools::ViewGetCurrentItem()
+TElTreeItem* ISHTools::ViewGetCurrentItem()
 {
     return Ext.m_Items->GetSelected();
 }
@@ -99,8 +98,7 @@ void ISHTools::RenameCurrent()
 
 void ISHTools::OnFrame()
 {
-    if (m_LastSelection.Length())
-    {
+    if (m_LastSelection.Length()) {
         SetCurrentItem(m_LastSelection.c_str(), true);
         m_LastSelection = "";
     }
@@ -120,5 +118,3 @@ void ISHTools::OnDeactivate()
 }
 
 //---------------------------------------------------------------------------
-
-

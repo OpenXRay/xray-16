@@ -9,39 +9,29 @@
 #include "pch.hpp"
 #include "property_integer_limited.hpp"
 
-property_integer_limited::property_integer_limited	(
-		integer_getter_type const &getter,
-		integer_setter_type const &setter,
-		int const %min,
-		int const %max
-	) :
-	inherited				(getter, setter),
-	m_min					(min),
-	m_max					(max)
+property_integer_limited::property_integer_limited(
+    integer_getter_type const& getter, integer_setter_type const& setter, int const % min, int const % max)
+    : inherited(getter, setter), m_min(min), m_max(max)
 {
 }
 
-System::Object ^property_integer_limited::GetValue	()
+System::Object ^ property_integer_limited::GetValue()
 {
-	int						value = safe_cast<int>(inherited::GetValue());
-	if (value < m_min)
-		value				= m_min;
+    int value = safe_cast<int>(inherited::GetValue());
+    if (value < m_min) value = m_min;
 
-	if (value > m_max)
-		value				= m_max;
+    if (value > m_max) value = m_max;
 
-	return					(value);
+    return (value);
 }
 
-void property_integer_limited::SetValue			(System::Object ^object)
+void property_integer_limited::SetValue(System::Object ^ object)
 {
-	int						new_value = safe_cast<int>(object);
+    int new_value = safe_cast<int>(object);
 
-	if (new_value < m_min)
-		new_value			= m_min;
+    if (new_value < m_min) new_value = m_min;
 
-	if (new_value > m_max)
-		new_value			= m_max;
+    if (new_value > m_max) new_value = m_max;
 
-	inherited::SetValue	(new_value);
+    inherited::SetValue(new_value);
 }

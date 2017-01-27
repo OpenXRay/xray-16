@@ -4,11 +4,12 @@
 #include "ESceneControlsCustom.h"
 
 //------------------------------------------------------------------------------
-class TUI_ControlGroupAdd: public TUI_CustomControl
+class TUI_ControlGroupAdd : public TUI_CustomControl
 {
-    bool __fastcall AfterAppendCallback(TShiftState Shift, CCustomObject *obj);
-public:
-    TUI_ControlGroupAdd(int st, int act, ESceneToolBase *parent);
+    bool __fastcall AfterAppendCallback(TShiftState Shift, CCustomObject* obj);
+
+  public:
+    TUI_ControlGroupAdd(int st, int act, ESceneToolBase* parent);
 
     virtual ~TUI_ControlGroupAdd() {}
 
@@ -17,4 +18,3 @@ public:
     virtual void Move(TShiftState _Shift);
 };
 #endif
-

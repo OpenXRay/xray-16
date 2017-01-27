@@ -9,25 +9,25 @@
  *      Pthreads-win32 - POSIX Threads Library for Win32
  *      Copyright(C) 1998 John E. Bossom
  *      Copyright(C) 1999,2005 Pthreads-win32 contributors
- * 
+ *
  *      Contact Email: rpj@callisto.canberra.edu.au
- * 
+ *
  *      The current list of contributors is contained
  *      in the file CONTRIBUTORS included with the source
  *      code distribution. The list can also be seen at the
  *      following World Wide Web location:
  *      http://sources.redhat.com/pthreads-win32/contributors.html
- * 
+ *
  *      This library is free software; you can redistribute it and/or
  *      modify it under the terms of the GNU Lesser General Public
  *      License as published by the Free Software Foundation; either
  *      version 2 of the License, or (at your option) any later version.
- * 
+ *
  *      This library is distributed in the hope that it will be useful,
  *      but WITHOUT ANY WARRANTY; without even the implied warranty of
  *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *      Lesser General Public License for more details.
- * 
+ *
  *      You should have received a copy of the GNU Lesser General Public
  *      License along with this library in the file COPYING.LIB;
  *      if not, write to the Free Software Foundation, Inc.,
@@ -61,47 +61,46 @@
  *    the condition is not satisfied.
  */
 
-void *
-pthread_timechange_handler_np (void *arg)
-     /*
-      * ------------------------------------------------------
-      * DOCPUBLIC
-      *      Broadcasts all CVs to force re-evaluation and
-      *      new timeouts if required.
-      *
-      * PARAMETERS
-      *      NONE
-      *
-      *
-      * DESCRIPTION
-      *      Broadcasts all CVs to force re-evaluation and
-      *      new timeouts if required.
-      *
-      *      This routine may be passed directly to pthread_create()
-      *      as a new thread in order to run asynchronously.
-      *
-      *
-      * RESULTS
-      *              0               successfully broadcast all CVs
-      *              EAGAIN          Not all CVs were broadcast
-      *
-      * ------------------------------------------------------
-      */
+void* pthread_timechange_handler_np(void* arg)
+/*
+ * ------------------------------------------------------
+ * DOCPUBLIC
+ *      Broadcasts all CVs to force re-evaluation and
+ *      new timeouts if required.
+ *
+ * PARAMETERS
+ *      NONE
+ *
+ *
+ * DESCRIPTION
+ *      Broadcasts all CVs to force re-evaluation and
+ *      new timeouts if required.
+ *
+ *      This routine may be passed directly to pthread_create()
+ *      as a new thread in order to run asynchronously.
+ *
+ *
+ * RESULTS
+ *              0               successfully broadcast all CVs
+ *              EAGAIN          Not all CVs were broadcast
+ *
+ * ------------------------------------------------------
+ */
 {
-  int result = 0;
-  pthread_cond_t cv;
+    int result = 0;
+    pthread_cond_t cv;
 
-  EnterCriticalSection (&ptw32_cond_list_lock);
+    EnterCriticalSection(&ptw32_cond_list_lock);
 
-  cv = ptw32_cond_list_head;
+    cv = ptw32_cond_list_head;
 
-  while (cv != NULL && 0 == result)
+    while (cv != NULL && 0 == result)
     {
-      result = pthread_cond_broadcast (&cv);
-      cv = cv->next;
+        result = pthread_cond_broadcast(&cv);
+        cv = cv->next;
     }
 
-  LeaveCriticalSection (&ptw32_cond_list_lock);
+    LeaveCriticalSection(&ptw32_cond_list_lock);
 
-  return (void *) (result != 0 ? EAGAIN : 0);
+    return (void*)(result != 0 ? EAGAIN : 0);
 }

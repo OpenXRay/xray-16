@@ -9,32 +9,32 @@
 // Public interface for stripifier
 ////////////////////////////////////////////////////////////////////////////////////////
 
-//GeForce1 and 2 cache size
+// GeForce1 and 2 cache size
 #define CACHESIZE_GEFORCE1_2 16
 
-//GeForce3 cache size
-#define CACHESIZE_GEFORCE3   24
+// GeForce3 cache size
+#define CACHESIZE_GEFORCE3 24
 
 enum PrimType
 {
-	PT_LIST,
-	PT_STRIP,
-	PT_FAN
+    PT_LIST,
+    PT_STRIP,
+    PT_FAN
 };
 
 struct PrimitiveGroup
 {
-	PrimType		type;
-	unsigned int	numIndices;
-	unsigned short* indices;
+    PrimType type;
+    unsigned int numIndices;
+    unsigned short* indices;
 
-////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////
 
-	PrimitiveGroup() : type(PT_STRIP), numIndices(0), indices(NULL) {}
-	~PrimitiveGroup()
-	{
-		if(indices)	xr_free(indices);
-	}
+    PrimitiveGroup() : type(PT_STRIP), numIndices(0), indices(NULL) {}
+    ~PrimitiveGroup()
+    {
+        if (indices) xr_free(indices);
+    }
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -49,7 +49,6 @@ struct PrimitiveGroup
 //
 void SetCacheSize(const unsigned int cacheSize);
 
-
 ////////////////////////////////////////////////////////////////////////////////////////
 // SetStitchStrips()
 //
@@ -62,7 +61,6 @@ void SetCacheSize(const unsigned int cacheSize);
 //
 void SetStitchStrips(const bool bStitchStrips);
 
-
 ////////////////////////////////////////////////////////////////////////////////////////
 // SetMinStripSize()
 //
@@ -73,7 +71,6 @@ void SetStitchStrips(const bool bStitchStrips);
 //
 void SetMinStripSize(const unsigned int minSize);
 
-
 ////////////////////////////////////////////////////////////////////////////////////////
 // SetListsOnly()
 //
@@ -82,7 +79,6 @@ void SetMinStripSize(const unsigned int minSize);
 // Default value: false
 //
 void SetListsOnly(const bool bListsOnly);
-
 
 ////////////////////////////////////////////////////////////////////////////////////////
 // GenerateStrips()
@@ -94,7 +90,7 @@ void SetListsOnly(const bool bListsOnly);
 //
 // Be sure to call xr_free on the returned primGroups to avoid leaking mem
 //
-void GenerateStrips(const u16* in_indices, const s32 in_numIndices, xr_vector<PrimitiveGroup> &primGroups);
+void GenerateStrips(const u16* in_indices, const s32 in_numIndices, xr_vector<PrimitiveGroup>& primGroups);
 
 ////////////////////////////////////////////////////////////////////////////////////////
 // RemapIndices()
@@ -107,11 +103,12 @@ void GenerateStrips(const u16* in_indices, const s32 in_numIndices, xr_vector<Pr
 //  of acceptable values for indices in your primitive groups.
 // remappedGroups: array of remapped PrimitiveGroups
 //
-// Note that, according to the remapping handed back to you, you must reorder your 
+// Note that, according to the remapping handed back to you, you must reorder your
 //  vertex buffer.
 //
 // Credit goes to the MS Xbox crew for the idea for this interface.
 //
-void RemapIndices(const xr_vector<PrimitiveGroup> &in_primGroups, const u16 numVerts, xr_vector<PrimitiveGroup> &remappedGroups);
+void RemapIndices(
+    const xr_vector<PrimitiveGroup>& in_primGroups, const u16 numVerts, xr_vector<PrimitiveGroup>& remappedGroups);
 
 #endif

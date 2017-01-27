@@ -15,11 +15,11 @@ void CSHCompilerTools::FillItemList()
     Ext.m_Items->GetFolders(folders);
     // fill items
     ListItemsVec items;
-    Shader_xrLCVec &lst = m_Library.Library();
-    for (Shader_xrLCIt it = lst.begin(); it!=lst.end(); it++)
+    Shader_xrLCVec& lst = m_Library.Library();
+    for (Shader_xrLCIt it = lst.begin(); it != lst.end(); it++)
         LHelper().CreateItem(items, it->Name, 0);
     // fill folders
-    for (RStringVecIt s_it = folders.begin(); s_it!=folders.end(); s_it++)
+    for (RStringVecIt s_it = folders.begin(); s_it != folders.end(); s_it++)
         LHelper().CreateItem(items, **s_it, 0);
     // assign items
     Ext.m_Items->AssignItems(items, false, true);
@@ -36,9 +36,8 @@ void CSHCompilerTools::RealUpdateList()
 void CSHCompilerTools::RealUpdateProperties()
 {
     PropItemVec items;
-    if (m_Shader)
-    {
-        Shader_xrLC &L = *m_Shader;
+    if (m_Shader) {
+        Shader_xrLC& L = *m_Shader;
         PHelper().CreateCName(items, "Name", L.Name, sizeof(L.Name), m_CurrentItem);
         PHelper().CreateFloat(items, "Translucency", &L.vert_translucency);
         PHelper().CreateFloat(items, "Ambient", &L.vert_ambient);
@@ -56,5 +55,3 @@ void CSHCompilerTools::RealUpdateProperties()
 }
 
 //---------------------------------------------------------------------------
-
-

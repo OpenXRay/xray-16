@@ -13,11 +13,10 @@ enum
 };
 
 //----------------------------------------------------
-bool ESceneSoundSrcTool::LoadLTX(CInifile &ini)
+bool ESceneSoundSrcTool::LoadLTX(CInifile& ini)
 {
     u32 version = ini.r_u32("main", "version");
-    if (version!=SOUND_SRC_TOOLS_VERSION)
-    {
+    if (version != SOUND_SRC_TOOLS_VERSION) {
         ELog.DlgMsg(mtError, "%s tools: Unsupported version.", ClassDesc());
         return false;
     }
@@ -26,32 +25,30 @@ bool ESceneSoundSrcTool::LoadLTX(CInifile &ini)
     return true;
 }
 
-void ESceneSoundSrcTool::SaveLTX(CInifile &ini, int id)
+void ESceneSoundSrcTool::SaveLTX(CInifile& ini, int id)
 {
     inherited::SaveLTX(ini, id);
 
     ini.w_u32("main", "version", SOUND_SRC_TOOLS_VERSION);
 }
 
-bool ESceneSoundSrcTool::LoadStream(IReader &F)
+bool ESceneSoundSrcTool::LoadStream(IReader& F)
 {
     u16 version = 0;
     if (F.r_chunk(CHUNK_VERSION, &version))
-        if (version!=SOUND_SRC_TOOLS_VERSION)
-        {
+        if (version != SOUND_SRC_TOOLS_VERSION) {
             ELog.DlgMsg(mtError, "%s tools: Unsupported version.", ClassDesc());
             return false;
         }
 
-    if (!inherited::LoadStream(F))
-        return false;
+    if (!inherited::LoadStream(F)) return false;
 
     return true;
 }
 
 //----------------------------------------------------
 
-void ESceneSoundSrcTool::SaveStream(IWriter &F)
+void ESceneSoundSrcTool::SaveStream(IWriter& F)
 {
     inherited::SaveStream(F);
 
@@ -60,12 +57,11 @@ void ESceneSoundSrcTool::SaveStream(IWriter &F)
 
 //----------------------------------------------------
 
-bool ESceneSoundSrcTool::LoadSelection(IReader &F)
+bool ESceneSoundSrcTool::LoadSelection(IReader& F)
 {
     u16 version = 0;
     R_ASSERT(F.r_chunk(CHUNK_VERSION, &version));
-    if (version!=SOUND_SRC_TOOLS_VERSION)
-    {
+    if (version != SOUND_SRC_TOOLS_VERSION) {
         ELog.DlgMsg(mtError, "%s tools: Unsupported version.", ClassDesc());
         return false;
     }
@@ -75,7 +71,7 @@ bool ESceneSoundSrcTool::LoadSelection(IReader &F)
 
 //----------------------------------------------------
 
-void ESceneSoundSrcTool::SaveSelection(IWriter &F)
+void ESceneSoundSrcTool::SaveSelection(IWriter& F)
 {
     F.w_chunk(CHUNK_VERSION, (u16*)&SOUND_SRC_TOOLS_VERSION, sizeof(SOUND_SRC_TOOLS_VERSION));
 
@@ -83,5 +79,3 @@ void ESceneSoundSrcTool::SaveSelection(IWriter &F)
 }
 
 //----------------------------------------------------
-
-

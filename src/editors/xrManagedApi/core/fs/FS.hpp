@@ -9,68 +9,60 @@ namespace ManagedApi
 {
 namespace Core
 {
-
 using namespace System;
 using System::Runtime::InteropServices::OutAttribute;
 using System::Runtime::InteropServices::StructLayoutAttribute;
 using System::Runtime::InteropServices::LayoutKind;
 using System::Runtime::InteropServices::FieldOffsetAttribute;
 
-[StructLayout(LayoutKind::Sequential, Size = sizeof(Fcolor))]
-public value struct ColorF
+[StructLayout(LayoutKind::Sequential, Size = sizeof(Fcolor))] public value struct ColorF
 {
-public:
+  public:
     float r, g, b, a;
 };
 
-[StructLayout(LayoutKind::Sequential, Size = sizeof(Fvector2))]
-public value struct Vector2F
+[StructLayout(LayoutKind::Sequential, Size = sizeof(Fvector2))] public value struct Vector2F
 {
     float x, y;
 };
 
-[StructLayout(LayoutKind::Sequential, Size = sizeof(Fvector3))]
-public value struct Vector3F
+[StructLayout(LayoutKind::Sequential, Size = sizeof(Fvector3))] public value struct Vector3F
 {
     float x, y, z;
 };
 
 //[FieldOffset(offsetof(Fvector4, x))]
-[StructLayout(LayoutKind::Sequential, Size = sizeof(Fvector4))]
-public value struct Vector4F
+[StructLayout(LayoutKind::Sequential, Size = sizeof(Fvector4))] public value struct Vector4F
 {
     float x, y, z, w;
 };
 
-[StructLayout(LayoutKind::Sequential, Size = sizeof(Ivector2))]
-public value struct Vector2I
+[StructLayout(LayoutKind::Sequential, Size = sizeof(Ivector2))] public value struct Vector2I
 {
     int x, y;
 };
 
-[StructLayout(LayoutKind::Sequential, Size = sizeof(Ivector3))]
-public value struct Vector3I
+[StructLayout(LayoutKind::Sequential, Size = sizeof(Ivector3))] public value struct Vector3I
 {
     int x, y, z;
 };
 
-[StructLayout(LayoutKind::Sequential, Size = sizeof(Ivector4))]
-public value struct Vector4I
+[StructLayout(LayoutKind::Sequential, Size = sizeof(Ivector4))] public value struct Vector4I
 {
     int x, y, z, w;
 };
 
-public ref class WriterBase abstract
+public
+ref class WriterBase abstract
 {
-internal:
-    ::IWriter* impl;
-private:
-    String^ fileName;
-internal:
-    WriterBase(::IWriter* impl);
-public:
-    property String^ FileName { String^ get(); }
-    ~WriterBase();
+    internal : ::IWriter* impl;
+
+  private:
+    String ^ fileName;
+    internal : WriterBase(::IWriter* impl);
+
+  public:
+    property String ^ FileName { String ^ get(); } ~WriterBase();
     // seek
     virtual void Seek(int position) = 0;
     // tell
@@ -104,9 +96,9 @@ public:
     // w_stringZ
     void WriteStringZ(const char* buffer);
     // w_string
-    void WriteString(String^ value);
+    void WriteString(String ^ value);
     // w_stringZ
-    void WriteStringZ(String^ value);
+    void WriteStringZ(String ^ value);
     // w_fcolor
     void WriteColorF(ColorF value);
     // w_fvector4
@@ -134,7 +126,7 @@ public:
     // w_sdir
     void WriteScaledDirection(Vector3F value);
     // w_printf
-    void WriteString(String^ format, ... array<Object^>^ args);
+    void WriteString(String ^ format, ... array<Object ^> ^ args);
     // open_chunk
     void OpenChunk(UInt32 type);
     // close_chunk
@@ -147,12 +139,13 @@ public:
     void WriteChunk(UInt32 type, void* buffer, UInt32 bufferSize);
 };
 
-public ref class ReaderBase abstract
+public
+ref class ReaderBase abstract
 {
-internal:
-    ::IReader* impl;
+    internal : ::IReader* impl;
     ReaderBase(::IReader* impl);
-public:
+
+  public:
     ~ReaderBase();
     // eof
     property bool EndOfStream { bool get(); }
@@ -181,19 +174,19 @@ public:
     // r_float
     float ReadFloat();
     // r_fvector4
-    void ReadVector4F([Out] Vector4F% value);
+    void ReadVector4F([Out] Vector4F % value);
     // r_fvector3
-    void ReadVector3F([Out] Vector3F% value);
+    void ReadVector3F([Out] Vector3F % value);
     // r_fvector2
-    void ReadVector2F([Out] Vector2F% value);
+    void ReadVector2F([Out] Vector2F % value);
     // r_ivector4(Ivector4)
-    void ReadVector4I([Out] Vector4I% value);
+    void ReadVector4I([Out] Vector4I % value);
     // r_ivector4(Ivector3)
-    void ReadVector3I([Out] Vector3I% value);
+    void ReadVector3I([Out] Vector3I % value);
     // r_ivector4(Ivector2)
-    void ReadVector2I([Out] Vector2I% value);
+    void ReadVector2I([Out] Vector2I % value);
     // r_fcolor
-    void ReadColorF([Out] ColorF% value);
+    void ReadColorF([Out] ColorF % value);
     // r_float_q16
     float ReadFloat16(float min, float max);
     // r_float_q8
@@ -203,9 +196,9 @@ public:
     // r_angle8
     float ReadAngle8();
     // r_dir
-    void ReadDirection([Out] Vector3F% value);
+    void ReadDirection([Out] Vector3F % value);
     // r_sdir
-    void ReadScaledDirection([Out] Vector3F% value);
+    void ReadScaledDirection([Out] Vector3F % value);
     // rewind
     void Rewind();
     // find_chunk
@@ -228,26 +221,24 @@ public:
     void Skip(int byteCount);
     // r_string
     void ReadString(char* buffer, UInt32 bufferSize);
-    void ReadString([Out] String^% str);
+    void ReadString([Out] String ^ % str);
     // skip_stringZ
     void SkipStringZ();
     // r_stringZ
     void ReadStringZ(char* buffer, UInt32 bufferSize);
-    void ReadStringZ([Out] String^% str);
+    void ReadStringZ([Out] String ^ % str);
     // close
     void Close();
     // open_chunk
-    ReaderBase^ OpenChunk(UInt32 id);
+    ReaderBase ^ OpenChunk(UInt32 id);
     // open_chunk_iterator
-    ReaderBase^ OpenChunkIterator([Out] UInt32% id, ReaderBase^ prevReader);
+    ReaderBase ^ OpenChunkIterator([Out] UInt32 % id, ReaderBase ^ prevReader);
 };
 
 ref class InternalReaderBase : ReaderBase
 {
-internal:
-    InternalReaderBase(::IReader* impl) : ReaderBase(impl) {}
+    internal : InternalReaderBase(::IReader* impl) : ReaderBase(impl) {}
 };
-
 }
 }
 }

@@ -11,7 +11,8 @@
 class ENGINE_API CEngine
 {
     HMODULE hPSGP;
-    public:
+
+  public:
     CEngine();
     ~CEngine();
 
@@ -22,9 +23,6 @@ class ENGINE_API CEngine
     void ReloadSettings();
 };
 
-
 ENGINE_API extern CEngine Engine;
 
-#endif // !defined(AFX_ENGINE_H__22802DD7_D7EB_4234_9781_E237657471AC__INCLUDED_)
-
-
+#endif  // !defined(AFX_ENGINE_H__22802DD7_D7EB_4234_9781_E237657471AC__INCLUDED_)

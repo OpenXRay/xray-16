@@ -18,59 +18,71 @@
 #include "EntityCondition.h"
 #include "ai/Monsters/states/monster_state_help_sound.h"
 
-CStateManagerCat::CStateManagerCat(CCat *obj) : inherited(obj)
+CStateManagerCat::CStateManagerCat(CCat* obj) : inherited(obj)
 {
-	add_state(eStateRest,				new CStateMonsterRest<CCat>(obj));
-	add_state(eStatePanic,				new CStateMonsterPanic<CCat>(obj));
-	add_state(eStateAttack,				new CStateMonsterAttack<CCat>(obj));
-	add_state(eStateEat,				new CStateMonsterEat<CCat>(obj));
-	add_state(eStateHearInterestingSound,	new CStateMonsterHearInterestingSound<CCat>(obj));
-	add_state(eStateHearDangerousSound,		new CStateMonsterHearDangerousSound<CCat>(obj));
-	add_state(eStateHitted,				new CStateMonsterHitted<CCat>(obj));
+    add_state(eStateRest, new CStateMonsterRest<CCat>(obj));
+    add_state(eStatePanic, new CStateMonsterPanic<CCat>(obj));
+    add_state(eStateAttack, new CStateMonsterAttack<CCat>(obj));
+    add_state(eStateEat, new CStateMonsterEat<CCat>(obj));
+    add_state(eStateHearInterestingSound, new CStateMonsterHearInterestingSound<CCat>(obj));
+    add_state(eStateHearDangerousSound, new CStateMonsterHearDangerousSound<CCat>(obj));
+    add_state(eStateHitted, new CStateMonsterHitted<CCat>(obj));
 
-	add_state(eStateThreaten,			new CStateMonsterLookActor<CCat>(obj));
-	add_state(eStateHearHelpSound,		new CStateMonsterHearHelpSound<CCat>(obj));
+    add_state(eStateThreaten, new CStateMonsterLookActor<CCat>(obj));
+    add_state(eStateHearHelpSound, new CStateMonsterHearHelpSound<CCat>(obj));
 
-	m_rot_jump_last_time = 0;
+    m_rot_jump_last_time = 0;
 }
 
 CStateManagerCat::~CStateManagerCat()
 {
 }
 
-#define ROTATION_JUMP_DELAY		3000
+#define ROTATION_JUMP_DELAY 3000
 
 void CStateManagerCat::execute()
 {
-	u32 state_id = u32(-1);
+    u32 state_id = u32(-1);
 
-	const CEntityAlive* enemy	= object->EnemyMan.get_enemy();
+    const CEntityAlive* enemy = object->EnemyMan.get_enemy();
 
-	if (enemy) {
-		{
-			switch (object->EnemyMan.get_danger_type()) {
-				case eStrong:	state_id = eStatePanic; break;
-				case eWeak:		state_id = eStateAttack; break;
-			}
-		}
-	} else if (object->HitMemory.is_hit()) {
-		state_id = eStateHitted;
-	} else if (check_state(eStateHearHelpSound)) {
-		state_id = eStateHearHelpSound;
-	} else if (object->hear_dangerous_sound) {
-		state_id = eStateHearDangerousSound;
-	} else if (object->hear_interesting_sound) {
-		state_id = eStateHearInterestingSound;
-	} else {
-		if (can_eat())	state_id = eStateEat;
-		else			state_id = eStateRest;
-	}
+    if (enemy) {
+        {
+            switch (object->EnemyMan.get_danger_type())
+            {
+            case eStrong: state_id = eStatePanic; break;
+            case eWeak: state_id = eStateAttack; break;
+            }
+        }
+    }
+    else if (object->HitMemory.is_hit())
+    {
+        state_id = eStateHitted;
+    }
+    else if (check_state(eStateHearHelpSound))
+    {
+        state_id = eStateHearHelpSound;
+    }
+    else if (object->hear_dangerous_sound)
+    {
+        state_id = eStateHearDangerousSound;
+    }
+    else if (object->hear_interesting_sound)
+    {
+        state_id = eStateHearInterestingSound;
+    }
+    else
+    {
+        if (can_eat())
+            state_id = eStateEat;
+        else
+            state_id = eStateRest;
+    }
 
-	select_state(state_id); 
+    select_state(state_id);
 
-	// выполнить текущее состояние
-	get_state_current()->execute();
+    // выполнить текущее состояние
+    get_state_current()->execute();
 
-	prev_substate = current_substate;
+    prev_substate = current_substate;
 }
-

@@ -16,21 +16,18 @@
 
 namespace Wml
 {
-
 template <class Real>
-class Matrix4 : public Matrix<4,Real>
+class Matrix4 : public Matrix<4, Real>
 {
-public:
+  public:
     // construction
-    Matrix4 ();
-    Matrix4 (const Matrix4& rkM);
-    Matrix4 (const Matrix<4,Real>& rkM);
+    Matrix4();
+    Matrix4(const Matrix4& rkM);
+    Matrix4(const Matrix<4, Real>& rkM);
 
     // input Mrc is in row r, column c.
-    Matrix4 (Real fM00, Real fM01, Real fM02, Real fM03,
-             Real fM10, Real fM11, Real fM12, Real fM13,
-             Real fM20, Real fM21, Real fM22, Real fM23,
-             Real fM30, Real fM31, Real fM32, Real fM33);
+    Matrix4(Real fM00, Real fM01, Real fM02, Real fM03, Real fM10, Real fM11, Real fM12, Real fM13, Real fM20,
+        Real fM21, Real fM22, Real fM23, Real fM30, Real fM31, Real fM32, Real fM33);
 
     // Create a matrix from an array of numbers.  The input array is
     // interpreted based on the Boolean input as
@@ -38,16 +35,16 @@ public:
     //                        m23,m30,m31,m32,m33} [row major]
     //   false: entry[0..15]={m00,m10,m20,m30,m01,m11,m21,m31,m02,m12,m22,
     //                        m32,m03,m13,m23,m33} [col major]
-    Matrix4 (const Real afEntry[16], bool bRowMajor);
+    Matrix4(const Real afEntry[16], bool bRowMajor);
 
     // assignment
-    Matrix4& operator= (const Matrix4& rkM);
-    Matrix4& operator= (const Matrix<4,Real>& rkM);
+    Matrix4& operator=(const Matrix4& rkM);
+    Matrix4& operator=(const Matrix<4, Real>& rkM);
 
     // matrix operations
-    Matrix4 Inverse () const;
-    Matrix4 Adjoint () const;
-    Real Determinant () const;
+    Matrix4 Inverse() const;
+    Matrix4 Adjoint() const;
+    Real Determinant() const;
 
     // special matrices
     WML_ITEM static const Matrix4 ZERO;
@@ -58,7 +55,6 @@ public:
 
 typedef Matrix4<float> Matrix4f;
 typedef Matrix4<double> Matrix4d;
-
 }
 
 #endif

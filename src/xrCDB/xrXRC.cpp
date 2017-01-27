@@ -9,7 +9,7 @@
 
 XRCDB_API xrXRC XRC("global");
 
-void xrXRC::DumpStatistics(IGameFont &font, IPerformanceAlert *alert)
+void xrXRC::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
 {
     Stats.FrameEnd();
     font.OutNext("XRC (%s):", name);

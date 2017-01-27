@@ -18,8 +18,8 @@
 #else
 #define ENGINE_API
 #define DLL_API
-#endif // !NO_ENGINE_API
-#endif // !ENGINE_API
+#endif  // !NO_ENGINE_API
+#endif  // !ENGINE_API
 
 #include "engineAPI.h"
 #include "eventAPI.h"

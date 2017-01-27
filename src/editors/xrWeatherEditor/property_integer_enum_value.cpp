@@ -11,47 +11,45 @@
 
 using System::String;
 
-property_integer_enum_value::property_integer_enum_value	(
-		integer_getter_type const &getter,
-		integer_setter_type const &setter,
-		pair *values,
-		u32 const &value_count
-	) :
-	inherited				(getter, setter),
-	m_collection			(gcnew collection_type())
+property_integer_enum_value::property_integer_enum_value(
+    integer_getter_type const& getter, integer_setter_type const& setter, pair* values, u32 const& value_count)
+    : inherited(getter, setter), m_collection(gcnew collection_type())
 {
-	for (u32 i=0; i<value_count; ++i) {
-		ValuePair^			pair = gcnew ValuePair();
-		pair->first			= values[i].first;
-		pair->second		= to_string(values[i].second);
-		m_collection->Add	(pair);
-	}
+    for (u32 i = 0; i < value_count; ++i)
+    {
+        ValuePair ^ pair = gcnew ValuePair();
+        pair->first = values[i].first;
+        pair->second = to_string(values[i].second);
+        m_collection->Add(pair);
+    }
 }
 
-System::Object ^property_integer_enum_value::GetValue		()
+System::Object ^ property_integer_enum_value::GetValue()
 {
-	int						value = safe_cast<int>(inherited::GetValue());
-	for each (ValuePair^ i in m_collection) {
-		if (i->first != value)
-			continue;
+    int value = safe_cast<int>(inherited::GetValue());
+    for
+        each(ValuePair ^ i in m_collection)
+        {
+            if (i->first != value) continue;
 
-		return				(value);
-	}
+            return (value);
+        }
 
-	return					(safe_cast<ValuePair^>(m_collection[0])->first);
+    return (safe_cast<ValuePair ^>(m_collection[0])->first);
 }
 
-void property_integer_enum_value::SetValue					(Object ^object)
+void property_integer_enum_value::SetValue(Object ^ object)
 {
-	String^					string_value = dynamic_cast<String^>(object);
+    String ^ string_value = dynamic_cast<String ^>(object);
 
-	for each (ValuePair^ i in m_collection) {
-		if (!i->second->Equals(string_value))
-			continue;
+    for
+        each(ValuePair ^ i in m_collection)
+        {
+            if (!i->second->Equals(string_value)) continue;
 
-		inherited::SetValue(i->first);
-		return;
-	}
+            inherited::SetValue(i->first);
+            return;
+        }
 
-	inherited::SetValue	(safe_cast<ValuePair^>(m_collection[0])->first);
+    inherited::SetValue(safe_cast<ValuePair ^>(m_collection[0])->first);
 }

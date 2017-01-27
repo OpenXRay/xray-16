@@ -12,14 +12,10 @@
 
 using namespace luabind;
 
-SCRIPT_EXPORT(CParticleParams, (),
-{
-	module(luaState)
-	[
-		class_<CParticleParams>("particle_params")
-			.def(								constructor<>())
-			.def(								constructor<const Fvector &>())
-			.def(								constructor<const Fvector &,const Fvector &>())
-			.def(								constructor<const Fvector &,const Fvector &,const Fvector &>())
-	];
+SCRIPT_EXPORT(CParticleParams, (), {
+    module(luaState)[class_<CParticleParams>("particle_params")
+                         .def(constructor<>())
+                         .def(constructor<const Fvector&>())
+                         .def(constructor<const Fvector&, const Fvector&>())
+                         .def(constructor<const Fvector&, const Fvector&, const Fvector&>())];
 });

@@ -14,41 +14,34 @@ void _STDCALL PrintInfo(_PPMD_FILE* DecodedFile, _PPMD_FILE* EncodedFile)
 {
 }
 
-
-
 static LONG PPMd_Locked = 0;
 
-static inline void
-PPMd_Lock()
+static inline void PPMd_Lock()
 {
     while (::InterlockedExchange(&PPMd_Locked, 1))
         ::Sleep(0);
 }
 
-static inline void
-PPMd_Unlock()
+static inline void PPMd_Unlock()
 {
     ::InterlockedExchange(&PPMd_Locked, 0);
 }
 
-
 void ppmd_initialize()
 {
-    if (trained_model)
-        trained_model->rewind();
+    if (trained_model) trained_model->rewind();
 
     static bool initialized = false;
-    if (initialized)
-        return;
+    if (initialized) return;
 
     initialized = true;
-    if (StartSubAllocator(suballocator_size))
-        return;
+    if (StartSubAllocator(suballocator_size)) return;
 
     exit(-1);
 }
 
-u32 ppmd_compress(void* dest_buffer, const u32& dest_buffer_size, const void* source_buffer, const u32& source_buffer_size)
+u32 ppmd_compress(
+    void* dest_buffer, const u32& dest_buffer_size, const void* source_buffer, const u32& source_buffer_size)
 {
     PPMd_Lock();
     ppmd_initialize();
@@ -61,8 +54,8 @@ u32 ppmd_compress(void* dest_buffer, const u32& dest_buffer_size, const void* so
     return (dest.tell() + 1);
 }
 
-u32 ppmd_trained_compress(void* dest_buffer, const u32& dest_buffer_size, const void* source_buffer, const u32& source_buffer_size,
-                          compression::ppmd::stream* tmodel)
+u32 ppmd_trained_compress(void* dest_buffer, const u32& dest_buffer_size, const void* source_buffer,
+    const u32& source_buffer_size, compression::ppmd::stream* tmodel)
 {
     PPMd_Lock();
 
@@ -81,7 +74,8 @@ u32 ppmd_trained_compress(void* dest_buffer, const u32& dest_buffer_size, const 
     return (dest.tell() + 1);
 }
 
-u32 ppmd_decompress(void* dest_buffer, const u32& dest_buffer_size, const void* source_buffer, const u32& source_buffer_size)
+u32 ppmd_decompress(
+    void* dest_buffer, const u32& dest_buffer_size, const void* source_buffer, const u32& source_buffer_size)
 {
     PPMd_Lock();
     ppmd_initialize();
@@ -94,8 +88,8 @@ u32 ppmd_decompress(void* dest_buffer, const u32& dest_buffer_size, const void* 
     return (dest.tell());
 }
 
-u32 ppmd_trained_decompress(void* dest_buffer, const u32& dest_buffer_size, const void* source_buffer, const u32& source_buffer_size,
-                            compression::ppmd::stream* tmodel)
+u32 ppmd_trained_decompress(void* dest_buffer, const u32& dest_buffer_size, const void* source_buffer,
+    const u32& source_buffer_size, compression::ppmd::stream* tmodel)
 {
     PPMd_Lock();
 
@@ -103,8 +97,6 @@ u32 ppmd_trained_decompress(void* dest_buffer, const u32& dest_buffer_size, cons
     trained_model = tmodel;
 
     ppmd_initialize();
-
-
 
     stream source(source_buffer, source_buffer_size);
     stream dest(dest_buffer, dest_buffer_size);
@@ -114,12 +106,12 @@ u32 ppmd_trained_decompress(void* dest_buffer, const u32& dest_buffer_size, cons
 
     PPMd_Unlock();
     return (dest.tell());
-
 }
 
-static const u32 compress_chunk_size = 100 * 1024; //100 kb
+static const u32 compress_chunk_size = 100 * 1024;  // 100 kb
 
-u32 ppmd_compress_mt(void* dest_buffer, const u32& dest_buffer_size, const void* source_buffer, const u32& source_buffer_size, ppmd_yield_callback_t ycb)
+u32 ppmd_compress_mt(void* dest_buffer, const u32& dest_buffer_size, const void* source_buffer,
+    const u32& source_buffer_size, ppmd_yield_callback_t ycb)
 {
     PPMd_Lock();
     ppmd_initialize();
@@ -134,8 +126,7 @@ u32 ppmd_compress_mt(void* dest_buffer, const u32& dest_buffer_size, const void*
 
     while (rest_src_buff)
     {
-        u32 to_compress = rest_src_buff > compress_chunk_size ?
-                          compress_chunk_size : rest_src_buff;
+        u32 to_compress = rest_src_buff > compress_chunk_size ? compress_chunk_size : rest_src_buff;
 
         stream source(src_buff_chunk, to_compress);
         stream dest(curr_dst_buff, dst_buff_size);
@@ -149,15 +140,15 @@ u32 ppmd_compress_mt(void* dest_buffer, const u32& dest_buffer_size, const void*
 
         src_buff_chunk += to_compress;
         rest_src_buff -= to_compress;
-        if (ycb)
-            ycb();
+        if (ycb) ycb();
     }
 
     PPMd_Unlock();
     return result_size;
 }
 
-u32 ppmd_decompress_mt(void* dest_buffer, const u32& dest_buffer_size, const void* source_buffer, const u32& source_buffer_size, ppmd_yield_callback_t ycb)
+u32 ppmd_decompress_mt(void* dest_buffer, const u32& dest_buffer_size, const void* source_buffer,
+    const u32& source_buffer_size, ppmd_yield_callback_t ycb)
 {
     PPMd_Lock();
     ppmd_initialize();
@@ -188,11 +179,9 @@ u32 ppmd_decompress_mt(void* dest_buffer, const u32& dest_buffer_size, const voi
 
         result_size += unpacked;
 
-        if (ycb)
-            ycb();
+        if (ycb) ycb();
     }
 
     PPMd_Unlock();
     return result_size;
 }
-

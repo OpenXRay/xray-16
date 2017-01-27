@@ -14,17 +14,16 @@
 using namespace Wml;
 
 //----------------------------------------------------------------------------
-void Wml::System::SwapBytes (int iSize, void* pvValue)
+void Wml::System::SwapBytes(int iSize, void* pvValue)
 {
-    assert( iSize >= 1 );
-    if ( iSize == 1 )
-        return;
+    assert(iSize >= 1);
+    if (iSize == 1) return;
 
     // size must be even
-    assert( (iSize & 1) == 0 );
+    assert((iSize & 1) == 0);
 
-    char* acBytes = (char*) pvValue;
-    for (int i0 = 0, i1 = iSize-1; i0 < iSize/2; i0++, i1--)
+    char* acBytes = (char*)pvValue;
+    for (int i0 = 0, i1 = iSize - 1; i0 < iSize / 2; i0++, i1--)
     {
         char cSave = acBytes[i0];
         acBytes[i0] = acBytes[i1];
@@ -32,19 +31,18 @@ void Wml::System::SwapBytes (int iSize, void* pvValue)
     }
 }
 //----------------------------------------------------------------------------
-void Wml::System::SwapBytes (int iSize, int iQuantity, void* pvValue)
+void Wml::System::SwapBytes(int iSize, int iQuantity, void* pvValue)
 {
-    assert( iSize >= 1 );
-    if ( iSize == 1 )
-        return;
+    assert(iSize >= 1);
+    if (iSize == 1) return;
 
     // size must be even
-    assert( (iSize & 1) == 0 );
+    assert((iSize & 1) == 0);
 
-    char* acBytes = (char*) pvValue;
+    char* acBytes = (char*)pvValue;
     for (int i = 0; i < iQuantity; i++, acBytes += iSize)
     {
-        for (int i0 = 0, i1 = iSize-1; i0 < iSize/2; i0++, i1--)
+        for (int i0 = 0, i1 = iSize - 1; i0 < iSize / 2; i0++, i1--)
         {
             char cSave = acBytes[i0];
             acBytes[i0] = acBytes[i1];
@@ -53,16 +51,15 @@ void Wml::System::SwapBytes (int iSize, int iQuantity, void* pvValue)
     }
 }
 //----------------------------------------------------------------------------
-bool Wml::System::IsPowerOfTwo (int iValue)
+bool Wml::System::IsPowerOfTwo(int iValue)
 {
     return (iValue != 0) && ((iValue & -iValue) == iValue);
 }
 //----------------------------------------------------------------------------
-bool Wml::System::FileExists (const char* acFilename)
+bool Wml::System::FileExists(const char* acFilename)
 {
-    FILE* pkFile = fopen(acFilename,"r");
-    if ( pkFile )
-    {
+    FILE* pkFile = fopen(acFilename, "r");
+    if (pkFile) {
         fclose(pkFile);
         return true;
     }

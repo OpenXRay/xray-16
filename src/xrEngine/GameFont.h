@@ -10,6 +10,7 @@
 class ENGINE_API CGameFont : public IGameFont
 {
     friend class dxFontRender;
+
 private:
     struct String
     {
@@ -19,6 +20,7 @@ private:
         u32 c;
         EAligment align;
     };
+
 protected:
     Fvector2 vHalfPixel;
     Ivector2 vTS;
@@ -56,13 +58,13 @@ public:
     virtual void SetAligment(EAligment aligment) override { eCurrentAlignment = aligment; }
     virtual float SizeOf_(LPCSTR s) override;
     virtual float SizeOf_(const wchar_t* wsStr) override;
-    virtual float SizeOf_(const char cChar); // only ANSII
+    virtual float SizeOf_(const char cChar);  // only ANSII
     virtual float CurrentHeight_() override;
     virtual void OutSetI(float x, float y) override;
     virtual void OutSet(float x, float y) override;
     virtual Fvector2 GetPosition() const override { return {fCurrentX, fCurrentY}; }
-    virtual void MasterOut(BOOL bCheckDevice, BOOL bUseCoords, BOOL bScaleCoords, BOOL bUseSkip,
-        float _x, float _y, float _skip, LPCSTR fmt, va_list p) override;
+    virtual void MasterOut(BOOL bCheckDevice, BOOL bUseCoords, BOOL bScaleCoords, BOOL bUseSkip, float _x, float _y,
+        float _skip, LPCSTR fmt, va_list p) override;
     virtual u32 smart_strlen(const char* S) override;
     virtual BOOL IsMultibyte() const override { return (uFlags & fsMultibyte); };
     virtual u16 SplitByWidth(u16* puBuffer, u16 uBufferSize, float fTargetWidth, const char* pszText) override;
@@ -70,7 +72,7 @@ public:
     virtual void OutI(float _x, float _y, LPCSTR fmt, ...) override;
     virtual void Out(float _x, float _y, LPCSTR fmt, ...) override;
     virtual void OutNext(LPCSTR fmt, ...) override;
-    virtual void OutNextVA(const char *format, va_list args) override;
+    virtual void OutNextVA(const char* format, va_list args) override;
     virtual void OutSkip(float val = 1.f) override;
     virtual void OnRender() override;
     virtual void Clear() override { strings.clear(); }
@@ -80,4 +82,4 @@ public:
 #endif
 };
 
-#endif // _XR_GAMEFONT_H_
+#endif  // _XR_GAMEFONT_H_

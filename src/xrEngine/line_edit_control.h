@@ -8,17 +8,14 @@
 #ifndef LINE_EDIT_CONTROL_H_INCLUDED
 #define LINE_EDIT_CONTROL_H_INCLUDED
 
-
-
 namespace text_editor
 {
-
-void remove_spaces(PSTR str); // in & out
+void remove_spaces(PSTR str);  // in & out
 void split_cmd(PSTR first, PSTR second, LPCSTR str);
 
 class base;
 
-enum key_state // Flags32
+enum key_state  // Flags32
 {
     ks_free = u32(0),
     ks_LShift = u32(1) << 0,
@@ -35,18 +32,17 @@ enum key_state // Flags32
 
     ks_force = u32(-1)
 
-};// enum key_state
+};  // enum key_state
 
 enum init_mode
 {
     im_standart = 0,
     im_number_only,
     im_read_only,
-    im_file_name_mode, // not "/\\:*?\"<>|^()[]%"
+    im_file_name_mode,  // not "/\\:*?\"<>|^()[]%"
 
     im_count
-};// init_mode
-
+};  // init_mode
 
 class ENGINE_API line_edit_control
 {
@@ -87,7 +83,7 @@ public:
 
 private:
     line_edit_control(line_edit_control const&);
-    line_edit_control const& operator= (line_edit_control const&);
+    line_edit_control const& operator=(line_edit_control const&);
 
     void update_key_states();
     void update_bufs();
@@ -127,7 +123,10 @@ private:
     void clamp_cur_pos();
 
 private:
-    enum { DIK_COUNT = 256 };
+    enum
+    {
+        DIK_COUNT = 256
+    };
     Base* m_actions[DIK_COUNT];
 
     char* m_edit_str;
@@ -138,7 +137,11 @@ private:
     char* m_buf2;
     char* m_buf3;
 
-    enum { MIN_BUF_SIZE = 8, MAX_BUF_SIZE = 4096 };
+    enum
+    {
+        MIN_BUF_SIZE = 8,
+        MAX_BUF_SIZE = 4096
+    };
     int m_buffer_size;
 
     int m_cur_pos;
@@ -162,8 +165,8 @@ private:
     bool m_cursor_view;
     bool m_need_update;
     bool m_unselected_mode;
-}; // class line_edit_control
+};  // class line_edit_control
 
-} // namespace text_editor
+}  // namespace text_editor
 
-#endif // ##ifndef LINE_EDIT_CONTROL_H_INCLUDED
+#endif  // ##ifndef LINE_EDIT_CONTROL_H_INCLUDED

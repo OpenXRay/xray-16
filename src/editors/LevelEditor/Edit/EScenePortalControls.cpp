@@ -7,7 +7,10 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-__fastcall TUI_ControlPortalSelect::TUI_ControlPortalSelect(int st, int act, ESceneToolBase *parent): TUI_CustomControl(st, act, parent) {}
+__fastcall TUI_ControlPortalSelect::TUI_ControlPortalSelect(int st, int act, ESceneToolBase* parent)
+    : TUI_CustomControl(st, act, parent)
+{
+}
 
 bool __fastcall TUI_ControlPortalSelect::Start(TShiftState Shift)
 {
@@ -23,4 +26,3 @@ bool __fastcall TUI_ControlPortalSelect::End(TShiftState Shift)
 {
     return SelectEnd(Shift);
 }
-

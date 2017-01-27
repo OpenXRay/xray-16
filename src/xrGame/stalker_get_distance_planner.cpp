@@ -19,62 +19,50 @@
 using namespace StalkerSpace;
 using namespace StalkerDecisionSpace;
 
-CStalkerGetDistancePlanner::CStalkerGetDistancePlanner	(CAI_Stalker *object, LPCSTR action_name) :
-	inherited			(object,action_name)
+CStalkerGetDistancePlanner::CStalkerGetDistancePlanner(CAI_Stalker* object, LPCSTR action_name)
+    : inherited(object, action_name)
 {
 }
 
-CStalkerGetDistancePlanner::~CStalkerGetDistancePlanner	()
+CStalkerGetDistancePlanner::~CStalkerGetDistancePlanner()
 {
 }
 
-void CStalkerGetDistancePlanner::setup					(CAI_Stalker *object, CPropertyStorage *storage)
+void CStalkerGetDistancePlanner::setup(CAI_Stalker* object, CPropertyStorage* storage)
 {
-	inherited::setup		(object,storage);
+    inherited::setup(object, storage);
 
-	CActionPlanner<CScriptGameObject>::m_storage.set_property	(eWorldPropertyInCover,	false);
+    CActionPlanner<CScriptGameObject>::m_storage.set_property(eWorldPropertyInCover, false);
 
-	clear					();
-	add_evaluators			();
-	add_actions				();
+    clear();
+    add_evaluators();
+    add_actions();
 
-	object->best_cover_invalidate	();
+    object->best_cover_invalidate();
 }
 
-void CStalkerGetDistancePlanner::add_evaluators			()
+void CStalkerGetDistancePlanner::add_evaluators()
 {
-	add_evaluator			(
-		eWorldPropertyInCover,
-		new CStalkerPropertyEvaluatorMember(
-			(CPropertyStorage*)0,//&CScriptActionPlanner::m_storage,
-			eWorldPropertyInCover,
-			true,
-			true,
-			"in cover"
-		)
-	);
-	
-	add_evaluator			(
-		eWorldPropertyTooFarToKillEnemy,
-		new CStalkerPropertyEvaluatorTooFarToKillEnemy(
-			m_object,
-			"too far to kill"
-		)
-	);
+    add_evaluator(eWorldPropertyInCover,
+        new CStalkerPropertyEvaluatorMember((CPropertyStorage*)0,  //&CScriptActionPlanner::m_storage,
+            eWorldPropertyInCover, true, true, "in cover"));
+
+    add_evaluator(
+        eWorldPropertyTooFarToKillEnemy, new CStalkerPropertyEvaluatorTooFarToKillEnemy(m_object, "too far to kill"));
 }
 
-void CStalkerGetDistancePlanner::add_actions			()
+void CStalkerGetDistancePlanner::add_actions()
 {
-	CStalkerActionBase		*action;
+    CStalkerActionBase* action;
 
-	action					= new CStalkerActionRunToCover		(m_object,"run to cover");
-	add_condition			(action,eWorldPropertyInCover,			false);
-	add_effect				(action,eWorldPropertyInCover,			true);
-	add_operator			(eWorldOperatorRunToCover,				action);
+    action = new CStalkerActionRunToCover(m_object, "run to cover");
+    add_condition(action, eWorldPropertyInCover, false);
+    add_effect(action, eWorldPropertyInCover, true);
+    add_operator(eWorldOperatorRunToCover, action);
 
-	action					= new CStalkerActionWaitInCover		(m_object,"wait in cover");
-	add_condition			(action,eWorldPropertyInCover,			true);
-	add_condition			(action,eWorldPropertyTooFarToKillEnemy,true);
-	add_effect				(action,eWorldPropertyTooFarToKillEnemy,false);
-	add_operator			(eWorldOperatorWaitInCover,				action);
+    action = new CStalkerActionWaitInCover(m_object, "wait in cover");
+    add_condition(action, eWorldPropertyInCover, true);
+    add_condition(action, eWorldPropertyTooFarToKillEnemy, true);
+    add_effect(action, eWorldPropertyTooFarToKillEnemy, false);
+    add_operator(eWorldOperatorWaitInCover, action);
 }

@@ -22,23 +22,23 @@
 // CAgentManagerActionNoOrders
 //////////////////////////////////////////////////////////////////////////
 
-CAgentManagerActionNoOrders::CAgentManagerActionNoOrders	(CAgentManager *object, LPCSTR action_name) :
-	inherited		(object,action_name)
+CAgentManagerActionNoOrders::CAgentManagerActionNoOrders(CAgentManager* object, LPCSTR action_name)
+    : inherited(object, action_name)
 {
 }
 
-void CAgentManagerActionNoOrders::finalize			()
+void CAgentManagerActionNoOrders::finalize()
 {
-	inherited::finalize				();
-	m_object->corpse().clear		();
+    inherited::finalize();
+    m_object->corpse().clear();
 }
 
 //////////////////////////////////////////////////////////////////////////
 // CAgentManagerActionGatherItems
 //////////////////////////////////////////////////////////////////////////
 
-CAgentManagerActionGatherItems::CAgentManagerActionGatherItems	(CAgentManager *object, LPCSTR action_name) :
-	inherited		(object,action_name)
+CAgentManagerActionGatherItems::CAgentManagerActionGatherItems(CAgentManager* object, LPCSTR action_name)
+    : inherited(object, action_name)
 {
 }
 
@@ -46,54 +46,54 @@ CAgentManagerActionGatherItems::CAgentManagerActionGatherItems	(CAgentManager *o
 // CAgentManagerActionKillEnemy
 //////////////////////////////////////////////////////////////////////////
 
-CAgentManagerActionKillEnemy::CAgentManagerActionKillEnemy	(CAgentManager *object, LPCSTR action_name) :
-	inherited		(object,action_name)
+CAgentManagerActionKillEnemy::CAgentManagerActionKillEnemy(CAgentManager* object, LPCSTR action_name)
+    : inherited(object, action_name)
 {
 }
 
-void CAgentManagerActionKillEnemy::initialize		()
+void CAgentManagerActionKillEnemy::initialize()
 {
-	inherited::initialize						();
-	
-	m_object->location().clear					();
+    inherited::initialize();
+
+    m_object->location().clear();
 }
 
-void CAgentManagerActionKillEnemy::finalize			()
+void CAgentManagerActionKillEnemy::finalize()
 {
-	inherited::finalize							();
-	
-//	m_object->enemy().distribute_enemies		();
+    inherited::finalize();
+
+    //	m_object->enemy().distribute_enemies		();
 }
 
-void CAgentManagerActionKillEnemy::execute			()
+void CAgentManagerActionKillEnemy::execute()
 {
-	inherited::execute							();
+    inherited::execute();
 
-	m_object->enemy().distribute_enemies		();
-	m_object->explosive().react_on_explosives	();
-	m_object->corpse().react_on_member_death	();
+    m_object->enemy().distribute_enemies();
+    m_object->explosive().react_on_explosives();
+    m_object->corpse().react_on_member_death();
 }
 
 //////////////////////////////////////////////////////////////////////////
 // CAgentManagerActionReactOnDanger
 //////////////////////////////////////////////////////////////////////////
 
-CAgentManagerActionReactOnDanger::CAgentManagerActionReactOnDanger	(CAgentManager *object, LPCSTR action_name) :
-	inherited		(object,action_name)
+CAgentManagerActionReactOnDanger::CAgentManagerActionReactOnDanger(CAgentManager* object, LPCSTR action_name)
+    : inherited(object, action_name)
 {
 }
 
-void CAgentManagerActionReactOnDanger::initialize		()
+void CAgentManagerActionReactOnDanger::initialize()
 {
-	inherited::initialize			();
+    inherited::initialize();
 
-	m_object->location().clear		();
+    m_object->location().clear();
 }
 
-void CAgentManagerActionReactOnDanger::execute			()
+void CAgentManagerActionReactOnDanger::execute()
 {
-	inherited::execute							();
+    inherited::execute();
 
-	m_object->explosive().react_on_explosives	();
-	m_object->corpse().react_on_member_death	();
+    m_object->explosive().react_on_explosives();
+    m_object->corpse().react_on_member_death();
 }

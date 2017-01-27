@@ -12,6 +12,6 @@ CScientificOutfit::CScientificOutfit()
 {
 }
 
-CScientificOutfit::~CScientificOutfit() 
+CScientificOutfit::~CScientificOutfit()
 {
 }

@@ -29,77 +29,76 @@ using namespace StalkerDecisionSpace;
 using namespace MonsterSpace;
 using namespace StalkerSpace;
 
-stalker_low_cover_planner::stalker_low_cover_planner	(CAI_Stalker *object, LPCSTR action_name) :
-	inherited				(object,action_name)
+stalker_low_cover_planner::stalker_low_cover_planner(CAI_Stalker* object, LPCSTR action_name)
+    : inherited(object, action_name)
 {
 }
 
-void stalker_low_cover_planner::setup					(CAI_Stalker *object, CPropertyStorage *storage)
+void stalker_low_cover_planner::setup(CAI_Stalker* object, CPropertyStorage* storage)
 {
-	inherited::setup		(object,storage);
-	clear					();
-	add_evaluators			();
-	add_actions				();
+    inherited::setup(object, storage);
+    clear();
+    add_evaluators();
+    add_actions();
 }
 
-void stalker_low_cover_planner::update					()
+void stalker_low_cover_planner::update()
 {
-	MemorySpace::CMemoryInfo	mem_object = object().memory().memory(object().memory().enemy().selected());
-	if (mem_object.m_object)
-		object().best_cover	(mem_object.m_object_params.m_position);
+    MemorySpace::CMemoryInfo mem_object = object().memory().memory(object().memory().enemy().selected());
+    if (mem_object.m_object) object().best_cover(mem_object.m_object_params.m_position);
 
-	inherited::update		();
+    inherited::update();
 }
 
-void stalker_low_cover_planner::initialize				()
+void stalker_low_cover_planner::initialize()
 {
-	inherited::initialize	();
-	
-	object().movement().set_movement_type(eMovementTypeStand);
-	object().movement().set_nearest_accessible_position	();
-	object().movement().set_desired_direction			(0);
-	object().movement().set_path_type					(MovementManager::ePathTypeLevelPath);
-	object().movement().set_detail_path_type			(DetailPathManager::eDetailPathTypeSmooth);
-	object().movement().set_mental_state				(eMentalStateDanger);
+    inherited::initialize();
 
-	CScriptActionPlanner::m_storage.set_property		(eWorldPropertyInCover,true);
+    object().movement().set_movement_type(eMovementTypeStand);
+    object().movement().set_nearest_accessible_position();
+    object().movement().set_desired_direction(0);
+    object().movement().set_path_type(MovementManager::ePathTypeLevelPath);
+    object().movement().set_detail_path_type(DetailPathManager::eDetailPathTypeSmooth);
+    object().movement().set_mental_state(eMentalStateDanger);
+
+    CScriptActionPlanner::m_storage.set_property(eWorldPropertyInCover, true);
 }
 
-void stalker_low_cover_planner::execute					()
+void stalker_low_cover_planner::execute()
 {
-	inherited::execute		();
+    inherited::execute();
 }
 
-void stalker_low_cover_planner::finalize				()
+void stalker_low_cover_planner::finalize()
 {
-	inherited::finalize		();
+    inherited::finalize();
 }
 
-void stalker_low_cover_planner::add_evaluators			()
+void stalker_low_cover_planner::add_evaluators()
 {
-	add_evaluator			(eWorldPropertyLowCover,	new CStalkerPropertyEvaluatorConst		(true,"using low cover"));
-	add_evaluator			(eWorldPropertyReadyToKill,	new CStalkerPropertyEvaluatorReadyToKill(m_object,"ready to kill"));
-	add_evaluator			(eWorldPropertySeeEnemy,	new CStalkerPropertyEvaluatorSeeEnemy	(m_object,"see enemy"));
+    add_evaluator(eWorldPropertyLowCover, new CStalkerPropertyEvaluatorConst(true, "using low cover"));
+    add_evaluator(eWorldPropertyReadyToKill, new CStalkerPropertyEvaluatorReadyToKill(m_object, "ready to kill"));
+    add_evaluator(eWorldPropertySeeEnemy, new CStalkerPropertyEvaluatorSeeEnemy(m_object, "see enemy"));
 }
 
-void stalker_low_cover_planner::add_actions				()
+void stalker_low_cover_planner::add_actions()
 {
-	CStalkerActionBase		*action;
+    CStalkerActionBase* action;
 
-	action					= new CStalkerActionGetReadyToKillLowCover	(m_object,"get_ready_to_kill");
-	add_condition			(action,eWorldPropertyReadyToKill,		false);
-	add_effect				(action,eWorldPropertyReadyToKill,		true);
-	add_operator			(eWorldOperatorGetReadyToKill,			action);
+    action = new CStalkerActionGetReadyToKillLowCover(m_object, "get_ready_to_kill");
+    add_condition(action, eWorldPropertyReadyToKill, false);
+    add_effect(action, eWorldPropertyReadyToKill, true);
+    add_operator(eWorldOperatorGetReadyToKill, action);
 
-	action					= new CStalkerActionKillEnemyLowCover		(m_object,"kill_enemy");
-	add_condition			(action,eWorldPropertyReadyToKill,		true);
-	add_condition			(action,eWorldPropertySeeEnemy,			true);
-	add_effect				(action,eWorldPropertyLowCover,			false);
-	add_operator			(eWorldOperatorKillEnemy,				action);
+    action = new CStalkerActionKillEnemyLowCover(m_object, "kill_enemy");
+    add_condition(action, eWorldPropertyReadyToKill, true);
+    add_condition(action, eWorldPropertySeeEnemy, true);
+    add_effect(action, eWorldPropertyLowCover, false);
+    add_operator(eWorldOperatorKillEnemy, action);
 
-	action					= new CStalkerActionHoldPositionLowCover	(m_object,"hold_position");
-	add_condition			(action,eWorldPropertyReadyToKill,		true);
-	add_condition			(action,eWorldPropertySeeEnemy,			false);
-	add_effect				(action,eWorldPropertyLowCover,			false);
-	add_operator			(eWorldOperatorHoldPosition,			action);
+    action = new CStalkerActionHoldPositionLowCover(m_object, "hold_position");
+    add_condition(action, eWorldPropertyReadyToKill, true);
+    add_condition(action, eWorldPropertySeeEnemy, false);
+    add_effect(action, eWorldPropertyLowCover, false);
+    add_operator(eWorldOperatorHoldPosition, action);
 }

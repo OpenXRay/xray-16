@@ -9,28 +9,24 @@
 #include "stdafx.h"
 #include "alife_schedule_registry.h"
 
-CALifeScheduleRegistry::~CALifeScheduleRegistry	()
+CALifeScheduleRegistry::~CALifeScheduleRegistry()
 {
 }
 
-void CALifeScheduleRegistry::add		(CSE_ALifeDynamicObject *object)
+void CALifeScheduleRegistry::add(CSE_ALifeDynamicObject* object)
 {
-	CSE_ALifeSchedulable		*schedulable = smart_cast<CSE_ALifeSchedulable*>(object);
-	if (!schedulable)
-		return;
+    CSE_ALifeSchedulable* schedulable = smart_cast<CSE_ALifeSchedulable*>(object);
+    if (!schedulable) return;
 
-	if (!schedulable->need_update(object))
-		return;
+    if (!schedulable->need_update(object)) return;
 
-	inherited::add				(object->ID,schedulable);
+    inherited::add(object->ID, schedulable);
 }
 
-void CALifeScheduleRegistry::remove	(CSE_ALifeDynamicObject *object, bool no_assert)
+void CALifeScheduleRegistry::remove(CSE_ALifeDynamicObject* object, bool no_assert)
 {
-	CSE_ALifeSchedulable		*schedulable = smart_cast<CSE_ALifeSchedulable*>(object);
-	if (!schedulable)
-		return;
+    CSE_ALifeSchedulable* schedulable = smart_cast<CSE_ALifeSchedulable*>(object);
+    if (!schedulable) return;
 
-	inherited::remove			(object->ID,no_assert || !schedulable->need_update(object));
+    inherited::remove(object->ID, no_assert || !schedulable->need_update(object));
 }
-

@@ -2,47 +2,48 @@
 
 #include "ai/Monsters/BaseMonster/base_monster.h"
 
-
-class CAI_PseudoDog : public CBaseMonster {
-	typedef		CBaseMonster	inherited;
+class CAI_PseudoDog : public CBaseMonster
+{
+    typedef CBaseMonster inherited;
 
 public:
+    float m_anger_hunger_threshold;
+    float m_anger_loud_threshold;
 
-	float			m_anger_hunger_threshold;
-	float			m_anger_loud_threshold;
+    TTime m_time_became_angry;
 
-	TTime			m_time_became_angry;
+    TTime time_growling;  // время нахождения в состоянии пугания
 
-	TTime			time_growling;			// время нахождения в состоянии пугания
+    enum
+    {
+        eAdditionalSounds = MonsterSound::eMonsterSoundCustom,
+        ePsyAttack = eAdditionalSounds | 0,
+    };
 
-	enum {
-		eAdditionalSounds		= MonsterSound::eMonsterSoundCustom,
-		ePsyAttack				= eAdditionalSounds | 0,
-	};
 public:
-					CAI_PseudoDog		();
-	virtual			~CAI_PseudoDog		();	
+    CAI_PseudoDog();
+    virtual ~CAI_PseudoDog();
 
-	virtual IFactoryObject	*_construct		();
+    virtual IFactoryObject* _construct();
 
-	virtual void	Load				(LPCSTR section);
+    virtual void Load(LPCSTR section);
 
-	virtual void	reinit				();
-	virtual void	reload				(LPCSTR section);
+    virtual void reinit();
+    virtual void reload(LPCSTR section);
 
-	virtual bool	ability_can_drag	() {return true;}
-	virtual bool	ability_psi_attack	() {return true;}
+    virtual bool ability_can_drag() { return true; }
+    virtual bool ability_psi_attack() { return true; }
 
-	virtual void	CheckSpecParams		(u32 spec_params);
-	//virtual void	play_effect_sound	();
+    virtual void CheckSpecParams(u32 spec_params);
+    // virtual void	play_effect_sound	();
 
-	virtual void	HitEntityInJump		(const CEntity *pEntity);
+    virtual void HitEntityInJump(const CEntity* pEntity);
 
-	virtual IStateManagerBase *create_state_manager	();
-	virtual	char*	get_monster_class_name () { return "pseudodog"; }
+    virtual IStateManagerBase* create_state_manager();
+    virtual char* get_monster_class_name() { return "pseudodog"; }
 
 private:
-#ifdef _DEBUG	
-	virtual void	debug_on_key		(int key);
+#ifdef _DEBUG
+    virtual void debug_on_key(int key);
 #endif
 };

@@ -7,11 +7,10 @@
 //---------------------------------------------------------------------------
 #pragma package(smart_init)
 #pragma resource "*.dfm"
-TForm7 *Form7;
+TForm7* Form7;
 
 //---------------------------------------------------------------------------
-__fastcall TForm7::TForm7(TComponent *Owner)
-    : TForm(Owner)
+__fastcall TForm7::TForm7(TComponent* Owner) : TForm(Owner)
 {
     ColorPanel->Color = (TColor)0;
     ClientHeight = Panel1->Height;
@@ -22,19 +21,16 @@ __fastcall TForm7::TForm7(TComponent *Owner)
 }
 
 //---------------------------------------------------------------------------
-void __fastcall TForm7::ColorPanelClick(TObject *Sender)
+void __fastcall TForm7::ColorPanelClick(TObject* Sender)
 {
-    if (ColorDialog->Execute()==false)
-        return;
+    if (ColorDialog->Execute() == false) return;
     ColorPanel->Color = ColorDialog->Color;
 }
 
 //---------------------------------------------------------------------------
-void __fastcall TForm7::LinearFuncButtonClick(TObject *Sender)
+void __fastcall TForm7::LinearFuncButtonClick(TObject* Sender)
 {
     m_iFunction = dynamic_cast<TComponent*>(Sender)->Tag;
 }
 
 //---------------------------------------------------------------------------
-
-

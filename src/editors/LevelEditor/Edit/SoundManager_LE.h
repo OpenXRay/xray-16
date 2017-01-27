@@ -7,28 +7,23 @@
 // refs
 class ESoundThumbnail;
 
-class CLevelSoundManager: public CSoundManager
+class CLevelSoundManager : public CSoundManager
 {
     typedef CSoundManager inherited;
     bool bNeedRefreshEnvGeom;
     void RealRefreshEnvGeometry();
-    void MakeGameSound(ESoundThumbnail *THM, LPCSTR src_name, LPCSTR game_name);
-public:
-    CLevelSoundManager()
-    {
-        bNeedRefreshEnvGeom = false;
-    }
+    void MakeGameSound(ESoundThumbnail* THM, LPCSTR src_name, LPCSTR game_name);
 
-    ~CLevelSoundManager() { }
+  public:
+    CLevelSoundManager() { bNeedRefreshEnvGeom = false; }
+
+    ~CLevelSoundManager() {}
 
     virtual void OnFrame();
 
     void RefreshEnvLibrary();
 
-    void RefreshEnvGeometry()
-    {
-        bNeedRefreshEnvGeom = true;
-    }
+    void RefreshEnvGeometry() { bNeedRefreshEnvGeom = true; }
 
     //        bool MakeEnvGeometry(CMemoryWriter& F, bool bErrMsg=false);
 
@@ -38,10 +33,9 @@ public:
 
     void RefreshSounds(bool bSync);
 
-    AnsiString UpdateFileName(AnsiString &fn);
+    AnsiString UpdateFileName(AnsiString& fn);
 };
 
-extern CLevelSoundManager *&LSndLib;
+extern CLevelSoundManager*& LSndLib;
 //---------------------------------------------------------------------------
 #endif
-

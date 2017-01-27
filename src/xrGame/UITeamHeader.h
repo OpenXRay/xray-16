@@ -17,30 +17,30 @@ class UITeamState;
 class UITeamHeader : public CUIWindow
 {
 private:
-	typedef	CUIWindow									inherited;
-	
-	typedef AssociativeVector<shared_str, CUIStatic*>		FieldsStatics;
-	typedef AssociativeVector<shared_str, CUIStatic*>		ColumnsStatics;
-	typedef AssociativeVector<shared_str, STRING_VALUE>	TranslatedStrings;
-	
-	FieldsStatics				m_field_fillers;
-	ColumnsStatics				m_columns_statics;
-	TranslatedStrings			m_translated_strings;
+    typedef CUIWindow inherited;
 
-	UITeamState const * const	m_parent;
-	XML_NODE*					m_team_header_root;
+    typedef AssociativeVector<shared_str, CUIStatic*> FieldsStatics;
+    typedef AssociativeVector<shared_str, CUIStatic*> ColumnsStatics;
+    typedef AssociativeVector<shared_str, STRING_VALUE> TranslatedStrings;
 
-	void			InitColumnsStatics	(CUIXml& uiXml);
-	void			InitFieldsStatics	(CUIXml& uiXml);
+    FieldsStatics m_field_fillers;
+    ColumnsStatics m_columns_statics;
+    TranslatedStrings m_translated_strings;
+
+    UITeamState const* const m_parent;
+    XML_NODE* m_team_header_root;
+
+    void InitColumnsStatics(CUIXml& uiXml);
+    void InitFieldsStatics(CUIXml& uiXml);
+
 public:
-					UITeamHeader	(UITeamState const * const parent);
-	virtual			~UITeamHeader	();
-			void	Init			(CUIXml& uiXml, LPCSTR path);
-	virtual	void	Update			();
+    UITeamHeader(UITeamState const* const parent);
+    virtual ~UITeamHeader();
+    void Init(CUIXml& uiXml, LPCSTR path);
+    virtual void Update();
 
 protected:
 private:
-}; //UITeamHeader
+};  // UITeamHeader
 
-
-#endif //UI_TEAM_HEADER
+#endif  // UI_TEAM_HEADER

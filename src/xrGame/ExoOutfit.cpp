@@ -12,6 +12,6 @@ CExoOutfit::CExoOutfit()
 {
 }
 
-CExoOutfit::~CExoOutfit() 
+CExoOutfit::~CExoOutfit()
 {
 }

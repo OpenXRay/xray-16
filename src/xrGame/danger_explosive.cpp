@@ -11,12 +11,11 @@
 #include "gameobject.h"
 #include "explosive.h"
 
-bool CDangerExplosive::operator==	(const u16 &object_id) const
+bool CDangerExplosive::operator==(const u16& object_id) const
 {
-	if (!m_grenade)
-		return	(false);
-	
-	const CGameObject	*game_object = smart_cast<const CGameObject*>(m_grenade);
-	VERIFY				(game_object);
-	return				(game_object->ID() == object_id);
+    if (!m_grenade) return (false);
+
+    const CGameObject* game_object = smart_cast<const CGameObject*>(m_grenade);
+    VERIFY(game_object);
+    return (game_object->ID() == object_id);
 }

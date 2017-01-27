@@ -4,34 +4,34 @@
 #include "ai/Monsters/ai_monster_bones.h"
 #include "ai_monster_space.h"
 
-
 class CController;
 
-class CControllerDirection : public CControlDirectionBase {
-	typedef CControlDirectionBase inherited;
+class CControllerDirection : public CControlDirectionBase
+{
+    typedef CControlDirectionBase inherited;
 
-	CController						*m_controller;
-	
-	bonesManipulation				m_bones;
-	CBoneInstance					*m_bone_spine;
-	CBoneInstance					*m_bone_head;
+    CController* m_controller;
 
-	MonsterSpace::SBoneRotation		m_head_orient;
-	
-	Fvector							m_head_look_point;
+    bonesManipulation m_bones;
+    CBoneInstance* m_bone_spine;
+    CBoneInstance* m_bone_head;
 
-public:	
-	virtual void		reinit				();
-	virtual	void		update_schedule		();	
+    MonsterSpace::SBoneRotation m_head_orient;
 
-			void		head_look_point		(const Fvector &look_point);
-			Fvector		&get_head_look_point() {return m_head_look_point;}
+    Fvector m_head_look_point;
 
-	const MonsterSpace::SBoneRotation &get_head_orientation() const {return m_head_orient;}
+public:
+    virtual void reinit();
+    virtual void update_schedule();
+
+    void head_look_point(const Fvector& look_point);
+    Fvector& get_head_look_point() { return m_head_look_point; }
+
+    const MonsterSpace::SBoneRotation& get_head_orientation() const { return m_head_orient; }
 
 private:
-	static	void		bone_callback			(CBoneInstance *B);
+    static void bone_callback(CBoneInstance* B);
 
-	void					assign_bones			();
-	void					update_head_orientation	();
+    void assign_bones();
+    void update_head_orientation();
 };

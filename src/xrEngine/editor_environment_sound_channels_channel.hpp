@@ -18,21 +18,16 @@
 
 namespace editor
 {
-
 class property_holder_collection;
 
 namespace environment
 {
 namespace sound_channels
 {
-
 class source;
 class manager;
 
-class channel :
-    public CEnvAmbient::SSndChannel,
-    public editor::property_holder_holder,
-    private Noncopyable
+class channel : public CEnvAmbient::SSndChannel, public editor::property_holder_holder, private Noncopyable
 {
 private:
     typedef CEnvAmbient::SSndChannel inherited;
@@ -49,15 +44,13 @@ public:
 private:
     LPCSTR xr_stdcall id_getter() const;
     void xr_stdcall id_setter(LPCSTR value);
+
 public:
     typedef xr_vector<source*> sound_container_type;
 
 private:
     typedef editor::property_holder property_holder_type;
-    typedef property_collection <
-    sound_container_type,
-    channel
-    > collection_type;
+    typedef property_collection<sound_container_type, channel> collection_type;
 
 public:
     virtual property_holder_type* object();
@@ -67,11 +60,11 @@ private:
     property_holder_type* m_property_holder;
     collection_type* m_collection;
     sound_container_type m_sounds;
-}; // class channel
-} // namespace sound_channels
-} // namespace environment
-} // namespace editor
+};  // class channel
+}  // namespace sound_channels
+}  // namespace environment
+}  // namespace editor
 
-#endif // #ifdef INGAME_EDITOR
+#endif  // #ifdef INGAME_EDITOR
 
-#endif // ifndef EDITOR_WEATHER_SOUND_CHANNELS_CHANNEL_HPP_INCLUDED
+#endif  // ifndef EDITOR_WEATHER_SOUND_CHANNELS_CHANNEL_HPP_INCLUDED

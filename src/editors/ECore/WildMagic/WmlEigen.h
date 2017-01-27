@@ -18,59 +18,58 @@
 
 namespace Wml
 {
-
 template <class Real>
 class WML_ITEM Eigen
 {
-public:
-    Eigen (int iSize);
-    Eigen (const Matrix2<Real>& rkM);
-    Eigen (const Matrix3<Real>& rkM);
-    Eigen (const Matrix4<Real>& rkM);
-    Eigen (const GMatrix<Real>& rkM);
-    ~Eigen ();
+  public:
+    Eigen(int iSize);
+    Eigen(const Matrix2<Real>& rkM);
+    Eigen(const Matrix3<Real>& rkM);
+    Eigen(const Matrix4<Real>& rkM);
+    Eigen(const GMatrix<Real>& rkM);
+    ~Eigen();
 
     // set the matrix for eigensolving
-    Real& operator() (int iRow, int iCol);
-    Eigen& operator= (const Matrix2<Real>& rkM);
-    Eigen& operator= (const Matrix3<Real>& rkM);
-    Eigen& operator= (const Matrix4<Real>& rkM);
-    Eigen& operator= (const GMatrix<Real>& rkM);
+    Real& operator()(int iRow, int iCol);
+    Eigen& operator=(const Matrix2<Real>& rkM);
+    Eigen& operator=(const Matrix3<Real>& rkM);
+    Eigen& operator=(const Matrix4<Real>& rkM);
+    Eigen& operator=(const GMatrix<Real>& rkM);
 
     // Get the eigenresults (eigenvectors are columns of eigenmatrix).  The
     // GetEigenvector calls involving Vector2, Vector3, and Vector4 should
     // only be called if you know that the eigenmatrix is of the appropriate
     // size.
-    Real GetEigenvalue (int i) const;
-    const Real* GetEigenvalues () const;
-    void GetEigenvector (int i, Vector2<Real>& rkV) const;
-    void GetEigenvector (int i, Vector3<Real>& rkV) const;
-    void GetEigenvector (int i, Vector4<Real>& rkV) const;
-    GVector<Real> GetEigenvector (int i) const;
-    const GMatrix<Real>& GetEigenvectors () const;
+    Real GetEigenvalue(int i) const;
+    const Real* GetEigenvalues() const;
+    void GetEigenvector(int i, Vector2<Real>& rkV) const;
+    void GetEigenvector(int i, Vector3<Real>& rkV) const;
+    void GetEigenvector(int i, Vector4<Real>& rkV) const;
+    GVector<Real> GetEigenvector(int i) const;
+    const GMatrix<Real>& GetEigenvectors() const;
 
     // solve eigensystem
-    void EigenStuff2 ();
-    void EigenStuff3 ();
-    void EigenStuff4 ();
-    void EigenStuffN ();
-    void EigenStuff  ();
+    void EigenStuff2();
+    void EigenStuff3();
+    void EigenStuff4();
+    void EigenStuffN();
+    void EigenStuff();
 
     // solve eigensystem, use decreasing sort on eigenvalues
-    void DecrSortEigenStuff2 ();
-    void DecrSortEigenStuff3 ();
-    void DecrSortEigenStuff4 ();
-    void DecrSortEigenStuffN ();
-    void DecrSortEigenStuff  ();
+    void DecrSortEigenStuff2();
+    void DecrSortEigenStuff3();
+    void DecrSortEigenStuff4();
+    void DecrSortEigenStuffN();
+    void DecrSortEigenStuff();
 
     // solve eigensystem, use increasing sort on eigenvalues
-    void IncrSortEigenStuff2 ();
-    void IncrSortEigenStuff3 ();
-    void IncrSortEigenStuff4 ();
-    void IncrSortEigenStuffN ();
-    void IncrSortEigenStuff  ();
+    void IncrSortEigenStuff2();
+    void IncrSortEigenStuff3();
+    void IncrSortEigenStuff4();
+    void IncrSortEigenStuffN();
+    void IncrSortEigenStuff();
 
-protected:
+  protected:
     int m_iSize;
     GMatrix<Real> m_kMat;
     Real* m_afDiag;
@@ -90,27 +89,26 @@ protected:
     // toggle between rotation and reflection.  The value m_bRotation must
     // be toggled accordingly.
     bool m_bIsRotation;
-    void GuaranteeRotation ();
+    void GuaranteeRotation();
 
     // Householder reduction to tridiagonal form
-    void Tridiagonal2 ();
-    void Tridiagonal3 ();
-    void Tridiagonal4 ();
-    void TridiagonalN ();
+    void Tridiagonal2();
+    void Tridiagonal3();
+    void Tridiagonal4();
+    void TridiagonalN();
 
     // QL algorithm with implicit shifting, applies to tridiagonal matrices
-    bool QLAlgorithm ();
+    bool QLAlgorithm();
 
     // sort eigenvalues from largest to smallest
-    void DecreasingSort ();
+    void DecreasingSort();
 
     // sort eigenvalues from smallest to largest
-    void IncreasingSort ();
+    void IncreasingSort();
 };
 
 typedef Eigen<float> Eigenf;
 typedef Eigen<double> Eigend;
-
 }
 
 #endif

@@ -22,28 +22,20 @@ class C3DCursor
     float brush_up_depth, brush_dn_depth;
 
     bool m_Visible;
-    void GetPickPoint(Fvector &src, Fvector &dst, Fvector *N);
+    void GetPickPoint(Fvector& src, Fvector& dst, Fvector* N);
     ECursorStyle eStyle;
-public:
+
+  public:
     C3DCursor();
     virtual ~C3DCursor();
     void SetBrushSegment(float segment = CURSOR_PRECISION_SEGMENT);
     void Render();
 
-    bool GetVisible()
-    {
-        return m_Visible;
-    }
+    bool GetVisible() { return m_Visible; }
 
-    float GetBrushSize()
-    {
-        return brush_radius;
-    }
+    float GetBrushSize() { return brush_radius; }
 
-    void SetBrushRadius(float r)
-    {
-        brush_radius = r;
-    }
+    void SetBrushRadius(float r) { brush_radius = r; }
 
     void SetBrushDepth(float up_d, float dn_d)
     {
@@ -51,15 +43,11 @@ public:
         brush_dn_depth = dn_d;
     }
 
-    void SetColor(Fcolor &c);
+    void SetColor(Fcolor& c);
     bool PrepareBrush();
-    void GetRandomBrushPos(Fvector &pos, Fvector &norm);
+    void GetRandomBrushPos(Fvector& pos, Fvector& norm);
 
     //.    void    Visible     (bool b){m_Visible = b;}
-    void Style(ECursorStyle st)
-    {
-        eStyle = st;
-    }
+    void Style(ECursorStyle st) { eStyle = st; }
 };
 #endif
-

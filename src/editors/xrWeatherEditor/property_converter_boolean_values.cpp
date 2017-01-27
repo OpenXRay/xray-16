@@ -12,54 +12,46 @@
 #include "property_container.hpp"
 
 using System::ComponentModel::TypeConverter;
-typedef TypeConverter::StandardValuesCollection	StandardValuesCollection;
+typedef TypeConverter::StandardValuesCollection StandardValuesCollection;
 using System::Object;
 
-bool property_converter_boolean_values::GetStandardValuesSupported				(ITypeDescriptorContext^ context)
+bool property_converter_boolean_values::GetStandardValuesSupported(ITypeDescriptorContext ^ context)
 {
-	return							(true);
+    return (true);
 }
 
-bool property_converter_boolean_values::GetStandardValuesExclusive				(ITypeDescriptorContext^ context)
+bool property_converter_boolean_values::GetStandardValuesExclusive(ITypeDescriptorContext ^ context)
 {
-	return							(true);
+    return (true);
 }
 
-StandardValuesCollection ^property_converter_boolean_values::GetStandardValues	(ITypeDescriptorContext^ context)
+StandardValuesCollection ^ property_converter_boolean_values::GetStandardValues(ITypeDescriptorContext ^ context)
 {
-	property_container^				container = safe_cast<property_container^>(context->Instance);
-	PropertySpecDescriptor^			descriptor = safe_cast<PropertySpecDescriptor^>(context->PropertyDescriptor);
-	IProperty^					raw_value = container->GetProperty(descriptor->item);
-	property_boolean_values_value^	value = safe_cast<property_boolean_values_value^>(raw_value);
-	return							(gcnew StandardValuesCollection(value->m_collection));
+    property_container ^ container = safe_cast<property_container ^>(context->Instance);
+    PropertySpecDescriptor ^ descriptor = safe_cast<PropertySpecDescriptor ^>(context->PropertyDescriptor);
+    IProperty ^ raw_value = container->GetProperty(descriptor->item);
+    property_boolean_values_value ^ value = safe_cast<property_boolean_values_value ^>(raw_value);
+    return (gcnew StandardValuesCollection(value->m_collection));
 }
 
-Object^	property_converter_boolean_values::ConvertTo							(
-		ITypeDescriptorContext^ context,
-		CultureInfo^ culture,
-		Object^ value,
-		Type^ destination_type
-	)
+Object ^ property_converter_boolean_values::ConvertTo(
+             ITypeDescriptorContext ^ context, CultureInfo ^ culture, Object ^ value, Type ^ destination_type)
 {
-	if (!context)
-		return						(inherited::ConvertTo(context, culture, value, destination_type));
+    if (!context) return (inherited::ConvertTo(context, culture, value, destination_type));
 
-	if (!context->Instance)
-		return						(inherited::ConvertTo(context, culture, value, destination_type));
+    if (!context->Instance) return (inherited::ConvertTo(context, culture, value, destination_type));
 
-	if (!context->PropertyDescriptor)
-		return						(inherited::ConvertTo(context, culture, value, destination_type));
+    if (!context->PropertyDescriptor) return (inherited::ConvertTo(context, culture, value, destination_type));
 
-	if (destination_type != System::String::typeid)
-		return						(inherited::ConvertTo(context, culture, value, destination_type));
+    if (destination_type != System::String::typeid)
+        return (inherited::ConvertTo(context, culture, value, destination_type));
 
-	if (dynamic_cast<System::String^>(value))
-		return						(value);
+    if (dynamic_cast<System::String ^>(value)) return (value);
 
-	property_container^				container = safe_cast<property_container^>(context->Instance);
-	PropertySpecDescriptor^			descriptor = safe_cast<PropertySpecDescriptor^>(context->PropertyDescriptor);
-	IProperty^					raw_value = container->GetProperty(descriptor->item);
-	property_boolean_values_value^	real_value = safe_cast<property_boolean_values_value^>(raw_value);
-	bool							bool_value = safe_cast<bool>(value);
-	return							(real_value->m_collection[bool_value ? 1 : 0]);
+    property_container ^ container = safe_cast<property_container ^>(context->Instance);
+    PropertySpecDescriptor ^ descriptor = safe_cast<PropertySpecDescriptor ^>(context->PropertyDescriptor);
+    IProperty ^ raw_value = container->GetProperty(descriptor->item);
+    property_boolean_values_value ^ real_value = safe_cast<property_boolean_values_value ^>(raw_value);
+    bool bool_value = safe_cast<bool>(value);
+    return (real_value->m_collection[bool_value ? 1 : 0]);
 }

@@ -13,10 +13,4 @@
 using namespace luabind;
 
 SCRIPT_EXPORT(smart_cover_object, (CGameObject),
-{
-	module(luaState)
-    [
-		class_<smart_cover::object,CGameObject>("smart_cover_object")
-			.def(constructor<>())
-	];
-});
+    { module(luaState)[class_<smart_cover::object, CGameObject>("smart_cover_object").def(constructor<>())]; });

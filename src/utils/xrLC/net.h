@@ -1,7 +1,7 @@
 #pragma once
 
-void net_light ();
+void net_light();
 namespace lc_net
 {
-	void net_lightmaps ();
+void net_lightmaps();
 }

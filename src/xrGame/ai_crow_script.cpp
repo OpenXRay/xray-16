@@ -12,11 +12,5 @@
 
 using namespace luabind;
 
-SCRIPT_EXPORT(CAI_Crow, (CGameObject),
-{
-	module(luaState)
-	[
-		class_<CAI_Crow,CGameObject>("CAI_Crow")
-			.def(constructor<>())
-	];
-});
+SCRIPT_EXPORT(
+    CAI_Crow, (CGameObject), { module(luaState)[class_<CAI_Crow, CGameObject>("CAI_Crow").def(constructor<>())]; });

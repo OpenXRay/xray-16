@@ -16,7 +16,6 @@
 
 namespace editor
 {
-
 class property_holder_collection;
 
 namespace environment
@@ -24,14 +23,11 @@ namespace environment
 namespace sound_channels
 {
 class manager;
-} // namespace sound_channels
+}  // namespace sound_channels
 
 namespace ambients
 {
-
-class sound_id :
-    public editor::property_holder_holder,
-    private Noncopyable
+class sound_id : public editor::property_holder_holder, private Noncopyable
 {
 public:
     sound_id(sound_channels::manager const& manager, shared_str const& sound);
@@ -53,11 +49,11 @@ private:
     property_holder_type* m_property_holder;
     sound_channels::manager const& m_manager;
     shared_str m_id;
-}; // class sound_id
-} // namespace ambients
-} // namespace environment
-} // namespace editor
+};  // class sound_id
+}  // namespace ambients
+}  // namespace environment
+}  // namespace editor
 
-#endif // #ifdef INGAME_EDITOR
+#endif  // #ifdef INGAME_EDITOR
 
-#endif // ifndef EDITOR_WEATHER_AMBIENTS_SOUND_HPP_INCLUDED
+#endif  // ifndef EDITOR_WEATHER_AMBIENTS_SOUND_HPP_INCLUDED

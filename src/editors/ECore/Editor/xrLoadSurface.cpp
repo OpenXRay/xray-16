@@ -9,28 +9,20 @@ struct SExts
 
     void format_register(LPCSTR ext)
     {
-        if (ext&&ext[0])
-        {
-            for (u32 i = 0; i<exts.size(); i++)
-                if (0==stricmp(exts[i], ext))
-                    return;
+        if (ext && ext[0]) {
+            for (u32 i = 0; i < exts.size(); i++)
+                if (0 == stricmp(exts[i], ext)) return;
             exts.push_back(xr_strdup(ext));
         }
     }
 
-    u32 size()
-    {
-        return (u32)exts.size();
-    }
+    u32 size() { return (u32)exts.size(); }
 
-    LPSTR operator [](int k)
-    {
-        return exts[k];
-    }
+    LPSTR operator[](int k) { return exts[k]; }
 
     ~SExts()
     {
-        for (u32 i = 0; i<exts.size(); i++)
+        for (u32 i = 0; i < exts.size(); i++)
             xr_free(exts[i]);
         exts.clear();
     }
@@ -41,22 +33,19 @@ SExts formats;
 void Surface_FormatExt(FREE_IMAGE_FORMAT f)
 {
     LPCSTR n = FreeImage_GetFIFExtensionList(f);
-    if (n)
-    {
+    if (n) {
         LPSTR base = xr_strdup(n);
         LPSTR ext = base;
         LPSTR cur = ext;
         for (; ext[0]; ext++)
         {
-            if (ext[0]==',')
-            {
+            if (ext[0] == ',') {
                 ext[0] = 0;
                 formats.format_register(cur);
                 cur = ++ext;
             }
         }
-        if (cur&&cur[0])
-            formats.format_register(cur);
+        if (cur && cur[0]) formats.format_register(cur);
         xr_free(base);
     }
 }
@@ -92,14 +81,13 @@ void Surface_Init()
     Msg("* %d supported formats", formats.size());
 }
 
-BOOL Surface_Detect(string_path &F, LPSTR N)
+BOOL Surface_Detect(string_path& F, LPSTR N)
 {
-    for (u32 i = 0; i<formats.size(); i++)
+    for (u32 i = 0; i < formats.size(); i++)
     {
         FS.update_path(F, "$textures$", strconcat(sizeof(F), F, N, ".", formats[i]));
-        int h = _open(F, O_RDONLY|O_BINARY);
-        if (h>0)
-        {
+        int h = _open(F, O_RDONLY | O_BINARY);
+        if (h > 0) {
             _close(h);
             return TRUE;
         }
@@ -107,21 +95,19 @@ BOOL Surface_Detect(string_path &F, LPSTR N)
     return FALSE;
 }
 
-FIBITMAP *Surface_Load(char *full_name)
+FIBITMAP* Surface_Load(char* full_name)
 {
     // load
     FREE_IMAGE_FORMAT fif = FreeImage_GetFIFFromFilename(full_name);
-    FIBITMAP *map = FreeImage_Load(fif, full_name);
-    if (0==map)
-        return NULL;
+    FIBITMAP* map = FreeImage_Load(fif, full_name);
+    if (0 == map) return NULL;
 
     // check if already 32bpp
-    if (32==FreeImage_GetBPP(map))
-        return map;
+    if (32 == FreeImage_GetBPP(map)) return map;
 
     // convert
-    FIBITMAP *map32 = FreeImage_ConvertTo32Bits(map);
-    if (0==map32)
+    FIBITMAP* map32 = FreeImage_ConvertTo32Bits(map);
+    if (0 == map32)
         map32 = map;
     else
         FreeImage_Unload(map);
@@ -129,26 +115,23 @@ FIBITMAP *Surface_Load(char *full_name)
     return map32;
 }
 
-u32 *Surface_Load(char *name, u32 &w, u32 &h)
+u32* Surface_Load(char* name, u32& w, u32& h)
 {
-    if (strchr(name, '.'))
-        *(strchr(name, '.')) = 0;
+    if (strchr(name, '.')) *(strchr(name, '.')) = 0;
 
     // detect format
     string_path full;
-    if (!Surface_Detect(full, name))
-        return NULL;
+    if (!Surface_Detect(full, name)) return NULL;
 
-    FIBITMAP *map32 = Surface_Load(full);
+    FIBITMAP* map32 = Surface_Load(full);
 
     h = FreeImage_GetHeight(map32);
     w = FreeImage_GetWidth(map32);
 
-    u32 memSize = w*h*4;
-    u32 *memPTR = (u32*)(xr_malloc(memSize));
-    u32 *memDATA = (u32*)(FreeImage_GetScanLine(map32, 0));
+    u32 memSize = w * h * 4;
+    u32* memPTR = (u32*)(xr_malloc(memSize));
+    u32* memDATA = (u32*)(FreeImage_GetScanLine(map32, 0));
     CopyMemory(memPTR, memDATA, memSize);
     FreeImage_Unload(map32);
     return memPTR;
 }
-

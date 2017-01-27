@@ -10,12 +10,13 @@
 #pragma link "ExtBtn"
 #pragma resource "*.dfm"
 //---------------------------------------------------------------------------
-__fastcall TfrmOneColor::TfrmOneColor(TComponent *Owner)
-    : TForm(Owner) {}
+__fastcall TfrmOneColor::TfrmOneColor(TComponent* Owner) : TForm(Owner)
+{
+}
 
 //---------------------------------------------------------------------------
 
-void __fastcall TfrmOneColor::ShowIndex(TfrmDOShuffle *parent)
+void __fastcall TfrmOneColor::ShowIndex(TfrmDOShuffle* parent)
 {
     m_Parent = parent;
     //	VERIFY(stage);
@@ -37,12 +38,10 @@ void __fastcall TfrmOneColor::HideIndex()
 
 //---------------------------------------------------------------------------
 
-void __fastcall TfrmOneColor::mcColorMouseDown(TObject *Sender,
-    TMouseButton Button, TShiftState Shift, int X, int Y)
+void __fastcall TfrmOneColor::mcColorMouseDown(TObject* Sender, TMouseButton Button, TShiftState Shift, int X, int Y)
 {
     u32 color = ((TMultiObjColor*)Sender)->Brush->Color;
-    if (SelectColorWin(&color))
-    {
+    if (SelectColorWin(&color)) {
         ((TMultiObjColor*)Sender)->_Set(color);
         m_Parent->bColorIndModif = true;
     }
@@ -50,8 +49,7 @@ void __fastcall TfrmOneColor::mcColorMouseDown(TObject *Sender,
 
 //---------------------------------------------------------------------------
 
-void __fastcall TfrmOneColor::FormClose(TObject *Sender,
-    TCloseAction &Action)
+void __fastcall TfrmOneColor::FormClose(TObject* Sender, TCloseAction& Action)
 {
     Action = caFree;
     m_Parent->RemoveColorIndex(this);
@@ -59,31 +57,27 @@ void __fastcall TfrmOneColor::FormClose(TObject *Sender,
 
 //---------------------------------------------------------------------------
 
-void __fastcall TfrmOneColor::ebMultiRemoveClick(TObject *Sender)
+void __fastcall TfrmOneColor::ebMultiRemoveClick(TObject* Sender)
 {
     Close();
 }
 
 //---------------------------------------------------------------------------
 
-void __fastcall TfrmOneColor::tvDOListDragOver(TObject *Sender,
-    TObject *Source, int X, int Y, TDragState State, bool &Accept)
+void __fastcall TfrmOneColor::tvDOListDragOver(
+    TObject* Sender, TObject* Source, int X, int Y, TDragState State, bool& Accept)
 {
     Accept = false;
-    if (Source==tvDOList)
-        return;
-    if (Source!=m_Parent->tvItems)
-        return;
-    for (TElTreeItem *node = tvDOList->Items->GetFirstNode(); node; node = node->GetNext())
-        if (node->Text==m_Parent->FDragItem->Text)
-            return;
+    if (Source == tvDOList) return;
+    if (Source != m_Parent->tvItems) return;
+    for (TElTreeItem* node = tvDOList->Items->GetFirstNode(); node; node = node->GetNext())
+        if (node->Text == m_Parent->FDragItem->Text) return;
     Accept = true;
 }
 
 //---------------------------------------------------------------------------
 
-void __fastcall TfrmOneColor::tvDOListDragDrop(TObject *Sender,
-    TObject *Source, int X, int Y)
+void __fastcall TfrmOneColor::tvDOListDragDrop(TObject* Sender, TObject* Source, int X, int Y)
 {
     tvDOList->Items->AddObject(0, m_Parent->FDragItem->Text, m_Parent->FDragItem->Data);
     m_Parent->bColorIndModif = true;
@@ -91,8 +85,7 @@ void __fastcall TfrmOneColor::tvDOListDragDrop(TObject *Sender,
 
 //---------------------------------------------------------------------------
 
-void __fastcall TfrmOneColor::tvDOListStartDrag(TObject *Sender,
-    TDragObject *&DragObject)
+void __fastcall TfrmOneColor::tvDOListStartDrag(TObject* Sender, TDragObject*& DragObject)
 {
     FDragItem = tvDOList->ItemFocused;
 }
@@ -101,9 +94,8 @@ void __fastcall TfrmOneColor::tvDOListStartDrag(TObject *Sender,
 
 void __fastcall TfrmOneColor::RemoveObject(LPCSTR text)
 {
-    for (TElTreeItem *node = tvDOList->Items->GetFirstNode(); node; node = node->GetNext())
-        if (node->Text==(WideString)text)
-        {
+    for (TElTreeItem* node = tvDOList->Items->GetFirstNode(); node; node = node->GetNext())
+        if (node->Text == (WideString)text) {
             node->Delete();
             return;
         }
@@ -111,17 +103,14 @@ void __fastcall TfrmOneColor::RemoveObject(LPCSTR text)
 
 void __fastcall TfrmOneColor::AppendObject(LPCSTR text, LPVOID data)
 {
-    for (TElTreeItem *node = tvDOList->Items->GetFirstNode(); node; node = node->GetNext())
-        if (node->Text==(WideString)text)
-            return;
+    for (TElTreeItem* node = tvDOList->Items->GetFirstNode(); node; node = node->GetNext())
+        if (node->Text == (WideString)text) return;
     tvDOList->Items->AddObject(0, text, data);
 }
 
-void __fastcall TfrmOneColor::tvDOListItemFocused(TObject *Sender)
+void __fastcall TfrmOneColor::tvDOListItemFocused(TObject* Sender)
 {
     m_Parent->OnItemFocused(tvDOList);
 }
 
 //---------------------------------------------------------------------------
-
-

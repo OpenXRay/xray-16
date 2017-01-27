@@ -3,48 +3,43 @@
 
 ColorMapManager::ColorMapManager()
 {
-	m_CMap[0] = RImplementation.Resources->_CreateTexture("$user$cmap0");
-	m_CMap[1] = RImplementation.Resources->_CreateTexture("$user$cmap1");
+    m_CMap[0] = RImplementation.Resources->_CreateTexture("$user$cmap0");
+    m_CMap[1] = RImplementation.Resources->_CreateTexture("$user$cmap1");
 }
 
-void ColorMapManager::SetTextures(const shared_str &tex0, const shared_str &tex1)
-{ 
-	UpdateTexture(tex0, 0); 
-	UpdateTexture(tex1, 1);
-}
-
-
-void ColorMapManager::UpdateTexture(const shared_str &strTexName, int iTex)
+void ColorMapManager::SetTextures(const shared_str& tex0, const shared_str& tex1)
 {
-	if ( strTexName==m_strCMap[iTex] ) return;
+    UpdateTexture(tex0, 0);
+    UpdateTexture(tex1, 1);
+}
 
-	m_strCMap[iTex] = strTexName;
+void ColorMapManager::UpdateTexture(const shared_str& strTexName, int iTex)
+{
+    if (strTexName == m_strCMap[iTex]) return;
 
-	if (strTexName.size())
-	{
-		map_TexIt I = m_TexCache.find(strTexName);
-		if (I!=m_TexCache.end())
-		{
-			ID3DBaseTexture*	e0	= I->second->surface_get();
-			m_CMap[iTex]->surface_set(e0);
-			_RELEASE(e0);
-		}
-		else
-		{
-			ref_texture	tmp;
-			tmp.create(strTexName.c_str());
+    m_strCMap[iTex] = strTexName;
 
-			m_TexCache.insert	(mk_pair(strTexName,tmp));
+    if (strTexName.size()) {
+        map_TexIt I = m_TexCache.find(strTexName);
+        if (I != m_TexCache.end()) {
+            ID3DBaseTexture* e0 = I->second->surface_get();
+            m_CMap[iTex]->surface_set(e0);
+            _RELEASE(e0);
+        }
+        else
+        {
+            ref_texture tmp;
+            tmp.create(strTexName.c_str());
 
-			ID3DBaseTexture*	e0	= tmp->surface_get();
-			m_CMap[iTex]->surface_set(e0);
-			_RELEASE(e0);
-		}
-	}
-	else
-	{
-		m_CMap[iTex]->surface_set(0);
-	}
+            m_TexCache.insert(mk_pair(strTexName, tmp));
 
-	
+            ID3DBaseTexture* e0 = tmp->surface_get();
+            m_CMap[iTex]->surface_set(e0);
+            _RELEASE(e0);
+        }
+    }
+    else
+    {
+        m_CMap[iTex]->surface_set(0);
+    }
 }

@@ -8,38 +8,38 @@
 
 #pragma once
 
-IC	CALifeScheduleRegistry::CALifeScheduleRegistry			()
+IC CALifeScheduleRegistry::CALifeScheduleRegistry()
 {
-	m_objects_per_update		= 1;
+    m_objects_per_update = 1;
 }
 
-IC	const u32 &CALifeScheduleRegistry::objects_per_update	() const
+IC const u32& CALifeScheduleRegistry::objects_per_update() const
 {
-	return						(m_objects_per_update);
+    return (m_objects_per_update);
 }
 
-IC	void CALifeScheduleRegistry::objects_per_update			(const u32 &objects_per_update)
+IC void CALifeScheduleRegistry::objects_per_update(const u32& objects_per_update)
 {
-	m_objects_per_update		= objects_per_update;
+    m_objects_per_update = objects_per_update;
 }
 
-IC	void CALifeScheduleRegistry::update						()
+IC void CALifeScheduleRegistry::update()
 {
-//	u32							count = 
-		objects().empty() ? 0 : inherited::update( CUpdatePredicate(m_objects_per_update), false );
+    //	u32							count =
+    objects().empty() ? 0 : inherited::update(CUpdatePredicate(m_objects_per_update), false);
 #ifdef DEBUG
-	if (psAI_Flags.test(aiALife)) {
-//		Msg						("[LSS][SU][%d : %d]",count, objects().size());
-	}
+    if (psAI_Flags.test(aiALife)) {
+        //		Msg						("[LSS][SU][%d : %d]",count, objects().size());
+    }
 #endif
 }
 
-IC	CSE_ALifeSchedulable *CALifeScheduleRegistry::object	(const ALife::_OBJECT_ID &id, bool no_assert) const
+IC CSE_ALifeSchedulable* CALifeScheduleRegistry::object(const ALife::_OBJECT_ID& id, bool no_assert) const
 {
-	_const_iterator				I = objects().find(id);
-	if (I == objects().end()) {
-		THROW2					(no_assert,"The spesified object hasn't been found in the schedule registry!");
-		return					(0);
-	}
-	return						((*I).second);
+    _const_iterator I = objects().find(id);
+    if (I == objects().end()) {
+        THROW2(no_assert, "The spesified object hasn't been found in the schedule registry!");
+        return (0);
+    }
+    return ((*I).second);
 }

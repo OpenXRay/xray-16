@@ -1,20 +1,20 @@
 //---------------------------------------------------------------------------
 #include "stdafx.h"
-#pragma hdrstop 
+#pragma hdrstop
 
 #include "UI_ParticleMain.h"
 #include "UI_ParticleTools.h"
 #include "TopBar.h"
-#include "LeftBar.h" 
+#include "LeftBar.h"
 #include "EditorPreferences.h"
 #include "D3DUtils.h"
-#include "BottomBar.h" 
+#include "BottomBar.h"
 #include "xr_trims.h"
 #include "main.h"
 #include "xr_input.h"
 
 //---------------------------------------------------------------------------
-CParticleMain *&PUI = (CParticleMain*)UI;
+CParticleMain*& PUI = (CParticleMain*)UI;
 
 //---------------------------------------------------------------------------
 
@@ -54,8 +54,7 @@ CCommandVar CParticleTool::CommandSaveXR(CCommandVar p1, CCommandVar p2)
 CCommandVar CParticleTool::CommandLoadXR(CCommandVar p1, CCommandVar p2)
 {
     xr_string temp_fn;
-    if (EFS.GetOpenName("$game_data$", temp_fn, false, NULL, 0))
-    {
+    if (EFS.GetOpenName("$game_data$", temp_fn, false, NULL, 0)) {
         ::Render->PSLibrary.OnDestroy();
         ::Render->PSLibrary.Load(temp_fn.c_str());
         ResetCurrent();
@@ -80,8 +79,7 @@ CCommandVar CParticleTool::CommandSaveBackup(CCommandVar p1, CCommandVar p2)
 
 CCommandVar CParticleTool::CommandReload(CCommandVar p1, CCommandVar p2)
 {
-    if (!IfModified())
-        return FALSE;
+    if (!IfModified()) return FALSE;
     Reload();
     ExecCommand(COMMAND_UPDATE_CAPTION);
     return TRUE;
@@ -158,9 +156,11 @@ CCommandVar CommandJumpToItem(CCommandVar p1, CCommandVar p2)
 void CParticleMain::RegisterCommands()
 {
     inherited::RegisterCommands();
-    // tools       
-    REGISTER_CMD_CE(COMMAND_SELECT_PREVIEW_OBJ, "Select Preview Object", PTools, CParticleTool::CommandSelectPreviewObj, true);
-    REGISTER_CMD_CE(COMMAND_EDIT_PREVIEW_PROPS, "Select Preview Props", PTools, CParticleTool::CommandEditPreviewProps, true);
+    // tools
+    REGISTER_CMD_CE(
+        COMMAND_SELECT_PREVIEW_OBJ, "Select Preview Object", PTools, CParticleTool::CommandSelectPreviewObj, true);
+    REGISTER_CMD_CE(
+        COMMAND_EDIT_PREVIEW_PROPS, "Select Preview Props", PTools, CParticleTool::CommandEditPreviewProps, true);
     REGISTER_CMD_CE(COMMAND_SAVE, "File\\Save", PTools, CParticleTool::CommandSave, true);
     REGISTER_CMD_C(COMMAND_SAVE_BACKUP, PTools, CParticleTool::CommandSaveBackup);
     REGISTER_CMD_CE(COMMAND_LOAD, "File\\Reload", PTools, CParticleTool::CommandReload, true);
@@ -180,10 +180,11 @@ void CParticleMain::RegisterCommands()
     REGISTER_CMD_C(COMMAND_SAVE_XR, PTools, CParticleTool::CommandSaveXR);
     REGISTER_CMD_C(COMMAND_LOAD_XR, PTools, CParticleTool::CommandLoadXR);
     REGISTER_CMD_C(COMMAND_COMPACT_PARTICLES, PTools, CParticleTool::Compact);
-    REGISTER_CMD_CE(COMMAND_CREATE_GROUP_FROM_SELECTED, "Particles\\CreateGroupFromEffect", PTools, CParticleTool::CreateGroupFromSelected, true);
+    REGISTER_CMD_CE(COMMAND_CREATE_GROUP_FROM_SELECTED, "Particles\\CreateGroupFromEffect", PTools,
+        CParticleTool::CreateGroupFromSelected, true);
 }
 
-char *CParticleMain::GetCaption()
+char* CParticleMain::GetCaption()
 {
     return "particles";
 }
@@ -209,15 +210,13 @@ void CParticleMain::RealUpdateScene()
 
 //---------------------------------------------------------------------------
 
-
 //---------------------------------------------------------------------------
 // Common
 //---------------------------------------------------------------------------
 void CParticleMain::ResetStatus()
 {
     VERIFY(m_bReady);
-    if (fraBottomBar->paStatus->Caption!="")
-    {
+    if (fraBottomBar->paStatus->Caption != "") {
         fraBottomBar->paStatus->Caption = "";
         fraBottomBar->paStatus->Repaint();
     }
@@ -226,12 +225,10 @@ void CParticleMain::ResetStatus()
 void CParticleMain::SetStatus(LPSTR s, bool bOutLog)
 {
     VERIFY(m_bReady);
-    if (fraBottomBar->paStatus->Caption!=s)
-    {
+    if (fraBottomBar->paStatus->Caption != s) {
         fraBottomBar->paStatus->Caption = s;
         fraBottomBar->paStatus->Repaint();
-        if (bOutLog&&s&&s[0])
-            ELog.Msg(mtInformation, s);
+        if (bOutLog && s && s[0]) ELog.Msg(mtInformation, s);
     }
 }
 
@@ -245,7 +242,7 @@ void CParticleMain::OutCameraPos()
 {
     VERIFY(m_bReady);
     AnsiString s;
-    const Fvector &c = EDevice.m_Camera.GetPosition();
+    const Fvector& c = EDevice.m_Camera.GetPosition();
     s.sprintf("C: %3.1f, %3.1f, %3.1f", c.x, c.y, c.z);
     //	const Fvector& hpb 	= EDevice.m_Camera.GetHPB();
     //	s.sprintf(" Cam: %3.1f°, %3.1f°, %3.1f°",rad2deg(hpb.y),rad2deg(hpb.x),rad2deg(hpb.z));
@@ -288,5 +285,3 @@ void CParticleMain::RealQuit()
 }
 
 //---------------------------------------------------------------------------
-
-

@@ -13,19 +13,20 @@
 //------------------------------------------------------------------------------
 // Node Add
 //------------------------------------------------------------------------------
-TUI_ControlWallmarkAdd::TUI_ControlWallmarkAdd(int st, int act, ESceneToolBase *parent): TUI_CustomControl(st, act, parent) {}
+TUI_ControlWallmarkAdd::TUI_ControlWallmarkAdd(int st, int act, ESceneToolBase* parent)
+    : TUI_CustomControl(st, act, parent)
+{
+}
 
 bool __fastcall TUI_ControlWallmarkAdd::Start(TShiftState Shift)
 {
-    ESceneWallmarkTool *S = (ESceneWallmarkTool*)parent_tool;
+    ESceneWallmarkTool* S = (ESceneWallmarkTool*)parent_tool;
 
     S->SelectObjects(false);
     wm_cnt = 0;
-    if (S->AddWallmark(UI->m_CurrentRStart, UI->m_CurrentRDir))
-    {
+    if (S->AddWallmark(UI->m_CurrentRStart, UI->m_CurrentRDir)) {
         wm_cnt++;
-        if (!Shift.Contains(ssAlt))
-        {
+        if (!Shift.Contains(ssAlt)) {
             Scene->UndoSave();
             ResetActionToSelect();
             return false;
@@ -36,37 +37,39 @@ bool __fastcall TUI_ControlWallmarkAdd::Start(TShiftState Shift)
     return false;
 }
 
-void TUI_ControlWallmarkAdd::Move(TShiftState _Shift) {}
+void TUI_ControlWallmarkAdd::Move(TShiftState _Shift)
+{
+}
 
 bool TUI_ControlWallmarkAdd::End(TShiftState _Shift)
 {
-    if (!_Shift.Contains(ssAlt))
-        ResetActionToSelect();
-    if (wm_cnt)
-        Scene->UndoSave();
+    if (!_Shift.Contains(ssAlt)) ResetActionToSelect();
+    if (wm_cnt) Scene->UndoSave();
     return true;
 }
 
 //------------------------------------------------------------------------------------
 // WM Move
 //------------------------------------------------------------------------------------
-TUI_ControlWallmarkMove::TUI_ControlWallmarkMove(int st, int act, ESceneToolBase *parent): TUI_CustomControl(st, act, parent) {}
+TUI_ControlWallmarkMove::TUI_ControlWallmarkMove(int st, int act, ESceneToolBase* parent)
+    : TUI_CustomControl(st, act, parent)
+{
+}
 
 bool TUI_ControlWallmarkMove::Start(TShiftState Shift)
 {
-    if (Shift.Contains(ssCtrl))
-    {
-        ESceneWallmarkTool *S = (ESceneWallmarkTool*)parent_tool;
-        if (S->MoveSelectedWallmarkTo(UI->m_CurrentRStart, UI->m_CurrentRDir))
-            Scene->UndoSave();
+    if (Shift.Contains(ssCtrl)) {
+        ESceneWallmarkTool* S = (ESceneWallmarkTool*)parent_tool;
+        if (S->MoveSelectedWallmarkTo(UI->m_CurrentRStart, UI->m_CurrentRDir)) Scene->UndoSave();
     }
     return false;
 }
 
-void __fastcall TUI_ControlWallmarkMove::Move(TShiftState _Shift) {}
+void __fastcall TUI_ControlWallmarkMove::Move(TShiftState _Shift)
+{
+}
 
 bool __fastcall TUI_ControlWallmarkMove::End(TShiftState _Shift)
 {
     return false;
 }
-
