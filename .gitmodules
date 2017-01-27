@@ -13,3 +13,6 @@
 [submodule "src/Externals/lzo"]
 	path = src/Externals/lzo
 	url = https://github.com/alexgdi/lzo.git
+[submodule "src/Externals/zlib"]
+	path = src/Externals/zlib
+	url = https://github.com/madler/zlib.git
