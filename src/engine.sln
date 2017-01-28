@@ -178,6 +178,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libvorbisfile", "Externals\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libjpeg", "Externals\jpeg\libjpeg.vcxproj", "{938C5808-85A1-4B5A-8CB4-D2D9D7851CB8}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BugTrap", "Externals\BugTrap.vcxproj", "{E8CF1ADA-264A-4127-86C2-FD7057D3792C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug_Dedicated|Mixed Platforms = Debug_Dedicated|Mixed Platforms
@@ -1608,6 +1610,30 @@ Global
 		{938C5808-85A1-4B5A-8CB4-D2D9D7851CB8}.Release|Mixed Platforms.Build.0 = Release|Win32
 		{938C5808-85A1-4B5A-8CB4-D2D9D7851CB8}.Release|Win32.ActiveCfg = Release|Win32
 		{938C5808-85A1-4B5A-8CB4-D2D9D7851CB8}.Release|Win32.Build.0 = Release|Win32
+		{E8CF1ADA-264A-4127-86C2-FD7057D3792C}.Debug_Dedicated|Mixed Platforms.ActiveCfg = Debug|Win32
+		{E8CF1ADA-264A-4127-86C2-FD7057D3792C}.Debug_Dedicated|Mixed Platforms.Build.0 = Debug|Win32
+		{E8CF1ADA-264A-4127-86C2-FD7057D3792C}.Debug_Dedicated|Win32.ActiveCfg = Debug|Win32
+		{E8CF1ADA-264A-4127-86C2-FD7057D3792C}.Debug_Dedicated|Win32.Build.0 = Debug|Win32
+		{E8CF1ADA-264A-4127-86C2-FD7057D3792C}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{E8CF1ADA-264A-4127-86C2-FD7057D3792C}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{E8CF1ADA-264A-4127-86C2-FD7057D3792C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{E8CF1ADA-264A-4127-86C2-FD7057D3792C}.Debug|Win32.Build.0 = Debug|Win32
+		{E8CF1ADA-264A-4127-86C2-FD7057D3792C}.Mixed_Dedicated|Mixed Platforms.ActiveCfg = Release|Win32
+		{E8CF1ADA-264A-4127-86C2-FD7057D3792C}.Mixed_Dedicated|Mixed Platforms.Build.0 = Release|Win32
+		{E8CF1ADA-264A-4127-86C2-FD7057D3792C}.Mixed_Dedicated|Win32.ActiveCfg = Release|Win32
+		{E8CF1ADA-264A-4127-86C2-FD7057D3792C}.Mixed_Dedicated|Win32.Build.0 = Release|Win32
+		{E8CF1ADA-264A-4127-86C2-FD7057D3792C}.Mixed|Mixed Platforms.ActiveCfg = Release|Win32
+		{E8CF1ADA-264A-4127-86C2-FD7057D3792C}.Mixed|Mixed Platforms.Build.0 = Release|Win32
+		{E8CF1ADA-264A-4127-86C2-FD7057D3792C}.Mixed|Win32.ActiveCfg = Release|Win32
+		{E8CF1ADA-264A-4127-86C2-FD7057D3792C}.Mixed|Win32.Build.0 = Release|Win32
+		{E8CF1ADA-264A-4127-86C2-FD7057D3792C}.Release_Dedicated|Mixed Platforms.ActiveCfg = Release|Win32
+		{E8CF1ADA-264A-4127-86C2-FD7057D3792C}.Release_Dedicated|Mixed Platforms.Build.0 = Release|Win32
+		{E8CF1ADA-264A-4127-86C2-FD7057D3792C}.Release_Dedicated|Win32.ActiveCfg = Release|Win32
+		{E8CF1ADA-264A-4127-86C2-FD7057D3792C}.Release_Dedicated|Win32.Build.0 = Release|Win32
+		{E8CF1ADA-264A-4127-86C2-FD7057D3792C}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{E8CF1ADA-264A-4127-86C2-FD7057D3792C}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{E8CF1ADA-264A-4127-86C2-FD7057D3792C}.Release|Win32.ActiveCfg = Release|Win32
+		{E8CF1ADA-264A-4127-86C2-FD7057D3792C}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1667,6 +1693,7 @@ Global
 		{3A214E06-B95E-4D61-A291-1F8DF2EC10FD} = {2BFC806B-CE92-4EA4-8FE8-5F2EA54BA348}
 		{CEBDE98B-A6AA-46E6-BC79-FAAF823DB9EC} = {2BFC806B-CE92-4EA4-8FE8-5F2EA54BA348}
 		{938C5808-85A1-4B5A-8CB4-D2D9D7851CB8} = {2BFC806B-CE92-4EA4-8FE8-5F2EA54BA348}
+		{E8CF1ADA-264A-4127-86C2-FD7057D3792C} = {2BFC806B-CE92-4EA4-8FE8-5F2EA54BA348}
 	EndGlobalSection
 	GlobalSection(DPCodeReviewSolutionGUID) = preSolution
 		DPCodeReviewSolutionGUID = {00000000-0000-0000-0000-000000000000}

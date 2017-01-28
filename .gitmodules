@@ -28,3 +28,6 @@
 [submodule "src/Externals/jpeg"]
 	path = src/Externals/jpeg
 	url = https://github.com/OpenXRay/libjpeg.git
+[submodule "src/Externals/BugTrap"]
+	path = src/Externals/BugTrap
+	url = https://github.com/OpenXRay/BugTrap.git
