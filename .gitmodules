@@ -25,3 +25,6 @@
 [submodule "src/Externals/libtheora"]
 	path = src/Externals/libtheora
 	url = https://github.com/xiph/theora.git
+[submodule "src/Externals/jpeg"]
+	path = src/Externals/jpeg
+	url = https://github.com/OpenXRay/libjpeg.git
