@@ -16,3 +16,12 @@
 [submodule "src/Externals/zlib"]
 	path = src/Externals/zlib
 	url = https://github.com/madler/zlib.git
+[submodule "src/Externals/libvorbis"]
+	path = src/Externals/libvorbis
+	url = https://github.com/xiph/vorbis.git
+[submodule "src/Externals/libogg"]
+	path = src/Externals/libogg
+	url = https://github.com/xiph/ogg.git
+[submodule "src/Externals/libtheora"]
+	path = src/Externals/libtheora
+	url = https://github.com/xiph/theora.git
