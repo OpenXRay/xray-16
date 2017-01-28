@@ -33,6 +33,9 @@
   <PropertyGroup Condition="'$(ConfigurationType)'=='StaticLibrary'">
     <OutDir>$(xrLibDir)</OutDir>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(ConfigurationType)'=='Makefile'">
+    <OutDir>$(xrLibDir)</OutDir>
+  </PropertyGroup>
   <PropertyGroup>
     <IntDir>$(xrIntDir)$(ProjectName)\</IntDir>
   </PropertyGroup>
