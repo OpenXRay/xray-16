@@ -524,7 +524,7 @@ struct raii_guard : private Noncopyable
 #ifdef DEBUG
             static const bool break_on_assert = !!strstr(Core.Params, "-break_on_assert");
 #else
-            static const bool break_on_assert = true;
+            static const bool break_on_assert = false;	// xxx: true will hide real lua error, LuaJIT problem?
 #endif
             if (!m_error_code) return;
             if (break_on_assert)
@@ -756,6 +756,13 @@ int CScriptEngine::lua_pcall_failed(lua_State* L)
 {
     print_output(L, "", LUA_ERRRUN);
     on_error(L);
+
+#ifndef DEBUG   // Debug already do it
+    // Print Lua call stack
+    const char* lua_error_text = lua_tostring(L, 1);    // error text
+    luaL_traceback(L, L, make_string("%s\n", lua_error_text).c_str(), 1); // add stack trace to it
+#endif
+
 #if !XRAY_EXCEPTIONS
     xrDebug::Fatal(DEBUG_INFO, "LUA error: %s", lua_isstring(L, -1) ? lua_tostring(L, -1) : "");
 #endif
@@ -786,9 +793,8 @@ void CScriptEngine::setup_callbacks()
 #if !XRAY_EXCEPTIONS
         luabind::set_error_callback(CScriptEngine::lua_error);
 #endif
-#ifndef MASTER_GOLD
+
         luabind::set_pcall_callback([](lua_State* L) { lua_pushcfunction(L, CScriptEngine::lua_pcall_failed); });
-#endif
     }
 #if !XRAY_EXCEPTIONS
     luabind::set_cast_failed_callback(CScriptEngine::lua_cast_failed);
