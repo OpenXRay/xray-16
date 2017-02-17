@@ -524,9 +524,9 @@ struct raii_guard : private Noncopyable
 #ifdef DEBUG
             static const bool break_on_assert = !!strstr(Core.Params, "-break_on_assert");
 #else
-            static const bool break_on_assert = false;	// xxx: true will hide real lua error, LuaJIT problem?
+            static const bool break_on_assert = true;   // xxx: there is no point to set it true\false in Release, since game will crash anyway in most cases due to XRAY_EXCEPTIONS disabled in Release build.
 #endif
-            if (!m_error_code) return;
+            if (!m_error_code) return;  // xxx: Check "lua_pcall_failed" before changing this!
             if (break_on_assert)
                 R_ASSERT2(!m_error_code, m_error_description);
             else
@@ -754,7 +754,12 @@ void CScriptEngine::lua_error(lua_State* L)
 
 int CScriptEngine::lua_pcall_failed(lua_State* L)
 {
-    print_output(L, "", LUA_ERRRUN);
+#if (!defined(DEBUG) && !XRAY_EXCEPTIONS)
+    print_output(L, "", 0); // xxx: Force game to not break in raii_guard() for this type of errors
+#else
+    print_output(L, "", LUA_ERRRUN); // xxx: Default behavior
+#endif
+
     on_error(L);
 
 #ifndef DEBUG   // Debug already do it
