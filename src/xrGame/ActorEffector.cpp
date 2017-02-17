@@ -203,7 +203,7 @@ BOOL CAnimatorCamEffector::ProcessCam(SCamEffectorInfo& info)
 
 BOOL CAnimatorCamLerpEffector::ProcessCam(SCamEffectorInfo& info)
 {
-    if (!inherited::inherited::ProcessCam(info)) return FALSE;
+    if (!CEffectorCam::ProcessCam(info)) return FALSE;
 
     const Fmatrix& m = m_objectAnimator->XFORM();
     m_objectAnimator->Update(Device.fTimeDelta);
