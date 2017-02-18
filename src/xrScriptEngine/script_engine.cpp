@@ -505,9 +505,9 @@ struct raii_guard : private Noncopyable
 {
     CScriptEngine* scriptEngine;
     int m_error_code;
-    LPCSTR const& m_error_description;
+    const char*& m_error_description;
 
-    raii_guard(CScriptEngine* scriptEngine, int error_code, LPCSTR const& error_description)
+    raii_guard(CScriptEngine* scriptEngine, int error_code, const char*& error_description)
        :m_error_code(error_code), m_error_description(error_description)
     {
         this->scriptEngine = scriptEngine;
@@ -525,7 +525,7 @@ struct raii_guard : private Noncopyable
 #else
             static const bool break_on_assert = true;   // xxx: there is no point to set it true\false in Release, since game will crash anyway in most cases due to XRAY_EXCEPTIONS disabled in Release build.
 #endif
-            if (!m_error_code) return;  // xxx: Check "lua_pcall_failed" before changing this!
+            if (!m_error_code) return;  // Check "lua_pcall_failed" before changing this!
             if (break_on_assert)
                 R_ASSERT2(!m_error_code, m_error_description);
             else
@@ -754,9 +754,9 @@ void CScriptEngine::lua_error(lua_State* L)
 int CScriptEngine::lua_pcall_failed(lua_State* L)
 {
 #if (!defined(DEBUG) && !XRAY_EXCEPTIONS)
-    print_output(L, "", 0); // xxx: Force game to not break in raii_guard() for this type of errors
+    print_output(L, "", 0); // Force game to not break in raii_guard() for this type of errors
 #else
-    print_output(L, "", LUA_ERRRUN); // xxx: Default behavior
+    print_output(L, "", LUA_ERRRUN); // Default behavior
 #endif
 
     on_error(L);
