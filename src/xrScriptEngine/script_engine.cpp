@@ -505,13 +505,12 @@ struct raii_guard : private Noncopyable
 {
     CScriptEngine* scriptEngine;
     int m_error_code;
-    const char* m_error_description;
+    LPCSTR const& m_error_description;
 
-    raii_guard(CScriptEngine* scriptEngine, int error_code, const char* error_description)
+    raii_guard(CScriptEngine* scriptEngine, int error_code, LPCSTR const& error_description)
+       :m_error_code(error_code), m_error_description(error_description)
     {
         this->scriptEngine = scriptEngine;
-        m_error_code = error_code;
-        m_error_description = error_description;
     }
 
     ~raii_guard()
