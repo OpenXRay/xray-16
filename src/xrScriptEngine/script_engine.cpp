@@ -534,7 +534,7 @@ struct raii_guard : private Noncopyable
     }
 };
 
-bool CScriptEngine::print_output(lua_State* L, LPCSTR caScriptFileName, int errorCode)
+bool CScriptEngine::print_output(lua_State* L, LPCSTR caScriptFileName, int errorCode, const char* caErrorText)
 {
     CScriptEngine* scriptEngine = GetInstance(L);
     VERIFY(scriptEngine);
@@ -563,6 +563,12 @@ bool CScriptEngine::print_output(lua_State* L, LPCSTR caScriptFileName, int erro
         }
 #endif
     }
+
+    if (caErrorText != NULL)
+    {
+        S = caErrorText;
+    }
+
     return true;
 }
 
@@ -753,19 +759,17 @@ void CScriptEngine::lua_error(lua_State* L)
 
 int CScriptEngine::lua_pcall_failed(lua_State* L)
 {
-#if (!defined(DEBUG) && !XRAY_EXCEPTIONS)
-    print_output(L, "", 0); // Force game to not break in raii_guard() for this type of errors
-#else
-    print_output(L, "", LUA_ERRRUN); // Default behavior
-#endif
-
-    on_error(L);
+    const char* sErrorText = NULL;
 
 #ifndef DEBUG   // Debug already do it
-    // Print Lua call stack
-    const char* lua_error_text = lua_tostring(L, 1);    // error text
-    luaL_traceback(L, L, make_string("%s\n", lua_error_text).c_str(), 1); // add stack trace to it
+    const char* lua_error_text = lua_tostring(L, -1); // lua-error text
+    luaL_traceback(L, L, make_string("[LUA][Error]: %s\n", lua_error_text).c_str(), 1); // add lua traceback to it
+    sErrorText = lua_tostring(L, -1); // get combined error text from lua stack
+    lua_pop(L, 1);  // restore lua stack
 #endif
+
+    print_output(L, "", LUA_ERRRUN, sErrorText);
+    on_error(L);
 
 #if !XRAY_EXCEPTIONS
     xrDebug::Fatal(DEBUG_INFO, "LUA error: %s", lua_isstring(L, -1) ? lua_tostring(L, -1) : "");
