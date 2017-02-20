@@ -29,18 +29,19 @@ void CUICursor::OnScreenResolutionChanged()
 {
     xr_delete(m_static);
     InitInternal();
+    pInput->ClipCursor(IsVisible());
 }
 
 void CUICursor::Show()
 {
     bVisible = true;
-    pInput->ClipCursor(false);
+    pInput->ClipCursor(true);
 }
 
 void CUICursor::Hide()
 {
     bVisible = false;
-    pInput->ClipCursor(true);
+    pInput->ClipCursor(false);
 }
 
 void CUICursor::InitInternal()
