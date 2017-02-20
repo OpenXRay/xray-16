@@ -520,22 +520,35 @@ void CHW::updateWindowProps(HWND m_hWnd)
             if (!strstr(Core.Params, "-no_dialog_header")) dwWindowStyle |= WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX;
             SetWindowLong(m_hWnd, GWL_STYLE, dwWindowStyle);
             // When moving from fullscreen to windowed mode, it is important to
-            // adjust the window size after recreating the device rather than
-            // beforehand to ensure that you get the window size you want.  For
-            // example, when switching from 640x480 fullscreen to windowed with
-            // a 1000x600 window on a 1024x768 desktop, it is impossible to set
-            // the window size to 1000x600 until after the display mode has
-            // changed to 1024x768, because windows cannot be larger than the
-            // desktop.
+			// adjust the window size after recreating the device rather than
+			// beforehand to ensure that you get the window size you want.  For
+			// example, when switching from 640x480 fullscreen to windowed with
+			// a 1000x600 window on a 1024x768 desktop, it is impossible to set
+			// the window size to 1000x600 until after the display mode has
+			// changed to 1024x768, because windows cannot be larger than the
+			// desktop.
 
             RECT m_rcWindowBounds;
-            RECT DesktopRect;
+            bool bCenter = false;
+            if (strstr(Core.Params, "-center_screen")) bCenter = true;
 
-            GetClientRect(GetDesktopWindow(), &DesktopRect);
+#ifndef _EDITOR
+            if (g_dedicated_server) bCenter = true;
+#endif
 
-            SetRect(&m_rcWindowBounds, (DesktopRect.right - DevPP.BackBufferWidth) / 2,
-                (DesktopRect.bottom - DevPP.BackBufferHeight) / 2, (DesktopRect.right + DevPP.BackBufferWidth) / 2,
-                (DesktopRect.bottom + DevPP.BackBufferHeight) / 2);
+            if (bCenter) {
+                RECT DesktopRect;
+
+                GetClientRect(GetDesktopWindow(), &DesktopRect);
+
+                SetRect(&m_rcWindowBounds, (DesktopRect.right - DevPP.BackBufferWidth) / 2,
+                    (DesktopRect.bottom - DevPP.BackBufferHeight) / 2, (DesktopRect.right + DevPP.BackBufferWidth) / 2,
+                    (DesktopRect.bottom + DevPP.BackBufferHeight) / 2);
+            }
+            else
+            {
+                SetRect(&m_rcWindowBounds, 0, 0, DevPP.BackBufferWidth, DevPP.BackBufferHeight);
+            };
 
             AdjustWindowRect(&m_rcWindowBounds, dwWindowStyle, FALSE);
 
