@@ -34,6 +34,7 @@ ENGINE_API BOOL g_bRendering = FALSE;
 
 BOOL g_bLoaded = FALSE;
 ref_light precache_light = 0;
+int g_dwFPSlimit = 120;
 
 BOOL CRenderDevice::Begin()
 {
@@ -184,6 +185,16 @@ void CRenderDevice::on_idle()
         Sleep(100);
         return;
     }
+
+#ifndef DEDICATED_SERVER
+    // FPS Lock
+    static DWORD dwLastFrameTime = 0;
+    int dwCurrentTime = timeGetTime();
+    if (g_dwFPSlimit > 0)
+        if ((dwCurrentTime - dwLastFrameTime) < (1000 / g_dwFPSlimit)) return;
+    dwLastFrameTime = dwCurrentTime;
+#endif
+
 #ifdef DEDICATED_SERVER
     u32 FrameStartTime = TimerGlobal.GetElapsed_ms();
 #endif
@@ -293,9 +304,15 @@ void CRenderDevice::Run()
     // Start all threads
     mt_bMustExit = FALSE;
     thread_spawn(SecondaryThreadProc, "X-RAY Secondary thread", 0, this);
-    // Message cycle
+    // App start
     seqAppStart.Process(rp_AppStart);
     GlobalEnv.Render->ClearTarget();
+    // Load FPS Lock
+    if (strstr(Core.Params, "-nofpslock"))
+        g_dwFPSlimit = -1;
+    else if (strstr(Core.Params, "-fpslock60"))
+        g_dwFPSlimit = 60;
+    // Message cycle
     message_loop();
     seqAppEnd.Process(rp_AppEnd);
     // Stop Balance-Thread
