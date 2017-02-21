@@ -188,8 +188,11 @@ void Startup()
     g_SpatialSpace = new ISpatial_DB("Spatial obj");
     g_SpatialSpacePhysic = new ISpatial_DB("Spatial phys");
     // Destroy LOGO
-    DestroyWindow(logoWindow);
-    logoWindow = NULL;
+    if (logoWindow != nullptr)
+    {
+        DestroyWindow(logoWindow);
+        logoWindow = nullptr;
+    }
     // Main cycle
     Memory.mem_usage();
     Device.Run();
@@ -307,18 +310,21 @@ int RunApplication(const char* commandLine)
     if (GetLastError() == ERROR_ALREADY_EXISTS) return 2;
 #endif
     SetThreadAffinityMask(GetCurrentThread(), 1);
-    logoWindow = CreateDialog(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_STARTUP), 0, LogoWndProc);
-    HWND logoPicture = GetDlgItem(logoWindow, IDC_STATIC_LOGO);
-    RECT logoRect;
-    GetWindowRect(logoPicture, &logoRect);
+    if (strstr(commandLine, "-nosplash") == NULL)
+    {
+        logoWindow = CreateDialog(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_STARTUP), 0, LogoWndProc);
+        HWND logoPicture = GetDlgItem(logoWindow, IDC_STATIC_LOGO);
+        RECT logoRect;
+        GetWindowRect(logoPicture, &logoRect);
 #ifndef DEBUG
-    HWND prevWindow = HWND_TOPMOST;
+        HWND prevWindow = (strstr(commandLine, "-splashnotop") == NULL) ? HWND_TOPMOST : HWND_NOTOPMOST;
 #else
-    HWND prevWindow = HWND_NOTOPMOST;
+        HWND prevWindow = HWND_NOTOPMOST;
 #endif
-    SetWindowPos(logoWindow, prevWindow, 0, 0, logoRect.right - logoRect.left, logoRect.bottom - logoRect.top,
-        SWP_NOMOVE | SWP_SHOWWINDOW);
-    UpdateWindow(logoWindow);
+        SetWindowPos(logoWindow, prevWindow, 0, 0, logoRect.right - logoRect.left, logoRect.bottom - logoRect.top,
+            SWP_NOMOVE | SWP_SHOWWINDOW);
+        UpdateWindow(logoWindow);
+    }
     *g_sLaunchOnExit_app = 0;
     *g_sLaunchOnExit_params = 0;
     const char* fsltx = "-fsltx ";
