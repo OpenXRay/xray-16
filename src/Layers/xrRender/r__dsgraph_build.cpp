@@ -1161,7 +1161,8 @@ void D3DXRenderBase::End()
     Memory.dbg_check();
     DoAsyncScreenshot();
 #if defined(USE_DX10) || defined(USE_DX11)
-    HW.m_pSwapChain->Present(0, 0);
+    bool bUseVSync = psDeviceFlags.is(rsFullscreen) && psDeviceFlags.test(rsVSync); //xxx: weird tearing glitches when VSync turned on for windowed mode in DX10\11
+    HW.m_pSwapChain->Present(bUseVSync ? 1 : 0, 0);
 #else
     CHK_DX(HW.pDevice->EndScene());
     HW.pDevice->Present(NULL, NULL, NULL, NULL);
