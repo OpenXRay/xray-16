@@ -347,7 +347,6 @@ class_<CScriptGameObject>& script_register_game_object1(class_<CScriptGameObject
         .def("set_smart_cover_target_lookout", &CScriptGameObject::set_smart_cover_target_lookout)
         .def("set_smart_cover_target_fire", &CScriptGameObject::set_smart_cover_target_fire)
         .def("set_smart_cover_target_fire_no_lookout", &CScriptGameObject::set_smart_cover_target_fire_no_lookout)
-        .def("set_smart_cover_target_idle", &CScriptGameObject::set_smart_cover_target_idle)
         .def("set_smart_cover_target_default", &CScriptGameObject::set_smart_cover_target_default)
 
         .def("idle_min_time", (void (CScriptGameObject::*)(float)) & CScriptGameObject::idle_min_time)

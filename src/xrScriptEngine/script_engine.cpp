@@ -505,13 +505,12 @@ struct raii_guard : private Noncopyable
 {
     CScriptEngine* scriptEngine;
     int m_error_code;
-    const char* m_error_description;
+    const char*& m_error_description;
 
-    raii_guard(CScriptEngine* scriptEngine, int error_code, const char* error_description)
+    raii_guard(CScriptEngine* scriptEngine, int error_code, const char*& error_description)
+       :m_error_code(error_code), m_error_description(error_description)
     {
         this->scriptEngine = scriptEngine;
-        m_error_code = error_code;
-        m_error_description = error_description;
     }
 
     ~raii_guard()
@@ -524,9 +523,9 @@ struct raii_guard : private Noncopyable
 #ifdef DEBUG
             static const bool break_on_assert = !!strstr(Core.Params, "-break_on_assert");
 #else
-            static const bool break_on_assert = true;
+            static const bool break_on_assert = true;   // xxx: there is no point to set it true\false in Release, since game will crash anyway in most cases due to XRAY_EXCEPTIONS disabled in Release build.
 #endif
-            if (!m_error_code) return;
+            if (!m_error_code) return;  // Check "lua_pcall_failed" before changing this!
             if (break_on_assert)
                 R_ASSERT2(!m_error_code, m_error_description);
             else
@@ -535,7 +534,7 @@ struct raii_guard : private Noncopyable
     }
 };
 
-bool CScriptEngine::print_output(lua_State* L, LPCSTR caScriptFileName, int errorCode)
+bool CScriptEngine::print_output(lua_State* L, LPCSTR caScriptFileName, int errorCode, const char* caErrorText)
 {
     CScriptEngine* scriptEngine = GetInstance(L);
     VERIFY(scriptEngine);
@@ -564,6 +563,12 @@ bool CScriptEngine::print_output(lua_State* L, LPCSTR caScriptFileName, int erro
         }
 #endif
     }
+
+    if (caErrorText != NULL)
+    {
+        S = caErrorText;
+    }
+
     return true;
 }
 
@@ -754,8 +759,18 @@ void CScriptEngine::lua_error(lua_State* L)
 
 int CScriptEngine::lua_pcall_failed(lua_State* L)
 {
-    print_output(L, "", LUA_ERRRUN);
+    const char* sErrorText = NULL;
+
+#ifndef DEBUG   // Debug already do it
+    const char* lua_error_text = lua_tostring(L, -1); // lua-error text
+    luaL_traceback(L, L, make_string("[LUA][Error]: %s\n", lua_error_text).c_str(), 1); // add lua traceback to it
+    sErrorText = lua_tostring(L, -1); // get combined error text from lua stack
+    lua_pop(L, 1);  // restore lua stack
+#endif
+
+    print_output(L, "", LUA_ERRRUN, sErrorText);
     on_error(L);
+
 #if !XRAY_EXCEPTIONS
     xrDebug::Fatal(DEBUG_INFO, "LUA error: %s", lua_isstring(L, -1) ? lua_tostring(L, -1) : "");
 #endif
@@ -786,9 +801,8 @@ void CScriptEngine::setup_callbacks()
 #if !XRAY_EXCEPTIONS
         luabind::set_error_callback(CScriptEngine::lua_error);
 #endif
-#ifndef MASTER_GOLD
+
         luabind::set_pcall_callback([](lua_State* L) { lua_pushcfunction(L, CScriptEngine::lua_pcall_failed); });
-#endif
     }
 #if !XRAY_EXCEPTIONS
     luabind::set_cast_failed_callback(CScriptEngine::lua_cast_failed);
