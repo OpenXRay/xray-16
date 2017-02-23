@@ -20,11 +20,7 @@ CZombie::CZombie()
     CControlled::init_external(this);
 }
 
-CZombie::~CZombie()
-{
-    xr_delete(StateMan);
-}
-
+CZombie::~CZombie() { xr_delete(StateMan); }
 void CZombie::Load(LPCSTR section)
 {
     inherited::Load(section);
@@ -137,7 +133,8 @@ void CZombie::vfAssignBones()
 
 BOOL CZombie::net_Spawn(CSE_Abstract* DC)
 {
-    if (!inherited::net_Spawn(DC)) return (FALSE);
+    if (!inherited::net_Spawn(DC))
+        return (FALSE);
 
     vfAssignBones();
 
@@ -154,9 +151,11 @@ void CZombie::Hit(SHit* pHDS)
     //	inherited::Hit(P,dir,who,element,p_in_object_space,impulse,hit_type);
     inherited::Hit(pHDS);
 
-    if (!g_Alive()) return;
+    if (!g_Alive())
+        return;
 
-    if ((pHDS->hit_type == ALife::eHitTypeFireWound) && (Device.dwFrame != last_hit_frame)) {
+    if ((pHDS->hit_type == ALife::eHitTypeFireWound) && (Device.dwFrame != last_hit_frame))
+    {
         if (!com_man().ta_is_active() && (time_resurrect + TIME_RESURRECT_RESTORE < Device.dwTimeGlobal) &&
             (conditions().GetHealth() < health_death_threshold))
         {
@@ -169,7 +168,8 @@ void CZombie::Hit(SHit* pHDS)
                 move().stop();
                 time_dead_start = Device.dwTimeGlobal;
 
-                if (fake_death_left == 0) fake_death_left = 1;
+                if (fake_death_left == 0)
+                    fake_death_left = 1;
                 fake_death_left--;
             }
         }
@@ -182,8 +182,10 @@ void CZombie::shedule_Update(u32 dt)
 {
     inherited::shedule_Update(dt);
 
-    if (time_dead_start != 0) {
-        if (time_dead_start + TIME_FAKE_DEATH < Device.dwTimeGlobal) {
+    if (time_dead_start != 0)
+    {
+        if (time_dead_start + TIME_FAKE_DEATH < Device.dwTimeGlobal)
+        {
             time_dead_start = 0;
 
             com_man().ta_pointbreak();
@@ -195,7 +197,8 @@ void CZombie::shedule_Update(u32 dt)
 
 bool CZombie::fake_death_fall_down()
 {
-    if (com_man().ta_is_active()) return false;
+    if (com_man().ta_is_active())
+        return false;
 
     com_man().ta_activate(anim_triple_death[u8(Random.randI(FAKE_DEATH_TYPES_COUNT))]);
     move().stop();
@@ -209,12 +212,14 @@ void CZombie::fake_death_stand_up()
     bool active = false;
     for (u32 i = 0; i < FAKE_DEATH_TYPES_COUNT; i++)
     {
-        if (com_man().ta_is_active(anim_triple_death[i])) {
+        if (com_man().ta_is_active(anim_triple_death[i]))
+        {
             active = true;
             break;
         }
     }
-    if (!active) return;
+    if (!active)
+        return;
 
     com_man().ta_pointbreak();
 }

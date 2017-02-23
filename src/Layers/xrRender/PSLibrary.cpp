@@ -10,28 +10,16 @@
 
 #define _game_data_ "$game_data$"
 
-bool ped_sort_pred(const PS::CPEDef* a, const PS::CPEDef* b)
-{
-    return xr_strcmp(a->Name(), b->Name()) < 0;
-}
-bool pgd_sort_pred(const PS::CPGDef* a, const PS::CPGDef* b)
-{
-    return xr_strcmp(a->m_Name, b->m_Name) < 0;
-}
-
-bool ped_find_pred(const PS::CPEDef* a, LPCSTR b)
-{
-    return xr_strcmp(a->Name(), b) < 0;
-}
-bool pgd_find_pred(const PS::CPGDef* a, LPCSTR b)
-{
-    return xr_strcmp(a->m_Name, b) < 0;
-}
+bool ped_sort_pred(const PS::CPEDef* a, const PS::CPEDef* b) { return xr_strcmp(a->Name(), b->Name()) < 0; }
+bool pgd_sort_pred(const PS::CPGDef* a, const PS::CPGDef* b) { return xr_strcmp(a->m_Name, b->m_Name) < 0; }
+bool ped_find_pred(const PS::CPEDef* a, LPCSTR b) { return xr_strcmp(a->Name(), b) < 0; }
+bool pgd_find_pred(const PS::CPGDef* a, LPCSTR b) { return xr_strcmp(a->m_Name, b) < 0; }
 //----------------------------------------------------
 void CPSLibrary::OnCreate()
 {
 #ifdef _EDITOR
-    if (pCreateEAction) {
+    if (pCreateEAction)
+    {
         Load2();
     }
     else
@@ -59,10 +47,12 @@ void CPSLibrary::OnDestroy()
 //----------------------------------------------------
 PS::PEDIt CPSLibrary::FindPEDIt(LPCSTR Name)
 {
-    if (!Name) return m_PEDs.end();
+    if (!Name)
+        return m_PEDs.end();
 #ifdef _EDITOR
     for (PS::PEDIt it = m_PEDs.begin(); it != m_PEDs.end(); it++)
-        if (0 == xr_strcmp((*it)->Name(), Name)) return it;
+        if (0 == xr_strcmp((*it)->Name(), Name))
+            return it;
     return m_PEDs.end();
 #else
     PS::PEDIt I = std::lower_bound(m_PEDs.begin(), m_PEDs.end(), Name, ped_find_pred);
@@ -81,10 +71,12 @@ PS::CPEDef* CPSLibrary::FindPED(LPCSTR Name)
 
 PS::PGDIt CPSLibrary::FindPGDIt(LPCSTR Name)
 {
-    if (!Name) return m_PGDs.end();
+    if (!Name)
+        return m_PGDs.end();
 #ifdef _EDITOR
     for (PS::PGDIt it = m_PGDs.begin(); it != m_PGDs.end(); it++)
-        if (0 == xr_strcmp((*it)->m_Name, Name)) return it;
+        if (0 == xr_strcmp((*it)->m_Name, Name))
+            return it;
     return m_PGDs.end();
 #else
     PS::PGDIt I = std::lower_bound(m_PGDs.begin(), m_PGDs.end(), Name, pgd_find_pred);
@@ -116,7 +108,8 @@ void CPSLibrary::RenamePGD(PS::CPGDef* src, LPCSTR new_name)
 void CPSLibrary::Remove(const char* nm)
 {
     PS::PEDIt it = FindPEDIt(nm);
-    if (it != m_PEDs.end()) {
+    if (it != m_PEDs.end())
+    {
         (*it)->DestroyShader();
         xr_delete(*it);
         m_PEDs.erase(it);
@@ -124,7 +117,8 @@ void CPSLibrary::Remove(const char* nm)
     else
     {
         PS::PGDIt it = FindPGDIt(nm);
-        if (it != m_PGDs.end()) {
+        if (it != m_PGDs.end())
+        {
             xr_delete(*it);
             m_PGDs.erase(it);
         }
@@ -141,7 +135,8 @@ bool CPSLibrary::Load2()
 
 #ifdef _EDITOR
     SPBItem* pb = NULL;
-    if (UI->m_bReady) pb = UI->ProgressStart(files.size(), "Loading particles...");
+    if (UI->m_bReady)
+        pb = UI->ProgressStart(files.size(), "Loading particles...");
 #endif
     FS_FileSet::iterator it = files.begin();
     FS_FileSet::iterator it_e = files.end();
@@ -155,11 +150,13 @@ bool CPSLibrary::Load2()
         CInifile ini(_path, TRUE, TRUE, FALSE);
 
 #ifdef _EDITOR
-        if (pb) pb->Inc();
+        if (pb)
+            pb->Inc();
 #endif
 
         xr_sprintf(_path, sizeof(_path), "%s%s", p_path, p_name);
-        if (0 == stricmp(p_ext, ".pe")) {
+        if (0 == stricmp(p_ext, ".pe"))
+        {
             PS::CPEDef* def = new PS::CPEDef();
             def->m_Name = _path;
             if (def->Load2(ini))
@@ -189,7 +186,8 @@ bool CPSLibrary::Load2()
         (*e_it)->CreateShader();
 
 #ifdef _EDITOR
-    if (pb) UI->ProgressEnd(pb);
+    if (pb)
+        UI->ProgressEnd(pb);
 #endif
     Msg("Loaded particles :%d", files.size());
     return true;
@@ -197,7 +195,8 @@ bool CPSLibrary::Load2()
 
 bool CPSLibrary::Load(const char* nm)
 {
-    if (!FS.exist(nm)) {
+    if (!FS.exist(nm))
+    {
         Msg("Can't find file: '%s'", nm);
         return false;
     }
@@ -206,11 +205,13 @@ bool CPSLibrary::Load(const char* nm)
     bool bRes = true;
     R_ASSERT(F->find_chunk(PS_CHUNK_VERSION));
     u16 ver = F->r_u16();
-    if (ver != PS_VERSION) return false;
+    if (ver != PS_VERSION)
+        return false;
     // second generation
     IReader* OBJ;
     OBJ = F->open_chunk(PS_CHUNK_SECONDGEN);
-    if (OBJ) {
+    if (OBJ)
+    {
         IReader* O = OBJ->open_chunk(0);
         for (int count = 1; O; count++)
         {
@@ -223,14 +224,16 @@ bool CPSLibrary::Load(const char* nm)
                 xr_delete(def);
             }
             O->close();
-            if (!bRes) break;
+            if (!bRes)
+                break;
             O = OBJ->open_chunk(count);
         }
         OBJ->close();
     }
     // second generation
     OBJ = F->open_chunk(PS_CHUNK_THIRDGEN);
-    if (OBJ) {
+    if (OBJ)
+    {
         IReader* O = OBJ->open_chunk(0);
         for (int count = 1; O; count++)
         {
@@ -243,7 +246,8 @@ bool CPSLibrary::Load(const char* nm)
                 xr_delete(def);
             }
             O->close();
-            if (!bRes) break;
+            if (!bRes)
+                break;
             O = OBJ->open_chunk(count);
         }
         OBJ->close();
@@ -271,16 +275,8 @@ void CPSLibrary::Reload()
 
 using PS::CPGDef;
 
-CPGDef const* const* CPSLibrary::particles_group_begin() const
-{
-    return (m_PGDs.size() ? &*m_PGDs.begin() : 0);
-}
-
-CPGDef const* const* CPSLibrary::particles_group_end() const
-{
-    return (m_PGDs.size() ? &*m_PGDs.end() : 0);
-}
-
+CPGDef const* const* CPSLibrary::particles_group_begin() const { return (m_PGDs.size() ? &*m_PGDs.begin() : 0); }
+CPGDef const* const* CPSLibrary::particles_group_end() const { return (m_PGDs.size() ? &*m_PGDs.end() : 0); }
 void CPSLibrary::particles_group_next(PS::CPGDef const* const*& iterator) const
 {
     VERIFY(iterator);

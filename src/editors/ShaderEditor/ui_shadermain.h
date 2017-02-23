@@ -18,7 +18,7 @@ class CShaderMain : public TUI
     virtual void RealUpdateScene();
     virtual void RealQuit();
 
-  public:
+public:
     CShaderMain();
     virtual ~CShaderMain();
 
@@ -33,9 +33,7 @@ class CShaderMain : public TUI
     virtual void OutInfo();
 
     virtual LPCSTR EditorName() { return "shader"; }
-
     virtual LPCSTR EditorDesc() { return "Shader Editor"; }
-
     virtual bool ApplyShortCut(WORD Key, TShiftState Shift);
     virtual bool ApplyGlobalShortCut(WORD Key, TShiftState Shift);
 
@@ -45,4 +43,4 @@ class CShaderMain : public TUI
 
 extern CShaderMain*& PUI;
 
-#endif  // UI_MainCommandH
+#endif // UI_MainCommandH

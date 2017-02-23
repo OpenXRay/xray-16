@@ -5,14 +5,16 @@
 
 void CGammaControl::Update()
 {
-    if (HW.pDevice) {
+    if (HW.pDevice)
+    {
         DXGI_GAMMA_CONTROL_CAPABILITIES GC;
         DXGI_GAMMA_CONTROL G;
         IDXGIOutput* pOutput;
 
         CHK_DX(HW.m_pSwapChain->GetContainingOutput(&pOutput));
         HRESULT hr = pOutput->GetGammaControlCapabilities(&GC);
-        if (SUCCEEDED(hr)) {
+        if (SUCCEEDED(hr))
+        {
             GenLUT(GC, G);
             pOutput->SetGammaControl(&G);
         }
@@ -48,7 +50,7 @@ void CGammaControl::GenLUT(const DXGI_GAMMA_CONTROL_CAPABILITIES& GC, DXGI_GAMMA
     }
 }
 
-#else  //	USE_DX10
+#else //	USE_DX10
 
 IC u16 clr2gamma(float c)
 {
@@ -59,7 +61,8 @@ IC u16 clr2gamma(float c)
 
 void CGammaControl::Update()
 {
-    if (HW.pDevice) {
+    if (HW.pDevice)
+    {
         D3DGAMMARAMP G;
         GenLUT(G);
         HW.pDevice->SetGammaRamp(0, D3DSGR_NO_CALIBRATION, &G);
@@ -80,4 +83,4 @@ void CGammaControl::GenLUT(D3DGAMMARAMP& G)
     }
 }
 
-#endif  //	USE_DX10
+#endif //	USE_DX10

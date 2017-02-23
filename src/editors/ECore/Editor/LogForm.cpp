@@ -11,11 +11,7 @@
 TfrmLog* TfrmLog::form = 0;
 
 //---------------------------------------------------------------------------
-__fastcall TfrmLog::TfrmLog(TComponent* Owner) : TForm(Owner)
-{
-    DEFINE_INI(fsStorage);
-}
-
+__fastcall TfrmLog::TfrmLog(TComponent* Owner) : TForm(Owner) { DEFINE_INI(fsStorage); }
 //---------------------------------------------------------------------------
 void __fastcall TfrmLog::CreateLog()
 {
@@ -23,11 +19,7 @@ void __fastcall TfrmLog::CreateLog()
     form = new TfrmLog((TComponent*)0);
 }
 
-void __fastcall TfrmLog::DestroyLog()
-{
-    xr_delete(form);
-}
-
+void __fastcall TfrmLog::DestroyLog() { xr_delete(form); }
 void __fastcall TfrmLog::ShowLog()
 {
     VERIFY(form);
@@ -40,11 +32,7 @@ void __fastcall TfrmLog::HideLog()
     form->Close();
 }
 
-void __fastcall TfrmLog::ebClearClick(TObject* Sender)
-{
-    lbLog->Items->Clear();
-}
-
+void __fastcall TfrmLog::ebClearClick(TObject* Sender) { lbLog->Items->Clear(); }
 //---------------------------------------------------------------------------
 
 void __fastcall TfrmLog::AddDlgMessage(TMsgDlgType mt, const AnsiString& msg)
@@ -58,11 +46,13 @@ void __fastcall TfrmLog::AddDlgMessage(TMsgDlgType mt, const AnsiString& msg)
 
 void __fastcall TfrmLog::AddMessage(TMsgDlgType mt, const AnsiString& msg)
 {
-    if (!form) return;
+    if (!form)
+        return;
     AnsiString M;
     for (int i = 1; i <= msg.Length(); i++)
     {
-        if (msg[i] == '\r') continue;
+        if (msg[i] == '\r')
+            continue;
         if (msg[i] == '\n')
             M += " ";
         else
@@ -70,7 +60,8 @@ void __fastcall TfrmLog::AddMessage(TMsgDlgType mt, const AnsiString& msg)
     }
     form->lbLog->Items->AddObject(M, (TObject*)mt);
     form->lbLog->ItemIndex = form->lbLog->Items->Count - 1;
-    if ((mt == mtError) && !form->Visible) form->Show();
+    if ((mt == mtError) && !form->Visible)
+        form->Show();
 }
 
 //---------------------------------------------------------------------------
@@ -84,7 +75,8 @@ void __fastcall TfrmLog::lbLogDrawItem(TWinControl* Control, int Index, TRect& R
 {
     TListBox* lb = ((TListBox*)Control);
     TCanvas* pCanvas = lb->Canvas;
-    if (!State.Contains(odSelected)) {
+    if (!State.Contains(odSelected))
+    {
         pCanvas->Brush->Color = TColor(MSG_DEF);
         TMsgDlgType mt = (TMsgDlgType)lb->Items->Objects[Index];
         switch (mt)
@@ -95,7 +87,7 @@ void __fastcall TfrmLog::lbLogDrawItem(TWinControl* Control, int Index, TRect& R
         }
     }
     pCanvas->FillRect(Rect);
-    int Offset = 2;  // default text offset width
+    int Offset = 2; // default text offset width
     pCanvas->TextOut(Rect.Left + Offset, Rect.Top, lb->Items->Strings[Index]);
 }
 
@@ -117,7 +109,8 @@ void __fastcall TfrmLog::ebClearSelectedClick(TObject* Sender)
 {
     for (int i = 0; i < lbLog->Items->Count; i++)
     {
-        if (lbLog->Selected[i]) {
+        if (lbLog->Selected[i])
+        {
             lbLog->Items->Delete(i);
             i--;
         }
@@ -126,11 +119,7 @@ void __fastcall TfrmLog::ebClearSelectedClick(TObject* Sender)
 
 //---------------------------------------------------------------------------
 
-void __fastcall TfrmLog::ebCloseClick(TObject* Sender)
-{
-    Close();
-}
-
+void __fastcall TfrmLog::ebCloseClick(TObject* Sender) { Close(); }
 //---------------------------------------------------------------------------
 
 void __fastcall TfrmLog::FormShow(TObject* Sender)
@@ -141,16 +130,13 @@ void __fastcall TfrmLog::FormShow(TObject* Sender)
 
 //---------------------------------------------------------------------------
 
-void __fastcall TfrmLog::ebFlushClick(TObject* Sender)
-{
-    FlushLog();
-}
-
+void __fastcall TfrmLog::ebFlushClick(TObject* Sender) { FlushLog(); }
 //---------------------------------------------------------------------------
 
 void __fastcall TfrmLog::lbLogKeyDown(TObject* Sender, WORD& Key, TShiftState Shift)
 {
-    if (Shift.Contains(ssCtrl) && (Key == 'C')) {
+    if (Shift.Contains(ssCtrl) && (Key == 'C'))
+    {
         imCopyClick(Sender);
     }
     else if (Shift.Contains(ssCtrl) && (Key == 'A'))
@@ -167,7 +153,8 @@ void __fastcall TfrmLog::imCopyClick(TObject* Sender)
     clp->Clear();
     xr_string tmp;
     for (int i = 0; i < lbLog->Items->Count; i++)
-        if (lbLog->Selected[i]) {
+        if (lbLog->Selected[i])
+        {
             tmp = tmp + lbLog->Items->Strings[i].c_str() + "\r\n";
         }
     clp->SetTextBuf((LPSTR)tmp.c_str());
@@ -175,16 +162,8 @@ void __fastcall TfrmLog::imCopyClick(TObject* Sender)
 
 //---------------------------------------------------------------------------
 
-void __fastcall TfrmLog::imSelectAllClick(TObject* Sender)
-{
-    lbLog->SelectAll();
-}
-
+void __fastcall TfrmLog::imSelectAllClick(TObject* Sender) { lbLog->SelectAll(); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfrmLog::lbLogKeyPress(TObject* Sender, char& Key)
-{
-    Key = 0;
-}
-
+void __fastcall TfrmLog::lbLogKeyPress(TObject* Sender, char& Key) { Key = 0; }
 //---------------------------------------------------------------------------

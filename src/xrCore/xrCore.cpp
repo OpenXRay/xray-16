@@ -13,7 +13,7 @@
 
 #ifdef DEBUG
 #include <malloc.h>
-#endif  // DEBUG
+#endif // DEBUG
 
 XRCORE_API xrCore Core;
 
@@ -29,12 +29,14 @@ static u32 init_counter = 0;
 void xrCore::_initialize(LPCSTR _ApplicationName, LogCallback cb, BOOL init_fs, LPCSTR fs_fname, bool plugin)
 {
     xr_strcpy(ApplicationName, _ApplicationName);
-    if (0 == init_counter) {
+    if (0 == init_counter)
+    {
         PluginMode = plugin;
         // Init COM so we can use CoCreateInstance
         // HRESULT co_res =
         Params = xr_strdup(GetCommandLine());
-        if (!strstr(Params, "-editor")) CoInitializeEx(NULL, COINIT_MULTITHREADED);
+        if (!strstr(Params, "-editor"))
+            CoInitializeEx(NULL, COINIT_MULTITHREADED);
 
         string_path fn, dr, di;
 
@@ -45,7 +47,8 @@ void xrCore::_initialize(LPCSTR _ApplicationName, LogCallback cb, BOOL init_fs, 
 
 #ifdef _EDITOR
         // working path
-        if (strstr(Params, "-wf")) {
+        if (strstr(Params, "-wf"))
+        {
             string_path c_name;
             sscanf(strstr(Core.Params, "-wf ") + 4, "%[^ ] ", c_name);
             SetCurrentDirectory(c_name);
@@ -82,24 +85,28 @@ void xrCore::_initialize(LPCSTR _ApplicationName, LogCallback cb, BOOL init_fs, 
         xr_EFS = new EFS_Utils();
         //. R_ASSERT (co_res==S_OK);
     }
-    if (init_fs) {
+    if (init_fs)
+    {
         u32 flags = 0;
-        if (0 != strstr(Params, "-build")) flags |= CLocatorAPI::flBuildCopy;
-        if (0 != strstr(Params, "-ebuild")) flags |= CLocatorAPI::flBuildCopy | CLocatorAPI::flEBuildCopy;
+        if (0 != strstr(Params, "-build"))
+            flags |= CLocatorAPI::flBuildCopy;
+        if (0 != strstr(Params, "-ebuild"))
+            flags |= CLocatorAPI::flBuildCopy | CLocatorAPI::flEBuildCopy;
 #ifdef DEBUG
         if (strstr(Params, "-cache"))
             flags |= CLocatorAPI::flCacheFiles;
         else
             flags &= ~CLocatorAPI::flCacheFiles;
-#endif          // DEBUG
-#ifdef _EDITOR  // for EDITORS - no cache
+#endif // DEBUG
+#ifdef _EDITOR // for EDITORS - no cache
         flags &= ~CLocatorAPI::flCacheFiles;
-#endif  // _EDITOR
+#endif // _EDITOR
         flags |= CLocatorAPI::flScanAppRoot;
 
 #ifndef _EDITOR
 #ifndef ELocatorAPIH
-        if (0 != strstr(Params, "-file_activity")) flags |= CLocatorAPI::flDumpFileActivity;
+        if (0 != strstr(Params, "-file_activity"))
+            flags |= CLocatorAPI::flDumpFileActivity;
 #endif
 #endif
         FS._initialize(flags, 0, fs_fname);
@@ -110,7 +117,7 @@ void xrCore::_initialize(LPCSTR _ApplicationName, LogCallback cb, BOOL init_fs, 
 #ifndef _EDITOR
         Msg("Process heap 0x%08x", GetProcessHeap());
 #endif
-#endif  // DEBUG
+#endif // DEBUG
     }
     SetLogCB(cb);
     init_counter++;
@@ -123,7 +130,8 @@ extern compression::ppmd::stream* trained_model;
 void xrCore::_destroy()
 {
     --init_counter;
-    if (0 == init_counter) {
+    if (0 == init_counter)
+    {
         ttapi_Done();
         FS._destroy();
         EFS._destroy();
@@ -131,7 +139,8 @@ void xrCore::_destroy()
         xr_delete(xr_EFS);
 
 #ifndef _EDITOR
-        if (trained_model) {
+        if (trained_model)
+        {
             void* buffer = trained_model->buffer();
             xr_free(buffer);
             xr_delete(trained_model);
@@ -159,7 +168,8 @@ void xrCore::CalculateBuildId()
     sscanf(buffer, "%s %d %d", month, &days, &years);
     for (int i = 0; i < 12; i++)
     {
-        if (_stricmp(monthId[i], month)) continue;
+        if (_stricmp(monthId[i], month))
+            continue;
         months = i;
         break;
     }
@@ -190,14 +200,15 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD ul_reason_for_call, LPVOID lpvRese
     //. LogFile.reserve (256);
     break;
     case DLL_THREAD_ATTACH:
-        if (!strstr(GetCommandLine(), "-editor")) CoInitializeEx(NULL, COINIT_MULTITHREADED);
+        if (!strstr(GetCommandLine(), "-editor"))
+            CoInitializeEx(NULL, COINIT_MULTITHREADED);
         timeBeginPeriod(1);
         break;
     case DLL_THREAD_DETACH: break;
     case DLL_PROCESS_DETACH:
 #ifdef USE_MEMORY_MONITOR
         memory_monitor::flush_each_time(true);
-#endif  // USE_MEMORY_MONITOR
+#endif // USE_MEMORY_MONITOR
         break;
     }
     return TRUE;

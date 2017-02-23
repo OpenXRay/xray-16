@@ -11,7 +11,7 @@ class dump_verifyer : public xr_dsa_verifyer
 public:
     dump_verifyer();
     ~dump_verifyer();
-};  // class dump_verifyer
+}; // class dump_verifyer
 
 class configs_verifyer
 {
@@ -32,8 +32,8 @@ private:
 
     mp_config_sections m_original_config;
     mp_active_params m_original_ap;
-};  // configs_verifyer
+}; // configs_verifyer
 
-}  // namespace mp_anticheat
+} // namespace mp_anticheat
 
-#endif  //#ifndef CONFIGS_DUMP_VERIFYER
+#endif //#ifndef CONFIGS_DUMP_VERIFYER

@@ -19,14 +19,21 @@ enum EGameIDs
 
 inline EGameIDs ParseStringToGameType(LPCSTR str)
 {
-    if (!xr_strcmp(str, "single")) return eGameIDSingle;
-    if (!xr_strcmp(str, "deathmatch") || !xr_strcmp(str, "dm")) return eGameIDDeathmatch;
-    if (!xr_strcmp(str, "teamdeathmatch") || !xr_strcmp(str, "tdm")) return eGameIDTeamDeathmatch;
-    if (!xr_strcmp(str, "artefacthunt") || !xr_strcmp(str, "ah")) return eGameIDArtefactHunt;
-    if (!xr_strcmp(str, "capturetheartefact") || !xr_strcmp(str, "cta")) return eGameIDCaptureTheArtefact;
-    if (!xr_strcmp(str, "dominationzone")) return eGameIDDominationZone;
-    if (!xr_strcmp(str, "teamdominationzone")) return eGameIDTeamDominationZone;
-    return eGameIDNoGame;  // EGameIDs
+    if (!xr_strcmp(str, "single"))
+        return eGameIDSingle;
+    if (!xr_strcmp(str, "deathmatch") || !xr_strcmp(str, "dm"))
+        return eGameIDDeathmatch;
+    if (!xr_strcmp(str, "teamdeathmatch") || !xr_strcmp(str, "tdm"))
+        return eGameIDTeamDeathmatch;
+    if (!xr_strcmp(str, "artefacthunt") || !xr_strcmp(str, "ah"))
+        return eGameIDArtefactHunt;
+    if (!xr_strcmp(str, "capturetheartefact") || !xr_strcmp(str, "cta"))
+        return eGameIDCaptureTheArtefact;
+    if (!xr_strcmp(str, "dominationzone"))
+        return eGameIDDominationZone;
+    if (!xr_strcmp(str, "teamdominationzone"))
+        return eGameIDTeamDominationZone;
+    return eGameIDNoGame; // EGameIDs
 }
 
 class PropValue;
@@ -38,7 +45,7 @@ struct GameTypeChooser
     Flags16 m_GameType;
 #ifndef XRGAME_EXPORTS
     void FillProp(LPCSTR pref, PropItemVec& items);
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
 #ifdef _EDITOR
     bool LoadStream(IReader& F);

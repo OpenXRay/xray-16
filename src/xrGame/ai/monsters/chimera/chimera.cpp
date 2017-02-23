@@ -15,11 +15,7 @@ CChimera::CChimera()
     com_man().add_ability(ControlCom::eControlJump);
 }
 
-CChimera::~CChimera()
-{
-    xr_delete(StateMan);
-}
-
+CChimera::~CChimera() { xr_delete(StateMan); }
 void CChimera::Load(LPCSTR section)
 {
     inherited::Load(section);
@@ -129,10 +125,10 @@ void CChimera::reinit()
 
     move().load_velocity(*cNameSect(), "Velocity_JumpGround", MonsterMovement::eChimeraVelocityParameterJumpGround);
 
-    com_man().load_jump_data(0,  //"jump_attack_0",
-        0,                       //"jump_attack_0",
+    com_man().load_jump_data(0, //"jump_attack_0",
+        0, //"jump_attack_0",
         "jump_attack_1", "jump_attack_2",
-        u32(-1),  // MonsterMovement::eVelocityParameterRunNormal,
+        u32(-1), // MonsterMovement::eVelocityParameterRunNormal,
         MonsterMovement::eChimeraVelocityParameterJumpGround, 0);
 }
 
@@ -161,7 +157,4 @@ void CChimera::jump(Fvector const& position, float const factor)
     sound().play(MonsterSound::eMonsterSoundAggressive);
 }
 
-void CChimera::UpdateCL()
-{
-    inherited::UpdateCL();
-}
+void CChimera::UpdateCL() { inherited::UpdateCL(); }

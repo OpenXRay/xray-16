@@ -19,17 +19,14 @@
 TfraBottomBar* fraBottomBar = 0;
 
 //---------------------------------------------------------------------------
-__fastcall TfraBottomBar::TfraBottomBar(TComponent* Owner) : TFrame(Owner)
-{
-    DEFINE_INI(fsStorage);
-}
-
+__fastcall TfraBottomBar::TfraBottomBar(TComponent* Owner) : TFrame(Owner) { DEFINE_INI(fsStorage); }
 //---------------------------------------------------------------------------
 
 void __fastcall TfraBottomBar::ClickOptionsMenuItem(TObject* Sender)
 {
     TMenuItem* mi = dynamic_cast<TMenuItem*>(Sender);
-    if (mi) {
+    if (mi)
+    {
         mi->Checked = !mi->Checked;
         if (mi == miDrawGrid)
             ExecCommand(COMMAND_TOGGLE_GRID);
@@ -159,18 +156,10 @@ void __fastcall TfraBottomBar::fsStorageRestorePlacement(TObject* Sender)
 
 //---------------------------------------------------------------------------
 
-void __fastcall TfraBottomBar::ebLogClick(TObject* Sender)
-{
-    TfrmLog::ChangeVisible();
-}
-
+void __fastcall TfraBottomBar::ebLogClick(TObject* Sender) { TfrmLog::ChangeVisible(); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfraBottomBar::ebStopClick(TObject* Sender)
-{
-    ExecCommand(COMMAND_BREAK_LAST_OPERATION);
-}
-
+void __fastcall TfraBottomBar::ebStopClick(TObject* Sender) { ExecCommand(COMMAND_BREAK_LAST_OPERATION); }
 //---------------------------------------------------------------------------
 
 void __fastcall TfraBottomBar::ebStatClick(TObject* Sender)
@@ -210,7 +199,7 @@ void __fastcall TfraBottomBar::pmOptionsPopup(TObject* Sender)
         TMenuItem* mi = miWeather->Items[i];
         BOOL bch;
         bch = ((EPrefs->sWeather.size()) && (0 == stricmp(mi->Caption.c_str(), EPrefs->sWeather.c_str()))) ||
-              (mi->Caption == "none" && EPrefs->sWeather.size() == 0);
+            (mi->Caption == "none" && EPrefs->sWeather.size() == 0);
         mi->Checked = bch;
     }
 }
@@ -261,26 +250,31 @@ void __fastcall TfraBottomBar::miWeatherClick(TObject* Sender)
 void TfraBottomBar::RedrawBar()
 {
     SPBItem* pbi = UI->ProgressLast();
-    if (pbi) {
+    if (pbi)
+    {
         AnsiString txt;
         float p, m;
         pbi->GetInfo(txt, p, m);
         // status line
-        if (paStatus->Caption != txt) {
+        if (paStatus->Caption != txt)
+        {
             paStatus->Caption = txt;
             paStatus->Repaint();
         }
         // progress
         int val = fis_zero(m) ? 0 : (int)((p / m) * 100);
-        if (val != cgProgress->Progress) {
+        if (val != cgProgress->Progress)
+        {
             cgProgress->Progress = val;
             cgProgress->Repaint();
         }
-        if (false == cgProgress->Visible) cgProgress->Visible = true;
+        if (false == cgProgress->Visible)
+            cgProgress->Visible = true;
     }
     else
     {
-        if (cgProgress->Visible) {
+        if (cgProgress->Visible)
+        {
             // status line
             paStatus->Caption = "";
             paStatus->Repaint();
@@ -319,11 +313,7 @@ void __fastcall TfraBottomBar::MacroLogCommandsClick(TObject* Sender)
 
 //---------------------------------------------------------------------------
 
-void __fastcall TfraBottomBar::MacroEditCommandListClick(TObject* Sender)
-{
-    ExecCommand(COMMAND_EDIT_COMMAND_LIST);
-}
-
+void __fastcall TfraBottomBar::MacroEditCommandListClick(TObject* Sender) { ExecCommand(COMMAND_EDIT_COMMAND_LIST); }
 //---------------------------------------------------------------------------
 
 void __fastcall TfraBottomBar::ebMacroMouseDown(TObject* Sender, TMouseButton Button, TShiftState Shift, int X, int Y)

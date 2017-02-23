@@ -11,7 +11,8 @@ void CRenderTarget::u_calc_tc_noise(Fvector2& p0, Fvector2& p1)
 
     // calculate shift from FPSes
     im_noise_time -= Device.fTimeDelta;
-    if (im_noise_time < 0) {
+    if (im_noise_time < 0)
+    {
         im_noise_shift_w = ::Random.randI(tw ? tw : 1);
         im_noise_shift_h = ::Random.randI(th ? th : 1);
         float fps_time = 1 / param_noise_fps;
@@ -39,7 +40,8 @@ void CRenderTarget::u_calc_tc_duality_ss(Fvector2& r0, Fvector2& r1, Fvector2& l
     // Calculate ordinaty TCs from blur and SS
     float tw = float(dwWidth);
     float th = float(dwHeight);
-    if (dwHeight != Device.dwHeight) param_blur = 1.f;
+    if (dwHeight != Device.dwHeight)
+        param_blur = 1.f;
     Fvector2 shift, p0, p1;
     shift.set(.5f / tw, .5f / th);
     shift.mul(param_blur);
@@ -73,7 +75,8 @@ BOOL CRenderTarget::u_need_PP()
         _g = _abs(_g - int(0x7f));
         int _b = color_get_B(param_color_base);
         _b = _abs(_b - int(0x7f));
-        if (_r > 2 || _g > 2 || _b > 2) _cbase = true;
+        if (_r > 2 || _g > 2 || _b > 2)
+            _cbase = true;
     }
     bool _cadd = false;
     {
@@ -84,16 +87,13 @@ BOOL CRenderTarget::u_need_PP()
         int _r = _abs((int)(param_color_add.x * 255));
         int _g = _abs((int)(param_color_add.y * 255));
         int _b = _abs((int)(param_color_add.z * 255));
-        if (_r > 2 || _g > 2 || _b > 2) _cadd = true;
+        if (_r > 2 || _g > 2 || _b > 2)
+            _cadd = true;
     }
     return _blur || _gray || _noise || _dual || _cbase || _cadd || u_need_CM();
 }
 
-bool CRenderTarget::u_need_CM()
-{
-    return (param_color_map_influence > 0.001f);
-}
-
+bool CRenderTarget::u_need_CM() { return (param_color_map_influence > 0.001f); }
 struct TL_2c3uv
 {
     Fvector4 p;

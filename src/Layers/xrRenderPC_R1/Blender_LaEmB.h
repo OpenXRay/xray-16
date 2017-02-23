@@ -9,8 +9,8 @@
 class CBlender_LaEmB : public IBlender
 {
 public:
-    string64 oT2_Name;   // name of secondary texture
-    string64 oT2_xform;  // xform for secondary texture
+    string64 oT2_Name; // name of secondary texture
+    string64 oT2_xform; // xform for secondary texture
     string64 oT2_const;
 
     void compile_ED(CBlender_Compile& C);
@@ -25,7 +25,6 @@ public:
 public:
     virtual LPCSTR getComment() { return "LEVEL: (lmap+env*const)*base"; }
     virtual BOOL canBeLMAPped() { return TRUE; }
-
     virtual void Save(IWriter& fs);
     virtual void Load(IReader& fs, u16 version);
 
@@ -35,4 +34,4 @@ public:
     virtual ~CBlender_LaEmB();
 };
 
-#endif  // !defined(AFX_BLENDERDEFAULT_H__C12F64EE_43E7_4483_9AC3_29272E0401E7__INCLUDED_1)
+#endif // !defined(AFX_BLENDERDEFAULT_H__C12F64EE_43E7_4483_9AC3_29272E0401E7__INCLUDED_1)

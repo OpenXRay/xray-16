@@ -49,9 +49,7 @@ public:
     const Fvector& get_enemy_position();
     u32 get_enemy_vertex() { return vertex; }
     TTime get_enemy_time_last_seen() { return time_last_seen; }
-
     Flags32& get_flags() { return flags; }
-
     bool see_enemy_now();
     bool see_enemy_now(const CEntityAlive* enemy);
     bool see_enemy_recently();
@@ -71,7 +69,6 @@ public:
 
     u32 get_my_vertex_enemy_last_seen() { return my_vertex_enemy_last_seen; }
     u32 get_enemy_vertex_enemy_last_seen() { return enemy_vertex_enemy_last_seen; }
-
     u32 see_enemy_duration();
 
 private:

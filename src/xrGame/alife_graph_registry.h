@@ -27,7 +27,6 @@ public:
 
     public:
         IC OBJECT_REGISTRY& objects() { return (m_objects); }
-
         IC const OBJECT_REGISTRY& objects() const { return (m_objects); }
     };
 

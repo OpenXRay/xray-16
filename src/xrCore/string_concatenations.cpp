@@ -22,7 +22,8 @@ void process(u32 const index, u32 const count, LPCSTR* strings)
 
         *k++ = ']';
 
-        if (i + 1 >= count) continue;
+        if (i + 1 >= count)
+            continue;
 
         *k++ = '[';
         *k++ = '\r';
@@ -40,20 +41,22 @@ static inline void process(LPSTR& i, LPCSTR e, u32 const index, LPCSTR (&strings
     VERIFY(i <= e);
     VERIFY(index < count);
 
-    if (i != e) return;
+    if (i != e)
+        return;
 
 #ifndef MASTER_GOLD
     process(index, count, strings);
-#else   // #ifndef MASTER_GOLD
+#else // #ifndef MASTER_GOLD
     --i;
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
 }
 
-}  // namespace strconcat_error
+} // namespace strconcat_error
 
 int stack_overflow_exception_filter(int exception_code)
 {
-    if (exception_code == EXCEPTION_STACK_OVERFLOW) {
+    if (exception_code == EXCEPTION_STACK_OVERFLOW)
+    {
         // Do not call _resetstkoflw here, because
         // at this point, the stack is not yet unwound.
         // Instead, signal that the handler (the __except block)
@@ -87,9 +90,11 @@ void string_tupples::error_process() const
     {
         strings[i] = m_strings[i].first;
 
-        if (overrun_string_index == (u32)-1) {
+        if (overrun_string_index == (u32)-1)
+        {
             part_size += m_strings[i].second;
-            if (part_size > max_concat_result_size) {
+            if (part_size > max_concat_result_size)
+            {
                 overrun_string_index = i;
             }
         }
@@ -99,11 +104,11 @@ void string_tupples::error_process() const
     strconcat_error::process(overrun_string_index, m_count, strings);
 }
 
-}  // namespace detail
+} // namespace detail
 
-}  // namespace core
+} // namespace core
 
-}  // namespace xray
+} // namespace xray
 
 using namespace xray::core::detail;
 

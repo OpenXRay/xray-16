@@ -30,7 +30,8 @@ void CBaseMonster::UpdateMemory()
     hear_dangerous_sound = hear_interesting_sound = false;
     SoundElem se;
 
-    if (SoundMemory.IsRememberSound()) {
+    if (SoundMemory.IsRememberSound())
+    {
         SoundMemory.GetSound(se, hear_dangerous_sound);
         hear_interesting_sound = !hear_dangerous_sound;
     }

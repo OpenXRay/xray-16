@@ -14,8 +14,10 @@ qr2_error_t xrGS_qr2_initA(qr2_t* qrec, const gsi_char* ip, int baseport, int is
         BasePort = GAMESPY_QR2_BASEPORT;
     else
     {
-        if (BasePort < START_PORT) BasePort = START_PORT;
-        if (BasePort > END_PORT) BasePort = END_PORT;
+        if (BasePort < START_PORT)
+            BasePort = START_PORT;
+        if (BasePort > END_PORT)
+            BasePort = END_PORT;
     }
 
     char SecretKey[16];
@@ -29,15 +31,8 @@ qr2_error_t xrGS_qr2_initA(qr2_t* qrec, const gsi_char* ip, int baseport, int is
 }
 }
 
-void CGameSpy_QR2::Think(void* qrec)
-{
-    qr2_think(static_cast<qr2_t>(qrec));
-}
-void CGameSpy_QR2::ShutDown(void* qrec)
-{
-    qr2_shutdown(static_cast<qr2_t>(qrec));
-}
-
+void CGameSpy_QR2::Think(void* qrec) { qr2_think(static_cast<qr2_t>(qrec)); }
+void CGameSpy_QR2::ShutDown(void* qrec) { qr2_shutdown(static_cast<qr2_t>(qrec)); }
 void CGameSpy_QR2::RegisterAdditionalKeys()
 {
     //---- Global Keys ----
@@ -100,9 +95,10 @@ bool CGameSpy_QR2::Init(int PortID, int Public, Context& ctx)
         ctx.OnKeyList, ctx.OnCount, ctx.OnError, &ctx);
 #ifndef MASTER_GOLD
     Msg("xrGS::xrGS_qr2_initA returned code is [%d]", err);
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
 
-    if (err != e_qrnoerror) {
+    if (err != e_qrnoerror)
+    {
         //		_tprintf(_T("Error starting query sockets\n"));
         Msg("xrGS::QR2 : Failes to Initialize!");
         return false;
@@ -122,7 +118,7 @@ bool CGameSpy_QR2::Init(int PortID, int Public, Context& ctx)
 
 #ifndef MASTER_GOLD
     Msg("xrGS::QR2 : Initialized");
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
     return true;
 };
 
@@ -141,12 +137,5 @@ void CGameSpy_QR2::KeyBufferAdd(void* keybuffer, int keyid)
     qr2_keybuffer_add(static_cast<qr2_keybuffer_t>(keybuffer), keyid);
 }
 
-const char* CGameSpy_QR2::GetGameVersion()
-{
-    return GAME_VERSION;
-}
-
-const char* CGameSpy_QR2::RegisteredKey(DWORD KeyID)
-{
-    return qr2_registered_key_list[KeyID];
-}
+const char* CGameSpy_QR2::GetGameVersion() { return GAME_VERSION; }
+const char* CGameSpy_QR2::RegisteredKey(DWORD KeyID) { return qr2_registered_key_list[KeyID]; }

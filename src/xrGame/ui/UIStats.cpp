@@ -8,14 +8,8 @@
 #include "Level.h"
 #include "game_base_space.h"
 
-CUIStats::CUIStats()
-{
-}
-
-CUIStats::~CUIStats()
-{
-}
-
+CUIStats::CUIStats() {}
+CUIStats::~CUIStats() {}
 CUIWindow* CUIStats::InitStats(CUIXml& xml_doc, LPCSTR path, int team)
 {
     string256 _path;
@@ -34,7 +28,8 @@ CUIWindow* CUIStats::InitStats(CUIXml& xml_doc, LPCSTR path, int team)
     AddWindow(pWnd, true);
     AddWindow(pPList, true);
 
-    if (xml_doc.NavigateToNode(strconcat(sizeof(_path), _path, path, ":spectator_list"), 0)) {
+    if (xml_doc.NavigateToNode(strconcat(sizeof(_path), _path, path, ":spectator_list"), 0))
+    {
         // spectators
         pPList = new CUIStatsPlayerList();
         pPList->SetTeam(team);

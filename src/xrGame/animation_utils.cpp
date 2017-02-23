@@ -5,9 +5,7 @@
 #include "xrCore/Animation/Bone.hpp"
 #include "game_object_space.h"
 
-anim_bone_fix::anim_bone_fix() : bone(NULL), parent(NULL), matrix(Fmatrix().identity())
-{
-}
+anim_bone_fix::anim_bone_fix() : bone(NULL), parent(NULL), matrix(Fmatrix().identity()) {}
 anim_bone_fix::~anim_bone_fix()
 {
     VERIFY(!bone);
@@ -75,7 +73,8 @@ bool find_in_parents(const u16 bone_to_find, const u16 from_bone, IKinematics& c
     for (; bi != root && bi != BI_NONE;)
     {
         const CBoneData& bd = ca.LL_GetData(bi);
-        if (bi == bone_to_find) return true;
+        if (bi == bone_to_find)
+            return true;
         bi = bd.GetParentID();
     }
     return false;

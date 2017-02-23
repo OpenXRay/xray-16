@@ -20,7 +20,6 @@ public:
     virtual bool check_completion();
     virtual bool check_start_conditions();
     virtual void remove_links(IGameObject* object) { inherited::remove_links(object); }
-
 private:
     void choose_action();
 };

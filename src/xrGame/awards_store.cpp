@@ -17,10 +17,7 @@ awards_store::awards_store(CGameSpy_Full* fullgs_obj)
     m_get_records_input.mNumFields = fields_count;
 }
 
-awards_store::~awards_store()
-{
-}
-
+awards_store::~awards_store() {}
 void awards_store::init_field_names()
 {
     for (int i = 0; i < at_awards_count; ++i)
@@ -50,7 +47,8 @@ void awards_store::load_awards(store_operation_cb& opcb)
 
     SAKERequest reqres = m_sake_obj->GetMyRecords(&m_get_records_input, &awards_store::get_my_awards_cb, this);
 
-    if (!reqres) {
+    if (!reqres)
+    {
         SAKEStartRequestResult tmp_result = m_sake_obj->GetRequestResult();
         m_award_operation_cb(false, CGameSpy_SAKE::TryToTranslate(tmp_result).c_str());
         m_award_operation_cb.clear();
@@ -73,7 +71,8 @@ void awards_store::merge_sake_to_ltx_awards()
     for (all_awards_t::iterator i = m_ltx_awards_result.begin(), ie = m_ltx_awards_result.end(); i != ie; ++i)
     {
         all_awards_t::const_iterator tmp_awi = m_awards_result.find(i->first);
-        if (tmp_awi != m_awards_result.end()) {
+        if (tmp_awi != m_awards_result.end())
+        {
             u16 tmp_count = std::max(i->second.m_count, tmp_awi->second.m_count);
             u32 tmp_rdate = std::max(i->second.m_last_reward_date, tmp_awi->second.m_last_reward_date);
             i->second = award_data(tmp_count, tmp_rdate);
@@ -83,21 +82,24 @@ void awards_store::merge_sake_to_ltx_awards()
 
 all_awards_t& awards_store::get_player_awards()
 {
-    if (m_ltx_awards_result.empty()) return m_awards_result;
+    if (m_ltx_awards_result.empty())
+        return m_awards_result;
     return m_ltx_awards_result;
 }
 
 bool awards_store::is_sake_equal_to_file() const
 {
     VERIFY(!m_ltx_awards_result.empty());
-    if (m_ltx_awards_result.empty()) return true;  // unknown
+    if (m_ltx_awards_result.empty())
+        return true; // unknown
 
     for (all_awards_t::const_iterator i = m_ltx_awards_result.begin(), ie = m_ltx_awards_result.end(); i != ie; ++i)
     {
         all_awards_t::const_iterator tmp_iter = m_awards_result.find(i->first);
         R_ASSERT(tmp_iter != m_awards_result.end());
 
-        if (i->second.m_count != tmp_iter->second.m_count) return false;
+        if (i->second.m_count != tmp_iter->second.m_count)
+            return false;
     }
     return true;
 }
@@ -118,12 +120,14 @@ void awards_store::process_award(SAKEField* award_params)
 
 void awards_store::process_aw_out_response(SAKEGetMyRecordsOutput* tmp_out, int const out_fields_count)
 {
-    VERIFY(tmp_out->mNumRecords <= 1);  // one raw
-    if (tmp_out->mNumRecords == 0) return;
+    VERIFY(tmp_out->mNumRecords <= 1); // one raw
+    if (tmp_out->mNumRecords == 0)
+        return;
 
     for (int i = 0; i < out_fields_count; ++i)
     {
-        if (get_award_by_stat_name(tmp_out->mRecords[0][i].mName) != at_awards_count) {
+        if (get_award_by_stat_name(tmp_out->mRecords[0][i].mName) != at_awards_count)
+        {
             process_award(&tmp_out->mRecords[0][i]);
         }
     }
@@ -134,7 +138,8 @@ void __cdecl awards_store::get_my_awards_cb(
 {
     awards_store* my_inst = static_cast<awards_store*>(userData);
     VERIFY(my_inst && my_inst->m_award_operation_cb);
-    if (result != SAKERequestResult_SUCCESS) {
+    if (result != SAKERequestResult_SUCCESS)
+    {
         my_inst->m_award_operation_cb(false, CGameSpy_SAKE::TryToTranslate(result).c_str());
     }
     else
@@ -147,4 +152,4 @@ void __cdecl awards_store::get_my_awards_cb(
     my_inst->m_award_operation_cb.clear();
 }
 
-}  // namespace gamespy_profile
+} // namespace gamespy_profile

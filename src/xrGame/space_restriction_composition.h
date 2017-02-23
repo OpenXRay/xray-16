@@ -32,7 +32,7 @@ protected:
 #ifdef DEBUG
 private:
     void check_restrictor_type();
-#endif  // DEBUG
+#endif // DEBUG
 
 protected:
     IC void merge(CBaseRestrictionPtr restriction);

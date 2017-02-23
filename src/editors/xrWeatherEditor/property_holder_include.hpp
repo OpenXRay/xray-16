@@ -25,15 +25,12 @@ generic<typename type0, typename type1> private ref struct Pair
 template <typename T>
 class value_holder : private Noncopyable
 {
-  public:
+public:
     inline value_holder(T& value) : m_value(value) {}
-
     inline T const& xr_stdcall get() { return (m_value); }
-
     inline void xr_stdcall set(T const& value) { m_value = value; }
-
-  private:
+private:
     T& m_value;
 };
 
-#endif  // ifndef PROPERTY_HOLDER_INCLUDE_HPP_INCLUDED
+#endif // ifndef PROPERTY_HOLDER_INCLUDE_HPP_INCLUDED

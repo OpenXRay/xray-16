@@ -18,7 +18,6 @@ class CPHStaticGeomShell : public CPHGeometryOwner, public CPHObject, public CPH
     virtual void InitContact(dContact* c, bool& do_collide, u16 /*material_idx_1*/, u16 /*material_idx_2*/) {}
     virtual u16 get_elements_number() { return 0; };
     virtual CPHSynchronize* get_element_sync(u16 element) { return NULL; };
-
 public:
     void Activate(const Fmatrix& form);
     void Deactivate();

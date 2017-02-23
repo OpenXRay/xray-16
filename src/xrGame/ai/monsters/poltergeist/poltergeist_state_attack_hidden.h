@@ -12,11 +12,9 @@ protected:
 public:
     CStatePoltergeistAttackHidden(_Object* obj);
     virtual ~CStatePoltergeistAttackHidden() {}
-
     virtual void initialize();
     virtual void execute();
     virtual void remove_links(IGameObject* object) { inherited::remove_links(object); }
-
     bool check_home_point();
 
 private:

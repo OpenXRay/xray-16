@@ -10,23 +10,17 @@
 
 #undef DECLARE_SPECIALIZATION
 
-#define DECLARE_SPECIALIZATION(B, A, C)                                                                                \
-    template <>                                                                                                        \
-    B* SmartDynamicCast::smart_cast<B, A>(A * p)                                                                       \
-    {                                                                                                                  \
-        return p->C();                                                                                                 \
-    };
+#define DECLARE_SPECIALIZATION(B, A, C)\
+    template <>\
+    B* SmartDynamicCast::smart_cast<B, A>(A* p)\
+    { return p->C(); };
 
 #ifdef XRGAME_EXPORTS
 template <>
 CGameObject* SmartDynamicCast::smart_cast<CGameObject, IGameObject>(IGameObject* p)
-{
-    return static_cast<CGameObject*>(p);
-}
+{ return static_cast<CGameObject*>(p); }
 
 template <>
 Feel::Sound* SmartDynamicCast::smart_cast<Feel::Sound, ISpatial>(ISpatial* p)
-{
-    return (p->dcast_FeelSound());
-}
+{ return (p->dcast_FeelSound()); }
 #endif

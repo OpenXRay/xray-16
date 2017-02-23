@@ -15,10 +15,7 @@
 #define CSObjectItemSingle CObjectItemSingle<_unknown_type, _client_object>
 
 TEMPLATE_SPECIALIZATION
-IC CSObjectItemSingle::CObjectItemSingle(const CLASS_ID& clsid, LPCSTR script_clsid) : inherited(clsid, script_clsid)
-{
-}
-
+IC CSObjectItemSingle::CObjectItemSingle(const CLASS_ID& clsid, LPCSTR script_clsid) : inherited(clsid, script_clsid) {}
 #ifndef NO_XR_GAME
 TEMPLATE_SPECIALIZATION
 ObjectFactory::ClientObjectBaseClass* CSObjectItemSingle::client_object() const

@@ -17,10 +17,7 @@ ESceneLightTool::ESceneLightTool() : ESceneCustomOTool(OBJCLASS_LIGHT)
 
 //------------------------------------------------------------------------------
 
-ESceneLightTool::~ESceneLightTool()
-{
-}
-
+ESceneLightTool::~ESceneLightTool() {}
 //------------------------------------------------------------------------------
 
 void ESceneLightTool::Clear(bool bSpecific)
@@ -80,7 +77,8 @@ void ESceneLightTool::AppendFrameLight(CLight* src)
 
 void ESceneLightTool::BeforeRender()
 {
-    if (psDeviceFlags.is(rsLighting)) {
+    if (psDeviceFlags.is(rsLighting))
+    {
         int l_cnt = 0;
         // set scene lights
         for (ObjectIt _F = m_Objects.begin(); _F != m_Objects.end(); _F++)
@@ -88,10 +86,12 @@ void ESceneLightTool::BeforeRender()
             CLight* l = (CLight*)(*_F);
             l_cnt++;
             if (l->Visible() && l->m_UseInD3D && l->m_Flags.is_any(ELight::flAffectDynamic | ELight::flAffectStatic))
-                if (::Render->ViewBase.testSphere_dirty(l->PPosition, l->m_Range)) AppendFrameLight(l);
+                if (::Render->ViewBase.testSphere_dirty(l->PPosition, l->m_Range))
+                    AppendFrameLight(l);
         }
         // set sun
-        if (m_Flags.is(flShowSun)) {
+        if (m_Flags.is(flShowSun))
+        {
             Flight L;
             Fvector C;
             //            if (psDeviceFlags.is(rsEnvironment)){
@@ -124,7 +124,8 @@ void ESceneLightTool::BeforeRender()
 
 void ESceneLightTool::AfterRender()
 {
-    if (m_Flags.is(flShowSun)) EDevice.LightEnable(frame_light.size(), FALSE);  // sun - last light!
+    if (m_Flags.is(flShowSun))
+        EDevice.LightEnable(frame_light.size(), FALSE); // sun - last light!
     for (u32 i = 0; i < frame_light.size(); i++)
         EDevice.LightEnable(i, FALSE);
     frame_light.clear();
@@ -137,8 +138,10 @@ void ESceneLightTool::AfterRender()
 void ESceneLightTool::OnRender(int priority, bool strictB2F)
 {
     inherited::OnRender(priority, strictB2F);
-    if (m_Flags.is(flShowSun)) {
-        if ((true == strictB2F) && (1 == priority)) {
+    if (m_Flags.is(flShowSun))
+    {
+        if ((true == strictB2F) && (1 == priority))
+        {
             EDevice.SetShader(EDevice.m_WireShader);
             RCache.set_xform_world(Fidentity);
             Fvector dir;
@@ -171,8 +174,10 @@ void ESceneLightTool::OnControlRenameRemoveClick(ButtonValue* V, bool& bDataModi
     case 0:
     {
         AnsiString new_name = item_name;
-        if (TfrmText::RunEditor(new_name, "Control name")) {
-            if (FindLightControl(new_name.c_str())) {
+        if (TfrmText::RunEditor(new_name, "Control name"))
+        {
+            if (FindLightControl(new_name.c_str()))
+            {
                 ELog.DlgMsg(mtError, "Duplicate name found.");
             }
             else if (new_name.IsEmpty() || new_name.Pos("\\"))
@@ -210,13 +215,14 @@ void ESceneLightTool::FillProp(LPCSTR pref, PropItemVec& items)
     PHelper().CreateCaption(
         items, PrepareKey(pref, "Common\\Controls\\Count"), shared_str().printf("%d", lcontrols.size()));
     //	B=PHelper().CreateButton(items,PHelper().PrepareKey(pref,"Common\\Controls\\Edit"),	"Append",
-    //ButtonValue::flFirstOnly);
+    // ButtonValue::flFirstOnly);
     //	B->OnBtnClickEvent	= OnControlAppendClick;
     RTokenVecIt _I = lcontrols.begin();
     RTokenVecIt _E = lcontrols.end();
     for (; _I != _E; _I++)
     {
-        if (_I->equal(LCONTROL_HEMI) || _I->equal(LCONTROL_STATIC) || _I->equal(LCONTROL_SUN)) {
+        if (_I->equal(LCONTROL_HEMI) || _I->equal(LCONTROL_STATIC) || _I->equal(LCONTROL_SUN))
+        {
             PHelper().CreateCaption(items, PrepareKey(pref, "Common\\Controls\\System", *_I->name), "");
         }
         else
@@ -249,7 +255,8 @@ xr_rtoken* ESceneLightTool::FindLightControl(int id)
     RTokenVecIt _I = lcontrols.begin();
     RTokenVecIt _E = lcontrols.end();
     for (; _I != _E; _I++)
-        if (_I->id == id) return _I;
+        if (_I->id == id)
+            return _I;
     return 0;
 }
 
@@ -260,7 +267,8 @@ RTokenVecIt ESceneLightTool::FindLightControlIt(LPCSTR name)
     RTokenVecIt _I = lcontrols.begin();
     RTokenVecIt _E = lcontrols.end();
     for (; _I != _E; _I++)
-        if (_I->equal(name)) return _I;
+        if (_I->equal(name))
+            return _I;
     return lcontrols.end();
 }
 
@@ -270,8 +278,10 @@ void ESceneLightTool::AppendLightControl(LPCSTR nm, u32* idx)
 {
     AnsiString name = nm;
     _Trim(name);
-    if (name.IsEmpty()) return;
-    if (FindLightControl(name.c_str())) return;
+    if (name.IsEmpty())
+        return;
+    if (FindLightControl(name.c_str()))
+        return;
     lcontrols.push_back(xr_rtoken(name.c_str(), idx ? *idx : lcontrol_last_idx++));
 }
 
@@ -280,19 +290,22 @@ void ESceneLightTool::AppendLightControl(LPCSTR nm, u32* idx)
 void ESceneLightTool::RemoveLightControl(LPCSTR name)
 {
     RTokenVecIt it = FindLightControlIt(name);
-    if (it != lcontrols.end()) lcontrols.erase(it);
+    if (it != lcontrols.end())
+        lcontrols.erase(it);
 }
 
 //------------------------------------------------------------------------------
 
 bool ESceneLightTool::Validate(bool full_test)
 {
-    if (!inherited::Validate(full_test)) return false;
+    if (!inherited::Validate(full_test))
+        return false;
     bool bRes = !m_Objects.empty();
     for (ObjectIt it = m_Objects.begin(); it != m_Objects.end(); it++)
     {
         CLight* L = dynamic_cast<CLight*>(*it);
-        if (!L->GetLControlName()) {
+        if (!L->GetLControlName())
+        {
             bRes = false;
             ELog.Msg(mtError, "%s: '%s' - Invalid light control.", ClassDesc(), L->Name);
         }
@@ -314,11 +327,7 @@ void ESceneLightTool::CreateControls()
 
 //----------------------------------------------------
 
-void ESceneLightTool::RemoveControls()
-{
-    inherited::RemoveControls();
-}
-
+void ESceneLightTool::RemoveControls() { inherited::RemoveControls(); }
 //----------------------------------------------------
 
 CCustomObject* ESceneLightTool::CreateObject(LPVOID data, LPCSTR name)

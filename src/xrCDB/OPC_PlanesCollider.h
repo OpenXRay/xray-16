@@ -68,7 +68,8 @@ public:
     {
         Plane PL[6];
 
-        if (worldb) {
+        if (worldb)
+        {
             // Create a _new_ OBB in world space
             OBB WorldBox;
             box.Rotate(*worldb, WorldBox);
@@ -114,4 +115,4 @@ protected:
     BOOL InitQuery(PlanesCache& cache, const Plane* planes, udword nb_planes, const Matrix4x4* worldm = null);
 };
 
-#endif  // __OPC_PLANESCOLLIDER_H__
+#endif // __OPC_PLANESCOLLIDER_H__

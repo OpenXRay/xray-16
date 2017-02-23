@@ -210,7 +210,8 @@ void CUIActorMenu::Construct()
     m_ItemInfo->InitItemInfo("actor_menu_item.xml");
 
     m_upgrade_info = NULL;
-    if (ai().get_alife()) {
+    if (ai().get_alife())
+    {
         m_upgrade_info = new UIInvUpgradeInfo();
         m_upgrade_info->SetAutoDelete(true);
         AttachChild(m_upgrade_info);
@@ -348,22 +349,26 @@ void CUIActorMenu::UpdateButtonsLayout()
     string32 tmp;
     LPCSTR str = CStringTable().translate("quick_use_str_1").c_str();
     strncpy_s(tmp, sizeof(tmp), str, 3);
-    if (tmp[2] == ',') tmp[1] = '\0';
+    if (tmp[2] == ',')
+        tmp[1] = '\0';
     m_QuickSlot1->SetTextST(tmp);
 
     str = CStringTable().translate("quick_use_str_2").c_str();
     strncpy_s(tmp, sizeof(tmp), str, 3);
-    if (tmp[2] == ',') tmp[1] = '\0';
+    if (tmp[2] == ',')
+        tmp[1] = '\0';
     m_QuickSlot2->SetTextST(tmp);
 
     str = CStringTable().translate("quick_use_str_3").c_str();
     strncpy_s(tmp, sizeof(tmp), str, 3);
-    if (tmp[2] == ',') tmp[1] = '\0';
+    if (tmp[2] == ',')
+        tmp[1] = '\0';
     m_QuickSlot3->SetTextST(tmp);
 
     str = CStringTable().translate("quick_use_str_4").c_str();
     strncpy_s(tmp, sizeof(tmp), str, 3);
-    if (tmp[2] == ',') tmp[1] = '\0';
+    if (tmp[2] == ',')
+        tmp[1] = '\0';
     m_QuickSlot4->SetTextST(tmp);
 
     UpdateConditionProgressBars();

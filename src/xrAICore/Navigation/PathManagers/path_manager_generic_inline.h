@@ -12,7 +12,7 @@
     template <typename _Graph, typename _DataStorage, typename _Parameters, typename _dist_type, typename _index_type, \
         typename _iteration_type>
 
-#define CGenericPathManager                                                                                            \
+#define CGenericPathManager \
     CPathManagerGeneric<_Graph, _DataStorage, _Parameters, _dist_type, _index_type, _iteration_type>
 
 TEMPLATE_SPECIALIZATION
@@ -24,15 +24,9 @@ IC CGenericPathManager::CPathManagerGeneric()
 }
 
 TEMPLATE_SPECIALIZATION
-CGenericPathManager::~CPathManagerGeneric()
-{
-}
-
+CGenericPathManager::~CPathManagerGeneric() {}
 TEMPLATE_SPECIALIZATION
-IC void CGenericPathManager::init()
-{
-}
-
+IC void CGenericPathManager::init() {}
 TEMPLATE_SPECIALIZATION
 IC void CGenericPathManager::setup(const _Graph* _graph, _DataStorage* _data_storage, xr_vector<_index_type>* _path,
     const _index_type& _start_node_index, const _index_type& _goal_node_index, const _Parameters& params)
@@ -65,7 +59,8 @@ IC _dist_type CGenericPathManager::estimate(const _index_type& vertex_id) const
 TEMPLATE_SPECIALIZATION
 IC void CGenericPathManager::init_path()
 {
-    if (path) path->clear_not_free();
+    if (path)
+        path->clear_not_free();
 }
 
 TEMPLATE_SPECIALIZATION
@@ -75,21 +70,14 @@ IC void CGenericPathManager::create_path(T& vertex)
     VERIFY(data_storage);
     //		Msg						("Path
     //[IC=xxx][VNC=%d][BV=%f]",data_storage->get_visited_node_count(),data_storage->get_best().f());
-    if (path) data_storage->get_node_path(*path, &vertex);
+    if (path)
+        data_storage->get_node_path(*path, &vertex);
 }
 
 TEMPLATE_SPECIALIZATION
-IC const _index_type& CGenericPathManager::start_node() const
-{
-    return (start_node_index);
-}
-
+IC const _index_type& CGenericPathManager::start_node() const { return (start_node_index); }
 TEMPLATE_SPECIALIZATION
-IC const _index_type& CGenericPathManager::goal_node() const
-{
-    return (goal_node_index);
-}
-
+IC const _index_type& CGenericPathManager::goal_node() const { return (goal_node_index); }
 TEMPLATE_SPECIALIZATION
 IC bool CGenericPathManager::is_goal_reached(const _index_type& vertex_id) const
 {
@@ -101,7 +89,7 @@ IC bool CGenericPathManager::is_limit_reached(const _iteration_type iteration_co
 {
     VERIFY(data_storage);
     return ((data_storage->get_best().f() >= max_range) || (iteration_count >= max_iteration_count) ||
-            (data_storage->get_visited_node_count() >= max_visited_node_count));
+        (data_storage->get_visited_node_count() >= max_visited_node_count));
 }
 
 TEMPLATE_SPECIALIZATION
@@ -132,10 +120,7 @@ IC const _index_type CGenericPathManager::get_value(const_iterator& i) const
 }
 
 TEMPLATE_SPECIALIZATION
-IC void CGenericPathManager::finalize()
-{
-}
-
+IC void CGenericPathManager::finalize() {}
 TEMPLATE_SPECIALIZATION
 IC const typename CGenericPathManager::const_iterator& CGenericPathManager::edge(const_iterator& i) const
 {

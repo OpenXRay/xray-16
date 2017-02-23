@@ -207,9 +207,7 @@ public:
 
     // CShootingObject
     virtual const Fmatrix& ParticlesXFORM() const { return m_fire_bone_xform; };
-
     virtual const Fvector& CurrentFirePoint() { return m_fire_pos; };
-
     void MGunFireStart();
     void MGunFireEnd();
     void MGunUpdateFire();
@@ -235,7 +233,6 @@ protected:
     shared_str m_death_bones_to_hide;
 
     virtual bool IsHudModeNow() { return false; };
-
     //////////////////////////////////////////////////
 
     // sound, light, particles...
@@ -284,10 +281,8 @@ public:
 
     CHelicopter::EHeliState state() { return m_curState; };
     int state_script() { return m_curState; };
-
     void setState(CHelicopter::EHeliState s);
     void setState_script(u32 s) { setState((CHelicopter::EHeliState)s); };
-
     void init();
     virtual void reinit();
 
@@ -313,7 +308,6 @@ public:
     virtual void renderable_Render() { inherited::renderable_Render(); };
     virtual BOOL renderable_ShadowGenerate() { return FALSE; }
     virtual BOOL renderable_ShadowReceive() { return TRUE; }
-
     virtual void OnEvent(NET_Packet& P, u16 type);
     virtual void UpdateCL();
     virtual void shedule_Update(u32 time_delta);
@@ -324,20 +318,17 @@ public:
     // CEntity
     virtual void HitSignal(float P, Fvector& local_dir, IGameObject* who, s16 element) { ; }
     virtual void HitImpulse(float P, Fvector& vWorldDir, Fvector& vLocalDir) { ; }
-
     virtual const Fmatrix& get_ParticlesXFORM();
     virtual const Fvector& get_CurrentFirePoint();
 
     virtual CGameObject* cast_game_object() { return this; }
     virtual CExplosive* cast_explosive() { return this; }
     virtual CPHSkeleton* PHSkeleton() { return this; }
-
 public:
     // for scripting
     bool isVisible(CScriptGameObject* O);
     bool isObjectVisible(IGameObject* O);
     bool isOnAttack() { return m_enemy.type != eEnemyNone; }
-
     void goPatrolByPatrolPath(LPCSTR path_name, int start_idx);
     void goByRoundPath(Fvector center, float radius, bool clockwise);
     void LookAtPoint(Fvector point, bool do_it);
@@ -375,7 +366,6 @@ public:
     float GetSafeAltitude() { return m_movement.GetSafeAltitude(); };
     float GetHeliHealth() const { return inherited::GetfHealth(); }
     float SetHeliHealth(float value) { return inherited::SetfHealth(value); }
-
 #ifdef DEBUG
 public:
     virtual void OnRender();

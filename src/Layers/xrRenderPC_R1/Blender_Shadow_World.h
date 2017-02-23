@@ -7,7 +7,6 @@ class CBlender_ShWorld : public IBlender
 public:
     virtual LPCSTR getComment() { return "INTERNAL: shadow projecting"; }
     virtual BOOL canBeLMAPped() { return FALSE; }
-
     virtual void Save(IWriter& fs);
     virtual void Load(IReader& fs, u16 version);
 
@@ -17,4 +16,4 @@ public:
     virtual ~CBlender_ShWorld();
 };
 
-#endif  // BLENDER_SHADOW_WORLD_H
+#endif // BLENDER_SHADOW_WORLD_H

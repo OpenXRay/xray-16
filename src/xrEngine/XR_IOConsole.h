@@ -20,7 +20,7 @@ class line_edit_control;
 struct TipString
 {
     shared_str text;
-    int HL_start;  // Highlight
+    int HL_start; // Highlight
     int HL_finish;
 
     TipString()
@@ -141,19 +141,19 @@ protected:
 
     BENCH_SEC_SCRAMBLEMEMBER2
 
-    enum Console_mark  // (int)=char
+    enum Console_mark // (int)=char
     {
         no_mark = ' ',
         mark0 = '~',
-        mark1 = '!',  // error
-        mark2 = '@',  // console cmd
+        mark1 = '!', // error
+        mark2 = '@', // console cmd
         mark3 = '#',
         mark4 = '$',
         mark5 = '%',
         mark6 = '^',
         mark7 = '&',
         mark8 = '*',
-        mark9 = '-',  // green = ok
+        mark9 = '-', // green = ok
         mark10 = '+',
         mark11 = '=',
         mark12 = '/'
@@ -211,8 +211,8 @@ protected:
     void update_tips();
     void select_for_filter(LPCSTR filter_str, vecTips& in_v, vecTipsEx& out_v);
 
-};  // class CConsole
+}; // class CConsole
 
 ENGINE_API extern CConsole* Console;
 
-#endif  // XR_IOCONSOLE_H_INCLUDED
+#endif // XR_IOCONSOLE_H_INCLUDED

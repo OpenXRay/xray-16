@@ -52,7 +52,8 @@ __fastcall TfrmMain::TfrmMain(TComponent* Owner) : TForm(Owner)
 
     EDevice.SetHandle(Handle, D3DWindow->Handle);
     EnableReceiveCommands();
-    if (!ExecCommand(COMMAND_INITIALIZE, (u32)D3DWindow, (u32)paRender)) {
+    if (!ExecCommand(COMMAND_INITIALIZE, (u32)D3DWindow, (u32)paRender))
+    {
         FlushLog();
         TerminateProcess(GetCurrentProcess(), -1);
     }
@@ -94,7 +95,8 @@ void __fastcall TfrmMain::FormCloseQuery(TObject* Sender, bool& CanClose)
 {
     tmRefresh->Enabled = false;
     CanClose = ExecCommand(COMMAND_EXIT);
-    if (!CanClose) tmRefresh->Enabled = true;
+    if (!CanClose)
+        tmRefresh->Enabled = true;
 }
 
 //---------------------------------------------------------------------------
@@ -110,7 +112,8 @@ void __fastcall TfrmMain::FormCreate(TObject* Sender)
 
 void __fastcall TfrmMain::sbToolsMinClick(TObject* Sender)
 {
-    if (paLeftBar->Tag > 0) {
+    if (paLeftBar->Tag > 0)
+    {
         paLeftBar->Parent = frmMain;
         paLeftBar->Tag = 0;
     }
@@ -125,7 +128,8 @@ void __fastcall TfrmMain::sbToolsMinClick(TObject* Sender)
 
 void __fastcall TfrmMain::TopClick(TObject* Sender)
 {
-    if (paLeftBar->Tag > 0) {
+    if (paLeftBar->Tag > 0)
+    {
         paLeftBar->Align = alRight;
         paLeftBar->Parent = frmMain;
         paLeftBar->Height = paLeftBar->Tag;
@@ -141,17 +145,14 @@ void __fastcall TfrmMain::IdleHandler(TObject* Sender, bool& Done)
     UI->Idle();
 }
 
-void __fastcall TfrmMain::D3DWindowResize(TObject* Sender)
-{
-    UI->Resize();
-}
-
+void __fastcall TfrmMain::D3DWindowResize(TObject* Sender) { UI->Resize(); }
 //---------------------------------------------------------------------------
 
 void __fastcall TfrmMain::D3DWindowKeyDown(TObject* Sender, WORD& Key, TShiftState Shift)
 {
     ShiftKey = Shift;
-    if (!UI->KeyDown(Key, Shift)) {
+    if (!UI->KeyDown(Key, Shift))
+    {
         UI->ApplyShortCut(Key, Shift);
     }
 }
@@ -160,7 +161,8 @@ void __fastcall TfrmMain::D3DWindowKeyDown(TObject* Sender, WORD& Key, TShiftSta
 
 void __fastcall TfrmMain::D3DWindowKeyUp(TObject* Sender, WORD& Key, TShiftState Shift)
 {
-    if (!UI->KeyUp(Key, Shift)) {
+    if (!UI->KeyUp(Key, Shift))
+    {
         ;
     }
 }
@@ -169,7 +171,8 @@ void __fastcall TfrmMain::D3DWindowKeyUp(TObject* Sender, WORD& Key, TShiftState
 
 void __fastcall TfrmMain::D3DWindowKeyPress(TObject* Sender, char& Key)
 {
-    if (!UI->KeyPress(Key, ShiftKey)) {
+    if (!UI->KeyPress(Key, ShiftKey))
+    {
         ;
     }
 }
@@ -178,8 +181,10 @@ void __fastcall TfrmMain::D3DWindowKeyPress(TObject* Sender, char& Key)
 
 void __fastcall TfrmMain::FormKeyDown(TObject* Sender, WORD& Key, TShiftState Shift)
 {
-    if (!D3DWindow->Focused()) UI->ApplyGlobalShortCut(Key, Shift);
-    if (Key == VK_MENU) Key = 0;
+    if (!D3DWindow->Focused())
+        UI->ApplyGlobalShortCut(Key, Shift);
+    if (Key == VK_MENU)
+        Key = 0;
 }
 
 //---------------------------------------------------------------------------
@@ -199,7 +204,8 @@ void __fastcall TfrmMain::tmRefreshTimer(TObject* Sender)
     for (i = 0; i < frmMain->ComponentCount; i++)
     {
         TComponent* temp = frmMain->Components[i];
-        if (dynamic_cast<TExtBtn*>(temp) != NULL) ((TExtBtn*)temp)->UpdateMouseInControl();
+        if (dynamic_cast<TExtBtn*>(temp) != NULL)
+            ((TExtBtn*)temp)->UpdateMouseInControl();
     }
     fraLeftBar->OnTimer();
     fraTopBar->OnTimer();
@@ -209,7 +215,8 @@ void __fastcall TfrmMain::tmRefreshTimer(TObject* Sender)
 
 void __fastcall TfrmMain::D3DWindowPaint(TObject* Sender)
 {
-    if (!UI || !UI->m_bReady) return;
+    if (!UI || !UI->m_bReady)
+        return;
     UI->RedrawScene();
 }
 
@@ -217,8 +224,10 @@ void __fastcall TfrmMain::D3DWindowPaint(TObject* Sender)
 
 void __fastcall TfrmMain::D3DWindowChangeFocus(TObject* Sender)
 {
-    if (!UI || !UI->m_bReady) return;
-    if (D3DWindow->Focused()) {
+    if (!UI || !UI->m_bReady)
+        return;
+    if (D3DWindow->Focused())
+    {
         UI->IR_Capture();
         UI->OnAppActivate();
     }
@@ -255,32 +264,21 @@ void __fastcall TfrmMain::D3DWindowMouseMove(TObject* Sender, TShiftState Shift,
 
 //---------------------------------------------------------------------------
 
-void __fastcall TfrmMain::ebAllMinClick(TObject* Sender)
-{
-    fraLeftBar->MinimizeAllFrames();
-}
-
+void __fastcall TfrmMain::ebAllMinClick(TObject* Sender) { fraLeftBar->MinimizeAllFrames(); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfrmMain::ebAllMaxClick(TObject* Sender)
-{
-    fraLeftBar->MaximizeAllFrames();
-}
-
+void __fastcall TfrmMain::ebAllMaxClick(TObject* Sender) { fraLeftBar->MaximizeAllFrames(); }
 //---------------------------------------------------------------------------
 
 void __fastcall TfrmMain::FormResize(TObject* Sender)
 {
-    if (fraLeftBar) fraLeftBar->UpdateBar();
+    if (fraLeftBar)
+        fraLeftBar->UpdateBar();
 }
 
 //---------------------------------------------------------------------------
 
-void __fastcall TfrmMain::paRenderResize(TObject* Sender)
-{
-    ExecCommand(COMMAND_RENDER_RESIZE);
-}
-
+void __fastcall TfrmMain::paRenderResize(TObject* Sender) { ExecCommand(COMMAND_RENDER_RESIZE); }
 //---------------------------------------------------------------------------
 
 void __fastcall TfrmMain::fsStorageSavePlacement(TObject* Sender)

@@ -8,20 +8,17 @@ CUITabControl::CUITabControl()
 {
 }
 
-CUITabControl::~CUITabControl()
-{
-    RemoveAll();
-}
-
+CUITabControl::~CUITabControl() { RemoveAll(); }
 void CUITabControl::SetCurrentOptValue()
 {
     CUIOptionsItem::SetCurrentOptValue();
     shared_str v = GetOptStringValue();
     CUITabButton* b = GetButtonById(v);
-    if (NULL == b) {
+    if (NULL == b)
+    {
 #ifndef MASTER_GOLD
         Msg("! tab named [%s] doesnt exist", v.c_str());
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
         v = m_TabsArr[0]->m_btn_id;
     }
     SetActiveTab(v);
@@ -45,11 +42,7 @@ void CUITabControl::SaveBackUpOptValue()
     m_opt_backup_value = GetActiveId();
 }
 
-bool CUITabControl::IsChangedOptValue() const
-{
-    return GetActiveId() != m_opt_backup_value;
-}
-
+bool CUITabControl::IsChangedOptValue() const { return GetActiveId() != m_opt_backup_value; }
 // добавление кнопки-закладки в список закладок контрола
 bool CUITabControl::AddItem(LPCSTR pItemName, LPCSTR pTexName, Fvector2 pos, Fvector2 size)
 {
@@ -89,12 +82,15 @@ void CUITabControl::RemoveAll()
 
 void CUITabControl::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 {
-    if (TAB_CHANGED == msg) {
+    if (TAB_CHANGED == msg)
+    {
         for (u32 i = 0; i < m_TabsArr.size(); ++i)
         {
-            if (m_TabsArr[i] == pWnd) {
+            if (m_TabsArr[i] == pWnd)
+            {
                 m_sPushedId = m_TabsArr[i]->m_btn_id;
-                if (m_sPrevPushedId == m_sPushedId) return;
+                if (m_sPrevPushedId == m_sPushedId)
+                    return;
 
                 OnTabChange(m_sPushedId, m_sPrevPushedId);
                 m_sPrevPushedId = m_sPushedId;
@@ -107,7 +103,8 @@ void CUITabControl::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
     {
         for (u8 i = 0; i < m_TabsArr.size(); ++i)
         {
-            if (pWnd == m_TabsArr[i]) {
+            if (pWnd == m_TabsArr[i])
+            {
                 if (msg == WINDOW_FOCUS_RECEIVED)
                     OnStaticFocusReceive(pWnd);
                 else
@@ -135,7 +132,8 @@ void CUITabControl::OnTabChange(const shared_str& sCur, const shared_str& sPrev)
 {
     CUITabButton* tb_cur = GetButtonById(sCur);
     CUITabButton* tb_prev = GetButtonById(sPrev);
-    if (tb_prev) tb_prev->SendMessage(tb_cur, TAB_CHANGED, NULL);
+    if (tb_prev)
+        tb_prev->SendMessage(tb_cur, TAB_CHANGED, NULL);
 
     tb_cur->SendMessage(tb_cur, TAB_CHANGED, NULL);
 
@@ -144,7 +142,8 @@ void CUITabControl::OnTabChange(const shared_str& sCur, const shared_str& sPrev)
 
 void CUITabControl::SetActiveTab(const shared_str& sNewTab)
 {
-    if (m_sPushedId == sNewTab) return;
+    if (m_sPushedId == sNewTab)
+        return;
 
     m_sPushedId = sNewTab;
     OnTabChange(m_sPushedId, m_sPrevPushedId);
@@ -154,10 +153,12 @@ void CUITabControl::SetActiveTab(const shared_str& sNewTab)
 
 bool CUITabControl::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
-    if (GetAcceleratorsMode() && WINDOW_KEY_PRESSED == keyboard_action) {
+    if (GetAcceleratorsMode() && WINDOW_KEY_PRESSED == keyboard_action)
+    {
         for (u32 i = 0; i < m_TabsArr.size(); ++i)
         {
-            if (m_TabsArr[i]->IsAccelerator(dik)) {
+            if (m_TabsArr[i]->IsAccelerator(dik))
+            {
                 SetActiveTab(m_TabsArr[i]->m_btn_id);
                 return true;
             }
@@ -166,11 +167,7 @@ bool CUITabControl::OnKeyboardAction(int dik, EUIMessages keyboard_action)
     return false;
 }
 
-bool operator==(const CUITabButton* btn, const shared_str& id)
-{
-    return (btn->m_btn_id == id);
-}
-
+bool operator==(const CUITabButton* btn, const shared_str& id) { return (btn->m_btn_id == id); }
 CUITabButton* CUITabControl::GetButtonById(const shared_str& id)
 {
     TABS_VECTOR::const_iterator it = std::find(m_TabsArr.begin(), m_TabsArr.end(), id);

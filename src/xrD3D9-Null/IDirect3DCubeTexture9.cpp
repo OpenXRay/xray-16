@@ -27,7 +27,8 @@ xrIDirect3DCubeTexture9::xrIDirect3DCubeTexture9(IDirect3DDevice9* pIDirect3DDev
 HRESULT xrIDirect3DCubeTexture9::QueryInterface(REFIID riid, void** ppvObj)
 {
     APIDEBUG("xrIDirect3DCubeTexture9::QueryInterface");
-    if (riid == IID_IUnknown || riid == IID_IDirect3DCubeTexture9) {
+    if (riid == IID_IUnknown || riid == IID_IDirect3DCubeTexture9)
+    {
         *ppvObj = this;
         AddRef();
         return NOERROR;
@@ -46,7 +47,8 @@ ULONG xrIDirect3DCubeTexture9::Release()
 {
     APIDEBUG("xrIDirect3DCubeTexture9::Release");
     m_refCount--;
-    if (m_refCount < 0) {
+    if (m_refCount < 0)
+    {
         delete this;
         return -1;
     }
@@ -88,10 +90,7 @@ DWORD xrIDirect3DCubeTexture9::GetPriority()
     APIDEBUG("xrIDirect3DCubeTexture9::GetPriority");
     return Priority;
 };
-void xrIDirect3DCubeTexture9::PreLoad()
-{
-    APIDEBUG("xrIDirect3DCubeTexture9::PreLoad");
-};
+void xrIDirect3DCubeTexture9::PreLoad() { APIDEBUG("xrIDirect3DCubeTexture9::PreLoad"); };
 D3DRESOURCETYPE xrIDirect3DCubeTexture9::GetType()
 {
     APIDEBUG("xrIDirect3DCubeTexture9::GetType");
@@ -125,11 +124,7 @@ D3DTEXTUREFILTERTYPE xrIDirect3DCubeTexture9::GetAutoGenFilterType()
     APIDEBUG("xrIDirect3DCubeTexture9::GetAutoGenFilterType");
     return FilterType;
 };
-void xrIDirect3DCubeTexture9::GenerateMipSubLevels()
-{
-    APIDEBUG("xrIDirect3DCubeTexture9::GenerateMipSubLevels");
-};
-
+void xrIDirect3DCubeTexture9::GenerateMipSubLevels() { APIDEBUG("xrIDirect3DCubeTexture9::GenerateMipSubLevels"); };
 HRESULT xrIDirect3DCubeTexture9::GetLevelDesc(UINT Level, D3DSURFACE_DESC* pDesc)
 {
     APIDEBUG("xrIDirect3DCubeTexture9::GetLevelDesc");

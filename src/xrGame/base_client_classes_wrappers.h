@@ -47,9 +47,7 @@ public:
     virtual ~FactoryObjectWrapperTpl(){};
 
     virtual IFactoryObject* _construct() { return (call_member<IFactoryObject*>(this, "_construct")); }
-
     static IFactoryObject* _construct_static(base* self) { return (self->base::_construct()); }
-
 private:
     // not exported
     virtual CLASS_ID& GetClassId() override
@@ -267,19 +265,12 @@ public:
     IC CGameObjectWrapper(){};
     virtual ~CGameObjectWrapper(){};
     virtual bool use(CGameObject* who_use) { return call<bool>("use", who_use); }
-
     static bool use_static(CGameObject* self, CGameObject* who_use) { return self->CGameObject::use(who_use); }
-
     virtual void net_Import(NET_Packet& packet) { call<void>("net_Import", &packet); }
-
     static void net_Import_static(CGameObject* self, NET_Packet* packet) { self->CGameObject::net_Import(*packet); }
-
     virtual void net_Export(NET_Packet& packet) { call<void>("net_Export", &packet); }
-
     static void net_Export_static(CGameObject* self, NET_Packet* packet) { self->CGameObject::net_Export(*packet); }
-
     virtual BOOL net_Spawn(CSE_Abstract* data) { return (luabind::call_member<bool>(this, "net_Spawn", data)); }
-
     static bool net_Spawn_static(CGameObject* self, CSE_Abstract* abstract)
     {
         return (!!self->CGameObject::net_Spawn(abstract));
@@ -291,7 +282,6 @@ class CEntityWrapper : public CEntity, public luabind::wrap_base
 public:
     IC CEntityWrapper() {}
     virtual ~CEntityWrapper() {}
-
     virtual void HitSignal(float P, Fvector& local_dir, IGameObject* who, s16 element)
     {
         luabind::call_member<void>(this, "HitSignal", P, local_dir, who, element);

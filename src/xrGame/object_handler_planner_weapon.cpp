@@ -22,7 +22,7 @@ void CObjectHandlerPlanner::add_evaluators(CWeapon* weapon)
     u16 id = weapon->ID();
     // dynamic state properties
     //.	add_evaluator		(uid(id,eWorldPropertyHidden)			,new
-    //CObjectPropertyEvaluatorState(weapon,m_object,CWeapon::eHidden));
+    // CObjectPropertyEvaluatorState(weapon,m_object,CWeapon::eHidden));
     add_evaluator(uid(id, eWorldPropertyHidden), new CObjectPropertyEvaluatorWeaponHidden(weapon, m_object));
 
     // dynamic member properties

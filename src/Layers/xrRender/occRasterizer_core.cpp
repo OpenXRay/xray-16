@@ -10,13 +10,15 @@ const int BOTTOM = 0, TOP = 1;
 void i_order(float* A, float* B, float* C)
 {
     float *min, *max, *mid;
-    if (A[1] <= B[1]) {
-        if (B[1] <= C[1]) {
+    if (A[1] <= B[1])
+    {
+        if (B[1] <= C[1])
+        {
             min = A;
             mid = B;
             max = C;
         }
-        else  // C < B
+        else // C < B
             if (A[1] <= C[1])
         {
             min = A;
@@ -30,14 +32,15 @@ void i_order(float* A, float* B, float* C)
             max = B;
         }
     }
-    else  // B < A
+    else // B < A
     {
-        if (A[1] <= C[1]) {
+        if (A[1] <= C[1])
+        {
             min = B;
             mid = A;
             max = C;
         }
-        else  // C < A
+        else // C < A
             if (B[1] <= C[1])
         {
             min = B;
@@ -73,10 +76,14 @@ IC void Vclamp(int& v, int a, int b)
 }
 IC BOOL shared(occTri* T1, occTri* T2)
 {
-    if (T1 == T2) return TRUE;
-    if (T1->adjacent[0] == T2) return TRUE;
-    if (T1->adjacent[1] == T2) return TRUE;
-    if (T1->adjacent[2] == T2) return TRUE;
+    if (T1 == T2)
+        return TRUE;
+    if (T1->adjacent[0] == T2)
+        return TRUE;
+    if (T1->adjacent[1] == T2)
+        return TRUE;
+    if (T1->adjacent[2] == T2)
+        return TRUE;
     return FALSE;
 }
 IC BOOL lesser(float& a, float& b)
@@ -100,11 +107,13 @@ void i_scan(int curY, float leftX, float lhx, float rightX, float rhx, float sta
 
     float startT = startR, endT = end_c;
     float startX = start_c, endX = endR;
-    if (start_c < startR) {
+    if (start_c < startR)
+    {
         startT = start_c;
         startX = startR;
     }
-    if (end_c < endR) {
+    if (end_c < endR)
+    {
         endT = endR;
         endX = end_c;
     }
@@ -113,13 +122,15 @@ void i_scan(int curY, float leftX, float lhx, float rightX, float rhx, float sta
     int minT = iFloor(startT) - 1, maxT = iCeil(endT) + 1;
     Vclamp(minT, 1, occ_dim - 1);
     Vclamp(maxT, 1, occ_dim - 1);
-    if (minT >= maxT) return;
+    if (minT >= maxT)
+        return;
 
     int minX = iCeil(startX), maxX = iFloor(endX);
     Vclamp(minX, 0, occ_dim);
     Vclamp(maxX, 0, occ_dim);
     int limLeft, limRight;
-    if (minX > maxX) {
+    if (minX > maxX)
+    {
         limLeft = maxX;
         limRight = minX;
     }
@@ -132,9 +143,9 @@ void i_scan(int curY, float leftX, float lhx, float rightX, float rhx, float sta
     // interpolate
     float lenR = endR - startR;
     float Zlen = endZ - startZ;
-    float Z = startZ + (minT - startR) / lenR * Zlen;     // interpolate Z to the start
-    float Zend = startZ + (maxT - startR) / lenR * Zlen;  // interpolate Z to the end
-    float dZ = (Zend - Z) / (maxT - minT);                // increment in Z / pixel wrt dX
+    float Z = startZ + (minT - startR) / lenR * Zlen; // interpolate Z to the start
+    float Zend = startZ + (maxT - startR) / lenR * Zlen; // interpolate Z to the end
+    float dZ = (Zend - Z) / (maxT - minT); // increment in Z / pixel wrt dX
 
     // Move to far my dz/5 to place the pixel at the center of face that it covers.
     // This will make sure that objects will not be clipped for just standing next to the home from outside.
@@ -150,9 +161,11 @@ void i_scan(int curY, float leftX, float lhx, float rightX, float rhx, float sta
     int limit = i_base + limLeft;
     for (; i < limit; i++, Z += dZ)
     {
-        if (shared(currentTri, pFrame[i - 1])) {
+        if (shared(currentTri, pFrame[i - 1]))
+        {
             // float ZR = (Z+2*pDepth[i-1])*one_div_3;
-            if (Z < pDepth[i]) {
+            if (Z < pDepth[i])
+            {
                 pFrame[i] = currentTri;
                 pDepth[i] = __max(Z, pDepth[i - 1]);
                 dwPixels++;
@@ -164,7 +177,8 @@ void i_scan(int curY, float leftX, float lhx, float rightX, float rhx, float sta
     limit = i_base + maxX;
     for (; i < limit; i++, Z += dZ)
     {
-        if (Z < pDepth[i]) {
+        if (Z < pDepth[i])
+        {
             pFrame[i] = currentTri;
             pDepth[i] = Z;
             dwPixels++;
@@ -177,9 +191,11 @@ void i_scan(int curY, float leftX, float lhx, float rightX, float rhx, float sta
     Z = Zend - dZ;
     for (; i >= limit; i--, Z -= dZ)
     {
-        if (shared(currentTri, pFrame[i + 1])) {
+        if (shared(currentTri, pFrame[i + 1]))
+        {
             // float ZR = (Z+2*pDepth[i+1])*one_div_3;
-            if (Z < pDepth[i]) {
+            if (Z < pDepth[i])
+            {
                 pFrame[i] = currentTri;
                 pDepth[i] = __max(Z, pDepth[i + 1]);
                 dwPixels++;
@@ -205,10 +221,12 @@ IC void i_test_micro(int x, int y)
     occTri** pFrame = Raster.get_frame();
     occTri* T1 = pFrame[pos_up];
     occTri* T2 = pFrame[pos_down];
-    if (T1 && shared(T1, T2)) {
+    if (T1 && shared(T1, T2))
+    {
         float* pDepth = Raster.get_depth();
         float ZR = (pDepth[pos_up] + pDepth[pos_down]) / 2;
-        if (ZR < pDepth[pos]) {
+        if (ZR < pDepth[pos])
+        {
             pFrame[pos] = T1;
             pDepth[pos] = ZR;
         }
@@ -229,7 +247,8 @@ void i_edge(int x1, int y1, int x2, int y2)
     int sx = x2 >= x1 ? 1 : -1;
     int sy = y2 >= y1 ? 1 : -1;
 
-    if (dy <= dx) {
+    if (dy <= dx)
+    {
         int d = (dy << 1) - dx;
         int d1 = dy << 1;
         int d2 = (dy - dx) << 1;
@@ -237,7 +256,8 @@ void i_edge(int x1, int y1, int x2, int y2)
         i_test(x1, y1);
         for (int x = x1 + sx, y = y1, i = 1; i <= dx; i++, x += sx)
         {
-            if (d > 0) {
+            if (d > 0)
+            {
                 d += d2;
                 y += sy;
             }
@@ -255,7 +275,8 @@ void i_edge(int x1, int y1, int x2, int y2)
         i_test(x1, y1);
         for (int x = x1, y = y1 + sy, i = 1; i <= dy; i++, y += sy)
         {
-            if (d > 0) {
+            if (d > 0)
+            {
                 d += d2;
                 x += sx;
             }
@@ -280,15 +301,18 @@ IC void i_section(int Sect, BOOL bMiddle)
     float *startp1, *startp2;
     float E1[3], E2[3];
 
-    if (Sect == BOTTOM) {
+    if (Sect == BOTTOM)
+    {
         startY = iCeil(currentA[1]);
         endY = iFloor(currentB[1]) - 1;
         startp1 = startp2 = currentA;
-        if (bMiddle) endY++;
+        if (bMiddle)
+            endY++;
 
         // check 'endY' for out-of-triangle
         int test = iFloor(currentC[1]);
-        if (endY >= test) endY--;
+        if (endY >= test)
+            endY--;
 
         // Find the edge differences
         E1[0] = currentB[0] - currentA[0];
@@ -304,11 +328,13 @@ IC void i_section(int Sect, BOOL bMiddle)
         endY = iFloor(currentC[1]);
         startp1 = currentA;
         startp2 = currentB;
-        if (bMiddle) startY--;
+        if (bMiddle)
+            startY--;
 
         // check 'startY' for out-of-triangle
         int test = iCeil(currentA[1]);
-        if (startY < test) startY++;
+        if (startY < test)
+            startY++;
 
         // Find the edge differences
         E1[0] = currentC[0] - currentA[0];
@@ -320,7 +346,8 @@ IC void i_section(int Sect, BOOL bMiddle)
     }
     Vclamp(startY, 0, occ_dim);
     Vclamp(endY, 0, occ_dim);
-    if (startY >= endY) return;
+    if (startY >= endY)
+        return;
 
     // Compute the inverse slopes of the lines, ie rate of change of X by Y
     float mE1 = E1[0] / E1[1];
@@ -331,17 +358,18 @@ IC void i_section(int Sect, BOOL bMiddle)
     float t, leftX, leftZ, rightX, rightZ, left_dX, right_dX, left_dZ, right_dZ;
 
     // find initial values, step values
-    if (((mE1 < mE2) && (Sect == BOTTOM)) || ((mE1 > mE2) && (Sect == TOP))) {
+    if (((mE1 < mE2) && (Sect == BOTTOM)) || ((mE1 > mE2) && (Sect == TOP)))
+    {
         // E1 is on the Left
         // Initial Starting values for left (from E1)
-        t = e1_init_dY / E1[1];  // Initial fraction of offset
+        t = e1_init_dY / E1[1]; // Initial fraction of offset
         leftX = startp1[0] + E1[0] * t;
         left_dX = mE1;
         leftZ = startp1[2] + E1[2] * t;
         left_dZ = E1[2] / E1[1];
 
         // Initial Ending values for right	(from E2)
-        t = e2_init_dY / E2[1];  // Initial fraction of offset
+        t = e2_init_dY / E2[1]; // Initial fraction of offset
         rightX = startp2[0] + E2[0] * t;
         right_dX = mE2;
         rightZ = startp2[2] + E2[2] * t;
@@ -351,14 +379,14 @@ IC void i_section(int Sect, BOOL bMiddle)
     {
         // E2 is on left
         // Initial Starting values for left (from E2)
-        t = e2_init_dY / E2[1];  // Initial fraction of offset
+        t = e2_init_dY / E2[1]; // Initial fraction of offset
         leftX = startp2[0] + E2[0] * t;
         left_dX = mE2;
         leftZ = startp2[2] + E2[2] * t;
         left_dZ = E2[2] / E2[1];
 
         // Initial Ending values for right	(from E1)
-        t = e1_init_dY / E1[1];  // Initial fraction of offset
+        t = e1_init_dY / E1[1]; // Initial fraction of offset
         rightX = startp1[0] + E1[0] * t;
         right_dX = mE1;
         rightZ = startp1[2] + E1[2] * t;
@@ -367,9 +395,9 @@ IC void i_section(int Sect, BOOL bMiddle)
 
     // Now scan all lines in this section
     float lhx = left_dX / 2;
-    leftX += lhx;  // half pixel
+    leftX += lhx; // half pixel
     float rhx = right_dX / 2;
-    rightX += rhx;  // half pixel
+    rightX += rhx; // half pixel
     for (; startY <= endY; startY++)
     {
         i_scan(startY, leftX, lhx, rightX, rhx, leftZ, rightZ);
@@ -380,23 +408,10 @@ IC void i_section(int Sect, BOOL bMiddle)
     }
 }
 
-void __stdcall i_section_b0()
-{
-    i_section(BOTTOM, 0);
-}
-void __stdcall i_section_b1()
-{
-    i_section(BOTTOM, 1);
-}
-void __stdcall i_section_t0()
-{
-    i_section(TOP, 0);
-}
-void __stdcall i_section_t1()
-{
-    i_section(TOP, 1);
-}
-
+void __stdcall i_section_b0() { i_section(BOTTOM, 0); }
+void __stdcall i_section_b1() { i_section(BOTTOM, 1); }
+void __stdcall i_section_t0() { i_section(TOP, 0); }
+void __stdcall i_section_t1() { i_section(TOP, 1); }
 u32 occRasterizer::rasterize(occTri* T)
 {
     // Order the vertices by Y
@@ -405,14 +420,15 @@ u32 occRasterizer::rasterize(occTri* T)
     i_order(&(T->raster[0].x), &(T->raster[1].x), &(T->raster[2].x));
 
     // Rasterize sections
-    if (currentB[1] - iFloor(currentB[1]) > .5f) {
-        i_section_b1();  // Rasterise First Section
-        i_section_t0();  // Rasterise Second Section
+    if (currentB[1] - iFloor(currentB[1]) > .5f)
+    {
+        i_section_b1(); // Rasterise First Section
+        i_section_t0(); // Rasterise Second Section
     }
     else
     {
-        i_section_b0();  // Rasterise First Section
-        i_section_t1();  // Rasterise Second Section
+        i_section_b0(); // Rasterise First Section
+        i_section_t1(); // Rasterise Second Section
     }
     return dwPixels;
 }

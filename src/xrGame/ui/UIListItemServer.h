@@ -57,7 +57,6 @@ public:
 
     int Get_gs_index() { return m_srv_info.info.Index; }
     LIST_SRV_ITEM* GetInfo() { return &m_srv_info; };
-
 protected:
     LIST_SRV_SIZES m_sizes;
 

@@ -9,10 +9,7 @@ CEnergyHolder::CEnergyHolder()
     m_enable = true;
 }
 
-CEnergyHolder::~CEnergyHolder()
-{
-}
-
+CEnergyHolder::~CEnergyHolder() {}
 void CEnergyHolder::reinit()
 {
     m_active = true;
@@ -40,19 +37,22 @@ void CEnergyHolder::reload(LPCSTR section, LPCSTR prefix, LPCSTR suffix)
 
 void CEnergyHolder::activate()
 {
-    if (!is_active()) on_activate();
+    if (!is_active())
+        on_activate();
     m_active = true;
 }
 
 void CEnergyHolder::deactivate()
 {
-    if (is_active()) on_deactivate();
+    if (is_active())
+        on_deactivate();
     m_active = false;
 }
 
 void CEnergyHolder::schedule_update()
 {
-    if (!m_enable) return;
+    if (!m_enable)
+        return;
 
     // Обновить значение энергии
     u32 cur_time = Device.dwTimeGlobal;
@@ -69,8 +69,10 @@ void CEnergyHolder::schedule_update()
     m_time_last_update = cur_time;
 
     // проверка на автоматическое включение/выключение поля
-    if (is_active() && should_deactivate() && m_auto_deactivate) deactivate();
-    if (!is_active() && can_activate() && m_auto_activate) activate();
+    if (is_active() && should_deactivate() && m_auto_deactivate)
+        deactivate();
+    if (!is_active() && can_activate() && m_auto_activate)
+        activate();
 }
 
 void CEnergyHolder::enable()

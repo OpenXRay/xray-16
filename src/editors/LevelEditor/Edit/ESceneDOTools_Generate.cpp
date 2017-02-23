@@ -50,21 +50,26 @@ void EDetailManager::FindClosestIndex(const Fcolor& C, SIndexDistVec& best)
     {
         src.set(it->first);
         float d = inv_a +
-                  sqrtf((C.r - src.r) * (C.r - src.r) + (C.g - src.g) * (C.g - src.g) + (C.b - src.b) * (C.b - src.b));
-        if (d < dist) {
+            sqrtf((C.r - src.r) * (C.r - src.r) + (C.g - src.g) * (C.g - src.g) + (C.b - src.b) * (C.b - src.b));
+        if (d < dist)
+        {
             dist = d;
             index = it->first;
             bRes = true;
         }
     }
 
-    if (bRes) {
-        if (best.size() < 4) {
+    if (bRes)
+    {
+        if (best.size() < 4)
+        {
             bool bFound = false;
             for (u32 k = 0; k < best.size(); k++)
             {
-                if (best[k].index == index) {
-                    if (dist < best[k].dist) {
+                if (best[k].index == index)
+                {
+                    if (dist < best[k].dist)
+                    {
                         best[k].dist = dist;
                         best[k].index = index;
                     }
@@ -72,7 +77,8 @@ void EDetailManager::FindClosestIndex(const Fcolor& C, SIndexDistVec& best)
                     break;
                 }
             }
-            if (!bFound) {
+            if (!bFound)
+            {
                 best.inc();
                 best[best.size() - 1].dist = dist;
                 best[best.size() - 1].index = index;
@@ -86,12 +92,15 @@ void EDetailManager::FindClosestIndex(const Fcolor& C, SIndexDistVec& best)
             for (int k = 0; k < 4; k++)
             {
                 float d = dist - best[k].dist;
-                if ((d < 0) && (d < dd)) {
+                if ((d < 0) && (d < dd))
+                {
                     i = k;
                     dd = d;
                 }
-                if (best[k].index == index) {
-                    if (dist < best[k].dist) {
+                if (best[k].index == index)
+                {
+                    if (dist < best[k].dist)
+                    {
                         best[k].dist = dist;
                         best[k].index = index;
                     }
@@ -99,7 +108,8 @@ void EDetailManager::FindClosestIndex(const Fcolor& C, SIndexDistVec& best)
                     break;
                 }
             }
-            if (!bFound && (i >= 0)) {
+            if (!bFound && (i >= 0))
+            {
                 best[i].dist = dist;
                 best[i].index = index;
             }
@@ -109,38 +119,48 @@ void EDetailManager::FindClosestIndex(const Fcolor& C, SIndexDistVec& best)
 
 bool EDetailManager::Initialize()
 {
-    if (m_SnapObjects.empty()) {
+    if (m_SnapObjects.empty())
+    {
         ELog.DlgMsg(mtError, "Snap list empty!");
         return false;
     }
-    if (!m_Base.Valid()) {
+    if (!m_Base.Valid())
+    {
         ELog.DlgMsg(mtError, "Base texture empty!");
         return false;
     }
-    if (!UpdateHeader()) return false;
+    if (!UpdateHeader())
+        return false;
     m_Base.CreateRMFromObjects(m_BBox, m_SnapObjects);
-    if (!UpdateSlots()) return false;
-    if (!objects.empty() && !UpdateObjects(false, false)) return false;
+    if (!UpdateSlots())
+        return false;
+    if (!objects.empty() && !UpdateObjects(false, false))
+        return false;
     return true;
 }
 
 bool EDetailManager::Reinitialize()
 {
-    if (m_SnapObjects.empty()) {
+    if (m_SnapObjects.empty())
+    {
         ELog.DlgMsg(mtError, "Snap list empty!");
         return false;
     }
-    if (!m_Base.Valid()) {
+    if (!m_Base.Valid())
+    {
         ELog.DlgMsg(mtError, "Base texture empty!");
         return false;
     }
     InvalidateCache();
 
-    if (!UpdateHeader()) return false;
+    if (!UpdateHeader())
+        return false;
     m_Base.CreateRMFromObjects(m_BBox, m_SnapObjects);
     //.    if (!UpdateBaseTexture(0))		return false;
-    if (!UpdateSlots()) return false;
-    if (!objects.empty() && !UpdateObjects(false, false)) return false;
+    if (!UpdateSlots())
+        return false;
+    if (!objects.empty() && !UpdateObjects(false, false))
+        return false;
 
     return true;
 }
@@ -148,7 +168,8 @@ bool EDetailManager::Reinitialize()
 bool EDetailManager::UpdateHeader()
 {
     // get bounding box
-    if (!Scene->GetBox(m_BBox, m_SnapObjects)) return false;
+    if (!Scene->GetBox(m_BBox, m_SnapObjects))
+        return false;
 
     // fill header
     int mn_x = iFloor(m_BBox.min.x / DETAIL_SLOT_SIZE);
@@ -174,7 +195,8 @@ void EDetailManager::UpdateSlotBBox(int sx, int sz, DetailSlot& slot)
 
     SBoxPickInfoVec pinf;
     ETOOLS::box_options(0);
-    if (Scene->BoxPickObjects(bbox, pinf, &m_SnapObjects)) {
+    if (Scene->BoxPickObjects(bbox, pinf, &m_SnapObjects))
+    {
         bbox.grow(EPS_L_VAR);
         Fplane frustum_planes[4];
         frustum_planes[0].build(bbox.min, left_vec);
@@ -197,12 +219,15 @@ void EDetailManager::UpdateSlotBBox(int sx, int sz, DetailSlot& slot)
                 sPoly sSrc(verts, 3);
                 sPoly sDest;
                 sPoly* sRes = frustum.ClipPoly(sSrc, sDest);
-                if (sRes) {
+                if (sRes)
+                {
                     for (u32 k = 0; k < sRes->size(); k++)
                     {
                         float H = (*sRes)[k].y;
-                        if (H > y_max) y_max = H + 0.03f;
-                        if (H < y_min) y_min = H - 0.03f;
+                        if (H > y_max)
+                            y_max = H + 0.03f;
+                        if (H < y_min)
+                            y_min = H - 0.03f;
                     }
                     slot.w_y(y_min, y_max - y_min);
                     slot.w_id(0, DetailSlot::ID_Empty);
@@ -262,7 +287,7 @@ void EDetailManager::GetSlotTCRect(Irect& rect, int sx, int sz)
     GetSlotRect(R, sx, sz);
     rect.x1 = m_Base.GetPixelUFromX(R.x1, m_BBox);
     rect.x2 = m_Base.GetPixelUFromX(R.x2, m_BBox);
-    rect.y2 = m_Base.GetPixelVFromZ(R.y1, m_BBox);  // v - координата флипнута
+    rect.y2 = m_Base.GetPixelVFromZ(R.y1, m_BBox); // v - координата флипнута
     rect.y1 = m_Base.GetPixelVFromZ(R.y2, m_BBox);
 }
 
@@ -277,13 +302,15 @@ void EDetailManager::CalcClosestCount(int part, const Fcolor& C, SIndexDistVec& 
     {
         src.set(best[k].index);
         float d = inv_a +
-                  sqrtf((C.r - src.r) * (C.r - src.r) + (C.g - src.g) * (C.g - src.g) + (C.b - src.b) * (C.b - src.b));
-        if (d < dist) {
+            sqrtf((C.r - src.r) * (C.r - src.r) + (C.g - src.g) * (C.g - src.g) + (C.b - src.b) * (C.b - src.b));
+        if (d < dist)
+        {
             dist = d;
             idx = k;
         }
     }
-    if (idx >= 0) best[idx].cnt[part]++;
+    if (idx >= 0)
+        best[idx].cnt[part]++;
 }
 
 u8 EDetailManager::GetRandomObject(u32 color_index)
@@ -304,17 +331,12 @@ u8 EDetailManager::GetObject(ColorIndexPairIt& CI, u8 id)
     return u8(it - objects.begin());
 }
 
-bool CompareWeightFunc(SIndexDist& d0, SIndexDist& d1)
-{
-    return d0.dist < d1.dist;
-}
-
+bool CompareWeightFunc(SIndexDist& d0, SIndexDist& d1) { return d0.dist < d1.dist; }
 struct best_rand
 {
     CRandom gen;
 
     best_rand(CRandom& A) { gen = A; }
-
     int operator()(int n) { return gen.randI(n); }
 };
 
@@ -334,7 +356,8 @@ bool EDetailManager::UpdateSlotObjects(int x, int z)
             for (int u = R.x1; u <= R.x2; u++)
             {
                 u32 clr;
-                if (m_Base.GetColor(clr, u, v)) {
+                if (m_Base.GetColor(clr, u, v))
+                {
                     Fcolor C;
                     C.set(clr);
                     FindClosestIndex(C, best);
@@ -376,7 +399,8 @@ bool EDetailManager::UpdateSlotObjects(int x, int z)
             for (int u = P[part].x1; u <= P[part].x2; u++)
             {
                 u32 clr;
-                if (m_Base.GetColor(clr, u, v)) {
+                if (m_Base.GetColor(clr, u, v))
+                {
                     Fcolor C;
                     C.set(clr);
                     CalcClosestCount(part, C, best);
@@ -398,17 +422,20 @@ bool EDetailManager::UpdateSlotObjects(int x, int z)
     for (u32 i = 0; i < best.size(); i++)
         o_cnt += m_ColorIndices[best[i].index].size();
     // равномерно заполняем пустые слоты
-    if (o_cnt > best.size()) {
+    if (o_cnt > best.size())
+    {
         while (best.size() < 4)
         {
             do
             {
                 id++;
-                if (id > 3) id = 0;
+                if (id > 3)
+                    id = 0;
             } while (m_ColorIndices[best[id].index].size() <= 1);
             best.push_back(SIndexDist());
             best.back() = best[id];
-            if (best.size() == o_cnt) break;
+            if (best.size() == o_cnt)
+                break;
         }
     }
 
@@ -424,17 +451,19 @@ bool EDetailManager::UpdateSlotObjects(int x, int z)
         for (U8It b_it = elem.begin(); b_it != elem.end(); b_it++)
             *b_it = u8(b_it - elem.begin());
         //        best_rand A(DetailRandom);
-        std::random_shuffle(elem.begin(), elem.end());  //,A);
+        std::random_shuffle(elem.begin(), elem.end()); //,A);
         for (b_it = elem.begin(); b_it != elem.end(); b_it++)
         {
             bool bNotFound = true;
             slot->w_id(k, GetObject(CI, *b_it));
             for (u32 j = 0; j < k; j++)
-                if (slot->r_id(j) == slot->r_id(k)) {
+                if (slot->r_id(j) == slot->r_id(k))
+                {
                     bNotFound = false;
                     break;
                 }
-            if (bNotFound) break;
+            if (bNotFound)
+                break;
         }
 
         slot->color_editor();
@@ -456,11 +485,13 @@ bool EDetailManager::UpdateSlotObjects(int x, int z)
 bool EDetailManager::UpdateObjects(bool bUpdateTex, bool bUpdateSelectedOnly)
 {
     m_Base.ReloadImage();
-    if (!m_Base.Valid()) {
+    if (!m_Base.Valid())
+    {
         ELog.DlgMsg(mtError, "Invalid base texture!");
         return false;
     }
-    if (objects.empty()) {
+    if (objects.empty())
+    {
         ELog.DlgMsg(mtError, "Object list empty!");
         return false;
     }
@@ -483,7 +514,8 @@ bool EDetailManager::UpdateObjects(bool bUpdateTex, bool bUpdateSelectedOnly)
 CDetailManager::DetailIt EDetailManager::FindDOByNameIt(LPCSTR name)
 {
     for (DetailIt it = objects.begin(); it != objects.end(); it++)
-        if (stricmp(((EDetail*)(*it))->GetName(), name) == 0) return it;
+        if (stricmp(((EDetail*)(*it))->GetName(), name) == 0)
+            return it;
     return objects.end();
 }
 
@@ -496,7 +528,8 @@ EDetail* EDetailManager::FindDOByName(LPCSTR name)
 bool EDetailManager::RemoveDO(LPCSTR name)
 {
     DetailIt it = FindDOByNameIt(name);
-    if (it != objects.end()) {
+    if (it != objects.end())
+    {
         xr_delete(*it);
         objects.erase(it);
         InvalidateSlots();
@@ -509,10 +542,12 @@ bool EDetailManager::RemoveDO(LPCSTR name)
 EDetail* EDetailManager::AppendDO(LPCSTR name, bool bTestUnique)
 {
     EDetail* D = 0;
-    if (bTestUnique && (0 != (D = FindDOByName(name)))) return D;
+    if (bTestUnique && (0 != (D = FindDOByName(name))))
+        return D;
 
     D = new EDetail();
-    if (!D->Update(name)) {
+    if (!D->Update(name))
+    {
         xr_delete(D);
         return 0;
     }
@@ -545,27 +580,27 @@ int EDetailManager::RemoveDOs()
     return cnt;
 }
 
-void EDetailManager::RemoveColorIndices()
-{
-    m_ColorIndices.clear();
-}
-
+void EDetailManager::RemoveColorIndices() { m_ColorIndices.clear(); }
 EDetail* EDetailManager::FindObjectInColorIndices(u32 index, LPCSTR name)
 {
     ColorIndexPairIt CI = m_ColorIndices.find(index);
-    if (CI != m_ColorIndices.end()) {
+    if (CI != m_ColorIndices.end())
+    {
         DOVec& lst = CI->second;
         for (DOIt it = lst.begin(); it != lst.end(); it++)
-            if (stricmp((*it)->GetName(), name) == 0) return *it;
+            if (stricmp((*it)->GetName(), name) == 0)
+                return *it;
     }
     return 0;
 }
 
 void EDetailManager::AppendIndexObject(u32 color, LPCSTR name, bool bTestUnique)
 {
-    if (bTestUnique) {
+    if (bTestUnique)
+    {
         EDetail* DO = FindObjectInColorIndices(color, name);
-        if (DO) m_ColorIndices[color].push_back(DO);
+        if (DO)
+            m_ColorIndices[color].push_back(DO);
     }
     else
     {

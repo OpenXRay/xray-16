@@ -45,13 +45,15 @@ void recalculation::check_files(u32 check_sum)
     string_path N, L;
     FS.update_path(L, "$level$", "level.details");
     FS.update_path(N, "$level$", "recalculation_data_slots.details");
-    if (!FS.exist(L)) {
+    if (!FS.exist(L))
+    {
         FS.file_delete(N);
         return;
     }
 
     IReader* R = FS.r_open("$level$", "recalculation_data_slots.details");
-    if (R) {
+    if (R)
+    {
         u32 check;
         R->r_chunk(0, &check);
         if (check != check_sum)
@@ -68,7 +70,8 @@ void recalculation::check_load(u32 check_sum)
     check_files(check_sum);
     string_path N;
     FS.update_path(N, "$level$", "recalculation_data_slots.details");
-    if (!FS.exist(N)) setup_recalculationflags_file(check_sum);
+    if (!FS.exist(N))
+        setup_recalculationflags_file(check_sum);
 }
 
 void recalculation::load(u32 check_sum)
@@ -87,7 +90,8 @@ void recalculation::load(u32 check_sum)
 
 void recalculation::close()
 {
-    if (dtFS) xr_delete(dtFS);
+    if (dtFS)
+        xr_delete(dtFS);
 }
 
 // const DetailHeader				&dtH;

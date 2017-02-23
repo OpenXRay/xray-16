@@ -73,13 +73,13 @@ class TMainForm : public TForm
     void __fastcall PopupCopyFromChange(TObject* Sender, TMenuItem* Source, bool Rebuild);
     void __fastcall PopupClick(TObject* Sender);
 
-  private:  // User declarations
+private: // User declarations
     TPPPropEditor* m_props[6];
     SPPInfo m_Params;
     TPPPropEditor* m_ActiveShowForm;
     float m_Marker;
 
-  public:  // User declarations
+public: // User declarations
     __fastcall TMainForm(TComponent* Owner);
     void SetMarkerPosition(float time);
     void UpdateGraph();

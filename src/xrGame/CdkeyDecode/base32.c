@@ -45,7 +45,8 @@ static void RightShift(unsigned char* pc, int s, int n)
 static int Base32Value(unsigned char ch)
 {
     const char* pc = strchr(gpcBase32Set, ch);
-    if (pc != 0) {
+    if (pc != 0)
+    {
         return (int)(pc - gpcBase32Set);
     }
     else
@@ -65,7 +66,8 @@ void MakeBase32Pretty(char* pcOut, const char* pcIn)
     int m;
     while (n > 0)
     {
-        if (n % 4 == 0) {
+        if (n % 4 == 0)
+        {
             m = 4;
         }
         else
@@ -78,7 +80,8 @@ void MakeBase32Pretty(char* pcOut, const char* pcIn)
         pcIn += m;
 
         n -= m;
-        if (n > 0) {
+        if (n > 0)
+        {
             *pcOut++ = '-';
         }
     }
@@ -97,11 +100,12 @@ int CleanForBase32(char* newstr, const char* oldstr, int maxoutput)
     for (/* */; *oldstr != 0; ++oldstr)
     {
         char ch;
-        if (*oldstr == '-') {
+        if (*oldstr == '-')
+        {
             continue;
         }
         ch = *oldstr;
-        if (numout + 1 == maxoutput)  // see if we will overflow
+        if (numout + 1 == maxoutput) // see if we will overflow
             return 0;
         *newstr++ = islower(ch) ? ch - ('a' - 'A') : ch;
         numout++;
@@ -144,7 +148,8 @@ int ConvertFromBase32(char* pcOut, const char* pcIn, int nInBytes)
 
             // Put the value onto the end of the register
             nValue = Base32Value(acWorkCopy[i]);
-            if (nValue < 0) {
+            if (nValue < 0)
+            {
                 return -acWorkCopy[i];
             }
             acShift[0] |= nValue;

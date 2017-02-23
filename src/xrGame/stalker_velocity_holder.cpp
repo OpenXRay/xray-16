@@ -13,15 +13,12 @@
 
 CStalkerVelocityHolder* g_stalker_velocity_holder = 0;
 
-CStalkerVelocityHolder::~CStalkerVelocityHolder()
-{
-    delete_data(m_collections);
-}
-
+CStalkerVelocityHolder::~CStalkerVelocityHolder() { delete_data(m_collections); }
 const CStalkerVelocityHolder::COLLECTION& CStalkerVelocityHolder::collection(const shared_str& section)
 {
     COLLECTIONS::const_iterator I = m_collections.find(section);
-    if (I != m_collections.end()) return (*(*I).second);
+    if (I != m_collections.end())
+        return (*(*I).second);
 
     COLLECTION* collection = new COLLECTION(section);
     m_collections.insert(std::make_pair(section, collection));

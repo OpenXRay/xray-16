@@ -89,7 +89,6 @@ void manager::add(CInifile& config, shared_str const& section)
         shared_str m_id;
 
         inline predicate(shared_str const& id) : m_id(id) {}
-
         inline bool operator()(sun const* const& object) const { return (object->id()._get() == m_id._get()); }
     };
 
@@ -109,14 +108,16 @@ void manager::fill(editor::property_holder* holder)
 
 shared_str manager::unique_id(shared_str const& id) const
 {
-    if (m_collection->unique_id(id.c_str())) return (id);
+    if (m_collection->unique_id(id.c_str()))
+        return (id);
 
     return (m_collection->generate_unique_id(id.c_str()));
 }
 
 manager::suns_ids_type const& manager::suns_ids() const
 {
-    if (!m_changed) return (m_suns_ids);
+    if (!m_changed)
+        return (m_suns_ids);
 
     m_changed = false;
 
@@ -141,9 +142,8 @@ struct predicate
     shared_str m_id;
 
     IC predicate(shared_str const& id) : m_id(id) {}
-
     IC bool operator()(sun* const& sun) const { return (sun->id()._get() == m_id._get()); }
-};  // struct predicate
+}; // struct predicate
 
 CLensFlareDescriptor* manager::get_flare(shared_str const& id) const
 {
@@ -153,4 +153,4 @@ CLensFlareDescriptor* manager::get_flare(shared_str const& id) const
     return (0);
 }
 
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR

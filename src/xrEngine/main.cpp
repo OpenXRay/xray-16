@@ -42,11 +42,7 @@ void InitEngine()
     Device.Initialize();
 }
 
-static void InitEngineExt()
-{
-    Engine.External.Initialize();
-}
-
+static void InitEngineExt() { Engine.External.Initialize(); }
 namespace
 {
 struct PathIncludePred
@@ -56,10 +52,10 @@ private:
 
 public:
     explicit PathIncludePred(const xr_auth_strings_t* ignoredPaths) : ignored(ignoredPaths) {}
-
     bool xr_stdcall IsIncluded(const char* path)
     {
-        if (!ignored) return true;
+        if (!ignored)
+            return true;
         return allow_to_include_path(*ignored, path);
     }
 };
@@ -96,7 +92,8 @@ void InitConsole()
 #endif
     Console->Initialize();
     xr_strcpy(Console->ConfigFile, "user.ltx");
-    if (strstr(Core.Params, "-ltx ")) {
+    if (strstr(Core.Params, "-ltx "))
+    {
         string64 c_name;
         sscanf(strstr(Core.Params, "-ltx ") + strlen("-ltx "), "%[^ ] ", c_name);
         xr_strcpy(Console->ConfigFile, c_name);
@@ -109,21 +106,9 @@ void InitInput()
     pInput = new CInput(captureInput);
 }
 
-void destroyInput()
-{
-    xr_delete(pInput);
-}
-
-void InitSound()
-{
-    CSound_manager_interface::_create();
-}
-
-void destroySound()
-{
-    CSound_manager_interface::_destroy();
-}
-
+void destroyInput() { xr_delete(pInput); }
+void InitSound() { CSound_manager_interface::_create(); }
+void destroySound() { CSound_manager_interface::_destroy(); }
 void destroySettings()
 {
     auto s = const_cast<CInifile**>(&pSettings);
@@ -154,15 +139,19 @@ void slowdownthread(void*)
 {
     for (;;)
     {
-        if (Device.GetStats().fFPS < 30) Sleep(1);
-        if (Device.mt_bMustExit || !pSettings || !Console || !pInput || !pApp) return;
+        if (Device.GetStats().fFPS < 30)
+            Sleep(1);
+        if (Device.mt_bMustExit || !pSettings || !Console || !pInput || !pApp)
+            return;
     }
 }
 void CheckPrivilegySlowdown()
 {
 #ifdef DEBUG
-    if (strstr(Core.Params, "-slowdown")) thread_spawn(slowdownthread, "slowdown", 0, 0);
-    if (strstr(Core.Params, "-slowdown2x")) {
+    if (strstr(Core.Params, "-slowdown"))
+        thread_spawn(slowdownthread, "slowdown", 0, 0);
+    if (strstr(Core.Params, "-slowdown2x"))
+    {
         thread_spawn(slowdownthread, "slowdown", 0, 0);
         thread_spawn(slowdownthread, "slowdown", 0, 0);
     }
@@ -175,9 +164,11 @@ void Startup()
     InitSound();
     // ...command line for auto start
     const char* startArgs = strstr(Core.Params, "-start ");
-    if (startArgs) Console->Execute(startArgs + 1);
+    if (startArgs)
+        Console->Execute(startArgs + 1);
     const char* loadArgs = strstr(Core.Params, "-load ");
-    if (loadArgs) Console->Execute(loadArgs + 1);
+    if (loadArgs)
+        Console->Execute(loadArgs + 1);
     // Initialize APP
     ShowWindow(Device.m_hWnd, SW_SHOWNORMAL);
     Device.Create();
@@ -201,7 +192,8 @@ void Startup()
     Engine.Event.Dump();
     // Destroying
     destroyInput();
-    if (!g_bBenchmark && !g_SASH.IsRunning()) destroySettings();
+    if (!g_bBenchmark && !g_SASH.IsRunning())
+        destroySettings();
     LALib.OnDestroy();
     if (!g_bBenchmark && !g_SASH.IsRunning())
         destroyConsole();
@@ -218,7 +210,8 @@ static BOOL CALLBACK LogoWndProc(HWND hw, UINT msg, WPARAM wp, LPARAM lp)
     case WM_DESTROY: break;
     case WM_CLOSE: DestroyWindow(hw); break;
     case WM_COMMAND:
-        if (LOWORD(wp) == IDCANCEL) DestroyWindow(hw);
+        if (LOWORD(wp) == IDCANCEL)
+            DestroyWindow(hw);
         break;
     default: return FALSE;
     }
@@ -241,7 +234,8 @@ public:
     {
         screensaverState = FALSE;
         SystemParametersInfo(SPI_GETSCREENSAVEACTIVE, 0, &screensaverState, 0);
-        if (screensaverState) SystemParametersInfo(SPI_SETSCREENSAVEACTIVE, FALSE, NULL, 0);
+        if (screensaverState)
+            SystemParametersInfo(SPI_SETSCREENSAVEACTIVE, FALSE, NULL, 0);
         stickyKeysFlags = 0;
         filterKeysFlags = 0;
         toggleKeysFlags = 0;
@@ -254,17 +248,20 @@ public:
         SystemParametersInfo(SPI_GETSTICKYKEYS, sizeof(stickyKeys), &stickyKeys, 0);
         SystemParametersInfo(SPI_GETFILTERKEYS, sizeof(filterKeys), &filterKeys, 0);
         SystemParametersInfo(SPI_GETTOGGLEKEYS, sizeof(toggleKeys), &toggleKeys, 0);
-        if (stickyKeys.dwFlags & SKF_AVAILABLE) {
+        if (stickyKeys.dwFlags & SKF_AVAILABLE)
+        {
             stickyKeysFlags = stickyKeys.dwFlags;
             stickyKeys.dwFlags = 0;
             SystemParametersInfo(SPI_SETSTICKYKEYS, sizeof(stickyKeys), &stickyKeys, 0);
         }
-        if (filterKeys.dwFlags & FKF_AVAILABLE) {
+        if (filterKeys.dwFlags & FKF_AVAILABLE)
+        {
             filterKeysFlags = filterKeys.dwFlags;
             filterKeys.dwFlags = 0;
             SystemParametersInfo(SPI_SETFILTERKEYS, sizeof(filterKeys), &filterKeys, 0);
         }
-        if (toggleKeys.dwFlags & TKF_AVAILABLE) {
+        if (toggleKeys.dwFlags & TKF_AVAILABLE)
+        {
             toggleKeysFlags = toggleKeys.dwFlags;
             toggleKeys.dwFlags = 0;
             SystemParametersInfo(SPI_SETTOGGLEKEYS, sizeof(toggleKeys), &toggleKeys, 0);
@@ -273,16 +270,20 @@ public:
 
     ~StickyKeyFilter()
     {
-        if (screensaverState) SystemParametersInfo(SPI_SETSCREENSAVEACTIVE, TRUE, NULL, 0);
-        if (stickyKeysFlags) {
+        if (screensaverState)
+            SystemParametersInfo(SPI_SETSCREENSAVEACTIVE, TRUE, NULL, 0);
+        if (stickyKeysFlags)
+        {
             stickyKeys.dwFlags = stickyKeysFlags;
             SystemParametersInfo(SPI_SETSTICKYKEYS, sizeof(stickyKeys), &stickyKeys, 0);
         }
-        if (filterKeysFlags) {
+        if (filterKeysFlags)
+        {
             filterKeys.dwFlags = filterKeysFlags;
             SystemParametersInfo(SPI_SETFILTERKEYS, sizeof(filterKeys), &filterKeys, 0);
         }
-        if (toggleKeysFlags) {
+        if (toggleKeysFlags)
+        {
             toggleKeys.dwFlags = toggleKeysFlags;
             SystemParametersInfo(SPI_SETTOGGLEKEYS, sizeof(toggleKeys), &toggleKeys, 0);
         }
@@ -295,7 +296,8 @@ int RunApplication(const char* commandLine)
     g_dedicated_server = true;
 #endif
     xrDebug::Initialize(g_dedicated_server);
-    if (!IsDebuggerPresent()) {
+    if (!IsDebuggerPresent())
+    {
         u32 heapFragmentation = 2;
         BOOL result = HeapSetInformation(
             GetProcessHeap(), HeapCompatibilityInformation, &heapFragmentation, sizeof(heapFragmentation));
@@ -304,7 +306,8 @@ int RunApplication(const char* commandLine)
     }
 #if !defined(DEDICATED_SERVER) && defined(NO_MULTI_INSTANCES)
     CreateMutex(NULL, TRUE, "Local\\STALKER-COP");
-    if (GetLastError() == ERROR_ALREADY_EXISTS) return 2;
+    if (GetLastError() == ERROR_ALREADY_EXISTS)
+        return 2;
 #endif
     SetThreadAffinityMask(GetCurrentThread(), 1);
     logoWindow = CreateDialog(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_STARTUP), 0, LogoWndProc);
@@ -323,14 +326,16 @@ int RunApplication(const char* commandLine)
     *g_sLaunchOnExit_params = 0;
     const char* fsltx = "-fsltx ";
     string_path fsgame = "";
-    if (strstr(commandLine, fsltx)) {
+    if (strstr(commandLine, fsltx))
+    {
         u32 sz = xr_strlen(fsltx);
         sscanf(strstr(commandLine, fsltx) + sz, "%[^ ] ", fsgame);
     }
     Core._initialize("xray", NULL, TRUE, *fsgame ? fsgame : nullptr);
     InitSettings();
     // Adjust player & computer name for Asian
-    if (pSettings->line_exist("string_table", "no_native_input")) {
+    if (pSettings->line_exist("string_table", "no_native_input"))
+    {
         xr_strcpy(Core.UserName, sizeof(Core.UserName), "Player");
         xr_strcpy(Core.CompName, sizeof(Core.CompName), "Computer");
     }
@@ -345,7 +350,8 @@ int RunApplication(const char* commandLine)
     Engine.External.CreateRendererList();
     Msg("command line %s", commandLine);
     LPCSTR benchName = "-batch_benchmark ";
-    if (strstr(commandLine, benchName)) {
+    if (strstr(commandLine, benchName))
+    {
         u32 sz = xr_strlen(benchName);
         string64 benchmarkName;
         sscanf(strstr(Core.Params, benchName) + sz, "%[^ ] ", benchmarkName);
@@ -353,7 +359,8 @@ int RunApplication(const char* commandLine)
         return 0;
     }
     LPCSTR sashName = "-openautomate ";
-    if (strstr(commandLine, sashName)) {
+    if (strstr(commandLine, sashName))
+    {
         u32 sz = xr_strlen(sashName);
         string512 sashArg;
         sscanf(strstr(Core.Params, sashName) + sz, "%[^ ] ", sashArg);
@@ -380,11 +387,12 @@ int RunApplication(const char* commandLine)
 #else
     Console->Execute("renderer renderer_r1");
 #endif
-    InitEngineExt();  // load xrRender and xrGame
+    InitEngineExt(); // load xrRender and xrGame
     Startup();
     Core._destroy();
     // check for need to execute something external
-    if (/*xr_strlen(g_sLaunchOnExit_params) && */ xr_strlen(g_sLaunchOnExit_app)) {
+    if (/*xr_strlen(g_sLaunchOnExit_params) && */ xr_strlen(g_sLaunchOnExit_app))
+    {
         // CreateProcess need to return results to next two structures
         STARTUPINFO si = {};
         si.cb = sizeof(si);
@@ -416,10 +424,12 @@ void RunBenchmark(const char* name)
         xr_strcpy(Core.Params, cmdSize, benchmarkCommand.c_str());
         xr_strlwr(Core.Params);
         InitInput();
-        if (i) InitEngine();
+        if (i)
+            InitEngine();
         Engine.External.Initialize();
         xr_strcpy(Console->ConfigFile, "user.ltx");
-        if (strstr(Core.Params, "-ltx ")) {
+        if (strstr(Core.Params, "-ltx "))
+        {
             string64 cfgName;
             sscanf(strstr(Core.Params, "-ltx ") + strlen("-ltx "), "%[^ ] ", cfgName);
             xr_strcpy(Console->ConfigFile, cfgName);
@@ -430,7 +440,8 @@ void RunBenchmark(const char* name)
 
 int StackoverflowFilter(int exceptionCode)
 {
-    if (exceptionCode == EXCEPTION_STACK_OVERFLOW) return EXCEPTION_EXECUTE_HANDLER;
+    if (exceptionCode == EXCEPTION_STACK_OVERFLOW)
+        return EXCEPTION_EXECUTE_HANDLER;
     return EXCEPTION_CONTINUE_SEARCH;
 }
 }

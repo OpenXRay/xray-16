@@ -153,11 +153,7 @@ SCRIPT_EXPORT(IRenderVisual, (), {
                          .def("dcast_PKinematicsAnimated", &IRenderVisual::dcast_PKinematicsAnimated)];
 });
 
-void IKinematicsAnimated_PlayCycle(IKinematicsAnimated* sa, LPCSTR anim)
-{
-    sa->PlayCycle(anim);
-}
-
+void IKinematicsAnimated_PlayCycle(IKinematicsAnimated* sa, LPCSTR anim) { sa->PlayCycle(anim); }
 SCRIPT_EXPORT(IKinematicsAnimated, (), {
     module(
         luaState)[class_<IKinematicsAnimated>("IKinematicsAnimated").def("PlayCycle", &IKinematicsAnimated_PlayCycle)];

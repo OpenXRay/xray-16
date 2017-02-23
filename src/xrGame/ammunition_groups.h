@@ -23,7 +23,7 @@ public:
         gid_double_barred,
         gid_hand_grenades,
         gid_cool_weapons,
-    };  // enum_group_id
+    }; // enum_group_id
     static u16 const gid_any = u16(-1);
 
     ammunition_group();
@@ -39,6 +39,6 @@ private:
     ammun_groups_map_t m_wpn_groups;
 };
 
-}  // namespace award_system
+} // namespace award_system
 
-#endif  //#ifndef AMMUNITION_GROUPS_INCLUDED
+#endif //#ifndef AMMUNITION_GROUPS_INCLUDED

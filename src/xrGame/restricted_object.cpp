@@ -22,10 +22,7 @@
 #include "xrAICore/Navigation/game_graph.h"
 #include "custommonster.h"
 
-CRestrictedObject::~CRestrictedObject()
-{
-}
-
+CRestrictedObject::~CRestrictedObject() {}
 IC void construct_string(LPSTR result, u32 const result_size, const xr_vector<ALife::_OBJECT_ID>& restrictions)
 {
     u32 count = xr_strlen(result) ? _GetItemCount(result) : 0;
@@ -34,9 +31,11 @@ IC void construct_string(LPSTR result, u32 const result_size, const xr_vector<AL
     for (; I != E; ++I)
     {
         CSE_ALifeDynamicObject* object = ai().alife().objects().object(*I);
-        if (ai().game_graph().vertex(object->m_tGraphID)->level_id() != ai().level_graph().level_id()) continue;
+        if (ai().game_graph().vertex(object->m_tGraphID)->level_id() != ai().level_graph().level_id())
+            continue;
 
-        if (count) xr_strcat(result, result_size, ",");
+        if (count)
+            xr_strcat(result, result_size, ",");
         xr_strcat(result, result_size, object->name_replace());
         ++count;
     }
@@ -74,7 +73,8 @@ BOOL CRestrictedObject::net_Spawn(CSE_Abstract* data)
     xr_strcpy(temp0, *monster->m_out_space_restrictors);
     xr_strcpy(temp1, *monster->m_in_space_restrictors);
 
-    if (ai().get_alife()) {
+    if (ai().get_alife())
+    {
         construct_string(temp0, sizeof(temp0), monster->m_dynamic_out_restrictions);
         construct_string(temp1, sizeof(temp1), monster->m_dynamic_in_restrictions);
     }
@@ -102,11 +102,7 @@ BOOL CRestrictedObject::net_Spawn(CSE_Abstract* data)
     return (TRUE);
 }
 
-void CRestrictedObject::net_Destroy()
-{
-    Level().space_restriction_manager().unrestrict(m_object->ID());
-}
-
+void CRestrictedObject::net_Destroy() { Level().space_restriction_manager().unrestrict(m_object->ID()); }
 u32 CRestrictedObject::accessible_nearest(const Fvector& position, Fvector& result) const
 {
     START_PROFILE("Restricted Object/Accessible Nearest");
@@ -157,7 +153,8 @@ void CRestrictedObject::add_border(u32 start_vertex_id, float radius) const
     VERIFY(!m_applied);
     VERIFY(m_removed);
     m_removed = false;
-    if (accessible(start_vertex_id)) {
+    if (accessible(start_vertex_id))
+    {
         m_applied = true;
         Level().space_restriction_manager().add_border(object().ID(), start_vertex_id, radius);
     }
@@ -172,7 +169,8 @@ void CRestrictedObject::add_border(const Fvector& start_position, const Fvector&
     VERIFY(!m_applied);
     VERIFY(m_removed);
     m_removed = false;
-    if (accessible(start_position)) {
+    if (accessible(start_position))
+    {
         m_applied = true;
         Level().space_restriction_manager().add_border(object().ID(), start_position, dest_position);
     }
@@ -187,7 +185,8 @@ void CRestrictedObject::add_border(u32 start_vertex_id, u32 dest_vertex_id) cons
     VERIFY(!m_applied);
     VERIFY(m_removed);
     m_removed = false;
-    if (accessible(start_vertex_id)) {
+    if (accessible(start_vertex_id))
+    {
         m_applied = true;
         Level().space_restriction_manager().add_border(object().ID(), start_vertex_id, dest_vertex_id);
     }
@@ -200,7 +199,8 @@ void CRestrictedObject::remove_border() const
 
     VERIFY(!m_removed);
     m_removed = true;
-    if (m_applied) Level().space_restriction_manager().remove_border(object().ID());
+    if (m_applied)
+        Level().space_restriction_manager().remove_border(object().ID());
     m_applied = false;
 
     STOP_PROFILE;
@@ -265,11 +265,13 @@ IC void CRestrictedObject::construct_restriction_string(LPSTR temp_restrictions,
     for (; I != E; ++I)
     {
         IGameObject* object = Level().Objects.net_Find(*I);
-        if (!object || !!strstr(*current_restrictions, *object->cName()) == value) continue;
+        if (!object || !!strstr(*current_restrictions, *object->cName()) == value)
+            continue;
 
         p(this, object->ID());
 
-        if (count) xr_strcat(temp_restrictions, temp_restrictions_size, ",");
+        if (count)
+            xr_strcat(temp_restrictions, temp_restrictions_size, ",");
 
         xr_strcat(temp_restrictions, temp_restrictions_size, *object->cName());
 
@@ -299,7 +301,8 @@ struct CRestrictionPredicate
 void CRestrictedObject::add_restrictions(
     const xr_vector<ALife::_OBJECT_ID>& out_restrictions, const xr_vector<ALife::_OBJECT_ID>& in_restrictions)
 {
-    if (out_restrictions.empty() && in_restrictions.empty()) return;
+    if (out_restrictions.empty() && in_restrictions.empty())
+        return;
 
     START_PROFILE("Restricted Object/Add Restrictions");
 
@@ -322,7 +325,8 @@ void CRestrictedObject::add_restrictions(
 void CRestrictedObject::remove_restrictions(
     const xr_vector<ALife::_OBJECT_ID>& out_restrictions, const xr_vector<ALife::_OBJECT_ID>& in_restrictions)
 {
-    if (out_restrictions.empty() && in_restrictions.empty()) return;
+    if (out_restrictions.empty() && in_restrictions.empty())
+        return;
 
     START_PROFILE("Restricted Object/Remove Restrictions");
 
@@ -345,7 +349,8 @@ void CRestrictedObject::remove_restrictions(
 
 void CRestrictedObject::add_restrictions(const shared_str& out_restrictions, const shared_str& in_restrictions)
 {
-    if (!out_restrictions.size() && !in_restrictions.size()) return;
+    if (!out_restrictions.size() && !in_restrictions.size())
+        return;
 
     START_PROFILE("Restricted Object/Add Restrictions");
 
@@ -358,7 +363,8 @@ void CRestrictedObject::add_restrictions(const shared_str& out_restrictions, con
 
 void CRestrictedObject::remove_restrictions(const shared_str& out_restrictions, const shared_str& in_restrictions)
 {
-    if (!out_restrictions.size() && !in_restrictions.size()) return;
+    if (!out_restrictions.size() && !in_restrictions.size())
+        return;
 
     START_PROFILE("Restricted Object/Remove Restrictions");
 
@@ -396,5 +402,6 @@ void CRestrictedObject::remove_all_restrictions()
 void CRestrictedObject::actual(bool value)
 {
     m_actual = value;
-    if (!actual()) m_object->on_restrictions_change();
+    if (!actual())
+        m_object->on_restrictions_change();
 }

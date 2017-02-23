@@ -30,7 +30,8 @@ IC bool CAI_Rat::bfCheckIfOutsideAIMap(Fvector& tTemp1)
     u32 dwNewNode = ai_location().level_vertex_id();
     const CLevelGraph::CVertex* tpNewNode = ai_location().level_vertex();
     CLevelGraph::CPosition QueryPos;
-    if (!ai().level_graph().valid_vertex_position(tTemp1)) return (false);
+    if (!ai().level_graph().valid_vertex_position(tTemp1))
+        return (false);
     ai().level_graph().vertex_position(QueryPos, tTemp1);
     if (!ai().level_graph().valid_vertex_id(dwNewNode) ||
         !ai().level_graph().inside(*ai_location().level_vertex(), QueryPos))
@@ -43,7 +44,8 @@ IC bool CAI_Rat::bfCheckIfOutsideAIMap(Fvector& tTemp1)
 
 void CAI_Rat::fire(bool const& bFire)
 {
-    if (bFire) {
+    if (bFire)
+    {
         m_bFiring = true;
         m_tAction = eRatActionAttackBegin;
     }
@@ -74,8 +76,10 @@ void CAI_Rat::select_speed()
     clamp(fAngle, -.99999f, .99999f);
     fAngle = acosf(fAngle);
 
-    if (_abs(m_fSpeed - m_fMinSpeed) <= EPS_L) {
-        if (fAngle >= 2 * PI_DIV_3) {
+    if (_abs(m_fSpeed - m_fMinSpeed) <= EPS_L)
+    {
+        if (fAngle >= 2 * PI_DIV_3)
+        {
             m_fSpeed = 0;
             m_fASpeed = m_fNullASpeed;
             movement().m_body.target.yaw = -y;
@@ -88,7 +92,8 @@ void CAI_Rat::select_speed()
     }
     else if (_abs(m_fSpeed - m_fMaxSpeed) <= EPS_L)
     {
-        if (fAngle >= 2 * PI_DIV_3) {
+        if (fAngle >= 2 * PI_DIV_3)
+        {
             m_fSpeed = 0;
             m_fASpeed = m_fNullASpeed;
             movement().m_body.target.yaw = -y;
@@ -112,7 +117,8 @@ void CAI_Rat::select_speed()
         //					movement().m_body.target.yaw = -y;
         //				}
         //				else
-        if (fAngle >= PI_DIV_2) {
+        if (fAngle >= PI_DIV_2)
+        {
             m_fSpeed = m_fMinSpeed;
             m_fASpeed = m_fMinASpeed;
         }
@@ -139,11 +145,14 @@ void CAI_Rat::select_speed()
 
     tTemp1 = Position();
     tTemp1.mad(tTemp2, 1 * m_fSpeed * m_fTimeUpdateDelta);
-    if (bfCheckIfOutsideAIMap(tTemp1)) {
+    if (bfCheckIfOutsideAIMap(tTemp1))
+    {
         tTemp1 = Position();
-        if (_abs(m_fSpeed - m_fAttackSpeed) < EPS_L) {
+        if (_abs(m_fSpeed - m_fAttackSpeed) < EPS_L)
+        {
             tTemp1.mad(tTemp2, 1 * m_fMaxSpeed * m_fTimeUpdateDelta);
-            if (bfCheckIfOutsideAIMap(tTemp1)) {
+            if (bfCheckIfOutsideAIMap(tTemp1))
+            {
                 m_fSpeed = m_fMinSpeed;
                 m_fASpeed = m_fMinASpeed;
             }
@@ -164,7 +173,8 @@ void CAI_Rat::select_speed()
 void CAI_Rat::make_turn()
 {
     m_fSpeed = m_fCurSpeed = 0.f;
-    if (m_bFiring && (angle_difference(movement().m_body.target.yaw, movement().m_body.current.yaw) < PI_DIV_6)) {
+    if (m_bFiring && (angle_difference(movement().m_body.target.yaw, movement().m_body.current.yaw) < PI_DIV_6))
+    {
         //		movement().m_body.speed	= 0.f;
         return;
     }
@@ -179,30 +189,29 @@ void CAI_Rat::make_turn()
     m_tHPB.x = -movement().m_body.current.yaw;
     m_tHPB.y = -movement().m_body.current.pitch;
 
-    XFORM().setHPB(m_tHPB.x, m_tHPB.y, 0.f);  // m_tHPB.z);
+    XFORM().setHPB(m_tHPB.x, m_tHPB.y, 0.f); // m_tHPB.z);
     Position() = tSavedPosition;
 }
 
-void CAI_Rat::set_firing(bool b_val)
-{
-    m_bFiring = b_val;
-}
-
+void CAI_Rat::set_firing(bool b_val) { m_bFiring = b_val; }
 bool CAI_Rat::calc_node(Fvector const& next_position)
 {
     u32 dwNewNode = ai_location().level_vertex_id();
     const CLevelGraph::CVertex* tpNewNode = ai_location().level_vertex();
     CLevelGraph::CPosition QueryPos;
     bool a = !ai().level_graph().valid_vertex_id(dwNewNode) || !ai().level_graph().valid_vertex_position(next_position);
-    if (!a) {
+    if (!a)
+    {
         ai().level_graph().vertex_position(QueryPos, next_position);
         a = !ai().level_graph().inside(*ai_location().level_vertex(), QueryPos);
     }
-    if (a) {
+    if (a)
+    {
         dwNewNode = ai().level_graph().vertex(ai_location().level_vertex_id(), next_position);
         tpNewNode = ai().level_graph().vertex(dwNewNode);
     }
-    if (ai().level_graph().valid_vertex_id(dwNewNode) && ai().level_graph().inside(*tpNewNode, QueryPos)) {
+    if (ai().level_graph().valid_vertex_id(dwNewNode) && ai().level_graph().inside(*tpNewNode, QueryPos))
+    {
         m_tNewPosition.y = ai().level_graph().vertex_plane_y(*tpNewNode, next_position.x, next_position.z);
         if (movement().restrictions().accessible(m_tNewPosition) || !movement().restrictions().accessible(Position()))
             return true;
@@ -224,17 +233,21 @@ Fvector CAI_Rat::calc_position()
     Fvector tOffset;
     tOffset.sub(m_tGoalDir, Position());
 
-    if (!m_bStraightForward) {
-        if (tOffset.y > 1.0) {  // We're too low
+    if (!m_bStraightForward)
+    {
+        if (tOffset.y > 1.0)
+        { // We're too low
             m_tHPB.y += fAT;
-            if (m_tHPB.y > 0.8f) m_tHPB.y = 0.8f;
+            if (m_tHPB.y > 0.8f)
+                m_tHPB.y = 0.8f;
         }
         else if (tOffset.y < -1.0)
-        {  // We're too high
+        { // We're too high
             m_tHPB.y -= fAT;
-            if (m_tHPB.y < -0.8f) m_tHPB.y = -0.8f;
+            if (m_tHPB.y < -0.8f)
+                m_tHPB.y = -0.8f;
         }
-        else  // Add damping
+        else // Add damping
             m_tHPB.y *= 0.95f;
     }
 
@@ -248,8 +261,10 @@ Fvector CAI_Rat::calc_position()
 
     tOffset.crossproduct(tOffset, tDirection);
 
-    if (m_bStraightForward) {
-        if (tOffset.y > 0.01f) {
+    if (m_bStraightForward)
+    {
+        if (tOffset.y > 0.01f)
+        {
             if (fSafeDot > .95f)
                 m_fDHeading = 0.f;
             else if (fSafeDot > 0.75f)
@@ -325,25 +340,30 @@ void CAI_Rat::move(bool bCanAdjustSpeed, bool bStraightForward)
     SRotation tSavedTorsoTarget = movement().m_body.target;
     float fSavedDHeading = m_fDHeading;
 
-    if (bCanAdjustSpeed) select_speed();
+    if (bCanAdjustSpeed)
+        select_speed();
 
-    if ((angle_difference(movement().m_body.target.yaw, movement().m_body.current.yaw) > PI_DIV_6)) {
+    if ((angle_difference(movement().m_body.target.yaw, movement().m_body.current.yaw) > PI_DIV_6))
+    {
         make_turn();
         return;
     }
 
-    if (fis_zero(m_fSpeed)) return;
+    if (fis_zero(m_fSpeed))
+        return;
 
     m_fCurSpeed = m_fSpeed;
 
-    if (m_bNoWay) {
+    if (m_bNoWay)
+    {
         m_tNewPosition = m_tOldPosition;
     }
     else
     {
         m_tNewPosition = calc_position();
     }
-    if (calc_node(m_tNewPosition)) {
+    if (calc_node(m_tNewPosition))
+    {
         set_position(m_tNewPosition);
         set_pitch(m_newPitch, -m_tHPB.x);
         m_tOldPosition = tSavedPosition;
@@ -361,20 +381,24 @@ void CAI_Rat::move(bool bCanAdjustSpeed, bool bStraightForward)
     if (m_bNoWay &&
         (!m_turning || (angle_difference(movement().m_body.target.yaw, movement().m_body.current.yaw) < EPS_L)))
     {
-        if ((Device.dwTimeGlobal - m_previous_query_time > TIME_TO_RETURN) || (!m_previous_query_time)) {
+        if ((Device.dwTimeGlobal - m_previous_query_time > TIME_TO_RETURN) || (!m_previous_query_time))
+        {
             movement().m_body.target.yaw = movement().m_body.current.yaw + PI;
             movement().m_body.target.yaw = angle_normalize(movement().m_body.target.yaw);
             Fvector tTemp;
             tTemp.setHP(-movement().m_body.target.yaw, -movement().m_body.target.pitch);
-            if (m_bStraightForward) {
+            if (m_bStraightForward)
+            {
                 tTemp.mul(100.f);
             }
 
-            if (!m_walk_on_way) m_tGoalDir.add(Position(), tTemp);
+            if (!m_walk_on_way)
+                m_tGoalDir.add(Position(), tTemp);
 
             m_previous_query_time = Device.dwTimeGlobal;
         }
-        if (!m_walk_on_way) make_turn();
+        if (!m_walk_on_way)
+            make_turn();
     }
     m_turning = false;
 }
@@ -393,7 +417,8 @@ void CAI_Rat::select_next_home_position()
                 ((*i).vertex_id() != m_current_graph_point))
                 ++iBranches;
     ai().game_graph().begin(tGraphID, i, e);
-    if (!iBranches) {
+    if (!iBranches)
+    {
         for (; i != e; ++i)
         {
             for (int j = 0; j < iPointCount; ++j)
@@ -418,7 +443,8 @@ void CAI_Rat::select_next_home_position()
                         ai().game_graph().vertex((*i).vertex_id())->vertex_type()) &&
                     ((*i).vertex_id() != m_current_graph_point))
                 {
-                    if (iBranches == iChosenBranch) {
+                    if (iBranches == iChosenBranch)
+                    {
                         m_current_graph_point = m_next_graph_point;
                         m_next_graph_point = (*i).vertex_id();
                         m_time_to_change_graph_point = Device.dwTimeGlobal + ::Random32.random(60000) + 60000;
@@ -435,7 +461,8 @@ bool CAI_Rat::can_stand_in_position()
     xr_vector<IGameObject*> tpNearestList;
     // float m_radius = Radius();
     Level().ObjectSpace.GetNearest(tpNearestList, Position(), 0.2f, this);
-    if (tpNearestList.empty()) return (true);
+    if (tpNearestList.empty())
+        return (true);
 
     Fvector c, d, C2;
     Visual()->getVisData().box.get_CD(c, d);
@@ -448,14 +475,16 @@ bool CAI_Rat::can_stand_in_position()
     xr_vector<IGameObject*>::iterator E = tpNearestList.end();
     for (; I != E; ++I)
     {
-        if (!smart_cast<CAI_Rat*>(*I)) continue;
+        if (!smart_cast<CAI_Rat*>(*I))
+            continue;
 
         (*I)->Visual()->getVisData().box.get_CD(c, d);
         M = (*I)->XFORM();
         M.transform_tiny(C2, c);
         M.c = C2;
 
-        if (box.intersects(MagicBox3(M, d))) return (false);
+        if (box.intersects(MagicBox3(M, d)))
+            return (false);
     }
     return (true);
 }
@@ -465,7 +494,8 @@ bool CAI_Rat::can_stand_here()
     xr_vector<IGameObject*> tpNearestList;
     Level().ObjectSpace.GetNearest(tpNearestList, Position(), Radius(), this);
     // xr_vector<IGameObject*>				&tpNearestList = Level().ObjectSpace.q_nearest;
-    if (tpNearestList.empty()) return (true);
+    if (tpNearestList.empty())
+        return (true);
 
     Fvector c, d, C2;
     Visual()->getVisData().box.get_CD(c, d);
@@ -478,39 +508,45 @@ bool CAI_Rat::can_stand_here()
     xr_vector<IGameObject*>::iterator E = tpNearestList.end();
     for (; I != E; ++I)
     {
-        if (!smart_cast<CAI_Rat*>(*I)) continue;
+        if (!smart_cast<CAI_Rat*>(*I))
+            continue;
 
         (*I)->Visual()->getVisData().box.get_CD(c, d);
         M = (*I)->XFORM();
         M.transform_tiny(C2, c);
         M.c = C2;
 
-        if (box.intersects(MagicBox3(M, d))) return (false);
+        if (box.intersects(MagicBox3(M, d)))
+            return (false);
     }
     return (true);
 }
 
 Fvector CAI_Rat::get_next_target_point()
 {
-    if (!m_path) {
+    if (!m_path)
+    {
         m_walk_on_way = false;
         m_current_way_point = u32(-1);
         return Position();
     }
 
-    if (m_current_way_point == u32(-1)) {
+    if (m_current_way_point == u32(-1))
+    {
         m_walk_on_way = false;
         return Position();
     }
 
     const CPatrolPath::CVertex* vertex = m_path->vertex(m_current_way_point);
 
-    if (Position().distance_to(ai().level_graph().vertex_position(vertex->data().level_vertex_id())) < 1.5f) {
+    if (Position().distance_to(ai().level_graph().vertex_position(vertex->data().level_vertex_id())) < 1.5f)
+    {
         monster_squad().get_squad(this)->SetLeader(this);
 
         m_current_way_point++;
 
-        if (m_current_way_point == m_path->vertex_count()) m_current_way_point = 0;
+        if (m_current_way_point == m_path->vertex_count())
+            m_current_way_point = 0;
 
         vertex = m_path->vertex(m_current_way_point);
     }
@@ -521,7 +557,8 @@ Fvector CAI_Rat::get_next_target_point()
 #ifdef _DEBUG
 void CAI_Rat::draw_way()
 {
-    if (!m_path) return;
+    if (!m_path)
+        return;
     const CPatrolPath::CVertex* vertex;
     Fvector P1, P2;
     Fmatrix m_sphere;

@@ -35,34 +35,21 @@
 #ifdef _eof
 #undef _eof
 #endif
-__inline int _eof(int _a)
-{
-    return ::eof(_a);
-}
+__inline int _eof(int _a) { return ::eof(_a); }
 #ifdef _access
 #undef _access
 #endif
-__inline int _access(const char* _a, int _b)
-{
-    return ::access(_a, _b);
-}
+__inline int _access(const char* _a, int _b) { return ::access(_a, _b); }
 #ifdef _lseek
 #undef _lseek
 #endif
-__inline long _lseek(int handle, long offset, int fromwhere)
-{
-    return ::lseek(handle, offset, fromwhere);
-}
+__inline long _lseek(int handle, long offset, int fromwhere) { return ::lseek(handle, offset, fromwhere); }
 #ifdef _dup
 #undef _dup
 #endif
 #define fmodf fmod
 
-__inline int _dup(int handle)
-{
-    return ::dup(handle);
-}
-
+__inline int _dup(int handle) { return ::dup(handle); }
 __inline float modff(float a, float* b)
 {
     double x, y;
@@ -71,11 +58,7 @@ __inline float modff(float a, float* b)
     return float(y);
 }
 
-__inline float expf(float val)
-{
-    return ::exp(val);
-}
-
+__inline float expf(float val) { return ::exp(val); }
 #include "xrCore/Platform.h"
 
 #ifdef _ECOREB
@@ -169,15 +152,15 @@ DEFINE_VECTOR(shared_str, RStrVec, RStrVecIt);
 #include "editors/ECore/Editor/EditorPreferences.h"
 #endif
 
-#define INI_NAME(buf)                                                                                                  \
-    {                                                                                                                  \
-        FS.update_path(buf, "$local_root$", EFS.ChangeFileExt(UI->EditorName(), ".ini").c_str());                      \
+#define INI_NAME(buf)                                                                             \
+    {                                                                                             \
+        FS.update_path(buf, "$local_root$", EFS.ChangeFileExt(UI->EditorName(), ".ini").c_str()); \
     }
-#define DEFINE_INI(storage)                                                                                            \
-    {                                                                                                                  \
-        string_path buf;                                                                                               \
-        INI_NAME(buf);                                                                                                 \
-        storage->IniFileName = buf;                                                                                    \
+#define DEFINE_INI(storage)         \
+    {                               \
+        string_path buf;            \
+        INI_NAME(buf);              \
+        storage->IniFileName = buf; \
     }
 #define NONE_CAPTION "<none>"
 #define MULTIPLESEL_CAPTION "<multiple selection>"

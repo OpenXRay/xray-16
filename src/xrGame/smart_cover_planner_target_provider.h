@@ -83,6 +83,6 @@ private:
     u32 m_loophole_value;
 };
 
-}  // namespace smart_cover
+} // namespace smart_cover
 
-#endif  // SMART_COVER_PLANNER_TARGET_PROVIDER_H_INCLUDED
+#endif // SMART_COVER_PLANNER_TARGET_PROVIDER_H_INCLUDED

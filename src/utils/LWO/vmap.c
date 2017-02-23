@@ -20,12 +20,18 @@ Free memory used by an lwVMap.
 
 void lwFreeVMap(lwVMap* vmap)
 {
-    if (vmap) {
-        if (vmap->name) free(vmap->name);
-        if (vmap->vindex) free(vmap->vindex);
-        if (vmap->pindex) free(vmap->pindex);
-        if (vmap->val) {
-            if (vmap->val[0]) free(vmap->val[0]);
+    if (vmap)
+    {
+        if (vmap->name)
+            free(vmap->name);
+        if (vmap->vindex)
+            free(vmap->vindex);
+        if (vmap->pindex)
+            free(vmap->pindex);
+        if (vmap->val)
+        {
+            if (vmap->val[0])
+                free(vmap->val[0]);
             free(vmap->val);
         }
         free(vmap);
@@ -50,10 +56,12 @@ lwVMap* lwGetVMap(FILE* fp, int cksize, int ptoffset, int poloffset, int perpoly
 
     set_flen(0);
     buf = getbytes(fp, cksize);
-    if (!buf) return NULL;
+    if (!buf)
+        return NULL;
 
     vmap = calloc(1, sizeof(lwVMap));
-    if (!vmap) {
+    if (!vmap)
+    {
         free(buf);
         return NULL;
     }
@@ -75,7 +83,8 @@ lwVMap* lwGetVMap(FILE* fp, int cksize, int ptoffset, int poloffset, int perpoly
     while (bp < buf + cksize)
     {
         i = sgetVX(&bp);
-        if (perpoly) i = sgetVX(&bp);
+        if (perpoly)
+            i = sgetVX(&bp);
         bp += vmap->dim * sizeof(float);
         ++npts;
     }
@@ -84,17 +93,23 @@ lwVMap* lwGetVMap(FILE* fp, int cksize, int ptoffset, int poloffset, int perpoly
 
     vmap->nverts = npts;
     vmap->vindex = calloc(npts, sizeof(int));
-    if (!vmap->vindex) goto Fail;
-    if (perpoly) {
+    if (!vmap->vindex)
+        goto Fail;
+    if (perpoly)
+    {
         vmap->pindex = calloc(npts, sizeof(int));
-        if (!vmap->pindex) goto Fail;
+        if (!vmap->pindex)
+            goto Fail;
     }
 
-    if (vmap->dim > 0) {
+    if (vmap->dim > 0)
+    {
         vmap->val = calloc(npts, sizeof(float*));
-        if (!vmap->val) goto Fail;
+        if (!vmap->val)
+            goto Fail;
         f = malloc(npts * vmap->dim * sizeof(float));
-        if (!f) goto Fail;
+        if (!f)
+            goto Fail;
         for (i = 0; i < npts; i++)
             vmap->val[i] = f + i * vmap->dim;
     }
@@ -105,7 +120,8 @@ lwVMap* lwGetVMap(FILE* fp, int cksize, int ptoffset, int poloffset, int perpoly
     for (i = 0; i < npts; i++)
     {
         vmap->vindex[i] = sgetVX(&bp);
-        if (perpoly) vmap->pindex[i] = sgetVX(&bp);
+        if (perpoly)
+            vmap->pindex[i] = sgetVX(&bp);
         for (j = 0; j < vmap->dim; j++)
             vmap->val[i][j] = sgetF4(&bp);
     }
@@ -114,7 +130,8 @@ lwVMap* lwGetVMap(FILE* fp, int cksize, int ptoffset, int poloffset, int perpoly
     return vmap;
 
 Fail:
-    if (buf) free(buf);
+    if (buf)
+        free(buf);
     lwFreeVMap(vmap);
     return NULL;
 }
@@ -146,9 +163,11 @@ int lwGetPointVMaps(lwPointList* point, lwVMap* vmap)
 
     for (i = 0; i < point->count; i++)
     {
-        if (point->pt[i].nvmaps) {
+        if (point->pt[i].nvmaps)
+        {
             point->pt[i].vm = calloc(point->pt[i].nvmaps, sizeof(lwVMapPt));
-            if (!point->pt[i].vm) return 0;
+            if (!point->pt[i].vm)
+                return 0;
             point->pt[i].nvmaps = 0;
         }
     }
@@ -158,7 +177,8 @@ int lwGetPointVMaps(lwPointList* point, lwVMap* vmap)
     vm = vmap;
     while (vm)
     {
-        if (!vm->perpoly) {
+        if (!vm->perpoly)
+        {
             for (i = 0; i < vm->nverts; i++)
             {
                 j = vm->vindex[i];
@@ -192,13 +212,15 @@ int lwGetPolyVMaps(lwPolygonList* polygon, lwVMap* vmap)
     vm = vmap;
     while (vm)
     {
-        if (vm->perpoly) {
+        if (vm->perpoly)
+        {
             for (i = 0; i < vm->nverts; i++)
             {
                 for (j = 0; j < polygon->pol[vm->pindex[i]].nverts; j++)
                 {
                     pv = &polygon->pol[vm->pindex[i]].v[j];
-                    if (vm->vindex[i] == pv->index) {
+                    if (vm->vindex[i] == pv->index)
+                    {
                         ++pv->nvmaps;
                         break;
                     }
@@ -215,9 +237,11 @@ int lwGetPolyVMaps(lwPolygonList* polygon, lwVMap* vmap)
         for (j = 0; j < polygon->pol[i].nverts; j++)
         {
             pv = &polygon->pol[i].v[j];
-            if (pv->nvmaps) {
+            if (pv->nvmaps)
+            {
                 pv->vm = calloc(pv->nvmaps, sizeof(lwVMapPt));
-                if (!pv->vm) return 0;
+                if (!pv->vm)
+                    return 0;
                 pv->nvmaps = 0;
             }
         }
@@ -228,13 +252,15 @@ int lwGetPolyVMaps(lwPolygonList* polygon, lwVMap* vmap)
     vm = vmap;
     while (vm)
     {
-        if (vm->perpoly) {
+        if (vm->perpoly)
+        {
             for (i = 0; i < vm->nverts; i++)
             {
                 for (j = 0; j < polygon->pol[vm->pindex[i]].nverts; j++)
                 {
                     pv = &polygon->pol[vm->pindex[i]].v[j];
-                    if (vm->vindex[i] == pv->index) {
+                    if (vm->vindex[i] == pv->index)
+                    {
                         pv->vm[pv->nvmaps].vmap = vm;
                         pv->vm[pv->nvmaps].index = i;
                         ++pv->nvmaps;

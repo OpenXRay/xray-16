@@ -58,10 +58,12 @@ void CStalkerActionDangerUnknownTakeCover::execute()
 {
     inherited::execute();
 
-    if (!object().memory().danger().selected()) return;
+    if (!object().memory().danger().selected())
+        return;
 
     const CCoverPoint* point = object().agent_manager().member().member(&object()).cover();
-    if (point) {
+    if (point)
+    {
         object().movement().set_level_dest_vertex(point->level_vertex_id());
         object().movement().set_desired_position(&point->position());
     }
@@ -70,7 +72,8 @@ void CStalkerActionDangerUnknownTakeCover::execute()
 
     object().CObjectHandler::set_goal(eObjectActionAimReady1, object().best_weapon());
 
-    if (!object().movement().path_completed()) {
+    if (!object().movement().path_completed())
+    {
         object().movement().set_body_state(eBodyStateStand);
         object().movement().set_movement_type(eMovementTypeRun);
         if (!m_direction_sight || !object().movement().distance_to_destination_greater(2.f))
@@ -83,11 +86,7 @@ void CStalkerActionDangerUnknownTakeCover::execute()
     set_property(eWorldPropertyCoverReached, true);
 }
 
-void CStalkerActionDangerUnknownTakeCover::finalize()
-{
-    inherited::finalize();
-}
-
+void CStalkerActionDangerUnknownTakeCover::finalize() { inherited::finalize(); }
 //////////////////////////////////////////////////////////////////////////
 // CStalkerActionDangerUnknownLookAround
 //////////////////////////////////////////////////////////////////////////
@@ -115,21 +114,19 @@ void CStalkerActionDangerUnknownLookAround::execute()
 {
     inherited::execute();
 
-    if (!object().memory().danger().selected()) return;
+    if (!object().memory().danger().selected())
+        return;
 
     if (fsimilar(object().movement().body_orientation().target.yaw, object().movement().body_orientation().current.yaw))
         object().sight().setup(CSightAction(SightManager::eSightTypeCoverLookOver, true));
     else
         object().sight().setup(CSightAction(SightManager::eSightTypeCover, true));
 
-    if (completed()) set_property(eWorldPropertyLookedAround, true);
+    if (completed())
+        set_property(eWorldPropertyLookedAround, true);
 }
 
-void CStalkerActionDangerUnknownLookAround::finalize()
-{
-    inherited::finalize();
-}
-
+void CStalkerActionDangerUnknownLookAround::finalize() { inherited::finalize(); }
 //////////////////////////////////////////////////////////////////////////
 // CStalkerActionDangerUnknownSearch
 //////////////////////////////////////////////////////////////////////////
@@ -139,16 +136,13 @@ CStalkerActionDangerUnknownSearch::CStalkerActionDangerUnknownSearch(CAI_Stalker
 {
 }
 
-void CStalkerActionDangerUnknownSearch::initialize()
-{
-    inherited::initialize();
-}
-
+void CStalkerActionDangerUnknownSearch::initialize() { inherited::initialize(); }
 void CStalkerActionDangerUnknownSearch::execute()
 {
     inherited::execute();
 
-    if (object().agent_manager().member().member(&object()).cover()) {
+    if (object().agent_manager().member().member(&object()).cover())
+    {
         object().agent_manager().location().add(
             new CDangerCoverLocation(object().agent_manager().member().member(&object()).cover(), Device.dwTimeGlobal,
                 DANGER_INTERVAL, DANGER_DISTANCE));
@@ -159,7 +153,4 @@ void CStalkerActionDangerUnknownSearch::execute()
     set_property(eWorldPropertyLookedAround, false);
 }
 
-void CStalkerActionDangerUnknownSearch::finalize()
-{
-    inherited::finalize();
-}
+void CStalkerActionDangerUnknownSearch::finalize() { inherited::finalize(); }

@@ -12,11 +12,9 @@ class CStateMonsterMoveToPoint : public CState<_Object>
 public:
     CStateMonsterMoveToPoint(_Object* obj) : inherited(obj, &data) {}
     virtual ~CStateMonsterMoveToPoint() {}
-
     virtual void initialize();
     virtual void execute();
     virtual void remove_links(IGameObject* object) { inherited::remove_links(object); }
-
     virtual bool check_completion();
 };
 

@@ -17,7 +17,8 @@ enum
 bool ESceneSectorTool::LoadLTX(CInifile& ini)
 {
     u32 version = ini.r_u32("main", "version");
-    if (version != SECTOR_TOOLS_VERSION) {
+    if (version != SECTOR_TOOLS_VERSION)
+    {
         ELog.DlgMsg(mtError, "%s tools: Unsupported version.", ClassDesc());
         return false;
     }
@@ -42,14 +43,17 @@ bool ESceneSectorTool::LoadStream(IReader& F)
 {
     u16 version = 0;
     if (F.r_chunk(CHUNK_VERSION, &version))
-        if (version != SECTOR_TOOLS_VERSION) {
+        if (version != SECTOR_TOOLS_VERSION)
+        {
             ELog.DlgMsg(mtError, "%s tools: Unsupported version.", ClassDesc());
             return false;
         }
 
-    if (!inherited::LoadStream(F)) return false;
+    if (!inherited::LoadStream(F))
+        return false;
 
-    if (F.find_chunk(CHUNK_FLAGS)) m_Flags.assign(F.r_u32());
+    if (F.find_chunk(CHUNK_FLAGS))
+        m_Flags.assign(F.r_u32());
 
     return true;
 }
@@ -73,7 +77,8 @@ bool ESceneSectorTool::LoadSelection(IReader& F)
 {
     u16 version = 0;
     R_ASSERT(F.r_chunk(CHUNK_VERSION, &version));
-    if (version != SECTOR_TOOLS_VERSION) {
+    if (version != SECTOR_TOOLS_VERSION)
+    {
         ELog.DlgMsg(mtError, "%s tools: Unsupported version.", ClassDesc());
         return false;
     }

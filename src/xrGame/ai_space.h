@@ -24,7 +24,7 @@ class moving_objects;
 namespace doors
 {
 class manager;
-}  // namespace doors
+} // namespace doors
 
 class CAI_Space : public AISpaceBase
 {

@@ -29,11 +29,7 @@ ComputeShader::~ComputeShader()
         m_Samplers[i]->Release();
 }
 
-u32 GetCB(ref_constant C)
-{
-    return (C->destination & RC_dest_pixel_cb_index_mask) >> RC_dest_pixel_cb_index_shift;
-}
-
+u32 GetCB(ref_constant C) { return (C->destination & RC_dest_pixel_cb_index_mask) >> RC_dest_pixel_cb_index_shift; }
 ComputeShader& ComputeShader::set_c(shared_str name, const Fvector4& value)
 {
     ref_constant c = m_ctable->get(name);
@@ -70,16 +66,20 @@ void ComputeShader::Dispatch(u32 dimx, u32 dimy, u32 dimz)
     for (; it != end; it++)
     {
         R_constant* Cs = &**it;
-        if (Cs->handler) Cs->handler->setup(Cs);
+        if (Cs->handler)
+            Cs->handler->setup(Cs);
     }
 
     HW.pContext->CSSetConstantBuffers(0, count, tempBuffer);
 
-    if (!m_Textures.empty()) HW.pContext->CSSetShaderResources(0, m_Textures.size(), &m_Textures[0]);
+    if (!m_Textures.empty())
+        HW.pContext->CSSetShaderResources(0, m_Textures.size(), &m_Textures[0]);
 
-    if (!m_Samplers.empty()) HW.pContext->CSSetSamplers(0, m_Samplers.size(), &m_Samplers[0]);
+    if (!m_Samplers.empty())
+        HW.pContext->CSSetSamplers(0, m_Samplers.size(), &m_Samplers[0]);
 
-    if (!m_Outputs.empty()) {
+    if (!m_Outputs.empty())
+    {
         UINT num = 0;
         HW.pContext->CSSetUnorderedAccessViews(0, m_Outputs.size(), &m_Outputs[0], &num);
     }

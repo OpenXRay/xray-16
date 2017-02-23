@@ -41,7 +41,6 @@ protected:
 
 protected:
     IC const Fvector& GetCharTC(u16 c) { return TCMap[c]; }
-
 public:
     CGameFont(LPCSTR section, u32 flags = 0);
     CGameFont(LPCSTR shader, LPCSTR texture, u32 flags = 0);
@@ -58,7 +57,7 @@ public:
     virtual void SetAligment(EAligment aligment) override { eCurrentAlignment = aligment; }
     virtual float SizeOf_(LPCSTR s) override;
     virtual float SizeOf_(const wchar_t* wsStr) override;
-    virtual float SizeOf_(const char cChar);  // only ANSII
+    virtual float SizeOf_(const char cChar); // only ANSII
     virtual float CurrentHeight_() override;
     virtual void OutSetI(float x, float y) override;
     virtual void OutSet(float x, float y) override;
@@ -76,10 +75,9 @@ public:
     virtual void OutSkip(float val = 1.f) override;
     virtual void OnRender() override;
     virtual void Clear() override { strings.clear(); }
-
 #ifdef DEBUG
     shared_str m_font_name;
 #endif
 };
 
-#endif  // _XR_GAMEFONT_H_
+#endif // _XR_GAMEFONT_H_

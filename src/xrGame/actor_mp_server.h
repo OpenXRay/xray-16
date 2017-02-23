@@ -29,4 +29,4 @@ public:
 #endif
 };
 
-#endif  // ACTOR_MP_SERVER_H
+#endif // ACTOR_MP_SERVER_H

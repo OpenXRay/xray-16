@@ -12,11 +12,7 @@
 using namespace luabind;
 using namespace luabind::policy;
 
-bool r_eof(NET_Packet* self)
-{
-    return (!!self->r_eof());
-}
-
+bool r_eof(NET_Packet* self) { return (!!self->r_eof()); }
 LPCSTR r_stringZ(NET_Packet* self)
 {
     shared_str temp;
@@ -24,16 +20,8 @@ LPCSTR r_stringZ(NET_Packet* self)
     return (*temp);
 }
 
-void w_bool(NET_Packet* self, bool value)
-{
-    self->w_u8(value ? 1 : 0);
-}
-
-bool r_bool(NET_Packet* self)
-{
-    return (!!self->r_u8());
-}
-
+void w_bool(NET_Packet* self, bool value) { self->w_u8(value ? 1 : 0); }
+bool r_bool(NET_Packet* self) { return (!!self->r_u8()); }
 ClientID r_clientID(NET_Packet* self)
 {
     ClientID clientID;

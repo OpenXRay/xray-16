@@ -14,12 +14,12 @@
 public
 ref class property_color : public property_color_base
 {
-  public:
+public:
     typedef editor::property_holder::color_getter_type color_getter_type;
     typedef editor::property_holder::color_setter_type color_setter_type;
     typedef property_color_base inherited;
 
-  public:
+public:
     property_color(
         color_getter_type const& getter, color_setter_type const& setter, array<System::Attribute ^> ^ attributes);
     virtual ~property_color();
@@ -27,9 +27,9 @@ ref class property_color : public property_color_base
     virtual editor::color get_value_raw() override;
     virtual void set_value_raw(editor::color value) override;
 
-  private:
+private:
     color_getter_type* m_getter;
     color_setter_type* m_setter;
-};  // ref class property_color
+}; // ref class property_color
 
-#endif  // ifndef PROPERTY_COLOR_HPP_INCLUDED
+#endif // ifndef PROPERTY_COLOR_HPP_INCLUDED

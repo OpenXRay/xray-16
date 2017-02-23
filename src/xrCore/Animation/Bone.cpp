@@ -18,11 +18,7 @@
 
 static const Fobb dummy = Fobb().identity();
 
-const Fobb& CBone::get_obb() const
-{
-    return dummy;
-}
-
+const Fobb& CBone::get_obb() const { return dummy; }
 CBone::CBone()
 {
     construct();
@@ -34,10 +30,7 @@ CBone::CBone()
     ResetData();
 }
 
-CBone::~CBone()
-{
-}
-
+CBone::~CBone() {}
 void CBone::ResetData()
 {
     IK_data.Reset();
@@ -89,7 +82,8 @@ void CBone::Load_1(IReader& F)
     R_ASSERT(F.find_chunk(BONE_CHUNK_VERSION));
     u16 ver = F.r_u16();
 
-    if ((ver != 0x0001) && (ver != BONE_VERSION)) return;
+    if ((ver != 0x0001) && (ver != BONE_VERSION))
+        return;
 
     R_ASSERT(F.find_chunk(BONE_CHUNK_DEF));
     F.r_stringZ(name);
@@ -103,7 +97,8 @@ void CBone::Load_1(IReader& F)
     F.r_fvector3(rest_rotate);
     rest_length = F.r_float();
 
-    if (ver == 0x0001) std::swap(rest_rotate.x, rest_rotate.y);
+    if (ver == 0x0001)
+        std::swap(rest_rotate.x, rest_rotate.y);
 
     LoadData(F);
 }
@@ -160,7 +155,8 @@ void CBone::LoadData(IReader& F)
     R_ASSERT(F.find_chunk(BONE_CHUNK_SHAPE));
     F.r(&shape, sizeof(SBoneShape));
 
-    if (F.find_chunk(BONE_CHUNK_FLAGS)) IK_data.ik_flags.assign(F.r_u32());
+    if (F.find_chunk(BONE_CHUNK_FLAGS))
+        IK_data.ik_flags.assign(F.r_u32());
 
     R_ASSERT(F.find_chunk(BONE_CHUNK_IK_JOINT));
     IK_data.type = (EJointType)F.r_u32();
@@ -168,16 +164,19 @@ void CBone::LoadData(IReader& F)
     IK_data.spring_factor = F.r_float();
     IK_data.damping_factor = F.r_float();
 
-    if (F.find_chunk(BONE_CHUNK_IK_JOINT_BREAK)) {
+    if (F.find_chunk(BONE_CHUNK_IK_JOINT_BREAK))
+    {
         IK_data.break_force = F.r_float();
         IK_data.break_torque = F.r_float();
     }
 
-    if (F.find_chunk(BONE_CHUNK_IK_JOINT_FRICTION)) {
+    if (F.find_chunk(BONE_CHUNK_IK_JOINT_FRICTION))
+    {
         IK_data.friction = F.r_float();
     }
 
-    if (F.find_chunk(BONE_CHUNK_MASS)) {
+    if (F.find_chunk(BONE_CHUNK_MASS))
+    {
         mass = F.r_float();
         F.r_fvector3(center_of_mass);
     }

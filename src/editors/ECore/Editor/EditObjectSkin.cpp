@@ -28,7 +28,7 @@ class fBoneNameEQ
 {
     shared_str name;
 
-  public:
+public:
     fBoneNameEQ(shared_str N) : name(N){};
 
     IC
@@ -54,12 +54,14 @@ bool CEditableObject::LoadBoneData(IReader& F)
     }
     bool bRes = true;
     // load bones
-    if (!load_bones.empty()) {
+    if (!load_bones.empty())
+    {
         for (BoneIt b_it = m_Bones.begin(); b_it != m_Bones.end(); b_it++)
         {
             CBone* B = *b_it;
             BoneIt n_it = std::find_if(load_bones.begin(), load_bones.end(), fBoneNameEQ(B->Name()));
-            if (n_it != load_bones.end()) {
+            if (n_it != load_bones.end())
+            {
                 B->CopyData(*n_it);
             }
             else
@@ -81,7 +83,8 @@ bool CEditableObject::LoadBoneData(IReader& F)
         bRes = false;
     }
     // load bone part
-    if (F.find_chunk(EOBJ_CHUNK_BONEPARTS2)) {
+    if (F.find_chunk(EOBJ_CHUNK_BONEPARTS2))
+    {
         shared_str buf;
         m_BoneParts.resize(F.r_u32());
         for (BPIt bp_it = m_BoneParts.begin(); bp_it != m_BoneParts.end(); bp_it++)
@@ -131,7 +134,8 @@ void CEditableObject::RenderSkeletonSingle(const Fmatrix& parent)
 
 void CEditableObject::RenderBones(const Fmatrix& parent)
 {
-    if (IsSkeleton()) {
+    if (IsSkeleton())
+    {
         // render
         BoneVec& lst = m_Bones;
         for (BoneIt b_it = lst.begin(); b_it != lst.end(); b_it++)
@@ -141,12 +145,15 @@ void CEditableObject::RenderBones(const Fmatrix& parent)
             Fmatrix& M = (*b_it)->_LTransform();
             Fvector p1 = M.c;
             u32 c_joint = (*b_it)->flags.is(CBone::flSelected) ? color_bone_sel_color : color_bone_norm_color;
-            if (EPrefs->object_flags.is(epoDrawJoints)) DU_impl.DrawJoint(p1, joint_size, c_joint);
+            if (EPrefs->object_flags.is(epoDrawJoints))
+                DU_impl.DrawJoint(p1, joint_size, c_joint);
             // center of mass
-            if ((*b_it)->shape.type != SBoneShape::stNone) {
+            if ((*b_it)->shape.type != SBoneShape::stNone)
+            {
                 Fvector cm;
                 M.transform_tiny(cm, (*b_it)->center_of_mass);
-                if ((*b_it)->flags.is(CBone::flSelected)) {
+                if ((*b_it)->flags.is(CBone::flSelected))
+                {
                     float sz = joint_size * 2.f;
                     DU_impl.DrawCross(cm, sz, sz, sz, sz, sz, sz, 0xFFFFFFFF, false);
                     DU_impl.DrawRomboid(cm, joint_size * 0.7f, color_bone_sel_cm);
@@ -163,28 +170,33 @@ void CEditableObject::RenderBones(const Fmatrix& parent)
                             DU.DrawLine		(p1,p2,c_joint);
                         }
             */
-            if ((*b_it)->Parent()) {
+            if ((*b_it)->Parent())
+            {
                 EDevice.SetShader(EDevice.m_SelectionShader);
                 Fvector& p2 = (*b_it)->Parent()->_LTransform().c;
                 DU_impl.DrawLine(p1, p2, color_bone_link_color);
             }
-            if (EPrefs->object_flags.is(epoDrawBoneAxis)) {
+            if (EPrefs->object_flags.is(epoDrawBoneAxis))
+            {
                 Fmatrix mat;
                 mat.mul(parent, M);
                 DU_impl.DrawObjectAxis(mat, 0.03f, (*b_it)->flags.is(CBone::flSelected));
             }
-            if (EPrefs->object_flags.is(epoDrawBoneNames)) {
+            if (EPrefs->object_flags.is(epoDrawBoneNames))
+            {
                 parent.transform_tiny(p1);
                 u32 c = (*b_it)->flags.is(CBone::flSelected) ? 0xFFFFFFFF : 0xFF000000;
                 u32 s = (*b_it)->flags.is(CBone::flSelected) ? 0xFF000000 : 0xFF909090;
                 DU_impl.OutText(p1, (*b_it)->Name().c_str(), c, s);
             }
-            if (EPrefs->object_flags.is(epoDrawBoneShapes)) {
+            if (EPrefs->object_flags.is(epoDrawBoneShapes))
+            {
                 EDevice.SetShader(EDevice.m_SelectionShader);
                 Fmatrix mat = M;
                 mat.mulA_43(parent);
                 u32 c = (*b_it)->flags.is(CBone::flSelected) ? 0x80ffffff : 0x300000ff;
-                if ((*b_it)->shape.Valid()) {
+                if ((*b_it)->shape.Valid())
+                {
                     switch ((*b_it)->shape.type)
                     {
                     case SBoneShape::stBox: DU_impl.DrawOBB(mat, (*b_it)->shape.box, c, c); break;
@@ -207,7 +219,8 @@ CBone* CEditableObject::PickBone(const Fvector& S, const Fvector& D, const Fmatr
     CBone* sel = 0;
     for (BoneIt b_it = lst.begin(); b_it != lst.end(); b_it++)
     {
-        if ((*b_it)->Pick(dist, S, D, parent)) sel = *b_it;
+        if ((*b_it)->Pick(dist, S, D, parent))
+            sel = *b_it;
     }
     return sel;
 }
@@ -221,14 +234,16 @@ void CEditableObject::SelectBones(bool bVal)
 
 void CEditableObject::SelectBone(CBone* b, bool bVal)
 {
-    if (b) b->Select(bVal);
+    if (b)
+        b->Select(bVal);
 }
 
 int CEditableObject::GetSelectedBones(BoneVec& sel_bones)
 {
     BoneVec& lst = m_Bones;
     for (BoneIt b_it = lst.begin(); b_it != lst.end(); b_it++)
-        if ((*b_it)->flags.is(CBone::flSelected)) sel_bones.push_back(*b_it);
+        if ((*b_it)->flags.is(CBone::flSelected))
+            sel_bones.push_back(*b_it);
     return sel_bones.size();
 }
 
@@ -237,27 +252,26 @@ int CEditableObject::GetSelectedBones(BoneVec& sel_bones)
 #include "MgcCont3DMinSphere.h"
 #include "ExportSkeleton.h"
 
-BOOL f_valid(float f)
-{
-    return _finite(f) && !_isnan(f);
-}
-
+BOOL f_valid(float f) { return _finite(f) && !_isnan(f); }
 BOOL SphereValid(FvectorVec& geom, Fsphere& test)
 {
-    if (!f_valid(test.P.x) || !f_valid(test.R)) {
+    if (!f_valid(test.P.x) || !f_valid(test.R))
+    {
         Msg("*** Attention ***: invalid sphere: %f,%f,%f - %f", test.P.x, test.P.y, test.P.z, test.R);
     }
 
     Fsphere S = test;
     S.R += EPS_L;
     for (FvectorIt I = geom.begin(); I != geom.end(); I++)
-        if (!S.contains(*I)) return FALSE;
+        if (!S.contains(*I))
+            return FALSE;
     return TRUE;
 }
 
 void ComputeSphere(Fsphere& B, FvectorVec& V)
 {
-    if (V.size() < 3) {
+    if (V.size() < 3)
+    {
         B.P.set(0, 0, 0);
         B.R = 0.f;
         return;
@@ -280,7 +294,8 @@ void ComputeSphere(Fsphere& B, FvectorVec& V)
     for (I = V.begin(); I != V.end(); I++)
     {
         float d = S2.P.distance_to_sqr(*I);
-        if (d > S2.R) S2.R = d;
+        if (d > S2.R)
+            S2.R = d;
     }
     S2.R = _sqrt(_abs(S2.R));
     BOOL B2 = SphereValid(V, S2);
@@ -293,22 +308,25 @@ void ComputeSphere(Fsphere& B, FvectorVec& V)
     BOOL B3 = SphereValid(V, S3);
 
     // select best one
-    if (B1 && (S1.R < S2.R)) {      // miniball or FM
-        if (B3 && (S3.R < S1.R)) {  // FM wins
+    if (B1 && (S1.R < S2.R))
+    { // miniball or FM
+        if (B3 && (S3.R < S1.R))
+        { // FM wins
             B.set(S3);
         }
         else
-        {  // MiniBall wins
+        { // MiniBall wins
             B.set(S1);
         }
     }
     else
-    {                               // base or FM
-        if (B3 && (S3.R < S2.R)) {  // FM wins
+    { // base or FM
+        if (B3 && (S3.R < S2.R))
+        { // FM wins
             B.set(S3);
         }
         else
-        {  // Base wins :)
+        { // Base wins :)
             R_ASSERT(B2);
             B.set(S2);
         }
@@ -321,7 +339,8 @@ void ComputeSphere(Fsphere& B, FvectorVec& V)
 
 void ComputeCylinder(Fcylinder& C, Fobb& B, FvectorVec& V)
 {
-    if (V.size() < 3) {
+    if (V.size() < 3)
+    {
         C.invalidate();
         return;
     }
@@ -380,8 +399,10 @@ void ComputeCylinder(Fcylinder& C, Fobb& B, FvectorVec& V)
     // pow(area,(3/2))/volume
     // 2*Pi*R*H+2*Pi*R*R
 
-    if (vI < vJ) {
-        if (vI < vK) {
+    if (vI < vJ)
+    {
+        if (vI < vK)
+        {
             // vI;
             C.m_direction.set(axisI);
             C.m_height = hI;
@@ -398,7 +419,8 @@ void ComputeCylinder(Fcylinder& C, Fobb& B, FvectorVec& V)
     else
     {
         // vJ < vI
-        if (vJ < vK) {
+        if (vJ < vK)
+        {
             // vJ
             C.m_direction.set(axisJ);
             C.m_height = hJ;
@@ -442,17 +464,19 @@ bool CEditableObject::GenerateBoneShape(bool bSelOnly)
                 VERIFY(sv.bones.size() == 1);
                 u16 b_id =
                     sv.bones[0]
-                        .id;  //(sv.bones.size()>1)?(sv.bones[0].w>sv.bones[1].w?sv.bones[0].id:sv.bones[1].id):sv.bones[0].id;
+                        .id; //(sv.bones.size()>1)?(sv.bones[0].w>sv.bones[1].w?sv.bones[0].id:sv.bones[1].id):sv.bones[0].id;
                 FvectorVec& P = bone_points[b_id];
                 bool bFound = false;
                 Fvector p;
                 m_Bones[b_id]->_RITransform().transform_tiny(p, sv.offs);
                 for (FvectorIt p_it = P.begin(); p_it != P.end(); p_it++)
-                    if (p_it->similar(p)) {
+                    if (p_it->similar(p))
+                    {
                         bFound = true;
                         break;
                     }
-                if (!bFound) P.push_back(p);
+                if (!bFound)
+                    P.push_back(p);
                 //		        if (sv.bone1!=BI_NONE) bone_points[sv.bone1].push_back(sv.offs1);
             }
         }
@@ -462,7 +486,8 @@ bool CEditableObject::GenerateBoneShape(bool bSelOnly)
     BoneVec& lst = m_Bones;
     for (BoneIt b_it = lst.begin(); b_it != lst.end(); b_it++)
     {
-        if (bSelOnly && !(*b_it)->flags.is(CBone::flSelected)) continue;
+        if (bSelOnly && !(*b_it)->flags.is(CBone::flSelected))
+            continue;
         FvectorVec& positions = bone_points[b_it - lst.begin()];
         ComputeOBB_WML((*b_it)->shape.box, positions);
         ComputeSphere((*b_it)->shape.sphere, positions);
@@ -476,5 +501,6 @@ void CEditableObject::ClampByLimits(bool bSelOnly)
 {
     BoneVec& lst = m_Bones;
     for (BoneIt b_it = lst.begin(); b_it != lst.end(); b_it++)
-        if (!bSelOnly || (bSelOnly && (*b_it)->Selected())) (*b_it)->ClampByLimits();
+        if (!bSelOnly || (bSelOnly && (*b_it)->Selected()))
+            (*b_it)->ClampByLimits();
 }

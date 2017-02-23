@@ -30,10 +30,11 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount, bool u
 void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount)
 #endif
 {
-    if (pSurface) return;
+    if (pSurface)
+        return;
 
     R_ASSERT(HW.pDevice && Name && Name[0] && w && h);
-    _order = CPU::GetCLK();  // Device.GetTimerGlobal()->GetElapsed_clk();
+    _order = CPU::GetCLK(); // Device.GetTimerGlobal()->GetElapsed_clk();
 
     // HRESULT		_hr;
 
@@ -53,8 +54,10 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount)
     //}
 
     // Check width-and-height of render target surface
-    if (w > D3D_REQ_TEXTURE2D_U_OR_V_DIMENSION) return;
-    if (h > D3D_REQ_TEXTURE2D_U_OR_V_DIMENSION) return;
+    if (w > D3D_REQ_TEXTURE2D_U_OR_V_DIMENSION)
+        return;
+    if (h > D3D_REQ_TEXTURE2D_U_OR_V_DIMENSION)
+        return;
 
     // Select usage
     u32 usage = 0;
@@ -125,7 +128,8 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount)
     else
     {
         desc.BindFlags = (bUseAsDepth ? D3D_BIND_DEPTH_STENCIL : (D3D_BIND_SHADER_RESOURCE | D3D_BIND_RENDER_TARGET));
-        if (RImplementation.o.dx10_msaa_opt) {
+        if (RImplementation.o.dx10_msaa_opt)
+        {
             desc.SampleDesc.Quality = UINT(D3D_STANDARD_MULTISAMPLE_PATTERN);
         }
     }
@@ -140,14 +144,16 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount)
 // OK
 #ifdef DEBUG
     Msg("* created RT(%s), %dx%d, format = %d samples = %d", Name, w, h, dx10FMT, SampleCount);
-#endif  // DEBUG
+#endif // DEBUG
     // R_CHK		(pSurface->GetSurfaceLevel	(0,&pRT));
-    if (bUseAsDepth) {
+    if (bUseAsDepth)
+    {
         D3D_DEPTH_STENCIL_VIEW_DESC ViewDesc;
         ZeroMemory(&ViewDesc, sizeof(ViewDesc));
 
         ViewDesc.Format = DXGI_FORMAT_UNKNOWN;
-        if (SampleCount <= 1) {
+        if (SampleCount <= 1)
+        {
             ViewDesc.ViewDimension = D3D_DSV_DIMENSION_TEXTURE2D;
         }
         else
@@ -169,7 +175,8 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount)
         CHK_DX(HW.pDevice->CreateRenderTargetView(pSurface, 0, &pRT));
 
 #ifdef USE_DX11
-    if (HW.FeatureLevel >= D3D_FEATURE_LEVEL_11_0 && !bUseAsDepth && SampleCount == 1 && useUAV) {
+    if (HW.FeatureLevel >= D3D_FEATURE_LEVEL_11_0 && !bUseAsDepth && SampleCount == 1 && useUAV)
+    {
         D3D11_UNORDERED_ACCESS_VIEW_DESC UAVDesc;
         ZeroMemory(&UAVDesc, sizeof(D3D11_UNORDERED_ACCESS_VIEW_DESC));
         UAVDesc.Format = dx10FMT;
@@ -186,7 +193,8 @@ void CRT::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount)
 
 void CRT::destroy()
 {
-    if (pTexture._get()) {
+    if (pTexture._get())
+    {
         pTexture->surface_set(0);
         pTexture = NULL;
     }
@@ -199,15 +207,8 @@ void CRT::destroy()
     _RELEASE(pUAView);
 #endif
 }
-void CRT::reset_begin()
-{
-    destroy();
-}
-void CRT::reset_end()
-{
-    create(*cName, dwWidth, dwHeight, fmt);
-}
-
+void CRT::reset_begin() { destroy(); }
+void CRT::reset_end() { create(*cName, dwWidth, dwHeight, fmt); }
 #ifdef USE_DX11
 void resptrcode_crt::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount, bool useUAV)
 {

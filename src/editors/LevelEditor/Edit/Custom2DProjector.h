@@ -6,7 +6,7 @@
 
 class CCustom2DProjector
 {
-  protected:
+protected:
     ref_shader shader_blended;
     ref_shader shader_overlap;
     u32 w;
@@ -16,13 +16,13 @@ class CCustom2DProjector
     TVertVec mesh;
     ref_geom geom;
 
-  public:
+public:
     void __stdcall OnImageChange(PropValue* prop);
 
-  public:
+public:
     shared_str name;
 
-  public:
+public:
     CCustom2DProjector();
     IC
 
@@ -54,13 +54,13 @@ class CCustom2DProjector
     void DestroyShader();
 
     IC LPCSTR GetName() { return *name; }
-
     IC
 
         bool
         GetColor(u32& color, int U, int V)
     {
-        if (Valid() && (U < (int)w) && (V < (int)h)) {
+        if (Valid() && (U < (int)w) && (V < (int)h))
+        {
             color = data[V * w + U];
             return true;
         }
@@ -82,7 +82,8 @@ class CCustom2DProjector
         GetPixelUFromX(float x, const Fbox& box)
     {
         int U = iFloor(GetUFromX(x, box) * (w - 1) + 0.5f);
-        if (U < 0) U = 0;
+        if (U < 0)
+            U = 0;
         return U;
     }
 
@@ -101,7 +102,8 @@ class CCustom2DProjector
         GetPixelVFromZ(float z, const Fbox& box)
     {
         int V = iFloor(GetVFromZ(z, box) * (h - 1) + 0.5f);
-        if (V < 0) V = 0;
+        if (V < 0)
+            V = 0;
         return V;
     }
 };

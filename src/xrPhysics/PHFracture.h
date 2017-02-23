@@ -22,7 +22,6 @@ class CShellSplitInfo
     friend class CPHElement;
     IC bool HaveElements() { return m_end_el_num != m_start_el_num; }
     IC bool HaveJoints() { return m_start_jt_num != m_end_jt_num; }
-
 public:
     IC void sub_diapasone(const CShellSplitInfo& sub)
     {
@@ -78,29 +77,27 @@ typedef xr_vector<element_fracture>::reverse_iterator ELEMENT_PAIR_RI;
 typedef xr_vector<CPHFracture>::reverse_iterator FRACTURE_RI;
 DEFINE_VECTOR(element_fracture, ELEMENT_PAIR_VECTOR, ELEMENT_PAIR_I)
 
-class CPHFracturesHolder  // stored in CPHElement
+class CPHFracturesHolder // stored in CPHElement
 {
     friend class CPHElement;
     friend class CPHShellSplitterHolder;
     bool m_has_breaks;
 
     FRACTURE_STORAGE m_fractures;
-    PH_IMPACT_STORAGE m_impacts;    // filled in anytime from CPHElement applyImpulseTrace cleared in PhDataUpdate
-    CFEEDBACK_STORAGE m_feedbacks;  // this store feedbacks for non contact joints
+    PH_IMPACT_STORAGE m_impacts; // filled in anytime from CPHElement applyImpulseTrace cleared in PhDataUpdate
+    CFEEDBACK_STORAGE m_feedbacks; // this store feedbacks for non contact joints
 public:
     CPHFracturesHolder();
 
     ~CPHFracturesHolder();
-    void DistributeAdditionalMass(u16 geom_num, const dMass& m);  //
+    void DistributeAdditionalMass(u16 geom_num, const dMass& m); //
     void SubFractureMass(u16 fracture_num);
     void AddImpact(const Fvector& force, const Fvector& point, u16 id);
     PH_IMPACT_STORAGE& Impacts() { return m_impacts; }
-
     CPHFracture& LastFracture() { return m_fractures.back(); }
-
 protected:
 private:
-    u16 CheckFractured();  // returns first breaked fracture
+    u16 CheckFractured(); // returns first breaked fracture
 
     element_fracture SplitFromEnd(CPHElement* element, u16 geom_num);
     void InitNewElement(CPHElement* element, const Fmatrix& shift_pivot, float density);
@@ -110,16 +107,17 @@ public:
     void SplitProcess(CPHElement* element, ELEMENT_PAIR_VECTOR& new_elements);
     u16 AddFracture(const CPHFracture& fracture);
     CPHFracture& Fracture(u16 num);
-    void PhTune(dBodyID body);               // set feedback for joints called from PhTune of ShellSplitterHolder
-    bool PhDataUpdate(CPHElement* element);  // collect joints and external impacts in fractures Update which set
-                                             // m_fractured; called from PhDataUpdate of ShellSplitterHolder returns
-                                             // true if has breaks
+    void PhTune(dBodyID body); // set feedback for joints called from PhTune of ShellSplitterHolder
+    bool PhDataUpdate(CPHElement* element); // collect joints and external impacts in fractures Update which set
+    // m_fractured; called from PhDataUpdate of ShellSplitterHolder returns true
+    // if has breaks
     void ApplyImpactsToElement(CPHElement* element);
 };
 
 IC void sub_diapasones(u16& from1, u16& to1, const u16& from0, const u16& to0)
 {
-    if (from0 == to0 || from1 == to1 || to1 <= from0 || to1 == u16(-1)) return;
+    if (from0 == to0 || from1 == to1 || to1 <= from0 || to1 == u16(-1))
+        return;
     R_ASSERT(from0 >= from1 && to0 <= to1);
     u16 dip = to0 - from0;
     to1 = to1 - dip;

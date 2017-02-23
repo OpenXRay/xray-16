@@ -14,14 +14,12 @@ class CStateControlCamp : public CState<_Object>
 public:
     CStateControlCamp(_Object* obj) : inherited(obj) {}
     virtual ~CStateControlCamp() {}
-
     virtual void initialize();
     virtual void execute();
     virtual bool check_completion();
     virtual bool check_start_conditions();
 
     virtual void remove_links(IGameObject* object) {}
-
 private:
     virtual void update_target_angle();
 };

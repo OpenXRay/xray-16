@@ -10,14 +10,11 @@ class cphysics_joint_scripted : public cphysics_game_scripted<CPhysicsJoint>
 {
 public:
     cphysics_joint_scripted(CPhysicsJoint* imp) : cphysics_game_scripted<CPhysicsJoint>(imp) {}
-
     u16 BoneID() { return physics_impl().BoneID(); }
-
     cphysics_element_scripted* PFirst_element();
     cphysics_element_scripted* PSecond_element();
 
     u16 GetAxesNumber() { return physics_impl().GetAxesNumber(); }
-
     void SetAxisSDfactors(float spring_factor, float damping_factor, int axis_num)
     {
         physics_impl().SetAxisSDfactors(spring_factor, damping_factor, axis_num);

@@ -83,7 +83,8 @@ bool CLight::LoadLTX(CInifile& ini, LPCSTR sect_name)
 {
     u32 version = ini.r_u32(sect_name, "version");
 
-    if (version != LIGHT_VERSION) {
+    if (version != LIGHT_VERSION)
+    {
         ELog.DlgMsg(mtError, "CLight: Unsupported version.");
         return false;
     }
@@ -105,14 +106,17 @@ bool CLight::LoadLTX(CInifile& ini, LPCSTR sect_name)
     m_LControl = ini.r_u32(sect_name, "light_control");
 
     LPCSTR anm = ini.r_string(sect_name, "anim_ref_name");
-    if (anm) {
+    if (anm)
+    {
         m_pAnimRef = LALib.FindItem(anm);
-        if (!m_pAnimRef) ELog.Msg(mtError, "Can't find light animation: %s", anm);
+        if (!m_pAnimRef)
+            ELog.Msg(mtError, "Can't find light animation: %s", anm);
     }
 
     m_FalloffTex = ini.r_string(sect_name, "fallof_texture");
 
-    if (m_Flags.is(ELight::flPointFuzzy)) {
+    if (m_Flags.is(ELight::flPointFuzzy))
+    {
         m_FuzzyData = new SFuzzyData();
         m_FuzzyData->LoadLTX(ini, sect_name);
     }
@@ -145,7 +149,8 @@ void CLight::SaveLTX(CInifile& ini, LPCSTR sect_name)
 
     ini.w_string(sect_name, "fallof_texture", m_FalloffTex.c_str());
 
-    if (m_Flags.is(ELight::flPointFuzzy)) {
+    if (m_Flags.is(ELight::flPointFuzzy))
+    {
         VERIFY(m_FuzzyData);
         m_FuzzyData->SaveLTX(ini, sect_name);
     }
@@ -157,14 +162,16 @@ bool CLight::LoadStream(IReader& F)
 
     string1024 buf;
     R_ASSERT(F.r_chunk(LIGHT_CHUNK_VERSION, &version));
-    if ((version != 0x0010) && (version != LIGHT_VERSION)) {
+    if ((version != 0x0010) && (version != LIGHT_VERSION))
+    {
         ELog.DlgMsg(mtError, "CLight: Unsupported version.");
         return false;
     }
 
     CCustomObject::LoadStream(F);
 
-    if (F.find_chunk(LIGHT_CHUNK_PARAMS)) {
+    if (F.find_chunk(LIGHT_CHUNK_PARAMS))
+    {
         m_Type = (ELight::EType)F.r_u32();
         F.r_fcolor(m_Color);
         m_Brightness = F.r_float();
@@ -193,11 +200,14 @@ bool CLight::LoadStream(IReader& F)
 
     R_ASSERT(F.r_chunk(LIGHT_CHUNK_USE_IN_D3D, &m_UseInD3D));
 
-    if (F.find_chunk(LIGHT_CHUNK_FLAG)) F.r(&m_Flags.flags, sizeof(m_Flags));
+    if (F.find_chunk(LIGHT_CHUNK_FLAG))
+        F.r(&m_Flags.flags, sizeof(m_Flags));
 
-    if (F.find_chunk(LIGHT_CHUNK_LCONTROL)) F.r(&m_LControl, sizeof(m_LControl));
+    if (F.find_chunk(LIGHT_CHUNK_LCONTROL))
+        F.r(&m_LControl, sizeof(m_LControl));
 
-    if (D3DLIGHT_DIRECTIONAL == m_Type) {
+    if (D3DLIGHT_DIRECTIONAL == m_Type)
+    {
         ESceneLightTool* lt = dynamic_cast<ESceneLightTool*>(ParentTool);
         VERIFY(lt);
         lt->m_SunShadowDir.set(FRotation.x, FRotation.y);
@@ -205,17 +215,21 @@ bool CLight::LoadStream(IReader& F)
         return false;
     }
 
-    if (F.find_chunk(LIGHT_CHUNK_ANIMREF)) {
+    if (F.find_chunk(LIGHT_CHUNK_ANIMREF))
+    {
         F.r_stringZ(buf, sizeof(buf));
         m_pAnimRef = LALib.FindItem(buf);
-        if (!m_pAnimRef) ELog.Msg(mtError, "Can't find light animation: %s", buf);
+        if (!m_pAnimRef)
+            ELog.Msg(mtError, "Can't find light animation: %s", buf);
     }
 
-    if (F.find_chunk(LIGHT_CHUNK_FALLOFF_TEXTURE)) {
+    if (F.find_chunk(LIGHT_CHUNK_FALLOFF_TEXTURE))
+    {
         F.r_stringZ(m_FalloffTex);
     }
 
-    if (F.find_chunk(LIGHT_CHUNK_FUZZY_DATA)) {
+    if (F.find_chunk(LIGHT_CHUNK_FUZZY_DATA))
+    {
         m_FuzzyData = new SFuzzyData();
         m_FuzzyData->LoadStream(F);
         m_Flags.set(ELight::flPointFuzzy, TRUE);
@@ -256,19 +270,22 @@ void CLight::SaveStream(IWriter& F)
     F.w_chunk(LIGHT_CHUNK_FLAG, &m_Flags, sizeof(m_Flags));
     F.w_chunk(LIGHT_CHUNK_LCONTROL, &m_LControl, sizeof(m_LControl));
 
-    if (m_pAnimRef) {
+    if (m_pAnimRef)
+    {
         F.open_chunk(LIGHT_CHUNK_ANIMREF);
         F.w_stringZ(m_pAnimRef->cName);
         F.close_chunk();
     }
 
-    if (m_FalloffTex.size()) {
+    if (m_FalloffTex.size())
+    {
         F.open_chunk(LIGHT_CHUNK_FALLOFF_TEXTURE);
         F.w_stringZ(m_FalloffTex);
         F.close_chunk();
     }
 
-    if (m_Flags.is(ELight::flPointFuzzy)) {
+    if (m_Flags.is(ELight::flPointFuzzy))
+    {
         VERIFY(m_FuzzyData);
         F.open_chunk(LIGHT_CHUNK_FUZZY_DATA);
         m_FuzzyData->SaveStream(F);

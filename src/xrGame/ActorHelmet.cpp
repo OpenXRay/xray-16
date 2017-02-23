@@ -16,11 +16,7 @@ CHelmet::CHelmet()
     m_boneProtection = new SBoneProtections();
 }
 
-CHelmet::~CHelmet()
-{
-    xr_delete(m_boneProtection);
-}
-
+CHelmet::~CHelmet() { xr_delete(m_boneProtection); }
 void CHelmet::Load(LPCSTR section)
 {
     inherited::Load(section);
@@ -33,7 +29,7 @@ void CHelmet::Load(LPCSTR section)
     m_HitTypeProtection[ALife::eHitTypeTelepatic] = pSettings->r_float(section, "telepatic_protection");
     m_HitTypeProtection[ALife::eHitTypeChemicalBurn] = pSettings->r_float(section, "chemical_burn_protection");
     m_HitTypeProtection[ALife::eHitTypeExplosion] = pSettings->r_float(section, "explosion_protection");
-    m_HitTypeProtection[ALife::eHitTypeFireWound] = 0.0f;  // pSettings->r_float(section,"fire_wound_protection");
+    m_HitTypeProtection[ALife::eHitTypeFireWound] = 0.0f; // pSettings->r_float(section,"fire_wound_protection");
     //	m_HitTypeProtection[ALife::eHitTypePhysicStrike]= pSettings->r_float(section,"physic_strike_protection");
     m_HitTypeProtection[ALife::eHitTypeLightBurn] = m_HitTypeProtection[ALife::eHitTypeBurn];
     m_boneProtection->m_fHitFracActor = pSettings->r_float(section, "hit_fraction_actor");
@@ -58,7 +54,8 @@ void CHelmet::Load(LPCSTR section)
 void CHelmet::ReloadBonesProtection()
 {
     IGameObject* parent = H_Parent();
-    if (IsGameTypeSingle()) parent = smart_cast<IGameObject*>(Level().CurrentViewEntity());
+    if (IsGameTypeSingle())
+        parent = smart_cast<IGameObject*>(Level().CurrentViewEntity());
 
     if (parent && parent->Visual() && m_BonesProtectionSect.size())
         m_boneProtection->reload(m_BonesProtectionSect, smart_cast<IKinematics*>(parent->Visual()));
@@ -66,7 +63,8 @@ void CHelmet::ReloadBonesProtection()
 
 BOOL CHelmet::net_Spawn(CSE_Abstract* DC)
 {
-    if (IsGameTypeSingle()) ReloadBonesProtection();
+    if (IsGameTypeSingle())
+        ReloadBonesProtection();
 
     BOOL res = inherited::net_Spawn(DC);
     return (res);
@@ -95,11 +93,14 @@ void CHelmet::OnH_A_Chield()
 void CHelmet::OnMoveToSlot(const SInvItemPlace& previous_place)
 {
     inherited::OnMoveToSlot(previous_place);
-    if (m_pInventory && (previous_place.type == eItemPlaceSlot)) {
+    if (m_pInventory && (previous_place.type == eItemPlaceSlot))
+    {
         CActor* pActor = smart_cast<CActor*>(H_Parent());
-        if (pActor) {
+        if (pActor)
+        {
             CTorch* pTorch = smart_cast<CTorch*>(pActor->inventory().ItemFromSlot(TORCH_SLOT));
-            if (pTorch && pTorch->GetNightVisionStatus()) pTorch->SwitchNightVision(true, false);
+            if (pTorch && pTorch->GetNightVisionStatus())
+                pTorch->SwitchNightVision(true, false);
         }
     }
 }
@@ -107,11 +108,14 @@ void CHelmet::OnMoveToSlot(const SInvItemPlace& previous_place)
 void CHelmet::OnMoveToRuck(const SInvItemPlace& previous_place)
 {
     inherited::OnMoveToRuck(previous_place);
-    if (m_pInventory && (previous_place.type == eItemPlaceSlot)) {
+    if (m_pInventory && (previous_place.type == eItemPlaceSlot))
+    {
         CActor* pActor = smart_cast<CActor*>(H_Parent());
-        if (pActor) {
+        if (pActor)
+        {
             CTorch* pTorch = smart_cast<CTorch*>(pActor->inventory().ItemFromSlot(TORCH_SLOT));
-            if (pTorch) pTorch->SwitchNightVision(false);
+            if (pTorch)
+                pTorch->SwitchNightVision(false);
         }
     }
 }
@@ -134,11 +138,7 @@ float CHelmet::GetHitTypeProtection(ALife::EHitType hit_type, s16 element)
     return fBase * bone;
 }
 
-float CHelmet::GetBoneArmor(s16 element)
-{
-    return m_boneProtection->getBoneArmor(element);
-}
-
+float CHelmet::GetBoneArmor(s16 element) { return m_boneProtection->getBoneArmor(element); }
 bool CHelmet::install_upgrade_impl(LPCSTR section, bool test)
 {
     bool result = inherited::install_upgrade_impl(section, test);
@@ -164,7 +164,8 @@ bool CHelmet::install_upgrade_impl(LPCSTR section, bool test)
 
     LPCSTR str;
     bool result2 = process_if_exists_set(section, "nightvision_sect", &CInifile::r_string, str, test);
-    if (result2 && !test) {
+    if (result2 && !test)
+    {
         m_NightVisionSect._set(str);
     }
     result |= result2;
@@ -182,12 +183,14 @@ bool CHelmet::install_upgrade_impl(LPCSTR section, bool test)
         section, "nearest_enemies_show_dist", &CInifile::r_float, m_fShowNearestEnemiesDistance, test);
 
     result2 = process_if_exists_set(section, "bones_koeff_protection", &CInifile::r_string, str, test);
-    if (result2 && !test) {
+    if (result2 && !test)
+    {
         m_BonesProtectionSect = str;
         ReloadBonesProtection();
     }
     result2 = process_if_exists_set(section, "bones_koeff_protection_add", &CInifile::r_string, str, test);
-    if (result2 && !test) AddBonesProtection(str);
+    if (result2 && !test)
+        AddBonesProtection(str);
 
     return result;
 }
@@ -195,7 +198,8 @@ bool CHelmet::install_upgrade_impl(LPCSTR section, bool test)
 void CHelmet::AddBonesProtection(LPCSTR bones_section)
 {
     IGameObject* parent = H_Parent();
-    if (IsGameTypeSingle()) parent = smart_cast<IGameObject*>(Level().CurrentViewEntity());
+    if (IsGameTypeSingle())
+        parent = smart_cast<IGameObject*>(Level().CurrentViewEntity());
 
     if (parent && parent->Visual() && m_BonesProtectionSect.size())
         m_boneProtection->add(bones_section, smart_cast<IKinematics*>(parent->Visual()));
@@ -204,16 +208,21 @@ void CHelmet::AddBonesProtection(LPCSTR bones_section)
 float CHelmet::HitThroughArmor(float hit_power, s16 element, float ap, bool& add_wound, ALife::EHitType hit_type)
 {
     float NewHitPower = hit_power;
-    if (hit_type == ALife::eHitTypeFireWound) {
+    if (hit_type == ALife::eHitTypeFireWound)
+    {
         float ba = GetBoneArmor(element);
-        if (ba < 0.0f) return NewHitPower;
+        if (ba < 0.0f)
+            return NewHitPower;
 
         float BoneArmor = ba * GetCondition();
-        if (/*!fis_zero(ba, EPS) && */ (ap > BoneArmor)) {
+        if (/*!fis_zero(ba, EPS) && */ (ap > BoneArmor))
+        {
             //пул€ пробила бронь
-            if (!IsGameTypeSingle()) {
+            if (!IsGameTypeSingle())
+            {
                 float hit_fraction = (ap - BoneArmor) / ap;
-                if (hit_fraction < m_boneProtection->m_fHitFracActor) hit_fraction = m_boneProtection->m_fHitFracActor;
+                if (hit_fraction < m_boneProtection->m_fHitFracActor)
+                    hit_fraction = m_boneProtection->m_fHitFracActor;
 
                 NewHitPower *= hit_fraction;
                 NewHitPower *= m_boneProtection->getBoneProtection(element);
@@ -225,7 +234,7 @@ float CHelmet::HitThroughArmor(float hit_power, s16 element, float ap, bool& add
         {
             //пул€ Ќ≈ пробила бронь
             NewHitPower *= m_boneProtection->m_fHitFracActor;
-            add_wound = false;  //раны нет
+            add_wound = false; //раны нет
         }
     }
     else
@@ -239,7 +248,8 @@ float CHelmet::HitThroughArmor(float hit_power, s16 element, float ap, bool& add
         float protect = GetDefHitTypeProtection(hit_type);
         NewHitPower -= protect * one;
 
-        if (NewHitPower < 0.f) NewHitPower = 0.f;
+        if (NewHitPower < 0.f)
+            NewHitPower = 0.f;
     }
     //увеличить изношенность шлема
     Hit(hit_power, hit_type);

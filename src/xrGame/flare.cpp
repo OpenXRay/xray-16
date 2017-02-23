@@ -17,15 +17,8 @@ BOOL CFlare::net_Spawn(CSE_Abstract* DC)
     return TRUE;
 }
 
-void CFlare::net_Destroy()
-{
-    inherited::net_Destroy();
-}
-
-void CFlare::UpdateXForm()
-{
-}
-
+void CFlare::net_Destroy() { inherited::net_Destroy(); }
+void CFlare::UpdateXForm() {}
 void CFlare::ActivateFlare()
 {
     VERIFY(!IsFlareActive());
@@ -35,7 +28,8 @@ void CFlare::ActivateFlare()
 
 bool CFlare::IsFlareActive()
 {
-    if (NULL == HudItemData()) return false;
+    if (NULL == HudItemData())
+        return false;
 
     VERIFY(g_player_hud->attached_item(HudItemData()->m_attach_place_idx) == HudItemData());
 
@@ -101,7 +95,7 @@ void CFlare::OnAnimationEnd(u32 state)
 
 void CFlare::SwitchOn()
 {
-    static int lt = 1;  // IRender_Light::POINT
+    static int lt = 1; // IRender_Light::POINT
     static bool ls = true;
     light_render = GlobalEnv.Render->light_create();
     light_render->set_type((IRender_Light::LT)lt);
@@ -124,20 +118,23 @@ void CFlare::SwitchOff()
 
 void CFlare::DropFlare()
 {
-    if (GetState() != eFlareHidden) SwitchState(eFlareDropping);
+    if (GetState() != eFlareHidden)
+        SwitchState(eFlareDropping);
 }
 
 void CFlare::UpdateCL()
 {
     inherited::UpdateCL();
 
-    if (light_render /* && HudItemData()*/) {
+    if (light_render /* && HudItemData()*/)
+    {
         float _c = CurrStateTime() / 1000.0f;
-        if (fsimilar(_c, m_work_time_sec) || _c > m_work_time_sec) {
+        if (fsimilar(_c, m_work_time_sec) || _c > m_work_time_sec)
+        {
             SwitchOff();
             return;
         }
-        if (_c + 2.0f > m_work_time_sec)  // 2sec
+        if (_c + 2.0f > m_work_time_sec) // 2sec
         {
             DropFlare();
         }
@@ -171,7 +168,8 @@ void CFlare::UpdateCL()
 
 void CFlare::FirePoint(Fvector& _fp)
 {
-    if (HudItemData()) {
+    if (HudItemData())
+    {
         firedeps _current_firedeps;
         HudItemData()->setup_firedeps(_current_firedeps);
         _fp.set(_current_firedeps.vLastFP);
@@ -188,7 +186,8 @@ void CFlare::FirePoint(Fvector& _fp)
 
 void CFlare::ParticlesMatrix(Fmatrix& _pm)
 {
-    if (HudItemData()) {
+    if (HudItemData())
+    {
         firedeps _current_firedeps;
         HudItemData()->setup_firedeps(_current_firedeps);
         _pm.set(_current_firedeps.m_FireParticlesXForm);

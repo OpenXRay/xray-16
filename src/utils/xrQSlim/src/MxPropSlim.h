@@ -1,4 +1,4 @@
-#ifndef MXPROPSLIM_INCLUDED  // -*- C++ -*-
+#ifndef MXPROPSLIM_INCLUDED // -*- C++ -*-
 #define MXPROPSLIM_INCLUDED
 #if !defined(__GNUC__)
 #pragma once
@@ -35,8 +35,8 @@ private:
         edge_info(unsigned int D) : target(D) {}
     };
     typedef MxSizedDynBlock<edge_info*, 6> edge_list;
-    MxBlock<edge_list> edge_links;   // 1 per vertex
-    MxBlock<MxQuadric*> __quadrics;  // 1 per vertex
+    MxBlock<edge_list> edge_links; // 1 per vertex
+    MxBlock<MxQuadric*> __quadrics; // 1 per vertex
 
     //
     // Temporary variables used by methods
@@ -82,7 +82,6 @@ public:
     bool decimate(unsigned int, float max_error, void* cb_params = 0);
 
     unsigned int dim() const { return D; }
-
     void consider_color(bool will = true);
     void consider_texture(bool will = true);
     void consider_normals(bool will = true);

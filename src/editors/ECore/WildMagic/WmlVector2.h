@@ -18,7 +18,7 @@ namespace Wml
 template <class Real>
 class Vector2 : public Vector<2, Real>
 {
-  public:
+public:
     // construction
     Vector2();
     Vector2(Real fX, Real fY);

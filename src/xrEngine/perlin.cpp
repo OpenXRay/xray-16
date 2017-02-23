@@ -16,11 +16,11 @@
 #define s_curve(t) (t * t * (3.0f - 2.0f * t))
 #define lerp(t, a, b) (a + t * (b - a))
 
-#define setup(i, b0, b1, r0, r1)                                                                                       \
-    t = vec[i] + N;                                                                                                    \
-    b0 = ((int)t) & BM;                                                                                                \
-    b1 = (b0 + 1) & BM;                                                                                                \
-    r0 = t - (int)t;                                                                                                   \
+#define setup(i, b0, b1, r0, r1) \
+    t = vec[i] + N;              \
+    b0 = ((int)t) & BM;          \
+    b1 = (b0 + 1) & BM;          \
+    r0 = t - (int)t;             \
     r1 = r0 - 1.0f;
 
 //-------------------------------------------------------------------------------------------------
@@ -57,7 +57,8 @@ float CPerlinNoise1D::noise(float arg)
 
     vec[0] = arg;
 
-    if (!mReady) {
+    if (!mReady)
+    {
         srand(mSeed);
         mReady = true;
         init();
@@ -90,7 +91,8 @@ float CPerlinNoise1D::Get(float v)
 float CPerlinNoise1D::GetContinious(float v)
 {
     float t_v = v;
-    if (mPrevContiniousTime != 0.0f) {
+    if (mPrevContiniousTime != 0.0f)
+    {
         v -= mPrevContiniousTime;
     }
     mPrevContiniousTime = t_v;
@@ -144,7 +146,8 @@ float CPerlinNoise2D::noise(const Fvector2& vec)
     float rx0, rx1, ry0, ry1, *q, sx, sy, a, b, t, u, v;
     int i, j;
 
-    if (!mReady) {
+    if (!mReady)
+    {
         srand(mSeed);
         mReady = true;
         init();
@@ -244,7 +247,8 @@ float CPerlinNoise3D::noise(const Fvector3& vec)
     float rx0, rx1, ry0, ry1, rz0, rz1, *q, sy, sz, a, b, c, d, t, u, v;
     int i, j;
 
-    if (!mReady) {
+    if (!mReady)
+    {
         srand(mSeed);
         mReady = true;
         init();

@@ -13,7 +13,8 @@ int xrSimulate(xr_vector<u16>& indices, int iCacheSize)
     for (u32 i = 0; i < indices.size(); i++)
     {
         int id = indices[i];
-        if (C.InCache(id)) continue;
+        if (C.InCache(id))
+            continue;
         count++;
         C.AddEntry(id);
     }
@@ -31,7 +32,8 @@ void xrStripify(xr_vector<u16>& indices, xr_vector<u16>& perturb, int iCacheSize
     GenerateStrips(&*indices.begin(), (u32)indices.size(), PGROUP);
     R_ASSERT(PGROUP.size() == 1);
     R_ASSERT(PGROUP[0].type == PT_LIST);
-    if (indices.size() != PGROUP[0].numIndices) throw "Stripify failed.";
+    if (indices.size() != PGROUP[0].numIndices)
+        throw "Stripify failed.";
 
     // Remap indices
     xr_vector<PrimitiveGroup> xPGROUP;
@@ -59,7 +61,8 @@ void xrStripify(xr_vector<u16>& indices, xr_vector<u16>& perturb, int iCacheSize
 
 void OGF::Stripify()
 {
-    if (progressive_test()) return;  // Mesh already progressive - don't stripify it
+    if (progressive_test())
+        return; // Mesh already progressive - don't stripify it
 
     // fast verts
     if (fast_path_data.vertices.size() && fast_path_data.faces.size())

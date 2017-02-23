@@ -60,7 +60,6 @@ public:
     ETelekineticState get_state() { return state; }
     virtual void switch_state(ETelekineticState new_state);
     CPhysicsShellHolder* get_object() { return object; }
-
     bool check_height();
     bool check_raise_time_out();
 
@@ -70,7 +69,6 @@ public:
     void enable();
 
     bool operator==(const CPhysicsShellHolder* obj) { return (object == obj); }
-
     void rotate();
 
 private:

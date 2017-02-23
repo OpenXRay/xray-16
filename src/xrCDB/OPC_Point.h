@@ -49,7 +49,6 @@ public:
     inline_ Point(const Point& p) : x(p.x), y(p.y), z(p.z) {}
     //! Destructor
     inline_ ~Point() {}
-
     //! Clears the vector3
     inline_ Point& Zero()
     {
@@ -325,12 +324,18 @@ public:
     //! Clamps each element
     inline_ Point& Clamp(float min, float max)
     {
-        if (x < min) x = min;
-        if (x > max) x = max;
-        if (y < min) y = min;
-        if (y > max) y = max;
-        if (z < min) z = min;
-        if (z > max) z = max;
+        if (x < min)
+            x = min;
+        if (x > max)
+            x = max;
+        if (y < min)
+            y = min;
+        if (y > max)
+            y = max;
+        if (z < min)
+            z = min;
+        if (z > max)
+            z = max;
         return *this;
     }
 
@@ -340,24 +345,25 @@ public:
     inline_ float Magnitude() const { return _sqrt(x * x + y * y + z * z); }
     //! Computes volume
     inline_ float Volume() const { return x * y * z; }
-
     //! Checks the point is near zero
     bool ApproxZero() const { return SquareMagnitude() < EPSILON2; }
-
     //! Slighty moves the point
     void Tweak(udword coordmask, udword tweakmask)
     {
-        if (coordmask & 1) {
+        if (coordmask & 1)
+        {
             udword Dummy = IR(x);
             Dummy ^= tweakmask;
             x = FR(Dummy);
         }
-        if (coordmask & 2) {
+        if (coordmask & 2)
+        {
             udword Dummy = IR(y);
             Dummy ^= tweakmask;
             y = FR(Dummy);
         }
-        if (coordmask & 4) {
+        if (coordmask & 4)
+        {
             udword Dummy = IR(z);
             Dummy ^= tweakmask;
             z = FR(Dummy);
@@ -370,13 +376,16 @@ public:
     inline_ void TweakBigger()
     {
         udword Dummy = (IR(x) & TWEAKNOTMASK);
-        if (!IS_NEGATIVE_FLOAT(x)) Dummy += TWEAKMASK + 1;
+        if (!IS_NEGATIVE_FLOAT(x))
+            Dummy += TWEAKMASK + 1;
         x = FR(Dummy);
         Dummy = (IR(y) & TWEAKNOTMASK);
-        if (!IS_NEGATIVE_FLOAT(y)) Dummy += TWEAKMASK + 1;
+        if (!IS_NEGATIVE_FLOAT(y))
+            Dummy += TWEAKMASK + 1;
         y = FR(Dummy);
         Dummy = (IR(z) & TWEAKNOTMASK);
-        if (!IS_NEGATIVE_FLOAT(z)) Dummy += TWEAKMASK + 1;
+        if (!IS_NEGATIVE_FLOAT(z))
+            Dummy += TWEAKMASK + 1;
         z = FR(Dummy);
     }
 
@@ -384,13 +393,16 @@ public:
     inline_ void TweakSmaller()
     {
         udword Dummy = (IR(x) & TWEAKNOTMASK);
-        if (IS_NEGATIVE_FLOAT(x)) Dummy += TWEAKMASK + 1;
+        if (IS_NEGATIVE_FLOAT(x))
+            Dummy += TWEAKMASK + 1;
         x = FR(Dummy);
         Dummy = (IR(y) & TWEAKNOTMASK);
-        if (IS_NEGATIVE_FLOAT(y)) Dummy += TWEAKMASK + 1;
+        if (IS_NEGATIVE_FLOAT(y))
+            Dummy += TWEAKMASK + 1;
         y = FR(Dummy);
         Dummy = (IR(z) & TWEAKNOTMASK);
-        if (IS_NEGATIVE_FLOAT(z)) Dummy += TWEAKMASK + 1;
+        if (IS_NEGATIVE_FLOAT(z))
+            Dummy += TWEAKMASK + 1;
         z = FR(Dummy);
     }
 
@@ -398,7 +410,8 @@ public:
     inline_ Point& Normalize()
     {
         float M = x * x + y * y + z * z;
-        if (M) {
+        if (M)
+        {
             M = 1.0f / _sqrt(M);
             x *= M;
             y *= M;
@@ -431,7 +444,6 @@ public:
 
     //! Dot product dp = this|a
     inline_ float Dot(const Point& p) const { return p.x * x + p.y * y + p.z * z; }
-
     //! Cross product this = a x b
     inline_ Point& Cross(const Point& a, const Point& b)
     {
@@ -452,8 +464,10 @@ public:
     {
         const float* Vals = &x;
         PointComponent m = _X;
-        if (Vals[_Y] > Vals[m]) m = _Y;
-        if (Vals[_Z] > Vals[m]) m = _Z;
+        if (Vals[_Y] > Vals[m])
+            m = _Y;
+        if (Vals[_Z] > Vals[m])
+            m = _Z;
         return m;
     }
 
@@ -462,8 +476,10 @@ public:
     {
         const float* Vals = &x;
         PointComponent m = _X;
-        if (AIR(Vals[_Y]) > AIR(Vals[m])) m = _Y;
-        if (AIR(Vals[_Z]) > AIR(Vals[m])) m = _Z;
+        if (AIR(Vals[_Y]) > AIR(Vals[m]))
+            m = _Y;
+        if (AIR(Vals[_Z]) > AIR(Vals[m]))
+            m = _Z;
         return m;
     }
 
@@ -472,8 +488,10 @@ public:
     {
         const float* Vals = &x;
         PointComponent m = _X;
-        if (Vals[_Y] < Vals[m]) m = _Y;
-        if (Vals[_Z] < Vals[m]) m = _Z;
+        if (Vals[_Y] < Vals[m])
+            m = _Y;
+        if (Vals[_Z] < Vals[m])
+            m = _Z;
         return m;
     }
 
@@ -493,7 +511,7 @@ public:
     inline_ udword GetHashValue() const
     {
         const udword* h = (const udword*)(this);
-        udword f = (h[0] + h[1] * 11 - (h[2] * 17)) & 0x7fffffff;  // avoid problems with +-0
+        udword f = (h[0] + h[1] * 11 - (h[2] * 17)) & 0x7fffffff; // avoid problems with +-0
         return (f >> 22) ^ (f >> 12) ^ (f);
     }
 
@@ -501,19 +519,16 @@ public:
 
     //! Unary operator for Point Negate = - Point
     inline_ Point operator-() const { return Point(-x, -y, -z); }
-
     //! Operator for Point Plus = Point + Point.
     inline_ Point operator+(const Point& p) const { return Point(x + p.x, y + p.y, z + p.z); }
     //! Operator for Point Minus = Point - Point.
     inline_ Point operator-(const Point& p) const { return Point(x - p.x, y - p.y, z - p.z); }
-
     //! Operator for Point Mul   = Point * Point.
     inline_ Point operator*(const Point& p) const { return Point(x * p.x, y * p.y, z * p.z); }
     //! Operator for Point Scale = Point * float.
     inline_ Point operator*(float s) const { return Point(x * s, y * s, z * s); }
     //! Operator for Point Scale = float * Point.
     inline_ friend Point operator*(float s, const Point& p) { return Point(s * p.x, s * p.y, s * p.z); }
-
     //! Operator for Point Div   = Point / Point.
     inline_ Point operator/(const Point& p) const { return Point(x / p.x, y / p.y, z / p.z); }
     //! Operator for Point Scale = Point / float.
@@ -524,12 +539,10 @@ public:
     }
     //! Operator for Point Scale = float / Point.
     inline_ friend Point operator/(float s, const Point& p) { return Point(s / p.x, s / p.y, s / p.z); }
-
     //! Operator for float DotProd = Point | Point.
     inline_ float operator|(const Point& p) const { return x * p.x + y * p.y + z * p.z; }
     //! Operator for Point VecProd = Point ^ Point.
     ICF Point operator^(const Point& p) const { return Point(y * p.z - z * p.y, z * p.x - x * p.z, x * p.y - y * p.x); }
-
     //! Operator for Point += Point.
     inline_ Point& operator+=(const Point& p)
     {
@@ -621,7 +634,7 @@ public:
         {
         public:
             float m[3][3];
-        };  // To allow inlining
+        }; // To allow inlining
         const ShadowMatrix3x3* Mat = (const ShadowMatrix3x3*)&mat;
 
         return Point(x * Mat->m[0][0] + y * Mat->m[1][0] + z * Mat->m[2][0],
@@ -636,7 +649,7 @@ public:
         {
         public:
             float m[4][4];
-        };  // To allow inlining
+        }; // To allow inlining
         const ShadowMatrix4x4* Mat = (const ShadowMatrix4x4*)&mat;
 
         return Point(x * Mat->m[0][0] + y * Mat->m[1][0] + z * Mat->m[2][0] + Mat->m[3][0],
@@ -651,7 +664,7 @@ public:
         {
         public:
             float m[3][3];
-        };  // To allow inlining
+        }; // To allow inlining
         const ShadowMatrix3x3* Mat = (const ShadowMatrix3x3*)&mat;
 
         float xp = x * Mat->m[0][0] + y * Mat->m[1][0] + z * Mat->m[2][0];
@@ -672,7 +685,7 @@ public:
         {
         public:
             float m[4][4];
-        };  // To allow inlining
+        }; // To allow inlining
         const ShadowMatrix4x4* Mat = (const ShadowMatrix4x4*)&mat;
 
         float xp = x * Mat->m[0][0] + y * Mat->m[1][0] + z * Mat->m[2][0] + Mat->m[3][0];
@@ -693,7 +706,6 @@ public:
 
     inline_ operator const float*() const { return &x; }
     inline_ operator float*() { return &x; }
-
 public:
     float x, y, z;
 };
@@ -701,4 +713,4 @@ public:
 FUNCTION ICEMATHS_API void Normalize1(Point& a);
 FUNCTION ICEMATHS_API void Normalize2(Point& a);
 
-#endif  //__ICEPOINT_H__
+#endif //__ICEPOINT_H__

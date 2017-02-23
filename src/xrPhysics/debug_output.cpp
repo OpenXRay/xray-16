@@ -9,7 +9,6 @@ static class DebugOutputEmptyImpl : public IDebugOutput
 
     virtual const Flags32& ph_dbg_draw_mask() const { return m1; };
     virtual const Flags32& ph_dbg_draw_mask1() const { return m2; }
-
     virtual void DBG_DrawStatBeforeFrameStep() {}
     virtual void DBG_DrawStatAfterFrameStep() {}
     // virtual	void DBG_RenderUpdate( )												=0;
@@ -25,11 +24,14 @@ static class DebugOutputEmptyImpl : public IDebugOutput
     virtual void DBG_DrawOBB(const Fmatrix& m, const Fvector h, u32 c) {}
     virtual void DBG_DrawPoint(const Fvector& p, float size, u32 c) {}
     virtual void DBG_DrawMatrix(const Fmatrix& m, float size, u8 a = 255) {}
-    // virtual	void DBG_DrawRotationX( const Fmatrix &m, float ang0, float ang1, float size, u32 ac, bool solid = false,
+    // virtual	void DBG_DrawRotationX( const Fmatrix &m, float ang0, float ang1, float size, u32 ac, bool solid =
+    // false,
     // u32 tessel = 7 ) = 0;
-    // virtual	void DBG_DrawRotationY( const Fmatrix &m, float ang0, float ang1, float size, u32 ac, bool solid = false,
+    // virtual	void DBG_DrawRotationY( const Fmatrix &m, float ang0, float ang1, float size, u32 ac, bool solid =
+    // false,
     // u32 tessel = 7 ) = 0;
-    // virtual	void DBG_DrawRotationZ( const Fmatrix &m, float ang0, float ang1, float size, u32 ac, bool solid = false,
+    // virtual	void DBG_DrawRotationZ( const Fmatrix &m, float ang0, float ang1, float size, u32 ac, bool solid =
+    // false,
     // u32 tessel = 7 ) = 0;
     virtual void _cdecl DBG_OutText(LPCSTR s, ...) {}
     // virtual	void DBG_TextOutSet( float x, float y )									=0;
@@ -40,9 +42,7 @@ static class DebugOutputEmptyImpl : public IDebugOutput
     virtual void DBG_DrawFrameStart() {}
     virtual void PH_DBG_Render() {}
     virtual void PH_DBG_Clear() {}
-
     virtual LPCSTR PH_DBG_ObjectTrackName() { return "none"; }
-
     // virtual	bool			draw_frame								()=0;
     u32 tries_num;
     virtual u32& dbg_tries_num() { return tries_num; }
@@ -64,7 +64,6 @@ static class DebugOutputEmptyImpl : public IDebugOutput
     virtual u32& dbg_contacts_num() { return contacts_num; }
     float vel_collid_damage_to_display;
     virtual float dbg_vel_collid_damage_to_display() { return vel_collid_damage_to_display; }
-
     virtual void DBG_ObjAfterPhDataUpdate(CPHObject* obj) {}
     virtual void DBG_ObjBeforePhDataUpdate(CPHObject* obj) {}
     virtual void DBG_ObjAfterStep(CPHObject* obj) {}
@@ -73,7 +72,6 @@ static class DebugOutputEmptyImpl : public IDebugOutput
     virtual void DBG_ObjBeforePhTune(CPHObject* obj) {}
     virtual void DBG_ObjAfterCollision(CPHObject* obj) {}
     virtual void DBG_ObjBeforeCollision(CPHObject* obj) {}
-
 } dbg_output_empty;
 
 IDebugOutput* ph_debug_output = &dbg_output_empty;

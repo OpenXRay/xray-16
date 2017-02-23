@@ -6,27 +6,26 @@
 
 void draw_rect(Fvector2 LTp, Fvector2 RBp, Fvector2 LTt, Fvector2 RBt, u32 clr, Fvector2 const& ts);
 
-CUIFrameWindow::CUIFrameWindow() : m_bTextureVisible(false)
-{
-    m_texture_color = color_argb(255, 255, 255, 255);
-}
-
+CUIFrameWindow::CUIFrameWindow() : m_bTextureVisible(false) { m_texture_color = color_argb(255, 255, 255, 255); }
 void CUIFrameWindow::SetWndSize(const Fvector2& sz)
 {
     Fvector2 size = sz;
     Fvector2 size_test = sz;
     UI().ClientToScreenScaled(size_test);
 
-    if (m_bTextureVisible) {  // fit to min size
+    if (m_bTextureVisible)
+    { // fit to min size
         Fvector2 min_size;
         min_size.x = m_tex_rect[fmLT].width() + m_tex_rect[fmRT].width();
         min_size.y = m_tex_rect[fmLT].height() + m_tex_rect[fmLB].height();
 
-        if (size_test.x < min_size.x) {
+        if (size_test.x < min_size.x)
+        {
             UI().ClientToScreenScaledWidth(min_size.x);
             size.x = min_size.x;
         }
-        if (size_test.y < min_size.y) {
+        if (size_test.y < min_size.y)
+        {
             UI().ClientToScreenScaledHeight(min_size.y);
             size.y = min_size.y;
         }
@@ -67,14 +66,11 @@ void CUIFrameWindow::InitTextureEx(LPCSTR texture, LPCSTR sh_name)
     R_ASSERT2(fsimilar(m_tex_rect[fmRT].width(), m_tex_rect[fmRB].width()), texture);
 }
 
-void CUIFrameWindow::InitTexture(LPCSTR texture)
-{
-    InitTextureEx(texture, "hud\\default");
-}
-
+void CUIFrameWindow::InitTexture(LPCSTR texture) { InitTextureEx(texture, "hud\\default"); }
 void CUIFrameWindow::Draw()
 {
-    if (m_bTextureVisible) DrawElements();
+    if (m_bTextureVisible)
+        DrawElements();
 
     inherited::Draw();
 }
@@ -92,21 +88,21 @@ void CUIFrameWindow::DrawElements()
     UI().ClientToScreenScaled(rect.rb);
 
     Fvector2 back_len = {0.0f, 0.0f};
-    u32 rect_count = 4;  // lt+rt+lb+rb
+    u32 rect_count = 4; // lt+rt+lb+rb
     back_len.x = rect.width() - m_tex_rect[fmLT].width() - m_tex_rect[fmRT].width();
     back_len.y = rect.height() - m_tex_rect[fmLT].height() - m_tex_rect[fmRB].height();
     R_ASSERT(back_len.x + EPS_L >= 0.0f && back_len.y + EPS_L >= 0.0f);
 
     u32 cnt = 0;
-    if (back_len.x > 0.0f)  // top+bottom
+    if (back_len.x > 0.0f) // top+bottom
         cnt = 2 * iCeil(back_len.x / m_tex_rect[fmT].width());
     rect_count += cnt;
 
-    if (back_len.y > 0.0f)  // left+right
+    if (back_len.y > 0.0f) // left+right
         cnt = 2 * iCeil(back_len.y / m_tex_rect[fmL].height());
     rect_count += cnt;
 
-    if (back_len.x > 0.0f && back_len.y > 0.0f)  // back
+    if (back_len.x > 0.0f && back_len.y > 0.0f) // back
         cnt = iCeil(back_len.x / m_tex_rect[fmBK].width()) * iCeil(back_len.y / m_tex_rect[fmBK].height());
 
     rect_count += cnt;
@@ -138,7 +134,8 @@ void CUIFrameWindow::DrawElements()
     get_points(tmp, fmRB, LTp, RBp, LTt, RBt);
     draw_rect(LTp, RBp, LTt, RBt, m_texture_color, ts);
 
-    if (back_len.x > 0.0f) {
+    if (back_len.x > 0.0f)
+    {
         tmp.lt = rect.lt;
         tmp.lt.x += m_tex_rect[fmLT].width();
         tmp.rb.x = rect.rb.x - m_tex_rect[fmRT].width();
@@ -152,7 +149,8 @@ void CUIFrameWindow::DrawElements()
         draw_tile_line(tmp, fmB, true, ts);
     }
 
-    if (back_len.y > 0.0f) {
+    if (back_len.y > 0.0f)
+    {
         tmp.lt = rect.lt;
         tmp.lt.y += m_tex_rect[fmLT].height();
         tmp.rb.x = rect.lt.x + m_tex_rect[fmL].width();
@@ -167,7 +165,8 @@ void CUIFrameWindow::DrawElements()
         draw_tile_line(tmp, fmR, false, ts);
     }
 
-    if (back_len.x > 0.0f && back_len.y > 0.0f) {
+    if (back_len.x > 0.0f && back_len.y > 0.0f)
+    {
         tmp.lt.x = rect.lt.x + m_tex_rect[fmLT].width();
         tmp.lt.y = rect.lt.y + m_tex_rect[fmLT].height();
         tmp.rb.x = rect.rb.x - m_tex_rect[fmRB].width();
@@ -190,11 +189,13 @@ bool CUIFrameWindow::get_points(Frect const& r, int i, Fvector2& LTp, Fvector2& 
 
     float rem_x = r.width() - m_tex_rect[i].width();
     float rem_y = r.height() - m_tex_rect[i].height();
-    if (rem_x < 0.0f) {
+    if (rem_x < 0.0f)
+    {
         RBt.x += rem_x;
         RBp.x += rem_x;
     }
-    if (rem_y < 0.0f) {
+    if (rem_y < 0.0f)
+    {
         RBt.y += rem_y;
         RBp.y += rem_y;
     }
@@ -207,7 +208,8 @@ void CUIFrameWindow::draw_tile_line(Frect rect, int i, bool b_horz, Fvector2 con
     Fvector2 LTt, RBt;
     Fvector2 LTp, RBp;
 
-    if (b_horz) {
+    if (b_horz)
+    {
         while (rect.lt.x + EPS_L < rect.rb.x)
         {
             get_points(rect, i, LTp, RBp, LTt, RBt);

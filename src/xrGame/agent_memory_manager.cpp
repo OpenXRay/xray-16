@@ -15,15 +15,8 @@
 #include "entity_alive.h"
 #include "memory_space_impl.h"
 
-void CAgentMemoryManager::update()
-{
-    reset_memory_masks();
-}
-
-void CAgentMemoryManager::remove_links(IGameObject* object)
-{
-}
-
+void CAgentMemoryManager::update() { reset_memory_masks(); }
+void CAgentMemoryManager::remove_links(IGameObject* object) {}
 template <typename T>
 IC void CAgentMemoryManager::reset_memory_masks(T& objects)
 {
@@ -74,7 +67,8 @@ void CAgentMemoryManager::object_information(const IGameObject* object, u32& lev
 {
     {
         VISIBLES::const_iterator I = std::find(visibles().begin(), visibles().end(), object_id(object));
-        if (visibles().end() != I) {
+        if (visibles().end() != I)
+        {
             level_time = (*I).m_last_level_time;
             position = (*I).m_object_params.m_position;
         }
@@ -82,7 +76,8 @@ void CAgentMemoryManager::object_information(const IGameObject* object, u32& lev
 
     {
         SOUNDS::const_iterator I = std::find(sounds().begin(), sounds().end(), object_id(object));
-        if ((sounds().end() != I) && (level_time < (*I).m_last_level_time)) {
+        if ((sounds().end() != I) && (level_time < (*I).m_last_level_time))
+        {
             level_time = (*I).m_last_level_time;
             position = (*I).m_object_params.m_position;
         }
@@ -90,7 +85,8 @@ void CAgentMemoryManager::object_information(const IGameObject* object, u32& lev
 
     {
         HITS::const_iterator I = std::find(hits().begin(), hits().end(), object_id(object));
-        if ((hits().end() != I) && (level_time < (*I).m_last_level_time)) {
+        if ((hits().end() != I) && (level_time < (*I).m_last_level_time))
+        {
             level_time = (*I).m_last_level_time;
             position = (*I).m_object_params.m_position;
         }

@@ -30,7 +30,8 @@ animation_movement_controller::animation_movement_controller(
     VERIFY(b);
 
 #ifdef DEBUG
-    if (dbg_draw_animation_movement_controller) {
+    if (dbg_draw_animation_movement_controller)
+    {
         m_pKinematicsC->CalculateBones_Invalidate();
         m_pKinematicsC->CalculateBones(TRUE);
         DBG_OpenCashedDraw();
@@ -49,7 +50,8 @@ animation_movement_controller::animation_movement_controller(
     m_pKinematicsC->CalculateBones(TRUE);
     SetPosesBlending();
 #ifdef DEBUG
-    if (dbg_draw_animation_movement_controller) {
+    if (dbg_draw_animation_movement_controller)
+    {
         DBG_OpenCashedDraw();
         DBG_DrawMatrix(*_pObjXForm, 3, 100);
         DBG_DrawBones(*_pObjXForm, _pKinematicsC);
@@ -60,18 +62,16 @@ animation_movement_controller::animation_movement_controller(
 
 animation_movement_controller::~animation_movement_controller()
 {
-    if (IsActive()) deinitialize();
+    if (IsActive())
+        deinitialize();
 }
 
-IC bool is_blending_in(CBlend& b)
-{
-    return b.blend_state() == CBlend::eAccrue && b.blendPower - EPS > b.blendAmount;
-}
-
+IC bool is_blending_in(CBlend& b) { return b.blend_state() == CBlend::eAccrue && b.blendPower - EPS > b.blendAmount; }
 void animation_movement_controller::deinitialize()
 {
 #ifdef DEBUG
-    if (dbg_draw_animation_movement_controller) {
+    if (dbg_draw_animation_movement_controller)
+    {
         DBG_OpenCashedDraw();
         DBG_DrawMatrix(m_pObjXForm, 3, 100);
         DBG_DrawBones(m_pObjXForm, m_pKinematicsC);
@@ -87,7 +87,8 @@ void animation_movement_controller::deinitialize()
     m_control_blend = 0;
 
 #ifdef DEBUG
-    if (dbg_draw_animation_movement_controller) {
+    if (dbg_draw_animation_movement_controller)
+    {
         DBG_OpenCashedDraw();
         DBG_DrawMatrix(m_pObjXForm, 3, 100);
         DBG_DrawBones(m_pObjXForm, m_pKinematicsC);
@@ -118,14 +119,15 @@ void animation_movement_controller::GetInitalPositionBlenSpeed()
 
 bool animation_movement_controller::IsBlending() const
 {
-    return is_blending_in(*m_control_blend);  // inital_position_blending ||
+    return is_blending_in(*m_control_blend); // inital_position_blending ||
 }
 float blend_linear_accel = 1.f;
 float blend_angular_accel = 1.f;
 void animation_movement_controller::InitalPositionBlending(const Fmatrix& to)
 {
 #ifdef DEBUG
-    if (dbg_draw_animation_movement_controller) {
+    if (dbg_draw_animation_movement_controller)
+    {
         DBG_DrawMatrix(m_pObjXForm, 1);
         // DBG_DrawMatrix( m_startObjXForm, 3 );
     }
@@ -138,7 +140,8 @@ void animation_movement_controller::InitalPositionBlending(const Fmatrix& to)
 //}
 
 #ifdef DEBUG
-    if (dbg_draw_animation_movement_controller) DBG_DrawMatrix(to, 2);
+    if (dbg_draw_animation_movement_controller)
+        DBG_DrawMatrix(to, 2);
 #endif
     /*
         Fmatrix res = to;
@@ -171,7 +174,8 @@ static void get_animation_root_position(Fmatrix& pos, IKinematics* K, IKinematic
     CKey* key = 0;
     for (int i = 0; i < keys.chanel_blend_conts[0]; ++i)
     {
-        if (keys.blends[0][i] == control_blend) key = &keys.keys[0][i];
+        if (keys.blends[0][i] == control_blend)
+            key = &keys.keys[0][i];
     }
     VERIFY(key);
 
@@ -205,7 +209,8 @@ void animation_movement_controller::OnFrame()
 //	ka->CalculateBones( TRUE );
 
 #ifdef DEBUG
-    if (dbg_draw_animation_movement_controller && dbg_frame_count < 3) {
+    if (dbg_draw_animation_movement_controller && dbg_frame_count < 3)
+    {
         DBG_OpenCashedDraw();
         DBG_DrawBones(m_pObjXForm, m_pKinematicsC);
         DBG_ClosedCashedDraw(50000);
@@ -297,7 +302,8 @@ anim: %s anim set: %s",
 
     bool set_blending = !m_poses_blending.target_reached(m_control_blend->timeCurrent);
 
-    if (stopped) {
+    if (stopped)
+    {
         m_control_blend = B;
         m_startObjXForm.set(new_matrix);
         GetInitalPositionBlenSpeed();
@@ -308,12 +314,13 @@ anim: %s anim set: %s",
     else if (local_animation)
     {
         float blend_time = m_control_blend->timeCurrent;
-        m_control_blend->timeCurrent = m_control_blend->timeTotal - SAMPLE_SPF;  //(SAMPLE_SPF+EPS);
+        m_control_blend->timeCurrent = m_control_blend->timeTotal - SAMPLE_SPF; //(SAMPLE_SPF+EPS);
         Fmatrix root;
         animation_root_position(root);
         m_startObjXForm.mulB_43(root);
 #ifdef DEBUG
-        if (dbg_draw_animation_movement_controller) {
+        if (dbg_draw_animation_movement_controller)
+        {
             DBG_OpenCashedDraw();
             DBG_DrawMatrix(m_startObjXForm, 1);
             DBG_ClosedCashedDraw(5000);
@@ -358,22 +365,16 @@ void animation_movement_controller::RootBoneCallback(CBoneInstance* B)
     R_ASSERT2(_valid(B->mTransform), "animation_movement_controller::RootBoneCallback");
 }
 
-bool animation_movement_controller::IsActive() const
-{
-    return !!m_control_blend;
-}
-
+bool animation_movement_controller::IsActive() const { return !!m_control_blend; }
 void animation_movement_controller::BlendDestroy(CBlend& blend)
 {
     VERIFY(m_control_blend);
     // Msg("deinit");
-    if (m_control_blend == &blend) deinitialize();
+    if (m_control_blend == &blend)
+        deinitialize();
 }
 
-void animation_movement_controller::stop()
-{
-    stopped = true;
-}
+void animation_movement_controller::stop() { stopped = true; }
 const float percent_blending = 0.2f;
 void animation_movement_controller::SetPosesBlending()
 {
@@ -401,10 +402,10 @@ float change_pos_delta = 0.02f;
 //	float sq_diff = Fvector().sub( m_pObjXForm.c,m_update_vis_pos).magnitude();
 //
 //	float change_pos_sq_delta = change_pos_delta * change_pos_delta * (( Device.fTimeDelta/0.01f )*(
-//Device.fTimeDelta/0.01f ));
+// Device.fTimeDelta/0.01f ));
 //
 //	if(  pos_sq_delta > change_pos_sq_delta || sphere.P.square_magnitude() + change_pos_sq_delta + pos_sq_delta >
-//sphere.R*sphere.R )
+// sphere.R*sphere.R )
 //	{
 //		m_update_vis_pos = m_pObjXForm.c;
 //		m_pKinematicsC->LL_VisBoxInvalidate();

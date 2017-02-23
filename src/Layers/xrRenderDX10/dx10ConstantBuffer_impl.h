@@ -179,7 +179,8 @@ IC void* dx10ConstantBuffer::AccessDirect(R_constant_load& L, u32 DataSize)
     VERIFY(L.index < (int)m_uiBufferSize);
     BYTE* res = ((BYTE*)m_pBufferData) + L.index;
 
-    if ((u32)L.index + DataSize <= m_uiBufferSize) {
+    if ((u32)L.index + DataSize <= m_uiBufferSize)
+    {
         m_bChanged = true;
         return res;
     }
@@ -187,4 +188,4 @@ IC void* dx10ConstantBuffer::AccessDirect(R_constant_load& L, u32 DataSize)
         return 0;
 }
 
-#endif  //	dx10ConstantBuffer_impl_included
+#endif //	dx10ConstantBuffer_impl_included

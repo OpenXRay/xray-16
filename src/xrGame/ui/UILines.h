@@ -24,11 +24,9 @@ public:
     ETextAlignment GetTextAlignment() { return m_eTextAlign; }
     void SetVTextAlignment(EVTextAlignment al) { m_eVTextAlign = al; }
     EVTextAlignment GetVTextAlignment() { return m_eVTextAlign; }
-
     void SetTextComplexMode(bool mode = true);
     void SetPasswordMode(bool mode = true);
     bool IsPasswordMode() { return !!uFlags.test(flPasswordMode); };
-
     void SetColoringMode(bool mode);
     void SetCutWordsMode(bool mode);
     void SetUseNewLineMode(bool mode);
@@ -58,7 +56,7 @@ protected:
 
     typedef xr_vector<CUILine> LinesVector;
     typedef LinesVector::iterator LinesVector_it;
-    LinesVector m_lines;  // parsed text
+    LinesVector m_lines; // parsed text
 
     shared_str m_text;
 

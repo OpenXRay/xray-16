@@ -48,7 +48,6 @@ public:
     CGameFont* pFontSystem;
 
     bool IsLoaded() { return loaded; }
-
     // Levels
     xr_vector<sLevelInfo> Levels;
     u32 Level_Current;
@@ -79,4 +78,4 @@ public:
 
 extern ENGINE_API CApplication* pApp;
 
-#endif  //__XR_BASE_H__
+#endif //__XR_BASE_H__

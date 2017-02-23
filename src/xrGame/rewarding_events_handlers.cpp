@@ -11,21 +11,19 @@ rewarding_event_handlers::rewarding_event_handlers(
 {
 }
 
-rewarding_event_handlers::~rewarding_event_handlers()
-{
-    delete_data(m_events_store);
-}
-
+rewarding_event_handlers::~rewarding_event_handlers() { delete_data(m_events_store); }
 void rewarding_event_handlers::OnWeapon_Fire(u16 sender, u16 sender_weapon_id)
 {
     for (handlers_store_t::iterator i = m_events_store.begin(), ie = m_events_store.end(); i != ie; ++i)
     {
-        if (i->second->OnWeapon_Fire(sender, sender_weapon_id)) {
+        if (i->second->OnWeapon_Fire(sender, sender_weapon_id))
+        {
             m_reward_action(i->first);
             break;
         }
     }
-    if (m_null_hanlder) m_null_hanlder->OnWeapon_Fire(sender, sender_weapon_id);
+    if (m_null_hanlder)
+        m_null_hanlder->OnWeapon_Fire(sender, sender_weapon_id);
 }
 
 void rewarding_event_handlers::OnBullet_Fire(
@@ -33,12 +31,14 @@ void rewarding_event_handlers::OnBullet_Fire(
 {
     for (handlers_store_t::iterator i = m_events_store.begin(), ie = m_events_store.end(); i != ie; ++i)
     {
-        if (i->second->OnBullet_Fire(sender, sender_weapon_id, position, direction)) {
+        if (i->second->OnBullet_Fire(sender, sender_weapon_id, position, direction))
+        {
             m_reward_action(i->first);
             break;
         }
     }
-    if (m_null_hanlder) m_null_hanlder->OnBullet_Fire(sender, sender_weapon_id, position, direction);
+    if (m_null_hanlder)
+        m_null_hanlder->OnBullet_Fire(sender, sender_weapon_id, position, direction);
 }
 
 void rewarding_event_handlers::OnBullet_Hit(
@@ -46,71 +46,83 @@ void rewarding_event_handlers::OnBullet_Hit(
 {
     for (handlers_store_t::iterator i = m_events_store.begin(), ie = m_events_store.end(); i != ie; ++i)
     {
-        if (i->second->OnBullet_Hit(hitter, victim, weapon, bone)) {
+        if (i->second->OnBullet_Hit(hitter, victim, weapon, bone))
+        {
             m_reward_action(i->first);
             break;
         }
     }
-    if (m_null_hanlder) m_null_hanlder->OnBullet_Hit(hitter, victim, weapon, bone);
+    if (m_null_hanlder)
+        m_null_hanlder->OnBullet_Hit(hitter, victim, weapon, bone);
 }
 void rewarding_event_handlers::OnArtefactSpawned()
 {
     for (handlers_store_t::iterator i = m_events_store.begin(), ie = m_events_store.end(); i != ie; ++i)
     {
-        if (i->second->OnArtefactSpawned()) {
+        if (i->second->OnArtefactSpawned())
+        {
             m_reward_action(i->first);
             break;
         }
     }
-    if (m_null_hanlder) m_null_hanlder->OnArtefactSpawned();
+    if (m_null_hanlder)
+        m_null_hanlder->OnArtefactSpawned();
 }
 
 void rewarding_event_handlers::OnPlayerTakeArtefact(game_PlayerState const* ps)
 {
     for (handlers_store_t::iterator i = m_events_store.begin(), ie = m_events_store.end(); i != ie; ++i)
     {
-        if (i->second->OnPlayerTakeArtefact(ps)) {
+        if (i->second->OnPlayerTakeArtefact(ps))
+        {
             m_reward_action(i->first);
             break;
         }
     }
-    if (m_null_hanlder) m_null_hanlder->OnPlayerTakeArtefact(ps);
+    if (m_null_hanlder)
+        m_null_hanlder->OnPlayerTakeArtefact(ps);
 }
 
 void rewarding_event_handlers::OnPlayerDropArtefact(game_PlayerState const* ps)
 {
     for (handlers_store_t::iterator i = m_events_store.begin(), ie = m_events_store.end(); i != ie; ++i)
     {
-        if (i->second->OnPlayerDropArtefact(ps)) {
+        if (i->second->OnPlayerDropArtefact(ps))
+        {
             m_reward_action(i->first);
             break;
         }
     }
-    if (m_null_hanlder) m_null_hanlder->OnPlayerDropArtefact(ps);
+    if (m_null_hanlder)
+        m_null_hanlder->OnPlayerDropArtefact(ps);
 }
 
 void rewarding_event_handlers::OnPlayerBringArtefact(game_PlayerState const* ps)
 {
     for (handlers_store_t::iterator i = m_events_store.begin(), ie = m_events_store.end(); i != ie; ++i)
     {
-        if (i->second->OnPlayerBringArtefact(ps)) {
+        if (i->second->OnPlayerBringArtefact(ps))
+        {
             m_reward_action(i->first);
             break;
         }
     }
-    if (m_null_hanlder) m_null_hanlder->OnPlayerBringArtefact(ps);
+    if (m_null_hanlder)
+        m_null_hanlder->OnPlayerBringArtefact(ps);
 }
 
 void rewarding_event_handlers::OnPlayerSpawned(game_PlayerState const* ps)
 {
     for (handlers_store_t::iterator i = m_events_store.begin(), ie = m_events_store.end(); i != ie; ++i)
     {
-        if (i->second->OnPlayerSpawned(ps)) {
+        if (i->second->OnPlayerSpawned(ps))
+        {
             m_reward_action(i->first);
             break;
         }
     }
-    if (m_null_hanlder) m_null_hanlder->OnPlayerSpawned(ps);
+    if (m_null_hanlder)
+        m_null_hanlder->OnPlayerSpawned(ps);
 }
 
 void rewarding_event_handlers::OnPlayerKilled(
@@ -118,59 +130,69 @@ void rewarding_event_handlers::OnPlayerKilled(
 {
     for (handlers_store_t::iterator i = m_events_store.begin(), ie = m_events_store.end(); i != ie; ++i)
     {
-        if (i->second->OnPlayerKilled(killer_id, target_id, weapon_id, kill_type)) {
+        if (i->second->OnPlayerKilled(killer_id, target_id, weapon_id, kill_type))
+        {
             m_reward_action(i->first);
             break;
         }
     }
-    if (m_null_hanlder) m_null_hanlder->OnPlayerKilled(killer_id, target_id, weapon_id, kill_type);
+    if (m_null_hanlder)
+        m_null_hanlder->OnPlayerKilled(killer_id, target_id, weapon_id, kill_type);
 }
 void rewarding_event_handlers::OnPlayerChangeTeam(s8 team)
 {
     for (handlers_store_t::iterator i = m_events_store.begin(), ie = m_events_store.end(); i != ie; ++i)
     {
-        if (i->second->OnPlayerChangeTeam(team)) {
+        if (i->second->OnPlayerChangeTeam(team))
+        {
             m_reward_action(i->first);
             break;
         }
     }
-    if (m_null_hanlder) m_null_hanlder->OnPlayerChangeTeam(team);
+    if (m_null_hanlder)
+        m_null_hanlder->OnPlayerChangeTeam(team);
 }
 
 void rewarding_event_handlers::OnPlayerRankChanged()
 {
     for (handlers_store_t::iterator i = m_events_store.begin(), ie = m_events_store.end(); i != ie; ++i)
     {
-        if (i->second->OnPlayerRankChanged()) {
+        if (i->second->OnPlayerRankChanged())
+        {
             m_reward_action(i->first);
             break;
         }
     }
-    if (m_null_hanlder) m_null_hanlder->OnPlayerRankChanged();
+    if (m_null_hanlder)
+        m_null_hanlder->OnPlayerRankChanged();
 }
 
 void rewarding_event_handlers::OnRoundEnd()
 {
     for (handlers_store_t::iterator i = m_events_store.begin(), ie = m_events_store.end(); i != ie; ++i)
     {
-        if (i->second->OnRoundEnd()) {
+        if (i->second->OnRoundEnd())
+        {
             m_reward_action(i->first);
             break;
         }
     }
-    if (m_null_hanlder) m_null_hanlder->OnRoundEnd();
+    if (m_null_hanlder)
+        m_null_hanlder->OnRoundEnd();
 }
 
 void rewarding_event_handlers::OnRoundStart()
 {
     for (handlers_store_t::iterator i = m_events_store.begin(), ie = m_events_store.end(); i != ie; ++i)
     {
-        if (i->second->OnRoundStart()) {
+        if (i->second->OnRoundStart())
+        {
             m_reward_action(i->first);
             break;
         }
     }
-    if (m_null_hanlder) m_null_hanlder->OnRoundStart();
+    if (m_null_hanlder)
+        m_null_hanlder->OnRoundStart();
 }
 
 void rewarding_event_handlers::set_null_handler(reward_event_handler* new_handler)
@@ -179,8 +201,5 @@ void rewarding_event_handlers::set_null_handler(reward_event_handler* new_handle
     m_null_hanlder = new_handler;
 }
 
-void rewarding_event_handlers::init()
-{
-}
-
-}  // namespace award_system
+void rewarding_event_handlers::init() {}
+} // namespace award_system

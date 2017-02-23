@@ -12,7 +12,7 @@
 #include "monster_state_home_point_rest.h"
 #include "monster_state_smart_terrain_task.h"
 
-#define TEMPLATE_SPECIALIZATION                                                                                        \
+#define TEMPLATE_SPECIALIZATION \
     template <typename _Object\
 >
 
@@ -36,10 +36,7 @@ CStateMonsterRestAbstract::CStateMonsterRest(_Object* obj) : inherited(obj)
 }
 
 TEMPLATE_SPECIALIZATION
-CStateMonsterRestAbstract::~CStateMonsterRest()
-{
-}
-
+CStateMonsterRestAbstract::~CStateMonsterRest() {}
 TEMPLATE_SPECIALIZATION
 void CStateMonsterRestAbstract::initialize()
 {
@@ -72,8 +69,10 @@ void CStateMonsterRestAbstract::execute()
     // check alife control
     bool captured_by_smart_terrain = false;
 
-    if (prev_substate == eStateSmartTerrainTask) {
-        if (!get_state(eStateSmartTerrainTask)->check_completion()) captured_by_smart_terrain = true;
+    if (prev_substate == eStateSmartTerrainTask)
+    {
+        if (!get_state(eStateSmartTerrainTask)->check_completion())
+            captured_by_smart_terrain = true;
     }
     else if (get_state(eStateSmartTerrainTask)->check_start_conditions())
         captured_by_smart_terrain = true;
@@ -85,8 +84,10 @@ void CStateMonsterRestAbstract::execute()
         // check restrictions
         bool move_to_restrictor = false;
 
-        if (prev_substate == eStateCustomMoveToRestrictor) {
-            if (!get_state(eStateCustomMoveToRestrictor)->check_completion()) move_to_restrictor = true;
+        if (prev_substate == eStateCustomMoveToRestrictor)
+        {
+            if (!get_state(eStateCustomMoveToRestrictor)->check_completion())
+                move_to_restrictor = true;
         }
         else if (get_state(eStateCustomMoveToRestrictor)->check_start_conditions())
             move_to_restrictor = true;
@@ -98,8 +99,10 @@ void CStateMonsterRestAbstract::execute()
             // check home point
             bool move_to_home_point = false;
 
-            if (prev_substate == eStateRest_MoveToHomePoint) {
-                if (!get_state(eStateRest_MoveToHomePoint)->check_completion()) move_to_home_point = true;
+            if (prev_substate == eStateRest_MoveToHomePoint)
+            {
+                if (!get_state(eStateRest_MoveToHomePoint)->check_completion())
+                    move_to_home_point = true;
             }
             else if (get_state(eStateRest_MoveToHomePoint)->check_start_conditions())
                 move_to_home_point = true;
@@ -111,7 +114,8 @@ void CStateMonsterRestAbstract::execute()
                 // check squad behaviour
                 bool use_squad = false;
 
-                if (monster_squad().get_squad(object)->GetCommand(object).type == SC_REST) {
+                if (monster_squad().get_squad(object)->GetCommand(object).type == SC_REST)
+                {
                     select_state(eStateSquad_Rest);
                     use_squad = true;
                 }
@@ -121,7 +125,8 @@ void CStateMonsterRestAbstract::execute()
                     use_squad = true;
                 }
 
-                if (!use_squad) {
+                if (!use_squad)
+                {
                     if (time_idle_selected + TIME_IDLE > time())
                         select_state(eStateRest_Idle);
                     else if (time_idle_selected + TIME_IDLE + TIME_IDLE / 2 > time())

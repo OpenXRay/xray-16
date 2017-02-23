@@ -26,7 +26,7 @@ const LPCSTR ratingField = "rating_names";
 const LPCSTR reputationgField = "reputation_names";
 const LPCSTR goodwillField = "goodwill_names";
 
-const LPCSTR st_months[12] =  // StringTable for GetDateAsString()
+const LPCSTR st_months[12] = // StringTable for GetDateAsString()
     {"month_january", "month_february", "month_march", "month_april", "month_may", "month_june", "month_july",
         "month_august", "month_september", "month_october", "month_november", "month_december"};
 
@@ -79,12 +79,16 @@ bool InventoryUtilities::GreaterRoomInRuck(PIItem item1, PIItem item2)
     r1 = item1->GetInvGridRect().rb;
     r2 = item2->GetInvGridRect().rb;
 
-    if (r1.x > r2.x) return true;
+    if (r1.x > r2.x)
+        return true;
 
-    if (r1.x == r2.x) {
-        if (r1.y > r2.y) return true;
+    if (r1.x == r2.x)
+    {
+        if (r1.y > r2.y)
+            return true;
 
-        if (r1.y == r2.y) {
+        if (r1.y == r2.y)
+        {
             if (item1->object().cNameSect() == item2->object().cNameSect())
                 return (item1->object().ID() > item2->object().ID());
             else
@@ -132,11 +136,13 @@ bool InventoryUtilities::FreeRoom_inBelt(TIItemContainer& item_list, PIItem _ite
                 {
                     for (m = 0; (m < iWH.x) && can_place; ++m)
                     {
-                        if (ruck_room[(i + k) * width + (j + m)]) can_place = false;
+                        if (ruck_room[(i + k) * width + (j + m)])
+                            can_place = false;
                     }
                 }
 
-                if (can_place) {
+                if (can_place)
+                {
                     found_place = true;
                     place_row = i;
                     place_col = j;
@@ -145,7 +151,8 @@ bool InventoryUtilities::FreeRoom_inBelt(TIItemContainer& item_list, PIItem _ite
         }
 
         //разместить элемент на найденном месте
-        if (found_place) {
+        if (found_place)
+        {
             for (k = 0; k < iWH.y; ++k)
             {
                 for (m = 0; m < iWH.x; ++m)
@@ -160,14 +167,16 @@ bool InventoryUtilities::FreeRoom_inBelt(TIItemContainer& item_list, PIItem _ite
     item_list.erase(std::remove(item_list.begin(), item_list.end(), _item), item_list.end());
 
     //для какого-то элемента места не нашлось
-    if (!found_place) return false;
+    if (!found_place)
+        return false;
 
     return true;
 }
 
 const ui_shader& InventoryUtilities::GetBuyMenuShader()
 {
-    if (!g_BuyMenuShader) {
+    if (!g_BuyMenuShader)
+    {
         g_BuyMenuShader = new ui_shader();
         (*g_BuyMenuShader)->create("hud\\default", BUY_MENU_TEXTURE);
     }
@@ -177,7 +186,8 @@ const ui_shader& InventoryUtilities::GetBuyMenuShader()
 
 const ui_shader& InventoryUtilities::GetEquipmentIconsShader()
 {
-    if (!g_EquipmentIconsShader) {
+    if (!g_EquipmentIconsShader)
+    {
         g_EquipmentIconsShader = new ui_shader();
         (*g_EquipmentIconsShader)->create("hud\\default", "ui\\ui_icon_equipment");
     }
@@ -187,7 +197,8 @@ const ui_shader& InventoryUtilities::GetEquipmentIconsShader()
 
 const ui_shader& InventoryUtilities::GetMPCharIconsShader()
 {
-    if (!g_MPCharIconsShader) {
+    if (!g_MPCharIconsShader)
+    {
         g_MPCharIconsShader = new ui_shader();
         (*g_MPCharIconsShader)->create("hud\\default", MP_CHAR_ICONS);
     }
@@ -197,7 +208,8 @@ const ui_shader& InventoryUtilities::GetMPCharIconsShader()
 
 const ui_shader& InventoryUtilities::GetOutfitUpgradeIconsShader()
 {
-    if (!g_OutfitUpgradeIconsShader) {
+    if (!g_OutfitUpgradeIconsShader)
+    {
         g_OutfitUpgradeIconsShader = new ui_shader();
         (*g_OutfitUpgradeIconsShader)->create("hud\\default", "ui\\ui_actor_armor");
     }
@@ -207,7 +219,8 @@ const ui_shader& InventoryUtilities::GetOutfitUpgradeIconsShader()
 
 const ui_shader& InventoryUtilities::GetWeaponUpgradeIconsShader()
 {
-    if (!g_WeaponUpgradeIconsShader) {
+    if (!g_WeaponUpgradeIconsShader)
+    {
         g_WeaponUpgradeIconsShader = new ui_shader();
         (*g_WeaponUpgradeIconsShader)->create("hud\\default", "ui\\ui_actor_weapons");
     }
@@ -261,18 +274,21 @@ const shared_str InventoryUtilities::GetTimeAsString(
     {
     case etpTimeToHours: xr_sprintf(bufTime, "%02i", hours); break;
     case etpTimeToMinutes:
-        if (full_mode || hours > 0) {
+        if (full_mode || hours > 0)
+        {
             xr_sprintf(bufTime, "%02i%c%02i", hours, timeSeparator, mins);
             break;
         }
         xr_sprintf(bufTime, "0%c%02i", timeSeparator, mins);
         break;
     case etpTimeToSeconds:
-        if (full_mode || hours > 0) {
+        if (full_mode || hours > 0)
+        {
             xr_sprintf(bufTime, "%02i%c%02i%c%02i", hours, timeSeparator, mins, timeSeparator, secs);
             break;
         }
-        if (mins > 0) {
+        if (mins > 0)
+        {
             xr_sprintf(bufTime, "%02i%c%02i", mins, timeSeparator, secs);
             break;
         }
@@ -403,23 +419,27 @@ void LoadStrings(CharInfoStrings* container, LPCSTR section, LPCSTR field)
 
 void InitCharacterInfoStrings()
 {
-    if (charInfoReputationStrings && charInfoRankStrings) return;
+    if (charInfoReputationStrings && charInfoRankStrings)
+        return;
 
-    if (!charInfoReputationStrings) {
+    if (!charInfoReputationStrings)
+    {
         // Create string->Id DB
         charInfoReputationStrings = new CharInfoStrings();
         // Reputation
         LoadStrings(charInfoReputationStrings, relationsLtxSection, reputationgField);
     }
 
-    if (!charInfoRankStrings) {
+    if (!charInfoRankStrings)
+    {
         // Create string->Id DB
         charInfoRankStrings = new CharInfoStrings();
         // Ranks
         LoadStrings(charInfoRankStrings, relationsLtxSection, ratingField);
     }
 
-    if (!charInfoGoodwillStrings) {
+    if (!charInfoGoodwillStrings)
+    {
         // Create string->Id DB
         charInfoGoodwillStrings = new CharInfoStrings();
         // Goodwills
@@ -442,7 +462,8 @@ LPCSTR InventoryUtilities::GetRankAsText(CHARACTER_RANK_VALUE rankID)
 {
     InitCharacterInfoStrings();
     CharInfoStrings::const_iterator cit = charInfoRankStrings->upper_bound(rankID);
-    if (charInfoRankStrings->end() == cit) return charInfoRankStrings->rbegin()->second.c_str();
+    if (charInfoRankStrings->end() == cit)
+        return charInfoRankStrings->rbegin()->second.c_str();
     return cit->second.c_str();
 }
 
@@ -453,7 +474,8 @@ LPCSTR InventoryUtilities::GetReputationAsText(CHARACTER_REPUTATION_VALUE rankID
     InitCharacterInfoStrings();
 
     CharInfoStrings::const_iterator cit = charInfoReputationStrings->upper_bound(rankID);
-    if (charInfoReputationStrings->end() == cit) return charInfoReputationStrings->rbegin()->second.c_str();
+    if (charInfoReputationStrings->end() == cit)
+        return charInfoReputationStrings->rbegin()->second.c_str();
 
     return cit->second.c_str();
 }
@@ -465,7 +487,8 @@ LPCSTR InventoryUtilities::GetGoodwillAsText(CHARACTER_GOODWILL goodwill)
     InitCharacterInfoStrings();
 
     CharInfoStrings::const_iterator cit = charInfoGoodwillStrings->upper_bound(goodwill);
-    if (charInfoGoodwillStrings->end() == cit) return charInfoGoodwillStrings->rbegin()->second.c_str();
+    if (charInfoGoodwillStrings->end() == cit)
+        return charInfoGoodwillStrings->rbegin()->second.c_str();
 
     return cit->second.c_str();
 }
@@ -475,25 +498,30 @@ LPCSTR InventoryUtilities::GetGoodwillAsText(CHARACTER_GOODWILL goodwill)
 // (для tutorial)
 void InventoryUtilities::SendInfoToActor(LPCSTR info_id)
 {
-    if (GameID() != eGameIDSingle) return;
+    if (GameID() != eGameIDSingle)
+        return;
 
     CActor* actor = smart_cast<CActor*>(Level().CurrentEntity());
-    if (actor) {
+    if (actor)
+    {
         actor->TransferInfo(info_id, true);
     }
 }
 
 void InventoryUtilities::SendInfoToLuaScripts(shared_str info)
 {
-    if (GameID() != eGameIDSingle) return;
-    if (info == shared_str("ui_talk_show")) {
-        int mode = 10;  // now Menu is Talk Dialog (show)
+    if (GameID() != eGameIDSingle)
+        return;
+    if (info == shared_str("ui_talk_show"))
+    {
+        int mode = 10; // now Menu is Talk Dialog (show)
         luabind::functor<void> funct;
         R_ASSERT(ai().script_engine().functor("pda.actor_menu_mode", funct));
         funct(mode);
     }
-    if (info == shared_str("ui_talk_hide")) {
-        int mode = 11;  // Talk Dialog hide
+    if (info == shared_str("ui_talk_hide"))
+    {
+        int mode = 11; // Talk Dialog hide
         luabind::functor<void> funct;
         R_ASSERT(ai().script_engine().functor("pda.actor_menu_mode", funct));
         funct(mode);
@@ -503,7 +531,8 @@ void InventoryUtilities::SendInfoToLuaScripts(shared_str info)
 u32 InventoryUtilities::GetGoodwillColor(CHARACTER_GOODWILL gw)
 {
     u32 res = 0xffc0c0c0;
-    if (gw == NEUTRAL_GOODWILL) {
+    if (gw == NEUTRAL_GOODWILL)
+    {
         res = 0xffc0c0c0;
     }
     else if (gw > 1000)
@@ -520,7 +549,8 @@ u32 InventoryUtilities::GetGoodwillColor(CHARACTER_GOODWILL gw)
 u32 InventoryUtilities::GetReputationColor(CHARACTER_REPUTATION_VALUE rv)
 {
     u32 res = 0xffc0c0c0;
-    if (rv == NEUTAL_REPUTATION) {
+    if (rv == NEUTAL_REPUTATION)
+    {
         res = 0xffc0c0c0;
     }
     else if (rv > 50)

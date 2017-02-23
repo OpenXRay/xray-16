@@ -40,16 +40,8 @@ void CStalkerActionDangerBySoundListenTo::initialize()
     object().CObjectHandler::set_goal(eObjectActionIdle);
 }
 
-void CStalkerActionDangerBySoundListenTo::execute()
-{
-    inherited::execute();
-}
-
-void CStalkerActionDangerBySoundListenTo::finalize()
-{
-    inherited::finalize();
-}
-
+void CStalkerActionDangerBySoundListenTo::execute() { inherited::execute(); }
+void CStalkerActionDangerBySoundListenTo::finalize() { inherited::finalize(); }
 //////////////////////////////////////////////////////////////////////////
 // CStalkerActionDangerBySoundCheck
 //////////////////////////////////////////////////////////////////////////
@@ -73,16 +65,8 @@ void CStalkerActionDangerBySoundCheck::initialize()
     object().CObjectHandler::set_goal(eObjectActionIdle);
 }
 
-void CStalkerActionDangerBySoundCheck::execute()
-{
-    inherited::execute();
-}
-
-void CStalkerActionDangerBySoundCheck::finalize()
-{
-    inherited::finalize();
-}
-
+void CStalkerActionDangerBySoundCheck::execute() { inherited::execute(); }
+void CStalkerActionDangerBySoundCheck::finalize() { inherited::finalize(); }
 //////////////////////////////////////////////////////////////////////////
 // CStalkerActionDangerBySoundTakeCover
 //////////////////////////////////////////////////////////////////////////
@@ -106,16 +90,8 @@ void CStalkerActionDangerBySoundTakeCover::initialize()
     object().CObjectHandler::set_goal(eObjectActionIdle);
 }
 
-void CStalkerActionDangerBySoundTakeCover::execute()
-{
-    inherited::execute();
-}
-
-void CStalkerActionDangerBySoundTakeCover::finalize()
-{
-    inherited::finalize();
-}
-
+void CStalkerActionDangerBySoundTakeCover::execute() { inherited::execute(); }
+void CStalkerActionDangerBySoundTakeCover::finalize() { inherited::finalize(); }
 //////////////////////////////////////////////////////////////////////////
 // CStalkerActionDangerBySoundLookOut
 //////////////////////////////////////////////////////////////////////////
@@ -139,16 +115,8 @@ void CStalkerActionDangerBySoundLookOut::initialize()
     object().CObjectHandler::set_goal(eObjectActionIdle);
 }
 
-void CStalkerActionDangerBySoundLookOut::execute()
-{
-    inherited::execute();
-}
-
-void CStalkerActionDangerBySoundLookOut::finalize()
-{
-    inherited::finalize();
-}
-
+void CStalkerActionDangerBySoundLookOut::execute() { inherited::execute(); }
+void CStalkerActionDangerBySoundLookOut::finalize() { inherited::finalize(); }
 //////////////////////////////////////////////////////////////////////////
 // CStalkerActionDangerBySoundLookAround
 //////////////////////////////////////////////////////////////////////////
@@ -172,12 +140,5 @@ void CStalkerActionDangerBySoundLookAround::initialize()
     object().CObjectHandler::set_goal(eObjectActionIdle);
 }
 
-void CStalkerActionDangerBySoundLookAround::execute()
-{
-    inherited::execute();
-}
-
-void CStalkerActionDangerBySoundLookAround::finalize()
-{
-    inherited::finalize();
-}
+void CStalkerActionDangerBySoundLookAround::execute() { inherited::execute(); }
+void CStalkerActionDangerBySoundLookAround::finalize() { inherited::finalize(); }

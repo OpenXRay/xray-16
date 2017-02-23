@@ -13,7 +13,7 @@
 private
 ref class window_ide_final : public editor::window_ide
 {
-  public:
+public:
     window_ide_final(editor::ide*& ide, editor::engine* engine) : editor::window_ide(engine)
     {
         m_ide = ide;
@@ -27,7 +27,7 @@ ref class window_ide_final : public editor::window_ide
         m_ide = nullptr;
     }
 
-  protected:
+protected:
     virtual void WndProc(Message % m) override
     {
         LRESULT result;
@@ -38,7 +38,7 @@ ref class window_ide_final : public editor::window_ide
         editor::window_ide::WndProc(m);
     }
 
-  private:
+private:
     void on_idle(System::Object ^ sender, System::EventArgs ^ event_args)
     {
         ide_impl* impl = dynamic_cast<ide_impl*>(m_ide);

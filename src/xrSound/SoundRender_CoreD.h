@@ -9,12 +9,13 @@
 #include <dsound.h>
 #pragma warning(pop)
 
-#define _RELEASE(x)                                                                                                    \
-    {                                                                                                                  \
-        if (x) {                                                                                                       \
-            (x)->Release();                                                                                            \
-            (x) = NULL;                                                                                                \
-        }                                                                                                              \
+#define _RELEASE(x)         \
+    {                       \
+        if (x)              \
+        {                   \
+            (x)->Release(); \
+            (x) = NULL;     \
+        }                   \
     }
 
 class CSoundRender_CoreD : public CSoundRender_Core
@@ -36,8 +37,8 @@ class CSoundRender_CoreD : public CSoundRender_Core
 
 public:
     // DSound interface
-    IDirectSound8* pDevice;       // The device itself
-    IDirectSoundBuffer* pBuffer;  // The primary buffer (mixer destination)
+    IDirectSound8* pDevice; // The device itself
+    IDirectSoundBuffer* pBuffer; // The primary buffer (mixer destination)
     IDirectSound3DListener8* pListener;
     LPKSPROPERTYSET pExtensions;
     DSCAPS dsCaps;

@@ -27,12 +27,5 @@ IC void CAgentCorpseManager::register_corpse(CAI_Stalker* corpse)
     m_corpses.push_back(CMemberCorpse(corpse, 0, Device.dwTimeGlobal));
 }
 
-IC CAgentCorpseManager::MEMBER_CORPSES& CAgentCorpseManager::corpses()
-{
-    return (m_corpses);
-}
-
-IC void CAgentCorpseManager::clear()
-{
-    m_corpses.clear();
-}
+IC CAgentCorpseManager::MEMBER_CORPSES& CAgentCorpseManager::corpses() { return (m_corpses); }
+IC void CAgentCorpseManager::clear() { m_corpses.clear(); }

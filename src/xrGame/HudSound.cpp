@@ -25,7 +25,7 @@ void HUD_SOUND_ITEM::LoadSound(LPCSTR section, LPCSTR line, HUD_SOUND_ITEM& hud_
 
         LoadSound(section, sound_line, s.snd, type, &s.volume, &s.delay);
         xr_sprintf(sound_line, "%s%d", line, ++k);
-    }  // while
+    } // while
 }
 
 void HUD_SOUND_ITEM::LoadSound(LPCSTR section, LPCSTR line, ref_sound& snd, int type, float* volume, float* delay)
@@ -39,19 +39,25 @@ void HUD_SOUND_ITEM::LoadSound(LPCSTR section, LPCSTR line, ref_sound& snd, int 
     _GetItem(str, 0, buf_str);
     snd.create(buf_str, st_Effect, type);
 
-    if (volume != NULL) {
+    if (volume != NULL)
+    {
         *volume = 1.f;
-        if (count > 1) {
+        if (count > 1)
+        {
             _GetItem(str, 1, buf_str);
-            if (xr_strlen(buf_str) > 0) *volume = (float)atof(buf_str);
+            if (xr_strlen(buf_str) > 0)
+                *volume = (float)atof(buf_str);
         }
     }
 
-    if (delay != NULL) {
+    if (delay != NULL)
+    {
         *delay = 0;
-        if (count > 2) {
+        if (count > 2)
+        {
             _GetItem(str, 2, buf_str);
-            if (xr_strlen(buf_str) > 0) *delay = (float)atof(buf_str);
+            if (xr_strlen(buf_str) > 0)
+                *delay = (float)atof(buf_str);
         }
     }
 }
@@ -69,15 +75,18 @@ void HUD_SOUND_ITEM::DestroySound(HUD_SOUND_ITEM& hud_snd)
 void HUD_SOUND_ITEM::PlaySound(
     HUD_SOUND_ITEM& hud_snd, const Fvector& position, const IGameObject* parent, bool b_hud_mode, bool looped, u8 index)
 {
-    if (hud_snd.sounds.empty()) return;
+    if (hud_snd.sounds.empty())
+        return;
 
     hud_snd.m_activeSnd = NULL;
     StopSound(hud_snd);
 
     u32 flags = b_hud_mode ? sm_2D : 0;
-    if (looped) flags |= sm_Looped;
+    if (looped)
+        flags |= sm_Looped;
 
-    if (index == u8(-1)) index = (u8)Random.randI(hud_snd.sounds.size());
+    if (index == u8(-1))
+        index = (u8)Random.randI(hud_snd.sounds.size());
 
     hud_snd.m_activeSnd = &hud_snd.sounds[index];
 
@@ -130,7 +139,8 @@ void HUD_SOUND_COLLECTION::PlaySound(
     xr_vector<HUD_SOUND_ITEM>::iterator it_e = m_sound_items.end();
     for (; it != it_e; ++it)
     {
-        if (it->m_b_exclusive) HUD_SOUND_ITEM::StopSound(*it);
+        if (it->m_b_exclusive)
+            HUD_SOUND_ITEM::StopSound(*it);
     }
 
     HUD_SOUND_ITEM* snd_item = FindSoundItem(alias, true);
@@ -146,7 +156,8 @@ void HUD_SOUND_COLLECTION::StopSound(LPCSTR alias)
 void HUD_SOUND_COLLECTION::SetPosition(LPCSTR alias, const Fvector& pos)
 {
     HUD_SOUND_ITEM* snd_item = FindSoundItem(alias, true);
-    if (snd_item->playing()) snd_item->set_position(pos);
+    if (snd_item->playing())
+        snd_item->set_position(pos);
 }
 
 void HUD_SOUND_COLLECTION::StopAllSounds()

@@ -22,7 +22,8 @@ float _nrand(float sigma)
 {
 #define ONE_OVER_SIGMA_EXP (1.0f / 0.7975f)
 
-    if (sigma == 0) return 0;
+    if (sigma == 0)
+        return 0;
 
     float y;
     do
@@ -49,11 +50,7 @@ void random_dir(Fvector& tgt_dir, const Fvector& src_dir, float dispersion)
     tgt_dir.add(src_dir, T).normalize();
 }
 
-float CWeapon::GetWeaponDeterioration()
-{
-    return conditionDecreasePerShot;
-};
-
+float CWeapon::GetWeaponDeterioration() { return conditionDecreasePerShot; };
 void CWeapon::FireTrace(const Fvector& P, const Fvector& D)
 {
     VERIFY(m_magazine.size());
@@ -67,7 +64,8 @@ void CWeapon::FireTrace(const Fvector& P, const Fvector& D)
         is_tracer = is_tracer /*&& (m_magazine.size() % 3 == 0)*/ && !IsSilencerAttached();
 
     l_cartridge.m_flags.set(CCartridge::cfTracer, is_tracer);
-    if (m_u8TracerColorID != u8(-1)) l_cartridge.param_s.u8ColorID = m_u8TracerColorID;
+    if (m_u8TracerColorID != u8(-1))
+        l_cartridge.param_s.u8ColorID = m_u8TracerColorID;
     //-------------------------------------------------------------
     //повысить изношенность оружия с учетом влияния конкретного патрона
     //	float Deterioration = GetWeaponDeterioration();
@@ -76,12 +74,15 @@ void CWeapon::FireTrace(const Fvector& P, const Fvector& D)
 
     float fire_disp = 0.f;
     CActor* tmp_actor = NULL;
-    if (!IsGameTypeSingle()) {
+    if (!IsGameTypeSingle())
+    {
         tmp_actor = smart_cast<CActor*>(Level().CurrentControlEntity());
-        if (tmp_actor) {
+        if (tmp_actor)
+        {
             CEntity::SEntityState state;
             tmp_actor->g_State(state);
-            if (m_first_bullet_controller.is_bullet_first(state.fVelocity)) {
+            if (m_first_bullet_controller.is_bullet_first(state.fVelocity))
+            {
                 fire_disp = m_first_bullet_controller.get_fire_dispertion();
                 m_first_bullet_controller.make_shot();
             }
@@ -91,9 +92,11 @@ void CWeapon::FireTrace(const Fvector& P, const Fvector& D)
         if (tmp_mp_game->get_reward_generator())
             tmp_mp_game->get_reward_generator()->OnWeapon_Fire(H_Parent()->ID(), ID());
     }
-    if (fsimilar(fire_disp, 0.f)) {
+    if (fsimilar(fire_disp, 0.f))
+    {
         // CActor* tmp_actor = smart_cast<CActor*>(Level().CurrentControlEntity());
-        if (H_Parent() && (H_Parent() == tmp_actor)) {
+        if (H_Parent() && (H_Parent() == tmp_actor))
+        {
             fire_disp = tmp_actor->GetFireDispertion();
         }
         else
@@ -111,7 +114,8 @@ void CWeapon::FireTrace(const Fvector& P, const Fvector& D)
 
     StartShotParticles();
 
-    if (m_bLightShotEnabled) Light_Start();
+    if (m_bLightShotEnabled)
+        Light_Start();
 
     // Ammo
     m_magazine.pop_back();
@@ -125,7 +129,8 @@ void CWeapon::StopShooting()
     //	SetPending			(TRUE);
 
     //принудительно останавливать зацикленные партиклы
-    if (m_pFlameParticles && m_pFlameParticles->IsLooped()) StopFlameParticles();
+    if (m_pFlameParticles && m_pFlameParticles->IsLooped())
+        StopFlameParticles();
 
     SwitchState(eIdle);
 
@@ -142,11 +147,9 @@ void CWeapon::StartFlameParticles2()
 {
     CShootingObject::StartParticles(m_pFlameParticles2, *m_sFlameParticles2, get_LastFP2());
 }
-void CWeapon::StopFlameParticles2()
-{
-    CShootingObject::StopParticles(m_pFlameParticles2);
-}
+void CWeapon::StopFlameParticles2() { CShootingObject::StopParticles(m_pFlameParticles2); }
 void CWeapon::UpdateFlameParticles2()
 {
-    if (m_pFlameParticles2) CShootingObject::UpdateParticles(m_pFlameParticles2, get_LastFP2());
+    if (m_pFlameParticles2)
+        CShootingObject::UpdateParticles(m_pFlameParticles2, get_LastFP2());
 }

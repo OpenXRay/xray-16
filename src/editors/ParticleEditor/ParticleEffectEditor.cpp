@@ -14,17 +14,28 @@
 
 BOOL PS::CPEDef::Equal(const CPEDef* pe)
 {
-    if (!m_Flags.equal(pe->m_Flags)) return FALSE;
-    if (!m_ShaderName.equal(pe->m_ShaderName)) return FALSE;
-    if (!m_TextureName.equal(pe->m_TextureName)) return FALSE;
-    if (0 != memcmp(&m_Frame, &pe->m_Frame, sizeof(m_Frame))) return FALSE;
-    if (!fsimilar(m_fTimeLimit, pe->m_fTimeLimit)) return FALSE;
-    if (m_MaxParticles != pe->m_MaxParticles) return FALSE;
-    if (m_Actions.size() != pe->m_Actions.size()) return FALSE;
-    if (!m_VelocityScale.similar(pe->m_VelocityScale)) return FALSE;
-    if (!fsimilar(m_fCollideOneMinusFriction, pe->m_fCollideOneMinusFriction)) return FALSE;
-    if (!fsimilar(m_fCollideResilience, pe->m_fCollideResilience)) return FALSE;
-    if (!fsimilar(m_fCollideSqrCutoff, pe->m_fCollideSqrCutoff)) return FALSE;
+    if (!m_Flags.equal(pe->m_Flags))
+        return FALSE;
+    if (!m_ShaderName.equal(pe->m_ShaderName))
+        return FALSE;
+    if (!m_TextureName.equal(pe->m_TextureName))
+        return FALSE;
+    if (0 != memcmp(&m_Frame, &pe->m_Frame, sizeof(m_Frame)))
+        return FALSE;
+    if (!fsimilar(m_fTimeLimit, pe->m_fTimeLimit))
+        return FALSE;
+    if (m_MaxParticles != pe->m_MaxParticles)
+        return FALSE;
+    if (m_Actions.size() != pe->m_Actions.size())
+        return FALSE;
+    if (!m_VelocityScale.similar(pe->m_VelocityScale))
+        return FALSE;
+    if (!fsimilar(m_fCollideOneMinusFriction, pe->m_fCollideOneMinusFriction))
+        return FALSE;
+    if (!fsimilar(m_fCollideResilience, pe->m_fCollideResilience))
+        return FALSE;
+    if (!fsimilar(m_fCollideSqrCutoff, pe->m_fCollideSqrCutoff))
+        return FALSE;
     return TRUE;
 }
 
@@ -68,7 +79,8 @@ void __fastcall PS::CPEDef::FindActionByName(LPCSTR new_name, bool& res)
 {
     res = false;
     for (EPAVecIt s_it = m_EActionList.begin(); s_it != m_EActionList.end(); s_it++)
-        if (0 == stricmp(new_name, *(*s_it)->actionName)) {
+        if (0 == stricmp(new_name, *(*s_it)->actionName))
+        {
             res = true;
             break;
         };
@@ -93,7 +105,8 @@ void __fastcall PS::CPEDef::OnActionsClick(ButtonValue* B, bool& bDataModified, 
         {
             for (int i = 0; actions_token[i].name; i++)
             {
-                if (0 == strcmp(actions_token[i].name, nm)) {
+                if (0 == strcmp(actions_token[i].name, nm))
+                {
                     EParticleAction* A = pCreateEAction((PAPI::PActionEnum)actions_token[i].id);
                     AnsiString pref = AnsiString(*A->actionName).LowerCase();
                     A->actionName =
@@ -116,15 +129,12 @@ void __fastcall PS::CPEDef::OnActionsClick(ButtonValue* B, bool& bDataModified, 
     bDataModified = false;
 }
 
-void __fastcall PS::CPEDef::OnFlagChange(PropValue* sender)
-{
-    ExecCommand(COMMAND_UPDATE_PROPERTIES);
-}
-
+void __fastcall PS::CPEDef::OnFlagChange(PropValue* sender) { ExecCommand(COMMAND_UPDATE_PROPERTIES); }
 void __fastcall PS::CPEDef::OnShaderChange(PropValue* sender)
 {
     m_CachedShader.destroy();
-    if (m_ShaderName.size() && m_TextureName.size()) m_CachedShader.create(m_ShaderName.c_str(), m_TextureName.c_str());
+    if (m_ShaderName.size() && m_TextureName.size())
+        m_CachedShader.create(m_ShaderName.c_str(), m_TextureName.c_str());
 }
 
 void __fastcall PS::CPEDef::OnFrameResize(PropValue* sender)
@@ -132,10 +142,7 @@ void __fastcall PS::CPEDef::OnFrameResize(PropValue* sender)
     m_Frame.m_iFrameDimX = iFloor(1.f / m_Frame.m_fTexSize.x);
 }
 
-void PS::CPEDef::CollisionFrictionOnBeforeEdit(PropValue* sender, float& edit_val)
-{
-    edit_val = 1.f - edit_val;
-}
+void PS::CPEDef::CollisionFrictionOnBeforeEdit(PropValue* sender, float& edit_val) { edit_val = 1.f - edit_val; }
 bool PS::CPEDef::CollisionFrictionOnAfterEdit(PropValue* sender, float& edit_val)
 {
     edit_val = 1.f - edit_val;
@@ -147,10 +154,7 @@ void PS::CPEDef::CollisionFrictionOnDraw(PropValue* sender, xr_string& draw_val)
     VERIFY(V);
     draw_sprintf(draw_val, 1.f - V->GetValue(), V->dec);
 }
-void PS::CPEDef::CollisionCutoffOnBeforeEdit(PropValue* sender, float& edit_val)
-{
-    edit_val = _sqrt(edit_val);
-}
+void PS::CPEDef::CollisionCutoffOnBeforeEdit(PropValue* sender, float& edit_val) { edit_val = _sqrt(edit_val); }
 bool PS::CPEDef::CollisionCutoffOnAfterEdit(PropValue* sender, float& edit_val)
 {
     edit_val = (edit_val) * (edit_val);
@@ -169,8 +173,9 @@ void __fastcall PS::CPEDef::OnActionEditClick(ButtonValue* B, bool& bDataModifie
     int idx = B->tag;
     switch (B->btn_num)
     {
-    case 0:  // up
-        if (idx > 0) {
+    case 0: // up
+        if (idx > 0)
+        {
             EParticleAction* E = m_EActionList[idx - 1];
             m_EActionList[idx - 1] = m_EActionList[idx];
             m_EActionList[idx] = E;
@@ -178,8 +183,9 @@ void __fastcall PS::CPEDef::OnActionEditClick(ButtonValue* B, bool& bDataModifie
             bDataModified = true;
         }
         break;
-    case 1:  // down
-        if (idx < (int(m_EActionList.size()) - 1)) {
+    case 1: // down
+        if (idx < (int(m_EActionList.size()) - 1))
+        {
             EParticleAction* E = m_EActionList[idx + 1];
             m_EActionList[idx + 1] = m_EActionList[idx];
             m_EActionList[idx] = E;
@@ -189,7 +195,8 @@ void __fastcall PS::CPEDef::OnActionEditClick(ButtonValue* B, bool& bDataModifie
         bDataModified = true;
         break;
     case 2:
-        if (ELog.DlgMsg(mtConfirmation, TMsgDlgButtons() << mbYes << mbNo, "Remove action?") == mrYes) {
+        if (ELog.DlgMsg(mtConfirmation, TMsgDlgButtons() << mbYes << mbNo, "Remove action?") == mrYes)
+        {
             PTools->RemoveAction(idx);
             ExecCommand(COMMAND_UPDATE_PROPERTIES);
             bDataModified = true;
@@ -219,13 +226,17 @@ bool __stdcall PS::CPEDef::NameOnAfterEdit(PropValue* sender, shared_str& edit_v
         for (; pe_it != pe_it_e; ++pe_it)
         {
             PS::CPGDef::SEffect* Eff = (*pe_it);
-            if (Eff->m_EffectName == this->m_Name) Eff->m_EffectName = edit_val;
+            if (Eff->m_EffectName == this->m_Name)
+                Eff->m_EffectName = edit_val;
 
-            if (Eff->m_OnPlayChildName == this->m_Name) Eff->m_OnPlayChildName = edit_val;
+            if (Eff->m_OnPlayChildName == this->m_Name)
+                Eff->m_OnPlayChildName = edit_val;
 
-            if (Eff->m_OnBirthChildName == this->m_Name) Eff->m_OnBirthChildName = edit_val;
+            if (Eff->m_OnBirthChildName == this->m_Name)
+                Eff->m_OnBirthChildName = edit_val;
 
-            if (Eff->m_OnDeadChildName == this->m_Name) Eff->m_OnDeadChildName = edit_val;
+            if (Eff->m_OnDeadChildName == this->m_Name)
+                Eff->m_OnDeadChildName = edit_val;
         }
     }
     _item_to_select_after_edit = edit_val.c_str();
@@ -254,7 +265,8 @@ void PS::CPEDef::FillProp(LPCSTR pref, ::PropItemVec& items, ::ListItem* owner)
     // sprite
     P = PHelper().CreateFlag32(items, PrepareKey(pref, "Sprite"), &m_Flags, dfSprite);
     P->OnChangeEvent.bind(this, &PS::CPEDef::OnFlagChange);
-    if (m_Flags.is(dfSprite)) {
+    if (m_Flags.is(dfSprite))
+    {
         P = PHelper().CreateChoose(items, PrepareKey(pref, "Sprite\\Texture"), &m_TextureName, smTexture, 0, 0, 2);
         P->OnChangeEvent.bind(this, &PS::CPEDef::OnShaderChange);
         P = PHelper().CreateChoose(items, PrepareKey(pref, "Sprite\\Shader"), &m_ShaderName, smEShader);
@@ -266,7 +278,8 @@ void PS::CPEDef::FillProp(LPCSTR pref, ::PropItemVec& items, ::ListItem* owner)
             PHelper().CreateFlag32(items, PrepareKey(pref, "Sprite\\Culling\\CCW"), &m_Flags, dfCullCCW);
         P = PHelper().CreateFlag32(items, PrepareKey(pref, "Sprite\\Frame"), &m_Flags, dfFramed);
         P->OnChangeEvent.bind(this, &PS::CPEDef::OnFlagChange);
-        if (m_Flags.is(dfFramed)) {
+        if (m_Flags.is(dfFramed))
+        {
             PHelper().CreateFlag32(items, PrepareKey(pref, "Sprite\\Frame\\Random Init"), &m_Flags, dfRandomFrame);
             PHelper().CreateS32(items, PrepareKey(pref, "Sprite\\Frame\\Count"), &m_Frame.m_iFrameCount, 1, 256);
             P = PHelper().CreateFloat(
@@ -277,7 +290,8 @@ void PS::CPEDef::FillProp(LPCSTR pref, ::PropItemVec& items, ::ListItem* owner)
             // animate
             P = PHelper().CreateFlag32(items, PrepareKey(pref, "Sprite\\Animated"), &m_Flags, dfAnimated);
             P->OnChangeEvent.bind(this, &PS::CPEDef::OnFlagChange);
-            if (m_Flags.is(dfAnimated)) {
+            if (m_Flags.is(dfAnimated))
+            {
                 PHelper().CreateFlag32(
                     items, PrepareKey(pref, "Sprite\\Animated\\Random Playback"), &m_Flags, dfRandomPlayback);
                 PHelper().CreateFloat(
@@ -288,7 +302,8 @@ void PS::CPEDef::FillProp(LPCSTR pref, ::PropItemVec& items, ::ListItem* owner)
     // align to path
     P = PHelper().CreateFlag32(items, PrepareKey(pref, "Movement\\Align To Path"), &m_Flags, dfAlignToPath);
     P->OnChangeEvent.bind(this, &PS::CPEDef::OnFlagChange);
-    if (m_Flags.is(dfAlignToPath)) {
+    if (m_Flags.is(dfAlignToPath))
+    {
         PHelper().CreateFlag32(items, PrepareKey(pref, "Movement\\Align To Path\\Face Align"), &m_Flags, dfFaceAlign);
         PHelper().CreateFlag32(
             items, PrepareKey(pref, "Movement\\Align To Path\\Default World Align"), &m_Flags, dfWorldAlign);
@@ -305,7 +320,8 @@ void PS::CPEDef::FillProp(LPCSTR pref, ::PropItemVec& items, ::ListItem* owner)
     P = PHelper().CreateFlag32(items, PrepareKey(pref, "Movement\\Collision"), &m_Flags, dfCollision);
     P->OnChangeEvent.bind(this, &PS::CPEDef::OnFlagChange);
     FloatValue* V = 0;
-    if (m_Flags.is(dfCollision)) {
+    if (m_Flags.is(dfCollision))
+    {
         PHelper().CreateFlag32(
             items, PrepareKey(pref, "Movement\\Collision\\Collide With Dynamic"), &m_Flags, dfCollisionDyn);
         PHelper().CreateFlag32(
@@ -350,15 +366,18 @@ bool PS::CPEDef::Validate(bool bMsg)
 
     u32 i = 0;
     for (; i < m_EActionList.size(); ++i)
-        if (m_EActionList[i]->type == PAPI::PAKillOldID) {
+        if (m_EActionList[i]->type == PAPI::PAKillOldID)
+        {
             have_kill_old = true;
-            if (i != 0) {
+            if (i != 0)
+            {
                 std::swap(m_EActionList[i], m_EActionList[0]);
             }
             break;
         }
 
-    if (bMsg && (false == have_kill_old)) Msg("!.'%s': dosn't contains 'Kill Old' action.", *m_Name);
+    if (bMsg && (false == have_kill_old))
+        Msg("!.'%s': dosn't contains 'Kill Old' action.", *m_Name);
     return have_kill_old;
 }
 #endif

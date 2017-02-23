@@ -14,7 +14,8 @@ bool TestDX11Present()
 {
     HMODULE hD3D11 = LoadLibrary("d3d11.dll");
 
-    if (!hD3D11) {
+    if (!hD3D11)
+    {
         Msg("* DX11: failed to load d3d11.dll");
         return false;
     }
@@ -22,7 +23,8 @@ bool TestDX11Present()
     FuncPtrD3D11CreateDeviceAndSwapChain pD3D11CreateDeviceAndSwapChain =
         (FuncPtrD3D11CreateDeviceAndSwapChain)GetProcAddress(hD3D11, "D3D11CreateDeviceAndSwapChain");
 
-    if (!pD3D11CreateDeviceAndSwapChain) {
+    if (!pD3D11CreateDeviceAndSwapChain)
+    {
         Msg("* DX11: failed to get address of D3D11CreateDeviceAndSwapChain");
         return false;
     }
@@ -34,7 +36,8 @@ bool TestDX11Present()
     wcex.lpfnWndProc = WndProc;
     wcex.hInstance = GetModuleHandle(NULL);
     wcex.lpszClassName = "TestDX11WindowClass";
-    if (!RegisterClassEx(&wcex)) {
+    if (!RegisterClassEx(&wcex))
+    {
         Msg("* DX11: failed to register window class");
         return false;
     }
@@ -45,7 +48,8 @@ bool TestDX11Present()
 
     DXGI_SWAP_CHAIN_DESC sd;
 
-    if (!hWnd) {
+    if (!hWnd)
+    {
         Msg("* DX11: failed to create window");
         return false;
     }
@@ -75,11 +79,15 @@ bool TestDX11Present()
     hr = pD3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, 0, pFeatureLevels, 1, D3D11_SDK_VERSION,
         &sd, &pSwapChain, &pd3dDevice, &FeatureLevel, &pContext);
 
-    if (FAILED(hr)) Msg("* D3D11: device creation failed with hr=0x%08x", hr);
+    if (FAILED(hr))
+        Msg("* D3D11: device creation failed with hr=0x%08x", hr);
 
-    if (pContext) pContext->Release();
-    if (pSwapChain) pSwapChain->Release();
-    if (pd3dDevice) pd3dDevice->Release();
+    if (pContext)
+        pContext->Release();
+    if (pSwapChain)
+        pSwapChain->Release();
+    if (pd3dDevice)
+        pd3dDevice->Release();
 
     FreeLibrary(hD3D11);
 
@@ -96,5 +104,5 @@ BOOL xrRender_test_hw()
     // hr = _HW.m_pAdapter->CheckInterfaceSupport(__uuidof(ID3DDevice), 0);
     //_HW.DestroyD3D				()		;
 
-    return TestDX11Present();  // SUCCEEDED(hr);
+    return TestDX11Present(); // SUCCEEDED(hr);
 }

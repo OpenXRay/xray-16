@@ -61,15 +61,18 @@ void game_sv_mp_script::SpawnPlayer(ClientID id, LPCSTR N, LPCSTR SkinName, RPoi
     ps_who->setFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD);
 
     CSE_Abstract* pOldOwner = CL->owner;
-    if (pOldOwner && pOldOwner->owner == CL) {
+    if (pOldOwner && pOldOwner->owner == CL)
+    {
         CSE_ALifeCreatureActor* pOldActor = smart_cast<CSE_ALifeCreatureActor*>(pOldOwner);
         CSE_Spectator* pOldSpectator = smart_cast<CSE_Spectator*>(pOldOwner);
 
-        if (pOldActor) {
+        if (pOldActor)
+        {
             AllowDeadBodyRemove(id, pOldActor->ID);
             m_CorpseList.push_back(pOldOwner->ID);
         };
-        if (pOldSpectator) {
+        if (pOldSpectator)
+        {
             pOldSpectator->owner = (xrClientData*)m_server->GetServerClient();
             NET_Packet P;
             u_EventGen(P, GE_DESTROY, pOldSpectator->ID);
@@ -78,21 +81,23 @@ void game_sv_mp_script::SpawnPlayer(ClientID id, LPCSTR N, LPCSTR SkinName, RPoi
     }
 
     // Spawn
-    CSE_Abstract* E = spawn_begin(N);  // create SE
+    CSE_Abstract* E = spawn_begin(N); // create SE
 
-    E->set_name_replace(get_name_id(id));  // name
+    E->set_name_replace(get_name_id(id)); // name
 
-    E->s_flags.assign(M_SPAWN_OBJECT_LOCAL | M_SPAWN_OBJECT_ASPLAYER);  // flags
+    E->s_flags.assign(M_SPAWN_OBJECT_LOCAL | M_SPAWN_OBJECT_ASPLAYER); // flags
 
     CSE_ALifeCreatureActor* pA = smart_cast<CSE_ALifeCreatureActor*>(E);
     CSE_Spectator* pS = smart_cast<CSE_Spectator*>(E);
 
     R_ASSERT2(pA || pS, "Respawned Client is not Actor nor Spectator");
 
-    if (pA) {
+    if (pA)
+    {
         pA->s_team = u8(ps_who->team);
 
-        if (xr_strlen(SkinName) != 0) pA->set_visual(SkinName);
+        if (xr_strlen(SkinName) != 0)
+            pA->set_visual(SkinName);
 
         ps_who->resetFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD);
         ps_who->RespawnTime = Device.dwTimeGlobal;
@@ -123,24 +128,13 @@ void game_sv_mp_script::SpawnPlayer(ClientID id, LPCSTR N, LPCSTR SkinName, RPoi
     signal_Syncronize();
 }
 
-void game_sv_mp_script::switch_Phase(u32 new_phase)
-{
-    inherited::switch_Phase(new_phase);
-}
-
-void game_sv_mp_script::net_Export_State(NET_Packet& P, ClientID id_to)
-{
-    inherited::net_Export_State(P, id_to);
-};
-
+void game_sv_mp_script::switch_Phase(u32 new_phase) { inherited::switch_Phase(new_phase); }
+void game_sv_mp_script::net_Export_State(NET_Packet& P, ClientID id_to) { inherited::net_Export_State(P, id_to); };
 void game_sv_mp_script::OnEvent(NET_Packet& P, u16 type, u32 time, ClientID sender)
 {
     inherited::OnEvent(P, type, time, sender);
 };
-void game_sv_mp_script::OnPlayerConnect(ClientID id_who)
-{
-    inherited::OnPlayerConnect(id_who);
-};
+void game_sv_mp_script::OnPlayerConnect(ClientID id_who) { inherited::OnPlayerConnect(id_who); };
 void game_sv_mp_script::OnPlayerDisconnect(ClientID id_who, LPSTR Name, u16 GameID)
 {
     inherited::OnPlayerDisconnect(id_who, Name, GameID);

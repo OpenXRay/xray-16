@@ -21,7 +21,6 @@ struct SAnimationPart
 
     void set_motion(MotionID const& m);
     MotionID const& get_motion() const { return motion; }
-
 private:
     MotionID motion;
 };
@@ -84,7 +83,6 @@ public:
     void add_anim_event(MotionID, float, u32);
 
     CBlend* current_blend() { return m_data.global.blend; }
-
     void restart();
 
     void freeze();

@@ -12,11 +12,7 @@ CTushkano::CTushkano()
     CControlled::init_external(this);
 }
 
-CTushkano::~CTushkano()
-{
-    xr_delete(StateMan);
-}
-
+CTushkano::~CTushkano() { xr_delete(StateMan); }
 void CTushkano::Load(LPCSTR section)
 {
     inherited::Load(section);

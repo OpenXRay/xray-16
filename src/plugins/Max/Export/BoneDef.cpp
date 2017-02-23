@@ -15,7 +15,8 @@ CBoneDef::CBoneDef(INode* pNode)
 LPCSTR CBoneDef::GetParentName()
 {
     INode* node = pBone->GetParentNode();
-    if (Helper::IsBone(node, U.m_SkinAllowDummy)) return node->GetName();
+    if (Helper::IsBone(node, U.m_SkinAllowDummy))
+        return node->GetName();
     return 0;
 }
 BOOL CBoneDef::SetInitTM(IPhysiqueExport* pExport, const Matrix3& matMesh)
@@ -25,24 +26,28 @@ BOOL CBoneDef::SetInitTM(IPhysiqueExport* pExport, const Matrix3& matMesh)
     R_ASSERT(Helper::IsBone(pBone, U.m_SkinAllowDummy));
     Matrix3 tmp;
     // Log("SetInitTM:",pBone->GetName());
-    if (Helper::IsBipedBone(pBone)) {
+    if (Helper::IsBipedBone(pBone))
+    {
         Helper::SetBipedUniform(pBone, TRUE, TRUE);
         bErr = CGINTM(pBone, pExport->GetInitNodeTM(pBone, tmp));
-        if (bErr) tmp.IdentityMatrix();
+        if (bErr)
+            tmp.IdentityMatrix();
         Helper::SetBipedUniform(pBone, FALSE, FALSE);
     }
     else
     {
         bErr = CGINTM(pBone, pExport->GetInitNodeTM(pBone, tmp));
-        if (bErr) tmp.IdentityMatrix();
+        if (bErr)
+            tmp.IdentityMatrix();
     }
 
-    if (1) {  //! bErr){
+    if (1)
+    { //! bErr){
         Helper::ConvertMatrix(tmp, matInit);
         matOffset.invert(matInit);
         // S matMesh
         //		pBone->matOffset = matMesh * Inverse(pBone->matInit);
     }
 
-    return 1;  //! bErr;
+    return 1; //! bErr;
 }

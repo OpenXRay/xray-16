@@ -12,7 +12,7 @@ struct L_point
 };
 struct L_rect
 {
-    L_point a, b;  // min,max
+    L_point a, b; // min,max
     int iArea;
 
     IC void set(L_rect& R)
@@ -30,10 +30,14 @@ struct L_rect
     IC bool PointInside(L_point& P) { return (P.x >= a.x && P.x <= b.x && P.y >= a.y && P.y <= b.y); };
     IC bool Intersect(L_rect& R)
     {
-        if (R.b.x < a.x) return false;
-        if (R.b.y < a.y) return false;
-        if (R.a.x > b.x) return false;
-        if (R.a.y > b.y) return false;
+        if (R.b.x < a.x)
+            return false;
+        if (R.b.y < a.y)
+            return false;
+        if (R.a.x > b.x)
+            return false;
+        if (R.a.y > b.y)
+            return false;
         return true;
     };
     IC void GetAB(L_point& A, L_point& B)
@@ -50,10 +54,14 @@ struct L_rect
     }
     IC void Merge(L_rect& R)
     {
-        if (R.a.x < a.x) a.x = R.a.x;
-        if (R.a.y < a.y) a.y = R.a.y;
-        if (R.b.x > b.x) b.x = R.b.x;
-        if (R.b.y > b.y) b.y = R.b.y;
+        if (R.a.x < a.x)
+            a.x = R.a.x;
+        if (R.a.y < a.y)
+            a.y = R.a.y;
+        if (R.b.x > b.x)
+            b.x = R.b.x;
+        if (R.b.y > b.y)
+            b.y = R.b.y;
     }
     IC int SizeX() { return b.x - a.x + 1; }
     IC int SizeY() { return b.y - a.y + 1; }

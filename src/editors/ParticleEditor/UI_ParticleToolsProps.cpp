@@ -39,11 +39,13 @@ void CParticleTool::OnParticleItemFocused(ListItemsVec& items)
     // reset to default
     ResetCurrent();
 
-    if (!items.empty()) {
+    if (!items.empty())
+    {
         for (ListItemsIt it = items.begin(); it != items.end(); it++)
         {
             ListItem* item = *it;
-            if (item) {
+            if (item)
+            {
                 m_EditMode = EEditMode(item->Type());
                 switch (m_EditMode)
                 {
@@ -97,7 +99,8 @@ void CParticleTool::RealUpdateProperties()
         }
     }
     m_PList->AssignItems(items, false, true);
-    if (_item_to_select_after_edit.Length()) {
+    if (_item_to_select_after_edit.Length())
+    {
         m_PList->SelectItem(_item_to_select_after_edit.c_str(), true, false, true);
         _item_to_select_after_edit = "";
     }

@@ -111,10 +111,7 @@ public:
     virtual void DumpOnlineStatistic() = 0;
 };
 
-IC IServerGameState::~IServerGameState()
-{
-}
-
+IC IServerGameState::~IServerGameState() {}
 class game_sv_GameState : public game_GameState, public IServerGameState
 {
     typedef game_GameState inherited;
@@ -158,7 +155,6 @@ public:
 
     virtual void SaveMapList() override;
     virtual bool HasMapRotation() override { return m_bMapRotation; };
-
     bool FindPlayerName(char const* name, IClient const* to_exclude);
     void GenerateNewName(char const* old_name, char* dest, u32 const dest_size);
     void CheckPlayerName(xrClientData* CL);
@@ -180,7 +176,6 @@ public:
     virtual bool OnNextMap() override { return false; }
     virtual void OnPrevMap() override {}
     virtual bool SwitchToNextMap() override { return m_bMapNeedRotation; };
-
     virtual BOOL IsVotingEnabled() override;
     virtual BOOL IsVotingEnabled(u16 flag) override;
     virtual bool IsVotingActive() override { return false; };
@@ -189,7 +184,7 @@ public:
     virtual void OnVoteStop() override{};
     // Main accessors
     virtual game_PlayerState* get_eid(u16 id) override;
-    virtual void* get_client(u16 id) override;  // if exist
+    virtual void* get_client(u16 id) override; // if exist
     // virtual       game_PlayerState*   get_it                  (u32 it);
     virtual game_PlayerState* get_id(ClientID id) override;
 
@@ -225,22 +220,21 @@ public:
     virtual BOOL OnPreCreate(CSE_Abstract* E) { return TRUE; };
     virtual void OnCreate(u16 id_who){};
     virtual void OnPostCreate(u16 id_who){};
-    virtual BOOL OnTouch(u16 eid_who, u16 eid_target, BOOL bForced = FALSE) = 0;  // TRUE=allow ownership, FALSE=denied
+    virtual BOOL OnTouch(u16 eid_who, u16 eid_target, BOOL bForced = FALSE) = 0; // TRUE=allow ownership, FALSE=denied
     virtual void OnDetach(u16 eid_who, u16 eid_target) = 0;
     virtual BOOL OnActivate(u16 eid_who, u16 eid_target) { return TRUE; };
-
     virtual void OnDestroyObject(u16 eid_who);
 
-    virtual void OnHit(u16 id_hitter, u16 id_hitted, NET_Packet& P);                //кто-то получил Hit
-    virtual void OnPlayerHitPlayer(u16 id_hitter, u16 id_hitted, NET_Packet& P){};  //игрок получил Hit
+    virtual void OnHit(u16 id_hitter, u16 id_hitted, NET_Packet& P); //кто-то получил Hit
+    virtual void OnPlayerHitPlayer(u16 id_hitter, u16 id_hitted, NET_Packet& P){}; //игрок получил Hit
 
     // Main
     virtual void Create(shared_str& options);
     virtual void Update();
-    virtual void net_Export_State(NET_Packet& P, ClientID id_to);  // full state
+    virtual void net_Export_State(NET_Packet& P, ClientID id_to); // full state
     virtual void net_Export_Update(
-        NET_Packet& P, ClientID id_to, ClientID id);  // just incremental update for specific client
-    virtual void net_Export_GameTime(NET_Packet& P);  // update GameTime only for remote clients
+        NET_Packet& P, ClientID id_to, ClientID id); // just incremental update for specific client
+    virtual void net_Export_GameTime(NET_Packet& P); // update GameTime only for remote clients
 
     virtual bool change_level(NET_Packet& net_packet, ClientID sender);
     virtual void save_game(NET_Packet& net_packet, ClientID sender);

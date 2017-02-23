@@ -6,7 +6,7 @@
 #include "Level.h"
 #include "level_debug.h"
 
-#define TEMPLATE_SPECIALIZATION                                                                                        \
+#define TEMPLATE_SPECIALIZATION \
     template <typename _Object\
 >
 #define CStateControllerHideLiteAbstract CStateControlHideLite<_Object>
@@ -38,11 +38,7 @@ void CStateControllerHideLiteAbstract::execute()
 }
 
 TEMPLATE_SPECIALIZATION
-bool CStateControllerHideLiteAbstract::check_start_conditions()
-{
-    return true;
-}
-
+bool CStateControllerHideLiteAbstract::check_start_conditions() { return true; }
 TEMPLATE_SPECIALIZATION
 void CStateControllerHideLiteAbstract::reinit()
 {
@@ -76,7 +72,8 @@ void CStateControllerHideLiteAbstract::select_target_point()
 
     const CCoverPoint* point = object->CoverMan->find_cover(object->EnemyMan.get_enemy_position(), 10.f, 30.f);
     // VERIFY(point);
-    if (point) {
+    if (point)
+    {
         target.node = point->level_vertex_id();
         target.position = point->position();
     }

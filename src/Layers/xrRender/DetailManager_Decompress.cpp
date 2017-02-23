@@ -47,14 +47,14 @@ IC bool InterpolateAndDither(float* alpha255, u32 x, u32 y, u32 sx, u32 sy, u32 
 static void draw_obb(const Fmatrix& matrix, const u32& color)
 {
     Fvector aabb[8];
-    matrix.transform_tiny(aabb[0], Fvector().set(-1, -1, -1));  // 0
-    matrix.transform_tiny(aabb[1], Fvector().set(-1, +1, -1));  // 1
-    matrix.transform_tiny(aabb[2], Fvector().set(+1, +1, -1));  // 2
-    matrix.transform_tiny(aabb[3], Fvector().set(+1, -1, -1));  // 3
-    matrix.transform_tiny(aabb[4], Fvector().set(-1, -1, +1));  // 4
-    matrix.transform_tiny(aabb[5], Fvector().set(-1, +1, +1));  // 5
-    matrix.transform_tiny(aabb[6], Fvector().set(+1, +1, +1));  // 6
-    matrix.transform_tiny(aabb[7], Fvector().set(+1, -1, +1));  // 7
+    matrix.transform_tiny(aabb[0], Fvector().set(-1, -1, -1)); // 0
+    matrix.transform_tiny(aabb[1], Fvector().set(-1, +1, -1)); // 1
+    matrix.transform_tiny(aabb[2], Fvector().set(+1, +1, -1)); // 2
+    matrix.transform_tiny(aabb[3], Fvector().set(+1, -1, -1)); // 3
+    matrix.transform_tiny(aabb[4], Fvector().set(-1, -1, +1)); // 4
+    matrix.transform_tiny(aabb[5], Fvector().set(-1, +1, +1)); // 5
+    matrix.transform_tiny(aabb[6], Fvector().set(+1, +1, +1)); // 6
+    matrix.transform_tiny(aabb[7], Fvector().set(+1, -1, +1)); // 7
 
     u16 aabb_id[12 * 2] = {0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 1, 5, 2, 6, 3, 7, 0, 4};
 
@@ -74,7 +74,8 @@ void CDetailManager::cache_Decompress(Slot* S)
     VERIFY(S);
     Slot& D = *S;
     D.type = stReady;
-    if (D.empty) return;
+    if (D.empty)
+        return;
 
     DetailSlot& DS = QueryDB(D.sx, D.sz);
 
@@ -96,7 +97,8 @@ void CDetailManager::cache_Decompress(Slot* S)
     Fvector* verts = g_pGameLevel->ObjectSpace.GetStaticVerts();
 #endif
 
-    if (0 == triCount) return;
+    if (0 == triCount)
+        return;
 
     // Build shading table
     float alpha255[dm_obj_in_slot][4];
@@ -114,7 +116,7 @@ void CDetailManager::cache_Decompress(Slot* S)
     u32 d_size = iCeil(dm_slot_size / density);
     svector<int, dm_obj_in_slot> selected;
 
-    u32 p_rnd = D.sx * D.sz;  // нужно для того чтобы убрать полосы(ряды)
+    u32 p_rnd = D.sx * D.sz; // нужно для того чтобы убрать полосы(ряды)
     CRandom r_selection(0x12071980 ^ p_rnd);
     CRandom r_jitter(0x12071980 ^ p_rnd);
     CRandom r_yaw(0x12071980 ^ p_rnd);
@@ -154,14 +156,19 @@ void CDetailManager::cache_Decompress(Slot* S)
                 InterpolateAndDither(alpha255[3], x, z, shift_x, shift_z, d_size, dither))
                 selected.push_back(3);
 #else
-            if ((DS.id0 != DetailSlot::ID_Empty)) selected.push_back(0);
-            if ((DS.id1 != DetailSlot::ID_Empty)) selected.push_back(1);
-            if ((DS.id2 != DetailSlot::ID_Empty)) selected.push_back(2);
-            if ((DS.id3 != DetailSlot::ID_Empty)) selected.push_back(3);
+            if ((DS.id0 != DetailSlot::ID_Empty))
+                selected.push_back(0);
+            if ((DS.id1 != DetailSlot::ID_Empty))
+                selected.push_back(1);
+            if ((DS.id2 != DetailSlot::ID_Empty))
+                selected.push_back(2);
+            if ((DS.id3 != DetailSlot::ID_Empty))
+                selected.push_back(3);
 #endif
 
             // Select
-            if (selected.empty()) continue;
+            if (selected.empty())
+                continue;
 #ifndef DBG_SWITCHOFF_RANDOMIZE
             u32 index;
             if (selected.size() == 1)
@@ -204,28 +211,36 @@ void CDetailManager::cache_Decompress(Slot* S)
                     RDEVICE.Statistic->TEST0.Begin();
                     I.e_obj->GetFaceWorld(I.s_obj->_Transform(), I.e_mesh, I.inf[k].id, verts);
                     RDEVICE.Statistic->TEST0.End();
-                    if (CDB::TestRayTri(Item_P, dir, verts, r_u, r_v, r_range, TRUE)) {
-                        if (r_range >= 0) {
+                    if (CDB::TestRayTri(Item_P, dir, verts, r_u, r_v, r_range, TRUE))
+                    {
+                        if (r_range >= 0)
+                        {
                             float y_test = Item_P.y - r_range;
-                            if (y_test > y) y = y_test;
+                            if (y_test > y)
+                                y = y_test;
                         }
                     }
                 }
 #else
                 CDB::TRI& T = tris[xrc.r_begin()[tid].id];
                 SGameMtl* mtl = GMLib.GetMaterialByIdx(T.material);
-                if (mtl->Flags.test(SGameMtl::flPassable)) continue;
+                if (mtl->Flags.test(SGameMtl::flPassable))
+                    continue;
 
                 Fvector Tv[3] = {verts[T.verts[0]], verts[T.verts[1]], verts[T.verts[2]]};
-                if (CDB::TestRayTri(Item_P, dir, Tv, r_u, r_v, r_range, TRUE)) {
-                    if (r_range >= 0) {
+                if (CDB::TestRayTri(Item_P, dir, Tv, r_u, r_v, r_range, TRUE))
+                {
+                    if (r_range >= 0)
+                    {
                         float y_test = Item_P.y - r_range;
-                        if (y_test > y) y = y_test;
+                        if (y_test > y)
+                            y = y_test;
                     }
                 }
 #endif
             }
-            if (y < D.vis.box.min.y) continue;
+            if (y < D.vis.box.min.y)
+                continue;
             Item_P.y = y;
 
 // Angles and scale
@@ -254,7 +269,7 @@ void CDetailManager::cache_Decompress(Slot* S)
 #ifndef _EDITOR
 #ifdef DEBUG
             if (det_render_debug)
-                draw_obb(mXform, color_rgba(255, 0, 0, 255));  // Fmatrix().mul_43( mXform, Fmatrix().scale(5,5,5) )
+                draw_obb(mXform, color_rgba(255, 0, 0, 255)); // Fmatrix().mul_43( mXform, Fmatrix().scale(5,5,5) )
 #endif
 #endif
 
@@ -284,7 +299,8 @@ gray255[3]						=	255.f*float(c_pal->a3)/15.f;
 
 // Vis-sorting
 #ifndef DBG_SWITCHOFF_RANDOMIZE
-            if (!UseVS()) {
+            if (!UseVS())
+            {
                 // Always still on CPU pipe
                 Item.vis_ID = 0;
             }
@@ -295,9 +311,9 @@ gray255[3]						=	255.f*float(c_pal->a3)/15.f;
                 else
                 {
                     if (::Random.randI(0, 3) == 0)
-                        Item.vis_ID = 2;  // Second wave
+                        Item.vis_ID = 2; // Second wave
                     else
-                        Item.vis_ID = 1;  // First wave
+                        Item.vis_ID = 1; // First wave
                 }
             }
 #else

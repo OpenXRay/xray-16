@@ -48,11 +48,7 @@ void CBurer::reinit()
     time_last_scan = 0;
 }
 
-void CBurer::net_Destroy()
-{
-    inherited::net_Destroy();
-}
-
+void CBurer::net_Destroy() { inherited::net_Destroy(); }
 void CBurer::reload(LPCSTR section)
 {
     inherited::reload(section);
@@ -65,16 +61,8 @@ void CBurer::reload(LPCSTR section)
         MonsterSound::eHighPriority + 3, u32(MonsterSound::eBaseChannel), eMonsterSoundTeleAttack, "head");
 }
 
-void CBurer::ActivateShield()
-{
-    m_shield_active = true;
-}
-
-void CBurer::DeactivateShield()
-{
-    m_shield_active = false;
-}
-
+void CBurer::ActivateShield() { m_shield_active = true; }
+void CBurer::DeactivateShield() { m_shield_active = false; }
 void CBurer::Load(LPCSTR section)
 {
     inherited::Load(section);
@@ -146,58 +134,62 @@ void CBurer::Load(LPCSTR section)
     //		SVelocityParam &velocity_drag		= move().get_velocity(MonsterMovement::eVelocityParameterDrag);
 
     anim().AddAnim(eAnimStandIdle, "stand_idle_", -1, &velocity_none,
-        PS_STAND);  //, 	"fx_stand_f", "fx_stand_b", "fx_stand_l", "fx_stand_r");
+        PS_STAND); //, 	"fx_stand_f", "fx_stand_b", "fx_stand_l", "fx_stand_r");
     anim().AddAnim(eAnimStandTurnLeft, "stand_turn_ls_", -1, &velocity_turn,
-        PS_STAND);  //, 	"fx_stand_f", "fx_stand_b", "fx_stand_l", "fx_stand_r");
+        PS_STAND); //, 	"fx_stand_f", "fx_stand_b", "fx_stand_l", "fx_stand_r");
     anim().AddAnim(eAnimStandTurnRight, "stand_turn_rs_", -1, &velocity_turn,
-        PS_STAND);  //, 	"fx_stand_f", "fx_stand_b", "fx_stand_l", "fx_stand_r");
-    //	anim().AddAnim(eAnimStandDamaged,	"stand_idle_dmg_",		-1, &velocity_none,		PS_STAND); //, 	"fx_stand_f",
+        PS_STAND); //, 	"fx_stand_f", "fx_stand_b", "fx_stand_l", "fx_stand_r");
+    //	anim().AddAnim(eAnimStandDamaged,	"stand_idle_dmg_",		-1, &velocity_none,		PS_STAND); //, "fx_stand_f",
     //"fx_stand_b", "fx_stand_l", "fx_stand_r");
 
     anim().AddAnim(eAnimWalkFwd, "stand_walk_fwd_", -1, &velocity_walk,
-        PS_STAND);  //, 	"fx_stand_f", "fx_stand_b", "fx_stand_l", "fx_stand_r");
+        PS_STAND); //, 	"fx_stand_f", "fx_stand_b", "fx_stand_l", "fx_stand_r");
     // anim().AddAnim(eAnimWalkDamaged,	"stand_walk_fwd_dmg_",	-1, &velocity_walk_dmg,	PS_STAND); //, 	"fx_stand_f",
     // "fx_stand_b", "fx_stand_l", "fx_stand_r");
     anim().AddAnim(eAnimRun, "stand_run_fwd_", -1, &velocity_run,
-        PS_STAND);  //, 	"fx_stand_f", "fx_stand_b", "fx_stand_l", "fx_stand_r");
-    // anim().AddAnim(eAnimRunDamaged,		"stand_run_dmg_",		-1,	&velocity_run_dmg,	PS_STAND); //, 	"fx_stand_f",
+        PS_STAND); //, 	"fx_stand_f", "fx_stand_b", "fx_stand_l", "fx_stand_r");
+    // anim().AddAnim(eAnimRunDamaged,		"stand_run_dmg_",		-1,	&velocity_run_dmg,	PS_STAND); //, "fx_stand_f",
     // "fx_stand_b", "fx_stand_l", "fx_stand_r");
 
     anim().AddAnim(eAnimAttack, "stand_attack_", -1, &velocity_turn,
-        PS_STAND);  //, 	"fx_stand_f", "fx_stand_b", "fx_stand_l", "fx_stand_r");
+        PS_STAND); //, 	"fx_stand_f", "fx_stand_b", "fx_stand_l", "fx_stand_r");
 
     anim().AddAnim(eAnimDie, "stand_die_", -1, &velocity_none,
-        PS_STAND);  //, 	"fx_stand_f", "fx_stand_b", "fx_stand_l", "fx_stand_r");
+        PS_STAND); //, 	"fx_stand_f", "fx_stand_b", "fx_stand_l", "fx_stand_r");
 
     anim().AddAnim(eAnimShieldStart, "stand_shield_", -1, &velocity_turn,
-        PS_STAND);  //, 	"fx_stand_f", "fx_stand_b", "fx_stand_l", "fx_stand_r");
+        PS_STAND); //, 	"fx_stand_f", "fx_stand_b", "fx_stand_l", "fx_stand_r");
     anim().AddAnim(eAnimShieldContinue, "stand_shield_idle_", -1, &velocity_turn,
-        PS_STAND);  //, 	"fx_stand_f", "fx_stand_b", "fx_stand_l", "fx_stand_r");
+        PS_STAND); //, 	"fx_stand_f", "fx_stand_b", "fx_stand_l", "fx_stand_r");
 
     anim().AddAnim(eAnimTeleFire, "stand_power_attack_", -1, &velocity_turn,
-        PS_STAND);  //, 	"fx_stand_f", "fx_stand_b", "fx_stand_l", "fx_stand_r");
+        PS_STAND); //, 	"fx_stand_f", "fx_stand_b", "fx_stand_l", "fx_stand_r");
     anim().AddAnim(eAnimTelekinesis, "telekinesis_", -1, &velocity_turn,
-        PS_STAND);  //, 	"fx_stand_f", "fx_stand_b", "fx_stand_l", "fx_stand_r");
+        PS_STAND); //, 	"fx_stand_f", "fx_stand_b", "fx_stand_l", "fx_stand_r");
     anim().AddAnim(eAnimGraviFire, "stand_power_attack_", -1, &velocity_turn,
-        PS_STAND);  //, 	"fx_stand_f", "fx_stand_b", "fx_stand_l", "fx_stand_r");
+        PS_STAND); //, 	"fx_stand_f", "fx_stand_b", "fx_stand_l", "fx_stand_r");
 
     anim().AddAnim(eAnimRunTurnLeft, "stand_run_fwd_turn_left_", -1, &velocity_run, PS_STAND);
     anim().AddAnim(eAnimRunTurnRight, "stand_run_fwd_turn_right_", -1, &velocity_run, PS_STAND);
 
-    // 	anim().AddAnim(eAnimScared,			"stand_scared_",		-1, &velocity_none,		PS_STAND); //, 	"fx_stand_f", "fx_stand_b",
+    // 	anim().AddAnim(eAnimScared,			"stand_scared_",		-1, &velocity_none,		PS_STAND); //, 	"fx_stand_f",
+    // "fx_stand_b",
     // "fx_stand_l", "fx_stand_r");
-    // 	anim().AddAnim(eAnimSteal,			"stand_steal_",			-1, &velocity_steal,	PS_STAND); //, 	"fx_stand_f", "fx_stand_b",
+    // 	anim().AddAnim(eAnimSteal,			"stand_steal_",			-1, &velocity_steal,	PS_STAND); //, 	"fx_stand_f",
+    // "fx_stand_b",
     // "fx_stand_l", "fx_stand_r");
-    // 	anim().AddAnim(eAnimEat,			"sit_eat_",				-1, &velocity_none,		PS_SIT); //, 	"fx_stand_f", "fx_stand_b",
+    // 	anim().AddAnim(eAnimEat,			"sit_eat_",				-1, &velocity_none,		PS_SIT); //, 	"fx_stand_f",
+    // "fx_stand_b",
     // "fx_stand_l", "fx_stand_r");
     //
-    // 	anim().AddAnim(eAnimSitIdle,		"sit_idle_",			-1, &velocity_none,		PS_SIT); //, 	"fx_stand_f", "fx_stand_b",
+    // 	anim().AddAnim(eAnimSitIdle,		"sit_idle_",			-1, &velocity_none,		PS_SIT); //, 	"fx_stand_f",
+    // "fx_stand_b",
     // "fx_stand_l", "fx_stand_r");
-    // 	anim().AddAnim(eAnimCheckCorpse,	"sit_check_corpse_",	-1, &velocity_none,		PS_SIT); //, 	"fx_stand_f",
+    // 	anim().AddAnim(eAnimCheckCorpse,	"sit_check_corpse_",	-1, &velocity_none,		PS_SIT); //, "fx_stand_f",
     // "fx_stand_b", "fx_stand_l", "fx_stand_r");
-    // 	anim().AddAnim(eAnimSitStandUp,		"sit_stand_up_",		-1, &velocity_none,		PS_SIT); //, 	"fx_stand_f",
+    // 	anim().AddAnim(eAnimSitStandUp,		"sit_stand_up_",		-1, &velocity_none,		PS_SIT); //, "fx_stand_f",
     // "fx_stand_b", "fx_stand_l", "fx_stand_r");
-    // 	anim().AddAnim(eAnimStandSitDown,	"stand_sit_down_",		-1, &velocity_none,		PS_STAND); //, 	"fx_stand_f",
+    // 	anim().AddAnim(eAnimStandSitDown,	"stand_sit_down_",		-1, &velocity_none,		PS_STAND); //, "fx_stand_f",
     // "fx_stand_b", "fx_stand_l", "fx_stand_r");
 
     //	anim().AddTransition(PS_SIT,		PS_STAND,		eAnimSitStandUp,	false);
@@ -210,8 +202,8 @@ void CBurer::Load(LPCSTR section)
     anim().LinkAction(ACT_WALK_BKWD, eAnimWalkFwd);
     anim().LinkAction(ACT_RUN, eAnimRun);
     // anim().LinkAction(ACT_EAT,			eAnimEat);
-    anim().LinkAction(ACT_SLEEP, eAnimStandIdle);  // eAnimSitIdle);
-    anim().LinkAction(ACT_REST, eAnimStandIdle);   // eAnimSitIdle);
+    anim().LinkAction(ACT_SLEEP, eAnimStandIdle); // eAnimSitIdle);
+    anim().LinkAction(ACT_REST, eAnimStandIdle); // eAnimSitIdle);
     anim().LinkAction(ACT_DRAG, eAnimWalkFwd);
     anim().LinkAction(ACT_ATTACK, eAnimAttack);
 // anim().LinkAction(ACT_STEAL,		eAnimSteal);
@@ -239,18 +231,17 @@ void CBurer::shedule_Update(u32 dt)
     CTelekinesis::schedule_update();
 }
 
-void CBurer::CheckSpecParams(u32 spec_params)
-{
-}
-
+void CBurer::CheckSpecParams(u32 spec_params) {}
 void xr_stdcall CBurer::StaminaHit()
 {
-    if (GodMode()) {
+    if (GodMode())
+    {
         return;
     }
 
     CWeapon* const active_weapon = smart_cast<CWeapon*>(Actor()->inventory().ActiveItem());
-    if (!active_weapon) {
+    if (!active_weapon)
+    {
         return;
     }
 
@@ -261,14 +252,17 @@ void xr_stdcall CBurer::StaminaHit()
 
     Actor()->conditions().PowerHit(stamina_hit, false);
 
-    if (do_weapon_drop) {
+    if (do_weapon_drop)
+    {
         Fvector dir = Actor()->Direction();
-        if (dir.y < 0.f) {
+        if (dir.y < 0.f)
+        {
             dir.y = -dir.y;
         }
         active_weapon->SetActivationSpeedOverride(normalize(dir) * m_weapon_drop_velocity);
 
-        if (!Actor()->inventory().Action((u16)kDROP, CMD_STOP)) {
+        if (!Actor()->inventory().Action((u16)kDROP, CMD_STOP))
+        {
             Actor()->g_PerformDrop();
         }
     }
@@ -276,11 +270,13 @@ void xr_stdcall CBurer::StaminaHit()
 
 void CBurer::UpdateGraviObject()
 {
-    if (!m_gravi_object.active) {
+    if (!m_gravi_object.active)
+    {
         return;
     }
 
-    if (!m_gravi_object.enemy || (m_gravi_object.enemy && m_gravi_object.enemy->getDestroy())) {
+    if (!m_gravi_object.enemy || (m_gravi_object.enemy && m_gravi_object.enemy->getDestroy()))
+    {
         m_gravi_object.deactivate();
         return;
     }
@@ -295,7 +291,8 @@ void CBurer::UpdateGraviObject()
     float dt = float(Device.dwTimeGlobal - m_gravi_object.time_last_update);
     float dist = dt * float(m_gravi.speed) / 1000.f;
 
-    if (dist < m_gravi.step) return;
+    if (dist < m_gravi.step)
+        return;
 
     Fvector new_pos;
     Fvector dir;
@@ -313,9 +310,11 @@ void CBurer::UpdateGraviObject()
     float trace_dist = float(m_gravi.step);
 
     collide::rq_result l_rq;
-    if (Level().ObjectSpace.RayPick(new_pos, dir, trace_dist, collide::rqtBoth, l_rq, NULL)) {
+    if (Level().ObjectSpace.RayPick(new_pos, dir, trace_dist, collide::rqtBoth, l_rq, NULL))
+    {
         const IGameObject* enemy = smart_cast<const IGameObject*>(m_gravi_object.enemy);
-        if ((l_rq.O == enemy) && (l_rq.range < trace_dist)) {
+        if ((l_rq.O == enemy) && (l_rq.range < trace_dist))
+        {
             // check for visibility
             bool b_enemy_visible = false;
             xr_vector<IGameObject*> visible_objects;
@@ -324,13 +323,15 @@ void CBurer::UpdateGraviObject()
             // find object
             for (u32 i = 0; i < visible_objects.size(); i++)
             {
-                if (visible_objects[i] == enemy) {
+                if (visible_objects[i] == enemy)
+                {
                     b_enemy_visible = true;
                     break;
                 }
             }
 
-            if (b_enemy_visible) {
+            if (b_enemy_visible)
+            {
                 Fvector impulse_dir;
 
                 impulse_dir.set(0.0f, 0.0f, 1.0f);
@@ -370,7 +371,8 @@ void CBurer::UpdateGraviObject()
     for (u32 i = 0; i < m_nearest.size(); i++)
     {
         CPhysicsShellHolder* obj = smart_cast<CPhysicsShellHolder*>(m_nearest[i]);
-        if (!obj || !obj->m_pPhysicsShell) continue;
+        if (!obj || !obj->m_pPhysicsShell)
+            continue;
 
         Fvector dir;
         dir.sub(obj->Position(), m_gravi_object.cur_pos);
@@ -381,7 +383,8 @@ void CBurer::UpdateGraviObject()
     // играть звук
     Fvector snd_pos = m_gravi_object.cur_pos;
     snd_pos.y += 0.5f;
-    if (sound_gravi_wave._feedback()) {
+    if (sound_gravi_wave._feedback())
+    {
         sound_gravi_wave.set_position(snd_pos);
     }
     else
@@ -400,36 +403,42 @@ void CBurer::UpdateCL()
 void CBurer::StartGraviPrepare()
 {
     const CEntityAlive* enemy = EnemyMan.get_enemy();
-    if (!enemy) return;
+    if (!enemy)
+        return;
 
     CActor* pA = const_cast<CActor*>(smart_cast<const CActor*>(enemy));
-    if (!pA) return;
+    if (!pA)
+        return;
 
     pA->CParticlesPlayer::StartParticles(particle_gravi_prepare, Fvector().set(0.0f, 0.1f, 0.0f), pA->ID());
 }
 void CBurer::StopGraviPrepare()
 {
     CActor* pA = Actor();
-    if (!pA) return;
+    if (!pA)
+        return;
     pA->CParticlesPlayer::StopParticles(particle_gravi_prepare, BI_NONE, true);
 }
 
 void CBurer::StartTeleObjectParticle(CGameObject* pO)
 {
     CParticlesPlayer* PP = smart_cast<CParticlesPlayer*>(pO);
-    if (!PP) return;
+    if (!PP)
+        return;
     PP->StartParticles(particle_tele_object, Fvector().set(0.0f, 0.1f, 0.0f), pO->ID());
 }
 void CBurer::StopTeleObjectParticle(CGameObject* pO)
 {
     CParticlesPlayer* PP = smart_cast<CParticlesPlayer*>(pO);
-    if (!PP) return;
+    if (!PP)
+        return;
     PP->StopParticles(particle_tele_object, BI_NONE, true);
 }
 
 void CBurer::Hit(SHit* pHDS)
 {
-    if (m_shield_active && pHDS->hit_type == ALife::eHitTypeFireWound && Device.dwFrame != last_hit_frame) {
+    if (m_shield_active && pHDS->hit_type == ALife::eHitTypeFireWound && Device.dwFrame != last_hit_frame)
+    {
         // вычислить позицию и направленность партикла
         Fmatrix pos;
         // CParticlesPlayer::MakeXFORM(this,element,Fvector().set(0.f,0.f,1.f),p_in_object_space,pos);
@@ -453,7 +462,8 @@ void CBurer::Die(IGameObject* who)
 {
     inherited::Die(who);
 
-    if (com_man().ta_is_active()) {
+    if (com_man().ta_is_active())
+    {
         com_man().ta_deactivate();
     }
 
@@ -471,7 +481,8 @@ void CBurer::net_Relcase(IGameObject* O)
 CBaseMonster::SDebugInfo CBurer::show_debug_info()
 {
     CBaseMonster::SDebugInfo info = inherited::show_debug_info();
-    if (!info.active) return CBaseMonster::SDebugInfo();
+    if (!info.active)
+        return CBaseMonster::SDebugInfo();
 
     string128 text;
     DBG().text(this).add_item(text, info.x, info.y += info.delta_y, info.color);
@@ -484,7 +495,8 @@ CBaseMonster::SDebugInfo CBurer::show_debug_info()
 
 void CBurer::face_enemy()
 {
-    if (!EnemyMan.get_enemy()) {
+    if (!EnemyMan.get_enemy())
+    {
         return;
     }
     Fvector const enemy_pos = EnemyMan.get_enemy()->Position();
@@ -492,7 +504,8 @@ void CBurer::face_enemy()
     Fvector const self2enemy = enemy_pos - self_pos;
     bool const good_aiming = angle_between_vectors(self2enemy, Direction()) < deg2rad(20.f);
 
-    if (!good_aiming) {
+    if (!good_aiming)
+    {
         dir().face_target(enemy_pos);
     }
 
@@ -503,12 +516,14 @@ extern CActor* g_actor;
 
 bool actor_is_reloading_weapon()
 {
-    if (!g_actor) {
+    if (!g_actor)
+    {
         return false;
     }
 
     CWeapon* const active_weapon = smart_cast<CWeapon*>(Actor()->inventory().ActiveItem());
-    if (active_weapon && active_weapon->GetState() == CWeapon::eReload) {
+    if (active_weapon && active_weapon->GetState() == CWeapon::eReload)
+    {
         return true;
     }
 

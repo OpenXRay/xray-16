@@ -5,7 +5,7 @@
 #include "Entity.h"
 #include "xrAICore/Navigation/ai_object_location.h"
 
-#define TEMPLATE_SPECIALIZATION                                                                                        \
+#define TEMPLATE_SPECIALIZATION \
     template <typename _Object\
 >
 
@@ -23,24 +23,23 @@ CStateGroupHearDangerousSoundAbstract::CStateGroupHearDangerousSound(_Object* ob
 }
 
 TEMPLATE_SPECIALIZATION
-void CStateGroupHearDangerousSoundAbstract::initialize()
-{
-    inherited::initialize();
-}
-
+void CStateGroupHearDangerousSoundAbstract::initialize() { inherited::initialize(); }
 TEMPLATE_SPECIALIZATION
 void CStateGroupHearDangerousSoundAbstract::reselect_state()
 {
     CMonsterSquad* squad = monster_squad().get_squad(object);
     VERIFY(squad);
 
-    if (get_state(eStateHearDangerousSound_Home)->check_start_conditions()) {
+    if (get_state(eStateHearDangerousSound_Home)->check_start_conditions())
+    {
         select_state(eStateHearDangerousSound_Home);
         return;
     }
 
-    if (squad->SquadActive() && squad->GetCommand(object).type == SC_REST) {
-        if (object != squad->GetLeader()) {
+    if (squad->SquadActive() && squad->GetCommand(object).type == SC_REST)
+    {
+        if (object != squad->GetLeader())
+        {
             select_state(eStateSquad);
         }
         else
@@ -68,7 +67,8 @@ void CStateGroupHearDangerousSoundAbstract::setup_substates()
 {
     state_ptr state = get_state_current();
 
-    if (current_substate == eStateSquad) {
+    if (current_substate == eStateSquad)
+    {
         SStateDataMoveToPoint data;
         CMonsterSquad* squad = monster_squad().get_squad(object);
 
@@ -80,7 +80,8 @@ void CStateGroupHearDangerousSoundAbstract::setup_substates()
         else
         {
             Fvector dest_pos = random_position(squad->GetLeader()->Position(), LEADER_RADIUS);
-            if (!object->control().path_builder().restrictions().accessible(dest_pos)) {
+            if (!object->control().path_builder().restrictions().accessible(dest_pos))
+            {
                 data.vertex = object->control().path_builder().restrictions().accessible_nearest(dest_pos, data.point);
             }
             else
@@ -103,7 +104,8 @@ void CStateGroupHearDangerousSoundAbstract::setup_substates()
         return;
     }
 
-    if (current_substate == eStateHearDangerousSound_Hide) {
+    if (current_substate == eStateHearDangerousSound_Hide)
+    {
         SStateDataMoveToPointEx data;
 
         data.vertex = 0;
@@ -114,7 +116,8 @@ void CStateGroupHearDangerousSoundAbstract::setup_substates()
 
         m_target_node = object->Home->get_place_in_max_home_to_direction(home2sound);
 
-        if (m_target_node == u32(-1)) {
+        if (m_target_node == u32(-1))
+        {
             data.point = object->Position();
         }
         else
@@ -123,8 +126,8 @@ void CStateGroupHearDangerousSoundAbstract::setup_substates()
         }
 
         data.action.action = ACT_RUN;
-        data.action.time_out = 0;    // do not use time out
-        data.completion_dist = 3.f;  // get exactly to the point
+        data.action.time_out = 0; // do not use time out
+        data.completion_dist = 3.f; // get exactly to the point
         data.time_to_rebuild = 0;
         data.accelerated = true;
         data.braking = true;

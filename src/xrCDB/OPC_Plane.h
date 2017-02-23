@@ -35,7 +35,6 @@ public:
     inline_ Plane(const Plane& plane) : n(plane.n), d(plane.d) {}
     //! Destructor
     inline_ ~Plane() {}
-
     inline_ Plane& Zero()
     {
         n.Zero();
@@ -58,7 +57,6 @@ public:
 
     inline_ float Distance(const Point& p) const { return (p | n) + d; }
     inline_ bool Belongs(const Point& p) const { return _abs(Distance(p)) < PLANE_EPSILON; }
-
     inline_ void Normalize()
     {
         float Denom = 1.0f / n.Magnitude();
@@ -70,8 +68,8 @@ public:
 
 public:
     // Members
-    Point n;  //!< The normal to the plane
-    float d;  //!< The distance from the origin
+    Point n; //!< The normal to the plane
+    float d; //!< The distance from the origin
 
     // Cast operators
     inline_ operator Point() const { return n; }
@@ -139,4 +137,4 @@ inline_ void TransformPlane(Plane& plane, const Matrix4x4& transform)
     plane.d = (plane.d * plane.n - Trans) | plane.n;
 }
 
-#endif  // __ICEPLANE_H__
+#endif // __ICEPLANE_H__

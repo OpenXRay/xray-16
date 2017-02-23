@@ -12,29 +12,18 @@
 #pragma resource "*.dfm"
 
 //---------------------------------------------------------------------------
-__fastcall TfraWayPoint::TfraWayPoint(TComponent* Owner) : TForm(Owner)
-{
-    DEFINE_INI(fsStorage);
-}
-
+__fastcall TfraWayPoint::TfraWayPoint(TComponent* Owner) : TForm(Owner) { DEFINE_INI(fsStorage); }
 //---------------------------------------------------------------------------
-void __fastcall TfraWayPoint::PanelMinClick(TObject* Sender)
-{
-    PanelMinMaxClick(Sender);
-}
-
+void __fastcall TfraWayPoint::PanelMinClick(TObject* Sender) { PanelMinMaxClick(Sender); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfraWayPoint::ExpandClick(TObject* Sender)
-{
-    PanelMaximizeClick(Sender);
-}
-
+void __fastcall TfraWayPoint::ExpandClick(TObject* Sender) { PanelMaximizeClick(Sender); }
 //---------------------------------------------------------------------------
 
 void __fastcall TfraWayPoint::ebAdd1LinksClick(TObject* Sender)
 {
-    if (!ebModePoint->Down) {
+    if (!ebModePoint->Down)
+    {
         ELog.DlgMsg(mtInformation, "Before editing enter Point Mode.");
         return;
     }
@@ -47,7 +36,8 @@ void __fastcall TfraWayPoint::ebAdd1LinksClick(TObject* Sender)
         ((CWayObject*)(*it))->RemoveLink();
         bRes |= ((CWayObject*)(*it))->Add1Link();
     }
-    if (bRes) Scene->UndoSave();
+    if (bRes)
+        Scene->UndoSave();
     ExecCommand(COMMAND_UPDATE_PROPERTIES);
 }
 
@@ -55,7 +45,8 @@ void __fastcall TfraWayPoint::ebAdd1LinksClick(TObject* Sender)
 
 void __fastcall TfraWayPoint::ebAdd2LinkClick(TObject* Sender)
 {
-    if (!ebModePoint->Down) {
+    if (!ebModePoint->Down)
+    {
         ELog.DlgMsg(mtInformation, "Before editing enter Point Mode.");
         return;
     }
@@ -64,7 +55,8 @@ void __fastcall TfraWayPoint::ebAdd2LinkClick(TObject* Sender)
     Scene->GetQueryObjects(lst, OBJCLASS_WAY, 1, 1, 0);
     for (ObjectIt it = lst.begin(); it != lst.end(); it++)
         bRes |= ((CWayObject*)(*it))->Add2Link();
-    if (bRes) Scene->UndoSave();
+    if (bRes)
+        Scene->UndoSave();
     ExecCommand(COMMAND_UPDATE_PROPERTIES);
 }
 
@@ -76,7 +68,8 @@ void __fastcall TfraWayPoint::ebConvert1Click(TObject* Sender)
     int cnt = Scene->GetQueryObjects(lst, OBJCLASS_WAY, 1, 1, 0);
     for (ObjectIt it = lst.begin(); it != lst.end(); it++)
         ((CWayObject*)(*it))->Convert1Link();
-    if (cnt) Scene->UndoSave();
+    if (cnt)
+        Scene->UndoSave();
     ExecCommand(COMMAND_UPDATE_PROPERTIES);
 }
 
@@ -88,7 +81,8 @@ void __fastcall TfraWayPoint::ebConvert2Click(TObject* Sender)
     int cnt = Scene->GetQueryObjects(lst, OBJCLASS_WAY, 1, 1, 0);
     for (ObjectIt it = lst.begin(); it != lst.end(); it++)
         ((CWayObject*)(*it))->Convert2Link();
-    if (cnt) Scene->UndoSave();
+    if (cnt)
+        Scene->UndoSave();
     ExecCommand(COMMAND_UPDATE_PROPERTIES);
 }
 
@@ -96,7 +90,8 @@ void __fastcall TfraWayPoint::ebConvert2Click(TObject* Sender)
 
 void __fastcall TfraWayPoint::ebRemoveLinksClick(TObject* Sender)
 {
-    if (!ebModePoint->Down) {
+    if (!ebModePoint->Down)
+    {
         ELog.DlgMsg(mtInformation, "Before editing enter Point Mode.");
         return;
     }
@@ -104,7 +99,8 @@ void __fastcall TfraWayPoint::ebRemoveLinksClick(TObject* Sender)
     int cnt = Scene->GetQueryObjects(lst, OBJCLASS_WAY, 1, 1, 0);
     for (ObjectIt it = lst.begin(); it != lst.end(); it++)
         ((CWayObject*)(*it))->RemoveLink();
-    if (cnt) Scene->UndoSave();
+    if (cnt)
+        Scene->UndoSave();
     ExecCommand(COMMAND_UPDATE_PROPERTIES);
 }
 
@@ -112,7 +108,8 @@ void __fastcall TfraWayPoint::ebRemoveLinksClick(TObject* Sender)
 
 void __fastcall TfraWayPoint::ebInvertLinkClick(TObject* Sender)
 {
-    if (!ebModePoint->Down) {
+    if (!ebModePoint->Down)
+    {
         ELog.DlgMsg(mtInformation, "Before editing enter Point Mode.");
         return;
     }
@@ -120,7 +117,8 @@ void __fastcall TfraWayPoint::ebInvertLinkClick(TObject* Sender)
     int cnt = Scene->GetQueryObjects(lst, OBJCLASS_WAY, 1, 1, 0);
     for (ObjectIt it = lst.begin(); it != lst.end(); it++)
         ((CWayObject*)(*it))->InvertLink();
-    if (cnt) Scene->UndoSave();
+    if (cnt)
+        Scene->UndoSave();
     ExecCommand(COMMAND_UPDATE_PROPERTIES);
 }
 

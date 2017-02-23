@@ -3,11 +3,7 @@
 
 #include "Envelope.hpp"
 
-CEnvelope::~CEnvelope()
-{
-    Clear();
-}
-
+CEnvelope::~CEnvelope() { Clear(); }
 CEnvelope::CEnvelope(CEnvelope* source)
 {
     *this = *source;
@@ -31,12 +27,14 @@ void CEnvelope::FindNearestKey(float t, KeyIt& min_k, KeyIt& max_k, float eps)
 {
     for (KeyIt k_it = keys.begin(); k_it != keys.end(); k_it++)
     {
-        if (fsimilar((*k_it)->time, t, eps)) {
+        if (fsimilar((*k_it)->time, t, eps))
+        {
             max_k = k_it + 1;
             min_k = (k_it == keys.begin()) ? k_it : k_it - 1;
             return;
         }
-        if ((*k_it)->time > t) {
+        if ((*k_it)->time > t)
+        {
             max_k = k_it;
             min_k = (k_it == keys.begin()) ? k_it : k_it - 1;
             return;
@@ -50,8 +48,10 @@ KeyIt CEnvelope::FindKey(float t, float eps)
 {
     for (KeyIt k_it = keys.begin(); k_it != keys.end(); k_it++)
     {
-        if (fsimilar((*k_it)->time, t, eps)) return k_it;
-        if ((*k_it)->time > t) return keys.end();
+        if (fsimilar((*k_it)->time, t, eps))
+            return k_it;
+        if ((*k_it)->time > t)
+            return keys.end();
     }
     return keys.end();
 }
@@ -61,12 +61,14 @@ void CEnvelope::InsertKey(float t, float val)
     KeyIt k_it;
     for (k_it = keys.begin(); k_it != keys.end(); k_it++)
     {
-        if (fsimilar((*k_it)->time, t, EPS_L)) {
+        if (fsimilar((*k_it)->time, t, EPS_L))
+        {
             (*k_it)->value = val;
             return;
         }
         // insert before
-        if ((*k_it)->time > t) break;
+        if ((*k_it)->time > t)
+            break;
     }
     // create _new key
     st_Key* K = new st_Key();
@@ -82,7 +84,8 @@ void CEnvelope::DeleteKey(float t)
 {
     for (KeyIt k_it = keys.begin(); k_it != keys.end(); k_it++)
     {
-        if (fsimilar((*k_it)->time, t, EPS_L)) {
+        if (fsimilar((*k_it)->time, t, EPS_L))
+        {
             xr_delete(*k_it);
             keys.erase(k_it);
             return;
@@ -93,17 +96,21 @@ void CEnvelope::DeleteKey(float t)
 BOOL CEnvelope::ScaleKeys(float from_time, float to_time, float scale_factor, float eps)
 {
     KeyIt min_k = FindKey(from_time, eps);
-    if (min_k == keys.end()) {
+    if (min_k == keys.end())
+    {
         KeyIt k0;
         FindNearestKey(from_time, k0, min_k, eps);
     }
     KeyIt max_k = FindKey(to_time, eps);
-    if (max_k == keys.end()) {
+    if (max_k == keys.end())
+    {
         KeyIt k1;
         FindNearestKey(to_time, max_k, k1, eps);
     }
-    if (min_k != keys.end() && min_k != max_k) {
-        if (max_k != keys.end()) max_k++;
+    if (min_k != keys.end() && min_k != max_k)
+    {
+        if (max_k != keys.end())
+            max_k++;
         float t0 = (*min_k)->time;
         float offset = 0;
         KeyIt it;
@@ -127,13 +134,18 @@ BOOL CEnvelope::ScaleKeys(float from_time, float to_time, float scale_factor, fl
 
 float CEnvelope::GetLength(float* mn, float* mx)
 {
-    if (!keys.empty()) {
-        if (mn) *mn = keys.front()->time;
-        if (mx) *mx = keys.back()->time;
+    if (!keys.empty())
+    {
+        if (mn)
+            *mn = keys.front()->time;
+        if (mx)
+            *mx = keys.back()->time;
         return keys.back()->time - keys.front()->time;
     }
-    if (mn) *mn = 0.f;
-    if (mx) *mx = 0.f;
+    if (mn)
+        *mn = 0.f;
+    if (mx)
+        *mx = 0.f;
     return 0.f;
 }
 
@@ -144,11 +156,7 @@ void CEnvelope::RotateKeys(float angle)
 }
 
 extern float evalEnvelope(CEnvelope* env, float time);
-float CEnvelope::Evaluate(float time)
-{
-    return evalEnvelope(this, time);
-}
-
+float CEnvelope::Evaluate(float time) { return evalEnvelope(this, time); }
 void CEnvelope::Save(IWriter& F)
 {
     F.w_u8((u8)behavior[0]);
@@ -184,17 +192,15 @@ void CEnvelope::Load_2(IReader& F)
     }
 }
 
-void CEnvelope::SaveA(IWriter&)
-{
-}
-
+void CEnvelope::SaveA(IWriter&) {}
 void CEnvelope::LoadA(IReader& F)
 {
     Clear();
     string512 buf;
     float f[9];
     F.r_string(buf, sizeof(buf));
-    if (strstr(buf, "{ Envelope")) {
+    if (strstr(buf, "{ Envelope"))
+    {
         F.r_string(buf, sizeof(buf));
         int nkeys = atoi(buf);
         keys.resize(nkeys);
@@ -209,12 +215,14 @@ void CEnvelope::LoadA(IReader& F)
             K.value = f[0];
             K.time = f[1];
             K.shape = (u8)f[2];
-            if (K.shape == SHAPE_TCB) {
+            if (K.shape == SHAPE_TCB)
+            {
                 K.tension = f[3];
                 K.continuity = f[4];
                 K.bias = f[5];
             }
-            if (K.shape == SHAPE_BEZ2) {
+            if (K.shape == SHAPE_BEZ2)
+            {
                 K.param[0] = f[3];
                 K.param[1] = f[4];
                 K.param[2] = f[5];
@@ -235,7 +243,8 @@ void CEnvelope::LoadA(IReader& F)
 
 void CEnvelope::Optimize()
 {
-    if (keys.empty()) return;
+    if (keys.empty())
+        return;
 
     KeyIt it = keys.begin();
     st_Key K = **it;
@@ -243,12 +252,14 @@ void CEnvelope::Optimize()
     bool equal = true;
     for (; it != keys.end(); it++)
     {
-        if (!(*it)->equal(K)) {
+        if (!(*it)->equal(K))
+        {
             equal = false;
             break;
         }
     }
-    if (equal && (keys.size() > 2)) {
+    if (equal && (keys.size() > 2))
+    {
         KeyVec new_keys;
         new_keys.push_back(new st_Key(*keys.front()));
         new_keys.push_back(new st_Key(*keys.back()));

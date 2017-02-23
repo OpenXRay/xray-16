@@ -25,4 +25,4 @@ public:
     virtual void OnDeviceDestroy() = 0;
 };
 
-#endif  //	LensFlareRender_included
+#endif //	LensFlareRender_included

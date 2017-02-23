@@ -55,7 +55,8 @@ void ESceneCustomOTool::SaveSelection(IWriter& F)
     int count = 0;
     for (ObjectIt it = m_Objects.begin(); it != m_Objects.end(); ++it)
     {
-        if ((*it)->Selected() && !(*it)->IsDeleted()) {
+        if ((*it)->Selected() && !(*it)->IsDeleted())
+        {
             F.open_chunk(count++);
             Scene->SaveObjectStream(*it, F);
             F.close_chunk();
@@ -82,8 +83,10 @@ bool ESceneCustomOTool::LoadLTX(CInifile& ini)
     {
         CCustomObject* obj = NULL;
         sprintf(buff, "object_%d", i);
-        if (Scene->ReadObjectLTX(ini, buff, obj)) {
-            if (!OnLoadAppendObject(obj)) xr_delete(obj);
+        if (Scene->ReadObjectLTX(ini, buff, obj))
+        {
+            if (!OnLoadAppendObject(obj))
+                xr_delete(obj);
         }
         pb->Inc();
     }
@@ -117,9 +120,11 @@ void ESceneCustomOTool::SaveLTX(CInifile& ini, int id)
     for (ObjectIt it = m_Objects.begin(); it != m_Objects.end(); ++it)
     {
         CCustomObject* O = (*it);
-        if (O->save_id != id) continue;
+        if (O->save_id != id)
+            continue;
 
-        if (O->IsDeleted() || O->m_CO_Flags.test(CCustomObject::flObjectInGroup)) continue;
+        if (O->IsDeleted() || O->m_CO_Flags.test(CCustomObject::flObjectInGroup))
+            continue;
 
         string128 buff;
         sprintf(buff, "object_%d", count);
@@ -140,7 +145,8 @@ void ESceneCustomOTool::SaveStream(IWriter& F)
     int count = 0;
     for (ObjectIt it = m_Objects.begin(); it != m_Objects.end(); ++it)
     {
-        if ((*it)->IsDeleted() || (*it)->m_CO_Flags.test(CCustomObject::flObjectInGroup)) continue;
+        if ((*it)->IsDeleted() || (*it)->m_CO_Flags.test(CCustomObject::flObjectInGroup))
+            continue;
 
         F.open_chunk(count++);
         Scene->SaveObjectStream(*it, F);
@@ -153,18 +159,15 @@ void ESceneCustomOTool::SaveStream(IWriter& F)
 
 //----------------------------------------------------
 
-bool ESceneCustomOTool::Export(LPCSTR path)
-{
-    return true;
-}
-
+bool ESceneCustomOTool::Export(LPCSTR path) { return true; }
 //----------------------------------------------------
 
 bool ESceneCustomOTool::ExportGame(SExportStreams* F)
 {
     bool bres = true;
     for (ObjectIt it = m_Objects.begin(); it != m_Objects.end(); it++)
-        if (!(*it)->ExportGame(F)) bres = false;
+        if (!(*it)->ExportGame(F))
+            bres = false;
     return bres;
 }
 
@@ -178,7 +181,7 @@ bool ESceneCustomOTool::ExportStatic(SceneBuilder* B, bool b_selected_only)
 BOOL GetStaticCformData(ObjectList& lst, mesh_build_data& data, bool b_selected_only);
 
 bool ESceneCustomOTool::GetStaticCformData(mesh_build_data& data,
-    bool b_selected_only)  // b_vertex* verts, int& vert_cnt, int& vert_it,b_face* faces, int& face_cnt, int& face_it,
+    bool b_selected_only) // b_vertex* verts, int& vert_cnt, int& vert_it,b_face* faces, int& face_cnt, int& face_it,
 {
     return ::GetStaticCformData(m_Objects, data, b_selected_only);
 }

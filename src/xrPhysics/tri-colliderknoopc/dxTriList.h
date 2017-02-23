@@ -7,7 +7,6 @@ struct dcVector3
     float x, y, z;
 
     dcVector3() {}
-
     dcVector3(dReal x, dReal y, dReal z)
     {
         this->x = (float)x;
@@ -27,9 +26,8 @@ struct dcVector3
     }
 
     ~dcVector3() {}
-
     operator float*()
-    {  //&slipch
+    { //&slipch
 
         return reinterpret_cast<float*>(this);
     }
@@ -201,11 +199,8 @@ struct dcVector3
     /* Comparison */
 
     bool operator==(const dcVector3& v) const { return x == v.x && y == v.y && z == v.z; }
-
     bool operator!=(const dcVector3& v) const { return v.x != x || v.y != y || v.z != z; }
-
     float DotProduct(const dcVector3& v) const { return x * v.x + y * v.y + z * v.z; }
-
     dcVector3 CrossProduct(const dcVector3& v) const
     {
         dcVector3 Out;
@@ -220,15 +215,11 @@ struct dcVector3
     }
 
     float MagnitudeSq() const { return DotProduct(*this); }
-
     float Magnitude() const { return _sqrt(MagnitudeSq()); }
-
     void Normalize() { operator/=(Magnitude()); }
-
     /* Member access */
 
     float& operator[](int Index) { return *(&x + Index); }
-
     float operator[](int Index) const { return *(&x + Index); }
 };
 
@@ -270,7 +261,7 @@ class dcTriListCollider;
 
 struct dxTriList
 {
-    dReal p[4];  // dxPlane
+    dReal p[4]; // dxPlane
 
     dTriCallback* Callback;
 
@@ -286,7 +277,6 @@ struct dcPlane
     float Distance;
 
     dcPlane() {}
-
     dcPlane(const dcVector3& v0, const dcVector3& v1, const dcVector3& v2)
     {
         dcVector3 u = v1 - v0;
@@ -311,7 +301,7 @@ struct dcPlane
 
     bool Contains(const dcVector3& RefObject, float Epsilon = 0.0f) const
     {
-        return Normal.DotProduct(RefObject) - Distance >= -Epsilon;  //@slipch ">=" instead ">"
+        return Normal.DotProduct(RefObject) - Distance >= -Epsilon; //@slipch ">=" instead ">"
     }
 };
 
@@ -327,4 +317,4 @@ const T& dcMIN(const T& x, const T& y)
     return x < y ? x : y;
 }
 
-#endif  //__DXTRILIST_INCLUDED__
+#endif //__DXTRILIST_INCLUDED__

@@ -24,7 +24,8 @@ void CALifeSimulatorBase::register_object(CSE_ALifeDynamicObject* object, bool a
 {
     object->on_before_register();
 
-    if (add_object) objects().add(object);
+    if (add_object)
+        objects().add(object);
 
     graph().update(object);
     scheduled().add(object);
@@ -35,11 +36,13 @@ void CALifeSimulatorBase::register_object(CSE_ALifeDynamicObject* object, bool a
     setup_simulator(object);
 
     CSE_ALifeInventoryItem* item = smart_cast<CSE_ALifeInventoryItem*>(object);
-    if (item && item->attached()) {
+    if (item && item->attached())
+    {
         CSE_ALifeDynamicObject* II = objects().object(item->base()->ID_Parent);
 
 #ifdef DEBUG
-        if (std::find(II->children.begin(), II->children.end(), item->base()->ID) != II->children.end()) {
+        if (std::find(II->children.begin(), II->children.end(), item->base()->ID) != II->children.end())
+        {
             Msg("[LSS] Specified item [%s][%d] is already attached to the specified object [%s][%d]",
                 item->base()->name_replace(), item->base()->ID, II->name_replace(), II->ID);
             FATAL("[LSS] Cannot recover from the previous error!");
@@ -50,7 +53,8 @@ void CALifeSimulatorBase::register_object(CSE_ALifeDynamicObject* object, bool a
         II->attach(item, true, false);
     }
 
-    if (can_register_objects()) object->on_register();
+    if (can_register_objects())
+        object->on_register();
 }
 
 void CALifeSimulatorBase::unregister_object(CSE_ALifeDynamicObject* object, bool alife_query)
@@ -67,7 +71,8 @@ void CALifeSimulatorBase::unregister_object(CSE_ALifeDynamicObject* object, bool
     smart_terrains().remove(object);
     groups().remove(object);
 
-    if (!object->m_bOnline) {
+    if (!object->m_bOnline)
+    {
         graph().remove(object, object->m_tGraphID);
         scheduled().remove(object);
     }
@@ -83,12 +88,15 @@ void CALifeSimulatorBase::on_death(CSE_Abstract* killed, CSE_Abstract* killer)
     typedef CSE_ALifeOnlineOfflineGroup::MEMBER GROUP_MEMBER;
 
     CSE_ALifeCreatureAbstract* creature = smart_cast<CSE_ALifeCreatureAbstract*>(killed);
-    if (creature) creature->on_death(killer);
+    if (creature)
+        creature->on_death(killer);
 
     GROUP_MEMBER* member = smart_cast<GROUP_MEMBER*>(killed);
-    if (!member) return;
+    if (!member)
+        return;
 
-    if (member->m_group_id == 0xffff) return;
+    if (member->m_group_id == 0xffff)
+        return;
 
     groups().object(member->m_group_id).notify_on_member_death(member);
 }

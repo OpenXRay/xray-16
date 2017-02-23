@@ -118,7 +118,8 @@ void CSoundRender_Core::env_load()
 {
     // Load environment
     string_path fn;
-    if (FS.exist(fn, "$game_data$", SNDENV_FILENAME)) {
+    if (FS.exist(fn, "$game_data$", SNDENV_FILENAME))
+    {
         s_environment = new SoundEnvironment_LIB();
         s_environment->Load(fn);
     }
@@ -131,7 +132,8 @@ void CSoundRender_Core::env_load()
 void CSoundRender_Core::env_unload()
 {
     // Unload
-    if (s_environment) s_environment->Unload();
+    if (s_environment)
+        s_environment->Unload();
     xr_delete(s_environment);
 
     // Unload geometry
@@ -144,16 +146,8 @@ void CSoundRender_Core::_restart()
     env_apply();
 }
 
-void CSoundRender_Core::set_handler(sound_event* E)
-{
-    Handler = E;
-}
-
-void CSoundRender_Core::set_geometry_occ(CDB::MODEL* M)
-{
-    geom_MODEL = M;
-}
-
+void CSoundRender_Core::set_handler(sound_event* E) { Handler = E; }
+void CSoundRender_Core::set_geometry_occ(CDB::MODEL* M) { geom_MODEL = M; }
 void CSoundRender_Core::set_geometry_som(IReader* I)
 {
 #ifdef _EDITOR
@@ -161,7 +155,8 @@ void CSoundRender_Core::set_geometry_som(IReader* I)
 #else
     xr_delete(geom_SOM);
 #endif
-    if (0 == I) return;
+    if (0 == I)
+        return;
 
     // check version
     R_ASSERT(I->find_chunk(0));
@@ -187,7 +182,8 @@ void CSoundRender_Core::set_geometry_som(IReader* I)
         SOM_poly P;
         geom->r(&P, sizeof(P));
         ETOOLS::collector_add_face_pd(CL, P.v1, P.v2, P.v3, *(u32*)&P.occ, 0.01f);
-        if (P.b2sided) ETOOLS::collector_add_face_pd(CL, P.v3, P.v2, P.v1, *(u32*)&P.occ, 0.01f);
+        if (P.b2sided)
+            ETOOLS::collector_add_face_pd(CL, P.v3, P.v2, P.v1, *(u32*)&P.occ, 0.01f);
     }
     geom_SOM = ETOOLS::create_model_cl(CL);
     ETOOLS::destroy_collector(CL);
@@ -198,7 +194,8 @@ void CSoundRender_Core::set_geometry_som(IReader* I)
         SOM_poly P;
         geom->r(&P, sizeof(P));
         CL.add_face_packed_D(P.v1, P.v2, P.v3, *(u32*)&P.occ, 0.01f);
-        if (P.b2sided) CL.add_face_packed_D(P.v3, P.v2, P.v1, *(u32*)&P.occ, 0.01f);
+        if (P.b2sided)
+            CL.add_face_packed_D(P.v3, P.v2, P.v1, *(u32*)&P.occ, 0.01f);
     }
     geom_SOM = new CDB::MODEL();
     geom_SOM->build(CL.getV(), int(CL.getVS()), CL.getT(), int(CL.getTS()));
@@ -214,8 +211,10 @@ void CSoundRender_Core::set_geometry_env(IReader* I)
 #else
     xr_delete(geom_ENV);
 #endif
-    if (0 == I) return;
-    if (0 == s_environment) return;
+    if (0 == I)
+        return;
+    if (0 == s_environment)
+        return;
 
     // Assosiate names
     xr_vector<u16> ids;
@@ -246,8 +245,8 @@ void CSoundRender_Core::set_geometry_env(IReader* I)
     for (u32 it = 0; it < H.facecount; it++)
     {
         CDB::TRI* T = tris + it;
-        u16 id_front = (u16)((T->dummy & 0x0000ffff) >> 0);  //	front face
-        u16 id_back = (u16)((T->dummy & 0xffff0000) >> 16);  //	back face
+        u16 id_front = (u16)((T->dummy & 0x0000ffff) >> 0); //	front face
+        u16 id_back = (u16)((T->dummy & 0xffff0000) >> 16); //	back face
         R_ASSERT(id_front < (u16)ids.size());
         R_ASSERT(id_back < (u16)ids.size());
         T->dummy = u32(ids[id_back] << 16) | u32(ids[id_front]);
@@ -266,20 +265,24 @@ void CSoundRender_Core::set_geometry_env(IReader* I)
 
 void CSoundRender_Core::create(ref_sound& S, const char* fName, esound_type sound_type, int game_type)
 {
-    if (!bPresent) return;
+    if (!bPresent)
+        return;
     S._p = new ref_sound_data(fName, sound_type, game_type);
 }
 
 void CSoundRender_Core::attach_tail(ref_sound& S, const char* fName)
 {
-    if (!bPresent) return;
+    if (!bPresent)
+        return;
     string_path fn;
     xr_strcpy(fn, fName);
-    if (strext(fn)) *strext(fn) = 0;
-    if (S._p->fn_attached[0].size() && S._p->fn_attached[1].size()) {
+    if (strext(fn))
+        *strext(fn) = 0;
+    if (S._p->fn_attached[0].size() && S._p->fn_attached[1].size())
+    {
 #ifdef DEBUG
         Msg("! 2 file already in queue [%s][%s]", S._p->fn_attached[0].c_str(), S._p->fn_attached[1].c_str());
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
         return;
     }
 
@@ -290,14 +293,16 @@ void CSoundRender_Core::attach_tail(ref_sound& S, const char* fName)
     CSoundRender_Source* s = SoundRender->i_create_source(fn);
     S._p->dwBytesTotal += s->bytes_total();
     S._p->fTimeTotal += s->length_sec();
-    if (S._feedback()) ((CSoundRender_Emitter*)S._feedback())->fTimeToStop += s->length_sec();
+    if (S._feedback())
+        ((CSoundRender_Emitter*)S._feedback())->fTimeToStop += s->length_sec();
 
     SoundRender->i_destroy_source(s);
 }
 
 void CSoundRender_Core::clone(ref_sound& S, const ref_sound& from, esound_type sound_type, int game_type)
 {
-    if (!bPresent) return;
+    if (!bPresent)
+        return;
     S._p = new ref_sound_data();
     S._p->handle = from._p->handle;
     S._p->dwBytesTotal = from._p->dwBytesTotal;
@@ -310,20 +315,23 @@ void CSoundRender_Core::clone(ref_sound& S, const ref_sound& from, esound_type s
 
 void CSoundRender_Core::play(ref_sound& S, IGameObject* O, u32 flags, float delay)
 {
-    if (!bPresent || 0 == S._handle()) return;
+    if (!bPresent || 0 == S._handle())
+        return;
     S._p->g_object = O;
     if (S._feedback())
         ((CSoundRender_Emitter*)S._feedback())->rewind();
     else
         i_play(&S, flags & sm_Looped, delay);
 
-    if (flags & sm_2D || S._handle()->channels_num() == 2) S._feedback()->switch_to_2D();
+    if (flags & sm_2D || S._handle()->channels_num() == 2)
+        S._feedback()->switch_to_2D();
 }
 
 void CSoundRender_Core::play_no_feedback(
     ref_sound& S, IGameObject* O, u32 flags, float delay, Fvector* pos, float* vol, float* freq, Fvector2* range)
 {
-    if (!bPresent || 0 == S._handle()) return;
+    if (!bPresent || 0 == S._handle())
+        return;
     ref_sound_data_ptr orig = S._p;
     S._p = new ref_sound_data();
     S._p->handle = orig->handle;
@@ -336,18 +344,24 @@ void CSoundRender_Core::play_no_feedback(
 
     i_play(&S, flags & sm_Looped, delay);
 
-    if (flags & sm_2D || S._handle()->channels_num() == 2) S._feedback()->switch_to_2D();
+    if (flags & sm_2D || S._handle()->channels_num() == 2)
+        S._feedback()->switch_to_2D();
 
-    if (pos) S._feedback()->set_position(*pos);
-    if (freq) S._feedback()->set_frequency(*freq);
-    if (range) S._feedback()->set_range((*range)[0], (*range)[1]);
-    if (vol) S._feedback()->set_volume(*vol);
+    if (pos)
+        S._feedback()->set_position(*pos);
+    if (freq)
+        S._feedback()->set_frequency(*freq);
+    if (range)
+        S._feedback()->set_range((*range)[0], (*range)[1]);
+    if (vol)
+        S._feedback()->set_volume(*vol);
     S._p = orig;
 }
 
 void CSoundRender_Core::play_at_pos(ref_sound& S, IGameObject* O, const Fvector& pos, u32 flags, float delay)
 {
-    if (!bPresent || 0 == S._handle()) return;
+    if (!bPresent || 0 == S._handle())
+        return;
     S._p->g_object = O;
     if (S._feedback())
         ((CSoundRender_Emitter*)S._feedback())->rewind();
@@ -356,11 +370,13 @@ void CSoundRender_Core::play_at_pos(ref_sound& S, IGameObject* O, const Fvector&
 
     S._feedback()->set_position(pos);
 
-    if (flags & sm_2D || S._handle()->channels_num() == 2) S._feedback()->switch_to_2D();
+    if (flags & sm_2D || S._handle()->channels_num() == 2)
+        S._feedback()->switch_to_2D();
 }
 void CSoundRender_Core::destroy(ref_sound& S)
 {
-    if (S._feedback()) {
+    if (S._feedback())
+    {
         CSoundRender_Emitter* E = (CSoundRender_Emitter*)S._feedback();
         E->stop(FALSE);
     }
@@ -371,7 +387,8 @@ void CSoundRender_Core::_create_data(ref_sound_data& S, LPCSTR fName, esound_typ
 {
     string_path fn;
     xr_strcpy(fn, fName);
-    if (strext(fn)) *strext(fn) = 0;
+    if (strext(fn))
+        *strext(fn) = 0;
     S.handle = (CSound_source*)SoundRender->i_create_source(fn);
     S.g_type = (game_type == sg_SourceType) ? S.handle->game_type() : game_type;
     S.s_type = sound_type;
@@ -383,7 +400,8 @@ void CSoundRender_Core::_create_data(ref_sound_data& S, LPCSTR fName, esound_typ
 }
 void CSoundRender_Core::_destroy_data(ref_sound_data& S)
 {
-    if (S.feedback) {
+    if (S.feedback)
+    {
         CSoundRender_Emitter* E = (CSoundRender_Emitter*)S.feedback;
         E->stop(FALSE);
     }
@@ -397,22 +415,26 @@ CSoundRender_Environment* CSoundRender_Core::get_environment(const Fvector& P)
 {
     static CSoundRender_Environment identity;
 
-    if (bUserEnvironment) {
+    if (bUserEnvironment)
+    {
         return &s_user_environment;
     }
     else
     {
-        if (geom_ENV) {
+        if (geom_ENV)
+        {
             Fvector dir = {0, -1, 0};
 #ifdef _EDITOR
             ETOOLS::ray_options(CDB::OPT_ONLYNEAREST);
             ETOOLS::ray_query(geom_ENV, P, dir, 1000.f);
-            if (ETOOLS::r_count()) {
+            if (ETOOLS::r_count())
+            {
                 CDB::RESULT* r = ETOOLS::r_begin();
 #else
             geom_DB.ray_options(CDB::OPT_ONLYNEAREST);
             geom_DB.ray_query(geom_ENV, P, dir, 1000.f);
-            if (geom_DB.r_count()) {
+            if (geom_DB.r_count())
+            {
                 CDB::RESULT* r = geom_DB.r_begin();
 #endif
                 CDB::TRI* T = geom_ENV->get_tris() + r->id;
@@ -420,13 +442,14 @@ CSoundRender_Environment* CSoundRender_Core::get_environment(const Fvector& P)
                 Fvector tri_norm;
                 tri_norm.mknormal(V[T->verts[0]], V[T->verts[1]], V[T->verts[2]]);
                 float dot = dir.dotproduct(tri_norm);
-                if (dot < 0) {
-                    u16 id_front = (u16)((T->dummy & 0x0000ffff) >> 0);  //	front face
+                if (dot < 0)
+                {
+                    u16 id_front = (u16)((T->dummy & 0x0000ffff) >> 0); //	front face
                     return s_environment->Get(id_front);
                 }
                 else
                 {
-                    u16 id_back = (u16)((T->dummy & 0xffff0000) >> 16);  //	back face
+                    u16 id_back = (u16)((T->dummy & 0xffff0000) >> 16); //	back face
                     return s_environment->Get(id_back);
                 }
             }
@@ -459,29 +482,26 @@ void CSoundRender_Core::env_apply()
     bListenerMoved = TRUE;
 }
 
-void CSoundRender_Core::update_listener(const Fvector& P, const Fvector& D, const Fvector& N, float dt)
-{
-}
-
+void CSoundRender_Core::update_listener(const Fvector& P, const Fvector& D, const Fvector& N, float dt) {}
 void CSoundRender_Core::i_eax_listener_set(CSound_environment* _E)
 {
     VERIFY(bEAX);
     CSoundRender_Environment* E = static_cast<CSoundRender_Environment*>(_E);
     EAXLISTENERPROPERTIES ep;
-    ep.lRoom = iFloor(E->Room);                         // room effect level at low frequencies
-    ep.lRoomHF = iFloor(E->RoomHF);                     // room effect high-frequency level re. low frequency level
-    ep.flRoomRolloffFactor = E->RoomRolloffFactor;      // like DS3D flRolloffFactor but for room effect
-    ep.flDecayTime = E->DecayTime;                      // reverberation decay time at low frequencies
-    ep.flDecayHFRatio = E->DecayHFRatio;                // high-frequency to low-frequency decay time ratio
-    ep.lReflections = iFloor(E->Reflections);           // early reflections level relative to room effect
-    ep.flReflectionsDelay = E->ReflectionsDelay;        // initial reflection delay time
-    ep.lReverb = iFloor(E->Reverb);                     // late reverberation level relative to room effect
-    ep.flReverbDelay = E->ReverbDelay;                  // late reverberation delay time relative to initial reflection
-    ep.dwEnvironment = EAXLISTENER_DEFAULTENVIRONMENT;  // sets all listener properties
-    ep.flEnvironmentSize = E->EnvironmentSize;          // environment size in meters
-    ep.flEnvironmentDiffusion = E->EnvironmentDiffusion;  // environment diffusion
-    ep.flAirAbsorptionHF = E->AirAbsorptionHF;            // change in level per meter at 5 kHz
-    ep.dwFlags = EAXLISTENER_DEFAULTFLAGS;                // modifies the behavior of properties
+    ep.lRoom = iFloor(E->Room); // room effect level at low frequencies
+    ep.lRoomHF = iFloor(E->RoomHF); // room effect high-frequency level re. low frequency level
+    ep.flRoomRolloffFactor = E->RoomRolloffFactor; // like DS3D flRolloffFactor but for room effect
+    ep.flDecayTime = E->DecayTime; // reverberation decay time at low frequencies
+    ep.flDecayHFRatio = E->DecayHFRatio; // high-frequency to low-frequency decay time ratio
+    ep.lReflections = iFloor(E->Reflections); // early reflections level relative to room effect
+    ep.flReflectionsDelay = E->ReflectionsDelay; // initial reflection delay time
+    ep.lReverb = iFloor(E->Reverb); // late reverberation level relative to room effect
+    ep.flReverbDelay = E->ReverbDelay; // late reverberation delay time relative to initial reflection
+    ep.dwEnvironment = EAXLISTENER_DEFAULTENVIRONMENT; // sets all listener properties
+    ep.flEnvironmentSize = E->EnvironmentSize; // environment size in meters
+    ep.flEnvironmentDiffusion = E->EnvironmentDiffusion; // environment diffusion
+    ep.flAirAbsorptionHF = E->AirAbsorptionHF; // change in level per meter at 5 kHz
+    ep.dwFlags = EAXLISTENER_DEFAULTFLAGS; // modifies the behavior of properties
 
     u32 deferred = bDeferredEAX ? DSPROPERTY_EAXLISTENER_DEFERRED : 0;
 
@@ -537,12 +557,14 @@ void CSoundRender_Core::i_eax_commit_setting()
 
 void CSoundRender_Core::object_relcase(IGameObject* obj)
 {
-    if (obj) {
+    if (obj)
+    {
         for (u32 eit = 0; eit < s_emitters.size(); eit++)
         {
             if (s_emitters[eit])
                 if (s_emitters[eit]->owner_data)
-                    if (obj == s_emitters[eit]->owner_data->g_object) s_emitters[eit]->owner_data->g_object = 0;
+                    if (obj == s_emitters[eit]->owner_data->g_object)
+                        s_emitters[eit]->owner_data->g_object = 0;
         }
     }
 }
@@ -550,9 +572,11 @@ void CSoundRender_Core::object_relcase(IGameObject* obj)
 #ifdef _EDITOR
 void CSoundRender_Core::set_user_env(CSound_environment* E)
 {
-    if (0 == E && !bUserEnvironment) return;
+    if (0 == E && !bUserEnvironment)
+        return;
 
-    if (E) {
+    if (E)
+    {
         s_user_environment = *((CSoundRender_Environment*)E);
         bUserEnvironment = TRUE;
     }
@@ -582,7 +606,8 @@ void CSoundRender_Core::refresh_sources()
 }
 void CSoundRender_Core::set_environment_size(CSound_environment* src_env, CSound_environment** dst_env)
 {
-    if (bEAX) {
+    if (bEAX)
+    {
         CSoundRender_Environment* SE = static_cast<CSoundRender_Environment*>(src_env);
         CSoundRender_Environment* DE = static_cast<CSoundRender_Environment*>(*dst_env);
         // set environment
@@ -599,7 +624,8 @@ void CSoundRender_Core::set_environment_size(CSound_environment* src_env, CSound
 }
 void CSoundRender_Core::set_environment(u32 id, CSound_environment** dst_env)
 {
-    if (bEAX) {
+    if (bEAX)
+    {
         CSoundRender_Environment* DE = static_cast<CSoundRender_Environment*>(*dst_env);
         // set environment
         i_eax_set(&DSPROPSETID_EAX_ListenerProperties,

@@ -1,6 +1,6 @@
 #pragma once
 
-#define TEMPLATE_SPECIALIZATION                                                                                        \
+#define TEMPLATE_SPECIALIZATION \
     template <typename _Object\
 >
 #define CStateChimeraThreatenStealAbstract CStateChimeraThreatenSteal<_Object>
@@ -22,11 +22,7 @@ void CStateChimeraThreatenStealAbstract::initialize()
 }
 
 TEMPLATE_SPECIALIZATION
-void CStateChimeraThreatenStealAbstract::finalize()
-{
-    inherited::finalize();
-}
-
+void CStateChimeraThreatenStealAbstract::finalize() { inherited::finalize(); }
 TEMPLATE_SPECIALIZATION
 void CStateChimeraThreatenStealAbstract::execute()
 {
@@ -42,10 +38,12 @@ void CStateChimeraThreatenStealAbstract::execute()
 TEMPLATE_SPECIALIZATION
 bool CStateChimeraThreatenStealAbstract::check_completion()
 {
-    if (inherited::check_completion()) return true;
+    if (inherited::check_completion())
+        return true;
 
     float dist_to_enemy = object->EnemyMan.get_enemy_position().distance_to(object->Position());
-    if (dist_to_enemy < MIN_DISTANCE_TO_ENEMY) return true;
+    if (dist_to_enemy < MIN_DISTANCE_TO_ENEMY)
+        return true;
 
     return false;
 }
@@ -54,7 +52,8 @@ TEMPLATE_SPECIALIZATION
 bool CStateChimeraThreatenStealAbstract::check_start_conditions()
 {
     float dist_to_enemy = object->EnemyMan.get_enemy_position().distance_to(object->Position());
-    if (dist_to_enemy > MIN_DISTANCE_TO_ENEMY) return true;
+    if (dist_to_enemy > MIN_DISTANCE_TO_ENEMY)
+        return true;
     return false;
 }
 

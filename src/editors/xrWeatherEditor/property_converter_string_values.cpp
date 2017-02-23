@@ -15,16 +15,8 @@ using System::ComponentModel::ITypeDescriptorContext;
 using System::ComponentModel::TypeConverter;
 typedef TypeConverter::StandardValuesCollection StandardValuesCollection;
 
-bool property_converter_string_values::GetStandardValuesSupported(ITypeDescriptorContext ^ context)
-{
-    return (true);
-}
-
-bool property_converter_string_values::GetStandardValuesExclusive(ITypeDescriptorContext ^ context)
-{
-    return (true);
-}
-
+bool property_converter_string_values::GetStandardValuesSupported(ITypeDescriptorContext ^ context) { return (true); }
+bool property_converter_string_values::GetStandardValuesExclusive(ITypeDescriptorContext ^ context) { return (true); }
 StandardValuesCollection ^ property_converter_string_values::GetStandardValues(ITypeDescriptorContext ^ context)
 {
     property_container ^ container = safe_cast<property_container ^>(context->Instance);

@@ -13,7 +13,8 @@
 
 IC const CObjectFactory& object_factory()
 {
-    if (!g_object_factory) {
+    if (!g_object_factory)
+    {
         g_object_factory = new CObjectFactory();
         g_object_factory->init();
     }
@@ -31,10 +32,7 @@ IC bool CObjectFactory::CObjectItemPredicate::operator()(const CObjectItemAbstra
     return (item->clsid() < clsid);
 }
 
-IC CObjectFactory::CObjectItemPredicateCLSID::CObjectItemPredicateCLSID(const CLASS_ID& clsid) : m_clsid(clsid)
-{
-}
-
+IC CObjectFactory::CObjectItemPredicateCLSID::CObjectItemPredicateCLSID(const CLASS_ID& clsid) : m_clsid(clsid) {}
 IC bool CObjectFactory::CObjectItemPredicateCLSID::operator()(const CObjectItemAbstract* item) const
 {
     return (m_clsid == item->clsid());
@@ -50,11 +48,7 @@ IC bool CObjectFactory::CObjectItemPredicateScript::operator()(const CObjectItem
     return (m_script_clsid_name == item->script_clsid());
 }
 
-IC const CObjectFactory::OBJECT_ITEM_STORAGE& CObjectFactory::clsids() const
-{
-    return (m_clsids);
-}
-
+IC const CObjectFactory::OBJECT_ITEM_STORAGE& CObjectFactory::clsids() const { return (m_clsids); }
 #ifndef NO_XR_GAME
 IC const CObjectItemAbstract& CObjectFactory::item(const CLASS_ID& clsid) const
 {
@@ -68,7 +62,8 @@ IC const CObjectItemAbstract* CObjectFactory::item(const CLASS_ID& clsid, bool n
 {
     actualize();
     const_iterator I = std::lower_bound(clsids().begin(), clsids().end(), clsid, CObjectItemPredicate());
-    if ((I == clsids().end()) || ((*I)->clsid() != clsid)) {
+    if ((I == clsids().end()) || ((*I)->clsid() != clsid))
+    {
         R_ASSERT(no_assert);
         return (0);
     }
@@ -81,7 +76,8 @@ IC void CObjectFactory::add(CObjectItemAbstract* item)
     const_iterator I;
 
     I = std::find_if(clsids().begin(), clsids().end(), CObjectItemPredicateCLSID(item->clsid()));
-    if (I != clsids().end()) {
+    if (I != clsids().end())
+    {
         string16 temp;
         CLSID2TEXT(item->clsid(), temp);
         VERIFY2(0, make_string("clsid is duplicated : %s", temp));
@@ -123,7 +119,8 @@ inline CObjectFactory::ServerObjectBaseClass* CObjectFactory::server_object(cons
 
 IC void CObjectFactory::actualize() const
 {
-    if (m_actual) return;
+    if (m_actual)
+        return;
 
     m_actual = true;
     std::sort(m_clsids.begin(), m_clsids.end(), CObjectItemPredicate());

@@ -60,11 +60,11 @@ private:
     property_holder_type* m_property_holder;
     collection_type* m_collection;
     sound_container_type m_sounds;
-};  // class channel
-}  // namespace sound_channels
-}  // namespace environment
-}  // namespace editor
+}; // class channel
+} // namespace sound_channels
+} // namespace environment
+} // namespace editor
 
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR
 
-#endif  // ifndef EDITOR_WEATHER_SOUND_CHANNELS_CHANNEL_HPP_INCLUDED
+#endif // ifndef EDITOR_WEATHER_SOUND_CHANNELS_CHANNEL_HPP_INCLUDED

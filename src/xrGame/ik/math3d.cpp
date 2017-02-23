@@ -82,7 +82,8 @@ void hmatmult(Matrix A, Matrix B, Matrix C)
     register float *b32, *c00, *c03;
     Matrix Bt, Ct;
 
-    if (A == B) {
+    if (A == B)
+    {
         cpmatrix(Bt, B);
         bmax = &Bt[3][0];
         b = &Bt[0][0];
@@ -95,7 +96,8 @@ void hmatmult(Matrix A, Matrix B, Matrix C)
         b32 = &B[3][2];
     }
 
-    if (A == C) {
+    if (A == C)
+    {
         cpmatrix(Ct, C);
         c00 = &Ct[0][0];
         c03 = &Ct[0][3];
@@ -249,8 +251,10 @@ void axisangletomatrix(Matrix m, float axis[], float theta)
 
     p = (float*)m;
 
-    if (axis[0] == 0.0f && axis[1] == 0.0f) {
-        if (axis[2] < 0) {
+    if (axis[0] == 0.0f && axis[1] == 0.0f)
+    {
+        if (axis[2] < 0)
+        {
             s = -s;
         }
         /*
@@ -272,7 +276,8 @@ void axisangletomatrix(Matrix m, float axis[], float theta)
     }
     else if (axis[0] == 0.0 && axis[2] == 0.0)
     {
-        if (axis[1] < 0) {
+        if (axis[1] < 0)
+        {
             s = -s;
         }
         /*
@@ -294,7 +299,8 @@ void axisangletomatrix(Matrix m, float axis[], float theta)
     }
     else if (axis[1] == 0.0 && axis[2] == 0.0)
     {
-        if (axis[0] < 0) {
+        if (axis[0] < 0)
+        {
             s = -s;
         }
         /*
@@ -500,11 +506,7 @@ void print_matrix(Matrix M)
 //
 // Print vector
 //
-void print_vector(float v[3])
-{
-    printf(" %lf %lf %lf \n", *v, v[1], v[2]);
-}
-
+void print_vector(float v[3]) { printf(" %lf %lf %lf \n", *v, v[1], v[2]); }
 //
 // Find a vector n normal to v
 //
@@ -520,15 +522,19 @@ void find_normal_vector(float v[3], float n[3])
     num_zero = (min < 1e-8f);
 
     temp = _abs(v[1]);
-    if (temp < 1e-8f) num_zero++;
-    if (temp < min) {
+    if (temp < 1e-8f)
+        num_zero++;
+    if (temp < min)
+    {
         min = temp;
         min_i = 1;
     }
 
     temp = _abs(v[2]);
-    if (temp < 1e-8) num_zero++;
-    if (temp < min) {
+    if (temp < 1e-8)
+        num_zero++;
+    if (temp < min)
+    {
         min = temp;
         min_i = 2;
     }
@@ -549,7 +555,8 @@ void find_normal_vector(float v[3], float n[3])
     // Vector has at least two nonzero components
     case 1:
     default:
-        if (min_i == 0) {
+        if (min_i == 0)
+        {
             n[1] = -v[2];
             n[2] = v[1];
         }
@@ -581,13 +588,15 @@ void rmatmult(Matrix A, Matrix B, Matrix C)
     register float* b;
     register float* c;
 
-    if (A == B) {
+    if (A == B)
+    {
         cpmatrix(Temp1, B);
         b = (float*)Temp1;
     }
     else
         b = (float*)B;
-    if (A == C) {
+    if (A == C)
+    {
         cpmatrix(Temp2, C);
         c = (float*)Temp2;
     }
@@ -758,7 +767,8 @@ void rotation_matrix_to_axis(const Matrix R, float axis[], float& angle)
     angle = acos((R[0][0] + R[1][1] + R[2][2] - 1) / 2.0f);
 
     // Close to identity. Arbitrarily set solution to z axis rotation of 0
-    if (_abs(angle) < eps || _abs(angle - M_PI) < eps) {
+    if (_abs(angle) < eps || _abs(angle - M_PI) < eps)
+    {
         angle = 0.0;
         axis[0] = axis[1] = 0.0;
         axis[2] = 1.0;
@@ -849,7 +859,8 @@ void matrixtoq(Quaternion q, Matrix m)
     float f;
 
     f = (1.0f + m[0][0] + m[1][1] + m[2][2]) / 4.0f;
-    if (f > EPSILON) {
+    if (f > EPSILON)
+    {
         W = _sqrt(f);
         X = (m[1][2] - m[2][1]) / (4 * W);
         Y = (m[2][0] - m[0][2]) / (4 * W);
@@ -859,7 +870,8 @@ void matrixtoq(Quaternion q, Matrix m)
     {
         W = 0.0;
         f = -(m[1][1] + m[2][2]) / 2.0f;
-        if (f > EPSILON) {
+        if (f > EPSILON)
+        {
             X = _sqrt(f);
             Y = m[0][1] / (2 * X);
             Z = m[0][2] / (2 * X);
@@ -868,7 +880,8 @@ void matrixtoq(Quaternion q, Matrix m)
         {
             X = 0.0;
             f = (1 - m[2][2]) / 2.0f;
-            if (f > EPSILON) {
+            if (f > EPSILON)
+            {
                 Y = _sqrt(f);
                 Z = m[1][2] / (2 * Y);
             }
@@ -899,7 +912,8 @@ void qtoaxis(float* angle, float axis[], Quaternion q)
 
     *angle = 2 * ((float)acos(q[0]));
     f = (float)_sin(*angle / 2);
-    if (f > 0) {
+    if (f > 0)
+    {
         axis[0] = q[1] / f;
         axis[1] = q[2] / f;
         axis[2] = q[3] / f;
@@ -928,7 +942,8 @@ float unitize4(float u[4])
     float f;
 
     f = (float)_sqrt(DOT4(u, u));
-    if (f > 0) {
+    if (f > 0)
+    {
         f = 1.0f / f;
         u[0] *= f;
         u[1] *= f;
@@ -940,11 +955,7 @@ float unitize4(float u[4])
 
 // length of a vector
 //
-float norm(float v[3])
-{
-    return _sqrt(DOT(v, v));
-}
-
+float norm(float v[3]) { return _sqrt(DOT(v, v)); }
 //
 // translation component of a matrix
 //

@@ -20,16 +20,8 @@ void set_goal_world_state(CScriptActionPlanner* action_planner, CScriptActionPla
     action_planner->set_target_state(*world_state);
 }
 
-bool get_actual(const CScriptActionPlanner* action_planner)
-{
-    return (action_planner->actual());
-}
-
-CScriptActionPlanner* cast_planner(CScriptActionBase* action)
-{
-    return (smart_cast<CScriptActionPlanner*>(action));
-}
-
+bool get_actual(const CScriptActionPlanner* action_planner) { return (action_planner->actual()); }
+CScriptActionPlanner* cast_planner(CScriptActionBase* action) { return (smart_cast<CScriptActionPlanner*>(action)); }
 IC static void CScriptActionPlanner_Export(lua_State* luaState)
 {
     module(
@@ -56,7 +48,7 @@ IC static void CScriptActionPlanner_Export(lua_State* luaState)
                       .def("clear", &CScriptActionPlanner::clear)
 #ifdef LOG_ACTION
                       .def("show", &CScriptActionPlanner::show)
-#endif  // LOG_ACTION
+#endif // LOG_ACTION
 
                       ,
         def("cast_planner", &cast_planner)];

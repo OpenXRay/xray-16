@@ -42,8 +42,7 @@ class noncopyable
 protected:
     noncopyable() {}
     ~noncopyable() {}
-
-private:  // emphasize the following members are private
+private: // emphasize the following members are private
     noncopyable(const noncopyable&);
     const noncopyable& operator=(const noncopyable&);
 };
@@ -58,11 +57,9 @@ public:
     cphysics_game_scripted(T* im) : impl(*im) {}
     virtual ~cphysics_game_scripted(){};
     virtual iphysics_scripted& iphysics_impl() { return impl.get_scripted(); }
-
 protected:
     virtual T& physics_impl() { return impl; }
     virtual const T& physics_impl() const { return impl; }
-
 public:
     typedef T type_impl;
 };
@@ -71,7 +68,8 @@ template <class wrap>
 wrap* get_script_wrapper(typename wrap::type_impl& E)
 {
     wrap* e = smart_cast<wrap*>(E.get_scripted().get());
-    if (e) return e;
+    if (e)
+        return e;
 
     e = new wrap(&E);
     E.get_scripted().set(e);

@@ -41,7 +41,8 @@ void CControlMovementBase::load(LPCSTR section)
 void CControlMovementBase::load_velocity(LPCSTR section, LPCSTR line, u32 velocity_id)
 {
     SVelocityParam velocity_param;
-    if (pSettings->line_exist(section, line)) velocity_param.Load(section, line);
+    if (pSettings->line_exist(section, line))
+        velocity_param.Load(section, line);
     m_velocities.insert(mk_pair(velocity_id, velocity_param));
 
     m_man->path_builder().detail().add_velocity(
@@ -60,7 +61,8 @@ SVelocityParam& CControlMovementBase::get_velocity(u32 velocity_id)
 void CControlMovementBase::update_frame()
 {
     SControlMovementData* ctrl_data = (SControlMovementData*)m_man->data(this, ControlCom::eControlMovement);
-    if (!ctrl_data) return;
+    if (!ctrl_data)
+        return;
 
     ctrl_data->velocity_target = m_velocity;
     ctrl_data->acc = m_accel;
@@ -92,8 +94,10 @@ void CControlMovementBase::stop_accel()
 
 float CControlMovementBase::get_velocity_from_path()
 {
-    if (m_man->path_builder().path().empty()) return 0.f;
-    if (!m_man->path_builder().enabled()) return 0.f;
+    if (m_man->path_builder().path().empty())
+        return 0.f;
+    if (!m_man->path_builder().enabled())
+        return 0.f;
 
     // get target velocity from path
     float velocity = 0.f;
@@ -107,7 +111,8 @@ float CControlMovementBase::get_velocity_from_path()
         next_point_velocity_index = detail.path()[detail.curr_travel_point_index() + 1].velocity;
 
     const CDetailPathManager::STravelParams& current_velocity = detail.velocity(cur_point_velocity_index);
-    if (fis_zero(current_velocity.linear_velocity) && (next_point_velocity_index != u32(-1))) {
+    if (fis_zero(current_velocity.linear_velocity) && (next_point_velocity_index != u32(-1)))
+    {
         const CDetailPathManager::STravelParams& next_velocity = detail.velocity(next_point_velocity_index);
         velocity = _abs(next_velocity.linear_velocity);
         m_object->dir().set_heading_speed(next_velocity.real_angular_velocity);

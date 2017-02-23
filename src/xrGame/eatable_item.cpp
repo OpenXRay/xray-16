@@ -21,10 +21,7 @@ CEatableItem::CEatableItem()
     m_physic_item = 0;
 }
 
-CEatableItem::~CEatableItem()
-{
-}
-
+CEatableItem::~CEatableItem() {}
 IFactoryObject* CEatableItem::_construct()
 {
     m_physic_item = smart_cast<CPhysicItem*>(this);
@@ -41,17 +38,20 @@ void CEatableItem::Load(LPCSTR section)
 
 BOOL CEatableItem::net_Spawn(CSE_Abstract* DC)
 {
-    if (!inherited::net_Spawn(DC)) return FALSE;
+    if (!inherited::net_Spawn(DC))
+        return FALSE;
 
     return TRUE;
 };
 
 bool CEatableItem::Useful() const
 {
-    if (!inherited::Useful()) return false;
+    if (!inherited::Useful())
+        return false;
 
     //проверить не все ли еще съедено
-    if (m_iPortionsNum == 0) return false;
+    if (m_iPortionsNum == 0)
+        return false;
 
     return true;
 }
@@ -59,17 +59,21 @@ bool CEatableItem::Useful() const
 void CEatableItem::OnH_A_Independent()
 {
     inherited::OnH_A_Independent();
-    if (!Useful()) {
-        if (object().Local() && OnServer()) object().DestroyObject();
+    if (!Useful())
+    {
+        if (object().Local() && OnServer())
+            object().DestroyObject();
     }
 }
 
 void CEatableItem::OnH_B_Independent(bool just_before_destroy)
 {
-    if (!Useful()) {
+    if (!Useful())
+    {
         object().setVisible(FALSE);
         object().setEnabled(FALSE);
-        if (m_physic_item) m_physic_item->m_ready_to_destroy = true;
+        if (m_physic_item)
+            m_physic_item->m_ready_to_destroy = true;
     }
     inherited::OnH_B_Independent(just_before_destroy);
 }
@@ -88,14 +92,16 @@ bool CEatableItem::UseBy(CEntityAlive* entity_alive)
 
     for (u8 i = 0; i < (u8)eBoostMaxCount; i++)
     {
-        if (pSettings->line_exist(m_physic_item->cNameSect().c_str(), ef_boosters_section_names[i])) {
+        if (pSettings->line_exist(m_physic_item->cNameSect().c_str(), ef_boosters_section_names[i]))
+        {
             SBooster B;
             B.Load(m_physic_item->cNameSect(), (EBoostParams)i);
             entity_alive->conditions().ApplyBooster(B, m_physic_item->cNameSect());
         }
     }
 
-    if (!IsGameTypeSingle() && OnServer()) {
+    if (!IsGameTypeSingle() && OnServer())
+    {
         NET_Packet tmp_packet;
         CGameObject::u_EventGen(tmp_packet, GEG_PLAYER_USE_BOOSTER, entity_alive->ID());
         tmp_packet.w_u16(object_id());

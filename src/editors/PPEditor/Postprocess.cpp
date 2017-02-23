@@ -31,7 +31,8 @@ FILE* g_LogFileHandle = NULL;
 //---------------------------------------------------------------------------
 void log_callback(LPCSTR lpString)
 {
-    if (!g_LogFileHandle) return;
+    if (!g_LogFileHandle)
+        return;
     fprintf(g_LogFileHandle, "%s\n", lpString);
 }
 

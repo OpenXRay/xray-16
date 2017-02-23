@@ -9,14 +9,8 @@
 poolSS<_vertex, 8 * 1024>& mu_vertices_pool();
 poolSS<_face, 8 * 1024>& mu_faces_pool();
 
-Tface<data_vertex>::Tface()
-{
-}
-
-Tvertex<data_vertex>::Tvertex()
-{
-}
-
+Tface<data_vertex>::Tface() {}
+Tvertex<data_vertex>::Tvertex() {}
 _vertex* _vertex::CreateCopy_NOADJ(v_vertices& vertises_storage) const
 {
     // xrMU_Model::_vertex* V	= create_vertex(Fvector().set(0,0,0));
@@ -37,20 +31,12 @@ Tvertex<data_vertex>::~Tvertex()
 {
 }
 
-void _face::Failure()
-{
-}
-
+void _face::Failure() {}
 // Fvector2	tc	[3];
 // Fvector		N;
 // u32			sm_group;
-void _face::read_vertices(INetReader& r)
-{
-}
-void _face::write_vertices(IWriter& w) const
-{
-}
-
+void _face::read_vertices(INetReader& r) {}
+void _face::write_vertices(IWriter& w) const {}
 void _face::read(INetReader& r)
 {
     base_Face::read(r);
@@ -71,55 +57,21 @@ void _face::write(IWriter& w) const
     w.w_u32(sm_group);
 }
 
-void _vertex::read(INetReader& r)
-{
-    base_Vertex::read(r);
-}
-
-void _vertex::write(IWriter& w) const
-{
-    base_Vertex::write(w);
-}
-
+void _vertex::read(INetReader& r) { base_Vertex::read(r); }
+void _vertex::write(IWriter& w) const { base_Vertex::write(w); }
 //////////////////////////////////////////////////////////////
-void _vertex::isolate_pool_clear_read(INetReader& r)
-{
-    R_ASSERT(false);
-}
-void _vertex::isolate_pool_clear_write(IWriter& w) const
-{
-    R_ASSERT(false);
-}
+void _vertex::isolate_pool_clear_read(INetReader& r) { R_ASSERT(false); }
+void _vertex::isolate_pool_clear_write(IWriter& w) const { R_ASSERT(false); }
 ///////////////////////////////////////////////////////////////
-void _vertex::read_adjacents(INetReader& r)
-{
-}
-void _vertex::write_adjacents(IWriter& w) const
-{
-}
-
-_vertex* _vertex::read_create()
-{
-    return mu_vertices_pool().create();
-}
-
-_face* _face::read_create()
-{
-    return mu_faces_pool().create();
-}
-
+void _vertex::read_adjacents(INetReader& r) {}
+void _vertex::write_adjacents(IWriter& w) const {}
+_vertex* _vertex::read_create() { return mu_vertices_pool().create(); }
+_face* _face::read_create() { return mu_faces_pool().create(); }
 poolSS<_vertex, 8 * 1024> mu_vertices;
 poolSS<_face, 8 * 1024> mu_faces;
 
-poolSS<_vertex, 8 * 1024>& mu_vertices_pool()
-{
-    return mu_vertices;
-}
-poolSS<_face, 8 * 1024>& mu_faces_pool()
-{
-    return mu_faces;
-}
-
+poolSS<_vertex, 8 * 1024>& mu_vertices_pool() { return mu_vertices; }
+poolSS<_face, 8 * 1024>& mu_faces_pool() { return mu_faces; }
 void mu_mesh_clear()
 {
     mu_vertices.clear();

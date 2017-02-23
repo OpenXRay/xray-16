@@ -43,7 +43,6 @@ public:
 
     // вернуть активность телекинеза
     bool is_active() { return active; }
-
     // вернуть активность объекта
     bool is_active_object(CPhysicsShellHolder* obj);
 
@@ -52,7 +51,6 @@ public:
 
     // вернуть количество контролируемых объектов (всех)
     u32 get_objects_total_count() { return objects.size(); }
-
     // вернуть объект по индексу в массиве
     // a	copy of the object!
     CTelekineticObject get_object_by_index(u32 index)
@@ -69,7 +67,6 @@ public:
 
 protected:
     virtual CTelekineticObject* alloc_tele_object() { return new CTelekineticObject(); }
-
 private:
     // обновление на шагах физики
     virtual void PhDataUpdate(float step);

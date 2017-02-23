@@ -29,11 +29,7 @@ SHit::SHit(float powerA, Fvector& dirA, IGameObject* whoA, u16 elementA, Fvector
     add_wound = true;
 }
 
-SHit::SHit()
-{
-    invalidate();
-}
-
+SHit::SHit() { invalidate(); }
 void SHit::invalidate()
 {
     Time = 0;
@@ -59,11 +55,7 @@ void SHit::invalidate()
     add_wound = false;
 }
 
-bool SHit::is_valide() const
-{
-    return hit_type != ALife::eHitTypeMax;
-}
-
+bool SHit::is_valide() const { return hit_type != ALife::eHitTypeMax; }
 void SHit::GenHeader(u16 PacketType, u16 ID)
 {
     DestID = ID;
@@ -94,12 +86,14 @@ void SHit::Read_Packet_Cont(NET_Packet Packet)
         aim_bullet = Packet.r_u16() != 0;
     else
         aim_bullet = false;
-    hit_type = (ALife::EHitType)Packet.r_u16();  // hit type
+    hit_type = (ALife::EHitType)Packet.r_u16(); // hit type
 
-    if (hit_type == ALife::eHitTypeFireWound) {
+    if (hit_type == ALife::eHitTypeFireWound)
+    {
         Packet.r_float(armor_piercing);
     }
-    if (PACKET_TYPE == GE_HIT_STATISTIC) {
+    if (PACKET_TYPE == GE_HIT_STATISTIC)
+    {
         Packet.r_u32(BulletID);
         Packet.r_u32(SenderID);
     }
@@ -114,12 +108,15 @@ void SHit::Write_Packet_Cont(NET_Packet& Packet)
     Packet.w_u16(boneID);
     Packet.w_vec3(p_in_bone_space);
     Packet.w_float(impulse);
-    if (IsGameTypeSingle()) Packet.w_u16(aim_bullet != 0);
+    if (IsGameTypeSingle())
+        Packet.w_u16(aim_bullet != 0);
     Packet.w_u16(u16(hit_type & 0xffff));
-    if (hit_type == ALife::eHitTypeFireWound) {
+    if (hit_type == ALife::eHitTypeFireWound)
+    {
         Packet.w_float(armor_piercing);
     }
-    if (PACKET_TYPE == GE_HIT_STATISTIC) {
+    if (PACKET_TYPE == GE_HIT_STATISTIC)
+    {
         Packet.w_u32(BulletID);
         Packet.w_u32(SenderID);
     }

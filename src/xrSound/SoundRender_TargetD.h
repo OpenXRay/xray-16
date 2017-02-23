@@ -15,12 +15,12 @@ class CSoundRender_TargetD : public CSoundRender_Target
 
     BOOL bDX7;
 
-    u32 buf_size;  // bytes
+    u32 buf_size; // bytes
     u32 buf_block;
 
     s32 cache_hw_volume;
     s32 cache_hw_freq;
-    u32 pos_write;  // bytes
+    u32 pos_write; // bytes
 private:
     void fill_block();
     u32 calc_interval(u32 ptr);

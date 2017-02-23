@@ -6,7 +6,6 @@ class IParticleCustom
 {
 public:
     virtual ~IParticleCustom() { ; }
-
     virtual void OnDeviceCreate() = 0;
     virtual void OnDeviceDestroy() = 0;
 
@@ -21,10 +20,9 @@ public:
 
     virtual float GetTimeLimit() = 0;
     virtual BOOL IsLooped() { return GetTimeLimit() < 0.f; }
-
     virtual const shared_str Name() = 0;
     virtual void SetHudMode(BOOL b) = 0;
     virtual BOOL GetHudMode() = 0;
 };
 
-#endif  //	ParticleCustom_included
+#endif //	ParticleCustom_included

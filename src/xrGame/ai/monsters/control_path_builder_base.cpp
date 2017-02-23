@@ -14,21 +14,14 @@ const u32 pmt_global_failed_duration = 3000;
 // Construction / Destruction
 //////////////////////////////////////////////////////////////////////////
 
-CControlPathBuilderBase::CControlPathBuilderBase()
-{
-    m_cover_approach = 0;
-}
-
-CControlPathBuilderBase::~CControlPathBuilderBase()
-{
-    xr_delete(m_cover_approach);
-}
-
+CControlPathBuilderBase::CControlPathBuilderBase() { m_cover_approach = 0; }
+CControlPathBuilderBase::~CControlPathBuilderBase() { xr_delete(m_cover_approach); }
 void CControlPathBuilderBase::reinit()
 {
     inherited::reinit();
 
-    if (!m_cover_approach) m_cover_approach = new CCoverEvaluatorCloseToEnemy(&m_man->path_builder().restrictions());
+    if (!m_cover_approach)
+        m_cover_approach = new CCoverEvaluatorCloseToEnemy(&m_man->path_builder().restrictions());
 
     reset();
 
@@ -97,14 +90,16 @@ void CControlPathBuilderBase::detour_graph_points(u32 game_graph_vertex_id)
 
 void CControlPathBuilderBase::set_dest_direction(const Fvector& dir)
 {
-    if (m_last_time_dir_set + m_time > time()) return;
+    if (m_last_time_dir_set + m_time > time())
+        return;
     m_dest_dir.set(dir);
     m_last_time_dir_set = time();
 }
 
 void CControlPathBuilderBase::set_target_accessible(STarget& target, const Fvector& position)
 {
-    if (!m_man->path_builder().accessible(position)) {
+    if (!m_man->path_builder().accessible(position))
+    {
         Fvector new_position;
         target.set_node(m_man->path_builder().restrictions().accessible_nearest(position, new_position));
         target.set_position(new_position);
@@ -128,14 +123,16 @@ void CControlPathBuilderBase::on_path_built()
 void CControlPathBuilderBase::on_path_updated()
 {
     // если level_path_manager failed
-    if (m_man->path_builder().level_path().failed()) {
+    if (m_man->path_builder().level_path().failed())
+    {
         m_failed = true;
         m_man->path_builder().level_path().reset();
         VERIFY(!m_man->path_builder().level_path().failed());
     }
 
     // если level_path_manager failed
-    if (m_man->path_builder().detail().failed()) m_failed = true;
+    if (m_man->path_builder().detail().failed())
+        m_failed = true;
 
     // проверка на конец пути, если этот путь не конечный
     if ((m_man->path_builder().detail().path().empty() || (m_man->path_builder().detail().curr_travel_point_index() >=
@@ -150,14 +147,11 @@ void CControlPathBuilderBase::on_path_updated()
     m_time_path_updated_external = time();
 }
 
-void CControlPathBuilderBase::on_path_end()
-{
-    m_path_end = true;
-}
-
+void CControlPathBuilderBase::on_path_end() { m_path_end = true; }
 void CControlPathBuilderBase::travel_point_changed()
 {
-    if (m_man->path_builder().detail().curr_travel_point_index() >= m_man->path_builder().detail().path().size() - 1) {
+    if (m_man->path_builder().detail().curr_travel_point_index() >= m_man->path_builder().detail().path().size() - 1)
+    {
         on_path_end();
     }
 }

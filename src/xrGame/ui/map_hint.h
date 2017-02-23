@@ -30,7 +30,6 @@ public:
     void Draw_();
     void SetOwner(CUIWindow* w) { m_owner = w; }
     CUIWindow* GetOwner() { return m_owner; }
-
 private:
     float m_posx_icon;
     float m_posx_caption;

@@ -32,4 +32,4 @@ public:
 
 #include "debug_renderer_inline.h"
 
-#endif  // DEBUG
+#endif // DEBUG

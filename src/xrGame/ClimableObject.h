@@ -29,13 +29,12 @@ public:
     virtual void Load(LPCSTR section);
     virtual BOOL net_Spawn(CSE_Abstract* DC);
     virtual void net_Destroy();
-    virtual void shedule_Update(u32 dt);  // Called by sheduler
-    virtual void UpdateCL();              // Called each frame, so no need for dt
+    virtual void shedule_Update(u32 dt); // Called by sheduler
+    virtual void UpdateCL(); // Called each frame, so no need for dt
     virtual void Center(Fvector& C) const;
     virtual float Radius() const;
     ////////////////////////////////////////////////////////////////////
     virtual IPhysicsShellHolder* cast_IPhysicsShellHolder() { return this; }
-
 #ifdef DEBUG
     virtual void OnRender();
 #endif
@@ -52,11 +51,11 @@ public:
     virtual const Fvector& Norm() const { return m_norm; }
     virtual float DDNorm(Fvector& dir) const;
     virtual bool BeforeLadder(CPHCharacter* actor, float tolerance = 0.f) const;
-    virtual float DDLowerP(CPHCharacter* actor, Fvector& out_dir) const;  // returns distance and dir to lover point
-    virtual float DDUpperP(CPHCharacter* actor, Fvector& out_dir) const;  // returns distance and dir to upper point
+    virtual float DDLowerP(CPHCharacter* actor, Fvector& out_dir) const; // returns distance and dir to lover point
+    virtual float DDUpperP(CPHCharacter* actor, Fvector& out_dir) const; // returns distance and dir to upper point
 
     void DToAxis(CPHCharacter* actor, Fvector& dir) const;
-    virtual float DDToAxis(CPHCharacter* actor, Fvector& out_dir) const;  // returns distance and dir to ladder axis
+    virtual float DDToAxis(CPHCharacter* actor, Fvector& out_dir) const; // returns distance and dir to ladder axis
     void POnAxis(CPHCharacter* actor, Fvector& P) const;
 
     virtual float AxDistToUpperP(CPHCharacter* actor) const;

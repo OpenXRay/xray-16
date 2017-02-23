@@ -12,11 +12,7 @@
 xr_token g_GameModes[] = {{"st_deathmatch", eGameIDDeathmatch}, {"st_team_deathmatch", eGameIDTeamDeathmatch},
     {"st_artefacthunt", eGameIDArtefactHunt}, {"st_capture_the_artefact", eGameIDCaptureTheArtefact}, {0, 0}};
 
-CUIOptConCom::CUIOptConCom()
-{
-    xr_strcpy(m_playerName, "");
-}
-
+CUIOptConCom::CUIOptConCom() { xr_strcpy(m_playerName, ""); }
 class CCC_UserName : public CCC_String
 {
 public:
@@ -27,7 +23,8 @@ public:
         xr_strcpy(str, arguments);
 
         u32 const max_name_length = GP_UNIQUENICK_LEN - 1;
-        if (xr_strlen(str) > max_name_length) str[max_name_length] = 0;
+        if (xr_strlen(str) > max_name_length)
+            str[max_name_length] = 0;
 
         CCC_String::Execute(str);
 
@@ -70,12 +67,5 @@ void CUIOptConCom::Init()
     CMD3(CCC_Mask, "mm_net_filter_listen", &m_uNetFilter, fl_listen);
 };
 
-void CUIOptConCom::ReadPlayerNameFromRegistry()
-{
-    GetPlayerName_FromRegistry(m_playerName, sizeof(m_playerName));
-};
-
-void CUIOptConCom::WritePlayerNameToRegistry()
-{
-    WritePlayerName_ToRegistry(m_playerName);
-};
+void CUIOptConCom::ReadPlayerNameFromRegistry() { GetPlayerName_FromRegistry(m_playerName, sizeof(m_playerName)); };
+void CUIOptConCom::WritePlayerNameToRegistry() { WritePlayerName_ToRegistry(m_playerName); };

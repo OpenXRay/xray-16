@@ -23,7 +23,6 @@ private:
 
 public:
     CMailSlotMsg() { Reset(); }
-
     void Reset()
     {
         m_len = 0;
@@ -40,11 +39,8 @@ public:
     }
 
     void* GetBuffer() { return m_buff; }
-
     void SetLen(u32 l) { m_len = l; }
-
     u32 GetLen() const { return m_len; }
-
     BOOL r_string(char* dst)
     {
         int sz;
@@ -101,9 +97,9 @@ public:
 inline HANDLE CreateMailSlotByName(LPSTR slotName)
 {
     HANDLE hSlot = CreateMailslot(slotName,
-        0,                             // no maximum message size
-        MAILSLOT_WAIT_FOREVER,         // no time-out for operations
-        (LPSECURITY_ATTRIBUTES)NULL);  // no security attributes
+        0, // no maximum message size
+        MAILSLOT_WAIT_FOREVER, // no time-out for operations
+        (LPSECURITY_ATTRIBUTES)NULL); // no security attributes
     return hSlot;
 }
 
@@ -112,10 +108,11 @@ inline BOOL CheckExisting(LPSTR slotName)
     HANDLE hFile;
     BOOL res;
     hFile = CreateFile(slotName, GENERIC_WRITE,
-        FILE_SHARE_READ,  // required to write to a mailslot
+        FILE_SHARE_READ, // required to write to a mailslot
         (LPSECURITY_ATTRIBUTES)NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, (HANDLE)NULL);
     res = hFile != INVALID_HANDLE_VALUE;
-    if (res) CloseHandle(hFile);
+    if (res)
+        CloseHandle(hFile);
     return res;
 }
 
@@ -125,10 +122,11 @@ inline BOOL SendMailslotMessage(LPSTR slotName, CMailSlotMsg& msg)
     HANDLE hFile;
     DWORD cbWritten;
     hFile = CreateFile(slotName, GENERIC_WRITE,
-        FILE_SHARE_READ,  // required to write to a mailslot
+        FILE_SHARE_READ, // required to write to a mailslot
         (LPSECURITY_ATTRIBUTES)NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, (HANDLE)NULL);
     R_ASSERT(hFile != INVALID_HANDLE_VALUE);
-    if (hFile == INVALID_HANDLE_VALUE) return false;
+    if (hFile == INVALID_HANDLE_VALUE)
+        return false;
     fResult = WriteFile(hFile, msg.GetBuffer(), msg.GetLen(), &cbWritten, (LPOVERLAPPED)NULL);
     R_ASSERT(fResult);
     fResult = CloseHandle(hFile);
@@ -144,17 +142,19 @@ inline BOOL CheckMailslotMessage(HANDLE hSlot, CMailSlotMsg& msg)
     OVERLAPPED ov;
     cbMessage = cMessage = cbRead = 0;
     hEvent = CreateEvent(NULL, FALSE, FALSE, "__Slot");
-    if (!hEvent) return FALSE;
+    if (!hEvent)
+        return FALSE;
     ov.Offset = 0;
     ov.OffsetHigh = 0;
     ov.hEvent = hEvent;
-    fResult = GetMailslotInfo(hSlot,  // mailslot handle
-        (LPDWORD)NULL,                // no maximum message size
-        &cbMessage,                   // size of next message
-        &cMessage,                    // number of messages
-        (LPDWORD)NULL);               // no read time-out
+    fResult = GetMailslotInfo(hSlot, // mailslot handle
+        (LPDWORD)NULL, // no maximum message size
+        &cbMessage, // size of next message
+        &cMessage, // number of messages
+        (LPDWORD)NULL); // no read time-out
     R_ASSERT(fResult);
-    if (!fResult || cbMessage == MAILSLOT_NO_MESSAGE) {
+    if (!fResult || cbMessage == MAILSLOT_NO_MESSAGE)
+    {
         CloseHandle(hEvent);
         return false;
     }

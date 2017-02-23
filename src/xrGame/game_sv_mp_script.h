@@ -20,13 +20,12 @@ public:
     virtual void net_Export_State(NET_Packet& P, ClientID id_to);
     virtual void OnEvent(NET_Packet& P, u16 type, u32 time, ClientID sender);
     virtual game_PlayerState* createPlayerState() { return inherited::createPlayerState(); };
-
     virtual void OnPlayerKillPlayer(ClientID id_killer, ClientID id_killed){};
-    virtual void OnPlayerHitPlayer(u16 id_hitter, u16 id_hitted, NET_Packet& P){};  //игрок получил Hit
+    virtual void OnPlayerHitPlayer(u16 id_hitter, u16 id_hitted, NET_Packet& P){}; //игрок получил Hit
     virtual BOOL OnTouch(u16 eid_who, u16 eid_target, BOOL bForced = FALSE)
     {
         return true;
-    };  // TRUE=allow ownership, FALSE=denied
+    }; // TRUE=allow ownership, FALSE=denied
     virtual void OnDetach(u16 eid_who, u16 eid_target){};
 
 protected:

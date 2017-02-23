@@ -27,13 +27,12 @@ public:
     void Stop();
     void Next();
 
-    void Destroy();  // be careful
+    void Destroy(); // be careful
 
     virtual void OnFrame();
     virtual void OnRender();
     CUIWindow* MainWnd() { return m_UIWindow; }
     bool IsActive() { return !!m_flags.test(etsActive); }
-
     // IInputReceiver
     virtual void IR_OnMousePress(int btn);
     virtual void IR_OnMouseRelease(int btn);
@@ -48,7 +47,6 @@ public:
     virtual void IR_OnMouseWheel(int direction);
     virtual void IR_OnActivate(void);
     bool Persistent() { return !!m_flags.test(etsPersistent); }
-
     fastdelegate::FastDelegate0<> m_on_destroy_event;
 
     enum
@@ -88,7 +86,6 @@ protected:
     CUISequencer* m_owner;
 
     virtual float current_factor() { return 1; }
-
 public:
     CUISequenceItem(CUISequencer* owner) : m_owner(owner) { m_flags.zero(); }
     virtual ~CUISequenceItem() {}
@@ -106,7 +103,6 @@ public:
 
     bool AllowKey(int dik);
     bool GrabInput() { return !!m_flags.test(etiGrabInput); }
-
     shared_str m_check_lua_function;
     shared_str m_onframe_lua_function;
 };

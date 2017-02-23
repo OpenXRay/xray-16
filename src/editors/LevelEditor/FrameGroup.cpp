@@ -22,69 +22,38 @@ __fastcall TfraGroup::TfraGroup(TComponent* Owner, ESceneGroupTool* gt) : TForm(
 
 //---------------------------------------------------------------------------
 
-void __fastcall TfraGroup::PaneMinClick(TObject* Sender)
-{
-    PanelMinMaxClick(Sender);
-}
-
+void __fastcall TfraGroup::PaneMinClick(TObject* Sender) { PanelMinMaxClick(Sender); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfraGroup::ExpandClick(TObject* Sender)
-{
-    PanelMaximizeClick(Sender);
-}
-
+void __fastcall TfraGroup::ExpandClick(TObject* Sender) { PanelMaximizeClick(Sender); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfraGroup::ebMakeGroupClick(TObject* Sender)
-{
-    ParentTools->GroupObjects();
-}
-
+void __fastcall TfraGroup::ebMakeGroupClick(TObject* Sender) { ParentTools->GroupObjects(); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfraGroup::ebMakeThumbnailClick(TObject* Sender)
-{
-    ParentTools->MakeThumbnail();
-}
-
+void __fastcall TfraGroup::ebMakeThumbnailClick(TObject* Sender) { ParentTools->MakeThumbnail(); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfraGroup::ebUngroupClick(TObject* Sender)
-{
-    ParentTools->UngroupObjects();
-}
-
+void __fastcall TfraGroup::ebUngroupClick(TObject* Sender) { ParentTools->UngroupObjects(); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfraGroup::ebCenterToGroupClick(TObject* Sender)
-{
-    ParentTools->CenterToGroup();
-}
-
+void __fastcall TfraGroup::ebCenterToGroupClick(TObject* Sender) { ParentTools->CenterToGroup(); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfraGroup::ebAlignToObjectClick(TObject* Sender)
-{
-    ParentTools->AlignToObject();
-}
-
+void __fastcall TfraGroup::ebAlignToObjectClick(TObject* Sender) { ParentTools->AlignToObject(); }
 //---------------------------------------------------------------------------
 
 void __fastcall TfraGroup::ebSelectClick(TObject* Sender)
 {
     LPCSTR nm;
     xr_string N = lbCurrent->Caption.c_str();
-    if (TfrmChoseItem::SelectItem(smGroup, nm, 1, N.c_str())) ParentTools->SetCurrentObject(nm);
+    if (TfrmChoseItem::SelectItem(smGroup, nm, 1, N.c_str()))
+        ParentTools->SetCurrentObject(nm);
 }
 
 //---------------------------------------------------------------------------
 
-void __fastcall TfraGroup::ebSaveSelectedClick(TObject* Sender)
-{
-    ParentTools->SaveSelectedObject();
-}
-
+void __fastcall TfraGroup::ebSaveSelectedClick(TObject* Sender) { ParentTools->SaveSelectedObject(); }
 //---------------------------------------------------------------------------
 
 #include "UI_LevelTools.h"
@@ -99,37 +68,22 @@ void __fastcall TfraGroup::ebReloadRefsClick(TObject* Sender)
 
 //---------------------------------------------------------------------------
 
-void __fastcall TfraGroup::ExtBtn1Click(TObject* Sender)
-{
-    SelByRefObject(true);
-}
-
+void __fastcall TfraGroup::ExtBtn1Click(TObject* Sender) { SelByRefObject(true); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfraGroup::ExtBtn3Click(TObject* Sender)
-{
-    SelByRefObject(false);
-}
-
+void __fastcall TfraGroup::ExtBtn3Click(TObject* Sender) { SelByRefObject(false); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfraGroup::ExtBtn6Click(TObject* Sender)
-{
-    MultiSelByRefObject(true);
-}
-
+void __fastcall TfraGroup::ExtBtn6Click(TObject* Sender) { MultiSelByRefObject(true); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfraGroup::ExtBtn7Click(TObject* Sender)
-{
-    MultiSelByRefObject(false);
-}
-
+void __fastcall TfraGroup::ExtBtn7Click(TObject* Sender) { MultiSelByRefObject(false); }
 //---------------------------------------------------------------------------
 
 void __fastcall TfraGroup::seSelPercentKeyPress(TObject* Sender, char& Key)
 {
-    if (Key == VK_RETURN) ExecCommand(COMMAND_RENDER_FOCUS);
+    if (Key == VK_RETURN)
+        ExecCommand(COMMAND_RENDER_FOCUS);
 }
 
 //---------------------------------------------------------------------------
@@ -138,7 +92,8 @@ void __fastcall TfraGroup::MultiSelByRefObject(bool clear_prev)
 {
     ObjectList objlist;
     LPU32Vec sellist;
-    if (Scene->GetQueryObjects(objlist, OBJCLASS_GROUP, 1, 1, -1)) {
+    if (Scene->GetQueryObjects(objlist, OBJCLASS_GROUP, 1, 1, -1))
+    {
         for (ObjectIt it = objlist.begin(); it != objlist.end(); it++)
         {
             LPCSTR N = ((CGroupObject*)*it)->RefName();
@@ -147,14 +102,17 @@ void __fastcall TfraGroup::MultiSelByRefObject(bool clear_prev)
             for (; _F != _E; _F++)
             {
                 CGroupObject* _O = (CGroupObject*)(*_F);
-                if ((*_F)->Visible() && _O->RefCompare(N)) {
-                    if (clear_prev) {
+                if ((*_F)->Visible() && _O->RefCompare(N))
+                {
+                    if (clear_prev)
+                    {
                         _O->Select(false);
                         sellist.push_back((u32*)_O);
                     }
                     else
                     {
-                        if (!_O->Selected()) sellist.push_back((u32*)_O);
+                        if (!_O->Selected())
+                            sellist.push_back((u32*)_O);
                     }
                 }
             }
@@ -178,14 +136,17 @@ void TfraGroup::SelByRefObject(bool flag)
 {
     ObjectList objlist;
     LPCSTR N = lbCurrent->Caption.c_str();
-    if (N) {
+    if (N)
+    {
         ObjectIt _F = Scene->FirstObj(OBJCLASS_GROUP);
         ObjectIt _E = Scene->LastObj(OBJCLASS_GROUP);
         for (; _F != _E; _F++)
         {
-            if ((*_F)->Visible()) {
+            if ((*_F)->Visible())
+            {
                 CGroupObject* _O = (CGroupObject*)(*_F);
-                if (_O->RefCompare(N)) _O->Select(flag);
+                if (_O->RefCompare(N))
+                    _O->Select(flag);
             }
         }
     }

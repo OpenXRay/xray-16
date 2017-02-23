@@ -38,7 +38,6 @@ public:
     CHUDState() { SetState(eHidden); }
     IC u32 GetNextState() const { return m_nextState; }
     IC u32 GetState() const { return m_hud_item_state; }
-
     IC void SetState(u32 v)
     {
         m_hud_item_state = v;
@@ -97,22 +96,19 @@ public:
     void OnMovementChanged(ACTOR_DEFS::EMoveCommand cmd);
 
     virtual u8 GetCurrentHudOffsetIdx() { return 0; }
-
     BOOL GetHUDmode();
     IC BOOL IsPending() const { return !!m_huditem_flags.test(fl_pending); }
-
     virtual bool ActivateItem();
     virtual void DeactivateItem();
     virtual void SendDeactivateItem();
     virtual void OnActiveItem(){};
     virtual void OnHiddenItem(){};
-    virtual void SendHiddenItem();  // same as OnHiddenItem but for client... (sends message to a server)...
+    virtual void SendHiddenItem(); // same as OnHiddenItem but for client... (sends message to a server)...
     virtual void OnMoveToRuck(const SInvItemPlace& prev);
 
-    bool IsHidden() const { return GetState() == eHidden; }  // Does weapon is in hidden state
+    bool IsHidden() const { return GetState() == eHidden; } // Does weapon is in hidden state
     bool IsHiding() const { return GetState() == eHiding; }
     bool IsShowing() const { return GetState() == eShowing; }
-
     virtual void SwitchState(u32 S);
     virtual void OnStateSwitch(u32 S);
 
@@ -123,7 +119,6 @@ public:
     virtual void PlayAnimBore();
     bool TryPlayAnimIdle();
     virtual bool MovingAnimAllowedNow() { return true; }
-
     virtual void PlayAnimIdleMoving();
     virtual void PlayAnimIdleSprint();
 
@@ -149,9 +144,7 @@ public:
     virtual bool need_renderable() { return true; };
     virtual void render_item_3d_ui() {}
     virtual bool render_item_3d_ui_query() { return false; }
-
     virtual bool CheckCompatibility(CHudItem*) { return true; }
-
 protected:
     IC void SetPending(BOOL H) { m_huditem_flags.set(fl_pending, H); }
     shared_str hud_sect;
@@ -162,7 +155,6 @@ protected:
 
     IC void EnableHudInertion(BOOL B) { m_huditem_flags.set(fl_inertion_enable, B); }
     IC void AllowHudInertion(BOOL B) { m_huditem_flags.set(fl_inertion_allow, B); }
-
     u32 m_animation_slot;
 
     HUD_SOUND_COLLECTION m_sounds;
@@ -184,7 +176,6 @@ public:
         return (*m_item);
     }
     IC u32 animation_slot() { return m_animation_slot; }
-
     virtual void on_renderable_Render() = 0;
     virtual void debug_draw_firedeps(){};
 

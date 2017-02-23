@@ -41,24 +41,25 @@ struct ECORE_API st_VertexWB :
 
     public WBVec
 {
-  protected:
+protected:
     static bool compare_by_weight(const st_WB& a, const st_WB& b)
     {
-        return a.weight > b.weight;  // отсортировать по убыванию
+        return a.weight > b.weight; // отсортировать по убыванию
     }
     static bool compare_by_bone(const st_WB& a, const st_WB& b)
     {
-        return a.bone < b.bone;  // отсортировать по возрастанию
+        return a.bone < b.bone; // отсортировать по возрастанию
     }
 
-  public:
+public:
     void sort_by_bone() { std::sort(begin(), end(), compare_by_bone); }
     void sort_by_weight() { std::sort(begin(), end(), compare_by_weight); }
     void prepare_weights(u32 max_influence)
     {
         sort_by_weight();
         // delete >max_influence weights
-        if (size() > max_influence) erase(begin() + max_influence, end());
+        if (size() > max_influence)
+            erase(begin() + max_influence, end());
         // accumulate weights
         float sum_weight = 0;
         WBIt it;
@@ -74,8 +75,8 @@ DEFINE_VECTOR(st_VertexWB, VWBVec, VWBIt);
 
 struct ECORE_API st_VMapPt
 {
-    int vmap_index;  // ссылка на мапу
-    int index;       // индекс в V-мапе на uv/w
+    int vmap_index; // ссылка на мапу
+    int index; // индекс в V-мапе на uv/w
     st_VMapPt()
     {
         vmap_index = -1;
@@ -85,9 +86,9 @@ struct ECORE_API st_VMapPt
 // uv's
 class ECORE_API st_VMap
 {
-    FloatVec vm;  // u,v - координаты или weight
-  public:
-    shared_str name;  // vertex uv map name
+    FloatVec vm; // u,v - координаты или weight
+public:
+    shared_str name; // vertex uv map name
     struct
     {
         u8 type : 2;
@@ -98,7 +99,7 @@ class ECORE_API st_VMap
     IntVec vindices;
     IntVec pindices;
 
-  public:
+public:
     st_VMap(LPCSTR nm = 0, u8 t = vmtUV, bool pm = false)
     {
         type = t;
@@ -137,7 +138,8 @@ class ECORE_API st_VMap
     {
         vm.resize(cnt * dim);
         vindices.resize(cnt);
-        if (polymap) pindices.resize(cnt);
+        if (polymap)
+            pindices.resize(cnt);
     }
     IC void appendUV(const float u, const float v)
     {
@@ -174,7 +176,7 @@ struct ECORE_API st_SVert
     Fvector2 uv;
     struct bone
     {
-      public:
+    public:
         float w;
         u16 id;
         bone()
@@ -186,17 +188,17 @@ struct ECORE_API st_SVert
     };
     svector<bone, 4> bones;
 
-  protected:
+protected:
     static bool compare_by_weight(const bone& a, const bone& b)
     {
-        return a.w > b.w;  // отсортировать по убыванию
+        return a.w > b.w; // отсортировать по убыванию
     }
     static bool compare_by_bone(const bone& a, const bone& b)
     {
-        return a.id < b.id;  // отсортировать по возрастанию
+        return a.id < b.id; // отсортировать по возрастанию
     }
 
-  public:
+public:
     void sort_by_weight() { std::sort(bones.begin(), bones.end(), compare_by_weight); }
     void sort_by_bone() { std::sort(bones.begin(), bones.end(), compare_by_bone); }
 };
@@ -205,14 +207,14 @@ struct st_Face;
 struct ECORE_API st_FaceVert
 {
     typedef st_Face type_face;
-    int pindex;  // point index in PointList
-    int vmref;   // vm-ref index
+    int pindex; // point index in PointList
+    int vmref; // vm-ref index
     bool gt(const st_FaceVert& v) const { return pindex > v.pindex; }
     bool eq(const st_FaceVert& v) const { return pindex == v.pindex; }
 };
 struct ECORE_API st_Face
 {
-    st_FaceVert pv[3];  // face vertices (P->P...)
+    st_FaceVert pv[3]; // face vertices (P->P...)
     void EdgeVerts(u8 e, st_FaceVert& v0, st_FaceVert& v1) const
     {
         VERIFY(e < 3);
@@ -280,7 +282,7 @@ class ECORE_API CEditableMesh
 #ifdef _EDITOR
     void UnloadRenderBuffers();
 #endif
-  public:
+public:
     static BOOL m_bDraftMeshMode;
     void GenerateFNormals();
     void GenerateVNormals(const Fmatrix* parent_xform);
@@ -288,16 +290,14 @@ class ECORE_API CEditableMesh
     void GenerateAdjacency();
 
     bool IsGeneratedSVertices(u32 influence) { return (m_SVertices && (m_SVertInfl == influence)); }
-
     void UnloadFNormals(bool force = false);
     void UnloadVNormals(bool force = false);
     void UnloadSVertices(bool force = false);
     void UnloadAdjacency(bool force = false);
-    IC Fvector* Vertices() { return m_Vertices; }  //
-    IC st_Face* Faces() { return m_Faces; }        // + some array size!!!
+    IC Fvector* Vertices() { return m_Vertices; } //
+    IC st_Face* Faces() { return m_Faces; } // + some array size!!!
     IC SurfFaces& Surfaces() { return m_SurfFaces; }
-
-  private:
+private:
     // internal variables
     enum
     {
@@ -307,10 +307,10 @@ class ECORE_API CEditableMesh
     };
     Flags8 m_Flags;
 
-  public:
+public:
     st_MeshOptions m_Ops;
 
-  protected:
+protected:
     Fbox m_Box;
 
     int m_FNormalsRefs;
@@ -323,13 +323,13 @@ class ECORE_API CEditableMesh
     u32 m_VertCount;
     u32 m_FaceCount;
 
-    Fvector* m_Vertices;       // |
-    AdjVec* m_Adjs;            // + some array size!!!
-    u32* m_SmoothGroups;       // |
-    Fvector* m_FaceNormals;    // |
-    Fvector* m_VertexNormals;  // | *3
-    st_SVert* m_SVertices;     // | *3
-    st_Face* m_Faces;          // + some array size!!!
+    Fvector* m_Vertices; // |
+    AdjVec* m_Adjs; // + some array size!!!
+    u32* m_SmoothGroups; // |
+    Fvector* m_FaceNormals; // |
+    Fvector* m_VertexNormals; // | *3
+    st_SVert* m_SVertices; // | *3
+    st_Face* m_Faces; // + some array size!!!
     SurfFaces m_SurfFaces;
     VMapVec m_VMaps;
     VMRefsVec m_VMRefs;
@@ -346,11 +346,11 @@ class ECORE_API CEditableMesh
     // mesh optimize routine
     bool OptimizeFace(st_Face& face);
 
-  public:
+public:
     void RecomputeBBox();
     void OptimizeMesh(BOOL NoOpt);
 
-  public:
+public:
     CEditableMesh(CEditableObject* parent)
     {
         m_Parent = parent;
@@ -374,7 +374,6 @@ class ECORE_API CEditableMesh
     void GetFacePT(u32 fid, const Fvector* pt[3]);
     IC BOOL Visible() { return m_Flags.is(flVisible); }
     IC void Show(BOOL bVisible) { m_Flags.set(flVisible, bVisible); }
-
     // mesh modify routine
     void CloneFrom(CEditableMesh* source);
     void Transform(const Fmatrix& parent);

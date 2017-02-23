@@ -3,7 +3,7 @@
 
 enum
 {
-    COMMAND_INITIALIZE = 0,  // p1 - D3DWindow, p2 - TPanel
+    COMMAND_INITIALIZE = 0, // p1 - D3DWindow, p2 - TPanel
     COMMAND_DESTROY,
     COMMAND_QUIT,
     COMMAND_EDITOR_PREF,
@@ -22,7 +22,7 @@ enum
     COMMAND_CHECK_MODIFIED,
     COMMAND_EXIT,
     COMMAND_SHOW_PROPERTIES,
-    COMMAND_UPDATE_PROPERTIES,  // p1 - forced update if needed
+    COMMAND_UPDATE_PROPERTIES, // p1 - forced update if needed
     COMMAND_REFRESH_PROPERTIES,
     COMMAND_MOVE_CAMERA_TO,
     COMMAND_ZOOM_EXTENTS,
@@ -63,8 +63,8 @@ enum
     COMMAND_EDIT_COMMAND_LIST,
     COMMAND_EXECUTE_COMMAND_LIST,
     COMMAND_LOG_COMMANDS,
-    COMMAND_RUN_MACRO,     // p1 - file name
-    COMMAND_ASSIGN_MACRO,  // p1 - slot, p2 - file_name
+    COMMAND_RUN_MACRO, // p1 - file name
+    COMMAND_ASSIGN_MACRO, // p1 - slot, p2 - file_name
 
     COMMAND_SIMULATE,
     COMMAND_USE_SIMULATE_POSITIONS,
@@ -86,13 +86,10 @@ class CCommandVar
     xr_string s;
     EType type;
 
-  public:
+public:
     CCommandVar() : i(0), type(tpInt) {}
-
     CCommandVar(xr_string str) : type(tpStr) { s = str; }
-
     CCommandVar(u32 val) : type(tpInt) { i = val; }
-
     IC operator u32()
     {
         VERIFY(type == tpInt);
@@ -136,7 +133,7 @@ struct ECORE_API SESubCommand
     CCommandVar p1;
     xr_shortcut shortcut;
 
-  public:
+public:
     SESubCommand(LPCSTR d, SECommand* p, CCommandVar _p0, CCommandVar _p1)
     {
         desc = d;
@@ -156,13 +153,14 @@ struct ECORE_API SECommand
     u32 idx;
     bool global_shortcut;
 
-  public:
+public:
     SECommand(LPCSTR n, LPCSTR d, bool edit, bool multi, TECommandEvent cmd, u32 i, bool _gs)
         : editable(edit), command(cmd), idx(i), global_shortcut(_gs)
     {
         name = xr_strdup(n);
         desc = xr_strdup(d);
-        if (!multi) AppendSubCommand("", u32(0), u32(0));
+        if (!multi)
+            AppendSubCommand("", u32(0), u32(0));
     }
     ~SECommand()
     {
@@ -197,24 +195,24 @@ ECORE_API BOOL AllowLogCommands();
 #define BIND_CMD_EVENT_S(a) fastdelegate::bind<TECommandEvent>(a)
 #define BIND_CMD_EVENT_C(a, b) fastdelegate::bind<TECommandEvent>(a, &b)
 
-#define REGISTER_CMD_S(id, cmd)                                                                                        \
+#define REGISTER_CMD_S(id, cmd) \
     RegisterCommand(id, new SECommand(#id, "", false, false, BIND_CMD_EVENT_S(cmd), id, false));
-#define REGISTER_CMD_C(id, owner, cmd)                                                                                 \
+#define REGISTER_CMD_C(id, owner, cmd) \
     RegisterCommand(id, new SECommand(#id, "", false, false, BIND_CMD_EVENT_C(owner, cmd), id, false));
-#define REGISTER_CMD_SE(id, desc, cmd, gs)                                                                             \
+#define REGISTER_CMD_SE(id, desc, cmd, gs) \
     RegisterCommand(id, new SECommand(#id, desc, true, false, BIND_CMD_EVENT_S(cmd), id, gs));
-#define REGISTER_CMD_CE(id, desc, owner, cmd, gs)                                                                      \
+#define REGISTER_CMD_CE(id, desc, owner, cmd, gs) \
     RegisterCommand(id, new SECommand(#id, desc, true, false, BIND_CMD_EVENT_C(owner, cmd), id, gs));
-#define REGISTER_SUB_CMD_SE(id, desc, cmd, gs)                                                                         \
-    {                                                                                                                  \
-        SECommand* SUB_CMD_HOLDER;                                                                                     \
+#define REGISTER_SUB_CMD_SE(id, desc, cmd, gs) \
+    {                                          \
+        SECommand* SUB_CMD_HOLDER;             \
         RegisterCommand(id, SUB_CMD_HOLDER = new SECommand(#id, desc, true, true, BIND_CMD_EVENT_S(cmd), id, gs));
-#define REGISTER_SUB_CMD_CE(id, desc, owner, cmd, gs)                                                                  \
-    {                                                                                                                  \
-        SECommand* SUB_CMD_HOLDER;                                                                                     \
-        RegisterCommand(                                                                                               \
+#define REGISTER_SUB_CMD_CE(id, desc, owner, cmd, gs) \
+    {                                                 \
+        SECommand* SUB_CMD_HOLDER;                    \
+        RegisterCommand(                              \
             id, SUB_CMD_HOLDER = new SECommand(#id, desc, true, true, BIND_CMD_EVENT_C(owner, cmd), id, gs));
 #define APPEND_SUB_CMD(desc, p0, p1) RegisterSubCommand(SUB_CMD_HOLDER, desc, p0, p1);
 #define REGISTER_SUB_CMD_END }
 
-#endif  // UI_MainCommandH
+#endif // UI_MainCommandH

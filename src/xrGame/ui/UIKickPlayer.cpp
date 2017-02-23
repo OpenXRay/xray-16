@@ -85,7 +85,8 @@ void CUIKickPlayer::InitKick(CUIXml& xml_doc)
 #include <dinput.h>
 bool CUIKickPlayer::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
-    if (dik == DIK_ESCAPE) {
+    if (dik == DIK_ESCAPE)
+    {
         OnBtnCancel();
         return true;
     }
@@ -94,7 +95,8 @@ bool CUIKickPlayer::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 
 void CUIKickPlayer::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 {
-    if (LIST_ITEM_SELECT == msg && pWnd == m_ui_players_list) {
+    if (LIST_ITEM_SELECT == msg && pWnd == m_ui_players_list)
+    {
         CUIListBoxItem* itm = smart_cast<CUIListBoxItem*>(m_ui_players_list->GetSelected());
         m_selected_item_text = itm->GetText();
     }
@@ -110,7 +112,8 @@ void CUIKickPlayer::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 void CUIKickPlayer::OnBtnOk()
 {
     CUIListBoxItem* item = smart_cast<CUIListBoxItem*>(m_ui_players_list->GetSelected());
-    if (item) {
+    if (item)
+    {
         string512 command;
         switch (mode)
         {
@@ -126,11 +129,7 @@ void CUIKickPlayer::OnBtnOk()
         return;
 }
 
-void CUIKickPlayer::OnBtnCancel()
-{
-    HideDialog();
-}
-
+void CUIKickPlayer::OnBtnCancel() { HideDialog(); }
 IC bool DM_Compare_Players(game_PlayerState* v1, game_PlayerState* v2);
 
 DEFINE_VECTOR(game_PlayerState*, ItemVec, ItemIt);
@@ -139,7 +138,8 @@ void CUIKickPlayer::Update()
 {
     CUIDialogWnd::Update();
 
-    if (m_prev_upd_time > Device.dwTimeContinual - 1000) return;
+    if (m_prev_upd_time > Device.dwTimeContinual - 1000)
+        return;
 
     m_prev_upd_time = Device.dwTimeContinual;
 
@@ -151,11 +151,12 @@ void CUIKickPlayer::Update()
     bool bNeedRefresh = false;
     bool bHasSelected = false;
 
-    xr_vector<game_PlayerState*>::iterator fit;  //, fite;
+    xr_vector<game_PlayerState*>::iterator fit; //, fite;
     for (; I != E; ++I)
     {
         game_PlayerState* pI = I->second;
-        if (m_selected_item_text.size() && !stricmp(pI->getName(), m_selected_item_text.c_str())) bHasSelected = true;
+        if (m_selected_item_text.size() && !stricmp(pI->getName(), m_selected_item_text.c_str()))
+            bHasSelected = true;
 
         fit = std::find(m_current_set.begin(), m_current_set.end(), pI);
         if (fit == m_current_set.end())
@@ -163,9 +164,11 @@ void CUIKickPlayer::Update()
         else if (stricmp((*fit)->getName(), pI->getName()))
             bNeedRefresh = true;
     }
-    if (m_current_set.size() != items.size()) bNeedRefresh = true;
+    if (m_current_set.size() != items.size())
+        bNeedRefresh = true;
 
-    if (bNeedRefresh) {
+    if (bNeedRefresh)
+    {
         I = items.begin();
         m_ui_players_list->Clear();
         m_current_set.clear();
@@ -176,6 +179,7 @@ void CUIKickPlayer::Update()
             m_current_set.push_back(p);
             m_ui_players_list->AddTextItem(p->getName());
         }
-        if (bHasSelected) m_ui_players_list->SetSelectedText(m_selected_item_text.c_str());
+        if (bHasSelected)
+            m_ui_players_list->SetSelectedText(m_selected_item_text.c_str());
     }
 }

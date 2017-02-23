@@ -44,4 +44,4 @@
 #define _Jump (mcJump)
 //-------------------------------------------------------------------------------
 
-#endif  //_Actor_Animation_H
+#endif //_Actor_Animation_H

@@ -38,17 +38,20 @@ CStateManagerBloodsucker::CStateManagerBloodsucker(CAI_Bloodsucker* monster) : i
 void CStateManagerBloodsucker::drag_object()
 {
     CEntityAlive* const ph_obj = object->m_cob;
-    if (!ph_obj) {
+    if (!ph_obj)
+    {
         return;
     }
 
     IKinematics* const kinematics = smart_cast<IKinematics*>(ph_obj->Visual());
-    if (!kinematics) {
+    if (!kinematics)
+    {
         return;
     }
 
     CMonsterSquad* const squad = monster_squad().get_squad(object);
-    if (squad) {
+    if (squad)
+    {
         squad->lock_corpse(ph_obj);
     }
 
@@ -59,24 +62,24 @@ void CStateManagerBloodsucker::drag_object()
 
     IPHCapture* const capture = object->character_physics_support()->movement()->PHCapture();
 
-    if (capture && !capture->Failed() && object->is_animated()) {
+    if (capture && !capture->Failed() && object->is_animated())
+    {
         object->start_drag();
     }
 }
 
-void CStateManagerBloodsucker::update()
-{
-    inherited::update();
-}
-
+void CStateManagerBloodsucker::update() { inherited::update(); }
 bool CStateManagerBloodsucker::check_vampire()
 {
-    if (prev_substate != eStateVampire_Execute) {
-        if (get_state(eStateVampire_Execute)->check_start_conditions()) return true;
+    if (prev_substate != eStateVampire_Execute)
+    {
+        if (get_state(eStateVampire_Execute)->check_start_conditions())
+            return true;
     }
     else
     {
-        if (!get_state(eStateVampire_Execute)->check_completion()) return true;
+        if (!get_state(eStateVampire_Execute)->check_completion())
+            return true;
     }
     return false;
 }
@@ -87,8 +90,10 @@ void CStateManagerBloodsucker::execute()
 
     const CEntityAlive* enemy = object->EnemyMan.get_enemy();
 
-    if (enemy) {
-        if (check_vampire()) {
+    if (enemy)
+    {
+        if (check_vampire())
+        {
             state_id = eStateVampire_Execute;
         }
         else

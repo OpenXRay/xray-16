@@ -45,7 +45,7 @@
 namespace Opcode
 {
 #include "OPC_TreeBuilders.h"
-}  // namespace Opcode
+} // namespace Opcode
 
 using namespace Opcode;
 
@@ -61,7 +61,8 @@ using namespace Opcode;
 bool AABBTreeOfAABBsBuilder::ComputeGlobalBox(const udword* primitives, udword nb_prims, AABB& global_box) const
 {
     // Checkings
-    if (!primitives || !nb_prims) return false;
+    if (!primitives || !nb_prims)
+        return false;
 
     // Initialize global box
     global_box = mAABBList[primitives[0]];
@@ -103,7 +104,8 @@ float AABBTreeOfAABBsBuilder::GetSplittingValue(udword index, udword axis) const
 bool AABBTreeOfTrianglesBuilder::ComputeGlobalBox(const udword* primitives, udword nb_prims, AABB& global_box) const
 {
     // Checkings
-    if (!primitives || !nb_prims) return false;
+    if (!primitives || !nb_prims)
+        return false;
 
     // Initialize global box
     Point Min(flt_max, flt_max, flt_max);
@@ -144,7 +146,7 @@ float AABBTreeOfTrianglesBuilder::GetSplittingValue(udword index, udword axis) c
     return (((const float*)mVerts[mTriList[index].mVRef[0]])[axis] +
                ((const float*)mVerts[mTriList[index].mVRef[1]])[axis] +
                ((const float*)mVerts[mTriList[index].mVRef[2]])[axis]) *
-           INV3;
+        INV3;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -160,7 +162,8 @@ float AABBTreeOfTrianglesBuilder::GetSplittingValue(udword index, udword axis) c
 float AABBTreeOfTrianglesBuilder::GetSplittingValue(
     const udword* primitives, udword nb_prims, const AABB& global_box, udword axis) const
 {
-    if (mRules & SPLIT_GEOMCENTER) {
+    if (mRules & SPLIT_GEOMCENTER)
+    {
         // Loop through triangles
         float SplitValue = 0.0f;
         for (udword i = 0; i < nb_prims; i++)

@@ -32,7 +32,8 @@ IC void CAI_Rat::add_active_member(bool bForceActive)
 IC void CAI_Rat::vfRemoveActiveMember()
 {
     CGroupHierarchyHolder& Group = Level().seniority_holder().team(g_Team()).squad(g_Squad()).group(g_Group());
-    if (m_bActive) {
+    if (m_bActive)
+    {
         R_ASSERT(Group.m_dwActiveCount > 0);
         --(Group.m_dwActiveCount);
         m_bActive = false;
@@ -46,7 +47,8 @@ IC void CAI_Rat::vfRemoveActiveMember()
 IC void CAI_Rat::vfAddStandingMember()
 {
     CGroupHierarchyHolder& Group = Level().seniority_holder().team(g_Team()).squad(g_Squad()).group(g_Group());
-    if ((Group.m_dwAliveCount * m_dwStandingCountPercent / 100 >= Group.m_dwStandingCount) && (!m_bStanding)) {
+    if ((Group.m_dwAliveCount * m_dwStandingCountPercent / 100 >= Group.m_dwStandingCount) && (!m_bStanding))
+    {
         ++Group.m_dwStandingCount;
         m_bStanding = true;
     }
@@ -55,7 +57,8 @@ IC void CAI_Rat::vfAddStandingMember()
 IC void CAI_Rat::vfRemoveStandingMember()
 {
     CGroupHierarchyHolder& Group = Level().seniority_holder().team(g_Team()).squad(g_Squad()).group(g_Group());
-    if (m_bStanding) {
+    if (m_bStanding)
+    {
         R_ASSERT(Group.m_dwStandingCount > 0);
         --(Group.m_dwStandingCount);
         m_bStanding = false;
@@ -65,12 +68,13 @@ IC void CAI_Rat::vfRemoveStandingMember()
 IC bool CAI_Rat::bfCheckIfSoundFrightful()
 {
     return (((m_tLastSound.eSoundType & SOUND_TYPE_WEAPON_BULLET_HIT) == SOUND_TYPE_WEAPON_BULLET_HIT) ||
-            ((m_tLastSound.eSoundType & SOUND_TYPE_WEAPON_SHOOTING) == SOUND_TYPE_WEAPON_SHOOTING));
+        ((m_tLastSound.eSoundType & SOUND_TYPE_WEAPON_SHOOTING) == SOUND_TYPE_WEAPON_SHOOTING));
 };
 
 IC void CAI_Rat::update_morale_broadcast(float const& fValue, float const& /**fRadius/**/)
 {
     CGroupHierarchyHolder& Group = Level().seniority_holder().team(g_Team()).squad(g_Squad()).group(g_Group());
     for (int i = 0; i < (int)Group.members().size(); ++i)
-        if (Group.members()[i]->g_Alive()) Group.members()[i]->m_fMorale += fValue;
+        if (Group.members()[i]->g_Alive())
+            Group.members()[i]->m_fMorale += fValue;
 }

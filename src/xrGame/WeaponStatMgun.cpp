@@ -80,7 +80,8 @@ void CWeaponStatMgun::Load(LPCSTR section)
 
 BOOL CWeaponStatMgun::net_Spawn(CSE_Abstract* DC)
 {
-    if (!inheritedPH::net_Spawn(DC)) return FALSE;
+    if (!inheritedPH::net_Spawn(DC))
+        return FALSE;
 
     IKinematics* K = smart_cast<IKinematics*>(Visual());
     CInifile* pUserData = K->LL_UserData();
@@ -131,21 +132,23 @@ void CWeaponStatMgun::net_Destroy()
     processing_deactivate();
 }
 
-void CWeaponStatMgun::net_Export(NET_Packet& P)  // export to server
+void CWeaponStatMgun::net_Export(NET_Packet& P) // export to server
 {
     inheritedPH::net_Export(P);
     P.w_u8(IsWorking() ? 1 : 0);
     save_data(m_destEnemyDir, P);
 }
 
-void CWeaponStatMgun::net_Import(NET_Packet& P)  // import from server
+void CWeaponStatMgun::net_Import(NET_Packet& P) // import from server
 {
     inheritedPH::net_Import(P);
     u8 state = P.r_u8();
     load_data(m_destEnemyDir, P);
 
-    if (TRUE == IsWorking() && !state) FireEnd();
-    if (FALSE == IsWorking() && state) FireStart();
+    if (TRUE == IsWorking() && !state)
+        FireEnd();
+    if (FALSE == IsWorking() && state)
+        FireStart();
 }
 
 void CWeaponStatMgun::UpdateCL()
@@ -154,7 +157,8 @@ void CWeaponStatMgun::UpdateCL()
     UpdateBarrelDir();
     UpdateFire();
 
-    if (OwnerActor() && OwnerActor()->IsMyCamera()) {
+    if (OwnerActor() && OwnerActor()->IsMyCamera())
+    {
         cam_Update(Device.fTimeDelta, g_fov);
         OwnerActor()->Cameras().UpdateFromCamera(Camera());
         OwnerActor()->Cameras().ApplyDevice(VIEWPORT_NEAR);
@@ -187,22 +191,24 @@ void CWeaponStatMgun::UpdateBarrelDir()
     XFi.invert(XFORM());
     Fvector dep;
     XFi.transform_dir(dep, m_destEnemyDir);
-    {  // x angle
+    { // x angle
         m_i_bind_x_xform.transform_dir(dep);
         dep.normalize();
         m_tgt_x_rot = angle_normalize_signed(m_bind_x_rot - dep.getP());
         float sv_x = m_tgt_x_rot;
 
         clamp(m_tgt_x_rot, -m_lim_x_rot.y, -m_lim_x_rot.x);
-        if (!fsimilar(sv_x, m_tgt_x_rot, EPS_L)) m_allow_fire = FALSE;
+        if (!fsimilar(sv_x, m_tgt_x_rot, EPS_L))
+            m_allow_fire = FALSE;
     }
-    {  // y angle
+    { // y angle
         m_i_bind_y_xform.transform_dir(dep);
         dep.normalize();
         m_tgt_y_rot = angle_normalize_signed(m_bind_y_rot - dep.getH());
         float sv_y = m_tgt_y_rot;
         clamp(m_tgt_y_rot, -m_lim_y_rot.y, -m_lim_y_rot.x);
-        if (!fsimilar(sv_y, m_tgt_y_rot, EPS_L)) m_allow_fire = FALSE;
+        if (!fsimilar(sv_y, m_tgt_y_rot, EPS_L))
+            m_allow_fire = FALSE;
     }
 
     m_cur_x_rot = angle_inertion_var(m_cur_x_rot, m_tgt_x_rot, 0.5f, 3.5f, PI_DIV_6, Device.fTimeDelta);
@@ -230,7 +236,8 @@ void CWeaponStatMgun::cam_Update(float dt, float fov)
     Camera()->yaw = angle_inertion_var(Camera()->yaw, des_cam_dir.x, 0.5f, 7.5f, PI_DIV_6, Device.fTimeDelta);
     Camera()->pitch = angle_inertion_var(Camera()->pitch, des_cam_dir.y, 0.5f, 7.5f, PI_DIV_6, Device.fTimeDelta);
 
-    if (OwnerActor()) {
+    if (OwnerActor())
+    {
         // rotate head
         OwnerActor()->Orientation().yaw = -Camera()->yaw;
         OwnerActor()->Orientation().pitch = -Camera()->pitch;
@@ -247,11 +254,7 @@ void CWeaponStatMgun::renderable_Render()
     RenderLight();
 }
 
-void CWeaponStatMgun::SetDesiredDir(float h, float p)
-{
-    m_destEnemyDir.setHP(h, p);
-}
-
+void CWeaponStatMgun::SetDesiredDir(float h, float p) { m_destEnemyDir.setHP(h, p); }
 void CWeaponStatMgun::Action(u16 id, u32 flags)
 {
     inheritedHolder::Action(id, flags);

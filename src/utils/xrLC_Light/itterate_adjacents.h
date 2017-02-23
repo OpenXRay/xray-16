@@ -14,7 +14,8 @@ public:
     {
         for (u32 test_face_idx = 0; test_face_idx < p.current_adjacents_size(); ++test_face_idx)
         {
-            if (p.add_adjacents(start_face_idx, test_face_idx)) RecurseTri(test_face_idx, p);
+            if (p.add_adjacents(start_face_idx, test_face_idx))
+                RecurseTri(test_face_idx, p);
         }
     }
 };

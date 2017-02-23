@@ -13,7 +13,7 @@
 #include "ai/Monsters/ai_monster_squad_manager.h"
 #include "Actor.h"
 
-#define TEMPLATE_SPECIALIZATION                                                                                        \
+#define TEMPLATE_SPECIALIZATION \
     template <typename _Object\
 >
 
@@ -64,10 +64,7 @@ CStateMonsterAttackAbstract::CStateMonsterAttack(_Object* obj, state_ptr state_r
 }
 
 TEMPLATE_SPECIALIZATION
-CStateMonsterAttackAbstract::~CStateMonsterAttack()
-{
-}
-
+CStateMonsterAttackAbstract::~CStateMonsterAttack() {}
 TEMPLATE_SPECIALIZATION
 void CStateMonsterAttackAbstract::initialize()
 {
@@ -104,8 +101,10 @@ void CStateMonsterAttackAbstract::execute()
     {
         // определить тип атаки
         bool b_melee = false;
-        if (prev_substate == eStateAttack_Melee) {
-            if (!get_state_current()->check_completion()) {
+        if (prev_substate == eStateAttack_Melee)
+        {
+            if (!get_state_current()->check_completion())
+            {
                 b_melee = true;
             }
         }
@@ -124,7 +123,8 @@ void CStateMonsterAttackAbstract::execute()
 
     // Notify squad
     CMonsterSquad* squad = monster_squad().get_squad(object);
-    if (squad) {
+    if (squad)
+    {
         SMemberGoal goal;
         goal.type = MG_AttackEnemy;
         goal.entity = const_cast<CEntityAlive*>(object->EnemyMan.get_enemy());
@@ -137,12 +137,15 @@ void CStateMonsterAttackAbstract::execute()
 TEMPLATE_SPECIALIZATION
 bool CStateMonsterAttackAbstract::check_steal_state()
 {
-    if (prev_substate == u32(-1)) {
-        if (get_state(eStateAttack_Steal)->check_start_conditions()) return true;
+    if (prev_substate == u32(-1))
+    {
+        if (get_state(eStateAttack_Steal)->check_start_conditions())
+            return true;
     }
     else if (prev_substate == eStateAttack_Steal)
     {
-        if (!get_state(eStateAttack_Steal)->check_completion()) return true;
+        if (!get_state(eStateAttack_Steal)->check_completion())
+            return true;
     }
     return false;
 }
@@ -150,12 +153,15 @@ bool CStateMonsterAttackAbstract::check_steal_state()
 TEMPLATE_SPECIALIZATION
 bool CStateMonsterAttackAbstract::check_camp_state()
 {
-    if (prev_substate == u32(-1)) {
-        if (get_state(eStateAttackCamp)->check_start_conditions()) return true;
+    if (prev_substate == u32(-1))
+    {
+        if (get_state(eStateAttackCamp)->check_start_conditions())
+            return true;
     }
     else if (prev_substate == eStateAttackCamp)
     {
-        if (!get_state(eStateAttackCamp)->check_completion()) return true;
+        if (!get_state(eStateAttackCamp)->check_completion())
+            return true;
     }
     return false;
 }
@@ -164,23 +170,26 @@ TEMPLATE_SPECIALIZATION
 bool CStateMonsterAttackAbstract::check_find_enemy_state()
 {
     // check state find enemy
-    if (object->EnemyMan.get_enemy_time_last_seen() + FIND_ENEMY_DELAY < Device.dwTimeGlobal) return true;
+    if (object->EnemyMan.get_enemy_time_last_seen() + FIND_ENEMY_DELAY < Device.dwTimeGlobal)
+        return true;
     return false;
 }
 
 TEMPLATE_SPECIALIZATION
 bool CStateMonsterAttackAbstract::check_run_away_state()
 {
-    if (m_time_start_behinder != 0) return false;
+    if (m_time_start_behinder != 0)
+        return false;
 
-    if (prev_substate == eStateAttack_RunAway) {
+    if (prev_substate == eStateAttack_RunAway)
+    {
         if (!get_state(eStateAttack_RunAway)->check_completion())
             return true;
         else
             m_time_next_run_away = Device.dwTimeGlobal + 10000;
     }
     else if ((object->EnemyMan.get_enemy() != Actor()) && object->Morale.is_despondent() &&
-             (m_time_next_run_away < Device.dwTimeGlobal))
+        (m_time_next_run_away < Device.dwTimeGlobal))
     {
         return true;
     }
@@ -191,12 +200,15 @@ bool CStateMonsterAttackAbstract::check_run_away_state()
 TEMPLATE_SPECIALIZATION
 bool CStateMonsterAttackAbstract::check_home_point()
 {
-    if (prev_substate != eStateAttack_MoveToHomePoint) {
-        if (get_state(eStateAttack_MoveToHomePoint)->check_start_conditions()) return true;
+    if (prev_substate != eStateAttack_MoveToHomePoint)
+    {
+        if (get_state(eStateAttack_MoveToHomePoint)->check_start_conditions())
+            return true;
     }
     else
     {
-        if (!get_state(eStateAttack_MoveToHomePoint)->check_completion()) return true;
+        if (!get_state(eStateAttack_MoveToHomePoint)->check_completion())
+            return true;
     }
 
     return false;
@@ -205,14 +217,18 @@ bool CStateMonsterAttackAbstract::check_home_point()
 TEMPLATE_SPECIALIZATION
 bool CStateMonsterAttackAbstract::check_run_attack_state()
 {
-    if (!object->ability_run_attack()) return false;
+    if (!object->ability_run_attack())
+        return false;
 
-    if (prev_substate == eStateAttack_Run) {
-        if (get_state(eStateAttack_RunAttack)->check_start_conditions()) return true;
+    if (prev_substate == eStateAttack_Run)
+    {
+        if (get_state(eStateAttack_RunAttack)->check_start_conditions())
+            return true;
     }
     else if (prev_substate == eStateAttack_RunAttack)
     {
-        if (!get_state(eStateAttack_RunAttack)->check_completion()) return true;
+        if (!get_state(eStateAttack_RunAttack)->check_completion())
+            return true;
     }
 
     return false;
@@ -223,7 +239,8 @@ void CStateMonsterAttackAbstract::setup_substates()
 {
     state_ptr state = get_state_current();
 
-    if (current_substate == eStateAttack_RunAway) {
+    if (current_substate == eStateAttack_RunAway)
+    {
         SStateHideFromPoint data;
         data.point = object->EnemyMan.get_enemy_position();
         data.accelerated = true;

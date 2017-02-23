@@ -24,10 +24,10 @@ const float offs_y = 1.f / tex_h;
 static Fvector LOD_pos[4] = {{-1.0f + offs_x, 1.0f - offs_y, 0.0f}, {1.0f - offs_x, 1.0f - offs_y, 0.0f},
     {1.0f - offs_x, -1.0f + offs_y, 0.0f}, {-1.0f + offs_x, -1.0f + offs_y, 0.0f}};
 static FVF::LIT LOD[4] = {
-    {{-1.0f, 1.0f, 0.0f}, 0xFFFFFFFF, {0.0f, 0.0f}},   // F 0
-    {{1.0f, 1.0f, 0.0f}, 0xFFFFFFFF, {0.0f, 0.0f}},    // F 1
-    {{1.0f, -1.0f, 0.0f}, 0xFFFFFFFF, {0.0f, 0.0f}},   // F 2
-    {{-1.0f, -1.0f, 0.0f}, 0xFFFFFFFF, {0.0f, 0.0f}},  // F 3
+    {{-1.0f, 1.0f, 0.0f}, 0xFFFFFFFF, {0.0f, 0.0f}}, // F 0
+    {{1.0f, 1.0f, 0.0f}, 0xFFFFFFFF, {0.0f, 0.0f}}, // F 1
+    {{1.0f, -1.0f, 0.0f}, 0xFFFFFFFF, {0.0f, 0.0f}}, // F 2
+    {{-1.0f, -1.0f, 0.0f}, 0xFFFFFFFF, {0.0f, 0.0f}}, // F 3
 };
 
 bool CEditableObject::Reload()
@@ -41,7 +41,8 @@ bool CEditableObject::RayPick(
 {
     bool picked = false;
     for (EditMeshIt m = m_Meshes.begin(); m != m_Meshes.end(); m++)
-        if ((*m)->RayPick(dist, S, D, inv_parent, pinf)) picked = true;
+        if ((*m)->RayPick(dist, S, D, inv_parent, pinf))
+            picked = true;
     return picked;
 }
 
@@ -67,7 +68,8 @@ void CEditableObject::BoxQuery(const Fmatrix& parent, const Fmatrix& inv_parent,
 bool CEditableObject::FrustumPick(const CFrustum& frustum, const Fmatrix& parent)
 {
     for (EditMeshIt m = m_Meshes.begin(); m != m_Meshes.end(); m++)
-        if ((*m)->FrustumPick(frustum, parent)) return true;
+        if ((*m)->FrustumPick(frustum, parent))
+            return true;
     return false;
 }
 
@@ -75,7 +77,8 @@ bool CEditableObject::BoxPick(CCustomObject* obj, const Fbox& box, const Fmatrix
 {
     bool picked = false;
     for (EditMeshIt m = m_Meshes.begin(); m != m_Meshes.end(); m++)
-        if ((*m)->BoxPick(box, inv_parent, pinf)) {
+        if ((*m)->BoxPick(box, inv_parent, pinf))
+        {
             pinf.back().s_obj = obj;
             picked = true;
         }
@@ -89,7 +92,8 @@ static const float ssaLim = 64.f * 64.f / (640 * 480);
 
 void CEditableObject::Render(const Fmatrix& parent, int priority, bool strictB2F)
 {
-    if (!(m_LoadState.is(LS_RBUFFERS))) DefferedLoadRP();
+    if (!(m_LoadState.is(LS_RBUFFERS)))
+        DefferedLoadRP();
 
     Fvector v;
     float r;
@@ -97,33 +101,42 @@ void CEditableObject::Render(const Fmatrix& parent, int priority, bool strictB2F
     bb.xform(m_BBox, parent);
     bb.getsphere(v, r);
 
-    if (EPrefs->object_flags.is(epoDrawLOD) && (m_objectFlags.is(eoUsingLOD) && (CalcSSA(v, r) < ssaLim))) {
-        if ((1 == priority) && (true == strictB2F)) RenderLOD(parent);
+    if (EPrefs->object_flags.is(epoDrawLOD) && (m_objectFlags.is(eoUsingLOD) && (CalcSSA(v, r) < ssaLim)))
+    {
+        if ((1 == priority) && (true == strictB2F))
+            RenderLOD(parent);
     }
     else
     {
         RCache.set_xform_world(parent);
-        if (m_objectFlags.is(eoHOM)) {
-            if ((1 == priority) && (false == strictB2F)) RenderEdge(parent, 0, 0, 0x40B64646);
+        if (m_objectFlags.is(eoHOM))
+        {
+            if ((1 == priority) && (false == strictB2F))
+                RenderEdge(parent, 0, 0, 0x40B64646);
 
-            if ((2 == priority) && (true == strictB2F)) RenderSelection(parent, 0, 0, 0xA0FFFFFF);
+            if ((2 == priority) && (true == strictB2F))
+                RenderSelection(parent, 0, 0, 0xA0FFFFFF);
         }
         else if (m_objectFlags.is(eoSoundOccluder))
         {
-            if ((1 == priority) && (false == strictB2F)) RenderEdge(parent, 0, 0, 0xFF000000);
+            if ((1 == priority) && (false == strictB2F))
+                RenderEdge(parent, 0, 0, 0xFF000000);
 
-            if ((2 == priority) && (true == strictB2F)) RenderSelection(parent, 0, 0, 0xA00000FF);
+            if ((2 == priority) && (true == strictB2F))
+                RenderSelection(parent, 0, 0, 0xA00000FF);
         }
         else
         {
-            if (psDeviceFlags.is(rsEdgedFaces) && (1 == priority) && (false == strictB2F)) RenderEdge(parent);
+            if (psDeviceFlags.is(rsEdgedFaces) && (1 == priority) && (false == strictB2F))
+                RenderEdge(parent);
 
             for (SurfaceIt s_it = m_Surfaces.begin(); s_it != m_Surfaces.end(); s_it++)
             {
                 int pr = (*s_it)->_Priority();
                 bool strict = (*s_it)->_StrictB2F();
 
-                if ((priority == pr) && (strictB2F == strict)) {
+                if ((priority == pr) && (strictB2F == strict))
+                {
                     EDevice.SetShader((*s_it)->_Shader());
                     for (EditMeshIt _M = m_Meshes.begin(); _M != m_Meshes.end(); _M++)
                         if (IsSkeleton())
@@ -145,13 +158,11 @@ void CEditableObject::RenderSingle(const Fmatrix& parent)
     }
 }
 
-void CEditableObject::RenderAnimation(const Fmatrix&)
-{
-}
-
+void CEditableObject::RenderAnimation(const Fmatrix&) {}
 void CEditableObject::RenderEdge(const Fmatrix& parent, CEditableMesh* mesh, CSurface* surf, u32 color)
 {
-    if (!(m_LoadState.is(LS_RBUFFERS))) DefferedLoadRP();
+    if (!(m_LoadState.is(LS_RBUFFERS)))
+        DefferedLoadRP();
 
     EDevice.SetShader(EDevice.m_WireShader);
     if (mesh)
@@ -163,7 +174,8 @@ void CEditableObject::RenderEdge(const Fmatrix& parent, CEditableMesh* mesh, CSu
 
 void CEditableObject::RenderSelection(const Fmatrix& parent, CEditableMesh* mesh, CSurface* surf, u32 color)
 {
-    if (!(m_LoadState.is(LS_RBUFFERS))) DefferedLoadRP();
+    if (!(m_LoadState.is(LS_RBUFFERS)))
+        DefferedLoadRP();
 
     RCache.set_xform_world(parent);
     EDevice.SetShader(EDevice.m_SelectionShader);
@@ -194,11 +206,12 @@ void CEditableObject::GetLODFrame(int frame, Fvector p[4], Fvector2 t[4], const 
     R_ASSERT(m_objectFlags.is(eoUsingLOD));
     Fvector P, S;
     m_BBox.get_CD(P, S);
-    float r = _max(S.x, S.z);  // sqrtf(S.x*S.x+S.z*S.z);
+    float r = _max(S.x, S.z); // sqrtf(S.x*S.x+S.z*S.z);
     Fmatrix T, matrix, rot;
     T.scale(r, S.y, r);
     T.translate_over(P);
-    if (parent) T.mulA_43(*parent);
+    if (parent)
+        T.mulA_43(*parent);
 
     float angle = frame * (PI_MUL_2 / float(LOD_SAMPLE_COUNT));
     rot.rotateY(-angle);
@@ -221,7 +234,8 @@ void CEditableObject::RenderLOD(const Fmatrix& parent)
     C.sub(parent.c, EDevice.m_Camera.GetPosition());
     C.y = 0;
     float m = C.magnitude();
-    if (m < EPS) return;
+    if (m < EPS)
+        return;
     C.div(m);
     int max_frame;
     float max_dot = 0;
@@ -235,9 +249,11 @@ void CEditableObject::RenderLOD(const Fmatrix& parent)
         Fvector D;
         D.setHP(angle, 0);
         float dot = C.dotproduct(D);
-        if (dot < 0.7072f) continue;
+        if (dot < 0.7072f)
+            continue;
 
-        if (dot > max_dot) {
+        if (dot > max_dot)
+        {
             max_dot = dot;
             max_frame = frame;
         }
@@ -267,21 +283,16 @@ xr_string CEditableObject::GetLODTextureName()
     return ImageLib.UpdateFileName(l_name);
 }
 
-void CEditableObject::OnDeviceCreate()
-{
-}
-
-void CEditableObject::OnDeviceDestroy()
-{
-    DefferedUnloadRP();
-}
-
+void CEditableObject::OnDeviceCreate() {}
+void CEditableObject::OnDeviceDestroy() { DefferedUnloadRP(); }
 void CEditableObject::DefferedLoadRP()
 {
-    if (m_LoadState.is(LS_RBUFFERS)) return;
+    if (m_LoadState.is(LS_RBUFFERS))
+        return;
 
     // skeleton
-    if (IsSkeleton()) vs_SkeletonGeom.create(FVF_SV, RCache.Vertex.Buffer(), RCache.Index.Buffer());
+    if (IsSkeleton())
+        vs_SkeletonGeom.create(FVF_SV, RCache.Vertex.Buffer(), RCache.Index.Buffer());
 
     //*/
     // создать LOD shader
@@ -289,18 +300,21 @@ void CEditableObject::DefferedLoadRP()
     xr_string fname = xr_string(l_name) + xr_string(".dds");
     m_LODShader.destroy();
     //    if (FS.exist(_game_textures_,fname.c_str()))
-    if (m_objectFlags.is(eoUsingLOD)) m_LODShader.create(GetLODShaderName(), l_name.c_str());
+    if (m_objectFlags.is(eoUsingLOD))
+        m_LODShader.create(GetLODShaderName(), l_name.c_str());
     m_LoadState.set(LS_RBUFFERS, TRUE);
 }
 
 void CEditableObject::DefferedUnloadRP()
 {
-    if (!(m_LoadState.is(LS_RBUFFERS))) return;
+    if (!(m_LoadState.is(LS_RBUFFERS)))
+        return;
     // skeleton
     vs_SkeletonGeom.destroy();
     // удалить буфера
     for (EditMeshIt _M = m_Meshes.begin(); _M != m_Meshes.end(); _M++)
-        if (*_M) (*_M)->GenerateRenderBuffers();
+        if (*_M)
+            (*_M)->GenerateRenderBuffers();
     // удалить shaders
     for (SurfaceIt s_it = m_Surfaces.begin(); s_it != m_Surfaces.end(); s_it++)
         (*s_it)->OnDeviceDestroy();
@@ -364,11 +378,7 @@ void CEditableObject::EvictObject()
 //}
 //---------------------------------------------------------------------------
 
-void __fastcall CEditableObject::OnChangeTransform(PropValue*)
-{
-    UI->RedrawScene();
-}
-
+void __fastcall CEditableObject::OnChangeTransform(PropValue*) { UI->RedrawScene(); }
 //---------------------------------------------------------------------------
 
 //#include "Layers/xrRender/blenders/Blender.h"
@@ -386,14 +396,16 @@ bool CEditableObject::CheckShaderCompatible()
     {
         IBlender* B = EDevice.Resources->_FindBlender(*(*s_it)->m_ShaderName);
         Shader_xrLC* C = EDevice.ShaderXRLC.Get(*(*s_it)->m_ShaderXRLCName);
-        if (!B || !C) {
+        if (!B || !C)
+        {
             ELog.Msg(mtError, "Object '%s': invalid or missing shader [E:'%s', C:'%s']", GetName(),
                 (*s_it)->_ShaderName(), (*s_it)->_ShaderXRLCName());
             bRes = false;
         }
         else
         {
-            if (!BE(B->canBeLMAPped(), !C->flags.bLIGHT_Vertex)) {
+            if (!BE(B->canBeLMAPped(), !C->flags.bLIGHT_Vertex))
+            {
                 ELog.Msg(mtError, "Object '%s': engine shader '%s' non compatible with compiler shader '%s'", GetName(),
                     (*s_it)->_ShaderName(), (*s_it)->_ShaderXRLCName());
                 bRes = false;
@@ -422,7 +434,8 @@ void CEditableObject::AddBone(CBone* parent_bone)
     B->ResetData();
     B->Reset();
 
-    if (parent_bone) {
+    if (parent_bone)
+    {
         B->SetParentName(parent_bone->Name().c_str());
     }
     else
@@ -452,7 +465,8 @@ void CEditableObject::DeleteBone(CBone* bone)
     for (BoneIt b_it = m_Bones.begin(); b_it != m_Bones.end(); ++b_it)
     {
         CBone* B = *b_it;
-        if (B->Parent() == bone) B->SetParentName(PB ? PB->Name().c_str() : "");
+        if (B->Parent() == bone)
+            B->SetParentName(PB ? PB->Name().c_str() : "");
     }
     BoneIt bit = std::find(m_Bones.begin(), m_Bones.end(), bone);
     if (bit == m_Bones.end())
@@ -465,7 +479,8 @@ void CEditableObject::DeleteBone(CBone* bone)
     RStringVec::iterator iit_e = (*bpit).bones.end();
     for (; iit != iit_e; ++iit)
     {
-        if (*iit == bone->Name()) {
+        if (*iit == bone->Name())
+        {
             (*bpit).bones.erase(iit);
             break;
         }
@@ -493,7 +508,8 @@ BPIt CEditableObject::BonePart(CBone* B)
         RStringVec::iterator iit_e = (*it).bones.end();
         for (; iit != iit_e; ++iit)
         {
-            if (*iit == B->Name()) return it;
+            if (*iit == B->Name())
+                return it;
         }
     }
     return it_e;
@@ -507,7 +523,8 @@ void CEditableObject::RenameBone(CBone* bone, LPCSTR new_name)
 
     for (; iit != iit_e; ++iit)
     {
-        if (*iit == bone->Name()) {
+        if (*iit == bone->Name())
+        {
             *iit = new_name;
             break;
         }
@@ -516,7 +533,8 @@ void CEditableObject::RenameBone(CBone* bone, LPCSTR new_name)
     for (BoneIt b_it = m_Bones.begin(); b_it != m_Bones.end(); ++b_it)
     {
         CBone* B = *b_it;
-        if (B->ParentName() == bone->Name()) B->SetParentName(new_name);
+        if (B->ParentName() == bone->Name())
+            B->SetParentName(new_name);
     }
 
     for (SMotionIt s_it = m_SMotions.begin(); s_it != m_SMotions.end(); ++s_it)
@@ -524,7 +542,8 @@ void CEditableObject::RenameBone(CBone* bone, LPCSTR new_name)
         CSMotion* M = *s_it;
         for (BoneMotionIt bm_it = M->BoneMotions().begin(); bm_it != M->BoneMotions().end(); ++bm_it)
         {
-            if (bm_it->name == bone->Name()) bm_it->name = new_name;
+            if (bm_it->name == bone->Name())
+                bm_it->name = new_name;
         }
     }
 

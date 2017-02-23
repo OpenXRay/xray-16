@@ -70,7 +70,8 @@ public:
         for (u32 j = 1; j < m_count; ++j)
             result += m_strings[j].second;
 
-        if (result > max_concat_result_size) {
+        if (result > max_concat_result_size)
+        {
             error_process();
         }
 
@@ -106,17 +107,11 @@ private:
     struct helper
     {
         static inline u32 length(LPCSTR string) { return (string ? (unsigned int)xr_strlen(string) : 0); }
-
         static inline LPCSTR string(LPCSTR string) { return (string); }
-
         static inline u32 length(shared_str const& string) { return (string.size()); }
-
         static inline LPCSTR string(shared_str const& string) { return (string.c_str()); }
-
         static inline u32 length(xr_string const& string) { return (string.size()); }
-
         static inline LPCSTR string(xr_string const& string) { return (string.c_str()); }
-
         template <typename T>
         static inline void add_string(string_tupples& self, T p)
         {
@@ -126,7 +121,7 @@ private:
             VERIFY(cstr);
             self.m_strings[index] = std::make_pair(cstr, length(p));
         }
-    };  // struct helper
+    }; // struct helper
 
 private:
     typedef std::pair<LPCSTR, u32> StringPair;
@@ -138,8 +133,8 @@ private:
 
 void XRCORE_API check_stack_overflow(u32 stack_increment);
 
-}  // namespace detail
+} // namespace detail
 
-}  // namespace core
+} // namespace core
 
-}  // namespace xray
+} // namespace xray

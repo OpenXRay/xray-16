@@ -5,15 +5,8 @@
 #include "xr_object.h"
 #include "xrServerEntities/smart_cast.h"
 
-IGame_ObjectPool::IGame_ObjectPool(void)
-{
-}
-
-IGame_ObjectPool::~IGame_ObjectPool(void)
-{
-    R_ASSERT(m_PrefetchObjects.empty());
-}
-
+IGame_ObjectPool::IGame_ObjectPool(void) {}
+IGame_ObjectPool::~IGame_ObjectPool(void) { R_ASSERT(m_PrefetchObjects.empty()); }
 void IGame_ObjectPool::prefetch()
 {
     R_ASSERT(m_PrefetchObjects.empty());
@@ -59,11 +52,7 @@ IGameObject* IGame_ObjectPool::create(LPCSTR name)
     return O;
 }
 
-void IGame_ObjectPool::destroy(IGameObject* O)
-{
-    xr_delete(O);
-}
-
+void IGame_ObjectPool::destroy(IGameObject* O) { xr_delete(O); }
 /*
 void IGame_ObjectPool::prefetch ()
 {

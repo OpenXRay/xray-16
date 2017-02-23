@@ -105,9 +105,11 @@ static int solve_R_angle(const float g[3], const float s[3], const float t[3], c
 
     n = solve_trig1(a, b, c, temp);
 
-    if (n == 2) {
+    if (n == 2)
+    {
         // Two positive solutions. choose first
-        if (temp[0] < 0 && temp[1] < 0) {
+        if (temp[0] < 0 && temp[1] < 0)
+        {
             r_angle = temp[0];
             // printf("Two solutions: %lf %lf\n", temp[0], temp[1]);
             n = 1;
@@ -125,7 +127,7 @@ static int solve_R_angle(const float g[3], const float s[3], const float t[3], c
         else
         {
             n = 1;
-            r_angle = temp[1];  //?
+            r_angle = temp[1]; //?
         }
     }
     else if (n == 1)
@@ -167,7 +169,8 @@ float get_circle_equation(const float ee[3], const float axis[3], const float po
 
     float alpha;
 
-    if (!law_of_cosines(wn, upper_len, lower_len, alpha)) return 0;
+    if (!law_of_cosines(wn, upper_len, lower_len, alpha))
+        return 0;
 
     // center of circle (origin is location of first S joint)
     vecscalarmult(c, n, _cos(alpha) * upper_len);
@@ -182,7 +185,8 @@ float get_circle_equation(const float ee[3], const float axis[3], const float po
     // inverting the normal vector
     //
 
-    if (DOT(n, pos_axis) < 0.0) vecscalarmult(n, n, -1.0);
+    if (DOT(n, pos_axis) < 0.0)
+        vecscalarmult(n, n, -1.0);
 
     vecscalarmult(temp, n, DOT(axis, n));
     vecsub(u, (float*)axis, temp);
@@ -220,7 +224,8 @@ int scale_goal(const float l1[3], const float l2[3], float g[3])
     float max_len = (L1 + L2) * 0.9999f;
     //    float min_len = fabs(L1 - L2);
 
-    if (g_len > max_len) {
+    if (g_len > max_len)
+    {
         vecscalarmult(g, g, max_len / (g_len /**1.01f*/));
         return 1;
     }
@@ -261,7 +266,8 @@ int SRS::SetGoalPos(const float eee[3], const Matrix E, float& rangle)
     get_translation(Temp, s);
     cpvector(ee, eee);
 
-    if (project_to_workspace) scale_goal(p_r1, s, ee);
+    if (project_to_workspace)
+        scale_goal(p_r1, s, ee);
 
     //
     // Note instead of using the length of the lower limb
@@ -269,7 +275,8 @@ int SRS::SetGoalPos(const float eee[3], const Matrix E, float& rangle)
     //
     radius = get_circle_equation(ee, proj_axis, pos_axis, upper_len, norm(s), c, u, v, n);
 
-    if (!solve_R_angle(ee, s, p_r1, T, r_angle)) return 0;
+    if (!solve_R_angle(ee, s, p_r1, T, r_angle))
+        return 0;
     rangle = r_angle;
 
     // Find RY, and store the positions of the R jt and
@@ -305,7 +312,8 @@ int SRS::SetGoal(const Matrix GG, float& rangle)
     get_translation(T, p_r1);
     get_translation(S, s);
 
-    if (project_to_workspace && scale_goal(p_r1, s, ee)) set_translation(G, ee);
+    if (project_to_workspace && scale_goal(p_r1, s, ee))
+        set_translation(G, ee);
 
     EvaluateCircle(ee);
     // radius = get_circle_equation(ee, proj_axis, pos_axis,
@@ -315,7 +323,8 @@ int SRS::SetGoal(const Matrix GG, float& rangle)
     // Build rotation matrix about the R joint
     //
 
-    if (!solve_R_angle(ee, s, p_r1, T, r_angle)) return 0;
+    if (!solve_R_angle(ee, s, p_r1, T, r_angle))
+        return 0;
     r_angle = -r_angle;
     rangle = r_angle;
 
@@ -389,7 +398,8 @@ inline void make_frame(const float p[3], float p_scale, const float q[3], Matrix
 
     // z vector is x cross y
 
-    if (invert) {
+    if (invert)
+    {
         R[0][0] = x[0];
         R[1][0] = x[1];
         R[2][0] = x[2];
@@ -492,21 +502,9 @@ float SRS::PosToAngle(const float p[3])
     return angle_between_vectors(u, pp, n);
 }
 
-void SRS::AngleToPos(float psi, float p[3])
-{
-    evaluate_circle(psi, p);
-}
-
-void SRS::SolveR1(const float p[3], Matrix R1)
-{
-    SolveR1(PosToAngle(p), R1);
-}
-
-void SRS::SolveR1R2(const float pos[3], Matrix R1, Matrix R2)
-{
-    SolveR1R2(PosToAngle(pos), R1, R2);
-}
-
+void SRS::AngleToPos(float psi, float p[3]) { evaluate_circle(psi, p); }
+void SRS::SolveR1(const float p[3], Matrix R1) { SolveR1(PosToAngle(p), R1); }
+void SRS::SolveR1R2(const float pos[3], Matrix R1, Matrix R2) { SolveR1R2(PosToAngle(pos), R1, R2); }
 //
 // Given an axis of rotation n, construct an arbitrary rotation matrix R(n,psi)
 // that represents a rotation about n by psi deccomposed into its cos,sin,
@@ -663,7 +661,8 @@ static void get_aim_circle_equation(const float g[3], const float a[3], const fl
     float beta = M_PI - alpha;
 
     float delta = asin(_sin(beta) * L3 / L4);
-    if (delta < 0) delta = -delta;
+    if (delta < 0)
+        delta = -delta;
     float gamma = M_PI - delta - beta;
 
     float c_gamma = _cos(gamma);

@@ -18,7 +18,7 @@ public:
     void import(NET_Packet& P)
     {
         data.clear();
-        P.r_begin(ID);  // VERIFY(M_EVENT==ID);
+        P.r_begin(ID); // VERIFY(M_EVENT==ID);
         switch (ID)
         {
         case M_SPAWN:
@@ -47,7 +47,8 @@ public:
         }
 
         u32 size = P.r_elapsed();
-        if (size) {
+        if (size)
+        {
             data.resize(size);
             P.r(&*data.begin(), size);
         }
@@ -59,7 +60,8 @@ public:
         P.w_u32(timestamp);
         P.w_u16(type);
         P.w_u16(destination);
-        if (data.size()) P.w(&*data.begin(), (u32)data.size());
+        if (data.size())
+            P.w(&*data.begin(), (u32)data.size());
     }
     void implication(NET_Packet& P) const
     {
@@ -69,11 +71,7 @@ public:
     }
 };
 
-IC bool operator<(const NET_Event& A, const NET_Event& B)
-{
-    return A.timestamp < B.timestamp;
-}
-
+IC bool operator<(const NET_Event& A, const NET_Event& B) { return A.timestamp < B.timestamp; }
 class NET_Queue_Event
 {
 public:
@@ -111,7 +109,8 @@ public:
     {
         //		if (queue.empty()/* || (T<queue.begin()->timestamp)*/)	return FALSE;
         //		else												return TRUE;
-        if (queue.empty()) return FALSE;
+        if (queue.empty())
+            return FALSE;
         /**
         else
         {

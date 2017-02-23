@@ -32,9 +32,7 @@ class CALifeRegistryWrapperObject
 
 public:
     IC CALifeRegistryWrapperObject() { m_registry = new T(); }
-
     virtual ~CALifeRegistryWrapperObject() { xr_delete(m_registry); }
-
     IC T& registry() const
     {
         VERIFY(m_registry);
@@ -62,7 +60,8 @@ class CGameTaskWrapper : public CALifeRegistryWrapperObject<CALifeRegistryWrappe
 {
 };
 
-//. class CFogOfWarWrapper :				public CALifeRegistryWrapperObject<CALifeRegistryWrapper<CFogOfWarRegistry> >
+//. class CFogOfWarWrapper :				public CALifeRegistryWrapperObject<CALifeRegistryWrapper<CFogOfWarRegistry>
+//>
 //{};
 class CActorStatisticsWrapper : public CALifeRegistryWrapperObject<CALifeRegistryWrapper<CActorStatisticRegistry>>
 {

@@ -112,7 +112,6 @@ public:
     void SetCellsHorizAlignment(xr_string alignment);
 
     const Ivector2 GetVirtualCellsAlignment() { return m_virtual_cells_alignment; };
-
     int ScrollPos();
     void ReinitScroll();
     void GetClientArea(Frect& r);
@@ -132,12 +131,11 @@ public:
 
     bool GetConditionProgBarVisibility() { return m_bConditionProgBarVisible; };
     void SetConditionProgBarVisibility(bool b) { m_bConditionProgBarVisible = b; };
-
 public:
     // items management
-    virtual void SetItem(CUICellItem* itm);                     // auto
-    virtual void SetItem(CUICellItem* itm, Fvector2 abs_pos);   // start at cursor pos
-    virtual void SetItem(CUICellItem* itm, Ivector2 cell_pos);  // start at cell
+    virtual void SetItem(CUICellItem* itm); // auto
+    virtual void SetItem(CUICellItem* itm, Fvector2 abs_pos); // start at cursor pos
+    virtual void SetItem(CUICellItem* itm, Ivector2 cell_pos); // start at cell
     bool CanSetItem(CUICellItem* itm);
 
     u32 ItemsCount();
@@ -176,9 +174,9 @@ private:
 protected:
     CUIDragDropListEx* m_pParentDragDropList;
 
-    Ivector2 m_cellsCapacity;  // count		(col,	row)
-    Ivector2 m_cellSize;       // pixels	(width, height)
-    Ivector2 m_cellSpacing;    // pixels	(width, height)
+    Ivector2 m_cellsCapacity; // count		(col,	row)
+    Ivector2 m_cellSize; // pixels	(width, height)
+    Ivector2 m_cellSpacing; // pixels	(width, height)
 
     UI_CELLS_VEC m_cells;
 

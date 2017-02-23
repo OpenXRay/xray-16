@@ -8,19 +8,16 @@ class ESceneShapeTool : public ESceneCustomOTool
 {
     typedef ESceneCustomOTool inherited;
 
-  protected:
+protected:
     // controls
     virtual void CreateControls();
     virtual void RemoveControls();
 
-  public:
+public:
     ESceneShapeTool() : ESceneCustomOTool(OBJCLASS_SHAPE) { ; }
-
     // definition
     IC LPCSTR ClassName() { return "shape"; }
-
     IC LPCSTR ClassDesc() { return "Shape"; }
-
     IC
 
         int
@@ -30,10 +27,8 @@ class ESceneShapeTool : public ESceneCustomOTool
     }
 
     virtual void Clear(bool bSpecific = false) { inherited::Clear(bSpecific); }
-
     // IO
     virtual bool IsNeedSave() { return inherited::IsNeedSave(); }
-
     virtual bool LoadStream(IReader&);
     virtual bool LoadLTX(CInifile&);
     virtual void SaveStream(IWriter&);

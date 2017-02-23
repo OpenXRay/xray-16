@@ -14,22 +14,16 @@ CEngine Engine;
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-CEngine::CEngine()
-{
-    pSettings = 0;
-}
-
-CEngine::~CEngine()
-{
-}
-
+CEngine::CEngine() { pSettings = 0; }
+CEngine::~CEngine() {}
 LPCSTR CEngine::LastWindowsError()
 {
     static string1024 errmsg_buf;
     LPCSTR err = 0;
 
     u32 hr = GetLastError();
-    if (hr != 0) {
+    if (hr != 0)
+    {
         FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, 0, hr, 0, errmsg_buf, 1024, 0);
         err = errmsg_buf;
     }
@@ -69,13 +63,14 @@ void CEngine::ReloadSettings()
     // game configure
     string_path si_name;
     FS.update_path(si_name, "$game_config$", "system.ltx");
-    pSettings = new CInifile(si_name, TRUE);  // FALSE,TRUE,TRUE);
+    pSettings = new CInifile(si_name, TRUE); // FALSE,TRUE,TRUE);
 }
 
 void CEngine::Destroy()
 {
     xr_delete(pSettings);
-    if (hPSGP) {
+    if (hPSGP)
+    {
         FreeLibrary(hPSGP);
         hPSGP = 0;
     }

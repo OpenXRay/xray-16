@@ -13,13 +13,14 @@ server_info_uploader& xrServer::GetServerInfoUploader()
     struct free_info_searcher
     {
         bool operator()(server_info_uploader const* uplinfo) { return !uplinfo->is_active(); };
-    };  // struct free_info_searcher
+    }; // struct free_info_searcher
 
     info_uploaders_t::iterator tmp_iter =
         std::find_if(m_info_uploaders.begin(), m_info_uploaders.end(), free_info_searcher());
 
     server_info_uploader* result = NULL;
-    if (tmp_iter != m_info_uploaders.end()) {
+    if (tmp_iter != m_info_uploaders.end())
+    {
         result = *tmp_iter;
     }
     else
@@ -30,14 +31,16 @@ server_info_uploader& xrServer::GetServerInfoUploader()
     return *result;
 }
 
-void xrServer::SendServerInfoToClient(ClientID const& new_client)  // WARNING ! this function is thread unsafe !!!
+void xrServer::SendServerInfoToClient(ClientID const& new_client) // WARNING ! this function is thread unsafe !!!
 {
-    if (IsGameTypeSingle()) {
+    if (IsGameTypeSingle())
+    {
         SendConfigFinished(new_client);
         return;
     }
 
-    if (!m_server_logo || !m_server_rules) {
+    if (!m_server_logo || !m_server_rules)
+    {
         SendConfigFinished(new_client);
         return;
     }
@@ -57,16 +60,19 @@ void xrServer::SendServerInfoToClient(ClientID const& new_client)  // WARNING ! 
 
 void xrServer::LoadServerInfo()
 {
-    if (!FS.exist("$app_data_root$", SERVER_LOGO_FN) || !FS.exist("$app_data_root$", SERVER_RULES_FN)) {
+    if (!FS.exist("$app_data_root$", SERVER_LOGO_FN) || !FS.exist("$app_data_root$", SERVER_RULES_FN))
+    {
         return;
     }
     m_server_logo = FS.r_open("$app_data_root$", SERVER_LOGO_FN);
-    if (!m_server_logo) {
+    if (!m_server_logo)
+    {
         Msg("! ERROR: failed to open server logo file %s", SERVER_LOGO_FN);
         return;
     }
     m_server_rules = FS.r_open("$app_data_root$", SERVER_RULES_FN);
-    if (!m_server_rules) {
+    if (!m_server_rules)
+    {
         Msg("! ERROR: failed to open server rules file %s", SERVER_RULES_FN);
         FS.r_close(m_server_logo);
         m_server_logo = NULL;
@@ -85,7 +91,8 @@ server_info_uploader::server_info_uploader(file_transfer::server_site* file_tran
 server_info_uploader::~server_info_uploader()
 {
     R_ASSERT(m_file_transfers != NULL);
-    if (is_active()) terminate_upload();
+    if (is_active())
+        terminate_upload();
 }
 
 void server_info_uploader::terminate_upload()

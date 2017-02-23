@@ -36,10 +36,12 @@ property_integer_values_value_reference_getter::!property_integer_values_value_r
 Object ^ property_integer_values_value_reference_getter::GetValue()
 {
     int value = safe_cast<int>(inherited::GetValue());
-    if (value < 0) value = 0;
+    if (value < 0)
+        value = 0;
 
     int count = collection()->Count;
-    if (value >= count) value = count - 1;
+    if (value >= count)
+        value = count - 1;
 
     return (value);
 }

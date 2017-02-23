@@ -11,8 +11,14 @@ Copyright 2000 GameSpy Industries, Inc
 #ifndef _GT2AINPUT_H_
 #define _GT2AINPUT_H_
 
-void InitializeInput(void);
+void InitializeInput
+(
+	void
+);
 
-const char* GetChatBuffer(void);
+const char * GetChatBuffer
+(
+	void
+);
 
 #endif

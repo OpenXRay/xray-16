@@ -41,7 +41,8 @@ void BONE::compute_bones(u32 const bone_id)
     m_result[bone_id] = Fmatrix(m_start_transform).invert().mulB_43(m_result[bone_id]).mulB_43(m_start_transform);
     VERIFY(_valid(m_result[bone_id]));
 
-    if ((bone_id + 1) == bone_count) return;
+    if ((bone_id + 1) == bone_count)
+        return;
 
     Fmatrix& bone_matrix = m_result[bone_id];
     Fvector angles;
@@ -71,7 +72,8 @@ void BONE::compute_bone(u32 const bone_id)
     Fmatrix local_bones[bone_count];
     fill_bones(bones_ids, m_bones_ids, local_bones, m_bones);
 
-    if (bone_id < bone_count - 1) {
+    if (bone_id < bone_count - 1)
+    {
         aim_at_position(m_bones[bone_id].c, m_bones[bone_count - 1].c, m_bones[bone_count - 1].k, m_result[bone_id]);
         return;
     }
@@ -84,12 +86,12 @@ void BONE::compute_bone(u32 const bone_id)
 	float const sin_alpha				= cross_product.magnitude();
 	float const cos_alpha				= current_direction.dotproduct(target_direction);
 	m_result[bone_id].rotation			(cross_product.normalize(), atan2f(sin_alpha, cos_alpha));
-#else   // #if 0
+#else // #if 0
     m_result[bone_id] = Fidentity;
-#endif  // #if 0
+#endif // #if 0
 }
 
 #undef BONE
 #undef TEMPLATE_SPECIALIZATION
 
-#endif  // #ifndef AIMERS_BONE_INLINE_H_INCLUDED
+#endif // #ifndef AIMERS_BONE_INLINE_H_INCLUDED

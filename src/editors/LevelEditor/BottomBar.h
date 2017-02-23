@@ -19,8 +19,8 @@ class ECORE_API TfraBottomBar :
 
     public TFrame
 {
-    __published :  // IDE-managed Components
-                   TFormStorage* fsStorage;
+    __published : // IDE-managed Components
+                  TFormStorage* fsStorage;
     TMxPopupMenu* pmOptions;
     TMenuItem* Quality1;
     TMenuItem* N25;
@@ -96,14 +96,14 @@ class ECORE_API TfraBottomBar :
     void __fastcall ebMacroMouseDown(TObject* Sender, TMouseButton Button, TShiftState Shift, int X, int Y);
     void __fastcall N501Click(TObject* Sender);
 
-  private:  // User declarations
+private: // User declarations
     void __fastcall MacroAssignClick(TObject* Sender);
     void __fastcall MacroClearClick(TObject* Sender);
     void __fastcall MacroExecuteClick(TObject* Sender);
     void __fastcall MacroLogCommandsClick(TObject* Sender);
     void __fastcall MacroEditCommandListClick(TObject* Sender);
 
-  public:  // User declarations
+public: // User declarations
     __fastcall TfraBottomBar(TComponent* Owner);
     void RefreshBar() { ; }
     void RedrawBar();

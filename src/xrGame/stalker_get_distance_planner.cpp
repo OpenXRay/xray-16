@@ -24,10 +24,7 @@ CStalkerGetDistancePlanner::CStalkerGetDistancePlanner(CAI_Stalker* object, LPCS
 {
 }
 
-CStalkerGetDistancePlanner::~CStalkerGetDistancePlanner()
-{
-}
-
+CStalkerGetDistancePlanner::~CStalkerGetDistancePlanner() {}
 void CStalkerGetDistancePlanner::setup(CAI_Stalker* object, CPropertyStorage* storage)
 {
     inherited::setup(object, storage);
@@ -44,7 +41,7 @@ void CStalkerGetDistancePlanner::setup(CAI_Stalker* object, CPropertyStorage* st
 void CStalkerGetDistancePlanner::add_evaluators()
 {
     add_evaluator(eWorldPropertyInCover,
-        new CStalkerPropertyEvaluatorMember((CPropertyStorage*)0,  //&CScriptActionPlanner::m_storage,
+        new CStalkerPropertyEvaluatorMember((CPropertyStorage*)0, //&CScriptActionPlanner::m_storage,
             eWorldPropertyInCover, true, true, "in cover"));
 
     add_evaluator(

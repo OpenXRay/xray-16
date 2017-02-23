@@ -23,8 +23,8 @@
 //---------------------------------------------------------------------------
 class TfrmObjectList : public TForm
 {
-    __published :  // IDE-managed Components
-                   TPanel* Panel1;
+    __published : // IDE-managed Components
+                  TPanel* Panel1;
     TRadioGroup* rgSO;
     TExtBtn* ebShowSel;
     TExtBtn* ebHideSel;
@@ -56,7 +56,7 @@ class TfrmObjectList : public TForm
     void __fastcall ElEdit1KeyDown(TObject* Sender, WORD& Key, TShiftState Shift);
     void __fastcall tvItemsMouseDown(TObject* Sender, TMouseButton Button, TShiftState Shift, int X, int Y);
 
-  private:  // User declarations
+private: // User declarations
     int obj_count;
     ObjClassID m_cur_cls;
     void __fastcall InitListBox();
@@ -83,7 +83,7 @@ class TfrmObjectList : public TForm
     void storeExpandedItems();
     void restoreExpandedItems();
 
-  public:  // User declarations
+public: // User declarations
     __fastcall TfrmObjectList(TComponent* Owner);
     static TfrmObjectList* CreateForm(TWinControl* parent = 0);
     static void DestroyForm(TfrmObjectList*& obj_list);

@@ -26,9 +26,9 @@ public:
     virtual void destroy();
     IReader const* get_config(shared_str config) const;
 
-#if 0   // def DEBUG
+#if 0 // def DEBUG
 			void	validate			();
-#endif  // DEBUG
+#endif // DEBUG
 
 private:
     typedef xr_list<std::pair<shared_str, IReader*>> configs_type;

@@ -19,7 +19,8 @@ CCar::SWheel::SWheelCollisionParams::SWheelCollisionParams()
 IC void CCar::SWheel::applywheelCollisionParams(
     const dxGeomUserData* ud, bool& do_colide, dContact& c, SGameMtl* material_1, SGameMtl* material_2)
 {
-    if (ud && ud->object_callbacks && ud->object_callbacks->HasCallback(WheellCollisionCallback)) {
+    if (ud && ud->object_callbacks && ud->object_callbacks->HasCallback(WheellCollisionCallback))
+    {
         SWheelCollisionParams& cp = *((SWheelCollisionParams*)(ud->callback_data));
         dSurfaceParameters& sp = c.surface;
         sp.mu *= cp.mu_factor;
@@ -40,7 +41,8 @@ void CCar::SWheel::WheellCollisionCallback(
 bool CCar::WheelHit(float P, s16 element, ALife::EHitType hit_type)
 {
     xr_map<u16, SWheel>::iterator i = m_wheels_map.find(element);
-    if (i != m_wheels_map.end()) {
+    if (i != m_wheels_map.end())
+    {
         i->second.Hit(P);
         return true;
     }
@@ -49,7 +51,8 @@ bool CCar::WheelHit(float P, s16 element, ALife::EHitType hit_type)
 }
 void CCar::SWheel::Init()
 {
-    if (inited) return;
+    if (inited)
+        return;
     BONE_P_PAIR_CIT bone = bone_map.find(bone_id);
     R_ASSERT2(bone->second.element, "No Element was created for wheel. Check collision is set");
     bone->second.element->set_DynamicLimits(default_l_limit, default_w_limit * 100.f);
@@ -75,7 +78,8 @@ void CCar::SWheel::Load(LPCSTR section)
     IKinematics* K = PKinematics(car->Visual());
     CInifile* ini = K->LL_UserData();
     VERIFY(ini);
-    if (ini->section_exist(section)) {
+    if (ini->section_exist(section))
+    {
         collision_params.damping_factor =
             READ_IF_EXISTS(ini, r_float, section, "damping_factor", collision_params.damping_factor);
         collision_params.spring_factor =
@@ -92,13 +96,15 @@ void CCar::SWheel::Load(LPCSTR section)
 }
 void CCar::SWheel::ApplyDriveAxisTorque(float torque)
 {
-    if (!joint) return;
+    if (!joint)
+        return;
     // dJointSetHinge2Param(joint->GetDJoint(), dParamFMax2,torque);//car->m_axle_friction
     joint->SetForce(torque, 1);
 }
 void CCar::SWheel::ApplyDriveAxisVel(float vel)
 {
-    if (!joint) return;
+    if (!joint)
+        return;
     // dJointSetHinge2Param(joint->GetDJoint(), dParamVel2, vel);
     joint->SetVelocity(vel, 1);
 }
@@ -110,14 +116,16 @@ void CCar::SWheel::ApplyDriveAxisVelTorque(float vel, float torque)
 }
 void CCar::SWheel::ApplySteerAxisVel(float vel)
 {
-    if (!joint) return;
+    if (!joint)
+        return;
     // dJointSetHinge2Param(joint->GetDJoint(), dParamVel, vel);
     joint->SetVelocity(vel, 0);
 }
 
 void CCar::SWheel::ApplySteerAxisTorque(float torque)
 {
-    if (!joint) return;
+    if (!joint)
+        return;
     // dJointSetHinge2Param(joint->GetDJoint(), dParamFMax, torque);
     joint->SetForce(torque, 0);
 }
@@ -130,13 +138,15 @@ void CCar::SWheel::ApplySteerAxisVelTorque(float vel, float torque)
 
 void CCar::SWheel::SetSteerHiLimit(float hi)
 {
-    if (!joint) return;
+    if (!joint)
+        return;
     // dJointSetHinge2Param(joint->GetDJoint(), dParamHiStop, hi);
     joint->SetHiLimitDynamic(0, hi);
 }
 void CCar::SWheel::SetSteerLoLimit(float lo)
 {
-    if (!joint) return;
+    if (!joint)
+        return;
     // dJointSetHinge2Param(joint->GetDJoint(), dParamLoStop, lo);
     joint->SetLoLimitDynamic(0, lo);
 }
@@ -149,8 +159,10 @@ void CCar::SWheel::SetSteerLimits(float hi, float lo)
 void CCar::SWheel::ApplyDamage(u16 level)
 {
     inherited::ApplyDamage(level);
-    if (!joint) return;
-    if (level == 0) return;
+    if (!joint)
+        return;
+    if (level == 0)
+        return;
     float sf, df;
     // dJointID dj=joint->GetDJoint();
     switch (level)
@@ -221,21 +233,15 @@ void CCar::SWheelDrive::Drive()
     float cur_speed = pwheel->car->RefWheelMaxSpeed() / gear_factor;
     pwheel->ApplyDriveAxisVel(pos_fvd * cur_speed);
 }
-void CCar::SWheelDrive::UpdatePower()
-{
-    pwheel->ApplyDriveAxisTorque(pwheel->car->RefWheelCurTorque() / gear_factor);
-}
-void CCar::SWheelDrive::Neutral()
-{
-    pwheel->ApplyDriveAxisVelTorque(0.f, pwheel->car->m_axle_friction);
-}
-
+void CCar::SWheelDrive::UpdatePower() { pwheel->ApplyDriveAxisTorque(pwheel->car->RefWheelCurTorque() / gear_factor); }
+void CCar::SWheelDrive::Neutral() { pwheel->ApplyDriveAxisVelTorque(0.f, pwheel->car->m_axle_friction); }
 float CCar::SWheelDrive::ASpeed()
 {
     CPhysicsJoint* J = pwheel->joint;
-    if (!J) return 0.f;
+    if (!J)
+        return 0.f;
     // return (dJointGetHinge2Angle2Rate(J->GetDJoint()))*pos_fvd;//dFabs
-    return (J->GetAxisAngleRate(1)) * pos_fvd;  // dFabs
+    return (J->GetAxisAngleRate(1)) * pos_fvd; // dFabs
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void CCar::SWheelSteer::Init()
@@ -248,7 +254,7 @@ void CCar::SWheelSteer::Init()
     {
     case jtWheel:
         pos_right =
-            bone_map.find(pwheel->bone_id)->second.element->mXFORM.i.y;  //.dotproduct(pwheel->car->m_root_transform.j);
+            bone_map.find(pwheel->bone_id)->second.element->mXFORM.i.y; //.dotproduct(pwheel->car->m_root_transform.j);
         break;
 
     default: NODEFAULT;
@@ -267,8 +273,9 @@ void CCar::SWheelSteer::Init()
 
 void CCar::SWheelSteer::SteerRight()
 {
-    limited = true;  // no need to limit wheels when steering
-    if (pos_right > 0) {
+    limited = true; // no need to limit wheels when steering
+    if (pos_right > 0)
+    {
         pwheel->SetSteerHiLimit(hi_limit);
         pwheel->ApplySteerAxisVel(pwheel->car->m_steering_speed);
     }
@@ -280,8 +287,9 @@ void CCar::SWheelSteer::SteerRight()
 }
 void CCar::SWheelSteer::SteerLeft()
 {
-    limited = true;  // no need to limit wheels when steering
-    if (pos_right < 0) {
+    limited = true; // no need to limit wheels when steering
+    if (pos_right < 0)
+    {
         pwheel->SetSteerHiLimit(hi_limit);
         pwheel->ApplySteerAxisVel(pwheel->car->m_steering_speed);
     }
@@ -294,8 +302,10 @@ void CCar::SWheelSteer::SteerLeft()
 void CCar::SWheelSteer::SteerIdle()
 {
     limited = false;
-    if (pwheel->car->e_state_steer == right) {
-        if (pos_right < 0) {
+    if (pwheel->car->e_state_steer == right)
+    {
+        if (pos_right < 0)
+        {
             pwheel->SetSteerHiLimit(0.f);
             pwheel->ApplySteerAxisVel(pwheel->car->m_steering_speed);
         }
@@ -307,7 +317,8 @@ void CCar::SWheelSteer::SteerIdle()
     }
     else
     {
-        if (pos_right > 0) {
+        if (pos_right > 0)
+        {
             pwheel->SetSteerHiLimit(0.f);
             pwheel->ApplySteerAxisVel(pwheel->car->m_steering_speed);
         }
@@ -322,12 +333,15 @@ void CCar::SWheelSteer::SteerIdle()
 void CCar::SWheelSteer::Limit()
 {
     CPhysicsJoint* J = pwheel->joint;
-    if (!J) return;
+    if (!J)
+        return;
     // dJointID joint=J->GetDJoint();
-    if (!limited) {
+    if (!limited)
+    {
         // dReal angle = dJointGetHinge2Angle1(joint);
         float angle = J->GetAxisAngle(0);
-        if (_abs(angle) < M_PI / 180.f) {
+        if (_abs(angle) < M_PI / 180.f)
+        {
             pwheel->SetSteerLimits(0.f, 0.f);
             pwheel->ApplySteerAxisVel(0.f);
             limited = true;
@@ -340,7 +354,7 @@ float CCar::SWheelSteer::GetSteerAngle()
 {
     VERIFY(pwheel);
     VERIFY(pwheel->joint);
-    return -pos_right * pwheel->joint->GetAxisAngle(0);  // dJointGetHinge2Angle1 (pwheel->joint->GetDJoint());
+    return -pos_right * pwheel->joint->GetAxisAngle(0); // dJointGetHinge2Angle1 (pwheel->joint->GetDJoint());
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -359,22 +373,12 @@ void CCar::SWheelBreak::Load(LPCSTR section)
     VERIFY(ini);
     break_torque = ini->r_float("car_definition", "break_torque");
     hand_break_torque = READ_IF_EXISTS(ini, r_float, "car_definition", "hand_break_torque", break_torque);
-    if (ini->section_exist(section)) {
+    if (ini->section_exist(section))
+    {
         break_torque = READ_IF_EXISTS(ini, r_float, section, "break_torque", break_torque);
         hand_break_torque = READ_IF_EXISTS(ini, r_float, section, "hand_break_torque", hand_break_torque);
     }
 }
-void CCar::SWheelBreak::Break(float k)
-{
-    pwheel->ApplyDriveAxisVelTorque(0.f, 100000.f * break_torque * k);
-}
-
-void CCar::SWheelBreak::HandBreak()
-{
-    pwheel->ApplyDriveAxisVelTorque(0.f, 100000.f * hand_break_torque);
-}
-
-void CCar::SWheelBreak::Neutral()
-{
-    pwheel->ApplyDriveAxisVelTorque(0.f, pwheel->car->m_axle_friction);
-}
+void CCar::SWheelBreak::Break(float k) { pwheel->ApplyDriveAxisVelTorque(0.f, 100000.f * break_torque * k); }
+void CCar::SWheelBreak::HandBreak() { pwheel->ApplyDriveAxisVelTorque(0.f, 100000.f * hand_break_torque); }
+void CCar::SWheelBreak::Neutral() { pwheel->ApplyDriveAxisVelTorque(0.f, pwheel->car->m_axle_friction); }

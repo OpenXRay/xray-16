@@ -24,10 +24,12 @@
    <markus@oberhumer.com>
  */
 
+
 /* WARNING: this file should *not* be used by applications. It is
    part of the implementation of the library and is subject
    to change.
  */
+
 
 #ifndef __LZO_DICT_H
 #define __LZO_DICT_H
@@ -36,195 +38,216 @@
 extern "C" {
 #endif
 
+
+
 /***********************************************************************
 // dictionary size
 ************************************************************************/
 
 /* dictionary needed for compression */
 #if !defined(D_BITS) && defined(DBITS)
-#define D_BITS DBITS
+#  define D_BITS		DBITS
 #endif
 #if !defined(D_BITS)
-#error "D_BITS is not defined"
+#  error "D_BITS is not defined"
 #endif
 #if (D_BITS < 16)
-#define D_SIZE LZO_SIZE(D_BITS)
-#define D_MASK LZO_MASK(D_BITS)
+#  define D_SIZE		LZO_SIZE(D_BITS)
+#  define D_MASK		LZO_MASK(D_BITS)
 #else
-#define D_SIZE LZO_USIZE(D_BITS)
-#define D_MASK LZO_UMASK(D_BITS)
+#  define D_SIZE		LZO_USIZE(D_BITS)
+#  define D_MASK		LZO_UMASK(D_BITS)
 #endif
-#define D_HIGH ((D_MASK >> 1) + 1)
+#define D_HIGH			((D_MASK >> 1) + 1)
+
 
 /* dictionary depth */
 #if !defined(DD_BITS)
-#define DD_BITS 0
+#  define DD_BITS		0
 #endif
-#define DD_SIZE LZO_SIZE(DD_BITS)
-#define DD_MASK LZO_MASK(DD_BITS)
+#define DD_SIZE			LZO_SIZE(DD_BITS)
+#define DD_MASK			LZO_MASK(DD_BITS)
 
 /* dictionary length */
 #if !defined(DL_BITS)
-#define DL_BITS (D_BITS - DD_BITS)
+#  define DL_BITS		(D_BITS - DD_BITS)
 #endif
 #if (DL_BITS < 16)
-#define DL_SIZE LZO_SIZE(DL_BITS)
-#define DL_MASK LZO_MASK(DL_BITS)
+#  define DL_SIZE		LZO_SIZE(DL_BITS)
+#  define DL_MASK		LZO_MASK(DL_BITS)
 #else
-#define DL_SIZE LZO_USIZE(DL_BITS)
-#define DL_MASK LZO_UMASK(DL_BITS)
+#  define DL_SIZE		LZO_USIZE(DL_BITS)
+#  define DL_MASK		LZO_UMASK(DL_BITS)
 #endif
+
 
 #if (D_BITS != DL_BITS + DD_BITS)
-#error "D_BITS does not match"
+#  error "D_BITS does not match"
 #endif
 #if (D_BITS < 8 || D_BITS > 18)
-#error "invalid D_BITS"
+#  error "invalid D_BITS"
 #endif
 #if (DL_BITS < 8 || DL_BITS > 20)
-#error "invalid DL_BITS"
+#  error "invalid DL_BITS"
 #endif
 #if (DD_BITS < 0 || DD_BITS > 6)
-#error "invalid DD_BITS"
+#  error "invalid DD_BITS"
 #endif
 
+
 #if !defined(DL_MIN_LEN)
-#define DL_MIN_LEN 3
+#  define DL_MIN_LEN	3
 #endif
 #if !defined(DL_SHIFT)
-#define DL_SHIFT ((DL_BITS + (DL_MIN_LEN - 1)) / DL_MIN_LEN)
+#  define DL_SHIFT		((DL_BITS + (DL_MIN_LEN - 1)) / DL_MIN_LEN)
 #endif
+
+
 
 /***********************************************************************
 // dictionary access
 ************************************************************************/
 
-#define LZO_HASH_GZIP 1
-#define LZO_HASH_GZIP_INCREMENTAL 2
-#define LZO_HASH_LZO_INCREMENTAL_A 3
-#define LZO_HASH_LZO_INCREMENTAL_B 4
+#define LZO_HASH_GZIP					1
+#define LZO_HASH_GZIP_INCREMENTAL		2
+#define LZO_HASH_LZO_INCREMENTAL_A		3
+#define LZO_HASH_LZO_INCREMENTAL_B		4
 
 #if !defined(LZO_HASH)
-#error "choose a hashing strategy"
+#  error "choose a hashing strategy"
 #endif
+
 
 #if (DL_MIN_LEN == 3)
-#define _DV2_A(p, shift1, shift2) (((((lzo_uint32)((p)[0]) << shift1) ^ (p)[1]) << shift2) ^ (p)[2])
-#define _DV2_B(p, shift1, shift2) (((((lzo_uint32)((p)[2]) << shift1) ^ (p)[1]) << shift2) ^ (p)[0])
-#define _DV3_B(p, shift1, shift2, shift3) ((_DV2_B((p) + 1, shift1, shift2) << (shift3)) ^ (p)[0])
+#  define _DV2_A(p,shift1,shift2) \
+		(((( (lzo_uint32)((p)[0]) << shift1) ^ (p)[1]) << shift2) ^ (p)[2])
+#  define _DV2_B(p,shift1,shift2) \
+		(((( (lzo_uint32)((p)[2]) << shift1) ^ (p)[1]) << shift2) ^ (p)[0])
+#  define _DV3_B(p,shift1,shift2,shift3) \
+		((_DV2_B((p)+1,shift1,shift2) << (shift3)) ^ (p)[0])
 #elif (DL_MIN_LEN == 2)
-#define _DV2_A(p, shift1, shift2) (((lzo_uint32)(p[0]) << shift1) ^ p[1])
-#define _DV2_B(p, shift1, shift2) (((lzo_uint32)(p[1]) << shift1) ^ p[2])
+#  define _DV2_A(p,shift1,shift2) \
+		(( (lzo_uint32)(p[0]) << shift1) ^ p[1])
+#  define _DV2_B(p,shift1,shift2) \
+		(( (lzo_uint32)(p[1]) << shift1) ^ p[2])
 #else
-#error "invalid DL_MIN_LEN"
+#  error "invalid DL_MIN_LEN"
 #endif
-#define _DV_A(p, shift) _DV2_A(p, shift, shift)
-#define _DV_B(p, shift) _DV2_B(p, shift, shift)
-#define DA2(p, s1, s2) (((((lzo_uint32)((p)[2]) << (s2)) + (p)[1]) << (s1)) + (p)[0])
-#define DS2(p, s1, s2) (((((lzo_uint32)((p)[2]) << (s2)) - (p)[1]) << (s1)) - (p)[0])
-#define DX2(p, s1, s2) (((((lzo_uint32)((p)[2]) << (s2)) ^ (p)[1]) << (s1)) ^ (p)[0])
-#define DA3(p, s1, s2, s3) ((DA2((p) + 1, s2, s3) << (s1)) + (p)[0])
-#define DS3(p, s1, s2, s3) ((DS2((p) + 1, s2, s3) << (s1)) - (p)[0])
-#define DX3(p, s1, s2, s3) ((DX2((p) + 1, s2, s3) << (s1)) ^ (p)[0])
-#define DMS(v, s) ((lzo_uint)(((v) & (D_MASK >> (s))) << (s)))
-#define DM(v) DMS(v, 0)
+#define _DV_A(p,shift) 		_DV2_A(p,shift,shift)
+#define _DV_B(p,shift)	 	_DV2_B(p,shift,shift)
+#define DA2(p,s1,s2) \
+		(((((lzo_uint32)((p)[2]) << (s2)) + (p)[1]) << (s1)) + (p)[0])
+#define DS2(p,s1,s2) \
+		(((((lzo_uint32)((p)[2]) << (s2)) - (p)[1]) << (s1)) - (p)[0])
+#define DX2(p,s1,s2) \
+		(((((lzo_uint32)((p)[2]) << (s2)) ^ (p)[1]) << (s1)) ^ (p)[0])
+#define DA3(p,s1,s2,s3) ((DA2((p)+1,s2,s3) << (s1)) + (p)[0])
+#define DS3(p,s1,s2,s3) ((DS2((p)+1,s2,s3) << (s1)) - (p)[0])
+#define DX3(p,s1,s2,s3) ((DX2((p)+1,s2,s3) << (s1)) ^ (p)[0])
+#define DMS(v,s)		((lzo_uint) (((v) & (D_MASK >> (s))) << (s)))
+#define DM(v)			DMS(v,0)
+
+
 
 #if (LZO_HASH == LZO_HASH_GZIP)
-/* hash function like in gzip/zlib (deflate) */
-#define _DINDEX(dv, p) (_DV_A((p), DL_SHIFT))
+   /* hash function like in gzip/zlib (deflate) */
+#  define _DINDEX(dv,p)		(_DV_A((p),DL_SHIFT))
 
 #elif (LZO_HASH == LZO_HASH_GZIP_INCREMENTAL)
-/* incremental hash like in gzip/zlib (deflate) */
-#define __LZO_HASH_INCREMENTAL
-#define DVAL_FIRST(dv, p) dv = _DV_A((p), DL_SHIFT)
-#define DVAL_NEXT(dv, p) dv = (((dv) << DL_SHIFT) ^ p[2])
-#define _DINDEX(dv, p) (dv)
-#define DVAL_LOOKAHEAD DL_MIN_LEN
+   /* incremental hash like in gzip/zlib (deflate) */
+#  define __LZO_HASH_INCREMENTAL
+#  define DVAL_FIRST(dv,p)	dv = _DV_A((p),DL_SHIFT)
+#  define DVAL_NEXT(dv,p)	dv = (((dv) << DL_SHIFT) ^ p[2])
+#  define _DINDEX(dv,p)		(dv)
+#  define DVAL_LOOKAHEAD	DL_MIN_LEN
 
 #elif (LZO_HASH == LZO_HASH_LZO_INCREMENTAL_A)
-/* incremental LZO hash version A */
-#define __LZO_HASH_INCREMENTAL
-#define DVAL_FIRST(dv, p) dv = _DV_A((p), 5)
-#define DVAL_NEXT(dv, p)                                                                                               \
-    dv ^= (lzo_uint32)(p[-1]) << (2 * 5);                                                                              \
-    dv = (((dv) << 5) ^ p[2])
-#define _DINDEX(dv, p) ((0x9f5f * (dv)) >> 5)
-#define DVAL_LOOKAHEAD DL_MIN_LEN
+   /* incremental LZO hash version A */
+#  define __LZO_HASH_INCREMENTAL
+#  define DVAL_FIRST(dv,p)	dv = _DV_A((p),5)
+#  define DVAL_NEXT(dv,p) \
+				dv ^= (lzo_uint32)(p[-1]) << (2*5); dv = (((dv) << 5) ^ p[2])
+#  define _DINDEX(dv,p)		((0x9f5f * (dv)) >> 5)
+#  define DVAL_LOOKAHEAD	DL_MIN_LEN
 
 #elif (LZO_HASH == LZO_HASH_LZO_INCREMENTAL_B)
-/* incremental LZO hash version B */
-#define __LZO_HASH_INCREMENTAL
-#define DVAL_FIRST(dv, p) dv = _DV_B((p), 5)
-#define DVAL_NEXT(dv, p)                                                                                               \
-    dv ^= p[-1];                                                                                                       \
-    dv = (((dv) >> 5) ^ ((lzo_uint32)(p[2]) << (2 * 5)))
-#define _DINDEX(dv, p) ((0x9f5f * (dv)) >> 5)
-#define DVAL_LOOKAHEAD DL_MIN_LEN
+   /* incremental LZO hash version B */
+#  define __LZO_HASH_INCREMENTAL
+#  define DVAL_FIRST(dv,p)	dv = _DV_B((p),5)
+#  define DVAL_NEXT(dv,p) \
+				dv ^= p[-1]; dv = (((dv) >> 5) ^ ((lzo_uint32)(p[2]) << (2*5)))
+#  define _DINDEX(dv,p)		((0x9f5f * (dv)) >> 5)
+#  define DVAL_LOOKAHEAD	DL_MIN_LEN
 
 #else
-#error "choose a hashing strategy"
+#  error "choose a hashing strategy"
 #endif
+
 
 #ifndef DINDEX
-#define DINDEX(dv, p) ((lzo_uint)((_DINDEX(dv, p)) & DL_MASK) << DD_BITS)
+#define DINDEX(dv,p)		((lzo_uint)((_DINDEX(dv,p)) & DL_MASK) << DD_BITS)
 #endif
 #if !defined(DINDEX1) && defined(D_INDEX1)
-#define DINDEX1 D_INDEX1
+#define DINDEX1				D_INDEX1
 #endif
 #if !defined(DINDEX2) && defined(D_INDEX2)
-#define DINDEX2 D_INDEX2
+#define DINDEX2				D_INDEX2
 #endif
 
+
+
 #if !defined(__LZO_HASH_INCREMENTAL)
-#define DVAL_FIRST(dv, p) ((void)0)
-#define DVAL_NEXT(dv, p) ((void)0)
-#define DVAL_LOOKAHEAD 0
+#  define DVAL_FIRST(dv,p)	((void) 0)
+#  define DVAL_NEXT(dv,p)	((void) 0)
+#  define DVAL_LOOKAHEAD	0
 #endif
+
 
 #if !defined(DVAL_ASSERT)
 #if defined(__LZO_HASH_INCREMENTAL) && !defined(NDEBUG)
-static void DVAL_ASSERT(lzo_uint32 dv, const lzo_byte* p)
+static void DVAL_ASSERT(lzo_uint32 dv, const lzo_byte *p)
 {
-    lzo_uint32 df;
-    DVAL_FIRST(df, (p));
-    assert(DINDEX(dv, p) == DINDEX(df, p));
+	lzo_uint32 df;
+	DVAL_FIRST(df,(p));
+	assert(DINDEX(dv,p) == DINDEX(df,p));
 }
 #else
-#define DVAL_ASSERT(dv, p) ((void)0)
+#  define DVAL_ASSERT(dv,p)	((void) 0)
 #endif
 #endif
+
+
 
 /***********************************************************************
 // dictionary updating
 ************************************************************************/
 
 #if defined(LZO_DICT_USE_PTR)
-#define DENTRY(p, in) (p)
-#define GINDEX(m_pos, m_off, dict, dindex, in) m_pos = dict[dindex]
+#  define DENTRY(p,in)							(p)
+#  define GINDEX(m_pos,m_off,dict,dindex,in)	m_pos = dict[dindex]
 #else
-#define DENTRY(p, in) ((lzo_uint)((p) - (in)))
-#define GINDEX(m_pos, m_off, dict, dindex, in) m_off = dict[dindex]
+#  define DENTRY(p,in)							((lzo_uint) ((p)-(in)))
+#  define GINDEX(m_pos,m_off,dict,dindex,in)	m_off = dict[dindex]
 #endif
+
 
 #if (DD_BITS == 0)
 
-#define UPDATE_D(dict, drun, dv, p, in) dict[DINDEX(dv, p)] = DENTRY(p, in)
-#define UPDATE_I(dict, drun, index, p, in) dict[index] = DENTRY(p, in)
-#define UPDATE_P(ptr, drun, p, in) (ptr)[0] = DENTRY(p, in)
+#  define UPDATE_D(dict,drun,dv,p,in)		dict[ DINDEX(dv,p) ] = DENTRY(p,in)
+#  define UPDATE_I(dict,drun,index,p,in)	dict[index] = DENTRY(p,in)
+#  define UPDATE_P(ptr,drun,p,in)			(ptr)[0] = DENTRY(p,in)
 
 #else
 
-#define UPDATE_D(dict, drun, dv, p, in)                                                                                \
-    dict[DINDEX(dv, p) + drun++] = DENTRY(p, in);                                                                      \
-    drun &= DD_MASK
-#define UPDATE_I(dict, drun, index, p, in)                                                                             \
-    dict[(index) + drun++] = DENTRY(p, in);                                                                            \
-    drun &= DD_MASK
-#define UPDATE_P(ptr, drun, p, in)                                                                                     \
-    (ptr)[drun++] = DENTRY(p, in);                                                                                     \
-    drun &= DD_MASK
+#  define UPDATE_D(dict,drun,dv,p,in)	\
+		dict[ DINDEX(dv,p) + drun++ ] = DENTRY(p,in); drun &= DD_MASK
+#  define UPDATE_I(dict,drun,index,p,in)	\
+		dict[ (index) + drun++ ] = DENTRY(p,in); drun &= DD_MASK
+#  define UPDATE_P(ptr,drun,p,in)	\
+		(ptr) [ drun++ ] = DENTRY(p,in); drun &= DD_MASK
 
 #endif
+
 
 /***********************************************************************
 // test for a match
@@ -233,30 +256,38 @@ static void DVAL_ASSERT(lzo_uint32 dv, const lzo_byte* p)
 #if defined(LZO_DICT_USE_PTR)
 
 /* m_pos is either NULL or a valid pointer */
-#define LZO_CHECK_MPOS_DET(m_pos, m_off, in, ip, max_offset)                                                           \
-    (m_pos == NULL || (m_off = (lzo_moff_t)(ip - m_pos)) > max_offset)
+#define LZO_CHECK_MPOS_DET(m_pos,m_off,in,ip,max_offset) \
+		(m_pos == NULL || (m_off = (lzo_moff_t) (ip - m_pos)) > max_offset)
 
 /* m_pos may point anywhere... */
-#define LZO_CHECK_MPOS_NON_DET(m_pos, m_off, in, ip, max_offset)                                                       \
-    (BOUNDS_CHECKING_OFF_IN_EXPR(                                                                                      \
-        (PTR_LT(m_pos, in) || (m_off = (lzo_moff_t)PTR_DIFF(ip, m_pos)) <= 0 || m_off > max_offset)))
+#define LZO_CHECK_MPOS_NON_DET(m_pos,m_off,in,ip,max_offset) \
+	(BOUNDS_CHECKING_OFF_IN_EXPR( \
+		(PTR_LT(m_pos,in) || \
+		 (m_off = (lzo_moff_t) PTR_DIFF(ip,m_pos)) <= 0 || \
+		  m_off > max_offset) ))
 
 #else
 
-#define LZO_CHECK_MPOS_DET(m_pos, m_off, in, ip, max_offset)                                                           \
-    (m_off == 0 || ((m_off = (lzo_moff_t)((ip) - (in)) - m_off) > max_offset) || (m_pos = (ip) - (m_off), 0))
+#define LZO_CHECK_MPOS_DET(m_pos,m_off,in,ip,max_offset) \
+		(m_off == 0 || \
+		 ((m_off = (lzo_moff_t) ((ip)-(in)) - m_off) > max_offset) || \
+		 (m_pos = (ip) - (m_off), 0) )
 
-#define LZO_CHECK_MPOS_NON_DET(m_pos, m_off, in, ip, max_offset)                                                       \
-    ((lzo_moff_t)((ip) - (in)) <= m_off || ((m_off = (lzo_moff_t)((ip) - (in)) - m_off) > max_offset) ||               \
-        (m_pos = (ip) - (m_off), 0))
+#define LZO_CHECK_MPOS_NON_DET(m_pos,m_off,in,ip,max_offset) \
+		((lzo_moff_t) ((ip)-(in)) <= m_off || \
+		 ((m_off = (lzo_moff_t) ((ip)-(in)) - m_off) > max_offset) || \
+		 (m_pos = (ip) - (m_off), 0) )
 
 #endif
+
 
 #if defined(LZO_DETERMINISTIC)
-#define LZO_CHECK_MPOS LZO_CHECK_MPOS_DET
+#  define LZO_CHECK_MPOS	LZO_CHECK_MPOS_DET
 #else
-#define LZO_CHECK_MPOS LZO_CHECK_MPOS_NON_DET
+#  define LZO_CHECK_MPOS	LZO_CHECK_MPOS_NON_DET
 #endif
+
+
 
 #ifdef __cplusplus
 } /* extern "C" */
@@ -267,3 +298,4 @@ static void DVAL_ASSERT(lzo_uint32 dv, const lzo_byte* p)
 /*
 vi:ts=4:et
 */
+

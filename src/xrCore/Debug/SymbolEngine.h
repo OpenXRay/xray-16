@@ -56,9 +56,7 @@ public:
     // initialize the symbol engine and then use the other member
     // functions in place of their corresponding DBGHELP.DLL functions.
     SymbolEngine(void) {}
-
     virtual ~SymbolEngine(void) {}
-
     /*----------------------------------------------------------------------
                       Public Helper Information Functions
     ----------------------------------------------------------------------*/
@@ -73,12 +71,12 @@ public:
     //             LOWORD(dwLS)       );
     //  szVer will contain a string like: 5.00.1878.1
     BOOL GetDbgHelpVersion(DWORD& dwMS, DWORD& dwLS) { return GetInMemoryFileVersion(_T("DBGHELP.DLL"), dwMS, dwLS); }
-
     // Returns the file version of the PDB reading DLLs
     BOOL GetPDBReaderVersion(DWORD& dwMS, DWORD& dwLS)
     {
         // First try MSDBI.DLL.
-        if (GetInMemoryFileVersion(_T("MSDBI.DLL"), dwMS, dwLS) == TRUE) {
+        if (GetInMemoryFileVersion(_T("MSDBI.DLL"), dwMS, dwLS) == TRUE)
+        {
             return TRUE;
         }
         else if (GetInMemoryFileVersion(_T("MSPDB60.DLL" ), dwMS, dwLS) == TRUE)
@@ -106,13 +104,15 @@ public:
         DWORD dwVerSize;
 
         dwVerSize = GetFileVersionInfoSize(szImageHlp, &dwVerInfoHandle);
-        if (dwVerSize == 0) {
+        if (dwVerSize == 0)
+        {
             return false;
         }
 
         // Got the version size, now get the version information.
         LPVOID lpData = (LPVOID) new TCHAR[dwVerSize];
-        if (GetFileVersionInfo(szImageHlp, dwVerInfoHandle, dwVerSize, lpData) == false) {
+        if (GetFileVersionInfo(szImageHlp, dwVerInfoHandle, dwVerSize, lpData) == false)
+        {
             delete[] lpData;
             return false;
         }
@@ -120,7 +120,8 @@ public:
         VS_FIXEDFILEINFO* lpVerInfo;
         UINT uiLen;
         BOOL bRet = VerQueryValue(lpData, _T("\\"), (LPVOID*)&lpVerInfo, &uiLen);
-        if (bRet) {
+        if (bRet)
+        {
             dwMS = lpVerInfo->dwFileVersionMS;
             dwLS = lpVerInfo->dwFileVersionLS;
         }
@@ -140,7 +141,6 @@ public:
     }
 
     BOOL SymCleanup() { return ::SymCleanup(m_hProcess); }
-
     /*----------------------------------------------------------------------
                            Public Module Manipulation
     ----------------------------------------------------------------------*/
@@ -161,14 +161,12 @@ public:
     }
 
     BOOL SymUnloadModule(IN DWORD BaseOfDll) { return ::SymUnloadModule(m_hProcess, BaseOfDll); }
-
     BOOL SymGetModuleInfo(IN DWORD dwAddr, OUT PIMAGEHLP_MODULE ModuleInfo)
     {
         return ::SymGetModuleInfo(m_hProcess, dwAddr, ModuleInfo);
     }
 
     DWORD SymGetModuleBase(IN DWORD dwAddr) { return ::SymGetModuleBase(m_hProcess, dwAddr); }
-
     /*----------------------------------------------------------------------
                            Public Symbol Manipulation
     ----------------------------------------------------------------------*/
@@ -189,9 +187,7 @@ public:
     }
 
     BOOL SymGetSymNext(IN OUT PIMAGEHLP_SYMBOL Symbol) { return ::SymGetSymNext(m_hProcess, Symbol); }
-
     BOOL SymGetSymPrev(IN OUT PIMAGEHLP_SYMBOL Symbol) { return ::SymGetSymPrev(m_hProcess, Symbol); }
-
     /*----------------------------------------------------------------------
                         Public Source Line Manipulation
     ----------------------------------------------------------------------*/
@@ -211,18 +207,20 @@ public:
         while (::SymGetLineFromAddr(m_hProcess, dwAddr - dwTempDis, pdwDisplacement, Line) == false)
         {
             dwTempDis += 1;
-            if (100 == dwTempDis) {
+            if (100 == dwTempDis)
+            {
                 return FALSE;
             }
         }
         // I found it and the source line information is correct, so
         // change the displacement if I had to search backward to find
         // the source line.
-        if (dwTempDis != 0) {
+        if (dwTempDis != 0)
+        {
             *pdwDisplacement = dwTempDis;
         }
         return TRUE;
-#endif  // DO_NOT_WORK_AROUND_SRCLINE_BUG
+#endif // DO_NOT_WORK_AROUND_SRCLINE_BUG
     }
 
     BOOL SymGetLineFromName(IN LPSTR ModuleName, IN LPSTR FileName, IN DWORD dwLineNumber, OUT PLONG plDisplacement,
@@ -232,9 +230,7 @@ public:
     }
 
     BOOL SymGetLineNext(IN OUT PIMAGEHLP_LINE Line) { return ::SymGetLineNext(m_hProcess, Line); }
-
     BOOL SymGetLinePrev(IN OUT PIMAGEHLP_LINE Line) { return ::SymGetLinePrev(m_hProcess, Line); }
-
     BOOL SymMatchFileName(IN LPSTR FileName, IN LPSTR Match, OUT LPSTR* FileNameStop, OUT LPSTR* MatchStop)
     {
         return ::SymMatchFileName(FileName, Match, FileNameStop, MatchStop);
@@ -245,14 +241,12 @@ public:
     ----------------------------------------------------------------------*/
 public:
     LPVOID SymFunctionTableAccess(DWORD AddrBase) { return ::SymFunctionTableAccess(m_hProcess, AddrBase); }
-
     BOOL SymGetSearchPath(OUT LPSTR SearchPath, IN DWORD SearchPathLength)
     {
         return ::SymGetSearchPath(m_hProcess, SearchPath, SearchPathLength);
     }
 
     BOOL SymSetSearchPath(IN LPSTR SearchPath) { return ::SymSetSearchPath(m_hProcess, SearchPath); }
-
     BOOL SymRegisterCallback(IN PSYMBOL_REGISTERED_CALLBACK CallbackFunction, IN PVOID UserContext)
     {
         return ::SymRegisterCallback(m_hProcess, CallbackFunction, UserContext);

@@ -10,21 +10,21 @@
 #include "xr_level_controller.h"
 #include "Level.h"
 
-CUIChatWnd::CUIChatWnd() : sendNextMessageToAll(true)
-{
-}
-
+CUIChatWnd::CUIChatWnd() : sendNextMessageToAll(true) {}
 void CUIChatWnd::PendingMode(bool const is_pending_mode)
 {
-    if (is_pending_mode) {
-        if (pendingGameMode) return;
+    if (is_pending_mode)
+    {
+        if (pendingGameMode)
+            return;
 
         UIPrefix->SetWndRect(pending_prefix_rect);
         UIEditBox->SetWndRect(pending_edit_rect);
         pendingGameMode = true;
         return;
     }
-    if (!pendingGameMode) return;
+    if (!pendingGameMode)
+        return;
 
     UIPrefix->SetWndRect(inprogress_prefix_rect);
     UIEditBox->SetWndRect(inprogress_edit_rect);
@@ -82,18 +82,11 @@ void CUIChatWnd::Show(bool status)
     inherited::Show(status);
 }
 
-void CUIChatWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
-{
-    CUIWndCallback::OnEvent(pWnd, msg, pData);
-}
-
+void CUIChatWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData) { CUIWndCallback::OnEvent(pWnd, msg, pData); }
 void CUIChatWnd::OnChatCommit(CUIWindow* w, void* d)
 {
     Game().ChatSay(UIEditBox->GetText(), sendNextMessageToAll);
     HideDialog();
 }
 
-void CUIChatWnd::OnChatCancel(CUIWindow* w, void* d)
-{
-    HideDialog();
-}
+void CUIChatWnd::OnChatCancel(CUIWindow* w, void* d) { HideDialog(); }

@@ -56,19 +56,22 @@ void CObjectHandlerPlanner::set_goal(MonsterSpace::EObjectAction object_action, 
     EWorldProperties goal = object_property(object_action);
     u32 condition_id = goal;
 
-    if (game_object && (eWorldPropertyNoItemsIdle != goal)) {
+    if (game_object && (eWorldPropertyNoItemsIdle != goal))
+    {
         CWeapon* weapon = smart_cast<CWeapon*>(game_object);
-        if (weapon && (goal == eWorldPropertyIdleStrap) && !weapon->can_be_strapped()) goal = eWorldPropertyIdle;
+        if (weapon && (goal == eWorldPropertyIdleStrap) && !weapon->can_be_strapped())
+            goal = eWorldPropertyIdle;
         condition_id = uid(game_object->ID(), goal);
     }
     else
         condition_id = u32(eWorldPropertyNoItemsIdle);
 
 #ifdef DEBUG
-    if (m_use_log) {
-        Msg("%6d : Active item %s", Device.dwTimeGlobal,
-            object().inventory().ActiveItem() ? *object().inventory().ActiveItem()->object().cName() :
-                                                "no active items");
+    if (m_use_log)
+    {
+        Msg("%6d : Active item %s", Device.dwTimeGlobal, object().inventory().ActiveItem() ?
+                *object().inventory().ActiveItem()->object().cName() :
+                "no active items");
         Msg("%6d : Goal %s", Device.dwTimeGlobal, property2string(condition_id));
     }
 #endif
@@ -76,10 +79,12 @@ void CObjectHandlerPlanner::set_goal(MonsterSpace::EObjectAction object_action, 
     condition.add_condition(CWorldProperty(condition_id, true));
     set_target_state(condition);
 
-    if (!game_object || (min_queue_size < 0)) return;
+    if (!game_object || (min_queue_size < 0))
+        return;
 
     CWeaponMagazined* weapon = smart_cast<CWeaponMagazined*>(game_object);
-    if (!weapon) return;
+    if (!weapon)
+        return;
 
     if ((m_min_queue_size != min_queue_size) || (m_max_queue_size != max_queue_size) ||
         (m_min_queue_interval != min_queue_interval) || (m_max_queue_interval != max_queue_interval) ||
@@ -518,7 +523,8 @@ void CObjectHandlerPlanner::remove_evaluators(IGameObject* object)
     for (;;)
     {
         EVALUATORS::iterator I = m_evaluators.lower_bound(uid(object->ID(), 0));
-        if (!object_action((*I).first, object)) break;
+        if (!object_action((*I).first, object))
+            break;
         remove_evaluator((*I).first);
     }
 }
@@ -529,7 +535,8 @@ void CObjectHandlerPlanner::remove_operators(IGameObject* object)
     for (;;)
     {
         OPERATOR_VECTOR::iterator I = std::lower_bound(m_operators.begin(), m_operators.end(), uid(object->ID(), 0));
-        if (!object_action((*I).m_operator_id, object)) break;
+        if (!object_action((*I).m_operator_id, object))
+            break;
         remove_operator((*I).m_operator_id);
     }
 }
@@ -575,14 +582,16 @@ void CObjectHandlerPlanner::setup(CAI_Stalker* object)
 void CObjectHandlerPlanner::add_item(CInventoryItem* inventory_item)
 {
     CWeapon* weapon = smart_cast<CWeapon*>(inventory_item);
-    if (weapon) {
+    if (weapon)
+    {
         add_evaluators(weapon);
         add_operators(weapon);
         return;
     }
 
     CMissile* missile = smart_cast<CMissile*>(inventory_item);
-    if (missile) {
+    if (missile)
+    {
         add_evaluators(missile);
         add_operators(missile);
         return;
@@ -592,7 +601,8 @@ void CObjectHandlerPlanner::add_item(CInventoryItem* inventory_item)
 void CObjectHandlerPlanner::remove_item(CInventoryItem* inventory_item)
 {
     VERIFY(target_state().conditions().size() == 1);
-    if (action_object_id(target_state().conditions().back().condition()) == inventory_item->object().ID()) {
+    if (action_object_id(target_state().conditions().back().condition()) == inventory_item->object().ID())
+    {
         init_storage();
         set_goal(MonsterSpace::eObjectActionIdle, 0, 0, 0, 0, 0);
     }

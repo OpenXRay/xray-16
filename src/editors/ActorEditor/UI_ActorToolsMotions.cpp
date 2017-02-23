@@ -22,16 +22,19 @@ MotionID EngineModel::FindMotionID(LPCSTR name, u16 slot)
 {
     MotionID M;
     CKinematicsAnimated* VA = PKinematicsAnimated(m_pVisual);
-    if (VA) M = VA->ID_Motion(name, slot);
+    if (VA)
+        M = VA->ID_Motion(name, slot);
     return M;
 }
 
 CMotionDef* EngineModel::FindMotionDef(LPCSTR name, u16 slot)
 {
     CKinematicsAnimated* VA = PKinematicsAnimated(m_pVisual);
-    if (VA) {
+    if (VA)
+    {
         MotionID M = FindMotionID(name, slot);
-        if (M.valid()) return VA->LL_GetMotionDef(M);
+        if (M.valid())
+            return VA->LL_GetMotionDef(M);
     }
     return 0;
 }
@@ -39,9 +42,11 @@ CMotionDef* EngineModel::FindMotionDef(LPCSTR name, u16 slot)
 CMotion* EngineModel::FindMotionKeys(LPCSTR name, u16 slot)
 {
     CKinematicsAnimated* VA = PKinematicsAnimated(m_pVisual);
-    if (VA) {
+    if (VA)
+    {
         MotionID M = FindMotionID(name, slot);
-        if (M.valid()) return VA->LL_GetMotion(M, VA->LL_GetBoneRoot());
+        if (M.valid())
+            return VA->LL_GetMotion(M, VA->LL_GetBoneRoot());
     }
     return 0;
 }
@@ -49,9 +54,11 @@ CMotion* EngineModel::FindMotionKeys(LPCSTR name, u16 slot)
 void EngineModel::FillMotionList(LPCSTR pref, ListItemsVec& items, int modeID)
 {
     LHelper().CreateItem(items, pref, modeID, 0);
-    if (IsRenderable() && fraLeftBar->ebRenderEngineStyle->Down) {
+    if (IsRenderable() && fraLeftBar->ebRenderEngineStyle->Down)
+    {
         CKinematicsAnimated* SA = PKinematicsAnimated(m_pVisual);
-        if (SA) {
+        if (SA)
+        {
             for (int k = SA->m_Motions.size() - 1; k >= 0; --k)
             {
                 xr_string slot_pref = ATools->BuildMotionPref((u16)k, pref);
@@ -96,7 +103,8 @@ void EngineModel::PlayFX(LPCSTR name, float power, u16 slot)
 
 void EngineModel::StopAnimation()
 {
-    if (m_pVisual && PKinematicsAnimated(m_pVisual)) {
+    if (m_pVisual && PKinematicsAnimated(m_pVisual))
+    {
         PKinematicsAnimated(m_pVisual)->LL_CloseCycle(0);
         PKinematicsAnimated(m_pVisual)->LL_CloseCycle(1);
         PKinematicsAnimated(m_pVisual)->LL_CloseCycle(2);
@@ -107,7 +115,8 @@ void EngineModel::StopAnimation()
 bool EngineModel::UpdateGeometryStream(CEditableObject* source)
 {
     m_GeometryStream.clear();
-    if (!source) return false;
+    if (!source)
+        return false;
     if (source->IsSkeleton())
         return (source->PrepareSVGeometry(m_GeometryStream, 4));
     else
@@ -131,27 +140,37 @@ bool EngineModel::UpdateVisual(CEditableObject* source, bool bUpdGeom, bool bUpd
     bool bRes = true;
     CMemoryWriter F;
     destroy_physics_shell(m_physics_shell);
-    if (source->IsSkeleton()) {
-        if (bUpdGeom) bRes = UpdateGeometryStream(source);
-        if (!bRes || !m_GeometryStream.size()) {
+    if (source->IsSkeleton())
+    {
+        if (bUpdGeom)
+            bRes = UpdateGeometryStream(source);
+        if (!bRes || !m_GeometryStream.size())
+        {
             ELog.Msg(mtError, "Can't create preview geometry.");
             return false;
         }
         F.w(m_GeometryStream.pointer(), m_GeometryStream.size());
-        if (bUpdKeys) UpdateMotionKeysStream(source);
-        if (bUpdDefs) UpdateMotionDefsStream(source);
-        if (m_MotionKeysStream.size()) F.w(m_MotionKeysStream.pointer(), m_MotionKeysStream.size());
-        if (m_MotionDefsStream.size()) F.w(m_MotionDefsStream.pointer(), m_MotionDefsStream.size());
+        if (bUpdKeys)
+            UpdateMotionKeysStream(source);
+        if (bUpdDefs)
+            UpdateMotionDefsStream(source);
+        if (m_MotionKeysStream.size())
+            F.w(m_MotionKeysStream.pointer(), m_MotionKeysStream.size());
+        if (m_MotionDefsStream.size())
+            F.w(m_MotionDefsStream.pointer(), m_MotionDefsStream.size());
     }
     else
     {
         bool bRes = true;
-        if (bUpdGeom) bRes = UpdateGeometryStream(source);
-        if (!bRes) {
+        if (bUpdGeom)
+            bRes = UpdateGeometryStream(source);
+        if (!bRes)
+        {
             ELog.Msg(mtError, "Can't create preview geometry.");
             return false;
         }
-        if (!m_GeometryStream.size()) return false;
+        if (!m_GeometryStream.size())
+            return false;
         F.w(m_GeometryStream.pointer(), m_GeometryStream.size());
     }
     IReader R(F.pointer(), F.size());
@@ -172,17 +191,22 @@ void EngineModel::PlayMotion(LPCSTR name, u16 slot)
     StopAnimation();
 
     CKinematicsAnimated* SA = PKinematicsAnimated(m_pVisual);
-    if (IsRenderable() && SA) {
+    if (IsRenderable() && SA)
+    {
         MotionID motion_ID = FindMotionID(name, slot);
-        if (motion_ID.valid()) {
+        if (motion_ID.valid())
+        {
             CMotionDef* mdef = SA->LL_GetMotionDef(motion_ID);
             VERIFY(mdef);
-            if (mdef->flags & esmFX) {
+            if (mdef->flags & esmFX)
+            {
                 for (int k = 0; k < MAX_PARTS; k++)
                 {
-                    if (!m_BPPlayItems[k].name.IsEmpty()) {
+                    if (!m_BPPlayItems[k].name.IsEmpty())
+                    {
                         MotionID D = SA->ID_Motion(m_BPPlayItems[k].name.c_str(), m_BPPlayItems[k].slot);
-                        if (D.valid()) SA->LL_PlayCycle((u16)k, D, false, 0, 0);
+                        if (D.valid())
+                            SA->LL_PlayCycle((u16)k, D, false, 0, 0);
                     }
                 }
                 m_pBlend = SA->PlayFX(motion_ID, 1.f);
@@ -191,7 +215,8 @@ void EngineModel::PlayMotion(LPCSTR name, u16 slot)
             {
                 u16 idx = mdef->bone_or_part;
                 R_ASSERT((idx == BI_NONE) || (idx < MAX_PARTS));
-                if (BI_NONE == idx) {
+                if (BI_NONE == idx)
+                {
                     for (int k = 0; k < MAX_PARTS; k++)
                     {
                         m_BPPlayItems[k].name = name;
@@ -207,12 +232,15 @@ void EngineModel::PlayMotion(LPCSTR name, u16 slot)
 
                 for (int k = 0; k < MAX_PARTS; k++)
                 {
-                    if (!m_BPPlayItems[k].name.IsEmpty()) {
+                    if (!m_BPPlayItems[k].name.IsEmpty())
+                    {
                         MotionID D = SA->ID_Motion(m_BPPlayItems[k].name.c_str(), m_BPPlayItems[k].slot);
                         CBlend* B = 0;
-                        if (D.valid()) {
+                        if (D.valid())
+                        {
                             B = SA->LL_PlayCycle((u16)k, D, false, 0, 0);
-                            if (B && (idx == k || idx == BI_NONE)) m_pBlend = B;
+                            if (B && (idx == k || idx == BI_NONE))
+                                m_pBlend = B;
                         }
                     }
                 }
@@ -275,9 +303,11 @@ void CActorTools::OnMotionKeysModified()
 {
     Modified();
     m_Flags.set(flUpdateMotionKeys, TRUE);
-    if (fraLeftBar->ebRenderEngineStyle->Down) {
+    if (fraLeftBar->ebRenderEngineStyle->Down)
+    {
         m_Flags.set(flUpdateMotionKeys, FALSE);
-        if (m_RenderObject.UpdateVisual(m_pEditObject, false, true, false)) {
+        if (m_RenderObject.UpdateVisual(m_pEditObject, false, true, false))
+        {
             PlayMotion();
         }
         else
@@ -293,9 +323,11 @@ void CActorTools::OnMotionDefsModified()
 {
     Modified();
     m_Flags.set(flUpdateMotionDefs, TRUE);
-    if (fraLeftBar->ebRenderEngineStyle->Down) {
+    if (fraLeftBar->ebRenderEngineStyle->Down)
+    {
         m_Flags.set(flUpdateMotionDefs, FALSE);
-        if (m_RenderObject.UpdateVisual(m_pEditObject, false, false, true)) {
+        if (m_RenderObject.UpdateVisual(m_pEditObject, false, false, true))
+        {
             PlayMotion();
         }
         else
@@ -310,9 +342,11 @@ void CActorTools::OnMotionDefsModified()
 void CActorTools::OnGeometryModified()
 {
     Modified();
-    if (fraLeftBar->ebRenderEngineStyle->Down) {
+    if (fraLeftBar->ebRenderEngineStyle->Down)
+    {
         m_Flags.set(flUpdateGeometry, FALSE);
-        if (m_RenderObject.UpdateVisual(m_pEditObject, true, false, false)) {
+        if (m_RenderObject.UpdateVisual(m_pEditObject, true, false, false))
+        {
             PlayMotion();
         }
         else
@@ -343,8 +377,10 @@ bool CActorTools::SaveMotions(LPCSTR name, bool bSelOnly)
 {
     VERIFY(m_pEditObject);
     ListItemsVec items;
-    if (bSelOnly) {
-        if (m_ObjectItems->GetSelected(MOTIONS_PREFIX, items, true)) {
+    if (bSelOnly)
+    {
+        if (m_ObjectItems->GetSelected(MOTIONS_PREFIX, items, true))
+        {
             CMemoryWriter F;
             F.w_u32(items.size());
             for (ListItemsIt it = items.begin(); it != items.end(); it++)
@@ -361,10 +397,12 @@ bool CActorTools::SaveMotions(LPCSTR name, bool bSelOnly)
 
 void CActorTools::MakePreview()
 {
-    if (m_pEditObject) {
+    if (m_pEditObject)
+    {
         CMemoryWriter F;
         m_Flags.set(flUpdateGeometry | flUpdateMotionDefs | flUpdateMotionKeys, FALSE);
-        if (m_RenderObject.UpdateVisual(m_pEditObject, true, true, true)) {
+        if (m_RenderObject.UpdateVisual(m_pEditObject, true, true, true))
+        {
             PlayMotion();
         }
         else
@@ -381,19 +419,23 @@ void CActorTools::MakePreview()
 
 void CActorTools::PlayMotion()
 {
-    if (m_pEditObject) {
+    if (m_pEditObject)
+    {
         //.	    m_ClipMaker->Stop();
         if (fraLeftBar->ebRenderEditorStyle->Down)
             m_pEditObject->SkeletonPlay();
         else if (fraLeftBar->ebRenderEngineStyle->Down)
         {
-            if (m_Flags.is(flUpdateMotionKeys)) {
+            if (m_Flags.is(flUpdateMotionKeys))
+            {
                 OnMotionKeysModified();
             }
-            if (m_Flags.is(flUpdateMotionDefs)) {
+            if (m_Flags.is(flUpdateMotionDefs))
+            {
                 OnMotionDefsModified();
             }
-            if (m_Flags.is(flUpdateGeometry)) {
+            if (m_Flags.is(flUpdateGeometry))
+            {
                 OnGeometryModified();
             }
             m_RenderObject.PlayMotion(m_CurrentMotion.c_str(), m_CurrentSlot);
@@ -438,8 +480,10 @@ bool CActorTools::RenameMotion(LPCSTR old_name, LPCSTR new_name)
 void CActorTools::AddMarksChannel(bool b12)
 {
     CSMotion* M = m_pEditObject->GetActiveSMotion();
-    if (M) {
-        if (b12) {
+    if (M)
+    {
+        if (b12)
+        {
             M->marks.resize(2);
             M->marks[0].name = "Left";
             M->marks[1].name = "Right";
@@ -459,12 +503,14 @@ void CActorTools::AddMarksChannel(bool b12)
 void CActorTools::RemoveMarksChannel(bool b12)
 {
     CSMotion* M = m_pEditObject->GetActiveSMotion();
-    if (M) {
+    if (M)
+    {
         if (b12)
             M->marks.clear();
         else
         {
-            if (M->marks.size() == 4) {
+            if (M->marks.size() == 4)
+            {
                 M->marks.pop_back();
                 M->marks.pop_back();
             }

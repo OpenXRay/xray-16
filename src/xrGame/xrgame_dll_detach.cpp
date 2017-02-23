@@ -47,7 +47,8 @@ void init_game_globals()
 {
     CreateUIGeom();
     InitHudSoundSettings();
-    if (!g_dedicated_server) {
+    if (!g_dedicated_server)
+    {
         //		CInfoPortion::InitInternal					();
         //.		CEncyclopediaArticle::InitInternal			();
         CPhraseDialog::InitInternal();
@@ -79,7 +80,8 @@ void clean_game_globals()
     story_ids.clear();
     spawn_story_ids.clear();
 
-    if (!g_dedicated_server) {
+    if (!g_dedicated_server)
+    {
         //.		CInfoPortion::DeleteSharedData					();
         //.		CInfoPortion::DeleteIdToIndexData				();
 

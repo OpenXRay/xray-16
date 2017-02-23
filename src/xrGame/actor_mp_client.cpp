@@ -20,7 +20,8 @@ CActorMP::CActorMP()
 
 void CActorMP::OnEvent(NET_Packet& P, u16 type)
 {
-    if (type == GEG_PLAYER_USE_BOOSTER) {
+    if (type == GEG_PLAYER_USE_BOOSTER)
+    {
         use_booster(P);
         return;
     }
@@ -38,7 +39,8 @@ void CActorMP::Die(IGameObject* killer)
 void CActorMP::cam_Set(EActorCameras style)
 {
 #ifndef DEBUG
-    if (style != eacFirstEye) return;
+    if (style != eacFirstEye)
+        return;
 #endif
     CCameraBase* old_cam = cam_Active();
     cam_active = style;
@@ -48,20 +50,23 @@ void CActorMP::cam_Set(EActorCameras style)
 
 void CActorMP::use_booster(NET_Packet& packet)
 {
-    if (OnServer()) return;
+    if (OnServer())
+        return;
 
     u16 tmp_booster_id;
     packet.r_u16(tmp_booster_id);
     IGameObject* tmp_booster = Level().Objects.net_Find(tmp_booster_id);
     VERIFY2(tmp_booster, "using unknown or deleted booster");
-    if (!tmp_booster) {
+    if (!tmp_booster)
+    {
         Msg("! ERROR: trying to use unkown booster object, ID = %d", tmp_booster_id);
         return;
     }
 
     CEatableItem* tmp_eatable = smart_cast<CEatableItem*>(tmp_booster);
     VERIFY2(tmp_eatable, "using not eatable object");
-    if (!tmp_eatable) {
+    if (!tmp_eatable)
+    {
         Msg("! ERROR: trying to use not eatable object, ID = %d", tmp_booster_id);
         return;
     }
@@ -71,13 +76,11 @@ void CActorMP::use_booster(NET_Packet& packet)
 void CActorMP::On_SetEntity()
 {
     prev_cam_inert_value = psCamInert;
-    if (this != Level().CurrentControlEntity()) {
+    if (this != Level().CurrentControlEntity())
+    {
         psCamInert = cam_inert_value;
     }
     inherited::On_SetEntity();
 }
 
-void CActorMP::On_LostEntity()
-{
-    psCamInert = prev_cam_inert_value;
-}
+void CActorMP::On_LostEntity() { psCamInert = prev_cam_inert_value; }

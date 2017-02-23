@@ -3,11 +3,7 @@
 
 #include "dxUIShader.h"
 
-void dxWallMarkArray::Copy(IWallMarkArray& _in)
-{
-    *this = *(dxWallMarkArray*)&_in;
-}
-
+void dxWallMarkArray::Copy(IWallMarkArray& _in) { *this = *(dxWallMarkArray*)&_in; }
 dxWallMarkArray::~dxWallMarkArray()
 {
     for (ShaderIt it = m_CollideMarks.begin(); it != m_CollideMarks.end(); ++it)
@@ -21,16 +17,8 @@ void dxWallMarkArray::AppendMark(LPCSTR s_textures)
     m_CollideMarks.push_back(s);
 }
 
-void dxWallMarkArray::clear()
-{
-    return m_CollideMarks.clear();
-}
-
-bool dxWallMarkArray::empty()
-{
-    return m_CollideMarks.empty();
-}
-
+void dxWallMarkArray::clear() { return m_CollideMarks.clear(); }
+bool dxWallMarkArray::empty() { return m_CollideMarks.empty(); }
 wm_shader dxWallMarkArray::GenerateWallmark()
 {
     wm_shader res;

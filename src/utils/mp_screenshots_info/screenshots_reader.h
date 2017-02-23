@@ -25,7 +25,6 @@ public:
 
     bool const verify();
     bool const is_valid() const { return m_info_section != NULL; };
-
 private:
     reader(){};
     u8* m_jpeg_data;
@@ -37,8 +36,8 @@ private:
     CInifile* m_info_section;
     sign_verifyer m_verifyer;
 
-};  // class reader
+}; // class reader
 
-}  // namespace screenshots
+} // namespace screenshots
 
-#endif  //#ifndef SCREENSHOT_READER_INCLUDED
+#endif //#ifndef SCREENSHOT_READER_INCLUDED

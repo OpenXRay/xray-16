@@ -36,7 +36,8 @@ xrIDirect3DIndexBuffer9::xrIDirect3DIndexBuffer9(
 HRESULT xrIDirect3DIndexBuffer9::QueryInterface(REFIID riid, void** ppvObj)
 {
     APIDEBUG("xrIDirect3DIndexBuffer9::QueryInterface");
-    if (riid == IID_IUnknown || riid == IID_IDirect3DIndexBuffer9) {
+    if (riid == IID_IUnknown || riid == IID_IDirect3DIndexBuffer9)
+    {
         *ppvObj = this;
         AddRef();
         return NOERROR;
@@ -55,7 +56,8 @@ ULONG xrIDirect3DIndexBuffer9::Release()
 {
     APIDEBUG("xrIDirect3DIndexBuffer9::Release");
     m_refCount--;
-    if (m_refCount < 0) {
+    if (m_refCount < 0)
+    {
         delete[] m_pBuffer;
         delete this;
         return -1;
@@ -99,10 +101,7 @@ DWORD __stdcall xrIDirect3DIndexBuffer9::GetPriority()
     APIDEBUG("xrIDirect3DIndexBuffer9::GetPriority");
     return Priority;
 };
-void __stdcall xrIDirect3DIndexBuffer9::PreLoad()
-{
-    APIDEBUG("xrIDirect3DIndexBuffer9::PreLoad");
-};
+void __stdcall xrIDirect3DIndexBuffer9::PreLoad() { APIDEBUG("xrIDirect3DIndexBuffer9::PreLoad"); };
 D3DRESOURCETYPE __stdcall xrIDirect3DIndexBuffer9::GetType()
 {
     APIDEBUG("xrIDirect3DIndexBuffer9::GetType");

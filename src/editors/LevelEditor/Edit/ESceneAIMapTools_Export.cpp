@@ -11,11 +11,7 @@ void ESceneAIMapTool::UnpackPosition(Fvector& Pdest, const NodePosition& Psrc, F
     Pdest.z = float(Psrc.z) * params.fPatchSize;
 }
 
-u32 ESceneAIMapTool::UnpackLink(u32& L)
-{
-    return L & 0x00ffffff;
-}
-
+u32 ESceneAIMapTool::UnpackLink(u32& L) { return L & 0x00ffffff; }
 void ESceneAIMapTool::PackPosition(NodePosition& Dest, Fvector& Src, Fbox& bb, SAIParams& params)
 {
     float sp = 1 / params.fPatchSize;
@@ -35,7 +31,8 @@ void ESceneAIMapTool::PackPosition(NodePosition& Dest, Fvector& Src, Fbox& bb, S
 bool ESceneAIMapTool::Export(LPCSTR path)
 {
     //.?	if (!RealUpdateSnapList()) return false;
-    if (!Valid()) return false;
+    if (!Valid())
+        return false;
 
     // calculate bbox
     Fbox bb;
@@ -46,7 +43,8 @@ bool ESceneAIMapTool::Export(LPCSTR path)
     // export
     IWriter* F = FS.w_open(fn.c_str());
 
-    if (F) {
+    if (F)
+    {
         F->open_chunk(E_AIMAP_CHUNK_VERSION);
         F->w_u16(E_AIMAP_VERSION);
         F->close_chunk();

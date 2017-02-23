@@ -5,21 +5,33 @@
 #include "ResourceManager.h"
 
 // Atomic
-// SVS::~SVS								()			{	_RELEASE(vs);		dxRenderDeviceRender::Instance().Resources->_DeleteVS			(this);
-// }
-// SPS::~SPS								()			{	_RELEASE(ps);		dxRenderDeviceRender::Instance().Resources->_DeletePS			(this);
-// }
-// SState::~SState							()			{	_RELEASE(state);	dxRenderDeviceRender::Instance().Resources->_DeleteState		(this);
-// }
-// SDeclaration::~SDeclaration				()			{	_RELEASE(dcl);		dxRenderDeviceRender::Instance().Resources->_DeleteDecl
-// (this);	}
+//SVS::~SVS()
+//{
+//    _RELEASE(vs);
+//    dxRenderDeviceRender::Instance().Resources->_DeleteVS(this);
+//}
+//SPS::~SPS()
+//{
+//     _RELEASE(ps);
+//     dxRenderDeviceRender::Instance().Resources->_DeletePS(this);
+//}
+//SState::~SState()
+//{
+//    _RELEASE(state);
+//    dxRenderDeviceRender::Instance().Resources->_DeleteState(this);
+//}
+//SDeclaration::~SDeclaration()
+//{
+//    _RELEASE(dcl);
+//    dxRenderDeviceRender::Instance().Resources->_DeleteDecl(this);
+//}
 
 ///////////////////////////////////////////////////////////////////////
-//	SVS
+//  SVS
 SVS::SVS() : vs(0)
 #if defined(USE_DX10) || defined(USE_DX11)
-//	,signature(0)
-#endif  //	USE_DX10
+//  ,signature(0)
+#endif //   USE_DX10
 {
     ;
 }
@@ -29,13 +41,13 @@ SVS::~SVS()
     RImplementation.Resources->_DeleteVS(this);
 #if defined(USE_DX10) || defined(USE_DX11)
 //_RELEASE(signature);
-//	Now it is release automatically
-#endif  //	USE_DX10
+//  Now it is release automatically
+#endif //   USE_DX10
     _RELEASE(vs);
 }
 
 ///////////////////////////////////////////////////////////////////////
-//	SPS
+//  SPS
 SPS::~SPS()
 {
     _RELEASE(ps);
@@ -44,7 +56,7 @@ SPS::~SPS()
 
 #if defined(USE_DX10) || defined(USE_DX11)
 ///////////////////////////////////////////////////////////////////////
-//	SGS
+//  SGS
 SGS::~SGS()
 {
     _RELEASE(gs);
@@ -70,7 +82,7 @@ SCS::~SCS()
 #endif
 
 ///////////////////////////////////////////////////////////////////////
-//	SInputSignature
+//  SInputSignature
 SInputSignature::SInputSignature(ID3DBlob* pBlob)
 {
     VERIFY(pBlob);
@@ -82,10 +94,10 @@ SInputSignature::~SInputSignature()
     _RELEASE(signature);
     RImplementation.Resources->_DeleteInputSignature(this);
 }
-#endif  //	USE_DX10
+#endif //   USE_DX10
 
 ///////////////////////////////////////////////////////////////////////
-//	SState
+//  SState
 SState::~SState()
 {
     _RELEASE(state);
@@ -93,7 +105,7 @@ SState::~SState()
 }
 
 ///////////////////////////////////////////////////////////////////////
-//	SDeclaration
+//  SDeclaration
 SDeclaration::~SDeclaration()
 {
     RImplementation.Resources->_DeleteDecl(this);
@@ -102,11 +114,11 @@ SDeclaration::~SDeclaration()
     iLayout = vs_to_layout.begin();
     for (; iLayout != vs_to_layout.end(); ++iLayout)
     {
-        //	Release vertex layout
+        //  Release vertex layout
         _RELEASE(iLayout->second);
     }
-#else   //	USE_DX10
-    //	Release vertex layout
+#else //    USE_DX10
+    //  Release vertex layout
     _RELEASE(dcl);
-#endif  //	USE_DX10
+#endif //   USE_DX10
 }

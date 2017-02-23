@@ -17,9 +17,9 @@ extern "C" XRLC_LIGHT_API xrLC_GlobalData* lc_global_data();
 //////////////////////////////////////////////////////////////////////////
 // tesselator callbacks
 
-typedef int tesscb_estimator(const Face* F);  // -1 = none, 0,1,2 = edge-number
-typedef void tesscb_face(Face* F);            // new face
-typedef void tesscb_vertex(Vertex* V);        // new vertex
+typedef int tesscb_estimator(const Face* F); // -1 = none, 0,1,2 = edge-number
+typedef void tesscb_face(Face* F); // new face
+typedef void tesscb_vertex(Vertex* V); // new vertex
 
 class base_lighting;
 class INetReader;

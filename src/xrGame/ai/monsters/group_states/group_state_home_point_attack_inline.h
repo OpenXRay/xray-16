@@ -6,7 +6,7 @@
 #include "ai/monsters/monster_cover_manager.h"
 #include "ai/Monsters/monster_home.h"
 
-#define TEMPLATE_SPECIALIZATION                                                                                        \
+#define TEMPLATE_SPECIALIZATION \
     template <typename _Object\
 >
 
@@ -16,11 +16,11 @@ namespace detail
 {
 namespace dog
 {
-const float scare_distance2enemy = 20.f;  // distance on which dog can be scared of enemy
+const float scare_distance2enemy = 20.f; // distance on which dog can be scared of enemy
 
-}  // namespace dog
+} // namespace dog
 
-}  // namespace detail
+} // namespace detail
 
 //////////////////////////////////////////////////////////////////////////
 // Construct Substates
@@ -81,18 +81,22 @@ bool CStateGroupAttackMoveToHomePointAbstract::enemy_inaccessible()
     CEntityAlive const* enemy = object->EnemyMan.get_enemy();
     Fvector const enemy_pos = enemy->Position();
     Fvector const enemy_vert_pos = ai().level_graph().vertex_position(enemy->ai_location().level_vertex_id());
-    if (enemy_vert_pos.distance_to(enemy_pos) > 1.f) {
+    if (enemy_vert_pos.distance_to(enemy_pos) > 1.f)
+    {
         return true;
     }
-    if (!object->Home->at_home(enemy_pos)) {
+    if (!object->Home->at_home(enemy_pos))
+    {
         return true;
     }
 
-    if (!ai().level_graph().valid_vertex_position(enemy_pos)) {
+    if (!ai().level_graph().valid_vertex_position(enemy_pos))
+    {
         return true;
     }
 
-    if (!ai().level_graph().valid_vertex_id(enemy->ai_location().level_vertex_id())) {
+    if (!ai().level_graph().valid_vertex_id(enemy->ai_location().level_vertex_id()))
+    {
         return true;
     }
 
@@ -102,12 +106,15 @@ bool CStateGroupAttackMoveToHomePointAbstract::enemy_inaccessible()
 TEMPLATE_SPECIALIZATION
 bool CStateGroupAttackMoveToHomePointAbstract::check_start_conditions()
 {
-    if (!object->Home->at_home()) {
+    if (!object->Home->at_home())
+    {
         return true;
     }
 
-    if (enemy_inaccessible()) {
-        if (!m_first_tick_enemy_inaccessible) {
+    if (enemy_inaccessible())
+    {
+        if (!m_first_tick_enemy_inaccessible)
+        {
             m_first_tick_enemy_inaccessible = current_time();
         }
 
@@ -117,7 +124,8 @@ bool CStateGroupAttackMoveToHomePointAbstract::check_start_conditions()
     }
     else
     {
-        if (m_last_tick_enemy_inaccessible && current_time() - m_last_tick_enemy_inaccessible > 3000) {
+        if (m_last_tick_enemy_inaccessible && current_time() - m_last_tick_enemy_inaccessible > 3000)
+        {
             m_first_tick_enemy_inaccessible = 0;
             m_last_tick_enemy_inaccessible = 0;
         }
@@ -131,15 +139,18 @@ bool CStateGroupAttackMoveToHomePointAbstract::check_completion()
 {
     bool const in_camp_state = prev_substate != u32(-1) && prev_substate != eStateAttack_HomePoint_Hide;
 
-    if (m_skip_camp && in_camp_state) {
+    if (m_skip_camp && in_camp_state)
+    {
         return true;
     }
 
-    if (!object->Home->at_home() && !in_camp_state) {
+    if (!object->Home->at_home() && !in_camp_state)
+    {
         return false;
     }
 
-    if (!enemy_inaccessible() && time() > m_state_started + 5000) {
+    if (!enemy_inaccessible() && time() > m_state_started + 5000)
+    {
         return true;
     }
 
@@ -159,7 +170,8 @@ bool CStateGroupAttackMoveToHomePointAbstract::check_completion()
 TEMPLATE_SPECIALIZATION
 void CStateGroupAttackMoveToHomePointAbstract::reselect_state()
 {
-    if (prev_substate == eStateAttack_HomePoint_Hide) {
+    if (prev_substate == eStateAttack_HomePoint_Hide)
+    {
         select_state(eStateAttack_HomePoint_LookOpenPlace);
         return;
     }
@@ -176,7 +188,8 @@ void CStateGroupAttackMoveToHomePointAbstract::setup_substates()
 {
     state_ptr state = get_state_current();
 
-    if (current_substate == eStateAttack_HomePoint_Hide) {
+    if (current_substate == eStateAttack_HomePoint_Hide)
+    {
         const CEntityAlive* enemy = object->EnemyMan.get_enemy();
 
         Fvector enemy2home = object->Home->get_home_point();
@@ -187,7 +200,8 @@ void CStateGroupAttackMoveToHomePointAbstract::setup_substates()
 
         m_skip_camp = false;
 
-        if (m_target_node == u32(-1)) {
+        if (m_target_node == u32(-1))
+        {
             m_target_node = object->Home->get_place_in_min_home();
             m_skip_camp = true;
         }
@@ -200,9 +214,9 @@ void CStateGroupAttackMoveToHomePointAbstract::setup_substates()
         data.vertex = m_target_node;
         data.point = ai().level_graph().vertex_position(data.vertex);
         data.action.action = ACT_RUN;
-        data.action.time_out = 0;  // do not use time out
+        data.action.time_out = 0; // do not use time out
         data.completion_dist = 1.f;
-        data.time_to_rebuild = 0;  // do not rebuild
+        data.time_to_rebuild = 0; // do not rebuild
         data.accelerated = true;
         data.braking = true;
         data.accel_type = eAT_Aggressive;
@@ -213,7 +227,8 @@ void CStateGroupAttackMoveToHomePointAbstract::setup_substates()
         return;
     }
 
-    if (current_substate == eStateAttack_HomePoint_LookOpenPlace) {
+    if (current_substate == eStateAttack_HomePoint_LookOpenPlace)
+    {
         SStateDataLookToPoint data;
 
         Fvector dir;

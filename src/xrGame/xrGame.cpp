@@ -22,17 +22,15 @@ DLL_API IFactoryObject* __cdecl xrFactory_Create(CLASS_ID clsid)
 {
     IFactoryObject* object = object_factory().client_object(clsid);
 #ifdef DEBUG
-    if (!object) return (0);
+    if (!object)
+        return (0);
 #endif
     // XXX nitrocaster XRFACTORY: set clsid during factory initialization
     object->GetClassId() = clsid;
     return (object);
 }
 
-DLL_API void __cdecl xrFactory_Destroy(IFactoryObject* O)
-{
-    xr_delete(O);
-}
+DLL_API void __cdecl xrFactory_Destroy(IFactoryObject* O) { xr_delete(O); }
 };
 
 void CCC_RegisterCommands();

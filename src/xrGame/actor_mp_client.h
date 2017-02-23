@@ -38,4 +38,4 @@ protected:
     void use_booster(NET_Packet& packet);
 };
 
-#endif  // ACTOR_MP_CLIENT_H
+#endif // ACTOR_MP_CLIENT_H

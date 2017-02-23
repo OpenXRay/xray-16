@@ -12,16 +12,16 @@
 public
 ref class property_collection_converter : public System::ComponentModel::TypeConverter
 {
-  public:
+public:
     typedef System::ComponentModel::ITypeDescriptorContext ITypeDescriptorContext;
     typedef System::Globalization::CultureInfo CultureInfo;
     typedef System::Type Type;
     typedef System::Object Object;
 
-  public:
+public:
     virtual bool CanConvertTo(ITypeDescriptorContext ^ context, Type ^ type) override;
     virtual Object ^
         ConvertTo(ITypeDescriptorContext ^ context, CultureInfo ^ culture, Object ^ value, Type ^ type) override;
-};  // ref class property_collection_converter
+}; // ref class property_collection_converter
 
-#endif  // ifndef PROPERTY_COLLECTION_CONVERTER_HPP_INCLUDED
+#endif // ifndef PROPERTY_COLLECTION_CONVERTER_HPP_INCLUDED

@@ -12,16 +12,15 @@ CUITextBanner::CUITextBanner()
 
 ////////////////////////////////////////////////////////////////////////////////
 
-CUITextBanner::~CUITextBanner()
-{
-}
-
+CUITextBanner::~CUITextBanner() {}
 ////////////////////////////////////////////////////////////////////////////////
 
 EffectParams* CUITextBanner::SetStyleParams(const TextBannerStyles styleName)
 {
-    if (tbsNone == styleName) {
-        if (!m_StyleParams.empty()) m_StyleParams.clear();
+    if (tbsNone == styleName)
+    {
+        if (!m_StyleParams.empty())
+            m_StyleParams.clear();
         return NULL;
     }
 
@@ -35,9 +34,11 @@ void CUITextBanner::Update()
     StyleParams_it it = m_StyleParams.begin();
 
     // Если анимация включена
-    if (m_bAnimate) {
+    if (m_bAnimate)
+    {
         for (; it != m_StyleParams.end(); ++it)
-            if (it->second.bOn) it->second.fTimePassed += Device.fTimeDelta;
+            if (it->second.bOn)
+                it->second.fTimePassed += Device.fTimeDelta;
     }
 }
 
@@ -45,7 +46,8 @@ void CUITextBanner::Update()
 
 void CUITextBanner::Out(float x, float y, const char* fmt, ...)
 {
-    if (!fmt) return;
+    if (!fmt)
+        return;
 
     StyleParams_it it = m_StyleParams.begin();
 
@@ -53,11 +55,13 @@ void CUITextBanner::Out(float x, float y, const char* fmt, ...)
     for (; it != m_StyleParams.end(); ++it)
     {
         // Fade effect
-        if (it->first & tbsFade) {
+        if (it->first & tbsFade)
+        {
             EffectFade();
         }
         // Flicker effect
-        if (it->first & tbsFlicker) {
+        if (it->first & tbsFlicker)
+        {
             EffectFlicker();
         }
     }
@@ -90,11 +94,14 @@ void CUITextBanner::EffectFade()
     EffectParams& fade = m_StyleParams[tbsFade];
 
     // Проверям включена ли анимация
-    if (!fade.bOn) return;
+    if (!fade.bOn)
+        return;
 
     // Если пришло время сменить направление фейда
-    if (fade.fTimePassed > fade.fPeriod) {
-        if (!fade.bCyclic) {
+    if (fade.fTimePassed > fade.fPeriod)
+    {
+        if (!fade.bCyclic)
+        {
             fade.bOn = false;
             return;
         }
@@ -106,7 +113,8 @@ void CUITextBanner::EffectFade()
         fade.fTimePassed = 0;
     }
 
-    if (fade.iEffectStage) {
+    if (fade.iEffectStage)
+    {
         m_Cl = subst_alpha(GetTextColor(), u8(iFloor(255.f * (fade.fTimePassed / fade.fPeriod))));
     }
     else
@@ -122,11 +130,14 @@ void CUITextBanner::EffectFlicker()
     EffectParams& flicker = m_StyleParams[tbsFlicker];
 
     // Проверям включена ли анимация
-    if (!flicker.bOn) return;
+    if (!flicker.bOn)
+        return;
 
     // Если пришло время, показать/спрятать надпись
-    if (flicker.fTimePassed > flicker.fPeriod) {
-        if (!flicker.bCyclic) {
+    if (flicker.fTimePassed > flicker.fPeriod)
+    {
+        if (!flicker.bCyclic)
+        {
             flicker.bOn = false;
             return;
         }
@@ -138,7 +149,8 @@ void CUITextBanner::EffectFlicker()
         flicker.fTimePassed = 0;
     }
 
-    if (flicker.iEffectStage) {
+    if (flicker.iEffectStage)
+    {
         m_Cl = subst_alpha(GetTextColor(), 0);
     }
     else
@@ -149,11 +161,7 @@ void CUITextBanner::EffectFlicker()
 
 //////////////////////////////////////////////////////////////////////////
 
-void CUITextBanner::SetTextColor(u32 cl)
-{
-    m_Cl = cl;
-}
-
+void CUITextBanner::SetTextColor(u32 cl) { m_Cl = cl; }
 //////////////////////////////////////////////////////////////////////////
 
 u32 CUITextBanner::GetTextColor()
@@ -166,7 +174,4 @@ u32 CUITextBanner::GetTextColor()
 
 //////////////////////////////////////////////////////////////////////////
 
-void CUITextBanner::ResetAnimation(const TextBannerStyles styleName)
-{
-    m_StyleParams[styleName].fTimePassed = 0;
-}
+void CUITextBanner::ResetAnimation(const TextBannerStyles styleName) { m_StyleParams[styleName].fTimePassed = 0; }

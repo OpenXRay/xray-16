@@ -35,7 +35,8 @@ void CStateManagerBurer::execute()
 {
     u32 state = u32(-1);
 
-    if (object->EnemyMan.get_enemy()) {
+    if (object->EnemyMan.get_enemy())
+    {
         switch (object->EnemyMan.get_danger_type())
         {
         case eStrong: state = eStatePanic; break;
@@ -65,7 +66,8 @@ void CStateManagerBurer::execute()
 
 void CStateManagerBurer::setup_substates()
 {
-    if (current_substate == eStateBurerScanning) {
+    if (current_substate == eStateBurerScanning)
+    {
         SStateDataAction data;
 
         data.action = ACT_LOOK_AROUND;

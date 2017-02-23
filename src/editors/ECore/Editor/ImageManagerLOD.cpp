@@ -114,7 +114,8 @@ BOOL GetPointColor(SPickQuery::SResult* R, u32& alpha, u32& color)
     CSurface* surf = R->e_mesh->GetSurfaceByFaceID(R->tag);
     VERIFY(surf);
     Shader_xrLC* c_sh = EDevice.ShaderXRLC.Get(surf->_ShaderXRLCName());
-    if (!c_sh->flags.bRendering) return FALSE;
+    if (!c_sh->flags.bRendering)
+        return FALSE;
     const Fvector2* cuv[3];
     R->e_mesh->GetFaceTC(R->tag, cuv);
 
@@ -131,9 +132,11 @@ BOOL GetPointColor(SPickQuery::SResult* R, u32& alpha, u32& color)
     int U = iFloor(uv.x * float(surf->m_ImageData->w) + .5f);
     int V = iFloor(uv.y * float(surf->m_ImageData->h) + .5f);
     U %= surf->m_ImageData->w;
-    if (U < 0) U += surf->m_ImageData->w;
+    if (U < 0)
+        U += surf->m_ImageData->w;
     V %= surf->m_ImageData->h;
-    if (V < 0) V += surf->m_ImageData->h;
+    if (V < 0)
+        V += surf->m_ImageData->h;
 
     /*
     //	float filter_core[3][3]={{0.0125,0.0125,0.0125},{0.0125,0.9,0.0125},{0.0125,0.0125,0.0125}};
@@ -296,8 +299,10 @@ void CImageManager::CreateLODTexture(
     {
         CSurface* surf = *surf_it;
         Shader_xrLC* c_sh = EDevice.ShaderXRLC.Get(surf->_ShaderXRLCName());
-        if (!c_sh->flags.bRendering) continue;
-        if (0 == surf->m_ImageData) surf->CreateImageData();
+        if (!c_sh->flags.bRendering)
+            continue;
+        if (0 == surf->m_ImageData)
+            surf->CreateImageData();
     }
 
     // calculate
@@ -341,7 +346,8 @@ void CImageManager::CreateLODTexture(
                         start.mad(M.k, -dR);
                         PQ.prepare_rq(start, M.k, d2R, CDB::OPT_CULL);
                         OBJECT->RayQuery(PQ);
-                        if (PQ.r_count()) {
+                        if (PQ.r_count())
+                        {
                             PQ.r_sort();
                             Fvector N = {0, 0, 0};
                             ///.		                Fcolor C	= {0,0,0,0};
@@ -349,9 +355,11 @@ void CImageManager::CreateLODTexture(
                             {
                                 SPickQuery::SResult* R = PQ.r_begin() + k;
                                 u32 uA, uC;
-                                if (!GetPointColor(R, uA, uC)) continue;
+                                if (!GetPointColor(R, uA, uC))
+                                    continue;
                                 float fA = float(uA) / 255.f;
-                                if (uA) {
+                                if (uA)
+                                {
                                     Fvector pt;
                                     pt.mad(PQ.m_Start, PQ.m_Direction, R->range - EPS_L);
                                     Fvector4 ptt;
@@ -372,7 +380,8 @@ void CImageManager::CreateLODTexture(
                                 ///.							if (Cn.a>=(200.f/255.f)) C.lerp(C,Cn,Cn.a);
                             }
                             float n_mag = N.magnitude();
-                            if (!fis_zero(n_mag, EPS)) n_vec.push_back(N.div(n_mag));
+                            if (!fis_zero(n_mag, EPS))
+                                n_vec.push_back(N.div(n_mag));
                             ///.		                c_vec.push_back 	(Fvector4().set(C.r,C.g,C.b,C.a));
                         }
                     }
@@ -384,10 +393,11 @@ void CImageManager::CreateLODTexture(
                 ///.			cC.div				(c_vec.size());
                 ///.			cC.mul				(255.f);
                 ///.			tgt_c				=
-                ///color_rgba(iFloor(cC.x),iFloor(cC.y),iFloor(cC.z),iFloor(cC.w)>200.f?255:0);
+                /// color_rgba(iFloor(cC.x),iFloor(cC.y),iFloor(cC.z),iFloor(cC.w)>200.f?255:0);
 
                 Fvector N = {0, 0, 0};
-                if (!n_vec.empty()) {
+                if (!n_vec.empty())
+                {
                     for (FvectorIt it = n_vec.begin(); it != n_vec.end(); it++)
                         N.add(*it);
                     N.div(n_vec.size());
@@ -399,7 +409,8 @@ void CImageManager::CreateLODTexture(
                 N.mul(255.f);
                 tgt_n = color_rgba(iFloor(N.x), iFloor(N.y), iFloor(N.z), color_get_A(tgt_c));
 
-                if (0 == color_get_A(tgt_c)) continue;
+                if (0 == color_get_A(tgt_c))
+                    continue;
                 TT.Start();
                 // light points
                 float res_transp = 0.f;
@@ -415,15 +426,18 @@ void CImageManager::CreateLODTexture(
                         OBJECT->RayQuery(PQ);
                         tR += TT1.GetElapsed_sec();
                         float ray_transp = 1.f;
-                        if (PQ.r_count()) {
+                        if (PQ.r_count())
+                        {
                             for (s32 k = 0; k < PQ.r_count(); k++)
                             {
                                 u32 a, uC;
                                 TT1.Start();
-                                if (!GetPointColor(PQ.r_begin() + k, a, uC)) continue;
+                                if (!GetPointColor(PQ.r_begin() + k, a, uC))
+                                    continue;
                                 tT += TT1.GetElapsed_sec();
                                 ray_transp *= (1.f - float(a) / 255.f);
-                                if (fis_zero(ray_transp, EPS_L)) break;
+                                if (fis_zero(ray_transp, EPS_L))
+                                    break;
                             }
                         }
                         avg_transp += ray_transp;

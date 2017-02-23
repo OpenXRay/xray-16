@@ -39,26 +39,20 @@ void ButtonListDialog::Initialize(int buttonCount)
     }
 }
 
-void ButtonListDialog::OnCancel()
-{
-    HideDialog();
-}
-
-const ButtonListDialog::NamedButton& ButtonListDialog::GetButton(int i) const
-{
-    return buttons[i];
-}
-
+void ButtonListDialog::OnCancel() { HideDialog(); }
+const ButtonListDialog::NamedButton& ButtonListDialog::GetButton(int i) const { return buttons[i]; }
 bool ButtonListDialog::OnKeyboardAction(int dik, EUIMessages keyboardAction)
 {
     CUIDialogWnd::OnKeyboardAction(dik, keyboardAction);
-    if (WINDOW_KEY_PRESSED == keyboardAction) {
-        if (DIK_ESCAPE == dik) {
+    if (WINDOW_KEY_PRESSED == keyboardAction)
+    {
+        if (DIK_ESCAPE == dik)
+        {
             OnCancel();
             return true;
         }
         int btnCount = buttons.size();
-        if (dik >= DIK_1 && dik <= DIK_1 - 1 + btnCount && btnCount <= 9)  // handle 1..9 keys only
+        if (dik >= DIK_1 && dik <= DIK_1 - 1 + btnCount && btnCount <= 9) // handle 1..9 keys only
         {
             OnButtonClick(dik - DIK_1);
             return true;
@@ -69,11 +63,14 @@ bool ButtonListDialog::OnKeyboardAction(int dik, EUIMessages keyboardAction)
 
 void ButtonListDialog::SendMessage(CUIWindow* wnd, s16 msg, void* data /*= nullptr */)
 {
-    if (BUTTON_CLICKED == msg) {
-        if (CancelButton == wnd) OnCancel();
+    if (BUTTON_CLICKED == msg)
+    {
+        if (CancelButton == wnd)
+            OnCancel();
         for (u32 i = 0; i < buttons.size(); i++)
         {
-            if (buttons[i].Button == wnd) {
+            if (buttons[i].Button == wnd)
+            {
                 OnButtonClick(i);
                 return;
             }

@@ -28,12 +28,12 @@ protected:
     typedef AssociativeVector<shared_str, u32> player_spawn_times_t;
     player_spawn_times_t m_player_spawns;
     u32 m_aveng_count;
-};  // class player_state_avenger
+}; // class player_state_avenger
 
 ADD_ACCUMULATIVE_STATE(acpv_avenger, player_state_avenger);
 #undef ACCUMULATIVE_STATE_LIST
 #define ACCUMULATIVE_STATE_LIST SAVE_TYPE_LIST(acpv_avenger, player_state_avenger)
 
-}  // namespace award_system
+} // namespace award_system
 
-#endif  //#ifndef PLAYER_STATE_AVENGER
+#endif //#ifndef PLAYER_STATE_AVENGER

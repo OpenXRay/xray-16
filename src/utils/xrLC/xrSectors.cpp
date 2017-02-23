@@ -10,7 +10,8 @@ void CBuild::BuildSectors()
     Logger.Progress(0);
     u32 SectorMax = 0;
     for (u32 I = 0; I < g_tree.size(); I++)
-        if (g_tree[I]->Sector > SectorMax) SectorMax = g_tree[I]->Sector;
+        if (g_tree[I]->Sector > SectorMax)
+            SectorMax = g_tree[I]->Sector;
     R_ASSERT(SectorMax < 0xffff);
 
     u32 SectorCount = SectorMax + 1;
@@ -22,7 +23,8 @@ void CBuild::BuildSectors()
     for (u32 I = 0; I < g_tree.size(); I++)
     {
         u32 Sector = g_tree[I]->Sector;
-        if (0 == g_sectors[Sector]) g_sectors[Sector] = new CSector(Sector);
+        if (0 == g_sectors[Sector])
+            g_sectors[Sector] = new CSector(Sector);
     }
 
     Logger.Status("Building hierrarhy...");
@@ -55,7 +57,8 @@ void CBuild::BuildSectors()
     for (u32 I = 0; I < L_dynamic.size(); I++)
     {
         b_light_dynamic& L = L_dynamic[I];
-        if (L.data.type == D3DLIGHT_DIRECTIONAL) {
+        if (L.data.type == D3DLIGHT_DIRECTIONAL)
+        {
             for (u32 j = 0; j < g_sectors.size(); j++)
             {
                 R_ASSERT(g_sectors[j]);
@@ -64,7 +67,8 @@ void CBuild::BuildSectors()
         }
         else
         {
-            if (L.sectors.size()) {
+            if (L.sectors.size())
+            {
                 for (u32 j = 0; j < L.sectors.size(); j++)
                 {
                     R_ASSERT(L.sectors[j] < g_sectors.size());

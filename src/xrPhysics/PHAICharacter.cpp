@@ -15,21 +15,21 @@
 
 #endif
 
-CPHAICharacter::CPHAICharacter()
-{
-    m_forced_physics_control = false;
-}
+CPHAICharacter::CPHAICharacter() { m_forced_physics_control = false; }
 void CPHAICharacter::Create(dVector3 sizes)
 {
     inherited::Create(sizes);
 
-    m_forced_physics_control = false;  //.
+    m_forced_physics_control = false; //.
 }
 bool CPHAICharacter::TryPosition(Fvector pos, bool exact_state)
 {
-    if (!b_exist) return false;
-    if (m_forced_physics_control || JumpState()) return false;  // b_was_on_object||b_on_object||
-    if (DoCollideObj()) return false;
+    if (!b_exist)
+        return false;
+    if (m_forced_physics_control || JumpState())
+        return false; // b_was_on_object||b_on_object||
+    if (DoCollideObj())
+        return false;
     Fvector current_pos;
     GetPosition(current_pos);
     Fvector cur_vel;
@@ -39,7 +39,8 @@ bool CPHAICharacter::TryPosition(Fvector pos, bool exact_state)
     displace.sub(pos, current_pos);
     float disp_mag = displace.magnitude();
 
-    if (fis_zero(disp_mag) || fis_zero(inl_ph_world().Device().fTimeDelta)) return true;
+    if (fis_zero(disp_mag) || fis_zero(inl_ph_world().Device().fTimeDelta))
+        return true;
     const u32 max_steps = 15;
     const float fmax_steps = float(max_steps);
     float fsteps_num = 1.f;
@@ -50,7 +51,8 @@ bool CPHAICharacter::TryPosition(Fvector pos, bool exact_state)
     float parts = disp_mag / disp_pstep;
     fsteps_num = floor(parts);
     steps_num = iFloor(parts);
-    if (steps_num > max_steps) {
+    if (steps_num > max_steps)
+    {
         steps_num = max_steps;
         fsteps_num = fmax_steps;
         disp_pstep = disp_mag / fsteps_num;
@@ -66,7 +68,8 @@ bool CPHAICharacter::TryPosition(Fvector pos, bool exact_state)
     {
         SetVelocity(vel);
         Enable();
-        if (!step_single(fixed_step)) {
+        if (!step_single(fixed_step))
+        {
             SetVelocity(cur_vel);
             ret = false;
             break;
@@ -97,7 +100,8 @@ bool CPHAICharacter::TryPosition(Fvector pos, bool exact_state)
     m_last_move.sub(pos_new, current_pos).mul(1.f / inl_ph_world().Device().fTimeDelta);
     m_body_interpolation.UpdatePositions();
     m_body_interpolation.UpdatePositions();
-    if (ret) Disable();
+    if (ret)
+        Disable();
     m_collision_damage_info.m_contact_velocity = 0.f;
     return ret;
 }
@@ -173,7 +177,8 @@ void CPHAICharacter::InitContact(dContact* c, bool& do_collide, u16 material_idx
         (material_2 && material_2->Flags.test(SGameMtl::flActorObstacle)))
         do_collide = true;
     inherited::InitContact(c, do_collide, material_idx_1, material_idx_2);
-    if (is_control || b_lose_control || b_jumping) c->surface.mu = 0.00f;
+    if (is_control || b_lose_control || b_jumping)
+        c->surface.mu = 0.00f;
     dxGeomUserData* D1 = retrieveGeomUserData(c->geom.g1);
     dxGeomUserData* D2 = retrieveGeomUserData(c->geom.g2);
     if (D1 && D2 && D1->ph_object && D2->ph_object && D1->ph_object->CastType() == tpCharacter &&
@@ -183,7 +188,8 @@ void CPHAICharacter::InitContact(dContact* c, bool& do_collide, u16 material_idx
         b_valide_wall_contact = false;
     }
 #ifdef DEBUG
-    if (debug_output().ph_dbg_draw_mask().test(phDbgNeverUseAiPhMove)) do_collide = false;
+    if (debug_output().ph_dbg_draw_mask().test(phDbgNeverUseAiPhMove))
+        do_collide = false;
 #endif
 }
 /*

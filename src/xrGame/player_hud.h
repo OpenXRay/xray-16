@@ -41,9 +41,9 @@ struct hud_item_measures
     };
     Flags8 m_prop_flags;
 
-    Fvector m_item_attach[2];  // pos,rot
+    Fvector m_item_attach[2]; // pos,rot
 
-    Fvector m_hands_offset[2][3];  // pos,rot/ normal,aim,GL
+    Fvector m_hands_offset[2][3]; // pos,rot/ normal,aim,GL
 
     u16 m_fire_bone;
     Fvector m_fire_point_offset;
@@ -52,7 +52,7 @@ struct hud_item_measures
     u16 m_shell_bone;
     Fvector m_shell_point_offset;
 
-    Fvector m_hands_attach[2];  // pos,rot
+    Fvector m_hands_attach[2]; // pos,rot
 
     void load(const shared_str& sect_name, IKinematics* K);
 };
@@ -114,7 +114,6 @@ public:
     bool render_item_ui_query();
     u32 anim_play(u16 part, const MotionID& M, BOOL bMixIn, const CMotionDef*& md, float speed);
     const shared_str& section_name() const { return m_sect_name; }
-
     attachable_hud_item* create_hud_item(const shared_str& sect);
 
     void attach_item(CHudItem* item);

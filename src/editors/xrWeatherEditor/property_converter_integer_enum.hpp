@@ -12,7 +12,7 @@
 public
 ref class property_converter_integer_enum : public System::ComponentModel::StringConverter
 {
-  private:
+private:
     typedef System::ComponentModel::StringConverter inherited;
     typedef System::Collections::ICollection ICollection;
     typedef Flobbster::Windows::Forms::PropertyBag PropertyBag;
@@ -22,15 +22,15 @@ ref class property_converter_integer_enum : public System::ComponentModel::Strin
     typedef System::Object Object;
     typedef System::Type Type;
 
-  public:
+public:
     typedef System::ComponentModel::TypeConverter::StandardValuesCollection StandardValuesCollection;
 
-  public:
+public:
     virtual bool GetStandardValuesSupported(ITypeDescriptorContext ^ context) override;
     virtual bool GetStandardValuesExclusive(ITypeDescriptorContext ^ context) override;
     virtual StandardValuesCollection ^ GetStandardValues(ITypeDescriptorContext ^ context) override;
     virtual Object ^ ConvertTo(ITypeDescriptorContext ^ context, CultureInfo ^ culture, Object ^ value,
                          Type ^ destination_type) override;
-};  // ref class property_converter_integer_enum
+}; // ref class property_converter_integer_enum
 
-#endif  // ifndef PROPERTY_CONVERTER_INTEGER_ENUM_HPP_INCLUDED
+#endif // ifndef PROPERTY_CONVERTER_INTEGER_ENUM_HPP_INCLUDED

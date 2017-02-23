@@ -47,8 +47,8 @@ private:
 
     static void __cdecl get_my_player_scores_cb(
         SAKE sake, SAKERequest request, SAKERequestResult result, void* inputData, void* outputData, void* userData);
-};  // best_scores_store
+}; // best_scores_store
 
-}  // namespace gamespy_profile
+} // namespace gamespy_profile
 
-#endif  //#ifndef BEST_SCORES_SYSTEM_INCLUDED
+#endif //#ifndef BEST_SCORES_SYSTEM_INCLUDED

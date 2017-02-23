@@ -41,9 +41,9 @@ let a different kind of sort finish the job.
 #define PUSH(i) stack[++tos] = i
 #define POP(i) i = stack[tos--]
 #define STACKEMPTY tos < 0
-#define SWAP(i, j)                                                                                                     \
-    t = i;                                                                                                             \
-    i = j;                                                                                                             \
+#define SWAP(i, j) \
+    t = i;         \
+    i = j;         \
     j = t
 
 static void vsortq(ObjectDB* odb)
@@ -68,11 +68,13 @@ static void vsortq(ObjectDB* odb)
                     ;
                 while (j && SORTVAL(--j) > v)
                     ;
-                if (i > j) break;
+                if (i > j)
+                    break;
                 SWAP(ARRAY(i), ARRAY(j));
             }
             SWAP(ARRAY(i), ARRAY(rt));
-            if (i - lt > rt - i) {
+            if (i - lt > rt - i)
+            {
                 PUSH(lt);
                 PUSH(i - 1);
                 lt = i + 1;
@@ -84,7 +86,8 @@ static void vsortq(ObjectDB* odb)
                 rt = i - 1;
             }
         }
-        if (STACKEMPTY) break;
+        if (STACKEMPTY)
+            break;
         POP(rt);
         POP(lt);
     }
@@ -138,7 +141,8 @@ int initPointSearch(ObjectDB* odb, int ipos)
     float m[3] = {0.0f}, sd[3] = {0.0f};
     int i, j;
 
-    if (odb->npoints <= 0) return 1;
+    if (odb->npoints <= 0)
+        return 1;
 
     for (i = 0; i < odb->npoints; i++)
         for (j = 0; j < 3; j++)
@@ -155,7 +159,8 @@ int initPointSearch(ObjectDB* odb, int ipos)
     odb->vsortkey += 3 * ipos;
 
     odb->vsort = (int*)calloc(odb->npoints, sizeof(int));
-    if (!odb->vsort) return 0;
+    if (!odb->vsort)
+        return 0;
 
     for (i = 0; i < odb->npoints; i++)
         odb->vsort[i] = i;
@@ -175,8 +180,10 @@ Free memory allocated by initPointSearch().
 
 void freePointSearch(ObjectDB* odb)
 {
-    if (odb) {
-        if (odb->vsort) {
+    if (odb)
+    {
+        if (odb->vsort)
+        {
             free(odb->vsort);
             odb->vsort = NULL;
         }
@@ -208,14 +215,16 @@ int pointSearch(ObjectDB* odb, float pos[3])
             rt = x - 1;
         else
             lt = x + 1;
-        if (pos[key] == SORTVAL(x)) {
+        if (pos[key] == SORTVAL(x))
+        {
             lt = rt = x;
             while (lt > 0 && pos[key] == SORTVAL(lt - 1))
                 --lt;
             while (rt < ARRAYSIZE - 1 && pos[key] == SORTVAL(rt + 1))
                 ++rt;
             for (x = lt; x <= rt; x++)
-                if (pos[0] == COORD(x, 0) && pos[1] == COORD(x, 1) && pos[2] == COORD(x, 2)) return ARRAY(x);
+                if (pos[0] == COORD(x, 0) && pos[1] == COORD(x, 1) && pos[2] == COORD(x, 2))
+                    return ARRAY(x);
             return -1;
         }
     }

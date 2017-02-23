@@ -3,10 +3,7 @@
 #include "UILines.h"
 #include "string_table.h"
 
-CUISpinText::CUISpinText() : m_curItem(-1)
-{
-}
-
+CUISpinText::CUISpinText() : m_curItem(-1) {}
 void CUISpinText::AddItem_(const char* item, int id)
 {
     SInfo _info;
@@ -15,7 +12,8 @@ void CUISpinText::AddItem_(const char* item, int id)
     _info._id = id;
 
     m_list.push_back(_info);
-    if (-1 == m_curItem) {
+    if (-1 == m_curItem)
+    {
         m_curItem = 0;
         SetItem(m_curItem);
     }
@@ -47,7 +45,8 @@ void CUISpinText::SetCurrentOptValue()
     xr_string val = GetOptTokenValue();
 
     for (u32 i = 0; i < m_list.size(); i++)
-        if (val == m_list[i]._orig.c_str()) {
+        if (val == m_list[i]._orig.c_str())
+        {
             m_curItem = i;
             break;
         }
@@ -74,14 +73,11 @@ void CUISpinText::SaveOptValue()
     SaveOptStringValue(m_list[m_curItem]._orig.c_str());
 }
 
-bool CUISpinText::IsChangedOptValue() const
-{
-    return m_opt_backup_value != m_curItem;
-}
-
+bool CUISpinText::IsChangedOptValue() const { return m_opt_backup_value != m_curItem; }
 void CUISpinText::OnBtnUpClick()
 {
-    if (CanPressUp()) {
+    if (CanPressUp())
+    {
         m_curItem++;
         SetItem(m_curItem);
     }
@@ -91,7 +87,8 @@ void CUISpinText::OnBtnUpClick()
 
 void CUISpinText::OnBtnDownClick()
 {
-    if (CanPressDown()) {
+    if (CanPressDown())
+    {
         m_curItem--;
         SetItem(m_curItem);
     }
@@ -99,12 +96,5 @@ void CUISpinText::OnBtnDownClick()
     CUICustomSpin::OnBtnDownClick();
 }
 
-bool CUISpinText::CanPressUp()
-{
-    return m_curItem < (int)m_list.size() - 1;
-}
-
-bool CUISpinText::CanPressDown()
-{
-    return m_curItem > 0;
-}
+bool CUISpinText::CanPressUp() { return m_curItem < (int)m_list.size() - 1; }
+bool CUISpinText::CanPressDown() { return m_curItem > 0; }

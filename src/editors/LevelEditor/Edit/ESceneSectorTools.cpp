@@ -22,15 +22,12 @@ void ESceneSectorTool::CreateControls()
 
 //----------------------------------------------------
 
-void ESceneSectorTool::RemoveControls()
-{
-    inherited::RemoveControls();
-}
-
+void ESceneSectorTool::RemoveControls() { inherited::RemoveControls(); }
 //----------------------------------------------------
 void ESceneSectorTool::_OnObjectRemove(CSceneObject* obj)
 {
-    if (obj && !m_Objects.empty()) {
+    if (obj && !m_Objects.empty())
+    {
         EditMeshVec* meshes = obj->Meshes();
         for (EditMeshIt m_it = meshes->begin(); m_it != meshes->end(); ++m_it)
         {
@@ -38,7 +35,8 @@ void ESceneSectorTool::_OnObjectRemove(CSceneObject* obj)
             {
                 CSector* sector = dynamic_cast<CSector*>(*_F);
                 VERIFY(sector);
-                if (sector->DelMesh(obj, *m_it)) break;
+                if (sector->DelMesh(obj, *m_it))
+                    break;
             }
         }
     }
@@ -48,7 +46,8 @@ void ESceneSectorTool::OnObjectRemove(CCustomObject* O, bool bDeleting)
 {
     inherited::OnObjectRemove(O, bDeleting);
 
-    if (bDeleting) {
+    if (bDeleting)
+    {
         CSceneObject* obj = dynamic_cast<CSceneObject*>(O);
         if (!obj)
         { /*
@@ -77,7 +76,8 @@ void ESceneSectorTool::OnBeforeObjectChange(CCustomObject* O)
     inherited::OnBeforeObjectChange(O);
 
     CSceneObject* obj = dynamic_cast<CSceneObject*>(O);
-    if (obj && !m_Objects.empty()) {
+    if (obj && !m_Objects.empty())
+    {
         EditMeshVec* meshes = obj->Meshes();
         for (EditMeshIt m_it = meshes->begin(); m_it != meshes->end(); m_it++)
         {
@@ -85,7 +85,8 @@ void ESceneSectorTool::OnBeforeObjectChange(CCustomObject* O)
             {
                 CSector* sector = dynamic_cast<CSector*>(*_F);
                 VERIFY(sector);
-                if (sector->DelMesh(obj, *m_it)) break;
+                if (sector->DelMesh(obj, *m_it))
+                    break;
             }
         }
     }

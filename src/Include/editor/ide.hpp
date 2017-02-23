@@ -39,8 +39,8 @@ public:
     virtual void weather_editor_setup(weathers_getter_type const& weathers_getter,
         weathers_size_getter_type const& weathers_size_getter, frames_getter_type const& frames_getter,
         frames_size_getter_type const& frames_size_getter) = 0;
-};  // class ide
+}; // class ide
 
-}  // namespace editor
+} // namespace editor
 
-#endif  // ifndef EDITOR_IDE_HPP_INCLUDED
+#endif // ifndef EDITOR_IDE_HPP_INCLUDED

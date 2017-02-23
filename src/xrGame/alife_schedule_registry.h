@@ -30,9 +30,11 @@ private:
 
         IC bool operator()(_iterator& i, u64 cycle_count, bool) const
         {
-            if ((*i).second->m_schedule_counter == cycle_count) return (false);
+            if ((*i).second->m_schedule_counter == cycle_count)
+                return (false);
 
-            if (m_current >= m_count) return (false);
+            if (m_current >= m_count)
+                return (false);
 
             ++m_current;
             (*i).second->m_schedule_counter = cycle_count;

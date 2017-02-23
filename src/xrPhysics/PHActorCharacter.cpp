@@ -8,7 +8,7 @@
 #include "xrEngine/GameMtlLib.h"
 
 // const float JUMP_HIGHT=0.5;
-const float JUMP_UP_VELOCITY = 6.0f;  // 5.6f;
+const float JUMP_UP_VELOCITY = 6.0f; // 5.6f;
 const float JUMP_INCREASE_VELOCITY_RATE = 1.2f;
 //#ifdef DEBUG
 // XRPHYSICS_API BOOL use_controllers_separation = TRUE;
@@ -29,16 +29,15 @@ CPHActorCharacter::CPHActorCharacter(bool single_game) : b_single_game(single_ga
     }
 }
 
-CPHActorCharacter::~CPHActorCharacter(void)
-{
-    ClearRestrictors();
-}
+CPHActorCharacter::~CPHActorCharacter(void) { ClearRestrictors(); }
 static u16 slide_material_index = GAMEMTL_NONE_IDX;
 void CPHActorCharacter::Create(dVector3 sizes)
 {
-    if (b_exist) return;
+    if (b_exist)
+        return;
     inherited::Create(sizes);
-    if (!b_single_game) {
+    if (!b_single_game)
+    {
         ClearRestrictors();
     }
     RESTRICTOR_I i = begin(m_restrictors), e = end(m_restrictors);
@@ -47,12 +46,15 @@ void CPHActorCharacter::Create(dVector3 sizes)
         (*i)->Create(this, sizes);
     }
 
-    if (m_phys_ref_object) {
+    if (m_phys_ref_object)
+    {
         SetPhysicsRefObject(m_phys_ref_object);
     }
-    if (slide_material_index == GAMEMTL_NONE_IDX) {
+    if (slide_material_index == GAMEMTL_NONE_IDX)
+    {
         GameMtlIt mi = GMLibrary().GetMaterialIt("materials\\earth_slide");
-        if (mi != GMLibrary().LastMaterial()) slide_material_index = u16(mi - GMLibrary().FirstMaterial());
+        if (mi != GMLibrary().LastMaterial())
+            slide_material_index = u16(mi - GMLibrary().FirstMaterial());
         // slide_material_index = GMLibrary().GetMaterialIdx("earth_slide");
     }
 }
@@ -66,7 +68,8 @@ void CPHActorCharacter::ValidateWalkOn()
 void SPHCharacterRestrictor::Create(CPHCharacter* ch, dVector3 sizes)
 {
     VERIFY(ch);
-    if (m_character) return;
+    if (m_character)
+        return;
     m_character = ch;
     m_restrictor = dCreateCylinder(0, m_restrictor_radius, sizes[1]);
     dGeomSetPosition(m_restrictor, 0.f, sizes[1] / 2.f, 0.f);
@@ -96,13 +99,15 @@ RESTRICTOR_I CPHActorCharacter::Restrictor(ERestrictionType rtype)
 }
 void CPHActorCharacter::SetRestrictorRadius(ERestrictionType rtype, float r)
 {
-    if (m_restrictors.size() > 0) (*Restrictor(rtype))->SetRadius(r);
+    if (m_restrictors.size() > 0)
+        (*Restrictor(rtype))->SetRadius(r);
 }
 
 void SPHCharacterRestrictor::SetRadius(float r)
 {
     m_restrictor_radius = r;
-    if (m_character) {
+    if (m_character)
+    {
         float h;
         dGeomCylinderGetParams(m_restrictor, &r, &h);
         dGeomCylinderSetParams(m_restrictor, m_restrictor_radius, h);
@@ -110,7 +115,8 @@ void SPHCharacterRestrictor::SetRadius(float r)
 }
 void CPHActorCharacter::Destroy()
 {
-    if (!b_exist) return;
+    if (!b_exist)
+        return;
     RESTRICTOR_I i = begin(m_restrictors), e = end(m_restrictors);
     for (; e != i; ++i)
     {
@@ -130,13 +136,15 @@ void CPHActorCharacter::ClearRestrictors()
 }
 void SPHCharacterRestrictor::Destroy()
 {
-    if (m_restrictor) {
+    if (m_restrictor)
+    {
         dGeomDestroyUserData(m_restrictor);
         dGeomDestroy(m_restrictor);
         m_restrictor = NULL;
     }
 
-    if (m_restrictor_transform) {
+    if (m_restrictor_transform)
+    {
         dGeomDestroyUserData(m_restrictor_transform);
         m_restrictor_transform = NULL;
     }
@@ -153,48 +161,54 @@ void CPHActorCharacter::SetPhysicsRefObject(IPhysicsShellHolder* ref_object)
 }
 void SPHCharacterRestrictor::SetPhysicsRefObject(IPhysicsShellHolder* ref_object)
 {
-    if (m_character) dGeomUserDataSetPhysicsRefObject(m_restrictor, ref_object);
+    if (m_character)
+        dGeomUserDataSetPhysicsRefObject(m_restrictor, ref_object);
 }
 void CPHActorCharacter::SetMaterial(u16 material)
 {
     inherited::SetMaterial(material);
-    if (!b_exist) return;
+    if (!b_exist)
+        return;
     RESTRICTOR_I i = begin(m_restrictors), e = end(m_restrictors);
     for (; e != i; ++i)
     {
         (*i)->SetMaterial(material);
     }
 }
-void SPHCharacterRestrictor::SetMaterial(u16 material)
-{
-    dGeomGetUserData(m_restrictor)->material = material;
-}
+void SPHCharacterRestrictor::SetMaterial(u16 material) { dGeomGetUserData(m_restrictor)->material = material; }
 void CPHActorCharacter::SetAcceleration(Fvector accel)
 {
     Fvector cur_a, input_a;
     float cur_mug, input_mug;
     cur_a.set(m_acceleration);
     cur_mug = m_acceleration.magnitude();
-    if (!fis_zero(cur_mug)) cur_a.mul(1.f / cur_mug);
+    if (!fis_zero(cur_mug))
+        cur_a.mul(1.f / cur_mug);
     input_a.set(accel);
     input_mug = accel.magnitude();
-    if (!fis_zero(input_mug)) input_a.mul(1.f / input_mug);
-    if (!cur_a.similar(input_a, 0.05f) || !fis_zero(input_mug - cur_mug, 0.5f)) inherited::SetAcceleration(accel);
+    if (!fis_zero(input_mug))
+        input_a.mul(1.f / input_mug);
+    if (!cur_a.similar(input_a, 0.05f) || !fis_zero(input_mug - cur_mug, 0.5f))
+        inherited::SetAcceleration(accel);
 }
 bool CPHActorCharacter::CanJump()
 {
     return !b_lose_control && LastMaterialIDX() != slide_material_index &&
-           (m_ground_contact_normal[1] > 0.5f || m_elevator_state.ClimbingState());
+        (m_ground_contact_normal[1] > 0.5f || m_elevator_state.ClimbingState());
 }
 void CPHActorCharacter::Jump(const Fvector& accel)
 {
-    if (!b_exist) return;
-    if (CanJump()) {
+    if (!b_exist)
+        return;
+    if (CanJump())
+    {
         b_jump = true;
         const dReal* vel = dBodyGetLinearVel(m_body);
         dReal amag = m_acceleration.magnitude();
-        if (amag < 1.f) amag = 1.f;
-        if (m_elevator_state.ClimbingState()) {
+        if (amag < 1.f)
+            amag = 1.f;
+        if (m_elevator_state.ClimbingState())
+        {
             m_elevator_state.GetJumpDir(m_acceleration, m_jump_accel);
             m_jump_accel.mul(JUMP_UP_VELOCITY / 2.f);
             // if(accel.square_magnitude()>EPS_L)m_jump_accel.mul(4.f);
@@ -212,11 +226,7 @@ void CPHActorCharacter::SetObjectContactCallback(ObjectContactCallbackFun* callb
     inherited::SetObjectContactCallback(callback);
 }
 
-void CPHActorCharacter::Disable()
-{
-    inherited::Disable();
-}
-
+void CPHActorCharacter::Disable() { inherited::Disable(); }
 struct SFindPredicate
 {
     SFindPredicate(const dContact* ac, bool* b)
@@ -240,7 +250,8 @@ static void BigVelSeparate(dContact* c, bool& do_collide)
 // if( !use_controllers_separation )
 // return;
 #endif
-    if (!do_collide) return;
+    if (!do_collide)
+        return;
     dxGeomUserData* dat1 = retrieveGeomUserData(c->geom.g1);
     dxGeomUserData* dat2 = retrieveGeomUserData(c->geom.g2);
 
@@ -263,7 +274,8 @@ static void BigVelSeparate(dContact* c, bool& do_collide)
     Fvector v1, v2;
     ch1->GetVelocity(v1);
     ch2->GetVelocity(v2);
-    if (v1.square_magnitude() < 4.f && v2.square_magnitude() < 4.f) return;
+    if (v1.square_magnitude() < 4.f && v2.square_magnitude() < 4.f)
+        return;
     c->surface.mu = 1.00f;
 
     dJointID contact_joint1 = dJointCreateContactSpecial(0, ContactGroup, c);
@@ -293,8 +305,10 @@ void CPHActorCharacter::InitContact(dContact* c, bool& do_collide, u16 material_
     if ((material_1 && material_1->Flags.test(SGameMtl::flActorObstacle)) ||
         (material_2 && material_2->Flags.test(SGameMtl::flActorObstacle)))
         do_collide = true;
-    if (b_single_game) {
-        if (b_restrictor) {
+    if (b_single_game)
+    {
+        if (b_restrictor)
+        {
             b_side_contact = true;
             // MulSprDmp(c->surface.soft_cfm,c->surface.soft_erp,def_spring_rate,def_dumping_rate);
             c->surface.mu = 0.00f;
@@ -321,31 +335,36 @@ void CPHActorCharacter::InitContact(dContact* c, bool& do_collide, u16 material_
     {
         dxGeomUserData* D1 = retrieveGeomUserData(c->geom.g1);
         dxGeomUserData* D2 = retrieveGeomUserData(c->geom.g2);
-        if (D1 && D2) {
+        if (D1 && D2)
+        {
             IPhysicsShellHolder* A1 = (D1->ph_ref_object);
             IPhysicsShellHolder* A2 = (D2->ph_ref_object);
-            if (A1 && A2 && A1->IsActor() && A2->IsActor()) {
+            if (A1 && A2 && A1->IsActor() && A2->IsActor())
+            {
                 do_collide =
                     do_collide && !b_restrictor && (A1->ObjectPPhysicsShell() == 0) == (A2->ObjectPPhysicsShell() == 0);
                 c->surface.mu = 1.f;
             }
         }
 
-        if (do_collide) inherited::InitContact(c, do_collide, material_idx_1, material_idx_2);
+        if (do_collide)
+            inherited::InitContact(c, do_collide, material_idx_1, material_idx_2);
         BigVelSeparate(c, do_collide);
     }
 }
 
 void CPHActorCharacter::ChooseRestrictionType(ERestrictionType my_type, float my_depth, CPHCharacter* ch)
 {
-    if (my_type != rtStalker || (ch->RestrictionType() != rtStalker && ch->RestrictionType() != rtStalkerSmall)) return;
+    if (my_type != rtStalker || (ch->RestrictionType() != rtStalker && ch->RestrictionType() != rtStalkerSmall))
+        return;
     float checkR = m_restrictors[rtStalkerSmall]
-                       ->m_restrictor_radius;  // 1.5f;//+m_restrictors[rtStalker]->m_restrictor_radius)/2.f;
+                       ->m_restrictor_radius; // 1.5f;//+m_restrictors[rtStalker]->m_restrictor_radius)/2.f;
 
     switch (ch->RestrictionType())
     {
     case rtStalkerSmall:
-        if (ch->ObjectRadius() > checkR) {
+        if (ch->ObjectRadius() > checkR)
+        {
             // if(my_depth>0.05f)
             ch->SetNewRestrictionType(rtStalker);
             Enable();
@@ -357,7 +376,8 @@ void CPHActorCharacter::ChooseRestrictionType(ERestrictionType my_type, float my
         }
         break;
     case rtStalker:
-        if (ch->ObjectRadius() < checkR) {
+        if (ch->ObjectRadius() < checkR)
+        {
 #ifdef DEBUG
             if (debug_output().ph_dbg_draw_mask1().test(ph_m1_DbgActorRestriction))
                 Msg("restriction  change large ->  small");
@@ -372,18 +392,20 @@ void CPHActorCharacter::ChooseRestrictionType(ERestrictionType my_type, float my
 
 void CPHActorCharacter::update_last_material()
 {
-    if (ignore_material(*p_lastMaterialIDX)) inherited::update_last_material();
+    if (ignore_material(*p_lastMaterialIDX))
+        inherited::update_last_material();
 }
 
 float free_fly_up_force_limit = 4000.f;
 void CPHActorCharacter::PhTune(dReal step)
 {
     inherited::PhTune(step);
-    if (b_lose_control && !b_external_impulse)  //
+    if (b_lose_control && !b_external_impulse) //
     {
         const float* force = dBodyGetForce(m_body);
         float fy = force[1];
-        if (fy > free_fly_up_force_limit) fy = free_fly_up_force_limit;
+        if (fy > free_fly_up_force_limit)
+            fy = free_fly_up_force_limit;
         dBodySetForce(m_body, force[0], fy, force[2]);
     }
 }

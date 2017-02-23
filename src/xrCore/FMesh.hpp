@@ -30,26 +30,26 @@ enum OGF_Chuncks
     OGF_TEXTURE = 2,
     OGF_VERTICES = 3,
     OGF_INDICES = 4,
-    OGF_P_MAP = 5,  //---------------------- unused
+    OGF_P_MAP = 5, //---------------------- unused
     OGF_SWIDATA = 6,
-    OGF_VCONTAINER = 7,       // not used ??
-    OGF_ICONTAINER = 8,       // not used ??
-    OGF_CHILDREN = 9,         // * For skeletons only
-    OGF_CHILDREN_L = 10,      // Link to child visuals
-    OGF_LODDEF2 = 11,         // + 5 channel data
-    OGF_TREEDEF2 = 12,        // + 5 channel data
-    OGF_S_BONE_NAMES = 13,    // * For skeletons only
-    OGF_S_MOTIONS = 14,       // * For skeletons only
-    OGF_S_SMPARAMS = 15,      // * For skeletons only
-    OGF_S_IKDATA = 16,        // * For skeletons only
-    OGF_S_USERDATA = 17,      // * For skeletons only (Ini-file)
-    OGF_S_DESC = 18,          // * For skeletons only
-    OGF_S_MOTION_REFS = 19,   // * For skeletons only
-    OGF_SWICONTAINER = 20,    // * SlidingWindowItem record container
-    OGF_GCONTAINER = 21,      // * both VB&IB
-    OGF_FASTPATH = 22,        // * extended/fast geometry
-    OGF_S_LODS = 23,          // * For skeletons only (Ini-file)
-    OGF_S_MOTION_REFS2 = 24,  // * changes in format
+    OGF_VCONTAINER = 7, // not used ??
+    OGF_ICONTAINER = 8, // not used ??
+    OGF_CHILDREN = 9, // * For skeletons only
+    OGF_CHILDREN_L = 10, // Link to child visuals
+    OGF_LODDEF2 = 11, // + 5 channel data
+    OGF_TREEDEF2 = 12, // + 5 channel data
+    OGF_S_BONE_NAMES = 13, // * For skeletons only
+    OGF_S_MOTIONS = 14, // * For skeletons only
+    OGF_S_SMPARAMS = 15, // * For skeletons only
+    OGF_S_IKDATA = 16, // * For skeletons only
+    OGF_S_USERDATA = 17, // * For skeletons only (Ini-file)
+    OGF_S_DESC = 18, // * For skeletons only
+    OGF_S_MOTION_REFS = 19, // * For skeletons only
+    OGF_SWICONTAINER = 20, // * SlidingWindowItem record container
+    OGF_GCONTAINER = 21, // * both VB&IB
+    OGF_FASTPATH = 22, // * extended/fast geometry
+    OGF_S_LODS = 23, // * For skeletons only (Ini-file)
+    OGF_S_MOTION_REFS2 = 24, // * changes in format
     OGF_COLLISION_VERTICES = 25,
     OGF_COLLISION_INDICES = 26,
     OGF_forcedword = 0xFFFFFFFF
@@ -99,9 +99,9 @@ struct ogf_bsphere
 const u8 xrOGF_FormatVersion = 4;
 struct ogf_header
 {
-    u8 format_version;  // = xrOGF_FormatVersion
-    u8 type;            // MT
-    u16 shader_id;      // should not be ZERO
+    u8 format_version; // = xrOGF_FormatVersion
+    u8 type; // MT
+    u16 shader_id; // should not be ZERO
     ogf_bbox bb;
     ogf_bsphere bs;
 };
@@ -159,4 +159,4 @@ struct XRCORE_API FSlideWindowItem
 // scale : vec4
 // bias : vec4
 
-#endif  // fmeshH
+#endif // fmeshH

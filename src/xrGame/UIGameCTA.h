@@ -131,7 +131,6 @@ public:
     BuyMenuItemPair GetBuyMenuItem(shared_str const& itemSectionName);
     void GetPurchaseItems(BuyMenuItemsCollection& dest, s32& moneyDif);
     IBuyWnd* GetBuyWnd() const { return m_pCurBuyMenu; };
-
     void ReInitPlayerDefItems();
 
     bool IsBuySpawnShown();

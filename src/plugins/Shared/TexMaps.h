@@ -9,8 +9,8 @@ class TexmapSlot
 {
 public:
     float amount;
-    Control* amtCtrl;  // ref to controller
-    Texmap* map;       // ref to map
+    Control* amtCtrl; // ref to controller
+    Texmap* map; // ref to map
     BOOL mapOn;
     TSTR name;
 
@@ -19,15 +19,18 @@ public:
     float EvalMono(ShadeContext& sc) { return amount * map->EvalMono(sc); }
     float LerpEvalMono(ShadeContext& sc, float v)
     {
-        if (amount < 0.0f) {
+        if (amount < 0.0f)
+        {
             float b = 1.0f + amount;
-            if (b < 0.0f) b = 0.0f;
+            if (b < 0.0f)
+                b = 0.0f;
             return -amount * (1.0f - map->EvalMono(sc)) + b * v;
         }
         else
         {
             float b = 1.0f - amount;
-            if (b < 0.0f) b = 0.0f;
+            if (b < 0.0f)
+                b = 0.0f;
             return amount * map->EvalMono(sc) + b * v;
         }
         //			float b = 1.0f - (amount<0.0f ? -amount : amount);
@@ -36,17 +39,20 @@ public:
     }
 
     // begin - ke/mjm - 03.16.00 - merge reshading code
-    float LerpMono(float origVal, float texVal)  // for reShading, no eval
+    float LerpMono(float origVal, float texVal) // for reShading, no eval
     {
-        if (amount < 0.0f) {
+        if (amount < 0.0f)
+        {
             float b = 1.0f + amount;
-            if (b < 0.0f) b = 0.0f;
+            if (b < 0.0f)
+                b = 0.0f;
             return -amount * texVal + b * (1.0f - origVal);
         }
         else
         {
             float b = 1.0f - amount;
-            if (b < 0.0f) b = 0.0f;
+            if (b < 0.0f)
+                b = 0.0f;
             return amount * texVal + b * origVal;
         }
     }
@@ -69,7 +75,6 @@ public:
     Texmaps(MtlBase* mb);
     void SetClientPtr(MtlBase* mb) { client = mb; }
     TexmapSlot& operator[](int i) { return txmap[i]; }
-
     Class_ID ClassID();
 
     void DeleteThis();
@@ -91,7 +96,7 @@ public:
     BOOL InvisibleProperty()
     {
         return TRUE;
-    }  // maps are made visible in scripter by pb_maps paramblock in the material so don't expose them as a subanim
+    } // maps are made visible in scripter by pb_maps paramblock in the material so don't expose them as a subanim
 
     //		int NumRefs() { return STD2_NMAX_TEXMAPS*2; }
     int NumRefs();

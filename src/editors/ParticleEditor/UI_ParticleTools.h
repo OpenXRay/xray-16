@@ -54,7 +54,8 @@ class CParticleTool : public CToolCustom
     void ApplyParent(bool bForce = false)
     {
         m_Flags.set(flApplyParent, TRUE);
-        if (bForce) RealApplyParent();
+        if (bForce)
+            RealApplyParent();
     }
 
     void RealCompileEffect();
@@ -62,7 +63,8 @@ class CParticleTool : public CToolCustom
     void CompileEffect(bool bForced = false)
     {
         m_Flags.set(flCompileEffect, TRUE);
-        if (bForced) RealCompileEffect();
+        if (bForced)
+            RealCompileEffect();
     }
 
     u32 remove_action_num;
@@ -70,21 +72,22 @@ class CParticleTool : public CToolCustom
 
     void __stdcall OnControlClick(ButtonValue* sender, bool& bDataModified, bool& bSafe);
 
-  public:
+public:
     void RemoveAction(u32 idx, bool bForced = false)
     {
         remove_action_num = idx;
         m_Flags.set(flRemoveAction, TRUE);
-        if (bForced) RealRemoveAction();
+        if (bForced)
+            RealRemoveAction();
     }
 
-  public:
+public:
     EEditMode m_EditMode;
 
     TProperties* m_ItemProps;
     TItemList* m_PList;
 
-  public:
+public:
     // flags
     enum
     {
@@ -100,7 +103,7 @@ class CParticleTool : public CToolCustom
 
     Flags32 m_Flags;
 
-  protected:
+protected:
     xr_string sel_eff_name;
 
     void __stdcall OnChangeMotion(PropValue* sender);
@@ -108,7 +111,7 @@ class CParticleTool : public CToolCustom
 
     void PrepareLighting();
 
-  public:
+public:
     CParticleTool();
     virtual ~CParticleTool();
 
@@ -122,7 +125,6 @@ class CParticleTool : public CToolCustom
     virtual bool IfModified();
 
     virtual bool IsModified() { return m_bModified; }
-
     virtual void Modified();
 
     virtual LPCSTR GetInfo();
@@ -144,7 +146,6 @@ class CParticleTool : public CToolCustom
     virtual void OnDeviceDestroy();
 
     virtual void Clear() { inherited::Clear(); }
-
     virtual void OnShowHint(AStringVec& SS);
 
     virtual bool __fastcall MouseStart(TShiftState Shift);
@@ -152,19 +153,17 @@ class CParticleTool : public CToolCustom
     virtual void __fastcall MouseMove(TShiftState Shift);
 
     virtual bool Pick(TShiftState Shift) { return false; }
-
     virtual bool RayPick(const Fvector& start, const Fvector& dir, float& dist, Fvector* pt, Fvector* n);
 
     virtual void ShowProperties(LPCSTR) { ; }
-
     virtual void UpdateProperties(BOOL bForced = FALSE)
     {
         m_Flags.set(flRefreshProps, TRUE);
-        if (bForced) RealUpdateProperties();
+        if (bForced)
+            RealUpdateProperties();
     }
 
     virtual void RefreshProperties() { ; }
-
     void PlayCurrent(int idx = -1);
     void StopCurrent(bool bFinishPlaying);
     void SelectEffect(LPCSTR name);

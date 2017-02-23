@@ -18,10 +18,7 @@ CEffectorZoomInertion::CEffectorZoomInertion() : CEffectorCam(eCEZoom, 100000.f)
     m_dwTimePassed = 0;
 }
 
-CEffectorZoomInertion::~CEffectorZoomInertion()
-{
-}
-
+CEffectorZoomInertion::~CEffectorZoomInertion() {}
 void CEffectorZoomInertion::LoadParams(LPCSTR Section, LPCSTR Prefix)
 {
     string256 full_name;
@@ -64,7 +61,8 @@ void CEffectorZoomInertion::Load()
 
 void CEffectorZoomInertion::Init(CWeaponMagazined* pWeapon)
 {
-    if (!pWeapon) return;
+    if (!pWeapon)
+        return;
 
     LoadParams(*pWeapon->cNameSect(), "ezi_");
 };
@@ -74,14 +72,17 @@ void CEffectorZoomInertion::SetParams(float disp)
     float old_disp = m_fDispRadius;
 
     m_fDispRadius = disp * m_fZoomAimingDispK;
-    if (m_fDispRadius < m_fDispMin) m_fDispRadius = m_fDispMin;
+    if (m_fDispRadius < m_fDispMin)
+        m_fDispRadius = m_fDispMin;
 
     m_fFloatSpeed = disp * m_fZoomAimingSpeedK;
-    if (m_fFloatSpeed < m_fSpeedMin) m_fFloatSpeed = m_fSpeedMin;
+    if (m_fFloatSpeed < m_fSpeedMin)
+        m_fFloatSpeed = m_fSpeedMin;
 
     //для того, чтоб сразу прошел пересчет направления
     //движения прицела
-    if (!fis_zero(old_disp - m_fDispRadius, EPS)) m_fEpsilon = 2 * m_fDispRadius;
+    if (!fis_zero(old_disp - m_fDispRadius, EPS))
+        m_fEpsilon = 2 * m_fDispRadius;
 }
 
 void CEffectorZoomInertion::CalcNextPoint()
@@ -100,12 +101,14 @@ BOOL CEffectorZoomInertion::ProcessCam(SCamEffectorInfo& info)
     bool camera_moved = false;
 
     //определяем двигал ли прицелом актер
-    if (!info.d.similar(m_vOldCameraDir, m_fCameraMoveEpsilon)) camera_moved = true;
+    if (!info.d.similar(m_vOldCameraDir, m_fCameraMoveEpsilon))
+        camera_moved = true;
 
     Fvector dir;
     dir.sub(m_vCurrentPoint, m_vTargetPoint);
 
-    if (m_dwTimePassed == 0) {
+    if (m_dwTimePassed == 0)
+    {
         m_vLastPoint.set(m_vCurrentPoint);
         CalcNextPoint();
     }
@@ -124,7 +127,8 @@ BOOL CEffectorZoomInertion::ProcessCam(SCamEffectorInfo& info)
 
     m_vOldCameraDir = info.d;
 
-    if (!camera_moved) info.d.add(m_vCurrentPoint);
+    if (!camera_moved)
+        info.d.add(m_vCurrentPoint);
 
     m_dwTimePassed += Device.dwTimeDelta;
 

@@ -31,7 +31,8 @@ void window_view::custom_init(window_ide % ide)
 
 void window_view::on_load_finished()
 {
-    if (m_loaded) return;
+    if (m_loaded)
+        return;
 
     m_loaded = true;
     EditButton_Click(this, nullptr);
@@ -40,21 +41,20 @@ void window_view::on_load_finished()
 
 void window_view::pause()
 {
-    if (EditButton->Checked) return;
+    if (EditButton->Checked)
+        return;
 
     EditButton_Click(this, nullptr);
 }
 
-IntPtr window_view::draw_handle()
-{
-    return (ViewPanel->Handle);
-}
-
+IntPtr window_view::draw_handle() { return (ViewPanel->Handle); }
 void window_view::reclip_cursor()
 {
-    if (EditButton->Checked) return;
+    if (EditButton->Checked)
+        return;
 
-    if (!m_loaded) return;
+    if (!m_loaded)
+        return;
 
     while (ShowCursor(FALSE) >= 0)
         ;
@@ -74,7 +74,8 @@ Void window_view::EditButton_Click(System::Object ^ sender, System::EventArgs ^ 
     EditButton->Checked = !EditButton->Checked;
     PauseButton->Enabled = EditButton->Checked;
 
-    if (EditButton->Checked) {
+    if (EditButton->Checked)
+    {
         m_engine->pause(PauseButton->Checked);
         m_engine->capture_input(true);
         ClipCursor(nullptr);
@@ -96,14 +97,16 @@ Void window_view::PauseButton_Click(System::Object ^ sender, System::EventArgs ^
 
 Void window_view::window_view_DoubleClick(System::Object ^ sender, System::EventArgs ^ e)
 {
-    if (!EditButton->Checked) return;
+    if (!EditButton->Checked)
+        return;
 
     EditButton_Click(this, nullptr);
 }
 
 Void window_view::window_view_SizeChanged(System::Object ^ sender, System::EventArgs ^ e)
 {
-    if (!components) return;
+    if (!components)
+        return;
 
     m_engine->on_resize();
     reclip_cursor();
@@ -111,42 +114,52 @@ Void window_view::window_view_SizeChanged(System::Object ^ sender, System::Event
 
 Void window_view::window_view_LocationChanged(System::Object ^ sender, System::EventArgs ^ e)
 {
-    if (!Parent) return;
+    if (!Parent)
+        return;
 
-    if (!m_loaded) return;
+    if (!m_loaded)
+        return;
 
     reclip_cursor();
 }
 
 Void window_view::window_view_Activated(System::Object ^ sender, System::EventArgs ^ e)
 {
-    if (!Parent) return;
+    if (!Parent)
+        return;
 
     while (ShowCursor(TRUE) <= 0)
         ;
 
-    if (!m_loaded) return;
+    if (!m_loaded)
+        return;
 }
 
 Void window_view::window_view_Deactivate(System::Object ^ sender, System::EventArgs ^ e)
 {
-    if (!Parent) return;
+    if (!Parent)
+        return;
 
-    if (!m_loaded) return;
+    if (!m_loaded)
+        return;
 
     ClipCursor(nullptr);
     while (ShowCursor(TRUE) <= 0)
         ;
 
-    if (!EditButton->Checked) EditButton_Click(this, nullptr);
+    if (!EditButton->Checked)
+        EditButton_Click(this, nullptr);
 }
 
 Void window_view::window_view_KeyUp(System::Object ^ sender, System::Windows::Forms::KeyEventArgs ^ e)
 {
-    if (!e->Alt) return;
+    if (!e->Alt)
+        return;
 
-    if (e->KeyCode == System::Windows::Forms::Keys::Return) {
-        if (!EditButton->Checked) EditButton_Click(this, nullptr);
+    if (e->KeyCode == System::Windows::Forms::Keys::Return)
+    {
+        if (!EditButton->Checked)
+            EditButton_Click(this, nullptr);
 
         return;
     }
@@ -154,46 +167,46 @@ Void window_view::window_view_KeyUp(System::Object ^ sender, System::Windows::Fo
 
 Void window_view::window_view_Paint(System::Object ^ sender, System::Windows::Forms::PaintEventArgs ^ e)
 {
-    if (dynamic_cast<ide_impl&>(m_ide->ide()).idle()) return;
+    if (dynamic_cast<ide_impl&>(m_ide->ide()).idle())
+        return;
 
     m_engine->on_idle();
 }
 
-void window_view::on_idle()
-{
-    check_cursor();
-}
-
-void window_view::property_grid(PropertyGrid ^ property_grid)
-{
-    m_property_grid = property_grid;
-}
-
+void window_view::on_idle() { check_cursor(); }
+void window_view::property_grid(PropertyGrid ^ property_grid) { m_property_grid = property_grid; }
 Void window_view::ViewPanel_MouseDown(System::Object ^ sender, System::Windows::Forms::MouseEventArgs ^ e)
 {
-    if (e->Button != System::Windows::Forms::MouseButtons::Middle) return;
+    if (e->Button != System::Windows::Forms::MouseButtons::Middle)
+        return;
 
     m_previous_location = e->Location;
 }
 
 Void window_view::ViewPanel_MouseMove(System::Object ^ sender, System::Windows::Forms::MouseEventArgs ^ e)
 {
-    if (e->Location.X == m_previous_location.X) return;
+    if (e->Location.X == m_previous_location.X)
+        return;
 
-    if (e->Button != System::Windows::Forms::MouseButtons::Middle) return;
+    if (e->Button != System::Windows::Forms::MouseButtons::Middle)
+        return;
 
-    if (!m_property_grid) return;
+    if (!m_property_grid)
+        return;
 
     m_property_grid->Refresh();
 
     Object ^ selected_object = m_property_grid->SelectedObject;
-    if (!selected_object) return;
+    if (!selected_object)
+        return;
 
     GridItem ^ item = m_property_grid->SelectedGridItem;
-    if (!item) return;
+    if (!item)
+        return;
 
     PropertyDescriptor ^ descriptor_raw = item->PropertyDescriptor;
-    if (!descriptor_raw) return;
+    if (!descriptor_raw)
+        return;
 
     PropertySpecDescriptor ^ descriptor = safe_cast<PropertySpecDescriptor ^>(descriptor_raw);
     property_container ^ container = safe_cast<property_container ^>(descriptor->bag);
@@ -201,7 +214,8 @@ Void window_view::ViewPanel_MouseMove(System::Object ^ sender, System::Windows::
     VERIFY(raw_value);
 
     IIncrementable ^ incrementable = dynamic_cast<IIncrementable ^>(raw_value);
-    if (!incrementable) return;
+    if (!incrementable)
+        return;
 
     incrementable->Increment(float(e->Location.X - m_previous_location.X));
     m_previous_location = e->Location;
@@ -214,17 +228,22 @@ Void window_view::ViewPanel_MouseLeave(System::Object ^ sender, System::EventArg
 
 Void window_view::ViewPanel_MouseClick(Object ^ sender, MouseEventArgs ^ e)
 {
-    if ((Control::ModifierKeys & Keys::Alt) != Keys::Alt) return;
+    if ((Control::ModifierKeys & Keys::Alt) != Keys::Alt)
+        return;
 
-    if (e->Button != System::Windows::Forms::MouseButtons::Left) return;
+    if (e->Button != System::Windows::Forms::MouseButtons::Left)
+        return;
 
-    if (!m_property_grid) return;
+    if (!m_property_grid)
+        return;
 
     Object ^ selected_object = m_property_grid->SelectedObject;
-    if (!selected_object) return;
+    if (!selected_object)
+        return;
 
     GridItem ^ item = m_property_grid->SelectedGridItem;
-    if (!item) return;
+    if (!item)
+        return;
 
     PropertyDescriptor ^ descriptor_raw = item->PropertyDescriptor;
     VERIFY(descriptor_raw);
@@ -234,7 +253,8 @@ Void window_view::ViewPanel_MouseClick(Object ^ sender, MouseEventArgs ^ e)
     VERIFY(raw_value);
 
     property_color_base ^ color = dynamic_cast<property_color_base ^>(raw_value);
-    if (!color) return;
+    if (!color)
+        return;
 
     HDC dc = GetWindowDC((HWND)ViewPanel->Handle.ToInt32());
     u32 pixel_color = GetPixel(dc, e->Location.X, e->Location.Y);
@@ -247,14 +267,11 @@ Void window_view::ViewPanel_MouseClick(Object ^ sender, MouseEventArgs ^ e)
     m_property_grid->Refresh();
 }
 
-Void window_view::window_view_KeyDown(Object ^ sender, KeyEventArgs ^ e)
-{
-    check_cursor();
-}
-
+Void window_view::window_view_KeyDown(Object ^ sender, KeyEventArgs ^ e) { check_cursor(); }
 void window_view::pick_color_cursor(bool value)
 {
-    if (!value) {
+    if (!value)
+    {
         ViewPanel->Cursor = System::Windows::Forms::Cursors::Default;
         return;
     }
@@ -268,15 +285,19 @@ void window_view::pick_color_cursor(bool value)
 
 bool window_view::pick_color_cursor()
 {
-    if ((Control::ModifierKeys & Keys::Alt) != Keys::Alt) return (false);
+    if ((Control::ModifierKeys & Keys::Alt) != Keys::Alt)
+        return (false);
 
-    if (!m_property_grid) return (false);
+    if (!m_property_grid)
+        return (false);
 
     Object ^ selected_object = m_property_grid->SelectedObject;
-    if (!selected_object) return (false);
+    if (!selected_object)
+        return (false);
 
     GridItem ^ item = m_property_grid->SelectedGridItem;
-    if (!item) return (false);
+    if (!item)
+        return (false);
 
     PropertyDescriptor ^ descriptor_raw = item->PropertyDescriptor;
     VERIFY(descriptor_raw);
@@ -286,12 +307,10 @@ bool window_view::pick_color_cursor()
     VERIFY(raw_value);
 
     property_color_base ^ color = dynamic_cast<property_color_base ^>(raw_value);
-    if (!color) return (false);
+    if (!color)
+        return (false);
 
     return (true);
 }
 
-void window_view::check_cursor()
-{
-    pick_color_cursor(pick_color_cursor());
-}
+void window_view::check_cursor() { pick_color_cursor(pick_color_cursor()); }

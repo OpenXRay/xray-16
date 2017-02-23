@@ -33,16 +33,19 @@ ETOOLS_API int __stdcall ogg_enc(const char* in_fn, const char* out_fn, float qu
 
     in = fopen(in_fn, "rb");
 
-    if (in == NULL) return 0;
+    if (in == NULL)
+        return 0;
 
     format = open_audio_file(in, &enc_opts);
-    if (!format) {
+    if (!format)
+    {
         fclose(in);
         return 0;
     };
 
     out = fopen(out_fn, "wb");
-    if (out == NULL) {
+    if (out == NULL)
+    {
         fclose(out);
         return 0;
     }
@@ -72,13 +75,18 @@ ETOOLS_API int __stdcall ogg_enc(const char* in_fn, const char* out_fn, float qu
     enc_opts.advopt_count = opt.advopt_count;
 
     // encode
-    if (oe_encode(&enc_opts)) res = 0;
+    if (oe_encode(&enc_opts))
+        res = 0;
 
     // clear comment
-    if (vc.user_comments[0]) _ogg_free(vc.user_comments[0]);
-    if (vc.user_comments) _ogg_free(vc.user_comments);
-    if (vc.comment_lengths) _ogg_free(vc.comment_lengths);
-    if (vc.vendor) _ogg_free(vc.vendor);
+    if (vc.user_comments[0])
+        _ogg_free(vc.user_comments[0]);
+    if (vc.user_comments)
+        _ogg_free(vc.user_comments);
+    if (vc.comment_lengths)
+        _ogg_free(vc.comment_lengths);
+    if (vc.vendor)
+        _ogg_free(vc.vendor);
 
     // close files
     fclose(in);

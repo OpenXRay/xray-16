@@ -10,9 +10,5 @@
 TForm9* Form9;
 
 //---------------------------------------------------------------------------
-__fastcall TForm9::TForm9(TComponent* Owner) : TForm(Owner)
-{
-    ClientHeight = Panel1->Height;
-}
-
+__fastcall TForm9::TForm9(TComponent* Owner) : TForm(Owner) { ClientHeight = Panel1->Height; }
 //---------------------------------------------------------------------------

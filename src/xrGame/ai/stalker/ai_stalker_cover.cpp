@@ -32,7 +32,7 @@ extern const float MIN_SUITABLE_ENEMY_DISTANCE = 3.f;
 static int g_advance_search_count = 0;
 static int g_near_cover_search_count = 0;
 static int g_far_cover_search_count = 0;
-#endif  // _DEBUG
+#endif // _DEBUG
 
 void CAI_Stalker::subscribe_on_best_cover_changed(const on_best_cover_changed_delegate& delegate)
 {
@@ -74,7 +74,8 @@ void CAI_Stalker::compute_enemy_distances(float& minimum_enemy_distance, float& 
     minimum_enemy_distance = MIN_SUITABLE_ENEMY_DISTANCE;
     maximum_enemy_distance = 170.f;
 
-    if (!best_weapon()) return;
+    if (!best_weapon())
+        return;
 
     int weapon_type = best_weapon()->object().ef_weapon_type();
     switch (weapon_type)
@@ -139,7 +140,8 @@ const CCoverPoint* CAI_Stalker::find_best_cover(const Fvector& position_to_cover
     m_ce_best->setup(position_to_cover_from, minimum_enemy_distance, maximum_enemy_distance, minimum_enemy_distance);
     const CCoverPoint* point =
         ai().cover_manager().best_cover(Position(), 10.f, *m_ce_best, CStalkerMovementRestrictor(this, true));
-    if (point) return (point);
+    if (point)
+        return (point);
 
 #ifdef _DEBUG
     ++g_far_cover_search_count;
@@ -159,46 +161,54 @@ float CAI_Stalker::best_cover_value(const Fvector& position_to_cover_from)
 
 void CAI_Stalker::best_cover_can_try_advance()
 {
-    if (!m_best_cover_actual) return;
+    if (!m_best_cover_actual)
+        return;
 
-    if (m_best_cover_advance_cover == m_best_cover) return;
+    if (m_best_cover_advance_cover == m_best_cover)
+        return;
 
     m_best_cover_can_try_advance = true;
 }
 
 void CAI_Stalker::update_best_cover_actuality(const Fvector& position_to_cover_from)
 {
-    if (!m_best_cover_actual) return;
+    if (!m_best_cover_actual)
+        return;
 
-    if (!m_best_cover) {
+    if (!m_best_cover)
+    {
         m_best_cover_actual = false;
         return;
     }
 
-    if (m_best_cover->m_is_smart_cover) {
+    if (m_best_cover->m_is_smart_cover)
+    {
         float value;
         smart_cover::cover const* cover = static_cast<smart_cover::cover const*>(m_best_cover);
         smart_cover::loophole* loophole = cover->best_loophole(
             position_to_cover_from, value, false, movement().current_params().cover() == m_best_cover);
-        if (!loophole) {
+        if (!loophole)
+        {
             m_ce_best->invalidate();
             m_best_cover_actual = false;
             return;
         }
     }
 
-    if (m_best_cover->position().distance_to_sqr(position_to_cover_from) < _sqr(MIN_SUITABLE_ENEMY_DISTANCE)) {
+    if (m_best_cover->position().distance_to_sqr(position_to_cover_from) < _sqr(MIN_SUITABLE_ENEMY_DISTANCE))
+    {
         m_best_cover_actual = false;
-#if 0  // def _DEBUG
+#if 0 // def _DEBUG
 		Msg								("* [%6d][%s] enemy too close",Device.dwTimeGlobal,*cName());
 #endif
         return;
     }
 
     float cover_value = best_cover_value(position_to_cover_from);
-    if (cover_value >= m_best_cover_value + 1.f) {
+    if (cover_value >= m_best_cover_value + 1.f)
+    {
         m_best_cover_actual = false;
-#if 0  // def _DEBUG
+#if 0 // def _DEBUG
 		Msg								("* [%6d][%s] cover became too bad",Device.dwTimeGlobal,*cName());
 #endif
         return;
@@ -210,10 +220,11 @@ void CAI_Stalker::update_best_cover_actuality(const Fvector& position_to_cover_f
     //		return;
     //	}
 
-    if (false)  //! m_best_cover_can_try_advance)
+    if (false) //! m_best_cover_can_try_advance)
         return;
 
-    if (m_best_cover_advance_cover == m_best_cover) return;
+    if (m_best_cover_advance_cover == m_best_cover)
+        return;
 
     m_best_cover_advance_cover = m_best_cover;
     m_best_cover_can_try_advance = false;
@@ -237,7 +248,8 @@ const CCoverPoint* CAI_Stalker::best_cover(const Fvector& position_to_cover_from
 
     update_best_cover_actuality(position_to_cover_from);
 
-    if (m_best_cover_actual) {
+    if (m_best_cover_actual)
+    {
         agent_manager().member().member(this).cover(m_best_cover);
         return (m_best_cover);
     }
@@ -245,7 +257,8 @@ const CCoverPoint* CAI_Stalker::best_cover(const Fvector& position_to_cover_from
     m_best_cover_actual = true;
 
     const CCoverPoint* best_cover = find_best_cover(position_to_cover_from);
-    if (best_cover != m_best_cover) {
+    if (best_cover != m_best_cover)
+    {
         on_best_cover_changed(best_cover, m_best_cover);
         m_best_cover = best_cover;
         m_best_cover_advance_cover = 0;
@@ -280,9 +293,11 @@ void CAI_Stalker::on_enemy_change(const CEntityAlive* enemy)
 
 void CAI_Stalker::on_danger_location_add(const CDangerLocation& location)
 {
-    if (!m_best_cover) return;
+    if (!m_best_cover)
+        return;
 
-    if (m_best_cover->position().distance_to_sqr(location.position()) <= _sqr(location.m_radius)) {
+    if (m_best_cover->position().distance_to_sqr(location.position()) <= _sqr(location.m_radius))
+    {
 #ifdef _DEBUG
 //		Msg								("* [%6d][%s] on_danger_add",Device.dwTimeGlobal,*cName());
 #endif
@@ -292,8 +307,10 @@ void CAI_Stalker::on_danger_location_add(const CDangerLocation& location)
 
 void CAI_Stalker::on_danger_location_remove(const CDangerLocation& location)
 {
-    if (!m_best_cover) {
-        if (Position().distance_to_sqr(location.position()) <= _sqr(location.m_radius)) {
+    if (!m_best_cover)
+    {
+        if (Position().distance_to_sqr(location.position()) <= _sqr(location.m_radius))
+        {
 #ifdef _DEBUG
 //			Msg							("* [%6d][%s] on_danger_remove",Device.dwTimeGlobal,*cName());
 #endif
@@ -303,7 +320,8 @@ void CAI_Stalker::on_danger_location_remove(const CDangerLocation& location)
         return;
     }
 
-    if (m_best_cover->position().distance_to_sqr(location.position()) <= _sqr(location.m_radius)) {
+    if (m_best_cover->position().distance_to_sqr(location.position()) <= _sqr(location.m_radius))
+    {
 #ifdef _DEBUG
 //		Msg								("* [%6d][%s] on_danger_remove",Device.dwTimeGlobal,*cName());
 #endif
@@ -319,11 +337,7 @@ void CAI_Stalker::on_cover_blocked(const CCoverPoint* cover)
     m_best_cover_actual = false;
 }
 
-void CAI_Stalker::best_cover_invalidate()
-{
-    m_best_cover_actual = false;
-}
-
+void CAI_Stalker::best_cover_invalidate() { m_best_cover_actual = false; }
 bool CAI_Stalker::use_smart_covers_only() const
 {
     VERIFY(m_ce_best);

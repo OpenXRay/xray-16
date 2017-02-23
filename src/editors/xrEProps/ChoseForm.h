@@ -27,8 +27,8 @@ class TProperties;
 
 class XR_EPROPS_API TfrmChoseItem : public TForm
 {
-    __published :  // IDE-managed Components
-                   TPanel* paRight;
+    __published : // IDE-managed Components
+                  TPanel* paRight;
     TFormStorage* fsStorage;
     TPanel* paMulti;
     TElTree* tvMulti;
@@ -79,7 +79,7 @@ class XR_EPROPS_API TfrmChoseItem : public TForm
     void __fastcall tmRepaintTimer(TObject* Sender);
     void __fastcall edFindChange(TObject* Sender);
 
-  private:  // User declarations
+private: // User declarations
     static TfrmChoseItem* form;
     static AnsiString select_item;
 
@@ -88,7 +88,7 @@ class XR_EPROPS_API TfrmChoseItem : public TForm
 
     int iMultiSelLimit;
 
-  private:
+private:
     Flags32 m_Flags;
 
     SChooseEvents E;
@@ -98,16 +98,16 @@ class XR_EPROPS_API TfrmChoseItem : public TForm
     void __fastcall AppendItem(SChooseItem* item, bool b_check_duplicate);
     void DrawImage();
 
-  protected:
+protected:
     static AnsiString m_LastSelection;
 
     DEFINE_MAP(u32, SChooseEvents, EventsMap, EventsMapIt);
     static EventsMap m_Events;
 
-  public:
+public:
     static TOnChooseFillEvents fill_events;
 
-  public:  // User declarations
+public: // User declarations
     __fastcall TfrmChoseItem(TComponent* Owner);
     static int __fastcall SelectItem(u32 choose_ID, LPCSTR& dest, int sel_cnt = 1, LPCSTR init_name = 0,
         TOnChooseFillItems item_fill = 0, void* fill_param = 0, TOnChooseSelectItem item_select = 0,

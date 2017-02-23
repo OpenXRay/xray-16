@@ -16,17 +16,17 @@ public
 ref class property_string_values_value_shared_str_getter : public property_string_shared_str,
                                                            public property_string_values_value_base
 {
-  private:
+private:
     typedef property_string_shared_str inherited;
 
-  public:
+public:
     typedef property_string_values_value_base::collection_type collection_type;
     typedef editor::property_holder::string_getter_type string_getter_type;
     typedef editor::property_holder::string_setter_type string_setter_type;
     typedef editor::property_holder::string_collection_getter_type string_collection_getter_type;
     typedef editor::property_holder::string_collection_size_getter_type string_collection_size_getter_type;
 
-  public:
+public:
     property_string_values_value_shared_str_getter(editor::engine* engine, shared_str& value,
         string_collection_getter_type const& collection_getter,
         string_collection_size_getter_type const& collection_size_getter);
@@ -34,9 +34,9 @@ ref class property_string_values_value_shared_str_getter : public property_strin
     !property_string_values_value_shared_str_getter();
     virtual collection_type ^ values();
 
-  public:
+public:
     string_collection_getter_type* m_collection_getter;
     string_collection_size_getter_type* m_collection_size_getter;
-};  // ref class property_string_values_value_shared_str_getter
+}; // ref class property_string_values_value_shared_str_getter
 
-#endif  // ifndef PROPERTY_STRING_VALUES_VALUE_SHARED_STR_GETTER_HPP_INCLUDED
+#endif // ifndef PROPERTY_STRING_VALUES_VALUE_SHARED_STR_GETTER_HPP_INCLUDED

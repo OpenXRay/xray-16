@@ -3,14 +3,14 @@
 #include "OGF_Face.h"
 #include "build.h"
 
-#define TRY(a)                                                                                                         \
-    try                                                                                                                \
-    {                                                                                                                  \
-        a;                                                                                                             \
-    }                                                                                                                  \
-    catch (...)                                                                                                        \
-    {                                                                                                                  \
-        Logger.clMsg("* E: %s", #a);                                                                                   \
+#define TRY(a)\
+    try\
+    {\
+        a;\
+    }\
+    catch (...)\
+    {\
+        Logger.clMsg("* E: %s", #a);\
     }
 
 void MModel_face2OGF_Vertices(const _face& FF, OGF_Vertex V[3], const xrMU_Model& model)
@@ -46,7 +46,7 @@ void calc_ogf(xrMU_Model& mu_model)
     for (xrMU_Model::v_subdivs_it it = mu_model.m_subdivs.begin(); it != mu_model.m_subdivs.end(); it++)
     {
         OGF* pOGF = new OGF();
-        b_material* M = &(pBuild->materials()[it->material]);  // and it's material
+        b_material* M = &(pBuild->materials()[it->material]); // and it's material
         R_ASSERT(M);
 
         try

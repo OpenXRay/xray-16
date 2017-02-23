@@ -8,21 +8,9 @@ IC void CControlPathBuilderBase::set_cover_params(float min, float max, float de
     m_cover_info.radius = radius;
 }
 
-IC void CControlPathBuilderBase::set_use_covers(bool val)
-{
-    m_cover_info.use_covers = val;
-}
-
-IC void CControlPathBuilderBase::set_rebuild_time(u32 time)
-{
-    m_time = time;
-}
-
-IC void CControlPathBuilderBase::set_distance_to_end(float dist)
-{
-    m_distance_to_path_end = dist;
-}
-
+IC void CControlPathBuilderBase::set_use_covers(bool val) { m_cover_info.use_covers = val; }
+IC void CControlPathBuilderBase::set_rebuild_time(u32 time) { m_time = time; }
+IC void CControlPathBuilderBase::set_distance_to_end(float dist) { m_distance_to_path_end = dist; }
 IC void CControlPathBuilderBase::set_generic_parameters()
 {
     CControlPathBuilderBase::set_rebuild_time(5000);

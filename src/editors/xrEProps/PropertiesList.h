@@ -29,8 +29,8 @@ class TItemList;
 
 class XR_EPROPS_API TProperties : public TForm
 {
-    __published :  // IDE-managed Components
-                   TElTree* tvProperties;
+    __published : // IDE-managed Components
+                  TElTree* tvProperties;
     TMxPopupMenu* pmEnum;
     TFormStorage* fsStorage;
     TMultiObjSpinEdit* seNumber;
@@ -89,7 +89,7 @@ class XR_EPROPS_API TProperties : public TForm
     void __fastcall hkShortcut_KeyDown(TObject* Sender, WORD& Key, TShiftState Shift);
     void __fastcall hkShortcut_Exit(TObject* Sender);
 
-  private:  // User declarations
+private: // User declarations
     void __fastcall PMItemClick(TObject* Sender);
     void __fastcall WaveFormClick(TElTreeItem* item);
     void __fastcall ColorClick(TElTreeItem* item);
@@ -138,14 +138,15 @@ class XR_EPROPS_API TProperties : public TForm
     void OutBOOL(BOOL val, TCanvas* Surface, TRect& R, bool bEnable);
     void OutText(LPCSTR text, TCanvas* Surface, TRect& R, bool bEnable, TGraphic* g = 0, bool bArrow = false);
 
-  public:
+public:
     void Modified()
     {
         bModified = true;
-        if (!OnModifiedEvent.empty()) OnModifiedEvent();
+        if (!OnModifiedEvent.empty())
+            OnModifiedEvent();
     }
 
-  public:
+public:
     enum
     {
         plFolderStore = (1 << 0),
@@ -158,7 +159,7 @@ class XR_EPROPS_API TProperties : public TForm
         plMultiSelect = (1 << 7),
     };
 
-  protected:
+protected:
     Flags32 m_Flags;
 
     // RT store
@@ -174,7 +175,7 @@ class XR_EPROPS_API TProperties : public TForm
     TItemList* m_Folders;
     void __stdcall OnFolderFocused(TElTreeItem* item);
 
-  public:  // User declarations
+public: // User declarations
     __fastcall TProperties(TComponent* Owner);
     static TProperties* CreateForm(const AnsiString& title, TWinControl* parent = 0, TAlign align = alNone,
         TOnModifiedEvent modif = 0, TOnItemFocused focused = 0, TOnCloseEvent close = 0,
@@ -236,7 +237,6 @@ class XR_EPROPS_API TProperties : public TForm
 
     void LockUpdating() { tvProperties->IsUpdating = true; }
     void UnlockUpdating() { tvProperties->IsUpdating = false; }
-
     // auxiliary routines
     static IC LPVOID GetItemData(TElTreeItem* item) { return (void*)item->Tag; }
     static IC bool IsItemType(TElTreeItem* item, EPropType type)
@@ -250,7 +250,8 @@ class XR_EPROPS_API TProperties : public TForm
     static IC LPCSTR GetItemColumn(TElTreeItem* item, int col)
     {
         static AnsiString t;
-        if (col < item->ColumnText->Count) t = item->ColumnText->Strings[col];
+        if (col < item->ColumnText->Count)
+            t = item->ColumnText->Strings[col];
         return t.c_str();
     }
 

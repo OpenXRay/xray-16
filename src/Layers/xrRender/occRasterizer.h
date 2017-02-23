@@ -6,7 +6,7 @@ const int occ_dim_0 = 64;
 const int occ_dim_1 = occ_dim_0 / 2;
 const int occ_dim_2 = occ_dim_1 / 2;
 const int occ_dim_3 = occ_dim_2 / 2;
-const int occ_dim = occ_dim_0 + 4;  // 2 pixel border around frame
+const int occ_dim = occ_dim_0 + 4; // 2 pixel border around frame
 
 class occTri
 {
@@ -20,8 +20,8 @@ public:
     Fvector center;
 };
 
-const float occQ_s32 = float(0x40000000);  // [-2..2]
-const float occQ_s16 = float(16384 - 1);   // [-2..2]
+const float occQ_s32 = float(0x40000000); // [-2..2]
+const float occQ_s16 = float(16384 - 1); // [-2..2]
 typedef s32 occD;
 
 class occRasterizer
@@ -42,7 +42,6 @@ public:
     IC s16 df_2_s16up(float d) { return s16(iCeil(d * occQ_s16)); }
     IC float ds32_2_f(s32 d) { return float(d) / occQ_s32; }
     IC float ds16_2_f(s16 d) { return float(d) / occQ_s16; }
-
     void clear();
     void propagade();
     u32 rasterize(occTri* T);

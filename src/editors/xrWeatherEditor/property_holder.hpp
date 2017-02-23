@@ -18,11 +18,11 @@ namespace editor
 {
 class engine;
 class property_holder_collection;
-}  // namespace editor
+} // namespace editor
 
 class property_holder : public editor::property_holder
 {
-  public:
+public:
     property_holder(editor::engine* engine, LPCSTR display_name, editor::property_holder_collection* collection,
         editor::property_holder_holder* holder);
     virtual ~property_holder();
@@ -30,7 +30,7 @@ class property_holder : public editor::property_holder
     property_container ^ container();
     editor::engine& engine();
 
-  public:
+public:
     virtual editor::property_holder_holder* holder();
     virtual void clear();
     virtual editor::property_value* add_property(LPCSTR identifier, LPCSTR category, LPCSTR description,
@@ -130,19 +130,19 @@ class property_holder : public editor::property_holder
         refresh_grid_on_change_enum const& refresh_grid);
     virtual editor::property_value* add_property(LPCSTR identifier, LPCSTR category, LPCSTR description,
         LPCSTR default_value, string_getter_type const& getter, string_setter_type const& setter,
-        LPCSTR default_extension,  // ".dds",
-        LPCSTR file_mask,          // "Texture files (*.dds)|*.dds",
-        LPCSTR default_folder,     // "R:\\development\\priquel\\resources\\gamedata\\textures\\sky",
-        LPCSTR caption,            // "Select texture..."
+        LPCSTR default_extension, // ".dds",
+        LPCSTR file_mask, // "Texture files (*.dds)|*.dds",
+        LPCSTR default_folder, // "R:\\development\\priquel\\resources\\gamedata\\textures\\sky",
+        LPCSTR caption, // "Select texture..."
         enter_text_enum const& can_enter_text, extension_action_enum const& remove_extension,
         readonly_enum const& read_only, notify_parent_on_change_enum const& notify_parent,
         password_char_enum const& password, refresh_grid_on_change_enum const& refresh_grid);
     virtual editor::property_value* add_property(LPCSTR identifier, LPCSTR category, LPCSTR description,
         LPCSTR default_value, shared_str& value,
-        LPCSTR default_extension,  // ".dds",
-        LPCSTR file_mask,          // "Texture files (*.dds)|*.dds",
-        LPCSTR default_folder,     // "R:\\development\\priquel\\resources\\gamedata\\textures\\sky",
-        LPCSTR caption,            // "Select texture..."
+        LPCSTR default_extension, // ".dds",
+        LPCSTR file_mask, // "Texture files (*.dds)|*.dds",
+        LPCSTR default_folder, // "R:\\development\\priquel\\resources\\gamedata\\textures\\sky",
+        LPCSTR caption, // "Select texture..."
         enter_text_enum const& can_enter_text, extension_action_enum const& remove_extension,
         readonly_enum const& read_only, notify_parent_on_change_enum const& notify_parent,
         password_char_enum const& password, refresh_grid_on_change_enum const& refresh_grid);
@@ -197,19 +197,19 @@ class property_holder : public editor::property_holder
         notify_parent_on_change_enum const& notify_parent, password_char_enum const& password,
         refresh_grid_on_change_enum const& refresh_grid);
 
-  public:
+public:
     typedef editor::property_holder_collection collection_type;
 
     System::String ^ display_name();
     collection_type* collection();
 
-  private:
+private:
     gcroot<property_container ^> m_container;
     gcroot<System::String ^> m_display_name;
     collection_type* m_collection;
     editor::engine* m_engine;
     editor::property_holder_holder* m_holder;
     bool m_disposing;
-};  // class property_holder
+}; // class property_holder
 
-#endif  // ifndef PROPERTY_HOLDER_HPP_INCLUDED
+#endif // ifndef PROPERTY_HOLDER_HPP_INCLUDED

@@ -26,12 +26,12 @@ public:
 private:
     static u32 const max_fury_time = 6000;
     u32 m_last_kills;
-};  // class player_state_invincible_fury
+}; // class player_state_invincible_fury
 
 ADD_ACCUMULATIVE_STATE(acpv_invincible_fury, player_state_invincible_fury);
 #undef ACCUMULATIVE_STATE_LIST
 #define ACCUMULATIVE_STATE_LIST SAVE_TYPE_LIST(acpv_invincible_fury, player_state_invincible_fury)
 
-}  // namespace award_system
+} // namespace award_system
 
-#endif  //#ifndef INVINCIBLE_FURY_INCLUDED
+#endif //#ifndef INVINCIBLE_FURY_INCLUDED

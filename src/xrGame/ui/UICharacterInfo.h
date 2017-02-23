@@ -94,7 +94,6 @@ public:
     }
 
     const shared_str& IconName() const { return m_texture_name; }
-
     static bool get_actor_community(shared_str* our, shared_str* enemy);
     static bool ignore_community(shared_str const& check_community);
 };

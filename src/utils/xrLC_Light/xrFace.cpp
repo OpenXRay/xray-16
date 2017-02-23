@@ -6,12 +6,8 @@
 #include "xrLC_globaldata.h"
 #include "serialize.h"
 #include "lightmap.h"
-volatile u32 dwInvalidFaces;  //= 0;
-u32 InvalideFaces()
-{
-    return dwInvalidFaces;
-}
-
+volatile u32 dwInvalidFaces; //= 0;
+u32 InvalideFaces() { return dwInvalidFaces; }
 const Shader_xrLC& base_Face::Shader() const
 {
     VERIFY(inlc_global_data());
@@ -28,7 +24,7 @@ void base_Face::CacheOpacity()
         flags.bOpaque = false;
     else
         flags.bOpaque = true;
-    if (!flags.bOpaque && !(T.THM.HasSurface()))  //(0==T.pSurface)//	pSurface was possible deleted
+    if (!flags.bOpaque && !(T.THM.HasSurface())) //(0==T.pSurface)//	pSurface was possible deleted
     {
         flags.bOpaque = true;
         Logger.clMsg("Strange face detected... Has alpha without texture...");
@@ -81,7 +77,8 @@ void destroy_face(Face*& v, bool unregister)
 Tvertex<DataVertex>::Tvertex()
 {
     VERIFY(inlc_global_data());
-    if (inlc_global_data()->vert_construct_register()) {
+    if (inlc_global_data()->vert_construct_register())
+    {
         // set_index( inlc_global_data()->g_vertices().size() );
         inlc_global_data()->g_vertices().push_back(this);
     }
@@ -91,10 +88,12 @@ Tvertex<DataVertex>::Tvertex()
 template <>
 Tvertex<DataVertex>::~Tvertex()
 {
-    if (g_bUnregister) {
+    if (g_bUnregister)
+    {
         vecVertexIt F =
             std::find(inlc_global_data()->g_vertices().begin(), inlc_global_data()->g_vertices().end(), this);
-        if (F != inlc_global_data()->g_vertices().end()) {
+        if (F != inlc_global_data()->g_vertices().end())
+        {
             vecVertex& verts = inlc_global_data()->g_vertices();
             std::swap(*F, *(verts.end() - 1));
             verts.pop_back();
@@ -130,7 +129,8 @@ Tface<DataVertex>::Tface()
     pDeflector = 0;
     flags.bSplitted = false;
     VERIFY(inlc_global_data());
-    if (!do_not_add_to_vector_in_global_data) {
+    if (!do_not_add_to_vector_in_global_data)
+    {
         // set_index( inlc_global_data()->g_faces().size() );
         inlc_global_data()->g_faces().push_back(this);
     }
@@ -141,9 +141,11 @@ Tface<DataVertex>::Tface()
 template <>
 Tface<DataVertex>::~Tface()
 {
-    if (g_bUnregister) {
+    if (g_bUnregister)
+    {
         vecFaceIt F = std::find(inlc_global_data()->g_faces().begin(), inlc_global_data()->g_faces().end(), this);
-        if (F != inlc_global_data()->g_faces().end()) {
+        if (F != inlc_global_data()->g_faces().end())
+        {
             vecFace& faces = inlc_global_data()->g_faces();
             std::swap(*F, *(faces.end() - 1));
             faces.pop_back();
@@ -178,40 +180,42 @@ void Face::Verify()
 {
     // 1st :: area
     float _a = CalcArea();
-    if (!_valid(_a) || (_a < EPS)) {
+    if (!_valid(_a) || (_a < EPS))
+    {
         Failure();
         return;
     }
 
     // 2nd :: TC0
     Fvector2* tc = getTC0();
-    float eps = .5f / 4096.f;  // half pixel from 4096 texture (0.0001220703125)
+    float eps = .5f / 4096.f; // half pixel from 4096 texture (0.0001220703125)
     float e0 = tc[0].distance_to(tc[1]);
     float e1 = tc[1].distance_to(tc[2]);
     float e2 = tc[2].distance_to(tc[0]);
     float p = e0 + e1 + e2;
-    if (!_valid(_a) || (p < eps)) {
+    if (!_valid(_a) || (p < eps))
+    {
         Failure();
         return;
     }
 
     // 3rd :: possibility to calc normal
     CalcNormal();
-    if (!_valid(N)) {
+    if (!_valid(N))
+    {
         Failure();
         return;
     }
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int affected = 0;
-void start_unwarp_recursion()
-{
-    affected = 1;
-}
+void start_unwarp_recursion() { affected = 1; }
 void Face::OA_Unwarp(CDeflector* D)
 {
-    if (pDeflector) return;
-    if (!D->OA_Place(this)) return;
+    if (pDeflector)
+        return;
+    if (!D->OA_Place(this))
+        return;
 
     // now iterate on all our neigbours
     for (int i = 0; i < 3; ++i)
@@ -224,7 +228,8 @@ void Face::OA_Unwarp(CDeflector* D)
 
 BOOL DataFace::RenderEqualTo(Face* F)
 {
-    if (F->dwMaterial != dwMaterial) return FALSE;
+    if (F->dwMaterial != dwMaterial)
+        return FALSE;
     // if (F->tc.size()	!= F->tc.size()		)	return FALSE;	// redundant???
     return TRUE;
 }
@@ -240,8 +245,10 @@ void DataFace::AddChannel(Fvector2& p1, Fvector2& p2, Fvector2& p3)
 
 BOOL DataFace::hasImplicitLighting()
 {
-    if (0 == this) return FALSE;
-    if (!Shader().flags.bRendering) return FALSE;
+    if (0 == this)
+        return FALSE;
+    if (!Shader().flags.bRendering)
+        return FALSE;
     VERIFY(inlc_global_data());
     b_material& M = inlc_global_data()->materials()[dwMaterial];
     b_BuildTexture& T = inlc_global_data()->textures()[M.surfidx];
@@ -343,15 +350,8 @@ void DataFace::write(IWriter& w) const
     write_lightmaps->write(w, lmap_layer);
     w.w_u32(sm_group);
 }
-void DataVertex::read(INetReader& r)
-{
-    base_Vertex::read(r);
-}
-void DataVertex::write(IWriter& w) const
-{
-    base_Vertex::write(w);
-}
-
+void DataVertex::read(INetReader& r) { base_Vertex::read(r); }
+void DataVertex::write(IWriter& w) const { base_Vertex::write(w); }
 void Face::read_vertices(INetReader& r)
 {
     VERIFY(::read_vertices);
@@ -427,8 +427,5 @@ void Vertex::read_adjacents(INetReader& r)
 {
     // VERIFY()
 }
-void Vertex::write_adjacents(IWriter& w) const
-{
-}
-
+void Vertex::write_adjacents(IWriter& w) const {}
 ///////////////////////////////////////////////////////////////

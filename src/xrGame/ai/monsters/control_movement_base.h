@@ -26,7 +26,6 @@ public:
     void stop_accel();
     void set_velocity(float val, bool max_acc = false);
     void set_accel(float val) { m_accel = val; }
-
     // services
     float get_velocity_from_path();
 };

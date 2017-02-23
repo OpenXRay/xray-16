@@ -8,11 +8,7 @@ namespace lc_net
 {
 static net_globals globs;
 
-net_globals& globals()
-{
-    return globs;
-}
-
+net_globals& globals() { return globs; }
 static LPCSTR global_data_file_path(LPCSTR name, string_path& path_name)
 {
     FS.update_path(path_name, "$app_root$", name);
@@ -22,7 +18,8 @@ static LPCSTR global_data_file_path(LPCSTR name, string_path& path_name)
 bool global_data_file_path(LPCSTR name, IAgent* agent, DWORD sessionId, string_path& path_name)
 {
     HRESULT rz = agent->GetSessionCacheDirectory(sessionId, path_name);
-    if (rz != S_OK) return false;
+    if (rz != S_OK)
+        return false;
     strconcat(sizeof(path_name), path_name, path_name, name);
     return true;
 }
@@ -56,7 +53,6 @@ public:
         ref_lock.Leave();
     }
     IC u32 id() { return _id; }
-
 private:
     virtual void add_ref()
     {
@@ -69,7 +65,8 @@ private:
         ref_lock.Enter();
         R_ASSERT(_use_count > 0);
         --_use_count;
-        if (_clear) {
+        if (_clear)
+        {
             destroy_data();
             _clear = false;
         }
@@ -98,11 +95,13 @@ private:
         u32 i;
         inStream->Read(&i, sizeof(i));
         R_ASSERT(i > 0);
-        if (i == _id) {
+        if (i == _id)
+        {
             create_data_lock.Leave();
             return true;
         }
-        if (_id == 0) {
+        if (_id == 0)
+        {
             bool ret = create_data(i, agent, sessionId);
             create_data_lock.Leave();
             return ret;
@@ -138,10 +137,13 @@ private:
 
     bool create_data(u32 id, IAgent* agent, DWORD sessionId)
     {
-        if (_id == id) return true;
+        if (_id == id)
+            return true;
         string_path path_name;
-        if (!global_data_file_path(impl::file_name(), agent, sessionId, path_name)) return false;
-        if (impl::create_data(path_name)) _id = id;
+        if (!global_data_file_path(impl::file_name(), agent, sessionId, path_name))
+            return false;
+        if (impl::create_data(path_name))
+            _id = id;
         return _id == id;
     }
     void destroy_data()
@@ -164,7 +166,8 @@ private:
     {
         create_data_lock.Enter();
 
-        if (_id > 0) {
+        if (_id > 0)
+        {
             R_ASSERT(_use_count == 0);
             impl::data_cleanup();
             lc_net::cleanup().set_cleanup<gl_type>(_id);
@@ -184,7 +187,8 @@ struct it
     static void cleanup(xr_vector<net_global_data*>& data)
     {
         tnet_global_data<et>* gd = static_cast<tnet_global_data<et>*>(data[et]);
-        if (gd->id() > 0 && lc_net::cleanup().get_cleanup<et>() >= gd->id()) gd->clear();
+        if (gd->id() > 0 && lc_net::cleanup().get_cleanup<et>() >= gd->id())
+            gd->clear();
         next::cleanup(data);
     }
 };

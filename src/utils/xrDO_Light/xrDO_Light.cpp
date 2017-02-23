@@ -32,18 +32,15 @@ CThreadManager::ReportStatusFunc ProxyStatus = cdecl_cast([](const char* format,
 
 CThreadManager::ReportProgressFunc ProxyProgress = cdecl_cast([](float progress) { Logger.Progress(progress); });
 
-static const char* h_str = "The following keys are supported / required:\n"
-                           "-? or -h   == this help\n"
-                           "-f<NAME>   == compile level in gamedata\\levels\\<NAME>\\\n"
-                           "-o         == modify build options\n"
-                           "\n"
-                           "NOTE: The last key is required for any functionality\n";
+static const char* h_str =
+    "The following keys are supported / required:\n"
+    "-? or -h   == this help\n"
+    "-f<NAME>   == compile level in gamedata\\levels\\<NAME>\\\n"
+    "-o         == modify build options\n"
+    "\n"
+    "NOTE: The last key is required for any functionality\n";
 
-void Help()
-{
-    MessageBox(0, h_str, "Command line options", MB_OK | MB_ICONINFORMATION);
-}
-
+void Help() { MessageBox(0, h_str, "Command line options", MB_OK | MB_ICONINFORMATION); }
 void Startup(LPSTR lpCmdLine)
 {
     char cmd[512];
@@ -51,16 +48,19 @@ void Startup(LPSTR lpCmdLine)
     bool bNet = false;
     xr_strcpy(cmd, lpCmdLine);
     strlwr(cmd);
-    if (strstr(cmd, "-?") || strstr(cmd, "-h")) {
+    if (strstr(cmd, "-?") || strstr(cmd, "-h"))
+    {
         Help();
         return;
     }
-    if (strstr(cmd, "-f") == 0) {
+    if (strstr(cmd, "-f") == 0)
+    {
         Help();
         return;
     }
     //  if (strstr(cmd,"-o"))                               bModifyOptions = TRUE;
-    if (strstr(cmd, "-net")) bNet = true;
+    if (strstr(cmd, "-net"))
+        bNet = true;
     // Load project
     char name[256];
     *name = 0;
@@ -81,7 +81,8 @@ void Startup(LPSTR lpCmdLine)
     char stats[256];
     xr_sprintf(stats, "Time elapsed: %s", make_time((dwStartupTime.GetElapsed_ms()) / 1000).c_str());
 
-    if (!strstr(cmd, "-silent")) Logger.Success(stats);
+    if (!strstr(cmd, "-silent"))
+        Logger.Success(stats);
     Logger.Destroy();
 }
 

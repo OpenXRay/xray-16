@@ -52,4 +52,4 @@ protected:
         OutFormatType outputPixelFormat, float bumpScale);
 };
 
-#endif  // MAYA_API_MNormalMapConverter
+#endif // MAYA_API_MNormalMapConverter

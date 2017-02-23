@@ -22,12 +22,12 @@ enum
 #pragma pack(push, 2)
 struct CKey
 {
-    Fquaternion Q;  // rotation
-    Fvector T;      // translation
+    Fquaternion Q; // rotation
+    Fvector T; // translation
 };
 struct CKeyQR
 {
-    s16 x, y, z, w;  // rotation
+    s16 x, y, z, w; // rotation
 };
 struct CKeyQT8
 {
@@ -72,22 +72,22 @@ public:
             _flags &= ~mask;
     }
     BOOL test_flag(u8 mask) const { return BOOL(_flags & mask); }
-
     void set_count(u32 cnt)
     {
         VERIFY(cnt);
         _count = cnt;
     }
     ICF u32 get_count() const { return (u32(_count) & 0x00FFFFFF); }
-
     float GetLength() { return float(_count) * SAMPLE_SPF; }
-
     u32 mem_usage()
     {
         u32 sz = sizeof(*this);
-        if (_keysR.size()) sz += _keysR.size() * sizeof(CKeyQR) / _keysR.ref_count();
-        if (_keysT8.size()) sz += _keysT8.size() * sizeof(CKeyQT8) / _keysT8.ref_count();
-        if (_keysT16.size()) sz += _keysT16.size() * sizeof(CKeyQT16) / _keysT16.ref_count();
+        if (_keysR.size())
+            sz += _keysR.size() * sizeof(CKeyQR) / _keysR.ref_count();
+        if (_keysT8.size())
+            sz += _keysT8.size() * sizeof(CKeyQT8) / _keysT8.ref_count();
+        if (_keysT16.size())
+            sz += _keysT16.size() * sizeof(CKeyQT16) / _keysT16.ref_count();
         return sz;
     }
 };
@@ -123,10 +123,10 @@ class XRCORE_API CMotionDef
 public:
     u16 bone_or_part;
     u16 motion;
-    u16 speed;    // quantized: 0..10
-    u16 power;    // quantized: 0..10
-    u16 accrue;   // quantized: 0..10
-    u16 falloff;  // quantized: 0..10
+    u16 speed; // quantized: 0..10
+    u16 power; // quantized: 0..10
+    u16 accrue; // quantized: 0..10
+    u16 falloff; // quantized: 0..10
     u16 flags;
     xr_vector<motion_marks> marks;
 
@@ -140,7 +140,6 @@ public:
 
     void Load(IReader* MP, u32 fl, u16 vers);
     u32 mem_usage() { return sizeof(*this); }
-
     ICF float Accrue() { return fQuantizerRangeExt * Dequantize(accrue); }
     ICF float Falloff() { return fQuantizerRangeExt * Dequantize(falloff); }
     ICF float Speed() { return Dequantize(speed); }
@@ -182,7 +181,8 @@ public:
     {
         u8 ret = 0;
         for (u8 i = 0; i < MAX_PARTS; ++i)
-            if (P[i].Name.size()) ret++;
+            if (P[i].Name.size())
+                ret++;
         return ret;
     };
 };
@@ -190,10 +190,10 @@ public:
 // shared motions
 struct XRCORE_API motions_value
 {
-    accel_map m_motion_map;  // motion associations
-    accel_map m_cycle;       // motion data itself (shared)
-    accel_map m_fx;          // motion data itself (shared)
-    CPartition m_partition;  // partition
+    accel_map m_motion_map; // motion associations
+    accel_map m_cycle; // motion data itself (shared)
+    accel_map m_fx; // motion data itself (shared)
+    CPartition m_partition; // partition
     u32 m_dwReference;
     BoneMotionMap m_motions;
     MotionDefVec m_mdefs;
@@ -240,17 +240,19 @@ protected:
     // ref-counting
     void destroy()
     {
-        if (0 == p_) return;
+        if (0 == p_)
+            return;
         p_->m_dwReference--;
-        if (0 == p_->m_dwReference) p_ = 0;
+        if (0 == p_->m_dwReference)
+            p_ = 0;
     }
 
 public:
-    bool create(shared_str key, IReader* data, vecBones* bones);  //{ motions_value* v =
-                                                                  //g_pMotionsContainer->dock(key,data,bones); if (0!=v)
-                                                                  //v->m_dwReference++; destroy(); p_ = v; }
+    bool create(shared_str key, IReader* data, vecBones* bones); //{ motions_value* v =
+    // g_pMotionsContainer->dock(key,data,bones); if (0!=v)
+    // v->m_dwReference++; destroy(); p_ = v; }
     bool create(
-        shared_motions const& rhs);  // { motions_value* v = rhs.p_; if (0!=v) v->m_dwReference++; destroy(); p_ = v; }
+        shared_motions const& rhs); // { motions_value* v = rhs.p_; if (0!=v) v->m_dwReference++; destroy(); p_ = v; }
 public:
     // construction
     shared_motions() { p_ = 0; }
@@ -260,7 +262,6 @@ public:
         create(rhs);
     }
     ~shared_motions() { destroy(); }
-
     // assignment & accessors
     shared_motions& operator=(shared_motions const& rhs)
     {
@@ -268,7 +269,6 @@ public:
         return *this;
     }
     bool operator==(shared_motions const& rhs) const { return (p_ == rhs.p_); }
-
     // misc func
     MotionVec* bone_motions(shared_str bone_name)
     {

@@ -32,17 +32,15 @@ CStateManagerChimera::CStateManagerChimera(CChimera* obj) : inherited(obj)
     // 	add_state(eStateCustom,					new CStateMonsterTestState<CChimera>(obj));
 }
 
-CStateManagerChimera::~CStateManagerChimera()
-{
-}
-
+CStateManagerChimera::~CStateManagerChimera() {}
 void CStateManagerChimera::execute()
 {
     u32 state_id = u32(-1);
 
     const CEntityAlive* enemy = object->EnemyMan.get_enemy();
 
-    if (enemy) {
+    if (enemy)
+    {
         // if (check_state(eStateThreaten)) state_id = eStateThreaten;
         switch (object->EnemyMan.get_danger_type())
         {

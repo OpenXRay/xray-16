@@ -12,7 +12,8 @@ int xrSimulate(xr_vector<u16>& indices, int iCacheSize)
     for (u32 i = 0; i < indices.size(); i++)
     {
         int id = indices[i];
-        if (C.InCache(id)) continue;
+        if (C.InCache(id))
+            continue;
         count++;
         C.AddEntry(id);
     }

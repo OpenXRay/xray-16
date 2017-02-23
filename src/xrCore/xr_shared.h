@@ -25,8 +25,10 @@ public:
     {
         T* result = 0;
         SharedMapIt I = container.find(key);
-        if (I != container.end()) result = I->second;
-        if (0 == result) {
+        if (I != container.end())
+            result = I->second;
+        if (0 == result)
+        {
             result = new T();
             result->m_ref_cnt = 0;
             if (p(key, result))
@@ -40,7 +42,8 @@ public:
     {
         SharedMapIt it = container.begin();
         SharedMapIt _E = container.end();
-        if (force_destroy) {
+        if (force_destroy)
+        {
             for (; it != _E; it++)
             {
                 T* sv = it->second;
@@ -53,7 +56,8 @@ public:
             for (; it != _E;)
             {
                 T* sv = it->second;
-                if (0 == sv->m_ref_cnt) {
+                if (0 == sv->m_ref_cnt)
+                {
                     SharedMapIt i_current = it;
                     SharedMapIt i_next = ++it;
                     xr_delete(sv);
@@ -79,14 +83,17 @@ protected:
     // ref-counting
     void destroy()
     {
-        if (0 == p_) return;
+        if (0 == p_)
+            return;
         p_->m_ref_cnt--;
-        if (0 == p_->m_ref_cnt) p_ = 0;
+        if (0 == p_->m_ref_cnt)
+            p_ = 0;
     }
     void create(shared_item const& rhs)
     {
         T* v = rhs.p_;
-        if (0 != v) v->m_ref_cnt++;
+        if (0 != v)
+            v->m_ref_cnt++;
         destroy();
         p_ = v;
     }
@@ -112,7 +119,8 @@ public:
     void create(shared_str key, shared_container<T>* container, const _on_new& p)
     {
         T* v = container->dock(key, p);
-        if (0 != v) v->m_ref_cnt++;
+        if (0 != v)
+            v->m_ref_cnt++;
         destroy();
         p_ = v;
     }

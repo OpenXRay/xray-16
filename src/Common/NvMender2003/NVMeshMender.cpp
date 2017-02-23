@@ -17,7 +17,7 @@ BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
 Comments:
 
   Todo
-  -	Performance improvements, right now for each vertex I am building the list
+  - Performance improvements, right now for each vertex I am building the list
     of it's neighbors, when we could do a single pass and build the full adjacency
     map in the beginning.  Note: I tried this and didn't see a real perf improvement.
 
@@ -74,7 +74,8 @@ public:
         Vec3Normalize(&tmp1, &tmp1);
         Vec3Normalize(&tmp2, &tmp2);
 
-        if (D3DXVec3Dot(&tmp1, &tmp2) >= minCreaseAngle) {
+        if (D3DXVec3Dot(&tmp1, &tmp2) >= minCreaseAngle)
+        {
             return true;
         }
         else if ((tmp1 == D3DXVECTOR3(0, 0, 0)) && (tmp2 == D3DXVECTOR3(0, 0, 0)))
@@ -100,7 +101,8 @@ public:
         Vec3Normalize(&tmp1, &tmp1);
         Vec3Normalize(&tmp2, &tmp2);
 
-        if (D3DXVec3Dot(&tmp1, &tmp2) >= minCreaseAngle) {
+        if (D3DXVec3Dot(&tmp1, &tmp2) >= minCreaseAngle)
+        {
             return true;
         }
         else if ((tmp1 == D3DXVECTOR3(0, 0, 0)) && (tmp2 == D3DXVECTOR3(0, 0, 0)))
@@ -143,9 +145,12 @@ bool operator<(const D3DXVECTOR3& lhs, const D3DXVECTOR3& rhs)
     // needed to have a vertex in a map.
     // must be an absolute sort so that we can reliably find the exact
     // position again, not a fuzzy compare for equality based on an epsilon.
-    if (lhs.x == rhs.x) {
-        if (lhs.y == rhs.y) {
-            if (lhs.z == rhs.z) {
+    if (lhs.x == rhs.x)
+    {
+        if (lhs.y == rhs.y)
+        {
+            if (lhs.z == rhs.z)
+            {
                 return false;
             }
             else
@@ -172,10 +177,7 @@ MeshMender::MeshMender()
     WeightNormalsByArea = 0.0f;
     m_RespectExistingSplits = DONT_RESPECT_SPLITS;
 }
-MeshMender::~MeshMender()
-{
-}
-
+MeshMender::~MeshMender() {}
 void MeshMender::UpdateIndices(const size_t oldIndex, const size_t newIndex, TriangleList& curGroup)
 {
     // make any triangle that used the oldIndex use the newIndex instead
@@ -185,7 +187,8 @@ void MeshMender::UpdateIndices(const size_t oldIndex, const size_t newIndex, Tri
         TriID tID = curGroup[t];
         for (size_t indx = 0; indx < 3; ++indx)
         {
-            if (m_Triangles[tID].indices[indx] == oldIndex) {
+            if (m_Triangles[tID].indices[indx] == oldIndex)
+            {
                 m_Triangles[tID].indices[indx] = newIndex;
             }
         }
@@ -194,7 +197,7 @@ void MeshMender::UpdateIndices(const size_t oldIndex, const size_t newIndex, Tri
 void MeshMender::ProcessNormals(TriangleList& possibleNeighbors, xr_vector<Vertex>& theVerts,
     xr_vector<unsigned int>& mappingNewToOldVert, D3DXVECTOR3 workingPosition)
 {
-    NeighborGroupList neighborGroups;  // a fresh group for each pass
+    NeighborGroupList neighborGroups; // a fresh group for each pass
 
     // reset each triangle to prepare for smoothing group building
     for (u32 i = 0; i < possibleNeighbors.size(); ++i)
@@ -208,7 +211,8 @@ void MeshMender::ProcessNormals(TriangleList& possibleNeighbors, xr_vector<Verte
     {
         Triangle* currTri = &(m_Triangles[possibleNeighbors[i]]);
         assert(currTri);
-        if (!currTri->handled) {
+        if (!currTri->handled)
+        {
             BuildGroups(currTri, possibleNeighbors, neighborGroups, theVerts, &canSmoothNormalsChecker,
                 MinNormalsCreaseCosAngle);
         }
@@ -223,7 +227,7 @@ void MeshMender::ProcessNormals(TriangleList& possibleNeighbors, xr_vector<Verte
         D3DXVECTOR3 gnorm(0.0f, 0.0f, 0.0f);
 
         assert(curGroup.size() != 0 && "should not be a zero group here.");
-        for (size_t t = 0; t < curGroup.size(); ++t)  // for each triangle in the group,
+        for (size_t t = 0; t < curGroup.size(); ++t) // for each triangle in the group,
         {
             TriID tID = curGroup[t];
             gnorm += m_Triangles[tID].normal;
@@ -240,15 +244,17 @@ void MeshMender::ProcessNormals(TriangleList& possibleNeighbors, xr_vector<Verte
         TriangleList& curGroup = neighborGroups[i];
         xr_set<size_t> thisGroupIndices;
 
-        for (size_t t = 0; t < curGroup.size(); ++t)  // for each tri
+        for (size_t t = 0; t < curGroup.size(); ++t) // for each tri
         {
             TriID tID = curGroup[t];
-            for (size_t indx = 0; indx < 3; ++indx)  // for each vert in that tri
+            for (size_t indx = 0; indx < 3; ++indx) // for each vert in that tri
             {
                 // if it is at the positions in question
-                if (theVerts[m_Triangles[tID].indices[indx]].pos == workingPosition) {
+                if (theVerts[m_Triangles[tID].indices[indx]].pos == workingPosition)
+                {
                     // see if another group is already using this vert
-                    if (otherGroupsIndices.find(m_Triangles[tID].indices[indx]) != otherGroupsIndices.end()) {
+                    if (otherGroupsIndices.find(m_Triangles[tID].indices[indx]) != otherGroupsIndices.end())
+                    {
                         // then we need to make a new vertex
                         Vertex ov;
                         ov = theVerts[m_Triangles[tID].indices[indx]];
@@ -281,7 +287,7 @@ void MeshMender::ProcessNormals(TriangleList& possibleNeighbors, xr_vector<Verte
 void MeshMender::ProcessTangents(TriangleList& possibleNeighbors, xr_vector<Vertex>& theVerts,
     xr_vector<unsigned int>& mappingNewToOldVert, D3DXVECTOR3 workingPosition)
 {
-    NeighborGroupList neighborGroups;  // a fresh group for each pass
+    NeighborGroupList neighborGroups; // a fresh group for each pass
 
     // reset each triangle to prepare for smoothing group building
     for (u32 i = 0; i < possibleNeighbors.size(); ++i)
@@ -295,7 +301,8 @@ void MeshMender::ProcessTangents(TriangleList& possibleNeighbors, xr_vector<Vert
     {
         Triangle* currTri = &(m_Triangles[possibleNeighbors[i]]);
         assert(currTri);
-        if (!currTri->handled) {
+        if (!currTri->handled)
+        {
             BuildGroups(currTri, possibleNeighbors, neighborGroups, theVerts, &canSmoothTangentsChecker,
                 MinTangentsCreaseCosAngle);
         }
@@ -306,7 +313,7 @@ void MeshMender::ProcessTangents(TriangleList& possibleNeighbors, xr_vector<Vert
     for (u32 i = 0; i < neighborGroups.size(); ++i)
     {
         D3DXVECTOR3 gtang(0, 0, 0);
-        for (unsigned int t = 0; t < neighborGroups[i].size(); ++t)  // for each triangle in the group,
+        for (unsigned int t = 0; t < neighborGroups[i].size(); ++t) // for each triangle in the group,
         {
             TriID tID = neighborGroups[i][t];
             gtang += m_Triangles[tID].tangent;
@@ -323,15 +330,17 @@ void MeshMender::ProcessTangents(TriangleList& possibleNeighbors, xr_vector<Vert
         TriangleList& curGroup = neighborGroups[i];
         xr_set<size_t> thisGroupIndices;
 
-        for (size_t t = 0; t < curGroup.size(); ++t)  // for each tri
+        for (size_t t = 0; t < curGroup.size(); ++t) // for each tri
         {
             TriID tID = curGroup[t];
-            for (size_t indx = 0; indx < 3; indx++)  // for each vert in that tri
+            for (size_t indx = 0; indx < 3; indx++) // for each vert in that tri
             {
                 // if it is at the positions in question
-                if (theVerts[m_Triangles[tID].indices[indx]].pos == workingPosition) {
+                if (theVerts[m_Triangles[tID].indices[indx]].pos == workingPosition)
+                {
                     // see if another group is already using this vert
-                    if (otherGroupsIndices.find(m_Triangles[tID].indices[indx]) != otherGroupsIndices.end()) {
+                    if (otherGroupsIndices.find(m_Triangles[tID].indices[indx]) != otherGroupsIndices.end())
+                    {
                         // then we need to make a new vertex
                         Vertex ov;
                         ov = theVerts[m_Triangles[tID].indices[indx]];
@@ -364,7 +373,7 @@ void MeshMender::ProcessTangents(TriangleList& possibleNeighbors, xr_vector<Vert
 void MeshMender::ProcessBinormals(TriangleList& possibleNeighbors, xr_vector<Vertex>& theVerts,
     xr_vector<unsigned int>& mappingNewToOldVert, D3DXVECTOR3 workingPosition)
 {
-    NeighborGroupList neighborGroups;  // a fresh group for each pass
+    NeighborGroupList neighborGroups; // a fresh group for each pass
 
     // reset each triangle to prepare for smoothing group building
     for (u32 i = 0; i < possibleNeighbors.size(); ++i)
@@ -378,7 +387,8 @@ void MeshMender::ProcessBinormals(TriangleList& possibleNeighbors, xr_vector<Ver
     {
         Triangle* currTri = &(m_Triangles[possibleNeighbors[i]]);
         assert(currTri);
-        if (!currTri->handled) {
+        if (!currTri->handled)
+        {
             BuildGroups(currTri, possibleNeighbors, neighborGroups, theVerts, &canSmoothBinormalsChecker,
                 MinBinormalsCreaseCosAngle);
         }
@@ -389,7 +399,7 @@ void MeshMender::ProcessBinormals(TriangleList& possibleNeighbors, xr_vector<Ver
     for (u32 i = 0; i < neighborGroups.size(); ++i)
     {
         D3DXVECTOR3 gbinormal(0, 0, 0);
-        for (unsigned int t = 0; t < neighborGroups[i].size(); ++t)  // for each triangle in the group,
+        for (unsigned int t = 0; t < neighborGroups[i].size(); ++t) // for each triangle in the group,
         {
             TriID tID = neighborGroups[i][t];
             gbinormal += m_Triangles[tID].binormal;
@@ -406,15 +416,17 @@ void MeshMender::ProcessBinormals(TriangleList& possibleNeighbors, xr_vector<Ver
         TriangleList& curGroup = neighborGroups[i];
         xr_set<size_t> thisGroupIndices;
 
-        for (size_t t = 0; t < curGroup.size(); ++t)  // for each tri
+        for (size_t t = 0; t < curGroup.size(); ++t) // for each tri
         {
             TriID tID = curGroup[t];
-            for (size_t indx = 0; indx < 3; ++indx)  // for each vert in that tri
+            for (size_t indx = 0; indx < 3; ++indx) // for each vert in that tri
             {
                 // if it is at the positions in question
-                if (theVerts[m_Triangles[tID].indices[indx]].pos == workingPosition) {
+                if (theVerts[m_Triangles[tID].indices[indx]].pos == workingPosition)
+                {
                     // see if another group is already using this vert
-                    if (otherGroupsIndices.find(m_Triangles[tID].indices[indx]) != otherGroupsIndices.end()) {
+                    if (otherGroupsIndices.find(m_Triangles[tID].indices[indx]) != otherGroupsIndices.end())
+                    {
                         // then we need to make a new vertex
                         Vertex ov;
                         ov = theVerts[m_Triangles[tID].indices[indx]];
@@ -457,7 +469,8 @@ bool MeshMender::Mend(xr_vector<Vertex>& theVerts, xr_vector<unsigned int>& theI
     m_RespectExistingSplits = respectExistingSplits;
 
     // fix cylindrical should happen before we do any other calculations
-    if (fixCylindricalWrapping == FIX_CYLINDRICAL) {
+    if (fixCylindricalWrapping == FIX_CYLINDRICAL)
+    {
         FixCylindricalWrapping(theVerts, theIndices, mappingNewToOldVert);
     }
 
@@ -469,7 +482,8 @@ bool MeshMender::Mend(xr_vector<Vertex>& theVerts, xr_vector<unsigned int>& theI
         D3DXVECTOR3 workingPosition = vert->first;
 
         TriangleList& possibleNeighbors = vert->second;
-        if (computeNormals == CALCULATE_NORMALS) {
+        if (computeNormals == CALCULATE_NORMALS)
+        {
             ProcessNormals(possibleNeighbors, theVerts, mappingNewToOldVert, workingPosition);
         }
         ProcessTangents(possibleNeighbors, theVerts, mappingNewToOldVert, workingPosition);
@@ -482,12 +496,13 @@ bool MeshMender::Mend(xr_vector<Vertex>& theVerts, xr_vector<unsigned int>& theI
     return true;
 }
 
-void MeshMender::BuildGroups(Triangle* tri,  // the tri of interest
-    TriangleList& possibleNeighbors,         // all tris arround a vertex
-    NeighborGroupList& neighborGroups,       // the neighbor groups to be updated
+void MeshMender::BuildGroups(Triangle* tri, // the tri of interest
+    TriangleList& possibleNeighbors, // all tris arround a vertex
+    NeighborGroupList& neighborGroups, // the neighbor groups to be updated
     xr_vector<Vertex>& theVerts, CanSmoothChecker* smoothChecker, const float& minCreaseAngle)
 {
-    if ((!tri) || (tri->handled)) return;
+    if ((!tri) || (tri->handled))
+        return;
 
     Triangle* neighbor1 = NULL;
     Triangle* neighbor2 = NULL;
@@ -495,23 +510,28 @@ void MeshMender::BuildGroups(Triangle* tri,  // the tri of interest
     FindNeighbors(tri, possibleNeighbors, &neighbor1, &neighbor2, theVerts);
 
     // see if I can join my first neighbors group
-    if (neighbor1 && (neighbor1->group != NO_GROUP)) {
-        if (smoothChecker->CanSmooth(tri, neighbor1, minCreaseAngle)) {
+    if (neighbor1 && (neighbor1->group != NO_GROUP))
+    {
+        if (smoothChecker->CanSmooth(tri, neighbor1, minCreaseAngle))
+        {
             neighborGroups[neighbor1->group].push_back(tri->myID);
             tri->group = neighbor1->group;
         }
     }
 
     // see if I can join my second neighbors group
-    if (neighbor2 && (neighbor2->group != NO_GROUP)) {
-        if (smoothChecker->CanSmooth(tri, neighbor2, minCreaseAngle)) {
+    if (neighbor2 && (neighbor2->group != NO_GROUP))
+    {
+        if (smoothChecker->CanSmooth(tri, neighbor2, minCreaseAngle))
+        {
             neighborGroups[neighbor2->group].push_back(tri->myID);
             tri->group = neighbor2->group;
         }
     }
     // I either couldn't join, or they weren't in a group, so I think I'll
     // just go and start my own group...right here we go.
-    if (tri->group == NO_GROUP) {
+    if (tri->group == NO_GROUP)
+    {
         tri->group = neighborGroups.size();
         neighborGroups.push_back(TriangleList());
         neighborGroups.back().push_back(tri->myID);
@@ -535,30 +555,36 @@ void MeshMender::FindNeighbors(Triangle* tri, TriangleList& possibleNeighbors, T
     {
         TriID tID = possibleNeighbors[n];
         Triangle* possible = &(m_Triangles[tID]);
-        if (possible != tri)  // check for myself
+        if (possible != tri) // check for myself
         {
-            if (SharesEdge(tri, possible, theVerts)) {
+            if (SharesEdge(tri, possible, theVerts))
+            {
                 theNeighbors.push_back(possible);
             }
         }
     }
 
-    if (theNeighbors.size() > 0) *neighbor1 = theNeighbors[0];
-    if (theNeighbors.size() > 1) *neighbor2 = theNeighbors[1];
+    if (theNeighbors.size() > 0)
+        *neighbor1 = theNeighbors[0];
+    if (theNeighbors.size() > 1)
+        *neighbor2 = theNeighbors[1];
 }
 
 bool MeshMender::TriHasEdge(
     const size_t& p0, const size_t& p1, const size_t& triA, const size_t& triB, const size_t& triC)
 {
-    if (((p0 == triB) && (p1 == triA)) || ((p0 == triA) && (p1 == triB))) {
+    if (((p0 == triB) && (p1 == triA)) || ((p0 == triA) && (p1 == triB)))
+    {
         return true;
     }
 
-    if (((p0 == triB) && (p1 == triC)) || ((p0 == triC) && (p1 == triB))) {
+    if (((p0 == triB) && (p1 == triC)) || ((p0 == triC) && (p1 == triB)))
+    {
         return true;
     }
 
-    if (((p0 == triC) && (p1 == triA)) || ((p0 == triA) && (p1 == triC))) {
+    if (((p0 == triC) && (p1 == triA)) || ((p0 == triA) && (p1 == triC)))
+    {
         return true;
     }
     return false;
@@ -567,15 +593,18 @@ bool MeshMender::TriHasEdge(
 bool MeshMender::TriHasEdge(const D3DXVECTOR3& p0, const D3DXVECTOR3& p1, const D3DXVECTOR3& triA,
     const D3DXVECTOR3& triB, const D3DXVECTOR3& triC)
 {
-    if (((p0 == triB) && (p1 == triA)) || ((p0 == triA) && (p1 == triB))) {
+    if (((p0 == triB) && (p1 == triA)) || ((p0 == triA) && (p1 == triB)))
+    {
         return true;
     }
 
-    if (((p0 == triB) && (p1 == triC)) || ((p0 == triC) && (p1 == triB))) {
+    if (((p0 == triB) && (p1 == triC)) || ((p0 == triC) && (p1 == triB)))
+    {
         return true;
     }
 
-    if (((p0 == triC) && (p1 == triA)) || ((p0 == triA) && (p1 == triC))) {
+    if (((p0 == triC) && (p1 == triA)) || ((p0 == triA) && (p1 == triC)))
+    {
         return true;
     }
     return false;
@@ -595,13 +624,16 @@ bool MeshMender::SharesEdgeRespectSplits(Triangle* triA, Triangle* triB, xr_vect
     size_t c2 = triB->indices[2];
 
     // edge B1->A1
-    if (TriHasEdge(b1, a1, a2, b2, c2)) return true;
+    if (TriHasEdge(b1, a1, a2, b2, c2))
+        return true;
 
     // edge A1->C1
-    if (TriHasEdge(a1, c1, a2, b2, c2)) return true;
+    if (TriHasEdge(a1, c1, a2, b2, c2))
+        return true;
 
     // edge C1->B1
-    if (TriHasEdge(c1, b1, a2, b2, c2)) return true;
+    if (TriHasEdge(c1, b1, a2, b2, c2))
+        return true;
 
     return false;
 }
@@ -613,7 +645,8 @@ bool MeshMender::SharesEdge(Triangle* triA, Triangle* triB, xr_vector<Vertex>& t
     // check based on position not on indices, because there may be splits
     // we don't care about. unless the user has told us they care about those
     // splits
-    if (m_RespectExistingSplits == RESPECT_SPLITS) {
+    if (m_RespectExistingSplits == RESPECT_SPLITS)
+    {
         return SharesEdgeRespectSplits(triA, triB, theVerts);
     }
 
@@ -626,13 +659,16 @@ bool MeshMender::SharesEdge(Triangle* triA, Triangle* triB, xr_vector<Vertex>& t
     D3DXVECTOR3 c2 = theVerts[triB->indices[2]].pos;
 
     // edge B1->A1
-    if (TriHasEdge(b1, a1, a2, b2, c2)) return true;
+    if (TriHasEdge(b1, a1, a2, b2, c2))
+        return true;
 
     // edge A1->C1
-    if (TriHasEdge(a1, c1, a2, b2, c2)) return true;
+    if (TriHasEdge(a1, c1, a2, b2, c2))
+        return true;
 
     // edge C1->B1
-    if (TriHasEdge(c1, b1, a2, b2, c2)) return true;
+    if (TriHasEdge(c1, b1, a2, b2, c2))
+        return true;
 
     return false;
 }
@@ -661,7 +697,7 @@ void MeshMender::SetUpData(xr_vector<Vertex>& theVerts, const xr_vector<unsigned
         // set up bin, norm, and tan
         SetUpFaceVectors(t, theVerts, computeNormals);
 
-        t.myID = m_Triangles.size();  // set id, to my index into m_Triangles
+        t.myID = m_Triangles.size(); // set id, to my index into m_Triangles
         m_Triangles.push_back(t);
     }
 
@@ -677,7 +713,8 @@ void MeshMender::SetUpData(xr_vector<Vertex>& theVerts, const xr_vector<unsigned
         {
             D3DXVECTOR3 v = theVerts[m_Triangles[i].indices[indx]].pos;
             VertexChildrenMap::iterator iter = m_VertexChildrenMap.find(v);
-            if (iter != m_VertexChildrenMap.end()) {
+            if (iter != m_VertexChildrenMap.end())
+            {
                 // we found it, so just add ourselves to it.
                 iter->second.push_back(TriID(i));
             }
@@ -696,13 +733,15 @@ void MeshMender::SetUpData(xr_vector<Vertex>& theVerts, const xr_vector<unsigned
 // assumes the triangle indices are set to match whats in the verts
 void MeshMender::SetUpFaceVectors(Triangle& t, const xr_vector<Vertex>& verts, const NormalCalcOption computeNormals)
 {
-    if (computeNormals == CALCULATE_NORMALS) {
+    if (computeNormals == CALCULATE_NORMALS)
+    {
         D3DXVECTOR3 edge0 = verts[t.indices[1]].pos - verts[t.indices[0]].pos;
         D3DXVECTOR3 edge1 = verts[t.indices[2]].pos - verts[t.indices[0]].pos;
 
         D3DXVec3Cross(&t.normal, &edge0, &edge1);
 
-        if (WeightNormalsByArea < 1.0f) {
+        if (WeightNormalsByArea < 1.0f)
+        {
             D3DXVECTOR3 normalizedNorm;
             Vec3Normalize(&normalizedNorm, &t.normal);
             D3DXVECTOR3 finalNorm = (normalizedNorm * (1.0f - WeightNormalsByArea)) + (t.normal * WeightNormalsByArea);
@@ -721,10 +760,10 @@ void MeshMender::OrthogonalizeTangentsAndBinormals(xr_vector<Vertex>& theVerts)
     for (size_t i = 0; i < len; ++i)
     {
         assert(D3DXVec3Length(&(theVerts[i].normal)) > 0.00001f &&
-               "found zero length normal when calculating tangent basis!,\
-			if you are not using mesh mender to compute normals, you\
-			must still pass in valid normals to be used when calculating\
-			tangents and binormals.");
+            "found zero length normal when calculating tangent basis!,\
+            if you are not using mesh mender to compute normals, you\
+            must still pass in valid normals to be used when calculating\
+            tangents and binormals.");
 
         // now with T and B and N we can get from tangent space to object space
         // but we want to go the other way, so we need the inverse
@@ -751,13 +790,14 @@ void MeshMender::OrthogonalizeTangentsAndBinormals(xr_vector<Vertex>& theVerts)
         float lenTan = D3DXVec3Length(&(theVerts[i].tangent));
         float lenBin = D3DXVec3Length(&(theVerts[i].binormal));
 
-        if ((lenTan <= 0.001f) || (lenBin <= 0.001f))  // should be approx 1.0f
+        if ((lenTan <= 0.001f) || (lenBin <= 0.001f)) // should be approx 1.0f
         {
             // the tangent space is ill defined at this vertex
             // so we can generate a valid one based on the normal vector,
             // which I'm assuming is valid!
 
-            if (lenTan > 0.5f) {
+            if (lenTan > 0.5f)
+            {
                 // the tangent is valid, so we can just use that
                 // to calculate the binormal
                 D3DXVec3Cross(&(theVerts[i].binormal), &(theVerts[i].normal), &(theVerts[i].tangent));
@@ -779,7 +819,8 @@ void MeshMender::OrthogonalizeTangentsAndBinormals(xr_vector<Vertex>& theVerts)
                 // I can find out which is further away from it by checking the dot product
                 D3DXVECTOR3 startAxis;
 
-                if (D3DXVec3Dot(&xAxis, &(theVerts[i].normal)) < D3DXVec3Dot(&yAxis, &(theVerts[i].normal))) {
+                if (D3DXVec3Dot(&xAxis, &(theVerts[i].normal)) < D3DXVec3Dot(&yAxis, &(theVerts[i].normal)))
+                {
                     // the xAxis is more different than the yAxis when compared to the normal
                     startAxis = xAxis;
                 }
@@ -796,7 +837,8 @@ void MeshMender::OrthogonalizeTangentsAndBinormals(xr_vector<Vertex>& theVerts)
         else
         {
             // one final sanity check, make sure that they tangent and binormal are different enough
-            if (D3DXVec3Dot(&(theVerts[i].binormal), &(theVerts[i].tangent)) > 0.999f) {
+            if (D3DXVec3Dot(&(theVerts[i].binormal), &(theVerts[i].tangent)) > 0.999f)
+            {
                 // then they are too similar lets make them more different
                 D3DXVec3Cross(&(theVerts[i].binormal), &(theVerts[i].normal), &(theVerts[i].tangent));
             }
@@ -834,12 +876,13 @@ void MeshMender::GetGradients(const MeshMender::Vertex& v0, const MeshMender::Ve
 
     // multiplying both sides by the inverse of the s,t matrix gives
     //[Tx,Ty,Tz] = 1/(s1t2-s2t1) *  [t2,-t1] * [px,py,pz]
-    // Bx,By,Bz                      -s2,s1	    qx,qy,qz
+    // Bx,By,Bz                      -s2,s1     qx,qy,qz
 
     // solve this for the unormalized T and B to get from tangent to object space
 
     float tmp = 0.0f;
-    if (_abs(s1 * t2 - s2 * t1) <= 0.0001f) {
+    if (_abs(s1 * t2 - s2 * t1) <= 0.0001f)
+    {
         tmp = (s1 * t2 - s2 * t1) > 0.f ? 1.0f : -1.f;
     }
     else
@@ -905,20 +948,25 @@ void MeshMender::FixCylindricalWrapping(
         for (unsigned int begin = 0; begin < 3; ++begin)
         {
             unsigned int end = begin + 1;
-            if (begin == 2) end = 0;
+            if (begin == 2)
+                end = 0;
             // for each   begin -> end   edge
 
             float sBegin = theVerts[theIndices[index + begin]].s;
             float sEnd = theVerts[theIndices[index + end]].s;
 
-            if (sBegin <= 1.0f && sEnd <= 1.0f && sBegin >= 0.0f && sEnd >= 0.0f) {
+            if (sBegin <= 1.0f && sEnd <= 1.0f && sBegin >= 0.0f && sEnd >= 0.0f)
+            {
                 // we only handle coordinates between 0 and 1 for the cylindrical wrappign fix
-                if (_abs(sBegin - sEnd) > 0.5f) {
+                if (_abs(sBegin - sEnd) > 0.5f)
+                {
                     unsigned int theOneToDupe = begin;
                     // we have some wrapping going on.
-                    if (sBegin > sEnd) theOneToDupe = end;
+                    if (sBegin > sEnd)
+                        theOneToDupe = end;
 
-                    if (alreadyDuped.find(theOneToDupe) == alreadyDuped.end()) {
+                    if (alreadyDuped.find(theOneToDupe) == alreadyDuped.end())
+                    {
                         size_t oldIndex = theIndices[index + theOneToDupe];
                         Vertex theDupe = theVerts[oldIndex];
                         alreadyDuped.insert(theOneToDupe);
@@ -937,14 +985,18 @@ void MeshMender::FixCylindricalWrapping(
             float tBegin = theVerts[theIndices[index + begin]].t;
             float tEnd = theVerts[theIndices[index + end]].t;
 
-            if (tBegin <= 1.0f && tEnd <= 1.0f && tBegin >= 0.0f && tEnd >= 0.0f) {
+            if (tBegin <= 1.0f && tEnd <= 1.0f && tBegin >= 0.0f && tEnd >= 0.0f)
+            {
                 // we only handle coordinates between 0 and 1 for the cylindrical wrappign fix
-                if (_abs(tBegin - tEnd) > 0.5f) {
+                if (_abs(tBegin - tEnd) > 0.5f)
+                {
                     unsigned int theOneToDupe = begin;
                     // we have some wrapping going on.
-                    if (tBegin > tEnd) theOneToDupe = end;
+                    if (tBegin > tEnd)
+                        theOneToDupe = end;
 
-                    if (alreadyDuped.find(theOneToDupe) == alreadyDuped.end()) {
+                    if (alreadyDuped.find(theOneToDupe) == alreadyDuped.end())
+                    {
                         size_t oldIndex = theIndices[index + theOneToDupe];
                         Vertex theDupe = theVerts[oldIndex];
                         alreadyDuped.insert(theOneToDupe);
@@ -966,7 +1018,8 @@ void MeshMender::FixCylindricalWrapping(
 void MeshMender::AppendToMapping(
     const size_t oldIndex, const size_t originalNumVerts, xr_vector<unsigned int>& mappingNewToOldVert)
 {
-    if (oldIndex >= originalNumVerts) {
+    if (oldIndex >= originalNumVerts)
+    {
         // then this is a newer vertex we are mapping to another vertex we created in meshmender.
         // we need to find the original old vertex index to map to.
         // so we can just use the mapping

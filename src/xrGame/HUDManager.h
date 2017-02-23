@@ -30,7 +30,6 @@ public:
 
     //.				CUI*		GetUI				(){return pUI;}
     CUIGameCustom* GetGameUI() { return pUIGame; }
-
     void HitMarked(int idx, float power, const Fvector& dir);
     bool AddGrenade_ForMark(CGrenade* grn);
     void Update_GrenadeView(Fvector& pos_actor);
@@ -61,7 +60,4 @@ public:
     void SetRenderable(bool renderable) { psHUD_Flags.set(HUD_DRAW_RT2, renderable); }
 };
 
-IC CHUDManager& HUD()
-{
-    return *((CHUDManager*)g_hud);
-}
+IC CHUDManager& HUD() { return *((CHUDManager*)g_hud); }

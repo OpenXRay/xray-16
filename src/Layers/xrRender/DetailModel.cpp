@@ -2,17 +2,16 @@
 #pragma hdrstop
 #include "detailmodel.h"
 
-CDetail::~CDetail()
-{
-}
-
+CDetail::~CDetail() {}
 void CDetail::Unload()
 {
-    if (vertices) {
+    if (vertices)
+    {
         xr_free(vertices);
         vertices = 0;
     }
-    if (indices) {
+    if (indices)
+    {
         xr_free(indices);
         indices = 0;
     }
@@ -44,7 +43,8 @@ void CDetail::transfer(Fmatrix& mXform, fvfVertexOut* vDest, u32 C, u16* iDest, 
         LPDWORD dit = LPDWORD(iDest);
         for (; sit != send; dit++, sit++)
             *dit = *sit + item;
-        if (number_indices & 1) iDest[number_indices - 1] = u16(indices[number_indices - 1] + u16(iOffset));
+        if (number_indices & 1)
+            iDest[number_indices - 1] = u16(indices[number_indices - 1] + u16(iOffset));
     }
 }
 
@@ -73,7 +73,8 @@ void CDetail::transfer(Fmatrix& mXform, fvfVertexOut* vDest, u32 C, u16* iDest, 
         LPDWORD dit = LPDWORD(iDest);
         for (; sit != send; dit++, sit++)
             *dit = *sit + item;
-        if (number_indices & 1) iDest[number_indices - 1] = u16(indices[number_indices - 1] + u16(iOffset));
+        if (number_indices & 1)
+            iDest[number_indices - 1] = u16(indices[number_indices - 1] + u16(iOffset));
     }
 }
 
@@ -134,7 +135,8 @@ void CDetail::Optimize()
     int vt_old = xrSimulate(vec_indices, cache);
     xrStripify(vec_indices, vec_permute, cache, 0);
     int vt_new = xrSimulate(vec_indices, cache);
-    if (vt_new < vt_old) {
+    if (vt_new < vt_old)
+    {
         // Msg					("* DM: %d verts, %d indices, VT: %d/%d",number_vertices,number_indices,vt_old,vt_new);
 
         // Copy faces

@@ -59,20 +59,26 @@ void CBone::ShapeScale(const Fvector& _amount)
         //		_IT.transform_dir(amount,_amount);
         //		if (Tools->GetSettings(etfCSParent)) _IT.transform_dir(amount);
         shape.box.m_halfsize.add(amount);
-        if (shape.box.m_halfsize.x < EPS) shape.box.m_halfsize.x = EPS;
-        if (shape.box.m_halfsize.y < EPS) shape.box.m_halfsize.y = EPS;
-        if (shape.box.m_halfsize.z < EPS) shape.box.m_halfsize.z = EPS;
+        if (shape.box.m_halfsize.x < EPS)
+            shape.box.m_halfsize.x = EPS;
+        if (shape.box.m_halfsize.y < EPS)
+            shape.box.m_halfsize.y = EPS;
+        if (shape.box.m_halfsize.z < EPS)
+            shape.box.m_halfsize.z = EPS;
     }
     break;
     case SBoneShape::stSphere:
         shape.sphere.R += _amount.x;
-        if (shape.sphere.R < EPS) shape.sphere.R = EPS;
+        if (shape.sphere.R < EPS)
+            shape.sphere.R = EPS;
         break;
     case SBoneShape::stCylinder:
         shape.cylinder.m_height += _amount.z;
-        if (shape.cylinder.m_height < EPS) shape.cylinder.m_height = EPS;
+        if (shape.cylinder.m_height < EPS)
+            shape.cylinder.m_height = EPS;
         shape.cylinder.m_radius += _amount.x;
-        if (shape.cylinder.m_radius < EPS) shape.cylinder.m_radius = EPS;
+        if (shape.cylinder.m_radius < EPS)
+            shape.cylinder.m_radius = EPS;
         break;
     }
 }
@@ -82,7 +88,8 @@ void CBone::ShapeRotate(const Fvector& _amount)
     Fvector amount = _amount;
     Fmatrix _IT;
     _IT.invert(_LTransform());
-    if (Tools->GetSettings(etfCSParent)) _IT.transform_dir(amount);
+    if (Tools->GetSettings(etfCSParent))
+        _IT.transform_dir(amount);
     switch (shape.type)
     {
     case SBoneShape::stBox:
@@ -108,7 +115,8 @@ void CBone::ShapeMove(const Fvector& _amount)
     Fvector amount = _amount;
     Fmatrix _IT;
     _IT.invert(_LTransform());
-    if (Tools->GetSettings(etfCSParent)) _IT.transform_dir(amount);
+    if (Tools->GetSettings(etfCSParent))
+        _IT.transform_dir(amount);
     switch (shape.type)
     {
     case SBoneShape::stBox: shape.box.m_translate.add(amount); break;
@@ -119,16 +127,8 @@ void CBone::ShapeMove(const Fvector& _amount)
     }
 }
 
-void CBone::BindRotate(const Fvector& _amount)
-{
-    rest_rotate.add(_amount);
-}
-
-void CBone::BindMove(const Fvector& _amount)
-{
-    rest_offset.add(_amount);
-}
-
+void CBone::BindRotate(const Fvector& _amount) { rest_rotate.add(_amount); }
+void CBone::BindMove(const Fvector& _amount) { rest_offset.add(_amount); }
 bool CBone::Pick(float& dist, const Fvector& S, const Fvector& D, const Fmatrix& parent)
 {
     Fvector start, dir;
@@ -152,8 +152,10 @@ bool CBone::Pick(float& dist, const Fvector& S, const Fvector& D, const Fmatrix&
 
 void CBone::BoneRotate(const Fvector& _axis, float angle)
 {
-    if (!fis_zero(angle)) {
-        if (Tools->GetSettings(etfCSParent)) {
+    if (!fis_zero(angle))
+    {
+        if (Tools->GetSettings(etfCSParent))
+        {
             // bind pose CS
             mot_rotate.x += _axis.x * angle;
             mot_rotate.y += _axis.y * angle;

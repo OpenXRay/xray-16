@@ -69,17 +69,14 @@ void CUIVote::Init()
     CUIXmlInit::Init3tButton(xml_doc, "vote:btn_cancel", 0, btn_cancel);
 }
 
-void CUIVote::SetVoting(LPCSTR txt)
-{
-    msg->SetText(txt);
-}
-
+void CUIVote::SetVoting(LPCSTR txt) { msg->SetText(txt); }
 void CUIVote::Update()
 {
     CUIDialogWnd::Update();
 
     static string512 teaminfo;
-    if (m_prev_upd_time > Device.dwTimeContinual - 1000) return;
+    if (m_prev_upd_time > Device.dwTimeContinual - 1000)
+        return;
     m_prev_upd_time = Device.dwTimeContinual;
     game_cl_GameState::PLAYERS_MAP_IT I = Game().players.begin();
     game_cl_GameState::PLAYERS_MAP_IT E = Game().players.end();
@@ -111,7 +108,8 @@ void CUIVote::Update()
 
 void CUIVote::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 {
-    if (BUTTON_CLICKED == msg) {
+    if (BUTTON_CLICKED == msg)
+    {
         if (btn_yes == pWnd)
             OnBtnYes();
         else if (btn_no == pWnd)
@@ -133,7 +131,4 @@ void CUIVote::OnBtnNo()
     HideDialog();
 }
 
-void CUIVote::OnBtnCancel()
-{
-    HideDialog();
-}
+void CUIVote::OnBtnCancel() { HideDialog(); }

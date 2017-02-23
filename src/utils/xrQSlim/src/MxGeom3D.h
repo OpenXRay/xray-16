@@ -1,4 +1,4 @@
-#ifndef MXGEOM3D_INCLUDED  // -*- C++ -*-
+#ifndef MXGEOM3D_INCLUDED // -*- C++ -*-
 #define MXGEOM3D_INCLUDED
 #if !defined(__GNUC__)
 #pragma once
@@ -53,12 +53,10 @@ public:
             p[i] = p0[i];
     }
     MxPlane3(const MxPlane3& n) { *this = n; }
-
     inline MxPlane3& operator=(const MxPlane3& n);
 
     operator const float*() const { return p; }
     operator float*() { return p; }
-
 #ifdef __GNUC__
     float& operator[](int i) { return p[i]; }
     const float& operator[](int i) const { return p[i]; }

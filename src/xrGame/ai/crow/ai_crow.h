@@ -126,7 +126,6 @@ public:
     virtual void UpdateCL();
 
     virtual CEntity* cast_entity() { return this; }
-
     virtual void net_Export(NET_Packet& P);
     virtual void net_Import(NET_Packet& P);
 
@@ -139,7 +138,6 @@ public:
     virtual void Die(IGameObject* who);
     virtual float ffGetFov() const { return 150.f; }
     virtual float ffGetRange() const { return 30.f; }
-
     virtual BOOL IsVisibleForHUD() { return FALSE; }
     virtual bool IsVisibleForZones() { return false; }
     virtual BOOL UsedAI_Locations();

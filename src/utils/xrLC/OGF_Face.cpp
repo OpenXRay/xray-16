@@ -18,10 +18,14 @@ void set_status(char* N, int id, int f, int v)
 BOOL OGF_Vertex::similar(OGF* ogf, OGF_Vertex& V)
 {
     const float ntb = _cos(deg2rad(5.f));
-    if (!P.similar(V.P)) return FALSE;
-    if (!N.similar(V.N)) return FALSE;
-    if (!T.similar(V.T)) return FALSE;
-    if (!B.similar(V.B)) return FALSE;
+    if (!P.similar(V.P))
+        return FALSE;
+    if (!N.similar(V.N))
+        return FALSE;
+    if (!T.similar(V.T))
+        return FALSE;
+    if (!B.similar(V.B))
+        return FALSE;
 
     R_ASSERT(UV.size() == V.UV.size());
     for (u32 i = 0; i < V.UV.size(); i++)
@@ -30,7 +34,8 @@ BOOL OGF_Vertex::similar(OGF* ogf, OGF_Vertex& V)
         b_texture* B = T->pBuildSurface;
         float eu = 1.f / float(B->dwWidth);
         float ev = 1.f / float(B->dwHeight);
-        if (!UV[i].similar(V.UV[i], eu, ev)) return FALSE;
+        if (!UV[i].similar(V.UV[i], eu, ev))
+            return FALSE;
     }
     return TRUE;
 }
@@ -38,14 +43,12 @@ void OGF_Vertex::dump(u32 id)
 {
     //	Msg	("%d: ");
 }
-BOOL x_vertex::similar(OGF* ogf, x_vertex& V)
-{
-    return P.similar(V.P);
-}
+BOOL x_vertex::similar(OGF* ogf, x_vertex& V) { return P.similar(V.P); }
 u16 OGF::x_BuildVertex(x_vertex& V1)
 {
     for (itXV it = fast_path_data.vertices.begin(); it != fast_path_data.vertices.end(); it++)
-        if (it->similar(this, V1)) return u16(it - fast_path_data.vertices.begin());
+        if (it->similar(this, V1))
+            return u16(it - fast_path_data.vertices.begin());
     fast_path_data.vertices.push_back(V1);
     return (u32)fast_path_data.vertices.size() - 1;
 }
@@ -55,7 +58,8 @@ u16 OGF::_BuildVertex(OGF_Vertex& V1)
     {
         for (itOGF_V it = data.vertices.begin(); it != data.vertices.end(); it++)
         {
-            if (it->similar(this, V1)) return u16(it - data.vertices.begin());
+            if (it->similar(this, V1))
+                return u16(it - data.vertices.begin());
         }
     }
     catch (...)
@@ -68,13 +72,15 @@ u16 OGF::_BuildVertex(OGF_Vertex& V1)
 }
 void OGF::x_BuildFace(OGF_Vertex& V1, OGF_Vertex& V2, OGF_Vertex& V3, bool _tc_)
 {
-    if (_tc_) return;  // make empty-list for stuff that has relevant TCs
+    if (_tc_)
+        return; // make empty-list for stuff that has relevant TCs
     x_face F;
     u32 VertCount = (u32)fast_path_data.vertices.size();
     F.v[0] = x_BuildVertex(x_vertex(V1));
     F.v[1] = x_BuildVertex(x_vertex(V2));
     F.v[2] = x_BuildVertex(x_vertex(V3));
-    if (!F.Degenerate()) {
+    if (!F.Degenerate())
+    {
         fast_path_data.faces.push_back(F);
     }
     else
@@ -90,9 +96,11 @@ void OGF::_BuildFace(OGF_Vertex& V1, OGF_Vertex& V2, OGF_Vertex& V3, bool _tc_)
     F.v[0] = _BuildVertex(V1);
     F.v[1] = _BuildVertex(V2);
     F.v[2] = _BuildVertex(V3);
-    if (!F.Degenerate()) {
+    if (!F.Degenerate())
+    {
         for (itOGF_F I = data.faces.begin(); I != data.faces.end(); I++)
-            if (I->Equal(F)) return;
+            if (I->Equal(F))
+                return;
         data.faces.push_back(F);
         x_BuildFace(V1, V2, V3, _tc_);
     }
@@ -107,7 +115,8 @@ BOOL OGF::dbg_SphereContainsVertex(Fvector& c, float R)
     Fsphere S;
     S.set(c, R);
     for (u32 it = 0; it < data.vertices.size(); it++)
-        if (S.contains(data.vertices[it].P)) return TRUE;
+        if (S.contains(data.vertices[it].P))
+            return TRUE;
     return FALSE;
 }
 
@@ -117,10 +126,12 @@ void OGF::adjacent_select(xr_vector<u32>& dest, xr_vector<bool>& vmark, xr_vecto
     for (u32 fit = 0; fit < data.faces.size(); fit++)
     {
         OGF_Face& F = data.faces[fit];
-        if (fmark[fit]) continue;  // already registered
+        if (fmark[fit])
+            continue; // already registered
 
         // new face - if empty - just put it in, else check connectivity
-        if (dest.empty()) {
+        if (dest.empty())
+        {
             fmark[fit] = true;
             dest.push_back(F.v[0]);
             vmark[F.v[0]] = true;
@@ -135,28 +146,34 @@ void OGF::adjacent_select(xr_vector<u32>& dest, xr_vector<bool>& vmark, xr_vecto
             BOOL bConnected = FALSE;
             for (u32 vid = 0; vid < 3; vid++)
             {
-                u32 id = F.v[vid];  // search in already registered verts
+                u32 id = F.v[vid]; // search in already registered verts
                 for (u32 sid = 0; sid < dest.size(); sid++)
                 {
-                    if (id == dest[sid]) {
-                        bConnected = TRUE;  // this face shares at least one vertex with already selected faces
+                    if (id == dest[sid])
+                    {
+                        bConnected = TRUE; // this face shares at least one vertex with already selected faces
                         break;
                     }
                 }
-                if (bConnected) break;
+                if (bConnected)
+                    break;
             }
-            if (bConnected) {
+            if (bConnected)
+            {
                 // add this face's vertices
                 fmark[fit] = true;
-                if (!vmark[F.v[0]]) {
+                if (!vmark[F.v[0]])
+                {
                     dest.push_back(F.v[0]);
                     vmark[F.v[0]] = true;
                 }
-                if (!vmark[F.v[1]]) {
+                if (!vmark[F.v[1]])
+                {
                     dest.push_back(F.v[1]);
                     vmark[F.v[1]] = true;
                 }
-                if (!vmark[F.v[2]]) {
+                if (!vmark[F.v[2]])
+                {
                     dest.push_back(F.v[2]);
                     vmark[F.v[2]] = true;
                 }
@@ -172,7 +189,8 @@ void OGF::Optimize()
     // x-vertices
     try
     {
-        if (fast_path_data.vertices.size() && fast_path_data.faces.size()) {
+        if (fast_path_data.vertices.size() && fast_path_data.faces.size())
+        {
             try
             {
                 VERIFY(fast_path_data.vertices.size() <= data.vertices.size());
@@ -224,7 +242,8 @@ void OGF::Optimize()
         R_ASSERT(data.vertices.size());
         dwRelevantUV = data.vertices.front().UV.size();
         const Shader_xrLC* SH = pBuild->shaders().Get(pBuild->materials()[material].reserved);
-        if (!SH->flags.bOptimizeUV) return;
+        if (!SH->flags.bOptimizeUV)
+            return;
     }
     catch (...)
     {
@@ -258,9 +277,11 @@ void OGF::Optimize()
             u32 _old = selection.size();
             adjacent_select(selection, vmarker, fmarker);
             u32 _new = selection.size();
-            if (_old == _new) break;  // group selected !
+            if (_old == _new)
+                break; // group selected !
         }
-        if (selection.empty()) break;
+        if (selection.empty())
+            break;
 
         // 1. Calc bounds
         Fvector2 Tdelta;
@@ -301,7 +322,7 @@ void OGF::Optimize()
 Lock progressive_cs
 #ifdef CONFIG_PROFILE_LOCKS
     (MUTEX_PROFILE_ID(progressive_cs))
-#endif  // CONFIG_PROFILE_LOCKS
+#endif // CONFIG_PROFILE_LOCKS
         ;
 void OGF::MakeProgressive(float metric_limit)
 {
@@ -309,10 +330,12 @@ void OGF::MakeProgressive(float metric_limit)
     // there is no-sense to simplify small models
     // for batch size 50,100,200 - we are CPU-limited anyway even on nv30
     // for nv40 and up the better guess will probably be around 500
-    if (data.faces.size() < c_PM_FaceLimit) return;
+    if (data.faces.size() < c_PM_FaceLimit)
+        return;
 
     //. AlexMX added for draft build mode
-    if (g_params().m_quality == ebqDraft) return;
+    if (g_params().m_quality == ebqDraft)
+        return;
 
     progressive_cs.Enter();
 
@@ -343,7 +366,8 @@ void OGF::MakeProgressive(float metric_limit)
             progressive_clear();
             Logger.clMsg("* mesh simplification failed: access violation");
         }
-        if (0 == VR) {
+        if (0 == VR)
+        {
             progressive_clear();
             Logger.clMsg("* mesh simplification failed");
         }
@@ -354,7 +378,8 @@ void OGF::MakeProgressive(float metric_limit)
             u32 _remove = VR->swr_records.size();
             u32 _simple = _full - _remove;
             float _metric = float(_remove) / float(_full);
-            if (_metric < metric_limit) {
+            if (_metric < metric_limit)
+            {
                 progressive_clear();
                 Logger.clMsg("* mesh simplified from [%4dv] to [%4dv], nf[%4d] ==> em[%0.2f]-discarded", _full, _simple,
                     VR->indices.size() / 3, metric_limit);
@@ -399,7 +424,8 @@ void OGF::MakeProgressive(float metric_limit)
 
     //////////////////////////////////////////////////////////////////////////
     // FAST-PATH
-    if (progressive_test() && fast_path_data.vertices.size() && fast_path_data.faces.size()) {
+    if (progressive_test() && fast_path_data.vertices.size() && fast_path_data.faces.size())
+    {
         // prepare progressive geom
         VIPM_Init();
         Fvector2 zero;
@@ -422,7 +448,8 @@ void OGF::MakeProgressive(float metric_limit)
             progressive_clear();
             Logger.clMsg("* X-mesh simplification failed: access violation");
         }
-        if (0 == VR) {
+        if (0 == VR)
+        {
             data.faces = _saved_faces;
             data.vertices = _saved_vertices;
             progressive_clear();
@@ -481,10 +508,7 @@ void OGF::MakeProgressive(float metric_limit)
     progressive_cs.Leave();
 }
 
-void OGF_Base::Save(IWriter& fs)
-{
-}
-
+void OGF_Base::Save(IWriter& fs) {}
 // Represent a node as HierrarhyVisual
 void OGF_Node::Save(IWriter& fs)
 {

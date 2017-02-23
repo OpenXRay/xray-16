@@ -15,7 +15,8 @@
 //------------------------------------------------------------------------------
 ETextureThumbnail::ETextureThumbnail(LPCSTR src_name, bool bLoad) : EImageThumbnail(src_name, ETTexture)
 {
-    if (!strchr(src_name, '\\')) {
+    if (!strchr(src_name, '\\'))
+    {
         xr_string _name = src_name;
         ImageLib.UpdateFileName(_name);
         m_Name = _name.c_str();
@@ -26,7 +27,8 @@ ETextureThumbnail::ETextureThumbnail(LPCSTR src_name, bool bLoad) : EImageThumbn
 #ifdef XR_EPROPS_EXPORTS
         Load();
 #else
-        if (!Load()) {
+        if (!Load())
+        {
             ImageLib.CreateTextureThumbnail(this, src_name);
         }
 #endif
@@ -34,11 +36,7 @@ ETextureThumbnail::ETextureThumbnail(LPCSTR src_name, bool bLoad) : EImageThumbn
 
 //------------------------------------------------------------------------------
 
-ETextureThumbnail::~ETextureThumbnail()
-{
-    m_Pixels.clear();
-}
-
+ETextureThumbnail::~ETextureThumbnail() { m_Pixels.clear(); }
 //------------------------------------------------------------------------------
 
 int ETextureThumbnail::MemoryUsage()
@@ -57,7 +55,8 @@ int ETextureThumbnail::MemoryUsage()
     }
     string_path fn;
     FS.update_path(fn, _game_textures_, EFS.ChangeFileExt(m_Name.c_str(), ".seq").c_str());
-    if (FS.exist(fn)) {
+    if (FS.exist(fn))
+    {
         string128 buffer;
         IReader* F = FS.r_open(0, fn);
         F->r_string(buffer, sizeof(buffer));
@@ -98,13 +97,15 @@ bool ETextureThumbnail::Load(LPCSTR src_name, LPCSTR path)
         FS.update_path(fn, _game_textures_, fn);
     }
 
-    if (!FS.exist(fn)) return false;
+    if (!FS.exist(fn))
+        return false;
 
     IReader* F = FS.r_open(fn);
     u16 version = 0;
 
     R_ASSERT(F->r_chunk(THM_CHUNK_VERSION, &version));
-    if (version != THM_TEXTURE_VERSION) {
+    if (version != THM_TEXTURE_VERSION)
+    {
         Msg("!Thumbnail: Unsupported version.");
         return false;
     }
@@ -132,7 +133,8 @@ bool ETextureThumbnail::Load(LPCSTR src_name, LPCSTR path)
 
 void ETextureThumbnail::Save(int age, LPCSTR path)
 {
-    if (!Valid()) return;
+    if (!Valid())
+        return;
 
     CMemoryWriter F;
     F.open_chunk(THM_CHUNK_VERSION);
@@ -155,7 +157,8 @@ void ETextureThumbnail::Save(int age, LPCSTR path)
     else
         FS.update_path(fn, _game_textures_, m_Name.c_str());
 
-    if (F.save_to(fn)) {
+    if (F.save_to(fn))
+    {
         FS.set_file_age(fn, age ? age : m_Age);
     }
     else
@@ -223,26 +226,25 @@ BOOL ETextureThumbnail::similar(ETextureThumbnail* thm1, xr_vector<AnsiString>& 
     return res;
 }
 
-LPCSTR ETextureThumbnail::FormatString()
-{
-    return m_TexParams.FormatString();
-}
-
+LPCSTR ETextureThumbnail::FormatString() { return m_TexParams.FormatString(); }
 //------------------------------------------------------------------------------
 
 void ETextureThumbnail::Draw(HDC hdc, const Irect& R)
 {
-    if (0 == m_Pixels.size()) {
+    if (0 == m_Pixels.size())
+    {
         u32 image_w, image_h, image_a;
         xr_string fn_img = EFS.ChangeFileExt(m_Name.c_str(), ".tga");
         string_path fn;
         FS.update_path(fn, _textures_, fn_img.c_str());
 
-        if (!FS.exist(fn)) {
+        if (!FS.exist(fn))
+        {
             fn_img = EFS.ChangeFileExt(m_Name.c_str(), ".dds");
             FS.update_path(fn, _game_textures_, fn_img.c_str());
 
-            if (!FS.exist(fn)) {
+            if (!FS.exist(fn))
+            {
                 ELog.Msg(mtError, "Can't make preview for texture '%s'.", m_Name.c_str());
                 return;
             }
@@ -250,21 +252,25 @@ void ETextureThumbnail::Draw(HDC hdc, const Irect& R)
 
         U32Vec data;
         u32 w, h, a;
-        if (!Surface_Load(fn, data, image_w, image_h, image_a)) {
+        if (!Surface_Load(fn, data, image_w, image_h, image_a))
+        {
             ELog.Msg(mtError, "Can't make preview for texture '%s'.", m_Name.c_str());
             return;
         }
         ImageLib.MakeThumbnailImage(this, data.begin(), image_w, image_h, image_a);
     }
 
-    if (Valid()) {
+    if (Valid())
+    {
         Irect r;
         r.x1 = R.x1 + 1;
         r.y1 = R.y1 + 1;
         r.x2 = R.x2 - 1;
         r.y2 = R.y2 - 1;
-        if (_Width() != _Height()) FHelper.FillRect(hdc, r, 0x00000000);
-        if (_Width() > _Height()) {
+        if (_Width() != _Height())
+            FHelper.FillRect(hdc, r, 0x00000000);
+        if (_Width() > _Height())
+        {
             r.y2 -= r.height() - iFloor(r.height() * float(_Height()) / float(_Width()));
         }
         else

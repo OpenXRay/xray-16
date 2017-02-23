@@ -1,7 +1,7 @@
 #pragma once
 #include "ai/monsters/monster_velocity_space.h"
 
-#define TEMPLATE_SPECIALIZATION                                                                                        \
+#define TEMPLATE_SPECIALIZATION \
     template <typename _Object\
 >
 
@@ -24,27 +24,22 @@ void CStateMonsterAttackRunAttackAbstract::execute()
 }
 
 TEMPLATE_SPECIALIZATION
-void CStateMonsterAttackRunAttackAbstract::finalize()
-{
-    inherited::finalize();
-}
-
+void CStateMonsterAttackRunAttackAbstract::finalize() { inherited::finalize(); }
 TEMPLATE_SPECIALIZATION
-void CStateMonsterAttackRunAttackAbstract::critical_finalize()
-{
-    inherited::critical_finalize();
-}
-
+void CStateMonsterAttackRunAttackAbstract::critical_finalize() { inherited::critical_finalize(); }
 TEMPLATE_SPECIALIZATION
 bool CStateMonsterAttackRunAttackAbstract::check_start_conditions()
 {
     float dist = object->MeleeChecker.distance_to_enemy(object->EnemyMan.get_enemy());
 
-    if (dist > object->db().m_run_attack_start_dist) return false;
-    if (dist < object->MeleeChecker.get_min_distance()) return false;
+    if (dist > object->db().m_run_attack_start_dist)
+        return false;
+    if (dist < object->MeleeChecker.get_min_distance())
+        return false;
 
     // check angle
-    if (!object->control().direction().is_face_target(object->EnemyMan.get_enemy(), deg(30))) return false;
+    if (!object->control().direction().is_face_target(object->EnemyMan.get_enemy(), deg(30)))
+        return false;
 
     // try to build path
     Fvector target_position;
@@ -60,7 +55,8 @@ bool CStateMonsterAttackRunAttackAbstract::check_start_conditions()
 TEMPLATE_SPECIALIZATION
 bool CStateMonsterAttackRunAttackAbstract::check_completion()
 {
-    if (!object->control().path_builder().is_moving_on_path() || (object->m_time_last_attack_success != 0)) return true;
+    if (!object->control().path_builder().is_moving_on_path() || (object->m_time_last_attack_success != 0))
+        return true;
     return false;
 }
 

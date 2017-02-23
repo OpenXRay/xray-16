@@ -8,19 +8,16 @@ class EScenePSTool : public ESceneCustomOTool
 {
     typedef ESceneCustomOTool inherited;
 
-  protected:
+protected:
     // controls
     virtual void CreateControls();
     virtual void RemoveControls();
 
-  public:
+public:
     EScenePSTool() : ESceneCustomOTool(OBJCLASS_PS) { ; }
-
     // definition
     IC LPCSTR ClassName() { return "ps"; }
-
     IC LPCSTR ClassDesc() { return "Particle System"; }
-
     IC
 
         int
@@ -30,10 +27,8 @@ class EScenePSTool : public ESceneCustomOTool
     }
 
     virtual void Clear(bool bSpecific = false) { inherited::Clear(bSpecific); }
-
     // IO
     virtual bool IsNeedSave() { return inherited::IsNeedSave(); }
-
     virtual bool LoadStream(IReader&);
     virtual bool LoadLTX(CInifile&);
     virtual void SaveStream(IWriter&);

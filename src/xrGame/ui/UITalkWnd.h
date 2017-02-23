@@ -29,7 +29,6 @@ public:
 
     IC bool playing_sound() { return !!m_sound._feedback(); }
     IC CInventoryOwner* OthersInvOwner() const { return m_pOthersInvOwner; };
-
     void InitTalkWnd();
 
     virtual bool StopAnyMove() { return true; }
@@ -40,7 +39,7 @@ public:
 
     virtual void Show(bool status);
 
-    void Stop();  // deffered
+    void Stop(); // deffered
     void StopTalk();
 
     void UpdateQuestions();

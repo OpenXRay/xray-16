@@ -20,16 +20,12 @@ public:
     const TCHAR* InternalName()
     {
         return _T("S.T.A.L.K.E.R.Mtl");
-    }                                            // returns fixed parsable name (scripter-visible name)
-    HINSTANCE HInstance() { return hInstance; }  // returns owning module handle
+    } // returns fixed parsable name (scripter-visible name)
+    HINSTANCE HInstance() { return hInstance; } // returns owning module handle
 };
 
 static XRayMtlClassDesc stdmtl2CD;
-ClassDesc2* GetXRayMtlDesc()
-{
-    return &stdmtl2CD;
-}
-
+ClassDesc2* GetXRayMtlDesc() { return &stdmtl2CD; }
 ShaderParamDlg* XRayMtl::pShaderDlg;
 IAutoMParamDlg* XRayMtl::xrayDlg;
 IAutoMParamDlg* XRayMtl::masterDlg;
@@ -46,52 +42,17 @@ LPSTRVec XRayMtl::GameMtls;
 
 /////////////////////////////////////////////////////////////////////////
 // utility function
-IC float Min(float a, float b)
-{
-    return (a < b) ? a : b;
-}
-IC float Min(float a, float b, float c)
-{
-    return (a < b) ? Min(a, c) : Min(b, c);
-}
-IC float Min(Color& c)
-{
-    return Min(c.r, c.g, c.b);
-}
-IC float Max(float a, float b)
-{
-    return (a < b) ? b : a;
-}
-IC float Max(float a, float b, float c)
-{
-    return (a < b) ? Max(b, c) : Max(a, c);
-}
-IC float Max(Color& c)
-{
-    return Max(c.r, c.g, c.b);
-}
-
-IC float LBound(float x, float min = 0.0f)
-{
-    return x < min ? min : x;
-}
-IC Color LBound(Color& c, float min = 0.0f)
-{
-    return Color(LBound(c.r, min), LBound(c.g, min), LBound(c.b, min));
-}
-IC float UBound(float x, float max = 1.0f)
-{
-    return x > max ? max : x;
-}
-IC Color UBound(Color& c, float max = 1.0f)
-{
-    return Color(UBound(c.r, max), UBound(c.g, max), UBound(c.b, max));
-}
-
-IC float Bound(float x, float min = 0.0f, float max = 1.0f)
-{
-    return x < min ? min : (x > max ? max : x);
-}
+IC float Min(float a, float b) { return (a < b) ? a : b; }
+IC float Min(float a, float b, float c) { return (a < b) ? Min(a, c) : Min(b, c); }
+IC float Min(Color& c) { return Min(c.r, c.g, c.b); }
+IC float Max(float a, float b) { return (a < b) ? b : a; }
+IC float Max(float a, float b, float c) { return (a < b) ? Max(b, c) : Max(a, c); }
+IC float Max(Color& c) { return Max(c.r, c.g, c.b); }
+IC float LBound(float x, float min = 0.0f) { return x < min ? min : x; }
+IC Color LBound(Color& c, float min = 0.0f) { return Color(LBound(c.r, min), LBound(c.g, min), LBound(c.b, min)); }
+IC float UBound(float x, float max = 1.0f) { return x > max ? max : x; }
+IC Color UBound(Color& c, float max = 1.0f) { return Color(UBound(c.r, max), UBound(c.g, max), UBound(c.b, max)); }
+IC float Bound(float x, float min = 0.0f, float max = 1.0f) { return x < min ? min : (x > max ? max : x); }
 IC Color Bound(Color& c, float min = 0.0f, float max = 1.0f)
 {
     return Color(Bound(c.r, min, max), Bound(c.r, min, max), Bound(c.r, min, max));
@@ -157,9 +118,9 @@ static int mtlChannelType[STD2_NMAX_TEXMAPS] = {
 };
 
 static IReshading::ReshadeRequirements chooseReshade[3][3] = {
-    {IReshading::RR_None, IReshading::RR_NeedPreshade, IReshading::RR_NeedReshade},           // RR_None
-    {IReshading::RR_NeedPreshade, IReshading::RR_NeedPreshade, IReshading::RR_NeedPreshade},  // RR_NeedPreshade
-    {IReshading::RR_NeedReshade, IReshading::RR_NeedPreshade, IReshading::RR_NeedReshade},    // RR_NeedReshade
+    {IReshading::RR_None, IReshading::RR_NeedPreshade, IReshading::RR_NeedReshade}, // RR_None
+    {IReshading::RR_NeedPreshade, IReshading::RR_NeedPreshade, IReshading::RR_NeedPreshade}, // RR_NeedPreshade
+    {IReshading::RR_NeedReshade, IReshading::RR_NeedPreshade, IReshading::RR_NeedReshade}, // RR_NeedReshade
 };
 
 #define NO_UPDATE -2
@@ -171,7 +132,7 @@ static IReshading::ReshadeRequirements chooseReshade[3][3] = {
 class ShaderPBAccessor : public PBAccessor
 {
 public:
-    void Set(PB2Value& v, ReferenceMaker* owner, ParamID id, int tabIndex, TimeValue t)  // set from v
+    void Set(PB2Value& v, ReferenceMaker* owner, ParamID id, int tabIndex, TimeValue t) // set from v
     {
         XRayMtl* m = (XRayMtl*)owner;
         switch (id)
@@ -180,7 +141,8 @@ public:
         case std2_shader_type:
         {
             ClassDesc* pCD = XRayMtl::GetShaderCD(v.i);
-            if (pCD && m->GetShaderIndx() != NO_UPDATE) {
+            if (pCD && m->GetShaderIndx() != NO_UPDATE)
+            {
                 m->SwitchShader(pCD);
                 m->shaderId = v.i;
             }
@@ -191,7 +153,8 @@ public:
             for (int i = 0; i < XRayMtl::NumShaders(); i++)
             {
                 ClassDesc* pCD = XRayMtl::GetShaderCD(i);
-                if (_tcsicmp(pCD->ClassName(), v.s) == 0) {
+                if (_tcsicmp(pCD->ClassName(), v.s) == 0)
+                {
                     m->pb_shader->SetValue(std2_shader_type, 0, i);
                     break;
                 }
@@ -205,7 +168,7 @@ public:
         }
     }
 
-    void Get(PB2Value& v, ReferenceMaker* owner, ParamID id, int tabIndex, TimeValue t, Interval& valid)  // get into v
+    void Get(PB2Value& v, ReferenceMaker* owner, ParamID id, int tabIndex, TimeValue t, Interval& valid) // get into v
     {
         XRayMtl* m = (XRayMtl*)owner;
         switch (id)
@@ -213,7 +176,8 @@ public:
         case std2_shader_by_name:
         {
             ClassDesc* pCD = XRayMtl::GetShaderCD(m->shaderId);
-            if (pCD) v.s = (TCHAR*)pCD->ClassName();
+            if (pCD)
+                v.s = (TCHAR*)pCD->ClassName();
         }
         break;
         }
@@ -268,7 +232,7 @@ static ParamBlockDesc2 std2_shader_blk(std2_shader, _T("newShaderParameters"), 0
 class ExtendedPBAccessor : public PBAccessor
 {
 public:
-    void Set(PB2Value& v, ReferenceMaker* owner, ParamID id, int tabIndex, TimeValue t)  // set from v
+    void Set(PB2Value& v, ReferenceMaker* owner, ParamID id, int tabIndex, TimeValue t) // set from v
     {
         XRayMtl* m = (XRayMtl*)owner;
         IParamMap2* map = m->pb_extended ? m->pb_extended->GetMap() : NULL;
@@ -278,7 +242,8 @@ public:
         case std2_opacity_type:
             m->SetFlag(NEWSTDMTL_ADD_TRANSP, v.i == 2);
             m->SetFlag(NEWSTDMTL_FILT_TRANSP, v.i == 0);
-            if (map != NULL) {
+            if (map != NULL)
+            {
                 map->Show(std2_filter_color, v.i == 0);
                 map->Show(std2_ep_filter_map, v.i == 0);
                 m->UpdateTexmaps();
@@ -287,7 +252,8 @@ public:
             break;
         case std2_opacity:
             m->opacity = v.f;
-            if (m->pShader->GetParamDlg()) m->pShader->GetParamDlg()->UpdateOpacity();
+            if (m->pShader->GetParamDlg())
+                m->pShader->GetParamDlg()->UpdateOpacity();
             break;
         case std2_filter_color: m->filter = *v.p; break;
         case std2_falloff_type: m->SetFlag(NEWSTDMTL_FALLOFF_OUT, v.i == 1); break;
@@ -337,7 +303,7 @@ static ParamBlockDesc2 std2_extended_blk(std2_extended, _T("extendedParameters")
     std2_opacity_type, _T("opacityType"), TYPE_INT, 0, IDS_JW_OPACITYTYPE, p_default, 0, p_range, 0, 2, p_ui,
     TYPE_RADIO, 3, IDC_TR_SUB2, IDC_TR_SUB, IDC_TR_ADD, p_accessor, &extendedPBAccessor, end, std2_opacity,
     _T("opacity"), TYPE_PCNT_FRAC, P_ANIMATABLE, IDS_DS_OPACITY, p_default, 0.0, p_range, 0.0,
-    100.0,  // UI us in the shader rollout
+    100.0, // UI us in the shader rollout
     p_accessor, &extendedPBAccessor, end, std2_filter_color, _T("filterColor"), TYPE_RGBA, P_ANIMATABLE, IDS_DS_FILTER,
     p_default, Color(0, 0, 0), p_ui, TYPE_COLORSWATCH, IDC_FILTER_CS, p_accessor, &extendedPBAccessor, end,
     std2_ep_filter_map, _T("filterMap"), TYPE_TEXMAP, P_SUBTEX + P_NO_AUTO_LABELS, IDS_JW_FILTERMAP, p_subtexno, ID_FI,
@@ -364,7 +330,7 @@ static ParamBlockDesc2 std2_extended_blk(std2_extended, _T("extendedParameters")
 class SamplingPBAccessor : public PBAccessor
 {
 public:
-    void Set(PB2Value& v, ReferenceMaker* owner, ParamID id, int tabIndex, TimeValue t)  // set from v
+    void Set(PB2Value& v, ReferenceMaker* owner, ParamID id, int tabIndex, TimeValue t) // set from v
     {
         XRayMtl* m = (XRayMtl*)owner;
         macroRecorder->Disable();
@@ -373,7 +339,8 @@ public:
         case std2_ssampler:
         {
             ClassDesc* pCD = XRayMtl::GetSamplerCD(v.i);
-            if (pCD && m->GetSamplerIndx() != NO_UPDATE) {
+            if (pCD && m->GetSamplerIndx() != NO_UPDATE)
+            {
                 m->SwitchSampler(pCD);
                 //					m->samplerId = v.i;
             }
@@ -384,7 +351,8 @@ public:
             for (int i = 0; i < XRayMtl::NumSamplers(); i++)
             {
                 ClassDesc* pCD = XRayMtl::GetSamplerCD(i);
-                if (_tcsicmp(pCD->ClassName(), v.s) == 0) {
+                if (_tcsicmp(pCD->ClassName(), v.s) == 0)
+                {
                     m->pb_sampling->SetValue(std2_ssampler, 0, i);
                     break;
                 }
@@ -402,7 +370,8 @@ public:
         {
             m->GetPixelSampler()->SetAdaptiveOn(v.i);
             IParamMap2* map = m->pb_sampling ? m->pb_sampling->GetMap() : NULL;
-            if (map) {
+            if (map)
+            {
                 map->Enable(std2_ssampler_adapt_threshold, v.i);
             }
         }
@@ -420,7 +389,7 @@ public:
         }
         macroRecorder->Enable();
     }
-    void Get(PB2Value& v, ReferenceMaker* owner, ParamID id, int tabIndex, TimeValue t, Interval& valid)  // get into v
+    void Get(PB2Value& v, ReferenceMaker* owner, ParamID id, int tabIndex, TimeValue t, Interval& valid) // get into v
     {
         XRayMtl* m = (XRayMtl*)owner;
         switch (id)
@@ -428,7 +397,8 @@ public:
         case std2_ssampler_by_name:
         {
             ClassDesc* pCD = XRayMtl::GetSamplerCD(m->samplerId);
-            if (pCD) v.s = (TCHAR*)pCD->ClassName();
+            if (pCD)
+                v.s = (TCHAR*)pCD->ClassName();
         }
         break;
         }
@@ -502,7 +472,7 @@ static ParamBlockDesc2 std2_sampling_blk(std2_sampling, _T("samplingParameters")
 class XRayPBAccessor : public PBAccessor
 {
 public:
-    void Set(PB2Value& v, ReferenceMaker* owner, ParamID id, int tabIndex, TimeValue t)  // set from v
+    void Set(PB2Value& v, ReferenceMaker* owner, ParamID id, int tabIndex, TimeValue t) // set from v
     {
         XRayMtl* m = (XRayMtl*)owner;
         switch (id)
@@ -513,25 +483,28 @@ public:
         case std2_eshader_by_name:
         {
             int idx = m->FindEShader(v.s);
-            if (idx >= 0) m->pb_xray->SetValue(std2_eshader_type, 0, idx);
+            if (idx >= 0)
+                m->pb_xray->SetValue(std2_eshader_type, 0, idx);
         }
         break;
         case std2_cshader_by_name:
         {
             int idx = m->FindCShader(v.s);
-            if (idx >= 0) m->pb_xray->SetValue(std2_cshader_type, 0, idx);
+            if (idx >= 0)
+                m->pb_xray->SetValue(std2_cshader_type, 0, idx);
         }
         break;
         case std2_gamemtl_by_name:
         {
             int idx = m->FindGameMtl(v.s);
-            if (idx >= 0) m->pb_xray->SetValue(std2_gamemtl_type, 0, idx);
+            if (idx >= 0)
+                m->pb_xray->SetValue(std2_gamemtl_type, 0, idx);
         }
         break;
         }
     }
 
-    void Get(PB2Value& v, ReferenceMaker* owner, ParamID id, int tabIndex, TimeValue t, Interval& valid)  // get into v
+    void Get(PB2Value& v, ReferenceMaker* owner, ParamID id, int tabIndex, TimeValue t, Interval& valid) // get into v
     {
         XRayMtl* m = (XRayMtl*)owner;
         switch (id)
@@ -625,7 +598,8 @@ public:
     ResourceDelete() {}
     ~ResourceDelete()
     {
-        if (hLockButtons) ImageList_Destroy(hLockButtons);
+        if (hLockButtons)
+            ImageList_Destroy(hLockButtons);
     }
 };
 
@@ -644,7 +618,8 @@ static void SetupPadLockButton(HWND hWnd, int id, BOOL check)
 static void LoadXRayMtlResources()
 {
     static BOOL loaded = FALSE;
-    if (loaded) return;
+    if (loaded)
+        return;
     loaded = TRUE;
     HBITMAP hBitmap, hMask;
     hLockButtons = ImageList_Create(16, 15, TRUE, 2, 0);
@@ -700,7 +675,8 @@ static BOOL IsMultipleInstanced(XRayMtl* m, Texmap* t)
     int cnt = 0;
     for (int i = 0; i < STD2_NMAX_TEXMAPS; i++)
     {
-        if (m->maps->txmap[i].map == t) cnt++;
+        if (m->maps->txmap[i].map == t)
+            cnt++;
     }
     return (cnt > 1) ? TRUE : FALSE;
 }
@@ -718,7 +694,7 @@ public:
     // I hope to be able to host the texmap stuff entirely in the paramblock when I get assignable subanim
     // numbers supported in PB2's (so that the map, map enable and map amount Tab<>s are number in interleaved row
     // order)
-    void Set(PB2Value& v, ReferenceMaker* owner, ParamID id, int tabIndex, TimeValue t)  // set from v
+    void Set(PB2Value& v, ReferenceMaker* owner, ParamID id, int tabIndex, TimeValue t) // set from v
     {
         XRayMtl* m = (XRayMtl*)owner;
         switch (id)
@@ -733,27 +709,33 @@ public:
         {
             Texmap* tex = (Texmap*)v.r;
             m->maps->ReplaceReference(2 * tabIndex + 1, tex);
-            if (tex != NULL) {
+            if (tex != NULL)
+            {
                 macroRecorder->Disable();
                 m->EnableMap(tabIndex, TRUE);
                 macroRecorder->Enable();
-                if (m->maps->txmap[tabIndex].amtCtrl == NULL) {
+                if (m->maps->txmap[tabIndex].amtCtrl == NULL)
+                {
                     m->maps->ReplaceReference(2 * tabIndex, NewDefaultFloatController());
                     m->maps->txmap[tabIndex].amtCtrl->SetValue(TimeValue(0), &m->maps->txmap[tabIndex].amount);
                 }
             }
             else
             {
-                if (m->maps->txmap[tabIndex].amtCtrl != NULL) m->maps->DeleteReference(2 * tabIndex);
+                if (m->maps->txmap[tabIndex].amtCtrl != NULL)
+                    m->maps->DeleteReference(2 * tabIndex);
                 macroRecorder->Disable();
                 m->SetTexmapAmt(tabIndex, ((tabIndex == m->stdIDToChannel[ID_BU]) ? BUMP_DEF_AMT : 1.0f), TimeValue(0));
                 m->EnableMap(tabIndex, FALSE);
                 macroRecorder->Enable();
             }
-            if (tex && (tabIndex == m->stdIDToChannel[ID_RL] || tabIndex == m->stdIDToChannel[ID_RR])) {
-                if (!IsMultipleInstanced(m, tex)) {  // DS 4/26/99: keep settings for instanced map
+            if (tex && (tabIndex == m->stdIDToChannel[ID_RL] || tabIndex == m->stdIDToChannel[ID_RR]))
+            {
+                if (!IsMultipleInstanced(m, tex))
+                { // DS 4/26/99: keep settings for instanced map
                     UVGen* uvg0 = tex->GetTheUVGen();
-                    if (uvg0 && uvg0->IsStdUVGen()) {
+                    if (uvg0 && uvg0->IsStdUVGen())
+                    {
                         StdUVGen* uvg = (StdUVGen*)uvg0;
                         uvg->InitSlotType(MAPSLOT_ENVIRON);
                         uvg->SetCoordMapping(UVMAP_SPHERE_ENV);
@@ -771,9 +753,11 @@ public:
             // Kill the refmessage from the map, since it will
             // be fixed later by the ref message for std2_map_amnts.
             KillRefmsg kill(m->killRefmsg);
-            if (m->maps->txmap[tabIndex].amtCtrl) m->maps->txmap[tabIndex].amtCtrl->SetValue(t, &v.f);
+            if (m->maps->txmap[tabIndex].amtCtrl)
+                m->maps->txmap[tabIndex].amtCtrl->SetValue(t, &v.f);
             m->maps->txmap[tabIndex].amount = v.f;
-            if (tabIndex == m->stdIDToChannel[ID_BU]) m->mInRQ = chooseReshade[m->mInRQ][IReshading::RR_NeedPreshade];
+            if (tabIndex == m->stdIDToChannel[ID_BU])
+                m->mInRQ = chooseReshade[m->mInRQ][IReshading::RR_NeedPreshade];
         }
         break;
 
@@ -786,7 +770,7 @@ public:
         }
     }
 
-    void Get(PB2Value& v, ReferenceMaker* owner, ParamID id, int tabIndex, TimeValue t, Interval& valid)  // set from v
+    void Get(PB2Value& v, ReferenceMaker* owner, ParamID id, int tabIndex, TimeValue t, Interval& valid) // set from v
     {
         XRayMtl* m = (XRayMtl*)owner;
         switch (id)
@@ -828,7 +812,8 @@ static ParamBlockDesc2 std_maps_blk(std_maps, _T("maps"), 0, &stdmtl2CD, P_AUTO_
     IDC_MAP_3, IDC_MAP_4, IDC_MAP_5, IDC_MAP_6, IDC_MAP_7, IDC_MAP_8, IDC_MAP_9, IDC_MAP_10, IDC_MAP_11, IDC_MAP_12,
     IDC_MAP_13, IDC_MAP_14, IDC_MAP_15, IDC_MAP_16, IDC_MAP_17, IDC_MAP_18, IDC_MAP_19, IDC_MAP_20, IDC_MAP_21,
     IDC_MAP_22, IDC_MAP_23, p_accessor, &mapsPBAccessor, end, std2_map_amnts, _T("mapAmounts"), TYPE_PCNT_FRAC_TAB,
-    STD2_NMAX_TEXMAPS, 0, IDS_JW_MAPAMOUNTS, p_default, 1.0,  // default is given in internal units   JBW 10.8.99
+    STD2_NMAX_TEXMAPS, 0, IDS_JW_MAPAMOUNTS, p_default,
+    1.0, // default is given in internal units   JBW 10.8.99
     p_range, 0.0, 100.0, p_ui, TYPE_SPINNER, EDITTYPE_INT, IDC_AMTEDIT_0, IDC_AMTSPIN_0, IDC_AMTEDIT_1, IDC_AMTSPIN_1,
     IDC_AMTEDIT_2, IDC_AMTSPIN_2, IDC_AMTEDIT_3, IDC_AMTSPIN_3, IDC_AMTEDIT_4, IDC_AMTSPIN_4, IDC_AMTEDIT_5,
     IDC_AMTSPIN_5, IDC_AMTEDIT_6, IDC_AMTSPIN_6, IDC_AMTEDIT_7, IDC_AMTSPIN_7, IDC_AMTEDIT_8, IDC_AMTSPIN_8,
@@ -902,88 +887,88 @@ static ParamBlockDesc2 std2_dynamics_blk(std2_dynamics, _T("dynamicsParameters")
 // into two new blocks
 
 static ParamBlockDescID extVer10[] = {
-    {TYPE_FLOAT, NULL, TRUE, std2_opacity},       // opacity
-    {TYPE_FLOAT, NULL, TRUE, std2_falloff_amnt},  // opfalloff
-    {TYPE_RGBA, NULL, TRUE, std2_filter_color},   // filter
-    {TYPE_FLOAT, NULL, TRUE, std2_wire_size},     // wireSize
-    {TYPE_FLOAT, NULL, TRUE, std2_ior},           // index of refraction
-    {TYPE_FLOAT, NULL, TRUE, -1},                 // bounce
-    {TYPE_FLOAT, NULL, TRUE, -1},                 // static friction
-    {TYPE_FLOAT, NULL, TRUE, -1},                 // sliding friction
-    {TYPE_FLOAT, NULL, TRUE, std2_dim_lvl},       // reflect dim level
-    {TYPE_FLOAT, NULL, TRUE, std2_refl_lvl},      // reflect dim multiplier
+    {TYPE_FLOAT, NULL, TRUE, std2_opacity}, // opacity
+    {TYPE_FLOAT, NULL, TRUE, std2_falloff_amnt}, // opfalloff
+    {TYPE_RGBA, NULL, TRUE, std2_filter_color}, // filter
+    {TYPE_FLOAT, NULL, TRUE, std2_wire_size}, // wireSize
+    {TYPE_FLOAT, NULL, TRUE, std2_ior}, // index of refraction
+    {TYPE_FLOAT, NULL, TRUE, -1}, // bounce
+    {TYPE_FLOAT, NULL, TRUE, -1}, // static friction
+    {TYPE_FLOAT, NULL, TRUE, -1}, // sliding friction
+    {TYPE_FLOAT, NULL, TRUE, std2_dim_lvl}, // reflect dim level
+    {TYPE_FLOAT, NULL, TRUE, std2_refl_lvl}, // reflect dim multiplier
 };
 
 static ParamBlockDescID dynVer10[] = {
-    {TYPE_FLOAT, NULL, TRUE, -1},                     // opacity
-    {TYPE_FLOAT, NULL, TRUE, -1},                     // opfalloff
-    {TYPE_RGBA, NULL, TRUE, -1},                      // filter
-    {TYPE_FLOAT, NULL, TRUE, -1},                     // wireSize
-    {TYPE_FLOAT, NULL, TRUE, -1},                     // index of refraction
-    {TYPE_FLOAT, NULL, TRUE, std2_bounce},            // bounce
-    {TYPE_FLOAT, NULL, TRUE, std2_static_friction},   // static friction
-    {TYPE_FLOAT, NULL, TRUE, std2_sliding_friction},  // sliding friction
-    {TYPE_FLOAT, NULL, TRUE, -1},                     // reflect dim level
-    {TYPE_FLOAT, NULL, TRUE, -1},                     // reflect dim multiplier
+    {TYPE_FLOAT, NULL, TRUE, -1}, // opacity
+    {TYPE_FLOAT, NULL, TRUE, -1}, // opfalloff
+    {TYPE_RGBA, NULL, TRUE, -1}, // filter
+    {TYPE_FLOAT, NULL, TRUE, -1}, // wireSize
+    {TYPE_FLOAT, NULL, TRUE, -1}, // index of refraction
+    {TYPE_FLOAT, NULL, TRUE, std2_bounce}, // bounce
+    {TYPE_FLOAT, NULL, TRUE, std2_static_friction}, // static friction
+    {TYPE_FLOAT, NULL, TRUE, std2_sliding_friction}, // sliding friction
+    {TYPE_FLOAT, NULL, TRUE, -1}, // reflect dim level
+    {TYPE_FLOAT, NULL, TRUE, -1}, // reflect dim multiplier
 };
 
 // v10 Param Block Descriptor
 static ParamBlockDescID stdmtl2PB[NPARAMS] = {
-    {TYPE_FLOAT, NULL, TRUE, 7},   // opacity
-    {TYPE_FLOAT, NULL, TRUE, 8},   // opfalloff
-    {TYPE_RGBA, NULL, TRUE, 9},    // filter
-    {TYPE_FLOAT, NULL, TRUE, 10},  // wireSize
-    {TYPE_FLOAT, NULL, TRUE, 11},  // index of refraction
-    {TYPE_FLOAT, NULL, TRUE, 12},  // bounce
-    {TYPE_FLOAT, NULL, TRUE, 13},  // static friction
-    {TYPE_FLOAT, NULL, TRUE, 14},  // sliding friction
-    {TYPE_FLOAT, NULL, TRUE, 15},  // reflect dim level
-    {TYPE_FLOAT, NULL, TRUE, 16},  // reflect dim multiplier
+    {TYPE_FLOAT, NULL, TRUE, 7}, // opacity
+    {TYPE_FLOAT, NULL, TRUE, 8}, // opfalloff
+    {TYPE_RGBA, NULL, TRUE, 9}, // filter
+    {TYPE_FLOAT, NULL, TRUE, 10}, // wireSize
+    {TYPE_FLOAT, NULL, TRUE, 11}, // index of refraction
+    {TYPE_FLOAT, NULL, TRUE, 12}, // bounce
+    {TYPE_FLOAT, NULL, TRUE, 13}, // static friction
+    {TYPE_FLOAT, NULL, TRUE, 14}, // sliding friction
+    {TYPE_FLOAT, NULL, TRUE, 15}, // reflect dim level
+    {TYPE_FLOAT, NULL, TRUE, 16}, // reflect dim multiplier
 };
 
 #define NPARAMS_O 17
 
 // Old (2.5 and before) Param Block Descriptor
 static ParamBlockDescID stdmtlPB[NPARAMS_O] = {
-    {TYPE_RGBA, NULL, TRUE, 1},    // ambient
-    {TYPE_RGBA, NULL, TRUE, 2},    // diffuse
-    {TYPE_RGBA, NULL, TRUE, 3},    // specular
-    {TYPE_FLOAT, NULL, TRUE, 4},   // shininess
-    {TYPE_FLOAT, NULL, TRUE, 5},   // shini_strength
-    {TYPE_FLOAT, NULL, TRUE, 6},   // self-illum
-    {TYPE_FLOAT, NULL, TRUE, 7},   // opacity
-    {TYPE_FLOAT, NULL, TRUE, 8},   // opfalloff
-    {TYPE_RGBA, NULL, TRUE, 9},    // filter
-    {TYPE_FLOAT, NULL, TRUE, 10},  // wireSize
-    {TYPE_FLOAT, NULL, TRUE, 11},  // index of refraction
-    {TYPE_FLOAT, NULL, TRUE, 12},  // bounce
-    {TYPE_FLOAT, NULL, TRUE, 13},  // static friction
-    {TYPE_FLOAT, NULL, TRUE, 14},  // sliding friction
-    {TYPE_FLOAT, NULL, TRUE, 15},  // reflect dim level
-    {TYPE_FLOAT, NULL, TRUE, 16},  // reflect dim multiplier
-    {TYPE_FLOAT, NULL, TRUE, 17}   // soften
+    {TYPE_RGBA, NULL, TRUE, 1}, // ambient
+    {TYPE_RGBA, NULL, TRUE, 2}, // diffuse
+    {TYPE_RGBA, NULL, TRUE, 3}, // specular
+    {TYPE_FLOAT, NULL, TRUE, 4}, // shininess
+    {TYPE_FLOAT, NULL, TRUE, 5}, // shini_strength
+    {TYPE_FLOAT, NULL, TRUE, 6}, // self-illum
+    {TYPE_FLOAT, NULL, TRUE, 7}, // opacity
+    {TYPE_FLOAT, NULL, TRUE, 8}, // opfalloff
+    {TYPE_RGBA, NULL, TRUE, 9}, // filter
+    {TYPE_FLOAT, NULL, TRUE, 10}, // wireSize
+    {TYPE_FLOAT, NULL, TRUE, 11}, // index of refraction
+    {TYPE_FLOAT, NULL, TRUE, 12}, // bounce
+    {TYPE_FLOAT, NULL, TRUE, 13}, // static friction
+    {TYPE_FLOAT, NULL, TRUE, 14}, // sliding friction
+    {TYPE_FLOAT, NULL, TRUE, 15}, // reflect dim level
+    {TYPE_FLOAT, NULL, TRUE, 16}, // reflect dim multiplier
+    {TYPE_FLOAT, NULL, TRUE, 17} // soften
 };
 
 // Descriptor for mapping old (2.5 and before) shader parameters into new stdShader PB2's
 // Shader::ConvertParamBlock() uses this to extract old mtl shader params into new Shader
 static ParamBlockDescID stdmtlPB2[NPARAMS_O] = {
-    {TYPE_RGBA, NULL, TRUE, shdr_ambient},           // ambient
-    {TYPE_RGBA, NULL, TRUE, shdr_diffuse},           // diffuse
-    {TYPE_RGBA, NULL, TRUE, shdr_specular},          // specular
-    {TYPE_FLOAT, NULL, TRUE, shdr_glossiness},       // shininess
-    {TYPE_FLOAT, NULL, TRUE, shdr_spec_lvl},         // shini_strength
-    {TYPE_FLOAT, NULL, TRUE, shdr_self_illum_amnt},  // self-illum
-    {TYPE_FLOAT, NULL, TRUE, -1},                    // opacity
-    {TYPE_FLOAT, NULL, TRUE, -1},                    // opfalloff
-    {TYPE_RGBA, NULL, TRUE, -1},                     // filter
-    {TYPE_FLOAT, NULL, TRUE, -1},                    // wireSize
-    {TYPE_FLOAT, NULL, TRUE, -1},                    // index of refraction
-    {TYPE_FLOAT, NULL, TRUE, -1},                    // bounce
-    {TYPE_FLOAT, NULL, TRUE, -1},                    // static friction
-    {TYPE_FLOAT, NULL, TRUE, -1},                    // sliding friction
-    {TYPE_FLOAT, NULL, TRUE, -1},                    // reflect dim level
-    {TYPE_FLOAT, NULL, TRUE, -1},                    // reflect dim multiplier
-    {TYPE_FLOAT, NULL, TRUE, shdr_soften}            // soften
+    {TYPE_RGBA, NULL, TRUE, shdr_ambient}, // ambient
+    {TYPE_RGBA, NULL, TRUE, shdr_diffuse}, // diffuse
+    {TYPE_RGBA, NULL, TRUE, shdr_specular}, // specular
+    {TYPE_FLOAT, NULL, TRUE, shdr_glossiness}, // shininess
+    {TYPE_FLOAT, NULL, TRUE, shdr_spec_lvl}, // shini_strength
+    {TYPE_FLOAT, NULL, TRUE, shdr_self_illum_amnt}, // self-illum
+    {TYPE_FLOAT, NULL, TRUE, -1}, // opacity
+    {TYPE_FLOAT, NULL, TRUE, -1}, // opfalloff
+    {TYPE_RGBA, NULL, TRUE, -1}, // filter
+    {TYPE_FLOAT, NULL, TRUE, -1}, // wireSize
+    {TYPE_FLOAT, NULL, TRUE, -1}, // index of refraction
+    {TYPE_FLOAT, NULL, TRUE, -1}, // bounce
+    {TYPE_FLOAT, NULL, TRUE, -1}, // static friction
+    {TYPE_FLOAT, NULL, TRUE, -1}, // sliding friction
+    {TYPE_FLOAT, NULL, TRUE, -1}, // reflect dim level
+    {TYPE_FLOAT, NULL, TRUE, -1}, // reflect dim multiplier
+    {TYPE_FLOAT, NULL, TRUE, shdr_soften} // soften
 };
 #define NUMOLDVER 1
 static ParamVersionDesc oldXRayMtlVersions[NUMOLDVER] = {
@@ -1002,7 +987,7 @@ static ParamVersionDesc stdMtlVersion(stdmtlPB, NPARAMS_O, NEWSTDMTL_PBVERSION);
 
 #define IDT_MYTIMER 1010
 #define DRAGTHRESH 6
-#define DITHER_WHEN_INACTIVE  // avoids palette conflict probs
+#define DITHER_WHEN_INACTIVE // avoids palette conflict probs
 
 //-----------------------------------------------------------------------------
 //  XRayMtl
@@ -1020,7 +1005,8 @@ int XRayMtl::n_strings()
 */
 void* XRayMtl::GetInterface(ULONG id)
 {
-    if (id == IID_IReshading) return (IReshading*)(this);
+    if (id == IID_IReshading)
+        return (IReshading*)(this);
     //	else if ( id == IID_IValidityToken )
     //		return (IValidityToken*)( this );
     else
@@ -1034,14 +1020,14 @@ void XRayMtl::Reset()
 
     SetShaderIndx(FindShader(Class_ID(DEFAULT_SHADER_CLASS_ID, 0)));
     // back in 4.28, as it broke reset....fixed in shader.reset so only allocs pb if not there
-    pShader->Reset();  // mjm - 4.22.99 - fix mem leak (pblock already created through SetShaderIndx() above.
+    pShader->Reset(); // mjm - 4.22.99 - fix mem leak (pblock already created through SetShaderIndx() above.
 
     SetSamplerIndx(FindSampler(Class_ID(DEFAULT_SAMPLER_CLASS_ID, 0)));
 
     // HEY!! this should all be done automatically in ParamBlock init...
-    macroRecorder->Disable();  // don't want to see this parameter reset in macrorecorder
+    macroRecorder->Disable(); // don't want to see this parameter reset in macrorecorder
     // ensure all map-related parameters are set up
-    UpdateMapButtons();  // calls updatetexmaps
+    UpdateMapButtons(); // calls updatetexmaps
     UpdateExtendedMapButtons();
 
     pb_shader->SetValue(std2_wire, 0, FALSE);
@@ -1082,7 +1068,7 @@ void XRayMtl::Reset()
     macroRecorder->Enable();
 }
 
-XRayMtl::XRayMtl(BOOL loading) : mReshadeRQ(RR_None), mInRQ(RR_None)  // mjm - 06.02.00
+XRayMtl::XRayMtl(BOOL loading) : mReshadeRQ(RR_None), mInRQ(RR_None) // mjm - 06.02.00
 {
     texHandle[0] = texHandle[1] = NULL;
     texHandleValid.SetEmpty();
@@ -1135,7 +1121,8 @@ XRayMtl::XRayMtl(BOOL loading) : mReshadeRQ(RR_None), mInRQ(RR_None)  // mjm - 0
             }
         }
     */
-    if (!loading) {
+    if (!loading)
+    {
         // ask the ClassDesc to make the P_AUTO_CONSTRUCT paramblocks
         stdmtl2CD.MakeAutoParamBlocks(this);
         Reset();
@@ -1147,7 +1134,7 @@ RefTargetHandle XRayMtl::Clone(RemapDir& remap)
     // DebugPrint(" Cloning NEWSTDMTL %d \n", ++numNewStdMtls);
     macroRecorder->Disable();
     XRayMtl* mnew = new XRayMtl(TRUE);
-    *((MtlBase*)mnew) = *((MtlBase*)this);  // copy superclass stuff
+    *((MtlBase*)mnew) = *((MtlBase*)this); // copy superclass stuff
     mnew->ReplaceReference(TEXMAPS_REF, remap.CloneRef(maps));
     mnew->ReplaceReference(SHADER_REF, remap.CloneRef(pShader));
     mnew->ReplaceReference(XRAY_PB_REF, remap.CloneRef(pb_xray));
@@ -1220,7 +1207,7 @@ ParamDlg* XRayMtl::CreateParamDlg(HWND hwMtlEdit, IMtlParams* imp)
     texmapDlg = stdmtl2CD.CreateParamDlg(std_maps, hwMtlEdit, imp, this);
     xrayDlg = stdmtl2CD.CreateParamDlg(std2_xray, hwMtlEdit, imp, this);
     UpdateTexmaps();
-    if (pb_dynamics)  // not in the VIZ version
+    if (pb_dynamics) // not in the VIZ version
         stdmtl2CD.CreateParamDlg(std2_dynamics, hwMtlEdit, imp, this);
     // restore any saved rollout state
     stdmtl2CD.RestoreRolloutState();
@@ -1236,7 +1223,8 @@ BOOL XRayMtl::SetDlgThing(ParamDlg* dlg)
     KillRefmsg kill(killRefmsg);
 
     // set the appropriate 'thing' sub-object for each secondary dialog
-    if (dlg == pShaderDlg) {
+    if (dlg == pShaderDlg)
+    {
         // handle material switching in the shader dialog, incoming material is 'this'
         assert(SuperClassID() == MATERIAL_CLASS_ID);
         assert(ClassID() == XRAYMTL_CLASS_ID);
@@ -1244,7 +1232,8 @@ BOOL XRayMtl::SetDlgThing(ParamDlg* dlg)
         ULONG oldParams, newParams;
         Class_ID newClassId, oldClassId;
 
-        if (oldMtl) {
+        if (oldMtl)
+        {
             Shader* oldShader = oldMtl->GetShader();
             oldParams = oldShader->SupportStdParams();
             oldClassId = oldShader->ClassID();
@@ -1256,7 +1245,8 @@ BOOL XRayMtl::SetDlgThing(ParamDlg* dlg)
         newParams = pShader->SupportStdParams();
         newClassId = pShader->ClassID();
 
-        if (shaderId < 0) {
+        if (shaderId < 0)
+        {
             // it's the standin shader
             int i = -1;
             //			DbgAssert(0);
@@ -1264,7 +1254,8 @@ BOOL XRayMtl::SetDlgThing(ParamDlg* dlg)
         }
 
         // see if we need to change Shader basic params rollup
-        if ((oldClassId == newClassId) || ((newParams & STD_BASIC2_DLG) && (oldParams & STD_BASIC2_DLG))) {
+        if ((oldClassId == newClassId) || ((newParams & STD_BASIC2_DLG) && (oldParams & STD_BASIC2_DLG)))
+        {
             assert(pShaderDlg);
             // update in case of partial stdParam support
             pShaderDlg->SetThings(this, pShader);
@@ -1286,7 +1277,7 @@ BOOL XRayMtl::SetDlgThing(ParamDlg* dlg)
             pShaderDlg->LoadDialog(TRUE);
             masterDlg->AddDlg(pShaderDlg);
 
-            UpdateMapButtons();  // calls update texmaps
+            UpdateMapButtons(); // calls update texmaps
         }
     }
     else if (dlg == texmapDlg)
@@ -1305,7 +1296,8 @@ BOOL XRayMtl::SetDlgThing(ParamDlg* dlg)
     else if (dlg == samplingDlg)
     {
         samplingDlg->SetThing(this);
-        if (samplerId < 0) {
+        if (samplerId < 0)
+        {
             DbgAssert(0);
             //			SetSamplerIndx( FindSampler( pixelSampler->ClassID() ) );
         }
@@ -1331,7 +1323,7 @@ static int __cdecl classDescListCompare(const void* elem1, const void* elem2)
 {
     ClassDesc* s1 = *(ClassDesc**)elem1;
     ClassDesc* s2 = *(ClassDesc**)elem2;
-    TSTR sn1 = s1->ClassName();  // need to snap name string, since both use GetString()
+    TSTR sn1 = s1->ClassName(); // need to snap name string, since both use GetString()
     TSTR sn2 = s2->ClassName();
     return _tcscmp(sn1.data(), sn2.data());
 }
@@ -1343,7 +1335,8 @@ void XRayMtl::LoadShaderList()
     SubClassList* scList = GetCOREInterface()->GetDllDir().ClassDir().GetClassList(SHADER_CLASS_ID);
     for (long i = 0, j = 0; i < scList->Count(ACC_ALL); ++i)
     {
-        if ((*scList)[i].IsPublic()) {
+        if ((*scList)[i].IsPublic())
+        {
             ClassDesc* pClassD = (*scList)[i].CD();
             shaderList.Append(1, &pClassD);
         }
@@ -1353,13 +1346,15 @@ void XRayMtl::LoadShaderList()
 
 int XRayMtl::NumShaders()
 {
-    if (shaderList.Count() == 0) LoadShaderList();
+    if (shaderList.Count() == 0)
+        LoadShaderList();
     return shaderList.Count();
 }
 
 ClassDesc* XRayMtl::GetShaderCD(int i)
 {
-    if (shaderList.Count() == 0) LoadShaderList();
+    if (shaderList.Count() == 0)
+        LoadShaderList();
     return (i >= 0 && i < shaderList.Count()) ? shaderList[i] : NULL;
 }
 
@@ -1370,7 +1365,8 @@ void XRayMtl::LoadSamplerList()
     SubClassList* scList = GetCOREInterface()->GetDllDir().ClassDir().GetClassList(SAMPLER_CLASS_ID);
     for (long i = 0, j = 0; i < scList->Count(ACC_ALL); ++i)
     {
-        if ((*scList)[i].IsPublic()) {
+        if ((*scList)[i].IsPublic())
+        {
             ClassDesc* pClassD = (*scList)[i].CD();
             samplerList.Append(1, &pClassD);
         }
@@ -1380,13 +1376,15 @@ void XRayMtl::LoadSamplerList()
 
 int XRayMtl::NumSamplers()
 {
-    if (samplerList.Count() == 0) LoadSamplerList();
+    if (samplerList.Count() == 0)
+        LoadSamplerList();
     return samplerList.Count();
 }
 
 ClassDesc* XRayMtl::GetSamplerCD(int i)
 {
-    if (samplerList.Count() == 0) LoadSamplerList();
+    if (samplerList.Count() == 0)
+        LoadSamplerList();
     return (i >= 0 && i < samplerList.Count()) ? samplerList[i] : NULL;
 }
 
@@ -1410,13 +1408,14 @@ public:
     // ReferenceMaker
     RefResult NotifyRefChanged(Interval changeInt, RefTargetHandle hTarget, PartID& partID, RefMessage message)
     {
-        if (message == REFMSG_TARGET_DELETED) {
-            if (hTarget == rtarget) rtarget = NULL;
+        if (message == REFMSG_TARGET_DELETED)
+        {
+            if (hTarget == rtarget)
+                rtarget = NULL;
         }
         return REF_SUCCEED;
     }
     void DeleteThis() { xr_delete((SingleRefMaker*)this); }
-
     SClass_ID SuperClassID() { return SRM_CLASS_ID; }
     // From ref
     int NumRefs() { return 1; }
@@ -1456,15 +1455,18 @@ void XRayMtl::SwitchShader(Shader* newShader, BOOL loadDlg)
     Class_ID oldShaderId = pShader ? pShader->ClassID() : Class_ID(0, 0);
     Class_ID newShaderId = newShader->ClassID();
     Class_ID constShaderId(CONSTClassID, 0);
-    if (newShaderId != oldShaderId) {
-        if (pb_extended) {
+    if (newShaderId != oldShaderId)
+    {
+        if (pb_extended)
+        {
             int n = pb_extended->IDtoIndex(std2_opacity);
             pb_extended->RemoveController(n, 0);
         }
 
-        theHold.Suspend();  //-----------------------------------------------------
+        theHold.Suspend(); //-----------------------------------------------------
 
-        if (newShaderId == constShaderId) {  // constant
+        if (newShaderId == constShaderId)
+        { // constant
             SetFlag(NEWSTDMTL_FACETED, TRUE);
             pb_shader->SetValue(std2_faceted, 0, TRUE);
         }
@@ -1481,22 +1483,24 @@ void XRayMtl::SwitchShader(Shader* newShader, BOOL loadDlg)
         ULONG newParams = newShader->SupportStdParams();
 
         // copy any params in common
-        if (oldShader && newShader) {
+        if (oldShader && newShader)
+        {
             ShuffleShaderParams(newShader, oldShader);
             ShuffleTexMaps(newShader, oldShader);
         }
 
-        theHold.Resume();  //-----------------------------------------------------
+        theHold.Resume(); //-----------------------------------------------------
 
         if (theHold.Holding())
-            theHold.Put(new SwitchShaderRestore(this, oldShader, newShader));  // this will make a ref to oldShader
+            theHold.Put(new SwitchShaderRestore(this, oldShader, newShader)); // this will make a ref to oldShader
 
-        theHold.Suspend();  //-----------------------------------------------------
+        theHold.Suspend(); //-----------------------------------------------------
 
         // moved from below, or it crashes on reset
         if (oldShader)
-            oldShader->SetParamDlg(NULL);  // DS 3/9/99 ( undo may bring oldShader back, have to clear invalid pointer)
-        if (oldShaderDlg) oldShaderDlg->SetThings(this, NULL);
+            oldShader->SetParamDlg(NULL); // DS 3/9/99 ( undo may bring oldShader back, have to clear invalid pointer)
+        if (oldShaderDlg)
+            oldShaderDlg->SetThings(this, NULL);
 
         // NB: this deletes the oldShader ( unless it being ref'd by SwitchShaderRestore)
         SetShader(newShader);
@@ -1505,12 +1509,14 @@ void XRayMtl::SwitchShader(Shader* newShader, BOOL loadDlg)
         std2_extended_blk.SetSubTexNo(std2_ep_filter_map, stdIDToChannel[ID_FI]);
 
         // update UI if open
-        if (oldShaderDlg != NULL) {
+        if (oldShaderDlg != NULL)
+        {
             // enable or disable extra params
             UpdateExtraParams(newParams);
 
             // now update or replace the basic rollup
-            if ((newParams & STD_BASIC2_DLG) && (oldParams & STD_BASIC2_DLG)) {
+            if ((newParams & STD_BASIC2_DLG) && (oldParams & STD_BASIC2_DLG))
+            {
                 // update in case of partial stdParam support
                 oldShaderDlg->SetThings(this, newShader);
                 newShader->SetParamDlg(oldShaderDlg);
@@ -1537,9 +1543,9 @@ void XRayMtl::SwitchShader(Shader* newShader, BOOL loadDlg)
 
             UpdateMtlDisplay();
 
-        }  // end, oldShaderDlg not NULL
+        } // end, oldShaderDlg not NULL
 
-        theHold.Resume();  //--------------------------------------------------
+        theHold.Resume(); //--------------------------------------------------
     }
     ResumeAnimate();
 }
@@ -1549,10 +1555,11 @@ BOOL XRayMtl::SwitchShader(Class_ID shaderId)
 {
     ClassDesc* pCD;
     int n = FindShader(shaderId, &pCD);
-    if (pCD) {
+    if (pCD)
+    {
         // SS 1/26/2000: fix suggested by Kells
         // SwitchShader(pCD);
-        SetShaderIndx(n);  // sets pb2 & set calls switchshader w/ a real shader
+        SetShaderIndx(n); // sets pb2 & set calls switchshader w/ a real shader
         return TRUE;
     }
     return FALSE;
@@ -1562,7 +1569,7 @@ void XRayMtl::SwitchShader(ClassDesc* pNewCD)
 {
     // create the new shader object
     Shader* newShader = (Shader*)(pNewCD->Create(0));
-    newShader->Reset();  // creates pblock
+    newShader->Reset(); // creates pblock
 
     SwitchShader(newShader);
 }
@@ -1591,7 +1598,8 @@ void XRayMtl::SetShading(int s)
 // all faceted shaders approximated by constant, all new shaders by blinn.
 int XRayMtl::GetShading()
 {
-    if (IsFaceted()) return 0;
+    if (IsFaceted())
+        return 0;
     Class_ID id = pShader->ClassID();
     if (id == Class_ID(PHONGClassID, 0))
         return 1;
@@ -1626,7 +1634,7 @@ public:
     {
         Sampler* samp = mtl->pixelSampler;
 
-        samp->SetAFlag(A_LOCK_TARGET);  // keeps sh from getting auto-deleted
+        samp->SetAFlag(A_LOCK_TARGET); // keeps sh from getting auto-deleted
         mtl->SwitchSampler(saveSampler);
         samp->ClearAFlag(A_LOCK_TARGET);
 
@@ -1635,12 +1643,13 @@ public:
     void Restore(int isUndo) { Switch(); }
     void Redo() { Switch(); }
     TSTR Description() { return (TSTR(_T("SwitchSamplerRestore"))); }
-
     // ReferenceMaker
     RefResult NotifyRefChanged(Interval changeInt, RefTargetHandle hTarget, PartID& partID, RefMessage message)
     {
-        if (message == REFMSG_TARGET_DELETED) {
-            if (hTarget == saveSampler) saveSampler = NULL;
+        if (message == REFMSG_TARGET_DELETED)
+        {
+            if (hTarget == saveSampler)
+                saveSampler = NULL;
         }
         return REF_SUCCEED;
     }
@@ -1664,24 +1673,26 @@ static Class_ID defaultSamplerID(DEFAULT_SAMPLER_CLASS_ID, 0);
 
 void XRayMtl::SwitchSampler(Sampler* newSampler)
 {
-    theHold.Suspend();  //-----------------------------------------------------
+    theHold.Suspend(); //-----------------------------------------------------
 
     DbgAssert(newSampler);
     Class_ID oldSamplerId = pixelSampler ? pixelSampler->ClassID() : Class_ID(0, 0);
     Class_ID newSamplerId = newSampler->ClassID();
 
-    if (oldSamplerId != newSamplerId) {
-        theHold.Resume();  //-----------------------------------------------------
+    if (oldSamplerId != newSamplerId)
+    {
+        theHold.Resume(); //-----------------------------------------------------
         if (theHold.Holding())
-            theHold.Put(new SwitchSamplerRestore(this, pixelSampler));  // this will make a ref to oldShader
-        theHold.Suspend();  //-----------------------------------------------------
+            theHold.Put(new SwitchSamplerRestore(this, pixelSampler)); // this will make a ref to oldShader
+        theHold.Suspend(); //-----------------------------------------------------
 
         SetPixelSampler(newSampler);
     }
 
-    if (pb_sampling) UpdateSamplingParams();
+    if (pb_sampling)
+        UpdateSamplingParams();
 
-    theHold.Resume();  //-----------------------------------------------------
+    theHold.Resume(); //-----------------------------------------------------
 }
 
 void XRayMtl::SwitchSampler(ClassDesc* pNewCD)
@@ -1705,7 +1716,8 @@ BOOL XRayMtl::SwitchSampler(Class_ID samplerId)
     //	int n = FindSampler( samplerId, &pCD );
     int n = FindSampler(samplerId);
     //	if ( pCD ){
-    if (n >= 0) {
+    if (n >= 0)
+    {
         //		SwitchSampler( (Sampler*)(pCD->Create(0)) );
         SetSamplerIndx(n);
         return TRUE;
@@ -1720,7 +1732,8 @@ void XRayMtl::SetPixelSampler(Sampler* sampler)
     float quality = pixelSampler ? pixelSampler->GetQuality() : 0.5f;
     ReplaceReference(SAMPLER_REF, sampler);
     NotifyDependents(FOREVER, 0, REFMSG_SUBANIM_STRUCTURE_CHANGED);
-    if (pixelSampler) {
+    if (pixelSampler)
+    {
         pixelSampler->SetEnable(on);
         pixelSampler->SetTextureSuperSampleOn(superTex);
         pixelSampler->SetQuality(quality);
@@ -1744,9 +1757,11 @@ void XRayMtl::UpdateTexmaps()
 
     for (long i = 0; i < STD2_NMAX_TEXMAPS; ++i)
     {
-        if (i < nShaderMapChannels) {
+        if (i < nShaderMapChannels)
+        {
             BOOL isSupported = !(pShader->ChannelType(i) & UNSUPPORTED_CHANNEL);
-            if (pmap != NULL) {
+            if (pmap != NULL)
+            {
                 TSTR chanName = maps->txmap[i].name = pShader->GetTexChannelName(i);
                 // append dots
                 int n = chanName.length();
@@ -1764,19 +1779,22 @@ void XRayMtl::UpdateTexmaps()
             }
             // set up the Tab<> param aliases
             TSTR chanIntName = pShader->GetTexChannelInternalName(i);
-            if (chanIntName.Length() > 0) {
+            if (chanIntName.Length() > 0)
+            {
                 channelTypes[i] = pShader->ChannelType(i);
                 pb_maps->DefineParamAlias(chanIntName, std2_maps, i);
                 pb_maps->DefineParamAlias(chanIntName + _T("Enable"), std2_map_enables,
-                    i);  // JBW 5/24/99, made non-localizable (as names s/b internal)
+                    i); // JBW 5/24/99, made non-localizable (as names s/b internal)
                 pb_maps->DefineParamAlias(chanIntName + _T("Amount"), std2_map_amnts, i);
             }
         }
         else
-        {  // beyond the end of supported shader channels
-            if (pmap != NULL) {
+        { // beyond the end of supported shader channels
+            if (pmap != NULL)
+            {
                 // add the mtls texture channels
-                if (nMtlMapChannels > 0) {
+                if (nMtlMapChannels > 0)
+                {
                     TSTR chanName = maps->txmap[i].name = GetString(mtlChannelNameIDS[i - nShaderMapChannels]);
                     // append dots
                     int n = chanName.length();
@@ -1807,7 +1825,8 @@ void XRayMtl::UpdateTexmaps()
                 }
             }
             TSTR chanIntName = mtlChannelInternalNames[i - nShaderMapChannels];
-            if (chanIntName.Length() > 0) {
+            if (chanIntName.Length() > 0)
+            {
                 channelTypes[i] = mtlChannelType[i - nShaderMapChannels];
                 pb_maps->DefineParamAlias(chanIntName, std2_maps, i);
                 pb_maps->DefineParamAlias(chanIntName + GetString(IDS_JW_ENABLE), std2_map_enables, i);
@@ -1820,7 +1839,8 @@ void XRayMtl::UpdateTexmaps()
     for (long i = 0; i < N_ID_CHANNELS; ++i)
     {
         int chan = pShader->StdIDToChannel(i);
-        if (chan >= 0) {
+        if (chan >= 0)
+        {
             stdIDToChannel[i] = chan;
         }
         else if (mtlStdIDToChannel[i] >= 0)
@@ -1833,20 +1853,24 @@ void XRayMtl::UpdateTexmaps()
 
     // disable for old metal
     ULONG stdParms = pShader->SupportStdParams();
-    if ((stdParms & STD_BASIC2_DLG) && (stdParms & STD_PARAM_METAL)) {
+    if ((stdParms & STD_BASIC2_DLG) && (stdParms & STD_PARAM_METAL))
+    {
         // metal std shader, turn off stuff
         int n = stdIDToChannel[ID_SP];
-        if (pmap) {
+        if (pmap)
+        {
             pmap->Enable(std2_map_amnts, FALSE, n);
             pmap->Enable(std2_maps, FALSE, n);
             pmap->Enable(std2_map_enables, FALSE, n);
         }
     }
     // disable filter on additive/subtractive
-    if ((stdParms & STD_EXTRA_DLG) && TRANSP_FILTER != GetTransparencyType()) {
+    if ((stdParms & STD_EXTRA_DLG) && TRANSP_FILTER != GetTransparencyType())
+    {
         // metal std shader, turn off stuff
         int n = stdIDToChannel[ID_FI];
-        if (pmap) {
+        if (pmap)
+        {
             pmap->Enable(std2_map_amnts, FALSE, n);
             pmap->Enable(std2_maps, FALSE, n);
             pmap->Enable(std2_map_enables, FALSE, n);
@@ -1859,7 +1883,8 @@ static TCHAR* mapStates[] = {_T(" "), _T("m"), _T("M")};
 void XRayMtl::UpdateMapButtons()
 {
     UpdateTexmaps();
-    if (IsShaderInUI()) {
+    if (IsShaderInUI())
+    {
         pShader->GetParamDlg()->UpdateMapButtons();
         UpdateLockADTex(TRUE);
     }
@@ -1869,7 +1894,8 @@ void XRayMtl::UpdateMapButtons()
 void XRayMtl::UpdateExtendedMapButtons()
 {
     IParamMap2* pmap = pb_extended->GetMap();
-    if (pmap != NULL) {
+    if (pmap != NULL)
+    {
         int filtChan = stdIDToChannel[ID_FI];
         int state = GetMapState(filtChan);
         pmap->SetText(std2_ep_filter_map, mapStates[state]);
@@ -1882,7 +1908,8 @@ void XRayMtl::UpdateExtendedMapButtons()
 void XRayMtl::UpdateSamplingParams()
 {
     IParamMap2* map = pb_sampling->GetMap();
-    if (map) {
+    if (map)
+    {
         HWND hwnd = map->GetHWnd();
         BOOL qualityOn = pixelSampler->SupportsQualityLevels() > 0 ? TRUE : FALSE;
         map->Show(std2_ssampler_qual, qualityOn);
@@ -1917,7 +1944,8 @@ void XRayMtl::UpdateExtraParams(ULONG stdParams)
 {
     // update shader dlg map buttons
     IParamMap2* pmap = pb_extended->GetMap();
-    if (pmap != NULL) {
+    if (pmap != NULL)
+    {
         HWND hRollup = pmap->GetHWnd();
         BOOL opacOn = (stdParams & STD_EXTRA_OPACITY) ? TRUE : FALSE;
         pmap->Show(std2_opacity_type, opacOn);
@@ -1952,14 +1980,16 @@ void XRayMtl::UpdateExtraParams(ULONG stdParams)
 int XRayMtl::GetMapState(int nMap)
 {
     Texmap* t = (*maps)[nMap].map;
-    if (t == NULL) return 0;
+    if (t == NULL)
+        return 0;
     return (*maps)[nMap].mapOn ? 2 : 1;
 }
 
 TSTR XRayMtl::GetMapName(int nMap)
 {
     Texmap* t = (*maps)[nMap].map;
-    if (t == NULL) return TSTR(GetString(IDS_KE_NONE));
+    if (t == NULL)
+        return TSTR(GetString(IDS_KE_NONE));
     return t->GetFullName();
 }
 
@@ -1977,12 +2007,16 @@ void XRayMtl::UpdateLockADTex(BOOL passOn)
 {
     IParamMap2* pmap = pb_maps->GetMap();
     int lock = GetFlag(NEWSTDMTL_LOCK_ADTEX) != 0;
-    if (pShader->SupportStdParams() & STD_PARAM_LOCKADTEX) {
-        if (passOn) {
+    if (pShader->SupportStdParams() & STD_PARAM_LOCKADTEX)
+    {
+        if (passOn)
+        {
             pShader->SetLockADTex(lock);
-            if (pmap != NULL && pShader->GetParamDlg()) pShader->GetParamDlg()->LoadDialog(TRUE);
+            if (pmap != NULL && pShader->GetParamDlg())
+                pShader->GetParamDlg()->LoadDialog(TRUE);
         }
-        if (pmap != NULL) {
+        if (pmap != NULL)
+        {
             pmap->Show(std2_mp_ad_texlock, TRUE);
             pmap->Enable(std2_maps, !lock, 0);
         }
@@ -1990,7 +2024,8 @@ void XRayMtl::UpdateLockADTex(BOOL passOn)
     else
     {
         // no std params, so no amb/diff lock
-        if (pmap != NULL) {
+        if (pmap != NULL)
+        {
             pmap->Show(std2_mp_ad_texlock, FALSE);
             pmap->Enable(std2_maps, TRUE, 0);
         }
@@ -2000,24 +2035,26 @@ void XRayMtl::UpdateLockADTex(BOOL passOn)
 void XRayMtl::UpdateMtlDisplay()
 {
     IParamMap2* map = pb_maps->GetMap();
-    if (map != NULL) {
+    if (map != NULL)
+    {
         //	 removed to avoid multiple viewport redraws on change shader
         //		map->RedrawViews(GetCOREInterface()->GetTime());
         map->Invalidate();
     }
 }
 
-#define LIMIT0_1(x)                                                                                                    \
-    if (x < 0.0f)                                                                                                      \
-        x = 0.0f;                                                                                                      \
-    else if (x > 1.0f)                                                                                                 \
+#define LIMIT0_1(x)    \
+    if (x < 0.0f)      \
+        x = 0.0f;      \
+    else if (x > 1.0f) \
         x = 1.0f;
-#define LIMIT1(x)                                                                                                      \
-    if (x > 1.0f) x = 1.0f;
-#define LIMITMINMAX(x, min, max)                                                                                       \
-    if (x < min)                                                                                                       \
-        x = min;                                                                                                       \
-    else if (x > max)                                                                                                  \
+#define LIMIT1(x) \
+    if (x > 1.0f) \
+        x = 1.0f;
+#define LIMITMINMAX(x, min, max) \
+    if (x < min)                 \
+        x = min;                 \
+    else if (x > max)            \
         x = max;
 
 static Color LimitColor(Color c)
@@ -2031,7 +2068,8 @@ static Color LimitColor(Color c)
 void XRayMtl::Update(TimeValue t, Interval& valid)
 {
     Point3 p;
-    if (!ivalid.InInterval(t)) {
+    if (!ivalid.InInterval(t))
+    {
         ivalid.SetInfinite();
 
         pb_extended->GetValue(std2_filter_color, t, p, ivalid);
@@ -2040,7 +2078,8 @@ void XRayMtl::Update(TimeValue t, Interval& valid)
         pb_extended->GetValue(std2_opacity, t, opacity, ivalid);
         LIMIT0_1(opacity);
 
-        if (IsShaderInUI()) pShader->GetParamDlg()->UpdateOpacity();
+        if (IsShaderInUI())
+            pShader->GetParamDlg()->UpdateOpacity();
 
         pb_extended->GetValue(std2_falloff_amnt, t, opfall, ivalid);
         LIMIT0_1(opfall);
@@ -2062,10 +2101,12 @@ void XRayMtl::Update(TimeValue t, Interval& valid)
         SetFlag(NEWSTDMTL_LOCK_ADTEX, pb_maps->GetInt(std2_mp_ad_texlock, t) == 1);
         dimReflect = pb_extended->GetInt(std2_apply_refl_dimming, t);
 
-        if (pShader) pShader->Update(t, ivalid);
+        if (pShader)
+            pShader->Update(t, ivalid);
 
         for (int i = 0; i < STD2_NMAX_TEXMAPS; i++)
-            if (MAPACTIVE(i)) maps->txmap[i].Update(t, ivalid);
+            if (MAPACTIVE(i))
+                maps->txmap[i].Update(t, ivalid);
     }
     valid &= ivalid;
 }
@@ -2116,10 +2157,12 @@ void XRayMtl::ShuffleTexMaps(Shader* newShader, Shader* oldShader)
         // look for match in each old map
         for (oldChan = 0; oldChan < nOldShadeMaps; ++oldChan)
         {
-            if (newName == oldShader->GetTexChannelInternalName(oldChan)) break;
+            if (newName == oldShader->GetTexChannelInternalName(oldChan))
+                break;
         }
 
-        if (oldChan < nOldShadeMaps) {  // found it
+        if (oldChan < nOldShadeMaps)
+        { // found it
             maps->txmap[newChan].amtCtrl = oldMaps[oldChan].amtCtrl;
             maps->txmap[newChan].amount = oldMaps[oldChan].amount;
             maps->txmap[newChan].map = oldMaps[oldChan].map;
@@ -2127,7 +2170,7 @@ void XRayMtl::ShuffleTexMaps(Shader* newShader, Shader* oldShader)
             maps->txmap[newChan].name = oldMaps[oldChan].name;
         }
 
-    }  // end, for each new map
+    } // end, for each new map
 
     // now do the mtl maps
     for (int n = 0; n < MTL_NTEXMAPS; ++n)
@@ -2153,11 +2196,14 @@ void XRayMtl::ShuffleShaderParams(Shader* newShader, Shader* oldShader)
     FindShader(oldShader->ClassID(), &oldCD);
 
     // check if we have a ParamBlock2-based shaders
-    if (oldCD != NULL && oldCD->InternalName() != NULL) oldCD2 = (ClassDesc2*)oldCD;
-    if (newCD != NULL && newCD->InternalName() != NULL) newCD2 = (ClassDesc2*)newCD;
+    if (oldCD != NULL && oldCD->InternalName() != NULL)
+        oldCD2 = (ClassDesc2*)oldCD;
+    if (newCD != NULL && newCD->InternalName() != NULL)
+        newCD2 = (ClassDesc2*)newCD;
 
     // loop over destination shaders PB2-based parameters
-    if (oldCD2 != NULL && newCD2 != NULL) {
+    if (oldCD2 != NULL && newCD2 != NULL)
+    {
         // loop over each block in the new shader
         for (int i = 0; i < newCD2->NumParamBlockDescs(); i++)
         {
@@ -2174,20 +2220,22 @@ void XRayMtl::ShuffleShaderParams(Shader* newShader, Shader* oldShader)
                 {
                     ParamBlockDesc2* oldPBdesc = oldCD2->GetParamBlockDesc(i);
                     int j = oldPBdesc->NameToIndex(paramDef.int_name);
-                    if (j >= 0) {
+                    if (j >= 0)
+                    {
                         // found an internal name match, get the dest pblock and param def
                         ParamDef& srcParamDef = oldPBdesc->paramdefs[j];
                         // copy only if types match
-                        if (srcParamDef.type == paramDef.type) {
+                        if (srcParamDef.type == paramDef.type)
+                        {
                             IParamBlock2* oldPB2 = oldShader->GetParamBlockByID(oldPBdesc->ID);
                             newPB2->Assign(paramDef.ID, oldPB2, srcParamDef.ID);
-                            goto nextParam;  // found it, outta here...
+                            goto nextParam; // found it, outta here...
                         }
                     }
                 }
             nextParam:;
-            }  // end, dest param loop
-        }      // end, desk block loop
+            } // end, dest param loop
+        } // end, desk block loop
         Interval v;
         v.SetInfinite();
         newShader->Update(0, v);
@@ -2210,7 +2258,8 @@ float XRayMtl::GetXParency(int mtlNum, BOOL backFace)
     // (Actually, when the hardward doesn't support enough texture channels to do
     // the opacity map, the overide is only true for NON-decal maps).
     //
-    if (((*maps)[opacChan].map && MAPACTIVE(opacChan) && Active())) {
+    if (((*maps)[opacChan].map && MAPACTIVE(opacChan) && Active()))
+    {
         return 0.0f;
     }
 
@@ -2232,36 +2281,51 @@ ULONG XRayMtl::Requirements(int subMtlNum)
     int bumpChan = stdIDToChannel[ID_BU];
     int dispChan = stdIDToChannel[ID_DP];
 
-    if (opacity != 1.0f || MAPACTIVE(opacChan) || opfall > 0.0f) {
+    if (opacity != 1.0f || MAPACTIVE(opacChan) || opfall > 0.0f)
+    {
         req |= MTLREQ_TRANSP;
     }
 
-    if (opacity != 1.0f || ((*maps)[opacChan].map && MAPACTIVE(opacChan) && Active())) req |= MTLREQ_TRANSP_IN_VP;
+    if (opacity != 1.0f || ((*maps)[opacChan].map && MAPACTIVE(opacChan) && Active()))
+        req |= MTLREQ_TRANSP_IN_VP;
 
     for (int i = 0; i < STD2_NMAX_TEXMAPS; i++)
     {
-        if (MAPACTIVE(i)) req |= (*maps)[i].map->Requirements(subMtlNum);
+        if (MAPACTIVE(i))
+            req |= (*maps)[i].map->Requirements(subMtlNum);
     }
-    if (MAPACTIVE(bumpChan)) {
+    if (MAPACTIVE(bumpChan))
+    {
         ULONG bmpreq = (*maps)[bumpChan].map->Requirements(subMtlNum);
-        if (bmpreq & MTLREQ_UV) req |= MTLREQ_BUMPUV;
-        if (bmpreq & MTLREQ_UV2) req |= MTLREQ_BUMPUV2;
+        if (bmpreq & MTLREQ_UV)
+            req |= MTLREQ_BUMPUV;
+        if (bmpreq & MTLREQ_UV2)
+            req |= MTLREQ_BUMPUV2;
     }
-    if (flags & NEWSTDMTL_WIRE) req |= MTLREQ_WIRE;
-    if (flags & NEWSTDMTL_2SIDE) req |= MTLREQ_2SIDE;
+    if (flags & NEWSTDMTL_WIRE)
+        req |= MTLREQ_WIRE;
+    if (flags & NEWSTDMTL_2SIDE)
+        req |= MTLREQ_2SIDE;
     //	if (pixelSampler && pixelSampler->GetEnable() )
-    if (flags & NEWSTDMTL_SSAMP_ON) req |= MTLREQ_SUPERSAMPLE;
-    if (flags & NEWSTDMTL_WIRE_UNITS) req |= MTLREQ_WIRE_ABS;
-    if (flags & NEWSTDMTL_FACEMAP) req |= MTLREQ_FACEMAP;
-    if (flags & NEWSTDMTL_ADD_TRANSP) req |= MTLREQ_ADDITIVE_TRANSP;
-    if (flags & NEWSTDMTL_FACETED) req |= MTLREQ_FACETED;
-    if (MAPACTIVE(dispChan)) req |= MTLREQ_DISPLACEMAP;
+    if (flags & NEWSTDMTL_SSAMP_ON)
+        req |= MTLREQ_SUPERSAMPLE;
+    if (flags & NEWSTDMTL_WIRE_UNITS)
+        req |= MTLREQ_WIRE_ABS;
+    if (flags & NEWSTDMTL_FACEMAP)
+        req |= MTLREQ_FACEMAP;
+    if (flags & NEWSTDMTL_ADD_TRANSP)
+        req |= MTLREQ_ADDITIVE_TRANSP;
+    if (flags & NEWSTDMTL_FACETED)
+        req |= MTLREQ_FACETED;
+    if (MAPACTIVE(dispChan))
+        req |= MTLREQ_DISPLACEMAP;
     return req;
 }
 
 int XRayMtl::MapSlotType(int i)
 {
-    if (i == stdIDToChannel[ID_DP]) return MAPSLOT_DISPLACEMENT;  // DS 4/12/99
+    if (i == stdIDToChannel[ID_DP])
+        return MAPSLOT_DISPLACEMENT; // DS 4/12/99
     return (i == stdIDToChannel[ID_RL] || i == stdIDToChannel[ID_RR]) ? MAPSLOT_ENVIRON : MAPSLOT_TEXTURE;
 }
 
@@ -2270,7 +2334,8 @@ void XRayMtl::MappingsRequired(int subMtlNum, BitArray& mapreq, BitArray& bumpre
     int bumpChan = stdIDToChannel[ID_BU];
     for (int i = 0; i < STD2_NMAX_TEXMAPS; i++)
     {
-        if (MAPACTIVE(i)) {
+        if (MAPACTIVE(i))
+        {
             if (i == bumpChan)
                 (*maps)[i].map->MappingsRequired(subMtlNum, bumpreq, bumpreq);
             else
@@ -2286,11 +2351,7 @@ Interval XRayMtl::Validity(TimeValue t)
     return ivalid;
 }
 
-void XRayMtl::NotifyChanged()
-{
-    NotifyDependents(FOREVER, PART_ALL, REFMSG_CHANGE);
-}
-
+void XRayMtl::NotifyChanged() { NotifyDependents(FOREVER, PART_ALL, REFMSG_CHANGE); }
 void XRayMtl::SetFlag(ULONG f, ULONG val)
 {
     if (val)
@@ -2321,11 +2382,7 @@ void XRayMtl::SetTransparencyType(int type)
     }
 }
 
-void XRayMtl::DeleteThis()
-{
-    xr_delete((XRayMtl*)this);
-}
-
+void XRayMtl::DeleteThis() { xr_delete((XRayMtl*)this); }
 TSTR XRayMtl::SubAnimName(int i)
 {
     switch (i)
@@ -2399,7 +2456,7 @@ RefTargetHandle XRayMtl::GetReference(int i)
     switch (i)
     {
     case OLD_PBLOCK_REF:
-        return old_pblock;  // old pblock, replaced by the 6 new pb2's
+        return old_pblock; // old pblock, replaced by the 6 new pb2's
     case TEXMAPS_REF: return maps;
     case SHADER_REF: return pShader;
     case SHADER_PB_REF: return pb_shader;
@@ -2425,11 +2482,13 @@ void XRayMtl::SetReference(int i, RefTargetHandle rtarg)
     case TEXMAPS_REF:
     {
         maps = (Texmaps*)rtarg;
-        if (maps != NULL) maps->client = this;
+        if (maps != NULL)
+            maps->client = this;
         return;
     }
     case SHADER_REF:
-        if (IsShaderInUI()) {
+        if (IsShaderInUI())
+        {
             pShader->GetParamDlg()->SetThings(this, NULL);
             pShader->SetParamDlg(NULL);
         }
@@ -2456,7 +2515,8 @@ void XRayMtl::SetSubTexmap(int i, Texmap* m)
 // mjm - begin - 06.02.00
 void XRayMtl::UpdateReshadeRequirements(RefTargetHandle hTarget, PartID partID)
 {
-    if (!killRefmsg.DistributeRefmsg()) {
+    if (!killRefmsg.DistributeRefmsg())
+    {
         mReshadeRQ = RR_None;
     }
     else if (hTarget == maps)
@@ -2516,7 +2576,7 @@ RefResult XRayMtl::NotifyRefChanged(Interval changeInt, RefTargetHandle hTarget,
         return REF_STOP;
     }
     case REFMSG_CHANGE:
-        UpdateReshadeRequirements(hTarget, partID);  // mjm - 06.02.00
+        UpdateReshadeRequirements(hTarget, partID); // mjm - 06.02.00
 
         ivalid.SetEmpty();
         // ask ClassDesc if any paramblock change caused the notify
@@ -2524,9 +2584,10 @@ RefResult XRayMtl::NotifyRefChanged(Interval changeInt, RefTargetHandle hTarget,
         // else inval indicated param UI
         IParamBlock2* cpb;
         ParamID changing_param = stdmtl2CD.LastNotifyParamID(this, cpb);
-        if (hTarget != pShader)  // && hTarget != maps)
+        if (hTarget != pShader) // && hTarget != maps)
         {
-            if (changing_param != -1) {
+            if (changing_param != -1)
+            {
                 // DS 10/13/00: I needed to add code to check of the dialog for this map was actualy active because
                 // on during the creation of new materials, messages were getting routed to the current
                 // medit material, causing problems for undo of sub-object mtl assignment.
@@ -2542,11 +2603,13 @@ RefResult XRayMtl::NotifyRefChanged(Interval changeInt, RefTargetHandle hTarget,
                 stdmtl2CD.InvalidateUI();
                 if (hTarget == pb_extended && pShader && pShader->GetParamDlg())
                     pShader->GetParamDlg()->UpdateOpacity();
-                if (texHandle[0] || texHandle[1]) {
-                    if (curImp) curImp->MtlChanged();
+                if (texHandle[0] || texHandle[1])
+                {
+                    if (curImp)
+                        curImp->MtlChanged();
                 }
             }
-            DiscardTexHandles();  // DS 5/22/00
+            DiscardTexHandles(); // DS 5/22/00
         }
         break;
     }
@@ -2554,14 +2617,11 @@ RefResult XRayMtl::NotifyRefChanged(Interval changeInt, RefTargetHandle hTarget,
     return REF_SUCCEED;
 }
 
-Class_ID XRayMtl::ClassID()
-{
-    return XRAYMTL_CLASS_ID;
-}
-
+Class_ID XRayMtl::ClassID() { return XRAYMTL_CLASS_ID; }
 TSTR XRayMtl::GetSubTexmapSlotName(int i)
 {
-    if (pShader) {
+    if (pShader)
+    {
         long nShaderChan = pShader->nTexChannelsSupported();
         if (i < nShaderChan)
             return pShader->GetTexChannelName(i);
@@ -2572,17 +2632,14 @@ TSTR XRayMtl::GetSubTexmapSlotName(int i)
         return TSTR("");
 }
 
-void XRayMtl::EnableMap(int i, BOOL onoff)
-{
-    pb_maps->SetValue(std2_map_enables, TimeValue(0), onoff, i);
-}
-
+void XRayMtl::EnableMap(int i, BOOL onoff) { pb_maps->SetValue(std2_map_enables, TimeValue(0), onoff, i); }
 void XRayMtl::SetFilter(Color c, TimeValue t)
 {
     filter = c;
     pb_extended->SetValue(std2_filter_color, t, Point3(c.r, c.g, c.b));
     int opacChan = stdIDToChannel[ID_OP];
-    if (opacity != 1.0f || opfall != 0.0f || MAPACTIVE(opacChan)) NotifyChanged();
+    if (opacity != 1.0f || opfall != 0.0f || MAPACTIVE(opacChan))
+        NotifyChanged();
 }
 
 void XRayMtl::SetIOR(float v, TimeValue t)
@@ -2602,14 +2659,16 @@ void XRayMtl::SetOpacFalloff(float v, TimeValue t)
     opfall = v;
     pb_extended->SetValue(std2_falloff_amnt, t, v);
     int opacChan = stdIDToChannel[ID_OP];
-    if (opacity != 1.0f || opfall != 0.0f || MAPACTIVE(opacChan)) NotifyChanged();
+    if (opacity != 1.0f || opfall != 0.0f || MAPACTIVE(opacChan))
+        NotifyChanged();
 }
 
 void XRayMtl::SetWireSize(float v, TimeValue t)
 {
     wireSize = v;
     pb_extended->SetValue(std2_wire_size, t, v);
-    if (flags & NEWSTDMTL_WIRE) NotifyChanged();
+    if (flags & NEWSTDMTL_WIRE)
+        NotifyChanged();
 }
 
 void XRayMtl::SetDimIntens(float v, TimeValue t)
@@ -2624,23 +2683,21 @@ void XRayMtl::SetDimMult(float v, TimeValue t)
     pb_extended->SetValue(std2_refl_lvl, t, v);
 }
 
-void XRayMtl::SetTexmapAmt(int imap, float amt, TimeValue t)
-{
-    pb_maps->SetValue(std2_map_amnts, t, amt, imap);
-}
-
+void XRayMtl::SetTexmapAmt(int imap, float amt, TimeValue t) { pb_maps->SetValue(std2_map_amnts, t, amt, imap); }
 /////////////////////////////////////////////////////////////////////
 // shaders
 void XRayMtl::SetShaderIndx(long indx, BOOL update)
 {
-    if (!update) shaderId = NO_UPDATE;
+    if (!update)
+        shaderId = NO_UPDATE;
     pb_shader->SetValue(std2_shader_type, 0, indx < 0 ? 0 : indx);
     shaderId = indx;
 }
 
 void XRayMtl::SetSamplerIndx(long indx, BOOL update)
 {
-    if (!update) samplerId = NO_UPDATE;
+    if (!update)
+        samplerId = NO_UPDATE;
     pb_sampling->SetValue(std2_ssampler, 0, indx < 0 ? 0 : indx);
     samplerId = indx;
 }
@@ -2660,7 +2717,8 @@ void XRayMtl::SetShader(Shader* pNewShader)
 // the shader Gets & Sets
 BOOL XRayMtl::IsSelfIllumColorOn()
 {
-    if (pShader->SupportStdParams() & STD_PARAM_SELFILLUM_CLR) {
+    if (pShader->SupportStdParams() & STD_PARAM_SELFILLUM_CLR)
+    {
         return pShader->IsSelfIllumClrOn();
     }
     return FALSE;
@@ -2668,186 +2726,102 @@ BOOL XRayMtl::IsSelfIllumColorOn()
 
 void XRayMtl::SetSelfIllumColorOn(BOOL on)
 {
-    if (pShader->SupportStdParams() & STD_PARAM_SELFILLUM_CLR) {
+    if (pShader->SupportStdParams() & STD_PARAM_SELFILLUM_CLR)
+    {
         pShader->SetSelfIllumClrOn(on);
     }
 }
 
 void XRayMtl::SetAmbient(Color c, TimeValue t)
 {
-    if (pShader->SupportStdParams() & STD_PARAM_AMBIENT_CLR) {
+    if (pShader->SupportStdParams() & STD_PARAM_AMBIENT_CLR)
+    {
         pShader->SetAmbientClr(c, t);
     }
 }
 
 void XRayMtl::SetDiffuse(Color c, TimeValue t)
 {
-    if (pShader->SupportStdParams() & STD_PARAM_DIFFUSE_CLR) {
+    if (pShader->SupportStdParams() & STD_PARAM_DIFFUSE_CLR)
+    {
         pShader->SetDiffuseClr(c, t);
     }
 }
 
 void XRayMtl::SetSpecular(Color c, TimeValue t)
 {
-    if (pShader->SupportStdParams() & STD_PARAM_SPECULAR_CLR) {
+    if (pShader->SupportStdParams() & STD_PARAM_SPECULAR_CLR)
+    {
         pShader->SetSpecularClr(c, t);
     }
 }
 
 void XRayMtl::SetShininess(float v, TimeValue t)
 {
-    if (pShader->SupportStdParams() & STD_PARAM_GLOSSINESS) {
+    if (pShader->SupportStdParams() & STD_PARAM_GLOSSINESS)
+    {
         pShader->SetGlossiness(v, t);
     }
 }
 
 void XRayMtl::SetShinStr(float v, TimeValue t)
 {
-    if (pShader->SupportStdParams() & STD_PARAM_SPECULAR_LEV) {
+    if (pShader->SupportStdParams() & STD_PARAM_SPECULAR_LEV)
+    {
         pShader->SetSpecularLevel(v, t);
     }
 }
 
 void XRayMtl::SetSelfIllum(float v, TimeValue t)
 {
-    if (pShader->SupportStdParams() & STD_PARAM_SELFILLUM) {
+    if (pShader->SupportStdParams() & STD_PARAM_SELFILLUM)
+    {
         pShader->SetSelfIllum(v, t);
     }
 }
 
 void XRayMtl::SetSelfIllumColor(Color c, TimeValue t)
 {
-    if (pShader->SupportStdParams() & STD_PARAM_SELFILLUM_CLR) {
+    if (pShader->SupportStdParams() & STD_PARAM_SELFILLUM_CLR)
+    {
         pShader->SetSelfIllumClr(c, t);
     }
 }
 
 static Color blackClr(0.0, 0.0, 0.0);
 
-Color XRayMtl::GetAmbient(int mtlNum, BOOL backFace)
-{
-    return pShader->GetAmbientClr(mtlNum, backFace);
-}
-
-Color XRayMtl::GetDiffuse(int mtlNum, BOOL backFace)
-{
-    return pShader->GetDiffuseClr(mtlNum, backFace);
-}
-
-Color XRayMtl::GetSpecular(int mtlNum, BOOL backFace)
-{
-    return pShader->GetSpecularClr(mtlNum, backFace);
-}
-
-Color XRayMtl::GetSelfIllumColor(int mtlNum, BOOL backFace)
-{
-    return pShader->GetSelfIllumClr(mtlNum, backFace);
-}
-
+Color XRayMtl::GetAmbient(int mtlNum, BOOL backFace) { return pShader->GetAmbientClr(mtlNum, backFace); }
+Color XRayMtl::GetDiffuse(int mtlNum, BOOL backFace) { return pShader->GetDiffuseClr(mtlNum, backFace); }
+Color XRayMtl::GetSpecular(int mtlNum, BOOL backFace) { return pShader->GetSpecularClr(mtlNum, backFace); }
+Color XRayMtl::GetSelfIllumColor(int mtlNum, BOOL backFace) { return pShader->GetSelfIllumClr(mtlNum, backFace); }
 float XRayMtl::GetShininess(int mtlNum, BOOL backFace)
 {
     float g = pShader->GetGlossiness(mtlNum, backFace);
     return Bound(g, 0.01f, 1.0f);
 }
 
-float XRayMtl::GetShinStr(int mtlNum, BOOL backFace)
-{
-    return pShader->GetSpecularLevel(mtlNum, backFace);
-}
-
-float XRayMtl::GetSelfIllum(int mtlNum, BOOL backFace)
-{
-    return pShader->GetSelfIllum(mtlNum, backFace);
-}
-
-float XRayMtl::GetShininess(TimeValue t)
-{
-    return pShader->GetGlossiness(t);
-}
-
-float XRayMtl::GetShinStr(TimeValue t)
-{
-    return pShader->GetSpecularLevel(t);
-}
-
-float XRayMtl::GetSelfIllum(TimeValue t)
-{
-    return pShader->GetSelfIllum(t);
-}
-
-BOOL XRayMtl::GetSelfIllumColorOn(int mtlNum, BOOL backFace)
-{
-    return pShader->IsSelfIllumClrOn();
-}
-
-Color XRayMtl::GetAmbient(TimeValue t)
-{
-    return pShader->GetAmbientClr(t);
-}
-Color XRayMtl::GetDiffuse(TimeValue t)
-{
-    return pShader->GetDiffuseClr(t);
-}
-Color XRayMtl::GetSpecular(TimeValue t)
-{
-    return pShader->GetSpecularClr(t);
-}
-Color XRayMtl::GetSelfIllumColor(TimeValue t)
-{
-    return pShader->GetSelfIllumClr(t);
-}
-
-float XRayMtl::GetSoftenLevel(TimeValue t)
-{
-    return pShader->GetSoftenLevel(t);
-}
-
-Color XRayMtl::GetFilter()
-{
-    return filter;
-}
-float XRayMtl::GetTexmapAmt(int imap)
-{
-    return maps->txmap[imap].amount;
-}
-float XRayMtl::GetTexmapAmt(int imap, TimeValue t)
-{
-    return maps->txmap[imap].GetAmount(t);
-}
-
-Color XRayMtl::GetFilter(TimeValue t)
-{
-    return pb_extended->GetColor(std2_filter_color, t);
-}
-float XRayMtl::GetOpacity(TimeValue t)
-{
-    return pb_extended->GetFloat(std2_opacity, t);
-}
-float XRayMtl::GetOpacFalloff(TimeValue t)
-{
-    return pb_extended->GetFloat(std2_falloff_amnt, t);
-}
-float XRayMtl::GetWireSize(TimeValue t)
-{
-    return pb_extended->GetFloat(std2_wire_size, t);
-}
-float XRayMtl::GetIOR(TimeValue t)
-{
-    return pb_extended->GetFloat(std2_ior, t);
-}
-float XRayMtl::GetDimIntens(TimeValue t)
-{
-    return pb_extended->GetFloat(std2_dim_lvl, t);
-}
-float XRayMtl::GetDimMult(TimeValue t)
-{
-    return pb_extended->GetFloat(std2_refl_lvl, t);
-}
-BOOL XRayMtl::MapEnabled(int i)
-{
-    return maps->txmap[i].mapOn;
-}
-
+float XRayMtl::GetShinStr(int mtlNum, BOOL backFace) { return pShader->GetSpecularLevel(mtlNum, backFace); }
+float XRayMtl::GetSelfIllum(int mtlNum, BOOL backFace) { return pShader->GetSelfIllum(mtlNum, backFace); }
+float XRayMtl::GetShininess(TimeValue t) { return pShader->GetGlossiness(t); }
+float XRayMtl::GetShinStr(TimeValue t) { return pShader->GetSpecularLevel(t); }
+float XRayMtl::GetSelfIllum(TimeValue t) { return pShader->GetSelfIllum(t); }
+BOOL XRayMtl::GetSelfIllumColorOn(int mtlNum, BOOL backFace) { return pShader->IsSelfIllumClrOn(); }
+Color XRayMtl::GetAmbient(TimeValue t) { return pShader->GetAmbientClr(t); }
+Color XRayMtl::GetDiffuse(TimeValue t) { return pShader->GetDiffuseClr(t); }
+Color XRayMtl::GetSpecular(TimeValue t) { return pShader->GetSpecularClr(t); }
+Color XRayMtl::GetSelfIllumColor(TimeValue t) { return pShader->GetSelfIllumClr(t); }
+float XRayMtl::GetSoftenLevel(TimeValue t) { return pShader->GetSoftenLevel(t); }
+Color XRayMtl::GetFilter() { return filter; }
+float XRayMtl::GetTexmapAmt(int imap) { return maps->txmap[imap].amount; }
+float XRayMtl::GetTexmapAmt(int imap, TimeValue t) { return maps->txmap[imap].GetAmount(t); }
+Color XRayMtl::GetFilter(TimeValue t) { return pb_extended->GetColor(std2_filter_color, t); }
+float XRayMtl::GetOpacity(TimeValue t) { return pb_extended->GetFloat(std2_opacity, t); }
+float XRayMtl::GetOpacFalloff(TimeValue t) { return pb_extended->GetFloat(std2_falloff_amnt, t); }
+float XRayMtl::GetWireSize(TimeValue t) { return pb_extended->GetFloat(std2_wire_size, t); }
+float XRayMtl::GetIOR(TimeValue t) { return pb_extended->GetFloat(std2_ior, t); }
+float XRayMtl::GetDimIntens(TimeValue t) { return pb_extended->GetFloat(std2_dim_lvl, t); }
+float XRayMtl::GetDimMult(TimeValue t) { return pb_extended->GetFloat(std2_refl_lvl, t); }
+BOOL XRayMtl::MapEnabled(int i) { return maps->txmap[i].mapOn; }
 float XRayMtl::GetDynamicsProperty(TimeValue t, int mtlNum, int propID)
 {
     float val;
@@ -2880,12 +2854,15 @@ int XRayMtl::FindShader(Class_ID& findId, ClassDesc** ppCD)
     for (int i = 0; i < XRayMtl::NumShaders(); i++)
     {
         ClassDesc* pCD = XRayMtl::GetShaderCD(i);
-        if (findId == pCD->ClassID()) {
-            if (ppCD) *ppCD = pCD;
+        if (findId == pCD->ClassID())
+        {
+            if (ppCD)
+                *ppCD = pCD;
             return i;
         }
     }
-    if (ppCD) *ppCD = NULL;  // not found
+    if (ppCD)
+        *ppCD = NULL; // not found
     return -1;
 }
 
@@ -2894,12 +2871,15 @@ int XRayMtl::FindSampler(Class_ID findId, ClassDesc** ppCD)
     for (int i = 0; i < XRayMtl::NumSamplers(); i++)
     {
         ClassDesc* pCD = XRayMtl::GetSamplerCD(i);
-        if (findId == pCD->ClassID()) {
-            if (ppCD) *ppCD = pCD;
+        if (findId == pCD->ClassID())
+        {
+            if (ppCD)
+                *ppCD = pCD;
             return i;
         }
     }
-    if (ppCD) *ppCD = NULL;  // not found
+    if (ppCD)
+        *ppCD = NULL; // not found
     return -1;
 }
 
@@ -2959,7 +2939,8 @@ IOResult XRayMtl::Save(ISave* isave)
     IOResult res;
     isave->BeginChunk(MTL_HDR_CHUNK);
     res = MtlBase::Save(isave);
-    if (res != IO_OK) return res;
+    if (res != IO_OK)
+        return res;
     isave->EndChunk();
 
     isave->BeginChunk(NEWSTDMTL_VERS_CHUNK);
@@ -2990,9 +2971,11 @@ static INode* FindNodeRef(ReferenceTarget* rt)
     INode* nd = NULL;
     while (rm = di.Next())
     {
-        if (rm->SuperClassID() == BASENODE_CLASS_ID) return (INode*)rm;
+        if (rm->SuperClassID() == BASENODE_CLASS_ID)
+            return (INode*)rm;
         nd = FindNodeRef((ReferenceTarget*)rm);
-        if (nd) return nd;
+        if (nd)
+            return nd;
     }
     return NULL;
 }
@@ -3000,7 +2983,8 @@ static INode* FindNodeRef(ReferenceTarget* rt)
 static float GetNodeScaling(Mtl* m)
 {
     INode* n = FindNodeRef(m);
-    if (n == NULL) return 1.0f;
+    if (n == NULL)
+        return 1.0f;
     Interval v;
     Matrix3 tm = n->GetNodeTM(0, &v);
     float f = float(_abs(Length(tm.GetRow(0))) + _abs(Length(tm.GetRow(1))) + _abs(Length(tm.GetRow(2)))) / 3.0f;
@@ -3027,9 +3011,11 @@ void XRayMtl::OldVerFix(int loadVer)
     // ask the ClassDesc to make the P_AUTO_CONSTRUCT paramblock2s
     stdmtl2CD.MakeAutoParamBlocks(this);
 
-    if (loadVer < 10) {
+    if (loadVer < 10)
+    {
         // create a shader, note: always a stdshader as it's an old version
-        if (shaderId < 0 || shaderId > 3) shaderId = 1;  // v1 files
+        if (shaderId < 0 || shaderId > 3)
+            shaderId = 1; // v1 files
         long cid;
         switch (shaderId)
         {
@@ -3043,7 +3029,8 @@ void XRayMtl::OldVerFix(int loadVer)
         }
         long indx = FindShader(Class_ID(cid, 0));
 
-        if (indx < 0) return;
+        if (indx < 0)
+            return;
 
         // this sets the new shader via pb2 accessor
         SetShaderIndx(indx);
@@ -3067,7 +3054,8 @@ void XRayMtl::OldVerFix(int loadVer)
         std2_extended_blk.SetSubTexNo(std2_ep_filter_map, stdIDToChannel[ID_FI]);
 
         SetSamplerIndx(FindSampler(Class_ID(DEFAULT_SAMPLER_CLASS_ID, 0)));
-        if (flags & NEWSTDMTL_SSAMP_ON) {
+        if (flags & NEWSTDMTL_SSAMP_ON)
+        {
             pb_sampling->SetValue(std2_ssampler_enable, 0, TRUE);
         }
 
@@ -3094,34 +3082,42 @@ void XRayMtl::OldVerFix(int loadVer)
     pShader->SetLockADTex(GetFlag(NEWSTDMTL_LOCK_ADTEX) != 0);
     pb_maps->SetValue(std2_mp_ad_texlock, 0, GetFlag(NEWSTDMTL_LOCK_ADTEX) != 0);
 
-    if (loadVer < 8) {
+    if (loadVer < 8)
+    {
         Interval v;
         Update(0, v);
         // In old versions, the ID's & the channel numbers correspond
-        if (MAPACTIVE(ID_OP)) {
-            if (maps->txmap[ID_OP].amount != 1.0f) SetOpacity(0.0f, 0);
+        if (MAPACTIVE(ID_OP))
+        {
+            if (maps->txmap[ID_OP].amount != 1.0f)
+                SetOpacity(0.0f, 0);
         }
 
         if (stdParams & STD_PARAM_SELFILLUM)
-            if (MAPACTIVE(ID_SI)) {
-                if (maps->txmap[ID_SI].amount != 1.0f) pShader->SetSelfIllum(0.0f, 0);
+            if (MAPACTIVE(ID_SI))
+            {
+                if (maps->txmap[ID_SI].amount != 1.0f)
+                    pShader->SetSelfIllum(0.0f, 0);
             }
 
         if (stdParams & STD_PARAM_SPECULAR_LEV)
-            if (MAPACTIVE(ID_SS)) {
+            if (MAPACTIVE(ID_SS))
+            {
                 float amt = maps->txmap[ID_SS].amount;
                 SetTexmapAmt(ID_SS, amt * pShader->GetSpecularLevel(0, 0), 0);
                 pShader->SetSpecularLevel(0.0f, 0);
             }
 
         if (stdParams & STD_PARAM_GLOSSINESS)
-            if (MAPACTIVE(ID_SH)) {
+            if (MAPACTIVE(ID_SH))
+            {
                 float amt = maps->txmap[ID_SH].amount;
                 SetTexmapAmt(ID_SH, amt * pShader->GetGlossiness(0, 0), 0);
                 pShader->SetGlossiness(0.0f, 0);
             }
     }
-    if (loadVer < 9) {
+    if (loadVer < 9)
+    {
         if (stdParams & STD_PARAM_SOFTEN_LEV)
             if (flags & NEWSTDMTL_SOFTEN)
                 pShader->SetSoftenLevel(.6f, 0);
@@ -3171,9 +3167,11 @@ void XRayMtl::BumpFix()
 {
     // Fix up bump map amount on old files if the node is scaled.	DS 4/16/99
     int bumpChannel = stdIDToChannel[ID_BU];
-    if ((*maps)[bumpChannel].IsActive()) {
+    if ((*maps)[bumpChannel].IsActive())
+    {
         float s = GetNodeScaling(this);
-        if (s != 1.0f) {
+        if (s != 1.0f)
+        {
             float am = GetTexmapAmt(bumpChannel);
             SetTexmapAmt(bumpChannel, s * am, 0);
         }
@@ -3188,7 +3186,7 @@ public:
     XRayMtl* m;
 
     NewStdMtl2BumpFixCB(XRayMtl* s) { m = s; }
-    int Priority() { return 7; }  // run at lower priority after normal PLCB's are all finished
+    int Priority() { return 7; } // run at lower priority after normal PLCB's are all finished
     void proc(ILoad* iload)
     {
         m->BumpFix();
@@ -3210,7 +3208,7 @@ public:
 
         // make sure the right indx is selected for shaders & samplers
         m->SetShaderIndx(m->FindShader(m->pShader->ClassID()), FALSE);
-        if (m->pixelSampler == NULL)  // for some alpha files!
+        if (m->pixelSampler == NULL) // for some alpha files!
             m->SetSamplerIndx(m->FindSampler(Class_ID(DEFAULT_SAMPLER_CLASS_ID, 0)));
 
         m->SetSamplerIndx(m->FindSampler(m->pixelSampler->ClassID()), FALSE);
@@ -3264,21 +3262,24 @@ IOResult XRayMtl::Load(ILoad* iload)
         {
             LPSTR es_name;
             res = iload->ReadCStringChunk(&es_name);
-            if (res == IO_OK) eshaderId = XRayMtl::FindEShader(es_name);
+            if (res == IO_OK)
+                eshaderId = XRayMtl::FindEShader(es_name);
         }
         break;
         case NEWSTDMTL_XRAY_CSHADER_CHUNK:
         {
             LPSTR cs_name;
             res = iload->ReadCStringChunk(&cs_name);
-            if (res == IO_OK) cshaderId = XRayMtl::FindCShader(cs_name);
+            if (res == IO_OK)
+                cshaderId = XRayMtl::FindCShader(cs_name);
         }
         break;
         case NEWSTDMTL_XRAY_GAMEMTL_CHUNK:
         {
             LPSTR gm_name;
             res = iload->ReadCStringChunk(&gm_name);
-            if (res == IO_OK) gamemtlId = XRayMtl::FindGameMtl(gm_name);
+            if (res == IO_OK)
+                gamemtlId = XRayMtl::FindGameMtl(gm_name);
         }
         break;
         case NEWSTDMTL_VERS_CHUNK: res = iload->Read(&version, sizeof(version), &nb); break;
@@ -3293,23 +3294,28 @@ IOResult XRayMtl::Load(ILoad* iload)
         case NEWSTDMTL_DIM_REFLECT: dimReflect = TRUE; break;
         }
         iload->CloseChunk();
-        if (res != IO_OK) return res;
+        if (res != IO_OK)
+            return res;
     }
 
     // register version updaters
-    if (version <= FINAL_PARAMBLOCK_v1_VERSION) {
+    if (version <= FINAL_PARAMBLOCK_v1_VERSION)
+    {
         iload->RegisterPostLoadCallback(
             new ParamBlockPLCB((ParamVersionDesc*)oldNewStdMtlVersions, NEWSTDMTL_NUMOLDVER, &stdMtlVersion, this, 0));
         iload->RegisterPostLoadCallback(new NewStdMtl2UpdateCB(this, version));
-        if (version < 12) iload->RegisterPostLoadCallback(new NewStdMtl2BumpFixCB(this));
+        if (version < 12)
+            iload->RegisterPostLoadCallback(new NewStdMtl2BumpFixCB(this));
         iload->SetObsolete();
     }
 
-    if (TextureDisplayEnabled()) {
+    if (TextureDisplayEnabled())
+    {
         IncrActive();
     }
 
-    if (gamemtlId == -1) gamemtlId = XRayMtl::FindGameMtl("default");
+    if (gamemtlId == -1)
+        gamemtlId = XRayMtl::FindGameMtl("default");
 
     // register plcb to finalize setup
     iload->RegisterPostLoadCallback(new NewStdMtl2CB(this));
@@ -3338,14 +3344,16 @@ IC void AlphaCompCol(Color& c, RGBA c_over)
 Color XRayMtl::TranspColor(float opac, Color filt, Color diff)
 {
     // Compute the color of the transparent filter color
-    if (flags & NEWSTDMTL_ADD_TRANSP) {
+    if (flags & NEWSTDMTL_ADD_TRANSP)
+    {
         float f = 1.0f - opac;
         return Color(f, f, f);
     }
     else if (flags & NEWSTDMTL_FILT_TRANSP)
     {
         // Transparent Filter color mapping
-        if (opac > 0.5f) {
+        if (opac > 0.5f)
+        {
             // darken as opac goes ( 0.5--> 1.0)
             // so that max component reaches 0.0f when opac reaches 1.0
             // find max component of filt
@@ -3392,7 +3400,8 @@ void XRayMtl::PreShade(ShadeContext& sc, IReshadeFragment* pFrag)
 
 #ifdef _DEBUG
     IPoint2 sPt = sc.ScreenCoord();
-    if (sPt.x == xStop && sPt.y == yStop) long junk = -1;
+    if (sPt.x == xStop && sPt.y == yStop)
+        long junk = -1;
 #endif
 
     BOOL bumped = FALSE;
@@ -3410,7 +3419,8 @@ void XRayMtl::PreShade(ShadeContext& sc, IReshadeFragment* pFrag)
 
     // Bump mapping: Do this FIRST so other maps can use the perturbed normal
     int bumpChannel = stdIDToChannel[ID_BU];
-    if (DOMAP(bumpChannel)) {
+    if (DOMAP(bumpChannel))
+    {
         Point3 dn = (*maps)[bumpChannel].EvalNormalPerturb(sc);
         bumped = TRUE;
         N = Normalize(N + (sc.backFace ? -dn : dn));
@@ -3424,20 +3434,25 @@ void XRayMtl::PreShade(ShadeContext& sc, IReshadeFragment* pFrag)
     RGBA c;
     for (long i = 0; i < STD2_NMAX_TEXMAPS; ++i)
     {
-        if (sc.doMaps && (*maps)[i].IsActive()) {
+        if (sc.doMaps && (*maps)[i].IsActive())
+        {
             long t = pShader->ChannelType(i);
             // composite the channel
-            if ((t & SKIP_CHANNELS) == 0) {
-                if (t & MONO_CHANNEL) {
+            if ((t & SKIP_CHANNELS) == 0)
+            {
+                if (t & MONO_CHANNEL)
+                {
                     // note: r always holds channel data for mono channels
                     float m = (*maps)[i].map->EvalMono(sc);
                     pFrag->AddFloatChannel(m);
                 }
                 else
                 {
-                    if (i != ambChan || (flags & NEWSTDMTL_LOCK_ADTEX) == 0) {
+                    if (i != ambChan || (flags & NEWSTDMTL_LOCK_ADTEX) == 0)
+                    {
                         c = (*maps)[i].map->EvalColor(sc);
-                        if ((*maps)[i].map->IsHighDynamicRange()) {
+                        if ((*maps)[i].map->IsHighDynamicRange())
+                        {
                             LogLUV32Pixel lc;
 
                             lc = c;
@@ -3457,17 +3472,20 @@ void XRayMtl::PreShade(ShadeContext& sc, IReshadeFragment* pFrag)
 
     // Evaluate reflection map.
     int reflChan = stdIDToChannel[ID_RL];
-    if (DOMAP(reflChan)) {
+    if (DOMAP(reflChan))
+    {
         AColor rcol;
         Texmap* reflmap = (*maps)[reflChan].map;
-        if (reflmap->HandleOwnViewPerturb()) {
+        if (reflmap->HandleOwnViewPerturb())
+        {
             sc.TossCache(reflmap);
             rcol = reflmap->EvalColor(sc);
         }
         else
             rcol = sc.EvalEnvironMap(reflmap, sc.ReflectVector());
 
-        if ((*maps)[reflChan].map->IsHighDynamicRange()) {
+        if ((*maps)[reflChan].map->IsHighDynamicRange())
+        {
             LogLUV32Pixel lc;
 
             lc = rcol;
@@ -3482,7 +3500,8 @@ void XRayMtl::PreShade(ShadeContext& sc, IReshadeFragment* pFrag)
 
     // do refraction map
     int refrChan = stdIDToChannel[ID_RR];
-    if (DOMAP(refrChan)) {
+    if (DOMAP(refrChan))
+    {
         // Evaluate refraction map, as yet unfiltered by filter color.
         Texmap* refrmap = (*maps)[refrChan].map;
         AColor rcol;
@@ -3491,7 +3510,8 @@ void XRayMtl::PreShade(ShadeContext& sc, IReshadeFragment* pFrag)
         else
             rcol = sc.EvalEnvironMap(refrmap, sc.RefractVector(ioRefract));
 
-        if ((*maps)[refrChan].map->IsHighDynamicRange()) {
+        if ((*maps)[refrChan].map->IsHighDynamicRange())
+        {
             LogLUV32Pixel lc;
 
             lc = rcol;
@@ -3505,10 +3525,12 @@ void XRayMtl::PreShade(ShadeContext& sc, IReshadeFragment* pFrag)
 
     // see if the shader wants to save anything
     IReshading* pReshading;
-    if ((pReshading = (IReshading*)pShader->GetInterface(IID_IReshading)) != NULL) {
+    if ((pReshading = (IReshading*)pShader->GetInterface(IID_IReshading)) != NULL)
+    {
         pReshading->PreShade(sc, pFrag);
     }
-    if (bumped) sc.SetNormal(sc.OrigNormal());
+    if (bumped)
+        sc.SetNormal(sc.OrigNormal());
 }
 
 void XRayMtl::PostShade(ShadeContext& sc, IReshadeFragment* pFrag, int& nextTexIndex, IllumParams*)
@@ -3522,10 +3544,11 @@ void XRayMtl::PostShade(ShadeContext& sc, IReshadeFragment* pFrag, int& nextTexI
 
 #ifdef _DEBUG
     IPoint2 sPt = sc.ScreenCoord();
-    if (sPt.x == xStop && sPt.y == yStop) long junk = -1;
+    if (sPt.x == xStop && sPt.y == yStop)
+        long junk = -1;
 #endif
 
-    pShader->Update(sc.CurTime(), FOREVER);  // mjm - 12.17.99
+    pShader->Update(sc.CurTime(), FOREVER); // mjm - 12.17.99
     pShader->GetIllumParams(sc, ip);
     ip.ClearOutputs();
     ip.pShader = pShader;
@@ -3540,12 +3563,14 @@ void XRayMtl::PostShade(ShadeContext& sc, IReshadeFragment* pFrag, int& nextTexI
     int reflChan = stdIDToChannel[ID_RL];
     int refrChan = stdIDToChannel[ID_RR];
 
-    if (filtChan >= 0) ip.channels[filtChan] = filter;
-    if (trChan >= 0) ip.channels[trChan].r = opac;
+    if (filtChan >= 0)
+        ip.channels[filtChan] = filter;
+    if (trChan >= 0)
+        ip.channels[trChan].r = opac;
     ULONG trType =
         (flags & NEWSTDMTL_FILT_TRANSP) ? TRANSP_FILTER : (flags & NEWSTDMTL_ADD_TRANSP) ? TRANSP_ADD : TRANSP_SUB;
 
-    P = sc.P();  // position
+    P = sc.P(); // position
 
     ip.stdParams = pShader->SupportStdParams();
 
@@ -3555,9 +3580,11 @@ void XRayMtl::PostShade(ShadeContext& sc, IReshadeFragment* pFrag, int& nextTexI
     //	sc.SetIOR(ioRefract);
 
     // All normal color & scalar maps are handled here
-    if (pFrag->NChannels() > 0) {
+    if (pFrag->NChannels() > 0)
+    {
         // bump mapping
-        if (DOMAP(stdIDToChannel[ID_BU])) {
+        if (DOMAP(stdIDToChannel[ID_BU]))
+        {
             bumped = TRUE;
             // NB: shadeContext has perturbed normal
             sc.SetNormal(pFrag->GetUnitVecChannel(nextTexIndex++));
@@ -3566,19 +3593,24 @@ void XRayMtl::PostShade(ShadeContext& sc, IReshadeFragment* pFrag, int& nextTexI
         RGBA c;
         for (long i = 0; i < STD2_NMAX_TEXMAPS; ++i)
         {
-            if (sc.doMaps && (*maps)[i].IsActive()) {
+            if (sc.doMaps && (*maps)[i].IsActive())
+            {
                 long t = pShader->ChannelType(i);
                 // composite the channel
-                if ((t & SKIP_CHANNELS) == 0) {
-                    if (t & MONO_CHANNEL) {
+                if ((t & SKIP_CHANNELS) == 0)
+                {
+                    if (t & MONO_CHANNEL)
+                    {
                         // note: r always holds channel data for mono channels
                         ip.channels[i].r = (*maps)[i].LerpMono(
-                            ip.channels[i].r, pFrag->GetFloatChannel(nextTexIndex++));  // mjm - 1.17.00
+                            ip.channels[i].r, pFrag->GetFloatChannel(nextTexIndex++)); // mjm - 1.17.00
                     }
                     else
                     {
-                        if (i != ambChan || (flags & NEWSTDMTL_LOCK_ADTEX) == 0) {
-                            if ((*maps)[i].map->IsHighDynamicRange()) {
+                        if (i != ambChan || (flags & NEWSTDMTL_LOCK_ADTEX) == 0)
+                        {
+                            if ((*maps)[i].map->IsHighDynamicRange())
+                            {
                                 LogLUV32Pixel lc;
                                 lc.value = pFrag->GetIntChannel(nextTexIndex++);
                                 lc.GetRGB(c);
@@ -3588,25 +3620,29 @@ void XRayMtl::PostShade(ShadeContext& sc, IReshadeFragment* pFrag, int& nextTexI
                             {
                                 c = pFrag->GetColorChannel(nextTexIndex++);
                             }
-                            c *= (*maps)[i].amount;  // mjm - 1.17.00
+                            c *= (*maps)[i].amount; // mjm - 1.17.00
                             AlphaCompCol(ip.channels[i], c);
                         }
                     }
                     // lock adtex, really channels 0 & 1
-                    if (i == diffChan && (flags & NEWSTDMTL_LOCK_ADTEX) && ambChan >= 0) {
+                    if (i == diffChan && (flags & NEWSTDMTL_LOCK_ADTEX) && ambChan >= 0)
+                    {
                         AlphaCompCol(ip.channels[ambChan], c);
                     }
-                }  // end, don't skip
-            }      // end, is active
-        }          // end, for each possible map
+                } // end, don't skip
+            } // end, is active
+        } // end, for each possible map
 
         // Evaluate reflection map.
-        if ((*maps)[reflChan].map) ip.hasComponents |= HAS_REFLECT_MAP;
+        if ((*maps)[reflChan].map)
+            ip.hasComponents |= HAS_REFLECT_MAP;
 
-        if (DOMAP(reflChan)) {
+        if (DOMAP(reflChan))
+        {
             ip.hasComponents |= HAS_REFLECT;
-            AColor rcol;  // mjm - 1.17.00
-            if ((*maps)[reflChan].map->IsHighDynamicRange()) {
+            AColor rcol; // mjm - 1.17.00
+            if ((*maps)[reflChan].map->IsHighDynamicRange())
+            {
                 LogLUV32Pixel lc;
                 lc.value = pFrag->GetIntChannel(nextTexIndex++);
                 lc.GetRGB(rcol);
@@ -3614,7 +3650,7 @@ void XRayMtl::PostShade(ShadeContext& sc, IReshadeFragment* pFrag, int& nextTexI
             }
             else
             {
-                rcol = pFrag->GetColorChannel(nextTexIndex++);  // mjm - 1.17.00
+                rcol = pFrag->GetColorChannel(nextTexIndex++); // mjm - 1.17.00
             }
             Color rc(rcol.r, rcol.g, rcol.b);
             ip.channels[reflChan] = rc;
@@ -3622,39 +3658,44 @@ void XRayMtl::PostShade(ShadeContext& sc, IReshadeFragment* pFrag, int& nextTexI
         }
 
         // do refraction map
-        if ((*maps)[refrChan].map) ip.hasComponents |= HAS_REFRACT_MAP;
+        if ((*maps)[refrChan].map)
+            ip.hasComponents |= HAS_REFRACT_MAP;
 
-        if (DOMAP(refrChan)) {
+        if (DOMAP(refrChan))
+        {
             // Evaluate refraction map, as yet unfiltered by filter color.
             ip.refractAmt = (*maps)[refrChan].amount;
-            AColor rcol;  // mjm - 1.17.00
-            if ((*maps)[refrChan].map->IsHighDynamicRange()) {
+            AColor rcol; // mjm - 1.17.00
+            if ((*maps)[refrChan].map->IsHighDynamicRange())
+            {
                 LogLUV32Pixel lc;
                 lc.value = pFrag->GetIntChannel(nextTexIndex++);
                 lc.GetRGB(rcol);
             }
             else
             {
-                rcol = pFrag->GetColorChannel(nextTexIndex++);  // mjm - 1.17.00
+                rcol = pFrag->GetColorChannel(nextTexIndex++); // mjm - 1.17.00
             }
             Color rc(rcol.r, rcol.g, rcol.b);
             ip.channels[refrChan] = rc;
             ip.hasComponents |= HAS_REFRACT;
         }
-    }  // end, at least one map
+    } // end, at least one map
 
     // get falloff opacity for possible use by shader or compositor
-    opac = ip.channels[trChan].r;  // get (perhaps) textured opacity
+    opac = ip.channels[trChan].r; // get (perhaps) textured opacity
 
     ip.finalOpac = GetEffOpacity(sc, opac);
-    if (ip.finalOpac < 1.0f) ip.hasComponents |= HAS_OPACITY;
+    if (ip.finalOpac < 1.0f)
+        ip.hasComponents |= HAS_OPACITY;
 
     // init the global ambient
     ip.ambIllumOut = sc.ambientLight;
 
     // mapping done, illuminate...
     IReshading* pReshading;
-    if ((pReshading = (IReshading*)pShader->GetInterface(IID_IReshading)) != NULL) {
+    if ((pReshading = (IReshading*)pShader->GetInterface(IID_IReshading)) != NULL)
+    {
         pReshading->PostShade(sc, pFrag, nextTexIndex, &ip);
     }
 
@@ -3662,7 +3703,8 @@ void XRayMtl::PostShade(ShadeContext& sc, IReshadeFragment* pFrag, int& nextTexI
     sc.out.c = ip.finalC;
     sc.out.t = ip.finalT;
 
-    if (bumped) sc.SetNormal(sc.OrigNormal());
+    if (bumped)
+        sc.SetNormal(sc.OrigNormal());
 }
 
 // too late for sdk, eco in progress
@@ -3711,11 +3753,13 @@ void XRayMtl::Shade(ShadeContext& sc)
 
 #ifdef _DEBUG
     IPoint2 sPt = sc.ScreenCoord();
-    if (sPt.x == xStop && sPt.y == yStop) long junk = -1;
+    if (sPt.x == xStop && sPt.y == yStop)
+        long junk = -1;
 #endif
 
     BOOL bumped = FALSE;
-    if (gbufID) sc.SetGBufferID(gbufID);
+    if (gbufID)
+        sc.SetGBufferID(gbufID);
     //	ip.mtlFlags = flags;
 
     pShader->GetIllumParams(sc, ip);
@@ -3731,32 +3775,42 @@ void XRayMtl::Shade(ShadeContext& sc)
     int diffChan = stdIDToChannel[ID_DI];
     int trChan = stdIDToChannel[ID_OP];
     int filtChan = stdIDToChannel[ID_FI];
-    if (filtChan >= 0) ip.channels[filtChan] = filter;
-    if (trChan >= 0) ip.channels[trChan].r = opac;
+    if (filtChan >= 0)
+        ip.channels[filtChan] = filter;
+    if (trChan >= 0)
+        ip.channels[trChan].r = opac;
     ULONG trType =
         (flags & NEWSTDMTL_FILT_TRANSP) ? TRANSP_FILTER : (flags & NEWSTDMTL_ADD_TRANSP) ? TRANSP_ADD : TRANSP_SUB;
 
-    if (sc.mode == SCMODE_SHADOW) {
+    if (sc.mode == SCMODE_SHADOW)
+    {
         // Opacity mapping;
-        if (DOMAP(trChan)) opac = (*maps)[trChan].LerpEvalMono(sc, opac);
+        if (DOMAP(trChan))
+            opac = (*maps)[trChan].LerpEvalMono(sc, opac);
 
         // "Shadow mode": This just computes the transparency, which is all
         // you need for shadowing.
-        if (opac != 1.0f || opfall != 0.0f) {
-            if (opfall != 0.0f) {
+        if (opac != 1.0f || opfall != 0.0f)
+        {
+            if (opfall != 0.0f)
+            {
                 opac = GetEffOpacity(sc, opac);
             }
 
             // Transparency may use diffuse color mapping, check for orig 3ds transp
-            if ((flags & (NEWSTDMTL_ADD_TRANSP | NEWSTDMTL_FILT_TRANSP)) == 0) {
-                if (DOMAP(diffChan)) {
+            if ((flags & (NEWSTDMTL_ADD_TRANSP | NEWSTDMTL_FILT_TRANSP)) == 0)
+            {
+                if (DOMAP(diffChan))
+                {
                     mval = (*maps)[diffChan].Eval(sc);
                     AlphaCompCol(ip.channels[diffChan], mval);
                 }
             }
             // Transparency may also use filter color mapping
-            if (flags & NEWSTDMTL_FILT_TRANSP) {
-                if (DOMAP(filtChan)) {
+            if (flags & NEWSTDMTL_FILT_TRANSP)
+            {
+                if (DOMAP(filtChan))
+                {
                     mval = (*maps)[filtChan].Eval(sc);
                     AlphaCompCol(ip.channels[filtChan], mval);
                 }
@@ -3767,16 +3821,17 @@ void XRayMtl::Shade(ShadeContext& sc)
         else
             sc.out.t.Black();
         return;
-    }  // end, shadow mode
+    } // end, shadow mode
 
     // any shader can be faceted...& bumpmapped as well
-    if (flags & NEWSTDMTL_FACETED) {
+    if (flags & NEWSTDMTL_FACETED)
+    {
         Point3 N = sc.GNormal();
         bumped = TRUE;
         sc.SetNormal(N);
     }
 
-    P = sc.P();  // position
+    P = sc.P(); // position
 
     ip.stdParams = pShader->SupportStdParams();
 
@@ -3787,7 +3842,8 @@ void XRayMtl::Shade(ShadeContext& sc)
 
     // Bump mapping: Do this FIRST so other maps can use the perturbed normal
     int bumpChannel = stdIDToChannel[ID_BU];
-    if (DOMAP(bumpChannel)) {
+    if (DOMAP(bumpChannel))
+    {
         ip.hasComponents |= HAS_BUMPS;
         Point3 dn = (*maps)[bumpChannel].EvalNormalPerturb(sc);
         Point3 N = Normalize(sc.Normal() + (sc.backFace ? -dn : dn));
@@ -3800,24 +3856,30 @@ void XRayMtl::Shade(ShadeContext& sc)
     RGBA c;
     for (long i = 0; i < STD2_NMAX_TEXMAPS; ++i)
     {
-        if (sc.doMaps && (*maps)[i].IsActive()) {
+        if (sc.doMaps && (*maps)[i].IsActive())
+        {
             long t = pShader->ChannelType(i);
             // composite the channel
-            if ((t & SKIP_CHANNELS) == 0) {
-                if (t & MONO_CHANNEL) {
+            if ((t & SKIP_CHANNELS) == 0)
+            {
+                if (t & MONO_CHANNEL)
+                {
                     // note: x always holds channel data for mono channels
                     ip.channels[i].r = (*maps)[i].LerpEvalMono(sc, ip.channels[i].r);
                 }
                 else
                 {
-                    if (i != ambChan || (flags & NEWSTDMTL_LOCK_ADTEX) == 0) {
+                    if (i != ambChan || (flags & NEWSTDMTL_LOCK_ADTEX) == 0)
+                    {
                         c = (*maps)[i].Eval(sc);
                         AlphaCompCol(ip.channels[i], c);
                     }
                 }
                 // lock adtex, really channels 0 & 1
-                if (i == diffChan && ambChan >= 0 && (flags & NEWSTDMTL_LOCK_ADTEX)) {
-                    if (t0 & MONO_CHANNEL) {
+                if (i == diffChan && ambChan >= 0 && (flags & NEWSTDMTL_LOCK_ADTEX))
+                {
+                    if (t0 & MONO_CHANNEL)
+                    {
                         ip.channels[ambChan].r = (*maps)[diffChan].LerpEvalMono(sc, ip.channels[diffChan].r);
                     }
                     else
@@ -3831,13 +3893,16 @@ void XRayMtl::Shade(ShadeContext& sc)
 
     // Evaluate reflection map.
     int reflChan = stdIDToChannel[ID_RL];
-    if ((*maps)[reflChan].map) ip.hasComponents |= HAS_REFLECT_MAP;
+    if ((*maps)[reflChan].map)
+        ip.hasComponents |= HAS_REFLECT_MAP;
 
-    if (DOMAP(reflChan)) {
+    if (DOMAP(reflChan))
+    {
         ip.hasComponents |= HAS_REFLECT;
         AColor rcol;
         Texmap* reflmap = (*maps)[reflChan].map;
-        if (reflmap->HandleOwnViewPerturb()) {
+        if (reflmap->HandleOwnViewPerturb())
+        {
             sc.TossCache(reflmap);
             rcol = reflmap->EvalColor(sc);
         }
@@ -3850,9 +3915,11 @@ void XRayMtl::Shade(ShadeContext& sc)
 
     // do refraction map
     int refrChan = stdIDToChannel[ID_RR];
-    if ((*maps)[reflChan].map) ip.hasComponents |= HAS_REFRACT_MAP;
+    if ((*maps)[reflChan].map)
+        ip.hasComponents |= HAS_REFRACT_MAP;
 
-    if (DOMAP(refrChan)) {
+    if (DOMAP(refrChan))
+    {
         // Evaluate refraction map, as yet unfiltered by filter color.
         ip.refractAmt = (*maps)[refrChan].amount;
         Texmap* refrmap = (*maps)[refrChan].map;
@@ -3868,10 +3935,11 @@ void XRayMtl::Shade(ShadeContext& sc)
     }
 
     // get falloff opacity for possible use by shader or compositor
-    opac = ip.channels[trChan].r;  // get (perhaps) textured opacity
+    opac = ip.channels[trChan].r; // get (perhaps) textured opacity
 
     ip.finalOpac = GetEffOpacity(sc, opac);
-    if (ip.finalOpac < 1.0f) ip.hasComponents |= HAS_OPACITY;
+    if (ip.finalOpac < 1.0f)
+        ip.hasComponents |= HAS_OPACITY;
 
     // init the global ambient
     ip.ambIllumOut = sc.ambientLight;
@@ -3887,9 +3955,11 @@ void XRayMtl::Shade(ShadeContext& sc)
     // note: shadow must be on for any shadows to work. no ele's will get shadows
     // with shadows off
     int nEles = sc.NRenderElements();
-    if (nEles != 0) {
-        IllumParams* pIp2 = CloneIp(ip);  // too late for sdk, eco in progress
-        if (sc.shadow) {
+    if (nEles != 0)
+    {
+        IllumParams* pIp2 = CloneIp(ip); // too late for sdk, eco in progress
+        if (sc.shadow)
+        {
             // get unshadowed ip
             sc.shadow = FALSE;
             pIp2->ClearOutputs();
@@ -3899,7 +3969,8 @@ void XRayMtl::Shade(ShadeContext& sc)
         for (int i = 0; i < nEles; ++i)
         {
             IRenderElement* pEle = sc.GetRenderElement(i);
-            if (pEle->IsEnabled()) {
+            if (pEle->IsEnabled())
+            {
                 MaxRenderElement* pMaxEle = (MaxRenderElement*)pEle->GetInterface(MaxRenderElement::IID);
                 if (pEle->ShadowsApplied())
                     pMaxEle->PostIllum(sc, ip);
@@ -3910,7 +3981,8 @@ void XRayMtl::Shade(ShadeContext& sc)
         xr_delete(pIp2);
     }
 
-    if (bumped) sc.SetNormal(N0);  // restore normal
+    if (bumped)
+        sc.SetNormal(N0); // restore normal
 }
 
 float XRayMtl::EvalDisplacement(ShadeContext& sc)
@@ -3925,7 +3997,8 @@ float XRayMtl::EvalDisplacement(ShadeContext& sc)
 Interval XRayMtl::DisplacementValidity(TimeValue t)
 {
     int dispChan = stdIDToChannel[ID_DP];
-    if (MAPACTIVE(dispChan)) {
+    if (MAPACTIVE(dispChan))
+    {
         Interval iv;
         iv.SetInfinite();
         maps->txmap[dispChan].Update(t, iv);
@@ -3939,7 +4012,8 @@ void XRayMtl::DiscardTexHandles()
 {
     for (int i = 0; i < 2; i++)
     {
-        if (texHandle[i]) {
+        if (texHandle[i])
+        {
             texHandle[i]->DeleteThis();
             texHandle[i] = NULL;
         }
@@ -3950,7 +4024,8 @@ void XRayMtl::DiscardTexHandles()
 // begin - dds- 04.27.00 - multiple map display support
 void XRayMtl::ActivateTexDisplay(BOOL onoff)
 {
-    if (!onoff) {
+    if (!onoff)
+    {
         DiscardTexHandles();
     }
 }
@@ -3999,7 +4074,8 @@ static void StuffAlpha(BITMAPINFO* bi, float amt, float opac, Color fill)
     col.r = (int)(fill.r * 255.0f);
     col.g = (int)(fill.g * 255.0f);
     col.b = (int)(fill.b * 255.0f);
-    if (amt < 1.0f) {
+    if (amt < 1.0f)
+    {
         int ia = int(amt * 255.0f);
         int ic = int((1.0f - amt) * opac * 255.0f);
         for (int j = 0; j < npix; j++)
@@ -4031,7 +4107,8 @@ static void StuffAlphaInto(BITMAPINFO* bia, BITMAPINFO* bi, float amt, float opa
     int npix = w * h;
     UBYTE* a = BMIDATA(bia);
     UBYTE* b = BMIDATA(bi);
-    if (amt < 1.0f) {
+    if (amt < 1.0f)
+    {
         int ia = int(amt * 255.0f);
         int ic = int((1.0f - amt) * opac * 255.0f);
         for (int j = 0; j < npix; j++)
@@ -4069,11 +4146,13 @@ static Color whiteCol(1.0f, 1.0f, 1.0f);
 
 void XRayMtl::SetupGfxMultiMaps(TimeValue t, Material* mtl, MtlMakerCallback& cb)
 {
-    if (texHandleValid.InInterval(t)) {
+    if (texHandleValid.InInterval(t))
+    {
         mtl->texture.SetCount(numTexHandlesUsed);
         for (int i = 0; i < numTexHandlesUsed; i++)
         {
-            if (texHandle[i]) {
+            if (texHandle[i])
+            {
                 mtl->texture[i].textHandle = texHandle[i]->GetHandle();
                 Texmap* tx = (*maps)[useSubForTex[i]].map;
                 cb.GetGfxTexInfoFromTexmap(t, mtl->texture[i], tx);
@@ -4096,11 +4175,13 @@ void XRayMtl::SetupGfxMultiMaps(TimeValue t, Material* mtl, MtlMakerCallback& cb
     int nmaps = 0;
     for (int i = 0; i < NTEXHANDLES; i++)
     {
-        if (tx[i]) nmaps++;
+        if (tx[i])
+            nmaps++;
         bmi[i] = NULL;
     }
     mtl->texture.SetCount(nmaps);
-    if (nmaps == 0) return;
+    if (nmaps == 0)
+        return;
     for (int i = 0; i < nmaps; i++)
         mtl->texture[i].textHandle = NULL;
     texHandleValid.SetInfinite();
@@ -4111,13 +4192,16 @@ void XRayMtl::SetupGfxMultiMaps(TimeValue t, Material* mtl, MtlMakerCallback& cb
 
     int forceW = 0;
     int forceH = 0;
-    if (tx[0]) {
+    if (tx[0])
+    {
         cb.GetGfxTexInfoFromTexmap(t, mtl->texture[0], tx[0]);
         TextureInfo& ti = mtl->texture[0];
-        if (ti.tiling[0] == GW_TEX_NO_TILING || ti.tiling[1] == GW_TEX_NO_TILING) needDecal = TRUE;
+        if (ti.tiling[0] == GW_TEX_NO_TILING || ti.tiling[1] == GW_TEX_NO_TILING)
+            needDecal = TRUE;
         op = needDecal ? TXOP_ALPHABLEND : TXOP_MODULATE;
         bmi[0] = tx[0]->GetVPDisplayDIB(t, cb, valid, FALSE);
-        if (bmi[0]) {
+        if (bmi[0])
+        {
             texHandleValid &= valid;
             useSubForTex[0] = diffChan;
             ntx = 1;
@@ -4125,11 +4209,14 @@ void XRayMtl::SetupGfxMultiMaps(TimeValue t, Material* mtl, MtlMakerCallback& cb
             forceH = bmi[0]->bmiHeader.biHeight;
         }
     }
-    if (tx[1]) {
+    if (tx[1])
+    {
         cb.GetGfxTexInfoFromTexmap(t, mtl->texture[ntx], tx[1]);
-        if (nsupport > ntx) {
+        if (nsupport > ntx)
+        {
             bmi[1] = tx[1]->GetVPDisplayDIB(t, cb, valid, TRUE);
-            if (bmi[1]) {
+            if (bmi[1])
+            {
                 texHandleValid &= valid;
                 StuffAlpha(bmi[1], (*maps)[opacChan].amount, GetOpacity(t), ntx ? whiteCol : pShader->GetDiffuseClr(t));
                 texHandle[ntx] = cb.MakeHandle(bmi[1]);
@@ -4142,12 +4229,14 @@ void XRayMtl::SetupGfxMultiMaps(TimeValue t, Material* mtl, MtlMakerCallback& cb
         }
         else
         {
-            if (!needDecal) {
+            if (!needDecal)
+            {
                 TextureInfo ti;
                 //				if (SameUV(mtl->texture[0],mtl->texture[1])) {
                 // Not really correct to combine channels for different UV's but what the heck.
                 bmi[1] = tx[1]->GetVPDisplayDIB(t, cb, valid, TRUE, forceW, forceH);
-                if (bmi[1]) {
+                if (bmi[1])
+                {
                     texHandleValid &= valid;
                     StuffAlphaInto(bmi[1], bmi[0], (*maps)[opacChan].amount, GetOpacity(t));
                     op = TXOP_OPACITY;
@@ -4158,7 +4247,8 @@ void XRayMtl::SetupGfxMultiMaps(TimeValue t, Material* mtl, MtlMakerCallback& cb
             }
         }
     }
-    if (bmi[0]) {
+    if (bmi[0])
+    {
         texHandle[0] = cb.MakeHandle(bmi[0]);
         bmi[0] = NULL;
         mtl->texture[0].textHandle = texHandle[0]->GetHandle();
@@ -4176,15 +4266,17 @@ void XRayMtl::SetupGfxMultiMaps(TimeValue t, Material* mtl, MtlMakerCallback& cb
 // material is assigned to.
 // If it cannot determine the correct answer, it returns false
 //
-bool XRayMtl::IsOutputConst(ShadeContext& sc,  // describes context of evaluation
-    int stdID                                  // must be ID_AM, ect
+bool XRayMtl::IsOutputConst(ShadeContext& sc, // describes context of evaluation
+    int stdID // must be ID_AM, ect
     )
 {
     int channelID = StdIDToChannel(stdID);
     DbgAssert(0 <= channelID && channelID < NumSubTexmaps());
-    if (channelID < 0 || channelID >= NumSubTexmaps()) return false;
+    if (channelID < 0 || channelID >= NumSubTexmaps())
+        return false;
 
-    if (SubTexmapOn(channelID)) {
+    if (SubTexmapOn(channelID))
+    {
         Texmap* texMap = GetSubTexmap(channelID);
         DbgAssert(texMap != NULL);
         if (texMap != NULL && texMap->IsOutputMeaningful(sc))
@@ -4199,36 +4291,37 @@ bool XRayMtl::IsOutputConst(ShadeContext& sc,  // describes context of evaluatio
 // For a mono channel, the value is copied in all 3 components of the
 // output color.
 //
-bool XRayMtl::EvalColorStdChannel(ShadeContext& sc,  // describes context of evaluation
-    int stdID,                                       // must be ID_AM, ect
-    Color& outClr                                    // output var
+bool XRayMtl::EvalColorStdChannel(ShadeContext& sc, // describes context of evaluation
+    int stdID, // must be ID_AM, ect
+    Color& outClr // output var
     )
 {
     switch (stdID)
     {
-    case ID_BU:  // Bump (value 8)
+    case ID_BU: // Bump (value 8)
     {
         return EvalBump(sc, outClr);
     }
     break;
 
-    case ID_RL:  // Reflection (value 9)
+    case ID_RL: // Reflection (value 9)
     {
         return EvalReflection(sc, outClr);
     }
     break;
 
-    case ID_RR:  // Refraction (value 10)
+    case ID_RR: // Refraction (value 10)
     {
         return EvalRefraction(sc, outClr);
     }
     break;
 
-    case ID_DP:  // Displacement (value 11)
+    case ID_DP: // Displacement (value 11)
     {
         float outVal;
         bool bRes = EvalDisplacement(sc, outVal);
-        if (bRes) {
+        if (bRes)
+        {
             outClr.r = outClr.g = outClr.b = outVal;
         }
         return bRes;
@@ -4236,17 +4329,18 @@ bool XRayMtl::EvalColorStdChannel(ShadeContext& sc,  // describes context of eva
     break;
 
     // For everything else, there's a smart method
-    case ID_AM:  // Ambient (value 0)
-    case ID_DI:  // Diffuse (value 1)
-    case ID_SP:  // Specular (value 2)
-    case ID_SH:  // Shininess (value 3).  In R3 and later this is called Glossiness.
-    case ID_SS:  // Shininess strength (value 4).  In R3 and later this is called Specular Level.
-    case ID_SI:  // Self-illumination (value 5)
-    case ID_OP:  // Opacity (value 6)
-    case ID_FI:  // Filter color (value 7)
+    case ID_AM: // Ambient (value 0)
+    case ID_DI: // Diffuse (value 1)
+    case ID_SP: // Specular (value 2)
+    case ID_SH: // Shininess (value 3).  In R3 and later this is called Glossiness.
+    case ID_SS: // Shininess strength (value 4).  In R3 and later this is called Specular Level.
+    case ID_SI: // Self-illumination (value 5)
+    case ID_OP: // Opacity (value 6)
+    case ID_FI: // Filter color (value 7)
     {
         int id = StdIDToChannel(stdID);
-        if (id < 0 || id >= NumSubTexmaps()) return false;
+        if (id < 0 || id >= NumSubTexmaps())
+            return false;
         return EvalChannel(sc, id, outClr);
     }
     break;
@@ -4263,55 +4357,58 @@ bool XRayMtl::EvalColorStdChannel(ShadeContext& sc,  // describes context of eva
 //¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
 // Evaluates the material on a single texmap channel.
 //
-bool XRayMtl::EvalMonoStdChannel(ShadeContext& sc,  // describes context of evaluation
-    int stdID,                                      // must be ID_AM, ect
-    float& outVal                                   // output var
+bool XRayMtl::EvalMonoStdChannel(ShadeContext& sc, // describes context of evaluation
+    int stdID, // must be ID_AM, ect
+    float& outVal // output var
     )
 {
     switch (stdID)
     {
-    case ID_BU:  // Bump (value 8)
+    case ID_BU: // Bump (value 8)
     {
         Color outClr;
         bool bRes = EvalBump(sc, outClr);
-        if (bRes) outVal = Intens(outClr);
+        if (bRes)
+            outVal = Intens(outClr);
         return bRes;
     }
     break;
 
-    case ID_RL:  // Reflection (value 9)
+    case ID_RL: // Reflection (value 9)
     {
         return EvalReflection(sc, outVal);
     }
     break;
 
-    case ID_RR:  // Refraction (value 10)
+    case ID_RR: // Refraction (value 10)
     {
         return EvalRefraction(sc, outVal);
     }
     break;
 
-    case ID_DP:  // Displacement (value 11)
+    case ID_DP: // Displacement (value 11)
     {
         return EvalDisplacement(sc, outVal);
     }
     break;
 
     // For everything else, there's a smart method
-    case ID_AM:  // Ambient (value 0)
-    case ID_DI:  // Diffuse (value 1)
-    case ID_SP:  // Specular (value 2)
-    case ID_SH:  // Shininess (value 3).  In R3 and later this is called Glossiness.
-    case ID_SS:  // Shininess strength (value 4).  In R3 and later this is called Specular Level.
-    case ID_SI:  // Self-illumination (value 5)
-    case ID_OP:  // Opacity (value 6)
-    case ID_FI:  // Filter color (value 7)
+    case ID_AM: // Ambient (value 0)
+    case ID_DI: // Diffuse (value 1)
+    case ID_SP: // Specular (value 2)
+    case ID_SH: // Shininess (value 3).  In R3 and later this is called Glossiness.
+    case ID_SS: // Shininess strength (value 4).  In R3 and later this is called Specular Level.
+    case ID_SI: // Self-illumination (value 5)
+    case ID_OP: // Opacity (value 6)
+    case ID_FI: // Filter color (value 7)
     {
         int id = StdIDToChannel(stdID);
-        if (id < 0 || id >= NumSubTexmaps()) return false;
+        if (id < 0 || id >= NumSubTexmaps())
+            return false;
         Color outClr;
         bool bRes = EvalChannel(sc, id, outClr);
-        if (bRes) outVal = Intens(outClr);
+        if (bRes)
+            outVal = Intens(outClr);
         return bRes;
     }
     break;
@@ -4336,9 +4433,11 @@ bool XRayMtl::EvalChannel(ShadeContext& sc, int channelID, Color& outClr)
     // Check if the mtl has or not a shader
     Shader* pShad = GetShader();
     DbgAssert(pShader != NULL);
-    if (pShad == NULL) {
+    if (pShad == NULL)
+    {
         // Filter color and opacity values are managed by the stdmtl2?
-        if (channelID == StdIDToChannel(ID_FI)) {
+        if (channelID == StdIDToChannel(ID_FI))
+        {
             outClr = filter;
             return true;
         }
@@ -4368,8 +4467,10 @@ bool XRayMtl::EvalChannel(ShadeContext& sc, int channelID, Color& outClr)
     long channelType = pShad->ChannelType(channelID);
 
     // Evaluate the texture map
-    if (sc.doMaps) {
-        if (channelID == StdIDToChannel(ID_AM) && (flags & NEWSTDMTL_LOCK_ADTEX) == NEWSTDMTL_LOCK_ADTEX) {
+    if (sc.doMaps)
+    {
+        if (channelID == StdIDToChannel(ID_AM) && (flags & NEWSTDMTL_LOCK_ADTEX) == NEWSTDMTL_LOCK_ADTEX)
+        {
             // Treat exceptional situations first
             //
             // Evaluat the ambient channel using the diffuse texmap
@@ -4377,28 +4478,32 @@ bool XRayMtl::EvalChannel(ShadeContext& sc, int channelID, Color& outClr)
 
             long diffChanID = StdIDToChannel(ID_DI);
             long diffChanType = pShad->ChannelType(ID_DI);
-            if (diffChanID >= 0 && SubTexmapOn(diffChanID) && (diffChanType & SKIP_CHANNELS) == 0) {
+            if (diffChanID >= 0 && SubTexmapOn(diffChanID) && (diffChanType & SKIP_CHANNELS) == 0)
+            {
                 Texmap* texMap = GetSubTexmap(diffChanID);
-                if (texMap != NULL && texMap->IsOutputMeaningful(sc)) {
+                if (texMap != NULL && texMap->IsOutputMeaningful(sc))
+                {
                     // Evaluate the diffuse channel first
                     AColor diffColor;
-                    if ((diffChanType & MONO_CHANNEL) == MONO_CHANNEL) {
+                    if ((diffChanType & MONO_CHANNEL) == MONO_CHANNEL)
+                    {
                         diffColor.r = (*maps)[diffChanID].LerpEvalMono(sc, ip.channels[diffChanID].r);
                         diffColor.g = diffColor.b = diffColor.r;
                         diffColor.a = 0.0f;
                     }
-                    else  // if ( (diffChanType & CLR_CHANNEL ) == CLR_CHANNEL )
+                    else // if ( (diffChanType & CLR_CHANNEL ) == CLR_CHANNEL )
                     {
                         diffColor = (*maps)[diffChanID].Eval(sc);
                         AlphaCompCol(ip.channels[diffChanID], diffColor);
                     }
 
                     // Now evaluate the ambient channel
-                    if ((channelType & MONO_CHANNEL) == MONO_CHANNEL) {
+                    if ((channelType & MONO_CHANNEL) == MONO_CHANNEL)
+                    {
                         ip.channels[channelID].r = (*maps)[diffChanID].LerpEvalMono(sc, ip.channels[diffChanID].r);
                         ip.channels[channelID].g = ip.channels[channelID].b = ip.channels[channelID].r;
                     }
-                    else  // if ( (channelType & CLR_CHANNEL ) == CLR_CHANNEL )
+                    else // if ( (channelType & CLR_CHANNEL ) == CLR_CHANNEL )
                         AlphaCompCol(ip.channels[channelID], diffColor);
                 }
             }
@@ -4407,14 +4512,17 @@ bool XRayMtl::EvalChannel(ShadeContext& sc, int channelID, Color& outClr)
         {
             // Normal course of channel evaluation
 
-            if (SubTexmapOn(channelID) && (channelType & SKIP_CHANNELS) == 0) {
+            if (SubTexmapOn(channelID) && (channelType & SKIP_CHANNELS) == 0)
+            {
                 Texmap* texMap = GetSubTexmap(channelID);
-                if (texMap != NULL && texMap->IsOutputMeaningful(sc)) {
-                    if ((channelType & MONO_CHANNEL) == MONO_CHANNEL) {
+                if (texMap != NULL && texMap->IsOutputMeaningful(sc))
+                {
+                    if ((channelType & MONO_CHANNEL) == MONO_CHANNEL)
+                    {
                         ip.channels[channelID].r = (*maps)[channelID].LerpEvalMono(sc, ip.channels[channelID].r);
                         ip.channels[channelID].g = ip.channels[channelID].b = ip.channels[channelID].r;
                     }
-                    else  // if ( (channelType & CLR_CHANNEL ) == CLR_CHANNEL )
+                    else // if ( (channelType & CLR_CHANNEL ) == CLR_CHANNEL )
                     {
                         AColor c = (*maps)[channelID].Eval(sc);
                         AlphaCompCol(ip.channels[channelID], c);
@@ -4436,7 +4544,8 @@ bool XRayMtl::EvalChannel(ShadeContext& sc, int channelID, Color& outClr)
 bool XRayMtl::EvalBump(ShadeContext& sc, Color& outClr)
 {
     int id = StdIDToChannel(ID_BU);
-    if (!ShouldEvalSubTexmap(sc, id)) {
+    if (!ShouldEvalSubTexmap(sc, id))
+    {
         outClr.Black();
         return false;
     }
@@ -4454,14 +4563,16 @@ bool XRayMtl::EvalBump(ShadeContext& sc, Color& outClr)
 bool XRayMtl::EvalReflection(ShadeContext& sc, Color& outClr)
 {
     int id = StdIDToChannel(ID_RL);
-    if (!ShouldEvalSubTexmap(sc, id)) {
+    if (!ShouldEvalSubTexmap(sc, id))
+    {
         return false;
     }
 
     AColor rcol;
     Texmap* reflmap = (*maps)[id].map;
     DbgAssert(reflmap != NULL);
-    if (reflmap->HandleOwnViewPerturb()) {
+    if (reflmap->HandleOwnViewPerturb())
+    {
         sc.TossCache(reflmap);
         rcol = reflmap->EvalColor(sc);
     }
@@ -4482,11 +4593,13 @@ bool XRayMtl::EvalReflection(ShadeContext& sc, Color& outClr)
 bool XRayMtl::EvalReflection(ShadeContext& sc, float& outVal)
 {
     int id = StdIDToChannel(ID_RL);
-    if (!ShouldEvalSubTexmap(sc, id)) return false;
+    if (!ShouldEvalSubTexmap(sc, id))
+        return false;
 
     Texmap* reflmap = (*maps)[id].map;
     DbgAssert(reflmap != NULL);
-    if (reflmap->HandleOwnViewPerturb()) {
+    if (reflmap->HandleOwnViewPerturb())
+    {
         sc.TossCache(reflmap);
         outVal = reflmap->EvalMono(sc);
     }
@@ -4507,12 +4620,14 @@ bool XRayMtl::EvalReflection(ShadeContext& sc, float& outVal)
 bool XRayMtl::EvalRefraction(ShadeContext& sc, Color& outClr)
 {
     int id = StdIDToChannel(ID_RR);
-    if (!ShouldEvalSubTexmap(sc, id)) return false;
+    if (!ShouldEvalSubTexmap(sc, id))
+        return false;
 
     AColor rcol;
     Texmap* refrmap = (*maps)[id].map;
     DbgAssert(refrmap != NULL);
-    if (refrmap->HandleOwnViewPerturb()) {
+    if (refrmap->HandleOwnViewPerturb())
+    {
         rcol = refrmap->EvalColor(sc);
     }
     else
@@ -4532,11 +4647,13 @@ bool XRayMtl::EvalRefraction(ShadeContext& sc, Color& outClr)
 bool XRayMtl::EvalRefraction(ShadeContext& sc, float& outVal)
 {
     int id = StdIDToChannel(ID_RR);
-    if (!ShouldEvalSubTexmap(sc, id)) return false;
+    if (!ShouldEvalSubTexmap(sc, id))
+        return false;
 
     Texmap* refrmap = (*maps)[id].map;
     DbgAssert(refrmap != NULL);
-    if (refrmap->HandleOwnViewPerturb()) {
+    if (refrmap->HandleOwnViewPerturb())
+    {
         outVal = refrmap->EvalMono(sc);
     }
     else
@@ -4556,7 +4673,8 @@ bool XRayMtl::EvalRefraction(ShadeContext& sc, float& outVal)
 bool XRayMtl::EvalDisplacement(ShadeContext& sc, float& outVal)
 {
     int id = StdIDToChannel(ID_DP);
-    if (!ShouldEvalSubTexmap(sc, id)) return false;
+    if (!ShouldEvalSubTexmap(sc, id))
+        return false;
 
     outVal = (*maps)[id].EvalMono(sc);
     return true;
@@ -4567,9 +4685,11 @@ bool XRayMtl::EvalDisplacement(ShadeContext& sc, float& outVal)
 //
 bool XRayMtl::ShouldEvalSubTexmap(ShadeContext& sc, int id)
 {
-    if (id >= 0 && id < NumSubTexmaps() && sc.doMaps && SubTexmapOn(id)) {
+    if (id >= 0 && id < NumSubTexmaps() && sc.doMaps && SubTexmapOn(id))
+    {
         Texmap* texMap = GetSubTexmap(id);
-        if (texMap != NULL && texMap->IsOutputMeaningful(sc)) return true;
+        if (texMap != NULL && texMap->IsOutputMeaningful(sc))
+            return true;
     }
 
     return false;
@@ -4584,7 +4704,8 @@ void XRayMtl::LoadXRayShaderList()
     int e_res = LoadBlenderList(XRayMtl::EShaders);
     int c_res = LoadShaderLCList(XRayMtl::CShaders);
     int g_res = LoadGameMtlList(XRayMtl::GameMtls);
-    if ((e_res == -1) || (c_res == -1) || (g_res == -1)) {
+    if ((e_res == -1) || (c_res == -1) || (g_res == -1))
+    {
         Log("Can't load shader files!\nGame material will work incorrectly.");
         THROW;
     }
@@ -4612,39 +4733,35 @@ void XRayMtl::SetGameMtlIndx(long indx)
     pb_xray->SetValue(std2_gamemtl_type, 0, indx < 0 ? 0 : indx);
     gamemtlId = indx;
 }
-TCHAR* XRayMtl::GetEShader(DWORD i)
-{
-    return (i < EShaders.size()) ? (TCHAR*)EShaders[i] : 0;
-}
-TCHAR* XRayMtl::GetCShader(DWORD i)
-{
-    return (i < CShaders.size()) ? (TCHAR*)CShaders[i] : 0;
-}
-TCHAR* XRayMtl::GetGameMtl(DWORD i)
-{
-    return (i < GameMtls.size()) ? (TCHAR*)GameMtls[i] : 0;
-}
-
+TCHAR* XRayMtl::GetEShader(DWORD i) { return (i < EShaders.size()) ? (TCHAR*)EShaders[i] : 0; }
+TCHAR* XRayMtl::GetCShader(DWORD i) { return (i < CShaders.size()) ? (TCHAR*)CShaders[i] : 0; }
+TCHAR* XRayMtl::GetGameMtl(DWORD i) { return (i < GameMtls.size()) ? (TCHAR*)GameMtls[i] : 0; }
 int XRayMtl::FindEShader(LPCSTR name)
 {
-    if (!name) return -1;
+    if (!name)
+        return -1;
     for (LPSTRIt it = XRayMtl::EShaders.begin(); it != XRayMtl::EShaders.end(); it++)
-        if (0 == xr_strcmp(*it, name)) return it - XRayMtl::EShaders.begin();
+        if (0 == xr_strcmp(*it, name))
+            return it - XRayMtl::EShaders.begin();
     return -1;
 }
 
 int XRayMtl::FindCShader(LPCSTR name)
 {
-    if (!name) return -1;
+    if (!name)
+        return -1;
     for (LPSTRIt it = XRayMtl::CShaders.begin(); it != XRayMtl::CShaders.end(); it++)
-        if (0 == xr_strcmp(*it, name)) return it - XRayMtl::CShaders.begin();
+        if (0 == xr_strcmp(*it, name))
+            return it - XRayMtl::CShaders.begin();
     return -1;
 }
 
 int XRayMtl::FindGameMtl(LPCSTR name)
 {
-    if (!name) return -1;
+    if (!name)
+        return -1;
     for (LPSTRIt it = XRayMtl::GameMtls.begin(); it != XRayMtl::GameMtls.end(); it++)
-        if (0 == xr_strcmp(*it, name)) return it - XRayMtl::GameMtls.begin();
+        if (0 == xr_strcmp(*it, name))
+            return it - XRayMtl::GameMtls.begin();
     return -1;
 }

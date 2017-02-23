@@ -42,12 +42,12 @@ private:
     float m_radius;
     shared_str m_shader;
     shared_str m_texture;
-};  // class gradient
+}; // class gradient
 
-}  // namespace suns
-}  // namespace environment
-}  // namespace editor
+} // namespace suns
+} // namespace environment
+} // namespace editor
 
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR
 
-#endif  // ifndef EDITOR_WEATHER_SUNS_GRADIENT_HPP_INCLUDED
+#endif // ifndef EDITOR_WEATHER_SUNS_GRADIENT_HPP_INCLUDED

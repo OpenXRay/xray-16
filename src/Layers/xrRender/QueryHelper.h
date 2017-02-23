@@ -78,28 +78,17 @@ IC HRESULT EndQuery(ID3DQuery* pQuery)
     return S_OK;
 }
 
-#else  //	USE_DX10
+#else //	USE_DX10
 
-IC HRESULT CreateQuery(ID3DQuery** ppQuery, D3DQUERYTYPE Type)
-{
-    return HW.pDevice->CreateQuery(Type, ppQuery);
-}
-
+IC HRESULT CreateQuery(ID3DQuery** ppQuery, D3DQUERYTYPE Type) { return HW.pDevice->CreateQuery(Type, ppQuery); }
 IC HRESULT GetData(ID3DQuery* pQuery, void* pData, UINT DataSize)
 {
     return pQuery->GetData(pData, DataSize, D3DGETDATA_FLUSH);
 }
 
-IC HRESULT BeginQuery(ID3DQuery* pQuery)
-{
-    return pQuery->Issue(D3DISSUE_BEGIN);
-}
+IC HRESULT BeginQuery(ID3DQuery* pQuery) { return pQuery->Issue(D3DISSUE_BEGIN); }
+IC HRESULT EndQuery(ID3DQuery* pQuery) { return pQuery->Issue(D3DISSUE_END); }
 
-IC HRESULT EndQuery(ID3DQuery* pQuery)
-{
-    return pQuery->Issue(D3DISSUE_END);
-}
+#endif //	USE_DX10
 
-#endif  //	USE_DX10
-
-#endif  //	QueryHelper_included
+#endif //	QueryHelper_included

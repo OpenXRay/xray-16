@@ -85,14 +85,14 @@ public:
     u32 m_dwLastUpdateTime;
     //	Fmatrix				m_tServerTransform;
 
-    u32 m_dwCurrentTime;  // time updated in UpdateCL
+    u32 m_dwCurrentTime; // time updated in UpdateCL
 
     struct net_update
     {
-        u32 dwTimeStamp;    // server(game) timestamp
-        float o_model;      // model yaw
-        SRotation o_torso;  // torso in world coords
-        Fvector p_pos;      // in world coords
+        u32 dwTimeStamp; // server(game) timestamp
+        float o_model; // model yaw
+        SRotation o_torso; // torso in world coords
+        Fvector p_pos; // in world coords
         float fHealth;
 
         // non-exported (temporal)
@@ -110,9 +110,9 @@ public:
     };
     xr_deque<net_update> NET;
     net_update NET_Last;
-    BOOL NET_WasInterpolating;  // previous update was by interpolation or by extrapolation
-    u32 NET_Time;               // server time of last update
-                                //------------------------------
+    BOOL NET_WasInterpolating; // previous update was by interpolation or by extrapolation
+    u32 NET_Time; // server time of last update
+    //------------------------------
 
     virtual bool feel_touch_on_contact(IGameObject*);
     virtual bool feel_touch_contact(IGameObject*);
@@ -137,7 +137,6 @@ public:
 public:
     virtual CEntityAlive* cast_entity_alive() { return this; }
     virtual CEntity* cast_entity() { return this; }
-
 public:
     virtual IFactoryObject* _construct();
     virtual BOOL net_Spawn(CSE_Abstract* DC);
@@ -149,14 +148,13 @@ public:
     virtual void UpdateCL();
 
     // Network
-    virtual void net_Export(NET_Packet& P);  // export to server
-    virtual void net_Import(NET_Packet& P);  // import from server
+    virtual void net_Export(NET_Packet& P); // export to server
+    virtual void net_Import(NET_Packet& P); // import from server
     virtual void net_Relcase(IGameObject* O);
 
     virtual void SelectAnimation(const Fvector& _view, const Fvector& _move, float speed) = 0;
 
     virtual bool is_base_monster_with_enemy() { return false; }
-
 // debug
 #ifdef DEBUG
     virtual void OnRender();
@@ -164,7 +162,6 @@ public:
 #endif
 
     virtual bool bfExecMovement() { return (false); };
-
     IC bool angle_lerp_bounds(float& a, float b, float c, float d);
     IC void vfNormalizeSafe(Fvector& Vector);
 
@@ -199,7 +196,6 @@ public:
     virtual void save(NET_Packet& output_packet);
     virtual void load(IReader& input_packet);
     virtual BOOL net_SaveRelevant() { return inherited::net_SaveRelevant(); }
-
     virtual const MonsterSpace::SBoneRotation& head_orientation() const;
 
     virtual void UpdatePositionAnimation();
@@ -208,7 +204,6 @@ public:
     virtual CParticlesPlayer* cast_particles_player() { return this; }
     virtual CCustomMonster* cast_custom_monster() { return this; }
     virtual CScriptEntity* cast_script_entity() { return this; }
-
     void load_killer_clsids(LPCSTR section);
     bool is_special_killer(IGameObject* obj);
 
@@ -262,7 +257,7 @@ private:
 
 public:
     IC const bool& already_dead() const { return (m_already_dead); };
-    virtual bool use_simplified_visual() const { return false; }  //(already_dead());};
+    virtual bool use_simplified_visual() const { return false; } //(already_dead());};
     virtual void on_enemy_change(const CEntityAlive* enemy);
     virtual CVisualMemoryManager* visual_memory() const;
 
@@ -290,10 +285,8 @@ protected:
 
 protected:
     virtual void load_critical_wound_bones() {}
-
     virtual bool critical_wound_external_conditions_suitable() { return true; }
     virtual void critical_wounded_state_start() {}
-
     bool update_critical_wounded(const u16& bone_id, const float& power);
 
 public:
@@ -337,7 +330,7 @@ public:
 #ifdef DEBUG
     xr_vector<trajectory_pick> m_jump_picks;
     xr_vector<Fvector> m_jump_collide_tris;
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 };
 
 #include "custommonster_inline.h"

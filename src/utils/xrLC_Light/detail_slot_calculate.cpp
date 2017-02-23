@@ -30,10 +30,10 @@ float color_intensity(Fcolor& c)
 class base_color
 {
 public:
-    Fvector rgb;  // - all static lighting
-    float hemi;   // - hemisphere
-    float sun;    // - sun
-    float _tmp_;  // ???
+    Fvector rgb; // - all static lighting
+    float hemi; // - hemisphere
+    float sun; // - sun
+    float _tmp_; // ???
     base_color()
     {
         rgb.set(0, 0, 0);
@@ -92,8 +92,10 @@ IC bool RayPick(CDB::COLLIDER& DB, Fvector& P, Fvector& D, float r, R_Light& L)
     // 1. Check cached polygon
     float _u, _v, range;
     bool res = CDB::TestRayTri(P, D, L.tri, _u, _v, range, true);
-    if (res) {
-        if (range > 0 && range < r) return true;
+    if (res)
+    {
+        if (range > 0 && range < r)
+            return true;
     }
 
     // 2. Polygon doesn't pick - real database query
@@ -103,7 +105,8 @@ IC bool RayPick(CDB::COLLIDER& DB, Fvector& P, Fvector& D, float r, R_Light& L)
     t_count += 1;
 
     // 3. Analyze
-    if (0 == DB.r_count()) {
+    if (0 == DB.r_count())
+    {
         return false;
     }
     else
@@ -118,7 +121,7 @@ IC bool RayPick(CDB::COLLIDER& DB, Fvector& P, Fvector& D, float r, R_Light& L)
     }
 }
 
-float getLastRP_Scale(CDB::COLLIDER* DB, R_Light& L)  //, Face* skip)
+float getLastRP_Scale(CDB::COLLIDER* DB, R_Light& L) //, Face* skip)
 {
     u32 tris_count = DB->r_count();
     float scale = 1.f;
@@ -140,11 +143,13 @@ float getLastRP_Scale(CDB::COLLIDER* DB, R_Light& L)  //, Face* skip)
 
             const Shader_xrLC& SH = shader(F.dwMaterial, *(gl_data.g_shaders_xrlc), gl_data.g_materials);
             //			Shader_xrLCVec&	LIB = 		gl_data.g_shaders_xrlc->Library	();
-            //			if (M.shader_xrlc>=LIB.size()) return		0;		//. hack - vy gonite rebyata - eto ne hack - eto
-            //sledy zamesti - shader_xrlc - index ne togo masiva !!
+            //			if (M.shader_xrlc>=LIB.size()) return		0;		//. hack - vy gonite rebyata - eto ne hack -
+            //eto
+            // sledy zamesti - shader_xrlc - index ne togo masiva !!
             //			Shader_xrLC& SH	= LIB						[M.shader_xrlc];
 
-            if (!SH.flags.bLIGHT_CastShadow) continue;
+            if (!SH.flags.bLIGHT_CastShadow)
+                continue;
 
 #ifdef DEBUG
             const b_BuildTexture& build_texture = gl_data.g_textures[M.surfidx];
@@ -152,8 +157,10 @@ float getLastRP_Scale(CDB::COLLIDER* DB, R_Light& L)  //, Face* skip)
             VERIFY(!!(build_texture.THM.HasSurface()) == !!(T.pSurface));
 #endif
 
-            if (0 == T.pSurface) T.bHasAlpha = FALSE;
-            if (!T.bHasAlpha) {
+            if (0 == T.pSurface)
+                T.bHasAlpha = FALSE;
+            if (!T.bHasAlpha)
+            {
                 // Opaque poly - cache it
                 L.tri[0].set(rpinf.verts[0]);
                 L.tri[1].set(rpinf.verts[1]);
@@ -174,9 +181,11 @@ float getLastRP_Scale(CDB::COLLIDER* DB, R_Light& L)  //, Face* skip)
             int U = iFloor(uv.x * float(T.dwWidth) + .5f);
             int V = iFloor(uv.y * float(T.dwHeight) + .5f);
             U %= T.dwWidth;
-            if (U < 0) U += T.dwWidth;
+            if (U < 0)
+                U += T.dwWidth;
             V %= T.dwHeight;
-            if (V < 0) V += T.dwHeight;
+            if (V < 0)
+                V += T.dwHeight;
 
             u32 pixel = T.pSurface[V * T.dwWidth + U];
             u32 pixel_a = color_get_A(pixel);
@@ -192,27 +201,30 @@ float getLastRP_Scale(CDB::COLLIDER* DB, R_Light& L)  //, Face* skip)
     return scale;
 }
 
-float rayTrace(CDB::COLLIDER* DB, R_Light& L, Fvector& P, Fvector& D, float R)  //, Face* skip)
+float rayTrace(CDB::COLLIDER* DB, R_Light& L, Fvector& P, Fvector& D, float R) //, Face* skip)
 {
     R_ASSERT(DB);
 
     // 1. Check cached polygon
     float _u, _v, range;
     bool res = CDB::TestRayTri(P, D, L.tri, _u, _v, range, false);
-    if (res) {
-        if (range > 0 && range < R) return 0;
+    if (res)
+    {
+        if (range > 0 && range < R)
+            return 0;
     }
 
     // 2. Polygon doesn't pick - real database query
     DB->ray_query(&gl_data.RCAST_Model, P, D, R);
 
     // 3. Analyze polygons and cache nearest if possible
-    if (0 == DB->r_count()) {
+    if (0 == DB->r_count())
+    {
         return 1;
     }
     else
     {
-        return getLastRP_Scale(DB, L);  //,skip);
+        return getLastRP_Scale(DB, L); //,skip);
     }
     return 0;
 }
@@ -222,15 +234,18 @@ void LightPoint(CDB::COLLIDER* DB, base_color& C, Fvector& P, Fvector& N, base_l
     Fvector Ldir, Pnew;
     Pnew.mad(P, N, 0.01f);
 
-    if (0 == (flags & LP_dont_rgb)) {
+    if (0 == (flags & LP_dont_rgb))
+    {
         R_Light *L = &*lights.rgb.begin(), *E = &*lights.rgb.end();
         for (; L != E; L++)
         {
-            if (L->type == LT_DIRECT) {
+            if (L->type == LT_DIRECT)
+            {
                 // Cos
                 Ldir.invert(L->direction);
                 float D = Ldir.dotproduct(N);
-                if (D <= 0) continue;
+                if (D <= 0)
+                    continue;
 
                 // Trace Light
                 float scale = D * L->energy * rayTrace(DB, *L, Pnew, Ldir, 1000.f);
@@ -242,13 +257,15 @@ void LightPoint(CDB::COLLIDER* DB, base_color& C, Fvector& P, Fvector& N, base_l
             {
                 // Distance
                 float sqD = P.distance_to_sqr(L->position);
-                if (sqD > L->range2) continue;
+                if (sqD > L->range2)
+                    continue;
 
                 // Dir
                 Ldir.sub(L->position, P);
                 Ldir.normalize_safe();
                 float D = Ldir.dotproduct(N);
-                if (D <= 0) continue;
+                if (D <= 0)
+                    continue;
 
                 // Trace Light
                 float R = _sqrt(sqD);
@@ -261,15 +278,18 @@ void LightPoint(CDB::COLLIDER* DB, base_color& C, Fvector& P, Fvector& N, base_l
             }
         }
     }
-    if (0 == (flags & LP_dont_sun)) {
+    if (0 == (flags & LP_dont_sun))
+    {
         R_Light *L = &*(lights.sun.begin()), *E = &*(lights.sun.end());
         for (; L != E; L++)
         {
-            if (L->type == LT_DIRECT) {
+            if (L->type == LT_DIRECT)
+            {
                 // Cos
                 Ldir.invert(L->direction);
                 float D = Ldir.dotproduct(N);
-                if (D <= 0) continue;
+                if (D <= 0)
+                    continue;
 
                 // Trace Light
                 float scale = L->energy * rayTrace(DB, *L, Pnew, Ldir, 1000.f);
@@ -279,13 +299,15 @@ void LightPoint(CDB::COLLIDER* DB, base_color& C, Fvector& P, Fvector& N, base_l
             {
                 // Distance
                 float sqD = P.distance_to_sqr(L->position);
-                if (sqD > L->range2) continue;
+                if (sqD > L->range2)
+                    continue;
 
                 // Dir
                 Ldir.sub(L->position, P);
                 Ldir.normalize_safe();
                 float D = Ldir.dotproduct(N);
-                if (D <= 0) continue;
+                if (D <= 0)
+                    continue;
 
                 // Trace Light
                 float R = _sqrt(sqD);
@@ -296,15 +318,18 @@ void LightPoint(CDB::COLLIDER* DB, base_color& C, Fvector& P, Fvector& N, base_l
             }
         }
     }
-    if (0 == (flags & LP_dont_hemi)) {
+    if (0 == (flags & LP_dont_hemi))
+    {
         R_Light *L = &*lights.hemi.begin(), *E = &*lights.hemi.end();
         for (; L != E; L++)
         {
-            if (L->type == LT_DIRECT) {
+            if (L->type == LT_DIRECT)
+            {
                 // Cos
                 Ldir.invert(L->direction);
                 float D = Ldir.dotproduct(N);
-                if (D <= 0) continue;
+                if (D <= 0)
+                    continue;
 
                 // Trace Light
                 Fvector PMoved;
@@ -316,13 +341,15 @@ void LightPoint(CDB::COLLIDER* DB, base_color& C, Fvector& P, Fvector& N, base_l
             {
                 // Distance
                 float sqD = P.distance_to_sqr(L->position);
-                if (sqD > L->range2) continue;
+                if (sqD > L->range2)
+                    continue;
 
                 // Dir
                 Ldir.sub(L->position, P);
                 Ldir.normalize_safe();
                 float D = Ldir.dotproduct(N);
-                if (D <= 0) continue;
+                if (D <= 0)
+                    continue;
 
                 // Trace Light
                 float R = _sqrt(sqD);
@@ -338,7 +365,8 @@ void LightPoint(CDB::COLLIDER* DB, base_color& C, Fvector& P, Fvector& N, base_l
 bool detail_slot_process(u32 _x, u32 _z, DetailSlot& DS)
 {
     process_pallete(DS);
-    if (gl_data.slots_data.skip_slot(_x, _z)) return false;
+    if (gl_data.slots_data.skip_slot(_x, _z))
+        return false;
     return true;
 }
 
@@ -362,7 +390,8 @@ bool detail_slot_calculate(
     box_result.clear();
     for (CDB::RESULT* I = DB.r_begin(); I != DB.r_end(); I++)
         box_result.push_back(I->id);
-    if (box_result.empty()) return false;
+    if (box_result.empty())
+        return false;
     // continue;
 
     CDB::TRI* tris = gl_data.RCAST_Model.get_tris();
@@ -398,17 +427,21 @@ bool detail_slot_calculate(
             {
                 CDB::TRI& T = tris[*tit];
                 Fvector V[3] = {verts[T.verts[0]], verts[T.verts[1]], verts[T.verts[2]]};
-                if (CDB::TestRayTri(start, dir, V, r_u, r_v, r_range, TRUE)) {
-                    if (r_range >= 0.f) {
+                if (CDB::TestRayTri(start, dir, V, r_u, r_v, r_range, TRUE))
+                {
+                    if (r_range >= 0.f)
+                    {
                         float y_test = start.y - r_range;
-                        if (y_test > P.y) {
+                        if (y_test > P.y)
+                        {
                             P.y = y_test + EPS;
                             t_n.mknormal(V[0], V[1], V[2]);
                         }
                     }
                 }
             }
-            if (P.y < BB.min.y) continue;
+            if (P.y < BB.min.y)
+                continue;
 
             // light point
             LightPoint(&DB, amount, P, t_n, Selected, 0);

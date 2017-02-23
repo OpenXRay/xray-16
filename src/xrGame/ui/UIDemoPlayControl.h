@@ -25,10 +25,8 @@ public:
     // virtual bool	OnKeyboard		(int dik, EUIMessages keyboard_action);
     virtual bool OnKeyboardAction(int dik, EUIMessages keyboard_action);
     virtual bool WorkInPause() const { return true; }
-
     virtual void Update();
     Fvector2 const& GetLastCursorPos() const { return m_last_curr_pos; };
-
     void xr_stdcall OnRestart(CUIWindow* w, void* d);
     void xr_stdcall OnDecresaseSpeed(CUIWindow* w, void* d);
     void xr_stdcall OnPlayPause(CUIWindow* w, void* d);
@@ -52,11 +50,11 @@ private:
         eRewindUntilArtTake,
         eRewindUntilArtDrop,
         eRewindUntilArtDeliver
-    };  // enum eRewindTypeTags
+    }; // enum eRewindTypeTags
     typedef buffer_vector<shared_str> players_collection_t;
 
     ERewindTypeTags m_last_rewind_type;
-    shared_str m_last_rewind_target;  // player name
+    shared_str m_last_rewind_target; // player name
 
     Frect m_pbox_rect;
     Fvector2 m_rewind_type_pos;
@@ -82,6 +80,6 @@ private:
 
     Fvector2 m_last_curr_pos;
     demoplay_control* m_demo_play_control;
-};  // class UIDemoPlayControl
+}; // class UIDemoPlayControl
 
-#endif  //#ifndef UIDEMOPLAY_CONTROL
+#endif //#ifndef UIDEMOPLAY_CONTROL

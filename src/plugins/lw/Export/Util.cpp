@@ -5,12 +5,18 @@
 EChannelType GetChannelType(LWChannelID chan)
 {
     const char* chname = g_chinfo->channelName(chan);
-    if (xr_strcmp(chname, "Position.X") == 0) return ctPositionX;
-    if (xr_strcmp(chname, "Position.Y") == 0) return ctPositionY;
-    if (xr_strcmp(chname, "Position.Z") == 0) return ctPositionZ;
-    if (xr_strcmp(chname, "Rotation.H") == 0) return ctRotationH;
-    if (xr_strcmp(chname, "Rotation.P") == 0) return ctRotationP;
-    if (xr_strcmp(chname, "Rotation.B") == 0) return ctRotationB;
+    if (xr_strcmp(chname, "Position.X") == 0)
+        return ctPositionX;
+    if (xr_strcmp(chname, "Position.Y") == 0)
+        return ctPositionY;
+    if (xr_strcmp(chname, "Position.Z") == 0)
+        return ctPositionZ;
+    if (xr_strcmp(chname, "Rotation.H") == 0)
+        return ctRotationH;
+    if (xr_strcmp(chname, "Rotation.P") == 0)
+        return ctRotationP;
+    if (xr_strcmp(chname, "Rotation.B") == 0)
+        return ctRotationB;
     return ctUnsupported;
 }
 
@@ -26,7 +32,8 @@ CEnvelope* CreateEnvelope(LWChannelID chan, LWChannelID* chan_parent /*= nullptr
     group = g_chinfo->channelParent(chan);
     lwenv = g_chinfo->channelEnvelope(chan);
     lwkey = NULL;
-    if (chan_parent) {
+    if (chan_parent)
+    {
         group_parent = g_chinfo->channelParent(*chan_parent);
         lwenv_parent = g_chinfo->channelEnvelope(*chan_parent);
         lwkey_parent = NULL;
@@ -34,9 +41,11 @@ CEnvelope* CreateEnvelope(LWChannelID chan, LWChannelID* chan_parent /*= nullptr
     g_envf->egGet(lwenv, group, LWENVTAG_PREBEHAVE, &env->behavior[0]);
     g_envf->egGet(lwenv, group, LWENVTAG_POSTBEHAVE, &env->behavior[1]);
     float val_parent = 0;
-    if (chan_parent) {
+    if (chan_parent)
+    {
         lwkey_parent = g_envf->nextKey(lwenv_parent, lwkey_parent);
-        if (lwkey_parent) {
+        if (lwkey_parent)
+        {
             g_envf->keyGet(lwenv_parent, lwkey_parent, LWKEY_VALUE, &val);
             val_parent = (float)val;
         }

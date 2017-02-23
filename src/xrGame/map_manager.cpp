@@ -54,11 +54,7 @@ void SLocationKey::load(IReader& stream)
     location->load(stream);
 }
 
-void SLocationKey::destroy()
-{
-    delete_data(location);
-}
-
+void SLocationKey::destroy() { delete_data(location); }
 void CMapLocationRegistry::save(IWriter& stream)
 {
     stream.w_u32((u32)objects().size());
@@ -72,13 +68,15 @@ void CMapLocationRegistry::save(IWriter& stream)
         for (; i != e; ++i)
         {
             VERIFY((*i).location);
-            if ((*i).location->Serializable()) ++size;
+            if ((*i).location->Serializable())
+                ++size;
         }
         stream.w(&(*I).first, sizeof((*I).first));
         stream.w_u32(size);
         i = (*I).second.begin();
         for (; i != e; ++i)
-            if ((*i).location->Serializable()) (*i).save(stream);
+            if ((*i).location->Serializable())
+                (*i).save(stream);
     }
 }
 
@@ -91,7 +89,7 @@ CMapManager::CMapManager()
 
 CMapManager::~CMapManager()
 {
-    delete_data(m_deffered_destroy_queue);  // from prev frame
+    delete_data(m_deffered_destroy_queue); // from prev frame
     delete_data(m_locations_wrapper);
 }
 
@@ -100,14 +98,16 @@ CMapLocation* CMapManager::AddMapLocation(const shared_str& spot_type, u16 id)
     CMapLocation* l = new CMapLocation(spot_type.c_str(), id);
     Locations().push_back(SLocationKey(spot_type, id));
     Locations().back().location = l;
-    if (IsGameTypeSingle() && g_actor) Actor()->callback(GameObject::eMapLocationAdded)(spot_type.c_str(), id);
+    if (IsGameTypeSingle() && g_actor)
+        Actor()->callback(GameObject::eMapLocationAdded)(spot_type.c_str(), id);
 
     return l;
 }
 
 CMapLocation* CMapManager::AddRelationLocation(CInventoryOwner* pInvOwner)
 {
-    if (!Level().CurrentViewEntity()) return NULL;
+    if (!Level().CurrentViewEntity())
+        return NULL;
 
     ALife::ERelationType relation = ALife::eRelationTypeFriend;
     CInventoryOwner* pActor = smart_cast<CInventoryOwner*>(Level().CurrentViewEntity());
@@ -115,7 +115,8 @@ CMapLocation* CMapManager::AddRelationLocation(CInventoryOwner* pInvOwner)
     shared_str sname = RELATION_REGISTRY().GetSpotName(relation);
 
     CEntityAlive* pEntAlive = smart_cast<CEntityAlive*>(pInvOwner);
-    if (!pEntAlive->g_Alive()) sname = "deadbody_location";
+    if (!pEntAlive->g_Alive())
+        sname = "deadbody_location";
 
     R_ASSERT(!HasMapLocation(sname, pInvOwner->object_id()));
     CMapLocation* l = new CRelationMapLocation(sname, pInvOwner->object_id(), pActor->object_id());
@@ -124,30 +125,29 @@ CMapLocation* CMapManager::AddRelationLocation(CInventoryOwner* pInvOwner)
     return l;
 }
 
-void CMapManager::Destroy(CMapLocation* ml)
-{
-    m_deffered_destroy_queue.push_back(ml);
-}
-
+void CMapManager::Destroy(CMapLocation* ml) { m_deffered_destroy_queue.push_back(ml); }
 void CMapManager::RemoveMapLocation(const shared_str& spot_type, u16 id)
 {
     FindLocationBySpotID key(spot_type, id);
     Locations_it it = std::find_if(Locations().begin(), Locations().end(), key);
-    if (it != Locations().end()) {
-        if (IsGameTypeSingle()) Level().GameTaskManager().MapLocationRelcase((*it).location);
+    if (it != Locations().end())
+    {
+        if (IsGameTypeSingle())
+            Level().GameTaskManager().MapLocationRelcase((*it).location);
 
         Destroy((*it).location);
         Locations().erase(it);
     }
 }
 
-void CMapManager::RemoveMapLocationByObjectID(u16 id)  // call on destroy object
+void CMapManager::RemoveMapLocationByObjectID(u16 id) // call on destroy object
 {
     FindLocationByID key(id);
     Locations_it it = std::find_if(Locations().begin(), Locations().end(), key);
     while (it != Locations().end())
     {
-        if (IsGameTypeSingle()) Level().GameTaskManager().MapLocationRelcase((*it).location);
+        if (IsGameTypeSingle())
+            Level().GameTaskManager().MapLocationRelcase((*it).location);
 
         Destroy((*it).location);
         Locations().erase(it);
@@ -161,8 +161,10 @@ void CMapManager::RemoveMapLocation(CMapLocation* ml)
     FindLocation key(ml);
 
     Locations_it it = std::find_if(Locations().begin(), Locations().end(), key);
-    if (it != Locations().end()) {
-        if (IsGameTypeSingle()) Level().GameTaskManager().MapLocationRelcase((*it).location);
+    if (it != Locations().end())
+    {
+        if (IsGameTypeSingle())
+            Level().GameTaskManager().MapLocationRelcase((*it).location);
 
         Destroy((*it).location);
         Locations().erase(it);
@@ -176,7 +178,8 @@ bool CMapManager::GetMapLocationsForObject(u16 id, xr_vector<CMapLocation*>& res
     Locations_it it_e = Locations().end();
     for (; it != it_e; ++it)
     {
-        if ((*it).actual && (*it).object_id == id) res.push_back((*it).location);
+        if ((*it).actual && (*it).object_id == id)
+            res.push_back((*it).location);
     }
     return (res.size() != 0);
 }
@@ -192,7 +195,8 @@ CMapLocation* CMapManager::GetMapLocation(const shared_str& spot_type, u16 id)
 {
     FindLocationBySpotID key(spot_type, id);
     Locations_it it = std::find_if(Locations().begin(), Locations().end(), key);
-    if (it != Locations().end()) return (*it).location;
+    if (it != Locations().end())
+        return (*it).location;
 
     return 0;
 }
@@ -211,7 +215,7 @@ void CMapManager::GetMapLocations(const shared_str& spot_type, u16 id, xr_vector
 
 void CMapManager::Update()
 {
-    delete_data(m_deffered_destroy_queue);  // from prev frame
+    delete_data(m_deffered_destroy_queue); // from prev frame
 
     Locations_it it = Locations().begin();
     Locations_it it_e = Locations().end();
@@ -221,13 +225,15 @@ void CMapManager::Update()
         bool bForce = Device.dwFrame % 3 == idx % 3;
         (*it).actual = (*it).location->Update();
 
-        if ((*it).actual && bForce) (*it).location->CalcPosition();
+        if ((*it).actual && bForce)
+            (*it).location->CalcPosition();
     }
     std::sort(Locations().begin(), Locations().end());
 
     while ((!Locations().empty()) && (!Locations().back().actual))
     {
-        if (IsGameTypeSingle()) Level().GameTaskManager().MapLocationRelcase(Locations().back().location);
+        if (IsGameTypeSingle())
+            Level().GameTaskManager().MapLocationRelcase(Locations().back().location);
 
         Destroy(Locations().back().location);
         Locations().pop_back();
@@ -245,20 +251,17 @@ void CMapManager::DisableAllPointers()
 
 Locations& CMapManager::Locations()
 {
-    if (!m_locations) {
+    if (!m_locations)
+    {
         m_locations = &m_locations_wrapper->registry().objects();
 #ifdef DEBUG
         Msg("m_locations size=%d", m_locations->size());
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
     }
     return *m_locations;
 }
 
-void CMapManager::OnObjectDestroyNotify(u16 id)
-{
-    RemoveMapLocationByObjectID(id);
-}
-
+void CMapManager::OnObjectDestroyNotify(u16 id) { RemoveMapLocationByObjectID(id); }
 #ifdef DEBUG
 void CMapManager::Dump()
 {

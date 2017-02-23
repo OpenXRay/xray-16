@@ -109,7 +109,6 @@ public:
     void SetStep(float s);
     void Destroy();
     IC float FrameTime(bool frame_mark) { return b_frame_mark == frame_mark ? m_frame_time : m_previous_frame_time; }
-
     void FrameStep(dReal step = 0.025f);
     void Step();
     void StepTouch();
@@ -129,7 +128,6 @@ public:
     float FrameTime() { return m_frame_time; }
     ContactCallbackFun* default_contact_shotmark() { return m_default_contact_shotmark; }
     ContactCallbackFun* default_character_contact_shotmark() { return m_default_character_contact_shotmark; }
-
     void set_default_contact_shotmark(ContactCallbackFun* f) { m_default_contact_shotmark = f; }
     void set_default_character_contact_shotmark(ContactCallbackFun* f) { m_default_character_contact_shotmark = f; }
     void NetRelcase(CPhysicsShell* s);
@@ -168,8 +166,5 @@ private:
     }
 };
 extern CPHWorld* ph_world;
-IC CPHWorld& inl_ph_world()
-{
-    return *ph_world;
-}
+IC CPHWorld& inl_ph_world() { return *ph_world; }
 #endif

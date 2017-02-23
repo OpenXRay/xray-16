@@ -18,7 +18,6 @@ class CMonsterHome
 
 public:
     CMonsterHome(CBaseMonster* obj) : m_object(obj) {}
-
     void load(LPCSTR line);
     void setup(
         LPCSTR path_name, float min_radius, float max_radius, bool aggressive = false, float middle_radius = 0.f);

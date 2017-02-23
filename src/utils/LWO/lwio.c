@@ -28,16 +28,8 @@ read requests until flen is reset.
 
 static int flen;
 
-void set_flen(int i)
-{
-    flen = i;
-}
-
-int get_flen(void)
-{
-    return flen;
-}
-
+void set_flen(int i) { flen = i; }
+int get_flen(void) { return flen; }
 #ifdef _WIN32
 /*
 =====================================================================
@@ -64,7 +56,8 @@ void revbytes(void* bp, int elsize, int elcount)
 
     p = (unsigned char*)bp;
 
-    if (elsize == 2) {
+    if (elsize == 2)
+    {
         q = p + 1;
         while (elcount--)
         {
@@ -97,17 +90,21 @@ void* getbytes(FILE* fp, int size)
 {
     void* data;
 
-    if (flen == FLEN_ERROR) return NULL;
-    if (size < 0) {
+    if (flen == FLEN_ERROR)
+        return NULL;
+    if (size < 0)
+    {
         flen = FLEN_ERROR;
         return NULL;
     }
     data = malloc(size);
-    if (!data) {
+    if (!data)
+    {
         flen = FLEN_ERROR;
         return NULL;
     }
-    if (1 != fread(data, size, 1, fp)) {
+    if (1 != fread(data, size, 1, fp))
+    {
         flen = FLEN_ERROR;
         free(data);
         return NULL;
@@ -119,7 +116,8 @@ void* getbytes(FILE* fp, int size)
 
 void skipbytes(FILE* fp, int n)
 {
-    if (flen == FLEN_ERROR) return;
+    if (flen == FLEN_ERROR)
+        return;
     if (fseek(fp, n, SEEK_CUR))
         flen = FLEN_ERROR;
     else
@@ -130,13 +128,16 @@ int getI1(FILE* fp)
 {
     int i;
 
-    if (flen == FLEN_ERROR) return 0;
+    if (flen == FLEN_ERROR)
+        return 0;
     i = fgetc(fp);
-    if (i < 0) {
+    if (i < 0)
+    {
         flen = FLEN_ERROR;
         return 0;
     }
-    if (i > 127) i -= 256;
+    if (i > 127)
+        i -= 256;
     flen += 1;
     return i;
 }
@@ -145,8 +146,10 @@ short getI2(FILE* fp)
 {
     short i;
 
-    if (flen == FLEN_ERROR) return 0;
-    if (1 != fread(&i, 2, 1, fp)) {
+    if (flen == FLEN_ERROR)
+        return 0;
+    if (1 != fread(&i, 2, 1, fp))
+    {
         flen = FLEN_ERROR;
         return 0;
     }
@@ -159,8 +162,10 @@ int getI4(FILE* fp)
 {
     int i;
 
-    if (flen == FLEN_ERROR) return 0;
-    if (1 != fread(&i, 4, 1, fp)) {
+    if (flen == FLEN_ERROR)
+        return 0;
+    if (1 != fread(&i, 4, 1, fp))
+    {
         flen = FLEN_ERROR;
         return 0;
     }
@@ -173,9 +178,11 @@ unsigned char getU1(FILE* fp)
 {
     int i;
 
-    if (flen == FLEN_ERROR) return 0;
+    if (flen == FLEN_ERROR)
+        return 0;
     i = fgetc(fp);
-    if (i < 0) {
+    if (i < 0)
+    {
         flen = FLEN_ERROR;
         return 0;
     }
@@ -187,8 +194,10 @@ unsigned short getU2(FILE* fp)
 {
     unsigned short i;
 
-    if (flen == FLEN_ERROR) return 0;
-    if (1 != fread(&i, 2, 1, fp)) {
+    if (flen == FLEN_ERROR)
+        return 0;
+    if (1 != fread(&i, 2, 1, fp))
+    {
         flen = FLEN_ERROR;
         return 0;
     }
@@ -201,8 +210,10 @@ unsigned int getU4(FILE* fp)
 {
     unsigned int i;
 
-    if (flen == FLEN_ERROR) return 0;
-    if (1 != fread(&i, 4, 1, fp)) {
+    if (flen == FLEN_ERROR)
+        return 0;
+    if (1 != fread(&i, 4, 1, fp))
+    {
         flen = FLEN_ERROR;
         return 0;
     }
@@ -215,10 +226,12 @@ int getVX(FILE* fp)
 {
     int i, c;
 
-    if (flen == FLEN_ERROR) return 0;
+    if (flen == FLEN_ERROR)
+        return 0;
 
     c = fgetc(fp);
-    if (c != 0xFF) {
+    if (c != 0xFF)
+    {
         i = c << 8;
         c = fgetc(fp);
         i |= c;
@@ -235,7 +248,8 @@ int getVX(FILE* fp)
         flen += 4;
     }
 
-    if (ferror(fp)) {
+    if (ferror(fp))
+    {
         flen = FLEN_ERROR;
         return 0;
     }
@@ -246,8 +260,10 @@ float getF4(FILE* fp)
 {
     float f;
 
-    if (flen == FLEN_ERROR) return 0.0f;
-    if (1 != fread(&f, 4, 1, fp)) {
+    if (flen == FLEN_ERROR)
+        return 0.0f;
+    if (1 != fread(&f, 4, 1, fp))
+    {
         flen = FLEN_ERROR;
         return 0.0f;
     }
@@ -261,20 +277,24 @@ char* getS0(FILE* fp)
     char* s;
     int i, c, len, pos;
 
-    if (flen == FLEN_ERROR) return NULL;
+    if (flen == FLEN_ERROR)
+        return NULL;
 
     pos = ftell(fp);
     for (i = 1;; i++)
     {
         c = fgetc(fp);
-        if (c <= 0) break;
+        if (c <= 0)
+            break;
     }
-    if (c < 0) {
+    if (c < 0)
+    {
         flen = FLEN_ERROR;
         return NULL;
     }
 
-    if (i == 1) {
+    if (i == 1)
+    {
         if (fseek(fp, pos + 2, SEEK_SET))
             flen = FLEN_ERROR;
         else
@@ -284,16 +304,19 @@ char* getS0(FILE* fp)
 
     len = i + (i & 1);
     s = malloc(len);
-    if (!s) {
+    if (!s)
+    {
         flen = FLEN_ERROR;
         return NULL;
     }
 
-    if (fseek(fp, pos, SEEK_SET)) {
+    if (fseek(fp, pos, SEEK_SET))
+    {
         flen = FLEN_ERROR;
         return NULL;
     }
-    if (1 != fread(s, len, 1, fp)) {
+    if (1 != fread(s, len, 1, fp))
+    {
         flen = FLEN_ERROR;
         return NULL;
     }
@@ -306,9 +329,11 @@ int sgetI1(unsigned char** bp)
 {
     int i;
 
-    if (flen == FLEN_ERROR) return 0;
+    if (flen == FLEN_ERROR)
+        return 0;
     i = **bp;
-    if (i > 127) i -= 256;
+    if (i > 127)
+        i -= 256;
     flen += 1;
     *bp++;
     return i;
@@ -318,7 +343,8 @@ short sgetI2(unsigned char** bp)
 {
     short i;
 
-    if (flen == FLEN_ERROR) return 0;
+    if (flen == FLEN_ERROR)
+        return 0;
     memcpy(&i, *bp, 2);
     revbytes(&i, 2, 1);
     flen += 2;
@@ -330,7 +356,8 @@ int sgetI4(unsigned char** bp)
 {
     int i;
 
-    if (flen == FLEN_ERROR) return 0;
+    if (flen == FLEN_ERROR)
+        return 0;
     memcpy(&i, *bp, 4);
     revbytes(&i, 4, 1);
     flen += 4;
@@ -342,7 +369,8 @@ unsigned char sgetU1(unsigned char** bp)
 {
     unsigned char c;
 
-    if (flen == FLEN_ERROR) return 0;
+    if (flen == FLEN_ERROR)
+        return 0;
     c = **bp;
     flen += 1;
     *bp++;
@@ -354,7 +382,8 @@ unsigned short sgetU2(unsigned char** bp)
     unsigned char* buf = *bp;
     unsigned short i;
 
-    if (flen == FLEN_ERROR) return 0;
+    if (flen == FLEN_ERROR)
+        return 0;
     i = (buf[0] << 8) | buf[1];
     flen += 2;
     *bp += 2;
@@ -365,7 +394,8 @@ unsigned int sgetU4(unsigned char** bp)
 {
     unsigned int i;
 
-    if (flen == FLEN_ERROR) return 0;
+    if (flen == FLEN_ERROR)
+        return 0;
     memcpy(&i, *bp, 4);
     revbytes(&i, 4, 1);
     flen += 4;
@@ -378,9 +408,11 @@ int sgetVX(unsigned char** bp)
     unsigned char* buf = *bp;
     int i;
 
-    if (flen == FLEN_ERROR) return 0;
+    if (flen == FLEN_ERROR)
+        return 0;
 
-    if (buf[0] != 0xFF) {
+    if (buf[0] != 0xFF)
+    {
         i = buf[0] << 8 | buf[1];
         flen += 2;
         *bp += 2;
@@ -398,7 +430,8 @@ float sgetF4(unsigned char** bp)
 {
     float f;
 
-    if (flen == FLEN_ERROR) return 0.0f;
+    if (flen == FLEN_ERROR)
+        return 0.0f;
     memcpy(&f, *bp, 4);
     revbytes(&f, 4, 1);
     flen += 4;
@@ -412,17 +445,20 @@ char* sgetS0(unsigned char** bp)
     unsigned char* buf = *bp;
     int len;
 
-    if (flen == FLEN_ERROR) return NULL;
+    if (flen == FLEN_ERROR)
+        return NULL;
 
     len = strlen(buf) + 1;
-    if (len == 1) {
+    if (len == 1)
+    {
         flen += 2;
         *bp += 2;
         return NULL;
     }
     len += len & 1;
     s = malloc(len);
-    if (!s) {
+    if (!s)
+    {
         flen = FLEN_ERROR;
         return NULL;
     }

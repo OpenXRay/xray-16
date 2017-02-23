@@ -16,12 +16,5 @@ IC void CEF_Storage::alife_evaluation(bool value)
         alife().clear();
 }
 
-IC CNonALifeParams& CEF_Storage::non_alife()
-{
-    return (m_non_alife_params);
-}
-
-IC CALifeParams& CEF_Storage::alife()
-{
-    return (m_alife_params);
-}
+IC CNonALifeParams& CEF_Storage::non_alife() { return (m_non_alife_params); }
+IC CALifeParams& CEF_Storage::alife() { return (m_alife_params); }

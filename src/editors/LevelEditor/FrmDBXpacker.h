@@ -18,8 +18,8 @@
 //---------------------------------------------------------------------------
 class TDB_packer : public TForm
 {
-    __published :  // IDE-managed Components
-                   TPanel* Panel1;
+    __published : // IDE-managed Components
+                  TPanel* Panel1;
     TPanel* Panel2;
     TExtBtn* btnLoad;
     TExtBtn* btnSave;
@@ -46,13 +46,13 @@ class TDB_packer : public TForm
     void __fastcall btnSaveClick(TObject* Sender);
     void __fastcall ExtBtn5Click(TObject* Sender);
 
-  private:  // User declarations
+private: // User declarations
     static TDB_packer* m_form;
     xr_string m_cfgFileName;
     string_path m_root_folder;
     void _load_(const xr_string& fn);
 
-  public:  // User declarations
+public: // User declarations
     __fastcall TDB_packer(TComponent* Owner);
     void __fastcall prepare();
     static void __fastcall ActivatePacker();

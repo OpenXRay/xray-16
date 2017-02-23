@@ -12,17 +12,14 @@
 #include "patrol_point.h"
 #include "Common/LevelGameDef.h"
 
-CPatrolPathStorage::~CPatrolPathStorage()
-{
-    delete_data(m_registry);
-}
-
+CPatrolPathStorage::~CPatrolPathStorage() { delete_data(m_registry); }
 void CPatrolPathStorage::load_raw(
     const CLevelGraph* level_graph, const CGameLevelCrossTable* cross, const CGameGraph* game_graph, IReader& stream)
 {
     IReader* chunk = stream.open_chunk(WAY_PATROLPATH_CHUNK);
 
-    if (!chunk) return;
+    if (!chunk)
+        return;
 
     u32 chunk_iterator;
     for (IReader* sub_chunk = chunk->open_chunk_iterator(chunk_iterator); sub_chunk;

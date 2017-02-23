@@ -40,17 +40,15 @@ CStateManagerController::CStateManagerController(CController* obj) : inherited(o
 
 bool CStateManagerController::check_control_start_conditions(ControlCom::EControlType type)
 {
-    if (type == ControlCom::eAntiAim) {
+    if (type == ControlCom::eAntiAim)
+    {
         return current_substate == eStateAttack_Run;
     }
 
     return false;
 }
 
-CStateManagerController::~CStateManagerController()
-{
-}
-
+CStateManagerController::~CStateManagerController() {}
 void CStateManagerController::reinit()
 {
     inherited::reinit();
@@ -66,7 +64,8 @@ void CStateManagerController::execute()
 
     const CEntityAlive* enemy = object->EnemyMan.get_enemy();
 
-    if (enemy) {
+    if (enemy)
+    {
         state_id = eStateAttack;
     }
     else if (object->HitMemory.is_hit())

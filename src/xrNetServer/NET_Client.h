@@ -36,7 +36,7 @@ class XRNETSERVER_API IPureClient : private MultipacketReciever, private Multipa
     friend void sync_thread(void*);
 
 protected:
-    struct HOST_NODE  // deprecated...
+    struct HOST_NODE // deprecated...
     {
         DPN_APPLICATION_DESC dpAppDesc;
         IDirectPlay8Address* pHostAddress;
@@ -71,7 +71,6 @@ protected:
     void Sync_Average();
 
     void SetClientID(ClientID const& local_client) { net_ClientID = local_client; };
-
     IC virtual void SendTo_LL(void* data, u32 size, u32 dwFlags = DPNSEND_GUARANTEED, u32 dwTimeout = 0);
 
 public:
@@ -89,13 +88,11 @@ public:
     BOOL net_isDisconnected() { return net_Disconnected; }
     IC GameDescriptionData const& get_net_DescriptionData() const { return m_game_description; }
     LPCSTR net_SessionName() { return *(net_Hosts.front().dpSessionName); }
-
     // receive
-    IC void StartProcessQueue() { net_Queue.Lock(); };  // WARNING ! after Start mast be End !!! <-
-    IC virtual NET_Packet* net_msg_Retreive() { return net_Queue.Retreive(); };  //							|
-    IC void net_msg_Release() { net_Queue.Release(); };                          //							|
-    IC void EndProcessQueue() { net_Queue.Unlock(); };                           //							<-
-
+    IC void StartProcessQueue() { net_Queue.Lock(); }; // WARNING ! after Start mast be End !!! <-
+    IC virtual NET_Packet* net_msg_Retreive() { return net_Queue.Retreive(); }; //							|
+    IC void net_msg_Release() { net_Queue.Release(); }; //							|
+    IC void EndProcessQueue() { net_Queue.Unlock(); }; //							<-
     // send
     virtual void Send(NET_Packet& P, u32 dwFlags = DPNSEND_GUARANTEED, u32 dwTimeout = 0);
     virtual void Flush_Send_Buffer();
@@ -109,7 +106,6 @@ public:
     IClientStatistic& GetStatistic() { return net_Statistic; }
     void UpdateStatistic();
     ClientID const& GetClientID() { return net_ClientID; };
-
     bool GetServerAddress(ip_address& pAddress, DWORD* pPort);
 
     // time management
@@ -125,7 +121,6 @@ public:
     virtual void OnSessionTerminate(LPCSTR reason){};
 
     virtual bool TestLoadBEClient() { return false; }
-
 private:
     ClientID net_ClientID;
 

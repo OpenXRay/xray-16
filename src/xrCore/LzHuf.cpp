@@ -19,14 +19,14 @@ char wterr[] = "Can't write.";
 /********** LZSS compression **********/
 
 #define N 4096 /* buffer size */
-#define F 60   /* lookahead buffer size */
+#define F 60 /* lookahead buffer size */
 #define THRESHOLD 2
 #define NIL N /* leaf of tree */
 
 #define N_CHAR (256 - THRESHOLD + F) /* kinds of characters (character code = 0..N_CHAR-1) */
-#define T (N_CHAR * 2 - 1)           /* size of table */
-#define R (T - 1)                    /* position of root */
-#define MAX_FREQ 0x4000              /* updates tree when the */
+#define T (N_CHAR * 2 - 1) /* size of table */
+#define R (T - 1) /* position of root */
+#define MAX_FREQ 0x4000 /* updates tree when the */
 
 u8 text_buf[N + F];
 int match_position, match_length, lson[N + 1], rson[N + 257], dad[N + 1];
@@ -61,12 +61,14 @@ private:
 public:
     IC int _getb()
     {
-        if (in_iterator == in_end) return EOF;
+        if (in_iterator == in_end)
+            return EOF;
         return *in_iterator++;
     }
     IC void _putb(int c)
     {
-        if (out_iterator == out_end) {
+        if (out_iterator == out_end)
+        {
             u32 out_size = u32(out_end - out_start);
             out_start = (u8*)xr_realloc(out_start, out_size + 1024);
             out_iterator = out_start + out_size;
@@ -114,7 +116,8 @@ public:
 
         while (getlen <= 8)
         {
-            if ((int)(i = _getb()) < 0) i = 0;
+            if ((int)(i = _getb()) < 0)
+                i = 0;
             getbuf |= i << (8 - getlen);
             getlen += 8;
         }
@@ -130,7 +133,8 @@ public:
 
         while (getlen <= 8)
         {
-            if ((int)(i = _getb()) < 0) i = 0;
+            if ((int)(i = _getb()) < 0)
+                i = 0;
             getbuf |= i << (8 - getlen);
             getlen += 8;
         }
@@ -143,9 +147,11 @@ public:
     IC void PutCode(int l, unsigned c) /* output c bits of code */
     {
         putbuf |= c >> putlen;
-        if ((putlen += l) >= 8) {
+        if ((putlen += l) >= 8)
+        {
             _putb(putbuf >> 8);
-            if ((putlen -= 8) >= 8) {
+            if ((putlen -= 8) >= 8)
+            {
                 _putb(putbuf);
                 codesize += 2;
                 putlen -= 8;
@@ -160,7 +166,8 @@ public:
     }
     IC void PutFlush()
     {
-        if (putlen) {
+        if (putlen)
+        {
             _putb(putbuf >> 8);
             codesize++;
         }
@@ -191,7 +198,8 @@ void InsertNode(int r) /* insert to tree */
     match_length = 0;
     for (;;)
     {
-        if (cmp >= 0) {
+        if (cmp >= 0)
+        {
             if (rson[p] != NIL)
                 p = rson[p];
             else
@@ -213,14 +221,20 @@ void InsertNode(int r) /* insert to tree */
             }
         }
         for (i = 1; i < F; i++)
-            if ((cmp = key[i] - text_buf[p + i]) != 0) break;
-        if (i > THRESHOLD) {
-            if (i > match_length) {
+            if ((cmp = key[i] - text_buf[p + i]) != 0)
+                break;
+        if (i > THRESHOLD)
+        {
+            if (i > match_length)
+            {
                 match_position = ((r - p) & (N - 1)) - 1;
-                if ((match_length = i) >= F) break;
+                if ((match_length = i) >= F)
+                    break;
             }
-            if (i == match_length) {
-                if ((c = ((r - p) & (N - 1)) - 1) < (unsigned)match_position) {
+            if (i == match_length)
+            {
+                if ((c = ((r - p) & (N - 1)) - 1) < (unsigned)match_position)
+                {
                     match_position = c;
                 }
             }
@@ -242,18 +256,21 @@ void DeleteNode(int p) /* remove from tree */
 {
     int q;
 
-    if (dad[p] == NIL) return; /* not registered */
+    if (dad[p] == NIL)
+        return; /* not registered */
     if (rson[p] == NIL)
         q = lson[p];
     else
     {
-        if (lson[p] == NIL) {
+        if (lson[p] == NIL)
+        {
             q = rson[p];
         }
         else
         {
             q = lson[p];
-            if (rson[q] != NIL) {
+            if (rson[q] != NIL)
+            {
                 do
                 {
                     q = rson[q];
@@ -362,7 +379,8 @@ void reconst(void)
     j = 0;
     for (i = 0; i < T; i++)
     {
-        if (son[i] >= T) {
+        if (son[i] >= T)
+        {
             freq[j] = (freq[i] + 1) / 2;
             son[j] = son[i];
             j++;
@@ -385,7 +403,8 @@ void reconst(void)
     /* connect prnt */
     for (i = 0; i < T; i++)
     {
-        if ((k = son[i]) >= T) {
+        if ((k = son[i]) >= T)
+        {
             prnt[k] = i;
         }
         else
@@ -400,7 +419,8 @@ void update(int c)
 {
     int i, j, k, l;
 
-    if (freq[R] == MAX_FREQ) {
+    if (freq[R] == MAX_FREQ)
+    {
         reconst();
     }
     c = prnt[c + T];
@@ -409,7 +429,8 @@ void update(int c)
         k = ++freq[c];
 
         /* if the order is disturbed, exchange nodes */
-        if ((unsigned)k > freq[l = c + 1]) {
+        if ((unsigned)k > freq[l = c + 1])
+        {
             while ((unsigned)k > freq[++l])
                 ;
             l--;
@@ -418,13 +439,15 @@ void update(int c)
 
             i = son[c];
             prnt[i] = l;
-            if (i < T) prnt[i + 1] = l;
+            if (i < T)
+                prnt[i + 1] = l;
 
             j = son[l];
             son[l] = i;
 
             prnt[j] = c;
-            if (j < T) prnt[j + 1] = c;
+            if (j < T)
+                prnt[j + 1] = c;
             son[c] = j;
 
             c = l;
@@ -447,7 +470,8 @@ void EncodeChar(unsigned c)
         i >>= 1;
 
         /* if node's address is odd-numbered, choose bigger brother node */
-        if (k & 1) i += 0x8000;
+        if (k & 1)
+            i += 0x8000;
 
         j++;
         k = prnt[k];
@@ -516,7 +540,8 @@ void Encode(void) /* compression */
     fs._putb((textsize & 0xff00) >> 8);
     fs._putb((textsize & 0xff0000L) >> 16);
     fs._putb((textsize & 0xff000000L) >> 24);
-    if (textsize == 0) return;
+    if (textsize == 0)
+        return;
     textsize = 0; /* rewind and re-read */
     StartHuff();
     InitTree();
@@ -536,8 +561,10 @@ void Encode(void) /* compression */
     InsertNode(r);
     do
     {
-        if (match_length > len) match_length = len;
-        if (match_length <= THRESHOLD) {
+        if (match_length > len)
+            match_length = len;
+        if (match_length <= THRESHOLD)
+        {
             match_length = 1;
             // textsize==56158 - FATAL :(
             EncodeChar(text_buf[r]);
@@ -552,7 +579,8 @@ void Encode(void) /* compression */
         {
             DeleteNode(s);
             text_buf[s] = (unsigned char)c;
-            if (s < F - 1) text_buf[s + N] = (unsigned char)c;
+            if (s < F - 1)
+                text_buf[s + N] = (unsigned char)c;
             s = (s + 1) & (N - 1);
             r = (r + 1) & (N - 1);
             InsertNode(r);
@@ -563,7 +591,8 @@ void Encode(void) /* compression */
             DeleteNode(s);
             s = (s + 1) & (N - 1);
             r = (r + 1) & (N - 1);
-            if (--len) InsertNode(r);
+            if (--len)
+                InsertNode(r);
         }
     } while (len > 0);
     fs.PutFlush();
@@ -578,7 +607,8 @@ void Decode(void) /* recover */
     textsize |= (fs._getb() << 8);
     textsize |= (fs._getb() << 16);
     textsize |= (fs._getb() << 24);
-    if (textsize == 0) return;
+    if (textsize == 0)
+        return;
 
     fs.Init_Output(textsize);
 
@@ -589,7 +619,8 @@ void Decode(void) /* recover */
     for (count = 0; count < textsize;)
     {
         c = DecodeChar();
-        if (c < 256) {
+        if (c < 256)
+        {
             fs._putb(c);
             text_buf[r++] = (unsigned char)c;
             r &= (N - 1);
@@ -620,7 +651,8 @@ unsigned _writeLZ(int hf, void* d, unsigned size)
     Encode();
     // Flush cache
     int size_out = fs.OutSize();
-    if (size_out) _write(hf, fs.OutPointer(), size_out);
+    if (size_out)
+        _write(hf, fs.OutPointer(), size_out);
     fs.OutRelease();
     return size_out;
 }

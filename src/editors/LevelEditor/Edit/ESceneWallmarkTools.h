@@ -9,7 +9,7 @@ class ESceneWallmarkTool : public ESceneToolBase
 {
     typedef ESceneToolBase inherited;
 
-  public:
+public:
     DEFINE_VECTOR(FVF::LIT, LITVertVec, LITVertVecIt);
     struct wm_slot;
 
@@ -59,7 +59,7 @@ class ESceneWallmarkTool : public ESceneToolBase
     WMSVec marks;
     WMVec pool;
 
-  private:
+private:
     ref_geom hGeom;
 
     Fvector sml_normal;
@@ -80,16 +80,16 @@ class ESceneWallmarkTool : public ESceneToolBase
 
     void RefiningSlots();
 
-  private:
+private:
     wallmark* wm_allocate();
     void wm_destroy(wallmark* W);
 
-  private:
+private:
     // controls
     virtual void CreateControls();
     virtual void RemoveControls();
 
-  public:
+public:
     enum
     {
         flDrawWallmark = (1 << 0),
@@ -106,20 +106,15 @@ class ESceneWallmarkTool : public ESceneToolBase
 
     int ObjectCount();
 
-  public:
+public:
     ESceneWallmarkTool();
     virtual ~ESceneWallmarkTool();
 
     virtual bool AllowEnabling() { return true; }
-
     virtual BOOL AllowMouseStart() { return true; }
-
     virtual void OnObjectRemove(CCustomObject* O, bool bDeleting) {}
-
     virtual void UpdateSnapList() {}
-
     virtual ObjectList* GetSnapList() { return 0; }
-
     // selection manipulate
     virtual int RaySelect(
         int flag, float& distance, const Fvector& start, const Fvector& direction, BOOL bDistanceOnly);
@@ -130,14 +125,11 @@ class ESceneWallmarkTool : public ESceneToolBase
     virtual int SelectionCount(bool testflag);
 
     virtual void ShowObjects(bool flag, bool bAllowSelectionFlag = false, bool bSelFlag = true) {}
-
     virtual void Clear(bool bOnlyNodes = false);
 
     // definition
     IC LPCSTR ClassName() { return "wallmark"; }
-
     IC LPCSTR ClassDesc() { return "Wallmark"; }
-
     IC
 
         int
@@ -162,7 +154,6 @@ class ESceneWallmarkTool : public ESceneToolBase
     virtual void SaveLTX(CInifile&, int id);
 
     virtual bool can_use_inifile() { return false; }
-
     virtual bool LoadSelection(IReader&);
     virtual void SaveSelection(IWriter&);
     virtual bool Export(LPCSTR fn);
@@ -176,7 +167,6 @@ class ESceneWallmarkTool : public ESceneToolBase
     virtual void OnSynchronize();
 
     virtual bool GetSummaryInfo(SSceneSummary* inf) { return false; }
-
     // properties
     virtual void FillProp(LPCSTR pref, PropItemVec& items);
 

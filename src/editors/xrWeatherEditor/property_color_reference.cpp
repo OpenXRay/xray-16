@@ -16,22 +16,7 @@ property_color_reference::property_color_reference(color& value, array<System::A
 {
 }
 
-property_color_reference::~property_color_reference()
-{
-    this->!property_color_reference();
-}
-
-property_color_reference::!property_color_reference()
-{
-    delete (m_value);
-}
-
-color property_color_reference::get_value_raw()
-{
-    return (m_value->get());
-}
-
-void property_color_reference::set_value_raw(color value)
-{
-    m_value->set(value);
-}
+property_color_reference::~property_color_reference() { this->!property_color_reference(); }
+property_color_reference::!property_color_reference() { delete (m_value); }
+color property_color_reference::get_value_raw() { return (m_value->get()); }
+void property_color_reference::set_value_raw(color value) { m_value->set(value); }

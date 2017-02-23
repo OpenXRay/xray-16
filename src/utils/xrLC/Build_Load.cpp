@@ -16,11 +16,13 @@ void transfer(const char* name, xr_vector<T>& dest, IReader& F, u32 chunk)
     IReader* O = F.open_chunk(chunk);
     u32 count = O ? (O->length() / sizeof(T)) : 0;
     Logger.clMsg("* %16s: %d", name, count);
-    if (count) {
+    if (count)
+    {
         dest.reserve(count);
         dest.insert(dest.begin(), (T*)O->pointer(), (T*)O->pointer() + count);
     }
-    if (O) O->close();
+    if (O)
+        O->close();
 }
 
 extern u32* Surface_Load(char* name, u32& w, u32& h);
@@ -118,7 +120,8 @@ void CBuild::Load(const b_params& Params, const IReader& _in_FS)
         Logger.clMsg("* %16s: %d", "faces", lc_global_data()->g_faces().size());
         F->close();
 
-        if (g_using_smooth_groups) {
+        if (g_using_smooth_groups)
+        {
             F = fs.open_chunk(EB_SmoothGroups);
 
             R_ASSERT2(F, "EB_SmoothGroups chunk not found.");
@@ -137,7 +140,8 @@ void CBuild::Load(const b_params& Params, const IReader& _in_FS)
             xr_free(sm_groups);
         }
 
-        if (InvalideFaces()) {
+        if (InvalideFaces())
+        {
             err_save();
             xrDebug::Fatal(DEBUG_INFO, "* FATAL: %d invalid faces. Compilation aborted", InvalideFaces());
         }
@@ -146,7 +150,8 @@ void CBuild::Load(const b_params& Params, const IReader& _in_FS)
     //*******
     Logger.Status("Models and References");
     F = fs.open_chunk(EB_MU_models);
-    if (F) {
+    if (F)
+    {
         while (!F->eof())
         {
             mu_models().push_back(new xrMU_Model());
@@ -155,7 +160,8 @@ void CBuild::Load(const b_params& Params, const IReader& _in_FS)
         F->close();
     }
     F = fs.open_chunk(EB_MU_refs);
-    if (F) {
+    if (F)
+    {
         while (!F->eof())
         {
             mu_refs().push_back(new xrMU_Reference());
@@ -251,15 +257,18 @@ void CBuild::Load(const b_params& Params, const IReader& _in_FS)
         for (u32 LH = 0; LH < L_layers.size(); LH++)
         {
             R_Layer& TEST = L_layers[LH];
-            if (0 == stricmp(TEST.control.name, LCONTROL_HEMI)) {
+            if (0 == stricmp(TEST.control.name, LCONTROL_HEMI))
+            {
                 // Hemi found
                 L_static().hemi = TEST.lights;
             }
-            if (0 == stricmp(TEST.control.name, LCONTROL_SUN)) {
+            if (0 == stricmp(TEST.control.name, LCONTROL_SUN))
+            {
                 // Sun found
                 L_static().sun = TEST.lights;
             }
-            if (0 == stricmp(TEST.control.name, LCONTROL_STATIC)) {
+            if (0 == stricmp(TEST.control.name, LCONTROL_STATIC))
+            {
                 // Static found
                 L_static().rgb = TEST.lights;
             }
@@ -293,9 +302,11 @@ void CBuild::Load(const b_params& Params, const IReader& _in_FS)
 
             // load thumbnail
             LPSTR N = BT.name;
-            if (strchr(N, '.')) *(strchr(N, '.')) = 0;
+            if (strchr(N, '.'))
+                *(strchr(N, '.')) = 0;
             strlwr(N);
-            if (0 == xr_strcmp(N, "level_lods")) {
+            if (0 == xr_strcmp(N, "level_lods"))
+            {
                 // HACK for merged lod textures
                 BT.dwWidth = 1024;
                 BT.dwHeight = 1024;
@@ -327,13 +338,15 @@ void CBuild::Load(const b_params& Params, const IReader& _in_FS)
                 BT.THM.width = THM->r_u32();
                 BT.THM.height = THM->r_u32();
                 BOOL bLOD = FALSE;
-                if (N[0] == 'l' && N[1] == 'o' && N[2] == 'd' && N[3] == '\\') bLOD = TRUE;
+                if (N[0] == 'l' && N[1] == 'o' && N[2] == 'd' && N[3] == '\\')
+                    bLOD = TRUE;
 
                 // load surface if it has an alpha channel or has "implicit lighting" flag
                 BT.dwWidth = BT.THM.width;
                 BT.dwHeight = BT.THM.height;
                 BT.bHasAlpha = BT.THM.HasAlphaChannel();
-                if (!bLOD) {
+                if (!bLOD)
+                {
                     if (BT.bHasAlpha || BT.THM.flags.test(STextureParams::flImplicitLighted) ||
                         g_build_options.b_radiosity)
                     {
@@ -342,7 +355,8 @@ void CBuild::Load(const b_params& Params, const IReader& _in_FS)
                         BT.pSurface = Surface_Load(N, w, h);
                         BT.THM.SetHasSurface(TRUE);
                         R_ASSERT2(BT.pSurface, "Can't load surface");
-                        if ((w != BT.dwWidth) || (h != BT.dwHeight)) {
+                        if ((w != BT.dwWidth) || (h != BT.dwHeight))
+                        {
                             Msg("! THM doesn't correspond to the texture: %dx%d -> %dx%d", BT.dwWidth, BT.dwHeight, w,
                                 h);
                             BT.dwWidth = BT.THM.width = w;

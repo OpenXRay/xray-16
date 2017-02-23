@@ -20,7 +20,7 @@ public:
             unsigned short g;
         };
     };
-    u16v16_t& operator+=(const u16v16_t& v);  // incrementation by a Vec4f
+    u16v16_t& operator+=(const u16v16_t& v); // incrementation by a Vec4f
 
     void set(unsigned short _r, unsigned short _g)
     {
@@ -41,7 +41,7 @@ public:
             unsigned long b : 8;
         };
     };
-    r12g12b8_t& operator+=(const r12g12b8_t& v);  // incrementation by a Vec4f
+    r12g12b8_t& operator+=(const r12g12b8_t& v); // incrementation by a Vec4f
 
     void set(unsigned long _r, unsigned long _g, unsigned long _b)
     {
@@ -52,15 +52,19 @@ public:
 };
 inline int iClamp(int a, int lo, int hi)
 {
-    if (a < lo) a = lo;
-    if (a > hi) a = hi;
+    if (a < lo)
+        a = lo;
+    if (a > hi)
+        a = hi;
     return a;
 }
 
 inline float fClamp(float a, float lo, float hi)
 {
-    if (a < lo) a = lo;
-    if (a > hi) a = hi;
+    if (a < lo)
+        a = lo;
+    if (a > hi)
+        a = hi;
     return a;
 }
 
@@ -89,7 +93,7 @@ public:
         b = _b;
     }
 
-    rgba_t& operator+=(const rgba_t& v)  // incrementation by a rgba_t
+    rgba_t& operator+=(const rgba_t& v) // incrementation by a rgba_t
     {
         r = iClamp((int)r + (int)v.r, 0, 255);
         g = iClamp((int)g + (int)v.g, 0, 255);
@@ -99,9 +103,9 @@ public:
         return *this;
     }
 
-    rgba_t& operator-=(const rgba_t& v);  // decrementation by a rgba_t
-    rgba_t& operator*=(const float d);    // multiplication by a constant
-    rgba_t& operator/=(const float d);    // division by a constant
+    rgba_t& operator-=(const rgba_t& v); // decrementation by a rgba_t
+    rgba_t& operator*=(const float d); // multiplication by a constant
+    rgba_t& operator/=(const float d); // division by a constant
 
     rgba_t& operator=(const rgba_t& v)
     {
@@ -124,9 +128,7 @@ public:
     }
 
     friend rgba_t operator/(const rgba_t& v, float s) { return rgba_t(v.r / s, v.g / s, v.b / s, v.a / s); }
-
     friend rgba_t operator/(const rgba_t& v, int s) { return rgba_t(v.r / s, v.g / s, v.b / s, v.a / s); }
-
     void set(unsigned char _r, unsigned char _g, unsigned char _b, unsigned char _a)
     {
         r = _r;
@@ -161,7 +163,7 @@ public:
         b = _b;
     }
 
-    rgba16_t& operator+=(const rgba16_t& v)  // incrementation by a rgba_t
+    rgba16_t& operator+=(const rgba16_t& v) // incrementation by a rgba_t
     {
         r = iClamp((int)r + (int)v.r, 0, 65535);
         g = iClamp((int)g + (int)v.g, 0, 65535);
@@ -171,9 +173,9 @@ public:
         return *this;
     }
 
-    rgba16_t& operator-=(const rgba16_t& v);  // decrementation by a rgba_t
-    rgba16_t& operator*=(const float d);      // multiplication by a constant
-    rgba16_t& operator/=(const float d);      // division by a constant
+    rgba16_t& operator-=(const rgba16_t& v); // decrementation by a rgba_t
+    rgba16_t& operator*=(const float d); // multiplication by a constant
+    rgba16_t& operator/=(const float d); // division by a constant
 
     rgba16_t& operator=(const rgba16_t& v)
     {
@@ -196,9 +198,7 @@ public:
     }
 
     friend rgba16_t operator/(const rgba16_t& v, float s) { return rgba16_t(v.r / s, v.g / s, v.b / s, v.a / s); }
-
     friend rgba16_t operator/(const rgba16_t& v, int s) { return rgba16_t(v.r / s, v.g / s, v.b / s, v.a / s); }
-
     void set(unsigned short _r, unsigned short _g, unsigned short _b, unsigned short _a)
     {
         r = _r;
@@ -223,7 +223,7 @@ public:
             char a;
         };
     };
-    urgba_t& operator+=(const urgba_t& v);  // incrementation by a Vec4f
+    urgba_t& operator+=(const urgba_t& v); // incrementation by a Vec4f
 
     void set(char _r, char _g, char _b, char _a)
     {
@@ -248,7 +248,7 @@ public:
             char u;
         };
     };
-    q8w8v8u8_t& operator+=(const q8w8v8u8_t& v);  // incrementation by a Vec4f
+    q8w8v8u8_t& operator+=(const q8w8v8u8_t& v); // incrementation by a Vec4f
 
     void set(char _r, char _g, char _b, char _a)
     {
@@ -301,7 +301,7 @@ public:
         r = v.r;
         g = v.g;
         b = v.b;
-    }  // copy constructor
+    } // copy constructor
 
     void set(const float _r, const float _g, const float _b, const float _a)
     {
@@ -319,12 +319,12 @@ public:
         b = v.b;
     }
 
-    fpPixel& operator+=(const fpPixel& v);  // incrementation by a Vec4f
+    fpPixel& operator+=(const fpPixel& v); // incrementation by a Vec4f
 
-    fpPixel& operator=(const fpPixel& v);   // assignment of a Vec3f
-    fpPixel& operator-=(const fpPixel& v);  // decrementation by a Vec3f
-    fpPixel& operator*=(const float d);     // multiplication by a constant
-    fpPixel& operator/=(const float d);     // division by a constant
+    fpPixel& operator=(const fpPixel& v); // assignment of a Vec3f
+    fpPixel& operator-=(const fpPixel& v); // decrementation by a Vec3f
+    fpPixel& operator*=(const float d); // multiplication by a constant
+    fpPixel& operator/=(const float d); // division by a constant
 
     friend fpPixel operator+(const fpPixel& v1, const fpPixel& v2)
     {
@@ -332,16 +332,18 @@ public:
     }
 
     friend fpPixel operator/(const fpPixel& v, float s) { return fpPixel(v.r / s, v.g / s, v.b / s, v.a / s); }
-    friend int operator==(const fpPixel& v1, const fpPixel& v2);  // v1 == v2 ?
+    friend int operator==(const fpPixel& v1, const fpPixel& v2); // v1 == v2 ?
 
     int normalize()
     {
         double u;
         u = x * x + y * y + z * z;
 
-        if (fabs(u - 1.0) < 1e-12) return 0;  // already normalized
+        if (fabs(u - 1.0) < 1e-12)
+            return 0; // already normalized
 
-        if (fabs((double)u) < 1e-12) {
+        if (fabs((double)u) < 1e-12)
+        {
             x = y = z = 0.0;
             return -1;
         }
@@ -374,10 +376,10 @@ class CNormalData
 {
 public:
     CNormalData() { normals = 0; }
-
     ~CNormalData()
     {
-        if (normals) {
+        if (normals)
+        {
             delete[] normals;
             normals = 0;
         }
@@ -425,9 +427,7 @@ public:
     int nPlanesInFile;
 
     int width() const { return m_width; }
-
     int height() const { return m_height; }
-
     _type* pixels()
     {
         int s = m_pixels.size();
@@ -544,9 +544,7 @@ public:
     int nPlanesInFile;
 
     int width() const { return m_width; }
-
     int height() const { return m_height; }
-
     rgba_t* pixels()
     {
         int s = m_pixels.size();
@@ -662,11 +660,8 @@ public:
     int nPlanesInFile;
 
     int width() const { return m_width; }
-
     int height() const { return m_height; }
-
     fpPixel* pixels() { return &m_pixels[0]; }
-
     fpImage()
     {
         m_width = 0;
@@ -675,7 +670,6 @@ public:
         m_pixels.clear();
     };
     ~fpImage() {}
-
     void zeroize()
     {
         fpPixel* p = &m_pixels[0];

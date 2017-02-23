@@ -66,8 +66,7 @@ editor::property_value* property_holder::add_property(LPCSTR identifier, LPCSTR 
     notify_parent_on_change_enum const& notify_parent, password_char_enum const& password,
     refresh_grid_on_change_enum const& refresh_grid)
 {
-    m_container->add_property(
-        (can_enter_text == property_holder::can_enter_text) ?
+    m_container->add_property((can_enter_text == property_holder::can_enter_text) ?
             gcnew PropertySpec(to_string(identifier), String::typeid, to_string(category), to_string(description),
                 to_string(default_value), property_editor_file_name::typeid, (String ^) nullptr) :
             gcnew PropertySpec(to_string(identifier), String::typeid, to_string(category), to_string(description),
@@ -84,8 +83,7 @@ editor::property_value* property_holder::add_property(LPCSTR identifier, LPCSTR 
     readonly_enum const& read_only, notify_parent_on_change_enum const& notify_parent,
     password_char_enum const& password, refresh_grid_on_change_enum const& refresh_grid)
 {
-    m_container->add_property(
-        (can_enter_text == property_holder::can_enter_text) ?
+    m_container->add_property((can_enter_text == property_holder::can_enter_text) ?
             gcnew PropertySpec(to_string(identifier), String::typeid, to_string(category), to_string(description),
                 to_string(default_value), property_editor_file_name::typeid, (String ^) nullptr) :
             gcnew PropertySpec(to_string(identifier), String::typeid, to_string(category), to_string(description),
@@ -104,7 +102,8 @@ editor::property_value* property_holder::add_property(LPCSTR identifier, LPCSTR 
 {
     PropertySpec ^ spec = nullptr;
 
-    if (value_editor == value_editor_tree_view) {
+    if (value_editor == value_editor_tree_view)
+    {
         if (can_enter_text == property_holder::can_enter_text)
             spec =
                 gcnew PropertySpec(to_string(identifier), String::typeid, to_string(category), to_string(description),
@@ -139,7 +138,8 @@ editor::property_value* property_holder::add_property(LPCSTR identifier, LPCSTR 
 {
     PropertySpec ^ spec = nullptr;
 
-    if (value_editor == value_editor_tree_view) {
+    if (value_editor == value_editor_tree_view)
+    {
         if (can_enter_text == property_holder::can_enter_text)
             spec =
                 gcnew PropertySpec(to_string(identifier), String::typeid, to_string(category), to_string(description),
@@ -176,7 +176,8 @@ editor::property_value* property_holder::add_property(LPCSTR identifier, LPCSTR 
 {
     PropertySpec ^ spec = nullptr;
 
-    if (value_editor == value_editor_tree_view) {
+    if (value_editor == value_editor_tree_view)
+    {
         if (can_enter_text == property_holder::can_enter_text)
             spec =
                 gcnew PropertySpec(to_string(identifier), String::typeid, to_string(category), to_string(description),
@@ -212,7 +213,8 @@ editor::property_value* property_holder::add_property(LPCSTR identifier, LPCSTR 
 {
     PropertySpec ^ spec = nullptr;
 
-    if (value_editor == value_editor_tree_view) {
+    if (value_editor == value_editor_tree_view)
+    {
         if (can_enter_text == property_holder::can_enter_text)
             spec =
                 gcnew PropertySpec(to_string(identifier), String::typeid, to_string(category), to_string(description),

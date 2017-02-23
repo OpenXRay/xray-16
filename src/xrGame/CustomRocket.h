@@ -37,7 +37,6 @@ public:
     virtual BOOL net_Spawn(CSE_Abstract* DC);
     virtual void net_Destroy();
     virtual BOOL AlwaysTheCrow() { return TRUE; }
-
     virtual void reinit();
     virtual void reload(LPCSTR section);
 
@@ -49,9 +48,7 @@ public:
 
     virtual BOOL UsedAI_Locations() { return (FALSE); }
     virtual bool Useful() const { return (m_eState == eInactive); }
-
     virtual void renderable_Render() { inherited::renderable_Render(); }
-
     //создание физической оболочки
     virtual void activate_physic_shell();
     virtual void create_physic_shell();
@@ -91,10 +88,10 @@ protected:
 
     enum ERocketState
     {
-        eInactive,  //ракета неактивна и находиться в инвентаре
-        eEngine,    //включен двигатель
-        eFlying,    //просто летим
-        eCollide    //произошло столкновение с препятствием
+        eInactive, //ракета неактивна и находиться в инвентаре
+        eEngine, //включен двигатель
+        eFlying, //просто летим
+        eCollide //произошло столкновение с препятствием
     };
 
     //текущее состояние ракеты

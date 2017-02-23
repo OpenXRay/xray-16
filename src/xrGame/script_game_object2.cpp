@@ -41,7 +41,8 @@
 void CScriptGameObject::explode(u32 level_time)
 {
     CExplosive* explosive = smart_cast<CExplosive*>(&object());
-    if (object().H_Parent()) {
+    if (object().H_Parent())
+    {
         ai().script_engine().script_log(LuaMessageType::Error, "CExplosive : cannot explode object wiht parent!");
         return;
     }
@@ -60,7 +61,8 @@ void CScriptGameObject::explode(u32 level_time)
 bool CScriptGameObject::active_zone_contact(u16 id)
 {
     CScriptZone* script_zone = smart_cast<CScriptZone*>(&object());
-    if (!script_zone) {
+    if (!script_zone)
+    {
         ai().script_engine().script_log(
             LuaMessageType::Error, "CScriptZone : cannot access class member active_zone_contact!");
         return (false);
@@ -71,7 +73,8 @@ bool CScriptGameObject::active_zone_contact(u16 id)
 CScriptGameObject* CScriptGameObject::best_weapon()
 {
     CObjectHandler* object_handler = smart_cast<CAI_Stalker*>(&object());
-    if (!object_handler) {
+    if (!object_handler)
+    {
         ai().script_engine().script_log(
             LuaMessageType::Error, "CScriptEntity : cannot access class member best_weapon!");
         return (0);
@@ -126,7 +129,8 @@ void CScriptGameObject::set_item(
 void CScriptGameObject::play_cycle(LPCSTR anim, bool mix_in)
 {
     IKinematicsAnimated* sa = smart_cast<IKinematicsAnimated*>(object().Visual());
-    if (sa) {
+    if (sa)
+    {
         MotionID m = sa->ID_Cycle(anim);
         if (m)
             sa->PlayCycle(m, (BOOL)mix_in);
@@ -141,33 +145,29 @@ void CScriptGameObject::play_cycle(LPCSTR anim, bool mix_in)
     }
 }
 
-void CScriptGameObject::play_cycle(LPCSTR anim)
-{
-    play_cycle(anim, true);
-}
-
+void CScriptGameObject::play_cycle(LPCSTR anim) { play_cycle(anim, true); }
 void CScriptGameObject::Hit(CScriptHit* tpLuaHit)
 {
     CScriptHit& tLuaHit = *tpLuaHit;
     NET_Packet P;
     SHit HS;
-    HS.GenHeader(GE_HIT, object().ID());  //	object().u_EventGen(P,GE_HIT,object().ID());
+    HS.GenHeader(GE_HIT, object().ID()); //	object().u_EventGen(P,GE_HIT,object().ID());
     THROW2(tLuaHit.m_tpDraftsman,
-        "Where is hit initiator??!");             //	THROW2			(tLuaHit.m_tpDraftsman,"Where is hit initiator??!");
-    HS.whoID = u16(tLuaHit.m_tpDraftsman->ID());  //	P.w_u16			(u16(tLuaHit.m_tpDraftsman->ID()));
-    HS.weaponID = 0;                              //	P.w_u16			(0);
-    HS.dir = tLuaHit.m_tDirection;                //	P.w_dir			(tLuaHit.m_tDirection);
-    HS.power = tLuaHit.m_fPower;                  //	P.w_float		(tLuaHit.m_fPower);
+        "Where is hit initiator??!"); //	THROW2			(tLuaHit.m_tpDraftsman,"Where is hit initiator??!");
+    HS.whoID = u16(tLuaHit.m_tpDraftsman->ID()); //	P.w_u16			(u16(tLuaHit.m_tpDraftsman->ID()));
+    HS.weaponID = 0; //	P.w_u16			(0);
+    HS.dir = tLuaHit.m_tDirection; //	P.w_dir			(tLuaHit.m_tDirection);
+    HS.power = tLuaHit.m_fPower; //	P.w_float		(tLuaHit.m_fPower);
     IKinematics* V = smart_cast<IKinematics*>(
-        object().Visual());               //	IKinematics		*V = smart_cast<IKinematics*>(object().Visual());
-    VERIFY(V);                            //	VERIFY			(V);
-    if (xr_strlen(tLuaHit.m_caBoneName))  //	if (xr_strlen	(tLuaHit.m_caBoneName))
-        HS.boneID = (V->LL_BoneID(tLuaHit.m_caBoneName));  //		P.w_s16		(V->LL_BoneID(tLuaHit.m_caBoneName));
-    else                                                   //	else
-        HS.boneID = (s16(0));                              //		P.w_s16		(s16(0));
-    HS.p_in_bone_space = Fvector().set(0, 0, 0);           //	P.w_vec3		(Fvector().set(0,0,0));
-    HS.impulse = tLuaHit.m_fImpulse;                       //	P.w_float		(tLuaHit.m_fImpulse);
-    HS.hit_type = (ALife::EHitType)(tLuaHit.m_tHitType);   //	P.w_u16			(u16(tLuaHit.m_tHitType));
+        object().Visual()); //	IKinematics		*V = smart_cast<IKinematics*>(object().Visual());
+    VERIFY(V); //	VERIFY			(V);
+    if (xr_strlen(tLuaHit.m_caBoneName)) //	if (xr_strlen	(tLuaHit.m_caBoneName))
+        HS.boneID = (V->LL_BoneID(tLuaHit.m_caBoneName)); //		P.w_s16		(V->LL_BoneID(tLuaHit.m_caBoneName));
+    else //	else
+        HS.boneID = (s16(0)); //		P.w_s16		(s16(0));
+    HS.p_in_bone_space = Fvector().set(0, 0, 0); //	P.w_vec3		(Fvector().set(0,0,0));
+    HS.impulse = tLuaHit.m_fImpulse; //	P.w_float		(tLuaHit.m_fImpulse);
+    HS.hit_type = (ALife::EHitType)(tLuaHit.m_tHitType); //	P.w_u16			(u16(tLuaHit.m_tHitType));
     HS.Write_Packet(P);
 
     object().u_EventSend(P);
@@ -175,26 +175,26 @@ void CScriptGameObject::Hit(CScriptHit* tpLuaHit)
 
 #pragma todo("Dima to Dima : find out why user defined conversion operators work incorrect")
 
-CScriptGameObject::operator IGameObject*()
-{
-    return (&object());
-}
-
+CScriptGameObject::operator IGameObject*() { return (&object()); }
 CScriptGameObject* CScriptGameObject::GetBestEnemy()
 {
     const CCustomMonster* monster = smart_cast<const CCustomMonster*>(&object());
-    if (!monster) return (0);
+    if (!monster)
+        return (0);
 
-    if (monster->memory().enemy().selected()) return (monster->memory().enemy().selected()->lua_game_object());
+    if (monster->memory().enemy().selected())
+        return (monster->memory().enemy().selected()->lua_game_object());
     return (0);
 }
 
 const CDangerObject* CScriptGameObject::GetBestDanger()
 {
     const CCustomMonster* monster = smart_cast<const CCustomMonster*>(&object());
-    if (!monster) return (0);
+    if (!monster)
+        return (0);
 
-    if (!monster->memory().danger().selected()) return (0);
+    if (!monster->memory().danger().selected())
+        return (0);
 
     return (monster->memory().danger().selected());
 }
@@ -202,16 +202,19 @@ const CDangerObject* CScriptGameObject::GetBestDanger()
 CScriptGameObject* CScriptGameObject::GetBestItem()
 {
     const CCustomMonster* monster = smart_cast<const CCustomMonster*>(&object());
-    if (!monster) return (0);
+    if (!monster)
+        return (0);
 
-    if (monster->memory().item().selected()) return (monster->memory().item().selected()->lua_game_object());
+    if (monster->memory().item().selected())
+        return (monster->memory().item().selected()->lua_game_object());
     return (0);
 }
 
 u32 CScriptGameObject::memory_time(const CScriptGameObject& lua_game_object)
 {
     CCustomMonster* monster = smart_cast<CCustomMonster*>(&object());
-    if (!monster) {
+    if (!monster)
+    {
         ai().script_engine().script_log(LuaMessageType::Error, "CScriptEntity : cannot access class member memory!");
         return (0);
     }
@@ -222,7 +225,8 @@ u32 CScriptGameObject::memory_time(const CScriptGameObject& lua_game_object)
 Fvector CScriptGameObject::memory_position(const CScriptGameObject& lua_game_object)
 {
     CCustomMonster* monster = smart_cast<CCustomMonster*>(&object());
-    if (!monster) {
+    if (!monster)
+    {
         ai().script_engine().script_log(LuaMessageType::Error, "CScriptEntity : cannot access class member memory!");
         return (Fvector().set(0.f, 0.f, 0.f));
     }
@@ -243,7 +247,8 @@ void CScriptGameObject::enable_memory_object(CScriptGameObject* game_object, boo
 const xr_vector<CNotYetVisibleObject>& CScriptGameObject::not_yet_visible_objects() const
 {
     CCustomMonster* monster = smart_cast<CCustomMonster*>(&object());
-    if (!monster) {
+    if (!monster)
+    {
         ai().script_engine().script_log(
             LuaMessageType::Error, "CGameObject : cannot access class member not_yet_visible_objects!");
         NODEFAULT;
@@ -254,7 +259,8 @@ const xr_vector<CNotYetVisibleObject>& CScriptGameObject::not_yet_visible_object
 float CScriptGameObject::visibility_threshold() const
 {
     CCustomMonster* monster = smart_cast<CCustomMonster*>(&object());
-    if (!monster) {
+    if (!monster)
+    {
         ai().script_engine().script_log(
             LuaMessageType::Error, "CGameObject : cannot access class member visibility_threshold!");
         NODEFAULT;
@@ -265,7 +271,8 @@ float CScriptGameObject::visibility_threshold() const
 void CScriptGameObject::enable_vision(bool value)
 {
     CCustomMonster* monster = smart_cast<CCustomMonster*>(&object());
-    if (!monster) {
+    if (!monster)
+    {
         ai().script_engine().script_log(
             LuaMessageType::Error, "CVisualMemoryManager : cannot access class member enable_vision!");
         return;
@@ -276,7 +283,8 @@ void CScriptGameObject::enable_vision(bool value)
 bool CScriptGameObject::vision_enabled() const
 {
     CCustomMonster* monster = smart_cast<CCustomMonster*>(&object());
-    if (!monster) {
+    if (!monster)
+    {
         ai().script_engine().script_log(
             LuaMessageType::Error, "CVisualMemoryManager : cannot access class member vision_enabled!");
         return (false);
@@ -287,7 +295,8 @@ bool CScriptGameObject::vision_enabled() const
 void CScriptGameObject::set_sound_threshold(float value)
 {
     CCustomMonster* monster = smart_cast<CCustomMonster*>(&object());
-    if (!monster) {
+    if (!monster)
+    {
         ai().script_engine().script_log(
             LuaMessageType::Error, "CSoundMemoryManager : cannot access class member set_sound_threshold!");
         return;
@@ -298,7 +307,8 @@ void CScriptGameObject::set_sound_threshold(float value)
 void CScriptGameObject::restore_sound_threshold()
 {
     CCustomMonster* monster = smart_cast<CCustomMonster*>(&object());
-    if (!monster) {
+    if (!monster)
+    {
         ai().script_engine().script_log(
             LuaMessageType::Error, "CSoundMemoryManager : cannot access class member restore_sound_threshold!");
         return;
@@ -309,27 +319,31 @@ void CScriptGameObject::restore_sound_threshold()
 void CScriptGameObject::SetStartDialog(LPCSTR dialog_id)
 {
     CAI_PhraseDialogManager* pDialogManager = smart_cast<CAI_PhraseDialogManager*>(&object());
-    if (!pDialogManager) return;
+    if (!pDialogManager)
+        return;
     pDialogManager->SetStartDialog(dialog_id);
 }
 
 void CScriptGameObject::GetStartDialog()
 {
     CAI_PhraseDialogManager* pDialogManager = smart_cast<CAI_PhraseDialogManager*>(&object());
-    if (!pDialogManager) return;
+    if (!pDialogManager)
+        return;
     pDialogManager->GetStartDialog();
 }
 void CScriptGameObject::RestoreDefaultStartDialog()
 {
     CAI_PhraseDialogManager* pDialogManager = smart_cast<CAI_PhraseDialogManager*>(&object());
-    if (!pDialogManager) return;
+    if (!pDialogManager)
+        return;
     pDialogManager->RestoreDefaultStartDialog();
 }
 
 void CScriptGameObject::SetActorPosition(Fvector pos)
 {
     CActor* actor = smart_cast<CActor*>(&object());
-    if (actor) {
+    if (actor)
+    {
         Fmatrix F = actor->XFORM();
         F.c = pos;
         actor->ForceTransform(F);
@@ -343,11 +357,13 @@ void CScriptGameObject::SetActorPosition(Fvector pos)
 void CScriptGameObject::SetNpcPosition(Fvector pos)
 {
     CCustomMonster* obj = smart_cast<CCustomMonster*>(&object());
-    if (obj) {
+    if (obj)
+    {
         Fmatrix F = obj->XFORM();
         F.c = pos;
         obj->movement().detail().make_inactual();
-        if (obj->animation_movement_controlled()) obj->destroy_anim_mov_ctrl();
+        if (obj->animation_movement_controlled())
+            obj->destroy_anim_mov_ctrl();
         obj->ForceTransform(F);
         //		actor->XFORM().c = pos;
     }
@@ -359,7 +375,8 @@ void CScriptGameObject::SetNpcPosition(Fvector pos)
 void CScriptGameObject::SetActorDirection(float dir)
 {
     CActor* actor = smart_cast<CActor*>(&object());
-    if (actor) {
+    if (actor)
+    {
         actor->cam_Active()->Set(dir, 0, 0);
         //		actor->XFORM().setXYZ(0,dir,0);
     }
@@ -394,7 +411,8 @@ bool CScriptGameObject::DisableHitMarks() const
 Fvector CScriptGameObject::GetMovementSpeed() const
 {
     CActor* actor = smart_cast<CActor*>(&object());
-    if (!actor) {
+    if (!actor)
+    {
         ai().script_engine().script_log(
             LuaMessageType::Error, "ScriptGameObject : attempt to call GetMovementSpeed method for non-actor object");
         NODEFAULT;
@@ -415,7 +433,8 @@ CHolderCustom* CScriptGameObject::get_current_holder()
 void CScriptGameObject::set_ignore_monster_threshold(float ignore_monster_threshold)
 {
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
-    if (!stalker) {
+    if (!stalker)
+    {
         ai().script_engine().script_log(
             LuaMessageType::Error, "CAI_Stalker : cannot access class member set_ignore_monster_threshold!");
         return;
@@ -427,7 +446,8 @@ void CScriptGameObject::set_ignore_monster_threshold(float ignore_monster_thresh
 void CScriptGameObject::restore_ignore_monster_threshold()
 {
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
-    if (!stalker) {
+    if (!stalker)
+    {
         ai().script_engine().script_log(
             LuaMessageType::Error, "CAI_Stalker : cannot access class member restore_ignore_monster_threshold!");
         return;
@@ -438,7 +458,8 @@ void CScriptGameObject::restore_ignore_monster_threshold()
 float CScriptGameObject::ignore_monster_threshold() const
 {
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
-    if (!stalker) {
+    if (!stalker)
+    {
         ai().script_engine().script_log(
             LuaMessageType::Error, "CAI_Stalker : cannot access class member ignore_monster_threshold!");
         return (0.f);
@@ -449,7 +470,8 @@ float CScriptGameObject::ignore_monster_threshold() const
 void CScriptGameObject::set_max_ignore_monster_distance(const float& max_ignore_monster_distance)
 {
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
-    if (!stalker) {
+    if (!stalker)
+    {
         ai().script_engine().script_log(
             LuaMessageType::Error, "CAI_Stalker : cannot access class member set_max_ignore_monster_distance!");
         return;
@@ -460,7 +482,8 @@ void CScriptGameObject::set_max_ignore_monster_distance(const float& max_ignore_
 void CScriptGameObject::restore_max_ignore_monster_distance()
 {
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
-    if (!stalker) {
+    if (!stalker)
+    {
         ai().script_engine().script_log(
             LuaMessageType::Error, "CAI_Stalker : cannot access class member restore_max_ignore_monster_distance!");
         return;
@@ -471,7 +494,8 @@ void CScriptGameObject::restore_max_ignore_monster_distance()
 float CScriptGameObject::max_ignore_monster_distance() const
 {
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
-    if (!stalker) {
+    if (!stalker)
+    {
         ai().script_engine().script_log(
             LuaMessageType::Error, "CAI_Stalker : cannot access class member max_ignore_monster_distance!");
         return (0.f);
@@ -482,7 +506,8 @@ float CScriptGameObject::max_ignore_monster_distance() const
 CCar* CScriptGameObject::get_car()
 {
     CCar* car = smart_cast<CCar*>(&object());
-    if (!car) {
+    if (!car)
+    {
         ai().script_engine().script_log(LuaMessageType::Error, "CGameObject : cannot access class member get_car!");
         NODEFAULT;
     }
@@ -493,7 +518,8 @@ CCar* CScriptGameObject::get_car()
 void CScriptGameObject::debug_planner(const script_planner* planner)
 {
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
-    if (!stalker) {
+    if (!stalker)
+    {
         ai().script_engine().script_log(
             LuaMessageType::Error, "CAI_Stalker : cannot access class member debug_planner!");
         return;
@@ -505,14 +531,16 @@ void CScriptGameObject::debug_planner(const script_planner* planner)
 
 u32 CScriptGameObject::location_on_path(float distance, Fvector* location)
 {
-    if (!location) {
+    if (!location)
+    {
         ai().script_engine().script_log(
             LuaMessageType::Error, "CAI_Stalker : location_on_path -> specify destination location!");
         return (u32(-1));
     }
 
     CCustomMonster* monster = smart_cast<CCustomMonster*>(&object());
-    if (!monster) {
+    if (!monster)
+    {
         ai().script_engine().script_log(
             LuaMessageType::Error, "CAI_Stalker : cannot access class member location_on_path!");
         return (u32(-1));
@@ -525,7 +553,8 @@ u32 CScriptGameObject::location_on_path(float distance, Fvector* location)
 bool CScriptGameObject::is_there_items_to_pickup() const
 {
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
-    if (!stalker) {
+    if (!stalker)
+    {
         ai().script_engine().script_log(
             LuaMessageType::Error, "CAI_Stalker : cannot access class member is_there_items_to_pickup!");
         return false;

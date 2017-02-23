@@ -56,7 +56,7 @@ public:
     int GetNodesNum(LPCSTR path, int index, LPCSTR tag_name);
     int GetNodesNum(XML_NODE* node, LPCSTR tag_name);
 
-#ifdef DEBUG  // debug & mixed
+#ifdef DEBUG // debug & mixed
     //проверка того, что аттрибуты у тегов уникальны
     //(если не NULL, то уникальность нарушена и возврашаетс€ им€
     //повтор€ющегос€ атрибута)
@@ -72,20 +72,17 @@ public:
 
     void SetLocalRoot(XML_NODE* pLocalRoot) { m_pLocalRoot = pLocalRoot; }
     XML_NODE* GetLocalRoot() { return m_pLocalRoot; }
-
     XML_NODE* GetRoot() { return m_root; }
-
 protected:
     XML_NODE* m_root;
     XML_NODE* m_pLocalRoot;
 
-#ifdef DEBUG  // debug & mixed
+#ifdef DEBUG // debug & mixed
     //буфферный вектор дл€ проверки уникальность аттрибутов
     xr_vector<shared_str> m_AttribValues;
 #endif
 public:
     virtual shared_str correct_file_name(LPCSTR path, LPCSTR fn) { return fn; }
-
 private:
     XMLDocument(const XMLDocument& copy);
     void operator=(const XMLDocument& copy);
@@ -94,4 +91,4 @@ private:
     TiXmlDocument m_Doc;
 };
 
-#endif  // xrXMLParserH
+#endif // xrXMLParserH

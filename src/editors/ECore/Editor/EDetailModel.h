@@ -37,9 +37,12 @@ class ECORE_API EDetail :
         };
         IC BOOL similar(EVertexIn& V)
         {
-            if (!fsimilar(u, V.u, EPS_L)) return FALSE;
-            if (!fsimilar(v, V.v, EPS_L)) return FALSE;
-            if (!P.similar(V.P, EPS_L)) return FALSE;
+            if (!fsimilar(u, V.u, EPS_L))
+                return FALSE;
+            if (!fsimilar(v, V.v, EPS_L))
+                return FALSE;
+            if (!P.similar(V.P, EPS_L))
+                return FALSE;
             return TRUE;
         }
         void remapUV(const fvfVertexIn& src, const Fvector2& offs, const Fvector2& scale, bool bRotate);
@@ -87,9 +90,9 @@ class ECORE_API EDetail :
 
     u16 _AddVert(const Fvector& p, float u, float v);
 
-  public:
+public:
     //    bool				m_bMarkDel;
-  public:
+public:
     EDetail();
     virtual ~EDetail();
 
@@ -109,4 +112,4 @@ class ECORE_API EDetail :
 };
 DEFINE_VECTOR(EDetail*, DOVec, DOIt);
 
-#endif  //_INCDEF_DetailModel_H_
+#endif //_INCDEF_DetailModel_H_

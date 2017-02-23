@@ -22,7 +22,6 @@ public:
 
     SMonsterCorpse get_corpse_info();
     u32 get_corpse_count() { return m_objects.size(); }
-
     void clear() { m_objects.clear(); }
     void remove_links(IGameObject* O);
 

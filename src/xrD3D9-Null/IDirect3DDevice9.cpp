@@ -70,7 +70,8 @@ ULONG xrIDirect3DDevice9::Release(void)
 {
     APIDEBUG("xrIDirect3DDevice9::Release");
     m_refCount--;
-    if (m_refCount < 0) {
+    if (m_refCount < 0)
+    {
         delete this;
         return 0;
     }
@@ -80,7 +81,8 @@ ULONG xrIDirect3DDevice9::Release(void)
 HRESULT xrIDirect3DDevice9::QueryInterface(const IID& iid, void FAR* FAR* ppvObj)
 {
     APIDEBUG("xrIDirect3DDevice9::QueryInterface");
-    if (iid == IID_IUnknown || iid == IID_IDirect3DDevice9) {
+    if (iid == IID_IUnknown || iid == IID_IDirect3DDevice9)
+    {
         *ppvObj = this;
         AddRef();
         return NOERROR;

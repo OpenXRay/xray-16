@@ -67,11 +67,7 @@ void CUIMapLocationHint::SetInfoMode(u8 mode)
     m_info["t_hint_text"]->Show(mode == 2);
 }
 
-void CUIMapLocationHint::Draw_()
-{
-    inherited::Draw();
-}
-
+void CUIMapLocationHint::Draw_() { inherited::Draw(); }
 void CUIMapLocationHint::SetInfoStr(LPCSTR text)
 {
     SetInfoMode(1);
@@ -118,7 +114,8 @@ void CUIMapLocationHint::SetInfoTask(CGameTask* task)
     S = m_info["t_time_rem"];
     bool b_rem = (task->m_ReceiveTime != task->m_TimeToComplete);
     S->Show(b_rem);
-    if (b_rem) {
+    if (b_rem)
+    {
         string512 buff, buff2;
         InventoryUtilities::GetTimePeriodAsString(buff, sizeof(buff), Level().GetGameTime(), task->m_TimeToComplete);
 
@@ -132,7 +129,8 @@ void CUIMapLocationHint::SetInfoTask(CGameTask* task)
     S = m_info["t_hint_text"];
     S->TextItemControl()->SetTextST(task->m_Description.c_str());
     S->AdjustHeightToText();
-    if (b_rem) {
+    if (b_rem)
+    {
         S = m_info["t_time_rem"];
     }
     else

@@ -29,7 +29,6 @@ class CMonsterMorale
 public:
     CMonsterMorale() {}
     ~CMonsterMorale() {}
-
     void init_external(CBaseMonster* obj);
     void load(LPCSTR section);
     void reinit();

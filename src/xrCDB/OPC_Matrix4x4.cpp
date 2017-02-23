@@ -85,7 +85,7 @@ float Matrix4x4::CoFactor(udword row, udword col) const
                    m[(row + 3) & 3][(col + 2) & 3] * m[(row + 2) & 3][(col + 3) & 3] * m[(row + 1) & 3][(col + 1) & 3] +
                    m[(row + 3) & 3][(col + 3) & 3] * m[(row + 2) & 3][(col + 1) & 3] *
                        m[(row + 1) & 3][(col + 2) & 3])) *
-           ((row + col) & 1 ? -1.0f : +1.0f);
+        ((row + col) & 1 ? -1.0f : +1.0f);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -104,7 +104,8 @@ Matrix4x4& Matrix4x4::Invert()
     float Det = Determinant();
     Matrix4x4 Temp;
 
-    if (_abs(Det) < MATRIX4X4_EPSILON) return *this;  // The matrix is not invertible! Singular case!
+    if (_abs(Det) < MATRIX4X4_EPSILON)
+        return *this; // The matrix is not invertible! Singular case!
 
     float IDet = 1.0f / Det;
 
@@ -255,7 +256,8 @@ Matrix4x4& Matrix4x4::Rot(float angle, Point& p1, Point& p2)
     Matrix4x4 Rx, InvRx;
     Rx.Identity();
     float d = _sqrt(Axis.y * Axis.y + Axis.z * Axis.z);
-    if (d != 0.0f) {
+    if (d != 0.0f)
+    {
         float CosAngle = Axis.z / d;
         float SinAngle = Axis.y / d;
         Rx.SetRow(1, Point(0.0f, CosAngle, SinAngle));
@@ -303,7 +305,8 @@ void Matrix::LUBackwardSubstitution(sdword* indx, float* b)
         sum = b[ip];
         b[ip] = b[i];
 
-        if (ii >= 0) {
+        if (ii >= 0)
+        {
             for (j = ii; j <= i - 1; j++)
                 sum -= (*this)(i, j) * b[j];
         }
@@ -343,7 +346,8 @@ void Matrix::LUDecomposition(sdword* indx, float* d)
     {
         big = 0.0f;
         for (j = 0; j < 4; j++)
-            if ((tmp = (float)_abs((*this)(i, j))) > big) big = tmp;
+            if ((tmp = (float)_abs((*this)(i, j))) > big)
+                big = tmp;
         /*
         if (big == 0.0f) {
             printf("ludcmp(): singular matrix found...\n");
@@ -368,12 +372,14 @@ void Matrix::LUDecomposition(sdword* indx, float* d)
             for (k = 0; k < j; k++)
                 sum -= (*this)(i, k) * (*this)(k, j);
             (*this)(i, j) = sum;
-            if ((dum = vv[i] * (float)_abs(sum)) >= big) {
+            if ((dum = vv[i] * (float)_abs(sum)) >= big)
+            {
                 big = dum;
                 imax = i;
             }
         }
-        if (j != imax) {
+        if (j != imax)
+        {
             for (k = 0; k < 4; k++)
             {
                 dum = (*this)(imax, k);
@@ -384,8 +390,10 @@ void Matrix::LUDecomposition(sdword* indx, float* d)
             vv[imax] = vv[j];
         }
         indx[j] = imax;
-        if ((*this)(j, j) == 0.0f) (*this)(j, j) = 1.0e-20f; /* can be 0.0 also... */
-        if (j != 3) {
+        if ((*this)(j, j) == 0.0f)
+            (*this)(j, j) = 1.0e-20f; /* can be 0.0 also... */
+        if (j != 3)
+        {
             dum = 1.0f / (*this)(j, j);
             for (i = j + 1; i < 4; i++)
                 (*this)(i, j) *= dum;
@@ -416,7 +424,8 @@ Matrix& Matrix::ComputeAxisMatrix(Point& axis, float angle)
     Point Up = Point(0, 1, 0) - dotProduct * axis;
 
     // This is to prevent bogus view matrix (up view vector3 equals to axis)
-    if (Up.Magnitude() < 1e-6f) {
+    if (Up.Magnitude() < 1e-6f)
+    {
         Up = Point(0, 0, 1);
     }
     else
@@ -456,7 +465,8 @@ Matrix::operator PRS() const
     float ScaleFactor;
     Point Scale, Row, NormalizedRow;
 
-    if (IsIdentity()) {  // The special case of the identity matrix
+    if (IsIdentity())
+    { // The special case of the identity matrix
         Cast.SetScale(1.0f, 1.0f, 1.0f).SetQuaternion((Quat)(*this));
     }
     else

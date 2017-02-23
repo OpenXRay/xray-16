@@ -1,6 +1,6 @@
 #pragma once
 
-#define TEMPLATE_SPECIALIZATION                                                                                        \
+#define TEMPLATE_SPECIALIZATION \
     template <typename _Object\
 >
 #define CStateMonsterHittedMoveOutAbstract CStateMonsterHittedMoveOut<_Object>
@@ -20,8 +20,10 @@ TEMPLATE_SPECIALIZATION
 void CStateMonsterHittedMoveOutAbstract::execute()
 {
     // проверить на завершение пути
-    if (object->control().path_builder().detail().time_path_built() > time_state_started) {
-        if (object->control().path_builder().is_path_end(DIST_TO_PATH_END)) select_target();
+    if (object->control().path_builder().detail().time_path_built() > time_state_started)
+    {
+        if (object->control().path_builder().is_path_end(DIST_TO_PATH_END))
+            select_target();
     }
 
     if (target.node != u32(-1))
@@ -44,10 +46,12 @@ void CStateMonsterHittedMoveOutAbstract::execute()
 TEMPLATE_SPECIALIZATION
 bool CStateMonsterHittedMoveOutAbstract::check_completion()
 {
-    if (object->HitMemory.get_last_hit_time() > time_state_started) return true;
+    if (object->HitMemory.get_last_hit_time() > time_state_started)
+        return true;
 
     float dist = object->HitMemory.get_last_hit_position().distance_to(object->Position());
-    if (dist < DIST_TO_HIT_POINT) return true;
+    if (dist < DIST_TO_HIT_POINT)
+        return true;
 
     return false;
 }

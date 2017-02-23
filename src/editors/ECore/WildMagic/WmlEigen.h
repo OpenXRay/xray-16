@@ -21,7 +21,7 @@ namespace Wml
 template <class Real>
 class WML_ITEM Eigen
 {
-  public:
+public:
     Eigen(int iSize);
     Eigen(const Matrix2<Real>& rkM);
     Eigen(const Matrix3<Real>& rkM);
@@ -69,7 +69,7 @@ class WML_ITEM Eigen
     void IncrSortEigenStuffN();
     void IncrSortEigenStuff();
 
-  protected:
+protected:
     int m_iSize;
     GMatrix<Real> m_kMat;
     Real* m_afDiag;

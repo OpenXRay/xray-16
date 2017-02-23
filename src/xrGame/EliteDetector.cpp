@@ -7,15 +7,8 @@
 #include "ui/UIStatic.h"
 #include "ui/ArtefactDetectorUI.h"
 
-CEliteDetector::CEliteDetector()
-{
-    m_artefacts.m_af_rank = 3;
-}
-
-CEliteDetector::~CEliteDetector()
-{
-}
-
+CEliteDetector::CEliteDetector() { m_artefacts.m_af_rank = 3; }
+CEliteDetector::~CEliteDetector() {}
 void CEliteDetector::CreateUI()
 {
     R_ASSERT(NULL == m_ui);
@@ -23,15 +16,12 @@ void CEliteDetector::CreateUI()
     ui().construct(this);
 }
 
-CUIArtefactDetectorElite& CEliteDetector::ui()
-{
-    return *((CUIArtefactDetectorElite*)m_ui);
-}
-
+CUIArtefactDetectorElite& CEliteDetector::ui() { return *((CUIArtefactDetectorElite*)m_ui); }
 void CEliteDetector::UpdateAf()
 {
     ui().Clear();
-    if (m_artefacts.m_ItemInfos.size() == 0) return;
+    if (m_artefacts.m_ItemInfos.size() == 0)
+        return;
 
     CAfList::ItemsMapIt it_b = m_artefacts.m_ItemInfos.begin();
     CAfList::ItemsMapIt it_e = m_artefacts.m_ItemInfos.end();
@@ -41,22 +31,21 @@ void CEliteDetector::UpdateAf()
     for (; it_b != it_e; ++it_b)
     {
         CArtefact* pAf = it_b->first;
-        if (pAf->H_Parent()) continue;
+        if (pAf->H_Parent())
+            continue;
 
         ui().RegisterItemToDraw(pAf->Position(), "af_sign");
 
-        if (pAf->CanBeInvisible()) {
+        if (pAf->CanBeInvisible())
+        {
             float d = detector_pos.distance_to(pAf->Position());
-            if (d < m_fAfVisRadius) pAf->SwitchVisibility(true);
+            if (d < m_fAfVisRadius)
+                pAf->SwitchVisibility(true);
         }
     }
 }
 
-bool CEliteDetector::render_item_3d_ui_query()
-{
-    return IsWorking();
-}
-
+bool CEliteDetector::render_item_3d_ui_query() { return IsWorking(); }
 void CEliteDetector::render_item_3d_ui()
 {
     R_ASSERT(HudItemData());
@@ -181,7 +170,8 @@ void CUIArtefactDetectorElite::Draw()
         Fvector2 pos;
         pos.set(pt3d.x, -pt3d.z);
         pos.sub(rp);
-        if (1 /* r.in(pos)*/) {
+        if (1 /* r.in(pos)*/)
+        {
             (*it).pStatic->SetWndPos(pos);
             (*it).pStatic->Draw();
         }
@@ -199,15 +189,12 @@ void CUIArtefactDetectorElite::GetUILocatorMatrix(Fmatrix& _m)
     _m.mulB_43(m_map_attach_offset);
 }
 
-void CUIArtefactDetectorElite::Clear()
-{
-    m_items_to_draw.clear();
-}
-
+void CUIArtefactDetectorElite::Clear() { m_items_to_draw.clear(); }
 void CUIArtefactDetectorElite::RegisterItemToDraw(const Fvector& p, const shared_str& palette_idx)
 {
     xr_map<shared_str, CUIStatic*>::iterator it = m_palette.find(palette_idx);
-    if (it == m_palette.end()) {
+    if (it == m_palette.end())
+    {
         Msg("! RegisterItemToDraw. static not found for [%s]", palette_idx.c_str());
         return;
     }
@@ -216,16 +203,8 @@ void CUIArtefactDetectorElite::RegisterItemToDraw(const Fvector& p, const shared
     m_items_to_draw.push_back(itm);
 }
 
-CScientificDetector::CScientificDetector()
-{
-    m_artefacts.m_af_rank = 3;
-}
-
-CScientificDetector::~CScientificDetector()
-{
-    m_zones.destroy();
-}
-
+CScientificDetector::CScientificDetector() { m_artefacts.m_af_rank = 3; }
+CScientificDetector::~CScientificDetector() { m_zones.destroy(); }
 void CScientificDetector::Load(LPCSTR section)
 {
     inherited::Load(section);
@@ -243,13 +222,16 @@ void CScientificDetector::UpfateWork()
     for (; ait_b != ait_e; ++ait_b)
     {
         CArtefact* pAf = ait_b->first;
-        if (pAf->H_Parent()) continue;
+        if (pAf->H_Parent())
+            continue;
 
         ui().RegisterItemToDraw(pAf->Position(), pAf->cNameSect());
 
-        if (pAf->CanBeInvisible()) {
+        if (pAf->CanBeInvisible())
+        {
             float d = detector_pos.distance_to(pAf->Position());
-            if (d < m_fAfVisRadius) pAf->SwitchVisibility(true);
+            if (d < m_fAfVisRadius)
+                pAf->SwitchVisibility(true);
         }
     }
 
@@ -270,7 +252,8 @@ void CScientificDetector::shedule_Update(u32 dt)
 {
     inherited::shedule_Update(dt);
 
-    if (!H_Parent()) return;
+    if (!H_Parent())
+        return;
     Fvector P;
     P.set(H_Parent()->Position());
     m_zones.feel_touch_update(P, m_fAfDetectRadius);

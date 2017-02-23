@@ -70,10 +70,7 @@ struct SPHObjDBGDraw : public SPHDBGDrawAbsract
     Fvector AABB;
     Fvector AABB_center;
 };
-void DBG_DrawPHObject(const CPHObject* obj)
-{
-    DBG_DrawPHAbstruct(new SPHObjDBGDraw(obj));
-}
+void DBG_DrawPHObject(const CPHObject* obj) { DBG_DrawPHAbstruct(new SPHObjDBGDraw(obj)); }
 struct SPHContactDBGDraw : public SPHDBGDrawAbsract
 {
     // int geomClass;
@@ -110,11 +107,7 @@ struct SPHContactDBGDraw : public SPHDBGDrawAbsract
     }
 };
 
-void DBG_DrawContact(const dContact& c)
-{
-    DBG_DrawPHAbstruct(new SPHContactDBGDraw(c));
-}
-
+void DBG_DrawContact(const dContact& c) { DBG_DrawPHAbstruct(new SPHContactDBGDraw(c)); }
 struct SPHDBGDrawTri : public SPHDBGDrawAbsract
 {
     Fvector v[3];
@@ -146,7 +139,8 @@ struct SPHDBGDrawTri : public SPHDBGDrawAbsract
     }
     virtual void render()
     {
-        if (solid) {
+        if (solid)
+        {
             GlobalEnv.DRender->dbg_DrawTRI(Fidentity, v[0], v[1], v[2], c);
             GlobalEnv.DRender->dbg_DrawTRI(Fidentity, v[2], v[1], v[0], c);
         }
@@ -171,15 +165,8 @@ static void clear_vector(PHABS_DBG_V& v)
     v.clear();
 }
 
-void DBG_DrawTri(CDB::RESULT* T, u32 c)
-{
-    DBG_DrawPHAbstruct(new SPHDBGDrawTri(T, c));
-}
-void DBG_DrawTri(CDB::TRI* T, const Fvector* V_verts, u32 c)
-{
-    DBG_DrawPHAbstruct(new SPHDBGDrawTri(T, V_verts, c));
-}
-
+void DBG_DrawTri(CDB::RESULT* T, u32 c) { DBG_DrawPHAbstruct(new SPHDBGDrawTri(T, c)); }
+void DBG_DrawTri(CDB::TRI* T, const Fvector* V_verts, u32 c) { DBG_DrawPHAbstruct(new SPHDBGDrawTri(T, V_verts, c)); }
 void DBG_DrawTri(const Fvector& v0, const Fvector& v1, const Fvector& v2, u32 ac, bool solid)
 {
     DBG_DrawPHAbstruct(new SPHDBGDrawTri(v0, v1, v2, ac, solid));
@@ -198,10 +185,7 @@ struct SPHDBGDrawLine : public SPHDBGDrawAbsract
     virtual void render() { Level().debug_renderer().draw_line(Fidentity, p[0], p[1], c); }
 };
 
-void DBG_DrawLine(const Fvector& p0, const Fvector& p1, u32 c)
-{
-    DBG_DrawPHAbstruct(new SPHDBGDrawLine(p0, p1, c));
-}
+void DBG_DrawLine(const Fvector& p0, const Fvector& p1, u32 c) { DBG_DrawPHAbstruct(new SPHDBGDrawLine(p0, p1, c)); }
 void DBG_DrawMatrix(const Fmatrix& m, float size, u8 a /* = 255*/)
 {
     Fvector to;
@@ -310,10 +294,7 @@ struct SPHDBGDrawOBB : public SPHDBGDrawAbsract
     virtual void render() { Level().debug_renderer().draw_obb(m, h, c); }
 };
 
-void DBG_DrawOBB(const Fmatrix& m, const Fvector h, u32 c)
-{
-    DBG_DrawPHAbstruct(new SPHDBGDrawOBB(m, h, c));
-};
+void DBG_DrawOBB(const Fmatrix& m, const Fvector h, u32 c) { DBG_DrawPHAbstruct(new SPHDBGDrawOBB(m, h, c)); };
 void DBG_DrawOBB(const Fobb& b, u32 c)
 {
     Fmatrix m;
@@ -340,11 +321,7 @@ struct SPHDBGDrawPoint : public SPHDBGDrawAbsract
         Level().debug_renderer().draw_ellipse(m, c);
     }
 };
-void DBG_DrawPoint(const Fvector& p, float size, u32 c)
-{
-    DBG_DrawPHAbstruct(new SPHDBGDrawPoint(p, size, c));
-}
-
+void DBG_DrawPoint(const Fvector& p, float size, u32 c) { DBG_DrawPHAbstruct(new SPHDBGDrawPoint(p, size, c)); }
 struct SPHDBGOutText : public SPHDBGDrawAbsract
 {
     string1024 s;
@@ -357,7 +334,8 @@ struct SPHDBGOutText : public SPHDBGDrawAbsract
     virtual void render()
     {
         // if(rendered) return;
-        if (!fsimilar(dbg_text_current_height_scale, dbg_text_height_scale)) {
+        if (!fsimilar(dbg_text_current_height_scale, dbg_text_height_scale))
+        {
             UI().Font().pFontStat->SetHeight(
                 UI().Font().pFontStat->GetHeight() * dbg_text_height_scale / dbg_text_current_height_scale);
             dbg_text_current_height_scale = dbg_text_height_scale;
@@ -384,11 +362,7 @@ struct SPHDBGTextSetColor : public SPHDBGDrawAbsract
     virtual void render() { UI().Font().pFontStat->SetColor(color); }
 };
 
-void DBG_TextSetColor(u32 color)
-{
-    DBG_DrawPHAbstruct(new SPHDBGTextSetColor(color));
-}
-
+void DBG_TextSetColor(u32 color) { DBG_DrawPHAbstruct(new SPHDBGTextSetColor(color)); }
 struct SPHDBGTextOutSet : public SPHDBGDrawAbsract
 {
     float x, y;
@@ -397,15 +371,8 @@ struct SPHDBGTextOutSet : public SPHDBGDrawAbsract
     virtual void render() { UI().Font().pFontStat->OutSet(x, y); }
 };
 
-void DBG_TextOutSet(float x, float y)
-{
-    DBG_DrawPHAbstruct(new SPHDBGTextOutSet(x, y));
-}
-
-void DBG_OpenCashedDraw()
-{
-    dbg_ph_draw_mode = dmCashed;
-}
+void DBG_TextOutSet(float x, float y) { DBG_DrawPHAbstruct(new SPHDBGTextOutSet(x, y)); }
+void DBG_OpenCashedDraw() { dbg_ph_draw_mode = dmCashed; }
 void DBG_ClosedCashedDraw(u32 remove_time)
 {
     dbg_ph_draw_mode = dmSecondaryThread;
@@ -419,7 +386,8 @@ IC void push(PHABS_DBG_V& v, SPHDBGDrawAbsract* a)
 }
 void DBG_DrawPHAbstruct(SPHDBGDrawAbsract* a)
 {
-    if (dbg_ph_draw_mode != dmCashed && dbg_ph_draw_mode != dmCashedSecondary) {
+    if (dbg_ph_draw_mode != dmCashed && dbg_ph_draw_mode != dmCashedSecondary)
+    {
         if (physics_world()->Processing())
             dbg_ph_draw_mode = dmSecondaryThread;
         else
@@ -435,7 +403,8 @@ void DBG_DrawPHAbstruct(SPHDBGDrawAbsract* a)
     switch (dbg_ph_draw_mode)
     {
     case dmSecondaryThread:
-        if (draw_frame) {
+        if (draw_frame)
+        {
             push(dbg_draw_abstruct0, a);
         }
         else
@@ -452,7 +421,8 @@ void DBG_DrawPHAbstruct(SPHDBGDrawAbsract* a)
 void DBG_PHAbstruactStartFrame(bool dr_frame)
 {
     PHABS_DBG_I i, e;
-    if (dr_frame) {
+    if (dr_frame)
+    {
         i = dbg_draw_abstruct0.begin();
         e = dbg_draw_abstruct0.end();
     }
@@ -465,7 +435,8 @@ void DBG_PHAbstruactStartFrame(bool dr_frame)
     {
         xr_delete(*i);
     }
-    if (dr_frame) {
+    if (dr_frame)
+    {
         dbg_draw_abstruct0.clear();
     }
     else
@@ -477,7 +448,8 @@ void capped_cylinder_ray_collision_test();
 void DBG_PHAbstructRender()
 {
     PHABS_DBG_I i, e;
-    if (!draw_frame) {
+    if (!draw_frame)
+    {
         i = dbg_draw_abstruct0.begin();
         e = dbg_draw_abstruct0.end();
     }
@@ -489,12 +461,14 @@ void DBG_PHAbstructRender()
 
     for (; e != i; ++i)
     {
-        if (!(*i)) {
+        if (!(*i))
+        {
         }
         else
             (*i)->render();
     }
-    if (dbg_ph_draw_mode != dmCashed) {
+    if (dbg_ph_draw_mode != dmCashed)
+    {
         PHABS_DBG_I i, e;
         i = dbg_draw_cashed.begin();
         e = dbg_draw_cashed.end();
@@ -502,7 +476,8 @@ void DBG_PHAbstructRender()
         {
             (*i)->render();
         }
-        if (cash_draw_remove_time < Device.dwTimeGlobal) {
+        if (cash_draw_remove_time < Device.dwTimeGlobal)
+        {
             clear_vector(dbg_draw_cashed);
         }
     }
@@ -522,7 +497,8 @@ static void DBG_DrawTarckObj();
 static u32 previous_frame = u32(-1);
 void DBG_RenderUpdate()
 {
-    if (Device.Paused() || Device.dwFrame == previous_frame || !(Device.fTimeDelta > EPS_S)) return;
+    if (Device.Paused() || Device.dwFrame == previous_frame || !(Device.fTimeDelta > EPS_S))
+        return;
     draw_frame = !draw_frame;
     clear_vector(dbg_draw_simple);
     previous_frame = Device.dwFrame;
@@ -561,12 +537,14 @@ void PH_DBG_Clear()
 
 void PH_DBG_Render()
 {
-    if (ph_dbg_draw_mask.test(phDbgDrawZDisable)) GlobalEnv.DRender->ZEnable(false);
+    if (ph_dbg_draw_mask.test(phDbgDrawZDisable))
+        GlobalEnv.DRender->ZEnable(false);
     // CHK_DX(HW.pDevice->SetRenderState(D3DRS_ZENABLE,0));
     UI().Font().pFontStat->OutSet(550, 250);
     DBG_PHAbstructRender();
 
-    if (ph_dbg_draw_mask.test(phDbgDrawZDisable)) GlobalEnv.DRender->ZEnable(true);
+    if (ph_dbg_draw_mask.test(phDbgDrawZDisable))
+        GlobalEnv.DRender->ZEnable(true);
     // CHK_DX(HW.pDevice->SetRenderState(D3DRS_ZENABLE,1));
 
     // draw_frame=!draw_frame;
@@ -574,7 +552,8 @@ void PH_DBG_Render()
 
 void DBG_DrawStatBeforeFrameStep()
 {
-    if (ph_dbg_draw_mask.test(phDbgDrawObjectStatistics)) {
+    if (ph_dbg_draw_mask.test(phDbgDrawObjectStatistics))
+    {
         static float obj_count = 0.f;
         static float update_obj_count = 0.f;
         obj_count = obj_count * 0.9f + float(physics_world()->ObjectsNumber()) * 0.1f;
@@ -586,7 +565,8 @@ void DBG_DrawStatBeforeFrameStep()
 
 void DBG_DrawStatAfterFrameStep()
 {
-    if (ph_dbg_draw_mask.test(phDbgDrawObjectStatistics)) {
+    if (ph_dbg_draw_mask.test(phDbgDrawObjectStatistics))
+    {
         DBG_OutText("------------------------------");
         static float fdbg_bodies_num = 0.f;
         static float fdbg_joints_num = 0.f;
@@ -605,7 +585,8 @@ void DBG_DrawStatAfterFrameStep()
         DBG_OutText("Ph Number of tries %5.0f", fdbg_tries_num);
         DBG_OutText("------------------------------");
     }
-    if (ph_dbg_draw_mask.test(phDbgDrawCashedTriesStat)) {
+    if (ph_dbg_draw_mask.test(phDbgDrawCashedTriesStat))
+    {
         DBG_OutText("------------------------------");
         static float fdbg_saved_tries_for_active_objects = 0;
         static float fdbg_total_saved_tries = 0;
@@ -691,7 +672,8 @@ void CFunctionGraph::ScaleMarkerPos(u32 ID, float& p)
 void CFunctionGraph::ScaleMarkerPos(CStatGraph::EStyle Style, float& p)
 {
     VERIFY(IsActive());
-    if (Style == CStatGraph::stVert) p = ScaleX(p);
+    if (Style == CStatGraph::stVert)
+        p = ScaleX(p);
 }
 void CFunctionGraph::Clear()
 {
@@ -705,16 +687,14 @@ bool CFunctionGraph::IsActive()
     return !!m_stat_graph;
 }
 
-LPCSTR PH_DBG_ObjectTrackName()
-{
-    return s_dbg_trace_obj_name;
-}
+LPCSTR PH_DBG_ObjectTrackName() { return s_dbg_trace_obj_name; }
 // extern ENGINE_API	IGame_Level*	g_pGameLevel;
 void PH_DBG_SetTrackObject()
 {
     //	xr_strcpy( s_dbg_trace_obj_name,obj);
     //	dbg_trace_object_name=s_dbg_trace_obj_name;
-    if (g_pGameLevel) trace_object = Level().Objects.FindObjectByName(PH_DBG_ObjectTrackName());
+    if (g_pGameLevel)
+        trace_object = Level().Objects.FindObjectByName(PH_DBG_ObjectTrackName());
 }
 
 static LPCSTR name_bool(BOOL v)
@@ -751,7 +731,8 @@ void DBG_AnimBlend(IKinematicsAnimated& ka, const CBlend& B)
     // UI().Font().pFontStat->SetHeight	(20.0f);
 
     DBG_OutText("-------------------------------------");
-    if (dbg_track_obj_flags.test(dbg_track_obj_blends_motion_name)) {
+    if (dbg_track_obj_flags.test(dbg_track_obj_blends_motion_name))
+    {
         std::pair<LPCSTR, LPCSTR> motion = ka.LL_MotionDefName_dbg(B.motionID);
         DBG_OutText("motion : name %s, set: %s ", motion.first, motion.second);
     }
@@ -775,7 +756,8 @@ void DBG_AnimBlend(IKinematicsAnimated& ka, const CBlend& B)
 
 void DBG_AnimPartState(IKinematicsAnimated& ka, u16 part)
 {
-    if (!dbg_track_obj_flags.test(1 << part)) return;
+    if (!dbg_track_obj_flags.test(1 << part))
+        return;
     DBG_OutText("=======================================");
     const u16 n = (u16)ka.LL_PartBlendsCount(part);
     DBG_OutText("bone part : %d num blends: %d", part, n);
@@ -785,7 +767,8 @@ void DBG_AnimPartState(IKinematicsAnimated& ka, u16 part)
 }
 void DBG_AnimState(IKinematicsAnimated& ka)
 {
-    if (dbg_track_obj_flags.test(dbg_track_obj_blends_dump)) {
+    if (dbg_track_obj_flags.test(dbg_track_obj_blends_dump))
+    {
         ka.LL_DumpBlends_dbg();
         dbg_track_obj_flags.set(dbg_track_obj_blends_dump, FALSE);
     }
@@ -795,29 +778,35 @@ void DBG_AnimState(IKinematicsAnimated& ka)
 
 static void DBG_DrawTarckObj()
 {
-    if (!ph_dbg_draw_mask1.test(ph_m1_DbgTrackObject)) {
+    if (!ph_dbg_draw_mask1.test(ph_m1_DbgTrackObject))
+    {
         trace_object = 0;
         return;
     }
     DBG_TextOutSet(450, 150);
     DBG_OutText("obj name: %s", PH_DBG_ObjectTrackName());
 
-    if (!trace_object) {
+    if (!trace_object)
+    {
         // trace_object= Level().Objects.FindObjectByName( PH_DBG_ObjectTrackName() );
         PH_DBG_SetTrackObject();
-        if (!trace_object) {
+        if (!trace_object)
+        {
             DBG_OutText("obj name: %s not found", PH_DBG_ObjectTrackName());
             return;
         }
     }
 
     IRenderVisual* v = trace_object->Visual();
-    if (!v) return;
+    if (!v)
+        return;
     DBG_OutText("visual name: %s ", *trace_object->cNameVisual());
     IKinematics* k = smart_cast<IKinematics*>(v);
-    if (!k) return;
+    if (!k)
+        return;
     IKinematicsAnimated* ka = smart_cast<IKinematicsAnimated*>(k);
-    if (!ka) return;
+    if (!ka)
+        return;
     DBG_AnimState(*ka);
 }
 
@@ -835,7 +824,8 @@ void DBG_DrawBones(const Fmatrix& xform, IKinematics* K)
         DBG_DrawMatrix(Fmatrix().mul_43(xform, bone_pos), 0.1);
 
         u16 bp = bd.GetParentID();
-        if (BI_NONE != bp) {
+        if (BI_NONE != bp)
+        {
             CBoneInstance& pbi = K->LL_GetBoneInstance(bp);
             DBG_DrawLine(Fmatrix().mul_43(xform, bone_pos).c, Fmatrix().mul_43(xform, pbi.mTransform).c,
                 color_xrgb(255, 255, 0));
@@ -859,15 +849,17 @@ void DBG_PhysBones(IGameObject& O)
     CPhysicsShellHolder* sh = smart_cast<CPhysicsShellHolder*>(&O);
     VERIFY(sh);
     CPhysicsShell* shell = sh->PPhysicsShell();
-    if (!shell) return;
+    if (!shell)
+        return;
     u16 nb_elements = shell->get_ElementsNumber();
     for (u16 i = 0; i < nb_elements; ++i)
     {
         CPhysicsElement* e = shell->get_ElementByStoreOrder(i);
 
-        DBG_DrawMatrix(e->XFORM(), 0.1f);  // Fmatrix().mul_43( O.XFORM(),e->XFORM())
+        DBG_DrawMatrix(e->XFORM(), 0.1f); // Fmatrix().mul_43( O.XFORM(),e->XFORM())
         CPhysicsElement* pE = (e)->parent_element();
-        if (pE) DBG_DrawLine(e->XFORM().c, pE->XFORM().c, color_xrgb(255, 100, 0));
+        if (pE)
+            DBG_DrawLine(e->XFORM().c, pE->XFORM().c, color_xrgb(255, 100, 0));
     }
 }
 
@@ -885,7 +877,8 @@ void DBG_DrawBind(IGameObject& O)
 
         DBG_DrawMatrix(Fmatrix().mul_43(O.XFORM(), binds[i]), 0.1, 100);
         u16 bp = bd.GetParentID();
-        if (BI_NONE != bp) {
+        if (BI_NONE != bp)
+        {
             DBG_DrawLine(Fmatrix().mul_43(O.XFORM(), binds[i]).c, Fmatrix().mul_43(O.XFORM(), binds[bp]).c,
                 color_xrgb(0, 255, 255));
         }
@@ -907,12 +900,12 @@ class cphdebug_impl : public IPhDebugRender
 
 public:
     cphdebug_impl() { ph_debug_render = this; }
-
 } ph_debug_render_impl;
 
 void DBG_PH_NetRelcase(IGameObject* obj)
 {
-    if (trace_object == obj) trace_object = NULL;
+    if (trace_object == obj)
+        trace_object = NULL;
 }
 
 bool is_trace_obj(CPHObject* obj)
@@ -922,26 +915,26 @@ bool is_trace_obj(CPHObject* obj)
 
 void DBG_ObjBeforeCollision(CPHObject* obj)
 {
-    if (is_trace_obj(obj)) DBG_OpenCashedDraw();
+    if (is_trace_obj(obj))
+        DBG_OpenCashedDraw();
 }
 void DBG_ObjAfterCollision(CPHObject* obj)
 {
-    if (is_trace_obj(obj)) DBG_ClosedCashedDraw(50000);
+    if (is_trace_obj(obj))
+        DBG_ClosedCashedDraw(50000);
 }
 
-void DBG_ObjBeforePhTune(CPHObject* obj)
-{
-}
-void DBG_ObjeAfterPhTune(CPHObject* obj)
-{
-}
+void DBG_ObjBeforePhTune(CPHObject* obj) {}
+void DBG_ObjeAfterPhTune(CPHObject* obj) {}
 Fvector dbg_trace_prev_pos = {0, 0, 0};
 void DBG_ObjBeforeStep(CPHObject* obj)
 {
-    if (is_trace_obj(obj)) {
+    if (is_trace_obj(obj))
+    {
         DBG_OpenCashedDraw();
         // dbg_draw_velocity	( 0.1f, color_xrgb( 255, 0, 0 ) );
-        if (obj->ref_object()->ObjectPPhysicsShell()) {
+        if (obj->ref_object()->ObjectPPhysicsShell())
+        {
             obj->ref_object()->ObjectPPhysicsShell()->dbg_draw_force(0.1f, color_xrgb(0, 0, 255));
             Fmatrix form = Fidentity;
             obj->ref_object()->ObjectPPhysicsShell()->GetGlobalTransformDynamic(&form);
@@ -952,21 +945,23 @@ void DBG_ObjBeforeStep(CPHObject* obj)
 
 void DBG_ObjAfterStep(CPHObject* obj)
 {
-    if (is_trace_obj(obj)) {
-        if (obj->ref_object()->ObjectPPhysicsShell()) {
+    if (is_trace_obj(obj))
+    {
+        if (obj->ref_object()->ObjectPPhysicsShell())
+        {
             obj->ref_object()->ObjectPPhysicsShell()->dbg_draw_velocity(0.1f, color_xrgb(255, 0, 0));
         }
         // dbg_draw_force		( 0.1f, color_xrgb( 0, 0, 255 ) );
     }
 }
 
-void DBG_ObjBeforePhDataUpdate(CPHObject* obj)
-{
-}
+void DBG_ObjBeforePhDataUpdate(CPHObject* obj) {}
 void DBG_ObjAfterPhDataUpdate(CPHObject* obj)
 {
-    if (!is_trace_obj(obj)) return;
-    if (obj->ref_object()->ObjectPPhysicsShell()) {
+    if (!is_trace_obj(obj))
+        return;
+    if (obj->ref_object()->ObjectPPhysicsShell())
+    {
         Fmatrix form = Fidentity;
         obj->ref_object()->ObjectPPhysicsShell()->GetGlobalTransformDynamic(&form);
         DBG_DrawLine(dbg_trace_prev_pos, form.c, color_xrgb(255, 0, 0));
@@ -978,7 +973,6 @@ class CPHDebugOutput : public IDebugOutput
 {
     virtual const Flags32& ph_dbg_draw_mask() const { return ::ph_dbg_draw_mask; }
     virtual const Flags32& ph_dbg_draw_mask1() const { return ::ph_dbg_draw_mask1; }
-
     virtual void DBG_DrawStatBeforeFrameStep() { ::DBG_DrawStatBeforeFrameStep(); }
     virtual void DBG_DrawStatAfterFrameStep() { ::DBG_DrawStatAfterFrameStep(); }
     // virtual	void DBG_RenderUpdate( )												=0;
@@ -994,11 +988,14 @@ class CPHDebugOutput : public IDebugOutput
     virtual void DBG_DrawOBB(const Fmatrix& m, const Fvector h, u32 c) { ::DBG_DrawOBB(m, h, c); }
     virtual void DBG_DrawPoint(const Fvector& p, float size, u32 c) { ::DBG_DrawPoint(p, size, c); }
     virtual void DBG_DrawMatrix(const Fmatrix& m, float size, u8 a = 255) { ::DBG_DrawMatrix(m, size, a); }
-    // virtual	void DBG_DrawRotationX( const Fmatrix &m, float ang0, float ang1, float size, u32 ac, bool solid = false,
+    // virtual	void DBG_DrawRotationX( const Fmatrix &m, float ang0, float ang1, float size, u32 ac, bool solid =
+    // false,
     // u32 tessel = 7 ) = 0;
-    // virtual	void DBG_DrawRotationY( const Fmatrix &m, float ang0, float ang1, float size, u32 ac, bool solid = false,
+    // virtual	void DBG_DrawRotationY( const Fmatrix &m, float ang0, float ang1, float size, u32 ac, bool solid =
+    // false,
     // u32 tessel = 7 ) = 0;
-    // virtual	void DBG_DrawRotationZ( const Fmatrix &m, float ang0, float ang1, float size, u32 ac, bool solid = false,
+    // virtual	void DBG_DrawRotationZ( const Fmatrix &m, float ang0, float ang1, float size, u32 ac, bool solid =
+    // false,
     // u32 tessel = 7 ) = 0;
     virtual void _cdecl DBG_OutText(LPCSTR s, ...)
     {
@@ -1018,19 +1015,18 @@ class CPHDebugOutput : public IDebugOutput
     virtual void PH_DBG_Render() { ::PH_DBG_Render(); }
     virtual void PH_DBG_Clear() { ::PH_DBG_Clear(); }
     virtual LPCSTR PH_DBG_ObjectTrackName() { return ::PH_DBG_ObjectTrackName(); }
-
     // virtual	bool			draw_frame								()=0;
     virtual u32& dbg_tries_num()
     {
         return ::dbg_tries_num;
         //	make_string( "%s, _14_=%f \n", dump_string( make_string( "%s.i, ", name ).c_str(), form.i ).c_str( ) ,
-        //form._14_ )	+
+        // form._14_ )	+
         //	make_string( "%s, _24_=%f \n", dump_string( make_string( "%s.j, ", name ).c_str(), form.j ).c_str( ) ,
-        //form._24_ )	+
+        // form._24_ )	+
         //	make_string( "%s, _34_=%f \n", dump_string( make_string( "%s.k, ", name ).c_str(), form.k ).c_str( ) ,
-        //form._34_  ) +
+        // form._34_  ) +
         //	make_string( "%s, _44_=%f \n", dump_string( make_string( "%s.c, ", name ).c_str(), form.c ).c_str( ) ,
-        //form._44_ );
+        // form._44_ );
     }
     virtual u32& dbg_saved_tries_for_active_objects() { return ::dbg_saved_tries_for_active_objects; }
     virtual u32& dbg_total_saved_tries() { return ::dbg_total_saved_tries; }
@@ -1040,7 +1036,6 @@ class CPHDebugOutput : public IDebugOutput
     virtual u32& dbg_joints_num() { return ::dbg_joints_num; }
     virtual u32& dbg_islands_num() { return ::dbg_islands_num; }
     virtual u32& dbg_contacts_num() { return ::dbg_contacts_num; }
-
     virtual float dbg_vel_collid_damage_to_display()
     {
         return ::dbg_vel_collid_damage_to_display;
@@ -1058,10 +1053,8 @@ class CPHDebugOutput : public IDebugOutput
     virtual void DBG_ObjBeforePhTune(CPHObject* obj) { ::DBG_ObjBeforePhTune(obj); }
     virtual void DBG_ObjAfterCollision(CPHObject* obj) { ::DBG_ObjAfterCollision(obj); }
     virtual void DBG_ObjBeforeCollision(CPHObject* obj) { ::DBG_ObjBeforeCollision(obj); }
-
 public:
     CPHDebugOutput() { ph_debug_output = this; }
-
 } ph_debug_output_impl;
 
 #endif

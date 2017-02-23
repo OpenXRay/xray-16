@@ -3,10 +3,7 @@
 
 #include "xrEngine/GameFont.h"
 
-dxFontRender::dxFontRender()
-{
-}
-
+dxFontRender::dxFontRender() {}
 dxFontRender::~dxFontRender()
 {
     pShader.destroy();
@@ -23,9 +20,11 @@ extern ENGINE_API Fvector2 g_current_font_scale;
 void dxFontRender::OnRender(CGameFont& owner)
 {
     VERIFY(g_bRendering);
-    if (pShader) RCache.set_Shader(pShader);
+    if (pShader)
+        RCache.set_Shader(pShader);
 
-    if (!(owner.uFlags & CGameFont::fsValid)) {
+    if (!(owner.uFlags & CGameFont::fsValid))
+    {
         CTexture* T = RCache.get_ActiveTexture(0);
         owner.vTS.set((int)T->get_Width(), (int)T->get_Height());
         owner.fTCHeight = owner.fHeight / float(owner.vTS.y);
@@ -43,7 +42,8 @@ void dxFontRender::OnRender(CGameFont& owner)
         {
             int L = owner.smart_strlen(owner.strings[i + count].string);
 
-            if ((L + length) < MAX_MB_CHARS) {
+            if ((L + length) < MAX_MB_CHARS)
+            {
                 count++;
                 length += L;
             }
@@ -65,14 +65,16 @@ void dxFontRender::OnRender(CGameFont& owner)
 
             int len = owner.IsMultibyte() ? mbhMulti2Wide(wsStr, NULL, MAX_MB_CHARS, PS.string) : xr_strlen(PS.string);
 
-            if (len) {
+            if (len)
+            {
                 float X = float(iFloor(PS.x));
                 float Y = float(iFloor(PS.y));
                 float S = PS.height * g_current_font_scale.y;
                 float Y2 = Y + S;
                 float fSize = 0;
 
-                if (PS.align) fSize = owner.IsMultibyte() ? owner.SizeOf_(wsStr) : owner.SizeOf_(PS.string);
+                if (PS.align)
+                    fSize = owner.IsMultibyte() ? owner.SizeOf_(wsStr) : owner.SizeOf_(PS.string);
 
                 switch (PS.align)
                 {
@@ -82,7 +84,8 @@ void dxFontRender::OnRender(CGameFont& owner)
 
                 u32 clr, clr2;
                 clr2 = clr = PS.c;
-                if (owner.uFlags & CGameFont::fsGradient) {
+                if (owner.uFlags & CGameFont::fsGradient)
+                {
                     u32 _R = color_get_R(clr) / 2;
                     u32 _G = color_get_G(clr) / 2;
                     u32 _B = color_get_B(clr) / 2;
@@ -90,12 +93,12 @@ void dxFontRender::OnRender(CGameFont& owner)
                     clr2 = color_rgba(_R, _G, _B, _A);
                 }
 
-#if defined(USE_DX10) || defined(USE_DX11) ||                                                                          \
-    defined(USE_OGL)  //	Vertex shader will cancel a DX9 correction, so make fake offset
+#if defined(USE_DX10) || defined(USE_DX11) || \
+defined(USE_OGL) // Vertex shader will cancel a DX9 correction, so make fake offset
                 X -= 0.5f;
                 Y -= 0.5f;
                 Y2 -= 0.5f;
-#endif  //	USE_DX10
+#endif // USE_DX10
 
                 float tu, tv;
                 for (int j = 0; j < len; j++)
@@ -108,16 +111,17 @@ void dxFontRender::OnRender(CGameFont& owner)
 
                     float fTCWidth = l.z / owner.vTS.x;
 
-                    if (!fis_zero(l.z)) {
-                        //						tu			= ( l.x / owner.vTS.x ) + ( 0.5f / owner.vTS.x );
-                        //						tv			= ( l.y / owner.vTS.y ) + ( 0.5f / owner.vTS.y );
+                    if (!fis_zero(l.z))
+                    {
+                        //tu = (l.x / owner.vTS.x) + (0.5f / owner.vTS.x);
+                        //tv = (l.y / owner.vTS.y) + (0.5f / owner.vTS.y);
                         tu = (l.x / owner.vTS.x);
                         tv = (l.y / owner.vTS.y);
 #if !defined(USE_DX10) && !defined(USE_DX11) && !defined(USE_OGL)
-                        //	Make half pixel offset for 1 to 1 mapping
+                        //  Make half pixel offset for 1 to 1 mapping
                         tu += (0.5f / owner.vTS.x);
                         tv += (0.5f / owner.vTS.y);
-#endif  //	USE_DX10
+#endif // USE_DX10
 
                         v->set(X, Y2, clr2, tu, tv + owner.fTCHeight);
                         v++;
@@ -129,9 +133,11 @@ void dxFontRender::OnRender(CGameFont& owner)
                         v++;
                     }
                     X += scw * owner.vInterval.x;
-                    if (owner.IsMultibyte()) {
+                    if (owner.IsMultibyte())
+                    {
                         X -= 2;
-                        if (IsNeedSpaceCharacter(wsStr[1 + j])) X += owner.fXStep;
+                        if (IsNeedSpaceCharacter(wsStr[1 + j]))
+                            X += owner.fXStep;
                     }
                 }
             }
@@ -140,7 +146,8 @@ void dxFontRender::OnRender(CGameFont& owner)
         // Unlock and draw
         u32 vCount = (u32)(v - start);
         RCache.Vertex.Unlock(vCount, pGeom.stride());
-        if (vCount) {
+        if (vCount)
+        {
             RCache.set_Geometry(pGeom);
             RCache.Render(D3DPT_TRIANGLELIST, vOffset, 0, vCount, 0, vCount / 2);
         }

@@ -72,7 +72,8 @@ void CUIMMShniaga::InitShniaga(CUIXml& xml_doc, LPCSTR path)
     strconcat(sizeof(_path), _path, path, ":shniaga:magnifire:y_offset");
     m_offset = xml_doc.ReadFlt(_path, 0, 0);
 
-    if (!g_pGameLevel || !g_pGameLevel->bReady) {
+    if (!g_pGameLevel || !g_pGameLevel->bReady)
+    {
         if (!*g_last_saved_game || !CSavedGameWrapper::valid_saved_game(g_last_saved_game))
             CreateList(m_buttons, xml_doc, "menu_main");
         else
@@ -82,7 +83,8 @@ void CUIMMShniaga::InitShniaga(CUIXml& xml_doc, LPCSTR path)
     }
     else
     {
-        if (GameID() == eGameIDSingle) {
+        if (GameID() == eGameIDSingle)
+        {
             VERIFY(Actor());
             if (g_actor && !Actor()->g_Alive())
                 CreateList(m_buttons, xml_doc, "menu_main_single_dead");
@@ -100,10 +102,7 @@ void CUIMMShniaga::InitShniaga(CUIXml& xml_doc, LPCSTR path)
     m_sound->music_Play();
 }
 
-void CUIMMShniaga::OnDeviceReset()
-{
-}
-
+void CUIMMShniaga::OnDeviceReset() {}
 extern CActor* g_actor;
 
 void CUIMMShniaga::CreateList(xr_vector<CUITextWnd*>& lst, CUIXml& xml_doc, LPCSTR path)
@@ -162,7 +161,7 @@ void CUIMMShniaga::SetPage(enum_page_id page_id, LPCSTR xml_file, LPCSTR xml_pat
     case epi_new_network_game: { lst = &m_buttons_new_network;
     }
     break;
-    };  // switch (page_id)
+    }; // switch (page_id)
     delete_data(*lst);
 
     CUIXml tmp_xml;
@@ -183,7 +182,7 @@ void CUIMMShniaga::ShowPage(enum_page_id page_id)
     case epi_new_network_game: { ShowNetworkGame();
     }
     break;
-    };  // switch (page_id)
+    }; // switch (page_id)
 }
 
 void CUIMMShniaga::ShowMain()
@@ -221,13 +220,16 @@ void CUIMMShniaga::ShowNetworkGame()
 bool CUIMMShniaga::IsButton(CUIWindow* st)
 {
     for (u32 i = 0; i < m_buttons.size(); ++i)
-        if (m_buttons[i] == st) return true;
+        if (m_buttons[i] == st)
+            return true;
 
     for (u32 i = 0; i < m_buttons_new.size(); ++i)
-        if (m_buttons_new[i] == st) return true;
+        if (m_buttons_new[i] == st)
+            return true;
 
     for (u32 i = 0, count = m_buttons_new_network.size(); i < count; ++i)
-        if (m_buttons_new_network[i] == st) return true;
+        if (m_buttons_new_network[i] == st)
+            return true;
 
     return false;
 }
@@ -235,7 +237,8 @@ bool CUIMMShniaga::IsButton(CUIWindow* st)
 void CUIMMShniaga::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 {
     CUIWindow::SendMessage(pWnd, msg, pData);
-    if (IsButton(pWnd)) {
+    if (IsButton(pWnd))
+    {
         switch (msg)
         {
         case WINDOW_FOCUS_RECEIVED: SelectBtn(pWnd); break;
@@ -264,22 +267,26 @@ void CUIMMShniaga::SelectBtn(CUIWindow* btn)
     R_ASSERT(m_page >= 0);
     for (int i = 0; i < (int)m_buttons.size(); ++i)
     {
-        if (0 == m_page) {
-            if (m_buttons[i] == btn) {
+        if (0 == m_page)
+        {
+            if (m_buttons[i] == btn)
+            {
                 SelectBtn(i);
                 return;
             }
         }
         else if (1 == m_page)
         {
-            if (m_buttons_new[i] == btn) {
+            if (m_buttons_new[i] == btn)
+            {
                 SelectBtn(i);
                 return;
             }
         }
         else if (2 == m_page)
         {
-            if (m_buttons_new_network[i] == btn) {
+            if (m_buttons_new_network[i] == btn)
+            {
                 SelectBtn(i);
                 return;
             }
@@ -287,14 +294,11 @@ void CUIMMShniaga::SelectBtn(CUIWindow* btn)
     }
 }
 
-void CUIMMShniaga::Draw()
-{
-    CUIWindow::Draw();
-}
-
+void CUIMMShniaga::Draw() { CUIWindow::Draw(); }
 void CUIMMShniaga::Update()
 {
-    if (m_start_time > Device.dwTimeContinual - m_run_time) {
+    if (m_start_time > Device.dwTimeContinual - m_run_time)
+    {
         Fvector2 pos = m_shniaga->GetWndPos();
         pos.y = this->pos(m_origin, m_destination, Device.dwTimeContinual - m_start_time);
         m_shniaga->SetWndPos(pos);
@@ -302,7 +306,8 @@ void CUIMMShniaga::Update()
     else
         ProcessEvent(E_Stop);
 
-    if (m_start_time > Device.dwTimeContinual - m_run_time * 10 / 100) ProcessEvent(E_Finilize);
+    if (m_start_time > Device.dwTimeContinual - m_run_time * 10 / 100)
+        ProcessEvent(E_Finilize);
 
     ProcessEvent(E_Update);
 
@@ -314,7 +319,8 @@ bool CUIMMShniaga::OnMouseAction(float x, float y, EUIMessages mouse_action)
     Fvector2 pos = UI().GetUICursor().GetCursorPosition();
     Frect r;
     m_magnifier->GetAbsoluteRect(r);
-    if (WINDOW_LBUTTON_DOWN == mouse_action && r.in(pos.x, pos.y)) {
+    if (WINDOW_LBUTTON_DOWN == mouse_action && r.in(pos.x, pos.y))
+    {
         OnBtnClick();
     }
 
@@ -335,18 +341,22 @@ void CUIMMShniaga::OnBtnClick()
 
 bool CUIMMShniaga::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
-    if (WINDOW_KEY_PRESSED == keyboard_action) {
+    if (WINDOW_KEY_PRESSED == keyboard_action)
+    {
         switch (dik)
         {
         case DIK_UP:
-            if (m_selected_btn > 0) SelectBtn(m_selected_btn - 1);
+            if (m_selected_btn > 0)
+                SelectBtn(m_selected_btn - 1);
             return true;
         case DIK_DOWN:
-            if (m_selected_btn < BtnCount() - 1) SelectBtn(m_selected_btn + 1);
+            if (m_selected_btn < BtnCount() - 1)
+                SelectBtn(m_selected_btn + 1);
             return true;
         case DIK_RETURN: OnBtnClick(); return true;
         case DIK_ESCAPE:
-            if (m_page != epi_main) ShowMain();
+            if (m_page != epi_main)
+                ShowMain();
             return true;
         }
     }
@@ -413,7 +423,8 @@ void CUIMMShniaga::ProcessEvent(EVENT ev)
         m_destination = m_selected->GetWndPos().y - m_magnifier->GetWndPos().y;
         m_destination += m_offset;
         m_run_time = u32((log(1 + abs(m_origin - m_destination)) / log(GetHeight())) * 300);
-        if (m_run_time < 100) m_run_time = 100;
+        if (m_run_time < 100)
+            m_run_time = 100;
 
         // reset flags
         m_flags.set(fl_SoundFinalized, FALSE);
@@ -421,14 +432,16 @@ void CUIMMShniaga::ProcessEvent(EVENT ev)
     }
     break;
     case E_Finilize:
-        if (!m_flags.test(fl_SoundFinalized)) {
+        if (!m_flags.test(fl_SoundFinalized))
+        {
             m_sound->whell_Click();
 
             m_flags.set(fl_SoundFinalized, TRUE);
         }
         break;
     case E_Stop:
-        if (!m_flags.test(fl_MovingStoped)) {
+        if (!m_flags.test(fl_MovingStoped))
+        {
             m_sound->whell_Stop();
 
             Fvector2 pos = m_shniaga->GetWndPos();

@@ -20,7 +20,7 @@ public:
 private:
     HANDLE m_event;
 
-private:  // hidden
+private: // hidden
     xr_event(const xr_event&);
     void operator=(const xr_event&);
 };
@@ -37,7 +37,7 @@ public:
 private:
     CRITICAL_SECTION m_mutex;
 
-private:  // hidden
+private: // hidden
     xr_mutex(const xr_mutex&);
     void operator=(const xr_mutex&);
 };
@@ -51,7 +51,7 @@ public:
 private:
     xr_mutex& m_mutex;
 
-private:  // hidden
+private: // hidden
     xr_sync(const xr_sync&);
     void operator=(const xr_sync&);
 };
@@ -70,12 +70,12 @@ public:
     static bool yield();
     static void sleep(unsigned msec);
     //	static pid_t getId();
-    static unsigned getTickCount();  // msec
+    static unsigned getTickCount(); // msec
 
 private:
     HANDLE m_thread;
 
-private:  // hidden
+private: // hidden
     xr_thread(const xr_thread&);
     void operator=(const xr_thread&);
 };
@@ -98,7 +98,7 @@ private:
     virtual void run();
     xr_event m_event;
 
-private:  // hidden
+private: // hidden
     xr_waitableThread(const xr_waitableThread&);
     void operator=(const xr_waitableThread&);
 };

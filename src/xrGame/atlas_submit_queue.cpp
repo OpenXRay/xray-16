@@ -12,16 +12,14 @@ atlas_submit_queue::atlas_submit_queue(gamespy_profile::stats_submitter* stats_s
     m_atlas_submitted.bind(this, &atlas_submit_queue::atlas_submitted);
 }
 
-atlas_submit_queue::~atlas_submit_queue()
-{
-}
-
+atlas_submit_queue::~atlas_submit_queue() {}
 void atlas_submit_queue::submit_all()
 {
     gamespy_gp::login_manager* tmp_lmngr = MainMenu()->GetLoginMngr();
     VERIFY(tmp_lmngr);
     gamespy_gp::profile const* tmp_curr_prof = tmp_lmngr->get_current_profile();
-    if (!tmp_curr_prof || !tmp_curr_prof->online()) {
+    if (!tmp_curr_prof || !tmp_curr_prof->online())
+    {
         Msg("! ATLAS submit can be only in online profile mode");
         return;
     }
@@ -37,7 +35,8 @@ void atlas_submit_queue::submit_reward(gamespy_profile::enum_awards_t const awar
     gamespy_gp::login_manager* tmp_lmngr = MainMenu()->GetLoginMngr();
     VERIFY(tmp_lmngr);
     gamespy_gp::profile const* tmp_curr_prof = tmp_lmngr->get_current_profile();
-    if (!tmp_curr_prof->online()) {
+    if (!tmp_curr_prof->online())
+    {
         Msg("! ATLAS submit can be only in online profile mode");
         return;
     }
@@ -52,7 +51,7 @@ void atlas_submit_queue::submit_reward(gamespy_profile::enum_awards_t const awar
     submit_task tmp_task;
     tmp_task.m_data_type = submit_task::edt_award_id;
     tmp_task.m_award_id = award_id;
-    tmp_task.m_awards_count = tmp_iter->second.m_count;  //+1 was on quick_reward_with_award
+    tmp_task.m_awards_count = tmp_iter->second.m_count; //+1 was on quick_reward_with_award
     m_reward_tasks.push_back(tmp_task);
 
     update();
@@ -63,7 +62,8 @@ void atlas_submit_queue::submit_best_results()
     gamespy_gp::login_manager* tmp_lmngr = MainMenu()->GetLoginMngr();
     VERIFY(tmp_lmngr);
     gamespy_gp::profile const* tmp_curr_prof = tmp_lmngr->get_current_profile();
-    if (!tmp_curr_prof->online()) {
+    if (!tmp_curr_prof->online())
+    {
         Msg("! ATLAS submit can be only in online profile mode");
         return;
     }
@@ -77,7 +77,8 @@ void atlas_submit_queue::submit_best_results()
 
 void atlas_submit_queue::update()
 {
-    if (m_reward_tasks.empty() || is_active()) return;
+    if (m_reward_tasks.empty() || is_active())
+        return;
 
     gamespy_gp::login_manager* tmp_lmngr = MainMenu()->GetLoginMngr();
     VERIFY(tmp_lmngr);
@@ -85,7 +86,8 @@ void atlas_submit_queue::update()
     VERIFY(tmp_curr_prof);
     VERIFY2(tmp_curr_prof->online(), "ATLAS submit can be only in online profile mode");
 
-    if (m_reward_tasks.front().m_data_type == submit_task::edt_award_id) {
+    if (m_reward_tasks.front().m_data_type == submit_task::edt_award_id)
+    {
         do_atlas_reward(tmp_curr_prof, m_reward_tasks.front().m_award_id, m_reward_tasks.front().m_awards_count);
     }
     else if (m_reward_tasks.front().m_data_type == submit_task::edt_best_scores_ptr)
@@ -139,7 +141,8 @@ void atlas_submit_queue::do_atlas_submit_all(gamespy_gp::profile const* profile)
 
 void __stdcall atlas_submit_queue::atlas_submitted(bool result, char const* err_string)
 {
-    if (result) {
+    if (result)
+    {
         Msg("* submit complete successfully !");
     }
     else

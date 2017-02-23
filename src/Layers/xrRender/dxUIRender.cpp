@@ -142,9 +142,9 @@ void dxUIRender::SetScissor(Irect* rect)
 #if (RENDER == R_R3) || (RENDER == R_R4)
     RCache.set_Scissor(rect);
     StateManager.OverrideScissoring(rect ? true : false, TRUE);
-#else   //	(RENDER == R_R3) || (RENDER == R_R4)
+#else //	(RENDER == R_R3) || (RENDER == R_R4)
     RCache.set_Scissor(rect);
-#endif  //	(RENDER == R_R3) || (RENDER == R_R4)
+#endif //	(RENDER == R_R3) || (RENDER == R_R4)
 }
 
 void dxUIRender::GetActiveTextureResolution(Fvector2& res)
@@ -267,18 +267,12 @@ void dxUIRender::FlushPrimitive()
     default: NODEFAULT;
     }
 
-    if (primCount > 0) RCache.Render(d3dPrimType, vOffset, primCount);
+    if (primCount > 0)
+        RCache.Render(d3dPrimType, vOffset, primCount);
 
     PrimitiveType = ptNone;
     m_PointType = pttNone;
 }
 
-void dxUIRender::CacheSetXformWorld(const Fmatrix& M)
-{
-    RCache.set_xform_world(M);
-}
-
-void dxUIRender::CacheSetCullMode(CullMode m)
-{
-    RCache.set_CullMode(CULL_NONE + m);
-}
+void dxUIRender::CacheSetXformWorld(const Fmatrix& M) { RCache.set_xform_world(M); }
+void dxUIRender::CacheSetCullMode(CullMode m) { RCache.set_CullMode(CULL_NONE + m); }

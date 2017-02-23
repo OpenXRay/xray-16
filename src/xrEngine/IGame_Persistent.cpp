@@ -21,7 +21,7 @@ bool g_dedicated_server = false;
 
 #ifdef INGAME_EDITOR
 #include "editor_environment_manager.hpp"
-#endif  // INGAME_EDITOR
+#endif // INGAME_EDITOR
 
 ENGINE_API IGame_Persistent* g_pGamePersistent = NULL;
 
@@ -39,12 +39,12 @@ IGame_Persistent::IGame_Persistent()
 #ifndef _EDITOR
     pEnvironment = new CEnvironment();
 #endif
-#else   // #ifdef INGAME_EDITOR
+#else // #ifdef INGAME_EDITOR
     if (RDEVICE.editor())
         pEnvironment = new editor::environment::manager();
     else
         pEnvironment = new CEnvironment();
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR
 }
 
 IGame_Persistent::~IGame_Persistent()
@@ -59,14 +59,8 @@ IGame_Persistent::~IGame_Persistent()
 #endif
 }
 
-void IGame_Persistent::OnAppActivate()
-{
-}
-
-void IGame_Persistent::OnAppDeactivate()
-{
-}
-
+void IGame_Persistent::OnAppActivate() {}
+void IGame_Persistent::OnAppDeactivate() {}
 void IGame_Persistent::OnAppStart()
 {
 #ifndef _EDITOR
@@ -94,7 +88,8 @@ void IGame_Persistent::PreStart(LPCSTR op)
     new_game_params.parse_cmd_line(op);
 
     // change game type
-    if (0 != xr_strcmp(prev_type, new_game_params.m_game_type)) {
+    if (0 != xr_strcmp(prev_type, new_game_params.m_game_type))
+    {
         OnGameEnd();
     }
 }
@@ -104,10 +99,13 @@ void IGame_Persistent::Start(LPCSTR op)
     xr_strcpy(prev_type, m_game_params.m_game_type);
     m_game_params.parse_cmd_line(op);
     // change game type
-    if ((0 != xr_strcmp(prev_type, m_game_params.m_game_type))) {
-        if (*m_game_params.m_game_type) OnGameStart();
+    if ((0 != xr_strcmp(prev_type, m_game_params.m_game_type)))
+    {
+        if (*m_game_params.m_game_type)
+            OnGameStart();
 #ifndef _EDITOR
-        if (g_hud) DEL_INSTANCE(g_hud);
+        if (g_hud)
+            DEL_INSTANCE(g_hud);
 #endif
     }
     else
@@ -122,7 +120,8 @@ void IGame_Persistent::Disconnect()
     // clear "need to play" particles
     destroy_particles(true);
 
-    if (g_hud) DEL_INSTANCE(g_hud);
+    if (g_hud)
+        DEL_INSTANCE(g_hud);
 //. g_hud->OnDisconnected ();
 #endif
 }
@@ -132,7 +131,8 @@ void IGame_Persistent::OnGameStart()
 #ifndef _EDITOR
     // LoadTitle("st_prefetching_objects");
     LoadTitle();
-    if (!strstr(Core.Params, "-noprefetch")) Prefetch();
+    if (!strstr(Core.Params, "-noprefetch"))
+        Prefetch();
 #endif
 }
 
@@ -168,7 +168,8 @@ void IGame_Persistent::OnGameEnd()
 void IGame_Persistent::OnFrame()
 {
 #ifndef _EDITOR
-    if (!Device.Paused() || Device.dwPrecacheFrame) Environment().OnFrame();
+    if (!Device.Paused() || Device.dwPrecacheFrame)
+        Environment().OnFrame();
 
     stats.Starting = ps_needtoplay.size();
     stats.Active = ps_active.size();
@@ -186,7 +187,8 @@ void IGame_Persistent::OnFrame()
         // u32 cnt = ps_destroy.size();
         CPS_Instance* psi = ps_destroy.back();
         VERIFY(psi);
-        if (psi->Locked()) {
+        if (psi->Locked())
+        {
             Log("--locked");
             break;
         }
@@ -211,7 +213,8 @@ void IGame_Persistent::destroy_particles(const bool& all_particles)
     }
 
     // delete active particles
-    if (all_particles) {
+    if (all_particles)
+    {
         for (; !ps_active.empty();)
             (*ps_active.begin())->PSI_internal_delete();
     }

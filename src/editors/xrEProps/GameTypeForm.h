@@ -13,8 +13,8 @@ class GameTypeChooser;
 
 class TfmGameType : public TForm
 {
-    __published :  // IDE-managed Components
-                   TExtBtn* ebOk;
+    __published : // IDE-managed Components
+                  TExtBtn* ebOk;
     TExtBtn* ebCancel;
     TCheckBox* cbSingle;
     TCheckBox* cbDeathMatch;
@@ -24,8 +24,8 @@ class TfmGameType : public TForm
     void __fastcall ebOkClick(TObject* Sender);
     void __fastcall ebCancelClick(TObject* Sender);
 
-  private:  // User declarations
-  public:   // User declarations
+private: // User declarations
+public: // User declarations
     GameTypeChooser* m_data;
     __fastcall TfmGameType(TComponent* Owner);
     bool __fastcall Run(const char* title, GameTypeChooser* data);

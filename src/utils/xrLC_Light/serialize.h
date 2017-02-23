@@ -62,7 +62,8 @@ void w_pointer(IWriter& w, const T* p, const xr_vector<T>& storage)
 {
     u32 size = storage.size();
     for (u32 i = 0; i < size; ++i)
-        if (p == &storage[i]) {
+        if (p == &storage[i])
+        {
             w.w_u32(i);
             return;
         }
@@ -89,15 +90,8 @@ void w_vector(IWriter& w, const svector<T, dim>& v)
         i->write(w);
 }
 
-static void w_sphere(IWriter& w, const Fsphere& v)
-{
-    w.w(&v, sizeof(Fsphere));
-}
-static void r_sphere(INetReader& r, Fsphere& v)
-{
-    r.r(&v, sizeof(Fsphere));
-}
-
+static void w_sphere(IWriter& w, const Fsphere& v) { w.w(&v, sizeof(Fsphere)); }
+static void r_sphere(INetReader& r, Fsphere& v) { r.r(&v, sizeof(Fsphere)); }
 template <typename type>
 class get_id_standart
 {
@@ -107,7 +101,8 @@ public:
     static void preset(const xr_vector<type*>& vec) {}
     static u32 get_id(const type* f, const xr_vector<type*>& vec)
     {
-        if (f == 0) return id_none;
+        if (f == 0)
+            return id_none;
         xr_vector<type*>::const_iterator F = std::find(vec.begin(), vec.end(), f);
         VERIFY(F != vec.end());
         return u32(F - vec.begin());
@@ -128,7 +123,8 @@ public:
     }
     static u32 get_id(const type* f, const xr_vector<type*>& vec)
     {
-        if (f == 0) return id_none;  //??
+        if (f == 0)
+            return id_none; //??
         u32 idx = f->self_index();
         VERIFY(vec[idx] == f);
         return idx;
@@ -152,7 +148,7 @@ private:
 
     void write(IWriter& w) const
     {
-        xr_vector<T*>::const_iterator i = vec.begin(), e = vec.end();
+        xr_vector<T *>::const_iterator i = vec.begin(), e = vec.end();
         w.w_u32(vec.size());
         for (; i != e; ++i)
             (*i)->write(w);
@@ -168,7 +164,7 @@ private:
     void write_ref(IWriter& w, const xr_vector<T*>& ref_vec) const
     {
         w.w_u32(ref_vec.size());
-        xr_vector<T*>::const_iterator i = ref_vec.begin(), e = ref_vec.end();
+        xr_vector<T *>::const_iterator i = ref_vec.begin(), e = ref_vec.end();
         for (; i != e; ++i)
             write(w, *i);
     }
@@ -206,7 +202,8 @@ private:
     {
         VERIFY(!f);
         u32 id = r.r_u32();
-        if (id == t_serialize::id_none) return;
+        if (id == t_serialize::id_none)
+            return;
         f = vec[id];
     }
 
@@ -237,7 +234,6 @@ public:
 public:
     vector_serialize(xr_vector<type*>* _vec) : serialize(*_vec) {}
     vector_serialize(const xr_vector<type*>* _vec) : serialize(*_vec) {}
-
     static u32 get_id(const type* f, const xr_vector<type*>& vec)
     {
         return id_type::get_id(f, vec);
@@ -260,7 +256,6 @@ public:
     }
     void read(INetReader& r, type*& f) const { serialize.read(r, f); }
     void write(IWriter& w, const type* f) const { serialize.write(w, f); }
-
     void read_ref(INetReader& r, xr_vector<type*>& ref_vec) const { serialize.read_ref(r, ref_vec); }
     void write_ref(IWriter& w, const xr_vector<type*>& ref_vec) const { serialize.write_ref(w, ref_vec); }
 };
@@ -268,30 +263,12 @@ public:
 void write(IWriter& w, const b_texture& b);
 void read(INetReader& r, b_texture& b);
 
-IC void write_task_id(IGenericStream* stream, u32 id)
-{
-    stream->Write(&id, sizeof(id));
-}
-IC void read_task_id(IGenericStream* stream, u32& id)
-{
-    stream->Read(&id, sizeof(u32));
-}
-IC void write_task_type(IGenericStream* stream, u32 type)
-{
-    stream->Write(&type, sizeof(u32));
-}
-IC void read_task_type(IGenericStream* stream, u32& type)
-{
-    stream->Read(&type, sizeof(u32));
-}
-IC void read_task_pool(IGenericStream* stream, u8& pool_id)
-{
-    stream->Read(&pool_id, sizeof(u8));
-}
-IC void write_task_pool(IGenericStream* stream, u8 pool_id)
-{
-    stream->Write(&pool_id, sizeof(pool_id));
-}
+IC void write_task_id(IGenericStream* stream, u32 id) { stream->Write(&id, sizeof(id)); }
+IC void read_task_id(IGenericStream* stream, u32& id) { stream->Read(&id, sizeof(u32)); }
+IC void write_task_type(IGenericStream* stream, u32 type) { stream->Write(&type, sizeof(u32)); }
+IC void read_task_type(IGenericStream* stream, u32& type) { stream->Read(&type, sizeof(u32)); }
+IC void read_task_pool(IGenericStream* stream, u8& pool_id) { stream->Read(&pool_id, sizeof(u8)); }
+IC void write_task_pool(IGenericStream* stream, u8 pool_id) { stream->Write(&pool_id, sizeof(pool_id)); }
 IC void write_task_caption(IGenericStream* stream, u32 id, u32 type)
 {
     write_task_id(stream, id);

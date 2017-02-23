@@ -49,26 +49,26 @@ class MeshTri
 
 private:
     DlinkDefine(MeshTri, List);
-    DWORD dwListId;  // For use when doing consistency checks.
+    DWORD dwListId; // For use when doing consistency checks.
 
     void InternalDelete(BOOL bBinUnusedEdges);
 
 public:
-    MeshPt* pPt1;  // Points.
+    MeshPt* pPt1; // Points.
     MeshPt* pPt2;
     MeshPt* pPt3;
-    MeshEdge* pEdge12;  // Edges between point numbers.
+    MeshEdge* pEdge12; // Edges between point numbers.
     MeshEdge* pEdge23;
     MeshEdge* pEdge31;
 
     DlinkMethods(MeshTri, List);
 
-    MESHTRI_APP_DEFINED  // App-defined data.
+    MESHTRI_APP_DEFINED // App-defined data.
 
-        MeshTri(void);
+    MeshTri(void);
     // Set pEdgeListRoot to non-NULL to autocreate edges.
     MeshTri(
-        MeshPt* pNewPt1, MeshPt* pNewPt2, MeshPt* pNewPt3, MeshTri* pListRoot = NULL, MeshEdge* pEdgeListRoot = NULL);
+    MeshPt* pNewPt1, MeshPt* pNewPt2, MeshPt* pNewPt3, MeshTri* pListRoot = NULL, MeshEdge* pEdgeListRoot = NULL);
     ~MeshTri(void);
     // Set bBinUnusedEdges to TRUE to autodestroy edges.
     void Delete(BOOL bBinUnusedEdges = FALSE);
@@ -96,12 +96,18 @@ public:
     IC bool Equal(MeshTri* F)
     {
         // Test for 6 variations
-        if ((pPt1 == F->pPt1) && (pPt2 == F->pPt2) && (pPt3 == F->pPt3)) return true;
-        if ((pPt1 == F->pPt1) && (pPt3 == F->pPt2) && (pPt2 == F->pPt3)) return true;
-        if ((pPt3 == F->pPt1) && (pPt1 == F->pPt2) && (pPt2 == F->pPt3)) return true;
-        if ((pPt3 == F->pPt1) && (pPt2 == F->pPt2) && (pPt1 == F->pPt3)) return true;
-        if ((pPt2 == F->pPt1) && (pPt1 == F->pPt2) && (pPt3 == F->pPt3)) return true;
-        if ((pPt2 == F->pPt1) && (pPt3 == F->pPt2) && (pPt1 == F->pPt3)) return true;
+        if ((pPt1 == F->pPt1) && (pPt2 == F->pPt2) && (pPt3 == F->pPt3))
+            return true;
+        if ((pPt1 == F->pPt1) && (pPt3 == F->pPt2) && (pPt2 == F->pPt3))
+            return true;
+        if ((pPt3 == F->pPt1) && (pPt1 == F->pPt2) && (pPt2 == F->pPt3))
+            return true;
+        if ((pPt3 == F->pPt1) && (pPt2 == F->pPt2) && (pPt1 == F->pPt3))
+            return true;
+        if ((pPt2 == F->pPt1) && (pPt1 == F->pPt2) && (pPt3 == F->pPt3))
+            return true;
+        if ((pPt2 == F->pPt1) && (pPt3 == F->pPt2) && (pPt1 == F->pPt3))
+            return true;
         return false;
     }
 };
@@ -113,23 +119,23 @@ class MeshEdge
 
 private:
     DlinkDefine(MeshEdge, List);
-    DWORD dwListId;  // For use when doing consistency checks.
+    DWORD dwListId; // For use when doing consistency checks.
 
 public:
     MeshPt* pPt1;
     MeshPt* pPt2;
-    MeshTri* pTri12;  // Tri that numbers pt1, pt2 in that order.
-    MeshTri* pTri21;  // Tri that numbers pt2, pt1 in that order.
+    MeshTri* pTri12; // Tri that numbers pt1, pt2 in that order.
+    MeshTri* pTri21; // Tri that numbers pt2, pt1 in that order.
 
-    MeshEdge* pEdgeProx;  // The edge that this is close to, if any.
+    MeshEdge* pEdgeProx; // The edge that this is close to, if any.
 
     DlinkMethods(MeshEdge, List);
 
-    MESHEDGE_APP_DEFINED  // App-defined data.
+    MESHEDGE_APP_DEFINED // App-defined data.
 
-        //	BINARY_HEAP_VARS();			// Helper stuff.
+    //	BINARY_HEAP_VARS();			// Helper stuff.
 
-        MeshEdge(void);
+    MeshEdge(void);
     MeshEdge(MeshPt* pNewPt1, MeshPt* pNewPt2, MeshEdge* pListRoot = NULL);
     ~MeshEdge(void);
     // Find the other triangle that uses this edge.
@@ -177,21 +183,21 @@ class MeshPt
     friend class MeshTri;
 
 private:
-    ArbitraryList<MeshEdge*> EdgeList;  // The list of edges that use this point (in no order).
-    ArbitraryList<MeshTri*> TriList;    // The list of tris that use this point (in no order).
-    ArbitraryList<MeshPt*> ProxPtList;  // The list of prox pts (in no order).
+    ArbitraryList<MeshEdge*> EdgeList; // The list of edges that use this point (in no order).
+    ArbitraryList<MeshTri*> TriList; // The list of tris that use this point (in no order).
+    ArbitraryList<MeshPt*> ProxPtList; // The list of prox pts (in no order).
 
-    int iCurTriNum;   // Used with First/NextTri.
-    int iCurEdgeNum;  // Used with First/NextEdge.
-    int iCurProxNum;  // Used with First/NextProx.
+    int iCurTriNum; // Used with First/NextTri.
+    int iCurEdgeNum; // Used with First/NextEdge.
+    int iCurProxNum; // Used with First/NextProx.
 
     DlinkDefine(MeshPt, List);
-    DWORD dwListId;  // For use when doing consistency checks.
+    DWORD dwListId; // For use when doing consistency checks.
 
 public:
-    MESHPT_APP_DEFINED  // App-defined data.
+    MESHPT_APP_DEFINED // App-defined data.
 
-        DlinkMethods(MeshPt, List);
+    DlinkMethods(MeshPt, List);
 
     MeshPt(MeshPt* pListRoot = NULL);
     ~MeshPt(void);
@@ -308,7 +314,8 @@ inline MeshTri::MeshTri(MeshPt* pNewPt1, MeshPt* pNewPt2, MeshPt* pNewPt3, MeshT
     pPt3->AddTri(this);
 
     pEdge12 = pPt1->FindTriEdge(pPt2);
-    if ((pEdge12 == NULL) && (pEdgeListRoot != NULL)) {
+    if ((pEdge12 == NULL) && (pEdgeListRoot != NULL))
+    {
         // Autocreate the edge.
         pEdge12 = new MeshEdge(pPt1, pPt2, pEdgeListRoot);
     }
@@ -318,7 +325,8 @@ inline MeshTri::MeshTri(MeshPt* pNewPt1, MeshPt* pNewPt2, MeshPt* pNewPt3, MeshT
     }
 
     pEdge23 = pPt2->FindTriEdge(pPt3);
-    if ((pEdge23 == NULL) && (pEdgeListRoot != NULL)) {
+    if ((pEdge23 == NULL) && (pEdgeListRoot != NULL))
+    {
         // Autocreate the edge.
         pEdge23 = new MeshEdge(pPt2, pPt3, pEdgeListRoot);
     }
@@ -328,7 +336,8 @@ inline MeshTri::MeshTri(MeshPt* pNewPt1, MeshPt* pNewPt2, MeshPt* pNewPt3, MeshT
     }
 
     pEdge31 = pPt3->FindTriEdge(pPt1);
-    if ((pEdge31 == NULL) && (pEdgeListRoot != NULL)) {
+    if ((pEdge31 == NULL) && (pEdgeListRoot != NULL))
+    {
         // Autocreate the edge.
         pEdge31 = new MeshEdge(pPt3, pPt1, pEdgeListRoot);
     }
@@ -338,7 +347,8 @@ inline MeshTri::MeshTri(MeshPt* pNewPt1, MeshPt* pNewPt2, MeshPt* pNewPt3, MeshT
     }
 
     ListInit();
-    if (pListRoot != NULL) {
+    if (pListRoot != NULL)
+    {
         ListAddAfter(pListRoot);
     }
 }
@@ -346,9 +356,11 @@ inline MeshTri::MeshTri(MeshPt* pNewPt1, MeshPt* pNewPt2, MeshPt* pNewPt3, MeshT
 inline void MeshTri::InternalDelete(BOOL bBinUnusedEdges)
 {
     // Remove edge references.
-    if (pEdge12 != NULL) {
+    if (pEdge12 != NULL)
+    {
         pEdge12->RemoveTri(this);
-        if (bBinUnusedEdges && (pEdge12->pTri12 == NULL) && (pEdge12->pTri21 == NULL)) {
+        if (bBinUnusedEdges && (pEdge12->pTri12 == NULL) && (pEdge12->pTri21 == NULL))
+        {
             // This edge is no longer in use.
             xr_delete(pEdge12);
         }
@@ -366,9 +378,11 @@ inline void MeshTri::InternalDelete(BOOL bBinUnusedEdges)
         VERIFY(pPt3 == NULL);
     }
 
-    if (pEdge23 != NULL) {
+    if (pEdge23 != NULL)
+    {
         pEdge23->RemoveTri(this);
-        if (bBinUnusedEdges && (pEdge23->pTri12 == NULL) && (pEdge23->pTri21 == NULL)) {
+        if (bBinUnusedEdges && (pEdge23->pTri12 == NULL) && (pEdge23->pTri21 == NULL))
+        {
             // This edge is no longer in use.
             xr_delete(pEdge23);
         }
@@ -386,9 +400,11 @@ inline void MeshTri::InternalDelete(BOOL bBinUnusedEdges)
         VERIFY(pPt3 == NULL);
     }
 
-    if (pEdge31 != NULL) {
+    if (pEdge31 != NULL)
+    {
         pEdge31->RemoveTri(this);
-        if (bBinUnusedEdges && (pEdge31->pTri12 == NULL) && (pEdge31->pTri21 == NULL)) {
+        if (bBinUnusedEdges && (pEdge31->pTri12 == NULL) && (pEdge31->pTri21 == NULL))
+        {
             // This edge is no longer in use.
             xr_delete(pEdge31);
         }
@@ -407,7 +423,8 @@ inline void MeshTri::InternalDelete(BOOL bBinUnusedEdges)
     }
 
     // Remove point references.
-    if (pPt1 != NULL) {
+    if (pPt1 != NULL)
+    {
         pPt1->RemoveTri(this);
         pPt1 = NULL;
     }
@@ -423,7 +440,8 @@ inline void MeshTri::InternalDelete(BOOL bBinUnusedEdges)
         VERIFY(pPt3 == NULL);
     }
 
-    if (pPt2 != NULL) {
+    if (pPt2 != NULL)
+    {
         pPt2->RemoveTri(this);
         pPt2 = NULL;
     }
@@ -439,7 +457,8 @@ inline void MeshTri::InternalDelete(BOOL bBinUnusedEdges)
         VERIFY(pPt3 == NULL);
     }
 
-    if (pPt3 != NULL) {
+    if (pPt3 != NULL)
+    {
         pPt3->RemoveTri(this);
         pPt3 = NULL;
     }
@@ -458,11 +477,7 @@ inline void MeshTri::InternalDelete(BOOL bBinUnusedEdges)
     ListDel();
 }
 
-inline MeshTri::~MeshTri(void)
-{
-    InternalDelete(FALSE);
-}
-
+inline MeshTri::~MeshTri(void) { InternalDelete(FALSE); }
 inline void MeshTri::Delete(BOOL bBinUnusedEdges /*= FALSE*/)
 {
     InternalDelete(bBinUnusedEdges);
@@ -479,7 +494,8 @@ inline void MeshTri::AddEdge(MeshEdge* pEdge)
 inline void MeshTri::RemoveEdge(MeshEdge* pEdge)
 {
     VERIFY(pEdge != NULL);
-    if (pEdge12 == pEdge) {
+    if (pEdge12 == pEdge)
+    {
         pEdge12 = NULL;
     }
     else if (pEdge23 == pEdge)
@@ -496,7 +512,8 @@ inline void MeshTri::RemoveEdge(MeshEdge* pEdge)
 inline void MeshTri::RemovePt(MeshPt* pPt)
 {
     VERIFY(pPt != NULL);
-    if (pPt1 == pPt) {
+    if (pPt1 == pPt)
+    {
         pPt1 = NULL;
     }
     else if (pPt2 == pPt)
@@ -513,7 +530,8 @@ inline void MeshTri::RemovePt(MeshPt* pPt)
 inline MeshTri* MeshTri::QueryList(void)
 {
     MeshTri* pListRoot = ListFindFirst();
-    if (pListRoot == this) {
+    if (pListRoot == this)
+    {
         VERIFY(ListFindLast() == this);
         pListRoot = NULL;
     }
@@ -523,34 +541,41 @@ inline MeshTri* MeshTri::QueryList(void)
 inline void MeshTri::SetList(MeshTri* pListRoot)
 {
     ListDel();
-    if (pListRoot != NULL) {
+    if (pListRoot != NULL)
+    {
         ListAddAfter(pListRoot);
     }
 }
 
-#define FAIL_CHECK()                                                                                                   \
-    bRes = FALSE;                                                                                                      \
+#define FAIL_CHECK()\
+    bRes = FALSE;\
     VERIFY(FALSE)
 inline bool MeshTri::ConsistencyCheck(MeshPt* pPtRoot, MeshEdge* pEdgeRoot, MeshTri* pTriRoot)
 {
     bool bRes = TRUE;
-    if ((pTriRoot != NULL) && (QueryList() != pTriRoot)) {
+    if ((pTriRoot != NULL) && (QueryList() != pTriRoot))
+    {
         FAIL_CHECK();
     }
 
-    if (pEdge12 != NULL) {
-        if ((pEdgeRoot != NULL) && (pEdge12->QueryList() != pEdgeRoot)) {
+    if (pEdge12 != NULL)
+    {
+        if ((pEdgeRoot != NULL) && (pEdge12->QueryList() != pEdgeRoot))
+        {
             FAIL_CHECK();
         }
 
-        if (pEdge12->pTri12 == this) {
-            if ((pEdge12->pPt1 != pPt1) || (pEdge12->pPt2 != pPt2)) {
+        if (pEdge12->pTri12 == this)
+        {
+            if ((pEdge12->pPt1 != pPt1) || (pEdge12->pPt2 != pPt2))
+            {
                 FAIL_CHECK();
             }
         }
         else if (pEdge12->pTri21 == this)
         {
-            if ((pEdge12->pPt1 != pPt2) || (pEdge12->pPt2 != pPt1)) {
+            if ((pEdge12->pPt1 != pPt2) || (pEdge12->pPt2 != pPt1))
+            {
                 FAIL_CHECK();
             }
         }
@@ -564,19 +589,24 @@ inline bool MeshTri::ConsistencyCheck(MeshPt* pPtRoot, MeshEdge* pEdgeRoot, Mesh
         FAIL_CHECK();
     }
 
-    if (pEdge23 != NULL) {
-        if ((pEdgeRoot != NULL) && (pEdge23->QueryList() != pEdgeRoot)) {
+    if (pEdge23 != NULL)
+    {
+        if ((pEdgeRoot != NULL) && (pEdge23->QueryList() != pEdgeRoot))
+        {
             FAIL_CHECK();
         }
 
-        if (pEdge23->pTri12 == this) {
-            if ((pEdge23->pPt1 != pPt2) || (pEdge23->pPt2 != pPt3)) {
+        if (pEdge23->pTri12 == this)
+        {
+            if ((pEdge23->pPt1 != pPt2) || (pEdge23->pPt2 != pPt3))
+            {
                 FAIL_CHECK();
             }
         }
         else if (pEdge23->pTri21 == this)
         {
-            if ((pEdge23->pPt1 != pPt3) || (pEdge23->pPt2 != pPt2)) {
+            if ((pEdge23->pPt1 != pPt3) || (pEdge23->pPt2 != pPt2))
+            {
                 FAIL_CHECK();
             }
         }
@@ -590,19 +620,24 @@ inline bool MeshTri::ConsistencyCheck(MeshPt* pPtRoot, MeshEdge* pEdgeRoot, Mesh
         FAIL_CHECK();
     }
 
-    if (pEdge31 != NULL) {
-        if ((pEdgeRoot != NULL) && (pEdge31->QueryList() != pEdgeRoot)) {
+    if (pEdge31 != NULL)
+    {
+        if ((pEdgeRoot != NULL) && (pEdge31->QueryList() != pEdgeRoot))
+        {
             FAIL_CHECK();
         }
 
-        if (pEdge31->pTri12 == this) {
-            if ((pEdge31->pPt1 != pPt3) || (pEdge31->pPt2 != pPt1)) {
+        if (pEdge31->pTri12 == this)
+        {
+            if ((pEdge31->pPt1 != pPt3) || (pEdge31->pPt2 != pPt1))
+            {
                 FAIL_CHECK();
             }
         }
         else if (pEdge31->pTri21 == this)
         {
-            if ((pEdge31->pPt1 != pPt1) || (pEdge31->pPt2 != pPt3)) {
+            if ((pEdge31->pPt1 != pPt1) || (pEdge31->pPt2 != pPt3))
+            {
                 FAIL_CHECK();
             }
         }
@@ -616,19 +651,24 @@ inline bool MeshTri::ConsistencyCheck(MeshPt* pPtRoot, MeshEdge* pEdgeRoot, Mesh
         FAIL_CHECK();
     }
 
-    if ((pPt1 == NULL) || (pPt2 == NULL) || (pPt3 == NULL)) {
+    if ((pPt1 == NULL) || (pPt2 == NULL) || (pPt3 == NULL))
+    {
         FAIL_CHECK();
     }
     else
     {
-        if (pPtRoot != NULL) {
-            if (pPt1->QueryList() != pPtRoot) {
+        if (pPtRoot != NULL)
+        {
+            if (pPt1->QueryList() != pPtRoot)
+            {
                 FAIL_CHECK();
             }
-            if (pPt2->QueryList() != pPtRoot) {
+            if (pPt2->QueryList() != pPtRoot)
+            {
                 FAIL_CHECK();
             }
-            if (pPt3->QueryList() != pPtRoot) {
+            if (pPt3->QueryList() != pPtRoot)
+            {
                 FAIL_CHECK();
             }
         }
@@ -661,7 +701,8 @@ inline MeshEdge::MeshEdge(MeshPt* pNewPt1, MeshPt* pNewPt2, MeshEdge* pListRoot)
     pPt2->AddEdge(this);
 
     ListInit();
-    if (pListRoot != NULL) {
+    if (pListRoot != NULL)
+    {
         ListAddAfter(pListRoot);
     }
 }
@@ -670,7 +711,8 @@ inline MeshEdge::~MeshEdge(void)
 {
     RemoveProx();
 
-    if (pPt1 != NULL) {
+    if (pPt1 != NULL)
+    {
         MeshPt* pPt = pPt1;
         RemovePt(pPt);
         pPt->RemoveEdge(this);
@@ -685,7 +727,8 @@ inline MeshEdge::~MeshEdge(void)
         VERIFY(pTri21 == NULL);
     }
 
-    if (pPt2 != NULL) {
+    if (pPt2 != NULL)
+    {
         MeshPt* pPt = pPt2;
         RemovePt(pPt);
         pPt->RemoveEdge(this);
@@ -711,7 +754,8 @@ inline MeshEdge::~MeshEdge(void)
 inline void MeshEdge::RemoveTri(MeshTri* pTri)
 {
     VERIFY(pTri != NULL);
-    if (pTri12 == pTri) {
+    if (pTri12 == pTri)
+    {
         pTri12 = NULL;
     }
     else
@@ -725,7 +769,8 @@ inline void MeshEdge::RemoveTri(MeshTri* pTri)
 inline void MeshEdge::RemovePt(MeshPt* pPt)
 {
     VERIFY(pPt != NULL);
-    if (pPt1 == pPt) {
+    if (pPt1 == pPt)
+    {
         pPt1 = NULL;
     }
     else
@@ -740,7 +785,7 @@ inline void MeshEdge::AddTri(MeshTri* pTri)
     VERIFY(pTri != NULL);
     // Assumes the tri's pt pointers have already been set up.
     if (((pPt1 == pTri->pPt1) && (pPt2 == pTri->pPt2)) || ((pPt1 == pTri->pPt2) && (pPt2 == pTri->pPt3)) ||
-        ((pPt1 == pTri->pPt3) && (pPt2 == pTri->pPt1)))
+    ((pPt1 == pTri->pPt3) && (pPt2 == pTri->pPt1)))
     {
         VERIFY(pTri12 == NULL);
         pTri12 = pTri;
@@ -748,7 +793,7 @@ inline void MeshEdge::AddTri(MeshTri* pTri)
     else
     {
         VERIFY(((pPt1 == pTri->pPt2) && (pPt2 == pTri->pPt1)) || ((pPt1 == pTri->pPt3) && (pPt2 == pTri->pPt2)) ||
-               ((pPt1 == pTri->pPt1) && (pPt2 == pTri->pPt3)));
+        ((pPt1 == pTri->pPt1) && (pPt2 == pTri->pPt3)));
         VERIFY(pTri21 == NULL);
         pTri21 = pTri;
     }
@@ -758,7 +803,8 @@ inline void MeshEdge::AddTri(MeshTri* pTri)
 inline MeshTri* MeshEdge::OtherTri(MeshTri* pTri)
 {
     VERIFY(pTri != NULL);
-    if (pTri == pTri12) {
+    if (pTri == pTri12)
+    {
         return (pTri21);
     }
     else
@@ -771,7 +817,8 @@ inline MeshTri* MeshEdge::OtherTri(MeshTri* pTri)
 inline MeshPt* MeshEdge::OtherPt(MeshPt* pPt)
 {
     VERIFY(pPt != NULL);
-    if (pPt == pPt1) {
+    if (pPt == pPt1)
+    {
         return (pPt2);
     }
     else
@@ -785,13 +832,17 @@ inline MeshPt* MeshEdge::OtherPt(MeshPt* pPt)
 inline bool MeshEdge::bTryToMergeEdges(MeshEdge* pedge)
 {
     VERIFY(pedge != this);
-    if (pPt1 == pedge->pPt1) {
+    if (pPt1 == pedge->pPt1)
+    {
         VERIFY(pPt2 == pedge->pPt2);
-        if ((pTri12 == NULL) && (pedge->pTri21 == NULL) && ((pEdgeProx == NULL) || (pedge->pEdgeProx == NULL))) {
+        if ((pTri12 == NULL) && (pedge->pTri21 == NULL) && ((pEdgeProx == NULL) || (pedge->pEdgeProx == NULL)))
+        {
             // Merge them.
             pTri12 = pedge->pTri12;
-            if (pTri12 != NULL) {
-                if (pTri12->pEdge12 == pedge) {
+            if (pTri12 != NULL)
+            {
+                if (pTri12->pEdge12 == pedge)
+                {
                     pTri12->pEdge12 = this;
                 }
                 else if (pTri12->pEdge23 == pedge)
@@ -805,7 +856,8 @@ inline bool MeshEdge::bTryToMergeEdges(MeshEdge* pedge)
                 }
             }
             pedge->pTri12 = NULL;
-            if (pedge->pEdgeProx != NULL) {
+            if (pedge->pEdgeProx != NULL)
+            {
                 VERIFY(pEdgeProx == NULL);
                 pEdgeProx = pedge->pEdgeProx;
                 VERIFY(pEdgeProx->pEdgeProx == pedge);
@@ -818,8 +870,10 @@ inline bool MeshEdge::bTryToMergeEdges(MeshEdge* pedge)
         {
             // Merge them.
             pTri21 = pedge->pTri21;
-            if (pTri21 != NULL) {
-                if (pTri21->pEdge12 == pedge) {
+            if (pTri21 != NULL)
+            {
+                if (pTri21->pEdge12 == pedge)
+                {
                     pTri21->pEdge12 = this;
                 }
                 else if (pTri21->pEdge23 == pedge)
@@ -833,7 +887,8 @@ inline bool MeshEdge::bTryToMergeEdges(MeshEdge* pedge)
                 }
             }
             pedge->pTri21 = NULL;
-            if (pedge->pEdgeProx != NULL) {
+            if (pedge->pEdgeProx != NULL)
+            {
                 VERIFY(pEdgeProx == NULL);
                 pEdgeProx = pedge->pEdgeProx;
                 VERIFY(pEdgeProx->pEdgeProx == pedge);
@@ -852,11 +907,14 @@ inline bool MeshEdge::bTryToMergeEdges(MeshEdge* pedge)
     {
         VERIFY(pPt1 == pedge->pPt2);
         VERIFY(pPt2 == pedge->pPt1);
-        if ((pTri12 == NULL) && (pedge->pTri12 == NULL) && ((pEdgeProx == NULL) || (pedge->pEdgeProx == NULL))) {
+        if ((pTri12 == NULL) && (pedge->pTri12 == NULL) && ((pEdgeProx == NULL) || (pedge->pEdgeProx == NULL)))
+        {
             // Merge them.
             pTri12 = pedge->pTri21;
-            if (pTri12 != NULL) {
-                if (pTri12->pEdge12 == pedge) {
+            if (pTri12 != NULL)
+            {
+                if (pTri12->pEdge12 == pedge)
+                {
                     pTri12->pEdge12 = this;
                 }
                 else if (pTri12->pEdge23 == pedge)
@@ -870,7 +928,8 @@ inline bool MeshEdge::bTryToMergeEdges(MeshEdge* pedge)
                 }
             }
             pedge->pTri21 = NULL;
-            if (pedge->pEdgeProx != NULL) {
+            if (pedge->pEdgeProx != NULL)
+            {
                 VERIFY(pEdgeProx == NULL);
                 pEdgeProx = pedge->pEdgeProx;
                 VERIFY(pEdgeProx->pEdgeProx == pedge);
@@ -883,8 +942,10 @@ inline bool MeshEdge::bTryToMergeEdges(MeshEdge* pedge)
         {
             // Merge them.
             pTri21 = pedge->pTri12;
-            if (pTri21 != NULL) {
-                if (pTri21->pEdge12 == pedge) {
+            if (pTri21 != NULL)
+            {
+                if (pTri21->pEdge12 == pedge)
+                {
                     pTri21->pEdge12 = this;
                 }
                 else if (pTri21->pEdge23 == pedge)
@@ -898,7 +959,8 @@ inline bool MeshEdge::bTryToMergeEdges(MeshEdge* pedge)
                 }
             }
             pedge->pTri12 = NULL;
-            if (pedge->pEdgeProx != NULL) {
+            if (pedge->pEdgeProx != NULL)
+            {
                 VERIFY(pEdgeProx == NULL);
                 pEdgeProx = pedge->pEdgeProx;
                 VERIFY(pEdgeProx->pEdgeProx == pedge);
@@ -918,7 +980,8 @@ inline bool MeshEdge::bTryToMergeEdges(MeshEdge* pedge)
 inline MeshEdge* MeshEdge::QueryList(void)
 {
     MeshEdge* pListRoot = ListFindFirst();
-    if (pListRoot == this) {
+    if (pListRoot == this)
+    {
         VERIFY(ListFindLast() == this);
         pListRoot = NULL;
     }
@@ -928,7 +991,8 @@ inline MeshEdge* MeshEdge::QueryList(void)
 inline void MeshEdge::SetList(MeshEdge* pListRoot)
 {
     ListDel();
-    if (pListRoot != NULL) {
+    if (pListRoot != NULL)
+    {
         ListAddAfter(pListRoot);
     }
 }
@@ -939,7 +1003,8 @@ inline void MeshEdge::SetList(MeshEdge* pListRoot)
 inline bool MeshEdge::AddProx(MeshEdge* pEdge)
 {
     VERIFY(pEdge != NULL);
-    if (pEdgeProx != NULL) {
+    if (pEdgeProx != NULL)
+    {
         // Already got prox.
         return (FALSE);
     }
@@ -952,14 +1017,17 @@ inline bool MeshEdge::AddProx(MeshEdge* pEdge)
     {
         // Check that the pts agree.
         // Either pPt1<->pPt1 and pPt2<->pPt2, or the other way round.
-        if (pEdge->pPt1->CheckProx(pPt1)) {
-            if (!pEdge->pPt2->CheckProx(pPt2)) {
+        if (pEdge->pPt1->CheckProx(pPt1))
+        {
+            if (!pEdge->pPt2->CheckProx(pPt2))
+            {
                 return (FALSE);
             }
         }
         else if (pEdge->pPt1->CheckProx(pPt2))
         {
-            if (!pEdge->pPt2->CheckProx(pPt1)) {
+            if (!pEdge->pPt2->CheckProx(pPt1))
+            {
                 return (FALSE);
             }
         }
@@ -994,10 +1062,12 @@ inline MeshEdge* MeshEdge::DoProxMatch(void)
         while (pEdgeOther != NULL)
         {
             MeshPt* pPtOther = pEdgeOther->OtherPt(pPtProx);
-            if (pPtOther->CheckProx(pPt2)) {
+            if (pPtOther->CheckProx(pPt2))
+            {
                 // Yes - this is prox.
                 bool bRes = AddProx(pEdgeOther);
-                if (bRes) {
+                if (bRes)
+                {
                     pPtProx->EndEdge();
                     return pEdgeOther;
                 }
@@ -1020,7 +1090,8 @@ inline MeshEdge* MeshEdge::DoProxMatch(void)
 // The pt prox data can still agree - it is not touched.
 inline bool MeshEdge::RemoveProx(void)
 {
-    if (pEdgeProx == NULL) {
+    if (pEdgeProx == NULL)
+    {
         return (FALSE);
     }
     else
@@ -1035,26 +1106,33 @@ inline bool MeshEdge::RemoveProx(void)
 inline bool MeshEdge::ConsistencyCheck(MeshPt* pPtRoot, MeshEdge* pEdgeRoot, MeshTri* pTriRoot)
 {
     bool bRes = TRUE;
-    if ((pEdgeRoot != NULL) && (QueryList() != pEdgeRoot)) {
+    if ((pEdgeRoot != NULL) && (QueryList() != pEdgeRoot))
+    {
         FAIL_CHECK();
     }
 
-    if (pEdgeProx != NULL) {
-        if (pEdgeProx->pEdgeProx != this) {
+    if (pEdgeProx != NULL)
+    {
+        if (pEdgeProx->pEdgeProx != this)
+        {
             FAIL_CHECK();
         }
-        if ((pEdgeRoot != NULL) && (pEdgeProx->QueryList() != pEdgeRoot)) {
+        if ((pEdgeRoot != NULL) && (pEdgeProx->QueryList() != pEdgeRoot))
+        {
             FAIL_CHECK();
         }
         // Either pPt1<->pPt1 and pPt2<->pPt2, or the other way round.
-        if (pEdgeProx->pPt1->CheckProx(pPt1)) {
-            if (!pEdgeProx->pPt2->CheckProx(pPt2)) {
+        if (pEdgeProx->pPt1->CheckProx(pPt1))
+        {
+            if (!pEdgeProx->pPt2->CheckProx(pPt2))
+            {
                 FAIL_CHECK();
             }
         }
         else if (pEdgeProx->pPt1->CheckProx(pPt2))
         {
-            if (!pEdgeProx->pPt2->CheckProx(pPt1)) {
+            if (!pEdgeProx->pPt2->CheckProx(pPt1))
+            {
                 FAIL_CHECK();
             }
         }
@@ -1064,25 +1142,31 @@ inline bool MeshEdge::ConsistencyCheck(MeshPt* pPtRoot, MeshEdge* pEdgeRoot, Mes
         }
     }
 
-    if (pTri12 != NULL) {
-        if ((pTriRoot != NULL) && (pTri12->QueryList() != pTriRoot)) {
+    if (pTri12 != NULL)
+    {
+        if ((pTriRoot != NULL) && (pTri12->QueryList() != pTriRoot))
+        {
             FAIL_CHECK();
         }
 
-        if (pTri12->pEdge12 == this) {
-            if ((pTri12->pPt1 != pPt1) || (pTri12->pPt2 != pPt2)) {
+        if (pTri12->pEdge12 == this)
+        {
+            if ((pTri12->pPt1 != pPt1) || (pTri12->pPt2 != pPt2))
+            {
                 FAIL_CHECK();
             }
         }
         else if (pTri12->pEdge23 == this)
         {
-            if ((pTri12->pPt2 != pPt1) || (pTri12->pPt3 != pPt2)) {
+            if ((pTri12->pPt2 != pPt1) || (pTri12->pPt3 != pPt2))
+            {
                 FAIL_CHECK();
             }
         }
         else if (pTri12->pEdge31 == this)
         {
-            if ((pTri12->pPt3 != pPt1) || (pTri12->pPt1 != pPt2)) {
+            if ((pTri12->pPt3 != pPt1) || (pTri12->pPt1 != pPt2))
+            {
                 FAIL_CHECK();
             }
         }
@@ -1092,25 +1176,31 @@ inline bool MeshEdge::ConsistencyCheck(MeshPt* pPtRoot, MeshEdge* pEdgeRoot, Mes
         }
     }
 
-    if (pTri21 != NULL) {
-        if ((pTriRoot != NULL) && (pTri21->QueryList() != pTriRoot)) {
+    if (pTri21 != NULL)
+    {
+        if ((pTriRoot != NULL) && (pTri21->QueryList() != pTriRoot))
+        {
             FAIL_CHECK();
         }
 
-        if (pTri21->pEdge12 == this) {
-            if ((pTri21->pPt1 != pPt2) || (pTri21->pPt2 != pPt1)) {
+        if (pTri21->pEdge12 == this)
+        {
+            if ((pTri21->pPt1 != pPt2) || (pTri21->pPt2 != pPt1))
+            {
                 FAIL_CHECK();
             }
         }
         else if (pTri21->pEdge23 == this)
         {
-            if ((pTri21->pPt2 != pPt2) || (pTri21->pPt3 != pPt1)) {
+            if ((pTri21->pPt2 != pPt2) || (pTri21->pPt3 != pPt1))
+            {
                 FAIL_CHECK();
             }
         }
         else if (pTri21->pEdge31 == this)
         {
-            if ((pTri21->pPt3 != pPt2) || (pTri21->pPt1 != pPt1)) {
+            if ((pTri21->pPt3 != pPt2) || (pTri21->pPt1 != pPt1))
+            {
                 FAIL_CHECK();
             }
         }
@@ -1120,16 +1210,20 @@ inline bool MeshEdge::ConsistencyCheck(MeshPt* pPtRoot, MeshEdge* pEdgeRoot, Mes
         }
     }
 
-    if ((pPt1 == NULL) || (pPt2 == NULL)) {
+    if ((pPt1 == NULL) || (pPt2 == NULL))
+    {
         FAIL_CHECK();
     }
     else
     {
-        if (pPtRoot != NULL) {
-            if (pPt1->QueryList() != pPtRoot) {
+        if (pPtRoot != NULL)
+        {
+            if (pPt1->QueryList() != pPtRoot)
+            {
                 FAIL_CHECK();
             }
-            if (pPt2->QueryList() != pPtRoot) {
+            if (pPt2->QueryList() != pPtRoot)
+            {
                 FAIL_CHECK();
             }
         }
@@ -1145,7 +1239,8 @@ inline MeshPt::MeshPt(MeshPt* pListRoot)
     iCurProxNum = -1;
 
     ListInit();
-    if (pListRoot != NULL) {
+    if (pListRoot != NULL)
+    {
         ListAddAfter(pListRoot);
     }
 }
@@ -1175,7 +1270,8 @@ inline void MeshPt::RemoveEdge(MeshEdge* pEdge)
     u32 i;
     for (i = 0; i < EdgeList.size(); i++)
     {
-        if (ppEdgeList[i] == pEdge) {
+        if (ppEdgeList[i] == pEdge)
+        {
             break;
         }
     }
@@ -1191,7 +1287,8 @@ inline void MeshPt::RemoveTri(MeshTri* pTri)
     u32 i;
     for (i = 0; i < TriList.size(); i++)
     {
-        if (ppTriList[i] == pTri) {
+        if (ppTriList[i] == pTri)
+        {
             break;
         }
     }
@@ -1243,11 +1340,13 @@ inline MeshEdge* MeshPt::FindEdge(MeshPt* pPt)
         MeshEdge* pEdge = ppEdgeList[i];
         VERIFY(pEdge != NULL);
         VERIFY((pEdge->pPt1 == this) || (pEdge->pPt2 == this));
-        if (pEdge->pPt2 == pPt) {
+        if (pEdge->pPt2 == pPt)
+        {
             VERIFY(pEdge->pPt1 == this);
             return (pEdge);
         }
-        if (pEdge->pPt1 == pPt) {
+        if (pEdge->pPt1 == pPt)
+        {
             VERIFY(pEdge->pPt2 == this);
             return (pEdge);
         }
@@ -1273,12 +1372,14 @@ inline MeshEdge* MeshPt::FindTriEdge(MeshPt* pPt)
         MeshEdge* pEdge = ppEdgeList[i];
         VERIFY(pEdge != NULL);
         VERIFY((pEdge->pPt1 == this) || (pEdge->pPt2 == this));
-        if (pEdge->pPt2 == pPt) {
+        if (pEdge->pPt2 == pPt)
+        {
             VERIFY(pEdge->pPt1 == this);
             // Check that it would be possible to add a tri to this.
             // The tri will use this,pPt in that order, so must be in
             // pTri12
-            if (pEdge->pTri12 == NULL) {
+            if (pEdge->pTri12 == NULL)
+            {
                 return (pEdge);
             }
             //			else
@@ -1286,12 +1387,14 @@ inline MeshEdge* MeshPt::FindTriEdge(MeshPt* pPt)
             //				int bogus = 0;
             //			}
         }
-        if (pEdge->pPt1 == pPt) {
+        if (pEdge->pPt1 == pPt)
+        {
             VERIFY(pEdge->pPt2 == this);
             // Check that it would be possible to add a tri to this.
             // The tri will use this,pPt in that order, so must be in
             // pTri21
-            if (pEdge->pTri21 == NULL) {
+            if (pEdge->pTri21 == NULL)
+            {
                 return (pEdge);
             }
             //			else
@@ -1314,13 +1417,16 @@ inline MeshTri* MeshPt::FindTri(MeshPt* pPt1, MeshPt* pPt2)
         MeshTri* pTri = ppTriList[i];
         VERIFY(pTri != NULL);
         VERIFY((pTri->pPt1 == this) || (pTri->pPt2 == this) || (pTri->pPt3 == this));
-        if ((pTri->pPt1 == this) && (pTri->pPt2 == pPt1) && (pTri->pPt3 == pPt2)) {
+        if ((pTri->pPt1 == this) && (pTri->pPt2 == pPt1) && (pTri->pPt3 == pPt2))
+        {
             return (pTri);
         }
-        if ((pTri->pPt2 == this) && (pTri->pPt3 == pPt1) && (pTri->pPt1 == pPt2)) {
+        if ((pTri->pPt2 == this) && (pTri->pPt3 == pPt1) && (pTri->pPt1 == pPt2))
+        {
             return (pTri);
         }
-        if ((pTri->pPt3 == this) && (pTri->pPt1 == pPt1) && (pTri->pPt2 == pPt2)) {
+        if ((pTri->pPt3 == this) && (pTri->pPt1 == pPt1) && (pTri->pPt2 == pPt2))
+        {
             return (pTri);
         }
     }
@@ -1336,17 +1442,19 @@ inline MeshTri* MeshPt::NextTri(MeshPt* pPt)
     VERIFY(iCurTriNum >= 0);
     while (TRUE)
     {
-        if (iCurTriNum < (int)TriList.size()) {
+        if (iCurTriNum < (int)TriList.size())
+        {
             MeshTri* pTri = (TriList.ptr())[iCurTriNum++];
             VERIFY(pTri != NULL);
-            if (pPt == NULL) {
+            if (pPt == NULL)
+            {
                 // Return all tris.
                 return (pTri);
             }
 
             // Return only tris that use this,pPt
             if (((pTri->pPt1 == this) && (pTri->pPt2 == pPt)) || ((pTri->pPt2 == this) && (pTri->pPt3 == pPt)) ||
-                ((pTri->pPt3 == this) && (pTri->pPt1 == pPt)))
+            ((pTri->pPt3 == this) && (pTri->pPt1 == pPt)))
             {
                 return (pTri);
             }
@@ -1371,11 +1479,7 @@ inline MeshTri* MeshPt::FirstTri(MeshPt* pPt)
 }
 
 // Terminate the current First/Next loop.
-inline void MeshPt::EndTri(void)
-{
-    iCurTriNum = -1;
-}
-
+inline void MeshPt::EndTri(void) { iCurTriNum = -1; }
 // Return the next Edge in the list.
 // If a non-NULL pPt is supplied, only edges using this and pPt
 // are returned, otherwise all edges are returned.
@@ -1385,16 +1489,19 @@ inline MeshEdge* MeshPt::NextEdge(MeshPt* pPt)
     VERIFY(iCurEdgeNum >= 0);
     while (TRUE)
     {
-        if (iCurEdgeNum < (int)EdgeList.size()) {
+        if (iCurEdgeNum < (int)EdgeList.size())
+        {
             MeshEdge* pEdge = (EdgeList.ptr())[iCurEdgeNum++];
             VERIFY(pEdge != NULL);
-            if (pPt == NULL) {
+            if (pPt == NULL)
+            {
                 // Return all edges.
                 return (pEdge);
             }
 
             // Return only the edges the use this & pPt.
-            if ((pEdge->pPt1 == pPt) || (pEdge->pPt2 == pPt)) {
+            if ((pEdge->pPt1 == pPt) || (pEdge->pPt2 == pPt))
+            {
                 VERIFY((pEdge->pPt1 == this) || (pEdge->pPt2 == this));
                 return (pEdge);
             }
@@ -1418,11 +1525,7 @@ inline MeshEdge* MeshPt::FirstEdge(MeshPt* pPt)
 }
 
 // Terminate the current First/Next loop.
-inline void MeshPt::EndEdge(void)
-{
-    iCurEdgeNum = -1;
-}
-
+inline void MeshPt::EndEdge(void) { iCurEdgeNum = -1; }
 // Returns TRUE if the two pts are marked as being in proximity.
 inline bool MeshPt::CheckProx(MeshPt* pPt)
 {
@@ -1431,7 +1534,8 @@ inline bool MeshPt::CheckProx(MeshPt* pPt)
     for (u32 i = 0; i < ProxPtList.size(); i++)
     {
         VERIFY(ppPt[i] != NULL);
-        if (ppPt[i] == pPt) {
+        if (ppPt[i] == pPt)
+        {
             // Yes.
             return (TRUE);
         }
@@ -1448,7 +1552,8 @@ inline bool MeshPt::AddProx(MeshPt* pPt, bool bProxEdges)
     bool bRes;
 
     VERIFY(pPt != NULL);
-    if (CheckProx(pPt)) {
+    if (CheckProx(pPt))
+    {
         // Already prox.
         VERIFY(pPt->CheckProx(this));
         bRes = FALSE;
@@ -1479,7 +1584,8 @@ inline bool MeshPt::AddProx(MeshPt* pPt, bool bProxEdges)
         {
             VERIFY(ppPt[i] != NULL);
             MeshEdge* pedgeProx = pPt->FindEdge(ppPt[i]);
-            if (pedgeProx != NULL) {
+            if (pedgeProx != NULL)
+            {
                 bool bRes = pedgeProx->AddProx(pedge);
                 VERIFY(bRes);
                 break;
@@ -1497,7 +1603,8 @@ inline bool MeshPt::AddProx(MeshPt* pPt, bool bProxEdges)
 inline bool MeshPt::RemoveProx(MeshPt* pPt)
 {
     VERIFY(pPt != NULL);
-    if (CheckProx(pPt)) {
+    if (CheckProx(pPt))
+    {
         // Yep, they are prox.
         VERIFY(pPt->CheckProx(this));
 
@@ -1508,7 +1615,8 @@ inline bool MeshPt::RemoveProx(MeshPt* pPt)
         ppPtList = ProxPtList.ptr();
         for (i = 0; i < ProxPtList.size(); i++)
         {
-            if (ppPtList[i] == pPt) {
+            if (ppPtList[i] == pPt)
+            {
                 break;
             }
         }
@@ -1520,7 +1628,8 @@ inline bool MeshPt::RemoveProx(MeshPt* pPt)
         ppPtList = pPt->ProxPtList.ptr();
         for (i = 0; i < pPt->ProxPtList.size(); i++)
         {
-            if (ppPtList[i] == this) {
+            if (ppPtList[i] == this)
+            {
                 break;
             }
         }
@@ -1552,7 +1661,8 @@ inline MeshPt* MeshPt::NextProx(void)
     VERIFY(iCurProxNum >= 0);
     while (TRUE)
     {
-        if (iCurProxNum < (int)ProxPtList.size()) {
+        if (iCurProxNum < (int)ProxPtList.size())
+        {
             MeshPt* pptProx = (ProxPtList.ptr())[iCurProxNum++];
             VERIFY(pptProx != NULL);
             return (pptProx);
@@ -1567,15 +1677,12 @@ inline MeshPt* MeshPt::NextProx(void)
 }
 
 // Terminate the current First/Next loop.
-inline void MeshPt::EndProx(void)
-{
-    iCurProxNum = -1;
-}
-
+inline void MeshPt::EndProx(void) { iCurProxNum = -1; }
 inline MeshPt* MeshPt::QueryList(void)
 {
     MeshPt* pListRoot = ListFindFirst();
-    if (pListRoot == this) {
+    if (pListRoot == this)
+    {
         VERIFY(ListFindLast() == this);
         pListRoot = NULL;
     }
@@ -1585,7 +1692,8 @@ inline MeshPt* MeshPt::QueryList(void)
 inline void MeshPt::SetList(MeshPt* pListRoot)
 {
     ListDel();
-    if (pListRoot != NULL) {
+    if (pListRoot != NULL)
+    {
         ListAddAfter(pListRoot);
     }
 }
@@ -1593,7 +1701,8 @@ inline void MeshPt::SetList(MeshPt* pListRoot)
 inline bool MeshPt::ConsistencyCheck(MeshPt* pPtRoot, MeshEdge* pEdgeRoot, MeshTri* pTriRoot)
 {
     bool bRes = TRUE;
-    if ((pPtRoot != NULL) && (QueryList() != pPtRoot)) {
+    if ((pPtRoot != NULL) && (QueryList() != pPtRoot))
+    {
         FAIL_CHECK();
     }
 
@@ -1602,10 +1711,12 @@ inline bool MeshPt::ConsistencyCheck(MeshPt* pPtRoot, MeshEdge* pEdgeRoot, MeshT
     for (u32 i = 0; i < ProxPtList.size(); i++)
     {
         VERIFY(ppPt[i] != NULL);
-        if (!ppPt[i]->CheckProx(this)) {
+        if (!ppPt[i]->CheckProx(this))
+        {
             FAIL_CHECK();
         }
-        if ((pPtRoot != NULL) && (ppPt[i]->QueryList() != pPtRoot)) {
+        if ((pPtRoot != NULL) && (ppPt[i]->QueryList() != pPtRoot))
+        {
             FAIL_CHECK();
         }
     }
@@ -1614,7 +1725,8 @@ inline bool MeshPt::ConsistencyCheck(MeshPt* pPtRoot, MeshEdge* pEdgeRoot, MeshT
     MeshEdge* pEdge = FirstEdge();
     while (pEdge != NULL)
     {
-        if (!pEdge->ConsistencyCheck(pPtRoot, pEdgeRoot, pTriRoot)) {
+        if (!pEdge->ConsistencyCheck(pPtRoot, pEdgeRoot, pTriRoot))
+        {
             // Will have already VERIFYed.
             bRes = FALSE;
         }
@@ -1623,7 +1735,8 @@ inline bool MeshPt::ConsistencyCheck(MeshPt* pPtRoot, MeshEdge* pEdgeRoot, MeshT
     MeshTri* pTri = FirstTri();
     while (pTri != NULL)
     {
-        if (!pTri->ConsistencyCheck(pPtRoot, pEdgeRoot, pTriRoot)) {
+        if (!pTri->ConsistencyCheck(pPtRoot, pEdgeRoot, pTriRoot))
+        {
             // Will have already VERIFYed.
             bRes = FALSE;
         }

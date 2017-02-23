@@ -24,11 +24,8 @@ struct STravelPathPoint
     u32 velocity;
 
     IC void set_position(const Fvector& pos) { position = pos; }
-
     IC void set_vertex_id(const u32 _vertex_id) { vertex_id = _vertex_id; }
-
     IC Fvector& get_position() { return (position); }
-
     IC u32 get_vertex_id() { return (vertex_id); }
 };
 };

@@ -31,7 +31,8 @@ public:
     CTimerBase() : qwStartTime(0), qwPausedTime(0), qwPauseAccum(0), bPause(FALSE) {}
     ICF void Start()
     {
-        if (bPause) return;
+        if (bPause)
+            return;
         qwStartTime = CPU::QPC() - qwPauseAccum;
     }
     ICF u64 GetElapsed_ticks() const
@@ -79,10 +80,10 @@ private:
 
 public:
     IC CTimer() : m_time_factor(1.f), m_real_ticks(0), m_ticks(0) {}
-
     ICF void Start()
     {
-        if (bPause) return;
+        if (bPause)
+            return;
 
         inherited::Start();
 
@@ -91,7 +92,6 @@ public:
     }
 
     IC const float& time_factor() const { return (m_time_factor); }
-
     IC void time_factor(const float& time_factor)
     {
         u64 current = inherited::GetElapsed_ticks();
@@ -104,19 +104,18 @@ public:
     {
 #ifndef _EDITOR
         FPU::m64r();
-#endif  // _EDITOR
+#endif // _EDITOR
 
         u64 result = GetElapsed_ticks(inherited::GetElapsed_ticks());
 
 #ifndef _EDITOR
         FPU::m24r();
-#endif  // _EDITOR
+#endif // _EDITOR
 
         return (result);
     }
 
     IC u32 GetElapsed_ms() const { return (u32(GetElapsed_ticks() * u64(1000) / CPU::qpc_freq)); }
-
     IC float GetElapsed_sec() const
     {
 #ifndef _EDITOR
@@ -142,10 +141,12 @@ public:
     IC BOOL Paused() const { return bPause; }
     IC void Pause(BOOL b)
     {
-        if (bPause == b) return;
+        if (bPause == b)
+            return;
 
         u64 _current = CPU::QPC() - CPU::qpc_overhead;
-        if (b) {
+        if (b)
+        {
             save_clock = _current;
             qwPausedTime = CTimerBase::GetElapsed_ticks();
         }
@@ -180,18 +181,19 @@ public:
 
     ICF void Begin()
     {
-        if (!g_bEnableStatGather) return;
+        if (!g_bEnableStatGather)
+            return;
         count++;
         T.Start();
     }
     ICF void End()
     {
-        if (!g_bEnableStatGather) return;
+        if (!g_bEnableStatGather)
+            return;
         accum += T.GetElapsed_ticks();
     }
 
     ICF u64 GetElapsed_ticks() const { return accum; }
-
     IC u32 GetElapsed_ms() const { return u32(GetElapsed_ticks() * u64(1000) / CPU::qpc_freq); }
     IC float GetElapsed_sec() const
     {
@@ -206,4 +208,4 @@ public:
     }
 };
 
-#endif  // FTimerH
+#endif // FTimerH

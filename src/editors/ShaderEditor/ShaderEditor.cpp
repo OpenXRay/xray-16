@@ -7,7 +7,7 @@
 #include "UI_ShaderTools.h"
 //---------------------------------------------------------------------------
 USEFORM("BottomBar.cpp", fraBottomBar); /* TFrame: File Type */
-USEFORM("LeftBar.cpp", fraLeftBar);     /* TFrame: File Type */
+USEFORM("LeftBar.cpp", fraLeftBar); /* TFrame: File Type */
 USEFORM("main.cpp", frmMain);
 USEFORM("Splash.cpp", frmSplash);
 USEFORM("TopBar.cpp", fraTopBar); /* TFrame: File Type */
@@ -26,7 +26,8 @@ SInit init;
 WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR, int)
 {
     //    try{
-    if (!Application->Handle) {
+    if (!Application->Handle)
+    {
         Application->CreateHandle();
         Application->Icon->Handle = LoadIcon(MainInstance, "MAINICON");
         Application->Title = "Loading...";

@@ -131,4 +131,4 @@ public:
     void Invalidate() { m_State = lfsNone; }
 };
 
-#endif  // xr_efflensflareH
+#endif // xr_efflensflareH

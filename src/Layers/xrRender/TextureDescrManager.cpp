@@ -17,9 +17,11 @@ public:
 void fix_texture_thm_name(LPSTR fn)
 {
     LPSTR _ext = strext(fn);
-    if (_ext && (0 == stricmp(_ext, ".tga") || 0 == stricmp(_ext, ".thm") || 0 == stricmp(_ext, ".dds") ||
-                    0 == stricmp(_ext, ".bmp") || 0 == stricmp(_ext, ".ogm")))
+    if (_ext && (!stricmp(_ext, ".tga") || !stricmp(_ext, ".thm") || !stricmp(_ext, ".dds") ||
+       !stricmp(_ext, ".bmp") || !stricmp(_ext, ".ogm")))
+    {
         *_ext = 0;
+    }
 }
 
 void CTextureDescrMngr::LoadTHM(LPCSTR initial)
@@ -28,7 +30,7 @@ void CTextureDescrMngr::LoadTHM(LPCSTR initial)
     FS.file_list(flist, initial, FS_ListFiles, "*.thm");
 #ifdef DEBUG
     Msg("count of .thm files=%d", flist.size());
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
     FS_FileSetIt It = flist.begin();
     FS_FileSetIt It_e = flist.end();
     STextureParams tp;
@@ -54,7 +56,8 @@ void CTextureDescrMngr::LoadTHM(LPCSTR initial)
             if (tp.detail_name.size() &&
                 tp.flags.is_any(STextureParams::flDiffuseDetail | STextureParams::flBumpDetail))
             {
-                if (desc.m_assoc) xr_delete(desc.m_assoc);
+                if (desc.m_assoc)
+                    xr_delete(desc.m_assoc);
 
                 desc.m_assoc = new texture_assoc();
                 desc.m_assoc->detail_name = tp.detail_name;
@@ -65,17 +68,21 @@ void CTextureDescrMngr::LoadTHM(LPCSTR initial)
 
                 desc.m_assoc->usage = 0;
 
-                if (tp.flags.is(STextureParams::flDiffuseDetail)) desc.m_assoc->usage |= (1 << 0);
+                if (tp.flags.is(STextureParams::flDiffuseDetail))
+                    desc.m_assoc->usage |= (1 << 0);
 
-                if (tp.flags.is(STextureParams::flBumpDetail)) desc.m_assoc->usage |= (1 << 1);
+                if (tp.flags.is(STextureParams::flBumpDetail))
+                    desc.m_assoc->usage |= (1 << 1);
             }
-            if (desc.m_spec) xr_delete(desc.m_spec);
+            if (desc.m_spec)
+                xr_delete(desc.m_spec);
 
             desc.m_spec = new texture_spec();
             desc.m_spec->m_material = tp.material + tp.material_weight;
             desc.m_spec->m_use_steep_parallax = false;
 
-            if (tp.bump_mode == STextureParams::tbmUse) {
+            if (tp.bump_mode == STextureParams::tbmUse)
+            {
                 desc.m_spec->m_bump_name = tp.bump_name;
             }
             else if (tp.bump_mode == STextureParams::tbmUseParallax)
@@ -92,14 +99,14 @@ void CTextureDescrMngr::Load()
 #ifdef DEBUG
     CTimer TT;
     TT.Start();
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 
     LoadTHM("$game_textures$");
     LoadTHM("$level$");
 
 #ifdef DEBUG
     Msg("load time=%d ms", TT.GetElapsed_ms());
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 }
 
 void CTextureDescrMngr::UnLoad()
@@ -128,8 +135,10 @@ CTextureDescrMngr::~CTextureDescrMngr()
 shared_str CTextureDescrMngr::GetBumpName(const shared_str& tex_name) const
 {
     map_TD::const_iterator I = m_texture_details.find(tex_name);
-    if (I != m_texture_details.end()) {
-        if (I->second.m_spec) {
+    if (I != m_texture_details.end())
+    {
+        if (I->second.m_spec)
+        {
             return I->second.m_spec->m_bump_name;
         }
     }
@@ -139,8 +148,10 @@ shared_str CTextureDescrMngr::GetBumpName(const shared_str& tex_name) const
 BOOL CTextureDescrMngr::UseSteepParallax(const shared_str& tex_name) const
 {
     map_TD::const_iterator I = m_texture_details.find(tex_name);
-    if (I != m_texture_details.end()) {
-        if (I->second.m_spec) {
+    if (I != m_texture_details.end())
+    {
+        if (I->second.m_spec)
+        {
             return I->second.m_spec->m_use_steep_parallax;
         }
     }
@@ -150,8 +161,10 @@ BOOL CTextureDescrMngr::UseSteepParallax(const shared_str& tex_name) const
 float CTextureDescrMngr::GetMaterial(const shared_str& tex_name) const
 {
     map_TD::const_iterator I = m_texture_details.find(tex_name);
-    if (I != m_texture_details.end()) {
-        if (I->second.m_spec) {
+    if (I != m_texture_details.end())
+    {
+        if (I->second.m_spec)
+        {
             return I->second.m_spec->m_material;
         }
     }
@@ -161,8 +174,10 @@ float CTextureDescrMngr::GetMaterial(const shared_str& tex_name) const
 void CTextureDescrMngr::GetTextureUsage(const shared_str& tex_name, BOOL& bDiffuse, BOOL& bBump) const
 {
     map_TD::const_iterator I = m_texture_details.find(tex_name);
-    if (I != m_texture_details.end()) {
-        if (I->second.m_assoc) {
+    if (I != m_texture_details.end())
+    {
+        if (I->second.m_assoc)
+        {
             u8 usage = I->second.m_assoc->usage;
             bDiffuse = !!(usage & (1 << 0));
             bBump = !!(usage & (1 << 1));
@@ -173,12 +188,14 @@ void CTextureDescrMngr::GetTextureUsage(const shared_str& tex_name, BOOL& bDiffu
 BOOL CTextureDescrMngr::GetDetailTexture(const shared_str& tex_name, LPCSTR& res, R_constant_setup*& CS) const
 {
     map_TD::const_iterator I = m_texture_details.find(tex_name);
-    if (I != m_texture_details.end()) {
-        if (I->second.m_assoc) {
+    if (I != m_texture_details.end())
+    {
+        if (I->second.m_assoc)
+        {
             texture_assoc* TA = I->second.m_assoc;
             res = TA->detail_name.c_str();
             map_CS::const_iterator It2 = m_detail_scalers.find(tex_name);
-            CS = It2 == m_detail_scalers.end() ? 0 : It2->second;  // TA->cs;
+            CS = It2 == m_detail_scalers.end() ? 0 : It2->second; // TA->cs;
             return TRUE;
         }
     }

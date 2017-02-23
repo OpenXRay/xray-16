@@ -10,27 +10,20 @@
 #include "Level.h"
 #include "CharacterPhysicsSupport.h"
 
-CBaseGraviZone::CBaseGraviZone(void)
-{
-    m_dwTeleTime = 0;
-}
-
-CBaseGraviZone::~CBaseGraviZone(void)
-{
-}
-
+CBaseGraviZone::CBaseGraviZone(void) { m_dwTeleTime = 0; }
+CBaseGraviZone::~CBaseGraviZone(void) {}
 void CBaseGraviZone::Load(LPCSTR section)
 {
     inherited::Load(section);
 
-    m_fThrowInImpulse = pSettings->r_float(section, "throw_in_impulse");             // 800.f;
-    m_fThrowInImpulseAlive = pSettings->r_float(section, "throw_in_impulse_alive");  // 800.f;
+    m_fThrowInImpulse = pSettings->r_float(section, "throw_in_impulse"); // 800.f;
+    m_fThrowInImpulseAlive = pSettings->r_float(section, "throw_in_impulse_alive"); // 800.f;
     m_fThrowInAtten = pSettings->r_float(section, "throw_in_atten");
-    m_fBlowoutRadiusPercent = pSettings->r_float(section, "blowout_radius_percent");  // 0.3f;
+    m_fBlowoutRadiusPercent = pSettings->r_float(section, "blowout_radius_percent"); // 0.3f;
 
-    m_fTeleHeight = pSettings->r_float(section, "tele_height");  // 1.5f;
-    m_dwTimeToTele = pSettings->r_u32(section, "time_to_tele");  // 7000;
-    m_dwTelePause = pSettings->r_u32(section, "tele_pause");     // 1000
+    m_fTeleHeight = pSettings->r_float(section, "tele_height"); // 1.5f;
+    m_dwTimeToTele = pSettings->r_u32(section, "time_to_tele"); // 7000;
+    m_dwTelePause = pSettings->r_u32(section, "tele_pause"); // 1000
 
     if (pSettings->line_exist(section, "tele_particles_big"))
         m_sTeleParticlesBig = pSettings->r_string(section, "tele_particles_big");
@@ -43,11 +36,7 @@ void CBaseGraviZone::Load(LPCSTR section)
         m_sTeleParticlesSmall = NULL;
 }
 
-BOOL CBaseGraviZone::net_Spawn(CSE_Abstract* DC)
-{
-    return inherited::net_Spawn(DC);
-}
-
+BOOL CBaseGraviZone::net_Spawn(CSE_Abstract* DC) { return inherited::net_Spawn(DC); }
 void CBaseGraviZone::net_Destroy()
 {
     Telekinesis().deactivate();
@@ -76,26 +65,31 @@ bool CBaseGraviZone::IdleState()
 
     m_dwTeleTime += Device.dwTimeDelta;
 
-    if (!result) {
-        if (m_dwTeleTime > m_dwTimeToTele) {
+    if (!result)
+    {
+        if (m_dwTeleTime > m_dwTimeToTele)
+        {
             for (OBJECT_INFO_VEC_IT it = m_ObjectInfoMap.begin(); m_ObjectInfoMap.end() != it; ++it)
             {
                 CPhysicsShellHolder* GO = smart_cast<CPhysicsShellHolder*>((*it).object);
 
-                if (GO && GO->PPhysicsShell() && Telekinesis().is_active_object(GO)) {
+                if (GO && GO->PPhysicsShell() && Telekinesis().is_active_object(GO))
+                {
                     Telekinesis().deactivate(GO);
                     StopTeleParticles(GO);
                 }
             }
         }
-        if (m_dwTeleTime > m_dwTimeToTele + m_dwTelePause) {
+        if (m_dwTeleTime > m_dwTimeToTele + m_dwTelePause)
+        {
             m_dwTeleTime = 0;
 
             for (OBJECT_INFO_VEC_IT it = m_ObjectInfoMap.begin(); m_ObjectInfoMap.end() != it; ++it)
             {
                 CPhysicsShellHolder* GO = smart_cast<CPhysicsShellHolder*>((*it).object);
 
-                if (GO && GO->PPhysicsShell() && !Telekinesis().is_active_object(GO)) {
+                if (GO && GO->PPhysicsShell() && !Telekinesis().is_active_object(GO))
+                {
                     Telekinesis().activate(GO, 0.1f, m_fTeleHeight, m_dwTimeToTele);
                     PlayTeleParticles(GO);
                 }
@@ -116,7 +110,8 @@ bool CBaseGraviZone::CheckAffectField(CPhysicsShellHolder* GO, float dist_to_rad
 void CBaseGraviZone::Affect(SZoneObjectInfo* O)
 {
     CPhysicsShellHolder* GO = smart_cast<CPhysicsShellHolder*>(O->object);
-    if (!GO) return;
+    if (!GO)
+        return;
 
     //////////////////////////////////////////////////////////////////////////
     //	зат€гиваем объет по направлению к центру зоны
@@ -138,7 +133,8 @@ void CBaseGraviZone::Affect(SZoneObjectInfo* O)
 
     bool CanApplyPhisImpulse = GO->Local() == TRUE;
 
-    if (CheckAffectField(GO, dist_to_radius) && CanApplyPhisImpulse) {
+    if (CheckAffectField(GO, dist_to_radius) && CanApplyPhisImpulse)
+    {
         AffectPull(GO, throw_in_dir, dist);
     }
     else
@@ -147,7 +143,8 @@ void CBaseGraviZone::Affect(SZoneObjectInfo* O)
         // выброс аномалии
 
         //если врем€ выброса еще не пришло
-        if (m_dwBlowoutExplosionTime < (u32)m_iPreviousStateTime || m_dwBlowoutExplosionTime >= (u32)m_iStateTime) {
+        if (m_dwBlowoutExplosionTime < (u32)m_iPreviousStateTime || m_dwBlowoutExplosionTime >= (u32)m_iStateTime)
+        {
             AffectPull(GO, throw_in_dir, BlowoutRadiusPercent(GO) * Radius());
             return;
         }
@@ -155,15 +152,12 @@ void CBaseGraviZone::Affect(SZoneObjectInfo* O)
     }
 }
 
-void CBaseGraviZone::ThrowInCenter(Fvector& C)
-{
-    Center(C);
-}
-
+void CBaseGraviZone::ThrowInCenter(Fvector& C) { Center(C); }
 void CBaseGraviZone::AffectPull(CPhysicsShellHolder* GO, const Fvector& throw_in_dir, float dist)
 {
     CEntityAlive* EA = smart_cast<CEntityAlive*>(GO);
-    if (EA && EA->g_Alive()) {
+    if (EA && EA->g_Alive())
+    {
         AffectPullAlife(EA, throw_in_dir, dist);
     }
     else if (GO && GO->PPhysicsShell())
@@ -192,10 +186,11 @@ void CBaseGraviZone::AffectThrow(SZoneObjectInfo* O, CPhysicsShellHolder* GO, co
 {
     Fvector position_in_bone_space;
 
-    float power = Power(dist, Radius());  // Power(GO->Position().distance_to(zone_center));
+    float power = Power(dist, Radius()); // Power(GO->Position().distance_to(zone_center));
     float impulse = m_fHitImpulseScale * power * GO->GetMass();
 
-    if (power > 0.01f) {
+    if (power > 0.01f)
+    {
         position_in_bone_space.set(0.f, 0.f, 0.f);
         CreateHit(GO->ID(), ID(), throw_in_dir, power, 0, position_in_bone_space, impulse, m_eHitTypeBlowout);
         PlayHitParticles(GO);
@@ -205,18 +200,22 @@ void CBaseGraviZone::AffectThrow(SZoneObjectInfo* O, CPhysicsShellHolder* GO, co
 void CBaseGraviZone::PlayTeleParticles(CGameObject* pObject)
 {
     CParticlesPlayer* PP = smart_cast<CParticlesPlayer*>(pObject);
-    if (!PP) return;
+    if (!PP)
+        return;
 
     shared_str particle_str = NULL;
 
     //разные партиклы дл€ объектов разного размера
-    if (pObject->Radius() < SMALL_OBJECT_RADIUS) {
-        if (!m_sTeleParticlesSmall) return;
+    if (pObject->Radius() < SMALL_OBJECT_RADIUS)
+    {
+        if (!m_sTeleParticlesSmall)
+            return;
         particle_str = m_sTeleParticlesSmall;
     }
     else
     {
-        if (!m_sTeleParticlesBig) return;
+        if (!m_sTeleParticlesBig)
+            return;
         particle_str = m_sTeleParticlesBig;
     }
 
@@ -226,17 +225,21 @@ void CBaseGraviZone::PlayTeleParticles(CGameObject* pObject)
 void CBaseGraviZone::StopTeleParticles(CGameObject* pObject)
 {
     CParticlesPlayer* PP = smart_cast<CParticlesPlayer*>(pObject);
-    if (!PP) return;
+    if (!PP)
+        return;
     shared_str particle_str = NULL;
 
     //разные партиклы дл€ объектов разного размера
-    if (pObject->Radius() < SMALL_OBJECT_RADIUS) {
-        if (!m_sTeleParticlesSmall) return;
+    if (pObject->Radius() < SMALL_OBJECT_RADIUS)
+    {
+        if (!m_sTeleParticlesSmall)
+            return;
         particle_str = m_sTeleParticlesSmall;
     }
     else
     {
-        if (!m_sTeleParticlesBig) return;
+        if (!m_sTeleParticlesBig)
+            return;
         particle_str = m_sTeleParticlesBig;
     }
 

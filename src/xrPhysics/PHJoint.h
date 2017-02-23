@@ -19,20 +19,20 @@ class CPHJoint : public CPhysicsJoint, public cphysics_scripted
     dJointID m_joint1;
     CPhysicsJoint** m_back_ref;
     CPHJointDestroyInfo* m_destroy_info;
-    float m_erp;  // joint erp
-    float m_cfm;  // joint cfm
+    float m_erp; // joint erp
+    float m_cfm; // joint cfm
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
     struct SPHAxis
     {
-        float high;         // high limit
-        float low;          // law limit
-        float zero;         // zero angle position
-        float erp;          // limit erp
-        float cfm;          // limit cfm
-        eVs vs;             // coordinate system
-        float force;        // max force
-        float velocity;     // velocity to achieve
-        Fvector direction;  // axis direction
+        float high; // high limit
+        float low; // law limit
+        float zero; // zero angle position
+        float erp; // limit erp
+        float cfm; // limit cfm
+        eVs vs; // coordinate system
+        float force; // max force
+        float velocity; // velocity to achieve
+        Fvector direction; // axis direction
         IC void set_limits(float h, float l)
         {
             high = h;
@@ -154,21 +154,23 @@ public:
 
 private:
     virtual iphysics_scripted& get_scripted() { return *this; }
-
 public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 IC void own_axis(const Fmatrix& m, Fvector& axis)
 {
-    if (m._11 == 1.f) {
+    if (m._11 == 1.f)
+    {
         axis.set(1.f, 0.f, 0.f);
         return;
     }
     float k = m._13 * m._21 - m._11 * m._23 + m._23;
 
-    if (k == 0.f) {
-        if (m._13 == 0.f) {
+    if (k == 0.f)
+    {
+        if (m._13 == 0.f)
+        {
             axis.set(0.f, 0.f, 1.f);
             return;
         }
@@ -191,7 +193,8 @@ IC void own_axis_angle(const Fmatrix& m, Fvector& axis, float& angle)
 {
     own_axis(m, axis);
     Fvector ort1, ort2;
-    if (!(axis.z == 0.f && axis.y == 0.f)) {
+    if (!(axis.z == 0.f && axis.y == 0.f))
+    {
         ort1.set(0.f, -axis.z, axis.y);
         ort2.crossproduct(axis, ort1);
     }
@@ -209,13 +212,15 @@ IC void own_axis_angle(const Fmatrix& m, Fvector& axis, float& angle)
     float cosinus = ort1.dotproduct(ort1_t);
     float sinus = ort2.dotproduct(ort1_t);
     angle = acosf(cosinus);
-    if (sinus < 0.f) angle = -angle;
+    if (sinus < 0.f)
+        angle = -angle;
 }
 
 IC void axis_angleB(const Fmatrix& m, const Fvector& axis, float& angle)
 {
     Fvector ort1, ort2;
-    if (!(fis_zero(axis.z) && fis_zero(axis.y))) {
+    if (!(fis_zero(axis.z) && fis_zero(axis.y)))
+    {
         ort1.set(0.f, -axis.z, axis.y);
         ort2.crossproduct(axis, ort1);
     }
@@ -232,7 +237,8 @@ IC void axis_angleB(const Fmatrix& m, const Fvector& axis, float& angle)
     float pr1, pr2;
     pr1 = ort1.dotproduct(ort1_t);
     pr2 = ort2.dotproduct(ort1_t);
-    if (pr1 == 0.f && pr2 == 0.f) {
+    if (pr1 == 0.f && pr2 == 0.f)
+    {
         angle = 0.f;
         return;
     }
@@ -242,14 +248,16 @@ IC void axis_angleB(const Fmatrix& m, const Fvector& axis, float& angle)
     float cosinus = ort1.dotproduct(ort_r);
     float sinus = ort2.dotproduct(ort_r);
     angle = acosf(cosinus);
-    if (sinus < 0.f) angle = -angle;
+    if (sinus < 0.f)
+        angle = -angle;
 }
 
 IC void axis_angleA(const Fmatrix& m, const Fvector& axis, float& angle)
 {
     Fvector ort1, ort2, axis_t;
     m.transform_dir(axis_t, axis);
-    if (!(fis_zero(axis_t.z) && fis_zero(axis_t.y))) {
+    if (!(fis_zero(axis_t.z) && fis_zero(axis_t.y)))
+    {
         ort1.set(0.f, -axis_t.z, axis_t.y);
         ort2.crossproduct(axis_t, ort1);
     }
@@ -266,7 +274,8 @@ IC void axis_angleA(const Fmatrix& m, const Fvector& axis, float& angle)
     float pr1, pr2;
     pr1 = ort1.dotproduct(ort1_t);
     pr2 = ort2.dotproduct(ort1_t);
-    if (pr1 == 0.f && pr2 == 0.f) {
+    if (pr1 == 0.f && pr2 == 0.f)
+    {
         angle = 0.f;
         return;
     }
@@ -276,7 +285,8 @@ IC void axis_angleA(const Fmatrix& m, const Fvector& axis, float& angle)
     float cosinus = ort1.dotproduct(ort_r);
     float sinus = ort2.dotproduct(ort_r);
     angle = acosf(cosinus);
-    if (sinus < 0.f) angle = -angle;
+    if (sinus < 0.f)
+        angle = -angle;
     // if(angle>M_PI) angle=angle-2.f*M_PI;
     // if(angle<-M_PI) angle=angle+2.f*M_PI;
 }

@@ -6,16 +6,8 @@
 #include "ai/monsters/control_animation_base.h"
 #include "ai/monsters/control_movement_base.h"
 
-CCat::CCat()
-{
-    StateMan = new CStateManagerCat(this);
-}
-
-CCat::~CCat()
-{
-    xr_delete(StateMan);
-}
-
+CCat::CCat() { StateMan = new CStateManagerCat(this); }
+CCat::~CCat() { xr_delete(StateMan); }
 void CCat::Load(LPCSTR section)
 {
     inherited::Load(section);
@@ -103,16 +95,19 @@ void CCat::reinit()
 void CCat::try_to_jump()
 {
     IGameObject* target = const_cast<CEntityAlive*>(EnemyMan.get_enemy());
-    if (!target || !EnemyMan.see_enemy_now()) return;
+    if (!target || !EnemyMan.see_enemy_now())
+        return;
 }
 
 void CCat::CheckSpecParams(u32 spec_params)
 {
-    if ((spec_params & ASP_CHECK_CORPSE) == ASP_CHECK_CORPSE) {
+    if ((spec_params & ASP_CHECK_CORPSE) == ASP_CHECK_CORPSE)
+    {
         com_man().seq_run(anim().get_motion_id(eAnimCheckCorpse));
     }
 
-    if ((spec_params & ASP_ROTATION_JUMP) == ASP_ROTATION_JUMP) {
+    if ((spec_params & ASP_ROTATION_JUMP) == ASP_ROTATION_JUMP)
+    {
         // float yaw, pitch;
         // Fvector().sub(EnemyMan.get_enemy()->Position(), Position()).getHP(yaw,pitch);
         // yaw *= -1;
@@ -142,11 +137,7 @@ void CCat::CheckSpecParams(u32 spec_params)
     }
 }
 
-void CCat::UpdateCL()
-{
-    inherited::UpdateCL();
-}
-
+void CCat::UpdateCL() { inherited::UpdateCL(); }
 void CCat::HitEntityInJump(const CEntity* pEntity)
 {
     SAAParam& params = anim().AA_GetParams("jump_attack_2");

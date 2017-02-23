@@ -12,28 +12,13 @@
 #define CSALifeAbstractRegistry CALifeAbstractRegistry<_index_type, _data_type>
 
 TEMPLATE_SPECIALIZATION
-IC CSALifeAbstractRegistry::CALifeAbstractRegistry()
-{
-}
-
+IC CSALifeAbstractRegistry::CALifeAbstractRegistry() {}
 TEMPLATE_SPECIALIZATION
-CSALifeAbstractRegistry::~CALifeAbstractRegistry()
-{
-    delete_data(m_objects);
-}
-
+CSALifeAbstractRegistry::~CALifeAbstractRegistry() { delete_data(m_objects); }
 TEMPLATE_SPECIALIZATION
-void CSALifeAbstractRegistry::save(IWriter& memory_stream)
-{
-    save_data(m_objects, memory_stream);
-}
-
+void CSALifeAbstractRegistry::save(IWriter& memory_stream) { save_data(m_objects, memory_stream); }
 TEMPLATE_SPECIALIZATION
-void CSALifeAbstractRegistry::load(IReader& file_stream)
-{
-    load_data(m_objects, file_stream);
-}
-
+void CSALifeAbstractRegistry::load(IReader& file_stream) { load_data(m_objects, file_stream); }
 TEMPLATE_SPECIALIZATION
 IC const typename CSALifeAbstractRegistry::OBJECT_REGISTRY& CSALifeAbstractRegistry::objects() const
 {
@@ -44,7 +29,8 @@ TEMPLATE_SPECIALIZATION
 IC void CSALifeAbstractRegistry::add(const _index_type& index, _data_type& data, bool no_assert)
 {
     const_iterator I = objects().find(index);
-    if (I != objects().end()) {
+    if (I != objects().end())
+    {
         THROW2(no_assert, "Specified object has been already found in the specified registry!");
         return;
     }
@@ -55,7 +41,8 @@ TEMPLATE_SPECIALIZATION
 IC void CSALifeAbstractRegistry::remove(const _index_type& index, bool no_assert)
 {
     iterator I = m_objects.find(index);
-    if (I == objects().end()) {
+    if (I == objects().end())
+    {
         THROW2(no_assert, "Specified object hasn't been found in the specified registry!");
         return;
     }
@@ -66,7 +53,8 @@ TEMPLATE_SPECIALIZATION
 IC _data_type* CSALifeAbstractRegistry::object(const _index_type& index, bool no_assert)
 {
     iterator I = m_objects.find(index);
-    if (I == objects().end()) {
+    if (I == objects().end())
+    {
         THROW2(no_assert, "Specified object hasn't been found in the specified registry!");
         return (0);
     }

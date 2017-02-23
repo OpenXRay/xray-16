@@ -8,6 +8,4 @@
 
 #pragma once
 
-IC CALifeSurgeManager::CALifeSurgeManager(IPureServer* server, LPCSTR section) : inherited(server, section)
-{
-}
+IC CALifeSurgeManager::CALifeSurgeManager(IPureServer* server, LPCSTR section) : inherited(server, section) {}

@@ -28,16 +28,8 @@ CALifeMonsterMovementManager::~CALifeMonsterMovementManager()
     delete_data(m_patrol);
 }
 
-bool CALifeMonsterMovementManager::completed() const
-{
-    return (true);
-}
-
-bool CALifeMonsterMovementManager::actual() const
-{
-    return (true);
-}
-
+bool CALifeMonsterMovementManager::completed() const { return (true); }
+bool CALifeMonsterMovementManager::actual() const { return (true); }
 void CALifeMonsterMovementManager::update()
 {
     switch (path_type())
@@ -64,12 +56,5 @@ void CALifeMonsterMovementManager::update()
     };
 }
 
-void CALifeMonsterMovementManager::on_switch_online()
-{
-    detail().on_switch_online();
-}
-
-void CALifeMonsterMovementManager::on_switch_offline()
-{
-    detail().on_switch_offline();
-}
+void CALifeMonsterMovementManager::on_switch_online() { detail().on_switch_online(); }
+void CALifeMonsterMovementManager::on_switch_offline() { detail().on_switch_offline(); }

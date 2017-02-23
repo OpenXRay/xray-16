@@ -33,7 +33,7 @@ public:
     u32 dwMode;
     union
     {
-        u32 tcm;  // mask for tc-modifiers
+        u32 tcm; // mask for tc-modifiers
         Flags32 tcm_flags;
     };
     WaveForm scaleU, scaleV;
@@ -41,7 +41,6 @@ public:
     WaveForm scrollU, scrollV;
 
     CMatrix() { memset(this, 0, sizeof(CMatrix)); }
-
     IC void tc_trans(Fmatrix& T, float u, float v)
     {
         T.identity();
@@ -50,15 +49,22 @@ public:
     }
     void Calculate();
 
-    IC BOOL Similar(CMatrix& M)  // comare by modes and params
+    IC BOOL Similar(CMatrix& M) // comare by modes and params
     {
-        if (dwMode != M.dwMode) return FALSE;
-        if (tcm != M.tcm) return FALSE;
-        if (!scaleU.Similar(M.scaleU)) return FALSE;
-        if (!scaleV.Similar(M.scaleV)) return FALSE;
-        if (!rotate.Similar(M.rotate)) return FALSE;
-        if (!scrollU.Similar(M.scrollU)) return FALSE;
-        if (!scrollV.Similar(M.scrollV)) return FALSE;
+        if (dwMode != M.dwMode)
+            return FALSE;
+        if (tcm != M.tcm)
+            return FALSE;
+        if (!scaleU.Similar(M.scaleU))
+            return FALSE;
+        if (!scaleV.Similar(M.scaleV))
+            return FALSE;
+        if (!rotate.Similar(M.rotate))
+            return FALSE;
+        if (!scrollU.Similar(M.scrollU))
+            return FALSE;
+        if (!scrollV.Similar(M.scrollV))
+            return FALSE;
         return TRUE;
     }
 

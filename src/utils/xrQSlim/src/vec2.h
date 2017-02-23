@@ -1,4 +1,4 @@
-#ifndef GFXVEC2_INCLUDED  // -*- C++ -*-
+#ifndef GFXVEC2_INCLUDED // -*- C++ -*-
 #define GFXVEC2_INCLUDED
 #if !defined(__GNUC__)
 #pragma once
@@ -57,12 +57,10 @@ public:
     //
     typedef T value_type;
     static int dim() { return 2; }
-
     // Access methods
     //
     operator T*() { return elt; }
     operator const T*() const { return elt; }
-
     // In-place arithmetic methods
     //
     inline TVec2& operator+=(const TVec2& v);
@@ -216,7 +214,8 @@ template <class T>
 inline void unitize(TVec2<T>& v)
 {
     T l = norm2(v);
-    if (l != 1.0 && l != 0.0) v /= _sqrt(l);
+    if (l != 1.0 && l != 0.0)
+        v /= _sqrt(l);
 }
 
 typedef TVec2<double> Vec2;

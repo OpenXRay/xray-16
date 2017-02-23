@@ -4,8 +4,8 @@
 #include "Layers/xrRender/FBasicVisual.h"
 
 const float tweak_COP_initial_offs = 1200.f;
-const float tweak_ortho_xform_initial_offs = 1000.f;  //. ?
-const float tweak_guaranteed_range = 20.f;            //. ?
+const float tweak_ortho_xform_initial_offs = 1000.f; //. ?
+const float tweak_guaranteed_range = 20.f; //. ?
 
 // float			OLES_SUN_LIMIT_27_01_07			= 180.f		;
 float OLES_SUN_LIMIT_27_01_07 = 100.f;
@@ -47,7 +47,6 @@ struct BoundingBox
 
     BoundingBox() : minPt(1e33f, 1e33f, 1e33f), maxPt(-1e33f, -1e33f, -1e33f) {}
     BoundingBox(const BoundingBox& other) : minPt(other.minPt), maxPt(other.maxPt) {}
-
     explicit BoundingBox(const D3DXVECTOR3* points, UINT n) : minPt(1e33f, 1e33f, 1e33f), maxPt(-1e33f, -1e33f, -1e33f)
     {
         for (unsigned int i = 0; i < n; i++)
@@ -125,7 +124,8 @@ static inline BOOL PlaneIntersection(
 
     float cosTheta = D3DXVec3Dot(&n0, &n1_n2);
 
-    if (ALMOST_ZERO(cosTheta) || IS_SPECIAL(cosTheta)) return FALSE;
+    if (ALMOST_ZERO(cosTheta) || IS_SPECIAL(cosTheta))
+        return FALSE;
 
     float secTheta = 1.f / cosTheta;
 
@@ -153,17 +153,17 @@ Frustum::Frustum(const D3DXMATRIX* matrix)
     D3DXVECTOR4 column3(matrix->_13, matrix->_23, matrix->_33, matrix->_43);
 
     D3DXVECTOR4 planes[6];
-    planes[0] = column4 - column1;  // left
-    planes[1] = column4 + column1;  // right
-    planes[2] = column4 - column2;  // bottom
-    planes[3] = column4 + column2;  // top
-    planes[4] = column4 - column3;  // near
-    planes[5] = column4 + column3;  // far
+    planes[0] = column4 - column1; // left
+    planes[1] = column4 + column1; // right
+    planes[2] = column4 - column2; // bottom
+    planes[3] = column4 + column2; // top
+    planes[4] = column4 - column3; // near
+    planes[5] = column4 + column3; // far
     // ignore near & far plane
 
     int p;
 
-    for (p = 0; p < 6; p++)  // normalize the planes
+    for (p = 0; p < 6; p++) // normalize the planes
     {
         float dot = planes[p].x * planes[p].x + planes[p].y * planes[p].y + planes[p].z * planes[p].z;
         dot = 1.f / _sqrt(dot);
@@ -177,7 +177,7 @@ Frustum::Frustum(const D3DXMATRIX* matrix)
     for (int i = 0; i < 6; i++)
         nVertexLUT[i] = ((planes[i].x < 0.f) ? 1 : 0) | ((planes[i].y < 0.f) ? 2 : 0) | ((planes[i].z < 0.f) ? 4 : 0);
 
-    for (int i = 0; i < 8; i++)  // compute extrema
+    for (int i = 0; i < 8; i++) // compute extrema
     {
         const D3DXPLANE& p0 = (i & 1) ? camPlanes[4] : camPlanes[5];
         const D3DXPLANE& p1 = (i & 2) ? camPlanes[3] : camPlanes[2];
@@ -222,7 +222,8 @@ public:
                 light_cuboid_points[P.points[0]], light_cuboid_points[P.points[2]], light_cuboid_points[P.points[1]]);
 
             // verify
-            if (_debug) {
+            if (_debug)
+            {
                 Fvector& p0 = light_cuboid_points[P.points[0]];
                 Fvector& p1 = light_cuboid_points[P.points[1]];
                 Fvector& p2 = light_cuboid_points[P.points[2]];
@@ -245,7 +246,8 @@ public:
     {
         translation.set(0.f, 0.f, 0.f);
 
-        if (fis_zero(1 - abs(view_ray.D.dotproduct(light_ray.D)), EPS_S)) return;
+        if (fis_zero(1 - abs(view_ray.D.dotproduct(light_ray.D)), EPS_S))
+            return;
 
         // compute planes for each polygon.
         compute_planes();
@@ -260,12 +262,14 @@ public:
         for (u32 i = 0; i < LIGHT_CUBOIDSIDEPOLYS_COUNT; i++)
         {
             float tmp_dot = view_ray.D.dotproduct(light_cuboid_polys[i].plane.n);
-            if (tmp_dot <= EPS_L) continue;
+            if (tmp_dot <= EPS_L)
+                continue;
 
             align_planes[align_planes_count] = i;
             ++align_planes_count;
 
-            if (align_planes_count == 2) break;
+            if (align_planes_count == 2)
+                break;
         }
 
         Fvector align_vector;
@@ -309,7 +313,8 @@ public:
             for (u32 i = 0; i < view_frustum_rays.size(); ++i)
             {
                 float plane_dot_ray = view_frustum_rays[i].D.dotproduct(light_cuboid_polys[align_planes[p]].plane.n);
-                if (plane_dot_ray < 0) {
+                if (plane_dot_ray < 0)
+                {
                     Fvector per_plane_view;
                     per_plane_view.crossproduct(light_cuboid_polys[align_planes[p]].plane.n, view_ray.D);
                     Fvector per_view_to_plane;
@@ -321,7 +326,8 @@ public:
                 }
             }
 
-            if (fis_zero(max_mag)) continue;
+            if (fis_zero(max_mag))
+                continue;
 
             VERIFY(max_mag <= 1.f);
 
@@ -340,13 +346,15 @@ public:
             tmp_vector.crossproduct(view_frustum_rays[i].D, light_ray.D);
 
             // check if the vectors are parallel
-            if (fis_zero(tmp_vector.square_magnitude(), EPS)) continue;
+            if (fis_zero(tmp_vector.square_magnitude(), EPS))
+                continue;
 
             Fplane tmp_plane;
             tmp_plane.build(view_frustum_rays[i].P, tmp_vector);
 
             float sign = 0;
-            if (check_cull_plane_valid(tmp_plane, sign, 5)) {
+            if (check_cull_plane_valid(tmp_plane, sign, 5))
+            {
                 tmp_plane.n.mul(-sign);
                 tmp_plane.d *= -sign;
                 dest.push_back(tmp_plane);
@@ -354,7 +362,8 @@ public:
         }
 
         // compute culling planes by ray points pairs as edges
-        if (clip_by_view_near && abs(view_ray.D.dotproduct(light_ray.D)) < 0.8) {
+        if (clip_by_view_near && abs(view_ray.D.dotproduct(light_ray.D)) < 0.8)
+        {
             Fvector perp_light_view, perp_light_to_view;
             perp_light_view.crossproduct(view_ray.D, light_ray.D);
             perp_light_to_view.crossproduct(perp_light_view, light_ray.D);
@@ -371,13 +380,15 @@ public:
                 Fvector P = view_frustum_rays[i].P;
                 P.mad(view_frustum_rays[i].D, 5);
 
-                if (plane.classify(P) > max_dist) {
+                if (plane.classify(P) > max_dist)
+                {
                     max_dist = 0.f;
                     break;
                 }
             }
 
-            if (max_dist > -1000) {
+            if (max_dist > -1000)
+            {
                 plane.d += max_dist;
                 dest.push_back(plane);
             }
@@ -403,7 +414,8 @@ public:
                 else
                     light_cuboid_polys[p].plane.intersectRayDist(view_frustum_rays[i].P, view_frustum_rays[i].D, dist);
 
-                if (dist > EPS_L && dist < min_dist) min_dist = dist;
+                if (dist > EPS_L && dist < min_dist)
+                    min_dist = dist;
             }
 
             view_frustum_rays[i].P.mad(view_frustum_rays[i].D, min_dist);
@@ -422,16 +434,19 @@ public:
             tmp_pt.mad(view_frustum_rays[j].D, mad_factor);
             tmp_dist = plane.classify(tmp_pt);
 
-            if (fis_zero(tmp_dist, EPS_L)) continue;
+            if (fis_zero(tmp_dist, EPS_L))
+                continue;
 
-            if (!oriented) {
+            if (!oriented)
+            {
                 orient = tmp_dist > 0.f ? 1.f : -1.f;
                 valid = true;
                 oriented = true;
                 continue;
             }
 
-            if (tmp_dist < 0 && orient < 0 || tmp_dist > 0 && orient > 0) continue;
+            if (tmp_dist < 0 && orient < 0 || tmp_dist > 0 && orient > 0)
+                continue;
 
             valid = false;
             break;
@@ -471,7 +486,8 @@ public:
         int counter;
         _edge(int _p0, int _p1, int m) : p0(_p0), p1(_p1), counter(m)
         {
-            if (p0 > p1) swap(p0, p1);
+            if (p0 > p1)
+                swap(p0, p1);
         }
         bool equal(_edge& E) { return p0 == E.p0 && p1 == E.p1; }
     };
@@ -494,7 +510,8 @@ public:
             P.planeD = -P.planeN.dotproduct(points[P.points[0]]);
 
             // verify
-            if (_debug) {
+            if (_debug)
+            {
                 Fvector& p0 = points[P.points[0]];
                 Fvector& p1 = points[P.points[1]];
                 Fvector& p2 = points[P.points[2]];
@@ -527,7 +544,8 @@ public:
         for (int it = 0; it < int(polys.size()); it++)
         {
             _poly& base = polys[it];
-            if (base.classify(cog) > 0) std::reverse(base.points.begin(), base.points.end());
+            if (base.classify(cog) > 0)
+                std::reverse(base.points.begin(), base.points.end());
         }
 
         // remove faceforward polys, build list of edges -> find open ones
@@ -535,7 +553,7 @@ public:
         for (int it = 0; it < int(polys.size()); it++)
         {
             _poly& base = polys[it];
-            VERIFY(base.classify(cog) < 0);  // debug
+            VERIFY(base.classify(cog) < 0); // debug
 
             int marker = (base.planeN.dotproduct(direction) <= 0) ? -1 : 1;
 
@@ -546,19 +564,23 @@ public:
                 _edge E(plist[p], plist[(p + 1) % plist.size()], marker);
                 bool found = false;
                 for (int e = 0; e < int(edges.size()); e++)
-                    if (edges[e].equal(E)) {
+                    if (edges[e].equal(E))
+                    {
                         edges[e].counter += marker;
                         found = true;
                         break;
                     }
-                if (!found) {
+                if (!found)
+                {
                     edges.push_back(E);
-                    if (_debug) T.dbg_addline(points[E.p0], points[E.p1], color_rgba(255, 0, 0, 255));
+                    if (_debug)
+                        T.dbg_addline(points[E.p0], points[E.p1], color_rgba(255, 0, 0, 255));
                 }
             }
 
             // remove if unused
-            if (marker < 0) {
+            if (marker < 0)
+            {
                 polys.erase(polys.begin() + it);
                 it--;
             }
@@ -567,9 +589,11 @@ public:
         // Extend model to infinity, the volume is not capped, so this is indeed up to infinity
         for (int e = 0; e < int(edges.size()); e++)
         {
-            if (edges[e].counter != 0) continue;
+            if (edges[e].counter != 0)
+                continue;
             _edge& E = edges[e];
-            if (_debug) T.dbg_addline(points[E.p0], points[E.p1], color_rgba(255, 255, 255, 255));
+            if (_debug)
+                T.dbg_addline(points[E.p0], points[E.p1], color_rgba(255, 255, 255, 255));
             Fvector3 point;
             points.push_back(point.sub(points[E.p0], direction));
             points.push_back(point.sub(points[E.p1], direction));
@@ -578,8 +602,8 @@ public:
             int pend = int(points.size());
             P.points.push_back(E.p0);
             P.points.push_back(E.p1);
-            P.points.push_back(pend - 1);  // p1 mod
-            P.points.push_back(pend - 2);  // p0 mod
+            P.points.push_back(pend - 1); // p1 mod
+            P.points.push_back(pend - 2); // p0 mod
             if (_debug)
                 T.dbg_addline(points[E.p0], point.mad(points[E.p0], direction, -1000), color_rgba(0, 255, 0, 255));
             if (_debug)
@@ -591,7 +615,8 @@ public:
         for (int it = 0; it < int(polys.size()); it++)
         {
             _poly& base = polys[it];
-            if (base.classify(cog) > 0) std::reverse(base.points.begin(), base.points.end());
+            if (base.classify(cog) > 0)
+                std::reverse(base.points.begin(), base.points.end());
         }
 
         // Export
@@ -628,7 +653,7 @@ struct DumbClipper
 {
     CFrustum frustum;
     xr_vector<D3DXPLANE> planes;
-    BOOL clip(D3DXVECTOR3& p0, D3DXVECTOR3& p1)  // returns TRUE if result meaningfull
+    BOOL clip(D3DXVECTOR3& p0, D3DXVECTOR3& p1) // returns TRUE if result meaningfull
     {
         float denum;
         D3DXVECTOR3 D;
@@ -637,19 +662,24 @@ struct DumbClipper
             D3DXPLANE& P = planes[it];
             float cls0 = D3DXPlaneDotCoord(&P, &p0);
             float cls1 = D3DXPlaneDotCoord(&P, &p1);
-            if (cls0 > 0 && cls1 > 0) return false;  // fully outside
+            if (cls0 > 0 && cls1 > 0)
+                return false; // fully outside
 
-            if (cls0 > 0) {
+            if (cls0 > 0)
+            {
                 // clip p0
                 D = p1 - p0;
                 denum = D3DXPlaneDotNormal(&P, &D);
-                if (denum != 0) p0 += -D * cls0 / denum;
+                if (denum != 0)
+                    p0 += -D * cls0 / denum;
             }
-            if (cls1 > 0) {
+            if (cls1 > 0)
+            {
                 // clip p1
                 D = p0 - p1;
                 denum = D3DXPlaneDotNormal(&P, &D);
-                if (denum != 0) p1 += -D * cls1 / denum;
+                if (denum != 0)
+                    p1 += -D * cls1 / denum;
             }
         }
         return true;
@@ -683,10 +713,12 @@ struct DumbClipper
                 {
                     for (int c1 = 0; c1 < 8; c1++)
                     {
-                        if (c0 == c1) continue;
+                        if (c0 == c1)
+                            continue;
                         D3DXVECTOR3 p0 = point(bb, c0);
                         D3DXVECTOR3 p1 = point(bb, c1);
-                        if (!clip(p0, p1)) continue;
+                        if (!clip(p0, p1))
+                            continue;
                         Fvector x0 = wform(xf, *((Fvector*)(&p0)));
                         Fvector x1 = wform(xf, *((Fvector*)(&p1)));
                         result.modify(x0);
@@ -774,7 +806,8 @@ void CRender::render_sun()
             CSector* S = (CSector*)Sectors[s];
             dxRender_Visual* V = S->root();
             float vol = V->vis.box.getvolume();
-            if (vol > largest_sector_vol) {
+            if (vol > largest_sector_vol)
+            {
                 largest_sector_vol = vol;
                 largest_sector = S;
             }
@@ -796,7 +829,8 @@ void CRender::render_sun()
         L_pos.set(fuckingsun->position);
         L_dir.set(fuckingsun->direction).normalize();
         L_up.set(0, 1, 0);
-        if (_abs(L_up.dotproduct(L_dir)) > .99f) L_up.set(0, 0, 1);
+        if (_abs(L_up.dotproduct(L_dir)) > .99f)
+            L_up.set(0, 0, 1);
         L_right.crossproduct(L_up, L_dir).normalize();
         L_up.crossproduct(L_dir, L_right).normalize();
         mdir_View.build_camera_dir(L_pos, L_dir, L_up);
@@ -837,7 +871,8 @@ void CRender::render_sun()
     r_dsgraph_render_subspace(cull_sector, &cull_frustum, cull_xform, cull_COP, TRUE);
 
     // IGNORE PORTALS
-    if (ps_r2_ls_flags.test(R2FLAG_SUN_IGNORE_PORTALS)) {
+    if (ps_r2_ls_flags.test(R2FLAG_SUN_IGNORE_PORTALS))
+    {
         for (u32 s = 0; s < Sectors.size(); s++)
         {
             CSector* S = (CSector*)Sectors[s];
@@ -862,16 +897,17 @@ void CRender::render_sun()
 
     // Compute REAL sheared xform based on receivers/casters information
     FPU::m64r();
-    if (_abs(m_fCosGamma) < 0.99f && ps_r2_ls_flags.test(R2FLAG_SUN_TSM)) {
+    if (_abs(m_fCosGamma) < 0.99f && ps_r2_ls_flags.test(R2FLAG_SUN_TSM))
+    {
         //  get the near and the far plane (points) in eye space.
         D3DXVECTOR3 frustumPnts[8];
 
-        Frustum eyeFrustum(&m_Projection);  // autocomputes all the extrema points
+        Frustum eyeFrustum(&m_Projection); // autocomputes all the extrema points
 
         for (int i = 0; i < 4; i++)
         {
-            frustumPnts[i] = eyeFrustum.pntList[(i << 1)];            // far plane
-            frustumPnts[i + 4] = eyeFrustum.pntList[(i << 1) | 0x1];  // near plane
+            frustumPnts[i] = eyeFrustum.pntList[(i << 1)]; // far plane
+            frustumPnts[i + 4] = eyeFrustum.pntList[(i << 1) | 0x1]; // near plane
         }
 
         //   we need to transform the eye into the light's post-projective space.
@@ -880,10 +916,10 @@ void CRender::render_sun()
         //   this matrix is a variant of "light space" from LSPSMs, with the Y and Z axes permuted
 
         D3DXVECTOR3 leftVector, upVector, viewVector;
-        const D3DXVECTOR3 eyeVector(0.f, 0.f, -1.f);  //  eye is always -Z in eye space
+        const D3DXVECTOR3 eyeVector(0.f, 0.f, -1.f); //  eye is always -Z in eye space
 
         //  code copied straight from BuildLSPSMProjectionMatrix
-        D3DXVec3TransformNormal(&upVector, &m_lightDir, &m_View);  // lightDir is defined in eye space, so xform it
+        D3DXVec3TransformNormal(&upVector, &m_lightDir, &m_View); // lightDir is defined in eye space, so xform it
         D3DXVec3Cross(&leftVector, &upVector, &eyeVector);
         D3DXVec3Normalize(&leftVector, &leftVector);
         D3DXVec3Cross(&viewVector, &upVector, &leftVector);
@@ -921,7 +957,7 @@ void CRender::render_sun()
         float min_z = std::min(depthbounds.x, frustumBox.minPt.z);
         float max_z = std::max(depthbounds.y, frustumBox.maxPt.z);
 
-        if (min_z <= 1.f)  //?
+        if (min_z <= 1.f) //?
         {
             D3DXMATRIX lightSpaceTranslate;
             D3DXMatrixTranslation(&lightSpaceTranslate, 0.f, 0.f, -min_z + 1.f);
@@ -995,8 +1031,8 @@ void CRender::render_sun()
 
         //  compute eta.
         float lambda = frustumAABB2D.maxPt.x - frustumAABB2D.minPt.x;
-        float delta_proj = m_fTSM_Delta * lambda;  // focusPt.x - frustumAABB2D.minPt.x;
-        const float xi = -0.6f;                    // - 0.6f;  // 80% line
+        float delta_proj = m_fTSM_Delta * lambda; // focusPt.x - frustumAABB2D.minPt.x;
+        const float xi = -0.6f; // - 0.6f;  // 80% line
         float eta = (lambda * delta_proj * (1.f + xi)) / (lambda * (1.f - xi) - 2.f * delta_proj);
 
         //  compute the projection point a distance eta from the top line.  this point is on the center line, y=0
@@ -1011,7 +1047,8 @@ void CRender::render_sun()
         {
             D3DXVECTOR2 tmp(frustumPnts[i].x * x_scale, frustumPnts[i].y * y_scale);
             float x_dist = tmp.x - projectionPtQ.x;
-            if (!(ALMOST_ZERO(tmp.y) || ALMOST_ZERO(x_dist))) {
+            if (!(ALMOST_ZERO(tmp.y) || ALMOST_ZERO(x_dist)))
+            {
                 max_slope = std::max(max_slope, tmp.y / x_dist);
                 min_slope = std::min(min_slope, tmp.y / x_dist);
             }
@@ -1057,7 +1094,8 @@ void CRender::render_sun()
     FPU::m24r();
 
     // perform "refit" or "focusing" on relevant
-    if (ps_r2_ls_flags.test(R2FLAG_SUN_FOCUS)) {
+    if (ps_r2_ls_flags.test(R2FLAG_SUN_FOCUS))
+    {
         FPU::m64r();
 
         // create clipper
@@ -1100,8 +1138,8 @@ void CRender::render_sun()
         }
         for (int e = 0; e < 8; e++)
         {
-            pt = wform(x_full_inverse, corners[e]);  // world space
-            pt = wform(xform, pt);                   // trapezoid space
+            pt = wform(x_full_inverse, corners[e]); // world space
+            pt = wform(xform, pt); // trapezoid space
             b_receivers.modify(pt);
         }
 
@@ -1111,12 +1149,18 @@ void CRender::render_sun()
 
         // because caster points are from coarse representation only allow to "shrink" box, not grow
         // that is the same as if we first clip casters by frustum
-        if (b_receivers.min.x < -1) b_receivers.min.x = -1;
-        if (b_receivers.min.y < -1) b_receivers.min.y = -1;
-        if (b_casters.min.z < 0) b_casters.min.z = 0;
-        if (b_receivers.max.x > +1) b_receivers.max.x = +1;
-        if (b_receivers.max.y > +1) b_receivers.max.y = +1;
-        if (b_casters.max.z > +1) b_casters.max.z = +1;
+        if (b_receivers.min.x < -1)
+            b_receivers.min.x = -1;
+        if (b_receivers.min.y < -1)
+            b_receivers.min.y = -1;
+        if (b_casters.min.z < 0)
+            b_casters.min.z = 0;
+        if (b_receivers.max.x > +1)
+            b_receivers.max.x = +1;
+        if (b_receivers.max.y > +1)
+            b_receivers.max.y = +1;
+        if (b_casters.max.z > +1)
+            b_casters.max.z = +1;
 
         // refit?
         /*
@@ -1149,18 +1193,20 @@ void CRender::render_sun()
     {
         bool bNormal = mapNormalPasses[0][0].size() || mapMatrixPasses[0][0].size();
         bool bSpecial = mapNormalPasses[1][0].size() || mapMatrixPasses[1][0].size() || mapSorted.size();
-        if (bNormal || bSpecial) {
+        if (bNormal || bSpecial)
+        {
             Target->phase_smap_direct(fuckingsun, SE_SUN_FAR);
             RCache.set_xform_world(Fidentity);
             RCache.set_xform_view(Fidentity);
             RCache.set_xform_project(fuckingsun->X.D.combine);
             r_dsgraph_render_graph(0);
             fuckingsun->X.D.transluent = FALSE;
-            if (bSpecial) {
+            if (bSpecial)
+            {
                 fuckingsun->X.D.transluent = TRUE;
                 Target->phase_smap_direct_tsh(fuckingsun, SE_SUN_FAR);
-                r_dsgraph_render_graph(1);  // normal level, secondary priority
-                r_dsgraph_render_sorted();  // strict-sorted geoms
+                r_dsgraph_render_graph(1); // normal level, secondary priority
+                r_dsgraph_render_sorted(); // strict-sorted geoms
             }
         }
     }
@@ -1241,7 +1287,8 @@ void CRender::render_sun_near()
             CSector* S = (CSector*)Sectors[s];
             dxRender_Visual* V = S->root();
             float vol = V->vis.box.getvolume();
-            if (vol > largest_sector_vol) {
+            if (vol > largest_sector_vol)
+            {
                 largest_sector_vol = vol;
                 largest_sector = S;
             }
@@ -1263,7 +1310,8 @@ void CRender::render_sun_near()
         L_pos.set(fuckingsun->position);
         L_dir.set(fuckingsun->direction).normalize();
         L_right.set(1, 0, 0);
-        if (_abs(L_right.dotproduct(L_dir)) > .99f) L_right.set(0, 0, 1);
+        if (_abs(L_right.dotproduct(L_dir)) > .99f)
+            L_right.set(0, 0, 1);
         L_up.crossproduct(L_dir, L_right).normalize();
         L_right.crossproduct(L_up, L_dir).normalize();
         mdir_View.build_camera_dir(L_pos, L_dir, L_up);
@@ -1372,26 +1420,29 @@ void CRender::render_sun_near()
     r_dsgraph_render_subspace(cull_sector, &cull_frustum, cull_xform, cull_COP, TRUE);
 
     // Finalize & Cleanup
-    fuckingsun->X.D.combine = cull_xform;  //*((Fmatrix*)&m_LightViewProj);
+    fuckingsun->X.D.combine = cull_xform; //*((Fmatrix*)&m_LightViewProj);
 
     // Render shadow-map
     //. !!! We should clip based on shrinked frustum (again)
     {
         bool bNormal = mapNormalPasses[0][0].size() || mapMatrixPasses[0][0].size();
         bool bSpecial = mapNormalPasses[1][0].size() || mapMatrixPasses[1][0].size() || mapSorted.size();
-        if (bNormal || bSpecial) {
+        if (bNormal || bSpecial)
+        {
             Target->phase_smap_direct(fuckingsun, SE_SUN_NEAR);
             RCache.set_xform_world(Fidentity);
             RCache.set_xform_view(Fidentity);
             RCache.set_xform_project(fuckingsun->X.D.combine);
             r_dsgraph_render_graph(0);
-            if (ps_r2_ls_flags.test(R2FLAG_SUN_DETAILS)) Details->Render();
+            if (ps_r2_ls_flags.test(R2FLAG_SUN_DETAILS))
+                Details->Render();
             fuckingsun->X.D.transluent = FALSE;
-            if (bSpecial) {
+            if (bSpecial)
+            {
                 fuckingsun->X.D.transluent = TRUE;
                 Target->phase_smap_direct_tsh(fuckingsun, SE_SUN_NEAR);
-                r_dsgraph_render_graph(1);  // normal level, secondary priority
-                r_dsgraph_render_sorted();  // strict-sorted geoms
+                r_dsgraph_render_graph(1); // normal level, secondary priority
+                r_dsgraph_render_sorted(); // strict-sorted geoms
             }
         }
     }
@@ -1414,7 +1465,8 @@ void CRender::render_sun_near()
 
 void CRender::render_sun_filtered()
 {
-    if (!RImplementation.o.sunfilter) return;
+    if (!RImplementation.o.sunfilter)
+        return;
     Target->phase_accumulator();
     Target->accum_direct(SE_SUN_LUMINANCE);
 }
@@ -1448,12 +1500,14 @@ void CRender::render_sun_cascades()
 {
     bool b_need_to_render_sunshafts = RImplementation.Target->need_to_render_sunshafts();
     bool last_cascade_chain_mode = m_sun_cascades.back().reset_chain;
-    if (b_need_to_render_sunshafts) m_sun_cascades[m_sun_cascades.size() - 1].reset_chain = true;
+    if (b_need_to_render_sunshafts)
+        m_sun_cascades[m_sun_cascades.size() - 1].reset_chain = true;
 
     for (u32 i = 0; i < m_sun_cascades.size(); ++i)
         render_sun_cascade(i);
 
-    if (b_need_to_render_sunshafts) m_sun_cascades[m_sun_cascades.size() - 1].reset_chain = last_cascade_chain_mode;
+    if (b_need_to_render_sunshafts)
+        m_sun_cascades[m_sun_cascades.size() - 1].reset_chain = last_cascade_chain_mode;
 }
 
 void CRender::render_sun_cascade(u32 cascade_ind)
@@ -1495,7 +1549,8 @@ void CRender::render_sun_cascade(u32 cascade_ind)
             CSector* S = (CSector*)Sectors[s];
             dxRender_Visual* V = S->root();
             float vol = V->vis.box.getvolume();
-            if (vol > largest_sector_vol) {
+            if (vol > largest_sector_vol)
+            {
                 largest_sector_vol = vol;
                 largest_sector = S;
             }
@@ -1512,7 +1567,8 @@ void CRender::render_sun_cascade(u32 cascade_ind)
         L_pos.set(fuckingsun->position);
         L_dir.set(fuckingsun->direction).normalize();
         L_right.set(1, 0, 0);
-        if (_abs(L_right.dotproduct(L_dir)) > .99f) L_right.set(0, 0, 1);
+        if (_abs(L_right.dotproduct(L_dir)) > .99f)
+            L_right.set(0, 0, 1);
         L_up.crossproduct(L_dir, L_right).normalize();
         L_right.crossproduct(L_up, L_dir).normalize();
         mdir_View.build_camera_dir(L_pos, L_dir, L_up);
@@ -1527,7 +1583,8 @@ void CRender::render_sun_cascade(u32 cascade_ind)
         t_cuboid light_cuboid;
         {
             // Initialize the first cascade rays, then each cascade will initialize rays for next one.
-            if (cascade_ind == 0 || m_sun_cascades[cascade_ind].reset_chain) {
+            if (cascade_ind == 0 || m_sun_cascades[cascade_ind].reset_chain)
+            {
                 Fvector3 near_p, edge_vec;
                 for (int p = 0; p < 4; p++)
                 {
@@ -1690,19 +1747,22 @@ void CRender::render_sun_cascade(u32 cascade_ind)
     {
         bool bNormal = mapNormalPasses[0][0].size() || mapMatrixPasses[0][0].size();
         bool bSpecial = mapNormalPasses[1][0].size() || mapMatrixPasses[1][0].size() || mapSorted.size();
-        if (bNormal || bSpecial) {
+        if (bNormal || bSpecial)
+        {
             Target->phase_smap_direct(fuckingsun, SE_SUN_FAR);
             RCache.set_xform_world(Fidentity);
             RCache.set_xform_view(Fidentity);
             RCache.set_xform_project(fuckingsun->X.D.combine);
             r_dsgraph_render_graph(0);
-            if (ps_r2_ls_flags.test(R2FLAG_SUN_DETAILS)) Details->Render();
+            if (ps_r2_ls_flags.test(R2FLAG_SUN_DETAILS))
+                Details->Render();
             fuckingsun->X.D.transluent = FALSE;
-            if (bSpecial) {
+            if (bSpecial)
+            {
                 fuckingsun->X.D.transluent = TRUE;
                 Target->phase_smap_direct_tsh(fuckingsun, SE_SUN_FAR);
-                r_dsgraph_render_graph(1);  // normal level, secondary priority
-                r_dsgraph_render_sorted();  // strict-sorted geoms
+                r_dsgraph_render_graph(1); // normal level, secondary priority
+                r_dsgraph_render_sorted(); // strict-sorted geoms
             }
         }
     }

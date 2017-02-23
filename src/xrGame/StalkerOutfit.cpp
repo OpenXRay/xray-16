@@ -3,14 +3,8 @@
 #include "ActorHelmet.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
-CStalkerOutfit::CStalkerOutfit()
-{
-}
-
-CStalkerOutfit::~CStalkerOutfit()
-{
-}
-
+CStalkerOutfit::CStalkerOutfit() {}
+CStalkerOutfit::~CStalkerOutfit() {}
 using namespace luabind;
 
 SCRIPT_EXPORT(CStalkerOutfit, (CGameObject), {

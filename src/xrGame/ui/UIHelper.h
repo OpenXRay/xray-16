@@ -41,6 +41,6 @@ public:
     static CUIDragDropListEx* CreateDragDropListEx(CUIXml& xml, LPCSTR ui_path, CUIWindow* parent);
     static CUIDragDropReferenceList* CreateDragDropReferenceList(CUIXml& xml, LPCSTR ui_path, CUIWindow* parent);
 
-};  // class UIHelper
+}; // class UIHelper
 
-#endif  // UI_HELPER_H_INCLUDED
+#endif // UI_HELPER_H_INCLUDED

@@ -23,11 +23,7 @@ ALife::EMeetActionType CSE_ALifeSmartZone::tfGetActionType(
     return ((object->m_tGraphID == m_tGraphID) ? ALife::eMeetActionSmartTerrain : ALife::eMeetActionTypeIgnore);
 }
 
-bool CSE_ALifeSmartZone::bfActive()
-{
-    return (true);
-}
-
+bool CSE_ALifeSmartZone::bfActive() { return (true); }
 CSE_ALifeDynamicObject* CSE_ALifeSmartZone::tpfGetBestDetector()
 {
     VERIFY2(false, "This function shouldn't be called");

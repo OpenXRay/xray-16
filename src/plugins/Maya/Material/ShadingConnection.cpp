@@ -19,7 +19,8 @@ ShadingConnection::ShadingConnection(MObject shaderObj, MString shapeName, MStri
     // By default, the connection is direct until proven otherwise.
     this->m_directConnection = true;
 
-    if (attribute != "") traverseAttribute(attribute);
+    if (attribute != "")
+        traverseAttribute(attribute);
 }
 
 ShadingConnection::TYPE ShadingConnection::traverseAttribute(MString attributeName)
@@ -45,7 +46,8 @@ ShadingConnection::TYPE ShadingConnection::analyzePlug(MPlug plug)
     plug.connectedTo(connectedElements, true, false, &status);
     assert(status);
 
-    if (connectedElements.length() == 0) {
+    if (connectedElements.length() == 0)
+    {
         // It's a constant color... set it now and return.
         unsigned int numChildren = plug.numChildren();
         assert(numChildren == 3);
@@ -63,7 +65,8 @@ ShadingConnection::TYPE ShadingConnection::analyzePlug(MPlug plug)
     assert(status);
 
     // If this is a triple shading switch, go through it.
-    if (connectedObject.hasFn(MFn::kTripleShadingSwitch)) {
+    if (connectedObject.hasFn(MFn::kTripleShadingSwitch))
+    {
         return traverseTripleShadingSwitch(connectedObject);
     }
 
@@ -89,7 +92,7 @@ ShadingConnection::TYPE ShadingConnection::traverseTripleShadingSwitch(MObject c
     // This assumption should always be safe, unless some drastic changes occured in the
     // implementation of the shading switches... in which case this code won't work, so
     // we would throw an exception.
-    assert(numChildren >= 2);  // "Abnormal hierarchy in switching node."
+    assert(numChildren >= 2); // "Abnormal hierarchy in switching node."
 
     // Go through each row of the switch table.
     for (unsigned int index = 0; index < numElements; index++)
@@ -110,7 +113,8 @@ ShadingConnection::TYPE ShadingConnection::traverseTripleShadingSwitch(MObject c
             MFnDependencyNode inShape(inShapeObj);
             MString inShapeName = inShape.name();
 
-            if (inShapeName == m_shapeName) return analyzePlug(inTexturePlug);
+            if (inShapeName == m_shapeName)
+                return analyzePlug(inTexturePlug);
         }
     }
 
@@ -119,11 +123,7 @@ ShadingConnection::TYPE ShadingConnection::traverseTripleShadingSwitch(MObject c
     return analyzePlug(defaultPlug);
 }
 
-ShadingConnection::TYPE ShadingConnection::type()
-{
-    return m_type;
-}
-
+ShadingConnection::TYPE ShadingConnection::type() { return m_type; }
 MColor ShadingConnection::constantColor()
 {
     assert(m_type == CONSTANT_COLOR);
@@ -136,11 +136,7 @@ MObject ShadingConnection::texture()
     return m_texture;
 }
 
-MObject ShadingConnection::shaderObj()
-{
-    return m_shaderObj;
-}
-
+MObject ShadingConnection::shaderObj() { return m_shaderObj; }
 MString ShadingConnection::shaderName()
 {
     MStatus stat;
@@ -149,16 +145,8 @@ MString ShadingConnection::shaderName()
     return shaderNode.name();
 }
 
-MString ShadingConnection::attributeName()
-{
-    return m_attributeName;
-}
-
-MString ShadingConnection::shapeName()
-{
-    return m_shapeName;
-}
-
+MString ShadingConnection::attributeName() { return m_attributeName; }
+MString ShadingConnection::shapeName() { return m_shapeName; }
 ShadingConnection::TYPE ShadingConnection::setConstantColor(MColor col)
 {
     m_constantColor = col;
@@ -181,7 +169,4 @@ ShadingConnection::TYPE ShadingConnection::setTexture(MObject texture)
     return m_type;
 }
 
-bool ShadingConnection::isDirectConnection()
-{
-    return m_directConnection;
-}
+bool ShadingConnection::isDirectConnection() { return m_directConnection; }

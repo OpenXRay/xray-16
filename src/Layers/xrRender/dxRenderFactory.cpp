@@ -13,7 +13,7 @@
 #include "dxLensFlareRender.h"
 #include "dxEnvironmentRender.h"
 #include "dxObjectSpaceRender.h"
-#endif  // _EDITOR
+#endif // _EDITOR
 
 #include "dxFontRender.h"
 #include "dxApplicationRender.h"
@@ -23,19 +23,11 @@
 
 dxRenderFactory RenderFactoryImpl;
 
-#define RENDER_FACTORY_IMPLEMENT(Class)                                                                                \
-    I##Class* dxRenderFactory::Create##Class()                                                                         \
-    \
-{                                                                                                               \
-        return new dx##Class();                                                                                        \
-    \
-}                                                                                                               \
-    void dxRenderFactory::Destroy##Class(I##Class* pObject)                                                            \
-    \
-{                                                                                                               \
-        xr_delete((dx##Class*&)pObject);                                                                               \
-    \
-}
+#define RENDER_FACTORY_IMPLEMENT(Class)\
+    I##Class* dxRenderFactory::Create##Class()\
+    { return new dx##Class(); }\
+    void dxRenderFactory::Destroy##Class(I##Class* pObject)\
+    { xr_delete((dx##Class*&)pObject); }
 
 #ifndef _EDITOR
 RENDER_FACTORY_IMPLEMENT(UISequenceVideoItem)
@@ -44,10 +36,10 @@ RENDER_FACTORY_IMPLEMENT(StatGraphRender)
 RENDER_FACTORY_IMPLEMENT(ConsoleRender)
 #ifdef DEBUG
 RENDER_FACTORY_IMPLEMENT(ObjectSpaceRender)
-#endif  // DEBUG
+#endif // DEBUG
 RENDER_FACTORY_IMPLEMENT(ApplicationRender)
 RENDER_FACTORY_IMPLEMENT(WallMarkArray)
-#endif  // _EDITOR
+#endif // _EDITOR
 
 #ifndef _EDITOR
 RENDER_FACTORY_IMPLEMENT(ThunderboltRender)

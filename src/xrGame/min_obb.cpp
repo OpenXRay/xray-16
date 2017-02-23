@@ -6,7 +6,6 @@ class PointArray
 {
 public:
     PointArray(int iQuantity, const Fvector* akPoint) : m_akPoint(akPoint) { m_iQuantity = iQuantity; }
-
     int m_iQuantity;
     const Fvector* m_akPoint;
 };
@@ -49,7 +48,7 @@ static Fvector GetColumn(Fmatrix& self, const u32& index)
     }
 #ifdef DEBUG
     return (Fvector().set(flt_max, flt_max, flt_max));
-#endif  // DEBUG
+#endif // DEBUG
 }
 
 //----------------------------------------------------------------------------
@@ -166,7 +165,8 @@ MagicBox3 MagicMinBox(int iQuantity, const Fvector* akPoint)
             {
                 afAngle[2] = afA0[2] + i2 * (afA1[2] - afA0[2]) / iMax;
                 float fVolume = Volume(afAngle, &kPA);
-                if (fVolume < fMinVolume) {
+                if (fVolume < fMinVolume)
+                {
                     fMinVolume = fVolume;
                     afAInitial[0] = afAngle[0];
                     afAInitial[1] = afAngle[1];

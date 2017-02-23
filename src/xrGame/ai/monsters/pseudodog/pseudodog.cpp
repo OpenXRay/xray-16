@@ -33,11 +33,7 @@ IFactoryObject* CAI_PseudoDog::_construct()
     return (this);
 }
 
-CAI_PseudoDog::~CAI_PseudoDog()
-{
-    xr_delete(StateMan);
-}
-
+CAI_PseudoDog::~CAI_PseudoDog() { xr_delete(StateMan); }
 void CAI_PseudoDog::reinit()
 {
     inherited::reinit();
@@ -45,7 +41,8 @@ void CAI_PseudoDog::reinit()
     m_time_became_angry = 0;
     time_growling = 0;
 
-    if (CCustomMonster::use_simplified_visual()) return;
+    if (CCustomMonster::use_simplified_visual())
+        return;
     com_man().add_rotation_jump_data("1", "2", "3", "4", deg(90));
 }
 
@@ -139,7 +136,8 @@ void CAI_PseudoDog::reload(LPCSTR section)
 {
     inherited::reload(section);
 
-    if (CCustomMonster::use_simplified_visual()) return;
+    if (CCustomMonster::use_simplified_visual())
+        return;
 
     // load additional sounds
     sound().add(pSettings->r_string(section, "sound_psy_attack"), DEFAULT_SAMPLE_COUNT, SOUND_TYPE_MONSTER_ATTACKING,
@@ -152,11 +150,13 @@ void CAI_PseudoDog::reload(LPCSTR section)
 
 void CAI_PseudoDog::CheckSpecParams(u32 spec_params)
 {
-    if ((spec_params & ASP_PSI_ATTACK) == ASP_PSI_ATTACK) {
+    if ((spec_params & ASP_PSI_ATTACK) == ASP_PSI_ATTACK)
+    {
         com_man().seq_run(anim().get_motion_id(eAnimAttackPsi));
     }
 
-    if ((spec_params & ASP_THREATEN) == ASP_THREATEN) {
+    if ((spec_params & ASP_THREATEN) == ASP_THREATEN)
+    {
         anim().SetCurAnim(eAnimThreaten);
     }
 }
@@ -168,12 +168,7 @@ void CAI_PseudoDog::HitEntityInJump(const CEntity* pEntity)
 }
 
 #ifdef _DEBUG
-void CAI_PseudoDog::debug_on_key(int key)
-{
-}
+void CAI_PseudoDog::debug_on_key(int key) {}
 #endif
 
-IStateManagerBase* CAI_PseudoDog::create_state_manager()
-{
-    return new CStateManagerPseudodog(this);
-}
+IStateManagerBase* CAI_PseudoDog::create_state_manager() { return new CStateManagerPseudodog(this); }

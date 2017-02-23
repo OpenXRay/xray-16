@@ -20,10 +20,7 @@ CSHGameMtlTools::CSHGameMtlTools(ISHInit& init) : ISHTools(init)
     m_GameMtlPairTools = 0;
 }
 
-CSHGameMtlTools::~CSHGameMtlTools()
-{
-}
-
+CSHGameMtlTools::~CSHGameMtlTools() {}
 //---------------------------------------------------------------------------
 
 void CSHGameMtlTools::OnActivate()
@@ -36,16 +33,8 @@ void CSHGameMtlTools::OnActivate()
     inherited::OnActivate();
 }
 
-void CSHGameMtlTools::OnDeactivate()
-{
-    inherited::OnDeactivate();
-}
-
-void CSHGameMtlTools::OnFrame()
-{
-    inherited::OnFrame();
-}
-
+void CSHGameMtlTools::OnDeactivate() { inherited::OnDeactivate(); }
+void CSHGameMtlTools::OnFrame() { inherited::OnFrame(); }
 //---------------------------------------------------------------------------
 
 bool CSHGameMtlTools::OnCreate()
@@ -56,11 +45,7 @@ bool CSHGameMtlTools::OnCreate()
     return true;
 }
 
-void CSHGameMtlTools::OnDestroy()
-{
-    m_bModified = FALSE;
-}
-
+void CSHGameMtlTools::OnDestroy() { m_bModified = FALSE; }
 void CSHGameMtlTools::Reload()
 {
     // mtl
@@ -112,13 +97,15 @@ bool CSHGameMtlTools::Save()
 
     m_bLockUpdate = FALSE;
 
-    if (bRes) m_bModified = FALSE;
+    if (bRes)
+        m_bModified = FALSE;
     return bRes;
 }
 
 SGameMtl* CSHGameMtlTools::FindItem(LPCSTR name)
 {
-    if (name && name[0]) {
+    if (name && name[0])
+    {
         return GMLib.GetMaterial(name);
     }
     else
@@ -135,7 +122,8 @@ LPCSTR CSHGameMtlTools::AppendItem(LPCSTR folder_name, LPCSTR parent_name)
 {
     LPCSTR M = 0;
     SGameMtl* parent = FindItem(parent_name);
-    if (!parent) {
+    if (!parent)
+    {
         if (!TfrmChoseItem::SelectItem(
                 smCustom, M, 1, 0, fastdelegate::bind<TOnChooseFillItems>(this, &CSHGameMtlTools::FillChooseMtlType)) ||
             !M)
@@ -146,7 +134,8 @@ LPCSTR CSHGameMtlTools::AppendItem(LPCSTR folder_name, LPCSTR parent_name)
         pref.c_str(), 2, fastdelegate::bind<TFindObjectByName>(this, &CSHGameMtlTools::ItemExist), false, true);
     SGameMtl* S = GMLib.AppendMaterial(parent);
     S->m_Name = m_LastSelection.c_str();
-    if (!parent) S->Flags.set(SGameMtl::flDynamic, 0 == strcmp(M, "Dynamic"));
+    if (!parent)
+        S->Flags.set(SGameMtl::flDynamic, 0 == strcmp(M, "Dynamic"));
     ExecCommand(COMMAND_UPDATE_LIST);
     ExecCommand(COMMAND_UPDATE_PROPERTIES);
     Modified();
@@ -155,11 +144,13 @@ LPCSTR CSHGameMtlTools::AppendItem(LPCSTR folder_name, LPCSTR parent_name)
 
 void CSHGameMtlTools::OnRenameItem(LPCSTR old_full_name, LPCSTR new_full_name, EItemType type)
 {
-    if (type == TYPE_OBJECT) {
+    if (type == TYPE_OBJECT)
+    {
         SGameMtl* S = FindItem(old_full_name);
         R_ASSERT(S);
         S->m_Name = new_full_name;
-        if (S == m_Mtl) {
+        if (S == m_Mtl)
+        {
             ExecCommand(COMMAND_UPDATE_PROPERTIES);
             ExecCommand(COMMAND_UPDATE_LIST);
         }
@@ -168,7 +159,8 @@ void CSHGameMtlTools::OnRenameItem(LPCSTR old_full_name, LPCSTR new_full_name, E
 
 void CSHGameMtlTools::OnRemoveItem(LPCSTR name, EItemType type, bool& res)
 {
-    if (type == TYPE_OBJECT) {
+    if (type == TYPE_OBJECT)
+    {
         R_ASSERT(name && name[0]);
         GMLib.RemoveMaterial(name);
     }
@@ -177,43 +169,36 @@ void CSHGameMtlTools::OnRemoveItem(LPCSTR name, EItemType type, bool& res)
 
 void CSHGameMtlTools::SetCurrentItem(LPCSTR name, bool bView)
 {
-    if (m_bLockUpdate) return;
+    if (m_bLockUpdate)
+        return;
 
     SGameMtl* S = FindItem(name);
     // load material
-    if (m_Mtl != S) {
+    if (m_Mtl != S)
+    {
         m_Mtl = S;
         ExecCommand(COMMAND_UPDATE_PROPERTIES);
-        if (bView) ViewSetCurrentItem(name);
+        if (bView)
+            ViewSetCurrentItem(name);
     }
 }
 
-void CSHGameMtlTools::ResetCurrentItem()
-{
-    m_Mtl = 0;
-}
-
+void CSHGameMtlTools::ResetCurrentItem() { m_Mtl = 0; }
 //---------------------------------------------------------------------------
 
-void CSHGameMtlTools::RealUpdateList()
-{
-    FillItemList();
-}
-
+void CSHGameMtlTools::RealUpdateList() { FillItemList(); }
 //------------------------------------------------------------------------------
 
 void CSHGameMtlTools::RealUpdateProperties()
 {
     PropItemVec items;
-    if (m_Mtl) m_Mtl->FillProp(items, m_CurrentItem);
+    if (m_Mtl)
+        m_Mtl->FillProp(items, m_CurrentItem);
     Ext.m_ItemProps->AssignItems(items);
     Ext.m_ItemProps->SetModifiedEvent(fastdelegate::bind<TOnModifiedEvent>(this, &CSHGameMtlTools::Modified));
 }
 
 //---------------------------------------------------------------------------
 
-void CSHGameMtlTools::ApplyChanges(bool bForced)
-{
-}
-
+void CSHGameMtlTools::ApplyChanges(bool bForced) {}
 //---------------------------------------------------------------------------

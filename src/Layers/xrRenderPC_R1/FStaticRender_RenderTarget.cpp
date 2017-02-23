@@ -57,13 +57,15 @@ BOOL CRenderTarget::Create()
     // Bufferts
     RT.create(RTname, rtWidth, rtHeight, HW.Caps.fTarget);
     RT_distort.create(RTname_distort, rtWidth, rtHeight, HW.Caps.fTarget);
-    if (RImplementation.o.color_mapping) {
-        // RT_color_map.create	(RTname_color_map,	rtWidth,rtHeight,HW.Caps.fTarget);
+    if (RImplementation.o.color_mapping)
+    {
+        // RT_color_map.create  (RTname_color_map,  rtWidth,rtHeight,HW.Caps.fTarget);
         RT_color_map.create(RTname_color_map, curWidth, curHeight, HW.Caps.fTarget);
     }
     // RImplementation.o.color_mapping = RT_color_map->valid();
 
-    if ((rtHeight != Device.dwHeight) || (rtWidth != Device.dwWidth)) {
+    if ((rtHeight != Device.dwHeight) || (rtWidth != Device.dwWidth))
+    {
         R_CHK(HW.pDevice->CreateDepthStencilSurface(
             rtWidth, rtHeight, HW.Caps.fDepth, D3DMULTISAMPLE_NONE, 0, TRUE, &ZB, NULL));
     }
@@ -77,18 +79,22 @@ BOOL CRenderTarget::Create()
     R_CHK(
         HW.pDevice->CreateDepthStencilSurface(512, 512, HW.Caps.fDepth, D3DMULTISAMPLE_NONE, 0, TRUE, &pTempZB, NULL));
 
-    //	Igor: TMP
-    //	Create an RT for online screenshot makining
-    // u32		w = Device.dwWidth, h = Device.dwHeight;
-    // HW.pDevice->CreateOffscreenPlainSurface(Device.dwWidth,Device.dwHeight,D3DFMT_A8R8G8B8,D3DPOOL_SYSTEMMEM,&pFB,NULL);
+    // Igor: TMP
+    // Create an RT for online screenshot makining
+    //u32 w = Device.dwWidth, h = Device.dwHeight;
+    //HW.pDevice->CreateOffscreenPlainSurface(
+    // Device.dwWidth, Device.dwHeight, D3DFMT_A8R8G8B8, D3DPOOL_SYSTEMMEM, &pFB, NULL);
     HW.pDevice->CreateOffscreenPlainSurface(rtWidth, rtHeight, HW.Caps.fTarget, D3DPOOL_SYSTEMMEM, &pFB, NULL);
 
     // Shaders and stream
     s_postprocess[0].create("postprocess");
-    if (RImplementation.o.distortion) s_postprocess_D[0].create("postprocess_d");
-    if (RImplementation.o.color_mapping) {
+    if (RImplementation.o.distortion)
+        s_postprocess_D[0].create("postprocess_d");
+    if (RImplementation.o.color_mapping)
+    {
         s_postprocess[1].create("postprocess_cm");
-        if (RImplementation.o.distortion) s_postprocess_D[1].create("postprocess_dcm");
+        if (RImplementation.o.distortion)
+            s_postprocess_D[1].create("postprocess_dcm");
     }
     g_postprocess.create(
         D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_SPECULAR | D3DFVF_TEX3, RCache.Vertex.Buffer(), RCache.QuadIB);
@@ -112,18 +118,19 @@ CRenderTarget::~CRenderTarget()
 
 void CRenderTarget::calc_tc_noise(Fvector2& p0, Fvector2& p1)
 {
-    //.	CTexture*	T					= RCache.get_ActiveTexture	(2);
-    //.	VERIFY2		(T, "Texture #3 in noise shader should be setted up");
-    //.	u32			tw					= iCeil(float(T->get_Width	())*param_noise_scale+EPS_S);
-    //.	u32			th					= iCeil(float(T->get_Height ())*param_noise_scale+EPS_S);
+    //. CTexture*   T                   = RCache.get_ActiveTexture  (2);
+    //. VERIFY2     (T, "Texture #3 in noise shader should be setted up");
+    //. u32         tw                  = iCeil(float(T->get_Width  ())*param_noise_scale+EPS_S);
+    //. u32         th                  = iCeil(float(T->get_Height ())*param_noise_scale+EPS_S);
     u32 tw = iCeil(256 * param_noise_scale + EPS_S);
     u32 th = iCeil(256 * param_noise_scale + EPS_S);
     VERIFY2(tw && th, "Noise scale can't be zero in any way");
-    //.	if (bDebug)	Msg			("%d,%d,%f",tw,th,param_noise_scale);
+    //. if (bDebug) Msg         ("%d,%d,%f",tw,th,param_noise_scale);
 
     // calculate shift from FPSes
     im_noise_time -= Device.fTimeDelta;
-    if (im_noise_time < 0) {
+    if (im_noise_time < 0)
+    {
         im_noise_shift_w = ::Random.randI(tw ? tw : 1);
         im_noise_shift_h = ::Random.randI(th ? th : 1);
         float fps_time = 1 / param_noise_fps;
@@ -151,7 +158,8 @@ void CRenderTarget::calc_tc_duality_ss(Fvector2& r0, Fvector2& r1, Fvector2& l0,
     // Calculate ordinaty TCs from blur and SS
     float tw = float(rtWidth);
     float th = float(rtHeight);
-    if (rtHeight != Device.dwHeight) param_blur = 1.f;
+    if (rtHeight != Device.dwHeight)
+        param_blur = 1.f;
     Fvector2 shift, p0, p1;
     shift.set(.5f / tw, .5f / th);
     shift.mul(param_blur);
@@ -192,18 +200,20 @@ BOOL CRenderTarget::NeedPostProcess()
         _g = _abs(_g - int(0x7f));
         int _b = color_get_B(param_color_base);
         _b = _abs(_b - int(0x7f));
-        if (_r > 2 || _g > 2 || _b > 2) _cbase = true;
+        if (_r > 2 || _g > 2 || _b > 2)
+            _cbase = true;
     }
     bool _cadd = false;
     {
-        // int		_r	= color_get_R(param_color_add)	;
-        // int		_g	= color_get_G(param_color_add)	;
-        // int		_b	= color_get_B(param_color_add)	;
-        // if (_r>2 || _g>2 || _b>2)	_cadd	= true	;
+        // int      _r  = color_get_R(param_color_add)  ;
+        // int      _g  = color_get_G(param_color_add)  ;
+        // int      _b  = color_get_B(param_color_add)  ;
+        // if (_r>2 || _g>2 || _b>2)    _cadd   = true  ;
         int _r = _abs((int)(param_color_add.x * 255));
         int _g = _abs((int)(param_color_add.y * 255));
         int _b = _abs((int)(param_color_add.z * 255));
-        if (_r > 2 || _g > 2 || _b > 2) _cadd = true;
+        if (_r > 2 || _g > 2 || _b > 2)
+            _cadd = true;
     }
     return _blur || _gray || _noise || _dual || _cbase || _cadd || _cmap || _menu_pp;
 }
@@ -222,22 +232,23 @@ void CRenderTarget::Begin()
     /*
     if (g_pGameLevel->IR_GetKeyState(DIK_LSHIFT))
     {
-        Msg					("[%5d]------------------------",Device.dwFrame);
-        SHOW				(param_blur)
-        SHOW				(param_gray)
-        SHOW				(param_duality_h)
-        SHOW				(param_duality_v)
-        SHOW				(param_noise)
-        SHOW				(param_noise_scale)
-        SHOW				(param_noise_fps)
+        Msg                 ("[%5d]------------------------",Device.dwFrame);
+        SHOW                (param_blur)
+        SHOW                (param_gray)
+        SHOW                (param_duality_h)
+        SHOW                (param_duality_v)
+        SHOW                (param_noise)
+        SHOW                (param_noise_scale)
+        SHOW                (param_noise_fps)
 
-        SHOWX				(param_color_base)
-        SHOWX				(param_color_gray)
-        SHOWX				(param_color_add)
+        SHOWX               (param_color_base)
+        SHOWX               (param_color_gray)
+        SHOWX               (param_color_add)
     }
     */
 
-    if (!Perform()) {
+    if (!Perform())
+    {
         // Base RT
         RCache.set_RT(HW.pBaseRT);
         RCache.set_ZB(HW.pBaseZB);
@@ -274,18 +285,19 @@ struct TL_2c3uv
 
 void CRenderTarget::DoAsyncScreenshot()
 {
-    //	Igor: screenshot will not have postprocess applied.
-    //	TODO: fox that later
-    if (RImplementation.m_bMakeAsyncSS) {
+    //  Igor: screenshot will not have postprocess applied.
+    //  TODO: fox that later
+    if (RImplementation.m_bMakeAsyncSS)
+    {
         HRESULT hr;
 
         IDirect3DSurface9* pFBSrc = HW.pBaseRT;
-        //	Don't addref, no need to release.
+        //  Don't addref, no need to release.
         // ID3DTexture2D *pTex = RT->pSurface;
 
         // hr = pTex->GetSurfaceLevel(0, &pFBSrc);
 
-        //	SHould be async function
+        //  SHould be async function
         hr = HW.pDevice->GetRenderTargetData(pFBSrc, pFB);
 
         // pFBSrc->Release();
@@ -296,15 +308,18 @@ void CRenderTarget::DoAsyncScreenshot()
 
 void CRenderTarget::End()
 {
-    if (g_pGamePersistent) g_pGamePersistent->OnRenderPPUI_main();  // PP-UI
+    if (g_pGamePersistent)
+        g_pGamePersistent->OnRenderPPUI_main(); // PP-UI
 
     // find if distortion is needed at all
     BOOL bPerform = Perform();
     BOOL bDistort = RImplementation.o.distortion;
     BOOL bCMap = NeedColorMapping();
     bool _menu_pp = g_pGamePersistent ? g_pGamePersistent->OnRenderPPUI_query() : false;
-    if ((0 == RImplementation.mapDistort.size()) && !_menu_pp) bDistort = FALSE;
-    if (bDistort) phase_distortion();
+    if ((0 == RImplementation.mapDistort.size()) && !_menu_pp)
+        bDistort = FALSE;
+    if (bDistort)
+        phase_distortion();
 
     // combination/postprocess
     RCache.set_RT(HW.pBaseRT);
@@ -312,18 +327,19 @@ void CRenderTarget::End()
     curWidth = Device.dwWidth;
     curHeight = Device.dwHeight;
 
-    if (!bPerform) return;
+    if (!bPerform)
+        return;
 
     int gblend = clampr(iFloor((1 - param_gray) * 255.f), 0, 255);
     int nblend = clampr(iFloor((1 - param_noise) * 255.f), 0, 255);
     u32 p_color = subst_alpha(param_color_base, nblend);
     u32 p_gray = subst_alpha(param_color_gray, gblend);
     Fvector p_brightness = param_color_add;
-    // Msg				("param_gray:%f(%d),param_noise:%f(%d)",param_gray,gblend,param_noise,nblend);
-    // Msg				("base: %d,%d,%d",	color_get_R(p_color),		color_get_G(p_color),
+    // Msg              ("param_gray:%f(%d),param_noise:%f(%d)",param_gray,gblend,param_noise,nblend);
+    // Msg              ("base: %d,%d,%d",  color_get_R(p_color),       color_get_G(p_color),
     // color_get_B(p_color));
-    // Msg				("gray: %d,%d,%d",	color_get_R(p_gray),		color_get_G(p_gray), color_get_B(p_gray));
-    // Msg				("add:  %d,%d,%d",	color_get_R(p_brightness),	color_get_G(p_brightness),
+    // Msg              ("gray: %d,%d,%d",  color_get_R(p_gray),        color_get_G(p_gray), color_get_B(p_gray));
+    // Msg              ("add:  %d,%d,%d",  color_get_R(p_brightness),  color_get_G(p_brightness),
     // color_get_B(p_brightness));
 
     // Draw full-screen quad textured with our scene image
@@ -349,10 +365,11 @@ void CRenderTarget::End()
     RCache.Vertex.Unlock(4, g_postprocess.stride());
 
     static shared_str s_colormap = "c_colormap";
-    if (bCMap) {
+    if (bCMap)
+    {
         RCache.set_RT(RT_color_map->pRT);
 
-        //	Prepare colormapped buffer
+        //  Prepare colormapped buffer
         RCache.set_Element(bDistort ? s_postprocess_D[1]->E[4] : s_postprocess[1]->E[4]);
         RCache.set_Geometry(g_postprocess);
         RCache.set_c(s_colormap, param_color_map_influence, param_color_map_interpolate, 0, 0);
@@ -362,14 +379,14 @@ void CRenderTarget::End()
         // return;
     }
 
-    //	Element 0 for for normal post-process
-    //	Element 4 for color map post-process
-    // int iShaderElement	= bCMap ? 4 : 0;
-    // RCache.set_Element	(bDistort ? s_postprocess_D->E[iShaderElement] : s_postprocess->E[iShaderElement]);
+    //  Element 0 for for normal post-process
+    //  Element 4 for color map post-process
+    // int iShaderElement   = bCMap ? 4 : 0;
+    // RCache.set_Element   (bDistort ? s_postprocess_D->E[iShaderElement] : s_postprocess->E[iShaderElement]);
 
     RCache.set_Shader(bDistort ? s_postprocess_D[bCMap] : s_postprocess[bCMap]);
 
-    // RCache.set_Shader	(bDistort ? s_postprocess_D : s_postprocess);
+    // RCache.set_Shader    (bDistort ? s_postprocess_D : s_postprocess);
 
     // Actual rendering
     static shared_str s_brightness = "c_brightness";
@@ -393,5 +410,6 @@ void CRenderTarget::phase_distortion()
     else
         RImplementation.mapDistort.clear();
 
-    if (g_pGamePersistent) g_pGamePersistent->OnRenderPPUI_PP();  // PP-UI
+    if (g_pGamePersistent)
+        g_pGamePersistent->OnRenderPPUI_PP(); // PP-UI
 }

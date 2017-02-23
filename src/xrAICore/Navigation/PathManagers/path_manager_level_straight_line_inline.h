@@ -8,7 +8,7 @@
 
 #pragma once
 
-#define TEMPLATE_SPECIALIZATION                                                                                        \
+#define TEMPLATE_SPECIALIZATION \
     template <typename _DataStorage, typename _dist_type, typename _index_type, typename _iteration_type>
 
 #define CLevelStraightLinePathManager                                                                                  \
@@ -17,10 +17,7 @@
 >
 
 TEMPLATE_SPECIALIZATION
-CLevelStraightLinePathManager::~CPathManager()
-{
-}
-
+CLevelStraightLinePathManager::~CPathManager() {}
 TEMPLATE_SPECIALIZATION
 IC void CLevelStraightLinePathManager::setup(const _Graph* _graph, _DataStorage* _data_storage,
     xr_vector<_index_type>* _path, const _index_type& _start_node_index, const _index_type& _goal_node_index,
@@ -51,8 +48,10 @@ IC void CLevelStraightLinePathManager::create_path(T& vertex)
             fDirectDistance = tPosition.distance_to(graph->vertex_position(*I));
         else
             fDirectDistance = m_parameters->max_range;
-        if (fDirectDistance == m_parameters->max_range) {
-            if (fLastDirectDistance == 0) {
+        if (fDirectDistance == m_parameters->max_range)
+        {
+            if (fLastDirectDistance == 0)
+            {
                 fCumulativeDistance += graph->distance(dwNode, *I);
                 dwNode = *I;
             }
@@ -66,7 +65,8 @@ IC void CLevelStraightLinePathManager::create_path(T& vertex)
         }
         else
             fLastDirectDistance = fDirectDistance;
-        if (fCumulativeDistance + fLastDirectDistance >= m_parameters->max_range) {
+        if (fCumulativeDistance + fLastDirectDistance >= m_parameters->max_range)
+        {
             m_parameters->m_distance = m_parameters->max_range;
             return;
         }
@@ -78,8 +78,7 @@ IC void CLevelStraightLinePathManager::create_path(T& vertex)
     else
         fDirectDistance = m_parameters->max_range;
     if (fDirectDistance == m_parameters->max_range)
-        m_parameters->m_distance =
-            fCumulativeDistance + fLastDirectDistance +
+        m_parameters->m_distance = fCumulativeDistance + fLastDirectDistance +
             m_parameters->m_dest_point.distance_to(graph->vertex_position((*path)[path->size() - 1]));
     else
         m_parameters->m_distance = fCumulativeDistance + fDirectDistance;

@@ -10,11 +10,7 @@ UITeamPanels::UITeamPanels()
     need_update_panels = false;
 }
 
-UITeamPanels::~UITeamPanels()
-{
-    CUIStatsIcon::FreeTexInfo();
-}
-
+UITeamPanels::~UITeamPanels() { CUIStatsIcon::FreeTexInfo(); }
 #define TEAM_NODE_NAME "team"
 #define FRAME_NODE_NAME "frame"
 
@@ -39,9 +35,11 @@ void UITeamPanels::InitAllFrames(shared_str const& frame_node)
     for (int i = 0; i < number_of_items; ++i)
     {
         XML_NODE* tempFrameNode = uiXml.NavigateToNode(frame_node.c_str(), i);
-        if (!tempFrameNode) break;
+        if (!tempFrameNode)
+            break;
         LPCSTR frame_class = uiXml.ReadAttrib(tempFrameNode, "class", "class_of_frame_not_defined");
-        if (!xr_strcmp(frame_class, "frame_line")) {
+        if (!xr_strcmp(frame_class, "frame_line"))
+        {
             CUIFrameLineWnd* temp_frame_line = new CUIFrameLineWnd();
             CUIXmlInit::InitFrameLine(uiXml, frame_node.c_str(), i, temp_frame_line);
             temp_frame_line->SetAutoDelete(true);
@@ -63,7 +61,8 @@ void UITeamPanels::InitAllTeams(shared_str const& team_node)
     for (int i = 0; i < numberOfTeams; ++i)
     {
         XML_NODE* tempTeamNode = uiXml.NavigateToNode(team_node.c_str(), i);
-        if (!tempTeamNode) break;
+        if (!tempTeamNode)
+            break;
         LPCSTR tempTeamName = uiXml.ReadAttrib(tempTeamNode, "tname", "team_not_set_in_tname_xml_attribute");
         UITeamState* tempTeamPanel = panelsFactory.CreateTeamPanel(tempTeamName, this);
         VERIFY2(tempTeamPanel, make_string("failed to create team panel \"%s\"", tempTeamName).c_str());
@@ -104,12 +103,13 @@ void UITeamPanels::UpdatePanels()
         case GAME_PHASE_TEAM2_SCORES:
         case GAME_PHASE_INPROGRESS:
         {
-            if (i->first.equal(green_team) || i->first.equal(blue_team) || i->first.equal(spectators_team)) {
+            if (i->first.equal(green_team) || i->first.equal(blue_team) || i->first.equal(spectators_team))
+            {
                 need_show = true;
             }
             break;
         };
-        };  // end switch
+        }; // end switch
         i->second->Show(need_show);
     }
     need_update_panels = false;
@@ -152,29 +152,25 @@ void UITeamPanels::UpdatePlayer(ClientID const& clientId)
     for (TTeamsMap::iterator i = myPanels.begin(); i != ie; ++i)
     {
         VERIFY(i->second);
-        if (i->second->UpdatePlayer(clientId)) {
+        if (i->second->UpdatePlayer(clientId))
+        {
             playerFound = true;
         }
     }
-    if (!playerFound) {
+    if (!playerFound)
+    {
         AddPlayer(clientId);
     }
 }
 
-void UITeamPanels::NeedUpdatePlayers()
-{
-    need_update_players = true;
-}
-
-void UITeamPanels::NeedUpdatePanels()
-{
-    need_update_panels = true;
-}
-
+void UITeamPanels::NeedUpdatePlayers() { need_update_players = true; }
+void UITeamPanels::NeedUpdatePanels() { need_update_panels = true; }
 void UITeamPanels::Update()
 {
-    if (need_update_players) UpdateExistingPlayers();
-    if (need_update_panels) UpdatePanels();
+    if (need_update_players)
+        UpdateExistingPlayers();
+    if (need_update_panels)
+        UpdatePanels();
     inherited::Update();
 }
 

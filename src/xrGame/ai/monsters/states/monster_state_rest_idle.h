@@ -16,7 +16,6 @@ public:
     virtual void finalize();
     virtual void critical_finalize();
     virtual void remove_links(IGameObject* object) { inherited::remove_links(object); }
-
     virtual void reselect_state();
     virtual void setup_substates();
 };

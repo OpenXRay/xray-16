@@ -17,4 +17,4 @@ public:
     virtual ~pure_relcase();
 };
 
-#endif  // pure_relcaseH
+#endif // pure_relcaseH

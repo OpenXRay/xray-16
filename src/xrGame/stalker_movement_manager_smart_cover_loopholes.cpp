@@ -26,7 +26,7 @@
 namespace smart_cover
 {
 shared_str transform_vertex(shared_str const& vertex_id, bool const& in);
-}  // namespace smart_cover
+} // namespace smart_cover
 
 using smart_cover::loophole;
 using MemorySpace::CMemoryInfo;
@@ -45,7 +45,8 @@ float stalker_movement_manager_smart_cover::enter_path(LoopholePath* result, Fve
     Loopholes::const_iterator e = loopholes.end();
     for (; i != e; ++i)
     {
-        if (!(*i)->enterable()) continue;
+        if (!(*i)->enterable())
+            continue;
 
         loophole_path(cover, (*i)->id(), target_loophole_id, m_temp_loophole_path);
         VERIFY(!m_temp_loophole_path.empty());
@@ -53,17 +54,20 @@ float stalker_movement_manager_smart_cover::enter_path(LoopholePath* result, Fve
         smart_cover::loophole const& loophole = this->loophole(cover, loophole_id);
         float new_value = cover.fov_position(loophole).distance_to(position);
         new_value += ai().graph_engine().m_string_algorithm->data_storage().get_best().g();
-        if (new_value >= value) continue;
+        if (new_value >= value)
+            continue;
 
         value = new_value;
 
-        if (result) result->swap(m_temp_loophole_path);
+        if (result)
+            result->swap(m_temp_loophole_path);
     }
 
     VERIFY(value < flt_max);
     VERIFY(!result || !result->empty());
 
-    if (result) result->insert(result->begin(), smart_cover::transform_vertex("", true));
+    if (result)
+        result->insert(result->begin(), smart_cover::transform_vertex("", true));
 
     return (value);
 }
@@ -80,7 +84,8 @@ void stalker_movement_manager_smart_cover::build_enter_path()
     Fvector const& position = object().Position();
     enter_path(&m_path, position, object().ai_location().level_vertex_id(), target_cover, target_loophole_id);
 
-    if (m_path.size() > 1) {
+    if (m_path.size() > 1)
+    {
         m_current_transition = &action(target_cover, m_path[0], m_path[1]);
         m_current_transition_animation = &m_current_transition->animation();
     }
@@ -114,14 +119,15 @@ bool stalker_movement_manager_smart_cover::test_pick(Fvector source, Fvector des
         CAI_Stalker* m_object;
 
         inline parameters(float& range, CAI_Stalker& object) : m_range(&range), m_object(&object) {}
-    };  // struct parameters
+    }; // struct parameters
 
     struct test_pick
     {
         static BOOL callback(collide::rq_result& result, LPVOID user_data)
         {
             parameters* const param = (parameters*)user_data;
-            if (param->m_object->feel_vision_mtl_transp(result.O, result.element) < 1.f) {
+            if (param->m_object->feel_vision_mtl_transp(result.O, result.element) < 1.f)
+            {
                 *param->m_range = result.range;
                 return (FALSE);
             }
@@ -158,7 +164,8 @@ stalker_movement_manager_smart_cover::transition_action const& stalker_movement_
     ActionsList::const_iterator e = actions.end();
     for (; i != e; ++i)
     {
-        if (!(*i)->applicable()) continue;
+        if (!(*i)->applicable())
+            continue;
 
         typedef smart_cover::transitions::action::Animations Animations;
         Animations::const_iterator I = (*i)->animations().begin();
@@ -168,19 +175,25 @@ stalker_movement_manager_smart_cover::transition_action const& stalker_movement_
             Fvector action_position;
             transform.transform_tiny(action_position, (*I)->position());
             float const distance_sqr = action_position.distance_to_sqr(position);
-            if (distance_sqr > min_distance_sqr) continue;
+            if (distance_sqr > min_distance_sqr)
+                continue;
 
             u32 vertex_id = u32(-1);
-            if ((*I)->has_animation()) {
-                if (!ai().level_graph().valid_vertex_position(action_position)) continue;
+            if ((*I)->has_animation())
+            {
+                if (!ai().level_graph().valid_vertex_position(action_position))
+                    continue;
 
                 vertex_id = ai().level_graph().vertex_id(action_position);
-                if (!ai().level_graph().valid_vertex_id(vertex_id)) continue;
+                if (!ai().level_graph().valid_vertex_id(vertex_id))
+                    continue;
 
                 float const y = ai().level_graph().vertex_plane_y(vertex_id, action_position.x, action_position.z);
-                if (!fsimilar(y, action_position.y, 2.f)) continue;
+                if (!fsimilar(y, action_position.y, 2.f))
+                    continue;
 
-                if (!test_pick(object().Position(), action_position)) continue;
+                if (!test_pick(object().Position(), action_position))
+                    continue;
             }
 
             if (target_body_state && ((*I)->body_state() != *target_body_state) &&
@@ -244,7 +257,8 @@ void stalker_movement_manager_smart_cover::build_exit_path()
     Loopholes::const_iterator E = loopholes.end();
     for (; I != E; ++I)
     {
-        if (!(*I)->exitable()) continue;
+        if (!(*I)->exitable())
+            continue;
 
         shared_str const& exitable_loophole_id = (*I)->id();
         loophole_path(cur_cover, cur_loophole.id(), exitable_loophole_id, m_temp_loophole_path);
@@ -269,7 +283,8 @@ void stalker_movement_manager_smart_cover::build_exit_path()
 
         new_value += exit_path_weight(exit_vertex_id, exit_position, targe_vertex_id, target_position);
 
-        if (new_value >= value) continue;
+        if (new_value >= value)
+            continue;
 
         value = new_value;
         m_path.swap(m_temp_loophole_path);
@@ -279,7 +294,8 @@ void stalker_movement_manager_smart_cover::build_exit_path()
 
     m_path.push_back(smart_cover::transform_vertex("", false));
 
-    if (m_path.size() > 1) {
+    if (m_path.size() > 1)
+    {
         m_current_transition = &action(*m_current.cover(), m_path[0], m_path[1]);
         m_current_transition_animation = &m_current_transition->animation();
     }
@@ -318,7 +334,8 @@ void stalker_movement_manager_smart_cover::build_exit_path_to_cover()
     Loopholes::const_iterator E = loopholes.end();
     for (; I != E; ++I)
     {
-        if (!(*I)->exitable()) continue;
+        if (!(*I)->exitable())
+            continue;
 
         shared_str const& exitable_loophole_id = (*I)->id();
         loophole_path(current_cover, current_loophole.id(), exitable_loophole_id, m_temp_loophole_path);
@@ -342,7 +359,8 @@ void stalker_movement_manager_smart_cover::build_exit_path_to_cover()
         new_value += enter_path(0, exit_position, exit_vertex_id, target_cover,
             (target_loophole.enterable() ? target_loophole : nearest_enterable_loophole()).id());
 
-        if (new_value >= value) continue;
+        if (new_value >= value)
+            continue;
 
         selected_action = &current_action;
         value = new_value;
@@ -353,7 +371,8 @@ void stalker_movement_manager_smart_cover::build_exit_path_to_cover()
 
     m_path.push_back(smart_cover::transform_vertex("", false));
 
-    if (m_path.size() > 1) {
+    if (m_path.size() > 1)
+    {
         VERIFY(selected_action);
         m_current_transition = selected_action;
         m_current_transition_animation = &m_current_transition->animation();
@@ -369,17 +388,20 @@ void stalker_movement_manager_smart_cover::actualize_path()
 {
     VERIFY(m_current.cover() || m_target.cover());
 
-    if (!m_current.cover()) {
+    if (!m_current.cover())
+    {
         build_enter_path();
         return;
     }
 
-    if (!m_target.cover()) {
+    if (!m_target.cover())
+    {
         build_exit_path();
         return;
     }
 
-    if (m_current.cover() != m_target.cover()) {
+    if (m_current.cover() != m_target.cover())
+    {
         build_exit_path_to_cover();
         return;
     }
@@ -398,7 +420,8 @@ void stalker_movement_manager_smart_cover::actualize_path()
 
     VERIFY(!m_path.empty());
 
-    if (m_path.size() > 1) {
+    if (m_path.size() > 1)
+    {
         m_current_transition = &action(*m_current.cover(), m_path[0], m_path[1]);
         m_current_transition_animation = &m_current_transition->animation();
     }
@@ -411,21 +434,24 @@ void stalker_movement_manager_smart_cover::actualize_path()
 
 void stalker_movement_manager_smart_cover::try_actualize_path()
 {
-    if (m_path.empty()) {
+    if (m_path.empty())
+    {
         actualize_path();
         return;
     }
 
     shared_str current_loophole_id =
         smart_cover::transform_vertex(m_current.cover() ? m_current.cover_loophole()->id() : "", true);
-    if (m_path.front() != current_loophole_id) {
+    if (m_path.front() != current_loophole_id)
+    {
         actualize_path();
         return;
     }
 
     shared_str target_loophole_id = smart_cover::transform_vertex(
         (m_target.cover() == m_current.cover()) ? m_target.cover_loophole()->id() : "", false);
-    if (m_path.back() == target_loophole_id) return;
+    if (m_path.back() == target_loophole_id)
+        return;
 
     actualize_path();
 }
@@ -469,18 +495,20 @@ void stalker_movement_manager_smart_cover::go_next_loophole()
     VERIFY(!m_path.empty());
 
     //	VERIFY						(m_path.size() > 1);
-    if (m_path.size() == 1) {
+    if (m_path.size() == 1)
+    {
         VERIFY(m_current.cover());
         VERIFY(m_current.cover_loophole()->id() == m_path[0]);
         return;
     }
 
-    if (m_path[0]._get() == smart_cover::transform_vertex("", true)._get()) {
+    if (m_path[0]._get() == smart_cover::transform_vertex("", true)._get())
+    {
         VERIFY(m_target.cover());
         VERIFY(!m_current.cover());
 #ifdef DEBUG
         Msg("setting up cover (direct from target): %s (%s)", m_target.cover_id().c_str(), m_enter_cover_id.c_str());
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
         m_current.cover_id(m_target.cover_id());
         m_current.cover_loophole_id(m_path[1]);
         return;
@@ -488,11 +516,12 @@ void stalker_movement_manager_smart_cover::go_next_loophole()
 
     VERIFY(m_current.cover());
 
-    if (m_path[1]._get() == smart_cover::transform_vertex("", false)._get()) {
+    if (m_path[1]._get() == smart_cover::transform_vertex("", false)._get())
+    {
         VERIFY(m_path.size() == 2);
 #ifdef DEBUG
         Msg("exiting from cover: %s", m_current.cover_id().c_str());
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
         m_current.cover_id("");
         on_smart_cover_exit();
         return;
@@ -510,7 +539,8 @@ void stalker_movement_manager_smart_cover::non_animated_change_loophole()
 {
     VERIFY(m_current.cover());
     setup_movement_params();
-    if (!m_non_animated_loophole_change) return;
+    if (!m_non_animated_loophole_change)
+        return;
 
     VERIFY(m_current.cover());
     inherited::update(m_current);
@@ -519,7 +549,8 @@ void stalker_movement_manager_smart_cover::non_animated_change_loophole()
     cover_type const& cover = *m_current.cover();
     shared_str const& loophole_id = next_loophole_id();
 
-    if (!exit_loophole(loophole_id)) {
+    if (!exit_loophole(loophole_id))
+    {
         if (!target_approached(m_apply_loophole_direction_distance))
             object().sight().setup(CSightAction(SightManager::eSightTypePathDirection));
         else
@@ -530,13 +561,16 @@ void stalker_movement_manager_smart_cover::non_animated_change_loophole()
         }
     }
 
-    if (!path_completed()) return;
+    if (!path_completed())
+        return;
 
-    if (!object().sight().current_action().target_reached()) return;
+    if (!object().sight().current_action().target_reached())
+        return;
 
     go_next_loophole();
 
-    if (!m_current.cover()) return;
+    if (!m_current.cover())
+        return;
 
     m_animation_selector->on_animation_end();
     m_animation_selector->planner().update();
@@ -550,7 +584,8 @@ void stalker_movement_manager_smart_cover::setup_movement_params()
     try_actualize_path();
     VERIFY(!m_path.empty());
 
-    if (m_path.size() == 1) {
+    if (m_path.size() == 1)
+    {
         m_non_animated_loophole_change = false;
         return;
     }
@@ -558,7 +593,8 @@ void stalker_movement_manager_smart_cover::setup_movement_params()
     shared_str const& loophole_id = m_path[1];
     m_current.m_movement_type = eMovementTypeRun;
 
-    if (exit_loophole(loophole_id)) return;
+    if (exit_loophole(loophole_id))
+        return;
 
     m_current.m_body_state = current_transition_animation().body_state();
 
@@ -579,7 +615,6 @@ struct loophole_id_predicate
     shared_str m_id;
 
     IC loophole_id_predicate(shared_str const& id) : m_id(id) {}
-
     IC bool operator()(smart_cover::loophole* loophole) const { return (loophole->id()._get() == m_id._get()); }
 };
 
@@ -651,20 +686,25 @@ void stalker_movement_manager_smart_cover::stop_non_animated_loophole_change()
 Fvector stalker_movement_manager_smart_cover::position_to_cover_from() const
 {
     Fvector const* cover_fire_position = m_target.cover_fire_position();
-    if (cover_fire_position) return (*cover_fire_position);
+    if (cover_fire_position)
+        return (*cover_fire_position);
 
     CGameObject const* fire_object = m_target.cover_fire_object();
-    if (fire_object) {
-        if (!object().g_Alive()) return (fire_object->Position());
+    if (fire_object)
+    {
+        if (!object().g_Alive())
+            return (fire_object->Position());
 
         CMemoryInfo info = object().memory().memory(fire_object);
-        if (info.m_visual_info | info.m_sound_info | info.m_hit_info) return (info.m_object_params.m_position);
+        if (info.m_visual_info | info.m_sound_info | info.m_hit_info)
+            return (info.m_object_params.m_position);
 
         return (fire_object->Position());
     }
 
     CEntityAlive const* enemy = object().memory().enemy().selected();
-    if (!enemy) return (object().Position());
+    if (!enemy)
+        return (object().Position());
 
     VERIFY(enemy);
     return (object().memory().memory(enemy).m_object_params.m_position);

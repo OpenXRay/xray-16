@@ -47,6 +47,6 @@ public:
 private:
     textract_list extract_list;
     tnew_config_map new_config;
-};  // class weapon_collection
+}; // class weapon_collection
 
-#endif  //#ifndef WEAPON_COLLECTION
+#endif //#ifndef WEAPON_COLLECTION

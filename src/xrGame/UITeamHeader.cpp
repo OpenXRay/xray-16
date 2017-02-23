@@ -3,14 +3,8 @@
 #include "UITeamState.h"
 #include "ui/UIStatic.h"
 
-UITeamHeader::UITeamHeader(UITeamState const* const parent) : m_parent(parent), m_team_header_root(NULL)
-{
-}
-
-UITeamHeader::~UITeamHeader()
-{
-}
-
+UITeamHeader::UITeamHeader(UITeamState const* const parent) : m_parent(parent), m_team_header_root(NULL) {}
+UITeamHeader::~UITeamHeader() {}
 void UITeamHeader::Update()
 {
     inherited::Update();
@@ -22,7 +16,7 @@ void UITeamHeader::Update()
         CUIStatic* fieldStatic = i->second;
         VERIFY2(fieldStatic, make_string("field %s not initialized", i->first.c_str()).c_str());
         STRING_VALUE temp_text = m_translated_strings[i->first];
-        buffer_vector<char>::size_type new_size = temp_text.size() + 16;  // i hope STRING_VALUE has size() method :)
+        buffer_vector<char>::size_type new_size = temp_text.size() + 16; // i hope STRING_VALUE has size() method :)
         buffer_vector<char> new_string(_alloca(new_size), new_size);
         xr_sprintf(new_string.begin(), new_size, "%s: %d", temp_text.c_str(), temp_value);
         fieldStatic->TextItemControl()->SetText(new_string.begin());
@@ -37,7 +31,8 @@ void UITeamHeader::InitColumnsStatics(CUIXml& uiXml)
     for (int i = 0; i < tempNumber; ++i)
     {
         XML_NODE* tempColumnNode = uiXml.NavigateToNode(COLUMN_NODE_NAME, i);
-        if (!tempColumnNode) break;
+        if (!tempColumnNode)
+            break;
         LPCSTR tempColumnName = uiXml.ReadAttrib(tempColumnNode, "name", "column_not_set_in_name_attribute");
         CUIStatic* tempColumn = new CUIStatic();
         VERIFY(tempColumn);
@@ -58,7 +53,8 @@ void UITeamHeader::InitFieldsStatics(CUIXml& uiXml)
     for (int i = 0; i < tempNumber; ++i)
     {
         XML_NODE* tempFieldNode = uiXml.NavigateToNode(FILED_NODE_NAME, i);
-        if (!tempFieldNode) break;
+        if (!tempFieldNode)
+            break;
         LPCSTR tempFieldName = uiXml.ReadAttrib(tempFieldNode, "name", "field_not_set_in_name_attribute");
         CUIStatic* tempField = new CUIStatic();
         VERIFY(tempField);

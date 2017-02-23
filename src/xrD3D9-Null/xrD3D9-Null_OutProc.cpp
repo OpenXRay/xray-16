@@ -25,7 +25,8 @@ void LogOut_File(const char* pszFormat, ...)
 
     FILE* fp;
     fp = fopen("d3d9-null.log", "a+t");
-    if (fp) {
+    if (fp)
+    {
         fprintf(fp, "%s", s);
         fclose(fp);
     }

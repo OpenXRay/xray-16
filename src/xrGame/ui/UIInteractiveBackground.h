@@ -35,7 +35,6 @@ public:
     void InitIB(Fvector2 pos, Fvector2 size);
     void InitIB(LPCSTR texture_e, Fvector2 pos, Fvector2 size);
     T* Get(IBState state) { return m_states[state]; };
-
     void InitState(IBState state, LPCSTR texture);
     void SetCurrentState(IBState state);
 
@@ -74,7 +73,8 @@ void CUIInteractiveBackground<T>::InitState(IBState state, LPCSTR texture)
 {
     Fvector2 size = GetWndSize();
 
-    if (!m_states[state]) {
+    if (!m_states[state])
+    {
         m_states[state] = new T();
         m_states[state]->SetAutoDelete(true);
         AttachChild(m_states[state]);
@@ -91,27 +91,31 @@ template <class T>
 void CUIInteractiveBackground<T>::SetCurrentState(IBState state)
 {
     m_states[S_Current] = m_states[state];
-    if (!m_states[S_Current]) m_states[S_Current] = m_states[S_Enabled];
+    if (!m_states[S_Current])
+        m_states[S_Current] = m_states[S_Enabled];
 }
 
 template <class T>
 void CUIInteractiveBackground<T>::Draw()
 {
-    if (m_states[S_Current]) m_states[S_Current]->Draw();
+    if (m_states[S_Current])
+        m_states[S_Current]->Draw();
 }
 
 template <class T>
 void CUIInteractiveBackground<T>::SetWidth(float width)
 {
     for (int i = 0; i < S_Total; ++i)
-        if (m_states[i]) m_states[i]->SetWidth(width);
+        if (m_states[i])
+            m_states[i]->SetWidth(width);
 }
 
 template <class T>
 void CUIInteractiveBackground<T>::SetHeight(float height)
 {
     for (int i = 0; i < S_Total; ++i)
-        if (m_states[i]) m_states[i]->SetHeight(height);
+        if (m_states[i])
+            m_states[i]->SetHeight(height);
 }
 
 typedef CUIInteractiveBackground<CUIFrameLineWnd> CUI_IB_FrameLineWnd;

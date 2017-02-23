@@ -43,11 +43,11 @@ private:
         u32 size;
         enum_stats_buffer_type type;
         _D3DPOOL location;
-    };  // stats_item
+    }; // stats_item
 
     xr_vector<stats_item> m_buffers_list;
 #endif
-};  // class stats_manager
+}; // class stats_manager
 
 u32 get_format_pixel_size(D3DFORMAT format);
 
@@ -55,4 +55,4 @@ u32 get_format_pixel_size(D3DFORMAT format);
 u32 get_format_pixel_size(DXGI_FORMAT format);
 #endif
 
-#endif  // #ifndef STATS_MANAGER_H_INCLUDED
+#endif // #ifndef STATS_MANAGER_H_INCLUDED

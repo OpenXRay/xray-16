@@ -58,10 +58,9 @@ public:
     CUICellItem* Child(u32 idx) { return m_childs[idx]; };
     bool HasChild(CUICellItem* item);
     virtual bool EqualTo(CUICellItem* itm);
-    IC const Ivector2& GetGridSize() { return m_grid_size; };  // size in grid
+    IC const Ivector2& GetGridSize() { return m_grid_size; }; // size in grid
     IC void SetAccelerator(int dik) { m_accelerator = dik; };
     IC int GetAccelerator() const { return m_accelerator; };
-
     virtual CUIDragItem* CreateDragItem();
 
     CUIDragDropListEx* OwnerList() { return m_pParentList; }
@@ -70,10 +69,8 @@ public:
     void SetCustomDraw(ICustomDrawCellItem* c);
     void Mark(bool status);
     CUIStatic& get_ui_text() const { return *m_text; }
-
     virtual bool IsHelper() { return false; }
     virtual void SetIsHelper(bool is_helper) { ; }
-
 public:
     static CUICellItem* m_mouse_selected_item;
     void* m_pData;

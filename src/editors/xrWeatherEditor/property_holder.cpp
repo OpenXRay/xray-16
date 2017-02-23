@@ -28,7 +28,8 @@ property_holder::property_holder(editor::engine* engine, LPCSTR display_name, pr
 
 property_holder::~property_holder()
 {
-    if (m_disposing) return;
+    if (m_disposing)
+        return;
 
     m_disposing = true;
     delete (m_container);
@@ -36,11 +37,13 @@ property_holder::~property_holder()
 
 void property_holder::on_dispose()
 {
-    if (m_disposing) return;
+    if (m_disposing)
+        return;
 
     VERIFY(m_collection);
     int index = m_collection->index(this);
-    if (index < 0) {
+    if (index < 0)
+    {
         m_collection->destroy(this);
         return;
     }
@@ -49,33 +52,14 @@ void property_holder::on_dispose()
     m_collection->erase(index);
 }
 
-property_container ^ property_holder::container()
-{
-    return (m_container);
-}
-
+property_container ^ property_holder::container() { return (m_container); }
 engine& property_holder::engine()
 {
     VERIFY(m_engine);
     return (*m_engine);
 }
 
-property_holder_holder* property_holder::holder()
-{
-    return (m_holder);
-}
-
-String ^ property_holder::display_name()
-{
-    return (m_display_name);
-}
-
-collection_type* property_holder::collection()
-{
-    return (m_collection);
-}
-
-void property_holder::clear()
-{
-    m_container->clear();
-}
+property_holder_holder* property_holder::holder() { return (m_holder); }
+String ^ property_holder::display_name() { return (m_display_name); }
+collection_type* property_holder::collection() { return (m_collection); }
+void property_holder::clear() { m_container->clear(); }

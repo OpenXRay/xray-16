@@ -39,11 +39,13 @@ void transfer(const char* name, xr_vector<T>& dest, IReader& F, u32 chunk)
     IReader* O = F.open_chunk(chunk);
     u32 count = O ? (O->length() / sizeof(T)) : 0;
     Logger.clMsg("* %16s: %d", name, count);
-    if (count) {
+    if (count)
+    {
         dest.reserve(count);
         dest.insert(dest.begin(), (T*)O->pointer(), (T*)O->pointer() + count);
     }
-    if (O) O->close();
+    if (O)
+        O->close();
 }
 
 extern u32* Surface_Load(char* name, u32& w, u32& h);
@@ -53,7 +55,8 @@ void xrLoad(LPCSTR name, bool draft_mode)
 {
     FS.get_path("$level$")->_set((LPSTR)name);
     string256 N;
-    if (!draft_mode) {
+    if (!draft_mode)
+    {
         // shaders
         string_path N;
         FS.update_path(N, "$game_data$", "shaders_xrlc.xr");
@@ -123,11 +126,13 @@ void xrLoad(LPCSTR name, bool draft_mode)
                     // load thumbnail
                     string128& N = BT.name;
                     LPSTR extension = strext(N);
-                    if (extension) *extension = 0;
+                    if (extension)
+                        *extension = 0;
 
                     xr_strlwr(N);
 
-                    if (0 == xr_strcmp(N, "level_lods")) {
+                    if (0 == xr_strcmp(N, "level_lods"))
+                    {
                         // HACK for merged lod textures
                         BT.dwWidth = 1024;
                         BT.dwHeight = 1024;
@@ -154,15 +159,18 @@ void xrLoad(LPCSTR name, bool draft_mode)
                         BT.THM.width = THM->r_u32();
                         BT.THM.height = THM->r_u32();
                         BOOL bLOD = FALSE;
-                        if (N[0] == 'l' && N[1] == 'o' && N[2] == 'd' && N[3] == '\\') bLOD = TRUE;
+                        if (N[0] == 'l' && N[1] == 'o' && N[2] == 'd' && N[3] == '\\')
+                            bLOD = TRUE;
 
                         // load surface if it has an alpha channel or has "implicit lighting" flag
                         BT.dwWidth = BT.THM.width;
                         BT.dwHeight = BT.THM.height;
                         BT.bHasAlpha = BT.THM.HasAlphaChannel();
                         BT.pSurface = 0;
-                        if (!bLOD) {
-                            if (BT.bHasAlpha || BT.THM.flags.test(STextureParams::flImplicitLighted)) {
+                        if (!bLOD)
+                        {
+                            if (BT.bHasAlpha || BT.THM.flags.test(STextureParams::flImplicitLighted))
+                            {
                                 Logger.clMsg("- loading: %s", N);
                                 u32 w = 0, h = 0;
                                 BT.pSurface = Surface_Load(N, w, h);
@@ -213,7 +221,8 @@ void xrLoad(LPCSTR name, bool draft_mode)
                 R_Light RL;
                 F->r(&temp, sizeof(temp));
                 Flight& L = temp.data;
-                if (_abs(L.range) > 10000.f) {
+                if (_abs(L.range) > 10000.f)
+                {
                     Msg("! BAD light range : %f", L.range);
                     L.range = L.range > 0.f ? 10000.f : -10000.f;
                 }
@@ -239,7 +248,8 @@ void xrLoad(LPCSTR name, bool draft_mode)
                 RL.tri[2].set(0, 0, 0);
 
                 // place into layer
-                if (0 == temp.controller_ID) g_lights.push_back(RL);
+                if (0 == temp.controller_ID)
+                    g_lights.push_back(RL);
             }
             F->close();
         }
@@ -297,6 +307,7 @@ void xrLoad(LPCSTR name, bool draft_mode)
 
         F->close();
 
-        if (!strstr(Core.Params, "-keep_temp_files")) DeleteFile(file_name);
+        if (!strstr(Core.Params, "-keep_temp_files"))
+            DeleteFile(file_name);
     }
 }

@@ -13,11 +13,7 @@ CSoundRender_Target::CSoundRender_Target(void)
     wave = 0;
 }
 
-CSoundRender_Target::~CSoundRender_Target(void)
-{
-    VERIFY(wave == 0);
-}
-
+CSoundRender_Target::~CSoundRender_Target(void) { VERIFY(wave == 0); }
 BOOL CSoundRender_Target::_initialize()
 {
     /*
@@ -56,11 +52,7 @@ void CSoundRender_Target::start(CSoundRender_Emitter* E)
     // attach		();
 }
 
-void CSoundRender_Target::render()
-{
-    rendering = TRUE;
-}
-
+void CSoundRender_Target::render() { rendering = TRUE; }
 void CSoundRender_Target::stop()
 {
     dettach();
@@ -68,16 +60,8 @@ void CSoundRender_Target::stop()
     rendering = FALSE;
 }
 
-void CSoundRender_Target::rewind()
-{
-    R_ASSERT(rendering);
-}
-
-void CSoundRender_Target::update()
-{
-    R_ASSERT(m_pEmitter);
-}
-
+void CSoundRender_Target::rewind() { R_ASSERT(rendering); }
+void CSoundRender_Target::update() { R_ASSERT(m_pEmitter); }
 void CSoundRender_Target::fill_parameters()
 {
     VERIFY(m_pEmitter);
@@ -104,7 +88,8 @@ void CSoundRender_Target::attach()
 
 void CSoundRender_Target::dettach()
 {
-    if (wave) {
+    if (wave)
+    {
         ov_clear(&ovf);
         FS.r_close(wave);
     }

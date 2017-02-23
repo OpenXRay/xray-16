@@ -14,7 +14,8 @@ void CRenderTarget::phase_ssao()
     HW.pContext->ClearRenderTargetView(rt_ssao_temp->pRT, ColorRGBA);
 
     // low/hi RTs
-    if (!RImplementation.o.dx10_msaa) {
+    if (!RImplementation.o.dx10_msaa)
+    {
         u_setrt(rt_ssao_temp, 0, 0, 0 /*HW.pBaseZB*/);
     }
     else
@@ -121,7 +122,8 @@ void CRenderTarget::phase_downsamp()
     u32 w = Device.dwWidth;
     u32 h = Device.dwHeight;
 
-    if (RImplementation.o.ssao_half_data) {
+    if (RImplementation.o.ssao_half_data)
+    {
         set_viewport(HW.pContext, float(Device.dwWidth) * 0.5f, float(Device.dwHeight) * 0.5f);
         w /= 2;
         h /= 2;
@@ -157,5 +159,6 @@ void CRenderTarget::phase_downsamp()
         RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
     }
 
-    if (RImplementation.o.ssao_half_data) set_viewport(HW.pContext, float(Device.dwWidth), float(Device.dwHeight));
+    if (RImplementation.o.ssao_half_data)
+        set_viewport(HW.pContext, float(Device.dwWidth), float(Device.dwHeight));
 }

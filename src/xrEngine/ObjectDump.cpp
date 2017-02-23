@@ -5,14 +5,16 @@
 
 ENGINE_API std::string dbg_object_base_dump_string(const IGameObject* obj)
 {
-    if (!obj) return make_string("object: NULL ptr");
+    if (!obj)
+        return make_string("object: NULL ptr");
     return make_string("object name: %s, section name: %s, visual name: %s \n", obj->cName().c_str(),
         obj->cNameSect().c_str(), obj->Visual() ? obj->cNameVisual().c_str() : "none");
 }
 
 ENGINE_API std::string dbg_object_poses_dump_string(const IGameObject* obj)
 {
-    if (!obj) return std::string("");
+    if (!obj)
+        return std::string("");
 
     u32 ps_size = obj->ps_Size();
     std::string buf("");
@@ -27,7 +29,8 @@ ENGINE_API std::string dbg_object_poses_dump_string(const IGameObject* obj)
 
 ENGINE_API std::string dbg_object_visual_geom_dump_string(const IGameObject* obj)
 {
-    if (!obj || !obj->Visual()) return std::string("");
+    if (!obj || !obj->Visual())
+        return std::string("");
     const Fbox& box = obj->BoundingBox();
     Fvector c;
     obj->Center(c);
@@ -57,7 +60,8 @@ ENGINE_API std::string dbg_object_visual_geom_dump_string(const IGameObject* obj
  */
 ENGINE_API std::string dbg_object_props_dump_string(const IGameObject* obj)
 {
-    if (!obj) return std::string("");
+    if (!obj)
+        return std::string("");
     GameObjectProperties props;
     obj->DBGGetProps(props);
     const char* format =
@@ -83,7 +87,7 @@ ENGINE_API std::string dbg_object_props_dump_string(const IGameObject* obj)
 ENGINE_API std::string dbg_object_full_dump_string(const IGameObject* obj)
 {
     return dbg_object_base_dump_string(obj) + dbg_object_props_dump_string(obj) + dbg_object_poses_dump_string(obj) +
-           dbg_object_visual_geom_dump_string(obj);
+        dbg_object_visual_geom_dump_string(obj);
 }
 ENGINE_API std::string dbg_object_full_capped_dump_string(const IGameObject* obj)
 {

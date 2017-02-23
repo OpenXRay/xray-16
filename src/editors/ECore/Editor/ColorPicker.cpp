@@ -6,10 +6,10 @@
 
 class CTCD
 {
-  public:
+public:
     TColorDialog* cdColor;
 
-  public:
+public:
     CTCD()
     {
         cdColor = new TColorDialog((TComponent*)0);
@@ -26,9 +26,11 @@ extern "C" DLL_API bool FSColorPickerExecute(u32* currentColor, LPDWORD original
 bool SelectColor(u32* currentcolor, bool bDefaultPicker)
 {
     VERIFY(currentcolor);
-    if (bDefaultPicker) {
+    if (bDefaultPicker)
+    {
         TCD.cdColor->Color = TColor(rgb2bgr(*currentcolor));
-        if (TCD.cdColor->Execute()) {
+        if (TCD.cdColor->Execute())
+        {
             *currentcolor = bgr2rgb(TCD.cdColor->Color);
             return true;
         }
@@ -37,7 +39,8 @@ bool SelectColor(u32* currentcolor, bool bDefaultPicker)
     else
     {
         u32 clr = *currentcolor;
-        if (FSColorPickerExecute(&clr, 0, 0)) {
+        if (FSColorPickerExecute(&clr, 0, 0))
+        {
             *currentcolor = clr;
             return true;
         }
@@ -48,9 +51,11 @@ bool SelectColor(u32* currentcolor, bool bDefaultPicker)
 bool SelectColorWin(u32* currentcolor, bool bDefaultPicker)
 {
     VERIFY(currentcolor);
-    if (bDefaultPicker) {
+    if (bDefaultPicker)
+    {
         TCD.cdColor->Color = TColor(*currentcolor);
-        if (TCD.cdColor->Execute()) {
+        if (TCD.cdColor->Execute())
+        {
             *currentcolor = TCD.cdColor->Color;
             return true;
         }
@@ -59,7 +64,8 @@ bool SelectColorWin(u32* currentcolor, bool bDefaultPicker)
     else
     {
         u32 cur = bgr2rgb(*currentcolor);
-        if (FSColorPickerExecute(&cur, 0, 0)) {
+        if (FSColorPickerExecute(&cur, 0, 0))
+        {
             *currentcolor = rgb2bgr(cur);
             return true;
         }

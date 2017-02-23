@@ -23,15 +23,18 @@ void CPPEffectorPsyDogAura::switch_off()
 BOOL CPPEffectorPsyDogAura::update()
 {
     // update factor
-    if (m_effector_state == eStatePermanent) {
+    if (m_effector_state == eStatePermanent)
+    {
         m_factor = 1.f;
     }
     else
     {
         m_factor = float(Device.dwTimeGlobal - m_time_state_started) / float(m_time_to_fade);
-        if (m_effector_state == eStateFadeOut) m_factor = 1 - m_factor;
+        if (m_effector_state == eStateFadeOut)
+            m_factor = 1 - m_factor;
 
-        if (m_factor > 1) {
+        if (m_factor > 1)
+        {
             m_effector_state = eStatePermanent;
             m_factor = 1.f;
         }
@@ -58,7 +61,8 @@ void CPsyDogAura::reinit()
 
 void CPsyDogAura::update_schedule()
 {
-    if (!m_object->g_Alive()) return;
+    if (!m_object->g_Alive())
+        return;
 
     m_time_phantom_saw_actor = 0;
 
@@ -68,8 +72,10 @@ void CPsyDogAura::update_schedule()
     for (; I != E; ++I)
     {
         const CGameObject* obj = (*I).m_object;
-        if (smart_cast<const CPsyDogPhantom*>(obj)) {
-            if (m_actor->memory().visual().visible_now(obj)) m_time_actor_saw_phantom = time();
+        if (smart_cast<const CPsyDogPhantom*>(obj))
+        {
+            if (m_actor->memory().visual().visible_now(obj))
+                m_time_actor_saw_phantom = time();
         }
     }
 
@@ -85,27 +91,32 @@ void CPsyDogAura::update_schedule()
             ENEMIES_MAP::const_iterator E = (*it)->EnemyMemory.get_memory().end();
             for (; I != E; ++I)
             {
-                if (I->first == m_actor) {
+                if (I->first == m_actor)
+                {
                     m_time_phantom_saw_actor = _max(m_time_phantom_saw_actor, I->second.time);
                 }
             }
         }
 
-        if (m_time_phantom_saw_actor == time()) break;
+        if (m_time_phantom_saw_actor == time())
+            break;
     }
 
     bool const close_to_actor = m_actor ? m_object->Position().distance_to(m_actor->Position()) < 30 : false;
     bool const need_be_active =
         ((m_time_actor_saw_phantom + 2000 > time()) || (m_time_phantom_saw_actor + 10000 > time())) && close_to_actor;
-    if (active()) {
-        if (!need_be_active) {
+    if (active())
+    {
+        if (!need_be_active)
+        {
             m_effector->switch_off();
             m_effector = 0;
         }
     }
     else
     {
-        if (need_be_active) {
+        if (need_be_active)
+        {
             // create effector
             m_effector = new CPPEffectorPsyDogAura(m_state, 5000);
             Actor()->Cameras().AddPPEffector(m_effector);
@@ -115,7 +126,8 @@ void CPsyDogAura::update_schedule()
 
 void CPsyDogAura::on_death()
 {
-    if (active()) {
+    if (active())
+    {
         m_effector->switch_off();
         m_effector = 0;
     }

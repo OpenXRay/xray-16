@@ -9,7 +9,7 @@ namespace lc_net
 {
 void net_global_data_impl<gl_implicit_cl_data>::init()
 {
-    data_init();  // init as new data
+    data_init(); // init as new data
 }
 
 void net_global_data_impl<gl_implicit_cl_data>::create_data_file(LPCSTR path)
@@ -38,8 +38,5 @@ bool net_global_data_impl<gl_implicit_cl_data>::create_data(LPCSTR path)
     Memory.mem_compact();
     return true;
 }
-void net_global_data_impl<gl_implicit_cl_data>::destroy_data()
-{
-    cl_globs.NetClear();
-}
+void net_global_data_impl<gl_implicit_cl_data>::destroy_data() { cl_globs.NetClear(); }
 }

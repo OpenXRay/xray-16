@@ -16,22 +16,29 @@ bool CUIMpTradeWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
 #ifdef DEBUG
     // for debug only
-    if (keyboard_action == WINDOW_KEY_PRESSED && dik == DIK_NUMPAD7) {
-        if (GetRank() > 0) SetRank(clampr(u32(GetRank() - 1), u32(0), u32(4)));
+    if (keyboard_action == WINDOW_KEY_PRESSED && dik == DIK_NUMPAD7)
+    {
+        if (GetRank() > 0)
+            SetRank(clampr(u32(GetRank() - 1), u32(0), u32(4)));
     }
-    if (keyboard_action == WINDOW_KEY_PRESSED && dik == DIK_NUMPAD8) {
+    if (keyboard_action == WINDOW_KEY_PRESSED && dik == DIK_NUMPAD8)
+    {
         SetRank(clampr(u32(GetRank() + 1), u32(0), u32(4)));
     }
 #endif
 
-    if (!m_store_hierarchy->CurrentIsRoot()) {
-        if (m_shop_wnd->OnKeyboardAction(dik, keyboard_action)) return true;
+    if (!m_store_hierarchy->CurrentIsRoot())
+    {
+        if (m_shop_wnd->OnKeyboardAction(dik, keyboard_action))
+            return true;
 
         m_root_tab_control->SetAcceleratorsMode(false);
     }
 
-    if (keyboard_action == WINDOW_KEY_PRESSED) {
-        if (dik == DIK_Q) {
+    if (keyboard_action == WINDOW_KEY_PRESSED)
+    {
+        if (dik == DIK_Q)
+        {
             OnBtnPistolAmmoClicked(NULL, NULL);
         }
         else if (dik == DIK_W)
@@ -44,7 +51,8 @@ bool CUIMpTradeWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
         }
     }
 
-    if (keyboard_action == WINDOW_KEY_PRESSED && dik == DIK_NUMPADPLUS) {
+    if (keyboard_action == WINDOW_KEY_PRESSED && dik == DIK_NUMPADPLUS)
+    {
         return true;
     }
 
@@ -63,7 +71,8 @@ void CUIMpTradeWnd::Update()
 
 void CUIMpTradeWnd::UpdateMoneyIndicator()
 {
-    if (m_bIgnoreMoneyAndRank) {
+    if (m_bIgnoreMoneyAndRank)
+    {
         m_static_player_money->SetText("---");
     }
     else
@@ -87,7 +96,8 @@ void CUIMpTradeWnd::UpdateMoneyIndicator()
         }
     }
 
-    if (!(Device.dwFrame % 30)) {
+    if (!(Device.dwFrame % 30))
+    {
         u32 _cost;
         string128 buff;
         StorePreset(_preset_idx_temp, true, false, false);
@@ -113,19 +123,11 @@ void CUIMpTradeWnd::SetInfoString(LPCSTR str)
     m_static_information->ResetColorAnimation();
 #ifndef MASTER_GOLD
     Msg("Buy menu message:%s", str);
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
 }
 
-void CUIMpTradeWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
-{
-    CUIWndCallback::OnEvent(pWnd, msg, pData);
-}
-
-CUICellItem* CUIMpTradeWnd::CurrentItem()
-{
-    return m_pCurrentCellItem;
-}
-
+void CUIMpTradeWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData) { CUIWndCallback::OnEvent(pWnd, msg, pData); }
+CUICellItem* CUIMpTradeWnd::CurrentItem() { return m_pCurrentCellItem; }
 CInventoryItem* CUIMpTradeWnd::CurrentIItem()
 {
     return (m_pCurrentCellItem) ? (CInventoryItem*)m_pCurrentCellItem->m_pData : NULL;
@@ -133,10 +135,12 @@ CInventoryItem* CUIMpTradeWnd::CurrentIItem()
 LPCSTR _team_names[] = {"green", "blue"};
 void CUIMpTradeWnd::SetCurrentItem(CUICellItem* itm)
 {
-    if (m_pCurrentCellItem == itm) return;
+    if (m_pCurrentCellItem == itm)
+        return;
     m_pCurrentCellItem = itm;
     m_item_info->InitItem(itm);
-    if (m_pCurrentCellItem) {
+    if (m_pCurrentCellItem)
+    {
         const shared_str& current_sect_name = CurrentIItem()->object().cNameSect();
         string256 str;
         xr_sprintf(str, "%d", GetItemPrice(CurrentIItem()));
@@ -147,7 +151,8 @@ void CUIMpTradeWnd::SetCurrentItem(CUICellItem* itm)
         string64 tex_name;
         string64 team;
 
-        if (m_store_hierarchy->FindItem(current_sect_name)) {  // our team
+        if (m_store_hierarchy->FindItem(current_sect_name))
+        { // our team
             xr_strcpy(team, _team_names[m_store_hierarchy->TeamIdx()]);
         }
         else
@@ -177,7 +182,8 @@ void CUIMpTradeWnd::BindDragDropListEvents(CUIDragDropListEx* lst, bool bDrag)
     lst->m_f_item_selected = CUIDragDropListEx::DRAG_CELL_EVENT(this, &CUIMpTradeWnd::OnItemSelected);
     lst->m_f_item_rbutton_click = CUIDragDropListEx::DRAG_CELL_EVENT(this, &CUIMpTradeWnd::OnItemRButtonClick);
     lst->m_f_item_lbutton_click = CUIDragDropListEx::DRAG_CELL_EVENT(this, &CUIMpTradeWnd::OnItemLButtonClick);
-    if (bDrag) lst->m_f_item_start_drag = CUIDragDropListEx::DRAG_CELL_EVENT(this, &CUIMpTradeWnd::OnItemStartDrag);
+    if (bDrag)
+        lst->m_f_item_start_drag = CUIDragDropListEx::DRAG_CELL_EVENT(this, &CUIMpTradeWnd::OnItemStartDrag);
 }
 
 bool CUIMpTradeWnd::OnItemDrop(CUICellItem* itm)
@@ -187,25 +193,29 @@ bool CUIMpTradeWnd::OnItemDrop(CUICellItem* itm)
 
     CUIDragDropListEx* _new_owner = CUIDragDropListEx::m_drag_item->BackList();
 
-    if (!_new_owner || _new_owner == _owner_list) return true;
+    if (!_new_owner || _new_owner == _owner_list)
+        return true;
 
     dd_list_type _new_owner_type = GetListType(_new_owner);
 
     SBuyItemInfo* iinfo = FindItem(itm);
 
-    if (_owner_type == dd_shop) {
+    if (_owner_type == dd_shop)
+    {
         BuyItemAction(iinfo);
         return true;
     }
 
-    if (_new_owner_type == dd_shop) {
+    if (_new_owner_type == dd_shop)
+    {
         SBuyItemInfo* tmp_iinfo = NULL;
         bool res = TryToSellItem(iinfo, true, tmp_iinfo);
         VERIFY(res);
         return true;
     }
 
-    if (_new_owner_type == dd_own_bag) {
+    if (_new_owner_type == dd_own_bag)
+    {
         CUICellItem* citm = _owner_list->RemoveItem(itm, false);
         _new_owner->SetItem(citm);
         UpdateCorrespondingItemsForList(_owner_list);
@@ -213,7 +223,8 @@ bool CUIMpTradeWnd::OnItemDrop(CUICellItem* itm)
     else
     {
         VERIFY(_new_owner_type == dd_own_slot);
-        if (_new_owner == GetMatchedListForItem(iinfo->m_name_sect)) {
+        if (_new_owner == GetMatchedListForItem(iinfo->m_name_sect))
+        {
             CUICellItem* citm = _owner_list->RemoveItem(itm, false);
             _new_owner->SetItem(citm);
             UpdateCorrespondingItemsForList(_new_owner);
@@ -222,11 +233,7 @@ bool CUIMpTradeWnd::OnItemDrop(CUICellItem* itm)
     return true;
 }
 
-bool CUIMpTradeWnd::OnItemStartDrag(CUICellItem* itm)
-{
-    return false;
-}
-
+bool CUIMpTradeWnd::OnItemStartDrag(CUICellItem* itm) { return false; }
 bool CUIMpTradeWnd::OnItemDbClick(CUICellItem* itm)
 {
     CUIDragDropListEx* owner_list = itm->OwnerList();
@@ -243,7 +250,8 @@ bool CUIMpTradeWnd::OnItemDbClick(CUICellItem* itm)
     case dd_own_bag:
     case dd_own_slot:
     {
-        if (!CanBuyOrSellInList(owner_list)) {
+        if (!CanBuyOrSellInList(owner_list))
+        {
             SBuyItemInfo* tmp_iinfo = NULL;
             TryToSellItem(iinfo, true, tmp_iinfo);
         }
@@ -271,7 +279,8 @@ bool CUIMpTradeWnd::OnItemLButtonClick(CUICellItem* itm)
     CUIDragDropListEx* owner_list = itm->OwnerList();
     SBuyItemInfo* iinfo = FindItem(itm);
 
-    if (!CanBuyOrSellInList(owner_list)) {
+    if (!CanBuyOrSellInList(owner_list))
+    {
         return false;
     }
 
@@ -279,7 +288,8 @@ bool CUIMpTradeWnd::OnItemLButtonClick(CUICellItem* itm)
 
     SBuyItemInfo* pitem = CreateItem(buy_item_name, SBuyItemInfo::e_undefined, false);
     bool b_res = TryToBuyItem(pitem, bf_normal, NULL);
-    if (!b_res) {
+    if (!b_res)
+    {
         DestroyItem(pitem);
     }
 
@@ -289,7 +299,7 @@ bool CUIMpTradeWnd::OnItemLButtonClick(CUICellItem* itm)
 bool CUIMpTradeWnd::CanBuyOrSellInList(CUIDragDropListEx* list)
 {
     return list == m_list[e_pistol_ammo] || list == m_list[e_rifle_ammo] || list == m_list[e_medkit] ||
-           list == m_list[e_granade];
+        list == m_list[e_granade];
 }
 
 bool CUIMpTradeWnd::OnItemRButtonClick(CUICellItem* itm)
@@ -301,20 +311,24 @@ bool CUIMpTradeWnd::OnItemRButtonClick(CUICellItem* itm)
     SBuyItemInfo* iinfo = FindItem(itm);
     SBuyItemInfo* tmp_iinfo = NULL;
 
-    if (!CanBuyOrSellInList(owner_list)) {
+    if (!CanBuyOrSellInList(owner_list))
+    {
         return false;
     }
 
     shared_str section = iinfo->m_name_sect;
     DeleteHelperItems(owner_list);
     iinfo = FindItem(section, SBuyItemInfo::e_bought);
-    if (!iinfo) iinfo = FindItem(section, SBuyItemInfo::e_own);
+    if (!iinfo)
+        iinfo = FindItem(section, SBuyItemInfo::e_own);
 
-    if (iinfo) {
+    if (iinfo)
+    {
         TryToSellItem(iinfo, true, tmp_iinfo);
     }
 
-    if (owner_list == m_list[e_pistol_ammo]) {
+    if (owner_list == m_list[e_pistol_ammo])
+    {
         UpdateCorrespondingItemsForList(m_list[e_pistol]);
     }
     else if (owner_list == m_list[e_rifle_ammo])
@@ -331,8 +345,10 @@ bool CUIMpTradeWnd::OnItemRButtonClick(CUICellItem* itm)
 
 CUIMpTradeWnd::dd_list_type CUIMpTradeWnd::GetListType(CUIDragDropListEx* l)
 {
-    if (l == m_list[e_shop]) return dd_shop;
-    if (l == m_list[e_player_bag]) return dd_own_bag;
+    if (l == m_list[e_shop])
+        return dd_shop;
+    if (l == m_list[e_player_bag])
+        return dd_own_bag;
 
     return dd_own_slot;
 }
@@ -345,31 +361,33 @@ CUIDragDropListEx* CUIMpTradeWnd::GetMatchedListForItem(const shared_str& sect_n
     res = m_list[list_idx];
 
     // special case
-    if (list_idx == e_pistol_ammo || list_idx == e_rifle_ammo) {
+    if (list_idx == e_pistol_ammo || list_idx == e_rifle_ammo)
+    {
         CUICellItem* ci = (m_list[list_idx - 1]->ItemsCount()) ? m_list[list_idx - 1]->GetItemIdx(0) : NULL;
-        if (!ci) return m_list[e_player_bag];
+        if (!ci)
+            return m_list[e_player_bag];
 
         CInventoryItem* ii = (CInventoryItem*)ci->m_pData;
 
-        if (!ii->IsNecessaryItem(sect_name)) return m_list[e_player_bag];
+        if (!ii->IsNecessaryItem(sect_name))
+            return m_list[e_player_bag];
     }
 
-    if (list_idx == e_pistol || list_idx == e_rifle || list_idx == e_outfit || list_idx == e_outfit) {
-        if (m_list[list_idx]->ItemsCount()) return m_list[e_player_bag];
+    if (list_idx == e_pistol || list_idx == e_rifle || list_idx == e_outfit || list_idx == e_outfit)
+    {
+        if (m_list[list_idx]->ItemsCount())
+            return m_list[e_player_bag];
     }
     return res;
 }
 
-const u32 CUIMpTradeWnd::GetRank() const
-{
-    return g_mp_restrictions.GetRank();
-}
-
+const u32 CUIMpTradeWnd::GetRank() const { return g_mp_restrictions.GetRank(); }
 shared_str _fake;
 const shared_str& CUIMpTradeWnd::GetWeaponNameByIndex(u8 grpNum, u8 idx)
 {
     //	return _fake;
-    if (idx >= m_item_mngr->GetItemsCount()) return _fake;
+    if (idx >= m_item_mngr->GetItemsCount())
+        return _fake;
     return m_item_mngr->GetItemName(u32(idx));
 }
 
@@ -384,21 +402,15 @@ void CUIMpTradeWnd::IgnoreMoneyAndRank(bool ignore)
 {
     m_bIgnoreMoneyAndRank = ignore;
 
-    if (m_bIgnoreMoneyAndRank) {
+    if (m_bIgnoreMoneyAndRank)
+    {
         SetMoneyAmount(1);
         SetRank(0);
     }
 }
 
-void CUIMpTradeWnd::IgnoreMoney(bool ignore)
-{
-}
-
-u32 CUIMpTradeWnd::GetMoneyAmount() const
-{
-    return m_money;
-}
-
+void CUIMpTradeWnd::IgnoreMoney(bool ignore) {}
+u32 CUIMpTradeWnd::GetMoneyAmount() const { return m_money; }
 u32 CUIMpTradeWnd::GetPresetCost(ETradePreset idx)
 {
     const preset_items& v = GetPreset(idx);
@@ -412,11 +424,14 @@ u32 CUIMpTradeWnd::GetPresetCost(ETradePreset idx)
 
         u32 _item_cost = m_item_mngr->GetItemCost(_one.sect_name, GetRank());
 
-        if (_one.addon_names[0].c_str()) _item_cost += m_item_mngr->GetItemCost(_one.addon_names[0], GetRank());
+        if (_one.addon_names[0].c_str())
+            _item_cost += m_item_mngr->GetItemCost(_one.addon_names[0], GetRank());
 
-        if (_one.addon_names[1].c_str()) _item_cost += m_item_mngr->GetItemCost(_one.addon_names[1], GetRank());
+        if (_one.addon_names[1].c_str())
+            _item_cost += m_item_mngr->GetItemCost(_one.addon_names[1], GetRank());
 
-        if (_one.addon_names[2].c_str()) _item_cost += m_item_mngr->GetItemCost(_one.addon_names[2], GetRank());
+        if (_one.addon_names[2].c_str())
+            _item_cost += m_item_mngr->GetItemCost(_one.addon_names[2], GetRank());
 
         _item_cost *= _one.count;
 
@@ -427,7 +442,8 @@ u32 CUIMpTradeWnd::GetPresetCost(ETradePreset idx)
 
 void CUIMpTradeWnd::SetRank(u32 rank)
 {
-    if (m_bIgnoreMoneyAndRank) rank = _RANK_COUNT - 1;
+    if (m_bIgnoreMoneyAndRank)
+        rank = _RANK_COUNT - 1;
     g_mp_restrictions.SetRank(rank);
 
     string64 tex_name;
@@ -439,26 +455,24 @@ void CUIMpTradeWnd::SetRank(u32 rank)
     m_static_player_rank->InitTexture(tex_name);
     m_static_player_rank->TextureOn();
 
-    if (m_bIgnoreMoneyAndRank) m_static_player_rank->TextureOff();
+    if (m_bIgnoreMoneyAndRank)
+        m_static_player_rank->TextureOff();
 }
 
-u32 CUIMpTradeWnd::GetRank()
-{
-    return g_mp_restrictions.GetRank();
-};
-
+u32 CUIMpTradeWnd::GetRank() { return g_mp_restrictions.GetRank(); };
 void CUIMpTradeWnd::SetMoneyAmount(u32 money)
 {
     VERIFY(money >= 0);
     m_money = money;
-    if (m_bIgnoreMoneyAndRank) m_money = u32(-1);
+    if (m_bIgnoreMoneyAndRank)
+        m_money = u32(-1);
 }
 
 void CUIMpTradeWnd::ResetItems()
 {
 #ifdef DEBUG
     Msg("--ResetItems");
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
     ResetToOrigin();
     CleanUserItems();
     m_store_hierarchy->Reset();
@@ -466,11 +480,7 @@ void CUIMpTradeWnd::ResetItems()
     SetCurrentItem(NULL);
 }
 
-bool CUIMpTradeWnd::CanBuyAllItems()
-{
-    return true;
-}
-
+bool CUIMpTradeWnd::CanBuyAllItems() { return true; }
 void CUIMpTradeWnd::AddonToSlot(int add_on, int slot, bool bRealRepresentationSet)
 {
     // own
@@ -481,7 +491,4 @@ void CUIMpTradeWnd::SectionToSlot(const u8 grpNum, u8 uIndexInSlot, bool bRealRe
     // own
 }
 
-bool CUIMpTradeWnd::CheckBuyAvailabilityInSlots()
-{
-    return true;
-}
+bool CUIMpTradeWnd::CheckBuyAvailabilityInSlots() { return true; }

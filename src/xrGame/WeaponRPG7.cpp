@@ -7,14 +7,8 @@
 #include "player_hud.h"
 #include "hudmanager.h"
 
-CWeaponRPG7::CWeaponRPG7()
-{
-}
-
-CWeaponRPG7::~CWeaponRPG7()
-{
-}
-
+CWeaponRPG7::CWeaponRPG7() {}
+CWeaponRPG7::~CWeaponRPG7() {}
 void CWeaponRPG7::Load(LPCSTR section)
 {
     inherited::Load(section);
@@ -25,11 +19,7 @@ void CWeaponRPG7::Load(LPCSTR section)
     m_sRocketSection = pSettings->r_string(section, "rocket_class");
 }
 
-bool CWeaponRPG7::AllowBore()
-{
-    return inherited::AllowBore() && 0 != iAmmoElapsed;
-}
-
+bool CWeaponRPG7::AllowBore() { return inherited::AllowBore() && 0 != iAmmoElapsed; }
 void CWeaponRPG7::FireTrace(const Fvector& P, const Fvector& D)
 {
     inherited::FireTrace(P, D);
@@ -48,7 +38,8 @@ void CWeaponRPG7::UpdateMissileVisibility()
     vis_hud = (!!iAmmoElapsed || GetState() == eReload);
     vis_weap = !!iAmmoElapsed;
 
-    if (GetHUDmode()) {
+    if (GetHUDmode())
+    {
         HudItemData()->set_bone_visible("grenade", vis_hud, TRUE);
     }
 
@@ -62,7 +53,8 @@ BOOL CWeaponRPG7::net_Spawn(CSE_Abstract* DC)
     BOOL l_res = inherited::net_Spawn(DC);
 
     UpdateMissileVisibility();
-    if (iAmmoElapsed && !getCurrentRocket()) CRocketLauncher::SpawnRocket(m_sRocketSection, this);
+    if (iAmmoElapsed && !getCurrentRocket())
+        CRocketLauncher::SpawnRocket(m_sRocketSection, this);
 
     return l_res;
 }
@@ -83,19 +75,12 @@ void CWeaponRPG7::ReloadMagazine()
 {
     inherited::ReloadMagazine();
 
-    if (iAmmoElapsed && !getRocketCount()) CRocketLauncher::SpawnRocket(m_sRocketSection.c_str(), this);
+    if (iAmmoElapsed && !getRocketCount())
+        CRocketLauncher::SpawnRocket(m_sRocketSection.c_str(), this);
 }
 
-void CWeaponRPG7::SwitchState(u32 S)
-{
-    inherited::SwitchState(S);
-}
-
-void CWeaponRPG7::FireStart()
-{
-    inherited::FireStart();
-}
-
+void CWeaponRPG7::SwitchState(u32 S) { inherited::SwitchState(S); }
+void CWeaponRPG7::FireStart() { inherited::FireStart(); }
 #include "inventory.h"
 #include "inventoryOwner.h"
 void CWeaponRPG7::switch2_Fire()
@@ -104,7 +89,8 @@ void CWeaponRPG7::switch2_Fire()
     m_bFireSingleShot = true;
     bWorking = false;
 
-    if (GetState() == eFire && getRocketCount()) {
+    if (GetState() == eFire && getRocketCount())
+    {
         Fvector p1, d1, p;
         Fvector p2, d2, d;
         p1.set(get_LastFP());
@@ -112,12 +98,14 @@ void CWeaponRPG7::switch2_Fire()
         p = p1;
         d = d1;
         CEntity* E = smart_cast<CEntity*>(H_Parent());
-        if (E) {
+        if (E)
+        {
             E->g_fireParams(this, p2, d2);
             p = p2;
             d = d2;
 
-            if (IsHudModeNow()) {
+            if (IsHudModeNow())
+            {
                 Fvector p0;
                 float dist = HUD().GetCurrentRayQuery().range;
                 p0.mul(d2, dist);
@@ -143,7 +131,8 @@ void CWeaponRPG7::switch2_Fire()
         VERIFY(pGrenade);
         pGrenade->SetInitiator(H_Parent()->ID());
 
-        if (OnServer()) {
+        if (OnServer())
+        {
             NET_Packet P;
             u_EventGen(P, GE_LAUNCH_ROCKET, ID());
             P.w_u16(u16(getCurrentRocket()->ID()));
@@ -176,7 +165,8 @@ void CWeaponRPG7::OnEvent(NET_Packet& P, u16 type)
         bool bLaunch = (type == GE_LAUNCH_ROCKET);
         P.r_u16(id);
         CRocketLauncher::DetachRocket(id, bLaunch);
-        if (bLaunch) UpdateMissileVisibility();
+        if (bLaunch)
+            UpdateMissileVisibility();
     }
     break;
     }

@@ -16,7 +16,6 @@ struct SSimpleImage
     u32 tag;
 
     int LongestEdge() const { return (w > h) ? w : h; }
-
     int Area() const { return w * h; }
 };
 
@@ -42,10 +41,10 @@ class ECORE_API CImageManager
 {
     bool MakeGameTexture(ETextureThumbnail* THM, LPCSTR game_name, u32* data);
 
-  public:
+public:
     static void MakeThumbnailImage(ETextureThumbnail* THM, u32* data, u32 w, u32 h, u32 a);
 
-  public:
+public:
     CImageManager() { ; }
     ~CImageManager() { ; }
     // texture routines

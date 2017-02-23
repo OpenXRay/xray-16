@@ -13,7 +13,7 @@ public:
 public:
     union
     {
-        struct  // Direct definition
+        struct // Direct definition
         {
             T _11, _12, _13;
             T _21, _22, _23;
@@ -25,7 +25,7 @@ public:
             Tvector j;
             Tvector k;
         };
-        float m[3][3];  // Array
+        float m[3][3]; // Array
     };
     // Class members
     IC SelfRef set_rapid(const _matrix<T>& a)
@@ -73,7 +73,7 @@ public:
         return *this;
     }
 
-    IC SelfRef transpose(SelfCRef matSource)  // faster version of transpose
+    IC SelfRef transpose(SelfCRef matSource) // faster version of transpose
     {
         _11 = matSource._11;
         _12 = matSource._21;
@@ -86,7 +86,7 @@ public:
         _33 = matSource._33;
         return *this;
     }
-    IC SelfRef transpose(const _matrix<T>& matSource)  // faster version of transpose
+    IC SelfRef transpose(const _matrix<T>& matSource) // faster version of transpose
     {
         _11 = matSource._11;
         _12 = matSource._21;
@@ -99,10 +99,10 @@ public:
         _33 = matSource._33;
         return *this;
     }
-    IC SelfRef transpose(void)  // self transpose - slower
+    IC SelfRef transpose(void) // self transpose - slower
     {
         _matrix33 a;
-        CopyMemory(&a, this, 9 * sizeof(float));  // save matrix
+        CopyMemory(&a, this, 9 * sizeof(float)); // save matrix
         transpose(a);
         return *this;
     }
@@ -135,10 +135,10 @@ public:
         return *this;
     }
 
-#define ROT(a, i, j, k, l)                                                                                             \
-    g = a.m[i][j];                                                                                                     \
-    h = a.m[k][l];                                                                                                     \
-    a.m[i][j] = g - s * (h + g * tau);                                                                                 \
+#define ROT(a, i, j, k, l)             \
+    g = a.m[i][j];                     \
+    h = a.m[k][l];                     \
+    a.m[i][j] = g - s * (h + g * tau); \
     a.m[k][l] = h + s * (g - h * tau);
 
     int IC Meigen(Tvector& dout, SelfRef a)
@@ -165,7 +165,8 @@ public:
             sm += _abs(a.m[0][1]);
             sm += _abs(a.m[0][2]);
             sm += _abs(a.m[1][2]);
-            if (sm == 0.0) {
+            if (sm == 0.0)
+            {
                 set(v);
                 dout.set(d);
                 return i;
@@ -187,7 +188,8 @@ public:
                     {
                         theta = 0.5f * h / (a.m[0][1]);
                         t = 1.0f / (_abs(theta) + _sqrt(1.0f + theta * theta));
-                        if (theta < 0.0f) t = -t;
+                        if (theta < 0.0f)
+                            t = -t;
                     }
                     c = 1.0f / _sqrt(1 + t * t);
                     s = t * c;
@@ -218,7 +220,8 @@ public:
                     {
                         theta = 0.5f * h / (a.m[0][2]);
                         t = 1.0f / (_abs(theta) + _sqrt(1.0f + theta * theta));
-                        if (theta < 0.0f) t = -t;
+                        if (theta < 0.0f)
+                            t = -t;
                     }
                     c = 1.0f / _sqrt(1 + t * t);
                     s = t * c;
@@ -249,7 +252,8 @@ public:
                     {
                         theta = 0.5f * h / (a.m[1][2]);
                         t = 1.0f / (_abs(theta) + _sqrt(1.0f + theta * theta));
-                        if (theta < 0.0) t = -t;
+                        if (theta < 0.0)
+                            t = -t;
                     }
                     c = 1.0f / _sqrt(1 + t * t);
                     s = t * c;
@@ -381,7 +385,7 @@ public:
         R.z = (m[2][0] * V1.x + m[2][1] * V1.y + m[2][2] * V1.z);
         return *this;
     }
-    IC void transform_dir(_vector2<T>& dest, const _vector2<T>& v) const  // preferred to use
+    IC void transform_dir(_vector2<T>& dest, const _vector2<T>& v) const // preferred to use
     {
         dest.x = v.x * _11 + v.y * _21;
         dest.y = v.x * _12 + v.y * _22;

@@ -86,7 +86,7 @@ public:
 #ifdef XRGAME_EXPORTS
     virtual void add_online(const bool& update_registries);
     virtual void add_offline(const xr_vector<ALife::_OBJECT_ID>& saved_children, const bool& update_registries);
-#if 0  // def DEBUG
+#if 0 // def DEBUG
             bool                    check_inventory_consistency ();
 #endif
     void vfInitInventory();
@@ -113,7 +113,6 @@ public:
     virtual const CSE_Abstract* base() const;
     virtual bool natural_weapon() const { return false; }
     virtual bool natural_detector() const { return false; }
-
 #ifdef XRGAME_EXPORTS
     u32 dwfGetItemCost(CSE_ALifeInventoryItem* tpALifeInventoryItem);
     virtual void spawn_supplies();
@@ -240,10 +239,10 @@ public:
     float m_fAccuracy;
     float m_fIntelligence;
 
-    u32 timestamp;  // server(game) timestamp
+    u32 timestamp; // server(game) timestamp
     u8 flags;
-    float o_model;      // model yaw
-    SRotation o_torso;  // torso in world coords
+    float o_model; // model yaw
+    SRotation o_torso; // torso in world coords
     bool m_bDeathIsProcessed;
 
     xr_vector<ALife::_OBJECT_ID> m_dynamic_out_restrictions;
@@ -263,7 +262,6 @@ public:
 
     IC float get_health() const { return fHealth; }
     IC ALife::_OBJECT_ID get_killer_id() const { return m_killer_id; }
-
     void set_health(float const health_value);
     void set_killer_id(ALife::_OBJECT_ID const killer_id);
 
@@ -332,7 +330,6 @@ public:
     virtual CSE_Abstract* cast_abstract() { return this; };
     virtual CSE_ALifeSchedulable* cast_schedulable() { return this; };
     virtual CSE_ALifeMonsterAbstract* cast_monster_abstract() { return this; };
-
     IC CALifeMonsterBrain& brain() const
     {
         VERIFY(m_brain);
@@ -344,11 +341,10 @@ public:
     virtual u32 ef_detector_type() const;
 
     IC int Rank() { return m_rank; }
-
 #ifdef XRGAME_EXPORTS
     void kill();
     bool has_detector();
-#endif  // #ifdef XRGAME_EXPORTS
+#endif // #ifdef XRGAME_EXPORTS
 
 #ifndef XRGAME_EXPORTS
     virtual void update(){};
@@ -428,7 +424,6 @@ public:
 #endif
     virtual CSE_Abstract* cast_abstract() { return this; };
     virtual CSE_ALifeTraderAbstract* cast_trader_abstract() { return this; };
-
 public:
     virtual BOOL Net_Relevant();
     virtual void UPDATE_Read(NET_Packet& P);
@@ -498,7 +493,7 @@ public:
     float fAttackAngle;
     float fAttackSuccessProbability;
 
-    CSE_ALifeMonsterRat(LPCSTR caSection);  // constructor for variable initialization
+    CSE_ALifeMonsterRat(LPCSTR caSection); // constructor for variable initialization
     virtual ~CSE_ALifeMonsterRat();
     virtual bool bfUseful();
     virtual CSE_Abstract* init();
@@ -532,7 +527,7 @@ public:
     float fAttackDistance;
     float fAttackAngle;
 
-    CSE_ALifeMonsterZombie(LPCSTR caSection);  // constructor for variable initialization
+    CSE_ALifeMonsterZombie(LPCSTR caSection); // constructor for variable initialization
     virtual ~CSE_ALifeMonsterZombie();
     virtual void UPDATE_Read(NET_Packet& P);
     virtual void UPDATE_Write(NET_Packet& P);
@@ -549,7 +544,7 @@ class CSE_ALifeMonsterBase : public CSE_ALifeMonsterAbstract, public CSE_PHSkele
 public:
     u16 m_spec_object_id;
 
-    CSE_ALifeMonsterBase(LPCSTR caSection);  // constructor for variable initialization
+    CSE_ALifeMonsterBase(LPCSTR caSection); // constructor for variable initialization
     virtual ~CSE_ALifeMonsterBase();
     virtual void load(NET_Packet& tNetPacket);
     virtual CSE_Abstract* cast_abstract() { return this; }
@@ -559,7 +554,7 @@ public:
     virtual void on_spawn();
     virtual void add_online(const bool& update_registries);
     virtual void add_offline(const xr_vector<ALife::_OBJECT_ID>& saved_children, const bool& update_registries);
-#endif  // XRGAME_EXPORTS
+#endif // XRGAME_EXPORTS
     virtual void UPDATE_Read(NET_Packet& P);
     virtual void UPDATE_Write(NET_Packet& P);
     virtual void STATE_Read(NET_Packet& P, u16 size);
@@ -572,7 +567,7 @@ class CSE_ALifePsyDogPhantom : public CSE_ALifeMonsterBase
     using inherited = CSE_ALifeMonsterBase;
 
 public:
-    CSE_ALifePsyDogPhantom(LPCSTR caSection);  // constructor for variable initialization
+    CSE_ALifePsyDogPhantom(LPCSTR caSection); // constructor for variable initialization
     virtual ~CSE_ALifePsyDogPhantom();
     virtual CSE_Abstract* cast_abstract() { return this; }
     virtual bool bfActive() { return false; }
@@ -673,7 +668,7 @@ public:
     virtual CSE_ALifeOnlineOfflineGroup* cast_online_offline_group() { return this; };
 #ifdef XRGAME_EXPORTS
     virtual CALifeSmartTerrainTask* get_current_task();
-#endif  // #ifdef XRGAME_EXPORTS
+#endif // #ifdef XRGAME_EXPORTS
 
 public:
     typedef CSE_ALifeMonsterAbstract MEMBER;

@@ -50,8 +50,8 @@ private:
     void load_actions(luabind::adl::object const& table, ActionsList& result);
 };
 
-}  // namespace smart_cover
+} // namespace smart_cover
 
 #include "smart_cover_description_inline.h"
 
-#endif  // SMART_COVER_DESCRIPTION_H_INCLUDED
+#endif // SMART_COVER_DESCRIPTION_H_INCLUDED

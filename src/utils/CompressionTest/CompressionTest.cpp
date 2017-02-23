@@ -22,17 +22,15 @@ class StopWatch
 {
 public:
     StopWatch() { ::QueryPerformanceFrequency(&_freq); }
-
     void start() { ::QueryPerformanceCounter(&_start_time); }
     void stop() { ::QueryPerformanceCounter(&_stop_time); }
-
     double cur_time() const
     {
         LARGE_INTEGER t;
         QueryPerformanceCounter(&t);
         return ((t.QuadPart - _start_time.QuadPart) * 1000.0) / _freq.QuadPart;
     }
-    double time() const  // in milliseconds
+    double time() const // in milliseconds
     {
         return ((_stop_time.QuadPart - _start_time.QuadPart) * 1000.0) / _freq.QuadPart;
     }
@@ -45,10 +43,7 @@ private:
 
 //------------------------------------------------------------------------------
 
-void _STDCALL PrintInfo(_PPMD_FILE*, _PPMD_FILE*)
-{
-}
-
+void _STDCALL PrintInfo(_PPMD_FILE*, _PPMD_FILE*) {}
 //------------------------------------------------------------------------------
 
 struct BlockInfo
@@ -78,7 +73,6 @@ struct BlockInfo
     public:
         EqualSize(unsigned sz) : _sz(sz) {}
         bool operator()(const BlockInfo& bi) { return bi.size == this->_sz; }
-
     private:
         unsigned _sz;
     };
@@ -113,10 +107,12 @@ static unsigned _LZO_TotalCompressed = 0;
 
 static void _InitPPM(const char* model_file = 0)
 {
-    if (model_file) {
+    if (model_file)
+    {
         FILE* mdl = fopen(model_file, "rb");
 
-        if (mdl) {
+        if (mdl)
+        {
             fseek(mdl, 0, SEEK_END);
 
             _ModelDataSize = ftell(mdl);
@@ -144,7 +140,8 @@ static void _InitLZO(const char* dic_name = _DefaultDictName)
 
     FILE* dic = fopen(dic_name, "rb");
 
-    if (dic) {
+    if (dic)
+    {
         fseek(dic, 0, SEEK_END);
 
         _LZO_Dict_Sz = ftell(dic);
@@ -166,7 +163,8 @@ static bool _ProcessFile_PPMd(const char* file_name)
     bool success = false;
     FILE* file = fopen(file_name, "rb");
 
-    if (file) {
+    if (file)
+    {
         // read data
 
         fseek(file, 0, SEEK_END);
@@ -190,21 +188,24 @@ static bool _ProcessFile_PPMd(const char* file_name)
         StopWatch timer;
 
         timer.start();
-        if (trained_model) trained_model->rewind();
+        if (trained_model)
+            trained_model->rewind();
         EncodeFile(&dst, &src, _OrderModel, _RestorationMethodCutOff);
         timer.stop();
         printf("PPMd1 :  %2.0f%% %1.5fms  %u->%u\n", 100.0f * float(dst.tell()) / float(src.tell()),
             (float)timer.time(), src.tell(), dst.tell());
 
         timer.start();
-        if (trained_model) trained_model->rewind();
+        if (trained_model)
+            trained_model->rewind();
         EncodeFile(&dst, &src, _OrderModel, _RestorationMethodCutOff);
         timer.stop();
         printf("PPMd2 :  %2.0f%% %1.5fms  %u->%u\n", 100.0f * float(dst.tell()) / float(src.tell()),
             (float)timer.time(), src.tell(), dst.tell());
 
         timer.start();
-        if (trained_model) trained_model->rewind();
+        if (trained_model)
+            trained_model->rewind();
         EncodeFile(&dst, &src, _OrderModel, _RestorationMethodCutOff);
         timer.stop();
         printf("PPMd3 :  %2.0f%% %1.5fms  %u->%u\n", 100.0f * float(dst.tell()) / float(src.tell()),
@@ -222,7 +223,8 @@ static bool _ProcessFile_PPMd(const char* file_name)
         memset(uncomp_data, 0xDD, uncomp_size);
 
         dst.rewind();
-        if (trained_model) trained_model->rewind();
+        if (trained_model)
+            trained_model->rewind();
         DecodeFile(&uncomp, &dst, _OrderModel, _RestorationMethodCutOff);
 
         // compare
@@ -232,7 +234,8 @@ static bool _ProcessFile_PPMd(const char* file_name)
 
         for (const char *s = src_data, *u = uncomp_data; s != src_data + src_size; ++s, ++u)
         {
-            if (*s != *u) {
+            if (*s != *u)
+            {
                 ok = false;
                 err_b = s - src_data;
                 break;
@@ -250,7 +253,8 @@ static bool _ProcessFile_PPMd(const char* file_name)
         vector<BlockInfo>::iterator i =
             find_if(_PPM_BlockInfo.begin(), _PPM_BlockInfo.end(), BlockInfo::EqualSize(src_size));
 
-        if (i == _PPM_BlockInfo.end()) {
+        if (i == _PPM_BlockInfo.end())
+        {
             _PPM_BlockInfo.push_back(BlockInfo(src_size));
             i = _PPM_BlockInfo.end() - 1;
         }
@@ -264,7 +268,7 @@ static bool _ProcessFile_PPMd(const char* file_name)
         delete[] uncomp_data;
         delete[] comp_data;
         delete[] src_data;
-    }  // if file open
+    } // if file open
 
     return success;
 }
@@ -276,7 +280,8 @@ static bool _ProcessFile_LZO(const char* file_name)
     bool success = false;
     FILE* file = fopen(file_name, "rb");
 
-    if (file) {
+    if (file)
+    {
         // read data
 
         fseek(file, 0, SEEK_END);
@@ -298,7 +303,8 @@ static bool _ProcessFile_LZO(const char* file_name)
         StopWatch timer;
 
         timer.start();
-        if (_LZO_Dict) {
+        if (_LZO_Dict)
+        {
             lzo1x_999_compress_dict(src_data, src_size, comp_data, &comp_size, _LZOWrkMem, _LZO_Dict, _LZO_Dict_Sz);
         }
         else
@@ -318,7 +324,8 @@ static bool _ProcessFile_LZO(const char* file_name)
         uint8_t* uncomp_data = new uint8_t[uncomp_size];
 
         memset(uncomp_data, 0xDD, uncomp_size);
-        if (_LZO_Dict) {
+        if (_LZO_Dict)
+        {
             lzo1x_decompress_dict_safe(comp_data, comp_size, uncomp_data, &uncomp_size, NULL, _LZO_Dict, _LZO_Dict_Sz);
         }
         else
@@ -333,7 +340,8 @@ static bool _ProcessFile_LZO(const char* file_name)
 
         for (const uint8_t *s = src_data, *u = uncomp_data; s != src_data + src_size; ++s, ++u)
         {
-            if (*s != *u) {
+            if (*s != *u)
+            {
                 ok = false;
                 err_b = s - src_data;
                 break;
@@ -351,7 +359,8 @@ static bool _ProcessFile_LZO(const char* file_name)
         vector<BlockInfo>::iterator i =
             find_if(_LZO_BlockInfo.begin(), _LZO_BlockInfo.end(), BlockInfo::EqualSize(src_size));
 
-        if (i == _LZO_BlockInfo.end()) {
+        if (i == _LZO_BlockInfo.end())
+        {
             _LZO_BlockInfo.push_back(BlockInfo(src_size));
             i = _LZO_BlockInfo.end() - 1;
         }
@@ -365,7 +374,7 @@ static bool _ProcessFile_LZO(const char* file_name)
         delete[] uncomp_data;
         delete[] comp_data;
         delete[] src_data;
-    }  // if file open
+    } // if file open
 
     return success;
 }
@@ -394,7 +403,8 @@ int main(int argc, char* argv[])
     {
         const char* arg = argv[i];
 
-        if (arg[0] == '-' || arg[0] == '/') {
+        if (arg[0] == '-' || arg[0] == '/')
+        {
             if (!_strnicmp(arg + 1, "mdl", 3))
                 mdl_name = arg + 1 + 3 + 1;
             else if (!_strnicmp(arg + 1, "dic", 3))
@@ -402,7 +412,8 @@ int main(int argc, char* argv[])
         }
     }
 
-    if (argc > 1) {
+    if (argc > 1)
+    {
         _InitPPM(mdl_name);
         _InitLZO(dic_name);
 
@@ -416,29 +427,34 @@ int main(int argc, char* argv[])
 
         while (end > src_name)
         {
-            if (*end == '\\' || *end == '/') break;
+            if (*end == '\\' || *end == '/')
+                break;
 
             --end;
         }
 
-        if (*end == '\\' || *end == '/') {
+        if (*end == '\\' || *end == '/')
+        {
             strncpy(dir, src_name, end - src_name);
             dir[end - src_name] = '\0';
         }
 
         // process files
 
-        if (handle != reinterpret_cast<HANDLE>(INVALID_HANDLE_VALUE)) {
+        if (handle != reinterpret_cast<HANDLE>(INVALID_HANDLE_VALUE))
+        {
             BOOL rv = TRUE;
             bool all_ok = true;
 
             while (rv)
             {
-                if (!(found_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
+                if (!(found_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
+                {
                     char name[2048];
 
                     _snprintf(name, sizeof(name), "%s\\%s", dir, found_data.cFileName);
-                    if (!_ProcessFile(name)) {
+                    if (!_ProcessFile(name))
+                    {
                         all_ok = false;
                         break;
                     }
@@ -492,7 +508,7 @@ int main(int argc, char* argv[])
         printf("LZO  :  %2.1f%%  %u -> %u\n", 100.0f * float(_LZO_TotalCompressed) / float(_LZO_TotalUncompressed),
             _LZO_TotalUncompressed, _LZO_TotalCompressed);
 
-    }  // if( argc > 1 )
+    } // if( argc > 1 )
 
     return 0;
 }

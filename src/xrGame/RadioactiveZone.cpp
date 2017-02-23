@@ -8,23 +8,14 @@
 #include "Hit.h"
 #include "xrEngine/xr_collide_form.h"
 
-CRadioactiveZone::CRadioactiveZone(void)
-{
-}
-
-CRadioactiveZone::~CRadioactiveZone(void)
-{
-}
-
-void CRadioactiveZone::Load(LPCSTR section)
-{
-    inherited::Load(section);
-}
-
+CRadioactiveZone::CRadioactiveZone(void) {}
+CRadioactiveZone::~CRadioactiveZone(void) {}
+void CRadioactiveZone::Load(LPCSTR section) { inherited::Load(section); }
 bool CRadioactiveZone::BlowoutState()
 {
     bool result = inherited::BlowoutState();
-    if (!result) UpdateBlowout();
+    if (!result)
+        UpdateBlowout();
     return result;
 }
 
@@ -33,7 +24,8 @@ void CRadioactiveZone::Affect(SZoneObjectInfo* O)
     float one = 0.1f;
     float tg = Device.fTimeGlobal;
 
-    if (!O->object || O->f_time_affected + one > Device.fTimeGlobal) return;
+    if (!O->object || O->f_time_affected + one > Device.fTimeGlobal)
+        return;
 
     clamp(O->f_time_affected, tg - (one * 3), tg);
 
@@ -44,7 +36,8 @@ void CRadioactiveZone::Affect(SZoneObjectInfo* O)
     float power = Power(O->object->Position().distance_to(pos), nearest_shape_radius(O));
 
     float impulse = 0.0f;
-    if (power < EPS) {
+    if (power < EPS)
+    {
         O->f_time_affected = tg;
         return;
     }
@@ -66,16 +59,18 @@ void CRadioactiveZone::Affect(SZoneObjectInfo* O)
 ///		Msg( "Zone hit ___   damage = %.4f    Frame=%d ", send_power, Device.dwFrame );
 #endif
         O->f_time_affected += one;
-    }  // while
+    } // while
 }
 
 void CRadioactiveZone::feel_touch_new(IGameObject* O)
 {
     inherited::feel_touch_new(O);
-    if (GameID() != eGameIDSingle) {
-        if (smart_cast<CActor*>(O)) {
+    if (GameID() != eGameIDSingle)
+    {
+        if (smart_cast<CActor*>(O))
+        {
             CreateHit(O->ID(), ID(), Fvector().set(0, 0, 0), 0.0f, BI_NONE, Fvector().set(0, 0, 0), 0.0f,
-                m_eHitTypeBlowout);  // ALife::eHitTypeRadiation
+                m_eHitTypeBlowout); // ALife::eHitTypeRadiation
         }
     };
 };
@@ -84,8 +79,10 @@ void CRadioactiveZone::feel_touch_new(IGameObject* O)
 bool CRadioactiveZone::feel_touch_contact(IGameObject* O)
 {
     CActor* A = smart_cast<CActor*>(O);
-    if (A) {
-        if (!((CCF_Shape*)GetCForm())->Contact(O)) return false;
+    if (A)
+    {
+        if (!((CCF_Shape*)GetCForm())->Contact(O))
+            return false;
         return A->feel_touch_on_contact(this);
     }
     else
@@ -94,13 +91,15 @@ bool CRadioactiveZone::feel_touch_contact(IGameObject* O)
 
 void CRadioactiveZone::UpdateWorkload(u32 dt)
 {
-    if (IsEnabled() && GameID() != eGameIDSingle) {
+    if (IsEnabled() && GameID() != eGameIDSingle)
+    {
         OBJECT_INFO_VEC_IT it;
         Fvector pos;
         XFORM().transform_tiny(pos, GetCForm()->getSphere().P);
         for (it = m_ObjectInfoMap.begin(); m_ObjectInfoMap.end() != it; ++it)
         {
-            if (!(*it).object->getDestroy() && smart_cast<CActor*>((*it).object)) {
+            if (!(*it).object->getDestroy() && smart_cast<CActor*>((*it).object))
+            {
                 //=====================================
                 NET_Packet l_P;
                 l_P.write_start();
@@ -134,7 +133,8 @@ float CRadioactiveZone::nearest_shape_radius(SZoneObjectInfo* O)
 {
     CCF_Shape* Sh = (CCF_Shape*)GetCForm();
 
-    if (Sh->Shapes().size() == 1) {
+    if (Sh->Shapes().size() == 1)
+    {
         return Radius();
     }
     else

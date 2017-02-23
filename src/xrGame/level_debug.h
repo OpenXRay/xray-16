@@ -62,7 +62,6 @@ public:
             std::sort(m_data.begin(), m_data.end(), sort_id_pred());
         }
         IC void clear() { m_data.clear(); }
-
         template <class T>
         IC void process(T& process_pred)
         {
@@ -96,7 +95,6 @@ public:
 
     public:
         CObjectInfo() { setup(); }
-
         void add_item(LPCSTR text, u32 color, u32 id = u32(-1));
 
         void draw_info(float x, float& y);

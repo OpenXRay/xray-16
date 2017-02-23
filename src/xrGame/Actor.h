@@ -80,7 +80,6 @@ public:
 
 public:
     virtual BOOL AlwaysTheCrow() { return TRUE; }
-
     virtual CAttachmentOwner* cast_attachment_owner() { return this; }
     virtual CInventoryOwner* cast_inventory_owner() { return this; }
     virtual CActor* cast_actor() { return this; }
@@ -90,7 +89,6 @@ public:
     virtual CCharacterPhysicsSupport* character_physics_support() const { return m_pPhysics_support; }
     virtual CPHDestroyable* ph_destroyable();
     CHolderCustom* Holder() { return m_holder; }
-
 public:
     virtual void Load(LPCSTR section);
 
@@ -146,7 +144,6 @@ public:
     CCharacterPhysicsSupport* m_pPhysics_support;
 
     virtual LPCSTR Name() const { return CInventoryOwner::Name(); }
-
 public:
     // PhraseDialogManager
     virtual void ReceivePhrase(DIALOG_SHARED_PTR& phrase_dialog);
@@ -242,7 +239,6 @@ public:
     s32 GetZoomRndSeed() { return m_ZoomRndSeed; };
     void SetShotRndSeed(s32 Seed = 0);
     s32 GetShotRndSeed() { return m_ShotRndSeed; };
-
 public:
     void detach_Vehicle();
     void steer_Vehicle(float angle);
@@ -270,8 +266,8 @@ protected:
 
     //ориентаци€ модели
     float r_model_yaw_dest;
-    float r_model_yaw;        // orientation of model
-    float r_model_yaw_delta;  // effect on multiple "strafe"+"something"
+    float r_model_yaw; // orientation of model
+    float r_model_yaw_delta; // effect on multiple "strafe"+"something"
 
 public:
     SActorMotions* m_anims;
@@ -295,7 +291,6 @@ public:
 
     virtual const SRotation Orientation() const { return r_torso; };
     SRotation& Orientation() { return r_torso; };
-
     void g_SetAnimation(u32 mstate_rl);
     void g_SetSprintAnimation(u32 mstate_rl, MotionID& head, MotionID& torso, MotionID& legs);
 
@@ -306,7 +301,6 @@ public:
     // visiblity
     virtual float ffGetFov() const { return 90.f; }
     virtual float ffGetRange() const { return 500.f; }
-
 public:
     CActorCameraManager& Cameras()
     {
@@ -315,7 +309,6 @@ public:
     }
     IC CCameraBase* cam_Active() { return cameras[cam_active]; }
     IC CCameraBase* cam_FirstEye() { return cameras[eacFirstEye]; }
-
 protected:
     virtual void cam_Set(EActorCameras style);
     void cam_Update(float dt, float fFOV);
@@ -347,7 +340,6 @@ public:
     CGameObject* ObjectWeLookingAt() { return m_pObjectWeLookingAt; }
     CInventoryOwner* PersonWeLookingAt() { return m_pPersonWeLookingAt; }
     LPCSTR GetDefaultActionForObject() { return *m_sDefaultObjAction; }
-
 protected:
     CGameObject* m_pUsableObject;
     // Person we're looking at
@@ -371,7 +363,7 @@ protected:
     bool m_bPickupMode;
     //рассто€ние (в метрах) на котором актер чувствует гранату (любую)
     float m_fFeelGrenadeRadius;
-    float m_fFeelGrenadeTime;  //врем€ гранаты (сек) после которого актер чувствует гранату
+    float m_fFeelGrenadeTime; //врем€ гранаты (сек) после которого актер чувствует гранату
     //рассто€ние подсветки предметов
     float m_fPickupInfoRadius;
 
@@ -401,10 +393,8 @@ public:
 
     bool AnyAction() { return (mstate_real & mcAnyAction) != 0; };
     bool AnyMove() { return (mstate_real & mcAnyMove) != 0; };
-
     bool is_jump();
     u32 MovingState() const { return mstate_real; }
-
 protected:
     u32 mstate_wishful;
     u32 mstate_old;
@@ -441,7 +431,6 @@ public:
     virtual void g_WeaponBones(int& L, int& R1, int& R2);
     virtual void g_fireParams(const CHudItem* pHudItem, Fvector& P, Fvector& D);
     virtual bool g_stateFire() { return !((mstate_wishful & mcLookout) && !IsGameTypeSingle()); }
-
     virtual BOOL g_State(SEntityState& state) const;
     virtual float GetWeaponAccuracy() const;
     float GetFireDispertion() const { return m_fdisp_controller.GetCurrentDispertion(); }
@@ -493,11 +482,11 @@ protected:
 
 public:
     virtual BOOL net_Spawn(CSE_Abstract* DC);
-    virtual void net_Export(NET_Packet& P);  // export to server
-    virtual void net_Import(NET_Packet& P);  // import from server
+    virtual void net_Export(NET_Packet& P); // export to server
+    virtual void net_Import(NET_Packet& P); // import from server
     virtual void net_Destroy();
-    virtual BOOL net_Relevant();               //	{ return getSVU() | getLocal(); };		// relevant for export to server
-    virtual void net_Relcase(IGameObject* O);  //
+    virtual BOOL net_Relevant(); //	{ return getSVU() | getLocal(); };		// relevant for export to server
+    virtual void net_Relcase(IGameObject* O); //
     virtual void xr_stdcall on_requested_spawn(IGameObject* object);
     // object serialization
     virtual void save(NET_Packet& output_packet);
@@ -509,8 +498,8 @@ protected:
     xr_deque<net_update> NET;
     Fvector NET_SavedAccel;
     net_update NET_Last;
-    BOOL NET_WasInterpolating;  // previous update was by interpolation or by extrapolation
-    u32 NET_Time;               // server time of last update
+    BOOL NET_WasInterpolating; // previous update was by interpolation or by extrapolation
+    u32 NET_Time; // server time of last update
 
     //---------------------------------------------
     void net_Import_Base(NET_Packet& P);
@@ -528,9 +517,9 @@ protected:
     //---------------------------------------------
     //	bool					m_bHasUpdate;
     /// spline coeff /////////////////////
-    float SCoeff[3][4];           //коэффициэнты дл€ сплайна Ѕизье
-    float HCoeff[3][4];           //коэффициэнты дл€ сплайна Ёрмита
-    Fvector IPosS, IPosH, IPosL;  //положение актера после интерпол€ции Ѕизье, Ёрмита, линейной
+    float SCoeff[3][4]; //коэффициэнты дл€ сплайна Ѕизье
+    float HCoeff[3][4]; //коэффициэнты дл€ сплайна Ёрмита
+    Fvector IPosS, IPosH, IPosL; //положение актера после интерпол€ции Ѕизье, Ёрмита, линейной
 
 #ifdef DEBUG
     DEF_DEQUE(VIS_POSITION, Fvector);
@@ -577,21 +566,19 @@ public:
     void g_Physics(Fvector& accel, float jump, float dt);
     virtual void ForceTransform(const Fmatrix& m);
     void SetPhPosition(const Fmatrix& pos);
-    virtual void PH_B_CrPr();  // actions & operations before physic correction-prediction steps
-    virtual void PH_I_CrPr();  // actions & operations after correction before prediction steps
-    virtual void PH_A_CrPr();  // actions & operations after phisic correction-prediction steps
-                               //	virtual void			UpdatePosStack	( u32 Time0, u32 Time1 );
+    virtual void PH_B_CrPr(); // actions & operations before physic correction-prediction steps
+    virtual void PH_I_CrPr(); // actions & operations after correction before prediction steps
+    virtual void PH_A_CrPr(); // actions & operations after phisic correction-prediction steps
+    //	virtual void			UpdatePosStack	( u32 Time0, u32 Time1 );
     virtual void MoveActor(Fvector NewPos, Fvector NewDir);
 
     virtual void SpawnAmmoForWeapon(CInventoryItem* pIItem);
     virtual void RemoveAmmoForWeapon(CInventoryItem* pIItem);
     virtual void spawn_supplies();
     virtual bool human_being() const { return (true); }
-
     virtual shared_str GetDefaultVisualOutfit() const { return m_DefaultVisualOutfit; };
     virtual void SetDefaultVisualOutfit(shared_str DefaultOutfit) { m_DefaultVisualOutfit = DefaultOutfit; };
     virtual void UpdateAnimation() { g_SetAnimation(mstate_real); };
-
     virtual void ChangeVisual(shared_str NewVisual);
     virtual void OnChangeVisual();
 
@@ -604,9 +591,7 @@ public:
 
     void set_input_external_handler(CActorInputHandler* handler);
     bool input_external_handler_installed() const { return (m_input_external_handler != 0); }
-
     IC void lock_accel_for(u32 time) { m_time_lock_accel = Device.dwTimeGlobal + time; }
-
 private:
     CActorInputHandler* m_input_external_handler;
     u32 m_time_lock_accel;
@@ -634,9 +619,8 @@ protected:
 public:
     void SetWeaponHideState(u16 State, bool bSet);
 
-private:  // IPhysicsShellHolder
+private: // IPhysicsShellHolder
     virtual void HideAllWeapons(bool v) { SetWeaponHideState(INV_STATE_BLOCK_ALL, v); }
-
 public:
     void SetCantRunState(bool bSet);
 
@@ -680,7 +664,7 @@ public:
     void SwitchTorch();
 #ifdef DEBUG
     void NoClipFly(int cmd);
-#endif  // DEBUG
+#endif // DEBUG
 
 public:
     virtual void on_weapon_shot_start(CWeapon* weapon);
@@ -744,10 +728,8 @@ public:
 
     void DisableHitMarks(bool disable) { m_disabled_hitmarks = disable; };
     bool DisableHitMarks() { return m_disabled_hitmarks; };
-
     void set_inventory_disabled(bool is_disabled) { m_inventory_disabled = is_disabled; }
     bool inventory_disabled() const { return m_inventory_disabled; }
-
 private:
     void set_state_box(u32 mstate);
 

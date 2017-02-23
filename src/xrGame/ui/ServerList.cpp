@@ -61,7 +61,8 @@ CServerList::CServerList()
 CServerList::~CServerList()
 {
     xr_delete(m_message_box);
-    if (m_GSBrowser) m_GSBrowser->Clear();
+    if (m_GSBrowser)
+        m_GSBrowser->Clear();
 
     DestroySrvItems();
 };
@@ -81,14 +82,17 @@ void CServerList::OnBrowserDestroy(CGameSpy_Browser* browser)
 
 void CServerList::Update()
 {
-    if (m_need_refresh_fr < Device.dwFrame + 10) RefreshList_internal();
+    if (m_need_refresh_fr < Device.dwFrame + 10)
+        RefreshList_internal();
 
-    if (m_bAnimation) {
+    if (m_bAnimation)
+    {
         //		m_pAnimation->Update();
         //		m_frame[LST_SRV_PROP].SetColor(subst_alpha(0xffffffff, color_get_A(m_pAnimation->GetColor())));
         //		m_frame[LST_PLAYERS].SetColor(subst_alpha(0xffffffff, color_get_A(m_pAnimation->GetColor())));
 
-        if (true /*m_pAnimation->Done()*/) {
+        if (true /*m_pAnimation->Done()*/)
+        {
             m_bAnimation = false;
             if (m_bShowServerInfo)
                 AfterAppear();
@@ -102,14 +106,17 @@ void CServerList::Update()
 bool CServerList::NeedToRefreshCurServer()
 {
     CUIListItemServer* pItem = (CUIListItemServer*)m_list[LST_SERVER].GetSelectedItem();
-    if (!pItem) return false;
+    if (!pItem)
+        return false;
     return browser().HasAllKeys(pItem->GetInfo()->info.Index) == false;
 };
 
 void CServerList::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 {
-    if (m_bShowServerInfo && LIST_ITEM_CLICKED == msg && &m_list[LST_SERVER] == pWnd) {
-        if (NeedToRefreshCurServer()) {
+    if (m_bShowServerInfo && LIST_ITEM_CLICKED == msg && &m_list[LST_SERVER] == pWnd)
+    {
+        if (NeedToRefreshCurServer())
+        {
             RefreshQuick();
         }
         else
@@ -120,7 +127,8 @@ void CServerList::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
     }
     else if (BUTTON_CLICKED == msg)
     {
-        if (pWnd == &m_header[1]) {
+        if (pWnd == &m_header[1])
+        {
             SetSortFunc("server_name", true);
         }
         else if (pWnd == &m_header[2])
@@ -151,7 +159,8 @@ void CServerList::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
     else if (MESSAGE_BOX_YES_CLICKED == msg)
     {
         CUIListItemServer* item = smart_cast<CUIListItemServer*>(m_list[LST_SERVER].GetSelectedItem());
-        if (!item) return;
+        if (!item)
+            return;
         xr_string command;
 
         item->CreateConsoleCommand(command, m_playerName.c_str(), m_message_box->m_pMessageBox->GetUserPassword(),
@@ -211,16 +220,8 @@ void CServerList::AddBoolYN(const char* keyName, bool value)
     AddServerDetail(GameInfo(*st.translate(keyName), value ? *st.translate("mp_si_yes") : *st.translate("mp_si_no")));
 }
 
-void CServerList::AddBoolKeyED(void* s, const char* keyName, int k)
-{
-    AddBoolED(keyName, browser().GetBool(s, k));
-}
-
-void CServerList::AddBoolKeyYN(void* s, const char* keyName, int k)
-{
-    AddBoolYN(keyName, browser().GetBool(s, k));
-}
-
+void CServerList::AddBoolKeyED(void* s, const char* keyName, int k) { AddBoolED(keyName, browser().GetBool(s, k)); }
+void CServerList::AddBoolKeyYN(void* s, const char* keyName, int k) { AddBoolYN(keyName, browser().GetBool(s, k)); }
 void CServerList::AddIntKey(void* s, const char* keyName, int k)
 {
     CStringTable st;
@@ -232,7 +233,8 @@ void CServerList::AddIntKey(void* s, const char* keyName, int k)
 void CServerList::AddIntKeyN(void* s, float m, const char* keyName, const char* suffix, int k)
 {
     CStringTable st;
-    if (browser().GetInt(s, k)) {
+    if (browser().GetInt(s, k))
+    {
         string256 tmp;
         xr_sprintf(tmp, "%d%s", int(browser().GetInt(s, k) * m), suffix);
         AddServerDetail(GameInfo(*st.translate(keyName), tmp));
@@ -244,7 +246,8 @@ void CServerList::AddIntKeyN(void* s, float m, const char* keyName, const char* 
 void CServerList::AddTimeKey(void* s, const char* keyName, const char* format, const char* suffix, int k)
 {
     CStringTable st;
-    if (browser().GetInt(s, k)) {
+    if (browser().GetInt(s, k))
+    {
         string256 tmp;
         xr_sprintf(tmp, format, browser().GetFloat(s, k), *st.translate(suffix));
         AddServerDetail(GameInfo(*st.translate(keyName), tmp));
@@ -272,7 +275,8 @@ void CServerList::FillUpDetailedServerInfo()
     bool spect = false;
 
     CUIListItemServer* pItem = (CUIListItemServer*)m_list[LST_SERVER].GetSelectedItem();
-    if (!pItem) {
+    if (!pItem)
+    {
         ClearDetailedServerInfo();
         return;
     }
@@ -281,7 +285,8 @@ void CServerList::FillUpDetailedServerInfo()
     browser().GetServerInfoByIndex(&srvInfo, serverIndex);
     u32 teams = srvInfo.m_aTeams.size();
 
-    if (2 == teams) {
+    if (2 == teams)
+    {
         LPSTR _buff = NULL;
         CUIListBoxItem* pItemAdv;
         // TEAM 1
@@ -289,9 +294,11 @@ void CServerList::FillUpDetailedServerInfo()
         for (it = srvInfo.m_aPlayers.begin(); it != srvInfo.m_aPlayers.end(); ++it)
         {
             PlayerInfo pf = *it;
-            if (1 != pf.Team) continue;
-            if (pf.Spectator) continue;
-            if (!t1)  // add header
+            if (1 != pf.Team)
+                continue;
+            if (pf.Spectator)
+                continue;
+            if (!t1) // add header
             {
                 STRCONCAT(_buff, CStringTable().translate("ui_st_team").c_str(), "\"",
                     CTeamInfo::GetTeam1_name().c_str(), "\"");
@@ -318,9 +325,12 @@ void CServerList::FillUpDetailedServerInfo()
         for (it = srvInfo.m_aPlayers.begin(); it != srvInfo.m_aPlayers.end(); it++)
         {
             PlayerInfo pf = *it;
-            if (2 != pf.Team) continue;
-            if (pf.Spectator) continue;
-            if (!t2) {
+            if (2 != pf.Team)
+                continue;
+            if (pf.Spectator)
+                continue;
+            if (!t2)
+            {
                 STRCONCAT(_buff, CStringTable().translate("ui_st_team").c_str(), "\"",
                     CTeamInfo::GetTeam2_name().c_str(), "\"");
                 m_list[LST_PLAYERS].AddTextItem(_buff);
@@ -341,8 +351,10 @@ void CServerList::FillUpDetailedServerInfo()
         for (it = srvInfo.m_aPlayers.begin(); it != srvInfo.m_aPlayers.end(); ++it)
         {
             PlayerInfo pf = *it;
-            if (!pf.Spectator) continue;
-            if (!spect) {
+            if (!pf.Spectator)
+                continue;
+            if (!spect)
+            {
                 pItemAdv = m_list[LST_PLAYERS].AddTextItem(CStringTable().translate("mp_spectator").c_str());
                 spect = true;
             }
@@ -397,7 +409,8 @@ void CServerList::FillUpDetailedServerInfo()
     AddBoolKeyYN(sv, "mp_si_invinsibility_indicators", G_DAMAGE_BLOCK_INDICATOR_KEY);
     AddTimeKey(sv, "mp_si_invinsibility_time", "%.f %s", "mp_si_sec", G_DAMAGE_BLOCK_TIME_KEY);
     AddBoolKeyYN(sv, "mp_si_anomalies", G_ANOMALIES_ENABLED_KEY);
-    if (browser().GetInt(sv, G_ANOMALIES_TIME_KEY)) {
+    if (browser().GetInt(sv, G_ANOMALIES_TIME_KEY))
+    {
         AddTimeKey(sv, "mp_si_anomalies_period", "%.1f %s", "mp_si_min", G_ANOMALIES_TIME_KEY);
     }
     else
@@ -413,7 +426,8 @@ void CServerList::FillUpDetailedServerInfo()
         AddBoolKeyYN(sv, "mp_si_friendly_names", G_FRIENDLY_NAMES_KEY);
         AddIntKeyN(sv, 1 / 100.0f, "mp_si_friendly_fire", " %", G_FRIENDLY_FIRE_KEY);
     }
-    if (srvInfo.m_GameType == eGameIDArtefactHunt || srvInfo.m_GameType == eGameIDCaptureTheArtefact) {
+    if (srvInfo.m_GameType == eGameIDArtefactHunt || srvInfo.m_GameType == eGameIDCaptureTheArtefact)
+    {
         AddString("mp_si_artefacts", "");
         AddIntKey(sv, "mp_si_afcount", G_ARTEFACTS_COUNT_KEY);
         AddTimeKey(sv, "mp_si_afstaytime", "%.2f %s", "mp_si_min", G_ARTEFACT_STAY_TIME_KEY);
@@ -439,7 +453,8 @@ void CServerList::ClearDetailedServerInfo()
 
 void CServerList::ShowServerInfo()
 {
-    if (!m_bShowServerInfo && NeedToRefreshCurServer()) {
+    if (!m_bShowServerInfo && NeedToRefreshCurServer())
+    {
         RefreshQuick();
     }
     m_bShowServerInfo = !m_bShowServerInfo;
@@ -481,11 +496,7 @@ void CServerList::SetFilters(SServerFilters& sf)
     RefreshList();
 }
 
-void CServerList::SetPlayerName(LPCSTR name)
-{
-    m_playerName = name;
-}
-
+void CServerList::SetPlayerName(LPCSTR name) { m_playerName = name; }
 bool CServerList::IsValidItem(ServerInfo& item)
 {
     bool result = true;
@@ -551,32 +562,42 @@ void CServerList::ConnectToSelected()
     R_ASSERT(lmngr);
     gamespy_gp::profile const* tmp_profile = lmngr->get_current_profile();
     R_ASSERT2(tmp_profile, "need first to log in");
-    if (tmp_profile->online()) {
-        if (!MainMenu()->ValidateCDKey()) return;
+    if (tmp_profile->online())
+    {
+        if (!MainMenu()->ValidateCDKey())
+            return;
 
-        if (!xr_strcmp(tmp_profile->unique_nick(), "@unregistered")) {
-            if (m_connect_cb) m_connect_cb(ece_unique_nick_not_registred, "mp_gp_unique_nick_not_registred");
+        if (!xr_strcmp(tmp_profile->unique_nick(), "@unregistered"))
+        {
+            if (m_connect_cb)
+                m_connect_cb(ece_unique_nick_not_registred, "mp_gp_unique_nick_not_registred");
             return;
         }
-        if (!xr_strcmp(tmp_profile->unique_nick(), "@expired")) {
-            if (m_connect_cb) m_connect_cb(ece_unique_nick_expired, "mp_gp_unique_nick_has_expired");
+        if (!xr_strcmp(tmp_profile->unique_nick(), "@expired"))
+        {
+            if (m_connect_cb)
+                m_connect_cb(ece_unique_nick_expired, "mp_gp_unique_nick_has_expired");
             return;
         }
     }
 
     CUIListItemServer* item = smart_cast<CUIListItemServer*>(m_list[LST_SERVER].GetSelectedItem());
-    if (!item) return;
-    if (!browser().CheckDirectConnection(item->GetInfo()->info.Index)) {
+    if (!item)
+        return;
+    if (!browser().CheckDirectConnection(item->GetInfo()->info.Index))
+    {
         Msg("! Direct connection to this server is not available -> its behind firewall");
         return;
     }
 
-    if (xr_strcmp(item->GetInfo()->info.version, MainMenu()->GetGSVer())) {
+    if (xr_strcmp(item->GetInfo()->info.version, MainMenu()->GetGSVer()))
+    {
         MainMenu()->SetErrorDialog(CMainMenu::ErrDifferentVersion);
         return;
     }
 
-    if (item->GetInfo()->info.icons.pass || item->GetInfo()->info.icons.user_pass) {
+    if (item->GetInfo()->info.icons.pass || item->GetInfo()->info.icons.user_pass)
+    {
         m_message_box->m_pMessageBox->SetUserPasswordMode(item->GetInfo()->info.icons.user_pass);
         m_message_box->m_pMessageBox->SetPasswordMode(item->GetInfo()->info.icons.pass);
         m_message_box->ShowDialog(true);
@@ -646,7 +667,8 @@ void CServerList::RefreshGameSpyList(bool Local)
     switch (result)
     {
     case GSUpdateStatus::ConnectingToMaster:
-        if (MainMenu()) MainMenu()->Show_CTMS_Dialog();
+        if (MainMenu())
+            MainMenu()->Show_CTMS_Dialog();
         break;
     case GSUpdateStatus::MasterUnreachable: MainMenu()->SetErrorDialog(CMainMenu::ErrMasterServerConnectFailed); break;
     }
@@ -656,7 +678,8 @@ void CServerList::RefreshGameSpyList(bool Local)
 
 void CServerList::AddServerToList(ServerInfo* pServerInfo)
 {
-    if (!IsValidItem(*pServerInfo)) return;
+    if (!IsValidItem(*pServerInfo))
+        return;
 
     CUIListItemServer* item = GetFreeItem();
 
@@ -676,7 +699,8 @@ void CServerList::UpdateServerInList(ServerInfo* pServerInfo, int index)
     for (int i = 0; i < sz; i++)
     {
         CUIListItemServer* pItem = static_cast<CUIListItemServer*>(m_list[LST_SERVER].GetItemByIDX(i));
-        if (pItem->Get_gs_index() == index) {
+        if (pItem->Get_gs_index() == index)
+        {
             UpdateServerInList(pServerInfo, pItem);
             return;
         }
@@ -691,11 +715,7 @@ void CServerList::UpdateServerInList(ServerInfo* pServerInfo, CUIListItemServer*
     pItem->SetParams(m_itemInfo);
 };
 
-void CServerList::RefreshList()
-{
-    m_need_refresh_fr = Device.dwFrame;
-}
-
+void CServerList::RefreshList() { m_need_refresh_fr = Device.dwFrame; }
 void CServerList::RefreshList_internal()
 {
     m_need_refresh_fr = u32(-1);
@@ -742,12 +762,14 @@ void CServerList::RefreshList_internal()
 void CServerList::RefreshQuick()
 {
     CUIListItemServer* pItem = (CUIListItemServer*)m_list[LST_SERVER].GetSelectedItem();
-    if (!pItem) return;
+    if (!pItem)
+        return;
     browser().RefreshQuick(pItem->GetInfo()->info.Index);
 
     RefreshList();
 
-    if (m_bShowServerInfo) {
+    if (m_bShowServerInfo)
+    {
         ClearDetailedServerInfo();
         FillUpDetailedServerInfo();
     }
@@ -756,7 +778,8 @@ void CServerList::RefreshQuick()
 bool g_bSort_Ascending = true;
 void CServerList::SetSortFunc(const char* func_name, bool make_sort)
 {
-    if (!xr_strcmp(m_sort_func, func_name)) {
+    if (!xr_strcmp(m_sort_func, func_name))
+    {
         g_bSort_Ascending = !g_bSort_Ascending;
     }
     else
@@ -764,7 +787,8 @@ void CServerList::SetSortFunc(const char* func_name, bool make_sort)
 
     m_sort_func = func_name;
 
-    if (make_sort) RefreshList();
+    if (make_sort)
+        RefreshList();
 }
 
 void CServerList::SrvInfo2LstSrvInfo(const ServerInfo* pServerInfo)
@@ -782,7 +806,7 @@ void CServerList::SrvInfo2LstSrvInfo(const ServerInfo* pServerInfo)
     m_itemInfo.info.version = pServerInfo->m_ServerVersion;
     m_itemInfo.info.icons.pass = pServerInfo->m_bPassword;
     m_itemInfo.info.icons.dedicated = pServerInfo->m_bDedicated;
-    m_itemInfo.info.icons.punkbuster = false;  //	= pServerInfo->m_bPunkBuster;
+    m_itemInfo.info.icons.punkbuster = false; //	= pServerInfo->m_bPunkBuster;
     m_itemInfo.info.icons.user_pass = pServerInfo->m_bUserPass;
 
     m_itemInfo.info.Index = pServerInfo->Index;
@@ -862,7 +886,8 @@ bool CServerList::sort_by_Version(int p1, int p2)
 void CServerList::SaveCurItem()
 {
     CUIListItemServer* pItem = (CUIListItemServer*)m_list[LST_SERVER].GetSelectedItem();
-    if (!pItem) {
+    if (!pItem)
+    {
         m_cur_item = -1;
         return;
     }
@@ -872,7 +897,8 @@ void CServerList::SaveCurItem()
 
 void CServerList::RestoreCurItem()
 {
-    if (-1 == m_cur_item) return;
+    if (-1 == m_cur_item)
+        return;
 
     m_list[LST_SERVER].SetSelectedTAG(m_cur_item);
     m_list[LST_SERVER].SetScrollPos(m_list[LST_SERVER].GetSelectedIDX());
@@ -911,11 +937,13 @@ CUIListItemServer* CServerList::GetFreeItem()
     SrvItems_It it = m_items_cache.begin();
     SrvItems_It it_e = m_items_cache.end();
 
-    if (m_last_retreived_index != u32(-1)) std::advance(it, m_last_retreived_index);
+    if (m_last_retreived_index != u32(-1))
+        std::advance(it, m_last_retreived_index);
 
     for (; it != it_e; ++it)
     {
-        if (it->m_busy == false) {
+        if (it->m_busy == false)
+        {
             it->m_busy = true;
             m_last_retreived_index = (u32)(it - m_items_cache.begin());
             return it->m_ui_item;

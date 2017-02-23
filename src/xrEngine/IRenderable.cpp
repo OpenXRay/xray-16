@@ -9,7 +9,8 @@ RenderableBase::RenderableBase()
     renderable.pROS = NULL;
     renderable.pROS_Allowed = TRUE;
     ISpatial* self = dynamic_cast<ISpatial*>(this);
-    if (self) self->GetSpatialData().type |= STYPE_RENDERABLE;
+    if (self)
+        self->GetSpatialData().type |= STYPE_RENDERABLE;
 }
 
 extern ENGINE_API BOOL g_bRendering;
@@ -17,13 +18,15 @@ RenderableBase::~RenderableBase()
 {
     VERIFY(!g_bRendering);
     GlobalEnv.Render->model_Delete(renderable.visual);
-    if (renderable.pROS) GlobalEnv.Render->ros_destroy(renderable.pROS);
+    if (renderable.pROS)
+        GlobalEnv.Render->ros_destroy(renderable.pROS);
     renderable.visual = NULL;
     renderable.pROS = NULL;
 }
 
 IRender_ObjectSpecific* RenderableBase::renderable_ROS()
 {
-    if (0 == renderable.pROS && renderable.pROS_Allowed) renderable.pROS = GlobalEnv.Render->ros_create(this);
+    if (0 == renderable.pROS && renderable.pROS_Allowed)
+        renderable.pROS = GlobalEnv.Render->ros_create(this);
     return renderable.pROS;
 }

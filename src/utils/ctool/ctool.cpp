@@ -13,20 +13,10 @@
 
 using namespace std;
 
-#define MAKE_FOUR_CC(ch0, ch1, ch2, ch3)                                                                               \
-    \
-((u32)(u8)(ch0) | \
-((u32)(u8)(ch1) << 8) |                                                                                                \
-        \
-((u32)(u8)(ch2) << 16) |                                                                                               \
-        \
-((u32)(u8)(ch3) << 24))
+#define MAKE_FOUR_CC(ch0, ch1, ch2, ch3)\
+    ((u32)(u8)(ch0) | ((u32)(u8)(ch1) << 8) | ((u32)(u8)(ch2) << 16) | ((u32)(u8)(ch3) << 24))
 
-inline bool IsEmptyString(const char* str)
-{
-    return !(str && str[0] != '\0');
-}
-
+inline bool IsEmptyString(const char* str) { return !(str && str[0] != '\0'); }
 static unsigned _LZO_MinPacketSize = 8;
 static unsigned _LZO_MaxPacketSize = 8 * 1024;
 
@@ -40,7 +30,8 @@ static void _UnpackPackets(const char* src_bin, const char* dst_name = "")
 {
     FILE* src_file = fopen(src_bin, "rb");
 
-    if (src_file) {
+    if (src_file)
+    {
         // read the file
 
         fseek(src_file, 0, SEEK_END);
@@ -56,7 +47,8 @@ static void _UnpackPackets(const char* src_bin, const char* dst_name = "")
 
         u32 id = *((u32*)src_data);
 
-        if (id == MAKE_FOUR_CC('B', 'I', 'N', 'S')) {
+        if (id == MAKE_FOUR_CC('B', 'I', 'N', 'S'))
+        {
             const u8* data = src_data + sizeof(u32);
             const u8* data_end = src_data + src_sz;
             unsigned count = 0;
@@ -102,7 +94,6 @@ struct PacketInfo
 
     static bool WeightPredicate(const PacketInfo& p1, const PacketInfo& p2) { return p1.weight > p2.weight; }
     static bool SizePredicate(const PacketInfo& p1, const PacketInfo& p2) { return p1.size > p2.size; }
-
 public:
     unsigned size;
     unsigned count;
@@ -119,21 +110,16 @@ public:
 
 //------------------------------------------------------------------------------
 
-PacketInfo::PacketInfo() : size(0), count(0), weight(0)
-{
-}
-
+PacketInfo::PacketInfo() : size(0), count(0), weight(0) {}
 //------------------------------------------------------------------------------
 
-PacketInfo::~PacketInfo()
-{
-}
-
+PacketInfo::~PacketInfo() {}
 //------------------------------------------------------------------------------
 
 void PacketInfo::add_data(const u8* data, unsigned data_sz)
 {
-    if (data_sz == size) {
+    if (data_sz == size)
+    {
         packet.push_back(Data());
 
         packet.back().data = new u8[data_sz];
@@ -166,13 +152,16 @@ static void _BuildDictionary(const char* bins_file, const char* dst_name = "")
     FILE* src_file = fopen(bins_file, "rb");
     static char const* raw_bins_filename = "raw_bins_tmp.bin";
     FILE* raw_bins_file = fopen(raw_bins_filename, "wb");
-    if (!raw_bins_file) {
-        if (src_file) fclose(src_file);
+    if (!raw_bins_file)
+    {
+        if (src_file)
+            fclose(src_file);
         printf("ERROR: failed to create raw_bins_tmp.bin");
         return;
     }
 
-    if (src_file) {
+    if (src_file)
+    {
         // read the file
 
         fseek(src_file, 0, SEEK_END);
@@ -188,7 +177,8 @@ static void _BuildDictionary(const char* bins_file, const char* dst_name = "")
 
         u32 id = *((u32*)src_data);
 
-        if (id == MAKE_FOUR_CC('B', 'I', 'N', 'S')) {
+        if (id == MAKE_FOUR_CC('B', 'I', 'N', 'S'))
+        {
             const u8* data = src_data + sizeof(u32);
             const u8* data_end = src_data + src_sz;
             unsigned count = 0;
@@ -203,9 +193,11 @@ static void _BuildDictionary(const char* bins_file, const char* dst_name = "")
 
                 for (info = packet_info.begin(); info != packet_info.end(); ++info)
                 {
-                    if (info->size == sz) break;
+                    if (info->size == sz)
+                        break;
                 }
-                if (info == packet_info.end()) {
+                if (info == packet_info.end())
+                {
                     packet_info.push_back(PacketInfo());
                     info = packet_info.end() - 1;
 
@@ -276,9 +268,10 @@ static void _BuildDictionary(const char* bins_file, const char* dst_name = "")
     const char* dic_file = IsEmptyString(dst_name) ? "lzo.dic" : dst_name;
     FILE* dic = fopen(dic_file, "wb");
 
-    float const lzo_dict_max_size = 5.0f * 1024;  // 5 Kb
+    float const lzo_dict_max_size = 5.0f * 1024; // 5 Kb
 
-    if (dic) {
+    if (dic)
+    {
         //        unsigned    min_sz  = 200;
         //        unsigned    max_sz  = 350;
         unsigned min_sz = _LZO_MinPacketSize;
@@ -288,7 +281,8 @@ static void _BuildDictionary(const char* bins_file, const char* dst_name = "")
         {
             const PacketInfo& info = packet_info[i];
 
-            if (info.size < min_sz || info.size > max_sz) continue;
+            if (info.size < min_sz || info.size > max_sz)
+                continue;
 
             /*unsigned    cnt = (info.size < 32)
                               ? unsigned((10000.0f/float(info.size)) * info.weight)
@@ -299,7 +293,8 @@ static void _BuildDictionary(const char* bins_file, const char* dst_name = "")
 
             for (unsigned p = 0, n = 0; p < cnt; ++p, ++n)
             {
-                if (n >= info.count) n = 0;
+                if (n >= info.count)
+                    n = 0;
 
                 fwrite(info.packet[n].data, info.packet[n].size, 1, dic);
             }
@@ -317,7 +312,8 @@ static void _BuildDictionary(const char* bins_file, const char* dst_name = "")
 
 int main(int argc, char* argv[])
 {
-    if (argc < 2) {
+    if (argc < 2)
+    {
         printf("usage: CTOOL <command> [option(s)] [file(s)]\n");
         printf("commands:\n");
         printf("u -- unpack packets from .bins-file\n");
@@ -330,7 +326,8 @@ int main(int argc, char* argv[])
 
     for (; i < argc; ++i)
     {
-        if (argv[i][0] != '-' && argv[i][0] != '/') break;
+        if (argv[i][0] != '-' && argv[i][0] != '/')
+            break;
 
         if (!_strnicmp(argv[i] + 1, "dic", 3))
             dic_name = argv[i] + 1 + 3 + 1;
@@ -345,12 +342,15 @@ int main(int argc, char* argv[])
         else if (!_strnicmp(argv[i] + 1, "msize", 5))
             _PPM_ModelSize = atoi(argv[i] + 1 + 5 + 1);
 
-        if (_LZO_MinPacketSize < 8) _LZO_MinPacketSize = 8;
+        if (_LZO_MinPacketSize < 8)
+            _LZO_MinPacketSize = 8;
 
-        if (_LZO_MaxPacketSize > 64 * 1024) _LZO_MinPacketSize = 64 * 1024;
+        if (_LZO_MaxPacketSize > 64 * 1024)
+            _LZO_MinPacketSize = 64 * 1024;
     }
 
-    if (i < argc) {
+    if (i < argc)
+    {
         if (argv[1][0] == 'u')
             _UnpackPackets(argv[i]);
         else if (argv[1][0] == 'd')

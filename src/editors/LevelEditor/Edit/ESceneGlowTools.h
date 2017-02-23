@@ -9,7 +9,7 @@ class ESceneGlowTool : public ESceneCustomOTool
     typedef ESceneCustomOTool inherited;
     friend class CGlow;
 
-  protected:
+protected:
     // controls
     virtual void CreateControls();
     virtual void RemoveControls();
@@ -22,14 +22,11 @@ class ESceneGlowTool : public ESceneCustomOTool
 
     Flags32 m_Flags;
 
-  public:
+public:
     ESceneGlowTool() : ESceneCustomOTool(OBJCLASS_GLOW) { ; }
-
     // definition
     IC LPCSTR ClassName() { return "glow"; }
-
     IC LPCSTR ClassDesc() { return "Glow"; }
-
     IC
 
         int
@@ -48,7 +45,6 @@ class ESceneGlowTool : public ESceneCustomOTool
 
     // IO
     virtual bool IsNeedSave() { return true; }
-
     virtual bool LoadStream(IReader&);
     virtual bool LoadLTX(CInifile&);
     virtual void SaveStream(IWriter&);

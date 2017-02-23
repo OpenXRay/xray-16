@@ -40,7 +40,6 @@ public:
     virtual bool IdleState();
 
     virtual float BlowoutRadiusPercent(CPhysicsShellHolder* /*GO*/) { return m_fBlowoutRadiusPercent; }
-
 protected:
     virtual CTelekinesis& Telekinesis() = 0;
 
@@ -75,7 +74,6 @@ class CGraviZone : public CBaseGraviZone
 
 protected:
     virtual CTelekinesis& Telekinesis() { return m_telekinesis; }
-
 public:
     CGraviZone(void) {}
     virtual ~CGraviZone(void) {}

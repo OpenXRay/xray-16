@@ -21,12 +21,5 @@ void UIVoteStatusWnd::InitFromXML(CUIXml& xml_doc)
     CUIXmlInit::InitTextWnd(xml_doc, "vote_wnd:static_time_message", 0, m_time_message);
 }
 
-void UIVoteStatusWnd::SetVoteTimeResultMsg(LPCSTR s)
-{
-    m_time_message->SetText(s);
-}
-
-void UIVoteStatusWnd::SetVoteMsg(LPCSTR s)
-{
-    m_str_message->SetText(s);
-}
+void UIVoteStatusWnd::SetVoteTimeResultMsg(LPCSTR s) { m_time_message->SetText(s); }
+void UIVoteStatusWnd::SetVoteMsg(LPCSTR s) { m_str_message->SetText(s); }

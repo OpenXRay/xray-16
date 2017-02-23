@@ -10,10 +10,7 @@ void run_mu_light(bool net)
 
     run_mu_base(net);
 }
-void wait_mu_base()
-{
-    wait_mu_base_thread();
-}
+void wait_mu_base() { wait_mu_base_thread(); }
 void wait_mu_secondary()
 {
     if (!mu_light_net)

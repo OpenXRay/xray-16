@@ -48,7 +48,6 @@ public:
 
     virtual void on_scan_success() {}
     virtual void on_scanning() {}
-
 private:
     float get_velocity(IGameObject* obj);
 

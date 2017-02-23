@@ -164,7 +164,8 @@ public:
     IC SelfRef norm_safe(void)
     {
         float m = _sqrt(x * x + y * y);
-        if (m) {
+        if (m)
+        {
             x /= m;
             y /= m;
         }
@@ -173,7 +174,6 @@ public:
     IC T distance_to(const Self& p) const { return _sqrt((x - p.x) * (x - p.x) + (y - p.y) * (y - p.y)); }
     IC T square_magnitude(void) const { return x * x + y * y; }
     IC T magnitude(void) const { return _sqrt(square_magnitude()); }
-
     IC SelfRef mad(const Self& p, const Self& d, T r)
     {
         x = p.x + d.x * r;
@@ -190,9 +190,7 @@ public:
     }
 
     IC bool similar(Self& p, T eu, T ev) const { return _abs(x - p.x) < eu && _abs(y - p.y) < ev; }
-
     IC bool similar(const Self& p, float E = EPS_L) const { return _abs(x - p.x) < E && _abs(y - p.y) < E; };
-
     // average arithmetic
     IC SelfRef averageA(Self& p1, Self& p2)
     {
@@ -226,7 +224,8 @@ public:
     IC SelfRef normalize_safe(const Self& v)
     {
         float m = _sqrt(v.x * v.x + v.y * v.y);
-        if (m) {
+        if (m)
+        {
             x = v.x / m;
             y = v.y / m;
         }

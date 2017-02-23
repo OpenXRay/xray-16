@@ -85,8 +85,6 @@ public:
 
     virtual BOOL IsVisibleForHUD() { return false; }
     virtual bool IsVisibleForZones() { return false; }
-
     virtual BOOL UsedAI_Locations() { return false; }
-
     virtual CEntity* cast_entity() { return this; }
 };

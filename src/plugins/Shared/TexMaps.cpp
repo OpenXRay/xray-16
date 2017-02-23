@@ -47,8 +47,10 @@ TexmapSlot::TexmapSlot()
 
 void TexmapSlot::Update(TimeValue t, Interval& ivalid)
 {
-    if (IsActive()) map->Update(t, ivalid);
-    if (amtCtrl) {
+    if (IsActive())
+        map->Update(t, ivalid);
+    if (amtCtrl)
+    {
         amtCtrl->GetValue(t, &amount, ivalid);
     }
 }
@@ -57,7 +59,8 @@ float TexmapSlot::GetAmount(TimeValue t)
 {
     Interval v;
     float f;
-    if (amtCtrl) {
+    if (amtCtrl)
+    {
         amtCtrl->GetValue(t, &f, v);
         return f;
     }
@@ -81,11 +84,13 @@ SvGraphNodeReference Texmaps::SvTraverseAnimGraph(IGraphObjectManager* gom, Anim
 {
     int i, nUsedSlots;
 
-    if (!gom->TestFilter(SV_FILTER_MAPS)) return SvGraphNodeReference();
+    if (!gom->TestFilter(SV_FILTER_MAPS))
+        return SvGraphNodeReference();
 
     nUsedSlots = 0;
     for (i = 0; i < STD2_NMAX_TEXMAPS; i++)
-        if (txmap[i].map) nUsedSlots++;
+        if (txmap[i].map)
+            nUsedSlots++;
 
     if (nUsedSlots)
         return SvStdTraverseAnimGraph(gom, owner, id, flags);
@@ -94,32 +99,12 @@ SvGraphNodeReference Texmaps::SvTraverseAnimGraph(IGraphObjectManager* gom, Anim
 }
 
 static TexmapsClassDesc texmapsCD;
-ClassDesc* GetTexmapsDesc()
-{
-    return &texmapsCD;
-}
-
+ClassDesc* GetTexmapsDesc() { return &texmapsCD; }
 static OldTexmapsClassDesc oldtexmapsCD;
-ClassDesc* GetOldTexmapsDesc()
-{
-    return &oldtexmapsCD;
-}
-
-Class_ID Texmaps::ClassID()
-{
-    return TexmapsClassID;
-}
-
-int Texmaps::NumSubs()
-{
-    return STD2_NMAX_TEXMAPS * 2;
-}
-
-int Texmaps::NumRefs()
-{
-    return STD2_NMAX_TEXMAPS * 2;
-}
-
+ClassDesc* GetOldTexmapsDesc() { return &oldtexmapsCD; }
+Class_ID Texmaps::ClassID() { return TexmapsClassID; }
+int Texmaps::NumSubs() { return STD2_NMAX_TEXMAPS * 2; }
+int Texmaps::NumRefs() { return STD2_NMAX_TEXMAPS * 2; }
 Animatable* Texmaps::SubAnim(int i)
 {
     if (i & 1)
@@ -165,11 +150,7 @@ void Texmaps::SetReference(int i, RefTargetHandle rtarg)
     }
 }
 
-void Texmaps::DeleteThis()
-{
-    xr_delete((Texmaps*)this);
-}
-
+void Texmaps::DeleteThis() { xr_delete((Texmaps*)this); }
 RefResult Texmaps::NotifyRefChanged(Interval changeInt, RefTargetHandle hTarget, PartID& partID, RefMessage message)
 {
     switch (message)
@@ -191,14 +172,17 @@ RefResult Texmaps::NotifyRefChanged(Interval changeInt, RefTargetHandle hTarget,
 
 void Texmaps::RescaleWorldUnits(float f)
 {
-    if (TestAFlag(A_WORK1)) return;
+    if (TestAFlag(A_WORK1))
+        return;
     SetAFlag(A_WORK1);
     // This code will be replaced in particular implementations
     for (int i = 0; i < NumRefs(); i++)
     {
-        if ((i & 1) == 0) continue;  // skip the amount controllers
+        if ((i & 1) == 0)
+            continue; // skip the amount controllers
         ReferenceMaker* srm = GetReference(i);
-        if (srm) {
+        if (srm)
+        {
             srm->RescaleWorldUnits(f);
         }
     }
@@ -212,8 +196,10 @@ RefTargetHandle Texmaps::Clone(RemapDir& remap)
         tm->txmap[i].amount = txmap[i].amount;
         tm->txmap[i].mapOn = txmap[i].mapOn;
         tm->txmap[i].map = NULL;
-        if (txmap[i].amtCtrl) tm->ReplaceReference(2 * i, remap.CloneRef(txmap[i].amtCtrl));
-        if (txmap[i].map) tm->ReplaceReference(2 * i + 1, remap.CloneRef(txmap[i].map));
+        if (txmap[i].amtCtrl)
+            tm->ReplaceReference(2 * i, remap.CloneRef(txmap[i].amtCtrl));
+        if (txmap[i].map)
+            tm->ReplaceReference(2 * i + 1, remap.CloneRef(txmap[i].map));
     }
     BaseClone(this, tm, remap);
     return tm;
@@ -243,13 +229,15 @@ IOResult Texmaps::Save(ISave* isave)
     isave->BeginChunk(TEX_ONOFF_CHUNK);
     ULONG nb, f = 0;
     for (int i = 0; i < STD2_NMAX_TEXMAPS; i++)
-        if (txmap[i].mapOn) f |= (1 << i);
+        if (txmap[i].mapOn)
+            f |= (1 << i);
     isave->Write(&f, sizeof(f), &nb);
     isave->EndChunk();
 
     for (int i = 0; i < STD2_NMAX_TEXMAPS; i++)
     {
-        if (txmap[i].amount != 1.0f) {
+        if (txmap[i].amount != 1.0f)
+        {
             isave->BeginChunk(TEX_AMT0 + i);
             isave->Write(&txmap[i].amount, sizeof(float), &nb);
             isave->EndChunk();
@@ -309,7 +297,8 @@ IOResult Texmaps::Load(ILoad* iload)
         case TEX_AMTF: res = iload->Read(&txmap[id - TEX_AMT0].amount, sizeof(float), &nb); break;
         }
         iload->CloseChunk();
-        if (res != IO_OK) return res;
+        if (res != IO_OK)
+            return res;
     }
     return IO_OK;
 }

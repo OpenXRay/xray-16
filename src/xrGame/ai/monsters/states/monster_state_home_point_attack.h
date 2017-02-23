@@ -21,7 +21,6 @@ public:
     virtual void critical_finalize();
     virtual void execute();
     virtual void remove_links(IGameObject* object) { inherited::remove_links(object); }
-
     virtual bool check_start_conditions();
     virtual bool check_completion();
 

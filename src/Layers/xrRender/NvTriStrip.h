@@ -33,7 +33,8 @@ struct PrimitiveGroup
     PrimitiveGroup() : type(PT_STRIP), numIndices(0), indices(NULL) {}
     ~PrimitiveGroup()
     {
-        if (indices) xr_free(indices);
+        if (indices)
+            xr_free(indices);
     }
 };
 

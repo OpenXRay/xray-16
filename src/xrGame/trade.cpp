@@ -42,19 +42,14 @@ CTrade::CTrade(CInventoryOwner* p_io)
         else
         {
             pStalker = smart_cast<CAI_Stalker*>(p_io);
-            if (pStalker) pThis.Set(TT_STALKER, pStalker, p_io);
+            if (pStalker)
+                pThis.Set(TT_STALKER, pStalker, p_io);
         }
     }
 }
 
-CTrade::~CTrade()
-{
-}
-
-void CTrade::RemovePartner()
-{
-    pPartner.Set(TT_NONE, 0, 0);
-}
+CTrade::~CTrade() {}
+void CTrade::RemovePartner() { pPartner.Set(TT_NONE, 0, 0); }
 //// предложение торговли
 // void CTrade::Communicate()
 //{
@@ -145,8 +140,10 @@ void CTrade::StartTradeEx(CInventoryOwner* pInvOwner)
 
 void CTrade::TradeCB(bool bStart)
 {
-    if (bStart) {
-        if (pThis.type == TT_TRADER) smart_cast<CAI_Trader*>(pThis.base)->OnStartTrade();
+    if (bStart)
+    {
+        if (pThis.type == TT_TRADER)
+            smart_cast<CAI_Trader*>(pThis.base)->OnStartTrade();
     }
     else if (pThis.type == TT_TRADER)
         smart_cast<CAI_Trader*>(pThis.base)->OnStopTrade();
@@ -165,7 +162,8 @@ void CTrade::StopTrade()
     //	Msg("--TRADE:: [%s]: Trade stopped...",*pThis.base->cName());
 
     CAI_Trader* pTrader = NULL;
-    if (pThis.type == TT_TRADER) {
+    if (pThis.type == TT_TRADER)
+    {
         // pTrader = smart_cast<CAI_Trader*>(pThis.base);
         // pTrader->OnStopTrade();
     }
@@ -177,6 +175,4 @@ void CTrade::StopTrade()
     RemovePartner();
 }
 
-void CTrade::UpdateTrade()
-{
-}
+void CTrade::UpdateTrade() {}

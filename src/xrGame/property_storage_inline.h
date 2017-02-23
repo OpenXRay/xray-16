@@ -24,7 +24,4 @@ IC const CPropertyStorage::_value_type& CPropertyStorage::property(const _condit
     return ((*I).m_value);
 }
 
-IC void CPropertyStorage::clear()
-{
-    m_storage.clear();
-}
+IC void CPropertyStorage::clear() { m_storage.clear(); }

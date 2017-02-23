@@ -7,10 +7,10 @@
 // refs
 class ENGINE_API CObjectAnimator
 {
-  private:
+private:
     DEFINE_VECTOR(COMotion*, MotionVec, MotionIt);
 
-  protected:
+protected:
     bool bLoop;
 
     shared_str m_Name;
@@ -25,7 +25,7 @@ class ENGINE_API CObjectAnimator
     void SetActiveMotion(COMotion* mot);
     COMotion* FindMotionByName(LPCSTR name);
 
-  public:
+public:
     CObjectAnimator();
     virtual ~CObjectAnimator();
 
@@ -33,23 +33,18 @@ class ENGINE_API CObjectAnimator
     void Load(LPCSTR name);
 
     IC LPCSTR Name() { return *m_Name; }
-
     float& Speed() { return m_Speed; }
-
     COMotion* Play(bool bLoop, LPCSTR name = 0);
 
     void Pause(bool val) { return m_MParam.Pause(val); }
-
     void Stop();
 
     IC BOOL IsPlaying() { return m_MParam.bPlay; }
-
     IC const Fmatrix& XFORM() { return m_XFORM; }
-
     float GetLength();
     // Update
     void Update(float dt);
     void DrawPath();
 };
 
-#endif  // ObjectAnimatorH
+#endif // ObjectAnimatorH

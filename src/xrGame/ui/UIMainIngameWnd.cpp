@@ -111,7 +111,7 @@ void CUIMainIngameWnd::Init()
 	xml_init.InitStatic			(uiXml, "static_wpn_icon", 0, &UIWeaponIcon);
 	UIWeaponIcon.SetShader		(GetEquipmentIconsShader());
 	UIWeaponIcon_rect			= UIWeaponIcon.GetWndRect();
-*/  //---------------------------------------------------------
+*/ //---------------------------------------------------------
     UIPickUpItemIcon = UIHelper::CreateStatic(uiXml, "pick_up_item", this);
     UIPickUpItemIcon->SetShader(GetEquipmentIconsShader());
 
@@ -181,13 +181,15 @@ void CUIMainIngameWnd::Init()
     UIInvincibleIcon = UIHelper::CreateStatic(uiXml, "invincible_static", NULL);
     UIInvincibleIcon->Show(false);
 
-    if ((GameID() == eGameIDArtefactHunt) || (GameID() == eGameIDCaptureTheArtefact)) {
+    if ((GameID() == eGameIDArtefactHunt) || (GameID() == eGameIDCaptureTheArtefact))
+    {
         UIArtefactIcon = UIHelper::CreateStatic(uiXml, "artefact_static", NULL);
         UIArtefactIcon->Show(false);
     }
 
-    shared_str warningStrings[7] = {"jammed", "radiation", "wounds", "starvation", "fatigue", "invincible"
-                                                                                              "artefact"};
+    shared_str warningStrings[7] = {"jammed", "radiation", "wounds", "starvation", "fatigue",
+        "invincible"
+        "artefact"};
 
     // Загружаем пороговые значения для индикаторов
     EWarningIcons j = ewiWeaponJammed;
@@ -255,7 +257,8 @@ void CUIMainIngameWnd::Draw()
 
     // show IO icon
     bool IOActive = (FS.dwOpenCounter > 0);
-    if (IOActive) UIStaticDiskIO_start_time = Device.fTimeGlobal;
+    if (IOActive)
+        UIStaticDiskIO_start_time = Device.fTimeGlobal;
 
     if ((UIStaticDiskIO_start_time + 1.0f) < Device.fTimeGlobal)
         UIStaticDiskIO->Show(false);
@@ -267,7 +270,8 @@ void CUIMainIngameWnd::Draw()
     }
     FS.dwOpenCounter = 0;
 
-    if (!IsGameTypeSingle()) {
+    if (!IsGameTypeSingle())
+    {
         float luminocity = smart_cast<CGameObject*>(Level().CurrentEntity())->ROS()->get_luminocity();
         float power = log(luminocity > .001f ? luminocity : .001f) * (1.f /*luminocity_factor*/);
         luminocity = exp(power);
@@ -276,7 +280,8 @@ void CUIMainIngameWnd::Draw()
         cur_lum = luminocity * 0.01f + cur_lum * 0.99f;
         UIMotionIcon->SetLuminosity((s16)iFloor(cur_lum * 100.0f));
     }
-    if (!pActor || !pActor->g_Alive()) return;
+    if (!pActor || !pActor->g_Alive())
+        return;
 
     UIMotionIcon->SetNoise((s16)(0xffff & iFloor(pActor->m_snd_noise * 100)));
 
@@ -304,11 +309,14 @@ void CUIMainIngameWnd::Update()
     CUIWindow::Update();
     CActor* pActor = smart_cast<CActor*>(Level().CurrentViewEntity());
 
-    if (m_pMPChatWnd) m_pMPChatWnd->Update();
+    if (m_pMPChatWnd)
+        m_pMPChatWnd->Update();
 
-    if (m_pMPLogWnd) m_pMPLogWnd->Update();
+    if (m_pMPLogWnd)
+        m_pMPLogWnd->Update();
 
-    if (!pActor) return;
+    if (!pActor)
+        return;
 
     UIZoneMap->Update();
 
@@ -317,14 +325,17 @@ void CUIMainIngameWnd::Update()
 
     UpdatePickUpItem();
 
-    if (Device.dwFrame % 10) return;
+    if (Device.dwFrame % 10)
+        return;
 
     game_PlayerState* lookat_player = Game().local_player;
-    if (Level().IsDemoPlayStarted()) {
+    if (Level().IsDemoPlayStarted())
+    {
         lookat_player = Game().lookat_player();
     }
     bool b_God = (GodMode() || (!lookat_player)) ? true : lookat_player->testFlag(GAME_PLAYER_FLAG_INVINCIBLE);
-    if (b_God) {
+    if (b_God)
+    {
         SetWarningIconColor(ewiInvincible, 0xffffffff);
     }
     else
@@ -333,12 +344,15 @@ void CUIMainIngameWnd::Update()
     }
 
     UpdateMainIndicators();
-    if (IsGameTypeSingle()) return;
+    if (IsGameTypeSingle())
+        return;
 
     // ewiArtefact
-    if (GameID() == eGameIDArtefactHunt) {
+    if (GameID() == eGameIDArtefactHunt)
+    {
         bool b_Artefact = !!(pActor->inventory().ItemFromSlot(ARTEFACT_SLOT));
-        if (b_Artefact) {
+        if (b_Artefact)
+        {
             SetWarningIconColor(ewiArtefact, 0xffffff00);
         }
         else
@@ -360,7 +374,7 @@ void CUIMainIngameWnd::Update()
         {
             SetWarningIconColor(ewiArtefact, 0xffff0000);
         }
-        else if (pActor->inventory().ItemFromSlot(ARTEFACT_SLOT))  // own artefact
+        else if (pActor->inventory().ItemFromSlot(ARTEFACT_SLOT)) // own artefact
         {
             SetWarningIconColor(ewiArtefact, 0xff00ff00);
         }
@@ -369,22 +383,26 @@ void CUIMainIngameWnd::Update()
             SetWarningIconColor(ewiArtefact, 0x00ffffff);
         }
     }
-}  // update
+} // update
 
 void CUIMainIngameWnd::RenderQuickInfos()
 {
     CActor* pActor = smart_cast<CActor*>(Level().CurrentViewEntity());
-    if (!pActor) return;
+    if (!pActor)
+        return;
 
     static CGameObject* pObject = NULL;
     LPCSTR actor_action = pActor->GetDefaultActionForObject();
     UIStaticQuickHelp->Show(NULL != actor_action);
 
-    if (NULL != actor_action) {
-        if (stricmp(actor_action, UIStaticQuickHelp->GetText())) UIStaticQuickHelp->SetTextST(actor_action);
+    if (NULL != actor_action)
+    {
+        if (stricmp(actor_action, UIStaticQuickHelp->GetText()))
+            UIStaticQuickHelp->SetTextST(actor_action);
     }
 
-    if (pObject != pActor->ObjectWeLookingAt()) {
+    if (pObject != pActor->ObjectWeLookingAt())
+    {
         UIStaticQuickHelp->SetTextST(actor_action ? actor_action : " ");
         UIStaticQuickHelp->ResetColorAnimation();
         pObject = pActor->ObjectWeLookingAt();
@@ -404,16 +422,19 @@ void CUIMainIngameWnd::SetWarningIconColorUI(CUIStatic* s, const u32 cl)
     int bOn = (cl >> 24);
     bool bIsShown = s->IsShown();
 
-    if (bOn) {
+    if (bOn)
+    {
         s->SetTextureColor(cl);
     }
 
-    if (bOn && !bIsShown) {
+    if (bOn && !bIsShown)
+    {
         m_UIIcons->AddWindow(s, false);
         s->Show(true);
     }
 
-    if (!bOn && bIsShown) {
+    if (!bOn && bIsShown)
+    {
         m_UIIcons->RemoveWindow(s);
         s->Show(false);
     }
@@ -429,7 +450,8 @@ void CUIMainIngameWnd::SetWarningIconColor(EWarningIcons icon, const u32 cl)
     case ewiAll: bMagicFlag = false;
     case ewiWeaponJammed:
         SetWarningIconColorUI(UIWeaponJammedIcon, cl);
-        if (bMagicFlag) break;
+        if (bMagicFlag)
+            break;
 
     /*	case ewiRadiation:
             SetWarningIconColorUI	(&UIRadiaitionIcon, cl);
@@ -447,7 +469,8 @@ void CUIMainIngameWnd::SetWarningIconColor(EWarningIcons icon, const u32 cl)
     */
     case ewiInvincible:
         SetWarningIconColorUI(UIInvincibleIcon, cl);
-        if (bMagicFlag) break;
+        if (bMagicFlag)
+            break;
         break;
     case ewiArtefact: SetWarningIconColorUI(UIArtefactIcon, cl); break;
 
@@ -455,11 +478,7 @@ void CUIMainIngameWnd::SetWarningIconColor(EWarningIcons icon, const u32 cl)
     }
 }
 
-void CUIMainIngameWnd::TurnOffWarningIcon(EWarningIcons icon)
-{
-    SetWarningIconColor(icon, 0x00ffffff);
-}
-
+void CUIMainIngameWnd::TurnOffWarningIcon(EWarningIcons icon) { SetWarningIconColor(icon, 0x00ffffff); }
 void CUIMainIngameWnd::SetFlashIconState_(EFlashingIcons type, bool enable)
 {
     // Включаем анимацию требуемой иконки
@@ -525,17 +544,15 @@ void CUIMainIngameWnd::AnimateContacts(bool b_snd)
 {
     UIZoneMap->Counter_ResetClrAnimation();
 
-    if (b_snd) HUD_SOUND_ITEM::PlaySound(m_contactSnd, Fvector().set(0, 0, 0), 0, true);
+    if (b_snd)
+        HUD_SOUND_ITEM::PlaySound(m_contactSnd, Fvector().set(0, 0, 0), 0, true);
 }
 
-void CUIMainIngameWnd::SetPickUpItem(CInventoryItem* PickUpItem)
-{
-    m_pPickUpItem = PickUpItem;
-};
-
+void CUIMainIngameWnd::SetPickUpItem(CInventoryItem* PickUpItem) { m_pPickUpItem = PickUpItem; };
 void CUIMainIngameWnd::UpdatePickUpItem()
 {
-    if (!m_pPickUpItem || !Level().CurrentViewEntity() || !smart_cast<CActor*>(Level().CurrentViewEntity())) {
+    if (!m_pPickUpItem || !Level().CurrentViewEntity() || !smart_cast<CActor*>(Level().CurrentViewEntity()))
+    {
         UIPickUpItemIcon->Show(false);
         return;
     };
@@ -579,47 +596,35 @@ void CUIMainIngameWnd::UpdatePickUpItem()
 void CUIMainIngameWnd::OnConnected()
 {
     UIZoneMap->SetupCurrentMap();
-    if (m_ui_hud_states) {
+    if (m_ui_hud_states)
+    {
         m_ui_hud_states->on_connected();
     }
 }
 
-void CUIMainIngameWnd::OnSectorChanged(int sector)
-{
-    UIZoneMap->OnSectorChanged(sector);
-}
-
+void CUIMainIngameWnd::OnSectorChanged(int sector) { UIZoneMap->OnSectorChanged(sector); }
 void CUIMainIngameWnd::reset_ui()
 {
     m_pPickUpItem = NULL;
     UIMotionIcon->ResetVisibility();
-    if (m_ui_hud_states) {
+    if (m_ui_hud_states)
+    {
         m_ui_hud_states->reset_ui();
     }
 }
 
-void CUIMainIngameWnd::ShowZoneMap(bool status)
-{
-    UIZoneMap->visible = status;
-}
-
-void CUIMainIngameWnd::DrawZoneMap()
-{
-    UIZoneMap->Render();
-}
-
-void CUIMainIngameWnd::UpdateZoneMap()
-{
-    UIZoneMap->Update();
-}
-
+void CUIMainIngameWnd::ShowZoneMap(bool status) { UIZoneMap->visible = status; }
+void CUIMainIngameWnd::DrawZoneMap() { UIZoneMap->Render(); }
+void CUIMainIngameWnd::UpdateZoneMap() { UIZoneMap->Update(); }
 void CUIMainIngameWnd::UpdateMainIndicators()
 {
     CActor* pActor = smart_cast<CActor*>(Level().CurrentViewEntity());
-    if (!pActor) return;
+    if (!pActor)
+        return;
 
     UpdateQuickSlots();
-    if (IsGameTypeSingle()) CurrentGameUI()->GetPdaMenu().UpdateRankingWnd();
+    if (IsGameTypeSingle())
+        CurrentGameUI()->GetPdaMenu().UpdateRankingWnd();
 
     u8 flags = 0;
     flags |= LA_CYCLIC;
@@ -627,14 +632,16 @@ void CUIMainIngameWnd::UpdateMainIndicators()
     flags |= LA_TEXTURECOLOR;
     // Bleeding icon
     float bleeding = pActor->conditions().BleedingSpeed();
-    if (fis_zero(bleeding, EPS)) {
+    if (fis_zero(bleeding, EPS))
+    {
         m_ind_bleeding->Show(false);
         m_ind_bleeding->ResetColorAnimation();
     }
     else
     {
         m_ind_bleeding->Show(true);
-        if (bleeding < 0.35f) {
+        if (bleeding < 0.35f)
+        {
             m_ind_bleeding->InitTexture("ui_inGame2_circle_bloodloose_green");
             m_ind_bleeding->SetColorAnimation("ui_slow_blinking_alpha", flags);
         }
@@ -651,14 +658,16 @@ void CUIMainIngameWnd::UpdateMainIndicators()
     }
     // Radiation icon
     float radiation = pActor->conditions().GetRadiation();
-    if (fis_zero(radiation, EPS)) {
+    if (fis_zero(radiation, EPS))
+    {
         m_ind_radiation->Show(false);
         m_ind_radiation->ResetColorAnimation();
     }
     else
     {
         m_ind_radiation->Show(true);
-        if (radiation < 0.35f) {
+        if (radiation < 0.35f)
+        {
             m_ind_radiation->InitTexture("ui_inGame2_circle_radiation_green");
             m_ind_radiation->SetColorAnimation("ui_slow_blinking_alpha", flags);
         }
@@ -694,9 +703,11 @@ void CUIMainIngameWnd::UpdateMainIndicators()
     // Armor broken icon
     CCustomOutfit* outfit = smart_cast<CCustomOutfit*>(pActor->inventory().ItemFromSlot(OUTFIT_SLOT));
     m_ind_outfit_broken->Show(false);
-    if (outfit) {
+    if (outfit)
+    {
         float condition = outfit->GetCondition();
-        if (condition < 0.75f) {
+        if (condition < 0.75f)
+        {
             m_ind_outfit_broken->Show(true);
             if (condition > 0.5f)
                 m_ind_outfit_broken->InitTexture("ui_inGame2_circle_Armorbroken_green");
@@ -709,9 +720,11 @@ void CUIMainIngameWnd::UpdateMainIndicators()
     // Helmet broken icon
     CHelmet* helmet = smart_cast<CHelmet*>(pActor->inventory().ItemFromSlot(HELMET_SLOT));
     m_ind_helmet_broken->Show(false);
-    if (helmet) {
+    if (helmet)
+    {
         float condition = helmet->GetCondition();
-        if (condition < 0.75f) {
+        if (condition < 0.75f)
+        {
             m_ind_helmet_broken->Show(true);
             if (condition > 0.5f)
                 m_ind_helmet_broken->InitTexture("ui_inGame2_circle_Helmetbroken_green");
@@ -724,13 +737,16 @@ void CUIMainIngameWnd::UpdateMainIndicators()
     // Weapon broken icon
     u16 slot = pActor->inventory().GetActiveSlot();
     m_ind_weapon_broken->Show(false);
-    if (slot == INV_SLOT_2 || slot == INV_SLOT_3) {
+    if (slot == INV_SLOT_2 || slot == INV_SLOT_3)
+    {
         CWeapon* weapon = smart_cast<CWeapon*>(pActor->inventory().ItemFromSlot(slot));
-        if (weapon) {
+        if (weapon)
+        {
             float condition = weapon->GetCondition();
             float start_misf_cond = weapon->GetMisfireStartCondition();
             float end_misf_cond = weapon->GetMisfireEndCondition();
-            if (condition < start_misf_cond) {
+            if (condition < start_misf_cond)
+            {
                 m_ind_weapon_broken->Show(true);
                 if (condition > (start_misf_cond + end_misf_cond) / 2)
                     m_ind_weapon_broken->InitTexture("ui_inGame2_circle_Gunbroken_green");
@@ -745,9 +761,11 @@ void CUIMainIngameWnd::UpdateMainIndicators()
     float cur_weight = pActor->inventory().TotalWeight();
     float max_weight = pActor->MaxWalkWeight();
     m_ind_overweight->Show(false);
-    if (cur_weight >= max_weight - 10.0f && IsGameTypeSingle()) {
+    if (cur_weight >= max_weight - 10.0f && IsGameTypeSingle())
+    {
         m_ind_overweight->Show(true);
-        if (cur_weight > max_weight) m_ind_overweight->InitTexture("ui_inGame2_circle_Overweight_red");
+        if (cur_weight > max_weight)
+            m_ind_overweight->InitTexture("ui_inGame2_circle_Overweight_red");
         // else if(cur_weight>max_weight-10.0f)
         //	m_ind_overweight->InitTexture("ui_inGame2_circle_Overweight_yellow");
         else
@@ -760,33 +778,40 @@ void CUIMainIngameWnd::UpdateQuickSlots()
     string32 tmp;
     LPCSTR str = CStringTable().translate("quick_use_str_1").c_str();
     strncpy_s(tmp, sizeof(tmp), str, 3);
-    if (tmp[2] == ',') tmp[1] = '\0';
+    if (tmp[2] == ',')
+        tmp[1] = '\0';
     m_QuickSlotText1->SetTextST(tmp);
 
     str = CStringTable().translate("quick_use_str_2").c_str();
     strncpy_s(tmp, sizeof(tmp), str, 3);
-    if (tmp[2] == ',') tmp[1] = '\0';
+    if (tmp[2] == ',')
+        tmp[1] = '\0';
     m_QuickSlotText2->SetTextST(tmp);
 
     str = CStringTable().translate("quick_use_str_3").c_str();
     strncpy_s(tmp, sizeof(tmp), str, 3);
-    if (tmp[2] == ',') tmp[1] = '\0';
+    if (tmp[2] == ',')
+        tmp[1] = '\0';
     m_QuickSlotText3->SetTextST(tmp);
 
     str = CStringTable().translate("quick_use_str_4").c_str();
     strncpy_s(tmp, sizeof(tmp), str, 3);
-    if (tmp[2] == ',') tmp[1] = '\0';
+    if (tmp[2] == ',')
+        tmp[1] = '\0';
     m_QuickSlotText4->SetTextST(tmp);
 
     CActor* pActor = smart_cast<CActor*>(Level().CurrentViewEntity());
-    if (!pActor) return;
+    if (!pActor)
+        return;
 
     for (u8 i = 0; i < 4; i++)
     {
         CUIStatic* wnd = smart_cast<CUIStatic*>(m_quick_slots_icons[i]->FindChild("counter"));
-        if (wnd) {
+        if (wnd)
+        {
             shared_str item_name = g_quick_use_slots[i];
-            if (item_name.size()) {
+            if (item_name.size())
+            {
                 u32 count = pActor->inventory().dwfGetSameItemCount(item_name.c_str(), true);
                 string32 str;
                 xr_sprintf(str, "x%d", count);
@@ -804,7 +829,8 @@ void CUIMainIngameWnd::UpdateQuickSlots()
                 main_slot->SetTextureRect(texture_rect);
                 main_slot->TextureOn();
                 main_slot->SetStretchTexture(true);
-                if (!count) {
+                if (!count)
+                {
                     wnd->SetTextureColor(color_rgba(255, 255, 255, 0));
                     wnd->TextItemControl()->SetTextColor(color_rgba(255, 255, 255, 0));
                     m_quick_slots_icons[i]->SetTextureColor(color_rgba(255, 255, 255, 100));
@@ -829,7 +855,8 @@ void CUIMainIngameWnd::UpdateQuickSlots()
 void CUIMainIngameWnd::DrawMainIndicatorsForInventory()
 {
     CActor* pActor = smart_cast<CActor*>(Level().CurrentViewEntity());
-    if (!pActor) return;
+    if (!pActor)
+        return;
 
     UpdateQuickSlots();
     UpdateBoosterIndicators(pActor->conditions().GetCurBoosterInfluences());
@@ -842,42 +869,50 @@ void CUIMainIngameWnd::DrawMainIndicatorsForInventory()
     m_QuickSlotText3->Draw();
     m_QuickSlotText4->Draw();
 
-    if (m_ind_boost_psy->IsShown()) {
+    if (m_ind_boost_psy->IsShown())
+    {
         m_ind_boost_psy->Update();
         m_ind_boost_psy->Draw();
     }
 
-    if (m_ind_boost_radia->IsShown()) {
+    if (m_ind_boost_radia->IsShown())
+    {
         m_ind_boost_radia->Update();
         m_ind_boost_radia->Draw();
     }
 
-    if (m_ind_boost_chem->IsShown()) {
+    if (m_ind_boost_chem->IsShown())
+    {
         m_ind_boost_chem->Update();
         m_ind_boost_chem->Draw();
     }
 
-    if (m_ind_boost_wound->IsShown()) {
+    if (m_ind_boost_wound->IsShown())
+    {
         m_ind_boost_wound->Update();
         m_ind_boost_wound->Draw();
     }
 
-    if (m_ind_boost_weight->IsShown()) {
+    if (m_ind_boost_weight->IsShown())
+    {
         m_ind_boost_weight->Update();
         m_ind_boost_weight->Draw();
     }
 
-    if (m_ind_boost_health->IsShown()) {
+    if (m_ind_boost_health->IsShown())
+    {
         m_ind_boost_health->Update();
         m_ind_boost_health->Draw();
     }
 
-    if (m_ind_boost_power->IsShown()) {
+    if (m_ind_boost_power->IsShown())
+    {
         m_ind_boost_power->Update();
         m_ind_boost_power->Draw();
     }
 
-    if (m_ind_boost_rad->IsShown()) {
+    if (m_ind_boost_rad->IsShown())
+    {
         m_ind_boost_rad->Update();
         m_ind_boost_rad->Draw();
     }

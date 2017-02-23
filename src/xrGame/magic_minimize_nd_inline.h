@@ -4,23 +4,11 @@
 #define _MinimizeND MinimizeND<m_iDimensions>
 
 TEMPLATE_SPECIALIZATION
-inline int& _MinimizeND::MaxLevel()
-{
-    return m_kMinimizer.MaxLevel();
-}
-
+inline int& _MinimizeND::MaxLevel() { return m_kMinimizer.MaxLevel(); }
 TEMPLATE_SPECIALIZATION
-inline int& _MinimizeND::MaxBracket()
-{
-    return m_kMinimizer.MaxBracket();
-}
-
+inline int& _MinimizeND::MaxBracket() { return m_kMinimizer.MaxBracket(); }
 TEMPLATE_SPECIALIZATION
-inline void*& _MinimizeND::UserData()
-{
-    return m_pvUserData;
-}
-
+inline void*& _MinimizeND::UserData() { return m_pvUserData; }
 TEMPLATE_SPECIALIZATION
 _MinimizeND::MinimizeND(Function oF, int iMaxLevel, int iMaxBracket, int iMaxIterations, void* pvUserData)
     : m_kMinimizer(LineFunction, iMaxLevel, iMaxBracket)
@@ -78,7 +66,8 @@ void _MinimizeND::GetMinimum(
 
         const float fEpsilon = 1e-06f;
         fLength = _sqrt(fLength);
-        if (fLength < fEpsilon) {
+        if (fLength < fEpsilon)
+        {
             // New position did not change significantly from old one.
             // Should there be a better convergence criterion here?
             break;
@@ -119,28 +108,35 @@ void _MinimizeND::ComputeDomain(const float* afT0, const float* afT1, float& rfL
         float fB0 = afT0[i] - m_afTCurr[i];
         float fB1 = afT1[i] - m_afTCurr[i];
         float fInv;
-        if (m_afDCurr[i] > 0.0f) {
+        if (m_afDCurr[i] > 0.0f)
+        {
             // valid t-interval is [B0,B1]
             fInv = 1.0f / m_afDCurr[i];
             fB0 *= fInv;
-            if (fB0 > rfL0) rfL0 = fB0;
+            if (fB0 > rfL0)
+                rfL0 = fB0;
             fB1 *= fInv;
-            if (fB1 < rfL1) rfL1 = fB1;
+            if (fB1 < rfL1)
+                rfL1 = fB1;
         }
         else if (m_afDCurr[i] < 0.0f)
         {
             // valid t-interval is [B1,B0]
             fInv = 1.0f / m_afDCurr[i];
             fB0 *= fInv;
-            if (fB0 < rfL1) rfL1 = fB0;
+            if (fB0 < rfL1)
+                rfL1 = fB0;
             fB1 *= fInv;
-            if (fB1 > rfL0) rfL0 = fB1;
+            if (fB1 > rfL0)
+                rfL0 = fB1;
         }
     }
 
     // correction if numerical errors lead to values nearly zero
-    if (rfL0 > 0.0f) rfL0 = 0.0f;
-    if (rfL1 < 0.0f) rfL1 = 0.0f;
+    if (rfL0 > 0.0f)
+        rfL0 = 0.0f;
+    if (rfL1 < 0.0f)
+        rfL1 = 0.0f;
 }
 
 TEMPLATE_SPECIALIZATION

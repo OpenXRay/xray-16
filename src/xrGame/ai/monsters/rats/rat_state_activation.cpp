@@ -25,7 +25,8 @@ void CAI_Rat::activate_state_free_active()
     m_tVarGoal.set(m_tGoalVariation);
     m_fASpeed = m_fAngleSpeed;
 
-    if (bfCheckIfGoalChanged()) {
+    if (bfCheckIfGoalChanged())
+    {
         if ((Position().distance_to(m_tSpawnPosition) > m_fStableDistance) ||
             (::Random.randF(0, 1) > m_fChangeActiveStateProbability))
             if (Position().distance_to(m_home_position) > m_fMaxHomeRadius)
@@ -34,7 +35,8 @@ void CAI_Rat::activate_state_free_active()
                 vfChooseNewSpeed();
         else
         {
-            if (can_stand_here()) vfRemoveActiveMember();
+            if (can_stand_here())
+                vfRemoveActiveMember();
         }
     }
 
@@ -51,13 +53,15 @@ void CAI_Rat::activate_state_free_active()
 
 void CAI_Rat::activate_state_free_passive()
 {
-    if (memory().enemy().selected()) {
+    if (memory().enemy().selected())
+    {
         m_fGoalChangeTime = 0;
         add_active_member(true);
         return;
     }
 
-    if (m_fMorale < m_fMoraleNormalValue) {
+    if (m_fMorale < m_fMoraleNormalValue)
+    {
         add_active_member(true);
         return;
     }
@@ -109,12 +113,14 @@ void CAI_Rat::activate_move()
 
 void CAI_Rat::activate_state_attack_range()
 {
-    if (!m_attack_rebuild) {
+    if (!m_attack_rebuild)
+    {
         time_attack_rebuild = Device.dwTimeGlobal;
         m_attack_rebuild = true;
     }
 
-    if (m_attack_rebuild && Device.dwTimeGlobal - time_attack_rebuild > 5000) {
+    if (m_attack_rebuild && Device.dwTimeGlobal - time_attack_rebuild > 5000)
+    {
         m_attack_rebuild = false;
     }
 
@@ -162,9 +168,11 @@ void CAI_Rat::activate_state_eat()
     direction.sub(temp_position, Position());
     float y, p;
     direction.getHP(y, p);
-    if (a && angle_difference(y, -movement().m_body.current.yaw) < PI_DIV_6) {
+    if (a && angle_difference(y, -movement().m_body.current.yaw) < PI_DIV_6)
+    {
         m_fSpeed = 0;
-        if (Device.dwTimeGlobal - m_previous_query_time > m_dwHitInterval) {
+        if (Device.dwTimeGlobal - m_previous_query_time > m_dwHitInterval)
+        {
             m_previous_query_time = Device.dwTimeGlobal;
             const CEntityAlive* const_corpse = smart_cast<const CEntityAlive*>(memory().item().selected());
             VERIFY(const_corpse);

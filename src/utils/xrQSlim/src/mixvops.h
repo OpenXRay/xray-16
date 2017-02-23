@@ -1,6 +1,6 @@
-#ifndef MIXVOPS_INCLUDED  // -*- C++ -*-
-#define MIXVOPS_INCLUDED  //
-#endif                    // WARNING:  Multiple inclusions allowed
+#ifndef MIXVOPS_INCLUDED // -*- C++ -*-
+#define MIXVOPS_INCLUDED //
+#endif // WARNING:  Multiple inclusions allowed
 
 /************************************************************************
 
@@ -42,8 +42,8 @@
 #ifdef __T
 #undef __T
 #endif
-#define __LINKAGE                                                                                                      \
-    template <class __T>                                                                                               \
+#define __LINKAGE\
+    template <class __T> \
     inline
 #endif
 
@@ -51,54 +51,64 @@
 
 #define forall(i, N) for (unsigned int i = 0; i < (unsigned int)N; i++)
 
-#define def3(name, op)                                                                                                 \
-    __OP name(__T* r, const __T* u, const __T* v, __DIM)                                                               \
-    {                                                                                                                  \
-        forall(i, N) op;                                                                                               \
-        return r;                                                                                                      \
+#define def3(name, op)\
+    __OP name(__T* r, const __T* u, const __T* v, __DIM)\
+    {\
+        forall(i, N) op;\
+        return r;\
     }
 
-#define def2(name, op)                                                                                                 \
-    __OP name(__T* r, const __T* u, __DIM)                                                                             \
-    {                                                                                                                  \
-        forall(i, N) op;                                                                                               \
-        return r;                                                                                                      \
+#define def2(name, op)\
+    __OP name(__T* r, const __T* u, __DIM)\
+    {\
+        forall(i, N) op;\
+        return r;\
     }
 
-#define def1(name, op)                                                                                                 \
-    __OP name(__T* r, __DIM)                                                                                           \
-    {                                                                                                                  \
-        forall(i, N) op;                                                                                               \
-        return r;                                                                                                      \
+#define def1(name, op)\
+    __OP name(__T* r, __DIM)\
+    {\
+        forall(i, N) op;\
+        return r;\
     }
 
-#define def2s(name, op)                                                                                                \
-    __OP name(__T* r, const __T* u, __T d, __DIM)                                                                      \
-    {                                                                                                                  \
-        forall(i, N) op;                                                                                               \
-        return r;                                                                                                      \
+#define def2s(name, op)\
+    __OP name(__T* r, const __T* u, __T d, __DIM)\
+    {\
+        forall(i, N) op;\
+        return r;\
     }
 
-#define def1s(name, op)                                                                                                \
-    __OP name(__T* r, __T d, __DIM)                                                                                    \
-    {                                                                                                                  \
-        forall(i, N) op;                                                                                               \
-        return r;                                                                                                      \
+#define def1s(name, op)\
+    __OP name(__T* r, __T d, __DIM)\
+    {\
+        forall(i, N) op;\
+        return r;\
     }
 
-def3(mxv_add, r[i] = u[i] + v[i]) def3(mxv_sub, r[i] = u[i] - v[i]) def3(mxv_mul, r[i] = u[i] * v[i])
-    def3(mxv_div, r[i] = u[i] / v[i]) def3(mxv_min, r[i] = u[i] < v[i] ? u[i] : v[i];)
-        def3(mxv_max, r[i] = u[i] > v[i] ? u[i] : v[i];)
+def3(mxv_add, r[i] = u[i] + v[i])
+def3(mxv_sub, r[i] = u[i] - v[i])
+def3(mxv_mul, r[i] = u[i] * v[i])
+def3(mxv_div, r[i] = u[i] / v[i])
+def3(mxv_min, r[i] = u[i] < v[i] ? u[i] : v[i];)
+def3(mxv_max, r[i] = u[i] > v[i] ? u[i] : v[i];)
 
-            def2(mxv_addinto, r[i] += u[i]) def2(mxv_subfrom, r[i] -= u[i]) def2(mxv_mulby, r[i] *= u[i])
-                def2(mxv_divby, r[i] /= u[i])
+def2(mxv_addinto, r[i] += u[i])
+def2(mxv_subfrom, r[i] -= u[i])
+def2(mxv_mulby, r[i] *= u[i])
+def2(mxv_divby, r[i] /= u[i])
 
-                    def2(mxv_set, r[i] = u[i]) def1(mxv_neg, r[i] = -r[i]) def2(mxv_neg, r[i] = -u[i])
+def2(mxv_set, r[i] = u[i])
+def1(mxv_neg, r[i] = -r[i])
+def2(mxv_neg, r[i] = -u[i])
 
-                        def1s(mxv_set, r[i] = d) def1s(mxv_scale, r[i] *= d) def1s(mxv_invscale, r[i] /= d)
-                            def2s(mxv_scale, r[i] = u[i] * d) def2s(mxv_invscale, r[i] = u[i] / d)
+def1s(mxv_set, r[i] = d)
+def1s(mxv_scale, r[i] *= d)
+def1s(mxv_invscale, r[i] /= d)
+def2s(mxv_scale, r[i] = u[i] * d)
+def2s(mxv_invscale, r[i] = u[i] / d)
 
-                                __LINKAGE __T mxv_dot(const __T* u, const __T* v, __DIM)
+__LINKAGE __T mxv_dot(const __T* u, const __T* v, __DIM)
 {
     __T dot = 0.0;
     forall(i, N) dot += u[i] * v[i];
@@ -119,19 +129,13 @@ __OP mxv_lerp(__T* r, const __T* u, const __T* v, __T t, __DIM)
     return r;
 }
 
-__LINKAGE __T mxv_norm(const __T* v, __DIM)
-{
-    return _sqrt(mxv_dot(v, v, N));
-}
-__LINKAGE __T mxv_norm2(const __T* v, __DIM)
-{
-    return mxv_dot(v, v, N);
-}
-
+__LINKAGE __T mxv_norm(const __T* v, __DIM) { return _sqrt(mxv_dot(v, v, N)); }
+__LINKAGE __T mxv_norm2(const __T* v, __DIM) { return mxv_dot(v, v, N); }
 __LINKAGE __T mxv_unitize(__T* v, __DIM)
 {
     __T l = mxv_norm2(v, N);
-    if (l != 1.0 && l != 0.0) {
+    if (l != 1.0 && l != 0.0)
+    {
         l = _sqrt(l);
         mxv_invscale(v, l, N);
     }
@@ -175,11 +179,7 @@ __LINKAGE bool mxv_eql(const __T* u, const __T* v, __DIM)
     return e;
 }
 
-__LINKAGE bool mxv_equal(const __T* u, const __T* v, __DIM)
-{
-    return mxv_L2(u, v, N) < FEQ_EPS2;
-}
-
+__LINKAGE bool mxv_equal(const __T* u, const __T* v, __DIM) { return mxv_L2(u, v, N) < FEQ_EPS2; }
 __OP mxv_basis(__T* r, unsigned int b, __DIM)
 {
     forall(i, N) r[i] = (i == b) ? __T(1.0) : __T(0.0);

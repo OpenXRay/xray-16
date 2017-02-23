@@ -60,7 +60,8 @@ void CCustom2DProjector::CreateRMFromObjects(const Fbox& box, ObjectList& lst)
 
 void CCustom2DProjector::Render(bool blended)
 {
-    if (!Valid()) return;
+    if (!Valid())
+        return;
     EDevice.RenderNearer(0.001f);
     RCache.set_xform_world(Fidentity);
     EDevice.SetShader(blended ? shader_blended : shader_overlap);
@@ -74,7 +75,8 @@ void CCustom2DProjector::Render(bool blended)
         Stream->Unlock(MAX_BUF_SIZE, geom->vb_stride);
         EDevice.DP(D3DPT_TRIANGLELIST, geom, vBase, MAX_BUF_SIZE / 3);
     }
-    if (cnt.rem) {
+    if (cnt.rem)
+    {
         FVF::V* pv = (FVF::V*)Stream->Lock(cnt.rem, geom->vb_stride, vBase);
         CopyMemory(pv, mesh.begin() + cnt.quot * MAX_BUF_SIZE, sizeof(FVF::V) * cnt.rem);
         Stream->Unlock(cnt.rem, geom->vb_stride);
@@ -86,7 +88,8 @@ void CCustom2DProjector::Render(bool blended)
 void CCustom2DProjector::CreateShader()
 {
     DestroyShader();
-    if (Valid()) {
+    if (Valid())
+    {
         shader_blended.create("editor\\do_base", *name);
         shader_overlap.create("default", *name);
         geom.create(FVF::F_V, RCache.Vertex.Buffer(), 0);
@@ -107,7 +110,4 @@ void CCustom2DProjector::OnImageChange(PropValue* prop)
     CreateShader();
 }
 
-void CCustom2DProjector::ReloadImage()
-{
-    LoadImage(*name);
-}
+void CCustom2DProjector::ReloadImage() { LoadImage(*name); }

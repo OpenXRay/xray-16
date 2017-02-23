@@ -27,7 +27,7 @@
 #define _WIN32_DCOM
 
 #pragma warning(push)
-#pragma warning(disable:4005) // macro redefinition
+#pragma warning(disable : 4005) // macro redefinition
 #include <windows.h>
 #include <windowsx.h>
 #pragma warning(pop)

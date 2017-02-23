@@ -37,11 +37,13 @@ void EScene::UndoClear()
 
 void EScene::UndoSave()
 {
-    if (UI->GetEState() != esEditScene) return;
+    if (UI->GetEState() != esEditScene)
+        return;
     Modified();
     UI->RedrawScene();
 
-    if (0 == EPrefs->scene_undo_level) return;
+    if (0 == EPrefs->scene_undo_level)
+        return;
 
     UndoItem item;
     GetTempFileName(FS.get_path(_temp_)->m_Path, "undo", 0, item.m_FileName);
@@ -55,7 +57,8 @@ void EScene::UndoSave()
         m_RedoStack.pop_back();
     }
 
-    if (m_UndoStack.size() > EPrefs->scene_undo_level) {
+    if (m_UndoStack.size() > EPrefs->scene_undo_level)
+    {
         unlink(m_UndoStack.front().m_FileName);
         m_UndoStack.pop_front();
     }
@@ -64,16 +67,19 @@ void EScene::UndoSave()
 bool EScene::Undo()
 {
     //	if( !m_UndoStack.empty() ){
-    if (m_UndoStack.size() > 1) {
+    if (m_UndoStack.size() > 1)
+    {
         m_RedoStack.push_back(m_UndoStack.back());
         m_UndoStack.pop_back();
 
-        if (m_RedoStack.size() > EPrefs->scene_undo_level) {
+        if (m_RedoStack.size() > EPrefs->scene_undo_level)
+        {
             unlink(m_RedoStack.front().m_FileName);
             m_RedoStack.pop_front();
         }
 
-        if (!m_UndoStack.empty()) {
+        if (!m_UndoStack.empty())
+        {
             Unload(TRUE);
             Load(m_UndoStack.back().m_FileName, true);
         }
@@ -88,14 +94,16 @@ bool EScene::Undo()
 
 bool EScene::Redo()
 {
-    if (!m_RedoStack.empty()) {
+    if (!m_RedoStack.empty())
+    {
         Unload(TRUE);
         Load(m_RedoStack.back().m_FileName, true);
 
         m_UndoStack.push_back(m_RedoStack.back());
         m_RedoStack.pop_back();
 
-        if (m_UndoStack.size() > EPrefs->scene_undo_level) {
+        if (m_UndoStack.size() > EPrefs->scene_undo_level)
+        {
             unlink(m_UndoStack.front().m_FileName);
             m_UndoStack.pop_front();
         }

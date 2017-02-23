@@ -12,7 +12,6 @@ public:
     virtual bool NeedCursor() const { return false; }
     virtual bool OnKeyboardAction(int dik, EUIMessages keyboard_action);
     virtual bool StopAnyMove() { return false; }
-
 private:
     CUIScrollView* m_pList;
     u32 m_text_color;

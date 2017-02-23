@@ -90,8 +90,8 @@ private:
     //
     // Stores angle of R joint
     //
-    float upper_len;  // Len of T pos vector
-    float lower_len;  // Len of S pos vector
+    float upper_len; // Len of T pos vector
+    float lower_len; // Len of S pos vector
     float reciprocal_upper_len;
 
     float r_angle;
@@ -117,9 +117,7 @@ private:
 
 public:
     void ProjectOn() { project_to_workspace = 1; }
-
     void ProjectOff() { project_to_workspace = 0; }
-
     //
     // Given the position of the R joint find the corresponding
     // swivel angle. Must call SetGoal or SetGoalPos first.
@@ -179,17 +177,12 @@ public:
     void init(const Matrix T, const Matrix S, const float a[3], const float p[3]);
 
     SRS(const Matrix T1, const Matrix S1, const float a[3], const float p[3]) { init(T1, S1, a, p); }
-
     SRS() {}
-
     ~SRS() {}
-
     void Tmatrix(Matrix TT) { cpmatrix(TT, T); }
     void Smatrix(Matrix SS) { cpmatrix(SS, S); }
     void SetTMatrix(const Matrix TT) { cpmatrix(T, TT); }
-
     void SetSMatrix(const Matrix SS) { cpmatrix(S, SS); }
-
     // Sets the goal for an aiming problem
     // goal is the point we want to point to
     // axis is the pointing axis in the hand frame

@@ -37,7 +37,7 @@ private:
     bool haveGotUpdate;
     // bool sendedSpawnMe;
 
-    u16 greenArtefactOwner;  // GameID, if 0, then no body took the artefact
+    u16 greenArtefactOwner; // GameID, if 0, then no body took the artefact
     u16 blueArtefactOwner;
 
     const shared_str& GetLocalPlayerTeamSection() const;
@@ -112,7 +112,6 @@ public:
     void Set_ShowPlayerNames(bool Show) { m_bShowPlayersNames = Show; };
     bool Get_ShowPlayerNames() { return m_bShowPlayersNames; };
     bool Get_ShowPlayerNamesEnabled() { return m_bFriendlyNames; };
-
     // ui part
     virtual void OnSpectatorSelect();
     virtual void OnMapInfoAccept();
@@ -148,7 +147,6 @@ public:
     // very bad... need to fix problem with team indexes...
     virtual void OnSpeechMessage(NET_Packet& P);
     virtual u8 GetTeamCount() { return 2; };
-
     virtual void OnSwitchPhase(u32 old_phase, u32 new_phase);
     virtual void OnGameRoundStarted();
     u16 GetGreenArtefactOwnerID() const;

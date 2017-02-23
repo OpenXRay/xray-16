@@ -15,13 +15,12 @@ enum
 //---------------------------------------------------------------------------
 class TUI_ControlWayPointAdd : public TUI_CustomControl
 {
-  public:
+public:
     TUI_ControlWayPointAdd(int st, int act, ESceneToolBase* parent);
 
     virtual ~TUI_ControlWayPointAdd() {}
-
     virtual bool Start(TShiftState _Shift);
     virtual void OnEnter();
 };
 
-#endif  // UI_WayPointToolsH
+#endif // UI_WayPointToolsH

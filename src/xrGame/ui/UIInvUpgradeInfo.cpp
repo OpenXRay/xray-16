@@ -30,10 +30,7 @@ UIInvUpgradeInfo::UIInvUpgradeInfo()
     m_properties_wnd = NULL;
 }
 
-UIInvUpgradeInfo::~UIInvUpgradeInfo()
-{
-}
-
+UIInvUpgradeInfo::~UIInvUpgradeInfo() {}
 void UIInvUpgradeInfo::init_from_xml(LPCSTR xml_name)
 {
     CUIXml ui_xml;
@@ -82,13 +79,15 @@ void UIInvUpgradeInfo::init_from_xml(LPCSTR xml_name)
 
 bool UIInvUpgradeInfo::init_upgrade(Upgrade_type* upgr, CInventoryItem* inv_item)
 {
-    if (!upgr || !inv_item) {
+    if (!upgr || !inv_item)
+    {
         m_upgrade = NULL;
         Show(false);
         return false;
     }
 
-    if (m_upgrade == upgr) {
+    if (m_upgrade == upgr)
+    {
         return false;
     }
     m_upgrade = upgr;
@@ -99,7 +98,8 @@ bool UIInvUpgradeInfo::init_upgrade(Upgrade_type* upgr, CInventoryItem* inv_item
 
     m_name->SetText(m_upgrade->name());
     m_desc->SetText(m_upgrade->description_text());
-    if (m_upgrade->is_known()) {
+    if (m_upgrade->is_known())
+    {
         m_prereq->Show(true);
         m_properties_wnd->Show(true);
         luabind::functor<LPCSTR> cost_func;
@@ -112,7 +112,8 @@ bool UIInvUpgradeInfo::init_upgrade(Upgrade_type* upgr, CInventoryItem* inv_item
         inventory::upgrade::UpgradeStateResult upg_res_script = m_upgrade->get_preconditions();
         string512 str_res = "";
         m_prereq->SetTextColor(color_rgba(255, 90, 90, 255));
-        if (upg_res == inventory::upgrade::result_e_installed) {
+        if (upg_res == inventory::upgrade::result_e_installed)
+        {
             m_prereq->SetTextColor(color_rgba(117, 255, 123, 255));
             xr_sprintf(str_res, sizeof(str_res), "%s", CStringTable().translate("st_upgr_installed").c_str());
         }
@@ -130,7 +131,8 @@ bool UIInvUpgradeInfo::init_upgrade(Upgrade_type* upgr, CInventoryItem* inv_item
                 CStringTable().translate("st_upgr_cant_do").c_str());
         else
         {
-            if (upg_res != inventory::upgrade::result_ok) {
+            if (upg_res != inventory::upgrade::result_ok)
+            {
                 xr_sprintf(str_res, sizeof(str_res), "%s:\\n%s", CStringTable().translate("st_upgr_disable").c_str(),
                     m_upgrade->get_prerequisites());
                 if (upg_res == inventory::upgrade::result_e_parents)
@@ -187,7 +189,8 @@ bool UIInvUpgradeInfo::init_upgrade(Upgrade_type* upgr, CInventoryItem* inv_item
 
 void UIInvUpgradeInfo::Draw()
 {
-    if (m_upgrade) {
+    if (m_upgrade)
+    {
         inherited::Draw();
     }
 }

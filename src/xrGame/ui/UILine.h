@@ -56,7 +56,6 @@ public:
 
     void Draw(CGameFont* pFont, float x, float y) const;
     bool IsEmpty() { return m_subLines.empty(); }
-
 protected:
     int GetSize();
     const CUILine* Cut2Pos(Position& pos, bool to_first = true);

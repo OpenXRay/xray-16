@@ -16,16 +16,16 @@
     [System::ComponentModel::TypeConverter(property_collection_converter::typeid)] public ref class property_collection
     : public property_collection_base
 {
-  public:
+public:
     property_collection(collection_type* collection);
     virtual ~property_collection();
     !property_collection();
 
-  protected:
+protected:
     virtual collection_type* collection() override;
 
-  private:
+private:
     collection_type* m_collection;
-};  // ref class property_collection
+}; // ref class property_collection
 
-#endif  // ifndef PROPERTY_COLLECTION_HPP_INCLUDED
+#endif // ifndef PROPERTY_COLLECTION_HPP_INCLUDED

@@ -22,16 +22,9 @@ IC CBaseAction::CActionBase(const xr_vector<COperatorCondition>& conditions,
 }
 
 TEMPLATE_SPECIALIZATION
-IC CBaseAction::CActionBase(_object_type* object, LPCSTR action_name)
-{
-    init(object, action_name);
-}
-
+IC CBaseAction::CActionBase(_object_type* object, LPCSTR action_name) { init(object, action_name); }
 TEMPLATE_SPECIALIZATION
-CBaseAction::~CActionBase()
-{
-}
-
+CBaseAction::~CActionBase() {}
 TEMPLATE_SPECIALIZATION
 void CBaseAction::init(_object_type* object, LPCSTR action_name)
 {
@@ -58,7 +51,8 @@ void CBaseAction::setup(_object_type* object, CPropertyStorage* storage)
     m_inertia_time = 0;
 #ifdef LOG_ACTION
     m_switched = false;
-    if (m_use_log && xr_strlen(m_action_name)) debug_log(eActionStateSetup);
+    if (m_use_log && xr_strlen(m_action_name))
+        debug_log(eActionStateSetup);
 #endif
 }
 
@@ -68,7 +62,8 @@ void CBaseAction::initialize()
 #ifdef LOG_ACTION
     VERIFY3(!m_switched, m_action_name, "::initialize()");
     m_switched = true;
-    if (m_use_log && xr_strlen(m_action_name)) debug_log(eActionStateInitialized);
+    if (m_use_log && xr_strlen(m_action_name))
+        debug_log(eActionStateInitialized);
 #endif
     m_start_level_time = Device.dwTimeGlobal;
     m_first_time = true;
@@ -79,7 +74,8 @@ void CBaseAction::execute()
 {
     m_first_time = false;
 #ifdef LOG_ACTION
-    if (m_use_log && xr_strlen(m_action_name) && m_switched) debug_log(eActionStateExecuted);
+    if (m_use_log && xr_strlen(m_action_name) && m_switched)
+        debug_log(eActionStateExecuted);
     m_switched = false;
 #endif
 }
@@ -89,34 +85,19 @@ void CBaseAction::finalize()
 {
 #ifdef LOG_ACTION
     VERIFY3(!m_switched, m_action_name, "::finalize()");
-    if (m_use_log && xr_strlen(m_action_name)) debug_log(eActionStateFinalized);
+    if (m_use_log && xr_strlen(m_action_name))
+        debug_log(eActionStateFinalized);
 #endif
 }
 
 TEMPLATE_SPECIALIZATION
-bool CBaseAction::completed() const
-{
-    return (m_start_level_time + m_inertia_time <= Device.dwTimeGlobal);
-}
-
+bool CBaseAction::completed() const { return (m_start_level_time + m_inertia_time <= Device.dwTimeGlobal); }
 TEMPLATE_SPECIALIZATION
-IC u32 CBaseAction::start_level_time() const
-{
-    return (m_start_level_time);
-}
-
+IC u32 CBaseAction::start_level_time() const { return (m_start_level_time); }
 TEMPLATE_SPECIALIZATION
-IC u32 CBaseAction::inertia_time() const
-{
-    return (m_inertia_time);
-}
-
+IC u32 CBaseAction::inertia_time() const { return (m_inertia_time); }
 TEMPLATE_SPECIALIZATION
-IC void CBaseAction::set_inertia_time(u32 inertia_time)
-{
-    m_inertia_time = inertia_time;
-}
-
+IC void CBaseAction::set_inertia_time(u32 inertia_time) { m_inertia_time = inertia_time; }
 #ifdef LOG_ACTION
 TEMPLATE_SPECIALIZATION
 IC void CBaseAction::debug_log(const EActionStates state_state) const
@@ -153,10 +134,7 @@ IC void CBaseAction::debug_log(const EActionStates state_state) const
 }
 
 TEMPLATE_SPECIALIZATION
-IC void CBaseAction::set_use_log(bool value)
-{
-    m_use_log = value;
-}
+IC void CBaseAction::set_use_log(bool value) { m_use_log = value; }
 #endif
 
 TEMPLATE_SPECIALIZATION
@@ -174,32 +152,23 @@ IC const typename CBaseAction::_value_type& CBaseAction::property(const _conditi
 }
 
 TEMPLATE_SPECIALIZATION
-IC void CBaseAction::set_weight(const _edge_value_type& weight)
-{
-    m_weight = _max(min_weight(), weight);
-}
-
+IC void CBaseAction::set_weight(const _edge_value_type& weight) { m_weight = _max(min_weight(), weight); }
 TEMPLATE_SPECIALIZATION
 typename CBaseAction::_edge_value_type CBaseAction::weight(
     const CSConditionState& condition0, const CSConditionState& condition1) const
 {
     _edge_value_type _min_weight = min_weight();
-    if (m_weight < _min_weight) m_weight = _min_weight;
+    if (m_weight < _min_weight)
+        m_weight = _min_weight;
     return (m_weight);
 }
 
 #ifdef LOG_ACTION
 TEMPLATE_SPECIALIZATION
-IC void CBaseAction::show(LPCSTR offset)
-{
-}
+IC void CBaseAction::show(LPCSTR offset) {}
 #endif
 
 TEMPLATE_SPECIALIZATION
-IC bool CBaseAction::first_time() const
-{
-    return (m_first_time);
-}
-
+IC bool CBaseAction::first_time() const { return (m_first_time); }
 #undef TEMPLATE_SPECIALIZATION
 #undef CBaseAction

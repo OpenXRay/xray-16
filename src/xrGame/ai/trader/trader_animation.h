@@ -25,7 +25,6 @@ class CTraderAnimation
 
 public:
     CTraderAnimation(CAI_Trader* trader) : m_trader(trader) {}
-
     void reinit();
 
     void set_animation(LPCSTR anim);

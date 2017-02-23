@@ -42,33 +42,18 @@ struct CWrapperBase : public T, public luabind::wrap_base
 
 #pragma warning(pop)
 
-void game_cl_mp_script::EventGen(NET_Packet* P, u16 type, u16 dest)
-{
-    u_EventGen(*P, type, dest);
-}
-
-void game_cl_mp_script::GameEventGen(NET_Packet* P, u16 dest)
-{
-    u_EventGen(*P, u16(GE_GAME_EVENT & 0xffff), dest);
-}
-
-void game_cl_mp_script::EventSend(NET_Packet* P)
-{
-    u_EventSend(*P);
-}
-
-void game_cl_mp_script::shedule_Update(u32 dt)
-{
-    inherited::shedule_Update(dt);
-}
-
+void game_cl_mp_script::EventGen(NET_Packet* P, u16 type, u16 dest) { u_EventGen(*P, type, dest); }
+void game_cl_mp_script::GameEventGen(NET_Packet* P, u16 dest) { u_EventGen(*P, u16(GE_GAME_EVENT & 0xffff), dest); }
+void game_cl_mp_script::EventSend(NET_Packet* P) { u_EventSend(*P); }
+void game_cl_mp_script::shedule_Update(u32 dt) { inherited::shedule_Update(dt); }
 game_cl_mp_script::game_cl_mp_script() : inherited(){};
 
 CScriptGameObject* game_cl_mp_script::GetObjectByGameID(u16 id)
 {
     CObject* pObject = Level().Objects.net_Find(id);
     CGameObject* pGameObject = smart_cast<CGameObject*>(pObject);
-    if (!pGameObject) return NULL;
+    if (!pGameObject)
+        return NULL;
 
     return pGameObject->lua_game_object();
 }

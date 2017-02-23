@@ -70,7 +70,6 @@ public:
      */
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     inline_ void SetFullBoxBoxTest(bool flag) { mFullBoxBoxTest = flag; }
-
     // Settings
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -84,15 +83,15 @@ public:
 
 protected:
     // Precomputed data
-    Matrix3x3 mAR;           //!< Absolute rotation matrix
-    Matrix3x3 mRModelToBox;  //!< Rotation from model space to obb space
-    Matrix3x3 mRBoxToModel;  //!< Rotation from obb space to model space
-    Point mTModelToBox;      //!< Translation from model space to obb space
-    Point mTBoxToModel;      //!< Translation from obb space to model space
+    Matrix3x3 mAR; //!< Absolute rotation matrix
+    Matrix3x3 mRModelToBox; //!< Rotation from model space to obb space
+    Matrix3x3 mRBoxToModel; //!< Rotation from obb space to model space
+    Point mTModelToBox; //!< Translation from model space to obb space
+    Point mTBoxToModel; //!< Translation from obb space to model space
 
     Point mBoxExtents;
-    Point mB0;  //!< - mTModelToBox + mBoxExtents
-    Point mB1;  //!< - mTModelToBox - mBoxExtents
+    Point mB0; //!< - mTModelToBox + mBoxExtents
+    Point mB1; //!< - mTModelToBox - mBoxExtents
 
     float mBBx1;
     float mBBy1;
@@ -109,10 +108,10 @@ protected:
     float mBB_9;
 
     // Leaf description
-    Point mLeafVerts[3];   //!< Triangle vertices
-                           // Settings
-    bool mFullBoxBoxTest;  //!< Perform full BV-BV tests (true) or SAT-lite tests (false)
-                           // Internal methods
+    Point mLeafVerts[3]; //!< Triangle vertices
+    // Settings
+    bool mFullBoxBoxTest; //!< Perform full BV-BV tests (true) or SAT-lite tests (false)
+    // Internal methods
     void _Collide(const AABBCollisionNode* node);
     void _Collide(const AABBNoLeafNode* node);
     void _Collide(const AABBQuantizedNode* node);
@@ -125,4 +124,4 @@ protected:
     BOOL InitQuery(OBBCache& cache, const OBB& box, const Matrix4x4* worldb = null, const Matrix4x4* worldm = null);
 };
 
-#endif  // __OPC_OBBCOLLIDER_H__
+#endif // __OPC_OBBCOLLIDER_H__

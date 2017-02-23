@@ -48,7 +48,6 @@ public:
 
 public:
     tnet_execution_base(u32 id) : net_execution(id) {}
-
     virtual net_execution_impl& implementation() = 0;
 
 private:

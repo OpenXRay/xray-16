@@ -13,11 +13,7 @@ void ESceneGlowTool::CreateControls()
 
 //----------------------------------------------------
 
-void ESceneGlowTool::RemoveControls()
-{
-    inherited::RemoveControls();
-}
-
+void ESceneGlowTool::RemoveControls() { inherited::RemoveControls(); }
 //----------------------------------------------------
 
 void ESceneGlowTool::FillProp(LPCSTR pref, PropItemVec& items)

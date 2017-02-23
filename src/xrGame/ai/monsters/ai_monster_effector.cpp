@@ -62,7 +62,8 @@ CMonsterEffectorHit::CMonsterEffectorHit(float time, float amp, float periods, f
 BOOL CMonsterEffectorHit::ProcessCam(SCamEffectorInfo& info)
 {
     fLifeTime -= Device.fTimeDelta;
-    if (fLifeTime < 0) return FALSE;
+    if (fLifeTime < 0)
+        return FALSE;
 
     // процент оставшегося времени
     float time_left_perc = fLifeTime / total;
@@ -75,7 +76,7 @@ BOOL CMonsterEffectorHit::ProcessCam(SCamEffectorInfo& info)
     Mdef.i.crossproduct(info.n, info.d);
     Mdef.c.set(info.p);
 
-    float period_all = period_number * PI_MUL_2;  // макс. значение цикла
+    float period_all = period_number * PI_MUL_2; // макс. значение цикла
     float cur_amp = max_amp * (PI / 180) * time_left_perc;
 
     Fvector dangle;

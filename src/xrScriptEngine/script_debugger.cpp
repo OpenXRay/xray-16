@@ -7,7 +7,8 @@
 
 void CScriptDebugger::SendMessageToIde(CMailSlotMsg& msg)
 {
-    if (CheckExisting(IDE_MAIL_SLOT)) {
+    if (CheckExisting(IDE_MAIL_SLOT))
+    {
         SendMailslotMessage(IDE_MAIL_SLOT, msg);
         m_bIdePresent = true;
     }
@@ -109,11 +110,7 @@ LRESULT CScriptDebugger::DebugMessage(UINT nMsg, WPARAM wParam, LPARAM lParam)
     return 0;
 }
 
-BOOL CScriptDebugger::Active()
-{
-    return m_bIdePresent;
-}
-
+BOOL CScriptDebugger::Active() { return m_bIdePresent; }
 CScriptDebugger::CScriptDebugger(CScriptEngine* scriptEngine)
 {
     this->scriptEngine = scriptEngine;
@@ -124,7 +121,8 @@ CScriptDebugger::CScriptDebugger(CScriptEngine* scriptEngine)
     //	m_pDebugger					= this;
     m_nLevel = 0;
     m_mailSlot = CreateMailSlotByName(DEBUGGER_MAIL_SLOT);
-    if (m_mailSlot == INVALID_HANDLE_VALUE) {
+    if (m_mailSlot == INVALID_HANDLE_VALUE)
+    {
         m_bIdePresent = false;
         return;
     }
@@ -135,7 +133,8 @@ void CScriptDebugger::Connect(LPCSTR mslot_name)
 {
     m_bIdePresent = CheckExisting(IDE_MAIL_SLOT);
     ZeroMemory(m_curr_connected_mslot, sizeof(m_curr_connected_mslot));
-    if (Active()) {
+    if (Active())
+    {
         _SendMessage(DMSG_NEW_CONNECTION, 0, 0);
         CMailSlotMsg msg;
         msg.w_int(DMSG_GET_BREAKPOINTS);
@@ -147,7 +146,8 @@ void CScriptDebugger::Connect(LPCSTR mslot_name)
 
 CScriptDebugger::~CScriptDebugger()
 {
-    if (Active()) _SendMessage(DMSG_CLOSE_CONNECTION, 0, 0);
+    if (Active())
+        _SendMessage(DMSG_CLOSE_CONNECTION, 0, 0);
     CloseHandle(m_mailSlot);
     xr_delete(m_threads);
     xr_delete(m_callStack);
@@ -156,7 +156,8 @@ CScriptDebugger::~CScriptDebugger()
 
 void CScriptDebugger::UnPrepareLua(lua_State* l, int idx)
 {
-    if (idx == -1) return;  // !Active()
+    if (idx == -1)
+        return; // !Active()
     m_lua->UnPrepareLua(l, idx);
 }
 
@@ -164,33 +165,28 @@ int CScriptDebugger::PrepareLua(lua_State* l)
 {
     // call this function immediatly before calling lua_pcall.
     // returns index in stack for errorFunc
-    if (!Active()) return -1;
+    if (!Active())
+        return -1;
     m_nMode = DMOD_NONE;
     return m_lua->PrepareLua(l);
 }
 
 BOOL CScriptDebugger::PrepareLuaBind()
 {
-    if (!Active()) return FALSE;
+    if (!Active())
+        return FALSE;
     m_lua->PrepareLuaBind();
     m_nMode = DMOD_NONE;
     return TRUE;
 }
 
-void CScriptDebugger::initiateDebugBreak()
-{
-    m_nMode = DMOD_BREAK;
-}
-
-void CScriptDebugger::Write(const char* szMsg)
-{
-    _SendMessage(DMSG_WRITE_DEBUG, (WPARAM)szMsg, 0);
-}
-
+void CScriptDebugger::initiateDebugBreak() { m_nMode = DMOD_BREAK; }
+void CScriptDebugger::Write(const char* szMsg) { _SendMessage(DMSG_WRITE_DEBUG, (WPARAM)szMsg, 0); }
 void CScriptDebugger::LineHook(const char* szFile, int nLine)
 {
     CheckNewMessages();
-    if (m_nMode == DMOD_STOP) {
+    if (m_nMode == DMOD_STOP)
+    {
         // Console->Execute("quit");
         return;
     }
@@ -205,7 +201,8 @@ void CScriptDebugger::LineHook(const char* szFile, int nLine)
 
 void CScriptDebugger::FunctionHook(const char* szFile, int nLine, BOOL bCall)
 {
-    if (m_nMode == DMOD_STOP) return;
+    if (m_nMode == DMOD_STOP)
+        return;
     m_nLevel += bCall ? 1 : -1;
 }
 
@@ -213,7 +210,8 @@ void CScriptDebugger::DrawThreadInfo(int nThreadID)
 {
     // find corresponding lua_state
     lua_State* ls = m_threads->FindScript(nThreadID);
-    if (!ls) return;
+    if (!ls)
+        return;
     m_lua->set_lua(ls);
     DrawCurrentState();
 }
@@ -245,14 +243,11 @@ void CScriptDebugger::GetBreakPointsFromIde()
 
 void CScriptDebugger::ErrorBreak(const char* szFile, int nLine)
 {
-    if (Active()) DebugBreak(szFile, nLine);
+    if (Active())
+        DebugBreak(szFile, nLine);
 }
 
-void CScriptDebugger::ClearStackTrace()
-{
-    _SendMessage(DMSG_CLEAR_STACKTRACE, 0, 0);
-}
-
+void CScriptDebugger::ClearStackTrace() { _SendMessage(DMSG_CLEAR_STACKTRACE, 0, 0); }
 void CScriptDebugger::AddStackTrace(const char* szDesc, const char* szFile, int nLine)
 {
     StackTrace st;
@@ -262,36 +257,12 @@ void CScriptDebugger::AddStackTrace(const char* szDesc, const char* szFile, int 
     _SendMessage(DMSG_ADD_STACKTRACE, (WPARAM)&st, 0);
 }
 
-int CScriptDebugger::GetStackTraceLevel()
-{
-    return m_callStack->GetLevel();
-}
-
-void CScriptDebugger::StackLevelChanged()
-{
-    m_lua->DrawLocalVariables();
-}
-
-void CScriptDebugger::DrawVariableInfo(char* varName)
-{
-    m_lua->DrawVariableInfo(varName);
-}
-
-void CScriptDebugger::ClearLocalVariables()
-{
-    _SendMessage(DMSG_CLEAR_LOCALVARIABLES, 0, 0);
-}
-
-void CScriptDebugger::AddLocalVariable(const Variable& var)
-{
-    _SendMessage(DMSG_ADD_LOCALVARIABLE, (WPARAM)&var, 0);
-}
-
-void CScriptDebugger::ClearGlobalVariables()
-{
-    _SendMessage(DMSG_CLEAR_GLOBALVARIABLES, 0, 0);
-}
-
+int CScriptDebugger::GetStackTraceLevel() { return m_callStack->GetLevel(); }
+void CScriptDebugger::StackLevelChanged() { m_lua->DrawLocalVariables(); }
+void CScriptDebugger::DrawVariableInfo(char* varName) { m_lua->DrawVariableInfo(varName); }
+void CScriptDebugger::ClearLocalVariables() { _SendMessage(DMSG_CLEAR_LOCALVARIABLES, 0, 0); }
+void CScriptDebugger::AddLocalVariable(const Variable& var) { _SendMessage(DMSG_ADD_LOCALVARIABLE, (WPARAM)&var, 0); }
+void CScriptDebugger::ClearGlobalVariables() { _SendMessage(DMSG_CLEAR_GLOBALVARIABLES, 0, 0); }
 void CScriptDebugger::AddGlobalVariable(const char* name, const char* type, const char* value)
 {
     Variable var;
@@ -319,7 +290,7 @@ void CScriptDebugger::CheckNewMessages()
     }
 }
 
-void CScriptDebugger::WaitForReply(bool bWaitForModalResult)  // UINT nMsg)
+void CScriptDebugger::WaitForReply(bool bWaitForModalResult) // UINT nMsg)
 {
     bool mr = false;
     do
@@ -327,11 +298,12 @@ void CScriptDebugger::WaitForReply(bool bWaitForModalResult)  // UINT nMsg)
         CMailSlotMsg msg;
         while (true)
         {
-            if (CheckMailslotMessage(m_mailSlot, msg)) break;
+            if (CheckMailslotMessage(m_mailSlot, msg))
+                break;
             Sleep(10);
         }
         R_ASSERT(msg.GetLen());
-        mr = TranslateIdeMessage(&msg);  // mr--is this an ide modalResult ?
+        mr = TranslateIdeMessage(&msg); // mr--is this an ide modalResult ?
     } while (bWaitForModalResult && !mr);
 }
 
@@ -433,12 +405,5 @@ void CScriptDebugger::FillBreakPointsIn(CMailSlotMsg* msg)
     }
 }
 
-void CScriptDebugger::ClearThreads()
-{
-    _SendMessage(DMSG_CLEAR_THREADS, 0, 0);
-}
-
-void CScriptDebugger::AddThread(SScriptThread& th)
-{
-    _SendMessage(DMSG_ADD_THREAD, (WPARAM)(&th), 0);
-}
+void CScriptDebugger::ClearThreads() { _SendMessage(DMSG_CLEAR_THREADS, 0, 0); }
+void CScriptDebugger::AddThread(SScriptThread& th) { _SendMessage(DMSG_ADD_THREAD, (WPARAM)(&th), 0); }

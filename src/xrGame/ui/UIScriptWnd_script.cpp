@@ -20,8 +20,7 @@ SCRIPT_EXPORT(CUIDialogWndEx, (), {
 export_class& script_register_ui_window1(export_class& instance)
 {
     instance.def(constructor<>())
-        .def("AddCallback",
-            (void (BaseType::*)(LPCSTR, s16, const luabind::functor<void>&, const luabind::object&)) &
+        .def("AddCallback", (void (BaseType::*)(LPCSTR, s16, const luabind::functor<void>&, const luabind::object&)) &
                 BaseType::AddCallback)
         .def("Register", (void (BaseType::*)(CUIWindow*, LPCSTR)) & BaseType::Register);
     return (instance);

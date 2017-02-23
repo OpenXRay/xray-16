@@ -36,7 +36,6 @@ public:
 
 public:
     virtual CInventoryOwner* cast_inventory_owner() { return this; }
-
 public:
     virtual IFactoryObject* _construct();
     virtual BOOL net_Spawn(CSE_Abstract* DC);
@@ -54,7 +53,6 @@ public:
     //обновление
     virtual void UpdateInventoryOwner(u32 deltaT);
     virtual bool CanPutInSlot(PIItem item, u32 slot) { return true; };
-
     CPda* GetPDA() const;
 
     // инвентарь
@@ -64,7 +62,7 @@ public:
     //торговля и общение с персонажем
 
     virtual bool AllowItemToTrade(CInventoryItem const* item, const SInvItemPlace& place) const;
-    virtual void OnFollowerCmd(int cmd){};  // redefine for CAI_Stalkker
+    virtual void OnFollowerCmd(int cmd){}; // redefine for CAI_Stalkker
     bool bDisableBreakDialog;
     //инициализация объекта торговли
     CTrade* GetTrade();
@@ -82,15 +80,12 @@ public:
     virtual void EnableTalk() { m_bAllowTalk = true; }
     virtual void DisableTalk() { m_bAllowTalk = false; }
     virtual bool IsTalkEnabled() { return m_bAllowTalk; }
-
     void EnableTrade() { m_bAllowTrade = true; }
     void DisableTrade() { m_bAllowTrade = false; }
     bool IsTradeEnabled() { return m_bAllowTrade; }
-
     void EnableInvUpgrade() { m_bAllowInvUpgrade = true; }
     void DisableInvUpgrade() { m_bAllowInvUpgrade = false; }
     bool IsInvUpgradeEnabled() { return m_bAllowInvUpgrade; }
-
     CInventoryOwner* GetTalkPartner() { return m_pTalkPartner; }
     virtual void NewPdaContact(CInventoryOwner*);
     virtual void LostPdaContact(CInventoryOwner*);
@@ -169,7 +164,6 @@ public:
     }
     IC const CSpecificCharacter& SpecificCharacter() const { return CharacterInfo().m_SpecificCharacter; };
     bool InfinitiveMoney() { return CharacterInfo().m_SpecificCharacter.MoneyDef().inf_money; }
-
     //установка группировки на клиентском и серверном объкте
     virtual void SetCommunity(CHARACTER_COMMUNITY_INDEX);
     virtual void SetRank(CHARACTER_RANK_VALUE);
@@ -183,7 +177,6 @@ public:
     CHARACTER_RANK_VALUE Rank() const { return CharacterInfo().Rank().value(); };
     CHARACTER_REPUTATION_VALUE Reputation() const { return CharacterInfo().Reputation().value(); };
     float Sympathy() const { return CharacterInfo().Sympathy(); }
-
 protected:
     CCharacterInfo* m_pCharacterInfo;
     xr_string m_game_name;
@@ -208,7 +201,6 @@ protected:
 public:
     IC const shared_str& item_to_spawn() const { return m_item_to_spawn; }
     IC const u32& ammo_in_box_to_spawn() const { return m_ammo_in_box_to_spawn; }
-
 public:
     virtual bool unlimited_ammo() = 0;
     virtual void on_weapon_shot_start(CWeapon* weapon);
@@ -219,7 +211,6 @@ public:
 
 public:
     virtual bool use_simplified_visual() const { return (false); };
-
 private:
     CTradeParameters* m_trade_parameters;
     CPurchaseList* m_purchase_list;
@@ -240,7 +231,6 @@ public:
     virtual float missile_throw_force();
     virtual bool use_throw_randomness();
     virtual bool NeedOsoznanieMode() { return m_need_osoznanie_mode != FALSE; }
-
     void deadbody_can_take(bool status);
     IC bool deadbody_can_take_status() const { return m_deadbody_can_take; }
     void deadbody_closed(bool status);

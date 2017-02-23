@@ -69,7 +69,6 @@ public:
 
     float GetMaxPower() { return m_fMaxPower; }
     void SetMaxPower(float p) { m_fMaxPower = p; }
-
     //вычисление силы хита в зависимости от расстояния до центра зоны
     //относительный размер силы (от 0 до 1)
     float RelativePower(float dist, float nearest_shape_radius);
@@ -77,19 +76,17 @@ public:
     float Power(float dist, float nearest_shape_radius);
 
     virtual CCustomZone* cast_custom_zone() { return this; }
-
     //различные состояния в которых может находиться зона
     typedef enum {
-        eZoneStateIdle = 0,    //состояние зоны, когда внутри нее нет активных объектов
-        eZoneStateAwaking,     //пробуждение зоны (объект попал в зону)
-        eZoneStateBlowout,     //выброс
-        eZoneStateAccumulate,  //накапливание энергии, после выброса
+        eZoneStateIdle = 0, //состояние зоны, когда внутри нее нет активных объектов
+        eZoneStateAwaking, //пробуждение зоны (объект попал в зону)
+        eZoneStateBlowout, //выброс
+        eZoneStateAccumulate, //накапливание энергии, после выброса
         eZoneStateDisabled,
         eZoneStateMax
     } EZoneState;
 
     IC ALife::EHitType GetHitType() { return m_eHitTypeBlowout; }
-
 protected:
     enum EZoneFlags
     {
@@ -170,11 +167,9 @@ public:
     void ZoneEnable();
     void ZoneDisable();
     EZoneState ZoneState() { return m_eZoneState; }
-
 protected:
     //воздействие зоной на объект
     virtual void Affect(SZoneObjectInfo* O) {}
-
     //воздействовать на все объекты в зоне
     void AffectObjects();
 
@@ -289,7 +284,6 @@ protected:
     void StopObjectIdleParticles(CGameObject* pObject);
 
     virtual bool IsVisibleForZones() { return false; }
-
     //обновление, если зона передвигается
     virtual void OnMove();
     Fvector m_vPrevPos;
@@ -307,7 +301,6 @@ public:
     virtual u32 ef_anomaly_type() const;
     virtual u32 ef_weapon_type() const;
     virtual bool register_schedule() const { return true; }
-
     // optimization FAST/SLOW mode
 public:
     virtual BOOL AlwaysTheCrow();

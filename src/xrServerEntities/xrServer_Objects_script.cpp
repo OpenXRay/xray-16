@@ -15,21 +15,9 @@
 
 using namespace luabind;
 
-LPCSTR get_section_name(const CSE_Abstract* abstract)
-{
-    return (abstract->name());
-}
-
-LPCSTR get_name(const CSE_Abstract* abstract)
-{
-    return (abstract->name_replace());
-}
-
-CScriptIniFile* get_spawn_ini(CSE_Abstract* abstract)
-{
-    return ((CScriptIniFile*)&abstract->spawn_ini());
-}
-
+LPCSTR get_section_name(const CSE_Abstract* abstract) { return (abstract->name()); }
+LPCSTR get_name(const CSE_Abstract* abstract) { return (abstract->name_replace()); }
+CScriptIniFile* get_spawn_ini(CSE_Abstract* abstract) { return ((CScriptIniFile*)&abstract->spawn_ini()); }
 template <typename T>
 struct CWrapperBase : public T, public luabind::wrap_base
 {
@@ -37,7 +25,6 @@ struct CWrapperBase : public T, public luabind::wrap_base
     typedef CWrapperBase<T> self_type;
 
     IC CWrapperBase(LPCSTR section) : T(section) {}
-
     virtual void STATE_Read(NET_Packet& p1) { call<void>("STATE_Read", &p1); }
     static void STATE_Read_static(inherited* ptr, NET_Packet* p1)
     {

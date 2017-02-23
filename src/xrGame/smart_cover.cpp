@@ -23,12 +23,12 @@ IC u32 to_u32(shared_str const& string)
     return (*(u32 const*)&get);
 }
 
-}  // namespace hash_fixed_vertex_manager
+} // namespace hash_fixed_vertex_manager
 
 namespace smart_cover
 {
 shared_str transform_vertex(shared_str const& vertex_id, bool const& in);
-}  // namespace smart_cover
+} // namespace smart_cover
 
 using smart_cover::cover;
 using smart_cover::description;
@@ -49,9 +49,11 @@ cover::cover(smart_cover::object const& object, DescriptionPtr description, bool
         for (luabind::iterator i(loopholes_availability), e; i != e; ++i)
         {
             LPCSTR const loophole_id = luabind::object_cast<LPCSTR>(i.key());
-            if (xr_strcmp(loophole_id, (*I)->id())) continue;
+            if (xr_strcmp(loophole_id, (*I)->id()))
+                continue;
 
-            if (!luabind::object_cast<bool>(*i)) break;
+            if (!luabind::object_cast<bool>(*i))
+                break;
 
             m_loopholes.push_back(*I);
             break;
@@ -76,13 +78,10 @@ cover::cover(smart_cover::object const& object, DescriptionPtr description, bool
 
 #ifdef DEBUG
     check_loopholes_connectivity();
-#endif  // DEBUG
+#endif // DEBUG
 }
 
-cover::~cover()
-{
-}
-
+cover::~cover() {}
 void cover::vertex(smart_cover::loophole const& loophole, smart_cover::loophole_data& loophole_data)
 {
     CLevelGraph const& graph = ai().level_graph();
@@ -97,7 +96,8 @@ void cover::vertex(smart_cover::loophole const& loophole, smart_cover::loophole_
     const_iterator I = loophole.actions().begin();
     const_iterator E = loophole.actions().end();
     for (; I != E; ++I)
-        if ((*I).second->movement()) {
+        if ((*I).second->movement())
+        {
             Fvector pos = position((*I).second->target_position());
             pos.y += 2.0f;
             u32 level_vertex_id = graph.vertex_id(pos);
@@ -113,9 +113,7 @@ class id_predicate
 
 public:
     IC id_predicate(shared_str const& id) : m_id(id) {}
-
     IC bool operator()(cover::Vertex const& vertex) const { return (m_id._get() == vertex.first->id()._get()); }
-
     IC bool operator()(smart_cover::loophole_data::Action const& action) const
     {
         return (m_id._get() == action.first._get());
@@ -161,28 +159,34 @@ void cover::evaluate_loophole(Fvector const& position, smart_cover::loophole*& s
     VERIFY(source);
     VERIFY2(_valid(position), make_string("[%f][%f][%f]", VPUSH(position)));
 
-    if (!source->usable()) return;
+    if (!source->usable())
+        return;
 
     Fvector fov_position = this->fov_position(*source);
     VERIFY2(_valid(fov_position), make_string("[%f][%f][%f]", VPUSH(fov_position)));
     float const distance_to_target = fov_position.distance_to(position);
-    if (distance_to_target > source->range()) return;
+    if (distance_to_target > source->range())
+        return;
 
     float const min_enemy_distance =
         is_smart_cover_entered ? object().enter_min_enemy_distance() : object().exit_min_enemy_distance();
-    if (distance_to_target <= min_enemy_distance) return;
+    if (distance_to_target <= min_enemy_distance)
+        return;
 
     Fvector direction = Fvector().sub(position, fov_position);
     VERIFY2(_valid(direction), make_string("[%f][%f][%f]", VPUSH(direction)));
-    if (direction.magnitude() < 1.f) return;
+    if (direction.magnitude() < 1.f)
+        return;
 
     direction.normalize();
     float cos_alpha = this->fov_direction(*source).dotproduct(direction);
 
     float alpha = _abs(acosf(cos_alpha));
-    if (alpha >= source->fov() / 2) return;
+    if (alpha >= source->fov() / 2)
+        return;
 
-    if (alpha >= value) return;
+    if (alpha >= value)
+        return;
 
     value = 2.f * alpha / source->fov();
     result = source;
@@ -193,14 +197,16 @@ void cover::evaluate_loophole_for_default_usage(
 {
     VERIFY(source);
 
-    if (!source->usable()) return;
+    if (!source->usable())
+        return;
 
     Fvector fov_position = this->fov_position(*source);
     Fvector direction = Fvector().sub(position, fov_position);
     direction.normalize_safe();
     float cos_alpha = this->fov_direction(*source).dotproduct(direction);
     float alpha = acosf(cos_alpha);
-    if (alpha >= value) return;
+    if (alpha >= value)
+        return;
 
     value = alpha;
     result = source;
@@ -211,7 +217,6 @@ struct loophole_predicate
     smart_cover::loophole const* m_loophole;
 
     IC loophole_predicate(smart_cover::loophole const* loophole) : m_loophole(loophole) {}
-
     IC bool operator()(cover::Vertex const& vertex) const { return (vertex.first == m_loophole); }
 };
 
@@ -265,18 +270,20 @@ void cover::check_loopholes_connectivity() const
                                                enter.c_str(), lhs.c_str(), m_description->table_id().c_str()));
     }
 }
-#endif  // DEBUG
+#endif // DEBUG
 
 static bool in_fov(
     Fvector const& position, Fvector const& fov_position, Fvector const& fov_direction, float const fov_angle)
 {
     Fvector direction = Fvector().sub(position, fov_position);
-    if (direction.magnitude() < 1.f) return (false);
+    if (direction.magnitude() < 1.f)
+        return (false);
 
     direction.normalize();
     float cos_alpha = fov_direction.dotproduct(direction);
     float alpha = acosf(cos_alpha);
-    if (alpha >= fov_angle / 2) return (false);
+    if (alpha >= fov_angle / 2)
+        return (false);
 
     return (true);
 }
@@ -294,7 +301,8 @@ bool cover::is_position_in_danger_fov(smart_cover::loophole const& source, Fvect
 bool cover::is_position_in_range(smart_cover::loophole const& source, Fvector const& position) const
 {
     Fvector fov_position = this->fov_position(source);
-    if (fov_position.distance_to(position) > source.range()) return (false);
+    if (fov_position.distance_to(position) > source.range())
+        return (false);
 
     return (true);
 }
@@ -303,7 +311,8 @@ bool cover::in_min_acceptable_range(
     smart_cover::loophole const& source, Fvector const& position, float const& min_range) const
 {
     Fvector fov_position = this->fov_position(source);
-    if (fov_position.distance_to(position) < min_range) return (false);
+    if (fov_position.distance_to(position) < min_range)
+        return (false);
 
     return (true);
 }

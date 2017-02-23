@@ -2,14 +2,8 @@
 #include "WeaponPM.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
-CWeaponPM::CWeaponPM() : CWeaponPistol()
-{
-}
-
-CWeaponPM::~CWeaponPM()
-{
-}
-
+CWeaponPM::CWeaponPM() : CWeaponPistol() {}
+CWeaponPM::~CWeaponPM() {}
 using namespace luabind;
 
 SCRIPT_EXPORT(

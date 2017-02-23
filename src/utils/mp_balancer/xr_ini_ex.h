@@ -67,7 +67,6 @@ public:
     void set_override_names(BOOL b) { m_flags.set(eOverrideNames, b); }
     void save_at_end(BOOL b) { m_flags.set(eSaveAtEnd, b); }
     LPCSTR fname() { return m_file_name; };
-
     Sect& r_section(LPCSTR S);
     Sect& r_section(const shared_str& S);
     BOOL line_exist(LPCSTR S, LPCSTR L);
@@ -77,13 +76,12 @@ public:
     BOOL section_exist(LPCSTR S);
     BOOL section_exist(const shared_str& S);
     Root& sections() { return DATA; }
-
     CLASS_ID r_clsid(LPCSTR S, LPCSTR L);
     CLASS_ID r_clsid(const shared_str& S, LPCSTR L) { return r_clsid(*S, L); }
-    LPCSTR r_string(LPCSTR S, LPCSTR L);                                                  // оставляет кавычки
-    LPCSTR r_string(const shared_str& S, LPCSTR L) { return r_string(*S, L); }            // оставляет кавычки
-    shared_str r_string_wb(LPCSTR S, LPCSTR L);                                           // убирает кавычки
-    shared_str r_string_wb(const shared_str& S, LPCSTR L) { return r_string_wb(*S, L); }  // убирает кавычки
+    LPCSTR r_string(LPCSTR S, LPCSTR L); // оставляет кавычки
+    LPCSTR r_string(const shared_str& S, LPCSTR L) { return r_string(*S, L); } // оставляет кавычки
+    shared_str r_string_wb(LPCSTR S, LPCSTR L); // убирает кавычки
+    shared_str r_string_wb(const shared_str& S, LPCSTR L) { return r_string_wb(*S, L); } // убирает кавычки
     u8 r_u8(LPCSTR S, LPCSTR L);
     u8 r_u8(const shared_str& S, LPCSTR L) { return r_u8(*S, L); }
     u16 r_u16(LPCSTR S, LPCSTR L);
@@ -148,4 +146,4 @@ public:
 // Main configuration file
 extern CInifileEx* pSettingsEx;
 
-#endif  //__XR_INI_H__
+#endif //__XR_INI_H__

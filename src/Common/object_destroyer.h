@@ -11,9 +11,7 @@
 struct CDestroyer
 {
     IC static void delete_data(LPCSTR data) {}
-
     IC static void delete_data(LPSTR data) { xr_free(data); }
-
     template <typename T1, typename T2>
     IC static void delete_data(std::pair<T1, T2>& data)
     {
@@ -103,7 +101,8 @@ struct CDestroyer
         template <>
         IC static void delete_data<true>(T& data)
         {
-            if (data) CDestroyer::delete_data(*data);
+            if (data)
+                CDestroyer::delete_data(*data);
             xr_delete(data);
         }
     };

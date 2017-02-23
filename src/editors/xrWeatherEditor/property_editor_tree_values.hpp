@@ -14,12 +14,12 @@
 namespace editor
 {
 ref class window_tree_values;
-}  // namespace editor
+} // namespace editor
 
 public
 ref class property_editor_tree_values : public System::Drawing::Design::UITypeEditor
 {
-  private:
+private:
     typedef System::Drawing::Design::UITypeEditor inherited;
     typedef System::Drawing::Design::UITypeEditorEditStyle UITypeEditorEditStyle;
     typedef System::Windows::Forms::OpenFileDialog OpenFileDialog;
@@ -29,14 +29,14 @@ ref class property_editor_tree_values : public System::Drawing::Design::UITypeEd
     typedef System::IServiceProvider IServiceProvider;
     typedef System::Object Object;
 
-  public:
+public:
     property_editor_tree_values();
     virtual UITypeEditorEditStyle GetEditStyle(ITypeDescriptorContext ^ context) override;
     virtual System::Object ^
         EditValue(ITypeDescriptorContext ^ context, IServiceProvider ^ provider, Object ^ value) override;
 
-  private:
+private:
     editor::window_tree_values ^ m_dialog;
-};  // ref class property_editor_tree_values
+}; // ref class property_editor_tree_values
 
-#endif  // ifndef PROPERTY_EDITOR_TREE_VALUES_HPP_INCLUDED
+#endif // ifndef PROPERTY_EDITOR_TREE_VALUES_HPP_INCLUDED

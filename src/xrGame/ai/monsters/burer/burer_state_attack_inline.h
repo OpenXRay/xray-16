@@ -13,7 +13,7 @@ namespace burer
 {
 float const health_delta = 0.01f;
 
-}  // namespace detail
+} // namespace detail
 
 template <typename Object>
 CStateBurerAttack<Object>::CStateBurerAttack(Object* obj) : inherited(obj)
@@ -58,24 +58,29 @@ void CStateBurerAttack<Object>::execute()
 
     // Notify squad
     CMonsterSquad* squad = monster_squad().get_squad(object);
-    if (squad) {
+    if (squad)
+    {
         SMemberGoal goal;
         goal.type = MG_AttackEnemy;
         goal.entity = enemy;
         squad->UpdateGoal(object, goal);
     }
 
-    if (object->anim().has_override_animation()) {
+    if (object->anim().has_override_animation())
+    {
         object->anim().clear_override_animation();
     }
 
-    if (object->conditions().GetHealth() <= m_last_health - burer::health_delta) {
+    if (object->conditions().GetHealth() <= m_last_health - burer::health_delta)
+    {
         m_last_health = object->conditions().GetHealth();
         m_lost_delta_health = true;
     }
 
-    if (m_wait_state_end) {
-        if (get_state_current()->check_completion()) {
+    if (m_wait_state_end)
+    {
+        if (get_state_current()->check_completion())
+        {
             m_wait_state_end = false;
         }
         else
@@ -96,7 +101,8 @@ void CStateBurerAttack<Object>::execute()
 
     bool selected_state = true;
 
-    if (gravi_ready) {
+    if (gravi_ready)
+    {
         select_state(eStateBurerAttack_Gravi);
     }
     else if (m_lost_delta_health && shield_ready)
@@ -117,7 +123,8 @@ void CStateBurerAttack<Object>::execute()
         selected_state = false;
     }
 
-    if (selected_state) {
+    if (selected_state)
+    {
         get_state_current()->execute();
         m_wait_state_end = true;
         prev_substate = current_substate;
@@ -132,24 +139,30 @@ void CStateBurerAttack<Object>::execute()
     bool const in_runaway_range = self2enemy_dist < object->m_runaway_distance;
     bool const in_normal_range = self2enemy_dist < object->m_normal_distance;
 
-    if (current_substate == eStateCustomMoveToRestrictor) {
-        if (!get_state_current()->check_completion()) {
+    if (current_substate == eStateCustomMoveToRestrictor)
+    {
+        if (!get_state_current()->check_completion())
+        {
             get_state_current()->execute();
             prev_substate = current_substate;
             return;
         }
     }
 
-    if (get_state(eStateCustomMoveToRestrictor)->check_start_conditions()) {
+    if (get_state(eStateCustomMoveToRestrictor)->check_start_conditions())
+    {
         select_state(eStateCustomMoveToRestrictor);
         get_state_current()->execute();
         prev_substate = current_substate;
         return;
     }
 
-    if (current_substate == eStateBurerAttack_RunAround) {
-        if (get_state_current()->check_completion()) {
-            if (in_runaway_range) {
+    if (current_substate == eStateBurerAttack_RunAround)
+    {
+        if (get_state_current()->check_completion())
+        {
+            if (in_runaway_range)
+            {
                 m_next_runaway_allowed_tick = current_time() + 5000;
             }
         }
@@ -161,7 +174,8 @@ void CStateBurerAttack<Object>::execute()
         }
     }
 
-    if (m_lost_delta_health || (in_runaway_range && current_time() > m_next_runaway_allowed_tick)) {
+    if (m_lost_delta_health || (in_runaway_range && current_time() > m_next_runaway_allowed_tick))
+    {
         m_lost_delta_health = false;
         select_state(eStateBurerAttack_RunAround);
     }
@@ -176,7 +190,8 @@ void CStateBurerAttack<Object>::execute()
 
         select_state(eStateBurerAttack_FaceEnemy);
 
-        if (!good_aiming) {
+        if (!good_aiming)
+        {
             bool const rotate_right = object->control().direction().is_from_right(enemy_pos);
             object->anim().set_override_animation(rotate_right ? eAnimStandTurnRight : eAnimStandTurnLeft, 0);
             object->dir().face_target(enemy_pos);
@@ -193,7 +208,8 @@ void CStateBurerAttack<Object>::execute()
 template <typename Object>
 void CStateBurerAttack<Object>::finalize()
 {
-    if (object->anim().has_override_animation()) {
+    if (object->anim().has_override_animation())
+    {
         object->anim().clear_override_animation();
     }
 
@@ -203,7 +219,8 @@ void CStateBurerAttack<Object>::finalize()
 template <typename Object>
 void CStateBurerAttack<Object>::critical_finalize()
 {
-    if (object->anim().has_override_animation()) {
+    if (object->anim().has_override_animation())
+    {
         object->anim().clear_override_animation();
     }
 
@@ -213,7 +230,8 @@ void CStateBurerAttack<Object>::critical_finalize()
 template <typename Object>
 bool CStateBurerAttack<Object>::check_control_start_conditions(ControlCom::EControlType type)
 {
-    if (type == ControlCom::eAntiAim) {
+    if (type == ControlCom::eAntiAim)
+    {
         return m_allow_anti_aim;
     }
 

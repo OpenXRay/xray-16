@@ -21,10 +21,7 @@ CBlender_default_aref::CBlender_default_aref()
     oBlend.value = FALSE;
 }
 
-CBlender_default_aref::~CBlender_default_aref()
-{
-}
-
+CBlender_default_aref::~CBlender_default_aref() {}
 void CBlender_default_aref::Save(IWriter& fs)
 {
     IBlender::Save(fs);
@@ -53,7 +50,8 @@ void CBlender_default_aref::Load(IReader& fs, u16 version)
 void CBlender_default_aref::Compile(CBlender_Compile& C)
 {
     IBlender::Compile(C);
-    if (C.bEditor) {
+    if (C.bEditor)
+    {
         C.PassBegin();
         {
             C.PassSET_ZB(TRUE, TRUE);
@@ -82,7 +80,8 @@ void CBlender_default_aref::Compile(CBlender_Compile& C)
         case SE_R1_NORMAL_HQ:
         {
             LPCSTR sname = "lmap";
-            if (C.bDetail_Diffuse) sname = "lmap_dt";
+            if (C.bDetail_Diffuse)
+                sname = "lmap_dt";
             if (oBlend.value)
                 C.r_Pass(
                     sname, sname, TRUE, TRUE, TRUE, TRUE, D3DBLEND_SRCALPHA, D3DBLEND_INVSRCALPHA, TRUE, oAREF.value);
@@ -110,7 +109,8 @@ void CBlender_default_aref::Compile(CBlender_Compile& C)
         }
         break;
         case SE_R1_LPOINT:
-            if (!oBlend.value) {
+            if (!oBlend.value)
+            {
                 C.r_Pass(
                     "lmap_point", "add_point", FALSE, TRUE, FALSE, TRUE, D3DBLEND_ONE, D3DBLEND_ONE, TRUE, oAREF.value);
                 C.r_Sampler("s_base", C.L_textures[0]);
@@ -120,7 +120,8 @@ void CBlender_default_aref::Compile(CBlender_Compile& C)
             }
             break;
         case SE_R1_LSPOT:
-            if (!oBlend.value) {
+            if (!oBlend.value)
+            {
                 C.r_Pass(
                     "lmap_spot", "add_spot", FALSE, TRUE, FALSE, TRUE, D3DBLEND_ONE, D3DBLEND_ONE, TRUE, oAREF.value);
                 C.r_Sampler("s_base", C.L_textures[0]);

@@ -23,10 +23,10 @@ class CSpawnPoint : public CCustomObject, public CPhysicsShellHolderEditorBase
 
     friend class SceneBuilder;
 
-  public:
+public:
     class CLE_Visual
     {
-      public:
+    public:
         static bool g_tmp_lock;
         CSE_Visual* source;
         IRenderVisual* visual;
@@ -37,20 +37,20 @@ class CSpawnPoint : public CCustomObject, public CPhysicsShellHolderEditorBase
         void PlayAnimationLastFrame();
         void PauseAnimation();
 
-      public:
+    public:
         CLE_Visual(CSE_Visual* src);
         virtual ~CLE_Visual();
     };
 
     class CLE_Motion
     {
-      public:
+    public:
         CSE_Motion* source;
         CObjectAnimator* animator;
         void OnChangeMotion();
         void PlayMotion();
 
-      public:
+    public:
         CLE_Motion(CSE_Motion* src);
         virtual ~CLE_Motion();
     };
@@ -83,12 +83,10 @@ class CSpawnPoint : public CCustomObject, public CPhysicsShellHolderEditorBase
         }
 
         ~SSpawnData() { Destroy(); }
-
         void Create(LPCSTR entity_ref);
         void Destroy();
 
         bool Valid() { return m_Data; }
-
         bool LoadStream(IReader&);
         void SaveStream(IWriter&);
         bool LoadLTX(CInifile& ini, LPCSTR sect_name);
@@ -144,21 +142,20 @@ class CSpawnPoint : public CCustomObject, public CPhysicsShellHolderEditorBase
     void __stdcall OnFillRespawnItemProfile(ChooseValue*);
     bool OnAppendObject(CCustomObject* object);
 
-  protected:
+protected:
     virtual void SetPosition(const Fvector& pos);
     virtual void SetRotation(const Fvector& rot);
     virtual void SetScale(const Fvector& scale);
 
-  protected:
+protected:
     virtual void Move(Fvector& amount);
 
-  public:
+public:
     CSpawnPoint(LPVOID data, LPCSTR name);
     void Construct(LPVOID data);
     virtual ~CSpawnPoint();
 
     virtual bool CanAttach() { return true; }
-
     bool RefCompare(LPCSTR ref);
     virtual LPCSTR RefName();
 
@@ -189,17 +186,18 @@ class CSpawnPoint : public CCustomObject, public CPhysicsShellHolderEditorBase
     virtual void OnSceneRemove();
     void UseSimulatePose();
 
-  public:
+public:
     virtual IKinematics* _BCL ObjectKinematics()
     {
-        if (!m_SpawnData.m_Visual || !m_SpawnData.m_Visual->visual) return 0;
+        if (!m_SpawnData.m_Visual || !m_SpawnData.m_Visual->visual)
+            return 0;
         return m_SpawnData.m_Visual->visual->dcast_PKinematics();
     }
 
-  private:
+private:
     virtual void OnUpdateTransform();
 
-  private:
+private:
     void RenderSimBox();
 };
 

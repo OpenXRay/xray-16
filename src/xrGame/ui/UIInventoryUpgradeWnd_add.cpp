@@ -39,10 +39,12 @@ void CUIInventoryUpgradeWnd::LoadCellsBacks(CUIXml& uiXml)
 void CUIInventoryUpgradeWnd::LoadCellStates(LPCSTR state_str, LPCSTR texture_name, LPCSTR texture_name2, u32 color)
 {
     VERIFY(state_str && xr_strcmp(state_str, ""));
-    if (texture_name && !xr_strcmp(texture_name, "")) {
+    if (texture_name && !xr_strcmp(texture_name, ""))
+    {
         texture_name = NULL;
     }
-    if (texture_name2 && !xr_strcmp(texture_name2, "")) {
+    if (texture_name2 && !xr_strcmp(texture_name2, ""))
+    {
         texture_name2 = NULL;
     }
 
@@ -51,36 +53,46 @@ void CUIInventoryUpgradeWnd::LoadCellStates(LPCSTR state_str, LPCSTR texture_nam
 
 UIUpgrade::ViewState CUIInventoryUpgradeWnd::SelectCellState(LPCSTR state_str)
 {
-    if (!xr_strcmp(state_str, "enabled")) {
+    if (!xr_strcmp(state_str, "enabled"))
+    {
         return UIUpgrade::STATE_ENABLED;
     }
-    if (!xr_strcmp(state_str, "highlight")) {
+    if (!xr_strcmp(state_str, "highlight"))
+    {
         return UIUpgrade::STATE_FOCUSED;
     }
-    if (!xr_strcmp(state_str, "touched")) {
+    if (!xr_strcmp(state_str, "touched"))
+    {
         return UIUpgrade::STATE_TOUCHED;
     }
-    if (!xr_strcmp(state_str, "selected")) {
+    if (!xr_strcmp(state_str, "selected"))
+    {
         return UIUpgrade::STATE_SELECTED;
     }
-    if (!xr_strcmp(state_str, "unknown")) {
+    if (!xr_strcmp(state_str, "unknown"))
+    {
         return UIUpgrade::STATE_UNKNOWN;
     }
 
-    if (!xr_strcmp(state_str, "disabled_parent")) {
+    if (!xr_strcmp(state_str, "disabled_parent"))
+    {
         return UIUpgrade::STATE_DISABLED_PARENT;
     }
-    if (!xr_strcmp(state_str, "disabled_group")) {
+    if (!xr_strcmp(state_str, "disabled_group"))
+    {
         return UIUpgrade::STATE_DISABLED_GROUP;
     }
-    if (!xr_strcmp(state_str, "disabled_money")) {
+    if (!xr_strcmp(state_str, "disabled_money"))
+    {
         return UIUpgrade::STATE_DISABLED_PREC_MONEY;
     }
-    if (!xr_strcmp(state_str, "disabled_quest")) {
+    if (!xr_strcmp(state_str, "disabled_quest"))
+    {
         return UIUpgrade::STATE_DISABLED_PREC_QUEST;
     }
 
-    if (!xr_strcmp(state_str, "disabled_highlight")) {
+    if (!xr_strcmp(state_str, "disabled_highlight"))
+    {
         return UIUpgrade::STATE_DISABLED_FOCUSED;
     }
 
@@ -99,7 +111,8 @@ bool CUIInventoryUpgradeWnd::VerirfyCells()
 {
     for (int i = 0; i < UIUpgrade::STATE_COUNT; ++i)
     {
-        if (!m_cell_textures[i]._get()) return false;
+        if (!m_cell_textures[i]._get())
+            return false;
     }
     return true;
 }
@@ -148,14 +161,14 @@ void CUIInventoryUpgradeWnd::LoadSchemes(CUIXml& uiXml)
                 item->attach_point(item_point);
 
                 scheme->cells.push_back(item);
-            }  // for i_cell
+            } // for i_cell
 
             uiXml.SetLocalRoot(tmpl_node);
-        }  // for i_clm
+        } // for i_clm
 
         m_schemes.push_back(scheme);
         uiXml.SetLocalRoot(tmpl_root);
-    }  // for i_tmpl
+    } // for i_tmpl
 
     uiXml.SetLocalRoot(stored_root);
 }

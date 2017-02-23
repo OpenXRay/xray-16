@@ -45,8 +45,8 @@ XRSOUND_API extern u32 snd_device_id;
 // Flags
 enum
 {
-    ss_Hardware = (1ul << 1ul),  //!< Use hardware mixing only
-    ss_EAX = (1ul << 2ul),       //!< Use eax
+    ss_Hardware = (1ul << 1ul), //!< Use hardware mixing only
+    ss_EAX = (1ul << 2ul), //!< Use eax
     ss_forcedword = u32(-1)
 };
 
@@ -66,8 +66,8 @@ enum
 };
 enum
 {
-    sm_Looped = (1ul << 0ul),  //!< Looped
-    sm_2D = (1ul << 1ul),      //!< 2D mode
+    sm_Looped = (1ul << 0ul), //!< Looped
+    sm_2D = (1ul << 1ul), //!< 2D mode
     sm_forcedword = u32(-1),
 };
 enum esound_type
@@ -92,11 +92,11 @@ class ref_sound_data : public xr_resource
 {
 public:
     //	shared_str						nm;
-    CSound_source* handle;     //!< Pointer to wave-source interface
-    CSound_emitter* feedback;  //!< Pointer to emitter, automaticaly clears on emitter-stop
+    CSound_source* handle; //!< Pointer to wave-source interface
+    CSound_emitter* feedback; //!< Pointer to emitter, automaticaly clears on emitter-stop
     esound_type s_type;
-    int g_type;             //!< Sound type, usually for AI
-    IGameObject* g_object;  //!< Game object that emitts ref_sound
+    int g_type; //!< Sound type, usually for AI
+    IGameObject* g_object; //!< Game object that emitts ref_sound
     CSound_UserDataPtr g_userdata;
     shared_str fn_attached[2];
 
@@ -124,7 +124,6 @@ struct ref_sound
 public:
     ref_sound() {}
     ~ref_sound() {}
-
     IC CSound_source* _handle() const { return _p ? _p->handle : NULL; }
     IC CSound_emitter* _feedback() { return _p ? _p->feedback : 0; }
     IC IGameObject* _g_object()
@@ -283,7 +282,6 @@ protected:
 
 public:
     virtual ~CSound_manager_interface() {}
-
     static void _create();
     static void _destroy();
 
@@ -342,11 +340,7 @@ IC ref_sound_data::ref_sound_data(LPCSTR fName, esound_type sound_type, int game
 {
     ::Sound->_create_data(*this, fName, sound_type, game_type);
 }
-IC ref_sound_data::~ref_sound_data()
-{
-    ::Sound->_destroy_data(*this);
-}
-
+IC ref_sound_data::~ref_sound_data() { ::Sound->_destroy_data(*this); }
 IC void ref_sound::create(LPCSTR name, esound_type sound_type, int game_type)
 {
     VERIFY(!::Sound->i_locked());
@@ -393,32 +387,38 @@ IC void ref_sound::set_position(const Fvector& pos)
 IC void ref_sound::set_frequency(float freq)
 {
     VERIFY(!::Sound->i_locked());
-    if (_feedback()) _feedback()->set_frequency(freq);
+    if (_feedback())
+        _feedback()->set_frequency(freq);
 }
 IC void ref_sound::set_range(float min, float max)
 {
     VERIFY(!::Sound->i_locked());
-    if (_feedback()) _feedback()->set_range(min, max);
+    if (_feedback())
+        _feedback()->set_range(min, max);
 }
 IC void ref_sound::set_volume(float vol)
 {
     VERIFY(!::Sound->i_locked());
-    if (_feedback()) _feedback()->set_volume(vol);
+    if (_feedback())
+        _feedback()->set_volume(vol);
 }
 IC void ref_sound::set_priority(float p)
 {
     VERIFY(!::Sound->i_locked());
-    if (_feedback()) _feedback()->set_priority(p);
+    if (_feedback())
+        _feedback()->set_priority(p);
 }
 IC void ref_sound::stop()
 {
     VERIFY(!::Sound->i_locked());
-    if (_feedback()) _feedback()->stop(FALSE);
+    if (_feedback())
+        _feedback()->stop(FALSE);
 }
 IC void ref_sound::stop_deffered()
 {
     VERIFY(!::Sound->i_locked());
-    if (_feedback()) _feedback()->stop(TRUE);
+    if (_feedback())
+        _feedback()->stop(TRUE);
 }
 IC const CSound_params* ref_sound::get_params()
 {
@@ -431,7 +431,8 @@ IC const CSound_params* ref_sound::get_params()
 IC void ref_sound::set_params(CSound_params* p)
 {
     VERIFY(!::Sound->i_locked());
-    if (_feedback()) {
+    if (_feedback())
+    {
         _feedback()->set_position(p->position);
         _feedback()->set_frequency(p->freq);
         _feedback()->set_range(p->min_distance, p->max_distance);

@@ -39,7 +39,7 @@ public:
     DEFINE_MAP_PRED(const char*, SVS*, map_VS, map_VSIt, str_pred);
 #if defined(USE_DX10) || defined(USE_DX11)
     DEFINE_MAP_PRED(const char*, SGS*, map_GS, map_GSIt, str_pred);
-#endif  //	USE_DX10
+#endif //	USE_DX10
 #ifdef USE_DX11
     DEFINE_MAP_PRED(const char*, SHS*, map_HS, map_HSIt, str_pred);
     DEFINE_MAP_PRED(const char*, SDS*, map_DS, map_DSIt, str_pred);
@@ -61,7 +61,7 @@ private:
     map_PS m_ps;
 #if defined(USE_DX10) || defined(USE_DX11)
     map_GS m_gs;
-#endif  //	USE_DX10
+#endif //	USE_DX10
     map_TD m_td;
 
     xr_vector<SState*> v_states;
@@ -72,7 +72,7 @@ private:
 #if defined(USE_DX10) || defined(USE_DX11)
     xr_vector<dx10ConstantBuffer*> v_constant_buffer;
     xr_vector<SInputSignature*> v_input_signature;
-#endif  //	USE_DX10
+#endif //	USE_DX10
 
     // lists
     xr_vector<STextureList*> lst_textures;
@@ -107,7 +107,6 @@ public:
     //.	BOOL							_GetDetailTexture	(LPCSTR Name, LPCSTR& T, R_constant_setup* &M);
 
     map_Blender& _GetBlenders() { return m_blenders; }
-
     // Debug
     void DBG_VerifyGeoms();
     void DBG_VerifyTextures();
@@ -139,7 +138,7 @@ public:
 
     SInputSignature* _CreateInputSignature(ID3DBlob* pBlob);
     void _DeleteInputSignature(const SInputSignature* pSignature);
-#endif  //	USE_DX10
+#endif //	USE_DX10
 
 #ifdef USE_DX11
     CRT* _CreateRT(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount = 1, bool useUAV = false);
@@ -153,7 +152,7 @@ public:
 #if defined(USE_DX10) || defined(USE_DX11)
     SGS* _CreateGS(LPCSTR Name);
     void _DeleteGS(const SGS* GS);
-#endif  //	USE_DX10
+#endif //	USE_DX10
 
 #ifdef USE_DX11
     SHS* _CreateHS(LPCSTR Name);
@@ -164,7 +163,7 @@ public:
 
     SCS* _CreateCS(LPCSTR Name);
     void _DeleteCS(const SCS* CS);
-#endif  //	USE_DX10
+#endif //	USE_DX10
 
     SPS* _CreatePS(LPCSTR Name);
     void _DeletePS(const SPS* PS);
@@ -246,7 +245,7 @@ private:
     template <typename T>
     void DestroyShader(const T* sh);
 
-#endif  //	USE_DX10
+#endif //	USE_DX10
 };
 
-#endif  // ResourceManagerH
+#endif // ResourceManagerH

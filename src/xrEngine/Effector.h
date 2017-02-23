@@ -29,10 +29,8 @@ public:
     void SetType(ECamEffectorType type) { eType = type; }
     void SetHudAffect(bool val) { bHudAffect = val; }
     bool GetHudAffect() { return bHudAffect; }
-
     IC ECamEffectorType GetType() { return eType; }
     virtual BOOL Valid() { return fLifeTime > 0.0f; }
-
     BENCH_SEC_SCRAMBLEVTBL1
 
     virtual BOOL ProcessCam(SCamEffectorInfo& info)

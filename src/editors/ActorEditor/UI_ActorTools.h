@@ -43,7 +43,7 @@ class EngineModel : public CPhysicsShellHolderEditorBase
     bool UpdateMotionKeysStream(CEditableObject* source);
     bool UpdateMotionDefsStream(CEditableObject* source);
 
-  public:
+public:
     float m_fLOD;
     IRenderVisual* m_pVisual;
 
@@ -58,7 +58,7 @@ class EngineModel : public CPhysicsShellHolderEditorBase
 
     BPPlayItem m_BPPlayItems[4];
 
-  public:
+public:
     EngineModel()
     {
         m_pVisual = 0;
@@ -80,7 +80,6 @@ class EngineModel : public CPhysicsShellHolderEditorBase
     bool UpdateVisual(CEditableObject* source, bool bUpdGeom, bool bUpdKeys, bool bUpdDefs);
 
     bool IsRenderable() { return !!m_pVisual; }
-
     void PlayMotion(LPCSTR name, u16 slot);
     void RestoreParams(TFormStorage* s);
     void SaveParams(TFormStorage* s);
@@ -93,13 +92,14 @@ class EngineModel : public CPhysicsShellHolderEditorBase
     CMotionDef* FindMotionDef(LPCSTR name, u16 slot);
     CMotion* FindMotionKeys(LPCSTR name, u16 slot);
 
-  private:
+private:
     //    virtual Fmatrix& _BCL ObjectXFORM() { return m_pobject_matrix; }
     //    virtual Fvector& _BCL ObjectPosition() { return m_pobject_matrix.c; }
     //    virtual IRenderVisual* _BCL ObjectVisual() { return m_pVisual; }
     virtual IKinematics* _BCL ObjectKinematics()
     {
-        if (!m_pVisual) return 0;
+        if (!m_pVisual)
+            return 0;
         return m_pVisual->dcast_PKinematics();
     }
 };
@@ -113,10 +113,10 @@ class PreviewModel
     Fvector m_vPosition;
     AnsiString m_LastObjectName;
 
-  public:
+public:
     CEditableObject* m_pObject;
 
-  public:
+public:
     enum
     {
         pmScroll = (1 << 0),
@@ -134,7 +134,7 @@ class PreviewModel
 
     EScrollAxis m_ScrollAxis;
 
-  public:
+public:
     PreviewModel()
     {
         m_pObject = 0;
@@ -204,7 +204,7 @@ class CActorTools : public CToolCustom
 
     SMotionVec appended_motions;
 
-  protected:
+protected:
     // flags
     enum
     {
@@ -220,16 +220,14 @@ class CActorTools : public CToolCustom
     Flags32 m_Flags;
 
     void RefreshSubProperties() { m_Flags.set(flRefreshSubProps, TRUE); }
-
     void RefreshShaders() { m_Flags.set(flRefreshShaders, TRUE); }
-
     void __stdcall PMMotionItemClick(TObject* Sender);
 
     void RealUpdateProperties();
 
     void PrepareLighting();
 
-  public:
+public:
     EngineModel m_RenderObject;
     PreviewModel m_PreviewObject;
 
@@ -238,7 +236,7 @@ class CActorTools : public CToolCustom
 
     TfrmKeyBar* m_KeyBar;
     // undo part
-  protected:
+protected:
 #pragma pack(push, 1)
     struct UndoItem
     {
@@ -248,13 +246,13 @@ class CActorTools : public CToolCustom
     xr_deque<UndoItem> m_UndoStack;
     xr_deque<UndoItem> m_RedoStack;
 
-  public:
+public:
     void UndoClear();
     void UndoSave();
     bool Undo();
     bool Redo();
 
-  public:
+public:
     CActorTools();
     virtual ~CActorTools();
 
@@ -276,7 +274,6 @@ class CActorTools : public CToolCustom
     virtual bool IfModified();
 
     virtual bool IsModified() { return m_bObjectModified; }
-
     virtual void Modified();
     void __stdcall OnItemModified(void);
 
@@ -303,15 +300,14 @@ class CActorTools : public CToolCustom
     virtual bool RayPick(const Fvector& start, const Fvector& dir, float& dist, Fvector* pt, Fvector* n);
 
     virtual void ShowProperties(LPCSTR focused_item) {}
-
     virtual void UpdateProperties(BOOL bForced = FALSE)
     {
         m_Flags.set(flRefreshProps, TRUE);
-        if (bForced) RealUpdateProperties();
+        if (bForced)
+            RealUpdateProperties();
     }
 
     virtual void RefreshProperties() {}
-
     void GetStatTime(float& a, float& b, float& c);
 
     bool IsEngineMode();
@@ -341,9 +337,7 @@ class CActorTools : public CToolCustom
     void OnGeometryModified(void);
 
     bool IsVisualPresent() { return m_RenderObject.IsRenderable(); }
-
     CEditableObject* CurrentObject() { return m_pEditObject; }
-
     void SetCurrentMotion(LPCSTR name, u16 slot);
     CSMotion* GetCurrentMotion();
     CSMotion* FindMotion(LPCSTR name);

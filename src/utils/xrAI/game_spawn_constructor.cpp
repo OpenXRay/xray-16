@@ -25,7 +25,7 @@ CGameSpawnConstructor::CGameSpawnConstructor(LPCSTR name, LPCSTR output, LPCSTR 
     :
 #ifdef CONFIG_PROFILE_LOCKS
       m_critical_section(MUTEX_PROFILE_ID(CGameSpawnConstructor)),
-#endif  // CONFIG_PROFILE_LOCKS
+#endif // CONFIG_PROFILE_LOCKS
       m_thread_manager(ProxyStatus, ProxyProgress)
 {
     load_spawns(name, no_separator_check);
@@ -94,8 +94,9 @@ void CGameSpawnConstructor::load_spawns(LPCSTR name, bool no_separator_check)
     }
 
     string256 temp;
-    xr_sprintf(temp, "There are no valid levels (with AI-map and graph) in the section 'levels' in the '%s' to build "
-                     "spawn file from!",
+    xr_sprintf(temp,
+        "There are no valid levels (with AI-map and graph) in the section 'levels' in the '%s' to build spawn file "
+        "from!",
         GAME_CONFIG);
     R_ASSERT2(!m_level_spawns.empty(), temp);
 }
@@ -147,7 +148,8 @@ void CGameSpawnConstructor::verify_spawns()
 
 void CGameSpawnConstructor::verify_level_changers()
 {
-    if (m_level_changers.empty()) return;
+    if (m_level_changers.empty())
+        return;
 
     Msg("List of the level changers which are invalid for some reasons");
     LEVEL_CHANGER_STORAGE::const_iterator I = m_level_changers.begin();
@@ -212,10 +214,12 @@ shared_str CGameSpawnConstructor::spawn_name(LPCSTR output)
 
 void CGameSpawnConstructor::add_story_object(ALife::_STORY_ID id, CSE_ALifeDynamicObject* object, LPCSTR level_name)
 {
-    if (id == INVALID_STORY_ID) return;
+    if (id == INVALID_STORY_ID)
+        return;
 
     ALife::STORY_P_PAIR_IT I = m_story_objects.find(id);
-    if (I != m_story_objects.end()) {
+    if (I != m_story_objects.end())
+    {
         Msg("Object %s, story id %d", object->name_replace(), object->m_story_id);
         Msg("Object %s, story id %d", (*I).second->name_replace(), (*I).second->m_story_id);
         VERIFY3(I == m_story_objects.end(), "There are several objects which has the same unique story ID, level ",
@@ -233,11 +237,7 @@ void CGameSpawnConstructor::add_object(CSE_Abstract* object)
     m_critical_section.Leave();
 }
 
-void CGameSpawnConstructor::remove_object(CSE_Abstract* object)
-{
-    spawn_graph().remove_vertex(object->m_tSpawnID);
-}
-
+void CGameSpawnConstructor::remove_object(CSE_Abstract* object) { spawn_graph().remove_vertex(object->m_tSpawnID); }
 void CGameSpawnConstructor::process_actor(LPCSTR start_level_name)
 {
     m_actor = 0;
@@ -246,7 +246,8 @@ void CGameSpawnConstructor::process_actor(LPCSTR start_level_name)
     LEVEL_SPAWN_STORAGE::iterator E = m_level_spawns.end();
     for (; I != E; ++I)
     {
-        if (!(*I)->actor()) continue;
+        if (!(*I)->actor())
+            continue;
 
         Msg("Actor is on the level %s",
             *game_graph().header().level(game_graph().vertex((*I)->actor()->m_tGraphID)->level_id()).name());
@@ -256,9 +257,11 @@ void CGameSpawnConstructor::process_actor(LPCSTR start_level_name)
 
     R_ASSERT2(m_actor, "There is no ACTOR spawn point!");
 
-    if (!start_level_name) return;
+    if (!start_level_name)
+        return;
 
-    if (!xr_strcmp(*actor_level_name(), start_level_name)) return;
+    if (!xr_strcmp(*actor_level_name(), start_level_name))
+        return;
 
     const CGameGraph::SLevel& level = game_graph().header().level(start_level_name);
     GameGraph::_GRAPH_ID dest = GameGraph::_GRAPH_ID(-1);
@@ -266,22 +269,26 @@ void CGameSpawnConstructor::process_actor(LPCSTR start_level_name)
     CGraphEngine* graph_engine = new CGraphEngine(game_graph().header().vertex_count());
 
     bool failed = !graph_engine->search(game_graph(), m_actor->m_tGraphID, GameGraph::_GRAPH_ID(-1), 0, evaluator);
-    if (failed) {
+    if (failed)
+    {
         Msg("! Cannot build path via game graph from the current level to the level %s!", start_level_name);
         float min_dist = flt_max;
         Fvector current = game_graph().vertex(m_actor->m_tGraphID)->game_point();
         GameGraph::_GRAPH_ID n = game_graph().header().vertex_count();
         for (GameGraph::_GRAPH_ID i = 0; i < n; ++i)
         {
-            if (game_graph().vertex(i)->level_id() == level.id()) {
+            if (game_graph().vertex(i)->level_id() == level.id())
+            {
                 float distance = game_graph().vertex(i)->game_point().distance_to_sqr(current);
-                if (distance < min_dist) {
+                if (distance < min_dist)
+                {
                     min_dist = distance;
                     dest = i;
                 }
             }
         }
-        if (!game_graph().vertex(dest)) {
+        if (!game_graph().vertex(dest))
+        {
             Msg("! There is no game vertices on the level %s, cannot jump to the specified level", start_level_name);
             return;
         }
@@ -302,13 +309,15 @@ void clear_temp_folder()
     FS.update_path(query, "$app_data_root$", "temp\\*.*");
     _finddata_t file;
     intptr_t handle = _findfirst(query, &file);
-    if (handle == intptr_t(-1)) return;
+    if (handle == intptr_t(-1))
+        return;
 
     typedef xr_vector<shared_str> FILES;
     FILES files;
     do
     {
-        if (file.attrib & _A_SUBDIR) continue;
+        if (file.attrib & _A_SUBDIR)
+            continue;
 
         files.push_back(file.name);
     } while (!_findnext(handle, &file));

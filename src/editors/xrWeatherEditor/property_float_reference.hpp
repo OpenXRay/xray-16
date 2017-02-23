@@ -14,7 +14,7 @@
 public
 ref class property_float_reference : public XRay::SdkControls::IProperty, public XRay::SdkControls::IIncrementable
 {
-  public:
+public:
     property_float_reference(float& value, float const % increment_factor);
     virtual ~property_float_reference();
     !property_float_reference();
@@ -22,9 +22,9 @@ ref class property_float_reference : public XRay::SdkControls::IProperty, public
     virtual void SetValue(System::Object ^ object);
     virtual void Increment(float value);
 
-  private:
+private:
     value_holder<float>* m_value;
     float m_increment_factor;
-};  // ref class property_float_reference
+}; // ref class property_float_reference
 
-#endif  // ifndef PROPERTY_FLOAT_REFERENCE_HPP_INCLUDED
+#endif // ifndef PROPERTY_FLOAT_REFERENCE_HPP_INCLUDED

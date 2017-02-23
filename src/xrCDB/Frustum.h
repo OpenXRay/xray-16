@@ -41,7 +41,7 @@ class XRCDB_API CFrustum
 public:
     struct fplane : public Fplane
     {
-        u32 aabb_overlap_id;  // [0..7]
+        u32 aabb_overlap_id; // [0..7]
         void cache();
     };
     fplane planes[FRUSTUM_MAXPLANES];
@@ -55,11 +55,13 @@ public:
 
         Fvector Neg;
         Neg.set(mM[id[3]], mM[id[4]], mM[id[5]]);
-        if (P.classify(Neg) > 0) return fcvNone;
+        if (P.classify(Neg) > 0)
+            return fcvNone;
 
         Fvector Pos;
         Pos.set(mM[id[0]], mM[id[1]], mM[id[2]]);
-        if (P.classify(Pos) <= 0) return fcvFully;
+        if (P.classify(Pos) <= 0)
+            return fcvFully;
 
         return fcvPartial;
     }
@@ -73,7 +75,7 @@ public:
 
     void CreateOccluder(Fvector* p, int count, Fvector& vBase, CFrustum& clip);
     BOOL CreateFromClipPoly(
-        Fvector* p, int count, Fvector& vBase, CFrustum& clip);  // returns 'false' if creation failed
+        Fvector* p, int count, Fvector& vBase, CFrustum& clip); // returns 'false' if creation failed
     void CreateFromPoints(Fvector* p, int count, Fvector& vBase);
     void CreateFromMatrix(Fmatrix& M, u32 mask);
     void CreateFromPortal(sPoly* P, Fvector& vPN, Fvector& vBase, Fmatrix& mFullXFORM);
@@ -82,7 +84,6 @@ public:
     sPoly* ClipPoly(sPoly& src, sPoly& dest) const;
 
     u32 getMask() const { return (1 << p_count) - 1; }
-
     EFC_Visible testSphere(Fvector& c, float r, u32& test_mask) const;
     BOOL testSphere_dirty(Fvector& c, float r) const;
     EFC_Visible testAABB(const float* mM, u32& test_mask) const;
@@ -102,4 +103,4 @@ public:
 };
 #pragma pack(pop)
 
-#endif  // !defined(AFX_FRUSTUM_H__E66ED755_F741_49CF_8B2A_404CCF7067F2__INCLUDED_)
+#endif // !defined(AFX_FRUSTUM_H__E66ED755_F741_49CF_8B2A_404CCF7067F2__INCLUDED_)

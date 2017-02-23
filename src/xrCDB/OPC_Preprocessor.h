@@ -47,7 +47,7 @@
 #endif
 
 // Check debug mode
-#ifdef DEBUG  // May be defined instead of _DEBUG. Let's fix it.
+#ifdef DEBUG // May be defined instead of _DEBUG. Let's fix it.
 #undef _DEBUG
 #define _DEBUG
 #endif
@@ -79,4 +79,4 @@
 // Down the hatch
 #pragma inline_depth(255)
 
-#endif  // __ICEPREPROCESSOR_H__
+#endif // __ICEPREPROCESSOR_H__

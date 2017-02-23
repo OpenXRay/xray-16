@@ -33,7 +33,8 @@ BOOL object::net_Spawn(CSE_Abstract* server_entity)
     CSE_SmartCover* smart_cover = smart_cast<CSE_SmartCover*>(server_entity);
     VERIFY(smart_cover);
 
-    if (!smart_cover->m_description.size()) Msg("! smart cover %s has no description", smart_cover->name_replace());
+    if (!smart_cover->m_description.size())
+        Msg("! smart cover %s has no description", smart_cover->name_replace());
 
     CCF_Shape* shape = new CCF_Shape(this);
     SetCForm(shape);
@@ -60,7 +61,8 @@ BOOL object::net_Spawn(CSE_Abstract* server_entity)
 
     shape->ComputeBounds();
 
-    if (!inherited::net_Spawn(server_entity)) return (FALSE);
+    if (!inherited::net_Spawn(server_entity))
+        return (FALSE);
 
     spatial.type &= ~STYPE_VISIBLEFORAI;
 
@@ -79,26 +81,10 @@ BOOL object::net_Spawn(CSE_Abstract* server_entity)
     return (TRUE);
 }
 
-void object::Center(Fvector& result) const
-{
-    XFORM().transform_tiny(result, GetCForm()->getSphere().P);
-}
-
-float object::Radius() const
-{
-    return (GetCForm()->getRadius());
-}
-
-void object::UpdateCL()
-{
-    NODEFAULT;
-}
-
-void object::shedule_Update(u32 dt)
-{
-    NODEFAULT;
-}
-
+void object::Center(Fvector& result) const { XFORM().transform_tiny(result, GetCForm()->getSphere().P); }
+float object::Radius() const { return (GetCForm()->getRadius()); }
+void object::UpdateCL() { NODEFAULT; }
+void object::shedule_Update(u32 dt) { NODEFAULT; }
 #ifdef DEBUG
 void dbg_draw_frustum(float FOV, float _FAR, float A, Fvector& P, Fvector& D, Fvector& U);
 
@@ -137,7 +123,8 @@ void object::OnRender()
         }
     }
 
-    if (!m_cover) return;
+    if (!m_cover)
+        return;
 
     typedef smart_cover::description::Loopholes::const_iterator const_iterator;
     const_iterator I = m_cover->loopholes().begin();
@@ -151,7 +138,7 @@ void object::OnRender()
         dbg_draw_frustum(loophole->fov() * 180.f / PI, loophole->range(), 1.f, position, direction, up);
     }
 }
-#endif  // DEBUG
+#endif // DEBUG
 
 bool object::inside(Fvector const& position) const
 {
@@ -167,7 +154,8 @@ bool object::inside(Fvector const& position) const
         {
         case 0:
         {
-            if ((*i).data.sphere.P.distance_to(position) <= (*i).data.sphere.R) return (true);
+            if ((*i).data.sphere.P.distance_to(position) <= (*i).data.sphere.R)
+                return (true);
 
             continue;
         }
@@ -196,17 +184,23 @@ bool object::inside(Fvector const& position) const
             matrix.transform_tiny(B[7], A);
 
             plane.build(B[0], B[3], B[5]);
-            if (plane.classify(position) <= 0.f) return (true);
+            if (plane.classify(position) <= 0.f)
+                return (true);
             plane.build(B[1], B[2], B[3]);
-            if (plane.classify(position) <= 0.f) return (true);
+            if (plane.classify(position) <= 0.f)
+                return (true);
             plane.build(B[6], B[5], B[4]);
-            if (plane.classify(position) <= 0.f) return (true);
+            if (plane.classify(position) <= 0.f)
+                return (true);
             plane.build(B[4], B[2], B[1]);
-            if (plane.classify(position) <= 0.f) return (true);
+            if (plane.classify(position) <= 0.f)
+                return (true);
             plane.build(B[3], B[2], B[4]);
-            if (plane.classify(position) <= 0.f) return (true);
+            if (plane.classify(position) <= 0.f)
+                return (true);
             plane.build(B[1], B[0], B[6]);
-            if (plane.classify(position) <= 0.f) return (true);
+            if (plane.classify(position) <= 0.f)
+                return (true);
 
             continue;
         }

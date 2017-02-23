@@ -8,16 +8,14 @@ class ESceneDummyTool : public ESceneCustomOTool
 {
     typedef ESceneCustomOTool inherited;
 
-  protected:
+protected:
     // controls
     virtual void CreateControls();
     virtual void RemoveControls();
 
-  public:
+public:
     ESceneDummyTool() : ESceneCustomOTool(OBJCLASS_DUMMY) { ; }
-
     virtual void Clear(bool bSpecific = false) { inherited::Clear(bSpecific); }
-
     // definition
     IC LPCSTR ClassName()
     {
@@ -40,7 +38,6 @@ class ESceneDummyTool : public ESceneCustomOTool
     }
 
     virtual bool IsNeedSave() { return false; }
-
     virtual CCustomObject* CreateObject(LPVOID data, LPCSTR name) { return 0; };
 };
 

@@ -8,11 +8,7 @@
 
 #pragma once
 
-IC CScriptTokenList::CScriptTokenList()
-{
-    clear();
-}
-
+IC CScriptTokenList::CScriptTokenList() { clear(); }
 IC void CScriptTokenList::add(LPCSTR name, int id)
 {
     VERIFY((token(name) == m_token_list.end()) && (token(id) == m_token_list.end()));
@@ -65,12 +61,5 @@ IC CScriptTokenList::iterator CScriptTokenList::token(int id)
     return (std::find_if(m_token_list.begin(), m_token_list.end(), CTokenPredicateID(id)));
 }
 
-IC const CScriptTokenList::TOKEN_LIST& CScriptTokenList::tokens() const
-{
-    return (m_token_list);
-}
-
-IC CScriptTokenList::TOKEN_LIST& CScriptTokenList::tokens()
-{
-    return (m_token_list);
-}
+IC const CScriptTokenList::TOKEN_LIST& CScriptTokenList::tokens() const { return (m_token_list); }
+IC CScriptTokenList::TOKEN_LIST& CScriptTokenList::tokens() { return (m_token_list); }

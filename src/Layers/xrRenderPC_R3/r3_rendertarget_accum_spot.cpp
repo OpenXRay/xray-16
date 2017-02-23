@@ -12,10 +12,12 @@ void CRenderTarget::accum_spot(light* L)
     // *****************************	Mask by stencil		*************************************
     ref_shader shader;
     ref_shader* shader_msaa;
-    if (IRender_Light::OMNIPART == L->flags.type) {
+    if (IRender_Light::OMNIPART == L->flags.type)
+    {
         shader = L->s_point;
         shader_msaa = L->s_point_msaa;
-        if (!shader) {
+        if (!shader)
+        {
             shader = s_accum_point;
             shader_msaa = s_accum_point_msaa;
         }
@@ -24,13 +26,14 @@ void CRenderTarget::accum_spot(light* L)
     {
         shader = L->s_spot;
         shader_msaa = L->s_spot_msaa;
-        if (!shader) {
+        if (!shader)
+        {
             shader = s_accum_spot;
             shader_msaa = s_accum_spot_msaa;
         }
     }
 
-    BOOL bIntersect = FALSE;  // enable_scissor(L);
+    BOOL bIntersect = FALSE; // enable_scissor(L);
     {
         // setup xform
         L->xform_calc();
@@ -45,7 +48,7 @@ void CRenderTarget::accum_spot(light* L)
         // *** in practice, 'cause we "clear" it back to 0x1 it usually allows us to > 200 lights :)
         //	Done in blender!
         // RCache.set_ColorWriteEnable		(FALSE);
-        RCache.set_Element(s_accum_mask->E[SE_MASK_SPOT]);  // masker
+        RCache.set_Element(s_accum_mask->E[SE_MASK_SPOT]); // masker
 
         // backfaces: if (stencil>=1 && zfail)			stencil = light_id
         RCache.set_CullMode(CULL_CW);
@@ -69,12 +72,13 @@ void CRenderTarget::accum_spot(light* L)
     }
 
     // nv-stencil recompression
-    if (RImplementation.o.nvstencil) u_stencil_optimize();
+    if (RImplementation.o.nvstencil)
+        u_stencil_optimize();
 
     // *****************************	Minimize overdraw	*************************************
     // Select shader (front or back-faces), *** back, if intersect near plane
     RCache.set_ColorWriteEnable();
-    RCache.set_CullMode(CULL_CW);  // back
+    RCache.set_CullMode(CULL_CW); // back
 
     // 2D texgens
     Fmatrix m_Texgen;
@@ -131,7 +135,8 @@ void CRenderTarget::accum_spot(light* L)
     {
         // Select shader
         u32 _id = 0;
-        if (L->flags.bShadow) {
+        if (L->flags.bShadow)
+        {
             bool bFullSize = (L->X.S.size == RImplementation.o.smapsize);
             if (L->X.S.transluent)
                 _id = SE_L_TRANSLUENT;
@@ -147,7 +152,7 @@ void CRenderTarget::accum_spot(light* L)
         }
         RCache.set_Element(shader->E[_id]);
 
-        RCache.set_CullMode(CULL_CW);  // back
+        RCache.set_CullMode(CULL_CW); // back
 
         // Constants
         float att_R = L->range * .95f;
@@ -167,7 +172,8 @@ void CRenderTarget::accum_spot(light* L)
         //			HW.pDevice->SetSamplerState	( 0, D3DSAMP_MIPMAPLODBIAS, FOURCC_GET4 );
         //		}
 
-        if (!RImplementation.o.dx10_msaa) {
+        if (!RImplementation.o.dx10_msaa)
+        {
             RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, dwLightMarkerID, 0xff, 0x00);
             draw_volume(L);
         }
@@ -179,13 +185,14 @@ void CRenderTarget::accum_spot(light* L)
             RCache.set_CullMode(D3DCULL_CW);
             draw_volume(L);
             // per sample
-            if (RImplementation.o.dx10_msaa_opt) {
+            if (RImplementation.o.dx10_msaa_opt)
+            {
                 RCache.set_Element(shader_msaa[0]->E[_id]);
                 RCache.set_Stencil(TRUE, D3DCMP_EQUAL, dwLightMarkerID | 0x80, 0xff, 0x00);
                 RCache.set_CullMode(D3DCULL_CW);
                 draw_volume(L);
             }
-            else  // checked Holger
+            else // checked Holger
             {
                 for (u32 i = 0; i < RImplementation.o.dx10_msaa_samples; ++i)
                 {
@@ -209,7 +216,8 @@ void CRenderTarget::accum_spot(light* L)
     }
 
     // blend-copy
-    if (!RImplementation.o.fp16_blend) {
+    if (!RImplementation.o.fp16_blend)
+    {
         if (!RImplementation.o.dx10_msaa)
             u_setrt(rt_Accumulator, NULL, NULL, HW.pBaseZB);
         else
@@ -217,23 +225,25 @@ void CRenderTarget::accum_spot(light* L)
         RCache.set_Element(s_accum_mask->E[SE_MASK_ACCUM_VOL]);
         RCache.set_c("m_texgen", m_Texgen);
         RCache.set_c("m_texgen_J", m_Texgen_J);
-        if (!RImplementation.o.dx10_msaa) {
+        if (!RImplementation.o.dx10_msaa)
+        {
             RCache.set_Stencil(TRUE, D3DCMP_EQUAL, dwLightMarkerID, 0xff, 0x00);
             draw_volume(L);
         }
-        else  // checked Holger
+        else // checked Holger
         {
             // per pixel
             RCache.set_Element(s_accum_mask->E[SE_MASK_ACCUM_VOL]);
             RCache.set_Stencil(TRUE, D3DCMP_EQUAL, dwLightMarkerID, 0xff, 0x00);
             draw_volume(L);
             // per sample
-            if (RImplementation.o.dx10_msaa_opt) {
+            if (RImplementation.o.dx10_msaa_opt)
+            {
                 RCache.set_Element(s_accum_mask_msaa[0]->E[SE_MASK_ACCUM_VOL]);
                 RCache.set_Stencil(TRUE, D3DCMP_EQUAL, dwLightMarkerID | 0x80, 0xff, 0x00);
                 draw_volume(L);
             }
-            else  // checked Holger
+            else // checked Holger
             {
                 for (u32 i = 0; i < RImplementation.o.dx10_msaa_samples; ++i)
                 {
@@ -259,7 +269,8 @@ void CRenderTarget::accum_spot(light* L)
 void CRenderTarget::accum_volumetric(light* L)
 {
     // if (L->flags.type != IRender_Light::SPOT) return;
-    if (!L->flags.bVolumetric) return;
+    if (!L->flags.bVolumetric)
+        return;
 
     phase_vol_accumulator();
 
@@ -268,14 +279,15 @@ void CRenderTarget::accum_volumetric(light* L)
 
     shader = L->s_volumetric;
     shader_msaa = L->s_volumetric_msaa;
-    if (!shader) {
+    if (!shader)
+    {
         shader = s_accum_volume;
         shader_msaa = s_accum_volume_msaa;
     }
 
     // *** assume accumulator setted up ***
     // *****************************	Mask by stencil		*************************************
-    BOOL bIntersect = FALSE;  // enable_scissor(L);
+    BOOL bIntersect = FALSE; // enable_scissor(L);
     {
         // setup xform
         L->xform_calc();
@@ -288,7 +300,7 @@ void CRenderTarget::accum_volumetric(light* L)
     }
 
     RCache.set_ColorWriteEnable();
-    RCache.set_CullMode(CULL_NONE);  // back
+    RCache.set_CullMode(CULL_NONE); // back
 
     // 2D texgens
     Fmatrix m_Texgen;
@@ -431,7 +443,8 @@ void CRenderTarget::accum_volumetric(light* L)
             char* pszSMapName;
             BOOL b_HW_smap = RImplementation.o.HW_smap;
             BOOL b_HW_PCF = RImplementation.o.HW_smap_PCF;
-            if (b_HW_smap) {
+            if (b_HW_smap)
+            {
                 if (b_HW_PCF)
                     pszSMapName = r2_RT_smap_depth;
                 else
@@ -449,7 +462,8 @@ void CRenderTarget::accum_volumetric(light* L)
                 std::pair<u32, ref_texture>& loader = *_it;
                 u32 load_id = loader.first;
                 //	Shadowmap texture always uses 0 texture unit
-                if (load_id == 0) {
+                if (load_id == 0)
+                {
                     //	Assign correct texture
                     loader.second.create(pszSMapName);
                 }

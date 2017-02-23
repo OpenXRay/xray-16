@@ -45,12 +45,12 @@ protected:
 
     typedef struct
     {
-        u32 c;         // color
-        CGameFont* f;  // font
-        float h;       // height
+        u32 c; // color
+        CGameFont* f; // font
+        float h; // height
     } S_ELEMENT;
 
-    S_ELEMENT m_h;  // header
-    S_ELEMENT m_i;  // item
-    S_ELEMENT m_t;  // team header
+    S_ELEMENT m_h; // header
+    S_ELEMENT m_i; // item
+    S_ELEMENT m_t; // team header
 };

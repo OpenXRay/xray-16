@@ -37,7 +37,7 @@ ref class PostProcessParamBase abstract
     bool dontDestroy = false;
     PostProcessParamBase(::CPostProcessParam* impl);
 
-  public:
+public:
     ~PostProcessParamBase();
     // update
     virtual void Update(float dt) = 0;
@@ -69,7 +69,7 @@ ref class PostProcessParam : PostProcessParamBase
 {
     internal : PostProcessParam(::CPostProcessValue* impl);
 
-  public:
+public:
     // update
     virtual void Update(float dt) override;
     // load(IReader)
@@ -98,13 +98,13 @@ ref class PostProcessParam : PostProcessParamBase
 public
 ref class PostProcessInfo
 {
-  public:
+public:
     [StructLayout(LayoutKind::Explicit, Size = sizeof(Fvector3))] value struct Color
     {
-      private:
+    private:
         [FieldOffset(0)] Vector3F vec;
 
-      public:
+    public:
         [FieldOffset(0)] float r;
         [FieldOffset(1 * sizeof(float))] float g;
         [FieldOffset(2 * sizeof(float))] float b;
@@ -142,7 +142,7 @@ ref class PostProcessInfo
     };
     value struct Duality
     {
-      public:
+    public:
         float h, v;
 
         Duality(float _h, float _v) : h(_h), v(_v) {}
@@ -155,7 +155,7 @@ ref class PostProcessInfo
     };
     value struct Noise
     {
-      public:
+    public:
         float intensity, grain, fps;
 
         Noise(float _i, float _g, float _f) : intensity(_i), grain(_g), fps(_f) {}
@@ -170,7 +170,7 @@ ref class PostProcessInfo
     internal : ::SPPInfo* impl;
     bool dontDestroy = false;
 
-  public:
+public:
     // blur
     property float Blur
     {
@@ -243,7 +243,7 @@ ref class PostProcessInfo
 
 ref class PostProcessParamProxy : PostProcessParamBase
 {
-  public:
+public:
     PostProcessParamProxy(::CPostProcessParam* impl);
     virtual void Update(float dt) override;
     virtual void Load(ReaderBase ^ reader) override;
@@ -264,7 +264,7 @@ ref class BasicPostProcessAnimator
 {
     internal : ::BasicPostProcessAnimator* impl;
 
-  public:
+public:
     BasicPostProcessAnimator();
     BasicPostProcessAnimator(int id, bool cyclic);
     ~BasicPostProcessAnimator();

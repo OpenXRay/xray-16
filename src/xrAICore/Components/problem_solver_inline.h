@@ -8,28 +8,20 @@
 
 #pragma once
 
-#define TEMPLATE_SPECIALIZATION                                                                                        \
-    template <typename _operator_condition, typename _operator, typename _condition_state,                             \
-        typename _condition_evaluator, typename _operator_id_type, bool _reverse_search, typename _operator_ptr,       \
+#define TEMPLATE_SPECIALIZATION                                                                                  \
+    template <typename _operator_condition, typename _operator, typename _condition_state,                       \
+        typename _condition_evaluator, typename _operator_id_type, bool _reverse_search, typename _operator_ptr, \
         typename _condition_evaluator_ptr\
 >
 
-#define CProblemSolverAbstract                                                                                         \
-    CProblemSolver<_operator_condition, _operator, _condition_state, _condition_evaluator, _operator_id_type,          \
+#define CProblemSolverAbstract                                                                                \
+    CProblemSolver<_operator_condition, _operator, _condition_state, _condition_evaluator, _operator_id_type, \
         _reverse_search, _operator_ptr, _condition_evaluator_ptr>
 
 TEMPLATE_SPECIALIZATION
-IC CProblemSolverAbstract::CProblemSolver()
-{
-    init();
-}
-
+IC CProblemSolverAbstract::CProblemSolver() { init(); }
 TEMPLATE_SPECIALIZATION
-CProblemSolverAbstract::~CProblemSolver()
-{
-    clear();
-}
-
+CProblemSolverAbstract::~CProblemSolver() { clear(); }
 TEMPLATE_SPECIALIZATION
 IC void CProblemSolverAbstract::clear()
 {
@@ -41,10 +33,7 @@ IC void CProblemSolverAbstract::clear()
 }
 
 TEMPLATE_SPECIALIZATION
-void CProblemSolverAbstract::init()
-{
-}
-
+void CProblemSolverAbstract::init() {}
 TEMPLATE_SPECIALIZATION
 void CProblemSolverAbstract::setup()
 {
@@ -61,7 +50,8 @@ void CProblemSolverAbstract::setup()
 TEMPLATE_SPECIALIZATION
 IC bool CProblemSolverAbstract::actual() const
 {
-    if (!m_actuality) return (false);
+    if (!m_actuality)
+        return (false);
 
     xr_vector<COperatorCondition>::const_iterator I = current_state().conditions().begin();
     xr_vector<COperatorCondition>::const_iterator E = current_state().conditions().end();
@@ -69,10 +59,12 @@ IC bool CProblemSolverAbstract::actual() const
     EVALUATORS::const_iterator e = evaluators().end();
     for (; I != E; ++I)
     {
-        if ((*i).first < (*I).condition()) i = std::lower_bound(i, e, (*I).condition(), evaluators().value_comp());
+        if ((*i).first < (*I).condition())
+            i = std::lower_bound(i, e, (*I).condition(), evaluators().value_comp());
         VERIFY(i != e);
         VERIFY((*i).first == (*I).condition());
-        if ((*i).second->evaluate() != (*I).value()) return (false);
+        if ((*i).second->evaluate() != (*I).value())
+            return (false);
     }
     return (true);
 }
@@ -98,7 +90,8 @@ IC void CProblemSolverAbstract::validate_properties(const CState& conditions) co
     xr_vector<COperatorCondition>::const_iterator E = conditions.conditions().end();
     for (; I != E; ++I)
     {
-        if (evaluators().find((*I).condition()) == evaluators().end()) {
+        if (evaluators().find((*I).condition()) == evaluators().end())
+        {
             Msg("! cannot find corresponding evaluator to the property with id %d", (*I).condition());
             THROW(evaluators().find((*I).condition()) != evaluators().end());
         }
@@ -210,16 +203,13 @@ IC typename CProblemSolverAbstract::_edge_value_type CProblemSolverAbstract::get
 }
 
 TEMPLATE_SPECIALIZATION
-IC bool CProblemSolverAbstract::is_accessible(const _index_type& vertex_index) const
-{
-    return (m_applied);
-}
-
+IC bool CProblemSolverAbstract::is_accessible(const _index_type& vertex_index) const { return (m_applied); }
 TEMPLATE_SPECIALIZATION
 IC const typename CProblemSolverAbstract::_index_type& CProblemSolverAbstract::value(
     const _index_type& vertex_index, const_iterator& i, bool reverse_search) const
 {
-    if (reverse_search) {
+    if (reverse_search)
+    {
         if ((*i).m_operator->applicable_reverse(
                 (*i).m_operator->effects(), (*i).m_operator->conditions(), vertex_index))
             m_applied = (*i).m_operator->apply_reverse(
@@ -229,7 +219,8 @@ IC const typename CProblemSolverAbstract::_index_type& CProblemSolverAbstract::v
     }
     else
     {
-        if ((*i).m_operator->applicable(vertex_index, current_state(), (*i).m_operator->conditions(), *this)) {
+        if ((*i).m_operator->applicable(vertex_index, current_state(), (*i).m_operator->conditions(), *this))
+        {
             (*i).m_operator->apply(vertex_index, (*i).m_operator->effects(), m_temp, m_current_state, *this);
             m_applied = true;
         }
@@ -264,27 +255,32 @@ IC bool CProblemSolverAbstract::is_goal_reached_impl(const _index_type& vertex_i
     xr_vector<COperatorCondition>::const_iterator EE = current_state().conditions().end();
     for (; (i != e) && (I != E);)
     {
-        if ((*I).condition() < (*i).condition()) {
+        if ((*I).condition() < (*i).condition())
+        {
             ++I;
         }
         else if ((*I).condition() > (*i).condition())
         {
             for (; (II != EE) && ((*II).condition() < (*i).condition());)
                 ++II;
-            if ((II == EE) || ((*II).condition() > (*i).condition())) evaluate_condition(II, EE, (*i).condition());
-            if ((*II).value() != (*i).value()) return (false);
+            if ((II == EE) || ((*II).condition() > (*i).condition()))
+                evaluate_condition(II, EE, (*i).condition());
+            if ((*II).value() != (*i).value())
+                return (false);
             ++II;
             ++i;
         }
         else
         {
-            if ((*I).value() != (*i).value()) return (false);
+            if ((*I).value() != (*i).value())
+                return (false);
             ++I;
             ++i;
         }
     }
 
-    if (I == E) {
+    if (I == E)
+    {
         I = II;
         E = EE;
     }
@@ -293,14 +289,16 @@ IC bool CProblemSolverAbstract::is_goal_reached_impl(const _index_type& vertex_i
 
     for (; i != e;)
     {
-        if ((I == E) || ((*I).condition() > (*i).condition())) evaluate_condition(I, E, (*i).condition());
+        if ((I == E) || ((*I).condition() > (*i).condition()))
+            evaluate_condition(I, E, (*i).condition());
 
         if ((*I).condition() < (*i).condition())
             ++I;
         else
         {
             VERIFY((*I).condition() == (*i).condition());
-            if ((*I).value() != (*i).value()) return (false);
+            if ((*I).value() != (*i).value())
+                return (false);
             ++I;
             ++i;
         }
@@ -318,13 +316,15 @@ IC bool CProblemSolverAbstract::is_goal_reached_impl(const _index_type& vertex_i
     xr_vector<COperatorCondition>::const_iterator e = vertex_index.conditions().end();
     for (; i != e;)
     {
-        if ((I == E) || ((*I).condition() > (*i).condition())) evaluate_condition(I, E, (*i).condition());
+        if ((I == E) || ((*I).condition() > (*i).condition()))
+            evaluate_condition(I, E, (*i).condition());
 
         if ((*I).condition() < (*i).condition())
             ++I;
         else
         {
-            if ((*I).value() != (*i).value()) return (false);
+            if ((*I).value() != (*i).value())
+                return (false);
             ++I;
             ++i;
         }
@@ -352,7 +352,8 @@ IC void CProblemSolverAbstract::solve()
 #ifndef AI_COMPILER
     m_solution_changed = false;
 
-    if (actual()) return;
+    if (actual())
+        return;
 
     m_actuality = true;
     m_solution_changed = true;
@@ -383,7 +384,8 @@ IC typename CProblemSolverAbstract::_edge_value_type CProblemSolverAbstract::est
     xr_vector<COperatorCondition>::const_iterator i = condition.conditions().begin();
     xr_vector<COperatorCondition>::const_iterator e = condition.conditions().end();
     for (; (I != E) && (i != e);)
-        if ((*I).condition() < (*i).condition()) {
+        if ((*I).condition() < (*i).condition())
+        {
             ++result;
             ++I;
         }
@@ -391,7 +393,8 @@ IC typename CProblemSolverAbstract::_edge_value_type CProblemSolverAbstract::est
             ++i;
         else
         {
-            if ((*I).value() != (*i).value()) ++result;
+            if ((*I).value() != (*i).value())
+                ++result;
             ++I;
             ++i;
         }
@@ -410,14 +413,16 @@ IC typename CProblemSolverAbstract::_edge_value_type CProblemSolverAbstract::est
     xr_vector<COperatorCondition>::const_iterator e = condition.conditions().end();
     for (; (i != e);)
     {
-        if ((I == E) || ((*I).condition() > (*i).condition())) evaluate_condition(I, E, (*i).condition());
+        if ((I == E) || ((*I).condition() > (*i).condition()))
+            evaluate_condition(I, E, (*i).condition());
 
         if ((*I).condition() < (*i).condition())
             ++I;
         else
         {
             VERIFY((*I).condition() == (*i).condition());
-            if ((*I).value() != (*i).value()) ++result;
+            if ((*I).value() != (*i).value())
+                ++result;
             ++I;
             ++i;
         }

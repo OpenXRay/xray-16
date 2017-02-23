@@ -14,7 +14,7 @@
 #include "level_debug.h"
 #endif
 
-#define TEMPLATE_SPECIALIZATION                                                                                        \
+#define TEMPLATE_SPECIALIZATION \
     template <typename _Object\
 >
 
@@ -33,10 +33,7 @@ CStateMonsterEatAbstract::CStateMonsterEat(_Object* obj) : inherited(obj)
 }
 
 TEMPLATE_SPECIALIZATION
-CStateMonsterEatAbstract::~CStateMonsterEat()
-{
-}
-
+CStateMonsterEatAbstract::~CStateMonsterEat() {}
 TEMPLATE_SPECIALIZATION
 void CStateMonsterEatAbstract::reinit()
 {
@@ -73,17 +70,21 @@ void CStateMonsterEatAbstract::critical_finalize()
 TEMPLATE_SPECIALIZATION
 void CStateMonsterEatAbstract::reselect_state()
 {
-    if (prev_substate == u32(-1)) {
+    if (prev_substate == u32(-1))
+    {
         select_state(eStateEat_CorpseApproachRun);
         return;
     }
-    if (prev_substate == eStateEat_CorpseApproachRun) {
+    if (prev_substate == eStateEat_CorpseApproachRun)
+    {
         select_state(eStateEat_CheckCorpse);
         return;
     }
 
-    if (prev_substate == eStateEat_CheckCorpse) {
-        if (object->ability_can_drag()) {
+    if (prev_substate == eStateEat_CheckCorpse)
+    {
+        if (object->ability_can_drag())
+        {
             select_state(eStateEat_Drag);
         }
         else
@@ -96,7 +97,8 @@ void CStateMonsterEatAbstract::reselect_state()
         return;
     }
 
-    if (prev_substate == eStateEat_Drag) {
+    if (prev_substate == eStateEat_Drag)
+    {
         if (get_state(eStateEat_Eat)->check_start_conditions())
             select_state(eStateEat_Eat);
         else
@@ -104,7 +106,8 @@ void CStateMonsterEatAbstract::reselect_state()
         return;
     }
 
-    if (prev_substate == eStateEat_Eat) {
+    if (prev_substate == eStateEat_Eat)
+    {
         m_time_last_eat = time();
 
         if (!hungry())
@@ -114,7 +117,8 @@ void CStateMonsterEatAbstract::reselect_state()
         return;
     }
 
-    if (prev_substate == eStateEat_CorpseApproachWalk) {
+    if (prev_substate == eStateEat_CorpseApproachWalk)
+    {
         if (get_state(eStateEat_Eat)->check_start_conditions())
             select_state(eStateEat_Eat);
         else
@@ -122,11 +126,13 @@ void CStateMonsterEatAbstract::reselect_state()
         return;
     }
 
-    if (prev_substate == eStateEat_WalkAway) {
+    if (prev_substate == eStateEat_WalkAway)
+    {
         select_state(eStateEat_Rest);
         return;
     }
-    if (prev_substate == eStateEat_Rest) {
+    if (prev_substate == eStateEat_Rest)
+    {
         select_state(eStateEat_Rest);
         return;
     }
@@ -137,11 +143,13 @@ void CStateMonsterEatAbstract::setup_substates()
 {
     state_ptr state = get_state_current();
 
-    if (current_substate == eStateEat_CorpseApproachRun) {
+    if (current_substate == eStateEat_CorpseApproachRun)
+    {
         // Определить позицию ближайшей боны у трупа
         Fvector nearest_bone_pos;
         const CEntityAlive* corpse = object->CorpseMan.get_corpse();
-        if ((corpse->m_pPhysicsShell == NULL) || (!corpse->m_pPhysicsShell->isActive())) {
+        if ((corpse->m_pPhysicsShell == NULL) || (!corpse->m_pPhysicsShell->isActive()))
+        {
             nearest_bone_pos = corpse->Position();
         }
         else
@@ -170,7 +178,8 @@ void CStateMonsterEatAbstract::setup_substates()
         return;
     }
 
-    if (current_substate == eStateEat_CheckCorpse) {
+    if (current_substate == eStateEat_CheckCorpse)
+    {
         SStateDataAction data;
         data.action = ACT_STAND_IDLE;
         data.spec_params = 0;
@@ -183,7 +192,8 @@ void CStateMonsterEatAbstract::setup_substates()
         return;
     }
 
-    if (current_substate == eStateEat_WalkAway) {
+    if (current_substate == eStateEat_WalkAway)
+    {
         SStateHideFromPoint data;
 
         data.point = object->CorpseMan.get_corpse_position();
@@ -203,7 +213,8 @@ void CStateMonsterEatAbstract::setup_substates()
         return;
     }
 
-    if (current_substate == eStateEat_Rest) {
+    if (current_substate == eStateEat_Rest)
+    {
         SStateDataAction data;
         data.action = ACT_REST;
         data.spec_params = 0;
@@ -215,11 +226,13 @@ void CStateMonsterEatAbstract::setup_substates()
         return;
     }
 
-    if (current_substate == eStateEat_CorpseApproachWalk) {
+    if (current_substate == eStateEat_CorpseApproachWalk)
+    {
         // Определить позицию ближайшей боны у трупа
         Fvector nearest_bone_pos;
         const CEntityAlive* corpse = object->CorpseMan.get_corpse();
-        if ((corpse->m_pPhysicsShell == NULL) || (!corpse->m_pPhysicsShell->isActive())) {
+        if ((corpse->m_pPhysicsShell == NULL) || (!corpse->m_pPhysicsShell->isActive()))
+        {
             nearest_bone_pos = corpse->Position();
         }
         else
@@ -244,8 +257,10 @@ void CStateMonsterEatAbstract::setup_substates()
 TEMPLATE_SPECIALIZATION
 bool CStateMonsterEatAbstract::check_completion()
 {
-    if (corpse != object->CorpseMan.get_corpse()) return true;
-    if (!hungry()) return true;
+    if (corpse != object->CorpseMan.get_corpse())
+        return true;
+    if (!hungry())
+        return true;
 
     return false;
 }
@@ -254,7 +269,7 @@ TEMPLATE_SPECIALIZATION
 bool CStateMonsterEatAbstract::check_start_conditions()
 {
     return (object->CorpseMan.get_corpse() && object->Home->at_home(object->CorpseMan.get_corpse()->Position()) &&
-            hungry() && !monster_squad().get_squad(object)->is_locked_corpse(object->CorpseMan.get_corpse()));
+        hungry() && !monster_squad().get_squad(object)->is_locked_corpse(object->CorpseMan.get_corpse()));
 }
 
 #define TIME_NOT_HUNGRY 20000
@@ -268,7 +283,8 @@ bool CStateMonsterEatAbstract::hungry()
 TEMPLATE_SPECIALIZATION
 void CStateMonsterEatAbstract::remove_links(IGameObject* object)
 {
-    if (corpse == object) corpse = 0;
+    if (corpse == object)
+        corpse = 0;
 }
 
 #undef TEMPLATE_SPECIALIZATION

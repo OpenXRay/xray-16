@@ -15,11 +15,7 @@
 
 using namespace luabind;
 
-xrTime CSavedGameWrapper__game_time(const CSavedGameWrapper* self)
-{
-    return (xrTime(self->game_time()));
-}
-
+xrTime CSavedGameWrapper__game_time(const CSavedGameWrapper* self) { return (xrTime(self->game_time())); }
 SCRIPT_EXPORT(CSavedGameWrapper, (), {
     module(luaState)[class_<CSavedGameWrapper>("CSavedGameWrapper")
                          .def(constructor<LPCSTR>())

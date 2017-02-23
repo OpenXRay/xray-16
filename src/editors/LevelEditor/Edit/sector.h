@@ -24,7 +24,7 @@ class CSectorItem
     CSceneObject* object;
     CEditableMesh* mesh;
 
-  public:
+public:
     CSectorItem();
     CSectorItem(CSceneObject* o, CEditableMesh* m);
     void GetTransform(Fmatrix& parent);
@@ -75,7 +75,7 @@ class CSector : public CCustomObject
     void OnDestroy();
     void UpdateVolume();
 
-  public:
+public:
     u8 m_map_idx;
 
     CSector(LPVOID data, LPCSTR name);
@@ -83,13 +83,12 @@ class CSector : public CCustomObject
     virtual ~CSector();
 
     virtual bool CanAttach() { return false; }
-
     virtual void Render(int priority, bool strictB2F);
     virtual bool RayPick(float& distance, const Fvector& start, const Fvector& direction, SRayPickInfo* pinf = NULL);
     virtual bool FrustumPick(const CFrustum& frustum);
     virtual bool SpherePick(const Fvector& center, float radius);
     virtual bool GetBox(Fbox& box) const;
-    virtual void Move(Fvector& amount);  // need for Shift Level
+    virtual void Move(Fvector& amount); // need for Shift Level
     virtual void OnSceneUpdate();
 
     // file system function
@@ -100,11 +99,10 @@ class CSector : public CCustomObject
     virtual void FillProp(LPCSTR pref, PropItemVec& values);
     virtual bool GetSummaryInfo(SSceneSummary* inf);
 
-    bool AddMesh(CSceneObject* O, CEditableMesh* M);  // возвращает добавлен ли объект
-    int DelMesh(CSceneObject* O, CEditableMesh* M);   // 0-не удален 1-удален 2-удален сектор вообще
+    bool AddMesh(CSceneObject* O, CEditableMesh* M); // возвращает добавлен ли объект
+    int DelMesh(CSceneObject* O, CEditableMesh* M); // 0-не удален 1-удален 2-удален сектор вообще
 
     bool IsDefault() { return m_bDefault; }
-
     bool Contains(CSceneObject* O, CEditableMesh* M)
     {
         SItemIt it;
@@ -112,7 +110,6 @@ class CSector : public CCustomObject
     }
 
     void SetColor(u32 clr) { sector_color.set(subst_alpha(clr, 0)); }
-
     void CaptureInsideVolume();
     void DistributeInsideObjects();
     void CaptureAllUnusedMeshes();

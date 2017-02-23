@@ -34,10 +34,7 @@ CStateManagerCat::CStateManagerCat(CCat* obj) : inherited(obj)
     m_rot_jump_last_time = 0;
 }
 
-CStateManagerCat::~CStateManagerCat()
-{
-}
-
+CStateManagerCat::~CStateManagerCat() {}
 #define ROTATION_JUMP_DELAY 3000
 
 void CStateManagerCat::execute()
@@ -46,7 +43,8 @@ void CStateManagerCat::execute()
 
     const CEntityAlive* enemy = object->EnemyMan.get_enemy();
 
-    if (enemy) {
+    if (enemy)
+    {
         {
             switch (object->EnemyMan.get_danger_type())
             {

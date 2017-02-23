@@ -50,7 +50,8 @@ public:
     void SetEnabled(bool b)
     {
         m_b_enabled = b;
-        if (!m_b_enabled) Show(m_b_enabled);
+        if (!m_b_enabled)
+            Show(m_b_enabled);
     }
     bool GetEnabled() { return m_b_enabled; }
     virtual void Show(bool b);
@@ -81,21 +82,18 @@ public:
     }
     int GetMaxRange() { return m_iMaxPos; }
     int GetMinRange() { return m_iMinPos; }
-
     void SetPageSize(int iPage)
     {
         m_iPageSize = _max(0, iPage);
         UpdateScrollBar();
     }
     int GetPageSize() { return m_iPageSize; }
-
     void SetScrollPos(int iPos)
     {
         SetScrollPosClamped(iPos);
         UpdateScrollBar();
     }
     int GetScrollPos() { return _max(m_iMinPos, m_iScrollPos); }
-
     void TryScrollInc(bool by_scrollbox = false);
     void TryScrollDec(bool by_scrollbox = false);
 };

@@ -103,11 +103,11 @@ void CRenderTarget::accum_spot_geom_destroy()
 {
 #ifdef DEBUG
     _SHOW_REF("g_accum_spot_ib", g_accum_spot_ib);
-#endif  // DEBUG
+#endif // DEBUG
     _RELEASE(g_accum_spot_ib);
 #ifdef DEBUG
     _SHOW_REF("g_accum_spot_vb", g_accum_spot_vb);
-#endif  // DEBUG
+#endif // DEBUG
     _RELEASE(g_accum_spot_vb);
 }
 
@@ -208,10 +208,10 @@ void CRenderTarget::accum_volumetric_geom_destroy()
 {
 #ifdef DEBUG
     _SHOW_REF("g_accum_volumetric_ib", g_accum_volumetric_ib);
-#endif  // DEBUG
+#endif // DEBUG
     _RELEASE(g_accum_volumetric_ib);
 #ifdef DEBUG
     _SHOW_REF("g_accum_volumetric_vb", g_accum_volumetric_vb);
-#endif  // DEBUG
+#endif // DEBUG
     _RELEASE(g_accum_volumetric_vb);
 }

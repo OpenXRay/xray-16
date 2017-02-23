@@ -43,7 +43,8 @@ void lwListAdd(void** list, void* node)
     lwNode *head, *tail;
 
     head = *((lwNode**)list);
-    if (!head) {
+    if (!head)
+    {
         *list = node;
         return;
     }
@@ -67,7 +68,8 @@ void lwListInsert(void** vlist, void* vitem, int (*compare)(void*, void*))
 {
     lwNode **list, *item, *node, *prev;
 
-    if (!*vlist) {
+    if (!*vlist)
+    {
         *vlist = vitem;
         return;
     }
@@ -79,12 +81,14 @@ void lwListInsert(void** vlist, void* vitem, int (*compare)(void*, void*))
 
     while (node)
     {
-        if (0 < compare(node, item)) break;
+        if (0 < compare(node, item))
+            break;
         prev = node;
         node = node->next;
     }
 
-    if (!prev) {
+    if (!prev)
+    {
         *list = item;
         node->prev = item;
         item->next = node;

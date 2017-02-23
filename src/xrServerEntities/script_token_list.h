@@ -21,7 +21,6 @@ protected:
         LPCSTR m_name;
 
         IC CTokenPredicateName(LPCSTR name) { m_name = name; }
-
         IC bool operator()(const xr_token& token) const { return (token.name && !xr_strcmp(token.name, m_name)); }
     };
 
@@ -30,7 +29,6 @@ protected:
         int m_id;
 
         IC CTokenPredicateID(int id) { m_id = id; }
-
         IC bool operator()(const xr_token& token) const { return (token.name && (token.id == m_id)); }
     };
 

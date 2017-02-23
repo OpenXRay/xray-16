@@ -16,22 +16,27 @@
 
 void CAI_Rat::update_home_position()
 {
-    if (!g_Alive()) return;
+    if (!g_Alive())
+        return;
 
     CEntity* leader = Level().seniority_holder().team(g_Team()).squad(g_Squad()).leader();
     VERIFY(leader);
 
-    if (ID() != leader->ID()) {
+    if (ID() != leader->ID())
+    {
         CAI_Rat* rat_leader = smart_cast<CAI_Rat*>(leader);
         VERIFY(rat_leader);
-        if (m_home_position.distance_to(rat_leader->m_home_position) > EPS_L) add_active_member(true);
+        if (m_home_position.distance_to(rat_leader->m_home_position) > EPS_L)
+            add_active_member(true);
 
         m_home_position = rat_leader->m_home_position;
     }
 
-    if (Device.dwTimeGlobal < m_time_to_change_graph_point) return;
+    if (Device.dwTimeGlobal < m_time_to_change_graph_point)
+        return;
 
-    if (ai().cross_table().vertex(ai_location().level_vertex_id()).game_vertex_id() != m_next_graph_point) return;
+    if (ai().cross_table().vertex(ai_location().level_vertex_id()).game_vertex_id() != m_next_graph_point)
+        return;
 
     m_next_graph_point = ai().cross_table().vertex(ai_location().level_vertex_id()).game_vertex_id();
     select_next_home_position();

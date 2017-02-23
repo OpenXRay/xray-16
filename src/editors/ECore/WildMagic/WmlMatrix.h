@@ -37,7 +37,7 @@ namespace Wml
 template <int N, class Real>
 class Matrix
 {
-  public:
+public:
     // Construction.  In the second constructor, if bZero is 'true', the
     // matrix is set to the zero matrix.  If bZero is 'false', the matrix
     // is set to the identity matrix.
@@ -88,15 +88,15 @@ class Matrix
     Matrix& operator/=(Real fScalar);
 
     // matrix products
-    Matrix Transpose() const;                        // M^T
-    Matrix TransposeTimes(const Matrix& rkM) const;  // this^T * M
-    Matrix TimesTranspose(const Matrix& rkM) const;  // this * M^T
+    Matrix Transpose() const; // M^T
+    Matrix TransposeTimes(const Matrix& rkM) const; // this^T * M
+    Matrix TimesTranspose(const Matrix& rkM) const; // this * M^T
 
     // matrix-vector operations
-    Vector<N, Real> operator*(const Vector<N, Real>& rkV) const;               // M * v
-    Real QForm(const Vector<N, Real>& rkU, const Vector<N, Real>& rkV) const;  // u^T*M*v
+    Vector<N, Real> operator*(const Vector<N, Real>& rkV) const; // M * v
+    Real QForm(const Vector<N, Real>& rkU, const Vector<N, Real>& rkV) const; // u^T*M*v
 
-  protected:
+protected:
     // for indexing into the 1D array of the matrix, iCol+N*iRow
     static int I(int iRow, int iCol);
 

@@ -20,10 +20,7 @@ CBlender_LmEbB::CBlender_LmEbB()
     oBlend.value = FALSE;
 }
 
-CBlender_LmEbB::~CBlender_LmEbB()
-{
-}
-
+CBlender_LmEbB::~CBlender_LmEbB() {}
 void CBlender_LmEbB::Save(IWriter& fs)
 {
     description.version = 0x1;
@@ -40,7 +37,8 @@ void CBlender_LmEbB::Load(IReader& fs, u16 version)
     xrPREAD_MARKER(fs);
     xrPREAD_PROP(fs, xrPID_TEXTURE, oT2_Name);
     xrPREAD_PROP(fs, xrPID_MATRIX, oT2_xform);
-    if (version >= 0x1) {
+    if (version >= 0x1)
+    {
         xrPREAD_PROP(fs, xrPID_BOOL, oBlend);
     }
 }
@@ -52,7 +50,8 @@ void CBlender_LmEbB::Load(IReader& fs, u16 version)
 void CBlender_LmEbB::Compile(CBlender_Compile& C)
 {
     IBlender::Compile(C);
-    if (C.bEditor) {
+    if (C.bEditor)
+    {
         C.PassBegin();
         {
             C.PassSET_ZB(TRUE, TRUE);

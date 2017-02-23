@@ -15,6 +15,6 @@ public:
     virtual void SetShader() = 0;
 };
 
-#endif  // DEBUG
+#endif // DEBUG
 
-#endif  //	ObjectSpaceRender_included
+#endif //	ObjectSpaceRender_included

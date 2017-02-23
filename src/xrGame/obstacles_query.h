@@ -60,4 +60,4 @@ public:
 
 #include "obstacles_query_inline.h"
 
-#endif  // OBSTACLES_QUERY_H
+#endif // OBSTACLES_QUERY_H

@@ -30,27 +30,33 @@ static const float camera_collision_character_gl_shift_y = 0.8f;
 static void cammera_shell_collide_callback_common(
     bool& do_collide, bool bo1, dContact& c, SGameMtl* material_1, SGameMtl* material_2)
 {
-    if (!do_collide) return;
+    if (!do_collide)
+        return;
     do_collide = false;
     SGameMtl* oposite_matrial = bo1 ? material_1 : material_2;
-    if (oposite_matrial->Flags.test(SGameMtl::flPassable)) return;
+    if (oposite_matrial->Flags.test(SGameMtl::flPassable))
+        return;
 
     dxGeomUserData* my_data = retrieveGeomUserData(bo1 ? c.geom.g1 : c.geom.g2);
     dxGeomUserData* oposite_data = retrieveGeomUserData(bo1 ? c.geom.g2 : c.geom.g1);
 
     VERIFY(my_data);
-    if (oposite_data && oposite_data->ph_ref_object == my_data->ph_ref_object) return;
-    if (c.geom.depth > camera_collision_sckin_depth / 2.f) cam_collided = true;
+    if (oposite_data && oposite_data->ph_ref_object == my_data->ph_ref_object)
+        return;
+    if (c.geom.depth > camera_collision_sckin_depth / 2.f)
+        cam_collided = true;
 
-    if (!cam_step) return;
+    if (!cam_step)
+        return;
     c.surface.mu = 0;
 
     dJointID contact_joint =
-        dJointCreateContactSpecial(0, ContactGroup, &c);  // dJointCreateContact(0, ContactGroup, &c);//
+        dJointCreateContactSpecial(0, ContactGroup, &c); // dJointCreateContact(0, ContactGroup, &c);//
     CPHObject* obj = (CPHObject*)my_data->callback_data;
     VERIFY(obj);
 #ifdef DEBUG
-    if (dbg_draw_camera_collision) debug_output().DBG_DrawContact(c);
+    if (dbg_draw_camera_collision)
+        debug_output().DBG_DrawContact(c);
 #endif
     obj->Island().DActiveIsland()->ConnectJoint(contact_joint);
 
@@ -83,7 +89,8 @@ static void cammera_shell_character_collide_callback(
     if (!oposite_data || !oposite_data->ph_object || oposite_data->ph_object->CastType() != CPHObject::tpCharacter)
         return;
 
-    if (!oposite_data->ph_ref_object || !(oposite_data->ph_ref_object->IsStalker())) return;
+    if (!oposite_data->ph_ref_object || !(oposite_data->ph_ref_object->IsStalker()))
+        return;
 
     do_collide = true;
     c.surface.soft_cfm = soft_cfm_for_controllers;
@@ -100,7 +107,8 @@ static void get_viewport_geom(Fvector& box, Fmatrix& form, const CCameraBase& ca
     form.k.set(camera.Direction());
     form.c.mad(camera.Position(), camera.Direction(), _viewport_near / 2.f);
 #ifdef DEBUG
-    if (!_valid(form)) {
+    if (!_valid(form))
+    {
         dump("form", form);
         dump("camera.Right()", camera.Right());
         dump("camera.Up()", camera.Up());
@@ -129,7 +137,7 @@ CPhysicsShell* create_camera_shell(IPhysicsShellHolder* actor)
     cyl.m_radius = 0.5f;
     // roote->add_Box(obb);
     CODEGeom* character_test_geom = smart_cast<CODEGeom*>(new CCylinderGeom(cyl));
-    character_test_geom->build(Fvector().set(0, 0, 0));  // roote->mass_Center()
+    character_test_geom->build(Fvector().set(0, 0, 0)); // roote->mass_Center()
     VERIFY(smart_cast<CPHElement*>(roote));
     CPHElement* eeroot = static_cast<CPHElement*>(roote);
 
@@ -165,7 +173,8 @@ void update_current_entity_camera_collision(IPhysicsShellHolder* l_actor)
     if (actor_camera_shell && actor_camera_shell->get_ElementByStoreOrder(0)->PhysicsRefObject() != l_actor)
         destroy_physics_shell(actor_camera_shell);
 
-    if (!actor_camera_shell) actor_camera_shell = create_camera_shell(l_actor);
+    if (!actor_camera_shell)
+        actor_camera_shell = create_camera_shell(l_actor);
 }
 
 void get_camera_box(Fvector& box_size, Fmatrix& xform, const CCameraBase& camera, float _viewport_near)
@@ -194,9 +203,9 @@ void set_camera_collision(const Fvector& box_size, const Fmatrix& xform, CPhysic
     // CBoxGeom* character_collision_geom = smart_cast<CBoxGeom*>( roote->geometry( 1 ) );
     CCylinderGeom* character_collision_geom = smart_cast<CCylinderGeom*>(roote->geometry(1));
     VERIFY(character_collision_geom);
-    const Fvector character_collision_box_size = Fvector().add(box_size,
-        Fvector().set(camera_collision_character_skin_depth, camera_collision_character_skin_depth,
-            camera_collision_character_skin_depth));
+    const Fvector character_collision_box_size =
+        Fvector().add(box_size, Fvector().set(camera_collision_character_skin_depth,
+                                    camera_collision_character_skin_depth, camera_collision_character_skin_depth));
     // character_collision_geom->set_size( character_collision_box_size );
     character_collision_geom->set_radius(character_collision_box_size.x);
     VERIFY(_valid(xform));
@@ -231,7 +240,8 @@ void do_collide_and_move(
     shell->EnableCollision();
     shell->CollideAll();
 
-    if (cam_collided) {
+    if (cam_collided)
+    {
 #ifdef DEBUG
 // debug_output().PH_DBG_Clear();
 // debug_output().DBG_OpenCashedDraw();
@@ -244,7 +254,8 @@ void do_collide_and_move(
             roote->setQuaternion(Fquaternion().set(xform));
             cam_collided = false;
             shell->PureStep();
-            if (!cam_collided) break;
+            if (!cam_collided)
+                break;
         }
         cam_step = false;
 #ifdef DEBUG
@@ -328,14 +339,16 @@ void collide_camera(CCameraBase& camera, float _viewport_near, IPhysicsShellHold
         return;
     set_camera_collision(box_size, xform, roote, box);
 #ifdef DEBUG
-    if (dbg_draw_camera_collision) {
+    if (dbg_draw_camera_collision)
+    {
         debug_output().DBG_DrawMatrix(Fmatrix().translate(xform.c), 1);
         shell->dbg_draw_geometry(1, color_xrgb(0, 0, 255));
     }
 #endif
     do_collide_and_move(xform, l_actor, shell, roote);
 #ifdef DEBUG
-    if (dbg_draw_camera_collision) shell->dbg_draw_geometry(1, color_xrgb(0, 255, 0));
+    if (dbg_draw_camera_collision)
+        shell->dbg_draw_geometry(1, color_xrgb(0, 255, 0));
 #endif
     roote->GetGlobalPositionDynamic(&camera.vPosition);
     camera.vPosition.mad(camera.Direction(), -_viewport_near / 2.f);

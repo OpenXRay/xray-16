@@ -10,7 +10,7 @@ public:
     {
         Fvector v;
         Fvector2 t;
-        u32 c_rgb_hemi;  // rgb,hemi
+        u32 c_rgb_hemi; // rgb,hemi
         u8 c_sun;
     };
     struct _face
@@ -36,7 +36,7 @@ public:
     float lod_factor;
 
 public:
-    virtual void Render(float LOD);  // LOD - Level Of Detail  [0.0f - min, 1.0f - max], Ignored
+    virtual void Render(float LOD); // LOD - Level Of Detail  [0.0f - min, 1.0f - max], Ignored
     virtual void Load(LPCSTR N, IReader* data, u32 dwFlags);
     virtual void Copy(dxRender_Visual* pFrom);
 };

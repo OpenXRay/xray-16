@@ -17,18 +17,10 @@ CShaderMain*& PUI = (CShaderMain*)UI;
 
 //---------------------------------------------------------------------------
 
-CShaderMain::CShaderMain()
-{
-    EPrefs = new CCustomPreferences();
-}
-
+CShaderMain::CShaderMain() { EPrefs = new CCustomPreferences(); }
 //---------------------------------------------------------------------------
 
-CShaderMain::~CShaderMain()
-{
-    xr_delete(EPrefs);
-}
-
+CShaderMain::~CShaderMain() { xr_delete(EPrefs); }
 //---------------------------------------------------------------------------
 
 CCommandVar CShaderTool::CommandSave(CCommandVar p1, CCommandVar p2)
@@ -118,14 +110,10 @@ void CShaderMain::RegisterCommands()
 
 char* CShaderMain::GetCaption()
 {
-    return (LPSTR)STools->CurrentToolsName();  // "shaders&materials";
+    return (LPSTR)STools->CurrentToolsName(); // "shaders&materials";
 }
 
-bool __fastcall CShaderMain::ApplyShortCut(WORD Key, TShiftState Shift)
-{
-    return inherited::ApplyShortCut(Key, Shift);
-}
-
+bool __fastcall CShaderMain::ApplyShortCut(WORD Key, TShiftState Shift) { return inherited::ApplyShortCut(Key, Shift); }
 //---------------------------------------------------------------------------
 
 bool __fastcall CShaderMain::ApplyGlobalShortCut(WORD Key, TShiftState Shift)
@@ -135,11 +123,7 @@ bool __fastcall CShaderMain::ApplyGlobalShortCut(WORD Key, TShiftState Shift)
 
 //---------------------------------------------------------------------------
 
-void CShaderMain::RealUpdateScene()
-{
-    inherited::RealUpdateScene();
-}
-
+void CShaderMain::RealUpdateScene() { inherited::RealUpdateScene(); }
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
@@ -148,7 +132,8 @@ void CShaderMain::RealUpdateScene()
 void CShaderMain::ResetStatus()
 {
     VERIFY(m_bReady);
-    if (fraBottomBar->paStatus->Caption != "") {
+    if (fraBottomBar->paStatus->Caption != "")
+    {
         fraBottomBar->paStatus->Caption = "";
         fraBottomBar->paStatus->Repaint();
     }
@@ -157,18 +142,16 @@ void CShaderMain::ResetStatus()
 void CShaderMain::SetStatus(LPSTR s, bool bOutLog)
 {
     VERIFY(m_bReady);
-    if (fraBottomBar->paStatus->Caption != s) {
+    if (fraBottomBar->paStatus->Caption != s)
+    {
         fraBottomBar->paStatus->Caption = s;
         fraBottomBar->paStatus->Repaint();
-        if (bOutLog && s && s[0]) ELog.Msg(mtInformation, s);
+        if (bOutLog && s && s[0])
+            ELog.Msg(mtInformation, s);
     }
 }
 
-void CShaderMain::ProgressDraw()
-{
-    fraBottomBar->RedrawBar();
-}
-
+void CShaderMain::ProgressDraw() { fraBottomBar->RedrawBar(); }
 //---------------------------------------------------------------------------
 void CShaderMain::OutCameraPos()
 {
@@ -205,15 +188,7 @@ void CShaderMain::OutGridSize()
 }
 
 //---------------------------------------------------------------------------
-void CShaderMain::OutInfo()
-{
-    fraBottomBar->paSel->Caption = Tools->GetInfo();
-}
-
+void CShaderMain::OutInfo() { fraBottomBar->paSel->Caption = Tools->GetInfo(); }
 //---------------------------------------------------------------------------
-void CShaderMain::RealQuit()
-{
-    frmMain->Close();
-}
-
+void CShaderMain::RealQuit() { frmMain->Close(); }
 //---------------------------------------------------------------------------

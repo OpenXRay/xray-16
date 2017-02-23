@@ -15,11 +15,9 @@ class CStatePsyDogHide : public CState<_Object>
 public:
     CStatePsyDogHide(_Object* obj) : inherited(obj) {}
     virtual ~CStatePsyDogHide() {}
-
     virtual void initialize();
     virtual void execute();
     virtual void remove_links(IGameObject* object) { inherited::remove_links(object); }
-
     virtual bool check_completion();
     virtual bool check_start_conditions();
 

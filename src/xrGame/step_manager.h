@@ -40,11 +40,9 @@ public:
 
     // process event
     virtual void event_on_step() {}
-
 protected:
     Fvector get_foot_position(ELegType leg_type);
     virtual bool is_on_ground() { return true; }
-
 private:
     void reload_foot_bones();
     void load_foot_bones(CInifile::Sect& data);

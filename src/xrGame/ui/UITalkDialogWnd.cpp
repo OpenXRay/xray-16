@@ -22,11 +22,7 @@ CUITalkDialogWnd::CUITalkDialogWnd() : m_pNameTextFont(NULL)
     m_ClickedQuestionID = "";
     mechanic_mode = false;
 }
-CUITalkDialogWnd::~CUITalkDialogWnd()
-{
-    xr_delete(m_uiXml);
-}
-
+CUITalkDialogWnd::~CUITalkDialogWnd() { xr_delete(m_uiXml); }
 void CUITalkDialogWnd::InitTalkDialogWnd()
 {
     m_uiXml = new CUIXml();
@@ -125,14 +121,11 @@ void CUITalkDialogWnd::OnQuestionClicked(CUIWindow* w, void*)
     GetMessageTarget()->SendMessage(this, TALK_DIALOG_QUESTION_CLICKED);
 }
 
-void CUITalkDialogWnd::OnExitClicked(CUIWindow* w, void*)
-{
-    m_pParent->StopTalk();
-}
-
+void CUITalkDialogWnd::OnExitClicked(CUIWindow* w, void*) { m_pParent->StopTalk(); }
 void CUITalkDialogWnd::OnTradeClicked(CUIWindow* w, void*)
 {
-    if (mechanic_mode) {
+    if (mechanic_mode)
+    {
         GetTop()->SendMessage(this, TALK_DIALOG_UPGRADE_BUTTON_CLICKED);
     }
     else
@@ -146,41 +139,31 @@ void CUITalkDialogWnd::OnUpgradeClicked(CUIWindow* w, void*)
     GetTop()->SendMessage(this, TALK_DIALOG_UPGRADE_BUTTON_CLICKED);
 }
 
-void CUITalkDialogWnd::SetTradeMode()
-{
-    OnTradeClicked(&UIToTradeButton, 0);
-}
-
+void CUITalkDialogWnd::SetTradeMode() { OnTradeClicked(&UIToTradeButton, 0); }
 //пересылаем сообщение родительскому окну для обработки
 //и фильтруем если оно пришло от нашего дочернего окна
-void CUITalkDialogWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
-{
-    CUIWndCallback::OnEvent(pWnd, msg, pData);
-}
-
+void CUITalkDialogWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData) { CUIWndCallback::OnEvent(pWnd, msg, pData); }
 void CUITalkDialogWnd::ClearAll()
 {
     UIAnswersList->Clear();
     ClearQuestions();
 }
 
-void CUITalkDialogWnd::ClearQuestions()
-{
-    UIQuestionsList->Clear();
-}
-
+void CUITalkDialogWnd::ClearQuestions() { UIQuestionsList->Clear(); }
 void CUITalkDialogWnd::AddQuestion(LPCSTR str, LPCSTR value, int number, bool b_finalizer)
 {
     CUIQuestionItem* itm = new CUIQuestionItem(m_uiXml, "question_item");
     itm->Init(value, str);
-    ++number;  // zero-based index
-    if (number <= 10) {
+    ++number; // zero-based index
+    if (number <= 10)
+    {
         string16 buff;
         xr_sprintf(buff, "%d.", (number == 10) ? 0 : number);
         itm->m_num_text->SetText(buff);
         itm->m_text->SetAccelerator(DIK_ESCAPE + number, 0);
     }
-    if (b_finalizer) {
+    if (b_finalizer)
+    {
         itm->m_text->SetAccelerator(kQUIT, 2);
         itm->m_text->SetAccelerator(kUSE, 3);
     }
@@ -241,7 +224,8 @@ void CUITalkDialogWnd::SetOsoznanieMode(bool b)
     //	UIDialogFrameTop.Show (!b);
 
     UIToTradeButton.Show(!b);
-    if (mechanic_mode) {
+    if (mechanic_mode)
+    {
         UIToTradeButton.m_hint_text = "ui_st_upgrade_hint";
         UIToTradeButton.TextItemControl()->SetTextST("ui_st_upgrade");
     }
@@ -257,11 +241,7 @@ void CUITalkDialogWnd::UpdateButtonsLayout(bool b_disable_break, bool trade_enab
     UIToTradeButton.Show(trade_enabled);
 }
 
-void CUIQuestionItem::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
-{
-    CUIWndCallback::OnEvent(pWnd, msg, pData);
-}
-
+void CUIQuestionItem::SendMessage(CUIWindow* pWnd, s16 msg, void* pData) { CUIWndCallback::OnEvent(pWnd, msg, pData); }
 CUIQuestionItem::CUIQuestionItem(CUIXml* xml_doc, LPCSTR path)
 {
     m_text = new CUI3tButton();

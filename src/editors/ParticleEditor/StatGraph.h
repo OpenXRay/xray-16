@@ -5,7 +5,7 @@
 //---------------------------------------------------------------------------
 class ENGINE_API CStatGraph : public pureRender
 {
-  public:
+public:
     enum EStyle
     {
         stBar,
@@ -16,7 +16,7 @@ class ENGINE_API CStatGraph : public pureRender
         stHor,
     };
 
-  protected:
+protected:
     struct SElement
     {
         u32 color;
@@ -37,7 +37,6 @@ class ENGINE_API CStatGraph : public pureRender
         ElementsDeq elements;
 
         SSubGraph(EStyle s) { style = s; };
-
         void SetStyle(EStyle s) { style = s; };
     };
 
@@ -66,7 +65,7 @@ class ENGINE_API CStatGraph : public pureRender
     DEFINE_DEQUE(SMarker, MarkersDeq, MarkersDeqIt);
     MarkersDeq m_Markers;
 
-  protected:
+protected:
     virtual void RenderBack();
 
     virtual void RenderBars(FVF::TL0uv** ppv, ElementsDeq* pelements);
@@ -75,7 +74,7 @@ class ENGINE_API CStatGraph : public pureRender
     //	virtual void	RenderPoints	( FVF::TL0uv** ppv, ElementsDeq* pelements );
     virtual void RenderMarkers(FVF::TL0uv** ppv, MarkersDeq* pmarkers);
 
-  public:
+public:
     CStatGraph();
     ~CStatGraph();
     virtual void OnRender();
@@ -87,7 +86,8 @@ class ENGINE_API CStatGraph : public pureRender
         void
         SetStyle(EStyle s, u32 SubGraphID = 0)
     {
-        if (SubGraphID >= subgraphs.size()) return;
+        if (SubGraphID >= subgraphs.size())
+            return;
         SubGraphVecIt it = subgraphs.begin() + SubGraphID;
         it->SetStyle(s);
     }
@@ -134,7 +134,8 @@ class ENGINE_API CStatGraph : public pureRender
         void
         AppendItem(float d, u32 clr, u32 SubGraphID = 0)
     {
-        if (SubGraphID >= subgraphs.size()) return;
+        if (SubGraphID >= subgraphs.size())
+            return;
 
         clamp(d, mn, mx);
 
@@ -174,7 +175,8 @@ class ENGINE_API CStatGraph : public pureRender
         void
         UpdateMarkerPos(u32 ID, float NewPos)
     {
-        if (ID >= m_Markers.size()) return;
+        if (ID >= m_Markers.size())
+            return;
         SMarker& pMarker = m_Markers[ID];
         pMarker.m_fPos = NewPos;
     };
@@ -192,7 +194,8 @@ class ENGINE_API CStatGraph : public pureRender
         void
         RemoveMarker(u32 ID)
     {
-        if (ID >= m_Markers.size()) return;
+        if (ID >= m_Markers.size())
+            return;
         m_Markers.erase(m_Markers.begin() + ID);
     }
 };

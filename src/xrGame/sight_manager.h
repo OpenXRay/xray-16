@@ -30,39 +30,39 @@ public:
         aiming_none = u32(0),
         aiming_weapon = u32(1),
         aiming_head = u32(2),
-    };  // enum
+    }; // enum
     enum animation_frame_type
     {
         animation_frame_none = u32(0),
         animation_frame_start = u32(1),
         animation_frame_end = u32(2),
-    };  // enum
+    }; // enum
 
 private:
     struct bone_parameters_base
     {
         Fmatrix m_rotation;
-    };  // struct bone_parameters_base
+    }; // struct bone_parameters_base
 
     struct bone_parameters : bone_parameters_base
     {
         Fmatrix m_rotation;
         float m_factor;
-    };  // struct bone_parameters
+    }; // struct bone_parameters
 
     struct parameters
     {
         bone_parameters m_spine;
         bone_parameters m_shoulder;
         bone_parameters m_head;
-    };  // struct parameters
+    }; // struct parameters
 
     struct parameters_base
     {
         bone_parameters_base m_spine;
         bone_parameters_base m_shoulder;
         bone_parameters_base m_head;
-    };  // struct parameters
+    }; // struct parameters
 
 private:
     parameters m_current;

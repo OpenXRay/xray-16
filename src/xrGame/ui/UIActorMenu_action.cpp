@@ -74,13 +74,15 @@ bool CUIActorMenu::OnItemDrop(CUICellItem* itm)
     InfoCurItem(NULL);
     CUIDragDropListEx* old_owner = itm->OwnerList();
     CUIDragDropListEx* new_owner = CUIDragDropListEx::m_drag_item->BackList();
-    if (old_owner == new_owner || !old_owner || !new_owner) {
+    if (old_owner == new_owner || !old_owner || !new_owner)
+    {
         return false;
     }
     EDDListType t_new = GetListType(new_owner);
     EDDListType t_old = GetListType(old_owner);
 
-    if (!AllowItemDrops(t_old, t_new)) {
+    if (!AllowItemDrops(t_old, t_new))
+    {
         Msg("incorrect action [%d]->[%d]", t_old, t_new);
         return true;
     }
@@ -88,9 +90,11 @@ bool CUIActorMenu::OnItemDrop(CUICellItem* itm)
     {
     case iTrashSlot:
     {
-        if (CurrentIItem()->IsQuestItem()) return true;
+        if (CurrentIItem()->IsQuestItem())
+            return true;
 
-        if (t_old == iQuickSlot) {
+        if (t_old == iQuickSlot)
+        {
             old_owner->RemoveItem(itm, false);
             return true;
         }
@@ -102,7 +106,8 @@ bool CUIActorMenu::OnItemDrop(CUICellItem* itm)
     {
         //.			if(GetSlotList(CurrentIItem()->GetSlot())==new_owner)
         u16 slot_to_place;
-        if (CanSetItemToList(CurrentIItem(), new_owner, slot_to_place)) ToSlot(itm, true, slot_to_place);
+        if (CanSetItemToList(CurrentIItem(), new_owner, slot_to_place))
+            ToSlot(itm, true, slot_to_place);
     }
     break;
     case iActorBag: { ToBag(itm, true);
@@ -116,13 +121,15 @@ bool CUIActorMenu::OnItemDrop(CUICellItem* itm)
     break;
     case iPartnerTrade:
     {
-        if (t_old != iPartnerTradeBag) return false;
+        if (t_old != iPartnerTradeBag)
+            return false;
         ToPartnerTrade(itm, true);
     }
     break;
     case iPartnerTradeBag:
     {
-        if (t_old != iPartnerTrade) return false;
+        if (t_old != iPartnerTrade)
+            return false;
         ToPartnerTradeBag(itm, true);
     }
     break;
@@ -145,7 +152,7 @@ bool CUIActorMenu::OnItemDrop(CUICellItem* itm)
 bool CUIActorMenu::OnItemStartDrag(CUICellItem* itm)
 {
     InfoCurItem(NULL);
-    return false;  // default behaviour
+    return false; // default behaviour
 }
 
 bool CUIActorMenu::OnItemDbClick(CUICellItem* itm)
@@ -166,7 +173,8 @@ bool CUIActorMenu::OnItemDbClick(CUICellItem* itm)
     }
     case iActorBag:
     {
-        if (m_currMenuMode == mmTrade) {
+        if (m_currMenuMode == mmTrade)
+        {
             ToActorTrade(itm, false);
             break;
         }
@@ -175,15 +183,19 @@ bool CUIActorMenu::OnItemDbClick(CUICellItem* itm)
             ToDeadBodyBag(itm, false);
             break;
         }
-        if (m_currMenuMode != mmUpgrade && TryUseItem(itm)) {
+        if (m_currMenuMode != mmUpgrade && TryUseItem(itm))
+        {
             break;
         }
-        if (TryActiveSlot(itm)) {
+        if (TryActiveSlot(itm))
+        {
             break;
         }
         PIItem iitem_to_place = (PIItem)itm->m_pData;
-        if (!ToSlot(itm, false, iitem_to_place->BaseSlot())) {
-            if (!ToBelt(itm, false)) {
+        if (!ToSlot(itm, false, iitem_to_place->BaseSlot()))
+        {
+            if (!ToBelt(itm, false))
+            {
                 ToSlot(itm, true, iitem_to_place->BaseSlot());
             }
         }
@@ -218,7 +230,7 @@ bool CUIActorMenu::OnItemDbClick(CUICellItem* itm)
     }
     break;
 
-    };  // switch
+    }; // switch
 
     UpdateItemsPlace();
     UpdateConditionProgressBars();
@@ -255,7 +267,8 @@ bool CUIActorMenu::OnItemFocusReceive(CUICellItem* itm)
 
 bool CUIActorMenu::OnItemFocusLost(CUICellItem* itm)
 {
-    if (itm) {
+    if (itm)
+    {
         itm->m_selected = false;
     }
     InfoCurItem(NULL);
@@ -266,17 +279,21 @@ bool CUIActorMenu::OnItemFocusLost(CUICellItem* itm)
 
 bool CUIActorMenu::OnItemFocusedUpdate(CUICellItem* itm)
 {
-    if (itm) {
+    if (itm)
+    {
         itm->m_selected = true;
-        if (m_highlight_clear) {
+        if (m_highlight_clear)
+        {
             set_highlight_item(itm);
         }
     }
     VERIFY(m_ItemInfo);
-    if (Device.dwTimeGlobal < itm->FocusReceiveTime() + m_ItemInfo->delay) {
-        return true;  // false
+    if (Device.dwTimeGlobal < itm->FocusReceiveTime() + m_ItemInfo->delay)
+    {
+        return true; // false
     }
-    if (CUIDragDropListEx::m_drag_item || m_UIPropertiesBox->IsShown() || !m_item_info_view) {
+    if (CUIDragDropListEx::m_drag_item || m_UIPropertiesBox->IsShown() || !m_item_info_view)
+    {
         return true;
     }
 
@@ -287,13 +304,14 @@ bool CUIActorMenu::OnItemFocusedUpdate(CUICellItem* itm)
 bool CUIActorMenu::OnMouseAction(float x, float y, EUIMessages mouse_action)
 {
     inherited::OnMouseAction(x, y, mouse_action);
-    return true;  // no click`s
+    return true; // no click`s
 }
 
 bool CUIActorMenu::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
     InfoCurItem(NULL);
-    if (is_binded(kDROP, dik)) {
+    if (is_binded(kDROP, dik))
+    {
         if (WINDOW_KEY_PRESSED == keyboard_action && CurrentIItem() && !CurrentIItem()->IsQuestItem() &&
             CurrentIItem()->parent_id() == m_pActorInvOwner->object_id())
         {
@@ -303,30 +321,37 @@ bool CUIActorMenu::OnKeyboardAction(int dik, EUIMessages keyboard_action)
         return true;
     }
 
-    if (is_binded(kSPRINT_TOGGLE, dik)) {
-        if (WINDOW_KEY_PRESSED == keyboard_action) {
+    if (is_binded(kSPRINT_TOGGLE, dik))
+    {
+        if (WINDOW_KEY_PRESSED == keyboard_action)
+        {
             OnPressUserKey();
         }
         return true;
     }
 
-    if (is_binded(kUSE, dik) || is_binded(kINVENTORY, dik)) {
-        if (WINDOW_KEY_PRESSED == keyboard_action) {
+    if (is_binded(kUSE, dik) || is_binded(kINVENTORY, dik))
+    {
+        if (WINDOW_KEY_PRESSED == keyboard_action)
+        {
             g_btnHint->Discard();
             HideDialog();
         }
         return true;
     }
 
-    if (is_binded(kQUIT, dik)) {
-        if (WINDOW_KEY_PRESSED == keyboard_action) {
+    if (is_binded(kQUIT, dik))
+    {
+        if (WINDOW_KEY_PRESSED == keyboard_action)
+        {
             g_btnHint->Discard();
             HideDialog();
         }
         return true;
     }
 
-    if (inherited::OnKeyboardAction(dik, keyboard_action)) return true;
+    if (inherited::OnKeyboardAction(dik, keyboard_action))
+        return true;
 
     return false;
 }
@@ -360,7 +385,8 @@ void CUIActorMenu::OnMesBoxYes(CUIWindow*, void*)
     case mmInventory: break;
     case mmTrade: break;
     case mmUpgrade:
-        if (m_repair_mode) {
+        if (m_repair_mode)
+        {
             RepairEffect_CurItem();
             m_repair_mode = false;
         }

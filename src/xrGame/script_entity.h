@@ -113,7 +113,6 @@ public:
 
     void set_script_capture(bool val = true) { m_can_capture = val; }
     bool can_script_capture() { return m_can_capture; }
-
 public:
     IC CGameObject& object() const;
 };

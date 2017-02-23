@@ -35,15 +35,12 @@ CAI_Dog::CAI_Dog()
     //	com_man().add_ability(ControlCom::eControlMeleeJump);
 }
 
-CAI_Dog::~CAI_Dog()
-{
-    xr_delete(StateMan);
-}
-
+CAI_Dog::~CAI_Dog() { xr_delete(StateMan); }
 void CAI_Dog::Load(LPCSTR section)
 {
     inherited::Load(section);
-    if (pSettings->line_exist(section, "anim_factor")) {
+    if (pSettings->line_exist(section, "anim_factor"))
+    {
         m_anim_factor = pSettings->r_u32(section, "anim_factor");
     }
     else
@@ -51,7 +48,8 @@ void CAI_Dog::Load(LPCSTR section)
         m_anim_factor = 50;
     }
 
-    if (pSettings->line_exist(section, "corpse_use_timeout")) {
+    if (pSettings->line_exist(section, "corpse_use_timeout"))
+    {
         m_corpse_use_timeout = 1000 * pSettings->r_u32(section, "corpse_use_timeout");
     }
     else
@@ -59,7 +57,8 @@ void CAI_Dog::Load(LPCSTR section)
         m_corpse_use_timeout = 5000;
     }
 
-    if (pSettings->line_exist(section, "min_sleep_time")) {
+    if (pSettings->line_exist(section, "min_sleep_time"))
+    {
         m_min_sleep_time = 1000 * pSettings->r_u32(section, "min_sleep_time");
     }
     else
@@ -67,7 +66,8 @@ void CAI_Dog::Load(LPCSTR section)
         m_min_sleep_time = 5000;
     }
 
-    if (pSettings->line_exist(section, "min_life_time")) {
+    if (pSettings->line_exist(section, "min_life_time"))
+    {
         m_min_life_time = 1000 * pSettings->r_u32(section, "min_life_time");
     }
     else
@@ -75,7 +75,8 @@ void CAI_Dog::Load(LPCSTR section)
         m_min_life_time = 10000;
     }
 
-    if (pSettings->line_exist(section, "drive_out_time")) {
+    if (pSettings->line_exist(section, "drive_out_time"))
+    {
         m_drive_out_time = 1000 * pSettings->r_u32(section, "drive_out_time");
     }
     else
@@ -83,15 +84,18 @@ void CAI_Dog::Load(LPCSTR section)
         m_drive_out_time = 10000;
     }
 
-    if (pSettings->line_exist(section, "min_move_dist")) {
+    if (pSettings->line_exist(section, "min_move_dist"))
+    {
         min_move_dist = pSettings->r_u32(section, "min_move_dist");
         ;
     }
-    if (pSettings->line_exist(section, "max_move_dist")) {
+    if (pSettings->line_exist(section, "max_move_dist"))
+    {
         max_move_dist = pSettings->r_u32(section, "max_move_dist");
         ;
     }
-    if (max_move_dist < min_move_dist) {
+    if (max_move_dist < min_move_dist)
+    {
         min_move_dist = u32(5);
         max_move_dist = u32(7);
     }
@@ -204,7 +208,8 @@ void CAI_Dog::reinit()
 {
     inherited::reinit();
 
-    if (CCustomMonster::use_simplified_visual()) return;
+    if (CCustomMonster::use_simplified_visual())
+        return;
 
     com_man().add_rotation_jump_data("1", "2", "3", "4", PI_DIV_2);
     com_man().add_rotation_jump_data("5", "6", "7", "8", deg(179));
@@ -226,11 +231,13 @@ void CAI_Dog::UpdateCL()
 {
     inherited::UpdateCL();
 
-    if (!detail::object_exists_in_alife_registry(ID())) {
+    if (!detail::object_exists_in_alife_registry(ID()))
+    {
         return;
     }
 
-    if (b_anim_end) {
+    if (b_anim_end)
+    {
         b_anim_end = false;
         StateMan->update();
     }
@@ -240,7 +247,8 @@ bool CAI_Dog::is_night()
 {
     u32 year = 0, month = 0, day = 0, hours = 0, mins = 0, secs = 0, milisecs = 0;
     split_time(Level().GetGameTime(), year, month, day, hours, mins, secs, milisecs);
-    if (hours <= 6 || hours >= 21) {
+    if (hours <= 6 || hours >= 21)
+    {
         return true;
     }
     return false;
@@ -248,27 +256,28 @@ bool CAI_Dog::is_night()
 
 void CAI_Dog::CheckSpecParams(u32 spec_params)
 {
-    if ((spec_params & ASP_CHECK_CORPSE) == ASP_CHECK_CORPSE) {
+    if ((spec_params & ASP_CHECK_CORPSE) == ASP_CHECK_CORPSE)
+    {
         com_man().seq_run(anim().get_motion_id(eAnimCheckCorpse));
     }
 
-    if ((spec_params & ASP_THREATEN) == ASP_THREATEN) {
+    if ((spec_params & ASP_THREATEN) == ASP_THREATEN)
+    {
         anim().SetCurAnim(eAnimThreaten);
     }
-    if ((spec_params & ASP_MOVE_SMELLING) == ASP_MOVE_SMELLING) {
+    if ((spec_params & ASP_MOVE_SMELLING) == ASP_MOVE_SMELLING)
+    {
         anim().SetCurAnim(eAnimHomeWalkGrowl);
     }
 }
 
-u32 CAI_Dog::get_number_animation()
-{
-    return current_anim;
-}
-
+u32 CAI_Dog::get_number_animation() { return current_anim; }
 u32 CAI_Dog::random_anim()
 {
-    if (m_anim_factor > u32(Random.randI(100))) {
-        if (is_night()) return 5;
+    if (m_anim_factor > u32(Random.randI(100)))
+    {
+        if (is_night())
+            return 5;
         return 4;
     }
     return Random.randI(4);
@@ -283,17 +292,22 @@ void CAI_Dog::set_current_animation(u32 curr_anim)
 
 bool CAI_Dog::check_start_conditions(ControlCom::EControlType type)
 {
-    if (type == ControlCom::eControlJump) {
+    if (type == ControlCom::eControlJump)
+    {
         // Lain: if leader or enemy is higher - can jump
-        if (const CEntityAlive* enemy = EnemyMan.get_enemy()) {
-            if (can_use_agressive_jump(enemy)) {
+        if (const CEntityAlive* enemy = EnemyMan.get_enemy())
+        {
+            if (can_use_agressive_jump(enemy))
+            {
                 // true, probably...
                 return inherited::check_start_conditions(type);
             }
         }
 
-        if (CMonsterSquad* squad = monster_squad().get_squad(this)) {
-            if (squad->GetLeader() != this) {
+        if (CMonsterSquad* squad = monster_squad().get_squad(this))
+        {
+            if (squad->GetLeader() != this)
+            {
                 return false;
             }
         }
@@ -305,7 +319,8 @@ void CAI_Dog::start_animation()
 {
     // Lain: check if animation is captured
     CControl_Com* capturer = control().get_capturer(ControlCom::eControlAnimation);
-    if (capturer && capturer->ced() != NULL) {
+    if (capturer && capturer->ced() != NULL)
+    {
         return;
     }
 
@@ -330,54 +345,46 @@ void CAI_Dog::anim_end_reinit()
     com_man().script_release(ControlCom::eControlAnimation);
 }
 
-bool CAI_Dog::get_custom_anim_state()
-{
-    return b_state_anim;
-}
-
-void CAI_Dog::set_custom_anim_state(bool b_state_animation)
-{
-    b_state_anim = b_state_animation;
-}
-
+bool CAI_Dog::get_custom_anim_state() { return b_state_anim; }
+void CAI_Dog::set_custom_anim_state(bool b_state_animation) { b_state_anim = b_state_animation; }
 LPCSTR CAI_Dog::get_current_animation()
 {
     switch (current_anim)
     {
     case 1:
-        return "stand_idle_smelling_up_0";  //Нюхает вверх
+        return "stand_idle_smelling_up_0"; //Нюхает вверх
     case 2:
-        return "stand_idle_smelling_down_0";  //Нюхает вниз
+        return "stand_idle_smelling_down_0"; //Нюхает вниз
     case 3:
-        return "stand_idle_smelling_look_around_0";  //Нюхает по кругу
+        return "stand_idle_smelling_look_around_0"; //Нюхает по кругу
     case 4:
-        return "stand_idle_dig_ground_0";  //Обнюховает и роет землю
+        return "stand_idle_dig_ground_0"; //Обнюховает и роет землю
     case 5:
-        return "stand_idle_howl_0";  //Воет
+        return "stand_idle_howl_0"; //Воет
     case 6:
-        return "stand_growl_idle_0";  //Рычит стоя
+        return "stand_growl_idle_0"; //Рычит стоя
     case 7:
-        return "stand_idle_shake_0";  //Отряхивается !!!!!
+        return "stand_idle_shake_0"; //Отряхивается !!!!!
     case 8:
-        return "stand_sit_down_0";  //Садиться
+        return "stand_sit_down_0"; //Садиться
     case 9:
-        return "sit_idle_0";  // Cидит
+        return "sit_idle_0"; // Cидит
     case 10:
-        return "sit_idle_1";  //Чухается сидя
+        return "sit_idle_1"; //Чухается сидя
     case 11:
-        return "sit_idle_2";  //Оглядывается сидя
+        return "sit_idle_2"; //Оглядывается сидя
     case 12:
-        return "sit_stand_up_0";  //Встает
+        return "sit_stand_up_0"; //Встает
     case 13:
-        return "sit_lie_down_0";  //Ложится
+        return "sit_lie_down_0"; //Ложится
     case 14:
-        return "lie_to_sit_0";  //Подымается
+        return "lie_to_sit_0"; //Подымается
     case 15:
-        return "stand_eat_0";  //Отрывает куски
+        return "stand_eat_0"; //Отрывает куски
     case 16:
-        return "stand_threaten_0";  //Лает
+        return "stand_threaten_0"; //Лает
     default:
-        return "stand_idle_1";  //Нюхает вперед
+        return "stand_idle_1"; //Нюхает вперед
     }
 }
 
@@ -405,8 +412,10 @@ u32 CAI_Dog::get_attack_rebuild_time()
 bool CAI_Dog::can_use_agressive_jump(const IGameObject* enemy)
 {
     float delta_y = 0.8f;
-    if (enemy == Actor()) {
-        if (Actor()->is_jump()) {
+    if (enemy == Actor())
+    {
+        if (Actor()->is_jump())
+        {
             delta_y += 0.8f;
         }
     }

@@ -23,11 +23,7 @@ ConvolutionKernel::ConvolutionKernel()
     m_nNumElements = 0;
 }
 
-ConvolutionKernel::~ConvolutionKernel()
-{
-    Free();
-}
-
+ConvolutionKernel::~ConvolutionKernel() { Free(); }
 ConvolutionKernel& ConvolutionKernel::operator=(const ConvolutionKernel& src)
 {
     Initialize(src.m_nNumElements);
@@ -49,7 +45,8 @@ HRESULT ConvolutionKernel::Initialize(int numElements)
 
 HRESULT ConvolutionKernel::Free()
 {
-    if (m_pElements != NULL) {
+    if (m_pElements != NULL)
+    {
         delete[] m_pElements;
         m_pElements = NULL;
     }
@@ -62,7 +59,8 @@ HRESULT ConvolutionKernel::Free()
 void ConvolutionKernel::SetElements(int numElements, ConvolutionKernelElement* pElements)
 {
     assert(pElements != NULL);
-    if (numElements != m_nNumElements) {
+    if (numElements != m_nNumElements)
+    {
         HRESULT hr = Initialize(numElements);
         ASSERT_IF_FAILED(hr);
     }
@@ -93,10 +91,14 @@ void ConvolutionKernel::GetKernelExtents(int* xlow, int* xhigh, int* ylow, int* 
     *ylow = *yhigh = m_pElements[0].y_offset;
     for (int i = 1; i < m_nNumElements; i++)
     {
-        if (m_pElements[i].x_offset < *xlow) *xlow = m_pElements[i].x_offset;
-        if (m_pElements[i].x_offset > *xhigh) *xhigh = m_pElements[i].x_offset;
-        if (m_pElements[i].y_offset < *ylow) *ylow = m_pElements[i].y_offset;
-        if (m_pElements[i].y_offset > *yhigh) *yhigh = m_pElements[i].y_offset;
+        if (m_pElements[i].x_offset < *xlow)
+            *xlow = m_pElements[i].x_offset;
+        if (m_pElements[i].x_offset > *xhigh)
+            *xhigh = m_pElements[i].x_offset;
+        if (m_pElements[i].y_offset < *ylow)
+            *ylow = m_pElements[i].y_offset;
+        if (m_pElements[i].y_offset > *yhigh)
+            *yhigh = m_pElements[i].y_offset;
     }
 }
 
@@ -107,11 +109,7 @@ Convolver::Convolver() : m_BorderedImage()
     m_nNumKernels = NULL;
 }
 
-Convolver::~Convolver()
-{
-    Free();
-}
-
+Convolver::~Convolver() { Free(); }
 HRESULT Convolver::Free()
 {
     SAFE_ARRAY_DELETE(m_pKernels);
@@ -138,10 +136,14 @@ HRESULT Convolver::Initialize(NVI_Image** hSrcImage, const ConvolutionKernel* pK
         m_pKernels[n] = pKernels[n];
         int xlow, xhigh, ylow, yhigh;
         m_pKernels[n].GetKernelExtents(&xlow, &xhigh, &ylow, &yhigh);
-        if (xlow < maxKernSize.left) maxKernSize.left = xlow;
-        if (ylow < maxKernSize.bottom) maxKernSize.bottom = ylow;
-        if (xhigh > maxKernSize.right) maxKernSize.right = xhigh;
-        if (yhigh > maxKernSize.top) maxKernSize.top = yhigh;
+        if (xlow < maxKernSize.left)
+            maxKernSize.left = xlow;
+        if (ylow < maxKernSize.bottom)
+            maxKernSize.bottom = ylow;
+        if (xhigh > maxKernSize.right)
+            maxKernSize.right = xhigh;
+        if (yhigh > maxKernSize.top)
+            maxKernSize.top = yhigh;
     }
     // Initialize allocated the bordered image & copies from source
     m_BorderedImage.Initialize(hSrcImage, &maxKernSize, wrap);

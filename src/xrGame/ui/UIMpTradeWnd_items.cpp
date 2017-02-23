@@ -17,11 +17,7 @@ extern "C" void __cdecl xrFactory_Destroy(IFactoryObject* O);
 
 CUICellItem* create_cell_item(CInventoryItem* itm);
 
-SBuyItemInfo::SBuyItemInfo()
-{
-    m_item_state = e_undefined;
-}
-
+SBuyItemInfo::SBuyItemInfo() { m_item_state = e_undefined; }
 SBuyItemInfo::~SBuyItemInfo()
 {
     CInventoryItem* iitem = (CInventoryItem*)m_cell_item->m_pData;
@@ -31,7 +27,8 @@ SBuyItemInfo::~SBuyItemInfo()
 
 void SBuyItemInfo::SetState(const EItmState& s)
 {
-    if (s == e_undefined) {
+    if (s == e_undefined)
+    {
         m_item_state = s;
         return;
     }
@@ -94,7 +91,8 @@ CInventoryItem* CUIMpTradeWnd::CreateItem_internal(const shared_str& name_sect)
 SBuyItemInfo* CUIMpTradeWnd::CreateItem(const shared_str& name_sect, SBuyItemInfo::EItmState type, bool find_if_exist)
 {
     SBuyItemInfo* iinfo = (find_if_exist) ? FindItem(name_sect, type) : NULL;
-    if (iinfo) return iinfo;
+    if (iinfo)
+        return iinfo;
 
     iinfo = new SBuyItemInfo();
     m_all_items.push_back(iinfo);
@@ -110,7 +108,6 @@ struct state_eq
     SBuyItemInfo::EItmState m_state;
 
     state_eq(SBuyItemInfo::EItmState state) : m_state(state) {}
-
     bool operator()(SBuyItemInfo* itm) { return (m_state == itm->GetState()); }
 };
 
@@ -129,7 +126,8 @@ SBuyItemInfo* CUIMpTradeWnd::FindItem(const shared_str& name_sect, SBuyItemInfo:
     for (; it != it_e; ++it)
     {
         SBuyItemInfo* pitm = *it;
-        if (pitm->m_name_sect == name_sect && pitm->GetState() == type) return pitm;
+        if (pitm->m_name_sect == name_sect && pitm->GetState() == type)
+            return pitm;
     }
     return NULL;
 }
@@ -142,7 +140,8 @@ SBuyItemInfo* CUIMpTradeWnd::FindItem(CUICellItem* item)
     for (; it != it_e; ++it)
     {
         SBuyItemInfo* pitm = *it;
-        if (pitm->m_cell_item == item) return pitm;
+        if (pitm->m_cell_item == item)
+            return pitm;
     }
     R_ASSERT2(0, "buy menu data corruption. cant find corresponding SBuyItemInfo* for CellItem");
     return NULL;
@@ -171,16 +170,20 @@ void CUIMpTradeWnd::DeleteHelperItems(CUIDragDropListEx* list)
     {
         SBuyItemInfo* item = *it;
 
-        if (item->m_cell_item->OwnerList() != list) {
+        if (item->m_cell_item->OwnerList() != list)
+        {
             continue;
         }
 
-        if (item->GetState() != SBuyItemInfo::e_bought && item->GetState() != SBuyItemInfo::e_own) {
+        if (item->GetState() != SBuyItemInfo::e_bought && item->GetState() != SBuyItemInfo::e_own)
+        {
             continue;
         }
 
-        if (item->m_cell_item->IsHelper()) {
-            if (std::find(to_sell.begin(), to_sell.end(), item) == to_sell.end()) {
+        if (item->m_cell_item->IsHelper())
+        {
+            if (std::find(to_sell.begin(), to_sell.end(), item) == to_sell.end())
+            {
                 to_sell.push_back(item);
             }
         }
@@ -210,7 +213,8 @@ void CUIMpTradeWnd::CreateHelperItems(xr_vector<shared_str>& ammo_types)
     for (xr_vector<shared_str>::iterator it = ammo_types.begin(); it != ammo_types.end(); ++it)
     {
         const shared_str& ammo_name = *it;
-        if (!m_store_hierarchy->FindItem(ammo_name)) {
+        if (!m_store_hierarchy->FindItem(ammo_name))
+        {
             continue;
         }
 
@@ -228,11 +232,13 @@ void CUIMpTradeWnd::CreateHelperItems(CUIDragDropListEx* list, const CStoreHiera
         shared_str item_name = *it;
         CUIDragDropListEx* match_list = GetMatchedListForItem(item_name);
 
-        if (match_list == list) {
+        if (match_list == list)
+        {
             SBuyItemInfo* new_item = CreateItem(item_name, SBuyItemInfo::e_undefined, false);
 
             CUIInventoryCellItem* inventory_cell_item;
-            if ((inventory_cell_item = dynamic_cast<CUIInventoryCellItem*>(new_item->m_cell_item)) != NULL) {
+            if ((inventory_cell_item = dynamic_cast<CUIInventoryCellItem*>(new_item->m_cell_item)) != NULL)
+            {
                 inventory_cell_item->SetIsHelper(true);
                 inventory_cell_item->UpdateItemText();
 
@@ -252,7 +258,8 @@ void CUIMpTradeWnd::CreateHelperItems(CUIDragDropListEx* list)
 {
     CUIDragDropListEx* parent_list = NULL;
 
-    if (list == m_list[e_pistol_ammo]) {
+    if (list == m_list[e_pistol_ammo])
+    {
         parent_list = m_list[e_pistol];
     }
     else if (list == m_list[e_rifle_ammo])
@@ -260,13 +267,15 @@ void CUIMpTradeWnd::CreateHelperItems(CUIDragDropListEx* list)
         parent_list = m_list[e_rifle];
     }
 
-    if (list == m_list[e_medkit] || list == m_list[e_granade]) {
+    if (list == m_list[e_medkit] || list == m_list[e_granade])
+    {
         CreateHelperItems(list, &m_store_hierarchy->GetRoot());
         return;
     }
 
     VERIFY(parent_list);
-    if (!parent_list->ItemsCount()) {
+    if (!parent_list->ItemsCount())
+    {
         return;
     }
 
@@ -276,8 +285,10 @@ void CUIMpTradeWnd::CreateHelperItems(CUIDragDropListEx* list)
 
     CreateHelperItems(wpn->m_ammoTypes);
 
-    if (CWeaponMagazinedWGrenade* wpn2 = smart_cast<CWeaponMagazinedWGrenade*>(parent_item)) {
-        if (wpn2->IsGrenadeLauncherAttached()) {
+    if (CWeaponMagazinedWGrenade* wpn2 = smart_cast<CWeaponMagazinedWGrenade*>(parent_item))
+    {
+        if (wpn2->IsGrenadeLauncherAttached())
+        {
             CreateHelperItems(wpn2->m_ammoTypes2);
         }
     }
@@ -293,7 +304,8 @@ void CUIMpTradeWnd::UpdateCorrespondingItemsForList(CUIDragDropListEx* _list)
     else if (_list == m_list[e_rifle])
         dependent_list = m_list[e_rifle_ammo];
 
-    if (!dependent_list) return;
+    if (!dependent_list)
+        return;
 
     DeleteHelperItems(dependent_list);
 
@@ -309,7 +321,8 @@ void CUIMpTradeWnd::UpdateCorrespondingItemsForList(CUIDragDropListEx* _list)
 
     CreateHelperItems(dependent_list);
 
-    if (_list->ItemsCount() != 0) {
+    if (_list->ItemsCount() != 0)
+    {
         R_ASSERT(_list->ItemsCount() == 1);
 
         CInventoryItem* main_item = (CInventoryItem*)_list->GetItemIdx(0)->m_pData;
@@ -322,7 +335,8 @@ void CUIMpTradeWnd::UpdateCorrespondingItemsForList(CUIDragDropListEx* _list)
                 CUICellItem* ci = bag_list->GetItemIdx(idx);
                 SBuyItemInfo* iinfo = FindItem(ci);
 
-                if (main_item->IsNecessaryItem(iinfo->m_name_sect)) {
+                if (main_item->IsNecessaryItem(iinfo->m_name_sect))
+                {
                     CUICellItem* ci2 = bag_list->RemoveItem(ci, false);
                     dependent_list->SetItem(ci2);
                     goto _l1;
@@ -339,7 +353,8 @@ void CUIMpTradeWnd::UpdateCorrespondingItemsForList(CUIDragDropListEx* _list)
         SBuyItemInfo* bi = *(_curr);
 
         CUIDragDropListEx* _owner_list = bi->m_cell_item->OwnerList();
-        if (_owner_list != bag_list) {
+        if (_owner_list != bag_list)
+        {
             _tmp_list.erase(_curr);
             continue;
         }
@@ -355,12 +370,14 @@ void CUIMpTradeWnd::UpdateCorrespondingItemsForList(CUIDragDropListEx* _list)
 
             bNecessary = _ii->IsNecessaryItem(bi->m_name_sect);
 
-            if (bNecessary) {
+            if (bNecessary)
+            {
                 _tmp_list.erase(_curr);
                 break;
             }
         }
-        if (!bNecessary) {
+        if (!bNecessary)
+        {
             // sell
             SBuyItemInfo* res_info = NULL;
             TryToSellItem(bi, true, res_info);
@@ -404,7 +421,8 @@ struct eq_name_state_addon_comparer
     }
     bool operator()(SBuyItemInfo* info)
     {
-        if ((info->m_name_sect == m_name) && (info->GetState() == m_state)) {
+        if ((info->m_name_sect == m_name) && (info->GetState() == m_state))
+        {
             return GetItemAddonsState_ext(info) == m_addons;
         }
         else
@@ -422,7 +440,8 @@ struct eq_group_state_comparer
     }
     bool operator()(SBuyItemInfo* info)
     {
-        if (!info->m_cell_item->IsHelper() && (info->GetState() == m_state)) {
+        if (!info->m_cell_item->IsHelper() && (info->GetState() == m_state))
+        {
             const shared_str& _grp = g_mp_restrictions.GetItemGroup(info->m_name_sect);
             return (_grp == m_group);
         }
@@ -471,16 +490,16 @@ const preset_items& CUIMpTradeWnd::GetPreset(ETradePreset idx)
 };
 
 u32 _list_prio[] = {
-    6,   //	e_pistol
-    4,   //	e_pistol_ammo
-    7,   //	e_rifle
-    5,   //	e_rifle_ammo
-    10,  //	e_outfit
-    9,   //	e_medkit
-    8,   //	e_granade
-    3,   //	e_others
-    2,   //	e_player_bag
-    0,   //	e_shop
+    6, //	e_pistol
+    4, //	e_pistol_ammo
+    7, //	e_rifle
+    5, //	e_rifle_ammo
+    10, //	e_outfit
+    9, //	e_medkit
+    8, //	e_granade
+    3, //	e_others
+    2, //	e_player_bag
+    0, //	e_shop
     0, 0, 0, 0,
 };
 
@@ -509,11 +528,13 @@ struct preset_eq
 
 void CUIMpTradeWnd::StorePreset(ETradePreset idx, bool bSilent, bool check_allowed_items, bool flush_helpers)
 {
-    if (flush_helpers) {
+    if (flush_helpers)
+    {
         DeleteHelperItems();
     }
 
-    if (!bSilent) {
+    if (!bSilent)
+    {
         string512 buff;
         xr_sprintf(buff, "%s [%d]", CStringTable().translate("ui_st_preset_stored_to").c_str(), idx);
         SetInfoString(buff);
@@ -526,23 +547,29 @@ void CUIMpTradeWnd::StorePreset(ETradePreset idx, bool bSilent, bool check_allow
     for (; it != it_e; ++it)
     {
         SBuyItemInfo* iinfo = *it;
-        if (!(iinfo->GetState() == SBuyItemInfo::e_bought || iinfo->GetState() == SBuyItemInfo::e_own)) continue;
+        if (!(iinfo->GetState() == SBuyItemInfo::e_bought || iinfo->GetState() == SBuyItemInfo::e_own))
+            continue;
 
-        if (iinfo->m_cell_item->IsHelper()) {
+        if (iinfo->m_cell_item->IsHelper())
+        {
             continue;
         }
 
         u8 addon_state = GetItemAddonsState_ext(iinfo);
 
         preset_items::iterator fit = std::find_if(v.begin(), v.end(), preset_eq(iinfo->m_name_sect, addon_state));
-        if (fit != v.end()) continue;
+        if (fit != v.end())
+            continue;
 
         u32 cnt = GetItemCount(iinfo->m_name_sect, SBuyItemInfo::e_bought, addon_state);
         cnt += GetItemCount(iinfo->m_name_sect, SBuyItemInfo::e_own, addon_state);
-        if (0 == cnt) continue;
+        if (0 == cnt)
+            continue;
 
-        if (check_allowed_items) {
-            if (NULL == m_store_hierarchy->FindItem(iinfo->m_name_sect, 0)) continue;
+        if (check_allowed_items)
+        {
+            if (NULL == m_store_hierarchy->FindItem(iinfo->m_name_sect, 0))
+                continue;
         }
         v.resize(v.size() + 1);
         _preset_item& _one = v.back();
@@ -550,16 +577,20 @@ void CUIMpTradeWnd::StorePreset(ETradePreset idx, bool bSilent, bool check_allow
         _one.count = cnt;
         _one.addon_state = addon_state;
 
-        if (addon_state & at_scope) _one.addon_names[0] = GetAddonNameSect(iinfo, at_scope);
+        if (addon_state & at_scope)
+            _one.addon_names[0] = GetAddonNameSect(iinfo, at_scope);
 
-        if (addon_state & at_glauncher) _one.addon_names[1] = GetAddonNameSect(iinfo, at_glauncher);
+        if (addon_state & at_glauncher)
+            _one.addon_names[1] = GetAddonNameSect(iinfo, at_glauncher);
 
-        if (addon_state & at_silencer) _one.addon_names[2] = GetAddonNameSect(iinfo, at_silencer);
+        if (addon_state & at_silencer)
+            _one.addon_names[2] = GetAddonNameSect(iinfo, at_silencer);
     }
 
     std::sort(v.begin(), v.end(), preset_sorter(m_item_mngr));
 
-    if (flush_helpers) {
+    if (flush_helpers)
+    {
         UpdateHelperItems();
     }
 }
@@ -582,23 +613,27 @@ void CUIMpTradeWnd::ApplyPreset(ETradePreset idx)
             SBuyItemInfo* pitem = CreateItem(_one.sect_name, SBuyItemInfo::e_undefined, false);
 
             bool b_res = TryToBuyItem(pitem, bf_normal, NULL);
-            if (!b_res) {
+            if (!b_res)
+            {
                 DestroyItem(pitem);
             }
             else
             {
-                if (_one.addon_state) {
+                if (_one.addon_state)
+                {
                     for (u32 i = 0; i < 3; ++i)
                     {
                         item_addon_type at = (i == 0) ? at_scope : ((i == 1) ? at_glauncher : at_silencer);
 
-                        if (!(_one.addon_state & at)) continue;
+                        if (!(_one.addon_state & at))
+                            continue;
 
                         shared_str addon_name = GetAddonNameSect(pitem, at);
 
                         SBuyItemInfo* addon_item = CreateItem(addon_name, SBuyItemInfo::e_undefined, false);
                         bool b_res_addon = TryToBuyItem(addon_item, bf_normal, pitem);
-                        if (!b_res_addon) DestroyItem(addon_item);
+                        if (!b_res_addon)
+                            DestroyItem(addon_item);
                     }
                 }
             }
@@ -623,29 +658,33 @@ void CUIMpTradeWnd::CleanUserItems()
         do
         {
             iinfo = FindItem(_state);
-            if (iinfo) {
+            if (iinfo)
+            {
                 while (iinfo->m_cell_item->ChildsCount())
                 {
                     CUICellItem* iii = iinfo->m_cell_item->PopChild(NULL);
                     SBuyItemInfo* iinfo_sub = FindItem(iii);
                     R_ASSERT2(iinfo_sub->GetState() == _state || iinfo_sub->GetState() == SBuyItemInfo::e_shop ||
-                                  iinfo_sub->GetState() == SBuyItemInfo::e_own,
+                            iinfo_sub->GetState() == SBuyItemInfo::e_own,
                         _state_names[_state]);
                 }
 
-                if (IsAddonAttached(iinfo, at_scope)) {
+                if (IsAddonAttached(iinfo, at_scope))
+                {
                     SBuyItemInfo* detached_addon = DetachAddon(iinfo, at_scope);
                     detached_addon->SetState(SBuyItemInfo::e_undefined);
                     detached_addon->SetState(SBuyItemInfo::e_shop);
                     detached_addon->m_cell_item->SetOwnerList(NULL);
                 }
-                if (IsAddonAttached(iinfo, at_silencer)) {
+                if (IsAddonAttached(iinfo, at_silencer))
+                {
                     SBuyItemInfo* detached_addon = DetachAddon(iinfo, at_silencer);
                     detached_addon->SetState(SBuyItemInfo::e_undefined);
                     detached_addon->SetState(SBuyItemInfo::e_shop);
                     detached_addon->m_cell_item->SetOwnerList(NULL);
                 }
-                if (IsAddonAttached(iinfo, at_glauncher)) {
+                if (IsAddonAttached(iinfo, at_glauncher))
+                {
                     SBuyItemInfo* detached_addon = DetachAddon(iinfo, at_glauncher);
                     detached_addon->SetState(SBuyItemInfo::e_undefined);
                     detached_addon->SetState(SBuyItemInfo::e_shop);
@@ -671,7 +710,8 @@ void CUIMpTradeWnd::SellAll()
     do
     {
         iinfo = FindItem(SBuyItemInfo::e_bought);
-        if (iinfo) b_ok = TryToSellItem(iinfo, true, tmp_iinfo);
+        if (iinfo)
+            b_ok = TryToSellItem(iinfo, true, tmp_iinfo);
 
         R_ASSERT(b_ok);
     } while (iinfo);
@@ -679,7 +719,8 @@ void CUIMpTradeWnd::SellAll()
     do
     {
         iinfo = FindItem(SBuyItemInfo::e_own);
-        if (iinfo) {
+        if (iinfo)
+        {
             VERIFY(iinfo->m_cell_item->OwnerList());
             CUICellItem* citem = iinfo->m_cell_item->OwnerList()->RemoveItem(iinfo->m_cell_item, false);
             SBuyItemInfo* iinfo_int = FindItem(citem);
@@ -702,7 +743,8 @@ void CUIMpTradeWnd::ResetToOrigin()
     do
     {
         iinfo = FindItem(SBuyItemInfo::e_bought);
-        if (iinfo) b_ok = TryToSellItem(iinfo, true, tmp_iinfo);
+        if (iinfo)
+            b_ok = TryToSellItem(iinfo, true, tmp_iinfo);
 
         R_ASSERT(b_ok);
     } while (iinfo);
@@ -710,7 +752,8 @@ void CUIMpTradeWnd::ResetToOrigin()
     do
     {
         iinfo = FindItem(SBuyItemInfo::e_sold);
-        if (iinfo) b_ok = TryToBuyItem(iinfo, bf_normal, NULL);
+        if (iinfo)
+            b_ok = TryToBuyItem(iinfo, bf_normal, NULL);
 
         R_ASSERT(b_ok);
     } while (iinfo);
@@ -744,23 +787,13 @@ void CUIMpTradeWnd::SetupPlayerItemsBegin()
     UpdateHelperItems();
 }
 
-void CUIMpTradeWnd::SetupPlayerItemsEnd()
-{
-    StorePreset(_preset_idx_origin, true, false, true);
-}
-
-void CUIMpTradeWnd::SetupDefaultItemsBegin()
-{
-    SetupPlayerItemsBegin();
-}
-void CUIMpTradeWnd::SetupDefaultItemsEnd()
-{
-    StorePreset(_preset_idx_default, true, false, true);
-}
-
+void CUIMpTradeWnd::SetupPlayerItemsEnd() { StorePreset(_preset_idx_origin, true, false, true); }
+void CUIMpTradeWnd::SetupDefaultItemsBegin() { SetupPlayerItemsBegin(); }
+void CUIMpTradeWnd::SetupDefaultItemsEnd() { StorePreset(_preset_idx_default, true, false, true); }
 void CUIMpTradeWnd::CheckDragItemToDestroy()
 {
-    if (CUIDragDropListEx::m_drag_item && CUIDragDropListEx::m_drag_item->ParentItem()) {
+    if (CUIDragDropListEx::m_drag_item && CUIDragDropListEx::m_drag_item->ParentItem())
+    {
         CUIDragDropListEx* _drag_owner = CUIDragDropListEx::m_drag_item->ParentItem()->OwnerList();
         _drag_owner->DestroyDragItem();
     }
@@ -771,7 +804,8 @@ struct items_sorter
     items_sorter(){};
     bool operator()(SBuyItemInfo* i1, SBuyItemInfo* i2)
     {
-        if (i1->m_name_sect == i2->m_name_sect) return i1->GetState() < i2->GetState();
+        if (i1->m_name_sect == i2->m_name_sect)
+            return i1->GetState() < i2->GetState();
 
         return i1->m_name_sect < i2->m_name_sect;
     };
@@ -791,7 +825,7 @@ void CUIMpTradeWnd::DumpAllItems(LPCSTR s)
         Msg("[%s] state[%s]", iinfo->m_name_sect.c_str(), iinfo->GetStateAsText());
     }
     Msg("------");
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
 }
 
 void CUIMpTradeWnd::DumpPreset(ETradePreset idx)
@@ -808,11 +842,14 @@ void CUIMpTradeWnd::DumpPreset(ETradePreset idx)
 
         Msg("[%s]-[%d]", _one.sect_name.c_str(), _one.count);
 
-        if (_one.addon_names[0].c_str()) Msg("	[%s]", _one.addon_names[0].c_str());
-        if (_one.addon_names[1].c_str()) Msg("	[%s]", _one.addon_names[1].c_str());
-        if (_one.addon_names[2].c_str()) Msg("	[%s]", _one.addon_names[2].c_str());
+        if (_one.addon_names[0].c_str())
+            Msg("	[%s]", _one.addon_names[0].c_str());
+        if (_one.addon_names[1].c_str())
+            Msg("	[%s]", _one.addon_names[1].c_str());
+        if (_one.addon_names[2].c_str())
+            Msg("	[%s]", _one.addon_names[2].c_str());
     }
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
 }
 
 #include <dinput.h>
@@ -824,8 +861,10 @@ void CUICellItemTradeMenuDraw::OnDraw(CUICellItem* cell)
     UI().ClientToScreenScaled(pos, pos.x, pos.y);
 
     int acc = cell->GetAccelerator();
-    if (acc != 0) {
-        if (acc == 11) acc = 1;
+    if (acc != 0)
+    {
+        if (acc == 11)
+            acc = 1;
         string64 buff;
 
         xr_sprintf(buff, " %d", acc - DIK_ESCAPE);
@@ -839,13 +878,15 @@ void CUICellItemTradeMenuDraw::OnDraw(CUICellItem* cell)
     bool b_can_buy_rank =
         m_trade_wnd->CheckBuyPossibility(m_info_item->m_name_sect, CUIMpTradeWnd::bf_check_rank_restr, true);
 
-    if (!b_can_buy_rank) {
+    if (!b_can_buy_rank)
+    {
         cell->SetTextureColor(m_trade_wnd->m_item_color_restr_rank);
         return;
     }
     bool b_can_buy_money =
         m_trade_wnd->CheckBuyPossibility(m_info_item->m_name_sect, CUIMpTradeWnd::bf_check_money, true);
-    if (!b_can_buy_money) {
+    if (!b_can_buy_money)
+    {
         cell->SetTextureColor(m_trade_wnd->m_item_color_restr_money);
         return;
     }

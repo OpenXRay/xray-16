@@ -41,10 +41,8 @@ public:
     virtual IStateManagerBase* create_state_manager();
 
     virtual char* get_monster_class_name() { return "psydog"; }
-
     u8 get_phantoms_count();
     bool must_hide() { return get_phantoms_count() == 0; }
-
 private:
     bool spawn_phantom();
     void delete_phantom(CPsyDogPhantom*);

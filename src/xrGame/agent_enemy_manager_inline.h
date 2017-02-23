@@ -22,7 +22,4 @@ IC CAgentManager& CAgentEnemyManager::object() const
     return (*m_object);
 }
 
-IC CAgentEnemyManager::ENEMIES& CAgentEnemyManager::enemies()
-{
-    return (m_enemies);
-}
+IC CAgentEnemyManager::ENEMIES& CAgentEnemyManager::enemies() { return (m_enemies); }

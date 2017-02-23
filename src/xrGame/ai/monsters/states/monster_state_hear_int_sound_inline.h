@@ -2,7 +2,7 @@
 
 #include "state_custom_action_look.h"
 
-#define TEMPLATE_SPECIALIZATION                                                                                        \
+#define TEMPLATE_SPECIALIZATION \
     template <typename _Object\
 >
 
@@ -18,7 +18,8 @@ CStateMonsterHearInterestingSoundAbstract::CStateMonsterHearInterestingSound(_Ob
 TEMPLATE_SPECIALIZATION
 void CStateMonsterHearInterestingSoundAbstract::reselect_state()
 {
-    if (prev_substate == u32(-1)) {
+    if (prev_substate == u32(-1))
+    {
         if (get_state(eStateHearInterestingSound_MoveToDest)->check_start_conditions())
             select_state(eStateHearInterestingSound_MoveToDest);
         else
@@ -34,7 +35,8 @@ void CStateMonsterHearInterestingSoundAbstract::setup_substates()
 {
     state_ptr state = get_state_current();
 
-    if (current_substate == eStateHearInterestingSound_MoveToDest) {
+    if (current_substate == eStateHearInterestingSound_MoveToDest)
+    {
         SStateDataMoveToPoint data;
         data.point = get_target_position();
         data.vertex = u32(-1);
@@ -51,7 +53,8 @@ void CStateMonsterHearInterestingSoundAbstract::setup_substates()
         return;
     }
 
-    if (current_substate == eStateHearInterestingSound_LookAround) {
+    if (current_substate == eStateHearInterestingSound_LookAround)
+    {
         SStateDataActionLook data;
         data.action = ACT_LOOK_AROUND;
         data.sound_type = MonsterSound::eMonsterSoundIdle;
@@ -71,9 +74,11 @@ TEMPLATE_SPECIALIZATION
 Fvector CStateMonsterHearInterestingSoundAbstract::get_target_position()
 {
     Fvector snd_pos = object->SoundMemory.GetSound().position;
-    if (!object->Home->has_home()) return snd_pos;
+    if (!object->Home->has_home())
+        return snd_pos;
 
-    if (object->Home->at_home(snd_pos)) return snd_pos;
+    if (object->Home->at_home(snd_pos))
+        return snd_pos;
 
     return ai().level_graph().vertex_position(object->Home->get_place());
 }

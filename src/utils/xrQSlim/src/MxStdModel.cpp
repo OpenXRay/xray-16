@@ -73,11 +73,7 @@ MxFaceID MxStdModel::alloc_face(MxVertexID v1, MxVertexID v2, MxVertexID v3)
     return id;
 }
 
-void MxStdModel::free_face(MxFaceID f)
-{
-    f_data.remove(f);
-}
-
+void MxStdModel::free_face(MxFaceID f) { f_data.remove(f); }
 void MxStdModel::init_face(MxFaceID id)
 {
     neighbors(face(id).v[0]).add(id);
@@ -113,7 +109,8 @@ void MxStdModel::collect_unmarked_neighbors(MxVertexID vid, MxFaceList& faces)
     for (unsigned int i = 0; i < (unsigned int)neighbors(vid).length(); i++)
     {
         unsigned int fid = neighbors(vid)(i);
-        if (!fmark(fid)) {
+        if (!fmark(fid))
+        {
             faces.add(fid);
             fmark(fid, 1);
         }
@@ -136,7 +133,8 @@ void MxStdModel::partition_marked_neighbors(MxVertexID v, unsigned short pivot, 
     for (unsigned int i = 0; i < (unsigned int)neighbors(v).length(); i++)
     {
         unsigned int f = neighbors(v)(i);
-        if (fmark(f)) {
+        if (fmark(f))
+        {
             if (fmark(f) < pivot)
                 lo.add(f);
             else
@@ -159,7 +157,8 @@ void MxStdModel::collect_unmarked_corners(const MxFaceList& faces, MxVertexList&
         for (unsigned int j = 0; j < 3; j++)
         {
             MxVertexID v = face(faces(i))(j);
-            if (!vmark(v)) {
+            if (!vmark(v))
+            {
                 verts.add(v);
                 vmark(v, 1);
             }
@@ -178,7 +177,7 @@ void MxStdModel::collect_vertex_star(unsigned int v, MxVertexList& verts)
     const MxFaceList& N = neighbors(v);
 
     mark_corners(N, 0);
-    vmark(v, 1);  // Don't want to include v in the star
+    vmark(v, 1); // Don't want to include v in the star
     collect_unmarked_corners(N, verts);
 }
 
@@ -241,14 +240,16 @@ void MxStdModel::compute_vertex_normal(MxVertexID v, float* n)
 
         mxv_addinto(n, fn, 3);
     }
-    if (i > 0) mxv_unitize(n, 3);
+    if (i > 0)
+        mxv_unitize(n, 3);
 }
 
 void MxStdModel::synthesize_normals(unsigned int start)
 {
     float n[3];
 
-    if (normal_binding() == MX_PERFACE) {
+    if (normal_binding() == MX_PERFACE)
+    {
         for (MxFaceID f = start; f < face_count(); f++)
         {
             compute_face_normal(f, n);
@@ -282,7 +283,7 @@ void MxStdModel::remap_vertex(unsigned int from, unsigned int to)
     collect_unmarked_neighbors(from, neighbors(to));
 
     vertex_mark_invalid(from);
-    neighbors(from).reset();  // remove links in old vertex
+    neighbors(from).reset(); // remove links in old vertex
 }
 
 unsigned int MxStdModel::split_edge(unsigned int a, unsigned int b)
@@ -295,7 +296,8 @@ unsigned int MxStdModel::split_edge(unsigned int a, unsigned int b)
 static void remove_neighbor(MxFaceList& faces, unsigned int f)
 {
     unsigned int j;
-    if (varray_find(faces, f, &j)) faces.remove(j);
+    if (varray_find(faces, f, &j))
+        faces.remove(j);
 }
 
 unsigned int MxStdModel::split_edge(unsigned int v1, unsigned int v2, float x, float y, float z)
@@ -340,7 +342,8 @@ void MxStdModel::flip_edge(unsigned int v1, unsigned int v2)
 {
     MxFaceList faces;
     collect_edge_neighbors(v1, v2, faces);
-    if (faces.length() != 2) return;
+    if (faces.length() != 2)
+        return;
 
     unsigned int f1 = faces(0);
     unsigned int f2 = faces(1);
@@ -368,7 +371,8 @@ void MxStdModel::split_face4(unsigned int f, unsigned int* newverts)
     unsigned int new1 = split_edge(v1, v2);
     unsigned int new2 = split_edge(v0, v2);
 
-    if (newverts) {
+    if (newverts)
+    {
         newverts[0] = pivot;
         newverts[1] = new1;
         newverts[2] = new2;
@@ -384,12 +388,17 @@ void MxStdModel::compact_vertices()
 
     for (oldID = 0; oldID < vert_count(); oldID++)
     {
-        if (vertex_is_valid(oldID)) {
-            if (newID != oldID) {
+        if (vertex_is_valid(oldID))
+        {
+            if (newID != oldID)
+            {
                 vertex(newID) = vertex(oldID);
-                if (normal_binding() == MX_PERVERTEX) normal(newID) = normal(oldID);
-                if (color_binding() == MX_PERVERTEX) color(newID) = color(oldID);
-                if (texcoord_binding() == MX_PERVERTEX) texcoord(newID) = texcoord(oldID);
+                if (normal_binding() == MX_PERVERTEX)
+                    normal(newID) = normal(oldID);
+                if (color_binding() == MX_PERVERTEX)
+                    color(newID) = color(oldID);
+                if (texcoord_binding() == MX_PERVERTEX)
+                    texcoord(newID) = texcoord(oldID);
 
                 // Because we'll be freeing the link lists for the
                 // old vertices, we actually have to swap values instead
@@ -420,15 +429,18 @@ void MxStdModel::unlink_face(MxFaceID fid)
     unsigned int j;
     int found = 0;
 
-    if (varray_find(neighbors(f(0)), fid, &j)) {
+    if (varray_find(neighbors(f(0)), fid, &j))
+    {
         found++;
         neighbors(f(0)).remove(j);
     }
-    if (varray_find(neighbors(f(1)), fid, &j)) {
+    if (varray_find(neighbors(f(1)), fid, &j))
+    {
         found++;
         neighbors(f(1)).remove(j);
     }
-    if (varray_find(neighbors(f(2)), fid, &j)) {
+    if (varray_find(neighbors(f(2)), fid, &j))
+    {
         found++;
         neighbors(f(2)).remove(j);
     }
@@ -445,7 +457,8 @@ void MxStdModel::remove_degeneracy(MxFaceList& faces)
         VERIFY(face_is_valid(faces(i)));
         MxFace& f = face(faces(i));
 
-        if (f(0) == f(1) || f(1) == f(2) || f(0) == f(2)) unlink_face(faces(i));
+        if (f(0) == f(1) || f(1) == f(2) || f(0) == f(2))
+            unlink_face(faces(i));
     }
 }
 
@@ -454,7 +467,8 @@ void MxStdModel::compute_contraction(MxVertexID v1, MxVertexID v2, MxPairContrac
     conx->v1 = v1;
     conx->v2 = v2;
 
-    if (vnew) {
+    if (vnew)
+    {
         mxv_sub(conx->dv1, vnew, vertex(v1), 3);
         mxv_sub(conx->dv2, vnew, vertex(v2), 3);
     }
@@ -508,7 +522,8 @@ void MxStdModel::apply_contraction(const MxPairContraction& conx)
 
     //
     // !!HACK: This is really only a temporary solution to the problem
-    if (normal_binding() == MX_PERFACE) {
+    if (normal_binding() == MX_PERFACE)
+    {
         float n[3];
         for (i = 0; i < (unsigned int)conx.delta_faces.length(); i++)
         {
@@ -552,7 +567,8 @@ void MxStdModel::apply_expansion(const MxPairExpansion& conx)
 
     //
     // !!HACK: This is really only a temporary solution to the problem
-    if (normal_binding() == MX_PERFACE) {
+    if (normal_binding() == MX_PERFACE)
+    {
         float n[3];
         for (i = 0; i < (unsigned int)conx.delta_faces.length(); i++)
         {
@@ -598,7 +614,7 @@ void MxStdModel::compute_contraction(MxFaceID fid, MxFaceContraction* conx)
     mark_neighborhood_delta(f[1], +1);
     mark_neighborhood_delta(f[2], +1);
 
-    fmark(fid, 0);  // don't include f in dead_faces
+    fmark(fid, 0); // don't include f in dead_faces
 
     partition_marked_neighbors(f[0], 2, conx->delta_faces, conx->dead_faces);
     partition_marked_neighbors(f[1], 2, conx->delta_faces, conx->dead_faces);
@@ -628,10 +644,12 @@ void MxStdModel::contract(MxVertexID v1, MxVertexID v2, MxVertexID v3, const flo
 
     //
     // !!HACK: Only a temporary solution
-    if (normal_binding() == MX_PERFACE) {
+    if (normal_binding() == MX_PERFACE)
+    {
         float n[3];
         for (unsigned int i = 0; i < (unsigned int)changed.length(); i++)
-            if (face_is_valid(changed[i])) {
+            if (face_is_valid(changed[i]))
+            {
                 compute_face_normal(changed[i], n);
                 normal(changed[i]) = MxNormal(n);
             }
@@ -672,11 +690,7 @@ MxVertexID MxStdModel::resolve_proxies(MxVertexID v)
     return v;
 }
 
-float* MxStdModel::vertex_position(MxVertexID v)
-{
-    return vertex(resolve_proxies(v));
-}
-
+float* MxStdModel::vertex_position(MxVertexID v) { return vertex(resolve_proxies(v)); }
 MxVertexID& MxStdModel::vertex_proxy_parent(MxVertexID v)
 {
     VERIFY(vertex_is_proxy(v));
@@ -685,7 +699,7 @@ MxVertexID& MxStdModel::vertex_proxy_parent(MxVertexID v)
 
 MxVertexID MxStdModel::add_proxy_vertex(MxVertexID parent)
 {
-    MxVertexID v = alloc_vertex(0, 0, 0);  // position will be ignored
+    MxVertexID v = alloc_vertex(0, 0, 0); // position will be ignored
 
     vertex_mark_proxy(v);
     vertex_proxy_parent(v) = parent;

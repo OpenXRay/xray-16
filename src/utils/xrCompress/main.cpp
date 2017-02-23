@@ -17,14 +17,16 @@ int __cdecl main(int argc, char* argv[])
     C.SetStoreFiles(NULL != strstr(params, "-store"));
 
 #ifndef MOD_COMPRESS
-    if (strstr(params, "-diff")) {
+    if (strstr(params, "-diff"))
+    {
         ProcessDifference();
     }
     else
 #endif
     {
 #ifndef MOD_COMPRESS
-        if (argc < 2) {
+        if (argc < 2)
+        {
             printf("ERROR: u must pass folder name as parameter.\n");
             printf("-diff /? option to get information about creating difference.\n");
             printf("-fast	- fast compression.\n");
@@ -55,7 +57,8 @@ int __cdecl main(int argc, char* argv[])
 
         LPCSTR p = strstr(params, "-ltx");
 
-        if (0 != p) {
+        if (0 != p)
+        {
             string64 ltx_name;
             sscanf(strstr(params, "-ltx ") + 5, "%[^ ] ", ltx_name);
 

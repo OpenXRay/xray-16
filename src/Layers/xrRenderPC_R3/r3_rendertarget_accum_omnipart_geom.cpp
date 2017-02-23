@@ -46,12 +46,12 @@ void CRenderTarget::accum_omnip_geom_destroy()
 {
 #ifdef DEBUG
     _SHOW_REF("g_accum_omnip_ib", g_accum_omnip_ib);
-#endif  // DEBUG
+#endif // DEBUG
     HW.stats_manager.decrement_stats_ib(g_accum_omnip_ib);
     _RELEASE(g_accum_omnip_ib);
 #ifdef DEBUG
     _SHOW_REF("g_accum_omnip_vb", g_accum_omnip_vb);
-#endif  // DEBUG
+#endif // DEBUG
     HW.stats_manager.decrement_stats_vb(g_accum_omnip_vb);
     _RELEASE(g_accum_omnip_vb);
 }

@@ -29,46 +29,41 @@ login_manager::login_manager(CGameSpy_Full* fullgs_obj)
     m_current_profile = NULL;
 }
 
-login_manager::~login_manager()
-{
-    xr_delete(m_current_profile);
-}
-
+login_manager::~login_manager() { xr_delete(m_current_profile); }
 void login_manager::login(char const* email, char const* nick, char const* password, login_operation_cb logincb)
 {
-    if (!logincb) {
+    if (!logincb)
+    {
         logincb.bind(this, &login_manager::only_log_login);
     }
     login_params_t tmp_args(email, nick, password);
     m_login_qam.execute(this, tmp_args, logincb);
 }
 
-void login_manager::stop_login()
-{
-    m_login_qam.stop();
-}
-
+void login_manager::stop_login() { m_login_qam.stop(); }
 void login_manager::login_raw(login_params_t const& login_args, login_operation_cb logincb)
 {
     VERIFY(!m_login_operation_cb);
     VERIFY2(!m_current_profile, "please, logout first (gs_logout)");
 
-    if (m_current_profile) {
+    if (m_current_profile)
+    {
         Msg("! WARNING: first you need to log out...");
         m_login_operation_cb(NULL, "mp_first_need_to_logout");
         m_login_operation_cb.clear();
         return;
     }
 
-    m_last_email = login_args.m_t1;     // email;
-    m_last_nick = login_args.m_t2;      // nick;
-    m_last_password = login_args.m_t3;  // password;
+    m_last_email = login_args.m_t1; // email;
+    m_last_nick = login_args.m_t2; // nick;
+    m_last_password = login_args.m_t3; // password;
     m_login_operation_cb = logincb;
 
     GPResult tmp_res =
         m_gamespy_gp->Connect(m_last_email, m_last_nick, m_last_password, &login_manager::login_cb, this);
 
-    if (tmp_res != GP_NO_ERROR) {
+    if (tmp_res != GP_NO_ERROR)
+    {
         m_login_operation_cb.clear();
         logincb(NULL, CGameSpy_GP::TryToTranslate(tmp_res).c_str());
         return;
@@ -78,7 +73,8 @@ void login_manager::login_raw(login_params_t const& login_args, login_operation_
 void login_manager::release_login(profile const* prof_arg, char const*)
 {
     VERIFY(m_current_profile == prof_arg);
-    if (m_current_profile == prof_arg) {
+    if (m_current_profile == prof_arg)
+    {
         logout();
         // disconnect will reset connection state
         // so we must to reinit all asyncronous tasks
@@ -88,11 +84,13 @@ void login_manager::release_login(profile const* prof_arg, char const*)
 
 void login_manager::login_offline(char const* nick, login_operation_cb logincb)
 {
-    if (m_login_operation_cb) {
+    if (m_login_operation_cb)
+    {
         Msg("! WARNING: login in process...");
         return;
     }
-    if (!logincb) {
+    if (!logincb)
+    {
         m_login_operation_cb.bind(this, &login_manager::only_log_login);
     }
     else
@@ -101,7 +99,8 @@ void login_manager::login_offline(char const* nick, login_operation_cb logincb)
     }
 
     VERIFY2(!m_current_profile, "please, logout first (gs_logout)");
-    if (m_current_profile) {
+    if (m_current_profile)
+    {
         Msg("! WARNING: first you need to log out...");
         m_login_operation_cb(NULL, "mp_first_need_to_logout");
         m_login_operation_cb.clear();
@@ -110,10 +109,12 @@ void login_manager::login_offline(char const* nick, login_operation_cb logincb)
 
     pcstr name_iterator = nick;
     bool has_non_white_chars = false;
-    if (nick) {
+    if (nick)
+    {
         while (*name_iterator)
         {
-            if (*name_iterator != ' ' && *name_iterator != '\t') {
+            if (*name_iterator != ' ' && *name_iterator != '\t')
+            {
                 has_non_white_chars = true;
                 break;
             }
@@ -122,7 +123,8 @@ void login_manager::login_offline(char const* nick, login_operation_cb logincb)
         }
     }
 
-    if (!has_non_white_chars) {
+    if (!has_non_white_chars)
+    {
         Msg("! ERROR: nick name is empty");
         m_login_operation_cb(NULL, "mp_nick_name_not_valid");
         m_login_operation_cb.clear();
@@ -139,35 +141,35 @@ void login_manager::login_offline(char const* nick, login_operation_cb logincb)
 
 void login_manager::set_unique_nick(char const* new_unick, login_operation_cb logincb)
 {
-    if (!logincb) {
+    if (!logincb)
+    {
         logincb.bind(this, &login_manager::only_log_login);
     }
     set_unick_params_t tmp_arg(new_unick);
     m_unique_nick_qam.execute(this, tmp_arg, logincb);
 }
 
-void login_manager::stop_setting_unique_nick()
-{
-    m_unique_nick_qam.stop();
-}
-
+void login_manager::stop_setting_unique_nick() { m_unique_nick_qam.stop(); }
 void login_manager::set_unique_nick_raw(set_unick_params_t const& new_unick, login_operation_cb logincb)
 {
     VERIFY(!m_login_operation_cb);
 
-    if (!m_current_profile) {
+    if (!m_current_profile)
+    {
         Msg("! WARNING: first you need to log in...");
         logincb(NULL, "mp_first_need_to_login");
         return;
     }
 
-    if (!new_unick.m_t1.size()) {
+    if (!new_unick.m_t1.size())
+    {
         Msg("! ERROR: nick name is empty");
         logincb(NULL, "mp_unique_nick_not_valid");
         return;
     }
 
-    if (!m_current_profile->online()) {
+    if (!m_current_profile->online())
+    {
         // verify symbols in new unique nick
         string256 updated_unick;
         modify_player_name(new_unick.m_t1.c_str(), updated_unick);
@@ -181,7 +183,8 @@ void login_manager::set_unique_nick_raw(set_unick_params_t const& new_unick, log
 
     GPResult tmp_res = m_gamespy_gp->SetUniqueNick(m_last_unick, &login_manager::setunick_cb, this);
 
-    if (tmp_res != GP_NO_ERROR) {
+    if (tmp_res != GP_NO_ERROR)
+    {
         m_login_operation_cb.clear();
         logincb(NULL, CGameSpy_GP::TryToTranslate(tmp_res).c_str());
         return;
@@ -191,7 +194,8 @@ void login_manager::set_unique_nick_raw(set_unick_params_t const& new_unick, log
 void login_manager::logout()
 {
     VERIFY2(m_current_profile, "not logged in");
-    if (m_current_profile->online()) {
+    if (m_current_profile->online())
+    {
         m_gamespy_gp->Disconnect();
     }
     delete_profile_obj();
@@ -201,28 +205,28 @@ void login_manager::logout()
 void login_manager::reinit_connection_tasks()
 {
     account_manager* tmp_acc_mngr = MainMenu()->GetAccountMngr();
-    if (tmp_acc_mngr->is_get_account_profiles_active()) {
+    if (tmp_acc_mngr->is_get_account_profiles_active())
+    {
         Msg("! WARNING: reiniting get account profiles");
         tmp_acc_mngr->reinit_get_account_profiles();
     }
-    if (tmp_acc_mngr->is_email_searching_active()) {
+    if (tmp_acc_mngr->is_email_searching_active())
+    {
         Msg("! WARNING: reiniting searching emails");
         tmp_acc_mngr->reinit_email_searching();
     }
-    if (tmp_acc_mngr->is_suggest_unique_nicks_active()) {
+    if (tmp_acc_mngr->is_suggest_unique_nicks_active())
+    {
         Msg("! WARNING: reiniting suggesting unique nicks");
         tmp_acc_mngr->reinit_suggest_unique_nicks();
     }
 }
 
-void login_manager::delete_profile_obj()
-{
-    xr_delete(m_current_profile);
-}
-
+void login_manager::delete_profile_obj() { xr_delete(m_current_profile); }
 void __stdcall login_manager::only_log_login(profile const* res_profile, char const* description)
 {
-    if (!res_profile) {
+    if (!res_profile)
+    {
         Msg("! GameSpy login ERROR: %s", description ? description : "unknown");
         return;
     }
@@ -241,7 +245,8 @@ void __cdecl login_manager::setunick_cb(GPConnection* connection, void* arg, voi
     VERIFY(tmp_res);
     VERIFY(my_inst->m_current_profile);
 
-    if (tmp_res->result != GP_NO_ERROR) {
+    if (tmp_res->result != GP_NO_ERROR)
+    {
         tmp_cb(NULL, CGameSpy_GP::TryToTranslate(tmp_res->result).c_str());
         return;
     }
@@ -260,7 +265,8 @@ void __cdecl login_manager::login_cb(GPConnection* connection, void* arg, void* 
     VERIFY(my_inst);
     VERIFY(tmp_res);
 
-    if (tmp_res->result != GP_NO_ERROR) {
+    if (tmp_res->result != GP_NO_ERROR)
+    {
         my_inst->m_login_operation_cb.clear();
         tmp_cb(NULL, CGameSpy_GP::TryToTranslate(tmp_res->result).c_str());
         return;
@@ -272,7 +278,8 @@ void __cdecl login_manager::login_cb(GPConnection* connection, void* arg, void* 
     VERIFY(my_inst->m_gamespy_gp);
     GPResult tmp_lticket_res = my_inst->m_gamespy_gp->GetLoginTicket(tmp_ticket_dest);
     VERIFY(tmp_lticket_res == GP_NO_ERROR);
-    if (tmp_lticket_res != GP_NO_ERROR) {
+    if (tmp_lticket_res != GP_NO_ERROR)
+    {
         Msg("! ERROR: failed to get login ticket");
         tmp_ticket_dest[0] = 0;
     }
@@ -290,14 +297,16 @@ void __cdecl login_manager::wslogin_cb(GHTTPResult httpResult, WSLoginResponse* 
     login_operation_cb tmp_cb = my_inst->m_login_operation_cb;
     my_inst->m_login_operation_cb.clear();
 
-    if (httpResult != GHTTPSuccess) {
+    if (httpResult != GHTTPSuccess)
+    {
         tmp_cb(NULL, CGameSpy_ATLAS::TryToTranslate(httpResult).c_str());
         my_inst->delete_profile_obj();
         return;
     }
     VERIFY(response);
 
-    if (response->mLoginResult != WSLogin_Success) {
+    if (response->mLoginResult != WSLogin_Success)
+    {
         tmp_cb(NULL, CGameSpy_ATLAS::TryToTranslate(response->mLoginResult).c_str());
         my_inst->delete_profile_obj();
         return;
@@ -313,7 +322,8 @@ void __cdecl login_manager::wslogin_cb(GHTTPResult httpResult, WSLoginResponse* 
 
 void login_manager::save_email_to_registry(char const* email)
 {
-    if (!email || (xr_strlen(email) == 0)) {
+    if (!email || (xr_strlen(email) == 0))
+    {
         Msg("! ERROR: email is empty");
         return;
     }
@@ -332,7 +342,8 @@ static const u32 pass_key_seed = 0x07071984;
 void login_manager::save_password_to_registry(char const* password)
 {
     using namespace secure_messaging;
-    if (!password || (xr_strlen(password) == 0)) {
+    if (!password || (xr_strlen(password) == 0))
+    {
         Msg("! ERROR: password is empty");
         return;
     }
@@ -351,11 +362,12 @@ char const* login_manager::get_password_from_registry()
 {
     using namespace secure_messaging;
     xr_strcpy(m_reg_password, "");
-    u8 tmp_password_dest[128];  // max password length is 30 symbols...
+    u8 tmp_password_dest[128]; // max password length is 30 symbols...
 
     u32 pass_size = ReadRegistry_BinaryValue(REGISTRY_VALUE_USERPASSWORD, tmp_password_dest, sizeof(tmp_password_dest));
 
-    if (pass_size) {
+    if (pass_size)
+    {
         key_t pass_key;
         generate_key(pass_key_seed, pass_key);
         decrypt(tmp_password_dest, pass_size, pass_key);
@@ -398,4 +410,4 @@ void login_manager::forgot_password(char const* url)
     ShellExecute(0, "open", "cmd.exe", params, NULL, SW_SHOW);
 }
 
-}  // namespace gamespy_gp
+} // namespace gamespy_gp

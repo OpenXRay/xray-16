@@ -21,11 +21,7 @@ ICF float calcLOD(float ssa /*fDistSq*/, float R)
 }
 
 // NORMAL
-IC bool cmp_normal_items(const _NormalItem& N1, const _NormalItem& N2)
-{
-    return (N1.ssa > N2.ssa);
-}
-
+IC bool cmp_normal_items(const _NormalItem& N1, const _NormalItem& N2) { return (N1.ssa > N2.ssa); }
 void __fastcall mapNormal_Render(mapNormalItems& N)
 {
     // *** DIRECT ***
@@ -43,11 +39,7 @@ void __fastcall mapNormal_Render(mapNormalItems& N)
 }
 
 // Matrix
-IC bool cmp_matrix_items(const _MatrixItem& N1, const _MatrixItem& N2)
-{
-    return (N1.ssa > N2.ssa);
-}
-
+IC bool cmp_matrix_items(const _MatrixItem& N1, const _MatrixItem& N2) { return (N1.ssa > N2.ssa); }
 void __fastcall mapMatrix_Render(mapMatrixItems& N)
 {
     // *** DIRECT ***
@@ -82,15 +74,8 @@ void __fastcall sorted_L1(mapSorted_Node* N)
     V->Render(calcLOD(N->key, V->vis.sphere.R));
 }
 
-IC bool cmp_vs_nrm(mapNormalVS::TNode* N1, mapNormalVS::TNode* N2)
-{
-    return (N1->val.ssa > N2->val.ssa);
-}
-IC bool cmp_vs_mat(mapMatrixVS::TNode* N1, mapMatrixVS::TNode* N2)
-{
-    return (N1->val.ssa > N2->val.ssa);
-}
-
+IC bool cmp_vs_nrm(mapNormalVS::TNode* N1, mapNormalVS::TNode* N2) { return (N1->val.ssa > N2->val.ssa); }
+IC bool cmp_vs_mat(mapMatrixVS::TNode* N1, mapMatrixVS::TNode* N2) { return (N1->val.ssa > N2->val.ssa); }
 IC bool cmp_ps_nrm(mapNormalPS::TNode* N1, mapNormalPS::TNode* N2)
 {
 #ifdef USE_DX11
@@ -109,40 +94,22 @@ IC bool cmp_ps_mat(mapMatrixPS::TNode* N1, mapMatrixPS::TNode* N2)
 }
 
 #if defined(USE_DX10) || defined(USE_DX11)
-IC bool cmp_gs_nrm(mapNormalGS::TNode* N1, mapNormalGS::TNode* N2)
-{
-    return (N1->val.ssa > N2->val.ssa);
-}
-IC bool cmp_gs_mat(mapMatrixGS::TNode* N1, mapMatrixGS::TNode* N2)
-{
-    return (N1->val.ssa > N2->val.ssa);
-}
-#endif  //	USE_DX10
+IC bool cmp_gs_nrm(mapNormalGS::TNode* N1, mapNormalGS::TNode* N2) { return (N1->val.ssa > N2->val.ssa); }
+IC bool cmp_gs_mat(mapMatrixGS::TNode* N1, mapMatrixGS::TNode* N2) { return (N1->val.ssa > N2->val.ssa); }
+#endif //	USE_DX10
 
-IC bool cmp_cs_nrm(mapNormalCS::TNode* N1, mapNormalCS::TNode* N2)
-{
-    return (N1->val.ssa > N2->val.ssa);
-}
-IC bool cmp_cs_mat(mapMatrixCS::TNode* N1, mapMatrixCS::TNode* N2)
-{
-    return (N1->val.ssa > N2->val.ssa);
-}
-
-IC bool cmp_states_nrm(mapNormalStates::TNode* N1, mapNormalStates::TNode* N2)
-{
-    return (N1->val.ssa > N2->val.ssa);
-}
-IC bool cmp_states_mat(mapMatrixStates::TNode* N1, mapMatrixStates::TNode* N2)
-{
-    return (N1->val.ssa > N2->val.ssa);
-}
-
+IC bool cmp_cs_nrm(mapNormalCS::TNode* N1, mapNormalCS::TNode* N2) { return (N1->val.ssa > N2->val.ssa); }
+IC bool cmp_cs_mat(mapMatrixCS::TNode* N1, mapMatrixCS::TNode* N2) { return (N1->val.ssa > N2->val.ssa); }
+IC bool cmp_states_nrm(mapNormalStates::TNode* N1, mapNormalStates::TNode* N2) { return (N1->val.ssa > N2->val.ssa); }
+IC bool cmp_states_mat(mapMatrixStates::TNode* N1, mapMatrixStates::TNode* N2) { return (N1->val.ssa > N2->val.ssa); }
 IC bool cmp_textures_lex2_nrm(mapNormalTextures::TNode* N1, mapNormalTextures::TNode* N2)
 {
     STextureList* t1 = N1->key;
     STextureList* t2 = N2->key;
-    if ((*t1)[0] < (*t2)[0]) return true;
-    if ((*t1)[0] > (*t2)[0]) return false;
+    if ((*t1)[0] < (*t2)[0])
+        return true;
+    if ((*t1)[0] > (*t2)[0])
+        return false;
     if ((*t1)[1] < (*t2)[1])
         return true;
     else
@@ -152,8 +119,10 @@ IC bool cmp_textures_lex2_mat(mapMatrixTextures::TNode* N1, mapMatrixTextures::T
 {
     STextureList* t1 = N1->key;
     STextureList* t2 = N2->key;
-    if ((*t1)[0] < (*t2)[0]) return true;
-    if ((*t1)[0] > (*t2)[0]) return false;
+    if ((*t1)[0] < (*t2)[0])
+        return true;
+    if ((*t1)[0] > (*t2)[0])
+        return false;
     if ((*t1)[1] < (*t2)[1])
         return true;
     else
@@ -163,10 +132,14 @@ IC bool cmp_textures_lex3_nrm(mapNormalTextures::TNode* N1, mapNormalTextures::T
 {
     STextureList* t1 = N1->key;
     STextureList* t2 = N2->key;
-    if ((*t1)[0] < (*t2)[0]) return true;
-    if ((*t1)[0] > (*t2)[0]) return false;
-    if ((*t1)[1] < (*t2)[1]) return true;
-    if ((*t1)[1] > (*t2)[1]) return false;
+    if ((*t1)[0] < (*t2)[0])
+        return true;
+    if ((*t1)[0] > (*t2)[0])
+        return false;
+    if ((*t1)[1] < (*t2)[1])
+        return true;
+    if ((*t1)[1] > (*t2)[1])
+        return false;
     if ((*t1)[2] < (*t2)[2])
         return true;
     else
@@ -176,10 +149,14 @@ IC bool cmp_textures_lex3_mat(mapMatrixTextures::TNode* N1, mapMatrixTextures::T
 {
     STextureList* t1 = N1->key;
     STextureList* t2 = N2->key;
-    if ((*t1)[0] < (*t2)[0]) return true;
-    if ((*t1)[0] > (*t2)[0]) return false;
-    if ((*t1)[1] < (*t2)[1]) return true;
-    if ((*t1)[1] > (*t2)[1]) return false;
+    if ((*t1)[0] < (*t2)[0])
+        return true;
+    if ((*t1)[0] > (*t2)[0])
+        return false;
+    if ((*t1)[1] < (*t2)[1])
+        return true;
+    if ((*t1)[1] > (*t2)[1])
+        return false;
     if ((*t1)[2] < (*t2)[2])
         return true;
     else
@@ -211,8 +188,10 @@ void sort_tlist_nrm(xr_vector<mapNormalTextures::TNode*, render_alloc<mapNormalT
     BOOL bSSA)
 {
     int amount = textures.begin()->key->size();
-    if (bSSA) {
-        if (amount <= 1) {
+    if (bSSA)
+    {
+        if (amount <= 1)
+        {
             // Just sort by SSA
             textures.getANY_P(lst);
             std::sort(lst.begin(), lst.end(), cmp_textures_ssa_nrm);
@@ -260,8 +239,10 @@ void sort_tlist_mat(xr_vector<mapMatrixTextures::TNode*, render_alloc<mapMatrixT
     BOOL bSSA)
 {
     int amount = textures.begin()->key->size();
-    if (bSSA) {
-        if (amount <= 1) {
+    if (bSSA)
+    {
+        if (amount <= 1)
+        {
             // Just sort by SSA
             textures.getANY_P(lst);
             std::sort(lst.begin(), lst.end(), cmp_textures_ssa_mat);
@@ -341,10 +322,10 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority, bool _clear)
 
                     mapNormalPS& ps = Ngs->val;
                     ps.ssa = 0;
-#else   //	USE_DX10
+#else //	USE_DX10
                 mapNormalPS& ps = Nvs->val;
                 ps.ssa = 0;
-#endif  //	USE_DX10
+#endif //	USE_DX10
 
                     ps.getANY_P(nrmPS);
                     std::sort(nrmPS.begin(), nrmPS.end(), cmp_ps_nrm);
@@ -389,28 +370,35 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority, bool _clear)
                                     mapNormalItems& items = Ntex->val;
                                     items.ssa = 0;
                                     mapNormal_Render(items);
-                                    if (_clear) items.clear();
+                                    if (_clear)
+                                        items.clear();
                                 }
                                 nrmTextures.clear();
                                 nrmTexturesTemp.clear();
-                                if (_clear) tex.clear();
+                                if (_clear)
+                                    tex.clear();
                             }
                             nrmStates.clear();
-                            if (_clear) states.clear();
+                            if (_clear)
+                                states.clear();
                         }
                         nrmCS.clear();
-                        if (_clear) cs.clear();
+                        if (_clear)
+                            cs.clear();
                     }
                     nrmPS.clear();
-                    if (_clear) ps.clear();
+                    if (_clear)
+                        ps.clear();
 #if defined(USE_DX10) || defined(USE_DX11)
                 }
                 nrmGS.clear();
-                if (_clear) gs.clear();
-#endif  //	USE_DX10
+                if (_clear)
+                    gs.clear();
+#endif //	USE_DX10
             }
             nrmVS.clear();
-            if (_clear) vs.clear();
+            if (_clear)
+                vs.clear();
         }
     }
 
@@ -442,10 +430,10 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority, bool _clear)
 
                 mapMatrixPS& ps = Ngs->val;
                 ps.ssa = 0;
-#else   //	USE_DX10
+#else //	USE_DX10
             mapMatrixPS& ps = Nvs->val;
             ps.ssa = 0;
-#endif  //	USE_DX10
+#endif //	USE_DX10
 
                 ps.getANY_P(matPS);
                 std::sort(matPS.begin(), matPS.end(), cmp_ps_mat);
@@ -494,24 +482,30 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority, bool _clear)
                             }
                             matTextures.clear();
                             matTexturesTemp.clear();
-                            if (_clear) tex.clear();
+                            if (_clear)
+                                tex.clear();
                         }
                         matStates.clear();
-                        if (_clear) states.clear();
+                        if (_clear)
+                            states.clear();
                     }
                     matCS.clear();
-                    if (_clear) cs.clear();
+                    if (_clear)
+                        cs.clear();
                 }
                 matPS.clear();
-                if (_clear) ps.clear();
+                if (_clear)
+                    ps.clear();
 #if defined(USE_DX10) || defined(USE_DX11)
             }
             matGS.clear();
-            if (_clear) gs.clear();
-#endif  //	USE_DX10
+            if (_clear)
+                gs.clear();
+#endif //	USE_DX10
         }
         matVS.clear();
-        if (_clear) vs.clear();
+        if (_clear)
+            vs.clear();
     }
 
     BasicStats.Primitives.End();
@@ -540,7 +534,8 @@ void D3DXRenderBase::r_dsgraph_render_hud()
     mapHUD.clear();
 
 #if RENDER == R_R1
-    if (g_hud && g_hud->RenderActiveItemUIQuery()) r_dsgraph_render_hud_ui();  // hud ui
+    if (g_hud && g_hud->RenderActiveItemUIQuery())
+        r_dsgraph_render_hud_ui(); // hud ui
 #endif
     /*
     if(g_hud && g_hud->RenderActiveItemUIQuery())
@@ -603,7 +598,8 @@ void D3DXRenderBase::r_dsgraph_render_hud_ui()
     RCache.set_RT(0, 1);
     RCache.set_RT(0, 2);
 #if (RENDER == R_R3) || (RENDER == R_R4)
-    if (!RImplementation.o.dx10_msaa) {
+    if (!RImplementation.o.dx10_msaa)
+    {
         if (RImplementation.o.albedo_wo)
             RImplementation.Target->u_setrt(RImplementation.Target->rt_Accumulator, rt_null, rt_null, HW.pBaseZB);
         else
@@ -618,13 +614,13 @@ void D3DXRenderBase::r_dsgraph_render_hud_ui()
             RImplementation.Target->u_setrt(
                 RImplementation.Target->rt_Color, rt_null, rt_null, RImplementation.Target->rt_MSAADepth->pZRT);
     }
-#else   // (RENDER==R_R3) || (RENDER==R_R4)
+#else // (RENDER==R_R3) || (RENDER==R_R4)
     if (RImplementation.o.albedo_wo)
         RImplementation.Target->u_setrt(RImplementation.Target->rt_Accumulator, rt_null, rt_null, HW.pBaseZB);
     else
         RImplementation.Target->u_setrt(RImplementation.Target->rt_Color, rt_null, rt_null, HW.pBaseZB);
-#endif  // (RENDER==R_R3) || (RENDER==R_R4)
-#endif  // RENDER!=R_R1
+#endif // (RENDER==R_R3) || (RENDER==R_R4)
+#endif // RENDER!=R_R1
 
     rmNear();
     g_hud->RenderActiveItemUI();
@@ -717,14 +713,15 @@ void D3DXRenderBase::r_dsgraph_render_subspace(IRender_Sector* _sector, CFrustum
     Fvector& _cop, BOOL _dynamic, BOOL _precise_portals)
 {
     VERIFY(_sector);
-    RImplementation.marker++;  // !!! critical here
+    RImplementation.marker++; // !!! critical here
 
     // Save and build new frustum, disable HOM
     CFrustum ViewSave = ViewBase;
     ViewBase = *_frustum;
     View = &ViewBase;
 
-    if (_precise_portals && RImplementation.rmPortals) {
+    if (_precise_portals && RImplementation.rmPortals)
+    {
         // Check if camera is too near to some portal - if so force DualRender
         Fvector box_radius;
         box_radius.set(EPS_L * 20, EPS_L * 20, EPS_L * 20);
@@ -754,7 +751,8 @@ void D3DXRenderBase::r_dsgraph_render_subspace(IRender_Sector* _sector, CFrustum
         }
     }
 
-    if (_dynamic) {
+    if (_dynamic)
+    {
         set_Object(0);
 
         // Traverse object database
@@ -765,8 +763,10 @@ void D3DXRenderBase::r_dsgraph_render_subspace(IRender_Sector* _sector, CFrustum
         {
             ISpatial* spatial = lstRenderables[o_it];
             CSector* sector = (CSector*)spatial->GetSpatialData().sector;
-            if (0 == sector) continue;                                   // disassociated from S/P structure
-            if (PortalTraverser.i_marker != sector->r_marker) continue;  // inactive (untouched) sector
+            if (0 == sector)
+                continue; // disassociated from S/P structure
+            if (PortalTraverser.i_marker != sector->r_marker)
+                continue; // inactive (untouched) sector
             for (u32 v_it = 0; v_it < sector->r_frustums.size(); v_it++)
             {
                 set_Frustum(&(sector->r_frustums[v_it]));
@@ -775,7 +775,8 @@ void D3DXRenderBase::r_dsgraph_render_subspace(IRender_Sector* _sector, CFrustum
 
                 // renderable
                 IRenderable* renderable = spatial->dcast_Renderable();
-                if (0 == renderable) continue;  // unknown, but renderable object (r1_glow???)
+                if (0 == renderable)
+                    continue; // unknown, but renderable object (r1_glow???)
 
                 renderable->renderable_Render();
             }
@@ -803,7 +804,7 @@ void D3DXRenderBase::r_dsgraph_render_R1_box(IRender_Sector* _S, Fbox& BB, int s
         dxRender_Visual* V = lstVisuals[test];
 
         // Visual is 100% visible - simply add it
-        xr_vector<dxRender_Visual*>::iterator I, E;  // it may be usefull for 'hierrarhy' visuals
+        xr_vector<dxRender_Visual *>::iterator I, E; // it may be usefull for 'hierrarhy' visuals
 
         switch (V->Type)
         {
@@ -816,7 +817,8 @@ void D3DXRenderBase::r_dsgraph_render_R1_box(IRender_Sector* _S, Fbox& BB, int s
             for (; I != E; I++)
             {
                 dxRender_Visual* T = *I;
-                if (BB.intersect(T->vis.box)) lstVisuals.push_back(T);
+                if (BB.intersect(T->vis.box))
+                    lstVisuals.push_back(T);
             }
         }
         break;
@@ -831,7 +833,8 @@ void D3DXRenderBase::r_dsgraph_render_R1_box(IRender_Sector* _S, Fbox& BB, int s
             for (; I != E; I++)
             {
                 dxRender_Visual* T = *I;
-                if (BB.intersect(T->vis.box)) lstVisuals.push_back(T);
+                if (BB.intersect(T->vis.box))
+                    lstVisuals.push_back(T);
             }
         }
         break;
@@ -843,7 +846,8 @@ void D3DXRenderBase::r_dsgraph_render_R1_box(IRender_Sector* _S, Fbox& BB, int s
             for (; I != E; I++)
             {
                 dxRender_Visual* T = *I;
-                if (BB.intersect(T->vis.box)) lstVisuals.push_back(T);
+                if (BB.intersect(T->vis.box))
+                    lstVisuals.push_back(T);
             }
         }
         break;
@@ -851,7 +855,8 @@ void D3DXRenderBase::r_dsgraph_render_R1_box(IRender_Sector* _S, Fbox& BB, int s
         {
             // Renderable visual
             ShaderElement* E = V->shader->E[sh]._get();
-            if (E && !(E->flags.bDistort)) {
+            if (E && !(E->flags.bDistort))
+            {
                 for (u32 pass = 0; pass < E->passes.size(); pass++)
                 {
                     RCache.set_Element(E, pass);

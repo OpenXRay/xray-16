@@ -23,8 +23,8 @@
 
 class XR_EPROPS_API TItemList : public TForm
 {
-    __published :  // IDE-managed Components
-                   TElTree* tvItems;
+    __published : // IDE-managed Components
+                  TElTree* tvItems;
     TFormStorage* fsStorage;
     TMxPopupMenu* pmSystem;
     TMenuItem* ExpandAll1;
@@ -68,7 +68,7 @@ class XR_EPROPS_API TItemList : public TForm
     void __fastcall tvItemsHeaderResize(TObject* Sender);
     void __fastcall tvItemsCompareItems(TObject* Sender, TElTreeItem* Item1, TElTreeItem* Item2, int& res);
 
-  private:  // User declarations
+private: // User declarations
     RStringVec last_selected_items;
 
     ListItemsVec m_Items;
@@ -77,7 +77,7 @@ class XR_EPROPS_API TItemList : public TForm
     void OutBOOL(BOOL val, TCanvas* Surface, const TRect& R);
     void OutText(LPCSTR text, TCanvas* Surface, TRect R, TGraphic* g = 0, bool bArrow = false);
 
-  public:
+public:
     s32 iLocked;
     Flags32 m_Flags;
     // events
@@ -88,7 +88,7 @@ class XR_EPROPS_API TItemList : public TForm
     TOnItemRename OnItemRenameEvent;
     TOnItemRemove OnItemRemoveEvent;
 
-  protected:
+protected:
     // RT store
     struct SFolderStore
     {
@@ -97,10 +97,10 @@ class XR_EPROPS_API TItemList : public TForm
     DEFINE_MAP(AnsiString, SFolderStore, FolderStoreMap, FolderStorePairIt);
     FolderStoreMap FolderStore;
 
-  protected:
+protected:
     void __stdcall RenameItem(LPCSTR fn0, LPCSTR fn1, EItemType type);
 
-  public:  // User declarations
+public: // User declarations
     enum
     {
         // set
@@ -117,7 +117,7 @@ class XR_EPROPS_API TItemList : public TForm
         //        ilRT_UpdateLocked=(1<<31),
     };
 
-  public:  // User declarations
+public: // User declarations
     __fastcall TItemList(TComponent* Owner);
 
     void ShowListModal();
@@ -129,7 +129,6 @@ class XR_EPROPS_API TItemList : public TForm
     virtual void SelectItem(LPCSTR full_name, bool bVal, bool bLeaveSel, bool bExpand);
     virtual void AssignItems(ListItemsVec& values, bool full_expand, bool full_sort = false);
     bool IsFocused() { return tvItems->Focused(); }
-
     const ListItemsVec& GetItems() { return m_Items; }
     virtual int GetSelected(RStringVec& items);
     virtual int GetSelected(LPCSTR pref, ListItemsVec& items, bool bOnlyObject);
@@ -152,9 +151,7 @@ class XR_EPROPS_API TItemList : public TForm
         VERIFY(iLocked >= 0);
     }
     virtual bool IsLocked() { return (iLocked > 0); }
-
     virtual void SetImages(TImageList* image_list) { tvItems->Images = image_list; }
-
     virtual void LoadSelection(TFormStorage* storage);
     virtual void SaveSelection(TFormStorage* storage);
 
@@ -168,7 +165,7 @@ class XR_EPROPS_API TItemList : public TForm
     {
         LoadSelection(fs);
         //		tvItems->HeaderSections->Item[0]->Width =
-        //fs->ReadInteger(AnsiString().sprintf("%s_column0_width",Name.c_str()),tvItems->HeaderSections->Item[0]->Width);
+        // fs->ReadInteger(AnsiString().sprintf("%s_column0_width",Name.c_str()),tvItems->HeaderSections->Item[0]->Width);
         miDrawThumbnails->Checked = fs->ReadInteger(AnsiString().sprintf("%s_draw_thm", Name.c_str()), false);
         RefreshForm();
     }
@@ -193,12 +190,9 @@ class XR_EPROPS_API TItemList : public TForm
     virtual void SetOnItemRenameEvent(TOnItemRename e) { OnItemRenameEvent = e; }
     virtual void SetOnItemRemoveEvent(TOnItemRemove e) { OnItemRemoveEvent = e; }
     virtual void SetOnModifiedEvent(TOnModifiedEvent e) { OnModifiedEvent = e; }
-
     virtual void SetILFocus() { SetFocus(); }
-
     virtual u32 GetFlags() { return m_Flags.flags; }
     virtual void SetFlags(u32 mask) { m_Flags.assign(mask); }
-
 #ifdef __BORLANDC__
     static TItemList* CreateForm(
         LPCSTR title, TWinControl* parent = 0, TAlign align = alNone, u32 flags = ilMultiSelect | ilFolderStore);

@@ -12,7 +12,6 @@ struct SIniFileStream : public IIniFileStream
     LPCSTR gen_name();
 
     virtual void __stdcall move_begin() { counter = 0; };
-
     virtual void __stdcall w_float(float a);
     virtual void __stdcall w_vec3(const Fvector& a);
     virtual void __stdcall w_vec4(const Fvector4& a);

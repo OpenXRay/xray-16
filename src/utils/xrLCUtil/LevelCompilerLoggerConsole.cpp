@@ -1,18 +1,9 @@
 #include "pch.hpp"
 #include "LevelCompilerLoggerConsole.hpp"
 
-LevelCompilerLoggerConsole::LevelCompilerLoggerConsole()
-{
-}
-
-void LevelCompilerLoggerConsole::Initialize(const char* name)
-{
-}
-
-void LevelCompilerLoggerConsole::Destroy()
-{
-}
-
+LevelCompilerLoggerConsole::LevelCompilerLoggerConsole() {}
+void LevelCompilerLoggerConsole::Initialize(const char* name) {}
+void LevelCompilerLoggerConsole::Destroy() {}
 void LevelCompilerLoggerConsole::clMsg(const char* format, ...)
 {
     va_list args;
@@ -52,20 +43,7 @@ void LevelCompilerLoggerConsole::StatusV(const char* format, va_list args)
     Msg("Status: %s", buf);
 }
 
-void LevelCompilerLoggerConsole::Progress(float progress)
-{
-    Msg("Progress: %f", progress);
-}
-
-void LevelCompilerLoggerConsole::Phase(const char* phaseName)
-{
-    Msg("Phase: %s", phaseName);
-}
-
-void LevelCompilerLoggerConsole::Success(const char* msg)
-{
-}
-
-void LevelCompilerLoggerConsole::Failure(const char* msg)
-{
-}
+void LevelCompilerLoggerConsole::Progress(float progress) { Msg("Progress: %f", progress); }
+void LevelCompilerLoggerConsole::Phase(const char* phaseName) { Msg("Phase: %s", phaseName); }
+void LevelCompilerLoggerConsole::Success(const char* msg) {}
+void LevelCompilerLoggerConsole::Failure(const char* msg) {}

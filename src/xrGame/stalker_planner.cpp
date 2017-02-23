@@ -25,15 +25,8 @@
 
 using namespace StalkerDecisionSpace;
 
-CStalkerPlanner::CStalkerPlanner()
-{
-    m_affect_cover = false;
-}
-
-CStalkerPlanner::~CStalkerPlanner()
-{
-}
-
+CStalkerPlanner::CStalkerPlanner() { m_affect_cover = false; }
+CStalkerPlanner::~CStalkerPlanner() {}
 #ifdef LOG_ACTION
 LPCSTR CStalkerPlanner::action2string(const _action_id_type& action_id)
 {
@@ -81,7 +74,8 @@ void CStalkerPlanner::update(u32 time_delta)
     inherited::update();
 
 #ifdef GOAP_DEBUG
-    if (m_failed) {
+    if (m_failed)
+    {
         {
             Msg("%d", evaluators().size());
             EVALUATORS::const_iterator I = evaluators().begin();

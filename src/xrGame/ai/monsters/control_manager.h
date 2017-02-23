@@ -61,8 +61,8 @@ public:
     void set_base_controller(CControl_Com*, ControlCom::EControlType);
 
     // capturing/releasing
-    void capture(CControl_Com*, ControlCom::EControlType);  // who, type
-    void release(CControl_Com*, ControlCom::EControlType);  // who, type
+    void capture(CControl_Com*, ControlCom::EControlType); // who, type
+    void release(CControl_Com*, ControlCom::EControlType); // who, type
     bool check_capturer(CControl_Com* com, ControlCom::EControlType type);
 
     // Lain: added
@@ -85,7 +85,6 @@ public:
     CControlDirection& direction() { return (*m_direction); }
     CControlPathBuilder& path_builder() { return (*m_path); }
     CControlMovement& movement() { return (*m_movement); }
-
     void install_path_manager(CControlPathBuilder*);
 
     bool is_captured(ControlCom::EControlType);

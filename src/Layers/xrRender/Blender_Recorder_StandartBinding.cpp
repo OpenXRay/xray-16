@@ -14,12 +14,11 @@
 #include "xrEngine/Environment.h"
 
 // matrices
-#define BIND_DECLARE(xf)                                                                                               \
-    \
-class cl_xform_##xf : public R_constant_setup{virtual void setup(R_constant * C){RCache.xforms.set_c_##xf(C);          \
-    }                                                                                                                  \
-    }                                                                                                                  \
-    ;                                                                                                                  \
+#define BIND_DECLARE(xf)\
+    class cl_xform_##xf : public R_constant_setup\
+    {\
+        virtual void setup(R_constant* C) {RCache.xforms.set_c_##xf(C); }\
+    };\
     static cl_xform_##xf binder_##xf
 BIND_DECLARE(w);
 BIND_DECLARE(invw);
@@ -29,11 +28,11 @@ BIND_DECLARE(wv);
 BIND_DECLARE(vp);
 BIND_DECLARE(wvp);
 
-#define DECLARE_TREE_BIND(c)                                                                                           \
-    class cl_tree_##c : public R_constant_setup                                                                        \
-    {                                                                                                                  \
-        virtual void setup(R_constant* C) { RCache.tree.set_c_##c(C); }                                                \
-    };                                                                                                                 \
+#define DECLARE_TREE_BIND(c)\
+    class cl_tree_##c : public R_constant_setup\
+    {\
+        virtual void setup(R_constant* C) { RCache.tree.set_c_##c(C); }\
+    };\
     static cl_tree_##c tree_binder_##c
 
 DECLARE_TREE_BIND(m_xform_v);
@@ -75,17 +74,16 @@ class cl_texgen : public R_constant_setup
 #if defined(USE_DX10) || defined(USE_DX11)
         Fmatrix mTexelAdjust = {
             0.5f, 0.0f, 0.0f, 0.0f, 0.0f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.5f, 0.5f, 0.0f, 1.0f};
-#else   //	USE_DX10
+#else // USE_DX10
         float _w = float(RDEVICE.dwWidth);
         float _h = float(RDEVICE.dwHeight);
         float o_w = (.5f / _w);
         float o_h = (.5f / _h);
         Fmatrix mTexelAdjust = {0.5f, 0.0f, 0.0f, 0.0f, 0.0f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.5f + o_w,
             0.5f + o_h, 0.0f, 1.0f};
-#endif  //	USE_DX10
+#endif // USE_DX10
 
         mTexgen.mul(mTexelAdjust, RCache.xforms.m_wvp);
-
         RCache.set_c(C, mTexgen);
     }
 };
@@ -100,17 +98,16 @@ class cl_VPtexgen : public R_constant_setup
 #if defined(USE_DX10) || defined(USE_DX11)
         Fmatrix mTexelAdjust = {
             0.5f, 0.0f, 0.0f, 0.0f, 0.0f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.5f, 0.5f, 0.0f, 1.0f};
-#else   //	USE_DX10
+#else // USE_DX10
         float _w = float(RDEVICE.dwWidth);
         float _h = float(RDEVICE.dwHeight);
         float o_w = (.5f / _w);
         float o_h = (.5f / _h);
         Fmatrix mTexelAdjust = {0.5f, 0.0f, 0.0f, 0.0f, 0.0f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.5f + o_w,
             0.5f + o_h, 0.0f, 1.0f};
-#endif  //	USE_DX10
+#endif // USE_DX10
 
         mTexgen.mul(mTexelAdjust, RCache.xforms.m_vp);
-
         RCache.set_c(C, mTexgen);
     }
 };
@@ -124,7 +121,8 @@ class cl_fog_plane : public R_constant_setup
     Fvector4 result;
     virtual void setup(R_constant* C)
     {
-        if (marker != Device.dwFrame) {
+        if (marker != Device.dwFrame)
+        {
             // Plane
             Fvector4 plane;
             Fmatrix& M = Device.mFullTransform;
@@ -138,7 +136,7 @@ class cl_fog_plane : public R_constant_setup
             // Near/Far
             float A = g_pGamePersistent->Environment().CurrentEnv->fog_near;
             float B = 1 / (g_pGamePersistent->Environment().CurrentEnv->fog_far - A);
-            result.set(-plane.x * B, -plane.y * B, -plane.z * B, 1 - (plane.w - A) * B);  // view-plane
+            result.set(-plane.x * B, -plane.y * B, -plane.z * B, 1 - (plane.w - A) * B); // view-plane
         }
         RCache.set_c(C, result);
     }
@@ -152,7 +150,8 @@ class cl_fog_params : public R_constant_setup
     Fvector4 result;
     virtual void setup(R_constant* C)
     {
-        if (marker != Device.dwFrame) {
+        if (marker != Device.dwFrame)
+        {
             // Near/Far
             float n = g_pGamePersistent->Environment().CurrentEnv->fog_near;
             float f = g_pGamePersistent->Environment().CurrentEnv->fog_far;
@@ -171,7 +170,8 @@ class cl_fog_color : public R_constant_setup
     Fvector4 result;
     virtual void setup(R_constant* C)
     {
-        if (marker != Device.dwFrame) {
+        if (marker != Device.dwFrame)
+        {
             CEnvDescriptor& desc = *g_pGamePersistent->Environment().CurrentEnv;
             result.set(desc.fog_color.x, desc.fog_color.y, desc.fog_color.z, 0);
         }
@@ -233,7 +233,8 @@ class cl_sun0_color : public R_constant_setup
     Fvector4 result;
     virtual void setup(R_constant* C)
     {
-        if (marker != Device.dwFrame) {
+        if (marker != Device.dwFrame)
+        {
             CEnvDescriptor& desc = *g_pGamePersistent->Environment().CurrentEnv;
             result.set(desc.sun_color.x, desc.sun_color.y, desc.sun_color.z, 0);
         }
@@ -247,7 +248,8 @@ class cl_sun0_dir_w : public R_constant_setup
     Fvector4 result;
     virtual void setup(R_constant* C)
     {
-        if (marker != Device.dwFrame) {
+        if (marker != Device.dwFrame)
+        {
             CEnvDescriptor& desc = *g_pGamePersistent->Environment().CurrentEnv;
             result.set(desc.sun_dir.x, desc.sun_dir.y, desc.sun_dir.z, 0);
         }
@@ -261,7 +263,8 @@ class cl_sun0_dir_e : public R_constant_setup
     Fvector4 result;
     virtual void setup(R_constant* C)
     {
-        if (marker != Device.dwFrame) {
+        if (marker != Device.dwFrame)
+        {
             Fvector D;
             CEnvDescriptor& desc = *g_pGamePersistent->Environment().CurrentEnv;
             Device.mView.transform_dir(D, desc.sun_dir);
@@ -280,7 +283,8 @@ class cl_amb_color : public R_constant_setup
     Fvector4 result;
     virtual void setup(R_constant* C)
     {
-        if (marker != Device.dwFrame) {
+        if (marker != Device.dwFrame)
+        {
             CEnvDescriptorMixer& desc = *g_pGamePersistent->Environment().CurrentEnv;
             result.set(desc.ambient.x, desc.ambient.y, desc.ambient.z, desc.weight);
         }
@@ -294,7 +298,8 @@ class cl_hemi_color : public R_constant_setup
     Fvector4 result;
     virtual void setup(R_constant* C)
     {
-        if (marker != Device.dwFrame) {
+        if (marker != Device.dwFrame)
+        {
             CEnvDescriptor& desc = *g_pGamePersistent->Environment().CurrentEnv;
             result.set(desc.hemi_color.x, desc.hemi_color.y, desc.hemi_color.z, desc.hemi_color.w);
         }
@@ -339,7 +344,7 @@ void CBlender_Compile::SetMapping()
     r_Constant("hemi_cube_pos_faces", &binder_hemi_cube_pos_faces);
     r_Constant("hemi_cube_neg_faces", &binder_hemi_cube_neg_faces);
 
-    //	Igor	temp solution for the texgen functionality in the shader
+    // Igor temp solution for the texgen functionality in the shader
     r_Constant("m_texgen", &binder_texgen);
     r_Constant("mVPTexgen", &binder_VPtexgen);
 
@@ -362,18 +367,19 @@ void CBlender_Compile::SetMapping()
     r_Constant("L_sun_color", &binder_sun0_color);
     r_Constant("L_sun_dir_w", &binder_sun0_dir_w);
     r_Constant("L_sun_dir_e", &binder_sun0_dir_e);
-    //	r_Constant				("L_lmap_color",	&binder_lm_color);
+    //r_Constant("L_lmap_color", &binder_lm_color);
     r_Constant("L_hemi_color", &binder_hemi_color);
     r_Constant("L_ambient", &binder_amb_color);
 #endif
     r_Constant("screen_res", &binder_screen_res);
 
     // detail
-    // if (bDetail	&& detail_scaler)
-    //	Igor: bDetail can be overridden by no_detail_texture option.
-    //	But shader can be deatiled implicitly, so try to set this parameter
-    //	anyway.
-    if (detail_scaler) r_Constant("dt_params", detail_scaler);
+    //if (bDetail  && detail_scaler)
+    // Igor: bDetail can be overridden by no_detail_texture option.
+    // But shader can be deatiled implicitly, so try to set this parameter
+    // anyway.
+    if (detail_scaler)
+        r_Constant("dt_params", detail_scaler);
 
     // other common
     for (u32 it = 0; it < RImplementation.Resources->v_constant_setup.size(); it++)

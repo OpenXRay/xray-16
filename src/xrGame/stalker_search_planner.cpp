@@ -41,16 +41,8 @@ void CStalkerSearchPlanner::initialize()
     CScriptActionPlanner::m_storage.set_property(eWorldPropertyAmbushLocationReached, false);
 }
 
-void CStalkerSearchPlanner::update()
-{
-    inherited::update();
-}
-
-void CStalkerSearchPlanner::finalize()
-{
-    inherited::finalize();
-}
-
+void CStalkerSearchPlanner::update() { inherited::update(); }
+void CStalkerSearchPlanner::finalize() { inherited::finalize(); }
 void CStalkerSearchPlanner::add_evaluators()
 {
     add_evaluator(eWorldPropertyPureEnemy, new CStalkerPropertyEvaluatorConst(true, "is_there_enemies_delayed"));

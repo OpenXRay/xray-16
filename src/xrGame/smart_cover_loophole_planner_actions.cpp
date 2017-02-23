@@ -51,10 +51,7 @@ using namespace MonsterSpace;
 using namespace StalkerDecisionSpace;
 using namespace ObjectHandlerSpace;
 
-loophole_action_base::loophole_action_base(CAI_Stalker* object, LPCSTR action_name) : inherited(object, action_name)
-{
-}
-
+loophole_action_base::loophole_action_base(CAI_Stalker* object, LPCSTR action_name) : inherited(object, action_name) {}
 Fvector loophole_action_base::nearest_loophole_direction(Fvector const& position) const
 {
     stalker_movement_manager_smart_cover& movement = object().movement();
@@ -86,7 +83,8 @@ void loophole_action_base::process_fire_position(bool const& change_sight)
     VERIFY(object().movement().current_params().cover_fire_position());
 
     Fvector const& position = *object().movement().current_params().cover_fire_position();
-    if (!object().movement().in_current_loophole_fov(position)) {
+    if (!object().movement().in_current_loophole_fov(position))
+    {
         object().sight().setup(CSightAction(SightManager::eSightTypeDirection,
             nearest_loophole_direction(*object().movement().current_params().cover_fire_position()), true));
 
@@ -98,7 +96,8 @@ void loophole_action_base::process_fire_position(bool const& change_sight)
         SightManager::eSightTypePosition, *object().movement().current_params().cover_fire_position(), true));
     object().sight().update();
 
-    if (!change_sight) return;
+    if (!change_sight)
+        return;
 
     object().sight().Exec_Look(0.f);
 }
@@ -108,11 +107,13 @@ void loophole_action_base::process_fire_object(bool const& change_sight)
     VERIFY(object().movement().current_params().cover_fire_object());
 
     CGameObject const* fire_object = object().movement().current_params().cover_fire_object();
-    if (object().movement().in_current_loophole_fov(fire_object->Position())) {
+    if (object().movement().in_current_loophole_fov(fire_object->Position()))
+    {
         object().sight().setup(CSightAction(fire_object, true, true));
         object().sight().update();
 
-        if (!change_sight) return;
+        if (!change_sight)
+            return;
 
         object().sight().Exec_Look(0.f);
         return;
@@ -123,7 +124,8 @@ void loophole_action_base::process_fire_object(bool const& change_sight)
 
     object().sight().update();
 
-    if (!change_sight) return;
+    if (!change_sight)
+        return;
 
     object().sight().Exec_Look(0.f);
 
@@ -142,13 +144,16 @@ void loophole_action_base::process_default(bool const& change_sight)
     object().sight().setup(CSightAction(SightManager::eSightTypeAnimationDirection, true, false));
     object().sight().update();
 
-    if (!change_sight) return;
+    if (!change_sight)
+        return;
 
     object().sight().Exec_Look(0.f);
 
-    if (object().movement().current_params().cover() != object().movement().target_params().cover()) return;
+    if (object().movement().current_params().cover() != object().movement().target_params().cover())
+        return;
 
-    if (object().movement().target_params().cover_loophole()) return;
+    if (object().movement().target_params().cover_loophole())
+        return;
 
 #pragma todo("insert here loophole selection")
 }
@@ -156,9 +161,11 @@ void loophole_action_base::process_default(bool const& change_sight)
 bool loophole_action_base::enemy_in_fov() const
 {
     CEntityAlive const* enemy = object().memory().enemy().selected();
-    if (!enemy) return (false);
+    if (!enemy)
+        return (false);
 
-    if (!object().movement().in_current_loophole_fov(enemy->Position())) return (false);
+    if (!object().movement().in_current_loophole_fov(enemy->Position()))
+        return (false);
 
     return (true);
 }
@@ -168,7 +175,8 @@ bool loophole_action_base::process_enemy(bool const& change_sight)
     CEntityAlive const* enemy = object().memory().enemy().selected();
     VERIFY(enemy);
 
-    if (enemy_in_fov()) {
+    if (enemy_in_fov())
+    {
         if (object().memory().visual().visible_now(enemy))
             object().sight().setup(CSightAction(enemy, true, true));
         else
@@ -176,7 +184,8 @@ bool loophole_action_base::process_enemy(bool const& change_sight)
                 CSightAction(SightManager::eSightTypePosition, object().memory().memory_position(enemy), true));
 
         object().sight().update();
-        if (!change_sight) return (true);
+        if (!change_sight)
+            return (true);
 
         object().sight().Exec_Look(0.f);
         return (true);
@@ -186,7 +195,8 @@ bool loophole_action_base::process_enemy(bool const& change_sight)
         CSightAction(SightManager::eSightTypeDirection, nearest_loophole_direction(enemy->Position()), true));
     object().sight().update();
 
-    if (!change_sight) return (true);
+    if (!change_sight)
+        return (true);
 
     object().sight().Exec_Look(0.f);
     return (true);
@@ -194,17 +204,20 @@ bool loophole_action_base::process_enemy(bool const& change_sight)
 
 bool loophole_action_base::setup_sight(bool const& change_sight)
 {
-    if (object().movement().current_params().cover_fire_position()) {
+    if (object().movement().current_params().cover_fire_position())
+    {
         process_fire_position(change_sight);
         return (true);
     }
 
-    if (object().movement().current_params().cover_fire_object()) {
+    if (object().movement().current_params().cover_fire_object())
+    {
         process_fire_object(change_sight);
         return (true);
     }
 
-    if (!object().memory().enemy().selected()) {
+    if (!object().memory().enemy().selected())
+    {
         process_default(change_sight);
         return (true);
     }
@@ -232,25 +245,10 @@ void loophole_action::initialize()
     m_animation = animations[m_random.randI(animations.size())];
 }
 
-void loophole_action::execute()
-{
-    inherited::execute();
-}
-
-void loophole_action::finalize()
-{
-    inherited::finalize();
-}
-
-void loophole_action::select_animation(shared_str& result)
-{
-    result = m_animation;
-}
-
-void loophole_action::on_animation_end()
-{
-}
-
+void loophole_action::execute() { inherited::execute(); }
+void loophole_action::finalize() { inherited::finalize(); }
+void loophole_action::select_animation(shared_str& result) { result = m_animation; }
+void loophole_action::on_animation_end() {}
 //////////////////////////////////////////////////////////////////////////
 // loophole_action_no_sight
 //////////////////////////////////////////////////////////////////////////
@@ -267,19 +265,12 @@ void loophole_action_no_sight::initialize()
     object().sight().setup(CSightAction(SightManager::eSightTypeAnimationDirection, true, false));
 }
 
-void loophole_action_no_sight::finalize()
-{
-    inherited::finalize();
-}
-
+void loophole_action_no_sight::finalize() { inherited::finalize(); }
 //////////////////////////////////////////////////////////////////////////
 // loophole_reload
 //////////////////////////////////////////////////////////////////////////
 
-loophole_reload::loophole_reload(CAI_Stalker* object, LPCSTR action_name) : inherited(object, action_name)
-{
-}
-
+loophole_reload::loophole_reload(CAI_Stalker* object, LPCSTR action_name) : inherited(object, action_name) {}
 void loophole_reload::select_animation(shared_str& result)
 {
     inherited::select_animation(result);
@@ -308,16 +299,8 @@ void transition::initialize()
     m_animation = animations[m_random.randI(animations.size())];
 }
 
-void transition::finalize()
-{
-    inherited::finalize();
-}
-
-void transition::select_animation(shared_str& result)
-{
-    result = m_animation;
-}
-
+void transition::finalize() { inherited::finalize(); }
+void transition::select_animation(shared_str& result) { result = m_animation; }
 void transition::on_animation_end()
 {
     m_planner->m_storage.set_property(m_state_from, false);
@@ -330,10 +313,7 @@ void transition::on_animation_end()
 // loophole_lookout
 //////////////////////////////////////////////////////////////////////////
 
-loophole_lookout::loophole_lookout(CAI_Stalker* object, LPCSTR action_name) : inherited(object, action_name)
-{
-}
-
+loophole_lookout::loophole_lookout(CAI_Stalker* object, LPCSTR action_name) : inherited(object, action_name) {}
 void loophole_lookout::initialize()
 {
     inherited::initialize();
@@ -359,10 +339,7 @@ void loophole_lookout::finalize()
 // loophole_fire
 //////////////////////////////////////////////////////////////////////////
 
-loophole_fire::loophole_fire(CAI_Stalker* object, LPCSTR action_name) : inherited(object, action_name)
-{
-}
-
+loophole_fire::loophole_fire(CAI_Stalker* object, LPCSTR action_name) : inherited(object, action_name) {}
 void loophole_fire::initialize()
 {
     inherited::initialize();
@@ -398,11 +375,7 @@ void loophole_fire::finalize()
     inherited::finalize();
 }
 
-void loophole_fire::select_animation(shared_str& result)
-{
-    inherited::select_animation(result);
-}
-
+void loophole_fire::select_animation(shared_str& result) { inherited::select_animation(result); }
 void loophole_fire::on_animation_end()
 {
     inherited::on_animation_end();
@@ -413,7 +386,8 @@ void loophole_fire::on_animation_end()
 void loophole_fire::on_mark()
 {
     CWeapon* best_weapon = smart_cast<CWeapon*>(object().best_weapon());
-    if (!best_weapon) return;
+    if (!best_weapon)
+        return;
 
     u32 const magazine_size = best_weapon->GetAmmoMagSize();
     //	Msg							( "started firing: %d", magazine_size );
@@ -423,7 +397,8 @@ void loophole_fire::on_mark()
 void loophole_fire::on_no_mark()
 {
     VERIFY(object().movement().current_params().cover());
-    if (!object().movement().current_params().cover()->can_fire()) return;
+    if (!object().movement().current_params().cover()->can_fire())
+        return;
 
     object().set_goal(eObjectActionIdle, object().best_weapon(), 1, 3);
 }

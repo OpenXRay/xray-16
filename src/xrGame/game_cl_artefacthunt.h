@@ -26,10 +26,10 @@ protected:
     virtual void OnBuySpawnMenu_Ok();
 
 public:
-    u8 artefactsNum;       // ah
-    u16 artefactBearerID;  // ah,ZoneMap
+    u8 artefactsNum; // ah
+    u16 artefactBearerID; // ah,ZoneMap
     u16 old_artefactBearerID;
-    u8 teamInPossession;  // ah,ZoneMap
+    u8 teamInPossession; // ah,ZoneMap
     u8 old_teamInPossession;
     u16 artefactID;
     u16 old_artefactID;

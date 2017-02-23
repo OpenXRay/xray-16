@@ -36,17 +36,10 @@ IC void CSoundMemoryManager::priority(const ESoundTypes& sound_type, u32 priorit
 }
 
 #ifdef USE_SELECTED_SOUND
-IC const MemorySpace::CSoundObject* CSoundMemoryManager::sound() const
-{
-    return (m_selected_sound);
-}
+IC const MemorySpace::CSoundObject* CSoundMemoryManager::sound() const { return (m_selected_sound); }
 #endif
 
-IC void CSoundMemoryManager::set_squad_objects(SOUNDS* squad_objects)
-{
-    m_sounds = squad_objects;
-}
-
+IC void CSoundMemoryManager::set_squad_objects(SOUNDS* squad_objects) { m_sounds = squad_objects; }
 IC void CSoundMemoryManager::set_threshold(float threshold)
 {
     m_sound_threshold = threshold;

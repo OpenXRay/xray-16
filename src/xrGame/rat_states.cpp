@@ -18,13 +18,11 @@
 // rat_state_death
 ////////////////////////////////////////////////////////////////////////////
 
-void rat_state_death::initialize()
-{
-}
-
+void rat_state_death::initialize() {}
 void rat_state_death::execute()
 {
-    if (object().m_fFood > 0.f) return;
+    if (object().m_fFood > 0.f)
+        return;
 
     object().setEnabled(FALSE);
 
@@ -33,45 +31,49 @@ void rat_state_death::execute()
     object().u_EventSend(packet);
 }
 
-void rat_state_death::finalize()
-{
-}
-
+void rat_state_death::finalize() {}
 ////////////////////////////////////////////////////////////////////////////
 // rat_state_free_active
 ////////////////////////////////////////////////////////////////////////////
 
 void rat_state_free_active::initialize()
 {
-    if (object().m_walk_on_way) return;
+    if (object().m_walk_on_way)
+        return;
     object().init_free_active();
 }
 
 void rat_state_free_active::execute()
 {
-    if (!object().get_alife()) return;
+    if (!object().get_alife())
+        return;
 
-    if (object().m_walk_on_way) {
+    if (object().m_walk_on_way)
+    {
         object().m_state_manager->push_state(CAI_Rat::aiRatNoWay);
         return;
     }
 
-    if (object().switch_if_enemy() && (!object().switch_if_porsuit() || !object().switch_if_home())) {
+    if (object().switch_if_enemy() && (!object().switch_if_porsuit() || !object().switch_if_home()))
+    {
         object().m_state_manager->push_state(CAI_Rat::aiRatAttackMelee);
         return;
     }
 
-    if (!object().get_morale()) {
+    if (!object().get_morale())
+    {
         object().m_state_manager->push_state(CAI_Rat::aiRatUnderFire);
         return;
     }
 
-    if (object().switch_to_free_recoil()) {
+    if (object().switch_to_free_recoil())
+    {
         object().m_state_manager->push_state(CAI_Rat::aiRatFreeRecoil);
         return;
     }
 
-    if (object().switch_to_eat()) {
+    if (object().switch_to_eat())
+    {
         object().m_state_manager->push_state(CAI_Rat::aiRatEatCorpse);
         return;
     }
@@ -79,23 +81,19 @@ void rat_state_free_active::execute()
     object().activate_state_free_active();
 }
 
-void rat_state_free_active::finalize()
-{
-}
-
+void rat_state_free_active::finalize() {}
 ////////////////////////////////////////////////////////////////////////////
 // rat_state_free_passive
 ////////////////////////////////////////////////////////////////////////////
 
-void rat_state_free_passive::initialize()
-{
-}
-
+void rat_state_free_passive::initialize() {}
 void rat_state_free_passive::execute()
 {
-    if (!object().get_alife()) return;
+    if (!object().get_alife())
+        return;
 
-    if (object().m_walk_on_way) {
+    if (object().m_walk_on_way)
+    {
         object().m_state_manager->change_state(CAI_Rat::aiRatNoWay);
         return;
     }
@@ -103,22 +101,18 @@ void rat_state_free_passive::execute()
     object().activate_state_free_passive();
 }
 
-void rat_state_free_passive::finalize()
-{
-}
-
+void rat_state_free_passive::finalize() {}
 ////////////////////////////////////////////////////////////////////////////
 // rat_state_attack_range
 ////////////////////////////////////////////////////////////////////////////
 
-void rat_state_attack_range::initialize()
-{
-}
-
+void rat_state_attack_range::initialize() {}
 void rat_state_attack_range::execute()
 {
-    if (!object().get_alife()) return;
-    if (!object().switch_if_enemy()) {
+    if (!object().get_alife())
+        return;
+    if (!object().switch_if_enemy())
+    {
         object().m_state_manager->pop_state();
         return;
     }
@@ -132,28 +126,25 @@ void rat_state_attack_range::execute()
     object().activate_state_attack_range();
 }
 
-void rat_state_attack_range::finalize()
-{
-    object().fire(false);
-}
-
+void rat_state_attack_range::finalize() { object().fire(false); }
 ////////////////////////////////////////////////////////////////////////////
 // rat_state_attack_melee
 ////////////////////////////////////////////////////////////////////////////
 
-void rat_state_attack_melee::initialize()
-{
-}
-
+void rat_state_attack_melee::initialize() {}
 void rat_state_attack_melee::execute()
 {
-    if (!object().get_alife()) return;
-    if (object().get_state() != CAI_Rat::aiRatAttackMelee) {
+    if (!object().get_alife())
+        return;
+    if (object().get_state() != CAI_Rat::aiRatAttackMelee)
+    {
         object().m_state_manager->change_state(object().get_state());
         return;
     }
-    if (object().switch_if_enemy()) {
-        if (object().switch_if_porsuit()) {
+    if (object().switch_if_enemy())
+    {
+        if (object().switch_if_porsuit())
+        {
             object().m_state_manager->change_state(CAI_Rat::aiRatReturnHome);
             return;
         }
@@ -163,11 +154,13 @@ void rat_state_attack_melee::execute()
         object().m_state_manager->pop_state();
         return;
     }
-    if (object().switch_if_dist_angle()) {
+    if (object().switch_if_dist_angle())
+    {
         object().m_state_manager->change_state(CAI_Rat::aiRatAttackRange);
         return;
     }
-    if (object().switch_if_dist_no_angle()) {
+    if (object().switch_if_dist_no_angle())
+    {
         object().activate_turn();
         object().activate_state_move();
         // object().m_state_manager->change_state(CAI_Rat::aiRatAttackRange);
@@ -191,36 +184,34 @@ void rat_state_attack_melee::execute()
     object().activate_state_move();
 }
 
-void rat_state_attack_melee::finalize()
-{
-}
-
+void rat_state_attack_melee::finalize() {}
 ////////////////////////////////////////////////////////////////////////////
 // rat_state_under_fire
 ////////////////////////////////////////////////////////////////////////////
 
-void rat_state_under_fire::initialize()
-{
-    object().init_state_under_fire();
-}
-
+void rat_state_under_fire::initialize() { object().init_state_under_fire(); }
 void rat_state_under_fire::execute()
 {
-    if (!object().get_alife()) return;
-    if (object().switch_if_enemy()) {
+    if (!object().get_alife())
+        return;
+    if (object().switch_if_enemy())
+    {
         object().m_state_manager->change_state(CAI_Rat::aiRatAttackMelee);
         return;
     }
     else
     {
-        if (object().get_if_dw_time()) {
-            if (object().get_if_tp_entity()) {
+        if (object().get_if_dw_time())
+        {
+            if (object().get_if_tp_entity())
+            {
                 object().m_state_manager->push_state(CAI_Rat::aiRatAttackMelee);
                 return;
             }
             object().set_previous_query_time();
         }
-        if (object().get_morale()) {
+        if (object().get_morale())
+        {
             object().m_state_manager->pop_state();
             return;
         }
@@ -228,41 +219,42 @@ void rat_state_under_fire::execute()
     object().activate_state_move();
 }
 
-void rat_state_under_fire::finalize()
-{
-}
-
+void rat_state_under_fire::finalize() {}
 ////////////////////////////////////////////////////////////////////////////
 // rat_state_retreat
 ////////////////////////////////////////////////////////////////////////////
 
-void rat_state_retreat::initialize()
-{
-}
-
+void rat_state_retreat::initialize() {}
 void rat_state_retreat::execute()
 {
-    if (!object().get_alife()) return;
+    if (!object().get_alife())
+        return;
 
-    if (object().m_walk_on_way) {
+    if (object().m_walk_on_way)
+    {
         object().m_state_manager->push_state(CAI_Rat::aiRatNoWay);
         return;
     }
 
-    if (object().switch_if_no_enemy()) {
+    if (object().switch_if_no_enemy())
+    {
         object().m_state_manager->pop_state();
         return;
     }
-    if (object().switch_if_enemy() && object().switch_if_alife()) {
-        if (object().get_state() != CAI_Rat::aiRatRetreat) {
+    if (object().switch_if_enemy() && object().switch_if_alife())
+    {
+        if (object().get_state() != CAI_Rat::aiRatRetreat)
+        {
             object().m_state_manager->change_state(object().get_state());
             return;
         }
-        if (object().switch_if_dist_no_angle()) {
+        if (object().switch_if_dist_no_angle())
+        {
             object().activate_state_move();
             return;
         }
-        if (object().switch_if_dist_angle()) {
+        if (object().switch_if_dist_angle())
+        {
             object().m_state_manager->change_state(CAI_Rat::aiRatAttackRange);
             return;
         }
@@ -272,40 +264,40 @@ void rat_state_retreat::execute()
     object().activate_state_move();
 }
 
-void rat_state_retreat::finalize()
-{
-}
-
+void rat_state_retreat::finalize() {}
 ////////////////////////////////////////////////////////////////////////////
 // rat_state_pursuit
 ////////////////////////////////////////////////////////////////////////////
 
-void rat_state_pursuit::initialize()
-{
-}
-
+void rat_state_pursuit::initialize() {}
 void rat_state_pursuit::execute()
 {
-    if (!object().get_alife()) return;
+    if (!object().get_alife())
+        return;
 
-    if (object().m_walk_on_way) {
+    if (object().m_walk_on_way)
+    {
         object().m_state_manager->push_state(CAI_Rat::aiRatNoWay);
         return;
     }
 
-    if (object().switch_if_lost_time()) {
+    if (object().switch_if_lost_time())
+    {
         object().m_state_manager->pop_state();
         return;
     }
-    if (object().switch_if_enemy()) {
+    if (object().switch_if_enemy())
+    {
         object().m_state_manager->push_state(CAI_Rat::aiRatAttackMelee);
         return;
     }
-    if (!object().get_morale()) {
+    if (!object().get_morale())
+    {
         object().m_state_manager->push_state(CAI_Rat::aiRatUnderFire);
         return;
     }
-    if (object().switch_to_free_recoil()) {
+    if (object().switch_to_free_recoil())
+    {
         object().m_state_manager->change_state(CAI_Rat::aiRatFreeRecoil);
         return;
     }
@@ -315,17 +307,15 @@ void rat_state_pursuit::execute()
     object().activate_state_move();
 }
 
-void rat_state_pursuit::finalize()
-{
-}
-
+void rat_state_pursuit::finalize() {}
 ////////////////////////////////////////////////////////////////////////////
 // rat_state_free_recoil
 ////////////////////////////////////////////////////////////////////////////
 
 void rat_state_free_recoil::initialize()
 {
-    if (object().m_walk_on_way) return;
+    if (object().m_walk_on_way)
+        return;
 
     object().init_free_recoil();
     object().set_rew_cur_position();
@@ -333,64 +323,70 @@ void rat_state_free_recoil::initialize()
 
 void rat_state_free_recoil::execute()
 {
-    if (!object().get_alife()) return;
+    if (!object().get_alife())
+        return;
 
-    if (object().m_walk_on_way) {
+    if (object().m_walk_on_way)
+    {
         object().m_state_manager->change_state(CAI_Rat::aiRatNoWay);
         return;
     }
 
-    if (object().switch_if_enemy()) {
+    if (object().switch_if_enemy())
+    {
         object().m_state_manager->pop_state();
         return;
     }
-    if (object().switch_if_time()) {
+    if (object().switch_if_time())
+    {
         object().m_state_manager->pop_state();
         return;
     }
-    if (object().switch_if_enemy() && object().switch_if_lost_rtime()) {
+    if (object().switch_if_enemy() && object().switch_if_lost_rtime())
+    {
         object().m_state_manager->change_state(CAI_Rat::aiRatPursuit);
         return;
     }
     object().activate_state_free_recoil();
 }
 
-void rat_state_free_recoil::finalize()
-{
-}
-
+void rat_state_free_recoil::finalize() {}
 ////////////////////////////////////////////////////////////////////////////
 // rat_state_return_home
 ////////////////////////////////////////////////////////////////////////////
 
-void rat_state_return_home::initialize()
-{
-}
-
+void rat_state_return_home::initialize() {}
 void rat_state_return_home::execute()
 {
-    if (!object().get_alife()) return;
+    if (!object().get_alife())
+        return;
 
-    if (object().m_walk_on_way) {
+    if (object().m_walk_on_way)
+    {
         object().m_state_manager->push_state(CAI_Rat::aiRatNoWay);
         return;
     }
 
-    if (object().switch_if_enemy() && !object().switch_if_porsuit()) {
+    if (object().switch_if_enemy() && !object().switch_if_porsuit())
+    {
         object().set_goal_time();
         object().m_state_manager->push_state(CAI_Rat::aiRatAttackMelee);
         return;
     }
-    if (object().switch_if_enemy()) {
-        if (object().switch_if_dist_no_angle()) {
+    if (object().switch_if_enemy())
+    {
+        if (object().switch_if_dist_no_angle())
+        {
             return;
         }
-        if (object().switch_if_dist_angle()) {
+        if (object().switch_if_dist_angle())
+        {
             object().m_state_manager->change_state(CAI_Rat::aiRatAttackRange);
             return;
         }
     }
-    if (!object().switch_if_enemy() || object().switch_if_home() || !object().switch_if_alife()) {
+    if (!object().switch_if_enemy() || object().switch_if_home() || !object().switch_if_alife())
+    {
         object().m_state_manager->pop_state();
         return;
     }
@@ -398,66 +394,61 @@ void rat_state_return_home::execute()
     object().activate_state_home();
 }
 
-void rat_state_return_home::finalize()
-{
-}
-
+void rat_state_return_home::finalize() {}
 ////////////////////////////////////////////////////////////////////////////
 // rat_state_eat_corpse
 ////////////////////////////////////////////////////////////////////////////
 
-void rat_state_eat_corpse::initialize()
-{
-}
-
+void rat_state_eat_corpse::initialize() {}
 void rat_state_eat_corpse::execute()
 {
-    if (!object().get_alife()) return;
+    if (!object().get_alife())
+        return;
 
-    if (object().m_walk_on_way) {
+    if (object().m_walk_on_way)
+    {
         object().m_state_manager->push_state(CAI_Rat::aiRatNoWay);
         return;
     }
 
-    if (object().switch_if_enemy() && object().switch_if_porsuit() || !object().switch_if_home()) {
+    if (object().switch_if_enemy() && object().switch_if_porsuit() || !object().switch_if_home())
+    {
         object().m_state_manager->pop_state();
         return;
     }
 
-    if (!object().switch_if_enemy()) {
-        if (!object().get_morale()) {
+    if (!object().switch_if_enemy())
+    {
+        if (!object().get_morale())
+        {
             object().m_state_manager->pop_state();
             return;
         }
     }
     object().set_goal_time(10.f);
-    if (object().switch_to_free_recoil()) {
+    if (object().switch_to_free_recoil())
+    {
         object().m_state_manager->push_state(CAI_Rat::aiRatFreeRecoil);
         return;
     }
     object().activate_state_eat();
 }
 
-void rat_state_eat_corpse::finalize()
-{
-    object().set_firing();
-}
-
+void rat_state_eat_corpse::finalize() { object().set_firing(); }
 ////////////////////////////////////////////////////////////////////////////
 // rat_state_no_way
 ////////////////////////////////////////////////////////////////////////////
 
-void rat_state_no_way::initialize()
-{
-    object().time_old_attack = Device.dwTimeGlobal;
-}
-
+void rat_state_no_way::initialize() { object().time_old_attack = Device.dwTimeGlobal; }
 void rat_state_no_way::execute()
 {
-    if (!object().get_alife()) return;
+    if (!object().get_alife())
+        return;
 
-    if (!object().m_walk_on_way) {
-        if (object().check_completion_no_way()) {
+    if (!object().m_walk_on_way)
+    {
+        if (object().check_completion_no_way())
+        {
             object().m_state_manager->push_state(CAI_Rat::aiRatAttackMelee);
             return;
         }
@@ -473,6 +464,4 @@ void rat_state_no_way::execute()
     }
 }
 
-void rat_state_no_way::finalize()
-{
-}
+void rat_state_no_way::finalize() {}

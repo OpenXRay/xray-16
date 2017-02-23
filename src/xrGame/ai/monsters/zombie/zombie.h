@@ -25,7 +25,6 @@ public:
     virtual void Hit(SHit* pHDS);
 
     virtual bool ability_pitch_correction() { return false; }
-
     virtual void shedule_Update(u32 dt);
 
     static void BoneCallback(CBoneInstance* B);
@@ -33,7 +32,6 @@ public:
 
     virtual bool use_center_to_aim() const { return true; }
     virtual char* get_monster_class_name() { return "zombie"; }
-
     CBoneInstance* bone_spine;
     CBoneInstance* bone_head;
 
@@ -48,7 +46,7 @@ public:
     float health_death_threshold;
     u8 fake_death_left;
 
-    bool fake_death_fall_down();  // return true if everything is ok
+    bool fake_death_fall_down(); // return true if everything is ok
     void fake_death_stand_up();
 
 #ifdef _DEBUG

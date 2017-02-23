@@ -23,22 +23,14 @@ void Image::SaveTGA(const char* name, ImageFormat format, bool align)
     std::fclose(file);
 }
 
-void Image::SaveTGA(IWriter& writer, bool align)
-{
-    SaveTGA(writer, format, align);
-}
-
+void Image::SaveTGA(IWriter& writer, bool align) { SaveTGA(writer, format, align); }
 void Image::SaveTGA(IWriter& writer, ImageFormat format, bool align)
 {
     auto writerFunc = [&](void* data, u32 dataSize) { writer.w(data, dataSize); };
     SaveTGA(writerFunc, format, align);
 }
 
-void Image::SaveTGA(const char* name, bool align)
-{
-    SaveTGA(name, format, align);
-}
-
+void Image::SaveTGA(const char* name, bool align) { SaveTGA(name, format, align); }
 template <typename TWriter>
 void Image::SaveTGA(TWriter& writerFunc, ImageFormat format, bool align)
 {
@@ -46,7 +38,7 @@ void Image::SaveTGA(TWriter& writerFunc, ImageFormat format, bool align)
     R_ASSERT(width);
     R_ASSERT(height);
     TGAHeader hdr = {};
-    hdr.ImageType = 2;  // uncompressed true-color image
+    hdr.ImageType = 2; // uncompressed true-color image
     hdr.Width = width;
     hdr.Height = height;
     int scanLength = width * channelCount;
@@ -69,7 +61,8 @@ void Image::SaveTGA(TWriter& writerFunc, ImageFormat format, bool align)
                 writerFunc(buffer, sizeof(buffer));
                 p += channelCount;
             }
-            if (paddingSize) writerFunc(&paddingBuf, paddingSize);
+            if (paddingSize)
+                writerFunc(&paddingBuf, paddingSize);
         }
         break;
     }

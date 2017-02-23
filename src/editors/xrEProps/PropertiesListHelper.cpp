@@ -9,15 +9,13 @@
 
 //---------------------------------------------------------------------------
 CPropHelper PHelper_impl;
-IPropHelper& PHelper()
-{
-    return PHelper_impl;
-}
+IPropHelper& PHelper() { return PHelper_impl; }
 //---------------------------------------------------------------------------
 PropItem* CPropHelper::CreateItem(PropItemVec& items, const shared_str& key, EPropType type, u32 item_flags)
 {
     PropItem* item = FindItem(items, key, type);
-    if (!item) {
+    if (!item)
+    {
         item = new PropItem(type);
         item->SetName(key);
         item->m_Flags.set(item_flags, TRUE);
@@ -35,14 +33,17 @@ PropValue* CPropHelper::AppendValue(
 }
 PropItem* CPropHelper::FindItem(PropItemVec& items, shared_str key, EPropType type)
 {
-    if (type != PROP_UNDEF) {
+    if (type != PROP_UNDEF)
+    {
         for (PropItemIt it = items.begin(); it != items.end(); it++)
-            if (((*it)->type == type) && ((*it)->key == key)) return *it;
+            if (((*it)->type == type) && ((*it)->key == key))
+                return *it;
     }
     else
     {
         for (PropItemIt it = items.begin(); it != items.end(); it++)
-            if ((*it)->key == key) return *it;
+            if ((*it)->key == key)
+                return *it;
     }
     return 0;
 }
@@ -196,7 +197,8 @@ ChooseValue* CPropHelper::CreateChoose(PropItemVec& items, shared_str key, share
     ChooseValue* cv = (ChooseValue*)AppendValue(
         items, key, new ChooseValue(val, mode, path, fill_param, sub_item_count, choose_flags), PROP_CHOOSE);
     SChooseEvents* E = TfrmChoseItem::GetEvents(mode);
-    if (E && !E->on_thm.empty()) {
+    if (E && !E->on_thm.empty())
+    {
         cv->Owner()->m_Flags.set(PropItem::flDrawThumbnail, TRUE);
         cv->OnDrawThumbnailEvent = E->on_thm;
     }
@@ -225,7 +227,8 @@ CTextValue* CPropHelper::CreateCName(PropItemVec& items, shared_str key, LPSTR v
     V->Owner()->OnDrawTextEvent.bind(this, &CPropHelper::CNameDraw);
     V->tag = (u32)owner;
     VERIFY(owner);
-    if (V->Owner()->m_Flags.is(PropItem::flMixed)) V->Owner()->m_Flags.set(PropItem::flDisabled, TRUE);
+    if (V->Owner()->m_Flags.is(PropItem::flMixed))
+        V->Owner()->m_Flags.set(PropItem::flDisabled, TRUE);
     return V;
 }
 //---------------------------------------------------------------------------
@@ -256,7 +259,8 @@ RTextValue* CPropHelper::CreateName(PropItemVec& items, shared_str key, shared_s
     V->Owner()->OnDrawTextEvent.bind(this, &CPropHelper::NameDraw);
     V->tag = (u32)owner;
     VERIFY(owner);
-    if (V->Owner()->m_Flags.is(PropItem::flMixed)) V->Owner()->m_Flags.set(PropItem::flDisabled, TRUE);
+    if (V->Owner()->m_Flags.is(PropItem::flMixed))
+        V->Owner()->m_Flags.set(PropItem::flDisabled, TRUE);
     return V;
 }
 RTextValue* CPropHelper::CreateNameCB(PropItemVec& items, shared_str key, shared_str* val, TOnDrawTextEvent draw,
@@ -266,7 +270,8 @@ RTextValue* CPropHelper::CreateNameCB(PropItemVec& items, shared_str key, shared
     V->OnAfterEditEvent = after;
     V->OnBeforeEditEvent = before;
     V->Owner()->OnDrawTextEvent = draw;
-    if (V->Owner()->m_Flags.is(PropItem::flMixed)) V->Owner()->m_Flags.set(PropItem::flDisabled, TRUE);
+    if (V->Owner()->m_Flags.is(PropItem::flMixed))
+        V->Owner()->m_Flags.set(PropItem::flDisabled, TRUE);
     return V;
 }
 //---------------------------------------------------------------------------

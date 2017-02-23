@@ -113,7 +113,6 @@ public:
     const CHARACTER_REPUTATION& Reputation() const { return m_CurrentReputation; }
     float Sympathy() const { return m_Sympathy; }
     void SetSympathy(float sympathy) { m_Sympathy = sympathy; }
-
     //доступут только у InventoryOwner
 protected:
     void SetRank(CHARACTER_RANK_VALUE rank);
@@ -132,6 +131,6 @@ protected:
     CHARACTER_RANK m_CurrentRank;
     CHARACTER_REPUTATION m_CurrentReputation;
     CHARACTER_COMMUNITY m_CurrentCommunity;
-    float m_Sympathy;  // % влияния на группировку
+    float m_Sympathy; // % влияния на группировку
 #endif
 };

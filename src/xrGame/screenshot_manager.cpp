@@ -15,20 +15,9 @@
 
 #pragma comment(lib, "libjpeg.lib")
 
-void* cxalloc(size_t size)
-{
-    return xr_malloc(size);
-}
-
-void cxfree(void* ptr)
-{
-    xr_free(ptr);
-}
-
-void* cxrealloc(void* ptr, size_t size)
-{
-    return xr_realloc(ptr, size);
-}
+void* cxalloc(size_t size) { return xr_malloc(size); }
+void cxfree(void* ptr) { xr_free(ptr); }
+void* cxrealloc(void* ptr, size_t size) { return xr_realloc(ptr, size); }
 /*
 void jpeg_encode_callback(long progress)
 {
@@ -57,15 +46,17 @@ screenshot_manager::screenshot_manager()
 }
 screenshot_manager::~screenshot_manager()
 {
-    if (is_active()) {
+    if (is_active())
+    {
         Engine.Sheduler.Unregister(this);
         m_state = 0;
     }
     xr_free(m_jpeg_buffer);
     xr_free(m_buffer_for_compress);
-    if (m_make_start_event) {
+    if (m_make_start_event)
+    {
         SetEvent(m_make_start_event);
-        WaitForSingleObject(m_make_done_event, INFINITE);  // thread stoped
+        WaitForSingleObject(m_make_done_event, INFINITE); // thread stoped
         CloseHandle(m_make_done_event);
         CloseHandle(m_make_start_event);
     }
@@ -73,7 +64,8 @@ screenshot_manager::~screenshot_manager()
 
 void screenshot_manager::realloc_jpeg_buffer(u32 new_size)
 {
-    if (m_jpeg_buffer_capacity >= new_size) return;
+    if (m_jpeg_buffer_capacity >= new_size)
+        return;
     void* new_buffer = xr_realloc(m_jpeg_buffer, new_size);
     m_jpeg_buffer = static_cast<u8*>(new_buffer);
     m_jpeg_buffer_capacity = new_size;
@@ -92,10 +84,10 @@ void screenshot_manager::prepare_image()
 #pragma pack(pop)
     typedef rgb24color rgb24map[RESULT_HEIGHT][RESULT_WIDTH];
     u32* sizes = reinterpret_cast<u32*>(m_result_writer.pointer());
-    u32* width = sizes;                                  // first dword is width
-    u32* height = ++sizes;                               // second dword is height
-    u32* rgba = reinterpret_cast<u32*>(++sizes);         // then RGBA data
-    rgb24map* dest = reinterpret_cast<rgb24map*>(rgba);  // WARNING sorce and dest stored in one place ...
+    u32* width = sizes; // first dword is width
+    u32* height = ++sizes; // second dword is height
+    u32* rgba = reinterpret_cast<u32*>(++sizes); // then RGBA data
+    rgb24map* dest = reinterpret_cast<rgb24map*>(rgba); // WARNING sorce and dest stored in one place ...
 
     float dx = float(*width) / RESULT_WIDTH;
     float dy = float(*height) / RESULT_HEIGHT;
@@ -125,8 +117,8 @@ void screenshot_manager::make_jpeg_file()
     CxImage jpg_image;
 
     jpg_image.CreateFromArray(rgb24data,
-        width,   // width
-        height,  // height
+        width, // width
+        height, // height
         24, width * 3, true);
 
     jpg_image.SetJpegQuality(30);
@@ -149,7 +141,8 @@ void screenshot_manager::sign_jpeg_file()
     game_cl_mp* tmp_cl_game = smart_cast<game_cl_mp*>(&Game());
     tmp_writer.set_player_name(tmp_cl_game->local_player->getName());
     shared_str tmp_cdkey_digest = Level().get_cdkey_digest();
-    if (tmp_cdkey_digest.size() == 0) tmp_cdkey_digest = "null";
+    if (tmp_cdkey_digest.size() == 0)
+        tmp_cdkey_digest = "null";
     tmp_writer.set_player_cdkey_digest(tmp_cdkey_digest);
     m_jpeg_buffer_size = tmp_writer.write_info();
 }
@@ -158,8 +151,10 @@ void screenshot_manager::shedule_Update(u32 dt)
 {
     R_ASSERT(m_state & making_screenshot || m_state & drawing_download_states);
     bool is_make_in_progress = is_making_screenshot();
-    if (is_make_in_progress && (m_defered_ssframe_counter == 0)) {
-        if (!m_make_done_event) {
+    if (is_make_in_progress && (m_defered_ssframe_counter == 0))
+    {
+        if (!m_make_done_event)
+        {
             prepare_image();
             make_jpeg_file();
             sign_jpeg_file();
@@ -171,12 +166,14 @@ void screenshot_manager::shedule_Update(u32 dt)
         {
             DWORD thread_result = WaitForSingleObject(m_make_done_event, 0);
             R_ASSERT((thread_result != WAIT_ABANDONED) && (thread_result != WAIT_FAILED));
-            if (thread_result == WAIT_OBJECT_0) {
+            if (thread_result == WAIT_OBJECT_0)
+            {
                 m_complete_callback(m_buffer_for_compress, m_buffer_for_compress_size, m_jpeg_buffer_size);
                 m_state &= ~making_screenshot;
             }
         }
-        if (!is_making_screenshot() && !is_drawing_downloads()) {
+        if (!is_making_screenshot() && !is_drawing_downloads())
+        {
             Engine.Sheduler.Unregister(this);
         }
     }
@@ -202,23 +199,27 @@ void screenshot_manager::shedule_Update(u32 dt)
         GetProcessAffinityMask(GetCurrentProcess(), &process_affinity_mask, &tmp_dword);
         process_screenshot(btwCount1(static_cast<u32>(process_affinity_mask)) == 1);
     }
-    if (is_drawing_downloads()) {
+    if (is_drawing_downloads())
+    {
         static_cast<game_cl_mp*>(Level().game)->draw_all_active_binder_states();
     }
 }
 
 void screenshot_manager::make_screenshot(complete_callback_t cb)
 {
-    if (is_making_screenshot()) {
+    if (is_making_screenshot())
+    {
 #ifdef DEBUG
         Msg("! ERROR: CL: screenshot making in progress...");
 #endif
         return;
     }
-    if (m_result_writer.size()) m_result_writer.clear();
+    if (m_result_writer.size())
+        m_result_writer.clear();
 
     m_complete_callback = cb;
-    if (!is_drawing_downloads()) {
+    if (!is_drawing_downloads())
+    {
         Engine.Sheduler.Register(this, TRUE);
     }
     m_state |= making_screenshot;
@@ -229,15 +230,18 @@ void screenshot_manager::make_screenshot(complete_callback_t cb)
 
 void screenshot_manager::set_draw_downloads(bool draw)
 {
-    if (draw) {
-        if (!is_active()) {
+    if (draw)
+    {
+        if (!is_active())
+        {
             Engine.Sheduler.Register(this, TRUE);
         }
         m_state |= drawing_download_states;
     }
     else
     {
-        if (!is_making_screenshot() && is_drawing_downloads()) {
+        if (!is_making_screenshot() && is_drawing_downloads())
+        {
             Engine.Sheduler.Unregister(this);
         }
         m_state &= ~drawing_download_states;
@@ -246,7 +250,8 @@ void screenshot_manager::set_draw_downloads(bool draw)
 
 void screenshot_manager::process_screenshot(bool singlecore)
 {
-    if (m_make_start_event) {
+    if (m_make_start_event)
+    {
         SetEvent(m_make_start_event);
         return;
     }
@@ -259,8 +264,10 @@ void __stdcall screenshot_manager::jpeg_compress_cb(long progress)
     /*#ifdef DEBUG
         Msg("* JPEG encoding progress : %d%%", progress);
     #endif*/
-    if (progress % 5 == 0) {
-        if (!SwitchToThread()) Sleep(10);
+    if (progress % 5 == 0)
+    {
+        if (!SwitchToThread())
+            Sleep(10);
     }
 }
 
@@ -270,7 +277,8 @@ void screenshot_manager::screenshot_maker_thread(void* arg_ptr)
     DWORD wait_result = WaitForSingleObject(this_ptr->m_make_start_event, INFINITE);
     while ((wait_result != WAIT_ABANDONED) || (wait_result != WAIT_FAILED))
     {
-        if (!this_ptr->is_active()) break;
+        if (!this_ptr->is_active())
+            break;
         this_ptr->timer_begin("preparing image");
         this_ptr->prepare_image();
         this_ptr->timer_end();
@@ -291,7 +299,8 @@ void screenshot_manager::screenshot_maker_thread(void* arg_ptr)
 
 void screenshot_manager::realloc_compress_buffer(u32 need_size)
 {
-    if (m_buffer_for_compress && (need_size <= m_buffer_for_compress_capacity)) return;
+    if (m_buffer_for_compress && (need_size <= m_buffer_for_compress_capacity))
+        return;
 #ifdef DEBUG
     Msg("* reallocing compression buffer.");
 #endif
@@ -316,9 +325,5 @@ void screenshot_manager::timer_begin(LPCSTR comment)
     m_debug_timer.Start();
 }
 
-void screenshot_manager::timer_end()
-{
-    Msg("* %s : %u ms", m_timer_comment.c_str(), m_debug_timer.GetElapsed_ms());
-}
-
+void screenshot_manager::timer_end() { Msg("* %s : %u ms", m_timer_comment.c_str(), m_debug_timer.GetElapsed_ms()); }
 #endif

@@ -23,7 +23,7 @@ public:
     virtual void DiscardState();
 
     virtual void OnEvent(NET_Packet& P, u16 type);
-    virtual bool DropGrenade();  // in this case if grenade state is eReady, it should Throw
+    virtual bool DropGrenade(); // in this case if grenade state is eReady, it should Throw
 
     virtual void OnAnimationEnd(u32 state);
     virtual void UpdateCL();
@@ -36,7 +36,6 @@ public:
     virtual void State(u32 state);
 
     virtual void OnH_B_Chield() { inherited::OnH_B_Chield(); }
-
     virtual void Hit(SHit* pHDS);
 
     virtual bool NeedToDestroyObject() const;
@@ -47,7 +46,7 @@ public:
     virtual void DeactivateItem();
     virtual bool GetBriefInfo(II_BriefInfo& info);
 
-    virtual void SendHiddenItem();  // same as OnHiddenItem but for client... (sends message to a server)...
+    virtual void SendHiddenItem(); // same as OnHiddenItem but for client... (sends message to a server)...
 protected:
     ALife::_TIME_ID m_dwGrenadeRemoveTime;
     ALife::_TIME_ID m_dwGrenadeIndependencyTime;
@@ -61,7 +60,6 @@ private:
 
 protected:
     virtual void UpdateXForm() { CMissile::UpdateXForm(); };
-
 public:
     virtual BOOL UsedAI_Locations();
     virtual CExplosive* cast_explosive() { return this; }
@@ -69,10 +67,8 @@ public:
     virtual CHudItem* cast_hud_item() { return this; }
     virtual CGameObject* cast_game_object() { return this; }
     virtual IDamageSource* cast_IDamageSource() { return CExplosive::cast_IDamageSource(); }
-
     typedef fastdelegate::FastDelegate<void(CGrenade*)> destroy_callback;
     void set_destroy_callback(destroy_callback callback) { m_destroy_callback = callback; }
-
 private:
     destroy_callback m_destroy_callback;
 };

@@ -26,7 +26,8 @@ IC bool VertexCache::InCache(int entry)
 
     for (u32 i = 0; i < entries.size(); i++)
     {
-        if (entries[i] == entry) {
+        if (entries[i] == entry)
+        {
             returnVal = true;
             break;
         }

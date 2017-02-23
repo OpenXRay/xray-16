@@ -41,13 +41,16 @@ bool OBB::ContainsPoint(const Point& p) const
     // mRot * Point maps from world space to box space (what we need here)
 
     float f = mRot2.m[0][0] * RelPoint.x + mRot2.m[0][1] * RelPoint.y + mRot2.m[0][2] * RelPoint.z;
-    if (f >= mExtents.x || f <= -mExtents.x) return false;
+    if (f >= mExtents.x || f <= -mExtents.x)
+        return false;
 
     f = mRot2.m[1][0] * RelPoint.x + mRot2.m[1][1] * RelPoint.y + mRot2.m[1][2] * RelPoint.z;
-    if (f >= mExtents.y || f <= -mExtents.y) return false;
+    if (f >= mExtents.y || f <= -mExtents.y)
+        return false;
 
     f = mRot2.m[2][0] * RelPoint.x + mRot2.m[2][1] * RelPoint.y + mRot2.m[2][2] * RelPoint.z;
-    if (f >= mExtents.z || f <= -mExtents.z) return false;
+    if (f >= mExtents.z || f <= -mExtents.z)
+        return false;
     return true;
 }
 
@@ -83,7 +86,8 @@ void OBB::Create(const AABB& aabb, const Matrix4x4& mat)
 bool OBB::ComputePlanes(Plane* planes) const
 {
     // Checkings
-    if (!planes) return false;
+    if (!planes)
+        return false;
 
     Point Axis0 = *mRot2[0];
     Point Axis1 = *mRot2[1];
@@ -126,7 +130,8 @@ bool OBB::ComputePlanes(Plane* planes) const
 bool OBB::ComputePoints(Point* pts) const
 {
     // Checkings
-    if (!pts) return false;
+    if (!pts)
+        return false;
 
     Point Axis0 = *mRot2[0];
     Point Axis1 = *mRot2[1];

@@ -8,30 +8,35 @@
 #include "ui/UIInventoryUtilities.h"
 
 //--------------------------- QR2 callbacks ---------------------------------------
-#define ADD_KEY_VAL(g, q, qf, o, gf)                                                                                   \
-    {                                                                                                                  \
-        if (g) {                                                                                                       \
-            q->qf(o, g->gf);                                                                                           \
-        }                                                                                                              \
-        else                                                                                                           \
-            q->BufferAdd(o, "");                                                                                       \
+#define ADD_KEY_VAL(g, q, qf, o, gf) \
+    {                                \
+        if (g)                       \
+        {                            \
+            q->qf(o, g->gf);         \
+        }                            \
+        else                         \
+            q->BufferAdd(o, "");     \
     }
-#define ADD_KEY_VAL_INT(g, q, qf, o, gf)                                                                               \
-    {                                                                                                                  \
-        if (g) {                                                                                                       \
-            q->qf(o, int(g->gf));                                                                                      \
-        }                                                                                                              \
-        else                                                                                                           \
-            q->BufferAdd(o, "");                                                                                       \
+#define ADD_KEY_VAL_INT(g, q, qf, o, gf) \
+    {                                    \
+        if (g)                           \
+        {                                \
+            q->qf(o, int(g->gf));        \
+        }                                \
+        else                             \
+            q->BufferAdd(o, "");         \
     }
 extern u32 g_sv_dwMaxClientPing;
 void __cdecl callback_serverkey(int keyid, qr2_buffer_t outbuf, void* userdata)
 {
-    if (!userdata) return;
+    if (!userdata)
+        return;
     xrGameSpyServer* pServer = static_cast<CGameSpy_QR2::Context*>(userdata)->GSServer;
-    if (!pServer) return;
+    if (!pServer)
+        return;
     CGameSpy_QR2* pQR2 = pServer->QR2();
-    if (!pQR2) return;
+    if (!pQR2)
+        return;
 
     IServerGameState* gameState = pServer->GetGameState();
     game_sv_mp* gmMP = smart_cast<game_sv_mp*>(gameState);
@@ -51,10 +56,11 @@ void __cdecl callback_serverkey(int keyid, qr2_buffer_t outbuf, void* userdata)
     case SERVER_UP_TIME_KEY: pQR2->BufferAdd(outbuf, time_str); break;
     case GAMETYPE_KEY:
         ADD_KEY_VAL(gameState, pQR2, BufferAdd, outbuf, type_name());
-        break;  //		pQR2->BufferAdd(outbuf, gameState->type_name()); break;
+        break; //		pQR2->BufferAdd(outbuf, gameState->type_name()); break;
     case GAMEMODE_KEY: pQR2->BufferAdd(outbuf, "openplaying"); break;
     case PASSWORD_KEY:
-        if (0 == *(pServer->Password)) {
+        if (0 == *(pServer->Password))
+        {
             pQR2->BufferAdd_Int(outbuf, 0);
         }
         else
@@ -63,7 +69,8 @@ void __cdecl callback_serverkey(int keyid, qr2_buffer_t outbuf, void* userdata)
         }
         break;
     case G_USER_PASSWORD_KEY:
-        if (pServer->HasProtected()) {
+        if (pServer->HasProtected())
+        {
             pQR2->BufferAdd_Int(outbuf, 1);
         }
         else
@@ -77,97 +84,105 @@ void __cdecl callback_serverkey(int keyid, qr2_buffer_t outbuf, void* userdata)
     case DEDICATED_KEY: pQR2->BufferAdd_Int(outbuf, pServer->IsDedicated()); break;
     case GAMETYPE_NAME_KEY:
         ADD_KEY_VAL(gameState, pQR2, BufferAdd_Int, outbuf, Type());
-        break;  // pQR2->BufferAdd_Int(outbuf, gameState->Type()); break;
+        break; // pQR2->BufferAdd_Int(outbuf, gameState->Type()); break;
     case NUMTEAMS_KEY:
         ADD_KEY_VAL(gmMP, pQR2, BufferAdd_Int, outbuf, GetNumTeams());
-        break;  // pQR2->BufferAdd_Int(outbuf, gmMP->GetNumTeams()); break;
+        break; // pQR2->BufferAdd_Int(outbuf, gmMP->GetNumTeams()); break;
     case G_MAX_PING_KEY:
         pQR2->BufferAdd_Int(outbuf, g_sv_dwMaxClientPing);
         break;
     //------- game ---------//
     case G_MAP_ROTATION_KEY:
         ADD_KEY_VAL(gmDM, pQR2, BufferAdd_Int, outbuf, HasMapRotation());
-        break;  // if (gmDM) pQR2->BufferAdd_Int(outbuf, gmDM->HasMapRotation());		else pQR2->BufferAdd(outbuf, "");
-                // break;
+        break; // if (gmDM) pQR2->BufferAdd_Int(outbuf, gmDM->HasMapRotation());		else pQR2->BufferAdd(outbuf,
+               // "");
+    // break;
     case G_VOTING_ENABLED_KEY:
         ADD_KEY_VAL(gmDM, pQR2, BufferAdd_Int, outbuf, IsVotingEnabled());
-        break;  // if (gmDM) pQR2->BufferAdd_Int(outbuf, gmDM->IsVotingEnabled());		else pQR2->BufferAdd(outbuf, "");
-                // break;
+        break; // if (gmDM) pQR2->BufferAdd_Int(outbuf, gmDM->IsVotingEnabled());		else pQR2->BufferAdd(outbuf,
+               // "");
+    // break;
     case G_SPECTATOR_MODES_KEY:
         ADD_KEY_VAL(gmDM, pQR2, BufferAdd_Int, outbuf, GetSpectatorModes());
-        break;  // if (gmDM) pQR2->BufferAdd_Int(outbuf, gmDM->GetSpectatorModes());	else pQR2->BufferAdd(outbuf, "");
-                // break;
+        break; // if (gmDM) pQR2->BufferAdd_Int(outbuf, gmDM->GetSpectatorModes());	else pQR2->BufferAdd(outbuf, "");
+    // break;
     //------- deathmatch -------//
     case G_FRAG_LIMIT_KEY:
         ADD_KEY_VAL(gmDM, pQR2, BufferAdd_Int, outbuf, GetFragLimit());
-        break;  // if (gmDM)pQR2->BufferAdd_Int(outbuf, gmDM->GetFragLimit());			else pQR2->BufferAdd(outbuf, "");
-                // break;
+        break; // if (gmDM)pQR2->BufferAdd_Int(outbuf, gmDM->GetFragLimit());			else pQR2->BufferAdd(outbuf,
+               // "");
+    // break;
     case G_TIME_LIMIT_KEY:
         ADD_KEY_VAL(gmDM, pQR2, BufferAdd_Int, outbuf, GetTimeLimit());
-        break;  // if (gmDM)pQR2->BufferAdd_Int(outbuf, gmDM->GetTimeLimit());			else pQR2->BufferAdd(outbuf, "");
-                // break;
+        break; // if (gmDM)pQR2->BufferAdd_Int(outbuf, gmDM->GetTimeLimit());			else pQR2->BufferAdd(outbuf,
+               // "");
+    // break;
     case G_DAMAGE_BLOCK_TIME_KEY:
         ADD_KEY_VAL(gmDM, pQR2, BufferAdd_Int, outbuf, GetDMBLimit());
-        break;  // if (gmDM)pQR2->BufferAdd_Int(outbuf, gmDM->GetDMBLimit());			else pQR2->BufferAdd(outbuf, "");
-                // break;
+        break; // if (gmDM)pQR2->BufferAdd_Int(outbuf, gmDM->GetDMBLimit());			else pQR2->BufferAdd(outbuf,
+               // "");
+    // break;
     case G_DAMAGE_BLOCK_INDICATOR_KEY:
         ADD_KEY_VAL(gmDM, pQR2, BufferAdd_Int, outbuf, IsDamageBlockIndEnabled());
-        break;  // if (gmDM)pQR2->BufferAdd_Int(outbuf, gmDM->IsDamageBlockIndEnabled()); else pQR2->BufferAdd(outbuf,
-                // "");	break;
+        break; // if (gmDM)pQR2->BufferAdd_Int(outbuf, gmDM->IsDamageBlockIndEnabled()); else pQR2->BufferAdd(outbuf,
+    // "");	break;
     case G_ANOMALIES_ENABLED_KEY:
         ADD_KEY_VAL(gmDM, pQR2, BufferAdd_Int, outbuf, IsAnomaliesEnabled());
-        break;  // if (gmDM)pQR2->BufferAdd_Int(outbuf, gmDM->IsAnomaliesEnabled());	else pQR2->BufferAdd(outbuf, "");
-                // break;
+        break; // if (gmDM)pQR2->BufferAdd_Int(outbuf, gmDM->IsAnomaliesEnabled());	else pQR2->BufferAdd(outbuf, "");
+    // break;
     case G_ANOMALIES_TIME_KEY:
         ADD_KEY_VAL(gmDM, pQR2, BufferAdd_Int, outbuf, GetAnomaliesTime());
-        break;  // if (gmDM)pQR2->BufferAdd_Int(outbuf, gmDM->GetAnomaliesTime());		else pQR2->BufferAdd(outbuf, "");
-                // break;
+        break; // if (gmDM)pQR2->BufferAdd_Int(outbuf, gmDM->GetAnomaliesTime());		else pQR2->BufferAdd(outbuf,
+               // "");
+    // break;
     case G_WARM_UP_TIME_KEY:
         ADD_KEY_VAL(gmDM, pQR2, BufferAdd_Int, outbuf, GetWarmUpTime());
-        break;  // if (gmDM)pQR2->BufferAdd_Int(outbuf, gmDM->GetWarmUpTime());			else pQR2->BufferAdd(outbuf, "");
-                // break;
+        break; // if (gmDM)pQR2->BufferAdd_Int(outbuf, gmDM->GetWarmUpTime());			else pQR2->BufferAdd(outbuf,
+               // "");
+    // break;
     case G_FORCE_RESPAWN_KEY:
         ADD_KEY_VAL(gmDM, pQR2, BufferAdd_Int, outbuf, GetForceRespawn());
-        break;  // if (gmDM)pQR2->BufferAdd_Int(outbuf, gmDM->GetForceRespawn());		else pQR2->BufferAdd(outbuf, "");
-                // break;
+        break; // if (gmDM)pQR2->BufferAdd_Int(outbuf, gmDM->GetForceRespawn());		else pQR2->BufferAdd(outbuf,
+               // "");
+    // break;
     //---- game_sv_teamdeathmatch ----
     case G_AUTO_TEAM_BALANCE_KEY:
         ADD_KEY_VAL(gmTDM, pQR2, BufferAdd_Int, outbuf, Get_AutoTeamBalance());
-        break;  // if (gmTDM)pQR2->BufferAdd_Int(outbuf, gmTDM->Get_AutoTeamBalance	());			break;
+        break; // if (gmTDM)pQR2->BufferAdd_Int(outbuf, gmTDM->Get_AutoTeamBalance	());			break;
     case G_AUTO_TEAM_SWAP_KEY:
         ADD_KEY_VAL(gmTDM, pQR2, BufferAdd_Int, outbuf, Get_AutoTeamSwap());
-        break;  // if (gmTDM)pQR2->BufferAdd_Int(outbuf, gmTDM->Get_AutoTeamSwap		());			break;
+        break; // if (gmTDM)pQR2->BufferAdd_Int(outbuf, gmTDM->Get_AutoTeamSwap		());			break;
     case G_FRIENDLY_INDICATORS_KEY:
         ADD_KEY_VAL(gmTDM, pQR2, BufferAdd_Int, outbuf, Get_FriendlyIndicators());
-        break;  // if (gmTDM)pQR2->BufferAdd_Int(outbuf, gmTDM->Get_FriendlyIndicators	());			break;
+        break; // if (gmTDM)pQR2->BufferAdd_Int(outbuf, gmTDM->Get_FriendlyIndicators	());			break;
     case G_FRIENDLY_NAMES_KEY:
         ADD_KEY_VAL(gmTDM, pQR2, BufferAdd_Int, outbuf, Get_FriendlyNames());
-        break;  // if (gmTDM)pQR2->BufferAdd_Int(outbuf, gmTDM->Get_FriendlyNames		());			break;
+        break; // if (gmTDM)pQR2->BufferAdd_Int(outbuf, gmTDM->Get_FriendlyNames		());			break;
     case G_FRIENDLY_FIRE_KEY:
         ADD_KEY_VAL_INT(gmTDM, pQR2, BufferAdd_Int, outbuf, GetFriendlyFire() * 100.0f);
-        break;  // if (gmTDM)pQR2->BufferAdd_Int(outbuf, int(gmTDM->GetFriendlyFire()*100.0f));		break;
+        break; // if (gmTDM)pQR2->BufferAdd_Int(outbuf, int(gmTDM->GetFriendlyFire()*100.0f));		break;
     //---- game_sv_artefacthunt ----
     case G_ARTEFACTS_COUNT_KEY:
         ADD_KEY_VAL(gmAhunt, pQR2, BufferAdd_Int, outbuf, Get_ArtefactsCount());
-        break;  // if (gmAhunt) pQR2->BufferAdd_Int(outbuf, gmAhunt->Get_ArtefactsCount		());			break;
+        break; // if (gmAhunt) pQR2->BufferAdd_Int(outbuf, gmAhunt->Get_ArtefactsCount		());			break;
     case G_ARTEFACT_STAY_TIME_KEY:
         ADD_KEY_VAL(gmAhunt, pQR2, BufferAdd_Int, outbuf, Get_ArtefactsStayTime());
-        break;  // if (gmAhunt) pQR2->BufferAdd_Int(outbuf, gmAhunt->Get_ArtefactsStayTime		());			break;
+        break; // if (gmAhunt) pQR2->BufferAdd_Int(outbuf, gmAhunt->Get_ArtefactsStayTime		());			break;
     case G_ARTEFACT_RESPAWN_TIME_KEY:
         ADD_KEY_VAL(gmAhunt, pQR2, BufferAdd_Int, outbuf, Get_ArtefactsRespawnDelta());
-        break;  // if (gmAhunt) pQR2->BufferAdd_Int(outbuf, gmAhunt->Get_ArtefactsRespawnDelta	());			break;
+        break; // if (gmAhunt) pQR2->BufferAdd_Int(outbuf, gmAhunt->Get_ArtefactsRespawnDelta	());			break;
     case G_REINFORCEMENT_KEY:
         ADD_KEY_VAL(gmAhunt, pQR2, BufferAdd_Int, outbuf, Get_ReinforcementTime());
-        break;  // if (gmAhunt) pQR2->BufferAdd_Int(outbuf, gmAhunt->Get_ReinforcementTime		());			break;
+        break; // if (gmAhunt) pQR2->BufferAdd_Int(outbuf, gmAhunt->Get_ReinforcementTime		());			break;
     case G_SHIELDED_BASES_KEY:
         ADD_KEY_VAL(gmAhunt, pQR2, BufferAdd_Int, outbuf, Get_ShieldedBases());
-        break;  // if (gmAhunt) pQR2->BufferAdd_Int(outbuf, gmAhunt->Get_ShieldedBases			());			break;
+        break; // if (gmAhunt) pQR2->BufferAdd_Int(outbuf, gmAhunt->Get_ShieldedBases			());			break;
     case G_RETURN_PLAYERS_KEY:
         ADD_KEY_VAL(gmAhunt, pQR2, BufferAdd_Int, outbuf, Get_ReturnPlayers());
-        break;  // if (gmAhunt) pQR2->BufferAdd_Int(outbuf, gmAhunt->Get_ReturnPlayers			());			break;
+        break; // if (gmAhunt) pQR2->BufferAdd_Int(outbuf, gmAhunt->Get_ReturnPlayers			());			break;
     case G_BEARER_CANT_SPRINT_KEY:
         ADD_KEY_VAL(gmAhunt, pQR2, BufferAdd_Int, outbuf, Get_BearerCantSprint());
-        break;  // if (gmAhunt) pQR2->BufferAdd_Int(outbuf, gmAhunt->Get_BearerCantSprint		());			break;
+        break; // if (gmAhunt) pQR2->BufferAdd_Int(outbuf, gmAhunt->Get_BearerCantSprint		());			break;
     default:
     {
         //			R_ASSERT2(0, "Unknown GameSpy Server key ");
@@ -181,10 +196,13 @@ void __cdecl callback_serverkey(int keyid, qr2_buffer_t outbuf, void* userdata)
 void __cdecl callback_playerkey(int keyid, int index, qr2_buffer_t outbuf, void* userdata)
 {
     xrGameSpyServer* pServer = static_cast<CGameSpy_QR2::Context*>(userdata)->GSServer;
-    if (!pServer) return;
-    if (u32(index) >= pServer->GetClientsCount()) return;
+    if (!pServer)
+        return;
+    if (u32(index) >= pServer->GetClientsCount())
+        return;
     CGameSpy_QR2* pQR2 = pServer->QR2();
-    if (!pQR2) return;
+    if (!pQR2)
+        return;
 
     xrGameSpyClientData* pCD = NULL;
 
@@ -199,15 +217,18 @@ void __cdecl callback_playerkey(int keyid, int index, qr2_buffer_t outbuf, void*
         }
         bool operator()(IClient* client)
         {
-            if (current == index) return true;
+            if (current == index)
+                return true;
             ++current;
             return false;
         }
     };
 
-    if (pServer->IsDedicated()) {
+    if (pServer->IsDedicated())
+    {
         index_searcher tmp_predicate(index + 1);
-        if (u32(index + 1) >= pServer->GetClientsCount()) return;
+        if (u32(index + 1) >= pServer->GetClientsCount())
+            return;
         pCD = static_cast<xrGameSpyClientData*>(pServer->FindClient(tmp_predicate));
     }
     else
@@ -215,7 +236,8 @@ void __cdecl callback_playerkey(int keyid, int index, qr2_buffer_t outbuf, void*
         index_searcher tmp_predicate(index);
         pCD = static_cast<xrGameSpyClientData*>(pServer->FindClient(tmp_predicate));
     }
-    if (!pCD || !pCD->ps) return;
+    if (!pCD || !pCD->ps)
+        return;
 
     switch (keyid)
     {
@@ -241,18 +263,22 @@ void __cdecl callback_playerkey(int keyid, int index, qr2_buffer_t outbuf, void*
 void __cdecl callback_teamkey(int keyid, int index, qr2_buffer_t outbuf, void* userdata)
 {
     xrGameSpyServer* pServer = static_cast<CGameSpy_QR2::Context*>(userdata)->GSServer;
-    if (!pServer) return;
+    if (!pServer)
+        return;
 
     CGameSpy_QR2* pQR2 = pServer->QR2();
-    if (!pQR2) return;
+    if (!pQR2)
+        return;
 
     game_sv_Deathmatch* gmDM = smart_cast<game_sv_Deathmatch*>(pServer->GetGameState());
-    if (!gmDM || u32(index) >= gmDM->GetNumTeams()) return;
+    if (!gmDM || u32(index) >= gmDM->GetNumTeams())
+        return;
 
     switch (keyid)
     {
     case T_SCORE_T_KEY:
-        if (gmDM) pQR2->BufferAdd_Int(outbuf, gmDM->GetTeamScore(index));
+        if (gmDM)
+            pQR2->BufferAdd_Int(outbuf, gmDM->GetTeamScore(index));
         break;
     default: { pQR2->BufferAdd(outbuf, "");
     }
@@ -262,10 +288,12 @@ void __cdecl callback_teamkey(int keyid, int index, qr2_buffer_t outbuf, void* u
 
 void __cdecl callback_keylist(qr2_key_type keytype, qr2_keybuffer_t keybuffer, void* userdata)
 {
-    if (!userdata) return;
+    if (!userdata)
+        return;
     xrGameSpyServer* pServer = static_cast<CGameSpy_QR2::Context*>(userdata)->GSServer;
     CGameSpy_QR2* pQR2 = pServer->QR2();
-    if (!pQR2) return;
+    if (!pQR2)
+        return;
 
     switch (keytype)
     {
@@ -280,7 +308,7 @@ void __cdecl callback_keylist(qr2_key_type keytype, qr2_keybuffer_t keybuffer, v
 
         pQR2->KeyBufferAdd(keybuffer, GAMETYPE_KEY);
         pQR2->KeyBufferAdd(keybuffer, PASSWORD_KEY);
-        pQR2->KeyBufferAdd(keybuffer, G_USER_PASSWORD_KEY);  // user
+        pQR2->KeyBufferAdd(keybuffer, G_USER_PASSWORD_KEY); // user
 
         pQR2->KeyBufferAdd(keybuffer, HOSTPORT_KEY);
 
@@ -345,7 +373,8 @@ void __cdecl callback_keylist(qr2_key_type keytype, qr2_keybuffer_t keybuffer, v
 
 int __cdecl callback_count(qr2_key_type keytype, void* userdata)
 {
-    if (!userdata) return 0;
+    if (!userdata)
+        return 0;
     xrGameSpyServer* pServer = static_cast<CGameSpy_QR2::Context*>(userdata)->GSServer;
     switch (keytype)
     {
@@ -354,7 +383,8 @@ int __cdecl callback_count(qr2_key_type keytype, void* userdata)
     break;
     case key_team:
     {
-        if (!pServer->GetGameState()) return 0;
+        if (!pServer->GetGameState())
+            return 0;
         switch (pServer->GetGameState()->Type())
         {
         case eGameIDDominationZone:
@@ -376,7 +406,8 @@ void __cdecl callback_adderror(qr2_error_t error, gsi_char* errmsg, void* userda
 {
     Msg("! Error while adding this server to master list ->%s.", errmsg);
     xrGameSpyServer* pServer = static_cast<CGameSpy_QR2::Context*>(userdata)->GSServer;
-    if (pServer) pServer->OnError_Add(error);
+    if (pServer)
+        pServer->OnError_Add(error);
 };
 
 void __cdecl callback_nn(int cookie, void* userdata){};
@@ -386,7 +417,8 @@ void __cdecl callback_deny_ip(void* userdata, unsigned int sender_ip, int* resul
 {
     *result = 0;
     IPureServer* pServer = static_cast<CGameSpy_QR2::Context*>(userdata)->GSServer;
-    if (pServer && pServer->IsPlayerIPDenied(static_cast<u32>(sender_ip))) {
+    if (pServer && pServer->IsPlayerIPDenied(static_cast<u32>(sender_ip)))
+    {
         *result = 1;
     }
 };

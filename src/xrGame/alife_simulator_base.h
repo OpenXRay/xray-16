@@ -37,7 +37,7 @@ namespace upgrade
 {
 class Manager;
 }
-}  // namespace upgrade, inventory
+} // namespace upgrade, inventory
 
 class CALifeSimulatorBase : public IPureDestroyableObject
 {

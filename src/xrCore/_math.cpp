@@ -17,11 +17,7 @@ XRCORE_API Dmatrix Didentity;
 XRCORE_API CRandom Random;
 
 #ifdef _M_AMD64
-u16 getFPUsw()
-{
-    return 0;
-}
-
+u16 getFPUsw() { return 0; }
 namespace FPU
 {
 XRCORE_API void m24(void)
@@ -55,9 +51,7 @@ XRCORE_API void m64r(void)
     _control87(_RC_NEAR, MCW_RC);
 }
 
-void initialize()
-{
-}
+void initialize() {}
 };
 #else
 u16 getFPUsw()
@@ -113,23 +107,24 @@ void initialize()
 
     _control87(_PC_24, MCW_PC);
     _control87(_RC_CHOP, MCW_RC);
-    _24 = getFPUsw();  // 24, chop
+    _24 = getFPUsw(); // 24, chop
     _control87(_RC_NEAR, MCW_RC);
-    _24r = getFPUsw();  // 24, rounding
+    _24r = getFPUsw(); // 24, rounding
 
     _control87(_PC_53, MCW_PC);
     _control87(_RC_CHOP, MCW_RC);
-    _53 = getFPUsw();  // 53, chop
+    _53 = getFPUsw(); // 53, chop
     _control87(_RC_NEAR, MCW_RC);
-    _53r = getFPUsw();  // 53, rounding
+    _53r = getFPUsw(); // 53, rounding
 
     _control87(_PC_64, MCW_PC);
     _control87(_RC_CHOP, MCW_RC);
-    _64 = getFPUsw();  // 64, chop
+    _64 = getFPUsw(); // 64, chop
     _control87(_RC_NEAR, MCW_RC);
-    _64r = getFPUsw();  // 64, rounding
+    _64r = getFPUsw(); // 64, rounding
 
-    if (!Core.PluginMode) m24r();
+    if (!Core.PluginMode)
+        m24r();
     ::Random.seed(u32(CPU::GetCLK() % (1i64 << 32i64)));
 }
 };
@@ -169,7 +164,8 @@ u64 __fastcall GetCLK(void)
 void Detect()
 {
     // General CPU identification
-    if (!_cpuid(&ID)) {
+    if (!_cpuid(&ID))
+    {
         // Core.Fatal ("Fatal error: can't detect CPU/FPU.");
         abort();
     }
@@ -244,7 +240,8 @@ void _initialize_cpu(void)
 
     // DUMP_PHASE;
 
-    if (strstr(Core.Params, "-x86")) {
+    if (strstr(Core.Params, "-x86"))
+    {
         CPU::ID.feature &= ~_CPU_FEATURE_MMX;
         CPU::ID.feature &= ~_CPU_FEATURE_3DNOW;
         CPU::ID.feature &= ~_CPU_FEATURE_SSE;
@@ -257,22 +254,31 @@ void _initialize_cpu(void)
 
     string256 features;
     xr_strcpy(features, sizeof(features), "RDTSC");
-    if (CPU::ID.feature & _CPU_FEATURE_MMX) xr_strcat(features, ", MMX");
-    if (CPU::ID.feature & _CPU_FEATURE_3DNOW) xr_strcat(features, ", 3DNow!");
-    if (CPU::ID.feature & _CPU_FEATURE_SSE) xr_strcat(features, ", SSE");
-    if (CPU::ID.feature & _CPU_FEATURE_SSE2) xr_strcat(features, ", SSE2");
-    if (CPU::ID.feature & _CPU_FEATURE_SSE3) xr_strcat(features, ", SSE3");
-    if (CPU::ID.feature & _CPU_FEATURE_SSSE3) xr_strcat(features, ", SSSE3");
-    if (CPU::ID.feature & _CPU_FEATURE_SSE4_1) xr_strcat(features, ", SSE4.1");
-    if (CPU::ID.feature & _CPU_FEATURE_SSE4_2) xr_strcat(features, ", SSE4.2");
-    if (CPU::ID.feature & _CPU_FEATURE_HTT) xr_strcat(features, ", HTT");
+    if (CPU::ID.feature & _CPU_FEATURE_MMX)
+        xr_strcat(features, ", MMX");
+    if (CPU::ID.feature & _CPU_FEATURE_3DNOW)
+        xr_strcat(features, ", 3DNow!");
+    if (CPU::ID.feature & _CPU_FEATURE_SSE)
+        xr_strcat(features, ", SSE");
+    if (CPU::ID.feature & _CPU_FEATURE_SSE2)
+        xr_strcat(features, ", SSE2");
+    if (CPU::ID.feature & _CPU_FEATURE_SSE3)
+        xr_strcat(features, ", SSE3");
+    if (CPU::ID.feature & _CPU_FEATURE_SSSE3)
+        xr_strcat(features, ", SSSE3");
+    if (CPU::ID.feature & _CPU_FEATURE_SSE4_1)
+        xr_strcat(features, ", SSE4.1");
+    if (CPU::ID.feature & _CPU_FEATURE_SSE4_2)
+        xr_strcat(features, ", SSE4.2");
+    if (CPU::ID.feature & _CPU_FEATURE_HTT)
+        xr_strcat(features, ", HTT");
 
     Msg("* CPU features: %s", features);
     Msg("* CPU cores/threads: %d/%d\n", CPU::ID.n_cores, CPU::ID.n_threads);
 
-    Fidentity.identity();   // Identity matrix
-    Didentity.identity();   // Identity matrix
-    pvInitializeStatics();  // Lookup table for compressed normals
+    Fidentity.identity(); // Identity matrix
+    Didentity.identity(); // Identity matrix
+    pvInitializeStatics(); // Lookup table for compressed normals
     FPU::initialize();
     _initialize_cpu_thread();
 
@@ -280,9 +286,7 @@ void _initialize_cpu(void)
 }
 
 #ifdef M_BORLAND
-void _initialize_cpu_thread()
-{
-}
+void _initialize_cpu_thread() {}
 #else
 // per-thread initialization
 #include <xmmintrin.h>
@@ -298,11 +302,14 @@ extern void __cdecl _terminate();
 void _initialize_cpu_thread()
 {
     xrDebug::OnThreadSpawn();
-    if (!Core.PluginMode) FPU::m24r();
-    if (CPU::ID.feature & _CPU_FEATURE_SSE) {
+    if (!Core.PluginMode)
+        FPU::m24r();
+    if (CPU::ID.feature & _CPU_FEATURE_SSE)
+    {
         //_mm_setcsr ( _mm_getcsr() | (_MM_FLUSH_ZERO_ON+_MM_DENORMALS_ZERO_ON) );
         _MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
-        if (_denormals_are_zero_supported) {
+        if (_denormals_are_zero_supported)
+        {
             __try
             {
                 _MM_SET_DENORMALS_ZERO_MODE(_MM_DENORMALS_ZERO_ON);

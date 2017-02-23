@@ -11,7 +11,6 @@ class IRenderVisual
 {
 public:
     virtual ~IRenderVisual() { ; }
-
     virtual vis_data& getVisData() = 0;
     virtual u32 getType() = 0;
 
@@ -24,4 +23,4 @@ public:
     virtual IParticleCustom* dcast_ParticleCustom() { return 0; }
 };
 
-#endif  //	RenderVisual_included
+#endif //	RenderVisual_included

@@ -12,11 +12,7 @@
 #define _CActionPlannerScript CActionPlannerScript<_object_type>
 
 TEMPLATE_SPECIALIZATION
-IC _CActionPlannerScript::CActionPlannerScript()
-{
-    m_object = 0;
-}
-
+IC _CActionPlannerScript::CActionPlannerScript() { m_object = 0; }
 TEMPLATE_SPECIALIZATION
 void _CActionPlannerScript::setup(_object_type* object)
 {
@@ -26,10 +22,6 @@ void _CActionPlannerScript::setup(_object_type* object)
 }
 
 TEMPLATE_SPECIALIZATION
-IC _object_type& _CActionPlannerScript::object() const
-{
-    return (*m_object);
-}
-
+IC _object_type& _CActionPlannerScript::object() const { return (*m_object); }
 #undef TEMPLATE_SPECIALIZATION
 #undef _CActionPlannerScript

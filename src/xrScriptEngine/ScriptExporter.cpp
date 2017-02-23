@@ -21,7 +21,8 @@ ScriptExporter::Node::Node(const char* id, size_t depCount, const char* const* d
 
 void ScriptExporter::Node::Export(lua_State* luaState)
 {
-    if (done) {
+    if (done)
+    {
 #ifdef CONFIG_SCRIPT_ENGINE_LOG_SKIPPED_EXPORTS
         Msg("* ScriptExporter: skipping exported node %s", id);
 #endif
@@ -33,7 +34,8 @@ void ScriptExporter::Node::Export(lua_State* luaState)
         // check if 'deps[i]' depends on 'node'
         for (Node* n = GetFirst(); n; n = n->GetNext())
         {
-            if (!n->done && !strcmp(deps[i], n->id)) {
+            if (!n->done && !strcmp(deps[i], n->id))
+            {
                 n->Export(luaState);
                 break;
             }
@@ -50,15 +52,18 @@ bool ScriptExporter::Node::HasDependency(const Node* node) const
 {
     for (size_t i = 0; i < depCount; i++)
     {
-        if (!strcmp(deps[i], node->id)) return true;
+        if (!strcmp(deps[i], node->id))
+            return true;
     }
     for (size_t i = 0; i < depCount; i++)
     {
         // check if 'deps[i]' depends on 'node'
         for (Node* n = GetFirst(); n; n = n->GetNext())
         {
-            if (!strcmp(deps[i], n->id)) {
-                if (n->HasDependency(node)) return true;
+            if (!strcmp(deps[i], n->id))
+            {
+                if (n->HasDependency(node))
+                    return true;
                 break;
             }
         }
@@ -68,7 +73,8 @@ bool ScriptExporter::Node::HasDependency(const Node* node) const
 
 void ScriptExporter::Node::InsertAfter(Node* target, Node* node)
 {
-    if (!target) {
+    if (!target)
+    {
         node->prevNode = nullptr;
         node->nextNode = firstNode;
         if (firstNode)
@@ -81,7 +87,8 @@ void ScriptExporter::Node::InsertAfter(Node* target, Node* node)
     {
         node->prevNode = target;
         node->nextNode = target->nextNode;
-        if (target == lastNode) lastNode = node;
+        if (target == lastNode)
+            lastNode = node;
         target->nextNode = node;
     }
     nodeCount++;

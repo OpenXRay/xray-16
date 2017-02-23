@@ -7,7 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #pragma once
-#include "xrScriptEngine/DebugMacros.hpp"  // for THROW // XXX: move debug macros to xrCore
+#include "xrScriptEngine/DebugMacros.hpp" // for THROW // XXX: move debug macros to xrCore
 
 #define TEMPLATE_SPECIALIZATION template <typename _world_property>
 #define CConditionStateAbstract CConditionState<_world_property>
@@ -20,10 +20,7 @@ IC CConditionStateAbstract::CConditionState()
 }
 
 TEMPLATE_SPECIALIZATION
-CConditionStateAbstract::~CConditionState()
-{
-}
-
+CConditionStateAbstract::~CConditionState() {}
 TEMPLATE_SPECIALIZATION
 IC const xr_vector<typename CConditionStateAbstract::COperatorCondition>& CConditionStateAbstract::conditions() const
 {
@@ -87,7 +84,8 @@ IC u8 CConditionStateAbstract::weight(const CConditionState& condition) const
             ++i;
         else
         {
-            if ((*I).value() != (*i).value()) ++result;
+            if ((*I).value() != (*i).value())
+                ++result;
             ++I;
             ++i;
         }
@@ -118,14 +116,17 @@ IC bool CConditionStateAbstract::operator<(const CConditionState& condition) con
 TEMPLATE_SPECIALIZATION
 IC bool CConditionStateAbstract::operator==(const CConditionState& condition) const
 {
-    if (hash_value() != condition.hash_value()) return (false);
+    if (hash_value() != condition.hash_value())
+        return (false);
     xr_vector<COperatorCondition>::const_iterator I = conditions().begin();
     xr_vector<COperatorCondition>::const_iterator E = conditions().end();
     xr_vector<COperatorCondition>::const_iterator i = condition.conditions().begin();
     xr_vector<COperatorCondition>::const_iterator e = condition.conditions().end();
     for (; (I != E) && (i != e); ++I, ++i)
-        if (!(*I == *i)) return (false);
-    if ((I == E) && (i == e)) return (true);
+        if (!(*I == *i))
+            return (false);
+    if ((I == E) && (i == e))
+        return (true);
     return (false);
 }
 
@@ -145,7 +146,8 @@ IC CConditionState<_world_property>& CConditionStateAbstract::operator-=(const C
             ++i;
         else
         {
-            if ((*I).value() != (*i).value()) {
+            if ((*I).value() != (*i).value())
+            {
                 temp.push_back(*I);
                 m_hash ^= (*I).hash_value();
             }
@@ -179,11 +181,7 @@ IC bool CConditionStateAbstract::includes(const CConditionState& condition) cons
 }
 
 TEMPLATE_SPECIALIZATION
-IC u32 CConditionStateAbstract::hash_value() const
-{
-    return (m_hash);
-}
-
+IC u32 CConditionStateAbstract::hash_value() const { return (m_hash); }
 TEMPLATE_SPECIALIZATION
 IC const typename CConditionStateAbstract::COperatorCondition* CConditionStateAbstract::property(
     const typename CConditionStateAbstract::COperatorCondition::_condition_type& condition) const

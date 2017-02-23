@@ -5,16 +5,12 @@
 #include "xrServer_Objects_ALife_Monsters.h"
 #include "Include/xrRender/RenderVisual.h"
 
-CVisualZone::CVisualZone()
-{
-}
-CVisualZone::~CVisualZone()
-{
-}
-
+CVisualZone::CVisualZone() {}
+CVisualZone::~CVisualZone() {}
 BOOL CVisualZone::net_Spawn(CSE_Abstract* DC)
 {
-    if (!inherited::net_Spawn(DC)) return (FALSE);
+    if (!inherited::net_Spawn(DC))
+        return (FALSE);
 
     CSE_Abstract* e = (CSE_Abstract*)(DC);
     CSE_ALifeZoneVisual* Z = smart_cast<CSE_ALifeZoneVisual*>(e);
@@ -36,7 +32,8 @@ BOOL CVisualZone::net_Spawn(CSE_Abstract* DC)
 
 void CVisualZone::SwitchZoneState(EZoneState new_state)
 {
-    if (m_eZoneState == eZoneStateBlowout && new_state != eZoneStateBlowout) {
+    if (m_eZoneState == eZoneStateBlowout && new_state != eZoneStateBlowout)
+    {
         //	IKinematicsAnimated*	SA=smart_cast<IKinematicsAnimated*>(Visual());
         smart_cast<IKinematicsAnimated*>(Visual())->PlayCycle(m_idle_animation);
     }

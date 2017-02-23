@@ -6,13 +6,13 @@
 
 #if _MSC_VER > 1000
 #pragma once
-#endif  // _MSC_VER > 1000
+#endif // _MSC_VER > 1000
 
 #ifndef __AFXWIN_H__
-#error include 'stdafx.h' before including this file for PCH
+	#error include 'stdafx.h' before including this file for PCH
 #endif
 
-#include "resource.h"  // main symbols
+#include "resource.h"		// main symbols
 
 /////////////////////////////////////////////////////////////////////////////
 // CGt2testApp:
@@ -22,27 +22,28 @@
 class CGt2testApp : public CWinApp
 {
 public:
-    CGt2testApp();
+	CGt2testApp();
 
-    // Overrides
-    // ClassWizard generated virtual function overrides
-    //{{AFX_VIRTUAL(CGt2testApp)
-public:
-    virtual BOOL InitInstance();
-    //}}AFX_VIRTUAL
+// Overrides
+	// ClassWizard generated virtual function overrides
+	//{{AFX_VIRTUAL(CGt2testApp)
+	public:
+	virtual BOOL InitInstance();
+	//}}AFX_VIRTUAL
 
-    // Implementation
+// Implementation
 
-    //{{AFX_MSG(CGt2testApp)
-    // NOTE - the ClassWizard will add and remove member functions here.
-    //    DO NOT EDIT what you see in these blocks of generated code !
-    //}}AFX_MSG
-    DECLARE_MESSAGE_MAP()
+	//{{AFX_MSG(CGt2testApp)
+		// NOTE - the ClassWizard will add and remove member functions here.
+		//    DO NOT EDIT what you see in these blocks of generated code !
+	//}}AFX_MSG
+	DECLARE_MESSAGE_MAP()
 };
+
 
 /////////////////////////////////////////////////////////////////////////////
 
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.
 
-#endif  // !defined(AFX_GT2TEST_H__BDC522B0_AA93_4D1B_8271_A3CFD716E950__INCLUDED_)
+#endif // !defined(AFX_GT2TEST_H__BDC522B0_AA93_4D1B_8271_A3CFD716E950__INCLUDED_)

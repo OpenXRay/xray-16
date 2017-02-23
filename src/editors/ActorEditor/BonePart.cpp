@@ -21,7 +21,8 @@ TLabel* L[4];
 bool TfrmBonePart::Run(CEditableObject* object)
 {
     int res = mrCancel;
-    if (object) {
+    if (object)
+    {
         m_EditObject = object;
         m_BoneParts = &object->BoneParts();
         res = ShowModal();
@@ -93,7 +94,8 @@ void __fastcall TfrmBonePart::UpdateCount()
 
 void __fastcall TfrmBonePart::FormKeyDown(TObject* Sender, WORD& Key, TShiftState Shift)
 {
-    if (Key == VK_ESCAPE) return;
+    if (Key == VK_ESCAPE)
+        return;
 }
 
 //---------------------------------------------------------------------------
@@ -124,7 +126,8 @@ void __fastcall TfrmBonePart::tvPartDragOver(
     TObject* Sender, TObject* Source, int X, int Y, TDragState State, bool& Accept)
 {
     Accept = false;
-    if (Source == Sender) return;
+    if (Source == Sender)
+        return;
     Accept = true;
 }
 
@@ -134,14 +137,17 @@ void __fastcall TfrmBonePart::ebSaveClick(TObject* Sender)
 {
     for (int k = 0; k < 4; k++)
     {
-        if (T[k]->Items->Count && E[k]->Text.IsEmpty()) {
+        if (T[k]->Items->Count && E[k]->Text.IsEmpty())
+        {
             ELog.DlgMsg(mtError, "Verify parts name.");
             return;
         }
         for (int i = k - 1; i >= 0; i--)
         {
-            if (!T[k]->Items->Count) continue;
-            if (E[k]->Text.UpperCase() == E[i]->Text.UpperCase()) {
+            if (!T[k]->Items->Count)
+                continue;
+            if (E[k]->Text.UpperCase() == E[i]->Text.UpperCase())
+            {
                 ELog.DlgMsg(mtError, "Unique name required.");
                 return;
             }
@@ -157,7 +163,8 @@ void __fastcall TfrmBonePart::ebSaveClick(TObject* Sender)
                 b_use[m_EditObject->FindBoneByNameIdx(AnsiString(node->Text).c_str())]++;
     }
     for (U8It u_it = b_use.begin(); u_it != b_use.end(); u_it++)
-        if (*u_it != 1) {
+        if (*u_it != 1)
+        {
             ELog.DlgMsg(mtError, "Invalid bone part found (missing or duplicate bones).");
             return;
         }
@@ -166,7 +173,8 @@ void __fastcall TfrmBonePart::ebSaveClick(TObject* Sender)
     m_BoneParts->clear();
     for (k = 0; k < 4; k++)
     {
-        if (T[k]->Items->Count) {
+        if (T[k]->Items->Count)
+        {
             m_BoneParts->push_back(SBonePart());
             SBonePart& BP = m_BoneParts->back();
             BP.alias = E[k]->Text.c_str();
@@ -236,14 +244,16 @@ void __fastcall TfrmBonePart::ebClearClick(TObject* Sender)
 void __fastcall TfrmBonePart::ebSaveToClick(TObject* Sender)
 {
     xr_string temp_fn;
-    if (EFS.GetSaveName(_import_, temp_fn)) {
+    if (EFS.GetSaveName(_import_, temp_fn))
+    {
         CInifile ini(temp_fn.c_str(), FALSE, FALSE, TRUE);
         string64 buff;
         for (int i = 0; i < 4; ++i)
         {
             sprintf(buff, "part_%d", i);
             ini.w_string(buff, "partition_name", E[i]->Text.c_str());
-            if (T[i]->Items->Count) {
+            if (T[i]->Items->Count)
+            {
                 for (TElTreeItem* node = T[i]->Items->GetFirstNode(); node; node = node->GetNext())
                     ini.w_string(buff, AnsiString(node->Text).c_str(), NULL);
             }
@@ -257,7 +267,8 @@ void __fastcall TfrmBonePart::ebLoadFromClick(TObject* Sender)
 {
     //.
     xr_string temp_fn;
-    if (EFS.GetOpenName(_import_, temp_fn, false, NULL, 0)) {
+    if (EFS.GetOpenName(_import_, temp_fn, false, NULL, 0))
+    {
         ebClearClick(Sender);
         CInifile ini(temp_fn.c_str(), TRUE, TRUE, FALSE);
         string64 buff;
@@ -271,7 +282,8 @@ void __fastcall TfrmBonePart::ebLoadFromClick(TObject* Sender)
             CInifile::SectCIt e = S.Data.end();
             for (; it != e; ++it)
             {
-                if (0 != stricmp(it->first.c_str(), "partition_name")) {
+                if (0 != stricmp(it->first.c_str(), "partition_name"))
+                {
                     FHelper.AppendObject(T[i], it->first.c_str(), false, true);
                 }
             }

@@ -1,14 +1,14 @@
 #include "stdafx.h"
 
 static u32 dwPositionPart[8] = {
-    0,  // no position
-    3,  // x,y,z
-    4,  // sx,sy,sz,rhw
-    4,  // x,y,z,b1
-    5,  // x,y,z,b1,b2
-    6,  // x,y,z,b1,b2,b3
-    7,  // x,y,z,b1,b2,b3,b4
-    8   // x,y,z,b1,b2,b3,b4,b5
+    0, // no position
+    3, // x,y,z
+    4, // sx,sy,sz,rhw
+    4, // x,y,z,b1
+    5, // x,y,z,b1,b2
+    6, // x,y,z,b1,b2,b3
+    7, // x,y,z,b1,b2,b3,b4
+    8 // x,y,z,b1,b2,b3,b4,b5
 };
 
 #define FAKES 0xffffffff
@@ -26,7 +26,8 @@ void ConvertVertices(u32 dwTypeDest, void* pDest, u32 dwTypeSrc, void* pSource, 
     u32* src = (u32*)pSource;
 
     // avoid redundant processing
-    if (dwTypeDest == dwTypeSrc) {
+    if (dwTypeDest == dwTypeSrc)
+    {
         CopyMemory(pDest, pSource, dwSizeDest * dwCount * 4);
         return;
     }
@@ -34,7 +35,8 @@ void ConvertVertices(u32 dwTypeDest, void* pDest, u32 dwTypeSrc, void* pSource, 
     // how many bytes to 'simple copy'
     u32 dwPosDest = (dwTypeDest & D3DFVF_POSITION_MASK) >> 1;
     u32 dwPosSrc = (dwTypeSrc & D3DFVF_POSITION_MASK) >> 1;
-    if (dwPosDest == dwPosSrc) {
+    if (dwPosDest == dwPosSrc)
+    {
         u32 cnt = dwPositionPart[dwPosSrc];
         for (u32 i = 0; i < cnt; i++)
             TransferMask[tmPos++] = i;
@@ -46,57 +48,70 @@ void ConvertVertices(u32 dwTypeDest, void* pDest, u32 dwTypeSrc, void* pSource, 
     }
 
     // ---------------------- "Reserved" property
-    if ((dwTypeDest & D3DFVF_PSIZE) && (dwTypeSrc & D3DFVF_PSIZE)) {  // DEST & SRC
+    if ((dwTypeDest & D3DFVF_PSIZE) && (dwTypeSrc & D3DFVF_PSIZE))
+    { // DEST & SRC
         TransferMask[tmPos++] = tmPosSrc++;
     }
-    if ((dwTypeDest & D3DFVF_PSIZE) && !(dwTypeSrc & D3DFVF_PSIZE)) {  // DEST & !SRC
-        TransferMask[tmPos++] = FAKEZ;                                 // fake data
+    if ((dwTypeDest & D3DFVF_PSIZE) && !(dwTypeSrc & D3DFVF_PSIZE))
+    { // DEST & !SRC
+        TransferMask[tmPos++] = FAKEZ; // fake data
     }
-    if (!(dwTypeDest & D3DFVF_PSIZE) && (dwTypeSrc & D3DFVF_PSIZE)) {  // !DEST & SRC
-        tmPosSrc++;                                                    // skip it
+    if (!(dwTypeDest & D3DFVF_PSIZE) && (dwTypeSrc & D3DFVF_PSIZE))
+    { // !DEST & SRC
+        tmPosSrc++; // skip it
     }
 
     // ---------------------- "Normal" property
-    if ((dwTypeDest & D3DFVF_NORMAL) && (dwTypeSrc & D3DFVF_NORMAL)) {  // DEST & SRC
+    if ((dwTypeDest & D3DFVF_NORMAL) && (dwTypeSrc & D3DFVF_NORMAL))
+    { // DEST & SRC
         TransferMask[tmPos++] = tmPosSrc++;
         TransferMask[tmPos++] = tmPosSrc++;
         TransferMask[tmPos++] = tmPosSrc++;
     }
-    if ((dwTypeDest & D3DFVF_NORMAL) && !(dwTypeSrc & D3DFVF_NORMAL)) {  // DEST & !SRC
+    if ((dwTypeDest & D3DFVF_NORMAL) && !(dwTypeSrc & D3DFVF_NORMAL))
+    { // DEST & !SRC
         VERIFY2(0, "Source format doesn't have NORMAL but destination HAS");
     }
-    if (!(dwTypeDest & D3DFVF_NORMAL) && (dwTypeSrc & D3DFVF_NORMAL)) {  // !DEST & SRC
-        tmPosSrc++;                                                      // skip it
-        tmPosSrc++;                                                      // skip it
-        tmPosSrc++;                                                      // skip it
+    if (!(dwTypeDest & D3DFVF_NORMAL) && (dwTypeSrc & D3DFVF_NORMAL))
+    { // !DEST & SRC
+        tmPosSrc++; // skip it
+        tmPosSrc++; // skip it
+        tmPosSrc++; // skip it
     }
 
     // ---------------------- "Diffuse" property
-    if ((dwTypeDest & D3DFVF_DIFFUSE) && (dwTypeSrc & D3DFVF_DIFFUSE)) {  // DEST & SRC
+    if ((dwTypeDest & D3DFVF_DIFFUSE) && (dwTypeSrc & D3DFVF_DIFFUSE))
+    { // DEST & SRC
         TransferMask[tmPos++] = tmPosSrc++;
     }
-    if ((dwTypeDest & D3DFVF_DIFFUSE) && !(dwTypeSrc & D3DFVF_DIFFUSE)) {  // DEST & !SRC
-        TransferMask[tmPos++] = FAKES;                                     // fake data - white
+    if ((dwTypeDest & D3DFVF_DIFFUSE) && !(dwTypeSrc & D3DFVF_DIFFUSE))
+    { // DEST & !SRC
+        TransferMask[tmPos++] = FAKES; // fake data - white
     }
-    if (!(dwTypeDest & D3DFVF_DIFFUSE) && (dwTypeSrc & D3DFVF_DIFFUSE)) {  // !DEST & SRC
-        tmPosSrc++;                                                        // skip it
+    if (!(dwTypeDest & D3DFVF_DIFFUSE) && (dwTypeSrc & D3DFVF_DIFFUSE))
+    { // !DEST & SRC
+        tmPosSrc++; // skip it
     }
 
     // ---------------------- "Specular" property
-    if ((dwTypeDest & D3DFVF_SPECULAR) && (dwTypeSrc & D3DFVF_SPECULAR)) {  // DEST & SRC
+    if ((dwTypeDest & D3DFVF_SPECULAR) && (dwTypeSrc & D3DFVF_SPECULAR))
+    { // DEST & SRC
         TransferMask[tmPos++] = tmPosSrc++;
     }
-    if ((dwTypeDest & D3DFVF_SPECULAR) && !(dwTypeSrc & D3DFVF_SPECULAR)) {  // DEST & !SRC
-        TransferMask[tmPos++] = FAKES;                                       // fake data - white
+    if ((dwTypeDest & D3DFVF_SPECULAR) && !(dwTypeSrc & D3DFVF_SPECULAR))
+    { // DEST & !SRC
+        TransferMask[tmPos++] = FAKES; // fake data - white
     }
-    if (!(dwTypeDest & D3DFVF_SPECULAR) && (dwTypeSrc & D3DFVF_SPECULAR)) {  // !DEST & SRC
-        tmPosSrc++;                                                          // skip it
+    if (!(dwTypeDest & D3DFVF_SPECULAR) && (dwTypeSrc & D3DFVF_SPECULAR))
+    { // !DEST & SRC
+        tmPosSrc++; // skip it
     }
 
     // ---------------------- "Texture coords" property
     u32 dwTDest = ((dwTypeDest & D3DFVF_TEXCOUNT_MASK) >> D3DFVF_TEXCOUNT_SHIFT);
     u32 dwTSrc = ((dwTypeSrc & D3DFVF_TEXCOUNT_MASK) >> D3DFVF_TEXCOUNT_SHIFT);
-    if (dwTDest <= dwTSrc) {
+    if (dwTDest <= dwTSrc)
+    {
         for (u32 i = 0; i < dwTDest; i++)
         {
             TransferMask[tmPos++] = tmPosSrc++;
@@ -105,7 +120,8 @@ void ConvertVertices(u32 dwTypeDest, void* pDest, u32 dwTypeSrc, void* pSource, 
     }
     else
     {
-        if (dwTSrc == 0) {
+        if (dwTSrc == 0)
+        {
             R_ASSERT(0 == "Source vertex format doesn't has texture coords at all");
         }
         // Copy real TC

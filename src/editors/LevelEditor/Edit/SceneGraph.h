@@ -3,7 +3,7 @@
 template <class K, class T>
 class FixedMAP
 {
-  public:
+public:
     struct TNode
     {
         K key;
@@ -15,7 +15,7 @@ class FixedMAP
 
     typedef void __fastcall callback(TNode*);
 
-  private:
+private:
     TNode* nodes;
     DWORD pool;
     DWORD limit;
@@ -48,9 +48,11 @@ class FixedMAP
         void
         recurseLR(TNode* N, callback CB)
     {
-        if (N->left) recurseLR(N->left, CB);
+        if (N->left)
+            recurseLR(N->left, CB);
         CB(N);
-        if (N->right) recurseLR(N->right, CB);
+        if (N->right)
+            recurseLR(N->right, CB);
     }
 
     IC
@@ -58,12 +60,14 @@ class FixedMAP
         void
         recurseRL(TNode* N, callback CB)
     {
-        if (N->right) recurseRL(N->right, CB);
+        if (N->right)
+            recurseRL(N->right, CB);
         CB(N);
-        if (N->left) recurseRL(N->left, CB);
+        if (N->left)
+            recurseRL(N->left, CB);
     }
 
-  public:
+public:
     FixedMAP()
     {
         nodes = 0;
@@ -72,7 +76,6 @@ class FixedMAP
     }
 
     ~FixedMAP() { delete[] nodes; }
-
     IC
 
         void
@@ -84,12 +87,15 @@ class FixedMAP
 
     IC TNode* insert(const K& k, const T& v)
     {
-        if (pool) {
+        if (pool)
+        {
             TNode* node = nodes;
 
         once_more:
-            if (k < node->key) {
-                if (node->left) {
+            if (k < node->key)
+            {
+                if (node->left)
+                {
                     node = node->left;
                     goto once_more;
                 }
@@ -102,7 +108,8 @@ class FixedMAP
             }
             else if (k > node->key)
             {
-                if (node->right) {
+                if (node->right)
+                {
                     node = node->right;
                     goto once_more;
                 }
@@ -124,13 +131,16 @@ class FixedMAP
 
     IC TNode* insertInAnyWay(const K& k, const T& v)
     {
-        if (pool) {
+        if (pool)
+        {
             TNode* node = nodes;
 
         once_more:
-            if (k <= node->key) {
+            if (k <= node->key)
+            {
                 VERIFY(node->val != v);
-                if (node->left) {
+                if (node->left)
+                {
                     node = node->left;
                     goto once_more;
                 }
@@ -143,7 +153,8 @@ class FixedMAP
             }
             else
             {
-                if (node->right) {
+                if (node->right)
+                {
                     node = node->right;
                     goto once_more;
                 }
@@ -163,12 +174,15 @@ class FixedMAP
 
     IC TNode* insert(const K& k)
     {
-        if (pool) {
+        if (pool)
+        {
             TNode* node = nodes;
 
         once_more:
-            if (k < node->key) {
-                if (node->left) {
+            if (k < node->key)
+            {
+                if (node->left)
+                {
                     node = node->left;
                     goto once_more;
                 }
@@ -181,7 +195,8 @@ class FixedMAP
             }
             else if (k > node->key)
             {
-                if (node->right) {
+                if (node->right)
+                {
                     node = node->right;
                     goto once_more;
                 }
@@ -203,12 +218,15 @@ class FixedMAP
 
     IC TNode* insertInAnyWay(const K& k)
     {
-        if (pool) {
+        if (pool)
+        {
             TNode* node = nodes;
 
         once_more:
-            if (k <= node->key) {
-                if (node->left) {
+            if (k <= node->key)
+            {
+                if (node->left)
+                {
                     node = node->left;
                     goto once_more;
                 }
@@ -221,7 +239,8 @@ class FixedMAP
             }
             else
             {
-                if (node->right) {
+                if (node->right)
+                {
                     node = node->right;
                     goto once_more;
                 }
@@ -248,20 +267,17 @@ class FixedMAP
     }
 
     IC TNode* begin() { return nodes; }
-
     IC TNode* end() { return nodes + pool; }
-
-    IC TNode* last() { return nodes + limit; }  // for setup only
+    IC TNode* last() { return nodes + limit; } // for setup only
     IC TNode* size() { return pool; }
-
     IC TNode& operator[](int v) { return nodes[v]; }
-
     IC
 
         void
         traverseLR(callback CB)
     {
-        if (pool) recurseLR(nodes, CB);
+        if (pool)
+            recurseLR(nodes, CB);
     }
 
     IC
@@ -269,7 +285,8 @@ class FixedMAP
         void
         traverseRL(callback CB)
     {
-        if (pool) recurseRL(nodes, CB);
+        if (pool)
+            recurseRL(nodes, CB);
     }
 
     IC

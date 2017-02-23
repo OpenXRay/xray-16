@@ -15,4 +15,4 @@ float dot(LWFVector a, LWFVector b);
 void cross(LWFVector a, LWFVector b, LWFVector c);
 void normalize(LWFVector v);
 
-#endif  //_VECMAT_H_/*
+#endif //_VECMAT_H_/*

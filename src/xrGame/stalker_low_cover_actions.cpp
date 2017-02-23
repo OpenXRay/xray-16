@@ -88,11 +88,13 @@ void CStalkerActionKillEnemyLowCover::execute()
 
     fire();
 
-    if (!object().memory().enemy().selected()) return;
+    if (!object().memory().enemy().selected())
+        return;
 
     CMemoryInfo mem_object = object().memory().memory(object().memory().enemy().selected());
 
-    if (!mem_object.m_object) return;
+    if (!mem_object.m_object)
+        return;
 
     object().best_cover(mem_object.m_object_params.m_position);
 }
@@ -132,11 +134,13 @@ void CStalkerActionHoldPositionLowCover::execute()
 
     CMemoryInfo mem_object = object().memory().memory(object().memory().enemy().selected());
 
-    if (!mem_object.m_object) return;
+    if (!mem_object.m_object)
+        return;
 
     object().sight().setup(CSightAction(SightManager::eSightTypePosition, mem_object.m_object_params.m_position, true));
 
-    if (completed()) {
+    if (completed())
+    {
         if (object().agent_manager().member().can_detour() || !object().agent_manager().member().cover_detouring() ||
             !fire_make_sense())
         {
@@ -147,7 +151,8 @@ void CStalkerActionHoldPositionLowCover::execute()
         }
     }
 
-    if (object().agent_manager().member().cover_detouring() && fire_make_sense()) {
+    if (object().agent_manager().member().cover_detouring() && fire_make_sense())
+    {
         object().sound().play(StalkerSpace::eStalkerSoundNeedBackup, 3000, 3000, 10000, 10000);
         fire();
     }
@@ -156,10 +161,12 @@ void CStalkerActionHoldPositionLowCover::execute()
         aim_ready();
     }
 
-    if (object().memory().enemy().selected()) {
+    if (object().memory().enemy().selected())
+    {
         CMemoryInfo mem_object = object().memory().memory(object().memory().enemy().selected());
 
-        if (mem_object.m_object) {
+        if (mem_object.m_object)
+        {
             object().best_cover(mem_object.m_object_params.m_position);
         }
     }

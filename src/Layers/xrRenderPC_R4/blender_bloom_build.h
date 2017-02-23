@@ -6,7 +6,6 @@ public:
     virtual LPCSTR getComment() { return "INTERNAL: combine to bloom target"; }
     virtual BOOL canBeDetailed() { return FALSE; }
     virtual BOOL canBeLMAPped() { return FALSE; }
-
     virtual void Compile(CBlender_Compile& C);
 
     CBlender_bloom_build();
@@ -19,7 +18,6 @@ public:
     virtual LPCSTR getComment() { return "INTERNAL: combine to bloom target msaa"; }
     virtual BOOL canBeDetailed() { return FALSE; }
     virtual BOOL canBeLMAPped() { return FALSE; }
-
     virtual void Compile(CBlender_Compile& C);
 
     CBlender_bloom_build_msaa();
@@ -32,7 +30,6 @@ public:
     virtual LPCSTR getComment() { return "INTERNAL: combine to bloom target msaa"; }
     virtual BOOL canBeDetailed() { return FALSE; }
     virtual BOOL canBeLMAPped() { return FALSE; }
-
     virtual void Compile(CBlender_Compile& C);
 
     CBlender_postprocess_msaa();

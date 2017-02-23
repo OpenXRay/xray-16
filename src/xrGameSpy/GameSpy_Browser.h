@@ -87,7 +87,6 @@ struct ServerInfo
 
     ServerInfo(){};
     ServerInfo(string128 NewAddress) { xr_strcpy(m_Address, NewAddress); };
-
     bool operator==(LPCSTR Address)
     {
         int res = xr_strcmp(m_Address, Address);

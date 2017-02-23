@@ -68,7 +68,8 @@ public:
     {
         string256 tmp;
         tmp[0] = 0;
-        if (n) {
+        if (n)
+        {
             xr_strcpy(tmp, n);
             xr_strlwr(tmp);
         }
@@ -79,7 +80,6 @@ public:
     int FrameEnd() { return iFrameEnd; }
     float FPS() { return fFPS; }
     int Length() { return iFrameEnd - iFrameStart + 1; }
-
     void SetParam(int s, int e, float fps)
     {
         iFrameStart = s;

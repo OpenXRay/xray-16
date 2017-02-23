@@ -1,7 +1,7 @@
 #pragma once
 #include "xrPhysics/PhysicsShell.h"
 
-#define TEMPLATE_SPECIALIZATION                                                                                        \
+#define TEMPLATE_SPECIALIZATION \
     template <typename _Object\
 >
 
@@ -12,10 +12,7 @@
 #define TIME_IN_STATE 8000
 
 TEMPLATE_SPECIALIZATION
-CStateMonsterRestFunAbstract::CStateMonsterRestFun(_Object* obj) : inherited(obj)
-{
-}
-
+CStateMonsterRestFunAbstract::CStateMonsterRestFun(_Object* obj) : inherited(obj) {}
 TEMPLATE_SPECIALIZATION
 void CStateMonsterRestFunAbstract::initialize()
 {
@@ -46,11 +43,13 @@ void CStateMonsterRestFunAbstract::execute()
 
     object->set_state_sound(MonsterSound::eMonsterSoundIdle);
 
-    if ((dist < object->db().m_fDistToCorpse + 0.5f) && (time_last_hit + MIN_DELAY < Device.dwTimeGlobal)) {
+    if ((dist < object->db().m_fDistToCorpse + 0.5f) && (time_last_hit + MIN_DELAY < Device.dwTimeGlobal))
+    {
         CEntityAlive* corpse = const_cast<CEntityAlive*>(object->CorpseMan.get_corpse());
         CPhysicsShellHolder* target = smart_cast<CPhysicsShellHolder*>(corpse);
 
-        if (target && target->m_pPhysicsShell) {
+        if (target && target->m_pPhysicsShell)
+        {
             Fvector dir;
             dir.add(Fvector().sub(target->Position(), object->Position()), object->Direction());
 
@@ -62,9 +61,8 @@ void CStateMonsterRestFunAbstract::execute()
             // выполнить бросок
             for (u32 i = 0; i < target->m_pPhysicsShell->get_ElementsNumber(); i++)
             {
-                target->m_pPhysicsShell->get_ElementByStoreOrder((u16)i)->applyImpulse(dir,
-                    IMPULSE_TO_CORPSE * target->m_pPhysicsShell->getMass() /
-                        target->m_pPhysicsShell->Elements().size());
+                target->m_pPhysicsShell->get_ElementByStoreOrder((u16)i)->applyImpulse(dir, IMPULSE_TO_CORPSE *
+                        target->m_pPhysicsShell->getMass() / target->m_pPhysicsShell->Elements().size());
             }
 
             time_last_hit = Device.dwTimeGlobal;
@@ -81,8 +79,10 @@ bool CStateMonsterRestFunAbstract::check_start_conditions()
 TEMPLATE_SPECIALIZATION
 bool CStateMonsterRestFunAbstract::check_completion()
 {
-    if (!object->CorpseMan.get_corpse()) return true;
-    if (time_state_started + TIME_IN_STATE < Device.dwTimeGlobal) return true;
+    if (!object->CorpseMan.get_corpse())
+        return true;
+    if (time_state_started + TIME_IN_STATE < Device.dwTimeGlobal)
+        return true;
     return false;
 }
 

@@ -52,7 +52,7 @@ private:
 
 public:
 public:
-    xrLC_GlobalData();  //:_RCAST_Model (0), _b_nosun(false),_gl_linear(false){}
+    xrLC_GlobalData(); //:_RCAST_Model (0), _b_nosun(false),_gl_linear(false){}
     ~xrLC_GlobalData();
     IC xr_vector<b_BuildTexture>& textures() { return _cl_globs._textures; }
     IC xr_vector<CLightmap*>& lightmaps() { return _g_lightmaps; }
@@ -62,7 +62,6 @@ public:
     IC CMemoryWriter& err_multiedge() { return _err_multiedge; };
     IC CMemoryWriter& err_tjunction() { return _err_tjunction; };
     IC b_params& g_params() { return _cl_globs._g_params; }
-
     Face* create_face();
     void destroy_face(Face*& f);
 
@@ -81,7 +80,6 @@ public:
     CDB::MODEL* RCAST_Model() { return _cl_globs._RCAST_Model; }
     xr_vector<xrMU_Model*>& mu_models() { return _mu_models; }
     xr_vector<xrMU_Reference*>& mu_refs() { return _mu_refs; }
-
     void read_mu_models(INetReader& r);
     void write_mu_models(IWriter& w) const;
 
@@ -147,18 +145,17 @@ extern "C" XRLC_LIGHT_API u32 InvalideFaces();
 XRLC_LIGHT_API void ImplicitLighting(BOOL net);
 
 extern xrLC_GlobalData* data;
-IC xrLC_GlobalData* inlc_global_data()
-{
-    return data;
-}
+IC xrLC_GlobalData* inlc_global_data() { return data; }
 static LPCSTR gl_data_net_file_name = "tmp_global_data";
 
 #ifdef _DEBUG
-static LPCSTR libraries = "XRLC_LightStab.dll,XRLC_Light.dll,xrCore.dll,xrCDB.dll,xrAPI.dll,DXT.dll,BugTrap.dll,"
-                          "BugTrapD.dll,FreeImage.dll,msvcr80.dll,Microsoft.VC80.CRT.manifest";
+static LPCSTR libraries =
+    "XRLC_LightStab.dll,XRLC_Light.dll,xrCore.dll,xrCDB.dll,xrAPI.dll,DXT.dll,BugTrap.dll,BugTrapD.dll,FreeImage.dll,"
+    "msvcr80.dll,Microsoft.VC80.CRT.manifest";
 #else
-static LPCSTR libraries = "XRLC_LightStab.dll,XRLC_Light.dll,xrCore.dll,xrCDB.dll,xrAPI.dll,DXT.dll,BugTrap.dll,"
-                          "FreeImage.dll,msvcr80.dll,Microsoft.VC80.CRT.manifest";
+static LPCSTR libraries =
+    "XRLC_LightStab.dll,XRLC_Light.dll,xrCore.dll,xrCDB.dll,xrAPI.dll,DXT.dll,BugTrap.dll,FreeImage.dll,msvcr80.dll,"
+    "Microsoft.VC80.CRT.manifest";
 #endif
 //#define NET_CMP
 //#define LOAD_GL_DATA

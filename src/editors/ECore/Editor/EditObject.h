@@ -51,14 +51,14 @@ class ECORE_API CSurface
         rtValidShader = (1 << 0),
     };
 
-  public:
+public:
     enum EFlags
     {
         sf2Sided = (1 << 0),
     };
     shared_str m_Name;
-    shared_str m_Texture;  //
-    shared_str m_VMap;     //
+    shared_str m_Texture; //
+    shared_str m_VMap; //
     shared_str m_ShaderName;
     shared_str m_ShaderXRLCName;
     shared_str m_GameMtlName;
@@ -72,7 +72,7 @@ class ECORE_API CSurface
     u32 tag;
     SSimpleImage* m_ImageData;
 
-  public:
+public:
     CSurface()
     {
         m_GameMtlName = "default";
@@ -103,7 +103,8 @@ class ECORE_API CSurface
     IC bool _StrictB2F() { return _Shader() ? _Shader()->E[0]->flags.bStrictB2F : false; }
     IC ref_shader _Shader()
     {
-        if (!m_RTFlags.is(rtValidShader)) OnDeviceCreate();
+        if (!m_RTFlags.is(rtValidShader))
+            OnDeviceCreate();
         return m_Shader;
     }
 #endif
@@ -130,7 +131,8 @@ class ECORE_API CSurface
     {
         string512 buf;
         xr_strcpy(buf, sizeof(buf), name);
-        if (strext(buf)) *strext(buf) = 0;
+        if (strext(buf))
+            *strext(buf) = 0;
         m_Texture = buf;
     }
     IC void SetVMap(LPCSTR name) { m_VMap = name; }
@@ -208,12 +210,12 @@ class ECORE_API CEditableObject :
     CPhysicsShell* m_physics_shell;
     Fmatrix* m_object_xform;
 
-  public:
+public:
     SAnimParams m_SMParam;
     xr_vector<shared_str> m_SMotionRefs;
     shared_str m_LODs;
 
-  public:
+public:
     // options
     Flags32 m_objectFlags;
     enum
@@ -231,19 +233,19 @@ class ECORE_API CEditableObject :
     IC BOOL IsStatic()
     {
         return !m_objectFlags.is(eoSoundOccluder) && !m_objectFlags.is(eoDynamic) && !m_objectFlags.is(eoHOM) &&
-               !m_objectFlags.is(eoMultipleUsage);
+            !m_objectFlags.is(eoMultipleUsage);
     }
     IC BOOL IsMUStatic()
     {
         return !m_objectFlags.is(eoSoundOccluder) && !m_objectFlags.is(eoDynamic) && !m_objectFlags.is(eoHOM) &&
-               m_objectFlags.is(eoMultipleUsage);
+            m_objectFlags.is(eoMultipleUsage);
     }
 
-  private:
+private:
     // bounding volume
     Fbox m_BBox;
 
-  public:
+public:
     // temp variable for actor
     Fvector a_vPosition;
     Fvector a_vRotate;
@@ -256,11 +258,10 @@ class ECORE_API CEditableObject :
     bool bOnModified;
     IC bool IsModified() { return bOnModified; }
     IC void Modified() { bOnModified = true; }
-
     AnsiString m_LoadName;
     int m_RefCount;
 
-  protected:
+protected:
     int m_ObjectVersion;
 
     void ClearGeometry();
@@ -272,7 +273,7 @@ class ECORE_API CEditableObject :
     void __stdcall OnChangeTransform(PropValue* prop);
     void __stdcall OnChangeShader(PropValue* prop);
 
-  public:
+public:
     enum
     {
         LS_RBUFFERS = (1 << 0),
@@ -281,13 +282,12 @@ class ECORE_API CEditableObject :
 
     AnsiString m_LibName;
 
-  public:
+public:
     // constructor/destructor methods
     CEditableObject(LPCSTR name);
     virtual ~CEditableObject();
 
     LPCSTR GetName() { return m_LibName.c_str(); }
-
     void SetVersionToCurrent(BOOL bCreate, BOOL bModif);
 
     void Optimize();
@@ -302,7 +302,6 @@ class ECORE_API CEditableObject :
     IC SurfaceIt LastSurface() { return m_Surfaces.end(); }
     IC int SurfaceCount() { return m_Surfaces.size(); }
     IC int Version() { return m_ObjectVersion; }
-
     // LOD
     xr_string GetLODTextureName();
     LPCSTR GetLODShaderName() { return LOD_SHADER_NAME; }
@@ -341,15 +340,11 @@ class ECORE_API CEditableObject :
     IC void SkeletonPlay() { m_SMParam.Play(); }
     IC void SkeletonStop() { m_SMParam.Stop(); }
     IC void SkeletonPause(bool val) { m_SMParam.Pause(val); }
-
     // get object properties methods
 
     IC xr_string& GetClassScript() { return m_ClassScript; }
-
     IC const Fbox& GetBox() const { return m_BBox; }
-
     IC LPCSTR GetLODs() { return m_LODs.c_str(); }
-
     // animation
     IC bool IsSkeleton() { return !!m_Bones.size(); }
     IC bool IsSMotionActive() { return IsSkeleton() && m_ActiveSMotion; }
@@ -500,18 +495,17 @@ class ECORE_API CEditableObject :
     bool ExportLWO(LPCSTR fname);
     bool Validate();
 
-  private:
+private:
     float GetBonesBottom();
 
-  public:
+public:
     void CalculateRootObjectAnimation(const Fmatrix& anchor);
     void GetAnchorForRootObjectAnimation(Fmatrix& anchor);
     bool AnimateRootObject(CSMotion* motion);
 
-  private:
+private:
     virtual void Bone_Calculate(CBoneData* bd, Fmatrix* parent) { VERIFY(false); }
     virtual void Bone_GetAnimPos(Fmatrix& pos, u16 id, u8 channel_mask, bool ignore_callbacks) { VERIFY(false); }
-
     virtual bool PickBone(
         const Fmatrix& parent_xform, pick_result& r, float dist, const Fvector& start, const Fvector& dir, u16 bone_id)
     {
@@ -519,7 +513,6 @@ class ECORE_API CEditableObject :
         return false;
     }
     virtual void EnumBoneVertices(SEnumVerticesCallback& C, u16 bone_id) { VERIFY(false); }
-
     // Low level interface
     virtual u16 LL_BoneID(LPCSTR B)
     {
@@ -542,7 +535,6 @@ class ECORE_API CEditableObject :
     virtual CBoneData& LL_GetData(u16 bone_id);
 
     virtual const IBoneData& GetBoneData(u16 bone_id) const { return *GetBone(bone_id); }
-
     virtual u16 LL_BoneCount() const { return (u16)BoneCount(); }
     virtual u16 LL_VisibleBoneCount()
     {
@@ -567,21 +559,17 @@ class ECORE_API CEditableObject :
         return root_id;
     }
     virtual void LL_SetBoneRoot(u16 bone_id) { VERIFY(false); }
-
     virtual BOOL LL_GetBoneVisible(u16 bone_id) { return TRUE; }
     virtual void LL_SetBoneVisible(u16 bone_id, BOOL val, BOOL bRecursive) { VERIFY(false); }
     virtual u64 LL_GetBonesVisible() { return u64(-1); }
     virtual void LL_SetBonesVisible(u64 mask) { VERIFY(false); }
-
     // Main functionality
-    virtual void CalculateBones(BOOL bForceExact = FALSE) {}  // Recalculate skeleton
+    virtual void CalculateBones(BOOL bForceExact = FALSE) {} // Recalculate skeleton
     virtual void CalculateBones_Invalidate() {}
     virtual void Callback(UpdateCallback C, void* Param) { VERIFY(false); }
-
     //	Callback: data manipulation
     virtual void SetUpdateCallback(UpdateCallback pCallback) { VERIFY(false); }
     virtual void SetUpdateCallbackParam(void* pCallbackParam) { VERIFY(false); }
-
     virtual UpdateCallback GetUpdateCallback()
     {
         VERIFY(false);
@@ -606,7 +594,7 @@ class ECORE_API CEditableObject :
     virtual void DebugRender(Fmatrix& XFORM) { VERIFY(false); }
     virtual shared_str getDebugName() { return m_ModifName; }
 #endif
-  private:
+private:
     virtual IKinematics* ObjectKinematics() { return this; }
 };
 //----------------------------------------------------

@@ -13,22 +13,23 @@ class CSceneObject : public CCustomObject
     CEditableObject* m_pReference;
     void ReferenceChange(PropValue* sender);
 
-  public:
+public:
     enum
     {
         //    	flDynamic	= (1<<0),
         flFORCE32 = u32(-1)
     };
 
-  private:
+private:
     Fbox m_TBBox;
     // options
     Flags32 m_Flags;
 
-  public:
+public:
     virtual void SetScale(const Fvector& scale)
     {
-        if (m_pReference && m_pReference->IsDynamic()) {
+        if (m_pReference && m_pReference->IsDynamic())
+        {
             ELog.Msg(mtError, "Dynamic object %s - can't scale.", Name);
         }
         else
@@ -38,13 +39,13 @@ class CSceneObject : public CCustomObject
         }
     }
 
-  protected:
+protected:
     typedef CCustomObject inherited;
     int m_iBlinkTime;
     CSurface* m_BlinkSurf;
     void RenderBlink();
 
-  public:
+public:
     // constructor/destructor methods
     CSceneObject(LPVOID data, LPCSTR name);
     virtual ~CSceneObject();
@@ -70,16 +71,12 @@ class CSceneObject : public CCustomObject
     }
 
     IC CEditableObject* GetReference() { return m_pReference; }
-
     CEditableObject* SetReference(LPCSTR ref_name);
     CEditableObject* UpdateReference();
 
     IC EditMeshVec* Meshes() { return m_pReference ? &m_pReference->Meshes() : 0; }
-
     virtual LPCSTR RefName() { return m_pReference ? m_pReference->GetName() : 0; }
-
     virtual bool CanAttach() { return true; }
-
     // statistics methods
     IC
 

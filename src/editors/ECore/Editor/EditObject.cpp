@@ -28,10 +28,7 @@ void CSurface::CreateImageData()
     m_ImageData->layers.push_back(U32Vec());
     ImageLib.LoadTextureData(*m_ImageData->name, m_ImageData->layers.back(), m_ImageData->w, m_ImageData->h);
 }
-void CSurface::RemoveImageData()
-{
-    xr_delete(m_ImageData);
-}
+void CSurface::RemoveImageData() { xr_delete(m_ImageData); }
 #endif
 
 CEditableObject::CEditableObject(LPCSTR name) : m_physics_shell(0), m_object_xform(0)
@@ -69,11 +66,7 @@ CEditableObject::CEditableObject(LPCSTR name) : m_physics_shell(0), m_object_xfo
     m_ModifTime = 0;
 }
 
-CEditableObject::~CEditableObject()
-{
-    ClearGeometry();
-}
-
+CEditableObject::~CEditableObject() { ClearGeometry(); }
 //----------------------------------------------------
 
 void CEditableObject::VerifyMeshNames()
@@ -95,14 +88,16 @@ bool CEditableObject::ContainsMesh(const CEditableMesh* m)
 {
     VERIFY(m);
     for (EditMeshIt m_def = m_Meshes.begin(); m_def != m_Meshes.end(); m_def++)
-        if (m == (*m_def)) return true;
+        if (m == (*m_def))
+            return true;
     return false;
 }
 
 CEditableMesh* CEditableObject::FindMeshByName(const char* name, CEditableMesh* Ignore)
 {
     for (EditMeshIt m = m_Meshes.begin(); m != m_Meshes.end(); m++)
-        if ((Ignore != (*m)) && (stricmp((*m)->Name().c_str(), name) == 0)) return (*m);
+        if ((Ignore != (*m)) && (stricmp((*m)->Name().c_str(), name) == 0))
+            return (*m);
     return 0;
 }
 
@@ -199,8 +194,10 @@ void CEditableObject::TranslateToWorld(const Fmatrix& parent)
 CSurface* CEditableObject::FindSurfaceByName(const char* surf_name, int* s_id)
 {
     for (SurfaceIt s_it = m_Surfaces.begin(); s_it != m_Surfaces.end(); s_it++)
-        if (stricmp((*s_it)->_Name(), surf_name) == 0) {
-            if (s_id) *s_id = s_it - m_Surfaces.begin();
+        if (stricmp((*s_it)->_Name(), surf_name) == 0)
+        {
+            if (s_id)
+                *s_id = s_it - m_Surfaces.begin();
             return *s_it;
         }
     return 0;
@@ -210,7 +207,8 @@ LPCSTR CEditableObject::GenerateSurfaceName(const char* base_name)
 {
     static string1024 nm;
     strcpy(nm, base_name);
-    if (FindSurfaceByName(nm)) {
+    if (FindSurfaceByName(nm))
+    {
         DWORD idx = 0;
         do
         {
@@ -228,7 +226,8 @@ bool CEditableObject::VerifyBoneParts()
         for (int i = 0; i < int(bp_it->bones.size()); i++)
         {
             int idx = FindBoneByNameIdx(bp_it->bones[i].c_str());
-            if (idx == -1) {
+            if (idx == -1)
+            {
                 bp_it->bones.erase(bp_it->bones.begin() + i);
                 i--;
             }
@@ -239,7 +238,8 @@ bool CEditableObject::VerifyBoneParts()
         }
 
     for (U8It u_it = b_use.begin(); u_it != b_use.end(); u_it++)
-        if (*u_it != 1) return false;
+        if (*u_it != 1)
+            return false;
     return true;
 }
 
@@ -258,11 +258,13 @@ void CEditableObject::PrepareOGFDesc(ogf_desc& desc)
 void CEditableObject::SetVersionToCurrent(BOOL bCreate, BOOL bModif)
 {
     string512 tmp;
-    if (bCreate) {
+    if (bCreate)
+    {
         m_CreateName = strconcat(sizeof(tmp), tmp, "\\\\", Core.CompName, "\\", Core.UserName);
         m_CreateTime = time(NULL);
     }
-    if (bModif) {
+    if (bModif)
+    {
         m_ModifName = strconcat(sizeof(tmp), tmp, "\\\\", Core.CompName, "\\", Core.UserName);
         m_ModifTime = time(NULL);
     }
@@ -290,12 +292,14 @@ bool CEditableObject::Validate()
 {
     bool bRes = true;
     for (SurfaceIt s_it = m_Surfaces.begin(); s_it != m_Surfaces.end(); s_it++)
-        if (false == (*s_it)->Validate()) {
+        if (false == (*s_it)->Validate())
+        {
             Msg("!Invalid surface found: Object [%s], Surface [%s].", GetName(), (*s_it)->_Name());
             bRes = false;
         }
     for (EditMeshIt m_def = m_Meshes.begin(); m_def != m_Meshes.end(); m_def++)
-        if (false == (*m_def)->Validate()) {
+        if (false == (*m_def)->Validate())
+        {
             Msg("!Invalid mesh found: Object [%s], Mesh [%s].", m_LibName.c_str(), (*m_def)->Name().c_str());
             bRes = false;
         }
@@ -305,17 +309,9 @@ bool CEditableObject::Validate()
 //----------------------------------------------------------------------------
 //#ifdef DEBUG
 
-LPCSTR CEditableObject::LL_BoneName_dbg(u16 ID)
-{
-    return GetBone(ID)->Name().c_str();
-}
-
+LPCSTR CEditableObject::LL_BoneName_dbg(u16 ID) { return GetBone(ID)->Name().c_str(); }
 //#endif
-CBoneInstance& CEditableObject::LL_GetBoneInstance(u16 bone_id)
-{
-    return *GetBone(bone_id);
-}
-
+CBoneInstance& CEditableObject::LL_GetBoneInstance(u16 bone_id) { return *GetBone(bone_id); }
 CBoneData& CEditableObject::LL_GetData(u16 bone_id)
 {
     VERIFY(false);

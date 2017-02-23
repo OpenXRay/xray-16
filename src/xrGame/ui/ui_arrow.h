@@ -16,7 +16,6 @@ public:
     void SetNewValue(float new_value);
     void SetPos(float pos);
     IC float GetPos() { return m_pos; }
-
 private:
     float m_angle_begin;
     float m_angle_end;
@@ -26,6 +25,6 @@ private:
     float m_temp_pos;
     float m_pos;
 
-};  // class UI_Arrow
+}; // class UI_Arrow
 
-#endif  // UI_ARROW_H_INCLUDED
+#endif // UI_ARROW_H_INCLUDED

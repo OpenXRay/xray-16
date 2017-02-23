@@ -87,7 +87,8 @@ void CUIGameLog::Update()
     {
         CUILightAnimColorConroller* pItem = smart_cast<CUILightAnimColorConroller*>(*it);
 
-        if (!pItem->IsColorAnimationPresent()) toDelList.push_back(*it);
+        if (!pItem->IsColorAnimationPresent())
+            toDelList.push_back(*it);
     }
 
     // Delete elements
@@ -97,7 +98,8 @@ void CUIGameLog::Update()
         RemoveWindow(*it);
 
     // REMOVE INVISIBLE AND PART VISIBLE ITEMS
-    if (m_flags.test(eNeedRecalc)) RecalcSize();
+    if (m_flags.test(eNeedRecalc))
+        RecalcSize();
 
     toDelList.clear();
     Frect visible_rect;
@@ -119,5 +121,6 @@ void CUIGameLog::Update()
     for (it = toDelList.begin(); it != it_e; ++it)
         RemoveWindow(*it);
 
-    if (m_flags.test(eNeedRecalc)) RecalcSize();
+    if (m_flags.test(eNeedRecalc))
+        RecalcSize();
 }

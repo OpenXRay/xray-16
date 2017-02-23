@@ -10,11 +10,7 @@
 
 #include "mat3.h"
 
-Mat3 Mat3::I()
-{
-    return Mat3(Vec3(1, 0, 0), Vec3(0, 1, 0), Vec3(0, 0, 1));
-}
-
+Mat3 Mat3::I() { return Mat3(Vec3(1, 0, 0), Vec3(0, 1, 0), Vec3(0, 0, 1)); }
 Mat3& Mat3::diag(double d)
 {
     *this = 0.0;
@@ -22,11 +18,7 @@ Mat3& Mat3::diag(double d)
     return *this;
 }
 
-Mat3 diag(const Vec3& v)
-{
-    return Mat3(Vec3(v[0], 0, 0), Vec3(0, v[1], 0), Vec3(0, 0, v[2]));
-}
-
+Mat3 diag(const Vec3& v) { return Mat3(Vec3(v[0], 0, 0), Vec3(0, v[1], 0), Vec3(0, 0, v[2])); }
 Mat3 Mat3::outer_product(const Vec3& v)
 {
     Mat3 A;
@@ -67,17 +59,14 @@ Mat3 operator*(const Mat3& n, const Mat3& m)
     return A;
 }
 
-Mat3 adjoint(const Mat3& m)
-{
-    return Mat3(m[1] ^ m[2], m[2] ^ m[0], m[0] ^ m[1]);
-}
-
+Mat3 adjoint(const Mat3& m) { return Mat3(m[1] ^ m[2], m[2] ^ m[0], m[0] ^ m[1]); }
 double invert(Mat3& inv, const Mat3& m)
 {
     Mat3 A = adjoint(m);
     double d = A[0] * m[0];
 
-    if (d == 0.0) return 0.0;
+    if (d == 0.0)
+        return 0.0;
 
     inv = transpose(A) / d;
     return d;

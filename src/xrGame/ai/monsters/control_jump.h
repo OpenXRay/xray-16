@@ -11,9 +11,9 @@ struct SControlJumpData : public ControlCom::IComData
     enum EFlags
     {
         eEnablePredictPosition = u32(1) << 0,
-        ePrepareSkip = u32(1) << 1,  // do not use prepare state
+        ePrepareSkip = u32(1) << 1, // do not use prepare state
         ePrepareInMove = u32(1) << 2,
-        eGlideOnPrepareFailed = u32(1) << 3,  // if not set then cannot start jump
+        eGlideOnPrepareFailed = u32(1) << 3, // if not set then cannot start jump
         eGlidePlayAnimOnce = u32(1) << 4,
         eGroundSkip = u32(1) << 5,
         eUseTargetPosition = u32(1) << 6,
@@ -74,10 +74,10 @@ class CControlJump : public CControl_ComCustom<SControlJumpData>
 
     // run-time params
     u32 m_time_next_allowed;
-    u32 m_time_started;         // time jump started
-    float m_jump_time;          // physical-counted time of jump
-    float m_blend_speed;        // current anim blend speed
-    Fvector m_target_position;  // save target position for internal needs
+    u32 m_time_started; // time jump started
+    float m_jump_time; // physical-counted time of jump
+    float m_blend_speed; // current anim blend speed
+    Fvector m_target_position; // save target position for internal needs
 
     u32 m_last_saved_pos_time;
     Fvector m_last_saved_pos;
@@ -118,9 +118,7 @@ public:
 
     float get_max_distance() const { return m_max_distance; }
     float get_min_distance() const { return m_min_distance; }
-
     SControlJumpData& setup_data() { return m_data; }
-
     void remove_links(IGameObject* object);
 
 private:
@@ -147,7 +145,4 @@ private:
     IC bool is_flag(SControlJumpData::EFlags flag);
 };
 
-IC bool CControlJump::is_flag(SControlJumpData::EFlags flag)
-{
-    return (m_data.flags.is(flag) == TRUE);
-}
+IC bool CControlJump::is_flag(SControlJumpData::EFlags flag) { return (m_data.flags.is(flag) == TRUE); }

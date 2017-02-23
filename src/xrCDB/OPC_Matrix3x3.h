@@ -40,7 +40,6 @@ public:
     inline_ Matrix3x3(const Matrix3x3& mat) { CopyMemory(m, &mat.m, 9 * sizeof(float)); }
     //! Destructor
     inline_ ~Matrix3x3() {}
-
     //! Assign values
     inline_ void Set(float m00, float m01, float m02, float m10, float m11, float m12, float m20, float m21, float m22)
     {
@@ -101,7 +100,6 @@ public:
 
     //! Copy from a Matrix3x3
     inline_ void Copy(const Matrix3x3& source) { CopyMemory(m, source.m, 9 * sizeof(float)); }
-
     // Row-column access
     //! Returns a row.
     inline_ void GetRow(const udword r, Point& p) const
@@ -145,17 +143,26 @@ public:
     //! Checks for identity
     inline_ bool IsIdentity() const
     {
-        if (IR(m[0][0]) != IEEE_1_0) return false;
-        if (IR(m[0][1]) != 0) return false;
-        if (IR(m[0][2]) != 0) return false;
+        if (IR(m[0][0]) != IEEE_1_0)
+            return false;
+        if (IR(m[0][1]) != 0)
+            return false;
+        if (IR(m[0][2]) != 0)
+            return false;
 
-        if (IR(m[1][0]) != 0) return false;
-        if (IR(m[1][1]) != IEEE_1_0) return false;
-        if (IR(m[1][2]) != 0) return false;
+        if (IR(m[1][0]) != 0)
+            return false;
+        if (IR(m[1][1]) != IEEE_1_0)
+            return false;
+        if (IR(m[1][2]) != 0)
+            return false;
 
-        if (IR(m[2][0]) != 0) return false;
-        if (IR(m[2][1]) != 0) return false;
-        if (IR(m[2][2]) != IEEE_1_0) return false;
+        if (IR(m[2][0]) != 0)
+            return false;
+        if (IR(m[2][1]) != 0)
+            return false;
+        if (IR(m[2][2]) != IEEE_1_0)
+            return false;
 
         return true;
     }
@@ -413,7 +420,7 @@ public:
     float Determinant() const
     {
         return (m[0][0] * m[1][1] * m[2][2] + m[0][1] * m[1][2] * m[2][0] + m[0][2] * m[1][0] * m[2][1]) -
-               (m[2][0] * m[1][1] * m[0][2] + m[2][1] * m[1][2] * m[0][0] + m[2][2] * m[1][0] * m[0][1]);
+            (m[2][0] * m[1][1] * m[0][2] + m[2][1] * m[1][2] * m[0][0] + m[2][2] * m[1][0] * m[0][1]);
     }
     /*
             //! Compute a cofactor. Used for matrix inversion.
@@ -427,7 +434,7 @@ public:
     //! Invert the matrix. Determinant must be different from zero, else matrix can't be inverted.
     Matrix3x3& Invert()
     {
-        float Det = Determinant();  // Must be !=0
+        float Det = Determinant(); // Must be !=0
         Matrix3x3 Temp;
 
         float OneOverDet = 1.0f / Det;
@@ -469,7 +476,7 @@ public:
     Matrix3x3& Exp(const Matrix3x3& a)
     {
         const int NbTerms = 100;
-        Matrix3x3 Term;  // next term in series
+        Matrix3x3 Term; // next term in series
         Matrix3x3 Temp;
 
         Identity();
@@ -523,7 +530,6 @@ public:
 
     //! Operator for Point Mul = Matrix3x3 * Point;
     inline_ Point operator*(const Point& v) const { return Point(ROW[0] | v, ROW[1] | v, ROW[2] | v); }
-
     //! Operator for Matrix3x3 Mul = Matrix3x3 * float;
     inline_ Matrix3x3 operator*(float s) const
     {
@@ -541,7 +547,8 @@ public:
     //! Operator for Matrix3x3 Div = Matrix3x3 / float;
     inline_ Matrix3x3 operator/(float s) const
     {
-        if (s) s = 1.0f / s;
+        if (s)
+            s = 1.0f / s;
         return Matrix3x3(m[0][0] * s, m[0][1] * s, m[0][2] * s, m[1][0] * s, m[1][1] * s, m[1][2] * s, m[2][0] * s,
             m[2][1] * s, m[2][2] * s);
     }
@@ -623,7 +630,8 @@ public:
     //! Operator for Matrix3x3 /= float
     inline_ Matrix3x3& operator/=(float s)
     {
-        if (s) s = 1.0f / s;
+        if (s)
+            s = 1.0f / s;
         m[0][0] *= s;
         m[0][1] *= s;
         m[0][2] *= s;
@@ -644,9 +652,8 @@ public:
 
     inline_ const Point* operator[](int nRow) const { return (const Point*)&m[nRow][0]; }
     inline_ Point* operator[](int nRow) { return (Point*)&m[nRow][0]; }
-
 public:
     float m[3][3];
 };
 
-#endif  // __ICEMATRIX3X3_H__
+#endif // __ICEMATRIX3X3_H__

@@ -195,9 +195,9 @@ public:
         void unpack_from_byte(u8 const b)
         {
             grenades_type = (b >> 6);
-            grenades_count = b & 0x3f;  // 111111
+            grenades_count = b & 0x3f; // 111111
         }
-    };  // struct grenade_count_t
+    }; // struct grenade_count_t
     grenade_count_t a_elapsed_grenades;
 
     float m_fHitPower;

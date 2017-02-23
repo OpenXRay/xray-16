@@ -40,7 +40,8 @@ time::time(editor::environment::manager* manager, weather const* weather, shared
 
 time::~time()
 {
-    if (!Device.editor()) return;
+    if (!Device.editor())
+        return;
 
     ::ide().destroy(m_property_holder);
 }
@@ -133,15 +134,12 @@ void time::save(CInifile& config)
     config.w_fvector4(m_identifier.c_str(), "clouds_color", clouds_color);
 }
 
-LPCSTR time::id_getter() const
-{
-    return (m_identifier.c_str());
-}
-
+LPCSTR time::id_getter() const { return (m_identifier.c_str()); }
 void time::id_setter(LPCSTR value_)
 {
     shared_str value = value_;
-    if (m_identifier._get() == value._get()) return;
+    if (m_identifier._get() == value._get())
+        return;
 
     if (m_weather)
         m_identifier = m_weather->unique_id(m_identifier, value);
@@ -149,36 +147,12 @@ void time::id_setter(LPCSTR value_)
         m_identifier = value;
 }
 
-LPCSTR const* time::ambients_collection()
-{
-    return (&*m_manager.ambients().ambients_ids().begin());
-}
-
-u32 time::ambients_collection_size()
-{
-    return (m_manager.ambients().ambients_ids().size());
-}
-
-LPCSTR const* time::suns_collection()
-{
-    return (&*m_manager.suns().suns_ids().begin());
-}
-
-u32 time::suns_collection_size()
-{
-    return (m_manager.suns().suns_ids().size());
-}
-
-LPCSTR const* time::thunderbolts_collection()
-{
-    return (&*m_manager.thunderbolts().collections_ids().begin());
-}
-
-u32 time::thunderbolts_collection_size()
-{
-    return (m_manager.thunderbolts().collections_ids().size());
-}
-
+LPCSTR const* time::ambients_collection() { return (&*m_manager.ambients().ambients_ids().begin()); }
+u32 time::ambients_collection_size() { return (m_manager.ambients().ambients_ids().size()); }
+LPCSTR const* time::suns_collection() { return (&*m_manager.suns().suns_ids().begin()); }
+u32 time::suns_collection_size() { return (m_manager.suns().suns_ids().size()); }
+LPCSTR const* time::thunderbolts_collection() { return (&*m_manager.thunderbolts().collections_ids().begin()); }
+u32 time::thunderbolts_collection_size() { return (m_manager.thunderbolts().collections_ids().size()); }
 float time::sun_altitude_getter() const
 {
     float y, x;
@@ -207,54 +181,42 @@ void time::sun_longitude_setter(float value)
     sun_dir.setHP(y, deg2rad(value));
 }
 
-LPCSTR time::ambient_getter() const
-{
-    return (m_ambient.c_str());
-}
-
+LPCSTR time::ambient_getter() const { return (m_ambient.c_str()); }
 void time::ambient_setter(LPCSTR value)
 {
-    if (m_ambient._get() == shared_str(value)._get()) return;
+    if (m_ambient._get() == shared_str(value)._get())
+        return;
 
     m_ambient = value;
     env_ambient = m_manager.AppendEnvAmb(value);
 }
 
-LPCSTR time::sun_getter() const
-{
-    return (m_sun.c_str());
-}
-
+LPCSTR time::sun_getter() const { return (m_sun.c_str()); }
 void time::sun_setter(LPCSTR value)
 {
-    if (m_sun._get() == shared_str(value)._get()) return;
+    if (m_sun._get() == shared_str(value)._get())
+        return;
 
     m_sun = value;
     lens_flare_id = m_manager.eff_LensFlare->AppendDef(m_manager, m_manager.m_suns_config, value);
 }
 
-LPCSTR time::thunderbolt_getter() const
-{
-    return (m_thunderbolt_collection.c_str());
-}
-
+LPCSTR time::thunderbolt_getter() const { return (m_thunderbolt_collection.c_str()); }
 void time::thunderbolt_setter(LPCSTR value)
 {
-    if (m_thunderbolt_collection._get() == shared_str(value)._get()) return;
+    if (m_thunderbolt_collection._get() == shared_str(value)._get())
+        return;
 
     m_thunderbolt_collection = value;
     tb_id = m_manager.eff_Thunderbolt->AppendDef(
         m_manager, m_manager.m_thunderbolt_collections_config, m_manager.m_thunderbolts_config, value);
 }
 
-LPCSTR time::sky_texture_getter() const
-{
-    return (sky_texture_name.c_str());
-}
-
+LPCSTR time::sky_texture_getter() const { return (sky_texture_name.c_str()); }
 void time::sky_texture_setter(LPCSTR value)
 {
-    if (sky_texture_name._get() == shared_str(value)._get()) return;
+    if (sky_texture_name._get() == shared_str(value)._get())
+        return;
 
     sky_texture_name = value;
 
@@ -264,39 +226,20 @@ void time::sky_texture_setter(LPCSTR value)
     m_pDescriptor->OnDeviceCreate(*this);
 }
 
-LPCSTR time::clouds_texture_getter() const
-{
-    return (clouds_texture_name.c_str());
-}
-
+LPCSTR time::clouds_texture_getter() const { return (clouds_texture_name.c_str()); }
 void time::clouds_texture_setter(LPCSTR value)
 {
-    if (clouds_texture_name._get() == shared_str(value)._get()) return;
+    if (clouds_texture_name._get() == shared_str(value)._get())
+        return;
 
     clouds_texture_name = value;
     m_pDescriptor->OnDeviceCreate(*this);
 }
 
-float time::sky_rotation_getter() const
-{
-    return (rad2deg(sky_rotation));
-}
-
-void time::sky_rotation_setter(float value)
-{
-    sky_rotation = deg2rad(value);
-}
-
-float time::wind_direction_getter() const
-{
-    return (rad2deg(wind_direction));
-}
-
-void time::wind_direction_setter(float value)
-{
-    wind_direction = deg2rad(value);
-}
-
+float time::sky_rotation_getter() const { return (rad2deg(sky_rotation)); }
+void time::sky_rotation_setter(float value) { sky_rotation = deg2rad(value); }
+float time::wind_direction_getter() const { return (rad2deg(wind_direction)); }
+void time::wind_direction_setter(float value) { wind_direction = deg2rad(value); }
 void time::fill(editor::property_holder_collection* collection)
 {
     VERIFY(!m_property_holder);
@@ -443,13 +386,15 @@ void time::lerp(CEnvironment* parent, CEnvDescriptor& A, CEnvDescriptor& B, floa
     float start_time = m_manager.Current[0]->exec_time;
     float stop_time = m_manager.Current[1]->exec_time;
     float current_time = m_manager.GetGameTime();
-    if (start_time >= stop_time) {
+    if (start_time >= stop_time)
+    {
         if (current_time >= start_time)
             clamp(current_time, start_time, 24.f * 60.f * 60.f);
         else
             clamp(current_time, 0.f, stop_time);
 
-        if (current_time <= stop_time) current_time += 24.f * 60.f * 60.f;
+        if (current_time <= stop_time)
+            current_time += 24.f * 60.f * 60.f;
 
         stop_time += 24.f * 60.f * 60.f;
     }
@@ -481,4 +426,4 @@ void time::lerp(CEnvironment* parent, CEnvDescriptor& A, CEnvDescriptor& B, floa
     inherited::lerp(parent, A, B, f, M, m_power);
 }
 
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR

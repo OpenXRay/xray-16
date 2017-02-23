@@ -16,23 +16,12 @@ property_vec3f::property_vec3f(vec3f_getter_type const& getter, vec3f_setter_typ
 {
 }
 
-property_vec3f::~property_vec3f()
-{
-    this->!property_vec3f();
-}
-
+property_vec3f::~property_vec3f() { this->!property_vec3f(); }
 property_vec3f::!property_vec3f()
 {
     delete (m_getter);
     delete (m_setter);
 }
 
-vec3f property_vec3f::get_value_raw()
-{
-    return ((*m_getter)());
-}
-
-void property_vec3f::set_value_raw(vec3f value)
-{
-    (*m_setter)(value);
-}
+vec3f property_vec3f::get_value_raw() { return ((*m_getter)()); }
+void property_vec3f::set_value_raw(vec3f value) { (*m_setter)(value); }

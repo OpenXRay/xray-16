@@ -16,18 +16,13 @@ extern void save_stack_trace();
 MEMPOOL mem_pools[mem_pools_count];
 
 // MSVC
-ICF u8* acc_header(void* P)
-{
-    return (u8*)P - 1;
-}
-ICF u32 get_header(void* P)
-{
-    return (u32)*acc_header(P);
-}
+ICF u8* acc_header(void* P) { return (u8*)P - 1; }
+ICF u32 get_header(void* P) { return (u32)*acc_header(P); }
 ICF u32 get_pool(size_t size)
 {
     u32 pid = u32(size / mem_pools_ebase);
-    if (pid >= mem_pools_count) return mem_generic;
+    if (pid >= mem_pools_count)
+        return mem_generic;
     return pid;
 }
 
@@ -41,11 +36,13 @@ void* xrMemory::mem_alloc(size_t size)
 {
     stat_calls++;
     static bool g_use_pure_alloc_initialized = false;
-    if (!g_use_pure_alloc_initialized) {
+    if (!g_use_pure_alloc_initialized)
+    {
         g_use_pure_alloc_initialized = true;
         g_use_pure_alloc = Core.PluginMode || strstr(GetCommandLine(), "-pure_alloc");
     }
-    if (g_use_pure_alloc) {
+    if (g_use_pure_alloc)
+    {
         void* result = malloc(size);
 #ifdef USE_MEMORY_MONITOR
         memory_monitor::monitor_alloc(result, size, _name);
@@ -53,11 +50,13 @@ void* xrMemory::mem_alloc(size_t size)
         return result;
     }
 #ifdef DEBUG_MEMORY_MANAGER
-    if (mem_initialized) debug_cs.Enter();
+    if (mem_initialized)
+        debug_cs.Enter();
 #endif
     u32 _footer = debug_mode ? 4 : 0;
     void* _ptr = 0;
-    if (!mem_initialized) {
+    if (!mem_initialized)
+    {
         // generic
         void* _real = xr_aligned_offset_malloc(1 + size + _footer, 16, 0x1);
         _ptr = (void*)(((u8*)_real) + 1);
@@ -70,7 +69,8 @@ void* xrMemory::mem_alloc(size_t size)
 #endif
         // accelerated
         u32 pool = get_pool(1 + size + _footer);
-        if (mem_generic == pool) {
+        if (mem_generic == pool)
+        {
             // generic
             void* _real = xr_aligned_offset_malloc(1 + size + _footer, 16, 0x1);
             _ptr = (void*)(((u8*)_real) + 1);
@@ -86,8 +86,10 @@ void* xrMemory::mem_alloc(size_t size)
     }
 
 #ifdef DEBUG_MEMORY_MANAGER
-    if (debug_mode) dbg_register(_ptr, size, _name);
-    if (mem_initialized) debug_cs.Leave();
+    if (debug_mode)
+        dbg_register(_ptr, size, _name);
+    if (mem_initialized)
+        debug_cs.Leave();
 #endif
 #ifdef USE_MEMORY_MONITOR
     memory_monitor::monitor_alloc(_ptr, size, _name);
@@ -101,18 +103,23 @@ void xrMemory::mem_free(void* P)
 #ifdef USE_MEMORY_MONITOR
     memory_monitor::monitor_free(P);
 #endif
-    if (g_use_pure_alloc) {
+    if (g_use_pure_alloc)
+    {
         free(P);
         return;
     }
 #ifdef DEBUG_MEMORY_MANAGER
-    if (g_globalCheckAddr == P) DEBUG_BREAK;
-    if (mem_initialized) debug_cs.Enter();
+    if (g_globalCheckAddr == P)
+        DEBUG_BREAK;
+    if (mem_initialized)
+        debug_cs.Enter();
 #endif
-    if (debug_mode) dbg_unregister(P);
+    if (debug_mode)
+        dbg_unregister(P);
     u32 pool = get_header(P);
     void* _real = (void*)((u8*)P - 1);
-    if (mem_generic == pool) {
+    if (mem_generic == pool)
+    {
         // generic
         xr_aligned_free(_real);
     }
@@ -123,7 +130,8 @@ void xrMemory::mem_free(void* P)
         mem_pools[pool].destroy(_real);
     }
 #ifdef DEBUG_MEMORY_MANAGER
-    if (mem_initialized) debug_cs.Leave();
+    if (mem_initialized)
+        debug_cs.Leave();
 #endif
 }
 
@@ -136,7 +144,8 @@ void* xrMemory::mem_realloc(void* P, size_t size)
 #endif
 {
     stat_calls++;
-    if (g_use_pure_alloc) {
+    if (g_use_pure_alloc)
+    {
         void* result = realloc(P, size);
 #ifdef USE_MEMORY_MONITOR
         memory_monitor::monitor_free(P);
@@ -144,7 +153,8 @@ void* xrMemory::mem_realloc(void* P, size_t size)
 #endif
         return result;
     }
-    if (!P) {
+    if (!P)
+    {
 #ifdef DEBUG_MEMORY_NAME
         return mem_alloc(size, _name);
 #else
@@ -152,13 +162,16 @@ void* xrMemory::mem_realloc(void* P, size_t size)
 #endif
     }
 #ifdef DEBUG_MEMORY_MANAGER
-    if (g_globalCheckAddr == P) DEBUG_BREAK;
-    if (mem_initialized) debug_cs.Enter();
+    if (g_globalCheckAddr == P)
+        DEBUG_BREAK;
+    if (mem_initialized)
+        debug_cs.Enter();
 #endif
     u32 p_current = get_header(P);
     u32 newPool = get_pool(1 + size + (debug_mode ? 4 : 0));
     u32 p_mode;
-    if (mem_generic == p_current) {
+    if (mem_generic == p_current)
+    {
         if (newPool < p_current)
             p_mode = 2;
         else
@@ -168,10 +181,12 @@ void* xrMemory::mem_realloc(void* P, size_t size)
         p_mode = 1;
     void* _real = (void*)((u8*)P - 1);
     void* _ptr = NULL;
-    if (!p_mode) {
+    if (!p_mode)
+    {
         u32 _footer = debug_mode ? 4 : 0;
 #ifdef DEBUG_MEMORY_MANAGER
-        if (debug_mode) {
+        if (debug_mode)
+        {
             g_bDbgFillMemory = false;
             dbg_unregister(P);
             g_bDbgFillMemory = true;
@@ -181,7 +196,8 @@ void* xrMemory::mem_realloc(void* P, size_t size)
         _ptr = (void*)((u8*)_real2 + 1);
         *acc_header(_ptr) = mem_generic;
 #ifdef DEBUG_MEMORY_MANAGER
-        if (debug_mode) dbg_register(_ptr, size, _name);
+        if (debug_mode)
+            dbg_register(_ptr, size, _name);
 #endif
 #ifdef USE_MEMORY_MONITOR
         memory_monitor::monitor_free(P);
@@ -220,10 +236,12 @@ void* xrMemory::mem_realloc(void* P, size_t size)
         _ptr = p_new;
     }
 #ifdef DEBUG_MEMORY_MANAGER
-    if (mem_initialized) debug_cs.Leave();
-    if (g_globalCheckAddr == _ptr) DEBUG_BREAK;
+    if (mem_initialized)
+        debug_cs.Leave();
+    if (g_globalCheckAddr == _ptr)
+        DEBUG_BREAK;
 #endif
     return _ptr;
 }
 
-#endif  // __BORLANDC__
+#endif // __BORLANDC__

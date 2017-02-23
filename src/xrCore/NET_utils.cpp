@@ -10,7 +10,7 @@ void NET_Packet::read_start()
     INI_W(move_begin());
 }
 
-u32 NET_Packet::r_begin(u16& type)  // returns time of receiving
+u32 NET_Packet::r_begin(u16& type) // returns time of receiving
 {
     r_pos = 0;
     if (!inistream)
@@ -67,7 +67,7 @@ void NET_Packet::r_vec3(Fvector& A)
         r(&A, sizeof(Fvector));
     else
         inistream->r_vec3(A);
-}  // vec3
+} // vec3
 
 void NET_Packet::r_vec4(Fvector4& A)
 {
@@ -75,7 +75,7 @@ void NET_Packet::r_vec4(Fvector4& A)
         r(&A, sizeof(Fvector4));
     else
         inistream->r_vec4(A);
-}  // vec4
+} // vec4
 
 void NET_Packet::r_float(float& A)
 {
@@ -83,7 +83,7 @@ void NET_Packet::r_float(float& A)
         r(&A, sizeof(float));
     else
         inistream->r_float(A);
-}  // float
+} // float
 
 void NET_Packet::r_u64(u64& A)
 {
@@ -91,7 +91,7 @@ void NET_Packet::r_u64(u64& A)
         r(&A, sizeof(u64));
     else
         inistream->r_u64(A);
-}  // qword (8b)
+} // qword (8b)
 
 void NET_Packet::r_s64(s64& A)
 {
@@ -99,7 +99,7 @@ void NET_Packet::r_s64(s64& A)
         r(&A, sizeof(s64));
     else
         inistream->r_s64(A);
-}  // qword (8b)
+} // qword (8b)
 
 void NET_Packet::r_u32(u32& A)
 {
@@ -107,7 +107,7 @@ void NET_Packet::r_u32(u32& A)
         r(&A, sizeof(u32));
     else
         inistream->r_u32(A);
-}  // dword (4b)
+} // dword (4b)
 
 void NET_Packet::r_s32(s32& A)
 {
@@ -115,7 +115,7 @@ void NET_Packet::r_s32(s32& A)
         r(&A, sizeof(s32));
     else
         inistream->r_s32(A);
-}  // dword (4b)
+} // dword (4b)
 
 void NET_Packet::r_u16(u16& A)
 {
@@ -123,7 +123,7 @@ void NET_Packet::r_u16(u16& A)
         r(&A, sizeof(u16));
     else
         inistream->r_u16(A);
-}  // word (2b)
+} // word (2b)
 
 void NET_Packet::r_s16(s16& A)
 {
@@ -131,7 +131,7 @@ void NET_Packet::r_s16(s16& A)
         r(&A, sizeof(s16));
     else
         inistream->r_s16(A);
-}  // word (2b)
+} // word (2b)
 
 void NET_Packet::r_u8(u8& A)
 {
@@ -139,7 +139,7 @@ void NET_Packet::r_u8(u8& A)
         r(&A, sizeof(u8));
     else
         inistream->r_u8(A);
-}  // byte (1b)
+} // byte (1b)
 
 void NET_Packet::r_s8(s8& A)
 {
@@ -147,7 +147,7 @@ void NET_Packet::r_s8(s8& A)
         r(&A, sizeof(s8));
     else
         inistream->r_s8(A);
-}  // byte (1b)
+} // byte (1b)
 
 // IReader compatibility
 Fvector NET_Packet::r_vec3()
@@ -183,56 +183,56 @@ float NET_Packet::r_float()
     float A;
     r_float(A);
     return (A);
-}  // float
+} // float
 
 u64 NET_Packet::r_u64()
 {
     u64 A;
     r_u64(A);
     return (A);
-}  // qword (8b)
+} // qword (8b)
 
 s64 NET_Packet::r_s64()
 {
     s64 A;
     r_s64(A);
     return (A);
-}  // qword (8b)
+} // qword (8b)
 
 u32 NET_Packet::r_u32()
 {
     u32 A;
     r_u32(A);
     return (A);
-}  // dword (4b)
+} // dword (4b)
 
 s32 NET_Packet::r_s32()
 {
     s32 A;
     r_s32(A);
     return (A);
-}  // dword (4b)
+} // dword (4b)
 
 u16 NET_Packet::r_u16()
 {
     u16 A;
     r_u16(A);
     return (A);
-}  // word (2b)
+} // word (2b)
 
 s16 NET_Packet::r_s16()
 {
     s16 A;
     r_s16(A);
     return (A);
-}  // word (2b)
+} // word (2b)
 
 u8 NET_Packet::r_u8()
 {
     u8 A;
     r_u8(A);
     return (A);
-}  // byte (1b)
+} // byte (1b)
 
 s8 NET_Packet::r_s8()
 {
@@ -245,7 +245,7 @@ void NET_Packet::r_float_q16(float& A, float min, float max)
 {
     u16 val;
     r_u16(val);
-    A = (float(val) * (max - min)) / 65535.f + min;  // floating-point-error possible
+    A = (float(val) * (max - min)) / 65535.f + min; // floating-point-error possible
     VERIFY((A >= min - EPS_S) && (A <= max + EPS_S));
 }
 
@@ -253,20 +253,12 @@ void NET_Packet::r_float_q8(float& A, float min, float max)
 {
     u8 val;
     r_u8(val);
-    A = (float(val) / 255.0001f) * (max - min) + min;  // floating-point-error possible
+    A = (float(val) / 255.0001f) * (max - min) + min; // floating-point-error possible
     VERIFY((A >= min) && (A <= max));
 }
 
-void NET_Packet::r_angle16(float& A)
-{
-    r_float_q16(A, 0, PI_MUL_2);
-}
-
-void NET_Packet::r_angle8(float& A)
-{
-    r_float_q8(A, 0, PI_MUL_2);
-}
-
+void NET_Packet::r_angle16(float& A) { r_float_q16(A, 0, PI_MUL_2); }
+void NET_Packet::r_angle8(float& A) { r_float_q8(A, 0, PI_MUL_2); }
 void NET_Packet::r_dir(Fvector& A)
 {
     u16 t;
@@ -286,20 +278,22 @@ void NET_Packet::r_sdir(Fvector& A)
 
 void NET_Packet::r_stringZ(LPSTR S)
 {
-    if (!inistream) {
+    if (!inistream)
+    {
         LPCSTR data = LPCSTR(&B.data[r_pos]);
         size_t len = xr_strlen(data);
         r(S, (u32)len + 1);
     }
     else
     {
-        inistream->r_string(S, 4096);  //???
+        inistream->r_string(S, 4096); //???
     }
 }
 
 void NET_Packet::r_stringZ(xr_string& dest)
 {
-    if (!inistream) {
+    if (!inistream)
+    {
         dest = LPCSTR(&B.data[r_pos]);
         r_advance(u32(dest.size() + 1));
     }
@@ -313,7 +307,8 @@ void NET_Packet::r_stringZ(xr_string& dest)
 
 void NET_Packet::r_stringZ(shared_str& dest)
 {
-    if (!inistream) {
+    if (!inistream)
+    {
         dest = LPCSTR(&B.data[r_pos]);
         r_advance(dest.size() + 1);
     }
@@ -327,7 +322,8 @@ void NET_Packet::r_stringZ(shared_str& dest)
 
 void NET_Packet::skip_stringZ()
 {
-    if (!inistream) {
+    if (!inistream)
+    {
         LPCSTR data = LPCSTR(&B.data[r_pos]);
         u32 len = xr_strlen(data);
         r_advance(len + 1);
@@ -359,7 +355,8 @@ void NET_Packet::r_clientID(ClientID& C)
 
 void NET_Packet::r_stringZ_s(LPSTR string, u32 const size)
 {
-    if (inistream) {
+    if (inistream)
+    {
         inistream->r_string(string, size);
         return;
     }

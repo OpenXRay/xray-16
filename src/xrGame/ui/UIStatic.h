@@ -31,7 +31,6 @@ private:
     typedef CUIWindow inherited;
     lanim_cont_xf m_lanim_xform;
     void EnableHeading_int(bool b) { m_bHeading = b; }
-
 public:
     CUIStatic();
     virtual ~CUIStatic();
@@ -42,18 +41,15 @@ public:
 
     virtual void CreateShader(LPCSTR tex, LPCSTR sh = "hud\\default");
     ui_shader& GetShader() { return m_UIStaticItem.GetShader(); };
-
     virtual void SetTextureColor(u32 color) { m_UIStaticItem.SetTextureColor(color); }
     virtual u32 GetTextureColor() const { return m_UIStaticItem.GetTextureColor(); }
     virtual void SetTextureRect(const Frect& r) { m_UIStaticItem.SetTextureRect(r); }
     virtual const Frect& GetTextureRect() const { return m_UIStaticItem.GetTextureRect(); }
-
     virtual void InitTexture(LPCSTR tex_name);
     virtual void InitTextureEx(LPCSTR tex_name, LPCSTR sh_name = "hud\\default");
     CUIStaticItem* GetStaticItem() { return &m_UIStaticItem; }
     void SetTextureRect_script(Frect* pr) { m_UIStaticItem.SetTextureRect(*pr); }
     const Frect* GetTextureRect_script() { return &m_UIStaticItem.GetTextureRect(); }
-
     void SetHeadingPivot(const Fvector2& p, const Fvector2& offset, bool fixedLT)
     {
         m_UIStaticItem.SetHeadingPivot(p, offset, fixedLT);
@@ -63,7 +59,6 @@ public:
     Fvector2 GetTextureOffeset() const { return m_TextureOffset; }
     void TextureOn() { m_bTextureEnable = true; }
     void TextureOff() { m_bTextureEnable = false; }
-
     // own
     void SetXformLightAnim(LPCSTR lanim, bool bCyclic);
     void ResetXformAnimation();
@@ -76,18 +71,14 @@ public:
 
     void SetShader(const ui_shader& sh);
     CUIStaticItem& GetUIStaticItem() { return m_UIStaticItem; }
-
     void SetStretchTexture(bool stretch_texture) { m_bStretchTexture = stretch_texture; }
     bool GetStretchTexture() { return m_bStretchTexture; }
-
     void SetHeading(float f) { m_fHeading = f; };
     float GetHeading() { return m_fHeading; }
     bool Heading() { return m_bHeading; }
     void EnableHeading(bool b) { m_bHeading = b; }
-
     void SetConstHeading(bool b) { m_bConstHeading = b; };
     bool GetConstHeading() { return m_bConstHeading; }
-
     virtual void ColorAnimationSetTextureColor(u32 color, bool only_alpha);
     virtual void ColorAnimationSetTextColor(u32 color, bool only_alpha);
 

@@ -21,7 +21,8 @@ void xrCompiler(LPCSTR name, bool draft_mode, bool pure_covers, LPCSTR out_name)
     Logger.Phase("Loading level...");
     xrLoad(name, draft_mode);
     mem_Optimize();
-    if (!draft_mode) {
+    if (!draft_mode)
+    {
         Logger.Phase("Calculating coverage...");
         xrCover(pure_covers);
         mem_Optimize();

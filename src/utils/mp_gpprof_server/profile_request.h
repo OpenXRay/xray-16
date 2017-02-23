@@ -27,12 +27,11 @@ public:
 
 private:
     fetch_profile_request() : m_in(NULL), m_out(NULL), m_err(NULL) {}
-
     request_ptr_t m_fcg_request;
     std::string m_profile_name;
     fcgi_istream m_in;
     fcgi_ostream m_out;
     fcgi_ostream m_err;
-};  // class fetch_profile_request
+}; // class fetch_profile_request
 
-#endif  //#ifndef PROFILE_REQUEST_INCLUDED
+#endif //#ifndef PROFILE_REQUEST_INCLUDED

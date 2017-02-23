@@ -15,7 +15,7 @@
 
 #ifdef DEBUG
 #include "debug_output.h"
-#endif  // DEBUG
+#endif // DEBUG
 
 #include "PHDynamicData.h"
 #include "xrServerEntities/PHSynchronize.h"
@@ -33,11 +33,12 @@ static	const float dynamic_erp				= 1.f / 1000.f;//static_erp;//
 */
 
 #ifdef DEBUG
-#define CHECK_POS(pos, msg, br)                                                                                        \
-    if (!valid_pos(pos, phBoundaries)) {                                                                               \
-        Msg("pos:%f,%f,%f", pos.x, pos.y, pos.z);                                                                      \
-        Msg(msg);                                                                                                      \
-        VERIFY(!br);                                                                                                   \
+#define CHECK_POS(pos, msg, br)                   \
+    if (!valid_pos(pos, phBoundaries))            \
+    {                                             \
+        Msg("pos:%f,%f,%f", pos.x, pos.y, pos.z); \
+        Msg(msg);                                 \
+        VERIFY(!br);                              \
     }
 
 #else
@@ -120,7 +121,8 @@ void StaticEnvironment(bool& do_colide, bool bo1, dContact& c, SGameMtl* materia
 {
     dJointID contact_joint = dJointCreateContact(0, ContactGroup, &c);
 
-    if (bo1) {
+    if (bo1)
+    {
         ((CPHActivationShape*)(retrieveGeomUserData(c.geom.g1)->callback_data))
             ->DActiveIsland()
             ->ConnectJoint(contact_joint);
@@ -169,10 +171,7 @@ CPHActivationShape::CPHActivationShape()
     m_flags.zero();
     m_flags.set(flFixedRotation, TRUE);
 }
-CPHActivationShape::~CPHActivationShape()
-{
-    VERIFY(!m_body && !m_geom);
-}
+CPHActivationShape::~CPHActivationShape() { VERIFY(!m_body && !m_geom); }
 void CPHActivationShape::Create(
     const Fvector start_pos, const Fvector start_size, IPhysicsShellHolder* ref_obj, EType _type /*=etBox*/, u16 flags)
 {
@@ -218,7 +217,8 @@ bool CPHActivationShape::Activate(
     const Fvector need_size, u16 steps, float max_displacement, float max_rotation, bool un_freeze_later /*	=false*/)
 {
 #ifdef DEBUG
-    if (debug_output().ph_dbg_draw_mask().test(phDbgDrawDeathActivationBox)) {
+    if (debug_output().ph_dbg_draw_mask().test(phDbgDrawDeathActivationBox))
+    {
         debug_output().DBG_OpenCashedDraw();
         Fmatrix M;
         PHDynamicData::DMXPStoFMX(dBodyGetRotation(m_body), dBodyGetPosition(m_body), M);
@@ -245,18 +245,22 @@ bool CPHActivationShape::Activate(
     float max_vel = max_depth / fnum_it * fnum_steps_r / fixed_step;
     float limit_l_vel = _max(_max(need_size.x, need_size.y), need_size.z) / fnum_it * fnum_steps_r / fixed_step;
 
-    if (limit_l_vel > default_l_limit) limit_l_vel = default_l_limit;
+    if (limit_l_vel > default_l_limit)
+        limit_l_vel = default_l_limit;
 
-    if (max_vel > limit_l_vel) max_vel = limit_l_vel;
+    if (max_vel > limit_l_vel)
+        max_vel = limit_l_vel;
 
     float max_a_vel = max_rotation / fnum_it * fnum_steps_r / fixed_step;
 
-    if (max_a_vel > default_w_limit) max_a_vel = default_w_limit;
+    if (max_a_vel > default_w_limit)
+        max_a_vel = default_w_limit;
 
     // ph_world->CutVelocity(0.f,0.f);
     dGeomUserDataSetCallbackData(m_geom, this);
     dGeomUserDataSetObjectContactCallback(m_geom, ActivateTestDepthCallback);
-    if (m_flags.test(flStaticEnvironment)) dGeomUserDataAddObjectContactCallback(m_geom, StaticEnvironment);
+    if (m_flags.test(flStaticEnvironment))
+        dGeomUserDataAddObjectContactCallback(m_geom, StaticEnvironment);
     max_depth = 0.f;
 
     Fvector from_size;
@@ -286,7 +290,8 @@ bool CPHActivationShape::Activate(
                 ph_world->CutVelocity(max_vel, max_a_vel);
                 CHECK_POS(Position(), "pos after CutVelocity", true);
                 // if(m==0&&i==0)ph_world->GetState(temp_state);
-                if (max_depth < resolve_depth) {
+                if (max_depth < resolve_depth)
+                {
                     ret = true;
                     break;
                 }
@@ -299,9 +304,11 @@ bool CPHActivationShape::Activate(
     }
     RestoreVelocityState(temp_state);
     CHECK_POS(Position(), "pos after RestoreVelocityState(temp_state);", true);
-    if (!un_freeze_later) ph_world->UnFreeze();
+    if (!un_freeze_later)
+        ph_world->UnFreeze();
 #ifdef DEBUG
-    if (debug_output().ph_dbg_draw_mask().test(phDbgDrawDeathActivationBox)) {
+    if (debug_output().ph_dbg_draw_mask().test(phDbgDrawDeathActivationBox))
+    {
         debug_output().DBG_OpenCashedDraw();
         Fmatrix M;
         PHDynamicData::DMXPStoFMX(dBodyGetRotation(m_body), dBodyGetPosition(m_body), M);
@@ -314,39 +321,22 @@ bool CPHActivationShape::Activate(
 #endif
     return ret;
 }
-const Fvector& CPHActivationShape::Position()
-{
-    return cast_fv(dBodyGetPosition(m_body));
-}
-void CPHActivationShape::Size(Fvector& size)
-{
-    dGeomBoxGetLengths(m_geom, cast_fp(size));
-}
-
-void CPHActivationShape::PhDataUpdate(dReal step)
-{
-    m_safe_state.new_state(m_body);
-}
-void CPHActivationShape::PhTune(dReal step)
-{
-}
-dGeomID CPHActivationShape::dSpacedGeom()
-{
-    return m_geom;
-}
+const Fvector& CPHActivationShape::Position() { return cast_fv(dBodyGetPosition(m_body)); }
+void CPHActivationShape::Size(Fvector& size) { dGeomBoxGetLengths(m_geom, cast_fp(size)); }
+void CPHActivationShape::PhDataUpdate(dReal step) { m_safe_state.new_state(m_body); }
+void CPHActivationShape::PhTune(dReal step) {}
+dGeomID CPHActivationShape::dSpacedGeom() { return m_geom; }
 void CPHActivationShape::get_spatial_params()
 {
     spatialParsFromDGeom(m_geom, spatial.sphere.P, AABB, spatial.sphere.R);
 }
 
-void CPHActivationShape::InitContact(dContact* c, bool& do_collide, u16, u16)
-{
-}
-
+void CPHActivationShape::InitContact(dContact* c, bool& do_collide, u16, u16) {}
 void CPHActivationShape::CutVelocity(float l_limit, float /*a_limit*/)
 {
     dVector3 limitedl, diffl;
-    if (dVectorLimit(dBodyGetLinearVel(m_body), l_limit, limitedl)) {
+    if (dVectorLimit(dBodyGetLinearVel(m_body), l_limit, limitedl))
+    {
         dVectorSub(diffl, limitedl, dBodyGetLinearVel(m_body));
         dBodySetLinearVel(m_body, diffl[0], diffl[1], diffl[2]);
         dBodySetAngularVel(m_body, 0.f, 0.f, 0.f);

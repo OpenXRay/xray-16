@@ -15,7 +15,7 @@
 #include <windows.h>
 #pragma comment(lib, "comdlg32.lib")
 #pragma managed
-#endif  // #ifdef USE_CUSTOM_DIALOG
+#endif // #ifdef USE_CUSTOM_DIALOG
 
 #include "property_editor_file_name.hpp"
 #include "property_file_name_value.hpp"
@@ -42,7 +42,8 @@ property_editor_file_name::property_editor_file_name() : m_dialog(gcnew OpenFile
 
 UITypeEditorEditStyle property_editor_file_name::GetEditStyle(ITypeDescriptorContext ^ context)
 {
-    if (context) return (UITypeEditorEditStyle::Modal);
+    if (context)
+        return (UITypeEditorEditStyle::Modal);
 
     return (inherited::GetEditStyle(context));
 }
@@ -50,13 +51,15 @@ UITypeEditorEditStyle property_editor_file_name::GetEditStyle(ITypeDescriptorCon
 Object ^
     property_editor_file_name::EditValue(ITypeDescriptorContext ^ context, IServiceProvider ^ provider, Object ^ value)
 {
-    if (!context || !provider) return (inherited::EditValue(context, provider, value));
+    if (!context || !provider)
+        return (inherited::EditValue(context, provider, value));
 
     typedef System::Windows::Forms::Design::IWindowsFormsEditorService IWindowsFormsEditorService;
     IWindowsFormsEditorService ^ service =
         dynamic_cast<IWindowsFormsEditorService ^>(provider->GetService(IWindowsFormsEditorService::typeid));
 
-    if (!service) return (inherited::EditValue(context, provider, value));
+    if (!service)
+        return (inherited::EditValue(context, provider, value));
 
     property_container ^ container = safe_cast<property_container ^>(context->Instance);
     PropertySpecDescriptor ^ descriptor = safe_cast<PropertySpecDescriptor ^>(context->PropertyDescriptor);
@@ -85,7 +88,8 @@ Object ^
     case System::Windows::Forms::DialogResult::OK:
     {
         String ^ file_name = System::IO::Path::GetFullPath(m_dialog->FileName->ToLower());
-        if (file_name->StartsWith(initial_directory)) file_name = file_name->Substring(initial_directory->Length);
+        if (file_name->StartsWith(initial_directory))
+            file_name = file_name->Substring(initial_directory->Length);
 
         if (real_value->remove_extension() && (file_name->EndsWith(default_extension)))
             file_name = file_name->Substring(0, file_name->Length - default_extension->Length);
@@ -94,7 +98,7 @@ Object ^
         break;
     }
     }
-#else   // #ifndef USE_CUSTOM_DIALOG
+#else // #ifndef USE_CUSTOM_DIALOG
     CustomControls::FormOpenFileDialog ^ dialog = gcnew CustomControls::FormOpenFileDialog();
     dialog->StartLocation = CustomControls::Controls::AddonWindowLocation::None;
     dialog->DefaultViewMode = CustomControls::OS::FolderViewMode::Thumbnails;
@@ -108,7 +112,7 @@ Object ^
     dialog->OpenDialog->InitialDirectory = "";
     dialog->ShowDialog();
     delete (dialog);
-#endif  // #ifndef USE_CUSTOM_DIALOG
+#endif // #ifndef USE_CUSTOM_DIALOG
 
     return (inherited::EditValue(context, provider, value));
 }

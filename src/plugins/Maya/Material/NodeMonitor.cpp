@@ -18,7 +18,8 @@ MObject getObjFromName(MString name, MStatus& stat)
 
     // Attempt to add the given name to the selection list,
     // then get the corresponding dependency node handle.
-    if (!list.add(name) || !list.getDependNode(0, obj)) {
+    if (!list.add(name) || !list.getDependNode(0, obj))
+    {
         // Failed.
         stat = MStatus::kInvalidParameter;
         return obj;
@@ -36,7 +37,8 @@ MString getNameFromObj(MObject obj)
 
     // If this object is a MFnDagNode, we should store the dag name.
     // Otherwise, use the MFnDependencyNode name.
-    if (obj.hasFn(MFn::kDagNode)) {
+    if (obj.hasFn(MFn::kDagNode))
+    {
         MFnDagNode dagNode(obj);
         nodeName = dagNode.fullPathName();
     }
@@ -64,11 +66,7 @@ NodeMonitor::NodeMonitor(NodeMonitorManager* manager /* = NULL */)
     fManager = manager;
 }
 
-NodeMonitor::~NodeMonitor()
-{
-    stopWatching();
-}
-
+NodeMonitor::~NodeMonitor() { stopWatching(); }
 bool NodeMonitor::watch(MString nodeName)
 {
     // if already watching another object, release the callbacks.
@@ -88,7 +86,8 @@ bool NodeMonitor::watch(MObject nodeObj)
     // Get the name of the given object... since an MObject is not
     // persistent. We'll use the name of the object to attach/re-attach
     // callbacks when necessary.
-    if (newNodeName == "") {
+    if (newNodeName == "")
+    {
         // This is bad. We've been given an invalid node object.
         // return false to indicate that an error occured.
 
@@ -101,7 +100,8 @@ bool NodeMonitor::watch(MObject nodeObj)
 
 void NodeMonitor::stopWatching()
 {
-    if (fNodeName != "") {
+    if (fNodeName != "")
+    {
         // Clean up the callbacks
         detachCallbacks();
 
@@ -110,14 +110,11 @@ void NodeMonitor::stopWatching()
     }
 }
 
-bool NodeMonitor::dirty()
-{
-    return fIsDirty;
-}
-
+bool NodeMonitor::dirty() { return fIsDirty; }
 void NodeMonitor::cleanIt()
 {
-    if (dirty()) {
+    if (dirty())
+    {
         // We have to re-attach the callback.
         attachCallbacks();
     }
@@ -136,7 +133,8 @@ bool NodeMonitor::attachCallbacks()
 
     MStatus stat;
     MObject node = getObjFromName(fNodeName, stat);
-    if (!stat) {
+    if (!stat)
+    {
         detachCallbacks();
         return false;
     }
@@ -144,12 +142,14 @@ bool NodeMonitor::attachCallbacks()
     fIsDirty = false;
 
     fDirtyCallbackId = MNodeMessage::addNodeDirtyCallback(node, watchedObjectDirtyCallback, this, &stat);
-    if (stat) {
+    if (stat)
+    {
         fRenamedCallbackId = MNodeMessage::addNameChangedCallback(node, watchedObjectRenamedCallback, this, &stat);
     }
 
     // If an error occured, detach any valid callback.
-    if (!stat) {
+    if (!stat)
+    {
         detachCallbacks();
         return false;
     }
@@ -161,12 +161,14 @@ void NodeMonitor::detachCallbacks()
 {
     MStatus stat;
 
-    if (fDirtyCallbackId) {
+    if (fDirtyCallbackId)
+    {
         stat = MMessage::removeCallback(fDirtyCallbackId);
         assert(stat);
     }
 
-    if (fRenamedCallbackId) {
+    if (fRenamedCallbackId)
+    {
         stat = MMessage::removeCallback(fRenamedCallbackId);
         assert(stat);
     }
@@ -203,7 +205,8 @@ void NodeMonitor::callbackOccured()
     pMon->fNodeName = getNameFromObj(node);
 
     // Call the manager, if there's one.
-    if (pMon->fManager != NULL) pMon->fManager->onNodeRenamed(node, oldName, pMon->fNodeName);
+    if (pMon->fManager != NULL)
+        pMon->fManager->onNodeRenamed(node, oldName, pMon->fNodeName);
 
     pMon->callbackOccured();
 }

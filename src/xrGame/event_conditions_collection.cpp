@@ -70,7 +70,8 @@ bool event_conditions_collection::logical_and(arguments_t& arguments)
     {
         VERIFY(i->m_argument_type_tag == event_argument_type::at_condition);
         result &= execute_condition(i->m_argument_value.cond_ptr_value);
-        if (!result) return false;
+        if (!result)
+            return false;
     }
     return true;
 }
@@ -83,7 +84,8 @@ bool event_conditions_collection::logical_or(arguments_t& arguments)
     {
         VERIFY(i->m_argument_type_tag == event_argument_type::at_condition);
         result |= execute_condition(i->m_argument_value.cond_ptr_value);
-        if (result) return true;
+        if (result)
+            return true;
     }
     return false;
 }
@@ -96,7 +98,7 @@ enum enum_hit_params_args
     hpa_bfunc,
     hpa_hit_distance,
     hpa_args_count
-};  // enum enum_hit_params_args
+}; // enum enum_hit_params_args
 
 bool event_conditions_collection::hit_params(arguments_t& arguments)
 {
@@ -122,7 +124,7 @@ enum enum_kill_params_args
     kpa_kill_spec_kill_type,
     kpa_kill_time_period,
     kpa_args_count
-};  // enum enum_kill_params_args
+}; // enum enum_kill_params_args
 
 bool event_conditions_collection::kill_params(arguments_t& arguments)
 {
@@ -146,17 +148,18 @@ enum enum_accumul_params_args
     cpa_bfunc,
     cpa_value,
     cpa_args_count
-};  // enum enum_accumul_params_args
+}; // enum enum_accumul_params_args
 
 bool event_conditions_collection::accumul_params(arguments_t& arguments)
 {
     VERIFY(arguments.size() == cpa_args_count);
     VERIFY(arguments[cpa_param_id].m_argument_type_tag == event_argument_type::at_u16);
     VERIFY((arguments[cpa_bfunc].m_argument_type_tag == event_argument_type::at_float_bfunction) ||
-           (arguments[cpa_bfunc].m_argument_type_tag == event_argument_type::at_u32_bfunction));
+        (arguments[cpa_bfunc].m_argument_type_tag == event_argument_type::at_u32_bfunction));
     VERIFY((arguments[cpa_value].m_argument_type_tag == event_argument_type::at_float) ||
-           (arguments[cpa_value].m_argument_type_tag == event_argument_type::at_u32));
-    if (arguments[cpa_value].m_argument_type_tag == event_argument_type::at_float) {
+        (arguments[cpa_value].m_argument_type_tag == event_argument_type::at_u32));
+    if (arguments[cpa_value].m_argument_type_tag == event_argument_type::at_float)
+    {
         return m_player_state_accum->check_accumulative_value(
             static_cast<enum_accumulative_player_values>(arguments[cpa_param_id].m_argument_value.u16_value),
             arguments[cpa_bfunc].m_argument_value.float_function_ptr,
@@ -178,18 +181,21 @@ bool event_conditions_collection::execute_condition(event_condition_t* cond)
     case eo_hit_params: result = hit_params(cond->m_arguments); break;
     case eo_kill_params: result = kill_params(cond->m_arguments); break;
     case eo_accumul_value_params: result = accumul_params(cond->m_arguments); break;
-    };  // switch (cond->m_operation)
+    }; // switch (cond->m_operation)
     return result;
 }
 
 void event_conditions_collection::execute_root_condtiion(event_root_conditions_t::value_type& rcond)
 {
-    if (!rcond.m_rise_count) return;
+    if (!rcond.m_rise_count)
+        return;
 
-    if ((rcond.m_game_mask & Game().Type()) == 0) return;
+    if ((rcond.m_game_mask & Game().Type()) == 0)
+        return;
 
     VERIFY(rcond.m_root_condition);
-    if (execute_condition(rcond.m_root_condition)) {
+    if (execute_condition(rcond.m_root_condition))
+    {
         m_event_action(rcond.m_delegate_argument);
         --rcond.m_rise_count;
     }
@@ -327,4 +333,4 @@ event_condition_t* event_conditions_collection::add_accumm_value_condition(
     return add_condition(eo_accumul_value_params, args_buffer);
 }
 
-}  // namespace award_system
+} // namespace award_system

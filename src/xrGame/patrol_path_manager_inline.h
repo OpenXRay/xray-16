@@ -27,31 +27,11 @@ IC CPatrolPathManager::CPatrolPathManager(CRestrictedObject* object, CGameObject
     m_dest_position.set(flt_max, flt_max, flt_max);
 }
 
-IC bool CPatrolPathManager::actual() const
-{
-    return (m_actuality);
-}
-
-IC bool CPatrolPathManager::failed() const
-{
-    return (m_failed);
-}
-
-IC const CPatrolPath* CPatrolPathManager::get_path() const
-{
-    return (m_path);
-}
-
-IC bool CPatrolPathManager::completed() const
-{
-    return (m_completed);
-}
-
-IC bool CPatrolPathManager::random() const
-{
-    return (m_random);
-}
-
+IC bool CPatrolPathManager::actual() const { return (m_actuality); }
+IC bool CPatrolPathManager::failed() const { return (m_failed); }
+IC const CPatrolPath* CPatrolPathManager::get_path() const { return (m_path); }
+IC bool CPatrolPathManager::completed() const { return (m_completed); }
+IC bool CPatrolPathManager::random() const { return (m_random); }
 IC const Fvector& CPatrolPathManager::destination_position() const
 {
     VERIFY(_valid(m_dest_position));
@@ -60,7 +40,8 @@ IC const Fvector& CPatrolPathManager::destination_position() const
 
 IC void CPatrolPathManager::set_path(const CPatrolPath* path, shared_str path_name)
 {
-    if (m_path == path) return;
+    if (m_path == path)
+        return;
     m_path = path;
     m_path_name = path_name;
     m_actuality = false;
@@ -82,22 +63,14 @@ IC void CPatrolPathManager::set_route_type(const EPatrolRouteType patrol_route_t
     m_route_type = patrol_route_type;
 }
 
-IC void CPatrolPathManager::set_random(bool random)
-{
-    m_random = random;
-}
-
+IC void CPatrolPathManager::set_random(bool random) { m_random = random; }
 IC void CPatrolPathManager::make_inactual()
 {
     m_actuality = false;
     m_completed = false;
 }
 
-IC void CPatrolPathManager::set_path(shared_str path_name)
-{
-    set_path(ai().patrol_paths().path(path_name), path_name);
-}
-
+IC void CPatrolPathManager::set_path(shared_str path_name) { set_path(ai().patrol_paths().path(path_name), path_name); }
 IC void CPatrolPathManager::set_path(shared_str path_name, const EPatrolStartType patrol_start_type,
     const EPatrolRouteType patrol_route_type, bool random)
 {
@@ -106,11 +79,7 @@ IC void CPatrolPathManager::set_path(shared_str path_name, const EPatrolStartTyp
     set_route_type(patrol_route_type);
     set_random(random);
 }
-IC u32 CPatrolPathManager::get_current_point_index() const
-{
-    return (m_curr_point_index);
-}
-
+IC u32 CPatrolPathManager::get_current_point_index() const { return (m_curr_point_index); }
 IC CRestrictedObject& CPatrolPathManager::object() const
 {
     VERIFY(m_object);

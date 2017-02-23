@@ -82,7 +82,8 @@ inline float unitize(float u[])
     //        return(0.0);
     //    }
 
-    if (f != 0.0) {
+    if (f != 0.0)
+    {
         m = (float)_sqrt(f);
 
         u[0] = u[0] / m;

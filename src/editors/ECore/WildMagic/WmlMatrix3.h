@@ -34,7 +34,7 @@ namespace Wml
 template <class Real>
 class Matrix3 : public Matrix<3, Real>
 {
-  public:
+public:
     // construction
     Matrix3();
     Matrix3(const Matrix3& rkM);
@@ -125,7 +125,7 @@ class Matrix3 : public Matrix<3, Real>
     WML_ITEM static const Matrix3 ZERO;
     WML_ITEM static const Matrix3 IDENTITY;
 
-  protected:
+protected:
     // support for eigendecomposition
     void Tridiagonalize(Real afDiag[3], Real afSubDiag[3]);
     bool QLAlgorithm(Real afDiag[3], Real afSubDiag[3]);

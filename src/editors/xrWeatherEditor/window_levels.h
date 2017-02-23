@@ -22,7 +22,7 @@ ref class window_ide;
 public
 ref class window_levels : public WeifenLuo::WinFormsUI::DockContent
 {
-  public:
+public:
     window_levels(window_ide ^ ide) : m_ide(ide)
     {
         InitializeComponent();
@@ -31,24 +31,25 @@ ref class window_levels : public WeifenLuo::WinFormsUI::DockContent
         //
     }
 
-  protected:
+protected:
     /// <summary>
     /// Clean up any resources being used.
     /// </summary>
     ~window_levels()
     {
-        if (components) {
+        if (components)
+        {
             delete components;
         }
     }
 
-  private:
+private:
     XRay::SdkControls::PropertyGrid ^ PropertyGrid;
 
-  protected:
-  protected:
-  protected:
-  private:
+protected:
+protected:
+protected:
+private:
     /// <summary>
     /// Required designer variable.
     /// </summary>
@@ -92,13 +93,13 @@ ref class window_levels : public WeifenLuo::WinFormsUI::DockContent
         this->ResumeLayout(false);
     }
 #pragma endregion
-  private:
+private:
     window_ide ^ m_ide;
 
-  public:
+public:
     inline ::PropertyGrid ^ property_grid() { return this->PropertyGrid; }
 
         private : Void window_levels_Leave(System::Object ^ sender, System::EventArgs ^ e);
-};  // ref class window_levels
+}; // ref class window_levels
 
-}  // namespace editor
+} // namespace editor

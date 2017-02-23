@@ -12,4 +12,4 @@
 template <typename container_type, typename holder_type>
 class property_collection;
 
-#endif  // #define PROPERTY_COLLECTION_FORWARD_HPP_INCLUDED
+#endif // #define PROPERTY_COLLECTION_FORWARD_HPP_INCLUDED

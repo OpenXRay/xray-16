@@ -141,11 +141,8 @@ struct CVisibleObject : CMemoryObject<CGameObject>
 
 public:
     IC CVisibleObject() { m_visible.zero(); }
-
     IC bool visible(const squad_mask_type& mask) const { return (!!m_visible.test(mask)); }
-
     IC void visible(const squad_mask_type& mask, bool value) { m_visible.set(mask, value ? TRUE : FALSE); }
-
     IC void fill(const CGameObject* game_object, const CGameObject* self, const squad_mask_type& mask,
         const squad_mask_type& visibility_mask)
     {

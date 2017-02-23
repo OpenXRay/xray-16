@@ -6,7 +6,7 @@
 
 namespace gamespy_sake
 {
-}  // namespace gamespy_sake
+} // namespace gamespy_sake
 
 class XRGAMESPY_API CGameSpy_SAKE
 {
@@ -27,6 +27,6 @@ private:
     SAKE m_sake_inst;
 
     void Init();
-};  // class GameSpy_SAKE
+}; // class GameSpy_SAKE
 
-#endif  //#ifndef GAMESPY_SAKE
+#endif //#ifndef GAMESPY_SAKE

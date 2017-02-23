@@ -6,9 +6,7 @@
 #include "vector_clear.h"
 #include "xrCore/xrPool.h"
 
-xrMU_Model::xrMU_Model() : m_lod_ID(u16(-1)), read_faces(0), read_vertices(0), write_faces(0), write_vertices(0)
-{
-}
+xrMU_Model::xrMU_Model() : m_lod_ID(u16(-1)), read_faces(0), read_vertices(0), write_faces(0), write_vertices(0) {}
 xrMU_Model::~xrMU_Model()
 {
     reading_close();
@@ -35,25 +33,10 @@ void xrMU_Model::clear_mesh()
     vec_clear(m_faces, _destruct_face);
 }
 
-void xrMU_Model::read_color(INetReader& r)
-{
-    r_pod_vector(r, color);
-}
-void xrMU_Model::write_color(IWriter& w) const
-{
-    w_pod_vector(w, color);
-}
-
-void xrMU_Model::read_subdivs(INetReader& r)
-{
-    r_pod_vector(r, m_subdivs);
-}
-
-void xrMU_Model::write_subdivs(IWriter& w) const
-{
-    w_pod_vector(w, m_subdivs);
-}
-
+void xrMU_Model::read_color(INetReader& r) { r_pod_vector(r, color); }
+void xrMU_Model::write_color(IWriter& w) const { w_pod_vector(w, color); }
+void xrMU_Model::read_subdivs(INetReader& r) { r_pod_vector(r, m_subdivs); }
+void xrMU_Model::write_subdivs(IWriter& w) const { w_pod_vector(w, m_subdivs); }
 void xrMU_Model::read(INetReader& r)
 {
     reading_open();
@@ -86,22 +69,20 @@ void xrMU_Model::write(IWriter& w) const
 u32 xrMU_Model::find(const _vertex* v) const
 {
     v_vertices::const_iterator i = std::find(m_vertices.begin(), m_vertices.end(), v);
-    if (i == m_vertices.end()) return u32(-1);
+    if (i == m_vertices.end())
+        return u32(-1);
     return u32(i - m_vertices.begin());
 }
 
 u32 xrMU_Model::find(const _face* f) const
 {
     v_faces::const_iterator i = std::find(m_faces.begin(), m_faces.end(), f);
-    if (i == m_faces.end()) return u32(-1);
+    if (i == m_faces.end())
+        return u32(-1);
     return u32(i - m_faces.begin());
 }
 
-xrMU_Model* xrMU_Model::read_create()
-{
-    return new xrMU_Model();
-}
-
+xrMU_Model* xrMU_Model::read_create() { return new xrMU_Model(); }
 void xrMU_Model::reading_open()
 {
     VERIFY(!read_faces);

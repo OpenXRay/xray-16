@@ -14,11 +14,11 @@
 
 // This section originally from Paul's matrix library.
 
-#define SWAP(a, b, t)                                                                                                  \
-    {                                                                                                                  \
-        t = a;                                                                                                         \
-        a = b;                                                                                                         \
-        b = t;                                                                                                         \
+#define SWAP(a, b, t)\
+    {\
+        t = a;\
+        a = b;\
+        b = t;\
     }
 #define A(i, j) mxm_ref(_a, i, j, N)
 #define B(i, j) mxm_ref(_b, i, j, N)
@@ -42,12 +42,15 @@ static double internal_solve(double* _a, double* b, const int N)
     { /* eliminate in column i */
         max = -1.0;
         for (k = i; k < N; k++) /* find pivot for column i */
-            if (_abs(A(k, i)) > max) {
+            if (_abs(A(k, i)) > max)
+            {
                 max = _abs(A(k, i));
                 j = k;
             }
-        if (max <= 0.) return 0.0; /* if no nonzero pivot, PUNT */
-        if (j != i) {              /* swap rows i and j */
+        if (max <= 0.)
+            return 0.0; /* if no nonzero pivot, PUNT */
+        if (j != i)
+        { /* swap rows i and j */
             for (k = i; k < N; k++)
                 SWAP(A(i, k), A(j, k), t);
             det = -det;
@@ -61,8 +64,8 @@ static double internal_solve(double* _a, double* b, const int N)
         /* we know that A(i, i) will be set to 1, so don't bother to do it */
         b[i] /= pivot;
         for (j = i + 1; j < N; j++)
-        {                               /* eliminate in rows below i */
-            t = A(j, i);                /* we're gonna zero this guy */
+        { /* eliminate in rows below i */
+            t = A(j, i); /* we're gonna zero this guy */
             for (k = i + 1; k < N; k++) /* subtract scaled row i from row j */
                 A(j, k) -= A(i, k) * t; /* (ignore k<=i, we know they're 0) */
             b[j] -= b[i] * t;
@@ -103,12 +106,15 @@ static double internal_invert(double* _a, double* _b, const int N)
     { /* eliminate in column i, below diag */
         max = -1.;
         for (k = i; k < (unsigned int)N; k++) /* find pivot for column i */
-            if (_abs(A(k, i)) > max) {
+            if (_abs(A(k, i)) > max)
+            {
                 max = _abs(A(k, i));
                 j = k;
             }
-        if (max <= 0.) return 0.; /* if no nonzero pivot, PUNT */
-        if (j != i) {             /* swap rows i and j */
+        if (max <= 0.)
+            return 0.; /* if no nonzero pivot, PUNT */
+        if (j != i)
+        { /* swap rows i and j */
             for (k = i; k < (unsigned int)N; k++)
                 SWAP(A(i, k), A(j, k), t);
             for (k = 0; k < (unsigned int)N; k++)
@@ -124,10 +130,10 @@ static double internal_invert(double* _a, double* _b, const int N)
         /* we know that A(i, i) will be set to 1, so don't bother to do it */
 
         for (j = i + 1; j < (unsigned int)N; j++)
-        {                                             /* eliminate in rows below i */
-            t = A(j, i);                              /* we're gonna zero this guy */
+        { /* eliminate in rows below i */
+            t = A(j, i); /* we're gonna zero this guy */
             for (k = i + 1; k < (unsigned int)N; k++) /* subtract scaled row i from row j */
-                A(j, k) -= A(i, k) * t;               /* (ignore k<=i, we know they're 0) */
+                A(j, k) -= A(i, k) * t; /* (ignore k<=i, we know they're 0) */
             for (k = 0; k < (unsigned int)N; k++)
                 B(j, k) -= B(i, k) * t;
         }
@@ -138,8 +144,8 @@ static double internal_invert(double* _a, double* _b, const int N)
     for (i = N - 1; i > 0; i--)
     { /* eliminate in column i, above diag */
         for (j = 0; j < i; j++)
-        {                                         /* eliminate in rows above i */
-            t = A(j, i);                          /* we're gonna zero this guy */
+        { /* eliminate in rows above i */
+            t = A(j, i); /* we're gonna zero this guy */
             for (k = 0; k < (unsigned int)N; k++) /* subtract scaled row i from row j */
                 B(j, k) -= B(i, k) * t;
         }
@@ -209,7 +215,8 @@ int mxm_cholesky(double* U, const double* A, const int N)
         for (int j = 0; j <= (i - 1); j++)
             sum -= mxm_ref(U, j, i, N) * mxm_ref(U, j, i, N);
 
-        if (sum > 0) {
+        if (sum > 0)
+        {
             mxm_ref(U, i, i, N) = _sqrt(sum);
 
             /* Now find elements U[i][k], k > i. */

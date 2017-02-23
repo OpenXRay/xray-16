@@ -36,7 +36,6 @@ public:
     virtual void create_physic_shell();
 
     virtual CArtefact* cast_artefact() { return this; }
-
 protected:
     virtual void UpdateCLChild(){};
     virtual void CreateArtefactActivation();
@@ -100,19 +99,20 @@ public:
     virtual void OnStateSwitch(u32 S);
     virtual void OnAnimationEnd(u32 state);
     virtual bool IsHidden() const { return GetState() == eHidden; }
-
     // optimization FAST/SLOW mode
     u32 o_render_frame;
     BOOL o_fastmode;
     IC void o_switch_2_fast()
     {
-        if (o_fastmode) return;
+        if (o_fastmode)
+            return;
         o_fastmode = TRUE;
         // processing_activate		();
     }
     IC void o_switch_2_slow()
     {
-        if (!o_fastmode) return;
+        if (!o_fastmode)
+            return;
         o_fastmode = FALSE;
         // processing_deactivate		();
     }

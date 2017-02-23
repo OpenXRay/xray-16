@@ -13,11 +13,7 @@
 using namespace luabind;
 using namespace luabind::policy;
 
-CScriptIniFile* get_system_ini()
-{
-    return ((CScriptIniFile*)pSettings);
-}
-
+CScriptIniFile* get_system_ini() { return ((CScriptIniFile*)pSettings); }
 bool r_line(CScriptIniFile* self, LPCSTR S, int L, luabind::string& N, luabind::string& V)
 {
     THROW3(self->section_exist(S), "Cannot find section", S);
@@ -28,10 +24,12 @@ bool r_line(CScriptIniFile* self, LPCSTR S, int L, luabind::string& N, luabind::
 
     LPCSTR n, v;
     bool result = !!self->r_line(S, L, &n, &v);
-    if (!result) return (false);
+    if (!result)
+        return (false);
 
     N = n;
-    if (v) V = v;
+    if (v)
+        V = v;
     return (true);
 }
 
@@ -45,10 +43,7 @@ CScriptIniFile* create_ini_file(LPCSTR ini_string)
 #pragma warning(pop)
 
 #ifdef XRGAME_EXPORTS
-CScriptIniFile* get_game_ini()
-{
-    return (CScriptIniFile*)pGameIni;
-}
+CScriptIniFile* get_game_ini() { return (CScriptIniFile*)pGameIni; }
 #endif
 
 static void CScriptIniFile_Export(lua_State* luaState)

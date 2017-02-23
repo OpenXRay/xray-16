@@ -49,7 +49,8 @@ public:
         ERP_Result result = rpNone;
 
         T fDiscr = fB * fB - fA * fC;
-        if (fDiscr < (T)0.0) {
+        if (fDiscr < (T)0.0)
+        {
             quantity = 0;
         }
         else if (fDiscr > (T)0.0)
@@ -58,7 +59,8 @@ public:
             T fInvA = ((T)1.0) / fA;
             afT[0] = range * (-fB - fRoot) * fInvA;
             afT[1] = range * (-fB + fRoot) * fInvA;
-            if (afT[0] >= (T)0.0) {
+            if (afT[0] >= (T)0.0)
+            {
                 quantity = 2;
                 result = rpOriginOutside;
             }
@@ -74,7 +76,8 @@ public:
         else
         {
             afT[0] = range * (-fB / fA);
-            if (afT[0] >= (T)0.0) {
+            if (afT[0] >= (T)0.0)
+            {
                 quantity = 1;
                 result = rpOriginOutside;
             }
@@ -103,7 +106,8 @@ public:
         float afT[2];
         Fsphere::ERP_Result result = intersect(start, dir, dist, quantity, afT);
 
-        if (result == Fsphere::rpOriginInside || ((result == Fsphere::rpOriginOutside) && (afT[0] < dist))) {
+        if (result == Fsphere::rpOriginInside || ((result == Fsphere::rpOriginOutside) && (afT[0] < dist)))
+        {
             switch (result)
             {
             case Fsphere::rpOriginInside: dist = afT[0] < dist ? afT[0] : dist; break;
@@ -118,9 +122,11 @@ public:
         int quantity;
         T afT[2];
         ERP_Result result = intersect(start, dir, dist, quantity, afT);
-        if (rpNone != result) {
+        if (rpNone != result)
+        {
             VERIFY(quantity > 0);
-            if (afT[0] < dist) {
+            if (afT[0] < dist)
+            {
                 dist = afT[0];
                 return result;
             }
@@ -138,9 +144,11 @@ public:
         T v = Q.dotproduct(D);
         T d = R2 - (c2 - v * v);
 
-        if (d > 0.f) {
+        if (d > 0.f)
+        {
             T _range = v - _sqrt(d);
-            if (_range < range) {
+            if (_range < range)
+            {
                 range = _range;
                 return (c2 < R2) ? rpOriginInside : rpOriginOutside;
             }
@@ -163,13 +171,13 @@ public:
         return P.distance_to_sqr(S.P) < SumR * SumR;
     }
     IC BOOL contains(const _vector3<T>& PT) const { return P.distance_to_sqr(PT) <= (R * R + EPS_S); }
-
     // returns true if this wholly contains the argument sphere
     IC BOOL contains(const _sphere<T>& S) const
     {
         // can't contain a sphere that's bigger than me !
         const T RDiff = R - S.R;
-        if (RDiff < 0) return false;
+        if (RDiff < 0)
+            return false;
 
         return (P.distance_to_sqr(S.P) <= RDiff * RDiff);
     }

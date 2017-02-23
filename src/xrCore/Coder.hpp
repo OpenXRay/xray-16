@@ -136,32 +136,20 @@ inline void rcDecNormalize(_PPMD_FILE* stream)
 }
 */
 
-static inline UINT rcGetCurrentCount()
-{
-    return (code - low) / (range /= SubRange.scale);
-}
+static inline UINT rcGetCurrentCount() { return (code - low) / (range /= SubRange.scale); }
 static inline void rcRemoveSubrange()
 {
     low += range * SubRange.low;
     range *= SubRange.high - SubRange.low;
 }
 
-static inline UINT rcBinStart(UINT f0, UINT Shift)
-{
-    return f0 * (range >>= Shift);
-}
-static inline UINT rcBinDecode(UINT tmp)
-{
-    return (code - low >= tmp);
-}
-static inline void rcBinCorrect0(UINT tmp)
-{
-    range = tmp;
-}
+static inline UINT rcBinStart(UINT f0, UINT Shift) { return f0 * (range >>= Shift); }
+static inline UINT rcBinDecode(UINT tmp) { return (code - low >= tmp); }
+static inline void rcBinCorrect0(UINT tmp) { range = tmp; }
 static inline void rcBinCorrect1(UINT tmp, UINT f1)
 {
     low += tmp;
     range *= f1;
 }
 
-}  // namespace ppmd
+} // namespace ppmd

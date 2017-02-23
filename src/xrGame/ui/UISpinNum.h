@@ -8,11 +8,11 @@ public:
     virtual void InitSpin(Fvector2 pos, Fvector2 size);
 
     // CUIOptionsItem
-    virtual void SetCurrentOptValue();       // opt->current
-    virtual void SaveBackUpOptValue();       // current->backup
-    virtual void SaveOptValue();             // current->opt
-    virtual void UndoOptValue();             // backup->current
-    virtual bool IsChangedOptValue() const;  // backup!=current
+    virtual void SetCurrentOptValue(); // opt->current
+    virtual void SaveBackUpOptValue(); // current->backup
+    virtual void SaveOptValue(); // current->opt
+    virtual void UndoOptValue(); // backup->current
+    virtual bool IsChangedOptValue() const; // backup!=current
 
     virtual void OnBtnUpClick();
     virtual void OnBtnDownClick();
@@ -20,7 +20,6 @@ public:
     void SetMax(int max) { m_iMax = max; };
     void SetMin(int min) { m_iMin = min; };
     int Value() const { return m_iVal; }
-
 protected:
     void SetValue(int v);
     virtual bool CanPressUp();
@@ -43,11 +42,11 @@ public:
     virtual void InitSpin(Fvector2 pos, Fvector2 size);
 
     // CUIOptionsItem
-    virtual void SetCurrentOptValue();       // opt->current
-    virtual void SaveBackUpOptValue();       // current->backup
-    virtual void SaveOptValue();             // current->opt
-    virtual void UndoOptValue();             // backup->current
-    virtual bool IsChangedOptValue() const;  // backup!=current
+    virtual void SetCurrentOptValue(); // opt->current
+    virtual void SaveBackUpOptValue(); // current->backup
+    virtual void SaveOptValue(); // current->opt
+    virtual void UndoOptValue(); // backup->current
+    virtual bool IsChangedOptValue() const; // backup!=current
 
     virtual void OnBtnUpClick();
     virtual void OnBtnDownClick();

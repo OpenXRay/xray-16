@@ -38,16 +38,8 @@ void CStalkerDangerGrenadePlanner::initialize()
     CScriptActionPlanner::m_storage.set_property(eWorldPropertyLookedAround, false);
 }
 
-void CStalkerDangerGrenadePlanner::update()
-{
-    inherited::update();
-}
-
-void CStalkerDangerGrenadePlanner::finalize()
-{
-    inherited::finalize();
-}
-
+void CStalkerDangerGrenadePlanner::update() { inherited::update(); }
+void CStalkerDangerGrenadePlanner::finalize() { inherited::finalize(); }
 void CStalkerDangerGrenadePlanner::add_evaluators()
 {
     add_evaluator(eWorldPropertyDanger, new CStalkerPropertyEvaluatorDangers(m_object, "danger"));

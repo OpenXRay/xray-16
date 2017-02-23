@@ -19,9 +19,7 @@ CBlender_default::CBlender_default()
     oTessellation.IDselected = 0;
 }
 
-CBlender_default::~CBlender_default()
-{
-}
+CBlender_default::~CBlender_default() {}
 void CBlender_default::Save(IWriter& fs)
 {
     IBlender::Save(fs);
@@ -43,14 +41,16 @@ void CBlender_default::Save(IWriter& fs)
 void CBlender_default::Load(IReader& fs, u16 version)
 {
     IBlender::Load(fs, version);
-    if (version > 0) {
+    if (version > 0)
+    {
         xrPREAD_PROP(fs, xrPID_TOKEN, oTessellation);
     }
 }
 void CBlender_default::Compile(CBlender_Compile& C)
 {
     IBlender::Compile(C);
-    if (C.bEditor) {
+    if (C.bEditor)
+    {
         C.PassBegin();
         {
             C.PassSET_ZB(TRUE, TRUE);
@@ -74,7 +74,8 @@ void CBlender_default::Compile(CBlender_Compile& C)
         {
         case SE_R1_NORMAL_HQ:
             // Level view
-            if (C.bDetail_Diffuse) {
+            if (C.bDetail_Diffuse)
+            {
                 C.r_Pass("lmap_dt", "lmap_dt", TRUE);
                 C.r_Sampler("s_base", C.L_textures[0]);
                 C.r_Sampler("s_lmap", C.L_textures[1]);

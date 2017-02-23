@@ -62,7 +62,8 @@ Matrix3x3& Matrix3x3::FromTo(const Point& from, const Point& to)
     float e = from | to;
 
     // "from" almost or equal to "to"-vector3?
-    if (e > 1.0f - EPSILON) {
+    if (e > 1.0f - EPSILON)
+    {
         // return identity
         Identity();
     }
@@ -72,7 +73,8 @@ Matrix3x3& Matrix3x3::FromTo(const Point& from, const Point& to)
         // Left= from ^ (1,0,0)
         Point Left(0.0f, from.z, -from.y);
         // Was left=CROSS(from,(1,0,0)) a good choice?
-        if ((Left | Left) < EPSILON) {
+        if ((Left | Left) < EPSILON)
+        {
             // Here we now that left = CROSS(from, (1,0,0)) will be a good choice
             Left = Point(-from.z, 0.0f, from.x);
         }
@@ -115,7 +117,7 @@ Matrix3x3& Matrix3x3::FromTo(const Point& from, const Point& to)
         m[1][2] = m[2][1];
         m[2][2] = fzz + uzz + lzz;
     }
-    else  // the most common case, unless "from"="to", or "from"=-"to"
+    else // the most common case, unless "from"="to", or "from"=-"to"
     {
 #if 0
 		// unoptimized version - a good compiler will optimize this.

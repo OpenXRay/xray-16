@@ -8,9 +8,11 @@ u32 const hits_store::fetch_hits(Predicate& predicate, buffer_vector<bullet_hit>
     {
         for (bullet_hits_t::const_iterator hi = i->second->begin(), hie = i->second->end(); hi != hie; ++hi)
         {
-            if (predicate(i->first.first, i->first.second, *hi)) {
+            if (predicate(i->first.first, i->first.second, *hi))
+            {
                 ++ret_count;
-                if (dest_hits.capacity() == dest_hits.size()) continue;
+                if (dest_hits.capacity() == dest_hits.size())
+                    continue;
 
                 dest_hits.push_back(*hi);
             }
@@ -19,4 +21,4 @@ u32 const hits_store::fetch_hits(Predicate& predicate, buffer_vector<bullet_hit>
     return ret_count;
 }
 
-}  // namespace award_system
+} // namespace award_system

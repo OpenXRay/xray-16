@@ -21,4 +21,4 @@ IC bool moving_objects::collided(const IGameObject* object, const Fvector& posit
     return (object->Position().distance_to(position) <= (object->Radius() + radius));
 }
 
-#endif  // MOVING_OBJECTS_IMPL_H
+#endif // MOVING_OBJECTS_IMPL_H

@@ -15,16 +15,16 @@ class SPickQuery
 {
     Flags32 m_Flags;
 
-  public:
+public:
     Fvector m_Start;
     Fvector m_Direction;
     float m_Dist;
     Fbox m_BB;
 
-  public:
+public:
     class SResult
     {
-      public:
+    public:
         Fvector verts[3];
         float u, v;
         float range;
@@ -33,13 +33,13 @@ class SPickQuery
         //.            u32				tag;
         union
         {
-            u32 tag;  // 4b
+            u32 tag; // 4b
             struct
             {
-                u32 material : 14;         //
-                u32 suppress_shadows : 1;  //
-                u32 suppress_wm : 1;       //
-                u32 sector : 16;           //
+                u32 material : 14; //
+                u32 suppress_shadows : 1; //
+                u32 suppress_wm : 1; //
+                u32 sector : 16; //
             };
         };
 
@@ -83,10 +83,10 @@ class SPickQuery
     };
     DEFINE_VECTOR(SResult, ResultVec, ResultIt);
 
-  protected:
+protected:
     ResultVec results;
 
-  public:
+public:
     IC void prepare_rq(const Fvector& start, const Fvector& dir, float dist, u32 flags)
     {
         m_Start.set(start);
@@ -104,9 +104,11 @@ class SPickQuery
     IC void append_mtx(const Fmatrix& parent, CDB::RESULT* R, CEditableObject* obj, CEditableMesh* mesh)
     {
         SResult D(parent, R, obj, mesh);
-        if (m_Flags.is(CDB::OPT_ONLYNEAREST) && !results.empty()) {
+        if (m_Flags.is(CDB::OPT_ONLYNEAREST) && !results.empty())
+        {
             SResult& S = results.back();
-            if (D.range < S.range) S = D;
+            if (D.range < S.range)
+                S = D;
         }
         else
             results.push_back(D);
@@ -114,9 +116,11 @@ class SPickQuery
     IC void append(CDB::RESULT* R, CEditableObject* obj, CEditableMesh* mesh)
     {
         SResult D(R, obj, mesh);
-        if (m_Flags.is(CDB::OPT_ONLYNEAREST) && !results.empty()) {
+        if (m_Flags.is(CDB::OPT_ONLYNEAREST) && !results.empty())
+        {
             SResult& S = results.back();
-            if (D.range < S.range) S = D;
+            if (D.range < S.range)
+                S = D;
         }
         else
             results.push_back(D);
@@ -175,4 +179,4 @@ struct SBoxPickInfo
 DEFINE_VECTOR(SBoxPickInfo, SBoxPickInfoVec, SBoxPickInfoIt);
 #endif
 //----------------------------------------------------
-#endif  // pick_definitionH
+#endif // pick_definitionH

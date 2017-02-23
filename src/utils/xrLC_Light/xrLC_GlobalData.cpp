@@ -30,10 +30,7 @@ twrite_models* write_models = 0;
 tread_mu_refs* read_mu_refs = 0;
 twrite_mu_refs* write_mu_refs = 0;
 
-xrLC_GlobalData* lc_global_data()
-{
-    return data;
-}
+xrLC_GlobalData* lc_global_data() { return data; }
 void create_global_data()
 {
     VERIFY(!inlc_global_data());
@@ -42,7 +39,8 @@ void create_global_data()
 void destroy_global_data()
 {
     VERIFY(inlc_global_data());
-    if (data) data->clear();
+    if (data)
+        data->clear();
     xr_delete(data);
 }
 
@@ -94,10 +92,7 @@ poolFaces &xrLC_GlobalData	::FacePool			()
 }
 */
 
-void xrLC_GlobalData::destroy_rcmodel()
-{
-    xr_delete(_cl_globs._RCAST_Model);
-}
+void xrLC_GlobalData::destroy_rcmodel() { xr_delete(_cl_globs._RCAST_Model); }
 void xrLC_GlobalData::clear_build_textures_surface()
 {
     Logger.clLog("mem usage before clear build textures surface: %u", Memory.mem_usage());
@@ -118,7 +113,8 @@ void xrLC_GlobalData::clear_build_textures_surface(const xr_vector<u32>& exept)
     for (; i != e; ++i)
     {
         xr_vector<u32>::const_iterator ff = std::find(exept.begin(), exept.end(), u32(i - b));
-        if (ff == exept.end()) ::clear((*i));
+        if (ff == exept.end())
+            ::clear((*i));
     }
     Memory.mem_compact();
     Logger.clLog("mem usage after clear build textures surface: %u", Memory.mem_usage());
@@ -133,7 +129,8 @@ void xrLC_GlobalData::create_rcmodel(CDB::CollectorPacked& CL)
 
 void xrLC_GlobalData::initialize()
 {
-    if (strstr(Core.Params, "-att")) _gl_linear = true;
+    if (strstr(Core.Params, "-att"))
+        _gl_linear = true;
 }
 
 /*
@@ -162,16 +159,8 @@ void xrLC_GlobalData::initialize()
 
 //*((u32*)&F)
 
-base_Face* convert_nax(u32 dummy)
-{
-    return (base_Face*)(*((void**)&dummy));
-}
-
-u32 convert_nax(base_Face* F)
-{
-    return *((u32*)&F);
-}
-
+base_Face* convert_nax(u32 dummy) { return (base_Face*)(*((void**)&dummy)); }
+u32 convert_nax(base_Face* F) { return *((u32*)&F); }
 void write(IWriter& w, const CDB::TRI& tri)
 {
     w.w_u32(tri.verts[0]);
@@ -390,13 +379,13 @@ void xrLC_GlobalData::write_mu_models(IWriter& w) const
 
 void xrLC_GlobalData::read_modes_color(INetReader& r)
 {
-    xr_vector<xrMU_Model*>::iterator i = _mu_models.begin(), e = _mu_models.end();
+    xr_vector<xrMU_Model *>::iterator i = _mu_models.begin(), e = _mu_models.end();
     for (; e != i; ++i)
         (*i)->read_color(r);
 }
 void xrLC_GlobalData::write_modes_color(IWriter& w) const
 {
-    xr_vector<xrMU_Model*>::const_iterator i = _mu_models.begin(), e = _mu_models.end();
+    xr_vector<xrMU_Model *>::const_iterator i = _mu_models.begin(), e = _mu_models.end();
     for (; e != i; ++i)
         (*i)->write_color(w);
 }
@@ -423,11 +412,7 @@ void xrLC_GlobalData::write_mu_model_refs(IWriter& w) const
     xr_delete(write_mu_refs);
 }
 
-bool xrLC_GlobalData::b_r_vertices()
-{
-    return !!::read_vertices;
-}
-
+bool xrLC_GlobalData::b_r_vertices() { return !!::read_vertices; }
 // bool			xrLC_GlobalData	::			b_r_faces		()
 //{
 //	return !!read_faces;
@@ -435,13 +420,13 @@ bool xrLC_GlobalData::b_r_vertices()
 
 void xrLC_GlobalData::close_models_read()
 {
-    xr_vector<xrMU_Model*>::iterator i = _mu_models.begin(), e = _mu_models.end();
+    xr_vector<xrMU_Model *>::iterator i = _mu_models.begin(), e = _mu_models.end();
     for (; e != i; ++i)
         (*i)->reading_close();
 }
 void xrLC_GlobalData::close_models_write() const
 {
-    xr_vector<xrMU_Model*>::const_iterator i = _mu_models.begin(), e = _mu_models.end();
+    xr_vector<xrMU_Model *>::const_iterator i = _mu_models.begin(), e = _mu_models.end();
     for (; e != i; ++i)
         (*i)->writting_close();
 }
@@ -459,14 +444,16 @@ std::pair<u32, u32> get_id(const xr_vector<xrMU_Model*>& mu_models, const T* v)
         {
             VERIFY(m);
             u32 id = m->find(_v);
-            if (id == u32(-1)) return false;
+            if (id == u32(-1))
+                return false;
             _id = id;
             return true;
         }
     } f(v, face_id);
 
     xr_vector<xrMU_Model*>::const_iterator ii = std::find_if(mu_models.begin(), mu_models.end(), f);
-    if (ii == mu_models.end()) return std::pair<u32, u32>(u32(-1), u32(-1));
+    if (ii == mu_models.end())
+        return std::pair<u32, u32>(u32(-1), u32(-1));
     return std::pair<u32, u32>(u32(ii - mu_models.begin()), face_id);
 }
 
@@ -515,13 +502,15 @@ void xrLC_GlobalData::read(INetReader& r, base_Face*& f)
 
 void xrLC_GlobalData::write(IWriter& w, const base_Face* f) const
 {
-    if (!f) {
+    if (!f)
+    {
         w.w_u8(smit_null);
         return;
     }
 
     const Face* face = dynamic_cast<const Face*>(f);
-    if (face) {
+    if (face)
+    {
         VERIFY(write_faces);
         w.w_u8(smit_plain);
         write_faces->write(w, face);
@@ -551,7 +540,7 @@ xrLC_GlobalData::~xrLC_GlobalData()
 template <typename T>
 void vec_clear(xr_vector<T*>& v)
 {
-    typename xr_vector<T*>::iterator i = v.begin(), e = v.end();
+    typename xr_vector<T *>::iterator i = v.begin(), e = v.end();
     for (; i != e; ++i)
         xr_delete(*i);
     v.clear();
@@ -570,7 +559,7 @@ void mu_mesh_clear();
 void xrLC_GlobalData::clear_mu_models()
 {
     Logger.clLog("mem usage before mu_clear %d", Memory.mem_usage());
-    vec_clear(_mu_models);  // not clear ogf
+    vec_clear(_mu_models); // not clear ogf
     vec_clear(_mu_refs);
     mu_mesh_clear();
     Memory.mem_compact();
@@ -587,7 +576,7 @@ void xrLC_GlobalData::clear()
     close_models_write();
 
     vec_clear(_g_lightmaps);
-    vec_clear(_mu_models);  // mem leak
+    vec_clear(_mu_models); // mem leak
     vec_clear(_mu_refs);
     mu_mesh_clear();
     gl_mesh_clear();

@@ -20,10 +20,6 @@ IC CEvaluator::CPropertyEvaluatorConst(_value_type value, LPCSTR evaluator_name)
 }
 
 TEMPLATE_SPECIALIZATION
-typename CEvaluator::_value_type CEvaluator::evaluate()
-{
-    return (m_value);
-}
-
+typename CEvaluator::_value_type CEvaluator::evaluate() { return (m_value); }
 #undef TEMPLATE_SPECIALIZATION
 #undef CEvaluator

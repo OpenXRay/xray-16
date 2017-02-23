@@ -6,7 +6,7 @@
 
 class SSceneSummary
 {
-  public:
+public:
     enum ESummaryTextureType
     {
         sttFirst = 0,
@@ -18,8 +18,8 @@ class SSceneSummary
         sttGlow,
         sttLOD,
         sttLast
-    };  // не забывать токен менять
-  private:
+    }; // не забывать токен менять
+private:
     struct STextureInfo
     {
         shared_str file_name;
@@ -41,7 +41,7 @@ class SSceneSummary
         float pixel_area;
         void OnHighlightClick(ButtonValue* sender, bool& bDataModified, bool& bSafe);
 
-      public:
+    public:
         STextureInfo(const shared_str& fn, ESummaryTextureType t)
         {
             file_name = fn;
@@ -57,9 +57,7 @@ class SSceneSummary
         void Export(IWriter* F, u32& mem_use);
 
         bool operator<(const STextureInfo& other) const { return xr_strcmp(file_name, other.file_name) < 0; };
-
         bool operator<(const shared_str& fn) const { return xr_strcmp(file_name, fn) < 0; };
-
         bool operator==(const shared_str& fn) const { return file_name.equal(fn); };
     };
 
@@ -81,7 +79,7 @@ class SSceneSummary
         u32 ref_count;
         bool bReady;
 
-      public:
+    public:
         SObjectInfo(const shared_str& name)
         {
             object_name = name;
@@ -94,16 +92,14 @@ class SSceneSummary
         void Export(IWriter* F);
 
         bool operator<(const SObjectInfo& other) const { return xr_strcmp(object_name, other.object_name) < 0; };
-
         bool operator<(const shared_str& fn) const { return xr_strcmp(object_name, fn) < 0; };
-
         bool operator==(const shared_str& fn) const { return object_name.equal(fn); };
     };
 
     DEFINE_SET(SObjectInfo, OISet, OISetIt);
     OISet objects;
 
-  public:
+public:
     RStringSet lod_objects;
     RStringSet mu_objects;
     RStringSet waves;
@@ -127,21 +123,20 @@ class SSceneSummary
     int pe_static_cnt;
     Fbox bbox;
 
-  private:
+private:
     void OnFileClick(ButtonValue* sender, bool& bModif, bool& bSafe);
     void OnHighlightClick(ButtonValue* sender, bool& bDataModified, bool& bSafe);
 
-  public:
+public:
     void Prepare();
 
-  protected:
+protected:
     struct SPixelDensityPair
     {
         float pm;
         u32 color;
 
         SPixelDensityPair(float _pm, u32 _c) : pm(_pm), color(_c) {}
-
         bool operator<(const SPixelDensityPair& other) const { return pm < other.pm; };
     };
 
@@ -149,23 +144,25 @@ class SSceneSummary
     PDVec pm_colors;
     bool OnWeightAfterEditClick(PropValue* sender, float& edit_val);
 
-  public:
+public:
     static u32 SelectPMColor(float pm);
 
-  public:
+public:
     SSceneSummary();
 
     void AppendTexture(shared_str name, ESummaryTextureType type, float area, float pixel_area, shared_str obj_name)
     {
         TISetIt it = std::find(textures.begin(), textures.end(), name);
-        if (it == textures.end()) {
+        if (it == textures.end())
+        {
             std::pair<TISetIt, bool> res = textures.insert(STextureInfo(name, type));
             it = res.first;
         }
         STextureInfo* info = (STextureInfo*)(&(*it));
 
         STextureInfo::objinf_map_it o_it = info->objects.find(obj_name);
-        if (o_it == info->objects.end()) {
+        if (o_it == info->objects.end())
+        {
             std::pair<STextureInfo::objinf_map_it, bool> res =
                 info->objects.insert(std::make_pair(obj_name, STextureInfo::SObjInfo(area)));
             o_it = res.first;
@@ -178,7 +175,8 @@ class SSceneSummary
     void AppendObject(shared_str name)
     {
         OISetIt it = std::find(objects.begin(), objects.end(), name);
-        if (it == objects.end()) {
+        if (it == objects.end())
+        {
             std::pair<OISetIt, bool> res = objects.insert(SObjectInfo(name));
             it = res.first;
         }

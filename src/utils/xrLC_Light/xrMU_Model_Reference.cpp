@@ -43,13 +43,14 @@ void xrMU_Reference::export_cform_game(CDB::CollectorPacked& CL)
         for (xrMU_Model::v_faces_it I = model->m_faces.begin(); I != model->m_faces.end(); I++)
         {
             _face* F = *I;
-            if (F->Shader().flags.bCollision) {
+            if (F->Shader().flags.bCollision)
+            {
                 cfFaces->push_back(F);
 
                 for (u32 vit = 0; vit < 3; vit++)
                 {
                     u32 g_id = u32(std::lower_bound(model->m_vertices.begin(), model->m_vertices.end(), F->v[vit]) -
-                                   model->m_vertices.begin());
+                        model->m_vertices.begin());
                     cfVertexMarks[g_id] = true;
                 }
             }
@@ -59,7 +60,8 @@ void xrMU_Reference::export_cform_game(CDB::CollectorPacked& CL)
         cfVertices->reserve(model->m_vertices.size());
         std::sort(cfFaces->begin(), cfFaces->end());
         for (u32 V = 0; V < model->m_vertices.size(); V++)
-            if (cfVertexMarks[V]) cfVertices->push_back(model->m_vertices[V]);
+            if (cfVertexMarks[V])
+                cfVertices->push_back(model->m_vertices[V]);
     }
 
     // Collect faces
@@ -81,11 +83,7 @@ void xrMU_Reference::export_cform_game(CDB::CollectorPacked& CL)
     xr_delete(cfVertices);
 }
 
-void xrMU_Reference::export_cform_rcast(CDB::CollectorPacked& CL)
-{
-    model->export_cform_rcast(CL, xform);
-}
-
+void xrMU_Reference::export_cform_rcast(CDB::CollectorPacked& CL) { model->export_cform_rcast(CL, xform); }
 // xrMU_Model*				model;
 //   Fmatrix					xform;
 //   Flags32					flags;

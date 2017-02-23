@@ -6,10 +6,7 @@
 #ifndef _EDITOR
 #include <xmmintrin.h>
 
-__forceinline int iFloor_SSE(float const x)
-{
-    return _mm_cvtt_ss2si(_mm_set_ss(x));
-}
+__forceinline int iFloor_SSE(float const x) { return _mm_cvtt_ss2si(_mm_set_ss(x)); }
 #endif
 
 //==============================================================================
@@ -22,20 +19,20 @@ __forceinline int iFloor_SSE(float const x)
 #define LERP(t, a, b) (a + t * (b - a))
 
 #ifndef _EDITOR
-#define PN_SETUP(i, b0, b1, r0, r1)                                                                                    \
-    t = vec[i] + 10000.f;                                                                                              \
-    tt = iFloor_SSE(t);                                                                                                \
-    b0 = tt & (B - 1);                                                                                                 \
-    b1 = (b0 + 1) & (B - 1);                                                                                           \
-    r0 = t - float(tt);                                                                                                \
+#define PN_SETUP(i, b0, b1, r0, r1) \
+    t = vec[i] + 10000.f;           \
+    tt = iFloor_SSE(t);             \
+    b0 = tt & (B - 1);              \
+    b1 = (b0 + 1) & (B - 1);        \
+    r0 = t - float(tt);             \
     r1 = r0 - 1.f;
 #else
 
-#define PN_SETUP(i, b0, b1, r0, r1)                                                                                    \
-    t = vec[i] + 10000.f;                                                                                              \
-    b0 = iFloor(t) & (B - 1);                                                                                          \
-    b1 = (b0 + 1) & (B - 1);                                                                                           \
-    r0 = t - iFloor(t);                                                                                                \
+#define PN_SETUP(i, b0, b1, r0, r1) \
+    t = vec[i] + 10000.f;           \
+    b0 = iFloor(t) & (B - 1);       \
+    b1 = (b0 + 1) & (B - 1);        \
+    r0 = t - iFloor(t);             \
     r1 = r0 - 1.f;
 
 #endif

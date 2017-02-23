@@ -28,6 +28,6 @@
 #define dFabs(x) ((float)_abs(x)) /* absolute value */
 #endif
 
-#endif  // XRGAME_EXPORTS
+#endif // XRGAME_EXPORTS
 
-#endif  // ODE_REDEFINE
+#endif // ODE_REDEFINE

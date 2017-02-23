@@ -14,7 +14,8 @@ int EDetailManager::RaySelect(int flag, float& dist, const Fvector& start, const
 {
     // box selected only
 
-    if (!m_Flags.is(flSlotBoxesDraw)) return 0;
+    if (!m_Flags.is(flSlotBoxesDraw))
+        return 0;
 
     float fx, fz;
     Fbox bbox;
@@ -32,9 +33,11 @@ int EDetailManager::RaySelect(int flag, float& dist, const Fvector& start, const
             fx = fromSlotX(x);
             bbox.min.set(fx - DETAIL_SLOT_SIZE_2, slot->r_ybase(), fz - DETAIL_SLOT_SIZE_2);
             bbox.max.set(fx + DETAIL_SLOT_SIZE_2, slot->r_ybase() + slot->r_yheight(), fz + DETAIL_SLOT_SIZE_2);
-            if (bbox.Pick2(start, direction, P)) {
+            if (bbox.Pick2(start, direction, P))
+            {
                 float d = start.distance_to(P);
-                if (d < dist) {
+                if (d < dist)
+                {
                     dist = d;
                     sx = x;
                     sz = z;
@@ -42,8 +45,10 @@ int EDetailManager::RaySelect(int flag, float& dist, const Fvector& start, const
             }
         }
     }
-    if ((sx >= 0) || (sz >= 0)) {
-        if (!bDistanceOnly) {
+    if ((sx >= 0) || (sz >= 0))
+    {
+        if (!bDistanceOnly)
+        {
             if (flag == -1)
                 m_Selected[sz * dtH.size_x + sx] = !m_Selected[sz * dtH.size_x + sx];
             else
@@ -59,7 +64,8 @@ int EDetailManager::FrustumSelect(int flag, const CFrustum& frustum)
 {
     // box selected only
 
-    if (!m_Flags.is(flSlotBoxesDraw)) return 0;
+    if (!m_Flags.is(flSlotBoxesDraw))
+        return 0;
 
     int count = 0;
 
@@ -77,7 +83,8 @@ int EDetailManager::FrustumSelect(int flag, const CFrustum& frustum)
             bbox.max.set(fx + DETAIL_SLOT_SIZE_2, slot->r_ybase() + slot->r_yheight(), fz + DETAIL_SLOT_SIZE_2);
             u32 mask = 0xff;
             bool bRes = !!frustum.testAABB(bbox.data(), mask);
-            if (bRes) {
+            if (bRes)
+            {
                 if (flag == -1)
                     m_Selected[z * dtH.size_x + x] = !m_Selected[z * dtH.size_x + x];
                 else
@@ -101,7 +108,8 @@ void EDetailManager::SelectObjects(bool flag)
 
 void EDetailManager::InvertSelection()
 {
-    if (!m_Flags.is(flSlotBoxesDraw)) return;
+    if (!m_Flags.is(flSlotBoxesDraw))
+        return;
     //	for (int i=0; i<m_Selected.size(); i++)
     //    	m_Selected[i] = m_Selected[i];
     for (U8It it = m_Selected.begin(); it != m_Selected.end(); it++)
@@ -110,11 +118,13 @@ void EDetailManager::InvertSelection()
 
 int EDetailManager::SelectionCount(bool testflag)
 {
-    if (!m_Flags.is(flSlotBoxesDraw)) return 0;
+    if (!m_Flags.is(flSlotBoxesDraw))
+        return 0;
     int count = 0;
     //	for (int i=0; i<m_Selected.size(); i++)
     //    	if (m_Selected[i]==testflag) count++;
     for (U8It it = m_Selected.begin(); it != m_Selected.end(); it++)
-        if (*it == testflag) count++;
+        if (*it == testflag)
+            count++;
     return count;
 }

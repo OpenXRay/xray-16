@@ -98,7 +98,6 @@ class CMemoryWriteBlock
 
 public:
     CMemoryWriteBlock(u8* _buffer, u32 _size) : buffer(_buffer), buffer_size(_size), position(0) {}
-
     //	 bool			save_to				(LPCSTR fn)						{ return mem_writer.save_to(fn); }
     void send(IGenericStream* _stream);
     u32 rest() { return buffer_size - tell(); }
@@ -107,7 +106,6 @@ public:
 public:
     void clear() { position = 0; }
     bool is_empty() { return 0 == position; }
-
 private:
     u32 tell() { return position; }
     u8* pointer() { return buffer; }
@@ -149,7 +147,6 @@ public:
         return 0;
     };
     void seek(u32 pos) { VERIFY(false); };
-
     IC int tell() const
     {
         VERIFY(false);
@@ -163,7 +160,6 @@ public:
     };
     //	IC void*		pointer		()	const		{	VERIFY(false); return 0; 	};
     IC void advance(int cnt) { VERIFY(false); }
-
     virtual void r(void* p, int cnt) = 0;
 
     void r_string(char* dest, u32 tgt_sz);
@@ -201,7 +197,6 @@ private:
         return 0;
     };
     virtual void flush() { VERIFY(false); }
-
 public:
     INetBuffWriter() : mem_writter(0)
     {

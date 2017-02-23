@@ -31,7 +31,7 @@ class CShaderTool : public CToolCustom
 
     void PrepareLighting();
 
-  public:
+public:
     TItemList* m_Items;
     TProperties* m_ItemProps;
     TProperties* m_PreviewProps;
@@ -41,10 +41,9 @@ class CShaderTool : public CToolCustom
     ISHTools* m_Current;
 
     ISHTools* Current() { return m_Current; }
-
     void __stdcall OnItemFocused(ListItemsVec& items);
 
-  public:
+public:
     CShaderTool();
     virtual ~CShaderTool();
 
@@ -71,7 +70,6 @@ class CShaderTool : public CToolCustom
     virtual void OnDeviceDestroy();
 
     virtual void Clear() { inherited::Clear(); }
-
     virtual void OnShowHint(AStringVec& SS);
 
     virtual bool __fastcall MouseStart(TShiftState Shift)
@@ -87,9 +85,7 @@ class CShaderTool : public CToolCustom
     }
 
     virtual void __fastcall MouseMove(TShiftState Shift) { inherited::MouseMove(Shift); }
-
     virtual bool Pick(TShiftState Shift) { return false; }
-
     virtual bool RayPick(const Fvector& start, const Fvector& dir, float& dist, Fvector* pt, Fvector* n);
 
     virtual void ShowProperties(LPCSTR focused_item);
@@ -97,15 +93,16 @@ class CShaderTool : public CToolCustom
     virtual void UpdateProperties(BOOL bForced = false)
     {
         m_Flags.set(flRefreshProps, TRUE);
-        if (bForced) RealUpdateProperties();
+        if (bForced)
+            RealUpdateProperties();
     }
 
     virtual void RefreshProperties() { ; }
-
     virtual void UpdateList(bool bForced = false)
     {
         m_Flags.set(flRefreshList, TRUE);
-        if (bForced) RealUpdateList();
+        if (bForced)
+            RealUpdateList();
     }
 
     virtual bool GetSelectionPosition(Fmatrix& result);

@@ -1,4 +1,4 @@
-#ifndef MXMATRIX_INCLUDED  // -*- C++ -*-
+#ifndef MXMATRIX_INCLUDED // -*- C++ -*-
 #define MXMATRIX_INCLUDED
 #if !defined(__GNUC__)
 #pragma once
@@ -34,7 +34,6 @@ class MxMatrix : public MxBlock2<double>
 public:
     MxMatrix(unsigned int n) : MxBlock2<double>(n, n) { *this = 0.0; }
     MxMatrix(const MxMatrix& m) : MxBlock2<double>(m.dim(), m.dim()) { copy(m); }
-
     MxMatrix& operator=(const MxMatrix& m)
     {
         copy(m);
@@ -47,7 +46,6 @@ public:
     }
 
     unsigned int dim() const { return width(); }
-
     MxMatrix& operator+=(const MxMatrix& m)
     {
         mxm_addinto(*this, m, dim());

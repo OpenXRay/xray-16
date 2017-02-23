@@ -32,11 +32,7 @@ void ESceneObjectTool::CreateControls()
 
 //----------------------------------------------------
 
-void ESceneObjectTool::RemoveControls()
-{
-    inherited::RemoveControls();
-}
-
+void ESceneObjectTool::RemoveControls() { inherited::RemoveControls(); }
 //----------------------------------------------------
 
 bool ESceneObjectTool::Validate(bool full_test)
@@ -50,9 +46,12 @@ bool ESceneObjectTool::Validate(bool full_test)
         for (ObjectIt b_it = m_Objects.begin(); b_it != m_Objects.end(); b_it++)
         {
             B = (CSceneObject*)(*b_it);
-            if (A == B) continue;
-            if (A->RefCompare(B->GetReference())) {
-                if (A->PPosition.similar(B->PPosition, EPS_L)) {
+            if (A == B)
+                continue;
+            if (A->RefCompare(B->GetReference()))
+            {
+                if (A->PPosition.similar(B->PPosition, EPS_L))
+                {
                     bRes = false;
                     ELog.Msg(mtError, "Duplicate object position '%s'-'%s' with reference '%s'.", A->Name, B->Name,
                         A->RefName());
@@ -60,7 +59,8 @@ bool ESceneObjectTool::Validate(bool full_test)
             }
         }
         // validate lods
-        if (full_test && A->IsMUStatic()) {
+        if (full_test && A->IsMUStatic())
+        {
             CEditableObject* E = A->GetReference();
             VERIFY(E);
             xr_string lod_name = E->GetLODTextureName();
@@ -70,14 +70,17 @@ bool ESceneObjectTool::Validate(bool full_test)
             //.          FS.update_path	(fn,_textures_,EFS.ChangeFileExt(l_name,".tga").c_str());
             FS.update_path(fn, _game_textures_, EFS.ChangeFileExt(l_name, ".dds").c_str());
             age = FS.get_file_age(fn);
-            if (age == -1) Msg("!There is no texture '%s'", fn);
+            if (age == -1)
+                Msg("!There is no texture '%s'", fn);
             l_name += "_nm";
             //.         FS.update_path	(fn,_textures_,EFS.ChangeFileExt(l_name,".tga").c_str());
             FS.update_path(fn, _game_textures_, EFS.ChangeFileExt(l_name, ".dds").c_str());
             age_nm = FS.get_file_age(fn);
-            if (age_nm == -1) Msg("!There is no texture '%s'", fn);
+            if (age_nm == -1)
+                Msg("!There is no texture '%s'", fn);
 
-            if (age_nm == -1 || age == -1) bRes = false;
+            if (age_nm == -1 || age == -1)
+                bRes = false;
             /*
                         if ((age!=E->Version()) || (age_nm!=E->Version()) )
                         {
@@ -103,7 +106,8 @@ void ESceneObjectTool::OnChangeAppendRandomFlags(PropValue* prop)
 
 void ESceneObjectTool::FillAppendRandomProperties(bool bUpdateOnly)
 {
-    if (!bUpdateOnly) m_Props = TProperties::CreateModalForm("Random Append Properties", false);
+    if (!bUpdateOnly)
+        m_Props = TProperties::CreateModalForm("Random Append Properties", false);
 
     m_AppendRandomObjectsStr = _ListToSequence(m_AppendRandomObjects).c_str();
 
@@ -111,10 +115,12 @@ void ESceneObjectTool::FillAppendRandomProperties(bool bUpdateOnly)
     PropItemVec items;
     V = PHelper().CreateFlag32(items, "Scale", &m_Flags, flAppendRandomScale);
     V->OnChangeEvent.bind(this, &ESceneObjectTool::OnChangeAppendRandomFlags);
-    if (m_Flags.is(flAppendRandomScale)) {
+    if (m_Flags.is(flAppendRandomScale))
+    {
         V = PHelper().CreateFlag32(items, "Scale\\Proportional", &m_Flags, flAppendRandomScaleProportional);
         V->OnChangeEvent.bind(this, &ESceneObjectTool::OnChangeAppendRandomFlags);
-        if (m_Flags.is(flAppendRandomScaleProportional)) {
+        if (m_Flags.is(flAppendRandomScaleProportional))
+        {
             PHelper().CreateFloat(items, "Scale\\Minimum", &m_AppendRandomMinScale.x, 0.001f, 1000.f, 0.001f, 3);
             PHelper().CreateFloat(items, "Scale\\Maximum", &m_AppendRandomMaxScale.x, 0.001f, 1000.f, 0.001f, 3);
         }
@@ -127,7 +133,8 @@ void ESceneObjectTool::FillAppendRandomProperties(bool bUpdateOnly)
 
     V = PHelper().CreateFlag32(items, "Rotate", &m_Flags, flAppendRandomRotation);
     V->OnChangeEvent.bind(this, &ESceneObjectTool::OnChangeAppendRandomFlags);
-    if (m_Flags.is(flAppendRandomRotation)) {
+    if (m_Flags.is(flAppendRandomRotation))
+    {
         PHelper().CreateAngle3(items, "Rotate\\Minimum", &m_AppendRandomMinRotation);
         PHelper().CreateAngle3(items, "Rotate\\Maximum", &m_AppendRandomMaxRotation);
     }
@@ -136,8 +143,10 @@ void ESceneObjectTool::FillAppendRandomProperties(bool bUpdateOnly)
 
     m_Props->AssignItems(items);
 
-    if (!bUpdateOnly) {
-        if (mrOk == m_Props->ShowPropertiesModal()) Scene->UndoSave();
+    if (!bUpdateOnly)
+    {
+        if (mrOk == m_Props->ShowPropertiesModal())
+            Scene->UndoSave();
         TProperties::DestroyForm(m_Props);
     }
 }
@@ -170,7 +179,8 @@ bool ESceneObjectTool::GetBox(Fbox& bb)
 void ESceneObjectTool::OnFrame()
 {
     inherited::OnFrame();
-    if (m_Flags.is(flAppendRandomUpdateProps)) {
+    if (m_Flags.is(flAppendRandomUpdateProps))
+    {
         m_Flags.set(flAppendRandomUpdateProps, FALSE);
         FillAppendRandomProperties(true);
     }
@@ -187,29 +197,34 @@ CCustomObject* ESceneObjectTool::CreateObject(LPVOID data, LPCSTR name)
 
 void ESceneObjectTool::HighlightTexture(LPCSTR tex_name, bool allow_ratio, u32 t_width, u32 t_height, BOOL mark)
 {
-    if (tex_name && tex_name[0]) {
+    if (tex_name && tex_name[0])
+    {
         for (ObjectIt a_it = m_Objects.begin(); a_it != m_Objects.end(); a_it++)
         {
             CSceneObject* s_obj = dynamic_cast<CSceneObject*>(*a_it);
-            if (s_obj->Visible()) {
+            if (s_obj->Visible())
+            {
                 CEditableObject* e_obj = s_obj->GetReference();
                 VERIFY(e_obj);
                 SurfaceVec& s_vec = e_obj->Surfaces();
                 for (SurfaceIt it = s_vec.begin(); it != s_vec.end(); it++)
                 {
-                    if (0 == stricmp((*it)->_Texture(), tex_name)) {
+                    if (0 == stricmp((*it)->_Texture(), tex_name))
+                    {
                         Fvector verts[3];
                         for (EditMeshIt mesh_it = e_obj->FirstMesh(); mesh_it != e_obj->LastMesh(); mesh_it++)
                         {
                             const SurfFaces& surf_faces = (*mesh_it)->GetSurfFaces();
                             SurfFaces::const_iterator sf_it = surf_faces.find(*it);
-                            if (sf_it != surf_faces.end()) {
+                            if (sf_it != surf_faces.end())
+                            {
                                 const IntVec& lst = sf_it->second;
                                 for (IntVec::const_iterator i_it = lst.begin(); i_it != lst.end(); i_it++)
                                 {
                                     e_obj->GetFaceWorld(s_obj->_Transform(), *mesh_it, *i_it, verts);
                                     u32 clr = 0x80FFFFFF;
-                                    if (allow_ratio) {
+                                    if (allow_ratio)
+                                    {
                                         // select color
                                         const Fvector2* tc[3];
                                         Fvector c, e01, e02;

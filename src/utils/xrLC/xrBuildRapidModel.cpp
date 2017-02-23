@@ -15,12 +15,18 @@ CDB::MODEL* RCAST_Model = 0;
 IC bool FaceEqual(Face& F1, Face& F2)
 {
     // Test for 6 variations
-    if ((F1.v[0] == F2.v[0]) && (F1.v[1] == F2.v[1]) && (F1.v[2] == F2.v[2])) return true;
-    if ((F1.v[0] == F2.v[0]) && (F1.v[2] == F2.v[1]) && (F1.v[1] == F2.v[2])) return true;
-    if ((F1.v[2] == F2.v[0]) && (F1.v[0] == F2.v[1]) && (F1.v[1] == F2.v[2])) return true;
-    if ((F1.v[2] == F2.v[0]) && (F1.v[1] == F2.v[1]) && (F1.v[0] == F2.v[2])) return true;
-    if ((F1.v[1] == F2.v[0]) && (F1.v[0] == F2.v[1]) && (F1.v[2] == F2.v[2])) return true;
-    if ((F1.v[1] == F2.v[0]) && (F1.v[2] == F2.v[1]) && (F1.v[0] == F2.v[2])) return true;
+    if ((F1.v[0] == F2.v[0]) && (F1.v[1] == F2.v[1]) && (F1.v[2] == F2.v[2]))
+        return true;
+    if ((F1.v[0] == F2.v[0]) && (F1.v[2] == F2.v[1]) && (F1.v[1] == F2.v[2]))
+        return true;
+    if ((F1.v[2] == F2.v[0]) && (F1.v[0] == F2.v[1]) && (F1.v[1] == F2.v[2]))
+        return true;
+    if ((F1.v[2] == F2.v[0]) && (F1.v[1] == F2.v[1]) && (F1.v[0] == F2.v[2]))
+        return true;
+    if ((F1.v[1] == F2.v[0]) && (F1.v[0] == F2.v[1]) && (F1.v[2] == F2.v[2]))
+        return true;
+    if ((F1.v[1] == F2.v[0]) && (F1.v[2] == F2.v[1]) && (F1.v[0] == F2.v[2]))
+        return true;
     return false;
 }
 
@@ -58,7 +64,8 @@ void CBuild::BuildRapid(BOOL bSaveForOtherCompilers)
     {
         Face* F = (*it);
         const Shader_xrLC& SH = F->Shader();
-        if (!SH.flags.bLIGHT_CastShadow) continue;
+        if (!SH.flags.bLIGHT_CastShadow)
+            continue;
 
         Logger.Progress(float(it - lc_global_data()->g_faces().begin()) / float(lc_global_data()->g_faces().size()));
 
@@ -80,16 +87,20 @@ void CBuild::BuildRapid(BOOL bSaveForOtherCompilers)
         for (u32 ait = 0; ait < adjacent_vec.size(); ++ait)
         {
             Face* Test = adjacent_vec[ait];
-            if (Test == F) continue;
-            if (!Test->flags.bProcessed) continue;
-            if (FaceEqual(*F, *Test)) {
+            if (Test == F)
+                continue;
+            if (!Test->flags.bProcessed)
+                continue;
+            if (FaceEqual(*F, *Test))
+            {
                 bAlready = TRUE;
                 break;
             }
         }
 
         //
-        if (!bAlready) {
+        if (!bAlready)
+        {
             F->flags.bProcessed = true;
             CL.add_face_D(F->v[0]->P, F->v[1]->P, F->v[2]->P, *((u32*)&F), F->sm_group);
         }
@@ -101,7 +112,8 @@ void CBuild::BuildRapid(BOOL bSaveForOtherCompilers)
     */
 
     // Export references
-    if (bSaveForOtherCompilers) Logger.Phase("Building rcast-CFORM-mu model...");
+    if (bSaveForOtherCompilers)
+        Logger.Phase("Building rcast-CFORM-mu model...");
     Logger.Status("Models...");
     for (u32 ref = 0; ref < mu_refs().size(); ref++)
         mu_refs()[ref]->export_cform_rcast(CL);
@@ -116,12 +128,15 @@ void CBuild::BuildRapid(BOOL bSaveForOtherCompilers)
     string_path fn;
 
     bool keep_temp_files = !!strstr(Core.Params, "-keep_temp_files");
-    if (g_params().m_quality != ebqDraft) {
-        if (keep_temp_files) SaveAsSMF(strconcat(sizeof(fn), fn, pBuild->path, "build_cform_source.smf"), CL);
+    if (g_params().m_quality != ebqDraft)
+    {
+        if (keep_temp_files)
+            SaveAsSMF(strconcat(sizeof(fn), fn, pBuild->path, "build_cform_source.smf"), CL);
     }
 
     // Saving for AI/DO usage
-    if (bSaveForOtherCompilers) {
+    if (bSaveForOtherCompilers)
+    {
         Logger.Status("Saving...");
         string_path fn;
 
@@ -141,8 +156,10 @@ void CBuild::BuildRapid(BOOL bSaveForOtherCompilers)
             cf.t[1].set(cuv[1]);
             cf.t[2].set(cuv[2]);
         }
-        if (g_params().m_quality != ebqDraft) {
-            if (keep_temp_files) SaveUVM(strconcat(sizeof(fn), fn, pBuild->path, "build_cform_source.uvm"), rc_faces);
+        if (g_params().m_quality != ebqDraft)
+        {
+            if (keep_temp_files)
+                SaveUVM(strconcat(sizeof(fn), fn, pBuild->path, "build_cform_source.uvm"), rc_faces);
         }
 
         MFS->open_chunk(0);

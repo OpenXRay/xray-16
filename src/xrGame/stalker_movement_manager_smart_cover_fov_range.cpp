@@ -17,13 +17,15 @@
 
 bool stalker_movement_manager_smart_cover::fill_enemy_position(Fvector& position) const
 {
-    if (m_current.cover_fire_position()) {
+    if (m_current.cover_fire_position())
+    {
         position = *m_current.cover_fire_position();
         return (true);
     }
 
     CEntityAlive const* enemy = object().memory().enemy().selected();
-    if (!enemy) return (false);
+    if (!enemy)
+        return (false);
 
     position = object().memory().memory(enemy).m_object_params.m_position;
     return (true);
@@ -31,18 +33,23 @@ bool stalker_movement_manager_smart_cover::fill_enemy_position(Fvector& position
 
 bool stalker_movement_manager_smart_cover::enemy_in_fov() const
 {
-    if (!m_current.cover()) return (false);
+    if (!m_current.cover())
+        return (false);
 
     Fvector position;
-    if (!fill_enemy_position(position)) return (false);
+    if (!fill_enemy_position(position))
+        return (false);
 
     float value;
-    if (m_current.cover()->best_loophole(position, value, false, true)) return (true);
+    if (m_current.cover()->best_loophole(position, value, false, true))
+        return (true);
 
     VERIFY(m_current.cover_loophole());
-    if (!m_current.cover()->is_position_in_fov(*m_current.cover_loophole(), position)) return (false);
+    if (!m_current.cover()->is_position_in_fov(*m_current.cover_loophole(), position))
+        return (false);
 
-    if (!m_current.cover()->is_position_in_range(*m_current.cover_loophole(), position)) return (false);
+    if (!m_current.cover()->is_position_in_range(*m_current.cover_loophole(), position))
+        return (false);
 
     return (true);
 }
@@ -59,7 +66,8 @@ bool stalker_movement_manager_smart_cover::in_current_loophole_fov(Fvector const
 {
     VERIFY(m_current.cover() || entering_smart_cover_with_animation());
     VERIFY(entering_smart_cover_with_animation() || m_current.cover_loophole());
-    if (m_current.cover()) return (m_current.cover()->is_position_in_fov(*m_current.cover_loophole(), position));
+    if (m_current.cover())
+        return (m_current.cover()->is_position_in_fov(*m_current.cover_loophole(), position));
 
     smart_cover::cover const* cover = ai().cover_manager().smart_cover(m_enter_cover_id);
     VERIFY(cover);
@@ -72,7 +80,8 @@ bool stalker_movement_manager_smart_cover::in_current_loophole_range(Fvector con
 {
     VERIFY(m_current.cover() || entering_smart_cover_with_animation());
     VERIFY(entering_smart_cover_with_animation() || m_current.cover_loophole());
-    if (m_current.cover()) return (m_current.cover()->is_position_in_range(*m_current.cover_loophole(), position));
+    if (m_current.cover())
+        return (m_current.cover()->is_position_in_range(*m_current.cover_loophole(), position));
 
     smart_cover::cover const* cover = ai().cover_manager().smart_cover(m_enter_cover_id);
     VERIFY(cover);

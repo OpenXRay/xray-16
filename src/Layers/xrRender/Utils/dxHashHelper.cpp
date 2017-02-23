@@ -2,21 +2,18 @@
 #include "dxHashHelper.h"
 
 bool dxHashHelper::m_bTableReady = false;
-u32 dxHashHelper::m_CrcTable[256];  // Lookup table array
+u32 dxHashHelper::m_CrcTable[256]; // Lookup table array
 
 dxHashHelper::dxHashHelper() : m_uiCrcValue(0xffffffff)
 {
-    if (!m_bTableReady) {
+    if (!m_bTableReady)
+    {
         Crc32Init();
         m_bTableReady = true;
     }
 }
 
-u32 dxHashHelper::GetHash() const
-{
-    return m_uiCrcValue ^ 0xffffffff;
-}
-
+u32 dxHashHelper::GetHash() const { return m_uiCrcValue ^ 0xffffffff; }
 // Reflects CRC bits in the lookup table
 inline u32 dxHashHelper::Reflect(u32 ref, char ch)
 {
@@ -28,7 +25,8 @@ inline u32 dxHashHelper::Reflect(u32 ref, char ch)
     // bit 1 for bit 6, etc.
     for (int i = 1; i < (ch + 1); i++)
     {
-        if (ref & 1) value |= 1 << (ch - i);
+        if (ref & 1)
+            value |= 1 << (ch - i);
         ref >>= 1;
     }
     return value;

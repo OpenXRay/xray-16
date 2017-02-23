@@ -15,26 +15,11 @@
 // R_constant_table::~R_constant_table	()	{	dxRenderDeviceRender::Instance().Resources->_DeleteConstantTable(this);
 // }
 
-R_constant_table::~R_constant_table()
-{
-    RImplementation.Resources->_DeleteConstantTable(this);
-}
-
-void R_constant_table::fatal(LPCSTR S)
-{
-    FATAL(S);
-}
-
+R_constant_table::~R_constant_table() { RImplementation.Resources->_DeleteConstantTable(this); }
+void R_constant_table::fatal(LPCSTR S) { FATAL(S); }
 // predicates
-IC bool p_search(ref_constant C, LPCSTR S)
-{
-    return xr_strcmp(*C->name, S) < 0;
-}
-IC bool p_sort(ref_constant C1, ref_constant C2)
-{
-    return xr_strcmp(C1->name, C2->name) < 0;
-}
-
+IC bool p_search(ref_constant C, LPCSTR S) { return xr_strcmp(*C->name, S) < 0; }
+IC bool p_sort(ref_constant C1, ref_constant C2) { return xr_strcmp(C1->name, C2->name) < 0; }
 ref_constant R_constant_table::get(LPCSTR S)
 {
     // assumption - sorted by name
@@ -52,7 +37,8 @@ ref_constant R_constant_table::get(shared_str& S)
     for (; I != E; ++I)
     {
         ref_constant C = *I;
-        if (C->name.equal(S)) return C;
+        if (C->name.equal(S))
+            return C;
     }
     return 0;
 }
@@ -70,8 +56,10 @@ BOOL R_constant_table::parse(void* _desc, u32 destination)
 
         // Type
         u16 type = RC_float;
-        if (D3DXRS_BOOL == it->RegisterSet) type = RC_bool;
-        if (D3DXRS_INT4 == it->RegisterSet) type = RC_int;
+        if (D3DXRS_BOOL == it->RegisterSet)
+            type = RC_bool;
+        if (D3DXRS_INT4 == it->RegisterSet)
+            type = RC_int;
 
         // Rindex,Rcount
         u16 r_index = it->RegisterIndex;
@@ -128,8 +116,9 @@ BOOL R_constant_table::parse(void* _desc, u32 destination)
                 // ***Register sampler***
                 // We have determined all valuable info, search if constant already created
                 ref_constant C = get(name);
-                if (!C) {
-                    C = new R_constant();  //.g_constant_allocator.create();
+                if (!C)
+                {
+                    C = new R_constant(); //.g_constant_allocator.create();
                     C->name = name;
                     C->destination = RC_dest_sampler;
                     C->type = RC_sampler;
@@ -155,12 +144,14 @@ BOOL R_constant_table::parse(void* _desc, u32 destination)
             break;
         default: bSkip = TRUE; break;
         }
-        if (bSkip) continue;
+        if (bSkip)
+            continue;
 
         // We have determined all valuable info, search if constant already created
         ref_constant C = get(name);
-        if (!C) {
-            C = new R_constant();  //.g_constant_allocator.create();
+        if (!C)
+        {
+            C = new R_constant(); //.g_constant_allocator.create();
             C->name = name;
             C->destination = destination;
             C->type = type;
@@ -181,20 +172,22 @@ BOOL R_constant_table::parse(void* _desc, u32 destination)
     std::sort(table.begin(), table.end(), p_sort);
     return TRUE;
 }
-#endif  //	USE_DX10
+#endif //	USE_DX10
 
 /// !!!!!!!!FIX THIS FOR DX11!!!!!!!!!
 void R_constant_table::merge(R_constant_table* T)
 {
-    if (0 == T) return;
+    if (0 == T)
+        return;
 
     // Real merge
     for (u32 it = 0; it < T->table.size(); it++)
     {
         ref_constant src = T->table[it];
         ref_constant C = get(*src->name);
-        if (!C) {
-            C = new R_constant();  //.g_constant_allocator.create();
+        if (!C)
+        {
+            C = new R_constant(); //.g_constant_allocator.create();
             C->name = src->name;
             C->destination = src->destination;
             C->type = src->type;
@@ -233,27 +226,29 @@ void R_constant_table::merge(R_constant_table* T)
     m_CBTable.reserve(m_CBTable.size() + T->m_CBTable.size());
     for (u32 i = 0; i < T->m_CBTable.size(); ++i)
         m_CBTable.push_back(T->m_CBTable[i]);
-#endif  //	USE_DX10
+#endif //	USE_DX10
 }
 
 void R_constant_table::clear()
 {
     //.
     for (u32 it = 0; it < table.size(); it++)
-        table[it] = 0;  //.g_constant_allocator.destroy(table[it]);
+        table[it] = 0; //.g_constant_allocator.destroy(table[it]);
     table.clear();
 #if defined(USE_DX10) || defined(USE_DX11)
     m_CBTable.clear();
-#endif  //
+#endif //
 }
 
 BOOL R_constant_table::equal(R_constant_table& C)
 {
-    if (table.size() != C.table.size()) return FALSE;
+    if (table.size() != C.table.size())
+        return FALSE;
     u32 size = table.size();
     for (u32 it = 0; it < size; it++)
     {
-        if (!table[it]->equal(&*C.table[it])) return FALSE;
+        if (!table[it]->equal(&*C.table[it]))
+            return FALSE;
     }
 
     return TRUE;

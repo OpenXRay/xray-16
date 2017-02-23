@@ -9,10 +9,7 @@
 #include "stdafx.h"
 #include "alife_simulator_header.h"
 
-CALifeSimulatorHeader::~CALifeSimulatorHeader()
-{
-}
-
+CALifeSimulatorHeader::~CALifeSimulatorHeader() {}
 void CALifeSimulatorHeader::save(IWriter& memory_stream)
 {
     memory_stream.open_chunk(ALIFE_CHUNK_DATA);
@@ -29,7 +26,8 @@ void CALifeSimulatorHeader::load(IReader& file_stream)
 
 bool CALifeSimulatorHeader::valid(IReader& file_stream) const
 {
-    if (!file_stream.find_chunk(ALIFE_CHUNK_DATA)) return (false);
+    if (!file_stream.find_chunk(ALIFE_CHUNK_DATA))
+        return (false);
 
     u32 version;
     file_stream.r(&version, sizeof(version));

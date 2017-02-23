@@ -34,7 +34,7 @@ class CInventoryItem;
 class CEntity;
 class CEntityAlive;
 class CActor;
-class CGameObject;  // XXX: remove
+class CGameObject; // XXX: remove
 class CCustomZone;
 class CPhysicsShellHolder;
 class IInputReceiver;
@@ -194,8 +194,8 @@ public:
     virtual shared_str cNameVisual() const = 0;
     virtual void cNameVisual_set(shared_str N) = 0;
     // Properties
-    virtual void processing_activate() = 0;    // request to enable UpdateCL
-    virtual void processing_deactivate() = 0;  // request to disable UpdateCL
+    virtual void processing_activate() = 0; // request to enable UpdateCL
+    virtual void processing_deactivate() = 0; // request to disable UpdateCL
     virtual bool processing_enabled() = 0;
     virtual void setVisible(BOOL _visible) = 0;
     virtual BOOL getVisible() const = 0;
@@ -212,7 +212,7 @@ public:
     // ~Properties
     virtual void Load(LPCSTR section) = 0;
     // Update
-    virtual void UpdateCL() = 0;  // Called each frame, so no need for dt
+    virtual void UpdateCL() = 0; // Called each frame, so no need for dt
     // Position stack
     virtual u32 ps_Size() const = 0;
     virtual GameObjectSavedPosition ps_Element(u32 id) const = 0;
@@ -220,9 +220,9 @@ public:
     // HUD
     virtual void OnHUDDraw(CCustomHUD* hud) = 0;
     // Active/non active
-    virtual void OnH_B_Chield() = 0;  // before
+    virtual void OnH_B_Chield() = 0; // before
     virtual void OnH_B_Independent(bool justBeforeDestroy) = 0;
-    virtual void OnH_A_Chield() = 0;  // after
+    virtual void OnH_A_Chield() = 0; // after
     virtual void OnH_A_Independent() = 0;
     virtual void On_SetEntity() = 0;
     virtual void On_LostEntity() = 0;
@@ -262,15 +262,15 @@ public:
     virtual void net_Save(NET_Packet& packet) = 0;
     virtual void net_Load(IReader& reader) = 0;
     virtual BOOL net_SaveRelevant() = 0;
-    virtual void net_Export(NET_Packet& packet) = 0;  // export to server
-    virtual void net_Import(NET_Packet& packet) = 0;  // import from server
+    virtual void net_Export(NET_Packet& packet) = 0; // export to server
+    virtual void net_Import(NET_Packet& packet) = 0; // import from server
     virtual BOOL net_Spawn(CSE_Abstract* entity) = 0;
     virtual void net_Destroy() = 0;
     virtual void net_ImportInput(NET_Packet& packet) = 0;
-    virtual BOOL net_Relevant() = 0;  // relevant for export to server
+    virtual BOOL net_Relevant() = 0; // relevant for export to server
     virtual void net_MigrateInactive(NET_Packet& packet) = 0;
     virtual void net_MigrateActive(NET_Packet& packet) = 0;
-    virtual void net_Relcase(IGameObject* obj) = 0;  // destroy all links to another objects
+    virtual void net_Relcase(IGameObject* obj) = 0; // destroy all links to another objects
     virtual void save(NET_Packet& packet) = 0;
     virtual void load(IReader& reader) = 0;
     virtual void OnEvent(NET_Packet& packet, u16 type) = 0;
@@ -300,14 +300,14 @@ public:
     virtual void reload(LPCSTR section) = 0;
     // network
     virtual bool object_removed() const = 0;
-    virtual void make_Interpolation() = 0;  // interpolation from last visible to corrected position/rotation
-    virtual void PH_B_CrPr() = 0;           // actions & operations before physic correction-prediction steps
-    virtual void PH_I_CrPr() = 0;           // actions & operations after correction before prediction steps
+    virtual void make_Interpolation() = 0; // interpolation from last visible to corrected position/rotation
+    virtual void PH_B_CrPr() = 0; // actions & operations before physic correction-prediction steps
+    virtual void PH_I_CrPr() = 0; // actions & operations after correction before prediction steps
 #ifdef DEBUG
     virtual void PH_Ch_CrPr() = 0;
     virtual void dbg_DrawSkeleton() = 0;
 #endif
-    virtual void PH_A_CrPr() = 0;  // actions & operations after phisic correction-prediction steps
+    virtual void PH_A_CrPr() = 0; // actions & operations after phisic correction-prediction steps
     virtual void CrPr_SetActivationStep(u32 step) = 0;
     virtual u32 CrPr_GetActivationStep() = 0;
     virtual void CrPr_SetActivated(bool activate) = 0;
@@ -353,8 +353,5 @@ public:
     virtual void SetScriptBinderObject(CScriptBinderObject* obj) = 0;
 };
 
-inline IGameObject::~IGameObject()
-{
-}
-
-#endif  //__XR_OBJECT_H__
+inline IGameObject::~IGameObject() {}
+#endif //__XR_OBJECT_H__

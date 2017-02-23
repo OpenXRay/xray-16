@@ -12,7 +12,6 @@ class CStateMonsterHitObject : public CState<_Object>
 
 public:
     CStateMonsterHitObject(_Object* obj) : inherited(obj) {}
-
     virtual void initialize();
     virtual void execute();
     virtual bool check_start_conditions();

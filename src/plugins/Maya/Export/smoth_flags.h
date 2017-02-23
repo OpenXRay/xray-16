@@ -10,7 +10,8 @@ IC void set_face_adge_hard(u32& flags, u16 edge_idx)
 template <typename export_class>
 MStatus t_set_smoth_flags(export_class& export_obj, u32& flags, const MIntArray& tri_vert_indeces)
 {
-    if (tri_vert_indeces.length() != 3) {
+    if (tri_vert_indeces.length() != 3)
+    {
         Msg("XRAY Plagin ERROR");
         return MS::kFailure;
     }
@@ -21,7 +22,8 @@ MStatus t_set_smoth_flags(export_class& export_obj, u32& flags, const MIntArray&
         int b = tri_vert_indeces[(i + 1) % 3];
         SXREdgeInfoPtr elem = export_obj.findEdgeInfo(a, b);
 
-        if (elem && !elem->smooth) set_face_adge_hard(flags, i);
+        if (elem && !elem->smooth)
+            set_face_adge_hard(flags, i);
     }
 
     return MS::kSuccess;

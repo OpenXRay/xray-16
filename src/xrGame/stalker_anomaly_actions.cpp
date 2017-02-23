@@ -68,7 +68,8 @@ void CStalkerActionGetOutOfAnomaly::finalize()
 {
     inherited::finalize();
 
-    if (!object().g_Alive()) return;
+    if (!object().g_Alive())
+        return;
 
     object().sound().set_sound_mask(0);
 }
@@ -88,10 +89,12 @@ void CStalkerActionGetOutOfAnomaly::execute()
     m_temp1.clear();
 
     CSE_ALifeDynamicObject const* const base_alife_object = ai().alife().objects().object(object().ID(), true);
-    if (!base_alife_object) return;
+    if (!base_alife_object)
+        return;
 
     CSE_ALifeHumanAbstract const* const alife_object = smart_cast<CSE_ALifeHumanAbstract const*>(base_alife_object);
-    if (!alife_object) return;
+    if (!alife_object)
+        return;
 
     typedef xr_vector<ALife::_OBJECT_ID> ids_type;
     ids_type const& restrictions = alife_object->m_dynamic_in_restrictions;
@@ -101,10 +104,13 @@ void CStalkerActionGetOutOfAnomaly::execute()
     for (; I != E; ++I)
     {
         CCustomZone* zone = smart_cast<CCustomZone*>(*I);
-        if (zone && (zone->restrictor_type() != RestrictionSpace::eRestrictorTypeNone)) {
-            if (smart_cast<CRadioactiveZone*>(zone)) continue;
+        if (zone && (zone->restrictor_type() != RestrictionSpace::eRestrictorTypeNone))
+        {
+            if (smart_cast<CRadioactiveZone*>(zone))
+                continue;
 
-            if (std::find(restrictions.begin(), restrictions.end(), zone->ID()) != restrictions.end()) continue;
+            if (std::find(restrictions.begin(), restrictions.end(), zone->ID()) != restrictions.end())
+                continue;
 
             m_temp0.push_back(zone->ID());
         }
@@ -138,7 +144,8 @@ void CStalkerActionDetectAnomaly::finalize()
 {
     inherited::finalize();
 
-    if (!object().g_Alive()) return;
+    if (!object().g_Alive())
+        return;
 
     object().CObjectHandler::set_goal(eObjectActionIdle);
     object().sound().set_sound_mask(0);
@@ -148,7 +155,8 @@ void CStalkerActionDetectAnomaly::execute()
 {
     inherited::execute();
 
-    if (completed() || object().memory().enemy().selected()) {
+    if (completed() || object().memory().enemy().selected())
+    {
         set_property(eWorldPropertyAnomaly, false);
         return;
     }

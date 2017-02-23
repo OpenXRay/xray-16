@@ -29,17 +29,14 @@ public:
 
     virtual bool check_completion() { return false; }
     virtual bool check_start_conditions() { return true; }
-
     virtual void reselect_state() {}
     virtual void check_force_state() {}
-
     CSState* get_state(u32 state_id);
     CSState* get_state_current();
 
     void fill_data_with(void* ptr_src, u32 size);
 
     u32 time_started() { return time_state_started; }
-
     virtual bool check_control_start_conditions(ControlCom::EControlType type);
 
 // Lain: added
@@ -52,7 +49,6 @@ protected:
     void add_state(u32 state_id, CSState* s);
 
     virtual void setup_substates() {}
-
     EMonsterState get_state_type();
 
     u32 current_substate;

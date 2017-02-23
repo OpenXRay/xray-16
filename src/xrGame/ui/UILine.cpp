@@ -28,9 +28,7 @@ void dump_list_lines()
         Msg("--leak detected ---- Line = %d", (*_it).num);
 }
 #else
-void dump_list_lines()
-{
-}
+void dump_list_lines() {}
 #endif
 
 CUILine::CUILine()
@@ -53,13 +51,15 @@ CUILine::~CUILine()
     bool bOK = false;
     for (; _it != dbg_list_lines.end(); ++_it)
     {
-        if ((*_it).wnd == this) {
+        if ((*_it).wnd == this)
+        {
             bOK = true;
             dbg_list_lines.erase(_it);
             break;
         }
     }
-    if (!bOK) Msg("CUILine::~CUILine()!!!!!!!!!!!!!!!!!!!!!!! cannot find window in list");
+    if (!bOK)
+        Msg("CUILine::~CUILine()!!!!!!!!!!!!!!!!!!!!!!! cannot find window in list");
 #endif
 }
 
@@ -98,16 +98,8 @@ void CUILine::AddSubLine(const char* str, u32 color)
     m_subLines.push_back(sline);
 }
 
-void CUILine::AddSubLine(const CUISubLine* subLine)
-{
-    m_subLines.push_back(*subLine);
-}
-
-void CUILine::Clear()
-{
-    m_subLines.clear();
-}
-
+void CUILine::AddSubLine(const CUISubLine* subLine) { m_subLines.push_back(*subLine); }
+void CUILine::Clear() { m_subLines.clear(); }
 void CUILine::ProcessNewLines()
 {
     for (u32 i = 0; i < m_subLines.size(); i++)
@@ -116,13 +108,16 @@ void CUILine::ProcessNewLines()
         //		if (pos != npos)
         //			pos = m_subLines[i].m_text.find('\r');
 
-        if (pos != npos) {
+        if (pos != npos)
+        {
             CUISubLine sbLine;
-            if (pos) sbLine = *m_subLines[i].Cut2Pos((int)pos - 1);
+            if (pos)
+                sbLine = *m_subLines[i].Cut2Pos((int)pos - 1);
             sbLine.m_last_in_line = true;
             m_subLines.insert(m_subLines.begin() + i, sbLine);
             m_subLines[i + 1].m_text.erase(0, 2);
-            if (m_subLines[i + 1].m_text.empty()) {
+            if (m_subLines[i + 1].m_text.empty())
+            {
                 m_subLines.erase(m_subLines.begin() + i + 1);
             }
         }
@@ -137,7 +132,7 @@ void CUILine::Draw(CGameFont* pFont, float x, float y) const
     for (int i = 0; i < size; i++)
     {
         m_subLines[i].Draw(pFont, x + length, y);
-        float ll = pFont->SizeOf_(m_subLines[i].m_text.c_str());  //. all ok
+        float ll = pFont->SizeOf_(m_subLines[i].m_text.c_str()); //. all ok
         UI().ClientToScreenScaledWidth(ll);
         length += ll;
     }
@@ -177,7 +172,7 @@ const CUILine* CUILine::Cut2Pos(Position& pos, bool to_first)
     {
         m_tmpLine->AddSubLine(&m_subLines[i]);
 
-        if (m_subLines[i].m_last_in_line)  // check if this subline must be last in line
+        if (m_subLines[i].m_last_in_line) // check if this subline must be last in line
         {
             for (int j = 0; j <= i; j++)
                 m_subLines.erase(m_subLines.begin());

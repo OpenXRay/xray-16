@@ -12,7 +12,6 @@ class tnet_execution_base<et_mu_ref_light>::net_execution_impl
 
 public:
     net_execution_impl() : mu_ref_id(u32(-1)) {}
-
     void construct(u32 id) { mu_ref_id = id; }
     void send_task(IGenericStream* outStream);
     void receive_result(IGenericStream* inStream);

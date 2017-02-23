@@ -16,8 +16,8 @@ enum
 class dcTriListCollider;
 class dcTriListCollider
 {
-    dxGeom* Geometry;     // The geom object
-    dxTriList* GeomData;  // Buffered pointer to classdata
+    dxGeom* Geometry; // The geom object
+    dxTriList* GeomData; // Buffered pointer to classdata
 
     xr_vector<Triangle> pos_tries;
     xr_vector<Triangle> neg_tries;
@@ -100,9 +100,12 @@ IC void dcTriListCollider::VxToGlClTriState(u32 v, CDB::TRI* T_array)
     {
         u32* verts = T_array[*LI].verts;
         flags8& state = gl_cl_tries_state[LI - B];
-        if (verts[0] == v) state.set(fl_engaged_v0, TRUE);
-        if (verts[1] == v) state.set(fl_engaged_v1, TRUE);
-        if (verts[2] == v) state.set(fl_engaged_v2, TRUE);
+        if (verts[0] == v)
+            state.set(fl_engaged_v0, TRUE);
+        if (verts[1] == v)
+            state.set(fl_engaged_v1, TRUE);
+        if (verts[2] == v)
+            state.set(fl_engaged_v2, TRUE);
     }
 }
 IC void dcTriListCollider::SideToGlClTriState(u32 v0, u32 v1, CDB::TRI* T_array)
@@ -113,10 +116,13 @@ IC void dcTriListCollider::SideToGlClTriState(u32 v0, u32 v1, CDB::TRI* T_array)
     {
         u32* verts = T_array[*LI].verts;
         flags8& state = gl_cl_tries_state[LI - B];
-        if (verts[0] == v1 && verts[1] == v0) state.set(fl_engaged_s0, TRUE);
-        if (verts[1] == v1 && verts[2] == v0) state.set(fl_engaged_s1, TRUE);
-        if (verts[2] == v1 && verts[0] == v0) state.set(fl_engaged_s2, TRUE);
+        if (verts[0] == v1 && verts[1] == v0)
+            state.set(fl_engaged_s0, TRUE);
+        if (verts[1] == v1 && verts[2] == v0)
+            state.set(fl_engaged_s1, TRUE);
+        if (verts[2] == v1 && verts[0] == v0)
+            state.set(fl_engaged_s2, TRUE);
     }
 }
 
-#endif  //__DCTRILISTCOLLIDER_INCLUDED__(
+#endif //__DCTRILISTCOLLIDER_INCLUDED__(

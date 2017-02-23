@@ -10,12 +10,12 @@
 static const u32 s_arena_size = (128 + 16) * 1024 * 1024;
 static char s_fake_array[s_arena_size];
 doug_lea_allocator g_collision_allocator(s_fake_array, s_arena_size, "collision");
-#endif  // #ifdef USE_ARENA_ALLOCATOR
+#endif // #ifdef USE_ARENA_ALLOCATOR
 
 namespace Opcode
 {
 #include "OPC_TreeBuilders.h"
-}  // namespace Opcode
+} // namespace Opcode
 
 using namespace CDB;
 using namespace Opcode;
@@ -36,7 +36,7 @@ BOOL APIENTRY DllMain(HANDLE hModule, u32 ul_reason_for_call, LPVOID lpReserved)
 MODEL::MODEL()
 #ifdef CONFIG_PROFILE_LOCKS
     : cs(MUTEX_PROFILE_ID(MODEL))
-#endif  // CONFIG_PROFILE_LOCKS
+#endif // CONFIG_PROFILE_LOCKS
 {
     tree = 0;
     tris = 0;
@@ -47,7 +47,7 @@ MODEL::MODEL()
 }
 MODEL::~MODEL()
 {
-    syncronize();  // maybe model still in building
+    syncronize(); // maybe model still in building
     status = S_INIT;
     CDELETE(tree);
     CFREE(tris);
@@ -88,7 +88,8 @@ void MODEL::build(Fvector* V, int Vcnt, TRI* T, int Tcnt, build_callback* bc, vo
 #ifdef _EDITOR
     build_internal(V, Vcnt, T, Tcnt, bc, bcp);
 #else
-    if (!strstr(Core.Params, "-mt_cdb")) {
+    if (!strstr(Core.Params, "-mt_cdb"))
+    {
         build_internal(V, Vcnt, T, Tcnt, bc, bcp);
         status = S_READY;
     }
@@ -115,14 +116,16 @@ void MODEL::build_internal(Fvector* V, int Vcnt, TRI* T, int Tcnt, build_callbac
     CopyMemory(tris, T, tris_count * sizeof(TRI));
 
     // callback
-    if (bc) bc(verts, Vcnt, tris, Tcnt, bcp);
+    if (bc)
+        bc(verts, Vcnt, tris, Tcnt, bcp);
 
     // Release data pointers
     status = S_BUILD;
 
     // Allocate temporary "OPCODE" tris + convert tris to 'pointer' form
     u32* temp_tris = CALLOC(u32, tris_count * 3);
-    if (0 == temp_tris) {
+    if (0 == temp_tris)
+    {
         CFREE(verts);
         CFREE(tris);
         return;
@@ -147,7 +150,8 @@ void MODEL::build_internal(Fvector* V, int Vcnt, TRI* T, int Tcnt, build_callbac
     // if (Memory.debug_mode) OPCC.KeepOriginal = true;
 
     tree = CNEW(OPCODE_Model)();
-    if (!tree->Build(OPCC)) {
+    if (!tree->Build(OPCC))
+    {
         CFREE(verts);
         CFREE(tris);
         CFREE(temp_tris);
@@ -161,7 +165,8 @@ void MODEL::build_internal(Fvector* V, int Vcnt, TRI* T, int Tcnt, build_callbac
 
 u32 MODEL::memory()
 {
-    if (S_BUILD == status) {
+    if (S_BUILD == status)
+    {
         Msg("! xrCDB: model still isn't ready");
         return 0;
     }
@@ -179,18 +184,11 @@ COLLIDER::COLLIDER()
     frustum_mode = 0;
 }
 
-COLLIDER::~COLLIDER()
-{
-    r_free();
-}
-
+COLLIDER::~COLLIDER() { r_free(); }
 RESULT& COLLIDER::r_add()
 {
     rd.push_back(RESULT());
     return rd.back();
 }
 
-void COLLIDER::r_free()
-{
-    rd.clear_and_free();
-}
+void COLLIDER::r_free() { rd.clear_and_free(); }

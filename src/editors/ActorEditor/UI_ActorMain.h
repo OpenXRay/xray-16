@@ -36,7 +36,7 @@ class CActorMain : public TUI
     virtual void RealUpdateScene();
     virtual void RealQuit();
 
-  public:
+public:
     CActorMain();
     virtual ~CActorMain();
 
@@ -51,9 +51,7 @@ class CActorMain : public TUI
     virtual void OutInfo();
 
     virtual LPCSTR EditorName() { return "actor"; }
-
     virtual LPCSTR EditorDesc() { return "Actor Editor"; }
-
     virtual bool ApplyShortCut(WORD Key, TShiftState Shift);
     virtual bool ApplyGlobalShortCut(WORD Key, TShiftState Shift);
 
@@ -67,9 +65,8 @@ class CAEPreferences : public CCustomPreferences
 {
     typedef CCustomPreferences inherited;
 
-  public:
+public:
     CAEPreferences() : bAlwaysShowKeyBar12(FALSE), bAlwaysShowKeyBar34(FALSE) {}
-
     BOOL bAlwaysShowKeyBar12;
     BOOL bAlwaysShowKeyBar34;
 

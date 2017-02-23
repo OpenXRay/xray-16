@@ -130,7 +130,8 @@ void CPoltergeist::Load(LPCSTR section)
 
     LPCSTR polter_type = pSettings->r_string(section, "type");
 
-    if (xr_strcmp(polter_type, "flamer") == 0) {
+    if (xr_strcmp(polter_type, "flamer") == 0)
+    {
         m_flame = new CPolterFlame(this);
         m_flame->load(section);
     }
@@ -163,14 +164,11 @@ float CPoltergeist::get_post_process_factor() const
     return factor;
 }
 
-bool CPoltergeist::check_work_condition() const
-{
-    return g_Alive() && Actor() && Actor()->g_Alive();
-}
-
+bool CPoltergeist::check_work_condition() const { return g_Alive() && Actor() && Actor()->g_Alive(); }
 void CPoltergeist::remove_pp_effector()
 {
-    if (m_detection_pp_type_index != 0 && Actor()) {
+    if (m_detection_pp_type_index != 0 && Actor())
+    {
         RemoveEffector(Actor(), m_detection_pp_type_index);
         m_detection_pp_type_index = 0;
     }
@@ -178,7 +176,8 @@ void CPoltergeist::remove_pp_effector()
 
 void CPoltergeist::update_detection()
 {
-    if (!check_work_condition()) {
+    if (!check_work_condition())
+    {
         remove_pp_effector();
         return;
     }
@@ -196,7 +195,7 @@ void CPoltergeist::update_detection()
     {
         float const relative_range = dist2actor / get_detection_far_range();
         float const range_factor = relative_range * get_detection_far_range_factor() +
-                                   (1.f - relative_range) * get_detection_near_range_factor();
+            (1.f - relative_range) * get_detection_near_range_factor();
 
         float const speed_factor = get_detection_speed_factor();
         float const raw_speed = m_last_actor_pos.distance_to(actor_pos) / time_passed_sec;
@@ -210,14 +209,18 @@ void CPoltergeist::update_detection()
     m_current_detection_level -= time_passed_sec * get_detection_loose_speed();
     m_current_detection_level = (m_current_detection_level < 0) ? 0.f : m_current_detection_level;
 
-    if (m_current_detection_level > m_detection_max_level) m_current_detection_level = m_detection_max_level;
+    if (m_current_detection_level > m_detection_max_level)
+        m_current_detection_level = m_detection_max_level;
 
-    if (time_passed_sec != 0.f) m_last_actor_pos = actor_pos;
+    if (time_passed_sec != 0.f)
+        m_last_actor_pos = actor_pos;
 
     SetActorVisibility(ID(), get_post_process_factor());
 
-    if (m_current_detection_level > 0.01f && m_detection_pp_effector_name && m_detection_pp_effector_name[0]) {
-        if (!m_detection_pp_type_index) {
+    if (m_current_detection_level > 0.01f && m_detection_pp_effector_name && m_detection_pp_effector_name[0])
+    {
+        if (!m_detection_pp_type_index)
+        {
             for (m_detection_pp_type_index = (u32)effPoltergeistTeleDetectStartEffect;
                  Actor()->Cameras().GetPPEffector((EEffectorPPType)m_detection_pp_type_index);
                  ++m_detection_pp_type_index)
@@ -236,11 +239,7 @@ void CPoltergeist::update_detection()
     }
 }
 
-bool CPoltergeist::detected_enemy()
-{
-    return get_current_detection_level() > m_fly_around_level;
-}
-
+bool CPoltergeist::detected_enemy() { return get_current_detection_level() > m_fly_around_level; }
 void CPoltergeist::reload(LPCSTR section)
 {
     inherited::reload(section);
@@ -277,7 +276,8 @@ void CPoltergeist::reinit()
 
 void CPoltergeist::Hide()
 {
-    if (state_invisible) return;
+    if (state_invisible)
+        return;
 
     state_invisible = true;
     setVisible(false);
@@ -290,7 +290,8 @@ void CPoltergeist::Hide()
 
 void CPoltergeist::Show()
 {
-    if (!state_invisible) return;
+    if (!state_invisible)
+        return;
 
     state_invisible = false;
 
@@ -320,7 +321,8 @@ void CPoltergeist::UpdateCL()
 
     ability()->update_frame();
 
-    if (Actor()->memory().visual().visible_now(this) && Actor()->Position().distance_to(Position()) < 85.f) {
+    if (Actor()->memory().visual().visible_now(this) && Actor()->Position().distance_to(Position()) < 85.f)
+    {
         MakeMeCrow();
     }
 
@@ -329,12 +331,14 @@ void CPoltergeist::UpdateCL()
 
 void CPoltergeist::ForceFinalAnimation()
 {
-    if (state_invisible) anim().SetCurAnim(eAnimMiscAction_01);
+    if (state_invisible)
+        anim().SetCurAnim(eAnimMiscAction_01);
 }
 
 void CPoltergeist::shedule_Update(u32 dt)
 {
-    if (!check_work_condition()) {
+    if (!check_work_condition())
+    {
         remove_pp_effector();
     }
 
@@ -349,7 +353,8 @@ void CPoltergeist::shedule_Update(u32 dt)
 
 BOOL CPoltergeist::net_Spawn(CSE_Abstract* DC)
 {
-    if (!inherited::net_Spawn(DC)) return (FALSE);
+    if (!inherited::net_Spawn(DC))
+        return (FALSE);
     VERIFY(character_physics_support());
     VERIFY(character_physics_support()->movement());
     character_physics_support()->movement()->DestroyCharacter();
@@ -394,7 +399,8 @@ void CPoltergeist::Hit(SHit* pHDS)
 {
     ability()->on_hit(pHDS);
 
-    if (pHDS->who == Actor()) {
+    if (pHDS->who == Actor())
+    {
         m_current_detection_level = m_detection_max_level;
     }
 
@@ -403,11 +409,13 @@ void CPoltergeist::Hit(SHit* pHDS)
 
 void CPoltergeist::UpdateHeight()
 {
-    if (!state_invisible) return;
+    if (!state_invisible)
+        return;
 
     u32 cur_time = Device.dwTimeGlobal;
 
-    if (time_height_updated < cur_time) {
+    if (time_height_updated < cur_time)
+    {
         time_height_updated = cur_time + Random.randI(m_height_change_min_time, m_height_change_max_time);
         target_height = Random.randF(m_height_min, m_height_max);
     }
@@ -415,7 +423,8 @@ void CPoltergeist::UpdateHeight()
 
 void CPoltergeist::on_activate()
 {
-    if (m_disable_hide) return;
+    if (m_disable_hide)
+        return;
 
     Hide();
 
@@ -425,7 +434,8 @@ void CPoltergeist::on_activate()
 
 void CPoltergeist::on_deactivate()
 {
-    if (m_disable_hide) return;
+    if (m_disable_hide)
+        return;
 
     Show();
 }
@@ -481,7 +491,8 @@ float CPoltergeist::get_detection_success_level()
 CBaseMonster::SDebugInfo CPoltergeist::show_debug_info()
 {
     CBaseMonster::SDebugInfo info = inherited::show_debug_info();
-    if (!info.active) return CBaseMonster::SDebugInfo();
+    if (!info.active)
+        return CBaseMonster::SDebugInfo();
 
     string128 text;
     xr_sprintf(text, "Invisibility Value = [%f]", Energy::get_value());

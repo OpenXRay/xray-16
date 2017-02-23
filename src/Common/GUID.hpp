@@ -6,9 +6,11 @@ class xrGUID
 public:
     u64 g[2];
 
-    ICF bool operator==(const xrGUID& that) const { return g[0] == that.g[0] && g[1] == that.g[1]; }
+    ICF bool operator==(const xrGUID& that) const
+    { return g[0]==that.g[0] && g[1]==that.g[1]; }
 
-    ICF bool operator!=(const xrGUID& that) const { return !(*this == that); }
+    ICF bool operator!=(const xrGUID& that) const
+    { return !(*this==that); }
 
     ICF void LoadLTX(CInifile& ini, const char* section, const char* name)
     {

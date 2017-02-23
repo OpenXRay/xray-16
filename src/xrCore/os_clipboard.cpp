@@ -11,10 +11,12 @@
 
 void os_clipboard::copy_to_clipboard(LPCSTR buf)
 {
-    if (!OpenClipboard(0)) return;
+    if (!OpenClipboard(0))
+        return;
     u32 handle_size = (xr_strlen(buf) + 1) * sizeof(char);
     HGLOBAL handle = GlobalAlloc(GHND, handle_size);
-    if (!handle) {
+    if (!handle)
+    {
         CloseClipboard();
         return;
     }
@@ -32,10 +34,12 @@ void os_clipboard::paste_from_clipboard(LPSTR buffer, u32 const& buffer_size)
     VERIFY(buffer);
     VERIFY(buffer_size > 0);
 
-    if (!OpenClipboard(0)) return;
+    if (!OpenClipboard(0))
+        return;
 
     HGLOBAL hmem = GetClipboardData(CF_TEXT);
-    if (!hmem) return;
+    if (!hmem)
+        return;
 
     LPCSTR clipdata = (LPCSTR)GlobalLock(hmem);
     strncpy_s(buffer, buffer_size, clipdata, buffer_size - 1);
@@ -43,7 +47,7 @@ void os_clipboard::paste_from_clipboard(LPSTR buffer, u32 const& buffer_size)
     for (u32 i = 0; i < strlen(buffer); ++i)
     {
         char c = buffer[i];
-        if (((isprint(c) == 0) && (c != char(-1))) || c == '\t' || c == '\n')  // "ÿ" = -1
+        if (((isprint(c) == 0) && (c != char(-1))) || c == '\t' || c == '\n') // "ÿ" = -1
         {
             buffer[i] = ' ';
         }
@@ -55,10 +59,12 @@ void os_clipboard::paste_from_clipboard(LPSTR buffer, u32 const& buffer_size)
 
 void os_clipboard::update_clipboard(LPCSTR string)
 {
-    if (!OpenClipboard(0)) return;
+    if (!OpenClipboard(0))
+        return;
 
     HGLOBAL handle = GetClipboardData(CF_TEXT);
-    if (!handle) {
+    if (!handle)
+    {
         CloseClipboard();
         copy_to_clipboard(string);
         return;
@@ -70,9 +76,9 @@ void os_clipboard::update_clipboard(LPCSTR string)
     int buffer_size = (memory_length + string_length + 1) * sizeof(char);
 #ifndef _EDITOR
     LPSTR buffer = (LPSTR)_alloca(buffer_size);
-#else   // #ifndef _EDITOR
+#else // #ifndef _EDITOR
     LPSTR buffer = (LPSTR)xr_alloc<char>(buffer_size);
-#endif  // #ifndef _EDITOR
+#endif // #ifndef _EDITOR
     xr_strcpy(buffer, buffer_size, memory);
     GlobalUnlock(handle);
 
@@ -81,5 +87,5 @@ void os_clipboard::update_clipboard(LPCSTR string)
     copy_to_clipboard(buffer);
 #ifdef _EDITOR
     xr_free(buffer);
-#endif  // #ifdef _EDITOR
+#endif // #ifdef _EDITOR
 }

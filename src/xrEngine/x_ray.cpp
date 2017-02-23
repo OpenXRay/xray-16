@@ -23,7 +23,7 @@ extern CRenderDevice Device;
 
 #ifdef MASTER_GOLD
 #define NO_MULTI_INSTANCES
-#endif  // #ifdef MASTER_GOLD
+#endif // #ifdef MASTER_GOLD
 
 //////////////////////////////////////////////////////////////////////////
 struct _SoundProcessor : public pureFrame
@@ -38,7 +38,7 @@ struct _SoundProcessor : public pureFrame
 LPCSTR _GetFontTexName(LPCSTR section)
 {
     static const char* tex_names[] = {"texture800", "texture", "texture1600"};
-    int def_idx = 1;  // default 1024x768
+    int def_idx = 1; // default 1024x768
     int idx = def_idx;
 
 #if 0
@@ -60,7 +60,8 @@ LPCSTR _GetFontTexName(LPCSTR section)
 
     while (idx >= 0)
     {
-        if (pSettings->line_exist(section, tex_names[idx])) return pSettings->r_string(section, tex_names[idx]);
+        if (pSettings->line_exist(section, tex_names[idx]))
+            return pSettings->r_string(section, tex_names[idx]);
         --idx;
     }
     return pSettings->r_string(section, tex_names[def_idx]);
@@ -72,20 +73,23 @@ void _InitializeFont(CGameFont*& F, LPCSTR section, u32 flags)
     R_ASSERT(font_tex_name);
 
     LPCSTR sh_name = pSettings->r_string(section, "shader");
-    if (!F) {
+    if (!F)
+    {
         F = new CGameFont(sh_name, font_tex_name, flags);
     }
     else
         F->Initialize(sh_name, font_tex_name);
 
-    if (pSettings->line_exist(section, "size")) {
+    if (pSettings->line_exist(section, "size"))
+    {
         float sz = pSettings->r_float(section, "size");
         if (flags & CGameFont::fsDeviceIndependent)
             F->SetHeightI(sz);
         else
             F->SetHeight(sz);
     }
-    if (pSettings->line_exist(section, "interval")) F->SetInterval(pSettings->r_fvector2(section, "interval"));
+    if (pSettings->line_exist(section, "interval"))
+        F->SetInterval(pSettings->r_fvector2(section, "interval"));
 }
 
 CApplication::CApplication()
@@ -149,7 +153,8 @@ CApplication::~CApplication()
 
 void CApplication::OnEvent(EVENT E, u64 P1, u64 P2)
 {
-    if (E == eQuit) {
+    if (E == eQuit)
+    {
         g_SASH.EndBenchmark();
 
         PostQuitMessage(0);
@@ -190,13 +195,15 @@ void CApplication::OnEvent(EVENT E, u64 P1, u64 P2)
         ls_tip_number[0] = '\0';
         ls_tip[0] = '\0';
 
-        if (g_pGameLevel) {
+        if (g_pGameLevel)
+        {
             Console->Hide();
             g_pGameLevel->net_Stop();
             DEL_INSTANCE(g_pGameLevel);
             Console->Show();
 
-            if ((FALSE == Engine.Event.Peek("KERNEL:quit")) && (FALSE == Engine.Event.Peek("KERNEL:start"))) {
+            if ((FALSE == Engine.Event.Peek("KERNEL:quit")) && (FALSE == Engine.Event.Peek("KERNEL:start")))
+            {
                 Console->Execute("main_menu off");
                 Console->Execute("main_menu on");
             }
@@ -230,7 +237,7 @@ void CApplication::OnEvent(EVENT E, u64 P1, u64 P2)
         //-----------------------------------------------------------
 
         LoadBegin();
-        g_pGamePersistent->Start("");  // server_options.c_str()); - no prefetch !
+        g_pGamePersistent->Start(""); // server_options.c_str()); - no prefetch !
         g_pGameLevel->net_StartPlayDemo();
         LoadEnd();
 
@@ -243,7 +250,8 @@ static CTimer phase_timer;
 void CApplication::LoadBegin()
 {
     ll_dwReference++;
-    if (1 == ll_dwReference) {
+    if (1 == ll_dwReference)
+    {
         loaded = false;
 
 #ifndef DEDICATED_SERVER
@@ -259,7 +267,8 @@ void CApplication::LoadBegin()
 void CApplication::LoadEnd()
 {
     ll_dwReference--;
-    if (0 == ll_dwReference) {
+    if (0 == ll_dwReference)
+    {
         Msg("* phase time: %d ms", phase_timer.GetElapsed_ms());
         Msg("* phase cmem: %d K", Memory.mem_usage() / 1024);
         Console->Execute("stat_memory");
@@ -278,11 +287,13 @@ void CApplication::destroy_loading_shaders()
 
 void CApplication::LoadDraw()
 {
-    if (loaded) return;
+    if (loaded)
+        return;
 
     Device.dwFrame += 1;
 
-    if (!Device.Begin()) return;
+    if (!Device.Begin())
+        return;
 
     if (g_dedicated_server)
         Console->OnRender();
@@ -314,17 +325,15 @@ void CApplication::LoadStage()
     LoadDraw();
 }
 
-void CApplication::LoadSwitch()
-{
-}
-
+void CApplication::LoadSwitch() {}
 // Sequential
 void CApplication::OnFrame()
 {
     Engine.Event.OnFrame();
     g_SpatialSpace->update();
     g_SpatialSpacePhysic->update();
-    if (g_pGameLevel) g_pGameLevel->SoundEvent_Dispatch();
+    if (g_pGameLevel)
+        g_pGameLevel->SoundEvent_Dispatch();
 }
 
 void CApplication::Level_Append(LPCSTR folder)
@@ -367,7 +376,8 @@ void gen_logo_name(string_path& dest, LPCSTR level_name, int num)
     strconcat(sizeof(dest), dest, "intro\\intro_", level_name);
 
     u32 len = xr_strlen(dest);
-    if (dest[len - 1] == '\\') dest[len - 1] = 0;
+    if (dest[len - 1] == '\\')
+        dest[len - 1] = 0;
 
     string16 buff;
     xr_strcat(dest, sizeof(dest), "_");
@@ -376,12 +386,14 @@ void gen_logo_name(string_path& dest, LPCSTR level_name, int num)
 
 void CApplication::Level_Set(u32 L)
 {
-    if (L >= Levels.size()) return;
+    if (L >= Levels.size())
+        return;
     FS.get_path("$level$")->_set(Levels[L].folder);
 
     static string_path path;
 
-    if (Level_Current != L) {
+    if (Level_Current != L)
+    {
         path[0] = 0;
 
         Level_Current = L;
@@ -397,13 +409,15 @@ void CApplication::Level_Set(u32 L)
                 break;
         }
 
-        if (count) {
+        if (count)
+        {
             int num = ::Random.randI(count);
             gen_logo_name(path, Levels[L].folder, num);
         }
     }
 
-    if (path[0]) m_pRender->setLevelLogo(path);
+    if (path[0])
+        m_pRender->setLevelLogo(path);
 }
 
 int CApplication::Level_ID(LPCSTR name, LPCSTR ver, bool bSet)
@@ -416,31 +430,37 @@ int CApplication::Level_ID(LPCSTR name, LPCSTR ver, bool bSet)
     for (; it != it_e; ++it)
     {
         CLocatorAPI::archive& A = *it;
-        if (A.hSrcFile == NULL) {
+        if (A.hSrcFile == NULL)
+        {
             LPCSTR ln = A.header->r_string("header", "level_name");
             LPCSTR lv = A.header->r_string("header", "level_ver");
-            if (0 == stricmp(ln, name) && 0 == stricmp(lv, ver)) {
+            if (0 == stricmp(ln, name) && 0 == stricmp(lv, ver))
+            {
                 FS.LoadArchive(A);
                 arch_res = true;
             }
         }
     }
 
-    if (arch_res) Level_Scan();
+    if (arch_res)
+        Level_Scan();
 
     string256 buffer;
     strconcat(sizeof(buffer), buffer, name, "\\");
     for (u32 I = 0; I < Levels.size(); ++I)
     {
-        if (0 == stricmp(buffer, Levels[I].folder)) {
+        if (0 == stricmp(buffer, Levels[I].folder))
+        {
             result = int(I);
             break;
         }
     }
 
-    if (bSet && result != -1) Level_Set(result);
+    if (bSet && result != -1)
+        Level_Set(result);
 
-    if (arch_res) g_pGamePersistent->OnAssetsChanged();
+    if (arch_res)
+        g_pGamePersistent->OnAssetsChanged();
     return result;
 }
 
@@ -455,7 +475,8 @@ CInifile* CApplication::GetArchiveHeader(LPCSTR name, LPCSTR ver)
 
         LPCSTR ln = A.header->r_string("header", "level_name");
         LPCSTR lv = A.header->r_string("header", "level_ver");
-        if (0 == stricmp(ln, name) && 0 == stricmp(lv, ver)) {
+        if (0 == stricmp(ln, name) && 0 == stricmp(lv, ver))
+        {
             return A.header;
         }
     }
@@ -464,14 +485,12 @@ CInifile* CApplication::GetArchiveHeader(LPCSTR name, LPCSTR ver)
 
 void CApplication::LoadAllArchives()
 {
-    if (FS.load_all_unloaded_archives()) {
+    if (FS.load_all_unloaded_archives())
+    {
         Level_Scan();
         g_pGamePersistent->OnAssetsChanged();
     }
 }
 
 #pragma optimize("g", off)
-void CApplication::load_draw_internal()
-{
-    m_pRender->load_draw_internal(*this);
-}
+void CApplication::load_draw_internal() { m_pRender->load_draw_internal(*this); }

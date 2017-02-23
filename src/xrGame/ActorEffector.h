@@ -19,7 +19,6 @@ protected:
 public:
     CActorCameraManager() : inherited(false) {}
     virtual ~CActorCameraManager() {}
-
     IC void hud_camera_Matrix(Fmatrix& M)
     {
         M.set(m_cam_info_hud.r, m_cam_info_hud.n, m_cam_info_hud.d, m_cam_info_hud.p);
@@ -70,7 +69,6 @@ public:
     void SetCyclic(bool b) { m_bCyclic = b; }
     virtual BOOL Valid();
     float GetAnimatorLength() { return fLifeTime; };
-
     virtual bool AbsolutePositioning() { return m_bAbsolutePositioning; }
 };
 
@@ -128,8 +126,8 @@ class SndShockEffector : public CEffectorController
     typedef CEffectorController inherited;
 
 public:
-    float m_snd_length;  // ms
-    float m_cur_length;  // ms
+    float m_snd_length; // ms
+    float m_cur_length; // ms
     float m_stored_volume;
     float m_end_time;
     float m_life_time;

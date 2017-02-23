@@ -23,7 +23,8 @@ void CTelekinesis<_Object>::InitExtern(_Object* pO, float s, float h, u32 keep_t
 template <typename _Object>
 void CTelekinesis<_Object>::Activate()
 {
-    if (active) return;
+    if (active)
+        return;
     VERIFY(objects.empty());
 
     active = true;
@@ -37,7 +38,8 @@ void CTelekinesis<_Object>::Activate()
     for (u32 i = 0; i < m_nearest.size(); i++)
     {
         CGameObject* obj = smart_cast<CGameObject*>(m_nearest[i]);
-        if (!obj || !obj->m_pPhysicsShell) continue;
+        if (!obj || !obj->m_pPhysicsShell)
+            continue;
 
         // отключить гравитацию
         obj->m_pPhysicsShell->set_ApplyByGravity(FALSE);
@@ -49,7 +51,8 @@ void CTelekinesis<_Object>::Activate()
         objects.push_back(tele_object);
     }
 
-    if (!objects.empty()) CPHUpdateObject::Activate();
+    if (!objects.empty())
+        CPHUpdateObject::Activate();
 }
 
 template <typename _Object>
@@ -70,7 +73,8 @@ void CTelekinesis<_Object>::Deactivate()
 template <typename _Object>
 void CTelekinesis<_Object>::Throw(const Fvector& target)
 {
-    if (!active) return;
+    if (!active)
+        return;
 
     for (u32 i = 0; i < objects.size(); i++)
     {
@@ -83,7 +87,8 @@ void CTelekinesis<_Object>::Throw(const Fvector& target)
 template <typename _Object>
 void CTelekinesis<_Object>::UpdateSched()
 {
-    if (!active) return;
+    if (!active)
+        return;
 
     // обновить состояние объектов
     for (u32 i = 0; i < objects.size(); i++)
@@ -92,15 +97,19 @@ void CTelekinesis<_Object>::UpdateSched()
         switch (cur_obj->get_state())
         {
         case TS_Raise:
-            if (cur_obj->check_height()) cur_obj->prepare_keep();  // начать удержание предмета
+            if (cur_obj->check_height())
+                cur_obj->prepare_keep(); // начать удержание предмета
             break;
         case TS_Keep:
-            if (cur_obj->time_keep_elapsed()) {
+            if (cur_obj->time_keep_elapsed())
+            {
                 cur_obj->release();
 
                 // удалить объект из массива
-                if (objects.size() > 1) {
-                    if (i != (objects.size() - 1)) objects[i] = objects.back();
+                if (objects.size() > 1)
+                {
+                    if (i != (objects.size() - 1))
+                        objects[i] = objects.back();
                     objects.pop_back();
                 }
                 else
@@ -118,7 +127,8 @@ void CTelekinesis<_Object>::UpdateSched()
 template <typename _Object>
 void CTelekinesis<_Object>::PhDataUpdate(dReal step)
 {
-    if (!active) return;
+    if (!active)
+        return;
 
     for (u32 i = 0; i < objects.size(); i++)
     {

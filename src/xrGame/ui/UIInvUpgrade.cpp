@@ -38,17 +38,13 @@ UIUpgrade::UIUpgrade(CUIInventoryUpgradeWnd* parent_wnd) : m_point(NULL)
     Reset();
 }
 
-UIUpgrade::~UIUpgrade()
-{
-    xr_delete(m_point);
-}
-
+UIUpgrade::~UIUpgrade() { xr_delete(m_point); }
 void UIUpgrade::init_upgrade(LPCSTR upgrade_id, CInventoryItem& item)
 {
     VERIFY(upgrade_id && xr_strcmp(upgrade_id, ""));
     m_upgrade_id = upgrade_id;
 
-    m_prev_state = STATE_COUNT;  // no defined
+    m_prev_state = STATE_COUNT; // no defined
     update_item(&item);
 }
 
@@ -76,7 +72,7 @@ void UIUpgrade::Reset()
 void UIUpgrade::load_from_xml(CUIXml& ui_xml, int i_column, int i_cell, Frect const& t_cell_item)
 {
     m_scheme_index.x = i_column;
-    m_scheme_index.y = i_cell;  // row
+    m_scheme_index.y = i_cell; // row
 
     CUIXmlInit::InitWindow(ui_xml, "cell", i_cell, this);
 
@@ -111,7 +107,8 @@ void UIUpgrade::set_texture(Layer layer, LPCSTR texture)
         break;
     case LAYER_COLOR:
     {
-        if (texture) {
+        if (texture)
+        {
             m_color->InitTexture(texture);
             m_color->Show(true);
         }
@@ -127,7 +124,8 @@ void UIUpgrade::set_texture(Layer layer, LPCSTR texture)
 
 void UIUpgrade::Draw()
 {
-    if (get_upgrade()) inherited::Draw();
+    if (get_upgrade())
+        inherited::Draw();
 }
 
 void UIUpgrade::Update()
@@ -136,7 +134,8 @@ void UIUpgrade::Update()
 
     update_upgrade_state();
 
-    if (m_prev_state != m_state) {
+    if (m_prev_state != m_state)
+    {
         update_mask();
     }
 
@@ -145,7 +144,8 @@ void UIUpgrade::Update()
 
 void UIUpgrade::update_upgrade_state()
 {
-    if (m_bCursorOverWindow || m_point->CursorOverWindow()) {
+    if (m_bCursorOverWindow || m_point->CursorOverWindow())
+    {
         on_over_window();
     }
     else
@@ -153,7 +153,8 @@ void UIUpgrade::update_upgrade_state()
         m_button_state = BUTTON_FREE;
     }
 
-    if (m_state_lock) {
+    if (m_state_lock)
+    {
         return;
     }
 
@@ -174,14 +175,16 @@ void UIUpgrade::update_upgrade_state()
         break;
     case BUTTON_PRESSED:
     case BUTTON_DPRESSED:
-        if (m_state == STATE_ENABLED || m_state == STATE_FOCUSED) m_state = STATE_TOUCHED;
+        if (m_state == STATE_ENABLED || m_state == STATE_FOCUSED)
+            m_state = STATE_TOUCHED;
         break;
     }
 }
 
 void UIUpgrade::update_mask()
 {
-    if (m_state < STATE_ENABLED || STATE_COUNT <= m_state) {
+    if (m_state < STATE_ENABLED || STATE_COUNT <= m_state)
+    {
         R_ASSERT2(0, "Unknown state UIUpgrade!");
     }
 
@@ -192,25 +195,31 @@ void UIUpgrade::update_mask()
 
 bool UIUpgrade::OnMouseAction(float x, float y, EUIMessages mouse_action)
 {
-    if (inherited::OnMouseAction(x, y, mouse_action)) return true;
+    if (inherited::OnMouseAction(x, y, mouse_action))
+        return true;
 
-    if (m_bCursorOverWindow || m_point->CursorOverWindow()) {
+    if (m_bCursorOverWindow || m_point->CursorOverWindow())
+    {
         highlight_relation(true);
-        if (mouse_action == WINDOW_LBUTTON_DOWN) {
+        if (mouse_action == WINDOW_LBUTTON_DOWN)
+        {
             OnClick();
             return true;
         }
-        if (mouse_action == WINDOW_LBUTTON_DB_CLICK) {
+        if (mouse_action == WINDOW_LBUTTON_DB_CLICK)
+        {
             OnDbClick();
             return true;
         }
-        if (mouse_action == WINDOW_RBUTTON_DOWN) {
+        if (mouse_action == WINDOW_RBUTTON_DOWN)
+        {
             OnRClick();
             return true;
         }
-    }  // m_bCursorOverWindow
+    } // m_bCursorOverWindow
 
-    if (mouse_action == WINDOW_LBUTTON_UP || mouse_action == WINDOW_RBUTTON_UP) {
+    if (mouse_action == WINDOW_LBUTTON_UP || mouse_action == WINDOW_RBUTTON_UP)
+    {
         m_button_state = BUTTON_FREE;
         return true;
     }
@@ -236,7 +245,8 @@ void UIUpgrade::OnFocusLost()
 
 void UIUpgrade::OnClick()
 {
-    if (m_state == STATE_ENABLED || m_state == STATE_FOCUSED || m_state == STATE_TOUCHED) {
+    if (m_state == STATE_ENABLED || m_state == STATE_FOCUSED || m_state == STATE_TOUCHED)
+    {
         m_parent_wnd->AskUsing(
             make_string("%s %s", CStringTable().translate("st_upgrade_install").c_str(), get_upgrade()->name()).c_str(),
             get_upgrade()->id_str());
@@ -263,7 +273,8 @@ void UIUpgrade::OnRClick()
 
 void UIUpgrade::on_over_window()
 {
-    if (m_button_state == BUTTON_PRESSED) {
+    if (m_button_state == BUTTON_PRESSED)
+    {
         return;
     }
 
@@ -273,7 +284,8 @@ void UIUpgrade::on_over_window()
 
 void UIUpgrade::highlight_relation(bool enable)
 {
-    if (enable) {
+    if (enable)
+    {
         m_parent_wnd->HighlightHierarchy(get_upgrade()->id());
         return;
     }
@@ -282,7 +294,8 @@ void UIUpgrade::highlight_relation(bool enable)
 
 void UIUpgrade::update_item(CInventoryItem* inv_item)
 {
-    if (!inv_item) {
+    if (!inv_item)
+    {
         return;
     }
     VERIFY(get_upgrade());
@@ -302,7 +315,7 @@ void UIUpgrade::update_item(CInventoryItem* inv_item)
         m_state = STATE_UNKNOWN;
         m_state_lock = true;
         break;
-    case inventory::upgrade::result_e_installed:  // has_upgrade
+    case inventory::upgrade::result_e_installed: // has_upgrade
         m_item->SetTextureColor(color_rgba(255, 255, 255, 255));
         m_state = STATE_SELECTED;
         m_state_lock = true;
@@ -343,10 +356,7 @@ CUIUpgradePoint::CUIUpgradePoint(UIUpgrade* upgr)
     m_parent_upgrade = upgr;
 }
 
-CUIUpgradePoint::~CUIUpgradePoint()
-{
-}
-
+CUIUpgradePoint::~CUIUpgradePoint() {}
 void CUIUpgradePoint::load_from_xml(CUIXml& ui_xml, int i_cell)
 {
     float point_x = ui_xml.ReadAttribFlt("cell", i_cell, "point_x", 0.0f);
@@ -358,23 +368,29 @@ void CUIUpgradePoint::load_from_xml(CUIXml& ui_xml, int i_cell)
 }
 bool CUIUpgradePoint::OnMouseAction(float x, float y, EUIMessages mouse_action)
 {
-    if (inherited::OnMouseAction(x, y, mouse_action)) return true;
-    if (m_bCursorOverWindow) {
+    if (inherited::OnMouseAction(x, y, mouse_action))
+        return true;
+    if (m_bCursorOverWindow)
+    {
         m_parent_upgrade->highlight_relation(true);
-        if (mouse_action == WINDOW_LBUTTON_DOWN) {
+        if (mouse_action == WINDOW_LBUTTON_DOWN)
+        {
             m_parent_upgrade->OnClick();
             return true;
         }
-        if (mouse_action == WINDOW_LBUTTON_DB_CLICK) {
+        if (mouse_action == WINDOW_LBUTTON_DB_CLICK)
+        {
             m_parent_upgrade->OnDbClick();
             return true;
         }
-        if (mouse_action == WINDOW_RBUTTON_DOWN) {
+        if (mouse_action == WINDOW_RBUTTON_DOWN)
+        {
             m_parent_upgrade->OnRClick();
             return true;
         }
     }
-    if (mouse_action == WINDOW_LBUTTON_UP || mouse_action == WINDOW_RBUTTON_UP) {
+    if (mouse_action == WINDOW_LBUTTON_UP || mouse_action == WINDOW_RBUTTON_UP)
+    {
         m_parent_upgrade->set_button_state(UIUpgrade::BUTTON_FREE);
         return true;
     }

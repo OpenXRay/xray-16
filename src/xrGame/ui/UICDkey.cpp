@@ -33,15 +33,18 @@ struct inappropriate_characters
 {
     inline bool operator()(char const character) const
     {
-        if ((character >= 'a') && (character <= 'z')) return false;
+        if ((character >= 'a') && (character <= 'z'))
+            return false;
 
-        if ((character >= 'A') && (character <= 'Z')) return false;
+        if ((character >= 'A') && (character <= 'Z'))
+            return false;
 
-        if ((character >= '0') && (character <= '9')) return false;
+        if ((character >= '0') && (character <= '9'))
+            return false;
 
         return true;
     }
-};  // struct inappropriate_characters
+}; // struct inappropriate_characters
 
 void CUICDkey::paste_from_clipboard()
 {
@@ -63,7 +66,8 @@ void CUICDkey::Show(bool status)
 void CUICDkey::OnFocusLost()
 {
     inherited::OnFocusLost();
-    if (m_bInputFocus) {
+    if (m_bInputFocus)
+    {
         m_bInputFocus = false;
         GetMessageTarget()->SendMessage(this, EDIT_TEXT_COMMIT, NULL);
     }
@@ -75,7 +79,8 @@ void CUICDkey::Draw()
     LPCSTR edt_str = ec().str_edit();
     u32 edt_size = xr_strlen(edt_str);
 
-    if (edt_size == 0) {
+    if (edt_size == 0)
+    {
         m_view_access = true;
     }
 
@@ -96,7 +101,8 @@ void CUICDkey::Draw()
 
     string64 xx_str = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
     edt_size = xr_strlen(edt_str);
-    if (edt_size > 63) {
+    if (edt_size > 63)
+    {
         edt_size = 63;
     }
     xx_str[edt_size] = 0;
@@ -104,12 +110,14 @@ void CUICDkey::Draw()
     string64 xx_str1 = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
     LPCSTR edt_str1 = ec().str_before_cursor();
     u32 edt_size1 = xr_strlen(edt_str1);
-    if (edt_size1 > 63) {
+    if (edt_size1 > 63)
+    {
         edt_size1 = 63;
     }
     xx_str1[edt_size1] = 0;
 
-    if (m_bInputFocus) {
+    if (m_bInputFocus)
+    {
         LPCSTR res = (m_view_access) ? edt_str : xx_str;
         LPCSTR res1 = (m_view_access) ? edt_str1 : xx_str1;
 
@@ -129,9 +137,12 @@ void CUICDkey::Draw()
         w_tmp = TextItemControl()->m_pFont->SizeOf_("-");
         UI().ClientToScreenScaledWidth(w_tmp);
 
-        if (i > 3) out.x += w_tmp;
-        if (i > 7) out.x += w_tmp;
-        if (i > 11) out.x += w_tmp;
+        if (i > 3)
+            out.x += w_tmp;
+        if (i > 7)
+            out.x += w_tmp;
+        if (i > 11)
+            out.x += w_tmp;
 
         UI().ClientToScreenScaled(out);
         TextItemControl()->m_pFont->Out(out.x, out.y, "_");
@@ -143,11 +154,7 @@ void CUICDkey::Draw()
     TextItemControl()->m_pFont->OnRender();
 }
 
-LPCSTR CUICDkey::GetText()
-{
-    return AddHyphens(inherited::GetText());
-}
-
+LPCSTR CUICDkey::GetText() { return AddHyphens(inherited::GetText()); }
 void CUICDkey::SetCurrentOptValue()
 {
     CUIOptionsItem::SetCurrentOptValue();
@@ -164,34 +171,29 @@ void CUICDkey::SaveOptValue()
     xr_strcpy(gsCDKey, sizeof(gsCDKey), AddHyphens(inherited::GetText()));
     WriteCDKey_ToRegistry(gsCDKey);
 
-    if (MainMenu()->IsCDKeyIsValid()) m_view_access = false;
+    if (MainMenu()->IsCDKeyIsValid())
+        m_view_access = false;
 }
 
-void CUICDkey::SaveBackUpOptValue()  // current->backup
+void CUICDkey::SaveBackUpOptValue() // current->backup
 {
     xr_strcpy(m_opt_backup_value, inherited::GetText());
 }
 
-void CUICDkey::UndoOptValue()  // backup->current
+void CUICDkey::UndoOptValue() // backup->current
 {
     inherited::SetText(m_opt_backup_value);
 }
 
-bool CUICDkey::IsChangedOptValue() const
-{
-    return 0 != xr_strcmp(m_opt_backup_value, inherited::GetText());
-}
-
-void CUICDkey::CreateCDKeyEntry()
-{
-}
-
+bool CUICDkey::IsChangedOptValue() const { return 0 != xr_strcmp(m_opt_backup_value, inherited::GetText()); }
+void CUICDkey::CreateCDKeyEntry() {}
 //=================================================================
 
 void CUIMPPlayerName::OnFocusLost()
 {
     inherited::OnFocusLost();
-    if (m_bInputFocus) {
+    if (m_bInputFocus)
+    {
         m_bInputFocus = false;
         GetMessageTarget()->SendMessage(this, EDIT_TEXT_COMMIT, NULL);
     }
@@ -205,14 +207,16 @@ void CUIMPPlayerName::OnFocusLost()
 void GetCDKey_FromRegistry(char* cdkey)
 {
     ReadRegistry_StrValue(REGISTRY_VALUE_GSCDKEY, cdkey);
-    if (xr_strlen(cdkey) > 64) {
+    if (xr_strlen(cdkey) > 64)
+    {
         cdkey[64] = 0;
     }
 }
 
 void WriteCDKey_ToRegistry(LPSTR cdkey)
 {
-    if (xr_strlen(cdkey) > 64) {
+    if (xr_strlen(cdkey) > 64)
+    {
         cdkey[64] = 0;
     }
     WriteRegistry_StrValue(REGISTRY_VALUE_GSCDKEY, cdkey);
@@ -221,16 +225,19 @@ void WriteCDKey_ToRegistry(LPSTR cdkey)
 void GetPlayerName_FromRegistry(char* name, u32 const name_size)
 {
     string256 new_name;
-    if (!ReadRegistry_StrValue(REGISTRY_VALUE_USERNAME, name)) {
+    if (!ReadRegistry_StrValue(REGISTRY_VALUE_USERNAME, name))
+    {
         name[0] = 0;
         Msg("! Player name registry key (%s) not found !", REGISTRY_VALUE_USERNAME);
         return;
     }
     u32 const max_name_length = GP_UNIQUENICK_LEN - 1;
-    if (xr_strlen(name) > max_name_length) {
+    if (xr_strlen(name) > max_name_length)
+    {
         name[max_name_length] = 0;
     }
-    if (xr_strlen(name) == 0) {
+    if (xr_strlen(name) == 0)
+    {
         Msg("! Player name in registry is empty! (%s)", REGISTRY_VALUE_USERNAME);
     }
     modify_player_name(name, new_name);
@@ -240,7 +247,8 @@ void GetPlayerName_FromRegistry(char* name, u32 const name_size)
 void WritePlayerName_ToRegistry(LPSTR name)
 {
     u32 const max_name_length = GP_UNIQUENICK_LEN - 1;
-    if (xr_strlen(name) > max_name_length) {
+    if (xr_strlen(name) > max_name_length)
+    {
         name[max_name_length] = 0;
     }
     WriteRegistry_StrValue(REGISTRY_VALUE_USERNAME, name);

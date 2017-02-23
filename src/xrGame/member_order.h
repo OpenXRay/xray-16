@@ -28,7 +28,6 @@ public:
         bool m_processing;
 
         IC CMemberDeathReaction() { clear(); }
-
         IC void clear()
         {
             m_member = 0;
@@ -45,7 +44,6 @@ public:
         bool m_processing;
 
         IC CGrenadeReaction() { clear(); }
-
         IC void clear()
         {
             m_grenade = 0;

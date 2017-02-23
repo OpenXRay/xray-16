@@ -6,12 +6,14 @@ void CRenderTarget::accum_point(light* L)
     RImplementation.Stats.l_visible++;
 
     ref_shader shader = L->s_point;
-    if (!shader) shader = s_accum_point;
+    if (!shader)
+        shader = s_accum_point;
 
     Fmatrix Pold = Fidentity;
     Fmatrix FTold = Fidentity;
 
-    if (L->flags.bHudMode) {
+    if (L->flags.bHudMode)
+    {
         extern ENGINE_API float psHUD_FOV;
         Pold = Device.mProject;
         FTold = Device.mFullTransform;
@@ -45,7 +47,7 @@ void CRenderTarget::accum_point(light* L)
     // *** similar to "Carmack's reverse", but assumes convex, non intersecting objects,
     // *** thus can cope without stencil clear with 127 lights
     // *** in practice, 'cause we "clear" it back to 0x1 it usually allows us to > 200 lights :)
-    RCache.set_Element(s_accum_mask->E[SE_MASK_POINT]);  // masker
+    RCache.set_Element(s_accum_mask->E[SE_MASK_POINT]); // masker
     RCache.set_ColorWriteEnable(FALSE);
 
     // backfaces: if (stencil>=1 && zfail)	stencil = light_id
@@ -61,12 +63,13 @@ void CRenderTarget::accum_point(light* L)
     draw_volume(L);
 
     // nv-stencil recompression
-    if (RImplementation.o.nvstencil) u_stencil_optimize();
+    if (RImplementation.o.nvstencil)
+        u_stencil_optimize();
 
     // *****************************	Minimize overdraw	*************************************
     // Select shader (front or back-faces), *** back, if intersect near plane
     RCache.set_ColorWriteEnable();
-    RCache.set_CullMode(CULL_CW);  // back
+    RCache.set_CullMode(CULL_CW); // back
     /*
     if (bIntersect)	RCache.set_CullMode		(CULL_CW);		// back
     else			RCache.set_CullMode		(CULL_CCW);		// front
@@ -82,7 +85,8 @@ void CRenderTarget::accum_point(light* L)
     {
         // Select shader
         u32 _id = 0;
-        if (L->flags.bShadow) {
+        if (L->flags.bShadow)
+        {
             bool bFullSize = (L->X.S.size == u32(RImplementation.o.smapsize));
             if (L->X.S.transluent)
                 _id = SE_L_TRANSLUENT;
@@ -104,7 +108,8 @@ void CRenderTarget::accum_point(light* L)
         RCache.set_c("m_texgen", m_Texgen);
 
         // Fetch4 : enable
-        if (RImplementation.o.HW_smap_FETCH4) {
+        if (RImplementation.o.HW_smap_FETCH4)
+        {
 //. we hacked the shader to force smap on S0
 #define FOURCC_GET4 MAKEFOURCC('G', 'E', 'T', '4')
             HW.pDevice->SetSamplerState(0, D3DSAMP_MIPMAPLODBIAS, FOURCC_GET4);
@@ -116,7 +121,8 @@ void CRenderTarget::accum_point(light* L)
         draw_volume(L);
 
         // Fetch4 : disable
-        if (RImplementation.o.HW_smap_FETCH4) {
+        if (RImplementation.o.HW_smap_FETCH4)
+        {
 //. we hacked the shader to force smap on S0
 #define FOURCC_GET1 MAKEFOURCC('G', 'E', 'T', '1')
             HW.pDevice->SetSamplerState(0, D3DSAMP_MIPMAPLODBIAS, FOURCC_GET1);
@@ -124,7 +130,8 @@ void CRenderTarget::accum_point(light* L)
     }
 
     // blend-copy
-    if (!RImplementation.o.fp16_blend) {
+    if (!RImplementation.o.fp16_blend)
+    {
         u_setrt(rt_Accumulator, NULL, NULL, HW.pBaseZB);
         RCache.set_Element(s_accum_mask->E[SE_MASK_ACCUM_VOL]);
         RCache.set_c("m_texgen", m_Texgen);
@@ -138,7 +145,8 @@ void CRenderTarget::accum_point(light* L)
 
     u_DBT_disable();
 
-    if (L->flags.bHudMode) {
+    if (L->flags.bHudMode)
+    {
         RImplementation.rmNormal();
         // Restore projection
         Device.mProject = Pold;

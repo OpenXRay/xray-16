@@ -4,7 +4,7 @@
 #include "ai/monsters/monster_cover_manager.h"
 #include "cover_point.h"
 
-#define TEMPLATE_SPECIALIZATION                                                                                        \
+#define TEMPLATE_SPECIALIZATION \
     template <typename _Object\
 >
 #define CStatePsyDogHideAbstract CStatePsyDogHide<_Object>
@@ -34,30 +34,28 @@ void CStatePsyDogHideAbstract::execute()
 }
 
 TEMPLATE_SPECIALIZATION
-bool CStatePsyDogHideAbstract::check_start_conditions()
-{
-    return true;
-}
-
+bool CStatePsyDogHideAbstract::check_start_conditions() { return true; }
 TEMPLATE_SPECIALIZATION
 bool CStatePsyDogHideAbstract::check_completion()
 {
     return ((object->ai_location().level_vertex_id() == target.node) &&
-            !object->control().path_builder().is_moving_on_path());
+        !object->control().path_builder().is_moving_on_path());
 }
 
 TEMPLATE_SPECIALIZATION
 void CStatePsyDogHideAbstract::select_target_point()
 {
     const CCoverPoint* point = object->CoverMan->find_cover(object->EnemyMan.get_enemy_position(), 10.f, 30.f);
-    if (point && (object->Position().distance_to(point->position()) > 2.f)) {
+    if (point && (object->Position().distance_to(point->position()) > 2.f))
+    {
         target.node = point->level_vertex_id();
         target.position = point->position();
     }
     else
     {
         const CCoverPoint* point = object->CoverMan->find_cover(object->Position(), 10.f, 30.f);
-        if (point && (object->Position().distance_to(point->position()) > 2.f)) {
+        if (point && (object->Position().distance_to(point->position()) > 2.f))
+        {
             target.node = point->level_vertex_id();
             target.position = point->position();
         }

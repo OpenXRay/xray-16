@@ -24,13 +24,15 @@ void CBuild::xrPhase_ResolveMaterials()
             BOOL bCreate = TRUE;
             for (u32 I = 0; I < counts.size(); I++)
             {
-                if (F->dwMaterial == counts[I].dwMaterial) {
+                if (F->dwMaterial == counts[I].dwMaterial)
+                {
                     counts[I].dwCount += 1;
                     bCreate = FALSE;
                     break;
                 }
             }
-            if (bCreate) {
+            if (bCreate)
+            {
                 _counter C;
                 C.dwMaterial = F->dwMaterial;
                 C.dwCount = 1;
@@ -54,11 +56,13 @@ void CBuild::xrPhase_ResolveMaterials()
         for (vecFaceIt F_it = lc_global_data()->g_faces().begin(); F_it != lc_global_data()->g_faces().end(); F_it++)
         {
             Face* F = *F_it;
-            if (!F->Shader().flags.bRendering) continue;
+            if (!F->Shader().flags.bRendering)
+                continue;
 
             for (u32 I = 0; I < counts.size(); I++)
             {
-                if (F->dwMaterial == counts[I].dwMaterial) {
+                if (F->dwMaterial == counts[I].dwMaterial)
+                {
                     g_XSplit[I]->push_back(F);
                 }
             }
@@ -70,7 +74,8 @@ void CBuild::xrPhase_ResolveMaterials()
     Logger.Status("Removing empty subdivs...");
     {
         for (int SP = 0; SP < int(g_XSplit.size()); SP++)
-            if (g_XSplit[SP]->empty()) xr_delete(g_XSplit[SP]);
+            if (g_XSplit[SP]->empty())
+                xr_delete(g_XSplit[SP]);
         g_XSplit.erase(std::remove(g_XSplit.begin(), g_XSplit.end(), (vecFace*)NULL), g_XSplit.end());
     }
 

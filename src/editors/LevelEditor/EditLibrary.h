@@ -32,8 +32,8 @@ class EObjectThumbnail;
 
 class TfrmEditLibrary : public TForm
 {
-    __published :  // IDE-managed Components
-                   TPanel* paCommands;
+    __published : // IDE-managed Components
+                  TPanel* paCommands;
     TExtBtn* ebMakeThm;
     TFormStorage* fsStorage;
     TExtBtn* ebProperties;
@@ -79,7 +79,7 @@ class TfrmEditLibrary : public TForm
     void __fastcall ebMakeLOD_lowClick(TObject* Sender);
     void __fastcall ebExportOBJClick(TObject* Sender);
 
-  private:  // User declarations
+private: // User declarations
     void InitObjects();
     EObjectThumbnail* m_Thm;
     static TfrmEditLibrary* form;
@@ -119,7 +119,7 @@ class TfrmEditLibrary : public TForm
     bool SelectionToReference(ListItemsVec* props);
     void ExportOneOBJ(CEditableObject*);
 
-  public:  // User declarations
+public: // User declarations
     void __stdcall OnModified();
     __fastcall TfrmEditLibrary(TComponent* Owner);
     static bool FinalClose();

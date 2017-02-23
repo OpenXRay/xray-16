@@ -61,9 +61,11 @@ public:
     }
     virtual bool IsColorAnimationPresent()
     {
-        if (m_lanim_clr.m_lanim == NULL) return false;
+        if (m_lanim_clr.m_lanim == NULL)
+            return false;
 
-        if (m_lanim_clr.m_lanimFlags.test(LA_CYCLIC) || m_lanim_clr.m_lanim_start_time < 0.0f) return true;
+        if (m_lanim_clr.m_lanimFlags.test(LA_CYCLIC) || m_lanim_clr.m_lanim_start_time < 0.0f)
+            return true;
 
         float t = Device.dwTimeContinual / 1000.0f;
         if (t - m_lanim_clr.m_lanim_start_time < m_lanim_clr.m_lanim->Length_sec())
@@ -74,12 +76,14 @@ public:
 
     void UpdateColorAnimation()
     {
-        if (m_lanim_clr.m_lanim == NULL) return;
-        if (m_lanim_clr.m_lanim_start_time < 0.0f) ResetColorAnimation();
+        if (m_lanim_clr.m_lanim == NULL)
+            return;
+        if (m_lanim_clr.m_lanim_start_time < 0.0f)
+            ResetColorAnimation();
 
         float t = Device.dwTimeContinual / 1000.0f;
 
-        if (t < m_lanim_clr.m_lanim_start_time)  // consider animation delay
+        if (t < m_lanim_clr.m_lanim_start_time) // consider animation delay
             return;
 
         if (m_lanim_clr.m_lanimFlags.test(LA_CYCLIC) ||
@@ -88,13 +92,15 @@ public:
             int frame;
             u32 clr = m_lanim_clr.m_lanim->CalculateRGB(t - m_lanim_clr.m_lanim_start_time, frame);
 
-            if (m_lanim_clr.m_lanimFlags.test(LA_TEXTURECOLOR)) {
+            if (m_lanim_clr.m_lanimFlags.test(LA_TEXTURECOLOR))
+            {
                 if (m_lanim_clr.m_lanimFlags.test(LA_ONLYALPHA))
                     ColorAnimationSetTextureColor(color_get_A(clr), true);
                 else
                     ColorAnimationSetTextureColor(clr, false);
             }
-            if (m_lanim_clr.m_lanimFlags.test(LA_TEXTCOLOR)) {
+            if (m_lanim_clr.m_lanimFlags.test(LA_TEXTCOLOR))
+            {
                 if (m_lanim_clr.m_lanimFlags.test(LA_ONLYALPHA))
                     ColorAnimationSetTextColor(color_get_A(clr), true);
                 else

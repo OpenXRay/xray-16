@@ -21,42 +21,42 @@ namespace environment
 {
 namespace detail
 {
-}  // namespace detail
+} // namespace detail
 
 namespace suns
 {
 class manager;
-}  // namespace suns
+} // namespace suns
 
 namespace effects
 {
 class manager;
-}  // namespace effects
+} // namespace effects
 
 namespace levels
 {
 class manager;
-}  // namespace levels
+} // namespace levels
 
 namespace sound_channels
 {
 class manager;
-}  // namespace sound_channels
+} // namespace sound_channels
 
 namespace ambients
 {
 class manager;
-}  // namespace ambients
+} // namespace ambients
 
 namespace thunderbolts
 {
 class manager;
-}  // namespace thunderbolts
+} // namespace thunderbolts
 
 namespace weathers
 {
 class manager;
-}  // namespace weathers
+} // namespace weathers
 
 class manager : public ::CEnvironment
 {
@@ -151,10 +151,10 @@ private:
     ambients_manager_type* m_ambients;
     thunderbolts_manager_type* m_thunderbolts;
     weathers_manager_type* m_weathers;
-};  // class manager
-}  // namespace environment
-}  // namespace editor
+}; // class manager
+} // namespace environment
+} // namespace editor
 
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR
 
-#endif  // ifndef EDITOR_ENVIRONMENT_MANAGER_HPP_INCLUDED
+#endif // ifndef EDITOR_ENVIRONMENT_MANAGER_HPP_INCLUDED

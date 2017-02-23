@@ -16,18 +16,18 @@ public
 ref class property_string_values_value_shared_str : public property_string_shared_str,
                                                     public property_string_values_value_base
 {
-  private:
+private:
     typedef property_string_shared_str inherited;
     typedef property_string_values_value_base::collection_type collection_type;
 
-  public:
+public:
     property_string_values_value_shared_str(
         editor::engine* engine, shared_str& value, LPCSTR const* values, u32 const& value_count);
 
     virtual collection_type ^ values() { return m_collection; };
 
-  public:
+public:
     collection_type ^ m_collection;
-};  // ref class property_string_values_value_shared_str
+}; // ref class property_string_values_value_shared_str
 
-#endif  // ifndef PROPERTY_STRING_VALUES_VALUE_SHARED_STR_HPP_INCLUDED
+#endif // ifndef PROPERTY_STRING_VALUES_VALUE_SHARED_STR_HPP_INCLUDED

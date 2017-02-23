@@ -39,15 +39,8 @@ enum
     NETFLAG_LOG_CL_PACKETS = (1 << 3),
 };
 
-IC u32 TimeGlobal(CTimer* timer)
-{
-    return timer->GetElapsed_ms();
-}
-IC u32 TimerAsync(CTimer* timer)
-{
-    return TimeGlobal(timer);
-}
-
+IC u32 TimeGlobal(CTimer* timer) { return timer->GetElapsed_ms(); }
+IC u32 TimerAsync(CTimer* timer) { return TimeGlobal(timer); }
 class XRNETSERVER_API IClientStatistic
 {
     DPN_CONNECTION_INFO ci_last;
@@ -75,7 +68,6 @@ public:
     IC u32 getMPS_Send() { return mps_send; }
     IC u32 getReceivedPerSec() { return dwBytesReceivedPerSec; }
     IC u32 getSendedPerSec() { return dwBytesSendedPerSec; }
-
     IC void Clear()
     {
         CTimer* timer = device_timer;

@@ -31,9 +31,9 @@ static const char rcsid[] = "$Id: os_unix.c,v 1.37 2002/03/05 19:14:49 robs Exp 
 #include <arpa/inet.h>
 #include <assert.h>
 #include <errno.h>
-#include <fcntl.h> /* for fcntl */
+#include <fcntl.h>      /* for fcntl */
 #include <math.h>
-#include <memory.h> /* for memchr() */
+#include <memory.h>     /* for memchr() */
 #include <netinet/tcp.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -60,20 +60,19 @@ static const char rcsid[] = "$Id: os_unix.c,v 1.37 2002/03/05 19:14:49 robs Exp 
 #include "fcgios.h"
 
 #ifndef INADDR_NONE
-#define INADDR_NONE ((unsigned long)-1)
+#define INADDR_NONE ((unsigned long) -1)
 #endif
 
 /*
  * This structure holds an entry for each oustanding async I/O operation.
  */
-typedef struct
-{
-    OS_AsyncProc procPtr;  /* callout completion procedure */
-    ClientData clientData; /* caller private data */
+typedef struct {
+    OS_AsyncProc procPtr;	    /* callout completion procedure */
+    ClientData clientData;	    /* caller private data */
     int fd;
     int len;
     int offset;
-    void* buf;
+    void *buf;
     int inUse;
 } AioInfo;
 
@@ -88,7 +87,7 @@ typedef struct
 
 static int asyncIoInUse = FALSE;
 static int asyncIoTableSize = 16;
-static AioInfo* asyncIoTable = NULL;
+static AioInfo *asyncIoTable = NULL;
 
 static int libInitialized = FALSE;
 
@@ -119,13 +118,14 @@ static void OS_SigpipeHandler(int signo)
     ;
 }
 
-static void installSignalHandler(int signo, const struct sigaction* act, int force)
+static void installSignalHandler(int signo, const struct sigaction * act, int force)
 {
     struct sigaction sa;
 
     sigaction(signo, NULL, &sa);
 
-    if (force || sa.sa_handler == SIG_DFL) {
+    if (force || sa.sa_handler == SIG_DFL) 
+    {
         sigaction(signo, act, NULL);
     }
 }
@@ -165,14 +165,16 @@ static void OS_InstallSignalHandlers(int force)
  */
 int OS_LibInit(int stdioFds[3])
 {
-    if (libInitialized) return 0;
+    if(libInitialized)
+        return 0;
 
-    asyncIoTable = (AioInfo*)malloc(asyncIoTableSize * sizeof(AioInfo));
-    if (asyncIoTable == NULL) {
+    asyncIoTable = (AioInfo *)malloc(asyncIoTableSize * sizeof(AioInfo));
+    if(asyncIoTable == NULL) {
         errno = ENOMEM;
         return -1;
     }
-    memset((char*)asyncIoTable, 0, asyncIoTableSize * sizeof(AioInfo));
+    memset((char *) asyncIoTable, 0,
+           asyncIoTableSize * sizeof(AioInfo));
 
     FD_ZERO(&readFdSet);
     FD_ZERO(&writeFdSet);
@@ -203,7 +205,8 @@ int OS_LibInit(int stdioFds[3])
  */
 void OS_LibShutdown()
 {
-    if (!libInitialized) return;
+    if(!libInitialized)
+        return;
 
     free(asyncIoTable);
     asyncIoTable = NULL;
@@ -229,34 +232,37 @@ void OS_LibShutdown()
  *----------------------------------------------------------------------
  */
 
-static int OS_BuildSockAddrUn(const char* bindPath, struct sockaddr_un* servAddrPtr, int* servAddrLen)
+static int OS_BuildSockAddrUn(const char *bindPath,
+                              struct sockaddr_un *servAddrPtr,
+                              int *servAddrLen)
 {
     int bindPathLen = strlen(bindPath);
 
 #ifdef HAVE_SOCKADDR_UN_SUN_LEN /* 4.3BSD Reno and later: BSDI, DEC */
-    if (bindPathLen >= sizeof(servAddrPtr->sun_path)) {
+    if(bindPathLen >= sizeof(servAddrPtr->sun_path)) {
         return -1;
     }
-#else /* 4.3 BSD Tahoe: Solaris, HPUX, DEC, ... */
-    if (bindPathLen > sizeof(servAddrPtr->sun_path)) {
+#else                           /* 4.3 BSD Tahoe: Solaris, HPUX, DEC, ... */
+    if(bindPathLen > sizeof(servAddrPtr->sun_path)) {
         return -1;
     }
 #endif
-    memset((char*)servAddrPtr, 0, sizeof(*servAddrPtr));
+    memset((char *) servAddrPtr, 0, sizeof(*servAddrPtr));
     servAddrPtr->sun_family = AF_UNIX;
     memcpy(servAddrPtr->sun_path, bindPath, bindPathLen);
 #ifdef HAVE_SOCKADDR_UN_SUN_LEN /* 4.3BSD Reno and later: BSDI, DEC */
-    *servAddrLen = sizeof(servAddrPtr->sun_len) + sizeof(servAddrPtr->sun_family) + bindPathLen + 1;
+    *servAddrLen = sizeof(servAddrPtr->sun_len)
+            + sizeof(servAddrPtr->sun_family)
+            + bindPathLen + 1;
     servAddrPtr->sun_len = *servAddrLen;
-#else /* 4.3 BSD Tahoe: Solaris, HPUX, DEC, ... */
+#else                           /* 4.3 BSD Tahoe: Solaris, HPUX, DEC, ... */
     *servAddrLen = sizeof(servAddrPtr->sun_family) + bindPathLen;
 #endif
     return 0;
 }
-union SockAddrUnion
-{
-    struct sockaddr_un unixVariant;
-    struct sockaddr_in inetVariant;
+union SockAddrUnion {
+    struct  sockaddr_un	unixVariant;
+    struct  sockaddr_in	inetVariant;
 };
 
 /*
@@ -276,89 +282,83 @@ union SockAddrUnion
  *
  *----------------------------------------------------------------------
  */
-int OS_CreateLocalIpcFd(const char* bindPath, int backlog)
+int OS_CreateLocalIpcFd(const char *bindPath, int backlog)
 {
     int listenSock, servLen;
-    union SockAddrUnion sa;
-    int tcp = FALSE;
+    union   SockAddrUnion sa;  
+    int	    tcp = FALSE;
     unsigned long tcp_ia = 0;
-    char* tp;
-    short port = 0;
-    char host[MAXPATHLEN];
+    char    *tp;
+    short   port = 0;
+    char    host[MAXPATHLEN];
 
     strcpy(host, bindPath);
-    if ((tp = strchr(host, ':')) != 0) {
-        *tp++ = 0;
-        if ((port = atoi(tp)) == 0) {
-            *--tp = ':';
-        }
-        else
-        {
-            tcp = TRUE;
-        }
+    if((tp = strchr(host, ':')) != 0) {
+	*tp++ = 0;
+	if((port = atoi(tp)) == 0) {
+	    *--tp = ':';
+	 } else {
+	    tcp = TRUE;
+	 }
     }
-    if (tcp) {
-        if (!*host || !strcmp(host, "*")) {
-            tcp_ia = htonl(INADDR_ANY);
-        }
-        else
-        {
-            tcp_ia = inet_addr(host);
-            if (tcp_ia == INADDR_NONE) {
-                struct hostent* hep;
-                hep = gethostbyname(host);
-                if ((!hep) || (hep->h_addrtype != AF_INET || !hep->h_addr_list[0])) {
-                    fprintf(stderr, "Cannot resolve host name %s -- exiting!\n", host);
-                    exit(1);
-                }
-                if (hep->h_addr_list[1]) {
-                    fprintf(stderr, "Host %s has multiple addresses ---\n", host);
-                    fprintf(stderr, "you must choose one explicitly!!!\n");
-                    exit(1);
-                }
-                tcp_ia = ((struct in_addr*)(hep->h_addr))->s_addr;
-            }
-        }
+    if(tcp) {
+      if (!*host || !strcmp(host,"*")) {
+	tcp_ia = htonl(INADDR_ANY);
+      } else {
+	tcp_ia = inet_addr(host);
+	if (tcp_ia == INADDR_NONE) {
+	  struct hostent * hep;
+	  hep = gethostbyname(host);
+	  if ((!hep) || (hep->h_addrtype != AF_INET || !hep->h_addr_list[0])) {
+	    fprintf(stderr, "Cannot resolve host name %s -- exiting!\n", host);
+	    exit(1);
+	  }
+	  if (hep->h_addr_list[1]) {
+	    fprintf(stderr, "Host %s has multiple addresses ---\n", host);
+	    fprintf(stderr, "you must choose one explicitly!!!\n");
+	    exit(1);
+	  }
+	  tcp_ia = ((struct in_addr *) (hep->h_addr))->s_addr;
+	}
+      }
     }
 
-    if (tcp) {
-        listenSock = socket(AF_INET, SOCK_STREAM, 0);
-        if (listenSock >= 0) {
+    if(tcp) {
+	listenSock = socket(AF_INET, SOCK_STREAM, 0);
+        if(listenSock >= 0) {
             int flag = 1;
-            if (setsockopt(listenSock, SOL_SOCKET, SO_REUSEADDR, (char*)&flag, sizeof(flag)) < 0) {
+            if(setsockopt(listenSock, SOL_SOCKET, SO_REUSEADDR,
+                          (char *) &flag, sizeof(flag)) < 0) {
                 fprintf(stderr, "Can't set SO_REUSEADDR.\n");
-                exit(1001);
-            }
-        }
+	        exit(1001);
+	    }
+	}
+    } else {
+	listenSock = socket(AF_UNIX, SOCK_STREAM, 0);
     }
-    else
-    {
-        listenSock = socket(AF_UNIX, SOCK_STREAM, 0);
-    }
-    if (listenSock < 0) {
+    if(listenSock < 0) {
         return -1;
     }
 
     /*
      * Bind the listening socket.
      */
-    if (tcp) {
-        memset((char*)&sa.inetVariant, 0, sizeof(sa.inetVariant));
-        sa.inetVariant.sin_family = AF_INET;
-        sa.inetVariant.sin_addr.s_addr = tcp_ia;
-        sa.inetVariant.sin_port = htons(port);
-        servLen = sizeof(sa.inetVariant);
+    if(tcp) {
+	memset((char *) &sa.inetVariant, 0, sizeof(sa.inetVariant));
+	sa.inetVariant.sin_family = AF_INET;
+	sa.inetVariant.sin_addr.s_addr = tcp_ia;
+	sa.inetVariant.sin_port = htons(port);
+	servLen = sizeof(sa.inetVariant);
+    } else {
+	unlink(bindPath);
+	if(OS_BuildSockAddrUn(bindPath, &sa.unixVariant, &servLen)) {
+	    fprintf(stderr, "Listening socket's path name is too long.\n");
+	    exit(1000);
+	}
     }
-    else
-    {
-        unlink(bindPath);
-        if (OS_BuildSockAddrUn(bindPath, &sa.unixVariant, &servLen)) {
-            fprintf(stderr, "Listening socket's path name is too long.\n");
-            exit(1000);
-        }
-    }
-    if (bind(listenSock, (struct sockaddr*)&sa.unixVariant, servLen) < 0 || listen(listenSock, backlog) < 0) {
-        perror("bind/listen");
+    if(bind(listenSock, (struct sockaddr *) &sa.unixVariant, servLen) < 0
+       || listen(listenSock, backlog) < 0) {
+	perror("bind/listen");
         exit(errno);
     }
 
@@ -385,55 +385,50 @@ int OS_CreateLocalIpcFd(const char* bindPath, int backlog)
  *
  *----------------------------------------------------------------------
  */
-int OS_FcgiConnect(char* bindPath)
+int OS_FcgiConnect(char *bindPath)
 {
-    union SockAddrUnion sa;
+    union   SockAddrUnion sa;
     int servLen, resultSock;
     int connectStatus;
-    char* tp;
-    char host[MAXPATHLEN];
-    short port = 0;
-    int tcp = FALSE;
+    char    *tp;
+    char    host[MAXPATHLEN];
+    short   port = 0;
+    int	    tcp = FALSE;
 
     strcpy(host, bindPath);
-    if ((tp = strchr(host, ':')) != 0) {
-        *tp++ = 0;
-        if ((port = atoi(tp)) == 0) {
-            *--tp = ':';
-        }
-        else
-        {
-            tcp = TRUE;
-        }
+    if((tp = strchr(host, ':')) != 0) {
+	*tp++ = 0;
+	if((port = atoi(tp)) == 0) {
+	    *--tp = ':';
+	 } else {
+	    tcp = TRUE;
+	 }
     }
-    if (tcp == TRUE) {
-        struct hostent* hp;
-        if ((hp = gethostbyname((*host ? host : "localhost"))) == NULL) {
-            fprintf(stderr, "Unknown host: %s\n", bindPath);
-            exit(1000);
-        }
-        sa.inetVariant.sin_family = AF_INET;
-        memcpy(&sa.inetVariant.sin_addr, hp->h_addr, hp->h_length);
-        sa.inetVariant.sin_port = htons(port);
-        servLen = sizeof(sa.inetVariant);
-        resultSock = socket(AF_INET, SOCK_STREAM, 0);
-    }
-    else
-    {
-        if (OS_BuildSockAddrUn(bindPath, &sa.unixVariant, &servLen)) {
-            fprintf(stderr, "Listening socket's path name is too long.\n");
-            exit(1000);
-        }
-        resultSock = socket(AF_UNIX, SOCK_STREAM, 0);
+    if(tcp == TRUE) {
+	struct	hostent	*hp;
+	if((hp = gethostbyname((*host ? host : "localhost"))) == NULL) {
+	    fprintf(stderr, "Unknown host: %s\n", bindPath);
+	    exit(1000);
+	}
+	sa.inetVariant.sin_family = AF_INET;
+	memcpy(&sa.inetVariant.sin_addr, hp->h_addr, hp->h_length);
+	sa.inetVariant.sin_port = htons(port);
+	servLen = sizeof(sa.inetVariant);
+	resultSock = socket(AF_INET, SOCK_STREAM, 0);
+    } else {
+	if(OS_BuildSockAddrUn(bindPath, &sa.unixVariant, &servLen)) {
+	    fprintf(stderr, "Listening socket's path name is too long.\n");
+	    exit(1000);
+	}
+	resultSock = socket(AF_UNIX, SOCK_STREAM, 0);
     }
 
     ASSERT(resultSock >= 0);
-    connectStatus = connect(resultSock, (struct sockaddr*)&sa.unixVariant, servLen);
-    if (connectStatus >= 0) {
+    connectStatus = connect(resultSock, (struct sockaddr *) &sa.unixVariant,
+                             servLen);
+    if(connectStatus >= 0) {
         return resultSock;
-    }
-    else
-    {
+    } else {
         /*
          * Most likely (errno == ENOENT || errno == ECONNREFUSED)
          * and no FCGI application server is running.
@@ -459,10 +454,10 @@ int OS_FcgiConnect(char* bindPath)
  *
  *--------------------------------------------------------------
  */
-int OS_Read(int fd, char* buf, size_t len)
+int OS_Read(int fd, char * buf, size_t len)
 {
     if (shutdownNow) return -1;
-    return (read(fd, buf, len));
+    return(read(fd, buf, len));
 }
 
 /*
@@ -481,10 +476,10 @@ int OS_Read(int fd, char* buf, size_t len)
  *
  *--------------------------------------------------------------
  */
-int OS_Write(int fd, char* buf, size_t len)
+int OS_Write(int fd, char * buf, size_t len)
 {
     if (shutdownNow) return -1;
-    return (write(fd, buf, len));
+    return(write(fd, buf, len));
 }
 
 /*
@@ -502,16 +497,16 @@ int OS_Write(int fd, char* buf, size_t len)
  *
  *----------------------------------------------------------------------
  */
-int OS_SpawnChild(char* appPath, int listenFd)
+int OS_SpawnChild(char *appPath, int listenFd)
 {
     int forkResult;
 
     forkResult = fork();
-    if (forkResult < 0) {
+    if(forkResult < 0) {
         exit(errno);
     }
 
-    if (forkResult == 0) {
+    if(forkResult == 0) {
         /*
          * Close STDIN unconditionally.  It's used by the parent
          * process for CGI communication.  The FastCGI applciation
@@ -528,26 +523,26 @@ int OS_SpawnChild(char* appPath, int listenFd)
          * we're set.  If not, change it so the child knows where to
          * get the listen socket from.
          */
-        if (listenFd != FCGI_LISTENSOCK_FILENO) {
+        if(listenFd != FCGI_LISTENSOCK_FILENO) {
             dup2(listenFd, FCGI_LISTENSOCK_FILENO);
             close(listenFd);
         }
 
-        close(STDOUT_FILENO);
-        close(STDERR_FILENO);
+	close(STDOUT_FILENO);
+	close(STDERR_FILENO);
 
         /*
-     * We're a child.  Exec the application.
+	 * We're a child.  Exec the application.
          *
          * XXX: entire environment passes through
-     */
-        execl(appPath, appPath, NULL);
-        /*
-         * XXX: Can't do this as we've already closed STDERR!!!
-         *
-         * perror("exec");
-         */
-        exit(errno);
+	 */
+	execl(appPath, appPath, NULL);
+	/*
+	 * XXX: Can't do this as we've already closed STDERR!!!
+	 *
+	 * perror("exec");
+	 */
+	exit(errno);
     }
     return 0;
 }
@@ -573,7 +568,8 @@ int OS_SpawnChild(char* appPath, int listenFd)
  *
  *--------------------------------------------------------------
  */
-int OS_AsyncReadStdin(void* buf, int len, OS_AsyncProc procPtr, ClientData clientData)
+int OS_AsyncReadStdin(void *buf, int len, OS_AsyncProc procPtr,
+                      ClientData clientData)
 {
     int index = AIO_RD_IX(STDIN_FILENO);
 
@@ -587,7 +583,8 @@ int OS_AsyncReadStdin(void* buf, int len, OS_AsyncProc procPtr, ClientData clien
     asyncIoTable[index].buf = buf;
     asyncIoTable[index].inUse = 1;
     FD_SET(STDIN_FILENO, &readFdSet);
-    if (STDIN_FILENO > maxFd) maxFd = STDIN_FILENO;
+    if(STDIN_FILENO > maxFd)
+        maxFd = STDIN_FILENO;
     return 0;
 }
 
@@ -596,12 +593,14 @@ static void GrowAsyncTable(void)
     int oldTableSize = asyncIoTableSize;
 
     asyncIoTableSize = asyncIoTableSize * 2;
-    asyncIoTable = (AioInfo*)realloc(asyncIoTable, asyncIoTableSize * sizeof(AioInfo));
-    if (asyncIoTable == NULL) {
+    asyncIoTable = (AioInfo *)realloc(asyncIoTable, asyncIoTableSize * sizeof(AioInfo));
+    if(asyncIoTable == NULL) {
         errno = ENOMEM;
         exit(errno);
     }
-    memset((char*)&asyncIoTable[oldTableSize], 0, oldTableSize * sizeof(AioInfo));
+    memset((char *) &asyncIoTable[oldTableSize], 0,
+           oldTableSize * sizeof(AioInfo));
+
 }
 
 /*
@@ -628,17 +627,18 @@ static void GrowAsyncTable(void)
  *
  *--------------------------------------------------------------
  */
-int OS_AsyncRead(int fd, int offset, void* buf, int len, OS_AsyncProc procPtr, ClientData clientData)
+int OS_AsyncRead(int fd, int offset, void *buf, int len,
+		 OS_AsyncProc procPtr, ClientData clientData)
 {
     int index = AIO_RD_IX(fd);
 
     ASSERT(asyncIoTable != NULL);
     asyncIoInUse = TRUE;
 
-    if (fd > maxFd) maxFd = fd;
+    if(fd > maxFd)
+        maxFd = fd;
 
-    while (index >= asyncIoTableSize)
-    {
+    while (index >= asyncIoTableSize) {
         GrowAsyncTable();
     }
 
@@ -677,16 +677,17 @@ int OS_AsyncRead(int fd, int offset, void* buf, int len, OS_AsyncProc procPtr, C
  *
  *--------------------------------------------------------------
  */
-int OS_AsyncWrite(int fd, int offset, void* buf, int len, OS_AsyncProc procPtr, ClientData clientData)
+int OS_AsyncWrite(int fd, int offset, void *buf, int len,
+		  OS_AsyncProc procPtr, ClientData clientData)
 {
     int index = AIO_WR_IX(fd);
 
     asyncIoInUse = TRUE;
 
-    if (fd > maxFd) maxFd = fd;
+    if(fd > maxFd)
+        maxFd = fd;
 
-    while (index >= asyncIoTableSize)
-    {
+    while (index >= asyncIoTableSize) {
         GrowAsyncTable();
     }
 
@@ -720,7 +721,8 @@ int OS_AsyncWrite(int fd, int offset, void* buf, int len, OS_AsyncProc procPtr, 
  */
 int OS_Close(int fd)
 {
-    if (fd == -1) return 0;
+    if (fd == -1)
+        return 0;
 
     if (asyncIoInUse) {
         int index = AIO_RD_IX(fd);
@@ -746,12 +748,13 @@ int OS_Close(int fd)
     /*
      * shutdown() the send side and then read() from client until EOF
      * or a timeout expires.  This is done to minimize the potential
-     * that a TCP RST will be sent by our TCP stack in response to
+     * that a TCP RST will be sent by our TCP stack in response to 
      * receipt of additional data from the client.  The RST would
      * cause the client to discard potentially useful response data.
      */
 
-    if (shutdown(fd, 1) == 0) {
+    if (shutdown(fd, 1) == 0)
+    {
         struct timeval tv;
         fd_set rfds;
         int rv;
@@ -759,13 +762,14 @@ int OS_Close(int fd)
 
         FD_ZERO(&rfds);
 
-        do
+        do 
         {
             FD_SET(fd, &rfds);
             tv.tv_sec = 2;
             tv.tv_usec = 0;
             rv = select(fd + 1, &rfds, NULL, NULL, &tv);
-        } while (rv > 0 && read(fd, trash, sizeof(trash)) > 0);
+        }
+        while (rv > 0 && read(fd, trash, sizeof(trash)) > 0);
     }
 
     return close(fd);
@@ -787,7 +791,7 @@ int OS_Close(int fd)
  */
 int OS_CloseRead(int fd)
 {
-    if (asyncIoTable[AIO_RD_IX(fd)].inUse != 0) {
+    if(asyncIoTable[AIO_RD_IX(fd)].inUse != 0) {
         asyncIoTable[AIO_RD_IX(fd)].inUse = 0;
         FD_CLR(fd, &readFdSet);
     }
@@ -812,12 +816,12 @@ int OS_CloseRead(int fd)
  *
  *--------------------------------------------------------------
  */
-int OS_DoIo(struct timeval* tmo)
+int OS_DoIo(struct timeval *tmo)
 {
     int fd, len, selectStatus;
     OS_AsyncProc procPtr;
     ClientData clientData;
-    AioInfo* aioPtr;
+    AioInfo *aioPtr;
     fd_set readFdSetCpy;
     fd_set writeFdSetCpy;
 
@@ -825,12 +829,11 @@ int OS_DoIo(struct timeval* tmo)
     FD_ZERO(&readFdSetCpy);
     FD_ZERO(&writeFdSetCpy);
 
-    for (fd = 0; fd <= maxFd; fd++)
-    {
-        if (FD_ISSET(fd, &readFdSet)) {
+    for(fd = 0; fd <= maxFd; fd++) {
+        if(FD_ISSET(fd, &readFdSet)) {
             FD_SET(fd, &readFdSetCpy);
         }
-        if (FD_ISSET(fd, &writeFdSet)) {
+        if(FD_ISSET(fd, &writeFdSet)) {
             FD_SET(fd, &writeFdSetCpy);
         }
     }
@@ -839,84 +842,89 @@ int OS_DoIo(struct timeval* tmo)
      * If there were no completed events from a prior call, see if there's
      * any work to do.
      */
-    if (numRdPosted == 0 && numWrPosted == 0) {
-        selectStatus = select((maxFd + 1), &readFdSetCpy, &writeFdSetCpy, NULL, tmo);
-        if (selectStatus < 0) {
+    if(numRdPosted == 0 && numWrPosted == 0) {
+        selectStatus = select((maxFd+1), &readFdSetCpy, &writeFdSetCpy,
+                              NULL, tmo);
+        if(selectStatus < 0) {
             exit(errno);
-        }
+	}
 
-        for (fd = 0; fd <= maxFd; fd++)
-        {
-            /*
-             * Build up a list of completed events.  We'll work off of
-             * this list as opposed to looping through the read and write
-             * fd sets since they can be affected by a callbacl routine.
-             */
-            if (FD_ISSET(fd, &readFdSetCpy)) {
-                numRdPosted++;
-                FD_SET(fd, &readFdSetPost);
-                FD_CLR(fd, &readFdSet);
-            }
+        for(fd = 0; fd <= maxFd; fd++) {
+	    /*
+	     * Build up a list of completed events.  We'll work off of
+	     * this list as opposed to looping through the read and write
+	     * fd sets since they can be affected by a callbacl routine.
+	     */
+	    if(FD_ISSET(fd, &readFdSetCpy)) {
+	        numRdPosted++;
+		FD_SET(fd, &readFdSetPost);
+		FD_CLR(fd, &readFdSet);
+	    }
 
-            if (FD_ISSET(fd, &writeFdSetCpy)) {
-                numWrPosted++;
-                FD_SET(fd, &writeFdSetPost);
-                FD_CLR(fd, &writeFdSet);
-            }
+            if(FD_ISSET(fd, &writeFdSetCpy)) {
+	        numWrPosted++;
+	        FD_SET(fd, &writeFdSetPost);
+		FD_CLR(fd, &writeFdSet);
+	    }
         }
     }
 
-    if (numRdPosted == 0 && numWrPosted == 0) return 0;
+    if(numRdPosted == 0 && numWrPosted == 0)
+        return 0;
 
-    for (fd = 0; fd <= maxFd; fd++)
-    {
+    for(fd = 0; fd <= maxFd; fd++) {
         /*
-     * Do reads and dispatch callback.
-     */
-        if (FD_ISSET(fd, &readFdSetPost) && asyncIoTable[AIO_RD_IX(fd)].inUse) {
-            numRdPosted--;
-            FD_CLR(fd, &readFdSetPost);
-            aioPtr = &asyncIoTable[AIO_RD_IX(fd)];
+	 * Do reads and dispatch callback.
+	 */
+        if(FD_ISSET(fd, &readFdSetPost)
+	   && asyncIoTable[AIO_RD_IX(fd)].inUse) {
 
-            len = read(aioPtr->fd, aioPtr->buf, aioPtr->len);
+	    numRdPosted--;
+	    FD_CLR(fd, &readFdSetPost);
+	    aioPtr = &asyncIoTable[AIO_RD_IX(fd)];
 
-            procPtr = aioPtr->procPtr;
-            aioPtr->procPtr = NULL;
-            clientData = aioPtr->clientData;
-            aioPtr->inUse = 0;
+	    len = read(aioPtr->fd, aioPtr->buf, aioPtr->len);
 
-            (*procPtr)(clientData, len);
-        }
+	    procPtr = aioPtr->procPtr;
+	    aioPtr->procPtr = NULL;
+	    clientData = aioPtr->clientData;
+	    aioPtr->inUse = 0;
+
+	    (*procPtr)(clientData, len);
+	}
 
         /*
-     * Do writes and dispatch callback.
-     */
-        if (FD_ISSET(fd, &writeFdSetPost) && asyncIoTable[AIO_WR_IX(fd)].inUse) {
-            numWrPosted--;
-            FD_CLR(fd, &writeFdSetPost);
-            aioPtr = &asyncIoTable[AIO_WR_IX(fd)];
+	 * Do writes and dispatch callback.
+	 */
+        if(FD_ISSET(fd, &writeFdSetPost) &&
+           asyncIoTable[AIO_WR_IX(fd)].inUse) {
 
-            len = write(aioPtr->fd, aioPtr->buf, aioPtr->len);
+	    numWrPosted--;
+	    FD_CLR(fd, &writeFdSetPost);
+	    aioPtr = &asyncIoTable[AIO_WR_IX(fd)];
 
-            procPtr = aioPtr->procPtr;
-            aioPtr->procPtr = NULL;
-            clientData = aioPtr->clientData;
-            aioPtr->inUse = 0;
-            (*procPtr)(clientData, len);
-        }
+	    len = write(aioPtr->fd, aioPtr->buf, aioPtr->len);
+
+	    procPtr = aioPtr->procPtr;
+	    aioPtr->procPtr = NULL;
+	    clientData = aioPtr->clientData;
+	    aioPtr->inUse = 0;
+	    (*procPtr)(clientData, len);
+	}
     }
     return 0;
 }
 
-/*
- * Not all systems have strdup().
+/* 
+ * Not all systems have strdup().  
  * @@@ autoconf should determine whether or not this is needed, but for now..
  */
-static char* str_dup(const char* str)
+static char * str_dup(const char * str)
 {
-    char* sdup = (char*)malloc(strlen(str) + 1);
+    char * sdup = (char *) malloc(strlen(str) + 1);
 
-    if (sdup) strcpy(sdup, str);
+    if (sdup)
+        strcpy(sdup, str);
 
     return sdup;
 }
@@ -934,7 +942,7 @@ static char* str_dup(const char* str)
  *
  *----------------------------------------------------------------------
  */
-static int ClientAddrOK(struct sockaddr_in* saPtr, const char* clientList)
+static int ClientAddrOK(struct sockaddr_in *saPtr, const char *clientList)
 {
     int result = FALSE;
     char *clientListCopy, *cur, *next;
@@ -945,8 +953,7 @@ static int ClientAddrOK(struct sockaddr_in* saPtr, const char* clientList)
 
     clientListCopy = str_dup(clientList);
 
-    for (cur = clientListCopy; cur != NULL; cur = next)
-    {
+    for (cur = clientListCopy; cur != NULL; cur = next) {
         next = strchr(cur, ',');
         if (next != NULL) {
             *next++ = '\0';
@@ -982,16 +989,18 @@ static int ClientAddrOK(struct sockaddr_in* saPtr, const char* clientList)
 static int AcquireLock(int sock, int fail_on_intr)
 {
 #ifdef USE_LOCKING
-    do
-    {
+    do {
         struct flock lock;
         lock.l_type = F_WRLCK;
         lock.l_start = 0;
         lock.l_whence = SEEK_SET;
         lock.l_len = 0;
 
-        if (fcntl(sock, F_SETLKW, &lock) != -1) return 0;
-    } while (errno == EINTR && !fail_on_intr && !shutdownPending);
+        if (fcntl(sock, F_SETLKW, &lock) != -1)
+            return 0;
+    } while (errno == EINTR 
+             && ! fail_on_intr 
+             && ! shutdownPending);
 
     return -1;
 
@@ -1020,15 +1029,15 @@ static int AcquireLock(int sock, int fail_on_intr)
 static int ReleaseLock(int sock)
 {
 #ifdef USE_LOCKING
-    do
-    {
+    do {
         struct flock lock;
         lock.l_type = F_UNLCK;
         lock.l_start = 0;
         lock.l_whence = SEEK_SET;
         lock.l_len = 0;
 
-        if (fcntl(sock, F_SETLK, &lock) != -1) return 0;
+        if (fcntl(sock, F_SETLK, &lock) != -1)
+            return 0;
     } while (errno == EINTR);
 
     return -1;
@@ -1043,44 +1052,44 @@ static int ReleaseLock(int sock)
  * retry or exit().  Based on Apache's http_main.c accept() handling
  * and Stevens' Unix Network Programming Vol 1, 2nd Ed, para. 15.6.
  */
-static int is_reasonable_accept_errno(const int error)
+static int is_reasonable_accept_errno (const int error)
 {
-    switch (error)
-    {
+    switch (error) {
 #ifdef EPROTO
-    /* EPROTO on certain older kernels really means ECONNABORTED, so
-     * we need to ignore it for them.  See discussion in new-httpd
-     * archives nh.9701 search for EPROTO.  Also see nh.9603, search
-     * for EPROTO:  There is potentially a bug in Solaris 2.x x<6, and
-     * other boxes that implement tcp sockets in userland (i.e. on top of
-     * STREAMS).  On these systems, EPROTO can actually result in a fatal
-     * loop.  See PR#981 for example.  It's hard to handle both uses of
-     * EPROTO. */
-    case EPROTO:
+        /* EPROTO on certain older kernels really means ECONNABORTED, so
+         * we need to ignore it for them.  See discussion in new-httpd
+         * archives nh.9701 search for EPROTO.  Also see nh.9603, search
+         * for EPROTO:  There is potentially a bug in Solaris 2.x x<6, and
+         * other boxes that implement tcp sockets in userland (i.e. on top of
+         * STREAMS).  On these systems, EPROTO can actually result in a fatal
+         * loop.  See PR#981 for example.  It's hard to handle both uses of
+         * EPROTO. */
+        case EPROTO:
 #endif
 #ifdef ECONNABORTED
-    case ECONNABORTED:
+        case ECONNABORTED:
 #endif
-/* Linux generates the rest of these, other tcp stacks (i.e.
- * bsd) tend to hide them behind getsockopt() interfaces.  They
- * occur when the net goes sour or the client disconnects after the
- * three-way handshake has been done in the kernel but before
- * userland has picked up the socket. */
+        /* Linux generates the rest of these, other tcp stacks (i.e.
+         * bsd) tend to hide them behind getsockopt() interfaces.  They
+         * occur when the net goes sour or the client disconnects after the
+         * three-way handshake has been done in the kernel but before
+         * userland has picked up the socket. */
 #ifdef ECONNRESET
-    case ECONNRESET:
+        case ECONNRESET:
 #endif
 #ifdef ETIMEDOUT
-    case ETIMEDOUT:
+        case ETIMEDOUT:
 #endif
 #ifdef EHOSTUNREACH
-    case EHOSTUNREACH:
+        case EHOSTUNREACH:
 #endif
 #ifdef ENETUNREACH
-    case ENETUNREACH:
+        case ENETUNREACH:
 #endif
-        return 1;
+            return 1;
 
-    default: return 0;
+        default:
+            return 0;
     }
 }
 
@@ -1107,7 +1116,7 @@ static int is_reasonable_accept_errno(const int error)
  */
 static int is_af_unix_keeper(const int fd)
 {
-    struct timeval tval = {READABLE_UNIX_FD_DROP_DEAD_TIMEVAL};
+    struct timeval tval = { READABLE_UNIX_FD_DROP_DEAD_TIMEVAL };
     fd_set read_fds;
 
     FD_ZERO(&read_fds);
@@ -1132,23 +1141,20 @@ static int is_af_unix_keeper(const int fd)
  *
  *----------------------------------------------------------------------
  */
-int OS_Accept(int listen_sock, int fail_on_intr, const char* webServerAddrs)
+int OS_Accept(int listen_sock, int fail_on_intr, const char *webServerAddrs)
 {
     int socket = -1;
-    union
-    {
+    union {
         struct sockaddr_un un;
         struct sockaddr_in in;
     } sa;
 
-    for (;;)
-    {
-        if (AcquireLock(listen_sock, fail_on_intr)) return -1;
+    for (;;) {
+        if (AcquireLock(listen_sock, fail_on_intr))
+            return -1;
 
-        for (;;)
-        {
-            do
-            {
+        for (;;) {
+            do {
 #ifdef HAVE_SOCKLEN
                 socklen_t len = sizeof(sa);
 #else
@@ -1157,16 +1163,19 @@ int OS_Accept(int listen_sock, int fail_on_intr, const char* webServerAddrs)
                 if (shutdownPending) break;
                 /* There's a window here */
 
-                socket = accept(listen_sock, (struct sockaddr*)&sa, &len);
-            } while (socket < 0 && errno == EINTR && !fail_on_intr && !shutdownPending);
+                socket = accept(listen_sock, (struct sockaddr *)&sa, &len);
+            } while (socket < 0 
+                     && errno == EINTR 
+                     && ! fail_on_intr 
+                     && ! shutdownPending);
 
             if (socket < 0) {
-                if (shutdownPending || !is_reasonable_accept_errno(errno)) {
+                if (shutdownPending || ! is_reasonable_accept_errno(errno)) {
                     int errnoSave = errno;
 
                     ReleaseLock(listen_sock);
-
-                    if (!shutdownPending) {
+                    
+                    if (! shutdownPending) {
                         errno = errnoSave;
                     }
 
@@ -1174,30 +1183,33 @@ int OS_Accept(int listen_sock, int fail_on_intr, const char* webServerAddrs)
                 }
                 errno = 0;
             }
-            else
-            { /* socket >= 0 */
+            else {  /* socket >= 0 */
                 int set = 1;
 
-                if (sa.in.sin_family != AF_INET) break;
+                if (sa.in.sin_family != AF_INET)
+                    break;
 
 #ifdef TCP_NODELAY
                 /* No replies to outgoing data, so disable Nagle */
-                setsockopt(socket, IPPROTO_TCP, TCP_NODELAY, (char*)&set, sizeof(set));
+                setsockopt(socket, IPPROTO_TCP, TCP_NODELAY, (char *)&set, sizeof(set));
 #endif
 
                 /* Check that the client IP address is approved */
-                if (ClientAddrOK(&sa.in, webServerAddrs)) break;
+                if (ClientAddrOK(&sa.in, webServerAddrs))
+                    break;
 
                 close(socket);
-            } /* socket >= 0 */
-        }     /* for(;;) */
+            }  /* socket >= 0 */
+        }  /* for(;;) */
 
-        if (ReleaseLock(listen_sock)) return (-1);
+        if (ReleaseLock(listen_sock))
+            return (-1);
 
-        if (sa.in.sin_family != AF_UNIX || is_af_unix_keeper(socket)) break;
+        if (sa.in.sin_family != AF_UNIX || is_af_unix_keeper(socket))
+            break;
 
         close(socket);
-    } /* while(1) - lock */
+    }  /* while(1) - lock */
 
     return (socket);
 }
@@ -1239,8 +1251,7 @@ int OS_IpcClose(int ipcFd)
  */
 int OS_IsFcgi(int sock)
 {
-    union
-    {
+	union {
         struct sockaddr_in in;
         struct sockaddr_un un;
     } sa;
@@ -1252,11 +1263,10 @@ int OS_IsFcgi(int sock)
 
     errno = 0;
 
-    if (getpeername(sock, (struct sockaddr*)&sa, &len) != 0 && errno == ENOTCONN) {
+    if (getpeername(sock, (struct sockaddr *)&sa, &len) != 0 && errno == ENOTCONN) {
         return TRUE;
     }
-    else
-    {
+    else {
         return FALSE;
     }
 }
@@ -1273,11 +1283,11 @@ int OS_IsFcgi(int sock)
 void OS_SetFlags(int fd, int flags)
 {
     int val;
-    if ((val = fcntl(fd, F_GETFL, 0)) < 0) {
+    if((val = fcntl(fd, F_GETFL, 0)) < 0) {
         exit(errno);
     }
     val |= flags;
-    if (fcntl(fd, F_SETFL, val) < 0) {
+    if(fcntl(fd, F_SETFL, val) < 0) {
         exit(errno);
     }
 }

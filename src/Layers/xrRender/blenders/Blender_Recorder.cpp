@@ -11,15 +11,24 @@
 
 static int ParseName(LPCSTR N)
 {
-    if (0 == xr_strcmp(N, "$null")) return -1;
-    if (0 == xr_strcmp(N, "$base0")) return 0;
-    if (0 == xr_strcmp(N, "$base1")) return 1;
-    if (0 == xr_strcmp(N, "$base2")) return 2;
-    if (0 == xr_strcmp(N, "$base3")) return 3;
-    if (0 == xr_strcmp(N, "$base4")) return 4;
-    if (0 == xr_strcmp(N, "$base5")) return 5;
-    if (0 == xr_strcmp(N, "$base6")) return 6;
-    if (0 == xr_strcmp(N, "$base7")) return 7;
+    if (0 == xr_strcmp(N, "$null"))
+        return -1;
+    if (0 == xr_strcmp(N, "$base0"))
+        return 0;
+    if (0 == xr_strcmp(N, "$base1"))
+        return 1;
+    if (0 == xr_strcmp(N, "$base2"))
+        return 2;
+    if (0 == xr_strcmp(N, "$base3"))
+        return 3;
+    if (0 == xr_strcmp(N, "$base4"))
+        return 4;
+    if (0 == xr_strcmp(N, "$base5"))
+        return 5;
+    if (0 == xr_strcmp(N, "$base6"))
+        return 6;
+    if (0 == xr_strcmp(N, "$base7"))
+        return 7;
     return -1;
 }
 
@@ -27,12 +36,8 @@ static int ParseName(LPCSTR N)
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-CBlender_Compile::CBlender_Compile()
-{
-}
-CBlender_Compile::~CBlender_Compile()
-{
-}
+CBlender_Compile::CBlender_Compile() {}
+CBlender_Compile::~CBlender_Compile() {}
 void CBlender_Compile::_cpp_Compile(ShaderElement* _SH)
 {
     SH = _SH;
@@ -46,12 +51,14 @@ void CBlender_Compile::_cpp_Compile(ShaderElement* _SH)
     detail_texture = NULL;
     detail_scaler = NULL;
     LPCSTR base = NULL;
-    if (bDetail && BT->canBeDetailed()) {
+    if (bDetail && BT->canBeDetailed())
+    {
         //
         sh_list& lst = L_textures;
         int id = ParseName(BT->oT_Name);
         base = BT->oT_Name;
-        if (id >= 0) {
+        if (id >= 0)
+        {
             if (id >= int(lst.size()))
                 xrDebug::Fatal(DEBUG_INFO, "Not enought textures for shader. Base texture: '%s'.", *lst[0]);
             base = *lst[id];
@@ -64,11 +71,13 @@ void CBlender_Compile::_cpp_Compile(ShaderElement* _SH)
         ////////////////////
         //	Igor
         //	Need this to correct base to detect steep parallax.
-        if (BT->canUseSteepParallax()) {
+        if (BT->canUseSteepParallax())
+        {
             sh_list& lst = L_textures;
             int id = ParseName(BT->oT_Name);
             base = BT->oT_Name;
-            if (id >= 0) {
+            if (id >= 0)
+            {
                 if (id >= int(lst.size()))
                     xrDebug::Fatal(DEBUG_INFO, "Not enought textures for shader. Base texture: '%s'.", *lst[0]);
                 base = *lst[id];
@@ -86,17 +95,20 @@ void CBlender_Compile::_cpp_Compile(ShaderElement* _SH)
 
 #ifndef _EDITOR
 #if RENDER == R_R1
-    if (RImplementation.o.no_detail_textures) bDetail = FALSE;
+    if (RImplementation.o.no_detail_textures)
+        bDetail = FALSE;
 #endif
 #endif
 
-    if (bDetail) {
+    if (bDetail)
+    {
         RImplementation.Resources->m_textures_description.GetTextureUsage(base, bDetail_Diffuse, bDetail_Bump);
 
 #ifndef _EDITOR
 #if RENDER != R_R1
         //	Detect the alowance of detail bump usage here.
-        if (!(RImplementation.o.advancedpp && ps_r2_ls_flags.test(R2FLAG_DETAIL_BUMP))) {
+        if (!(RImplementation.o.advancedpp && ps_r2_ls_flags.test(R2FLAG_DETAIL_BUMP)))
+        {
             bDetail_Diffuse |= bDetail_Bump;
             bDetail_Bump = false;
         }
@@ -126,9 +138,11 @@ void CBlender_Compile::SetParams(int iPriority, bool bStrictB2F)
 {
     SH->flags.iPriority = iPriority;
     SH->flags.bStrictB2F = bStrictB2F;
-    if (bStrictB2F) {
+    if (bStrictB2F)
+    {
 #ifdef _EDITOR
-        if (1 != (SH->flags.iPriority / 2)) {
+        if (1 != (SH->flags.iPriority / 2))
+        {
             Log("!If StrictB2F true then Priority must div 2.");
             SH->flags.bStrictB2F = FALSE;
         }
@@ -175,7 +189,7 @@ void CBlender_Compile::PassEnd()
     proto.cs = RImplementation.Resources->_CreateCS(pass_cs);
     ctable.merge(&proto.cs->constants);
 #endif
-#endif  //	USE_DX10
+#endif //	USE_DX10
     SetMapping();
     proto.constants = RImplementation.Resources->_CreateConstantTable(ctable);
     proto.T = RImplementation.Resources->_CreateTextureList(passTextures);
@@ -202,7 +216,8 @@ void CBlender_Compile::PassSET_VS(LPCSTR name)
 
 void CBlender_Compile::PassSET_ZB(BOOL bZTest, BOOL bZWrite, BOOL bInvertZTest)
 {
-    if (Pass()) bZWrite = FALSE;
+    if (Pass())
+        bZWrite = FALSE;
     RS.SetRS(D3DRS_ZFUNC, bZTest ? (bInvertZTest ? D3DCMP_GREATER : D3DCMP_LESSEQUAL) : D3DCMP_ALWAYS);
     RS.SetRS(D3DRS_ZWRITEENABLE, BC(bZWrite));
     /*
@@ -213,7 +228,8 @@ void CBlender_Compile::PassSET_ZB(BOOL bZTest, BOOL bZWrite, BOOL bInvertZTest)
 
 void CBlender_Compile::PassSET_ablend_mode(BOOL bABlend, u32 abSRC, u32 abDST)
 {
-    if (bABlend && D3DBLEND_ONE == abSRC && D3DBLEND_ZERO == abDST) bABlend = FALSE;
+    if (bABlend && D3DBLEND_ONE == abSRC && D3DBLEND_ZERO == abDST)
+        bABlend = FALSE;
     RS.SetRS(D3DRS_ALPHABLENDENABLE, BC(bABlend));
     RS.SetRS(D3DRS_SRCBLEND, bABlend ? abSRC : D3DBLEND_ONE);
     RS.SetRS(D3DRS_DESTBLEND, bABlend ? abDST : D3DBLEND_ZERO);
@@ -225,20 +241,22 @@ void CBlender_Compile::PassSET_ablend_mode(BOOL bABlend, u32 abSRC, u32 abDST)
     //	alpha in DX10 identical to color.
     RS.SetRS(D3DRS_SRCBLENDALPHA, bABlend ? abSRC : D3DBLEND_ONE);
     RS.SetRS(D3DRS_DESTBLENDALPHA, bABlend ? abDST : D3DBLEND_ZERO);
-#endif  //	USE_DX10
+#endif //	USE_DX10
 }
 void CBlender_Compile::PassSET_ablend_aref(BOOL bATest, u32 aRef)
 {
     clamp(aRef, 0u, 255u);
     RS.SetRS(D3DRS_ALPHATESTENABLE, BC(bATest));
-    if (bATest) RS.SetRS(D3DRS_ALPHAREF, u32(aRef));
+    if (bATest)
+        RS.SetRS(D3DRS_ALPHAREF, u32(aRef));
 }
 
 void CBlender_Compile::PassSET_Blend(BOOL bABlend, u32 abSRC, u32 abDST, BOOL bATest, u32 aRef)
 {
     PassSET_ablend_mode(bABlend, abSRC, abDST);
 #ifdef DEBUG
-    if (strstr(Core.Params, "-noaref")) {
+    if (strstr(Core.Params, "-noaref"))
+    {
         bATest = FALSE;
         aRef = 0;
     }
@@ -256,12 +274,9 @@ void CBlender_Compile::PassSET_LightFog(BOOL bLight, BOOL bFog)
 //
 void CBlender_Compile::StageBegin()
 {
-    StageSET_Address(D3DTADDRESS_WRAP);  // Wrapping enabled by default
+    StageSET_Address(D3DTADDRESS_WRAP); // Wrapping enabled by default
 }
-void CBlender_Compile::StageEnd()
-{
-    dwStage++;
-}
+void CBlender_Compile::StageEnd() { dwStage++; }
 void CBlender_Compile::StageSET_Address(u32 adr)
 {
     RS.SetSAMP(Stage(), D3DSAMP_ADDRESSU, adr);
@@ -274,18 +289,9 @@ void CBlender_Compile::StageSET_XForm(u32 tf, u32 tc)
     RS.SetTSS(Stage(), D3DTSS_TEXCOORDINDEX, tc);
 #endif
 }
-void CBlender_Compile::StageSET_Color(u32 a1, u32 op, u32 a2)
-{
-    RS.SetColor(Stage(), a1, op, a2);
-}
-void CBlender_Compile::StageSET_Color3(u32 a1, u32 op, u32 a2, u32 a3)
-{
-    RS.SetColor3(Stage(), a1, op, a2, a3);
-}
-void CBlender_Compile::StageSET_Alpha(u32 a1, u32 op, u32 a2)
-{
-    RS.SetAlpha(Stage(), a1, op, a2);
-}
+void CBlender_Compile::StageSET_Color(u32 a1, u32 op, u32 a2) { RS.SetColor(Stage(), a1, op, a2); }
+void CBlender_Compile::StageSET_Color3(u32 a1, u32 op, u32 a2, u32 a3) { RS.SetColor3(Stage(), a1, op, a2, a3); }
+void CBlender_Compile::StageSET_Alpha(u32 a1, u32 op, u32 a2) { RS.SetAlpha(Stage(), a1, op, a2); }
 #if !defined(USE_DX10) && !defined(USE_DX11)
 void CBlender_Compile::StageSET_TMC(LPCSTR T, LPCSTR M, LPCSTR C, int UVW_channel)
 {
@@ -307,7 +313,8 @@ void CBlender_Compile::Stage_Texture(LPCSTR name, u32, u32 fmin, u32 fmip, u32 f
     sh_list& lst = L_textures;
     int id = ParseName(name);
     LPCSTR N = name;
-    if (id >= 0) {
+    if (id >= 0)
+    {
         if (id >= int(lst.size()))
             xrDebug::Fatal(DEBUG_INFO, "Not enought textures for shader. Base texture: '%s'.", *lst[0]);
         N = *lst[id];
@@ -316,7 +323,7 @@ void CBlender_Compile::Stage_Texture(LPCSTR name, u32, u32 fmin, u32 fmip, u32 f
     //	i_Address				(Stage(),address);
     i_Filter(Stage(), fmin, fmip, fmag);
 }
-#endif  //	USE_DX10
+#endif //	USE_DX10
 void CBlender_Compile::Stage_Matrix(LPCSTR name, int iChannel)
 {
     sh_list& lst = L_matrices;
@@ -326,7 +333,8 @@ void CBlender_Compile::Stage_Matrix(LPCSTR name, int iChannel)
 
     // Setup transform pipeline
     u32 ID = Stage();
-    if (M) {
+    if (M)
+    {
         switch (M->dwMode)
         {
         case CMatrix::modeProgrammable: StageSET_XForm(D3DTTFF_COUNT3, D3DTSS_TCI_CAMERASPACEPOSITION | ID); break;

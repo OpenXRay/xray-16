@@ -10,17 +10,13 @@
 
 class CScriptGameObject;
 
-#define TEMPLATE_SPECIALIZATION                                                                                        \
+#define TEMPLATE_SPECIALIZATION \
     template <typename _object_type, template <typename _base_object_type> class ancestor, typename _base_object_type>
 #define CWrapper CWrapperAbstract<_object_type, ancestor, _base_object_type>
 #define CWrapper2 CWrapperAbstract2<_object_type, ancestor, _base_object_type>
 
 TEMPLATE_SPECIALIZATION
-IC CWrapper::CWrapperAbstract()
-{
-    m_object = 0;
-}
-
+IC CWrapper::CWrapperAbstract() { m_object = 0; }
 TEMPLATE_SPECIALIZATION
 template <typename T1>
 IC CWrapper::CWrapperAbstract(T1 t1) : inherited(t1)
@@ -36,10 +32,7 @@ IC CWrapper::CWrapperAbstract(T1 t1, T2 t2, T3 t3) : inherited(t1, t2, t3)
 }
 
 TEMPLATE_SPECIALIZATION
-CWrapper::~CWrapperAbstract()
-{
-}
-
+CWrapper::~CWrapperAbstract() {}
 TEMPLATE_SPECIALIZATION
 void CWrapper::setup(_object_type* object)
 {
@@ -69,11 +62,7 @@ IC _object_type& CWrapper::object() const
 //////////////////////////////////////////////////////////////////////////
 
 TEMPLATE_SPECIALIZATION
-IC CWrapper2::CWrapperAbstract2()
-{
-    m_object = 0;
-}
-
+IC CWrapper2::CWrapperAbstract2() { m_object = 0; }
 TEMPLATE_SPECIALIZATION
 template <typename T1>
 IC CWrapper2::CWrapperAbstract2(T1 t1) : inherited(t1)
@@ -117,10 +106,7 @@ IC CWrapper2::CWrapperAbstract2(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5) : inherited(t
 }
 
 TEMPLATE_SPECIALIZATION
-CWrapper2::~CWrapperAbstract2()
-{
-}
-
+CWrapper2::~CWrapperAbstract2() {}
 TEMPLATE_SPECIALIZATION
 void CWrapper2::setup(_object_type* object, CPropertyStorage* storage)
 {

@@ -36,8 +36,8 @@ public:
 
 protected:
     game_state_accumulator* m_owner;
-};  // class player_state_param
+}; // class player_state_param
 
-}  // namespace award_system
+} // namespace award_system
 
-#endif  //#ifndef PLAYER_STATE_PARAM_INCLUDED
+#endif //#ifndef PLAYER_STATE_PARAM_INCLUDED

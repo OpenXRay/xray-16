@@ -8,7 +8,7 @@
 struct Triangle;
 struct dxBox
 {
-    dVector3 side;  // side lengths (x,y,z)
+    dVector3 side; // side lengths (x,y,z)
 };
 
 IC float dcTriListCollider::dBoxProj(dxGeom* box, const dReal* normal)
@@ -21,7 +21,7 @@ IC float dcTriListCollider::dBoxProj(dxGeom* box, const dReal* normal)
     hside[2] *= 0.5f;
     const dReal* R = dGeomGetRotation(box);
     return dFabs(dDOT14(normal, R + 0) * hside[0]) + dFabs(dDOT14(normal, R + 1) * hside[1]) +
-           dFabs(dDOT14(normal, R + 2) * hside[2]);
+        dFabs(dDOT14(normal, R + 2) * hside[2]);
 }
 
 IC void dcTriListCollider::CrossProjLine(
@@ -29,7 +29,8 @@ IC void dcTriListCollider::CrossProjLine(
 {
     dVector3 ac = {pt1[0] - pt2[0], pt1[1] - pt2[1], pt1[2] - pt2[2]};
     dReal factor = (dDOT(vc2, vc2) * dDOT44(vc1, vc1) - dDOT14(vc2, vc1) * dDOT14(vc2, vc1));
-    if (factor == 0.f) {
+    if (factor == 0.f)
+    {
         proj[0] = dInfinity;
         // proj[1]=dInfinity;
         // proj[2]=dInfinity;
@@ -47,7 +48,8 @@ IC void dcTriListCollider::CrossProjLine1(
 {
     dVector3 ac = {pt1[0] - pt2[0], pt1[1] - pt2[1], pt1[2] - pt2[2]};
     dReal factor = (dDOT44(vc2, vc2) * dDOT(vc1, vc1) - dDOT41(vc2, vc1) * dDOT41(vc2, vc1));
-    if (factor == 0.f) {
+    if (factor == 0.f)
+    {
         proj[0] = dInfinity;
         // proj[1]=dInfinity;
         // proj[2]=dInfinity;
@@ -70,7 +72,8 @@ IC bool dcTriListCollider::CrossProjLine14(
     dReal vc1_2 = dDOT(vc1, vc1);
 
     dReal factor = /*vc2_2*/ vc1_2 - vc1_vc2 * vc1_vc2;
-    if (factor == 0.f) {
+    if (factor == 0.f)
+    {
         // proj[0]=dInfinity;
         // proj[1]=dInfinity;
         // proj[2]=dInfinity;
@@ -80,13 +83,16 @@ IC bool dcTriListCollider::CrossProjLine14(
     dReal ac_vc2 = dDOT14(ac, vc2);
     dReal t1 = (ac_vc2 * vc1_vc2 - ac_vc1 /*vc2_2*/) / factor;
 
-    if (t1 < 0.f) return false;
-    if (t1 > 1.f) return false;
+    if (t1 < 0.f)
+        return false;
+    if (t1 > 1.f)
+        return false;
 
     dReal t2 = (ac_vc1 * vc1_vc2 - ac_vc2 * vc1_2) / factor;
 
-    dReal nt2 = t2;  //*_sqrt(vc2_2);
-    if (nt2 > hside || nt2 < -hside) return false;
+    dReal nt2 = t2; //*_sqrt(vc2_2);
+    if (nt2 > hside || nt2 < -hside)
+        return false;
 
     proj[0] = pt1[0] + vc1[0] * t1;
     proj[1] = pt1[1] + vc1[1] * t1;
@@ -117,16 +123,21 @@ inline dReal PointBoxTest(const dReal* Pt, const dReal* BxP, const dReal* BxEx, 
     dReal depth0, depth1, depth2;
 
     depth0 = -dFabs(BxPR[0] - PtR[0]) + BxEx[0] / 2;
-    if (depth0 < 0) return -1.f;
+    if (depth0 < 0)
+        return -1.f;
 
     depth1 = -dFabs(BxPR[1] - PtR[1]) + BxEx[1] / 2;
-    if (depth1 < 0) return -1.f;
+    if (depth1 < 0)
+        return -1.f;
 
     depth2 = -dFabs(BxPR[2] - PtR[2]) + BxEx[2] / 2;
-    if (depth2 < 0) return -1;
+    if (depth2 < 0)
+        return -1;
 
-    if (depth0 < depth1) {
-        if (depth0 < depth2) {
+    if (depth0 < depth1)
+    {
+        if (depth0 < depth2)
+        {
             normR[0] = PtR[0] - BxPR[0];
             dMULTIPLY0_331(norm, R, normR);
             return depth0;
@@ -141,7 +152,8 @@ inline dReal PointBoxTest(const dReal* Pt, const dReal* BxP, const dReal* BxEx, 
     }
     else
     {
-        if (depth1 < depth2) {
+        if (depth1 < depth2)
+        {
             normR[1] = PtR[1] - BxPR[1];
             dMULTIPLY0_331(norm, R, normR);
             return depth1;
@@ -163,7 +175,7 @@ IC dReal dcTriListCollider::FragmentonBoxTest(
     accurate_normalize(fragmentonAx);
     dReal BxPPr = dDOT(fragmentonAx, BxP);
     BxExPr = dFabs(dDOT14(fragmentonAx, R + 0) * BxEx[0]) + dFabs(dDOT14(fragmentonAx, R + 1) * BxEx[1]) +
-             dFabs(dDOT14(fragmentonAx, R + 2) * BxEx[2]);
+        dFabs(dDOT14(fragmentonAx, R + 2) * BxEx[2]);
 
     if ((dDOT(fragmentonAx, Pt1) - BxPPr - BxExPr / 2.f) * (dDOT(fragmentonAx, Pt2) - BxPPr - BxExPr / 2.f) > 0.f &&
         (dDOT(fragmentonAx, Pt1) - BxPPr + BxExPr / 2.f) * (dDOT(fragmentonAx, Pt2) - BxPPr + BxExPr / 2.f) > 0.f)
@@ -173,31 +185,36 @@ IC dReal dcTriListCollider::FragmentonBoxTest(
     dCROSS114(crossAx0, =, fragmentonAx, R + 0);
     accurate_normalize(crossAx0);
     BxExPr = dFabs(dDOT14(crossAx0, R + 0) * BxEx[0]) + dFabs(dDOT14(crossAx0, R + 1) * BxEx[1]) +
-             dFabs(dDOT14(crossAx0, R + 2) * BxEx[2]);
+        dFabs(dDOT14(crossAx0, R + 2) * BxEx[2]);
     dReal distance0 = dDOT(crossAx0, Pt1) - dDOT(crossAx0, BxP);
-    if (dFabs(distance0) > BxExPr / 2.f) return -1.f;
+    if (dFabs(distance0) > BxExPr / 2.f)
+        return -1.f;
     dReal depth0 = BxExPr / 2.f - dFabs(distance0);
 
     dVector3 crossAx1;
     dCROSS114(crossAx1, =, fragmentonAx, R + 1);
     accurate_normalize(crossAx1);
     BxExPr = dFabs(dDOT14(crossAx1, R + 0) * BxEx[0]) + dFabs(dDOT14(crossAx1, R + 1) * BxEx[1]) +
-             dFabs(dDOT14(crossAx1, R + 2) * BxEx[2]);
+        dFabs(dDOT14(crossAx1, R + 2) * BxEx[2]);
     dReal distance1 = dDOT(crossAx1, Pt1) - dDOT(crossAx1, BxP);
-    if (dFabs(distance1) > BxExPr / 2.f) return -1.f;
+    if (dFabs(distance1) > BxExPr / 2.f)
+        return -1.f;
     dReal depth1 = BxExPr / 2.f - dFabs(distance1);
 
     dVector3 crossAx2;
     dCROSS114(crossAx2, =, fragmentonAx, R + 2);
     accurate_normalize(crossAx2);
     BxExPr = dFabs(dDOT14(crossAx2, R + 0) * BxEx[0]) + dFabs(dDOT14(crossAx2, R + 1) * BxEx[1]) +
-             dFabs(dDOT14(crossAx2, R + 2) * BxEx[2]);
+        dFabs(dDOT14(crossAx2, R + 2) * BxEx[2]);
     dReal distance2 = dDOT(crossAx2, Pt1) - dDOT(crossAx2, BxP);
-    if (dFabs(distance2) > BxExPr / 2.f) return -1.f;
+    if (dFabs(distance2) > BxExPr / 2.f)
+        return -1.f;
     dReal depth2 = BxExPr / 2.f - dFabs(distance2);
 
-    if (depth0 < depth1) {
-        if (depth0 < depth2) {
+    if (depth0 < depth1)
+    {
+        if (depth0 < depth2)
+        {
             norm[0] = distance0 * crossAx0[0];
             norm[1] = distance0 * crossAx0[1];
             norm[2] = distance0 * crossAx0[2];
@@ -223,7 +240,8 @@ IC dReal dcTriListCollider::FragmentonBoxTest(
 
     else
     {
-        if (depth1 < depth2) {
+        if (depth1 < depth2)
+        {
             norm[0] = distance1 * crossAx1[0];
             norm[1] = distance1 * crossAx1[1];
             norm[2] = distance1 * crossAx1[2];

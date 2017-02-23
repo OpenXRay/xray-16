@@ -26,6 +26,6 @@ private:
     typedef base inherited;
 };
 
-}  // namespace steering_behaviour
+} // namespace steering_behaviour
 
-#endif  // STEERING_BEHAVIOUR_SEPARATION_H_INCLUDED
+#endif // STEERING_BEHAVIOUR_SEPARATION_H_INCLUDED

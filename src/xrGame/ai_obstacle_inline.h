@@ -20,7 +20,8 @@ IC ai_obstacle::ai_obstacle(CGameObject* object)
 
 IC void ai_obstacle::compute()
 {
-    if (m_actual) return;
+    if (m_actual)
+        return;
 
     m_actual = true;
     compute_impl();
@@ -50,4 +51,4 @@ IC const MagicBox3 ai_obstacle::min_box()
     return (m_min_box);
 }
 
-#endif  // AI_OBSTACLE_INLINE_H
+#endif // AI_OBSTACLE_INLINE_H

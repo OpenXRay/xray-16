@@ -8,22 +8,16 @@
 
 #pragma once
 
-#define TEMPLATE_SPECIALIZATION                                                                                        \
-    template <typename TEdge, bool EuclidianHeuristics>                                                                \
+#define TEMPLATE_SPECIALIZATION                         \
+    template <typename TEdge, bool EuclidianHeuristics> \
     template <typename TCompoundVertex>
 
 #define CEdgePathBuilder CEdgePath<TEdge, EuclidianHeuristics>::CDataStorage<TCompoundVertex>
 
 TEMPLATE_SPECIALIZATION
-inline CEdgePathBuilder::CDataStorage(const u32 vertex_count) : Inherited(vertex_count)
-{
-}
-
+inline CEdgePathBuilder::CDataStorage(const u32 vertex_count) : Inherited(vertex_count) {}
 TEMPLATE_SPECIALIZATION
-CEdgePathBuilder::~CDataStorage()
-{
-}
-
+CEdgePathBuilder::~CDataStorage() {}
 TEMPLATE_SPECIALIZATION
 inline void CEdgePathBuilder::assign_parent(Vertex& neighbour, Vertex* parent)
 {
@@ -48,7 +42,8 @@ inline void CEdgePathBuilder::get_edge_path(xr_vector<TEdge>& path, Vertex* best
     i--;
     path.resize(n + i);
     t2 = best;
-    if (!reverse_order) {
+    if (!reverse_order)
+    {
         auto it = path.rbegin();
         for (; t2->back(); t2 = t2->back(), it++)
             *it = t2->edge();

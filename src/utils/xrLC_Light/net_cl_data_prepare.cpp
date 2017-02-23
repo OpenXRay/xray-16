@@ -20,7 +20,6 @@ class NetCompileDetaPrepare : public CThread
 {
 public:
     NetCompileDetaPrepare() : CThread(0, ProxyMsg) { thMessages = FALSE; }
-
 private:
     virtual void Execute()
     {
@@ -32,7 +31,7 @@ private:
 void RunNetCompileDataPrepare()
 {
     cl_data_prepare.start(new NetCompileDetaPrepare());
-    SartupNetTaskManager();  //.
+    SartupNetTaskManager(); //.
 }
 
 void WaitNetCompileDataPrepare()
@@ -45,10 +44,11 @@ void WaitNetCompileDataPrepare()
         // cl_data_prepare.wait();
         inited = global_compile_data_initialized;
         wait_lock.Leave();
-        if (inited) break;
+        if (inited)
+            break;
     }
 }
-void WaitNetBaseCompileDataPrepare()  // to do refactoring
+void WaitNetBaseCompileDataPrepare() // to do refactoring
 {
     for (;;)
     {
@@ -58,7 +58,8 @@ void WaitNetBaseCompileDataPrepare()  // to do refactoring
         // cl_data_prepare.wait();
         inited = base_global_compile_data_initialized;
         wait_lock.Leave();
-        if (inited) break;
+        if (inited)
+            break;
     }
 }
 
@@ -84,11 +85,7 @@ void SetGlobalCompileDataInitialized()
     wait_lock.Leave();
 }
 
-void SartupNetTaskManager()
-{
-    lc_net::get_task_manager().startup();
-}
-
+void SartupNetTaskManager() { lc_net::get_task_manager().startup(); }
 extern u32 vertises_has_lighting;
 u32 CalcAllTranslucency();
 

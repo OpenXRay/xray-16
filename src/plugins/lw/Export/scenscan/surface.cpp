@@ -25,7 +25,8 @@ static int findSurf(ObjectDB* odb, const char* tag)
     int i;
 
     for (i = 0; i < odb->nsurfaces; i++)
-        if (!strcmp(tag, odb->surf[i].name)) return i;
+        if (!strcmp(tag, odb->surf[i].name))
+            return i;
 
     return -1;
 }
@@ -41,10 +42,13 @@ void freeObjectSurfs(ObjectDB* odb)
 {
     int i;
 
-    if (odb) {
-        if (odb->surf) {
+    if (odb)
+    {
+        if (odb->surf)
+        {
             for (i = 0; i < odb->nsurfaces; i++)
-                if (odb->surf[i].name) free(odb->surf[i].name);
+                if (odb->surf[i].name)
+                    free(odb->surf[i].name);
             free(odb->surf);
             odb->surf = 0;
             odb->nsurfaces = 0;
@@ -79,20 +83,26 @@ int getObjectSurfs(ObjectDB* odb, LWMeshInfo* mesh, GlobalFunc* global)
     const char* tag;
 
     imglist = (st_LWImageList*)global(LWIMAGELIST_GLOBAL, GFUSE_TRANSIENT);
-    if (!imglist) return 0;
+    if (!imglist)
+        return 0;
     txfunc = (st_LWTextureFuncs*)global(LWTEXTUREFUNCS_GLOBAL, GFUSE_TRANSIENT); /* get the surface ID array */
-    if (!txfunc) return 0;
+    if (!txfunc)
+        return 0;
     surff = (st_LWSurfaceFuncs*)global(LWSURFACEFUNCS_GLOBAL, GFUSE_TRANSIENT);
-    if (!surff) return 0;
+    if (!surff)
+        return 0;
     surfid = surff->byObject(odb->filename);
-    if (!surfid) return 0;
+    if (!surfid)
+        return 0;
 
     /* count the surface IDs and alloc the surface array */
 
     for (odb->nsurfaces = 0;; odb->nsurfaces++)
-        if (!surfid[odb->nsurfaces]) break;
+        if (!surfid[odb->nsurfaces])
+            break;
     odb->surf = (st_DBSurface*)calloc(odb->nsurfaces, sizeof(DBSurface));
-    if (!odb->surf) {
+    if (!odb->surf)
+    {
         odb->nsurfaces = 0;
         return 0;
     }
@@ -104,14 +114,16 @@ int getObjectSurfs(ObjectDB* odb, LWMeshInfo* mesh, GlobalFunc* global)
         odb->surf[i].id = surfid[i];
         tag = surff->name(surfid[i]);
         odb->surf[i].name = (char*)malloc(xr_strlen(tag) + 1);
-        if (!odb->surf[i].name) {
+        if (!odb->surf[i].name)
+        {
             freeObjectSurfs(odb);
             return 0;
         }
         strcpy(odb->surf[i].name, tag);
 
         LWTextureID tid = surff->getTex(surfid[i], SURF_COLR);
-        if (!tid) {
+        if (!tid)
+        {
             g_msg->error("Empty texture in surface:", odb->surf[i].name);
             freeObjectSurfs(odb);
             return 0;
@@ -121,7 +133,8 @@ int getObjectSurfs(ObjectDB* odb, LWMeshInfo* mesh, GlobalFunc* global)
             DWORD imid;
             int res = txfunc->getParam(tlid, TXTAG_IMAGE, &imid);
             tag = imglist->name((LWImageID)imid);
-            if (!tag) {
+            if (!tag)
+            {
                 g_msg->error("Invalid texture name.", 0);
                 return 0;
             }

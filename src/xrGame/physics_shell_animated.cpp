@@ -24,11 +24,7 @@ bool physics_shell_animated::update(const Fmatrix& xrorm)
     return true;
 }
 
-physics_shell_animated::~physics_shell_animated()
-{
-    destroy_physics_shell(physics_shell);
-}
-
+physics_shell_animated::~physics_shell_animated() { destroy_physics_shell(physics_shell); }
 void physics_shell_animated::create_shell(CPhysicsShellHolder* O)
 {
     physics_shell = P_build_Shell((IPhysicsShellHolder*)(O), true, (BONE_P_MAP*)0, true);

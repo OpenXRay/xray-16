@@ -28,20 +28,20 @@ CStateManagerZombie::CStateManagerZombie(CZombie* obj) : inherited(obj)
     add_state(eStateHearHelpSound, new CStateMonsterHearHelpSound<CZombie>(obj));
 }
 
-CStateManagerZombie::~CStateManagerZombie()
-{
-}
-
+CStateManagerZombie::~CStateManagerZombie() {}
 void CStateManagerZombie::execute()
 {
-    if (object->com_man().ta_is_active()) return;
+    if (object->com_man().ta_is_active())
+        return;
 
     u32 state_id = u32(-1);
 
-    if (!object->is_under_control()) {
+    if (!object->is_under_control())
+    {
         const CEntityAlive* enemy = object->EnemyMan.get_enemy();
 
-        if (enemy) {
+        if (enemy)
+        {
             state_id = eStateAttack;
         }
         else if (check_state(eStateHearHelpSound))

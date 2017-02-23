@@ -32,12 +32,9 @@ public:
     IC BOOL PSI_alive() { return m_iLifeTime > 0; }
     IC BOOL PSI_IsAutomatic() { return m_bAutoRemove; }
     IC void PSI_SetLifeTime(float life_time) { m_iLifeTime = iFloor(life_time * 1000); }
-
     virtual void Play(bool bHudMode) = 0;
     virtual BOOL Locked() { return FALSE; }
-
     virtual shared_str shedule_Name() const { return shared_str("particle_instance"); };
-
     virtual void shedule_Update(u32 dt);
     virtual IRenderable* dcast_Renderable() { return this; }
 };

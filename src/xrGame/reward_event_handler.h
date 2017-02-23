@@ -30,8 +30,8 @@ public:
 
 protected:
     game_state_accumulator* m_player_state_accum;
-};  // class reward_event_handler
+}; // class reward_event_handler
 
-}  // namespace award_system
+} // namespace award_system
 
-#endif  //#ifndef REWARD_EVENT_HANDLER
+#endif //#ifndef REWARD_EVENT_HANDLER

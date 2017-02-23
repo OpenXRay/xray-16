@@ -19,12 +19,10 @@ class CMonsterStateInterface
 public:
     CMonsterStateInterface(CBaseMonster* p_object) : m_object(p_object) {}
     virtual ~CMonsterStateInterface() {}
-
     virtual void* get_data() = 0 {}
     virtual void initialize() { time_state_started = Device.dwTimeGlobal; }
     virtual void execute() {}
     virtual bool check_completion() { return true; }
-
 protected:
     CBaseMonster* m_object;
     u32 time_state_started;
@@ -42,15 +40,12 @@ public:
     }
 
     virtual ~CMonsterStateAdapter() { xr_delete(m_impl); }
-
     virtual void initialize() { m_impl->initialize(); }
     virtual void execute() { m_impl->execute(); }
     virtual bool check_completion() { return m_impl->check_completion(); }
-
     virtual void remove_links(IGameObject* object) { inherited::remove_links(object); }
-
 private:
     CMonsterStateInterface* m_impl;
 };
 
-#endif  // GROUP_STATE_ADAPTER_H_INCLUDED
+#endif // GROUP_STATE_ADAPTER_H_INCLUDED

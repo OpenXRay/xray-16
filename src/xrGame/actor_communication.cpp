@@ -36,26 +36,31 @@ void CActor::AddGameNews(GAME_NEWS_DATA& news_data)
     news_data.receive_time = Level().GetGameTime();
     news_vector.push_back(news_data);
 
-    if (CurrentGameUI()) {
+    if (CurrentGameUI())
+    {
         CurrentGameUI()->UIMainIngameWnd->ReceiveNews(&news_data);
     }
 }
 
 bool CActor::OnReceiveInfo(shared_str info_id) const
 {
-    if (!CInventoryOwner::OnReceiveInfo(info_id)) return false;
+    if (!CInventoryOwner::OnReceiveInfo(info_id))
+        return false;
 
     CInfoPortion info_portion;
     info_portion.Load(info_id);
 
     callback(GameObject::eInventoryInfo)(lua_game_object(), *info_id);
 
-    if (!CurrentGameUI()) return false;
+    if (!CurrentGameUI())
+        return false;
     //только если находимся в режиме single
     CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(CurrentGameUI());
-    if (!pGameSP) return false;
+    if (!pGameSP)
+        return false;
 
-    if (pGameSP->TalkMenu->IsShown()) {
+    if (pGameSP->TalkMenu->IsShown())
+    {
         pGameSP->TalkMenu->NeedUpdateQuestions();
     }
 
@@ -66,22 +71,27 @@ void CActor::OnDisableInfo(shared_str info_id) const
 {
     CInventoryOwner::OnDisableInfo(info_id);
 
-    if (!CurrentGameUI()) return;
+    if (!CurrentGameUI())
+        return;
 
     //только если находимся в режиме single
     CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(CurrentGameUI());
-    if (!pGameSP) return;
+    if (!pGameSP)
+        return;
 
-    if (pGameSP->TalkMenu->IsShown()) pGameSP->TalkMenu->NeedUpdateQuestions();
+    if (pGameSP->TalkMenu->IsShown())
+        pGameSP->TalkMenu->NeedUpdateQuestions();
 }
 
 void CActor::ReceivePhrase(DIALOG_SHARED_PTR& phrase_dialog)
 {
     //только если находимся в режиме single
     CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(CurrentGameUI());
-    if (!pGameSP) return;
+    if (!pGameSP)
+        return;
 
-    if (pGameSP->TalkMenu->IsShown()) pGameSP->TalkMenu->NeedUpdateQuestions();
+    if (pGameSP->TalkMenu->IsShown())
+        pGameSP->TalkMenu->NeedUpdateQuestions();
 
     CPhraseDialogManager::ReceivePhrase(phrase_dialog);
 }
@@ -103,7 +113,8 @@ void CActor::UpdateAvailableDialogs(CPhraseDialogManager* partner)
 
 void CActor::TryToTalk()
 {
-    if (!IsTalking()) {
+    if (!IsTalking())
+    {
         RunTalkDialog(m_pPersonWeLookingAt, false);
     }
 }
@@ -111,10 +122,12 @@ void CActor::TryToTalk()
 void CActor::RunTalkDialog(CInventoryOwner* talk_partner, bool disable_break)
 {
     //предложить поговорить с нами
-    if (talk_partner->OfferTalk(this)) {
+    if (talk_partner->OfferTalk(this))
+    {
         StartTalk(talk_partner);
 
-        if (CurrentGameUI()->TopInputReceiver()) CurrentGameUI()->TopInputReceiver()->HideDialog();
+        if (CurrentGameUI()->TopInputReceiver())
+            CurrentGameUI()->TopInputReceiver()->HideDialog();
 
         //		smart_cast<CUIGameSP*>(CurrentGameUI())->StartTalk(disable_break);
         smart_cast<CUIGameSP*>(CurrentGameUI())->StartTalk(talk_partner->bDisableBreakDialog);
@@ -124,7 +137,8 @@ void CActor::RunTalkDialog(CInventoryOwner* talk_partner, bool disable_break)
 void CActor::StartTalk(CInventoryOwner* talk_partner)
 {
     PIItem det_active = inventory().ItemFromSlot(DETECTOR_SLOT);
-    if (det_active) {
+    if (det_active)
+    {
         CCustomDetector* det = smart_cast<CCustomDetector*>(det_active);
         det->HideDetector(true);
     }
@@ -136,7 +150,8 @@ void CActor::StartTalk(CInventoryOwner* talk_partner)
 
 void CActor::NewPdaContact(CInventoryOwner* pInvOwner)
 {
-    if (!IsGameTypeSingle()) return;
+    if (!IsGameTypeSingle())
+        return;
 
     bool b_alive = !!(smart_cast<CEntityAlive*>(pInvOwner))->g_Alive();
     CurrentGameUI()->UIMainIngameWnd->AnimateContacts(b_alive);
@@ -147,7 +162,8 @@ void CActor::NewPdaContact(CInventoryOwner* pInvOwner)
 void CActor::LostPdaContact(CInventoryOwner* pInvOwner)
 {
     CGameObject* GO = smart_cast<CGameObject*>(pInvOwner);
-    if (GO) {
+    if (GO)
+    {
         for (int t = ALife::eRelationTypeFriend; t < ALife::eRelationTypeLast; ++t)
         {
             ALife::ERelationType tt = (ALife::ERelationType)t;
@@ -172,7 +188,8 @@ void CActor::UpdateDefferedMessages()
     while (m_defferedMessages.size())
     {
         SDefNewsMsg& M = m_defferedMessages.back();
-        if (M.time <= Device.dwTimeGlobal) {
+        if (M.time <= Device.dwTimeGlobal)
+        {
             AddGameNews(*M.news_data);
             xr_delete(M.news_data);
             m_defferedMessages.pop_back();
@@ -185,7 +202,8 @@ void CActor::UpdateDefferedMessages()
 bool CActor::OnDialogSoundHandlerStart(CInventoryOwner* inv_owner, LPCSTR phrase)
 {
     CAI_Trader* trader = smart_cast<CAI_Trader*>(inv_owner);
-    if (!trader) return false;
+    if (!trader)
+        return false;
 
     trader->dialog_sound_start(phrase);
     return true;
@@ -194,15 +212,13 @@ bool CActor::OnDialogSoundHandlerStart(CInventoryOwner* inv_owner, LPCSTR phrase
 bool CActor::OnDialogSoundHandlerStop(CInventoryOwner* inv_owner)
 {
     CAI_Trader* trader = smart_cast<CAI_Trader*>(inv_owner);
-    if (!trader) return false;
+    if (!trader)
+        return false;
 
     trader->dialog_sound_stop();
     return true;
 }
 
 #ifdef DEBUG
-void CActor::DumpTasks()
-{
-    Level().GameTaskManager().DumpTasks();
-}
-#endif  // DEBUG
+void CActor::DumpTasks() { Level().GameTaskManager().DumpTasks(); }
+#endif // DEBUG

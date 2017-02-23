@@ -26,16 +26,17 @@ class CPhysicsShellHolder : public CGameObject,
 public:
     void SheduleRegister()
     {
-        if (!IsSheduled()) shedule_register();
+        if (!IsSheduled())
+            shedule_register();
         b_sheduled = true;
     }
     void SheduleUnregister()
     {
-        if (IsSheduled()) shedule_unregister();
+        if (IsSheduled())
+            shedule_unregister();
         b_sheduled = false;
     }
     IC bool IsSheduled() { return b_sheduled; }
-
 public:
     typedef CGameObject inherited;
 
@@ -45,9 +46,7 @@ public:
     virtual ~CPhysicsShellHolder();
 
     virtual bool ActivationSpeedOverriden(Fvector& dest, bool clear_override) { return false; }
-
     IC CPhysicsShell*& PPhysicsShell() { return m_pPhysicsShell; }
-
     IC CPhysicsShellHolder* PhysicsShellHolder() { return this; }
     virtual const IObjectPhysicsCollision* physics_collision();
     virtual const IPhysicsShell* physics_shell() const;
@@ -66,7 +65,6 @@ public:
     virtual ICollisionHitCallback* get_collision_hit_callback() { return NULL; }
     virtual void set_collision_hit_callback(ICollisionHitCallback* cc) { ; }
     virtual void enable_notificate() { ; }
-
 public:
     virtual void PHGetLinearVell(Fvector& velocity);
     virtual void PHSetLinearVell(Fvector& velocity);
@@ -110,7 +108,7 @@ public:
 public:
     virtual void on_physics_disable();
 
-private:  // IPhysicsShellHolder
+private: // IPhysicsShellHolder
     virtual Fmatrix& ObjectXFORM();
     virtual Fvector& ObjectPosition();
     virtual LPCSTR ObjectName() const;
@@ -135,7 +133,7 @@ private:  // IPhysicsShellHolder
     virtual bool IsActor();
     virtual bool IsStalker();
     // virtual	void						SetWeaponHideState					( u16 State, bool bSet )=0;
-    virtual void HideAllWeapons(bool v);  //(SetWeaponHideState(INV_STATE_BLOCK_ALL,true))
+    virtual void HideAllWeapons(bool v); //(SetWeaponHideState(INV_STATE_BLOCK_ALL,true))
     virtual void MovementCollisionEnable(bool enable);
     virtual CPHSoundPlayer* ObjectPhSoundPlayer() { return ph_sound_player(); }
     virtual ICollisionDamageReceiver* ObjectPhCollisionDamageReceiver();

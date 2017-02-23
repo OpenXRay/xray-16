@@ -9,11 +9,5 @@
 #include "stdafx.h"
 #include "script_abstract_action.h"
 
-CScriptAbstractAction::~CScriptAbstractAction()
-{
-}
-
-bool CScriptAbstractAction::completed()
-{
-    return (m_bCompleted);
-}
+CScriptAbstractAction::~CScriptAbstractAction() {}
+bool CScriptAbstractAction::completed() { return (m_bCompleted); }

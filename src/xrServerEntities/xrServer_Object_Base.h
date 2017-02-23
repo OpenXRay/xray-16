@@ -71,15 +71,15 @@ private:
 
 public:
     BOOL net_Ready;
-    BOOL net_Processed;  // Internal flag for connectivity-graph
+    BOOL net_Processed; // Internal flag for connectivity-graph
 
     u16 m_wVersion;
     u16 m_script_version;
     u16 RespawnTime;
 
-    u16 ID;          // internal ID
-    u16 ID_Parent;   // internal ParentID, 0xffff means no parent
-    u16 ID_Phantom;  // internal PhantomID, 0xffff means no phantom
+    u16 ID; // internal ID
+    u16 ID_Parent; // internal ParentID, 0xffff means no parent
+    u16 ID_Phantom; // internal PhantomID, 0xffff means no phantom
     xrClientData* owner;
 
     // spawn data
@@ -87,7 +87,7 @@ public:
     //. u8                              s_gameid;
     GameTypeChooser m_gameType;
     u8 s_RP;
-    Flags16 s_flags;  // state flags
+    Flags16 s_flags; // state flags
     xr_vector<u16> children;
 
     // update data
@@ -125,8 +125,8 @@ public:
     virtual visual_data* __stdcall visual_collection() const { return 0; }
     virtual u32 __stdcall visual_collection_size() const { return 0; }
     virtual void __stdcall set_additional_info(void* info){};
-#endif                                              // #ifndef XRGAME_EXPORTS
-    virtual BOOL Net_Relevant() { return FALSE; };  // !!!! WARNING!!!
+#endif // #ifndef XRGAME_EXPORTS
+    virtual BOOL Net_Relevant() { return FALSE; }; // !!!! WARNING!!!
     //
     virtual void __stdcall Spawn_Write(NET_Packet& tNetPacket, BOOL bLocal);
     virtual BOOL __stdcall Spawn_Read(NET_Packet& tNetPacket);
@@ -166,7 +166,6 @@ public:
     virtual CSE_ALifeSchedulable* cast_schedulable() { return 0; };
     virtual CSE_ALifeInventoryItem* cast_inventory_item() { return 0; };
     virtual CSE_ALifeTraderAbstract* cast_trader_abstract() { return 0; };
-
     virtual CSE_ALifeObject* cast_alife_object() { return 0; }
     virtual CSE_ALifeDynamicObject* cast_alife_dynamic_object() { return 0; }
     virtual CSE_ALifeItemAmmo* cast_item_ammo() { return 0; }
@@ -176,7 +175,6 @@ public:
     virtual CSE_ALifeHumanAbstract* cast_human_abstract() { return 0; };
     virtual CSE_ALifeAnomalousZone* cast_anomalous_zone() { return 0; };
     virtual CSE_ALifeTrader* cast_trader() { return 0; };
-
     virtual CSE_ALifeCreatureAbstract* cast_creature_abstract() { return 0; };
     virtual CSE_ALifeSmartZone* cast_smart_zone() { return 0; };
     virtual CSE_ALifeOnlineOfflineGroup* cast_online_offline_group() { return 0; };

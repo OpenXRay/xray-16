@@ -100,6 +100,6 @@ protected:
         void		clear_all_factions		();
         bool	__stdcall	SortingLessFunction		( CUIWindow* left, CUIWindow* right );
     */
-};  // class CUILogsWnd
+}; // class CUILogsWnd
 
-#endif  // UI_PDA_LOGS_WND_H_INCLUDED
+#endif // UI_PDA_LOGS_WND_H_INCLUDED

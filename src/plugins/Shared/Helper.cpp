@@ -19,18 +19,12 @@
 // Constructors                                                               //
 //----------------------------------------------------------------------------//
 
-Helper::Helper()
-{
-}
-
+Helper::Helper() {}
 //----------------------------------------------------------------------------//
 // Destructor                                                                 //
 //----------------------------------------------------------------------------//
 
-Helper::~Helper()
-{
-}
-
+Helper::~Helper() {}
 //----------------------------------------------------------------------------//
 // Get the transformation matrix of a bone node                               //
 //----------------------------------------------------------------------------//
@@ -52,7 +46,8 @@ Matrix3 Helper::GetBoneTM(INode* pNode, TimeValue t)
 BOOL Helper::IsBipedBone(INode* pNode)
 {
     // check for invalid and root nodes
-    if ((pNode == 0) || pNode->IsRootNode()) return false;
+    if ((pNode == 0) || pNode->IsRootNode())
+        return false;
 
     // check for biped nodes
     Control* pControl;
@@ -69,17 +64,22 @@ BOOL Helper::IsBipedBone(INode* pNode)
 BOOL Helper::IsBone(INode* pNode, BOOL bAllowDummy)
 {
     // check for invalid nodes
-    if (pNode == 0) return false;
+    if (pNode == 0)
+        return false;
 
     // check for root node
-    if (pNode->IsRootNode()) return false;
+    if (pNode->IsRootNode())
+        return false;
 
     // check for bone node
     ObjectState os;
     os = pNode->EvalWorldState(0);
-    if (os.obj->ClassID() == Class_ID(BONE_CLASS_ID, 0)) return true;
-    if (os.obj->ClassID() == BONE_OBJ_CLASSID) return true;
-    if (os.obj->ClassID() == Class_ID(DUMMY_CLASS_ID, 0)) return bAllowDummy;
+    if (os.obj->ClassID() == Class_ID(BONE_CLASS_ID, 0))
+        return true;
+    if (os.obj->ClassID() == BONE_OBJ_CLASSID)
+        return true;
+    if (os.obj->ClassID() == Class_ID(DUMMY_CLASS_ID, 0))
+        return bAllowDummy;
 
     // check for biped node
     Control* pControl;
@@ -95,12 +95,14 @@ BOOL Helper::IsBone(INode* pNode, BOOL bAllowDummy)
 BOOL Helper::IsMesh(INode* pNode)
 {
     // check for invalid and root nodes
-    if ((pNode == 0) || pNode->IsRootNode()) return false;
+    if ((pNode == 0) || pNode->IsRootNode())
+        return false;
 
     // check for mesh
     ObjectState os;
     os = pNode->EvalWorldState(0);
-    if (os.obj->SuperClassID() == GEOMOBJECT_CLASS_ID) return true;
+    if (os.obj->SuperClassID() == GEOMOBJECT_CLASS_ID)
+        return true;
 
     return false;
 }
@@ -111,7 +113,8 @@ BOOL Helper::IsMesh(INode* pNode)
 
 void Helper::SetBipedUniform(INode* pNode, BOOL bUniform, BOOL bFigure)
 {
-    if (IsBipedBone(pNode)) {
+    if (IsBipedBone(pNode))
+    {
         // get the TM controller of the node
         Control* pControl;
         pControl = pNode->GetTMController();

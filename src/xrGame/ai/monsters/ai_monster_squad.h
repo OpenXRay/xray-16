@@ -11,12 +11,12 @@ class CBaseMonster;
 //////////////////////////////////////////////////////////////////////////
 enum EMemberGoalType
 {
-    MG_AttackEnemy,       // entity
-    MG_PanicFromEnemy,    // entity
-    MG_InterestingSound,  // position
-    MG_DangerousSound,    // position
-    MG_WalkGraph,         // node
-    MG_Rest,              // node, position
+    MG_AttackEnemy, // entity
+    MG_PanicFromEnemy, // entity
+    MG_InterestingSound, // position
+    MG_DangerousSound, // position
+    MG_WalkGraph, // node
+    MG_Rest, // node, position
     MG_None,
 };
 
@@ -52,7 +52,7 @@ enum ESquadCommandType
 
 struct SSquadCommand
 {
-    ESquadCommandType type;  // тип команды
+    ESquadCommandType type; // тип команды
 
     const CEntity* entity;
     Fvector position;
@@ -99,7 +99,6 @@ public:
 
     void SetLeader(CEntity* pE) { leader = pE; }
     CEntity* GetLeader() { return leader; }
-
     // -----------------------------------------------------------------
 
     void UpdateGoal(CEntity* pE, const SMemberGoal& goal);
@@ -187,7 +186,6 @@ public:
     MEMBER_COMMAND_MAP* get_commands() { return &m_commands; }
     bool home_in_danger() { return Device.dwTimeGlobal < m_home_danger_end_tick; }
     void set_home_in_danger() { m_home_danger_end_tick = Device.dwTimeGlobal + m_home_danger_mode_time; }
-
 private:
     // danger mode is turns on when monsters hear dangerous sound or get a hit
     // danger mode turns off after m_danger_mode_time miliseconds

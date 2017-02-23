@@ -82,26 +82,31 @@ void CControl_Manager::reload(LPCSTR section)
 
 void CControl_Manager::reinit()
 {
-    if (m_object->CCustomMonster::use_simplified_visual()) return;
+    if (m_object->CCustomMonster::use_simplified_visual())
+        return;
     // todo: make it simpler
     // reinit pure first, base second, custom third
     CONTROLLERS_MAP_IT it;
 
     for (it = m_control_elems.begin(); it != m_control_elems.end(); ++it)
-        if (is_pure(it->second)) it->second->reinit();
+        if (is_pure(it->second))
+            it->second->reinit();
 
     for (it = m_control_elems.begin(); it != m_control_elems.end(); ++it)
-        if (is_base(it->second)) it->second->reinit();
+        if (is_base(it->second))
+            it->second->reinit();
 
     for (it = m_control_elems.begin(); it != m_control_elems.end(); ++it)
-        if (!is_pure(it->second) && !is_base(it->second)) it->second->reinit();
+        if (!is_pure(it->second) && !is_base(it->second))
+            it->second->reinit();
 
     // fill active elems
     m_active_elems.clear();
     m_active_elems.reserve(ControlCom::eControllersCount);
     for (it = m_control_elems.begin(); it != m_control_elems.end(); ++it)
     {
-        if (it->second->is_active() && !is_locked(it->second)) {
+        if (it->second->is_active() && !is_locked(it->second))
+        {
             m_active_elems.push_back(it->second);
         }
     }
@@ -114,12 +119,14 @@ struct predicate_remove
 
 void CControl_Manager::update_frame()
 {
-    if (!m_object->g_Alive()) return;
+    if (!m_object->g_Alive())
+        return;
 
     for (COM_VEC_IT it = m_active_elems.begin(); it != m_active_elems.end(); ++it)
     {
         // update coms
-        if ((*it)) (*it)->update_frame();
+        if ((*it))
+            (*it)->update_frame();
     }
 
     m_active_elems.erase(
@@ -128,12 +135,14 @@ void CControl_Manager::update_frame()
 
 void CControl_Manager::update_schedule()
 {
-    if (!m_object->g_Alive()) return;
+    if (!m_object->g_Alive())
+        return;
 
     for (COM_VEC_IT it = m_active_elems.begin(); it != m_active_elems.end(); ++it)
     {
         // update coms
-        if ((*it)) (*it)->update_schedule();
+        if ((*it))
+            (*it)->update_schedule();
     }
 
     m_active_elems.erase(
@@ -143,7 +152,8 @@ void CControl_Manager::update_schedule()
 ControlCom::EControlType CControl_Manager::com_type(CControl_Com* com)
 {
     for (CONTROLLERS_MAP_IT it = m_control_elems.begin(); it != m_control_elems.end(); ++it)
-        if (it->second == com) return it->first;
+        if (it->second == com)
+            return it->first;
 
     return ControlCom::eControlInvalid;
 }
@@ -162,18 +172,15 @@ void CControl_Manager::notify(ControlCom::EEventType event, ControlCom::IEventDa
 //////////////////////////////////////////////////////////////////////////
 // Messaging
 //////////////////////////////////////////////////////////////////////////
-void CControl_Manager::subscribe(CControl_Com* com, ControlCom::EEventType type)
-{
-    m_listeners[type].push_back(com);
-}
-
+void CControl_Manager::subscribe(CControl_Com* com, ControlCom::EEventType type) { m_listeners[type].push_back(com); }
 void CControl_Manager::unsubscribe(CControl_Com* com, ControlCom::EEventType type)
 {
     CONTROLLERS_VECTOR& vect = m_listeners[type];
 
     for (u32 i = 0; i < vect.size(); i++)
     {
-        if (vect[i] == com) {
+        if (vect[i] == com)
+        {
             vect[i] = vect.back();
             vect.pop_back();
             return;
@@ -187,7 +194,8 @@ ControlCom::IComData* CControl_Manager::data(CControl_Com* who, ControlCom::ECon
 
     // get_capturer
     CControl_Com* capturer = target->ced()->capturer();
-    if (capturer == who) {
+    if (capturer == who)
+    {
         return target->ced()->data();
     }
 
@@ -205,27 +213,12 @@ void CControl_Manager::set_base_controller(CControl_Com* com, ControlCom::EContr
     m_base_elems[type] = com;
 }
 
-void CControl_Manager::install_path_manager(CControlPathBuilder* pman)
-{
-    m_path = pman;
-}
-
-bool CControl_Manager::is_pure(CControl_Com* com)
-{
-    return (com->cing() == 0);
-}
-
-bool CControl_Manager::is_base(CControl_Com* com)
-{
-    return (com->ced() == 0);
-}
-bool CControl_Manager::is_locked(CControl_Com* com)
-{
-    return (com->ced() && com->ced()->is_locked());
-}
-
+void CControl_Manager::install_path_manager(CControlPathBuilder* pman) { m_path = pman; }
+bool CControl_Manager::is_pure(CControl_Com* com) { return (com->cing() == 0); }
+bool CControl_Manager::is_base(CControl_Com* com) { return (com->ced() == 0); }
+bool CControl_Manager::is_locked(CControl_Com* com) { return (com->ced() && com->ced()->is_locked()); }
 // capture
-void CControl_Manager::capture(CControl_Com* com, ControlCom::EControlType type)  // who, type
+void CControl_Manager::capture(CControl_Com* com, ControlCom::EControlType type) // who, type
 {
     CControl_Com* target = m_control_elems[type];
 
@@ -233,8 +226,10 @@ void CControl_Manager::capture(CControl_Com* com, ControlCom::EControlType type)
     CControl_Com* capturer = target->ced()->capturer();
 
 #ifdef DEBUG
-    if (capturer && !is_base(capturer)) {
-        if (CBaseMonster* p_monster = m_object) {
+    if (capturer && !is_base(capturer))
+    {
+        if (CBaseMonster* p_monster = m_object)
+        {
             debug::text_tree root_s;
             p_monster->add_debug_info(root_s);
             debug::log_text_tree(root_s);
@@ -250,10 +245,12 @@ void CControl_Manager::capture(CControl_Com* com, ControlCom::EControlType type)
     VERIFY(!capturer || is_base(capturer));
 #endif
 
-    if (target->is_active()) {
+    if (target->is_active())
+    {
         target->ced()->on_release();
         // if there is base capturer - stop control com
-        if (capturer) capturer->cing()->on_stop_control(type);
+        if (capturer)
+            capturer->cing()->on_stop_control(type);
     }
 
     // 3.
@@ -276,14 +273,15 @@ bool CControl_Manager::check_capturer(CControl_Com* com, ControlCom::EControlTyp
 CControl_Com* CControl_Manager::get_capturer(ControlCom::EControlType type)
 {
     CControl_Com* target = m_control_elems[type];
-    if (!target || !target->ced()) {
+    if (!target || !target->ced())
+    {
         return 0;
     }
 
     return target->ced()->capturer();
 }
 
-void CControl_Manager::release(CControl_Com* com, ControlCom::EControlType type)  // who, type
+void CControl_Manager::release(CControl_Com* com, ControlCom::EControlType type) // who, type
 {
     CControl_Com* target = m_control_elems[type];
     CControl_Com* capturer = target->ced()->capturer();
@@ -291,7 +289,8 @@ void CControl_Manager::release(CControl_Com* com, ControlCom::EControlType type)
 
     // select new capture if there is a base controller
     CONTROLLERS_MAP_IT it = m_base_elems.find(type);
-    if (it != m_base_elems.end()) {
+    if (it != m_base_elems.end())
+    {
         com->cing()->on_stop_control(type);
         target->ced()->set_capturer(0);
 
@@ -300,7 +299,8 @@ void CControl_Manager::release(CControl_Com* com, ControlCom::EControlType type)
     else
     {
         // if active - finalize
-        if (target->is_active()) {
+        if (target->is_active())
+        {
             target->ced()->on_release();
             deactivate(type);
         }
@@ -337,15 +337,12 @@ void CControl_Manager::deactivate(ControlCom::EControlType type)
     m_control_elems[type]->set_active(false);
     check_active_com(m_control_elems[type], eRemove);
 }
-void CControl_Manager::deactivate(CControl_Com* com)
-{
-    deactivate(com_type(com));
-}
-
+void CControl_Manager::deactivate(CControl_Com* com) { deactivate(com_type(com)); }
 bool CControl_Manager::is_captured(ControlCom::EControlType type)
 {
     CControl_Com* capturer = m_control_elems[type]->ced()->capturer();
-    if (!capturer || is_base(capturer)) return false;
+    if (!capturer || is_base(capturer))
+        return false;
 
     return true;
 }
@@ -353,7 +350,7 @@ bool CControl_Manager::is_captured(ControlCom::EControlType type)
 bool CControl_Manager::is_captured_pure()
 {
     return (is_captured(ControlCom::eControlPath) || is_captured(ControlCom::eControlAnimation) ||
-            is_captured(ControlCom::eControlMovement) || is_captured(ControlCom::eControlDir));
+        is_captured(ControlCom::eControlMovement) || is_captured(ControlCom::eControlDir));
 }
 
 void CControl_Manager::lock(CControl_Com* com, ControlCom::EControlType type)
@@ -414,16 +411,20 @@ bool CControl_Manager::build_path_line(CControl_Com* com, const Fvector& target,
 
 void CControl_Manager::check_active_com(CControl_Com* com, bool b_add)
 {
-    if (b_add) {
-        if (com->is_active() && !com->ced()->is_locked()) {
+    if (b_add)
+    {
+        if (com->is_active() && !com->ced()->is_locked())
+        {
             COM_VEC_IT it = std::find(m_active_elems.begin(), m_active_elems.end(), com);
-            if (it == m_active_elems.end()) m_active_elems.push_back(com);
+            if (it == m_active_elems.end())
+                m_active_elems.push_back(com);
         }
     }
     else
     {
         COM_VEC_IT it = std::find(m_active_elems.begin(), m_active_elems.end(), com);
-        if (it != m_active_elems.end()) (*it) = 0;  // do not remove just mark
+        if (it != m_active_elems.end())
+            (*it) = 0; // do not remove just mark
     }
 }
 
@@ -435,11 +436,13 @@ void CControl_Manager::add_debug_info(debug::text_tree& root_s)
     u32 index = 0;
     for (CONTROLLERS_MAP_IT it = m_control_elems.begin(); it != m_control_elems.end(); ++it, ++index)
     {
-        if (!it->second->is_inited()) continue;
+        if (!it->second->is_inited())
+            continue;
 
         debug::text_tree& con_s = root_s.add_line(make_xrstr(it->first), it->second->is_active());
 
-        if (it->second->ced()) {
+        if (it->second->ced())
+        {
             con_s.add_line(
                 "Capturer", it->second->ced()->capturer() ? make_xrstr(com_type(it->second->ced()->capturer())) : "-");
             con_s.add_line("Locked", it->second->ced()->is_locked());
@@ -450,4 +453,4 @@ void CControl_Manager::add_debug_info(debug::text_tree& root_s)
         }
     }
 }
-#endif  // DEBUG
+#endif // DEBUG

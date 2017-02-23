@@ -32,7 +32,9 @@ MxStdSlim::MxStdSlim(MxStdModel* m0) : heap(64)
 
     unsigned int i;
     for (i = 0; i < m->face_count(); i++)
-        if (m->face_is_valid(i)) valid_faces++;
+        if (m->face_is_valid(i))
+            valid_faces++;
     for (i = 0; i < m->vert_count(); i++)
-        if (m->vertex_is_valid(i)) valid_verts++;
+        if (m->vertex_is_valid(i))
+            valid_verts++;
 }

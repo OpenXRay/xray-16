@@ -21,8 +21,8 @@
 
 class TfraEmitter : public TFrame
 {
-    __published :  // IDE-managed Components
-                   TLabel* RxLabel20;
+    __published : // IDE-managed Components
+                  TLabel* RxLabel20;
     TLabel* RxLabel22;
     TExtBtn* ebBirthFunc;
     TMultiObjSpinEdit* seBirthRate;
@@ -58,15 +58,14 @@ class TfraEmitter : public TFrame
     TMultiObjSpinEdit* seBoxSizeY;
     TMultiObjSpinEdit* seBoxSizeZ;
 
-  private:  // User declarations
-  public:   // User declarations
+private: // User declarations
+public: // User declarations
     __fastcall TfraEmitter(TComponent* Owner);
     void GetInfoFirst(const PS::SEmitterDef& E);
     void GetInfoNext(const PS::SEmitterDef& E);
     void SetInfo(PS::SEmitterDef& E);
 
     virtual void OnEnter() { ; }
-
     virtual void OnExit() { ; }
 };
 

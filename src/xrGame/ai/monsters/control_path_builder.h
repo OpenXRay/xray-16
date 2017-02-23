@@ -49,7 +49,7 @@ public:
     // services
     bool is_path_end(float dist_to_end);
     bool valid_destination(const Fvector& pos, u32 node);
-    bool valid_and_accessible(Fvector& pos, u32 node);  // validate with a small correction
+    bool valid_and_accessible(Fvector& pos, u32 node); // validate with a small correction
     bool is_moving_on_path();
 
     bool get_node_in_radius(u32 src_node, float min_radius, float max_radius, u32 attempts, u32& dest_node);

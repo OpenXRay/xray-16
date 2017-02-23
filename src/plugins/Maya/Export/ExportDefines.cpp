@@ -13,7 +13,8 @@ MObject findShader(MObject& setNode, SXRShaderData& d)
     // cout << "looking for shader in node " << fnNode.name().asChar() << "\n";
     MPlug shaderPlug = fnNode.findPlug("surfaceShader");
 
-    if (!shaderPlug.isNull()) {
+    if (!shaderPlug.isNull())
+    {
         MPlugArray connectedPlugs;
         bool asSrc = false;
         bool asDst = true;
@@ -34,27 +35,32 @@ MStatus parseShader(MObject& src, SXRShaderData& d)
     MStatus status;
 
     MFnSet fnSet(src, &status);
-    if (status == MStatus::kFailure) {
+    if (status == MStatus::kFailure)
+    {
         status.perror("Unable to lookup shader from set of shaders for object");
         return status;
     }
 
     MObject shaderNode = findShader(src, d);
-    if (shaderNode == MObject::kNullObj) return (MStatus::kFailure);
+    if (shaderNode == MObject::kNullObj)
+        return (MStatus::kFailure);
 
     MPlug colorPlug = MFnDependencyNode(shaderNode).findPlug("color", &status);
-    if (status == MStatus::kFailure) return (status);
+    if (status == MStatus::kFailure)
+        return (status);
 
     MItDependencyGraph dgIt(colorPlug, MFn::kFileTexture, MItDependencyGraph::kUpstream,
         MItDependencyGraph::kBreadthFirst, MItDependencyGraph::kNodeLevel, &status);
 
-    if (status == MStatus::kFailure) return (status);
+    if (status == MStatus::kFailure)
+        return (status);
 
     dgIt.disablePruningOnFilter();
 
     // If no texture file node was found, just continue.
     //
-    if (dgIt.isDone()) {
+    if (dgIt.isDone())
+    {
         //		cout << "no textures found for " << colorPlug.name() << "\n";
         return (MStatus::kSuccess);
     }
@@ -68,7 +74,8 @@ MStatus parseShader(MObject& src, SXRShaderData& d)
 
     MStringArray rgFolders;
 
-    if (strchr(textureName.asChar(), '\\')) {
+    if (strchr(textureName.asChar(), '\\'))
+    {
         textureName.split('\\', rgFolders);
     }
     else
@@ -81,13 +88,16 @@ MStatus parseShader(MObject& src, SXRShaderData& d)
     short index;
     // double side flag
     MPlug xrDoubleSidePlug = MFnDependencyNode(shaderNode).findPlug("xrayDoubleSide", &status);
-    if (status == MS::kSuccess) {
+    if (status == MS::kSuccess)
+    {
         MFnEnumAttribute enm = xrDoubleSidePlug.attribute();
-        if ((status == MS::kSuccess) && (MS::kSuccess == xrDoubleSidePlug.getValue(index))) d.double_side = index;
+        if ((status == MS::kSuccess) && (MS::kSuccess == xrDoubleSidePlug.getValue(index)))
+            d.double_side = index;
     }
     // engine
     MPlug xrEnginePlug = MFnDependencyNode(shaderNode).findPlug("xrayEngineShader", &status);
-    if (status == MS::kSuccess) {
+    if (status == MS::kSuccess)
+    {
         MFnEnumAttribute enm = xrEnginePlug.attribute();
 
         if ((status == MS::kSuccess) && (MS::kSuccess == xrEnginePlug.getValue(index)))
@@ -95,14 +105,16 @@ MStatus parseShader(MObject& src, SXRShaderData& d)
     }
     // compiler
     MPlug xrCompilerPlug = MFnDependencyNode(shaderNode).findPlug("xrayCompilerShader", &status);
-    if (status == MS::kSuccess) {
+    if (status == MS::kSuccess)
+    {
         MFnEnumAttribute enm = xrCompilerPlug.attribute();
         if ((status == MS::kSuccess) && (MS::kSuccess == xrCompilerPlug.getValue(index)))
             d.comp_name = enm.fieldName(index);
     }
     // game material
     MPlug xrGameMaterialPlug = MFnDependencyNode(shaderNode).findPlug("xrayGameMaterial", &status);
-    if (status == MS::kSuccess) {
+    if (status == MS::kSuccess)
+    {
         MFnEnumAttribute enm = xrGameMaterialPlug.attribute();
         if ((status == MS::kSuccess) && (MS::kSuccess == xrGameMaterialPlug.getValue(index)))
             d.gmat_name = enm.fieldName(index);

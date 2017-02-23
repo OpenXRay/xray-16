@@ -60,7 +60,6 @@ private:
 
 public:
     IC CEF_Params() { clear(); }
-
     IC void clear()
     {
         m_member = 0;
@@ -70,11 +69,8 @@ public:
     }
 
     IC T1*& member() { return (m_member); }
-
     IC T1*& enemy() { return (m_enemy); }
-
     IC T2*& member_item() { return (m_member_item); }
-
     IC T2*& enemy_item() { return (m_enemy_item); }
 };
 
@@ -87,7 +83,6 @@ template <typename T>
 struct CEnemyFunction : public T
 {
     IC CEnemyFunction(CEF_Storage* storage) : T(storage) {}
-
     template <typename P>
     IC float get_value(P& params)
     {
@@ -101,7 +96,8 @@ struct CEnemyFunction : public T
 
     virtual float ffGetValue()
     {
-        if (ef_storage().non_alife().member()) return (get_value(ef_storage().non_alife()));
+        if (ef_storage().non_alife().member())
+            return (get_value(ef_storage().non_alife()));
         return (get_value(ef_storage().alife()));
     }
 };

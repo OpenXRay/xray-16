@@ -2,9 +2,9 @@
 #pragma hdrstop
 
 static BOOL crc32_ready = FALSE;
-static u32 crc32_table[256];  // Lookup table array
+static u32 crc32_table[256]; // Lookup table array
 
-inline u32 Reflect(u32 ref, char ch)  // Reflects CRC bits in the lookup table
+inline u32 Reflect(u32 ref, char ch) // Reflects CRC bits in the lookup table
 {
     // Used only by Init_CRC32_Table().
 
@@ -14,7 +14,8 @@ inline u32 Reflect(u32 ref, char ch)  // Reflects CRC bits in the lookup table
     // bit 1 for bit 6, etc.
     for (int i = 1; i < (ch + 1); i++)
     {
-        if (ref & 1) value |= 1 << (ch - i);
+        if (ref & 1)
+            value |= 1 << (ch - i);
         ref >>= 1;
     }
     return value;
@@ -40,7 +41,8 @@ void crc32_init()
 
 u32 crc32(const void* P, u32 len)
 {
-    if (!crc32_ready) {
+    if (!crc32_ready)
+    {
         crc32_init();
         crc32_ready = TRUE;
     }
@@ -69,7 +71,8 @@ u32 crc32(const void* P, u32 len)
 
 u32 crc32(const void* P, u32 len, u32 starting_crc)
 {
-    if (!crc32_ready) {
+    if (!crc32_ready)
+    {
         crc32_init();
         crc32_ready = TRUE;
     }
@@ -85,7 +88,8 @@ u32 crc32(const void* P, u32 len, u32 starting_crc)
 
 u32 path_crc32(const char* path, u32 len)
 {
-    if (!crc32_ready) {
+    if (!crc32_ready)
+    {
         crc32_init();
         crc32_ready = TRUE;
     }
@@ -96,7 +100,8 @@ u32 path_crc32(const char* path, u32 len)
     while (len--)
     {
         const u8 c = *buffer;
-        if (c != '/' && c != '\\') {
+        if (c != '/' && c != '\\')
+        {
             ulCRC = (ulCRC >> 8) ^ crc32_table[(ulCRC & 0xFF) ^ *buffer];
         }
 

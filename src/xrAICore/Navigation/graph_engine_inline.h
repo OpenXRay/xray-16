@@ -29,10 +29,7 @@ inline CGraphEngine::~CGraphEngine()
 }
 
 #ifndef AI_COMPILER
-inline const CGraphEngine::CSolverAlgorithm& CGraphEngine::solver_algorithm() const
-{
-    return *m_solver_algorithm;
-}
+inline const CGraphEngine::CSolverAlgorithm& CGraphEngine::solver_algorithm() const { return *m_solver_algorithm; }
 #endif
 
 template <typename _Graph, typename _Parameters>
@@ -126,4 +123,4 @@ inline bool CGraphEngine::search(const _Graph& graph, const shared_str& start_no
     STOP_PROFILE
 }
 
-#endif  // AI_COMPILER
+#endif // AI_COMPILER

@@ -23,21 +23,16 @@
 #ifdef DEBUG
 #include "Level.h"
 #include "space_restrictor.h"
-#endif  // DEBUG
+#endif // DEBUG
 
 int g_restriction_checker = 0;
 
-CSpaceRestrictionComposition::~CSpaceRestrictionComposition()
-{
-    --g_restriction_checker;
-}
-
+CSpaceRestrictionComposition::~CSpaceRestrictionComposition() { --g_restriction_checker; }
 struct CMergePredicate
 {
     CSpaceRestrictionComposition* m_restriction;
 
     IC CMergePredicate(CSpaceRestrictionComposition* restriction) { m_restriction = restriction; }
-
     IC bool operator()(u32 level_vertex_id) const { return (m_restriction->inside(level_vertex_id, false)); }
 };
 
@@ -49,17 +44,21 @@ IC void CSpaceRestrictionComposition::merge(CBaseRestrictionPtr restriction)
 
 bool CSpaceRestrictionComposition::inside(const Fsphere& sphere)
 {
-    if (!initialized()) {
+    if (!initialized())
+    {
         initialize();
-        if (!initialized()) return (true);
+        if (!initialized())
+            return (true);
     }
 
-    if (!m_sphere.intersect(sphere)) return (false);
+    if (!m_sphere.intersect(sphere))
+        return (false);
 
     RESTRICTIONS::iterator I = m_restrictions.begin();
     RESTRICTIONS::iterator E = m_restrictions.end();
     for (; I != E; ++I)
-        if ((*I)->inside(sphere)) return (true);
+        if ((*I)->inside(sphere))
+            return (true);
 
     return (false);
 }
@@ -68,7 +67,8 @@ void CSpaceRestrictionComposition::initialize()
 {
     u32 n = _GetItemCount(*m_space_restrictors);
     VERIFY(n);
-    if (n == 1) {
+    if (n == 1)
+    {
 #ifdef DEBUG
         m_correct = true;
         check_restrictor_type();
@@ -79,7 +79,8 @@ void CSpaceRestrictionComposition::initialize()
     string256 element;
 
     for (u32 i = 0; i < n; ++i)
-        if (!m_space_restriction_holder->restriction(_GetItem(*m_space_restrictors, i, element))->initialized()) return;
+        if (!m_space_restriction_holder->restriction(_GetItem(*m_space_restrictors, i, element))->initialized())
+            return;
 
     Fsphere* spheres = (Fsphere*)_alloca(n * sizeof(Fsphere));
     for (u32 i = 0; i < n; ++i)
@@ -149,7 +150,8 @@ void CSpaceRestrictionComposition::test_correctness()
         m_test_storage.erase(std::unique(m_test_storage.begin(), m_test_storage.end()), m_test_storage.end());
     }
 
-    if (m_test_storage.empty()) {
+    if (m_test_storage.empty())
+    {
         m_correct = false;
         return;
     }
@@ -172,7 +174,8 @@ void CSpaceRestrictionComposition::test_correctness()
             else
                 m_correct = (m_test_storage.size() <= nodes.size());
 
-            if (!m_correct) break;
+            if (!m_correct)
+                break;
         }
     }
 }
@@ -189,12 +192,15 @@ Fsphere CSpaceRestrictionComposition::sphere() const
 #ifdef DEBUG
 void CSpaceRestrictionComposition::check_restrictor_type()
 {
-    if (_GetItemCount(*m_space_restrictors) == 1) return;
+    if (_GetItemCount(*m_space_restrictors) == 1)
+        return;
 
-    if (!ai().get_alife()) return;
+    if (!ai().get_alife())
+        return;
 
     IGameObject* object = Level().Objects.FindObjectByName(m_space_restrictors);
-    if (!object) return;
+    if (!object)
+        return;
 
     CSpaceRestrictor* restrictor = smart_cast<CSpaceRestrictor*>(object);
     VERIFY3(restrictor, "you are trying to use object as a restrictor", *m_space_restrictors);
@@ -203,4 +209,4 @@ void CSpaceRestrictionComposition::check_restrictor_type()
     VERIFY2(restrictor->restrictor_type() != RestrictionSpace::eRestrictorTypeNone,
         "impossible situation: wrong net_Spawn branch used");
 }
-#endif  // DEBUG
+#endif // DEBUG

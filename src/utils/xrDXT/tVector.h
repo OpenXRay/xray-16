@@ -13,7 +13,8 @@ class nvVector
 public:
     void tvfree(_Type*& ptr)
     {
-        if (ptr) {
+        if (ptr)
+        {
             delete[] ptr;
             ptr = 0;
         }
@@ -51,7 +52,8 @@ public:
 
     void resize(size_t newSize)
     {
-        if (newSize != allocated_size) {
+        if (newSize != allocated_size)
+        {
             allocated_size = newSize;
 
             tvfree(m_data);
@@ -63,7 +65,8 @@ public:
     }
     void push_back(_Type item)
     {
-        if (allocated_size == 0) {
+        if (allocated_size == 0)
+        {
             FirstAllocation();
         }
         else if (current_size >= allocated_size)
@@ -113,8 +116,6 @@ public:
         allocated_size = 0;
     }
     void clear() { Release(); }
-
     size_t size() const { return current_size; }
-
     ~nvVector() { Release(); }
 };

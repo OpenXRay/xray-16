@@ -34,7 +34,6 @@ private:
 
     typedef CState<Object> inherited;
     virtual void remove_links(IGameObject* object) { inherited::remove_links(object); }
-
     CControl_Com* m_capturer;
 
     enum enum_run_side
@@ -74,8 +73,8 @@ private:
 
     float m_min_run_distance;
 
-};  // ChimeraAttackState
+}; // ChimeraAttackState
 
 #include "chimera_attack_state_inline.h"
 
-#endif  // #ifdef CHIMERA_ATTACK_STATE_H_INCLUDED
+#endif // #ifdef CHIMERA_ATTACK_STATE_H_INCLUDED

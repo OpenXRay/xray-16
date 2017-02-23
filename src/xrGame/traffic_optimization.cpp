@@ -54,4 +54,4 @@ void deinit_lzo(u8*& src_wm_buffer, lzo_dictionary_buffer& src_dict)
     xr_free(src_dict.data);
 }
 
-}  // namespace compression
+} // namespace compression

@@ -11,11 +11,7 @@ CUIMapInfo::CUIMapInfo()
     AttachChild(m_view);
 }
 
-CUIMapInfo::~CUIMapInfo()
-{
-    xr_delete(m_view);
-}
-
+CUIMapInfo::~CUIMapInfo() { xr_delete(m_view); }
 void CUIMapInfo::InitMapInfo(Fvector2 pos, Fvector2 size)
 {
     SetWndPos(pos);
@@ -26,28 +22,29 @@ void CUIMapInfo::InitMapInfo(Fvector2 pos, Fvector2 size)
     m_view->SetFixedScrollBar(false);
 }
 
-#define ADD_TEXT(x, y, z)                                                                                              \
-    text = *str_tbl.translate(x);                                                                                      \
-    text += ": ";                                                                                                      \
-    text += txt_color_tag;                                                                                             \
-    if (ltx.line_exist("map_info", y))                                                                                 \
-        text += *str_tbl.translate(ltx.r_string_wb("map_info", y));                                                    \
-    else                                                                                                               \
-        text += *str_tbl.translate(z);                                                                                 \
-    text += "%c[default]\\n";                                                                                          \
-    st = new CUITextWnd();                                                                                             \
-    st->SetTextComplexMode(true);                                                                                      \
-    st->SetFont(txt_font);                                                                                             \
-    st->SetTextColor(header_color);                                                                                    \
-    st->SetText(text.c_str());                                                                                         \
-    st->SetWidth(m_view->GetDesiredChildWidth());                                                                      \
-    st->AdjustHeightToText();                                                                                          \
+#define ADD_TEXT(x, y, z)                                           \
+    text = *str_tbl.translate(x);                                   \
+    text += ": ";                                                   \
+    text += txt_color_tag;                                          \
+    if (ltx.line_exist("map_info", y))                              \
+        text += *str_tbl.translate(ltx.r_string_wb("map_info", y)); \
+    else                                                            \
+        text += *str_tbl.translate(z);                              \
+    text += "%c[default]\\n";                                       \
+    st = new CUITextWnd();                                          \
+    st->SetTextComplexMode(true);                                   \
+    st->SetFont(txt_font);                                          \
+    st->SetTextColor(header_color);                                 \
+    st->SetText(text.c_str());                                      \
+    st->SetWidth(m_view->GetDesiredChildWidth());                   \
+    st->AdjustHeightToText();                                       \
     m_view->AddWindow(st, true)
 
 void CUIMapInfo::InitMap(LPCSTR map_name, LPCSTR map_ver)
 {
     m_view->Clear();
-    if (NULL == map_name) return;
+    if (NULL == map_name)
+        return;
 
     CStringTable str_tbl;
 
@@ -60,7 +57,8 @@ void CUIMapInfo::InitMap(LPCSTR map_name, LPCSTR map_ver)
     info_path += map_name;
     info_path += ".ltx";
 
-    if (FS.exist("$game_config$", info_path.c_str())) {
+    if (FS.exist("$game_config$", info_path.c_str()))
+    {
         string_path ltxPath;
         FS.update_path(ltxPath, CONFIG_PATH, info_path.c_str());
         CInifile ltx(ltxPath);
@@ -71,7 +69,8 @@ void CUIMapInfo::InitMap(LPCSTR map_name, LPCSTR map_ver)
         CUIXmlInit::InitTextWnd(xml_doc, "map_name", 0, st);
 
         xr_string S = str_tbl.translate(map_name).c_str();
-        if (map_ver) {
+        if (map_ver)
+        {
             S += "[";
             S += map_ver;
             S += "]";
@@ -98,17 +97,22 @@ void CUIMapInfo::InitMap(LPCSTR map_name, LPCSTR map_ver)
         text += ": ";
         text += txt_color_tag;
         bool b_ = false;
-        if (strstr(_modes.c_str(), "st_deathmatch")) {
+        if (strstr(_modes.c_str(), "st_deathmatch"))
+        {
             text += *str_tbl.translate("st_deathmatch");
             b_ = true;
         }
-        if (strstr(_modes.c_str(), "st_team_deathmatch")) {
-            if (b_) text += ", ";
+        if (strstr(_modes.c_str(), "st_team_deathmatch"))
+        {
+            if (b_)
+                text += ", ";
             text += *str_tbl.translate("st_team_deathmatch");
             b_ = true;
         }
-        if (strstr(_modes.c_str(), "st_artefacthunt")) {
-            if (b_) text += ", ";
+        if (strstr(_modes.c_str(), "st_artefacthunt"))
+        {
+            if (b_)
+                text += ", ";
             text += *str_tbl.translate("st_artefacthunt");
         }
 
@@ -139,7 +143,4 @@ void CUIMapInfo::InitMap(LPCSTR map_name, LPCSTR map_ver)
     }
 }
 
-const char* CUIMapInfo::GetLargeDesc()
-{
-    return *m_large_desc;
-}
+const char* CUIMapInfo::GetLargeDesc() { return *m_large_desc; }

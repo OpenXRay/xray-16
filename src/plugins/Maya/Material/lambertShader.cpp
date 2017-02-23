@@ -66,7 +66,7 @@ public:
 
     virtual void postConstructor();
 
-    static MTypeId id;  // The IFF type id
+    static MTypeId id; // The IFF type id
 
 protected:
     // Translucence coefficient
@@ -282,13 +282,8 @@ MObject CXRayMtl::xrMaterialData;
 // destruction
 //
 
-CXRayMtl::CXRayMtl()
-{
-}
-CXRayMtl::~CXRayMtl()
-{
-}
-
+CXRayMtl::CXRayMtl() {}
+CXRayMtl::~CXRayMtl() {}
 // The creator() method allows Maya to instantiate instances of this node.
 // It is called every time a new instance of the node is requested by
 // either the createNode command or the MFnDependencyNode::create()
@@ -297,21 +292,17 @@ CXRayMtl::~CXRayMtl()
 // In this case creator simply returns a new CXRayMtl object.
 //
 
-void* CXRayMtl::creator()
-{
-    return new CXRayMtl;
-}
-
+void* CXRayMtl::creator() { return new CXRayMtl; }
 // The initialize method is called only once when the node is first
 // registered with Maya. In this method you define the attributes of the
 // node, what data comes in and goes out of the node that other nodes may
 // want to connect to.
 //
 
-#define MAKE_INPUT(attr)                                                                                               \
-    CHECK_MSTATUS(attr.setKeyable(true));                                                                              \
-    CHECK_MSTATUS(attr.setStorable(true));                                                                             \
-    CHECK_MSTATUS(attr.setReadable(true));                                                                             \
+#define MAKE_INPUT(attr)                   \
+    CHECK_MSTATUS(attr.setKeyable(true));  \
+    CHECK_MSTATUS(attr.setStorable(true)); \
+    CHECK_MSTATUS(attr.setReadable(true)); \
     CHECK_MSTATUS(attr.setWritable(true));
 
 extern unsigned crc16_calc(unsigned char* data, unsigned count, unsigned old_crc = 0);
@@ -323,7 +314,7 @@ MStatus CXRayMtl::initialize()
     MFnEnumAttribute eAttr;
     MFnTypedAttribute tAttr;
 
-    MStatus status;  // Status will be used to hold the MStatus value
+    MStatus status; // Status will be used to hold the MStatus value
     // returned by each api function call. It is important
     // to check the status returned by a call to aid in
     // debugging. Failed API calls can result in subtle
@@ -832,24 +823,28 @@ MStatus CXRayMtl::compute(const MPlug& plug, MDataBlock& block)
 
             // Find ambient component
             //
-            if (currentLight.child(aLightAmbient).asBool()) {
+            if (currentLight.child(aLightAmbient).asBool())
+            {
                 resultColor += lightIntensity;
             }
 
             // Find diffuse component
             //
-            if (currentLight.child(aLightDiffuse).asBool()) {
+            if (currentLight.child(aLightDiffuse).asBool())
+            {
                 MFloatVector& lightDirection = currentLight.child(aLightDirection).asFloatVector();
                 float cosln = lightDirection * surfaceNormal;
 
-                if (cosln > 0.0f) {
+                if (cosln > 0.0f)
+                {
                     resultColor += lightIntensity * (cosln * diffuseReflectivity);
                 }
             }
 
             // Advance to the next light.
             //
-            if (count < numLights) {
+            if (count < numLights)
+            {
                 status = lightData.next();
                 CHECK_MSTATUS(status);
             }
@@ -863,20 +858,22 @@ MStatus CXRayMtl::compute(const MPlug& plug, MDataBlock& block)
 
         // Set ouput color attribute
         //
-        if (plug == aOutColor || plug == aOutColorR || plug == aOutColorG || plug == aOutColorB) {
+        if (plug == aOutColor || plug == aOutColorR || plug == aOutColorG || plug == aOutColorB)
+        {
             // Get the handle to the attribute
             //
             MDataHandle outColorHandle = block.outputValue(aOutColor, &status);
             CHECK_MSTATUS(status);
             MFloatVector& outColor = outColorHandle.asFloatVector();
 
-            outColor = resultColor;     // Set the output value
-            outColorHandle.setClean();  // Mark the output value as clean
+            outColor = resultColor; // Set the output value
+            outColorHandle.setClean(); // Mark the output value as clean
         }
 
         // Set ouput transparency
         //
-        if (plug == aOutTransparency || plug == aOutTransR || plug == aOutTransG || plug == aOutTransB) {
+        if (plug == aOutTransparency || plug == aOutTransR || plug == aOutTransG || plug == aOutTransB)
+        {
             MFloatVector& transparency = block.inputValue(aInTransparency, &status).asFloatVector();
             CHECK_MSTATUS(status);
 
@@ -886,13 +883,13 @@ MStatus CXRayMtl::compute(const MPlug& plug, MDataBlock& block)
             CHECK_MSTATUS(status);
             MFloatVector& outTrans = outTransHandle.asFloatVector();
 
-            outTrans = transparency;    // Set the output value
-            outTransHandle.setClean();  // Mark the output value as clean
+            outTrans = transparency; // Set the output value
+            outTransHandle.setClean(); // Mark the output value as clean
         }
     }
     else
     {
-        return (MS::kUnknownParameter);  // We got an unexpected plug
+        return (MS::kUnknownParameter); // We got an unexpected plug
     }
 
     return (MS::kSuccess);
@@ -922,7 +919,8 @@ static MObject INIT_OBJ = MObject::kNullObj;
 
 void uninitialize(void*)
 {
-    if (!INIT_OBJ.isNull()) {
+    if (!INIT_OBJ.isNull())
+    {
         uninitializePlugin(INIT_OBJ);
         INIT_OBJ = MObject::kNullObj;
     }

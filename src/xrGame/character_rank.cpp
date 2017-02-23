@@ -26,7 +26,8 @@ int CHARACTER_RANK::ValueToIndex(CHARACTER_RANK_VALUE val)
 {
     for (int i = 0; i < (int)m_pItemDataVector->size(); i++)
     {
-        if (val < (*m_pItemDataVector)[i].threshold) return i;
+        if (val < (*m_pItemDataVector)[i].threshold)
+            return i;
     }
     return GetMaxIndex();
 }
@@ -37,11 +38,7 @@ void CHARACTER_RANK::set(CHARACTER_RANK_VALUE new_val)
     m_current_index = ValueToIndex(new_val);
 }
 
-shared_str CHARACTER_RANK::id() const
-{
-    return IndexToId(m_current_index);
-}
-
+shared_str CHARACTER_RANK::id() const { return IndexToId(m_current_index); }
 void CHARACTER_RANK::InitIdToIndex()
 {
     section_name = GAME_RELATIONS_SECT;
@@ -50,11 +47,7 @@ void CHARACTER_RANK::InitIdToIndex()
     m_rank_kill_table.set_table_params(RANK_KILL_TABLE_SECT, 1);
 }
 
-CHARACTER_GOODWILL CHARACTER_RANK::relation(int to)
-{
-    return relation(m_current_index, to);
-}
-
+CHARACTER_GOODWILL CHARACTER_RANK::relation(int to) { return relation(m_current_index, to); }
 CHARACTER_GOODWILL CHARACTER_RANK::relation(int from, int to)
 {
     VERIFY(from >= 0 && from < (int)m_relation_table.table().size());

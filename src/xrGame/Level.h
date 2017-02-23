@@ -57,16 +57,15 @@ class CLevel : public IGame_Level, public IPureClient
 public:
     struct AIStatistics
     {
-        CStatTimer Think;        // thinking
-        CStatTimer Range;        // query: range
-        CStatTimer Path;         // query: path
-        CStatTimer Node;         // query: node
-        CStatTimer Vis;          // visibility detection - total
-        CStatTimer VisQuery;     // visibility detection - portal traversal and frustum culling
-        CStatTimer VisRayTests;  // visibility detection - ray casting
+        CStatTimer Think; // thinking
+        CStatTimer Range; // query: range
+        CStatTimer Path; // query: path
+        CStatTimer Node; // query: node
+        CStatTimer Vis; // visibility detection - total
+        CStatTimer VisQuery; // visibility detection - portal traversal and frustum culling
+        CStatTimer VisRayTests; // visibility detection - ray casting
 
         AIStatistics() { FrameStart(); }
-
         void FrameStart()
         {
             Think.FrameStart();
@@ -120,11 +119,11 @@ protected:
     EVENT eEntitySpawn;
     // Statistics
     CStatGraph* pStatGraphS = nullptr;
-    u32 m_dwSPC;  // SendedPacketsCount
-    u32 m_dwSPS;  // SendedPacketsSize
+    u32 m_dwSPC; // SendedPacketsCount
+    u32 m_dwSPS; // SendedPacketsSize
     CStatGraph* pStatGraphR = nullptr;
-    u32 m_dwRPC;  // ReceivedPacketsCount
-    u32 m_dwRPS;  // ReceivedPacketsSize
+    u32 m_dwRPC; // ReceivedPacketsCount
+    u32 m_dwRPS; // ReceivedPacketsSize
 private:
     struct ClientStatistics
     {
@@ -136,7 +135,6 @@ private:
         CStatTimer BulletManagerCommit;
 
         ClientStatistics() { FrameStart(); }
-
         void FrameStart()
         {
             ClientSend.FrameStart();
@@ -195,7 +193,6 @@ public:
     void RemoveObject_From_4CrPr(CGameObject* pObj);
     IGameObject* CurrentControlEntity() const { return pCurrentControlEntity; }
     void SetControlEntity(IGameObject* O) { pCurrentControlEntity = O; }
-
 private:
     void make_NetCorrectionPrediction();
     u32 m_dwDeltaUpdate = 0;
@@ -204,11 +201,10 @@ private:
     void BlockCheatLoad();
     bool Connect2Server(const char* options);
     void SendClientDigestToServer();
-    shared_str m_client_digest;  // for screenshots
+    shared_str m_client_digest; // for screenshots
 
 public:
     shared_str const get_cdkey_digest() const { return m_client_digest; }
-
 private:
     bool m_bConnectResultReceived;
     bool m_bConnectResult;
@@ -242,7 +238,7 @@ public:
 protected:
     bool net_start_result_total;
     bool connected_to_server;
-    bool deny_m_spawn;  // only for debug...
+    bool deny_m_spawn; // only for debug...
     bool sended_request_connection_data;
     void MakeReconnect();
     LevelMapSyncData map_data;
@@ -312,11 +308,11 @@ public:
     void ClientSave();
     u32 Objects_net_Save(NET_Packet* _Packet, u32 start, u32 count);
     virtual void Send(NET_Packet& P, u32 dwFlags = DPNSEND_GUARANTEED, u32 dwTimeout = 0);
-    void g_cl_Spawn(LPCSTR name, u8 rp, u16 flags, Fvector pos);  // only ask server
-    void g_sv_Spawn(CSE_Abstract* E);                             // server reply/command spawning
+    void g_cl_Spawn(LPCSTR name, u8 rp, u16 flags, Fvector pos); // only ask server
+    void g_sv_Spawn(CSE_Abstract* E); // server reply/command spawning
     // Save/Load/State
-    void SLS_Load(LPCSTR name);  // Game Load
-    void SLS_Default();          // Default/Editor Load
+    void SLS_Load(LPCSTR name); // Game Load
+    void SLS_Default(); // Default/Editor Load
     IC CSpaceRestrictionManager& space_restriction_manager();
     IC CSeniorityHierarchyHolder& seniority_holder();
     IC CClientSpawnManager& client_spawn_manager();
@@ -324,7 +320,7 @@ public:
 #ifdef DEBUG
     IC CDebugRenderer& debug_renderer();
 #endif
-    void __stdcall script_gc();  // GC-cycle
+    void __stdcall script_gc(); // GC-cycle
     IC CPHCommander& ph_commander();
     IC CPHCommander& ph_commander_scripts();
     IC CPHCommander& ph_commander_physics_worldstep();
@@ -382,7 +378,6 @@ protected:
 
 public:
     virtual u32 GetRealPing() { return m_dwRealPing; }
-
 public:
     void remove_objects();
     virtual void OnSessionTerminate(LPCSTR reason);
@@ -400,21 +395,12 @@ public:
 };
 
 // XXX nitrocaster: should not cast to inherited
-IC CLevel& Level()
-{
-    return *(CLevel*)g_pGameLevel;
-}
-IC game_cl_GameState& Game()
-{
-    return *Level().game;
-}
+IC CLevel& Level() { return *(CLevel*)g_pGameLevel; }
+IC game_cl_GameState& Game() { return *Level().game; }
 u32 GameID();
 
 #ifdef DEBUG
-IC CLevelDebug& DBG()
-{
-    return *(CLevelDebug*)Level().m_level_debug;
-}
+IC CLevelDebug& DBG() { return *(CLevelDebug*)Level().m_level_debug; }
 #endif
 
 IC CSpaceRestrictionManager& CLevel::space_restriction_manager()
@@ -467,17 +453,7 @@ IC CPHCommander& CLevel::ph_commander_physics_worldstep()
     return *m_ph_commander_physics_worldstep;
 }
 
-IC bool OnServer()
-{
-    return Level().IsServer();
-}
-IC bool OnClient()
-{
-    return Level().IsClient();
-}
-IC bool IsGameTypeSingle()
-{
-    return (g_pGamePersistent->GameType() == eGameIDSingle);
-}
-
+IC bool OnServer() { return Level().IsServer(); }
+IC bool OnClient() { return Level().IsClient(); }
+IC bool IsGameTypeSingle() { return (g_pGamePersistent->GameType() == eGameIDSingle); }
 extern bool g_bDebugEvents;

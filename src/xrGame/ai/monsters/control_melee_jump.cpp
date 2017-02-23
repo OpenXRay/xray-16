@@ -17,16 +17,22 @@ void CControlMeleeJump::reinit()
 
 bool CControlMeleeJump::check_start_conditions()
 {
-    if (is_active()) return false;
-    if (m_man->is_captured_pure()) return false;
+    if (is_active())
+        return false;
+    if (m_man->is_captured_pure())
+        return false;
 
-    if (!m_object->EnemyMan.get_enemy()) return false;
-    if (m_time_next_melee_jump > Device.dwTimeGlobal) return false;
+    if (!m_object->EnemyMan.get_enemy())
+        return false;
+    if (m_time_next_melee_jump > Device.dwTimeGlobal)
+        return false;
 
     Fvector enemy_position;
     enemy_position.set(m_object->EnemyMan.get_enemy()->Position());
-    if (m_man->direction().is_face_target(enemy_position, CHECK_YAW)) return false;
-    if (enemy_position.distance_to(m_object->Position()) > MAX_DISTANCE_TO_ENEMY) return false;
+    if (m_man->direction().is_face_target(enemy_position, CHECK_YAW))
+        return false;
+    if (enemy_position.distance_to(m_object->Position()) > MAX_DISTANCE_TO_ENEMY)
+        return false;
 
     return true;
 }

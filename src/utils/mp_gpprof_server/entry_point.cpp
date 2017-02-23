@@ -37,15 +37,18 @@ int main(int argc, char** argv)
 
         FCGX_Init();
         int binded_sock = 0;
-        if (argc >= 2) binded_sock = FCGX_OpenSocket(argv[1], 128);
-        if (!binded_sock) {
+        if (argc >= 2)
+            binded_sock = FCGX_OpenSocket(argv[1], 128);
+        if (!binded_sock)
+        {
             cerr << "failed to bind socket to address " << argv[1] << endl;
             return EXIT_FAILURE;
         }
 
         cout << "binded server to: " << argv[1] << ", value=" << binded_sock << endl;
 
-        if (argc >= 3) root_path = argv[2];
+        if (argc >= 3)
+            root_path = argv[2];
 
         std::auto_ptr<requests_poll> req_poll(new requests_poll());
         fetch_profile_request::request_ptr_t new_request(new FCGX_Request());

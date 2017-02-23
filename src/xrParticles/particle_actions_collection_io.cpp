@@ -190,15 +190,8 @@ void PAMatchVelocity::Save(IWriter& F)
     F.w_float(max_radius);
 }
 
-void PAMove::Load(IReader& F)
-{
-    ParticleAction::Load(F);
-}
-void PAMove::Save(IWriter& F)
-{
-    ParticleAction::Save(F);
-}
-
+void PAMove::Load(IReader& F) { ParticleAction::Load(F); }
+void PAMove::Save(IWriter& F) { ParticleAction::Save(F); }
 void PAOrbitLine::Load(IReader& F)
 {
     ParticleAction::Load(F);

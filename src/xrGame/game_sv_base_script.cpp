@@ -22,26 +22,20 @@ CUISequencer* g_tutorial2 = NULL;
 
 void start_tutorial(LPCSTR name)
 {
-    if (g_tutorial) {
+    if (g_tutorial)
+    {
         VERIFY(!g_tutorial2);
         g_tutorial2 = g_tutorial;
     };
 
     g_tutorial = xr_new<CUISequencer>();
     g_tutorial->Start(name);
-    if (g_tutorial2) g_tutorial->m_pStoredInputReceiver = g_tutorial2->m_pStoredInputReceiver;
+    if (g_tutorial2)
+        g_tutorial->m_pStoredInputReceiver = g_tutorial2->m_pStoredInputReceiver;
 }
 
-LPCSTR translate_string(LPCSTR str)
-{
-    return *CStringTable().translate(str);
-}
-
-bool has_active_tutotial()
-{
-    return (g_tutorial != NULL);
-}
-
+LPCSTR translate_string(LPCSTR str) { return *CStringTable().translate(str); }
+bool has_active_tutotial() { return (g_tutorial != NULL); }
 #pragma optimize("s", on)
 void game_sv_GameState::script_register(lua_State* L)
 {
@@ -70,9 +64,8 @@ void game_sv_GameState::script_register(lua_State* L)
                           .def("setHMS", &xrTime::setHMS)
                           .def("setHMSms", &xrTime::setHMSms)
                           .def("set", &xrTime::set)
-                          .def("get", &xrTime::get,
-                              out_value(_2) + out_value(_3) + out_value(_4) + out_value(_5) + out_value(_6) +
-                                  out_value(_7) + out_value(_8))
+                          .def("get", &xrTime::get, out_value(_2) + out_value(_3) + out_value(_4) + out_value(_5) +
+                                  out_value(_6) + out_value(_7) + out_value(_8))
                           .def("dateToString", &xrTime::dateToString)
                           .def("timeToString", &xrTime::timeToString),
         // declarations

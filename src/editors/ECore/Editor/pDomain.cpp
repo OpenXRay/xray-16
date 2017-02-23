@@ -43,10 +43,7 @@ PDomain::PDomain(const PDomain& inDomain)
     f[8] = inDomain.f[8];
 }
 
-PDomain::~PDomain()
-{
-}
-
+PDomain::~PDomain() {}
 void PDomain::Load(IReader& F)
 {
     type = PDomainEnum(F.r_u32());
@@ -100,7 +97,8 @@ void	PDomain::set(PAPI::PDomainEnum t, 		float inA0, float inA1, float inA2,
 //--------------------------------------------------------------------
 void PDomain::Render(u32 clr, const Fmatrix& parent)
 {
-    if (!flags.is(flRenderable)) return;
+    if (!flags.is(flRenderable))
+        return;
     u32 clr_s = subst_alpha(clr, 0x60);
     u32 clr_w = subst_alpha(clr, 0xff);
     RCache.set_xform_world(parent);
@@ -140,7 +138,8 @@ void PDomain::Render(u32 clr, const Fmatrix& parent)
         Fvector c, d;
         float h = d.sub(v[1], v[0]).magnitude();
         c.add(v[0], v[1]).div(2.f);
-        if (!fis_zero(h)) {
+        if (!fis_zero(h))
+        {
             d.div(h);
             DU_impl.DrawCylinder(parent, c, d, h, f[6], clr_s, clr_w, true, true);
             DU_impl.DrawCylinder(parent, c, d, h, f[7], clr_s, clr_w, true, true);
@@ -151,7 +150,8 @@ void PDomain::Render(u32 clr, const Fmatrix& parent)
     {
         Fvector d;
         float h = d.sub(v[1], v[0]).magnitude();
-        if (!fis_zero(h)) {
+        if (!fis_zero(h))
+        {
             d.div(h);
             DU_impl.DrawCone(parent, v[0], d, h, f[6], clr_s, clr_w, true, true);
             DU_impl.DrawCone(parent, v[0], d, h, f[7], clr_s, clr_w, true, true);
@@ -174,11 +174,7 @@ xr_token domain_token[] = {{"Point", PDPoint}, {"Line", PDLine}, {"Triangle", PD
     {"Box", PDBox}, {"Sphere", PDSphere}, {"Cylinder", PDCylinder}, {"Cone", PDCone}, {"Blob", PDBlob},
     {"Disc", PDDisc}, {"Rectangle", PDRectangle}, {0, 0}};
 
-void PDomain::OnTypeChange(PropValue* sender)
-{
-    ExecCommand(COMMAND_UPDATE_PROPERTIES);
-}
-
+void PDomain::OnTypeChange(PropValue* sender) { ExecCommand(COMMAND_UPDATE_PROPERTIES); }
 void PDomain::FillProp(PropItemVec& items, LPCSTR pref, u32 clr)
 {
     PropValue* V;

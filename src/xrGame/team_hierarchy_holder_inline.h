@@ -21,7 +21,4 @@ IC CSeniorityHierarchyHolder& CTeamHierarchyHolder::team() const
     return (*m_seniority_manager);
 }
 
-IC const CTeamHierarchyHolder::SQUAD_REGISTRY& CTeamHierarchyHolder::squads() const
-{
-    return (m_squads);
-}
+IC const CTeamHierarchyHolder::SQUAD_REGISTRY& CTeamHierarchyHolder::squads() const { return (m_squads); }

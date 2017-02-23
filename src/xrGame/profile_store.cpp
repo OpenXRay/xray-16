@@ -25,7 +25,8 @@ profile_store::profile_store(CGameSpy_Full* fullgs_obj)
 
 profile_store::~profile_store()
 {
-    if (m_progress_indicator) Engine.Sheduler.Unregister(this);
+    if (m_progress_indicator)
+        Engine.Sheduler.Unregister(this);
 
     xr_delete(m_awards_store);
     xr_delete(m_best_scores_store);
@@ -49,7 +50,7 @@ void profile_store::shedule_Update(u32 dt)
 #ifdef DEBUG
     Msg("--- GameSpy core (SAKE) thinking ...");
 #endif
-    m_fullgs_obj->CoreThink(10);  // 10 milliseconds on update
+    m_fullgs_obj->CoreThink(10); // 10 milliseconds on update
 }
 
 void profile_store::set_current_profile(int profileId, char const* loginTicket)
@@ -60,13 +61,15 @@ void profile_store::set_current_profile(int profileId, char const* loginTicket)
 
 void profile_store::load_current_profile(store_operation_cb progress_indicator_cb, store_operation_cb complete_cb)
 {
-    if (!complete_cb) {
+    if (!complete_cb)
+    {
         complete_cb.bind(this, &profile_store::onlylog_completion);
     }
     gamespy_gp::login_manager* tmp_lmngr = MainMenu()->GetLoginMngr();
     R_ASSERT(tmp_lmngr);
     gamespy_gp::profile const* tmp_curr_prof = tmp_lmngr->get_current_profile();
-    if (!tmp_curr_prof) {
+    if (!tmp_curr_prof)
+    {
         complete_cb(false, "mp_first_need_to_login");
         return;
     }
@@ -78,9 +81,11 @@ void profile_store::load_current_profile(store_operation_cb progress_indicator_c
 
 void profile_store::load_current_profile_raw(load_prof_params_t const& args, store_operation_cb complete_cb)
 {
-    if (m_complete_cb) {
+    if (m_complete_cb)
+    {
         Msg("! ERROR: loading already in progress.");
-        if (complete_cb) {
+        if (complete_cb)
+        {
             complete_cb(false, "mp_loading_already_in_progress");
         }
         return;
@@ -96,14 +101,12 @@ void profile_store::stop_loading()
     m_progress_indicator.bind(this, &profile_store::onlylog_operation);
 }
 
-void profile_store::release_current_profile(bool, char const*)
-{
-}
-
+void profile_store::release_current_profile(bool, char const*) {}
 void profile_store::load_profile(store_operation_cb progress_indicator_cb)
 {
     VERIFY(!m_progress_indicator);
-    if (!progress_indicator_cb) {
+    if (!progress_indicator_cb)
+    {
         m_progress_indicator.bind(this, &profile_store::onlylog_operation);
     }
     else
@@ -116,18 +119,22 @@ void profile_store::load_profile(store_operation_cb progress_indicator_cb)
     IReader* tmp_reader = NULL;
     m_valid_ltx = false;
 
-    if (FS.exist(tmp_path)) {
+    if (FS.exist(tmp_path))
+    {
         tmp_reader = FS.r_open("$app_data_root$", profile_store_file_name);
     }
 
-    if (tmp_reader) {
+    if (tmp_reader)
+    {
         u32 const tmp_length = tmp_reader->length();
-        if (tmp_length) {
+        if (tmp_length)
+        {
             m_valid_ltx = m_dsigned_reader.load_and_verify(static_cast<u8*>(tmp_reader->pointer()), tmp_length);
             FS.r_close(tmp_reader);
         }
     }
-    if (m_valid_ltx) {
+    if (m_valid_ltx)
+    {
         s32 tmp_profile_id = m_dsigned_reader.get_ltx().r_s32(profile_data_section, profile_id_line);
         gamespy_gp::login_manager* tmp_lmngr = MainMenu()->GetLoginMngr();
         R_ASSERT(tmp_lmngr);
@@ -171,7 +178,8 @@ void profile_store::load_profile_fields()
 {
     SAKERequest reqres = m_sake_obj->GetMyRecords(&m_get_records_input, &profile_store::get_my_fields_cb, this);
 
-    if (!reqres) {
+    if (!reqres)
+    {
         SAKEStartRequestResult tmp_result = m_sake_obj->GetRequestResult();
         loaded_fields(false, CGameSpy_SAKE::TryToTranslate(tmp_result).c_str());
     }
@@ -181,7 +189,8 @@ void __cdecl profile_store::get_my_fields_cb(
     SAKE sake, SAKERequest request, SAKERequestResult result, void* inputData, void* outputData, void* userData)
 {
     profile_store* my_inst = static_cast<profile_store*>(userData);
-    if (result != SAKERequestResult_SUCCESS) {
+    if (result != SAKERequestResult_SUCCESS)
+    {
         my_inst->loaded_fields(false, CGameSpy_SAKE::TryToTranslate(result).c_str());
         return;
     }
@@ -194,7 +203,8 @@ void __cdecl profile_store::get_my_fields_cb(
 
 void profile_store::loaded_fields(bool const result, char const* err_descr)
 {
-    if (!m_complete_cb) {
+    if (!m_complete_cb)
+    {
         Msg("WARNING: loading awards terminated by user");
         VERIFY(!m_progress_indicator);
         Engine.Sheduler.Unregister(this);
@@ -206,12 +216,14 @@ void profile_store::loaded_fields(bool const result, char const* err_descr)
     m_progress_indicator.clear();
     Engine.Sheduler.Unregister(this);
 
-    if (!result) {
+    if (!result)
+    {
         tmp_cb(false, err_descr);
         return;
     }
 
-    if (m_valid_ltx) {
+    if (m_valid_ltx)
+    {
         m_awards_store->load_awards_from_ltx(m_dsigned_reader.get_ltx());
         m_best_scores_store->load_best_scores_from_ltx(m_dsigned_reader.get_ltx());
         m_awards_store->merge_sake_to_ltx_awards();
@@ -223,7 +235,8 @@ void profile_store::loaded_fields(bool const result, char const* err_descr)
 
 void __stdcall profile_store::onlylog_operation(bool const result, char const* descr)
 {
-    if (!result) {
+    if (!result)
+    {
         Msg("! Profile store ERROR: %s", descr ? descr : "unknown");
         return;
     }
@@ -232,7 +245,8 @@ void __stdcall profile_store::onlylog_operation(bool const result, char const* d
 
 void __stdcall profile_store::onlylog_completion(bool const result, char const* err_descr)
 {
-    if (!result) {
+    if (!result)
+    {
         Msg("! Profile loading ERROR: %s", err_descr ? err_descr : "unknown");
         return;
     }
@@ -243,17 +257,19 @@ void __stdcall profile_store::onlylog_completion(bool const result, char const* 
 static u32 const actuality_update_time = 120;
 #else
 static u32 const actuality_update_time = 3600;
-#endif  //#ifdef DEBUG
+#endif //#ifdef DEBUG
 
 void profile_store::check_sake_actuality()
 {
-    if (!m_awards_store->is_sake_equal_to_file() || !m_best_scores_store->is_sake_equal_to_file()) {
+    if (!m_awards_store->is_sake_equal_to_file() || !m_best_scores_store->is_sake_equal_to_file())
+    {
         __time32_t current_time;
         _time32(&current_time);
 
         __time32_t last_submit_time =
             static_cast<__time32_t>(m_dsigned_reader.get_ltx().r_u32(profile_data_section, profile_last_submit_time));
-        if ((current_time - last_submit_time) >= actuality_update_time) {
+        if ((current_time - last_submit_time) >= actuality_update_time)
+        {
             atlas_submit_queue* tmp_submit_queue = MainMenu()->GetSubmitQueue();
             VERIFY(tmp_submit_queue);
             tmp_submit_queue->submit_all();
@@ -261,4 +277,4 @@ void profile_store::check_sake_actuality()
     }
 }
 
-}  // namespace gamespy_profile
+} // namespace gamespy_profile

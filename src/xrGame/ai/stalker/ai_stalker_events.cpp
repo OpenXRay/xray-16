@@ -41,7 +41,8 @@ void CAI_Stalker::OnEvent(NET_Packet& P, u16 type)
         Msg("Trying to take - %s (%d)", *O->cName(), O->ID());
 #endif
         CGameObject* _O = smart_cast<CGameObject*>(O);
-        if (inventory().CanTakeItem(smart_cast<CInventoryItem*>(_O))) {
+        if (inventory().CanTakeItem(smart_cast<CInventoryItem*>(_O)))
+        {
             O->H_SetParent(this);
             inventory().Take(_O, true, false);
             if (!inventory().ActiveItem() && GetScriptControl() && smart_cast<CShootingObject*>(O))
@@ -75,7 +76,8 @@ void CAI_Stalker::OnEvent(NET_Packet& P, u16 type)
         IGameObject* O = Level().Objects.net_Find(id);
 
 #pragma todo("Dima to Oles : how can this happen?")
-        if (!O) break;
+        if (!O)
+            break;
 
         bool just_before_destroy = !P.r_eof() && P.r_u8();
         bool dont_create_shell = (type == GE_TRADE_SELL) || just_before_destroy;
@@ -98,9 +100,11 @@ void CAI_Stalker::on_ownership_reject(IGameObject* O, bool just_before_destroy)
     CGameObject* const game_object = smart_cast<CGameObject*>(O);
     VERIFY(game_object);
 
-    if (!inventory().DropItem(game_object, just_before_destroy, just_before_destroy)) return;
+    if (!inventory().DropItem(game_object, just_before_destroy, just_before_destroy))
+        return;
 
-    if (O->getDestroy()) return;
+    if (O->getDestroy())
+        return;
 
     feel_touch_deny(O, 2000);
 }
@@ -115,7 +119,8 @@ void CAI_Stalker::generate_take_event(IGameObject const* const object) const
 
 void CAI_Stalker::DropItemSendMessage(IGameObject* O)
 {
-    if (!O || !O->H_Parent() || (this != O->H_Parent())) return;
+    if (!O || !O->H_Parent() || (this != O->H_Parent()))
+        return;
 
 #ifndef SILENCE
     Msg("Dropping item!");
@@ -135,14 +140,18 @@ void CAI_Stalker::UpdateAvailableDialogs(CPhraseDialogManager* partner)
 void CAI_Stalker::feel_touch_new(IGameObject* O)
 {
     //	Msg					("FEEL_TOUCH::NEW : %s",*O->cName());
-    if (!g_Alive()) return;
-    if (Remote()) return;
-    if ((O->GetSpatialData().type | STYPE_VISIBLEFORAI) != O->GetSpatialData().type) return;
+    if (!g_Alive())
+        return;
+    if (Remote())
+        return;
+    if ((O->GetSpatialData().type | STYPE_VISIBLEFORAI) != O->GetSpatialData().type)
+        return;
 
     // Now, test for game specific logical objects to minimize traffic
     CInventoryItem* I = smart_cast<CInventoryItem*>(O);
 
-    if (!wounded() && !critically_wounded() && I && I->useful_for_NPC() && can_take(I)) {
+    if (!wounded() && !critically_wounded() && I && I->useful_for_NPC() && can_take(I))
+    {
 #ifndef SILENCE
         Msg("Taking item %s (%d)!", I->object().cName().c_str(), I->object().ID());
 #endif
@@ -151,7 +160,7 @@ void CAI_Stalker::feel_touch_new(IGameObject* O)
     }
 
     VERIFY2(std::find(m_ignored_touched_objects.begin(), m_ignored_touched_objects.end(), O) ==
-                m_ignored_touched_objects.end(),
+            m_ignored_touched_objects.end(),
         make_string("object %s is already in ignroed touched objects list", O->cName().c_str()));
     m_ignored_touched_objects.push_back(O);
 }

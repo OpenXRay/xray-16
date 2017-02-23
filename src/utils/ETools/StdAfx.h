@@ -21,9 +21,9 @@
 #pragma comment(lib, "d3dx9.lib")
 
 // Warnings
-#pragma warning(disable : 4786)  // too long names
-#pragma warning(disable : 4503)  // decorated name length exceeded
-#pragma warning(disable : 4251)  // object needs DLL interface
+#pragma warning(disable : 4786) // too long names
+#pragma warning(disable : 4503) // decorated name length exceeded
+#pragma warning(disable : 4251) // object needs DLL interface
 
 #pragma comment(lib, "xrCore.lib")
 #pragma comment(lib, "xrQSlim.lib")
@@ -31,4 +31,4 @@
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.
 
-#endif  // !defined(AFX_STDAFX_H__A9DB83DB_A9FD_11D0_BFD1_444553540000__INCLUDED_)
+#endif // !defined(AFX_STDAFX_H__A9DB83DB_A9FD_11D0_BFD1_444553540000__INCLUDED_)

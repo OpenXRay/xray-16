@@ -1,15 +1,8 @@
 #include "statistics_collector.hpp"
 #include "wpn_collection.hpp"
 
-statistics_collector::statistics_collector(weapon_collection* wpn_collection)
-{
-    m_wpn_collection = wpn_collection;
-}
-
-statistics_collector::~statistics_collector()
-{
-    delete_data(m_all_params);
-}
+statistics_collector::statistics_collector(weapon_collection* wpn_collection) { m_wpn_collection = wpn_collection; }
+statistics_collector::~statistics_collector() { delete_data(m_all_params); }
 #define CSV_SETTINGS "csv_settings"
 void statistics_collector::load_settings()
 {
@@ -18,10 +11,12 @@ void statistics_collector::load_settings()
     {
         LPCSTR key = NULL;
         LPCSTR value = NULL;
-        if (m_wpn_collection->settings->r_line(CSV_SETTINGS, i, &key, &value) && key) {
+        if (m_wpn_collection->settings->r_line(CSV_SETTINGS, i, &key, &value) && key)
+        {
             csv_files::iterator new_file_iter =
                 m_all_params.insert(std::make_pair(shared_str(key), xr_new<params_collection>())).first;
-            if (value) {
+            if (value)
+            {
                 get_string_collection(value, *new_file_iter->second);
             }
         }
@@ -41,9 +36,11 @@ statistics_collector::csv_files::const_iterator statistics_collector::get_most_a
     csv_files::const_iterator ret_iter = m_all_params.end();
     for (csv_files::const_iterator i = m_all_params.begin(), ie = m_all_params.end(); i != ie; ++i)
     {
-        if (strncmp(i->first.c_str(), section.c_str(), i->first.size())) continue;
+        if (strncmp(i->first.c_str(), section.c_str(), i->first.size()))
+            continue;
 
-        if (ret_iter == ie) {
+        if (ret_iter == ie)
+        {
             ret_iter = i;
             max_size = i->first.size();
         }
@@ -81,8 +78,10 @@ void statistics_collector::save_file(csv_files::value_type const& val)
          i != ie; ++i)
     {
         csv_files::const_iterator temp_cit = get_most_acceptable_group(*i);
-        if (temp_cit == m_all_params.end()) continue;
-        if (temp_cit->first != val.first) continue;
+        if (temp_cit == m_all_params.end())
+            continue;
+        if (temp_cit->first != val.first)
+            continue;
 
         sprintf_s(temp_string, "\"%s\",", i->c_str());
         dest_string.append(temp_string);
@@ -90,7 +89,8 @@ void statistics_collector::save_file(csv_files::value_type const& val)
              param_i != param_ie; ++param_i)
         {
             LPCSTR val = m_wpn_collection->priquel_config->r_string(i->c_str(), param_i->c_str());
-            if (!val) val = "";
+            if (!val)
+                val = "";
             sprintf_s(temp_string, "\"%s\",", val);
             dest_string.append(temp_string);
         }

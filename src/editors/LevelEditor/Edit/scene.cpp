@@ -24,11 +24,7 @@
 EScene* Scene;
 
 //----------------------------------------------------
-st_LevelOptions::st_LevelOptions()
-{
-    Reset();
-}
-
+st_LevelOptions::st_LevelOptions() { Reset(); }
 void st_LevelOptions::Reset()
 {
     m_FNLevelPath = "level";
@@ -42,11 +38,7 @@ void st_LevelOptions::Reset()
     m_mapUsage.SetDefaults();
 }
 
-void st_LevelOptions::SetCustomQuality()
-{
-    m_BuildParams.m_quality = ebqCustom;
-}
-
+void st_LevelOptions::SetCustomQuality() { m_BuildParams.m_quality = ebqCustom; }
 void st_LevelOptions::SetDraftQuality()
 {
     m_BuildParams.setDraftQuality();
@@ -125,7 +117,8 @@ void EScene::AppendObject(CCustomObject* object, bool bUndo)
     VERIFY3(mt, "Can't find Object Tools:", GetTool(object->ClassID)->ClassDesc());
     mt->_AppendObject(object);
     UI->UpdateScene();
-    if (bUndo) {
+    if (bUndo)
+    {
         object->Select(true);
         UndoSave();
     }
@@ -137,7 +130,8 @@ bool EScene::RemoveObject(CCustomObject* object, bool bUndo, bool bDeleting)
     VERIFY(m_Valid);
 
     ESceneCustomOTool* mt = GetOTool(object->ClassID);
-    if (mt && mt->IsEditable()) {
+    if (mt && mt->IsEditable())
+    {
         mt->_RemoveObject(object);
         // signal everyone "I'm deleting"
         //        if (object->ClassID==OBJCLASS_SCENEOBJECT)
@@ -149,13 +143,15 @@ bool EScene::RemoveObject(CCustomObject* object, bool bUndo, bool bDeleting)
             for (; _I != _E; _I++)
             {
                 ESceneToolBase* mt = _I->second;
-                if (mt) mt->OnObjectRemove(object, bDeleting);
+                if (mt)
+                    mt->OnObjectRemove(object, bDeleting);
             }
             UpdateSnapList();
         }
         UI->UpdateScene();
     }
-    if (bUndo) UndoSave();
+    if (bUndo)
+        UndoSave();
     return true;
 }
 
@@ -165,13 +161,15 @@ void EScene::BeforeObjectChange(CCustomObject* object)
     VERIFY(m_Valid);
 
     ESceneCustomOTool* mt = GetOTool(object->ClassID);
-    if (mt && mt->IsEditable()) {
+    if (mt && mt->IsEditable())
+    {
         SceneToolsMapPairIt _I = m_SceneTools.begin();
         SceneToolsMapPairIt _E = m_SceneTools.end();
         for (; _I != _E; _I++)
         {
             ESceneToolBase* mt = _I->second;
-            if (mt) mt->OnBeforeObjectChange(object);
+            if (mt)
+                mt->OnBeforeObjectChange(object);
         }
         UI->UpdateScene();
     }
@@ -181,34 +179,41 @@ int EScene::MultiRenameObjects()
 {
     int cnt = 0;
 
-    if (LTools->GetTarget() == OBJCLASS_DUMMY) {
+    if (LTools->GetTarget() == OBJCLASS_DUMMY)
+    {
         SceneToolsMapPairIt t_it = m_SceneTools.begin();
         SceneToolsMapPairIt t_end = m_SceneTools.end();
         for (; t_it != t_end; t_it++)
         {
             ESceneCustomOTool* ot = dynamic_cast<ESceneCustomOTool*>(t_it->second);
-            if (ot && (t_it->first != OBJCLASS_DUMMY)) cnt += ot->MultiRenameObjects();
+            if (ot && (t_it->first != OBJCLASS_DUMMY))
+                cnt += ot->MultiRenameObjects();
         }
     }
     else
     {
         ESceneCustomOTool* ot = GetOTool(LTools->GetTarget());
-        if (ot) cnt += ot->MultiRenameObjects();
+        if (ot)
+            cnt += ot->MultiRenameObjects();
     }
     return cnt;
 }
 
 void EScene::OnFrame(float dT)
 {
-    if (!valid()) return;
-    if (locked()) return;
+    if (!valid())
+        return;
+    if (locked())
+        return;
 
     SceneToolsMapPairIt t_it = m_SceneTools.begin();
     SceneToolsMapPairIt t_end = m_SceneTools.end();
     for (; t_it != t_end; t_it++)
-        if (t_it->second && t_it->second->IsEnabled()) t_it->second->OnFrame();
+        if (t_it->second && t_it->second->IsEnabled())
+            t_it->second->OnFrame();
 
-    if (m_RTFlags.test(flUpdateSnapList)) UpdateSnapListReal();
+    if (m_RTFlags.test(flUpdateSnapList))
+        UpdateSnapListReal();
 }
 
 void EScene::Reset()
@@ -219,7 +224,8 @@ void EScene::Reset()
     SceneToolsMapPairIt t_it = m_SceneTools.begin();
     SceneToolsMapPairIt t_end = m_SceneTools.end();
     for (; t_it != t_end; t_it++)
-        if (t_it->second && t_it->first != OBJCLASS_DUMMY) t_it->second->Reset();
+        if (t_it->second && t_it->first != OBJCLASS_DUMMY)
+            t_it->second->Reset();
     g_scene_physics.UpdateLevelCollision();
 }
 
@@ -227,7 +233,8 @@ void EScene::Unload(BOOL bEditableOnly)
 {
     m_LastAvailObject = 0;
     Clear(bEditableOnly);
-    if (m_SummaryInfo) m_SummaryInfo->HideProperties();
+    if (m_SummaryInfo)
+        m_SummaryInfo->HideProperties();
 }
 
 void EScene::Clear(BOOL bEditableToolsOnly)
@@ -238,8 +245,10 @@ void EScene::Clear(BOOL bEditableToolsOnly)
     SceneToolsMapPairIt t_it = m_SceneTools.begin();
     SceneToolsMapPairIt t_end = m_SceneTools.end();
     for (; t_it != t_end; t_it++)
-        if (t_it->second && t_it->first != OBJCLASS_DUMMY) {
-            if (!bEditableToolsOnly || (bEditableToolsOnly && t_it->second->IsEditable())) {
+        if (t_it->second && t_it->first != OBJCLASS_DUMMY)
+        {
+            if (!bEditableToolsOnly || (bEditableToolsOnly && t_it->second->IsEditable()))
+            {
                 t_it->second->Clear();
             }
         }
@@ -257,11 +266,7 @@ void EScene::Clear(BOOL bEditableToolsOnly)
 
 //----------------------------------------------------
 
-bool EScene::GetBox(Fbox& box, ObjClassID classfilter)
-{
-    return GetBox(box, ListObj(classfilter));
-}
-
+bool EScene::GetBox(Fbox& box, ObjClassID classfilter) { return GetBox(box, ListObj(classfilter)); }
 //----------------------------------------------------
 
 bool EScene::GetBox(Fbox& box, ObjectList& lst)
@@ -272,7 +277,8 @@ bool EScene::GetBox(Fbox& box, ObjectList& lst)
     {
         Fbox bb;
 
-        if ((*it)->GetBox(bb)) {
+        if ((*it)->GetBox(bb))
+        {
             box.modify(bb.min);
             box.modify(bb.max);
             bRes = true;
@@ -290,28 +296,23 @@ void EScene::Modified()
     ExecCommand(COMMAND_UPDATE_CAPTION);
 }
 
-bool EScene::IsUnsaved()
-{
-    return (m_RTFlags.is(flRT_Unsaved) && (ObjCount() || !Tools->GetEditFileName().IsEmpty()));
-}
-
-bool EScene::IsModified()
-{
-    return (m_RTFlags.is(flRT_Modified));
-}
-
+bool EScene::IsUnsaved() { return (m_RTFlags.is(flRT_Unsaved) && (ObjCount() || !Tools->GetEditFileName().IsEmpty())); }
+bool EScene::IsModified() { return (m_RTFlags.is(flRT_Modified)); }
 bool EScene::IfModified()
 {
-    if (locked()) {
+    if (locked())
+    {
         ELog.DlgMsg(mtError, "Scene sharing violation");
         return false;
     }
-    if (m_RTFlags.is(flRT_Unsaved) && (ObjCount() || !Tools->GetEditFileName().IsEmpty())) {
+    if (m_RTFlags.is(flRT_Unsaved) && (ObjCount() || !Tools->GetEditFileName().IsEmpty()))
+    {
         int mr = ELog.DlgMsg(mtConfirmation, "The scene has been modified. Do you want to save your changes?");
         switch (mr)
         {
         case mrYes:
-            if (!ExecCommand(COMMAND_SAVE)) return false;
+            if (!ExecCommand(COMMAND_SAVE))
+                return false;
             break;
         case mrNo:
         {
@@ -330,7 +331,8 @@ void EScene::OnObjectsUpdate()
     SceneToolsMapPairIt t_it = m_SceneTools.begin();
     SceneToolsMapPairIt t_end = m_SceneTools.end();
     for (; t_it != t_end; t_it++)
-        if (t_it->second) t_it->second->OnSceneUpdate();
+        if (t_it->second)
+            t_it->second->OnSceneUpdate();
 }
 
 void EScene::OnDeviceCreate()
@@ -338,7 +340,8 @@ void EScene::OnDeviceCreate()
     SceneToolsMapPairIt t_it = m_SceneTools.begin();
     SceneToolsMapPairIt t_end = m_SceneTools.end();
     for (; t_it != t_end; t_it++)
-        if (t_it->second) t_it->second->OnDeviceCreate();
+        if (t_it->second)
+            t_it->second->OnDeviceCreate();
 }
 
 void EScene::OnDeviceDestroy()
@@ -346,7 +349,8 @@ void EScene::OnDeviceDestroy()
     SceneToolsMapPairIt t_it = m_SceneTools.begin();
     SceneToolsMapPairIt t_end = m_SceneTools.end();
     for (; t_it != t_end; t_it++)
-        if (t_it->second) t_it->second->OnDeviceDestroy();
+        if (t_it->second)
+            t_it->second->OnDeviceDestroy();
 }
 
 //------------------------------------------------------------------------------
@@ -354,7 +358,8 @@ void EScene::OnDeviceDestroy()
 void EScene::OnShowHint(AStringVec& dest)
 {
     CCustomObject* obj = RayPickObject(flt_max, UI->m_CurrentRStart, UI->m_CurrentRDir, LTools->CurrentClassID(), 0, 0);
-    if (obj) obj->OnShowHint(dest);
+    if (obj)
+        obj->OnShowHint(dest);
 }
 
 //------------------------------------------------------------------------------
@@ -366,7 +371,8 @@ bool EScene::ExportGame(SExportStreams* F)
     SceneToolsMapPairIt t_end = m_SceneTools.end();
     for (; t_it != t_end; t_it++)
         if (t_it->second)
-            if (!t_it->second->ExportGame(F)) bres = false;
+            if (!t_it->second->ExportGame(F))
+                bres = false;
     return bres;
 }
 
@@ -380,59 +386,73 @@ bool EScene::Validate(
     SceneToolsMapPairIt t_end = m_SceneTools.end();
     for (; t_it != t_end; t_it++)
     {
-        if (t_it->second) {
-            if (!t_it->second->Validate(bFullTest)) {
+        if (t_it->second)
+        {
+            if (!t_it->second->Validate(bFullTest))
+            {
                 ELog.Msg(mtError, "ERROR: Validate '%s' failed!", t_it->second->ClassDesc());
                 bRes = false;
             }
         }
     }
 
-    if (bTestPortal) {
+    if (bTestPortal)
+    {
         if (Scene->ObjCount(OBJCLASS_SECTOR) || Scene->ObjCount(OBJCLASS_PORTAL))
-            if (!PortalUtils.Validate(true)) bRes = false;
+            if (!PortalUtils.Validate(true))
+                bRes = false;
     }
-    if (bTestHOM) {
+    if (bTestHOM)
+    {
         bool bHasHOM = false;
         ObjectList& lst = ListObj(OBJCLASS_SCENEOBJECT);
         for (ObjectIt it = lst.begin(); it != lst.end(); it++)
         {
             CEditableObject* O = ((CSceneObject*)(*it))->GetReference();
             R_ASSERT(O);
-            if (O->m_objectFlags.is(CEditableObject::eoHOM)) {
+            if (O->m_objectFlags.is(CEditableObject::eoHOM))
+            {
                 bHasHOM = true;
                 break;
             }
         }
-        if (!bHasHOM) Msg("!Level doesn't contain HOM objects!");
+        if (!bHasHOM)
+            Msg("!Level doesn't contain HOM objects!");
         //.			if (mrNo==ELog.DlgMsg(mtConfirmation,TMsgDlgButtons() << mbYes << mbNo,"Level doesn't contain
-        //HOM.\nContinue anyway?"))
+        // HOM.\nContinue anyway?"))
         //.				return false;
     }
-    if (ObjCount(OBJCLASS_SPAWNPOINT) == 0) {
+    if (ObjCount(OBJCLASS_SPAWNPOINT) == 0)
+    {
         ELog.Msg(mtError, "*ERROR: Can't find any Spawn Object.");
         bRes = false;
     }
-    if (ObjCount(OBJCLASS_LIGHT) == 0) {
+    if (ObjCount(OBJCLASS_LIGHT) == 0)
+    {
         ELog.Msg(mtError, "*ERROR: Can't find any Light Object.");
         bRes = false;
     }
-    if (ObjCount(OBJCLASS_SCENEOBJECT) == 0) {
+    if (ObjCount(OBJCLASS_SCENEOBJECT) == 0)
+    {
         ELog.Msg(mtError, "*ERROR: Can't find any Scene Object.");
         bRes = false;
     }
-    if (bTestGlow) {
-        if (ObjCount(OBJCLASS_GLOW) == 0) {
+    if (bTestGlow)
+    {
+        if (ObjCount(OBJCLASS_GLOW) == 0)
+        {
             ELog.Msg(mtError, "*ERROR: Can't find any Glow Object.");
             bRes = false;
         }
     }
-    if (FindDuplicateName()) {
+    if (FindDuplicateName())
+    {
         ELog.Msg(mtError, "*ERROR: Found duplicate object name.");
         bRes = false;
     }
 
-    if (bTestShaderCompatible) {
+    if (bTestShaderCompatible)
+    {
         bool res = true;
         ObjectList& lst = ListObj(OBJCLASS_SCENEOBJECT);
         DEFINE_SET(CEditableObject*, EOSet, EOSetIt);
@@ -441,42 +461,51 @@ bool EScene::Validate(
         for (ObjectIt it = lst.begin(); it != lst.end(); it++)
         {
             CSceneObject* S = (CSceneObject*)(*it);
-            if (S->IsStatic() || S->IsMUStatic()) {
+            if (S->IsStatic() || S->IsMUStatic())
+            {
                 static_obj++;
                 CEditableObject* O = ((CSceneObject*)(*it))->GetReference();
                 R_ASSERT(O);
-                if (objects.find(O) == objects.end()) {
-                    if (!O->CheckShaderCompatible()) res = false;
+                if (objects.find(O) == objects.end())
+                {
+                    if (!O->CheckShaderCompatible())
+                        res = false;
                     objects.insert(O);
                 }
             }
         }
-        if (!res) {
+        if (!res)
+        {
             ELog.Msg(mtError, "*ERROR: Scene has non compatible shaders. See log.");
             bRes = false;
         }
-        if (0 == static_obj) {
+        if (0 == static_obj)
+        {
             ELog.Msg(mtError, "*ERROR: Can't find static geometry.");
             bRes = false;
         }
     }
 
-    if (!SndLib->Validate()) bRes = false;
+    if (!SndLib->Validate())
+        bRes = false;
 
     {
         ObjectList& lst = ListObj(OBJCLASS_PS);
         for (ObjectIt it = lst.begin(); it != lst.end(); it++)
         {
             EParticlesObject* S = (EParticlesObject*)(*it);
-            if (!S->GetParticles()) {
+            if (!S->GetParticles())
+            {
                 ELog.Msg(mtError, "*ERROR: Particle System hasn't reference.");
                 bRes = false;
             }
         }
     }
 
-    if (bRes) {
-        if (bNeedOkMsg) ELog.DlgMsg(mtInformation, "Validation OK!");
+    if (bRes)
+    {
+        if (bNeedOkMsg)
+            ELog.DlgMsg(mtInformation, "Validation OK!");
     }
     else
     {
@@ -488,7 +517,8 @@ bool EScene::Validate(
 xr_string EScene::LevelPath()
 {
     string_path path;
-    if (m_LevelOp.m_FNLevelPath.size()) {
+    if (m_LevelOp.m_FNLevelPath.size())
+    {
         FS.update_path(path, "$level$", m_LevelOp.m_FNLevelPath.c_str());
         strcat(path, "\\");
     }
@@ -500,7 +530,8 @@ xr_string EScene::LevelPath()
 void EScene::SelectLightsForObject(CCustomObject* obj)
 {
     ESceneCustomOTool* t = Scene->GetOTool(OBJCLASS_LIGHT);
-    if (!t) return;
+    if (!t)
+        return;
 
     ESceneLightTool* lt = dynamic_cast<ESceneLightTool*>(t);
     VERIFY(lt);
@@ -509,13 +540,15 @@ void EScene::SelectLightsForObject(CCustomObject* obj)
 
 void EScene::HighlightTexture(LPCSTR t_name, bool allow_ratio, u32 t_width, u32 t_height, bool leave_previous)
 {
-    if (!leave_previous) Tools->ClearDebugDraw();
+    if (!leave_previous)
+        Tools->ClearDebugDraw();
 
     SceneToolsMapPairIt t_it = m_SceneTools.begin();
     SceneToolsMapPairIt t_end = m_SceneTools.end();
 
     for (; t_it != t_end; ++t_it)
-        if (t_it->second) t_it->second->HighlightTexture(t_name, allow_ratio, t_width, t_height, !leave_previous);
+        if (t_it->second)
+            t_it->second->HighlightTexture(t_name, allow_ratio, t_width, t_height, !leave_previous);
 
     UI->RedrawScene();
 }
@@ -533,11 +566,7 @@ void EScene::OnBuildControlClick(ButtonValue* V, bool& bModif, bool& bSafe)
     ExecCommand(COMMAND_UPDATE_PROPERTIES);
 }
 
-void EScene::OnRTFlagsChange(PropValue* sender)
-{
-    ExecCommand(COMMAND_UPDATE_PROPERTIES);
-}
-
+void EScene::OnRTFlagsChange(PropValue* sender) { ExecCommand(COMMAND_UPDATE_PROPERTIES); }
 void EScene::FillProp(LPCSTR pref, PropItemVec& items, ObjClassID cls_id)
 {
     PHelper().CreateCaption(items, PrepareKey(pref, "Scene\\Name"), LTools->m_LastFileName.c_str());
@@ -587,13 +616,15 @@ void EScene::FillProp(LPCSTR pref, PropItemVec& items, ObjClassID cls_id)
     V->Owner()->Enable(enabled);
 
     // tools options
-    if (OBJCLASS_DUMMY == cls_id) {
+    if (OBJCLASS_DUMMY == cls_id)
+    {
         SceneToolsMapPairIt _I = FirstTool();
         SceneToolsMapPairIt _E = LastTool();
         for (; _I != _E; _I++)
         {
             ESceneToolBase* mt = _I->second;
-            if ((_I->first != OBJCLASS_DUMMY) && mt) {
+            if ((_I->first != OBJCLASS_DUMMY) && mt)
+            {
                 mt->FillProp(mt->ClassDesc(), items);
             }
         }
@@ -601,7 +632,8 @@ void EScene::FillProp(LPCSTR pref, PropItemVec& items, ObjClassID cls_id)
     else
     {
         ESceneToolBase* mt = GetTool(cls_id);
-        if (mt) {
+        if (mt)
+        {
             mt->FillProp(mt->ClassDesc(), items);
         }
     }
@@ -611,19 +643,22 @@ void EScene::RegisterSubstObjectName(const xr_string& _from, const xr_string& _t
 {
     xr_string _tmp;
     bool b = GetSubstObjectName(_from, _tmp);
-    if (b) Msg("! subst for '%s' already exist -'%s'", _from.c_str(), _tmp.c_str());
+    if (b)
+        Msg("! subst for '%s' already exist -'%s'", _from.c_str(), _tmp.c_str());
 
     TSubstPairs_it It = m_subst_pairs.begin();
     TSubstPairs_it It_e = m_subst_pairs.end();
     for (; It != It_e; ++It)
     {
-        if (It->first == _from) {
+        if (It->first == _from)
+        {
             It->second = _to;
             break;
         }
     }
 
-    if (It == It_e) m_subst_pairs.push_back(TSubstPair(_from, _to));
+    if (It == It_e)
+        m_subst_pairs.push_back(TSubstPair(_from, _to));
 }
 
 bool EScene::GetSubstObjectName(const xr_string& _from, xr_string& _to) const
@@ -632,7 +667,8 @@ bool EScene::GetSubstObjectName(const xr_string& _from, xr_string& _to) const
     TSubstPairs_cit It_e = m_subst_pairs.end();
     for (; It != It_e; ++It)
     {
-        if (It->first == _from) {
+        if (It->first == _from)
+        {
             _to = It->second;
             break;
         }

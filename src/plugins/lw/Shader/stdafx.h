@@ -64,4 +64,4 @@ DEFINE_VECTOR(AnsiString, AStringVec, AStringIt);
 #define GAMEMTL_NONE u32(-1)
 #define _game_data_ "$game_data$"
 
-#endif  // StdafxH
+#endif // StdafxH

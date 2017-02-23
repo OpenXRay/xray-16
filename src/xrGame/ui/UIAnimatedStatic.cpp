@@ -24,12 +24,14 @@ CUIAnimatedStatic::CUIAnimatedStatic()
 
 void CUIAnimatedStatic::Update()
 {
-    if (!m_bPlaying) return;
+    if (!m_bPlaying)
+        return;
 
     static u32 oneFrameDuration = 0;
 
     // Пересчитаем пааметры анимации
-    if (m_bParamsChanged && 0 != m_uFrameCount) {
+    if (m_bParamsChanged && 0 != m_uFrameCount)
+    {
         // Пересчитаем время одного кадра
         oneFrameDuration = iCeil(m_uAnimationDuration / static_cast<float>(m_uFrameCount));
 
@@ -43,15 +45,18 @@ void CUIAnimatedStatic::Update()
     m_prevTime = Device.dwTimeContinual;
 
     // Если анимация закончилась
-    if (m_uTimeElapsed > m_uAnimationDuration) {
+    if (m_uTimeElapsed > m_uAnimationDuration)
+    {
         Rewind(0);
-        if (!m_bCyclic) Stop();
+        if (!m_bCyclic)
+            Stop();
     }
 
     // Теперь вычисляем кадры в зависимости от времени
     u32 curFrame = m_uTimeElapsed / oneFrameDuration;
 
-    if (curFrame != m_uCurFrame) {
+    if (curFrame != m_uCurFrame)
+    {
         m_uCurFrame = curFrame;
         SetFrame(m_uCurFrame);
     }
@@ -78,7 +83,8 @@ void CUIAnimatedStatic::SetAnimPos(float pos)
 
     u32 curFrame = u32(m_uFrameCount * pos);
 
-    if (curFrame != m_uCurFrame) {
+    if (curFrame != m_uCurFrame)
+    {
         m_uCurFrame = curFrame;
         SetFrame(m_uCurFrame);
     }
@@ -107,11 +113,13 @@ void CUISleepStatic::Update()
 
     u32 start_pixel = 0, end_pixel = 0, start_pixel2 = 0, end_pixel2 = 0;
     hours += psActorSleepTime - 1;
-    if (hours >= 24) hours -= 24;
+    if (hours >= 24)
+        hours -= 24;
 
     start_pixel = hours * 85;
     end_pixel = (hours + 7) * 85;
-    if (end_pixel > 2048) {
+    if (end_pixel > 2048)
+    {
         end_pixel2 = end_pixel - 2048;
         end_pixel = 2048;
     }
@@ -125,7 +133,8 @@ void CUISleepStatic::Update()
     m_UIStaticItem.SetTextureRect(r);
     m_UIStaticItem.SetSize(Fvector2().set(iFloor((end_pixel - start_pixel) * UI().get_current_kx()), 128));
     m_UIStaticItem.SetPos(pos.x, pos.y);
-    if (end_pixel2 > 0) {
+    if (end_pixel2 > 0)
+    {
         r.set((float)start_pixel2, 0.0f, (float)end_pixel2, 128.0f);
         m_UIStaticItem2.SetTextureRect(r);
         m_UIStaticItem2.SetSize(Fvector2().set(iFloor(end_pixel2 * UI().get_current_kx()), 128));

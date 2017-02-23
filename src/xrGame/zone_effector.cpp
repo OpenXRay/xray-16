@@ -15,11 +15,7 @@ CZoneEffector::CZoneEffector()
     m_factor = 0.1f;
 }
 
-CZoneEffector::~CZoneEffector()
-{
-    Stop();
-}
-
+CZoneEffector::~CZoneEffector() { Stop(); }
 void CZoneEffector::Load(LPCSTR section)
 {
     VERIFY2(pSettings->line_exist(section, "pp_eff_name"), section);
@@ -32,7 +28,8 @@ void CZoneEffector::Load(LPCSTR section)
 void CZoneEffector::Activate()
 {
     m_pActor = smart_cast<CActor*>(Level().CurrentEntity());
-    if (!m_pActor) return;
+    if (!m_pActor)
+        return;
     m_pp_effector = new CPostprocessAnimatorLerp();
     m_pp_effector->SetType(EEffectorPPType(u32(u64(this) & u32(-1))));
     m_pp_effector->SetCyclic(true);
@@ -43,7 +40,8 @@ void CZoneEffector::Activate()
 
 void CZoneEffector::Stop()
 {
-    if (!m_pp_effector) return;
+    if (!m_pp_effector)
+        return;
 
     m_pActor->Cameras().RemovePPEffector(EEffectorPPType(u32(u64(this) & u32(-1))));
     m_pp_effector = NULL;
@@ -57,26 +55,29 @@ void CZoneEffector::Update(float dist, float r, ALife::EHitType hit_type)
 
     bool camera_on_actor = (Level().CurrentEntity() && smart_cast<CActor*>(Level().CurrentEntity()));
 
-    if (m_pp_effector) {
-        if ((dist > max_r) || !camera_on_actor || (m_pActor && !m_pActor->g_Alive())) Stop();
+    if (m_pp_effector)
+    {
+        if ((dist > max_r) || !camera_on_actor || (m_pActor && !m_pActor->g_Alive()))
+            Stop();
     }
     else
     {
-        if ((dist < max_r) && camera_on_actor) Activate();
+        if ((dist < max_r) && camera_on_actor)
+            Activate();
     }
 
     float protection = 0.f;
-    if (m_pActor) {
+    if (m_pActor)
+    {
         CCustomOutfit* outfit = m_pActor->GetOutfit();
-        if (outfit) protection = outfit->GetDefHitTypeProtection(hit_type);
+        if (outfit)
+            protection = outfit->GetDefHitTypeProtection(hit_type);
     }
-    if (m_pp_effector) {
+    if (m_pp_effector)
+    {
         m_factor = ((max_r - dist) / (max_r - min_r)) - protection;
         clamp(m_factor, 0.01f, 1.0f);
     }
 }
 
-float CZoneEffector::GetFactor()
-{
-    return m_factor;
-}
+float CZoneEffector::GetFactor() { return m_factor; }

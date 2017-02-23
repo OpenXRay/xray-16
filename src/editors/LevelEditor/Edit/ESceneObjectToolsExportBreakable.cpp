@@ -34,31 +34,37 @@ IC
         const IntVec& face_lst = sp_it->second;
         CSurface* surf = sp_it->first;
         int gm_id = surf->_GameMtl();
-        if (gm_id == GAMEMTL_NONE_ID) {
+        if (gm_id == GAMEMTL_NONE_ID)
+        {
             ELog.DlgMsg(mtError, "Object '%s', surface '%s' contain invalid game material.",
                 mesh->Parent()->m_LibName.c_str(), surf->_Name());
             bResult = FALSE;
             break;
         }
         SGameMtl* M = GMLib.GetMaterialByID(gm_id);
-        if (0 == M) {
+        if (0 == M)
+        {
             ELog.DlgMsg(mtError, "Object '%s', surface '%s' contain undefined game material.",
                 mesh->Parent()->m_LibName.c_str(), surf->_Name());
             bResult = FALSE;
             break;
         }
-        if (!M->Flags.is(game_mtl_mask)) continue;
+        if (!M->Flags.is(game_mtl_mask))
+            continue;
 
         // check engine shader compatibility
-        if (!ignore_shader) {
+        if (!ignore_shader)
+        {
             IBlender* B = EDevice.Resources->_FindBlender(surf->_ShaderName());
-            if (FALSE == B) {
+            if (FALSE == B)
+            {
                 ELog.Msg(mtError, "Can't find engine shader '%s'. Object '%s', surface '%s'. Export interrupted.",
                     surf->_ShaderName(), mesh->Parent()->m_LibName.c_str(), surf->_Name());
                 bResult = FALSE;
                 break;
             }
-            if (TRUE == B->canBeLMAPped()) {
+            if (TRUE == B->canBeLMAPped())
+            {
                 ELog.Msg(mtError, "Object '%s', surface '%s' contain static engine shader - '%s'. Export interrupted.",
                     mesh->Parent()->m_LibName.c_str(), surf->_Name(), surf->_ShaderName());
                 bResult = FALSE;
@@ -89,7 +95,8 @@ IC
             mesh->GetFaceTC(*f_it, uv);
             extractor->AppendFace(surf, v, n, uv);
         }
-        if (!bResult) break;
+        if (!bResult)
+            break;
     }
     mesh->UnloadVNormals();
     return bResult;
@@ -101,7 +108,8 @@ bool ESceneObjectTool::ExportBreakableObjects(SExportStreams* F)
     CGeomPartExtractor* extractor = 0;
 
     Fbox bb;
-    if (!GetBox(bb)) return false;
+    if (!GetBox(bb))
+        return false;
 
     extractor = new CGeomPartExtractor();
     extractor->Initialize(bb, EPS_L, 2);
@@ -115,11 +123,13 @@ bool ESceneObjectTool::ExportBreakableObjects(SExportStreams* F)
             pb->Inc();
             CSceneObject* obj = dynamic_cast<CSceneObject*>(*it);
             VERIFY(obj);
-            if (obj->IsStatic()) {
+            if (obj->IsStatic())
+            {
                 CEditableObject* O = obj->GetReference();
                 const Fmatrix& T = obj->_Transform();
                 for (EditMeshIt M = O->FirstMesh(); M != O->LastMesh(); M++)
-                    if (!build_mesh(T, *M, extractor, SGameMtl::flBreakable, FALSE)) {
+                    if (!build_mesh(T, *M, extractor, SGameMtl::flBreakable, FALSE))
+                    {
                         bResult = false;
                         break;
                     }
@@ -127,22 +137,26 @@ bool ESceneObjectTool::ExportBreakableObjects(SExportStreams* F)
         }
         UI->ProgressEnd(pb);
     }
-    if (!extractor->Process()) bResult = false;
+    if (!extractor->Process())
+        bResult = false;
     // export parts
-    if (bResult) {
+    if (bResult)
+    {
         SBPartVec& parts = extractor->GetParts();
         SPBItem* pb = UI->ProgressStart(parts.size(), "Export Parts...");
         for (SBPartVecIt p_it = parts.begin(); p_it != parts.end(); p_it++)
         {
             pb->Inc();
             SBPart* P = *p_it;
-            if (P->Valid()) {
+            if (P->Valid())
+            {
                 // export visual
                 AnsiString sn = AnsiString().sprintf("meshes\\brkbl#%d.ogf", (p_it - parts.begin()));
                 xr_string fn = Scene->LevelPath() + sn.c_str();
                 IWriter* W = FS.w_open(fn.c_str());
                 R_ASSERT(W);
-                if (!P->Export(*W, 1)) {
+                if (!P->Export(*W, 1))
+                {
                     ELog.DlgMsg(mtError, "Invalid breakable object.");
                     bResult = false;
                     break;
@@ -162,7 +176,8 @@ bool ESceneObjectTool::ExportBreakableObjects(SExportStreams* F)
                     m_Data->angle().set(P->m_RefRotate);
                     m_Visual->set_visual(sn.c_str(), false);
 
-                    if (s_draw_dbg) {
+                    if (s_draw_dbg)
+                    {
                         Fmatrix MX;
                         MX.setXYZi(P->m_RefRotate);
                         MX.translate_over(P->m_RefOffset);
@@ -202,11 +217,15 @@ IC BOOL OrientToNorm(Fvector& local_norm, Fmatrix33& form, Fvector& hs)
     int max_proj = 0, min_size = 0;
     for (u32 k = 1; k < 3; k++)
     {
-        if (_abs(local_norm[k]) > _abs(local_norm[max_proj])) max_proj = k;
-        if (hs[k] < hs[min_size]) min_size = k;
+        if (_abs(local_norm[k]) > _abs(local_norm[max_proj]))
+            max_proj = k;
+        if (hs[k] < hs[min_size])
+            min_size = k;
     }
-    if (min_size != max_proj) return FALSE;
-    if (local_norm[max_proj] < 0.f) {
+    if (min_size != max_proj)
+        return FALSE;
+    if (local_norm[max_proj] < 0.f)
+    {
         local_norm.invert();
         ax_pointer[max_proj].invert();
         ax_pointer[(max_proj + 1) % 3].invert();
@@ -220,7 +239,8 @@ bool ESceneObjectTool::ExportClimableObjects(SExportStreams* F)
     CGeomPartExtractor* extractor = 0;
 
     Fbox bb;
-    if (!GetBox(bb)) return false;
+    if (!GetBox(bb))
+        return false;
 
     extractor = new CGeomPartExtractor();
     extractor->Initialize(bb, EPS_L, int_max);
@@ -234,12 +254,14 @@ bool ESceneObjectTool::ExportClimableObjects(SExportStreams* F)
             pb->Inc();
             CSceneObject* obj = dynamic_cast<CSceneObject*>(*it);
             VERIFY(obj);
-            if (obj->IsStatic()) {
+            if (obj->IsStatic())
+            {
                 CEditableObject* O = obj->GetReference();
                 const Fmatrix& T = obj->_Transform();
 
                 for (EditMeshIt M = O->FirstMesh(); M != O->LastMesh(); M++)
-                    if (!build_mesh(T, *M, extractor, SGameMtl::flClimable, TRUE)) {
+                    if (!build_mesh(T, *M, extractor, SGameMtl::flClimable, TRUE))
+                    {
                         bResult = false;
                         break;
                     }
@@ -247,17 +269,20 @@ bool ESceneObjectTool::ExportClimableObjects(SExportStreams* F)
         }
         UI->ProgressEnd(pb);
     }
-    if (!extractor->Process()) bResult = false;
+    if (!extractor->Process())
+        bResult = false;
 
     // export parts
-    if (bResult) {
+    if (bResult)
+    {
         SBPartVec& parts = extractor->GetParts();
         SPBItem* pb = UI->ProgressStart(parts.size(), "Export Parts...");
         for (SBPartVecIt p_it = parts.begin(); p_it != parts.end(); p_it++)
         {
             pb->Inc();
             SBPart* P = *p_it;
-            if (P->Valid()) {
+            if (P->Valid())
+            {
                 // export visual
                 AnsiString sn = AnsiString().sprintf("clmbl#%d", (p_it - parts.begin()));
 
@@ -292,7 +317,8 @@ bool ESceneObjectTool::ExportClimableObjects(SExportStreams* F)
                         (P->m_BBox.max.y - P->m_BBox.min.y) * 0.5f, (P->m_BBox.max.z - P->m_BBox.min.z) * 0.5f);
                     m_Shape->assign_shapes(&shape, 1);
                     // orientate object
-                    if (!OrientToNorm(local_normal, P->m_OBB.m_rotate, P->m_OBB.m_halfsize)) {
+                    if (!OrientToNorm(local_normal, P->m_OBB.m_rotate, P->m_OBB.m_halfsize))
+                    {
                         ELog.Msg(
                             mtError, "Invalid climable object found. [%3.2f, %3.2f, %3.2f]", VPUSH(P->m_RefOffset));
                     }
@@ -300,7 +326,7 @@ bool ESceneObjectTool::ExportClimableObjects(SExportStreams* F)
                     {
                         Fmatrix M;
                         M.set(P->m_OBB.m_rotate.i, P->m_OBB.m_rotate.j, P->m_OBB.m_rotate.k, P->m_OBB.m_translate);
-                        M.getXYZ(P->m_RefRotate);  // не i потому что в движке так
+                        M.getXYZ(P->m_RefRotate); // не i потому что в движке так
                         m_Data->position().set(P->m_RefOffset);
                         m_Data->angle().set(P->m_RefRotate);
 
@@ -312,7 +338,8 @@ bool ESceneObjectTool::ExportClimableObjects(SExportStreams* F)
                         F->spawn.stream.w(Packet.B.data, Packet.B.count);
                         F->spawn.stream.close_chunk();
 
-                        if (s_draw_dbg) {
+                        if (s_draw_dbg)
+                        {
                             Tools->m_DebugDraw.AppendOBB(P->m_OBB);
                             M.transform_dir(local_normal);
                             Tools->m_DebugDraw.AppendLine(

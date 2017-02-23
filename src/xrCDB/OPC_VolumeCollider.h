@@ -23,8 +23,7 @@
 struct OPCODE_API VolumeCache
 {
     VolumeCache() {}
-
-    Container TouchedPrimitives;  //!< Indices of touched primitives
+    Container TouchedPrimitives; //!< Indices of touched primitives
 };
 
 class OPCODE_API VolumeCollider : public Collider
@@ -72,7 +71,6 @@ public:
      */
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     inline_ udword GetNbVolumeBVTests() const { return mNbVolumeBVTests; }
-
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /**
      *	Stats: gets the number of Volume-Triangle overlap tests after a collision query.
@@ -81,7 +79,6 @@ public:
      */
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     inline_ udword GetNbVolumePrimTests() const { return mNbVolumePrimTests; }
-
 // Settings
 
 #ifdef OPC_USE_CALLBACKS
@@ -123,23 +120,23 @@ public:
 
 protected:
     // Touched primitives
-    Container* mTouchedPrimitives;  //!< List of touched primitives
+    Container* mTouchedPrimitives; //!< List of touched primitives
 #ifdef OPC_USE_CALLBACKS
     // User callback
-    udword mUserData;           //!< User-defined data sent to callback
-    OPC_CALLBACK mObjCallback;  //!< Object callback
+    udword mUserData; //!< User-defined data sent to callback
+    OPC_CALLBACK mObjCallback; //!< Object callback
 #else
     // User pointers
-    const IndexedTriangle* mFaces;  //!< User-defined faces
-    const Point* mVerts;            //!< User-defined vertices
+    const IndexedTriangle* mFaces; //!< User-defined faces
+    const Point* mVerts; //!< User-defined vertices
 #endif
     // Dequantization coeffs
     Point mCenterCoeff;
     Point mExtentsCoeff;
     // Stats
-    udword mNbVolumeBVTests;    //!< Number of Volume-BV tests
-    udword mNbVolumePrimTests;  //!< Number of Volume-Primitive tests
-                                // Internal methods
+    udword mNbVolumeBVTests; //!< Number of Volume-BV tests
+    udword mNbVolumePrimTests; //!< Number of Volume-Primitive tests
+    // Internal methods
     void _Dump(const AABBCollisionNode* node);
     void _Dump(const AABBNoLeafNode* node);
     void _Dump(const AABBQuantizedNode* node);
@@ -159,4 +156,4 @@ protected:
     }
 };
 
-#endif  // __OPC_VOLUMECOLLIDER_H__
+#endif // __OPC_VOLUMECOLLIDER_H__

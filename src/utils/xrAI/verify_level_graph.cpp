@@ -25,7 +25,8 @@ void floodfill(const CLevelGraph& level_graph, xr_vector<bool>& marks, u32 start
     {
         POP();
         vertex_id = level_graph.vertex_id(vertex);
-        if (marks[vertex_id]) continue;
+        if (marks[vertex_id])
+            continue;
         marks[vertex_id] = true;
         level_graph.begin(vertex, I, E);
         for (; I != E; ++I)
@@ -55,9 +56,11 @@ bool verify_invalid_links(const CLevelGraph& graph)
         for (; i != e; ++i)
         {
             u32 link_vertex_id = graph.value(I, i);
-            if (!graph.valid_vertex_id(link_vertex_id)) continue;
+            if (!graph.valid_vertex_id(link_vertex_id))
+                continue;
 
-            if (vertex_id == link_vertex_id) {
+            if (vertex_id == link_vertex_id)
+            {
                 Msg("Vertex [%d][%f][%f][%f] has link to itself", vertex_id, VPUSH(graph.vertex_position(I)));
                 result = false;
                 continue;
@@ -73,14 +76,16 @@ void verify_level_graph(LPCSTR name, bool verbose)
     Logger.Phase("Verifying level graph");
     Logger.Progress(0.f);
     CLevelGraph* level_graph = new CLevelGraph(name);
-    if (!level_graph->header().vertex_count()) {
+    if (!level_graph->header().vertex_count())
+    {
         Logger.Progress(1.f);
         Msg("Level graph is empty!");
         xr_delete(level_graph);
         return;
     }
 
-    if (!verify_invalid_links(*level_graph)) {
+    if (!verify_invalid_links(*level_graph))
+    {
         Logger.Progress(1.f);
         Msg("AI map is CORRUPTED : REGENERATE AI-MAP");
         xr_delete(level_graph);
@@ -115,7 +120,8 @@ void verify_level_graph(LPCSTR name, bool verbose)
 
     bool no_single_links = single_links.empty();
     Logger.Progress(0.1f);
-    if (single_links.empty()) single_links.push_back(0);
+    if (single_links.empty())
+        single_links.push_back(0);
 
     {
         std::sort(single_links.begin(), single_links.end());
@@ -123,8 +129,10 @@ void verify_level_graph(LPCSTR name, bool verbose)
         single_links.erase(I, single_links.end());
     }
 
-    if (!no_single_links) {
-        if (verbose) {
+    if (!no_single_links)
+    {
+        if (verbose)
+        {
             xr_vector<u32>::const_iterator I = single_links.begin();
             xr_vector<u32>::const_iterator E = single_links.end();
             for (; I != E; ++I)
@@ -144,7 +152,8 @@ void verify_level_graph(LPCSTR name, bool verbose)
         xr_vector<bool>::const_iterator II = marks.begin(), BB = II;
         xr_vector<bool>::const_iterator EE = marks.end();
         for (; II != EE; ++II)
-            if (!*II) {
+            if (!*II)
+            {
                 valid = false;
                 Msg("AI-map is NOT valid :\nNode \n%6d[%f][%f][%f]\ncannot be reached from the node\n%6d[%f][%f][%f]\n",
                     u32(II - BB), VPUSH(level_graph->vertex_position(u32(II - BB))), *I,
@@ -152,14 +161,16 @@ void verify_level_graph(LPCSTR name, bool verbose)
                 break;
             }
 
-        if (!valid) break;
+        if (!valid)
+            break;
         Logger.Progress(0.15f + 0.85f * float(i) / float(n));
     }
 
     xr_free(stack_storage);
     xr_delete(level_graph);
     Logger.Progress(1.f);
-    if (valid) Msg("AI-map is valid!");
+    if (valid)
+        Msg("AI-map is valid!");
 
     Msg("Verifying level %s completed", name);
 }

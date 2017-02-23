@@ -17,13 +17,13 @@ class CEditShape : public CCustomObject, CShapeData
 {
     typedef CCustomObject inherited;
 
-  private:
+private:
     // bounds
     Fbox m_Box;
     Fsphere m_Sphere;
     void ComputeBounds();
 
-  public:
+public:
     u8 m_shape_type;
     u32 m_DrawTranspColor;
     u32 m_DrawEdgeColor;
@@ -46,17 +46,16 @@ class CEditShape : public CCustomObject, CShapeData
 
     virtual void FillProp(LPCSTR pref, PropItemVec& values);
 
-  protected:
+protected:
     virtual void SetScale(const Fvector& val);
     virtual void OnUpdateTransform();
 
-  public:
+public:
     CEditShape(LPVOID data, LPCSTR name);
     void Construct(LPVOID data);
     virtual ~CEditShape();
 
     virtual bool CanAttach() { return true; }
-
     // pick functions
     virtual bool RayPick(float& distance, const Fvector& start, const Fvector& direction, SRayPickInfo* pinf = NULL);
     virtual bool FrustumPick(const CFrustum& frustum);
@@ -82,7 +81,6 @@ class CEditShape : public CCustomObject, CShapeData
     void Detach();
 
     ShapeVec& GetShapes() { return shapes; }
-
     virtual void OnDetach();
     // events
     virtual void OnShowHint(AStringVec& dest);

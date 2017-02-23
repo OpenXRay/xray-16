@@ -11,7 +11,7 @@
 
 #if _MSC_VER > 1000
 #pragma once
-#endif  // _MSC_VER > 1000
+#endif // _MSC_VER > 1000
 
 #include <maya/MDagPath.h>
 #include <stdio.h>
@@ -32,4 +32,4 @@ public:
     virtual ~SmdBone();
 };
 
-#endif  // !defined(AFX_SMDBONE_H__27691F7E_CEE4_422A_9FDE_7972C7C13819__INCLUDED_)
+#endif // !defined(AFX_SMDBONE_H__27691F7E_CEE4_422A_9FDE_7972C7C13819__INCLUDED_)

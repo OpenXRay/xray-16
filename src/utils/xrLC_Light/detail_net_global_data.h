@@ -18,10 +18,8 @@ class net_global_data_impl<gl_detail_cl_data>
 {
 public:
     net_global_data_impl<gl_detail_cl_data>() {}
-
     void init();
     void cleanup() { data_cleanup(); }
-
 protected:
     void create_data_file(LPCSTR path);
     bool create_data(LPCSTR path);
@@ -34,4 +32,4 @@ protected:
 // template<> struct global_add_global<gl_detail_cl_data, gl_lm_data>{};
 }
 
-#endif  // #ifndef DETAIL_NET_GLOBAL_DATA_H_INCLUDED
+#endif // #ifndef DETAIL_NET_GLOBAL_DATA_H_INCLUDED

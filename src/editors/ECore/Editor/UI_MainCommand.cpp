@@ -29,33 +29,23 @@ BOOL bAllowLogCommands = FALSE;
 TfrmText* frmEditCommandList = 0;
 AnsiString sCommandListText;
 
-BOOL AllowLogCommands()
-{
-    return bAllowLogCommands;
-}
-
-ECommandVec& GetEditorCommands()
-{
-    return ECommands;
-}
-
-void EnableReceiveCommands()
-{
-    bAllowReceiveCommand = TRUE;
-}
-
+BOOL AllowLogCommands() { return bAllowLogCommands; }
+ECommandVec& GetEditorCommands() { return ECommands; }
+void EnableReceiveCommands() { bAllowReceiveCommand = TRUE; }
 SESubCommand* FindCommandByShortcut(const xr_shortcut& val)
 {
     ECommandVec& cmds = GetEditorCommands();
     for (u32 cmd_idx = 0; cmd_idx < cmds.size(); cmd_idx++)
     {
         SECommand*& CMD = cmds[cmd_idx];
-        if (CMD && CMD->editable) {
+        if (CMD && CMD->editable)
+        {
             VERIFY(!CMD->sub_commands.empty());
             for (u32 sub_cmd_idx = 0; sub_cmd_idx < CMD->sub_commands.size(); sub_cmd_idx++)
             {
                 SESubCommand*& SUB_CMD = CMD->sub_commands[sub_cmd_idx];
-                if (SUB_CMD->shortcut.similar(val)) return SUB_CMD;
+                if (SUB_CMD->shortcut.similar(val))
+                    return SUB_CMD;
             }
         }
     }
@@ -68,7 +58,8 @@ SECommand* FindCommandByName(LPCSTR nm)
     for (u32 cmd_idx = 0; cmd_idx < cmds.size(); cmd_idx++)
     {
         SECommand*& CMD = cmds[cmd_idx];
-        if (CMD && (0 == stricmp(CMD->name, nm))) return CMD;
+        if (CMD && (0 == stricmp(CMD->name, nm)))
+            return CMD;
     }
     return 0;
 }
@@ -79,19 +70,24 @@ SESubCommand* FindSubCommandByName(SECommand* CMD, LPCSTR nm)
     for (u32 sub_cmd_idx = 0; sub_cmd_idx < CMD->sub_commands.size(); sub_cmd_idx++)
     {
         SESubCommand* SUB_CMD = CMD->sub_commands[sub_cmd_idx];
-        if (0 == stricmp(SUB_CMD->desc.c_str(), nm)) return SUB_CMD;
+        if (0 == stricmp(SUB_CMD->desc.c_str(), nm))
+            return SUB_CMD;
     }
     return 0;
 }
 
 void ParseParam(xr_string sp, CCommandVar& res)
 {
-    if (!sp.empty()) {
+    if (!sp.empty())
+    {
         u32 rs = 0, ip = 0;
-        if (0 == strstr(sp.c_str(), "\"")) rs = sscanf(sp.c_str(), "%d", &ip);
-        if (1 != rs) {
+        if (0 == strstr(sp.c_str(), "\""))
+            rs = sscanf(sp.c_str(), "%d", &ip);
+        if (1 != rs)
+        {
             _GetItem(sp.c_str(), 1, sp, '\"');
-            if (!sp.empty()) res = sp;
+            if (!sp.empty())
+                res = sp;
         }
         else
             res = ip;
@@ -102,20 +98,23 @@ CCommandVar ExecCommand(const xr_shortcut& val)
 {
     SESubCommand* SUB = FindCommandByShortcut(val);
     CCommandVar res = CCommandVar(u32(0));
-    if (SUB) res = ExecCommand(SUB->parent->idx, SUB->p0, SUB->p1);
+    if (SUB)
+        res = ExecCommand(SUB->parent->idx, SUB->p0, SUB->p1);
     return res;
 }
 
 CCommandVar ExecCommand(u32 cmd, CCommandVar p1, CCommandVar p2)
 {
-    if (!bAllowReceiveCommand) return 0;
+    if (!bAllowReceiveCommand)
+        return 0;
 
     VERIFY(cmd < ECommands.size());
     CCommandVar res;
     SECommand* CMD = ECommands[cmd];
     VERIFY(CMD && !CMD->command.empty());
     static int exec_level = 0;
-    if (bAllowLogCommands) {
+    if (bAllowLogCommands)
+    {
         string128 level;
         strcpy(level, exec_level == 0 ? "" : ";");
         for (int k = 0; k < exec_level; ++k)
@@ -144,9 +143,11 @@ CCommandVar ExecCommand(u32 cmd, CCommandVar p1, CCommandVar p2)
 
 void RegisterCommand(u32 cmd, SECommand* cmd_impl)
 {
-    if (cmd >= ECommands.size()) ECommands.resize(cmd + 1, 0);
+    if (cmd >= ECommands.size())
+        ECommands.resize(cmd + 1, 0);
     SECommand*& CMD = ECommands[cmd];
-    if (CMD) {
+    if (CMD)
+    {
         Msg("RegisterCommand: command '%s' overridden by command '%s'.", *CMD->desc, *cmd_impl->desc);
         xr_delete(CMD);
     }
@@ -164,7 +165,8 @@ BOOL LoadShortcuts(CInifile* ini)
     for (u32 cmd_idx = 0; cmd_idx < ECommands.size(); cmd_idx++)
     {
         SECommand*& CMD = ECommands[cmd_idx];
-        if (CMD && CMD->editable) {
+        if (CMD && CMD->editable)
+        {
             for (u32 sub_cmd_idx = 0; sub_cmd_idx < CMD->sub_commands.size(); sub_cmd_idx++)
             {
                 SESubCommand*& SUB = CMD->sub_commands[sub_cmd_idx];
@@ -173,10 +175,12 @@ BOOL LoadShortcuts(CInifile* ini)
                     sprintf(nm, "%s.\"%s\"", CMD->Name(), SUB->desc.c_str());
                 else
                     sprintf(nm, "%s", CMD->Name());
-                if (ini->line_exist("shortcuts", nm)) {
+                if (ini->line_exist("shortcuts", nm))
+                {
                     LPCSTR val = ini->r_string("shortcuts", nm);
                     int res = sscanf(val, "%d,%s", &SUB->shortcut.hotkey, tmp);
-                    if (2 == res) {
+                    if (2 == res)
+                    {
                         xr_string sp;
                         _GetItem(tmp, 0, sp);
                         ParseParam(sp, SUB->p0);
@@ -195,7 +199,8 @@ BOOL SaveShortcuts(CInifile* ini)
     for (u32 cmd_idx = 0; cmd_idx < ECommands.size(); cmd_idx++)
     {
         SECommand*& CMD = ECommands[cmd_idx];
-        if (CMD && CMD->editable) {
+        if (CMD && CMD->editable)
+        {
             for (u32 sub_cmd_idx = 0; sub_cmd_idx < CMD->sub_commands.size(); sub_cmd_idx++)
             {
                 SESubCommand*& SUB = CMD->sub_commands[sub_cmd_idx];
@@ -227,17 +232,14 @@ void ClearCommands()
     ECommands.clear();
 }
 
-void TUI::ClearCommands()
-{
-    ::ClearCommands();
-}
-
+void TUI::ClearCommands() { ::ClearCommands(); }
 //------------------------------------------------------------------------------
 // UI Commands
 //------------------------------------------------------------------------------
 CCommandVar TUI::CommandRenderFocus(CCommandVar p1, CCommandVar p2)
 {
-    if (((TForm*)m_D3DWindow->Owner)->Visible && m_bReady) m_D3DWindow->SetFocus();
+    if (((TForm*)m_D3DWindow->Owner)->Visible && m_bReady)
+        m_D3DWindow->SetFocus();
     return 1;
 }
 
@@ -254,7 +256,8 @@ CCommandVar TUI::CommandBreakLastOperation(CCommandVar p1, CCommandVar p2)
 
 CCommandVar TUI::CommandRenderResize(CCommandVar p1, CCommandVar p2)
 {
-    if (psDeviceFlags.is(rsDrawSafeRect)) {
+    if (psDeviceFlags.is(rsDrawSafeRect))
+    {
         int w = m_D3DPanel->Width, h = m_D3DPanel->Height, w_2 = w / 2, h_2 = h / 2;
         Irect rect;
         if ((0.75f * float(w)) > float(h))
@@ -287,7 +290,8 @@ CCommandVar CommandInitialize(CCommandVar p1, CCommandVar p2)
     // make interface
     //----------------
     EPrefs->OnCreate();
-    if (UI->OnCreate((TD3DWindow*)(u32)p1, (TPanel*)(u32)p2)) {
+    if (UI->OnCreate((TD3DWindow*)(u32)p1, (TPanel*)(u32)p2))
+    {
         ExecCommand(COMMAND_CREATE_SOUND_LIB);
         R_ASSERT(SndLib);
         SndLib->OnCreate();
@@ -297,7 +301,8 @@ CCommandVar CommandInitialize(CCommandVar p1, CCommandVar p2)
         psDeviceFlags.set(rsEnvironment, FALSE);
         g_pGamePersistent = new IGame_Persistent();
 
-        if (Tools->OnCreate()) {
+        if (Tools->OnCreate())
+        {
             EPrefs->Load();
             EDevice.seqAppStart.Process(rp_AppStart);
             ExecCommand(COMMAND_RESTORE_UI_BAR);
@@ -458,19 +463,12 @@ CCommandVar CommandEvictTextures(CCommandVar p1, CCommandVar p2)
     return TRUE;
 }
 
-CCommandVar CommandCheckModified(CCommandVar p1, CCommandVar p2)
-{
-    return Tools->IsModified();
-}
-
-CCommandVar CommandExit(CCommandVar p1, CCommandVar p2)
-{
-    return Tools->IfModified();
-}
-
+CCommandVar CommandCheckModified(CCommandVar p1, CCommandVar p2) { return Tools->IsModified(); }
+CCommandVar CommandExit(CCommandVar p1, CCommandVar p2) { return Tools->IfModified(); }
 CCommandVar CommandShowProperties(CCommandVar p1, CCommandVar p2)
 {
-    if (p1.IsString()) {
+    if (p1.IsString())
+    {
         xr_string SSS = p1;
         Tools->ShowProperties(SSS.c_str());
     }
@@ -546,13 +544,16 @@ CCommandVar CommandGridSlotSize(CCommandVar p1, CCommandVar p2)
 {
     float step = 1.f;
     float val = EPrefs->grid_cell_size;
-    if (p1) {
-        if (val < 1) step /= 10.f;
+    if (p1)
+    {
+        if (val < 1)
+            step /= 10.f;
         EPrefs->grid_cell_size += step;
     }
     else
     {
-        if (fsimilar(val, 1.f) || (val < 1)) step /= 10.f;
+        if (fsimilar(val, 1.f) || (val < 1))
+            step /= 10.f;
         EPrefs->grid_cell_size -= step;
     }
     ExecCommand(COMMAND_UPDATE_GRID);
@@ -575,7 +576,8 @@ CCommandVar CommandMuteSound(CCommandVar p1, CCommandVar p2)
 CCommandVar CommandMoveCameraTo(CCommandVar p1, CCommandVar p2)
 {
     Fvector pos = EDevice.m_Camera.GetPosition();
-    if (NumericVectorRun("Move to", &pos, 3)) EDevice.m_Camera.Set(EDevice.m_Camera.GetHPB(), pos);
+    if (NumericVectorRun("Move to", &pos, 3))
+        EDevice.m_Camera.Set(EDevice.m_Camera.GetHPB(), pos);
     return TRUE;
 }
 
@@ -588,8 +590,10 @@ CCommandVar ExecuteCommandList(LPCSTR text)
         xr_string line, cmd, params, sp1, sp2;
         F.r_string(line);
         line = _Trim(line);
-        if (!line.empty()) {
-            if (line[0] == ';' || (line[0] == '/' && line[1] == '/')) continue;
+        if (!line.empty())
+        {
+            if (line[0] == ';' || (line[0] == '/' && line[1] == '/'))
+                continue;
             _GetItem(line.c_str(), 0, cmd, '(');
             _GetItem(line.c_str(), 1, params, '(');
             _GetItem(params.c_str(), 0, params, ')');
@@ -601,23 +605,27 @@ CCommandVar ExecuteCommandList(LPCSTR text)
             _GetItem(cmd.c_str(), 1, sub_cmd_name, '.');
 
             SECommand* CMD = FindCommandByName(cmd_name.c_str());
-            if (CMD) {
+            if (CMD)
+            {
                 SESubCommand* SUB = FindSubCommandByName(CMD, sub_cmd_name.c_str());
-                if (!sub_cmd_name.empty() && !SUB) {
+                if (!sub_cmd_name.empty() && !SUB)
+                {
                     ELog.DlgMsg(mtError, "Can't find sub-command: '%s'", sub_cmd_name.c_str());
                     res = FALSE;
                     break;
                 }
                 // parse params
                 CCommandVar p1, p2;
-                if (SUB) {
+                if (SUB)
+                {
                     p1 = SUB->p0;
                     p2 = SUB->p1;
                 }
                 ParseParam(sp1, p1);
                 ParseParam(sp2, p2);
                 // execute command
-                if (FALSE == ExecCommand(CMD->idx, p1, p2)) {
+                if (FALSE == ExecCommand(CMD->idx, p1, p2))
+                {
                     ELog.DlgMsg(mtError, "Can't execute command: '%s'", cmd.c_str());
                     res = FALSE;
                     break;
@@ -654,7 +662,8 @@ bool __stdcall OnCloseCommandListEditor()
 
 CCommandVar CommandEditCommandList(CCommandVar _p1, CCommandVar _p2)
 {
-    if (NULL == frmEditCommandList) {
+    if (NULL == frmEditCommandList)
+    {
         frmEditCommandList = TfrmText::CreateForm(
             sCommandListText, "Execute command list", 0, 0, "Run", OnRunExecuteListClick, OnCloseCommandListEditor);
         return TRUE;
@@ -671,11 +680,14 @@ CCommandVar CommandLogCommands(CCommandVar _p1, CCommandVar _p2)
 CCommandVar CommandRunMacro(CCommandVar p1, CCommandVar p2)
 {
     xr_string fn;
-    if (p1.IsString()) {
+    if (p1.IsString())
+    {
         fn = xr_string(p1);
         IReader* F = FS.r_open(fn.c_str());
-        if (NULL == F) F = FS.r_open(_import_, fn.c_str());
-        if (F) {
+        if (NULL == F)
+            F = FS.r_open(_import_, fn.c_str());
+        if (F)
+        {
             ExecCommand(COMMAND_EXECUTE_COMMAND_LIST, xr_string((LPCSTR)F->pointer()));
             FS.r_close(F);
             return TRUE;
@@ -697,7 +709,8 @@ CCommandVar CommandRunMacro(CCommandVar p1, CCommandVar p2)
 CCommandVar CommandAssignMacro(CCommandVar p1, CCommandVar p2)
 {
     xr_string fn = p2.IsString() ? xr_string(p2) : xr_string("");
-    if (p2.IsString()) {
+    if (p2.IsString())
+    {
         if (0 == fn.find(FS.get_path(_import_)->m_Path))
             fn = xr_string(fn.c_str() + xr_strlen(FS.get_path(_import_)->m_Path));
         ECommands[COMMAND_RUN_MACRO]->sub_commands[p1]->p0 = fn;
@@ -705,7 +718,8 @@ CCommandVar CommandAssignMacro(CCommandVar p1, CCommandVar p2)
     }
     else
     {
-        if (EFS.GetOpenName(_import_, fn, false, NULL, 2)) return ExecCommand(COMMAND_ASSIGN_MACRO, p1, fn);
+        if (EFS.GetOpenName(_import_, fn, false, NULL, 2))
+            return ExecCommand(COMMAND_ASSIGN_MACRO, p1, fn);
     }
     return FALSE;
 }
@@ -790,21 +804,23 @@ bool TUI::ApplyShortCut(WORD Key, TShiftState Shift)
 {
     VERIFY(m_bReady);
 
-    if (ApplyGlobalShortCut(Key, Shift)) return true;
+    if (ApplyGlobalShortCut(Key, Shift))
+        return true;
 
-    if (Key == VK_ESCAPE) {
+    if (Key == VK_ESCAPE)
+    {
         ExecCommand(COMMAND_CHANGE_ACTION, etaSelect);
         return true;
     }
 
     xr_shortcut SC;
     SC.key = Key;
-    SC.ext.assign(
-        u8((Shift.Contains(ssShift) ? xr_shortcut::flShift : 0) | (Shift.Contains(ssCtrl) ? xr_shortcut::flCtrl : 0) |
-            (Shift.Contains(ssAlt) ? xr_shortcut::flAlt : 0)));
+    SC.ext.assign(u8((Shift.Contains(ssShift) ? xr_shortcut::flShift : 0) |
+        (Shift.Contains(ssCtrl) ? xr_shortcut::flCtrl : 0) | (Shift.Contains(ssAlt) ? xr_shortcut::flAlt : 0)));
     SESubCommand* SUB = FindCommandByShortcut(SC);
 
-    if (!SUB || SUB->parent->global_shortcut) return false;
+    if (!SUB || SUB->parent->global_shortcut)
+        return false;
 
     return ExecCommand(SC);
 }
@@ -815,19 +831,20 @@ bool TUI::ApplyGlobalShortCut(WORD Key, TShiftState Shift)
 {
     VERIFY(m_bReady);
 
-    if (Key == VK_OEM_3) {
+    if (Key == VK_OEM_3)
+    {
         ExecCommand(COMMAND_RENDER_FOCUS);
         return true;
     }
 
     xr_shortcut SC;
     SC.key = Key;
-    SC.ext.assign(
-        u8((Shift.Contains(ssShift) ? xr_shortcut::flShift : 0) | (Shift.Contains(ssCtrl) ? xr_shortcut::flCtrl : 0) |
-            (Shift.Contains(ssAlt) ? xr_shortcut::flAlt : 0)));
+    SC.ext.assign(u8((Shift.Contains(ssShift) ? xr_shortcut::flShift : 0) |
+        (Shift.Contains(ssCtrl) ? xr_shortcut::flCtrl : 0) | (Shift.Contains(ssAlt) ? xr_shortcut::flAlt : 0)));
     SESubCommand* SUB = FindCommandByShortcut(SC);
 
-    if (!SUB || !SUB->parent->global_shortcut) return false;
+    if (!SUB || !SUB->parent->global_shortcut)
+        return false;
 
     return ExecCommand(SUB->parent->idx, SUB->p0, SUB->p1);
 }

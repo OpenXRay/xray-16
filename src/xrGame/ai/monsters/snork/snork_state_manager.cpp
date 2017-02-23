@@ -37,17 +37,15 @@ CStateManagerSnork::CStateManagerSnork(CSnork* obj) : inherited(obj)
     add_state(eStateHearHelpSound, new CStateMonsterHearHelpSound<CSnork>(obj));
 }
 
-CStateManagerSnork::~CStateManagerSnork()
-{
-}
-
+CStateManagerSnork::~CStateManagerSnork() {}
 void CStateManagerSnork::execute()
 {
     u32 state_id = u32(-1);
 
     const CEntityAlive* enemy = object->EnemyMan.get_enemy();
 
-    if (enemy) {
+    if (enemy)
+    {
         switch (object->EnemyMan.get_danger_type())
         {
         case eStrong: state_id = eStatePanic; break;
@@ -82,7 +80,8 @@ void CStateManagerSnork::execute()
 
     select_state(state_id);
 
-    if ((current_substate == eStateAttack) && (current_substate != prev_substate)) {
+    if ((current_substate == eStateAttack) && (current_substate != prev_substate))
+    {
         object->start_threaten = true;
     }
 

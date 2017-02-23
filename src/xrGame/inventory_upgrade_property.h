@@ -47,11 +47,11 @@ protected:
     StrFunctor m_desc;
     FunctorParams_type m_functor_params;
 
-};  // class Property
+}; // class Property
 
-}  // namespace upgrade
-}  // namespace inventory
+} // namespace upgrade
+} // namespace inventory
 
 #include "inventory_upgrade_property_inline.h"
 
-#endif  // INVENTORY_UPGRADE_PROPERTY_H_INCLUDED
+#endif // INVENTORY_UPGRADE_PROPERTY_H_INCLUDED

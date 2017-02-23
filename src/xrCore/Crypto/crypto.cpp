@@ -6,11 +6,7 @@
 
 namespace crypto
 {
-static void unsafe_xr_free(void* ptr)
-{
-    xr_free(ptr);
-};
-
+static void unsafe_xr_free(void* ptr) { xr_free(ptr); };
 static unsigned char rnd_seed[] = "S.T.A.L.K.E.R. 4ever Rulezz !!!";
 
 XRCORE_API void xr_crypto_init()
@@ -31,4 +27,4 @@ XRCORE_API void xr_crypto_init()
     #endif*/
 }
 
-}  // namespace crypto
+} // namespace crypto

@@ -19,7 +19,8 @@ void compress(LPCSTR f_in, LPCSTR f_out)
         gzwrite(z_file, buff, buff_size);
     }
     buff_size = length % buff_size;
-    if (buff_size != 0) {
+    if (buff_size != 0)
+    {
         fread(buff, 1, buff_size, file);
         gzwrite(z_file, buff, buff_size);
     }
@@ -41,7 +42,8 @@ void decompress(LPCSTR f_in, LPCSTR f_out)
     {
         u32 read = gzread(z_file, buff, buff_size);
         fwrite(buff, 1, read, file);
-        if (read < buff_size) break;
+        if (read < buff_size)
+            break;
     }
 
     fclose(file);
@@ -54,7 +56,8 @@ void compress(LPCSTR f_in_out)
     strconcat(sizeof(tmp), tmp, f_in_out, "___ctmp");
     compress(f_in_out, tmp);
 
-    if (GetFileAttributes(f_in_out) != u32(-1)) unlink(f_in_out);
+    if (GetFileAttributes(f_in_out) != u32(-1))
+        unlink(f_in_out);
     // physically rename file
     VerifyPath(f_in_out);
     rename(tmp, f_in_out);
@@ -65,7 +68,8 @@ void decompress(LPCSTR f_in_out)
     string_path tmp;
     strconcat(sizeof(tmp), tmp, f_in_out, "___dtmp");
     decompress(f_in_out, tmp);
-    if (GetFileAttributes(f_in_out) != u32(-1)) unlink(f_in_out);
+    if (GetFileAttributes(f_in_out) != u32(-1))
+        unlink(f_in_out);
     // physically rename file
     VerifyPath(f_in_out);
     rename(tmp, f_in_out);

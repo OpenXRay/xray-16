@@ -16,14 +16,16 @@ static void generate_orthonormal_basis(const Fvector& dir, Fmatrix& result)
 CParticlesPlayer::SParticlesInfo* CParticlesPlayer::SBoneInfo::FindParticles(const shared_str& ps_name)
 {
     for (ParticlesInfoListIt it = particles.begin(); it != particles.end(); it++)
-        if (it->ps && it->ps->Name() == ps_name) return &(*it);
+        if (it->ps && it->ps->Name() == ps_name)
+            return &(*it);
     return 0;
 }
 CParticlesPlayer::SParticlesInfo* CParticlesPlayer::SBoneInfo::AppendParticles(
     IGameObject* object, const shared_str& ps_name)
 {
     SParticlesInfo* pi = FindParticles(ps_name);
-    if (pi) return pi;
+    if (pi)
+        return pi;
     particles.push_back(SParticlesInfo());
     pi = &particles.back();
     pi->ps = CParticlesObject::Create(*ps_name, FALSE);
@@ -32,7 +34,8 @@ CParticlesPlayer::SParticlesInfo* CParticlesPlayer::SBoneInfo::AppendParticles(
 void CParticlesPlayer::SBoneInfo::StopParticles(const shared_str& ps_name, bool bDestroy)
 {
     SParticlesInfo* pi = FindParticles(ps_name);
-    if (pi) {
+    if (pi)
+    {
         if (!bDestroy)
             pi->ps->Stop();
         else
@@ -43,7 +46,8 @@ void CParticlesPlayer::SBoneInfo::StopParticles(const shared_str& ps_name, bool 
 void CParticlesPlayer::SBoneInfo::StopParticles(u16 sender_id, bool bDestroy)
 {
     for (ParticlesInfoListIt it = particles.begin(); it != particles.end(); it++)
-        if (it->sender_id == sender_id) {
+        if (it->sender_id == sender_id)
+        {
             if (!bDestroy)
                 it->ps->Stop();
             else
@@ -64,11 +68,7 @@ CParticlesPlayer::CParticlesPlayer()
     m_self_object = 0;
 }
 
-CParticlesPlayer::~CParticlesPlayer()
-{
-    VERIFY(!m_self_object);
-}
-
+CParticlesPlayer::~CParticlesPlayer() { VERIFY(!m_self_object); }
 void CParticlesPlayer::LoadParticles(IKinematics* K)
 {
     VERIFY(K);
@@ -78,7 +78,8 @@ void CParticlesPlayer::LoadParticles(IKinematics* K)
     //считать список косточек и соответствующих
     //офсетов  куда можно вешать партиклы
     CInifile* ini = K->LL_UserData();
-    if (ini && ini->section_exist("particle_bones")) {
+    if (ini && ini->section_exist("particle_bones"))
+    {
         bone_mask = 0;
         CInifile::Sect& data = ini->r_section("particle_bones");
         for (CInifile::SectCIt I = data.Data.begin(); I != data.Data.end(); I++)
@@ -92,7 +93,8 @@ void CParticlesPlayer::LoadParticles(IKinematics* K)
             bone_mask |= u64(1) << u64(index);
         }
     }
-    if (m_Bones.empty()) {
+    if (m_Bones.empty())
+    {
         bone_mask = u64(1) << u64(0);
         m_Bones.push_back(SBoneInfo(K->LL_GetBoneRoot(), Fvector().set(0, 0, 0)));
     }
@@ -144,7 +146,8 @@ void CParticlesPlayer::StartParticles(
     VERIFY(object);
 
     SBoneInfo* pBoneInfo = get_nearest_bone_info(smart_cast<IKinematics*>(object->Visual()), bone_num);
-    if (!pBoneInfo) return;
+    if (!pBoneInfo)
+        return;
 
     SParticlesInfo& particles_info = *pBoneInfo->AppendParticles(object, particles_name);
 
@@ -157,7 +160,8 @@ void CParticlesPlayer::StartParticles(
     m.setHPB(particles_info.angles.x, particles_info.angles.y, particles_info.angles.z);
     GetBonePos(object, pBoneInfo->index, pBoneInfo->offset, m.c);
     particles_info.ps->UpdateParent(m, zero_vel);
-    if (!particles_info.ps->IsPlaying()) particles_info.ps->Play(false);
+    if (!particles_info.ps->IsPlaying())
+        particles_info.ps->Play(false);
 
     m_bActiveBones = true;
 }
@@ -180,7 +184,8 @@ void CParticlesPlayer::StartParticles(
         m.set(xform);
         GetBonePos(object, it->index, it->offset, m.c);
         particles_info.ps->UpdateParent(m, zero_vel);
-        if (!particles_info.ps->IsPlaying()) particles_info.ps->Play(false);
+        if (!particles_info.ps->IsPlaying())
+            particles_info.ps->Play(false);
     }
 
     m_bActiveBones = true;
@@ -196,7 +201,8 @@ void CParticlesPlayer::StartParticles(
 
 void CParticlesPlayer::StopParticles(u16 sender_id, u16 bone_id, bool bDestroy)
 {
-    if (BI_NONE == bone_id) {
+    if (BI_NONE == bone_id)
+    {
         for (BoneInfoVecIt it = m_Bones.begin(); it != m_Bones.end(); it++)
             it->StopParticles(sender_id, bDestroy);
     }
@@ -211,7 +217,8 @@ void CParticlesPlayer::StopParticles(u16 sender_id, u16 bone_id, bool bDestroy)
 
 void CParticlesPlayer::StopParticles(const shared_str& ps_name, u16 bone_id, bool bDestroy)
 {
-    if (BI_NONE == bone_id) {
+    if (BI_NONE == bone_id)
+    {
         for (BoneInfoVecIt it = m_Bones.begin(); it != m_Bones.end(); it++)
             it->StopParticles(ps_name, bDestroy);
     }
@@ -227,11 +234,13 @@ void CParticlesPlayer::StopParticles(const shared_str& ps_name, u16 bone_id, boo
 //остановка партиклов, по истечении их времени жизни
 void CParticlesPlayer::AutoStopParticles(const shared_str& ps_name, u16 bone_id, u32 life_time)
 {
-    if (BI_NONE == bone_id) {
+    if (BI_NONE == bone_id)
+    {
         for (BoneInfoVecIt it = m_Bones.begin(); it != m_Bones.end(); it++)
         {
             SParticlesInfo* pInfo = it->FindParticles(ps_name);
-            if (pInfo) pInfo->life_time = life_time;
+            if (pInfo)
+                pInfo->life_time = life_time;
         }
     }
     else
@@ -239,7 +248,8 @@ void CParticlesPlayer::AutoStopParticles(const shared_str& ps_name, u16 bone_id,
         SBoneInfo* bi = get_bone_info(bone_id);
         VERIFY(bi);
         SParticlesInfo* pInfo = bi->FindParticles(ps_name);
-        if (pInfo) pInfo->life_time = life_time;
+        if (pInfo)
+            pInfo->life_time = life_time;
     }
 }
 struct SRP
@@ -248,7 +258,8 @@ struct SRP
 };
 void CParticlesPlayer::UpdateParticles()
 {
-    if (!m_bActiveBones) return;
+    if (!m_bActiveBones)
+        return;
     m_bActiveBones = false;
 
     IGameObject* object = m_self_object;
@@ -261,7 +272,8 @@ void CParticlesPlayer::UpdateParticles()
         for (ParticlesInfoListIt p_it = b_info.particles.begin(); p_it != b_info.particles.end(); p_it++)
         {
             SParticlesInfo& p_info = *p_it;
-            if (!p_info.ps) continue;
+            if (!p_info.ps)
+                continue;
             //обновить позицию партиклов
             Fmatrix xform;
             xform.setHPB(p_info.angles.x, p_info.angles.y, p_info.angles.z);
@@ -269,7 +281,8 @@ void CParticlesPlayer::UpdateParticles()
             p_info.ps->UpdateParent(xform, parent_vel);
 
             //обновить время существования
-            if (p_info.life_time != u32(-1)) {
+            if (p_info.life_time != u32(-1))
+            {
                 if (p_info.life_time > Device.dwTimeDelta)
                     p_info.life_time -= Device.dwTimeDelta;
                 else
@@ -278,7 +291,8 @@ void CParticlesPlayer::UpdateParticles()
                     p_info.life_time = u32(-1);
                 }
             }
-            if (!p_info.ps->IsPlaying()) {
+            if (!p_info.ps->IsPlaying())
+            {
                 CParticlesObject::Destroy(p_info.ps);
             }
             else

@@ -25,13 +25,13 @@ MxQuadric::MxQuadric(const MxVector& p1, const MxVector& p2, const MxVector& p3,
 
     MxVector e1 = p2;
     e1 -= p1;
-    unitize(e1);  // e1 = p2-p1; unitize
+    unitize(e1); // e1 = p2-p1; unitize
     MxVector e2 = p3;
-    e2 -= p1;  // e2 = p3-p1
+    e2 -= p1; // e2 = p3-p1
     MxVector t = e1;
     t *= e1 * e2;
     e2 -= t;
-    unitize(e2);  // e2 = p3-p1-e1*(e1*(p3-p1)); unitize
+    unitize(e2); // e2 = p3-p1-e1*(e1*(p3-p1)); unitize
 
     double p1e1 = p1 * e1;
     double p1e2 = p1 * e2;
@@ -103,7 +103,8 @@ bool MxQuadric::optimize(MxVector& v) const
     MxMatrix Ainv(A.dim());
 
     double det = A.invert(Ainv);
-    if (FEQ(det, 0.0, 1e-12)) return false;
+    if (FEQ(det, 0.0, 1e-12))
+        return false;
 
     v = (Ainv * b);
     mxv_neg(v, v.dim());

@@ -5,7 +5,6 @@ class position_prediction
 {
 public:
     position_prediction() { reinit(); }
-
     void reinit()
     {
         m_predicted_enemy_velocity = cr_fvector3(0.f);
@@ -20,9 +19,12 @@ public:
         float const self2enemy_time = self_velocity > epsilon ? self2enemy_mag / self_velocity : 0;
 
         float const predictiton_delta_sec = (current_time() - m_last_prediction_time) / 1000.f;
-        if (predictiton_delta_sec > 0.4f) {
-            if (m_last_prediction_time != 0) {
-                if (predictiton_delta_sec < 2.f) {
+        if (predictiton_delta_sec > 0.4f)
+        {
+            if (m_last_prediction_time != 0)
+            {
+                if (predictiton_delta_sec < 2.f)
+                {
                     Fvector const move_delta = enemy_pos - m_last_update_enemy_pos;
                     m_predicted_enemy_velocity = move_delta / predictiton_delta_sec;
                 }
@@ -44,6 +46,6 @@ private:
     TTime m_last_prediction_time;
     Fvector m_last_update_enemy_pos;
 
-};  // class position_prediction
+}; // class position_prediction
 
-#endif  // #ifndef POSITION_PREDICTION_H_INCLUDED
+#endif // #ifndef POSITION_PREDICTION_H_INCLUDED

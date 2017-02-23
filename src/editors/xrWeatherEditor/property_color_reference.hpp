@@ -14,19 +14,19 @@
 public
 ref class property_color_reference : public property_color_base
 {
-  public:
+public:
     typedef property_color_base inherited;
     typedef editor::color color;
 
-  public:
+public:
     property_color_reference(color& value, array<System::Attribute ^> ^ attributes);
     virtual ~property_color_reference();
     !property_color_reference();
     virtual color get_value_raw() override;
     virtual void set_value_raw(color value) override;
 
-  private:
+private:
     value_holder<color>* m_value;
-};  // ref class property_color_reference
+}; // ref class property_color_reference
 
-#endif  // ifndef PROPERTY_COLOR_REFERENCE_HPP_INCLUDED
+#endif // ifndef PROPERTY_COLOR_REFERENCE_HPP_INCLUDED

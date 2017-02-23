@@ -17,7 +17,8 @@ public:
 
     void push_obsolete(const_reference element)
     {
-        if (m_sequence.size() >= MaxCount) {
+        if (m_sequence.size() >= MaxCount)
+        {
             m_sequence.erase(m_sequence.begin());
         }
         m_sequence.push_back(element);
@@ -28,11 +29,9 @@ public:
     iterator begin() { return m_sequence.begin(); };
     iterator end() { return m_sequence.end(); };
     void clear() { m_sequence.clear(); };
-
     size_type size() const { return m_sequence.size(); };
     container_type const& get_contaier() const { return m_sequence; };
-
 private:
     container_type m_sequence;
     T m_sequence_store[MaxCount];
-};  // class obsolete_queue<buffer_vector<T>, MaxCount>
+}; // class obsolete_queue<buffer_vector<T>, MaxCount>

@@ -35,10 +35,10 @@ private:
     Fmatrix m_result[bone_count];
     Fmatrix m_bones[bone_count];
     u16 m_bones_ids[bone_count];
-};  // class bone
+}; // class bone
 
-}  // namespace aimers
+} // namespace aimers
 
 #include "aimers_bone_inline.h"
 
-#endif  // #ifndef AIMERS_BONE_H_INCLUDED
+#endif // #ifndef AIMERS_BONE_H_INCLUDED

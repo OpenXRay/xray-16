@@ -17,16 +17,16 @@
 //---------------------------------------------------------------------------
 class TForm9 : public TForm
 {
-    __published :  // IDE-managed Components
-                   TPanel* Panel1;
+    __published : // IDE-managed Components
+                  TPanel* Panel1;
     TMultiObjSpinEdit* WorkTime;
     TMultiObjSpinEdit* Value;
     TSpeedButton* AddButton;
     TSpeedButton* DeleteButton;
     TImageList* ImageList;
 
-  private:  // User declarations
-  public:   // User declarations
+private: // User declarations
+public: // User declarations
     __fastcall TForm9(TComponent* Owner);
 };
 

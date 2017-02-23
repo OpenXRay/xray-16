@@ -9,7 +9,8 @@ CGameSpy_ATLAS::CGameSpy_ATLAS()
 
 CGameSpy_ATLAS::~CGameSpy_ATLAS()
 {
-    if (m_interface) {
+    if (m_interface)
+    {
         scShutdown(m_interface);
     }
 }
@@ -18,31 +19,16 @@ void CGameSpy_ATLAS::Init()
 {
     SCResult init_res = scInitialize(GAMESPY_GAMEID, &m_interface);
     VERIFY(init_res == SCResult_NO_ERROR);
-    if (init_res != SCResult_NO_ERROR) {
+    if (init_res != SCResult_NO_ERROR)
+    {
         Msg("! GameSpy ATLAS: failed to initialize, error code: %d", init_res);
     }
 }
 
-void CGameSpy_ATLAS::Think()
-{
-    scThink(m_interface);
-}
-
-shared_str const CGameSpy_ATLAS::TryToTranslate(GHTTPResult httpResult)
-{
-    return "mp_gamespy_http_error";
-}
-
-shared_str const CGameSpy_ATLAS::TryToTranslate(WSLoginValue loginValue)
-{
-    return "mp_gamespy_ws_login_error";
-}
-
-shared_str const CGameSpy_ATLAS::TryToTranslate(SCResult result)
-{
-    return "mp_gamespy_atlas_error";
-}
-
+void CGameSpy_ATLAS::Think() { scThink(m_interface); }
+shared_str const CGameSpy_ATLAS::TryToTranslate(GHTTPResult httpResult) { return "mp_gamespy_http_error"; }
+shared_str const CGameSpy_ATLAS::TryToTranslate(WSLoginValue loginValue) { return "mp_gamespy_ws_login_error"; }
+shared_str const CGameSpy_ATLAS::TryToTranslate(SCResult result) { return "mp_gamespy_atlas_error"; }
 u32 CGameSpy_ATLAS::WSLoginProfile(shared_str const& email, shared_str const& nick, shared_str const& password,
     WSLoginCallback callback, void* userData)
 {
@@ -65,11 +51,7 @@ SCResult CGameSpy_ATLAS::SetReportIntention(const gsi_u8 theConnectionId[SC_CONN
         theCallback, theTimeoutMs, theUserData);
 }
 
-char const* CGameSpy_ATLAS::GetConnectionId()
-{
-    return scGetConnectionId(m_interface);
-}
-
+char const* CGameSpy_ATLAS::GetConnectionId() { return scGetConnectionId(m_interface); }
 SCResult CGameSpy_ATLAS::SubmitReport(const SCReportPtr theReport, gsi_bool isAuthoritative,
     const GSLoginCertificate* theCertificate, const GSLoginPrivateData* thePrivateData,
     SCSubmitReportCallback theCallback, gsi_time theTimeoutMs, void* theUserData)

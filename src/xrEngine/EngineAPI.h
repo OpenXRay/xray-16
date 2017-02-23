@@ -17,14 +17,8 @@ public:
     virtual IFactoryObject* _construct() = 0;
 };
 
-inline IFactoryObject::~IFactoryObject()
-{
-}
-inline IFactoryObject* IFactoryObject::_construct()
-{
-    return this;
-}
-
+inline IFactoryObject::~IFactoryObject() {}
+inline IFactoryObject* IFactoryObject::_construct() { return this; }
 class ENGINE_API FactoryObjectBase : public virtual IFactoryObject
 {
 public:
@@ -67,7 +61,7 @@ public:
 
 #ifndef DEDICATED_SERVER
     void InitializeNotDedicated();
-#endif  // DEDICATED_SERVER
+#endif // DEDICATED_SERVER
 
     void Destroy();
 
@@ -80,10 +74,10 @@ public:
 ENGINE_API bool is_enough_address_space_available();
 
 #define NEW_INSTANCE(a) Engine.External.pCreate(a)
-#define DEL_INSTANCE(a)                                                                                                \
-    {                                                                                                                  \
-        Engine.External.pDestroy(a);                                                                                   \
-        a = NULL;                                                                                                      \
+#define DEL_INSTANCE(a)\
+    {\
+        Engine.External.pDestroy(a);\
+        a = NULL;\
     }
 
-#endif  // !defined(AFX_ENGINEAPI_H__CF21372B_C8B8_4891_82FC_D872C84E1DD4__INCLUDED_)
+#endif // !defined(AFX_ENGINEAPI_H__CF21372B_C8B8_4891_82FC_D872C84E1DD4__INCLUDED_)

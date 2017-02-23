@@ -18,7 +18,8 @@ void CPHCollisionDamageReceiver::Init()
     CPhysicsShellHolder* sh = PPhysicsShellHolder();
     IKinematics* K = smart_cast<IKinematics*>(sh->Visual());
     CInifile* ini = K->LL_UserData();
-    if (ini->section_exist("collision_damage")) {
+    if (ini->section_exist("collision_damage"))
+    {
         CInifile::Sect& data = ini->r_section("collision_damage");
         for (CInifile::SectCIt I = data.Data.begin(); I != data.Data.end(); I++)
         {
@@ -28,7 +29,8 @@ void CPHCollisionDamageReceiver::Init()
             BoneInsert(index, float(atof(*item.second)));
             CODEGeom* og = sh->PPhysicsShell()->get_GeomByID(index);
             // R_ASSERT3(og, "collision damage bone has no physics collision", *item.first);
-            if (og) og->add_obj_contact_cb(DamageReceiverCollisionCallback);
+            if (og)
+                og->add_obj_contact_cb(DamageReceiverCollisionCallback);
         }
     }
 }
@@ -37,23 +39,25 @@ const static float hit_threthhold = 5.f;
 void CPHCollisionDamageReceiver::CollisionHit(u16 source_id, u16 bone_id, float power, const Fvector& dir, Fvector& pos)
 {
     DAMAGE_BONES_I i = FindBone(bone_id);
-    if (i == m_controled_bones.end()) return;
+    if (i == m_controled_bones.end())
+        return;
     power *= i->second;
-    if (power < hit_threthhold) return;
+    if (power < hit_threthhold)
+        return;
 
     NET_Packet P;
     CPhysicsShellHolder* ph = PPhysicsShellHolder();
     SHit HS;
 
-    HS.GenHeader(GE_HIT, ph->ID());         //	ph->u_EventGen(P,GE_HIT,ph->ID());
-    HS.whoID = ph->ID();                    //	P.w_u16		(ph->ID());
-    HS.weaponID = source_id;                //	P.w_u16		(source_id);
-    HS.dir = dir;                           //	P.w_dir		(dir);
-    HS.power = power;                       //	P.w_float	(power);
-    HS.boneID = s16(bone_id);               //	P.w_s16		(s16(bone_id));
-    HS.p_in_bone_space = pos;               //	P.w_vec3	(pos);
-    HS.impulse = 0.f;                       //	P.w_float	(0.f);
-    HS.hit_type = (ALife::eHitTypeStrike);  //	P.w_u16		(ALife::eHitTypeStrike);
+    HS.GenHeader(GE_HIT, ph->ID()); //	ph->u_EventGen(P,GE_HIT,ph->ID());
+    HS.whoID = ph->ID(); //	P.w_u16		(ph->ID());
+    HS.weaponID = source_id; //	P.w_u16		(source_id);
+    HS.dir = dir; //	P.w_dir		(dir);
+    HS.power = power; //	P.w_float	(power);
+    HS.boneID = s16(bone_id); //	P.w_s16		(s16(bone_id));
+    HS.p_in_bone_space = pos; //	P.w_vec3	(pos);
+    HS.impulse = 0.f; //	P.w_float	(0.f);
+    HS.hit_type = (ALife::eHitTypeStrike); //	P.w_u16		(ALife::eHitTypeStrike);
     HS.Write_Packet(P);
 
     ph->u_EventSend(P);

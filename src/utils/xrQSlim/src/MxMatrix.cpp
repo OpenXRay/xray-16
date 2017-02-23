@@ -19,11 +19,11 @@
 //
 // Uses Gaussian elimination with partial pivoting.
 
-#define SWAP(a, b, t)                                                                                                  \
-    {                                                                                                                  \
-        t = a;                                                                                                         \
-        a = b;                                                                                                         \
-        b = t;                                                                                                         \
+#define SWAP(a, b, t)\
+    {\
+        t = a;\
+        a = b;\
+        b = t;\
     }
 static double internal_invert(MxMatrix& A, MxMatrix& B)
 {
@@ -42,12 +42,15 @@ static double internal_invert(MxMatrix& A, MxMatrix& B)
     { /* eliminate in column i, below diag */
         max = -1.;
         for (k = i; k < N; k++) /* find pivot for column i */
-            if (_abs(A(k, i)) > max) {
+            if (_abs(A(k, i)) > max)
+            {
                 max = _abs(A(k, i));
                 j = k;
             }
-        if (max <= 0.) return 0.; /* if no nonzero pivot, PUNT */
-        if (j != i) {             /* swap rows i and j */
+        if (max <= 0.)
+            return 0.; /* if no nonzero pivot, PUNT */
+        if (j != i)
+        { /* swap rows i and j */
             for (k = i; k < N; k++)
                 SWAP(A(i, k), A(j, k), t);
             for (k = 0; k < N; k++)
@@ -63,8 +66,8 @@ static double internal_invert(MxMatrix& A, MxMatrix& B)
         /* we know that A(i, i) will be set to 1, so don't bother to do it */
 
         for (j = i + 1; j < N; j++)
-        {                               /* eliminate in rows below i */
-            t = A(j, i);                /* we're gonna zero this guy */
+        { /* eliminate in rows below i */
+            t = A(j, i); /* we're gonna zero this guy */
             for (k = i + 1; k < N; k++) /* subtract scaled row i from row j */
                 A(j, k) -= A(i, k) * t; /* (ignore k<=i, we know they're 0) */
             for (k = 0; k < N; k++)
@@ -77,8 +80,8 @@ static double internal_invert(MxMatrix& A, MxMatrix& B)
     for (i = N - 1; i > 0; i--)
     { /* eliminate in column i, above diag */
         for (j = 0; j < i; j++)
-        {                           /* eliminate in rows above i */
-            t = A(j, i);            /* we're gonna zero this guy */
+        { /* eliminate in rows above i */
+            t = A(j, i); /* we're gonna zero this guy */
             for (k = 0; k < N; k++) /* subtract scaled row i from row j */
                 B(j, k) -= B(i, k) * t;
         }

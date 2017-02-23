@@ -16,7 +16,8 @@ void xrServer::OnCL_Disconnected(IClient* CL)
     xrClientData* xrCData = (xrClientData*)(CL);
     VERIFY(xrCData);
 
-    if (!xrCData->ps) return;
+    if (!xrCData->ps)
+        return;
 
     P.w_stringZ(xrCData->ps->getName());
     P.w_u16(xrCData->ps->GameID);
@@ -29,7 +30,8 @@ void xrServer::OnCL_Disconnected(IClient* CL)
 
     //
     xrS_entities::iterator I = entities.begin(), E = entities.end();
-    if (GetClientsCount() > 1 && !CL->flags.bLocal) {
+    if (GetClientsCount() > 1 && !CL->flags.bLocal)
+    {
         // Migrate entities
         for (; I != E; ++I)
         {

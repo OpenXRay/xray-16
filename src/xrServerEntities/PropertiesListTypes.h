@@ -19,7 +19,7 @@ enum EPropType
     PROP_SHORTCUT,
     PROP_BUTTON,
     PROP_CHOOSE,
-    PROP_NUMERIC,  // {u8,u16,u32,s8,s16,s32,f32}
+    PROP_NUMERIC, // {u8,u16,u32,s8,s16,s32,f32}
     PROP_BOOLEAN,
     PROP_FLAG,
     PROP_VECTOR,
@@ -121,7 +121,8 @@ public:
     virtual void ResetValue() { set_value(*value, init_value); }
     bool ApplyValue(const T& val)
     {
-        if (!(*value == val)) {
+        if (!(*value == val))
+        {
             set_value(*value, val);
             return true;
         }
@@ -189,7 +190,8 @@ public:
     }
     IC void AppendValue(PropValue* value)
     {
-        if (!values.empty() && !value->Equal(values.front())) m_Flags.set(flMixed, TRUE);
+        if (!values.empty() && !value->Equal(values.front()))
+            m_Flags.set(flMixed, TRUE);
         values.push_back(value);
     }
     IC xr_string GetDrawText()
@@ -200,13 +202,15 @@ public:
     IC void CheckMixed()
     {
         m_Flags.set(flMixed, FALSE);
-        if (values.size() > 1) {
+        if (values.size() > 1)
+        {
             PropValueIt F = values.begin();
             PropValueIt it = F;
             ++it;
             for (; values.end() != it; ++it)
             {
-                if (!(*it)->Equal(*F)) {
+                if (!(*it)->Equal(*F))
+                {
                     m_Flags.set(flMixed, TRUE);
                     break;
                 }
@@ -219,14 +223,16 @@ public:
     {
         T1* CV = smart_cast<T1*>(values.front());
         VERIFY(CV);
-        if (!CV->OnBeforeEditEvent.empty()) CV->OnBeforeEditEvent(CV, val);
+        if (!CV->OnBeforeEditEvent.empty())
+            CV->OnBeforeEditEvent(CV, val);
     }
     template <class T1, class T2>
     IC bool AfterEdit(T2& val)
     {
         T1* CV = smart_cast<T1*>(values.front());
         VERIFY(CV);
-        if (!CV->OnAfterEditEvent.empty()) return CV->OnAfterEditEvent(CV, val);
+        if (!CV->OnAfterEditEvent.empty())
+            return CV->OnAfterEditEvent(CV, val);
         return true;
     }
     template <class T1, class T2>
@@ -238,11 +244,14 @@ public:
         {
             T1* CV = smart_cast<T1*>(*it);
             VERIFY(CV);
-            if (CV->ApplyValue(val)) {
+            if (CV->ApplyValue(val))
+            {
                 bChanged = true;
-                if (!CV->OnChangeEvent.empty()) CV->OnChangeEvent(*it);
+                if (!CV->OnChangeEvent.empty())
+                    CV->OnChangeEvent(*it);
             }
-            if (!CV->Equal(values.front())) m_Flags.set(flMixed, TRUE);
+            if (!CV->Equal(values.front()))
+                m_Flags.set(flMixed, TRUE);
         }
         return bChanged;
     }
@@ -262,7 +271,8 @@ public:
     IC void OnChange()
     {
         for (PropValueIt it = values.begin(); values.end() != it; ++it)
-            if (!(*it)->OnChangeEvent.empty()) (*it)->OnChangeEvent(*it);
+            if (!(*it)->OnChangeEvent.empty())
+                (*it)->OnChangeEvent(*it);
     }
     /*
         template <class T1, class T2>
@@ -314,7 +324,8 @@ public:
     virtual void ResetValue() { ; }
     virtual bool Equal(PropValue* val)
     {
-        if (!OnTestEqual.empty()) {
+        if (!OnTestEqual.empty())
+        {
             bool res = true;
             OnTestEqual(this, (CanvasValue*)val, res);
             return res;
@@ -356,7 +367,8 @@ public:
     virtual bool Equal(PropValue* val) { return true; }
     bool OnBtnClick(bool& bSafe)
     {
-        if (!OnBtnClickEvent.empty()) {
+        if (!OnBtnClickEvent.empty())
+        {
             bool bDModif = true;
             OnBtnClickEvent(this, bDModif, bSafe);
             return bDModif;
@@ -367,10 +379,7 @@ public:
 };
 //------------------------------------------------------------------------------
 
-IC bool operator==(const xr_shortcut& A, const xr_shortcut& B)
-{
-    return !!A.similar(B);
-}
+IC bool operator==(const xr_shortcut& A, const xr_shortcut& B) { return !!A.similar(B); }
 class ShortcutValue : public CustomValue<xr_shortcut>
 {
 public:
@@ -382,10 +391,13 @@ public:
     virtual xr_string GetDrawText(TOnDrawTextEvent OnDrawText);
     bool ApplyValue(const xr_shortcut& val)
     {
-        if (!(*value == val)) {
+        if (!(*value == val))
+        {
             bool allow = true;
-            if (!OnValidateResultEvent.empty()) OnValidateResultEvent(this, val, allow);
-            if (allow) {
+            if (!OnValidateResultEvent.empty())
+                OnValidateResultEvent(this, val, allow);
+            if (allow)
+            {
                 set_value(*value, val);
                 return true;
             }
@@ -400,7 +412,8 @@ public:
     virtual xr_string GetDrawText(TOnDrawTextEvent OnDrawText)
     {
         xr_string txt = GetValue().c_str() ? GetValue().c_str() : "";
-        if (!OnDrawText.empty()) OnDrawText(this, txt);
+        if (!OnDrawText.empty())
+            OnDrawText(this, txt);
         return txt;
     }
 };
@@ -411,7 +424,8 @@ public:
     virtual xr_string GetDrawText(TOnDrawTextEvent OnDrawText)
     {
         xr_string txt = GetValue();
-        if (!OnDrawText.empty()) OnDrawText(this, txt);
+        if (!OnDrawText.empty())
+            OnDrawText(this, txt);
         return txt;
     }
 };
@@ -441,13 +455,15 @@ public:
     virtual xr_string GetDrawText(TOnDrawTextEvent OnDrawText)
     {
         xr_string txt = GetValue();
-        if (!OnDrawText.empty()) OnDrawText(this, txt);
+        if (!OnDrawText.empty())
+            OnDrawText(this, txt);
         return txt;
     }
     virtual bool Equal(PropValue* val) { return (0 == xr_strcmp(value, ((CTextValue*)val)->value)); }
     bool ApplyValue(LPCSTR val)
     {
-        if (0 != xr_strcmp(value, val)) {
+        if (0 != xr_strcmp(value, val))
+        {
             xr_strcpy(value, xr_strlen(val) + 1, val);
             return true;
         }
@@ -488,10 +504,7 @@ public:
 typedef CustomValue<BOOL> BOOLValue;
 //------------------------------------------------------------------------------
 
-IC bool operator==(const WaveForm& A, const WaveForm& B)
-{
-    return !!A.Similar(B);
-}
+IC bool operator==(const WaveForm& A, const WaveForm& B) { return !!A.Similar(B); }
 class WaveValue : public CustomValue<WaveForm>
 {
 public:
@@ -512,10 +525,7 @@ public:
 
 //------------------------------------------------------------------------------
 
-IC bool operator==(const Fcolor& A, const Fcolor& B)
-{
-    return !!A.similar_rgba(B);
-}
+IC bool operator==(const Fcolor& A, const Fcolor& B) { return !!A.similar_rgba(B); }
 typedef CustomValue<Fcolor> ColorValue;
 //------------------------------------------------------------------------------
 
@@ -579,10 +589,7 @@ IC xr_string draw_sprintf(xr_string& s, const float& V, int dec)
     return s;
 }
 //------------------------------------------------------------------------------
-IC bool operator==(const Fvector& A, const Fvector& B)
-{
-    return !!A.similar(B);
-}
+IC bool operator==(const Fvector& A, const Fvector& B) { return !!A.similar(B); }
 IC void clamp(Fvector& V, const Fvector& mn, const Fvector& mx)
 {
     clamp(V.x, mn.x, mx.x);
@@ -670,7 +677,8 @@ public:
     virtual bool GetValueEx() { return !!value->is(mask); }
     bool ApplyValue(const T& val)
     {
-        if (!val.equal(*value, mask)) {
+        if (!val.equal(*value, mask))
+        {
             value->set(mask, val.is(mask));
             return true;
         }
@@ -707,7 +715,8 @@ public:
             OnDrawText(this, draw_val);
         else
             for (int i = 0; token[i].name; i++)
-                if (token[i].id == (int)GetValue()) return token[i].name;
+                if (token[i].id == (int)GetValue())
+                    return token[i].name;
         return draw_val;
     }
 };
@@ -736,7 +745,8 @@ public:
             OnDrawText(this, draw_val);
         else
             for (u32 k = 0; k < token_count; k++)
-                if ((T)token[k].id == GetValue()) return *token[k].name;
+                if ((T)token[k].id == GetValue())
+                    return *token[k].name;
         return draw_val;
     }
 };
@@ -763,7 +773,8 @@ public:
     {
         u32 draw_val = GetValue();
         for (u32 i = 0; i < cnt; i++)
-            if (items[i].ID == draw_val) return items[i].str;
+            if (items[i].ID == draw_val)
+                return items[i].str;
         return 0;
     }
 };
@@ -779,7 +790,8 @@ public:
     RListValue(shared_str* val, shared_str* _items, u32 cnt) : RTextValue(val), items(_items), item_count(cnt){};
     virtual bool Equal(PropValue* val)
     {
-        if (items != ((RListValue*)val)->items) {
+        if (items != ((RListValue*)val)->items)
+        {
             m_Owner->m_Flags.set(PropItem::flDisabled, TRUE);
             return false;
         }
@@ -796,7 +808,8 @@ public:
     CListValue(LPSTR val, u32 sz, xr_string* _items, u32 cnt) : CTextValue(val, sz), items(_items), item_count(cnt){};
     virtual bool Equal(PropValue* val)
     {
-        if (items != ((CListValue*)val)->items) {
+        if (items != ((CListValue*)val)->items)
+        {
             m_Owner->m_Flags.set(PropItem::flDisabled, TRUE);
             return false;
         }

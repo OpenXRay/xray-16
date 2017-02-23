@@ -18,12 +18,5 @@ CObjectFactory::CObjectFactory()
     register_classes();
 }
 
-CObjectFactory::~CObjectFactory()
-{
-    delete_data(m_clsids);
-}
-
-void CObjectFactory::init()
-{
-    register_script_classes();
-}
+CObjectFactory::~CObjectFactory() { delete_data(m_clsids); }
+void CObjectFactory::init() { register_script_classes(); }

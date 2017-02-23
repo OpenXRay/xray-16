@@ -92,7 +92,8 @@ public:
         IC u32 GetVisuals(xr_vector<dxRender_Visual*>& visuals)
         {
             visuals.reserve(_children_related.size() + _children_free.size() + 1);
-            if (_effect) visuals.push_back(_effect);
+            if (_effect)
+                visuals.push_back(_effect);
             visuals.insert(visuals.end(), _children_related.begin(), _children_related.end());
             visuals.insert(visuals.end(), _children_free.begin(), _children_free.end());
             return visuals.size();
@@ -130,7 +131,6 @@ public:
     virtual void OnFrame(u32 dt);
 
     virtual void Copy(dxRender_Visual* pFrom) { FATAL("Can't duplicate particle system - NOT IMPLEMENTED"); }
-
     virtual void OnDeviceCreate();
     virtual void OnDeviceDestroy();
 
@@ -139,11 +139,9 @@ public:
     BOOL Compile(CPGDef* def);
 
     const CPGDef* GetDefinition() { return m_Def; }
-
     virtual void Play();
     virtual void Stop(BOOL bDefferedStop = TRUE);
     virtual BOOL IsPlaying() { return m_RT_Flags.is(flRT_Playing); }
-
     virtual void SetHudMode(BOOL b);
     virtual BOOL GetHudMode();
 
@@ -167,7 +165,7 @@ public:
 #define PGD_CHUNK_VERSION 0x0001
 #define PGD_CHUNK_NAME 0x0002
 #define PGD_CHUNK_FLAGS 0x0003
-#define PGD_CHUNK_EFFECTS 0x0004  // obsolete
+#define PGD_CHUNK_EFFECTS 0x0004 // obsolete
 #define PGD_CHUNK_TIME_LIMIT 0x0005
 #define PGD_CHUNK_EFFECTS2 0x0007
 

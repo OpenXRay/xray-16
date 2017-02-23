@@ -15,7 +15,8 @@
 TfrmObjectList* TfrmObjectList::CreateForm(TWinControl* parent)
 {
     TfrmObjectList* OL = new TfrmObjectList(parent);
-    if (parent) OL->Parent = parent;
+    if (parent)
+        OL->Parent = parent;
     return OL;
 }
 
@@ -25,24 +26,13 @@ void TfrmObjectList::DestroyForm(TfrmObjectList*& obj_list)
     xr_delete(obj_list);
 }
 
-void __fastcall TfrmObjectList::ShowObjectList()
-{
-    Show();
-}
-
-void __fastcall TfrmObjectList::ShowObjectListModal()
-{
-    ShowModal();
-}
-
-void __fastcall TfrmObjectList::HideObjectList()
-{
-    Hide();
-}
-
+void __fastcall TfrmObjectList::ShowObjectList() { Show(); }
+void __fastcall TfrmObjectList::ShowObjectListModal() { ShowModal(); }
+void __fastcall TfrmObjectList::HideObjectList() { Hide(); }
 void __fastcall TfrmObjectList::UpdateObjectList()
 {
-    if (Visible && !bLockUpdate) sbRefreshListClick(0);
+    if (Visible && !bLockUpdate)
+        sbRefreshListClick(0);
 }
 
 //---------------------------------------------------------------------------
@@ -52,11 +42,7 @@ __fastcall TfrmObjectList::TfrmObjectList(TComponent* Owner) : TForm(Owner)
     find_node = NULL;
 }
 
-void __fastcall TfrmObjectList::sbCloseClick(TObject* Sender)
-{
-    Close();
-}
-
+void __fastcall TfrmObjectList::sbCloseClick(TObject* Sender) { Close(); }
 //---------------------------------------------------------------------------
 
 void __fastcall TfrmObjectList::FormShow(TObject* Sender)
@@ -73,7 +59,8 @@ void __fastcall TfrmObjectList::FormShow(TObject* Sender)
 TElTreeItem* TfrmObjectList::FindFolderByType(int type)
 {
     for (TElTreeItem* node = tvItems->Items->GetFirstNode(); node; node = node->GetNext())
-        if (!node->Parent && (node->Tag == type)) return node;
+        if (!node->Parent && (node->Tag == type))
+            return node;
     return 0;
 }
 
@@ -81,9 +68,11 @@ TElTreeItem* TfrmObjectList::FindFolderByType(int type)
 TElTreeItem* TfrmObjectList::FindObjectByType(int type, void* obj)
 {
     for (TElTreeItem* node = tvItems->Items->GetFirstNode(); node; node = node->GetNext())
-        if (!node->Parent && (node->Tag == type)) {
+        if (!node->Parent && (node->Tag == type))
+        {
             for (TElTreeItem* chield = node->GetFirstChild(); chield; chield = node->GetNextChild(chield))
-                if (chield->Data == obj) return chield;
+                if (chield->Data == obj)
+                    return chield;
             break;
         }
     return 0;
@@ -95,7 +84,8 @@ TElTreeItem* TfrmObjectList::AddFolder(LPCSTR name, void* data, TElTreeItem* par
     for (TElTreeItem* fnode = tvItems->Items->GetFirstNode(); fnode; fnode = fnode->GetNext())
     {
         if (fnode->Parent == parent_node)
-            if (AnsiString(fnode->Text) == name) return fnode;
+            if (AnsiString(fnode->Text) == name)
+                return fnode;
     }
 
     TElTreeItem* node;
@@ -123,7 +113,8 @@ TElTreeItem* TfrmObjectList::AddObject(TElTreeItem* node, LPCSTR name, void* obj
 
 void gen_object_name(CCustomObject* O, string1024& str_name, bool b_parent_is_group)
 {
-    if (b_parent_is_group) {
+    if (b_parent_is_group)
+    {
         sprintf(str_name, "[%s] %s", O->ParentTool->ClassDesc(), O->Name);
     }
     else
@@ -136,7 +127,8 @@ void gen_group_name(CGroupObject* O, string1024& str_name)
 {
     strcpy(str_name, O->RefName());
 
-    if (strchr(str_name, '\\')) *strchr(str_name, '\\') = 0;
+    if (strchr(str_name, '\\'))
+        *strchr(str_name, '\\') = 0;
 }
 
 void TfrmObjectList::storeExpandedItems()
@@ -145,7 +137,8 @@ void TfrmObjectList::storeExpandedItems()
 
     for (TElTreeItem* node = tvItems->Items->GetFirstNode(); node; node = node->GetNext())
     {
-        if (node->Expanded) ItemsStore[node->Text].expanded = true;
+        if (node->Expanded)
+            ItemsStore[node->Text].expanded = true;
     }
 }
 
@@ -154,7 +147,8 @@ void TfrmObjectList::restoreExpandedItems()
     for (TElTreeItem* node = tvItems->Items->GetFirstNode(); node; node = node->GetNext())
     {
         FolderStorePairIt it = ItemsStore.find(node->Text);
-        if (it != ItemsStore.end()) node->Expand(false);
+        if (it != ItemsStore.end())
+            node->Expand(false);
     }
 }
 
@@ -169,11 +163,14 @@ void __fastcall TfrmObjectList::InitListBox()
     for (SceneToolsMapPairIt it = Scene->FirstTool(); it != Scene->LastTool(); ++it)
     {
         ESceneCustomOTool* ot = dynamic_cast<ESceneCustomOTool*>(it->second);
-        if (ot && ((m_cur_cls == OBJCLASS_DUMMY) || (it->first == m_cur_cls))) {
-            if (it->first == OBJCLASS_DUMMY) continue;
+        if (ot && ((m_cur_cls == OBJCLASS_DUMMY) || (it->first == m_cur_cls)))
+        {
+            if (it->first == OBJCLASS_DUMMY)
+                continue;
 
             TElTreeItem* tool_node = FindFolderByType(it->first);
-            if (!tool_node) {
+            if (!tool_node)
+            {
                 AnsiString name;
                 name.sprintf("%ss", it->second->ClassDesc());
                 tool_node = AddFolder(name.LowerCase().c_str(), NULL, NULL);
@@ -182,7 +179,8 @@ void __fastcall TfrmObjectList::InitListBox()
 
             ObjectList& lst = ot->GetObjects();
 
-            if (OBJCLASS_GROUP == it->first) {
+            if (OBJCLASS_GROUP == it->first)
+            {
                 for (ObjectIt _F = lst.begin(); _F != lst.end(); ++_F)
                 {
                     TElTreeItem* group_profile_node = NULL;
@@ -214,7 +212,8 @@ void __fastcall TfrmObjectList::InitListBox()
                 {
                     Flags32 fl = (*_F)->m_CO_Flags;
                     TElTreeItem* parent_node = tool_node;
-                    if (fl.test(CCustomObject::flObjectInGroup)) {
+                    if (fl.test(CCustomObject::flObjectInGroup))
+                    {
                         CGroupObject* GO = (CGroupObject*)((*_F)->GetOwner());
                         string1024 gn;
                         gen_group_name(GO, gn);
@@ -226,8 +225,8 @@ void __fastcall TfrmObjectList::InitListBox()
                     gen_object_name(*_F, str_name, false);
                     TColor clr =
                         (fl.test(CCustomObject::flObjectInGroup) && !fl.test(CCustomObject::flObjectInGroupUnique)) ?
-                            TColor(0x00a9a6a0) :
-                            clBlack;
+                        TColor(0x00a9a6a0) :
+                        clBlack;
                     AddObject(parent_node, str_name, (void*)(*_F), clr);
                 }
             }
@@ -258,7 +257,8 @@ void TfrmObjectList::UpdateState()
 
     for (TElTreeItem* node = tvItems->Items->GetFirstNode(); node; node = node->GetNext())
     {
-        if (NULL == node->Data) {
+        if (NULL == node->Data)
+        {
             node->Selected = false;
             continue;
         }
@@ -276,50 +276,61 @@ void TfrmObjectList::UpdateState()
         else if (rgSO->ItemIndex == 2)
             node->Hidden = O->Visible();
 
-        if (O->Visible()) node->Selected = O->Selected();
+        if (O->Visible())
+            node->Selected = O->Selected();
 
-        if (O->Selected()) {
+        if (O->Selected())
+        {
             ++sel_count;
             sel_node = node;
-            if (first_sel_node == NULL && O->Visible()) first_sel_node = node;
+            if (first_sel_node == NULL && O->Visible())
+                first_sel_node = node;
         }
 
-        if (!node->Hidden) {
+        if (!node->Hidden)
+        {
             string1024 str_name;
             bool b_parent_is_group = false;
-            if (PO && PO->ClassID == OBJCLASS_GROUP) b_parent_is_group = true;
+            if (PO && PO->ClassID == OBJCLASS_GROUP)
+                b_parent_is_group = true;
 
             gen_object_name(O, str_name, b_parent_is_group);
 
-            if (AnsiString(node->Text) != str_name) {
+            if (AnsiString(node->Text) != str_name)
+            {
                 node->Text = str_name;
                 need_sort = true;
             }
             Flags32 fl = O->m_CO_Flags;
             TColor clr = (fl.test(CCustomObject::flObjectInGroup) && !fl.test(CCustomObject::flObjectInGroupUnique)) ?
-                             TColor(0x00a9a6a0) :
-                             clBlack;
-            if (node->Color != clr) node->Color = clr;
+                TColor(0x00a9a6a0) :
+                clBlack;
+            if (node->Color != clr)
+                node->Color = clr;
         }
     }
 
     tvItems->IsUpdating = false;
 
-    if (need_sort) tvItems->Sort(true);
+    if (need_sort)
+        tvItems->Sort(true);
 
-    if (first_sel_node && sel_count == 1) tvItems->EnsureVisible(first_sel_node);
+    if (first_sel_node && sel_count == 1)
+        tvItems->EnsureVisible(first_sel_node);
 }
 
 void TfrmObjectList::UpdateSelection()
 {
-    if (tvItems->Items->Count) {
+    if (tvItems->Items->Count)
+    {
         bLockUpdate = true;
 
         Scene->SelectObjects(false, OBJCLASS_DUMMY /*m_cur_cls*/);
 
         for (TElTreeItem* node = tvItems->GetNextSelected(0); node; node = tvItems->GetNextSelected(node))
         {
-            if (node->Data) {
+            if (node->Data)
+            {
                 CCustomObject* O = (CCustomObject*)(node->Data);
                 O->Select(true);
                 ElEdit1->Text = O->Name;
@@ -343,7 +354,8 @@ void TfrmObjectList::UpdateSelection()
 void __fastcall TfrmObjectList::ebHideSelClick(TObject* Sender)
 {
     for (TElTreeItem* node = tvItems->GetNextSelected(0); node; node = tvItems->GetNextSelected(node))
-        if (node->Parent) ((CCustomObject*)(node->Data))->Show(false);
+        if (node->Parent)
+            ((CCustomObject*)(node->Data))->Show(false);
 
     UpdateState();
 }
@@ -353,7 +365,8 @@ void __fastcall TfrmObjectList::ebHideSelClick(TObject* Sender)
 void __fastcall TfrmObjectList::ebShowSelClick(TObject* Sender)
 {
     for (TElTreeItem* node = tvItems->GetNextSelected(0); node; node = tvItems->GetNextSelected(node))
-        if (node->Parent) {
+        if (node->Parent)
+        {
             ((CCustomObject*)(node->Data))->Show(true);
             ((CCustomObject*)(node->Data))->Select(true);
         }
@@ -362,17 +375,14 @@ void __fastcall TfrmObjectList::ebShowSelClick(TObject* Sender)
 
 //---------------------------------------------------------------------------
 
-void __fastcall TfrmObjectList::ebShowPropertiesClick(TObject* Sender)
-{
-    ExecCommand(COMMAND_SHOW_PROPERTIES);
-}
-
+void __fastcall TfrmObjectList::ebShowPropertiesClick(TObject* Sender) { ExecCommand(COMMAND_SHOW_PROPERTIES); }
 //---------------------------------------------------------------------------
 BOOL bForceInitListBox = FALSE;
 
 void __fastcall TfrmObjectList::sbRefreshListClick(TObject* Sender)
 {
-    if ((Scene->ObjCount() != obj_count) || (m_cur_cls != LTools->CurrentClassID()) || bForceInitListBox) {
+    if ((Scene->ObjCount() != obj_count) || (m_cur_cls != LTools->CurrentClassID()) || bForceInitListBox)
+    {
         InitListBox();
         bForceInitListBox = FALSE;
     }
@@ -382,11 +392,7 @@ void __fastcall TfrmObjectList::sbRefreshListClick(TObject* Sender)
 
 //---------------------------------------------------------------------------
 
-void __fastcall TfrmObjectList::tmRefreshListTimer(TObject* Sender)
-{
-    UpdateState();
-}
-
+void __fastcall TfrmObjectList::tmRefreshListTimer(TObject* Sender) { UpdateState(); }
 //---------------------------------------------------------------------------
 
 void __fastcall TfrmObjectList::FormClose(TObject* Sender, TCloseAction& Action)
@@ -400,7 +406,8 @@ void __fastcall TfrmObjectList::FormClose(TObject* Sender, TCloseAction& Action)
 
 void __fastcall TfrmObjectList::FormKeyDown(TObject* Sender, WORD& Key, TShiftState Shift)
 {
-    if (Key == VK_ESCAPE) sbClose->Click();
+    if (Key == VK_ESCAPE)
+        sbClose->Click();
 }
 
 //---------------------------------------------------------------------------
@@ -418,13 +425,15 @@ extern bool __fastcall LookupFunc(TElTreeItem* Item, void* SearchDetails);
 //---------------------------------------------------------------------------
 void __fastcall TfrmObjectList::tvItemsKeyPress(TObject* Sender, char& Key)
 {
-    if (Key == VK_RETURN) {
+    if (Key == VK_RETURN)
+    {
         ExecCommand(COMMAND_SHOW_PROPERTIES);
     }
     else
     {
         TElTreeItem* node = tvItems->Items->LookForItemEx(tvItems->Selected, -1, false, false, false, &Key, LookupFunc);
-        if (!node) node = tvItems->Items->LookForItemEx(0, -1, false, false, false, &Key, LookupFunc);
+        if (!node)
+            node = tvItems->Items->LookForItemEx(0, -1, false, false, false, &Key, LookupFunc);
 
         FHelper.RestoreSelection(tvItems, node, false);
     }
@@ -433,24 +442,17 @@ void __fastcall TfrmObjectList::tvItemsKeyPress(TObject* Sender, char& Key)
 //---------------------------------------------------------------------------
 #include "xrEngine/xr_input.h"
 
-void __fastcall TfrmObjectList::tvItemsItemFocused(TObject* Sender)
-{
-    UpdateSelection();
-}
-
+void __fastcall TfrmObjectList::tvItemsItemFocused(TObject* Sender) { UpdateSelection(); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfrmObjectList::tvItemsAfterSelectionChange(TObject* Sender)
-{
-    UpdateSelection();
-}
-
+void __fastcall TfrmObjectList::tvItemsAfterSelectionChange(TObject* Sender) { UpdateSelection(); }
 //---------------------------------------------------------------------------
 
 void __fastcall TfrmObjectList::tvItemsDblClick(TObject* Sender)
 {
     TElTreeItem* node = tvItems->ItemFocused;
-    if (node->Data) ExecCommand(COMMAND_SHOW_PROPERTIES);
+    if (node->Data)
+        ExecCommand(COMMAND_SHOW_PROPERTIES);
 }
 
 //---------------------------------------------------------------------------
@@ -469,11 +471,14 @@ void TfrmObjectList::ProcessFindItemInList(TElTreeItem* from, AnsiString str)
     bool bfound = false;
     for (TElTreeItem* node = from; node; node = node->GetNext())
     {
-        if (NULL == node->Data) continue;
+        if (NULL == node->Data)
+            continue;
 
         CCustomObject* O = (CCustomObject*)node->Data;
-        if (strstr(O->FName.c_str(), str.c_str())) {
-            if (find_node) {
+        if (strstr(O->FName.c_str(), str.c_str()))
+        {
+            if (find_node)
+            {
                 find_node->ParentColors = stored_parent_colors;
                 find_node->BkColor = storred_bk_color;
             }
@@ -490,7 +495,8 @@ void TfrmObjectList::ProcessFindItemInList(TElTreeItem* from, AnsiString str)
         }
     }
 
-    if (!bfound && find_node) {
+    if (!bfound && find_node)
+    {
         find_node->ParentColors = stored_parent_colors;
         find_node->BkColor = storred_bk_color;
         find_node = NULL;
@@ -499,7 +505,8 @@ void TfrmObjectList::ProcessFindItemInList(TElTreeItem* from, AnsiString str)
 
 void __fastcall TfrmObjectList::ElEdit1Exit(TObject* Sender)
 {
-    if (find_node) {
+    if (find_node)
+    {
         find_node->ParentColors = stored_parent_colors;
         find_node->BkColor = storred_bk_color;
     }
@@ -512,7 +519,8 @@ void __fastcall TfrmObjectList::ElEdit1Exit(TObject* Sender)
 
 void __fastcall TfrmObjectList::ElEdit1KeyDown(TObject* Sender, WORD& Key, TShiftState Shift)
 {
-    if (Key == VK_F3) {
+    if (Key == VK_F3)
+    {
         TElEdit* edt = ElEdit1;
         AnsiString str = edt->Text;
         ProcessFindItemInList(
@@ -525,7 +533,8 @@ void __fastcall TfrmObjectList::ElEdit1KeyDown(TObject* Sender, WORD& Key, TShif
 void __fastcall TfrmObjectList::tvItemsMouseDown(TObject* Sender, TMouseButton Button, TShiftState Shift, int X, int Y)
 {
     TElTreeItem* node = tvItems->GetNodeAt(X, Y);
-    if (node && NULL == node->Data) {
+    if (node && NULL == node->Data)
+    {
         if (node->Expanded)
             node->Collapse(Button == mbRight);
         else

@@ -57,9 +57,8 @@ public:
         Reset();
     }
     BOOL IsPlaying() { return playing; }
-
     u32 Width(bool bRealSize);
     u32 Height(bool bRealSize);
 };
 
-#endif  // xrTheora_SurfaceH
+#endif // xrTheora_SurfaceH

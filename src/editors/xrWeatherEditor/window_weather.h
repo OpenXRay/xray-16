@@ -22,7 +22,7 @@ ref class window_ide;
 public
 ref class window_weather : public WeifenLuo::WinFormsUI::DockContent
 {
-  public:
+public:
     window_weather(window_ide ^ ide) : m_ide(ide)
     {
         InitializeComponent();
@@ -31,35 +31,36 @@ ref class window_weather : public WeifenLuo::WinFormsUI::DockContent
         //
     }
 
-  protected:
+protected:
     /// <summary>
     /// Clean up any resources being used.
     /// </summary>
     ~window_weather()
     {
-        if (components) {
+        if (components)
+        {
             delete components;
         }
     }
 
-  private:
+private:
     System::Windows::Forms::ToolStrip ^ toolStrip1;
 
-  private:
+private:
     System::Windows::Forms::ToolStripButton ^ SaveButton;
 
-  private:
+private:
     XRay::SdkControls::PropertyGrid ^ PropertyGrid;
 
-  private:
+private:
     System::Windows::Forms::ToolStripButton ^ ReloadWeatherButton;
 
-  private:
+private:
     System::Windows::Forms::ToolStripButton ^ ReloadAllWeathersButton;
 
-  protected:
-  protected:
-  private:
+protected:
+protected:
+private:
     /// <summary>
     /// Required designer variable.
     /// </summary>
@@ -152,16 +153,16 @@ ref class window_weather : public WeifenLuo::WinFormsUI::DockContent
         this->PerformLayout();
     }
 #pragma endregion
-  private:
+private:
     window_ide ^ m_ide;
 
-  public:
+public:
     inline ::PropertyGrid ^ property_grid() { return this->PropertyGrid; }
 
         private : Void window_weather_Leave(Object ^ sender, EventArgs ^ e);
     Void SaveButton_Click(Object ^ sender, EventArgs ^ e);
     Void ReloadWeatherButton_Click(Object ^ sender, EventArgs ^ e);
     Void ReloadAllWeathersButton_Click(Object ^ sender, EventArgs ^ e);
-};  // ref class window_weather
+}; // ref class window_weather
 
-}  // namespace editor
+} // namespace editor

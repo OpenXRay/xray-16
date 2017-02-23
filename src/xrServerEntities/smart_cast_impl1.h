@@ -17,9 +17,9 @@ void add_smart_cast_stats_all(LPCSTR, LPCSTR);
 
 #ifdef MASTER_GOLD
 #define MAX_SEQUENCE_LENGTH 1
-#else  // #ifdef MASTER_GOLD
+#else // #ifdef MASTER_GOLD
 #define MAX_SEQUENCE_LENGTH 1
-#endif  // #ifdef MASTER_GOLD
+#endif // #ifdef MASTER_GOLD
 
 //#define SHOW_SMART_CAST_UNOPTIMIZED_CASES
 
@@ -286,7 +286,7 @@ struct CMatcher
         };
 
         typedef typename selector<object_type_traits::is_base_and_derived<typename Head::Head, Source>::value ||
-                                  object_type_traits::is_same<typename Head::Head, Source>::value>::result result;
+            object_type_traits::is_same<typename Head::Head, Source>::value>::result result;
     };
 
     template <>
@@ -382,8 +382,7 @@ struct conversion_sequence
         };
 
         typedef typename selector<can_use_heritage &&
-                                  object_type_traits::is_base_and_derived<typename Head::Head, Source>::value>::result
-            result;
+            object_type_traits::is_base_and_derived<typename Head::Head, Source>::value>::result result;
     };
 
     template <>
@@ -459,7 +458,8 @@ struct CSmartCaster
 
     IC static Target* smart_cast(Head* p)
     {
-        if (!p) return (reinterpret_cast<Target*>(p));
+        if (!p)
+            return (reinterpret_cast<Target*>(p));
         return (CHelper<typename Tail::Tail>::smart_cast(p));
     }
 };
@@ -506,7 +506,7 @@ template <typename T1, typename T2>
 IC T1* smart_cast(T2* p)
 {
     return (CHelper1<T1, T2>::smart_cast < object_type_traits::is_base_and_derived<T1, T2>::value ||
-            object_type_traits::is_same<T1, T2>::value > (p));
+        object_type_traits::is_same<T1, T2>::value > (p));
 }
 
 template <typename T2>
@@ -540,7 +540,8 @@ struct CHelper2
 #ifdef DEBUG
         add_smart_cast_stats(typeid(T2*).name(), typeid(void*).name());
 #endif
-        if (!p) return ((void*)0);
+        if (!p)
+            return ((void*)0);
         return (dynamic_cast<void*>(p));
     }
 };
@@ -552,14 +553,15 @@ IC T1 smart_cast(T2* p)
 #ifdef PURE_DYNAMIC_CAST_COMPATIBILITY_CHECK
     STATIC_CHECK(object_type_traits::is_pointer<T1>::value, Invalid_target_type_for_Dynamic_Cast);
     STATIC_CHECK(object_type_traits::is_void<object_type_traits::remove_pointer<T1>::type>::value ||
-                     std::is_polymorphic<object_type_traits::remove_pointer<T1>::type>::value,
+            std::is_polymorphic<object_type_traits::remove_pointer<T1>::type>::value,
         Invalid_target_type_for_Dynamic_Cast);
     STATIC_CHECK(std::is_polymorphic<T2>::value, Invalid_source_type_for_Dynamic_Cast);
 #endif
 #ifdef SMART_CAST_STATS_ALL
     add_smart_cast_stats_all(typeid(T2*).name(), typeid(T1).name());
 #endif
-    if (!p) return (reinterpret_cast<T1>(p));
+    if (!p)
+        return (reinterpret_cast<T1>(p));
     return (SmartDynamicCast::CHelper2<T2>::smart_cast<object_type_traits::remove_pointer<T1>::type>(p));
 }
 

@@ -13,16 +13,13 @@
 //------------------------------------------------------------------------------
 EObjectThumbnail::EObjectThumbnail(LPCSTR src_name, bool bLoad) : EImageThumbnail(src_name, ETObject)
 {
-    if (bLoad) Load();
+    if (bLoad)
+        Load();
 }
 
 //------------------------------------------------------------------------------
 
-EObjectThumbnail::~EObjectThumbnail()
-{
-    m_Pixels.clear();
-}
-
+EObjectThumbnail::~EObjectThumbnail() { m_Pixels.clear(); }
 //------------------------------------------------------------------------------
 
 void EObjectThumbnail::CreateFromData(u32* p, u32 w, u32 h, int fc, int vc)
@@ -42,13 +39,15 @@ bool EObjectThumbnail::Load(LPCSTR src_name, LPCSTR path)
         FS.update_path(fn, path, fn);
     else
         FS.update_path(fn, _objects_, fn);
-    if (!FS.exist(fn)) return false;
+    if (!FS.exist(fn))
+        return false;
 
     IReader* F = FS.r_open(fn);
     u16 version = 0;
 
     R_ASSERT(F->r_chunk(THM_CHUNK_VERSION, &version));
-    if (version != THM_OBJECT_VERSION) {
+    if (version != THM_OBJECT_VERSION)
+    {
         Msg("!Thumbnail: Unsupported version.");
         return false;
     }
@@ -78,7 +77,8 @@ bool EObjectThumbnail::Load(LPCSTR src_name, LPCSTR path)
 
 void EObjectThumbnail::Save(int age, LPCSTR path)
 {
-    if (!Valid()) return;
+    if (!Valid())
+        return;
 
     CMemoryWriter F;
     F.open_chunk(THM_CHUNK_VERSION);
@@ -101,7 +101,8 @@ void EObjectThumbnail::Save(int age, LPCSTR path)
     //.    else			FS.update_path(fn,_objects_,m_Name.c_str());
 
     strcpy(fn, m_Name.c_str());
-    if (F.save_to(fn)) {
+    if (F.save_to(fn))
+    {
         FS.set_file_age(fn, age ? age : m_Age);
     }
     else

@@ -110,7 +110,8 @@ xrMU_Model::_vertex* xrMU_Model::load_create_vertex(Fvector& P)
     // find similar
     for (u32 it = 0; it < m_vertices.size(); it++)
     {
-        if (m_vertices[it]->P.similar(P, .001f)) return m_vertices[it];
+        if (m_vertices[it]->P.similar(P, .001f))
+            return m_vertices[it];
     }
     // create new
     return create_vertex(P);

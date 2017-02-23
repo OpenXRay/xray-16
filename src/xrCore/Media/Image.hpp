@@ -49,7 +49,6 @@ public:
     }
 
     ~Image() {}
-
     Image& Create(u16 width, u16 height, void* data, ImageFormat format);
     void SaveTGA(IWriter& writer, bool align);
     void SaveTGA(IWriter& writer, ImageFormat format, bool align);

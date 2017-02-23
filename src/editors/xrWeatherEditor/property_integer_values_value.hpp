@@ -15,25 +15,25 @@
 public
 ref class property_integer_values_value : public property_integer, public property_integer_values_value_base
 {
-  public:
+public:
     typedef editor::property_holder::integer_getter_type integer_getter_type;
     typedef editor::property_holder::integer_setter_type integer_setter_type;
 
-  private:
+private:
     typedef property_integer inherited;
     typedef System::Collections::ArrayList collection_type;
     typedef System::Object Object;
     typedef System::Collections::IList IList;
 
-  public:
+public:
     property_integer_values_value(integer_getter_type const& getter, integer_setter_type const& setter,
         LPCSTR const* values, u32 const& value_count);
     virtual Object ^ GetValue() override;
     virtual void SetValue(Object ^ object) override;
     virtual IList ^ collection();
 
-  private:
+private:
     collection_type ^ m_collection;
-};  // ref class property_integer_values_value
+}; // ref class property_integer_values_value
 
-#endif  // ifndef PROPERTY_INTEGER_VALUES_VALUE_HPP_INCLUDED
+#endif // ifndef PROPERTY_INTEGER_VALUES_VALUE_HPP_INCLUDED

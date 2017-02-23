@@ -22,7 +22,4 @@ IC CScriptActionCondition::CScriptActionCondition(u32 dwFlags, double dTime)
     m_tStartTime = ALife::_TIME_ID(-1);
 }
 
-IC void CScriptActionCondition::initialize()
-{
-    m_tStartTime = Device.dwTimeGlobal;
-}
+IC void CScriptActionCondition::initialize() { m_tStartTime = Device.dwTimeGlobal; }

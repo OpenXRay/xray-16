@@ -7,16 +7,20 @@ extern void Detach(vecFace* S);
 
 IC BOOL FaceEqual(Face* F1, Face* F2)
 {
-    if (F1->dwMaterial != F2->dwMaterial) return FALSE;
-    if (F1->tc.size() != F2->tc.size()) return FALSE;
-    if (F1->lmap_layer != F2->lmap_layer) return FALSE;
+    if (F1->dwMaterial != F2->dwMaterial)
+        return FALSE;
+    if (F1->tc.size() != F2->tc.size())
+        return FALSE;
+    if (F1->lmap_layer != F2->lmap_layer)
+        return FALSE;
     return TRUE;
 }
 
 BOOL NeedMerge(vecFace& subdiv, Fbox& bb_base)
 {
     // 1. Amount of polygons
-    if (subdiv.size() >= u32(3 * c_SS_HighVertLimit / 4)) return FALSE;
+    if (subdiv.size() >= u32(3 * c_SS_HighVertLimit / 4))
+        return FALSE;
 
     // 2. Bounding box
     bb_base.invalidate();
@@ -27,13 +31,16 @@ BOOL NeedMerge(vecFace& subdiv, Fbox& bb_base)
         bb_base.modify(F->v[1]->P);
         bb_base.modify(F->v[2]->P);
     }
-    bb_base.grow(EPS_S);  // Enshure non-zero volume
+    bb_base.grow(EPS_S); // Enshure non-zero volume
 
     Fvector sz_base;
     bb_base.getsize(sz_base);
-    if (sz_base.x < c_SS_maxsize) return TRUE;
-    if (sz_base.y < c_SS_maxsize) return TRUE;
-    if (sz_base.z < c_SS_maxsize) return TRUE;
+    if (sz_base.x < c_SS_maxsize)
+        return TRUE;
+    if (sz_base.y < c_SS_maxsize)
+        return TRUE;
+    if (sz_base.z < c_SS_maxsize)
+        return TRUE;
     return FALSE;
 }
 
@@ -42,8 +49,10 @@ float Cuboid(Fbox& BB)
     Fvector sz;
     BB.getsize(sz);
     float min = sz.x;
-    if (sz.y < min) min = sz.y;
-    if (sz.z < min) min = sz.z;
+    if (sz.y < min)
+        min = sz.y;
+    if (sz.z < min)
+        min = sz.z;
 
     float volume_cube = min * min * min;
     float volume = sz.x * sz.y * sz.z;
@@ -55,8 +64,10 @@ IC void MakeCube(Fbox& BB_dest, const Fbox& BB_src)
     Fvector C, D;
     BB_src.get_CD(C, D);
     float max = D.x;
-    if (D.y > max) max = D.y;
-    if (D.z > max) max = D.z;
+    if (D.y > max)
+        max = D.y;
+    if (D.z > max)
+        max = D.z;
 
     BB_dest.set(C, C);
     BB_dest.grow(max);
@@ -74,7 +85,8 @@ IC BOOL ValidateMergeLinearSize(const Fvector& merged, const Fvector& orig1, con
 IC BOOL ValidateMerge(u32 f1, const Fbox& bb_base, const Fbox& bb_base_orig, u32 f2, const Fbox& bb, float& volume)
 {
     // Polygons
-    if ((f1 + f2) > u32(4 * c_SS_HighVertLimit / 3)) return FALSE;  // Don't exceed limits (4/3 max POLY)
+    if ((f1 + f2) > u32(4 * c_SS_HighVertLimit / 3))
+        return FALSE; // Don't exceed limits (4/3 max POLY)
 
     // Size
     Fbox merge;
@@ -89,9 +101,12 @@ IC BOOL ValidateMerge(u32 f1, const Fbox& bb_base, const Fbox& bb_base_orig, u32
     //	if (sz.y>(4*c_SS_maxsize/3))			return FALSE;
     //	if (sz.z>(4*c_SS_maxsize/3))			return FALSE;
 
-    if (!ValidateMergeLinearSize(sz, orig1, orig2, 0)) return FALSE;  // Don't exceed limits (4/3 GEOM)
-    if (!ValidateMergeLinearSize(sz, orig1, orig2, 1)) return FALSE;
-    if (!ValidateMergeLinearSize(sz, orig1, orig2, 2)) return FALSE;
+    if (!ValidateMergeLinearSize(sz, orig1, orig2, 0))
+        return FALSE; // Don't exceed limits (4/3 GEOM)
+    if (!ValidateMergeLinearSize(sz, orig1, orig2, 1))
+        return FALSE;
+    if (!ValidateMergeLinearSize(sz, orig1, orig2, 2))
+        return FALSE;
 
     // Volume
     Fbox bb0, bb1;
@@ -99,8 +114,9 @@ IC BOOL ValidateMerge(u32 f1, const Fbox& bb_base, const Fbox& bb_base_orig, u32
     float v1 = bb0.getvolume();
     MakeCube(bb1, bb);
     float v2 = bb1.getvolume();
-    volume = merge.getvolume();                        // / Cuboid(merge);
-    if (volume > 2 * 2 * 2 * (v1 + v2)) return FALSE;  // Don't merge too distant groups (8 vol)
+    volume = merge.getvolume(); // / Cuboid(merge);
+    if (volume > 2 * 2 * 2 * (v1 + v2))
+        return FALSE; // Don't merge too distant groups (8 vol)
 
     // OK
     return TRUE;
@@ -118,7 +134,7 @@ typedef struct MERGEGM_PARAMS
     vecFace* subdiv;
     Fbox* bb_base_orig;
     Fbox* bb_base;
-    HANDLE hEvents[3];  // 0=start,1=terminate,2=ready
+    HANDLE hEvents[3]; // 0=start,1=terminate,2=ready
 } * LP_MERGEGM_PARAMS;
 
 static CRITICAL_SECTION mergegm_cs;
@@ -148,15 +164,16 @@ DWORD WINAPI MergeGmThreadProc(LPVOID lpParameter)
             // Error ?
             ExitThread(1);
             break;
-        }  // switch
-    }      // while
+        } // switch
+    } // while
 
     return 0;
 }
 
 void InitMergeGmThreads()
 {
-    if (mergegm_threads_initialized) return;
+    if (mergegm_threads_initialized)
+        return;
 
     SYSTEM_INFO SystemInfo;
     GetSystemInfo(&SystemInfo);
@@ -187,7 +204,8 @@ void InitMergeGmThreads()
 
 void DoneMergeGmThreads()
 {
-    if (!mergegm_threads_initialized) return;
+    if (!mergegm_threads_initialized)
+        return;
 
     // Asking helper threads to terminate
     for (u32 i = 0; i < mergegm_threads_count; i++)
@@ -236,7 +254,7 @@ void FindBestMergeCandidate_threads(u32* selected, float* selected_volume, u32 s
         mergegm_params[i].bb_base = bb_base;
 
         SetEvent(mergegm_params[i].hEvents[0]);
-    }  // for
+    } // for
 
     // Wait for result
     WaitForMultipleObjects(mergegm_threads_count, mergegm_ready_events, TRUE, INFINITE);
@@ -244,7 +262,8 @@ void FindBestMergeCandidate_threads(u32* selected, float* selected_volume, u32 s
     // Compose results
     for (u32 i = 0; i < mergegm_threads_count; i++)
     {
-        if (mergegm_params[i].selected_volume < *selected_volume) {
+        if (mergegm_params[i].selected_volume < *selected_volume)
+        {
             *selected = mergegm_params[i].selected;
             *selected_volume = mergegm_params[i].selected_volume;
         }
@@ -260,11 +279,15 @@ void FindBestMergeCandidate(u32* selected, float* selected_volume, u32 split, u3
         float volume;
         vecFace& TEST = *(g_XSplit[test]);
 
-        if (!FaceEqual(subdiv->front(), TEST.front())) continue;
-        if (!NeedMerge(TEST, bb)) continue;
-        if (!ValidateMerge(subdiv->size(), *bb_base, *bb_base_orig, TEST.size(), bb, volume)) continue;
+        if (!FaceEqual(subdiv->front(), TEST.front()))
+            continue;
+        if (!NeedMerge(TEST, bb))
+            continue;
+        if (!ValidateMerge(subdiv->size(), *bb_base, *bb_base_orig, TEST.size(), bb, volume))
+            continue;
 
-        if (volume < *selected_volume) {
+        if (volume < *selected_volume)
+        {
             *selected = test;
             *selected_volume = volume;
         }
@@ -287,7 +310,8 @@ void CBuild::xrPhase_MergeGeometry()
         while (NeedMerge(subdiv, bb_base))
         {
             //	Save original AABB for later tests
-            if (!bb_base_orig_inited) {
+            if (!bb_base_orig_inited)
+            {
                 bb_base_orig_inited = true;
                 bb_base_orig = bb_base;
             }
@@ -296,7 +320,8 @@ void CBuild::xrPhase_MergeGeometry()
             u32 selected = split;
             float selected_volume = flt_max;
 
-            if ((g_XSplit.size() - split) < 200) {  // may need adjustment
+            if ((g_XSplit.size() - split) < 200)
+            { // may need adjustment
                 // single thread
                 FindBestMergeCandidate(
                     &selected, &selected_volume, split + 1, g_XSplit.size(), &subdiv, &bb_base_orig, &bb_base);
@@ -308,7 +333,8 @@ void CBuild::xrPhase_MergeGeometry()
                     &selected, &selected_volume, split + 1, g_XSplit.size(), &subdiv, &bb_base_orig, &bb_base);
             }
 
-            if (selected == split) break;  // No candidates for merge
+            if (selected == split)
+                break; // No candidates for merge
 
             // **OK**. Perform merge
             subdiv.insert(subdiv.begin(), g_XSplit[selected]->begin(), g_XSplit[selected]->end());

@@ -15,7 +15,8 @@ CUIStatsIcon::CUIStatsIcon()
 
 void CUIStatsIcon::InitTexInfo()
 {
-    if (m_tex_info[RANK_0][0].sh->inited()) return;
+    if (m_tex_info[RANK_0][0].sh->inited())
+        return;
     // ranks
     string128 rank_tex;
     for (int i = RANK_0; i <= RANK_4; i++)
@@ -67,16 +68,19 @@ void CUIStatsIcon::FreeTexInfo()
 
 void CUIStatsIcon::SetValue(LPCSTR str)
 {
-    if (0 == str[0]) {
+    if (0 == str[0])
+    {
         SetVisible(false);
         return;
     }
     else
         SetVisible(true);
 
-    if (strstr(str, "status")) {
+    if (strstr(str, "status"))
+    {
         int team = 1;
-        if (strstr(str, "green")) team = 0;
+        if (strstr(str, "green"))
+            team = 0;
 
         int rank = atoi(strstr(str, "0")) - 1;
 

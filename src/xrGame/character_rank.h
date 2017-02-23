@@ -38,7 +38,6 @@ public:
     shared_str id() const;
     int index() const { return m_current_index; };
     CHARACTER_RANK_VALUE value() const { return m_current_value; };
-
     static int ValueToIndex(CHARACTER_RANK_VALUE);
 
 private:

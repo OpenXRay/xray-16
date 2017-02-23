@@ -27,13 +27,15 @@ float CActor::GetWeaponAccuracy() const
 {
     CWeapon* W = smart_cast<CWeapon*>(inventory().ActiveItem());
 
-    if (IsZoomAimingMode() && W && !GetWeaponParam(W, IsRotatingToZoom(), false)) {
+    if (IsZoomAimingMode() && W && !GetWeaponParam(W, IsRotatingToZoom(), false))
+    {
         return m_fDispAim;
     }
     float dispersion = m_fDispBase * GetWeaponParam(W, Get_PDM_Base(), 1.0f);
 
     CEntity::SEntityState state;
-    if (g_State(state)) {
+    if (g_State(state))
+    {
         // fAVelocity = angle velocity
         dispersion *=
             (1.0f + (state.fAVelocity / VEL_A_MAX) * m_fDispVelFactor * GetWeaponParam(W, Get_PDM_Vel_F(), 1.0f));
@@ -42,13 +44,16 @@ float CActor::GetWeaponAccuracy() const
             (1.0f + (state.fVelocity / VEL_MAX) * m_fDispVelFactor * GetWeaponParam(W, Get_PDM_Vel_F(), 1.0f));
 
         bool bAccelerated = isActorAccelerated(mstate_real, IsZoomAimingMode());
-        if (bAccelerated || !state.bCrouch) {
+        if (bAccelerated || !state.bCrouch)
+        {
             dispersion *= (1.0f + m_fDispAccelFactor * GetWeaponParam(W, Get_PDM_Accel_F(), 1.0f));
         }
 
-        if (state.bCrouch) {
+        if (state.bCrouch)
+        {
             dispersion *= (1.0f + m_fDispCrouchFactor * GetWeaponParam(W, Get_PDM_Crouch(), 1.0f));
-            if (!bAccelerated) {
+            if (!bAccelerated)
+            {
                 dispersion *= (1.0f + m_fDispCrouchNoAccelFactor * GetWeaponParam(W, Get_PDM_Crouch_NA(), 1.0f));
             }
         }
@@ -62,7 +67,8 @@ void CActor::g_fireParams(const CHudItem* pHudItem, Fvector& fire_pos, Fvector& 
     fire_dir = Cameras().Direction();
 
     const CMissile* pMissile = smart_cast<const CMissile*>(pHudItem);
-    if (pMissile) {
+    if (pMissile)
+    {
         Fvector offset;
         XFORM().transform_dir(offset, pMissile->throw_point_offset());
         fire_pos.add(offset);
@@ -89,7 +95,8 @@ BOOL CActor::g_State(SEntityState& state) const
 
 void CActor::SetCantRunState(bool bDisable)
 {
-    if (g_Alive() && this == Level().CurrentControlEntity()) {
+    if (g_Alive() && this == Level().CurrentControlEntity())
+    {
         NET_Packet P;
         u_EventGen(P, GEG_PLAYER_DISABLE_SPRINT, ID());
         P.w_s8(bDisable ? 1 : -1);
@@ -98,7 +105,8 @@ void CActor::SetCantRunState(bool bDisable)
 }
 void CActor::SetWeaponHideState(u16 State, bool bSet)
 {
-    if (g_Alive() && this == Level().CurrentControlEntity()) {
+    if (g_Alive() && this == Level().CurrentControlEntity())
+    {
         NET_Packet P;
         u_EventGen(P, GEG_PLAYER_WEAPON_HIDE_STATE, ID());
         P.w_u16(State);
@@ -107,15 +115,17 @@ void CActor::SetWeaponHideState(u16 State, bool bSet)
     };
 }
 static u16 BestWeaponSlots[] = {
-    INV_SLOT_3,    // 2
-    INV_SLOT_2,    // 1
-    GRENADE_SLOT,  // 3
-    KNIFE_SLOT,    // 0
+    INV_SLOT_3, // 2
+    INV_SLOT_2, // 1
+    GRENADE_SLOT, // 3
+    KNIFE_SLOT, // 0
 };
 void CActor::SelectBestWeapon(IGameObject* O)
 {
-    if (!O) return;
-    if (IsGameTypeSingle()) return;
+    if (!O)
+        return;
+    if (IsGameTypeSingle())
+        return;
     // if (Level().CurrentControlEntity() != this) return;
     // if (OnClient()) return;
     //-------------------------------------------------
@@ -125,37 +135,44 @@ void CActor::SelectBestWeapon(IGameObject* O)
     CInventoryItem* pIItem = smart_cast<CInventoryItem*>(O);
     bool NeedToSelectBestWeapon = false;
 
-    if (pArtefact && pArtefact->H_Parent())  // just take an artefact
+    if (pArtefact && pArtefact->H_Parent()) // just take an artefact
         return;
 
-    if ((pWeapon || pGrenade || pArtefact) && pIItem) {
+    if ((pWeapon || pGrenade || pArtefact) && pIItem)
+    {
         NeedToSelectBestWeapon = true;
-        if ((GameID() == eGameIDArtefactHunt) || (GameID() == eGameIDCaptureTheArtefact))  // only for test...
+        if ((GameID() == eGameIDArtefactHunt) || (GameID() == eGameIDCaptureTheArtefact)) // only for test...
         {
-            if (pIItem->BaseSlot() == INV_SLOT_2 || pIItem->BaseSlot() == INV_SLOT_3) {
+            if (pIItem->BaseSlot() == INV_SLOT_2 || pIItem->BaseSlot() == INV_SLOT_3)
+            {
                 CInventoryItem* pIItemInSlot = inventory().ItemFromSlot(pIItem->BaseSlot());
-                if (pIItemInSlot != NULL && pIItemInSlot != pIItem) NeedToSelectBestWeapon = false;
+                if (pIItemInSlot != NULL && pIItemInSlot != pIItem)
+                    NeedToSelectBestWeapon = false;
             }
         }
     }
-    if (!NeedToSelectBestWeapon) return;
+    if (!NeedToSelectBestWeapon)
+        return;
     //-------------------------------------------------
     for (int i = 0; i < 4; i++)
     {
-        if (inventory().ItemFromSlot(BestWeaponSlots[i])) {
-            if (inventory().GetActiveSlot() != BestWeaponSlots[i]) {
+        if (inventory().ItemFromSlot(BestWeaponSlots[i]))
+        {
+            if (inventory().GetActiveSlot() != BestWeaponSlots[i])
+            {
                 PIItem best_item = inventory().ItemFromSlot(BestWeaponSlots[i]);
-                if (best_item && best_item->can_kill()) {
+                if (best_item && best_item->can_kill())
+                {
 #ifdef DEBUG
                     Msg("--- Selecting best weapon [%d], Frame[%d]", BestWeaponSlots[i], Device.dwFrame);
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
                     inventory().Activate(BestWeaponSlots[i]);
                 }
                 else
                 {
 #ifdef DEBUG
                     Msg("--- Weapon is not best...");
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
                 }
             }
             return;
@@ -168,25 +185,32 @@ BOOL g_bShowHitSectors = TRUE;
 
 void CActor::HitSector(IGameObject* who, IGameObject* weapon)
 {
-    if (!g_bShowHitSectors) return;
-    if (!g_Alive()) return;
+    if (!g_bShowHitSectors)
+        return;
+    if (!g_Alive())
+        return;
 
     bool bShowHitSector = true;
 
     CEntityAlive* pEntityAlive = smart_cast<CEntityAlive*>(who);
 
-    if (!pEntityAlive || this == who) bShowHitSector = false;
+    if (!pEntityAlive || this == who)
+        bShowHitSector = false;
 
-    if (weapon) {
+    if (weapon)
+    {
         CWeapon* pWeapon = smart_cast<CWeapon*>(weapon);
-        if (pWeapon) {
-            if (pWeapon->IsSilencerAttached()) {
+        if (pWeapon)
+        {
+            if (pWeapon->IsSilencerAttached())
+            {
                 bShowHitSector = false;
             }
         }
     }
 
-    if (!bShowHitSector) return;
+    if (!bShowHitSector)
+        return;
     Level().MapManager().AddMapLocation(ENEMY_HIT_SPOT, who->ID());
 }
 
@@ -196,12 +220,14 @@ void CActor::on_weapon_shot_start(CWeapon* weapon)
     CameraRecoil const& camera_recoil = (IsZoomAimingMode()) ? weapon->zoom_cam_recoil : weapon->cam_recoil;
 
     CCameraShotEffector* effector = smart_cast<CCameraShotEffector*>(Cameras().GetCamEffector(eCEShot));
-    if (!effector) {
+    if (!effector)
+    {
         effector = (CCameraShotEffector*)Cameras().AddCamEffector(new CCameraShotEffector(camera_recoil));
     }
     else
     {
-        if (effector->m_WeaponID != weapon->ID()) {
+        if (effector->m_WeaponID != weapon->ID())
+        {
             effector->Initialize(camera_recoil);
         }
     }
@@ -217,20 +243,18 @@ void CActor::on_weapon_shot_start(CWeapon* weapon)
 void CActor::on_weapon_shot_update()
 {
     CCameraShotEffector* effector = smart_cast<CCameraShotEffector*>(Cameras().GetCamEffector(eCEShot));
-    if (effector) {
+    if (effector)
+    {
         update_camera(effector);
     }
 }
 
-void CActor::on_weapon_shot_remove(CWeapon* weapon)
-{
-    Cameras().RemoveCamEffector(eCEShot);
-}
-
+void CActor::on_weapon_shot_remove(CWeapon* weapon) { Cameras().RemoveCamEffector(eCEShot); }
 void CActor::on_weapon_shot_stop()
 {
     CCameraShotEffector* effector = smart_cast<CCameraShotEffector*>(Cameras().GetCamEffector(eCEShot));
-    if (effector && effector->IsActive()) {
+    if (effector && effector->IsActive())
+    {
         effector->StopShoting();
     }
 }
@@ -238,7 +262,8 @@ void CActor::on_weapon_shot_stop()
 void CActor::on_weapon_hide(CWeapon* weapon)
 {
     CCameraShotEffector* effector = smart_cast<CCameraShotEffector*>(Cameras().GetCamEffector(eCEShot));
-    if (effector && effector->IsActive()) effector->Reset();
+    if (effector && effector->IsActive())
+        effector->Reset();
 }
 
 Fvector CActor::weapon_recoil_delta_angle()
@@ -246,7 +271,8 @@ Fvector CActor::weapon_recoil_delta_angle()
     CCameraShotEffector* effector = smart_cast<CCameraShotEffector*>(Cameras().GetCamEffector(eCEShot));
     Fvector result = {0.f, 0.f, 0.f};
 
-    if (effector) effector->GetDeltaAngle(result);
+    if (effector)
+        effector->GetDeltaAngle(result);
 
     return (result);
 }
@@ -256,7 +282,8 @@ Fvector CActor::weapon_recoil_last_delta()
     CCameraShotEffector* effector = smart_cast<CCameraShotEffector*>(Cameras().GetCamEffector(eCEShot));
     Fvector result = {0.f, 0.f, 0.f};
 
-    if (effector) effector->GetLastDelta(result);
+    if (effector)
+        effector->GetLastDelta(result);
 
     return (result);
 }
@@ -264,11 +291,14 @@ Fvector CActor::weapon_recoil_last_delta()
 
 void CActor::SpawnAmmoForWeapon(CInventoryItem* pIItem)
 {
-    if (OnClient()) return;
-    if (!pIItem) return;
+    if (OnClient())
+        return;
+    if (!pIItem)
+        return;
 
     CWeaponMagazined* pWM = smart_cast<CWeaponMagazined*>(pIItem);
-    if (!pWM || !pWM->AutoSpawnAmmo()) return;
+    if (!pWM || !pWM->AutoSpawnAmmo())
+        return;
 
     ///	CWeaponAmmo* pAmmo = smart_cast<CWeaponAmmo*>(inventory().GetAny( (pWM->m_ammoTypes[0].c_str()) ));
     //	if (!pAmmo)
@@ -277,14 +307,18 @@ void CActor::SpawnAmmoForWeapon(CInventoryItem* pIItem)
 
 void CActor::RemoveAmmoForWeapon(CInventoryItem* pIItem)
 {
-    if (OnClient()) return;
-    if (!pIItem) return;
+    if (OnClient())
+        return;
+    if (!pIItem)
+        return;
 
     CWeaponMagazined* pWM = smart_cast<CWeaponMagazined*>(pIItem);
-    if (!pWM || !pWM->AutoSpawnAmmo()) return;
+    if (!pWM || !pWM->AutoSpawnAmmo())
+        return;
 
     CWeaponAmmo* pAmmo = smart_cast<CWeaponAmmo*>(inventory().GetAny(pWM->m_ammoTypes[0].c_str()));
-    if (!pAmmo) return;
+    if (!pAmmo)
+        return;
     //--- мы нашли патроны к текущему оружию
     /*
     //--- проверяем не подходят ли они к чему-то еще

@@ -40,7 +40,8 @@ void CUISpeechMenu::InitList(LPCSTR section_name)
     for (int i = 0; true; ++i)
     {
         xr_sprintf(phrase, "phrase_%i", i);
-        if (pSettings->line_exist(section_name, phrase)) {
+        if (pSettings->line_exist(section_name, phrase))
+        {
             LPCSTR s = pSettings->r_string(section_name, phrase);
             _GetItem(s, 0, phrase);
             xr_sprintf(str, "%d. %s", i + 1, CStringTable().translate(phrase).c_str());
@@ -56,7 +57,8 @@ void CUISpeechMenu::InitList(LPCSTR section_name)
 
 bool CUISpeechMenu::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
-    if (dik < DIK_1 || dik > DIK_0) return CUIDialogWnd::OnKeyboardAction(dik, keyboard_action);
+    if (dik < DIK_1 || dik > DIK_0)
+        return CUIDialogWnd::OnKeyboardAction(dik, keyboard_action);
 
     game_cl_mp* game = smart_cast<game_cl_mp*>(&Game());
 

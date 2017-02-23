@@ -10,10 +10,7 @@
 TNewEffectDialog* NewEffectDialog;
 
 //---------------------------------------------------------------------------
-__fastcall TNewEffectDialog::TNewEffectDialog(TComponent* Owner) : TForm(Owner)
-{
-}
-
+__fastcall TNewEffectDialog::TNewEffectDialog(TComponent* Owner) : TForm(Owner) {}
 //---------------------------------------------------------------------------
 void __fastcall TNewEffectDialog::TimeChange(TObject* Sender)
 {

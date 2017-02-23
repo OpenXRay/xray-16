@@ -9,17 +9,14 @@ dxConsoleRender::dxConsoleRender()
 #endif
 }
 
-void dxConsoleRender::Copy(IConsoleRender& _in)
-{
-    *this = *(dxConsoleRender*)&_in;
-}
-
+void dxConsoleRender::Copy(IConsoleRender& _in) { *this = *(dxConsoleRender*)&_in; }
 void dxConsoleRender::OnRender(bool bGame)
 {
     VERIFY(HW.pDevice);
 
     D3DRECT R = {0, 0, Device.dwWidth, Device.dwHeight};
-    if (bGame) R.y2 /= 2;
+    if (bGame)
+        R.y2 /= 2;
 
 #if defined(USE_DX10) || defined(USE_DX11)
     u32 vOffset = 0;
@@ -39,7 +36,7 @@ void dxConsoleRender::OnRender(bool bGame)
     RCache.set_Geometry(m_Geom);
 
     RCache.Render(D3DPT_TRIANGLELIST, vOffset, 0, 4, 0, 2);
-#else   //	USE_DX10
+#else //	USE_DX10
     CHK_DX(HW.pDevice->Clear(1, &R, D3DCLEAR_TARGET, color_xrgb(32, 32, 32), 1, 0));
-#endif  //	USE_DX10
+#endif //	USE_DX10
 }

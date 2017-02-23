@@ -32,13 +32,13 @@ CUIArtefactParams::~CUIArtefactParams()
     xr_delete(m_Prop_line);
 }
 
-LPCSTR af_immunity_section_names[] =  // ALife::EInfluenceType
+LPCSTR af_immunity_section_names[] = // ALife::EInfluenceType
     {
-        "radiation_immunity",      // infl_rad=0
-        "burn_immunity",           // infl_fire=1
-        "chemical_burn_immunity",  // infl_acid=2
-        "telepatic_immunity",      // infl_psi=3
-        "shock_immunity",          // infl_electra=4
+        "radiation_immunity", // infl_rad=0
+        "burn_immunity", // infl_fire=1
+        "chemical_burn_immunity", // infl_acid=2
+        "telepatic_immunity", // infl_psi=3
+        "shock_immunity", // infl_electra=4
 
         //	"strike_immunity",
         //	"wound_immunity",
@@ -46,22 +46,22 @@ LPCSTR af_immunity_section_names[] =  // ALife::EInfluenceType
         //	"fire_wound_immunity",
 };
 
-LPCSTR af_restore_section_names[] =  // ALife::EConditionRestoreType
+LPCSTR af_restore_section_names[] = // ALife::EConditionRestoreType
     {
-        "health_restore_speed",     // eHealthRestoreSpeed=0
-        "satiety_restore_speed",    // eSatietyRestoreSpeed=1
-        "power_restore_speed",      // ePowerRestoreSpeed=2
-        "bleeding_restore_speed",   // eBleedingRestoreSpeed=3
-        "radiation_restore_speed",  // eRadiationRestoreSpeed=4
+        "health_restore_speed", // eHealthRestoreSpeed=0
+        "satiety_restore_speed", // eSatietyRestoreSpeed=1
+        "power_restore_speed", // ePowerRestoreSpeed=2
+        "bleeding_restore_speed", // eBleedingRestoreSpeed=3
+        "radiation_restore_speed", // eRadiationRestoreSpeed=4
 };
 
-LPCSTR af_immunity_caption[] =  // ALife::EInfluenceType
+LPCSTR af_immunity_caption[] = // ALife::EInfluenceType
     {
-        "ui_inv_outfit_radiation_protection",      // "(radiation_imm)",
-        "ui_inv_outfit_burn_protection",           // "(burn_imm)",
-        "ui_inv_outfit_chemical_burn_protection",  // "(chemical_burn_imm)",
-        "ui_inv_outfit_telepatic_protection",      // "(telepatic_imm)",
-        "ui_inv_outfit_shock_protection",          // "(shock_imm)",
+        "ui_inv_outfit_radiation_protection", // "(radiation_imm)",
+        "ui_inv_outfit_burn_protection", // "(burn_imm)",
+        "ui_inv_outfit_chemical_burn_protection", // "(chemical_burn_imm)",
+        "ui_inv_outfit_telepatic_protection", // "(telepatic_imm)",
+        "ui_inv_outfit_shock_protection", // "(shock_imm)",
 
         //	"ui_inv_outfit_strike_protection",			// "(strike_imm)",
         //	"ui_inv_outfit_wound_protection",			// "(wound_imm)",
@@ -69,7 +69,7 @@ LPCSTR af_immunity_caption[] =  // ALife::EInfluenceType
         //	"ui_inv_outfit_fire_wound_protection",		// "(fire_wound_imm)",
 };
 
-LPCSTR af_restore_caption[] =  // ALife::EConditionRestoreType
+LPCSTR af_restore_caption[] = // ALife::EConditionRestoreType
     {
         "ui_inv_health", "ui_inv_satiety", "ui_inv_power", "ui_inv_bleeding", "ui_inv_radiation",
 };
@@ -91,7 +91,8 @@ void CUIArtefactParams::InitFromXml(CUIXml& xml)
 
     XML_NODE* stored_root = xml.GetLocalRoot();
     XML_NODE* base_node = xml.NavigateToNode(base, 0);
-    if (!base_node) {
+    if (!base_node)
+    {
         return;
     }
     CUIXmlInit::InitWindow(xml, base, 0, this);
@@ -151,7 +152,8 @@ void CUIArtefactParams::SetInfo(shared_str const& af_section)
     AttachChild(m_Prop_line);
 
     CActor* actor = smart_cast<CActor*>(Level().CurrentViewEntity());
-    if (!actor) {
+    if (!actor)
+    {
         return;
     }
 
@@ -163,7 +165,8 @@ void CUIArtefactParams::SetInfo(shared_str const& af_section)
     {
         shared_str const& sect = pSettings->r_string(af_section, "hit_absorbation_sect");
         val = pSettings->r_float(sect, af_immunity_section_names[i]);
-        if (fis_zero(val)) {
+        if (fis_zero(val))
+        {
             continue;
         }
         max_val = actor->conditions().GetZoneMaxPower((ALife::EInfluenceType)i);
@@ -180,7 +183,8 @@ void CUIArtefactParams::SetInfo(shared_str const& af_section)
 
     {
         val = pSettings->r_float(af_section, "additional_inventory_weight");
-        if (!fis_zero(val)) {
+        if (!fis_zero(val))
+        {
             m_additional_weight->SetValue(val);
 
             pos.set(m_additional_weight->GetWndPos());
@@ -195,7 +199,8 @@ void CUIArtefactParams::SetInfo(shared_str const& af_section)
     for (u32 i = 0; i < ALife::eRestoreTypeMax; ++i)
     {
         val = pSettings->r_float(af_section, af_restore_section_names[i]);
-        if (fis_zero(val)) {
+        if (fis_zero(val))
+        {
             continue;
         }
         m_restore_item[i]->SetValue(val);
@@ -225,10 +230,7 @@ UIArtefactParamItem::UIArtefactParamItem()
     m_texture_plus._set("");
 }
 
-UIArtefactParamItem::~UIArtefactParamItem()
-{
-}
-
+UIArtefactParamItem::~UIArtefactParamItem() {}
 void UIArtefactParamItem::Init(CUIXml& xml, LPCSTR section)
 {
     CUIXmlInit::InitWindow(xml, section, 0, this);
@@ -243,7 +245,8 @@ void UIArtefactParamItem::Init(CUIXml& xml, LPCSTR section)
     m_unit_str._set(CStringTable().translate(unit_str));
 
     LPCSTR texture_minus = xml.Read("texture_minus", 0, "");
-    if (texture_minus && xr_strlen(texture_minus)) {
+    if (texture_minus && xr_strlen(texture_minus))
+    {
         m_texture_minus._set(texture_minus);
 
         LPCSTR texture_plus = xml.Read("caption:texture", 0, "");
@@ -252,11 +255,7 @@ void UIArtefactParamItem::Init(CUIXml& xml, LPCSTR section)
     }
 }
 
-void UIArtefactParamItem::SetCaption(LPCSTR name)
-{
-    m_caption->TextItemControl()->SetText(name);
-}
-
+void UIArtefactParamItem::SetCaption(LPCSTR name) { m_caption->TextItemControl()->SetText(name); }
 void UIArtefactParamItem::SetValue(float value)
 {
     value *= m_magnitude;
@@ -264,10 +263,11 @@ void UIArtefactParamItem::SetValue(float value)
     xr_sprintf(buf, "%+.0f", value);
 
     LPSTR str;
-    if (m_unit_str.size()) {
+    if (m_unit_str.size())
+    {
         STRCONCAT(str, buf, " ", m_unit_str.c_str());
     }
-    else  // = ""
+    else // = ""
     {
         STRCONCAT(str, buf);
     }
@@ -278,8 +278,10 @@ void UIArtefactParamItem::SetValue(float value)
     u32 color = (positive) ? green_clr : red_clr;
     m_value->SetTextColor(color);
 
-    if (m_texture_minus.size()) {
-        if (positive) {
+    if (m_texture_minus.size())
+    {
+        if (positive)
+        {
             m_caption->InitTexture(m_texture_plus.c_str());
         }
         else

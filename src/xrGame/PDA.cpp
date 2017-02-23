@@ -19,10 +19,7 @@ CPda::CPda(void)
     TurnOff();
 }
 
-CPda::~CPda()
-{
-}
-
+CPda::~CPda() {}
 BOOL CPda::net_Spawn(CSE_Abstract* DC)
 {
     inherited::net_Spawn(DC);
@@ -55,12 +52,15 @@ void CPda::shedule_Update(u32 dt)
 {
     inherited::shedule_Update(dt);
 
-    if (!H_Parent()) return;
+    if (!H_Parent())
+        return;
     Position().set(H_Parent()->Position());
 
-    if (IsOn() && Level().CurrentEntity() && Level().CurrentEntity()->ID() == H_Parent()->ID()) {
+    if (IsOn() && Level().CurrentEntity() && Level().CurrentEntity()->ID() == H_Parent()->ID())
+    {
         CEntityAlive* EA = smart_cast<CEntityAlive*>(H_Parent());
-        if (!EA || !EA->g_Alive()) {
+        if (!EA || !EA->g_Alive())
+        {
             TurnOff();
             return;
         }
@@ -77,7 +77,8 @@ void CPda::UpdateActiveContacts()
     for (; it != feel_touch.end(); ++it)
     {
         CEntityAlive* pEA = smart_cast<CEntityAlive*>(*it);
-        if (!!pEA->g_Alive() && !pEA->cast_base_monster()) {
+        if (!!pEA->g_Alive() && !pEA->cast_base_monster())
+        {
             m_active_contacts.push_back(*it);
         }
     }
@@ -85,7 +86,8 @@ void CPda::UpdateActiveContacts()
 
 void CPda::feel_touch_new(IGameObject* O)
 {
-    if (CInventoryOwner* pNewContactInvOwner = smart_cast<CInventoryOwner*>(O)) {
+    if (CInventoryOwner* pNewContactInvOwner = smart_cast<CInventoryOwner*>(O))
+    {
         CInventoryOwner* pOwner = smart_cast<CInventoryOwner*>(H_Parent());
         VERIFY(pOwner);
         pOwner->NewPdaContact(pNewContactInvOwner);
@@ -94,8 +96,10 @@ void CPda::feel_touch_new(IGameObject* O)
 
 void CPda::feel_touch_delete(IGameObject* O)
 {
-    if (!H_Parent()) return;
-    if (CInventoryOwner* pLostContactInvOwner = smart_cast<CInventoryOwner*>(O)) {
+    if (!H_Parent())
+        return;
+    if (CInventoryOwner* pLostContactInvOwner = smart_cast<CInventoryOwner*>(O))
+    {
         CInventoryOwner* pOwner = smart_cast<CInventoryOwner*>(H_Parent());
         VERIFY(pOwner);
         pOwner->LostPdaContact(pLostContactInvOwner);
@@ -106,14 +110,17 @@ bool CPda::feel_touch_contact(IGameObject* O)
 {
     CEntityAlive* entity_alive = smart_cast<CEntityAlive*>(O);
 
-    if (entity_alive && entity_alive->cast_base_monster()) {
+    if (entity_alive && entity_alive->cast_base_monster())
+    {
         return true;
     }
     else if (CInventoryOwner* pInvOwner = smart_cast<CInventoryOwner*>(O))
     {
-        if (this != pInvOwner->GetPDA()) {
+        if (this != pInvOwner->GetPDA())
+        {
             CEntityAlive* pEntityAlive = smart_cast<CEntityAlive*>(O);
-            if (pEntityAlive) return true;
+            if (pEntityAlive)
+                return true;
         }
         else
             return false;
@@ -127,9 +134,11 @@ void CPda::OnH_A_Chield()
     VERIFY(IsOff());
 
     //включить PDA только если оно находится у первого владельца
-    if (H_Parent()->ID() == m_idOriginalOwner) {
+    if (H_Parent()->ID() == m_idOriginalOwner)
+    {
         TurnOn();
-        if (m_sFullName.empty()) {
+        if (m_sFullName.empty())
+        {
             m_sFullName.assign(NameItem());
             m_sFullName += " ";
             m_sFullName += (smart_cast<CInventoryOwner*>(H_Parent()))->Name();
@@ -163,7 +172,8 @@ void CPda::ActivePDAContacts(xr_vector<CPda*>& res)
     for (; it != it_e; ++it)
     {
         CPda* p = GetPdaFromOwner(*it);
-        if (p) res.push_back(p);
+        if (p)
+            res.push_back(p);
     }
 }
 
@@ -179,10 +189,7 @@ void CPda::load(IReader& input_packet)
     load_data(m_sFullName, input_packet);
 }
 
-IGameObject* CPda::GetOwnerObject()
-{
-    return Level().Objects.net_Find(GetOriginalOwnerID());
-}
+IGameObject* CPda::GetOwnerObject() { return Level().Objects.net_Find(GetOriginalOwnerID()); }
 /* remove must
 LPCSTR		CPda::Name				()
 {
@@ -203,14 +210,11 @@ LPCSTR		CPda::Name				()
 }
 */
 
-CPda* CPda::GetPdaFromOwner(IGameObject* owner)
-{
-    return smart_cast<CInventoryOwner*>(owner)->GetPDA();
-}
-
+CPda* CPda::GetPdaFromOwner(IGameObject* owner) { return smart_cast<CInventoryOwner*>(owner)->GetPDA(); }
 void CPda::PlayScriptFunction()
 {
-    if (xr_strcmp(m_functor_str, "")) {
+    if (xr_strcmp(m_functor_str, ""))
+    {
         luabind::functor<void> m_functor;
         R_ASSERT(ai().script_engine().functor(m_functor_str.c_str(), m_functor));
         m_functor();

@@ -14,21 +14,21 @@
 public
 ref class property_integer_limited : public property_integer
 {
-  private:
+private:
     typedef property_integer inherited;
 
-  public:
+public:
     typedef System::Object Object;
 
-  public:
+public:
     property_integer_limited(
         integer_getter_type const& getter, integer_setter_type const& setter, int const % min, int const % max);
     virtual Object ^ GetValue() override;
     virtual void SetValue(System::Object ^ object) override;
 
-  private:
+private:
     int m_min;
     int m_max;
-};  // ref class property_integer_limited
+}; // ref class property_integer_limited
 
-#endif  // ifndef PROPERTY_INTEGER_LIMITED_HPP_INCLUDED
+#endif // ifndef PROPERTY_INTEGER_LIMITED_HPP_INCLUDED

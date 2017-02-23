@@ -20,10 +20,7 @@ CBlender_Model_EbB::CBlender_Model_EbB()
     oBlend.value = FALSE;
 }
 
-CBlender_Model_EbB::~CBlender_Model_EbB()
-{
-}
-
+CBlender_Model_EbB::~CBlender_Model_EbB() {}
 void CBlender_Model_EbB::Save(IWriter& fs)
 {
     description.version = 0x1;
@@ -40,7 +37,8 @@ void CBlender_Model_EbB::Load(IReader& fs, u16 version)
     xrPREAD_MARKER(fs);
     xrPREAD_PROP(fs, xrPID_TEXTURE, oT2_Name);
     xrPREAD_PROP(fs, xrPID_MATRIX, oT2_xform);
-    if (version >= 0x1) {
+    if (version >= 0x1)
+    {
         xrPREAD_PROP(fs, xrPID_BOOL, oBlend);
     }
 }
@@ -49,10 +47,12 @@ void CBlender_Model_EbB::Load(IReader& fs, u16 version)
 void CBlender_Model_EbB::Compile(CBlender_Compile& C)
 {
     IBlender::Compile(C);
-    if (C.bEditor) {
+    if (C.bEditor)
+    {
         C.PassBegin();
         {
-            if (oBlend.value) {
+            if (oBlend.value)
+            {
                 C.PassSET_ZB(TRUE, FALSE);
                 C.PassSET_Blend_BLEND();
             }
@@ -149,7 +149,8 @@ void CBlender_Model_EbB::Compile(CBlender_Compile& C)
 {
     IBlender::Compile(C);
 
-    if (oBlend.value) {
+    if (oBlend.value)
+    {
         // forward
         LPCSTR vsname = 0;
         LPCSTR psname = 0;
@@ -170,13 +171,13 @@ void CBlender_Model_EbB::Compile(CBlender_Compile& C)
         // deferred
         switch (C.iElement)
         {
-        case SE_R2_NORMAL_HQ:  // deffer
+        case SE_R2_NORMAL_HQ: // deffer
             uber_deffer(C, true, "model", "base", false);
             break;
-        case SE_R2_NORMAL_LQ:  // deffer
+        case SE_R2_NORMAL_LQ: // deffer
             uber_deffer(C, false, "model", "base", false);
             break;
-        case SE_R2_SHADOW:  // smap
+        case SE_R2_SHADOW: // smap
             if (RImplementation.o.HW_smap)
                 C.r_Pass("shadow_direct_model", "dumb", FALSE, TRUE, TRUE, FALSE);
             else
@@ -193,7 +194,8 @@ void CBlender_Model_EbB::Compile(CBlender_Compile& C)
 {
     IBlender::Compile(C);
 
-    if (oBlend.value) {
+    if (oBlend.value)
+    {
         // forward
         LPCSTR vsname = 0;
         LPCSTR psname = 0;
@@ -219,19 +221,19 @@ void CBlender_Model_EbB::Compile(CBlender_Compile& C)
         // deferred
         switch (C.iElement)
         {
-        case SE_R2_NORMAL_HQ:  // deffer
+        case SE_R2_NORMAL_HQ: // deffer
             uber_deffer(C, true, "model", "base", false, 0, true);
             C.r_Stencil(TRUE, D3DCMP_ALWAYS, 0xff, 0x7f, D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
             C.r_StencilRef(0x01);
             C.r_End();
             break;
-        case SE_R2_NORMAL_LQ:  // deffer
+        case SE_R2_NORMAL_LQ: // deffer
             uber_deffer(C, false, "model", "base", false, 0, true);
             C.r_Stencil(TRUE, D3DCMP_ALWAYS, 0xff, 0x7f, D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
             C.r_StencilRef(0x01);
             C.r_End();
             break;
-        case SE_R2_SHADOW:  // smap
+        case SE_R2_SHADOW: // smap
             // if (RImplementation.o.HW_smap)	C.r_Pass	("shadow_direct_model","dumb",	FALSE,TRUE,TRUE,FALSE);
             // else							C.r_Pass	("shadow_direct_model","shadow_direct_base",FALSE);
             C.r_Pass("shadow_direct_model", "dumb", FALSE, TRUE, TRUE, FALSE);

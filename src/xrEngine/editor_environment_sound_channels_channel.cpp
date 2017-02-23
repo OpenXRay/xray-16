@@ -48,7 +48,8 @@ channel::~channel()
     xr_delete(m_collection);
     delete_data(m_sounds);
 
-    if (!Device.editor()) return;
+    if (!Device.editor())
+        return;
 
     ::ide().destroy(m_property_holder);
 }
@@ -87,7 +88,8 @@ void channel::save(CInifile& config)
     *temp = 0;
     for (i = b; i != e; ++i)
     {
-        if (i == b) {
+        if (i == b)
+        {
             xr_strcpy(temp, count, (*i)->id());
             continue;
         }
@@ -99,15 +101,12 @@ void channel::save(CInifile& config)
     config.w_string(m_load_section.c_str(), "sounds", temp);
 }
 
-LPCSTR channel::id_getter() const
-{
-    return (m_load_section.c_str());
-}
-
+LPCSTR channel::id_getter() const { return (m_load_section.c_str()); }
 void channel::id_setter(LPCSTR value_)
 {
     shared_str value = value_;
-    if (m_load_section._get() == value._get()) return;
+    if (m_load_section._get() == value._get())
+        return;
 
     m_load_section = m_manager.unique_id(value);
 }
@@ -143,14 +142,6 @@ void channel::fill(editor::property_holder_collection* collection)
         "sounds", "properties", "this option is resposible for sound sources", m_collection);
 }
 
-channel::property_holder_type* channel::object()
-{
-    return (m_property_holder);
-}
-
-CEnvAmbient::SSndChannel::sounds_type& channel::sounds()
-{
-    return (inherited::sounds());
-}
-
-#endif  // #ifdef INGAME_EDITOR
+channel::property_holder_type* channel::object() { return (m_property_holder); }
+CEnvAmbient::SSndChannel::sounds_type& channel::sounds() { return (inherited::sounds()); }
+#endif // #ifdef INGAME_EDITOR

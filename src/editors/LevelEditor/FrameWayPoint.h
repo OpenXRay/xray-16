@@ -18,8 +18,8 @@ class CEditObject;
 //---------------------------------------------------------------------------
 class TfraWayPoint : public TForm
 {
-    __published :  // IDE-managed Components
-                   TPanel* paCommands;
+    __published : // IDE-managed Components
+                  TPanel* paCommands;
     TLabel* APHeadLabel1;
     TExtBtn* ExtBtn2;
     TFormStorage* fsStorage;
@@ -46,8 +46,8 @@ class TfraWayPoint : public TForm
     void __fastcall ebConvert1Click(TObject* Sender);
     void __fastcall ebConvert2Click(TObject* Sender);
 
-  private:  // User declarations
-  public:   // User declarations
+private: // User declarations
+public: // User declarations
     __fastcall TfraWayPoint(TComponent* Owner);
 };
 

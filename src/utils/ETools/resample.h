@@ -35,10 +35,10 @@ typedef struct
 
 typedef enum {
     RES_END,
-    RES_GAIN,   /* (double)1.0 */
+    RES_GAIN, /* (double)1.0 */
     RES_CUTOFF, /* (double)0.80 */
-    RES_TAPS,   /* (int)45 */
-    RES_BETA    /* (double)16.0 */
+    RES_TAPS, /* (int)45 */
+    RES_BETA /* (double)16.0 */
 } res_parameter;
 
 int res_init(res_state* state, int channels, int outfreq, int infreq, res_parameter op1, ...);

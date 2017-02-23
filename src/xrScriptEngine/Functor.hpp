@@ -12,7 +12,6 @@ class functor : public adl::object
 public:
     functor() {}
     functor(const adl::object& obj) : adl::object(obj) {}
-
     template <typename... Args>
     TResult operator()(Args&&... args) const
     {
@@ -54,7 +53,8 @@ struct default_converter<functor<T>> : native_converter_base<functor<T>>
 
     static functor<T> to_cpp_deferred(lua_State* luaState, int index)
     {
-        if (lua_isnil(luaState, index)) return functor<T>();
+        if (lua_isnil(luaState, index))
+            return functor<T>();
         return object(from_stack(luaState, index));
     }
 

@@ -50,15 +50,24 @@ struct st_Key
     st_Key() { ZeroMemory(this, sizeof(st_Key)); }
     IC bool equal(const st_Key& tgt)
     {
-        if (!fsimilar(value, tgt.value)) return false;
-        if (!fsimilar(shape, tgt.shape)) return false;
-        if (!fsimilar(tension, tgt.tension)) return false;
-        if (!fsimilar(continuity, tgt.continuity)) return false;
-        if (!fsimilar(bias, tgt.bias)) return false;
-        if (!fsimilar(param[0], tgt.param[0])) return false;
-        if (!fsimilar(param[1], tgt.param[1])) return false;
-        if (!fsimilar(param[2], tgt.param[2])) return false;
-        if (!fsimilar(param[3], tgt.param[3])) return false;
+        if (!fsimilar(value, tgt.value))
+            return false;
+        if (!fsimilar(shape, tgt.shape))
+            return false;
+        if (!fsimilar(tension, tgt.tension))
+            return false;
+        if (!fsimilar(continuity, tgt.continuity))
+            return false;
+        if (!fsimilar(bias, tgt.bias))
+            return false;
+        if (!fsimilar(param[0], tgt.param[0]))
+            return false;
+        if (!fsimilar(param[1], tgt.param[1]))
+            return false;
+        if (!fsimilar(param[2], tgt.param[2]))
+            return false;
+        if (!fsimilar(param[3], tgt.param[3]))
+            return false;
         return true;
     }
     IC void Save(IWriter& F)
@@ -66,7 +75,7 @@ struct st_Key
         F.w_float(value);
         F.w_float(time);
         F.w_u8(shape);
-        if (shape != 4)  // ! Stepped
+        if (shape != 4) // ! Stepped
         {
             F.w_float_q16(tension, -32.f, 32.f);
             F.w_float_q16(continuity, -32.f, 32.f);
@@ -92,7 +101,7 @@ struct st_Key
         value = F.r_float();
         time = F.r_float();
         shape = F.r_u8();
-        if (shape != 4)  // ! Stepped
+        if (shape != 4) // ! Stepped
         {
             tension = F.r_float_q16(-32.f, 32.f);
             continuity = F.r_float_q16(-32.f, 32.f);
@@ -148,4 +157,4 @@ public:
     void Optimize();
 };
 
-#endif  //_ENVELOPE_H_
+#endif //_ENVELOPE_H_

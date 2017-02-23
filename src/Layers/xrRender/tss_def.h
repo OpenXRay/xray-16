@@ -8,7 +8,7 @@ class SimulatorStates
 private:
     struct State
     {
-        u32 type;  // 0=RS, 1=TSS
+        u32 type; // 0=RS, 1=TSS
         u32 v1, v2, v3;
 
         IC void set_RS(u32 a, u32 b)
@@ -51,6 +51,6 @@ public:
     void UpdateDesc(D3D_BLEND_DESC& desc) const;
     void UpdateDesc(D3D_SAMPLER_DESC descArray[D3D_COMMONSHADER_SAMPLER_SLOT_COUNT],
         bool SamplerUsed[D3D_COMMONSHADER_SAMPLER_SLOT_COUNT], int iBaseSamplerIndex) const;
-#endif  //	USE_DX10
+#endif // USE_DX10
 };
 #endif

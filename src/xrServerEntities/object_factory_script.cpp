@@ -20,13 +20,15 @@ void CObjectFactory::register_script_class(LPCSTR client_class, LPCSTR server_cl
 #endif
 #ifndef NO_XR_GAME
     luabind::object client;
-    if (!ai().script_engine().function_object(client_class, client, LUA_TUSERDATA)) {
+    if (!ai().script_engine().function_object(client_class, client, LUA_TUSERDATA))
+    {
         ai().script_engine().script_log(LuaMessageType::Error, "Cannot register class %s", client_class);
         return;
     }
 #endif
     luabind::object server;
-    if (!ai().script_engine().function_object(server_class, server, LUA_TUSERDATA)) {
+    if (!ai().script_engine().function_object(server_class, server, LUA_TUSERDATA))
+    {
         ai().script_engine().script_log(LuaMessageType::Error, "Cannot register class %s", server_class);
         return;
     }
@@ -44,7 +46,8 @@ void CObjectFactory::register_script_class(LPCSTR unknown_class, LPCSTR clsid, L
     Msg("* CObjectFactory: registering script class '%s'", clsid);
 #endif
     luabind::object creator;
-    if (!ai().script_engine().function_object(unknown_class, creator, LUA_TUSERDATA)) {
+    if (!ai().script_engine().function_object(unknown_class, creator, LUA_TUSERDATA))
+    {
         ai().script_engine().script_log(LuaMessageType::Error, "Cannot register class %s", unknown_class);
         return;
     }
@@ -57,13 +60,13 @@ void CObjectFactory::register_script_class(LPCSTR unknown_class, LPCSTR clsid, L
 
 #ifndef NO_XR_GAME
 ENGINE_API bool g_dedicated_server;
-#endif  // NO_XR_GAME
+#endif // NO_XR_GAME
 
 void CObjectFactory::register_script_classes()
 {
 #ifndef NO_XR_GAME
     if (!g_dedicated_server)
-#endif  // NO_XR_GAME
+#endif // NO_XR_GAME
         ai();
 }
 

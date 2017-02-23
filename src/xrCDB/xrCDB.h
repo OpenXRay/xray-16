@@ -29,19 +29,19 @@ class AABBNoLeafNode;
 namespace CDB
 {
 // Triangle
-class XRCDB_API TRI  //*** 16 bytes total (was 32 :)
+class XRCDB_API TRI //*** 16 bytes total (was 32 :)
 {
 public:
-    u32 verts[3];  // 3*4 = 12b
+    u32 verts[3]; // 3*4 = 12b
     union
     {
-        u32 dummy;  // 4b
+        u32 dummy; // 4b
         struct
         {
-            u32 material : 14;         //
-            u32 suppress_shadows : 1;  //
-            u32 suppress_wm : 1;       //
-            u32 sector : 16;           //
+            u32 material : 14; //
+            u32 suppress_shadows : 1; //
+            u32 suppress_wm : 1; //
+            u32 sector : 16; //
         };
     };
 
@@ -67,7 +67,7 @@ class XRCDB_API MODEL
 private:
     Lock cs;
     Opcode::OPCODE_Model* tree;
-    u32 status;  // 0=ready, 1=init, 2=building
+    u32 status; // 0=ready, 1=init, 2=building
 
     // tris
     TRI* tris;
@@ -87,7 +87,8 @@ public:
     IC int get_tris_count() const { return tris_count; }
     IC void syncronize() const
     {
-        if (S_READY != status) {
+        if (S_READY != status)
+        {
             Log("! WARNING: syncronized CDB::query");
             Lock* C = (Lock*)&cs;
             C->Enter();
@@ -107,13 +108,13 @@ struct XRCDB_API RESULT
     Fvector verts[3];
     union
     {
-        u32 dummy;  // 4b
+        u32 dummy; // 4b
         struct
         {
-            u32 material : 14;         //
-            u32 suppress_shadows : 1;  //
-            u32 suppress_wm : 1;       //
-            u32 sector : 16;           //
+            u32 material : 14; //
+            u32 suppress_shadows : 1; //
+            u32 suppress_wm : 1; //
+            u32 sector : 16; //
         };
     };
     int id;
@@ -127,7 +128,7 @@ enum
     OPT_CULL = (1 << 0),
     OPT_ONLYFIRST = (1 << 1),
     OPT_ONLYNEAREST = (1 << 2),
-    OPT_FULL_TEST = (1 << 3)  // for box & frustum queries - enable class III test(s)
+    OPT_FULL_TEST = (1 << 3) // for box & frustum queries - enable class III test(s)
 };
 
 // Collider itself
@@ -194,7 +195,6 @@ public:
 struct non_copyable
 {
     non_copyable() {}
-
 private:
     non_copyable(const non_copyable&) {}
     non_copyable& operator=(const non_copyable&) {}

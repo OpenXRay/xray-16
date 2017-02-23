@@ -25,8 +25,8 @@ class CEditableObject;
 //---------------------------------------------------------------------------
 class TClipMaker : public TForm, public pureFrame
 {
-    __published :  // IDE-managed Components
-                   TFormStorage* fsStorage;
+    __published : // IDE-managed Components
+                  TFormStorage* fsStorage;
     TPanel* paB;
     TPanel* paBase;
     TPanel* paClipProps;
@@ -126,17 +126,17 @@ class TClipMaker : public TForm, public pureFrame
     void __fastcall ebSyncClick(TObject* Sender);
     void __fastcall ebClearClick(TObject* Sender);
 
-  public:
+public:
     xr_string m_ClipFName;
 
     class CUIClip : public CClip
     {
-      public:
+    public:
         float run_time;
         s32 idx;
         TClipMaker* owner;
 
-      public:
+    public:
         CUIClip(LPCSTR name, TClipMaker* owner, float r_t);
 
         CUIClip(TClipMaker* own, float r_t)
@@ -149,15 +149,10 @@ class TClipMaker : public TForm, public pureFrame
         ~CUIClip();
 
         int PWidth() { return length * owner->m_Zoom; }
-
         int PLeft() { return run_time * owner->m_Zoom; }
-
         int PRight() { return PLeft() + PWidth(); }
-
         float Length() { return length; }
-
         float RunTime() { return run_time; }
-
         AnsiString CycleName(u16 bp)
         {
             VERIFY(bp < 4);
@@ -171,14 +166,12 @@ class TClipMaker : public TForm, public pureFrame
         }
 
         AnsiString FXName() { return *fx.name; }
-
         u16 FXSlot() { return fx.slot; }
-
         void SetCycle(LPCSTR name, u16 part, u16 slot);
         void SetFX(LPCSTR name, u16 slot);
     };
 
-  protected:
+protected:
     enum
     {
         flRT_RepaintClips = (1 << 0),
@@ -218,7 +211,8 @@ class TClipMaker : public TForm, public pureFrame
     void RepaintClips(bool bForced = false)
     {
         m_RTFlags.set(flRT_RepaintClips, TRUE);
-        if (bForced) RealRepaintClips();
+        if (bForced)
+            RealRepaintClips();
     }
 
     void RealUpdateProperties();
@@ -226,7 +220,8 @@ class TClipMaker : public TForm, public pureFrame
     void UpdateProperties(bool bForced = false)
     {
         m_RTFlags.set(flRT_UpdateProperties, TRUE);
-        if (bForced) RealUpdateProperties();
+        if (bForced)
+            RealUpdateProperties();
     }
 
     void RealUpdateClips();
@@ -235,7 +230,8 @@ class TClipMaker : public TForm, public pureFrame
     {
         m_RTFlags.set(flRT_UpdateClips, TRUE);
         m_RTFlags.set(flRT_RepaintClips, bRepaint);
-        if (bForced) RealUpdateClips();
+        if (bForced)
+            RealUpdateClips();
     }
 
     void Clear();
@@ -246,7 +242,7 @@ class TClipMaker : public TForm, public pureFrame
 
     void __stdcall OnClipItemFocused(ListItemsVec& items);
 
-  public:
+public:
     float m_CurrentPlayTime;
     float m_TotalLength;
     float m_Zoom;
@@ -254,7 +250,7 @@ class TClipMaker : public TForm, public pureFrame
     void Play(BOOL bLoop);
     void Stop();
 
-  public:  // User declarations
+public: // User declarations
     __fastcall TClipMaker(TComponent* Owner);
 
     static TClipMaker* CreateForm();

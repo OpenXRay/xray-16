@@ -21,7 +21,8 @@ void CControlDirectionBase::reinit()
 
 void CControlDirectionBase::face_target(const Fvector& position, u32 delay, float add_yaw)
 {
-    if (m_time_last_faced + delay > Device.dwTimeGlobal) return;
+    if (m_time_last_faced + delay > Device.dwTimeGlobal)
+        return;
 
     m_delay = delay;
 
@@ -49,27 +50,22 @@ void CControlDirectionBase::use_path_direction(bool reversed)
     float yaw, pitch;
     m_man->path_builder().detail().direction().getHP(yaw, pitch);
 
-    if (fsimilar(yaw, 0.f, EPS_S)) return;
+    if (fsimilar(yaw, 0.f, EPS_S))
+        return;
 
     m_heading.target = angle_normalize((reversed) ? (-yaw + PI) : (-yaw));
 }
 
-void CControlDirectionBase::set_heading_speed(float value, bool force)
-{
-    m_heading.speed_target = value;
-}
-
-void CControlDirectionBase::set_heading(float value, bool force)
-{
-    m_heading.target = value;
-}
+void CControlDirectionBase::set_heading_speed(float value, bool force) { m_heading.speed_target = value; }
+void CControlDirectionBase::set_heading(float value, bool force) { m_heading.target = value; }
 //////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////
 void CControlDirectionBase::update_frame()
 {
     SControlDirectionData* ctrl_data = (SControlDirectionData*)m_man->data(this, ControlCom::eControlDir);
-    if (!ctrl_data) return;
+    if (!ctrl_data)
+        return;
 
     ctrl_data->heading.target_angle = m_heading.target;
     ctrl_data->heading.target_speed = m_heading.speed_target;

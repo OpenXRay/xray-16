@@ -14,4 +14,4 @@
 
 ENGINE_API extern xrGUID generate_guid();
 
-#endif  // guid_generatorH
+#endif // guid_generatorH

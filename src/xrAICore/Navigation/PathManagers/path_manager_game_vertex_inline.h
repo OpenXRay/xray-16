@@ -8,11 +8,11 @@
 
 #pragma once
 
-#define TEMPLATE_SPECIALIZATION                                                                                        \
+#define TEMPLATE_SPECIALIZATION \
     template <typename _DataStorage, typename _dist_type, typename _index_type, typename _iteration_type>
 
-#define CGameVertexPathManager                                                                                         \
-    CPathManager<CGameGraph, _DataStorage, SGameVertex<_dist_type, _index_type, _iteration_type>, _dist_type,          \
+#define CGameVertexPathManager                                                                                \
+    CPathManager<CGameGraph, _DataStorage, SGameVertex<_dist_type, _index_type, _iteration_type>, _dist_type, \
         _index_type, _iteration_type\
 >
 
@@ -29,20 +29,24 @@ IC void CGameVertexPathManager::setup(const _Graph* _graph, _DataStorage* _data_
 TEMPLATE_SPECIALIZATION
 IC bool CGameVertexPathManager::is_accessible(const _index_type& vertex_id) const
 {
-    if (!inherited::is_accessible(vertex_id)) return (false);
+    if (!inherited::is_accessible(vertex_id))
+        return (false);
 
-    if (!m_start_is_accessible) return (true);
+    if (!m_start_is_accessible)
+        return (true);
 
     typedef _Parameters::VERTEX_TYPES::const_iterator const_iterator;
 #ifdef DEBUG
-    if (m_evaluator->m_vertex_types->empty()) {
+    if (m_evaluator->m_vertex_types->empty())
+    {
         Msg("! warning : empty vertex types");
     }
 #endif
     const_iterator I = m_evaluator->m_vertex_types->begin();
     const_iterator E = m_evaluator->m_vertex_types->end();
     for (; I != E; ++I)
-        if (graph->mask((*I).tMask, graph->vertex(vertex_id)->vertex_type())) return (true);
+        if (graph->mask((*I).tMask, graph->vertex(vertex_id)->vertex_type()))
+            return (true);
 
     return (false);
 }

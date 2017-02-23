@@ -11,11 +11,7 @@
 //////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////
 
-void* CXRayObjectExport::creator()
-{
-    return new CXRayObjectExport();
-}
-
+void* CXRayObjectExport::creator() { return new CXRayObjectExport(); }
 //////////////////////////////////////////////////////////////
 
 MStatus CXRayObjectExport::reader(const MFileObject& file, const MString& options, FileAccessMode mode)
@@ -29,12 +25,13 @@ MStatus CXRayObjectExport::writer(const MFileObject& file, const MString& option
 {
     MStatus status = MS::kFailure;
     int export_mode = 0;
-    if (options.length() > 0) {
+    if (options.length() > 0)
+    {
         int i, length;
         // Start parsing.
         MStringArray optionList;
         MStringArray theOption;
-        options.split(';', optionList);  // break out all the options.
+        options.split(';', optionList); // break out all the options.
 
         length = optionList.length();
         for (i = 0; i < length; ++i)
@@ -42,8 +39,10 @@ MStatus CXRayObjectExport::writer(const MFileObject& file, const MString& option
             theOption.clear();
             optionList[i].split('=', theOption);
 
-            if (theOption[0] == MString("ogf")) {
-                if (theOption.length() > 1) export_mode = theOption[1].asInt();
+            if (theOption[0] == MString("ogf"))
+            {
+                if (theOption.length() > 1)
+                    export_mode = theOption[1].asInt();
             }
         }
     }
@@ -57,20 +56,23 @@ MStatus CXRayObjectExport::writer(const MFileObject& file, const MString& option
     CEditableObject* OBJECT = new CEditableObject(fname);
     OBJECT->SetVersionToCurrent(TRUE, TRUE);
 
-    if ((mode == MPxFileTranslator::kExportAccessMode) || (mode == MPxFileTranslator::kSaveAccessMode)) {
+    if ((mode == MPxFileTranslator::kExportAccessMode) || (mode == MPxFileTranslator::kSaveAccessMode))
+    {
         status = ExportAll(OBJECT) ? MS::kSuccess : MS::kFailure;
     }
     else if (mode == MPxFileTranslator::kExportActiveAccessMode)
     {
         status = ExportSelected(OBJECT) ? MS::kSuccess : MS::kFailure;
     }
-    if (MS::kSuccess == status) {
+    if (MS::kSuccess == status)
+    {
         OBJECT->Optimize();
         OBJECT->Save(fname);
 
         Log("Object succesfully exported.");
         Msg("%d vertices, %d faces", OBJECT->GetVertexCount(), OBJECT->GetFaceCount(true, false));
-        if (export_mode) {
+        if (export_mode)
+        {
             mname = file.fullName() + ".ogf";
             Log("Export OGF object: ", fname);
             fname = mname.asChar();
@@ -99,10 +101,7 @@ MString CXRayObjectExport::filter() const
 
 //////////////////////////////////////////////////////////////
 
-bool CXRayObjectExport::haveReadMethod() const
-{
-    return false;
-}
+bool CXRayObjectExport::haveReadMethod() const { return false; }
 //////////////////////////////////////////////////////////////
 
 bool CXRayObjectExport::haveWriteMethod() const
@@ -195,8 +194,10 @@ bool CXRayObjectExport::initializeSetsAndLookupTables(bool exportAll)
         setList->getDependNode(i, mset);
 
         MFnSet fnSet(mset, &stat);
-        if (stat) {
-            if (MFnSet::kRenderableOnly == fnSet.restriction(&stat)) {
+        if (stat)
+        {
+            if (MFnSet::kRenderableOnly == fnSet.restriction(&stat))
+            {
                 sets->append(mset);
             }
         }
@@ -221,10 +222,12 @@ bool CXRayObjectExport::initializeSetsAndLookupTables(bool exportAll)
     MIntArray vertexCounts;
     MIntArray polygonCounts;
 
-    if (exportAll) {
+    if (exportAll)
+    {
         MItDag dagIterator(MItDag::kBreadthFirst, MFn::kInvalid, &stat);
 
-        if (MS::kSuccess != stat) {
+        if (MS::kSuccess != stat)
+        {
             fprintf(stderr, "Failure in DAG iterator setup.\n");
             return false;
         }
@@ -236,15 +239,18 @@ bool CXRayObjectExport::initializeSetsAndLookupTables(bool exportAll)
             MDagPath dagPath;
             stat = dagIterator.getPath(dagPath);
 
-            if (stat) {
+            if (stat)
+            {
                 // skip over intermediate objects
                 //
                 MFnDagNode dagNode(dagPath, &stat);
-                if (dagNode.isIntermediateObject()) {
+                if (dagNode.isIntermediateObject())
+                {
                     continue;
                 }
 
-                if ((dagPath.hasFn(MFn::kMesh)) && (dagPath.hasFn(MFn::kTransform))) {
+                if ((dagPath.hasFn(MFn::kMesh)) && (dagPath.hasFn(MFn::kTransform)))
+                {
                     // We want only the shape,
                     // not the transform-extended-to-shape.
                     continue;
@@ -299,7 +305,8 @@ bool CXRayObjectExport::initializeSetsAndLookupTables(bool exportAll)
                 MObject component = MObject::kNullObj;
                 status = dagIterator.getPath(dagPath);
 
-                if (!status) {
+                if (!status)
+                {
                     fprintf(stderr, "Failure getting DAG path.\n");
                     freeLookupTables();
                     return false;
@@ -308,9 +315,11 @@ bool CXRayObjectExport::initializeSetsAndLookupTables(bool exportAll)
                 // skip over intermediate objects
                 //
                 MFnDagNode dagNode(dagPath, &stat);
-                if (dagNode.isIntermediateObject()) continue;
+                if (dagNode.isIntermediateObject())
+                    continue;
 
-                if ((dagPath.hasFn(MFn::kMesh)) && (dagPath.hasFn(MFn::kTransform))) {
+                if ((dagPath.hasFn(MFn::kMesh)) && (dagPath.hasFn(MFn::kTransform)))
+                {
                     // We want only the shape,
                     // not the transform-extended-to-shape.
                     continue;
@@ -343,7 +352,8 @@ bool CXRayObjectExport::initializeSetsAndLookupTables(bool exportAll)
     // and we have counts of the vertices/polygons for each
     // object so create the maya group look-up table.
     //
-    if (objectCount > 0) {
+    if (objectCount > 0)
+    {
         // To export Maya groups we traverse the hierarchy starting at
         // each objectNodeNamesArray[i] going towards the root collecting transform
         // nodes as we go.
@@ -354,8 +364,9 @@ bool CXRayObjectExport::initializeSetsAndLookupTables(bool exportAll)
             recFindTransformDAGNodes(objectNodeNamesArray[i], transformNodeNameIndicesArray);
         }
 
-        if (transformNodeNameArray.length() > 0) {
-            objectGroupsTablePtr = xr_alloc<bool*>(objectCount);  // (bool**) malloc( sizeof(bool*)*objectCount );
+        if (transformNodeNameArray.length() > 0)
+        {
+            objectGroupsTablePtr = xr_alloc<bool*>(objectCount); // (bool**) malloc( sizeof(bool*)*objectCount );
             length = transformNodeNameArray.length();
             for (i = 0; i < objectCount; i++)
             {
@@ -363,7 +374,8 @@ bool CXRayObjectExport::initializeSetsAndLookupTables(bool exportAll)
                 objectGroupsTablePtr[i] = xr_alloc<bool>(length);
                 ZeroMemory(objectGroupsTablePtr[i], length * sizeof(bool));
 
-                if (objectGroupsTablePtr[i] == NULL) {
+                if (objectGroupsTablePtr[i] == NULL)
+                {
                     Log("!calloc returned NULL (objectGroupsTablePtr)");
                     return false;
                 }
@@ -377,9 +389,10 @@ bool CXRayObjectExport::initializeSetsAndLookupTables(bool exportAll)
 
     // Create the vertex/polygon look-up tables.
     //
-    if (objectCount > 0) {
-        vertexTablePtr = xr_alloc<bool*>(objectCount);   //(bool**) malloc( sizeof(bool*)*objectCount );
-        polygonTablePtr = xr_alloc<bool*>(objectCount);  //(bool**) malloc( sizeof(bool*)*objectCount );
+    if (objectCount > 0)
+    {
+        vertexTablePtr = xr_alloc<bool*>(objectCount); //(bool**) malloc( sizeof(bool*)*objectCount );
+        polygonTablePtr = xr_alloc<bool*>(objectCount); //(bool**) malloc( sizeof(bool*)*objectCount );
 
         for (i = 0; i < objectCount; i++)
         {
@@ -387,7 +400,8 @@ bool CXRayObjectExport::initializeSetsAndLookupTables(bool exportAll)
             vertexTablePtr[i] = xr_alloc<bool>(vertexCounts[i] * numSets);
             ZeroMemory(vertexTablePtr[i], vertexCounts[i] * numSets * sizeof(bool));
 
-            if (vertexTablePtr[i] == NULL) {
+            if (vertexTablePtr[i] == NULL)
+            {
                 Log("!calloc returned NULL (vertexTable)");
                 return false;
             }
@@ -395,7 +409,8 @@ bool CXRayObjectExport::initializeSetsAndLookupTables(bool exportAll)
             //			polygonTablePtr[i] = (bool*)calloc( polygonCounts[i]*numSets, sizeof(bool) );
             polygonTablePtr[i] = xr_alloc<bool>(polygonCounts[i] * numSets);
             ZeroMemory(polygonTablePtr[i], polygonCounts[i] * numSets * sizeof(bool));
-            if (polygonTablePtr[i] == NULL) {
+            if (polygonTablePtr[i] == NULL)
+            {
                 Log("!calloc returned NULL (polygonTable)");
                 return false;
             }
@@ -404,7 +419,8 @@ bool CXRayObjectExport::initializeSetsAndLookupTables(bool exportAll)
 
     // If we found no meshes then return
     //
-    if (objectCount == 0) {
+    if (objectCount == 0)
+    {
         return false;
     }
 
@@ -427,7 +443,8 @@ bool CXRayObjectExport::initializeSetsAndLookupTables(bool exportAll)
         memberList.clear();
         stat = fnSet.getMembers(memberList, flattenedList);
 
-        if (MS::kSuccess != stat) {
+        if (MS::kSuccess != stat)
+        {
             fprintf(stderr, "Error in fnSet.getMembers()!\n");
         }
 
@@ -435,9 +452,12 @@ bool CXRayObjectExport::initializeSetsAndLookupTables(bool exportAll)
         numMembers = memberList.length();
         for (m = 0; m < numMembers; m++)
         {
-            if (memberList.getDagPath(m, object, component)) {
-                if ((!component.isNull()) && (object.apiType() == MFn::kMesh)) {
-                    if (component.apiType() == MFn::kMeshVertComponent) {
+            if (memberList.getDagPath(m, object, component))
+            {
+                if ((!component.isNull()) && (object.apiType() == MFn::kMesh))
+                {
+                    if (component.apiType() == MFn::kMeshVertComponent)
+                    {
                         MItMeshVertex viter(object, component);
                         for (; !viter.isDone(); viter.next())
                         {
@@ -452,7 +472,8 @@ bool CXRayObjectExport::initializeSetsAndLookupTables(bool exportAll)
                             numObjectNames = objectNames->length();
                             for (o = 0; o < numObjectNames; o++)
                             {
-                                if ((*objectNames)[o] == name) {
+                                if ((*objectNames)[o] == name)
+                                {
                                     // Mark set i as true in the table
                                     //
                                     vertexTable = vertexTablePtr[o];
@@ -477,13 +498,15 @@ bool CXRayObjectExport::initializeSetsAndLookupTables(bool exportAll)
                             numObjectNames = objectNames->length();
                             for (o = 0; o < numObjectNames; o++)
                             {
-                                if ((*objectNames)[o] == name) {
+                                if ((*objectNames)[o] == name)
+                                {
                                     // Mark set i as true in the table
                                     //
 
                                     // Check for bad components in the set
                                     //
-                                    if (compIdx >= polygonCounts[o]) {
+                                    if (compIdx >= polygonCounts[o])
+                                    {
                                         Msg("!Bad polygon index '%d' found. Polygon skipped", compIdx);
                                         break;
                                     }
@@ -502,9 +525,11 @@ bool CXRayObjectExport::initializeSetsAndLookupTables(bool exportAll)
                     // all polygons as members of the given set.
                     //
 
-                    if (object.hasFn(MFn::kMesh)) {
+                    if (object.hasFn(MFn::kMesh))
+                    {
                         MFnMesh fnMesh(object, &stat);
-                        if (MS::kSuccess != stat) {
+                        if (MS::kSuccess != stat)
+                        {
                             fprintf(stderr, "Failure in MFnMesh initialization.\n");
                             return false;
                         }
@@ -512,7 +537,8 @@ bool CXRayObjectExport::initializeSetsAndLookupTables(bool exportAll)
                         // We are going to iterate over all the polygons.
                         //
                         MItMeshPolygon piter(object, MObject::kNullObj, &stat);
-                        if (MS::kSuccess != stat) {
+                        if (MS::kSuccess != stat)
+                        {
                             fprintf(stderr, "Failure in MItMeshPolygon initialization.\n");
                             return false;
                         }
@@ -527,10 +553,12 @@ bool CXRayObjectExport::initializeSetsAndLookupTables(bool exportAll)
                             numObjectNames = objectNames->length();
                             for (o = 0; o < numObjectNames; o++)
                             {
-                                if ((*objectNames)[o] == name) {
+                                if ((*objectNames)[o] == name)
+                                {
                                     // Check for bad components in the set
                                     //
-                                    if (compIdx >= polygonCounts[o]) {
+                                    if (compIdx >= polygonCounts[o])
+                                    {
                                         Msg("!Bad polygon index '%d' found. Polygon skipped", compIdx);
                                         break;
                                     }
@@ -541,17 +569,18 @@ bool CXRayObjectExport::initializeSetsAndLookupTables(bool exportAll)
                                     break;
                                 }
                             }
-                        }  // end of piter.next() loop
-                    }      // end of condition if (object.hasFn(MFn::kMesh))
-                }          // end of else condifion if (!component.isNull())
-            }              // end of memberList.getDagPath(m,object,component)
-        }                  // end of memberList loop
-    }                      // end of for-loop for sets
+                        } // end of piter.next() loop
+                    } // end of condition if (object.hasFn(MFn::kMesh))
+                } // end of else condifion if (!component.isNull())
+            } // end of memberList.getDagPath(m,object,component)
+        } // end of memberList loop
+    } // end of for-loop for sets
 
     // Go through all of the group members and mark in the
     // lookup-table, the group that each shape belongs to.
     length = objectNodeNamesArray.length();
-    if (objectGroupsTablePtr) {
+    if (objectGroupsTablePtr)
+    {
         for (i = 0; i < length; i++)
         {
             MIntArray groupTableIndicesArray;
@@ -576,26 +605,32 @@ void CXRayObjectExport::freeLookupTables()
 // Frees up all tables and arrays allocated by this plug-in.
 //
 {
-    if (vertexTablePtr) {
+    if (vertexTablePtr)
+    {
         for (int i = 0; i < objectCount; i++)
         {
-            if (vertexTablePtr[i] != NULL) {
+            if (vertexTablePtr[i] != NULL)
+            {
                 xr_free(vertexTablePtr[i]);
             }
         }
     }
-    if (polygonTablePtr) {
+    if (polygonTablePtr)
+    {
         for (int i = 0; i < objectCount; i++)
         {
-            if (polygonTablePtr[i] != NULL) {
+            if (polygonTablePtr[i] != NULL)
+            {
                 xr_free(polygonTablePtr[i]);
             }
         }
     }
-    if (objectGroupsTablePtr) {
+    if (objectGroupsTablePtr)
+    {
         for (int i = 0; i < objectCount; i++)
         {
-            if (objectGroupsTablePtr[i] != NULL) {
+            if (objectGroupsTablePtr[i] != NULL)
+            {
                 xr_free(objectGroupsTablePtr[i]);
             }
         }
@@ -603,31 +638,37 @@ void CXRayObjectExport::freeLookupTables()
         objectGroupsTablePtr = NULL;
     }
 
-    if (vertexTablePtr != NULL) {
+    if (vertexTablePtr != NULL)
+    {
         xr_free(vertexTablePtr);
         vertexTablePtr = NULL;
     }
-    if (polygonTablePtr != NULL) {
+    if (polygonTablePtr != NULL)
+    {
         xr_free(polygonTablePtr);
         polygonTablePtr = NULL;
     }
 
-    if (lastSets != NULL) {
+    if (lastSets != NULL)
+    {
         xr_delete(lastSets);
         lastSets = NULL;
     }
 
-    if (lastMaterials != NULL) {
+    if (lastMaterials != NULL)
+    {
         xr_delete(lastMaterials);
         lastMaterials = NULL;
     }
 
-    if (sets != NULL) {
+    if (sets != NULL)
+    {
         xr_delete(sets);
         sets = NULL;
     }
 
-    if (objectNames != NULL) {
+    if (objectNames != NULL)
+    {
         xr_delete(objectNames);
         objectNames = NULL;
     }
@@ -676,10 +717,12 @@ void CXRayObjectExport::buildEdgeTable(MDagPath& mesh)
             int b = pIt.vertexIndex(v == (pvc - 1) ? 0 : v + 1);
 
             SXREdgeInfoPtr elem = findEdgeInfo(a, b);
-            if (NULL != elem) {
+            if (NULL != elem)
+            {
                 int edgeId = pIt.index();
 
-                if (INVALID_ID == elem->polyIds[0]) {
+                if (INVALID_ID == elem->polyIds[0])
+                {
                     elem->polyIds[0] = edgeId;
                 }
                 else
@@ -699,7 +742,7 @@ void CXRayObjectExport::CreateSmoothingGroups(MFnMesh& fnMesh)
     // Now create a polyId->smoothingGroup table
     //
     int numPolygons = fnMesh.numPolygons();
-    polySmoothingGroups = xr_alloc<int>(numPolygons);  //(int*)malloc( sizeof(int) *  numPolygons );
+    polySmoothingGroups = xr_alloc<int>(numPolygons); //(int*)malloc( sizeof(int) *  numPolygons );
     for (int i = 0; i < numPolygons; i++)
     {
         polySmoothingGroups[i] = NO_SMOOTHING_GROUP;
@@ -721,8 +764,10 @@ void CXRayObjectExport::CreateSMGFacegroups(MFnMesh& fnMesh)
     {
         newSmoothingGroup = true;
         // Check polygon has not already been visited
-        if (NO_SMOOTHING_GROUP == polySmoothingGroups[pid]) {
-            if (!smoothingAlgorithm(pid, fnMesh)) {
+        if (NO_SMOOTHING_GROUP == polySmoothingGroups[pid])
+        {
+            if (!smoothingAlgorithm(pid, fnMesh))
+            {
                 // No smooth edges for this polygon so we set
                 // the smoothing group to NO_SMOOTHING_GROUP (off)
                 polySmoothingGroups[pid] = NO_SMOOTHING_GROUP;
@@ -740,7 +785,8 @@ void CXRayObjectExport::CreateSMGFacegroups(MFnMesh& fnMesh)
 }
 void set_edge_smooth_flag(int& sm_group, int edge, bool value)
 {
-    if (value) {
+    if (value)
+    {
         sm_group &= ~(1 << edge);
         //		u32 sg = sm_group;
         //		sm_group = sg;
@@ -755,7 +801,8 @@ void CXRayObjectExport::CreateSMGEdgeAttrs(MFnMesh& fnMesh)
         MIntArray vertexList;
         fnMesh.getPolygonVertices(pid, vertexList);
         int vcount = vertexList.length();
-        if (vcount != 3) Msg("poly vertex count not equel 3(is not a tri) vertex count = %d", vcount);
+        if (vcount != 3)
+            Msg("poly vertex count not equel 3(is not a tri) vertex count = %d", vcount);
 
         for (int vid = 0; vid < vcount; vid++)
         {
@@ -764,7 +811,8 @@ void CXRayObjectExport::CreateSMGEdgeAttrs(MFnMesh& fnMesh)
 
             SXREdgeInfoPtr elem = findEdgeInfo(a, b);
 
-            if (NULL != elem) {
+            if (NULL != elem)
+            {
                 set_edge_smooth_flag(polySmoothingGroups[pid], vid, elem->smooth);
             }
         }
@@ -784,16 +832,19 @@ bool CXRayObjectExport::smoothingAlgorithm(int polyId, MFnMesh& fnMesh)
         int b = vertexList[vid == (vcount - 1) ? 0 : vid + 1];
 
         SXREdgeInfoPtr elem = findEdgeInfo(a, b);
-        if (NULL != elem) {
+        if (NULL != elem)
+        {
             // NOTE: We assume there are at most 2 polygons per edge
             //       halfEdge polygons get a smoothing group of
             //       NO_SMOOTHING_GROUP which is equivalent to "s off"
             //
-            if (NO_SMOOTHING_GROUP != elem->polyIds[1]) {  // Edge not a border
+            if (NO_SMOOTHING_GROUP != elem->polyIds[1])
+            { // Edge not a border
 
                 // We are starting a new smoothing group
                 //
-                if (newSmoothingGroup) {
+                if (newSmoothingGroup)
+                {
                     currSmoothingGroup = nextSmoothingGroup++;
                     newSmoothingGroup = false;
 
@@ -808,19 +859,21 @@ bool CXRayObjectExport::smoothingAlgorithm(int polyId, MFnMesh& fnMesh)
                 // If we have a smooth edge then this poly must be a member
                 // of the current smoothing group.
                 //
-                if (elem->smooth) {
+                if (elem->smooth)
+                {
                     polySmoothingGroups[polyId] = currSmoothingGroup;
                     smoothEdgeFound = true;
                 }
                 else
-                {  // Hard edge so ignore this polygon
+                { // Hard edge so ignore this polygon
                     continue;
                 }
 
                 // Find the adjacent poly id
                 //
                 int adjPoly = elem->polyIds[0];
-                if (adjPoly == polyId) {
+                if (adjPoly == polyId)
+                {
                     adjPoly = elem->polyIds[1];
                 }
 
@@ -830,7 +883,8 @@ bool CXRayObjectExport::smoothingAlgorithm(int polyId, MFnMesh& fnMesh)
                 // NO_SMOOTHING_GROUP then it has already been visited
                 // so we ignore it.
                 //
-                if (NO_SMOOTHING_GROUP == polySmoothingGroups[adjPoly]) {
+                if (NO_SMOOTHING_GROUP == polySmoothingGroups[adjPoly])
+                {
                     smoothingAlgorithm(adjPoly, fnMesh);
                 }
                 else if (polySmoothingGroups[adjPoly] != currSmoothingGroup)
@@ -852,8 +906,9 @@ void CXRayObjectExport::addEdgeInfo(int v1, int v2, bool smooth)
 {
     SXREdgeInfoPtr element = NULL;
 
-    if (NULL == edgeTable[v1]) {
-        edgeTable[v1] = xr_alloc<SXREdgeInfo>(1);  //(EdgeInfoPtr)malloc( sizeof(struct EdgeInfo) );
+    if (NULL == edgeTable[v1])
+    {
+        edgeTable[v1] = xr_alloc<SXREdgeInfo>(1); //(EdgeInfoPtr)malloc( sizeof(struct EdgeInfo) );
         element = edgeTable[v1];
     }
     else
@@ -863,7 +918,7 @@ void CXRayObjectExport::addEdgeInfo(int v1, int v2, bool smooth)
         {
             element = element->next;
         }
-        element->next = xr_alloc<SXREdgeInfo>(1);  //(EdgeInfoPtr)malloc( sizeof(struct EdgeInfo) );
+        element->next = xr_alloc<SXREdgeInfo>(1); //(EdgeInfoPtr)malloc( sizeof(struct EdgeInfo) );
         element = element->next;
     }
 
@@ -892,18 +947,21 @@ SXREdgeInfoPtr CXRayObjectExport::findEdgeInfo(int v1, int v2)
 
     while (NULL != element)
     {
-        if (v2 == element->vertId) {
+        if (v2 == element->vertId)
+        {
             return element;
         }
         element = element->next;
     }
 
-    if (element == NULL) {
+    if (element == NULL)
+    {
         element = edgeTable[v2];
 
         while (NULL != element)
         {
-            if (v1 == element->vertId) {
+            if (v1 == element->vertId)
+            {
                 return element;
             }
             element = element->next;
@@ -936,12 +994,14 @@ void CXRayObjectExport::destroyEdgeTable()
         }
     }
 
-    if (NULL != edgeTable) {
+    if (NULL != edgeTable)
+    {
         xr_free(edgeTable);
         edgeTable = NULL;
     }
 
-    if (NULL != polySmoothingGroups) {
+    if (NULL != polySmoothingGroups)
+    {
         xr_free(polySmoothingGroups);
         polySmoothingGroups = NULL;
     }
@@ -967,19 +1027,22 @@ void CXRayObjectExport::recFindTransformDAGNodes(MString& nodeName, MIntArray& t
         MStringArray result2;
         MGlobal::executeCommand("nodeType " + result[j], result2);
 
-        if (result2.length() == 1 && result2[0] == "transform") {
+        if (result2.length() == 1 && result2[0] == "transform")
+        {
             // check if result[j] is already in result[j]
             bool found = false;
             unsigned int i;
             for (i = 0; i < transformNodeNameArray.length(); i++)
             {
-                if (transformNodeNameArray[i] == result[j]) {
+                if (transformNodeNameArray[i] == result[j])
+                {
                     found = true;
                     break;
                 }
             }
 
-            if (!found) {
+            if (!found)
+            {
                 transformNodeIndicesArray.append(transformNodeNameArray.length());
                 transformNodeNameArray.append(result[j]);
             }

@@ -89,11 +89,11 @@ private:
     mutable collections_ids_type m_collections_ids;
     property_holder_type* m_property_holder;
     ::editor::environment::manager& m_environment;
-};  // class manager
-}  // namespace thunderbolts
-}  // namespace environment
-}  // namespace editor
+}; // class manager
+} // namespace thunderbolts
+} // namespace environment
+} // namespace editor
 
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR
 
-#endif  // ifndef EDITOR_WEATHER_THUNDERBOLTS_MANAGER_HPP_INCLUDED
+#endif // ifndef EDITOR_WEATHER_THUNDERBOLTS_MANAGER_HPP_INCLUDED

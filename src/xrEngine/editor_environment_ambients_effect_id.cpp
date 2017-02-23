@@ -22,21 +22,14 @@ effect_id::effect_id(manager const& manager, shared_str const& id) : m_manager(m
 
 effect_id::~effect_id()
 {
-    if (!Device.editor()) return;
+    if (!Device.editor())
+        return;
 
     ::ide().destroy(m_property_holder);
 }
 
-LPCSTR const* effect_id::collection()
-{
-    return (&*m_manager.effects_ids().begin());
-}
-
-u32 effect_id::collection_size()
-{
-    return (m_manager.effects_ids().size());
-}
-
+LPCSTR const* effect_id::collection() { return (&*m_manager.effects_ids().begin()); }
+u32 effect_id::collection_size() { return (m_manager.effects_ids().size()); }
 void effect_id::fill(editor::property_holder_collection* collection)
 {
     VERIFY(!m_property_holder);
@@ -55,9 +48,5 @@ void effect_id::fill(editor::property_holder_collection* collection)
         editor::property_holder::cannot_enter_text);
 }
 
-effect_id::property_holder_type* effect_id::object()
-{
-    return (m_property_holder);
-}
-
-#endif  // #ifdef INGAME_EDITOR
+effect_id::property_holder_type* effect_id::object() { return (m_property_holder); }
+#endif // #ifdef INGAME_EDITOR

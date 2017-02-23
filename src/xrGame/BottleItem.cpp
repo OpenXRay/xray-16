@@ -11,15 +11,8 @@
 
 #define BREAK_POWER 5.f
 
-CBottleItem::CBottleItem(void)
-{
-}
-
-CBottleItem::~CBottleItem(void)
-{
-    sndBreaking.destroy();
-}
-
+CBottleItem::CBottleItem(void) {}
+CBottleItem::~CBottleItem(void) { sndBreaking.destroy(); }
 void CBottleItem::Load(LPCSTR section)
 {
     inherited::Load(section);
@@ -47,7 +40,8 @@ void CBottleItem::BreakToPieces()
     sndBreaking.play_at_pos(0, Position(), false);
 
     //отыграть партиклы разбивания
-    if (*m_sBreakParticles) {
+    if (*m_sBreakParticles)
+    {
         //показываем эффекты
         CParticlesObject* pStaticPG;
         pStaticPG = CParticlesObject::Create(*m_sBreakParticles, TRUE);
@@ -55,7 +49,8 @@ void CBottleItem::BreakToPieces()
     }
 
     //ликвидировать сам объект
-    if (Local()) {
+    if (Local())
+    {
         DestroyObject();
     }
 }
@@ -64,9 +59,11 @@ void CBottleItem::Hit(SHit* pHDS)
 {
     inherited::Hit(pHDS);
 
-    if (pHDS->damage() > BREAK_POWER) {
+    if (pHDS->damage() > BREAK_POWER)
+    {
         // Generate Expode event
-        if (Local()) {
+        if (Local())
+        {
             NET_Packet P;
             u_EventGen(P, GE_GRENADE_EXPLODE, ID());
             u_EventSend(P);

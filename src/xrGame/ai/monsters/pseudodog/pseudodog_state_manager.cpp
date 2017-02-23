@@ -40,7 +40,8 @@ void CStateManagerPseudodog::execute()
 
     const CEntityAlive* enemy = object->EnemyMan.get_enemy();
 
-    if (enemy) {
+    if (enemy)
+    {
         switch (object->EnemyMan.get_danger_type())
         {
         case eStrong: state_id = eStatePanic; break;

@@ -32,26 +32,15 @@ vec random_vec()
     return normalize(cr_fvector3(local::random_component(), local::random_component(), local::random_component()));
 }
 
-ICF float min(float a, float b)
-{
-    return a < b ? a : b;
-}
-ICF float max(float a, float b)
-{
-    return a < b ? a : b;
-}
-
-}  // namespace detail
+ICF float min(float a, float b) { return a < b ? a : b; }
+ICF float max(float a, float b) { return a < b ? a : b; }
+} // namespace detail
 
 //----------------------------------------------------------
 // base
 //----------------------------------------------------------
 
-float base::calc_dist_factor(float dist) const
-{
-    return calc_dist_factor(m_p_params->factor, dist);
-}
-
+float base::calc_dist_factor(float dist) const { return calc_dist_factor(m_p_params->factor, dist); }
 float base::calc_dist_factor(vec_arg factor, float dist) const
 {
     STEER_ASSERT(m_p_params->min_factor_dist >= s_min_factor_dist);
@@ -72,7 +61,8 @@ vec evade::calc_acceleration()
 
     const float dist = detail::max(dest2pos_mag, detail::near_zero);
 
-    if (dist > m_p_params->max_evade_range) {
+    if (dist > m_p_params->max_evade_range)
+    {
         return detail::zero_vec;
     }
 
@@ -93,18 +83,21 @@ vec pursue::calc_acceleration()
     const vec pos2dest = m_p_params->dest - m_p_params->pos;
     const float dist = magnitude(pos2dest);
 
-    if (dist < m_p_params->arrive_range) {
+    if (dist < m_p_params->arrive_range)
+    {
         return detail::zero_vec;
     }
 
     const vec pos2dest_norm = pos2dest * (1.f / dist);
 
-    if (dist <= m_p_params->change_vel_range) {
+    if (dist <= m_p_params->change_vel_range)
+    {
         const float vel = m_p_params->vel;
         const float arrive_vel = m_p_params->arrive_vel;
         const float sum_vel = vel + arrive_vel;
 
-        if (sum_vel < detail::near_zero) {
+        if (sum_vel < detail::near_zero)
+        {
             // fix it ??
             return detail::zero_vec;
         }
@@ -127,7 +120,8 @@ vec restrictor::calc_acceleration()
     const vec pos2rest = m_p_params->restrictor_pos - m_p_params->pos;
     const float dist = magnitude(pos2rest);
 
-    if (dist <= m_p_params->max_allowed_range) {
+    if (dist <= m_p_params->max_allowed_range)
+    {
         return detail::zero_vec;
     }
     else
@@ -151,7 +145,8 @@ vec wander::calc_acceleration()
 
     const float proj_dir_mag = magnitude(proj_dir);
 
-    if (proj_dir_mag < detail::near_zero) {
+    if (proj_dir_mag < detail::near_zero)
+    {
         return detail::zero_vec;
     }
 
@@ -168,26 +163,10 @@ vec wander::calc_acceleration()
     return normalize(res) * m_p_params->factor.x;
 }
 
-float& wander::proj_x(vec& v)
-{
-    return m_p_params->plane == params::yz_plane ? v.y : v.x;
-}
-
-float& wander::proj_y(vec& v)
-{
-    return m_p_params->plane == params::xy_plane ? v.y : v.z;
-}
-
-const float& wander::proj_x(const vec& v)
-{
-    return m_p_params->plane == params::yz_plane ? v.y : v.x;
-}
-
-const float& wander::proj_y(const vec& v)
-{
-    return m_p_params->plane == params::xy_plane ? v.y : v.z;
-}
-
+float& wander::proj_x(vec& v) { return m_p_params->plane == params::yz_plane ? v.y : v.x; }
+float& wander::proj_y(vec& v) { return m_p_params->plane == params::xy_plane ? v.y : v.z; }
+const float& wander::proj_x(const vec& v) { return m_p_params->plane == params::yz_plane ? v.y : v.x; }
+const float& wander::proj_y(const vec& v) { return m_p_params->plane == params::xy_plane ? v.y : v.z; }
 //----------------------------------------------------------
 // containment
 //----------------------------------------------------------
@@ -209,7 +188,8 @@ vec containment::calc_acceleration()
             cr_fvector3(dotproduct(local_probe, right), dotproduct(local_probe, up), dotproduct(local_probe, dir));
 
         vec point_on_obstacle, normal;
-        if (m_p_params->test_obstacle(probe, point_on_obstacle, normal)) {
+        if (m_p_params->test_obstacle(probe, point_on_obstacle, normal))
+        {
             const float dist = magnitude(point_on_obstacle - m_p_params->pos);
             const float dist_factor = calc_dist_factor(dist);
 
@@ -239,7 +219,8 @@ vec grouping::calc_acceleration()
         const vec point2pos = m_p_params->pos - cur_nearest;
         const float point2pos_mag = magnitude(point2pos);
 
-        if (point2pos_mag < m_p_params->max_separate_range) {
+        if (point2pos_mag < m_p_params->max_separate_range)
+        {
             const vec pos2dest_norm = (point2pos_mag > detail::near_zero) ? (point2pos * (1.f / point2pos_mag)) :
                                                                             normalize((*m_p_params->pf_random_dir)());
 
@@ -250,7 +231,8 @@ vec grouping::calc_acceleration()
         ++num_nearest;
     }
 
-    if (!num_nearest) {
+    if (!num_nearest)
+    {
         return detail::zero_vec;
     }
 
@@ -259,7 +241,8 @@ vec grouping::calc_acceleration()
     const float pos2center_mag = magnitude(pos2center);
 
     // add cohesion force
-    if (pos2center_mag > detail::near_zero) {
+    if (pos2center_mag > detail::near_zero)
+    {
         steer = steer + normalize(pos2center) * calc_dist_factor(m_p_params->cohesion_factor, pos2center_mag);
     }
 
@@ -281,11 +264,13 @@ vec manager::calc_acceleration()
         base::params* p_params = p_base->get_supplier();
         STEER_ASSERT(p_params != NULL);
 
-        if (!p_params->update()) {
+        if (!p_params->update())
+        {
             schedule_remove(p_base);
         }
 
-        if (p_params->enabled) {
+        if (p_params->enabled)
+        {
             v = v + p_base->calc_acceleration();
         }
     }
@@ -293,16 +278,8 @@ vec manager::calc_acceleration()
     return v;
 }
 
-void manager::add(base* behaviour)
-{
-    m_behaviours.insert(behaviour);
-}
-
-void manager::schedule_remove(base* behaviour)
-{
-    m_schedule_remove.insert(behaviour);
-}
-
+void manager::add(base* behaviour) { m_behaviours.insert(behaviour); }
+void manager::schedule_remove(base* behaviour) { m_schedule_remove.insert(behaviour); }
 void manager::clear()
 {
     for_each(m_behaviours.begin(), m_behaviours.end(), &deleter);
@@ -315,7 +292,8 @@ void manager::remove_scheduled()
     for (Behaviours::iterator i = m_schedule_remove.begin(), e = m_schedule_remove.end(); i != e; ++i)
     {
         Behaviours::iterator it = m_behaviours.find(*i);
-        if (it != m_behaviours.end()) {
+        if (it != m_behaviours.end())
+        {
             deleter(*it);
             m_behaviours.erase(it);
         }
@@ -324,9 +302,5 @@ void manager::remove_scheduled()
     m_schedule_remove.clear();
 }
 
-void manager::deleter(base* p)
-{
-    delete (p);
-}
-
-}  // namespace steering_behaviour
+void manager::deleter(base* p) { delete (p); }
+} // namespace steering_behaviour

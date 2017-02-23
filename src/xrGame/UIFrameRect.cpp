@@ -25,11 +25,7 @@ void CUIFrameRect::InitTextureEx(LPCSTR texture, LPCSTR shader)
     CUITextureMaster::InitTexture(strconcat(sizeof(buf), buf, texture, "_lb"), shader, &frame[CUIFrameRect::fmLB]);
 }
 
-void CUIFrameRect::InitTexture(LPCSTR texture)
-{
-    InitTextureEx(texture, "hud\\default");
-}
-
+void CUIFrameRect::InitTexture(LPCSTR texture) { InitTextureEx(texture, "hud\\default"); }
 void CUIFrameRect::UpdateSize(bool recall)
 {
     //	VERIFY(g_bRendering);
@@ -63,14 +59,16 @@ void CUIFrameRect::UpdateSize(bool recall)
 
     bool resizing = false;
     Fvector2 new_size = GetWndSize();
-    if (size_top < 0.0f || size_bottom < 0.0f) {
+    if (size_top < 0.0f || size_bottom < 0.0f)
+    {
         Fvector2 n1;
         n1.x = _lt.x + _rt.x;
         n1.y = _lb.x + _rb.x;
         new_size.x = _max(n1.x, n1.y);
         resizing = true;
     }
-    if (size_left < 0.0f || size_right < 0.0f) {
+    if (size_left < 0.0f || size_right < 0.0f)
+    {
         Fvector2 n2;
         n2.x = _lt.y + _lb.y;
         n2.y = _rt.y + _rb.y;
@@ -78,7 +76,8 @@ void CUIFrameRect::UpdateSize(bool recall)
         resizing = true;
     }
 
-    if (resizing) {
+    if (resizing)
+    {
         SetWndSize(new_size);
         VERIFY(!recall);
         UpdateSize(true);
@@ -133,19 +132,18 @@ void CUIFrameRect::UpdateSize(bool recall)
 
 void CUIFrameRect::Draw()
 {
-    if (!uFlags.is(flValidSize)) {
+    if (!uFlags.is(flValidSize))
+    {
         VERIFY(g_bRendering);
         UpdateSize();
     }
 
     for (int k = 0; k < fmMax; ++k)
-        if (m_itm_mask.test(u16(1 << k))) frame[k].Render();
+        if (m_itm_mask.test(u16(1 << k)))
+            frame[k].Render();
 }
 
-void CUIFrameRect::Update()
-{
-}
-
+void CUIFrameRect::Update() {}
 void CUIFrameRect::SetWndSize(const Fvector2& size)
 {
     CUISimpleWindow::SetWndSize(size);
@@ -161,7 +159,8 @@ void CUIFrameRect::SetWndRect(const Frect& rect)
 void CUIFrameRect::SetWndPos(const Fvector2& pos)
 {
     Fvector2 _old_pos = GetWndPos();
-    if (_old_pos.similar(pos, EPS)) return;
+    if (_old_pos.similar(pos, EPS))
+        return;
 
     CUISimpleWindow::SetWndPos(pos);
     uFlags.set(flValidSize, false);
@@ -184,7 +183,8 @@ void CUIFrameRect::Draw(float x, float y)
     Fvector2 p = GetWndPos();
     float dx = p.x - x;
     float dy = p.y - y;
-    if (!fis_zero(dx) || !fis_zero(dy)) SetWndPos(Fvector2().set(x, y));
+    if (!fis_zero(dx) || !fis_zero(dy))
+        SetWndPos(Fvector2().set(x, y));
 
     Draw();
 }

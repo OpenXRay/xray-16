@@ -30,7 +30,8 @@ System::Object ^ property_integer_enum_value_reference::GetValue()
     for
         each(ValuePair ^ i in m_collection)
         {
-            if (i->first != value) continue;
+            if (i->first != value)
+                continue;
 
             return (value);
         }
@@ -45,7 +46,8 @@ void property_integer_enum_value_reference::SetValue(Object ^ object)
     for
         each(ValuePair ^ i in m_collection)
         {
-            if (!i->second->Equals(string_value)) continue;
+            if (!i->second->Equals(string_value))
+                continue;
 
             inherited::SetValue(i->first);
             return;

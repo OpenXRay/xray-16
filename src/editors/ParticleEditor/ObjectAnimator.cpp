@@ -4,16 +4,8 @@
 #include "ObjectAnimator.h"
 #include "xrCore/Animation/motion.hpp"
 
-bool motion_sort_pred(COMotion* a, COMotion* b)
-{
-    return a->name < b->name;
-}
-
-bool motion_find_pred(COMotion* a, shared_str b)
-{
-    return a->name < b;
-}
-
+bool motion_sort_pred(COMotion* a, COMotion* b) { return a->name < b->name; }
+bool motion_find_pred(COMotion* a, shared_str b) { return a->name < b; }
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
@@ -25,11 +17,7 @@ CObjectAnimator::CObjectAnimator()
     m_Name = "";
 }
 
-CObjectAnimator::~CObjectAnimator()
-{
-    Clear();
-}
-
+CObjectAnimator::~CObjectAnimator() { Clear(); }
 void CObjectAnimator::Clear()
 {
     for (MotionIt m_it = m_Motions.begin(); m_it != m_Motions.end(); m_it++)
@@ -41,7 +29,8 @@ void CObjectAnimator::Clear()
 void CObjectAnimator::SetActiveMotion(COMotion* mot)
 {
     m_Current = mot;
-    if (m_Current) m_MParam.Set(m_Current);
+    if (m_Current)
+        m_MParam.Set(m_Current);
     m_XFORM.identity();
 }
 
@@ -49,12 +38,15 @@ void CObjectAnimator::LoadMotions(LPCSTR fname)
 {
     string_path full_path;
     if (!FS.exist(full_path, "$level$", fname))
-        if (!FS.exist(full_path, "$game_anims$", fname)) Debug.fatal(DEBUG_INFO, "Can't find motion file '%s'.", fname);
+        if (!FS.exist(full_path, "$game_anims$", fname))
+            Debug.fatal(DEBUG_INFO, "Can't find motion file '%s'.", fname);
 
     LPCSTR ext = strext(full_path);
-    if (ext) {
+    if (ext)
+    {
         Clear();
-        if (0 == xr_strcmp(ext, ".anm")) {
+        if (0 == xr_strcmp(ext, ".anm"))
+        {
             COMotion* M = new COMotion();
             if (M->LoadMotion(full_path))
                 m_Motions.push_back(M);
@@ -70,7 +62,8 @@ void CObjectAnimator::LoadMotions(LPCSTR fname)
             {
                 COMotion* M = new COMotion();
                 bool bRes = M->Load(*F);
-                if (!bRes) FATAL("ERROR: Can't load motion. Incorrect file version.");
+                if (!bRes)
+                    FATAL("ERROR: Can't load motion. Incorrect file version.");
                 m_Motions.push_back(M);
             }
             FS.r_close(F);
@@ -88,7 +81,8 @@ void CObjectAnimator::Load(const char* name)
 
 void CObjectAnimator::Update(float dt)
 {
-    if (m_Current) {
+    if (m_Current)
+    {
         Fvector R, P;
         m_Current->_Evaluate(m_MParam.Frame(), P, R);
         m_MParam.Update(dt, m_Speed, bLoop);
@@ -99,9 +93,11 @@ void CObjectAnimator::Update(float dt)
 
 COMotion* CObjectAnimator::Play(bool loop, LPCSTR name)
 {
-    if (name && name[0]) {
+    if (name && name[0])
+    {
         MotionIt it = std::lower_bound(m_Motions.begin(), m_Motions.end(), name, motion_find_pred);
-        if ((it != m_Motions.end()) && (0 == xr_strcmp((*it)->Name(), name))) {
+        if ((it != m_Motions.end()) && (0 == xr_strcmp((*it)->Name(), name)))
+        {
             bLoop = loop;
             SetActiveMotion(*it);
             m_MParam.Play();
@@ -115,7 +111,8 @@ COMotion* CObjectAnimator::Play(bool loop, LPCSTR name)
     }
     else
     {
-        if (!m_Motions.empty()) {
+        if (!m_Motions.empty())
+        {
             bLoop = loop;
             SetActiveMotion(m_Motions.front());
             m_MParam.Play();
@@ -137,7 +134,8 @@ void CObjectAnimator::Stop()
 
 float CObjectAnimator::GetLength()
 {
-    if (!m_Current) return 0.0f;
+    if (!m_Current)
+        return 0.0f;
     float res = m_Current->Length() / m_Current->FPS();
     return res;
 }
@@ -152,7 +150,8 @@ static FvectorVec path_points;
 void CObjectAnimator::DrawPath()
 {
     // motion path
-    if (m_Current) {
+    if (m_Current)
+    {
         float fps = m_Current->FPS();
         float min_t = (float)m_Current->FrameStart() / fps;
         float max_t = (float)m_Current->FrameEnd() / fps;
@@ -175,7 +174,8 @@ void CObjectAnimator::DrawPath()
         for (KeyIt k_it = E->keys.begin(); k_it != E->keys.end(); k_it++)
         {
             m_Current->_Evaluate((*k_it)->time, T, r);
-            if (EDevice.m_Camera.GetPosition().distance_to_sqr(T) < 50.f * 50.f) {
+            if (EDevice.m_Camera.GetPosition().distance_to_sqr(T) < 50.f * 50.f)
+            {
                 DU.DrawCross(T, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, clr, false);
                 DU.OutText(T, AnsiString().sprintf("K: %3.3f", (*k_it)->time).c_str(), 0xffffffff, 0x00000000);
             }

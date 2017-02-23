@@ -50,7 +50,8 @@ void CEditableMesh::SaveMesh(IWriter& F)
     F.w(m_Faces, m_FaceCount * sizeof(st_Face));
     F.close_chunk();
 
-    if (GetSmoothGroups()) {
+    if (GetSmoothGroups())
+    {
         F.open_chunk(EMESH_CHUNK_SG);
         F.w(GetSmoothGroups(), m_FaceCount * sizeof(u32));
         F.close_chunk();
@@ -89,7 +90,8 @@ void CEditableMesh::SaveMesh(IWriter& F)
         F.w_u32((*vm_it)->size());
         F.w((*vm_it)->getVMdata(), (*vm_it)->VMdatasize());
         F.w((*vm_it)->getVIdata(), (*vm_it)->VIdatasize());
-        if ((*vm_it)->polymap) F.w((*vm_it)->getPIdata(), (*vm_it)->PIdatasize());
+        if ((*vm_it)->polymap)
+            F.w((*vm_it)->getPIdata(), (*vm_it)->PIdatasize());
     }
     F.close_chunk();
 }
@@ -99,7 +101,8 @@ bool CEditableMesh::LoadMesh(IReader& F)
     u32 version = 0;
 
     R_ASSERT(F.r_chunk(EMESH_CHUNK_VERSION, &version));
-    if (version != EMESH_CURRENT_VERSION) {
+    if (version != EMESH_CURRENT_VERSION)
+    {
         ELog.DlgMsg(mtError, "CEditableMesh: unsuported file version. Mesh can't load.");
         return false;
     }
@@ -113,7 +116,8 @@ bool CEditableMesh::LoadMesh(IReader& F)
 
     R_ASSERT(F.find_chunk(EMESH_CHUNK_VERTS));
     m_VertCount = F.r_u32();
-    if (m_VertCount < 3) {
+    if (m_VertCount < 3)
+    {
         Log("!CEditableMesh: Vertices<3.");
         return false;
     }
@@ -123,7 +127,8 @@ bool CEditableMesh::LoadMesh(IReader& F)
     R_ASSERT(F.find_chunk(EMESH_CHUNK_FACES));
     m_FaceCount = F.r_u32();
     m_Faces = xr_alloc<st_Face>(m_FaceCount);
-    if (m_FaceCount == 0) {
+    if (m_FaceCount == 0)
+    {
         Log("!CEditableMesh: Faces==0.");
         return false;
     }
@@ -132,7 +137,8 @@ bool CEditableMesh::LoadMesh(IReader& F)
     m_SmoothGroups = xr_alloc<u32>(m_FaceCount);
     MemFill32(m_SmoothGroups, m_Flags.is(flSGMask) ? 0 : u32(-1), m_FaceCount);
     u32 sg_chunk_size = F.find_chunk(EMESH_CHUNK_SG);
-    if (sg_chunk_size) {
+    if (sg_chunk_size)
+    {
         VERIFY(m_FaceCount * sizeof(u32) == sg_chunk_size);
         F.r(m_SmoothGroups, m_FaceCount * sizeof(u32));
     }
@@ -149,7 +155,7 @@ bool CEditableMesh::LoadMesh(IReader& F)
 
     R_ASSERT(F.find_chunk(EMESH_CHUNK_SFACE));
     string128 surf_name;
-    u32 sface_cnt = F.r_u16();  // surface-face count
+    u32 sface_cnt = F.r_u16(); // surface-face count
     for (u32 sp_i = 0; sp_i < sface_cnt; sp_i++)
     {
         F.r_stringZ(surf_name, sizeof(surf_name));
@@ -158,7 +164,8 @@ bool CEditableMesh::LoadMesh(IReader& F)
         VERIFY(surf);
         IntVec& face_lst = m_SurfFaces[surf];
         face_lst.resize(F.r_u32());
-        if (face_lst.empty()) {
+        if (face_lst.empty())
+        {
             Log("!Empty surface found: %s", surf->_Name());
             return false;
         }
@@ -166,7 +173,8 @@ bool CEditableMesh::LoadMesh(IReader& F)
         std::sort(face_lst.begin(), face_lst.end());
     }
 
-    if (F.find_chunk(EMESH_CHUNK_VMAPS_2)) {
+    if (F.find_chunk(EMESH_CHUNK_VMAPS_2))
+    {
         m_VMaps.resize(F.r_u32());
         for (VMapIt vm_it = m_VMaps.begin(); vm_it != m_VMaps.end(); vm_it++)
         {
@@ -178,12 +186,14 @@ bool CEditableMesh::LoadMesh(IReader& F)
             (*vm_it)->resize(F.r_u32());
             F.r((*vm_it)->getVMdata(), (*vm_it)->VMdatasize());
             F.r((*vm_it)->getVIdata(), (*vm_it)->VIdatasize());
-            if ((*vm_it)->polymap) F.r((*vm_it)->getPIdata(), (*vm_it)->PIdatasize());
+            if ((*vm_it)->polymap)
+                F.r((*vm_it)->getPIdata(), (*vm_it)->PIdatasize());
         }
     }
     else
     {
-        if (F.find_chunk(EMESH_CHUNK_VMAPS_1)) {
+        if (F.find_chunk(EMESH_CHUNK_VMAPS_1))
+        {
             m_VMaps.resize(F.r_u32());
             for (VMapIt vm_it = m_VMaps.begin(); vm_it != m_VMaps.end(); vm_it++)
             {
@@ -214,7 +224,8 @@ bool CEditableMesh::LoadMesh(IReader& F)
     }
 
 #ifdef _EDITOR
-    if (!EPrefs->object_flags.is(epoDeffLoadRB)) {
+    if (!EPrefs->object_flags.is(epoDeffLoadRB))
+    {
         GenerateFNormals();
         GenerateAdjacency();
         GenerateVNormals(0);
@@ -224,7 +235,8 @@ bool CEditableMesh::LoadMesh(IReader& F)
         UnloadVNormals();
     }
 
-    if (!EPrefs->object_flags.is(epoDeffLoadCF)) GenerateCFModel();
+    if (!EPrefs->object_flags.is(epoDeffLoadCF))
+        GenerateCFModel();
 #endif
     OptimizeMesh(false);
     RebuildVMaps();

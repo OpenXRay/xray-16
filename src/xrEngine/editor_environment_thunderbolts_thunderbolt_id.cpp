@@ -23,21 +23,14 @@ thunderbolt_id::thunderbolt_id(manager const& manager, shared_str const& id)
 
 thunderbolt_id::~thunderbolt_id()
 {
-    if (!Device.editor()) return;
+    if (!Device.editor())
+        return;
 
     ::ide().destroy(m_property_holder);
 }
 
-LPCSTR const* thunderbolt_id::collection()
-{
-    return (&*m_manager.thunderbolts_ids().begin());
-}
-
-u32 thunderbolt_id::collection_size()
-{
-    return (m_manager.thunderbolts_ids().size());
-}
-
+LPCSTR const* thunderbolt_id::collection() { return (&*m_manager.thunderbolts_ids().begin()); }
+u32 thunderbolt_id::collection_size() { return (m_manager.thunderbolts_ids().size()); }
 void thunderbolt_id::fill(editor::property_holder_collection* collection)
 {
     VERIFY(!m_property_holder);
@@ -56,9 +49,5 @@ void thunderbolt_id::fill(editor::property_holder_collection* collection)
         editor::property_holder::cannot_enter_text);
 }
 
-thunderbolt_id::property_holder_type* thunderbolt_id::object()
-{
-    return (m_property_holder);
-}
-
-#endif  // #ifdef INGAME_EDITOR
+thunderbolt_id::property_holder_type* thunderbolt_id::object() { return (m_property_holder); }
+#endif // #ifdef INGAME_EDITOR

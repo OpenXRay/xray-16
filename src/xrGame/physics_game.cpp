@@ -25,7 +25,7 @@
 static const float PARTICLE_EFFECT_DIST = 70.f;
 static const float SOUND_EFFECT_DIST = 70.f;
 const float mass_limit =
-    10000.f;  // some conventional value used as evaluative param (there is no code restriction on mass)
+    10000.f; // some conventional value used as evaluative param (there is no code restriction on mass)
 //////////////////////////////////////////////////////////////////////////////////
 static const float SQUARE_PARTICLE_EFFECT_DIST = PARTICLE_EFFECT_DIST * PARTICLE_EFFECT_DIST;
 static const float SQUARE_SOUND_EFFECT_DIST = SOUND_EFFECT_DIST * SOUND_EFFECT_DIST;
@@ -41,7 +41,8 @@ public:
     {
         ps_name = psn;
         c = contact;
-        if (invert_n) {
+        if (invert_n)
+        {
             c.normal[0] = -c.normal[0];
             c.normal[1] = -c.normal[1];
             c.normal[2] = -c.normal[2];
@@ -76,13 +77,12 @@ public:
         remove_time = Device.dwTimeGlobal + time_to_call_remove;
     }
     const Fvector& position() const { return cast_fv(c.pos); }
-
 private:
     virtual bool compare(const CPHReqComparerV* v) const { return v->compare(this); }
-
     virtual void run()
     {
-        if (b_called) return;
+        if (b_called)
+            return;
         b_called = true;
         CPHParticlesPlayCall::run();
     }
@@ -102,7 +102,6 @@ class CPHFindLiquidParticlesComparer : public CPHReqComparerV
 
 public:
     CPHFindLiquidParticlesComparer(const Fvector& position) : m_position(position) {}
-
 private:
     virtual bool compare(const CPHReqComparerV* v) const { return v->compare(this); }
     virtual bool compare(const CPHLiquidParticlesCondition* v) const { return true; }
@@ -112,7 +111,7 @@ private:
 
         Fvector disp = Fvector().sub(m_position, v->position());
         return disp.x * disp.x + disp.z * disp.z <
-               (minimal_plane_distance_between_liquid_particles * minimal_plane_distance_between_liquid_particles);
+            (minimal_plane_distance_between_liquid_particles * minimal_plane_distance_between_liquid_particles);
     }
 };
 
@@ -120,9 +119,9 @@ private:
 //	public CPHReqComparerV
 //{
 //	virtual bool			compare							(const	CPHReqComparerV* v)					const	{return
-//v->compare(this);}
+// v->compare(this);}
 //	virtual bool			compare							(const	CPHOnesConditionSelfCmpTrue* v)		const	{return
-//true;}
+// true;}
 //
 //};
 
@@ -172,12 +171,14 @@ static void play_object(dxGeomUserData* data, SGameMtlPair* mtl_pair, const dCon
 #else
     sp = data->ph_ref_object->ObjectPhSoundPlayer();
 #endif
-    if (sp) sp->Play(mtl_pair, *(Fvector*)c->pos);
+    if (sp)
+        sp->Play(mtl_pair, *(Fvector*)c->pos);
 }
 template <class Pars>
 IC bool play_liquid_particle_criteria(dxGeomUserData& data, float vel_cret)
 {
-    if (vel_cret > Pars::vel_cret_particles) return true;
+    if (vel_cret > Pars::vel_cret_particles)
+        return true;
 
     bool controller = !!data.ph_object && data.ph_object->CastType() == CPHObject::tpCharacter;
 
@@ -218,27 +219,35 @@ void TContactShotMark(CDB::TRI* T, dContactGeom* c)
     dxGeomUserData* data = 0;
     float vel_cret = 0;
     bool b_invert_normal = false;
-    if (!ContactShotMarkGetEffectPars(c, data, vel_cret, b_invert_normal)) return;
+    if (!ContactShotMarkGetEffectPars(c, data, vel_cret, b_invert_normal))
+        return;
     Fvector to_camera;
     to_camera.sub(cast_fv(c->pos), Device.vCameraPosition);
     float square_cam_dist = to_camera.square_magnitude();
-    if (data) {
+    if (data)
+    {
         SGameMtlPair* mtl_pair = GMLib.GetMaterialPairByIndices(T->material, data->material);
-        if (mtl_pair) {
-            if (vel_cret > Pars::vel_cret_wallmark && !mtl_pair->CollideMarks->empty()) {
+        if (mtl_pair)
+        {
+            if (vel_cret > Pars::vel_cret_wallmark && !mtl_pair->CollideMarks->empty())
+            {
                 wm_shader WallmarkShader = mtl_pair->CollideMarks->GenerateWallmark();
                 Level().ph_commander().add_call(
                     new CPHOnesCondition(), new CPHWallMarksCall(*((Fvector*)c->pos), T, WallmarkShader));
             }
-            if (square_cam_dist < SQUARE_SOUND_EFFECT_DIST) {
+            if (square_cam_dist < SQUARE_SOUND_EFFECT_DIST)
+            {
                 SGameMtl* static_mtl = GMLib.GetMaterialByIdx(T->material);
                 VERIFY(static_mtl);
-                if (!static_mtl->Flags.test(SGameMtl::flPassable)) {
-                    if (vel_cret > Pars::vel_cret_sound) {
-                        if (!mtl_pair->CollideSounds.empty()) {
+                if (!static_mtl->Flags.test(SGameMtl::flPassable))
+                {
+                    if (vel_cret > Pars::vel_cret_sound)
+                    {
+                        if (!mtl_pair->CollideSounds.empty())
+                        {
                             float volume = collide_volume_min +
-                                           vel_cret * (collide_volume_max - collide_volume_min) /
-                                               (_sqrt(mass_limit) * default_l_limit - Pars::vel_cret_sound);
+                                vel_cret * (collide_volume_max - collide_volume_min) /
+                                    (_sqrt(mass_limit) * default_l_limit - Pars::vel_cret_sound);
                             ref_sound& randSound =
                                 mtl_pair->CollideSounds[Random.randI(mtl_pair->CollideSounds.size())];
                             randSound.play_no_feedback(0, 0, 0, ((Fvector*)c->pos), &volume);
@@ -247,12 +256,14 @@ void TContactShotMark(CDB::TRI* T, dContactGeom* c)
                 }
                 else
                 {
-                    if (data->ph_ref_object && !mtl_pair->CollideSounds.empty()) {
+                    if (data->ph_ref_object && !mtl_pair->CollideSounds.empty())
+                    {
                         play_object(data, mtl_pair, c);
                     }
                 }
             }
-            if (square_cam_dist < SQUARE_PARTICLE_EFFECT_DIST && !mtl_pair->CollideParticles.empty()) {
+            if (square_cam_dist < SQUARE_PARTICLE_EFFECT_DIST && !mtl_pair->CollideParticles.empty())
+            {
                 SGameMtl* static_mtl = GMLib.GetMaterialByIdx(T->material);
                 VERIFY(static_mtl);
                 LPCSTR ps_name = *mtl_pair->CollideParticles[::Random.randI(0, mtl_pair->CollideParticles.size())];

@@ -51,7 +51,7 @@ void CSkeletonX::_Copy(CSkeletonX* B)
 
 #if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
     m_Indices = B->m_Indices;
-#endif  //	USE_DX10
+#endif //	USE_DX10
 }
 //////////////////////////////////////////////////////////////////////
 void CSkeletonX::_Render(ref_geom& hGeom, u32 vCount, u32 iOffset, u32 pCount)
@@ -110,42 +110,44 @@ void CSkeletonX::_Render_soft(ref_geom& hGeom, u32 vCount, u32 iOffset, u32 pCou
     u32 vOffset = cache_vOffset;
 
     _VertexStream& _VS = RCache.Vertex;
-    if (cache_DiscardID != _VS.DiscardID() || vCount != cache_vCount) {
+    if (cache_DiscardID != _VS.DiscardID() || vCount != cache_vCount)
+    {
         vertRender* Dest = (vertRender*)_VS.Lock(vCount, hGeom->vb_stride, vOffset);
         cache_DiscardID = _VS.DiscardID();
         cache_vCount = vCount;
         cache_vOffset = vOffset;
 
         RImplementation.BasicStats.Skinning.Begin();
-        if (*Vertices1W) {
-            Skin1W(Dest,                // dest
-                *Vertices1W,            // source
-                vCount,                 // count
-                Parent->bone_instances  // bones
+        if (*Vertices1W)
+        {
+            Skin1W(Dest, // dest
+                *Vertices1W, // source
+                vCount, // count
+                Parent->bone_instances // bones
                 );
         }
         else if (*Vertices2W)
         {
-            Skin2W(Dest,                // dest
-                *Vertices2W,            // source
-                vCount,                 // count
-                Parent->bone_instances  // bones
+            Skin2W(Dest, // dest
+                *Vertices2W, // source
+                vCount, // count
+                Parent->bone_instances // bones
                 );
         }
         else if (*Vertices3W)
         {
-            Skin3W(Dest,                // dest
-                *Vertices3W,            // source
-                vCount,                 // count
-                Parent->bone_instances  // bones
+            Skin3W(Dest, // dest
+                *Vertices3W, // source
+                vCount, // count
+                Parent->bone_instances // bones
                 );
         }
         else if (*Vertices4W)
         {
-            Skin4W(Dest,                // dest
-                *Vertices4W,            // source
-                vCount,                 // count
-                Parent->bone_instances  // bones
+            Skin4W(Dest, // dest
+                *Vertices4W, // source
+                vCount, // count
+                Parent->bone_instances // bones
                 );
         }
         else
@@ -172,8 +174,9 @@ void CSkeletonX::_Load(const char* N, IReader* data, u32& dwVertCount)
     u16 hw_bones_cnt = u16((HW.Caps.geometry.dwRegisters - 22 - 3) / 3);
 
 #if RENDER == R_R1
-    if (ps_r1_SoftwareSkinning == 1) hw_bones_cnt = 0;
-#endif  // RENDER == R_R1
+    if (ps_r1_SoftwareSkinning == 1)
+        hw_bones_cnt = 0;
+#endif // RENDER == R_R1
 
     u16 sw_bones_cnt = 0;
 #ifdef _EDITOR
@@ -189,7 +192,7 @@ void CSkeletonX::_Load(const char* N, IReader* data, u32& dwVertCount)
 
     switch (dwVertType)
     {
-    case OGF_VERTEXFORMAT_FVF_1L:  // 1-Link
+    case OGF_VERTEXFORMAT_FVF_1L: // 1-Link
     case 1:
     {
         size = dwVertCount * sizeof(vertBoned1W);
@@ -200,7 +203,8 @@ void CSkeletonX::_Load(const char* N, IReader* data, u32& dwVertCount)
             const vertBoned1W& VB = pVO[it];
             u16 mid = (u16)VB.matrix;
 
-            if (bids.end() == std::find(bids.begin(), bids.end(), mid)) bids.push_back(mid);
+            if (bids.end() == std::find(bids.begin(), bids.end(), mid))
+                bids.push_back(mid);
 
             sw_bones_cnt = _max(sw_bones_cnt, mid);
         }
@@ -209,7 +213,8 @@ void CSkeletonX::_Load(const char* N, IReader* data, u32& dwVertCount)
         crc = crc32(data->pointer(), size);
         Vertices1W.create(crc, dwVertCount, (vertBoned1W*)data->pointer());
 #else
-        if (1 == bids.size()) {
+        if (1 == bids.size())
+        {
             // HW- single bone
             RenderMode = RM_SINGLE;
             RMS_boneid = *bids.begin();
@@ -232,7 +237,7 @@ void CSkeletonX::_Load(const char* N, IReader* data, u32& dwVertCount)
 #endif
     }
     break;
-    case OGF_VERTEXFORMAT_FVF_2L:  // 2-Link
+    case OGF_VERTEXFORMAT_FVF_2L: // 2-Link
     case 2:
     {
         size = dwVertCount * sizeof(vertBoned2W);
@@ -244,12 +249,15 @@ void CSkeletonX::_Load(const char* N, IReader* data, u32& dwVertCount)
             sw_bones_cnt = _max(sw_bones_cnt, VB.matrix0);
             sw_bones_cnt = _max(sw_bones_cnt, VB.matrix1);
 
-            if (bids.end() == std::find(bids.begin(), bids.end(), VB.matrix0)) bids.push_back(VB.matrix0);
+            if (bids.end() == std::find(bids.begin(), bids.end(), VB.matrix0))
+                bids.push_back(VB.matrix0);
 
-            if (bids.end() == std::find(bids.begin(), bids.end(), VB.matrix1)) bids.push_back(VB.matrix1);
+            if (bids.end() == std::find(bids.begin(), bids.end(), VB.matrix1))
+                bids.push_back(VB.matrix1);
         }
         //.			R_ASSERT(sw_bones_cnt<=hw_bones_cnt);
-        if (sw_bones_cnt <= hw_bones_cnt) {
+        if (sw_bones_cnt <= hw_bones_cnt)
+        {
             // HW- two weights
             RenderMode = RM_SKINNING_2B;
             RMS_bonecount = sw_bones_cnt + 1;
@@ -264,7 +272,7 @@ void CSkeletonX::_Load(const char* N, IReader* data, u32& dwVertCount)
         }
     }
     break;
-    case OGF_VERTEXFORMAT_FVF_3L:  // 3-Link
+    case OGF_VERTEXFORMAT_FVF_3L: // 3-Link
     case 3:
     {
         size = dwVertCount * sizeof(vertBoned3W);
@@ -277,11 +285,13 @@ void CSkeletonX::_Load(const char* N, IReader* data, u32& dwVertCount)
             {
                 sw_bones_cnt = _max(sw_bones_cnt, VB.m[i]);
 
-                if (bids.end() == std::find(bids.begin(), bids.end(), VB.m[i])) bids.push_back(VB.m[i]);
+                if (bids.end() == std::find(bids.begin(), bids.end(), VB.m[i]))
+                    bids.push_back(VB.m[i]);
             }
         }
         //.			R_ASSERT(sw_bones_cnt<=hw_bones_cnt);
-        if ((sw_bones_cnt <= hw_bones_cnt)) {
+        if ((sw_bones_cnt <= hw_bones_cnt))
+        {
             RenderMode = RM_SKINNING_3B;
             RMS_bonecount = sw_bones_cnt + 1;
             GlobalEnv.Render->shader_option_skinning(3);
@@ -294,7 +304,7 @@ void CSkeletonX::_Load(const char* N, IReader* data, u32& dwVertCount)
         }
     }
     break;
-    case OGF_VERTEXFORMAT_FVF_4L:  // 4-Link
+    case OGF_VERTEXFORMAT_FVF_4L: // 4-Link
     case 4:
     {
         size = dwVertCount * sizeof(vertBoned4W);
@@ -308,11 +318,13 @@ void CSkeletonX::_Load(const char* N, IReader* data, u32& dwVertCount)
             {
                 sw_bones_cnt = _max(sw_bones_cnt, VB.m[i]);
 
-                if (bids.end() == std::find(bids.begin(), bids.end(), VB.m[i])) bids.push_back(VB.m[i]);
+                if (bids.end() == std::find(bids.begin(), bids.end(), VB.m[i]))
+                    bids.push_back(VB.m[i]);
             }
         }
         //.			R_ASSERT(sw_bones_cnt<=hw_bones_cnt);
-        if (sw_bones_cnt <= hw_bones_cnt) {
+        if (sw_bones_cnt <= hw_bones_cnt)
+        {
             RenderMode = RM_SKINNING_4B;
             RMS_bonecount = sw_bones_cnt + 1;
             GlobalEnv.Render->shader_option_skinning(4);
@@ -340,12 +352,14 @@ void CSkeletonX::_Load(const char* N, IReader* data, u32& dwVertCount)
 
 BOOL CSkeletonX::has_visible_bones()
 {
-    if (RM_SINGLE == RenderMode) {
+    if (RM_SINGLE == RenderMode)
+    {
         return Parent->LL_GetBoneVisible((u16)RMS_boneid);
     }
 
     for (u32 it = 0; it < BonesUsed.size(); it++)
-        if (Parent->LL_GetBoneVisible(BonesUsed[it])) {
+        if (Parent->LL_GetBoneVisible(BonesUsed[it]))
+        {
             return TRUE;
         }
     return FALSE;
@@ -504,8 +518,10 @@ void CSkeletonX::_FillVerticesSoft1W(const Fmatrix& view, CSkeletonWallmark& wm,
         Fvector test_normal;
         test_normal.mknormal(p[0], p[1], p[2]);
         float cosa = test_normal.dotproduct(normal);
-        if (cosa < EPS) continue;
-        if (CDB::TestSphereTri(wm.ContactPoint(), size, p)) {
+        if (cosa < EPS)
+            continue;
+        if (CDB::TestSphereTri(wm.ContactPoint(), size, p))
+        {
             Fvector UV;
             for (u32 k = 0; k < 3; k++)
             {
@@ -544,8 +560,10 @@ void CSkeletonX::_FillVerticesSoft2W(const Fmatrix& view, CSkeletonWallmark& wm,
         Fvector test_normal;
         test_normal.mknormal(p[0], p[1], p[2]);
         float cosa = test_normal.dotproduct(normal);
-        if (cosa < EPS) continue;
-        if (CDB::TestSphereTri(wm.ContactPoint(), size, p)) {
+        if (cosa < EPS)
+            continue;
+        if (CDB::TestSphereTri(wm.ContactPoint(), size, p))
+        {
             Fvector UV;
             for (u32 k = 0; k < 3; k++)
             {
@@ -573,4 +591,4 @@ void CSkeletonX::_DuplicateIndices(const char* N, IReader* data)
     u32 crc = crc32(data->pointer(), size);
     m_Indices.create(crc, iCount, (u16*)data->pointer());
 }
-#endif  //	USE_DX10
+#endif //	USE_DX10

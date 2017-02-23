@@ -34,59 +34,42 @@ EShaderList ENShaders;
 EShaderList LCShaders;
 EShaderList GameMtls;
 
-char* ENList_GetName(int idx)
-{
-    return ((idx >= 0) && (idx < ENShaders.count)) ? ENShaders.Names[idx] : "(none)";
-}
+char* ENList_GetName(int idx) { return ((idx >= 0) && (idx < ENShaders.count)) ? ENShaders.Names[idx] : "(none)"; }
 int ENList_GetIdx(sh_name n)
 {
     int k;
     for (k = 0; k < ENShaders.count; k++)
     {
-        if (strcmp(n, ENShaders.Names[k]) == 0) return k;
+        if (strcmp(n, ENShaders.Names[k]) == 0)
+            return k;
     }
     return -1;
 }
-void ENList_Clear()
-{
-    ENShaders.count = 0;
-}
-
-char* LCList_GetName(int idx)
-{
-    return ((idx >= 0) && (idx < LCShaders.count)) ? LCShaders.Names[idx] : "(none)";
-}
+void ENList_Clear() { ENShaders.count = 0; }
+char* LCList_GetName(int idx) { return ((idx >= 0) && (idx < LCShaders.count)) ? LCShaders.Names[idx] : "(none)"; }
 int LCList_GetIdx(sh_name n)
 {
     int k;
     for (k = 0; k < LCShaders.count; k++)
     {
-        if (strcmp(n, LCShaders.Names[k]) == 0) return k;
+        if (strcmp(n, LCShaders.Names[k]) == 0)
+            return k;
     }
     return -1;
 }
-void LCList_Clear()
-{
-    LCShaders.count = 0;
-}
-
-char* GMList_GetName(int idx)
-{
-    return ((idx >= 0) && (idx < GameMtls.count)) ? GameMtls.Names[idx] : "(none)";
-}
+void LCList_Clear() { LCShaders.count = 0; }
+char* GMList_GetName(int idx) { return ((idx >= 0) && (idx < GameMtls.count)) ? GameMtls.Names[idx] : "(none)"; }
 int GMList_GetIdx(sh_name n)
 {
     int k;
     for (k = 0; k < GameMtls.count; k++)
     {
-        if (strcmp(n, GameMtls.Names[k]) == 0) return k;
+        if (strcmp(n, GameMtls.Names[k]) == 0)
+            return k;
     }
     return -1;
 }
-void GMList_Clear()
-{
-    GameMtls.count = 0;
-}
+void GMList_Clear() { GameMtls.count = 0; }
 /*
 ======================================================================
 popCnt_VMAP()
@@ -96,23 +79,11 @@ callback for the vmap popup list, also used by Load().
 ====================================================================== */
 
 XCALL_(static int)
-popCnt_EN(void* data)
-{
-    return 1 + ENShaders.count;
-}
-
+popCnt_EN(void* data) { return 1 + ENShaders.count; }
 XCALL_(static int)
-popCnt_GM(void* data)
-{
-    return 1 + GameMtls.count;
-}
-
+popCnt_GM(void* data) { return 1 + GameMtls.count; }
 XCALL_(static int)
-popCnt_LC(void* data)
-{
-    return 1 + LCShaders.count;
-}
-
+popCnt_LC(void* data) { return 1 + LCShaders.count; }
 /*
 ======================================================================
 popName_VMAP()
@@ -122,23 +93,11 @@ vmap popup list, also used by Load() and Save().
 ====================================================================== */
 
 XCALL_(static const char*)
-popName_EN(void* data, int idx)
-{
-    return ENList_GetName(idx);
-}
-
+popName_EN(void* data, int idx) { return ENList_GetName(idx); }
 XCALL_(static const char*)
-popName_GM(void* data, int idx)
-{
-    return GMList_GetName(idx);
-}
-
+popName_GM(void* data, int idx) { return GMList_GetName(idx); }
 XCALL_(static const char*)
-popName_LC(void* data, int idx)
-{
-    return LCList_GetName(idx);
-}
-
+popName_LC(void* data, int idx) { return LCList_GetName(idx); }
 /*
 ======================================================================
 Create()
@@ -159,7 +118,8 @@ Create(void* priv, LWSurfaceID surf, LWError* err)
     XRShader* inst;
 
     inst = calloc(1, sizeof(XRShader));
-    if (!inst) {
+    if (!inst)
+    {
         *err = "Couldn't allocate memory for instance.";
         return NULL;
     }
@@ -183,11 +143,7 @@ Handler callback.  Free resources allocated by Create().
 ====================================================================== */
 
 XCALL_(static void)
-Destroy(XRShader* inst)
-{
-    free(inst);
-}
-
+Destroy(XRShader* inst) { free(inst); }
 /*
 ======================================================================
 Copy()
@@ -217,9 +173,12 @@ XCALL_(static LWError)
 Load(XRShader* inst, const LWLoadState* ls)
 {
     ls->read(ls->readData, (char*)inst, sizeof(XRShader));
-    if (ENList_GetIdx(inst->en_name) == -1) strcpy(inst->en_name, "default");
-    if (LCList_GetIdx(inst->lc_name) == -1) strcpy(inst->lc_name, "default");
-    if (GMList_GetIdx(inst->gm_name) == -1) strcpy(inst->gm_name, "default");
+    if (ENList_GetIdx(inst->en_name) == -1)
+        strcpy(inst->en_name, "default");
+    if (LCList_GetIdx(inst->lc_name) == -1)
+        strcpy(inst->lc_name, "default");
+    if (GMList_GetIdx(inst->gm_name) == -1)
+        strcpy(inst->gm_name, "default");
     inst->desc = 0;
 
     return NULL;
@@ -256,7 +215,8 @@ XCALL_(static const char*)
 DescLn(XRShader* inst)
 {
     char s[1024];
-    if (inst->desc) free(inst->desc);
+    if (inst->desc)
+        free(inst->desc);
     sprintf(s, "ES:'%s', CS:'%s', GM:'%s'", inst->en_name, inst->lc_name, inst->gm_name);
     inst->desc = strdup(s);
     return inst->desc;
@@ -288,7 +248,8 @@ anything to do, but it's here in case we want to add something later.
 XCALL_(static void)
 Cleanup(XRShader* inst)
 {
-    if (inst->desc) free(inst->desc);
+    if (inst->desc)
+        free(inst->desc);
     return;
 }
 
@@ -300,11 +261,7 @@ Handler callback, called at the start of each sampling pass.
 ====================================================================== */
 
 XCALL_(static LWError)
-NewTime(XRShader* inst, LWFrame f, LWTime t)
-{
-    return NULL;
-}
-
+NewTime(XRShader* inst, LWFrame f, LWTime t) { return NULL; }
 /*
 ======================================================================
 Flags()
@@ -314,11 +271,7 @@ else, so we return just the color bit.
 ====================================================================== */
 
 XCALL_(static unsigned int)
-Flags(XRShader* inst)
-{
-    return LWSHF_COLOR;
-}
-
+Flags(XRShader* inst) { return LWSHF_COLOR; }
 /*
 ======================================================================
 Evaluate()
@@ -330,10 +283,7 @@ computed for that spot.
 ====================================================================== */
 
 XCALL_(static void)
-Evaluate(XRShader* inst, LWShaderAccess* sa)
-{
-}
-
+Evaluate(XRShader* inst, LWShaderAccess* sa) {}
 /*
 ======================================================================
 Handler()
@@ -345,7 +295,8 @@ callback fields of the handler structure.
 XCALL_(static int)
 Handler(long version, GlobalFunc* global, LWShaderHandler* local, void* serverData)
 {
-    if (version != LWSHADER_VERSION) return AFUNC_BADVERSION;
+    if (version != LWSHADER_VERSION)
+        return AFUNC_BADVERSION;
 
     local->inst->create = Create;
     local->inst->destroy = Destroy;
@@ -386,7 +337,8 @@ void* ui_get(XRShader* dat, unsigned long vid)
 {
     void* result = NULL;
 
-    if (dat) switch (vid)
+    if (dat)
+        switch (vid)
         {
         case ID_EN:
             dat->en_idx = ENList_GetIdx(dat->en_name);
@@ -419,15 +371,18 @@ LWXPRefreshCode ui_set(XRShader* dat, unsigned long vid, void* value)
     {
     case ID_EN:
         dat->en_idx = *((int*)value);
-        if (dat->en_idx >= 0) strncpy(dat->en_name, ENList_GetName(dat->en_idx), sizeof(dat->en_name));
+        if (dat->en_idx >= 0)
+            strncpy(dat->en_name, ENList_GetName(dat->en_idx), sizeof(dat->en_name));
         break;
     case ID_LC:
         dat->lc_idx = *((int*)value);
-        if (dat->lc_idx >= 0) strncpy(dat->lc_name, LCList_GetName(dat->lc_idx), sizeof(dat->lc_name));
+        if (dat->lc_idx >= 0)
+            strncpy(dat->lc_name, LCList_GetName(dat->lc_idx), sizeof(dat->lc_name));
         break;
     case ID_GM:
         dat->gm_idx = *((int*)value);
-        if (dat->gm_idx >= 0) strncpy(dat->gm_name, GMList_GetName(dat->gm_idx), sizeof(dat->gm_name));
+        if (dat->gm_idx >= 0)
+            strncpy(dat->gm_name, GMList_GetName(dat->gm_idx), sizeof(dat->gm_name));
         break;
     default: return 0;
     }
@@ -448,7 +403,8 @@ void ui_chgnotify(LWXPanelID panel, unsigned long cid, unsigned long vid, int ev
     void* dat;
 
     if (event == LWXPEVENT_VALUE)
-        if (dat = xpanf->getData(panel, 0)) lwupdate(LWSHADER_HCLASS, dat);
+        if (dat = xpanf->getData(panel, 0))
+            lwupdate(LWSHADER_HCLASS, dat);
 }
 
 /*
@@ -461,25 +417,27 @@ Create and initialize an LWXP_VIEW panel.  Called by Interface().
 #define STR_Type_LC "Compiler"
 #define STR_Type_GM "Game Material"
 static LWXPanelControl ctrl_list[] = {
-    {ID_EN, STR_Type_EN, "iPopChoice"}, {ID_LC, STR_Type_LC, "iPopChoice"}, {ID_GM, STR_Type_GM, "iPopChoice"}, {0}};
+{ID_EN, STR_Type_EN, "iPopChoice"}, {ID_LC, STR_Type_LC, "iPopChoice"}, {ID_GM, STR_Type_GM, "iPopChoice"}, {0}};
 
 /* matching array of data descriptors */
 
 static LWXPanelDataDesc data_descrip[] = {
-    {ID_EN, STR_Type_EN, "integer"}, {ID_LC, STR_Type_LC, "integer"}, {ID_GM, STR_Type_GM, "integer"}, {0},
+{ID_EN, STR_Type_EN, "integer"}, {ID_LC, STR_Type_LC, "integer"}, {ID_GM, STR_Type_GM, "integer"}, {0},
 };
 static LWXPanelID get_xpanel(GlobalFunc* global, XRShader* dat)
 {
     LWXPanelID panID = NULL;
 
     static LWXPanelHint hint[] = {XpLABEL(0, "Shaders"), XpCHGNOTIFY(ui_chgnotify),
-        XpPOPFUNCS(ID_EN, popCnt_EN, popName_EN), XpPOPFUNCS(ID_LC, popCnt_LC, popName_LC),
-        XpPOPFUNCS(ID_GM, popCnt_GM, popName_GM), XpEND};
+    XpPOPFUNCS(ID_EN, popCnt_EN, popName_EN), XpPOPFUNCS(ID_LC, popCnt_LC, popName_LC),
+    XpPOPFUNCS(ID_GM, popCnt_GM, popName_GM), XpEND};
 
     xpanf = global(LWXPANELFUNCS_GLOBAL, GFUSE_TRANSIENT);
-    if (xpanf) {
+    if (xpanf)
+    {
         panID = xpanf->create(LWXP_VIEW, ctrl_list);
-        if (panID) {
+        if (panID)
+        {
             xpanf->hint(panID, 0, hint);
             xpanf->describe(panID, data_descrip, ui_get, ui_set);
             xpanf->viewInst(panID, dat);
@@ -500,12 +458,14 @@ The interface activation function.
 XCALL_(int)
 Interface(long version, GlobalFunc* global, LWInterface* local, void* serverData)
 {
-    if (version != LWINTERFACE_VERSION) return AFUNC_BADVERSION;
+    if (version != LWINTERFACE_VERSION)
+        return AFUNC_BADVERSION;
 
     colorpick = global(LWCOLORACTIVATEFUNC_GLOBAL, GFUSE_TRANSIENT);
     lwupdate = global(LWINSTUPDATE_GLOBAL, GFUSE_TRANSIENT);
     xpanf = global(LWXPANELFUNCS_GLOBAL, GFUSE_TRANSIENT);
-    if (!colorpick || !lwupdate || !xpanf) return AFUNC_BADGLOBAL;
+    if (!colorpick || !lwupdate || !xpanf)
+        return AFUNC_BADGLOBAL;
 
     local->panel = get_xpanel(global, local->inst);
     //   local->panel   = get_panel( local->inst );
@@ -516,6 +476,6 @@ Interface(long version, GlobalFunc* global, LWInterface* local, void* serverData
 }
 
 ServerRecord ServerDesc[] = {
-    {LWSHADER_HCLASS, SH_PLUGIN_NAME, Handler}, {LWSHADER_ICLASS, SH_PLUGIN_NAME, Interface}, {NULL}};
+{LWSHADER_HCLASS, SH_PLUGIN_NAME, Handler}, {LWSHADER_ICLASS, SH_PLUGIN_NAME, Interface}, {NULL}};
 
 #pragma warning(default : 4996)

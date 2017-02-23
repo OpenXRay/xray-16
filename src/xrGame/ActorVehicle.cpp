@@ -59,16 +59,19 @@ void CActor::attach_Vehicle(CHolderCustom* vehicle)
 
 void CActor::detach_Vehicle()
 {
-    if (!m_holder) return;
+    if (!m_holder)
+        return;
     CCar* car = smart_cast<CCar*>(m_holder);
-    if (!car) return;
+    if (!car)
+        return;
 
     // CPHShellSplitterHolder*sh= car->PPhysicsShell()->SplitterHolder();
     // if(sh)
     //	sh->Deactivate();
     car->PPhysicsShell()->SplitterHolderDeactivate();
 
-    if (!character_physics_support()->movement()->ActivateBoxDynamic(0)) {
+    if (!character_physics_support()->movement()->ActivateBoxDynamic(0))
+    {
         // if(sh)sh->Activate();
         car->PPhysicsShell()->SplitterHolderActivate();
         return;
@@ -76,7 +79,7 @@ void CActor::detach_Vehicle()
     // if(sh)
     //	sh->Activate();
     car->PPhysicsShell()->SplitterHolderActivate();
-    m_holder->detach_Actor();  //
+    m_holder->detach_Actor(); //
 
     character_physics_support()->movement()->SetPosition(m_holder->ExitPosition());
     character_physics_support()->movement()->SetVelocity(m_holder->ExitVelocity());
@@ -102,21 +105,26 @@ bool CActor::use_Vehicle(CHolderCustom* object)
     CHolderCustom* vehicle = object;
     Fvector center;
     Center(center);
-    if (m_holder) {
+    if (m_holder)
+    {
         if (!vehicle && m_holder->Use(Device.vCameraPosition, Device.vCameraDirection, center))
             detach_Vehicle();
         else
         {
             if (m_holder == vehicle)
-                if (m_holder->Use(Device.vCameraPosition, Device.vCameraDirection, center)) detach_Vehicle();
+                if (m_holder->Use(Device.vCameraPosition, Device.vCameraDirection, center))
+                    detach_Vehicle();
         }
         return true;
     }
     else
     {
-        if (vehicle) {
-            if (vehicle->Use(Device.vCameraPosition, Device.vCameraDirection, center)) {
-                if (pCamBobbing) {
+        if (vehicle)
+        {
+            if (vehicle->Use(Device.vCameraPosition, Device.vCameraDirection, center))
+            {
+                if (pCamBobbing)
+                {
                     Cameras().RemoveCamEffector(eCEBobbing);
                     pCamBobbing = NULL;
                 }

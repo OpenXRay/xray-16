@@ -58,7 +58,6 @@ public:
     virtual BOOL canBeDetailed() { return FALSE; }
     virtual BOOL canBeLMAPped() = 0;
     virtual BOOL canUseSteepParallax() { return FALSE; }
-
     virtual void Save(IWriter& fs);
     virtual void Load(IReader& fs, u16 version);
 
@@ -69,4 +68,4 @@ public:
 };
 #pragma pack(pop)
 
-#endif  // !defined(AFX_BLENDER_H__A023332E_C09B_4D93_AA53_57C052CCC075__INCLUDED_)
+#endif // !defined(AFX_BLENDER_H__A023332E_C09B_4D93_AA53_57C052CCC075__INCLUDED_)

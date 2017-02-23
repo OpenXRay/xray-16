@@ -22,4 +22,4 @@ public:
     virtual wm_shader GenerateWallmark() = 0;
 };
 
-#endif  //	WallMarkArray_included
+#endif //	WallMarkArray_included

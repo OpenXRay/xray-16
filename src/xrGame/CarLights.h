@@ -46,7 +46,6 @@ protected:
         const SCarLight* m_light;
 
         SFindLightPredicate(const SCarLight* light) : m_light(light) {}
-
         bool operator()(const SCarLight* light) const { return light->bone_id == m_light->bone_id; }
     };
     LIGHTS_STORAGE m_lights;

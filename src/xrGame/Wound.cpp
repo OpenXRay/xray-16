@@ -22,10 +22,7 @@ CWound::CWound(u16 bone_num)
     m_fDropTime = 0.f;
 }
 
-CWound::~CWound(void)
-{
-}
-
+CWound::~CWound(void) {}
 #define WOUND_MAX 10.f
 
 // serialization
@@ -57,17 +54,9 @@ float CWound::TotalSize()
     return total_size;
 }
 
-float CWound::TypeSize(ALife::EHitType hit_type)
-{
-    return m_Wounds[hit_type];
-}
-
+float CWound::TypeSize(ALife::EHitType hit_type) { return m_Wounds[hit_type]; }
 //кол-во кровавых ран
-float CWound::BloodSize()
-{
-    return m_Wounds[ALife::eHitTypeWound] + m_Wounds[ALife::eHitTypeFireWound];
-}
-
+float CWound::BloodSize() { return m_Wounds[ALife::eHitTypeWound] + m_Wounds[ALife::eHitTypeFireWound]; }
 void CWound::AddHit(float hit_power, ALife::EHitType hit_type)
 {
     m_Wounds[hit_type] += hit_power;
@@ -78,7 +67,8 @@ void CWound::Incarnation(float percent, float min_wound_size)
 {
     float total_size = TotalSize();
 
-    if (fis_zero(total_size)) {
+    if (fis_zero(total_size))
+    {
         for (int i = 0; i < ALife::eHitTypeMax; i++)
             m_Wounds[i] = 0.f;
         return;
@@ -88,6 +78,7 @@ void CWound::Incarnation(float percent, float min_wound_size)
     for (int i = 0; i < ALife::eHitTypeMax; i++)
     {
         m_Wounds[i] -= percent /* *m_Wounds[i]*/;
-        if (m_Wounds[i] < min_wound_size) m_Wounds[i] = 0;
+        if (m_Wounds[i] < min_wound_size)
+            m_Wounds[i] = 0;
     }
 }

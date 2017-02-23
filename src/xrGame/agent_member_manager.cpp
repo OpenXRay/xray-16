@@ -24,19 +24,15 @@ protected:
 
 public:
     IC CMemberPredicate2(const ALife::_OBJECT_ID& object_id) { m_object_id = object_id; }
-
     IC bool operator()(const CMemberOrder* order) const { return (order->object().ID() == m_object_id); }
 };
 
-CAgentMemberManager::~CAgentMemberManager()
-{
-    delete_data(m_members);
-}
-
+CAgentMemberManager::~CAgentMemberManager() { delete_data(m_members); }
 void CAgentMemberManager::add(CEntity* member)
 {
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(member);
-    if (!stalker || !stalker->g_Alive()) return;
+    if (!stalker || !stalker->g_Alive())
+        return;
 
     VERIFY2(sizeof(squad_mask_type) * 8 > members().size(),
         make_string("too many stalkers in group ([team:%d][squad:%d][group:%d]!", m_members.front()->object().g_Team(),
@@ -50,9 +46,11 @@ void CAgentMemberManager::add(CEntity* member)
 void CAgentMemberManager::remove(CEntity* member)
 {
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(member);
-    if (!stalker) return;
+    if (!stalker)
+        return;
 
-    if (registered_in_combat(stalker)) unregister_in_combat(stalker);
+    if (registered_in_combat(stalker))
+        unregister_in_combat(stalker);
 
     squad_mask_type m = mask(stalker);
     object().memory().update_memory_masks(m);
@@ -64,17 +62,15 @@ void CAgentMemberManager::remove(CEntity* member)
     m_members.erase(I);
 }
 
-void CAgentMemberManager::update()
-{
-}
-
+void CAgentMemberManager::update() {}
 void CAgentMemberManager::remove_links(IGameObject* object)
 {
     MEMBER_STORAGE::iterator I = m_members.begin();
     MEMBER_STORAGE::iterator E = m_members.end();
     for (; I != E; ++I)
     {
-        if ((*I)->grenade_reaction().m_grenade) {
+        if ((*I)->grenade_reaction().m_grenade)
+        {
             const CGameObject* explosive = smart_cast<const CGameObject*>((*I)->grenade_reaction().m_grenade);
             VERIFY(explosive);
             if (explosive->ID() == object->ID())
@@ -82,7 +78,8 @@ void CAgentMemberManager::remove_links(IGameObject* object)
             else
             {
                 CGrenade const* grenade = smart_cast<CGrenade const*>(explosive);
-                if (grenade && grenade->CurrentParentID() == object->ID()) (*I)->grenade_reaction().clear();
+                if (grenade && grenade->CurrentParentID() == object->ID())
+                    (*I)->grenade_reaction().clear();
             }
         }
 
@@ -99,7 +96,7 @@ void CAgentMemberManager::register_in_combat(const CAI_Stalker* object)
 //	if (!object->group_behaviour())
 //		return;
 
-#if 0   // def DEBUG
+#if 0 // def DEBUG
 	Msg							(
 		"%6d registering stalker %s in combat: 0x%08x -> 0x%08x",
 		Device.dwTimeGlobal,
@@ -107,7 +104,7 @@ void CAgentMemberManager::register_in_combat(const CAI_Stalker* object)
 		m_combat_mask,
 		m_combat_mask | mask(object)
 	);
-#endif  // DEBUG
+#endif // DEBUG
 
     squad_mask_type m = mask(object);
     m_actuality = m_actuality && ((m_combat_mask | m) == m_combat_mask);
@@ -121,7 +118,7 @@ void CAgentMemberManager::unregister_in_combat(const CAI_Stalker* object)
 //		return;
 //	}
 
-#if 0   // def DEBUG
+#if 0 // def DEBUG
 	Msg							(
 		"%6d UNregistering stalker %s in combat: 0x%08x -> 0x%08x",
 		Device.dwTimeGlobal,
@@ -129,7 +126,7 @@ void CAgentMemberManager::unregister_in_combat(const CAI_Stalker* object)
 		m_combat_mask,
 		(m_combat_mask & (squad_mask_type(-1) ^ mask(object)))
 	);
-#endif  // DEBUG
+#endif // DEBUG
 
     squad_mask_type m = mask(object);
     m_actuality = m_actuality && ((m_combat_mask & (squad_mask_type(-1) ^ m)) == m_combat_mask);
@@ -143,7 +140,8 @@ bool CAgentMemberManager::registered_in_combat(const CAI_Stalker* object) const
 
 CAgentMemberManager::MEMBER_STORAGE& CAgentMemberManager::combat_members()
 {
-    if (m_actuality) return (m_combat_members);
+    if (m_actuality)
+        return (m_combat_members);
 
     m_actuality = true;
 
@@ -152,7 +150,8 @@ CAgentMemberManager::MEMBER_STORAGE& CAgentMemberManager::combat_members()
     MEMBER_STORAGE::iterator E = members().end();
     for (; I != E; ++I)
     {
-        if (registered_in_combat(&(*I)->object())) m_combat_members.push_back(*I);
+        if (registered_in_combat(&(*I)->object()))
+            m_combat_members.push_back(*I);
     }
 
     return (m_combat_members);
@@ -166,7 +165,8 @@ CAgentMemberManager::squad_mask_type CAgentMemberManager::non_combat_members_mas
     MEMBER_STORAGE::const_iterator E = members().end();
     for (; I != E; ++I)
     {
-        if (!registered_in_combat(&(*I)->object())) result |= mask(&(*I)->object());
+        if (!registered_in_combat(&(*I)->object()))
+            result |= mask(&(*I)->object());
     }
 
     return (result);
@@ -178,7 +178,8 @@ u32 CAgentMemberManager::in_detour() const
     MEMBER_STORAGE::const_iterator I = members().begin();
     MEMBER_STORAGE::const_iterator E = members().end();
     for (; I != E; ++I)
-        if ((*I)->detour()) ++in_detour;
+        if ((*I)->detour())
+            ++in_detour;
 
     return (in_detour);
 }
@@ -194,7 +195,8 @@ bool CAgentMemberManager::cover_detouring() const
     MEMBER_STORAGE::const_iterator I = members().begin();
     MEMBER_STORAGE::const_iterator E = members().end();
     for (; I != E; ++I)
-        if ((*I)->detour()) return (true);
+        if ((*I)->detour())
+            return (true);
     return (false);
 }
 
@@ -204,9 +206,11 @@ bool CAgentMemberManager::can_cry_noninfo_phrase() const
     MEMBER_STORAGE::const_iterator E = members().end();
     for (; I != E; ++I)
     {
-        if (!registered_in_combat(&(*I)->object())) continue;
+        if (!registered_in_combat(&(*I)->object()))
+            continue;
 
-        if ((*I)->object().sound().active_sound_count(false)) return (false);
+        if ((*I)->object().sound().active_sound_count(false))
+            return (false);
     }
 
     return (true);
@@ -222,14 +226,16 @@ MemorySpace::squad_mask_type CAgentMemberManager::mask(const ALife::_OBJECT_ID& 
 CMemberOrder* CAgentMemberManager::get_member(const ALife::_OBJECT_ID& object_id)
 {
     iterator I = std::find_if(members().begin(), members().end(), CMemberPredicate2(object_id));
-    if (I == members().end()) return (0);
+    if (I == members().end())
+        return (0);
 
     return (&**I);
 }
 
 bool CAgentMemberManager::can_throw_grenade(const Fvector& location) const
 {
-    if (Device.dwTimeGlobal <= m_last_throw_time + m_throw_time_interval) return (false);
+    if (Device.dwTimeGlobal <= m_last_throw_time + m_throw_time_interval)
+        return (false);
 
     typedef CAgentMemberManager::MEMBER_STORAGE MEMBER_STORAGE;
     const float member_danger_radius_sqr = _sqr(5.f);
@@ -238,17 +244,17 @@ bool CAgentMemberManager::can_throw_grenade(const Fvector& location) const
     MEMBER_STORAGE::const_iterator E = members().end();
     for (; I != E; ++I)
     {
-        if ((*I)->object().Position().distance_to_sqr(location) <= member_danger_radius_sqr) return (false);
+        if ((*I)->object().Position().distance_to_sqr(location) <= member_danger_radius_sqr)
+            return (false);
 
-        if (!(*I)->cover()) continue;
+        if (!(*I)->cover())
+            continue;
 
-        if ((*I)->cover()->m_position.distance_to_sqr(location) <= cover_danger_radius_sqr) return (false);
+        if ((*I)->cover()->m_position.distance_to_sqr(location) <= cover_danger_radius_sqr)
+            return (false);
     }
 
     return (true);
 }
 
-void CAgentMemberManager::on_throw_completed()
-{
-    m_last_throw_time = Device.dwTimeGlobal;
-}
+void CAgentMemberManager::on_throw_completed() { m_last_throw_time = Device.dwTimeGlobal; }

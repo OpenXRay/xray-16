@@ -4,7 +4,7 @@
 #ifdef DEBUG
 #include "xrEngine/xr_ioconsole.h"
 #include "xrEngine/xr_ioc_cmd.h"
-#endif  //#ifdef DEBUG
+#endif //#ifdef DEBUG
 #include "string_table.h"
 CRestrictions g_mp_restrictions;
 
@@ -13,7 +13,8 @@ shared_str g_ranks[_RANK_COUNT];
 u32 get_rank(const shared_str& section)
 {
     int res = -1;
-    if (g_ranks[0].size() == 0) {  // load
+    if (g_ranks[0].size() == 0)
+    { // load
         string32 buff;
         for (int i = 0; i < _RANK_COUNT; i++)
         {
@@ -23,7 +24,8 @@ u32 get_rank(const shared_str& section)
     }
     for (u32 i = 0; i < _RANK_COUNT; i++)
     {
-        if (strstr(g_ranks[i].c_str(), section.c_str())) {
+        if (strstr(g_ranks[i].c_str(), section.c_str()))
+        {
             res = i;
             break;
         }
@@ -39,13 +41,11 @@ CRestrictions::CRestrictions()
     m_bInited = false;
 }
 
-CRestrictions::~CRestrictions()
-{
-}
-
+CRestrictions::~CRestrictions() {}
 void CRestrictions::InitGroups()
 {
-    if (m_bInited) return;
+    if (m_bInited)
+        return;
     m_bInited = true;
 
     // create groups
@@ -73,7 +73,7 @@ void CRestrictions::InitGroups()
 
 #ifndef MASTER_GOLD
     Dump();
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
 
 #ifdef DEBUG
     CMD4(CCC_Integer, "rank_for_buymenu", (int*)&m_rank, 0, 4);
@@ -81,12 +81,13 @@ void CRestrictions::InitGroups()
 }
 
 void CRestrictions::AddRestriction4rank(u32 rank, const shared_str& lst)
-{  // private
+{ // private
     VERIFY(m_bInited);
 
     rank_rest_vec& rest = m_restrictions[rank];
 
-    if (rank != _RANK_COUNT) {
+    if (rank != _RANK_COUNT)
+    {
         u32 src_idx = (rank == 0) ? _RANK_COUNT : (rank - 1);
         rest = m_restrictions[src_idx];
     }
@@ -113,7 +114,7 @@ bool CRestrictions::IsAvailable(const shared_str& itm)
 }
 
 void CRestrictions::AddGroup(LPCSTR group, LPCSTR lst)
-{  // private
+{ // private
     VERIFY(m_bInited);
 
     VERIFY(m_goups.find(group) == m_goups.end());
@@ -132,19 +133,16 @@ void CRestrictions::AddGroup(LPCSTR group, LPCSTR lst)
     }
 }
 
-bool CRestrictions::IsGroupExist(const shared_str& group) const
-{
-    return (m_goups.end() != m_goups.find(group));
-}
-
+bool CRestrictions::IsGroupExist(const shared_str& group) const { return (m_goups.end() != m_goups.find(group)); }
 RESTR CRestrictions::GetRestr(const shared_str& item)
-{  // private function
+{ // private function
     VERIFY(m_bInited);
     RESTR ret;
     string512 _name;
     int _cnt = 0;
     ptrdiff_t n = strchr(item.c_str(), ':') - item.c_str();
-    if (n > 0) {
+    if (n > 0)
+    {
         strncpy_s(_name, item.c_str(), n);
         _name[n] = 0;
         _cnt = sscanf(item.c_str() + n + 1, "%d", &ret.n);
@@ -156,14 +154,15 @@ RESTR CRestrictions::GetRestr(const shared_str& item)
 }
 
 shared_str CRestrictions::GetItemGroup(const shared_str& item) const
-{  // private function
+{ // private function
     VERIFY(m_bInited);
     Groups::const_iterator it;
     group_items::const_iterator IT;
 
     for (it = m_goups.begin(); it != m_goups.end(); it++)
         for (IT = (*it).second.begin(); IT != (*it).second.end(); IT++)
-            if ((*IT) == item) return (*it).first;
+            if ((*IT) == item)
+                return (*it).first;
 
     return NULL;
 }
@@ -199,7 +198,8 @@ CRestrictions::restr_item* CRestrictions::find_restr_item_internal(const u32& ra
 
     for (; it != it_e; ++it)
     {
-        if (it->first == group_name) return &(*it);
+        if (it->first == group_name)
+            return &(*it);
     }
     return NULL;
 }
@@ -212,7 +212,8 @@ const CRestrictions::restr_item* CRestrictions::find_restr_item(const u32& rank,
 
     for (; it != it_e; ++it)
     {
-        if (it->first == group_name) return &(*it);
+        if (it->first == group_name)
+            return &(*it);
     }
     VERIFY(it != it_e);
     return NULL;
@@ -249,5 +250,5 @@ void CRestrictions::Dump() const
         }
         Msg("-----------------------------------------");
     }
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
 }

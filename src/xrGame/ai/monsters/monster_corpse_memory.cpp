@@ -12,10 +12,7 @@ CMonsterCorpseMemory::CMonsterCorpseMemory()
     time_memory = 10000;
 }
 
-CMonsterCorpseMemory::~CMonsterCorpseMemory()
-{
-}
-
+CMonsterCorpseMemory::~CMonsterCorpseMemory() {}
 void CMonsterCorpseMemory::init_external(CBaseMonster* M, TTime mem_time)
 {
     monster = M;
@@ -27,9 +24,11 @@ void CMonsterCorpseMemory::update()
     for (xr_vector<const CGameObject*>::const_iterator I = monster->memory().item().objects().begin();
          I != monster->memory().item().objects().end(); ++I)
     {
-        if (monster->memory().visual().visible_now(*I)) {
+        if (monster->memory().visual().visible_now(*I))
+        {
             const CEntityAlive* p_corpse = smart_cast<const CEntityAlive*>(*I);
-            if (!p_corpse || p_corpse->g_Alive()) continue;
+            if (!p_corpse || p_corpse->g_Alive())
+                continue;
             add_corpse(p_corpse);
         }
     }
@@ -40,13 +39,15 @@ void CMonsterCorpseMemory::update()
 
 void CMonsterCorpseMemory::add_corpse(const CEntityAlive* corpse)
 {
-    if (const_cast<CEntityAlive*>(corpse)->is_locked_corpse()) return;
+    if (const_cast<CEntityAlive*>(corpse)->is_locked_corpse())
+        return;
     SMonsterCorpse corpse_info;
     corpse_info.position = corpse->Position();
     corpse_info.vertex = corpse->ai_location().level_vertex_id();
     corpse_info.time = Device.dwTimeGlobal;
     CORPSE_MAP_IT it = m_objects.find(corpse);
-    if (it != m_objects.end()) {
+    if (it != m_objects.end())
+    {
         // обновить данные о враге
         it->second = corpse_info;
     }
@@ -82,7 +83,8 @@ void CMonsterCorpseMemory::remove_non_actual()
             continue;
         }
 
-        if (const_cast<CEntityAlive*>(it->first)->is_locked_corpse()) {
+        if (const_cast<CEntityAlive*>(it->first)->is_locked_corpse())
+        {
             m_objects.erase(it);
             continue;
         }
@@ -92,8 +94,10 @@ void CMonsterCorpseMemory::remove_non_actual()
 const CEntityAlive* CMonsterCorpseMemory::get_corpse()
 {
     CORPSE_MAP_IT it = find_best_corpse();
-    if (it != m_objects.end()) {
-        if (const_cast<CEntityAlive*>(it->first)->is_locked_corpse()) return (0);
+    if (it != m_objects.end())
+    {
+        if (const_cast<CEntityAlive*>(it->first)->is_locked_corpse())
+            return (0);
 
         return it->first;
     }
@@ -106,7 +110,8 @@ SMonsterCorpse CMonsterCorpseMemory::get_corpse_info()
     ret_val.time = 0;
 
     CORPSE_MAP_IT it = find_best_corpse();
-    if (it != m_objects.end()) ret_val = it->second;
+    if (it != m_objects.end())
+        ret_val = it->second;
 
     return ret_val;
 }
@@ -118,7 +123,8 @@ CORPSE_MAP_IT CMonsterCorpseMemory::find_best_corpse()
 
     for (CORPSE_MAP_IT I = m_objects.begin(); I != m_objects.end(); I++)
     {
-        if (I->second.position.distance_to(monster->Position()) < min_dist) {
+        if (I->second.position.distance_to(monster->Position()) < min_dist)
+        {
             min_dist = I->second.position.distance_to(monster->Position());
             it = I;
         }
@@ -131,7 +137,8 @@ void CMonsterCorpseMemory::remove_links(IGameObject* O)
 {
     for (CORPSE_MAP_IT I = m_objects.begin(); I != m_objects.end(); ++I)
     {
-        if ((*I).first == O) {
+        if ((*I).first == O)
+        {
             m_objects.erase(I);
             break;
         }

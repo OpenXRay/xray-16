@@ -29,7 +29,6 @@ public:
     }
     u32 GetRank() { return m_rank; };
     const shared_str& GetRankName(u32 rank) const { return m_names[rank]; }
-
 protected:
     void Dump() const;
 

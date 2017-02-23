@@ -21,11 +21,7 @@
 
 //----------------------------------------------------
 
-ESoundEnvironment::ESoundEnvironment(LPVOID data, LPCSTR name) : CEditShape(data, name)
-{
-    Construct(data);
-}
-
+ESoundEnvironment::ESoundEnvironment(LPVOID data, LPCSTR name) : CEditShape(data, name) { Construct(data); }
 void ESoundEnvironment::Construct(LPVOID data)
 {
     ClassID = OBJCLASS_SOUND_ENV;
@@ -36,10 +32,7 @@ void ESoundEnvironment::Construct(LPVOID data)
     m_EnvOuter = "";
 }
 
-ESoundEnvironment::~ESoundEnvironment()
-{
-}
-
+ESoundEnvironment::~ESoundEnvironment() {}
 //----------------------------------------------------
 
 void ESoundEnvironment::OnUpdateTransform()
@@ -53,7 +46,8 @@ bool ESoundEnvironment::LoadLTX(CInifile& ini, LPCSTR sect_name)
 {
     u32 version = ini.r_u32(sect_name, "version");
 
-    if (version != SOUND_ENV_VERSION) {
+    if (version != SOUND_ENV_VERSION)
+    {
         ELog.DlgMsg(mtError, "ESoundSource: Unsupported version.");
         return false;
     }
@@ -77,7 +71,8 @@ bool ESoundEnvironment::LoadStream(IReader& F)
     u16 version = 0;
 
     R_ASSERT(F.r_chunk(SOUND_CHUNK_VERSION, &version));
-    if (version != SOUND_ENV_VERSION) {
+    if (version != SOUND_ENV_VERSION)
+    {
         ELog.DlgMsg(mtError, "ESoundSource: Unsupported version.");
         return false;
     }
@@ -106,11 +101,7 @@ void ESoundEnvironment::SaveStream(IWriter& F)
 
 //----------------------------------------------------
 
-void ESoundEnvironment::OnChangeEnvs(PropValue* prop)
-{
-    ExecCommand(COMMAND_REFRESH_SOUND_ENV_GEOMETRY);
-}
-
+void ESoundEnvironment::OnChangeEnvs(PropValue* prop) { ExecCommand(COMMAND_REFRESH_SOUND_ENV_GEOMETRY); }
 //----------------------------------------------------
 
 void ESoundEnvironment::FillProp(LPCSTR pref, PropItemVec& values)

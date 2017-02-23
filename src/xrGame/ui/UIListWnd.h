@@ -34,7 +34,6 @@ public:
     virtual void Update();
     virtual void DetachChild(CUIWindow* pChild);
     void SetScrollBarProfile(LPCSTR profile) { m_scrollbar_profile = profile; };
-
     // Добавление элементов в листбокс
     template <class Element>
     bool AddItem(
@@ -56,16 +55,13 @@ public:
 
     void SetItemWidth(float iItemWidth);
     float GetItemWidth() { return m_iItemWidth; }
-
     void SetItemHeight(float iItemHeight);
     float GetItemHeight() { return m_iItemHeight; }
     virtual void SetHeight(float height);
 
     void SetAlwaysShowScroll(bool flag = true) { m_bAlwaysShowScroll = flag; }
     void EnableAlwaysShowScroll(bool flag) { m_bAlwaysShowScroll_enable = flag; }
-
     int GetItemsCount() { return m_ItemList.size(); }
-
     //подготовить все элементы заново
     void Reset();
 
@@ -84,14 +80,11 @@ public:
 
     void SetTextColor(u32 color) { m_dwFontColor = color; }
     u32 GetTextColor() { return m_dwFontColor; }
-
     //делает активными (как кнопки) элементы списка
     void ActivateList(bool activity);
     bool IsListActive() { return m_bListActivity; }
-
     void SetVertFlip(bool vert_flip) { m_bVertFlip = vert_flip; }
     bool GetVertFlip() { return m_bVertFlip; }
-
     // Принудительная установка фокуса
     void SetFocusedItem(int iNewFocusedItem);
     int GetFocusedItem() { return m_iFocusedItem; }
@@ -100,9 +93,7 @@ public:
     void ShowSelectedItem(bool show = true);
 
     void ResetFocusCapture() { m_bForceFocusedItem = false; }
-
     int GetListPosition() const { return m_iFirstShownIndex; }
-
 protected:
     void create_active_back();
     void destroy_active_back();

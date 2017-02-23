@@ -31,8 +31,7 @@ public:
     u32 GetHeaderColor() { return m_iNameTextColor; }
     CGameFont* GetHeaderFont() { return m_pNameTextFont; }
     u32 GetOurReplicsColor() { return m_uOurReplicsColor; }
-
-    bool mechanic_mode;  // for inventory upgrades
+    bool mechanic_mode; // for inventory upgrades
 
     //номер выбранного вопроса
     shared_str m_ClickedQuestionID;

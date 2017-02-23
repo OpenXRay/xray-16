@@ -38,10 +38,12 @@ void CStateManagerFlesh::execute()
 {
     u32 state_id = u32(-1);
 
-    if (!object->is_under_control()) {
+    if (!object->is_under_control())
+    {
         const CEntityAlive* enemy = object->EnemyMan.get_enemy();
 
-        if (enemy) {
+        if (enemy)
+        {
             state_id = object->EnemyMan.get_danger_type() == eStrong && !object->HitMemory.is_hit() ? eStatePanic :
                                                                                                       eStateAttack;
         }

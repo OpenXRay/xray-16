@@ -82,11 +82,11 @@ public:
 private:
     bool loophole_path(shared_str const& source_raw, shared_str const& target_raw) const;
     void check_loopholes_connectivity() const;
-#endif  // DEBUG
+#endif // DEBUG
 };
 
-}  // namespace smart_cover
+} // namespace smart_cover
 
 #include "smart_cover_inline.h"
 
-#endif  // SMART_COVER_H_INCLUDED
+#endif // SMART_COVER_H_INCLUDED

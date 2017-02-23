@@ -15,8 +15,10 @@ SPPInfo& SPPInfo::add(const SPPInfo& ppi)
     color_gray += ppi.color_gray;
     color_add += ppi.color_add;
 
-    if (ppi.cm_tex1.size()) {
-        if (cm_tex1.size()) {
+    if (ppi.cm_tex1.size())
+    {
+        if (cm_tex1.size())
+        {
             cm_tex2 = ppi.cm_tex1;
             cm_interpolate = 1.0f - cm_influence / (cm_influence + ppi.cm_influence);
         }
@@ -55,10 +57,7 @@ SPPInfo::SPPInfo()
     cm_influence = 0.0f;
     cm_interpolate = 0.0f;
 }
-void SPPInfo::normalize()
-{
-}
-
+void SPPInfo::normalize() {}
 void SPPInfo::validate(LPCSTR str)
 {
     VERIFY2(_valid(duality.h), str);
@@ -89,9 +88,9 @@ SPPInfo& SPPInfo::lerp(const SPPInfo& def, const SPPInfo& to, float factor)
     pp.duality.v += def.duality.v + (to.duality.v - def.duality.v) * factor;
     pp.gray += def.gray + (to.gray - def.gray) * factor;
     pp.blur += def.blur + (to.blur - def.blur) * factor;
-    pp.noise.intensity = to.noise.intensity;  // + (to.noise.intensity - def.noise.intensity) * factor;
-    pp.noise.grain = to.noise.grain;          // + (to.noise.grain - def.noise.grain) * factor;
-    pp.noise.fps = to.noise.fps;              // + (to.noise.fps - def.noise.fps) * factor;
+    pp.noise.intensity = to.noise.intensity; // + (to.noise.intensity - def.noise.intensity) * factor;
+    pp.noise.grain = to.noise.grain; // + (to.noise.grain - def.noise.grain) * factor;
+    pp.noise.fps = to.noise.fps; // + (to.noise.fps - def.noise.fps) * factor;
 
     pp.color_base.set(def.color_base.r + (to.color_base.r - def.color_base.r) * factor,
         def.color_base.g + (to.color_base.g - def.color_base.g) * factor,

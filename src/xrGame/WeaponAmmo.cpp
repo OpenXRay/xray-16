@@ -47,11 +47,15 @@ void CCartridge::Load(LPCSTR section, u8 LocalAmmoType)
     m_flags.set(cfCanBeUnlimited | cfRicochet, TRUE);
     m_flags.set(cfMagneticBeam, FALSE);
 
-    if (pSettings->line_exist(section, "allow_ricochet")) {
-        if (!pSettings->r_bool(section, "allow_ricochet")) m_flags.set(cfRicochet, FALSE);
+    if (pSettings->line_exist(section, "allow_ricochet"))
+    {
+        if (!pSettings->r_bool(section, "allow_ricochet"))
+            m_flags.set(cfRicochet, FALSE);
     }
-    if (pSettings->line_exist(section, "magnetic_beam_shot")) {
-        if (pSettings->r_bool(section, "magnetic_beam_shot")) m_flags.set(cfMagneticBeam, TRUE);
+    if (pSettings->line_exist(section, "magnetic_beam_shot"))
+    {
+        if (pSettings->r_bool(section, "magnetic_beam_shot"))
+            m_flags.set(cfMagneticBeam, TRUE);
     }
 
     if (pSettings->line_exist(section, "can_be_unlimited"))
@@ -66,14 +70,8 @@ void CCartridge::Load(LPCSTR section, u8 LocalAmmoType)
     m_InvShortName = CStringTable().translate(pSettings->r_string(section, "inv_name_short"));
 }
 
-CWeaponAmmo::CWeaponAmmo(void)
-{
-}
-
-CWeaponAmmo::~CWeaponAmmo(void)
-{
-}
-
+CWeaponAmmo::CWeaponAmmo(void) {}
+CWeaponAmmo::~CWeaponAmmo(void) {}
 void CWeaponAmmo::Load(LPCSTR section)
 {
     inherited::Load(section);
@@ -108,25 +106,20 @@ BOOL CWeaponAmmo::net_Spawn(CSE_Abstract* DC)
     CSE_ALifeItemAmmo* l_pW = smart_cast<CSE_ALifeItemAmmo*>(e);
     m_boxCurr = l_pW->a_elapsed;
 
-    if (m_boxCurr > m_boxSize) l_pW->a_elapsed = m_boxCurr = m_boxSize;
+    if (m_boxCurr > m_boxSize)
+        l_pW->a_elapsed = m_boxCurr = m_boxSize;
 
     return bResult;
 }
 
-void CWeaponAmmo::net_Destroy()
-{
-    inherited::net_Destroy();
-}
-
-void CWeaponAmmo::OnH_B_Chield()
-{
-    inherited::OnH_B_Chield();
-}
-
+void CWeaponAmmo::net_Destroy() { inherited::net_Destroy(); }
+void CWeaponAmmo::OnH_B_Chield() { inherited::OnH_B_Chield(); }
 void CWeaponAmmo::OnH_B_Independent(bool just_before_destroy)
 {
-    if (!Useful()) {
-        if (Local()) {
+    if (!Useful())
+    {
+        if (Local())
+        {
             DestroyObject();
         }
         m_ready_to_destroy = true;
@@ -153,7 +146,8 @@ s32 CWeaponAmmo::Sort(PIItem pIItem)
 */
 bool CWeaponAmmo::Get(CCartridge& cartridge)
 {
-    if (!m_boxCurr) return false;
+    if (!m_boxCurr)
+        return false;
     cartridge.m_ammoSect = cNameSect();
 
     cartridge.param_s = cartridge_param;
@@ -162,13 +156,15 @@ bool CWeaponAmmo::Get(CCartridge& cartridge)
     cartridge.bullet_material_idx = GMLib.GetMaterialIdx(WEAPON_MATERIAL_NAME);
     cartridge.m_InvShortName = NameShort();
     --m_boxCurr;
-    if (m_pInventory) m_pInventory->InvalidateState();
+    if (m_pInventory)
+        m_pInventory->InvalidateState();
     return true;
 }
 
 void CWeaponAmmo::renderable_Render()
 {
-    if (!m_ready_to_destroy) inherited::renderable_Render();
+    if (!m_ready_to_destroy)
+        inherited::renderable_Render();
 }
 
 void CWeaponAmmo::UpdateCL()
@@ -177,7 +173,8 @@ void CWeaponAmmo::UpdateCL()
     inherited::UpdateCL();
     VERIFY2(_valid(renderable.xform), *cName());
 
-    if (!IsGameTypeSingle()) make_Interpolation();
+    if (!IsGameTypeSingle())
+        make_Interpolation();
 
     VERIFY2(_valid(renderable.xform), *cName());
 }
@@ -205,10 +202,12 @@ CInventoryItem* CWeaponAmmo::can_make_killing(const CInventory* inventory) const
     for (; I != E; ++I)
     {
         CWeapon* weapon = smart_cast<CWeapon*>(*I);
-        if (!weapon) continue;
+        if (!weapon)
+            continue;
         xr_vector<shared_str>::const_iterator i =
             std::find(weapon->m_ammoTypes.begin(), weapon->m_ammoTypes.end(), cNameSect());
-        if (i != weapon->m_ammoTypes.end()) return (weapon);
+        if (i != weapon->m_ammoTypes.end())
+            return (weapon);
     }
 
     return (0);

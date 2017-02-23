@@ -17,8 +17,8 @@ class ECORE_API TfraTopBar :
 
     public TFrame
 {
-    __published :  // IDE-managed Components
-                   TPanel* paTBEdit;
+    __published : // IDE-managed Components
+                  TPanel* paTBEdit;
     TExtBtn* ebEditUndo;
     TExtBtn* ebEditRedo;
     TPanel* paTBAction;
@@ -68,8 +68,8 @@ class ECORE_API TfraTopBar :
     void __fastcall ebAxisClick(TObject* Sender);
     void __fastcall ebSettingsClick(TObject* Sender);
 
-  private:  // User declarations
-  public:   // User declarations
+private: // User declarations
+public: // User declarations
     __fastcall TfraTopBar(TComponent* Owner);
     void OnTimer();
     void __fastcall RefreshBar();

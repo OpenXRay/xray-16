@@ -84,7 +84,7 @@ protected:
     dVector3 m_depart_position;
     dVector3 m_wall_contact_position;
     dVector3 m_ground_contact_position;
-    dReal jump_up_velocity;  //=6.0f;//5.6f;
+    dReal jump_up_velocity; //=6.0f;//5.6f;
     dReal m_collision_damage_factor;
     dReal m_max_velocity;
 
@@ -135,7 +135,6 @@ protected:
 public:
     CPHSimpleCharacter();
     virtual ~CPHSimpleCharacter() { Destroy(); }
-
     /////////////////CPHObject//////////////////////////////////////////////
     virtual void PhDataUpdate(dReal step);
     virtual void PhTune(dReal step);
@@ -150,7 +149,8 @@ public:
     // Check state
     virtual bool ContactWas()
     {
-        if (b_meet_control) {
+        if (b_meet_control)
+        {
             b_meet_control = false;
             return true;
         }
@@ -161,7 +161,6 @@ public:
     virtual void GroundNormal(Fvector& norm);
     virtual const ICollisionDamageInfo* CollisionDamageInfo() const { return this; }
     virtual ICollisionDamageInfo* CollisionDamageInfo() { return this; }
-
 private:
     virtual float ContactVelocity() const { return m_collision_damage_info.ContactVelocity(); }
     virtual void HitDir(Fvector& dir) const { return m_collision_damage_info.HitDir(dir); }
@@ -175,7 +174,6 @@ private:
     virtual void SetHitType(ALife::EHitType type) { m_collision_damage_info.m_hit_type = type; };
     virtual ICollisionHitCallback* HitCallback() const;
     virtual void Reinit() { m_collision_damage_info.Reinit(); };
-
 public:
     // Creating
     virtual void Create(dVector3 sizes);
@@ -238,7 +236,8 @@ public:
     virtual void SetNonInteractive(bool v);
     virtual bool IsEnabled()
     {
-        if (!b_exist) return false;
+        if (!b_exist)
+            return false;
         return !!dBodyIsEnabled(m_body);
     }
     virtual void GetBodyPosition(Fvector& vpos)

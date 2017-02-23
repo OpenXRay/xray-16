@@ -17,7 +17,8 @@ public:
     void Initialize(float time, float critical_condition);
     ICF bool CheckCondition(float current_condition)
     {
-        if (isInitialized() && !isActive() && m_fSpeedChangeCondition >= current_condition) {
+        if (isInitialized() && !isActive() && m_fSpeedChangeCondition >= current_condition)
+        {
             SetTimer(current_condition);
             return true;
         }

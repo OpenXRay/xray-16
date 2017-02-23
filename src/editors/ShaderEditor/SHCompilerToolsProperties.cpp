@@ -26,17 +26,14 @@ void CSHCompilerTools::FillItemList()
 }
 
 //------------------------------------------------------------------------------
-void CSHCompilerTools::RealUpdateList()
-{
-    FillItemList();
-}
-
+void CSHCompilerTools::RealUpdateList() { FillItemList(); }
 //------------------------------------------------------------------------------
 
 void CSHCompilerTools::RealUpdateProperties()
 {
     PropItemVec items;
-    if (m_Shader) {
+    if (m_Shader)
+    {
         Shader_xrLC& L = *m_Shader;
         PHelper().CreateCName(items, "Name", L.Name, sizeof(L.Name), m_CurrentItem);
         PHelper().CreateFloat(items, "Translucency", &L.vert_translucency);

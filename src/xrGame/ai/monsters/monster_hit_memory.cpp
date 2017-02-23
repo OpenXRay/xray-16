@@ -8,10 +8,7 @@ CMonsterHitMemory::CMonsterHitMemory()
     time_memory = 10000;
 }
 
-CMonsterHitMemory::~CMonsterHitMemory()
-{
-}
-
+CMonsterHitMemory::~CMonsterHitMemory() {}
 void CMonsterHitMemory::init_external(CBaseMonster* M, TTime mem_time)
 {
     monster = M;
@@ -58,10 +55,13 @@ struct predicate_old_hit
 
     IC bool operator()(const SMonsterHit& hit_info)
     {
-        if ((mem_time + hit_info.time) < cur_time) return true;
-        if (hit_info.object) {
+        if ((mem_time + hit_info.time) < cur_time)
+            return true;
+        if (hit_info.object)
+        {
             CEntityAlive* entity = smart_cast<CEntityAlive*>(hit_info.object);
-            if (entity && !entity->g_Alive()) return true;
+            if (entity && !entity->g_Alive())
+                return true;
         }
         return false;
     }
@@ -84,11 +84,13 @@ Fvector CMonsterHitMemory::get_last_hit_dir()
 
     for (u32 i = 0; i < m_hits.size(); i++)
     {
-        if (m_hits[i].time > last_hit.time) last_hit = m_hits[i];
+        if (m_hits[i].time > last_hit.time)
+            last_hit = m_hits[i];
     }
 
     // если есть хит, вычислить направление
-    if (last_hit.time != 0) {
+    if (last_hit.time != 0)
+    {
         float h, p;
         dir.getHP(h, p);
 
@@ -113,7 +115,8 @@ TTime CMonsterHitMemory::get_last_hit_time()
 
     for (u32 i = 0; i < m_hits.size(); i++)
     {
-        if (m_hits[i].time > last_hit.time) last_hit = m_hits[i];
+        if (m_hits[i].time > last_hit.time)
+            last_hit = m_hits[i];
     }
 
     return last_hit.time;
@@ -127,7 +130,8 @@ IGameObject* CMonsterHitMemory::get_last_hit_object()
 
     for (u32 i = 0; i < m_hits.size(); i++)
     {
-        if (m_hits[i].time > last_hit.time) last_hit = m_hits[i];
+        if (m_hits[i].time > last_hit.time)
+            last_hit = m_hits[i];
     }
 
     return last_hit.object;
@@ -141,7 +145,8 @@ Fvector CMonsterHitMemory::get_last_hit_position()
 
     for (u32 i = 0; i < m_hits.size(); i++)
     {
-        if (m_hits[i].time > last_hit.time) last_hit = m_hits[i];
+        if (m_hits[i].time > last_hit.time)
+            last_hit = m_hits[i];
     }
 
     return last_hit.position;
@@ -152,7 +157,6 @@ struct predicate_old_info
     const IGameObject* object;
 
     predicate_old_info(const IGameObject* obj) : object(obj) {}
-
     IC bool operator()(const SMonsterHit& hit_info) { return (object == hit_info.object); }
 };
 

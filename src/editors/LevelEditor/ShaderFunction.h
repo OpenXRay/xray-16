@@ -19,8 +19,8 @@ struct WaveForm;
 
 class TfrmShaderFunction : public TForm
 {
-    __published :  // IDE-managed Components
-                   TPanel* Panel1;
+    __published : // IDE-managed Components
+                  TPanel* Panel1;
     TStaticText* stFunction;
     TLabel* RxLabel1;
     TLabel* Label4;
@@ -56,7 +56,7 @@ class TfrmShaderFunction : public TForm
     void __fastcall FormClose(TObject* Sender, TCloseAction& Action);
     void __fastcall FormShow(TObject* Sender);
 
-  private:  // User declarations
+private: // User declarations
     bool bLoadMode;
 
     static WaveForm* m_CurFunc;
@@ -69,7 +69,7 @@ class TfrmShaderFunction : public TForm
 
     static TfrmShaderFunction* form;
 
-  public:  // User declarations
+public: // User declarations
     __fastcall TfrmShaderFunction(TComponent* Owner);
     static int __fastcall Run(WaveForm* func);
 };

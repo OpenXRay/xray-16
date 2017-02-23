@@ -9,10 +9,10 @@ class CSurface;
 //
 typedef struct SXREdgeInfo
 {
-    int polyIds[2];            // Id's of polygons that reference edge
-    int vertId;                // The second vertex of this edge
-    struct SXREdgeInfo* next;  // Pointer to next edge
-    bool smooth;               // Is this edge smooth
+    int polyIds[2]; // Id's of polygons that reference edge
+    int vertId; // The second vertex of this edge
+    struct SXREdgeInfo* next; // Pointer to next edge
+    bool smooth; // Is this edge smooth
 } * SXREdgeInfoPtr;
 
 struct SXRShaderData

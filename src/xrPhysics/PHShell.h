@@ -86,7 +86,6 @@ public:
     virtual void Activate(const Fmatrix& start_from, bool disable = false){};
 
     virtual CPhysicsShellAnimator* PPhysicsShellAnimator() { return m_pPhysicsShellAnimatorC; };
-
 private:
     void activate(bool disable);
 
@@ -115,7 +114,6 @@ public:
 
     virtual const CLBits& collide_bits() const { return CPHObject::collide_bits(); };
     virtual const _flags<CLClassBits>& collide_class_bits() const { return CPHObject::collide_class_bits(); }
-
     virtual void setMass(float M);
 
     virtual void setMass1(float M);
@@ -154,7 +152,6 @@ public:
     virtual void* get_CallbackData();
     virtual void set_PhysicsRefObject(IPhysicsShellHolder* ref_object);
     IPhysicsShellHolder* PhysicsRefObject() { return (*elements.begin())->PhysicsRefObject(); }
-
     // breakbable interface
     virtual bool isBreakable();
     virtual bool isFractured();
@@ -164,11 +161,13 @@ public:
     virtual void SplitProcess(PHSHELL_PAIR_VECTOR& out_shels);
     virtual void BlockBreaking()
     {
-        if (m_spliter_holder) m_spliter_holder->SetUnbreakable();
+        if (m_spliter_holder)
+            m_spliter_holder->SetUnbreakable();
     }
     virtual void UnblockBreaking()
     {
-        if (m_spliter_holder) m_spliter_holder->SetBreakable();
+        if (m_spliter_holder)
+            m_spliter_holder->SetBreakable();
     }
     virtual bool IsBreakingBlocked() { return m_spliter_holder && m_spliter_holder->IsUnbreakable(); }
     ///////	////////////////////////////////////////////////////////////////////////////////////////////
@@ -256,7 +255,6 @@ public:
     virtual void DisableGeomTrace();
     virtual void EnableGeomTrace();
     virtual bool HasTracedGeoms() { return !m_traced_geoms.empty(); }
-
     virtual void SetPrefereExactIntegration();
     virtual void CutVelocity(float l_limit, float a_limit);
     ///////////	//////////////////////////////////////////////////////////////////////////////////////////
@@ -270,7 +268,6 @@ public:
 protected:
     virtual void get_spatial_params();
     virtual dGeomID dSpacedGeom() { return (dGeomID)m_space; }
-
     virtual void ClearRecentlyDeactivated();
     void ClearCashedTries();
 
@@ -304,7 +301,6 @@ private:
 
 private:
     virtual iphysics_scripted& get_scripted() { return *this; }
-
 public:
 #ifdef DEBUG
     virtual void dbg_draw_velocity(float scale, u32 color);

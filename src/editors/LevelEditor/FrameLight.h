@@ -17,8 +17,8 @@ class CEditObject;
 //---------------------------------------------------------------------------
 class TfraLight : public TForm
 {
-    __published :  // IDE-managed Components
-                   TPanel* paCommands;
+    __published : // IDE-managed Components
+                  TPanel* paCommands;
     TExtBtn* ebUseSelInD3D;
     TLabel* APHeadLabel1;
     TExtBtn* ExtBtn2;
@@ -32,10 +32,10 @@ class TfraLight : public TForm
     void __fastcall ebUseAllInD3DClick(TObject* Sender);
     void __fastcall ebUnuseAllInD3DClick(TObject* Sender);
 
-  private:  // User declarations
+private: // User declarations
     void UseInD3D(bool bAll, bool bFlag);
 
-  public:  // User declarations
+public: // User declarations
     __fastcall TfraLight(TComponent* Owner);
 };
 

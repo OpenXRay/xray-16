@@ -60,9 +60,7 @@ class EDetailManager : public CDetailManager, public ESceneToolBase
     Fbox m_BBox;
 
     IC u32 toSlotX(float x) { return (x / DETAIL_SLOT_SIZE + 0.5f) + dtH.offs_x; }
-
     IC u32 toSlotZ(float z) { return (z / DETAIL_SLOT_SIZE + 0.5f) + dtH.offs_z; }
-
     IC
 
         float
@@ -94,18 +92,18 @@ class EDetailManager : public CDetailManager, public ESceneToolBase
     void __stdcall OnDensityChange(PropValue* prop);
     void __stdcall OnBaseTextureChange(PropValue* prop);
 
-  protected:
+protected:
     // controls
     virtual void CreateControls();
     virtual void RemoveControls();
 
-  public:
+public:
     // render part -----------------------------------------------------------------
     void InitRender();
     void RenderTexture(float alpha);
     void InvalidateCache();
     // render part -----------------------------------------------------------------
-  public:
+public:
     ColorIndexMap m_ColorIndices;
     U8Vec m_Selected;
     CCustom2DProjector m_Base;
@@ -113,17 +111,14 @@ class EDetailManager : public CDetailManager, public ESceneToolBase
     void SaveColorIndices(IWriter&);
     bool LoadColorIndices(IReader&);
 
-  public:
+public:
     EDetailManager();
     virtual ~EDetailManager();
 
     virtual bool AllowEnabling() { return true; }
-
     virtual BOOL AllowMouseStart() { return true; }
-
     // snap
     virtual ObjectList* GetSnapList() { return &m_SnapObjects; }
-
     virtual void UpdateSnapList(){};
 
     // selection manipulate
@@ -134,18 +129,14 @@ class EDetailManager : public CDetailManager, public ESceneToolBase
     virtual void InvertSelection();
 
     virtual void RemoveSelection() {}
-
     virtual int SelectionCount(bool testflag);
 
     virtual void ShowObjects(bool flag, bool bAllowSelectionFlag = false, bool bSelFlag = true) {}
-
     virtual void Clear(bool bSpecific = false);
 
     // definition
     IC LPCSTR ClassName() { return "detail_object"; }
-
     IC LPCSTR ClassDesc() { return "Detail Objects"; }
-
     IC
 
         int
@@ -156,9 +147,7 @@ class EDetailManager : public CDetailManager, public ESceneToolBase
 
     // validation
     virtual bool Valid() { return dtSlots || objects.size() || m_Base.Valid() || m_SnapObjects.size(); }
-
     virtual bool Validate(bool) { return true; }
-
     // events
     virtual void OnDeviceCreate();
     virtual void OnDeviceDestroy();
@@ -170,14 +159,12 @@ class EDetailManager : public CDetailManager, public ESceneToolBase
 
     // IO
     virtual bool IsNeedSave() { return Valid(); }
-
     virtual bool LoadStream(IReader&);
     virtual bool LoadLTX(CInifile&);
     virtual void SaveStream(IWriter&);
     virtual void SaveLTX(CInifile&, int id);
 
     virtual bool can_use_inifile() { return false; }
-
     virtual bool LoadSelection(IReader&);
     virtual void SaveSelection(IWriter&);
     virtual bool Export(LPCSTR fn);
@@ -189,7 +176,6 @@ class EDetailManager : public CDetailManager, public ESceneToolBase
     virtual bool GetSummaryInfo(SSceneSummary* inf);
 
     virtual void GetBBox(Fbox& bb, bool bSelOnly) {}
-
     // other
     bool UpdateHeader();
     bool UpdateSlots();

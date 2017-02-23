@@ -47,7 +47,6 @@ public:
     void cleanIt();
 
     void setManager(NodeMonitorManager* manager) { fManager = manager; }
-
 private:
     bool attachCallbacks();
 
@@ -71,4 +70,4 @@ private:
     NodeMonitorManager* fManager;
 };
 
-#endif  // MAYA_ShadingConnection
+#endif // MAYA_ShadingConnection

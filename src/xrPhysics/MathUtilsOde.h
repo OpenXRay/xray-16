@@ -19,7 +19,8 @@ ICF void accurate_normalize(float* a)
 {
     dReal sqr_magnitude = a[0] * a[0] + a[1] * a[1] + a[2] * a[2];
 
-    if (sqr_magnitude > accurate_normalize_epsilon) {
+    if (sqr_magnitude > accurate_normalize_epsilon)
+    {
         dReal l = dRecipSqrt(sqr_magnitude);
         a[0] *= l;
         a[1] *= l;
@@ -35,12 +36,14 @@ ICF void accurate_normalize(float* a)
     aa0 = dFabs(a0);
     aa1 = dFabs(a1);
     aa2 = dFabs(a2);
-    if (aa1 > aa0) {
-        if (aa2 > aa1) {
+    if (aa1 > aa0)
+    {
+        if (aa2 > aa1)
+        {
             goto aa2_largest;
         }
         else
-        {  // aa1 is largest
+        { // aa1 is largest
             a0 /= aa1;
             a2 /= aa1;
             l = dRecipSqrt(a0 * a0 + a2 * a2 + 1);
@@ -51,8 +54,9 @@ ICF void accurate_normalize(float* a)
     }
     else
     {
-        if (aa2 > aa0) {
-        aa2_largest:  // aa2 is largest
+        if (aa2 > aa0)
+        {
+        aa2_largest: // aa2 is largest
             a0 /= aa2;
             a1 /= aa2;
             l = dRecipSqrt(a0 * a0 + a1 * a1 + 1);
@@ -61,11 +65,12 @@ ICF void accurate_normalize(float* a)
             a[2] = (float)_copysign(l, a2);
         }
         else
-        {  // aa0 is largest
-            if (aa0 <= 0) {
+        { // aa0 is largest
+            if (aa0 <= 0)
+            {
                 // dDEBUGMSG ("vector has zero size"); ... this messace is annoying
-                a[0] = 1;  // if all a's are zero, this is where we'll end up.
-                a[1] = 0;  // return a default unit length vector.
+                a[0] = 1; // if all a's are zero, this is where we'll end up.
+                a[1] = 0; // return a default unit length vector.
                 a[2] = 0;
                 return;
             }
@@ -82,7 +87,8 @@ ICF void accurate_normalize(float* a)
 IC bool dVectorLimit(const float* v, float l, float* lv)
 {
     float mag = _sqrt(dDOT(v, v));
-    if (mag > l) {
+    if (mag > l)
+    {
         float f = mag / l;
         lv[0] = v[0] / f;
         lv[1] = v[1] / f;
@@ -96,7 +102,7 @@ IC bool dVectorLimit(const float* v, float l, float* lv)
     }
 }
 
-IC void dVectorInterpolate(float* res, const float* from, const float* to, float k)  // changes to
+IC void dVectorInterpolate(float* res, const float* from, const float* to, float k) // changes to
 {
     dVector3 tov;
     dVectorSet(res, from);
@@ -106,7 +112,7 @@ IC void dVectorInterpolate(float* res, const float* from, const float* to, float
 
 float E_NL(dBodyID b1, dBodyID b2, const dReal* norm);
 
-float E_NlS(dBodyID body, const dReal* norm, float norm_sign);  // if body c.geom.g1 norm_sign + else -
+float E_NlS(dBodyID body, const dReal* norm, float norm_sign); // if body c.geom.g1 norm_sign + else -
 
 #pragma warning(default : 4995)
 #pragma warning(default : 4267)

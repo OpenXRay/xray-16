@@ -39,7 +39,8 @@ bool TaskReceive(net_task& task, IAgent* agent, DWORD sessionId, IGenericStream*
 
 bool GetGlobalData(IAgent* agent, DWORD sessionId)
 {
-    if (!inlc_global_data()) {
+    if (!inlc_global_data())
+    {
         VERIFY(agent);
         net_pool.clear();
 
@@ -52,7 +53,8 @@ bool GetGlobalData(IAgent* agent, DWORD sessionId)
         */
         string_path cache_dir;
         HRESULT rz = agent->GetSessionCacheDirectory(sessionId, cache_dir);
-        if (rz != S_OK) return false;
+        if (rz != S_OK)
+            return false;
         strconcat(sizeof(cache_dir), cache_dir, cache_dir, gl_data_net_file_name);
 
         /*
@@ -128,7 +130,8 @@ class net_task_interface_impl : public net_task_interface
         g_sessionId = sessionId;
         net_task task(agent, sessionId);
 
-        if (!TaskReceive(task, agent, sessionId, inStream)) {
+        if (!TaskReceive(task, agent, sessionId, inStream))
+        {
             block.Leave();
             return false;
         }
@@ -138,7 +141,8 @@ class net_task_interface_impl : public net_task_interface
 
         block.Enter();
 
-        if (!TaskSendResult(task, outStream)) {
+        if (!TaskSendResult(task, outStream))
+        {
             block.Leave();
             return false;
         }

@@ -23,7 +23,6 @@ private:
         _action_id_type m_action_id;
 
         IC setup_pred(const _action_id_type& action_id) { m_action_id = action_id; }
-
         IC bool operator()(const setup_pair& pair) const { return (pair.first == m_action_id); }
     };
 

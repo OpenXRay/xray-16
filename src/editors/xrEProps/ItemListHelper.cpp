@@ -7,16 +7,14 @@
 
 //---------------------------------------------------------------------------
 CListHelper LHelper_impl;
-IListHelper& LHelper()
-{
-    return LHelper_impl;
-}
+IListHelper& LHelper() { return LHelper_impl; }
 //---------------------------------------------------------------------------
 
 ListItem* CListHelper::FindItem(ListItemsVec& items, LPCSTR key)
 {
     for (ListItemsIt it = items.begin(); it != items.end(); it++)
-        if ((*it)->key == key) return *it;
+        if ((*it)->key == key)
+            return *it;
     return 0;
 }
 
@@ -32,17 +30,20 @@ ListItem* CListHelper::CreateItem(ListItemsVec& items, LPCSTR key, int type, u32
 
 bool CListHelper::NameAfterEdit(ListItem* sender, LPCSTR value, shared_str& N)
 {
-    if (0 != AnsiString(N.c_str()).Pos("\\")) {
+    if (0 != AnsiString(N.c_str()).Pos("\\"))
+    {
         N = value;
         return false;
     }
     N = AnsiString(N.c_str()).LowerCase().c_str();
-    if (!N.size()) {
+    if (!N.size())
+    {
         N = value;
         return false;
     }
     int cnt = _GetItemCount(N.c_str(), '\\');
-    if (cnt > 1) {
+    if (cnt > 1)
+    {
         N = value;
         return false;
     }
@@ -53,7 +54,8 @@ bool CListHelper::NameAfterEdit(ListItem* sender, LPCSTR value, shared_str& N)
 
     for (TElTreeItem* itm = node->GetFirstSibling(); itm; itm = itm->GetNextSibling())
     {
-        if ((itm != node) && (itm->Text == AnsiString(N.c_str()))) {
+        if ((itm != node) && (itm->Text == AnsiString(N.c_str())))
+        {
             // елемент с таким именем уже существует
             N = value;
             return false;

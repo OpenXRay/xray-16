@@ -59,15 +59,15 @@ class EScene
 {
     CMemoryWriter m_SaveCache;
 
-  public:
+public:
     typedef FixedMAP<float, CCustomObject*> mapObject_D;
     typedef mapObject_D::TNode mapObject_Node;
     mapObject_D mapRenderObjects;
 
-  public:
+public:
     st_LevelOptions m_LevelOp;
 
-  protected:
+protected:
     bool m_Valid;
     int m_Locked;
     // version control
@@ -85,22 +85,21 @@ class EScene
 
     TProperties* m_SummaryInfo;
 
-    ObjectList m_ESO_SnapObjects;  // временно здесь а вообще нужно перенести в ESceneTools
-  protected:
+    ObjectList m_ESO_SnapObjects; // временно здесь а вообще нужно перенести в ESceneTools
+protected:
     bool OnLoadAppendObject(CCustomObject* O);
     bool OnLoadSelectionAppendObject(CCustomObject* O);
 
-  protected:
+protected:
     void RegisterSceneTools(ESceneToolBase* mt);
     void CreateSceneTools();
     void DestroySceneTools();
 
     void FindObjectByNameCB(LPCSTR new_name, bool& res) { res = !!FindObjectByName(new_name, (CCustomObject*)0); }
-
     void __stdcall OnBuildControlClick(ButtonValue* sender, bool& bModif, bool& bSafe);
     void __stdcall OnRTFlagsChange(PropValue* sender);
 
-  public:
+public:
     enum
     {
         flRT_Unsaved = (1 << 0),
@@ -110,7 +109,7 @@ class EScene
 
     Flags32 m_RTFlags;
 
-  public:
+public:
     typedef bool(__closure* TAppendObject)(CCustomObject* object);
 
     bool ReadObjectStream(IReader& F, CCustomObject*& O);
@@ -134,7 +133,7 @@ class EScene
     BOOL UnloadLevelPart(ESceneToolBase* M);
     BOOL UnloadLevelPart(LPCSTR map_name, ObjClassID cls);
 
-  public:
+public:
     bool ExportGame(SExportStreams* F);
 
     bool Load(LPCSTR map_name, bool bUndo);
@@ -200,13 +199,9 @@ class EScene
     }
 
     IC ESceneToolBase* GetTool(ObjClassID cat) { return m_SceneTools[cat]; }
-
     IC ESceneCustomOTool* GetOTool(ObjClassID cat) { return dynamic_cast<ESceneCustomOTool*>(GetTool(cat)); }
-
     IC SceneToolsMapPairIt FirstTool() { return m_SceneTools.begin(); }
-
     IC SceneToolsMapPairIt LastTool() { return m_SceneTools.end(); }
-
     IC ObjectList& ListObj(ObjClassID cat)
     {
         VERIFY(GetOTool(cat));
@@ -267,7 +262,7 @@ class EScene
     int RayQuery(SPickQuery& RQ, const Fvector& start, const Fvector& dir, float dist, u32 flags, CDB::MODEL* model);
     int BoxQuery(SPickQuery& RQ, const Fbox& bb, u32 flags, CDB::MODEL* model);
 
-    int RaySelect(int flag, ObjClassID classfilter = OBJCLASS_DUMMY);  // flag=0,1,-1 (-1 invert)
+    int RaySelect(int flag, ObjClassID classfilter = OBJCLASS_DUMMY); // flag=0,1,-1 (-1 invert)
     int FrustumSelect(int flag, ObjClassID classfilter = OBJCLASS_DUMMY);
     void SelectObjects(bool flag, ObjClassID classfilter = OBJCLASS_DUMMY);
     void ShowObjects(
@@ -299,7 +294,7 @@ class EScene
     bool GetBox(Fbox& box, ObjClassID classfilter);
     bool GetBox(Fbox& box, ObjectList& lst);
 
-  public:
+public:
     int GetQueryObjects(ObjectList& objset, ObjClassID classfilter, int iSel = 1, int iVis = 1, int iLock = 0);
 
     template <class Predicate>
@@ -308,17 +303,19 @@ class EScene
         for (ObjectPairIt it = FirstClass(); it != LastClass(); it++)
         {
             ObjectList& lst = it->second;
-            if ((classfilter == OBJCLASS_DUMMY) || (classfilter == it->first)) {
+            if ((classfilter == OBJCLASS_DUMMY) || (classfilter == it->first))
+            {
                 for (ObjectIt _F = lst.begin(); _F != lst.end(); _F++)
                 {
-                    if (cmp(_F)) dest.push_back(*_F);
+                    if (cmp(_F))
+                        dest.push_back(*_F);
                 }
             }
         }
         return dest.size();
     }
 
-  public:
+public:
     void OnCreate();
     void OnDestroy();
     void Modified();
@@ -327,9 +324,7 @@ class EScene
     bool IsModified();
 
     int GetUndoCount() { return m_UndoStack.size(); }
-
     int GetRedoCount() { return m_RedoStack.size(); }
-
     bool Validate(
         bool bNeedOkMsg, bool bTestPortal, bool bTestHOM, bool bTestGlow, bool bTestShaderCompatible, bool bFullTest);
     void OnObjectsUpdate();
@@ -353,17 +348,16 @@ class EScene
     xr_string LevelPath();
 
     shared_str LevelPrefix() { return m_LevelOp.m_LevelPrefix; }
-
     void FillProp(LPCSTR pref, PropItemVec& items, ObjClassID cls_id);
 
-  protected:
+protected:
     typedef std::pair<xr_string, xr_string> TSubstPair;
     typedef xr_vector<TSubstPair> TSubstPairs;
     typedef TSubstPairs::iterator TSubstPairs_it;
     typedef TSubstPairs::const_iterator TSubstPairs_cit;
     TSubstPairs m_subst_pairs;
 
-  public:
+public:
     void RegisterSubstObjectName(const xr_string& from, const xr_string& to);
     bool GetSubstObjectName(const xr_string& from, xr_string& to) const;
 };

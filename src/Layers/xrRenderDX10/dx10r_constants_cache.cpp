@@ -5,7 +5,8 @@
 
 dx10ConstantBuffer& R_constants::GetCBuffer(R_constant* C, BufferType BType)
 {
-    if (BType == BT_PixelBuffer) {
+    if (BType == BT_PixelBuffer)
+    {
         //	Decode index
         int iBufferIndex = (C->destination & RC_dest_pixel_cb_index_mask) >> RC_dest_pixel_cb_index_shift;
 
@@ -71,18 +72,24 @@ void R_constants::flush_cache()
 {
     for (int i = 0; i < CBackend::MaxCBuffers; ++i)
     {
-        if (RCache.m_aVertexConstants[i]) RCache.m_aVertexConstants[i]->Flush();
+        if (RCache.m_aVertexConstants[i])
+            RCache.m_aVertexConstants[i]->Flush();
 
-        if (RCache.m_aPixelConstants[i]) RCache.m_aPixelConstants[i]->Flush();
+        if (RCache.m_aPixelConstants[i])
+            RCache.m_aPixelConstants[i]->Flush();
 
-        if (RCache.m_aGeometryConstants[i]) RCache.m_aGeometryConstants[i]->Flush();
+        if (RCache.m_aGeometryConstants[i])
+            RCache.m_aGeometryConstants[i]->Flush();
 
 #ifdef USE_DX11
-        if (RCache.m_aHullConstants[i]) RCache.m_aHullConstants[i]->Flush();
+        if (RCache.m_aHullConstants[i])
+            RCache.m_aHullConstants[i]->Flush();
 
-        if (RCache.m_aDomainConstants[i]) RCache.m_aDomainConstants[i]->Flush();
+        if (RCache.m_aDomainConstants[i])
+            RCache.m_aDomainConstants[i]->Flush();
 
-        if (RCache.m_aComputeConstants[i]) RCache.m_aComputeConstants[i]->Flush();
+        if (RCache.m_aComputeConstants[i])
+            RCache.m_aComputeConstants[i]->Flush();
 #endif
     }
 }

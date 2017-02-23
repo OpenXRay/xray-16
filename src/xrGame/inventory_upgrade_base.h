@@ -52,7 +52,7 @@ public:
 #ifdef DEBUG
     virtual void log_hierarchy(LPCSTR nest);
 //	virtual		void		test_all_upgrades( CInventoryItem& item );
-#endif  // DEBUG
+#endif // DEBUG
 
     virtual bool is_root();
     bool make_known();
@@ -77,11 +77,11 @@ protected:
 protected:
     void add_dependent_groups(LPCSTR groups_str, Manager& manager_r);
 
-};  // class UpgradeBase
+}; // class UpgradeBase
 
-}  // namespace upgrade
-}  // namespace inventory
+} // namespace upgrade
+} // namespace inventory
 
 #include "inventory_upgrade_base_inline.h"
 
-#endif  // INVENTORY_UPGRADE_BASE_H_INCLUDED
+#endif // INVENTORY_UPGRADE_BASE_H_INCLUDED

@@ -103,10 +103,7 @@ inline_ float fepsilon(float f)
 }
 
 //! Is the float valid ?
-inline_ bool IsNAN(float value)
-{
-    return ((*(udword*)&value) & 0x7f800000) == 0x7f800000;
-}
+inline_ bool IsNAN(float value) { return ((*(udword*)&value) & 0x7f800000) == 0x7f800000; }
 #define NaN(value) (!((value >= 0) || (value < 0)))
 
 /*
@@ -145,14 +142,10 @@ inline_ float ComputeFloatEpsilon()
 {
     float f = 1.0f;
     ((udword&)f) ^= 1;
-    return f - 1.0f;  // You can check it's the same as FLT_EPSILON
+    return f - 1.0f; // You can check it's the same as FLT_EPSILON
 }
 
-inline_ bool IsFloatZero(float x, float epsilon = 1e-6f)
-{
-    return x * x < epsilon;
-}
-
+inline_ bool IsFloatZero(float x, float epsilon = 1e-6f) { return x * x < epsilon; }
 #define FCOMI_ST0 _asm _emit 0xdb _asm _emit 0xf0
 #define FCOMIP_ST0 _asm _emit 0xdf _asm _emit 0xf0
 #define FCMOVB_ST0 _asm _emit 0xda _asm _emit 0xc0
@@ -237,4 +230,4 @@ FUNCTION ICECORE_API int intChop(const float& f);
 FUNCTION ICECORE_API int intFloor(const float& f);
 FUNCTION ICECORE_API int intCeil(const float& f);
 
-#endif  // __ICEFPU_H__
+#endif // __ICEFPU_H__

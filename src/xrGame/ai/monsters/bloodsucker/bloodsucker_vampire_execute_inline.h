@@ -4,7 +4,7 @@
 #include "xrEngine/CameraBase.h"
 #include "HUDManager.h"
 
-#define TEMPLATE_SPECIALIZATION                                                                                        \
+#define TEMPLATE_SPECIALIZATION \
     template <typename _Object\
 >
 
@@ -47,7 +47,8 @@ void CStateBloodsuckerVampireExecuteAbstract::initialize()
 TEMPLATE_SPECIALIZATION
 void CStateBloodsuckerVampireExecuteAbstract::execute()
 {
-    if (!object->CControlledActor::is_turning() && !m_effector_activated) {
+    if (!object->CControlledActor::is_turning() && !m_effector_activated)
+    {
         object->ActivateVampireEffector();
         m_effector_activated = true;
     }
@@ -69,7 +70,8 @@ void CStateBloodsuckerVampireExecuteAbstract::execute()
         break;
 
     case eActionWaitTripleEnd:
-        if (!object->com_man().ta_is_active()) {
+        if (!object->com_man().ta_is_active())
+        {
             m_action = eActionCompleted;
         }
 
@@ -82,7 +84,8 @@ void CStateBloodsuckerVampireExecuteAbstract::execute()
     float const dist_to_enemy = magnitude(enemy_to_self);
     float const vampire_dist = object->get_vampire_distance();
 
-    if (angle_between_vectors(object->Direction(), enemy_to_self) < deg2rad(20.f) && dist_to_enemy > vampire_dist) {
+    if (angle_between_vectors(object->Direction(), enemy_to_self) < deg2rad(20.f) && dist_to_enemy > vampire_dist)
+    {
         object->set_action(ACT_RUN);
         object->anim().accel_activate(eAT_Aggressive);
         object->anim().accel_set_braking(false);
@@ -118,9 +121,11 @@ void CStateBloodsuckerVampireExecuteAbstract::cleanup()
 {
     Actor()->set_inventory_disabled(false);
 
-    if (object->com_man().ta_is_active()) object->com_man().ta_deactivate();
+    if (object->com_man().ta_is_active())
+        object->com_man().ta_deactivate();
 
-    if (object->CControlledActor::is_controlling()) object->CControlledActor::release();
+    if (object->CControlledActor::is_controlling())
+        object->CControlledActor::release();
 
     show_hud();
 }
@@ -148,39 +153,43 @@ bool CStateBloodsuckerVampireExecuteAbstract::check_start_conditions()
     // 	float dist		= object->MeleeChecker.distance_to_enemy	(enemy);
     // 	if ((dist > VAMPIRE_MAX_DIST) || (dist < VAMPIRE_MIN_DIST))	return false;
 
-    if (!object->done_enough_hits_before_vampire()) return false;
+    if (!object->done_enough_hits_before_vampire())
+        return false;
 
     u32 const vertex_id = ai().level_graph().check_position_in_direction(
         object->ai_location().level_vertex_id(), object->Position(), enemy->Position());
-    if (!ai().level_graph().valid_vertex_id(vertex_id)) return false;
+    if (!ai().level_graph().valid_vertex_id(vertex_id))
+        return false;
 
-    if (!object->MeleeChecker.can_start_melee(enemy)) return false;
+    if (!object->MeleeChecker.can_start_melee(enemy))
+        return false;
 
     // проверить направление на врага
-    if (!object->control().direction().is_face_target(enemy, PI_DIV_2)) return false;
+    if (!object->control().direction().is_face_target(enemy, PI_DIV_2))
+        return false;
 
-    if (!object->WantVampire()) return false;
+    if (!object->WantVampire())
+        return false;
 
     // является ли враг актером
-    if (!smart_cast<CActor const*>(enemy)) return false;
+    if (!smart_cast<CActor const*>(enemy))
+        return false;
 
-    if (object->CControlledActor::is_controlling()) return false;
+    if (object->CControlledActor::is_controlling())
+        return false;
 
     const CActor* actor = smart_cast<const CActor*>(enemy);
 
     VERIFY(actor);
 
-    if (actor->input_external_handler_installed()) return false;
+    if (actor->input_external_handler_installed())
+        return false;
 
     return true;
 }
 
 TEMPLATE_SPECIALIZATION
-bool CStateBloodsuckerVampireExecuteAbstract::check_completion()
-{
-    return (m_action == eActionCompleted);
-}
-
+bool CStateBloodsuckerVampireExecuteAbstract::check_completion() { return (m_action == eActionCompleted); }
 //////////////////////////////////////////////////////////////////////////
 
 TEMPLATE_SPECIALIZATION
@@ -198,7 +207,8 @@ void CStateBloodsuckerVampireExecuteAbstract::execute_vampire_continue()
     const CEntityAlive* enemy = object->EnemyMan.get_enemy();
 
     // if (object->Position().distance_to(Actor()->Position()) > 2.f) {
-    if (!object->MeleeChecker.can_start_melee(enemy)) {
+    if (!object->MeleeChecker.can_start_melee(enemy))
+    {
         object->com_man().ta_deactivate();
         m_action = eActionCompleted;
         return;
@@ -207,7 +217,8 @@ void CStateBloodsuckerVampireExecuteAbstract::execute_vampire_continue()
     object->sound().play(CAI_Bloodsucker::eVampireSucking);
 
     // проверить на грави удар
-    if (time_vampire_started + VAMPIRE_TIME_HOLD < Device.dwTimeGlobal) {
+    if (time_vampire_started + VAMPIRE_TIME_HOLD < Device.dwTimeGlobal)
+    {
         m_action = eActionFire;
     }
 }

@@ -30,7 +30,8 @@ CUISequenceSimpleItem::~CUISequenceSimpleItem()
 
 bool CUISequenceSimpleItem::IsPlaying()
 {
-    if (m_time_start < 0.0f) return true;
+    if (m_time_start < 0.0f)
+        return true;
 
     return (m_time_start + m_time_length) > (Device.dwTimeContinual / 1000.0f);
 }
@@ -41,7 +42,8 @@ CUIWindow* find_child_window(CUIWindow* parent, const shared_str& _name)
     CUIWindow::WINDOW_LIST_it _I = wl.begin();
     CUIWindow::WINDOW_LIST_it _E = wl.end();
     for (; _I != _E; ++_I)
-        if ((*_I)->WindowName() == _name) return (*_I);
+        if ((*_I)->WindowName() == _name)
+            return (*_I);
     return NULL;
 }
 
@@ -53,7 +55,8 @@ void CUISequenceSimpleItem::Load(CUIXml* xml, int idx)
     xml->SetLocalRoot(xml->NavigateToNode("item", idx));
 
     LPCSTR m_snd_name = xml->Read("sound", 0, "");
-    if (m_snd_name && m_snd_name[0]) {
+    if (m_snd_name && m_snd_name[0])
+    {
         m_sound.create(m_snd_name, st_Effect, sg_Undefined);
         VERIFY(m_sound._handle() || strstr(Core.Params, "-nosound"));
     }
@@ -69,11 +72,13 @@ void CUISequenceSimpleItem::Load(CUIXml* xml, int idx)
 
     str = xml->Read("guard_key", 0, NULL);
     m_continue_dik_guard = -1;
-    if (str && !_stricmp(str, "any")) {
+    if (str && !_stricmp(str, "any"))
+    {
         m_continue_dik_guard = 9999;
         str = NULL;
     }
-    if (str) {
+    if (str)
+    {
         EGameActions cmd = action_name_to_id(str);
         m_continue_dik_guard = get_action_dik(cmd);
     }
@@ -125,10 +130,12 @@ void CUISequenceSimpleItem::Load(CUIXml* xml, int idx)
         _si->m_wnd->Show(false);
         _si->m_wnd->SetWidth(_si->m_wnd->GetWidth() * UI().get_current_kx());
 
-        if (UI().is_widescreen()) {
+        if (UI().is_widescreen())
+        {
             XML_NODE* autostatic_node = xml->NavigateToNode("auto_static", i);
             XML_NODE* ws_rect = xml->NavigateToNode(autostatic_node, "widescreen_rect", 0);
-            if (ws_rect) {
+            if (ws_rect)
+            {
                 xml->SetLocalRoot(autostatic_node);
 
                 Fvector2 pos, size;
@@ -194,10 +201,12 @@ void CUISequenceSimpleItem::Update()
             s.Stop();
     }
 
-    if (g_pGameLevel && (!m_pda_section || 0 == xr_strlen(m_pda_section))) {
+    if (g_pGameLevel && (!m_pda_section || 0 == xr_strlen(m_pda_section)))
+    {
         CUIGameSP* ui_game_sp = smart_cast<CUIGameSP*>(CurrentGameUI());
 
-        if (ui_game_sp) {
+        if (ui_game_sp)
+        {
             if (ui_game_sp->GetPdaMenu().IsShown() || ui_game_sp->GetActorMenu().IsShown() ||
                 ui_game_sp->TalkMenu->IsShown() || ui_game_sp->UIChangeLevelWnd->IsShown() ||
                 (MainMenu()->IsActive() && !m_owner->m_flags.test(CUISequencer::etsOverMainMenu)))
@@ -206,7 +215,8 @@ void CUISequenceSimpleItem::Update()
                 m_UIWindow->Show(true);
         }
     }
-    if (m_desired_cursor_pos.x && m_desired_cursor_pos.y) GetUICursor().SetUICursorPosition(m_desired_cursor_pos);
+    if (m_desired_cursor_pos.x && m_desired_cursor_pos.y)
+        GetUICursor().SetUICursorPosition(m_desired_cursor_pos);
 }
 
 void CUISequenceSimpleItem::Start()
@@ -215,7 +225,8 @@ void CUISequenceSimpleItem::Start()
     inherited::Start();
     m_flags.set(etiStoredPauseState, Device.Paused());
 
-    if (m_flags.test(etiNeedPauseOn) && !m_flags.test(etiStoredPauseState)) {
+    if (m_flags.test(etiNeedPauseOn) && !m_flags.test(etiStoredPauseState))
+    {
         Device.Pause(TRUE, TRUE, FALSE, "simpleitem_start");
         bShowPauseString = FALSE;
     }
@@ -223,19 +234,24 @@ void CUISequenceSimpleItem::Start()
     if (m_flags.test(etiNeedPauseOff) && m_flags.test(etiStoredPauseState))
         Device.Pause(FALSE, TRUE, FALSE, "simpleitem_start");
 
-    if (m_flags.test(etiNeedPauseSound)) Device.Pause(TRUE, FALSE, TRUE, "simpleitem_start");
+    if (m_flags.test(etiNeedPauseSound))
+        Device.Pause(TRUE, FALSE, TRUE, "simpleitem_start");
 
-    if (m_desired_cursor_pos.x && m_desired_cursor_pos.y) GetUICursor().SetUICursorPosition(m_desired_cursor_pos);
+    if (m_desired_cursor_pos.x && m_desired_cursor_pos.y)
+        GetUICursor().SetUICursorPosition(m_desired_cursor_pos);
 
     m_owner->MainWnd()->AttachChild(m_UIWindow);
 
-    if (m_sound._handle()) m_sound.play(NULL, sm_2D);
+    if (m_sound._handle())
+        m_sound.play(NULL, sm_2D);
 
-    if (g_pGameLevel) {
+    if (g_pGameLevel)
+    {
         bool bShowPda = false;
         CUIGameSP* ui_game_sp = smart_cast<CUIGameSP*>(CurrentGameUI());
 
-        if (!stricmp(m_pda_section, "pda_tasks")) {
+        if (!stricmp(m_pda_section, "pda_tasks"))
+        {
             ui_game_sp->GetPdaMenu().SetActiveSubdialog("eptTasks");
             bShowPda = true;
         }
@@ -255,7 +271,8 @@ void CUISequenceSimpleItem::Start()
             bShowPda = true;
         }
 
-        if (ui_game_sp) {
+        if (ui_game_sp)
+        {
             if ((!ui_game_sp->GetPdaMenu().IsShown() && bShowPda) || (ui_game_sp->GetPdaMenu().IsShown() && !bShowPda))
             {
                 ui_game_sp->GetPdaMenu().HideDialog();
@@ -266,9 +283,10 @@ void CUISequenceSimpleItem::Start()
 
 bool CUISequenceSimpleItem::Stop(bool bForce)
 {
-    if (!m_flags.test(etiCanBeStopped) && !bForce) return false;
+    if (!m_flags.test(etiCanBeStopped) && !bForce)
+        return false;
 
-    if (m_UIWindow->GetParent() == m_owner->MainWnd())  // started??
+    if (m_UIWindow->GetParent() == m_owner->MainWnd()) // started??
         m_owner->MainWnd()->DetachChild(m_UIWindow);
 
     m_sound.stop();
@@ -279,11 +297,14 @@ bool CUISequenceSimpleItem::Stop(bool bForce)
     if (m_flags.test(etiNeedPauseOff) && m_flags.test(etiStoredPauseState))
         Device.Pause(TRUE, TRUE, FALSE, "simpleitem_stop");
 
-    if (m_flags.test(etiNeedPauseSound)) Device.Pause(FALSE, FALSE, TRUE, "simpleitem_stop");
+    if (m_flags.test(etiNeedPauseSound))
+        Device.Pause(FALSE, FALSE, TRUE, "simpleitem_stop");
 
-    if (g_pGameLevel) {
+    if (g_pGameLevel)
+    {
         CUIGameSP* ui_game_sp = smart_cast<CUIGameSP*>(CurrentGameUI());
-        if (ui_game_sp && ui_game_sp->GetPdaMenu().IsShown()) {
+        if (ui_game_sp && ui_game_sp->GetPdaMenu().IsShown())
+        {
             ui_game_sp->GetPdaMenu().HideDialog();
         }
     }
@@ -293,25 +314,29 @@ bool CUISequenceSimpleItem::Stop(bool bForce)
 
 void CUISequenceSimpleItem::OnKeyboardPress(int dik)
 {
-    if (!m_flags.test(etiCanBeStopped)) {
+    if (!m_flags.test(etiCanBeStopped))
+    {
         VERIFY(m_continue_dik_guard != -1);
-        if (m_continue_dik_guard == -1) m_flags.set(etiCanBeStopped, TRUE);  // not binded action :(
+        if (m_continue_dik_guard == -1)
+            m_flags.set(etiCanBeStopped, TRUE); // not binded action :(
 
         if (m_continue_dik_guard == 9999 || dik == m_continue_dik_guard)
-            m_flags.set(etiCanBeStopped, TRUE);  // match key
+            m_flags.set(etiCanBeStopped, TRUE); // match key
     }
 
     for (u32 idx = 0; idx < m_actions.size(); ++idx)
     {
         SActionItem& itm = m_actions[idx];
         bool b = is_binded(itm.m_action, dik);
-        if (b) {
+        if (b)
+        {
             luabind::functor<void> functor_to_call;
             bool functor_exists = ai().script_engine().functor(itm.m_functor.c_str(), functor_to_call);
             THROW3(functor_exists, "Cannot find script function described in tutorial item ", itm.m_functor.c_str());
             functor_to_call();
 
-            if (itm.m_bfinalize) {
+            if (itm.m_bfinalize)
+            {
                 m_flags.set(etiCanBeStopped, TRUE);
                 m_stop_lua_functions.clear();
                 Stop();

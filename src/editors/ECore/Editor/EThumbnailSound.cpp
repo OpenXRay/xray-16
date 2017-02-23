@@ -21,15 +21,13 @@ ESoundThumbnail::ESoundThumbnail(LPCSTR src_name, bool bLoad) : ECustomThumbnail
     m_fMaxAIDist = 300.f;
     m_fBaseVolume = 1.f;
     m_uGameType = 0;
-    if (bLoad) Load();
+    if (bLoad)
+        Load();
 }
 
 //------------------------------------------------------------------------------
 
-ESoundThumbnail::~ESoundThumbnail()
-{
-}
-
+ESoundThumbnail::~ESoundThumbnail() {}
 //------------------------------------------------------------------------------
 
 bool ESoundThumbnail::Load(LPCSTR src_name, LPCSTR path)
@@ -40,13 +38,15 @@ bool ESoundThumbnail::Load(LPCSTR src_name, LPCSTR path)
         FS.update_path(fn, path, fn);
     else
         FS.update_path(fn, _sounds_, fn);
-    if (!FS.exist(fn)) return false;
+    if (!FS.exist(fn))
+        return false;
 
     IReader* F = FS.r_open(fn);
     u16 version = 0;
 
     R_ASSERT(F->r_chunk(THM_CHUNK_VERSION, &version));
-    if (version != THM_SOUND_VERSION) {
+    if (version != THM_SOUND_VERSION)
+    {
         Msg("!Thumbnail: Unsupported version.");
         return false;
     }
@@ -61,7 +61,8 @@ bool ESoundThumbnail::Load(LPCSTR src_name, LPCSTR path)
     m_fMaxDist = F->r_float();
     m_uGameType = F->r_u32();
 
-    if (F->find_chunk(THM_CHUNK_SOUNDPARAM2)) m_fBaseVolume = F->r_float();
+    if (F->find_chunk(THM_CHUNK_SOUNDPARAM2))
+        m_fBaseVolume = F->r_float();
 
     if (F->find_chunk(THM_CHUNK_SOUND_AI_DIST))
         m_fMaxAIDist = F->r_float();
@@ -79,7 +80,8 @@ bool ESoundThumbnail::Load(LPCSTR src_name, LPCSTR path)
 
 void ESoundThumbnail::Save(int age, LPCSTR path)
 {
-    if (!Valid()) return;
+    if (!Valid())
+        return;
 
     CMemoryWriter F;
     F.open_chunk(THM_CHUNK_VERSION);
@@ -111,7 +113,8 @@ void ESoundThumbnail::Save(int age, LPCSTR path)
     else
         FS.update_path(fn, _sounds_, m_Name.c_str());
 
-    if (F.save_to(fn)) {
+    if (F.save_to(fn))
+    {
         FS.set_file_age(fn, age ? age : m_Age);
     }
     else
@@ -151,14 +154,17 @@ void ESoundThumbnail::OnMaxDistChange(PropValue* sender)
         FloatValue* CV = dynamic_cast<FloatValue*>(*it);
         VERIFY(CV);
         CV->lim_mx = *SV->value;
-        if (*CV->value > CV->lim_mx) {
+        if (*CV->value > CV->lim_mx)
+        {
             ELog.DlgMsg(mtInformation, "'Max AI Dist' <= 'Max Dist'. 'Max AI Dist' will be clamped.");
             bChanged = true;
             *CV->value = CV->lim_mx;
         }
-        if (!CV->Equal(S->Values().front())) S->m_Flags.set(PropItem::flMixed, TRUE);
+        if (!CV->Equal(S->Values().front()))
+            S->m_Flags.set(PropItem::flMixed, TRUE);
     }
-    if (bChanged) {
+    if (bChanged)
+    {
         P->Modified();
         P->RefreshForm();
     }

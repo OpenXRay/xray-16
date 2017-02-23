@@ -20,7 +20,4 @@ IC CAgentManager& CAgentExplosiveManager::object() const
     return (*m_object);
 }
 
-IC CAgentExplosiveManager::EXPLOSIVES& CAgentExplosiveManager::explosives()
-{
-    return (m_explosives);
-}
+IC CAgentExplosiveManager::EXPLOSIVES& CAgentExplosiveManager::explosives() { return (m_explosives); }

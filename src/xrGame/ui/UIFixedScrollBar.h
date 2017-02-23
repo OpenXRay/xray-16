@@ -25,7 +25,6 @@ public:
     virtual void SetWidth(float width){};
     virtual void SetHeight(float height){};
     virtual void Draw() { inherited::Draw(); };
-
     virtual void SendMessage(CUIWindow* pWnd, s16 msg, void* pData);
     virtual bool OnMouseAction(float x, float y, EUIMessages mouse_action);
     virtual bool OnMouseDown(int mouse_btn);

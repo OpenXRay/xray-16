@@ -98,10 +98,12 @@ void RELATION_REGISTRY::Action(CEntityAlive* from, CEntityAlive* to, ERelationAc
 
     //вычисление изменения репутации и рейтинга пока ведется
     //только для актера
-    if (!inv_owner_from || from->cast_base_monster()) return;
+    if (!inv_owner_from || from->cast_base_monster())
+        return;
 
     ALife::ERelationType relation = ALife::eRelationTypeDummy;
-    if (stalker) {
+    if (stalker)
+    {
         stalker->m_actor_relation_flags.set(action, TRUE);
         relation = GetRelationType(smart_cast<CInventoryOwner*>(stalker), inv_owner_from);
     }
@@ -110,21 +112,25 @@ void RELATION_REGISTRY::Action(CEntityAlive* from, CEntityAlive* to, ERelationAc
     {
     case ATTACK:
     {
-        if (actor) {
+        if (actor)
+        {
             //учитывать ATTACK и FIGHT_HELP, только если прошло время
             // min_attack_delta_time
             FIGHT_DATA* fight_data_from = FindFight(from->ID(), true);
-            if (Device.dwTimeGlobal - fight_data_from->attack_time < min_attack_delta_time) break;
+            if (Device.dwTimeGlobal - fight_data_from->attack_time < min_attack_delta_time)
+                break;
 
             fight_data_from->attack_time = Device.dwTimeGlobal;
 
             //если мы атаковали персонажа или монстра, который
             //кого-то атаковал, то мы помогли тому, кто защищался
             FIGHT_DATA* fight_data = FindFight(to->ID(), true);
-            if (fight_data) {
+            if (fight_data)
+            {
                 CAI_Stalker* defending_stalker =
                     smart_cast<CAI_Stalker*>(Level().Objects.net_Find(fight_data->defender));
-                if (defending_stalker) {
+                if (defending_stalker)
+                {
                     CAI_Stalker* attacking_stalker =
                         smart_cast<CAI_Stalker*>(Level().Objects.net_Find(fight_data->attacker));
                     Action(actor, defending_stalker, attacking_stalker ? FIGHT_HELP_HUMAN : FIGHT_HELP_MONSTER);
@@ -132,18 +138,22 @@ void RELATION_REGISTRY::Action(CEntityAlive* from, CEntityAlive* to, ERelationAc
             }
         }
 
-        if (stalker) {
+        if (stalker)
+        {
             bool bDangerScheme = false;
             const CEntityAlive* stalker_enemy = stalker->memory().enemy().selected();
-            if (actor && stalker_enemy) {
+            if (actor && stalker_enemy)
+            {
                 const CInventoryOwner* const_inv_owner_from = inv_owner_from;
-                if (stalker_enemy->human_being()) {
+                if (stalker_enemy->human_being())
+                {
                     const CInventoryOwner* const_inv_owner_stalker_enemy =
                         smart_cast<const CInventoryOwner*>(stalker_enemy);
                     ALife::ERelationType relation_to_actor =
                         GetRelationType(const_inv_owner_stalker_enemy, const_inv_owner_from);
 
-                    if (relation_to_actor == ALife::eRelationTypeEnemy) bDangerScheme = true;
+                    if (relation_to_actor == ALife::eRelationTypeEnemy)
+                        bDangerScheme = true;
                 }
             }
             SAttackGoodwillStorage* st = bDangerScheme ? &gw_danger : &gw_free;
@@ -176,7 +186,8 @@ void RELATION_REGISTRY::Action(CEntityAlive* from, CEntityAlive* to, ERelationAc
             //(считается, что такое нападение всегда случайно)
             // change relation only for pairs actor->stalker, do not use pairs stalker->stalker
             bool stalker_attack_team_mate = stalker && stalker_from;
-            if (delta_goodwill && !stalker_attack_team_mate) {
+            if (delta_goodwill && !stalker_attack_team_mate)
+            {
                 //изменить отношение ко всем членам атакованой группы (если такая есть)
                 //как к тому кого атаковали
                 CGroupHierarchyHolder& group = Level()
@@ -192,11 +203,13 @@ void RELATION_REGISTRY::Action(CEntityAlive* from, CEntityAlive* to, ERelationAc
                 //*(CHARACTER_GOODWILL)( stalker->Sympathy() * (float)(delta_goodwill));
                 CHARACTER_GOODWILL community_goodwill =
                     (CHARACTER_GOODWILL)(stalker->Sympathy() * (float)(st->community_member_attack_goodwill));
-                if (community_goodwill) {
+                if (community_goodwill)
+                {
                     ChangeCommunityGoodwill(stalker->Community(), from->ID(), community_goodwill);
                 }
             }
-            if (delta_reputation) {
+            if (delta_reputation)
+            {
                 inv_owner_from->ChangeReputation(delta_reputation);
             }
         }
@@ -204,7 +217,8 @@ void RELATION_REGISTRY::Action(CEntityAlive* from, CEntityAlive* to, ERelationAc
     break;
     case KILL:
     {
-        if (stalker) {
+        if (stalker)
+        {
             // FIGHT_DATA* fight_data_from = FindFight (from->ID(), true);
 
             //мы помним то, какое отношение обороняющегося к атакующему
@@ -244,7 +258,8 @@ void RELATION_REGISTRY::Action(CEntityAlive* from, CEntityAlive* to, ERelationAc
             //(считается, что такое нападение всегда случайно)
             bool stalker_kills_team_mate = stalker_from && (stalker_from->Community() == stalker->Community());
 
-            if (delta_goodwill && !stalker_kills_team_mate) {
+            if (delta_goodwill && !stalker_kills_team_mate)
+            {
                 //изменить отношение ко всем членам группы (если такая есть)
                 //убитого, кроме него самого
                 CGroupHierarchyHolder& group = Level()
@@ -254,7 +269,8 @@ void RELATION_REGISTRY::Action(CEntityAlive* from, CEntityAlive* to, ERelationAc
                                                    .group(stalker->g_Group());
                 for (std::size_t i = 0; i < group.members().size(); i++)
                 {
-                    if (stalker->ID() != group.members()[i]->ID()) {
+                    if (stalker->ID() != group.members()[i]->ID())
+                    {
                         ChangeGoodwill(group.members()[i]->ID(), from->ID(), delta_goodwill);
                     }
                 }
@@ -262,25 +278,29 @@ void RELATION_REGISTRY::Action(CEntityAlive* from, CEntityAlive* to, ERelationAc
                 //(CHARACTER_GOODWILL)( stalker->Sympathy() * (float)(delta_goodwill+community_member_kill_goodwill));
                 CHARACTER_GOODWILL community_goodwill =
                     (CHARACTER_GOODWILL)(stalker->Sympathy() * (float)(community_member_kill_goodwill));
-                if (community_goodwill) {
+                if (community_goodwill)
+                {
                     ChangeCommunityGoodwill(stalker->Community(), from->ID(), community_goodwill);
                 }
             }
 
-            if (delta_reputation) {
+            if (delta_reputation)
+            {
                 inv_owner_from->ChangeReputation(delta_reputation);
             }
 
             CHARACTER_RANK_VALUE delta_rank = 0;
             delta_rank = CHARACTER_RANK::rank_kill_points(CHARACTER_RANK::ValueToIndex(stalker->Rank()));
-            if (delta_rank) inv_owner_from->ChangeRank(delta_rank);
+            if (delta_rank)
+                inv_owner_from->ChangeRank(delta_rank);
         }
     }
     break;
     case FIGHT_HELP_HUMAN:
     case FIGHT_HELP_MONSTER:
     {
-        if (stalker && stalker->g_Alive()) {
+        if (stalker && stalker->g_Alive())
+        {
             CHARACTER_GOODWILL delta_goodwill = 0;
             CHARACTER_REPUTATION_VALUE delta_reputation = 0;
 
@@ -306,7 +326,8 @@ void RELATION_REGISTRY::Action(CEntityAlive* from, CEntityAlive* to, ERelationAc
             break;
             };
 
-            if (delta_goodwill) {
+            if (delta_goodwill)
+            {
                 //изменить отношение ко всем членам атакованой группы (если такая есть)
                 //как к тому кого атаковали
                 CGroupHierarchyHolder& group = Level()
@@ -320,15 +341,17 @@ void RELATION_REGISTRY::Action(CEntityAlive* from, CEntityAlive* to, ERelationAc
                 }
 
                 //*					ChangeCommunityGoodwill(stalker->Community(), from->ID(), (CHARACTER_GOODWILL)(
-                //stalker->Sympathy() * (float)delta_goodwill ));
+                // stalker->Sympathy() * (float)delta_goodwill ));
                 CHARACTER_GOODWILL community_goodwill =
                     (CHARACTER_GOODWILL)(stalker->Sympathy() * (float)(community_member_fight_help_goodwill));
-                if (community_goodwill) {
+                if (community_goodwill)
+                {
                     ChangeCommunityGoodwill(stalker->Community(), from->ID(), community_goodwill);
                 }
             }
 
-            if (delta_reputation) {
+            if (delta_reputation)
+            {
                 inv_owner_from->ChangeReputation(delta_reputation);
             }
         }

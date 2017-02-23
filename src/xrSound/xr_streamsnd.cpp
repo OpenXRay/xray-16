@@ -54,8 +54,10 @@ CSoundStream::~CSoundStream()
 
 void CSoundStream::Update()
 {
-    if (dwStatus & DSBSTATUS_BUFFERLOST) pBuffer->Restore();
-    if (bNeedUpdate) {
+    if (dwStatus & DSBSTATUS_BUFFERLOST)
+        pBuffer->Restore();
+    if (bNeedUpdate)
+    {
         fRealVolume = .5f * fRealVolume + .5f * fVolume;
         pBuffer->SetVolume(LONG((1 - fRealVolume * psSoundVMusic * fBaseVolume) * float(DSBVOLUME_MIN)));
         bNeedUpdate = false;
@@ -66,15 +68,18 @@ void CSoundStream::Play(BOOL loop, int cnt)
 {
     VERIFY(Sound);
 
-    if (isPause) {
+    if (isPause)
+    {
         Pause();
         return;
     }
-    if (dwStatus & DSBSTATUS_PLAYING) return;
+    if (dwStatus & DSBSTATUS_PLAYING)
+        return;
     dwDecPos = 0;
     isPresentData = true;
     //----------------
-    if (hAcmStream) {
+    if (hAcmStream)
+    {
         CHK_DX(acmStreamClose(hAcmStream, 0));
     }
     CHK_DX(acmStreamOpen(&hAcmStream, 0, psrc, pwfx, 0, NULL, 0, 0));
@@ -99,7 +104,8 @@ void CSoundStream::Stop()
 {
     int code;
     xr_free(WaveSource);
-    if (hAcmStream) {
+    if (hAcmStream)
+    {
         code = acmStreamClose(hAcmStream, 0);
         VERIFY2(code == 0, "Can't close stream");
     }
@@ -112,57 +118,63 @@ void CSoundStream::Stop()
 
 void CSoundStream::Pause()
 {
-    if (isPause) {
+    if (isPause)
+    {
         bMustPlay = true;
         isPause = false;
     }
     else
     {
-        if (!(dwStatus & DSBSTATUS_PLAYING)) return;
+        if (!(dwStatus & DSBSTATUS_PLAYING))
+            return;
         pBuffer->Stop();
         isPause = true;
     }
 }
 
-void CSoundStream::Restore()
-{
-    pBuffer->Restore();
-}
-
+void CSoundStream::Restore() { pBuffer->Restore(); }
 void CSoundStream::OnMove()
 {
     VERIFY(pBuffer);
 
     pBuffer->GetStatus(LPDWORD(&dwStatus));
 
-    if (isPause) return;
+    if (isPause)
+        return;
 
     u32 currpos;
     u32 delta;
 
-    if (dwStatus & DSBSTATUS_PLAYING) {
+    if (dwStatus & DSBSTATUS_PLAYING)
+    {
         Update();
         pBuffer->GetCurrentPosition(LPDWORD(&currpos), 0);
         if (writepos < currpos)
             delta = currpos - writepos;
         else
             delta = dsBufferSize - (writepos - currpos);
-        if (isPresentData && (delta > stream.cbDstLengthUsed)) {
+        if (isPresentData && (delta > stream.cbDstLengthUsed))
+        {
             isPresentData = Decompress(WaveDest);
             writepos += stream.cbDstLengthUsed;
         }
         else
         {
-            if (!isPresentData && (currpos < writepos)) {
+            if (!isPresentData && (currpos < writepos))
+            {
                 Stop();
-                if (bMustLoop && !iLoopCountRested) {
+                if (bMustLoop && !iLoopCountRested)
+                {
                     Play(bMustLoop, iLoopCountRested);
                 }
                 else
                 {
-                    if (bMustLoop) {
-                        if (iLoopCountRested) iLoopCountRested--;
-                        if (!iLoopCountRested) {
+                    if (bMustLoop)
+                    {
+                        if (iLoopCountRested)
+                            iLoopCountRested--;
+                        if (!iLoopCountRested)
+                        {
                             bMustLoop = false;
                         }
                         else
@@ -173,11 +185,13 @@ void CSoundStream::OnMove()
                 }
             }
         }
-        if (writepos > dsBufferSize) writepos -= dsBufferSize;
+        if (writepos > dsBufferSize)
+            writepos -= dsBufferSize;
     }
     else
     {
-        if (bMustPlay) {
+        if (bMustPlay)
+        {
             bMustPlay = false;
             Update();
             pBuffer->Play(0, 0, DSBPLAY_LOOPING);
@@ -188,7 +202,8 @@ void CSoundStream::OnMove()
 
 void CSoundStream::Load(LPCSTR name)
 {
-    if (name) {
+    if (name)
+    {
         xr_free(fName);
         fName = xr_strdup(name);
     }
@@ -205,7 +220,8 @@ BOOL CSoundStream::Decompress(unsigned char* dest)
     VERIFY(hAcmStream);
 
     // check for EOF
-    if (dwDecPos + dwSrcSize > dwTotalSize) {
+    if (dwDecPos + dwSrcSize > dwTotalSize)
+    {
         dwSrcSize = dwTotalSize - dwDecPos;
         r = false;
     }
@@ -230,9 +246,9 @@ BOOL CSoundStream::Decompress(unsigned char* dest)
 
 //--------------------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------------------
-void CSoundStream::AppWriteDataToBuffer(u32 dwOffset,  // our own write cursor
-    LPBYTE lpbSoundData,                               // start of our data
-    u32 dwSoundBytes)                                  // size of block to copy
+void CSoundStream::AppWriteDataToBuffer(u32 dwOffset, // our own write cursor
+    LPBYTE lpbSoundData, // start of our data
+    u32 dwSoundBytes) // size of block to copy
 {
     LPVOID lpvPtr1, lpvPtr2;
     DWORD dwBytes1;
@@ -240,10 +256,12 @@ void CSoundStream::AppWriteDataToBuffer(u32 dwOffset,  // our own write cursor
 
     // Obtain memory address of write block. This will be in two parts
     // if the block wraps around.
-    if (DS_OK == pBuffer->Lock(dwOffset, dwSoundBytes, &lpvPtr1, &dwBytes1, &lpvPtr2, &dwBytes2, 0)) {
+    if (DS_OK == pBuffer->Lock(dwOffset, dwSoundBytes, &lpvPtr1, &dwBytes1, &lpvPtr2, &dwBytes2, 0))
+    {
         // Write to pointers.
         CopyMemory(lpvPtr1, lpbSoundData, dwBytes1);
-        if (NULL != lpvPtr2) CopyMemory(lpvPtr2, lpbSoundData + dwBytes1, dwBytes2);
+        if (NULL != lpvPtr2)
+            CopyMemory(lpvPtr2, lpbSoundData + dwBytes1, dwBytes2);
         // Release the data back to DSound.
         CHK_DX(pBuffer->Unlock(lpvPtr1, dwBytes1, lpvPtr2, dwBytes2));
     }
@@ -257,7 +275,7 @@ BOOL ADPCMCreateSoundBuffer(IDirectSound8* lpDS, IDirectSoundBuffer** pDSB, WAVE
     DSBUFFERDESC dsBD;
 
     // Set up DSBUFFERDESC structure.
-    ZeroMemory(&dsBD, sizeof(DSBUFFERDESC));  // Zero it out.
+    ZeroMemory(&dsBD, sizeof(DSBUFFERDESC)); // Zero it out.
     dsBD.dwSize = sizeof(DSBUFFERDESC);
     dsBD.dwFlags = DSBCAPS_CTRLVOLUME | DSBCAPS_GETCURRENTPOSITION2 | DSBCAPS_LOCSOFTWARE;
 
@@ -266,7 +284,8 @@ BOOL ADPCMCreateSoundBuffer(IDirectSound8* lpDS, IDirectSoundBuffer** pDSB, WAVE
     dsBD.lpwfxFormat = fmt;
 
     // Create buffer.
-    if (FAILED(lpDS->CreateSoundBuffer(&dsBD, pDSB, NULL))) {
+    if (FAILED(lpDS->CreateSoundBuffer(&dsBD, pDSB, NULL)))
+    {
         pDSB = NULL;
         return FALSE;
     }
@@ -301,7 +320,8 @@ void CSoundStream::LoadADPCM()
         CopyMemory(buf, hdr.id, 4);
         buf[4] = 0;
         pos = hf->tell();
-        if (stricmp(buf, "fmt ") == 0) {
+        if (stricmp(buf, "fmt ") == 0)
+        {
             dwFMT_Size = hdr.len;
             psrc = (LPWAVEFORMATEX)xr_malloc(dwFMT_Size);
             pwfx = (LPWAVEFORMATEX)xr_malloc(dwFMT_Size);
@@ -311,7 +331,8 @@ void CSoundStream::LoadADPCM()
         }
         else
         {
-            if (stricmp(buf, "data") == 0) {
+            if (stricmp(buf, "data") == 0)
+            {
                 DataPos = hf->tell();
                 dwTotalSize = hdr.len;
             }

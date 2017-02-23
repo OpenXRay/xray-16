@@ -19,17 +19,18 @@
 //------------------------------------------------------------------------------
 CToolCustom* Tools = 0;
 //------------------------------------------------------------------------------
-#define CHECK_SNAP(R, A, C)                                                                                            \
-    {                                                                                                                  \
-        R += A;                                                                                                        \
-        if (fabsf(R) >= C) {                                                                                           \
-            A = snapto(R, C);                                                                                          \
-            R = 0;                                                                                                     \
-        }                                                                                                              \
-        else                                                                                                           \
-        {                                                                                                              \
-            A = 0;                                                                                                     \
-        }                                                                                                              \
+#define CHECK_SNAP(R, A, C)   \
+    {                         \
+        R += A;               \
+        if (fabsf(R) >= C)    \
+        {                     \
+            A = snapto(R, C); \
+            R = 0;            \
+        }                     \
+        else                  \
+        {                     \
+            A = 0;            \
+        }                     \
     }
 
 CToolCustom::CToolCustom()
@@ -46,10 +47,7 @@ CToolCustom::CToolCustom()
 
 //---------------------------------------------------------------------------
 
-CToolCustom::~CToolCustom()
-{
-}
-
+CToolCustom::~CToolCustom() {}
 //---------------------------------------------------------------------------
 
 bool CToolCustom::OnCreate()
@@ -97,15 +95,18 @@ void CToolCustom::SetAction(ETAction action)
     default: UI->GetD3DWindow()->Cursor = crHelp;
     }
 
-    if (m_Action == etaMove) {
-        if (!m_pAxisMoveObject && EPrefs->tools_show_move_axis) {
+    if (m_Action == etaMove)
+    {
+        if (!m_pAxisMoveObject && EPrefs->tools_show_move_axis)
+        {
             m_pAxisMoveObject = Lib.CreateEditObject("editor\\axis");
             m_Axis = etAxisUndefined;
         }
     }
     else
     {
-        if (m_pAxisMoveObject) Lib.RemoveEditObject(m_pAxisMoveObject);
+        if (m_pAxisMoveObject)
+            Lib.RemoveEditObject(m_pAxisMoveObject);
     }
     UI->RedrawScene();
     ExecCommand(COMMAND_REFRESH_UI_BAR);
@@ -132,7 +133,8 @@ bool __fastcall CToolCustom::MouseStart(TShiftState Shift)
     case etaSelect: break;
     case etaAdd: break;
     case etaMove:
-        if (etAxisY == m_Axis) {
+        if (etAxisY == m_Axis)
+        {
             m_MoveXVector.set(0, 0, 0);
             m_MoveYVector.set(0, 1, 0);
         }
@@ -163,7 +165,8 @@ bool __fastcall CToolCustom::MouseStart(TShiftState Shift)
     case etaScale: m_ScaleAmount.set(0, 0, 0); break;
     }
 
-    if (m_Action == etaMove && m_pAxisMoveObject) {
+    if (m_Action == etaMove && m_pAxisMoveObject)
+    {
         Fmatrix inv_parent;
         inv_parent.invert(m_axis_xform);
         Fvector start_point, start_dir;
@@ -174,7 +177,8 @@ bool __fastcall CToolCustom::MouseStart(TShiftState Shift)
         start_dir = UI->m_CurrentRDir;
         dist = 10000;
         m_pAxisMoveObject->RayPick(dist, start_point, start_dir, inv_parent, &pinfo);
-        if (pinfo.e_mesh) {
+        if (pinfo.e_mesh)
+        {
             LPCSTR mn = pinfo.e_mesh->Name().c_str();
             if (0 == stricmp(mn, "axis_x"))
                 SetAxis(etAxisX);
@@ -199,7 +203,8 @@ bool __fastcall CToolCustom::MouseEnd(TShiftState Shift)
     case etaSelect: break;
     case etaAdd: break;
     case etaMove:
-        if (EPrefs->tools_show_move_axis) m_Axis = etAxisUndefined;
+        if (EPrefs->tools_show_move_axis)
+            m_Axis = etAxisUndefined;
         break;
     case etaRotate: break;
     case etaScale: break;
@@ -218,21 +223,26 @@ void __fastcall CToolCustom::MouseMove(TShiftState Shift)
         m_MovedAmount.mul(m_MoveXVector, UI->m_MouseSM * UI->m_DeltaCpH.x);
         m_MovedAmount.mad(m_MoveYVector, -UI->m_MouseSM * UI->m_DeltaCpH.y);
 
-        if (m_Settings.is(etfMSnap)) {
+        if (m_Settings.is(etfMSnap))
+        {
             CHECK_SNAP(m_MoveReminder.x, m_MovedAmount.x, m_MoveSnap);
             CHECK_SNAP(m_MoveReminder.y, m_MovedAmount.y, m_MoveSnap);
             CHECK_SNAP(m_MoveReminder.z, m_MovedAmount.z, m_MoveSnap);
         }
 
-        if (!(etAxisX == m_Axis) && !(etAxisZX == m_Axis)) m_MovedAmount.x = 0.f;
-        if (!(etAxisZ == m_Axis) && !(etAxisZX == m_Axis)) m_MovedAmount.z = 0.f;
-        if (!(etAxisY == m_Axis)) m_MovedAmount.y = 0.f;
+        if (!(etAxisX == m_Axis) && !(etAxisZX == m_Axis))
+            m_MovedAmount.x = 0.f;
+        if (!(etAxisZ == m_Axis) && !(etAxisZX == m_Axis))
+            m_MovedAmount.z = 0.f;
+        if (!(etAxisY == m_Axis))
+            m_MovedAmount.y = 0.f;
     }
     break;
     case etaRotate:
     {
         m_RotateAmount = -UI->m_DeltaCpH.x * UI->m_MouseSR;
-        if (m_Settings.is(etfASnap)) CHECK_SNAP(m_fRotateSnapValue, m_RotateAmount, m_RotateSnapAngle);
+        if (m_Settings.is(etfASnap))
+            CHECK_SNAP(m_fRotateSnapValue, m_RotateAmount, m_RotateSnapAngle);
     }
     break;
     case etaScale:
@@ -245,10 +255,14 @@ void __fastcall CToolCustom::MouseMove(TShiftState Shift)
 
         m_ScaleAmount.set(dy, dy, dy);
 
-        if (m_Settings.is(etfNUScale)) {
-            if (!(etAxisX == m_Axis) && !(etAxisZX == m_Axis)) m_ScaleAmount.x = 0.f;
-            if (!(etAxisZ == m_Axis) && !(etAxisZX == m_Axis)) m_ScaleAmount.z = 0.f;
-            if (!(etAxisY == m_Axis)) m_ScaleAmount.y = 0.f;
+        if (m_Settings.is(etfNUScale))
+        {
+            if (!(etAxisX == m_Axis) && !(etAxisZX == m_Axis))
+                m_ScaleAmount.x = 0.f;
+            if (!(etAxisZ == m_Axis) && !(etAxisZX == m_Axis))
+                m_ScaleAmount.z = 0.f;
+            if (!(etAxisY == m_Axis))
+                m_ScaleAmount.y = 0.f;
         }
     }
     break;
@@ -262,15 +276,8 @@ void CToolCustom::GetCurrentFog(u32& fog_color, float& s_fog, float& e_fog)
     fog_color = dwFogColor;
 }
 
-void CToolCustom::RenderEnvironment()
-{
-}
-
-void CToolCustom::Clear()
-{
-    ClearDebugDraw();
-}
-
+void CToolCustom::RenderEnvironment() {}
+void CToolCustom::Clear() { ClearDebugDraw(); }
 void CToolCustom::Render()
 {
     // render errors
@@ -283,12 +290,14 @@ void CToolCustom::Render()
     for (SDebugDraw::PointIt vit = m_DebugDraw.m_Points.begin(); vit != m_DebugDraw.m_Points.end(); ++vit)
     {
         LPCSTR s = NULL;
-        if (vit->i) {
+        if (vit->i)
+        {
             temp.sprintf("P: %d", cnt++);
             s = temp.c_str();
         }
 
-        if (vit->descr.size()) {
+        if (vit->descr.size())
+        {
             s = vit->descr.c_str();
         }
         DU_impl.dbgDrawVert(vit->p[0], vit->c, s ? s : "");
@@ -297,18 +306,21 @@ void CToolCustom::Render()
     cnt = 0;
     for (SDebugDraw::LineIt eit = m_DebugDraw.m_Lines.begin(); eit != m_DebugDraw.m_Lines.end(); eit++)
     {
-        if (eit->i) temp.sprintf("L: %d", cnt++);
+        if (eit->i)
+            temp.sprintf("L: %d", cnt++);
         DU_impl.dbgDrawEdge(eit->p[0], eit->p[1], eit->c, eit->i ? temp.c_str() : "");
     }
     EDevice.SetShader(EDevice.m_SelectionShader);
     cnt = 0;
     for (SDebugDraw::FaceIt fwit = m_DebugDraw.m_WireFaces.begin(); fwit != m_DebugDraw.m_WireFaces.end(); fwit++)
     {
-        if (fwit->i) temp.sprintf("F: %d", cnt++);
+        if (fwit->i)
+            temp.sprintf("F: %d", cnt++);
         DU_impl.dbgDrawFace(fwit->p[0], fwit->p[1], fwit->p[2], fwit->c, fwit->i ? temp.c_str() : "");
     }
     cnt = 0;
-    if (!m_DebugDraw.m_SolidFaces.empty()) {
+    if (!m_DebugDraw.m_SolidFaces.empty())
+    {
         EDevice.SetShader(EDevice.m_SelectionShader);
         DU_impl.DD_DrawFace_begin(FALSE);
         for (SDebugDraw::FaceIt fsit = m_DebugDraw.m_SolidFaces.begin(); fsit != m_DebugDraw.m_SolidFaces.end(); fsit++)
@@ -326,7 +338,8 @@ void CToolCustom::Render()
     EDevice.SetRS(D3DRS_CULLMODE, D3DCULL_CCW);
     EDevice.ResetNearer();
 
-    if (m_pAxisMoveObject && GetSelectionPosition(m_axis_xform)) {
+    if (m_pAxisMoveObject && GetSelectionPosition(m_axis_xform))
+    {
         for (SurfaceIt s_it = m_pAxisMoveObject->Surfaces().begin(); s_it != m_pAxisMoveObject->Surfaces().end();
              ++s_it)
         {
@@ -343,7 +356,8 @@ void CToolCustom::Render()
         }
     }
 
-    if (m_pAxisMoveObject && GetSelectionPosition(m_axis_xform)) {
+    if (m_pAxisMoveObject && GetSelectionPosition(m_axis_xform))
+    {
         for (SurfaceIt s_it = m_pAxisMoveObject->Surfaces().begin(); s_it != m_pAxisMoveObject->Surfaces().end();
              ++s_it)
         {

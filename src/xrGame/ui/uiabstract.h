@@ -62,7 +62,6 @@ public:
     IC bool GetVisible() const { return m_bShowMe; }
     IC void SetAlignment(EWindowAlignment al) { m_alignment = al; };
     IC EWindowAlignment GetAlignment() const { return m_alignment; };
-
     IC Frect GetWndRect() const
     {
         Frect r;
@@ -90,7 +89,6 @@ public:
         m_wndPos.y += dy;
     }
     void MoveWndDelta(const Fvector2& d) { MoveWndDelta(d.x, d.y); };
-
 protected:
     bool m_bShowMe;
     Fvector2 m_wndPos;

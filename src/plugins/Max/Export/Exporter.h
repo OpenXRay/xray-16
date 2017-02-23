@@ -7,10 +7,7 @@
 DEFINE_VECTOR(INode*, INodeVec, INodeIt);
 
 //-----------------------------------------------------------------------------
-IC void ERR(LPCSTR s, LPCSTR dop = "")
-{
-    Msg("!Error: %s%s", s, dop);
-}
+IC void ERR(LPCSTR s, LPCSTR dop = "") { Msg("!Error: %s%s", s, dop); }
 IC int CGINTM(INode* node, int r)
 {
     char* msg = 0;
@@ -21,7 +18,8 @@ IC int CGINTM(INode* node, int r)
     case NO_MATRIX_SAVED: msg = "NO_MATRIX_SAVED"; break;
     case INVALID_MOD_POINTER: msg = "INVALID_MOD_POINTER"; break;
     }
-    if (msg) Msg("* '%s': GetInitNodeTM failed (%s)", node->GetName(), msg);
+    if (msg)
+        Msg("* '%s': GetInitNodeTM failed (%s)", node->GetName(), msg);
     return r;
 }
 //-----------------------------------------------------------------------------
@@ -61,7 +59,8 @@ private:
     int AddVert(const st_VERT& pTestV)
     {
         for (ExpVertIt vI = m_ExpVertices.begin(); vI != m_ExpVertices.end(); vI++)
-            if ((*vI)->similar(pTestV)) return vI - m_ExpVertices.begin();
+            if ((*vI)->similar(pTestV))
+                return vI - m_ExpVertices.begin();
 
         st_VERT* V = new st_VERT();
         *V = pTestV;
@@ -80,10 +79,12 @@ public:
     //-----------------------------------------------------------------------------
     CBoneDef* FindBone(LPCSTR name)
     {
-        if (name && name[0]) {
+        if (name && name[0])
+        {
             string nm = Helper::ConvertSpace(string(name));
             for (BoneDefIt it = m_Bones.begin(); it != m_Bones.end(); it++)
-                if ((*it)->name == nm) return *it;
+                if ((*it)->name == nm)
+                    return *it;
             return 0;
         }
         else

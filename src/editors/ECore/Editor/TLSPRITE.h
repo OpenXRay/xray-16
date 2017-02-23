@@ -5,7 +5,7 @@
 
 typedef struct _TLpolygon
 {
-  public:
+public:
     union
     {
         struct
@@ -197,7 +197,7 @@ class ECORE_API CTLSprite
 {
     FTLpolygon mesh;
 
-  public:
+public:
     CTLSprite();
     virtual ~CTLSprite();
     void Render(Fvector& pos, u32 color, float radius, float angle);
@@ -215,4 +215,4 @@ class ECORE_API CTLSprite
     void Render(Fvector& pos, float radius, bool bFixedSize, u32 clr = 0xffffffff);
 };
 
-#endif  //__TLSPRITE_H__
+#endif //__TLSPRITE_H__

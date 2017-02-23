@@ -51,7 +51,6 @@ public:
     }
 
     virtual void assign() { m_object[*m_name] = !!m_value; }
-
     virtual BOOL* value() { return (&m_value); }
 };
 
@@ -72,7 +71,8 @@ public:
 
     virtual void assign()
     {
-        if (!*m_value) m_value = shared_str("");
+        if (!*m_value)
+            m_value = shared_str("");
         m_object[*m_name] = *m_value;
     }
 

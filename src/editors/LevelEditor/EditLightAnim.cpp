@@ -55,18 +55,10 @@ void __fastcall TfrmEditLightAnim::FormDestroy(TObject* Sender)
 
 //---------------------------------------------------------------------------
 
-void __fastcall TfrmEditLightAnim::fsStorageRestorePlacement(TObject* Sender)
-{
-    m_Props->RestoreParams(fsStorage);
-}
-
+void __fastcall TfrmEditLightAnim::fsStorageRestorePlacement(TObject* Sender) { m_Props->RestoreParams(fsStorage); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfrmEditLightAnim::fsStorageSavePlacement(TObject* Sender)
-{
-    m_Props->SaveParams(fsStorage);
-}
-
+void __fastcall TfrmEditLightAnim::fsStorageSavePlacement(TObject* Sender) { m_Props->SaveParams(fsStorage); }
 //---------------------------------------------------------------------------
 
 void __fastcall TfrmEditLightAnim::OnModified()
@@ -78,7 +70,8 @@ void __fastcall TfrmEditLightAnim::OnModified()
 //---------------------------------------------------------------------------
 void __fastcall TfrmEditLightAnim::ShowEditor()
 {
-    if (!form) {
+    if (!form)
+    {
         form = new TfrmEditLightAnim((TComponent*)0);
         Scene->lock();
     }
@@ -104,7 +97,8 @@ void __fastcall TfrmEditLightAnim::FormClose(TObject* Sender, TCloseAction& Acti
     Scene->unlock();
     UI->EndEState(esEditLightAnim);
 
-    if (ebSave->Enabled && !bFinalClose) LALib.Reload();
+    if (ebSave->Enabled && !bFinalClose)
+        LALib.Reload();
 }
 
 //---------------------------------------------------------------------------
@@ -119,10 +113,13 @@ void __fastcall TfrmEditLightAnim::FormCloseQuery(TObject* Sender, bool& CanClos
 //---------------------------------------------------------------------------
 bool TfrmEditLightAnim::IsClose()
 {
-    if (ebSave->Enabled) {
+    if (ebSave->Enabled)
+    {
         int res = ELog.DlgMsg(mtConfirmation, "Library was change. Do you want save?");
-        if (res == mrCancel) return false;
-        if (res == mrYes) ebSaveClick(0);
+        if (res == mrCancel)
+            return false;
+        if (res == mrYes)
+            ebSaveClick(0);
     }
     return true;
 }
@@ -130,8 +127,10 @@ bool TfrmEditLightAnim::IsClose()
 //---------------------------------------------------------------------------
 bool TfrmEditLightAnim::FinalClose()
 {
-    if (!form) return true;
-    if (form->IsClose()) {
+    if (!form)
+        return true;
+    if (form->IsClose())
+    {
         form->bFinalClose = true;
         form->Close();
         return true;
@@ -143,7 +142,8 @@ bool TfrmEditLightAnim::FinalClose()
 
 void __fastcall TfrmEditLightAnim::OnItemFocused(TElTreeItem* item)
 {
-    if (item && FHelper.IsObject(item)) {
+    if (item && FHelper.IsObject(item))
+    {
         ListItem* prop = (ListItem*)item->Tag;
         VERIFY(prop);
         AnsiString nm = prop->Key();
@@ -170,18 +170,21 @@ void TfrmEditLightAnim::InitItems()
 
 void __fastcall TfrmEditLightAnim::FormKeyDown(TObject* Sender, WORD& Key, TShiftState Shift)
 {
-    if (Key == VK_ESCAPE) Close();
+    if (Key == VK_ESCAPE)
+        Close();
 }
 
 //---------------------------------------------------------------------------
 
 void TfrmEditLightAnim::UpdateView()
 {
-    if (m_CurrentItem) {
+    if (m_CurrentItem)
+    {
         stStartFrame->Caption = 0;
         stEndFrame->Caption = m_CurrentItem->iFrameCount - 1;
         sePointer->MaxValue = m_CurrentItem->iFrameCount - 1;
-        if (sePointer->Value > sePointer->MaxValue) sePointer->Value = sePointer->MaxValue;
+        if (sePointer->Value > sePointer->MaxValue)
+            sePointer->Value = sePointer->MaxValue;
         sePointer->Enabled = m_CurrentItem->iFrameCount > 1;
         pbG->Repaint();
 
@@ -194,7 +197,8 @@ void TfrmEditLightAnim::UpdateView()
 //------------------------------------------------------------------------------
 bool TfrmEditLightAnim::OnFrameCountAfterEdit(PropValue* v, s32& val)
 {
-    if (val != m_CurrentItem->iFrameCount) OnModified();
+    if (val != m_CurrentItem->iFrameCount)
+        OnModified();
     m_CurrentItem->Resize(val);
     UpdateView();
     return true;
@@ -206,7 +210,8 @@ void TfrmEditLightAnim::UpdateProperties()
 {
     // fill data
     PropItemVec items;
-    if (m_CurrentItem) {
+    if (m_CurrentItem)
+    {
         PHelper().CreateName(items, "Name", &m_CurrentItem->cName, m_CurrentOwner);
         PHelper().CreateFloat(items, "FPS", &m_CurrentItem->fFPS, 0.1f, 1000, 1.f, 1);
         S32Value* V;
@@ -216,7 +221,8 @@ void TfrmEditLightAnim::UpdateProperties()
         u32 frame = sePointer->Value;
         PHelper().CreateCaption(items, "Current\\Frame", shared_str().printf("%d", frame));
         u32* val = m_CurrentItem->GetKey(sePointer->Value);
-        if (val) {
+        if (val)
+        {
             PHelper().CreateColor(items, "Current\\Color", val);
             PHelper().CreateU8(items, "Current\\Alpha", ((u8*)val) + 3, 0x00, 0xFF);
         }
@@ -242,7 +248,8 @@ void __fastcall TfrmEditLightAnim::ebAddAnimClick(TObject* Sender)
     // folder name
     AnsiString pref;
     TElTreeItem* item = m_Items->GetSelected();
-    if (item) FHelper.MakeName(item, 0, pref, true);
+    if (item)
+        FHelper.MakeName(item, 0, pref, true);
     pref += "la";
     AnsiString name = FHelper.GenerateName(
         pref.c_str(), 2, fastdelegate::bind<TFindObjectByName>(this, &TfrmEditLightAnim::FindItemByName), false, true);
@@ -254,14 +261,11 @@ void __fastcall TfrmEditLightAnim::ebAddAnimClick(TObject* Sender)
 
 //---------------------------------------------------------------------------
 
-void TfrmEditLightAnim::FindItemByName(LPCSTR name, bool& res)
-{
-    res = !!LALib.FindItem(name);
-}
-
+void TfrmEditLightAnim::FindItemByName(LPCSTR name, bool& res) { res = !!LALib.FindItem(name); }
 void __fastcall TfrmEditLightAnim::ebCloneClick(TObject* Sender)
 {
-    if (m_CurrentItem) {
+    if (m_CurrentItem)
+    {
         // folder name
         AnsiString name = FHelper.GenerateName(m_CurrentItem->cName.c_str(), 2,
             fastdelegate::bind<TFindObjectByName>(this, &TfrmEditLightAnim::FindItemByName), false, true);
@@ -278,11 +282,7 @@ void __fastcall TfrmEditLightAnim::ebCloneClick(TObject* Sender)
 
 //---------------------------------------------------------------------------
 
-void __fastcall TfrmEditLightAnim::ebDeleteAnimClick(TObject* Sender)
-{
-    m_Items->RemoveSelItems();
-}
-
+void __fastcall TfrmEditLightAnim::ebDeleteAnimClick(TObject* Sender) { m_Items->RemoveSelItems(); }
 //---------------------------------------------------------------------------
 
 void __fastcall TfrmEditLightAnim::ebSaveClick(TObject* Sender)
@@ -308,7 +308,8 @@ void __fastcall TfrmEditLightAnim::ebReloadClick(TObject* Sender)
 
 void __fastcall TfrmEditLightAnim::pbGMouseDown(TObject* Sender, TMouseButton Button, TShiftState Shift, int X, int Y)
 {
-    if (Shift.Contains(ssLeft)) {
+    if (Shift.Contains(ssLeft))
+    {
         TRect R = pbG->ClientRect;
         TPoint pt(X, Y);
         pbG->ScreenToClient(pt);
@@ -318,7 +319,8 @@ void __fastcall TfrmEditLightAnim::pbGMouseDown(TObject* Sender, TMouseButton Bu
             ebCreateKeyClick(Sender);
         else
         {
-            if (m_CurrentItem->IsKey(sePointer->Value) && (sePointer->Value != 0)) {
+            if (m_CurrentItem->IsKey(sePointer->Value) && (sePointer->Value != 0))
+            {
                 iMoveKey = sePointer->Value;
                 iTgtMoveKey = iMoveKey;
             }
@@ -332,7 +334,8 @@ void __fastcall TfrmEditLightAnim::pbGMouseDown(TObject* Sender, TMouseButton Bu
 void __fastcall TfrmEditLightAnim::pbGMouseMove(TObject* Sender, TShiftState Shift, int X, int Y)
 {
     if (Shift.Contains(ssLeft))
-        if (iMoveKey >= 0) {
+        if (iMoveKey >= 0)
+        {
             TRect R = pbG->ClientRect;
             TPoint pt(X, Y);
             pbG->ScreenToClient(pt);
@@ -350,8 +353,10 @@ void __fastcall TfrmEditLightAnim::pbGMouseMove(TObject* Sender, TShiftState Shi
 
 void __fastcall TfrmEditLightAnim::pbGMouseUp(TObject* Sender, TMouseButton Button, TShiftState Shift, int X, int Y)
 {
-    if (iMoveKey >= 0) {
-        if (iTgtMoveKey != iMoveKey) {
+    if (iMoveKey >= 0)
+    {
+        if (iTgtMoveKey != iMoveKey)
+        {
             m_CurrentItem->MoveKey(iMoveKey, iTgtMoveKey);
             sePointer->Value = iTgtMoveKey;
             pbG->Repaint();
@@ -396,7 +401,8 @@ void __fastcall TfrmEditLightAnim::pbGPaint(TObject* Sender)
     R.bottom -= 2;
     B->Canvas->Brush->Color = TColor(0x00707070);
     B->Canvas->FillRect(R);
-    if (m_CurrentItem) {
+    if (m_CurrentItem)
+    {
         float segment = float(R.Width()) / (float(m_CurrentItem->iFrameCount));
         int half_segment = iFloor(segment / 2);
         // draw gradient
@@ -466,22 +472,21 @@ void __fastcall TfrmEditLightAnim::pbGPaint(TObject* Sender)
 
 void __fastcall TfrmEditLightAnim::sePointerKeyDown(TObject* Sender, WORD& Key, TShiftState Shift)
 {
-    if (Key == VK_RETURN) pbG->Repaint();
+    if (Key == VK_RETURN)
+        pbG->Repaint();
 }
 
 //---------------------------------------------------------------------------
 
-void __fastcall TfrmEditLightAnim::sePointerExit(TObject* Sender)
-{
-    pbG->Repaint();
-}
-
+void __fastcall TfrmEditLightAnim::sePointerExit(TObject* Sender) { pbG->Repaint(); }
 //---------------------------------------------------------------------------
 
 void __fastcall TfrmEditLightAnim::OnIdle()
 {
-    if (form) {
-        if (form->m_CurrentItem) {
+    if (form)
+    {
+        if (form->m_CurrentItem)
+        {
             int frame;
             u32 C = form->m_CurrentItem->CalculateBGR(EDevice.fTimeGlobal, frame);
             form->paColor->Color = TColor(subst_alpha(C, 0));
@@ -536,11 +541,13 @@ void __fastcall TfrmEditLightAnim::ebLastKeyClick(TObject* Sender)
 
 void __fastcall TfrmEditLightAnim::ebMoveKeyLeftClick(TObject* Sender)
 {
-    if ((sePointer->Value != 0) && (m_CurrentItem->IsKey(sePointer->Value))) {
+    if ((sePointer->Value != 0) && (m_CurrentItem->IsKey(sePointer->Value)))
+    {
         int f0, f1;
         f1 = f0 = sePointer->Value;
         f1--;
-        if (f1 >= 0) {
+        if (f1 >= 0)
+        {
             m_CurrentItem->MoveKey(f0, f1);
             sePointer->Value--;
             pbG->Repaint();
@@ -553,11 +560,13 @@ void __fastcall TfrmEditLightAnim::ebMoveKeyLeftClick(TObject* Sender)
 
 void __fastcall TfrmEditLightAnim::ebMoveKeyRightClick(TObject* Sender)
 {
-    if ((sePointer->Value != 0) && (m_CurrentItem->IsKey(sePointer->Value))) {
+    if ((sePointer->Value != 0) && (m_CurrentItem->IsKey(sePointer->Value)))
+    {
         int f0, f1;
         f1 = f0 = sePointer->Value;
         f1++;
-        if (f1 < m_CurrentItem->iFrameCount) {
+        if (f1 < m_CurrentItem->iFrameCount)
+        {
             m_CurrentItem->MoveKey(f0, f1);
             sePointer->Value++;
             pbG->Repaint();
@@ -586,9 +595,12 @@ void __fastcall TfrmEditLightAnim::ebFirstFrameClick(TObject* Sender)
 
 void __fastcall TfrmEditLightAnim::wnShapeKeyDown(TObject* Sender, WORD& Key, TShiftState Shift)
 {
-    if (m_CurrentItem) {
-        if (Key == VK_LEFT) {
-            if (Shift.Contains(ssAlt)) {
+    if (m_CurrentItem)
+    {
+        if (Key == VK_LEFT)
+        {
+            if (Shift.Contains(ssAlt))
+            {
                 sePointer->Value--;
                 pbG->Repaint();
             }
@@ -603,7 +615,8 @@ void __fastcall TfrmEditLightAnim::wnShapeKeyDown(TObject* Sender, WORD& Key, TS
         }
         else if (Key == VK_RIGHT)
         {
-            if (Shift.Contains(ssAlt)) {
+            if (Shift.Contains(ssAlt))
+            {
                 sePointer->Value++;
                 pbG->Repaint();
             }

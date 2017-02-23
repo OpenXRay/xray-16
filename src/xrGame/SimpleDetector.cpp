@@ -5,15 +5,8 @@
 #include "xrEngine/LightAnimLibrary.h"
 #include "player_hud.h"
 
-CSimpleDetector::CSimpleDetector(void)
-{
-    m_artefacts.m_af_rank = 1;
-}
-
-CSimpleDetector::~CSimpleDetector(void)
-{
-}
-
+CSimpleDetector::CSimpleDetector(void) { m_artefacts.m_af_rank = 1; }
+CSimpleDetector::~CSimpleDetector(void) {}
 void CSimpleDetector::CreateUI()
 {
     R_ASSERT(NULL == m_ui);
@@ -21,14 +14,11 @@ void CSimpleDetector::CreateUI()
     ui().construct(this);
 }
 
-CUIArtefactDetectorSimple& CSimpleDetector::ui()
-{
-    return *((CUIArtefactDetectorSimple*)m_ui);
-}
-
+CUIArtefactDetectorSimple& CSimpleDetector::ui() { return *((CUIArtefactDetectorSimple*)m_ui); }
 void CSimpleDetector::UpdateAf()
 {
-    if (m_artefacts.m_ItemInfos.size() == 0) return;
+    if (m_artefacts.m_ItemInfos.size() == 0)
+        return;
 
     CAfList::ItemsMapIt it_b = m_artefacts.m_ItemInfos.begin();
     CAfList::ItemsMapIt it_e = m_artefacts.m_ItemInfos.end();
@@ -37,18 +27,22 @@ void CSimpleDetector::UpdateAf()
 
     Fvector detector_pos = Position();
 
-    for (; it_b != it_e; ++it_b)  // only nearest
+    for (; it_b != it_e; ++it_b) // only nearest
     {
         CArtefact* pAf = it_b->first;
-        if (pAf->H_Parent()) continue;
+        if (pAf->H_Parent())
+            continue;
 
         float d = detector_pos.distance_to(pAf->Position());
-        if (d < min_dist) {
+        if (d < min_dist)
+        {
             min_dist = d;
             it = it_b;
         }
-        if (pAf->CanBeInvisible()) {
-            if (d < m_fAfVisRadius) pAf->SwitchVisibility(true);
+        if (pAf->CanBeInvisible())
+        {
+            if (d < m_fAfVisRadius)
+                pAf->SwitchVisibility(true);
         }
     }
 
@@ -69,11 +63,13 @@ void CSimpleDetector::UpdateAf()
 
     float snd_freq = min_snd_freq + (max_snd_freq - min_snd_freq) * (1.0f - fRelPow);
 
-    if (af_info.snd_time > af_info.cur_period) {
+    if (af_info.snd_time > af_info.cur_period)
+    {
         af_info.snd_time = 0;
         HUD_SOUND_ITEM::PlaySound(item_type->detect_snds, Fvector().set(0, 0, 0), this, true, false);
         ui().Flash(true, fRelPow);
-        if (item_type->detect_snds.m_activeSnd) item_type->detect_snds.m_activeSnd->snd.set_frequency(snd_freq);
+        if (item_type->detect_snds.m_activeSnd)
+            item_type->detect_snds.m_activeSnd->snd.set_frequency(snd_freq);
     }
     else
         af_info.snd_time += Device.fTimeDelta;
@@ -95,11 +91,13 @@ CUIArtefactDetectorSimple::~CUIArtefactDetectorSimple()
 
 void CUIArtefactDetectorSimple::Flash(bool bOn, float fRelPower)
 {
-    if (!m_parent->HudItemData()) return;
+    if (!m_parent->HudItemData())
+        return;
 
     IKinematics* K = m_parent->HudItemData()->m_model;
     R_ASSERT(K);
-    if (bOn) {
+    if (bOn)
+    {
         K->LL_SetBoneVisible(m_flash_bone, TRUE, TRUE);
         m_turn_off_flash_time = Device.dwTimeGlobal + iFloor(fRelPower * 1000.0f);
     }
@@ -108,7 +106,8 @@ void CUIArtefactDetectorSimple::Flash(bool bOn, float fRelPower)
         K->LL_SetBoneVisible(m_flash_bone, FALSE, TRUE);
         m_turn_off_flash_time = 0;
     }
-    if (bOn != m_flash_light->get_active()) m_flash_light->set_active(bOn);
+    if (bOn != m_flash_light->get_active())
+        m_flash_light->set_active(bOn);
 }
 
 void CUIArtefactDetectorSimple::setup_internals()
@@ -147,17 +146,22 @@ void CUIArtefactDetectorSimple::update()
 {
     inherited::update();
 
-    if (m_parent->HudItemData()) {
-        if (m_flash_bone == BI_NONE) setup_internals();
+    if (m_parent->HudItemData())
+    {
+        if (m_flash_bone == BI_NONE)
+            setup_internals();
 
-        if (m_turn_off_flash_time && m_turn_off_flash_time < Device.dwTimeGlobal) Flash(false, 0.0f);
+        if (m_turn_off_flash_time && m_turn_off_flash_time < Device.dwTimeGlobal)
+            Flash(false, 0.0f);
 
         firedeps fd;
         m_parent->HudItemData()->setup_firedeps(fd);
-        if (m_flash_light->get_active()) m_flash_light->set_position(fd.vLastFP);
+        if (m_flash_light->get_active())
+            m_flash_light->set_position(fd.vLastFP);
 
         m_on_off_light->set_position(fd.vLastFP2);
-        if (!m_on_off_light->get_active()) m_on_off_light->set_active(true);
+        if (!m_on_off_light->get_active())
+            m_on_off_light->set_active(true);
 
         int frame = 0;
         u32 clr = m_pOnOfLAnim->CalculateRGB(Device.fTimeGlobal, frame);

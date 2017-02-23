@@ -11,7 +11,7 @@ class ESceneSpawnTool : public ESceneCustomOTool
     typedef ESceneCustomOTool inherited;
     friend class CSpawnPoint;
 
-  protected:
+protected:
     // controls
     virtual void CreateControls();
     virtual void RemoveControls();
@@ -36,15 +36,13 @@ class ESceneSpawnTool : public ESceneCustomOTool
     ref_shader GetIcon(shared_str name);
     xr_vector<CEditableObject*> m_draw_RP_visuals;
 
-  public:
+public:
     ESceneSpawnTool();
     virtual ~ESceneSpawnTool();
 
     // definition
     IC LPCSTR ClassName() { return "spawn"; }
-
     IC LPCSTR ClassDesc() { return "Spawn"; }
-
     IC
 
         int
@@ -63,14 +61,12 @@ class ESceneSpawnTool : public ESceneCustomOTool
 
     // IO
     virtual bool IsNeedSave() { return true; }
-
     virtual bool LoadStream(IReader&);
     virtual bool LoadLTX(CInifile&);
     virtual void SaveStream(IWriter&);
     virtual void SaveLTX(CInifile&, int id);
 
     virtual bool can_use_inifile() { return true; }
-
     virtual bool LoadSelection(IReader&);
     virtual void SaveSelection(IWriter&);
 

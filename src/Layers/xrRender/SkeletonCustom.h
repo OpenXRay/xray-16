@@ -24,19 +24,19 @@ struct UCalc_mtlock
 
 #pragma warning(push)
 #pragma warning(disable : 4275)
-class CSkeletonWallmark : public intrusive_base  // 4+4+4+12+4+16+16 = 60 + 4 = 64
+class CSkeletonWallmark : public intrusive_base // 4+4+4+12+4+16+16 = 60 + 4 = 64
 {
 #pragma warning(pop)
-    CKinematics* m_Parent;    // 4
-    const Fmatrix* m_XForm;   // 4
-    ref_shader m_Shader;      // 4
-    Fvector3 m_ContactPoint;  // 12		model space
-    float m_fTimeStart;       // 4
+    CKinematics* m_Parent; // 4
+    const Fmatrix* m_XForm; // 4
+    ref_shader m_Shader; // 4
+    Fvector3 m_ContactPoint; // 12      model space
+    float m_fTimeStart; // 4
 public:
 #ifdef DEBUG
     u32 used_in_render;
 #endif
-    Fsphere m_LocalBounds;  // 16		model space
+    Fsphere m_LocalBounds; // 16        model space
     struct WMFace
     {
         Fvector3 vert[3];
@@ -45,9 +45,9 @@ public:
         float weight[3];
     };
     DEFINE_VECTOR(WMFace, WMFacesVec, WMFacesVecIt);
-    WMFacesVec m_Faces;  // 16
+    WMFacesVec m_Faces; // 16
 public:
-    Fsphere m_Bounds;  // 16		world space
+    Fsphere m_Bounds; // 16     world space
 public:
     CSkeletonWallmark(CKinematics* p, const Fmatrix* m, ref_shader s, const Fvector& cp, float ts)
         : m_Parent(p), m_XForm(m), m_Shader(s), m_fTimeStart(ts), m_ContactPoint(cp)
@@ -58,7 +58,7 @@ public:
     }
     ~CSkeletonWallmark()
 #ifdef DEBUG
-        ;
+    ;
 #else
     {
     }
@@ -114,7 +114,6 @@ public:
     virtual void BuildBoneMatrix(
         const CBoneData* bd, CBoneInstance& bi, const Fmatrix* parent, u8 mask_channel = (1 << 0));
     virtual void OnCalculateBones() {}
-
 public:
     dxRender_Visual* m_lod;
 
@@ -126,13 +125,13 @@ protected:
 
     // Globals
     CInifile* pUserData;
-    CBoneInstance* bone_instances;  // bone instances
-    vecBones* bones;                // all bones	(shared)
-    u16 iRoot;                      // Root bone index
+    CBoneInstance* bone_instances; // bone instances
+    vecBones* bones; // all bones (shared)
+    u16 iRoot; // Root bone index
 
     // Fast search
-    accel* bone_map_N;  // bones  associations	(shared)	- sorted by name
-    accel* bone_map_P;  // bones  associations	(shared)	- sorted by name-pointer
+    accel* bone_map_N; // bones associations (shared) - sorted by name
+    accel* bone_map_P; // bones associations (shared) - sorted by name-pointer
 
     BOOL Update_Visibility;
     u32 UCalc_Time;
@@ -227,7 +226,7 @@ public:
     ICF Fmatrix& LL_GetTransform_R(u16 bone_id)
     {
         return LL_GetBoneInstance(bone_id).mRenderTransform;
-    }  // rendering only
+    } // rendering only
     Fobb& LL_GetBox(u16 bone_id)
     {
         VERIFY(bone_id < LL_BoneCount());
@@ -254,7 +253,7 @@ public:
     void LL_SetBonesVisible(u64 mask);
 
     // Main functionality
-    virtual void CalculateBones(BOOL bForceExact = FALSE);  // Recalculate skeleton
+    virtual void CalculateBones(BOOL bForceExact = FALSE); // Recalculate skeleton
     void CalculateBones_Invalidate();
     void Callback(UpdateCallback C, void* Param)
     {
@@ -262,20 +261,17 @@ public:
         Update_Callback_Param = Param;
     }
 
-    //	Callback: data manipulation
+    // Callback: data manipulation
     virtual void SetUpdateCallback(UpdateCallback pCallback) { Update_Callback = pCallback; }
     virtual void SetUpdateCallbackParam(void* pCallbackParam) { Update_Callback_Param = pCallbackParam; }
-
     virtual UpdateCallback GetUpdateCallback() { return Update_Callback; }
     virtual void* GetUpdateCallbackParam() { return Update_Callback_Param; }
-
 // debug
 #ifdef DEBUG
     void DebugRender(Fmatrix& XFORM);
 
 protected:
     virtual shared_str getDebugName() { return dbg_name; }
-
 public:
 #endif
 
@@ -289,14 +285,15 @@ public:
     virtual IKinematicsAnimated* dcast_PKinematicsAnimated() { return 0; }
     virtual IRenderVisual* dcast_RenderVisual() { return this; }
     virtual IKinematics* dcast_PKinematics() { return this; }
-    //	virtual	CKinematics*		dcast_PKinematics	()				{ return this;	}
+    //virtual CKinematics* dcast_PKinematics() { return this; }
 
     virtual u32 mem_usage(bool bInstance)
     {
         u32 sz = sizeof(*this);
         sz += bone_instances ? bone_instances->mem_usage() : 0;
-        if (!bInstance) {
-            //			sz					+= pUserData?pUserData->mem_usage():0;
+        if (!bInstance)
+        {
+            // sz += pUserData?pUserData->mem_usage() : 0;
             for (vecBonesIt b_it = bones->begin(); b_it != bones->end(); b_it++)
                 sz += sizeof(vecBones::value_type) + (*b_it)->mem_usage();
         }
@@ -306,9 +303,6 @@ public:
 private:
     bool m_is_original_lod;
 };
-IC CKinematics* PCKinematics(dxRender_Visual* V)
-{
-    return V ? (CKinematics*)V->dcast_PKinematics() : 0;
-}
+IC CKinematics* PCKinematics(dxRender_Visual* V) { return V ? (CKinematics*)V->dcast_PKinematics() : 0; }
 //---------------------------------------------------------------------------
 #endif

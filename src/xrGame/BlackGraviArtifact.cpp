@@ -25,11 +25,7 @@ CBlackGraviArtefact::CBlackGraviArtefact(void)
     m_bStrike = false;
 }
 
-CBlackGraviArtefact::~CBlackGraviArtefact(void)
-{
-    m_GameObjectList.clear();
-}
-
+CBlackGraviArtefact::~CBlackGraviArtefact(void) { m_GameObjectList.clear(); }
 void CBlackGraviArtefact::Load(LPCSTR section)
 {
     inherited::Load(section);
@@ -42,7 +38,8 @@ void CBlackGraviArtefact::Load(LPCSTR section)
 
 BOOL CBlackGraviArtefact::net_Spawn(CSE_Abstract* DC)
 {
-    if (!inherited::net_Spawn(DC)) return FALSE;
+    if (!inherited::net_Spawn(DC))
+        return FALSE;
 
     CParticlesObject* pStaticPG;
     pStaticPG = CParticlesObject::Create("anomaly\\galantine", FALSE);
@@ -80,8 +77,10 @@ void CBlackGraviArtefact::UpdateCLChild()
     VERIFY(!physics_world()->Processing());
     inherited::UpdateCLChild();
 
-    if (getVisible() && m_pPhysicsShell) {
-        if (m_bStrike) {
+    if (getVisible() && m_pPhysicsShell)
+    {
+        if (m_bStrike)
+        {
             Fvector P;
             P.set(Position());
             feel_touch_update(P, m_fRadius);
@@ -114,7 +113,8 @@ void CBlackGraviArtefact::UpdateCLChild()
 void CBlackGraviArtefact::Hit(SHit* pHDS)
 {
     SHit HDS = *pHDS;
-    if (HDS.impulse > m_fImpulseThreshold) {
+    if (HDS.impulse > m_fImpulseThreshold)
+    {
         m_bStrike = true;
         //чтоб выстрел не повлиял на траекторию полета артефакта
         HDS.impulse = 0;
@@ -129,7 +129,8 @@ void CBlackGraviArtefact::feel_touch_new(IGameObject* O)
     CPhysicsShellHolder* pGameObject = smart_cast<CPhysicsShellHolder*>(O);
     CArtefact* pArtefact = smart_cast<CArtefact*>(O);
 
-    if (pGameObject && !pArtefact) {
+    if (pGameObject && !pArtefact)
+    {
         m_GameObjectList.push_back(pGameObject);
     }
 }
@@ -139,7 +140,8 @@ void CBlackGraviArtefact::feel_touch_delete(IGameObject* O)
     CGameObject* pGameObject = smart_cast<CGameObject*>(O);
     CArtefact* pArtefact = smart_cast<CArtefact*>(O);
 
-    if (pGameObject && !pArtefact) {
+    if (pGameObject && !pArtefact)
+    {
         m_GameObjectList.erase(std::find(m_GameObjectList.begin(), m_GameObjectList.end(), pGameObject));
     }
 }
@@ -178,7 +180,8 @@ void CBlackGraviArtefact::GraviStrike()
 
         float impulse = 100.f * m_fStrikeImpulse * (1.f - (distance / m_fRadius) * (distance / m_fRadius));
 
-        if (impulse > .001f) {
+        if (impulse > .001f)
+        {
             //?			BOOL		enabled = getEnabled();
             //?			setEnabled	(FALSE);
             impulse *= CExplosive::ExplosionEffect(rq_storage, NULL, pGameObject, Position(), m_fRadius);
@@ -190,12 +193,13 @@ void CBlackGraviArtefact::GraviStrike()
         if (pGameObject->m_pPhysicsShell)
             hit_power = 0;
         else if (pEntityAlive && pEntityAlive->g_Alive() &&
-                 pEntityAlive->character_physics_support()->movement()->CharacterExist())
+            pEntityAlive->character_physics_support()->movement()->CharacterExist())
             hit_power = 0;
         else
             hit_power = impulse;
 
-        if (impulse > .001f) {
+        if (impulse > .001f)
+        {
             while (!elements_list.empty())
             {
                 s16 element = elements_list.front();
@@ -203,16 +207,15 @@ void CBlackGraviArtefact::GraviStrike()
 
                 NET_Packet P;
                 SHit HS;
-                HS.GenHeader(GE_HIT, pGameObject->ID());  //				u_EventGen		(P,GE_HIT,
-                                                          //pGameObject->ID());
-                HS.whoID = ID();                          //				P.w_u16			(ID());
-                HS.weaponID = ID();                       //				P.w_u16			(ID());
-                HS.dir = strike_dir;                      //				P.w_dir			(strike_dir);
-                HS.power = hit_power;                     //				P.w_float		(hit_power);
-                HS.boneID = element;                      //				P.w_s16			(element);
-                HS.p_in_bone_space = bone_pos;            //				P.w_vec3		(bone_pos);
-                HS.impulse = impulse;                     //				P.w_float		(impulse);
-                HS.hit_type = (ALife::eHitTypeWound);     //				P.w_u16			(u16(ALife::eHitTypeWound));
+                HS.GenHeader(GE_HIT, pGameObject->ID()); //				u_EventGen		(P,GE_HIT, pGameObject->ID());
+                HS.whoID = ID(); //				P.w_u16			(ID());
+                HS.weaponID = ID(); //				P.w_u16			(ID());
+                HS.dir = strike_dir; //				P.w_dir			(strike_dir);
+                HS.power = hit_power; //				P.w_float		(hit_power);
+                HS.boneID = element; //				P.w_s16			(element);
+                HS.p_in_bone_space = bone_pos; //				P.w_vec3		(bone_pos);
+                HS.impulse = impulse; //				P.w_float		(impulse);
+                HS.hit_type = (ALife::eHitTypeWound); //				P.w_u16			(u16(ALife::eHitTypeWound));
                 HS.Write_Packet(P);
 
                 u_EventSend(P);

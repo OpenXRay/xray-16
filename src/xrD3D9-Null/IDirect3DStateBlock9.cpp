@@ -14,7 +14,8 @@ xrIDirect3DStateBlock9::xrIDirect3DStateBlock9(IDirect3DDevice9* pIDirect3DDevic
 HRESULT xrIDirect3DStateBlock9::QueryInterface(REFIID riid, void** ppvObj)
 {
     APIDEBUG("xrIDirect3DStateBlock9::QueryInterface");
-    if (riid == IID_IUnknown || riid == IID_IDirect3DStateBlock9) {
+    if (riid == IID_IUnknown || riid == IID_IDirect3DStateBlock9)
+    {
         *ppvObj = this;
         AddRef();
         return NOERROR;
@@ -33,7 +34,8 @@ ULONG xrIDirect3DStateBlock9::Release()
 {
     APIDEBUG("xrIDirect3DStateBlock9::Release");
     m_refCount--;
-    if (m_refCount < 0) {
+    if (m_refCount < 0)
+    {
         delete this;
         return -1;
     }

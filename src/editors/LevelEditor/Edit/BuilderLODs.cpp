@@ -23,7 +23,8 @@ BOOL GetPointColor(SPickQuery::SResult* R, u32& alpha)
     CSurface* surf = R->e_mesh->GetSurfaceByFaceID(R->tag);
     VERIFY(surf);
     Shader_xrLC* c_sh = EDevice.ShaderXRLC.Get(surf->_ShaderXRLCName());
-    if (!c_sh->flags.bRendering) return FALSE;
+    if (!c_sh->flags.bRendering)
+        return FALSE;
     const Fvector2* cuv[3];
     R->e_mesh->GetFaceTC(R->tag, cuv);
 
@@ -40,9 +41,11 @@ BOOL GetPointColor(SPickQuery::SResult* R, u32& alpha)
     int U = iFloor(uv.x * float(surf->m_ImageData->w) + .5f);
     int V = iFloor(uv.y * float(surf->m_ImageData->h) + .5f);
     U %= surf->m_ImageData->w;
-    if (U < 0) U += surf->m_ImageData->w;
+    if (U < 0)
+        U += surf->m_ImageData->w;
     V %= surf->m_ImageData->h;
-    if (V < 0) V += surf->m_ImageData->h;
+    if (V < 0)
+        V += surf->m_ImageData->h;
 
     alpha = color_get_A(surf->m_ImageData->layers.back()[V * surf->m_ImageData->w + U]);
     return TRUE;
@@ -50,7 +53,8 @@ BOOL GetPointColor(SPickQuery::SResult* R, u32& alpha)
 
 int SceneBuilder::BuildObjectLOD(const Fmatrix& parent, CEditableObject* E, int sector_num)
 {
-    if (!E->m_objectFlags.is(CEditableObject::eoUsingLOD)) return -1;
+    if (!E->m_objectFlags.is(CEditableObject::eoUsingLOD))
+        return -1;
     xr_string lod_name = E->GetLODTextureName();
 
     b_material mtl;
@@ -58,10 +62,12 @@ int SceneBuilder::BuildObjectLOD(const Fmatrix& parent, CEditableObject* E, int 
     mtl.shader = (u16)BuildShader(E->GetLODShaderName());
     mtl.sector = (u16)sector_num;
     mtl.shader_xrlc = -1;
-    if ((u16(-1) == mtl.surfidx) || (u16(-1) == mtl.shader)) return -2;
+    if ((u16(-1) == mtl.surfidx) || (u16(-1) == mtl.shader))
+        return -2;
 
     int mtl_idx = FindInMaterials(&mtl);
-    if (mtl_idx < 0) {
+    if (mtl_idx < 0)
+    {
         l_materials.push_back(mtl);
         mtl_idx = l_materials.size() - 1;
     }
@@ -84,7 +90,8 @@ int SceneBuilder::BuildObjectLOD(const Fmatrix& parent, CEditableObject* E, int 
     xr_string l_name = lod_name.c_str();
     u32 w, h;
     int age;
-    if (!ImageLib.LoadTextureData(l_name.c_str(), b.data, w, h, &age)) {
+    if (!ImageLib.LoadTextureData(l_name.c_str(), b.data, w, h, &age))
+    {
         Msg("!Can't find LOD texture: '%s'", l_name.c_str());
         return -2;
     }
@@ -93,7 +100,8 @@ int SceneBuilder::BuildObjectLOD(const Fmatrix& parent, CEditableObject* E, int 
             return -2;
         }*/
     l_name += "_nm";
-    if (!ImageLib.LoadTextureData(l_name.c_str(), b.ndata, w, h, &age)) {
+    if (!ImageLib.LoadTextureData(l_name.c_str(), b.ndata, w, h, &age))
+    {
         Msg("!Can't find LOD texture: '%s'", l_name.c_str());
         return -2;
     }

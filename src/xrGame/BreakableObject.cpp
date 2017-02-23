@@ -14,15 +14,8 @@ u32 CBreakableObject::m_remove_time = 0;
 float CBreakableObject::m_damage_threshold = 5.f;
 float CBreakableObject::m_health_threshhold = 0.f;
 float CBreakableObject::m_immunity_factor = 0.1f;
-CBreakableObject::CBreakableObject()
-{
-    Init();
-}
-
-CBreakableObject::~CBreakableObject()
-{
-}
-
+CBreakableObject::CBreakableObject() { Init(); }
+CBreakableObject::~CBreakableObject() {}
 void CBreakableObject::Load(LPCSTR section)
 {
     inherited::Load(section);
@@ -60,17 +53,20 @@ BOOL CBreakableObject::net_Spawn(CSE_Abstract* DC)
 void CBreakableObject::shedule_Update(u32 dt)
 {
     inherited::shedule_Update(dt);
-    if (m_pPhysicsShell && !bRemoved && Device.dwTimeGlobal - m_break_time > m_remove_time) SendDestroy();
+    if (m_pPhysicsShell && !bRemoved && Device.dwTimeGlobal - m_break_time > m_remove_time)
+        SendDestroy();
 }
 void CBreakableObject::UpdateCL()
 {
     inherited::UpdateCL();
     //	Fmatrix	d;
-    if (m_pPhysicsShell && m_pPhysicsShell->isFullActive()) m_pPhysicsShell->InterpolateGlobalTransform(&XFORM());
+    if (m_pPhysicsShell && m_pPhysicsShell->isFullActive())
+        m_pPhysicsShell->InterpolateGlobalTransform(&XFORM());
 }
 void CBreakableObject::enable_notificate()
 {
-    if (b_resived_damage) ProcessDamage();
+    if (b_resived_damage)
+        ProcessDamage();
 }
 
 // void CBreakableObject::Hit(float P,Fvector &dir, IGameObject* who,s16 element,
@@ -78,8 +74,10 @@ void CBreakableObject::enable_notificate()
 void CBreakableObject::Hit(SHit* pHDS)
 {
     CheckHitBreak(pHDS->damage(), pHDS->hit_type);
-    if (m_pPhysicsShell) {
-        if (pHDS->hit_type == ALife::eHitTypeExplosion) {
+    if (m_pPhysicsShell)
+    {
+        if (pHDS->hit_type == ALife::eHitTypeExplosion)
+        {
             ApplyExplosion(pHDS->dir, pHDS->impulse);
         }
         else
@@ -91,21 +89,9 @@ void CBreakableObject::Hit(SHit* pHDS)
     }
 }
 
-void CBreakableObject::net_Export(NET_Packet& P)
-{
-    VERIFY(Local());
-}
-
-void CBreakableObject::net_Import(NET_Packet& P)
-{
-    VERIFY(Remote());
-}
-
-BOOL CBreakableObject::UsedAI_Locations()
-{
-    return (FALSE);
-}
-
+void CBreakableObject::net_Export(NET_Packet& P) { VERIFY(Local()); }
+void CBreakableObject::net_Import(NET_Packet& P) { VERIFY(Remote()); }
+BOOL CBreakableObject::UsedAI_Locations() { return (FALSE); }
 void CBreakableObject::CreateUnbroken()
 {
     m_pUnbrokenObject = P_BuildStaticGeomShell((this), BreakableObjectCollisionCallback);
@@ -163,7 +149,7 @@ void CBreakableObject::CreateBroken()
     m_Shell->SmoothElementsInertia(0.3f);
     Fobb b;
     Visual()->getVisData().box.getradius(b.m_halfsize);
-    m_Shell->SetMaxAABBRadius(_max(_max(b.m_halfsize.x, b.m_halfsize.y), b.m_halfsize.z) * 2.f);  //+2.f
+    m_Shell->SetMaxAABBRadius(_max(_max(b.m_halfsize.x, b.m_halfsize.y), b.m_halfsize.z) * 2.f); //+2.f
 }
 
 void CBreakableObject::ActivateBroken()
@@ -181,7 +167,8 @@ void CBreakableObject::ActivateBroken()
 void CBreakableObject::net_Destroy()
 {
     DestroyUnbroken();
-    if (m_Shell) {
+    if (m_Shell)
+    {
         m_Shell->Deactivate();
         xr_delete(m_Shell);
         SheduleUnregister();
@@ -209,7 +196,8 @@ void CBreakableObject::Split()
 
 void CBreakableObject::Break()
 {
-    if (m_pPhysicsShell) return;
+    if (m_pPhysicsShell)
+        return;
     DestroyUnbroken();
     CreateBroken();
     ActivateBroken();
@@ -228,7 +216,8 @@ void CBreakableObject::Break()
 
 void CBreakableObject::SendDestroy()
 {
-    if (Local()) DestroyObject();
+    if (Local())
+        DestroyObject();
     //	NET_Packet		P;
     //	u_EventGen		(P,GE_DESTROY,ID());
     //	Msg				("ge_destroy: [%d] - %s",ID(),*cName());
@@ -242,7 +231,8 @@ void CBreakableObject::CollisionHit(u16 source_id, u16 bone_id, float c_damage, 
     VERIFY(bone_id == u16(-1));
     VERIFY(m_pUnbrokenObject);
 
-    if (m_damage_threshold < c_damage && m_max_frame_damage < c_damage) {
+    if (m_damage_threshold < c_damage && m_max_frame_damage < c_damage)
+    {
         b_resived_damage = true;
         m_max_frame_damage = c_damage;
         // this_object->m_contact_damage_pos.set(c.geom.pos[0],c.geom.pos[1],c.geom.pos[2]);
@@ -274,21 +264,26 @@ void CBreakableObject::ProcessDamage()
 }
 void CBreakableObject::CheckHitBreak(float power, ALife::EHitType hit_type)
 {
-    if (hit_type != ALife::eHitTypeStrike) {
+    if (hit_type != ALife::eHitTypeStrike)
+    {
         float res_power = power * m_immunity_factor;
-        if (power > m_health_threshhold) fHealth -= res_power;
+        if (power > m_health_threshhold)
+            fHealth -= res_power;
     }
-    if (fHealth <= 0.f) {
+    if (fHealth <= 0.f)
+    {
         Break();
         return;
     }
 
-    if (hit_type == ALife::eHitTypeStrike) Break();
+    if (hit_type == ALife::eHitTypeStrike)
+        Break();
 }
 
 void CBreakableObject::ApplyExplosion(const Fvector& dir, float impulse)
 {
-    if (!m_pPhysicsShell) return;
+    if (!m_pPhysicsShell)
+        return;
     Fvector pos;
     pos.set(0.f, 0.f, 0.f);
     u16 el_num = m_pPhysicsShell->get_ElementsNumber();

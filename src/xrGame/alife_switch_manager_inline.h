@@ -16,21 +16,9 @@ IC CALifeSwitchManager::CALifeSwitchManager(IPureServer* server, LPCSTR section)
     seed(u32(CPU::QPC() & 0xffffffff));
 }
 
-IC float CALifeSwitchManager::online_distance() const
-{
-    return (m_online_distance);
-}
-
-IC float CALifeSwitchManager::offline_distance() const
-{
-    return (m_offline_distance);
-}
-
-IC float CALifeSwitchManager::switch_distance() const
-{
-    return (m_switch_distance);
-}
-
+IC float CALifeSwitchManager::online_distance() const { return (m_online_distance); }
+IC float CALifeSwitchManager::offline_distance() const { return (m_offline_distance); }
+IC float CALifeSwitchManager::switch_distance() const { return (m_switch_distance); }
 IC void CALifeSwitchManager::set_switch_distance(float switch_distance)
 {
     m_switch_distance = switch_distance;

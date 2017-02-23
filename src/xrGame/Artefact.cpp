@@ -21,24 +21,25 @@
 #include "xrAICore/Navigation/PatrolPath/patrol_path.h"
 #include "xrAICore/Navigation/PatrolPath/patrol_path_storage.h"
 
-#define FASTMODE_DISTANCE (50.f)  // distance to camera from sphere, when zone switches to fast update sequence
+#define FASTMODE_DISTANCE (50.f) // distance to camera from sphere, when zone switches to fast update sequence
 
-#define CHOOSE_MAX(x, inst_x, y, inst_y, z, inst_z)                                                                    \
-    if (x > y)                                                                                                         \
-        if (x > z) {                                                                                                   \
-            inst_x;                                                                                                    \
-        }                                                                                                              \
-        else                                                                                                           \
-        {                                                                                                              \
-            inst_z;                                                                                                    \
-        }                                                                                                              \
-    else if (y > z)                                                                                                    \
-    {                                                                                                                  \
-        inst_y;                                                                                                        \
-    }                                                                                                                  \
-    else                                                                                                               \
-    {                                                                                                                  \
-        inst_z;                                                                                                        \
+#define CHOOSE_MAX(x, inst_x, y, inst_y, z, inst_z) \
+    if (x > y)                                      \
+        if (x > z)                                  \
+        {                                           \
+            inst_x;                                 \
+        }                                           \
+        else                                        \
+        {                                           \
+            inst_z;                                 \
+        }                                           \
+    else if (y > z)                                 \
+    {                                               \
+        inst_y;                                     \
+    }                                               \
+    else                                            \
+    {                                               \
+        inst_z;                                     \
     }
 
 CArtefact::CArtefact()
@@ -52,18 +53,17 @@ CArtefact::CArtefact()
     m_additional_weight = 0.0f;
 }
 
-CArtefact::~CArtefact()
-{
-}
-
+CArtefact::~CArtefact() {}
 void CArtefact::Load(LPCSTR section)
 {
     inherited::Load(section);
 
-    if (pSettings->line_exist(section, "particles")) m_sParticlesName = pSettings->r_string(section, "particles");
+    if (pSettings->line_exist(section, "particles"))
+        m_sParticlesName = pSettings->r_string(section, "particles");
 
     m_bLightsEnabled = !!pSettings->r_bool(section, "lights_enabled");
-    if (m_bLightsEnabled) {
+    if (m_bLightsEnabled)
+    {
         sscanf(pSettings->r_string(section, "trail_light_color"), "%f,%f,%f", &m_TrailLightColor.r,
             &m_TrailLightColor.g, &m_TrailLightColor.b);
         m_fTrailLightRange = pSettings->r_float(section, "trail_light_range");
@@ -75,7 +75,8 @@ void CArtefact::Load(LPCSTR section)
     m_fPowerRestoreSpeed = pSettings->r_float(section, "power_restore_speed");
     m_fBleedingRestoreSpeed = pSettings->r_float(section, "bleeding_restore_speed");
 
-    if (pSettings->section_exist(pSettings->r_string(section, "hit_absorbation_sect"))) {
+    if (pSettings->section_exist(pSettings->r_string(section, "hit_absorbation_sect")))
+    {
         m_ArtefactHitImmunities.LoadImmunities(pSettings->r_string(section, "hit_absorbation_sect"), pSettings);
     }
     m_bCanSpawnZone = !!pSettings->line_exist("artefact_spawn_zones", section);
@@ -85,7 +86,8 @@ void CArtefact::Load(LPCSTR section)
 
 BOOL CArtefact::net_Spawn(CSE_Abstract* DC)
 {
-    if (pSettings->r_bool(cNameSect(), "can_be_controlled")) m_detectorObj = new SArtefactDetectorsSupport(this);
+    if (pSettings->r_bool(cNameSect(), "can_be_controlled"))
+        m_detectorObj = new SArtefactDetectorsSupport(this);
 
     BOOL result = inherited::net_Spawn(DC);
     SwitchAfParticles(true);
@@ -93,9 +95,10 @@ BOOL CArtefact::net_Spawn(CSE_Abstract* DC)
     StartLights();
     m_CarringBoneID = u16(-1);
     IKinematicsAnimated* K = smart_cast<IKinematicsAnimated*>(Visual());
-    if (K) K->PlayCycle("idle");
+    if (K)
+        K->PlayCycle("idle");
 
-    o_fastmode = FALSE;  // start initially with fast-mode enabled
+    o_fastmode = FALSE; // start initially with fast-mode enabled
     o_render_frame = 0;
     SetState(eHidden);
 
@@ -107,7 +110,8 @@ void CArtefact::net_Destroy()
     inherited::net_Destroy();
 
     StopLights();
-    if (m_pTrailLight) m_pTrailLight.destroy();
+    if (m_pTrailLight)
+        m_pTrailLight.destroy();
 
     CPHUpdateObject::Deactivate();
     xr_delete(m_activationObj);
@@ -119,7 +123,8 @@ void CArtefact::OnH_A_Chield()
     inherited::OnH_A_Chield();
 
     StopLights();
-    if (IsGameTypeSingle()) {
+    if (IsGameTypeSingle())
+    {
         SwitchAfParticles(false);
     }
     else
@@ -130,7 +135,8 @@ void CArtefact::OnH_A_Chield()
         else
             m_CarringBoneID = u16(-1);
     }
-    if (m_detectorObj) {
+    if (m_detectorObj)
+    {
         m_detectorObj->m_currPatrolPath = NULL;
         m_detectorObj->m_currPatrolVertex = NULL;
     }
@@ -147,9 +153,11 @@ void CArtefact::OnH_B_Independent(bool just_before_destroy)
 
 void CArtefact::SwitchAfParticles(bool bOn)
 {
-    if (m_sParticlesName.size() == 0) return;
+    if (m_sParticlesName.size() == 0)
+        return;
 
-    if (bOn) {
+    if (bOn)
+    {
         Fvector dir;
         dir.set(0, 1, 0);
         CParticlesPlayer::StartParticles(m_sParticlesName, dir, ID(), -1, false);
@@ -165,22 +173,25 @@ void CArtefact::UpdateCL()
 {
     inherited::UpdateCL();
 
-    if (o_fastmode || m_activationObj) UpdateWorkload(Device.dwTimeDelta);
+    if (o_fastmode || m_activationObj)
+        UpdateWorkload(Device.dwTimeDelta);
 }
 
 void CArtefact::Interpolate()
 {
-    if (OnServer()) return;
+    if (OnServer())
+        return;
 
     net_updateInvData* p = NetSync();
-    while (p->NET_IItem.size() > 1)  // in real no interpolation, just get latest state
+    while (p->NET_IItem.size() > 1) // in real no interpolation, just get latest state
     {
         p->NET_IItem.pop_front();
     }
     inherited::Interpolate();
 
-    if (p->NET_IItem.size()) {
-        p->NET_IItem.clear();  // same as p->NET_IItem.pop_front();
+    if (p->NET_IItem.size())
+    {
+        p->NET_IItem.clear(); // same as p->NET_IItem.pop_front();
     }
 }
 
@@ -189,22 +200,26 @@ void CArtefact::UpdateWorkload(u32 dt)
     VERIFY(!physics_world()->Processing());
     // particles - velocity
     Fvector vel = {0, 0, 0};
-    if (H_Parent()) {
+    if (H_Parent())
+    {
         CPhysicsShellHolder* pPhysicsShellHolder = smart_cast<CPhysicsShellHolder*>(H_Parent());
-        if (pPhysicsShellHolder) pPhysicsShellHolder->PHGetLinearVell(vel);
+        if (pPhysicsShellHolder)
+            pPhysicsShellHolder->PHGetLinearVell(vel);
     }
     CParticlesPlayer::SetParentVel(vel);
 
     //
     UpdateLights();
-    if (m_activationObj && m_activationObj->IsInProgress()) {
+    if (m_activationObj && m_activationObj->IsInProgress())
+    {
         CPHUpdateObject::Activate();
         m_activationObj->UpdateActivation();
         return;
     }
 
     // custom-logic
-    if (!CAttachableItem::enabled()) UpdateCLChild();
+    if (!CAttachableItem::enabled())
+        UpdateCLChild();
 }
 
 void CArtefact::shedule_Update(u32 dt)
@@ -226,9 +241,11 @@ void CArtefact::shedule_Update(u32 dt)
         else
             o_switch_2_slow();
     }
-    if (!o_fastmode) UpdateWorkload(dt);
+    if (!o_fastmode)
+        UpdateWorkload(dt);
 
-    if (!H_Parent() && m_detectorObj) {
+    if (!H_Parent() && m_detectorObj)
+    {
         m_detectorObj->UpdateOnFrame();
     }
 }
@@ -242,7 +259,8 @@ void CArtefact::create_physic_shell()
 void CArtefact::StartLights()
 {
     VERIFY(!physics_world()->Processing());
-    if (!m_bLightsEnabled) return;
+    if (!m_bLightsEnabled)
+        return;
 
     VERIFY(m_pTrailLight == NULL);
     m_pTrailLight = GlobalEnv.Render->light_create();
@@ -259,7 +277,8 @@ void CArtefact::StartLights()
 void CArtefact::StopLights()
 {
     VERIFY(!physics_world()->Processing());
-    if (!m_bLightsEnabled || !m_pTrailLight) return;
+    if (!m_bLightsEnabled || !m_pTrailLight)
+        return;
 
     m_pTrailLight->set_active(false);
     m_pTrailLight.destroy();
@@ -268,7 +287,8 @@ void CArtefact::StopLights()
 void CArtefact::UpdateLights()
 {
     VERIFY(!physics_world()->Processing());
-    if (!m_bLightsEnabled || !m_pTrailLight || !m_pTrailLight->get_active()) return;
+    if (!m_bLightsEnabled || !m_pTrailLight || !m_pTrailLight->get_active())
+        return;
     m_pTrailLight->set_position(Position());
 }
 
@@ -277,37 +297,34 @@ void CArtefact::ActivateArtefact()
     VERIFY(m_bCanSpawnZone);
     VERIFY(H_Parent());
     CreateArtefactActivation();
-    if (!m_activationObj) return;
+    if (!m_activationObj)
+        return;
     m_activationObj->Start();
 }
 
 void CArtefact::PhDataUpdate(float step)
 {
-    if (m_activationObj && m_activationObj->IsInProgress()) m_activationObj->PhDataUpdate(step);
+    if (m_activationObj && m_activationObj->IsInProgress())
+        m_activationObj->PhDataUpdate(step);
 }
 
 bool CArtefact::CanTake() const
 {
-    if (!inherited::CanTake()) return false;
+    if (!inherited::CanTake())
+        return false;
 
-    if (m_activationObj && m_activationObj->IsInProgress()) return false;
+    if (m_activationObj && m_activationObj->IsInProgress())
+        return false;
 
     return true;
 }
 
-void CArtefact::Hide()
-{
-    SwitchState(eHiding);
-}
-
-void CArtefact::Show()
-{
-    SwitchState(eShowing);
-}
-
+void CArtefact::Hide() { SwitchState(eHiding); }
+void CArtefact::Show() { SwitchState(eShowing); }
 void CArtefact::MoveTo(Fvector const& position)
 {
-    if (!PPhysicsShell()) return;
+    if (!PPhysicsShell())
+        return;
 
     Fmatrix M = XFORM();
     M.translate(position);
@@ -319,28 +336,34 @@ void CArtefact::MoveTo(Fvector const& position)
 #include "Entity_alive.h"
 void CArtefact::UpdateXForm()
 {
-    if (Device.dwFrame != dwXF_Frame) {
+    if (Device.dwFrame != dwXF_Frame)
+    {
         dwXF_Frame = Device.dwFrame;
 
-        if (0 == H_Parent()) return;
+        if (0 == H_Parent())
+            return;
 
         // Get access to entity and its visual
         CEntityAlive* E = smart_cast<CEntityAlive*>(H_Parent());
 
-        if (!E) return;
+        if (!E)
+            return;
 
         const CInventoryOwner* parent = smart_cast<const CInventoryOwner*>(E);
-        if (parent && parent->use_simplified_visual()) return;
+        if (parent && parent->use_simplified_visual())
+            return;
 
         VERIFY(E);
         IKinematics* V = smart_cast<IKinematics*>(E->Visual());
         VERIFY(V);
-        if (CAttachableItem::enabled()) return;
+        if (CAttachableItem::enabled())
+            return;
 
         // Get matrices
         int boneL = -1, boneR = -1, boneR2 = -1;
         E->g_WeaponBones(boneL, boneR, boneR2);
-        if (boneR == -1) return;
+        if (boneR == -1)
+            return;
 
         boneL = boneR2;
 
@@ -370,11 +393,13 @@ bool CArtefact::Action(u16 cmd, u32 flags)
     {
     case kWPN_FIRE:
     {
-        if (flags & CMD_START && m_bCanSpawnZone) {
+        if (flags & CMD_START && m_bCanSpawnZone)
+        {
             SwitchState(eActivating);
             return true;
         }
-        if (flags & CMD_STOP && m_bCanSpawnZone && GetState() == eActivating) {
+        if (flags & CMD_STOP && m_bCanSpawnZone && GetState() == eActivating)
+        {
             SwitchState(eIdle);
             return true;
         }
@@ -405,11 +430,7 @@ void CArtefact::OnStateSwitch(u32 S)
     };
 }
 
-void CArtefact::PlayAnimIdle()
-{
-    PlayHUDMotion("anm_idle", FALSE, NULL, eIdle);
-}
-
+void CArtefact::PlayAnimIdle() { PlayHUDMotion("anm_idle", FALSE, NULL, eIdle); }
 void CArtefact::OnAnimationEnd(u32 state)
 {
     switch (state)
@@ -422,7 +443,8 @@ void CArtefact::OnAnimationEnd(u32 state)
     break;
     case eActivating:
     {
-        if (Local()) {
+        if (Local())
+        {
             SwitchState(eHiding);
             NET_Packet P;
             u_EventGen(P, GEG_PLAYER_ACTIVATEARTEFACT, H_Parent()->ID());
@@ -436,23 +458,22 @@ void CArtefact::OnAnimationEnd(u32 state)
 
 void CArtefact::FollowByPath(LPCSTR path_name, int start_idx, Fvector magic_force)
 {
-    if (m_detectorObj) m_detectorObj->FollowByPath(path_name, start_idx, magic_force);
+    if (m_detectorObj)
+        m_detectorObj->FollowByPath(path_name, start_idx, magic_force);
 }
 
-bool CArtefact::CanBeInvisible()
-{
-    return (m_detectorObj != NULL);
-}
-
+bool CArtefact::CanBeInvisible() { return (m_detectorObj != NULL); }
 void CArtefact::SwitchVisibility(bool b)
 {
-    if (m_detectorObj) m_detectorObj->SetVisible(b);
+    if (m_detectorObj)
+        m_detectorObj->SetVisible(b);
 }
 
 void CArtefact::StopActivation()
 {
     // VERIFY2(m_activationObj, "activation object not initialized");
-    if (!m_activationObj) return;
+    if (!m_activationObj)
+        return;
     m_activationObj->Stop();
 }
 
@@ -460,12 +481,13 @@ void CArtefact::ForceTransform(const Fmatrix& m)
 {
     VERIFY(PPhysicsShell());
     XFORM().set(m);
-    PPhysicsShell()->SetGlTransformDynamic(m);  // XFORM().set(m);
+    PPhysicsShell()->SetGlTransformDynamic(m); // XFORM().set(m);
 }
 
 void CArtefact::CreateArtefactActivation()
 {
-    if (m_activationObj) {
+    if (m_activationObj)
+    {
         return;
     }
     m_activationObj = new SArtefactActivation(this, H_Parent()->ID());
@@ -476,22 +498,20 @@ SArtefactDetectorsSupport::SArtefactDetectorsSupport(CArtefact* A)
 {
 }
 
-SArtefactDetectorsSupport::~SArtefactDetectorsSupport()
-{
-    m_sound.destroy();
-}
-
+SArtefactDetectorsSupport::~SArtefactDetectorsSupport() { m_sound.destroy(); }
 void SArtefactDetectorsSupport::SetVisible(bool b)
 {
     m_switchVisTime = Device.dwTimeGlobal;
-    if (b == !!m_parent->getVisible()) return;
+    if (b == !!m_parent->getVisible())
+        return;
 
     if (b)
         m_parent->StartLights();
     else
         m_parent->StopLights();
 
-    if (b) {
+    if (b)
+    {
         LPCSTR curr =
             pSettings->r_string(m_parent->cNameSect().c_str(), (b) ? "det_show_particles" : "det_hide_particles");
 
@@ -527,11 +547,14 @@ void SArtefactDetectorsSupport::Blink()
 
 void SArtefactDetectorsSupport::UpdateOnFrame()
 {
-    if (m_currPatrolPath && !m_parent->getVisible()) {
-        if (m_parent->Position().distance_to(m_destPoint) < 2.0f) {
+    if (m_currPatrolPath && !m_parent->getVisible())
+    {
+        if (m_parent->Position().distance_to(m_destPoint) < 2.0f)
+        {
             CPatrolPath::const_iterator b, e;
             m_currPatrolPath->begin(m_currPatrolVertex, b, e);
-            if (b != e) {
+            if (b != e)
+            {
                 std::advance(b, ::Random.randI(s32(e - b)));
                 m_currPatrolVertex = m_currPatrolPath->vertex((*b).vertex_id());
                 m_destPoint = m_currPatrolVertex->data().position();
@@ -544,7 +567,8 @@ void SArtefactDetectorsSupport::UpdateOnFrame()
         Fvector v;
         m_parent->PHGetLinearVell(v);
         float cosa = v.dotproduct(dir);
-        if (v.square_magnitude() < (0.7f * 0.7f) || (cosa < cos_et)) {
+        if (v.square_magnitude() < (0.7f * 0.7f) || (cosa < cos_et))
+        {
             Fvector power = dir;
             power.y += 1.0f;
             power.mul(m_path_moving_force);
@@ -555,17 +579,20 @@ void SArtefactDetectorsSupport::UpdateOnFrame()
     if (m_parent->getVisible() && m_parent->GetAfRank() != 0 && m_switchVisTime + 5000 < Device.dwTimeGlobal)
         SetVisible(false);
 
-    u32 dwDt = 2 * 3600 * 1000 / 10;  // 2 hour of game time
-    if (!m_parent->getVisible() && m_switchVisTime + dwDt < Device.dwTimeGlobal) {
+    u32 dwDt = 2 * 3600 * 1000 / 10; // 2 hour of game time
+    if (!m_parent->getVisible() && m_switchVisTime + dwDt < Device.dwTimeGlobal)
+    {
         m_switchVisTime = Device.dwTimeGlobal;
-        if (m_parent->Position().distance_to(Device.vCameraPosition) > 40.0f) Blink();
+        if (m_parent->Position().distance_to(Device.vCameraPosition) > 40.0f)
+            Blink();
     }
 }
 
 void SArtefactDetectorsSupport::FollowByPath(LPCSTR path_name, int start_idx, Fvector force)
 {
     m_currPatrolPath = ai().patrol_paths().path(path_name, true);
-    if (m_currPatrolPath) {
+    if (m_currPatrolPath)
+    {
         m_currPatrolVertex = m_currPatrolPath->vertex(start_idx);
         m_destPoint = m_currPatrolVertex->data().position();
         m_path_moving_force = force;

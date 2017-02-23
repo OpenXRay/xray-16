@@ -22,10 +22,7 @@ CXRaySkinExport::CXRaySkinExport(bool bReference)
     m_rgWeights = 0;
 };
 
-CXRaySkinExport::~CXRaySkinExport()
-{
-}
-
+CXRaySkinExport::~CXRaySkinExport() {}
 ////////////////////////////////////////////////////
 // set up the plug-in
 
@@ -56,7 +53,8 @@ MPxFileTranslator::MFileKind CXRaySkinExport::identifyFile(
     const char* name = fileName.name().asChar();
     int nameLength = xr_strlen(name);
 
-    if (m_bReferenceFile) {
+    if (m_bReferenceFile)
+    {
         if ((nameLength > 7) && !strcasecmp(name + nameLength - 7, ".object"))
             return kCouldBeMyFileType;
         else
@@ -71,38 +69,34 @@ MPxFileTranslator::MFileKind CXRaySkinExport::identifyFile(
     }
 }
 
-void* CXRaySkinExport::creator_skin()
-{
-    return new CXRaySkinExport(true);
-}
-
-void* CXRaySkinExport::creator_skin_motion()
-{
-    return new CXRaySkinExport(false);
-}
+void* CXRaySkinExport::creator_skin() { return new CXRaySkinExport(true); }
+void* CXRaySkinExport::creator_skin_motion() { return new CXRaySkinExport(false); }
 //////////////////////////////////////////////////////////////
 // the key routine which does all the work
 MStatus CXRaySkinExport::writer(const MFileObject& file, const MString& options, FileAccessMode mode)
 {
     MStatus status;
-    clearData();  // initialize all data structures
+    clearData(); // initialize all data structures
 
     bool b_ogf = false;
     MString locator_name;
-    if (options.length() > 0) {
+    if (options.length() > 0)
+    {
         int i, length;
         // Start parsing.
         MStringArray optionList;
         MStringArray theOption;
-        options.split(';', optionList);  // break out all the options.
+        options.split(';', optionList); // break out all the options.
 
         length = optionList.length();
         for (i = 0; i < length; ++i)
         {
             theOption.clear();
             optionList[i].split('=', theOption);
-            if (theOption[0] == MString("SkinCluster")) {
-                if (theOption.length() > 1) {
+            if (theOption[0] == MString("SkinCluster"))
+            {
+                if (theOption.length() > 1)
+                {
                     m_strSkinCluster = theOption[1];
                 }
                 else
@@ -119,13 +113,15 @@ MStatus CXRaySkinExport::writer(const MFileObject& file, const MString& options,
             }
             else if (theOption[0] == MString("ogf"))
             {
-                if (theOption.length() > 1) b_ogf = (theOption[1] == MString("on"));
+                if (theOption.length() > 1)
+                    b_ogf = (theOption[1] == MString("on"));
             }
         }
     }
 
     // sanity check the options
-    if (m_strSkinCluster.length() == 0) {
+    if (m_strSkinCluster.length() == 0)
+    {
         m_fSkinCluster = false;
     }
     else
@@ -133,7 +129,8 @@ MStatus CXRaySkinExport::writer(const MFileObject& file, const MString& options,
         m_fSkinCluster = true;
     }
     MString mname;
-    if (m_bReferenceFile) {
+    if (m_bReferenceFile)
+    {
         mname = file.fullName() + ".object";
     }
     else
@@ -143,7 +140,8 @@ MStatus CXRaySkinExport::writer(const MFileObject& file, const MString& options,
     LPCSTR fname = mname.asChar();
 
     // now load the bones themselves and store the skeleton hierarchy in memory
-    if (mode == kExportActiveAccessMode) {
+    if (mode == kExportActiveAccessMode)
+    {
         MSelectionList activeList;
         MGlobal::getActiveSelectionList(activeList);
         MItSelectionList iter(activeList);
@@ -162,8 +160,8 @@ MStatus CXRaySkinExport::writer(const MFileObject& file, const MString& options,
             aptTypePtr = obj.apiTypeStr();
             //-------------------------------
             MStatus stat;
-            MFnDagNode dagNode(DagPath);     // path to the visible mesh
-            MFnMesh meshFn(DagPath, &stat);  // this is the visible mesh
+            MFnDagNode dagNode(DagPath); // path to the visible mesh
+            MFnMesh meshFn(DagPath, &stat); // this is the visible mesh
             MObject inObj;
             MObject dataObj1;
 
@@ -171,12 +169,14 @@ MStatus CXRaySkinExport::writer(const MFileObject& file, const MString& options,
             // through its "inmesh" plug
             MPlug inMeshPlug = dagNode.findPlug("inMesh", &stat);
 
-            if (stat == MS::kSuccess && inMeshPlug.isConnected()) {
+            if (stat == MS::kSuccess && inMeshPlug.isConnected())
+            {
                 // walk the tree of stuff upstream from this plug
                 MItDependencyGraph dgIt(inMeshPlug, MFn::kInvalid, MItDependencyGraph::kUpstream,
                     MItDependencyGraph::kDepthFirst, MItDependencyGraph::kPlugLevel, &stat);
 
-                if (MS::kSuccess == stat) {
+                if (MS::kSuccess == stat)
+                {
                     dgIt.disablePruningOnFilter();
                     int count = 0;
 
@@ -187,7 +187,8 @@ MStatus CXRaySkinExport::writer(const MFileObject& file, const MString& options,
 
                         // go until we find a skinCluster
 
-                        if (thisNode.apiType() == MFn::kSkinClusterFilter) {
+                        if (thisNode.apiType() == MFn::kSkinClusterFilter)
+                        {
                             MFnSkinCluster skinCluster(thisNode);
                             const char* Name = skinCluster.name().asChar();
                             Msg("Found Selected skin - %s", Name);
@@ -208,9 +209,11 @@ MStatus CXRaySkinExport::writer(const MFileObject& file, const MString& options,
     }
     Msg("Starting skin export...");
 
-    if (m_fSkinCluster) Msg("Trying to export mesh - %s", m_strSkinCluster.asChar());
+    if (m_fSkinCluster)
+        Msg("Trying to export mesh - %s", m_strSkinCluster.asChar());
 
-    if (!status) {
+    if (!status)
+    {
         Msg("!problem setting up bone table");
         return status;
     }
@@ -218,23 +221,28 @@ MStatus CXRaySkinExport::writer(const MFileObject& file, const MString& options,
     // first look through the scene for skin cluster objects. Find any bones used in these
     // clusters and load and store their weights in table by vertex.
     status = getBones();
-    if (!status) Msg("!problem loading bone weights");
+    if (!status)
+        Msg("!problem loading bone weights");
 
     // now look through the scene for any geometry directly attached to bones
     // this is most commonly found when creating mechanical models vs. organic models
     status = parseBoneGeometry();
-    if (!status) Msg("!problem loading skin information");
+    if (!status)
+        Msg("!problem loading skin information");
 
     // now load the geometry information for any skin cluster objects detected earlier
-    if (m_skinPath.isValid()) {
+    if (m_skinPath.isValid())
+    {
         status = parseShape(m_skinPath);
-        if (!status) {
+        if (!status)
+        {
             Msg("!problem loading skin information");
             return status;
         }
     }
     MMatrix Mlocator = MMatrix::identity;
-    if (locator_name.length()) {
+    if (locator_name.length())
+    {
         MSelectionList L;
         L.add(locator_name);
 
@@ -245,7 +253,8 @@ MStatus CXRaySkinExport::writer(const MFileObject& file, const MString& options,
             MDagPath DagPath;
             li.getDagPath(DagPath, obj_locator);
 
-            if (DagPath.hasFn(MFn::kLocator)) {
+            if (DagPath.hasFn(MFn::kLocator))
+            {
                 MFnTransform fn(DagPath.transform());
                 MTransformationMatrix M = fn.transformation();
                 Mlocator = M.asMatrix();
@@ -258,7 +267,8 @@ MStatus CXRaySkinExport::writer(const MFileObject& file, const MString& options,
     if ((mode == MPxFileTranslator::kExportAccessMode) || (mode == MPxFileTranslator::kSaveAccessMode) ||
         (mode == MPxFileTranslator::kExportActiveAccessMode))
         status = (m_bReferenceFile) ? exportObject(fname, b_ogf) : exportMotion(fname, Mlocator);
-    if (MS::kSuccess == status) {
+    if (MS::kSuccess == status)
+    {
         Msg("Object succesfully exported.");
     }
     else
@@ -280,19 +290,23 @@ CSurface* CEditableObject::CreateSurface(MObject shader)
 {
     CSurface* S = 0;
     for (SurfaceIt s_it = m_Surfaces.begin(); s_it != m_Surfaces.end(); s_it++)
-        if ((*s_it)->tag == *((int*)&shader)) return *s_it;
-    if (!S) {
+        if ((*s_it)->tag == *((int*)&shader))
+            return *s_it;
+    if (!S)
+    {
         S = new CSurface();
         S->tag = *((int*)&shader);
         SXRShaderData d;
         MStatus status = parseShader(shader, d);
-        if (status == MStatus::kFailure) {
+        if (status == MStatus::kFailure)
+        {
             Msg("!Unable to retrieve filename of texture");
             xr_delete(S);
             return 0;
         }
         S->SetName(d.name.asChar());
-        if (!ParseMAMaterial(S, d)) {
+        if (!ParseMAMaterial(S, d))
+        {
             xr_delete(S);
             return 0;
         }
@@ -315,18 +329,22 @@ CSurface* CEditableObject::CreateSurface(MObject shader)
 MStatus CXRaySkinExport::gotoBindPose(void)
 {
     MStatus status;
-    if (m_bReferenceFile) {
+    if (m_bReferenceFile)
+    {
         for (SmdBoneIt itBones = m_boneList.begin(); itBones != m_boneList.end(); itBones++)
         {
-            if ((*itBones)->parentId == -1) {
+            if ((*itBones)->parentId == -1)
+            {
                 MFnTransform fnJoint = (*itBones)->path.node(&status);
-                if (!status) {
+                if (!status)
+                {
                     Msg("!Unable to cast as Transform!");
                     break;
                 }
                 MString cmd = "dagPose -r -g -bp " + fnJoint.fullPathName();
                 MGlobal::executeCommand(cmd, status);
-                if (!status) {
+                if (!status)
+                {
                     Msg("!Unable goto bind pose!");
                     break;
                 }
@@ -345,7 +363,8 @@ MStatus CXRaySkinExport::exportObject(LPCSTR fn, bool b_ogf)
 
     string_path fname;
     strcpy(fname, fn);
-    if (strext(fname)) *strext(fname) = 0;
+    if (strext(fname))
+        *strext(fname) = 0;
 
     CEditableObject* OBJECT = new CEditableObject(fname);
     OBJECT->SetVersionToCurrent(TRUE, TRUE);
@@ -428,7 +447,8 @@ MStatus CXRaySkinExport::exportObject(LPCSTR fn, bool b_ogf)
             }
             SXRShaderData D;
             surf = MESH->Parent()->CreateSurface((*it)->shader);
-            if (!surf) return MStatus::kFailure;
+            if (!surf)
+                return MStatus::kFailure;
             _surf_faces[surf].push_back(f_id);
         }
     }
@@ -436,7 +456,8 @@ MStatus CXRaySkinExport::exportObject(LPCSTR fn, bool b_ogf)
     // BONES
     OBJECT->Bones().reserve(m_boneList.size());
     status = getBoneData(MMatrix::identity);
-    if (!status) {
+    if (!status)
+    {
         Msg("!error getting bind pose.");
         MGlobal::executeCommand("doEnableNodeItems true all");
         return status;
@@ -452,7 +473,7 @@ MStatus CXRaySkinExport::exportObject(LPCSTR fn, bool b_ogf)
         BONE->SetWMap((*boneIt)->name);
         BONE->SetName((*boneIt)->name);
         BONE->SetParentName(
-            (*boneIt)->parentId > -1 ? m_boneList[(*boneIt)->parentId]->name : 0);  //. need convert space
+            (*boneIt)->parentId > -1 ? m_boneList[(*boneIt)->parentId]->name : 0); //. need convert space
         BONE->SetRestParams(length, offset, rotate);
     }
 
@@ -466,7 +487,8 @@ MStatus CXRaySkinExport::exportObject(LPCSTR fn, bool b_ogf)
 
     OBJECT->m_objectFlags.set(CEditableObject::eoDynamic, TRUE);
 
-    if ((MESH->GetVertexCount() < 4) || (MESH->GetFaceCount() < 2)) {
+    if ((MESH->GetVertexCount() < 4) || (MESH->GetFaceCount() < 2))
+    {
         Log("!Invalid mesh: '%s'. Faces<2 or Verts<4", *MESH->Name());
         MGlobal::executeCommand("doEnableNodeItems true all");
         return MStatus::kFailure;
@@ -482,7 +504,8 @@ MStatus CXRaySkinExport::exportObject(LPCSTR fn, bool b_ogf)
     Msg("Exporting to Object [%s]", object_name);
     OBJECT->Save(object_name);
     Msg("success.");
-    if (b_ogf) {
+    if (b_ogf)
+    {
         Msg("Exporting to OGF [%s]", ogf_name);
         OBJECT->ExportOGF(ogf_name, 4);
         Msg("success.");
@@ -499,7 +522,8 @@ MStatus CXRaySkinExport::exportMotion(LPCSTR fn, const MMatrix& locator)
     R_ASSERT(!m_bReferenceFile);
     string256 nm;
     strcpy(nm, fn);
-    if (strext(nm)) *strext(nm) = 0;
+    if (strext(nm))
+        *strext(nm) = 0;
 
     int frameFirst;
     int frameLast;
@@ -515,7 +539,8 @@ MStatus CXRaySkinExport::exportMotion(LPCSTR fn, const MMatrix& locator)
     frameLast = (int)endFrame.as(MTime::uiUnit());
     tmNew.setUnit(MTime::uiUnit());
 
-    if (currentFrame.unit() != MTime::kNTSCFrame) {
+    if (currentFrame.unit() != MTime::kNTSCFrame)
+    {
         Msg("!Can't export animation with FPS!=30.f");
         return MStatus::kFailure;
     }
@@ -566,7 +591,8 @@ MStatus CXRaySkinExport::exportMotion(LPCSTR fn, const MMatrix& locator)
             MGlobal::viewFrame(tmNew);
 
             status = getBoneData(locator);
-            if (!status) {
+            if (!status)
+            {
                 Msg("!error getting bone data at frame: ", i);
                 continue;
             }
@@ -636,7 +662,8 @@ int CXRaySkinExport::AppendVertex(MPoint pt, float u, float v, const WBVec& wb)
 {
     for (SmdVertIt it = m_vertList.begin(); it != m_vertList.end(); it++)
     {
-        if ((*it)->similar(pt.x, pt.y, pt.z, u, v, wb)) return it - m_vertList.begin();
+        if ((*it)->similar(pt.x, pt.y, pt.z, u, v, wb))
+            return it - m_vertList.begin();
     }
     {
         m_vertList.push_back(new SmdVertex(pt, u, v, wb));
@@ -696,7 +723,8 @@ MStatus CXRaySkinExport::parsePolySet(
         }
 
         // verify polygon zero area
-        if (meshPoly.zeroArea()) {
+        if (meshPoly.zeroArea())
+        {
             status = MS::kFailure;
             Log("!polygon have zero area:", meshPoly.index());
             return status;
@@ -710,7 +738,8 @@ MStatus CXRaySkinExport::parsePolySet(
                 }
         */
         // verify polygon has UV information
-        if (!meshPoly.hasUVs()) {
+        if (!meshPoly.hasUVs())
+        {
             status = MS::kFailure;
             Log("!polygon is missing UV information:", meshPoly.index());
             return status;
@@ -718,7 +747,8 @@ MStatus CXRaySkinExport::parsePolySet(
 
         // now iterate through each triangle on this polygon and create a triangle object in our list
         status = meshPoly.numTriangles(cTri);
-        if (!status) {
+        if (!status)
+        {
             status.perror("error getting triangle count");
             return status;
         }
@@ -736,19 +766,22 @@ MStatus CXRaySkinExport::parsePolySet(
             else
                 status = meshPoly.getTriangle(i, rgpt, rgint, MSpace::kWorld);
 
-            if (!status) {
+            if (!status)
+            {
                 status.perror("error getting triangle for mesh poly");
                 return status;
             }
 
-            if ((rgpt.length() != 3) || (rgint.length() != 3)) {
+            if ((rgpt.length() != 3) || (rgint.length() != 3))
+            {
                 Msg("!3 points not returned for triangle");
                 status = MS::kFailure;
                 return status;
             }
 
             tri = new SmdTriangle();
-            if (tri == NULL) {
+            if (tri == NULL)
+            {
                 Msg("!error creating triangle");
                 status = MS::kFailure;
                 return status;
@@ -756,7 +789,8 @@ MStatus CXRaySkinExport::parsePolySet(
 
             // set the bitmap filename for the triangle
             int iMat = texMap[meshPoly.index()];
-            if (iMat >= 0) tri->shader = rgShaders[iMat];
+            if (iMat >= 0)
+                tri->shader = rgShaders[iMat];
 
             WBVec wb;
             // VERTEX #1
@@ -764,7 +798,8 @@ MStatus CXRaySkinExport::parsePolySet(
             pt = rgpt[2];
             pt.z = -pt.z;
             CalculateTriangleVertex(rgint[2], pt, u, v, wb, meshPoly, ptMap);
-            if (presetBone > -1) weight = presetBone;
+            if (presetBone > -1)
+                weight = presetBone;
             tri->v[0] = AppendVertex(pt, u, 1.f - v, wb);
 
             // VERTEX #2
@@ -772,7 +807,8 @@ MStatus CXRaySkinExport::parsePolySet(
             pt = rgpt[1];
             pt.z = -pt.z;
             CalculateTriangleVertex(rgint[1], pt, u, v, wb, meshPoly, ptMap);
-            if (presetBone > -1) weight = presetBone;
+            if (presetBone > -1)
+                weight = presetBone;
             tri->v[1] = AppendVertex(pt, u, 1.f - v, wb);
 
             // VERTEX #3
@@ -780,7 +816,8 @@ MStatus CXRaySkinExport::parsePolySet(
             pt = rgpt[0];
             pt.z = -pt.z;
             CalculateTriangleVertex(rgint[0], pt, u, v, wb, meshPoly, ptMap);
-            if (presetBone > -1) weight = presetBone;
+            if (presetBone > -1)
+                weight = presetBone;
             tri->v[2] = AppendVertex(pt, u, 1.f - v, wb);
 
             tri->sm_group = smoothingGroup;
@@ -809,7 +846,8 @@ MStatus CXRaySkinExport::CalculateTriangleVertex(
     PtLookupMap::iterator mapIt;
 
     mapIt = ptMap.find(vt);
-    if (mapIt != ptMap.end()) {
+    if (mapIt != ptMap.end())
+    {
         vtLocal = (*mapIt).second;
     }
 
@@ -822,7 +860,8 @@ MStatus CXRaySkinExport::CalculateTriangleVertex(
     */
 
     status = meshPoly.getUVIndex(vtLocal, vtUV, u, v);
-    if (!status) {
+    if (!status)
+    {
         Msg("!error getting UV Index for local vertex '%d' and object vertex '%d'", vtLocal, vt);
         return status;
     }
@@ -872,9 +911,11 @@ MStatus CXRaySkinExport::getBones(void)
         MFnSkinCluster skinCluster(object);
 
         // did the user specify a skin cluster?
-        if (m_fSkinCluster) {
+        if (m_fSkinCluster)
+        {
             // If so, is this not it?
-            if (xr_strcmp(skinCluster.name().asChar(), m_strSkinCluster.asChar())) {
+            if (xr_strcmp(skinCluster.name().asChar(), m_strSkinCluster.asChar()))
+            {
                 continue;
             }
         }
@@ -889,12 +930,14 @@ MStatus CXRaySkinExport::getBones(void)
 
         MStatus stat;
         unsigned int nInfs = skinCluster.influenceObjects(m_rgInfs, &stat);
-        if (!stat) {
+        if (!stat)
+        {
             stat.perror("Error getting influence objects");
             continue;
         }
 
-        if (0 == nInfs) {
+        if (0 == nInfs)
+        {
             stat = MStatus::kFailure;
             stat.perror("Error: No influence objects found.");
             return stat;
@@ -905,14 +948,16 @@ MStatus CXRaySkinExport::getBones(void)
         for (size_t ii = 0; ii < nGeoms; ++ii)
         {
             unsigned int index = skinCluster.indexForOutputConnection(ii, &stat);
-            if (!stat) {
+            if (!stat)
+            {
                 Msg("!Error getting geometry index.");
                 return stat;
             }
 
             // get the dag path of the ii'th geometry
             stat = skinCluster.getPathAtIndex(index, m_skinPath);
-            if (!stat) {
+            if (!stat)
+            {
                 Msg("!Error getting geometry path.");
                 return stat;
             }
@@ -928,7 +973,8 @@ MStatus CXRaySkinExport::getBones(void)
             xr_delete(m_rgWeights);
             m_rgWeights = new VWBVec();
             m_rgWeights->resize(gIter.count(&stat));
-            if (!stat) {
+            if (!stat)
+            {
                 Msg("!Error creating array of vertices");
                 return stat;
             }
@@ -936,7 +982,8 @@ MStatus CXRaySkinExport::getBones(void)
             for (; !gIter.isDone(); gIter.next())
             {
                 MObject comp = gIter.component(&stat);
-                if (!stat) {
+                if (!stat)
+                {
                     Msg("!Error getting component.");
                     return stat;
                 }
@@ -945,12 +992,14 @@ MStatus CXRaySkinExport::getBones(void)
                 MFloatArray wts;
                 unsigned int infCount;
                 stat = skinCluster.getWeights(m_skinPath, comp, wts, infCount);
-                if (!stat) {
+                if (!stat)
+                {
                     Msg("!Error getting weights.");
                     return stat;
                 }
 
-                if (0 == infCount) {
+                if (0 == infCount)
+                {
                     Msg("!0 influence objects.");
                     return MStatus::kFailure;
                 }
@@ -959,7 +1008,8 @@ MStatus CXRaySkinExport::getBones(void)
                 st_VertexWB& wb = (*m_rgWeights)[gIter.index()];
                 for (u32 iInf = 0; iInf < infCount; ++iInf)
                 {
-                    if (!fis_zero(wts[iInf])) {
+                    if (!fis_zero(wts[iInf]))
+                    {
                         int bone_idx = -1;
                         {
                             int cnt = m_rgInfs.length();
@@ -969,7 +1019,8 @@ MStatus CXRaySkinExport::getBones(void)
                             char* name = (char*)joint.name().asChar();
                             NameIntMap::iterator mapIt2;
                             mapIt2 = m_jointMap.find(name);
-                            if (mapIt2 != m_jointMap.end()) {
+                            if (mapIt2 != m_jointMap.end())
+                            {
                                 bone_idx = (*mapIt2).second;
                             }
                             else
@@ -979,7 +1030,8 @@ MStatus CXRaySkinExport::getBones(void)
                                 return MS::kFailure;
                             }
                         }
-                        if (bone_idx != iInf) {
+                        if (bone_idx != iInf)
+                        {
                             Msg("!bone_idx!=iInf.[%d-%d]", bone_idx, iInf);
                         }
                         wb.push_back(st_WB(bone_idx, wts[iInf]));
@@ -990,7 +1042,8 @@ MStatus CXRaySkinExport::getBones(void)
         }
     }
 
-    if (0 == count) {
+    if (0 == count)
+    {
         Msg("!No skinned meshes found in this scene. Is your mesh bound to a skeleton?");
         return MStatus::kFailure;
     }
@@ -1014,7 +1067,8 @@ MStatus CXRaySkinExport::setUpBoneMap(MObject* pSkinObject)
     int lastJointID = -1;
     m_jointMap.clear();
 
-    if (!pSkinObject) {
+    if (!pSkinObject)
+    {
         // get list of all bones that are in this file
         MItDependencyNodes iter(MFn::kJoint);
         for (; !iter.isDone(); iter.next())
@@ -1028,7 +1082,8 @@ MStatus CXRaySkinExport::setUpBoneMap(MObject* pSkinObject)
             NameIntMap::iterator mapIt;
             mapIt = m_jointMap.find(name);
 
-            if (mapIt == m_jointMap.end()) {
+            if (mapIt == m_jointMap.end())
+            {
                 // this is a new bone; need to add it to the list
 
                 SmdBone* bone = new SmdBone();
@@ -1044,7 +1099,8 @@ MStatus CXRaySkinExport::setUpBoneMap(MObject* pSkinObject)
                 jointPath.pop(1);
 
                 MFnDagNode parentNode(jointPath, &status);
-                if (!status) {
+                if (!status)
+                {
                     status.perror("MFnDagNode constructor");
                     return status;
                 }
@@ -1053,7 +1109,8 @@ MStatus CXRaySkinExport::setUpBoneMap(MObject* pSkinObject)
                     char* parentName = (char*)parentNode.name().asChar();
                     mapIt = m_jointMap.find(parentName);
 
-                    if (mapIt != m_jointMap.end()) bone->parentId = (*mapIt).second;
+                    if (mapIt != m_jointMap.end())
+                        bone->parentId = (*mapIt).second;
                 }
 
                 m_boneList.push_back(bone);
@@ -1067,7 +1124,8 @@ MStatus CXRaySkinExport::setUpBoneMap(MObject* pSkinObject)
         MDagPathArray tmp_rgInfs;
         MStatus stat;
         unsigned int nInfs = skinCluster.influenceObjects(tmp_rgInfs, &stat);
-        if (!stat) {
+        if (!stat)
+        {
             stat.perror("Error getting influence objects");
             return MStatus::kFailure;
         }
@@ -1090,7 +1148,8 @@ MStatus CXRaySkinExport::setUpBoneMap(MObject* pSkinObject)
             jointPath.pop(1);
 
             MFnDagNode parentNode(jointPath, &status);
-            if (!status) {
+            if (!status)
+            {
                 status.perror("MFnDagNode constructor");
                 return status;
             }
@@ -1099,7 +1158,8 @@ MStatus CXRaySkinExport::setUpBoneMap(MObject* pSkinObject)
                 char* parentName = (char*)parentNode.name().asChar();
                 NameIntMap::iterator mapIt;
                 mapIt = m_jointMap.find(parentName);
-                if (mapIt != m_jointMap.end()) {
+                if (mapIt != m_jointMap.end())
+                {
                     bone->parentId = (*mapIt).second;
                 }
             }
@@ -1136,9 +1196,11 @@ IC MMatrix CalculateFullTransform(MFnTransform node)
     MMatrix mat = node.transformationMatrix(&status);
     int pcnt = node.parentCount();
     R_ASSERT3(pcnt <= 1, "Joint has more than 1 parent: ", node.name().asChar());
-    if (1 == pcnt) {
+    if (1 == pcnt)
+    {
         MObject obj = node.parent(0);
-        if (obj.hasFn(MFn::kTransform)) {
+        if (obj.hasFn(MFn::kTransform))
+        {
             mat *= CalculateFullTransform(obj);
         }
     }
@@ -1155,24 +1217,28 @@ MStatus CXRaySkinExport::getBoneData(const MMatrix& locator)
 
     status = gotoBindPose();
 
-    if (status == MS::kSuccess) {
+    if (status == MS::kSuccess)
+    {
         for (SmdBoneIt itBones = m_boneList.begin(); itBones != m_boneList.end(); itBones++)
         {
             MFnTransform fnJoint = (*itBones)->path.node(&status);
             LPCSTR nm = fnJoint.name().asChar();
-            if (!status) {
+            if (!status)
+            {
                 Msg("!Unable to cast as Transform!");
                 return status;
             }
 
             // get rotation/translation from the transformation matrix
             MTransformationMatrix mat = fnJoint.transformationMatrix(&status);
-            if (!status) {
+            if (!status)
+            {
                 Msg("!Unable to get transformation matrix!");
                 return status;
             }
 
-            if ((*itBones)->parentId == -1) {
+            if ((*itBones)->parentId == -1)
+            {
                 MMatrix FT = CalculateFullTransform(fnJoint);
                 MMatrix FT2;
                 FT2.setToProduct(FT, locator_i);
@@ -1200,7 +1266,8 @@ MStatus CXRaySkinExport::parseBoneGeometry()
     // goto bind pose
     status = gotoBindPose();
 
-    if (MStatus::kSuccess == status) {
+    if (MStatus::kSuccess == status)
+    {
         for (SmdBoneIt itBones = m_boneList.begin(); itBones != m_boneList.end(); itBones++)
         {
             MFnDagNode fnJoint = (*itBones)->path.node(&status);
@@ -1208,14 +1275,16 @@ MStatus CXRaySkinExport::parseBoneGeometry()
             for (unsigned int i = 0; i < fnJoint.childCount(&status); i++)
             {
                 MObject obj = fnJoint.child(i, &status);
-                if (status == MStatus::kFailure) {
+                if (status == MStatus::kFailure)
+                {
                     status.perror("Unable to load child for bone");
                     return (MStatus::kFailure);
                 }
                 MFnDagNode fnNode(obj);
                 MDagPath path;
                 status = fnNode.getPath(path);
-                if (status == MStatus::kFailure) {
+                if (status == MStatus::kFailure)
+                {
                     status.perror("unable to lookup path for child of bone");
                     return (MStatus::kFailure);
                 }
@@ -1225,7 +1294,8 @@ MStatus CXRaySkinExport::parseBoneGeometry()
                 // By default, dag paths only include transform nodes.
                 //
                 status = path.extendToShape();
-                if (status != MStatus::kSuccess) {
+                if (status != MStatus::kSuccess)
+                {
                     // no geometry under this node...
                     continue;
                 }
@@ -1234,10 +1304,12 @@ MStatus CXRaySkinExport::parseBoneGeometry()
                 // instance this path refers to.
                 //
                 int instanceNum = 0;
-                if (path.isInstanced()) instanceNum = path.instanceNumber();
+                if (path.isInstanced())
+                    instanceNum = path.instanceNumber();
 
                 MFnMesh fnMesh(path, &status);
-                if (status != MStatus::kSuccess) {
+                if (status != MStatus::kSuccess)
+                {
                     // this object is not a mesh
                     continue;
                 }
@@ -1249,7 +1321,8 @@ MStatus CXRaySkinExport::parseBoneGeometry()
                 MObjectArray rgShaders;
                 MIntArray rgFaces;
                 status = fnMesh.getConnectedShaders(instanceNum, rgShaders, rgFaces);
-                if (status == MStatus::kFailure) {
+                if (status == MStatus::kFailure)
+                {
                     Msg("!Unable to load shaders for mesh");
                     return (MStatus::kFailure);
                 }
@@ -1260,7 +1333,7 @@ MStatus CXRaySkinExport::parseBoneGeometry()
                 MItMeshPolygon piter(path, MObject::kNullObj, &status);
                 parsePolySet(piter, rgShaders, rgFaces, (*itBones)->id);
 
-                destroyEdgeTable();  // Free up the edge table
+                destroyEdgeTable(); // Free up the edge table
             }
         }
     }
@@ -1287,7 +1360,8 @@ MStatus CXRaySkinExport::parseShape(MDagPath path)
     // instance this path refers to.
     //
     int instanceNum = 0;
-    if (path.isInstanced()) instanceNum = path.instanceNumber();
+    if (path.isInstanced())
+        instanceNum = path.instanceNumber();
 
     MFnMesh fnMesh(path);
 
@@ -1296,7 +1370,8 @@ MStatus CXRaySkinExport::parseShape(MDagPath path)
     MObjectArray rgShaders;
     MIntArray rgFaces;
     status = fnMesh.getConnectedShaders(instanceNum, rgShaders, rgFaces);
-    if (status == MStatus::kFailure) {
+    if (status == MStatus::kFailure)
+    {
         status.perror("Unable to load shaders for mesh");
         return (MStatus::kFailure);
     }
@@ -1307,7 +1382,7 @@ MStatus CXRaySkinExport::parseShape(MDagPath path)
     MItMeshPolygon piter(path, MObject::kNullObj, &status);
     parsePolySet(piter, rgShaders, rgFaces);
 
-    destroyEdgeTable();  // Free up the edge table
+    destroyEdgeTable(); // Free up the edge table
 
     return MStatus::kSuccess;
 }
@@ -1345,7 +1420,7 @@ void CXRaySkinExport::CreateSMGFacegroups(MFnMesh& fnMesh)
     // Now create a polyId->smoothingGroup table
     //
     int numPolygons = fnMesh.numPolygons();
-    polySmoothingGroups = xr_alloc<int>(numPolygons);  //(int*)malloc( sizeof(int) *  numPolygons );
+    polySmoothingGroups = xr_alloc<int>(numPolygons); //(int*)malloc( sizeof(int) *  numPolygons );
     for (int i = 0; i < numPolygons; i++)
     {
         polySmoothingGroups[i] = NO_SMOOTHING_GROUP;
@@ -1362,8 +1437,10 @@ void CXRaySkinExport::CreateSMGFacegroups(MFnMesh& fnMesh)
     {
         newSmoothingGroup = true;
         // Check polygon has not already been visited
-        if (NO_SMOOTHING_GROUP == polySmoothingGroups[pid]) {
-            if (!smoothingAlgorithm(pid, fnMesh)) {
+        if (NO_SMOOTHING_GROUP == polySmoothingGroups[pid])
+        {
+            if (!smoothingAlgorithm(pid, fnMesh))
+            {
                 // No smooth edges for this polygon so we set
                 // the smoothing group to NO_SMOOTHING_GROUP (off)
                 polySmoothingGroups[pid] = NO_SMOOTHING_GROUP;
@@ -1371,9 +1448,7 @@ void CXRaySkinExport::CreateSMGFacegroups(MFnMesh& fnMesh)
         }
     }
 }
-void CXRaySkinExport::CreateSMGEdgeAttrs(MFnMesh& fnMesh)
-{
-}
+void CXRaySkinExport::CreateSMGEdgeAttrs(MFnMesh& fnMesh) {}
 void CXRaySkinExport::CreateSmoothingGroups(MFnMesh& fnMesh)
 {
     CreateSMGEdgeAttrs(fnMesh);
@@ -1413,10 +1488,12 @@ void CXRaySkinExport::buildEdgeTable(MDagPath& mesh)
             int b = pIt.vertexIndex(v == (pvc - 1) ? 0 : v + 1);
 
             SXREdgeInfoPtr elem = findEdgeInfo(a, b);
-            if (NULL != elem) {
+            if (NULL != elem)
+            {
                 int edgeId = pIt.index();
 
-                if (INVALID_ID == elem->polyIds[0]) {
+                if (INVALID_ID == elem->polyIds[0])
+                {
                     elem->polyIds[0] = edgeId;
                 }
                 else
@@ -1443,16 +1520,19 @@ bool CXRaySkinExport::smoothingAlgorithm(int polyId, MFnMesh& fnMesh)
         int b = vertexList[vid == (vcount - 1) ? 0 : vid + 1];
 
         SXREdgeInfoPtr elem = findEdgeInfo(a, b);
-        if (NULL != elem) {
+        if (NULL != elem)
+        {
             // NOTE: We assume there are at most 2 polygons per edge
             //       halfEdge polygons get a smoothing group of
             //       NO_SMOOTHING_GROUP which is equivalent to "s off"
             //
-            if (NO_SMOOTHING_GROUP != elem->polyIds[1]) {  // Edge not a border
+            if (NO_SMOOTHING_GROUP != elem->polyIds[1])
+            { // Edge not a border
 
                 // We are starting a new smoothing group
                 //
-                if (newSmoothingGroup) {
+                if (newSmoothingGroup)
+                {
                     currSmoothingGroup = nextSmoothingGroup++;
                     newSmoothingGroup = false;
 
@@ -1467,19 +1547,21 @@ bool CXRaySkinExport::smoothingAlgorithm(int polyId, MFnMesh& fnMesh)
                 // If we have a smooth edge then this poly must be a member
                 // of the current smoothing group.
                 //
-                if (elem->smooth) {
+                if (elem->smooth)
+                {
                     polySmoothingGroups[polyId] = currSmoothingGroup;
                     smoothEdgeFound = true;
                 }
                 else
-                {  // Hard edge so ignore this polygon
+                { // Hard edge so ignore this polygon
                     continue;
                 }
 
                 // Find the adjacent poly id
                 //
                 int adjPoly = elem->polyIds[0];
-                if (adjPoly == polyId) {
+                if (adjPoly == polyId)
+                {
                     adjPoly = elem->polyIds[1];
                 }
 
@@ -1489,7 +1571,8 @@ bool CXRaySkinExport::smoothingAlgorithm(int polyId, MFnMesh& fnMesh)
                 // NO_SMOOTHING_GROUP then it has already been visited
                 // so we ignore it.
                 //
-                if (NO_SMOOTHING_GROUP == polySmoothingGroups[adjPoly]) {
+                if (NO_SMOOTHING_GROUP == polySmoothingGroups[adjPoly])
+                {
                     smoothingAlgorithm(adjPoly, fnMesh);
                 }
                 else if (polySmoothingGroups[adjPoly] != currSmoothingGroup)
@@ -1511,8 +1594,9 @@ void CXRaySkinExport::addEdgeInfo(int v1, int v2, bool smooth)
 {
     SXREdgeInfoPtr element = NULL;
 
-    if (NULL == edgeTable[v1]) {
-        edgeTable[v1] = xr_alloc<SXREdgeInfo>(1);  //(EdgeInfoPtr)malloc( sizeof(struct EdgeInfo) );
+    if (NULL == edgeTable[v1])
+    {
+        edgeTable[v1] = xr_alloc<SXREdgeInfo>(1); //(EdgeInfoPtr)malloc( sizeof(struct EdgeInfo) );
         element = edgeTable[v1];
     }
     else
@@ -1522,7 +1606,7 @@ void CXRaySkinExport::addEdgeInfo(int v1, int v2, bool smooth)
         {
             element = element->next;
         }
-        element->next = xr_alloc<SXREdgeInfo>(1);  //(EdgeInfoPtr)malloc( sizeof(struct EdgeInfo) );
+        element->next = xr_alloc<SXREdgeInfo>(1); //(EdgeInfoPtr)malloc( sizeof(struct EdgeInfo) );
         element = element->next;
     }
 
@@ -1551,18 +1635,21 @@ SXREdgeInfoPtr CXRaySkinExport::findEdgeInfo(int v1, int v2)
 
     while (NULL != element)
     {
-        if (v2 == element->vertId) {
+        if (v2 == element->vertId)
+        {
             return element;
         }
         element = element->next;
     }
 
-    if (element == NULL) {
+    if (element == NULL)
+    {
         element = edgeTable[v2];
 
         while (NULL != element)
         {
-            if (v1 == element->vertId) {
+            if (v1 == element->vertId)
+            {
                 return element;
             }
             element = element->next;
@@ -1593,12 +1680,14 @@ void CXRaySkinExport::destroyEdgeTable()
         }
     }
 
-    if (NULL != edgeTable) {
+    if (NULL != edgeTable)
+    {
         xr_free(edgeTable);
         edgeTable = NULL;
     }
 
-    if (NULL != polySmoothingGroups) {
+    if (NULL != polySmoothingGroups)
+    {
         xr_free(polySmoothingGroups);
         polySmoothingGroups = NULL;
     }

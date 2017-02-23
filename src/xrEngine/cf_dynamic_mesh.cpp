@@ -15,7 +15,8 @@ BOOL CCF_DynamicMesh::_RayQuery(const collide::ray_defs& Q, collide::rq_results&
 {
     int s_count = R.r_count();
     BOOL res = inherited::_RayQuery(Q, R);
-    if (!res) return FALSE;
+    if (!res)
+        return FALSE;
 
     VERIFY(owner);
     VERIFY(owner->Visual());
@@ -28,13 +29,13 @@ BOOL CCF_DynamicMesh::_RayQuery(const collide::ray_defs& Q, collide::rq_results&
         IKinematics& K;
 
         spick(const collide::ray_defs& Q_, const IGameObject& obj_, IKinematics& K_) : Q(Q_), obj(obj_), K(K_) {}
-
         bool operator()(collide::rq_result& r)
         {
             IKinematics::pick_result br;
             VERIFY(r.O == &obj);
             bool res = K.PickBone(obj.XFORM(), br, Q.range, Q.start, Q.dir, (u16)r.element);
-            if (res) {
+            if (res)
+            {
                 r.range = br.dist;
             }
 #if 0

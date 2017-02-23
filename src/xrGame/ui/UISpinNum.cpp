@@ -8,37 +8,34 @@
 #include "UISpinNum.h"
 #include "UILines.h"
 
-CUISpinNum::CUISpinNum() : m_iVal(0), m_iMin(0), m_iMax(100), m_iStep(1)
-{
-}
-
-void CUISpinNum::SetCurrentOptValue()  // opt->current
+CUISpinNum::CUISpinNum() : m_iVal(0), m_iMin(0), m_iMax(100), m_iStep(1) {}
+void CUISpinNum::SetCurrentOptValue() // opt->current
 {
     CUIOptionsItem::SetCurrentOptValue();
     GetOptIntegerValue(m_iVal, m_iMin, m_iMax);
     SetValue(m_iVal);
 }
 
-void CUISpinNum::SaveBackUpOptValue()  // current->backup
+void CUISpinNum::SaveBackUpOptValue() // current->backup
 {
     CUIOptionsItem::SaveBackUpOptValue();
     m_opt_backup_value = m_iVal;
 }
 
-void CUISpinNum::SaveOptValue()  // current->opt
+void CUISpinNum::SaveOptValue() // current->opt
 {
     CUIOptionsItem::SaveOptValue();
     SaveOptIntegerValue(m_iVal);
 }
 
-void CUISpinNum::UndoOptValue()  // backup->current
+void CUISpinNum::UndoOptValue() // backup->current
 {
     m_iVal = m_opt_backup_value;
     SetValue(m_iVal);
     CUIOptionsItem::UndoOptValue();
 }
 
-bool CUISpinNum::IsChangedOptValue() const  // backup!=current
+bool CUISpinNum::IsChangedOptValue() const // backup!=current
 {
     return m_iVal != m_opt_backup_value;
 }
@@ -51,14 +48,16 @@ void CUISpinNum::InitSpin(Fvector2 pos, Fvector2 size)
 
 void CUISpinNum::IncVal()
 {
-    if (CanPressUp()) m_iVal += m_iStep;
+    if (CanPressUp())
+        m_iVal += m_iStep;
 
     SetValue(m_iVal);
 }
 
 void CUISpinNum::DecVal()
 {
-    if (CanPressDown()) m_iVal -= m_iStep;
+    if (CanPressDown())
+        m_iVal -= m_iStep;
 
     SetValue(m_iVal);
 }
@@ -81,20 +80,9 @@ void CUISpinNum::SetValue(int v)
     m_pLines->SetText(itoa(v, buff, 10));
 }
 
-bool CUISpinNum::CanPressUp()
-{
-    return m_iVal + m_iStep <= m_iMax;
-}
-
-bool CUISpinNum::CanPressDown()
-{
-    return m_iVal - m_iStep >= m_iMin;
-}
-
-CUISpinFlt::CUISpinFlt() : m_fVal(0), m_fMin(0), m_fMax(100), m_fStep(0.1f)
-{
-}
-
+bool CUISpinNum::CanPressUp() { return m_iVal + m_iStep <= m_iMax; }
+bool CUISpinNum::CanPressDown() { return m_iVal - m_iStep >= m_iMin; }
+CUISpinFlt::CUISpinFlt() : m_fVal(0), m_fMin(0), m_fMax(100), m_fStep(0.1f) {}
 void CUISpinFlt::SaveBackUpOptValue()
 {
     CUIOptionsItem::SaveBackUpOptValue();
@@ -121,11 +109,7 @@ void CUISpinFlt::SaveOptValue()
     SaveOptFloatValue(m_fVal);
 }
 
-bool CUISpinFlt::IsChangedOptValue() const
-{
-    return !fsimilar(m_fVal, m_opt_backup_value);
-}
-
+bool CUISpinFlt::IsChangedOptValue() const { return !fsimilar(m_fVal, m_opt_backup_value); }
 void CUISpinFlt::InitSpin(Fvector2 pos, Fvector2 size)
 {
     CUICustomSpin::InitSpin(pos, size);
@@ -167,12 +151,5 @@ void CUISpinFlt::SetValue(float v)
     m_pLines->SetText(buff);
 }
 
-bool CUISpinFlt::CanPressUp()
-{
-    return m_fVal + m_fStep <= m_fMax;
-}
-
-bool CUISpinFlt::CanPressDown()
-{
-    return (m_fVal - m_fStep > m_fMin) || fsimilar(m_fVal - m_fStep, m_fMin);
-}
+bool CUISpinFlt::CanPressUp() { return m_fVal + m_fStep <= m_fMax; }
+bool CUISpinFlt::CanPressDown() { return (m_fVal - m_fStep > m_fMin) || fsimilar(m_fVal - m_fStep, m_fMin); }

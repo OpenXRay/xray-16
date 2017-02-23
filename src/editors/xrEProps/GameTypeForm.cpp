@@ -29,9 +29,7 @@ bool gameTypeRun(const char* title, GameTypeChooser* data)
     return res;
 }
 
-__fastcall TfmGameType::TfmGameType(TComponent* Owner) : TForm(Owner)
-{
-}
+__fastcall TfmGameType::TfmGameType(TComponent* Owner) : TForm(Owner) {}
 //---------------------------------------------------------------------------
 
 void __fastcall TfmGameType::ebOkClick(TObject* Sender)

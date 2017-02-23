@@ -1,10 +1,7 @@
 #include "stdafx.h"
 #include "weaponBM16.h"
 
-CWeaponBM16::~CWeaponBM16()
-{
-}
-
+CWeaponBM16::~CWeaponBM16() {}
 void CWeaponBM16::Load(LPCSTR section)
 {
     inherited::Load(section);
@@ -93,9 +90,11 @@ void CWeaponBM16::PlayAnimIdleSprint()
 
 void CWeaponBM16::PlayAnimIdle()
 {
-    if (TryPlayAnimIdle()) return;
+    if (TryPlayAnimIdle())
+        return;
 
-    if (IsZoomed()) {
+    if (IsZoomed())
+    {
         switch (m_magazine.size())
         {
         case 0: { PlayHUDMotion("anm_idle_aim_0", TRUE, NULL, GetState());

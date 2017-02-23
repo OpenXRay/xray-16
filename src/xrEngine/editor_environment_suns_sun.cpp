@@ -29,7 +29,8 @@ sun::sun(manager const& manager, shared_str const& id)
 
 sun::~sun()
 {
-    if (!Device.editor()) return;
+    if (!Device.editor())
+        return;
 
     ::ide().destroy(m_property_holder);
 }
@@ -52,15 +53,12 @@ void sun::save(CInifile& config)
     config.w_string(m_id.c_str(), "sun_texture", m_texture.c_str());
 }
 
-LPCSTR sun::id_getter() const
-{
-    return (m_id.c_str());
-}
-
+LPCSTR sun::id_getter() const { return (m_id.c_str()); }
 void sun::id_setter(LPCSTR value_)
 {
     shared_str value = value_;
-    if (m_id._get() == value._get()) return;
+    if (m_id._get() == value._get())
+        return;
 
     m_id = m_manager.unique_id(value);
 }
@@ -94,9 +92,5 @@ void sun::fill(editor::property_holder_collection* collection)
         "Select texture...", editor::property_holder::cannot_enter_text, editor::property_holder::remove_extension);
 }
 
-property_holder* sun::object()
-{
-    return (m_property_holder);
-}
-
-#endif  // #ifdef INGAME_EDITOR
+property_holder* sun::object() { return (m_property_holder); }
+#endif // #ifdef INGAME_EDITOR

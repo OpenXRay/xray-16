@@ -1,19 +1,18 @@
 #include "pch.hpp"
 #include "xrThread.hpp"
 
-void CThread::StubLog(const char*, ...)
-{
-}
-
+void CThread::StubLog(const char*, ...) {}
 void CThread::startup(void* P)
 {
     CThread* T = (CThread*)P;
 
-    if (T->thMessages) T->log("* THREAD #%d: Started.", T->thID);
+    if (T->thMessages)
+        T->log("* THREAD #%d: Started.", T->thID);
     FPU::m64r();
     T->Execute();
     T->thCompleted = TRUE;
-    if (T->thMessages) T->log("* THREAD #%d: Task Completed.", T->thID);
+    if (T->thMessages)
+        T->log("* THREAD #%d: Task Completed.", T->thID);
 }
 
 void CThreadManager::start(CThread* T)
@@ -27,7 +26,8 @@ void CThreadManager::wait(u32 sleep_time)
 {
     // Wait for completition
     char perf[1024];
-    if (threads.empty()) return;
+    if (threads.empty())
+        return;
     for (;;)
     {
         Sleep(sleep_time);
@@ -49,23 +49,21 @@ void CThreadManager::wait(u32 sleep_time)
                 xr_sprintf(P, " %3.1f", threads[ID]->thPerformance);
             xr_strcat(perf, P);
         }
-        if (threads[0]->thMonitor) {
+        if (threads[0]->thMonitor)
+        {
             reportStatus("Performance: %3.1f :%s", sumPerformance, perf);
         }
         reportProgress(sumProgress / float(threads.size()));
-        if (sumComplete == threads.size()) break;
+        if (sumComplete == threads.size())
+            break;
     }
 
     // Delete threads
     for (u32 thID = 0; thID < threads.size(); thID++)
-        if (threads[thID]->thDestroyOnComplete) xr_delete(threads[thID]);
+        if (threads[thID]->thDestroyOnComplete)
+            xr_delete(threads[thID]);
     threads.clear();
 }
 
-void CThreadManager::StubReportStatus(const char*, ...)
-{
-}
-
-void CThreadManager::StubReportProgress(float)
-{
-}
+void CThreadManager::StubReportStatus(const char*, ...) {}
+void CThreadManager::StubReportProgress(float) {}

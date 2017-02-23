@@ -8,12 +8,12 @@
 
 #pragma once
 
-#define TEMPLATE_SPECIALIZATION                                                                                        \
-    template <typename _object_type, bool _reverse_search, typename _world_operator, typename _condition_evaluator,    \
+#define TEMPLATE_SPECIALIZATION                                                                                     \
+    template <typename _object_type, bool _reverse_search, typename _world_operator, typename _condition_evaluator, \
         typename _world_operator_ptr, typename _condition_evaluator_ptr>
 
-#define CPlanner                                                                                                       \
-    CActionPlanner<_object_type, _reverse_search, _world_operator, _condition_evaluator, _world_operator_ptr,          \
+#define CPlanner                                                                                              \
+    CActionPlanner<_object_type, _reverse_search, _world_operator, _condition_evaluator, _world_operator_ptr, \
         _condition_evaluator_ptr>
 
 TEMPLATE_SPECIALIZATION
@@ -25,11 +25,7 @@ IC CPlanner::CActionPlanner() : m_initialized(false), m_solving(false)
 }
 
 TEMPLATE_SPECIALIZATION
-IC CPlanner::~CActionPlanner()
-{
-    m_object = 0;
-}
-
+IC CPlanner::~CActionPlanner() { m_object = 0; }
 TEMPLATE_SPECIALIZATION
 void CPlanner::setup(_object_type* object)
 {
@@ -57,8 +53,10 @@ void CPlanner::update()
 
 #ifdef LOG_ACTION
     // printing solution
-    if (m_use_log) {
-        if (m_solution_changed) {
+    if (m_use_log)
+    {
+        if (m_solution_changed)
+        {
             show_current_world_state();
             show_target_world_state();
             Msg("%6d : Solution for object %s [%d vertices searched]", Device.dwTimeGlobal, object_name(),
@@ -70,7 +68,8 @@ void CPlanner::update()
 #endif
 
 #ifdef LOG_ACTION
-    if (m_failed) {
+    if (m_failed)
+    {
         // printing current world state
         show();
 
@@ -80,15 +79,18 @@ void CPlanner::update()
 
         show_current_world_state();
         show_target_world_state();
-        //		VERIFY2						(!m_failed,"Problem solver couldn't build a valid path - verify your conditions,
-        //effects and goals!");
+        //		VERIFY2						(!m_failed,"Problem solver couldn't build a valid path - verify your
+        //conditions,
+        // effects and goals!");
     }
 #endif
 
     THROW(!solution().empty());
 
-    if (initialized()) {
-        if (current_action_id() != solution().front()) {
+    if (initialized())
+    {
+        if (current_action_id() != solution().front())
+        {
             current_action().finalize();
             m_current_action_id = solution().front();
             current_action().initialize();
@@ -131,17 +133,9 @@ IC typename CPlanner::_action_id_type CPlanner::current_action_id() const
 }
 
 TEMPLATE_SPECIALIZATION
-IC typename CPlanner::COperator& CPlanner::current_action()
-{
-    return (action(current_action_id()));
-}
-
+IC typename CPlanner::COperator& CPlanner::current_action() { return (action(current_action_id())); }
 TEMPLATE_SPECIALIZATION
-IC bool CPlanner::initialized() const
-{
-    return (m_initialized);
-}
-
+IC bool CPlanner::initialized() const { return (m_initialized); }
 TEMPLATE_SPECIALIZATION
 IC void CPlanner::add_condition(_world_operator* action, _condition_type condition_id, _value_type condition_value)
 {
@@ -160,22 +154,15 @@ IC void CPlanner::add_effect(_world_operator* action, _condition_type condition_
 
 #ifdef LOG_ACTION
 TEMPLATE_SPECIALIZATION
-LPCSTR CPlanner::action2string(const _action_id_type& action_id)
-{
-    return (action(action_id).m_action_name);
-}
-
+LPCSTR CPlanner::action2string(const _action_id_type& action_id) { return (action(action_id).m_action_name); }
 TEMPLATE_SPECIALIZATION
 LPCSTR CPlanner::property2string(const _condition_type& property_id)
 {
-    return (evaluator(property_id).m_evaluator_name);  // itoa(property_id,m_temp_string,10));
+    return (evaluator(property_id).m_evaluator_name); // itoa(property_id,m_temp_string,10));
 }
 
 TEMPLATE_SPECIALIZATION
-LPCSTR CPlanner::object_name() const
-{
-    return (*m_object->cName());
-}
+LPCSTR CPlanner::object_name() const { return (*m_object->cName()); }
 #endif
 
 TEMPLATE_SPECIALIZATION
@@ -237,7 +224,8 @@ IC void CPlanner::show_current_world_state()
         xr_vector<COperatorCondition>::const_iterator J = std::lower_bound(current_state().conditions().begin(),
             current_state().conditions().end(), CWorldProperty((*I).first, false));
         char temp = '?';
-        if ((J != current_state().conditions().end()) && ((*J).condition() == (*I).first)) {
+        if ((J != current_state().conditions().end()) && ((*J).condition() == (*I).first))
+        {
             temp = (*J).value() ? '+' : '-';
             Msg("%5c : [%d][%s]", temp, (*I).first, property2string((*I).first));
         }
@@ -255,7 +243,8 @@ IC void CPlanner::show_target_world_state()
         xr_vector<COperatorCondition>::const_iterator J = std::lower_bound(
             target_state().conditions().begin(), target_state().conditions().end(), CWorldProperty((*I).first, false));
         char temp = '?';
-        if ((J != target_state().conditions().end()) && ((*J).condition() == (*I).first)) {
+        if ((J != target_state().conditions().end()) && ((*J).condition() == (*I).first))
+        {
             temp = (*J).value() ? '+' : '-';
             Msg("%5c : [%d][%s]", temp, (*I).first, property2string((*I).first));
         }

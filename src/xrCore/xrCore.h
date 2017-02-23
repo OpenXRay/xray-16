@@ -5,22 +5,19 @@
 #define _SILENCE_STDEXT_HASH_DEPRECATION_WARNINGS
 #ifndef DEBUG
 #define MASTER_GOLD
-#endif  // DEBUG
+#endif // DEBUG
 
 //#define BENCHMARK_BUILD
 
 #ifdef BENCHMARK_BUILD
 #define BENCH_SEC_CALLCONV __stdcall
-#define BENCH_SEC_SCRAMBLEVTBL1                                                                                        \
-    virtual int GetFlags() { return 1; }
-#define BENCH_SEC_SCRAMBLEVTBL2                                                                                        \
-    virtual void* GetData() { return 0; }
-#define BENCH_SEC_SCRAMBLEVTBL3                                                                                        \
-    virtual void* GetCache() { return 0; }
+#define BENCH_SEC_SCRAMBLEVTBL1 virtual int GetFlags() { return 1; }
+#define BENCH_SEC_SCRAMBLEVTBL2 virtual void* GetData() { return 0; }
+#define BENCH_SEC_SCRAMBLEVTBL3 virtual void* GetCache() { return 0; }
 #define BENCH_SEC_SIGN , void* pBenchScrampleVoid = 0
 #define BENCH_SEC_SCRAMBLEMEMBER1 float m_fSrambleMember1;
 #define BENCH_SEC_SCRAMBLEMEMBER2 float m_fSrambleMember2;
-#else  // BENCHMARK_BUILD
+#else // BENCHMARK_BUILD
 #define BENCH_SEC_CALLCONV
 #define BENCH_SEC_SCRAMBLEVTBL1
 #define BENCH_SEC_SCRAMBLEVTBL2
@@ -28,7 +25,7 @@
 #define BENCH_SEC_SIGN
 #define BENCH_SEC_SCRAMBLEMEMBER1
 #define BENCH_SEC_SCRAMBLEMEMBER2
-#endif  // BENCHMARK_BUILD
+#endif // BENCHMARK_BUILD
 
 #if !defined(_CPPUNWIND)
 #error Please enable exceptions...
@@ -70,16 +67,16 @@
 #include <time.h>
 
 // Warnings
-#pragma warning(disable : 4251)  // object needs DLL interface
-#pragma warning(disable : 4201)  // nonstandard extension used : nameless struct/union
-#pragma warning(disable : 4100)  // unreferenced formal parameter
-#pragma warning(disable : 4127)  // conditional expression is constant
+#pragma warning(disable : 4251) // object needs DLL interface
+#pragma warning(disable : 4201) // nonstandard extension used : nameless struct/union
+#pragma warning(disable : 4100) // unreferenced formal parameter
+#pragma warning(disable : 4127) // conditional expression is constant
 //#pragma warning (disable : 4530 ) // C++ exception handler used, but unwind semantics are not enabled
 #pragma warning(disable : 4345)
-#pragma warning(disable : 4714)  // __forceinline not inlined
+#pragma warning(disable : 4714) // __forceinline not inlined
 #ifndef DEBUG
-#pragma warning(disable : 4189)  // local variable is initialized but not refenced
-#endif                           // frequently in release code due to large amount of VERIFY
+#pragma warning(disable : 4189) // local variable is initialized but not refenced
+#endif // frequently in release code due to large amount of VERIFY
 
 #ifdef _M_AMD64
 #pragma warning(disable : 4512)
@@ -103,7 +100,7 @@
 
 #include <string>
 #pragma warning(pop)
-#pragma warning(disable : 4100)  // unreferenced formal parameter
+#pragma warning(disable : 4100) // unreferenced formal parameter
 
 // Our headers
 #ifdef XRCORE_EXPORTS
@@ -228,11 +225,10 @@ public:
 
 public:
     void _initialize(
-        LPCSTR ApplicationName, LogCallback cb = 0, BOOL init_fs = TRUE, LPCSTR fs_fname = 0, bool plugin = false);
+    LPCSTR ApplicationName, LogCallback cb = 0, BOOL init_fs = TRUE, LPCSTR fs_fname = 0, bool plugin = false);
     void _destroy();
     const char* GetBuildDate() const { return buildDate; }
     u32 GetBuildId() const { return buildId; }
-
 private:
     void CalculateBuildId();
 };

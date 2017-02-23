@@ -2,14 +2,8 @@
 #include "weaponsvu.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
-CWeaponSVU::CWeaponSVU(void)
-{
-}
-
-CWeaponSVU::~CWeaponSVU(void)
-{
-}
-
+CWeaponSVU::CWeaponSVU(void) {}
+CWeaponSVU::~CWeaponSVU(void) {}
 using namespace luabind;
 
 SCRIPT_EXPORT(CWeaponSVU, (CGameObject),

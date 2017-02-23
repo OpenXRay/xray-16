@@ -44,7 +44,7 @@ void dx103DFluidEmitters::DestroyShaders()
 {
     for (int i = 0; i < ET_EmittersTypeNum; ++i)
     {
-        //	Release shader's element.
+        //  Release shader's element.
         m_EmitterTechnique[i] = 0;
     }
 }
@@ -57,7 +57,8 @@ void dx103DFluidEmitters::RenderDensity(const dx103DFluidData& FluidData)
     for (u32 i = 0; i < iNumEmitters; ++i)
     {
         const CEmitter& Emitter = Emitters[i];
-        if (Emitter.m_bApplyDensity) ApplyDensity(Emitter);
+        if (Emitter.m_bApplyDensity)
+            ApplyDensity(Emitter);
     }
 }
 
@@ -69,7 +70,8 @@ void dx103DFluidEmitters::RenderVelocity(const dx103DFluidData& FluidData)
     for (u32 i = 0; i < iNumEmitters; ++i)
     {
         const CEmitter& Emitter = Emitters[i];
-        if (Emitter.m_bApplyImpulse) ApplyVelocity(Emitter);
+        if (Emitter.m_bApplyImpulse)
+            ApplyVelocity(Emitter);
     }
 }
 
@@ -97,7 +99,7 @@ void dx103DFluidEmitters::ApplyDensity(const CEmitter& Emitter)
     const float fMiddleIntencity = 1;
     const float saturation = Emitter.m_fSaturation;
     FLOAT density = 1.5f * (((_sin(t * 1.5f + 2.0f * float(PI) / 3.0f) * 0.5f + 0.5f)) * saturation +
-                               fMiddleIntencity * (1.0f - saturation));
+        fMiddleIntencity * (1.0f - saturation));
     density *= Emitter.m_fDensity;
     Fvector4 color;
     color.set(density, density, density, 1.0f);
@@ -112,12 +114,8 @@ void dx103DFluidEmitters::ApplyDensity(const CEmitter& Emitter)
     m_pGrid->DrawSlices();
 }
 
-//	TODO: DX10: Remove this hack
-static float lilrand()
-{
-    return (rand() / float(RAND_MAX) - 0.5f) * 5.0f;
-}
-
+//  TODO: DX10: Remove this hack
+static float lilrand() { return (rand() / float(RAND_MAX) - 0.5f) * 5.0f; }
 void dx103DFluidEmitters::ApplyVelocity(const CEmitter& Emitter)
 {
     // Draw gaussian ball of velocity
@@ -134,10 +132,11 @@ void dx103DFluidEmitters::ApplyVelocity(const CEmitter& Emitter)
         // fRadius += (0.1f - fRadius) * (1.0f + 0.5f * _sin( (1.0f/30.0f) * t * (2.0f * float(PI))) );
         // float fFactor = 1.0f + 0.5f * _sin(t * (2.0f * float(PI)) / 10 );
         float fPeriod = Emitter.m_DraughtParams.m_fPeriod;
-        if (fPeriod < 0.0001f) fPeriod = 0.0001f;
+        if (fPeriod < 0.0001f)
+            fPeriod = 0.0001f;
         float fFactor = 1.0f +
-                        Emitter.m_DraughtParams.m_fAmp *
-                            _sin((t + Emitter.m_DraughtParams.m_fPhase) * (2.0f * float(PI)) / fPeriod);
+            Emitter.m_DraughtParams.m_fAmp *
+            _sin((t + Emitter.m_DraughtParams.m_fPhase) * (2.0f * float(PI)) / fPeriod);
         FlowVelocity.mul(fFactor);
         break;
     }

@@ -49,7 +49,6 @@ public:
 
     bool TestLoadClient();
     IC bool GetTestClient() { return m_test_load_client; }
-
     bool InitDir();
 
 public:
@@ -58,8 +57,8 @@ public:
 
     //-	int					auto_update;
 
-};  // class BattlEyeSystem
+}; // class BattlEyeSystem
 
-#endif  // BATTLEYE
+#endif // BATTLEYE
 
-#endif  // XR_BATTLEYE_H_INCLUDED
+#endif // XR_BATTLEYE_H_INCLUDED

@@ -19,13 +19,15 @@ bool CGroupObject::GetBox(Fbox& bb) const
         case OBJCLASS_WAY:
         {
             Fbox box;
-            if (it->pObject->GetBox(box)) bb.merge(box);
+            if (it->pObject->GetBox(box))
+                bb.merge(box);
         }
         break;
         default: bb.modify(it->pObject->PPosition);
         }
     }
-    if (!bb.is_valid()) {
+    if (!bb.is_valid())
+    {
         bb.set(PPosition, PPosition);
         bb.grow(EMPTY_GROUP_SIZE);
     }
@@ -44,12 +46,15 @@ void CGroupObject::UpdatePivot(LPCSTR nm, bool center)
     // first init
     VERIFY(m_ObjectsInGroup.size());
     ObjectsInGroup::iterator it;
-    if (false == center) {
+    if (false == center)
+    {
         CCustomObject* object = 0;
-        if (nm && nm[0]) {
+        if (nm && nm[0])
+        {
             for (it = m_ObjectsInGroup.begin(); it != m_ObjectsInGroup.end(); ++it)
             {
-                if (0 == strcmp(nm, it->pObject->Name)) {
+                if (0 == strcmp(nm, it->pObject->Name))
+                {
                     object = it->pObject;
                     break;
                 }
@@ -60,15 +65,18 @@ void CGroupObject::UpdatePivot(LPCSTR nm, bool center)
             bool bValidPivot = false;
             for (it = m_ObjectsInGroup.begin(); it != m_ObjectsInGroup.end(); ++it)
             {
-                if (it->pObject->ClassID == OBJCLASS_SCENEOBJECT) {
+                if (it->pObject->ClassID == OBJCLASS_SCENEOBJECT)
+                {
                     object = it->pObject;
                     bValidPivot = true;
                     break;
                 }
             }
-            if (!bValidPivot) object = m_ObjectsInGroup.front().pObject;
+            if (!bValidPivot)
+                object = m_ObjectsInGroup.front().pObject;
         }
-        if (object) {
+        if (object)
+        {
             PPosition = object->PPosition;
             PRotation = object->PRotation;
             UpdateTransform(true);
@@ -244,7 +252,8 @@ void CGroupObject::Render(int priority, bool strictB2F)
     inherited::Render(priority, strictB2F);
     for (ObjectsInGroup::iterator it = m_ObjectsInGroup.begin(); it != m_ObjectsInGroup.end(); ++it)
     {
-        if (it->pObject->IsRender()) {
+        if (it->pObject->IsRender())
+        {
             switch (it->pObject->ClassID)
             {
             case OBJCLASS_SCENEOBJECT: it->pObject->Render(priority, strictB2F); break;
@@ -255,9 +264,11 @@ void CGroupObject::Render(int priority, bool strictB2F)
             }
         }
     }
-    if ((1 == priority) && (false == strictB2F)) {
+    if ((1 == priority) && (false == strictB2F))
+    {
         Fbox bb;
-        if (Selected() && GetBox(bb)) {
+        if (Selected() && GetBox(bb))
+        {
             EDevice.SetShader(EDevice.m_WireShader);
             RCache.set_xform_world(Fidentity);
             u32 clr = 0xFF7070FF;
@@ -268,7 +279,8 @@ void CGroupObject::Render(int priority, bool strictB2F)
 
 bool CGroupObject::FrustumPick(const CFrustum& frustum)
 {
-    if (m_ObjectsInGroup.empty()) {
+    if (m_ObjectsInGroup.empty())
+    {
         Fbox bb;
         GetBox(bb);
         u32 mask = u32(-1);
@@ -277,7 +289,8 @@ bool CGroupObject::FrustumPick(const CFrustum& frustum)
     else
     {
         for (ObjectsInGroup::iterator it = m_ObjectsInGroup.begin(); it != m_ObjectsInGroup.end(); ++it)
-            if (it->pObject->FrustumPick(frustum)) return true;
+            if (it->pObject->FrustumPick(frustum))
+                return true;
     }
     return false;
 }
@@ -287,7 +300,8 @@ bool CGroupObject::RayPick(float& distance, const Fvector& start, const Fvector&
     bool bPick = false;
 
     for (ObjectsInGroup::iterator it = m_ObjectsInGroup.begin(); it != m_ObjectsInGroup.end(); ++it)
-        if (it->pObject->RayPick(distance, start, direction, pinf)) bPick = true;
+        if (it->pObject->RayPick(distance, start, direction, pinf))
+            bPick = true;
 
     return bPick;
 }

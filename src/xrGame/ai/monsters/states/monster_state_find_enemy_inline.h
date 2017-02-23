@@ -5,7 +5,7 @@
 #include "monster_state_find_enemy_walk.h"
 #include "monster_state_find_enemy_look.h"
 
-#define TEMPLATE_SPECIALIZATION                                                                                        \
+#define TEMPLATE_SPECIALIZATION \
     template <typename _Object\
 >
 
@@ -21,14 +21,12 @@ CStateMonsterFindEnemyAbstract::CStateMonsterFindEnemy(_Object* obj) : inherited
 }
 
 TEMPLATE_SPECIALIZATION
-CStateMonsterFindEnemyAbstract::~CStateMonsterFindEnemy()
-{
-}
-
+CStateMonsterFindEnemyAbstract::~CStateMonsterFindEnemy() {}
 TEMPLATE_SPECIALIZATION
 void CStateMonsterFindEnemyAbstract::reselect_state()
 {
-    if (prev_substate == u32(-1)) {
+    if (prev_substate == u32(-1))
+    {
         select_state(eStateFindEnemy_Run);
         return;
     }

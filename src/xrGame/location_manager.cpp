@@ -13,10 +13,7 @@
 extern void setup_location_types(GameGraph::TERRAIN_VECTOR& m_vertex_types, CInifile const* ini, LPCSTR string);
 extern void setup_location_types_line(GameGraph::TERRAIN_VECTOR& m_vertex_types, LPCSTR string);
 
-CLocationManager::~CLocationManager()
-{
-}
-
+CLocationManager::~CLocationManager() {}
 void CLocationManager::Load(LPCSTR section)
 {
     if (pSettings->line_exist(section, "terrain"))
@@ -33,12 +30,5 @@ void CLocationManager::reload(LPCSTR section)
     setup_location_types(m_vertex_types, m_object->spawn_ini(), m_object->spawn_ini()->r_string("alife", "terrain"));
 }
 
-void CLocationManager::clear_location_types()
-{
-    m_vertex_types.clear();
-}
-
-void CLocationManager::add_location_type(LPCSTR mask)
-{
-    setup_location_types_line(m_vertex_types, mask);
-}
+void CLocationManager::clear_location_types() { m_vertex_types.clear(); }
+void CLocationManager::add_location_type(LPCSTR mask) { setup_location_types_line(m_vertex_types, mask); }

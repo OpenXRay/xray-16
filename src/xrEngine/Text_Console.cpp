@@ -21,11 +21,7 @@ CTextConsole::CTextConsole()
     m_last_time = Device.dwTimeGlobal;
 }
 
-CTextConsole::~CTextConsole()
-{
-    m_pMainWnd = NULL;
-}
-
+CTextConsole::~CTextConsole() { m_pMainWnd = NULL; }
 //-------------------------------------------------------------------------------------------
 LRESULT CALLBACK TextConsole_WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 void CTextConsole::CreateConsoleWnd()
@@ -47,7 +43,7 @@ void CTextConsole::CreateConsoleWnd()
     RegisterClass(&wndClass);
 
     // Set the window's initial style
-    u32 dwWindowStyle = WS_OVERLAPPED | WS_CHILD | WS_VISIBLE;  // | WS_CLIPSIBLINGS;// | WS_CLIPCHILDREN;
+    u32 dwWindowStyle = WS_OVERLAPPED | WS_CHILD | WS_VISIBLE; // | WS_CLIPSIBLINGS;// | WS_CLIPCHILDREN;
 
     // Set the window's initial width
     RECT rc;
@@ -81,7 +77,7 @@ void CTextConsole::CreateLogWnd()
     RegisterClass(&wndClass);
 
     // Set the window's initial style
-    u32 dwWindowStyle = WS_OVERLAPPED | WS_CHILD | WS_VISIBLE;  // | WS_CLIPSIBLINGS;
+    u32 dwWindowStyle = WS_OVERLAPPED | WS_CHILD | WS_VISIBLE; // | WS_CLIPSIBLINGS;
     // u32 dwWindowStyleEx = WS_EX_CLIENTEDGE;
 
     // Set the window's initial width
@@ -164,11 +160,16 @@ void CTextConsole::Destroy()
     SelectObject(m_hDC_LogWnd_BackBuffer, m_hPrevFont);
     SelectObject(m_hDC_LogWnd_BackBuffer, m_hOld_BM);
 
-    if (m_hBB_BM) DeleteObject(m_hBB_BM);
-    if (m_hOld_BM) DeleteObject(m_hOld_BM);
-    if (m_hLogWndFont) DeleteObject(m_hLogWndFont);
-    if (m_hPrevFont) DeleteObject(m_hPrevFont);
-    if (m_hBackGroundBrush) DeleteObject(m_hBackGroundBrush);
+    if (m_hBB_BM)
+        DeleteObject(m_hBB_BM);
+    if (m_hOld_BM)
+        DeleteObject(m_hOld_BM);
+    if (m_hLogWndFont)
+        DeleteObject(m_hLogWndFont);
+    if (m_hPrevFont)
+        DeleteObject(m_hPrevFont);
+    if (m_hBackGroundBrush)
+        DeleteObject(m_hBackGroundBrush);
 
     ReleaseDC(m_hLogWnd, m_hDC_LogWnd_BackBuffer);
     ReleaseDC(m_hLogWnd, m_hDC_LogWnd);
@@ -177,17 +178,15 @@ void CTextConsole::Destroy()
     DestroyWindow(m_hConsoleWnd);
 }
 
-void CTextConsole::OnRender()
-{
-}  // disable ÑConsole::OnRender()
-
+void CTextConsole::OnRender() {} // disable ÑConsole::OnRender()
 void CTextConsole::OnPaint()
 {
     RECT wRC;
     PAINTSTRUCT ps;
     BeginPaint(m_hLogWnd, &ps);
 
-    if (/*m_bNeedUpdate*/ Device.dwFrame % 2) {
+    if (/*m_bNeedUpdate*/ Device.dwFrame % 2)
+    {
         // m_dwLastUpdateTime = Device.dwTimeGlobal;
         // m_bNeedUpdate = false;
 
@@ -201,7 +200,7 @@ void CTextConsole::OnPaint()
 
     BitBlt(m_hDC_LogWnd, wRC.left, wRC.top, wRC.right - wRC.left, wRC.bottom - wRC.top, m_hDC_LogWnd_BackBuffer,
         wRC.left, wRC.top,
-        SRCCOPY);  //(FullUpdate) ? SRCCOPY : NOTSRCCOPY);
+        SRCCOPY); //(FullUpdate) ? SRCCOPY : NOTSRCCOPY);
     /*
      Msg ("URect - %d:%d - %d:%d", ps.rcPaint.left, ps.rcPaint.top, ps.rcPaint.right, ps.rcPaint.bottom);
      */
@@ -244,7 +243,7 @@ void CTextConsole::DrawLog(HDC hDC, RECT* pRect)
     TextOut(hDC, xb, Height - tm.tmHeight - 1, buf, cur0_len);
 
     SetTextColor(hDC, RGB(255, 255, 255));
-    TextOut(hDC, 0, Height - tm.tmHeight - 3, ioc_prompt, xr_strlen(ioc_prompt));  // ">>> "
+    TextOut(hDC, 0, Height - tm.tmHeight - 3, ioc_prompt, xr_strlen(ioc_prompt)); // ">>> "
 
     SetTextColor(hDC, (COLORREF)bgr2rgb(get_mark_color(mark11)));
     TextOut(hDC, xb, Height - tm.tmHeight - 3, s_edt, xr_strlen(s_edt));
@@ -264,12 +263,14 @@ void CTextConsole::DrawLog(HDC hDC, RECT* pRect)
     for (int i = LogFile->size() - 1 - scroll_delta; i >= 0; --i)
     {
         ypos -= tm.tmHeight;
-        if (ypos < y_top_max) {
+        if (ypos < y_top_max)
+        {
             break;
         }
         LPCSTR ls = ((*LogFile)[i]).c_str();
 
-        if (!ls) {
+        if (!ls)
+        {
             continue;
         }
         Console_mark cm = (Console_mark)ls[0];
@@ -279,12 +280,14 @@ void CTextConsole::DrawLog(HDC hDC, RECT* pRect)
         LPCSTR pOut = ls + b;
 
         BOOL res = TextOut(hDC, 10, ypos, pOut, xr_strlen(pOut));
-        if (!res) {
+        if (!res)
+        {
             R_ASSERT2(0, "TextOut(..) return NULL");
         }
     }
 
-    if (g_pGameLevel && (Device.dwTimeGlobal - m_last_time > 500)) {
+    if (g_pGameLevel && (Device.dwTimeGlobal - m_last_time > 500))
+    {
         m_last_time = Device.dwTimeGlobal;
 
         m_server_info.ResetData();
@@ -298,7 +301,8 @@ void CTextConsole::DrawLog(HDC hDC, RECT* pRect)
         TextOut(hDC, 10, ypos, m_server_info[i].name, xr_strlen(m_server_info[i].name));
 
         ypos += tm.tmHeight;
-        if (ypos > y_top_max) {
+        if (ypos > y_top_max)
+        {
             break;
         }
     }

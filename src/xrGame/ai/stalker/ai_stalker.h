@@ -159,7 +159,6 @@ public:
     virtual CAI_Stalker* cast_stalker() { return this; }
     virtual CCustomMonster* cast_custom_monster() { return this; }
     virtual CScriptEntity* cast_script_entity() { return this; }
-
 public:
     void init();
     virtual void Load(LPCSTR section);
@@ -213,14 +212,14 @@ public:
 
     // PDA && Dialogs
     //	virtual void						ReceivePdaMessage					(u16 who, EPdaMsg msg, shared_str
-    //info_id);
+    // info_id);
     virtual void UpdateAvailableDialogs(CPhraseDialogManager* partner);
 
     // scripts
     virtual CWeapon* GetCurrentWeapon() const;
     virtual u32 GetWeaponAmmo() const;
     //	virtual CInventoryItem				*GetCurrentEquipment	() const; <- moved to
-    //InventoryOwner::GetCurrentOutfit
+    // InventoryOwner::GetCurrentOutfit
     virtual CInventoryItem* GetMedikit() const;
     virtual CInventoryItem* GetFood() const;
     virtual bool bfAssignMovement(CScriptEntityAction* tpEntityAction);
@@ -234,7 +233,6 @@ public:
     virtual CPHSynchronize* PHGetSyncItem(u16 item) { return inherited::PHGetSyncItem(item); }
     virtual void PHUnFreeze() { return inherited::PHUnFreeze(); }
     virtual void PHFreeze() { return inherited::PHFreeze(); }
-
     // miscellanious functions
     void DropItemSendMessage(IGameObject* O);
     bool bfCheckForNodeVisibility(u32 dwNodeID, bool bIfRyPick = false);
@@ -244,7 +242,6 @@ public:
 
     // InventoryOwner stuff
     virtual bool CanPutInSlot(PIItem item, u32 slot) { return (slot != OUTFIT_SLOT) && (slot != PDA_SLOT); };
-
     //////////////////////////////////////////////////////////////////////////
     // action/evaluators support functions
     //////////////////////////////////////////////////////////////////////////
@@ -265,7 +262,6 @@ public:
     IC CAgentManager& agent_manager() const;
 
     virtual bool human_being() const { return (true); }
-
     bool undetected_anomaly();
     bool inside_anomaly();
 
@@ -406,7 +402,7 @@ public:
     virtual void UpdateCamera();
     virtual bool can_attach(const CInventoryItem* inventory_item) const;
     // because we don't want to use this feature for stalkers
-    virtual bool use_simplified_visual() const { return false; }  //(already_dead());};
+    virtual bool use_simplified_visual() const { return false; } //(already_dead());};
 #ifdef DEBUG
     void debug_planner(const script_planner* planner);
 #endif
@@ -671,7 +667,7 @@ private:
 #ifdef DEBUG
     xr_vector<trajectory_pick> m_throw_picks;
     xr_vector<Fvector> m_throw_collide_tris;
-#endif  // DEBUG
+#endif // DEBUG
 
 public:
     IC const bool& throw_enabled();

@@ -26,7 +26,8 @@ void CControlledActor::release()
 
 void CControlledActor::frame_update()
 {
-    if (is_controlling() && m_need_turn) {
+    if (is_controlling() && m_need_turn)
+    {
         update_turn();
     }
 }
@@ -43,11 +44,7 @@ void CControlledActor::install()
     m_need_turn = true;
 }
 
-void CControlledActor::look_point(const Fvector& point)
-{
-    m_target_point = point;
-}
-
+void CControlledActor::look_point(const Fvector& point) { m_target_point = point; }
 void CControlledActor::update_turn()
 {
     // get yaw and pitch to target
@@ -64,10 +61,12 @@ void CControlledActor::update_turn()
     // YAW
     float speed_factor = angle_difference(cam_current_yaw, cam_target_yaw) / MAX_DIST;
     clamp(speed_factor, 0.f, 1.f);
-    if (speed_factor > 0.5f) speed_factor = 1.f - speed_factor;
+    if (speed_factor > 0.5f)
+        speed_factor = 1.f - speed_factor;
 
     float speed;
-    if (fsimilar(cam_current_yaw, cam_target_yaw, EPS_ANGLE)) {
+    if (fsimilar(cam_current_yaw, cam_target_yaw, EPS_ANGLE))
+    {
         m_turned_yaw = true;
     }
     else
@@ -83,9 +82,11 @@ void CControlledActor::update_turn()
     // PITCH
     speed_factor = angle_difference(cam_current_pitch, cam_target_pitch) / MAX_DIST;
     clamp(speed_factor, 0.f, 1.f);
-    if (speed_factor > 0.5f) speed_factor = 1.f - speed_factor;
+    if (speed_factor > 0.5f)
+        speed_factor = 1.f - speed_factor;
 
-    if (fsimilar(cam_current_pitch, cam_target_pitch, EPS_ANGLE)) {
+    if (fsimilar(cam_current_pitch, cam_target_pitch, EPS_ANGLE))
+    {
         m_turned_pitch = true;
     }
     else
@@ -105,21 +106,16 @@ void CControlledActor::reset()
     m_turned_pitch = false;
 }
 
-bool CControlledActor::is_turning()
-{
-    return (!m_turned_yaw || !m_turned_pitch);
-}
-
-bool CControlledActor::is_installed()
-{
-    return !!m_actor;
-}
-
+bool CControlledActor::is_turning() { return (!m_turned_yaw || !m_turned_pitch); }
+bool CControlledActor::is_installed() { return !!m_actor; }
 bool CControlledActor::authorized(int cmd)
 {
-    if (cmd == kWPN_1) return true;
-    if (cmd == kWPN_FIRE) {
-        if (m_actor->inventory().GetActiveSlot() == 0) return true;
+    if (cmd == kWPN_1)
+        return true;
+    if (cmd == kWPN_FIRE)
+    {
+        if (m_actor->inventory().GetActiveSlot() == 0)
+            return true;
     }
 
     return false;

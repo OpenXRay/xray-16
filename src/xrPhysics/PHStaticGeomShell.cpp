@@ -39,15 +39,8 @@ void CPHStaticGeomShell::Deactivate()
     destroy();
 }
 
-CPHStaticGeomShell::CPHStaticGeomShell()
-{
-    spatial.type |= STYPE_PHYSIC;
-}
-
-void cb(CBoneInstance* B)
-{
-}
-
+CPHStaticGeomShell::CPHStaticGeomShell() { spatial.type |= STYPE_PHYSIC; }
+void cb(CBoneInstance* B) {}
 void P_BuildStaticGeomShell(CPHStaticGeomShell* pUnbrokenObject, IPhysicsShellHolder* obj,
     ObjectContactCallbackFun* object_contact_callback, const Fobb& b)
 {
@@ -74,7 +67,7 @@ IPHStaticGeomShell* P_BuildStaticGeomShell(IPhysicsShellHolder* obj, ObjectConta
     // R_ASSERT2(V,"need visual to build");
     IKinematics* K = obj->ObjectKinematics();
     R_ASSERT2(K, "need visual to build");
-    K->CalculateBones(TRUE);  //. bForce - was TRUE
+    K->CalculateBones(TRUE); //. bForce - was TRUE
 
     // V->getVisData().box.getradius	(b.m_halfsize);
     K->GetBox().getradius(b.m_halfsize);
@@ -95,7 +88,8 @@ IPHStaticGeomShell* P_BuildStaticGeomShell(IPhysicsShellHolder* obj, ObjectConta
 
 void DestroyStaticGeomShell(IPHStaticGeomShell*& UnbrokenObject)
 {
-    if (!UnbrokenObject) return;
+    if (!UnbrokenObject)
+        return;
     CPHStaticGeomShell* gs = static_cast<CPHStaticGeomShell*>(UnbrokenObject);
     gs->Deactivate();
     xr_delete(gs);
@@ -121,13 +115,11 @@ IPHStaticGeomShell* P_BuildLeaderGeomShell(IClimableObject* obj, ObjectContactCa
     return pStaticShell;
 }
 
-CPHLeaderGeomShell::CPHLeaderGeomShell(IClimableObject* climable)
-{
-    m_pClimable = climable;
-}
+CPHLeaderGeomShell::CPHLeaderGeomShell(IClimableObject* climable) { m_pClimable = climable; }
 void CPHLeaderGeomShell::near_callback(CPHObject* obj)
 {
-    if (obj && obj->CastType() == CPHObject::tpCharacter) {
+    if (obj && obj->CastType() == CPHObject::tpCharacter)
+    {
         CPHCharacter* ch = static_cast<CPHCharacter*>(obj);
         ch->SetElevator(m_pClimable);
     }

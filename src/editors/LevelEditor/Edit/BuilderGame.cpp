@@ -13,11 +13,7 @@
 #include "ESceneFogVolumeTools.h"
 #include "SpawnPoint.h"
 
-bool sort_fog_vol(EFogVolume* fv1, EFogVolume* fv2)
-{
-    return (fv1->m_volumeType < fv2->m_volumeType);
-}
-
+bool sort_fog_vol(EFogVolume* fv1, EFogVolume* fv2) { return (fv1->m_volumeType < fv2->m_volumeType); }
 BOOL SceneBuilder::BuildGame()
 {
     SExportStreams F;
@@ -25,7 +21,8 @@ BOOL SceneBuilder::BuildGame()
     F.envmodif.stream.w_u32(u32(SPAWNPOINT_VERSION));
     F.envmodif.stream.close_chunk();
 
-    if (!Scene->ExportGame(&F)) return FALSE;
+    if (!Scene->ExportGame(&F))
+        return FALSE;
 
     BOOL bRes = TRUE;
     // save spawn
@@ -33,12 +30,14 @@ BOOL SceneBuilder::BuildGame()
         xr_string lev_spawn = MakeLevelPath("level.spawn");
         EFS.MarkFile(lev_spawn.c_str(), true);
         if (F.spawn.chunk)
-            if (!F.spawn.stream.save_to(lev_spawn.c_str())) bRes = FALSE;
+            if (!F.spawn.stream.save_to(lev_spawn.c_str()))
+                bRes = FALSE;
 
         lev_spawn = MakeLevelPath("level_rs.spawn");
         EFS.MarkFile(lev_spawn.c_str(), true);
         if (F.spawn_rs.chunk)
-            if (!F.spawn_rs.stream.save_to(lev_spawn.c_str())) bRes = FALSE;
+            if (!F.spawn_rs.stream.save_to(lev_spawn.c_str()))
+                bRes = FALSE;
     }
 
     // save game
@@ -49,7 +48,8 @@ BOOL SceneBuilder::BuildGame()
         xr_string lev_game = MakeLevelPath("level.game");
         EFS.MarkFile(lev_game.c_str(), true);
         if (GAME.size())
-            if (!GAME.save_to(lev_game.c_str())) bRes = FALSE;
+            if (!GAME.save_to(lev_game.c_str()))
+                bRes = FALSE;
     }
 
     // save weather env modificator
@@ -57,7 +57,8 @@ BOOL SceneBuilder::BuildGame()
         xr_string lev_env_mod = MakeLevelPath("level.env_mod");
         EFS.MarkFile(lev_env_mod.c_str(), true);
         if (F.envmodif.chunk)
-            if (!F.envmodif.stream.save_to(lev_env_mod.c_str())) bRes = FALSE;
+            if (!F.envmodif.stream.save_to(lev_env_mod.c_str()))
+                bRes = FALSE;
     }
 
     // save static sounds
@@ -65,7 +66,8 @@ BOOL SceneBuilder::BuildGame()
         xr_string lev_sound_static = MakeLevelPath("level.snd_static");
         EFS.MarkFile(lev_sound_static.c_str(), true);
         if (F.sound_static.chunk)
-            if (!F.sound_static.stream.save_to(lev_sound_static.c_str())) bRes = FALSE;
+            if (!F.sound_static.stream.save_to(lev_sound_static.c_str()))
+                bRes = FALSE;
     }
     /*
         // save sound envs
@@ -81,15 +83,17 @@ BOOL SceneBuilder::BuildGame()
         xr_string lev_pe_static = MakeLevelPath("level.ps_static");
         EFS.MarkFile(lev_pe_static.c_str(), true);
         if (F.pe_static.chunk)
-            if (!F.pe_static.stream.save_to(lev_pe_static.c_str())) bRes = FALSE;
+            if (!F.pe_static.stream.save_to(lev_pe_static.c_str()))
+                bRes = FALSE;
     }
 
     // save fog volumes
-    if (1) {
+    if (1)
+    {
         xr_string lev_fog_vol = MakeLevelPath("level.fog_vol");
         EFS.MarkFile(lev_fog_vol.c_str(), true);
 
-        F.fog_vol.stream.w_u16(3);  // version
+        F.fog_vol.stream.w_u16(3); // version
 
         ObjectList& fogs = Scene->ListObj(OBJCLASS_FOG_VOL);
 
@@ -121,8 +125,10 @@ BOOL SceneBuilder::BuildGame()
             for (; fgit != fgit_e; ++fgit)
             {
                 EFogVolume* E = *fgit;
-                if (fgit == one_group.begin()) {
-                    if (E->m_volumeType != fvEmitter) {
+                if (fgit == one_group.begin())
+                {
+                    if (E->m_volumeType != fvEmitter)
+                    {
                         bRes = FALSE;
                         Msg("! incorrect fog volumes grouping");
                         break;
@@ -133,8 +139,10 @@ BOOL SceneBuilder::BuildGame()
                 Fmatrix M = E->_Transform();
                 F.fog_vol.stream.w(&M, sizeof(M));
 
-                if (fgit == one_group.begin()) {
-                    if (E->m_volumeType != fvEmitter) {
+                if (fgit == one_group.begin())
+                {
+                    if (E->m_volumeType != fvEmitter)
+                    {
                         bRes = FALSE;
                         Msg("! incorrect fog volumes grouping");
                         break;
@@ -144,18 +152,22 @@ BOOL SceneBuilder::BuildGame()
                 }
                 else
                 {
-                    if (E->m_volumeType != fvOcclusion) {
+                    if (E->m_volumeType != fvOcclusion)
+                    {
                         bRes = FALSE;
                         Msg("! incorrect fog volumes grouping");
                         break;
                     }
                 }
-                if (!bRes) break;
+                if (!bRes)
+                    break;
             }
-            if (!bRes) break;
+            if (!bRes)
+                break;
         }
 
-        if (!F.fog_vol.stream.save_to(lev_fog_vol.c_str())) bRes = FALSE;
+        if (!F.fog_vol.stream.save_to(lev_fog_vol.c_str()))
+            bRes = FALSE;
     }
 
     return bRes;

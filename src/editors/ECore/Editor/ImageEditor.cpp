@@ -58,14 +58,16 @@ void __fastcall TfrmImageLib::FormDestroy(TObject*)
 
 void __fastcall TfrmImageLib::EditLib(AnsiString& title, bool bImport)
 {
-    if (!form) {
+    if (!form)
+    {
         form = new TfrmImageLib((TComponent*)0);
         form->Caption = title;
         form->bImportMode = bImport;
         form->ebRemoveTexture->Enabled = !bImport;
         //.        form->ebRebuildAssociation->Enabled = !bImport;
         form->bReadonlyMode = !FS.can_write_to_alias(_textures_);
-        if (form->bReadonlyMode) {
+        if (form->bReadonlyMode)
+        {
             Log("#!You don't have permisions to modify textures.");
             form->ebOk->Enabled = false;
             form->ebRemoveTexture->Enabled = false;
@@ -86,16 +88,19 @@ void __fastcall TfrmImageLib::EditLib(AnsiString& title, bool bImport)
 ETextureThumbnail* TfrmImageLib::FindUsedTHM(const shared_str& name)
 {
     THMMapIt it = m_THM_Used.find(name);
-    if (it != m_THM_Used.end()) return it->second;
+    if (it != m_THM_Used.end())
+        return it->second;
 
     ETextureThumbnail* thm = new ETextureThumbnail(name.c_str(), false);
     m_THM_Used[name] = thm;
 
-    if (bImportMode) {
+    if (bImportMode)
+    {
         xr_string fn = name.c_str();
         ImageLib.UpdateFileName(fn);
 
-        if (!thm->Load(name.c_str(), _import_)) {
+        if (!thm->Load(name.c_str(), _import_))
+        {
             bool bLoad = thm->Load(fn.c_str(), _game_textures_);
             ImageLib.CreateTextureThumbnail(thm, name.c_str(), _import_, !bLoad);
         }
@@ -113,7 +118,8 @@ void TfrmImageLib::SaveUsedTHM()
 {
     for (THMMapIt t_it = m_THM_Used.begin(); t_it != m_THM_Used.end(); ++t_it)
     {
-        if (modif_map.find(FS_File(t_it->second->SrcName())) != modif_map.end()) t_it->second->Save();
+        if (modif_map.find(FS_File(t_it->second->SrcName())) != modif_map.end())
+            t_it->second->Save();
     }
 }
 
@@ -123,8 +129,10 @@ void __fastcall TfrmImageLib::ImportTextures()
 {
     texture_map.clear();
     int new_cnt = ImageLib.GetLocalNewTextures(texture_map);
-    if (new_cnt) {
-        if (ELog.DlgMsg(mtInformation, "Found %d new texture(s)", new_cnt)) EditLib(AnsiString("Update images"), true);
+    if (new_cnt)
+    {
+        if (ELog.DlgMsg(mtInformation, "Found %d new texture(s)", new_cnt))
+            EditLib(AnsiString("Update images"), true);
     }
     else
     {
@@ -137,7 +145,8 @@ void __fastcall TfrmImageLib::UpdateLib()
     VERIFY(!bReadonlyMode);
     RegisterModifiedTHM();
     SaveUsedTHM();
-    if (bImportMode && !texture_map.empty()) {
+    if (bImportMode && !texture_map.empty())
+    {
         AStringVec modif;
         LockForm();
         ImageLib.SafeCopyLocalToServer(texture_map);
@@ -164,7 +173,8 @@ void __fastcall TfrmImageLib::UpdateLib()
     else
     {
         // save game textures
-        if (modif_map.size()) {
+        if (modif_map.size())
+        {
             AStringVec modif;
             LockForm();
             ImageLib.SynchronizeTextures(true, true, true, &modif_map, &modif);
@@ -176,7 +186,8 @@ void __fastcall TfrmImageLib::UpdateLib()
 
 bool __fastcall TfrmImageLib::HideLib()
 {
-    if (form) {
+    if (form)
+    {
         form->Close();
         texture_map.clear();
         modif_map.clear();
@@ -195,7 +206,8 @@ void __fastcall TfrmImageLib::FormShow(TObject*)
 //---------------------------------------------------------------------------
 void __fastcall TfrmImageLib::FormClose(TObject*, TCloseAction& Action)
 {
-    if (!form) return;
+    if (!form)
+        return;
     form->Enabled = false;
     DestroyUsedTHM();
     form = 0;
@@ -209,7 +221,8 @@ void fix_texture_thm_name(LPSTR fn);
 void TfrmImageLib::InitItemsList()
 {
     R_ASSERT(m_THM_Used.empty());
-    if (!form->bImportMode) ImageLib.GetTexturesRaw(texture_map);
+    if (!form->bImportMode)
+        ImageLib.GetTexturesRaw(texture_map);
     /*
         FS_FileSet				flist;
         FS.file_list			(flist,"$game_textures$",FS_ListFiles|FS_ClampExt,"*.thm");
@@ -243,14 +256,18 @@ void TfrmImageLib::InitItemsList()
 //---------------------------------------------------------------------------
 void __fastcall TfrmImageLib::FormKeyDown(TObject*, WORD& Key, TShiftState Shift)
 {
-    if (Shift.Contains(ssCtrl)) {
-        if (Key == VK_CANCEL) ExecCommand(COMMAND_BREAK_LAST_OPERATION);
+    if (Shift.Contains(ssCtrl))
+    {
+        if (Key == VK_CANCEL)
+            ExecCommand(COMMAND_BREAK_LAST_OPERATION);
     }
     else
     {
-        if (Key == VK_ESCAPE) {
-            if (bFormLocked) ExecCommand(COMMAND_BREAK_LAST_OPERATION);
-            Key = 0;  // :-) нужно для того чтобы AccessVoilation не вылазил по ESCAPE
+        if (Key == VK_ESCAPE)
+        {
+            if (bFormLocked)
+                ExecCommand(COMMAND_BREAK_LAST_OPERATION);
+            Key = 0; // :-) нужно для того чтобы AccessVoilation не вылазил по ESCAPE
         }
     }
 }
@@ -259,7 +276,8 @@ void __fastcall TfrmImageLib::FormKeyDown(TObject*, WORD& Key, TShiftState Shift
 
 void __fastcall TfrmImageLib::ebOkClick(TObject*)
 {
-    if (bFormLocked) return;
+    if (bFormLocked)
+        return;
 
     UpdateLib();
     HideLib();
@@ -269,7 +287,8 @@ void __fastcall TfrmImageLib::ebOkClick(TObject*)
 
 void __fastcall TfrmImageLib::ebCancelClick(TObject*)
 {
-    if (bFormLocked) {
+    if (bFormLocked)
+    {
         ExecCommand(COMMAND_BREAK_LAST_OPERATION);
         return;
     }
@@ -281,7 +300,8 @@ void __fastcall TfrmImageLib::ebCancelClick(TObject*)
 
 void __fastcall TfrmImageLib::RegisterModifiedTHM()
 {
-    if (m_ItemProps->IsModified() || bImportMode) {
+    if (m_ItemProps->IsModified() || bImportMode)
+    {
         for (THMIt t_it = m_THM_Current.begin(); t_it != m_THM_Current.end(); ++t_it)
         {
             FS_FileSetIt it = texture_map.find(FS_File((*t_it)->SrcName()));
@@ -307,11 +327,7 @@ void __fastcall TfrmImageLib::fsStorageSavePlacement(TObject*)
 
 //---------------------------------------------------------------------------
 
-void __fastcall TfrmImageLib::ebRemoveTextureClick(TObject*)
-{
-    m_ItemList->RemoveSelItems(0);
-}
-
+void __fastcall TfrmImageLib::ebRemoveTextureClick(TObject*) { m_ItemList->RemoveSelItems(0); }
 //---------------------------------------------------------------------------
 
 void TfrmImageLib::DestroyUsedTHM()
@@ -321,11 +337,7 @@ void TfrmImageLib::DestroyUsedTHM()
     m_THM_Used.clear();
 }
 
-void TfrmImageLib::OnTypeChange(PropValue*)
-{
-    UpdateProperties();
-}
-
+void TfrmImageLib::OnTypeChange(PropValue*) { UpdateProperties(); }
 void TfrmImageLib::OnCubeMapBtnClick(ButtonValue* value, bool& bModif, bool&)
 {
     ButtonValue* B = dynamic_cast<ButtonValue*>(value);
@@ -336,7 +348,8 @@ void TfrmImageLib::OnCubeMapBtnClick(ButtonValue* value, bool& bModif, bool&)
     case 0:
     {
         RStringVec items;
-        if (0 != m_ItemList->GetSelected(items)) {
+        if (0 != m_ItemList->GetSelected(items))
+        {
             for (RStringVecIt it = items.begin(); it != items.end(); it++)
             {
                 AnsiString new_name = AnsiString(it->c_str()) + "#small";
@@ -355,11 +368,13 @@ void TfrmImageLib::OnItemsFocused(ListItemsVec& items)
     RegisterModifiedTHM();
     m_THM_Current.clear();
 
-    if (!items.empty()) {
+    if (!items.empty())
+    {
         for (ListItemsIt it = items.begin(); it != items.end(); it++)
         {
             ListItem* prop = *it;
-            if (prop) {
+            if (prop)
+            {
                 ETextureThumbnail* thm = 0;
 
                 thm = FindUsedTHM(prop->Key());
@@ -392,7 +407,8 @@ void TfrmImageLib::OnItemsFocused(ListItemsVec& items)
                 // fill prop
                 thm->FillProp(props, PropValue::TOnChange(this, &TfrmImageLib::OnTypeChange));
 
-                if (thm->_Format().type == STextureParams::ttCubeMap) {
+                if (thm->_Format().type == STextureParams::ttCubeMap)
+                {
                     ButtonValue* B = PHelper().CreateButton(props, "CubeMap\\Edit", "Make Small", 0);
                     B->OnBtnClickEvent.bind(this, &TfrmImageLib::OnCubeMapBtnClick);
                 }
@@ -406,16 +422,19 @@ void TfrmImageLib::OnItemsFocused(ListItemsVec& items)
 
 void __fastcall TfrmImageLib::btFilterClick(TObject* Sender)
 {
-    if (m_THM_Current.size() != 1) return;
+    if (m_THM_Current.size() != 1)
+        return;
 
     ETextureThumbnail* thm = m_THM_Current.back();
     xr_vector<AnsiString> sel_str_vec;
 
     for (TElTreeItem* node = m_ItemProps->tvProperties->Items->GetFirstNode(); node; node = node->GetNext())
     {
-        if (node && node->Selected && node->ChildrenCount == 0) {
+        if (node && node->Selected && node->ChildrenCount == 0)
+        {
             AnsiString str = node->Text;
-            if (node->Parent) str = node->Parent->Text + "\\" + str;
+            if (node->Parent)
+                str = node->Parent->Text + "\\" + str;
 
             sel_str_vec.push_back(str);
         }
@@ -427,15 +446,18 @@ void __fastcall TfrmImageLib::btFilterClick(TObject* Sender)
 
 void __fastcall TfrmImageLib::paImagePaint(TObject*)
 {
-    if (m_THM_Current.size() == 1) m_THM_Current.back()->Draw(paImage);
+    if (m_THM_Current.size() == 1)
+        m_THM_Current.back()->Draw(paImage);
 }
 
 //---------------------------------------------------------------------------
 
 void TfrmImageLib::OnFrame()
 {
-    if (form) {
-        if (m_Flags.is(flUpdateProperties)) {
+    if (form)
+    {
+        if (m_Flags.is(flUpdateProperties))
+        {
             form->m_ItemList->FireOnItemFocused();
             m_Flags.set(flUpdateProperties, FALSE);
         }
@@ -481,7 +503,8 @@ void TfrmImageLib::SortList(ETextureThumbnail* thm0, xr_vector<AnsiString>& sel_
     for (u32 k = 0; k < cnt; ++k)
     {
         ListItem* I = items[k];
-        if (!I->Visible()) continue;
+        if (!I->Visible())
+            continue;
         ETextureThumbnail* thm1 = (ETextureThumbnail*)I->m_Object;
 
         BOOL bVis = thm0->similar(thm1, sel_params);

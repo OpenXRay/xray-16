@@ -27,7 +27,8 @@
 
 BOOL GodMode()
 {
-    if (GameID() == eGameIDSingle) return psActorFlags.test(AF_GODMODE | AF_GODMODE_RT);
+    if (GameID() == eGameIDSingle)
+        return psActorFlags.test(AF_GODMODE | AF_GODMODE_RT);
     return FALSE;
 }
 
@@ -70,11 +71,7 @@ CActorCondition::CActorCondition(CActor* object) : inherited(object)
     m_max_fire_wound_protection = 0.0f;
 }
 
-CActorCondition::~CActorCondition()
-{
-    xr_delete(m_death_effector);
-}
-
+CActorCondition::~CActorCondition() { xr_delete(m_death_effector); }
 void CActorCondition::LoadCondition(LPCSTR entity_section)
 {
     inherited::LoadCondition(entity_section);
@@ -140,7 +137,8 @@ void CActorCondition::LoadCondition(LPCSTR entity_section)
 
 float CActorCondition::GetZoneMaxPower(ALife::EInfluenceType type) const
 {
-    if (type < ALife::infl_rad || ALife::infl_electra < type) {
+    if (type < ALife::infl_rad || ALife::infl_electra < type)
+    {
         return 1.0f;
     }
     return m_zone_max_power[type];
@@ -173,26 +171,33 @@ float CActorCondition::GetZoneMaxPower(ALife::EHitType hit_type) const
 
 void CActorCondition::UpdateCondition()
 {
-    if (psActorFlags.test(AF_GODMODE_RT)) {
+    if (psActorFlags.test(AF_GODMODE_RT))
+    {
         UpdateSatiety();
         UpdateBoosters();
 
         m_fAlcohol += m_fV_Alcohol * m_fDeltaTime;
         clamp(m_fAlcohol, 0.0f, 1.0f);
-        if (IsGameTypeSingle()) {
+        if (IsGameTypeSingle())
+        {
             CEffectorCam* ce = Actor()->Cameras().GetCamEffector((ECamEffectorType)effAlcohol);
-            if (ce) RemoveEffector(m_object, effAlcohol);
+            if (ce)
+                RemoveEffector(m_object, effAlcohol);
         }
     }
 
-    if (GodMode()) return;
-    if (!object().g_Alive()) return;
-    if (!object().Local() && m_object != Level().CurrentViewEntity()) return;
+    if (GodMode())
+        return;
+    if (!object().g_Alive())
+        return;
+    if (!object().Local() && m_object != Level().CurrentViewEntity())
+        return;
 
     float base_weight = object().MaxCarryWeight();
     float cur_weight = object().inventory().TotalWeight();
 
-    if ((object().mstate_real & mcAnyMove)) {
+    if ((object().mstate_real & mcAnyMove))
+    {
         ConditionWalk(cur_weight / base_weight, isActorAccelerated(object().mstate_real, object().IsZoomAimingMode()),
             (object().mstate_real & mcSprint) != 0);
     }
@@ -201,9 +206,11 @@ void CActorCondition::UpdateCondition()
         ConditionStand(cur_weight / base_weight);
     }
 
-    if (IsGameTypeSingle()) {
+    if (IsGameTypeSingle())
+    {
         float k_max_power = 1.0f;
-        if (true) {
+        if (true)
+        {
             k_max_power =
                 1.0f + _min(cur_weight, base_weight) / base_weight + _max(0.0f, (cur_weight - base_weight) / 10.0f);
         }
@@ -217,35 +224,44 @@ void CActorCondition::UpdateCondition()
     m_fAlcohol += m_fV_Alcohol * m_fDeltaTime;
     clamp(m_fAlcohol, 0.0f, 1.0f);
 
-    if (IsGameTypeSingle()) {
+    if (IsGameTypeSingle())
+    {
         CEffectorCam* ce = Actor()->Cameras().GetCamEffector((ECamEffectorType)effAlcohol);
-        if ((m_fAlcohol > 0.0001f)) {
-            if (!ce) {
+        if ((m_fAlcohol > 0.0001f))
+        {
+            if (!ce)
+            {
                 AddEffector(
                     m_object, effAlcohol, "effector_alcohol", GET_KOEFF_FUNC(this, &CActorCondition::GetAlcohol));
             }
         }
         else
         {
-            if (ce) RemoveEffector(m_object, effAlcohol);
+            if (ce)
+                RemoveEffector(m_object, effAlcohol);
         }
 
         string512 pp_sect_name;
         shared_str ln = Level().name();
-        if (ln.size()) {
+        if (ln.size())
+        {
             CEffectorPP* ppe = object().Cameras().GetPPEffector((EEffectorPPType)effPsyHealth);
 
             strconcat(sizeof(pp_sect_name), pp_sect_name, "effector_psy_health", "_", *ln);
-            if (!pSettings->section_exist(pp_sect_name)) xr_strcpy(pp_sect_name, "effector_psy_health");
+            if (!pSettings->section_exist(pp_sect_name))
+                xr_strcpy(pp_sect_name, "effector_psy_health");
 
-            if (!fsimilar(GetPsyHealth(), 1.0f, 0.05f)) {
-                if (!ppe) {
+            if (!fsimilar(GetPsyHealth(), 1.0f, 0.05f))
+            {
+                if (!ppe)
+                {
                     AddEffector(m_object, effPsyHealth, pp_sect_name, GET_KOEFF_FUNC(this, &CActorCondition::GetPsy));
                 }
             }
             else
             {
-                if (ppe) RemoveEffector(m_object, effPsyHealth);
+                if (ppe)
+                    RemoveEffector(m_object, effPsyHealth);
             }
         }
         //-		if(fis_zero(GetPsyHealth()))
@@ -257,16 +273,20 @@ void CActorCondition::UpdateCondition()
 
     inherited::UpdateCondition();
 
-    if (IsGameTypeSingle()) UpdateTutorialThresholds();
+    if (IsGameTypeSingle())
+        UpdateTutorialThresholds();
 
-    if (GetHealth() < 0.05f && m_death_effector == NULL && IsGameTypeSingle()) {
+    if (GetHealth() < 0.05f && m_death_effector == NULL && IsGameTypeSingle())
+    {
         if (pSettings->section_exist("actor_death_effector"))
             m_death_effector = new CActorDeathEffector(this, "actor_death_effector");
     }
-    if (m_death_effector && m_death_effector->IsActual()) {
+    if (m_death_effector && m_death_effector->IsActual())
+    {
         m_death_effector->UpdateCL();
 
-        if (!m_death_effector->IsActual()) m_death_effector->Stop();
+        if (!m_death_effector->IsActual())
+            m_death_effector->Stop();
     }
 
     AffectDamage_InjuriousMaterialAndMonstersInfluence();
@@ -277,9 +297,11 @@ void CActorCondition::UpdateBoosters()
     for (u8 i = 0; i < eBoostMaxCount; i++)
     {
         BOOSTER_MAP::iterator it = m_booster_influences.find((EBoostParams)i);
-        if (it != m_booster_influences.end()) {
+        if (it != m_booster_influences.end())
+        {
             it->second.fBoostTime -= m_fDeltaTime / (IsGameTypeSingle() ? Level().GetGameTimeFactor() : 1.0f);
-            if (it->second.fBoostTime <= 0.0f) {
+            if (it->second.fBoostTime <= 0.0f)
+            {
                 DisableBoostParameters(it->second);
                 m_booster_influences.erase(it);
             }
@@ -294,7 +316,8 @@ void CActorCondition::AffectDamage_InjuriousMaterialAndMonstersInfluence()
 {
     float one = 0.1f;
     float tg = Device.fTimeGlobal;
-    if (m_f_time_affected + one > tg) {
+    if (m_f_time_affected + one > tg)
+    {
         return;
     }
 
@@ -302,18 +325,20 @@ void CActorCondition::AffectDamage_InjuriousMaterialAndMonstersInfluence()
 
     float psy_influence = 0;
     float fire_influence = 0;
-    float radiation_influence = GetInjuriousMaterialDamage();  // Get Radiation from Material
+    float radiation_influence = GetInjuriousMaterialDamage(); // Get Radiation from Material
 
     // Add Radiation and Psy Level from Monsters
     CPda* const pda = m_object->GetPDA();
 
-    if (pda) {
+    if (pda)
+    {
         typedef xr_vector<IGameObject*> monsters;
 
         for (monsters::const_iterator it = pda->feel_touch.begin(); it != pda->feel_touch.end(); ++it)
         {
             CBaseMonster* const monster = smart_cast<CBaseMonster*>(*it);
-            if (!monster || !monster->g_Alive()) continue;
+            if (!monster || !monster->g_Alive())
+                continue;
 
             psy_influence += monster->get_psy_influence();
             radiation_influence += monster->get_radiation_influence();
@@ -340,7 +365,8 @@ void CActorCondition::AffectDamage_InjuriousMaterialAndMonstersInfluence()
             float damage = hits[i].value;
             ALife::EHitType type = hits[i].type;
 
-            if (damage > EPS) {
+            if (damage > EPS)
+            {
                 SHit HDS = SHit(damage,
                     //.								0.0f,
                     Fvector().set(0, 1, 0), NULL, BI_NONE, Fvector().set(0, 0, 0), 0.0f, type, 0.0f, false);
@@ -350,9 +376,9 @@ void CActorCondition::AffectDamage_InjuriousMaterialAndMonstersInfluence()
                 CGameObject::u_EventSend(np);
             }
 
-        }  // for
+        } // for
 
-    }  // while
+    } // while
 }
 
 #include "CharacterPhysicsSupport.h"
@@ -360,7 +386,8 @@ float CActorCondition::GetInjuriousMaterialDamage()
 {
     u16 mat_injurios = m_object->character_physics_support()->movement()->injurious_material_idx();
 
-    if (mat_injurios != GAMEMTL_NONE_IDX) {
+    if (mat_injurios != GAMEMTL_NONE_IDX)
+    {
         const SGameMtl* mtl = GMLib.GetMaterialByIdx(mat_injurios);
         return mtl->fInjuriousSpeed;
     }
@@ -387,26 +414,25 @@ float CActorCondition::GetZoneDanger() const
     return sum;
 }
 
-void CActorCondition::UpdateRadiation()
-{
-    inherited::UpdateRadiation();
-}
-
+void CActorCondition::UpdateRadiation() { inherited::UpdateRadiation(); }
 void CActorCondition::UpdateSatiety()
 {
-    if (!IsGameTypeSingle()) {
+    if (!IsGameTypeSingle())
+    {
         m_fDeltaPower += m_fV_SatietyPower * m_fDeltaTime;
         return;
     }
 
-    if (m_fSatiety > 0) {
+    if (m_fSatiety > 0)
+    {
         m_fSatiety -= m_fV_Satiety * m_fDeltaTime;
         clamp(m_fSatiety, 0.0f, 1.0f);
     }
 
     float satiety_health_koef = (m_fSatiety - m_fSatietyCritical) /
-                                (m_fSatiety >= m_fSatietyCritical ? 1 - m_fSatietyCritical : m_fSatietyCritical);
-    if (CanBeHarmed() && !psActorFlags.test(AF_GODMODE_RT)) {
+        (m_fSatiety >= m_fSatietyCritical ? 1 - m_fSatietyCritical : m_fSatietyCritical);
+    if (CanBeHarmed() && !psActorFlags.test(AF_GODMODE_RT))
+    {
         m_fDeltaHealth += m_fV_SatietyHealth * satiety_health_koef * m_fDeltaTime;
         m_fDeltaPower += m_fV_SatietyPower * m_fSatiety * m_fDeltaTime;
     }
@@ -414,7 +440,8 @@ void CActorCondition::UpdateSatiety()
 
 CWound* CActorCondition::ConditionHit(SHit* pHDS)
 {
-    if (GodMode()) return NULL;
+    if (GodMode())
+        return NULL;
     return inherited::ConditionHit(pHDS);
 }
 
@@ -457,10 +484,12 @@ bool CActorCondition::IsCantWalk() const
 
 bool CActorCondition::IsCantWalkWeight()
 {
-    if (IsGameTypeSingle() && !GodMode()) {
+    if (IsGameTypeSingle() && !GodMode())
+    {
         float max_w = m_object->MaxWalkWeight();
 
-        if (object().inventory().TotalWeight() > max_w) {
+        if (object().inventory().TotalWeight() > max_w)
+        {
             m_condition_flags.set(eCantWalkWeight, TRUE);
             return true;
         }
@@ -551,10 +580,7 @@ void CActorCondition::reinit()
     m_fSatiety = 1.f;
 }
 
-void CActorCondition::ChangeAlcohol(float value)
-{
-    m_fAlcohol += value;
-}
+void CActorCondition::ChangeAlcohol(float value) { m_fAlcohol += value; }
 void CActorCondition::ChangeSatiety(float value)
 {
     m_fSatiety += value;
@@ -563,7 +589,8 @@ void CActorCondition::ChangeSatiety(float value)
 
 void CActorCondition::BoostParameters(const SBooster& B)
 {
-    if (OnServer()) {
+    if (OnServer())
+    {
         switch (B.m_type)
         {
         case eBoostHpRestore: BoostHpRestore(B.fBoostValue); break;
@@ -589,7 +616,8 @@ void CActorCondition::BoostParameters(const SBooster& B)
 }
 void CActorCondition::DisableBoostParameters(const SBooster& B)
 {
-    if (!OnServer()) return;
+    if (!OnServer())
+        return;
 
     switch (B.m_type)
     {
@@ -613,76 +641,27 @@ void CActorCondition::DisableBoostParameters(const SBooster& B)
     default: NODEFAULT;
     }
 }
-void CActorCondition::BoostHpRestore(const float value)
-{
-    m_change_v.m_fV_HealthRestore += value;
-}
-void CActorCondition::BoostPowerRestore(const float value)
-{
-    m_fV_SatietyPower += value;
-}
-void CActorCondition::BoostRadiationRestore(const float value)
-{
-    m_change_v.m_fV_Radiation += value;
-}
-void CActorCondition::BoostBleedingRestore(const float value)
-{
-    m_change_v.m_fV_WoundIncarnation += value;
-}
+void CActorCondition::BoostHpRestore(const float value) { m_change_v.m_fV_HealthRestore += value; }
+void CActorCondition::BoostPowerRestore(const float value) { m_fV_SatietyPower += value; }
+void CActorCondition::BoostRadiationRestore(const float value) { m_change_v.m_fV_Radiation += value; }
+void CActorCondition::BoostBleedingRestore(const float value) { m_change_v.m_fV_WoundIncarnation += value; }
 void CActorCondition::BoostMaxWeight(const float value)
 {
     m_object->inventory().SetMaxWeight(object().inventory().GetMaxWeight() + value);
     m_MaxWalkWeight += value;
 }
-void CActorCondition::BoostBurnImmunity(const float value)
-{
-    m_fBoostBurnImmunity += value;
-}
-void CActorCondition::BoostShockImmunity(const float value)
-{
-    m_fBoostShockImmunity += value;
-}
-void CActorCondition::BoostRadiationImmunity(const float value)
-{
-    m_fBoostRadiationImmunity += value;
-}
-void CActorCondition::BoostTelepaticImmunity(const float value)
-{
-    m_fBoostTelepaticImmunity += value;
-}
-void CActorCondition::BoostChemicalBurnImmunity(const float value)
-{
-    m_fBoostChemicalBurnImmunity += value;
-}
-void CActorCondition::BoostExplImmunity(const float value)
-{
-    m_fBoostExplImmunity += value;
-}
-void CActorCondition::BoostStrikeImmunity(const float value)
-{
-    m_fBoostStrikeImmunity += value;
-}
-void CActorCondition::BoostFireWoundImmunity(const float value)
-{
-    m_fBoostFireWoundImmunity += value;
-}
-void CActorCondition::BoostWoundImmunity(const float value)
-{
-    m_fBoostWoundImmunity += value;
-}
-void CActorCondition::BoostRadiationProtection(const float value)
-{
-    m_fBoostRadiationProtection += value;
-}
-void CActorCondition::BoostTelepaticProtection(const float value)
-{
-    m_fBoostTelepaticProtection += value;
-}
-void CActorCondition::BoostChemicalBurnProtection(const float value)
-{
-    m_fBoostChemicalBurnProtection += value;
-}
-
+void CActorCondition::BoostBurnImmunity(const float value) { m_fBoostBurnImmunity += value; }
+void CActorCondition::BoostShockImmunity(const float value) { m_fBoostShockImmunity += value; }
+void CActorCondition::BoostRadiationImmunity(const float value) { m_fBoostRadiationImmunity += value; }
+void CActorCondition::BoostTelepaticImmunity(const float value) { m_fBoostTelepaticImmunity += value; }
+void CActorCondition::BoostChemicalBurnImmunity(const float value) { m_fBoostChemicalBurnImmunity += value; }
+void CActorCondition::BoostExplImmunity(const float value) { m_fBoostExplImmunity += value; }
+void CActorCondition::BoostStrikeImmunity(const float value) { m_fBoostStrikeImmunity += value; }
+void CActorCondition::BoostFireWoundImmunity(const float value) { m_fBoostFireWoundImmunity += value; }
+void CActorCondition::BoostWoundImmunity(const float value) { m_fBoostWoundImmunity += value; }
+void CActorCondition::BoostRadiationProtection(const float value) { m_fBoostRadiationProtection += value; }
+void CActorCondition::BoostTelepaticProtection(const float value) { m_fBoostTelepaticProtection += value; }
+void CActorCondition::BoostChemicalBurnProtection(const float value) { m_fBoostChemicalBurnProtection += value; }
 void CActorCondition::UpdateTutorialThresholds()
 {
     string256 cb_name;
@@ -695,59 +674,69 @@ void CActorCondition::UpdateTutorialThresholds()
     static float _cPsyHealthThr = pSettings->r_float("tutorial_conditions_thresholds", "psy_health");
 
     bool b = true;
-    if (b && !m_condition_flags.test(eCriticalPowerReached) && GetPower() < _cPowerThr) {
+    if (b && !m_condition_flags.test(eCriticalPowerReached) && GetPower() < _cPowerThr)
+    {
         m_condition_flags.set(eCriticalPowerReached, TRUE);
         b = false;
         xr_strcpy(cb_name, "_G.on_actor_critical_power");
     }
 
-    if (b && !m_condition_flags.test(eCriticalMaxPowerReached) && GetMaxPower() < _cPowerMaxThr) {
+    if (b && !m_condition_flags.test(eCriticalMaxPowerReached) && GetMaxPower() < _cPowerMaxThr)
+    {
         m_condition_flags.set(eCriticalMaxPowerReached, TRUE);
         b = false;
         xr_strcpy(cb_name, "_G.on_actor_critical_max_power");
     }
 
-    if (b && !m_condition_flags.test(eCriticalBleedingSpeed) && BleedingSpeed() > _cBleeding) {
+    if (b && !m_condition_flags.test(eCriticalBleedingSpeed) && BleedingSpeed() > _cBleeding)
+    {
         m_condition_flags.set(eCriticalBleedingSpeed, TRUE);
         b = false;
         xr_strcpy(cb_name, "_G.on_actor_bleeding");
     }
 
-    if (b && !m_condition_flags.test(eCriticalSatietyReached) && GetSatiety() < _cSatiety) {
+    if (b && !m_condition_flags.test(eCriticalSatietyReached) && GetSatiety() < _cSatiety)
+    {
         m_condition_flags.set(eCriticalSatietyReached, TRUE);
         b = false;
         xr_strcpy(cb_name, "_G.on_actor_satiety");
     }
 
-    if (b && !m_condition_flags.test(eCriticalRadiationReached) && GetRadiation() > _cRadiation) {
+    if (b && !m_condition_flags.test(eCriticalRadiationReached) && GetRadiation() > _cRadiation)
+    {
         m_condition_flags.set(eCriticalRadiationReached, TRUE);
         b = false;
         xr_strcpy(cb_name, "_G.on_actor_radiation");
     }
 
-    if (b && !m_condition_flags.test(ePhyHealthMinReached) && GetPsyHealth() < _cPsyHealthThr) {
+    if (b && !m_condition_flags.test(ePhyHealthMinReached) && GetPsyHealth() < _cPsyHealthThr)
+    {
         m_condition_flags.set(ePhyHealthMinReached, TRUE);
         b = false;
         xr_strcpy(cb_name, "_G.on_actor_psy");
     }
 
-    if (b && m_condition_flags.test(eCantWalkWeight) && !m_condition_flags.test(eCantWalkWeightReached)) {
+    if (b && m_condition_flags.test(eCantWalkWeight) && !m_condition_flags.test(eCantWalkWeightReached))
+    {
         m_condition_flags.set(eCantWalkWeightReached, TRUE);
         b = false;
         xr_strcpy(cb_name, "_G.on_actor_cant_walk_weight");
     }
 
-    if (b && !m_condition_flags.test(eWeaponJammedReached) && m_object->inventory().GetActiveSlot() != NO_ACTIVE_SLOT) {
+    if (b && !m_condition_flags.test(eWeaponJammedReached) && m_object->inventory().GetActiveSlot() != NO_ACTIVE_SLOT)
+    {
         PIItem item = m_object->inventory().ItemFromSlot(m_object->inventory().GetActiveSlot());
         CWeapon* pWeapon = smart_cast<CWeapon*>(item);
-        if (pWeapon && pWeapon->GetCondition() < _cWpnCondition) {
+        if (pWeapon && pWeapon->GetCondition() < _cWpnCondition)
+        {
             m_condition_flags.set(eWeaponJammedReached, TRUE);
             b = false;
             xr_strcpy(cb_name, "_G.on_actor_weapon_jammed");
         }
     }
 
-    if (!b) {
+    if (!b)
+    {
         luabind::functor<void> fl;
         R_ASSERT(ai().script_engine().functor<void>(cb_name, fl));
         fl();
@@ -757,8 +746,8 @@ void CActorCondition::UpdateTutorialThresholds()
 bool CActorCondition::DisableSprint(SHit* pHDS)
 {
     return (pHDS->hit_type != ALife::eHitTypeTelepatic) && (pHDS->hit_type != ALife::eHitTypeChemicalBurn) &&
-           (pHDS->hit_type != ALife::eHitTypeBurn) && (pHDS->hit_type != ALife::eHitTypeLightBurn) &&
-           (pHDS->hit_type != ALife::eHitTypeRadiation);
+        (pHDS->hit_type != ALife::eHitTypeBurn) && (pHDS->hit_type != ALife::eHitTypeLightBurn) &&
+        (pHDS->hit_type != ALife::eHitTypeRadiation);
 }
 
 bool CActorCondition::PlayHitSound(SHit* pHDS)
@@ -780,7 +769,7 @@ bool CActorCondition::PlayHitSound(SHit* pHDS)
     case ALife::eHitTypeBurn:
     case ALife::eHitTypeLightBurn:
     case ALife::eHitTypeChemicalBurn:
-        return (pHDS->damage() > 0.017f);  // field zone threshold
+        return (pHDS->damage() > 0.017f); // field zone threshold
         break;
     default: return true;
     }
@@ -789,7 +778,8 @@ bool CActorCondition::PlayHitSound(SHit* pHDS)
 float CActorCondition::HitSlowmo(SHit* pHDS)
 {
     float ret;
-    if (pHDS->hit_type == ALife::eHitTypeWound || pHDS->hit_type == ALife::eHitTypeStrike) {
+    if (pHDS->hit_type == ALife::eHitTypeWound || pHDS->hit_type == ALife::eHitTypeStrike)
+    {
         ret = pHDS->damage();
         clamp(ret, 0.0f, 1.f);
     }
@@ -801,11 +791,15 @@ float CActorCondition::HitSlowmo(SHit* pHDS)
 
 bool CActorCondition::ApplyInfluence(const SMedicineInfluenceValues& V, const shared_str& sect)
 {
-    if (m_curr_medicine_influence.InProcess()) return false;
+    if (m_curr_medicine_influence.InProcess())
+        return false;
 
-    if (m_object->Local() && m_object == Level().CurrentViewEntity()) {
-        if (pSettings->line_exist(sect, "use_sound")) {
-            if (m_use_sound._feedback()) m_use_sound.stop();
+    if (m_object->Local() && m_object == Level().CurrentViewEntity())
+    {
+        if (pSettings->line_exist(sect, "use_sound"))
+        {
+            if (m_use_sound._feedback())
+                m_use_sound.stop();
 
             shared_str snd_name = pSettings->r_string(sect, "use_sound");
             m_use_sound.create(snd_name.c_str(), st_Effect, sg_SourceType);
@@ -813,7 +807,8 @@ bool CActorCondition::ApplyInfluence(const SMedicineInfluenceValues& V, const sh
         }
     }
 
-    if (V.fTimeTotal < 0.0f) return inherited::ApplyInfluence(V, sect);
+    if (V.fTimeTotal < 0.0f)
+        return inherited::ApplyInfluence(V, sect);
 
     m_curr_medicine_influence = V;
     m_curr_medicine_influence.fTimeCurrent = m_curr_medicine_influence.fTimeTotal;
@@ -821,10 +816,14 @@ bool CActorCondition::ApplyInfluence(const SMedicineInfluenceValues& V, const sh
 }
 bool CActorCondition::ApplyBooster(const SBooster& B, const shared_str& sect)
 {
-    if (B.fBoostValue > 0.0f) {
-        if (m_object->Local() && m_object == Level().CurrentViewEntity()) {
-            if (pSettings->line_exist(sect, "use_sound")) {
-                if (m_use_sound._feedback()) m_use_sound.stop();
+    if (B.fBoostValue > 0.0f)
+    {
+        if (m_object->Local() && m_object == Level().CurrentViewEntity())
+        {
+            if (pSettings->line_exist(sect, "use_sound"))
+            {
+                if (m_use_sound._feedback())
+                    m_use_sound.stop();
 
                 shared_str snd_name = pSettings->r_string(sect, "use_sound");
                 m_use_sound.create(snd_name.c_str(), st_Effect, sg_SourceType);
@@ -833,7 +832,8 @@ bool CActorCondition::ApplyBooster(const SBooster& B, const shared_str& sect)
         }
 
         BOOSTER_MAP::iterator it = m_booster_influences.find(B.m_type);
-        if (it != m_booster_influences.end()) DisableBoostParameters((*it).second);
+        if (it != m_booster_influences.end())
+            DisableBoostParameters((*it).second);
 
         m_booster_influences[B.m_type] = B;
         BoostParameters(B);
@@ -846,7 +846,7 @@ void enable_input();
 void hide_indicators();
 void show_indicators();
 
-CActorDeathEffector::CActorDeathEffector(CActorCondition* parent, LPCSTR sect)  // -((
+CActorDeathEffector::CActorDeathEffector(CActorCondition* parent, LPCSTR sect) // -((
     : m_pParent(parent)
 {
     Actor()->SetWeaponHideState(INV_STATE_BLOCK_ALL, true);
@@ -864,15 +864,8 @@ CActorDeathEffector::CActorDeathEffector(CActorCondition* parent, LPCSTR sect)  
     m_start_health = m_pParent->health();
 }
 
-CActorDeathEffector::~CActorDeathEffector()
-{
-}
-
-void CActorDeathEffector::UpdateCL()
-{
-    m_pParent->SetHealth(m_start_health);
-}
-
+CActorDeathEffector::~CActorDeathEffector() {}
+void CActorDeathEffector::UpdateCL() { m_pParent->SetHealth(m_start_health); }
 void CActorDeathEffector::OnPPEffectorReleased()
 {
     m_b_actual = false;

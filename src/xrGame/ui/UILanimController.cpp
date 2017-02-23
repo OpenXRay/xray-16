@@ -7,11 +7,7 @@ color_animation::color_animation() : m_lanim(NULL), m_lanim_start_time(-1.0f), m
     m_lanimFlags.zero();
 }
 
-xform_animation::xform_animation()
-{
-    m_origSize.set(0, 0);
-}
-
+xform_animation::xform_animation() { m_origSize.set(0, 0); }
 void CUIColorAnimConrollerContainer::Update()
 {
     inherited::Update();
@@ -25,7 +21,8 @@ void CUIColorAnimConrollerContainer::ColorAnimationSetTextureColor(u32 color, bo
     for (; it != it_e; ++it)
     {
         ITextureOwner* TO = smart_cast<ITextureOwner*>(*it);
-        if (TO) TO->SetTextureColor((only_alpha) ? subst_alpha(TO->GetTextureColor(), color) : color);
+        if (TO)
+            TO->SetTextureColor((only_alpha) ? subst_alpha(TO->GetTextureColor(), color) : color);
     }
 }
 
@@ -36,6 +33,7 @@ void CUIColorAnimConrollerContainer::ColorAnimationSetTextColor(u32 color, bool 
     for (; it != it_e; ++it)
     {
         CUILightAnimColorConroller* TO = smart_cast<CUILightAnimColorConroller*>(*it);
-        if (TO) TO->ColorAnimationSetTextColor(color, only_alpha);
+        if (TO)
+            TO->ColorAnimationSetTextColor(color, only_alpha);
     }
 }

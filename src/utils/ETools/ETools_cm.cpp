@@ -66,8 +66,10 @@ public:
         for (u32 side = CUBE_POSITIVE_X; side <= CUBE_NEGATIVE_Z; side++)
         {
             float cur_dist = flt_max;
-            if (planes[side].intersectRayDist(Fvector().set(0, 0, 0), n, cur_dist)) {
-                if (cur_dist < t_dist) {
+            if (planes[side].intersectRayDist(Fvector().set(0, 0, 0), n, cur_dist))
+            {
+                if (cur_dist < t_dist)
+                {
                     t_dist = cur_dist;
                     t_side = side;
                 }

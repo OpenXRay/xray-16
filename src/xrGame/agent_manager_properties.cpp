@@ -28,7 +28,8 @@ CAgentManagerPropertyEvaluatorItem::_value_type CAgentManagerPropertyEvaluatorIt
     for (; I != E; ++I)
     {
         VERIFY(*I);
-        if ((*I)->object().memory().item().selected()) return (true);
+        if ((*I)->object().memory().item().selected())
+            return (true);
     }
     return (false);
 }
@@ -44,7 +45,8 @@ CAgentManagerPropertyEvaluatorEnemy::_value_type CAgentManagerPropertyEvaluatorE
     for (; I != E; ++I)
     {
         VERIFY(*I);
-        if ((*I)->object().memory().enemy().selected()) return (true);
+        if ((*I)->object().memory().enemy().selected())
+            return (true);
     }
     return (false);
 }
@@ -60,7 +62,8 @@ CAgentManagerPropertyEvaluatorDanger::_value_type CAgentManagerPropertyEvaluator
     for (; I != E; ++I)
     {
         VERIFY(*I);
-        if ((*I)->object().memory().danger().selected()) return (true);
+        if ((*I)->object().memory().danger().selected())
+            return (true);
     }
     return (false);
 }

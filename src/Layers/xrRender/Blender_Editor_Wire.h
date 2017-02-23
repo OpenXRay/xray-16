@@ -9,7 +9,6 @@ class CBlender_Editor_Wire : public IBlender
 public:
     virtual LPCSTR getComment() { return "EDITOR: wire"; }
     virtual BOOL canBeLMAPped() { return FALSE; }
-
     virtual void Save(IWriter& fs);
     virtual void Load(IReader& fs, u16 version);
 
@@ -19,4 +18,4 @@ public:
     virtual ~CBlender_Editor_Wire();
 };
 
-#endif  // BLENDER_EDITOR_WIRE_H
+#endif // BLENDER_EDITOR_WIRE_H

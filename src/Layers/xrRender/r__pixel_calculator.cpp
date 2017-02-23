@@ -27,7 +27,7 @@ void r_pixel_calculator::end()
     rt = 0;
 }
 
-//								+X,				-X,				+Y,				-Y,			+Z,				-Z
+// +X, -X, +Y, -Y, +Z, -Z
 static Fvector cmNorm[6] = {
     {0.f, 1.f, 0.f}, {0.f, 1.f, 0.f}, {0.f, 0.f, -1.f}, {0.f, 0.f, 1.f}, {0.f, 1.f, 0.f}, {0.f, 1.f, 0.f}};
 static Fvector cmDir[6] = {
@@ -57,7 +57,7 @@ r_aabb_ssa r_pixel_calculator::calculate(dxRender_Visual* V)
         RCache.set_xform_project(mProject);
 
         // render-0
-        Device.Clear();  // clear-ZB
+        Device.Clear(); // clear-ZB
         RCache.set_Shader(V->shader);
         V->Render(1.f);
 
@@ -84,10 +84,11 @@ void r_pixel_calculator::run()
     begin();
     for (u32 it = 0; it < RImplementation.Visuals.size(); it++)
     {
-        if (0 == dynamic_cast<IRender_Mesh*>(RImplementation.Visuals[it])) continue;
+        if (0 == dynamic_cast<IRender_Mesh*>(RImplementation.Visuals[it]))
+            continue;
         Msg("*%d*", it);
         calculate((dxRender_Visual*)RImplementation.Visuals[it]);
     }
     end();
 }
-#endif  //	USE_DX10
+#endif //   USE_DX10

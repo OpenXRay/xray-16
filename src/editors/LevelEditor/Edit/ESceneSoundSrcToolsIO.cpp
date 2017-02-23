@@ -16,7 +16,8 @@ enum
 bool ESceneSoundSrcTool::LoadLTX(CInifile& ini)
 {
     u32 version = ini.r_u32("main", "version");
-    if (version != SOUND_SRC_TOOLS_VERSION) {
+    if (version != SOUND_SRC_TOOLS_VERSION)
+    {
         ELog.DlgMsg(mtError, "%s tools: Unsupported version.", ClassDesc());
         return false;
     }
@@ -36,12 +37,14 @@ bool ESceneSoundSrcTool::LoadStream(IReader& F)
 {
     u16 version = 0;
     if (F.r_chunk(CHUNK_VERSION, &version))
-        if (version != SOUND_SRC_TOOLS_VERSION) {
+        if (version != SOUND_SRC_TOOLS_VERSION)
+        {
             ELog.DlgMsg(mtError, "%s tools: Unsupported version.", ClassDesc());
             return false;
         }
 
-    if (!inherited::LoadStream(F)) return false;
+    if (!inherited::LoadStream(F))
+        return false;
 
     return true;
 }
@@ -61,7 +64,8 @@ bool ESceneSoundSrcTool::LoadSelection(IReader& F)
 {
     u16 version = 0;
     R_ASSERT(F.r_chunk(CHUNK_VERSION, &version));
-    if (version != SOUND_SRC_TOOLS_VERSION) {
+    if (version != SOUND_SRC_TOOLS_VERSION)
+    {
         ELog.DlgMsg(mtError, "%s tools: Unsupported version.", ClassDesc());
         return false;
     }

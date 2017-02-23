@@ -7,7 +7,6 @@ class CCycleConstStorage
     T array[size];
     int first;
     IC int position(int i) const { return (first + i) % size; }
-
 public:
     IC CCycleConstStorage() { first = 0; }
     IC void fill_in(const T& val) { std::fill(array, array + size, val); }

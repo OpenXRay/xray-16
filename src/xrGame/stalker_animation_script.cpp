@@ -48,7 +48,8 @@ void CStalkerAnimationManager::add_script_animation(
     LPCSTR animation, bool hand_usage, Fvector position, Fvector rotation, bool local_animation)
 {
     const MotionID& motion = m_skeleton_animated->ID_Cycle_Safe(animation);
-    if (!motion) {
+    if (!motion)
+    {
         ai().script_engine().script_log(
             LuaMessageType::Error, "There is no animation %s (object %s)!", animation, *object().cName());
         return;
@@ -71,7 +72,8 @@ void CStalkerAnimationManager::add_script_animation(
 void CStalkerAnimationManager::add_script_animation(LPCSTR animation, bool hand_usage, bool use_movement_controller)
 {
     const MotionID& motion = m_skeleton_animated->ID_Cycle_Safe(animation);
-    if (!motion) {
+    if (!motion)
+    {
         ai().script_engine().script_log(
             LuaMessageType::Error, "There is no animation %s (object %s)!", animation, *object().cName());
         return;

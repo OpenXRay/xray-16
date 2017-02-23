@@ -11,10 +11,7 @@
 #include "alife_space.h"
 #include "Common/LevelStructure.hpp"
 
-CALifeSpawnHeader::~CALifeSpawnHeader()
-{
-}
-
+CALifeSpawnHeader::~CALifeSpawnHeader() {}
 void CALifeSpawnHeader::load(IReader& file_stream)
 {
     m_version = file_stream.r_u32();

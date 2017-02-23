@@ -16,11 +16,7 @@
 
 CScenePhyscs g_scene_physics;
 
-bool CScenePhyscs::Simulating()
-{
-    return !!physics_world();
-}
-
+bool CScenePhyscs::Simulating() { return !!physics_world(); }
 BOOL GetStaticCformData(const Fmatrix& parent, CEditableMesh* mesh, CEditableObject* object, Fvector* verts,
     int& vert_cnt, int& vert_it, CDB::TRI* faces, int& face_cnt, int& face_it);
 BOOL GetStaticCformData(CSceneObject* obj, mesh_build_data& data, bool b_selected_only)
@@ -51,7 +47,8 @@ BOOL GetStaticCformData(ObjectList& lst, mesh_build_data& data, bool b_selected_
     {
         //  pb->Inc((*_F)->Name);
         //  if (UI->NeedAbort()) break;
-        if (b_selected_only && !(*_F)->Selected()) continue;
+        if (b_selected_only && !(*_F)->Selected())
+            continue;
 
         switch ((*_F)->ClassID)
         {
@@ -82,7 +79,7 @@ BOOL GetStaticCformData(ObjectList& lst, mesh_build_data& data, bool b_selected_
 
                         bResult = ParseStaticObjects(grp_lst, group->Name, b_selected_only);
                     }break;   */
-        }  // end switch
+        } // end switch
     }
     //   UI->ProgressEnd(pb);
     return bResult;
@@ -98,19 +95,22 @@ void GetBox(Fbox& box, const Fvector* verts, u32 cnt)
 void CScenePhyscs::OnSceneModified()
 {
     ObjClassID cls = LTools->CurrentClassID();
-    if (cls == OBJCLASS_SCENEOBJECT || cls == OBJCLASS_GROUP) UpdateLevelCollision();
+    if (cls == OBJCLASS_SCENEOBJECT || cls == OBJCLASS_GROUP)
+        UpdateLevelCollision();
 }
 bool CScenePhyscs::CreateObjectSpace(bool b_selected_only)
 {
     ObjClassID cls = LTools->CurrentClassID();
-    if (cls == OBJCLASS_DUMMY) return FALSE;
+    if (cls == OBJCLASS_DUMMY)
+        return FALSE;
     ESceneToolBase* pCurrentTool = Scene->GetOTool(cls);
 
     bool bResult = true;
 
     mesh_build_data build_data;
 
-    if (b_selected_only) {
+    if (b_selected_only)
+    {
         if (pCurrentTool)
             pCurrentTool->GetStaticDesc(build_data.l_vert_cnt, build_data.l_face_cnt, b_selected_only, true);
     }
@@ -121,19 +121,23 @@ bool CScenePhyscs::CreateObjectSpace(bool b_selected_only)
         for (; t_it != t_end; ++t_it)
         {
             ESceneToolBase* mt = t_it->second;
-            if (mt) mt->GetStaticDesc(build_data.l_vert_cnt, build_data.l_face_cnt, b_selected_only, true);
+            if (mt)
+                mt->GetStaticDesc(build_data.l_vert_cnt, build_data.l_face_cnt, b_selected_only, true);
 
             // if (!mt->ExportStatic(this,b_selected_only))
             // {bResult = FALSE; break;}
         }
     }
-    if (!bResult) return false;
+    if (!bResult)
+        return false;
 
     build_data.l_faces = xr_alloc<CDB::TRI>(build_data.l_face_cnt);
     build_data.l_verts = xr_alloc<Fvector>(build_data.l_vert_cnt);
-    if (b_selected_only) {
+    if (b_selected_only)
+    {
         if (pCurrentTool)
-            if (!pCurrentTool->GetStaticCformData(build_data, b_selected_only)) {
+            if (!pCurrentTool->GetStaticCformData(build_data, b_selected_only))
+            {
                 bResult = false;
             }
     }
@@ -145,7 +149,8 @@ bool CScenePhyscs::CreateObjectSpace(bool b_selected_only)
         {
             ESceneToolBase* mt = t_it->second;
             if (mt)
-                if (!mt->GetStaticCformData(build_data, b_selected_only)) {
+                if (!mt->GetStaticCformData(build_data, b_selected_only))
+                {
                     bResult = false;
                     break;
                 }
@@ -175,13 +180,11 @@ CScenePhyscs::~CScenePhyscs()
     R_ASSERT(!m_object_space);
 }
 
-void CScenePhyscs::DestroyObjectSpace()
-{
-    destroy_object_space(m_object_space);
-}
+void CScenePhyscs::DestroyObjectSpace() { destroy_object_space(m_object_space); }
 void CScenePhyscs::DestroyWorld()
 {
-    if (physics_world()) destroy_physics_world();
+    if (physics_world())
+        destroy_physics_world();
 }
 
 void CScenePhyscs::CreateWorld()
@@ -197,24 +200,28 @@ void CScenePhyscs::CreateWorld()
 void CreatePhysicsShellsSelected()
 {
     ObjectList lst;
-    if (Scene->GetQueryObjects(lst, OBJCLASS_SPAWNPOINT, 1, 1, 0)) {
+    if (Scene->GetQueryObjects(lst, OBJCLASS_SPAWNPOINT, 1, 1, 0))
+    {
         for (ObjectIt it = lst.begin(); it != lst.end(); it++)
         {
             CSpawnPoint* O = dynamic_cast<CSpawnPoint*>(*it);
             R_ASSERT(O);
-            if (O->Selected() && O->ObjectKinematics()) O->CreatePhysicsShell(&O->FTransform);
+            if (O->Selected() && O->ObjectKinematics())
+                O->CreatePhysicsShell(&O->FTransform);
         }
     }
 }
 void CScenePhyscs::UseSimulatePoses()
 {
     ObjectList lst;
-    if (Scene->GetQueryObjects(lst, OBJCLASS_SPAWNPOINT, 1, 1, 0)) {
+    if (Scene->GetQueryObjects(lst, OBJCLASS_SPAWNPOINT, 1, 1, 0))
+    {
         for (ObjectIt it = lst.begin(); it != lst.end(); it++)
         {
             CSpawnPoint* O = dynamic_cast<CSpawnPoint*>(*it);
             R_ASSERT(O);
-            if (O->Selected()) O->UseSimulatePose();
+            if (O->Selected())
+                O->UseSimulatePose();
         }
     }
 }
@@ -222,7 +229,8 @@ void CScenePhyscs::UseSimulatePoses()
 void DestroyPhysicsShells()
 {
     ObjectList lst;
-    if (Scene->GetQueryObjects(lst, OBJCLASS_SPAWNPOINT, -1, -1, 0)) {
+    if (Scene->GetQueryObjects(lst, OBJCLASS_SPAWNPOINT, -1, -1, 0))
+    {
         for (ObjectIt it = lst.begin(); it != lst.end(); it++)
         {
             CSpawnPoint* O = dynamic_cast<CSpawnPoint*>(*it);
@@ -234,8 +242,10 @@ void DestroyPhysicsShells()
 
 void CScenePhyscs::CreateShellsSelected()
 {
-    if (b_update_level_collision) DestroyObjectSpace();
-    if (!m_object_space) CreateObjectSpace(false);
+    if (b_update_level_collision)
+        DestroyObjectSpace();
+    if (!m_object_space)
+        CreateObjectSpace(false);
 
     CreateWorld();
     CreatePhysicsShellsSelected();

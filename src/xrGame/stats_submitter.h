@@ -36,7 +36,6 @@ public:
     virtual shared_str shedule_Name() const { return shared_str("gamespy_atlas_updator"); };
     virtual bool shedule_Needed() { return true; };
     virtual float shedule_Scale() { return 1.0f; };
-
     static u8 const p_number[crypto::xr_dsa::public_key_length];
     static u8 const q_number[crypto::xr_dsa::private_key_length];
     static u8 const g_number[crypto::xr_dsa::public_key_length];
@@ -56,7 +55,7 @@ private:
         ert_set_award = 0x00,
         ert_set_best_scores,
         ert_synchronize_profile
-    };  // enum enum_report_type
+    }; // enum enum_report_type
 
     enum_report_type m_report_type;
     enum_awards_t m_last_award_id;
@@ -92,6 +91,6 @@ private:
         const SCInterfacePtr theInterface, GHTTPResult theHttpResult, SCResult theResult, void* theUserData);
 };
 
-}  // namespace gamespy_profile
+} // namespace gamespy_profile
 
-#endif  //#ifndef STATS_SUBMITTER_INCLUDED
+#endif //#ifndef STATS_SUBMITTER_INCLUDED

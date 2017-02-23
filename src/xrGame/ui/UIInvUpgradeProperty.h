@@ -20,7 +20,7 @@ namespace upgrade
 class Upgrade;
 class Property;
 }
-}  // namespace upgrade, inventory
+} // namespace upgrade, inventory
 
 class UIProperty : public CUIWindow
 {
@@ -49,7 +49,7 @@ public:
     bool compute_value(ItemUpgrades_type const& item_upgrades);
     bool show_result(LPCSTR values);
 
-};  // class UIProperty
+}; // class UIProperty
 
 // =========================================================================================
 
@@ -77,6 +77,6 @@ public:
 protected:
     void set_info(ItemUpgrades_type const& item_upgrades);
 
-};  // class UIInvUpgPropertiesWnd
+}; // class UIInvUpgPropertiesWnd
 
-#endif  // UI_INVENTORY_UPGRADE_PROPERTY_H_INCLUDED
+#endif // UI_INVENTORY_UPGRADE_PROPERTY_H_INCLUDED

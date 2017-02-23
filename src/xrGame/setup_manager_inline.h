@@ -20,11 +20,7 @@ IC CSSetupManager::CSetupManager(_object_type* object)
 }
 
 TEMPLATE_SPECIALIZATION
-CSSetupManager::~CSetupManager()
-{
-    clear();
-}
-
+CSSetupManager::~CSetupManager() { clear(); }
 TEMPLATE_SPECIALIZATION
 void CSSetupManager::reinit()
 {
@@ -41,17 +37,9 @@ IC _action_type& CSSetupManager::action(const _action_id_type& action_id) const
 }
 
 TEMPLATE_SPECIALIZATION
-IC _action_type& CSSetupManager::current_action() const
-{
-    return (action(current_action_id()));
-}
-
+IC _action_type& CSSetupManager::current_action() const { return (action(current_action_id())); }
 TEMPLATE_SPECIALIZATION
-IC const _action_id_type& CSSetupManager::current_action_id() const
-{
-    return (m_current_action_id);
-}
-
+IC const _action_id_type& CSSetupManager::current_action_id() const { return (m_current_action_id); }
 TEMPLATE_SPECIALIZATION
 IC void CSSetupManager::clear()
 {
@@ -68,18 +56,21 @@ IC void CSSetupManager::add_action(const _action_id_type& action_id, _action_typ
     VERIFY(action);
     VERIFY(std::find_if(actions().begin(), actions().end(), setup_pred(action_id)) == actions().end());
     action->set_object(m_object);
-    if (actions().empty()) m_current_action_id = action_id;
+    if (actions().empty())
+        m_current_action_id = action_id;
     actions().push_back(std::make_pair(action_id, action));
 }
 
 TEMPLATE_SPECIALIZATION
 void CSSetupManager::update()
 {
-    if (actions().empty()) return;
+    if (actions().empty())
+        return;
 
     select_action();
 
-    if (m_previous_action_id != current_action_id()) current_action().initialize();
+    if (m_previous_action_id != current_action_id())
+        current_action().initialize();
 
     m_previous_action_id = current_action_id();
 
@@ -89,10 +80,13 @@ void CSSetupManager::update()
 TEMPLATE_SPECIALIZATION
 IC void CSSetupManager::select_action()
 {
-    if (!m_actuality || current_action().completed()) {
+    if (!m_actuality || current_action().completed())
+    {
         m_actuality = true;
-        if (actions().size() == 1) {
-            if (m_current_action_id != (*actions().begin()).first) (*actions().begin()).second->initialize();
+        if (actions().size() == 1)
+        {
+            if (m_current_action_id != (*actions().begin()).first)
+                (*actions().begin()).second->initialize();
 
             m_current_action_id = (*actions().begin()).first;
             return;
@@ -115,7 +109,8 @@ IC void CSSetupManager::select_action()
                 m_total_weight += (*I).second->weight();
             else
                 continue;
-            if (m_total_weight > m_random) {
+            if (m_total_weight > m_random)
+            {
                 if (std::find_if(actions().begin(), actions().end(), setup_pred(m_current_action_id)) !=
                     actions().end())
                     current_action().finalize();
@@ -135,16 +130,8 @@ IC _object_type& CSSetupManager::object() const
 }
 
 TEMPLATE_SPECIALIZATION
-IC const typename CSSetupManager::setup_actions& CSSetupManager::actions() const
-{
-    return (m_actions);
-}
-
+IC const typename CSSetupManager::setup_actions& CSSetupManager::actions() const { return (m_actions); }
 TEMPLATE_SPECIALIZATION
-IC typename CSSetupManager::setup_actions& CSSetupManager::actions()
-{
-    return (m_actions);
-}
-
+IC typename CSSetupManager::setup_actions& CSSetupManager::actions() { return (m_actions); }
 #undef TEMPLATE_SPECIALIZATION
 #undef CSSetupManager

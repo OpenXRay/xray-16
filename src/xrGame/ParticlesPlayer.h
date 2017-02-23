@@ -21,8 +21,8 @@ public:
     {
         CParticlesObject* ps;
         Fvector angles;
-        u16 sender_id;  // id - объекта, который запустил партиклы
-        u32 life_time;  //время жизни партикла (-1) - бесконечно
+        u16 sender_id; // id - объекта, который запустил партиклы
+        u32 life_time; //время жизни партикла (-1) - бесконечно
     };
     DEFINE_VECTOR(SParticlesInfo, ParticlesInfoList, ParticlesInfoListIt);
 
@@ -44,19 +44,21 @@ public:
 
 private:
     // список костей
-    u64 bone_mask;  // используемые кости
+    u64 bone_mask; // используемые кости
     BoneInfoVec m_Bones;
     IGameObject* m_self_object;
 
 protected:
-    bool m_bActiveBones;  //есть ли косточки на которых играются партиклы
+    bool m_bActiveBones; //есть ли косточки на которых играются партиклы
 
 public:
     IC SBoneInfo* get_bone_info(u16 bone_index)
     {
-        if (BI_NONE == bone_index) return 0;
+        if (BI_NONE == bone_index)
+            return 0;
         for (BoneInfoVecIt it = m_Bones.begin(); it != m_Bones.end(); it++)
-            if (it->index == bone_index) return &(*it);
+            if (it->index == bone_index)
+                return &(*it);
         return 0;
     }
     SBoneInfo* get_nearest_bone_info(IKinematics* K, u16 bone_index);
@@ -100,7 +102,6 @@ public:
     }
 
     void SetParentVel(const Fvector& vel) { parent_vel = vel; }
-
     bool IsPlaying() { return m_bActiveBones; }
     virtual CParticlesPlayer* cast_particles_player() { return this; }
 };

@@ -8,9 +8,11 @@ u32 const kills_store::fetch_kills(Predicate& predicate, buffer_vector<kill>& de
     {
         for (kills_t::const_iterator ki = i->second->begin(), kie = i->second->end(); ki != kie; ++ki)
         {
-            if (predicate(i->first.first, i->first.second, *ki)) {
+            if (predicate(i->first.first, i->first.second, *ki))
+            {
                 ++ret_count;
-                if (dest_kills.capacity() == dest_kills.size()) continue;
+                if (dest_kills.capacity() == dest_kills.size())
+                    continue;
 
                 dest_kills.push_back(*ki);
             }
@@ -19,4 +21,4 @@ u32 const kills_store::fetch_kills(Predicate& predicate, buffer_vector<kill>& de
     return ret_count;
 }
 
-}  // namespace award_system
+} // namespace award_system

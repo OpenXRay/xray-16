@@ -50,7 +50,8 @@ static u32 get_next(u32 from, float& f_weight_per_task)
     for (u32 i = from; i < size; ++i)
     {
         weight += float(inlc_global_data()->g_deflectors()[i]->weight());
-        if (weight > f_weight_per_task) {
+        if (weight > f_weight_per_task)
+        {
             f_weight_per_task = weight;
             return i + 1;
         }
@@ -71,12 +72,13 @@ void net_lightmaps_add_all_tasks()
 
     get_intervals(num_tasks, size, local_num_tasks, stride, rest);
 
-    if (rest != 0) ++local_num_tasks;
+    if (rest != 0)
+        ++local_num_tasks;
 
     //
     u32 total_weight = 0;
-    xr_vector<CDeflector*>::const_iterator i = inlc_global_data()->g_deflectors().begin(),
-                                           e = inlc_global_data()->g_deflectors().end();
+    xr_vector<CDeflector *>::const_iterator i = inlc_global_data()->g_deflectors().begin(),
+                                            e = inlc_global_data()->g_deflectors().end();
     for (; i != e; ++i)
         total_weight += (*i)->weight();
 
@@ -86,7 +88,8 @@ void net_lightmaps_add_all_tasks()
 
     for (;;)
     {
-        if (local_num_tasks == 0) local_num_tasks = 1;
+        if (local_num_tasks == 0)
+            local_num_tasks = 1;
         float f_weight_per_task = f_weight / float(local_num_tasks);
         u32 to = get_next(from, f_weight_per_task);
         f_weight -= f_weight_per_task;
@@ -94,7 +97,8 @@ void net_lightmaps_add_all_tasks()
 
         net_lightmaps_add_task(from, to);
         from = to;
-        if (to >= size) break;
+        if (to >= size)
+            break;
     }
 }
 }

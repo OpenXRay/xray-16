@@ -174,8 +174,8 @@ public:
     virtual void cNameVisual_set(shared_str N) override;
     virtual shared_str shedule_Name() const override { return cName(); };
     // Properties
-    virtual void processing_activate() override;    // request to enable UpdateCL
-    virtual void processing_deactivate() override;  // request to disable UpdateCL
+    virtual void processing_activate() override; // request to enable UpdateCL
+    virtual void processing_deactivate() override; // request to disable UpdateCL
     virtual bool processing_enabled() override { return !!Props.bActiveCounter; }
     virtual void setVisible(BOOL _visible) override;
     virtual BOOL getVisible() const override { return Props.bVisible; }
@@ -218,21 +218,21 @@ public:
     static void u_EventSend(NET_Packet& P, u32 dwFlags = DPNSEND_GUARANTEED);
     // Methods
     virtual void Load(LPCSTR section) override;
-    virtual void UpdateCL() override;  // Called each frame, so no need for dt
+    virtual void UpdateCL() override; // Called each frame, so no need for dt
     virtual void OnChangeVisual() override;
     // object serialization
     virtual void net_Save(NET_Packet& packet) override;
     virtual void net_Load(IReader& reader) override;
     virtual BOOL net_SaveRelevant() override;
-    virtual void net_Export(NET_Packet& packet) override {}  // export to server
-    virtual void net_Import(NET_Packet& packet) override {}  // import from server
+    virtual void net_Export(NET_Packet& packet) override {} // export to server
+    virtual void net_Import(NET_Packet& packet) override {} // import from server
     virtual BOOL net_Spawn(CSE_Abstract* entity) override;
     virtual void net_Destroy() override;
     virtual void net_ImportInput(NET_Packet& packet) override {}
-    virtual BOOL net_Relevant() override { return getLocal(); }  // send messages only if active and local
+    virtual BOOL net_Relevant() override { return getLocal(); } // send messages only if active and local
     virtual void net_MigrateInactive(NET_Packet& packet) override { Props.net_Local = FALSE; }
     virtual void net_MigrateActive(NET_Packet& packet) override { Props.net_Local = TRUE; }
-    virtual void net_Relcase(IGameObject* O) override;  // destroy all links to another objects
+    virtual void net_Relcase(IGameObject* O) override; // destroy all links to another objects
     virtual void save(NET_Packet& output_packet) override;
     virtual void load(IReader& input_packet);
     // Position stack
@@ -240,8 +240,7 @@ public:
     virtual GameObjectSavedPosition ps_Element(u32 ID) const override;
     virtual void ForceTransform(const Fmatrix& m) override {}
     virtual void OnHUDDraw(CCustomHUD* hud) override {}
-    virtual BOOL Ready() override { return getReady(); }  // update only if active and fully initialized by/for network
-
+    virtual BOOL Ready() override { return getReady(); } // update only if active and fully initialized by/for network
     virtual void renderable_Render() override;
     virtual void OnEvent(NET_Packet& P, u16 type) override;
     virtual void Hit(SHit* pHDS) override {}
@@ -250,9 +249,9 @@ public:
     //игровое имя объекта
     virtual LPCSTR Name() const override;
     // Active/non active
-    virtual void OnH_B_Chield() override;  // before
+    virtual void OnH_B_Chield() override; // before
     virtual void OnH_B_Independent(bool just_before_destroy) override;
-    virtual void OnH_A_Chield() override;  // after
+    virtual void OnH_A_Chield() override; // after
     virtual void OnH_A_Independent() override;
     virtual void On_SetEntity() override {}
     virtual void On_LostEntity() override {}
@@ -280,14 +279,14 @@ public:
     virtual void reload(LPCSTR section) override;
     ///////////////////// network /////////////////////////////////////////
     virtual bool object_removed() const override { return m_bObjectRemoved; }
-    virtual void make_Interpolation() override {}  // interpolation from last visible to corrected position/rotation
-    virtual void PH_B_CrPr() override {}           // actions & operations before physic correction-prediction steps
-    virtual void PH_I_CrPr() override {}           // actions & operations after correction before prediction steps
+    virtual void make_Interpolation() override {} // interpolation from last visible to corrected position/rotation
+    virtual void PH_B_CrPr() override {} // actions & operations before physic correction-prediction steps
+    virtual void PH_I_CrPr() override {} // actions & operations after correction before prediction steps
 #ifdef DEBUG
     virtual void PH_Ch_CrPr() override {}
     virtual void dbg_DrawSkeleton() override;
 #endif
-    virtual void PH_A_CrPr() override {}  // actions & operations after phisic correction-prediction steps
+    virtual void PH_A_CrPr() override {} // actions & operations after phisic correction-prediction steps
     virtual void CrPr_SetActivationStep(u32 Step) override { m_dwCrPr_ActivationStep = Step; }
     virtual u32 CrPr_GetActivationStep() override { return m_dwCrPr_ActivationStep; }
     virtual void CrPr_SetActivated(bool Activate) override { m_bCrPr_Activated = Activate; }
@@ -357,11 +356,10 @@ public:
     virtual void set_nonscript_usable(bool usable) override;
     virtual CScriptBinderObject* GetScriptBinderObject() override { return scriptBinder.object(); }
     virtual void SetScriptBinderObject(CScriptBinderObject* object) override { scriptBinder.set_object(object); }
-
 protected:
     virtual void spawn_supplies();
 
-private:  // XXX: move to GameObjectBase
+private: // XXX: move to GameObjectBase
     void init();
     void setup_parent_ai_locations(bool assign_position = true);
     void validate_ai_locations(bool decrement_reference = true);
@@ -371,4 +369,4 @@ private:  // XXX: move to GameObjectBase
 };
 #pragma pack(pop)
 
-#endif  // !defined(AFX_GAMEOBJECT_H__3DA72D03_C759_4688_AEBB_89FA812AA873__INCLUDED_)
+#endif // !defined(AFX_GAMEOBJECT_H__3DA72D03_C759_4688_AEBB_89FA812AA873__INCLUDED_)

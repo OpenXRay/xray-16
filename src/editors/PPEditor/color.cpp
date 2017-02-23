@@ -12,7 +12,8 @@
 __fastcall TAddColorForm::TAddColorForm(TComponent* Owner, _pp_params p)
     : TForm(Owner), m_pp_params(p), m_bLocked(false)
 {
-    if (m_pp_params == pp_base_color) {
+    if (m_pp_params == pp_base_color)
+    {
         RedValue->MinValue = -1.0f;
         GreenValue->MinValue = -1.0f;
         BlueValue->MinValue = -1.0f;
@@ -79,12 +80,17 @@ __fastcall TAddColorForm::TAddColorForm(TComponent* Owner, _pp_params p)
 */
 void __fastcall TAddColorForm::TimeValueExit(TObject* Sender)
 {
-    if (m_bLocked) return;
-    if (MainForm->PointList->ItemIndex == -1) return;
+    if (m_bLocked)
+        return;
+    if (MainForm->PointList->ItemIndex == -1)
+        return;
     TMultiObjSpinEdit* spin = dynamic_cast<TMultiObjSpinEdit*>(Sender);
-    if (spin->Color == clLime) {
-        if (TimeValue->Value < TimeValue->MinValue) TimeValue->Value = TimeValue->MinValue;
-        if (TimeValue->Value > TimeValue->MaxValue) TimeValue->Value = TimeValue->MaxValue;
+    if (spin->Color == clLime)
+    {
+        if (TimeValue->Value < TimeValue->MinValue)
+            TimeValue->Value = TimeValue->MinValue;
+        if (TimeValue->Value > TimeValue->MaxValue)
+            TimeValue->Value = TimeValue->MaxValue;
 
         CPostProcessParam* cparam = MainForm->m_Animator->GetParam(GetTimeChannel());
 
@@ -97,7 +103,8 @@ void __fastcall TAddColorForm::TimeValueExit(TObject* Sender)
         cparam->add_value(time, GreenValue->Value, 1);
         cparam->add_value(time, BlueValue->Value, 2);
 
-        if (m_pp_params == pp_gray_color) {
+        if (m_pp_params == pp_gray_color)
+        {
             cparam = MainForm->m_Animator->GetParam(pp_gray_value);
             cparam->delete_value(time_prev);
             cparam->add_value(time, IntensityValue->Value, 0);
@@ -115,8 +122,10 @@ void __fastcall TAddColorForm::TimeValueExit(TObject* Sender)
 
 void __fastcall TAddColorForm::CnahgeParam(TObject* Sender)
 {
-    if (m_bLocked) return;
-    if (MainForm->PointList->ItemIndex == -1) return;
+    if (m_bLocked)
+        return;
+    if (MainForm->PointList->ItemIndex == -1)
+        return;
     TMultiObjSpinEdit* spin = dynamic_cast<TMultiObjSpinEdit*>(Sender);
     spin->Color = clLime;
 }
@@ -135,7 +144,8 @@ void TAddColorForm::Clear()
 
 void TAddColorForm::ShowCurrent(u32 keyIdx)
 {
-    if (keyIdx == -1) {
+    if (keyIdx == -1)
+    {
         Clear();
         return;
     }
@@ -163,7 +173,8 @@ void TAddColorForm::ShowCurrent(u32 keyIdx)
     GreenValue->Value = val;
     cparam->get_value(time, val, 2);
     BlueValue->Value = val;
-    if (m_pp_params == pp_gray_color) {
+    if (m_pp_params == pp_gray_color)
+    {
         CPostProcessParam* cparam = MainForm->m_Animator->GetParam(pp_gray_value);
 
         cparam->get_value(time, val, 0);
@@ -196,7 +207,8 @@ void TAddColorForm::AddNew(u32 keyIdx)
 
 void TAddColorForm::Remove(u32 keyIdx)
 {
-    if (keyIdx == -1) return;
+    if (keyIdx == -1)
+        return;
 
     CPostProcessParam* cparam = MainForm->m_Animator->GetParam(GetTimeChannel());
 
@@ -204,7 +216,8 @@ void TAddColorForm::Remove(u32 keyIdx)
 
     cparam->delete_value(time);
 
-    if (m_pp_params == pp_gray_color) {
+    if (m_pp_params == pp_gray_color)
+    {
         cparam = MainForm->m_Animator->GetParam(pp_gray_value);
         cparam->delete_value(time);
     }
@@ -215,7 +228,8 @@ void TAddColorForm::RemoveAllKeys()
     CPostProcessParam* cparam = MainForm->m_Animator->GetParam(GetTimeChannel());
     cparam->clear_all_keys();
 
-    if (m_pp_params == pp_gray_color) {
+    if (m_pp_params == pp_gray_color)
+    {
         cparam = MainForm->m_Animator->GetParam(pp_gray_value);
         cparam->clear_all_keys();
     }
@@ -229,7 +243,8 @@ void TAddColorForm::CreateKey(float time)
     cparam->add_value(time, 0.0f, 1);
     cparam->add_value(time, 0.0f, 2);
 
-    if (m_pp_params == pp_gray_color) {
+    if (m_pp_params == pp_gray_color)
+    {
         cparam = MainForm->m_Animator->GetParam(pp_gray_value);
         cparam->add_value(time, 0.0f, 0);
     }
@@ -243,12 +258,13 @@ void __fastcall TAddColorForm::ColorClick(TObject* Sender)
 
     ColorDialog->Color = color_rgba((BlueValue->Value - BlueValue->MinValue) / kl,
         (GreenValue->Value - GreenValue->MinValue) / kl, (RedValue->Value - RedValue->MinValue) / kl, 0.0f);
-    if (ColorDialog->Execute()) {
+    if (ColorDialog->Execute())
+    {
         TColor clr = ColorDialog->Color;
 
         RedValue->Value = RedValue->MinValue + color_get_B(clr) * kl;
         GreenValue->Value = GreenValue->MinValue + color_get_G(clr) * kl;
-        BlueValue->Value = BlueValue->MinValue + color_get_R(clr) * kl;  // /255
+        BlueValue->Value = BlueValue->MinValue + color_get_R(clr) * kl; // /255
 
         TimeValueExit(RedValue);
     }
@@ -258,7 +274,8 @@ void __fastcall TAddColorForm::ColorClick(TObject* Sender)
 
 void __fastcall TAddColorForm::TimeValueKeyDown(TObject* Sender, WORD& Key, TShiftState Shift)
 {
-    if (Key == VK_RETURN) TimeValueExit(Sender);
+    if (Key == VK_RETURN)
+        TimeValueExit(Sender);
 }
 
 //---------------------------------------------------------------------------

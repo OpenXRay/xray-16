@@ -20,7 +20,6 @@ public:
 
 public:
     virtual Fvector2* getTC0() { return tc; };
-
     // bool				VContains			( _vertex* pV);					// Does the face contains this vertex?
     // void				VReplace			( _vertex* what, _vertex* to);	// Replace ONE vertex by ANOTHER
     // void				VReplace_NoRemove	( _vertex* what, _vertex* to);

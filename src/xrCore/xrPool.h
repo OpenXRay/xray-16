@@ -36,7 +36,8 @@ public:
     }
     T* create()
     {
-        if (0 == list) block_create();
+        if (0 == list)
+            block_create();
 
         T* E = list;
         list = *access(list);

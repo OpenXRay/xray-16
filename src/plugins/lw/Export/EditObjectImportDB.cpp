@@ -16,7 +16,8 @@ DEFINE_MAP(void*, int, VMIndexLink, VMIndexLinkIt);
 
 bool CEditableObject::Import_LWO(st_ObjectDB* I)
 {
-    if (I) {
+    if (I)
+    {
         bool bResult = true;
 
         // parse lwo object
@@ -40,7 +41,8 @@ bool CEditableObject::Import_LWO(st_ObjectDB* I)
                     Osf->SetTexture(EFS.UpdateTextureNameWithFolder(tex_name));
                     Osf->SetVMap("");
 
-                    if (!Osf->_Texture() || !Osf->_Texture()[0]) {
+                    if (!Osf->_Texture() || !Osf->_Texture()[0])
+                    {
                         g_msg->error("Can't create shader. Textures empty. Invalid surface:. ", Osf->_Name());
                         bResult = false;
                         break;
@@ -52,7 +54,8 @@ bool CEditableObject::Import_LWO(st_ObjectDB* I)
                     Osf->SetFVF(D3DFVF_XYZ | D3DFVF_NORMAL | (Isf->tex_cnt << D3DFVF_TEXCOUNT_SHIFT));
                 }
             }
-            if (bResult) {
+            if (bResult)
+            {
                 // mesh
                 do
                 {
@@ -66,7 +69,8 @@ bool CEditableObject::Import_LWO(st_ObjectDB* I)
                     // vmaps
                     DBVMap* Ivmap = 0;
                     int vmap_count = 0;
-                    if (I->nvertmaps == 0) {
+                    if (I->nvertmaps == 0)
+                    {
                         g_msg->error("Import LWO: Mesh layer must contain UV!", 0);
                         bResult = false;
                         break;
@@ -83,7 +87,8 @@ bool CEditableObject::Import_LWO(st_ObjectDB* I)
                         {
                         case LWVMAP_TXUV:
                         {
-                            if (Ivmap->dim != 2) {
+                            if (Ivmap->dim != 2)
+                            {
                                 g_msg->error("Import LWO: 'UV Map' must contain 2 value!", 0);
                                 bResult = false;
                                 break;
@@ -100,7 +105,8 @@ bool CEditableObject::Import_LWO(st_ObjectDB* I)
                         break;
                         case LWVMAP_WGHT:
                         {
-                            if (Ivmap->dim != 1) {
+                            if (Ivmap->dim != 1)
+                            {
                                 g_msg->error("Import LWO: 'Weight' must contain 1 value!", 0);
                                 bResult = false;
                                 break;
@@ -140,9 +146,11 @@ bool CEditableObject::Import_LWO(st_ObjectDB* I)
                             bResult = false;
                             break;
                         }
-                        if (!bResult) break;
+                        if (!bResult)
+                            break;
                     }
-                    if (!bResult) break;
+                    if (!bResult)
+                        break;
                     // points
                     {
                         MESH->m_Points.resize(I->npoints);
@@ -157,7 +165,8 @@ bool CEditableObject::Import_LWO(st_ObjectDB* I)
                             sort(a_lst.begin(), a_lst.end());
                         }
                     }
-                    if (!bResult) break;
+                    if (!bResult)
+                        break;
                     // polygons
                     MESH->m_Faces.resize(I->npolygons);
                     MESH->m_VMRefs.reserve(I->npolygons * 3);
@@ -167,7 +176,8 @@ bool CEditableObject::Import_LWO(st_ObjectDB* I)
                     {
                         st_Face& Mpol = MESH->m_Faces[p_i];
                         DBPolygon& Ipol = I->pol[p_i];
-                        if (Ipol.nverts != 3) {
+                        if (Ipol.nverts != 3)
+                        {
                             g_msg->error("Import LWO: Face must contain only 3 vertices!", 0);
                             bResult = false;
                             break;
@@ -184,14 +194,16 @@ bool CEditableObject::Import_LWO(st_ObjectDB* I)
 
                             // parse uv-map
                             int vmp_cnt = Ipv.nvmaps;
-                            if (vmp_cnt) {
+                            if (vmp_cnt)
+                            {
                                 // берем из poly
                                 for (int vm_i = 0; vm_i < vmp_cnt; vm_i++)
                                 {
-                                    if (Ipv.vm[vm_i].vmap->type != LWVMAP_TXUV) continue;
+                                    if (Ipv.vm[vm_i].vmap->type != LWVMAP_TXUV)
+                                        continue;
                                     vm_lst.push_back(st_VMapPt());
                                     st_VMapPt& pt = vm_lst.back();
-                                    pt.vmap_index = VMIndices[Ipv.vm[vm_i].vmap];  // номер моей VMap
+                                    pt.vmap_index = VMIndices[Ipv.vm[vm_i].vmap]; // номер моей VMap
                                     pt.index = Ipv.vm[vm_i].index;
                                 }
                             }
@@ -200,17 +212,19 @@ bool CEditableObject::Import_LWO(st_ObjectDB* I)
                                 // берем из points
                                 DBPoint& Ipt = I->pt[Mpv.pindex];
                                 int vm_cnt = Ipt.nvmaps;
-                                if (!vm_cnt) {
+                                if (!vm_cnt)
+                                {
                                     g_msg->error("Can't find polygon/point UV-map!", 0);
                                     bResult = false;
                                     break;
                                 }
                                 for (int vm_i = 0; vm_i < vm_cnt; vm_i++)
                                 {
-                                    if (Ipt.vm[vm_i].vmap->type != LWVMAP_TXUV) continue;
+                                    if (Ipt.vm[vm_i].vmap->type != LWVMAP_TXUV)
+                                        continue;
                                     vm_lst.push_back(st_VMapPt());
                                     st_VMapPt& pt = vm_lst.back();
-                                    pt.vmap_index = VMIndices[Ipt.vm[vm_i].vmap];  // номер моей VMap
+                                    pt.vmap_index = VMIndices[Ipt.vm[vm_i].vmap]; // номер моей VMap
                                     pt.index = Ipt.vm[vm_i].index;
                                 }
                             }
@@ -220,33 +234,39 @@ bool CEditableObject::Import_LWO(st_ObjectDB* I)
                             int vm_cnt = Ipt.nvmaps;
                             for (int vm_i = 0; vm_i < vm_cnt; vm_i++)
                             {
-                                if (Ipt.vm[vm_i].vmap->type != LWVMAP_WGHT) continue;
+                                if (Ipt.vm[vm_i].vmap->type != LWVMAP_WGHT)
+                                    continue;
                                 vm_lst.push_back(st_VMapPt());
                                 st_VMapPt& pt = vm_lst.back();
-                                pt.vmap_index = VMIndices[Ipt.vm[vm_i].vmap];  // номер моей VMap
+                                pt.vmap_index = VMIndices[Ipt.vm[vm_i].vmap]; // номер моей VMap
                                 pt.index = Ipt.vm[vm_i].index;
                             }
                         }
-                        if (!bResult) break;
+                        if (!bResult)
+                            break;
                         // Ipol.surf->alpha_mode - заполнено как номер моего surface
                         surf_ids[p_i] = Ipol.sindex;
                     }
-                    if (!bResult) break;
+                    if (!bResult)
+                        break;
                     int p_idx = 0;
                     for (FaceIt pl_it = MESH->m_Faces.begin(); pl_it != MESH->m_Faces.end(); pl_it++)
                     {
                         MESH->m_SurfFaces[m_Surfaces[surf_ids[p_idx]]].push_back(p_idx);
                         p_idx++;
                     }
-                    if ((MESH->GetVertexCount() < 4) || (MESH->GetFaceCount() < 2)) {
+                    if ((MESH->GetVertexCount() < 4) || (MESH->GetFaceCount() < 2))
+                    {
                         ELog.Msg(mtError, "Invalid mesh: '%s'. Faces<2 or Verts<4", MESH->GetName());
                         bResult = false;
                     }
-                    if (!bResult) break;
+                    if (!bResult)
+                        break;
                     MESH->RecomputeBBox();
 
                     // check weight maps
-                    if (!m_Bones.empty()) {
+                    if (!m_Bones.empty())
+                    {
                         for (BoneIt b_it = m_Bones.begin(); b_it != m_Bones.end(); b_it++)
                         {
                             if ((*b_it)->WMap()[0] &&
@@ -258,12 +278,15 @@ bool CEditableObject::Import_LWO(st_ObjectDB* I)
                             }
                         }
                     }
-                    if (bResult) MESH->RebuildVMaps();
+                    if (bResult)
+                        MESH->RebuildVMaps();
                 } while (0);
             }
         }
-        if (!bResult) g_msg->error("Can't parse LWO object.", 0);
-        if (bResult) {
+        if (!bResult)
+            g_msg->error("Can't parse LWO object.", 0);
+        if (bResult)
+        {
             // fill default bone part
             m_BoneParts.push_back(SBonePart());
             SBonePart& BP = m_BoneParts.back();

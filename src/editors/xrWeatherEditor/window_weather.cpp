@@ -13,16 +13,8 @@
 using editor::window_weather;
 using System::Object;
 
-Void window_weather::window_weather_Leave(Object ^ sender, EventArgs ^ e)
-{
-    m_ide->view().property_grid(PropertyGrid);
-}
-
-Void window_weather::SaveButton_Click(Object ^ sender, EventArgs ^ e)
-{
-    m_ide->engine().save_weathers();
-}
-
+Void window_weather::window_weather_Leave(Object ^ sender, EventArgs ^ e) { m_ide->view().property_grid(PropertyGrid); }
+Void window_weather::SaveButton_Click(Object ^ sender, EventArgs ^ e) { m_ide->engine().save_weathers(); }
 Void window_weather::ReloadWeatherButton_Click(Object ^ sender, EventArgs ^ e)
 {
     m_ide->engine().reload_current_weather();

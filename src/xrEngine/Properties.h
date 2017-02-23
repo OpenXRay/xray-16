@@ -14,16 +14,16 @@
 enum xrProperties
 {
     xrPID_MARKER = 0,
-    xrPID_MATRIX,    // really only name(stringZ) is written into stream
-    xrPID_CONSTANT,  // really only name(stringZ) is written into stream
-    xrPID_TEXTURE,   // really only name(stringZ) is written into stream
+    xrPID_MATRIX, // really only name(stringZ) is written into stream
+    xrPID_CONSTANT, // really only name(stringZ) is written into stream
+    xrPID_TEXTURE, // really only name(stringZ) is written into stream
     xrPID_INTEGER,
     xrPID_FLOAT,
     xrPID_BOOL,
     xrPID_TOKEN,
     xrPID_CLSID,
-    xrPID_OBJECT,  // really only name(stringZ) is written into stream
-    xrPID_STRING,  // really only name(stringZ) is written into stream
+    xrPID_OBJECT, // really only name(stringZ) is written into stream
+    xrPID_STRING, // really only name(stringZ) is written into stream
     xrPID_MARKER_TEMPLATE,
     xrPID_FORCEDWORD = u32(-1)
 };
@@ -100,17 +100,14 @@ IC void xrPWRITE(IWriter& fs, u32 ID, LPCSTR name, LPCVOID data, u32 size)
 {
     fs.w_u32(ID);
     fs.w_stringZ(name);
-    if (data && size) fs.w(data, size);
+    if (data && size)
+        fs.w(data, size);
 }
-IC void xrPWRITE_MARKER(IWriter& fs, LPCSTR name)
-{
-    xrPWRITE(fs, xrPID_MARKER, name, 0, 0);
-}
-
-#define xrPWRITE_PROP(FS, name, ID, data)                                                                              \
+IC void xrPWRITE_MARKER(IWriter& fs, LPCSTR name) { xrPWRITE(fs, xrPID_MARKER, name, 0, 0); }
+#define xrPWRITE_PROP(FS, name, ID, data)            \
     \
-{                                                                                                               \
-        xrPWRITE(fs, ID, name, &data, sizeof(data));                                                                   \
+{                                             \
+        xrPWRITE(fs, ID, name, &data, sizeof(data)); \
     \
 }
 
@@ -121,21 +118,17 @@ IC u32 xrPREAD(IReader& fs)
     fs.skip_stringZ();
     return T;
 }
-IC void xrPREAD_MARKER(IReader& fs)
-{
-    R_ASSERT(xrPID_MARKER == xrPREAD(fs));
-}
-
-#define xrPREAD_PROP(fs, ID, data)                                                                                     \
+IC void xrPREAD_MARKER(IReader& fs) { R_ASSERT(xrPID_MARKER == xrPREAD(fs)); }
+#define xrPREAD_PROP(fs, ID, data)                                                                 \
     \
-{                                                                                                               \
-        R_ASSERT(ID == xrPREAD(fs));                                                                                   \
-        fs.r(&data, sizeof(data));                                                                                     \
-        switch (ID)                                                                                                    \
-        {                                                                                                              \
-        case xrPID_TOKEN: fs.advance(((xrP_TOKEN*)&data)->Count * sizeof(xrP_TOKEN::Item)); break;                     \
-        case xrPID_CLSID: fs.advance(((xrP_CLSID*)&data)->Count * sizeof(CLASS_ID)); break;                            \
-        };                                                                                                             \
+{                                                                                           \
+        R_ASSERT(ID == xrPREAD(fs));                                                               \
+        fs.r(&data, sizeof(data));                                                                 \
+        switch (ID)                                                                                \
+        {                                                                                          \
+        case xrPID_TOKEN: fs.advance(((xrP_TOKEN*)&data)->Count * sizeof(xrP_TOKEN::Item)); break; \
+        case xrPID_CLSID: fs.advance(((xrP_CLSID*)&data)->Count * sizeof(CLASS_ID)); break;        \
+        };                                                                                         \
     \
 }
 
@@ -156,4 +149,4 @@ IC void xrPREAD_MARKER(IReader& fs)
 // };
 //}
 #pragma pack(pop)
-#endif  // xrPROPERTIES_H
+#endif // xrPROPERTIES_H

@@ -20,12 +20,12 @@ public:
     struct private_key_t
     {
         u8 m_value[private_key_length];
-    };  // struct private_key_t
+    }; // struct private_key_t
 
     struct public_key_t
     {
         u8 m_value[public_key_length];
-    };  // struct public_key_t
+    }; // struct public_key_t
 
     shared_str const sign(private_key_t const& priv_key, u8 const* data, u32 const data_size);
     bool verify(public_key_t const& pub_key, u8 const* data, u32 const data_size, shared_str const& dsign);
@@ -36,8 +36,8 @@ public:
 
 private:
     dsa_st* m_dsa;
-};  // class xr_dsa
+}; // class xr_dsa
 
-}  // namespace crypto
+} // namespace crypto
 
-#endif  //#ifndef XR_DSA_INCLUDED
+#endif //#ifndef XR_DSA_INCLUDED

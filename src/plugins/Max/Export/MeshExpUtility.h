@@ -61,7 +61,6 @@ public:
     void EndEditParams(Interface* ip, IUtil* iu);
     void SelectionSetChanged(Interface* ip, IUtil* iu);
     void DeleteThis() {}
-
     void Init(HWND hWnd);
     void Destroy(HWND hWnd);
     void ExportObject();

@@ -36,7 +36,6 @@ public:
     void save(CInifile& config);
     void fill(editor::property_holder_collection* collection);
     inline LPCSTR id() const { return section.c_str(); }
-
 private:
     LPCSTR xr_stdcall id_getter() const;
     void xr_stdcall id_setter(LPCSTR value);
@@ -58,11 +57,11 @@ private:
 
 public:
     manager const& m_manager;
-};  // class collection
-}  // namespace thunderbolts
-}  // namespace environment
-}  // namespace editor
+}; // class collection
+} // namespace thunderbolts
+} // namespace environment
+} // namespace editor
 
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR
 
-#endif  // ifndef EDITOR_WEATHER_THUNDERBOLTS_COLLECTION_ID_HPP_INCLUDED
+#endif // ifndef EDITOR_WEATHER_THUNDERBOLTS_COLLECTION_ID_HPP_INCLUDED

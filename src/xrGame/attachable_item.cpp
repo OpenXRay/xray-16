@@ -18,11 +18,7 @@
 CAttachableItem* CAttachableItem::m_dbgItem = NULL;
 #endif
 
-CPhysicsShellHolder& CAttachableItem::object() const
-{
-    return (item().object());
-}
-
+CPhysicsShellHolder& CAttachableItem::object() const { return (item().object()); }
 IFactoryObject* CAttachableItem::_construct()
 {
     VERIFY(!m_item);
@@ -31,22 +27,21 @@ IFactoryObject* CAttachableItem::_construct()
     return (&item().object());
 }
 
-CAttachableItem::~CAttachableItem()
-{
-}
-
+CAttachableItem::~CAttachableItem() {}
 void CAttachableItem::reload(LPCSTR section)
 {
 #ifdef DEBUG
     m_valid = true;
 #endif
 
-    if (load_attach_position(section)) enable(false);
+    if (load_attach_position(section))
+        enable(false);
 }
 
 bool CAttachableItem::load_attach_position(LPCSTR section)
 {
-    if (!pSettings->line_exist(section, "attach_angle_offset")) return false;
+    if (!pSettings->line_exist(section, "attach_angle_offset"))
+        return false;
 
     Fvector angle_offset = pSettings->r_fvector3(section, "attach_angle_offset");
     Fvector position_offset = pSettings->r_fvector3(section, "attach_position_offset");
@@ -59,7 +54,8 @@ bool CAttachableItem::load_attach_position(LPCSTR section)
 void CAttachableItem::OnH_A_Chield()
 {
     const CInventoryOwner* inventory_owner = smart_cast<const CInventoryOwner*>(object().H_Parent());
-    if (inventory_owner && inventory_owner->attached(&item())) object().setVisible(true);
+    if (inventory_owner && inventory_owner->attached(&item()))
+        object().setVisible(true);
 }
 
 void CAttachableItem::renderable_Render()
@@ -68,32 +64,33 @@ void CAttachableItem::renderable_Render()
     GlobalEnv.Render->add_Visual(object().Visual());
 }
 
-void CAttachableItem::OnH_A_Independent()
-{
-    enable(false);
-}
-
+void CAttachableItem::OnH_A_Independent() { enable(false); }
 void CAttachableItem::enable(bool value)
 {
-    if (!object().H_Parent()) {
+    if (!object().H_Parent())
+    {
         m_enabled = value;
         return;
     }
 
-    if (value && !enabled() && object().H_Parent()) {
+    if (value && !enabled() && object().H_Parent())
+    {
         CGameObject* game_object = smart_cast<CGameObject*>(object().H_Parent());
         CAttachmentOwner* owner = smart_cast<CAttachmentOwner*>(game_object);
-        if (owner) {
+        if (owner)
+        {
             m_enabled = value;
             owner->attach(&item());
             object().setVisible(true);
         }
     }
 
-    if (!value && enabled() && object().H_Parent()) {
+    if (!value && enabled() && object().H_Parent())
+    {
         CGameObject* game_object = smart_cast<CGameObject*>(object().H_Parent());
         CAttachmentOwner* owner = smart_cast<CAttachmentOwner*>(game_object);
-        if (owner) {
+        if (owner)
+        {
             m_enabled = value;
             owner->detach(&item());
             object().setVisible(false);
@@ -103,11 +100,14 @@ void CAttachableItem::enable(bool value)
 
 bool CAttachableItem::can_be_attached() const
 {
-    if (!item().m_pInventory) return (false);
+    if (!item().m_pInventory)
+        return (false);
 
-    if (!item().m_pInventory->IsBeltUseful()) return (true);
+    if (!item().m_pInventory->IsBeltUseful())
+        return (true);
 
-    if (item().m_ItemCurrPlace.type != eItemPlaceBelt) return (false);
+    if (item().m_ItemCurrPlace.type != eItemPlaceBelt)
+        return (false);
 
     return (true);
 }
@@ -132,7 +132,8 @@ float ATT_ITEM_ROT_STEP = 0.01f;
 
 void attach_adjust_mode_keyb(int dik)
 {
-    if (!CAttachableItem::m_dbgItem) return;
+    if (!CAttachableItem::m_dbgItem)
+        return;
 
     bool b_move = !!(pInput->iGetAsyncKeyState(DIK_LSHIFT));
     bool b_rot = !!(pInput->iGetAsyncKeyState(DIK_LMENU));
@@ -142,9 +143,11 @@ void attach_adjust_mode_keyb(int dik)
         axis = 0;
     else if (pInput->iGetAsyncKeyState(DIK_X))
         axis = 1;
-    if (pInput->iGetAsyncKeyState(DIK_C)) axis = 2;
+    if (pInput->iGetAsyncKeyState(DIK_C))
+        axis = 2;
 
-    if (!b_move && !b_rot) return;
+    if (!b_move && !b_rot)
+        return;
 
     switch (dik)
     {
@@ -185,7 +188,8 @@ void attach_adjust_mode_keyb(int dik)
 
 void attach_draw_adjust_mode()
 {
-    if (!CAttachableItem::m_dbgItem) return;
+    if (!CAttachableItem::m_dbgItem)
+        return;
 
     string1024 _text;
 
@@ -212,4 +216,4 @@ void attach_draw_adjust_mode()
     xr_sprintf(_text, "attach_angle_offset IS [%3.3f][%3.3f][%3.3f]", _ang.x, _ang.y, _ang.z);
     F->OutNext(_text);
 }
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG

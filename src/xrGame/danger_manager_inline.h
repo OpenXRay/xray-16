@@ -20,22 +20,7 @@ IC void CDangerManager::reset()
     m_selected = 0;
 }
 
-IC const CDangerObject* CDangerManager::selected() const
-{
-    return (m_selected);
-}
-
-IC const CDangerManager::OBJECTS& CDangerManager::objects() const
-{
-    return (m_objects);
-}
-
-IC u32 CDangerManager::time_line() const
-{
-    return (m_time_line);
-}
-
-IC void CDangerManager::time_line(u32 value)
-{
-    m_time_line = value;
-}
+IC const CDangerObject* CDangerManager::selected() const { return (m_selected); }
+IC const CDangerManager::OBJECTS& CDangerManager::objects() const { return (m_objects); }
+IC u32 CDangerManager::time_line() const { return (m_time_line); }
+IC void CDangerManager::time_line(u32 value) { m_time_line = value; }

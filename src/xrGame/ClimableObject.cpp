@@ -29,33 +29,28 @@ IC void OrientToNorm(const Fvector& normal, Fmatrix& form, Fobb& box)
     for (int i = 1; 3 > i; ++i)
     {
         float dot_pr = abs(ax_pointer[i].dotproduct(normal));
-        if (max_dot < dot_pr) {
+        if (max_dot < dot_pr)
+        {
             max_ax_i = i;
             max_dot = dot_pr;
         }
-        if (min_size > s_pointer[i]) {
+        if (min_size > s_pointer[i])
+        {
             min_size_i = i;
             min_size = s_pointer[i];
         }
     }
     VERIFY(min_size_i == max_ax_i);
-    if (ax_pointer[max_ax_i].dotproduct(normal) < 0.f) {
+    if (ax_pointer[max_ax_i].dotproduct(normal) < 0.f)
+    {
         ax_pointer[max_ax_i].invert();
         ax_pointer[(max_ax_i + 1) % 3].invert();
     }
 }
 
-CClimableObject::CClimableObject() : m_pStaticShell(NULL), m_material(u16(-1))
-{
-}
-
-CClimableObject::~CClimableObject()
-{
-}
-void CClimableObject::Load(LPCSTR section)
-{
-    inherited::Load(section);
-}
+CClimableObject::CClimableObject() : m_pStaticShell(NULL), m_material(u16(-1)) {}
+CClimableObject::~CClimableObject() {}
+void CClimableObject::Load(LPCSTR section) { inherited::Load(section); }
 BOOL CClimableObject::net_Spawn(CSE_Abstract* DC)
 {
     CSE_Abstract* e = (CSE_Abstract*)(DC);
@@ -101,7 +96,8 @@ BOOL CClimableObject::net_Spawn(CSE_Abstract* DC)
 
     m_pStaticShell = P_BuildLeaderGeomShell(this, ObjectContactCallback, m_box);
 
-    if (m_axis.y < 0.f) {
+    if (m_axis.y < 0.f)
+    {
         m_axis.invert();
         m_side.invert();
     }
@@ -118,24 +114,17 @@ void CClimableObject::net_Destroy()
     // m_pStaticShell->Deactivate();
     // xr_delete(m_pStaticShell);
 }
-void CClimableObject::shedule_Update(u32 dt)  // Called by shedule
+void CClimableObject::shedule_Update(u32 dt) // Called by shedule
 {
     inherited::shedule_Update(dt);
 }
-void CClimableObject::UpdateCL()  // Called each frame, so no need for d
+void CClimableObject::UpdateCL() // Called each frame, so no need for d
 {
     inherited::UpdateCL();
 }
 
-void CClimableObject::Center(Fvector& C) const
-{
-    C.set(XFORM().c);
-}
-float CClimableObject::Radius() const
-{
-    return m_radius;
-}
-
+void CClimableObject::Center(Fvector& C) const { C.set(XFORM().c); }
+float CClimableObject::Radius() const { return m_radius; }
 float CClimableObject::DDLowerP(CPHCharacter* actor, Fvector& out_dir) const
 {
     VERIFY(actor);
@@ -155,9 +144,7 @@ float CClimableObject::DDUpperP(CPHCharacter* actor, Fvector& out_dir) const
     return to_mag_and_dir(out_dir);
 }
 
-void CClimableObject::DefineClimbState(CPHCharacter* actor) const
-{
-}
+void CClimableObject::DefineClimbState(CPHCharacter* actor) const {}
 float CClimableObject::DDAxis(Fvector& dir) const
 {
     dir.set(m_axis);
@@ -226,7 +213,8 @@ float CClimableObject::DDSideToAxis(CPHCharacter* actor, Fvector& dir) const
     side.set(m_side);
     to_mag_and_dir(side);
     float dot = side.dotproduct(dir);
-    if (dot > 0.f) {
+    if (dot > 0.f)
+    {
         dir.set(side);
         return dot;
     }
@@ -265,7 +253,7 @@ bool CClimableObject::InTouch(CPHCharacter* actor) const
     float foot_radius = actor->FootRadius();
     return (DDToPlain(actor, dir) < foot_radius + m_norm.magnitude() + normal_tolerance &&
                DDSideToAxis(actor, dir) < m_side.magnitude()) &&
-           InRange(actor);
+        InRange(actor);
 }
 
 float CClimableObject::AxDistToUpperP(CPHCharacter* actor) const
@@ -295,7 +283,7 @@ bool CClimableObject::InRange(CPHCharacter* actor) const
 {
     VERIFY(actor);
     return AxDistToLowerP(actor) > -down_leader_extension_tolerance &&
-           AxDistToUpperP(actor) + actor->FootRadius() > -up_leader_extension_tolerance;
+        AxDistToUpperP(actor) + actor->FootRadius() > -up_leader_extension_tolerance;
 }
 
 bool CClimableObject::BeforeLadder(CPHCharacter* actor, float tolerance /*=0.f*/) const
@@ -309,11 +297,7 @@ bool CClimableObject::BeforeLadder(CPHCharacter* actor, float tolerance /*=0.f*/
     return d.dotproduct(n) < -(width + actor->FootRadius() / 2.f + tolerance);
 }
 
-BOOL CClimableObject::UsedAI_Locations()
-{
-    return FALSE;
-}
-
+BOOL CClimableObject::UsedAI_Locations() { return FALSE; }
 void CClimableObject::ObjectContactCallback(
     bool& do_colide, bool bo1, dContact& c, SGameMtl* /*material_1*/, SGameMtl* /*material_2*/)
 {
@@ -324,7 +308,8 @@ void CClimableObject::ObjectContactCallback(
     CClimableObject* this_object = NULL;
     CPHCharacter* ch = NULL;
     float norm_sign = 0.f;
-    if (bo1) {
+    if (bo1)
+    {
         usr_data_ch = usr_data_2;
         usr_data_lad = usr_data_1;
         norm_sign = -1.f;
@@ -347,13 +332,15 @@ void CClimableObject::ObjectContactCallback(
     VERIFY(usr_data_lad);
     this_object = static_cast<CClimableObject*>(usr_data_lad->ph_ref_object);
     VERIFY(this_object);
-    if (!this_object->BeforeLadder(ch, -0.1f)) do_colide = false;
+    if (!this_object->BeforeLadder(ch, -0.1f))
+        do_colide = false;
 }
 #ifdef DEBUG
 extern Flags32 dbg_net_Draw_Flags;
 void CClimableObject::OnRender()
 {
-    if (!dbg_net_Draw_Flags.test(dbg_draw_climbable) && !ph_dbg_draw_mask.test(phDbgLadder)) return;
+    if (!dbg_net_Draw_Flags.test(dbg_draw_climbable) && !ph_dbg_draw_mask.test(phDbgLadder))
+        return;
 
     Fmatrix form;
     m_box.xform_get(form);

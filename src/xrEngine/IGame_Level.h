@@ -34,7 +34,6 @@ private:
 public:
     u32 Size() { return data.size(); }
     void ResetData() { data.clear(); }
-
     void AddItem(LPCSTR name_, LPCSTR value_, u32 color_ = RGB(255, 255, 255));
     void AddItem(shared_str& name_, LPCSTR value_, u32 color_ = RGB(255, 255, 255));
 
@@ -73,12 +72,11 @@ public:
     CObjectList Objects;
     CObjectSpace ObjectSpace;
     CCameraManager& Cameras() { return *m_pCameras; };
-
     BOOL bReady;
 
     CInifile* pLevel;
 
-public:  // deferred sound events
+public: // deferred sound events
     struct _esound_delegate
     {
         Feel::Sound* dest;
@@ -102,8 +100,8 @@ public:
     virtual void net_Update() = 0;
 
     virtual bool Load(u32 dwNum);
-    virtual bool Load_GameSpecific_Before() { return TRUE; };  // before object loading
-    virtual bool Load_GameSpecific_After() { return TRUE; };   // after object loading
+    virtual bool Load_GameSpecific_Before() { return TRUE; }; // before object loading
+    virtual bool Load_GameSpecific_After() { return TRUE; }; // after object loading
     virtual void Load_GameSpecific_CFORM(CDB::TRI* T, u32 count) = 0;
 
     virtual void OnFrame(void);
@@ -116,8 +114,8 @@ public:
     // Main interface
     IGameObject* CurrentEntity(void) const { return pCurrentEntity; }
     IGameObject* CurrentViewEntity(void) const { return pCurrentViewEntity; }
-    void SetEntity(IGameObject* O);      // { pCurrentEntity=pCurrentViewEntity=O; }
-    void SetViewEntity(IGameObject* O);  // { pCurrentViewEntity=O; }
+    void SetEntity(IGameObject* O); // { pCurrentEntity=pCurrentViewEntity=O; }
+    void SetViewEntity(IGameObject* O); // { pCurrentViewEntity=O; }
 
     void SoundEvent_Register(ref_sound_data_ptr S, float range);
     void SoundEvent_Dispatch();

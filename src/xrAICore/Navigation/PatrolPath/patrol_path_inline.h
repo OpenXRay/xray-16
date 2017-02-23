@@ -13,7 +13,8 @@ IC const CPatrolPath::CVertex* CPatrolPath::point(shared_str name) const
     const_vertex_iterator I = vertices().begin();
     const_vertex_iterator E = vertices().end();
     for (; I != E; ++I)
-        if ((*I).second->data().name() == name) return ((*I).second);
+        if ((*I).second->data().name() == name)
+            return ((*I).second);
     return (0);
 }
 
@@ -26,9 +27,11 @@ IC const CPatrolPath::CVertex* CPatrolPath::point(const Fvector& position, const
     const_vertex_iterator E = vertices().end();
     for (; I != E; ++I)
     {
-        if (!evaluator((*I).second->data().position())) continue;
+        if (!evaluator((*I).second->data().position()))
+            continue;
         float distance = (*I).second->data().position().distance_to_sqr(position);
-        if (distance < best_distance) {
+        if (distance < best_distance)
+        {
             best_distance = distance;
             nearest = (*I).second;
         }

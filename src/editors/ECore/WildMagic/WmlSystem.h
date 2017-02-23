@@ -47,7 +47,7 @@ namespace Wml
 {
 class WML_ITEM System
 {
-  public:
+public:
     // little/big endian support
     static void SwapBytes(int iSize, void* pvValue);
     static void SwapBytes(int iSize, int iQuantity, void* pvValue);

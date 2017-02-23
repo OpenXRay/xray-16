@@ -24,22 +24,22 @@
 
 int oe_write_page(ogg_page* page, FILE* fp);
 
-#define SETD(toset)                                                                                                    \
-    do                                                                                                                 \
-    {                                                                                                                  \
-        if (sscanf(opts[i].val, "%lf", &dval) != 1)                                                                    \
-            fprintf(stderr, "For option %s, couldn't read value %s as double\n", opts[i].arg, opts[i].val);            \
-        else                                                                                                           \
-            toset = dval;                                                                                              \
+#define SETD(toset)\
+    do\
+    {\
+        if (sscanf(opts[i].val, "%lf", &dval) != 1)\
+            fprintf(stderr, "For option %s, couldn't read value %s as double\n", opts[i].arg, opts[i].val);\
+        else\
+            toset = dval;\
     } while (0)
 
-#define SETL(toset)                                                                                                    \
-    do                                                                                                                 \
-    {                                                                                                                  \
-        if (sscanf(opts[i].val, "%ld", &lval) != 1)                                                                    \
-            fprintf(stderr, "For option %s, couldn't read value %s as integer\n", opts[i].arg, opts[i].val);           \
-        else                                                                                                           \
-            toset = lval;                                                                                              \
+#define SETL(toset)\
+    do\
+    {\
+        if (sscanf(opts[i].val, "%ld", &lval) != 1)\
+            fprintf(stderr, "For option %s, couldn't read value %s as integer\n", opts[i].arg, opts[i].val);\
+        else\
+            toset = lval;\
     } while (0)
 
 static void set_advanced_encoder_options(adv_opt* opts, int count, vorbis_info* vi)
@@ -56,7 +56,8 @@ static void set_advanced_encoder_options(adv_opt* opts, int count, vorbis_info* 
     {
         fprintf(stderr, _("Setting advanced encoder option \"%s\" to %s\n"), opts[i].arg, opts[i].val);
 
-        if (!xr_strcmp(opts[i].arg, "bitrate_average_damping")) {
+        if (!xr_strcmp(opts[i].arg, "bitrate_average_damping"))
+        {
             SETD(ai.bitrate_average_damping);
             manage = 1;
         }
@@ -105,8 +106,10 @@ static void set_advanced_encoder_options(adv_opt* opts, int count, vorbis_info* 
         }
     }
 
-    if (manage) {
-        if (vorbis_encode_ctl(vi, OV_ECTL_RATEMANAGE2_SET, &ai)) {
+    if (manage)
+    {
+        if (vorbis_encode_ctl(vi, OV_ECTL_RATEMANAGE2_SET, &ai))
+        {
             fprintf(stderr, "Failed to set advanced rate management parameters\n");
         }
     }
@@ -130,7 +133,8 @@ int oe_encode(oe_enc_opt* opt)
     int ret = 0;
     TIMER* timer;
 
-    if (opt->channels > 255) {
+    if (opt->channels > 255)
+    {
         fprintf(stderr, _("255 channels should be enough for anyone. (Sorry, vorbis doesn't support more)\n"));
         return 1;
     }
@@ -138,32 +142,37 @@ int oe_encode(oe_enc_opt* opt)
     /* get start time. */
     timer = timer_start();
 
-    if (!opt->managed && (opt->min_bitrate >= 0 || opt->max_bitrate >= 0)) {
+    if (!opt->managed && (opt->min_bitrate >= 0 || opt->max_bitrate >= 0))
+    {
         fprintf(stderr, _("Requesting a minimum or maximum bitrate requires --managed\n"));
         return 1;
     }
 
     /* if we had no quality or bitrate spec at all from the user, use
        the default quality with no management --Monty 20020711 */
-    if (opt->bitrate < 0 && opt->min_bitrate < 0 && opt->max_bitrate < 0) {
+    if (opt->bitrate < 0 && opt->min_bitrate < 0 && opt->max_bitrate < 0)
+    {
         opt->quality_set = 1;
     }
 
     opt->start_encode(opt->infilename, opt->filename, opt->bitrate, opt->quality, opt->quality_set, opt->managed,
-        opt->min_bitrate, opt->max_bitrate);
+    opt->min_bitrate, opt->max_bitrate);
 
     /* Have vorbisenc choose a mode for us */
     vorbis_info_init(&vi);
 
-    if (opt->quality_set > 0) {
-        if (vorbis_encode_setup_vbr(&vi, opt->channels, opt->rate, opt->quality)) {
+    if (opt->quality_set > 0)
+    {
+        if (vorbis_encode_setup_vbr(&vi, opt->channels, opt->rate, opt->quality))
+        {
             fprintf(stderr, _("Mode initialisation failed: invalid parameters for quality\n"));
             vorbis_info_clear(&vi);
             return 1;
         }
 
         /* do we have optional hard bitrate restrictions? */
-        if (opt->max_bitrate > 0 || opt->min_bitrate > 0) {
+        if (opt->max_bitrate > 0 || opt->min_bitrate > 0)
+        {
             struct ovectl_ratemanage2_arg ai;
             vorbis_encode_ctl(&vi, OV_ECTL_RATEMANAGE2_GET, &ai);
 
@@ -211,8 +220,8 @@ int oe_encode(oe_enc_opt* opt)
     else
     {
         if (vorbis_encode_setup_managed(&vi, opt->channels, opt->rate,
-                opt->max_bitrate > 0 ? opt->max_bitrate * 1000 : -1, opt->bitrate * 1000,
-                opt->min_bitrate > 0 ? opt->min_bitrate * 1000 : -1))
+            opt->max_bitrate > 0 ? opt->max_bitrate * 1000 : -1, opt->bitrate * 1000,
+            opt->min_bitrate > 0 ? opt->min_bitrate * 1000 : -1))
         {
             fprintf(stderr, _("Mode initialisation failed: invalid parameters for bitrate\n"));
             vorbis_info_clear(&vi);
@@ -220,7 +229,8 @@ int oe_encode(oe_enc_opt* opt)
         }
     }
 
-    if (opt->managed && opt->bitrate < 0) {
+    if (opt->managed && opt->bitrate < 0)
+    {
         struct ovectl_ratemanage2_arg ai;
         vorbis_encode_ctl(&vi, OV_ECTL_RATEMANAGE2_GET, &ai);
         ai.bitrate_average_kbps = -1;
@@ -264,9 +274,11 @@ int oe_encode(oe_enc_opt* opt)
 
         while ((result = ogg_stream_flush(&os, &og)) != 0)
         {
-            if (!result) break;
+            if (!result)
+                break;
             ret = oe_write_page(&og, opt->out);
-            if (ret != og.header_len + og.body_len) {
+            if (ret != og.header_len + og.body_len)
+            {
                 opt->error(_("Failed writing header to output stream\n"));
                 ret = 1;
                 goto cleanup; /* Bail and try to clean up stuff */
@@ -282,14 +294,16 @@ int oe_encode(oe_enc_opt* opt)
         float** buffer = vorbis_analysis_buffer(&vd, READSIZE);
         long samples_read = opt->read_samples(opt->readdata, buffer, READSIZE);
 
-        if (samples_read == 0) /* Tell the library that we wrote 0 bytes - signalling the end */
+        if (samples_read == 0)
+            /* Tell the library that we wrote 0 bytes - signalling the end */
             vorbis_analysis_wrote(&vd, 0);
         else
         {
             samplesdone += samples_read;
 
             /* Call progress update every 40 pages */
-            if (packetsdone >= 40) {
+            if (packetsdone >= 40)
+            {
                 double time;
 
                 packetsdone = 0;
@@ -323,10 +337,12 @@ int oe_encode(oe_enc_opt* opt)
                 while (!eos)
                 {
                     int result = ogg_stream_pageout(&os, &og);
-                    if (!result) break;
+                    if (!result)
+                        break;
 
                     ret = oe_write_page(&og, opt->out);
-                    if (ret != og.header_len + og.body_len) {
+                    if (ret != og.header_len + og.body_len)
+                    {
                         opt->error(_("Failed writing data to output stream\n"));
                         ret = 1;
                         goto cleanup; /* Bail */
@@ -334,7 +350,8 @@ int oe_encode(oe_enc_opt* opt)
                     else
                         bytes_written += ret;
 
-                    if (ogg_page_eos(&og)) eos = 1;
+                    if (ogg_page_eos(&og))
+                        eos = 1;
                 }
             }
         }
@@ -373,7 +390,7 @@ void update_statistics_full(char* fn, long total, long done, double time)
 
     fprintf(stderr, "\r");
     fprintf(stderr, _("\t[%5.1f%%] [%2dm%.2ds remaining] %c "), done * 100.0 / total, minutes, seconds,
-        spinner[spinpoint++ % 4]);
+    spinner[spinpoint++ % 4]);
 }
 
 void update_statistics_notime(char* fn, long total, long done, double time)
@@ -383,7 +400,7 @@ void update_statistics_notime(char* fn, long total, long done, double time)
 
     fprintf(stderr, "\r");
     fprintf(stderr, _("\tEncoding [%2dm%.2ds so far] %c "), ((int)time) / 60,
-        (int)(time - (double)((int)time / 60) * 60), spinner[spinpoint++ % 4]);
+    (int)(time - (double)((int)time / 60) * 60), spinner[spinpoint++ % 4]);
 }
 
 int oe_write_page(ogg_page* page, FILE* fp)
@@ -406,11 +423,11 @@ void final_statistics(char* fn, double time, int rate, long samples, long bytes)
     speed_ratio = (double)samples / (double)rate / time;
 
     fprintf(stderr, _("\n\tFile length:  %dm %04.1fs\n"), (int)(samples / rate / 60),
-        samples / rate - samples / rate / 60 * 60);
+    samples / rate - samples / rate / 60 * 60);
     fprintf(stderr, _("\tElapsed time: %dm %04.1fs\n"), (int)(time / 60), time - iFloor((float)time / 60) * 60);
     fprintf(stderr, _("\tRate:         %.4f\n"), speed_ratio);
     fprintf(
-        stderr, _("\tAverage bitrate: %.1f kb/s\n\n"), 8. / 1000. * ((double)bytes / ((double)samples / (double)rate)));
+    stderr, _("\tAverage bitrate: %.1f kb/s\n\n"), 8. / 1000. * ((double)bytes / ((double)samples / (double)rate)));
 }
 
 void final_statistics_null(char* fn, double time, int rate, long samples, long bytes)
@@ -418,16 +435,8 @@ void final_statistics_null(char* fn, double time, int rate, long samples, long b
     /* Don't do anything, this is just a placeholder function for quiet mode */
 }
 
-void update_statistics_null(char* fn, long total, long done, double time)
-{
-    /* So is this */
-}
-
-void encode_error(char* errmsg)
-{
-    fprintf(stderr, "\n%s\n", errmsg);
-}
-
+void update_statistics_null(char* fn, long total, long done, double time) { /* So is this */ }
+void encode_error(char* errmsg) { fprintf(stderr, "\n%s\n", errmsg); }
 static void print_brconstraints(int min, int max)
 {
     if (min > 0 && max > 0)
@@ -442,52 +451,54 @@ static void print_brconstraints(int min, int max)
 
 void start_encode_full(char* fn, char* outfn, int bitrate, float quality, int qset, int managed, int min, int max)
 {
-    if (bitrate > 0) {
-        if (managed > 0) {
+    if (bitrate > 0)
+    {
+        if (managed > 0)
+        {
             fprintf(stderr, _("Encoding %s%s%s to \n         "
                               "%s%s%s \nat average bitrate %d kbps "),
-                fn ? "\"" : "", fn ? fn : _("standard input"), fn ? "\"" : "", outfn ? "\"" : "",
-                outfn ? outfn : _("standard output"), outfn ? "\"" : "", bitrate);
+            fn ? "\"" : "", fn ? fn : _("standard input"), fn ? "\"" : "", outfn ? "\"" : "",
+            outfn ? outfn : _("standard output"), outfn ? "\"" : "", bitrate);
             print_brconstraints(min, max);
             fprintf(stderr, ", \nusing full bitrate management engine\n");
         }
         else
         {
             fprintf(stderr,
-                _("Encoding %s%s%s to \n         %s%s%s \nat approximate bitrate %d kbps (VBR encoding enabled)\n"),
-                fn ? "\"" : "", fn ? fn : _("standard input"), fn ? "\"" : "", outfn ? "\"" : "",
-                outfn ? outfn : _("standard output"), outfn ? "\"" : "", bitrate);
+            _("Encoding %s%s%s to \n         %s%s%s \nat approximate bitrate %d kbps (VBR encoding enabled)\n"),
+            fn ? "\"" : "", fn ? fn : _("standard input"), fn ? "\"" : "", outfn ? "\"" : "",
+            outfn ? outfn : _("standard output"), outfn ? "\"" : "", bitrate);
         }
     }
     else
     {
-        if (qset > 0) {
-            if (managed > 0) {
+        if (qset > 0)
+        {
+            if (managed > 0)
+            {
                 fprintf(stderr,
-                    _("Encoding %s%s%s to \n         %s%s%s \nat quality level %2.2f using constrained VBR "),
-                    fn ? "\"" : "", fn ? fn : _("standard input"), fn ? "\"" : "", outfn ? "\"" : "",
-                    outfn ? outfn : _("standard output"), outfn ? "\"" : "", quality * 10);
+                _("Encoding %s%s%s to \n         %s%s%s \nat quality level %2.2f using constrained VBR "),
+                fn ? "\"" : "", fn ? fn : _("standard input"), fn ? "\"" : "", outfn ? "\"" : "",
+                outfn ? outfn : _("standard output"), outfn ? "\"" : "", quality * 10);
                 print_brconstraints(min, max);
                 fprintf(stderr, "\n");
             }
             else
             {
                 fprintf(stderr, _("Encoding %s%s%s to \n         %s%s%s \nat quality %2.2f\n"), fn ? "\"" : "",
-                    fn ? fn : _("standard input"), fn ? "\"" : "", outfn ? "\"" : "",
-                    outfn ? outfn : _("standard output"), outfn ? "\"" : "", quality * 10);
+                fn ? fn : _("standard input"), fn ? "\"" : "", outfn ? "\"" : "", outfn ? outfn : _("standard output"),
+                outfn ? "\"" : "", quality * 10);
             }
         }
         else
         {
             fprintf(stderr, _("Encoding %s%s%s to \n         %s%s%s \nusing bitrate management "), fn ? "\"" : "",
-                fn ? fn : _("standard input"), fn ? "\"" : "", outfn ? "\"" : "", outfn ? outfn : _("standard output"),
-                outfn ? "\"" : "");
+            fn ? fn : _("standard input"), fn ? "\"" : "", outfn ? "\"" : "", outfn ? outfn : _("standard output"),
+            outfn ? "\"" : "");
             print_brconstraints(min, max);
             fprintf(stderr, "\n");
         }
     }
 }
 
-void start_encode_null(char* fn, char* outfn, int bitrate, float quality, int qset, int managed, int min, int max)
-{
-}
+void start_encode_null(char* fn, char* outfn, int bitrate, float quality, int qset, int managed, int min, int max) {}

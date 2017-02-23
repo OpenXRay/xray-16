@@ -9,11 +9,14 @@
 u32 CDbgScriptThreads::Fill()
 {
     u32 res = 0;
-    if (!scriptEngine) return res;
+    if (!scriptEngine)
+        return res;
     CScriptProcess* sp = scriptEngine->script_process(ScriptProcessor::Game);
-    if (sp) res += FillFrom(sp);
+    if (sp)
+        res += FillFrom(sp);
     sp = scriptEngine->script_process(ScriptProcessor::Level);
-    if (sp) res += FillFrom(sp);
+    if (sp)
+        res += FillFrom(sp);
     return res;
 }
 
@@ -38,7 +41,8 @@ lua_State* CDbgScriptThreads::FindScript(int nThreadID)
 {
     for (auto& thread : m_threads)
     {
-        if (thread.scriptID == nThreadID) return thread.lua;
+        if (thread.scriptID == nThreadID)
+            return thread.lua;
     }
     return nullptr;
 }

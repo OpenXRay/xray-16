@@ -50,7 +50,8 @@ void RunLightVertexNet()
             el->implementation().construct(i * task_size, (i + 1) * task_size);
             get_task_manager().add_task(el);
         }
-    if (rest_size != 0) {
+    if (rest_size != 0)
+    {
         tnet_execution_base<et_vertex_light>* el = execution_factory.create<et_vertex_light>();
         el->implementation().construct(
             vertex_light_task_number * task_size, vertex_light_task_number * task_size + rest_size);
@@ -58,7 +59,8 @@ void RunLightVertexNet()
     }
 
     exec_pool* pool = get_task_manager().run("Net Vertex Lighting");
-    if (pool) pool->wait();
+    if (pool)
+        pool->wait();
 
     // get_task_manager().wait_all();
 }

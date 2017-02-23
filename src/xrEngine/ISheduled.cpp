@@ -22,26 +22,20 @@ ScheduledBase::~ScheduledBase()
 // we need this to become MASTER_GOLD
 #ifndef DEBUG
     Engine.Sheduler.Unregister(this);
-#endif  // DEBUG
+#endif // DEBUG
 }
 
-void ScheduledBase::shedule_register()
-{
-    Engine.Sheduler.Register(this);
-}
-
-void ScheduledBase::shedule_unregister()
-{
-    Engine.Sheduler.Unregister(this);
-}
-
+void ScheduledBase::shedule_register() { Engine.Sheduler.Register(this); }
+void ScheduledBase::shedule_unregister() { Engine.Sheduler.Unregister(this); }
 void ScheduledBase::shedule_Update(u32 dt)
 {
 #ifdef DEBUG
-    if (shedule.dbg_startframe == shedule.dbg_update_shedule) {
+    if (shedule.dbg_startframe == shedule.dbg_update_shedule)
+    {
         LPCSTR name = "unknown";
         IGameObject* O = dynamic_cast<IGameObject*>(this);
-        if (O) name = *O->cName();
+        if (O)
+            name = *O->cName();
         xrDebug::Fatal(DEBUG_INFO, "'shedule_Update' called twice per frame for %s", name);
     }
     shedule.dbg_update_shedule = shedule.dbg_startframe;

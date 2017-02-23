@@ -27,8 +27,8 @@ struct CTypeHelper
         struct selector
         {
             typedef Loki::Typelist<Loki::Typelist<typename Head::Head, Loki::Typelist<P, typename Head::Tail>>,
-                typename Loki::TL::Erase<List, Head>::Result>
-                result;
+            typename Loki::TL::Erase<List, Head>::Result>
+            result;
         };
 
         template <>
@@ -54,9 +54,9 @@ struct CTypeHelper
 #define add_to_cast_list(B, A) typedef SmartDynamicCast::CTypeHelper<cast_type_list, A, B>::result TypeList_##A##B
 #define save_cast_list(B, A) TypeList_##A##B
 
-#define DECLARE_SPECIALIZATION(B, A, C)                                                                                \
-    class A;                                                                                                           \
-    class B;                                                                                                           \
-    template <>                                                                                                        \
-    extern B* SmartDynamicCast::smart_cast<B, A>(A * p);                                                               \
+#define DECLARE_SPECIALIZATION(B, A, C)\
+    class A;\
+    class B;\
+    template <>\
+    extern B* SmartDynamicCast::smart_cast<B, A>(A* p);\
     add_to_cast_list(B, A);

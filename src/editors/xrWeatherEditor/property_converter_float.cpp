@@ -23,9 +23,11 @@ typedef PropertyBag::PropertySpecDescriptor PropertySpecDescriptor;
 
 bool property_converter_float::CanConvertTo(ITypeDescriptorContext ^ context, Type ^ destination_type)
 {
-    if (destination_type == float ::typeid) return (true);
+    if (destination_type == float ::typeid)
+        return (true);
 
-    if (destination_type == String::typeid) return (true);
+    if (destination_type == String::typeid)
+        return (true);
 
     return (inherited::CanConvertTo(context, destination_type));
 }
@@ -33,7 +35,8 @@ bool property_converter_float::CanConvertTo(ITypeDescriptorContext ^ context, Ty
 Object ^ property_converter_float::ConvertTo(
              ITypeDescriptorContext ^ context, CultureInfo ^ culture, Object ^ value, Type ^ destination_type)
 {
-    if (destination_type != String::typeid) return (inherited::ConvertTo(context, culture, value, destination_type));
+    if (destination_type != String::typeid)
+        return (inherited::ConvertTo(context, culture, value, destination_type));
 
     float float_value = safe_cast<float>(value);
     char temp[32];
@@ -43,7 +46,8 @@ Object ^ property_converter_float::ConvertTo(
 
 bool property_converter_float::CanConvertFrom(ITypeDescriptorContext ^ context, Type ^ source_type)
 {
-    if (source_type == String::typeid) return (true);
+    if (source_type == String::typeid)
+        return (true);
 
     return (inherited::CanConvertFrom(context, source_type));
 }
@@ -51,7 +55,8 @@ bool property_converter_float::CanConvertFrom(ITypeDescriptorContext ^ context, 
 Object ^ property_converter_float::ConvertFrom(ITypeDescriptorContext ^ context, CultureInfo ^ culture, Object ^ value)
 {
     String ^ string = dynamic_cast<String ^>(value);
-    if (!value) return (inherited::ConvertFrom(context, culture, value));
+    if (!value)
+        return (inherited::ConvertFrom(context, culture, value));
 
     try
     {

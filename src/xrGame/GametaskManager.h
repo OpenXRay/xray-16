@@ -38,7 +38,6 @@ public:
     //	void					SetActiveTask					(const shared_str& id);
     void SetActiveTask(CGameTask* task);
     u32 ActualFrame() const { return m_actual_frame; }
-
     CGameTask* IterateGet(CGameTask* t, ETaskState state, bool bForward);
     u32 GetTaskIndex(CGameTask* t, ETaskState state);
     u32 GetTaskCount(ETaskState state);

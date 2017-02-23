@@ -13,8 +13,8 @@
 //---------------------------------------------------------------------------
 class TNFGen : public TForm
 {
-    __published :  // IDE-managed Components
-                   TMxLabel* RxLabel1;
+    __published : // IDE-managed Components
+                  TMxLabel* RxLabel1;
     TMxLabel* RxLabel2;
     TMxLabel* RxLabel3;
     TMxLabel* RxLabel4;
@@ -27,8 +27,8 @@ class TNFGen : public TForm
     TButton* Button2;
     void __fastcall Button1Click(TObject* Sender);
 
-  private:  // User declarations
-  public:   // User declarations
+private: // User declarations
+public: // User declarations
     __fastcall TNFGen(TComponent* Owner);
 };
 

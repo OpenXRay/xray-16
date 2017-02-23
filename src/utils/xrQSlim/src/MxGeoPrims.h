@@ -1,4 +1,4 @@
-#ifndef MXGEOPRIMS_INCLUDED  // -*- C++ -*-
+#ifndef MXGEOPRIMS_INCLUDED // -*- C++ -*-
 #define MXGEOPRIMS_INCLUDED
 #if !defined(__GNUC__)
 #pragma once
@@ -31,10 +31,7 @@ typedef unsigned int MxFaceID;
 #endif
 
 #if !defined(HAVE_RINT)
-inline double rint(double x)
-{
-    return floor(x + 0.5);
-}
+inline double rint(double x) { return floor(x + 0.5); }
 #endif
 
 class MxColor
@@ -42,7 +39,6 @@ class MxColor
 private:
     inline unsigned char _ftop(float x) { return (unsigned char)((x > 1.0f ? 1.0f : x) * 255.0f); }
     inline float _ptof(unsigned char c) const { return ((float)c) / 255.0f; }
-
 public:
     union
     {
@@ -105,13 +101,11 @@ public:
         u[1] = t;
     }
     MxTexCoord(const MxTexCoord& t) { *this = t; }
-
     float& operator[](int i) { return u[i]; }
     float operator[](int i) const { return u[i]; }
     operator const float*() const { return u; }
     operator const float*() { return u; }
     operator float*() { return u; }
-
     MxTexCoord& operator=(const MxTexCoord& t)
     {
         u[0] = t[0];
@@ -140,7 +134,6 @@ public:
         as.pos[2] = z;
     }
     MxVertex(const MxVertex& v) { *this = v; }
-
     MxVertex& operator=(const MxVertex& v)
     {
         as.pos[0] = v.as.pos[0];
@@ -151,7 +144,6 @@ public:
     operator const float*() const { return as.pos; }
     operator const float*() { return as.pos; }
     operator float*() { return as.pos; }
-
     float& operator()(int i) { return as.pos[i]; }
     float operator()(int i) const { return as.pos[i]; }
     //
@@ -166,10 +158,8 @@ class MxNormal
 private:
     inline short _ftos(float x) { return (short)rint((x > 1.0f ? 1.0f : x) * (float)SHRT_MAX); }
     inline short _dtos(double x) { return (short)rint((x > 1.0 ? 1.0 : x) * (double)SHRT_MAX); }
-
     inline float _stof(short s) const { return (float)s / (float)SHRT_MAX; }
     inline double _stod(short s) const { return (double)s / (double)SHRT_MAX; }
-
     short dir[3];
 
 public:
@@ -177,7 +167,6 @@ public:
     MxNormal(float x, float y, float z) { set(x, y, z); }
     MxNormal(const float* v) { set(v); }
     MxNormal(const double* v) { set(v); }
-
     inline void set(double x, double y, double z)
     {
         dir[0] = _dtos(x);
@@ -261,12 +250,12 @@ public:
     //
     MxVertexID& operator[](int i) { return v[i]; }
     MxVertexID operator[](int i) const { return v[i]; }
-
     int remap_vertex(MxVertexID from, MxVertexID to)
     {
         int nmapped = 0;
         for (int i = 0; i < 3; i++)
-            if (v[i] == from) {
+            if (v[i] == from)
+            {
                 v[i] = to;
                 nmapped++;
             }
@@ -340,39 +329,14 @@ inline ostream& operator<<(ostream& out, const MxTexCoord& t)
 }
 */
 #ifdef MXGL_INCLUDED
-inline void glC(const MxColor& c)
-{
-    glColor3ub(c.as.chan.r, c.as.chan.g, c.as.chan.b);
-}
-inline void glT(const MxTexCoord& t)
-{
-    glTexCoord2fv(t);
-}
-inline void glV(const MxVertex& v)
-{
-    glVertex3fv(v);
-}
-inline void glN(const MxNormal& n)
-{
-    glNormal3sv(n.raw());
-}
-
-inline void glC(const MxColor* c)
-{
-    glC(*c);
-}
-inline void glT(const MxTexCoord* t)
-{
-    glT(*t);
-}
-inline void glV(const MxVertex* v)
-{
-    glV(*v);
-}
-inline void glN(const MxNormal* n)
-{
-    glN(*n);
-}
+inline void glC(const MxColor& c) { glColor3ub(c.as.chan.r, c.as.chan.g, c.as.chan.b); }
+inline void glT(const MxTexCoord& t) { glTexCoord2fv(t); }
+inline void glV(const MxVertex& v) { glVertex3fv(v); }
+inline void glN(const MxNormal& n) { glNormal3sv(n.raw()); }
+inline void glC(const MxColor* c) { glC(*c); }
+inline void glT(const MxTexCoord* t) { glT(*t); }
+inline void glV(const MxVertex* v) { glV(*v); }
+inline void glN(const MxNormal* n) { glN(*n); }
 #endif
 
 // MXGEOPRIMS_INCLUDED

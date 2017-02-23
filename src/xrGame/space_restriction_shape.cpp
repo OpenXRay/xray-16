@@ -18,7 +18,6 @@ struct CBorderMergePredicate
     CSpaceRestrictionShape* m_restriction;
 
     IC CBorderMergePredicate(CSpaceRestrictionShape* restriction) { m_restriction = restriction; }
-
     IC void operator()(const CLevelGraph::CVertex& vertex) const
     {
         if (m_restriction->inside(ai().level_graph().vertex_id(&vertex), true) &&
@@ -35,7 +34,6 @@ struct CShapeTestPredicate
     CSpaceRestrictionShape* m_restriction;
 
     IC CShapeTestPredicate(CSpaceRestrictionShape* restriction) { m_restriction = restriction; }
-
     IC void operator()(const CLevelGraph::CVertex& vertex) const
     {
         if (m_restriction->inside(ai().level_graph().vertex_id(&vertex), false))
@@ -116,7 +114,8 @@ void CSpaceRestrictionShape::test_correctness()
 {
     m_correct = true;
 
-    if (m_test_storage.empty()) return;
+    if (m_test_storage.empty())
+        return;
 
     // leave only unique nodes in m_test_storage
     std::sort(m_test_storage.begin(), m_test_storage.end());
@@ -175,7 +174,7 @@ void CSpaceRestrictionShape::test_correctness()
 
     //		if (!b_found) {
     //			Msg("Node%u :: index[%u]:: position[%f,%f,%f]", index, (*I),
-    //VPUSH(ai().level_graph().vertex_position((*I))));
+    // VPUSH(ai().level_graph().vertex_position((*I))));
     //			index ++;
     //		}
 

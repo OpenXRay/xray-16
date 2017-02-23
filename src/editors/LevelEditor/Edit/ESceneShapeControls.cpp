@@ -19,11 +19,13 @@ bool __fastcall TUI_ControlShapeAdd::AfterAppendCallback(TShiftState Shift, CCus
     CEditShape* shape = dynamic_cast<CEditShape*>(obj);
     R_ASSERT(shape);
     TfraShape* F = (TfraShape*)parent_tool->pFrame;
-    if (F->ebTypeSphere->Down) {
+    if (F->ebTypeSphere->Down)
+    {
         Fsphere S;
         S.identity();
         shape->add_sphere(S);
-        if (!Shift.Contains(ssAlt)) F->ebTypeSphere->Down = false;
+        if (!Shift.Contains(ssAlt))
+            F->ebTypeSphere->Down = false;
         return true;
     }
     else if (F->ebTypeBox->Down)
@@ -31,7 +33,8 @@ bool __fastcall TUI_ControlShapeAdd::AfterAppendCallback(TShiftState Shift, CCus
         Fmatrix M;
         M.identity();
         shape->add_box(M);
-        if (!Shift.Contains(ssAlt)) F->ebTypeBox->Down = false;
+        if (!Shift.Contains(ssAlt))
+            F->ebTypeBox->Down = false;
         return true;
     }
     else
@@ -44,10 +47,12 @@ bool __fastcall TUI_ControlShapeAdd::AfterAppendCallback(TShiftState Shift, CCus
 bool __fastcall TUI_ControlShapeAdd::Start(TShiftState Shift)
 {
     TfraShape* F = (TfraShape*)parent_tool->pFrame;
-    if (F->ebAttachShape->Down) {
+    if (F->ebAttachShape->Down)
+    {
         CEditShape* from = dynamic_cast<CEditShape*>(
             Scene->RayPickObject(UI->ZFar(), UI->m_CurrentRStart, UI->m_CurrentRDir, OBJCLASS_SHAPE, 0, 0));
-        if (from) {
+        if (from)
+        {
             ObjectList lst;
             int cnt = Scene->GetQueryObjects(lst, OBJCLASS_SHAPE, 1, 1, 0);
             if (1 != cnt)
@@ -56,9 +61,11 @@ bool __fastcall TUI_ControlShapeAdd::Start(TShiftState Shift)
             {
                 CEditShape* base = dynamic_cast<CEditShape*>(lst.back());
                 R_ASSERT(base);
-                if (base != from) {
+                if (base != from)
+                {
                     base->Attach(from);
-                    if (!Shift.Contains(ssAlt)) {
+                    if (!Shift.Contains(ssAlt))
+                    {
                         F->ebAttachShape->Down = false;
                         ResetActionToSelect();
                     }

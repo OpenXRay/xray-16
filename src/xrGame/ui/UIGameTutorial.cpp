@@ -20,7 +20,8 @@ void CallFunction(shared_str const& func)
     luabind::functor<void> functor_to_call;
     bool functor_exists = ai().script_engine().functor(func.c_str(), functor_to_call);
     THROW3(functor_exists, "Cannot find script function described in tutorial item ", func.c_str());
-    if (functor_to_call.is_valid()) functor_to_call();
+    if (functor_to_call.is_valid())
+        functor_to_call();
 }
 
 void CallFunctions(xr_vector<shared_str>& v)
@@ -71,13 +72,15 @@ bool CUISequenceItem::AllowKey(int dik)
 
 void CUISequenceItem::Update()
 {
-    if (m_onframe_functor.is_valid()) m_onframe_functor(current_factor());
+    if (m_onframe_functor.is_valid())
+        m_onframe_functor(current_factor());
 }
 
 void CUISequenceItem::Start()
 {
     CallFunctions(m_start_lua_functions);
-    if (m_onframe_lua_function.size()) {
+    if (m_onframe_lua_function.size())
+    {
         bool functor_exists = ai().script_engine().functor(m_onframe_lua_function.c_str(), m_onframe_functor);
         THROW3(
             functor_exists, "Cannot find script function described in tutorial item ", m_onframe_lua_function.c_str());
@@ -90,11 +93,7 @@ bool CUISequenceItem::Stop(bool bForce)
     return true;
 }
 
-CUISequencer::CUISequencer()
-{
-    m_flags.zero();
-}
-
+CUISequencer::CUISequencer() { m_flags.zero(); }
 void CUISequencer::Start(LPCSTR tutor_name)
 {
     VERIFY(m_sequencer_items.size() == 0);
@@ -115,7 +114,8 @@ void CUISequencer::Start(LPCSTR tutor_name)
     int render_prio = uiXml.ReadInt("render_prio", 0, -2);
 
     CUIXmlInit xml_init;
-    if (UI().is_widescreen() && uiXml.NavigateToNode("global_wnd_16", 0)) {
+    if (UI().is_widescreen() && uiXml.NavigateToNode("global_wnd_16", 0))
+    {
         xml_init.AssignColor("tut_gray", color_rgba(255, 255, 255, 255));
         xml_init.InitWindow(uiXml, "global_wnd_16", 0, m_UIWindow);
     }
@@ -134,7 +134,8 @@ void CUISequencer::Start(LPCSTR tutor_name)
     }
 
     LPCSTR snd_name = uiXml.Read("sound", 0, "");
-    if (snd_name && snd_name[0]) {
+    if (snd_name && snd_name[0])
+    {
         m_global_sound.create(snd_name, st_Effect, sg_Undefined);
         VERIFY(m_global_sound._handle() || strstr(Core.Params, "-nosound"));
     }
@@ -167,7 +168,8 @@ void CUISequencer::Start(LPCSTR tutor_name)
     m_flags.set(etsActive, TRUE);
     m_flags.set(etsStoredPauseState, Device.Paused());
 
-    if (m_flags.test(etsNeedPauseOn) && !m_flags.test(etsStoredPauseState)) {
+    if (m_flags.test(etsNeedPauseOn) && !m_flags.test(etsStoredPauseState))
+    {
         Device.Pause(TRUE, TRUE, TRUE, "tutorial_start");
         bShowPauseString = FALSE;
     }
@@ -175,9 +177,11 @@ void CUISequencer::Start(LPCSTR tutor_name)
     if (m_flags.test(etsNeedPauseOff) && m_flags.test(etsStoredPauseState))
         Device.Pause(FALSE, TRUE, FALSE, "tutorial_start");
 
-    if (m_global_sound._handle()) m_global_sound.play(NULL, sm_2D);
+    if (m_global_sound._handle())
+        m_global_sound.play(NULL, sm_2D);
 
-    if (m_start_lua_function.size()) CallFunction(m_start_lua_function);
+    if (m_start_lua_function.size())
+        CallFunction(m_start_lua_function);
 }
 
 CUISequenceItem* CUISequencer::GetNextItem()
@@ -189,15 +193,18 @@ CUISequenceItem* CUISequencer::GetNextItem()
         luabind::functor<bool> functor_to_call;
         result = m_sequencer_items.front();
         shared_str const f = result->m_check_lua_function;
-        if (f.size() == 0) break;
+        if (f.size() == 0)
+            break;
 
         bool functor_exists = ai().script_engine().functor(f.c_str(), functor_to_call);
         THROW3(functor_exists, "Cannot find script function described in tutorial item ", f.c_str());
 
         bool call_result = true;
-        if (functor_to_call.is_valid()) call_result = functor_to_call();
+        if (functor_to_call.is_valid())
+            call_result = functor_to_call();
 
-        if (!call_result) {
+        if (!call_result)
+        {
             m_sequencer_items.pop_front();
             result = NULL;
         }
@@ -215,7 +222,8 @@ extern CUISequencer* g_tutorial2;
 
 void CUISequencer::Destroy()
 {
-    if (m_stop_lua_function.size()) CallFunction(m_stop_lua_function);
+    if (m_stop_lua_function.size())
+        CallFunction(m_stop_lua_function);
 
     m_global_sound.stop();
     Device.seqFrame.Remove(this);
@@ -226,20 +234,25 @@ void CUISequencer::Destroy()
     m_flags.set(etsActive, FALSE);
     m_pStoredInputReceiver = NULL;
 
-    if (!m_on_destroy_event.empty()) m_on_destroy_event();
+    if (!m_on_destroy_event.empty())
+        m_on_destroy_event();
 
-    if (g_tutorial == this) {
+    if (g_tutorial == this)
+    {
         g_tutorial = NULL;
     }
-    if (g_tutorial2 == this) {
+    if (g_tutorial2 == this)
+    {
         g_tutorial2 = NULL;
     }
 }
 
 void CUISequencer::Stop()
 {
-    if (m_sequencer_items.size()) {
-        if (m_flags.test(etsPlayEachItem)) {
+    if (m_sequencer_items.size())
+    {
+        if (m_flags.test(etsPlayEachItem))
+        {
             Next();
             return;
         }
@@ -261,20 +274,25 @@ void CUISequencer::Stop()
 
 void CUISequencer::OnFrame()
 {
-    if (!Device.b_is_Active) return;
-    if (!IsActive()) return;
+    if (!Device.b_is_Active)
+        return;
+    if (!IsActive())
+        return;
 
-    if (!m_sequencer_items.size()) {
+    if (!m_sequencer_items.size())
+    {
         Stop();
         return;
     }
     else
     {
         CUISequenceItem* pCurrItem = m_sequencer_items.front();
-        if (!pCurrItem->IsPlaying()) Next();
+        if (!pCurrItem->IsPlaying())
+            Next();
     }
 
-    if (!m_sequencer_items.size()) {
+    if (!m_sequencer_items.size())
+    {
         Stop();
         return;
     }
@@ -286,7 +304,8 @@ void CUISequencer::OnFrame()
 
 void CUISequencer::OnRender()
 {
-    if (m_UIWindow->IsShown()) m_UIWindow->Draw();
+    if (m_UIWindow->IsShown())
+        m_UIWindow->Draw();
 
     VERIFY(m_sequencer_items.size());
     m_sequencer_items.front()->OnRender();
@@ -296,14 +315,17 @@ void CUISequencer::Next()
 {
     CUISequenceItem* pCurrItem = m_sequencer_items.front();
     bool can_stop = pCurrItem->Stop();
-    if (!can_stop) return;
+    if (!can_stop)
+        return;
 
     m_sequencer_items.pop_front();
     delete_data(pCurrItem);
 
-    if (m_sequencer_items.size()) {
+    if (m_sequencer_items.size())
+    {
         pCurrItem = GetNextItem();
-        if (pCurrItem) pCurrItem->Start();
+        if (pCurrItem)
+            pCurrItem->Start();
     }
 }
 
@@ -317,65 +339,80 @@ bool CUISequencer::GrabInput()
 
 void CUISequencer::IR_OnMousePress(int btn)
 {
-    if (m_sequencer_items.size()) m_sequencer_items.front()->OnMousePress(btn);
+    if (m_sequencer_items.size())
+        m_sequencer_items.front()->OnMousePress(btn);
 
-    if (!GrabInput() && m_pStoredInputReceiver) m_pStoredInputReceiver->IR_OnMousePress(btn);
+    if (!GrabInput() && m_pStoredInputReceiver)
+        m_pStoredInputReceiver->IR_OnMousePress(btn);
 }
 
 void CUISequencer::IR_OnMouseRelease(int btn)
 {
-    if (!GrabInput() && m_pStoredInputReceiver) m_pStoredInputReceiver->IR_OnMouseRelease(btn);
+    if (!GrabInput() && m_pStoredInputReceiver)
+        m_pStoredInputReceiver->IR_OnMouseRelease(btn);
 }
 
 void CUISequencer::IR_OnMouseHold(int btn)
 {
-    if (!GrabInput() && m_pStoredInputReceiver) m_pStoredInputReceiver->IR_OnMouseHold(btn);
+    if (!GrabInput() && m_pStoredInputReceiver)
+        m_pStoredInputReceiver->IR_OnMouseHold(btn);
 }
 
 void CUISequencer::IR_OnMouseMove(int x, int y)
 {
-    if (!GrabInput() && m_pStoredInputReceiver) m_pStoredInputReceiver->IR_OnMouseMove(x, y);
+    if (!GrabInput() && m_pStoredInputReceiver)
+        m_pStoredInputReceiver->IR_OnMouseMove(x, y);
 }
 
 void CUISequencer::IR_OnMouseStop(int x, int y)
 {
-    if (!GrabInput() && m_pStoredInputReceiver) m_pStoredInputReceiver->IR_OnMouseStop(x, y);
+    if (!GrabInput() && m_pStoredInputReceiver)
+        m_pStoredInputReceiver->IR_OnMouseStop(x, y);
 }
 
 void CUISequencer::IR_OnKeyboardRelease(int dik)
 {
-    if (!GrabInput() && m_pStoredInputReceiver) m_pStoredInputReceiver->IR_OnKeyboardRelease(dik);
+    if (!GrabInput() && m_pStoredInputReceiver)
+        m_pStoredInputReceiver->IR_OnKeyboardRelease(dik);
 }
 
 void CUISequencer::IR_OnKeyboardHold(int dik)
 {
-    if (!GrabInput() && m_pStoredInputReceiver) m_pStoredInputReceiver->IR_OnKeyboardHold(dik);
+    if (!GrabInput() && m_pStoredInputReceiver)
+        m_pStoredInputReceiver->IR_OnKeyboardHold(dik);
 }
 
 void CUISequencer::IR_OnMouseWheel(int direction)
 {
-    if (!GrabInput() && m_pStoredInputReceiver) m_pStoredInputReceiver->IR_OnMouseWheel(direction);
+    if (!GrabInput() && m_pStoredInputReceiver)
+        m_pStoredInputReceiver->IR_OnMouseWheel(direction);
 }
 
 void CUISequencer::IR_OnKeyboardPress(int dik)
 {
-    if (m_sequencer_items.size()) m_sequencer_items.front()->OnKeyboardPress(dik);
+    if (m_sequencer_items.size())
+        m_sequencer_items.front()->OnKeyboardPress(dik);
 
     bool b = true;
-    if (m_sequencer_items.size()) b &= m_sequencer_items.front()->AllowKey(dik);
+    if (m_sequencer_items.size())
+        b &= m_sequencer_items.front()->AllowKey(dik);
 
     bool binded = is_binded(kQUIT, dik);
-    if (b && binded) {
+    if (b && binded)
+    {
         Stop();
         return;
     }
 
-    if (binded && CurrentGameUI()) {
-        if (CurrentGameUI()->GetActorMenu().IsShown()) {
+    if (binded && CurrentGameUI())
+    {
+        if (CurrentGameUI()->GetActorMenu().IsShown())
+        {
             CurrentGameUI()->HideActorMenu();
             return;
         }
-        if (CurrentGameUI()->GetPdaMenu().IsShown()) {
+        if (CurrentGameUI()->GetPdaMenu().IsShown())
+        {
             CurrentGameUI()->HidePdaMenu();
             return;
         }
@@ -383,16 +420,19 @@ void CUISequencer::IR_OnKeyboardPress(int dik)
         return;
     }
 
-    if (b && !GrabInput() && m_pStoredInputReceiver) m_pStoredInputReceiver->IR_OnKeyboardPress(dik);
+    if (b && !GrabInput() && m_pStoredInputReceiver)
+        m_pStoredInputReceiver->IR_OnKeyboardPress(dik);
 }
 
 void CUISequencer::IR_OnActivate()
 {
-    if (!pInput) return;
+    if (!pInput)
+        return;
     int i;
     for (i = 0; i < CInput::COUNT_KB_BUTTONS; i++)
     {
-        if (IR_GetKeyState(i)) {
+        if (IR_GetKeyState(i))
+        {
             EGameActions action = get_binded_action(i);
             switch (action)
             {

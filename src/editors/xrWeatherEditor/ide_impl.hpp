@@ -23,15 +23,15 @@ namespace editor
 ref class window_ide;
 class engine;
 class property_holder_holder;
-}  // namespace editor
+} // namespace editor
 
 class ide_impl : public editor::ide
 {
-  public:
+public:
     typedef editor::window_ide window_ide;
     typedef editor::property_holder property_holder;
 
-  public:
+public:
     ide_impl(editor::engine* engine);
     virtual ~ide_impl();
     void window(window_ide ^ window);
@@ -41,14 +41,14 @@ class ide_impl : public editor::ide
     void on_idle_end();
     bool idle() const;
 
-  public:
+public:
     virtual HWND main_handle();
     virtual HWND view_handle();
     virtual void run();
     virtual void on_load_finished();
     virtual void pause();
 
-  public:
+public:
     virtual property_holder* create_property_holder(
         LPCSTR display_name, editor::property_holder_collection* collection, editor::property_holder_holder* holder);
     virtual void destroy(property_holder*& property_holder);
@@ -58,11 +58,11 @@ class ide_impl : public editor::ide
         weathers_size_getter_type const& weathers_size_getter, frames_getter_type const& frames_getter,
         frames_size_getter_type const& frames_size_getter);
 
-  private:
+private:
     editor::engine* m_engine;
     gcroot<window_ide ^> m_window;
     bool m_paused;
     bool m_in_idle;
-};  // class ide
+}; // class ide
 
-#endif  // ifndef IDE_IMPL_HPP_INCLUDED
+#endif // ifndef IDE_IMPL_HPP_INCLUDED

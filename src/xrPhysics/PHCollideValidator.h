@@ -19,8 +19,8 @@ class CPHCollideValidator
         cbNCClassSmall = 1 << 7,
         cbClassRagDoll = 1 << 8,
         cbNCClassRagDoll = 1 << 9,
-        cbClassAnimated = 1 << 10,    //класс анимированного физического объекта
-        cbNCClassAnimated = 1 << 11,  //свойство игнорирования класса анимированного физического объекта
+        cbClassAnimated = 1 << 10, //класс анимированного физического объекта
+        cbNCClassAnimated = 1 << 11, //свойство игнорирования класса анимированного физического объекта
         cbNone = 1 << 12
 
     };
@@ -61,19 +61,18 @@ public:
         //#endif // DEBUG
         return (CollideType(obj1.collide_class_bits().flags, obj2.collide_class_bits().flags) != cbNCGroupObject ||
                    DoCollideGroup(obj1, obj2)) &&
-               DoCollideNonMatched(obj1, obj2);
+            DoCollideNonMatched(obj1, obj2);
     }
 
     static IC bool DoCollideStatic(const CPHObject& obj) { return !obj.collide_class_bits().test(cbNCStatic); }
-
 protected:
 private:
     static IC bool DoCollideNonMatched(const CPHObject& obj1, const CPHObject& obj2)
     {
         return !(((obj1.collide_class_bits().flags & ClassNCFlags.flags) &
                      ((obj2.collide_class_bits().flags & ClassFlags.flags) << 1)) ||
-                 ((obj2.collide_class_bits().flags & ClassNCFlags.flags) &
-                     ((obj1.collide_class_bits().flags & ClassFlags.flags) << 1)));
+            ((obj2.collide_class_bits().flags & ClassNCFlags.flags) &
+                ((obj1.collide_class_bits().flags & ClassFlags.flags) << 1)));
     }
 
     static IC bool DoCollideGroup(const CPHObject& obj1, const CPHObject& obj2)
@@ -82,7 +81,6 @@ private:
     }
 
     static IC CLClassBits CollideType(CLClassBits cb1, CLClassBits cb2) { return ((cb1 & cb2) & NonTypeFlags.flags); }
-
     static CGID freeGroupID;
     static _flags<CLClassBits> ClassFlags;
     static _flags<CLClassBits> ClassNCFlags;

@@ -38,16 +38,13 @@ animation_planner::animation_planner(CAI_Stalker* object, LPCSTR action_name)
 {
 }
 
-animation_planner::~animation_planner()
-{
-}
-
+animation_planner::~animation_planner() {}
 void animation_planner::setup(CAI_Stalker* object, CPropertyStorage* storage)
 {
     inherited::setup(object);
 #ifdef DEBUG
 //	inherited::m_use_log	= true;
-#endif  // DEBUG
+#endif // DEBUG
 
     add_evaluators();
     add_actions();
@@ -62,11 +59,7 @@ void animation_planner::target(StalkerDecisionSpace::EWorldProperties const& wor
     set_target_state(m_target);
 }
 
-void animation_planner::update()
-{
-    inherited::update();
-}
-
+void animation_planner::update() { inherited::update(); }
 void animation_planner::initialize()
 {
     typedef CAI_Stalker::HitCallback HitCallback;
@@ -84,7 +77,8 @@ void animation_planner::initialize()
     m_storage.set_property(eWorldPropertyReadyToFire, false);
     m_storage.set_property(eWorldPropertyReadyToFireNoLookout, false);
 
-    if (!target_state().conditions().empty()) return;
+    if (!target_state().conditions().empty())
+        return;
 
     target(eWorldPropertyLookedOut);
 }
@@ -93,7 +87,8 @@ void animation_planner::finalize()
 {
     inherited::finalize();
 
-    if (object().movement().target_selector().initialized()) object().movement().target_selector().finalize();
+    if (object().movement().target_selector().initialized())
+        object().movement().target_selector().finalize();
 
     object().movement().m_head.speed = m_head_speed;
     m_initialized = false;
@@ -288,10 +283,12 @@ bool animation_planner::hit_callback(SHit const* hit)
     m_time_object_hit = Device.dwTimeGlobal;
 
 #ifndef MASTER_GOLD
-    if (hit->who && smart_cast<CActor*>(hit->who) && psAI_Flags.test(aiIgnoreActor)) return (false);
-#endif  // MASTER_GOLD
+    if (hit->who && smart_cast<CActor*>(hit->who) && psAI_Flags.test(aiIgnoreActor))
+        return (false);
+#endif // MASTER_GOLD
 
-    if (!object().g_Alive()) return (false);
+    if (!object().g_Alive())
+        return (false);
 
     object().callback(GameObject::eHit)(m_object->lua_game_object(), hit->damage(), hit->direction(),
         smart_cast<const CGameObject*>(hit->who)->lua_game_object(), hit->boneID);
@@ -299,7 +296,4 @@ bool animation_planner::hit_callback(SHit const* hit)
     return (false);
 }
 
-LPCSTR animation_planner::object_name() const
-{
-    return ("animation_planner");
-}
+LPCSTR animation_planner::object_name() const { return ("animation_planner"); }

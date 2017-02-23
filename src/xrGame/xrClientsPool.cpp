@@ -4,16 +4,8 @@
 
 extern u32 g_sv_Client_Reconnect_Time;
 
-xrClientsPool::xrClientsPool()
-{
-    m_dclients.reserve(MAX_PLAYERS_COUNT);
-}
-
-xrClientsPool::~xrClientsPool()
-{
-    Clear();
-}
-
+xrClientsPool::xrClientsPool() { m_dclients.reserve(MAX_PLAYERS_COUNT); }
+xrClientsPool::~xrClientsPool() { Clear(); }
 void xrClientsPool::Clear()
 {
     for (dclients_t::iterator i = m_dclients.begin(), ie = m_dclients.end(); i != ie; ++i)
@@ -25,7 +17,8 @@ void xrClientsPool::Clear()
 
 bool const xrClientsPool::expired_client_deleter::operator()(dclient& right) const
 {
-    if ((m_current_time - right.m_dtime) > m_expire_time) {
+    if ((m_current_time - right.m_dtime) > m_expire_time)
+    {
         xr_delete(right.m_client);
         return true;
     }
@@ -36,15 +29,17 @@ void xrClientsPool::ClearExpiredClients()
 {
     expired_client_deleter tmp_deleter;
     tmp_deleter.m_current_time = Device.dwTimeGlobal;
-    tmp_deleter.m_expire_time = g_sv_Client_Reconnect_Time * 60 * 1000;  // in minutes
+    tmp_deleter.m_expire_time = g_sv_Client_Reconnect_Time * 60 * 1000; // in minutes
     m_dclients.erase(std::remove_if(m_dclients.begin(), m_dclients.end(), tmp_deleter), m_dclients.end());
 }
 
 void xrClientsPool::Add(xrClientData* new_dclient)
 {
-    if (!new_dclient->ps) return;
+    if (!new_dclient->ps)
+        return;
 
-    if (g_sv_Client_Reconnect_Time == 0) {
+    if (g_sv_Client_Reconnect_Time == 0)
+    {
         xr_delete(new_dclient);
         return;
     }
@@ -57,11 +52,14 @@ void xrClientsPool::Add(xrClientData* new_dclient)
 
 bool const xrClientsPool::pooled_client_finder::operator()(dclient const& right) const
 {
-    if (!right.m_client->ps || !m_new_client->ps) return false;
+    if (!right.m_client->ps || !m_new_client->ps)
+        return false;
 
-    if (m_new_client->m_cdkey_digest != right.m_client->m_cdkey_digest) return false;
+    if (m_new_client->m_cdkey_digest != right.m_client->m_cdkey_digest)
+        return false;
 
-    if (!xr_strcmp(m_new_client->ps->getName(), right.m_client->ps->getName())) return true;
+    if (!xr_strcmp(m_new_client->ps->getName(), right.m_client->ps->getName()))
+        return true;
 
     return false;
 }
@@ -72,7 +70,8 @@ xrClientData* xrClientsPool::Get(xrClientData* new_client)
     pooled_client_finder tmp_finder;
     tmp_finder.m_new_client = new_client;
     dclients_t::iterator tmp_iter = std::find_if(m_dclients.begin(), m_dclients.end(), tmp_finder);
-    if (tmp_iter != m_dclients.end()) {
+    if (tmp_iter != m_dclients.end())
+    {
         xrClientData* result = tmp_iter->m_client;
         m_dclients.erase(tmp_iter);
         return result;

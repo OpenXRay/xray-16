@@ -11,16 +11,8 @@ namespace lc_net
 static execution_globals_reg exe_reg;
 static globals_globals_reg gl_reg;
 
-const execution_globals_reg& exe_gl_reg()
-{
-    return exe_reg;
-}
-
-const globals_globals_reg& gl_gl_reg()
-{
-    return gl_reg;
-}
-
+const execution_globals_reg& exe_gl_reg() { return exe_reg; }
+const globals_globals_reg& gl_gl_reg() { return gl_reg; }
 template <typename e>
 static xr_vector<xr_vector<e_net_globals>*>& inter_get_table(enum_table<e>& table)
 {
@@ -69,7 +61,7 @@ struct list_glob
     static const e_net_globals next_ii = (e_net_globals)(i + 1);
     typedef list_glob<next_ii, e> next;
     next n;
-    add_enum<e, i> remove;  //
+    add_enum<e, i> remove; //
 };
 
 template <class e>

@@ -8,11 +8,11 @@
 
 #pragma once
 
-#define TEMPLATE_SPECIALIZATION                                                                                        \
-    template <typename TPathId, typename TBucketId, u32 BucketCount, bool ClearBuckets>                                \
+#define TEMPLATE_SPECIALIZATION                                                         \
+    template <typename TPathId, typename TBucketId, u32 BucketCount, bool ClearBuckets> \
     template <typename TManagerDataStorage>
 
-#define CBucketList                                                                                                    \
+#define CBucketList \
     CDataStorageBucketList<TPathId, TBucketId, BucketCount, ClearBuckets>::CDataStorage<TManagerDataStorage>
 
 TEMPLATE_SPECIALIZATION
@@ -25,10 +25,7 @@ inline CBucketList::CDataStorage(const u32 vertex_count) : Inherited(vertex_coun
 }
 
 TEMPLATE_SPECIALIZATION
-CBucketList::~CDataStorage()
-{
-}
-
+CBucketList::~CDataStorage() {}
 TEMPLATE_SPECIALIZATION
 inline void CBucketList::init()
 {
@@ -40,7 +37,8 @@ inline void CBucketList::init()
     m_list_tail->f() = m_max_distance;
     m_list_tail->prev() = m_list_head;
     m_min_bucket_id = BucketCount;
-    if (ClearBuckets) ZeroMemory(m_buckets, BucketCount * sizeof(Vertex*));
+    if (ClearBuckets)
+        ZeroMemory(m_buckets, BucketCount * sizeof(Vertex*));
 }
 
 TEMPLATE_SPECIALIZATION
@@ -53,14 +51,18 @@ inline void CBucketList::add_best_closed()
 TEMPLATE_SPECIALIZATION
 inline bool CBucketList::is_opened_empty()
 {
-    if (m_min_bucket_id == BucketCount) return true;
-    if (!m_buckets[m_min_bucket_id]) {
+    if (m_min_bucket_id == BucketCount)
+        return true;
+    if (!m_buckets[m_min_bucket_id])
+    {
         m_min_bucket_id++;
-        if (!ClearBuckets) {
+        if (!ClearBuckets)
+        {
             while (m_min_bucket_id < BucketCount)
             {
                 auto bucket = m_buckets[m_min_bucket_id];
-                if (!bucket || bucket->m_path_id != current_path_id() || bucket->m_bucket_id != m_min_bucket_id) {
+                if (!bucket || bucket->m_path_id != current_path_id() || bucket->m_bucket_id != m_min_bucket_id)
+                {
                     m_min_bucket_id++;
                     continue;
                 }
@@ -81,8 +83,10 @@ TEMPLATE_SPECIALIZATION
 inline u32 CBucketList::compute_bucket_id(Vertex& vertex) const
 {
     Distance dist = vertex.f();
-    if (dist >= m_max_bucket_value) return BucketCount - 1;
-    if (dist <= m_min_bucket_value) return 0;
+    if (dist >= m_max_bucket_value)
+        return BucketCount - 1;
+    if (dist <= m_min_bucket_value)
+        return 0;
     return u32(BucketCount * (dist - m_min_bucket_value) / (m_max_bucket_value - m_min_bucket_value));
 }
 
@@ -125,9 +129,11 @@ inline void CBucketList::verify_buckets() const
 TEMPLATE_SPECIALIZATION
 inline void CBucketList::add_to_bucket(Vertex& vertex, u32 m_bucket_id)
 {
-    if (m_bucket_id < m_min_bucket_id) m_min_bucket_id = m_bucket_id;
+    if (m_bucket_id < m_min_bucket_id)
+        m_min_bucket_id = m_bucket_id;
     Vertex* i = m_buckets[m_bucket_id];
-    if (!i || !ClearBuckets && (i->m_path_id != current_path_id() || i->m_bucket_id != m_bucket_id)) {
+    if (!i || !ClearBuckets && (i->m_path_id != current_path_id() || i->m_bucket_id != m_bucket_id))
+    {
         vertex.m_bucket_id = m_bucket_id;
         vertex.m_path_id = current_path_id();
         m_buckets[m_bucket_id] = &vertex;
@@ -137,7 +143,8 @@ inline void CBucketList::add_to_bucket(Vertex& vertex, u32 m_bucket_id)
     }
     vertex.m_bucket_id = m_bucket_id;
     vertex.m_path_id = current_path_id();
-    if (i->f() >= vertex.f()) {
+    if (i->f() >= vertex.f())
+    {
         m_buckets[m_bucket_id] = &vertex;
         vertex.next() = i;
         vertex.prev() = 0;
@@ -145,7 +152,8 @@ inline void CBucketList::add_to_bucket(Vertex& vertex, u32 m_bucket_id)
         verify_buckets();
         return;
     }
-    if (!i->next()) {
+    if (!i->next())
+    {
         vertex.prev() = i;
         vertex.next() = 0;
         i->next() = &vertex;
@@ -154,7 +162,8 @@ inline void CBucketList::add_to_bucket(Vertex& vertex, u32 m_bucket_id)
     }
     for (i = i->next(); i->next(); i = i->next())
     {
-        if (i->f() >= vertex.f()) {
+        if (i->f() >= vertex.f())
+        {
             vertex.next() = i;
             vertex.prev() = i->prev();
             i->prev()->next() = &vertex;
@@ -163,7 +172,8 @@ inline void CBucketList::add_to_bucket(Vertex& vertex, u32 m_bucket_id)
             return;
         }
     }
-    if (i->f() >= vertex.f()) {
+    if (i->f() >= vertex.f())
+    {
         vertex.next() = i;
         vertex.prev() = i->prev();
         i->prev()->next() = &vertex;
@@ -201,7 +211,8 @@ inline void CBucketList::decrease_opened(Vertex& vertex, const Distance /*value*
         VERIFY(m_buckets[vertex.m_bucket_id] == &vertex);
         m_buckets[vertex.m_bucket_id] = vertex.next();
     }
-    if (vertex.next()) vertex.next()->prev() = vertex.prev();
+    if (vertex.next())
+        vertex.next()->prev() = vertex.prev();
     verify_buckets();
     add_to_bucket(vertex, node_bucket_id);
     verify_buckets();
@@ -214,7 +225,8 @@ inline void CBucketList::remove_best_opened()
     verify_buckets();
     VERIFY(m_buckets[m_min_bucket_id] && is_visited(m_buckets[m_min_bucket_id]->index()));
     m_buckets[m_min_bucket_id] = m_buckets[m_min_bucket_id]->next();
-    if (m_buckets[m_min_bucket_id]) m_buckets[m_min_bucket_id]->prev() = 0;
+    if (m_buckets[m_min_bucket_id])
+        m_buckets[m_min_bucket_id]->prev() = 0;
     verify_buckets();
 }
 

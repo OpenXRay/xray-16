@@ -5,14 +5,14 @@
 #include "utils/xrLC_Light/lightmap.h"
 #include "utils/xrLC_Light/xrface.h"
 
-#define TRY(a)                                                                                                         \
-    try                                                                                                                \
-    {                                                                                                                  \
-        a;                                                                                                             \
-    }                                                                                                                  \
-    catch (...)                                                                                                        \
-    {                                                                                                                  \
-        Logger.clMsg("* E: %s", #a);                                                                                   \
+#define TRY(a)\
+    try\
+    {\
+        a;\
+    }\
+    catch (...)\
+    {\
+        Logger.clMsg("* E: %s", #a);\
     }
 
 void CBuild::validate_splits()
@@ -20,9 +20,10 @@ void CBuild::validate_splits()
     for (splitIt it = g_XSplit.begin(); it != g_XSplit.end(); it++)
     {
         u32 MODEL_ID = u32(it - g_XSplit.begin());
-        if ((*it)->size() > c_SS_HighVertLimit * 2) {
+        if ((*it)->size() > c_SS_HighVertLimit * 2)
+        {
             Logger.clMsg(
-                "! ERROR: subdiv #%d has more than %d faces (%d)", MODEL_ID, 2 * c_SS_HighVertLimit, (*it)->size());
+            "! ERROR: subdiv #%d has more than %d faces (%d)", MODEL_ID, 2 * c_SS_HighVertLimit, (*it)->size());
         }
     };
 }
@@ -86,8 +87,8 @@ void CBuild::Flex2OGF()
         u32 MODEL_ID = u32(it - g_XSplit.begin());
 
         OGF* pOGF = new OGF();
-        Face* F = *((*it)->begin());                    // first face
-        b_material* M = &(materials()[F->dwMaterial]);  // and it's material
+        Face* F = *((*it)->begin()); // first face
+        b_material* M = &(materials()[F->dwMaterial]); // and it's material
         R_ASSERT(F && M);
 
         try
@@ -107,12 +108,13 @@ void CBuild::Flex2OGF()
 
             try
             {
-                if (F->hasImplicitLighting()) {
+                if (F->hasImplicitLighting())
+                {
                     // specific lmap
                     string_path tn;
                     strconcat(sizeof(tn), tn, *T.name, "_lm.dds");
                     T.name = tn;
-                    T.pBuildSurface = T.pBuildSurface;  // Leave surface intact
+                    T.pBuildSurface = T.pBuildSurface; // Leave surface intact
                     R_ASSERT(pOGF);
                     pOGF->textures.push_back(T);
                 }
@@ -120,14 +122,15 @@ void CBuild::Flex2OGF()
                 {
                     // If lightmaps persist
                     CLightmap* LM = F->lmap_layer;
-                    if (LM) {
+                    if (LM)
+                    {
                         string_path fn;
                         xr_sprintf(fn, "%s_1", LM->lm_texture.name);
                         T.name = fn;
                         T.pBuildSurface = &(LM->lm_texture);
                         R_ASSERT(T.pBuildSurface);
                         R_ASSERT(pOGF);
-                        pOGF->textures.push_back(T);  //.
+                        pOGF->textures.push_back(T); //.
                         xr_sprintf(fn, "%s_2", LM->lm_texture.name);
                         T.name = fn;
                         pOGF->textures.push_back(T);
@@ -163,7 +166,8 @@ void CBuild::Flex2OGF()
             Logger.clMsg("%3d: cb  : v(%d)-f(%d)", MODEL_ID, pOGF->data.vertices.size(), pOGF->data.faces.size());
             pOGF->CalcBounds();
             Logger.clMsg("%3d: prog: v(%d)-f(%d)", MODEL_ID, pOGF->data.vertices.size(), pOGF->data.faces.size());
-            if (!g_build_options.b_noise) pOGF->MakeProgressive(c_PM_MetricLimit_static);
+            if (!g_build_options.b_noise)
+                pOGF->MakeProgressive(c_PM_MetricLimit_static);
             Logger.clMsg("%3d: strp: v(%d)-f(%d)", MODEL_ID, pOGF->data.vertices.size(), pOGF->data.faces.size());
             pOGF->Stripify();
         }

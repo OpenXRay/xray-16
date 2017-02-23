@@ -21,7 +21,7 @@ light::light(void) : SpatialBase(g_SpatialSpace)
     color.set(1, 1, 1, 1);
 
     m_volumetric_quality = 1;
-    // m_volumetric_quality	= 0.5;
+    // m_volumetric_quality = 0.5;
     m_volumetric_intensity = 1;
     m_volumetric_distance = 1;
 
@@ -31,12 +31,12 @@ light::light(void) : SpatialBase(g_SpatialSpace)
     ZeroMemory(omnipart, sizeof(omnipart));
     s_spot = NULL;
     s_point = NULL;
-    vis.frame2test = 0;  // xffffffff;
+    vis.frame2test = 0; // xffffffff;
     vis.query_id = 0;
     vis.query_order = 0;
     vis.visible = true;
     vis.pending = false;
-#endif  // (RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4)
+#endif // (RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4)
 }
 
 light::~light()
@@ -44,20 +44,22 @@ light::~light()
 #if (RENDER == R_R2) || (RENDER == R_R3) || (RENDER == R_R4)
     for (int f = 0; f < 6; f++)
         xr_delete(omnipart[f]);
-#endif  // (RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4)
+#endif // (RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4)
     set_active(false);
 
 // remove from Lights_LastFrame
 #if (RENDER == R_R2) || (RENDER == R_R3) || (RENDER == R_R4)
     for (u32 it = 0; it < RImplementation.Lights_LastFrame.size(); it++)
-        if (this == RImplementation.Lights_LastFrame[it]) RImplementation.Lights_LastFrame[it] = 0;
-#endif  // (RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4)
+        if (this == RImplementation.Lights_LastFrame[it])
+            RImplementation.Lights_LastFrame[it] = 0;
+#endif // (RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4)
 }
 
 #if (RENDER == R_R2) || (RENDER == R_R3) || (RENDER == R_R4)
 void light::set_texture(LPCSTR name)
 {
-    if ((0 == name) || (0 == name[0])) {
+    if ((0 == name) || (0 == name[0]))
+    {
         // default shaders
         s_spot.destroy();
         s_point.destroy();
@@ -74,12 +76,14 @@ void light::set_texture(LPCSTR name)
 
 #if (RENDER != R_R3) && (RENDER != R_R4)
     s_volumetric.create("accum_volumetric", name);
-#else   //	(RENDER!=R_R3) && (RENDER!=R_R4)
+#else //    (RENDER!=R_R3) && (RENDER!=R_R4)
     s_volumetric.create("accum_volumetric_nomsaa", name);
-    if (RImplementation.o.dx10_msaa) {
+    if (RImplementation.o.dx10_msaa)
+    {
         int bound = 1;
 
-        if (!RImplementation.o.dx10_msaa_opt) bound = RImplementation.o.dx10_msaa_samples;
+        if (!RImplementation.o.dx10_msaa_opt)
+            bound = RImplementation.o.dx10_msaa_samples;
 
         for (int i = 0; i < bound; ++i)
         {
@@ -89,46 +93,49 @@ void light::set_texture(LPCSTR name)
                 strconcat(sizeof(temp), temp, "r2\\accum_volumetric_", name), name);
         }
     }
-#endif  // (RENDER!=R_R3) || (RENDER!=R_R4)
+#endif // (RENDER!=R_R3) || (RENDER!=R_R4)
 }
 #endif
 
 #if RENDER == R_R1
-void light::set_texture(LPCSTR name)
-{
-}
+void light::set_texture(LPCSTR name) {}
 #endif
 
 void light::set_active(bool a)
 {
-    if (a) {
-        if (flags.bActive) return;
+    if (a)
+    {
+        if (flags.bActive)
+            return;
         flags.bActive = true;
         spatial_register();
         spatial_move();
-// Msg								("!!! L-register: %X",u32(this));
+//Msg("!!! L-register: %X", u32(this));
 
 #ifdef DEBUG
         Fvector zero = {0, -1000, 0};
-        if (position.similar(zero)) {
+        if (position.similar(zero))
+        {
             Msg("- Uninitialized light position.");
         }
-#endif  // DEBUG
+#endif // DEBUG
     }
     else
     {
-        if (!flags.bActive) return;
+        if (!flags.bActive)
+            return;
         flags.bActive = false;
         spatial_move();
         spatial_unregister();
-        // Msg								("!!! L-unregister: %X",u32(this));
+        //Msg("!!! L-unregister: %X", u32(this));
     }
 }
 
 void light::set_position(const Fvector& P)
 {
-    float eps = EPS_L;  //_max	(range*0.001f,EPS_L);
-    if (position.similar(P, eps)) return;
+    float eps = EPS_L; //_max(range*0.001f,EPS_L);
+    if (position.similar(P, eps))
+        return;
     position.set(P);
     spatial_move();
 }
@@ -136,15 +143,17 @@ void light::set_position(const Fvector& P)
 void light::set_range(float R)
 {
     float eps = _max(range * 0.1f, EPS_L);
-    if (fsimilar(range, R, eps)) return;
+    if (fsimilar(range, R, eps))
+        return;
     range = R;
     spatial_move();
 };
 
 void light::set_cone(float angle)
 {
-    if (fsimilar(cone, angle)) return;
-    VERIFY(cone < deg2rad(121.f));  // 120 is hard limit for lights
+    if (fsimilar(cone, angle))
+        return;
+    VERIFY(cone < deg2rad(121.f)); // 120 is hard limit for lights
     cone = angle;
     spatial_move();
 }
@@ -153,7 +162,8 @@ void light::set_rotation(const Fvector& D, const Fvector& R)
     Fvector old_D = direction;
     direction.normalize(D);
     right.normalize(R);
-    if (!fsimilar(1.f, old_D.dotproduct(D))) spatial_move();
+    if (!fsimilar(1.f, old_D.dotproduct(D)))
+        spatial_move();
 }
 
 void light::spatial_move()
@@ -168,7 +178,8 @@ void light::spatial_move()
     {
         // minimal enclosing sphere around cone
         VERIFY2(cone < deg2rad(121.f), "Too large light-cone angle. Maybe you have passed it in 'degrees'?");
-        if (cone >= PI_DIV_2) {
+        if (cone >= PI_DIV_2)
+        {
             // obtused-angled
             spatial.sphere.P.mad(position, direction, range);
             spatial.sphere.R = range * tanf(cone / 2.f);
@@ -184,8 +195,8 @@ void light::spatial_move()
     case IRender_Light::OMNIPART:
     {
         // is it optimal? seems to be...
-        // spatial.sphere.P.mad		(position,direction,range);
-        // spatial.sphere.R			= range;
+        //spatial.sphere.P.mad(position, direction, range);
+        //spatial.sphere.R = range;
         // This is optimal.
         const float fSphereR = range * RSQRTDIV2;
         spatial.sphere.P.mad(position, direction, fSphereR);
@@ -198,9 +209,10 @@ void light::spatial_move()
     SpatialBase::spatial_move();
 
 #if (RENDER == R_R2) || (RENDER == R_R3) || (RENDER == R_R4)
-    if (flags.bActive) gi_generate();
+    if (flags.bActive)
+        gi_generate();
     svis.invalidate();
-#endif  // (RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4)
+#endif // (RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4)
 }
 
 vis_data& light::get_homdata()
@@ -212,17 +224,14 @@ vis_data& light::get_homdata()
     return hom;
 };
 
-Fvector light::spatial_sector_point()
-{
-    return position;
-}
-
+Fvector light::spatial_sector_point() { return position; }
 //////////////////////////////////////////////////////////////////////////
 #if (RENDER == R_R2) || (RENDER == R_R3) || (RENDER == R_R4)
 // Xforms
 void light::xform_calc()
 {
-    if (Device.dwFrame == m_xform_frame) return;
+    if (Device.dwFrame == m_xform_frame)
+        return;
     m_xform_frame = Device.dwFrame;
 
     // build final rotation / translation
@@ -237,7 +246,8 @@ void light::xform_calc()
         L_dir.set(0, 0, 1);
 
     // R&N
-    if (right.square_magnitude() > EPS) {
+    if (right.square_magnitude() > EPS)
+    {
         // use specified 'up' and 'right', just enshure ortho-normalization
         L_right.set(right);
         L_right.normalize();
@@ -250,7 +260,8 @@ void light::xform_calc()
     {
         // auto find 'up' and 'right' vectors
         L_up.set(0, 1, 0);
-        if (_abs(L_up.dotproduct(L_dir)) > .99f) L_up.set(0, 0, 1);
+        if (_abs(L_up.dotproduct(L_dir)) > .99f)
+            L_up.set(0, 0, 1);
         L_right.crossproduct(L_up, L_dir);
         L_right.normalize();
         L_up.crossproduct(L_dir, L_right);
@@ -286,13 +297,13 @@ void light::xform_calc()
         // scale to account range and angle
         float s = 2.f * range * tanf(cone / 2.f);
         Fmatrix mScale;
-        mScale.scale(s, s, range);  // make range and radius
+        mScale.scale(s, s, range); // make range and radius
         m_xform.mul_43(mR, mScale);
     }
     break;
     case IRender_Light::OMNIPART:
     {
-        float L_R = 2 * range;  // volume is half-radius
+        float L_R = 2 * range; // volume is half-radius
         Fmatrix mScale;
         mScale.scale(L_R, L_R, L_R);
         m_xform.mul_43(mR, mScale);
@@ -302,7 +313,7 @@ void light::xform_calc()
     }
 }
 
-//								+X,				-X,				+Y,				-Y,			+Z,				-Z
+// +X, -X, +Y, -Y, +Z, -Z
 static Fvector cmNorm[6] = {
     {0.f, 1.f, 0.f}, {0.f, 1.f, 0.f}, {0.f, 0.f, -1.f}, {0.f, 0.f, 1.f}, {0.f, 1.f, 0.f}, {0.f, 1.f, 0.f}};
 static Fvector cmDir[6] = {
@@ -310,7 +321,8 @@ static Fvector cmDir[6] = {
 
 void light::Export(light_Package& package)
 {
-    if (flags.bShadow) {
+    if (flags.bShadow)
+    {
         switch (flags.type)
         {
         case IRender_Light::POINT:
@@ -331,16 +343,18 @@ void light::Export(light_Package& package)
                 L->set_cone(PI_DIV_2);
                 L->set_range(range);
                 L->set_color(color);
-                L->spatial.sector = spatial.sector;  //. dangerous?
+                L->spatial.sector = spatial.sector; //. dangerous?
                 L->s_spot = s_spot;
                 L->s_point = s_point;
 
 // Holger - do we need to export msaa stuff as well ?
 #if (RENDER == R_R3) || (RENDER == R_R4)
-                if (RImplementation.o.dx10_msaa) {
+                if (RImplementation.o.dx10_msaa)
+                {
                     int bound = 1;
 
-                    if (!RImplementation.o.dx10_msaa_opt) bound = RImplementation.o.dx10_msaa_samples;
+                    if (!RImplementation.o.dx10_msaa_opt)
+                        bound = RImplementation.o.dx10_msaa_samples;
 
                     for (int i = 0; i < bound; ++i)
                     {
@@ -349,9 +363,9 @@ void light::Export(light_Package& package)
                         // L->s_volumetric_msaa[i] = s_volumetric_msaa[i];
                     }
                 }
-#endif  //	(RENDER==R_R3) || (RENDER==R_R4)
+#endif // (RENDER==R_R3) || (RENDER==R_R4)
 
-                //	Igor: add volumetric support
+                //  Igor: add volumetric support
                 L->set_volumetric(flags.bVolumetric);
                 L->set_volumetric_quality(m_volumetric_quality);
                 L->set_volumetric_intensity(m_volumetric_intensity);
@@ -382,13 +396,14 @@ void light::set_attenuation_params(float a0, float a1, float a2, float fo)
     falloff = fo;
 }
 
-#endif  // (RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4)
+#endif // (RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4)
 
 extern float r_ssaGLOD_start, r_ssaGLOD_end;
 extern float ps_r2_slight_fade;
 float light::get_LOD()
 {
-    if (!flags.bShadow) return 1;
+    if (!flags.bShadow)
+        return 1;
     float distSQ = Device.vCameraPosition.distance_to_sqr(spatial.sphere.P) + EPS;
     float ssa = ps_r2_slight_fade * spatial.sphere.R / distSQ;
     float lod = _sqrt(clampr((ssa - r_ssaGLOD_end) / (r_ssaGLOD_start - r_ssaGLOD_end), 0.f, 1.f));

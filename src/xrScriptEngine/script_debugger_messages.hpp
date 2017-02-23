@@ -49,7 +49,6 @@ struct SScriptThread
     }
 
     SScriptThread(const SScriptThread& other) { operator=(other); }
-
     SScriptThread& operator=(const SScriptThread& other)
     {
         // pScript = other.pScript;

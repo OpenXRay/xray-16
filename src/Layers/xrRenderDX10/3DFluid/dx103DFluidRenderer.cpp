@@ -45,11 +45,7 @@ dx103DFluidRenderer::dx103DFluidRenderer() : m_bInited(false)
     RTFormats[RRT_EdgeTex] = D3DFMT_R32F;
 }
 
-dx103DFluidRenderer::~dx103DFluidRenderer()
-{
-    Destroy();
-}
-
+dx103DFluidRenderer::~dx103DFluidRenderer() { Destroy(); }
 void dx103DFluidRenderer::Initialize(int gridWidth, int gridHeight, int gridDepth)
 {
     Destroy();
@@ -87,7 +83,8 @@ void dx103DFluidRenderer::Initialize(int gridWidth, int gridHeight, int gridDept
 
 void dx103DFluidRenderer::Destroy()
 {
-    if (!m_bInited) return;
+    if (!m_bInited)
+        return;
 
     // createJitterTexture();
     m_JitterTexture = 0;
@@ -295,45 +292,14 @@ void dx103DFluidRenderer::CreateJitterTexture()
 namespace
 {
 // cubic b-spline
-float bsW0(float a)
-{
-    return (1.0f / 6.0f * (-(a * a * a) + (3.0f * a * a) - (3.0f * a) + 1.0f));
-}
-
-float bsW1(float a)
-{
-    return (1.0f / 6.0f * ((3.0f * a * a * a) - (6.0f * a * a) + 4.0f));
-}
-
-float bsW2(float a)
-{
-    return (1.0f / 6.0f * (-(3.0f * a * a * a) + (3.0f * a * a) + (3.0f * a) + 1.0f));
-}
-
-float bsW3(float a)
-{
-    return (1.0f / 6.0f * a * a * a);
-}
-
-float g0(float a)
-{
-    return (bsW0(a) + bsW1(a));
-}
-
-float g1(float a)
-{
-    return (bsW2(a) + bsW3(a));
-}
-
-float h0texels(float a)
-{
-    return (1.0f + a - (bsW1(a) / (bsW0(a) + bsW1(a))));
-}
-
-float h1texels(float a)
-{
-    return (1.0f - a + (bsW3(a) / (bsW2(a) + bsW3(a))));
-}
+float bsW0(float a) { return (1.0f / 6.0f * (-(a * a * a) + (3.0f * a * a) - (3.0f * a) + 1.0f)); }
+float bsW1(float a) { return (1.0f / 6.0f * ((3.0f * a * a * a) - (6.0f * a * a) + 4.0f)); }
+float bsW2(float a) { return (1.0f / 6.0f * (-(3.0f * a * a * a) + (3.0f * a * a) + (3.0f * a) + 1.0f)); }
+float bsW3(float a) { return (1.0f / 6.0f * a * a * a); }
+float g0(float a) { return (bsW0(a) + bsW1(a)); }
+float g1(float a) { return (bsW2(a) + bsW3(a)); }
+float h0texels(float a) { return (1.0f + a - (bsW1(a) / (bsW0(a) + bsW1(a)))); }
+float h1texels(float a) { return (1.0f - a + (bsW3(a) / (bsW2(a) + bsW3(a)))); }
 }
 
 void dx103DFluidRenderer::CreateHHGGTexture()
@@ -403,11 +369,7 @@ void dx103DFluidRenderer::CreateHHGGTexture()
     _RELEASE(HHGGTexture);
 }
 
-void dx103DFluidRenderer::SetScreenSize(int width, int height)
-{
-    CreateRayDataResources(width, height);
-}
-
+void dx103DFluidRenderer::SetScreenSize(int width, int height) { CreateRayDataResources(width, height); }
 void dx103DFluidRenderer::CalculateRenderTextureSize(int screenWidth, int screenHeight)
 {
     int maxProjectedSide = int(3.0 * _sqrt(3.0) * m_fMaxDim);
@@ -415,8 +377,10 @@ void dx103DFluidRenderer::CalculateRenderTextureSize(int screenWidth, int screen
 
     float screenAspectRatio = ((float)screenWidth) / screenHeight;
 
-    if (maxScreenDim > maxProjectedSide) {
-        if (screenHeight > screenWidth) {
+    if (maxScreenDim > maxProjectedSide)
+    {
+        if (screenHeight > screenWidth)
+        {
             m_iRenderTextureHeight = maxProjectedSide;
             m_iRenderTextureWidth = (int)(screenAspectRatio * maxProjectedSide);
         }
@@ -657,7 +621,7 @@ void dx103DFluidRenderer::Draw(const dx103DFluidData& FluidData)
     HW.pContext->ClearRenderTargetView(RT[RRT_RayCastTex]->pRT, color);
     // m_pD3DDevice->OMSetRenderTargets( 1, &pRayCastRTV , NULL );
     CRenderTarget* pTarget = RImplementation.Target;
-    pTarget->u_setrt(RT[RRT_RayCastTex], 0, 0, 0);  // LDR RT
+    pTarget->u_setrt(RT[RRT_RayCastTex], 0, 0, 0); // LDR RT
 
     // rtViewport.Width = renderTextureWidth;
     // rtViewport.Height = renderTextureHeight;
@@ -687,9 +651,9 @@ void dx103DFluidRenderer::Draw(const dx103DFluidData& FluidData)
     // m_pD3DDevice->OMSetRenderTargets( 1, &pRTV , pDSV );
     //	Restore render state
     if (!RImplementation.o.dx10_msaa)
-        pTarget->u_setrt(pTarget->rt_Generic_0, 0, 0, HW.pBaseZB);  // LDR RT
+        pTarget->u_setrt(pTarget->rt_Generic_0, 0, 0, HW.pBaseZB); // LDR RT
     else
-        pTarget->u_setrt(pTarget->rt_Generic_0_r, 0, 0, pTarget->rt_MSAADepth->pZRT);  // LDR RT
+        pTarget->u_setrt(pTarget->rt_Generic_0_r, 0, 0, pTarget->rt_MSAADepth->pZRT); // LDR RT
 
     if (bRenderFire)
         RCache.set_Element(m_RendererTechnique[RS_QuadRaycastCopyFire]);
@@ -724,7 +688,7 @@ void dx103DFluidRenderer::ComputeRayData()
     HW.pContext->ClearRenderTargetView(RT[RRT_RayDataTex]->pRT, blackColor);
     // m_pD3DDevice->OMSetRenderTargets(1, &pRayDataRTV, NULL);
     CRenderTarget* pTarget = RImplementation.Target;
-    pTarget->u_setrt(RT[RRT_RayDataTex], 0, 0, 0);  // LDR RT
+    pTarget->u_setrt(RT[RRT_RayDataTex], 0, 0, 0); // LDR RT
     // pEffect->GetVariableByName("sceneDepthTex")->AsShaderResource()->SetResource(g_pSceneDepthSRV);
     RCache.set_Element(m_RendererTechnique[RS_CompRayData_Back]);
 
@@ -752,7 +716,7 @@ void dx103DFluidRenderer::ComputeRayData()
     // We output xyz="position in grid space" and w=boxDepth,
     //  unless the pixel is occluded by the scene, in which case we output xyzw=(1,0,0,0)
     // m_pD3DDevice->OMSetRenderTargets(1, &pRayDataRTV, NULL);
-    pTarget->u_setrt(RT[RRT_RayDataTex], 0, 0, 0);  // LDR RT
+    pTarget->u_setrt(RT[RRT_RayDataTex], 0, 0, 0); // LDR RT
     RCache.set_Element(m_RendererTechnique[RS_CompRayData_Front]);
     // pTechnique->GetPassByName("CompRayData_Front")->Apply(0);
     DrawBox();
@@ -761,7 +725,7 @@ void dx103DFluidRenderer::ComputeRayData()
 void dx103DFluidRenderer::ComputeEdgeTexture()
 {
     CRenderTarget* pTarget = RImplementation.Target;
-    pTarget->u_setrt(RT[RRT_RayDataTexSmall], 0, 0, 0);  // LDR RT
+    pTarget->u_setrt(RT[RRT_RayDataTexSmall], 0, 0, 0); // LDR RT
     RCache.set_Element(m_RendererTechnique[RS_QuadDownSampleRayDataTexture]);
 
     // First setup viewport to match the size of the destination low-res texture
@@ -786,7 +750,7 @@ void dx103DFluidRenderer::ComputeEdgeTexture()
     DrawScreenQuad();
 
     // Create an edge texture, performing edge detection on 'rayDataTexSmall'
-    pTarget->u_setrt(RT[RRT_EdgeTex], 0, 0, 0);  // LDR RT
+    pTarget->u_setrt(RT[RRT_EdgeTex], 0, 0, 0); // LDR RT
     RCache.set_Element(m_RendererTechnique[RS_QuadEdgeDetect]);
     // m_pD3DDevice->OMSetRenderTargets( 1, &pEdgeRTV , NULL );
     // pRayDataSmallVar->SetResource(pRayDataSmallSRV);
@@ -848,7 +812,7 @@ void dx103DFluidRenderer::CalculateLighting(const dx103DFluidData& FluidData, Fo
 
     // Traverse object database
     g_SpatialSpace->q_box(m_lstRenderables,
-        0,  // ISpatial_DB::O_ORDERED,
+        0, // ISpatial_DB::O_ORDERED,
         STYPE_LIGHTSOURCE, center, size);
 
     u32 iNumRenderables = m_lstRenderables.size();
@@ -861,12 +825,14 @@ void dx103DFluidRenderer::CalculateLighting(const dx103DFluidData& FluidData, Fo
         light* pLight = (light*)spatial->dcast_Light();
         VERIFY(pLight);
 
-        if (pLight->flags.bStatic) continue;
+        if (pLight->flags.bStatic)
+            continue;
 
         float d = pLight->position.distance_to(Transform.c);
 
         float R = pLight->range + _max(size.x, _max(size.y, size.z));
-        if (d >= R) continue;
+        if (d >= R)
+            continue;
 
         Fvector3 LightIntencity;
 

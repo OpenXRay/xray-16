@@ -20,24 +20,10 @@
 
 using editor::window_ide;
 
-ide_impl::ide_impl(editor::engine* engine) : m_engine(engine), m_window(nullptr), m_paused(false), m_in_idle(false)
-{
-}
-
-ide_impl::~ide_impl()
-{
-}
-
-void ide_impl::window(window_ide ^ window)
-{
-    m_window = window;
-}
-
-window_ide ^ ide_impl::window()
-{
-    return (m_window);
-}
-
+ide_impl::ide_impl(editor::engine* engine) : m_engine(engine), m_window(nullptr), m_paused(false), m_in_idle(false) {}
+ide_impl::~ide_impl() {}
+void ide_impl::window(window_ide ^ window) { m_window = window; }
+window_ide ^ ide_impl::window() { return (m_window); }
 void ide_impl::on_idle_start()
 {
     VERIFY(!m_in_idle);
@@ -58,37 +44,17 @@ void ide_impl::on_idle_end()
     m_in_idle = false;
 }
 
-bool ide_impl::idle() const
-{
-    return (m_in_idle);
-}
-
-HWND ide_impl::main_handle()
-{
-    return ((HWND)m_window->Handle.ToInt32());
-}
-
-HWND ide_impl::view_handle()
-{
-    return ((HWND)m_window->view().draw_handle().ToInt32());
-}
-
-void ide_impl::run()
-{
-    Application::Run(m_window);
-}
-
+bool ide_impl::idle() const { return (m_in_idle); }
+HWND ide_impl::main_handle() { return ((HWND)m_window->Handle.ToInt32()); }
+HWND ide_impl::view_handle() { return ((HWND)m_window->view().draw_handle().ToInt32()); }
+void ide_impl::run() { Application::Run(m_window); }
 void ide_impl::on_load_finished()
 {
     m_window->view().on_load_finished();
     m_window->weather_editor().on_load_finished();
 }
 
-void ide_impl::pause()
-{
-    m_window->view().pause();
-}
-
+void ide_impl::pause() { m_window->view().pause(); }
 editor::property_holder* ide_impl::create_property_holder(
     LPCSTR display_name, editor::property_holder_collection* collection, editor::property_holder_holder* holder)
 {

@@ -21,8 +21,8 @@ struct tri
 };
 struct elipsoid
 {
-    Fmatrix mL2W;  // convertion from sphere(000,1) to real space
-    Fmatrix mW2L;  // convertion from real space to sphere(000,1)
+    Fmatrix mL2W; // convertion from sphere(000,1) to real space
+    Fmatrix mW2L; // convertion from real space to sphere(000,1)
 };
 struct ray_cache
 {
@@ -53,9 +53,12 @@ struct ray_cache
     }
     BOOL similar(const Fvector& _start, const Fvector& _dir, const float _range)
     {
-        if (!_start.similar(start)) return FALSE;
-        if (!fsimilar(1.f, dir.dotproduct(_dir))) return FALSE;
-        if (!fsimilar(_range, range)) return FALSE;
+        if (!_start.similar(start))
+            return FALSE;
+        if (!fsimilar(1.f, dir.dotproduct(_dir)))
+            return FALSE;
+        if (!fsimilar(_range, range))
+            return FALSE;
         return TRUE;
     }
 };
@@ -87,9 +90,9 @@ struct ray_defs
 };
 struct rq_result
 {
-    IGameObject* O;  // if NULL - static
-    float range;     // range to intersection
-    int element;     // номер кости/номер треугольника
+    IGameObject* O; // if NULL - static
+    float range; // range to intersection
+    int element; // номер кости/номер треугольника
     IC rq_result& set(IGameObject* _O, float _range, int _element)
     {
         O = _O;
@@ -99,7 +102,8 @@ struct rq_result
     }
     IC BOOL set_if_less(CDB::RESULT* I)
     {
-        if (I->range < range) {
+        if (I->range < range)
+        {
             set(0, I->range, I->id);
             return TRUE;
         }
@@ -108,7 +112,8 @@ struct rq_result
     }
     IC BOOL set_if_less(rq_result* R)
     {
-        if (R->range < range) {
+        if (R->range < range)
+        {
             set(R->O, R->range, R->element);
             return TRUE;
         }
@@ -117,7 +122,8 @@ struct rq_result
     }
     IC BOOL set_if_less(IGameObject* _who, float _range, int _element)
     {
-        if (_range < range) {
+        if (_range < range)
+        {
             set(_who, _range, _element);
             return TRUE;
         }
@@ -133,13 +139,14 @@ class rq_results
 protected:
     rqVec results;
     static bool r_sort_pred(const rq_result& a, const rq_result& b) { return a.range < b.range; }
-
 public:
     IC BOOL append_result(IGameObject* _who, float _range, int _element, BOOL bNearest)
     {
-        if (bNearest && !results.empty()) {
+        if (bNearest && !results.empty())
+        {
             rq_result& R = results.back();
-            if (_range < R.range) {
+            if (_range < R.range)
+            {
                 R.O = _who;
                 R.range = _range;
                 R.element = _element;
@@ -156,7 +163,8 @@ public:
     }
     IC void append_result(rq_result& res)
     {
-        if (0 == results.capacity()) results.reserve(8);
+        if (0 == results.capacity())
+            results.reserve(8);
         results.push_back(res);
     }
     IC int r_count() { return results.size(); }

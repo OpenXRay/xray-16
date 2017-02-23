@@ -11,20 +11,22 @@ int controlsInit = FALSE;
 
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, ULONG fdwReason, LPVOID lpvReserved)
 {
-    hInstance = hinstDLL;  // Hang on to this DLL's instance handle.
+    hInstance = hinstDLL; // Hang on to this DLL's instance handle.
 
-    if (!controlsInit) {
+    if (!controlsInit)
+    {
         controlsInit = TRUE;
         Core._initialize("S.T.A.L.K.E.R.Plugin", 0, FALSE, nullptr, true);
         FS._initialize(CLocatorAPI::flScanAppRoot, NULL, "xray_path.ltx");
-        FPU::m64r();                    // нужно чтобы макс не сбрасывал контрольки в 0
-        InitCustomControls(hInstance);  // Initialize MAX's custom controls
-        InitCommonControls();           // Initialize Win95 controls
+        FPU::m64r(); // нужно чтобы макс не сбрасывал контрольки в 0
+        InitCustomControls(hInstance); // Initialize MAX's custom controls
+        InitCommonControls(); // Initialize Win95 controls
         // load shader list
         XRayMtl::LoadXRayShaderList();
     }
 
-    if (DLL_PROCESS_DETACH == fdwReason) {
+    if (DLL_PROCESS_DETACH == fdwReason)
+    {
         Core._destroy();
         XRayMtl::UnloadXRayShaderList();
     }
@@ -32,16 +34,8 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, ULONG fdwReason, LPVOID lpvReserved)
     return (TRUE);
 }
 
-__declspec(dllexport) const TCHAR* LibDescription()
-{
-    return GetString(IDS_LIBDESCRIPTION);
-}
-
-__declspec(dllexport) int LibNumberClasses()
-{
-    return 1;
-}
-
+__declspec(dllexport) const TCHAR* LibDescription() { return GetString(IDS_LIBDESCRIPTION); }
+__declspec(dllexport) int LibNumberClasses() { return 1; }
 __declspec(dllexport) ClassDesc* LibClassDesc(int i)
 {
     switch (i)
@@ -51,16 +45,13 @@ __declspec(dllexport) ClassDesc* LibClassDesc(int i)
     }
 }
 
-__declspec(dllexport) ULONG LibVersion()
-{
-    return VERSION_3DSMAX;
-}
-
+__declspec(dllexport) ULONG LibVersion() { return VERSION_3DSMAX; }
 TCHAR* GetString(int id)
 {
     static TCHAR buf[256];
 
-    if (hInstance) return LoadString(hInstance, id, buf, sizeof(buf)) ? buf : NULL;
+    if (hInstance)
+        return LoadString(hInstance, id, buf, sizeof(buf)) ? buf : NULL;
 
     return NULL;
 }

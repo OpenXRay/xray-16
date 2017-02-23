@@ -15,8 +15,8 @@
 //---------------------------------------------------------------------------
 class TfrmBonePart : public TForm
 {
-    __published :  // IDE-managed Components
-                   TElTree* tvPart1;
+    __published : // IDE-managed Components
+                  TElTree* tvPart1;
     TLabel* RxLabel29;
     TEdit* edPart1Name;
     TElTree* tvPart2;
@@ -56,14 +56,14 @@ class TfrmBonePart : public TForm
     void __fastcall ebSaveToClick(TObject* Sender);
     void __fastcall ebLoadFromClick(TObject* Sender);
 
-  private:  // User declarations
+private: // User declarations
     xr_vector<TElTreeItem*> FDragItems;
     CEditableObject* m_EditObject;
     BPVec* m_BoneParts;
     void __fastcall FillBoneParts();
     void __fastcall UpdateCount();
 
-  public:  // User declarations
+public: // User declarations
     __fastcall TfrmBonePart(TComponent* Owner);
     bool Run(CEditableObject* object);
 };

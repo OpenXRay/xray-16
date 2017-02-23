@@ -57,30 +57,39 @@ float STestFootCallbackPars::max_real_depth = 0.2f;
 template <class Pars>
 void TTestDepthCallback(bool& do_colide, bool bo1, dContact& c, SGameMtl* material_1, SGameMtl* material_2)
 {
-    if (saved_callback) saved_callback(do_colide, bo1, c, material_1, material_2);
+    if (saved_callback)
+        saved_callback(do_colide, bo1, c, material_1, material_2);
 
-    if (do_colide && !material_1->Flags.test(SGameMtl::flPassable) && !material_2->Flags.test(SGameMtl::flPassable)) {
+    if (do_colide && !material_1->Flags.test(SGameMtl::flPassable) && !material_2->Flags.test(SGameMtl::flPassable))
+    {
         float& depth = c.geom.depth;
         float test_depth = depth - Pars::decrement_depth;
         save_max(max_depth, test_depth);
         c.surface.mu *= Pars::calback_friction_factor;
-        if (test_depth > Pars::depth_to_use_force) {
+        if (test_depth > Pars::depth_to_use_force)
+        {
             float force = Pars::callback_force_factor * ph_world->Gravity();
             dBodyID b1 = dGeomGetBody(c.geom.g1);
             dBodyID b2 = dGeomGetBody(c.geom.g2);
-            if (b1) dBodyAddForce(b1, c.geom.normal[0] * force, c.geom.normal[1] * force, c.geom.normal[2] * force);
-            if (b2) dBodyAddForce(b2, -c.geom.normal[0] * force, -c.geom.normal[1] * force, -c.geom.normal[2] * force);
+            if (b1)
+                dBodyAddForce(b1, c.geom.normal[0] * force, c.geom.normal[1] * force, c.geom.normal[2] * force);
+            if (b2)
+                dBodyAddForce(b2, -c.geom.normal[0] * force, -c.geom.normal[1] * force, -c.geom.normal[2] * force);
             dxGeomUserData* ud1 = retrieveGeomUserData(c.geom.g1);
             dxGeomUserData* ud2 = retrieveGeomUserData(c.geom.g2);
 
-            if (ud1) {
+            if (ud1)
+            {
                 CPhysicsShell* phsl = ud1->ph_ref_object->ObjectPPhysicsShell();
-                if (phsl) phsl->Enable();
+                if (phsl)
+                    phsl->Enable();
             }
 
-            if (ud2) {
+            if (ud2)
+            {
                 CPhysicsShell* phsl = ud2->ph_ref_object->ObjectPPhysicsShell();
-                if (phsl) phsl->Enable();
+                if (phsl)
+                    phsl->Enable();
             }
 
             do_colide = false;
@@ -130,12 +139,14 @@ public:
         const float* linear_velocity = dBodyGetLinearVel(m_body);
         // limit velocity
         bool ret = false;
-        if (dV_valid(linear_velocity)) {
+        if (dV_valid(linear_velocity))
+        {
             dReal mag;
             Fvector vlinear_velocity;
             vlinear_velocity.set(cast_fv(linear_velocity));
-            mag = _sqrt(linear_velocity[0] * linear_velocity[0] + linear_velocity[2] * linear_velocity[2]);  //
-            if (mag > l_limit) {
+            mag = _sqrt(linear_velocity[0] * linear_velocity[0] + linear_velocity[2] * linear_velocity[2]); //
+            if (mag > l_limit)
+            {
                 dReal f = mag / l_limit;
                 // dBodySetLinearVel(m_body,linear_velocity[0]/f,linear_velocity[1],linear_velocity[2]/f);///f
                 vlinear_velocity.x /= f;
@@ -143,7 +154,8 @@ public:
                 ret = true;
             }
             mag = _abs(linear_velocity[1]);
-            if (mag > y_limit) {
+            if (mag > y_limit)
+            {
                 vlinear_velocity.y = linear_velocity[1] / mag * y_limit;
                 ret = true;
             }
@@ -160,7 +172,8 @@ public:
     {
         const float* linear_velocity = dBodyGetLinearVel(m_body);
 
-        if (VelocityLimit()) {
+        if (VelocityLimit())
+        {
             dBodySetPosition(m_body, m_safe_position[0] + linear_velocity[0] * fixed_step,
                 m_safe_position[1] + linear_velocity[1] * fixed_step,
                 m_safe_position[2] + linear_velocity[2] * fixed_step);
@@ -201,10 +214,8 @@ public:
     float mf_othrs() { return m_max_force_others; }
     float mt_slf() { return m_max_torque_self; }
     float mt_othrs() { return m_max_torque_others; }
-
     float mf_slf_y() { return m_max_force_self_y; }
     float mf_slf_sd() { return m_max_force_self_sd; }
-
 protected:
     virtual void PhTune(dReal step)
     {
@@ -214,7 +225,8 @@ protected:
         {
             dJointID joint = dBodyGetJoint(m_body, i);
 
-            if (dJointGetType(joint) == dJointTypeContact) {
+            if (dJointGetType(joint) == dJointTypeContact)
+            {
                 dJointSetFeedback(joint, ContactFeedBacks.add());
             }
         }
@@ -226,7 +238,8 @@ protected:
         for (int i = 0; i < num; i++)
         {
             dJointID joint = dBodyGetJoint(m_body, i);
-            if (dJointGetType(joint) == dJointTypeContact) {
+            if (dJointGetType(joint) == dJointTypeContact)
+            {
                 dJointFeedback* feedback = dJointGetFeedback(joint);
                 R_ASSERT2(feedback, "Feedback was not set!!!");
                 dxJoint* b_joint = (dxJoint*)joint;
@@ -236,7 +249,8 @@ protected:
                 dReal* self_torque = feedback->t1;
                 dReal* othrers_force = feedback->f2;
                 dReal* othrers_torque = feedback->t2;
-                if (b_body_second) {
+                if (b_body_second)
+                {
                     other_body = b_joint->node[0].body;
                     self_force = feedback->f2;
                     self_torque = feedback->t2;
@@ -248,7 +262,8 @@ protected:
                 save_max(m_max_torque_self, _sqrt(dDOT(self_torque, self_torque)));
                 save_max(m_max_force_self_y, _abs(self_force[1]));
                 save_max(m_max_force_self_sd, _sqrt(self_force[0] * self_force[0] + self_force[2] * self_force[2]));
-                if (other_body) {
+                if (other_body)
+                {
                     dVector3 shoulder;
                     dVectorSub(shoulder, dJointGetPositionContact(joint), dBodyGetPosition(other_body));
                     dReal shoulder_lenght = _sqrt(dDOT(shoulder, shoulder));
@@ -321,7 +336,8 @@ bool ActivateBoxDynamic(IPHMovementControl* mov_control, bool character_exist, D
     //	int		num_steps=5;
     //	float	resolve_depth=0.01f;
 
-    if (!character_exist) {
+    if (!character_exist)
+    {
         num_it = 20;
         num_steps = 1;
         resolve_depth = 0.1f;
@@ -370,7 +386,8 @@ bool ActivateBoxDynamic(IPHMovementControl* mov_control, bool character_exist, D
         mov_control->character()->ApplyForce(0, ph_world->Gravity() * mov_control->character()->Mass(), 0);
         max_depth = 0.f;
         ph_world->Step();
-        if (max_depth < resolve_depth) {
+        if (max_depth < resolve_depth)
+        {
             break;
         }
         ph_world->CutVelocity(max_vel, max_a_vel);
@@ -394,12 +411,14 @@ bool ActivateBoxDynamic(IPHMovementControl* mov_control, bool character_exist, D
             mov_control->character()->ApplyForce(0, ph_world->Gravity() * mov_control->character()->Mass(), 0);
             ph_world->Step();
             ph_world->CutVelocity(max_vel, max_a_vel);
-            if (max_depth < resolve_depth) {
+            if (max_depth < resolve_depth)
+            {
                 ret = true;
                 break;
             }
         }
-        if (!ret) break;
+        if (!ret)
+            break;
     }
 
     mov_control->character()->SwitchInInitContact();

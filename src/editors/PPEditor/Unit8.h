@@ -21,8 +21,8 @@ using namespace std;
 //---------------------------------------------------------------------------
 class TForm8 : public TForm
 {
-    __published :  // IDE-managed Components
-                   TButton* Button1;
+    __published : // IDE-managed Components
+                  TButton* Button1;
     TButton* Button2;
     TOpenDialog* OpenDialog;
     TSaveDialog* SaveDialog;
@@ -30,13 +30,13 @@ class TForm8 : public TForm
     TLabel* Label1;
     TMultiObjSpinEdit* InitValue;
 
-  private:  // User declarations
+private: // User declarations
     void AddEntryTemplate(int iInsertAfter);
     void RecalcSize();
     void ResetPositions();
     int m_iTag;
 
-  public:  // User declarations
+public: // User declarations
     vector<TForm9*> m_Entries;
     __fastcall TForm8(TComponent* Owner);
     void __fastcall OnAddButtonClick(TObject* Sender);

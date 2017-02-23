@@ -18,17 +18,16 @@ public:
     virtual u32 const get_u32_param();
     virtual float const get_float_param() { return 0.0f; };
     virtual void reset_game() { m_player_is_climber = false; };
-
     virtual void OnPlayerRankChanged();
 
 protected:
     bool m_player_is_climber;
-};  // class player_state_climber
+}; // class player_state_climber
 
 ADD_ACCUMULATIVE_STATE(acpv_climber, player_state_climber);
 #undef ACCUMULATIVE_STATE_LIST
 #define ACCUMULATIVE_STATE_LIST SAVE_TYPE_LIST(acpv_climber, player_state_climber)
 
-}  // namespace award_system
+} // namespace award_system
 
-#endif  //#ifndef PLAYER_STATE_CLIMBER_INCLUDED
+#endif //#ifndef PLAYER_STATE_CLIMBER_INCLUDED

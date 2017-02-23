@@ -21,15 +21,8 @@
 
 xr_token shape_type_tok[] = {{"common", eShapeCommon}, {"level bound", eShapeLevelBound}, {0, 0}};
 
-CEditShape::CEditShape(LPVOID data, LPCSTR name) : CCustomObject(data, name)
-{
-    Construct(data);
-}
-
-CEditShape::~CEditShape()
-{
-}
-
+CEditShape::CEditShape(LPVOID data, LPCSTR name) : CCustomObject(data, name) { Construct(data); }
+CEditShape::~CEditShape() {}
 void CEditShape::Construct(LPVOID data)
 {
     ClassID = OBJCLASS_SHAPE;
@@ -39,11 +32,7 @@ void CEditShape::Construct(LPVOID data)
     m_Box.invalidate();
 }
 
-void CEditShape::OnUpdateTransform()
-{
-    inherited::OnUpdateTransform();
-}
-
+void CEditShape::OnUpdateTransform() { inherited::OnUpdateTransform(); }
 void CEditShape::ComputeBounds()
 {
     m_Box.invalidate();
@@ -85,7 +74,8 @@ void CEditShape::ComputeBounds()
 
 void CEditShape::SetScale(const Fvector& val)
 {
-    if (shapes.size() == 1) {
+    if (shapes.size() == 1)
+    {
         switch (shapes[0].type)
         {
         case cfSphere: { FScale.set(val.x, val.x, val.x);
@@ -185,7 +175,8 @@ void CEditShape::Attach(CEditShape* from)
 
 void CEditShape::Detach()
 {
-    if (shapes.size() > 1) {
+    if (shapes.size() > 1)
+    {
         Select(true);
         ApplyScale();
         // create scene shapes
@@ -260,7 +251,8 @@ bool CEditShape::RayPick(float& distance, const Fvector& start, const Fvector& d
             float bk_r = T.R;
             //            T.R					= FScale.x;
             T.intersect(S, D, dist);
-            if (dist <= 0.f) dist = distance;
+            if (dist <= 0.f)
+                dist = distance;
 
             T.R = bk_r;
         }
@@ -277,7 +269,8 @@ bool CEditShape::RayPick(float& distance, const Fvector& start, const Fvector& d
             BI.transform_tiny(S1, S);
             BI.transform_dir(D1, D);
             Fbox::ERP_Result rp_res = box.Pick2(S1, D1, P);
-            if (rp_res == Fbox::rpOriginOutside) {
+            if (rp_res == Fbox::rpOriginOutside)
+            {
                 it->data.box.transform_tiny(P);
                 FTransform.transform_tiny(P);
                 P.sub(start);
@@ -287,7 +280,8 @@ bool CEditShape::RayPick(float& distance, const Fvector& start, const Fvector& d
         break;
         }
     }
-    if (dist < distance) {
+    if (dist < distance)
+    {
         distance = dist;
         return true;
     }
@@ -306,7 +300,8 @@ bool CEditShape::FrustumPick(const CFrustum& frustum)
             Fvector C;
             Fsphere& T = it->data.sphere;
             M.transform_tiny(C, T.P);
-            if (frustum.testSphere_dirty(C, T.R * FScale.x)) return true;
+            if (frustum.testSphere_dirty(C, T.R * FScale.x))
+                return true;
         }
         break;
         case cfBox:
@@ -317,7 +312,8 @@ bool CEditShape::FrustumPick(const CFrustum& frustum)
             B.mulA_43(_Transform());
             box.xform(B);
             u32 mask = 0xff;
-            if (frustum.testAABB(box.data(), mask)) return true;
+            if (frustum.testAABB(box.data(), mask))
+                return true;
         }
         break;
         }
@@ -327,7 +323,8 @@ bool CEditShape::FrustumPick(const CFrustum& frustum)
 
 bool CEditShape::GetBox(Fbox& box) const
 {
-    if (m_Box.is_valid()) {
+    if (m_Box.is_valid())
+    {
         box.xform(m_Box, FTransform);
         return true;
     }
@@ -341,7 +338,8 @@ bool CEditShape::LoadLTX(CInifile& ini, LPCSTR sect_name)
     inherited::LoadLTX(ini, sect_name);
 
     u32 count = ini.r_u32(sect_name, "shapes_count");
-    if (vers > 0x0001) m_shape_type = ini.r_u8(sect_name, "shape_type");
+    if (vers > 0x0001)
+        m_shape_type = ini.r_u8(sect_name, "shape_type");
 
     string128 buff;
     shapes.resize(count);
@@ -349,7 +347,8 @@ bool CEditShape::LoadLTX(CInifile& ini, LPCSTR sect_name)
     {
         sprintf(buff, "shape_type_%d", i);
         shapes[i].type = ini.r_u8(sect_name, buff);
-        if (shapes[i].type == CShapeData::cfSphere) {
+        if (shapes[i].type == CShapeData::cfSphere)
+        {
             sprintf(buff, "shape_center_%d", i);
             shapes[i].data.sphere.P = ini.r_fvector3(sect_name, buff);
 
@@ -391,7 +390,8 @@ void CEditShape::SaveLTX(CInifile& ini, LPCSTR sect_name)
     {
         sprintf(buff, "shape_type_%d", i);
         ini.w_u8(sect_name, buff, shapes[i].type);
-        if (shapes[i].type == CShapeData::cfSphere) {
+        if (shapes[i].type == CShapeData::cfSphere)
+        {
             sprintf(buff, "shape_center_%d", i);
             ini.w_fvector3(sect_name, buff, shapes[i].data.sphere.P);
 
@@ -424,7 +424,8 @@ bool CEditShape::LoadStream(IReader& F)
     shapes.resize(F.r_u32());
     F.r(shapes.begin(), shapes.size() * sizeof(shape_def));
 
-    if (F.find_chunk(SHAPE_CHUNK_DATA)) m_shape_type = F.r_u8();
+    if (F.find_chunk(SHAPE_CHUNK_DATA))
+        m_shape_type = F.r_u8();
 
     ComputeBounds();
     return true;
@@ -458,8 +459,10 @@ void CEditShape::FillProp(LPCSTR pref, PropItemVec& values)
 void CEditShape::Render(int priority, bool strictB2F)
 {
     inherited::Render(priority, strictB2F);
-    if (1 == priority) {
-        if (strictB2F) {
+    if (1 == priority)
+    {
+        if (strictB2F)
+        {
             EDevice.SetShader(EDevice.m_WireShader);
             EDevice.SetRS(D3DRS_CULLMODE, D3DCULL_NONE);
             u32 clr =
@@ -497,7 +500,8 @@ void CEditShape::Render(int priority, bool strictB2F)
         }
         else
         {
-            if (Selected() && m_Box.is_valid()) {
+            if (Selected() && m_Box.is_valid())
+            {
                 EDevice.SetShader(EDevice.m_SelectionShader);
                 RCache.set_xform_world(_Transform());
                 u32 clr = 0xFFFFFFFF;
@@ -513,13 +517,12 @@ void CEditShape::Render(int priority, bool strictB2F)
 void CEditShape::OnFrame()
 {
     inherited::OnFrame();
-    if (m_shape_type == eShapeLevelBound) {
+    if (m_shape_type == eShapeLevelBound)
+    {
         TfraShape* F = (TfraShape*)ParentTool->pFrame;
         BOOL bVis = F->ebEditLevelBoundMode->Down;
         m_RT_Flags.set(flRT_Visible, bVis);
     }
 }
 
-void CEditShape::OnShowHint(AStringVec& dest)
-{
-}
+void CEditShape::OnShowHint(AStringVec& dest) {}

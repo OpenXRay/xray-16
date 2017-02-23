@@ -23,14 +23,11 @@ __fastcall TForm7::TForm7(TComponent* Owner) : TForm(Owner)
 //---------------------------------------------------------------------------
 void __fastcall TForm7::ColorPanelClick(TObject* Sender)
 {
-    if (ColorDialog->Execute() == false) return;
+    if (ColorDialog->Execute() == false)
+        return;
     ColorPanel->Color = ColorDialog->Color;
 }
 
 //---------------------------------------------------------------------------
-void __fastcall TForm7::LinearFuncButtonClick(TObject* Sender)
-{
-    m_iFunction = dynamic_cast<TComponent*>(Sender)->Tag;
-}
-
+void __fastcall TForm7::LinearFuncButtonClick(TObject* Sender) { m_iFunction = dynamic_cast<TComponent*>(Sender)->Tag; }
 //---------------------------------------------------------------------------

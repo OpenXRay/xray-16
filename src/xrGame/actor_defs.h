@@ -45,7 +45,7 @@ enum EMoveCommand
     mcLLookout = (1ul << 13ul),
     mcRLookout = (1ul << 14ul),
     mcAnyMove = (mcFwd | mcBack | mcLStrafe | mcRStrafe),
-    mcAnyAction = (mcAnyMove | mcJump | mcFall | mcLanding | mcLanding2),  // mcTurn|
+    mcAnyAction = (mcAnyMove | mcJump | mcFall | mcLanding | mcLanding2), // mcTurn|
     mcAnyState = (mcCrouch | mcAccel | mcClimb | mcSprint),
     mcLookout = (mcLLookout | mcRLookout),
 };
@@ -94,12 +94,12 @@ struct net_input
 //------------------------------
 struct net_update
 {
-    u32 dwTimeStamp;     // server(game) timestamp
-    float o_model;       // model yaw
-    SRotation o_torso;   // torso in world coords
-    Fvector p_pos;       // in world coords
-    Fvector p_accel;     // in world coords
-    Fvector p_velocity;  // in world coords
+    u32 dwTimeStamp; // server(game) timestamp
+    float o_model; // model yaw
+    SRotation o_torso; // torso in world coords
+    Fvector p_pos; // in world coords
+    Fvector p_accel; // in world coords
+    Fvector p_velocity; // in world coords
     u32 mstate;
     int weapon;
     float fHealth;
@@ -132,8 +132,8 @@ struct InterpData
 {
     Fvector Pos;
     Fvector Vel;
-    float o_model;      // model yaw
-    SRotation o_torso;  // torso in world coords
+    float o_model; // model yaw
+    SRotation o_torso; // torso in world coords
 };
 
-};  // namespace ACTOR_DEFS
+}; // namespace ACTOR_DEFS

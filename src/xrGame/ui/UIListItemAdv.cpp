@@ -1,10 +1,7 @@
 #include "stdafx.h"
 #include "UIListItemAdv.h"
 
-CUIListItemAdv::~CUIListItemAdv()
-{
-}
-
+CUIListItemAdv::~CUIListItemAdv() {}
 void CUIListItemAdv::SetTextColor(u32 color)
 {
     CUIListItem::SetTextColor(color);

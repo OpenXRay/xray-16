@@ -24,15 +24,8 @@
 #include "string_table.h"
 #include "Level.h"
 
-UIMapLegend::UIMapLegend()
-{
-}
-
-UIMapLegend::~UIMapLegend()
-{
-    xr_delete(m_list);
-}
-
+UIMapLegend::UIMapLegend() {}
+UIMapLegend::~UIMapLegend() { xr_delete(m_list); }
 void UIMapLegend::init_from_xml(CUIXml& xml, LPCSTR path)
 {
     CUIXmlInit::InitWindow(xml, path, 0, this);
@@ -66,15 +59,13 @@ void UIMapLegend::init_from_xml(CUIXml& xml, LPCSTR path)
     xml.SetLocalRoot(stored_root);
 }
 
-void UIMapLegend::Show(bool status)
-{
-    inherited::Show(status);
-}
-
+void UIMapLegend::Show(bool status) { inherited::Show(status); }
 void UIMapLegend::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 {
-    if (pWnd == m_btn_close) {
-        if (msg == BUTTON_DOWN) {
+    if (pWnd == m_btn_close)
+    {
+        if (msg == BUTTON_DOWN)
+        {
             Show(false);
             return;
         }
@@ -84,14 +75,8 @@ void UIMapLegend::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 
 // =================================================================================================
 
-UIMapLegendItem::UIMapLegendItem()
-{
-}
-
-UIMapLegendItem::~UIMapLegendItem()
-{
-}
-
+UIMapLegendItem::UIMapLegendItem() {}
+UIMapLegendItem::~UIMapLegendItem() {}
 void UIMapLegendItem::init_from_xml(CUIXml& xml, int index)
 {
     CUIXmlInit::InitWindow(xml, "item", index, this);
@@ -101,13 +86,16 @@ void UIMapLegendItem::init_from_xml(CUIXml& xml, int index)
 
     m_image[0] = UIHelper::CreateStatic(xml, "image", this);
 
-    if (xml.NavigateToNode("image_1")) {
+    if (xml.NavigateToNode("image_1"))
+    {
         m_image[1] = UIHelper::CreateStatic(xml, "image_1", this);
     }
-    if (xml.NavigateToNode("image_2")) {
+    if (xml.NavigateToNode("image_2"))
+    {
         m_image[2] = UIHelper::CreateStatic(xml, "image_2", this);
     }
-    if (xml.NavigateToNode("image_3")) {
+    if (xml.NavigateToNode("image_3"))
+    {
         m_image[3] = UIHelper::CreateStatic(xml, "image_3", this);
     }
 

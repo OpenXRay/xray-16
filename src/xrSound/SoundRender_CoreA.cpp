@@ -15,14 +15,13 @@ CSoundRender_CoreA::CSoundRender_CoreA() : CSoundRender_Core()
     eaxGet = 0;
 }
 
-CSoundRender_CoreA::~CSoundRender_CoreA()
-{
-}
-
+CSoundRender_CoreA::~CSoundRender_CoreA() {}
 BOOL CSoundRender_CoreA::EAXQuerySupport(BOOL bDeferred, const GUID* guid, u32 prop, void* val, u32 sz)
 {
-    if (AL_NO_ERROR != eaxGet(guid, prop, 0, val, sz)) return FALSE;
-    if (AL_NO_ERROR != eaxSet(guid, (bDeferred ? DSPROPERTY_EAXLISTENER_DEFERRED : 0) | prop, 0, val, sz)) return FALSE;
+    if (AL_NO_ERROR != eaxGet(guid, prop, 0, val, sz))
+        return FALSE;
+    if (AL_NO_ERROR != eaxSet(guid, (bDeferred ? DSPROPERTY_EAXLISTENER_DEFERRED : 0) | prop, 0, val, sz))
+        return FALSE;
     return TRUE;
 }
 
@@ -68,16 +67,13 @@ BOOL CSoundRender_CoreA::EAXTestSupport(BOOL bDeferred)
     return TRUE;
 }
 
-void CSoundRender_CoreA::_restart()
-{
-    inherited::_restart();
-}
-
+void CSoundRender_CoreA::_restart() { inherited::_restart(); }
 void CSoundRender_CoreA::_initialize()
 {
     pDeviceList = new ALDeviceList();
 
-    if (0 == pDeviceList->GetNumDevices()) {
+    if (0 == pDeviceList->GetNumDevices())
+    {
         CHECK_OR_EXIT(0, "OpenAL: Can't create sound device.");
         xr_delete(pDeviceList);
     }
@@ -86,7 +82,8 @@ void CSoundRender_CoreA::_initialize()
     const ALDeviceDesc& deviceDesc = pDeviceList->GetDeviceDesc(snd_device_id);
     // OpenAL device
     pDevice = alcOpenDevice(deviceDesc.name);
-    if (pDevice == NULL) {
+    if (pDevice == NULL)
+    {
         CHECK_OR_EXIT(0, "SOUND: OpenAL: Failed to create device.");
         bPresent = FALSE;
         return;
@@ -98,7 +95,8 @@ void CSoundRender_CoreA::_initialize()
 
     // Create context
     pContext = alcCreateContext(pDevice, NULL);
-    if (0 == pContext) {
+    if (0 == pContext)
+    {
         CHECK_OR_EXIT(0, "SOUND: OpenAL: Failed to create context.");
         bPresent = FALSE;
         alcCloseDevice(pDevice);
@@ -124,11 +122,14 @@ void CSoundRender_CoreA::_initialize()
     bEAX = deviceDesc.props.eax && !deviceDesc.props.eax_unwanted;
 
     eaxSet = (EAXSet)alGetProcAddress((const ALchar*)"EAXSet");
-    if (eaxSet == NULL) bEAX = false;
+    if (eaxSet == NULL)
+        bEAX = false;
     eaxGet = (EAXGet)alGetProcAddress((const ALchar*)"EAXGet");
-    if (eaxGet == NULL) bEAX = false;
+    if (eaxGet == NULL)
+        bEAX = false;
 
-    if (bEAX) {
+    if (bEAX)
+    {
         bDeferredEAX = EAXTestSupport(TRUE);
         bEAX = EAXTestSupport(FALSE);
     }
@@ -140,7 +141,8 @@ void CSoundRender_CoreA::_initialize()
     for (u32 tit = 0; tit < u32(psSoundTargets); tit++)
     {
         T = new CSoundRender_TargetA();
-        if (T->_initialize()) {
+        if (T->_initialize())
+        {
             s_targets.push_back(T);
         }
         else
@@ -155,7 +157,8 @@ void CSoundRender_CoreA::_initialize()
 
 void CSoundRender_CoreA::set_master_volume(float f)
 {
-    if (bPresent) {
+    if (bPresent)
+    {
         A_CHK(alListenerf(AL_GAIN, f));
     }
 }
@@ -181,20 +184,14 @@ void CSoundRender_CoreA::_clear()
     xr_delete(pDeviceList);
 }
 
-void CSoundRender_CoreA::i_eax_set(const GUID* guid, u32 prop, void* val, u32 sz)
-{
-    eaxSet(guid, prop, 0, val, sz);
-}
-void CSoundRender_CoreA::i_eax_get(const GUID* guid, u32 prop, void* val, u32 sz)
-{
-    eaxGet(guid, prop, 0, val, sz);
-}
-
+void CSoundRender_CoreA::i_eax_set(const GUID* guid, u32 prop, void* val, u32 sz) { eaxSet(guid, prop, 0, val, sz); }
+void CSoundRender_CoreA::i_eax_get(const GUID* guid, u32 prop, void* val, u32 sz) { eaxGet(guid, prop, 0, val, sz); }
 void CSoundRender_CoreA::update_listener(const Fvector& P, const Fvector& D, const Fvector& N, float dt)
 {
     inherited::update_listener(P, D, N, dt);
 
-    if (!Listener.position.similar(P)) {
+    if (!Listener.position.similar(P))
+    {
         Listener.position.set(P);
         bListenerMoved = TRUE;
     }

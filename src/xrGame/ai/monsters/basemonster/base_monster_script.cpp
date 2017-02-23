@@ -47,7 +47,8 @@ bool CBaseMonster::AssignGamePathIfNeeded(Fvector const target_pos, u32 const le
 
     u32 target_level_vertex = 0;
 
-    if (ai().level_graph().valid_vertex_id(level_vertex)) {
+    if (ai().level_graph().valid_vertex_id(level_vertex))
+    {
         target_level_vertex = level_vertex;
     }
     else if (ai().level_graph().valid_vertex_position(target_pos))
@@ -61,29 +62,34 @@ bool CBaseMonster::AssignGamePathIfNeeded(Fvector const target_pos, u32 const le
 
     bool level_vertex_is_valid = ai().level_graph().valid_vertex_id(target_level_vertex);
 
-    if (!level_vertex_is_valid) {
-        if (m_action_target_pos == target_pos && m_action_target_node != u32(-1)) {
+    if (!level_vertex_is_valid)
+    {
+        if (m_action_target_pos == target_pos && m_action_target_node != u32(-1))
+        {
             target_level_vertex = m_action_target_node;
             level_vertex_is_valid = true;
         }
         else
         {
             u32 const path_node = path().get_target_found_node();
-            if (path().is_target_actual() && path().get_target_set() == target_pos && path_node != u32(-1)) {
+            if (path().is_target_actual() && path().get_target_set() == target_pos && path_node != u32(-1))
+            {
                 target_level_vertex = path_node;
                 level_vertex_is_valid = ai().level_graph().valid_vertex_id(target_level_vertex);
             }
         }
     }
 
-    if (level_vertex_is_valid) {
+    if (level_vertex_is_valid)
+    {
         m_action_target_pos = target_pos;
         m_action_target_node = target_level_vertex;
 
         GameGraph::_GRAPH_ID const target_game_vertex = ai().cross_table().vertex(target_level_vertex).game_vertex_id();
         bool const game_vertex_is_valid = ai().game_graph().valid_vertex_id(target_game_vertex);
         VERIFY(game_vertex_is_valid);
-        if (game_vertex_is_valid && self_game_vertex != target_game_vertex) {
+        if (game_vertex_is_valid && self_game_vertex != target_game_vertex)
+        {
             path().detour_graph_points(target_game_vertex);
             control().path_builder().set_path_type(MovementManager::ePathTypeGamePath);
             control().path_builder().set_game_dest_vertex(target_game_vertex);
@@ -100,22 +106,26 @@ bool CBaseMonster::bfAssignMovement(CScriptEntityAction* tpEntityAction)
     CScriptMovementAction& l_tMovementAction = tpEntityAction->m_tMovementAction;
 
     // check if completed
-    if (l_tMovementAction.m_bCompleted) return (false);
+    if (l_tMovementAction.m_bCompleted)
+        return (false);
 
     // check if alive
     CEntityAlive* entity_alive = smart_cast<CEntityAlive*>(this);
-    if (entity_alive && !entity_alive->g_Alive()) {
+    if (entity_alive && !entity_alive->g_Alive())
+    {
         l_tMovementAction.m_bCompleted = true;
         return (false);
     }
 
-    if (control().path_builder().detail().time_path_built() >= tpEntityAction->m_tActionCondition.m_tStartTime) {
+    if (control().path_builder().detail().time_path_built() >= tpEntityAction->m_tActionCondition.m_tStartTime)
+    {
         if ((l_tMovementAction.m_fDistToEnd > 0) &&
             control().path_builder().is_path_end(l_tMovementAction.m_fDistToEnd))
         {
             l_tMovementAction.m_bCompleted = true;
         }
-        if (control().path_builder().actual_all() && control().path_builder().path_completed()) {
+        if (control().path_builder().actual_all() && control().path_builder().path_completed())
+        {
             l_tMovementAction.m_bCompleted = true;
             return false;
         }
@@ -162,7 +172,8 @@ bool CBaseMonster::bfAssignMovement(CScriptEntityAction* tpEntityAction)
         control().path_builder().patrol().set_start_type(l_tMovementAction.m_tPatrolPathStart);
         control().path_builder().patrol().set_route_type(l_tMovementAction.m_tPatrolPathStop);
         control().path_builder().patrol().set_random(l_tMovementAction.m_bRandom);
-        if (l_tMovementAction.m_previous_patrol_point != u32(-1)) {
+        if (l_tMovementAction.m_previous_patrol_point != u32(-1))
+        {
             control().path_builder().patrol().set_previous_point(l_tMovementAction.m_previous_patrol_point);
         }
         break;
@@ -170,7 +181,8 @@ bool CBaseMonster::bfAssignMovement(CScriptEntityAction* tpEntityAction)
     case CScriptMovementAction::eGoalTypePathPosition:
     case CScriptMovementAction::eGoalTypeNoPathPosition:
 
-        if (AssignGamePathIfNeeded(l_tMovementAction.m_tDestinationPosition, invalid_vertex_id)) break;
+        if (AssignGamePathIfNeeded(l_tMovementAction.m_tDestinationPosition, invalid_vertex_id))
+            break;
 
         path().set_target_point(l_tMovementAction.m_tDestinationPosition);
         break;
@@ -187,8 +199,10 @@ bool CBaseMonster::bfAssignMovement(CScriptEntityAction* tpEntityAction)
         CCustomMonster* const leader =
             should_follow_leader ? smart_cast<CCustomMonster*>(Level().Objects.net_Find(leader_id)) : NULL;
 
-        if (!should_follow_leader || !leader || (leader && !leader->GetScriptControl())) {
-            if (AssignGamePathIfNeeded(l_tMovementAction.m_tDestinationPosition, invalid_vertex_id)) break;
+        if (!should_follow_leader || !leader || (leader && !leader->GetScriptControl()))
+        {
+            if (AssignGamePathIfNeeded(l_tMovementAction.m_tDestinationPosition, invalid_vertex_id))
+                break;
 
             path().set_target_point(l_tMovementAction.m_tDestinationPosition);
         }
@@ -196,7 +210,8 @@ bool CBaseMonster::bfAssignMovement(CScriptEntityAction* tpEntityAction)
         {
             Fvector const leader_pos = leader->Position();
 
-            if (Device.dwTimeGlobal > m_offset_from_leader_chosen_tick + 5000) {
+            if (Device.dwTimeGlobal > m_offset_from_leader_chosen_tick + 5000)
+            {
                 GenerateNewOffsetFromLeader();
             }
 
@@ -206,13 +221,15 @@ bool CBaseMonster::bfAssignMovement(CScriptEntityAction* tpEntityAction)
                 vertex_id = ai().level_graph().check_position_in_direction(
                     leader->ai_location().level_vertex_id(), leader_pos, leader_pos + m_offset_from_leader);
 
-                if (ai().level_graph().valid_vertex_id(vertex_id)) {
+                if (ai().level_graph().valid_vertex_id(vertex_id))
+                {
                     break;
                 }
                 GenerateNewOffsetFromLeader();
             }
 
-            if (!ai().level_graph().valid_vertex_id(vertex_id)) {
+            if (!ai().level_graph().valid_vertex_id(vertex_id))
+            {
                 vertex_id = leader->ai_location().level_vertex_id();
                 m_offset_from_leader.set(0.f, 0.f, 0.f);
             }
@@ -225,7 +242,8 @@ bool CBaseMonster::bfAssignMovement(CScriptEntityAction* tpEntityAction)
 
     case CScriptMovementAction::eGoalTypePathNodePosition:
 
-        if (AssignGamePathIfNeeded(l_tMovementAction.m_tDestinationPosition, l_tMovementAction.m_tNodeID)) break;
+        if (AssignGamePathIfNeeded(l_tMovementAction.m_tDestinationPosition, l_tMovementAction.m_tNodeID))
+            break;
 
         path().set_target_point(l_tMovementAction.m_tDestinationPosition, l_tMovementAction.m_tNodeID);
         break;
@@ -245,7 +263,8 @@ bool CBaseMonster::bfAssignMovement(CScriptEntityAction* tpEntityAction)
 ///////////////////////////////////////////////////////////////////////////
 bool CBaseMonster::bfAssignObject(CScriptEntityAction* tpEntityAction)
 {
-    if (!inherited::bfAssignObject(tpEntityAction)) return (false);
+    if (!inherited::bfAssignObject(tpEntityAction))
+        return (false);
 
     //	CScriptObjectAction	&l_tObjectAction = tpEntityAction->m_tObjectAction;
     //	if (!l_tObjectAction.m_tpObject)
@@ -269,13 +288,15 @@ bool CBaseMonster::bfAssignObject(CScriptEntityAction* tpEntityAction)
 
 bool CBaseMonster::bfAssignWatch(CScriptEntityAction* tpEntityAction)
 {
-    if (!inherited::bfAssignWatch(tpEntityAction)) return (false);
+    if (!inherited::bfAssignWatch(tpEntityAction))
+        return (false);
 
     // Инициализировать action
     anim().m_tAction = ACT_STAND_IDLE;
 
     CScriptWatchAction& l_tWatchAction = tpEntityAction->m_tWatchAction;
-    if (l_tWatchAction.completed()) return false;
+    if (l_tWatchAction.completed())
+        return false;
 
     Fvector new_pos;
     switch (l_tWatchAction.m_tWatchType)
@@ -297,10 +318,12 @@ bool CBaseMonster::bfAssignWatch(CScriptEntityAction* tpEntityAction)
 
 bool CBaseMonster::bfAssignAnimation(CScriptEntityAction* tpEntityAction)
 {
-    if (!inherited::bfAssignAnimation(tpEntityAction)) return (false);
+    if (!inherited::bfAssignAnimation(tpEntityAction))
+        return (false);
 
     CScriptAnimationAction& l_tAnimAction = tpEntityAction->m_tAnimationAction;
-    if (l_tAnimAction.completed()) return false;
+    if (l_tAnimAction.completed())
+        return false;
 
     // translate animation.action into anim().action
     switch (l_tAnimAction.m_tAnimAction)
@@ -322,10 +345,13 @@ bool CBaseMonster::bfAssignAnimation(CScriptEntityAction* tpEntityAction)
 bool CBaseMonster::bfAssignSound(CScriptEntityAction* tpEntityAction)
 {
     CScriptSoundAction& l_tAction = tpEntityAction->m_tSoundAction;
-    if (l_tAction.completed()) return false;
+    if (l_tAction.completed())
+        return false;
 
-    if (l_tAction.m_monster_sound == MonsterSound::eMonsterSoundDummy) {
-        if (!inherited::bfAssignSound(tpEntityAction)) return (false);
+    if (l_tAction.m_monster_sound == MonsterSound::eMonsterSoundDummy)
+    {
+        if (!inherited::bfAssignSound(tpEntityAction))
+            return (false);
     }
 
     switch (l_tAction.m_monster_sound)
@@ -364,10 +390,12 @@ bool CBaseMonster::bfAssignSound(CScriptEntityAction* tpEntityAction)
 
 bool CBaseMonster::bfAssignMonsterAction(CScriptEntityAction* tpEntityAction)
 {
-    if (!inherited::bfAssignMonsterAction(tpEntityAction)) return false;
+    if (!inherited::bfAssignMonsterAction(tpEntityAction))
+        return false;
 
     CScriptMonsterAction& l_tAction = tpEntityAction->m_tMonsterAction;
-    if (l_tAction.completed()) return false;
+    if (l_tAction.completed())
+        return false;
 
     CEntityAlive* pE = smart_cast<CEntityAlive*>(l_tAction.m_tObject);
 
@@ -375,7 +403,8 @@ bool CBaseMonster::bfAssignMonsterAction(CScriptEntityAction* tpEntityAction)
     {
     case eGA_Rest: StateMan->force_script_state(eStateRest); break;
     case eGA_Eat:
-        if (pE && !pE->getDestroy() && !pE->g_Alive()) {
+        if (pE && !pE->getDestroy() && !pE->g_Alive())
+        {
             CorpseMan.force_corpse(pE);
             StateMan->force_script_state(eStateEat);
         }
@@ -384,7 +413,8 @@ bool CBaseMonster::bfAssignMonsterAction(CScriptEntityAction* tpEntityAction)
 
         break;
     case eGA_Attack:
-        if (pE && !pE->getDestroy() && pE->g_Alive()) {
+        if (pE && !pE->getDestroy() && pE->g_Alive())
+        {
             EnemyMan.force_enemy(pE);
             StateMan->force_script_state(eStateAttack);
         }
@@ -393,7 +423,8 @@ bool CBaseMonster::bfAssignMonsterAction(CScriptEntityAction* tpEntityAction)
 
         break;
     case eGA_Panic:
-        if (pE && !pE->getDestroy() && pE->g_Alive()) {
+        if (pE && !pE->getDestroy() && pE->g_Alive())
+        {
             EnemyMan.force_enemy(pE);
             StateMan->force_script_state(eStatePanic);
         }
@@ -408,8 +439,10 @@ bool CBaseMonster::bfAssignMonsterAction(CScriptEntityAction* tpEntityAction)
 
 void CBaseMonster::ProcessScripts()
 {
-    if (!g_Alive()) return;
-    if (m_script_processing_active) return;
+    if (!g_Alive())
+        return;
+    if (m_script_processing_active)
+        return;
 
     m_script_processing_active = true;
 
@@ -430,7 +463,8 @@ void CBaseMonster::ProcessScripts()
     anim().accel_deactivate();
 
     // если из скрипта выбрано действие по универсальной схеме, выполнить его
-    if (m_script_state_must_execute) StateMan->execute_script_state();
+    if (m_script_state_must_execute)
+        StateMan->execute_script_state();
 
     TranslateActionToPathParams();
 
@@ -444,7 +478,8 @@ void CBaseMonster::ProcessScripts()
 
     // Удалить все враги и объекты, которые были принудительно установлены
     // во время выполнения скриптового действия
-    if (m_script_state_must_execute) {
+    if (m_script_state_must_execute)
+    {
         EnemyMan.unforce_enemy();
         CorpseMan.unforce_corpse();
     }
@@ -453,7 +488,8 @@ void CBaseMonster::ProcessScripts()
     m_script_processing_active = false;
 
 #ifdef DEBUG
-    if (psAI_Flags.test(aiMonsterDebug)) {
+    if (psAI_Flags.test(aiMonsterDebug))
+    {
         DBG().object_info(this, this).remove_item(u32(0));
         DBG().object_info(this, this).remove_item(u32(1));
         DBG().object_info(this, this).add_item(*cName(), color_xrgb(255, 0, 0), 0);
@@ -471,9 +507,11 @@ CEntity* CBaseMonster::GetCurrentEnemy()
     VERIFY(g_Alive());
     CEntity* enemy = 0;
 
-    if (EnemyMan.get_enemy()) enemy = const_cast<CEntity*>(static_cast<CEntity const*>(EnemyMan.get_enemy()));
+    if (EnemyMan.get_enemy())
+        enemy = const_cast<CEntity*>(static_cast<CEntity const*>(EnemyMan.get_enemy()));
 
-    if (!enemy || enemy->getDestroy() || !enemy->g_Alive()) enemy = 0;
+    if (!enemy || enemy->getDestroy() || !enemy->g_Alive())
+        enemy = 0;
 
     return (enemy);
 }
@@ -482,25 +520,26 @@ CEntity* CBaseMonster::GetCurrentCorpse()
 {
     CEntity* corpse = 0;
 
-    if (CorpseMan.get_corpse()) corpse = const_cast<CEntity*>(smart_cast<const CEntity*>(CorpseMan.get_corpse()));
+    if (CorpseMan.get_corpse())
+        corpse = const_cast<CEntity*>(smart_cast<const CEntity*>(CorpseMan.get_corpse()));
 
-    if (!corpse || corpse->getDestroy() || corpse->g_Alive()) corpse = 0;
+    if (!corpse || corpse->getDestroy() || corpse->g_Alive())
+        corpse = 0;
 
     return (corpse);
 }
-void CBaseMonster::SetEnemy(const CEntityAlive* sent)
-{
-    EnemyMan.script_enemy(*sent);
-}
-
+void CBaseMonster::SetEnemy(const CEntityAlive* sent) { EnemyMan.script_enemy(*sent); }
 void CBaseMonster::SetScriptControl(const bool bScriptControl, shared_str caScriptName)
 {
-    if (StateMan) StateMan->critical_finalize();
+    if (StateMan)
+        StateMan->critical_finalize();
 
-    if (!m_bScriptControl && bScriptControl) {
+    if (!m_bScriptControl && bScriptControl)
+    {
         control().path_builder().patrol().make_inactual();
 
-        if (control().path_builder().path_type() != MovementManager::ePathTypeGamePath) {
+        if (control().path_builder().path_type() != MovementManager::ePathTypeGamePath)
+        {
             control().path_builder().detail().make_inactual();
         }
     }
@@ -510,7 +549,8 @@ void CBaseMonster::SetScriptControl(const bool bScriptControl, shared_str caScri
 
 int CBaseMonster::get_enemy_strength()
 {
-    if (EnemyMan.get_enemy()) {
+    if (EnemyMan.get_enemy())
+    {
         switch (EnemyMan.get_danger_type())
         {
         case eVeryStrong: return (4);
@@ -523,7 +563,4 @@ int CBaseMonster::get_enemy_strength()
     return (0);
 }
 
-void CBaseMonster::vfFinishAction(CScriptEntityAction* tpEntityAction)
-{
-    inherited::vfFinishAction(tpEntityAction);
-}
+void CBaseMonster::vfFinishAction(CScriptEntityAction* tpEntityAction) { inherited::vfFinishAction(tpEntityAction); }

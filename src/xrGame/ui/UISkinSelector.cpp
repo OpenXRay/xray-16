@@ -32,9 +32,9 @@ CUISkinSelectorWnd::CUISkinSelectorWnd(const char* strSectionName, s16 team)
     //	m_pAnims[0]		= new CUIAnimatedStatic(); m_pFrames->AttachChild(m_pAnims[0]);
     //	m_pAnims[1]		= new CUIAnimatedStatic(); m_pFrames->AttachChild(m_pAnims[1]);
     //	m_pButtons[0]	= new CUI3tButton();	m_pFrames->AttachChild(m_pButtons[0]);
-    //m_pButtons[0]->SetMessageTarget(this);
+    // m_pButtons[0]->SetMessageTarget(this);
     //	m_pButtons[1]	= new CUI3tButton();	m_pFrames->AttachChild(m_pButtons[1]);
-    //m_pButtons[1]->SetMessageTarget(this);
+    // m_pButtons[1]->SetMessageTarget(this);
 
     m_pBtnAutoSelect = new CUI3tButton();
     AttachChild(m_pBtnAutoSelect);
@@ -97,7 +97,8 @@ void CUISkinSelectorWnd::UpdateSkins()
             m_pImage[i]->SetSelectedState(false);
 
         string16 buf;
-        if (m_firstSkin + i < 10) {
+        if (m_firstSkin + i < 10)
+        {
             itoa((m_firstSkin + 1 + i) % 10, buf, 10);
             xr_strcat(buf, sizeof(buf), " ");
             m_pImage[i]->TextItemControl()->SetText(buf);
@@ -180,7 +181,8 @@ void CUISkinSelectorWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
         }
         else
             for (int i = 0; i < 6; i++)
-                if (pWnd == m_pImage[i]) {
+                if (pWnd == m_pImage[i])
+                {
                     m_iActiveIndex = m_firstSkin + i;
                     OnBtnOK();
                 }
@@ -216,7 +218,8 @@ void CUISkinSelectorWnd::OnBtnOK()
     VERIFY(game);
     // game_cl_Deathmatch * dm = smart_cast<game_cl_Deathmatch *>(&(Game()));
 
-    if (m_iActiveIndex == -1) {
+    if (m_iActiveIndex == -1)
+    {
         m_iActiveIndex = m_skinsEnabled[::Random.randI(m_skinsEnabled.size())];
     }
     game->OnSkinMenu_Ok();
@@ -229,8 +232,10 @@ bool CUISkinSelectorWnd::OnMouseAction(float x, float y, EUIMessages mouse_actio
 
 bool CUISkinSelectorWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
-    if (WINDOW_KEY_PRESSED != keyboard_action) {
-        if (dik == DIK_TAB) {
+    if (WINDOW_KEY_PRESSED != keyboard_action)
+    {
+        if (dik == DIK_TAB)
+        {
             ShowChildren(true);
             game_cl_mp* game = smart_cast<game_cl_mp*>(&Game());
             game->OnKeyboardRelease(kSCORES);
@@ -240,7 +245,8 @@ bool CUISkinSelectorWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
         return false;
     }
 
-    if (dik == DIK_TAB) {
+    if (dik == DIK_TAB)
+    {
         ShowChildren(false);
         game_cl_mp* game = smart_cast<game_cl_mp*>(&Game());
         game->OnKeyboardPress(kSCORES);
@@ -249,15 +255,18 @@ bool CUISkinSelectorWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
     }
 
     int right_border = (int)m_skins.size();
-    if (right_border > 9) right_border = 9;
+    if (right_border > 9)
+        right_border = 9;
 
-    if (dik >= DIK_1 && dik < (int)right_border + DIK_1) {
+    if (dik >= DIK_1 && dik < (int)right_border + DIK_1)
+    {
         int NewIndex = dik - DIK_1;
         //		Msg("Selected %d", NewIndex);
         //		for (u32 i=0; i<m_skinsEnabled.size(); i++)
         //			Msg("Enabled - %d", m_skinsEnabled[i]);
         xr_vector<int>::iterator It = std::find(m_skinsEnabled.begin(), m_skinsEnabled.end(), NewIndex);
-        if (It != m_skinsEnabled.end()) {
+        if (It != m_skinsEnabled.end())
+        {
             m_iActiveIndex = NewIndex;
             OnBtnOK();
         }
@@ -269,7 +278,7 @@ bool CUISkinSelectorWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
     switch (dik)
     {
     case DIK_ESCAPE: OnBtnCancel(); return true;
-    case DIK_SPACE:  // do autoselect
+    case DIK_SPACE: // do autoselect
         m_iActiveIndex = -1;
     case DIK_RETURN: OnBtnOK(); return true;
     case DIK_LEFT: OnKeyLeft(); return true;
@@ -281,7 +290,8 @@ bool CUISkinSelectorWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 
 void CUISkinSelectorWnd::OnKeyLeft()
 {
-    if (m_firstSkin > 0) {
+    if (m_firstSkin > 0)
+    {
         m_firstSkin--;
         UpdateSkins();
     }
@@ -289,7 +299,8 @@ void CUISkinSelectorWnd::OnKeyLeft()
 
 void CUISkinSelectorWnd::OnKeyRight()
 {
-    if (m_firstSkin + 6 < (int)m_skins.size()) {
+    if (m_firstSkin + 6 < (int)m_skins.size())
+    {
         m_firstSkin++;
         UpdateSkins();
     }
@@ -320,7 +331,8 @@ void CUISkinSelectorWnd::SetCurSkin(int skin)
 
     m_iActiveIndex = skin;
 
-    if (m_iActiveIndex != -1 && (m_iActiveIndex < m_firstSkin || m_iActiveIndex > m_firstSkin + 5)) {
+    if (m_iActiveIndex != -1 && (m_iActiveIndex < m_firstSkin || m_iActiveIndex > m_firstSkin + 5))
+    {
         if (m_iActiveIndex > (int)m_skins.size() - 6)
             m_firstSkin = (int)m_skins.size() - 6;
         else

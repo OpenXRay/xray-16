@@ -47,7 +47,8 @@ manager::~manager()
     delete_data(m_ambients);
     delete_data(m_ambients_ids);
 
-    if (!Device.editor()) return;
+    if (!Device.editor())
+        return;
 
     ::ide().destroy(m_property_holder);
 }
@@ -91,11 +92,7 @@ void manager::fill(editor::property_holder* holder)
     holder->add_property("ambients", "ambients", "this option is resposible for ambients", m_collection);
 }
 
-::editor::environment::effects::manager const& manager::effects_manager() const
-{
-    return (m_manager.effects());
-}
-
+::editor::environment::effects::manager const& manager::effects_manager() const { return (m_manager.effects()); }
 ::editor::environment::sound_channels::manager const& manager::sounds_manager() const
 {
     return (m_manager.sound_channels());
@@ -103,14 +100,16 @@ void manager::fill(editor::property_holder* holder)
 
 shared_str manager::unique_id(shared_str const& id) const
 {
-    if (m_collection->unique_id(id.c_str())) return (id);
+    if (m_collection->unique_id(id.c_str()))
+        return (id);
 
     return (m_collection->generate_unique_id(id.c_str()));
 }
 
 manager::ambients_ids_type const& manager::ambients_ids() const
 {
-    if (!m_changed) return (m_ambients_ids);
+    if (!m_changed)
+        return (m_ambients_ids);
 
     m_changed = false;
 
@@ -134,12 +133,13 @@ ambient* manager::get_ambient(shared_str const& id) const
     ambient_container_type::const_iterator i = m_ambients.begin();
     ambient_container_type::const_iterator e = m_ambients.end();
     for (; i != e; ++i)
-        if ((*i)->id() == id) return (*i);
+        if ((*i)->id() == id)
+            return (*i);
 
     NODEFAULT;
 #ifdef DEBUG
     return (0);
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 }
 
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR

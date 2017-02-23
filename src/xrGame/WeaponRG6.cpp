@@ -10,20 +10,20 @@
 #include "phdebug.h"
 #endif
 
-CWeaponRG6::~CWeaponRG6()
-{
-}
-
+CWeaponRG6::~CWeaponRG6() {}
 BOOL CWeaponRG6::net_Spawn(CSE_Abstract* DC)
 {
     BOOL l_res = inheritedSG::net_Spawn(DC);
-    if (!l_res) return l_res;
+    if (!l_res)
+        return l_res;
 
-    if (iAmmoElapsed && !getCurrentRocket()) {
+    if (iAmmoElapsed && !getCurrentRocket())
+    {
         shared_str grenade_name = m_ammoTypes[0];
         shared_str fake_grenade_name = pSettings->r_string(grenade_name, "fake_grenade_name");
 
-        if (fake_grenade_name.size()) {
+        if (fake_grenade_name.size())
+        {
             int k = iAmmoElapsed;
             while (k)
             {
@@ -46,7 +46,8 @@ void CWeaponRG6::Load(LPCSTR section)
 #include "inventoryOwner.h"
 void CWeaponRG6::FireStart()
 {
-    if (GetState() == eIdle && getRocketCount()) {
+    if (GetState() == eIdle && getRocketCount())
+    {
         inheritedSG::FireStart();
 
         Fvector p1, d;
@@ -54,9 +55,11 @@ void CWeaponRG6::FireStart()
         d.set(get_LastFD());
 
         CEntity* E = smart_cast<CEntity*>(H_Parent());
-        if (E) {
+        if (E)
+        {
             CInventoryOwner* io = smart_cast<CInventoryOwner*>(H_Parent());
-            if (NULL == io->inventory().ActiveItem()) {
+            if (NULL == io->inventory().ActiveItem())
+            {
                 Log("current_state", GetState());
                 Log("next_state", GetNextState());
                 Log("item_sect", cNameSect().c_str());
@@ -71,7 +74,8 @@ void CWeaponRG6::FireStart()
         Fvector::generate_orthonormal_basis(launch_matrix.k, launch_matrix.j, launch_matrix.i);
         launch_matrix.c.set(p1);
 
-        if (IsGameTypeSingle() && IsZoomed() && smart_cast<CActor*>(H_Parent())) {
+        if (IsGameTypeSingle() && IsZoomed() && smart_cast<CActor*>(H_Parent()))
+        {
             H_Parent()->setEnabled(FALSE);
             setEnabled(FALSE);
 
@@ -81,7 +85,8 @@ void CWeaponRG6::FireStart()
             setEnabled(TRUE);
             H_Parent()->setEnabled(TRUE);
 
-            if (HasPick) {
+            if (HasPick)
+            {
                 //			collide::rq_result& RQ = HUD().GetCurrentRayQuery();
                 Fvector Transference;
                 // Transference.add(p1, Fvector().mul(d, RQ.range));
@@ -98,9 +103,10 @@ void CWeaponRG6::FireStart()
                                 if(canfire0>1)DBG_DrawLine(p1,Fvector().add(p1,res[1]),color_xrgb(0,0,255));
                                 DBG_ClosedCashedDraw(30000);
                 #endif*/
-                if (canfire0 != 0) {
+                if (canfire0 != 0)
+                {
                     //					Msg ("d[%f,%f,%f] - res [%f,%f,%f]", d.x, d.y, d.z, res[0].x, res[0].y,
-                    //res[0].z);
+                    // res[0].z);
                     d = res[0];
                 };
             }
@@ -115,7 +121,8 @@ void CWeaponRG6::FireStart()
         VERIFY(pGrenade);
         pGrenade->SetInitiator(H_Parent()->ID());
 
-        if (OnServer()) {
+        if (OnServer())
+        {
             NET_Packet P;
             u_EventGen(P, GE_LAUNCH_ROCKET, ID());
             P.w_u16(u16(getCurrentRocket()->ID()));

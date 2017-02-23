@@ -43,7 +43,8 @@ MinBox3<Real>::MinBox3(int iQuantity, const Vector3<Real>* akPoint, Box3<Real>& 
             {
                 afAngle[2] = afA0[2] + i2 * (afA1[2] - afA0[2]) * fInvMax;
                 Real fVolume = Volume(afAngle, this);
-                if (fVolume < fMinVolume) {
+                if (fVolume < fMinVolume)
+                {
                     fMinVolume = fVolume;
                     afAInitial[0] = afAngle[0];
                     afAInitial[1] = afAngle[1];

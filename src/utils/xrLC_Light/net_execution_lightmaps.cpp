@@ -119,7 +119,8 @@ bool execution_lightmaps::execute(net_task_callback& net_callback)
         D->time_stat.m_time = timer.GetElapsed_sec();
 #endif
 
-        if (net_callback.break_all()) break;
+        if (net_callback.break_all())
+            break;
     }
 #ifdef COLLECT_EXECUTION_STATS
     statistics.time_stats.m_time = gtimer.GetElapsed_sec();

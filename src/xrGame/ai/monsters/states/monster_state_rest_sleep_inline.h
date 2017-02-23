@@ -1,21 +1,15 @@
 #pragma once
 
-#define TEMPLATE_SPECIALIZATION                                                                                        \
+#define TEMPLATE_SPECIALIZATION \
     template <typename _Object\
 >
 
 #define CStateMonsterRestSleepAbstract CStateMonsterRestSleep<_Object>
 
 TEMPLATE_SPECIALIZATION
-CStateMonsterRestSleepAbstract::CStateMonsterRestSleep(_Object* obj) : inherited(obj)
-{
-}
-
+CStateMonsterRestSleepAbstract::CStateMonsterRestSleep(_Object* obj) : inherited(obj) {}
 TEMPLATE_SPECIALIZATION
-CStateMonsterRestSleepAbstract::~CStateMonsterRestSleep()
-{
-}
-
+CStateMonsterRestSleepAbstract::~CStateMonsterRestSleep() {}
 TEMPLATE_SPECIALIZATION
 void CStateMonsterRestSleepAbstract::initialize()
 {

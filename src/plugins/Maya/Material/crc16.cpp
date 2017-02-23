@@ -15,7 +15,7 @@ gen16(1) for CCITT and start crc at -1 for SDLC
 */
 
 static BOOL crc16_ready = FALSE;
-static int crc16_table[256];  // Lookup table array
+static int crc16_table[256]; // Lookup table array
 
 int gen_tab[2][8] = {{0xC0C1, 0xC181, 0xC301, 0xC601, 0xCC01, 0xD801, 0xF001, 0xA001},
     {0x1189, 0x2312, 0x4624, 0x8C48, 0x1081, 0x2102, 0x4204, 0x8408}};
@@ -28,14 +28,16 @@ void crc16_init(unsigned p)
     {
         val = 0;
         for (j = 0; j < 8; j++)
-            if (i & (1 << j)) val ^= gen_tab[p][j];
+            if (i & (1 << j))
+                val ^= gen_tab[p][j];
         crc16_table[i] = val;
     }
 }
 
 unsigned crc16_calc(unsigned char* data, unsigned count, unsigned old_crc = 0)
 {
-    if (!crc16_ready) {
+    if (!crc16_ready)
+    {
         crc16_init(0);
         crc16_ready = TRUE;
     }

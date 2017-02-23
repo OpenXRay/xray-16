@@ -21,21 +21,14 @@ extern "C" bool __declspec(dllimport) __stdcall DXTCompress(
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-CLightmap::CLightmap()
-{
-}
-
-CLightmap::~CLightmap()
-{
-}
-CLightmap* CLightmap::read_create()
-{
-    return new CLightmap();
-}
+CLightmap::CLightmap() {}
+CLightmap::~CLightmap() {}
+CLightmap* CLightmap::read_create() { return new CLightmap(); }
 void CLightmap::Capture(CDeflector* D, int b_u, int b_v, int s_u, int s_v, BOOL bRotated)
 {
     // Allocate 512x512 texture if needed
-    if (lm.surface.empty()) lm.create(c_LMAP_size, c_LMAP_size);
+    if (lm.surface.empty())
+        lm.create(c_LMAP_size, c_LMAP_size);
 
     // Addressing
     xr_vector<UVtri> tris;
@@ -53,7 +46,8 @@ void CLightmap::Capture(CDeflector* D, int b_u, int b_v, int s_u, int s_v, BOOL 
 
     // Perform BLIT
     lm_layer& L = D->layer;
-    if (!bRotated) {
+    if (!bRotated)
+    {
         u32 real_H = (L.height + 2 * BORDER);
         u32 real_W = (L.width + 2 * BORDER);
         blit(lm, c_LMAP_size, c_LMAP_size, L, real_W, real_H, b_u, b_v, 254 - BORDER);
@@ -95,7 +89,8 @@ IC void line(int x1, int y1, int x2, int y2, b_texture* T)
     int sx = x2 >= x1 ? 1 : -1;
     int sy = y2 >= y1 ? 1 : -1;
 
-    if (dy <= dx) {
+    if (dy <= dx)
+    {
         int d = (dy << 1) - dx;
         int d1 = dy << 1;
         int d2 = (dy - dx) << 1;
@@ -104,7 +99,8 @@ IC void line(int x1, int y1, int x2, int y2, b_texture* T)
 
         for (int x = x1 + sx, y = y1, i = 1; i <= dx; i++, x += sx)
         {
-            if (d > 0) {
+            if (d > 0)
+            {
                 d += d2;
                 y += sy;
             }
@@ -122,7 +118,8 @@ IC void line(int x1, int y1, int x2, int y2, b_texture* T)
         pixel(x1, y1, T);
         for (int x = x1, y = y1 + sy, i = 1; i <= dy; i++, y += sy)
         {
-            if (d > 0) {
+            if (d > 0)
+            {
                 d += d2;
                 x += sx;
             }
@@ -179,8 +176,8 @@ void CLightmap::Save(LPCSTR path)
         xr_sprintf(lm_texture.name, "lmap#%d", lmapNameID);
         xr_sprintf(FN, "%s%s_1.dds", path, lm_texture.name);
         BYTE* raw_data = LPBYTE(&*lm_packed.begin());
-        u32 w = lm_texture.dwWidth;   // lm.width;
-        u32 h = lm_texture.dwHeight;  // lm.height;
+        u32 w = lm_texture.dwWidth; // lm.width;
+        u32 h = lm_texture.dwHeight; // lm.height;
         u32 pitch = w * 4;
 
         STextureParams fmt;
@@ -191,10 +188,10 @@ void CLightmap::Save(LPCSTR path)
         DXTCompress(FN, raw_data, 0, w, h, pitch, &fmt, 4);
     }
     lm_packed.clear_and_free();
-    Logger.Status("Compression hemi...");  //.
+    Logger.Status("Compression hemi..."); //.
     {
-        u32 w = lm_texture.dwWidth;   // lm.width;
-        u32 h = lm_texture.dwHeight;  // lm.height;
+        u32 w = lm_texture.dwWidth; // lm.width;
+        u32 h = lm_texture.dwHeight; // lm.height;
         u32 pitch = w * 4;
 
         string_path FN;

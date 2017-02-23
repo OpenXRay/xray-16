@@ -26,7 +26,8 @@ static int pntScan(ObjectDB* odb, LWPntID id)
 
     j = odb->npoints;
 
-    if (j == 0) {
+    if (j == 0)
+    {
         odb->pt[0].id = id;
         ++odb->npoints;
         return 0;
@@ -36,7 +37,8 @@ static int pntScan(ObjectDB* odb, LWPntID id)
     {
         odb->pt[j].id = odb->pt[j - 1].id;
         --j;
-        if (j == 0) break;
+        if (j == 0)
+            break;
     }
 
     odb->pt[j].id = id;
@@ -78,7 +80,8 @@ int findVert(ObjectDB* odb, LWPntID id)
             rt = x - 1;
         else
             lt = x + 1;
-        if (id == odb->pt[x].id) return x;
+        if (id == odb->pt[x].id)
+            return x;
     }
     return -1;
 }
@@ -100,7 +103,8 @@ void getPolyNormals(ObjectDB* odb, int i)
 
     for (j = 0; j < odb->npolygons; j++)
     {
-        if (odb->pol[j].nverts < 3) continue;
+        if (odb->pol[j].nverts < 3)
+            continue;
         for (k = 0; k < 3; k++)
         {
             p1[k] = odb->pt[odb->pol[j].v[0].index].pos[i][k];
@@ -142,17 +146,20 @@ void getVertNormals(ObjectDB* odb, int i)
             for (k = 0; k < 3; k++)
                 odb->pol[j].v[n].norm[i][k] = odb->pol[j].norm[i][k];
 
-            if (odb->surf[odb->pol[j].sindex].sman <= 0) continue;
+            if (odb->surf[odb->pol[j].sindex].sman <= 0)
+                continue;
 
             p = odb->pol[j].v[n].index;
 
             for (g = 0; g < odb->pt[p].npols; g++)
             {
                 h = odb->pt[p].pol[g];
-                if (h == j) continue;
+                if (h == j)
+                    continue;
 
                 a = vecangle(odb->pol[j].norm[i], odb->pol[h].norm[i]);
-                if (a > odb->surf[odb->pol[j].sindex].sman) continue;
+                if (a > odb->surf[odb->pol[j].sindex].sman)
+                    continue;
 
                 for (k = 0; k < 3; k++)
                     odb->pol[j].v[n].norm[i][k] += odb->pol[h].norm[i][k];
@@ -174,19 +181,24 @@ void freeObjectDB(ObjectDB* odb)
 {
     int i;
 
-    if (odb) {
+    if (odb)
+    {
         freeObjectVMaps(odb);
         freeObjectSurfs(odb);
         freePointSearch(odb);
 
-        if (odb->pt) {
+        if (odb->pt)
+        {
             for (i = 0; i < odb->npoints; i++)
-                if (odb->pt[i].pol) free(odb->pt[i].pol);
+                if (odb->pt[i].pol)
+                    free(odb->pt[i].pol);
             free(odb->pt);
         }
-        if (odb->pol) {
+        if (odb->pol)
+        {
             for (i = 0; i < odb->npolygons; i++)
-                if (odb->pol[i].v) free(odb->pol[i].v);
+                if (odb->pol[i].v)
+                    free(odb->pol[i].v);
             free(odb->pol);
         }
         free(odb);
@@ -212,39 +224,47 @@ ObjectDB* getObjectDB(LWItemID id, GlobalFunc* global)
     /* get the object info global */
 
     objinfo = (st_LWObjectInfo*)global(LWOBJECTINFO_GLOBAL, GFUSE_TRANSIENT);
-    if (!objinfo) return NULL;
+    if (!objinfo)
+        return NULL;
 
     /* get the mesh info for the object */
 
     mesh = objinfo->meshInfo(id, 1);
-    if (!mesh) return NULL;
+    if (!mesh)
+        return NULL;
 
     /* alloc the object database */
 
     odb = (st_ObjectDB*)calloc(1, sizeof(ObjectDB));
-    if (!odb) goto Finish;
+    if (!odb)
+        goto Finish;
 
     odb->id = id;
     name = objinfo->filename(id);
     odb->filename = (char*)malloc(xr_strlen(name) + 1);
-    if (!odb->filename) goto Finish;
+    if (!odb->filename)
+        goto Finish;
     strcpy(odb->filename, name);
 
     /* alloc and init the points array */
 
     npts = mesh->numPoints(mesh);
     odb->pt = (st_DBPoint*)calloc(npts, sizeof(DBPoint));
-    if (!odb->pt) goto Finish;
+    if (!odb->pt)
+        goto Finish;
 
-    if (mesh->scanPoints(mesh, (int(__cdecl*)(void*, struct st_GCoreVertex*))pntScan, odb)) goto Finish;
+    if (mesh->scanPoints(mesh, (int(__cdecl*)(void*, struct st_GCoreVertex*))pntScan, odb))
+        goto Finish;
 
     /* alloc and init the polygons array */
 
     npols = mesh->numPolygons(mesh);
     odb->pol = (st_DBPolygon*)calloc(npols, sizeof(DBPolygon));
-    if (!odb->pol) goto Finish;
+    if (!odb->pol)
+        goto Finish;
 
-    if (mesh->scanPolys(mesh, (int(__cdecl*)(void*, struct st_GCorePolygon*))polScan, odb)) goto Finish;
+    if (mesh->scanPolys(mesh, (int(__cdecl*)(void*, struct st_GCorePolygon*))polScan, odb))
+        goto Finish;
 
     /* get the vertices of each polygon */
 
@@ -252,7 +272,8 @@ ObjectDB* getObjectDB(LWItemID id, GlobalFunc* global)
     {
         nverts = mesh->polSize(mesh, odb->pol[i].id);
         odb->pol[i].v = (st_DBPolVert*)calloc(nverts, sizeof(DBPolVert));
-        if (!odb->pol[i].v) goto Finish;
+        if (!odb->pol[i].v)
+            goto Finish;
         odb->pol[i].nverts = nverts;
         for (j = 0; j < nverts; j++)
         {
@@ -271,9 +292,11 @@ ObjectDB* getObjectDB(LWItemID id, GlobalFunc* global)
 
     for (i = 0; i < npts; i++)
     {
-        if (odb->pt[i].npols == 0) continue;
+        if (odb->pt[i].npols == 0)
+            continue;
         odb->pt[i].pol = (int*)calloc(odb->pt[i].npols, sizeof(int));
-        if (!odb->pt[i].pol) goto Finish;
+        if (!odb->pt[i].pol)
+            goto Finish;
         odb->pt[i].npols = 0;
     }
 
@@ -307,11 +330,13 @@ ObjectDB* getObjectDB(LWItemID id, GlobalFunc* global)
 
     /* get the vmaps */
 
-    if (!getObjectVMaps(odb, mesh, global)) goto Finish;
+    if (!getObjectVMaps(odb, mesh, global))
+        goto Finish;
 
     /* get the surfaces */
 
-    if (!getObjectSurfs(odb, mesh, global)) goto Finish;
+    if (!getObjectSurfs(odb, mesh, global))
+        goto Finish;
 
     /* calculate initial vertex normals */
 
@@ -322,9 +347,11 @@ ObjectDB* getObjectDB(LWItemID id, GlobalFunc* global)
     ok = 1;
 
 Finish:
-    if (mesh->destroy) mesh->destroy(mesh);
+    if (mesh->destroy)
+        mesh->destroy(mesh);
 
-    if (!ok) {
+    if (!ok)
+    {
         freeObjectDB(odb);
         return NULL;
     }
@@ -386,7 +413,8 @@ int printObjectDB(ObjectDB* odb, FILE* fp, int c)
 
     if (initPointSearch(odb, c))
         for (i = 0; i < odb->npoints; i++)
-            if (i != pointSearch(odb, odb->pt[i].pos[c])) fprintf(fp, "Point search failed for point %d.\n", i);
+            if (i != pointSearch(odb, odb->pt[i].pos[c]))
+                fprintf(fp, "Point search failed for point %d.\n", i);
 
     fprintf(fp, "\n\nPolygons (%d)\n\n", odb->npolygons);
     for (i = 0; i < odb->npolygons; i++)

@@ -15,13 +15,11 @@
 
 using editor::environment::sound_channels::source;
 
-source::source(shared_str const& source) : m_source(source), m_property_holder(0)
-{
-}
-
+source::source(shared_str const& source) : m_source(source), m_property_holder(0) {}
 source::~source()
 {
-    if (!Device.editor()) return;
+    if (!Device.editor())
+        return;
 
     ::ide().destroy(m_property_holder);
 }
@@ -36,9 +34,5 @@ void source::fill(editor::property_holder_collection* collection)
         "Select sound...", editor::property_holder::cannot_enter_text, editor::property_holder::remove_extension);
 }
 
-source::property_holder_type* source::object()
-{
-    return (m_property_holder);
-}
-
-#endif  // #ifdef INGAME_EDITOR
+source::property_holder_type* source::object() { return (m_property_holder); }
+#endif // #ifdef INGAME_EDITOR

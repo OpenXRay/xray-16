@@ -23,11 +23,7 @@ void ESceneFogVolumeTool::CreateControls()
     pFrame = xr_new<TfraFogVol>((TComponent*)0, this);
 }
 
-void ESceneFogVolumeTool::RemoveControls()
-{
-    inherited::RemoveControls();
-}
-
+void ESceneFogVolumeTool::RemoveControls() { inherited::RemoveControls(); }
 void ESceneFogVolumeTool::Clear(bool bSpecific)
 {
     inherited::Clear(bSpecific);
@@ -46,12 +42,14 @@ bool ESceneFogVolumeTool::LoadStream(IReader& F)
 {
     u16 version = 0;
     if (F.r_chunk(TOOL_CHUNK_VERSION, &version))
-        if (version != FOG_VOL_TOOLS_VERSION) {
+        if (version != FOG_VOL_TOOLS_VERSION)
+        {
             ELog.DlgMsg(mtError, "%s tools: Unsupported version.", ClassDesc());
             return false;
         }
 
-    if (!inherited::LoadStream(F)) return false;
+    if (!inherited::LoadStream(F))
+        return false;
     return true;
 }
 
@@ -65,7 +63,8 @@ bool ESceneFogVolumeTool::LoadSelection(IReader& F)
 {
     u16 version = 0;
     R_ASSERT(F.r_chunk(TOOL_CHUNK_VERSION, &version));
-    if (version != FOG_VOL_TOOLS_VERSION) {
+    if (version != FOG_VOL_TOOLS_VERSION)
+    {
         ELog.DlgMsg(mtError, "%s tools: Unsupported version.", ClassDesc());
         return false;
     }
@@ -83,7 +82,8 @@ void ESceneFogVolumeTool::SaveSelection(IWriter& F)
 bool ESceneFogVolumeTool::LoadLTX(CInifile& ini)
 {
     u32 version = ini.r_u32("main", "version");
-    if (version != FOG_VOL_TOOLS_VERSION) {
+    if (version != FOG_VOL_TOOLS_VERSION)
+    {
         ELog.DlgMsg(mtError, "%s tools: Unsupported version.", ClassDesc());
         return false;
     }
@@ -105,7 +105,8 @@ void ESceneFogVolumeTool::GroupSelected()
 
     for (ObjectIt it = m_Objects.begin(); it != m_Objects.end(); ++it)
     {
-        if ((*it)->Selected()) {
+        if ((*it)->Selected())
+        {
             EFogVolume* fv = (EFogVolume*)(*it);
             fv->m_group_id = m_group_counter;
         }
@@ -116,18 +117,15 @@ void ESceneFogVolumeTool::UnGroupCurrent()
 {
     for (ObjectIt it = m_Objects.begin(); it != m_Objects.end(); ++it)
     {
-        if ((*it)->Selected()) {
+        if ((*it)->Selected())
+        {
             EFogVolume* fv = (EFogVolume*)(*it);
             fv->m_group_id = u32(-1);
         }
     }
 }
 
-void ESceneFogVolumeTool::RegisterGroup(u32 group)
-{
-    m_group_counter = _max(m_group_counter, group);
-}
-
+void ESceneFogVolumeTool::RegisterGroup(u32 group) { m_group_counter = _max(m_group_counter, group); }
 void ESceneFogVolumeTool::Selected(EFogVolume* fv)
 {
     u32 grp = fv->m_group_id;
@@ -137,7 +135,8 @@ void ESceneFogVolumeTool::Selected(EFogVolume* fv)
     {
         EFogVolume* fv_it = (EFogVolume*)(*it);
 
-        if (b_sel && (fv_it->m_group_id == grp) && (grp != u32(-1))) {
+        if (b_sel && (fv_it->m_group_id == grp) && (grp != u32(-1)))
+        {
             fv_it->m_DrawEdgeColor = 0xFFFF2020;
         }
         else
@@ -148,11 +147,7 @@ void ESceneFogVolumeTool::Selected(EFogVolume* fv)
 }
 
 //---------------------------------------
-EFogVolume::EFogVolume(LPVOID data, LPCSTR name) : CEditShape(data, name)
-{
-    Construct(data);
-}
-
+EFogVolume::EFogVolume(LPVOID data, LPCSTR name) : CEditShape(data, name) { Construct(data); }
 void EFogVolume::Construct(LPVOID data)
 {
     ClassID = OBJCLASS_FOG_VOL;
@@ -163,26 +158,21 @@ void EFogVolume::Construct(LPVOID data)
     SetDrawColor(0x205050FF, 0xFF202020);
 }
 
-EFogVolume::~EFogVolume()
-{
-}
-
-void EFogVolume::OnUpdateTransform()
-{
-    inherited::OnUpdateTransform();
-}
-
+EFogVolume::~EFogVolume() {}
+void EFogVolume::OnUpdateTransform() { inherited::OnUpdateTransform(); }
 bool EFogVolume::LoadLTX(CInifile& ini, LPCSTR sect_name)
 {
     u32 version = ini.r_u32(sect_name, "version");
 
     inherited::LoadLTX(ini, sect_name);
 
-    if (version > 0) {
+    if (version > 0)
+    {
         m_volumeType = ini.r_u8(sect_name, "folume_type");
         m_group_id = ini.r_u32(sect_name, "group_id");
     }
-    if (version > 1 && m_volumeType == fvEmitter) m_volume_profile = ini.r_string(sect_name, "profile");
+    if (version > 1 && m_volumeType == fvEmitter)
+        m_volume_profile = ini.r_string(sect_name, "profile");
 
     OnChangeEnvs(NULL);
 
@@ -197,7 +187,8 @@ void EFogVolume::SaveLTX(CInifile& ini, LPCSTR sect_name)
     ini.w_u8(sect_name, "folume_type", m_volumeType);
     ini.w_u32(sect_name, "group_id", m_group_id);
 
-    if (m_volumeType == fvEmitter) ini.w_string(sect_name, "profile", m_volume_profile.c_str());
+    if (m_volumeType == fvEmitter)
+        ini.w_string(sect_name, "profile", m_volume_profile.c_str());
 }
 
 bool EFogVolume::LoadStream(IReader& F)
@@ -208,11 +199,13 @@ bool EFogVolume::LoadStream(IReader& F)
 
     inherited::LoadStream(F);
 
-    if (F.find_chunk(OBJ_CHUNK_DATA)) {
+    if (F.find_chunk(OBJ_CHUNK_DATA))
+    {
         m_volumeType = F.r_u8();
         m_group_id = F.r_u32();
     }
-    if (version > 1 && m_volumeType == fvEmitter) F.r_stringZ(m_volume_profile);
+    if (version > 1 && m_volumeType == fvEmitter)
+        F.r_stringZ(m_volume_profile);
 
     OnChangeEnvs(NULL);
     return true;
@@ -229,7 +222,8 @@ void EFogVolume::SaveStream(IWriter& F)
     F.open_chunk(OBJ_CHUNK_DATA);
     F.w_u8(m_volumeType);
     F.w_u32(m_group_id);
-    if (m_volumeType == fvEmitter) F.w_stringZ(m_volume_profile.c_str());
+    if (m_volumeType == fvEmitter)
+        F.w_stringZ(m_volume_profile.c_str());
 
     F.close_chunk();
 }
@@ -265,14 +259,11 @@ bool EFogVolume::GetSummaryInfo(SSceneSummary* inf)
     return true;
 }
 
-void EFogVolume::OnSceneUpdate()
-{
-    inherited::OnSceneUpdate();
-}
-
+void EFogVolume::OnSceneUpdate() { inherited::OnSceneUpdate(); }
 void EFogVolume::Select(int flag)
 {
     inherited::Select(flag);
 
-    if (Selected()) ((ESceneFogVolumeTool*)ParentTool)->Selected(this);
+    if (Selected())
+        ((ESceneFogVolumeTool*)ParentTool)->Selected(this);
 }

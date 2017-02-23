@@ -92,11 +92,7 @@ void CStalkerCombatPlanner::setup(CAI_Stalker* object, CPropertyStorage* storage
     object->movement().property_storage(storage);
 }
 
-void CStalkerCombatPlanner::execute()
-{
-    inherited::execute();
-}
-
+void CStalkerCombatPlanner::execute() { inherited::execute(); }
 void CStalkerCombatPlanner::update()
 {
     inherited::update();
@@ -116,9 +112,10 @@ void CStalkerCombatPlanner::initialize()
 
 #ifdef DEBUG
 //	inherited_planner::m_use_log = true;
-#endif  // DEBUG
+#endif // DEBUG
 
-    if (!m_loaded) {
+    if (!m_loaded)
+    {
         CScriptActionPlanner::m_storage.set_property(eWorldPropertyInCover, false);
         CScriptActionPlanner::m_storage.set_property(eWorldPropertyLookedOut, false);
         CScriptActionPlanner::m_storage.set_property(eWorldPropertyPositionHolded, false);
@@ -143,7 +140,8 @@ void CStalkerCombatPlanner::initialize()
     m_last_level_time = 0;
     m_last_wounded = false;
 
-    if (!m_loaded && object().memory().enemy().selected()) {
+    if (!m_loaded && object().memory().enemy().selected())
+    {
         CVisualMemoryManager* visual_memory_manager = object().memory().enemy().selected()->visual_memory();
         VERIFY(visual_memory_manager);
         CScriptActionPlanner::m_storage.set_property(
@@ -158,7 +156,8 @@ void CStalkerCombatPlanner::initialize()
     //  this is possible when i enter combat when it is wait after combat stage
     //	VERIFY					(object().memory().enemy().selected());
 
-    if (m_object->memory().visual().visible_now(m_object->memory().enemy().selected())) {
+    if (m_object->memory().visual().visible_now(m_object->memory().enemy().selected()))
+    {
         if (m_object->memory().enemy().selected()->human_being())
             if (object().agent_manager().member().can_cry_noninfo_phrase())
                 if (object().agent_manager().member().members().size() > 1)
@@ -173,7 +172,8 @@ void CStalkerCombatPlanner::finalize()
 {
     inherited::finalize();
 
-    if (!object().g_Alive()) return;
+    if (!object().g_Alive())
+        return;
 
     object().memory().danger().time_line(Device.dwTimeGlobal + 3000);
     if (object().agent_manager().member().registered_in_combat(m_object))
@@ -183,7 +183,8 @@ void CStalkerCombatPlanner::finalize()
 
     //	object().sound().remove_active_sounds					(eStalkerSoundMaskNoDanger);
 
-    if (object().inventory().ItemFromSlot(INV_SLOT_2)) {
+    if (object().inventory().ItemFromSlot(INV_SLOT_2))
+    {
         CWeaponMagazined* temp = smart_cast<CWeaponMagazined*>(object().inventory().ItemFromSlot(INV_SLOT_2));
         if (object().inventory().ActiveItem() && temp &&
             (object().inventory().ActiveItem()->object().ID() == temp->ID()))
@@ -556,12 +557,5 @@ void CStalkerCombatPlanner::add_actions()
     add_operator(eWorldOperatorInSmartCover, action);
 }
 
-void CStalkerCombatPlanner::save(NET_Packet& packet)
-{
-    inherited::save(packet);
-}
-
-void CStalkerCombatPlanner::load(IReader& packet)
-{
-    inherited::load(packet);
-}
+void CStalkerCombatPlanner::save(NET_Packet& packet) { inherited::save(packet); }
+void CStalkerCombatPlanner::load(IReader& packet) { inherited::load(packet); }

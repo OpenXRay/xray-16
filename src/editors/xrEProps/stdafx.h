@@ -33,4 +33,4 @@ class MODEL;
 #pragma comment(lib, "xrCoreB.lib")
 #pragma comment(lib, "EToolsB.lib")
 
-#endif  // stdafxH
+#endif // stdafxH

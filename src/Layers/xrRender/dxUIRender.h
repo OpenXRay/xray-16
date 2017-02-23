@@ -8,7 +8,6 @@ class dxUIRender : public IUIRender
 {
 public:
     dxUIRender() : PrimitiveType(ptNone), m_PointType(pttNone) { ; }
-
     virtual void CreateUIGeom();
     virtual void DestroyUIGeom();
 
@@ -59,4 +58,4 @@ private:
 
 extern dxUIRender UIRenderImpl;
 
-#endif  //	dxUIRender_included
+#endif //	dxUIRender_included

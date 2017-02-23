@@ -12,7 +12,7 @@ public:
 
     TTime m_time_became_angry;
 
-    TTime time_growling;  // время нахождения в состоянии пугания
+    TTime time_growling; // время нахождения в состоянии пугания
 
     enum
     {
@@ -33,7 +33,6 @@ public:
 
     virtual bool ability_can_drag() { return true; }
     virtual bool ability_psi_attack() { return true; }
-
     virtual void CheckSpecParams(u32 spec_params);
     // virtual void	play_effect_sound	();
 
@@ -41,7 +40,6 @@ public:
 
     virtual IStateManagerBase* create_state_manager();
     virtual char* get_monster_class_name() { return "pseudodog"; }
-
 private:
 #ifdef _DEBUG
     virtual void debug_on_key(int key);

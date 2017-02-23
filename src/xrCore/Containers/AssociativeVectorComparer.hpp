@@ -31,15 +31,9 @@ public:
 #define _associative_vector_compare_predicate AssociativeVectorComparer<TKey, TValue, TComparer>
 
 TEMPLATE_SPECIALIZATION
-IC _associative_vector_compare_predicate::AssociativeVectorComparer()
-{
-}
-
+IC _associative_vector_compare_predicate::AssociativeVectorComparer() {}
 TEMPLATE_SPECIALIZATION
-IC _associative_vector_compare_predicate::AssociativeVectorComparer(const TComparer& comparer) : inherited(comparer)
-{
-}
-
+IC _associative_vector_compare_predicate::AssociativeVectorComparer(const TComparer& comparer) : inherited(comparer) {}
 TEMPLATE_SPECIALIZATION
 IC bool _associative_vector_compare_predicate::operator()(const TKey& lhs, const TKey& rhs) const
 {

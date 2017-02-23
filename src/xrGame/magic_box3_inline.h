@@ -18,15 +18,9 @@ IC MagicBox3::MagicBox3(const Fmatrix& m, const Fvector& half_size)
 }
 
 //----------------------------------------------------------------------------
-IC Fvector& MagicBox3::Center()
-{
-    return m_kCenter;
-}
+IC Fvector& MagicBox3::Center() { return m_kCenter; }
 //----------------------------------------------------------------------------
-IC const Fvector& MagicBox3::Center() const
-{
-    return m_kCenter;
-}
+IC const Fvector& MagicBox3::Center() const { return m_kCenter; }
 //----------------------------------------------------------------------------
 IC Fvector& MagicBox3::Axis(int i)
 {
@@ -40,15 +34,9 @@ IC const Fvector& MagicBox3::Axis(int i) const
     return m_akAxis[i];
 }
 //----------------------------------------------------------------------------
-IC Fvector* MagicBox3::Axes()
-{
-    return m_akAxis;
-}
+IC Fvector* MagicBox3::Axes() { return m_akAxis; }
 //----------------------------------------------------------------------------
-IC const Fvector* MagicBox3::Axes() const
-{
-    return m_akAxis;
-}
+IC const Fvector* MagicBox3::Axes() const { return m_akAxis; }
 //----------------------------------------------------------------------------
 IC float& MagicBox3::Extent(int i)
 {
@@ -62,13 +50,7 @@ IC const float& MagicBox3::Extent(int i) const
     return m_afExtent[i];
 }
 //----------------------------------------------------------------------------
-IC float* MagicBox3::Extents()
-{
-    return m_afExtent;
-}
+IC float* MagicBox3::Extents() { return m_afExtent; }
 //----------------------------------------------------------------------------
-IC const float* MagicBox3::Extents() const
-{
-    return m_afExtent;
-}
+IC const float* MagicBox3::Extents() const { return m_afExtent; }
 //----------------------------------------------------------------------------

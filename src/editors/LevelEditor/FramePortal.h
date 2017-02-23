@@ -20,8 +20,8 @@ class EScenePortalTool;
 //---------------------------------------------------------------------------
 class TfraPortal : public TForm
 {
-    __published :  // IDE-managed Components
-                   TPanel* paCommands;
+    __published : // IDE-managed Components
+                  TPanel* paCommands;
     TLabel* APHeadLabel1;
     TExtBtn* ExtBtn2;
     TExtBtn* ebInvertOrient;
@@ -36,8 +36,8 @@ class TfraPortal : public TForm
     void __fastcall ebInvertOrientClick(TObject* Sender);
     void __fastcall ExtBtn1Click(TObject* Sender);
 
-  private:  // User declarations
-  public:   // User declarations
+private: // User declarations
+public: // User declarations
     __fastcall TfraPortal(TComponent* Owner);
     EScenePortalTool* tool;
 };

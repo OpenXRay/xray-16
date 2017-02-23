@@ -5,11 +5,7 @@
 using namespace luabind;
 
 LPCSTR get_file_age_str(CLocatorAPI* fs, LPCSTR nm);
-CLocatorAPI* getFS()
-{
-    return &FS;
-}
-
+CLocatorAPI* getFS() { return &FS; }
 LPCSTR update_path_script(CLocatorAPI* fs, LPCSTR initial, LPCSTR src)
 {
     string_path temp;
@@ -63,19 +59,22 @@ struct FS_item
 template <bool b>
 bool sizeSorter(const FS_item& itm1, const FS_item& itm2)
 {
-    if (b) return (itm1.size < itm2.size);
+    if (b)
+        return (itm1.size < itm2.size);
     return (itm2.size < itm1.size);
 }
 template <bool b>
 bool modifSorter(const FS_item& itm1, const FS_item& itm2)
 {
-    if (b) return (itm1.modif < itm2.modif);
+    if (b)
+        return (itm1.modif < itm2.modif);
     return (itm2.modif < itm1.modif);
 }
 template <bool b>
 bool nameSorter(const FS_item& itm1, const FS_item& itm2)
 {
-    if (b) return (xr_strcmp(itm1.name, itm2.name) < 0);
+    if (b)
+        return (xr_strcmp(itm1.name, itm2.name) < 0);
     return (xr_strcmp(itm2.name, itm1.name) < 0);
 }
 
@@ -159,11 +158,7 @@ void dir_delete_script_2(CLocatorAPI* fs, LPCSTR path, LPCSTR nm, int remove_fil
     fs->dir_delete(path, nm, remove_files);
 }
 
-void dir_delete_script(CLocatorAPI* fs, LPCSTR full_path, int remove_files)
-{
-    fs->dir_delete(full_path, remove_files);
-}
-
+void dir_delete_script(CLocatorAPI* fs, LPCSTR full_path, int remove_files) { fs->dir_delete(full_path, remove_files); }
 LPCSTR get_file_age_str(CLocatorAPI* fs, LPCSTR nm)
 {
     time_t t = fs->get_file_age(nm);

@@ -43,7 +43,8 @@ void CRenderTarget::phase_scene_prepare()
     else
     {
         //	TODO: DX10: Check if we need to set RT here.
-        if (!RImplementation.o.dx10_msaa) {
+        if (!RImplementation.o.dx10_msaa)
+        {
             u_setrt(Device.dwWidth, Device.dwHeight, HW.pBaseRT, NULL, NULL, HW.pBaseZB);
             // CHK_DX	( HW.pDevice->Clear	( 0L, NULL, D3DCLEAR_ZBUFFER|D3DCLEAR_STENCIL, 0x0, 1.0f, 0L) );
             HW.pDevice->ClearDepthStencilView(HW.pBaseZB, D3D10_CLEAR_DEPTH | D3D10_CLEAR_STENCIL, 1.0f, 0);
@@ -66,10 +67,12 @@ void CRenderTarget::phase_scene_begin()
 {
     ID3DDepthStencilView* pZB = HW.pBaseZB;
 
-    if (RImplementation.o.dx10_msaa) pZB = rt_MSAADepth->pZRT;
+    if (RImplementation.o.dx10_msaa)
+        pZB = rt_MSAADepth->pZRT;
 
     // Targets, use accumulator for temporary storage
-    if (!RImplementation.o.dx10_gbuffer_opt) {
+    if (!RImplementation.o.dx10_gbuffer_opt)
+    {
         if (RImplementation.o.albedo_wo)
             u_setrt(rt_Position, rt_Normal, rt_Accumulator, pZB);
         else
@@ -108,7 +111,8 @@ void CRenderTarget::phase_scene_end()
 {
     disable_aniso();
 
-    if (!RImplementation.o.albedo_wo) return;
+    if (!RImplementation.o.albedo_wo)
+        return;
 
     // transfer from "rt_Accumulator" into "rt_Color"
     if (!RImplementation.o.dx10_msaa)
@@ -116,9 +120,10 @@ void CRenderTarget::phase_scene_end()
     else
         u_setrt(rt_Color, 0, 0, rt_MSAADepth->pZRT);
     RCache.set_CullMode(CULL_NONE);
-    RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0x00);  // stencil should be >= 1
-    if (RImplementation.o.nvstencil) u_stencil_optimize(CRenderTarget::SO_Combine);
-    RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0x00);  // stencil should be >= 1
+    RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0x00); // stencil should be >= 1
+    if (RImplementation.o.nvstencil)
+        u_stencil_optimize(CRenderTarget::SO_Combine);
+    RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0x00); // stencil should be >= 1
     RCache.set_ColorWriteEnable();
 
     // common calc for quad-rendering
@@ -144,7 +149,7 @@ void CRenderTarget::phase_scene_end()
     RCache.Vertex.Unlock(4, g_combine->vb_stride);
 
     // if (stencil>=1 && aref_pass)	stencil = light_id
-    RCache.set_Element(s_accum_mask->E[SE_MASK_ALBEDO]);  // masker
+    RCache.set_Element(s_accum_mask->E[SE_MASK_ALBEDO]); // masker
     RCache.set_Geometry(g_combine);
     RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
 }

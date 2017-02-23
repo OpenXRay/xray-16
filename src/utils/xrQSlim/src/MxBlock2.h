@@ -1,4 +1,4 @@
-#ifndef MXBLOCK2_INCLUDED  // -*- C++ -*-
+#ifndef MXBLOCK2_INCLUDED // -*- C++ -*-
 #define MXBLOCK2_INCLUDED
 #if !defined(__GNUC__)
 #pragma once
@@ -24,7 +24,6 @@ private:
 
 protected:
     MxBlock2() {}
-
 public:
     MxBlock2(int w, int h) : MxBlock<T>(w * h)
     {
@@ -34,10 +33,8 @@ public:
 
     T& operator()(int i, int j) { return (*this)[j * W + i]; }
     const T& operator()(int i, int j) const { return (*this)[j * W + i]; }
-
     int width() const { return W; }
     int height() const { return H; }
-
     void resize(int w, int h)
     {
         W = w;

@@ -12,7 +12,6 @@ public:
     virtual LPCSTR getComment() { return "LEVEL: diffuse*base"; }
     virtual BOOL canBeDetailed() { return TRUE; }
     virtual BOOL canBeLMAPped() { return FALSE; }
-
     virtual void Save(IWriter& fs);
     virtual void Load(IReader& fs, u16 version);
 
@@ -25,4 +24,4 @@ private:
     xrP_TOKEN oTessellation;
 };
 
-#endif  // !defined(AFX_BLENDER_VERTEX_H__D3B42F77_7018_4672_B6A5_6EE6BD947662__INCLUDED_)
+#endif // !defined(AFX_BLENDER_VERTEX_H__D3B42F77_7018_4672_B6A5_6EE6BD947662__INCLUDED_)

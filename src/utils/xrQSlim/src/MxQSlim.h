@@ -1,4 +1,4 @@
-#ifndef MXQSLIM_INCLUDED  // -*- C++ -*-
+#ifndef MXQSLIM_INCLUDED // -*- C++ -*-
 #define MXQSLIM_INCLUDED
 #if !defined(__GNUC__)
 #pragma once
@@ -34,7 +34,6 @@ public:
 public:
     MxQSlim(MxStdModel*);
     virtual ~MxQSlim() {}
-
     virtual void initialize();
 
     const MxQuadric3& vertex_quadric(MxVertexID v) { return quadrics(v); }

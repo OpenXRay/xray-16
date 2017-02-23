@@ -27,16 +27,13 @@ CZoneCampfire::~CZoneCampfire()
     m_disabled_sound.destroy();
 }
 
-void CZoneCampfire::Load(LPCSTR section)
-{
-    inherited::Load(section);
-}
-
+void CZoneCampfire::Load(LPCSTR section) { inherited::Load(section); }
 void CZoneCampfire::GoEnabledState()
 {
     inherited::GoEnabledState();
 
-    if (m_pDisabledParticles) {
+    if (m_pDisabledParticles)
+    {
         m_pDisabledParticles->Stop(FALSE);
         CParticlesObject::Destroy(m_pDisabledParticles);
     }
@@ -68,7 +65,8 @@ void CZoneCampfire::GoDisabledState()
 #define OVL_TIME 3000
 void CZoneCampfire::turn_on_script()
 {
-    if (psDeviceFlags.test(rsR2 | rsR3)) {
+    if (psDeviceFlags.test(rsR2 | rsR3))
+    {
         m_turn_time = Device.dwTimeGlobal + OVL_TIME;
         m_turned_on = true;
         GoEnabledState();
@@ -77,25 +75,24 @@ void CZoneCampfire::turn_on_script()
 
 void CZoneCampfire::turn_off_script()
 {
-    if (psDeviceFlags.test(rsR2 | rsR3)) {
+    if (psDeviceFlags.test(rsR2 | rsR3))
+    {
         m_turn_time = Device.dwTimeGlobal + OVL_TIME;
         m_turned_on = false;
         GoDisabledState();
     }
 }
 
-bool CZoneCampfire::is_on()
-{
-    return m_turned_on;
-}
-
+bool CZoneCampfire::is_on() { return m_turned_on; }
 void CZoneCampfire::shedule_Update(u32 dt)
 {
-    if (!IsEnabled() && m_turn_time) {
+    if (!IsEnabled() && m_turn_time)
+    {
         UpdateWorkload(dt);
     }
 
-    if (m_pIdleParticles) {
+    if (m_pIdleParticles)
+    {
         Fvector vel;
         vel.mul(
             GamePersistent().Environment().wind_blast_direction, GamePersistent().Environment().wind_strength_factor);
@@ -106,9 +103,11 @@ void CZoneCampfire::shedule_Update(u32 dt)
 
 void CZoneCampfire::PlayIdleParticles(bool bIdleLight)
 {
-    if (m_turn_time == 0 || m_turn_time - Device.dwTimeGlobal < (OVL_TIME - 2000)) {
+    if (m_turn_time == 0 || m_turn_time - Device.dwTimeGlobal < (OVL_TIME - 2000))
+    {
         inherited::PlayIdleParticles(bIdleLight);
-        if (m_pEnablingParticles) {
+        if (m_pEnablingParticles)
+        {
             m_pEnablingParticles->Stop(FALSE);
             CParticlesObject::Destroy(m_pEnablingParticles);
         }
@@ -132,10 +131,12 @@ BOOL CZoneCampfire::AlwaysTheCrow()
 void CZoneCampfire::UpdateWorkload(u32 dt)
 {
     inherited::UpdateWorkload(dt);
-    if (m_turn_time > Device.dwTimeGlobal) {
+    if (m_turn_time > Device.dwTimeGlobal)
+    {
         float k = float(m_turn_time - Device.dwTimeGlobal) / float(OVL_TIME);
 
-        if (m_turned_on) {
+        if (m_turned_on)
+        {
             k = 1.0f - k;
             PlayIdleParticles(true);
             StartIdleLight();
@@ -145,7 +146,8 @@ void CZoneCampfire::UpdateWorkload(u32 dt)
             StopIdleParticles(false);
         }
 
-        if (m_pIdleLight && m_pIdleLight->get_active()) {
+        if (m_pIdleLight && m_pIdleLight->get_active())
+        {
             VERIFY(m_pIdleLAnim);
             int frame = 0;
             u32 clr = m_pIdleLAnim->CalculateBGR(Device.fTimeGlobal, frame);
@@ -163,7 +165,8 @@ void CZoneCampfire::UpdateWorkload(u32 dt)
     else if (m_turn_time)
     {
         m_turn_time = 0;
-        if (m_turned_on) {
+        if (m_turned_on)
+        {
             PlayIdleParticles(true);
         }
         else

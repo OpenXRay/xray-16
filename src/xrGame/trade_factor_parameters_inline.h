@@ -8,15 +8,8 @@
 
 #pragma once
 
-IC CTradeFactorParameters::CTradeFactorParameters()
-{
-}
-
-IC void CTradeFactorParameters::clear()
-{
-    m_factors.clear();
-}
-
+IC CTradeFactorParameters::CTradeFactorParameters() {}
+IC void CTradeFactorParameters::clear() { m_factors.clear(); }
 IC void CTradeFactorParameters::enable(const shared_str& section, const CTradeFactors& factors)
 {
     FACTORS::const_iterator I = m_factors.find(section);

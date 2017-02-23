@@ -43,11 +43,19 @@ void bwdithermap(int levels, int magic[16][16])
 
     float magicfact = (N - 1) / 16;
     for (int i = 0; i < 4; i++)
+    {
         for (int j = 0; j < 4; j++)
+        {
             for (int k = 0; k < 4; k++)
+            {
                 for (int l = 0; l < 4; l++)
+                {
                     magic[4 * k + i][4 * l + j] =
                         (int)(0.5 + magic4x4[i][j] * magicfact + (magic4x4[k][l] / 16.) * magicfact);
+                }
+            }
+        }
+    }
 }
 //--------------------------------------------------- Decompression
 
@@ -81,26 +89,25 @@ CDetailManager::CDetailManager() : xrc("detail manager")
     m_global_time_old = 0;
 }
 
-CDetailManager::~CDetailManager()
-{
-}
+CDetailManager::~CDetailManager() {}
 /*
 */
 #ifndef _EDITOR
 
 /*
-void dump	(CDetailManager::vis_list& lst)
+void dump(CDetailManager::vis_list& lst)
 {
-    for (int i=0; i<lst.size(); i++)
+    for (int i = 0; i<lst.size(); i++)
     {
-        Msg("%8x / %8x / %8x",	lst[i]._M_start, lst[i]._M_finish, lst[i]._M_end_of_storage._M_data);
+        Msg("%8x / %8x / %8x",  lst[i]._M_start, lst[i]._M_finish, lst[i]._M_end_of_storage._M_data);
     }
 }
 */
 void CDetailManager::Load()
 {
     // Open file stream
-    if (!FS.exist("$level$", "level.details")) {
+    if (!FS.exist("$level$", "level.details"))
+    {
         dtFS = NULL;
         return;
     }
@@ -207,13 +214,15 @@ void CDetailManager::UpdateVisibleM()
         for (int _mx = 0; _mx < dm_cache1_line; _mx++)
         {
             CacheSlot1& MS = cache_level1[_mz][_mx];
-            if (MS.empty) {
+            if (MS.empty)
+            {
                 continue;
             }
             u32 mask = 0xff;
             u32 res = View.testSAABB(MS.vis.sphere.P, MS.vis.sphere.R, MS.vis.box.data(), mask);
-            if (fcvNone == res) {
-                continue;  // invisible-view frustum
+            if (fcvNone == res)
+            {
+                continue; // invisible-view frustum
             }
             // test slots
 
@@ -224,32 +233,38 @@ void CDetailManager::UpdateVisibleM()
                 Slot* PS = *MS.slots[_i];
                 Slot& S = *PS;
 
-                //				if ( ( _i + 1 ) < dwCC );
-                //					_mm_prefetch( (char *) *MS.slots[ _i + 1 ]  , _MM_HINT_T1 );
+                //if (_i+1<dwCC);
+                //    _mm_prefetch((char*)*MS.slots[_i+1], _MM_HINT_T1);
 
                 // if slot empty - continue
-                if (S.empty) {
+                if (S.empty)
+                {
                     continue;
                 }
 
                 // if upper test = fcvPartial - test inner slots
-                if (fcvPartial == res) {
+                if (fcvPartial == res)
+                {
                     u32 _mask = mask;
                     u32 _res = View.testSAABB(S.vis.sphere.P, S.vis.sphere.R, S.vis.box.data(), _mask);
-                    if (fcvNone == _res) {
-                        continue;  // invisible-view frustum
+                    if (fcvNone == _res)
+                    {
+                        continue; // invisible-view frustum
                     }
                 }
 #ifndef _EDITOR
-                if (!RImplementation.HOM.visible(S.vis)) {
-                    continue;  // invisible-occlusion
+                if (!RImplementation.HOM.visible(S.vis))
+                {
+                    continue; // invisible-occlusion
                 }
 #endif
                 // Add to visibility structures
-                if (RDEVICE.dwFrame > S.frame) {
-                    // Calc fade factor	(per slot)
+                if (RDEVICE.dwFrame > S.frame)
+                {
+                    // Calc fade factor (per slot)
                     float dist_sq = EYE.distance_to_sqr(S.vis.sphere.P);
-                    if (dist_sq > fade_limit) continue;
+                    if (dist_sq > fade_limit)
+                        continue;
                     float alpha = (dist_sq < fade_start) ? 0.f : (dist_sq - fade_start) / fade_range;
                     float alpha_i = 1.f - alpha;
                     float dist_sq_rcp = 1.f / dist_sq;
@@ -258,14 +273,15 @@ void CDetailManager::UpdateVisibleM()
                     for (int sp_id = 0; sp_id < dm_obj_in_slot; sp_id++)
                     {
                         SlotPart& sp = S.G[sp_id];
-                        if (sp.id == DetailSlot::ID_Empty) continue;
+                        if (sp.id == DetailSlot::ID_Empty)
+                            continue;
 
                         sp.r_items[0].clear_not_free();
                         sp.r_items[1].clear_not_free();
                         sp.r_items[2].clear_not_free();
 
                         float R = objects[sp.id]->bv_sphere.R;
-                        float Rq_drcp = R * R * dist_sq_rcp;  // reordered expression for 'ssa' calc
+                        float Rq_drcp = R * R * dist_sq_rcp; // reordered expression for 'ssa' calc
 
                         SlotItem **siIT = &(*sp.items.begin()), **siEND = &(*sp.items.end());
                         for (; siIT != siEND; siIT++)
@@ -273,29 +289,35 @@ void CDetailManager::UpdateVisibleM()
                             SlotItem& Item = *(*siIT);
                             float scale = Item.scale_calculated = Item.scale * alpha_i;
                             float ssa = scale * scale * Rq_drcp;
-                            if (ssa < r_ssaDISCARD) {
+                            if (ssa < r_ssaDISCARD)
+                            {
                                 continue;
                             }
                             u32 vis_id = 0;
-                            if (ssa > r_ssaCHEAP) vis_id = Item.vis_ID;
+                            if (ssa > r_ssaCHEAP)
+                                vis_id = Item.vis_ID;
 
                             sp.r_items[vis_id].push_back(*siIT);
 
-                            // 2							visible[vis_id][sp.id].push_back(&Item);
+                            // 2 visible[vis_id][sp.id].push_back(&Item);
                         }
                     }
                 }
                 for (int sp_id = 0; sp_id < dm_obj_in_slot; sp_id++)
                 {
                     SlotPart& sp = S.G[sp_id];
-                    if (sp.id == DetailSlot::ID_Empty) continue;
-                    if (!sp.r_items[0].empty()) {
+                    if (sp.id == DetailSlot::ID_Empty)
+                        continue;
+                    if (!sp.r_items[0].empty())
+                    {
                         m_visibles[0][sp.id].push_back(&sp.r_items[0]);
                     }
-                    if (!sp.r_items[1].empty()) {
+                    if (!sp.r_items[1].empty())
+                    {
                         m_visibles[1][sp.id].push_back(&sp.r_items[1]);
                     }
-                    if (!sp.r_items[2].empty()) {
+                    if (!sp.r_items[2].empty())
+                    {
                         m_visibles[2][sp.id].push_back(&sp.r_items[2]);
                     }
                 }
@@ -308,8 +330,10 @@ void CDetailManager::UpdateVisibleM()
 void CDetailManager::Render()
 {
 #ifndef _EDITOR
-    if (0 == dtFS) return;
-    if (!psDeviceFlags.is(rsDetails)) return;
+    if (0 == dtFS)
+        return;
+    if (!psDeviceFlags.is(rsDetails))
+        return;
 #endif
 
     // MT
@@ -338,14 +362,17 @@ void CDetailManager::Render()
 void __stdcall CDetailManager::MT_CALC()
 {
 #ifndef _EDITOR
-    if (0 == RImplementation.Details) return;  // possibly deleted
-    if (0 == dtFS) return;
-    if (!psDeviceFlags.is(rsDetails)) return;
+    if (0 == RImplementation.Details)
+        return; // possibly deleted
+    if (0 == dtFS)
+        return;
+    if (!psDeviceFlags.is(rsDetails))
+        return;
 #endif
 
     MT.Enter();
     if (m_frame_calc != RDEVICE.dwFrame)
-        if ((m_frame_rendered + 1) == RDEVICE.dwFrame)  // already rendered
+        if ((m_frame_rendered + 1) == RDEVICE.dwFrame) // already rendered
         {
             Fvector EYE = RDEVICE.vCameraPosition_saved;
 

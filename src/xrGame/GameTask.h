@@ -24,7 +24,7 @@ public:
     bool not_empty()
     {
         return m_s_complete_lua_functions.size() || m_s_fail_lua_functions.size() ||
-               m_s_lua_functions_on_complete.size() || m_s_lua_functions_on_fail.size();
+            m_s_lua_functions_on_complete.size() || m_s_lua_functions_on_fail.size();
     }
 
     virtual void save(IWriter& stream);
@@ -96,27 +96,22 @@ public:
     void SetTaskState(ETaskState state);
     ETaskState GetTaskState() const { return m_task_state; };
     ETaskType GetTaskType() const { return m_task_type; }
-
     ETaskState UpdateState();
     IC CMapLocation* LinkedMapLocation() { return m_linked_map_location; }
-
     // for scripting access
     void SetTitle_script(LPCSTR _title) { m_Title = _title; }
     LPCSTR GetTitle_script() { return m_Title.c_str(); }
     void SetPriority_script(int _prio) { m_priority = _prio; }
     int GetPriority_script() { return m_priority; }
     void SetType_script(int t) { m_task_type = (ETaskType)t; }
-
     LPCSTR GetID_script() { return m_ID.c_str(); }
     void SetID_script(LPCSTR _id) { m_ID = _id; }
     void SetDescription_script(LPCSTR _desc) { m_Description = _desc; }
     void SetIconName_script(LPCSTR _tex) { m_icon_texture_name = _tex; }
     LPCSTR GetIconName_script() { return m_icon_texture_name.c_str(); }
     void SetMapHint_script(LPCSTR _hint) { m_map_hint = _hint; }
-
     void SetMapLocation_script(LPCSTR _mls) { m_map_location = _mls; }
     void SetMapObjectID_script(int _id) { m_map_object_id = (u16)_id; }
-
     void AddCompleteInfo_script(LPCSTR _str);
     void AddFailInfo_script(LPCSTR _str);
     void AddOnCompleteInfo_script(LPCSTR _str);

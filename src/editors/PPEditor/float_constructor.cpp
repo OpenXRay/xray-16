@@ -7,11 +7,7 @@
 TfrmConstructor* frmConstructor;
 
 //---------------------------------------------------------------------------
-__fastcall TfrmConstructor::TfrmConstructor(TComponent* Owner) : TForm(Owner), b_locked(false)
-{
-    m_iTag = 0;
-}
-
+__fastcall TfrmConstructor::TfrmConstructor(TComponent* Owner) : TForm(Owner), b_locked(false) { m_iTag = 0; }
 //---------------------------------------------------------------------------
 TfrmTimeConstructor* TfrmConstructor::AddEntryTemplate(int iInsertAfterIdx)
 {
@@ -41,7 +37,8 @@ TfrmTimeConstructor* TfrmConstructor::AddEntryTemplate(int iInsertAfterIdx)
 //---------------------------------------------------------------------------
 void TfrmConstructor::UpdatePositions()
 {
-    if (b_locked) return;
+    if (b_locked)
+        return;
     float start_time = 0.0f;
     for (size_t a = 0; a < m_Entries.size(); ++a)
     {
@@ -55,17 +52,14 @@ void TfrmConstructor::UpdatePositions()
     Button2->Top = ClientHeight - Button2->Height;
 }
 
-void __fastcall TfrmConstructor::OnTimeChangeClick(TObject* Sender)
-{
-    UpdatePositions();
-}
-
+void __fastcall TfrmConstructor::OnTimeChangeClick(TObject* Sender) { UpdatePositions(); }
 //---------------------------------------------------------------------------
 void __fastcall TfrmConstructor::OnAddButtonClick(TObject* Sender)
 {
     int tag = dynamic_cast<TComponent*>(Sender)->Tag;
     for (size_t a = 0; a < m_Entries.size(); a++)
-        if (m_Entries[a]->Tag == tag) {
+        if (m_Entries[a]->Tag == tag)
+        {
             AddEntryTemplate(a);
             UpdatePositions();
             return;
@@ -75,11 +69,13 @@ void __fastcall TfrmConstructor::OnAddButtonClick(TObject* Sender)
 //---------------------------------------------------------------------------
 void __fastcall TfrmConstructor::OnDelButtonClick(TObject* Sender)
 {
-    if (m_Entries.size() == 1) return;
+    if (m_Entries.size() == 1)
+        return;
     int tag = dynamic_cast<TControl*>(Sender)->Parent->Parent->Tag;
-    vector<TfrmTimeConstructor*>::iterator s = m_Entries.begin(), e = m_Entries.end();
+    vector<TfrmTimeConstructor *>::iterator s = m_Entries.begin(), e = m_Entries.end();
     for (; s != e; ++s)
-        if ((*s)->Tag == tag) {
+        if ((*s)->Tag == tag)
+        {
             TfrmTimeConstructor* form = (*s);
             delete form;
             m_Entries.erase(s);
@@ -107,7 +103,8 @@ void __fastcall TfrmConstructor::Reset()
 //---------------------------------------------------------------------------
 TfrmTimeConstructor* __fastcall TfrmConstructor::GetEntry(u32 index)
 {
-    if (index >= m_Entries.size()) throw Exception("Float constructor: invalid index");
+    if (index >= m_Entries.size())
+        throw Exception("Float constructor: invalid index");
     return m_Entries[index];
 }
 

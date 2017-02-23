@@ -42,7 +42,8 @@
 // -Pi/2 to  Pi/2 (quadrants IV,I)
 inline float asin1(float x)
 {
-    if (_abs(x) > 1.0f) {
+    if (_abs(x) > 1.0f)
+    {
         //	printf("Domain error in asin1 %lf\n", x);
         x = (x > 0.f) ? 1.0f : -1.0f;
     }
@@ -52,7 +53,8 @@ inline float asin1(float x)
 //  Pi/2 to -Pi/2 (quadrants II,III)
 inline float asin2(float x)
 {
-    if (_abs(x) > 1.0f) {
+    if (_abs(x) > 1.0f)
+    {
         //	printf("Domain error in asin2 %lf\n", x);
         x = (x > 0) ? 1.0f : -1.0f;
     }
@@ -62,7 +64,8 @@ inline float asin2(float x)
 //  0 to Pi   (quadrants I,II)
 inline float acos1(float x)
 {
-    if (_abs(x) > 1.0f) {
+    if (_abs(x) > 1.0f)
+    {
         //	printf("Domain error in acos1 %lf\n", x);
         x = (x > 0) ? 1.0f : -1.0f;
     }
@@ -72,7 +75,8 @@ inline float acos1(float x)
 //  Pi to 2Pi (quadrants III,IV)
 inline float acos2(float x)
 {
-    if (_abs(x) > 1.0f) {
+    if (_abs(x) > 1.0f)
+    {
         //	printf("Domain error in acos2 %lf\n", x);
         x = (x > 0) ? 1.0f : -1.0f;
     }
@@ -122,17 +126,11 @@ public:
     void init(int jt_type, float a, float b, float c, float low, float high);
 
     SimpleJtLimit(int jt_type, float a, float b, float c, float low, float high) { init(jt_type, a, b, c, low, high); }
-
     SimpleJtLimit() {}
-
     AngleInt& Limits() { return limits; }
-
     float eval(float v) { return psi.eval(v); }
-
     float deriv(float v) { return psi.deriv(v); }
-
     void ResetPsi(float a, float b, float c) { psi.Reset(a, b, c); }
-
     void ResetJtLimits(float low, float high)
     {
         limits.SetLow(low);
@@ -141,20 +139,16 @@ public:
 
     float Low() { return limits.Low(); }
     float High() { return limits.High(); }
-
     void SetLow(float v) { limits.SetLow(v); }
     void SetHigh(float v) { limits.SetHigh(v); }
-
     int InRange(float t) { return limits.InRange(t); }
-
     // Reports where discontinuities can occur for theta(family)
     int Discontinuity(int family, float psi[2]) const;
 
     AngleInt& Limit() { return limits; }
-
     // Given psi calcuate joint variable. Two solns
-    float theta1(float psi) const;  // family 1
-    float theta2(float psi) const;  // family 2
+    float theta1(float psi) const; // family 1
+    float theta2(float psi) const; // family 2
     float theta(int family, float psi) const;
 
     // Derivatives of theta
@@ -218,11 +212,11 @@ public:
 class ComplexJtLimit
 {
 private:
-    PsiEquation cos_eq;  // cos(theta) equation
-    PsiEquation sin_eq;  // sin(theta) equation
-    PsiEquation eq;      // gamma equation
-    int type;            // Whether eq is a sin or cos of gamma
-    PsiEquation deriv;   // Derivative of sin_eq/cos_eq without denom
+    PsiEquation cos_eq; // cos(theta) equation
+    PsiEquation sin_eq; // sin(theta) equation
+    PsiEquation eq; // gamma equation
+    int type; // Whether eq is a sin or cos of gamma
+    PsiEquation deriv; // Derivative of sin_eq/cos_eq without denom
     AngleInt limits;
     float tan_low, tan_high;
 
@@ -254,13 +248,9 @@ public:
     }
 
     ComplexJtLimit() {}
-
     void ResetCosPsi(float a, float b, float c) { cos_eq.Reset(a, b, c); }
-
     void ResetSinPsi(float a, float b, float c) { sin_eq.Reset(a, b, c); }
-
     void Reset(float a, float b, float c) { eq.Reset(a, b, c); }
-
     void ResetJtLimits(float low, float high);
 
     void SetLow(float low);
@@ -269,8 +259,8 @@ public:
 
     // Given psi calcuate joint variable. Two solns
 
-    float theta1(float psi) const;  // family 1
-    float theta2(float psi) const;  // family 2
+    float theta1(float psi) const; // family 1
+    float theta2(float psi) const; // family 2
     float theta(int, float psi) const;
 
     // Derivatives of theta wrt to psi
@@ -300,7 +290,6 @@ public:
     int Singularities(float psi[4]) const;
 
     int InRange(float t) { return limits.InRange(t); }
-
     //
     // atan2(eq*sin_eq,eq*cos_eq) = v for psi
     //    returns the number of solutions
@@ -311,7 +300,6 @@ public:
 
     float Low() const { return limits.Low(); }
     float High() const { return limits.High(); }
-
     AngleInt& Limits() { return limits; }
 };
 

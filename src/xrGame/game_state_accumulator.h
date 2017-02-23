@@ -17,7 +17,7 @@ namespace award_system
 {
 #ifdef DEBUG
 extern char* player_values_strtable[];
-#endif  //#ifdef DEBUG
+#endif //#ifdef DEBUG
 
 class game_state_accumulator : public game_events_handler
 {
@@ -99,10 +99,10 @@ private:
 
     ammunition_group m_amm_groups;
     bone_group m_bone_groups;
-};  // class game_state_accumulator
+}; // class game_state_accumulator
 
 #include "game_state_accumulator_inline.h"
 
-}  // namespace award_system
+} // namespace award_system
 
-#endif  //#ifndef GAME_STATE_ACCUMULATOR_INCLUDED
+#endif //#ifndef GAME_STATE_ACCUMULATOR_INCLUDED

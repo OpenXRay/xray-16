@@ -26,11 +26,7 @@ CSoundPlayer::CSoundPlayer(IGameObject* object)
     m_sound_prefix = "";
 }
 
-CSoundPlayer::~CSoundPlayer()
-{
-    clear();
-}
-
+CSoundPlayer::~CSoundPlayer() { clear(); }
 void CSoundPlayer::clear()
 {
     m_sounds.clear();
@@ -45,10 +41,7 @@ void CSoundPlayer::clear()
     m_sound_mask = 0;
 }
 
-void CSoundPlayer::reinit()
-{
-}
-
+void CSoundPlayer::reinit() {}
 void CSoundPlayer::reload(LPCSTR section)
 {
     VERIFY(m_playing_sounds.empty());
@@ -66,7 +59,8 @@ u32 CSoundPlayer::add(LPCSTR prefix, u32 max_count, ESoundTypes type, u32 priori
     LPCSTR bone_name, CSound_UserDataPtr data)
 {
     SOUND_COLLECTIONS::iterator I = m_sounds.find(internal_type);
-    if (m_sounds.end() != I) return (0);
+    if (m_sounds.end() != I)
+        return (0);
 
     CSoundCollectionParamsFull sound_params;
     sound_params.m_priority = priority;
@@ -96,7 +90,8 @@ void CSoundPlayer::remove(u32 internal_type)
 bool CSoundPlayer::check_sound_legacy(u32 internal_type) const
 {
     SOUND_COLLECTIONS::const_iterator J = m_sounds.find(internal_type);
-    if (m_sounds.end() == J) {
+    if (m_sounds.end() == J)
+    {
 #ifdef DEBUG
         ai().script_engine().script_log(LuaMessageType::Message,
             "Can't find sound with internal type %d (sound_script = %d)", internal_type,
@@ -107,13 +102,15 @@ bool CSoundPlayer::check_sound_legacy(u32 internal_type) const
 
     VERIFY(m_sounds.end() != J);
     const CSoundCollectionParamsFull& sound = (*J).second.first;
-    if (sound.m_synchro_mask & m_sound_mask) return (false);
+    if (sound.m_synchro_mask & m_sound_mask)
+        return (false);
 
     xr_vector<CSoundSingle>::const_iterator I = m_playing_sounds.begin();
     xr_vector<CSoundSingle>::const_iterator E = m_playing_sounds.end();
     for (; I != E; ++I)
         if ((*I).m_synchro_mask & sound.m_synchro_mask)
-            if ((*I).m_priority <= sound.m_priority) return (false);
+            if ((*I).m_priority <= sound.m_priority)
+                return (false);
     return (true);
 }
 
@@ -162,12 +159,14 @@ bool CSoundPlayer::need_bone_data() const
 void CSoundPlayer::play(
     u32 internal_type, u32 max_start_time, u32 min_start_time, u32 max_stop_time, u32 min_stop_time, u32 id)
 {
-    if (!check_sound_legacy(internal_type)) return;
+    if (!check_sound_legacy(internal_type))
+        return;
 
     SOUND_COLLECTIONS::iterator I = m_sounds.find(internal_type);
     VERIFY(m_sounds.end() != I);
     CSoundCollectionParamsFull& sound = (*I).second.first;
-    if ((*I).second.second->m_sounds.empty()) {
+    if ((*I).second.second->m_sounds.empty())
+    {
 #ifdef DEBUG
         Msg("- There are no sounds in sound collection \"%s\" with internal type %d (sound_script = %d)",
             *sound.m_sound_prefix, internal_type, StalkerSpace::eStalkerSoundScript);
@@ -247,22 +246,27 @@ CSoundPlayer::CSoundCollection::CSoundCollection(const CSoundCollectionParams& p
         LPSTR S = (LPSTR)&s;
         _GetItem(*params.m_sound_prefix, j, temp);
         strconcat(sizeof(s), S, *params.m_sound_player_prefix, temp);
-        if (FS.exist(fn, "$game_sounds$", S, ".ogg")) {
+        if (FS.exist(fn, "$game_sounds$", S, ".ogg"))
+        {
             ref_sound* temp = add(params.m_type, S);
-            if (temp) m_sounds.push_back(temp);
+            if (temp)
+                m_sounds.push_back(temp);
         }
         for (u32 i = 0; i < params.m_max_count; ++i)
         {
             string256 name;
             xr_sprintf(name, "%s%d", S, i);
-            if (FS.exist(fn, "$game_sounds$", name, ".ogg")) {
+            if (FS.exist(fn, "$game_sounds$", name, ".ogg"))
+            {
                 ref_sound* temp = add(params.m_type, name);
-                if (temp) m_sounds.push_back(temp);
+                if (temp)
+                    m_sounds.push_back(temp);
             }
         }
     }
 #ifdef DEBUG
-    if (m_sounds.empty()) Msg("- There are no sounds with prefix %s", *params.m_sound_prefix);
+    if (m_sounds.empty())
+        Msg("- There are no sounds with prefix %s", *params.m_sound_prefix);
 #endif
 }
 
@@ -284,13 +288,15 @@ const ref_sound& CSoundPlayer::CSoundCollection::random(const u32& id)
 {
     VERIFY(!m_sounds.empty());
 
-    if (id != u32(-1)) {
+    if (id != u32(-1))
+    {
         m_last_sound_id = id;
         VERIFY(id < m_sounds.size());
         return (*m_sounds[id]);
     }
 
-    if (m_sounds.size() <= 2) {
+    if (m_sounds.size() <= 2)
+    {
         m_last_sound_id = CRandom32::random(m_sounds.size());
         return (*m_sounds[m_last_sound_id]);
     }

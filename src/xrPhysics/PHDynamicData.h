@@ -9,7 +9,7 @@
 
 #if _MSC_VER > 1000
 #pragma once
-#endif  // _MSC_VER > 1000
+#endif // _MSC_VER > 1000
 
 class PHDynamicData
 {
@@ -58,7 +58,8 @@ public:
     }
     void GetTGeomWorldMX(Fmatrix& aTransform)
     {
-        if (!transform) return;
+        if (!transform)
+            return;
         Fmatrix NormTransform, Transform;
         dVector3 P0 = {0, 0, 0, -1};
         Fvector Translate, Translate1;
@@ -151,4 +152,4 @@ public:
     bool SetTransform(dGeomID ageom);
 };
 
-#endif  // !defined(AFX_PHDynamicData_H__ACC01646_B581_4639_B78C_30311432021B__INCLUDED_)
+#endif // !defined(AFX_PHDynamicData_H__ACC01646_B581_4639_B78C_30311432021B__INCLUDED_)

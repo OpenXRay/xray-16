@@ -28,7 +28,8 @@ void net_execution_detail_light::receive_result(IGenericStream* outStream)
         int x, z;
         gl_data.slots_data.header().slot_x_z(i, x, z);
 
-        if (gl_data.slots_data.calculate_ignore(x, z)) continue;
+        if (gl_data.slots_data.calculate_ignore(x, z))
+            continue;
 
         DetailSlot& DS = gl_data.slots_data.get_slot(x, z);
         r_pod(r, DS);
@@ -49,7 +50,8 @@ void net_execution_detail_light::send_result(IGenericStream* outStream)
     {
         int x, z;
         gl_data.slots_data.header().slot_x_z(i, x, z);
-        if (gl_data.slots_data.calculate_ignore(x, z)) continue;
+        if (gl_data.slots_data.calculate_ignore(x, z))
+            continue;
         DetailSlot& DS = gl_data.slots_data.get_slot(x, z);
         w_pod(w, DS);
     }
@@ -93,10 +95,12 @@ bool net_execution_detail_light::execute(net_task_callback& net_callback)
     {
         int x, z;
         gl_data.slots_data.header().slot_x_z(i, x, z);
-        if (gl_data.slots_data.calculate_ignore(x, z)) continue;
+        if (gl_data.slots_data.calculate_ignore(x, z))
+            continue;
         DetailSlot& DS = gl_data.slots_data.get_slot(x, z);
         detail_slot_calculate(x, z, DS, box_result, DB, Selected);
-        if (!net_callback.test_connection()) break;
+        if (!net_callback.test_connection())
+            break;
     }
 
     return !net_callback.break_all();

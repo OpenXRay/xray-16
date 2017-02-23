@@ -23,11 +23,7 @@ extern "C" __declspec(dllimport) void LWO_CloseFile(lwObject* new_obj);
 
 DEFINE_MAP(void*, int, VMIndexLink, VMIndexLinkIt);
 
-bool CompareFunc(const st_VMapPt& vm0, const st_VMapPt& vm1)
-{
-    return vm0.vmap_index < vm1.vmap_index;
-};
-
+bool CompareFunc(const st_VMapPt& vm0, const st_VMapPt& vm1) { return vm0.vmap_index < vm1.vmap_index; };
 bool CEditableObject::Import_LWO(const char* fn, bool bNeedOptimize)
 {
     lwObject* I = 0;
@@ -44,7 +40,8 @@ bool CEditableObject::Import_LWO(const char* fn, bool bNeedOptimize)
     I = lwGetObject(fname, &failID, &failpos);
 #endif
     //	UI->ProgressUpdate(100);
-    if (I) {
+    if (I)
+    {
         bool bResult = true;
         ELog.Msg(mtInformation, "CEditableObject: import lwo %s...", fname);
 
@@ -61,7 +58,7 @@ bool CEditableObject::Import_LWO(const char* fn, bool bNeedOptimize)
                 for (Isf = I->surf; Isf; Isf = Isf->next)
                 {
                     //                    UI->ProgressUpdate(i);
-                    Isf->alpha_mode = i;  // перетираем для внутренних целей !!!
+                    Isf->alpha_mode = i; // перетираем для внутренних целей !!!
                     CSurface* Osf = xr_new<CSurface>();
                     m_Surfaces.push_back(Osf);
                     if (Isf->name && Isf->name[0])
@@ -71,7 +68,8 @@ bool CEditableObject::Import_LWO(const char* fn, bool bNeedOptimize)
                     Osf->m_Flags.set(CSurface::sf2Sided, (Isf->sideflags == 3) ? TRUE : FALSE);
                     AnsiString en_name = "default", lc_name = "default", gm_name = "default";
                     XRShader* sh_info = 0;
-                    if (Isf->nshaders && (stricmp(Isf->shader->name, SH_PLUGIN_NAME) == 0)) {
+                    if (Isf->nshaders && (stricmp(Isf->shader->name, SH_PLUGIN_NAME) == 0))
+                    {
                         sh_info = (XRShader*)Isf->shader->data;
                         en_name = sh_info->en_name;
                         lc_name = sh_info->lc_name;
@@ -80,21 +78,27 @@ bool CEditableObject::Import_LWO(const char* fn, bool bNeedOptimize)
                     else
                         ELog.Msg(mtError, "CEditableObject: Shader not found on surface '%s'.", Osf->_Name());
 #ifdef _EDITOR
-                    if (!Device.Resources->_FindBlender(en_name.c_str())) {
-                        ELog.Msg(mtError, "CEditableObject: Render shader '%s' - can't find in library.\nUsing "
-                                          "'default' shader on surface '%s'.",
+                    if (!Device.Resources->_FindBlender(en_name.c_str()))
+                    {
+                        ELog.Msg(mtError,
+                            "CEditableObject: Render shader '%s' - can't find in library.\nUsing 'default' shader on "
+                            "surface '%s'.",
                             en_name.c_str(), Osf->_Name());
                         en_name = "default";
                     }
-                    if (!Device.ShaderXRLC.Get(lc_name.c_str())) {
-                        ELog.Msg(mtError, "CEditableObject: Compiler shader '%s' - can't find in library.\nUsing "
-                                          "'default' shader on surface '%s'.",
+                    if (!Device.ShaderXRLC.Get(lc_name.c_str()))
+                    {
+                        ELog.Msg(mtError,
+                            "CEditableObject: Compiler shader '%s' - can't find in library.\nUsing 'default' shader on "
+                            "surface '%s'.",
                             lc_name.c_str(), Osf->_Name());
                         lc_name = "default";
                     }
-                    if (!GMLib.GetMaterial(gm_name.c_str())) {
-                        ELog.Msg(mtError, "CEditableObject: Game material '%s' - can't find in library.\nUsing "
-                                          "'default' material on surface '%s'.",
+                    if (!GMLib.GetMaterial(gm_name.c_str()))
+                    {
+                        ELog.Msg(mtError,
+                            "CEditableObject: Game material '%s' - can't find in library.\nUsing 'default' material on "
+                            "surface '%s'.",
                             lc_name.c_str(), Osf->_Name());
                         gm_name = "default";
                     }
@@ -117,14 +121,17 @@ bool CEditableObject::Import_LWO(const char* fn, bool bNeedOptimize)
                             bResult = false;
                             break;
                         }
-                        if (cidx != -1) {
+                        if (cidx != -1)
+                        {
                             // get textures
                             for (Icl = I->clip; Icl; Icl = Icl->next)
-                                if ((cidx == Icl->index) && (Icl->type == ID_STIL)) {
+                                if ((cidx == Icl->index) && (Icl->type == ID_STIL))
+                                {
                                     strcpy(tname, Icl->source.still.name);
                                     break;
                                 }
-                            if (tname[0] == 0) {
+                            if (tname[0] == 0)
+                            {
                                 ELog.DlgMsg(mtError,
                                     "Import LWO (Surface '%s'): 'Texture' name is empty or non 'STIL' type!",
                                     Osf->_Name());
@@ -138,19 +145,23 @@ bool CEditableObject::Import_LWO(const char* fn, bool bNeedOptimize)
                             Osf->SetVMap(Itx->param.imap.vmap_name);
                         }
                     }
-                    if (!bResult) break;
-                    if (!Osf->_VMap() || !Osf->_VMap()[0]) {
+                    if (!bResult)
+                        break;
+                    if (!Osf->_VMap() || !Osf->_VMap()[0])
+                    {
                         ELog.DlgMsg(mtError, "Invalid surface '%s'. VMap empty.", Osf->_Name());
                         bResult = false;
                         break;
                     }
-                    if (!Osf->_Texture() || !Osf->_Texture()[0]) {
+                    if (!Osf->_Texture() || !Osf->_Texture()[0])
+                    {
                         ELog.DlgMsg(
                             mtError, "Can't create shader. Invalid surface '%s'. Textures empty.", Osf->_Name());
                         bResult = false;
                         break;
                     }
-                    if (en_name.c_str() == 0) {
+                    if (en_name.c_str() == 0)
+                    {
                         ELog.DlgMsg(mtError, "Can't create shader. Invalid surface '%s'. Shader empty.", Osf->_Name());
                         bResult = false;
                         break;
@@ -163,7 +174,8 @@ bool CEditableObject::Import_LWO(const char* fn, bool bNeedOptimize)
                     i++;
                 }
             }
-            if (bResult) {
+            if (bResult)
+            {
                 // mesh layers
                 st_lwLayer* Ilr = 0;
                 int k = 0;
@@ -183,7 +195,8 @@ bool CEditableObject::Import_LWO(const char* fn, bool bNeedOptimize)
                     // vmaps
                     st_lwVMap* Ivmap = 0;
                     int vmap_count = 0;
-                    if (Ilr->nvmaps == 0) {
+                    if (Ilr->nvmaps == 0)
+                    {
                         ELog.DlgMsg(mtError, "Import LWO: Mesh layer must contain UV!");
                         bResult = false;
                         break;
@@ -199,7 +212,8 @@ bool CEditableObject::Import_LWO(const char* fn, bool bNeedOptimize)
                         {
                         case ID_TXUV:
                         {
-                            if (Ivmap->dim != 2) {
+                            if (Ivmap->dim != 2)
+                            {
                                 ELog.DlgMsg(mtError, "Import LWO: 'UV Map' must contain 2 value!");
                                 bResult = false;
                                 break;
@@ -221,7 +235,8 @@ bool CEditableObject::Import_LWO(const char* fn, bool bNeedOptimize)
                         break;
                         case ID_WGHT:
                         {
-                            if (Ivmap->dim != 1) {
+                            if (Ivmap->dim != 1)
+                            {
                                 ELog.DlgMsg(mtError, "Import LWO: 'Weight' must contain 1 value!");
                                 bResult = false;
                                 break;
@@ -260,16 +275,19 @@ bool CEditableObject::Import_LWO(const char* fn, bool bNeedOptimize)
                             bResult = false;
                             break;
                         }
-                        if (!bResult) break;
+                        if (!bResult)
+                            break;
                     }
-                    if (!bResult) break;
+                    if (!bResult)
+                        break;
                     // points
                     //					UI->ProgressStart(Ilr->point.count,"Fill points:");
                     {
                         MESH->m_VertCount = Ilr->point.count;
                         MESH->m_Verts = xr_alloc<Fvector>(MESH->m_VertCount);
                         int id = Ilr->polygon.count / 50;
-                        if (id == 0) id = 1;
+                        if (id == 0)
+                            id = 1;
                         for (int i = 0; i < Ilr->point.count; i++)
                         {
                             //	                    	if ((i%id)==0) UI->ProgressUpdate(i);
@@ -278,7 +296,8 @@ bool CEditableObject::Import_LWO(const char* fn, bool bNeedOptimize)
                             Mpt.set(Ipt.pos);
                         }
                     }
-                    if (!bResult) break;
+                    if (!bResult)
+                        break;
                     // polygons
                     //					UI->ProgressStart(Ilr->polygon.count,"Fill polygons:");
                     MESH->m_FaceCount = Ilr->polygon.count;
@@ -289,13 +308,15 @@ bool CEditableObject::Import_LWO(const char* fn, bool bNeedOptimize)
                     IntVec surf_ids;
                     surf_ids.resize(Ilr->polygon.count);
                     int id = Ilr->polygon.count / 50;
-                    if (id == 0) id = 1;
+                    if (id == 0)
+                        id = 1;
                     for (int i = 0; i < Ilr->polygon.count; i++)
                     {
                         //                    	if ((i%id)==0) UI->ProgressUpdate(i);
                         st_Face& Mpol = MESH->m_Faces[i];
                         st_lwPolygon& Ipol = Ilr->polygon.pol[i];
-                        if (Ipol.nverts != 3) {
+                        if (Ipol.nverts != 3)
+                        {
                             ELog.DlgMsg(mtError, "Import LWO: Face must contain only 3 vertices!");
                             bResult = false;
                             break;
@@ -318,34 +339,39 @@ bool CEditableObject::Import_LWO(const char* fn, bool bNeedOptimize)
                             int vmpl_cnt = Ipv.nvmaps;
                             st_lwPoint& Ipt = Ilr->point.pt[Mpv.pindex];
                             int vmpt_cnt = Ipt.nvmaps;
-                            if (!vmpl_cnt && !vmpt_cnt) {
+                            if (!vmpl_cnt && !vmpt_cnt)
+                            {
                                 ELog.DlgMsg(mtError, "Found mesh without UV's!", 0);
                                 bResult = false;
                                 break;
                             }
                             AStringVec names;
-                            if (vmpl_cnt) {
+                            if (vmpl_cnt)
+                            {
                                 // берем из poly
                                 for (int vm_i = 0; vm_i < vmpl_cnt; vm_i++)
                                 {
-                                    if (Ipv.vm[vm_i].vmap->type != ID_TXUV) continue;
+                                    if (Ipv.vm[vm_i].vmap->type != ID_TXUV)
+                                        continue;
                                     vm_lst.push_back(st_VMapPt());
                                     st_VMapPt& pt = vm_lst.back();
-                                    pt.vmap_index = VMIndices[Ipv.vm[vm_i].vmap];  // номер моей VMap
+                                    pt.vmap_index = VMIndices[Ipv.vm[vm_i].vmap]; // номер моей VMap
                                     names.push_back(Ipv.vm[vm_i].vmap->name);
                                     pt.index = Ipv.vm[vm_i].index;
                                 }
                             }
-                            if (vmpt_cnt) {
+                            if (vmpt_cnt)
+                            {
                                 // берем из points
                                 for (int vm_i = 0; vm_i < vmpt_cnt; vm_i++)
                                 {
-                                    if (Ipt.vm[vm_i].vmap->type != ID_TXUV) continue;
+                                    if (Ipt.vm[vm_i].vmap->type != ID_TXUV)
+                                        continue;
                                     if (std::find(names.begin(), names.end(), Ipt.vm[vm_i].vmap->name) != names.end())
                                         continue;
                                     vm_lst.push_back(st_VMapPt());
                                     st_VMapPt& pt = vm_lst.back();
-                                    pt.vmap_index = VMIndices[Ipt.vm[vm_i].vmap];  // номер моей VMap
+                                    pt.vmap_index = VMIndices[Ipt.vm[vm_i].vmap]; // номер моей VMap
                                     pt.index = Ipt.vm[vm_i].index;
                                 }
                             }
@@ -356,30 +382,35 @@ bool CEditableObject::Import_LWO(const char* fn, bool bNeedOptimize)
                             int vm_cnt = Ipt.nvmaps;
                             for (int vm_i = 0; vm_i < vm_cnt; vm_i++)
                             {
-                                if (Ipt.vm[vm_i].vmap->type != ID_WGHT) continue;
+                                if (Ipt.vm[vm_i].vmap->type != ID_WGHT)
+                                    continue;
                                 vm_lst.push_back(st_VMapPt());
                                 st_VMapPt& pt = vm_lst.back();
-                                pt.vmap_index = VMIndices[Ipt.vm[vm_i].vmap];  // номер моей VMap
+                                pt.vmap_index = VMIndices[Ipt.vm[vm_i].vmap]; // номер моей VMap
                                 pt.index = Ipt.vm[vm_i].index;
                             }
                             m_vm_lst.count = vm_lst.size();
                             m_vm_lst.pts = xr_alloc<st_VMapPt>(m_vm_lst.count);
                             Memory.mem_copy(m_vm_lst.pts, &*vm_lst.begin(), m_vm_lst.count * sizeof(st_VMapPt));
                         }
-                        if (!bResult) break;
+                        if (!bResult)
+                            break;
                         // Ipol.surf->alpha_mode - заполнено как номер моего surface
                         surf_ids[i] = Ipol.surf->alpha_mode;
                     }
-                    if (!bResult) break;
+                    if (!bResult)
+                        break;
                     for (u32 pl_id = 0; pl_id < MESH->GetFCount(); pl_id++)
                         MESH->m_SurfFaces[m_Surfaces[surf_ids[pl_id]]].push_back(pl_id);
 
-                    if (!bResult) break;
+                    if (!bResult)
+                        break;
                     k++;
                     // MESH->DumpAdjacency();
-                    if (bNeedOptimize) MESH->Optimize(false);
+                    if (bNeedOptimize)
+                        MESH->Optimize(false);
                     // MESH->DumpAdjacency();
-                    MESH->RebuildVMaps();  // !!!!!!
+                    MESH->RebuildVMaps(); // !!!!!!
                 }
             }
         }
@@ -394,7 +425,8 @@ bool CEditableObject::Import_LWO(const char* fn, bool bNeedOptimize)
             VerifyMeshNames();
         else
             ELog.DlgMsg(mtError, "Can't parse LWO object.");
-        if (bResult) m_LoadName = (strext(fname)) ? strcpy(strext(fname), ".object") : strcat(strext(fname), ".object");
+        if (bResult)
+            m_LoadName = (strext(fname)) ? strcpy(strext(fname), ".object") : strcat(strext(fname), ".object");
         return bResult;
     }
     else

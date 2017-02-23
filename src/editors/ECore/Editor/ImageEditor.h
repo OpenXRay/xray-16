@@ -24,8 +24,8 @@ class TProperties;
 
 class TfrmImageLib : public TForm
 {
-    __published :  // IDE-managed Components
-                   TPanel* paRight;
+    __published : // IDE-managed Components
+                  TPanel* paRight;
     TFormStorage* fsStorage;
     TPanel* paCommand;
     TExtBtn* ebOk;
@@ -64,7 +64,7 @@ class TfrmImageLib : public TForm
     void __fastcall btFilterClick(TObject* Sender);
     void __fastcall ExtBtn1Click(TObject* Sender);
 
-  private:
+private:
     // list functions
     void __stdcall RemoveTexture(LPCSTR fname, EItemType type, bool& res);
 
@@ -80,7 +80,7 @@ class TfrmImageLib : public TForm
 
     static Flags32 m_Flags;
 
-  private:  // User declarations
+private: // User declarations
     static TfrmImageLib* form;
 
     DEFINE_VECTOR(ETextureThumbnail*, THMVec, THMIt);
@@ -121,7 +121,7 @@ class TfrmImageLib : public TForm
     void __stdcall OnTypeChange(PropValue* prop);
     void SortList(ETextureThumbnail* thm, xr_vector<AnsiString>& sel_str_vec);
 
-  public:  // User declarations
+public: // User declarations
     __fastcall TfrmImageLib(TComponent* Owner);
     // static function
     static void __fastcall ImportTextures();
@@ -129,7 +129,6 @@ class TfrmImageLib : public TForm
     static bool __fastcall HideLib();
 
     static bool __fastcall Visible() { return !!form; }
-
     static void OnFrame();
 
     static void UpdateProperties() { m_Flags.set(flUpdateProperties, TRUE); }

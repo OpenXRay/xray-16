@@ -9,14 +9,8 @@
 #include "InventoryBox.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
-CF1::CF1(void)
-{
-}
-
-CF1::~CF1(void)
-{
-}
-
+CF1::CF1(void) {}
+CF1::~CF1(void) {}
 using namespace luabind;
 
 SCRIPT_EXPORT(CF1, (CGameObject), {

@@ -24,13 +24,14 @@ void CStateBurerShield<Object>::initialize()
 template <class Object>
 void CStateBurerShield<Object>::execute()
 {
-    if (!m_started)  // && current_time() > m_last_shield_started + TTime(m_shield_start_anim_length_sec*1000) )
+    if (!m_started) // && current_time() > m_last_shield_started + TTime(m_shield_start_anim_length_sec*1000) )
     {
         m_started = true;
         object->ActivateShield();
     }
 
-    if (m_started && object->m_shield_keep_particle != 0 && current_time() > m_next_particle_allowed) {
+    if (m_started && object->m_shield_keep_particle != 0 && current_time() > m_next_particle_allowed)
+    {
         object->CParticlesPlayer::StartParticles(
             object->m_shield_keep_particle, Fvector().set(0, 1, 0), object->ID(), -1, true);
 
@@ -62,9 +63,11 @@ void CStateBurerShield<Object>::critical_finalize()
 template <class Object>
 bool CStateBurerShield<Object>::check_start_conditions()
 {
-    if (current_time() < m_last_shield_started + object->m_shield_time + object->m_shield_cooldown) return false;
+    if (current_time() < m_last_shield_started + object->m_shield_time + object->m_shield_cooldown)
+        return false;
 
-    if (!object->EnemyMan.enemy_see_me_now()) return false;
+    if (!object->EnemyMan.enemy_see_me_now())
+        return false;
 
     return true;
 }
@@ -72,16 +75,21 @@ bool CStateBurerShield<Object>::check_start_conditions()
 template <class Object>
 bool CStateBurerShield<Object>::check_completion()
 {
-    if (current_time() > m_last_shield_started + object->m_shield_time) return true;
+    if (current_time() > m_last_shield_started + object->m_shield_time)
+        return true;
 
     CEntityAlive const* enemy = object->EnemyMan.get_enemy();
-    if (!enemy) return true;
+    if (!enemy)
+        return true;
 
-    if (enemy == Actor()) {
-        if (actor_is_reloading_weapon()) return true;
+    if (enemy == Actor())
+    {
+        if (actor_is_reloading_weapon())
+            return true;
     }
 
-    if (!object->EnemyMan.get_enemy()) return true;
+    if (!object->EnemyMan.get_enemy())
+        return true;
 
     return false;
 }

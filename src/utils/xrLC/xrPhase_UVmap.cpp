@@ -17,10 +17,11 @@ void Detach(vecFace* S)
         {
             Vertex* V = (*F)->v[i];
             Vertex* VC;
-            map_v2v_it W = verts.find(V);  // iterator
+            map_v2v_it W = verts.find(V); // iterator
 
-            if (W == verts.end()) {                                        // where is no such-vertex
-                VC = V->CreateCopy_NOADJ(lc_global_data()->g_vertices());  // make copy
+            if (W == verts.end())
+            { // where is no such-vertex
+                VC = V->CreateCopy_NOADJ(lc_global_data()->g_vertices()); // make copy
                 verts.insert(mk_pair(V, VC));
             }
             else
@@ -58,9 +59,12 @@ void CBuild::xrPhase_UVmap()
         // Detect vertex-lighting and avoid this subdivision
         R_ASSERT(!g_XSplit[SP]->empty());
         Face* Fvl = g_XSplit[SP]->front();
-        if (Fvl->Shader().flags.bLIGHT_Vertex) continue;  // do-not touch (skip)
-        if (!Fvl->Shader().flags.bRendering) continue;    // do-not touch (skip)
-        if (Fvl->hasImplicitLighting()) continue;         // do-not touch (skip)
+        if (Fvl->Shader().flags.bLIGHT_Vertex)
+            continue; // do-not touch (skip)
+        if (!Fvl->Shader().flags.bRendering)
+            continue; // do-not touch (skip)
+        if (Fvl->hasImplicitLighting())
+            continue; // do-not touch (skip)
 
         //   find first poly that doesn't has mapping and start recursion
         while (TRUE)
@@ -70,15 +74,18 @@ void CBuild::xrPhase_UVmap()
             float msA = 0;
             for (vecFaceIt it = g_XSplit[SP]->begin(); it != g_XSplit[SP]->end(); it++)
             {
-                if ((*it)->pDeflector == NULL) {
+                if ((*it)->pDeflector == NULL)
+                {
                     float a = (*it)->CalcArea();
-                    if (a > msA) {
+                    if (a > msA)
+                    {
                         msF = (*it);
                         msA = a;
                     }
                 }
             }
-            if (msF) {
+            if (msF)
+            {
                 CDeflector* D = new CDeflector();
                 lc_global_data()->g_deflectors().push_back(D);
                 // Start recursion from this face
@@ -95,7 +102,8 @@ void CBuild::xrPhase_UVmap()
                 for (int i = 0; i < int(g_XSplit[SP]->size()); i++)
                 {
                     Face* F = (*g_XSplit[SP])[i];
-                    if (F->pDeflector == D) {
+                    if (F->pDeflector == D)
+                    {
                         faces_affected.push_back(F);
                         g_XSplit[SP]->erase(g_XSplit[SP]->begin() + i);
                         i--;
@@ -108,7 +116,8 @@ void CBuild::xrPhase_UVmap()
             }
             else
             {
-                if (g_XSplit[SP]->empty()) {
+                if (g_XSplit[SP]->empty())
+                {
                     xr_delete(g_XSplit[SP]);
                     g_XSplit.erase(g_XSplit.begin() + SP);
                     SP--;

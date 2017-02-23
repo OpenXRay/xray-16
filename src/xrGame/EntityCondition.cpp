@@ -25,10 +25,7 @@ CEntityConditionSimple::CEntityConditionSimple()
     SetHealth(MAX_HEALTH);
 }
 
-CEntityConditionSimple::~CEntityConditionSimple()
-{
-}
-
+CEntityConditionSimple::~CEntityConditionSimple() {}
 CEntityCondition::CEntityCondition(CEntityAlive* object) : CEntityConditionSimple()
 {
     VERIFY(object);
@@ -89,11 +86,7 @@ CEntityCondition::CEntityCondition(CEntityAlive* object) : CEntityConditionSimpl
     m_bCanBeHarmed = true;
 }
 
-CEntityCondition::~CEntityCondition(void)
-{
-    ClearWounds();
-}
-
+CEntityCondition::~CEntityCondition(void) { ClearWounds(); }
 void CEntityCondition::ClearWounds()
 {
     for (WOUND_VECTOR_IT it = m_WoundVector.begin(); m_WoundVector.end() != it; ++it)
@@ -166,43 +159,26 @@ void CEntityCondition::ChangeHealth(const float value)
     m_fDeltaHealth += (CanBeHarmed() || (value > 0)) ? value : 0;
 }
 
-void CEntityCondition::ChangePower(const float value)
-{
-    m_fDeltaPower += value;
-}
-
-void CEntityCondition::ChangeRadiation(const float value)
-{
-    m_fDeltaRadiation += value;
-}
-
-void CEntityCondition::ChangePsyHealth(const float value)
-{
-    m_fDeltaPsyHealth += value;
-}
-
-void CEntityCondition::ChangeCircumspection(const float value)
-{
-    m_fDeltaCircumspection += value;
-}
-void CEntityCondition::ChangeEntityMorale(const float value)
-{
-    m_fDeltaEntityMorale += value;
-}
-
+void CEntityCondition::ChangePower(const float value) { m_fDeltaPower += value; }
+void CEntityCondition::ChangeRadiation(const float value) { m_fDeltaRadiation += value; }
+void CEntityCondition::ChangePsyHealth(const float value) { m_fDeltaPsyHealth += value; }
+void CEntityCondition::ChangeCircumspection(const float value) { m_fDeltaCircumspection += value; }
+void CEntityCondition::ChangeEntityMorale(const float value) { m_fDeltaEntityMorale += value; }
 void CEntityCondition::ChangeBleeding(const float percent)
 {
     //затянуть раны
     for (WOUND_VECTOR_IT it = m_WoundVector.begin(); m_WoundVector.end() != it; ++it)
     {
         (*it)->Incarnation(percent, m_fMinWoundSize);
-        if (0 == (*it)->TotalSize()) (*it)->SetDestroy(true);
+        if (0 == (*it)->TotalSize())
+            (*it)->SetDestroy(true);
     }
 }
 
 bool RemoveWoundPred(CWound* pWound)
 {
-    if (pWound->GetDestroy()) {
+    if (pWound->GetDestroy())
+    {
         xr_delete(pWound);
         return true;
     }
@@ -220,8 +196,10 @@ void CEntityCondition::UpdateConditionTime()
 {
     u64 _cur_time = (GameID() == eGameIDSingle) ? Level().GetGameTime() : Level().timeServer();
 
-    if (m_bTimeValid) {
-        if (_cur_time > m_iLastTimeCalled) {
+    if (m_bTimeValid)
+    {
+        if (_cur_time > m_iLastTimeCalled)
+        {
             float x = float(_cur_time - m_iLastTimeCalled) / 1000.0f;
             SetConditionDeltaTime(x);
         }
@@ -246,22 +224,26 @@ void CEntityCondition::UpdateConditionTime()
 //вычисление параметров с ходом игрового времени
 void CEntityCondition::UpdateCondition()
 {
-    if (GetHealth() <= 0) return;
+    if (GetHealth() <= 0)
+        return;
     //-----------------------------------------
     bool CriticalHealth = false;
 
-    if (m_fDeltaHealth + GetHealth() <= 0) {
+    if (m_fDeltaHealth + GetHealth() <= 0)
+    {
         CriticalHealth = true;
         m_object->OnCriticalHitHealthLoss();
     }
     else
     {
-        if (m_fDeltaHealth < 0) m_object->OnHitHealthLoss(GetHealth() + m_fDeltaHealth);
+        if (m_fDeltaHealth < 0)
+            m_object->OnHitHealthLoss(GetHealth() + m_fDeltaHealth);
     }
     //-----------------------------------------
     UpdateHealth();
     //-----------------------------------------
-    if (!CriticalHealth && m_fDeltaHealth + GetHealth() <= 0) {
+    if (!CriticalHealth && m_fDeltaHealth + GetHealth() <= 0)
+    {
         CriticalHealth = true;
         m_object->OnCriticalWoundHealthLoss();
     };
@@ -269,7 +251,8 @@ void CEntityCondition::UpdateCondition()
     UpdatePower();
     UpdateRadiation();
     //-----------------------------------------
-    if (!CriticalHealth && m_fDeltaHealth + GetHealth() <= 0) {
+    if (!CriticalHealth && m_fDeltaHealth + GetHealth() <= 0)
+    {
         CriticalHealth = true;
         m_object->OnCriticalRadiationHealthLoss();
     };
@@ -278,9 +261,11 @@ void CEntityCondition::UpdateCondition()
 
     UpdateEntityMorale();
 
-    if (Device.fTimeGlobal > m_fInvulnerableTime) {
+    if (Device.fTimeGlobal > m_fInvulnerableTime)
+    {
         float curr_health = GetHealth();
-        if (curr_health > m_fKillHitTreshold && curr_health + m_fDeltaHealth < 0) {
+        if (curr_health > m_fKillHitTreshold && curr_health + m_fDeltaHealth < 0)
+        {
             SetHealth(m_fLastChanceHealth);
             m_fInvulnerableTime = Device.fTimeGlobal + m_fInvulnerableTimeDelta;
         }
@@ -312,16 +297,20 @@ float CEntityCondition::HitOutfitEffect(
     float hit_power, ALife::EHitType hit_type, s16 element, float ap, bool& add_wound)
 {
     CInventoryOwner* pInvOwner = smart_cast<CInventoryOwner*>(m_object);
-    if (!pInvOwner) return hit_power;
+    if (!pInvOwner)
+        return hit_power;
 
     CCustomOutfit* pOutfit = (CCustomOutfit*)pInvOwner->inventory().ItemFromSlot(OUTFIT_SLOT);
     CHelmet* pHelmet = (CHelmet*)pInvOwner->inventory().ItemFromSlot(HELMET_SLOT);
-    if (!pOutfit && !pHelmet) return hit_power;
+    if (!pOutfit && !pHelmet)
+        return hit_power;
 
     float new_hit_power = hit_power;
-    if (pOutfit) new_hit_power = pOutfit->HitThroughArmor(hit_power, element, ap, add_wound, hit_type);
+    if (pOutfit)
+        new_hit_power = pOutfit->HitThroughArmor(hit_power, element, ap, add_wound, hit_type);
 
-    if (pHelmet) new_hit_power = pHelmet->HitThroughArmor(new_hit_power, element, ap, add_wound, hit_type);
+    if (pHelmet)
+        new_hit_power = pHelmet->HitThroughArmor(new_hit_power, element, ap, add_wound, hit_type);
 
     if (bDebug)
         Msg("new_hit_power = %.3f  hit_type = %s  ap = %.3f", new_hit_power, ALife::g_cafHitType2String(hit_type), ap);
@@ -332,10 +321,12 @@ float CEntityCondition::HitOutfitEffect(
 float CEntityCondition::HitPowerEffect(float power_loss)
 {
     CInventoryOwner* pInvOwner = smart_cast<CInventoryOwner*>(m_object);
-    if (!pInvOwner) return power_loss;
+    if (!pInvOwner)
+        return power_loss;
 
     CCustomOutfit* pOutfit = pInvOwner->GetOutfit();
-    if (!pOutfit) return power_loss * 0.5f;
+    if (!pOutfit)
+        return power_loss * 0.5f;
 
     float new_power_loss = power_loss * pOutfit->m_fPowerLoss;
 
@@ -351,13 +342,15 @@ CWound* CEntityCondition::AddWound(float hit_power, ALife::EHitType hit_type, u1
     WOUND_VECTOR_IT it = m_WoundVector.begin();
     for (; it != m_WoundVector.end(); it++)
     {
-        if ((*it)->GetBoneNum() == element) break;
+        if ((*it)->GetBoneNum() == element)
+            break;
     }
 
     CWound* pWound = NULL;
 
     //новая рана
-    if (it == m_WoundVector.end()) {
+    if (it == m_WoundVector.end())
+    {
         pWound = new CWound(element);
         pWound->AddHit(hit_power * ::Random.randF(0.5f, 1.5f), hit_type);
         m_WoundVector.push_back(pWound);
@@ -391,7 +384,8 @@ CWound* CEntityCondition::ConditionHit(SHit* pHDS)
     {
     case ALife::eHitTypeTelepatic:
         hit_power -= m_fBoostTelepaticProtection;
-        if (hit_power < 0.f) hit_power = 0.f;
+        if (hit_power < 0.f)
+            hit_power = 0.f;
         hit_power *= GetHitImmunity(pHDS->hit_type) - m_fBoostTelepaticImmunity;
         ChangePsyHealth(-hit_power);
         m_fHealthLost = hit_power * m_fHealthHitPart;
@@ -410,7 +404,8 @@ CWound* CEntityCondition::ConditionHit(SHit* pHDS)
         break;
     case ALife::eHitTypeChemicalBurn:
         hit_power -= m_fBoostChemicalBurnProtection;
-        if (hit_power < 0.f) hit_power = 0.f;
+        if (hit_power < 0.f)
+            hit_power = 0.f;
         hit_power *= GetHitImmunity(pHDS->hit_type) - m_fBoostChemicalBurnImmunity;
         m_fHealthLost = hit_power * m_fHealthHitPart;
         m_fDeltaHealth -= CanBeHarmed() ? m_fHealthLost : 0;
@@ -426,7 +421,8 @@ CWound* CEntityCondition::ConditionHit(SHit* pHDS)
         break;
     case ALife::eHitTypeRadiation:
         hit_power -= m_fBoostRadiationProtection;
-        if (hit_power < 0.f) hit_power = 0.f;
+        if (hit_power < 0.f)
+            hit_power = 0.f;
         hit_power *= GetHitImmunity(pHDS->hit_type) - m_fBoostRadiationImmunity;
         m_fDeltaRadiation += hit_power;
         bAddWound = false;
@@ -463,13 +459,15 @@ CWound* CEntityCondition::ConditionHit(SHit* pHDS)
     break;
     }
 
-    if (bDebug && !is_special_hit_2_self) {
+    if (bDebug && !is_special_hit_2_self)
+    {
         Msg("%s hitted in %s with %f[%f]", m_object->Name(),
             smart_cast<IKinematics*>(m_object->Visual())->LL_BoneName_dbg(pHDS->boneID), m_fHealthLost * 100.0f,
             hit_power_org);
     }
     //раны добавляются только живому
-    if (bAddWound && GetHealth() > 0) {
+    if (bAddWound && GetHealth() > 0)
+    {
         return AddWound(hit_power * m_fWoundBoneScale, pHDS->hit_type, pHDS->boneID);
     }
     else
@@ -499,18 +497,12 @@ void CEntityCondition::UpdateHealth()
     ChangeBleeding(m_change_v.m_fV_WoundIncarnation * m_fDeltaTime);
 }
 
-void CEntityCondition::UpdatePower()
-{
-}
-
-void CEntityCondition::UpdatePsyHealth()
-{
-    m_fDeltaPsyHealth += m_change_v.m_fV_PsyHealth * m_fDeltaTime;
-}
-
+void CEntityCondition::UpdatePower() {}
+void CEntityCondition::UpdatePsyHealth() { m_fDeltaPsyHealth += m_change_v.m_fV_PsyHealth * m_fDeltaTime; }
 void CEntityCondition::UpdateRadiation()
 {
-    if (m_fRadiation > 0) {
+    if (m_fRadiation > 0)
+    {
         m_fDeltaRadiation -= m_change_v.m_fV_Radiation * m_fDeltaTime;
 
         m_fDeltaHealth -= CanBeHarmed() ? m_change_v.m_fV_RadiationHealth * m_fRadiation * m_fDeltaTime : 0.0f;
@@ -519,14 +511,16 @@ void CEntityCondition::UpdateRadiation()
 
 void CEntityCondition::UpdateEntityMorale()
 {
-    if (m_fEntityMorale < m_fEntityMoraleMax) {
+    if (m_fEntityMorale < m_fEntityMoraleMax)
+    {
         m_fDeltaEntityMorale += m_change_v.m_fV_EntityMorale * m_fDeltaTime;
     }
 }
 
 bool CEntityCondition::IsLimping() const
 {
-    if (!m_use_limping_state) return (false);
+    if (!m_use_limping_state)
+        return (false);
     return (m_fPower * GetHealth() <= m_limping_threshold);
 }
 
@@ -535,7 +529,8 @@ void CEntityCondition::save(NET_Packet& output_packet)
     u8 is_alive = (GetHealth() > 0.f) ? 1 : 0;
 
     output_packet.w_u8(is_alive);
-    if (is_alive) {
+    if (is_alive)
+    {
         save_data(m_fPower, output_packet);
         save_data(m_fRadiation, output_packet);
         save_data(m_fEntityMorale, output_packet);
@@ -552,7 +547,8 @@ void CEntityCondition::load(IReader& input_packet)
     m_bTimeValid = false;
 
     u8 is_alive = input_packet.r_u8();
-    if (is_alive) {
+    if (is_alive)
+    {
         load_data(m_fPower, input_packet);
         load_data(m_fRadiation, input_packet);
         load_data(m_fEntityMorale, input_packet);
@@ -593,7 +589,8 @@ void CEntityCondition::SConditionChangeV::load(LPCSTR sect, LPCSTR prefix)
 
 void CEntityCondition::remove_links(const IGameObject* object)
 {
-    if (m_pWho != object) return;
+    if (m_pWho != object)
+        return;
 
     m_pWho = m_object;
     m_iWhoID = m_object->ID();
@@ -611,11 +608,7 @@ bool CEntityCondition::ApplyInfluence(const SMedicineInfluenceValues& V, const s
     return true;
 }
 
-bool CEntityCondition::ApplyBooster(const SBooster& B, const shared_str& sect)
-{
-    return true;
-}
-
+bool CEntityCondition::ApplyBooster(const SBooster& B, const shared_str& sect) { return true; }
 void SMedicineInfluenceValues::Load(const shared_str& sect)
 {
     fHealth = pSettings->r_float(sect.c_str(), "eat_health");

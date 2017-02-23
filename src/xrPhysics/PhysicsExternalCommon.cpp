@@ -7,7 +7,8 @@ bool ContactShotMarkGetEffectPars(dContactGeom* c, dxGeomUserData*& data, float&
     dBodyID b = dGeomGetBody(c->g1);
 
     b_invert_normal = false;
-    if (!b) {
+    if (!b)
+    {
         b = dGeomGetBody(c->g2);
         data = dGeomGetUserData(c->g2);
         b_invert_normal = true;
@@ -16,7 +17,8 @@ bool ContactShotMarkGetEffectPars(dContactGeom* c, dxGeomUserData*& data, float&
     {
         data = dGeomGetUserData(c->g1);
     }
-    if (!b) return false;
+    if (!b)
+        return false;
 
     dVector3 vel;
     dMass m;

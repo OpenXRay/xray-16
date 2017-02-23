@@ -40,7 +40,6 @@ public:
     }
 
     ~TexObj() { glDeleteTextures(1, &fTextureNum); }
-
     void bind()
     {
         assert(glGetError() == GL_NO_ERROR);
@@ -97,10 +96,12 @@ public:
 
     ~MTexture()
     {
-        if (m_levels) {
+        if (m_levels)
+        {
             for (unsigned int i = 0; i < m_numLevels; i++)
             {
-                if (m_levels[i]) {
+                if (m_levels[i])
+                {
                     xr_free(m_levels[i]);
                 }
             }
@@ -119,21 +120,19 @@ public:
 
     // Returns 1 if no mipmapping, >1 otherwise.
     unsigned int levels() { return m_numLevels; }
-
     bool bind();
 
     unsigned char* fetch(unsigned int s, unsigned int t, unsigned int level = 0)
     {
         // Verify that the mipmap level exists.
-        if (level > m_numLevels || m_levels == NULL || m_levels[level] == NULL) return NULL;
+        if (level > m_numLevels || m_levels == NULL || m_levels[level] == NULL)
+            return NULL;
 
         return internalFetch(s, t, level);
     }
 
     inline bool square() { return m_width == m_height; }
-
     inline bool mipmapped() { return levels() > 1; }
-
     // Return the width of a specific mipmap level.
     // If level == 0, return the width of the base level (source image).
     // Width is always >= 1, to prevent non-square textures from having zero-sized levels.
@@ -172,7 +171,7 @@ private:
 
     // Pyramid levels (assumes 4 bytes per pixel for now)
     unsigned char** m_levels;
-    unsigned int m_numLevels;  // Number of mipmaps + base texture
+    unsigned int m_numLevels; // Number of mipmaps + base texture
 
     // Cached variables (Depend on previous private variables)
     GLint m_internalFormat;
@@ -180,4 +179,4 @@ private:
     GLenum m_componentFormat;
 };
 
-#endif  // MAYA_API_MTexture
+#endif // MAYA_API_MTexture

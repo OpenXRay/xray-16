@@ -18,15 +18,14 @@ public:
     void SetTextureColor(u32 cl) { m_texture_color = cl; }
     bool IsHorizontal() { return bHorizontal; }
     void SetHorizontal(bool horiz) { bHorizontal = horiz; }
-
 protected:
     bool bHorizontal;
     bool inc_pos(Frect& rect, int counter, int i, Fvector2& LTp, Fvector2& RBp, Fvector2& LTt, Fvector2& RBt);
     enum
     {
-        flFirst = 0,  // Left or top
-        flBack,       // Center texture
-        flSecond,     // Right or bottom
+        flFirst = 0, // Left or top
+        flBack, // Center texture
+        flSecond, // Right or bottom
         flMax
     };
     u32 m_texture_color;

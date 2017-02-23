@@ -20,7 +20,8 @@
 
 MxBlockModel* MxBlockModel::clone(MxBlockModel* m)
 {
-    if (!m) m = new MxBlockModel(vert_count(), face_count());
+    if (!m)
+        m = new MxBlockModel(vert_count(), face_count());
 
     unsigned int i;
 
@@ -30,19 +31,22 @@ MxBlockModel* MxBlockModel::clone(MxBlockModel* m)
         m->add_face(face(i)[0], face(i)[1], face(i)[2]);
 
     m->normal_binding((u8)normal_binding());
-    if (normal_binding() != MX_UNBOUND) {
+    if (normal_binding() != MX_UNBOUND)
+    {
         m->normals->room_for(normal_count());
         m->normals->bitcopy(*normals);
     }
 
     m->color_binding((u8)color_binding());
-    if (color_binding() != MX_UNBOUND) {
+    if (color_binding() != MX_UNBOUND)
+    {
         m->colors->room_for(color_count());
         m->colors->bitcopy(*colors);
     }
 
     m->texcoord_binding((u8)texcoord_binding());
-    if (texcoord_binding() != MX_UNBOUND) {
+    if (texcoord_binding() != MX_UNBOUND)
+    {
         m->tcoords->room_for(texcoord_count());
         m->tcoords->bitcopy(*tcoords);
     }
@@ -75,9 +79,12 @@ void MxBlockModel::remove_vertex(MxVertexID v)
 
     free_vertex(v);
     vertices.remove(v);
-    if (normal_binding() == MX_PERVERTEX) normals->remove(v);
-    if (color_binding() == MX_PERVERTEX) colors->remove(v);
-    if (texcoord_binding() == MX_PERVERTEX) tcoords->remove(v);
+    if (normal_binding() == MX_PERVERTEX)
+        normals->remove(v);
+    if (color_binding() == MX_PERVERTEX)
+        colors->remove(v);
+    if (texcoord_binding() == MX_PERVERTEX)
+        tcoords->remove(v);
 }
 
 void MxBlockModel::remove_face(MxFaceID f)
@@ -86,15 +93,19 @@ void MxBlockModel::remove_face(MxFaceID f)
 
     free_face(f);
     faces.remove(f);
-    if (normal_binding() == MX_PERFACE) normals->remove(f);
-    if (color_binding() == MX_PERFACE) colors->remove(f);
-    if (texcoord_binding() == MX_PERFACE) tcoords->remove(f);
+    if (normal_binding() == MX_PERFACE)
+        normals->remove(f);
+    if (color_binding() == MX_PERFACE)
+        colors->remove(f);
+    if (texcoord_binding() == MX_PERFACE)
+        tcoords->remove(f);
 }
 
 MxFaceID MxBlockModel::add_face(unsigned int v1, unsigned int v2, unsigned int v3, bool will_link)
 {
     MxFaceID id = alloc_face(v1, v2, v3);
-    if (will_link) init_face(id);
+    if (will_link)
+        init_face(id);
     return id;
 }
 
@@ -121,9 +132,11 @@ unsigned int MxBlockModel::add_texcoord(float s, float t)
 
 unsigned int MxBlockModel::add_texmap(const char* name)
 {
-    if (!name) name = "tex";
+    if (!name)
+        name = "tex";
 
-    if (tex_name) xr_free(tex_name);
+    if (tex_name)
+        xr_free(tex_name);
 
     tex_name = xr_strdup(name);
     return 0;
@@ -158,7 +171,8 @@ const char* MxBlockModel::binding_name(int b)
 int MxBlockModel::parse_binding(const char* name)
 {
     for (int i = 0; i <= MX_MAX_BINDING; i++)
-        if (streq(bindings[i], name)) return i;
+        if (streq(bindings[i], name))
+            return i;
 
     return MX_UNBOUND;
 }
@@ -167,8 +181,10 @@ void MxBlockModel::color_binding(unsigned char b)
 {
     int size = binding_size(*this, b);
 
-    if (b == MX_UNBOUND) {
-        if (colors) {
+    if (b == MX_UNBOUND)
+    {
+        if (colors)
+        {
             xr_delete(colors);
         }
         binding_mask &= (~MX_COLOR_MASK);
@@ -189,8 +205,10 @@ void MxBlockModel::normal_binding(unsigned char b)
 {
     int size = binding_size(*this, b);
 
-    if (b == MX_UNBOUND) {
-        if (normals) {
+    if (b == MX_UNBOUND)
+    {
+        if (normals)
+        {
             xr_delete(normals);
         }
         binding_mask &= (~MX_NORMAL_MASK);
@@ -209,7 +227,8 @@ void MxBlockModel::normal_binding(unsigned char b)
 
 void MxBlockModel::texcoord_binding(unsigned char b)
 {
-    if (b != MX_UNBOUND && b != MX_PERVERTEX) FATAL("Illegal texture coordinate binding.");
+    if (b != MX_UNBOUND && b != MX_PERVERTEX)
+        FATAL("Illegal texture coordinate binding.");
 
     int size = binding_size(*this, b);
     if (tcoords)
@@ -236,7 +255,8 @@ void MxBlockModel::compute_face_normal(MxFaceID f, float* n, bool will_unitize)
     mxv_sub(a, v2, v1, 3);
     mxv_sub(b, v3, v1, 3);
     mxv_cross3(n, a, b);
-    if (will_unitize) mxv_unitize(n, 3);
+    if (will_unitize)
+        mxv_unitize(n, 3);
 }
 
 void MxBlockModel::compute_face_normal(MxFaceID f, double* n, bool will_unitize)
@@ -253,7 +273,8 @@ void MxBlockModel::compute_face_normal(MxFaceID f, double* n, bool will_unitize)
     }
 
     mxv_cross3(n, a, b);
-    if (will_unitize) mxv_unitize(n, 3);
+    if (will_unitize)
+        mxv_unitize(n, 3);
 }
 
 void MxBlockModel::compute_face_plane(MxFaceID f, float* p, bool will_unitize)
@@ -277,7 +298,8 @@ double MxBlockModel::compute_face_perimeter(MxFaceID fid, bool* flags)
 
     for (unsigned int i = 0; i < 3; i++)
     {
-        if (!flags || flags[i]) {
+        if (!flags || flags[i])
+        {
             float *vi = vertex(f[i]), *vj = vertex(f[(i + 1) % 3]), e[3];
             perim += mxv_norm(mxv_sub(e, vi, vj, 3), 3);
         }

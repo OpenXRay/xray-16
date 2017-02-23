@@ -18,11 +18,7 @@ IC Fvector random_position(const Fvector& center, float R)
     return v;
 }
 
-IC bool from_right(float ty, float cy)
-{
-    return ((angle_normalize_signed(ty - cy) > 0));
-}
-
+IC bool from_right(float ty, float cy) { return ((angle_normalize_signed(ty - cy) > 0)); }
 IC bool is_angle_between(float yaw, float yaw_from, float yaw_to)
 {
     float diff = angle_difference(yaw_from, yaw_to);
@@ -36,39 +32,43 @@ IC bool is_angle_between(float yaw, float yaw_from, float yaw_to)
 
 IC void velocity_lerp(float& _cur, float _target, float _accel, float _dt)
 {
-    if (fsimilar(_cur, _target)) return;
+    if (fsimilar(_cur, _target))
+        return;
 
-    if (_target > _cur) {
+    if (_target > _cur)
+    {
         _cur += _accel * _dt;
-        if (_cur > _target) _cur = _target;
+        if (_cur > _target)
+            _cur = _target;
     }
     else
     {
         _cur -= _accel * _dt;
-        if (_cur < 0) _cur = 0.f;
+        if (_cur < 0)
+            _cur = 0.f;
     }
 }
 
 IC void def_lerp(float& _cur, float _target, float _vel, float _dt)
 {
-    if (fsimilar(_cur, _target)) return;
+    if (fsimilar(_cur, _target))
+        return;
 
-    if (_target > _cur) {
+    if (_target > _cur)
+    {
         _cur += _vel * _dt;
-        if (_cur > _target) _cur = _target;
+        if (_cur > _target)
+            _cur = _target;
     }
     else
     {
         _cur -= _vel * _dt;
-        if (_cur < _target) _cur = _target;
+        if (_cur < _target)
+            _cur = _target;
     }
 }
 
-IC u32 time()
-{
-    return Device.dwTimeGlobal;
-}
-
+IC u32 time() { return Device.dwTimeGlobal; }
 //////////////////////////////////////////////////////////////////////////
 // bone routines
 //////////////////////////////////////////////////////////////////////////
@@ -84,7 +84,8 @@ IC void read_delay(LPCSTR section, LPCSTR name, u32& delay_min, u32& delay_max)
     LPCSTR delay = pSettings->r_string(section, name);
     string128 tempst;
 
-    if (_GetItemCount(delay) == 2) {
+    if (_GetItemCount(delay) == 2)
+    {
         delay_min = u32(atoi(_GetItem(delay, 0, tempst)));
         delay_max = u32(atoi(_GetItem(delay, 1, tempst)));
     }

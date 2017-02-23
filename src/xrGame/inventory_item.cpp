@@ -30,7 +30,8 @@
 
 net_updateInvData* CInventoryItem::NetSync()
 {
-    if (!m_net_updateData) m_net_updateData = new net_updateInvData();
+    if (!m_net_updateData)
+        m_net_updateData = new net_updateInvData();
     return m_net_updateData;
 }
 
@@ -67,17 +68,19 @@ CInventoryItem::~CInventoryItem()
     delete_data(m_net_updateData);
 
 #ifndef MASTER_GOLD
-    bool B_GOOD = (!m_pInventory || (std::find(m_pInventory->m_all.begin(), m_pInventory->m_all.end(), this) ==
-                                        m_pInventory->m_all.end()));
-    if (!B_GOOD) {
+    bool B_GOOD = (!m_pInventory ||
+        (std::find(m_pInventory->m_all.begin(), m_pInventory->m_all.end(), this) == m_pInventory->m_all.end()));
+    if (!B_GOOD)
+    {
         IGameObject* p = object().H_Parent();
         Msg("inventory ptr is [%s]", m_pInventory ? "not-null" : "null");
-        if (p) Msg("parent name is [%s]", p->cName().c_str());
+        if (p)
+            Msg("parent name is [%s]", p->cName().c_str());
 
         Msg("! ERROR item_id[%d] H_Parent=[%s][%d] [%d]", object().ID(), p ? p->cName().c_str() : "none",
             p ? p->ID() : -1, Device.dwFrame);
     }
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
 }
 
 void CInventoryItem::Load(LPCSTR section)
@@ -85,7 +88,8 @@ void CInventoryItem::Load(LPCSTR section)
     CHitImmunity::LoadImmunities(pSettings->r_string(section, "immunities_sect"), pSettings);
 
     ISpatial* self = smart_cast<ISpatial*>(this);
-    if (self) self->GetSpatialData().type |= STYPE_VISIBLEFORAI;
+    if (self)
+        self->GetSpatialData().type |= STYPE_VISIBLEFORAI;
 
     m_section_id._set(section);
     m_name = CStringTable().translate(pSettings->r_string(section, "inv_name"));
@@ -106,7 +110,8 @@ void CInventoryItem::Load(LPCSTR section)
     m_flags.set(FCanTrade, m_can_trade);
     m_flags.set(FIsQuestItem, READ_IF_EXISTS(pSettings, r_bool, section, "quest_item", FALSE));
 
-    if (BaseSlot() != NO_ACTIVE_SLOT || Belt()) {
+    if (BaseSlot() != NO_ACTIVE_SLOT || Belt())
+    {
         m_flags.set(FRuckDefault, pSettings->r_bool(section, "default_to_ruck"));
         m_flags.set(FAllowSprint, pSettings->r_bool(section, "sprint_allowed"));
         m_fControlInertionFactor = pSettings->r_float(section, "control_inertion_factor");
@@ -122,7 +127,8 @@ void CInventoryItem::ChangeCondition(float fDeltaCondition)
 
 void CInventoryItem::Hit(SHit* pHDS)
 {
-    if (!m_flags.test(FUsingCondition)) return;
+    if (!m_flags.test(FUsingCondition))
+        return;
 
     float hit_power = pHDS->damage();
     hit_power *= GetHitImmunity(pHDS->hit_type);
@@ -130,15 +136,8 @@ void CInventoryItem::Hit(SHit* pHDS)
     ChangeCondition(-hit_power);
 }
 
-LPCSTR CInventoryItem::NameItem()
-{
-    return m_name.c_str();
-}
-
-LPCSTR CInventoryItem::NameShort()
-{
-    return m_nameShort.c_str();
-}
+LPCSTR CInventoryItem::NameItem() { return m_name.c_str(); }
+LPCSTR CInventoryItem::NameShort() { return m_nameShort.c_str(); }
 /*
 LPCSTR CInventoryItem::NameComplex()
 {
@@ -160,20 +159,9 @@ LPCSTR CInventoryItem::NameComplex()
     return *m_nameComplex;
 }
 */
-bool CInventoryItem::Useful() const
-{
-    return CanTake();
-}
-
-bool CInventoryItem::ActivateItem()
-{
-    return false;
-}
-
-void CInventoryItem::DeactivateItem()
-{
-}
-
+bool CInventoryItem::Useful() const { return CanTake(); }
+bool CInventoryItem::ActivateItem() { return false; }
+void CInventoryItem::DeactivateItem() {}
 void CInventoryItem::OnH_B_Independent(bool just_before_destroy)
 {
     UpdateXForm();
@@ -187,15 +175,8 @@ void CInventoryItem::OnH_A_Independent()
     inherited::OnH_A_Independent();
 }
 
-void CInventoryItem::OnH_B_Chield()
-{
-    Level().RemoveObject_From_4CrPr(m_object);
-}
-
-void CInventoryItem::OnH_A_Chield()
-{
-    inherited::OnH_A_Chield();
-}
+void CInventoryItem::OnH_B_Chield() { Level().RemoveObject_From_4CrPr(m_object); }
+void CInventoryItem::OnH_A_Chield() { inherited::OnH_A_Chield(); }
 #ifdef DEBUG
 extern Flags32 dbg_net_Draw_Flags;
 #endif
@@ -203,8 +184,10 @@ extern Flags32 dbg_net_Draw_Flags;
 void CInventoryItem::UpdateCL()
 {
 #ifdef DEBUG
-    if (bDebug) {
-        if (dbg_net_Draw_Flags.test(dbg_draw_invitem)) {
+    if (bDebug)
+    {
+        if (dbg_net_Draw_Flags.test(dbg_draw_invitem))
+        {
             Device.seqRender.Remove(this);
             Device.seqRender.Add(this);
         }
@@ -215,7 +198,8 @@ void CInventoryItem::UpdateCL()
     }
 
 #endif
-    if (!IsGameTypeSingle()) {
+    if (!IsGameTypeSingle())
+    {
         Interpolate();
     }
 }
@@ -229,7 +213,8 @@ void CInventoryItem::OnEvent(NET_Packet& P, u16 type)
         u16 ItemID;
         P.r_u16(ItemID);
         CInventoryItem* ItemToAttach = smart_cast<CInventoryItem*>(Level().Objects.net_Find(ItemID));
-        if (!ItemToAttach) break;
+        if (!ItemToAttach)
+            break;
         Attach(ItemToAttach, true);
     }
     break;
@@ -246,7 +231,8 @@ void CInventoryItem::OnEvent(NET_Packet& P, u16 type)
         P.r_vec3(p);
         CPHSynchronize* pSyncObj = NULL;
         pSyncObj = object().PHGetSyncItem(0);
-        if (!pSyncObj) return;
+        if (!pSyncObj)
+            return;
         SPHNetState state;
         pSyncObj->get_State(state);
         state.position = p;
@@ -262,8 +248,10 @@ void CInventoryItem::OnEvent(NET_Packet& P, u16 type)
 //объекте, поэтому функция должна быть переопределена
 bool CInventoryItem::Detach(const char* item_section_name, bool b_spawn_item)
 {
-    if (OnClient()) return true;
-    if (b_spawn_item) {
+    if (OnClient())
+        return true;
+    if (b_spawn_item)
+    {
         CSE_Abstract* D = F_entity_Create(item_section_name);
         R_ASSERT(D);
         CSE_ALifeDynamicObject* l_tpALifeDynamicObject = smart_cast<CSE_ALifeDynamicObject*>(D);
@@ -277,11 +265,12 @@ bool CInventoryItem::Detach(const char* item_section_name, bool b_spawn_item)
         //.		D->s_gameid			=	u8(GameID());
         D->s_RP = 0xff;
         D->ID = 0xffff;
-        if (GameID() == eGameIDSingle) {
+        if (GameID() == eGameIDSingle)
+        {
             D->ID_Parent = u16(object().H_Parent()->ID());
         }
-        else  // i'm not sure this is right
-        {     // but it is simpliest way to avoid exception in MP BuyWnd... [Satan]
+        else // i'm not sure this is right
+        { // but it is simpliest way to avoid exception in MP BuyWnd... [Satan]
             if (object().H_Parent())
                 D->ID_Parent = u16(object().H_Parent()->ID());
             else
@@ -314,21 +303,25 @@ BOOL CInventoryItem::net_Spawn(CSE_Abstract* DC)
     m_flags.set(Fuseful_for_NPC, TRUE);
     CSE_Abstract* e = (CSE_Abstract*)(DC);
     CSE_ALifeObject* alife_object = smart_cast<CSE_ALifeObject*>(e);
-    if (alife_object) {
+    if (alife_object)
+    {
         m_flags.set(Fuseful_for_NPC, alife_object->m_flags.test(CSE_ALifeObject::flUsefulForAI));
     }
 
     CSE_ALifeInventoryItem* pSE_InventoryItem = smart_cast<CSE_ALifeInventoryItem*>(e);
-    if (!pSE_InventoryItem) return TRUE;
+    if (!pSE_InventoryItem)
+        return TRUE;
 
     //!!!
     m_fCondition = pSE_InventoryItem->m_fCondition;
 
-    if (IsGameTypeSingle()) {
+    if (IsGameTypeSingle())
+    {
         net_Spawn_install_upgrades(pSE_InventoryItem->m_upgrades);
     }
 
-    if (GameID() != eGameIDSingle) object().processing_activate();
+    if (GameID() != eGameIDSingle)
+        object().processing_activate();
 
     m_dwItemIndependencyTime = 0;
 
@@ -339,7 +332,8 @@ BOOL CInventoryItem::net_Spawn(CSE_Abstract* DC)
 
 void CInventoryItem::net_Destroy()
 {
-    if (m_pInventory) {
+    if (m_pInventory)
+    {
         VERIFY(std::find(m_pInventory->m_all.begin(), m_pInventory->m_all.end(), this) == m_pInventory->m_all.end());
     }
 
@@ -353,7 +347,8 @@ void CInventoryItem::save(NET_Packet& packet)
     packet.w_float(m_fCondition);
     //--	save_data				(m_upgrades, packet);
 
-    if (object().H_Parent()) {
+    if (object().H_Parent())
+    {
         packet.w_u8(0);
         return;
     }
@@ -369,7 +364,8 @@ void CInventoryItem::net_Import(NET_Packet& P)
     // Msg("Inventory item [%d][%s] net_Import...", object().ID(), object().cName().c_str());
     u8 NumItems = 0;
     NumItems = P.r_u8();
-    if (!NumItems) return;
+    if (!NumItems)
+        return;
 
     mask_inv_num_items num_items;
     num_items.common = NumItems;
@@ -385,9 +381,10 @@ void CInventoryItem::net_Import(NET_Packet& P)
 
     net_Import_PH_Params(P, N, num_items);
     ////////////////////////////////////////////
-    P.r_u8();  // active (not freezed ot not)
+    P.r_u8(); // active (not freezed ot not)
 
-    if (this->cast_game_object()->Local()) {
+    if (this->cast_game_object()->Local())
+    {
         return;
     }
 
@@ -409,10 +406,11 @@ void CInventoryItem::net_Import(NET_Packet& P)
     {
         p->NET_IItem.pop_front();
     }
-    if (!m_activated) {
+    if (!m_activated)
+    {
 #ifdef DEBUG
         Msg("Activating object [%d] before interpolation starts", object().ID());
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
         object().processing_activate();
         m_activated = true;
     }
@@ -501,7 +499,8 @@ void CInventoryItem::net_Import_PH_Params(NET_Packet& P, net_update_IItem& N, ma
 
     N.State.enabled = num_items.mask & CSE_ALifeInventoryItem::inventory_item_state_enabled;
     // UI().Font().pFontStat->OutNext("Import N.State.enabled:%i",int(N.State.enabled));
-    if (!(num_items.mask & CSE_ALifeInventoryItem::inventory_item_angular_null)) {
+    if (!(num_items.mask & CSE_ALifeInventoryItem::inventory_item_angular_null))
+    {
         N.State.angular_vel.x = P.r_float();
         N.State.angular_vel.y = P.r_float();
         N.State.angular_vel.z = P.r_float();
@@ -509,7 +508,8 @@ void CInventoryItem::net_Import_PH_Params(NET_Packet& P, net_update_IItem& N, ma
     else
         N.State.angular_vel.set(0.f, 0.f, 0.f);
 
-    if (!(num_items.mask & CSE_ALifeInventoryItem::inventory_item_linear_null)) {
+    if (!(num_items.mask & CSE_ALifeInventoryItem::inventory_item_linear_null))
+    {
         N.State.linear_vel.x = P.r_float();
         N.State.linear_vel.y = P.r_float();
         N.State.linear_vel.z = P.r_float();
@@ -534,7 +534,8 @@ void CInventoryItem::net_Export_PH_Params(NET_Packet& P, SPHNetState& State, mas
     // Msg("Export State.enabled:%i",int(State.enabled));
 
     float magnitude = _sqrt(State.quaternion.magnitude());
-    if (fis_zero(magnitude)) {
+    if (fis_zero(magnitude))
+    {
         magnitude = 1;
         State.quaternion.x = 0.f;
         State.quaternion.y = 0.f;
@@ -561,7 +562,8 @@ void CInventoryItem::net_Export_PH_Params(NET_Packet& P, SPHNetState& State, mas
     P.w_float(State.quaternion.z);
     P.w_float(State.quaternion.w);
 
-    if (!(num_items.mask & CSE_ALifeInventoryItem::inventory_item_angular_null)) {
+    if (!(num_items.mask & CSE_ALifeInventoryItem::inventory_item_angular_null))
+    {
         /*	clamp				(State.angular_vel.x,-10.f*PI_MUL_2,10.f*PI_MUL_2);
         clamp				(State.angular_vel.y,-10.f*PI_MUL_2,10.f*PI_MUL_2);
         clamp				(State.angular_vel.z,-10.f*PI_MUL_2,10.f*PI_MUL_2);*/
@@ -571,7 +573,8 @@ void CInventoryItem::net_Export_PH_Params(NET_Packet& P, SPHNetState& State, mas
         P.w_float(State.angular_vel.z);
     }
 
-    if (!(num_items.mask & CSE_ALifeInventoryItem::inventory_item_linear_null)) {
+    if (!(num_items.mask & CSE_ALifeInventoryItem::inventory_item_linear_null))
+    {
         /*clamp				(State.linear_vel.x,-32.f,32.f);
         clamp				(State.linear_vel.y,-32.f,32.f);
         clamp				(State.linear_vel.z,-32.f,32.f);*/
@@ -590,7 +593,8 @@ void CInventoryItem::net_Export_PH_Params(NET_Packet& P, SPHNetState& State, mas
 void CInventoryItem::net_Export(NET_Packet& P)
 {
     // copy from CPhysicObject
-    if (object().H_Parent() || IsGameTypeSingle()) {
+    if (object().H_Parent() || IsGameTypeSingle())
+    {
         P.w_u8(0);
         return;
     }
@@ -610,7 +614,8 @@ void CInventoryItem::net_Export(NET_Packet& P)
     R_ASSERT(temp < (u16(1) << 5));
     num_items.num_items = u8(temp);
 
-    if (State.enabled) num_items.mask |= CSE_ALifeInventoryItem::inventory_item_state_enabled;
+    if (State.enabled)
+        num_items.mask |= CSE_ALifeInventoryItem::inventory_item_state_enabled;
     if (fis_zero(State.angular_vel.square_magnitude()))
         num_items.mask |= CSE_ALifeInventoryItem::inventory_item_angular_null;
     if (fis_zero(State.linear_vel.square_magnitude()))
@@ -618,10 +623,11 @@ void CInventoryItem::net_Export(NET_Packet& P)
     // if (m_pPhysicsShell->PPhysicsShellAnimator())		{num_items.mask |= CSE_ALifeObjectPhysic::animated;}
 
     P.w_u8(num_items.common);
-    if (!num_items.common) {
+    if (!num_items.common)
+    {
 #ifdef DEBUG
         Msg("--- Number of sync items of inv item object is 0");
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
         return;
     }
 
@@ -631,12 +637,13 @@ void CInventoryItem::net_Export(NET_Packet& P)
     }*/
     net_Export_PH_Params(P, State, num_items);
 
-    if (object().PPhysicsShell() && object().PPhysicsShell()->isEnabled()) {
-        P.w_u8(1);  // not freezed
+    if (object().PPhysicsShell() && object().PPhysicsShell()->isEnabled())
+    {
+        P.w_u8(1); // not freezed
     }
     else
     {
-        P.w_u8(0);  // freezed
+        P.w_u8(0); // freezed
     }
 
     /*if (object().H_Parent() || IsGameTypeSingle())
@@ -736,9 +743,11 @@ void CInventoryItem::load(IReader& packet)
     //--	install_loaded_upgrades();
 
     u8 tmp = packet.r_u8();
-    if (!tmp) return;
+    if (!tmp)
+        return;
 
-    if (!object().PPhysicsShell()) {
+    if (!object().PPhysicsShell())
+    {
         object().setup_physic_shell();
         object().PPhysicsShell()->Disable();
     }
@@ -771,12 +780,12 @@ void CInventoryItem::PH_B_CrPr(){
     if (Level().InterpolationDisabled())
     {
         m_flags.set			(FInInterpolation, FALSE);
-//		m_bInInterpolation = false;
+    //		m_bInInterpolation = false;
     };*/
     ///////////////////////////////////////////////
 };
 
-void CInventoryItem::PH_I_CrPr()  // actions & operations between two phisic prediction steps
+void CInventoryItem::PH_I_CrPr() // actions & operations between two phisic prediction steps
     {
         /*net_updateData* p					= NetSync();
         //store recalculated data, then we able to restore it after small future prediction
@@ -832,16 +841,19 @@ void CInventoryItem::PH_Ch_CrPr(){
 
 void CInventoryItem::PH_A_CrPr()
 {
-    if (m_just_after_spawn) {
+    if (m_just_after_spawn)
+    {
         VERIFY(object().Visual());
         IKinematics* K = object().Visual()->dcast_PKinematics();
         VERIFY(K);
-        if (!object().PPhysicsShell()) {
+        if (!object().PPhysicsShell())
+        {
             Msg("! ERROR: PhysicsShell is NULL, object [%s][%d]", object().cName().c_str(), object().ID());
             VERIFY2(0, "physical shell is NULL");
             return;
         }
-        if (!object().PPhysicsShell()->isFullActive()) {
+        if (!object().PPhysicsShell()->isFullActive())
+        {
             K->CalculateBones_Invalidate();
             K->CalculateBones(TRUE);
         }
@@ -1103,17 +1115,20 @@ void CInventoryItem::Interpolate()
     {
         SPHNetState newState = p->NET_IItem.front().State;
 
-        if (p->NET_IItem.size() >= 2) {
+        if (p->NET_IItem.size() >= 2)
+        {
             float ret_interpolate = interpolate_states(p->NET_IItem.front(), p->NET_IItem.back(), newState);
             // Msg("Interpolation factor is %0.4f", ret_interpolate);
             // Msg("Current position is: x = %3.3f, y = %3.3f, z = %3.3f", newState.position.x, newState.position.y,
             // newState.position.z);
-            if (ret_interpolate >= 1.f) {
+            if (ret_interpolate >= 1.f)
+            {
                 p->NET_IItem.pop_front();
-                if (m_activated) {
+                if (m_activated)
+                {
 #ifdef DEBUG
                     Msg("Deactivating object [%d] after interpolation finish", object().ID());
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
                     object().processing_deactivate();
                     m_activated = false;
                 }
@@ -1128,12 +1143,14 @@ float CInventoryItem::interpolate_states(
     float ret_val = 0.f;
     u32 CurTime = Device.dwTimeGlobal;
 
-    if (CurTime == last.dwTimeStamp) return 0.f;
+    if (CurTime == last.dwTimeStamp)
+        return 0.f;
 
     float factor = float(CurTime - last.dwTimeStamp) / float(last.dwTimeStamp - first.dwTimeStamp);
 
     ret_val = factor;
-    if (factor > 1.f) {
+    if (factor > 1.f)
+    {
         factor = 1.f;
     }
     else if (factor < 0.f)
@@ -1164,35 +1181,16 @@ void CInventoryItem::reinit()
     m_ItemCurrPlace.type = eItemPlaceUndefined;
 }
 
-bool CInventoryItem::can_kill() const
-{
-    return (false);
-}
-
-CInventoryItem* CInventoryItem::can_kill(CInventory* inventory) const
-{
-    return (0);
-}
-
-const CInventoryItem* CInventoryItem::can_kill(const xr_vector<const CGameObject*>& items) const
-{
-    return (0);
-}
-
-CInventoryItem* CInventoryItem::can_make_killing(const CInventory* inventory) const
-{
-    return (0);
-}
-
-bool CInventoryItem::ready_to_kill() const
-{
-    return (false);
-}
-
+bool CInventoryItem::can_kill() const { return (false); }
+CInventoryItem* CInventoryItem::can_kill(CInventory* inventory) const { return (0); }
+const CInventoryItem* CInventoryItem::can_kill(const xr_vector<const CGameObject*>& items) const { return (0); }
+CInventoryItem* CInventoryItem::can_make_killing(const CInventory* inventory) const { return (0); }
+bool CInventoryItem::ready_to_kill() const { return (false); }
 void CInventoryItem::activate_physic_shell()
 {
     CEntityAlive* E = smart_cast<CEntityAlive*>(object().H_Parent());
-    if (!E) {
+    if (!E)
+    {
         on_activate_physic_shell();
         return;
     };
@@ -1204,18 +1202,23 @@ void CInventoryItem::activate_physic_shell()
 
 void CInventoryItem::UpdateXForm()
 {
-    if (0 == object().H_Parent()) return;
+    if (0 == object().H_Parent())
+        return;
 
     // Get access to entity and its visual
     CEntityAlive* E = smart_cast<CEntityAlive*>(object().H_Parent());
-    if (!E) return;
+    if (!E)
+        return;
 
-    if (E->cast_base_monster()) return;
+    if (E->cast_base_monster())
+        return;
 
     const CInventoryOwner* parent = smart_cast<const CInventoryOwner*>(E);
-    if (parent && parent->use_simplified_visual()) return;
+    if (parent && parent->use_simplified_visual())
+        return;
 
-    if (parent->attached(this)) return;
+    if (parent->attached(this))
+        return;
 
     R_ASSERT(E);
     IKinematics* V = smart_cast<IKinematics*>(E->Visual());
@@ -1224,7 +1227,8 @@ void CInventoryItem::UpdateXForm()
     // Get matrices
     int boneL = -1, boneR = -1, boneR2 = -1;
     E->g_WeaponBones(boneL, boneR, boneR2);
-    if (boneR == -1) return;
+    if (boneR == -1)
+        return;
 //	if ((HandDependence() == hd1Hand) || (STATE == eReload) || (!E->g_Alive()))
 //		boneL = boneR2;
 #pragma todo("TO ALL: serious performance problem")
@@ -1237,7 +1241,8 @@ void CInventoryItem::UpdateXForm()
     D.sub(mL.c, mR.c);
     D.normalize_safe();
 
-    if (fis_zero(D.magnitude())) {
+    if (fis_zero(D.magnitude()))
+    {
         mRes.set(E->XFORM());
         mRes.c.set(mR.c);
     }
@@ -1261,8 +1266,10 @@ void CInventoryItem::UpdateXForm()
 
 void CInventoryItem::OnRender()
 {
-    if (bDebug && object().Visual()) {
-        if (!(dbg_net_Draw_Flags.is_any(dbg_draw_invitem))) return;
+    if (bDebug && object().Visual())
+    {
+        if (!(dbg_net_Draw_Flags.is_any(dbg_draw_invitem)))
+            return;
 
         Fvector bc, bd;
         object().Visual()->getVisData().box.get_CD(bc, bd);
@@ -1354,12 +1361,16 @@ void CInventoryItem::modify_holder_params(float& range, float& fov) const
 
 bool CInventoryItem::NeedToDestroyObject() const
 {
-    if (GameID() == eGameIDSingle) return false;
+    if (GameID() == eGameIDSingle)
+        return false;
 
-    if (GameID() == eGameIDCaptureTheArtefact) return false;
+    if (GameID() == eGameIDCaptureTheArtefact)
+        return false;
 
-    if (object().Remote()) return false;
-    if (TimePassedAfterIndependant() > ITEM_REMOVE_TIME) return true;
+    if (object().Remote())
+        return false;
+    if (TimePassedAfterIndependant() > ITEM_REMOVE_TIME)
+        return true;
 
     return false;
 }
@@ -1376,7 +1387,8 @@ bool CInventoryItem::CanTrade() const
 {
     bool res = true;
 #pragma todo("Dima to Andy : why CInventoryItem::CanTrade can be called for the item, which doesn't have owner?")
-    if (m_pInventory) res = inventory_owner().AllowItemToTrade(this, m_ItemCurrPlace);
+    if (m_pInventory)
+        res = inventory_owner().AllowItemToTrade(this, m_ItemCurrPlace);
 
     return (res && m_flags.test(FCanTrade) && !IsQuestItem());
 }
@@ -1417,38 +1429,25 @@ Irect CInventoryItem::GetUpgrIconRect() const
     return Irect().set(x, y, w, h);
 }
 
-bool CInventoryItem::IsNecessaryItem(CInventoryItem* item)
-{
-    return IsNecessaryItem(item->object().cNameSect());
-};
-
-BOOL CInventoryItem::IsInvalid() const
-{
-    return object().getDestroy() || GetDropManual();
-}
-
-u16 CInventoryItem::object_id() const
-{
-    return object().ID();
-}
-
-u16 CInventoryItem::parent_id() const
-{
-    return (object().H_Parent()) ? object().H_Parent()->ID() : u16(-1);
-}
-
+bool CInventoryItem::IsNecessaryItem(CInventoryItem* item) { return IsNecessaryItem(item->object().cNameSect()); };
+BOOL CInventoryItem::IsInvalid() const { return object().getDestroy() || GetDropManual(); }
+u16 CInventoryItem::object_id() const { return object().ID(); }
+u16 CInventoryItem::parent_id() const { return (object().H_Parent()) ? object().H_Parent()->ID() : u16(-1); }
 void CInventoryItem::SetDropManual(BOOL val)
 {
     m_flags.set(FdropManual, val);
 
 #ifdef DEBUG
-    if (!IsGameTypeSingle()) {
-        if (!!m_name) {
+    if (!IsGameTypeSingle())
+    {
+        if (!!m_name)
+        {
             Msg("! WARNING: trying to set drop manual flag to item [%d][%s] to %d", object_id(), m_name.c_str(), val);
         }
     }
-#endif  // #ifdef DEBUG
-    if (!IsGameTypeSingle()) {
+#endif // #ifdef DEBUG
+    if (!IsGameTypeSingle())
+    {
         if (val == TRUE)
             DenyTrade();
         else
@@ -1456,7 +1455,4 @@ void CInventoryItem::SetDropManual(BOOL val)
     }
 }
 
-bool CInventoryItem::has_network_synchronization() const
-{
-    return false;
-}
+bool CInventoryItem::has_network_synchronization() const { return false; }

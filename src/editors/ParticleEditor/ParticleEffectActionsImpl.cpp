@@ -119,8 +119,10 @@ void EParticleAction::Load2(CInifile& ini, const shared_str& sect)
     for (PFloatMapIt f_it = floats.begin(); f_it != floats.end(); ++f_it, ++counter)
     {
         xr_sprintf(buff, sizeof(buff), "flt_%04d", counter);
-        if (ver == 0) {
-            if (ini.line_exist(sect.c_str(), buff)) f_it->second.val = ini.r_float(sect.c_str(), buff);
+        if (ver == 0)
+        {
+            if (ini.line_exist(sect.c_str(), buff))
+                f_it->second.val = ini.r_float(sect.c_str(), buff);
         }
         else
             f_it->second.val = ini.r_float(sect.c_str(), buff);
@@ -253,7 +255,8 @@ void EParticleAction::FillProp(PropItemVec& items, LPCSTR pref, u32 clr)
         break;
         case tpBool: V = PHelper().CreateBOOL(items, PrepareKey(pref, name).c_str(), &bools[o_it->name].val); break;
         }
-        if (V) V->Owner()->prop_color = clr;
+        if (V)
+            V->Owner()->prop_color = clr;
     }
     V = PHelper().CreateFlag32(items, PrepareKey(pref, "Draw").c_str(), &flags, flDraw);
     V->Owner()->prop_color = clr;
@@ -363,7 +366,8 @@ void pExplosion(IWriter& F, const Fvector& center, float velocity, float magnitu
     S.age = age;
     S.m_Flags.set(ParticleAction::ALLOW_ROTATE, allow_rotate);
 
-    if (S.epsilon < 0.0f) S.epsilon = EPS_L;
+    if (S.epsilon < 0.0f)
+        S.epsilon = EPS_L;
 
     F.w_u32(S.type);
     S.Save(F);
@@ -763,11 +767,7 @@ EPACopyVertexB::EPACopyVertexB() : EParticleAction(PAPI::PACopyVertexBID)
     appendBool("Copy Position", TRUE);
 }
 
-void EPACopyVertexB::Compile(IWriter& F)
-{
-    pCopyVertexB(F, _bool("Copy Position").val);
-}
-
+void EPACopyVertexB::Compile(IWriter& F) { pCopyVertexB(F, _bool("Copy Position").val); }
 EPADamping::EPADamping() : EParticleAction(PAPI::PADampingID)
 {
     actionType = "Damping";
@@ -777,11 +777,7 @@ EPADamping::EPADamping() : EParticleAction(PAPI::PADampingID)
     appendFloat("V High", P_MAXFLOAT, -P_MAXFLOAT, P_MAXFLOAT);
 }
 
-void EPADamping::Compile(IWriter& F)
-{
-    pDamping(F, _vector("Damping").val, _float("V Low").val, _float("V High").val);
-}
-
+void EPADamping::Compile(IWriter& F) { pDamping(F, _vector("Damping").val, _float("V Low").val, _float("V High").val); }
 EPAExplosion::EPAExplosion() : EParticleAction(PAPI::PAExplosionID)
 {
     actionType = "Explosion";
@@ -837,11 +833,7 @@ EPAGravity::EPAGravity() : EParticleAction(PAPI::PAGravityID)
     appendBool("Allow Rotate", TRUE);
 }
 
-void EPAGravity::Compile(IWriter& F)
-{
-    pGravity(F, _vector("Direction").val, _bool("Allow Rotate").val);
-}
-
+void EPAGravity::Compile(IWriter& F) { pGravity(F, _vector("Direction").val, _bool("Allow Rotate").val); }
 EPAJet::EPAJet() : EParticleAction(PAPI::PAJetID)
 {
     actionType = "Jet";
@@ -876,11 +868,7 @@ EPAKillOld::EPAKillOld() : EParticleAction(PAPI::PAKillOldID)
     appendBool("Kill Less Than", FALSE);
 }
 
-void EPAKillOld::Compile(IWriter& F)
-{
-    pKillOld(F, _float("Age Limit").val, _bool("Kill Less Than").val);
-}
-
+void EPAKillOld::Compile(IWriter& F) { pKillOld(F, _float("Age Limit").val, _bool("Kill Less Than").val); }
 EPAMatchVelocity::EPAMatchVelocity() : EParticleAction(PAPI::PAMatchVelocityID)
 {
     actionType = "MatchVelocity";
@@ -901,11 +889,7 @@ EPAMove::EPAMove() : EParticleAction(PAPI::PAMoveID)
     actionName = actionType;
 }
 
-void EPAMove::Compile(IWriter& F)
-{
-    pMove(F);
-}
-
+void EPAMove::Compile(IWriter& F) { pMove(F); }
 EPAOrbitLine::EPAOrbitLine() : EParticleAction(PAPI::PAOrbitLineID)
 {
     actionType = "OrbitLine";
@@ -1008,11 +992,7 @@ EPARestore::EPARestore() : EParticleAction(PAPI::PARestoreID)
     appendFloat("Time", 0.f, 0.0f, P_MAXFLOAT);
 }
 
-void EPARestore::Compile(IWriter& F)
-{
-    pRestore(F, _float("Time").val);
-}
-
+void EPARestore::Compile(IWriter& F) { pRestore(F, _float("Time").val); }
 EPAScatter::EPAScatter() : EParticleAction(PAPI::PAScatterID)
 {
     actionType = "Scatter";
@@ -1102,11 +1082,7 @@ EPASpeedLimit::EPASpeedLimit() : EParticleAction(PAPI::PASpeedLimitID)
     appendFloat("Max Speed", 15.0f, -P_MAXFLOAT, P_MAXFLOAT);
 }
 
-void EPASpeedLimit::Compile(IWriter& F)
-{
-    pSpeedLimit(F, _float("Min Speed").val, _float("Max Speed").val);
-}
-
+void EPASpeedLimit::Compile(IWriter& F) { pSpeedLimit(F, _float("Min Speed").val, _float("Max Speed").val); }
 EPATargetColor::EPATargetColor() : EParticleAction(PAPI::PATargetColorID)
 {
     actionType = "TargetColor";
@@ -1132,11 +1108,7 @@ EPATargetSize::EPATargetSize() : EParticleAction(PAPI::PATargetSizeID)
     appendVector("Scale", PVector::vNum, 1.f, 1.f, 0.f);
 }
 
-void EPATargetSize::Compile(IWriter& F)
-{
-    pTargetSize(F, _vector("Size").val, _vector("Scale").val);
-}
-
+void EPATargetSize::Compile(IWriter& F) { pTargetSize(F, _vector("Size").val, _vector("Scale").val); }
 EPATargetRotate::EPATargetRotate() : EParticleAction(PAPI::PATargetRotateID)
 {
     actionType = "TargetRotate";
@@ -1145,11 +1117,7 @@ EPATargetRotate::EPATargetRotate() : EParticleAction(PAPI::PATargetRotateID)
     appendFloat("Scale", 1.f, 0.0f, P_MAXFLOAT);
 }
 
-void EPATargetRotate::Compile(IWriter& F)
-{
-    pTargetRotate(F, _vector("Rotation").val, _float("Scale").val);
-}
-
+void EPATargetRotate::Compile(IWriter& F) { pTargetRotate(F, _vector("Rotation").val, _float("Scale").val); }
 EPATargetVelocity::EPATargetVelocity() : EParticleAction(PAPI::PATargetVelocityID)
 {
     actionType = "TargetVelocity";
@@ -1182,11 +1150,7 @@ void EPAVortex::Compile(IWriter& F)
         _float("Max Radius").val, _bool("Allow Rotate").val);
 }
 
-void EPAVortex::Render(const Fmatrix& parent)
-{
-    EParticleAction::Render(parent);
-}
-
+void EPAVortex::Render(const Fmatrix& parent) { EParticleAction::Render(parent); }
 EPATurbulence::EPATurbulence() : EParticleAction(PAPI::PATurbulenceID)
 {
     actionType = "Turbulence";
@@ -1207,7 +1171,8 @@ void EPATurbulence::Compile(IWriter& F)
 {
     pTurbulence(F, _float("Frequency").val, _int("Octaves").val, _float("Magnitude").val, _float("Delta").val,
         _vector("Movement").val);
-    if (nval != 0) {
+    if (nval != 0)
+    {
         for (int i = 0; i < detail; i++)
         {
             for (int j = 0; j < detail; j++)
@@ -1258,7 +1223,8 @@ void EPATurbulence::Render(const Fmatrix& parent)
 
     age += EDevice.fTimeDelta;
     // fill
-    if (nval == 0) {
+    if (nval == 0)
+    {
         nval = new float**[detail];
         for (i = 0; i < detail; i++)
         {
@@ -1302,8 +1268,10 @@ void EPATurbulence::Render(const Fmatrix& parent)
                 vec[2] = (((float)k / (float)detail) - 0.5) * 2.0 * draw_area;
 
                 clr.set(0, 0, 0, 0);
-                if (draw_p && draw_n) {
-                    if (nval[i][j][k] > 0.0) {
+                if (draw_p && draw_n)
+                {
+                    if (nval[i][j][k] > 0.0)
+                    {
                         clr.r = nval[i][j][k];
                         clr.a = nval[i][j][k];
                     }
@@ -1315,11 +1283,13 @@ void EPATurbulence::Render(const Fmatrix& parent)
                 }
                 else if (draw_p)
                 {
-                    if (nval[i][j][k] > 0.0) clr.set(nval[i][j][k]);
+                    if (nval[i][j][k] > 0.0)
+                        clr.set(nval[i][j][k]);
                 }
                 else if (draw_n)
                 {
-                    if (nval[i][j][k] < 0.0) clr.set(fabs(nval[i][j][k]));
+                    if (nval[i][j][k] < 0.0)
+                        clr.set(fabs(nval[i][j][k]));
                 }
                 pts.push_back(Stp(vec, clr));
             }
@@ -1340,7 +1310,8 @@ void PS::CPEDef::Render(const Fmatrix& parent)
     Fmatrix trans;
     trans.translate(parent.c);
     for (EPAVecIt it = m_EActionList.begin(); it != m_EActionList.end(); it++)
-        if ((*it)->flags.is(EParticleAction::flDraw | EParticleAction::flEnabled)) {
+        if ((*it)->flags.is(EParticleAction::flDraw | EParticleAction::flEnabled))
+        {
             PBool* ar = (*it)->_bool_safe("Allow Rotate");
             (*it)->Render((ar && ar->val) ? parent : trans);
         }

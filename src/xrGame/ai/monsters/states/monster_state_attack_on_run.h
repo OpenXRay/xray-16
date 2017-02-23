@@ -5,11 +5,7 @@
 
 #include "ai/weighted_random.h"
 
-inline TTime current_time()
-{
-    return Device.dwTimeGlobal;
-}
-
+inline TTime current_time() { return Device.dwTimeGlobal; }
 template <typename _Object>
 class CStateMonsterAttackOnRun : public CState<_Object>
 {
@@ -23,7 +19,6 @@ public:
     virtual void finalize();
     virtual void critical_finalize();
     virtual void remove_links(IGameObject* object) { inherited::remove_links(object); }
-
     virtual bool check_completion();
     virtual bool check_start_conditions();
 
@@ -42,7 +37,7 @@ private:
     {
         left = 0,
         right = 1
-    };  // coupled
+    }; // coupled
     aim_side m_attack_side;
     aim_side m_prepare_side;
     TTime m_prepare_side_chosen_time;
@@ -89,4 +84,4 @@ inline bool is_valid_point_to_move(Fvector const& point);
 
 #include "monster_state_attack_on_run_inline.h"
 
-#endif  // MONSTER_STATE_ATTACK_ON_RUN_H
+#endif // MONSTER_STATE_ATTACK_ON_RUN_H

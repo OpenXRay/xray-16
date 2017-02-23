@@ -40,15 +40,16 @@ static struct PPM_CONTEXT
 } * MinContext, *MaxContext;
 #pragma pack()
 
-static BYTE QTable[260];                // constants
-static PPM_CONTEXT::STATE* FoundState;  // found next state transition
+static BYTE QTable[260]; // constants
+static PPM_CONTEXT::STATE* FoundState; // found next state transition
 static int NumMasked, OrderFall, MaxOrder;
 static BYTE CharMask[256];
 
 inline PPM_CONTEXT* PPM_CONTEXT::createChild(STATE* pStats, STATE& FirstState)
 {
     PPM_CONTEXT* pc = (PPM_CONTEXT*)AllocContext();
-    if (pc) {
+    if (pc)
+    {
         memset(pc, 0, sizeof(PPM_CONTEXT));
         pc->oneState() = FirstState;
         pc->Suffix = this;
@@ -76,7 +77,8 @@ static void _FASTCALL StartModelRare(int MaxOrder)
     for (m = i = UP_FREQ, k = Step = 1; i < 260; i++)
     {
         QTable[i] = m;
-        if (!--k) {
+        if (!--k)
+        {
             k = ++Step;
             m++;
         }
@@ -88,11 +90,14 @@ static inline PPM_CONTEXT* CreateSuccessors(BOOL Skip, PPM_CONTEXT::STATE* p1)
     static PPM_CONTEXT::STATE UpState;
     PPM_CONTEXT *pc = MinContext, *UpBranch = FoundState->Successor;
     PPM_CONTEXT::STATE *p, *ps[MAX_O], **pps = ps;
-    if (!Skip) {
+    if (!Skip)
+    {
         *pps++ = FoundState;
-        if (!pc->Suffix) goto NO_LOOP;
+        if (!pc->Suffix)
+            goto NO_LOOP;
     }
-    if (p1) {
+    if (p1)
+    {
         p = p1;
         pc = pc->Suffix;
         goto LOOP_ENTRY;
@@ -100,8 +105,10 @@ static inline PPM_CONTEXT* CreateSuccessors(BOOL Skip, PPM_CONTEXT::STATE* p1)
     do
     {
         pc = pc->Suffix;
-        if (pc->NumStats) {
-            if ((p = pc->Stats)->Symbol != FoundState->Symbol) do
+        if (pc->NumStats)
+        {
+            if ((p = pc->Stats)->Symbol != FoundState->Symbol)
+                do
                 {
                     p++;
                 } while (p->Symbol != FoundState->Symbol);
@@ -109,21 +116,24 @@ static inline PPM_CONTEXT* CreateSuccessors(BOOL Skip, PPM_CONTEXT::STATE* p1)
         else
             p = &(pc->oneState());
     LOOP_ENTRY:
-        if (p->Successor != UpBranch) {
+        if (p->Successor != UpBranch)
+        {
             pc = p->Successor;
             break;
         }
         *pps++ = p;
     } while (pc->Suffix);
 NO_LOOP:
-    if (pps == ps) return pc;
+    if (pps == ps)
+        return pc;
     UpState.Symbol = *(BYTE*)UpBranch;
     UpState.Freq = UpState.Flag = 0;
     UpState.Successor = (PPM_CONTEXT*)(((BYTE*)UpBranch) + 1);
     do
     {
         pc = pc->createChild(*--pps, UpState);
-        if (!pc) return NULL;
+        if (!pc)
+            return NULL;
     } while (pps != ps);
     return pc;
 }
@@ -134,17 +144,23 @@ static inline void UpdateModel()
     fs = *FoundState;
     PPM_CONTEXT *pc, *Successor;
     UINT ns1;
-    if (!OrderFall) {
+    if (!OrderFall)
+    {
         MinContext = MaxContext = FoundState->Successor = CreateSuccessors(TRUE, p);
-        if (!MinContext) goto RESTART_MODEL;
+        if (!MinContext)
+            goto RESTART_MODEL;
         return;
     }
     *pText++ = fs.Symbol;
     Successor = (PPM_CONTEXT*)pText;
-    if (pText >= UnitsStart) goto RESTART_MODEL;
-    if (fs.Successor) {
-        if ((BYTE*)fs.Successor <= pText && (fs.Successor = CreateSuccessors(FALSE, p)) == NULL) goto RESTART_MODEL;
-        if (!--OrderFall) {
+    if (pText >= UnitsStart)
+        goto RESTART_MODEL;
+    if (fs.Successor)
+    {
+        if ((BYTE*)fs.Successor <= pText && (fs.Successor = CreateSuccessors(FALSE, p)) == NULL)
+            goto RESTART_MODEL;
+        if (!--OrderFall)
+        {
             Successor = fs.Successor;
             pText -= (MaxContext != MinContext);
         }
@@ -156,16 +172,20 @@ static inline void UpdateModel()
     }
     for (pc = MaxContext; pc != MinContext; pc = pc->Suffix)
     {
-        if ((ns1 = pc->NumStats) != 0) {
-            if ((ns1 & 1) != 0) {
+        if ((ns1 = pc->NumStats) != 0)
+        {
+            if ((ns1 & 1) != 0)
+            {
                 pc->Stats = (PPM_CONTEXT::STATE*)ExpandUnits(pc->Stats, (ns1 + 1) >> 1);
-                if (!pc->Stats) goto RESTART_MODEL;
+                if (!pc->Stats)
+                    goto RESTART_MODEL;
             }
         }
         else
         {
             p = (PPM_CONTEXT::STATE*)AllocUnits(1);
-            if (!p) goto RESTART_MODEL;
+            if (!p)
+                goto RESTART_MODEL;
             *p = pc->oneState();
             pc->Stats = p;
             pc->SummFreq = p->Freq;
@@ -197,7 +217,8 @@ inline void PPM_CONTEXT::encodeSymbol(int symbol)
 {
     STATE* p = Stats;
     for (int i = NumStats; p->Symbol != symbol; p++)
-        if (--i < 0) {
+        if (--i < 0)
+        {
             NumMasked = NumStats;
             FoundState = NULL;
             return;
@@ -230,7 +251,8 @@ static void EncodeFile2(FILE* DecodedFile)
             {
                 MinContext->EscFreq++;
                 MinContext = MinContext->Suffix;
-                if (!MinContext) goto STOP_ENCODING;
+                if (!MinContext)
+                    goto STOP_ENCODING;
             } while (MinContext->NumStats == NumMasked);
             MinContext->encodeSymbol(c);
         }
@@ -245,13 +267,15 @@ static void EncodeFile2(FILE* DecodedFile)
                 else
                     for (FoundState = MinContext->Stats; FoundState->Symbol != c; FoundState++)
                         ;
-                if (FoundState->Successor) {
+                if (FoundState->Successor)
+                {
                     MinContext = FoundState->Successor;
                     break;
                 }
             }
         MaxContext = MinContext;
-        if (((++NumBytes) & 0x7FFFF) == 0) PrintInfo(DecodedFile);
+        if (((++NumBytes) & 0x7FFFF) == 0)
+            PrintInfo(DecodedFile);
     }
 STOP_ENCODING:
     PrintInfo(DecodedFile);
@@ -275,7 +299,8 @@ static void EncodeFile1(FILE* DecodedFile)
             {
                 OrderFall++;
                 MinContext = MinContext->Suffix;
-                if (!MinContext) goto STOP_ENCODING;
+                if (!MinContext)
+                    goto STOP_ENCODING;
             } while (MinContext->NumStats == NumMasked);
             MinContext->encodeSymbol(c);
         }
@@ -285,7 +310,8 @@ static void EncodeFile1(FILE* DecodedFile)
             UpdateModel();
         else
             break;
-        if (((++NumBytes) & 0x3FFFF) == 0) PrintInfo(DecodedFile);
+        if (((++NumBytes) & 0x3FFFF) == 0)
+            PrintInfo(DecodedFile);
     }
 STOP_ENCODING:
     PrintInfo(DecodedFile);
@@ -294,8 +320,10 @@ STOP_ENCODING:
 }
 void PPM_CONTEXT::clean(int o, BOOL FreqsOnly)
 {
-    if (FreqsOnly) EscFreq = SummFreq = 0;
-    if (!NumStats) {
+    if (FreqsOnly)
+        EscFreq = SummFreq = 0;
+    if (!NumStats)
+    {
         if (o != MaxOrder && (BYTE*)oneState().Successor >= UnitsStart)
             oneState().Successor->clean(o + 1, FreqsOnly);
         else if ((BYTE*)oneState().Successor < UnitsStart || !FreqsOnly)
@@ -304,7 +332,8 @@ void PPM_CONTEXT::clean(int o, BOOL FreqsOnly)
     else
         for (STATE* p = Stats; p <= Stats + NumStats; p++)
         {
-            if (FreqsOnly) p->Freq = 0;
+            if (FreqsOnly)
+                p->Freq = 0;
             if (o != MaxOrder && (BYTE*)p->Successor >= UnitsStart)
                 p->Successor->clean(o + 1, FreqsOnly);
             else if ((BYTE*)p->Successor < UnitsStart || !FreqsOnly)
@@ -316,9 +345,12 @@ static const double MULT = 1.0 / log(2.0), COD_ERR = 0.02;
 inline double GetExtraBits(double f, double e, double f1, double sf1, double sf0, int ns)
 {
     double ExtraBits = f * log(f * (sf1 + f1 + f) / ((e + f) * double(f1 + f)));
-    if (e) ExtraBits += e * log(e * (sf1 + f1 + f) / (sf1 * (e + f)));
-    if (sf0 != e) ExtraBits += (sf0 - e) * log((sf0 + f) / sf0);
-    if (f1) ExtraBits -= f1 * log((f1 + f) / f1);
+    if (e)
+        ExtraBits += e * log(e * (sf1 + f1 + f) / (sf1 * (e + f)));
+    if (sf0 != e)
+        ExtraBits += (sf0 - e) * log((sf0 + f) / sf0);
+    if (f1)
+        ExtraBits -= f1 * log((f1 + f) / f1);
     ExtraBits *= MULT;
     if (ns)
         ExtraBits += COD_ERR * f;
@@ -332,19 +364,24 @@ PPM_CONTEXT* PPM_CONTEXT::cutOff(int o, int ob, double b)
     STATE tmp, *p, *p1;
     int ns = NumStats;
     double sf0, sf1, ExtraBits;
-    if (o < ob) {
-        if (!ns) {
-            if ((p = &oneState())->Successor) p->Successor = p->Successor->cutOff(o + 1, ob, b);
+    if (o < ob)
+    {
+        if (!ns)
+        {
+            if ((p = &oneState())->Successor)
+                p->Successor = p->Successor->cutOff(o + 1, ob, b);
         }
         else
             for (p = Stats + ns; p >= Stats; p--)
-                if (p->Successor) p->Successor = p->Successor->cutOff(o + 1, ob, b);
+                if (p->Successor)
+                    p->Successor = p->Successor->cutOff(o + 1, ob, b);
         return this;
     }
     else if (!ns)
     {
         p = &oneState();
-        if (!Suffix->NumStats) {
+        if (!Suffix->NumStats)
+        {
             sf0 = (p1 = &(Suffix->oneState()))->Freq + (sf1 = Suffix->EscFreq);
         }
         else
@@ -354,9 +391,11 @@ PPM_CONTEXT* PPM_CONTEXT::cutOff(int o, int ob, double b)
             sf0 = Suffix->SummFreq + Suffix->EscFreq;
             sf1 = sf0 - p1->Freq;
         }
-        if (!p->Successor && !p->Flag) {
+        if (!p->Successor && !p->Flag)
+        {
             ExtraBits = GetExtraBits(p->Freq, EscFreq, p1->Freq, sf1, sf0, 0);
-            if (ExtraBits < b || 4 * p->Freq < EscFreq) {
+            if (ExtraBits < b || 4 * p->Freq < EscFreq)
+            {
                 if (!Suffix->NumStats)
                     Suffix->oneState().Freq += p->Freq;
                 else
@@ -377,15 +416,18 @@ PPM_CONTEXT* PPM_CONTEXT::cutOff(int o, int ob, double b)
         CharMask[p->Symbol] = 1;
     sf0 = Suffix->SummFreq + (sf1 = Suffix->EscFreq);
     for (p1 = Suffix->Stats + Suffix->NumStats; p1 >= Suffix->Stats; p1--)
-        if (!CharMask[p1->Symbol]) sf1 += p1->Freq;
+        if (!CharMask[p1->Symbol])
+            sf1 += p1->Freq;
     for (p = Stats + ns; p >= Stats; p--)
     {
         CharMask[p->Symbol] = 0;
-        if (p->Flag || p->Successor) continue;
+        if (p->Flag || p->Successor)
+            continue;
         for (p1 = Suffix->Stats; p->Symbol != p1->Symbol; p1++)
             ;
         ExtraBits = GetExtraBits(p->Freq, EscFreq, p1->Freq, sf1, sf0, ns);
-        if (ExtraBits < b || 64 * p->Freq * (ns + 1) < SummFreq) {
+        if (ExtraBits < b || 64 * p->Freq * (ns + 1) < SummFreq)
+        {
             SummFreq -= p->Freq;
             EscFreq += p->Freq;
             p1->Freq += p->Freq;
@@ -405,10 +447,12 @@ PPM_CONTEXT* PPM_CONTEXT::cutOff(int o, int ob, double b)
         p1->Flag = 1;
     }
     NumStats = ns;
-    if (ns < 0) return NULL;
+    if (ns < 0)
+        return NULL;
     SizeOfModel += 1 + 2 * (ns + 1);
     nc++;
-    if (ns == 0) {
+    if (ns == 0)
+    {
         tmp = Stats[0];
         oneState() = tmp;
     }
@@ -418,27 +462,33 @@ void PPM_CONTEXT::write(int o, FILE* fp)
 {
     STATE* p;
     int f, a, b, c;
-    if ((int)nc < o) nc = o;
+    if ((int)nc < o)
+        nc = o;
     putc(NumStats, fp);
-    if (!NumStats) {
+    if (!NumStats)
+    {
         f = (p = &oneState())->Freq;
-        if (EscFreq) f = (2 * f) / EscFreq;
+        if (EscFreq)
+            f = (2 * f) / EscFreq;
         f = CLAMP(f, 1, 127) | 0x80 * (p->Successor != NULL);
         putc(f, fp);
         putc(p->Symbol, fp);
-        if (p->Successor) p->Successor->write(o + 1, fp);
+        if (p->Successor)
+            p->Successor->write(o + 1, fp);
         return;
     }
     for (p = Stats + 1; p <= Stats + NumStats; p++)
     {
-        if (p[0].Freq > p[-1].Freq) {
+        if (p[0].Freq > p[-1].Freq)
+        {
             STATE* p1 = p;
             do
             {
                 SWAP(p1[0], p1[-1]);
             } while (--p1 != Stats && p1[0].Freq > p1[-1].Freq);
         }
-        if (p[0].Freq == p[-1].Freq && p[0].Successor && !p[-1].Successor) {
+        if (p[0].Freq == p[-1].Freq && p[0].Successor && !p[-1].Successor)
+        {
             STATE* p1 = p;
             do
             {
@@ -455,28 +505,35 @@ void PPM_CONTEXT::write(int o, FILE* fp)
     {
         f = (64 * p->Freq + b) / a;
         f += !f;
-        if (p != Stats) putc((c - f) | 0x80 * (p->Successor != NULL), fp);
+        if (p != Stats)
+            putc((c - f) | 0x80 * (p->Successor != NULL), fp);
         c = f;
         putc(p->Symbol, fp);
     }
     for (p = Stats; p <= Stats + NumStats; p++)
-        if (p->Successor) p->Successor->write(o + 1, fp);
+        if (p->Successor)
+            p->Successor->write(o + 1, fp);
 }
 void PPM_CONTEXT::write(int o, FILE* fp1, FILE* fp2, FILE* fp3)
 {
     STATE *p, *p1;
     int f, a, b, c, d;
-    if (!NumStats) {
+    if (!NumStats)
+    {
         f = (p = &oneState())->Freq;
-        if (EscFreq) f = (2 * f) / EscFreq;
+        if (EscFreq)
+            f = (2 * f) / EscFreq;
         putc(QTable[CLAMP(f, 1, 196) - 1] | 0x80, fp1);
-        if (Suffix->NumStats) {
+        if (Suffix->NumStats)
+        {
             for (p1 = Suffix->Stats, d = 0; p1->Symbol != p->Symbol; p1++, d++)
                 ;
             putc(d, fp2);
         }
-        if (o < MaxOrder) putc(p->Successor != NULL, fp3);
-        if (p->Successor) p->Successor->write(o + 1, fp1, fp2, fp3);
+        if (o < MaxOrder)
+            putc(p->Successor != NULL, fp3);
+        if (p->Successor)
+            p->Successor->write(o + 1, fp1, fp2, fp3);
         return;
     }
     a = Stats->Freq + !Stats->Freq;
@@ -488,7 +545,8 @@ void PPM_CONTEXT::write(int o, FILE* fp1, FILE* fp2, FILE* fp3)
     {
         f = (64 * p->Freq + b) / a;
         f += !f;
-        if (p != Stats) putc(c - f, fp1);
+        if (p != Stats)
+            putc(c - f, fp1);
         c = f;
         if (!Suffix)
             putc(p->Symbol, fp2);
@@ -499,10 +557,12 @@ void PPM_CONTEXT::write(int o, FILE* fp1, FILE* fp2, FILE* fp3)
             putc(d, fp2);
             CharMask[p->Symbol] = 1;
         }
-        if (o < MaxOrder) putc(p->Successor != NULL, fp3);
+        if (o < MaxOrder)
+            putc(p->Successor != NULL, fp3);
     }
     for (p = Stats; p <= Stats + NumStats; p++)
-        if (p->Successor) p->Successor->write(o + 1, fp1, fp2, fp3);
+        if (p->Successor)
+            p->Successor->write(o + 1, fp1, fp2, fp3);
 }
 void ShrinkModel(int MaxSize)
 {
@@ -515,12 +575,14 @@ void ShrinkModel(int MaxSize)
         for (int i = MaxOrder; i > 0; i--)
             MaxContext->cutOff(0, i, b);
         printf("SizeOfModel: %7lu bytes, nc: %7lu\n", SizeOfModel, nc);
-        if (MaxSize >= (int)SizeOfModel) break;
+        if (MaxSize >= (int)SizeOfModel)
+            break;
         s0 = s1;
         b0 = b1;
         s1 = SizeOfModel;
         b1 = b;
-        if (!k) {
+        if (!k)
+        {
             b++;
             continue;
         }
@@ -532,8 +594,10 @@ void ShrinkModel(int MaxSize)
             b = 2.0 * b1;
         else if (b < 0.5 * b1)
             b = 0.5 * b1;
-        if (s1 < 1.25 * MaxSize) b = 0.5 * b + 0.5 * b1;
-        if (b - b1 < 0.01) b = b1 + 0.01;
+        if (s1 < 1.25 * MaxSize)
+            b = 0.5 * b + 0.5 * b1;
+        if (b - b1 < 0.01)
+            b = b1 + 0.01;
     }
 }
 void _STDCALL EncodeFile(FILE* DecodedFile, int MaxOrder, int MaxSize)
@@ -627,7 +691,8 @@ int MakePPMDictionaryFromFile(FILE* raw_bins_file_src)
 int MakePPMDictionary(char const* file_name)
 {
     FILE* fpIn = fopen(file_name, "rb");
-    if (!fpIn) return 1;
+    if (!fpIn)
+        return 1;
     MakePPMDictionaryFromFile(fpIn);
     fclose(fpIn);
     return 0;

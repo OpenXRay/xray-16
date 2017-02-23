@@ -18,18 +18,10 @@ CParticleMain*& PUI = (CParticleMain*)UI;
 
 //---------------------------------------------------------------------------
 
-CParticleMain::CParticleMain()
-{
-    EPrefs = new CCustomPreferences();
-}
-
+CParticleMain::CParticleMain() { EPrefs = new CCustomPreferences(); }
 //---------------------------------------------------------------------------
 
-CParticleMain::~CParticleMain()
-{
-    xr_delete(EPrefs);
-}
-
+CParticleMain::~CParticleMain() { xr_delete(EPrefs); }
 //---------------------------------------------------------------------------
 
 CCommandVar CParticleTool::CommandSelectPreviewObj(CCommandVar p1, CCommandVar p2)
@@ -54,7 +46,8 @@ CCommandVar CParticleTool::CommandSaveXR(CCommandVar p1, CCommandVar p2)
 CCommandVar CParticleTool::CommandLoadXR(CCommandVar p1, CCommandVar p2)
 {
     xr_string temp_fn;
-    if (EFS.GetOpenName("$game_data$", temp_fn, false, NULL, 0)) {
+    if (EFS.GetOpenName("$game_data$", temp_fn, false, NULL, 0))
+    {
         ::Render->PSLibrary.OnDestroy();
         ::Render->PSLibrary.Load(temp_fn.c_str());
         ResetCurrent();
@@ -79,7 +72,8 @@ CCommandVar CParticleTool::CommandSaveBackup(CCommandVar p1, CCommandVar p2)
 
 CCommandVar CParticleTool::CommandReload(CCommandVar p1, CCommandVar p2)
 {
-    if (!IfModified()) return FALSE;
+    if (!IfModified())
+        return FALSE;
     Reload();
     ExecCommand(COMMAND_UPDATE_CAPTION);
     return TRUE;
@@ -184,11 +178,7 @@ void CParticleMain::RegisterCommands()
         CParticleTool::CreateGroupFromSelected, true);
 }
 
-char* CParticleMain::GetCaption()
-{
-    return "particles";
-}
-
+char* CParticleMain::GetCaption() { return "particles"; }
 bool __fastcall CParticleMain::ApplyShortCut(WORD Key, TShiftState Shift)
 {
     return inherited::ApplyShortCut(Key, Shift);
@@ -203,11 +193,7 @@ bool __fastcall CParticleMain::ApplyGlobalShortCut(WORD Key, TShiftState Shift)
 
 //---------------------------------------------------------------------------
 
-void CParticleMain::RealUpdateScene()
-{
-    inherited::RealUpdateScene();
-}
-
+void CParticleMain::RealUpdateScene() { inherited::RealUpdateScene(); }
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
@@ -216,7 +202,8 @@ void CParticleMain::RealUpdateScene()
 void CParticleMain::ResetStatus()
 {
     VERIFY(m_bReady);
-    if (fraBottomBar->paStatus->Caption != "") {
+    if (fraBottomBar->paStatus->Caption != "")
+    {
         fraBottomBar->paStatus->Caption = "";
         fraBottomBar->paStatus->Repaint();
     }
@@ -225,18 +212,16 @@ void CParticleMain::ResetStatus()
 void CParticleMain::SetStatus(LPSTR s, bool bOutLog)
 {
     VERIFY(m_bReady);
-    if (fraBottomBar->paStatus->Caption != s) {
+    if (fraBottomBar->paStatus->Caption != s)
+    {
         fraBottomBar->paStatus->Caption = s;
         fraBottomBar->paStatus->Repaint();
-        if (bOutLog && s && s[0]) ELog.Msg(mtInformation, s);
+        if (bOutLog && s && s[0])
+            ELog.Msg(mtInformation, s);
     }
 }
 
-void CParticleMain::ProgressDraw()
-{
-    fraBottomBar->RedrawBar();
-}
-
+void CParticleMain::ProgressDraw() { fraBottomBar->RedrawBar(); }
 //---------------------------------------------------------------------------
 void CParticleMain::OutCameraPos()
 {
@@ -273,15 +258,7 @@ void CParticleMain::OutGridSize()
 }
 
 //---------------------------------------------------------------------------
-void CParticleMain::OutInfo()
-{
-    fraBottomBar->paSel->Caption = Tools->GetInfo();
-}
-
+void CParticleMain::OutInfo() { fraBottomBar->paSel->Caption = Tools->GetInfo(); }
 //---------------------------------------------------------------------------
-void CParticleMain::RealQuit()
-{
-    frmMain->Close();
-}
-
+void CParticleMain::RealQuit() { frmMain->Close(); }
 //---------------------------------------------------------------------------

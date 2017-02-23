@@ -10,8 +10,9 @@ void xrServer::Process_update(NET_Packet& P, ClientID sender)
     R_ASSERT2(CL, "Process_update client not found");
 
 #ifndef MASTER_GOLD
-    if (g_Dump_Update_Read) Msg("---- UPDATE_Read --- ");
-#endif  // #ifndef MASTER_GOLD
+    if (g_Dump_Update_Read)
+        Msg("---- UPDATE_Read --- ");
+#endif // #ifndef MASTER_GOLD
 
     R_ASSERT(CL->flags.bLocal);
     // while has information
@@ -26,14 +27,17 @@ void xrServer::Process_update(NET_Packet& P, ClientID sender)
         u32 _pos = P.r_tell();
         CSE_Abstract* E = ID_to_entity(ID);
 
-        if (E) {
+        if (E)
+        {
             // Msg				("sv_import: %d '%s'",E->ID,E->name_replace());
             E->net_Ready = TRUE;
             E->UPDATE_Read(P);
 
-            if (g_Dump_Update_Read) Msg("* %s : %d - %d", E->name(), size, P.r_tell() - _pos);
+            if (g_Dump_Update_Read)
+                Msg("* %s : %d - %d", E->name(), size, P.r_tell() - _pos);
 
-            if ((P.r_tell() - _pos) != size) {
+            if ((P.r_tell() - _pos) != size)
+            {
                 string16 tmp;
                 CLSID2TEXT(E->m_tClassID, tmp);
                 xrDebug::Fatal(DEBUG_INFO,
@@ -45,8 +49,9 @@ void xrServer::Process_update(NET_Packet& P, ClientID sender)
             P.r_advance(size);
     }
 #ifndef MASTER_GOLD
-    if (g_Dump_Update_Read) Msg("-------------------- ");
-#endif  // #ifndef MASTER_GOLD
+    if (g_Dump_Update_Read)
+        Msg("-------------------- ");
+#endif // #ifndef MASTER_GOLD
 }
 
 void xrServer::Process_save(NET_Packet& P, ClientID sender)
@@ -68,7 +73,8 @@ void xrServer::Process_save(NET_Packet& P, ClientID sender)
         s32 _pos_start = P.r_tell();
         CSE_Abstract* E = ID_to_entity(ID);
 
-        if (E) {
+        if (E)
+        {
             E->net_Ready = TRUE;
             E->load(P);
         }
@@ -76,7 +82,8 @@ void xrServer::Process_save(NET_Packet& P, ClientID sender)
             P.r_advance(size);
         s32 _pos_end = P.r_tell();
         s32 _size = size;
-        if (_size != (_pos_end - _pos_start)) {
+        if (_size != (_pos_end - _pos_start))
+        {
             Msg("! load/save mismatch, object: '%s'", E ? E->name_replace() : "unknown");
             s32 _rollback = _pos_start + _size;
             P.r_seek(_rollback);

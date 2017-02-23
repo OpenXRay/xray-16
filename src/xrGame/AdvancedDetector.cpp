@@ -5,15 +5,8 @@
 #include "player_hud.h"
 #include "game_object_space.h"
 
-CAdvancedDetector::CAdvancedDetector()
-{
-    m_artefacts.m_af_rank = 2;
-}
-
-CAdvancedDetector::~CAdvancedDetector()
-{
-}
-
+CAdvancedDetector::CAdvancedDetector() { m_artefacts.m_af_rank = 2; }
+CAdvancedDetector::~CAdvancedDetector() {}
 void CAdvancedDetector::CreateUI()
 {
     R_ASSERT(NULL == m_ui);
@@ -21,15 +14,12 @@ void CAdvancedDetector::CreateUI()
     ui().construct(this);
 }
 
-CUIArtefactDetectorAdv& CAdvancedDetector::ui()
-{
-    return *((CUIArtefactDetectorAdv*)m_ui);
-}
-
+CUIArtefactDetectorAdv& CAdvancedDetector::ui() { return *((CUIArtefactDetectorAdv*)m_ui); }
 void CAdvancedDetector::UpdateAf()
 {
     ui().SetValue(0.0f, Fvector().set(0, 0, 0));
-    if (m_artefacts.m_ItemInfos.size() == 0) return;
+    if (m_artefacts.m_ItemInfos.size() == 0)
+        return;
 
     CAfList::ItemsMapIt it_b = m_artefacts.m_ItemInfos.begin();
     CAfList::ItemsMapIt it_e = m_artefacts.m_ItemInfos.end();
@@ -37,19 +27,23 @@ void CAdvancedDetector::UpdateAf()
     float min_dist = flt_max;
 
     Fvector detector_pos = Position();
-    for (; it_b != it_e; ++it_b)  // only nearest
+    for (; it_b != it_e; ++it_b) // only nearest
     {
         CArtefact* pAf = it_b->first;
-        if (pAf->H_Parent()) continue;
+        if (pAf->H_Parent())
+            continue;
 
         float d = detector_pos.distance_to(pAf->Position());
-        if (d < min_dist) {
+        if (d < min_dist)
+        {
             min_dist = d;
             it = it_b;
         }
 
-        if (pAf->CanBeInvisible()) {
-            if (d < m_fAfVisRadius) pAf->SwitchVisibility(true);
+        if (pAf->CanBeInvisible())
+        {
+            if (d < m_fAfVisRadius)
+                pAf->SwitchVisibility(true);
         }
     }
 
@@ -78,10 +72,12 @@ void CAdvancedDetector::UpdateAf()
 
     float snd_freq = min_snd_freq + (max_snd_freq - min_snd_freq) * (1.0f - fRelPow);
 
-    if (af_info.snd_time > af_info.cur_period) {
+    if (af_info.snd_time > af_info.cur_period)
+    {
         af_info.snd_time = 0;
         HUD_SOUND_ITEM::PlaySound(item_type->detect_snds, Fvector().set(0, 0, 0), this, true, false);
-        if (item_type->detect_snds.m_activeSnd) item_type->detect_snds.m_activeSnd->snd.set_frequency(snd_freq);
+        if (item_type->detect_snds.m_activeSnd)
+            item_type->detect_snds.m_activeSnd->snd.set_frequency(snd_freq);
     }
     else
         af_info.snd_time += Device.fTimeDelta;
@@ -98,26 +94,22 @@ void CUIArtefactDetectorAdv::construct(CAdvancedDetector* p)
     m_bid = u16(-1);
 }
 
-CUIArtefactDetectorAdv::~CUIArtefactDetectorAdv()
-{
-}
-
-void CUIArtefactDetectorAdv::SetValue(const float val1, const Fvector& val2)
-{
-    m_target_dir = val2;
-}
-
+CUIArtefactDetectorAdv::~CUIArtefactDetectorAdv() {}
+void CUIArtefactDetectorAdv::SetValue(const float val1, const Fvector& val2) { m_target_dir = val2; }
 void CUIArtefactDetectorAdv::update()
 {
-    if (NULL == m_parent->HudItemData() || m_bid == u16(-1)) return;
+    if (NULL == m_parent->HudItemData() || m_bid == u16(-1))
+        return;
     inherited::update();
     attachable_hud_item* itm = m_parent->HudItemData();
     R_ASSERT(itm);
 
     BOOL b_visible = !fis_zero(m_target_dir.magnitude());
-    if (b_visible != itm->m_model->LL_GetBoneVisible(m_bid)) itm->m_model->LL_SetBoneVisible(m_bid, b_visible, TRUE);
+    if (b_visible != itm->m_model->LL_GetBoneVisible(m_bid))
+        itm->m_model->LL_SetBoneVisible(m_bid, b_visible, TRUE);
 
-    if (!b_visible) return;
+    if (!b_visible)
+        return;
 
     Fvector dest;
     Fmatrix Mi;

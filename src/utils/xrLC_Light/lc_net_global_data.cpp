@@ -5,10 +5,7 @@
 // void  DataReadCreate( LPCSTR fn );
 
 // void decompress( LPCSTR f_in_out );
-void DataReadCreate(LPCSTR fn)
-{
-}
-
+void DataReadCreate(LPCSTR fn) {}
 namespace lc_net
 {
 void net_global_data_impl<gl_cl_data>::create_data_file(LPCSTR path)

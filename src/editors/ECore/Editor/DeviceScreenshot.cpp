@@ -8,7 +8,8 @@
 
 bool CEditorRenderDevice::MakeScreenshot(U32Vec& pixels, u32 width, u32 height)
 {
-    if (!b_is_Ready) return false;
+    if (!b_is_Ready)
+        return false;
 
     // free managed resource
     Resources->Evict();

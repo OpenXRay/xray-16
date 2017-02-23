@@ -14,7 +14,8 @@ xrIDirect3DVertexShader9::xrIDirect3DVertexShader9(IDirect3DDevice9* pIDirect3DD
 HRESULT xrIDirect3DVertexShader9::QueryInterface(REFIID riid, void** ppvObj)
 {
     APIDEBUG("xrIDirect3DVertexShader9::QueryInterface");
-    if (riid == IID_IUnknown || riid == IID_IDirect3DVertexShader9) {
+    if (riid == IID_IUnknown || riid == IID_IDirect3DVertexShader9)
+    {
         *ppvObj = this;
         AddRef();
         return NOERROR;
@@ -33,7 +34,8 @@ ULONG xrIDirect3DVertexShader9::Release()
 {
     APIDEBUG("xrIDirect3DVertexShader9::Release");
     m_refCount--;
-    if (m_refCount < 0) {
+    if (m_refCount < 0)
+    {
         delete this;
         return -1;
     }

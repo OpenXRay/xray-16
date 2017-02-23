@@ -2,10 +2,10 @@
 
 #ifdef XRGAME_EXPORTS
 #include "ui/xrUIXmlParser.h"
-#else  // XRGAME_EXPORTS
+#else // XRGAME_EXPORTS
 #include "xrUIXmlParser.h"
 #include "Common/object_broker.h"
-#endif  // XRGAME_EXPORTS
+#endif // XRGAME_EXPORTS
 
 // T_ID    - уникальный текстовый идентификатор (аттрибут id в XML файле)
 // T_INDEX - уникальный числовой индекс
@@ -63,7 +63,6 @@ public:
     }
 
     static const int GetMaxIndex() { return m_pItemDataVector->size() - 1; }
-
     //удаление статичекого массива
     static void DeleteIdToIndexData();
 };
@@ -77,15 +76,9 @@ TEMPLATE_SPECIALIZATION
 LPCSTR CSXML_IdToIndex::tag_name = NULL;
 
 TEMPLATE_SPECIALIZATION
-CSXML_IdToIndex::CXML_IdToIndex()
-{
-}
-
+CSXML_IdToIndex::CXML_IdToIndex() {}
 TEMPLATE_SPECIALIZATION
-CSXML_IdToIndex::~CXML_IdToIndex()
-{
-}
-
+CSXML_IdToIndex::~CXML_IdToIndex() {}
 TEMPLATE_SPECIALIZATION
 const typename ITEM_DATA* CSXML_IdToIndex::GetById(const shared_str& str_id, bool no_assert)
 {
@@ -93,10 +86,12 @@ const typename ITEM_DATA* CSXML_IdToIndex::GetById(const shared_str& str_id, boo
     T_VECTOR::iterator it;
     for (it = m_pItemDataVector->begin(); m_pItemDataVector->end() != it; it++)
     {
-        if ((*it).id == str_id) break;
+        if ((*it).id == str_id)
+            break;
     }
 
-    if (it == m_pItemDataVector->end()) {
+    if (it == m_pItemDataVector->end())
+    {
         int i = 0;
         for (it = m_pItemDataVector->begin(); m_pItemDataVector->end() != it; it++, i++)
             Msg("[%d]=[%s]", i, *(*it).id);
@@ -111,7 +106,8 @@ const typename ITEM_DATA* CSXML_IdToIndex::GetById(const shared_str& str_id, boo
 TEMPLATE_SPECIALIZATION
 const typename ITEM_DATA* CSXML_IdToIndex::GetByIndex(int index, bool no_assert)
 {
-    if ((size_t)index >= m_pItemDataVector->size()) {
+    if ((size_t)index >= m_pItemDataVector->size())
+    {
         R_ASSERT3(no_assert, "item by index not found in files", file_str);
         return NULL;
     }
@@ -166,7 +162,8 @@ typename void CSXML_IdToIndex::InitInternal()
             T_VECTOR::iterator t_it = m_pItemDataVector->begin();
             for (; m_pItemDataVector->end() != t_it; t_it++)
             {
-                if (shared_str((*t_it).id) == shared_str(item_name)) break;
+                if (shared_str((*t_it).id) == shared_str(item_name))
+                    break;
             }
 
             R_ASSERT3(m_pItemDataVector->end() == t_it, "duplicate item id", item_name);
@@ -181,7 +178,8 @@ typename void CSXML_IdToIndex::InitInternal()
 
             index++;
         }
-        if (0 == items_num) delete_data(uiXml);
+        if (0 == items_num)
+            delete_data(uiXml);
     }
 }
 

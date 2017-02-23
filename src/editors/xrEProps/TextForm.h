@@ -27,8 +27,8 @@ typedef fastdelegate::FastDelegate3<const AnsiString&, AnsiString&, bool&> TOnCo
 
 class XR_EPROPS_API TfrmText : public TForm
 {
-    __published :  // IDE-managed Components
-                   TPanel* paBottomBar;
+    __published : // IDE-managed Components
+                  TPanel* paBottomBar;
     TExtBtn* ebOk;
     TExtBtn* ebCancel;
     TFormStorage* fsStorage;
@@ -56,21 +56,21 @@ class XR_EPROPS_API TfrmText : public TForm
     void __fastcall FormActivate(TObject* Sender);
     void __fastcall FormDeactivate(TObject* Sender);
 
-  private:  // User declarations
+private: // User declarations
     AnsiString* m_Text;
     TOnApplyClick OnApplyClick;
     TOnCloseClick OnCloseClick;
     TOnCodeInsight OnCodeInsight;
     void OutLineNumber();
 
-  public:  // User declarations
+public: // User declarations
     enum
     {
         flReadOnly = (1 << 0),
         flOurPPMenu = (1 << 1),
     };
 
-  public:
+public:
     __fastcall TfrmText(TComponent* Owner);
     static TfrmText* __fastcall CreateForm(AnsiString& text, LPCSTR caption = "Text", u32 flags = 0, int lim = 0,
         LPCSTR apply_name = "Apply", TOnApplyClick on_apply = 0, TOnCloseClick on_close = 0,

@@ -14,15 +14,15 @@
 public
 ref class property_boolean_reference : public XRay::SdkControls::IProperty
 {
-  public:
+public:
     property_boolean_reference(bool& value);
     virtual ~property_boolean_reference();
     !property_boolean_reference();
     virtual System::Object ^ GetValue();
     virtual void SetValue(System::Object ^ object);
 
-  private:
+private:
     value_holder<bool>* m_value;
-};  // ref class property_boolean
+}; // ref class property_boolean
 
-#endif  // ifndef PROPERTY_BOOLEAN_REFERENCE_HPP_INCLUDED
+#endif // ifndef PROPERTY_BOOLEAN_REFERENCE_HPP_INCLUDED

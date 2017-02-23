@@ -18,14 +18,8 @@ namespace inventory
 {
 namespace upgrade
 {
-Property::Property()
-{
-}
-
-Property::~Property()
-{
-}
-
+Property::Property() {}
+Property::~Property() {}
 void Property::construct(shared_str const& property_id, Manager& manager_r)
 {
     m_id._set(property_id);
@@ -41,7 +35,7 @@ void Property::construct(shared_str const& property_id, Manager& manager_r)
     m_desc.parameter2 = id_str();
     R_ASSERT2(ai().script_engine().functor(functor_str, m_desc.functr),
         make_string("Failed to get upgrade property functor in section[%s], functor[%s]", id_str(), functor_str));
-    m_desc();  // test
+    m_desc(); // test
 
     LPCSTR funct_params_str = pSettings->r_string(id(), "params");
     u32 const buffer_size = (xr_strlen(funct_params_str) + 1) * sizeof(char);
@@ -58,13 +52,14 @@ bool Property::run_functor(LPCSTR parameter, string256& result)
     result[0] = 0;
 
     m_desc.parameter = parameter;
-    LPCSTR functor_res = m_desc();  // execute !!!
-    if (!functor_res || !xr_strcmp(functor_res, "")) {
+    LPCSTR functor_res = m_desc(); // execute !!!
+    if (!functor_res || !xr_strcmp(functor_res, ""))
+    {
         return false;
     }
     xr_strcpy(result, sizeof(result), functor_res);
     return true;
 }
 
-}  // namespace upgrade
-}  // namespace inventory
+} // namespace upgrade
+} // namespace inventory

@@ -1,4 +1,4 @@
-#ifndef MXBLOCKMODEL_INCLUDED  // -*- C++ -*-
+#ifndef MXBLOCKMODEL_INCLUDED // -*- C++ -*-
 #define MXBLOCKMODEL_INCLUDED
 #if !defined(__GNUC__)
 #pragma once
@@ -54,7 +54,6 @@ protected:
     virtual MxFaceID alloc_face(MxVertexID, MxVertexID, MxVertexID);
     virtual void init_face(MxFaceID) {}
     virtual void free_face(MxFaceID) {}
-
 public:
     unsigned int binding_mask;
 
@@ -70,10 +69,14 @@ public:
     }
     virtual ~MxBlockModel()
     {
-        if (normals) xr_delete(normals);
-        if (colors) xr_delete(colors);
-        if (tcoords) xr_delete(tcoords);
-        if (tex_name) xr_free(tex_name);
+        if (normals)
+            xr_delete(normals);
+        if (colors)
+            xr_delete(colors);
+        if (tcoords)
+            xr_delete(tcoords);
+        if (tex_name)
+            xr_free(tex_name);
     }
 
     MxBlockModel* clone(MxBlockModel* into = NULL);
@@ -83,7 +86,6 @@ public:
     unsigned int color_count() const { return (colors ? colors->length() : 0); }
     unsigned int normal_count() const { return (normals ? normals->length() : 0); }
     unsigned int texcoord_count() const { return (tcoords ? tcoords->length() : 0); }
-
     MxVertexID add_vertex(float, float, float);
     MxFaceID add_face(unsigned int, unsigned int, unsigned int, bool will_link = true);
     unsigned int add_color(float, float, float);
@@ -92,7 +94,6 @@ public:
 
     MxVertexID add_vertex(float* v) { return add_vertex(v[0], v[1], v[2]); }
     MxFaceID add_face(unsigned int* f) { return add_face(f[0], f[1], f[2]); }
-
     void remove_vertex(MxVertexID v);
     void remove_face(MxFaceID f);
 

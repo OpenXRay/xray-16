@@ -7,13 +7,11 @@
 #include "game_object_space.h"
 #include "script_callback_ex.h"
 
-SHeliMovementState::~SHeliMovementState()
-{
-}
-
+SHeliMovementState::~SHeliMovementState() {}
 void SHeliMovementState::net_Destroy()
 {
-    if (need_to_del_path && currPatrolPath) {
+    if (need_to_del_path && currPatrolPath)
+    {
         CPatrolPath* tmp = const_cast<CPatrolPath*>(currPatrolPath);
         xr_delete(tmp);
     }
@@ -97,22 +95,20 @@ void SHeliMovementState::reinit()
 
     speedInDestPoint = 0.0f;
 }
-float SHeliMovementState::GetDistanceToDestPosition()
-{
-    return desiredPoint.distance_to(currP);
-}
-
+float SHeliMovementState::GetDistanceToDestPosition() { return desiredPoint.distance_to(currP); }
 void SHeliMovementState::UpdatePatrolPath()
 {
-    if (AlreadyOnPoint()) {
+    if (AlreadyOnPoint())
+    {
         float dist = GetDistanceToDestPosition();
         parent->callback(GameObject::eHelicopterOnPoint)(
             dist, currP, currPatrolVertex ? currPatrolVertex->vertex_id() : -1);
         CPatrolPath::const_iterator b, e;
         currPatrolPath->begin(currPatrolVertex, b, e);
-        if (b != e) {
+        if (b != e)
+        {
             if (need_to_del_path &&
-                currPatrolVertex->data().flags())  // fake flags that signals entrypoint for round path
+                currPatrolVertex->data().flags()) // fake flags that signals entrypoint for round path
                 SetPointFlags(currPatrolVertex->vertex_id(), 0);
 
             currPatrolVertex = currPatrolPath->vertex((*b).vertex_id());
@@ -131,7 +127,8 @@ void SHeliMovementState::UpdatePatrolPath()
 
 void SHeliMovementState::UpdateMovToPoint()
 {
-    if (AlreadyOnPoint()) {
+    if (AlreadyOnPoint())
+    {
         float dist = GetDistanceToDestPosition();
         parent->callback(GameObject::eHelicopterOnPoint)(dist, currP, -1);
         type = eMovNone;
@@ -142,9 +139,11 @@ bool SHeliMovementState::AlreadyOnPoint()
 {
     float dist = GetDistanceToDestPosition();
     bool res = false;
-    if (dist <= 0.1f) res = true;
+    if (dist <= 0.1f)
+        res = true;
 
-    if (dist < onPointRangeDist) {
+    if (dist < onPointRangeDist)
+    {
         Fvector P1 = currP;
         Fvector dir;
         dir.setHP(currPathH, 0.0f);
@@ -182,8 +181,7 @@ void SHeliMovementState::getPathAltitude(Fvector& point, float base_altitude)
 
     VERIFY(_valid(point));
 
-    float minY =
-        boundingVolume.min.y;  //+(m_boundingVolume.max.y-m_boundingVolume.min.y)*m_heli->m_data.m_alt_korridor;
+    float minY = boundingVolume.min.y; //+(m_boundingVolume.max.y-m_boundingVolume.min.y)*m_heli->m_data.m_alt_korridor;
     float maxY = boundingVolume.max.y + base_altitude;
     clamp(point.y, minY, maxY);
     VERIFY(_valid(point));
@@ -193,7 +191,8 @@ void SHeliMovementState::SetDestPosition(Fvector* pos)
     desiredPoint = *pos;
     type = eMovToPoint;
 
-    if (need_to_del_path && currPatrolPath) {
+    if (need_to_del_path && currPatrolPath)
+    {
         CPatrolPath* tmp = const_cast<CPatrolPath*>(currPatrolPath);
         xr_delete(tmp);
         need_to_del_path = false;
@@ -202,7 +201,8 @@ void SHeliMovementState::SetDestPosition(Fvector* pos)
 
 void SHeliMovementState::goPatrolByPatrolPath(LPCSTR path_name, int start_idx)
 {
-    if (need_to_del_path && currPatrolPath) {
+    if (need_to_del_path && currPatrolPath)
+    {
         CPatrolPath* tmp = const_cast<CPatrolPath*>(currPatrolPath);
         xr_delete(tmp);
     }
@@ -249,7 +249,8 @@ void SHeliMovementState::save(NET_Packet& output_packet)
 
     output_packet.w_float(onPointRangeDist);
 
-    if (type == eMovPatrolPath) {
+    if (type == eMovPatrolPath)
+    {
         output_packet.w_s32(currPatrolVertex->vertex_id());
     }
 }
@@ -284,12 +285,14 @@ void SHeliMovementState::load(IReader& input_packet)
 
     onPointRangeDist = input_packet.r_float();
 
-    if (type == eMovPatrolPath) {
+    if (type == eMovPatrolPath)
+    {
         currPatrolPath = ai().patrol_paths().path(patrol_path_name);
         int idx = input_packet.r_s32();
         currPatrolVertex = currPatrolPath->vertex(idx);
     }
-    if (type == eMovRoundPath) {
+    if (type == eMovRoundPath)
+    {
         goByRoundPath(round_center, round_radius, !round_reverse);
     }
 }
@@ -306,7 +309,7 @@ void SHeliMovementState::CreateRoundPoints(
     float height = center.y;
 
     float round_len = 2 * PI * radius;
-    static float dist = 30.0f;  // dist between points
+    static float dist = 30.0f; // dist between points
     float td = 2 * PI * dist / round_len;
     float dir_h = 0.0f;
 
@@ -324,13 +327,15 @@ void SHeliMovementState::CreateRoundPoints(
 
 void SHeliMovementState::goByRoundPath(Fvector center_, float radius_, bool clockwise_)
 {
-    if (type == eMovRoundPath) clockwise_ = !clockwise_;
+    if (type == eMovRoundPath)
+        clockwise_ = !clockwise_;
 
     float r_verify = maxLinearSpeed * GetAngSpeedHeading(maxLinearSpeed);
-    if (r_verify > radius_) {
+    if (r_verify > radius_)
+    {
 #ifndef MASTER_GOLD
         Msg("! Helicopter: cannot build round path R=%f. Min R=%f", radius_, r_verify);
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
         return;
     }
 
@@ -338,7 +343,8 @@ void SHeliMovementState::goByRoundPath(Fvector center_, float radius_, bool cloc
     round_radius = radius_;
     round_reverse = !clockwise_;
 
-    if (need_to_del_path && currPatrolPath) {
+    if (need_to_del_path && currPatrolPath)
+    {
         CPatrolPath* tmp = const_cast<CPatrolPath*>(currPatrolPath);
         xr_delete(tmp);
     }
@@ -352,7 +358,8 @@ void SHeliMovementState::goByRoundPath(Fvector center_, float radius_, bool cloc
     xr_vector<STmpPt> round_points;
     xr_vector<STmpPt>::iterator it, it_e;
     CreateRoundPoints(center_, radius_, start_h, end_h, round_points);
-    if (clockwise_) std::reverse(round_points.begin() + 1, round_points.end());
+    if (clockwise_)
+        std::reverse(round_points.begin() + 1, round_points.end());
 
     it = round_points.begin();
     it_e = round_points.end();
@@ -363,7 +370,8 @@ void SHeliMovementState::goByRoundPath(Fvector center_, float radius_, bool cloc
         CPatrolPoint pt = CPatrolPoint(
             (CLevelGraph*)0, (CGameLevelCrossTable*)0, (CGameGraph*)0, pp, (*it).point, u32(-1), 0, pt_name);
         pp->add_vertex(pt, pt_idx);
-        if (pt_idx) pp->add_edge(pt_idx - 1, pt_idx, 1.f);
+        if (pt_idx)
+            pp->add_edge(pt_idx - 1, pt_idx, 1.f);
     }
     pp->add_edge(pt_idx - 1, 0, 1.f);
 
@@ -380,7 +388,8 @@ void SHeliMovementState::goByRoundPath(Fvector center_, float radius_, bool cloc
     for (; b != e; ++b)
     {
         float d = (*b).second->data().position().distance_to(currP);
-        if ((d > stop_path) && (d < min_dist)) {
+        if ((d > stop_path) && (d < min_dist))
+        {
             min_dist = d;
             start_vertex_id = (*b).first;
         }
@@ -411,11 +420,7 @@ float SHeliMovementState::GetSpeedInDestPoint()
     else
         return speedInDestPoint;
 }
-void SHeliMovementState::SetSpeedInDestPoint(float val)
-{
-    speedInDestPoint = val;
-}
-
+void SHeliMovementState::SetSpeedInDestPoint(float val) { speedInDestPoint = val; }
 Fvector CHelicopter::GetCurrVelocityVec()
 {
     Fvector dir;

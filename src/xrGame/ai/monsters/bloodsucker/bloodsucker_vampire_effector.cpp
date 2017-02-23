@@ -21,7 +21,8 @@ BOOL CVampirePPEffector::Process(SPPInfo& pp)
     float time_past_perc = (m_total - fLifeTime) / m_total;
 
     float factor;
-    if (time_past_perc < TIME_ATTACK) {
+    if (time_past_perc < TIME_ATTACK)
+    {
         factor = 0.75f * time_past_perc / TIME_ATTACK;
     }
     else if (time_past_perc > (1 - TIME_ATTACK))
@@ -56,7 +57,8 @@ CVampireCameraEffector::CVampireCameraEffector(float time, const Fvector& src, c
 
     m_dist = src.distance_to(tgt);
 
-    if (m_dist < BEST_DISTANCE) {
+    if (m_dist < BEST_DISTANCE)
+    {
         m_direction.sub(src, tgt);
         m_dist = BEST_DISTANCE - m_dist;
     }
@@ -75,7 +77,8 @@ CVampireCameraEffector::CVampireCameraEffector(float time, const Fvector& src, c
 BOOL CVampireCameraEffector::ProcessCam(SCamEffectorInfo& info)
 {
     fLifeTime -= Device.fTimeDelta;
-    if (fLifeTime < 0) return FALSE;
+    if (fLifeTime < 0)
+        return FALSE;
 
     // процент оставшегося времени
     float time_left_perc = fLifeTime / m_time_total;
@@ -97,7 +100,8 @@ BOOL CVampireCameraEffector::ProcessCam(SCamEffectorInfo& info)
     Mdef.c.mad(m_direction, cur_dist);
 
     // check the time to return
-    if (time_left_perc < 0.2f) {
+    if (time_left_perc < 0.2f)
+    {
         dangle_target.x = 0.f;
         dangle_target.y = 0.f;
         dangle_target.z = 0.f;
@@ -108,15 +112,18 @@ BOOL CVampireCameraEffector::ProcessCam(SCamEffectorInfo& info)
     }
     else
     {
-        if (angle_lerp(dangle_current.x, dangle_target.x, ANGLE_SPEED, Device.fTimeDelta)) {
+        if (angle_lerp(dangle_current.x, dangle_target.x, ANGLE_SPEED, Device.fTimeDelta))
+        {
             dangle_target.x = Random.randFs(DELTA_ANGLE_X);
         }
 
-        if (angle_lerp(dangle_current.y, dangle_target.y, ANGLE_SPEED, Device.fTimeDelta)) {
+        if (angle_lerp(dangle_current.y, dangle_target.y, ANGLE_SPEED, Device.fTimeDelta))
+        {
             dangle_target.y = Random.randFs(DELTA_ANGLE_Y);
         }
 
-        if (angle_lerp(dangle_current.z, dangle_target.z, ANGLE_SPEED, Device.fTimeDelta)) {
+        if (angle_lerp(dangle_current.z, dangle_target.z, ANGLE_SPEED, Device.fTimeDelta))
+        {
             dangle_target.z = Random.randFs(DELTA_ANGLE_Z);
         }
     }

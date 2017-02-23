@@ -68,22 +68,20 @@ void __fastcall TfraLeftBar::fsStorageRestorePlacement(TObject* Sender)
 
 void UpdatePanel(TPanel* p)
 {
-    if (p) {
+    if (p)
+    {
         for (int j = 0; j < p->ControlCount; j++)
         {
             TExtBtn* btn = dynamic_cast<TExtBtn*>(p->Controls[j]);
-            if (btn) btn->UpdateMouseInControl();
+            if (btn)
+                btn->UpdateMouseInControl();
         }
     }
 }
 
 //---------------------------------------------------------------------------
 
-void TfraLeftBar::OnTimer()
-{
-    UpdateBar();
-}
-
+void TfraLeftBar::OnTimer() { UpdateBar(); }
 //---------------------------------------------------------------------------
 
 void TfraLeftBar::UpdateBar()
@@ -92,9 +90,11 @@ void TfraLeftBar::UpdateBar()
     for (i = 0; i < fraLeftBar->ComponentCount; i++)
     {
         TComponent* temp = fraLeftBar->Components[i];
-        if (dynamic_cast<TExtBtn*>(temp) != NULL) ((TExtBtn*)temp)->UpdateMouseInControl();
+        if (dynamic_cast<TExtBtn*>(temp) != NULL)
+            ((TExtBtn*)temp)->UpdateMouseInControl();
     }
-    if (ebRenderEngineStyle->Down && !ATools->IsVisualPresent()) SetRenderStyle(false);
+    if (ebRenderEngineStyle->Down && !ATools->IsVisualPresent())
+        SetRenderStyle(false);
 }
 
 //---------------------------------------------------------------------------
@@ -104,7 +104,8 @@ void TfraLeftBar::MinimizeAllFrames()
     for (int j = 0; j < paLeftBar->ControlCount; j++)
     {
         TPanel* pa = dynamic_cast<TPanel*>(paLeftBar->Controls[j]);
-        if (pa) PanelMinimize(pa);
+        if (pa)
+            PanelMinimize(pa);
     }
     UpdateBar();
 }
@@ -116,39 +117,24 @@ void TfraLeftBar::MaximizeAllFrames()
     for (int j = 0; j < paLeftBar->ControlCount; j++)
     {
         TPanel* pa = dynamic_cast<TPanel*>(paLeftBar->Controls[j]);
-        if (pa) PanelMaximize(pa);
+        if (pa)
+            PanelMaximize(pa);
     }
     UpdateBar();
 }
 
 //---------------------------------------------------------------------------
 
-void __fastcall TfraLeftBar::ebSaveClick(TObject* Sender)
-{
-    ExecCommand(COMMAND_SAVE);
-}
-
+void __fastcall TfraLeftBar::ebSaveClick(TObject* Sender) { ExecCommand(COMMAND_SAVE); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfraLeftBar::Refresh1Click(TObject* Sender)
-{
-    ExecCommand(COMMAND_REFRESH_TEXTURES);
-}
-
+void __fastcall TfraLeftBar::Refresh1Click(TObject* Sender) { ExecCommand(COMMAND_REFRESH_TEXTURES); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfraLeftBar::Checknewtextures1Click(TObject* Sender)
-{
-    ExecCommand(COMMAND_CHECK_TEXTURES);
-}
-
+void __fastcall TfraLeftBar::Checknewtextures1Click(TObject* Sender) { ExecCommand(COMMAND_CHECK_TEXTURES); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfraLeftBar::ImageEditor1Click(TObject* Sender)
-{
-    ExecCommand(COMMAND_IMAGE_EDITOR);
-}
-
+void __fastcall TfraLeftBar::ImageEditor1Click(TObject* Sender) { ExecCommand(COMMAND_IMAGE_EDITOR); }
 //---------------------------------------------------------------------------
 
 void __fastcall TfraLeftBar::PanelMimimizeClick(TObject* Sender)
@@ -167,18 +153,10 @@ void __fastcall TfraLeftBar::PanelMaximizeClick(TObject* Sender)
 
 //---------------------------------------------------------------------------
 
-void __fastcall TfraLeftBar::ebEditorPreferencesClick(TObject* Sender)
-{
-    ExecCommand(COMMAND_EDITOR_PREF);
-}
-
+void __fastcall TfraLeftBar::ebEditorPreferencesClick(TObject* Sender) { ExecCommand(COMMAND_EDITOR_PREF); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfraLeftBar::ebMakePreviewClick(TObject* Sender)
-{
-    ExecCommand(COMMAND_MAKE_PREVIEW);
-}
-
+void __fastcall TfraLeftBar::ebMakePreviewClick(TObject* Sender) { ExecCommand(COMMAND_MAKE_PREVIEW); }
 //---------------------------------------------------------------------------
 
 void __fastcall TfraLeftBar::ebSceneFileMouseDown(TObject* Sender, TMouseButton Button, TShiftState Shift, int X, int Y)
@@ -225,11 +203,7 @@ void __fastcall TfraLeftBar::tvMotionsDragOver(
 }
 
 //---------------------------------------------------------------------------
-void TfraLeftBar::RenameItem(LPCSTR p0, LPCSTR p1, EItemType tp)
-{
-    ATools->RenameMotion(p0, p1);
-}
-
+void TfraLeftBar::RenameItem(LPCSTR p0, LPCSTR p1, EItemType tp) { ATools->RenameMotion(p0, p1); }
 //---------------------------------------------------------------------------
 void __fastcall TfraLeftBar::tvMotionsDragDrop(TObject* Sender, TObject* Source, int X, int Y)
 {
@@ -238,25 +212,13 @@ void __fastcall TfraLeftBar::tvMotionsDragDrop(TObject* Sender, TObject* Source,
 
 //---------------------------------------------------------------------------
 
-void __fastcall TfraLeftBar::Import1Click(TObject* Sender)
-{
-    ExecCommand(COMMAND_IMPORT);
-}
-
+void __fastcall TfraLeftBar::Import1Click(TObject* Sender) { ExecCommand(COMMAND_IMPORT); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfraLeftBar::Load1Click(TObject* Sender)
-{
-    ExecCommand(COMMAND_LOAD);
-}
-
+void __fastcall TfraLeftBar::Load1Click(TObject* Sender) { ExecCommand(COMMAND_LOAD); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfraLeftBar::Clear1Click(TObject* Sender)
-{
-    ExecCommand(COMMAND_CLEAR);
-}
-
+void __fastcall TfraLeftBar::Clear1Click(TObject* Sender) { ExecCommand(COMMAND_CLEAR); }
 //---------------------------------------------------------------------------
 
 void __fastcall TfraLeftBar::Save2Click(TObject* Sender)
@@ -266,25 +228,13 @@ void __fastcall TfraLeftBar::Save2Click(TObject* Sender)
 
 //---------------------------------------------------------------------------
 
-void __fastcall TfraLeftBar::ebSaveAsClick(TObject* Sender)
-{
-    ExecCommand(COMMAND_SAVE, 0, 1);
-}
-
+void __fastcall TfraLeftBar::ebSaveAsClick(TObject* Sender) { ExecCommand(COMMAND_SAVE, 0, 1); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfraLeftBar::ebExportBatchClick(TObject* Sender)
-{
-    ExecCommand(COMMAND_BATCH_CONVERT);
-}
-
+void __fastcall TfraLeftBar::ebExportBatchClick(TObject* Sender) { ExecCommand(COMMAND_BATCH_CONVERT); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfraLeftBar::ebMakeThumbnailClick(TObject* Sender)
-{
-    ExecCommand(COMMAND_MAKE_THUMBNAIL);
-}
-
+void __fastcall TfraLeftBar::ebMakeThumbnailClick(TObject* Sender) { ExecCommand(COMMAND_MAKE_THUMBNAIL); }
 //---------------------------------------------------------------------------
 
 void __fastcall TfraLeftBar::ebBonePartClick(TObject* Sender)
@@ -295,24 +245,18 @@ void __fastcall TfraLeftBar::ebBonePartClick(TObject* Sender)
 
 //---------------------------------------------------------------------------
 
-void __fastcall TfraLeftBar::miExportOGFClick(TObject* Sender)
-{
-    ExecCommand(COMMAND_EXPORT_OGF);
-}
-
+void __fastcall TfraLeftBar::miExportOGFClick(TObject* Sender) { ExecCommand(COMMAND_EXPORT_OGF); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfraLeftBar::miExportOMFClick(TObject* Sender)
-{
-    ExecCommand(COMMAND_EXPORT_OMF);
-}
-
+void __fastcall TfraLeftBar::miExportOMFClick(TObject* Sender) { ExecCommand(COMMAND_EXPORT_OMF); }
 //---------------------------------------------------------------------------
 
 void __fastcall TfraLeftBar::ebRenderStyleClick(TObject* Sender)
 {
-    if (Sender == ebRenderEngineStyle) {
-        if (!ATools->IsVisualPresent()) ExecCommand(COMMAND_MAKE_PREVIEW);
+    if (Sender == ebRenderEngineStyle)
+    {
+        if (!ATools->IsVisualPresent())
+            ExecCommand(COMMAND_MAKE_PREVIEW);
         if (!ATools->IsVisualPresent())
             SetRenderStyle(false);
         else
@@ -335,67 +279,31 @@ void TfraLeftBar::SetRenderStyle(bool bEngineStyle)
 
 //---------------------------------------------------------------------------
 
-void __fastcall TfraLeftBar::Custom1Click(TObject* Sender)
-{
-    ExecCommand(COMMAND_SELECT_PREVIEW_OBJ, false);
-}
-
+void __fastcall TfraLeftBar::Custom1Click(TObject* Sender) { ExecCommand(COMMAND_SELECT_PREVIEW_OBJ, false); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfraLeftBar::none1Click(TObject* Sender)
-{
-    ExecCommand(COMMAND_SELECT_PREVIEW_OBJ, true);
-}
-
+void __fastcall TfraLeftBar::none1Click(TObject* Sender) { ExecCommand(COMMAND_SELECT_PREVIEW_OBJ, true); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfraLeftBar::Preferences1Click(TObject* Sender)
-{
-    ExecCommand(COMMAND_PREVIEW_OBJ_PREF);
-}
-
+void __fastcall TfraLeftBar::Preferences1Click(TObject* Sender) { ExecCommand(COMMAND_PREVIEW_OBJ_PREF); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfraLeftBar::ExportDM1Click(TObject* Sender)
-{
-    ExecCommand(COMMAND_EXPORT_DM);
-}
-
+void __fastcall TfraLeftBar::ExportDM1Click(TObject* Sender) { ExecCommand(COMMAND_EXPORT_DM); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfraLeftBar::ExportWaveFrontOBJ1Click(TObject* Sender)
-{
-    ExecCommand(COMMAND_EXPORT_OBJ);
-}
-
+void __fastcall TfraLeftBar::ExportWaveFrontOBJ1Click(TObject* Sender) { ExecCommand(COMMAND_EXPORT_OBJ); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfraLeftBar::ExportC1Click(TObject* Sender)
-{
-    ExecCommand(COMMAND_EXPORT_CPP);
-}
-
+void __fastcall TfraLeftBar::ExportC1Click(TObject* Sender) { ExecCommand(COMMAND_EXPORT_CPP); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfraLeftBar::ExtBtn1Click(TObject* Sender)
-{
-    ExecCommand(COMMAND_SHOW_CLIPMAKER);
-}
-
+void __fastcall TfraLeftBar::ExtBtn1Click(TObject* Sender) { ExecCommand(COMMAND_SHOW_CLIPMAKER); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfraLeftBar::MenuItem2Click(TObject* Sender)
-{
-    ExecCommand(COMMAND_SOUND_EDITOR);
-}
-
+void __fastcall TfraLeftBar::MenuItem2Click(TObject* Sender) { ExecCommand(COMMAND_SOUND_EDITOR); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfraLeftBar::MenuItem4Click(TObject* Sender)
-{
-    ExecCommand(COMMAND_SYNC_SOUNDS);
-}
-
+void __fastcall TfraLeftBar::MenuItem4Click(TObject* Sender) { ExecCommand(COMMAND_SYNC_SOUNDS); }
 //---------------------------------------------------------------------------
 
 void TfraLeftBar::RefreshBar()
@@ -415,11 +323,7 @@ void TfraLeftBar::RefreshBar()
 
 //---------------------------------------------------------------------------
 
-void __fastcall TfraLeftBar::ebOptimizeMotionsClick(TObject* Sender)
-{
-    ExecCommand(COMMAND_OPTIMIZE_MOTIONS);
-}
-
+void __fastcall TfraLeftBar::ebOptimizeMotionsClick(TObject* Sender) { ExecCommand(COMMAND_OPTIMIZE_MOTIONS); }
 //---------------------------------------------------------------------------
 
 void TfraLeftBar::SetReadOnly(BOOL val)
@@ -434,9 +338,5 @@ void TfraLeftBar::SetReadOnly(BOOL val)
 
 //---------------------------------------------------------------------------
 
-void __fastcall TfraLeftBar::Quit1Click(TObject* Sender)
-{
-    ExecCommand(COMMAND_QUIT);
-}
-
+void __fastcall TfraLeftBar::Quit1Click(TObject* Sender) { ExecCommand(COMMAND_QUIT); }
 //---------------------------------------------------------------------------

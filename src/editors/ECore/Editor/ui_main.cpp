@@ -51,21 +51,9 @@ TUI::~TUI()
     VERIFY(m_EditorState.size() == 0);
 }
 
-void TUI::OnDeviceCreate()
-{
-    DU_impl.OnDeviceCreate();
-}
-
-void TUI::OnDeviceDestroy()
-{
-    DU_impl.OnDeviceDestroy();
-}
-
-bool TUI::IsModified()
-{
-    return ExecCommand(COMMAND_CHECK_MODIFIED);
-}
-
+void TUI::OnDeviceCreate() { DU_impl.OnDeviceCreate(); }
+void TUI::OnDeviceDestroy() { DU_impl.OnDeviceDestroy(); }
+bool TUI::IsModified() { return ExecCommand(COMMAND_CHECK_MODIFIED); }
 //---------------------------------------------------------------------------
 
 void TUI::EnableSelectionRect(bool flag)
@@ -83,24 +71,29 @@ void TUI::UpdateSelectionRect(const Ivector2& from, const Ivector2& to)
 
 bool __fastcall TUI::KeyDown(WORD Key, TShiftState Shift)
 {
-    if (!m_bReady) return false;
+    if (!m_bReady)
+        return false;
     //	m_ShiftState = Shift;
     //	Log("Dn  ",Shift.Contains(ssShift)?"1":"0");
-    if (EDevice.m_Camera.KeyDown(Key, Shift)) return true;
+    if (EDevice.m_Camera.KeyDown(Key, Shift))
+        return true;
     return Tools->KeyDown(Key, Shift);
 }
 
 bool __fastcall TUI::KeyUp(WORD Key, TShiftState Shift)
 {
-    if (!m_bReady) return false;
+    if (!m_bReady)
+        return false;
     //	m_ShiftState = Shift;
-    if (EDevice.m_Camera.KeyUp(Key, Shift)) return true;
+    if (EDevice.m_Camera.KeyUp(Key, Shift))
+        return true;
     return Tools->KeyUp(Key, Shift);
 }
 
 bool __fastcall TUI::KeyPress(WORD Key, TShiftState Shift)
 {
-    if (!m_bReady) return false;
+    if (!m_bReady)
+        return false;
     return Tools->KeyPress(Key, Shift);
 }
 
@@ -108,18 +101,24 @@ bool __fastcall TUI::KeyPress(WORD Key, TShiftState Shift)
 
 void TUI::MousePress(TShiftState Shift, int X, int Y)
 {
-    if (!m_bReady) return;
-    if (m_MouseCaptured) return;
+    if (!m_bReady)
+        return;
+    if (m_MouseCaptured)
+        return;
 
     bMouseInUse = true;
 
     m_ShiftState = Shift;
 
     // camera activate
-    if (!EDevice.m_Camera.MoveStart(m_ShiftState)) {
-        if (Tools->Pick(Shift)) return;
-        if (!m_MouseCaptured) {
-            if (Tools->HiddenMode()) {
+    if (!EDevice.m_Camera.MoveStart(m_ShiftState))
+    {
+        if (Tools->Pick(Shift))
+            return;
+        if (!m_MouseCaptured)
+        {
+            if (Tools->HiddenMode())
+            {
                 IR_GetMousePosScreen(m_StartCpH);
                 m_DeltaCpH.set(0, 0);
             }
@@ -130,8 +129,10 @@ void TUI::MousePress(TShiftState Shift, int X, int Y)
                 EDevice.m_Camera.MouseRayFromPoint(m_CurrentRStart, m_CurrentRDir, m_CurrentCp);
             }
 
-            if (Tools->MouseStart(m_ShiftState)) {
-                if (Tools->HiddenMode()) ShowCursor(FALSE);
+            if (Tools->MouseStart(m_ShiftState))
+            {
+                if (Tools->HiddenMode())
+                    ShowCursor(FALSE);
                 m_MouseCaptured = true;
             }
         }
@@ -141,23 +142,30 @@ void TUI::MousePress(TShiftState Shift, int X, int Y)
 
 void TUI::MouseRelease(TShiftState Shift, int X, int Y)
 {
-    if (!m_bReady) return;
+    if (!m_bReady)
+        return;
 
     m_ShiftState = Shift;
 
-    if (EDevice.m_Camera.IsMoving()) {
-        if (EDevice.m_Camera.MoveEnd(m_ShiftState)) bMouseInUse = false;
+    if (EDevice.m_Camera.IsMoving())
+    {
+        if (EDevice.m_Camera.MoveEnd(m_ShiftState))
+            bMouseInUse = false;
     }
     else
     {
         bMouseInUse = false;
-        if (m_MouseCaptured) {
-            if (!Tools->HiddenMode()) {
+        if (m_MouseCaptured)
+        {
+            if (!Tools->HiddenMode())
+            {
                 IR_GetMousePosReal(EDevice.m_hRenderWnd, m_CurrentCp);
                 EDevice.m_Camera.MouseRayFromPoint(m_CurrentRStart, m_CurrentRDir, m_CurrentCp);
             }
-            if (Tools->MouseEnd(m_ShiftState)) {
-                if (Tools->HiddenMode()) {
+            if (Tools->MouseEnd(m_ShiftState))
+            {
+                if (Tools->HiddenMode())
+                {
                     SetCursorPos(m_StartCpH.x, m_StartCpH.y);
                     ShowCursor(TRUE);
                 }
@@ -173,21 +181,27 @@ void TUI::MouseRelease(TShiftState Shift, int X, int Y)
 //----------------------------------------------------
 void TUI::MouseMove(TShiftState Shift, int X, int Y)
 {
-    if (!m_bReady) return;
+    if (!m_bReady)
+        return;
     m_ShiftState = Shift;
 }
 
 //----------------------------------------------------
 void TUI::IR_OnMouseMove(int x, int y)
 {
-    if (!m_bReady) return;
+    if (!m_bReady)
+        return;
     bool bRayUpdated = false;
 
-    if (!EDevice.m_Camera.Process(m_ShiftState, x, y)) {
-        if (m_MouseCaptured || m_MouseMultiClickCaptured) {
-            if (Tools->HiddenMode()) {
+    if (!EDevice.m_Camera.Process(m_ShiftState, x, y))
+    {
+        if (m_MouseCaptured || m_MouseMultiClickCaptured)
+        {
+            if (Tools->HiddenMode())
+            {
                 m_DeltaCpH.set(x, y);
-                if (m_DeltaCpH.x || m_DeltaCpH.y) {
+                if (m_DeltaCpH.x || m_DeltaCpH.y)
+                {
                     Tools->MouseMove(m_ShiftState);
                 }
             }
@@ -201,7 +215,8 @@ void TUI::IR_OnMouseMove(int x, int y)
             bRayUpdated = true;
         }
     }
-    if (!bRayUpdated) {
+    if (!bRayUpdated)
+    {
         IR_GetMousePosReal(EDevice.m_hRenderWnd, m_CurrentCp);
         EDevice.m_Camera.MouseRayFromPoint(m_CurrentRStart, m_CurrentRDir, m_CurrentCp);
     }
@@ -214,7 +229,8 @@ void TUI::IR_OnMouseMove(int x, int y)
 void TUI::OnAppActivate()
 {
     VERIFY(m_bReady);
-    if (pInput) {
+    if (pInput)
+    {
         m_ShiftState.Clear();
         pInput->OnAppActivate();
         EDevice.seqAppActivate.Process(rp_AppActivate);
@@ -227,7 +243,8 @@ void TUI::OnAppActivate()
 void TUI::OnAppDeactivate()
 {
     VERIFY(m_bReady);
-    if (pInput) {
+    if (pInput)
+    {
         pInput->OnAppDeactivate();
         m_ShiftState.Clear();
         EDevice.seqAppDeactivate.Process(rp_AppDeactivate);
@@ -241,12 +258,15 @@ void TUI::OnAppDeactivate()
 bool TUI::ShowHint(const AStringVec& SS)
 {
     VERIFY(m_bReady);
-    if (SS.size()) {
+    if (SS.size())
+    {
         AnsiString S = _ListToSequence2(SS);
-        if (m_bHintShowing && (S == m_LastHint)) return true;
+        if (m_bHintShowing && (S == m_LastHint))
+            return true;
         m_LastHint = S;
         m_bHintShowing = true;
-        if (!m_pHintWindow) {
+        if (!m_pHintWindow)
+        {
             m_pHintWindow = new THintWindow((TComponent*)0);
             m_pHintWindow->Brush->Color = (TColor)0x0d9F2FF;
         }
@@ -283,7 +303,8 @@ void TUI::ShowHint(const AnsiString& s)
     AStringVec SS;
     SS.push_back(s);
     Tools->OnShowHint(SS);
-    if (!ShowHint(SS) && m_pHintWindow) HideHint();
+    if (!ShowHint(SS) && m_pHintWindow)
+        HideHint();
 }
 
 //---------------------------------------------------------------------------
@@ -291,29 +312,38 @@ void TUI::ShowHint(const AnsiString& s)
 void TUI::ShowObjectHint()
 {
     VERIFY(m_bReady);
-    if (!EPrefs->object_flags.is(epoShowHint)) {
+    if (!EPrefs->object_flags.is(epoShowHint))
+    {
         //    	if (m_bHintShowing) HideHint();
         return;
     }
-    if (EDevice.m_Camera.IsMoving() || m_MouseCaptured) return;
-    if (!m_bAppActive) return;
+    if (EDevice.m_Camera.IsMoving() || m_MouseCaptured)
+        return;
+    if (!m_bAppActive)
+        return;
 
     GetCursorPos(&m_HintPoint);
     TWinControl* ctr = FindVCLWindow(m_HintPoint);
-    if (ctr != m_D3DWindow) return;
+    if (ctr != m_D3DWindow)
+        return;
 
     AStringVec SS;
     Tools->OnShowHint(SS);
-    if (!ShowHint(SS) && m_pHintWindow) HideHint();
+    if (!ShowHint(SS) && m_pHintWindow)
+        HideHint();
 }
 
 //---------------------------------------------------------------------------
 void TUI::CheckWindowPos(TForm* form)
 {
-    if (form->Left + form->Width > Screen->Width) form->Left = Screen->Width - form->Width;
-    if (form->Top + form->Height > Screen->Height) form->Top = Screen->Height - form->Height;
-    if (form->Left < 0) form->Left = 0;
-    if (form->Top < 0) form->Top = 0;
+    if (form->Left + form->Width > Screen->Width)
+        form->Left = Screen->Width - form->Width;
+    if (form->Top + form->Height > Screen->Height)
+        form->Top = Screen->Height - form->Height;
+    if (form->Left < 0)
+        form->Left = 0;
+    if (form->Top < 0)
+        form->Top = 0;
 }
 
 //---------------------------------------------------------------------------
@@ -323,7 +353,8 @@ void TUI::CheckWindowPos(TForm* form)
 void TUI::PrepareRedraw()
 {
     VERIFY(m_bReady);
-    if (m_Flags.is(flResize)) RealResize();
+    if (m_Flags.is(flResize))
+        RealResize();
     // set render state
     EDevice.SetRS(D3DRS_TEXTUREFACTOR, 0xffffffff);
     // fog
@@ -341,7 +372,8 @@ void TUI::PrepareRedraw()
     */
     EDevice.SetRS(D3DRS_FOGCOLOR, fog_color);
     EDevice.SetRS(D3DRS_RANGEFOGENABLE, FALSE);
-    if (HW.Caps.bTableFog) {
+    if (HW.Caps.bTableFog)
+    {
         EDevice.SetRS(D3DRS_FOGTABLEMODE, D3DFOG_LINEAR);
         EDevice.SetRS(D3DRS_FOGVERTEXMODE, D3DFOG_NONE);
     }
@@ -355,7 +387,8 @@ void TUI::PrepareRedraw()
     // filter
     for (u32 k = 0; k < HW.Caps.raster.dwStages; k++)
     {
-        if (psDeviceFlags.is(rsFilterLinear)) {
+        if (psDeviceFlags.is(rsFilterLinear))
+        {
             EDevice.SetSS(k, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
             EDevice.SetSS(k, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
             EDevice.SetSS(k, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
@@ -385,7 +418,8 @@ void TUI::Redraw()
     try
     {
         EDevice.Statistic->RenderDUMP_RT.Begin();
-        if (EDevice.Begin()) {
+        if (EDevice.Begin())
+        {
             EDevice.UpdateView();
             EDevice.ResetMaterial();
 
@@ -394,7 +428,8 @@ void TUI::Redraw()
             //. temporary reset filter (      )
             for (u32 k = 0; k < HW.Caps.raster.dwStages; k++)
             {
-                if (psDeviceFlags.is(rsFilterLinear)) {
+                if (psDeviceFlags.is(rsFilterLinear))
+                {
                     EDevice.SetSS(k, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
                     EDevice.SetSS(k, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
                     EDevice.SetSS(k, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
@@ -408,7 +443,8 @@ void TUI::Redraw()
             }
 
             // draw grid
-            if (psDeviceFlags.is(rsDrawGrid)) {
+            if (psDeviceFlags.is(rsDrawGrid))
+            {
                 DU_impl.DrawGrid();
                 DU_impl.DrawPivot(m_Pivot);
             }
@@ -424,7 +460,8 @@ void TUI::Redraw()
             }
 
             // draw selection rect
-            if (m_SelectionRect) DU_impl.DrawSelectionRect(m_SelStart, m_SelEnd);
+            if (m_SelectionRect)
+                DU_impl.DrawSelectionRect(m_SelStart, m_SelEnd);
 
             // draw axis
             DU_impl.DrawAxis(EDevice.m_Camera.GetTransform());
@@ -471,7 +508,8 @@ void TUI::RealUpdateScene()
 
 void TUI::RealRedrawScene()
 {
-    if (!psDeviceFlags.is(rsRenderRealTime)) m_Flags.set(flRedraw, FALSE);
+    if (!psDeviceFlags.is(rsRenderRealTime))
+        m_Flags.set(flRedraw, FALSE);
     Redraw();
 }
 
@@ -480,7 +518,8 @@ void TUI::OnFrame()
     EDevice.FrameMove();
     SndLib->OnFrame();
     // tools on frame
-    if (m_Flags.is(flUpdateScene)) RealUpdateScene();
+    if (m_Flags.is(flUpdateScene))
+        RealUpdateScene();
     Tools->OnFrame();
     // show hint
     ShowObjectHint();
@@ -502,29 +541,30 @@ void TUI::Idle()
     // input
     pInput->OnFrame();
     Sleep(1);
-    if (ELog.in_use) return;
+    if (ELog.in_use)
+        return;
 
     OnFrame();
-    if (m_Flags.is(flRedraw)) RealRedrawScene();
+    if (m_Flags.is(flRedraw))
+        RealRedrawScene();
 
     // test quit
-    if (m_Flags.is(flNeedQuit)) RealQuit();
+    if (m_Flags.is(flNeedQuit))
+        RealQuit();
 }
 
 //---------------------------------------------------------------------------
-void ResetActionToSelect()
-{
-    ExecCommand(COMMAND_CHANGE_ACTION, etaSelect);
-}
-
+void ResetActionToSelect() { ExecCommand(COMMAND_CHANGE_ACTION, etaSelect); }
 //---------------------------------------------------------------------------
 
 #define MIN_PANEL_HEIGHT 15
 
 void __fastcall PanelMinMax(TPanel* pa)
 {
-    if (pa && (pa->Align != alClient)) {
-        if (pa->Tag > 0) {
+    if (pa && (pa->Align != alClient))
+    {
+        if (pa->Tag > 0)
+        {
             pa->Height = pa->Tag;
             pa->Tag = 0;
         }
@@ -539,8 +579,10 @@ void __fastcall PanelMinMax(TPanel* pa)
 
 void __fastcall PanelMinimize(TPanel* pa)
 {
-    if (pa && (pa->Align != alClient)) {
-        if (pa->Tag <= 0) {
+    if (pa && (pa->Align != alClient))
+    {
+        if (pa->Tag <= 0)
+        {
             pa->Tag = pa->Height;
             pa->Height = MIN_PANEL_HEIGHT;
         }
@@ -550,8 +592,10 @@ void __fastcall PanelMinimize(TPanel* pa)
 
 void __fastcall PanelMaximize(TPanel* pa)
 {
-    if (pa && (pa->Align != alClient)) {
-        if (pa->Tag > 0) {
+    if (pa && (pa->Align != alClient))
+    {
+        if (pa->Tag > 0)
+        {
             pa->Height = pa->Tag;
             pa->Tag = 0;
         }
@@ -559,21 +603,9 @@ void __fastcall PanelMaximize(TPanel* pa)
     }
 }
 
-void __fastcall PanelMinMaxClick(TObject* Sender)
-{
-    PanelMinMax(((TPanel*)((TControl*)Sender)->Parent));
-}
-
-void __fastcall PanelMinimizeClick(TObject* Sender)
-{
-    PanelMinimize(((TPanel*)((TControl*)Sender)->Parent));
-}
-
-void __fastcall PanelMaximizeClick(TObject* Sender)
-{
-    PanelMaximize(((TPanel*)((TControl*)Sender)->Parent));
-}
-
+void __fastcall PanelMinMaxClick(TObject* Sender) { PanelMinMax(((TPanel*)((TControl*)Sender)->Parent)); }
+void __fastcall PanelMinimizeClick(TObject* Sender) { PanelMinimize(((TPanel*)((TControl*)Sender)->Parent)); }
+void __fastcall PanelMaximizeClick(TObject* Sender) { PanelMaximize(((TPanel*)((TControl*)Sender)->Parent)); }
 //---------------------------------------------------------------------------
 
 bool TUI::OnCreate(TD3DWindow* w, TPanel* p)
@@ -594,12 +626,14 @@ bool TUI::OnCreate(TD3DWindow* w, TPanel* p)
 
     m_bReady = true;
 
-    if (!CreateMailslot()) {
+    if (!CreateMailslot())
+    {
         ELog.DlgMsg(mtError, "Can't create mail slot.\nIt's possible two Editors started.");
         return false;
     }
 
-    if (!FS.path_exist(_local_root_)) {
+    if (!FS.path_exist(_local_root_))
+    {
         ELog.DlgMsg(mtError, "Undefined Editor local directory.");
         return false;
     }
@@ -633,7 +667,8 @@ SPBItem* TUI::ProgressStart(float max_val, LPCSTR text)
 void TUI::ProgressEnd(SPBItem*& pbi)
 {
     VERIFY(m_bReady);
-    if (pbi) {
+    if (pbi)
+    {
         PBVecIt it = std::find(m_ProgressItems.begin(), m_ProgressItems.end(), pbi);
         VERIFY(it != m_ProgressItems.end());
         m_ProgressItems.erase(it);
@@ -666,7 +701,8 @@ void SPBItem::Update(float val)
 
 void SPBItem::Info(LPCSTR text, bool bWarn)
 {
-    if (text && text[0]) {
+    if (text && text[0])
+    {
         info = text;
         AnsiString txt;
         float p, m;

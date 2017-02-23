@@ -3,7 +3,7 @@
 #include "chimera_state_hunting_move_to_cover.h"
 #include "chimera_state_hunting_come_out.h"
 
-#define TEMPLATE_SPECIALIZATION                                                                                        \
+#define TEMPLATE_SPECIALIZATION \
     template <typename _Object\
 >
 
@@ -17,17 +17,9 @@ CStateChimeraHuntingAbstract::CStateChimeraHunting(_Object* obj) : inherited(obj
 }
 
 TEMPLATE_SPECIALIZATION
-bool CStateChimeraHuntingAbstract::check_start_conditions()
-{
-    return true;
-}
-
+bool CStateChimeraHuntingAbstract::check_start_conditions() { return true; }
 TEMPLATE_SPECIALIZATION
-bool CStateChimeraHuntingAbstract::check_completion()
-{
-    return false;
-}
-
+bool CStateChimeraHuntingAbstract::check_completion() { return false; }
 TEMPLATE_SPECIALIZATION
 void CStateChimeraHuntingAbstract::reselect_state()
 {

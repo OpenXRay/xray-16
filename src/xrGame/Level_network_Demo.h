@@ -6,7 +6,7 @@ BOOL m_DemoSave = false;
 BOOL m_DemoSaveStarted = false;
 u32 m_StartGlobalTime;
 // XXX nitrocaster: why not CurrentControlEntity* ?
-IGameObject* m_current_spectator = nullptr;  // in real, this is CurrentControlEntity
+IGameObject* m_current_spectator = nullptr; // in real, this is CurrentControlEntity
 message_filter* m_msg_filter = nullptr;
 demoplay_control* m_demoplay_control = nullptr;
 
@@ -33,40 +33,22 @@ void SetDemoSpectator(IGameObject* spectator);
 IGameObject* GetDemoSpectator();
 void PrepareToSaveDemo();
 void SaveDemoInfo();
-inline demo_info* GetDemoInfo() const
-{
-    return m_demo_info;
-}
+inline demo_info* GetDemoInfo() const { return m_demo_info; }
 bool PrepareToPlayDemo(shared_str const& file_name);
 void StartPlayDemo();
 void RestartPlayDemo();
 void StopPlayDemo();
 float GetDemoPlayPos() const;
 // void SetDemoPlayPos(float const pos);
-float GetDemoPlaySpeed() const;                  // Device.time_factor()
-void SetDemoPlaySpeed(float const time_factor);  // Device.time_factor(
+float GetDemoPlaySpeed() const; // Device.time_factor()
+void SetDemoPlaySpeed(float const time_factor); // Device.time_factor(
 message_filter* GetMessageFilter();
 demoplay_control* GetDemoPlayControl();
-BOOL IsDemoPlay()
-{
-    return (!m_DemoSave && m_DemoPlay);
-}
-BOOL IsDemoSave()
-{
-    return (m_DemoSave && !m_DemoPlay);
-}
-inline BOOL IsDemoPlayStarted()
-{
-    return (IsDemoPlay() && m_DemoPlayStarted);
-}
-inline BOOL IsDemoPlayFinished()
-{
-    return m_DemoPlayStoped;
-}
-inline BOOL IsDemoSaveStarted()
-{
-    return (IsDemoSave() && m_DemoSaveStarted);
-}
+BOOL IsDemoPlay() { return (!m_DemoSave && m_DemoPlay); }
+BOOL IsDemoSave() { return (m_DemoSave && !m_DemoPlay); }
+inline BOOL IsDemoPlayStarted() { return (IsDemoPlay() && m_DemoPlayStarted); }
+inline BOOL IsDemoPlayFinished() { return m_DemoPlayStoped; }
+inline BOOL IsDemoSaveStarted() { return (IsDemoSave() && m_DemoSaveStarted); }
 void SavePacket(NET_Packet& packet);
 
 private:
@@ -75,10 +57,7 @@ void StopSaveDemo();
 void SpawnDemoSpectator();
 // saving
 void SaveDemoHeader(const shared_str& server_options);
-inline bool IsDemoInfoSaved()
-{
-    return m_demo_info != nullptr;
-}
+inline bool IsDemoInfoSaved() { return m_demo_info != nullptr; }
 bool LoadDemoHeader();
 bool LoadPacket(NET_Packet& dest_packet, u32 global_time_delta);
 void SimulateServerUpdate();

@@ -21,8 +21,8 @@ class CSMotion;
 
 class TfrmKeyBar : public TForm
 {
-    __published :  // IDE-managed Components
-                   TPanel* Panel6;
+    __published : // IDE-managed Components
+                  TPanel* Panel6;
     TPanel* Panel1;
     TLabel* Label1;
     TMultiObjSpinEdit* seLOD;
@@ -80,12 +80,12 @@ class TfrmKeyBar : public TForm
     void __fastcall spinTimeFactorKeyPress(TObject* Sender, char& Key);
     void __fastcall spinTimeFactorLWChange(TObject* Sender, int Val);
 
-  private:  // User declarations
+private: // User declarations
     CSMotion* m_currentEditMotion;
     void draw_marks(int id);
     void set_mark(int id, int action);
 
-  public:  // User declarations
+public: // User declarations
     __fastcall TfrmKeyBar(TComponent* Owner);
     static TfrmKeyBar* CreateKeyBar(TWinControl* parent);
     void UpdateBar();

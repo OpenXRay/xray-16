@@ -93,4 +93,4 @@ public:
     virtual void Update();
     virtual void InitTextureEx(LPCSTR tex_name, LPCSTR sh_name = "hud\\default");
 };
-#endif  // UI_ANIMATED_STATIC_H_
+#endif // UI_ANIMATED_STATIC_H_

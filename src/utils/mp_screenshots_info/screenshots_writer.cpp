@@ -12,10 +12,7 @@ writer::writer(u8* jpeg_data, u32 jpeg_size, u32 jpeg_buffer_size) : m_info_data
     m_buffer_info_pos = jpeg_size;
 }
 
-writer::~writer()
-{
-}
-
+writer::~writer() {}
 char const* ss_info_secion = "screenshot_info";
 char const* ss_player_name_key = "player_name";
 char const* ss_player_digest_key = "player_digest";
@@ -66,7 +63,8 @@ u32 const writer::write_info(sha_process_yielder* yielder)
     u32 jpeg_data_size = m_buffer_info_pos + info_size;
 
     shared_str tmp_sign_res;
-    if (yielder && *yielder) {
+    if (yielder && *yielder)
+    {
         tmp_sign_res = m_signer.sign_mt(m_buffer, jpeg_data_size, *yielder);
     }
     else
@@ -85,15 +83,8 @@ u32 const writer::write_info(sha_process_yielder* yielder)
 
 // signer
 
-signer::signer() : xr_dsa_signer(p_number, q_number, g_number)
-{
-    feel_private_dsa_key();
-}
-
-signer::~signer()
-{
-}
-
+signer::signer() : xr_dsa_signer(p_number, q_number, g_number) { feel_private_dsa_key(); }
+signer::~signer() {}
 void signer::feel_private_dsa_key()
 {
     // Private key:

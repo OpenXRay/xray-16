@@ -44,26 +44,28 @@ void CUIMapWnd::init_xml_nav(CUIXml& xml)
 
 void CUIMapWnd::UpdateNav()
 {
-    if (Device.dwTimeGlobal - m_nav_timing < 10) {
+    if (Device.dwTimeGlobal - m_nav_timing < 10)
+    {
         return;
     }
     m_nav_timing = Device.dwTimeGlobal;
 
-    if (m_btn_nav[btn_up]->CursorOverWindow() && m_btn_nav[btn_up]->GetButtonState() == CUIButton::BUTTON_PUSHED) {
+    if (m_btn_nav[btn_up]->CursorOverWindow() && m_btn_nav[btn_up]->GetButtonState() == CUIButton::BUTTON_PUSHED)
+    {
         MoveMap(Fvector2().set(0.0f, m_map_move_step));
     }
     else if (m_btn_nav[btn_left]->CursorOverWindow() &&
-             m_btn_nav[btn_left]->GetButtonState() == CUIButton::BUTTON_PUSHED)
+        m_btn_nav[btn_left]->GetButtonState() == CUIButton::BUTTON_PUSHED)
     {
         MoveMap(Fvector2().set(m_map_move_step, 0.0f));
     }
     else if (m_btn_nav[btn_right]->CursorOverWindow() &&
-             m_btn_nav[btn_right]->GetButtonState() == CUIButton::BUTTON_PUSHED)
+        m_btn_nav[btn_right]->GetButtonState() == CUIButton::BUTTON_PUSHED)
     {
         MoveMap(Fvector2().set(-m_map_move_step, 0.0f));
     }
     else if (m_btn_nav[btn_down]->CursorOverWindow() &&
-             m_btn_nav[btn_down]->GetButtonState() == CUIButton::BUTTON_PUSHED)
+        m_btn_nav[btn_down]->GetButtonState() == CUIButton::BUTTON_PUSHED)
     {
         MoveMap(Fvector2().set(0.0f, -m_map_move_step));
     }
@@ -72,7 +74,8 @@ void CUIMapWnd::UpdateNav()
 void CUIMapWnd::OnBtnLegend_Push(CUIWindow*, void*)
 {
     CUITaskWnd* parent_wnd = smart_cast<CUITaskWnd*>(m_pParentWnd);
-    if (parent_wnd) {
+    if (parent_wnd)
+    {
         parent_wnd->Switch_ShowMapLegend();
     }
 }
@@ -81,21 +84,7 @@ void CUIMapWnd::OnBtnLegend_Push(CUIWindow*, void*)
 // void CUIMapWnd::OnBtnRight_Push(CUIWindow*, void*) { MoveMap( Fvector2().set( -m_map_move_step, 0.0f ) ); }
 // void CUIMapWnd::OnBtnDown_Push( CUIWindow*, void*) { MoveMap( Fvector2().set( 0.0f, -m_map_move_step ) ); }
 
-void CUIMapWnd::OnBtnZoomMore_Push(CUIWindow*, void*)
-{
-    ViewZoomIn();
-}
-
-void CUIMapWnd::OnBtnActor_Push(CUIWindow*, void*)
-{
-    ViewActor();
-}
-
-void CUIMapWnd::OnBtnZoomLess_Push(CUIWindow*, void*)
-{
-    ViewZoomOut();
-}
-void CUIMapWnd::OnBtnZoomReset_Push(CUIWindow*, void*)
-{
-    ViewGlobalMap();
-}
+void CUIMapWnd::OnBtnZoomMore_Push(CUIWindow*, void*) { ViewZoomIn(); }
+void CUIMapWnd::OnBtnActor_Push(CUIWindow*, void*) { ViewActor(); }
+void CUIMapWnd::OnBtnZoomLess_Push(CUIWindow*, void*) { ViewZoomOut(); }
+void CUIMapWnd::OnBtnZoomReset_Push(CUIWindow*, void*) { ViewGlobalMap(); }

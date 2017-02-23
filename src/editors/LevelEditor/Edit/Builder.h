@@ -25,9 +25,9 @@ class CSceneStat;
 // some types
 typedef Fvector b_vnormal;
 
-struct sb_light_control  // controller or "layer", 30fps
+struct sb_light_control // controller or "layer", 30fps
 {
-    string64 name;  // empty for base layer
+    string64 name; // empty for base layer
     U32Vec data;
 };
 
@@ -41,7 +41,7 @@ struct e_b_lod
 
 class SceneBuilder
 {
-  public:
+public:
     struct SBuildLight
     {
         Flight light;
@@ -50,10 +50,10 @@ class SceneBuilder
 
     DEFINE_VECTOR(SBuildLight, BLVec, BLIt);
 
-  protected:
+protected:
     BLVec simple_hemi;
 
-  public:
+public:
     CEditableObject* object_for_render;
 
     int l_vert_cnt, l_vert_it;
@@ -122,19 +122,18 @@ class SceneBuilder
     void SaveBuild();
     void SaveBuildAsObject();
 
-  protected:
+protected:
     friend void SaveBuild();
     friend class TfrmBuildProgress;
 
     Fbox m_LevelBox;
 
-  public:
+public:
     bool m_save_as_object;
     string_path m_LevelPath;
 
     xr_string MakeLevelPath(LPCSTR nm) { return xr_string(m_LevelPath) + xr_string(nm); }
-
-  protected:
+protected:
     bool EvictResource();
     bool PrepareFolders();
     bool PreparePath();
@@ -156,7 +155,7 @@ class SceneBuilder
     int m_iDefaultSectorNum;
     bool RenumerateSectors();
 
-  public:
+public:
     SceneBuilder();
     virtual ~SceneBuilder();
 

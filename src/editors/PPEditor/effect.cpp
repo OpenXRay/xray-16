@@ -48,7 +48,8 @@ void Effect::create(float time)
 //---------------------------------------------------------------------------
 void Effect::draw()
 {
-    if (m_Created == false) return;
+    if (m_Created == false)
+        return;
     m_BaseColor->draw();
     m_AddColor->draw();
     m_GrayColor->draw();
@@ -57,7 +58,8 @@ void Effect::draw()
 //---------------------------------------------------------------------------
 void Effect::add_point(int _xpos, int _ypos)
 {
-    if (m_Edit == ee_none) return;
+    if (m_Edit == ee_none)
+        return;
     float ftime = (float)_xpos / (float)m_Host->Width;
     float fvalue = (float)_ypos - (float)m_Host->Height * 0.5f;
     switch (m_Edit)

@@ -25,14 +25,11 @@ CCustomOutfit::CCustomOutfit()
     m_BonesProtectionSect = NULL;
 }
 
-CCustomOutfit::~CCustomOutfit()
-{
-    xr_delete(m_boneProtection);
-}
-
+CCustomOutfit::~CCustomOutfit() { xr_delete(m_boneProtection); }
 BOOL CCustomOutfit::net_Spawn(CSE_Abstract* DC)
 {
-    if (IsGameTypeSingle()) ReloadBonesProtection();
+    if (IsGameTypeSingle())
+        ReloadBonesProtection();
 
     BOOL res = inherited::net_Spawn(DC);
     return (res);
@@ -55,7 +52,8 @@ void CCustomOutfit::net_Import(NET_Packet& P)
 void CCustomOutfit::OnH_A_Chield()
 {
     inherited::OnH_A_Chield();
-    if (!IsGameTypeSingle()) ReloadBonesProtection();
+    if (!IsGameTypeSingle())
+        ReloadBonesProtection();
 }
 
 void CCustomOutfit::Load(LPCSTR section)
@@ -70,7 +68,7 @@ void CCustomOutfit::Load(LPCSTR section)
     m_HitTypeProtection[ALife::eHitTypeTelepatic] = pSettings->r_float(section, "telepatic_protection");
     m_HitTypeProtection[ALife::eHitTypeChemicalBurn] = pSettings->r_float(section, "chemical_burn_protection");
     m_HitTypeProtection[ALife::eHitTypeExplosion] = pSettings->r_float(section, "explosion_protection");
-    m_HitTypeProtection[ALife::eHitTypeFireWound] = 0.f;  // pSettings->r_float(section,"fire_wound_protection");
+    m_HitTypeProtection[ALife::eHitTypeFireWound] = 0.f; // pSettings->r_float(section,"fire_wound_protection");
     //	m_HitTypeProtection[ALife::eHitTypePhysicStrike]= pSettings->r_float(section,"physic_strike_protection");
     m_HitTypeProtection[ALife::eHitTypeLightBurn] = m_HitTypeProtection[ALife::eHitTypeBurn];
     m_boneProtection->m_fHitFracActor = pSettings->r_float(section, "hit_fraction_actor");
@@ -109,7 +107,8 @@ void CCustomOutfit::Load(LPCSTR section)
 void CCustomOutfit::ReloadBonesProtection()
 {
     IGameObject* parent = H_Parent();
-    if (IsGameTypeSingle()) parent = smart_cast<IGameObject*>(Level().CurrentViewEntity());
+    if (IsGameTypeSingle())
+        parent = smart_cast<IGameObject*>(Level().CurrentViewEntity());
 
     if (parent && parent->Visual() && m_BonesProtectionSect.size())
         m_boneProtection->reload(m_BonesProtectionSect, smart_cast<IKinematics*>(parent->Visual()));
@@ -133,24 +132,25 @@ float CCustomOutfit::GetHitTypeProtection(ALife::EHitType hit_type, s16 element)
     return fBase * bone;
 }
 
-float CCustomOutfit::GetBoneArmor(s16 element)
-{
-    return m_boneProtection->getBoneArmor(element);
-}
-
+float CCustomOutfit::GetBoneArmor(s16 element) { return m_boneProtection->getBoneArmor(element); }
 float CCustomOutfit::HitThroughArmor(float hit_power, s16 element, float ap, bool& add_wound, ALife::EHitType hit_type)
 {
     float NewHitPower = hit_power;
-    if (hit_type == ALife::eHitTypeFireWound) {
+    if (hit_type == ALife::eHitTypeFireWound)
+    {
         float ba = GetBoneArmor(element);
-        if (ba < 0.0f) return NewHitPower;
+        if (ba < 0.0f)
+            return NewHitPower;
 
         float BoneArmor = ba * GetCondition();
-        if (/*!fis_zero(ba, EPS) && */ (ap > BoneArmor)) {
+        if (/*!fis_zero(ba, EPS) && */ (ap > BoneArmor))
+        {
             //пуля пробила бронь
-            if (!IsGameTypeSingle()) {
+            if (!IsGameTypeSingle())
+            {
                 float hit_fraction = (ap - BoneArmor) / ap;
-                if (hit_fraction < m_boneProtection->m_fHitFracActor) hit_fraction = m_boneProtection->m_fHitFracActor;
+                if (hit_fraction < m_boneProtection->m_fHitFracActor)
+                    hit_fraction = m_boneProtection->m_fHitFracActor;
 
                 NewHitPower *= hit_fraction;
                 NewHitPower *= m_boneProtection->getBoneProtection(element);
@@ -162,7 +162,7 @@ float CCustomOutfit::HitThroughArmor(float hit_power, s16 element, float ap, boo
         {
             //пуля НЕ пробила бронь
             NewHitPower *= m_boneProtection->m_fHitFracActor;
-            add_wound = false;  //раны нет
+            add_wound = false; //раны нет
         }
     }
     else
@@ -176,7 +176,8 @@ float CCustomOutfit::HitThroughArmor(float hit_power, s16 element, float ap, boo
         float protect = GetDefHitTypeProtection(hit_type);
         NewHitPower -= protect * one;
 
-        if (NewHitPower < 0.f) NewHitPower = 0.f;
+        if (NewHitPower < 0.f)
+            NewHitPower = 0.f;
     }
     //увеличить изношенность костюма
     Hit(hit_power, hit_type);
@@ -184,36 +185,41 @@ float CCustomOutfit::HitThroughArmor(float hit_power, s16 element, float ap, boo
     return NewHitPower;
 }
 
-BOOL CCustomOutfit::BonePassBullet(int boneID)
-{
-    return m_boneProtection->getBonePassBullet(s16(boneID));
-}
-
+BOOL CCustomOutfit::BonePassBullet(int boneID) { return m_boneProtection->getBonePassBullet(s16(boneID)); }
 #include "torch.h"
 void CCustomOutfit::OnMoveToSlot(const SInvItemPlace& prev)
 {
-    if (m_pInventory) {
+    if (m_pInventory)
+    {
         CActor* pActor = smart_cast<CActor*>(H_Parent());
-        if (pActor) {
+        if (pActor)
+        {
             ApplySkinModel(pActor, true, false);
-            if (prev.type == eItemPlaceSlot && !bIsHelmetAvaliable) {
+            if (prev.type == eItemPlaceSlot && !bIsHelmetAvaliable)
+            {
                 CTorch* pTorch = smart_cast<CTorch*>(pActor->inventory().ItemFromSlot(TORCH_SLOT));
-                if (pTorch && pTorch->GetNightVisionStatus()) pTorch->SwitchNightVision(true, false);
+                if (pTorch && pTorch->GetNightVisionStatus())
+                    pTorch->SwitchNightVision(true, false);
             }
             PIItem pHelmet = pActor->inventory().ItemFromSlot(HELMET_SLOT);
-            if (pHelmet && !bIsHelmetAvaliable) pActor->inventory().Ruck(pHelmet, false);
+            if (pHelmet && !bIsHelmetAvaliable)
+                pActor->inventory().Ruck(pHelmet, false);
         }
     }
 }
 
 void CCustomOutfit::ApplySkinModel(CActor* pActor, bool bDress, bool bHUDOnly)
 {
-    if (bDress) {
-        if (!bHUDOnly && m_ActorVisual.size()) {
+    if (bDress)
+    {
+        if (!bHUDOnly && m_ActorVisual.size())
+        {
             shared_str NewVisual = NULL;
             char* TeamSection = Game().getTeamSection(pActor->g_Team());
-            if (TeamSection) {
-                if (pSettings->line_exist(TeamSection, *cNameSect())) {
+            if (TeamSection)
+            {
+                if (pSettings->line_exist(TeamSection, *cNameSect()))
+                {
                     NewVisual = pSettings->r_string(TeamSection, *cNameSect());
                     string256 SkinName;
 
@@ -223,7 +229,8 @@ void CCustomOutfit::ApplySkinModel(CActor* pActor, bool bDress, bool bHUDOnly)
                     NewVisual._set(SkinName);
                 }
             }
-            if (!NewVisual.size()) NewVisual = m_ActorVisual;
+            if (!NewVisual.size())
+                NewVisual = m_ActorVisual;
 
             pActor->ChangeVisual(NewVisual);
         }
@@ -233,34 +240,36 @@ void CCustomOutfit::ApplySkinModel(CActor* pActor, bool bDress, bool bHUDOnly)
     }
     else
     {
-        if (!bHUDOnly && m_ActorVisual.size()) {
+        if (!bHUDOnly && m_ActorVisual.size())
+        {
             shared_str DefVisual = pActor->GetDefaultVisualOutfit();
-            if (DefVisual.size()) {
+            if (DefVisual.size())
+            {
                 pActor->ChangeVisual(DefVisual);
             };
         }
 
-        if (pActor == Level().CurrentViewEntity()) g_player_hud->load_default();
+        if (pActor == Level().CurrentViewEntity())
+            g_player_hud->load_default();
     }
 }
 
 void CCustomOutfit::OnMoveToRuck(const SInvItemPlace& prev)
 {
-    if (m_pInventory && prev.type == eItemPlaceSlot) {
+    if (m_pInventory && prev.type == eItemPlaceSlot)
+    {
         CActor* pActor = smart_cast<CActor*>(H_Parent());
-        if (pActor) {
+        if (pActor)
+        {
             ApplySkinModel(pActor, false, false);
             CTorch* pTorch = smart_cast<CTorch*>(pActor->inventory().ItemFromSlot(TORCH_SLOT));
-            if (pTorch && !bIsHelmetAvaliable) pTorch->SwitchNightVision(false);
+            if (pTorch && !bIsHelmetAvaliable)
+                pTorch->SwitchNightVision(false);
         }
     }
 };
 
-u32 CCustomOutfit::ef_equipment_type() const
-{
-    return (m_ef_equipment_type);
-}
-
+u32 CCustomOutfit::ef_equipment_type() const { return (m_ef_equipment_type); }
 bool CCustomOutfit::install_upgrade_impl(LPCSTR section, bool test)
 {
     bool result = inherited::install_upgrade_impl(section, test);
@@ -284,21 +293,24 @@ bool CCustomOutfit::install_upgrade_impl(LPCSTR section, bool test)
     result |= process_if_exists(
         section, "fire_wound_protection", &CInifile::r_float, m_HitTypeProtection[ALife::eHitTypeFireWound], test);
     //	result |= process_if_exists( section, "physic_strike_protection", &CInifile::r_float,
-    //m_HitTypeProtection[ALife::eHitTypePhysicStrike], test );
+    // m_HitTypeProtection[ALife::eHitTypePhysicStrike], test );
     LPCSTR str;
     bool result2 = process_if_exists_set(section, "nightvision_sect", &CInifile::r_string, str, test);
-    if (result2 && !test) {
+    if (result2 && !test)
+    {
         m_NightVisionSect._set(str);
     }
     result |= result2;
 
     result2 = process_if_exists_set(section, "bones_koeff_protection", &CInifile::r_string, str, test);
-    if (result2 && !test) {
+    if (result2 && !test)
+    {
         m_BonesProtectionSect = str;
         ReloadBonesProtection();
     }
     result2 = process_if_exists_set(section, "bones_koeff_protection_add", &CInifile::r_string, str, test);
-    if (result2 && !test) AddBonesProtection(str);
+    if (result2 && !test)
+        AddBonesProtection(str);
 
     result |= result2;
     result |=
@@ -326,7 +338,8 @@ bool CCustomOutfit::install_upgrade_impl(LPCSTR section, bool test)
 void CCustomOutfit::AddBonesProtection(LPCSTR bones_section)
 {
     IGameObject* parent = H_Parent();
-    if (IsGameTypeSingle()) parent = smart_cast<IGameObject*>(Level().CurrentViewEntity());
+    if (IsGameTypeSingle())
+        parent = smart_cast<IGameObject*>(Level().CurrentViewEntity());
 
     if (parent && parent->Visual() && m_BonesProtectionSect.size())
         m_boneProtection->add(bones_section, smart_cast<IKinematics*>(parent->Visual()));

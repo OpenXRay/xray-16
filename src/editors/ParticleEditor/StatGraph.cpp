@@ -49,13 +49,13 @@ void CStatGraph::RenderBack()
     FVF::TL0uv* pv = pv_start;
     // base rect
     pv->set(lt.x, rb.y, back_color);
-    pv++;  // 0
+    pv++; // 0
     pv->set(lt.x, lt.y, back_color);
-    pv++;  // 1
+    pv++; // 1
     pv->set(rb.x, rb.y, back_color);
-    pv++;  // 2
+    pv++; // 2
     pv->set(rb.x, lt.y, back_color);
-    pv++;  // 3
+    pv++; // 3
     // render
     dwCount = u32(pv - pv_start);
     RCache.Vertex.Unlock(dwCount, hGeomTri->vb_stride);
@@ -67,15 +67,15 @@ void CStatGraph::RenderBack()
     pv = pv_start;
     // base rect
     pv->set(lt.x, lt.y, rect_color);
-    pv++;  // 0
+    pv++; // 0
     pv->set(rb.x - 1, lt.y, rect_color);
-    pv++;  // 1
+    pv++; // 1
     pv->set(rb.x - 1, rb.y, rect_color);
-    pv++;  // 2
+    pv++; // 2
     pv->set(lt.x, rb.y, rect_color);
-    pv++;  // 3
+    pv++; // 3
     pv->set(lt.x, lt.y, rect_color);
-    pv++;  // 0
+    pv++; // 0
     // render
     dwCount = u32(pv - pv_start);
     RCache.Vertex.Unlock(dwCount, hGeomLine->vb_stride);
@@ -96,9 +96,9 @@ void CStatGraph::RenderBack()
     pv = pv_start;
     // base Coordinate Line
     pv->set(lt.x, int(base_y), base_color);
-    pv++;  // 0
+    pv++; // 0
     pv->set(rb.x, int(base_y), base_color);
-    pv++;  // 0
+    pv++; // 0
     // grid
     //    float grid_offs_x		= float(rb.x-lt.x)/float(grid.x+1);
     //    float grid_offs_y		= float(rb.y-lt.y)/float(grid.y+1);
@@ -143,14 +143,16 @@ void CStatGraph::RenderBars(FVF::TL0uv** ppv, ElementsDeq* pelements)
     float base_y = float(rb.y) + (mn * elem_factor);
 
     float column_width = elem_offs;
-    if (column_width > 1) column_width--;
+    if (column_width > 1)
+        column_width--;
     for (ElementsDeqIt it = pelements->begin(); it != pelements->end(); it++)
     {
         float X = float(it - pelements->begin()) * elem_offs + lt.x;
         float Y0 = base_y;
         float Y1 = base_y - it->data * elem_factor;
 
-        if (Y1 > Y0) {
+        if (Y1 > Y0)
+        {
             (*ppv)->set(X, Y1, it->color);
             (*ppv)++;
             (*ppv)->set(X, Y0, it->color);
@@ -308,7 +310,8 @@ void CStatGraph::OnRender()
     FVF::TL0uv* pv_Line_start = NULL;
     FVF::TL0uv* pv_Line;
 
-    if (TriElem) {
+    if (TriElem)
+    {
         pv_Tri_start = (FVF::TL0uv*)RCache.Vertex.Lock(TriElem, hGeomTri->vb_stride, dwOffsetTri);
         pv_Tri = pv_Tri_start;
 
@@ -326,7 +329,8 @@ void CStatGraph::OnRender()
         RCache.Render(D3DPT_TRIANGLELIST, dwOffsetTri, 0, dwCount, 0, dwCount / 2);
     };
 
-    if (LineElem) {
+    if (LineElem)
+    {
         pv_Line_start = (FVF::TL0uv*)RCache.Vertex.Lock(LineElem, hGeomLine->vb_stride, dwOffsetLine);
         pv_Line = pv_Line_start;
 
@@ -345,7 +349,8 @@ void CStatGraph::OnRender()
         RCache.Render(D3DPT_LINELIST, dwOffsetLine, dwCount / 2);
     };
 
-    if (!m_Markers.empty()) {
+    if (!m_Markers.empty())
+    {
         dwOffsetLine = 0;
         LineElem = m_Markers.size() * 2;
 

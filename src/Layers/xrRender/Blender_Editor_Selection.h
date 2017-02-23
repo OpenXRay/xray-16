@@ -9,7 +9,6 @@ class CBlender_Editor_Selection : public IBlender
 public:
     virtual LPCSTR getComment() { return "EDITOR: selection"; }
     virtual BOOL canBeLMAPped() { return FALSE; }
-
     virtual void Save(IWriter& fs);
     virtual void Load(IReader& fs, u16 version);
 
@@ -19,4 +18,4 @@ public:
     virtual ~CBlender_Editor_Selection();
 };
 
-#endif  // BLENDER_EDITOR_SELECTION_H
+#endif // BLENDER_EDITOR_SELECTION_H

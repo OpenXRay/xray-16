@@ -32,9 +32,11 @@ CPatrolPoint::CPatrolPoint(const CPatrolPath* path)
 void CPatrolPoint::verify_vertex_id(
     const CLevelGraph* level_graph, const CGameLevelCrossTable* cross, const CGameGraph* game_graph) const
 {
-    if (!level_graph) return;
+    if (!level_graph)
+        return;
 
-    if (level_graph->valid_vertex_id(m_level_vertex_id)) {
+    if (level_graph->valid_vertex_id(m_level_vertex_id))
+    {
         return;
     }
 
@@ -82,7 +84,8 @@ CPatrolPoint& CPatrolPoint::load_raw(
     stream.r_fvector3(m_position);
     m_flags = stream.r_u32();
     stream.r_stringZ(m_name);
-    if (level_graph && level_graph->valid_vertex_position(m_position)) {
+    if (level_graph && level_graph->valid_vertex_position(m_position))
+    {
         Fvector position = m_position;
         position.y += .15f;
         m_level_vertex_id = level_graph->vertex_id(position);

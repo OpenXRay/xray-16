@@ -13,11 +13,7 @@
 
 using namespace luabind;
 
-LPCSTR profile_name_script(CSE_ALifeTraderAbstract* ta)
-{
-    return *ta->character_profile();
-}
-
+LPCSTR profile_name_script(CSE_ALifeTraderAbstract* ta) { return *ta->character_profile(); }
 SCRIPT_EXPORT(CSE_ALifeTraderAbstract, (), {
     module(luaState)[class_<CSE_ALifeTraderAbstract>("cse_alife_trader_abstract")
                          //			.def(		constructor<LPCSTR>())

@@ -2,40 +2,32 @@
 
 #include "UIStatix.h"
 
-CUIStatix::CUIStatix()
-{
-    m_bSelected = false;
-}
-
-CUIStatix::~CUIStatix()
-{
-}
-
+CUIStatix::CUIStatix() { m_bSelected = false; }
+CUIStatix::~CUIStatix() {}
 void CUIStatix::start_anim()
 {
     SetColorAnimation("ui_slow_blinking", LA_CYCLIC | LA_ONLYALPHA | LA_TEXTCOLOR | LA_TEXTURECOLOR);
     ResetColorAnimation();
 }
 
-void CUIStatix::stop_anim()
-{
-    SetColorAnimation(NULL, 0);
-}
-
+void CUIStatix::stop_anim() { SetColorAnimation(NULL, 0); }
 void CUIStatix::Update()
 {
     CUIStatic* child = smart_cast<CUIStatic*>(FindChild("auto_static_0"));
-    if (child) child->SetTextureColor(0x00ffffff);
+    if (child)
+        child->SetTextureColor(0x00ffffff);
     SetTextureColor(0xffffffff);
 
-    if (m_bCursorOverWindow) {
+    if (m_bCursorOverWindow)
+    {
         if (child)
             child->SetTextureColor(0xff349F06);
         else
             SetTextureColor(0xff349F06);
     }
 
-    if (!IsEnabled()) {
+    if (!IsEnabled())
+    {
         SetTextureColor(0x80ffffff);
     };
 
@@ -51,7 +43,8 @@ void CUIStatix::OnFocusLost()
     else
         SetTextureColor(0xffffffff);
 
-    if (!IsEnabled()) {
+    if (!IsEnabled())
+    {
         SetTextureColor(0x80ffffff);
     };
 }
@@ -73,9 +66,11 @@ void CUIStatix::SetSelectedState(bool state)
     bool b = m_bSelected;
     m_bSelected = state;
 
-    if (b == m_bSelected) return;
+    if (b == m_bSelected)
+        return;
 
-    if (!state) OnFocusLost();
+    if (!state)
+        OnFocusLost();
 
     if (state)
         start_anim();
@@ -83,7 +78,4 @@ void CUIStatix::SetSelectedState(bool state)
         stop_anim();
 }
 
-bool CUIStatix::GetSelectedState()
-{
-    return m_bSelected;
-}
+bool CUIStatix::GetSelectedState() { return m_bSelected; }

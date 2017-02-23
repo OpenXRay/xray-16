@@ -19,7 +19,8 @@ public:
     void set_cleanup(u32 id)
     {
         lock.Enter();
-        if (vec_cleanup[data] == id) {
+        if (vec_cleanup[data] == id)
+        {
             lock.Leave();
             return;
         }

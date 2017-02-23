@@ -15,7 +15,6 @@ public:
     IC Point(const Point& p) : x(p.x), y(p.y), z(p.z) {}
     //! Destructor
     IC ~Point() {}
-
     //! Returns MIN(x, y, z);
     // IC	float		Min()								const		{ return MIN(x, MIN(y, z));
     // }
@@ -23,31 +22,33 @@ public:
     // IC	float		Max()								const		{ return MAX(x, MAX(y, z));
     // }
     //! TO BE DOCUMENTED
-    // IC	Point&		Min(const Point& p)								{ x = MIN(x, p.x); y = MIN(y, p.y); z = MIN(z, p.z);	return *this;
+    // IC	Point&		Min(const Point& p)								{ x = MIN(x, p.x); y = MIN(y, p.y); z = MIN(z, p.z);	return
+    // *this;
     // }
     //! TO BE DOCUMENTED
-    // IC	Point&		Max(const Point& p)								{ x = MAX(x, p.x); y = MAX(y, p.y); z = MAX(z, p.z);	return *this;
+    // IC	Point&		Max(const Point& p)								{ x = MAX(x, p.x); y = MAX(y, p.y); z = MAX(z, p.z);	return
+    // *this;
     // }
 
     //! Computes square magnitude
     IC float SquareMagnitude() const { return x * x + y * y + z * z; }
     //! Computes magnitude
     IC float Magnitude() const { return _sqrt(x * x + y * y + z * z); }
-
     //! Return largest axis
     IC u32 LargestAxis() const
     {
         const float* Vals = &x;
         u32 m = 0;
-        if (Vals[1] > Vals[m]) m = 1;
-        if (Vals[2] > Vals[m]) m = 2;
+        if (Vals[1] > Vals[m])
+            m = 1;
+        if (Vals[2] > Vals[m])
+            m = 2;
         return m;
     }
 
     // Arithmetic operators
     //! Operator for Point Negate = - Point
     ICF Point operator-() const { return Point(-x, -y, -z); }
-
     //! Operator for Point Plus = Point + Point.
     ICF Point operator+(const Point& p) const { return Point(x + p.x, y + p.y, z + p.z); }
     //! Operator for Point Minus = Point - Point.
@@ -67,7 +68,6 @@ public:
     ICF float operator|(const Point& p) const { return x * p.x + y * p.y + z * p.z; }
     //! Operator for Point VecProd = Point ^ Point.
     ICF Point operator^(const Point& p) const { return Point(y * p.z - z * p.y, z * p.x - x * p.z, x * p.y - y * p.x); }
-
     //! Operator for Point += Point.
     ICF Point& operator+=(const Point& p)
     {
@@ -133,33 +133,39 @@ public:
     ICF operator const float*() const { return &x; }
     //! Access as array
     ICF operator float*() { return &x; }
-
 public:
-    float x;  //!< x coordinate
-    float y;  //!< y coordinate
-    float z;  //!< z coordinate
+    float x; //!< x coordinate
+    float y; //!< y coordinate
+    float z; //!< z coordinate
 };
 // using namespace CDB;
 using namespace Opcode;
 // typedef float*	Point;
 // typedef	dVector3 Point
 //! This macro quickly finds the min & max values among 3 variables
-#define FINDMINMAX(x0, x1, x2, min, max)                                                                               \
-    min = max = x0;                                                                                                    \
-    if (x1 < min) min = x1;                                                                                            \
-    if (x1 > max) max = x1;                                                                                            \
-    if (x2 < min) min = x2;                                                                                            \
-    if (x2 > max) max = x2;
+#define FINDMINMAX(x0, x1, x2, min, max) \
+    min = max = x0;                      \
+    if (x1 < min)                        \
+        min = x1;                        \
+    if (x1 > max)                        \
+        max = x1;                        \
+    if (x2 < min)                        \
+        min = x2;                        \
+    if (x2 > max)                        \
+        max = x2;
 
-#define EXITMINMAX(x0, x1, x2, min, max)                                                                               \
-    if (x0 < min && x1 < min && x2 < min) return false;                                                                \
-    if (x0 > max && x1 > max && x2 > max) return false;
+#define EXITMINMAX(x0, x1, x2, min, max)  \
+    if (x0 < min && x1 < min && x2 < min) \
+        return false;                     \
+    if (x0 > max && x1 > max && x2 > max) \
+        return false;
 
 //! TO BE DOCUMENTED
 ICF bool planeBoxOverlap_slow(const Point& normal, const float d, const Point& maxbox)
 {
     Point vmin, vmax;
-    if (normal[0] > 0.0f) {
+    if (normal[0] > 0.0f)
+    {
         vmin[0] = -maxbox[0];
         vmax[0] = maxbox[0];
     }
@@ -168,7 +174,8 @@ ICF bool planeBoxOverlap_slow(const Point& normal, const float d, const Point& m
         vmin[0] = maxbox[0];
         vmax[0] = -maxbox[0];
     }
-    if (normal[1] > 0.0f) {
+    if (normal[1] > 0.0f)
+    {
         vmin[1] = -maxbox[1];
         vmax[1] = maxbox[1];
     }
@@ -177,7 +184,8 @@ ICF bool planeBoxOverlap_slow(const Point& normal, const float d, const Point& m
         vmin[1] = maxbox[1];
         vmax[1] = -maxbox[1];
     }
-    if (normal[2] > 0.0f) {
+    if (normal[2] > 0.0f)
+    {
         vmin[2] = -maxbox[2];
         vmax[2] = maxbox[2];
     }
@@ -186,8 +194,10 @@ ICF bool planeBoxOverlap_slow(const Point& normal, const float d, const Point& m
         vmin[2] = maxbox[2];
         vmax[2] = -maxbox[2];
     }
-    if ((normal | vmin) + d >= 0.0f) return false;
-    if ((normal | vmax) + d > 0.0f) return true;
+    if ((normal | vmin) + d >= 0.0f)
+        return false;
+    if ((normal | vmax) + d > 0.0f)
+        return true;
     return false;
 }
 
@@ -201,76 +211,88 @@ ICF bool planeBoxOverlap(const Point& normal, const float d, const Point& maxbox
 }
 
 //! TO BE DOCUMENTED
-#define AXISTEST_X01(a, b, fa, fb)                                                                                     \
-    min = a * v0.y - b * v0.z;                                                                                         \
-    max = a * v2.y - b * v2.z;                                                                                         \
-    if (min > max) {                                                                                                   \
-        const float tmp = max;                                                                                         \
-        max = min;                                                                                                     \
-        min = tmp;                                                                                                     \
-    }                                                                                                                  \
-    rad = fa * extents.y + fb * extents.z;                                                                             \
-    if (min > rad || max < -rad) return false;
+#define AXISTEST_X01(a, b, fa, fb)         \
+    min = a * v0.y - b * v0.z;             \
+    max = a * v2.y - b * v2.z;             \
+    if (min > max)                         \
+    {                                      \
+        const float tmp = max;             \
+        max = min;                         \
+        min = tmp;                         \
+    }                                      \
+    rad = fa * extents.y + fb * extents.z; \
+    if (min > rad || max < -rad)           \
+        return false;
 
 //! TO BE DOCUMENTED
-#define AXISTEST_X2(a, b, fa, fb)                                                                                      \
-    min = a * v0.y - b * v0.z;                                                                                         \
-    max = a * v1.y - b * v1.z;                                                                                         \
-    if (min > max) {                                                                                                   \
-        const float tmp = max;                                                                                         \
-        max = min;                                                                                                     \
-        min = tmp;                                                                                                     \
-    }                                                                                                                  \
-    rad = fa * extents.y + fb * extents.z;                                                                             \
-    if (min > rad || max < -rad) return false;
+#define AXISTEST_X2(a, b, fa, fb)          \
+    min = a * v0.y - b * v0.z;             \
+    max = a * v1.y - b * v1.z;             \
+    if (min > max)                         \
+    {                                      \
+        const float tmp = max;             \
+        max = min;                         \
+        min = tmp;                         \
+    }                                      \
+    rad = fa * extents.y + fb * extents.z; \
+    if (min > rad || max < -rad)           \
+        return false;
 
 //! TO BE DOCUMENTED
-#define AXISTEST_Y02(a, b, fa, fb)                                                                                     \
-    min = b * v0.z - a * v0.x;                                                                                         \
-    max = b * v2.z - a * v2.x;                                                                                         \
-    if (min > max) {                                                                                                   \
-        const float tmp = max;                                                                                         \
-        max = min;                                                                                                     \
-        min = tmp;                                                                                                     \
-    }                                                                                                                  \
-    rad = fa * extents.x + fb * extents.z;                                                                             \
-    if (min > rad || max < -rad) return false;
+#define AXISTEST_Y02(a, b, fa, fb)         \
+    min = b * v0.z - a * v0.x;             \
+    max = b * v2.z - a * v2.x;             \
+    if (min > max)                         \
+    {                                      \
+        const float tmp = max;             \
+        max = min;                         \
+        min = tmp;                         \
+    }                                      \
+    rad = fa * extents.x + fb * extents.z; \
+    if (min > rad || max < -rad)           \
+        return false;
 
 //! TO BE DOCUMENTED
-#define AXISTEST_Y1(a, b, fa, fb)                                                                                      \
-    min = b * v0.z - a * v0.x;                                                                                         \
-    max = b * v1.z - a * v1.x;                                                                                         \
-    if (min > max) {                                                                                                   \
-        const float tmp = max;                                                                                         \
-        max = min;                                                                                                     \
-        min = tmp;                                                                                                     \
-    }                                                                                                                  \
-    rad = fa * extents.x + fb * extents.z;                                                                             \
-    if (min > rad || max < -rad) return false;
+#define AXISTEST_Y1(a, b, fa, fb)          \
+    min = b * v0.z - a * v0.x;             \
+    max = b * v1.z - a * v1.x;             \
+    if (min > max)                         \
+    {                                      \
+        const float tmp = max;             \
+        max = min;                         \
+        min = tmp;                         \
+    }                                      \
+    rad = fa * extents.x + fb * extents.z; \
+    if (min > rad || max < -rad)           \
+        return false;
 
 //! TO BE DOCUMENTED
-#define AXISTEST_Z12(a, b, fa, fb)                                                                                     \
-    min = a * v1.x - b * v1.y;                                                                                         \
-    max = a * v2.x - b * v2.y;                                                                                         \
-    if (min > max) {                                                                                                   \
-        const float tmp = max;                                                                                         \
-        max = min;                                                                                                     \
-        min = tmp;                                                                                                     \
-    }                                                                                                                  \
-    rad = fa * extents.x + fb * extents.y;                                                                             \
-    if (min > rad || max < -rad) return false;
+#define AXISTEST_Z12(a, b, fa, fb)         \
+    min = a * v1.x - b * v1.y;             \
+    max = a * v2.x - b * v2.y;             \
+    if (min > max)                         \
+    {                                      \
+        const float tmp = max;             \
+        max = min;                         \
+        min = tmp;                         \
+    }                                      \
+    rad = fa * extents.x + fb * extents.y; \
+    if (min > rad || max < -rad)           \
+        return false;
 
 //! TO BE DOCUMENTED
-#define AXISTEST_Z0(a, b, fa, fb)                                                                                      \
-    min = a * v0.x - b * v0.y;                                                                                         \
-    max = a * v1.x - b * v1.y;                                                                                         \
-    if (min > max) {                                                                                                   \
-        const float tmp = max;                                                                                         \
-        max = min;                                                                                                     \
-        min = tmp;                                                                                                     \
-    }                                                                                                                  \
-    rad = fa * extents.x + fb * extents.y;                                                                             \
-    if (min > rad || max < -rad) return false;
+#define AXISTEST_Z0(a, b, fa, fb)          \
+    min = a * v0.x - b * v0.y;             \
+    max = a * v1.x - b * v1.y;             \
+    if (min > max)                         \
+    {                                      \
+        const float tmp = max;             \
+        max = min;                         \
+        min = tmp;                         \
+    }                                      \
+    rad = fa * extents.x + fb * extents.y; \
+    if (min > rad || max < -rad)           \
+        return false;
 
 IC bool aabb_tri_aabb(Point center, Point extents, const Point* mLeafVerts)
 {
@@ -312,14 +334,16 @@ IC bool aabb_tri_aabb(Point center, Point extents, const Point* mLeafVerts)
     bool r0 = planeBoxOverlap(normal, d, extents);
 
 #ifdef DEBUG
-    if (r0 != planeBoxOverlap_slow(normal, d, extents)) {
+    if (r0 != planeBoxOverlap_slow(normal, d, extents))
+    {
         Msg("planeBoxOverlap != planeBoxOverlap_slow");
         Msg("normal %f,%f,%f", normal.x, normal.y, normal.z);
         Msg("dist %f", d);
         Msg("extents %f,%f,%f", extents.x, extents.y, extents.z);
     }
 #endif
-    if (!r0) return false;
+    if (!r0)
+        return false;
     return true;
 }
 IC bool __aabb_tri(Point center, Point extents, const Point* mLeafVerts)
@@ -335,7 +359,8 @@ IC bool __aabb_tri(Point center, Point extents, const Point* mLeafVerts)
     float min, max;
     // Find min, max of the triangle in x-direction, and test for overlap in X
     FINDMINMAX(v0.x, v1.x, v2.x, min, max);
-    if (min > extents.x || max < -extents.x) return false;
+    if (min > extents.x || max < -extents.x)
+        return false;
 
     // Same for Y
     v0.y = mLeafVerts[0].y - center.y;
@@ -343,7 +368,8 @@ IC bool __aabb_tri(Point center, Point extents, const Point* mLeafVerts)
     v2.y = mLeafVerts[2].y - center.y;
 
     FINDMINMAX(v0.y, v1.y, v2.y, min, max);
-    if (min > extents.y || max < -extents.y) return false;
+    if (min > extents.y || max < -extents.y)
+        return false;
 
     // Same for Z
     v0.z = mLeafVerts[0].z - center.z;
@@ -351,7 +377,8 @@ IC bool __aabb_tri(Point center, Point extents, const Point* mLeafVerts)
     v2.z = mLeafVerts[2].z - center.z;
 
     FINDMINMAX(v0.z, v1.z, v2.z, min, max);
-    if (min > extents.z || max < -extents.z) return false;
+    if (min > extents.z || max < -extents.z)
+        return false;
 
     // 2) Test if the box intersects the plane of the triangle
     // compute plane equation of triangle: normal*x+d=0
@@ -362,14 +389,16 @@ IC bool __aabb_tri(Point center, Point extents, const Point* mLeafVerts)
     const float d = -normal | v0;
     bool r0 = planeBoxOverlap(normal, d, extents);
 #ifdef DEBUG
-    if (r0 != planeBoxOverlap_slow(normal, d, extents)) {
+    if (r0 != planeBoxOverlap_slow(normal, d, extents))
+    {
         Msg("planeBoxOverlap != planeBoxOverlap_slow");
         Msg("normal %f,%f,%f", normal.x, normal.y, normal.z);
         Msg("dist %f", d);
         Msg("extents %f,%f,%f", extents.x, extents.y, extents.z);
     }
 #endif
-    if (!r0) return false;
+    if (!r0)
+        return false;
 
     // 3) "Class III" tests
     // if(bClass3)

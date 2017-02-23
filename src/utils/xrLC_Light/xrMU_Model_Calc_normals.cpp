@@ -14,11 +14,7 @@ void destroy_vertex(_vertex*& v, bool unregister)
     v = NULL;
 }
 
-void calc_normals(xrMU_Model& model)
-{
-    calculate_normals<_vertex>::calc_normals(model.m_vertices, model.m_faces);
-}
-
+void calc_normals(xrMU_Model& model) { calculate_normals<_vertex>::calc_normals(model.m_vertices, model.m_faces); }
 /*
 void xrMU_Model::calc_normals()
 {

@@ -2,22 +2,14 @@
 #include "camera_exporter.h"
 #include "editors/ECore/Editor/EditObject.h"
 
-bool CXRayCameraExport::haveReadMethod() const
-{
-    return false;
-}
-
+bool CXRayCameraExport::haveReadMethod() const { return false; }
 bool CXRayCameraExport::haveWriteMethod() const
 {
     std::cerr << "Dbg : bool CXRayCameraExport::haveWriteMethod () const\n";
     return true;
 }
 
-void* CXRayCameraExport::creator()
-{
-    return new CXRayCameraExport();
-}
-
+void* CXRayCameraExport::creator() { return new CXRayCameraExport(); }
 MStatus CXRayCameraExport::reader(const MFileObject& file, const MString& optionsString, FileAccessMode mode)
 {
     fprintf(stderr, "CXRayCameraExport::reader called in error\n");
@@ -63,7 +55,8 @@ static IC void ParseMatrix(MTransformationMatrix& mat, Fvector& t, Fvector& r, b
     MDistance dst_z(trans.z);
     t.set((float)dst_x.asMeters(), (float)dst_y.asMeters(), -(float)dst_z.asMeters());
 
-    if (bRoot) {
+    if (bRoot)
+    {
         t.set((float)dst_x.asMeters(), (float)dst_y.asMeters(), -(float)dst_z.asMeters());
     }
 }
@@ -71,7 +64,8 @@ static IC void ParseMatrix(MTransformationMatrix& mat, Fvector& t, Fvector& r, b
 bool correction_needed(float prev_ang, float curr_ang)
 {
     float dist = _abs(curr_ang - prev_ang);
-    if (_abs(dist - PI_MUL_2) < dist) {
+    if (_abs(dist - PI_MUL_2) < dist)
+    {
         //		Msg("needed [%f][%f]", prev_ang, curr_ang);
         return true;
     }
@@ -94,7 +88,8 @@ MStatus CXRayCameraExport::ExportCamera(const MFileObject& file)
         list.getDagPath(index, node, component);
         nodeFn.setObject(node);
         st = C.setObject(node);
-        if (st != MStatus::kSuccess) {
+        if (st != MStatus::kSuccess)
+        {
             Msg("Selected object is not a camera");
             return MStatus::kInvalidParameter;
         }
@@ -113,7 +108,7 @@ MStatus CXRayCameraExport::ExportCamera(const MFileObject& file)
     tmTemp.setUnit(MTime::uiUnit());
     tmTemp2.setUnit(MTime::uiUnit());
     tmQuant.setUnit(MTime::uiUnit());
-    tmQuant = 5.0;  // 10.0; //3 time in sec. temporary
+    tmQuant = 5.0; // 10.0; //3 time in sec. temporary
 
     COMotion M;
     int frms = (int)(endFrame - startFrame).as(MTime::uiUnit());
@@ -146,8 +141,10 @@ MStatus CXRayCameraExport::ExportCamera(const MFileObject& file)
 
         bool bpositive_y_prev = Rprev.y > 0.0f;
         bool bpositive_y_cur = R.y > 0.0f;
-        if (b_not_first && correction_needed(Rprev.y, R.y)) {
-            if (bpositive_y_prev && !bpositive_y_cur) {
+        if (b_not_first && correction_needed(Rprev.y, R.y))
+        {
+            if (bpositive_y_prev && !bpositive_y_cur)
+            {
                 add_ = PI_MUL_2;
                 R.y += add_;
                 Msg("+2pi correction");
@@ -161,7 +158,8 @@ MStatus CXRayCameraExport::ExportCamera(const MFileObject& file)
             else
             {
                 float dist = (R.y - Rprev.y);
-                if (dist > 0) {
+                if (dist > 0)
+                {
                     add_ = -PI_MUL_2;
                     R.y += add_;
                 }
@@ -179,11 +177,13 @@ MStatus CXRayCameraExport::ExportCamera(const MFileObject& file)
         Msg("%f - %f", time_, R.y);
         M.CreateKey(time_, P, R);
         count++;
-        if (tmTemp == endFrame) break;
+        if (tmTemp == endFrame)
+            break;
 
         tmTemp += tmQuant;
 
-        if (tmTemp > endFrame) tmTemp = endFrame;
+        if (tmTemp > endFrame)
+            tmTemp = endFrame;
 
         b_not_first = true;
     };

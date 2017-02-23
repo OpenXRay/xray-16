@@ -20,17 +20,19 @@ public:
         : dtH(_dtH), calculation_rect(Frect().invalidate()), recalculate(false), partial_calculate(false),
           force_recalculate(false), dtFS(0), slots_flags(0)
     {
-    }  //
+    } //
     IC bool recalculating() const { return recalculate; }
-
     IC bool skip_slot(int x, int z) const
     {
-        if (partial_calculate) {
+        if (partial_calculate)
+        {
             Frect srect;
             dtH.GetSlotRect(srect, x, z);
-            if (!calculation_rect.intersected(srect)) return true;
+            if (!calculation_rect.intersected(srect))
+                return true;
         }
-        if (!recalculating() || force_recalculate) return false;
+        if (!recalculating() || force_recalculate)
+            return false;
         return !!slots_flags[dtH.slot_index(x, z)];
     }
 
@@ -57,4 +59,4 @@ private:
     void check_files(u32 check_sum);
 };
 
-#endif  //__RECALCULATION_PARAMS_H__
+#endif //__RECALCULATION_PARAMS_H__

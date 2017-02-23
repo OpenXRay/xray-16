@@ -2,9 +2,7 @@
 #include "ip_filter.h"
 #include "xrCore/xr_ini.h"
 
-ip_filter::ip_filter()
-{
-}
+ip_filter::ip_filter() {}
 ip_filter::~ip_filter()
 {
     for (subnets_coll_t::iterator i = m_all_subnets.begin(), ie = m_all_subnets.end(); i != ie; ++i)
@@ -25,7 +23,8 @@ struct ip_searcher : public std::binary_function<subnet_item*, subnet_item*, boo
 {
     bool operator()(subnet_item const* left, subnet_item const* right) const
     {
-        if (left->subnet_mask) {
+        if (left->subnet_mask)
+        {
             return ((left->subnet_ip.data & left->subnet_mask) < (right->subnet_ip.data & left->subnet_mask));
         }
         return ((left->subnet_ip.data & right->subnet_mask) < (right->subnet_ip.data & right->subnet_mask));
@@ -49,14 +48,16 @@ u32 ip_filter::load()
     FS.update_path(temp, "$app_data_root$", "ip_filter.ltx");
     CInifile ini(temp);
 
-    if (!ini.section_exist(SUBNET_LIST_SECT_NAME)) return 0;
+    if (!ini.section_exist(SUBNET_LIST_SECT_NAME))
+        return 0;
 
     for (u32 i = 0, line_count = ini.line_count(SUBNET_LIST_SECT_NAME); i != line_count; ++i)
     {
         LPCSTR address;
         LPCSTR line;
         ini.r_line(SUBNET_LIST_SECT_NAME, i, &address, &line);
-        if (!xr_strlen(address)) continue;
+        if (!xr_strlen(address))
+            continue;
 
         subnet_item* tmp_item = new subnet_item();
         unsigned int parse_data[5];
@@ -81,7 +82,8 @@ u32 ip_filter::load()
 
 bool ip_filter::is_ip_present(u32 ip_address)
 {
-    if (m_all_subnets.size() == 0) return true;
+    if (m_all_subnets.size() == 0)
+        return true;
     subnet_item tmp_fake_item;
     hton_bo(ip_address, tmp_fake_item);
     tmp_fake_item.subnet_mask = 0;
@@ -90,7 +92,7 @@ bool ip_filter::is_ip_present(u32 ip_address)
 
 void ip_filter::unload()
 {
-    for (subnets_coll_t::iterator i = m_all_subnets.begin(),  // delete_data(m_all_subnets);
+    for (subnets_coll_t::iterator i = m_all_subnets.begin(), // delete_data(m_all_subnets);
          ie = m_all_subnets.end();
          i != ie; ++i)
     {

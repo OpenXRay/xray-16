@@ -1,4 +1,4 @@
-#ifndef MXVEC3_INCLUDED  // -*- C++ -*-
+#ifndef MXVEC3_INCLUDED // -*- C++ -*-
 #define MXVEC3_INCLUDED
 #if !defined(__GNUC__)
 #pragma once
@@ -17,18 +17,9 @@
 #include "vec3.h"
 
 #ifdef MXGL_INCLUDED
-inline void glV(const Vec3& v)
-{
-    glVertex3d(v[X], v[Y], v[Z]);
-}
-inline void glN(const Vec3& v)
-{
-    glNormal3d(v[X], v[Y], v[Z]);
-}
-inline void glC(const Vec3& v)
-{
-    glColor3d(v[X], v[Y], v[Z]);
-}
+inline void glV(const Vec3& v) { glVertex3d(v[X], v[Y], v[Z]); }
+inline void glN(const Vec3& v) { glNormal3d(v[X], v[Y], v[Z]); }
+inline void glC(const Vec3& v) { glColor3d(v[X], v[Y], v[Z]); }
 #endif
 
 // MXVEC3_INCLUDED

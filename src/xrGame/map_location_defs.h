@@ -17,7 +17,7 @@ struct SLocationKey : public ISerializable, public IPureDestroyableObject
             return location < key.location;
         else
             return actual > key.actual;
-    }  // move non-actual to tail
+    } // move non-actual to tail
 
     virtual void save(IWriter& stream);
     virtual void load(IReader& stream);

@@ -22,7 +22,8 @@ protected:
 public:
     OggVorbis_File* get_data()
     {
-        if (!wave) attach();
+        if (!wave)
+            attach();
         return &ovf;
     }
 
@@ -32,7 +33,6 @@ public:
 
     CSoundRender_Emitter* get_emitter() { return m_pEmitter; }
     BOOL get_Rendering() { return rendering; }
-
     virtual BOOL _initialize() = 0;
     virtual void _destroy() = 0;
     virtual void _restart() = 0;

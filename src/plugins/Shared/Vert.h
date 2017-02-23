@@ -49,14 +49,19 @@ public:
     }
     BOOL similar(const st_VERT& V) const
     {
-        if (data.size() != V.data.size()) return FALSE;
-        if (!uv.similar(V.uv)) return FALSE;
-        if (!P.similar(V.P)) return FALSE;
+        if (data.size() != V.data.size())
+            return FALSE;
+        if (!uv.similar(V.uv))
+            return FALSE;
+        if (!P.similar(V.P))
+            return FALSE;
         //		if ((0==sm_group)||(0==(sm_group&V.sm_group))) 		return FALSE;
         for (u32 k = 0; k < data.size(); k++)
         {
-            if (data[k].bone != V.data[k].bone) return FALSE;
-            if (!fsimilar(data[k].weight, V.data[k].weight)) return FALSE;
+            if (data[k].bone != V.data[k].bone)
+                return FALSE;
+            if (!fsimilar(data[k].weight, V.data[k].weight))
+                return FALSE;
         }
         return TRUE;
     }

@@ -13,11 +13,7 @@ namespace lc_net
 {
 task_manager g_task_manager;
 
-task_manager& get_task_manager()
-{
-    return g_task_manager;
-}
-
+task_manager& get_task_manager() { return g_task_manager; }
 XRLC_LIGHT_API net_task_interface* g_net_task_interface = &g_task_manager;
 
 void __cdecl Finalize(IGenericStream* inStream)
@@ -38,7 +34,8 @@ bool task_manager::initialize_session(DWORD _session_id)
 {
     init_lock.Enter();
     bool ret = false;
-    if (session_id == DWORD(-1)) {
+    if (session_id == DWORD(-1))
+    {
         session_id = _session_id;
         ret = true;
     }
@@ -56,10 +53,7 @@ void task_manager::receive_result(IGenericStream* inStream)
     pools[pool_id]->receive_result(inStream);
 }
 
-void task_manager::send_task(IGridUser& user, u32 id)
-{
-}
-
+void task_manager::send_task(IGridUser& user, u32 id) {}
 void task_manager::send_result(u8 pool_id, IGenericStream* outStream, net_execution& e)
 {
     write_task_pool(outStream, pool_id);
@@ -74,7 +68,8 @@ net_execution* task_manager::receive_task(u8& pool_id, IAgent* agent, DWORD sess
     R_ASSERT(pool_id < num_pools);
 
     pool_lock.Enter();
-    if (pools[pool_id] == 0) pools[pool_id] = new exec_pool(this);
+    if (pools[pool_id] == 0)
+        pools[pool_id] = new exec_pool(this);
     pool_lock.Leave();
     return pools[pool_id]->receive_task(agent, sessionId, inStream);
 }
@@ -93,7 +88,8 @@ void task_manager::startup()
         init_lock.Enter();
         user_inited = !!_user;
         init_lock.Leave();
-        if (user_inited) break;
+        if (user_inited)
+            break;
     }
 
     R_ASSERT(_user);
@@ -120,7 +116,8 @@ void task_manager::user_init_thread()
         init_lock.Enter();
         release = _release;
         init_lock.Leave();
-        if (release) break;
+        if (release)
+            break;
     }
     release_user();
 }
@@ -131,8 +128,10 @@ void task_manager::wait_all()
         Sleep(1000);
         u32 num_running = 0;
         for (u8 i = 0; i < num_pools; ++i)
-            if (pools[i] && pools[i]->is_running()) ++num_running;
-        if (num_running == 0) break;
+            if (pools[i] && pools[i]->is_running())
+                ++num_running;
+        if (num_running == 0)
+            break;
     }
     // R_ASSERT(_user);
     //_user->WaitForCompletion();
@@ -142,7 +141,8 @@ exec_pool* task_manager::run(LPCSTR name_pool)
 {
     pool_lock.Enter();
 
-    if (!pools[current_pool]) {
+    if (!pools[current_pool])
+    {
         pool_lock.Leave();
         return 0;
     }
@@ -172,15 +172,12 @@ void task_manager::progress(u32 task)
 //	{
 //		((task_manager*)_this)->release_user();
 //	}
-void task_manager::user_thread_proc(void* _this)
-{
-    ((task_manager*)_this)->user_init_thread();
-}
-
+void task_manager::user_thread_proc(void* _this) { ((task_manager*)_this)->user_init_thread(); }
 void task_manager::release_user()
 {
     init_lock.Enter();
-    if (!_user) {
+    if (!_user)
+    {
         init_lock.Leave();
         return;
     }
@@ -207,7 +204,8 @@ void task_manager::add_task(net_execution* task)
 {
     pool_lock.Enter();
 
-    if (!pools[current_pool]) pools[current_pool] = new exec_pool(start, this);
+    if (!pools[current_pool])
+        pools[current_pool] = new exec_pool(start, this);
 
     pools[current_pool]->add_task(task);
 

@@ -3,7 +3,7 @@
 #include "monster_state_controlled_attack.h"
 #include "monster_state_controlled_follow.h"
 
-#define TEMPLATE_SPECIALIZATION                                                                                        \
+#define TEMPLATE_SPECIALIZATION \
     template <typename _Object\
 >
 
@@ -26,7 +26,8 @@ void CStateMonsterControlledAbstract::execute()
     {
         // проверить валидность данных атаки
         const CEntity* enemy = object->get_data().m_object;
-        if (!enemy || enemy->getDestroy() || !enemy->g_Alive()) {
+        if (!enemy || enemy->getDestroy() || !enemy->g_Alive())
+        {
             object->get_data().m_object = object->get_controller();
             select_state(eStateControlled_Follow);
         }

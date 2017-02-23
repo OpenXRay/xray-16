@@ -14,8 +14,8 @@ class CController : public CBaseMonster, public CControlledActor
     typedef CBaseMonster inherited;
 
     u8 m_max_controlled_number;
-    ref_sound control_start_sound;  // звук, который играется в голове у актера
-    ref_sound control_hit_sound;    // звук, который играется в голове у актера
+    ref_sound control_start_sound; // звук, который играется в голове у актера
+    ref_sound control_hit_sound; // звук, который играется в голове у актера
 
     ref_sound m_sound_hit_fx;
     SndShockEffector* m_sndShockEffector;
@@ -63,7 +63,6 @@ public:
 public:
     CControllerAnimation& custom_anim() { return (*m_custom_anim_base); }
     CControllerDirection& custom_dir() { return (*m_custom_dir_base); }
-
 public:
     xr_vector<CEntity*> m_controlled_objects;
 
@@ -92,7 +91,6 @@ public:
     virtual void TranslateActionToPathParams();
 
     virtual bool ability_pitch_correction() { return false; }
-
     //-------------------------------------------------------------------
 
     virtual bool is_relation_enemy(const CEntityAlive* tpEntityAlive) const;
@@ -105,7 +103,7 @@ public:
     void TakeUnderControl(CEntity*);
     void UpdateControlled();
     void FreeFromControl();
-    void OnFreedFromControl(const CEntity*);  // если монстр сам себя освободил (destroyed || die)
+    void OnFreedFromControl(const CEntity*); // если монстр сам себя освободил (destroyed || die)
 
     void set_controlled_task(u32 task);
 
@@ -151,11 +149,9 @@ public:
 
 public:
     virtual bool use_center_to_aim() const { return true; }
-
     SAnimationTripleData anim_triple_control;
 
     virtual char* get_monster_class_name() { return "controller"; }
-
 private:
     float m_stamina_hit;
 

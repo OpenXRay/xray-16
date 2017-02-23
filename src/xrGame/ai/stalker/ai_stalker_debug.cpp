@@ -80,8 +80,10 @@ void try_change_current_entity()
     for (; I != E; ++I)
     {
         CCustomMonster* current = smart_cast<CCustomMonster*>(*I);
-        if (!current) continue;
-        if (Level().CurrentEntity() == current) continue;
+        if (!current)
+            continue;
+        if (Level().CurrentEntity() == current)
+            continue;
 
         Fvector A, B, tmp;
         current->Center(A);
@@ -90,15 +92,18 @@ void try_change_current_entity()
         B.mad(actor->cam_Active()->vPosition, actor->cam_Active()->vDirection,
             tmp.dotproduct(actor->cam_Active()->vDirection));
         float len = B.distance_to_sqr(A);
-        if (len > 1) continue;
+        if (len > 1)
+            continue;
 
-        if (maxlen > len && !current->getDestroy()) {
+        if (maxlen > len && !current->getDestroy())
+        {
             maxlen = len;
             nearest_agent = current;
         };
     }
 
-    if (!nearest_agent) return;
+    if (!nearest_agent)
+        return;
 
     Level().SetEntity(nearest_agent);
     actor->inventory().Items_SetCurrentEntityHud(false);
@@ -126,7 +131,8 @@ void restore_actor()
     g_debug_actor->inventory().Items_SetCurrentEntityHud(true);
 
     CHudItem* pHudItem = smart_cast<CHudItem*>(g_debug_actor->inventory().ActiveItem());
-    if (pHudItem) {
+    if (pHudItem)
+    {
         pHudItem->OnStateSwitch(pHudItem->GetState());
     }
 }
@@ -135,11 +141,13 @@ template <typename planner_type>
 void draw_planner(const planner_type& brain, LPCSTR start_indent, LPCSTR indent, LPCSTR planner_id)
 {
     planner_type& _brain = const_cast<planner_type&>(brain);
-    if (brain.solution().empty()) return;
+    if (brain.solution().empty())
+        return;
 
     CScriptActionPlannerAction* planner =
         smart_cast<CScriptActionPlannerAction*>(&_brain.action(brain.solution().front()));
-    if (planner) draw_planner(*planner, start_indent, indent, _brain.action2string(brain.solution().front()));
+    if (planner)
+        draw_planner(*planner, start_indent, indent, _brain.action2string(brain.solution().front()));
 
     DBG_OutText("%s ", start_indent);
     DBG_OutText("%splanner %s", start_indent, planner_id);
@@ -160,7 +168,8 @@ void draw_planner(const planner_type& brain, LPCSTR start_indent, LPCSTR indent,
             std::lower_bound(brain.current_state().conditions().begin(), brain.current_state().conditions().end(),
                 planner_type::CWorldProperty((*I).first, false));
         char temp = '?';
-        if ((J != brain.current_state().conditions().end()) && ((*J).condition() == (*I).first)) {
+        if ((J != brain.current_state().conditions().end()) && ((*J).condition() == (*I).first))
+        {
             temp = (*J).value() ? '+' : '-';
             DBG_OutText("%s%s%s    %5c : [%d][%s]", start_indent, indent, indent, temp, (*I).first,
                 _brain.property2string((*I).first));
@@ -175,7 +184,8 @@ void draw_planner(const planner_type& brain, LPCSTR start_indent, LPCSTR indent,
             std::lower_bound(brain.target_state().conditions().begin(), brain.target_state().conditions().end(),
                 planner_type::CWorldProperty((*I).first, false));
         char temp = '?';
-        if ((J != brain.target_state().conditions().end()) && ((*J).condition() == (*I).first)) {
+        if ((J != brain.target_state().conditions().end()) && ((*J).condition() == (*I).first))
+        {
             temp = (*J).value() ? '+' : '-';
             DBG_OutText("%s%s%s    %5c : [%d][%s]", start_indent, indent, indent, temp, (*I).first,
                 _brain.property2string((*I).first));
@@ -185,7 +195,8 @@ void draw_planner(const planner_type& brain, LPCSTR start_indent, LPCSTR indent,
 
 LPCSTR animation_name(CAI_Stalker* self, const MotionID& animation)
 {
-    if (!animation) return ("");
+    if (!animation)
+        return ("");
     IKinematicsAnimated* skeleton_animated = smart_cast<IKinematicsAnimated*>(self->Visual());
     VERIFY(skeleton_animated);
     LPCSTR name = skeleton_animated->LL_MotionDefName_dbg(animation).first;
@@ -229,21 +240,21 @@ LPCSTR danger_type(const CDangerObject::EDangerType& danger_type)
     return ("");
 }
 
-void CAI_Stalker::debug_planner(const script_planner* planner)
-{
-    m_debug_planner = planner;
-}
-
+void CAI_Stalker::debug_planner(const script_planner* planner) { m_debug_planner = planner; }
 void CAI_Stalker::debug_text()
 {
-    if (!m_dbg_hud_draw) return;
+    if (!m_dbg_hud_draw)
+        return;
     m_dbg_hud_draw = false;
 
-    if (!psAI_Flags.test(aiStalker)) return;
+    if (!psAI_Flags.test(aiStalker))
+        return;
 
     CActor* actor = smart_cast<CActor*>(Level().Objects.net_Find(0));
-    if (!actor) {
-        if (!g_debug_actor) return;
+    if (!actor)
+    {
+        if (!g_debug_actor)
+            return;
 
         actor = g_debug_actor;
     }
@@ -267,7 +278,8 @@ void CAI_Stalker::debug_text()
     update_range_fov(object_range, object_fov, eye_range, deg2rad(eye_fov));
     DBG_OutText("%s%seye range   : %f", indent, indent, object_range);
     DBG_OutText("%s%sFOV         : %f", indent, indent, rad2deg(object_fov));
-    if (g_Alive()) {
+    if (g_Alive())
+    {
         DBG_OutText("%s%sobjects     : %d", indent, indent, memory().visual().objects().size());
         DBG_OutText("%s%snot yet     : %d", indent, indent, memory().visual().not_yet_visible_objects().size());
         DBG_OutText("%s%sin frustum  : %d", indent, indent, memory().visual().raw_objects().size());
@@ -285,7 +297,8 @@ void CAI_Stalker::debug_text()
         DBG_OutText("%ssound", indent);
         DBG_OutText("%s%sobjects     : %d", indent, indent, memory().sound().objects().size());
 #ifdef USE_SELECTED_SOUND
-        if (memory().sound().sound()) {
+        if (memory().sound().sound())
+        {
             DBG_OutText("%s%sselected", indent, indent);
             DBG_OutText("%s%s%stype", indent, indent, indent);
             DBG_OutText("%s%s%spower     : %f", indent, indent, indent, memory().sound().sound()->m_power);
@@ -304,7 +317,8 @@ void CAI_Stalker::debug_text()
         IGameObject* object = (object_id == ALife::_OBJECT_ID(-1)) ? 0 : Level().Objects.net_Find(object_id);
         DBG_OutText("%s%slast hit object name : %s", indent, indent, object ? *object->cName() : "");
 #ifdef USE_SELECTED_HIT
-        if (memory().hit().hit()) {
+        if (memory().hit().hit())
+        {
             DBG_OutText("%s%sselected", indent, indent);
             DBG_OutText("%s%s%spower     : %f", indent, indent, indent, memory().hit().hit()->m_amount);
             DBG_OutText("%s%s%sobject    : %s", indent, indent, indent,
@@ -317,7 +331,8 @@ void CAI_Stalker::debug_text()
     }
     // enemy
     DBG_OutText("%senemy", indent);
-    if (inventory().ActiveItem()) {
+    if (inventory().ActiveItem())
+    {
         DBG_OutText("%s%scan kill member   : %s", indent, indent, can_kill_member() ? "+" : "-");
         DBG_OutText("%s%scan kill enemy    : %s", indent, indent, can_kill_enemy() ? "+" : "-");
         DBG_OutText("%s%spick distance     : %f", indent, indent, pick_distance());
@@ -327,7 +342,8 @@ void CAI_Stalker::debug_text()
     }
 
     DBG_OutText("%s%sobjects     : %d", indent, indent, memory().enemy().objects().size());
-    if (g_Alive()) {
+    if (g_Alive())
+    {
         CEnemyManager::OBJECTS::const_iterator I = memory().enemy().objects().begin();
         CEnemyManager::OBJECTS::const_iterator E = memory().enemy().objects().end();
         for (; I != E; ++I)
@@ -335,25 +351,29 @@ void CAI_Stalker::debug_text()
                 memory().visual().visible_now(*I) ? "visible" : "invisible");
     }
 
-    if (memory().enemy().selected()) {
+    if (memory().enemy().selected())
+    {
         DBG_OutText("%s%sselected", indent, indent);
 
         float fuzzy = 0.f;
         xr_vector<feel_visible_Item>::iterator I = feel_visible.begin(), E = feel_visible.end();
         for (; I != E; I++)
-            if (I->O->ID() == memory().enemy().selected()->ID()) {
+            if (I->O->ID() == memory().enemy().selected()->ID())
+            {
                 fuzzy = I->fuzzy;
                 break;
             }
 
-        if (g_Alive()) {
+        if (g_Alive())
+        {
             if (true || !g_mt_config.test(mtAiVision))
                 VERIFY(!memory().visual().visible_now(memory().enemy().selected()) || (fuzzy > 0.f));
             DBG_OutText("%s%s%svisible   : %s %f", indent, indent, indent,
                 memory().visual().visible_now(memory().enemy().selected()) ? "+" : "-", fuzzy);
         }
         DBG_OutText("%s%s%sobject    : %s", indent, indent, indent, *memory().enemy().selected()->cName());
-        if (g_Alive()) {
+        if (g_Alive())
+        {
             float interval = (1.f - panic_threshold()) * .25f, left = -1.f, right = -1.f;
             LPCSTR description = "invalid";
             u32 result = dwfChooseAction(2000, 1.f - interval, 1.f - 2 * interval, 1.f - 3 * interval,
@@ -404,7 +424,8 @@ void CAI_Stalker::debug_text()
     // danger
     DBG_OutText("%sdanger", indent);
     DBG_OutText("%s%sobjects     : %d", indent, indent, memory().danger().objects().size());
-    if (memory().danger().selected() && memory().danger().selected()->object()) {
+    if (memory().danger().selected() && memory().danger().selected()->object())
+    {
         DBG_OutText("%s%sselected", indent, indent);
         DBG_OutText("%s%s%stype      : %s", indent, indent, indent, danger_type(memory().danger().selected()->type()));
         DBG_OutText("%s%s%stime      : %.3f (%.3f)", indent, indent, indent,
@@ -436,7 +457,8 @@ void CAI_Stalker::debug_text()
     // agent manager
     DBG_OutText(" ");
     DBG_OutText("agent manager");
-    if (g_Alive()) {
+    if (g_Alive())
+    {
         DBG_OutText("%smembers           : %d", indent, agent_manager().member().members().size());
         DBG_OutText("%senemies           : %d", indent, agent_manager().enemy().enemies().size());
         DBG_OutText("%scorpses           : %d", indent, agent_manager().corpse().corpses().size());
@@ -449,8 +471,10 @@ void CAI_Stalker::debug_text()
         if (g_Alive())
             DBG_OutText("%sI am in detour    : %s", indent, agent_manager().member().member(this).detour() ? "+" : "-");
 
-        if (g_Alive()) {
-            if (agent_manager().member().member(this).cover()) {
+        if (g_Alive())
+        {
+            if (agent_manager().member().member(this).cover())
+            {
                 DBG_OutText("%scover         : [%s][%f][%f][%f]", indent,
                     agent_manager().member().member(this).cover()->m_is_smart_cover ? "smart" : "generated",
                     VPUSH(agent_manager().member().member(this).cover()->position()));
@@ -488,19 +512,22 @@ void CAI_Stalker::debug_text()
     DBG_OutText("%s%sammo in box to spawn: %d", indent, indent, item_to_spawn().size() ? ammo_in_box_to_spawn() : 0);
 
     CWeaponMagazined* weapon = smart_cast<CWeaponMagazined*>(inventory().ActiveItem());
-    if (weapon) {
+    if (weapon)
+    {
         CObjectHandlerPlanner& planner = CObjectHandler::planner();
         DBG_OutText("%s%squeue size          : %d", indent, indent, weapon->GetQueueSize());
         DBG_OutText("%s%squeue interval      : %d", indent, indent,
             planner.action(planner.uid(weapon->ID(), ObjectHandlerSpace::eWorldOperatorQueueWait1)).inertia_time());
     }
 
-    if (inventory().ActiveItem()) {
+    if (inventory().ActiveItem())
+    {
         DBG_OutText("%s%sactive item", indent, indent);
         DBG_OutText("%s%s%sobject         : %s", indent, indent, indent,
             inventory().ActiveItem() ? *inventory().ActiveItem()->object().cName() : "");
         CWeapon* weapon = smart_cast<CWeapon*>(inventory().ActiveItem());
-        if (weapon) {
+        if (weapon)
+        {
             DBG_OutText("%s%s%sstrapped       : %s", indent, indent, indent, weapon_strapped(weapon) ? "+" : "-");
             DBG_OutText("%s%s%sunstrapped     : %s", indent, indent, indent, weapon_unstrapped(weapon) ? "+" : "-");
             DBG_OutText("%s%s%sammo           : %d", indent, indent, indent, weapon->GetAmmoElapsed());
@@ -525,7 +552,8 @@ void CAI_Stalker::debug_text()
     draw_planner(movement().animation_selector().planner(), indent, indent, "smart cover planner");
 
     // debug planner
-    if (m_debug_planner) draw_planner(*m_debug_planner, indent, indent, "debug_planner");
+    if (m_debug_planner)
+        draw_planner(*m_debug_planner, indent, indent, "debug_planner");
 
     DBG_TextOutSet(640, up_indent);
     // brain
@@ -622,7 +650,8 @@ void CAI_Stalker::debug_text()
     DBG_OutText("%s%slevel vertex id : %d", indent, indent, ai_location().level_vertex_id());
     DBG_OutText("%s%sgame vertex id  : %d", indent, indent, ai_location().game_vertex_id());
 
-    if (movement().path_type() == MovementManager::ePathTypePatrolPath) {
+    if (movement().path_type() == MovementManager::ePathTypePatrolPath)
+    {
         DBG_OutText("%s%spatrol", indent, indent);
         DBG_OutText("%s%s%spath          : %s", indent, indent, indent, *movement().patrol().path_name());
         DBG_OutText("%s%s%scompleted     : %s", indent, indent, indent, movement().patrol().completed() ? "+" : "-");
@@ -635,7 +664,8 @@ void CAI_Stalker::debug_text()
             DBG_OutText("%s%s%sextrapolate   : unknown", indent, indent, indent);
     }
 
-    if (movement().path_type() == MovementManager::ePathTypeGamePath) {
+    if (movement().path_type() == MovementManager::ePathTypeGamePath)
+    {
         DBG_OutText("%s%sgame", indent, indent);
         DBG_OutText("%s%s%scompleted     : %s", indent, indent, indent, movement().game_path().completed() ? "+" : "-");
         DBG_OutText("%s%s%spath size     : %d", indent, indent, indent, movement().game_path().path().size());
@@ -653,7 +683,8 @@ void CAI_Stalker::debug_text()
     DBG_OutText("%s%s%svelocities    : %d", indent, indent, indent, movement().detail().velocities().size());
     DBG_OutText("%s%s%sextrapolate   : %f", indent, indent, indent, movement().detail().extrapolate_length());
     DBG_OutText("%s%s%spath size     : %d", indent, indent, indent, movement().detail().path().size());
-    if (!movement().detail().path().empty()) {
+    if (!movement().detail().path().empty())
+    {
         DBG_OutText("%s%s%sstart point   : [%f][%f][%f]", indent, indent, indent,
             VPUSH(movement().detail().path().front().position));
         DBG_OutText("%s%s%sdest point    : [%f][%f][%f]", indent, indent, indent,
@@ -703,9 +734,12 @@ void CAI_Stalker::debug_text()
     DBG_OutText(
         "%s%s%sin smart cover      : %c", indent, indent, indent, lua_game_object()->in_smart_cover() ? '+' : '-');
 
-    if (movement().current_params().cover()) {
-        if (movement().current_params().cover_loophole()) {
-            if (movement().current_params().cover_fire_position()) {
+    if (movement().current_params().cover())
+    {
+        if (movement().current_params().cover_loophole())
+        {
+            if (movement().current_params().cover_fire_position())
+            {
                 DBG_OutText("%s%s%sin loophole fov     : %c", indent, indent, indent,
                     movement().in_current_loophole_fov(*movement().current_params().cover_fire_position()) ? '+' : '-');
                 DBG_OutText("%s%s%sin loophole range   : %c", indent, indent, indent,
@@ -734,12 +768,14 @@ void CAI_Stalker::debug_text()
         }
     }
 
-    if (movement().current_params().cover_fire_position()) {
+    if (movement().current_params().cover_fire_position())
+    {
         Fvector position = *movement().current_params().cover_fire_position();
         DBG_OutText("%s%s%sfire position current : [%f][%f][%f]", indent, indent, indent, VPUSH(position));
     }
 
-    if (movement().target_params().cover_fire_position()) {
+    if (movement().target_params().cover_fire_position())
+    {
         Fvector position = *movement().target_params().cover_fire_position();
         DBG_OutText("%s%s%sfire position target  : [%f][%f][%f]", indent, indent, indent, VPUSH(position));
     }
@@ -924,7 +960,8 @@ void CAI_Stalker::dbg_draw_vision()
 {
     VERIFY(!!psAI_Flags.is(aiVision));
 
-    if (!smart_cast<CGameObject*>(Level().CurrentEntity())) return;
+    if (!smart_cast<CGameObject*>(Level().CurrentEntity()))
+        return;
 
     Fvector shift;
     shift.set(0.f, 2.5f, 0.f);
@@ -936,9 +973,11 @@ void CAI_Stalker::dbg_draw_vision()
 
     res.transform(v_res, shift);
 
-    if (v_res.z < 0 || v_res.w < 0) return;
+    if (v_res.z < 0 || v_res.w < 0)
+        return;
 
-    if (v_res.x < -1.f || v_res.x > 1.f || v_res.y < -1.f || v_res.y > 1.f) return;
+    if (v_res.x < -1.f || v_res.x > 1.f || v_res.y < -1.f || v_res.y > 1.f)
+        return;
 
     float x = (1.f + v_res.x) / 2.f * (Device.dwWidth);
     float y = (1.f - v_res.y) / 2.f * (Device.dwHeight);
@@ -987,7 +1026,8 @@ BOOL _ray_query_callback(collide::rq_result& result, LPVOID params)
 
     float power = param->m_holder->feel_vision_mtl_transp(result.O, result.element);
     param->m_power *= power;
-    if (param->m_power > param->m_power_threshold) return (true);
+    if (param->m_power > param->m_power_threshold)
+        return (true);
 
     param->m_pick_distance = result.range;
     return (false);
@@ -1020,14 +1060,16 @@ void draw_visiblity_rays(CCustomMonster* self, const IGameObject* object, collid
         VISIBLE_ITEMS::iterator E = self->feel_visible.end();
         for (; I != E; ++I)
         {
-            if ((*I).O == object) {
+            if ((*I).O == object)
+            {
                 item = &*I;
                 break;
             }
         }
     }
 
-    if (!item) return;
+    if (!item)
+        return;
 
     Fvector start_position = self->eye_matrix.c;
     Fvector dest_position = item->cp_LAST;
@@ -1040,7 +1082,8 @@ void draw_visiblity_rays(CCustomMonster* self, const IGameObject* object, collid
     points.push_back(start_position);
     fill_points(self, start_position, direction, distance, rq_storage, points, pick_distance);
 
-    if (fsimilar(pick_distance, distance) && !dest_position.similar(points.back())) points.push_back(dest_position);
+    if (fsimilar(pick_distance, distance) && !dest_position.similar(points.back()))
+        points.push_back(dest_position);
 
     VERIFY(points.size() > 1);
 
@@ -1062,11 +1105,14 @@ void draw_visiblity_rays(CCustomMonster* self, const IGameObject* object, collid
 
 void CAI_Stalker::dbg_draw_visibility_rays()
 {
-    if (!g_Alive()) return;
+    if (!g_Alive())
+        return;
 
     const CEntityAlive* enemy = memory().enemy().selected() ? memory().enemy().selected() : Actor();
-    if (enemy) {
-        if (memory().visual().visible_now(enemy)) {
+    if (enemy)
+    {
+        if (memory().visual().visible_now(enemy))
+        {
             collide::rq_results rq_storage;
             draw_visiblity_rays(this, enemy, rq_storage);
         }
@@ -1088,7 +1134,8 @@ static Fmatrix aim_on_actor(Fvector const& bone_position, Fvector const& weapon_
     CDebugRenderer& renderer = Level().debug_renderer();
     Fmatrix temp;
 
-    if (debug_draw) {
+    if (debug_draw)
+    {
         temp.scale(.01f, .01f, .01f);
         temp.c = bone_position;
         renderer.draw_ellipse(temp, color_xrgb(255, 0, 0));
@@ -1099,18 +1146,19 @@ static Fmatrix aim_on_actor(Fvector const& bone_position, Fvector const& weapon_
             Fvector().mad(weapon_position, weapon_direction, weapon_position.distance_to(target));
         renderer.draw_line(Fidentity, weapon_position, weapon_position_target, color_xrgb(255, 0, 255));
     }
-#endif  // #ifdef DEBUG_RENDER
+#endif // #ifdef DEBUG_RENDER
 
     Fvector const weapon2bone = Fvector().sub(bone_position, weapon_position);
     float const offset = weapon2bone.dotproduct(weapon_direction);
     Fvector current_point = Fvector().mad(weapon_position, weapon_direction, offset);
 
 #ifdef DEBUG_RENDER
-    if (debug_draw) {
+    if (debug_draw)
+    {
         temp.c = current_point;
         renderer.draw_ellipse(temp, color_xrgb(0, 0, 255));
     }
-#endif  // #ifdef DEBUG_RENDER
+#endif // #ifdef DEBUG_RENDER
 
     Fvector const bone2current = Fvector().sub(current_point, bone_position);
     float const sphere_radius_sqr = bone2current.square_magnitude();
@@ -1134,7 +1182,8 @@ static Fmatrix aim_on_actor(Fvector const& bone_position, Fvector const& weapon_
     Fvector const target_direction = Fvector().sub(target_point, bone_position).normalize();
 
 #ifdef DEBUG_RENDER
-    if (debug_draw) {
+    if (debug_draw)
+    {
         temp.c = target_point;
         renderer.draw_ellipse(temp, color_xrgb(255, 255, 255));
 
@@ -1143,13 +1192,14 @@ static Fmatrix aim_on_actor(Fvector const& bone_position, Fvector const& weapon_
         temp.c = bone_position;
         renderer.draw_ellipse(temp, color_xrgb(255, 255, 0));
     }
-#endif  // #ifdef DEBUG_RENDER
+#endif // #ifdef DEBUG_RENDER
 
     Fmatrix transform0;
     {
         Fvector cross_product = Fvector().crossproduct(current_direction, target_direction);
         float const sin_alpha = cross_product.magnitude();
-        if (!fis_zero(sin_alpha)) {
+        if (!fis_zero(sin_alpha))
+        {
             float const cos_alpha = current_direction.dotproduct(target_direction);
             transform0.rotation(cross_product.div(sin_alpha), atan2f(sin_alpha, cos_alpha));
         }
@@ -1174,7 +1224,8 @@ static Fmatrix aim_on_actor(Fvector const& bone_position, Fvector const& weapon_
         transform0.transform_dir(old_direction, weapon_direction);
         Fvector cross_product = Fvector().crossproduct(old_direction, new_direction);
         float const sin_alpha = cross_product.magnitude();
-        if (!fis_zero(sin_alpha)) {
+        if (!fis_zero(sin_alpha))
+        {
             float const cos_alpha = old_direction.dotproduct(new_direction);
             transform1.rotation(cross_product.div(sin_alpha), atan2f(sin_alpha, cos_alpha));
         }
@@ -1195,13 +1246,14 @@ static Fmatrix aim_on_actor(Fvector const& bone_position, Fvector const& weapon_
     transform.mul_43(transform1, transform0);
 
 #ifdef DEBUG_RENDER
-    if (debug_draw) {
+    if (debug_draw)
+    {
         temp.scale(.01f, .01f, .01f);
         transform.transform_dir(temp.c, Fvector().sub(weapon_position, bone_position));
         temp.c.add(bone_position);
         renderer.draw_ellipse(temp, color_xrgb(0, 255, 255));
     }
-#endif  // #ifdef DEBUG_RENDER
+#endif // #ifdef DEBUG_RENDER
 
     return (transform);
 }
@@ -1226,7 +1278,7 @@ static void fill_bones(CAI_Stalker& self, Fmatrix const& transform, IKinematicsA
 		CBlend* const blend				= kinematics_animated->LL_PlayCycle(i, animation, 0, 0, 0, 1);
 		if (blend)
 			blend->timeCurrent			= 0.f;//blend->timeTotal - (SAMPLE_SPF + EPS);
-#else   // #if 0
+#else // #if 0
         u32 const blend_count = kinematics_animated->LL_PartBlendsCount(i);
         for (u32 j = 0; j < blend_count; ++j)
         {
@@ -1236,7 +1288,7 @@ static void fill_bones(CAI_Stalker& self, Fmatrix const& transform, IKinematicsA
             *new_blend = *blend;
             new_blend->channel = 1;
         }
-#endif  // #if 0
+#endif // #if 0
     }
 
     animation_movement_controller const* controller = self.animation_movement();
@@ -1302,7 +1354,8 @@ static void draw_bones(IKinematics& kinematics, Fvector const& box_size, u32 con
 
         CBoneData& bone_data = kinematics.LL_GetData(i);
         u16 parent_bone_id = bone_data.GetParentID();
-        if (parent_bone_id == BI_NONE) continue;
+        if (parent_bone_id == BI_NONE)
+            continue;
 
         if (transform)
             temp2.mul_43(*transform, g_stalker_skeleton[parent_bone_id]);
@@ -1312,7 +1365,7 @@ static void draw_bones(IKinematics& kinematics, Fvector const& box_size, u32 con
         renderer.draw_line(Fidentity, temp2.c, temp.c, line_color);
     }
 }
-#endif  // #ifdef DEBUG_RENDER
+#endif // #ifdef DEBUG_RENDER
 
 static void draw_animation_bones(
     CAI_Stalker& self, Fmatrix const& transform, IKinematicsAnimated* kinematics_animated, LPCSTR animation_id)
@@ -1344,9 +1397,9 @@ static void draw_animation_bones(
 	actor_kinematics->Bone_GetAnimPos	(player_head, actor_kinematics->LL_BoneID("bip01_head"), 1, false);
 	player_head.mulA_43					(Actor()->XFORM());
 	Fvector								target = player_head.c;
-#else   // #if 0
+#else // #if 0
     Fvector target = self.sight().aiming_position();
-#endif  // #if 0
+#endif // #if 0
 
     Fmatrix spine_offset;
     Fmatrix shoulder_offset;
@@ -1358,7 +1411,7 @@ static void draw_animation_bones(
 
     draw_bones(
         *kinematics, Fvector().set(.011f, .011f, .011f), color_xrgb(0, 255, 0), color_xrgb(0, 255, 255), &transform);
-#endif  // #ifdef DEBUG_RENDER
+#endif // #ifdef DEBUG_RENDER
 
     Fmatrix weapon_bone_0;
 
@@ -1503,9 +1556,11 @@ static void draw_animation_bones(
 #ifdef DEBUG_RENDER
     CDebugRenderer& renderer = Level().debug_renderer();
 
-    if (self.inventory().ActiveItem()) {
+    if (self.inventory().ActiveItem())
+    {
         CWeapon* weapon = smart_cast<CWeapon*>(self.inventory().ActiveItem());
-        if (weapon) {
+        if (weapon)
+        {
             Fvector position = weapon->get_LastFP();
             Fvector direction = weapon->get_LastFD();
             renderer.draw_line(Fidentity, position, Fvector().mad(position, direction, position.distance_to(target)),
@@ -1532,7 +1587,7 @@ static void draw_animation_bones(
     renderer.draw_obb(g_stalker_skeleton[weapon_bone_id1], Fvector().set(.01f, .01f, .01f), color_xrgb(255, 0, 0));
     renderer.draw_line(
         Fidentity, g_stalker_skeleton[weapon_bone_id0].c, g_stalker_skeleton[weapon_bone_id1].c, color_xrgb(255, 0, 0));
-#endif  // #ifdef DEBUG_RENDER
+#endif // #ifdef DEBUG_RENDER
 }
 
 Fvector g_debug_position_0 = Fvector().set(0.f, 0.f, 0.f);
@@ -1556,8 +1611,9 @@ void CAI_Stalker::OnRender()
 
 	draw_animation_bones		(*this, m_start_transform, kinematics, "loophole_3_attack_idle_0");
 //	draw_animation_bones		(*this, XFORM(), kinematics, "loophole_3_attack_in_0");
-#else  // #if 0
-    if (inventory().ActiveItem()) {
+#else // #if 0
+    if (inventory().ActiveItem())
+    {
         Fvector position, direction, temp;
         g_fireParams(0, position, direction);
         temp = direction;
@@ -1566,14 +1622,18 @@ void CAI_Stalker::OnRender()
         Level().debug_renderer().draw_line(Fidentity, position, temp, color_xrgb(0 * 255, 255, 0 * 255));
     }
 
-    if (IsMyCamera()) {
-        if (!g_Alive()) return;
+    if (IsMyCamera())
+    {
+        if (!g_Alive())
+            return;
 
-        if (!memory().enemy().selected() || !memory().visual().visible_now(memory().enemy().selected())) return;
+        if (!memory().enemy().selected() || !memory().visual().visible_now(memory().enemy().selected()))
+            return;
 
         xr_vector<IGameObject*> objects;
         feel_vision_get(objects);
-        if (std::find(objects.begin(), objects.end(), memory().enemy().selected()) != objects.end()) {
+        if (std::find(objects.begin(), objects.end(), memory().enemy().selected()) != objects.end())
+        {
             Fvector position = feel_vision_get_vispoint(const_cast<CEntityAlive*>(memory().enemy().selected()));
             Level().debug_renderer().draw_aabb(position, .05f, .05f, .05f, color_xrgb(0 * 255, 255, 0 * 255));
             return;
@@ -1604,7 +1664,7 @@ void CAI_Stalker::OnRender()
 		direction.setHP		(yaw,pitch + safety_fire_angle);
 		Level().debug_renderer().draw_line(Fidentity, position, Fvector().mad(position, direction, 20.f), color_xrgb(0,255,0));
 	}
-#endif  // #if 0
+#endif // #if 0
 
     inherited::OnRender();
 
@@ -1648,7 +1708,8 @@ void CAI_Stalker::OnRender()
         Level().debug_renderer().draw_aabb(position, half_size - .01f, 1.f,
             ai().level_graph().header().cell_size() * .5f - .01f, color_xrgb(0 * 255, 255, 0 * 255));
 
-        if (ai().level_graph().valid_vertex_id(level_vertex_id)) {
+        if (ai().level_graph().valid_vertex_id(level_vertex_id))
+        {
             LevelGraph::CVertex* v = ai().level_graph().vertex(level_vertex_id);
 
             // high
@@ -1665,7 +1726,8 @@ void CAI_Stalker::OnRender()
                 direction.y = position.y;
                 Level().debug_renderer().draw_line(Fidentity, position, direction, color_xrgb(0, 0, 255));
                 value = ai().level_graph().compute_high_square(float(10 * i) / 180.f * PI, PI / 2.f, v);
-                if (value > best_value) {
+                if (value > best_value)
+                {
                     best_value = value;
                     j = i;
                 }
@@ -1706,7 +1768,8 @@ void CAI_Stalker::OnRender()
                     direction.y = position.y;
                     Level().debug_renderer().draw_line(Fidentity, position, direction, color_xrgb(0, 0, 255));
                     value = ai().level_graph().compute_low_square(float(10 * i) / 180.f * PI, PI / 2.f, v);
-                    if (value > best_value) {
+                    if (value > best_value)
+                    {
                         best_value = value;
                         j = i;
                     }
@@ -1735,9 +1798,10 @@ void CAI_Stalker::OnRender()
         }
     }
 
-    if (g_Alive()) movement().get_doors_actor().render();
+    if (g_Alive())
+        movement().get_doors_actor().render();
 
-#endif  // #if 0
+#endif // #if 0
 }
 
-#endif  // DEBUG
+#endif // DEBUG

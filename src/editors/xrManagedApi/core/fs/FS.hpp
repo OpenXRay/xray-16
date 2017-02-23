@@ -17,7 +17,7 @@ using System::Runtime::InteropServices::FieldOffsetAttribute;
 
 [StructLayout(LayoutKind::Sequential, Size = sizeof(Fcolor))] public value struct ColorF
 {
-  public:
+public:
     float r, g, b, a;
 };
 
@@ -57,11 +57,11 @@ ref class WriterBase abstract
 {
     internal : ::IWriter* impl;
 
-  private:
+private:
     String ^ fileName;
     internal : WriterBase(::IWriter* impl);
 
-  public:
+public:
     property String ^ FileName { String ^ get(); } ~WriterBase();
     // seek
     virtual void Seek(int position) = 0;
@@ -145,7 +145,7 @@ ref class ReaderBase abstract
     internal : ::IReader* impl;
     ReaderBase(::IReader* impl);
 
-  public:
+public:
     ~ReaderBase();
     // eof
     property bool EndOfStream { bool get(); }

@@ -9,11 +9,7 @@
 #ifndef STALKER_MOVEMENT_MANAGER_BASE_INLINE_H_INCLUDED
 #define STALKER_MOVEMENT_MANAGER_BASE_INLINE_H_INCLUDED
 
-IC const MonsterSpace::SBoneRotation& stalker_movement_manager_base::head_orientation() const
-{
-    return (m_head);
-}
-
+IC const MonsterSpace::SBoneRotation& stalker_movement_manager_base::head_orientation() const { return (m_head); }
 IC void stalker_movement_manager_base::set_head_orientation(const MonsterSpace::SBoneRotation& orientation)
 {
     m_head = orientation;
@@ -32,7 +28,7 @@ IC void stalker_movement_manager_base::add_velocity(int mask, float linear, floa
 IC bool stalker_movement_manager_base::turn_in_place() const
 {
     return (!path_completed() && fis_zero(speed()) &&
-            (angle_difference(body_orientation().current.yaw, body_orientation().target.yaw) > EPS_L));
+        (angle_difference(body_orientation().current.yaw, body_orientation().target.yaw) > EPS_L));
 }
 
 IC void stalker_movement_manager_base::set_body_state(EBodyState body_state)
@@ -52,15 +48,11 @@ IC void stalker_movement_manager_base::set_mental_state(EMentalState mental_stat
     THROW((m_target.m_body_state != eBodyStateCrouch) || (mental_state != eMentalStateFree));
     m_target.m_mental_state = mental_state;
     //#pragma todo("Dima to Dima: this is correct, commented just because of the October presentation, no time right now
-    //to fix it correctly, should be fixed sometimes later")
+    // to fix it correctly, should be fixed sometimes later")
     //.	m_path_actuality			= m_path_actuality && (m_target.m_mental_state == m_current.m_mental_state);
 }
 
-IC void stalker_movement_manager_base::set_path_type(EPathType path_type)
-{
-    m_target.m_path_type = path_type;
-}
-
+IC void stalker_movement_manager_base::set_path_type(EPathType path_type) { m_target.m_path_type = path_type; }
 IC void stalker_movement_manager_base::set_detail_path_type(EDetailPathType detail_path_type)
 {
     m_target.m_detail_path_type = detail_path_type;
@@ -101,16 +93,8 @@ IC DetailPathManager::EDetailPathType const& stalker_movement_manager_base::deta
     return (m_current.m_detail_path_type);
 }
 
-IC Fvector const* stalker_movement_manager_base::desired_position() const
-{
-    return (m_current.desired_position());
-}
-
-IC Fvector const* stalker_movement_manager_base::desired_direction() const
-{
-    return (m_current.desired_direction());
-}
-
+IC Fvector const* stalker_movement_manager_base::desired_position() const { return (m_current.desired_position()); }
+IC Fvector const* stalker_movement_manager_base::desired_direction() const { return (m_current.desired_direction()); }
 IC CAI_Stalker& stalker_movement_manager_base::object() const
 {
     VERIFY(m_object);
@@ -122,19 +106,7 @@ IC MonsterSpace::EMovementType const& stalker_movement_manager_base::target_move
     return (m_target.m_movement_type);
 }
 
-IC void stalker_movement_manager_base::danger_head_speed(const float& speed)
-{
-    m_danger_head_speed = speed;
-}
-
-IC stalker_movement_params const& stalker_movement_manager_base::current_params() const
-{
-    return (m_current);
-}
-
-IC stalker_movement_params& stalker_movement_manager_base::target_params()
-{
-    return (m_target);
-}
-
-#endif  // #ifndef STALKER_MOVEMENT_MANAGER_BASE_INLINE_H_INCLUDED
+IC void stalker_movement_manager_base::danger_head_speed(const float& speed) { m_danger_head_speed = speed; }
+IC stalker_movement_params const& stalker_movement_manager_base::current_params() const { return (m_current); }
+IC stalker_movement_params& stalker_movement_manager_base::target_params() { return (m_target); }
+#endif // #ifndef STALKER_MOVEMENT_MANAGER_BASE_INLINE_H_INCLUDED

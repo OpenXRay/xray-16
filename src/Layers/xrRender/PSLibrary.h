@@ -13,7 +13,7 @@ DEFINE_VECTOR(CPEDef*, PEDVec, PEDIt);
 
 class CPGDef;
 DEFINE_VECTOR(CPGDef*, PGDVec, PGDIt);
-}  // namespace PS
+} // namespace PS
 
 class ECORE_API CPSLibrary : public particles_systems::library_interface
 {
@@ -37,7 +37,6 @@ public:
 public:
     CPSLibrary() { ; }
     ~CPSLibrary() { ; }
-
     void OnCreate();
     void OnDestroy();
 
@@ -51,7 +50,6 @@ public:
     IC PS::PEDIt LastPED() { return m_PEDs.end(); }
     IC PS::PGDIt FirstPGD() { return m_PGDs.begin(); }
     IC PS::PGDIt LastPGD() { return m_PGDs.end(); }
-
     PS::CPEDef* AppendPED(PS::CPEDef* src = 0);
     PS::CPGDef* AppendPGD(PS::CPGDef* src = 0);
     void Remove(LPCSTR name);

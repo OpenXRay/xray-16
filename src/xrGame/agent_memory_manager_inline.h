@@ -20,21 +20,9 @@ IC CAgentManager& CAgentMemoryManager::object() const
     return (*m_object);
 }
 
-IC void CAgentMemoryManager::set_squad_objects(VISIBLES* objects)
-{
-    m_visible_objects = objects;
-}
-
-IC void CAgentMemoryManager::set_squad_objects(SOUNDS* objects)
-{
-    m_sound_objects = objects;
-}
-
-IC void CAgentMemoryManager::set_squad_objects(HITS* objects)
-{
-    m_hit_objects = objects;
-}
-
+IC void CAgentMemoryManager::set_squad_objects(VISIBLES* objects) { m_visible_objects = objects; }
+IC void CAgentMemoryManager::set_squad_objects(SOUNDS* objects) { m_sound_objects = objects; }
+IC void CAgentMemoryManager::set_squad_objects(HITS* objects) { m_hit_objects = objects; }
 IC CAgentMemoryManager::VISIBLES& CAgentMemoryManager::visibles() const
 {
     VERIFY(m_visible_objects);

@@ -55,23 +55,30 @@ void CControlRunAttack::on_release()
 
 bool CControlRunAttack::check_start_conditions()
 {
-    if (is_active()) return false;
-    if (m_man->is_captured_pure()) return false;
+    if (is_active())
+        return false;
+    if (m_man->is_captured_pure())
+        return false;
 
     const CEntityAlive* enemy = m_object->EnemyMan.get_enemy();
-    if (!enemy) return false;
+    if (!enemy)
+        return false;
     // check if faced enemy
-    if (!m_man->direction().is_face_target(enemy, PI_DIV_6)) return false;
+    if (!m_man->direction().is_face_target(enemy, PI_DIV_6))
+        return false;
 
     float dist = enemy->Position().distance_to(m_object->Position());
     // check distance to enemy
-    if ((dist > m_max_dist) || (dist < m_min_dist)) return false;
+    if ((dist > m_max_dist) || (dist < m_min_dist))
+        return false;
 
     // check if run state, speed
     SVelocityParam& velocity_run = m_object->move().get_velocity(MonsterMovement::eVelocityParameterRunNormal);
-    if (!fsimilar(m_man->movement().velocity_current(), velocity_run.velocity.linear, 2.f)) return false;
+    if (!fsimilar(m_man->movement().velocity_current(), velocity_run.velocity.linear, 2.f))
+        return false;
 
-    if (m_time_next_attack > time()) return false;
+    if (m_time_next_attack > time())
+        return false;
 
     return true;
 }
@@ -84,7 +91,7 @@ void CControlRunAttack::on_event(ControlCom::EEventType type, ControlCom::IEvent
         m_time_next_attack = time() + Random.randI(m_min_delay, m_max_delay);
         m_man->notify(ControlCom::eventRunAttackEnd, 0);
         break;
-    case ControlCom::eventAnimationStart:  // handle blend params
+    case ControlCom::eventAnimationStart: // handle blend params
     {
         // set animation speed
         SControlAnimationData* ctrl_data_anim =

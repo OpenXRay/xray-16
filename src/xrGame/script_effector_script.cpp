@@ -14,21 +14,9 @@
 using namespace luabind;
 using namespace luabind::policy;
 
-void SPPInfo_assign(SPPInfo* self, SPPInfo* obj)
-{
-    *self = *obj;
-}
-
-void add_effector(CScriptEffector* self)
-{
-    self->Add();
-}
-
-void remove_effector(CScriptEffector* self)
-{
-    self->Remove();
-}
-
+void SPPInfo_assign(SPPInfo* self, SPPInfo* obj) { *self = *obj; }
+void add_effector(CScriptEffector* self) { self->Add(); }
+void remove_effector(CScriptEffector* self) { self->Remove(); }
 SCRIPT_EXPORT(CScriptEffector, (), {
     module(luaState)[class_<SPPInfo::SDuality>("duality")
                          .def_readwrite("h", &SPPInfo::SDuality::h)

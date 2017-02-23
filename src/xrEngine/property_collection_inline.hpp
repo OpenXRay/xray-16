@@ -26,11 +26,7 @@ inline PROPERTY_COLLECTION::~property_collection()
 }
 
 SPECIALIZATION
-inline holder_type& PROPERTY_COLLECTION::holder() const
-{
-    return (m_holder);
-}
-
+inline holder_type& PROPERTY_COLLECTION::holder() const { return (m_holder); }
 SPECIALIZATION
 void PROPERTY_COLLECTION::clear()
 {
@@ -40,11 +36,7 @@ void PROPERTY_COLLECTION::clear()
 }
 
 SPECIALIZATION
-u32 PROPERTY_COLLECTION::size()
-{
-    return (m_container.size());
-}
-
+u32 PROPERTY_COLLECTION::size() { return (m_container.size()); }
 SPECIALIZATION
 void PROPERTY_COLLECTION::insert(property_holder* holder, u32 const& position)
 {
@@ -76,16 +68,9 @@ void PROPERTY_COLLECTION::erase(u32 const& position)
 }
 
 SPECIALIZATION
-editor::property_holder* PROPERTY_COLLECTION::item(u32 const& position)
-{
-    return (m_container[position]->object());
-}
-
+editor::property_holder* PROPERTY_COLLECTION::item(u32 const& position) { return (m_container[position]->object()); }
 SPECIALIZATION
-inline PROPERTY_COLLECTION::predicate::predicate(property_holder* holder) : m_holder(holder)
-{
-}
-
+inline PROPERTY_COLLECTION::predicate::predicate(property_holder* holder) : m_holder(holder) {}
 SPECIALIZATION
 inline bool PROPERTY_COLLECTION::predicate::operator()(typename container_type::value_type const& value) const
 {
@@ -97,22 +82,16 @@ int PROPERTY_COLLECTION::index(property_holder* holder)
 {
     typedef typename container_type::iterator iterator_type;
     iterator_type i = std::find_if(m_container.begin(), m_container.end(), predicate(holder));
-    if (i == m_container.end()) return (-1);
+    if (i == m_container.end())
+        return (-1);
 
     return (int(i - m_container.begin()));
 }
 
 SPECIALIZATION
-void PROPERTY_COLLECTION::destroy(editor::property_holder* holder)
-{
-    delete_data(holder->holder());
-}
-
+void PROPERTY_COLLECTION::destroy(editor::property_holder* holder) { delete_data(holder->holder()); }
 SPECIALIZATION
-inline PROPERTY_COLLECTION::unique_id_predicate::unique_id_predicate(LPCSTR id) : m_id(id)
-{
-}
-
+inline PROPERTY_COLLECTION::unique_id_predicate::unique_id_predicate(LPCSTR id) : m_id(id) {}
 SPECIALIZATION
 inline bool PROPERTY_COLLECTION::unique_id_predicate::operator()(typename container_type::value_type const& value) const
 {
@@ -137,7 +116,8 @@ shared_str PROPERTY_COLLECTION::generate_unique_id(LPCSTR prefix) const
         R_ASSERT(!_itoa_s(i, number, 10));
         xr_strcat(result, number);
 
-        if (!unique_id(result)) continue;
+        if (!unique_id(result))
+            continue;
 
         return (result);
     }
@@ -146,7 +126,8 @@ shared_str PROPERTY_COLLECTION::generate_unique_id(LPCSTR prefix) const
 SPECIALIZATION
 inline void PROPERTY_COLLECTION::make_state_changed()
 {
-    if (!m_changed) return;
+    if (!m_changed)
+        return;
 
     *m_changed = true;
 }
@@ -154,4 +135,4 @@ inline void PROPERTY_COLLECTION::make_state_changed()
 #undef PROPERTY_COLLECTION
 #undef SPECIALIZATION
 
-#endif  // #ifndef PROPERTY_COLLECTION_INLINE_HPP_INCLUDED
+#endif // #ifndef PROPERTY_COLLECTION_INLINE_HPP_INCLUDED

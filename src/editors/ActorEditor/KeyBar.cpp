@@ -19,10 +19,7 @@
 #pragma link "ElPopBtn"
 #pragma resource "*.dfm"
 //---------------------------------------------------------------------------
-__fastcall TfrmKeyBar::TfrmKeyBar(TComponent* Owner) : TForm(Owner)
-{
-}
-
+__fastcall TfrmKeyBar::TfrmKeyBar(TComponent* Owner) : TForm(Owner) {}
 //---------------------------------------------------------------------------
 TfrmKeyBar* TfrmKeyBar::CreateKeyBar(TWinControl* parent)
 {
@@ -33,25 +30,18 @@ TfrmKeyBar* TfrmKeyBar::CreateKeyBar(TWinControl* parent)
     return B;
 }
 
-void __fastcall TfrmKeyBar::seLODLWChange(TObject* Sender, int Val)
-{
-    ATools->m_RenderObject.m_fLOD = seLOD->Value;
-}
-
+void __fastcall TfrmKeyBar::seLODLWChange(TObject* Sender, int Val) { ATools->m_RenderObject.m_fLOD = seLOD->Value; }
 //---------------------------------------------------------------------------
 
 void __fastcall TfrmKeyBar::seLODKeyPress(TObject* Sender, char& Key)
 {
-    if (Key == VK_RETURN) ATools->m_RenderObject.m_fLOD = seLOD->Value;
+    if (Key == VK_RETURN)
+        ATools->m_RenderObject.m_fLOD = seLOD->Value;
 }
 
 //---------------------------------------------------------------------------
 
-void __fastcall TfrmKeyBar::seLODExit(TObject* Sender)
-{
-    ATools->m_RenderObject.m_fLOD = seLOD->Value;
-}
-
+void __fastcall TfrmKeyBar::seLODExit(TObject* Sender) { ATools->m_RenderObject.m_fLOD = seLOD->Value; }
 //---------------------------------------------------------------------------
 
 void TfrmKeyBar::UpdateBar()
@@ -65,9 +55,11 @@ void TfrmKeyBar::UpdateBar()
     anm_track->Min = iFloor(a * 1000);
     anm_track->Max = iFloor(b * 1000);
 
-    if (auto_ch->Checked) anm_track->Position = iFloor(c * 1000);
+    if (auto_ch->Checked)
+        anm_track->Position = iFloor(c * 1000);
 
-    if (m_currentEditMotion != ATools->GetCurrentMotion()) {
+    if (m_currentEditMotion != ATools->GetCurrentMotion())
+    {
         PanelCh1->Repaint();
         PanelCh2->Repaint();
         PanelCh3->Repaint();
@@ -80,9 +72,9 @@ void TfrmKeyBar::UpdateBar()
     bool bMarksPresent34 = (m_currentEditMotion && m_currentEditMotion->marks.size() == 4);
 
     PanelCh1->Visible = bMarksPresent12 || ((CAEPreferences*)EPrefs)->bAlwaysShowKeyBar12 ||
-                        ((CAEPreferences*)EPrefs)->bAlwaysShowKeyBar34;
+        ((CAEPreferences*)EPrefs)->bAlwaysShowKeyBar34;
     PanelCh2->Visible = bMarksPresent12 || ((CAEPreferences*)EPrefs)->bAlwaysShowKeyBar12 ||
-                        ((CAEPreferences*)EPrefs)->bAlwaysShowKeyBar34;
+        ((CAEPreferences*)EPrefs)->bAlwaysShowKeyBar34;
     PanelCh3->Visible = bMarksPresent34 || ((CAEPreferences*)EPrefs)->bAlwaysShowKeyBar34;
     PanelCh4->Visible = bMarksPresent34 || ((CAEPreferences*)EPrefs)->bAlwaysShowKeyBar34;
 
@@ -93,16 +85,18 @@ void TfrmKeyBar::UpdateBar()
 
     int h = 24;
     if (bMarksPresent34 || ((CAEPreferences*)EPrefs)->bAlwaysShowKeyBar34)
-        h += 60;  //(4x15)
+        h += 60; //(4x15)
     else if (bMarksPresent12 || ((CAEPreferences*)EPrefs)->bAlwaysShowKeyBar12)
-        h += 30;  //(2x15)
+        h += 30; //(2x15)
 
-    if (ClientHeight != h) ClientHeight = h;
+    if (ClientHeight != h)
+        ClientHeight = h;
 }
 
 void TfrmKeyBar::draw_marks(int i)
 {
-    if (m_currentEditMotion != ATools->GetCurrentMotion()) {
+    if (m_currentEditMotion != ATools->GetCurrentMotion())
+    {
         PanelCh1->Repaint();
         PanelCh2->Repaint();
         PanelCh3->Repaint();
@@ -111,11 +105,14 @@ void TfrmKeyBar::draw_marks(int i)
 
     m_currentEditMotion = ATools->GetCurrentMotion();
 
-    if (!m_currentEditMotion) return;
+    if (!m_currentEditMotion)
+        return;
 
-    if (m_currentEditMotion->marks.size() == 0) return;
+    if (m_currentEditMotion->marks.size() == 0)
+        return;
 
-    if (m_currentEditMotion->marks.size() < (u32)(i + 1)) return;
+    if (m_currentEditMotion->marks.size() < (u32)(i + 1))
+        return;
 
     motion_marks& M = m_currentEditMotion->marks[i];
 
@@ -179,9 +176,11 @@ void TfrmKeyBar::set_mark(int id, int action)
 {
     m_currentEditMotion = ATools->GetCurrentMotion();
 
-    if (!m_currentEditMotion) return;
+    if (!m_currentEditMotion)
+        return;
 
-    if (m_currentEditMotion->marks.size() == 0) return;
+    if (m_currentEditMotion->marks.size() == 0)
+        return;
 
     motion_marks& M = m_currentEditMotion->marks[id];
     float a, b, c;
@@ -191,39 +190,44 @@ void TfrmKeyBar::set_mark(int id, int action)
     motion_marks::ITERATOR it = M.intervals.begin();
     motion_marks::ITERATOR it_e = M.intervals.end();
 
-    if (action == 3) {  // del current
+    if (action == 3)
+    { // del current
 
         for (; it != it_e; ++it)
         {
             motion_marks::interval& iv = *it;
-            if (iv.first < cur_time && iv.second > cur_time) {
+            if (iv.first < cur_time && iv.second > cur_time)
+            {
                 M.intervals.erase(it);
                 break;
             }
         }
     }
     else if (action == 2)
-    {  // up
+    { // up
         for (; it != it_e; ++it)
         {
             motion_marks::interval& iv = *it;
-            if (iv.first < cur_time && iv.second > cur_time) {
+            if (iv.first < cur_time && iv.second > cur_time)
+            {
                 iv.second = cur_time;
                 break;
             }
         }
     }
     else if (action == 1)
-    {  // down
+    { // down
         for (; it != it_e; ++it)
         {
             motion_marks::interval& iv = *it;
-            if (iv.first < cur_time && iv.second > cur_time) {
+            if (iv.first < cur_time && iv.second > cur_time)
+            {
                 iv.first = cur_time;
                 break;
             }
         }
-        if (it == it_e) {  // insert new
+        if (it == it_e)
+        { // insert new
             M.intervals.push_back(motion_marks::interval(cur_time, b - a));
         }
     }
@@ -235,125 +239,58 @@ void TfrmKeyBar::set_mark(int id, int action)
     PanelCh4->Repaint();
 }
 
-void __fastcall TfrmKeyBar::BtnUpCh1Click(TObject* Sender)
-{
-    set_mark(0, 2);
-}
-
+void __fastcall TfrmKeyBar::BtnUpCh1Click(TObject* Sender) { set_mark(0, 2); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfrmKeyBar::BtnUpCh2Click(TObject* Sender)
-{
-    set_mark(1, 2);
-}
-
+void __fastcall TfrmKeyBar::BtnUpCh2Click(TObject* Sender) { set_mark(1, 2); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfrmKeyBar::BtnUpCh3Click(TObject* Sender)
-{
-    set_mark(2, 2);
-}
-
+void __fastcall TfrmKeyBar::BtnUpCh3Click(TObject* Sender) { set_mark(2, 2); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfrmKeyBar::BtnUpCh4Click(TObject* Sender)
-{
-    set_mark(3, 2);
-}
-
+void __fastcall TfrmKeyBar::BtnUpCh4Click(TObject* Sender) { set_mark(3, 2); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfrmKeyBar::BtnDownCh1Click(TObject* Sender)
-{
-    set_mark(0, 1);
-}
-
+void __fastcall TfrmKeyBar::BtnDownCh1Click(TObject* Sender) { set_mark(0, 1); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfrmKeyBar::BtnDownCh2Click(TObject* Sender)
-{
-    set_mark(1, 1);
-}
-
+void __fastcall TfrmKeyBar::BtnDownCh2Click(TObject* Sender) { set_mark(1, 1); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfrmKeyBar::BtnDownCh3Click(TObject* Sender)
-{
-    set_mark(2, 1);
-}
-
+void __fastcall TfrmKeyBar::BtnDownCh3Click(TObject* Sender) { set_mark(2, 1); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfrmKeyBar::BtnDownCh4Click(TObject* Sender)
-{
-    set_mark(3, 1);
-}
-
+void __fastcall TfrmKeyBar::BtnDownCh4Click(TObject* Sender) { set_mark(3, 1); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfrmKeyBar::BtnDelCh1Click(TObject* Sender)
-{
-    set_mark(0, 3);
-}
-
+void __fastcall TfrmKeyBar::BtnDelCh1Click(TObject* Sender) { set_mark(0, 3); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfrmKeyBar::BtnDelCh2Click(TObject* Sender)
-{
-    set_mark(1, 3);
-}
-
+void __fastcall TfrmKeyBar::BtnDelCh2Click(TObject* Sender) { set_mark(1, 3); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfrmKeyBar::BtnDelCh3Click(TObject* Sender)
-{
-    set_mark(2, 3);
-}
-
+void __fastcall TfrmKeyBar::BtnDelCh3Click(TObject* Sender) { set_mark(2, 3); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfrmKeyBar::BtnDelCh4Click(TObject* Sender)
-{
-    set_mark(3, 3);
-}
-
+void __fastcall TfrmKeyBar::BtnDelCh4Click(TObject* Sender) { set_mark(3, 3); }
 //---------------------------------------------------------------------------
-void __fastcall TfrmKeyBar::PanelCh1Paint(TObject* Sender)
-{
-    draw_marks(0);
-}
-
+void __fastcall TfrmKeyBar::PanelCh1Paint(TObject* Sender) { draw_marks(0); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfrmKeyBar::PanelCh2Paint(TObject* Sender)
-{
-    draw_marks(1);
-}
-
-void __fastcall TfrmKeyBar::PanelCh3Paint(TObject* Sender)
-{
-    draw_marks(2);
-}
-
+void __fastcall TfrmKeyBar::PanelCh2Paint(TObject* Sender) { draw_marks(1); }
+void __fastcall TfrmKeyBar::PanelCh3Paint(TObject* Sender) { draw_marks(2); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfrmKeyBar::PanelCh4Paint(TObject* Sender)
-{
-    draw_marks(3);
-}
-
+void __fastcall TfrmKeyBar::PanelCh4Paint(TObject* Sender) { draw_marks(3); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfrmKeyBar::spinTimeFactorExit(TObject* Sender)
-{
-    EDevice.time_factor(spinTimeFactor->Value);
-}
-
+void __fastcall TfrmKeyBar::spinTimeFactorExit(TObject* Sender) { EDevice.time_factor(spinTimeFactor->Value); }
 //---------------------------------------------------------------------------
 
 void __fastcall TfrmKeyBar::spinTimeFactorKeyPress(TObject* Sender, char& Key)
 {
-    if (Key == VK_RETURN) {
+    if (Key == VK_RETURN)
+    {
         EDevice.time_factor(spinTimeFactor->Value);
     }
 }

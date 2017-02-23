@@ -25,15 +25,20 @@ void CNoGravityZone::UpdateWorkload(u32 dt)
 }
 void CNoGravityZone::switchGravity(SZoneObjectInfo& io, bool val)
 {
-    if (io.object->getDestroy()) return;
+    if (io.object->getDestroy())
+        return;
     CPhysicsShellHolder* sh = smart_cast<CPhysicsShellHolder*>(io.object);
-    if (!sh) return;
+    if (!sh)
+        return;
     CPhysicsShell* shell = sh->PPhysicsShell();
-    if (shell && shell->isActive()) {
+    if (shell && shell->isActive())
+    {
         shell->set_ApplyByGravity(val);
-        if (!val && shell->get_ApplyByGravity()) {
+        if (!val && shell->get_ApplyByGravity())
+        {
             CPhysicsElement* e = shell->get_ElementByStoreOrder(u16(Random.randI(0, shell->get_ElementsNumber())));
-            if (e->isActive()) {
+            if (e->isActive())
+            {
                 e->applyImpulseTrace(Fvector().random_point(e->getRadius()), Fvector().random_dir(),
                     shell->getMass() * physics_world()->Gravity() * fixed_step, e->m_SelfID);
             }
@@ -42,12 +47,14 @@ void CNoGravityZone::switchGravity(SZoneObjectInfo& io, bool val)
         // shell->set_DynamicScales(1.f);
         return;
     }
-    if (!io.nonalive_object) {
+    if (!io.nonalive_object)
+    {
         CEntityAlive* ea = smart_cast<CEntityAlive*>(io.object);
         CPHMovementControl* mc = ea->character_physics_support()->movement();
         mc->SetApplyGravity(BOOL(val));
         mc->SetForcedPhysicsControl(!val);
-        if (!val && mc->Environment() == CPHMovementControl::peOnGround) {
+        if (!val && mc->Environment() == CPHMovementControl::peOnGround)
+        {
             Fvector gn;
             mc->GroundNormal(gn);
             mc->ApplyImpulse(gn, mc->GetMass() * physics_world()->Gravity() * fixed_step);

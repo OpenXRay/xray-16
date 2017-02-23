@@ -9,29 +9,35 @@ void xrServer::Perform_connect_spawn(CSE_Abstract* E, xrClientData* CL, NET_Pack
 {
     P.B.count = 0;
     xr_vector<u16>::iterator it = std::find(conn_spawned_ids.begin(), conn_spawned_ids.end(), E->ID);
-    if (it != conn_spawned_ids.end()) {
+    if (it != conn_spawned_ids.end())
+    {
         //.		Msg("Rejecting redundant SPAWN data [%d]", E->ID);
         return;
     }
 
     conn_spawned_ids.push_back(E->ID);
 
-    if (E->net_Processed) return;
-    if (E->s_flags.is(M_SPAWN_OBJECT_PHANTOM)) return;
+    if (E->net_Processed)
+        return;
+    if (E->s_flags.is(M_SPAWN_OBJECT_PHANTOM))
+        return;
 
     //.	Msg("Perform connect spawn [%d][%s]", E->ID, E->s_name.c_str());
 
     // Connectivity order
     CSE_Abstract* Parent = ID_to_entity(E->ID_Parent);
-    if (Parent) Perform_connect_spawn(Parent, CL, P);
+    if (Parent)
+        Perform_connect_spawn(Parent, CL, P);
 
     // Process
     Flags16 save = E->s_flags;
     //-------------------------------------------------
     E->s_flags.set(M_SPAWN_UPDATE, TRUE);
-    if (0 == E->owner) {
+    if (0 == E->owner)
+    {
         // PROCESS NAME; Name this entity
-        if (E->s_flags.is(M_SPAWN_OBJECT_ASPLAYER)) {
+        if (E->s_flags.is(M_SPAWN_OBJECT_ASPLAYER))
+        {
             CL->owner = E;
             VERIFY(CL->ps);
             E->set_name_replace(CL->ps->getName());
@@ -44,7 +50,8 @@ void xrServer::Perform_connect_spawn(CSE_Abstract* E, xrClientData* CL, NET_Pack
 
         CSE_ALifeObject* object = smart_cast<CSE_ALifeObject*>(E);
         VERIFY(object);
-        if (!object->keep_saved_data_anyway()) object->client_data.clear();
+        if (!object->keep_saved_data_anyway())
+            object->client_data.clear();
     }
     else
     {
@@ -109,7 +116,8 @@ void xrServer::OnCL_Connected(IClient* _CL)
     SendConnectionData(CL);
 
     VERIFY2(CL->ps, "Player state not created");
-    if (!CL->ps) {
+    if (!CL->ps)
+    {
         Msg("! ERROR: Player state not created - incorect message sequence!");
         return;
     }
@@ -134,7 +142,7 @@ void xrServer::SendConnectResult(IClient* CL, u8 res, u8 res1, char* ResultStr)
 
     SendTo(CL->ID, P);
 
-    if (!res)  // need disconnect
+    if (!res) // need disconnect
     {
 #ifdef MP_LOGGING
         Msg("* Server disconnecting client, resaon: %s", ResultStr);
@@ -143,7 +151,8 @@ void xrServer::SendConnectResult(IClient* CL, u8 res, u8 res1, char* ResultStr)
         DisconnectClient(CL, ResultStr);
     }
 
-    if (Level().IsDemoPlay()) {
+    if (Level().IsDemoPlay())
+    {
         Level().StartPlayDemo();
 
         return;
@@ -161,7 +170,8 @@ void xrServer::SendProfileCreationError(IClient* CL, char const* reason)
     P.w_stringZ(reason);
     P.w_clientID(CL->ID);
     SendTo(CL->ID, P);
-    if (CL != GetServerClient()) {
+    if (CL != GetServerClient())
+    {
         Flush_Clients_Buffers();
         DisconnectClient(CL, reason);
     }
@@ -173,7 +183,8 @@ void xrServer::SendProfileCreationError(IClient* CL, char const* reason)
 // WARNING ! if you will change this method see M_AUTH_CHALLENGE event handler
 void xrServer::Check_GameSpy_CDKey_Success(IClient* CL)
 {
-    if (NeedToCheckClient_BuildVersion(CL)) return;
+    if (NeedToCheckClient_BuildVersion(CL))
+        return;
     //-------------------------------------------------------------
     RequestClientDigest(CL);
 };
@@ -191,7 +202,8 @@ bool xrServer::NeedToCheckClient_BuildVersion(IClient* CL)
     VERIFY(tmp_client);
     PerformSecretKeysSync(tmp_client);
 
-    if (g_SV_Disable_Auth_Check) return false;
+    if (g_SV_Disable_Auth_Check)
+        return false;
     CL->flags.bVerified = FALSE;
     NET_Packet P;
     P.w_begin(M_AUTH_CHALLENGE);
@@ -210,9 +222,10 @@ void xrServer::OnBuildVersionRespond(IClient* CL, NET_Packet& P)
     Msg("_our = %d", _our);
     Msg("_him = %d", _him);
     _our = MP_DEBUG_AUTH;
-#endif  // USE_DEBUG_AUTH
+#endif // USE_DEBUG_AUTH
 
-    if (_our != _him) {
+    if (_our != _him)
+    {
         SendConnectResult(CL, 0, ecr_data_verification_failed, "Data verification failed. Cheater?");
     }
     else
@@ -220,11 +233,13 @@ void xrServer::OnBuildVersionRespond(IClient* CL, NET_Packet& P)
         bool bAccessUser = false;
         string512 res_check;
 
-        if (!CL->flags.bLocal) {
+        if (!CL->flags.bLocal)
+        {
             bAccessUser = Check_ServerAccess(CL, res_check);
         }
 
-        if (CL->flags.bLocal || bAccessUser) {
+        if (CL->flags.bLocal || bAccessUser)
+        {
             // Check_BuildVersion_Success( CL );
             RequestClientDigest(CL);
         }

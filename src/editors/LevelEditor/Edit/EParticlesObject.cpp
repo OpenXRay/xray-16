@@ -21,11 +21,7 @@
 
 // using namespace PS;
 
-EParticlesObject::EParticlesObject(LPVOID data, LPCSTR name) : CCustomObject(data, name)
-{
-    Construct(data);
-}
-
+EParticlesObject::EParticlesObject(LPVOID data, LPCSTR name) : CCustomObject(data, name) { Construct(data); }
 //----------------------------------------------------
 
 void EParticlesObject::Construct(LPVOID data)
@@ -37,11 +33,7 @@ void EParticlesObject::Construct(LPVOID data)
 
 //----------------------------------------------------
 
-EParticlesObject::~EParticlesObject()
-{
-    ::Render->model_Delete(dynamic_cast<IRenderVisual*>(m_Particles));
-}
-
+EParticlesObject::~EParticlesObject() { ::Render->model_Delete(dynamic_cast<IRenderVisual*>(m_Particles)); }
 //----------------------------------------------------
 
 bool EParticlesObject::GetBox(Fbox& box) const
@@ -62,7 +54,8 @@ void EParticlesObject::OnUpdateTransform()
 {
     inherited::OnUpdateTransform();
     Fvector v = {0.f, 0.f, 0.f};
-    if (m_Particles) m_Particles->UpdateParent(_Transform(), v, FALSE);
+    if (m_Particles)
+        m_Particles->UpdateParent(_Transform(), v, FALSE);
 }
 
 //----------------------------------------------------
@@ -73,7 +66,8 @@ void EParticlesObject::OnFrame()
     Fbox bb;
     GetBox(bb);
     if (::Render->occ_visible(bb))
-        if (m_Particles) m_Particles->OnFrame(EDevice.dwTimeDelta);
+        if (m_Particles)
+            m_Particles->OnFrame(EDevice.dwTimeDelta);
 }
 
 //----------------------------------------------------
@@ -83,17 +77,22 @@ void EParticlesObject::Render(int priority, bool strictB2F)
     inherited::Render(priority, strictB2F);
     Fbox bb;
     GetBox(bb);
-    if (::Render->occ_visible(bb)) {
+    if (::Render->occ_visible(bb))
+    {
         RCache.set_xform_world(Fidentity);
-        if (1 == priority) {
-            if (false == strictB2F) {
+        if (1 == priority)
+        {
+            if (false == strictB2F)
+            {
                 // draw emitter
                 EDevice.SetShader(EDevice.m_WireShader);
-                if (!Selected()) DU_impl.DrawCross(PPosition, 0.30f, 0.1f, 0.3f, 0.3f, 0.3f, 0.3f, 0xFFFFEBAA, false);
+                if (!Selected())
+                    DU_impl.DrawCross(PPosition, 0.30f, 0.1f, 0.3f, 0.3f, 0.3f, 0.3f, 0xFFFFEBAA, false);
 
                 Fvector p = PPosition;
                 DU_impl.DrawRomboid(p, 0.1f, 0x0AFFEBAA);
-                if (Selected()) {
+                if (Selected())
+                {
                     Fbox bb;
                     GetBox(bb);
                     u32 clr = 0xFFFFFFFF;
@@ -130,10 +129,13 @@ bool EParticlesObject::RayPick(float& distance, const Fvector& start, const Fvec
     ray2.sub(pos, start);
 
     float d = ray2.dotproduct(direction);
-    if (d > 0) {
+    if (d > 0)
+    {
         float d2 = ray2.magnitude();
-        if (((d2 * d2 - d * d) < (PSOBJECT_SIZE * PSOBJECT_SIZE)) && (d > PSOBJECT_SIZE)) {
-            if (d < distance) {
+        if (((d2 * d2 - d * d) < (PSOBJECT_SIZE * PSOBJECT_SIZE)) && (d > PSOBJECT_SIZE))
+        {
+            if (d < distance)
+            {
                 distance = d;
                 return true;
             }
@@ -146,14 +148,16 @@ bool EParticlesObject::RayPick(float& distance, const Fvector& start, const Fvec
 
 void EParticlesObject::Play()
 {
-    if (m_Particles) m_Particles->Play();
+    if (m_Particles)
+        m_Particles->Play();
 }
 
 //----------------------------------------------------
 
 void EParticlesObject::Stop()
 {
-    if (m_Particles) m_Particles->Stop();
+    if (m_Particles)
+        m_Particles->Stop();
 }
 
 //----------------------------------------------------
@@ -163,10 +167,12 @@ bool EParticlesObject::LoadLTX(CInifile& ini, LPCSTR sect_name)
 
     inherited::LoadLTX(ini, sect_name);
 
-    if (version >= 0x0012) m_GameType.LoadLTX(ini, sect_name, false);
+    if (version >= 0x0012)
+        m_GameType.LoadLTX(ini, sect_name, false);
 
     m_RefName = ini.r_string(sect_name, "ref_name");
-    if (!Compile(*m_RefName)) {
+    if (!Compile(*m_RefName))
+    {
         ELog.DlgMsg(mtError, "EParticlesObject: '%s' not found in library", *m_RefName);
         return false;
     }
@@ -188,7 +194,8 @@ bool EParticlesObject::LoadStream(IReader& F)
     u16 version = 0;
 
     R_ASSERT(F.r_chunk(CPSOBJECT_CHUNK_VERSION, &version));
-    if (version < 0x0011) {
+    if (version < 0x0011)
+    {
         ELog.DlgMsg(mtError, "PSObject: Unsupported version.");
         return false;
     }
@@ -199,12 +206,14 @@ bool EParticlesObject::LoadStream(IReader& F)
 
     F.r_stringZ(m_RefName);
 
-    if (version >= 0x0013) {
+    if (version >= 0x0013)
+    {
         R_ASSERT(F.find_chunk(CPSOBJECT_CHUNK_GAMETYPE));
         m_GameType.LoadStream(F);
     }
 
-    if (!Compile(*m_RefName)) {
+    if (!Compile(*m_RefName))
+    {
         ELog.DlgMsg(mtError, "EParticlesObject: '%s' not found in library", *m_RefName);
         return false;
     }
@@ -233,21 +242,16 @@ void EParticlesObject::SaveStream(IWriter& F)
 
 //----------------------------------------------------
 
-void EParticlesObject::OnDeviceCreate()
-{
-}
-
-void EParticlesObject::OnDeviceDestroy()
-{
-}
-
+void EParticlesObject::OnDeviceCreate() {}
+void EParticlesObject::OnDeviceDestroy() {}
 bool EParticlesObject::ExportGame(SExportStreams* F)
 {
     SExportStreamItem& I = F->pe_static;
 
-    if (I.chunk == 0) {
+    if (I.chunk == 0)
+    {
         I.stream.open_chunk(I.chunk++);
-        I.stream.w_u32(1);  // version
+        I.stream.w_u32(1); // version
         I.stream.close_chunk();
     }
 
@@ -264,10 +268,12 @@ bool EParticlesObject::ExportGame(SExportStreams* F)
 bool EParticlesObject::Compile(LPCSTR ref_name)
 {
     ::Render->model_Delete(dynamic_cast<IRenderVisual*>(m_Particles));
-    if (ref_name) {
+    if (ref_name)
+    {
         IRenderVisual* base = ::Render->model_CreateParticles(ref_name);
         m_Particles = dynamic_cast<IParticleCustom*>(base);
-        if (m_Particles) {
+        if (m_Particles)
+        {
             UpdateTransform();
             m_RefName = ref_name;
             return true;
@@ -279,7 +285,8 @@ bool EParticlesObject::Compile(LPCSTR ref_name)
 
 void EParticlesObject::OnRefChange(PropValue* V)
 {
-    if (!Compile(*m_RefName)) {
+    if (!Compile(*m_RefName))
+    {
         ELog.Msg(mtError, "Can't compile particle system '%s'", *m_RefName);
     }
     else

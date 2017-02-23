@@ -9,14 +9,11 @@ sake_worker::sake_worker() : m_thread_initialized(0), m_initialization_success(0
     {
         sched_yield();
     }
-    if (!m_initialization_success) throw std::runtime_error("failed to initialize sake_worker");
+    if (!m_initialization_success)
+        throw std::runtime_error("failed to initialize sake_worker");
 }
 
-sake_worker::~sake_worker()
-{
-    add_task(&sake_worker::thread_stopper, NULL);
-}
-
+sake_worker::~sake_worker() { add_task(&sake_worker::thread_stopper, NULL); }
 void sake_worker::add_task(sake_task_proc_t proc, void* arg)
 {
     m_newtask_mutex.lock();
@@ -43,11 +40,13 @@ void* sake_worker::worker_thread()
             while (!m_tasks.empty())
             {
                 task_item_t& tmp_item = m_tasks.front();
-                if (tmp_item.first == thread_stopper) {
+                if (tmp_item.first == thread_stopper)
+                {
                     stop_signal = true;
                     break;
                 }
-                if (tmp_item.first(tmp_item.second, m_sake_inst.get())) {
+                if (tmp_item.first(tmp_item.second, m_sake_inst.get()))
+                {
                     m_tasks.push_back(tmp_item);
                 }
                 m_tasks.pop_front();

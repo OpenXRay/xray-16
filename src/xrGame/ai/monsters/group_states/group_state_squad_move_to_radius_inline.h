@@ -1,6 +1,6 @@
 #pragma once
 
-#define TEMPLATE_SPECIALIZATION                                                                                        \
+#define TEMPLATE_SPECIALIZATION \
     template <typename _Object\
 >
 
@@ -21,8 +21,10 @@ TEMPLATE_SPECIALIZATION
 void CStateGroupSquadMoveToRadiusExAbstract::execute()
 {
     CMonsterSquad* squad = monster_squad().get_squad(object);
-    if (squad && squad->SquadActive()) {
-        if (squad->get_index(object) != u8(-1)) {
+    if (squad && squad->SquadActive())
+    {
+        if (squad->get_index(object) != u8(-1))
+        {
             float m_Angle = (PI - PI_DIV_2) / (squad->squad_alife_count() - 1) * (squad->get_index(object) - 1);
             float m_Delta_Angle = Random.randF(PI_DIV_3 / (squad->squad_alife_count() - 1));
             float m_heading, m_pitch;
@@ -38,7 +40,8 @@ void CStateGroupSquadMoveToRadiusExAbstract::execute()
             data.point.x = m_enemy_position.x + data.completion_dist * to_direction.x;
             data.point.y = m_enemy_position.y + data.completion_dist * to_direction.y;
             data.point.z = m_enemy_position.z + data.completion_dist * to_direction.z;
-            if (!ai().level_graph().valid_vertex_position(data.point)) {
+            if (!ai().level_graph().valid_vertex_position(data.point))
+            {
                 data.point = object->EnemyMan.get_enemy()->Position();
             }
         }
@@ -60,12 +63,14 @@ void CStateGroupSquadMoveToRadiusExAbstract::execute()
     object->path().set_use_covers();
     object->path().set_cover_params(5.f, 30.f, 1.f, 30.f);
 
-    if (data.accelerated) {
+    if (data.accelerated)
+    {
         object->anim().accel_activate(EAccelType(data.accel_type));
         object->anim().accel_set_braking(data.braking);
     }
 
-    if (data.action.sound_type != u32(-1)) {
+    if (data.action.sound_type != u32(-1))
+    {
         object->set_state_sound(data.action.sound_type, data.action.sound_delay == u32(-1));
     }
 }
@@ -73,12 +78,15 @@ void CStateGroupSquadMoveToRadiusExAbstract::execute()
 TEMPLATE_SPECIALIZATION
 bool CStateGroupSquadMoveToRadiusExAbstract::check_completion()
 {
-    if (data.action.time_out != 0) {
-        if (time_state_started + data.action.time_out < Device.dwTimeGlobal) return true;
+    if (data.action.time_out != 0)
+    {
+        if (time_state_started + data.action.time_out < Device.dwTimeGlobal)
+            return true;
     }
     if (object->Position().distance_to_xz(object->EnemyMan.get_enemy()->Position()) < data.completion_dist - 2.f)
         return true;
-    if (data.point.distance_to_xz(object->Position()) <= 2.f) return true;
+    if (data.point.distance_to_xz(object->Position()) <= 2.f)
+        return true;
     return false;
 }
 
@@ -107,7 +115,8 @@ void CStateGroupSquadMoveToRadiusAbstract::execute()
     data.point.x = m_enemy_position.x + data.completion_dist * to_direction.x;
     data.point.y = m_enemy_position.y + data.completion_dist * to_direction.y;
     data.point.z = m_enemy_position.z + data.completion_dist * to_direction.z;
-    if (!ai().level_graph().valid_vertex_position(data.point)) {
+    if (!ai().level_graph().valid_vertex_position(data.point))
+    {
         data.point = object->EnemyMan.get_enemy()->Position();
     }
 
@@ -120,12 +129,14 @@ void CStateGroupSquadMoveToRadiusAbstract::execute()
     object->path().set_use_covers();
     object->path().set_cover_params(5.f, 30.f, 1.f, 30.f);
 
-    if (data.accelerated) {
+    if (data.accelerated)
+    {
         object->anim().accel_activate(EAccelType(data.accel_type));
         object->anim().accel_set_braking(data.braking);
     }
 
-    if (data.action.sound_type != u32(-1)) {
+    if (data.action.sound_type != u32(-1))
+    {
         object->set_state_sound(data.action.sound_type, data.action.sound_delay == u32(-1));
     }
 }
@@ -133,11 +144,14 @@ void CStateGroupSquadMoveToRadiusAbstract::execute()
 TEMPLATE_SPECIALIZATION
 bool CStateGroupSquadMoveToRadiusAbstract::check_completion()
 {
-    if (data.action.time_out != 0) {
-        if (time_state_started + data.action.time_out < Device.dwTimeGlobal) return true;
+    if (data.action.time_out != 0)
+    {
+        if (time_state_started + data.action.time_out < Device.dwTimeGlobal)
+            return true;
     }
 
-    if (data.point.distance_to_xz(object->Position()) <= 1.f) return true;
+    if (data.point.distance_to_xz(object->Position()) <= 1.f)
+        return true;
 
     return false;
 }

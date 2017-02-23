@@ -33,7 +33,7 @@ int _cpuid(_processor_info* pinfo)
     unsigned int lpid_width, mlpp;
 #ifdef _CPUID_DEBUG
     unsigned int mlpc, mcc;
-#endif  // _CPUID_DEBUG
+#endif // _CPUID_DEBUG
     __asm {
 
         // set pointers
@@ -121,7 +121,7 @@ CALC_WIDTH:
 
 #ifdef _CPUID_DEBUG
 	mov			DWORD PTR [mcc] , eax
-#endif  // _CPUID_DEBUG
+#endif // _CPUID_DEBUG
 
         // Addressable logical processors per core
 	mov			ebx , eax
@@ -131,7 +131,7 @@ CALC_WIDTH:
 
 #ifdef _CPUID_DEBUG
 	mov			DWORD PTR [mlpc] , eax
-#endif  // _CPUID_DEBUG
+#endif // _CPUID_DEBUG
 
 	cmp			eax , 01h
 	jbe			NO_HTT
@@ -352,7 +352,7 @@ NO_CPUID:
     printf("mcc = %u\n", mcc);
     printf("mlpc = %u\n", mlpc);
     printf("\nlogical_id bit width = %u\n\n", lpid_width);
-#endif  // _CPUID_DEBUG
+#endif // _CPUID_DEBUG
 
     // Calculate available processors
     DWORD pa_mask_save, sa_mask_stub, pa_mask_test, proc_count = 0;
@@ -362,7 +362,8 @@ NO_CPUID:
     pa_mask_test = pa_mask_save;
     while (pa_mask_test)
     {
-        if (pa_mask_test & 0x01) ++proc_count;
+        if (pa_mask_test & 0x01)
+            ++proc_count;
         pa_mask_test >>= 1;
     }
 
@@ -370,7 +371,8 @@ NO_CPUID:
     pinfo->n_threads = proc_count;
 
     // easy case, HT is not possible at all
-    if (lpid_width == 0) {
+    if (lpid_width == 0)
+    {
         pinfo->affinity_mask = pa_mask_save;
         pinfo->n_cores = proc_count;
         return pinfo->feature;
@@ -382,7 +384,8 @@ NO_CPUID:
     pa_mask_test = pa_mask_save;
     while (pa_mask_test)
     {
-        if (pa_mask_test & 0x01) {
+        if (pa_mask_test & 0x01)
+        {
             // Switch thread to specific CPU
             ta_mask = (1 << n_cpu);
             SetThreadAffinityMask(GetCurrentThread(), ta_mask);
@@ -400,16 +403,18 @@ NO_CPUID:
             char mask[255];
             _itoa_s(dwAPIC_ID, mask, 2);
             printf("APID_ID #%2.2u = 0x%2.2X (%08.8sb)\n", n_avail, dwAPIC_ID, mask);
-#endif  // _CPUID_DEBUG
+#endif // _CPUID_DEBUG
 
             // search for the APIC_ID with the same base
             BOOL bFound = FALSE;
             for (DWORD i = 0; i < n_avail; ++i)
-                if ((dwAPIC_ID >> lpid_width) == (dwAPIC_IDS[i] >> lpid_width)) {
+                if ((dwAPIC_ID >> lpid_width) == (dwAPIC_IDS[i] >> lpid_width))
+                {
                     bFound = TRUE;
                     break;
                 }
-            if (!bFound) {
+            if (!bFound)
+            {
                 // add unique core
                 dwNums[n_avail] = n_cpu;
                 dwAPIC_IDS[n_avail] = dwAPIC_ID;

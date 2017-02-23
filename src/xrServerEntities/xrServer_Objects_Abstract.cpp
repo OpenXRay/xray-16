@@ -18,10 +18,12 @@
 ////////////////////////////////////////////////////////////////////////////
 CSE_Visual::CSE_Visual(LPCSTR name)
 {
-    if (name) {
+    if (name)
+    {
         string_path tmp;
         xr_strcpy(tmp, name);
-        if (strext(tmp)) *strext(tmp) = 0;
+        if (strext(tmp))
+            *strext(tmp) = 0;
         xr_strlwr(tmp);
         visual_name = tmp;
     }
@@ -32,15 +34,13 @@ CSE_Visual::CSE_Visual(LPCSTR name)
     flags.zero();
 }
 
-CSE_Visual::~CSE_Visual()
-{
-}
-
+CSE_Visual::~CSE_Visual() {}
 void CSE_Visual::set_visual(LPCSTR name, bool load)
 {
     string_path tmp;
     xr_strcpy(tmp, name);
-    if (strext(tmp)) *strext(tmp) = 0;
+    if (strext(tmp))
+        *strext(tmp) = 0;
     xr_strlwr(tmp);
     visual_name = tmp;
 }
@@ -48,7 +48,8 @@ void CSE_Visual::set_visual(LPCSTR name, bool load)
 void CSE_Visual::visual_read(NET_Packet& tNetPacket, u16 version)
 {
     tNetPacket.r_stringZ(visual_name);
-    if (version > 103) flags.assign(tNetPacket.r_u8());
+    if (version > 103)
+        flags.assign(tNetPacket.r_u8());
 }
 
 void CSE_Visual::visual_write(NET_Packet& tNetPacket)
@@ -84,35 +85,16 @@ void CSE_Visual::FillProps(LPCSTR pref, PropItemVec& items)
     V->OnChangeEvent.bind(this, &CSE_Visual::OnChangeAnim);
     PHelper().CreateFlag8(items, PrepareKey(pref, abstract->name(), "Model\\Obstacle"), &flags, flObstacle);
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
 ////////////////////////////////////////////////////////////////////////////
 // CSE_Animated
 ////////////////////////////////////////////////////////////////////////////
-CSE_Motion::CSE_Motion(LPCSTR name)
-{
-    motion_name = name;
-}
-
-CSE_Motion::~CSE_Motion()
-{
-}
-
-void CSE_Motion::set_motion(LPCSTR name)
-{
-    motion_name = name;
-}
-
-void CSE_Motion::motion_read(NET_Packet& tNetPacket)
-{
-    tNetPacket.r_stringZ(motion_name);
-}
-
-void CSE_Motion::motion_write(NET_Packet& tNetPacket)
-{
-    tNetPacket.w_stringZ(motion_name);
-}
-
+CSE_Motion::CSE_Motion(LPCSTR name) { motion_name = name; }
+CSE_Motion::~CSE_Motion() {}
+void CSE_Motion::set_motion(LPCSTR name) { motion_name = name; }
+void CSE_Motion::motion_read(NET_Packet& tNetPacket) { tNetPacket.r_stringZ(motion_name); }
+void CSE_Motion::motion_write(NET_Packet& tNetPacket) { tNetPacket.w_stringZ(motion_name); }
 void CSE_Motion::OnChangeMotion(PropValue* sender)
 {
     IServerEntity* abstract = smart_cast<IServerEntity*>(this);
@@ -129,6 +111,6 @@ void CSE_Motion::FillProps(LPCSTR pref, PropItemVec& items)
         PHelper().CreateChoose(items, PrepareKey(pref, abstract->name(), "Motion"), &motion_name, smGameAnim);
     V->OnChangeEvent.bind(this, &CSE_Motion::OnChangeMotion);
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
 #pragma pack(pop, 4)

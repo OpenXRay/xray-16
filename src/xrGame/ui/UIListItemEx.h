@@ -22,7 +22,6 @@ public:
     virtual void SetSelectionColor(u32 dwColor);
     virtual void Draw();
     virtual void dummy() {}
-
 protected:
     u32 m_dwSelectionColor;
 };

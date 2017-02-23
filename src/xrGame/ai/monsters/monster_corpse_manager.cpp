@@ -10,18 +10,14 @@ CMonsterCorpseManager::CMonsterCorpseManager()
     forced = false;
 }
 
-CMonsterCorpseManager::~CMonsterCorpseManager()
-{
-}
-void CMonsterCorpseManager::init_external(CBaseMonster* M)
-{
-    monster = M;
-}
-
+CMonsterCorpseManager::~CMonsterCorpseManager() {}
+void CMonsterCorpseManager::init_external(CBaseMonster* M) { monster = M; }
 void CMonsterCorpseManager::update()
 {
-    if (forced) {
-        if (corpse->m_fFood < 1) {
+    if (forced)
+    {
+        if (corpse->m_fFood < 1)
+        {
             corpse = 0;
             return;
         }
@@ -30,7 +26,8 @@ void CMonsterCorpseManager::update()
     {
         corpse = monster->CorpseMemory.get_corpse();
 
-        if (corpse) {
+        if (corpse)
+        {
             SMonsterCorpse corpse_info = monster->CorpseMemory.get_corpse_info();
             position = corpse_info.position;
             vertex = corpse_info.vertex;
@@ -53,7 +50,8 @@ void CMonsterCorpseManager::unforce_corpse()
 {
     corpse = monster->CorpseMemory.get_corpse();
 
-    if (corpse) {
+    if (corpse)
+    {
         SMonsterCorpse corpse_info = monster->CorpseMemory.get_corpse_info();
         position = corpse_info.position;
         vertex = corpse_info.vertex;
@@ -72,7 +70,8 @@ void CMonsterCorpseManager::reinit()
 
 void CMonsterCorpseManager::remove_links(IGameObject* O)
 {
-    if (corpse == O) {
+    if (corpse == O)
+    {
         corpse = NULL;
     }
 }

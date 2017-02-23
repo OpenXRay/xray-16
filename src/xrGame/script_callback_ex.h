@@ -13,13 +13,14 @@
 
 IC bool compare_safe(const luabind::object& o1, const luabind::object& o2)
 {
-    if ((luabind::type(o1) == LUA_TNIL) && (luabind::type(o2) == LUA_TNIL)) return (true);
+    if ((luabind::type(o1) == LUA_TNIL) && (luabind::type(o2) == LUA_TNIL))
+        return (true);
 
     return (o1 == o2);
 }
 
 #if XRAY_EXCEPTIONS
-#define process_error                                                                                                  \
+#define process_error \
     catch (luabind::error & e) { ai().script_engine().print_output(ai().script_engine().lua(), "", LUA_ERRRUN); }
 #else
 #define process_error
@@ -42,11 +43,9 @@ protected:
 
 private:
     bool empty() const { return !!m_functor.interpreter(); }
-
 public:
     CScriptCallbackEx() {}
     virtual ~CScriptCallbackEx() {}
-
     CScriptCallbackEx(const CScriptCallbackEx& callback)
     {
         clear();
@@ -56,8 +55,10 @@ public:
     CScriptCallbackEx& operator=(const CScriptCallbackEx& callback)
     {
         clear();
-        if (callback.m_functor.is_valid() && callback.m_functor.interpreter()) m_functor = callback.m_functor;
-        if (callback.m_object.is_valid() && callback.m_object.interpreter()) m_object = callback.m_object;
+        if (callback.m_functor.is_valid() && callback.m_functor.interpreter())
+            m_functor = callback.m_functor;
+        if (callback.m_object.is_valid() && callback.m_object.interpreter())
+            m_object = callback.m_object;
         return *this;
     }
 
@@ -67,7 +68,6 @@ public:
     }
 
     bool operator==(const object_type& object) const { return compare_safe(m_object, object); }
-
     void set(const functor_type& functor)
     {
         clear();
@@ -90,7 +90,6 @@ public:
     }
 
     operator unspecified_bool_type() const { return !m_functor.is_valid() ? 0 : &CScriptCallbackEx::empty; }
-
     template <typename... Args>
     TResult operator()(Args&&... args) const
     {
@@ -98,9 +97,11 @@ public:
         {
             try
             {
-                if (m_functor) {
+                if (m_functor)
+                {
                     VERIFY(m_functor.is_valid());
-                    if (m_object.is_valid()) {
+                    if (m_object.is_valid())
+                    {
                         VERIFY(m_object.is_valid());
                         return TResult(
                             luabind::call_function<TResult>(m_functor, m_object, std::forward<Args>(args)...));
@@ -127,9 +128,11 @@ public:
         {
             try
             {
-                if (m_functor) {
+                if (m_functor)
+                {
                     VERIFY(m_functor.is_valid());
-                    if (m_object.is_valid()) {
+                    if (m_object.is_valid())
+                    {
                         VERIFY(m_object.is_valid());
                         return TResult(
                             luabind::call_function<TResult>(m_functor, m_object, std::forward<Args>(args)...));
@@ -158,9 +161,11 @@ void CScriptCallbackEx<void>::operator()(Args&&... args) const
     {
         try
         {
-            if (m_functor) {
+            if (m_functor)
+            {
                 VERIFY(m_functor.is_valid());
-                if (m_object.is_valid()) {
+                if (m_object.is_valid())
+                {
                     VERIFY(m_object.is_valid());
                     luabind::call_function<void>(m_functor, m_object, std::forward<Args>(args)...);
                 }
@@ -184,9 +189,11 @@ void CScriptCallbackEx<void>::operator()(Args&&... args)
     {
         try
         {
-            if (m_functor) {
+            if (m_functor)
+            {
                 VERIFY(m_functor.is_valid());
-                if (m_object.is_valid()) {
+                if (m_object.is_valid())
+                {
                     VERIFY(m_object.is_valid());
                     luabind::call_function<void>(m_functor, m_object, std::forward<Args>(args)...);
                 }

@@ -11,13 +11,11 @@ class CStateMonsterAttackRun : public CState<_Object>
 
 public:
     IC CStateMonsterAttackRun(_Object* obj) : inherited(obj) {}
-
     virtual void initialize();
     virtual void execute();
     virtual void finalize();
     virtual void critical_finalize();
     virtual void remove_links(IGameObject* object) { inherited::remove_links(object); }
-
     virtual bool check_completion();
     virtual bool check_start_conditions();
 };

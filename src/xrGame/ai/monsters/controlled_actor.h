@@ -30,9 +30,7 @@ public:
 
     void frame_update();
     bool is_controlling() { return m_actor != 0; }
-
     void dont_need_turn() { m_need_turn = false; }
-
 private:
     void reset();
     void update_turn();

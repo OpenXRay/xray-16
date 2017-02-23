@@ -62,10 +62,11 @@ const u32 CItemMgr::GetItemIdx(const shared_str& sect_name) const
 {
     COST_MAP_CIT it = m_items.find(sect_name);
 
-    if (it == m_items.end()) {
+    if (it == m_items.end())
+    {
 #ifdef DEBUG
         Msg("item not found in registry [%s]", sect_name.c_str());
-#endif  // DEBUG
+#endif // DEBUG
         return u32(-1);
     }
 
@@ -87,14 +88,10 @@ void CItemMgr::Dump() const
         Msg("[%s] slot=[%d] cost= %d,%d,%d,%d,%d", it->first.c_str(), val.slot_idx, val.cost[0], val.cost[1],
             val.cost[2], val.cost[3], val.cost[4]);
     }
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
 }
 
-const u32 CItemMgr::GetItemsCount() const
-{
-    return m_items.size();
-}
-
+const u32 CItemMgr::GetItemsCount() const { return m_items.size(); }
 const shared_str& CItemMgr::GetItemName(u32 Idx) const
 {
     R_ASSERT(Idx < m_items.size());

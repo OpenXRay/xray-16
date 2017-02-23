@@ -10,19 +10,16 @@ class ESceneGroupTool : public ESceneCustomOTool
     xr_string m_CurrentObject;
     xr_vector<bool> m_stored_state;
 
-  protected:
+protected:
     // controls
     virtual void CreateControls();
     virtual void RemoveControls();
 
-  public:
+public:
     ESceneGroupTool() : ESceneCustomOTool(OBJCLASS_GROUP) { ; }
-
     // definition
     IC LPCSTR ClassName() { return "group"; }
-
     IC LPCSTR ClassDesc() { return "Group"; }
-
     IC
 
         int
@@ -32,12 +29,9 @@ class ESceneGroupTool : public ESceneCustomOTool
     }
 
     virtual void Clear(bool bSpecific = false) { inherited::Clear(bSpecific); }
-
     // IO
     virtual int SaveFileCount() const { return 2; }
-
     virtual bool IsNeedSave() { return inherited::IsNeedSave(); }
-
     virtual bool LoadStream(IReader&);
     virtual bool LoadLTX(CInifile&);
     virtual void SaveStream(IWriter&);
@@ -61,7 +55,6 @@ class ESceneGroupTool : public ESceneCustomOTool
     void SetCurrentObject(LPCSTR nm);
 
     LPCSTR GetCurrentObject() { return m_CurrentObject.c_str(); }
-
     virtual CCustomObject* CreateObject(LPVOID data, LPCSTR name);
     virtual BOOL _RemoveObject(CCustomObject* object);
 };

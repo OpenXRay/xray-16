@@ -7,8 +7,8 @@ class CVampirePPEffector : public CEffectorPP
 {
     typedef CEffectorPP inherited;
 
-    SPPInfo state;  // current state
-    float m_total;  // total PP time
+    SPPInfo state; // current state
+    float m_total; // total PP time
 
 public:
     CVampirePPEffector(const SPPInfo& ppi, float life_time);

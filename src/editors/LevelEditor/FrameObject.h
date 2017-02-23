@@ -22,8 +22,8 @@ class ESceneObjectTool;
 //---------------------------------------------------------------------------
 class TfraObject : public TForm
 {
-    __published :  // IDE-managed Components
-                   TFormStorage* fsStorage;
+    __published : // IDE-managed Components
+                  TFormStorage* fsStorage;
     TLabel* Label5;
     TExtBtn* ebSelectByRefs;
     TExtBtn* ebDeselectByRefs;
@@ -76,7 +76,7 @@ class TfraObject : public TForm
     void __fastcall ExtBtn8Click(TObject* Sender);
     void __fastcall ExtBtn9Click(TObject* Sender);
 
-  private:  // User declarations
+private: // User declarations
     void __fastcall MultiSelByRefObject(bool clear_prev);
     void __fastcall SelByRefObject(bool flag);
     TItemList* m_Items;
@@ -84,11 +84,11 @@ class TfraObject : public TForm
     LPCSTR m_Current;
     void __stdcall OnDrawObjectThumbnail(LPCSTR name, HDC hdc, const Irect& R);
 
-  public:  // User declarations
+public: // User declarations
     ESceneObjectTool* ParentTools;
     void RefreshList();
 
-  public:  // User declarations
+public: // User declarations
     __fastcall TfraObject(TComponent* Owner, ESceneObjectTool* parent_tools);
 
     LPCSTR Current() { return m_Current; }

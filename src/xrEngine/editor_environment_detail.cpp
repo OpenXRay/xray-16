@@ -25,7 +25,8 @@ static HRESULT AnsiToUnicode(LPCSTR pszA, LPVOID buffer, u32 const& buffer_size)
     u32 cCharacters = xr_strlen(pszA) + 1;
     VERIFY(cCharacters * 2 <= buffer_size);
 
-    if (MultiByteToWideChar(CP_ACP, 0, pszA, cCharacters, (LPOLESTR)buffer, cCharacters)) return (NOERROR);
+    if (MultiByteToWideChar(CP_ACP, 0, pszA, cCharacters, (LPOLESTR)buffer, cCharacters))
+        return (NOERROR);
 
     return (HRESULT_FROM_WIN32(GetLastError()));
 }
@@ -63,4 +64,4 @@ shared_str editor::environment::detail::real_path(LPCSTR folder, LPCSTR path)
     return (result);
 }
 
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR

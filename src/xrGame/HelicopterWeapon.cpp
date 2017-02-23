@@ -48,7 +48,8 @@ void CHelicopter::OnEvent(NET_Packet& P, u16 type)
 void CHelicopter::MGunUpdateFire()
 {
     fShotTimeCounter -= Device.fTimeDelta;
-    if (delta_t < 0) {
+    if (delta_t < 0)
+    {
         delta_t = Device.fTimeGlobal;
         flag_by_fire = 0;
     }
@@ -69,25 +70,31 @@ void CHelicopter::MGunUpdateFire()
     CShootingObject::UpdateFlameParticles();
     CShootingObject::UpdateLight();
 
-    if (!IsWorking()) {
+    if (!IsWorking())
+    {
         clamp(fShotTimeCounter, 0.0f, flt_max);
         return;
     }
-    if (no_fire_time > 0 && fire_time > 0) {
-        if (flag_by_fire == 1 && time_f > fire_time) {
+    if (no_fire_time > 0 && fire_time > 0)
+    {
+        if (flag_by_fire == 1 && time_f > fire_time)
+        {
             delta_t = Device.fTimeGlobal;
             time_f = Device.fTimeGlobal - delta_t;
             flag_by_fire = 0;
         }
-        if (time_f > no_fire_time && flag_by_fire == 0) {
+        if (time_f > no_fire_time && flag_by_fire == 0)
+        {
             delta_t = Device.fTimeGlobal;
             time_f = Device.fTimeGlobal - delta_t;
             flag_by_fire = 1;
         }
-        if (flag_by_fire == 0 && time_f < no_fire_time) return;
+        if (flag_by_fire == 0 && time_f < no_fire_time)
+            return;
     }
 
-    if (fShotTimeCounter <= 0) {
+    if (fShotTimeCounter <= 0)
+    {
         OnShot();
         fShotTimeCounter += fOneShotTime;
     }
@@ -100,13 +107,15 @@ void CHelicopter::OnShot()
 
     float fire_trail_speed = 15.0f;
     clamp(fire_trail_speed, GetCurrVelocity(), 300.0f);
-    if (m_enemy.bUseFireTrail) {
+    if (m_enemy.bUseFireTrail)
+    {
         Fvector enemy_pos = m_enemy.destEnemyPos;
 
         float dt = Device.fTimeGlobal - m_enemy.fStartFireTime;
         VERIFY(dt >= 0);
         float dist = m_enemy.fire_trail_length_curr - dt * fire_trail_speed;
-        if (dist < 0) {
+        if (dist < 0)
+        {
             MGunFireEnd();
             return;
         }
@@ -115,7 +124,8 @@ void CHelicopter::OnShot()
         fp.y = enemy_pos.y;
         Fvector fd;
         fd.sub(enemy_pos, fp).normalize_safe();
-        if (dist > (m_enemy.fire_trail_length_curr / 2.0f)) {
+        if (dist > (m_enemy.fire_trail_length_curr / 2.0f))
+        {
             fd.mul(-1.0f);
             dist = dist - (m_enemy.fire_trail_length_curr / 2.0f);
         }
@@ -136,7 +146,8 @@ void CHelicopter::OnShot()
     FireBullet(fire_pos, fire_dir, fireDispersionBase, m_CurrentAmmo, ID(), ID(), OnServer());
 
     StartShotParticles();
-    if (m_bLightShotEnabled) Light_Start();
+    if (m_bLightShotEnabled)
+        Light_Start();
 
     StartFlameParticles();
     StartSmokeParticles(fire_pos, zero_vel);
@@ -147,9 +158,11 @@ void CHelicopter::OnShot()
 
 void CHelicopter::MGunFireStart()
 {
-    if (!m_use_mgun_on_attack) return;
+    if (!m_use_mgun_on_attack)
+        return;
 
-    if (FALSE == IsWorking() && m_enemy.bUseFireTrail) {
+    if (FALSE == IsWorking() && m_enemy.bUseFireTrail)
+    {
         // start calc fire trail
         m_enemy.fStartFireTime = Device.fTimeGlobal;
         Fvector fp = get_CurrentFirePoint();
@@ -157,15 +170,17 @@ void CHelicopter::MGunFireStart()
 
         // calc min firetrail length
         float h = fp.y - ep.y;
-        if (h > 0.0f) {
+        if (h > 0.0f)
+        {
             float dl = h * tan(m_lim_x_rot.y);
             float ds = fp.distance_to_xz(ep);
-            if (ds > dl) {
+            if (ds > dl)
+            {
                 float half_trail = ds - dl;
                 m_enemy.fire_trail_length_curr = half_trail * 2.0f;
                 clamp(m_enemy.fire_trail_length_curr, 0.0f, m_enemy.fire_trail_length_des);
                 //				Msg("Start fire. Desired length=%f,
-                //cur_length=%f",m_enemy.fire_trail_length_des,m_enemy.fire_trail_length_curr);
+                // cur_length=%f",m_enemy.fire_trail_length_des,m_enemy.fire_trail_length_curr);
             }
             else
                 m_enemy.fire_trail_length_curr = m_enemy.fire_trail_length_des;
@@ -184,14 +199,11 @@ void CHelicopter::MGunFireEnd()
     m_enemy.fStartFireTime = -1.0f;
 }
 
-bool between(const float& src, const float& min, const float& max)
-{
-    return ((src > min) && (src < max));
-}
-
+bool between(const float& src, const float& min, const float& max) { return ((src > min) && (src < max)); }
 void CHelicopter::UpdateWeapons()
 {
-    if (isOnAttack()) {
+    if (isOnAttack())
+    {
         UpdateMGunDir();
     }
     else
@@ -203,16 +215,20 @@ void CHelicopter::UpdateWeapons()
     angle_lerp(m_cur_rot.x, m_tgt_rot.x, PI, Device.fTimeDelta);
     angle_lerp(m_cur_rot.y, m_tgt_rot.y, PI, Device.fTimeDelta);
 
-    if (isOnAttack()) {
-        if (m_allow_fire) {
+    if (isOnAttack())
+    {
+        if (m_allow_fire)
+        {
             float d = XFORM().c.distance_to_xz(m_enemy.destEnemyPos);
 
-            if (between(d, m_min_mgun_dist, m_max_mgun_dist)) MGunFireStart();
+            if (between(d, m_min_mgun_dist, m_max_mgun_dist))
+                MGunFireStart();
 
             if (between(d, m_min_rocket_dist, m_max_rocket_dist) &&
                 (Device.dwTimeGlobal - m_last_rocket_attack > m_time_between_rocket_attack))
             {
-                if (m_syncronize_rocket) {
+                if (m_syncronize_rocket)
+                {
                     startRocket(1);
                     startRocket(2);
                 }
@@ -265,7 +281,7 @@ void CHelicopter::UpdateMGunDir()
     XFi.invert(XFORM());
     Fvector dep;
     XFi.transform_tiny(dep, m_enemy.destEnemyPos);
-    {  // x angle
+    { // x angle
         Fvector A_;
         A_.sub(dep, m_bind_x);
         m_i_bind_x_xform.transform_dir(A_);
@@ -273,9 +289,10 @@ void CHelicopter::UpdateMGunDir()
         m_tgt_rot.x = angle_normalize_signed(m_bind_rot.x - A_.getP());
         float sv_x = m_tgt_rot.x;
         clamp(m_tgt_rot.x, -m_lim_x_rot.y, -m_lim_x_rot.x);
-        if (!fsimilar(sv_x, m_tgt_rot.x, EPS_L)) m_allow_fire = FALSE;
+        if (!fsimilar(sv_x, m_tgt_rot.x, EPS_L))
+            m_allow_fire = FALSE;
     }
-    {  // y angle
+    { // y angle
         Fvector A_;
         A_.sub(dep, m_bind_y);
         m_i_bind_y_xform.transform_dir(A_);
@@ -283,7 +300,8 @@ void CHelicopter::UpdateMGunDir()
         m_tgt_rot.y = angle_normalize_signed(m_bind_rot.y - A_.getH());
         float sv_y = m_tgt_rot.y;
         clamp(m_tgt_rot.y, -m_lim_y_rot.y, -m_lim_y_rot.x);
-        if (!fsimilar(sv_y, m_tgt_rot.y, EPS_L)) m_allow_fire = FALSE;
+        if (!fsimilar(sv_y, m_tgt_rot.y, EPS_L))
+            m_allow_fire = FALSE;
     }
 
     if ((angle_difference(m_cur_rot.x, m_tgt_rot.x) > deg2rad(m_barrel_dir_tolerance)) ||
@@ -293,7 +311,8 @@ void CHelicopter::UpdateMGunDir()
 
 void CHelicopter::startRocket(u16 idx)
 {
-    if ((getRocketCount() >= 1) && m_use_rocket_on_attack) {
+    if ((getRocketCount() >= 1) && m_use_rocket_on_attack)
+    {
         CExplosiveRocket* pGrenade = smart_cast<CExplosiveRocket*>(getCurrentRocket());
         VERIFY(pGrenade);
         pGrenade->SetInitiator(this->ID());
@@ -326,13 +345,5 @@ void CHelicopter::startRocket(u16 idx)
     }
 }
 
-const Fmatrix& CHelicopter::get_ParticlesXFORM()
-
-{
-    return m_fire_bone_xform;
-}
-
-const Fvector& CHelicopter::get_CurrentFirePoint()
-{
-    return m_fire_pos;
-}
+const Fmatrix& CHelicopter::get_ParticlesXFORM() { return m_fire_bone_xform; }
+const Fvector& CHelicopter::get_CurrentFirePoint() { return m_fire_pos; }

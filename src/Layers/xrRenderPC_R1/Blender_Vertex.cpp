@@ -19,10 +19,7 @@ CBlender_Vertex::CBlender_Vertex()
     oTessellation.IDselected = 0;
 }
 
-CBlender_Vertex::~CBlender_Vertex()
-{
-}
-
+CBlender_Vertex::~CBlender_Vertex() {}
 void CBlender_Vertex::Save(IWriter& fs)
 {
     IBlender::Save(fs);
@@ -45,7 +42,8 @@ void CBlender_Vertex::Save(IWriter& fs)
 void CBlender_Vertex::Load(IReader& fs, u16 version)
 {
     IBlender::Load(fs, version);
-    if (version > 0) {
+    if (version > 0)
+    {
         xrPREAD_PROP(fs, xrPID_TOKEN, oTessellation);
     }
 }
@@ -54,7 +52,8 @@ void CBlender_Vertex::Compile(CBlender_Compile& C)
 {
     IBlender::Compile(C);
 
-    if (C.bEditor) {
+    if (C.bEditor)
+    {
         // Editor shader
         C.PassBegin();
         {
@@ -79,7 +78,8 @@ void CBlender_Vertex::Compile(CBlender_Compile& C)
         {
         case SE_R1_NORMAL_HQ:
             // Level view
-            if (C.bDetail_Diffuse) {
+            if (C.bDetail_Diffuse)
+            {
                 C.r_Pass("vert_dt", "vert_dt", TRUE);
                 C.r_Sampler("s_base", C.L_textures[0]);
                 C.r_Sampler("s_detail", C.detail_texture);

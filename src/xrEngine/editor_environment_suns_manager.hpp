@@ -60,12 +60,12 @@ private:
 
 public:
     environment::manager const& m_environment;
-};  // class suns_manager
+}; // class suns_manager
 
-}  // namespace suns
-}  // namespace environment
-}  // namespace editor
+} // namespace suns
+} // namespace environment
+} // namespace editor
 
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR
 
-#endif  // ifndef EDITOR_WEATHER_SUNS_MANAGER_HPP_INCLUDED
+#endif // ifndef EDITOR_WEATHER_SUNS_MANAGER_HPP_INCLUDED

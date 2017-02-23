@@ -17,7 +17,8 @@ using namespace Wml;
 void Wml::System::SwapBytes(int iSize, void* pvValue)
 {
     assert(iSize >= 1);
-    if (iSize == 1) return;
+    if (iSize == 1)
+        return;
 
     // size must be even
     assert((iSize & 1) == 0);
@@ -34,7 +35,8 @@ void Wml::System::SwapBytes(int iSize, void* pvValue)
 void Wml::System::SwapBytes(int iSize, int iQuantity, void* pvValue)
 {
     assert(iSize >= 1);
-    if (iSize == 1) return;
+    if (iSize == 1)
+        return;
 
     // size must be even
     assert((iSize & 1) == 0);
@@ -51,15 +53,13 @@ void Wml::System::SwapBytes(int iSize, int iQuantity, void* pvValue)
     }
 }
 //----------------------------------------------------------------------------
-bool Wml::System::IsPowerOfTwo(int iValue)
-{
-    return (iValue != 0) && ((iValue & -iValue) == iValue);
-}
+bool Wml::System::IsPowerOfTwo(int iValue) { return (iValue != 0) && ((iValue & -iValue) == iValue); }
 //----------------------------------------------------------------------------
 bool Wml::System::FileExists(const char* acFilename)
 {
     FILE* pkFile = fopen(acFilename, "r");
-    if (pkFile) {
+    if (pkFile)
+    {
         fclose(pkFile);
         return true;
     }

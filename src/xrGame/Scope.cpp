@@ -4,14 +4,8 @@
 #include "GrenadeLauncher.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
-CScope::CScope()
-{
-}
-
-CScope::~CScope()
-{
-}
-
+CScope::CScope() {}
+CScope::~CScope() {}
 using namespace luabind;
 
 SCRIPT_EXPORT(CScope, (CGameObject), {

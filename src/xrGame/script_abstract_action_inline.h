@@ -8,7 +8,4 @@
 
 #pragma once
 
-IC CScriptAbstractAction::CScriptAbstractAction()
-{
-    m_bCompleted = true;
-}
+IC CScriptAbstractAction::CScriptAbstractAction() { m_bCompleted = true; }

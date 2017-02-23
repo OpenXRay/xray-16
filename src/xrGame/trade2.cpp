@@ -20,21 +20,26 @@ bool CTrade::CanTrade()
 
     m_nearest.clear_not_free();
     Level().ObjectSpace.GetNearest(m_nearest, pThis.base->Position(), 2.f, NULL);
-    if (!m_nearest.empty()) {
+    if (!m_nearest.empty())
+    {
         for (u32 i = 0, n = m_nearest.size(); i < n; ++i)
         {
             // Может ли объект торговать
             pEntity = smart_cast<CEntity*>(m_nearest[i]);
-            if (pEntity && !pEntity->g_Alive()) return false;
-            if (SetPartner(pEntity)) break;
+            if (pEntity && !pEntity->g_Alive())
+                return false;
+            if (SetPartner(pEntity))
+                break;
         }
     }
 
-    if (!pPartner.base) return false;
+    if (!pPartner.base)
+        return false;
 
     // Объект рядом
     float dist = pPartner.base->Position().distance_to(pThis.base->Position());
-    if (dist < 0.5f || dist > 4.5f) {
+    if (dist < 0.5f || dist > 4.5f)
+    {
         RemovePartner();
         return false;
     }
@@ -49,7 +54,8 @@ bool CTrade::CanTrade()
     yaw2 = angle_normalize(yaw2);
 
     float Res = rad2deg(_abs(yaw - yaw2) < PI ? _abs(yaw - yaw2) : PI_MUL_2 - _abs(yaw - yaw2));
-    if (Res < 165.f || Res > 195.f) {
+    if (Res < 165.f || Res > 195.f)
+    {
         RemovePartner();
         return false;
     }
@@ -63,7 +69,8 @@ void CTrade::TransferItem(CInventoryItem* pItem, bool bBuying)
     // актер цену не говорит никогда, все делают за него
     u32 dwTransferMoney = GetItemPrice(pItem, bBuying);
 
-    if (bBuying) {
+    if (bBuying)
+    {
         pPartner.inv_owner->on_before_sell(pItem);
         pThis.inv_owner->on_before_buy(pItem);
     }
@@ -76,7 +83,8 @@ void CTrade::TransferItem(CInventoryItem* pItem, bool bBuying)
     CGameObject* O1 = smart_cast<CGameObject*>(pPartner.inv_owner);
     CGameObject* O2 = smart_cast<CGameObject*>(pThis.inv_owner);
 
-    if (!bBuying) swap(O1, O2);
+    if (!bBuying)
+        swap(O1, O2);
 
     NET_Packet P;
     O1->u_EventGen(P, GE_TRADE_SELL, O1->ID());
@@ -100,15 +108,18 @@ void CTrade::TransferItem(CInventoryItem* pItem, bool bBuying)
 
     CAI_Trader* pTrader = NULL;
 
-    if (pThis.type == TT_TRADER && bBuying) {
+    if (pThis.type == TT_TRADER && bBuying)
+    {
         CArtefact* pArtefact = smart_cast<CArtefact*>(pItem);
-        if (pArtefact) {
+        if (pArtefact)
+        {
             pTrader = smart_cast<CAI_Trader*>(pThis.base);
             m_bNeedToUpdateArtefactTasks |= pTrader->BuyArtefact(pArtefact);
         }
     }
 
-    if ((pPartner.type == TT_ACTOR) || (pThis.type == TT_ACTOR)) {
+    if ((pPartner.type == TT_ACTOR) || (pThis.type == TT_ACTOR))
+    {
         bool bDir = (pThis.type != TT_ACTOR) && bBuying;
         Actor()->callback(GameObject::eTradeSellBuyItem)(pItem->object().lua_game_object(), bDir, dwTransferMoney);
     }
@@ -122,27 +133,17 @@ CInventory& CTrade::GetTradeInv(SInventoryOwner owner)
     return owner.inv_owner->inventory();
 }
 
-CTrade* CTrade::GetPartnerTrade()
-{
-    return pPartner.inv_owner->GetTrade();
-}
-CInventory* CTrade::GetPartnerInventory()
-{
-    return &GetTradeInv(pPartner);
-}
-
-CInventoryOwner* CTrade::GetPartner()
-{
-    return pPartner.inv_owner;
-}
-
+CTrade* CTrade::GetPartnerTrade() { return pPartner.inv_owner->GetTrade(); }
+CInventory* CTrade::GetPartnerInventory() { return &GetTradeInv(pPartner); }
+CInventoryOwner* CTrade::GetPartner() { return pPartner.inv_owner; }
 u32 CTrade::GetItemPrice(PIItem pItem, bool b_buying)
 {
     CArtefact* pArtefact = smart_cast<CArtefact*>(pItem);
 
     // computing base_cost
     float base_cost;
-    if (pArtefact && (pThis.type == TT_ACTOR) && (pPartner.type == TT_TRADER)) {
+    if (pArtefact && (pThis.type == TT_ACTOR) && (pPartner.type == TT_TRADER))
+    {
         CAI_Trader* pTrader = smart_cast<CAI_Trader*>(pPartner.inv_owner);
         VERIFY(pTrader);
         base_cost = (float)pTrader->ArtefactPrice(pArtefact);
@@ -169,7 +170,8 @@ u32 CTrade::GetItemPrice(PIItem pItem, bool b_buying)
     const SInventoryOwner* _partner = 0;
     bool buying = true;
     bool is_actor = (pThis.type == TT_ACTOR) || (pPartner.type == TT_ACTOR);
-    if (is_actor) {
+    if (is_actor)
+    {
         //.		buying				= (pPartner.type == TT_ACTOR);
         buying = b_buying;
         _partner = &(buying ? pThis : pPartner);
@@ -184,7 +186,8 @@ u32 CTrade::GetItemPrice(PIItem pItem, bool b_buying)
     // computing action factor
     const CTradeFactors* p_trade_factors;
 
-    if (buying) {
+    if (buying)
+    {
         if (!pThis.inv_owner->trade_parameters().enabled(CTradeParameters::action_buy(0), pItem->object().cNameSect()))
             return 0;
         p_trade_factors =
@@ -202,10 +205,10 @@ u32 CTrade::GetItemPrice(PIItem pItem, bool b_buying)
     float action_factor;
     if (trade_factors.friend_factor() <= trade_factors.enemy_factor())
         action_factor = trade_factors.friend_factor() +
-                        (trade_factors.enemy_factor() - trade_factors.friend_factor()) * (1.f - relation_factor);
+            (trade_factors.enemy_factor() - trade_factors.friend_factor()) * (1.f - relation_factor);
     else
         action_factor = trade_factors.enemy_factor() +
-                        (trade_factors.friend_factor() - trade_factors.enemy_factor()) * relation_factor;
+            (trade_factors.friend_factor() - trade_factors.enemy_factor()) * relation_factor;
 
     clamp(action_factor, _min(trade_factors.enemy_factor(), trade_factors.friend_factor()),
         _max(trade_factors.enemy_factor(), trade_factors.friend_factor()));

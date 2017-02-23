@@ -16,4 +16,4 @@ public:
     virtual ~CWeaponPM();
 };
 
-#endif  //__XR_WEAPON_PM_H__
+#endif //__XR_WEAPON_PM_H__

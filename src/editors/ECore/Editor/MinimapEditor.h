@@ -18,8 +18,8 @@
 //---------------------------------------------------------------------------
 class TTMinimapEditor : public TForm
 {
-    __published :  // IDE-managed Components
-                   TPanel* Panel1;
+    __published : // IDE-managed Components
+                  TPanel* Panel1;
     TExtBtn* btnLoad;
     TMxPanel* imgPanel;
     TMxLabel* MxLabel1;
@@ -36,7 +36,7 @@ class TTMinimapEditor : public TForm
     void __fastcall imgPanelMouseDown(TObject* Sender, TMouseButton Button, TShiftState Shift, int X, int Y);
     void __fastcall ElFloatSpinEditX1Change(TObject* Sender);
 
-  private:  // User declarations
+private: // User declarations
     static TTMinimapEditor* form;
     U32Vec image_data;
     u32 image_w;
@@ -47,7 +47,7 @@ class TTMinimapEditor : public TForm
     Ivector2 image_draw_size;
     void ApplyPoints(bool to_controls);
 
-  public:  // User declarations
+public: // User declarations
     __fastcall TTMinimapEditor(TComponent* Owner);
 
     static void __fastcall Show();

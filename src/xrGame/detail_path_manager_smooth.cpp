@@ -29,16 +29,13 @@ IC T cos_apb(T sina, T cosa, T sinb, T cosb)
     return (cosa * cosb - sina * sinb);
 }
 
-IC bool is_negative(float a)
-{
-    return (!fis_zero(a) && (a < 0.f));
-}
-
+IC bool is_negative(float a) { return (!fis_zero(a) && (a < 0.f)); }
 IC bool coincide_directions(const Fvector2& start_circle_center, const Fvector2& start_tangent_point,
     float start_cross_product, const Fvector2& dest_circle_center, const Fvector2& dest_tangent_point,
     float dest_cross_product)
 {
-    if (fis_zero(start_cross_product)) {
+    if (fis_zero(start_cross_product))
+    {
         Fvector2 circle_tangent_point_direction = Fvector2().sub(dest_tangent_point, dest_circle_center);
         Fvector2 start_tangent_dest_tangent_direction = Fvector2().sub(dest_tangent_point, start_tangent_point);
         float cp1 = start_tangent_dest_tangent_direction.crossproduct(circle_tangent_point_direction);
@@ -60,7 +57,8 @@ bool CDetailPathManager::compute_tangent(const STrajectoryPoint& start, const SC
 
     // computing 2D cross product for start point
     direction.sub(start.position, start_circle.center);
-    if (fis_zero(direction.square_magnitude())) direction = start.direction;
+    if (fis_zero(direction.square_magnitude()))
+        direction = start.direction;
 
     start_yaw = direction.getH();
     start_yaw = start_yaw >= 0.f ? start_yaw : start_yaw + PI_MUL_2;
@@ -68,7 +66,8 @@ bool CDetailPathManager::compute_tangent(const STrajectoryPoint& start, const SC
 
     // computing 2D cross product for dest point
     direction.sub(dest.position, dest_circle.center);
-    if (fis_zero(direction.square_magnitude())) direction = dest.direction;
+    if (fis_zero(direction.square_magnitude()))
+        direction = dest.direction;
 
     dest_yaw = direction.getH();
     dest_yaw = dest_yaw >= 0.f ? dest_yaw : dest_yaw + PI_MUL_2;
@@ -79,10 +78,13 @@ bool CDetailPathManager::compute_tangent(const STrajectoryPoint& start, const SC
     yaw1 = direction.getH();
     yaw1 = yaw2 = yaw1 >= 0.f ? yaw1 : yaw1 + PI_MUL_2;
 
-    if (start_cp * dest_cp >= 0.f) {
+    if (start_cp * dest_cp >= 0.f)
+    {
         // so, our tangents are outside
-        if (start_circle.center.similar(dest_circle.center, EPS_S)) {
-            if (fsimilar(start_circle.radius, dest_circle.radius, EPS_S)) {
+        if (start_circle.center.similar(dest_circle.center, EPS_S))
+        {
+            if (fsimilar(start_circle.radius, dest_circle.radius, EPS_S))
+            {
                 // so, our circles are equal
                 tangents[0] = tangents[1] = start_circle;
                 adjust_point(start_circle.center, dest_yaw, start_circle.radius, tangents[0].point);
@@ -105,7 +107,8 @@ bool CDetailPathManager::compute_tangent(const STrajectoryPoint& start, const SC
             // radius difference
             float r_diff = start_circle.radius - dest_circle.radius;
             float r_diff_abs = _abs(r_diff);
-            if ((r_diff_abs > distance) && !fsimilar(r_diff_abs, distance, EPS_S)) return (false);
+            if ((r_diff_abs > distance) && !fsimilar(r_diff_abs, distance, EPS_S))
+                return (false);
             // angle between external tangents and circle centers segment
             float temp = r_diff / distance;
             clamp(temp, -.99999f, .99999f);
@@ -163,15 +166,20 @@ bool CDetailPathManager::build_circle_trajectory(
     const float min_dist = .1f;
     STravelPathPoint t;
     t.velocity = velocity;
-    if (position.radius * _abs(position.angle) <= min_dist) {
-        if (!path) {
-            if (vertex_id) *vertex_id = position.vertex_id;
+    if (position.radius * _abs(position.angle) <= min_dist)
+    {
+        if (!path)
+        {
+            if (vertex_id)
+                *vertex_id = position.vertex_id;
             return (true);
         }
-        if (vertex_id) *vertex_id = position.vertex_id;
+        if (vertex_id)
+            *vertex_id = position.vertex_id;
 
         t.position = ai().level_graph().v3d(position.position);
-        if (vertex_id || (!path->empty() && !path->back().position.similar(t.position, EPS_S))) {
+        if (vertex_id || (!path->empty() && !path->back().position.similar(t.position, EPS_S)))
+        {
             VERIFY(t.velocity != u32(-1));
             t.vertex_id = position.vertex_id;
             path->push_back(t);
@@ -201,7 +209,8 @@ bool CDetailPathManager::build_circle_trajectory(
         int m = _min(iFloor(_abs(angle) / position.angular_velocity * 10.f + 1.5f),
             iFloor(position.radius * _abs(angle) / min_dist + 1.5f));
 #ifdef DEBUG
-        if (m >= 10000) {
+        if (m >= 10000)
+        {
             Msg("! [position.radius=%f],[angle=%f],[m=%d]", position.radius, angle, m);
             VERIFY(m < 10000);
         }
@@ -210,7 +219,8 @@ bool CDetailPathManager::build_circle_trajectory(
     }
     int k = vertex_id ? 0 : -1;
 
-    if (path) path->reserve(size + n + k);
+    if (path)
+        path->reserve(size + n + k);
 
     sina = -direction.x;
     cosa = direction.y;
@@ -226,9 +236,11 @@ bool CDetailPathManager::build_circle_trajectory(
         t.position.z = cos_apb(sina, cosa, sini, cosi) * position.radius + position.center.y;
 
         curr_vertex_id = ai().level_graph().check_position_in_direction(curr_vertex_id, curr_pos, t.position);
-        if (!ai().level_graph().valid_vertex_id(curr_vertex_id)) return (false);
+        if (!ai().level_graph().valid_vertex_id(curr_vertex_id))
+            return (false);
 
-        if (path) {
+        if (path)
+        {
             t.vertex_id = curr_vertex_id;
             path->push_back(t);
         }
@@ -253,8 +265,10 @@ bool CDetailPathManager::build_line_trajectory(const STrajectoryPoint& start, co
     VERIFY(ai().level_graph().valid_vertex_id(vertex_id));
     STravelPathPoint t;
     t.velocity = velocity;
-    if (ai().level_graph().inside(vertex_id, dest.point)) {
-        if (path) {
+    if (ai().level_graph().inside(vertex_id, dest.point))
+    {
+        if (path)
+        {
             t.position = ai().level_graph().v3d(dest.point);
             t.vertex_id = vertex_id;
             path->push_back(t);
@@ -263,8 +277,7 @@ bool CDetailPathManager::build_line_trajectory(const STrajectoryPoint& start, co
     }
 
     //	VERIFY				(ai().level_graph().check_position_in_direction(vertex_id,start.point,dest.point));
-    return (
-        path ?
+    return (path ?
             ai().level_graph().create_straight_path<false>(vertex_id, start.point, dest.point, *path, t, false, false) :
             ai().level_graph().valid_vertex_id(
                 ai().level_graph().check_position_in_direction(vertex_id, start.point, dest.point)));
@@ -274,11 +287,14 @@ bool CDetailPathManager::build_trajectory(const STrajectoryPoint& start, const S
     xr_vector<STravelPathPoint>* path, const u32 velocity1, const u32 velocity2, const u32 velocity3)
 {
     u32 vertex_id;
-    if (!build_circle_trajectory(start, path, &vertex_id, velocity1)) return (false);
+    if (!build_circle_trajectory(start, path, &vertex_id, velocity1))
+        return (false);
 
-    if (!build_line_trajectory(start, dest, vertex_id, path, velocity2)) return (false);
+    if (!build_line_trajectory(start, dest, vertex_id, path, velocity2))
+        return (false);
 
-    if (!build_circle_trajectory(dest, path, 0, velocity3)) return (false);
+    if (!build_circle_trajectory(dest, path, 0, velocity3))
+        return (false);
 
     return (true);
 }
@@ -295,9 +311,9 @@ bool CDetailPathManager::build_trajectory(STrajectoryPoint& start, STrajectoryPo
         {
             dist[i].index = i;
             dist[i].time = _abs(tangents[i][0].angle) / start.angular_velocity +
-                           _abs(tangents[i][1].angle) / dest.angular_velocity +
-                           tangents[i][0].point.distance_to(tangents[i][1].point) *
-                               (fis_zero(straight_velocity) ? 0 : 1.f / straight_velocity);
+                _abs(tangents[i][1].angle) / dest.angular_velocity +
+                tangents[i][0].point.distance_to(tangents[i][1].point) *
+                    (fis_zero(straight_velocity) ? 0 : 1.f / straight_velocity);
         }
     }
 
@@ -308,7 +324,8 @@ bool CDetailPathManager::build_trajectory(STrajectoryPoint& start, STrajectoryPo
         {
             (SCirclePoint&)(start) = tangents[dist[i].index][0];
             (SCirclePoint&)(dest) = tangents[dist[i].index][1];
-            if (build_trajectory(start, dest, path, velocity1, velocity2, velocity3)) {
+            if (build_trajectory(start, dest, path, velocity1, velocity2, velocity3))
+            {
                 time = dist[i].time;
                 return (true);
             }
@@ -325,9 +342,11 @@ bool CDetailPathManager::compute_trajectory(STrajectoryPoint& start, STrajectory
     const EDirectionType direction_type)
 {
     SCirclePoint start_circles[2], dest_circles[2];
-    if (!compute_circles(start, start_circles)) return false;
+    if (!compute_circles(start, start_circles))
+        return false;
 
-    if (!compute_circles(dest, dest_circles)) return false;
+    if (!compute_circles(dest, dest_circles))
+        return false;
 
     u32 tangent_count = 0;
     SCirclePoint tangent_points[4][2];
@@ -368,7 +387,8 @@ bool CDetailPathManager::compute_path(STrajectoryPoint& _start, STrajectoryPoint
         start = _start;
         (STravelParams&)start = (*I);
         real_straight_line_index = straight_line_index;
-        if (is_negative(start.linear_velocity)) {
+        if (is_negative(start.linear_velocity))
+        {
             real_straight_line_index = straight_line_index_negative;
             direction_type = EDirectionType(direction_type | eDirectionTypeFN);
             start.direction.mul(-1.f);
@@ -380,21 +400,26 @@ bool CDetailPathManager::compute_path(STrajectoryPoint& _start, STrajectoryPoint
             dest = _dest;
             (STravelParams&)dest = (*i);
 
-            if (is_negative(dest.linear_velocity)) direction_type = EDirectionType(direction_type | eDirectionTypeSN);
+            if (is_negative(dest.linear_velocity))
+                direction_type = EDirectionType(direction_type | eDirectionTypeSN);
 
-            if (direction_type & eDirectionTypeFN) dest.direction.mul(-1.f);
+            if (direction_type & eDirectionTypeFN)
+                dest.direction.mul(-1.f);
 
             m_temp_path.clear();
             if (compute_trajectory(start, dest, m_tpTravelLine ? &m_temp_path : 0, time, (*I).index,
                     real_straight_line_index, (*i).index, direction_type))
             {
-                if (!m_try_min_time || (time < min_time)) {
+                if (!m_try_min_time || (time < min_time))
+                {
                     min_time = time;
-                    if (m_tpTravelLine) {
+                    if (m_tpTravelLine)
+                    {
                         m_tpTravelLine->resize(size);
                         m_tpTravelLine->insert(m_tpTravelLine->end(), m_temp_path.begin(), m_temp_path.end());
 
-                        if (!m_try_min_time) return (true);
+                        if (!m_try_min_time)
+                            return (true);
                     }
                     else
                         return (true);
@@ -403,7 +428,8 @@ bool CDetailPathManager::compute_path(STrajectoryPoint& _start, STrajectoryPoint
         }
     }
 
-    if (fsimilar(min_time, flt_max)) return (false);
+    if (fsimilar(min_time, flt_max))
+        return (false);
 
     return (true);
 }
@@ -475,17 +501,21 @@ bool CDetailPathManager::init_build(const xr_vector<u32>& level_path, u32 interm
     VELOCITIES::const_iterator E = m_movement_params.end();
     for (; I != E; ++I)
     {
-        if (!check_mask(m_velocity_mask, (*I).first)) continue;
+        if (!check_mask(m_velocity_mask, (*I).first))
+            continue;
         STravelParamsIndex temp;
         (STravelParams&)temp = (*I).second;
         temp.index = (*I).first;
-        if (check_mask(m_desirable_mask, (*I).first)) {
+        if (check_mask(m_desirable_mask, (*I).first))
+        {
             m_start_params.insert(m_start_params.begin(), temp);
-            if (max_linear_velocity < temp.linear_velocity) {
+            if (max_linear_velocity < temp.linear_velocity)
+            {
                 straight_line_index = temp.index;
                 max_linear_velocity = temp.linear_velocity;
             }
-            if (min_linear_velocity > temp.linear_velocity) {
+            if (min_linear_velocity > temp.linear_velocity)
+            {
                 straight_line_index_negative = temp.index;
                 min_linear_velocity = temp.linear_velocity;
             }
@@ -494,7 +524,8 @@ bool CDetailPathManager::init_build(const xr_vector<u32>& level_path, u32 interm
             m_start_params.push_back(temp);
     }
 
-    if (m_start_params.empty()) return (false);
+    if (m_start_params.empty())
+        return (false);
 
     m_dest_params.clear();
     m_dest_params.push_back(STravelParamsIndex(0.f, PI_MUL_2, u32(-1)));
@@ -512,7 +543,8 @@ bool CDetailPathManager::fill_key_points(
 
     for (int _i = 0, i = 0, n = (int)level_path.size() - 1, j = n, m = j; _i < n;)
     {
-        if (!ai().level_graph().check_vertex_in_direction(start_point.vertex_id, start_point.position, level_path[j])) {
+        if (!ai().level_graph().check_vertex_in_direction(start_point.vertex_id, start_point.position, level_path[j]))
+        {
             m = j;
             j = (i + j) / 2;
         }
@@ -531,11 +563,14 @@ bool CDetailPathManager::fill_key_points(
                 j = (i + m) / 2;
             }
         }
-        if (i >= m - 1) {
-            if (i <= _i) return (false);
+        if (i >= m - 1)
+        {
+            if (i <= _i)
+                return (false);
             _i = i;
             m_key_points.push_back(start_point);
-            if (i == n) {
+            if (i == n)
+            {
                 if (ai().level_graph().valid_vertex_id(ai().level_graph().check_position_in_direction(
                         start_point.vertex_id, start_point.position, dest.position)))
                 {
@@ -576,13 +611,15 @@ IC CDetailPathManager::STravelPoint CDetailPathManager::compute_better_key_point
         direction21.mul(d * c);
         direction21.add(point1.position);
         //.
-        if (!ai().level_graph().valid_vertex_position(ai().level_graph().v3d(direction21))) return (point1);
+        if (!ai().level_graph().valid_vertex_position(ai().level_graph().v3d(direction21)))
+            return (point1);
 
         if (!reverse_order)
             vertex_id = ai().level_graph().check_position_in_direction(point0.vertex_id, point0.position, direction21);
         else
             vertex_id = ai().level_graph().check_position_in_direction(point2.vertex_id, point2.position, direction21);
-        if (ai().level_graph().valid_vertex_id(vertex_id)) {
+        if (ai().level_graph().valid_vertex_id(vertex_id))
+        {
             VERIFY(ai().level_graph().inside(vertex_id, direction21));
             u32 test_vertex_id;
             if (!reverse_order)
@@ -591,7 +628,8 @@ IC CDetailPathManager::STravelPoint CDetailPathManager::compute_better_key_point
             else
                 test_vertex_id =
                     ai().level_graph().check_position_in_direction(vertex_id, direction21, point0.position);
-            if (!ai().level_graph().valid_vertex_id(test_vertex_id)) {
+            if (!ai().level_graph().valid_vertex_id(test_vertex_id))
+            {
                 b = c;
             }
             else
@@ -637,7 +675,8 @@ void CDetailPathManager::build_path_via_key_points(STrajectoryPoint& start, STra
         VERIFY(ai().level_graph().inside((*I).vertex_id, (*I).position));
 
         bool last_point = (I + 1) == E;
-        if (!last_point) {
+        if (!last_point)
+        {
             (STravelPoint&)d = *I;
             d.direction.sub((I + 1)->position, d.position);
             VERIFY(!fis_zero(d.direction.magnitude()));
@@ -648,12 +687,14 @@ void CDetailPathManager::build_path_via_key_points(STrajectoryPoint& start, STra
 
         bool succeed = compute_path(s, d, &m_path, m_start_params, last_point ? finish_params : m_start_params,
             straight_line_index, straight_line_index_negative);
-        if (!succeed) {
+        if (!succeed)
+        {
             m_path.clear();
             return;
         }
 
-        if (last_point) break;
+        if (last_point)
+            break;
 
         s = d;
         VERIFY(m_path.size() > 1);
@@ -673,8 +714,10 @@ void CDetailPathManager::build_path_via_key_points(STrajectoryPoint& start, STra
         m_path.pop_back();
 
         d = p;
-        if (!m_path.empty()) {
-            if (is_negative(velocity(m_path.back().velocity).linear_velocity)) s.direction.mul(-1.f);
+        if (!m_path.empty())
+        {
+            if (is_negative(velocity(m_path.back().velocity).linear_velocity))
+                s.direction.mul(-1.f);
         }
 
         VERIFY(!fis_zero(s.direction.magnitude()));
@@ -697,7 +740,8 @@ void CDetailPathManager::postprocess_key_points(const xr_vector<u32>& level_path
     STrajectoryPoint& start, STrajectoryPoint& dest, xr_vector<STravelParamsIndex>& finish_params,
     u32 straight_line_index, u32 straight_line_index_negative)
 {
-    if (m_key_points.size() < 3) return;
+    if (m_key_points.size() < 3)
+        return;
 
     if (m_key_points[m_key_points.size() - 2].position.similar(m_key_points[m_key_points.size() - 1].position, EPS_S))
         m_key_points.pop_back();
@@ -711,28 +755,32 @@ void CDetailPathManager::postprocess_key_points(const xr_vector<u32>& level_path
         {
             u32 vertex_id = ai().level_graph().check_position_in_direction(
                 m_key_points[i - 1].vertex_id, m_key_points[i - 1].position, key_point0.position);
-            if (!ai().level_graph().valid_vertex_id(vertex_id)) {
+            if (!ai().level_graph().valid_vertex_id(vertex_id))
+            {
                 vertex_id = vertex_id;
             }
         }
         {
             u32 vertex_id = ai().level_graph().check_position_in_direction(
                 m_key_points[i - 1].vertex_id, m_key_points[i - 1].position, key_point1.position);
-            if (!ai().level_graph().valid_vertex_id(vertex_id)) {
+            if (!ai().level_graph().valid_vertex_id(vertex_id))
+            {
                 vertex_id = vertex_id;
             }
         }
         {
             u32 vertex_id = ai().level_graph().check_position_in_direction(
                 key_point0.vertex_id, key_point0.position, m_key_points[i + 1].position);
-            if (!ai().level_graph().valid_vertex_id(vertex_id)) {
+            if (!ai().level_graph().valid_vertex_id(vertex_id))
+            {
                 vertex_id = vertex_id;
             }
         }
         {
             u32 vertex_id = ai().level_graph().check_position_in_direction(
                 key_point1.vertex_id, key_point1.position, m_key_points[i + 1].position);
-            if (!ai().level_graph().valid_vertex_id(vertex_id)) {
+            if (!ai().level_graph().valid_vertex_id(vertex_id))
+            {
                 vertex_id = vertex_id;
             }
         }
@@ -747,7 +795,8 @@ void CDetailPathManager::postprocess_key_points(const xr_vector<u32>& level_path
 void CDetailPathManager::add_patrol_point()
 {
     m_last_patrol_point = m_path.size() - 1;
-    if ((m_path.size() > 1) && m_state_patrol_path && !fis_zero(extrapolate_length())) {
+    if ((m_path.size() > 1) && m_state_patrol_path && !fis_zero(extrapolate_length()))
+    {
         STravelPathPoint t;
         Fvector v;
         v.sub(m_path.back().position, m_path[m_last_patrol_point - 1].position);
@@ -769,7 +818,7 @@ void CDetailPathManager::add_patrol_point()
 void CDetailPathManager::build_smooth_path(const xr_vector<u32>& level_path, u32 intermediate_index)
 {
     //	Msg									("[%6d][%s] started to build detail
-    //path",Device.dwFrame,*m_restricted_object->object().cName());
+    // path",Device.dwFrame,*m_restricted_object->object().cName());
     START_PROFILE("Build Path/Detail Path");
 
     m_failed = true;
@@ -784,7 +833,8 @@ void CDetailPathManager::build_smooth_path(const xr_vector<u32>& level_path, u32
     VERIFY(!level_path.empty());
     m_dest_vertex_id = level_path.back();
 
-    if (m_restricted_object) {
+    if (m_restricted_object)
+    {
 #ifdef DEBUG
         Fvector start_pos = ai().level_graph().v3d(start.position);
         start_pos.y = ai().level_graph().vertex_plane_y(start.vertex_id, start_pos.x, start_pos.z);
@@ -795,7 +845,8 @@ void CDetailPathManager::build_smooth_path(const xr_vector<u32>& level_path, u32
         bool alvi = m_restricted_object->accessible(start.vertex_id);
         bool asp = m_restricted_object->accessible(start_pos);
         VERIFY(ai().level_graph().inside(start.vertex_id, start_pos));
-        if (!((alvi && asp) || (!asp && !alvi))) {
+        if (!((alvi && asp) || (!asp && !alvi)))
+        {
             Msg("! vertex [%d], position [%f][%f][%f], alvi[%c], asp[%c]", start.vertex_id, VPUSH(start_pos),
                 alvi ? '+' : '-', asp ? '+' : '-');
         }
@@ -807,8 +858,10 @@ void CDetailPathManager::build_smooth_path(const xr_vector<u32>& level_path, u32
 
     xr_vector<STravelParamsIndex>& finish_params = m_use_dest_orientation ? m_start_params : m_dest_params;
 
-    if (!fill_key_points(level_path, intermediate_index, start, dest)) {
-        if (m_restricted_object) m_restricted_object->remove_border();
+    if (!fill_key_points(level_path, intermediate_index, start, dest))
+    {
+        if (m_restricted_object)
+            m_restricted_object->remove_border();
         return;
     }
 
@@ -817,7 +870,8 @@ void CDetailPathManager::build_smooth_path(const xr_vector<u32>& level_path, u32
 
     build_path_via_key_points(start, dest, finish_params, straight_line_index, straight_line_index_negative);
 
-    if (m_restricted_object) m_restricted_object->remove_border();
+    if (m_restricted_object)
+        m_restricted_object->remove_border();
 
     STOP_PROFILE;
     //	Msg									("[%6d][%s] build_detail_path

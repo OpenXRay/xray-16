@@ -27,7 +27,6 @@ public:
     }
     //! Destructor
     inline_ ~OBB() {}
-
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /**
      *	Tests if a point is contained within the OBB.
@@ -91,10 +90,10 @@ public:
 
     void ComputeLSS(LSS& lss);
 
-    Point mCenter;    //!< B for Box
-    Point mExtents;   //!< B for Bounding
-                      //				Matrix3x3		mRot;			//!< O for Oriented
-    Matrix3x3 mRot2;  //!< O for Oriented
+    Point mCenter; //!< B for Box
+    Point mExtents; //!< B for Bounding
+    //				Matrix3x3		mRot;			//!< O for Oriented
+    Matrix3x3 mRot2; //!< O for Oriented
 
     // Orientation is stored in row-major format,
     // i.e. rows = eigen vectors of the covariance matrix
@@ -134,4 +133,4 @@ FUNCTION MESHMERIZER_API bool ComputeOBB(
 
 FUNCTION MESHMERIZER_API void OBBFromTriangle(const Point& p1, const Point& p2, const Point& p3, OBB& obb);
 
-#endif  // __ICEOBB_H__
+#endif // __ICEOBB_H__

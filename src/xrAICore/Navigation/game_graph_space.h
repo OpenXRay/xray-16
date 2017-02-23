@@ -38,15 +38,10 @@ class
 
 public:
     IC const shared_str& name() const { return (m_name); }
-
     IC const Fvector& offset() const { return (m_offset); }
-
     IC const _LEVEL_ID& id() const { return (m_id); }
-
     IC const shared_str& section() const { return (m_section); }
-
     IC const xrGUID& guid() const { return (m_guid); }
-
     IC void load(IReader* reader);
     IC void save(IWriter* writer);
 
@@ -143,9 +138,7 @@ class
 
 public:
     IC const Fvector& level_point() const { return (tPoint); }
-
     IC u32 level_vertex_id() const { return (tNodeID); }
-
     IC float distance() const { return (fDistance); }
 };
 

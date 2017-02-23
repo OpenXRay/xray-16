@@ -10,7 +10,7 @@ using std::swap;
 #define M_DONTDEFERCLEAR_EXT
 #endif
 
-#define M_DONTDEFERCLEAR_EXT  //. for mem-debug only
+#define M_DONTDEFERCLEAR_EXT //. for mem-debug only
 
 //--------
 #ifdef M_NOSTDCONTAINERS_EXT
@@ -176,7 +176,6 @@ public:
     xr_vector(size_t _count, const T& _value) : inherited(_count, _value) {}
     explicit xr_vector(size_t _count) : inherited(_count) {}
     u32 size() const { return (u32)inherited::size(); }
-
     void clear_and_free() { inherited::clear(); }
     void clear_not_free() { erase(begin(), end()); }
     void clear_and_reserve()
@@ -272,7 +271,6 @@ public:
     bool operator>(const xr_stack<_Ty, _C>& _X) const { return (_X < *this); }
     bool operator<=(const xr_stack<_Ty, _C>& _X) const { return (!(_X < *this)); }
     bool operator>=(const xr_stack<_Ty, _C>& _X) const { return (!(*this < _X)); }
-
 protected:
     _C c;
 };
@@ -344,7 +342,7 @@ class xr_hash_map : public stdext::hash_map<K, V, _Traits, allocator>
 public:
     u32 size() const { return (u32) __super ::size(); }
 };
-#endif  // #ifdef STLPORT
+#endif // #ifdef STLPORT
 
 #endif
 
@@ -364,45 +362,45 @@ struct pred_stri : public std::binary_function<char*, char*, bool>
 };
 
 // STL extensions
-#define DEF_VECTOR(N, T)                                                                                               \
-    typedef xr_vector<T> N;                                                                                            \
+#define DEF_VECTOR(N, T)    \
+    typedef xr_vector<T> N; \
     typedef N::iterator N##_it;
-#define DEF_LIST(N, T)                                                                                                 \
-    typedef xr_list<T> N;                                                                                              \
+#define DEF_LIST(N, T)    \
+    typedef xr_list<T> N; \
     typedef N::iterator N##_it;
-#define DEF_DEQUE(N, T)                                                                                                \
-    typedef xr_deque<T> N;                                                                                             \
+#define DEF_DEQUE(N, T)    \
+    typedef xr_deque<T> N; \
     typedef N::iterator N##_it;
-#define DEF_MAP(N, K, T)                                                                                               \
-    typedef xr_map<K, T> N;                                                                                            \
+#define DEF_MAP(N, K, T)    \
+    typedef xr_map<K, T> N; \
     typedef N::iterator N##_it;
 
-#define DEFINE_DEQUE(T, N, I)                                                                                          \
-    typedef xr_deque<T> N;                                                                                             \
+#define DEFINE_DEQUE(T, N, I) \
+    typedef xr_deque<T> N;    \
     typedef N::iterator I;
-#define DEFINE_LIST(T, N, I)                                                                                           \
-    typedef xr_list<T> N;                                                                                              \
+#define DEFINE_LIST(T, N, I) \
+    typedef xr_list<T> N;    \
     typedef N::iterator I;
-#define DEFINE_VECTOR(T, N, I)                                                                                         \
-    typedef xr_vector<T> N;                                                                                            \
+#define DEFINE_VECTOR(T, N, I) \
+    typedef xr_vector<T> N;    \
     typedef N::iterator I;
-#define DEFINE_MAP(K, T, N, I)                                                                                         \
-    typedef xr_map<K, T> N;                                                                                            \
+#define DEFINE_MAP(K, T, N, I) \
+    typedef xr_map<K, T> N;    \
     typedef N::iterator I;
-#define DEFINE_MAP_PRED(K, T, N, I, P)                                                                                 \
-    typedef xr_map<K, T, P> N;                                                                                         \
+#define DEFINE_MAP_PRED(K, T, N, I, P) \
+    typedef xr_map<K, T, P> N;         \
     typedef N::iterator I;
-#define DEFINE_MMAP(K, T, N, I)                                                                                        \
-    typedef xr_multimap<K, T> N;                                                                                       \
+#define DEFINE_MMAP(K, T, N, I)  \
+    typedef xr_multimap<K, T> N; \
     typedef N::iterator I;
-#define DEFINE_SVECTOR(T, C, N, I)                                                                                     \
-    typedef svector<T, C> N;                                                                                           \
+#define DEFINE_SVECTOR(T, C, N, I) \
+    typedef svector<T, C> N;       \
     typedef N::iterator I;
-#define DEFINE_SET(T, N, I)                                                                                            \
-    typedef xr_set<T> N;                                                                                               \
+#define DEFINE_SET(T, N, I) \
+    typedef xr_set<T> N;    \
     typedef N::iterator I;
-#define DEFINE_SET_PRED(T, N, I, P)                                                                                    \
-    typedef xr_set<T, P> N;                                                                                            \
+#define DEFINE_SET_PRED(T, N, I, P) \
+    typedef xr_set<T, P> N;         \
     typedef N::iterator I;
 #define DEFINE_STACK(T, N) typedef xr_stack<T> N;
 

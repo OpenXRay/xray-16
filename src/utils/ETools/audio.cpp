@@ -65,24 +65,29 @@ input_format* open_audio_file(FILE* in, oe_enc_opt* opt)
     while (formats[j].id_func)
     {
         size = formats[j].id_data_len;
-        if (size >= buf_size) {
+        if (size >= buf_size)
+        {
             buf = (unsigned char*)realloc(buf, size);
             buf_size = size;
         }
 
-        if (size > buf_filled) {
+        if (size > buf_filled)
+        {
             ret = fread(buf + buf_filled, 1, buf_size - buf_filled, in);
             buf_filled += ret;
 
-            if (buf_filled < size) { /* File truncated */
+            if (buf_filled < size)
+            { /* File truncated */
                 j++;
                 continue;
             }
         }
 
-        if (formats[j].id_func(buf, buf_filled)) {
+        if (formats[j].id_func(buf, buf_filled))
+        {
             /* ok, we now have something that can handle the file */
-            if (formats[j].open_func(in, opt, buf, buf_filled)) {
+            if (formats[j].open_func(in, opt, buf, buf_filled))
+            {
                 free(buf);
                 return &formats[j];
             }
@@ -97,7 +102,8 @@ input_format* open_audio_file(FILE* in, oe_enc_opt* opt)
 
 static int seek_forward(FILE* in, int length)
 {
-    if (fseek(in, length, SEEK_CUR)) {
+    if (fseek(in, length, SEEK_CUR))
+    {
         /* Failed. Do it the hard way. */
         unsigned char buf[1024];
         int seek_needed = length, seeked;
@@ -125,9 +131,11 @@ static int find_wav_chunk(FILE* in, char* type, unsigned int* len)
             return 0; /* EOF before reaching the appropriate chunk */
         }
 
-        if (memcmp(buf, type, 4)) {
+        if (memcmp(buf, type, 4))
+        {
             *len = READ_U32_LE(buf + 4);
-            if (!seek_forward(in, *len)) return 0;
+            if (!seek_forward(in, *len))
+                return 0;
 
             buf[4] = 0;
             fprintf(stderr, _("Skipping chunk of type \"%s\", length %d\n"), buf, *len);
@@ -146,17 +154,21 @@ static int find_aiff_chunk(FILE* in, char* type, unsigned int* len)
 
     while (1)
     {
-        if (fread(buf, 1, 8, in) < 8) {
+        if (fread(buf, 1, 8, in) < 8)
+        {
             fprintf(stderr, _("Warning: Unexpected EOF in AIFF chunk\n"));
             return 0;
         }
 
         *len = READ_U32_BE(buf + 4);
 
-        if (memcmp(buf, type, 4)) {
-            if ((*len) & 0x1) (*len)++;
+        if (memcmp(buf, type, 4))
+        {
+            if ((*len) & 0x1)
+                (*len)++;
 
-            if (!seek_forward(in, *len)) return 0;
+            if (!seek_forward(in, *len))
+                return 0;
         }
         else
             return 1;
@@ -170,7 +182,8 @@ double read_IEEE80(unsigned char* buf)
     double f =
         ((unsigned long)(buf[2] & 0xff) << 24) | ((buf[3] & 0xff) << 16) | ((buf[4] & 0xff) << 8) | (buf[5] & 0xff);
 
-    if (e == 32767) {
+    if (e == 32767)
+    {
         if (buf[2] & 0x80)
             return HUGE_VAL; /* Really NaN, but this won't happen in reality */
         else
@@ -191,13 +204,17 @@ double read_IEEE80(unsigned char* buf)
 /* AIFF/AIFC support adapted from the old OggSQUISH application */
 int aiff_id(unsigned char* buf, int len)
 {
-    if (len < 12) return 0; /* Truncated file, probably */
+    if (len < 12)
+        return 0; /* Truncated file, probably */
 
-    if (memcmp(buf, "FORM", 4)) return 0;
+    if (memcmp(buf, "FORM", 4))
+        return 0;
 
-    if (memcmp(buf + 8, "AIF", 3)) return 0;
+    if (memcmp(buf + 8, "AIF", 3))
+        return 0;
 
-    if (buf[11] != 'C' && buf[11] != 'F') return 0;
+    if (buf[11] != 'C' && buf[11] != 'F')
+        return 0;
 
     return 1;
 }
@@ -216,19 +233,22 @@ int aiff_open(FILE* in, oe_enc_opt* opt, unsigned char* buf, int buflen)
     else
         aifc = 0;
 
-    if (!find_aiff_chunk(in, "COMM", &len)) {
+    if (!find_aiff_chunk(in, "COMM", &len))
+    {
         fprintf(stderr, _("Warning: No common chunk found in AIFF file\n"));
         return 0; /* EOF before COMM chunk */
     }
 
-    if (len < 18) {
+    if (len < 18)
+    {
         fprintf(stderr, _("Warning: Truncated common chunk in AIFF header\n"));
         return 0; /* Weird common chunk */
     }
 
     buffer = (unsigned char*)alloca(len);
 
-    if (fread(buffer, 1, len, in) < len) {
+    if (fread(buffer, 1, len, in) < len)
+    {
         fprintf(stderr, _("Warning: Unexpected EOF in reading AIFF header\n"));
         return 0;
     }
@@ -240,13 +260,16 @@ int aiff_open(FILE* in, oe_enc_opt* opt, unsigned char* buf, int buflen)
 
     aiff->bigendian = 1;
 
-    if (aifc) {
-        if (len < 22) {
+    if (aifc)
+    {
+        if (len < 22)
+        {
             fprintf(stderr, _("Warning: AIFF-C header truncated.\n"));
             return 0;
         }
 
-        if (!memcmp(buffer + 18, "NONE", 4)) {
+        if (!memcmp(buffer + 18, "NONE", 4))
+        {
             aiff->bigendian = 1;
         }
         else if (!memcmp(buffer + 18, "sowt", 4))
@@ -261,17 +284,20 @@ int aiff_open(FILE* in, oe_enc_opt* opt, unsigned char* buf, int buflen)
         }
     }
 
-    if (!find_aiff_chunk(in, "SSND", &len)) {
+    if (!find_aiff_chunk(in, "SSND", &len))
+    {
         fprintf(stderr, _("Warning: No SSND chunk found in AIFF file\n"));
         return 0; /* No SSND chunk -> no actual audio */
     }
 
-    if (len < 8) {
+    if (len < 8)
+    {
         fprintf(stderr, _("Warning: Corrupted SSND chunk in AIFF header\n"));
         return 0;
     }
 
-    if (fread(buf2, 1, 8, in) < 8) {
+    if (fread(buf2, 1, 8, in) < 8)
+    {
         fprintf(stderr, _("Warning: Unexpected EOF reading AIFF header\n"));
         return 0;
     }
@@ -279,7 +305,8 @@ int aiff_open(FILE* in, oe_enc_opt* opt, unsigned char* buf, int buflen)
     format.offset = READ_U32_BE(buf2);
     format.blocksize = READ_U32_BE(buf2 + 4);
 
-    if (format.blocksize == 0 && (format.samplesize == 16 || format.samplesize == 8)) {
+    if (format.blocksize == 0 && (format.samplesize == 16 || format.samplesize == 8))
+    {
         /* From here on, this is very similar to the wav code. Oh well. */
 
         opt->rate = format.rate;
@@ -310,13 +337,16 @@ int wav_id(unsigned char* buf, int len)
 {
     unsigned int flen;
 
-    if (len < 12) return 0; /* Something screwed up */
+    if (len < 12)
+        return 0; /* Something screwed up */
 
-    if (memcmp(buf, "RIFF", 4)) return 0; /* Not wave */
+    if (memcmp(buf, "RIFF", 4))
+        return 0; /* Not wave */
 
     flen = READ_U32_LE(buf + 4); /* We don't use this */
 
-    if (memcmp(buf + 8, "WAVE", 4)) return 0; /* RIFF, but not wave */
+    if (memcmp(buf + 8, "WAVE", 4))
+        return 0; /* RIFF, but not wave */
 
     return 1;
 }
@@ -335,9 +365,11 @@ int wav_open(FILE* in, oe_enc_opt* opt, unsigned char* oldbuf, int buflen)
      * as a wav file (oldbuf)
      */
 
-    if (!find_wav_chunk(in, "fmt ", &len)) return 0; /* EOF */
+    if (!find_wav_chunk(in, "fmt ", &len))
+        return 0; /* EOF */
 
-    if (len < 16) {
+    if (len < 16)
+    {
         fprintf(stderr, _("Warning: Unrecognised format chunk in WAV header\n"));
         return 0; /* Weird format chunk */
     }
@@ -352,14 +384,16 @@ int wav_open(FILE* in, oe_enc_opt* opt, unsigned char* oldbuf, int buflen)
         fprintf(stderr, _("Warning: INVALID format chunk in wav header.\n"
                           " Trying to read anyway (may not work)...\n"));
 
-    if (fread(buf, 1, 16, in) < 16) {
+    if (fread(buf, 1, 16, in) < 16)
+    {
         fprintf(stderr, _("Warning: Unexpected EOF in reading WAV header\n"));
         return 0;
     }
 
     /* Deal with stupid broken apps. Don't use these programs.
      */
-    if (len - 16 > 0 && !seek_forward(in, len - 16)) return 0;
+    if (len - 16 > 0 && !seek_forward(in, len - 16))
+        return 0;
 
     format.format = READ_U16_LE(buf);
     format.channels = READ_U16_LE(buf + 2);
@@ -368,9 +402,11 @@ int wav_open(FILE* in, oe_enc_opt* opt, unsigned char* oldbuf, int buflen)
     format.align = READ_U16_LE(buf + 12);
     format.samplesize = READ_U16_LE(buf + 14);
 
-    if (!find_wav_chunk(in, "data", &len)) return 0; /* EOF */
+    if (!find_wav_chunk(in, "data", &len))
+        return 0; /* EOF */
 
-    if (format.format == 1) {
+    if (format.format == 1)
+    {
         samplesize = format.samplesize / 8;
         opt->read_samples = wav_read;
     }
@@ -402,14 +438,16 @@ int wav_open(FILE* in, oe_enc_opt* opt, unsigned char* oldbuf, int buflen)
                                             of trying to abstract stuff. */
         wav->samplesize = format.samplesize;
 
-        if (len) {
+        if (len)
+        {
             opt->total_samples_per_channel = len / (format.channels * samplesize);
         }
         else
         {
             long pos;
             pos = ftell(in);
-            if (fseek(in, 0, SEEK_END) == -1) {
+            if (fseek(in, 0, SEEK_END) == -1)
+            {
                 opt->total_samples_per_channel = 0; /* Give up */
             }
             else
@@ -440,14 +478,16 @@ long wav_read(void* in, float** buffer, int samples)
     int i, j;
     long realsamples;
 
-    if (f->totalsamples && f->samplesread + bytes_read / (sampbyte * f->channels) > f->totalsamples) {
+    if (f->totalsamples && f->samplesread + bytes_read / (sampbyte * f->channels) > f->totalsamples)
+    {
         bytes_read = sampbyte * f->channels * (f->totalsamples - f->samplesread);
     }
 
     realsamples = bytes_read / (sampbyte * f->channels);
     f->samplesread += realsamples;
 
-    if (f->samplesize == 8) {
+    if (f->samplesize == 8)
+    {
         unsigned char* bufu = (unsigned char*)buf;
         for (i = 0; i < realsamples; i++)
         {
@@ -459,7 +499,8 @@ long wav_read(void* in, float** buffer, int samples)
     }
     else if (f->samplesize == 16)
     {
-        if (!f->bigendian) {
+        if (!f->bigendian)
+        {
             for (i = 0; i < realsamples; i++)
             {
                 for (j = 0; j < f->channels; j++)
@@ -485,7 +526,8 @@ long wav_read(void* in, float** buffer, int samples)
     }
     else if (f->samplesize == 24)
     {
-        if (!f->bigendian) {
+        if (!f->bigendian)
+        {
             for (i = 0; i < realsamples; i++)
             {
                 for (j = 0; j < f->channels; j++)
@@ -493,7 +535,7 @@ long wav_read(void* in, float** buffer, int samples)
                     buffer[j][i] = ((buf[i * 3 * f->channels + 3 * j + 2] << 16) |
                                        (((unsigned char*)buf)[i * 3 * f->channels + 3 * j + 1] << 8) |
                                        (((unsigned char*)buf)[i * 3 * f->channels + 3 * j] & 0xff)) /
-                                   8388608.0f;
+                        8388608.0f;
                 }
             }
         }
@@ -585,12 +627,15 @@ static long read_resampled(void* d, float** buffer, int samples)
     int out_samples;
 
     in_samples = res_push_max_input(&rs->resampler, samples);
-    if (in_samples > rs->bufsize) in_samples = rs->bufsize;
+    if (in_samples > rs->bufsize)
+        in_samples = rs->bufsize;
 
     in_samples = rs->real_reader(rs->real_readdata, rs->bufs, in_samples);
 
-    if (in_samples <= 0) {
-        if (!rs->done) {
+    if (in_samples <= 0)
+    {
+        if (!rs->done)
+        {
             rs->done = 1;
             out_samples = res_drain(&rs->resampler, buffer);
             return out_samples;
@@ -600,7 +645,8 @@ static long read_resampled(void* d, float** buffer, int samples)
 
     out_samples = res_push(&rs->resampler, buffer, (float const**)rs->bufs, in_samples);
 
-    if (out_samples <= 0) {
+    if (out_samples <= 0)
+    {
         fprintf(stderr, _("BUG: Got zero samples from resampler: your file will be truncated. Please report this.\n"));
     }
 
@@ -618,7 +664,8 @@ int setup_resample(oe_enc_opt* opt)
     rs->bufs = (float**)malloc(sizeof(float*) * opt->channels);
     rs->channels = opt->channels;
     rs->done = 0;
-    if (res_init(&rs->resampler, rs->channels, opt->resamplefreq, opt->rate, RES_END)) {
+    if (res_init(&rs->resampler, rs->channels, opt->resamplefreq, opt->rate, RES_END))
+    {
         fprintf(stderr, _("Couldn't initialise resampler\n"));
         return -1;
     }
@@ -726,7 +773,8 @@ void setup_downmix(oe_enc_opt* opt)
 {
     downmix* d = (downmix*)calloc(1, sizeof(downmix));
 
-    if (opt->channels != 2) {
+    if (opt->channels != 2)
+    {
         fprintf(stderr, "Internal error! Please report this bug.\n");
         return;
     }

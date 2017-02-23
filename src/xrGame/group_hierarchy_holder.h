@@ -40,7 +40,7 @@ private:
 #ifdef SQUAD_HIERARCHY_HOLDER_USE_LEADER
 private:
     CEntity* m_leader;
-#endif  // SQUAD_HIERARCHY_HOLDER_USE_LEADER
+#endif // SQUAD_HIERARCHY_HOLDER_USE_LEADER
 
 private:
     CSquadHierarchyHolder* m_squad;
@@ -94,7 +94,7 @@ public:
 public:
     void update_leader();
     IC CEntity* leader() const;
-#endif  // SQUAD_HIERARCHY_HOLDER_USE_LEADER
+#endif // SQUAD_HIERARCHY_HOLDER_USE_LEADER
 };
 
 #include "group_hierarchy_holder_inline.h"

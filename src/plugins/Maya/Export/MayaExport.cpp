@@ -10,14 +10,16 @@ BOOL CEditableObject::ParseMAMaterial(CSurface* dest, SXRShaderData& d)
 {
     string1024 tmp;
     strcpy_s(tmp, d.tex_name.asChar());
-    if (strext(tmp)) *strext(tmp) = 0;
+    if (strext(tmp))
+        *strext(tmp) = 0;
 
     dest->SetTexture(EFS.AppendFolderToName(tmp, sizeof(tmp), 1, TRUE));
     dest->SetFVF(D3DFVF_XYZ | D3DFVF_NORMAL | (1 << D3DFVF_TEXCOUNT_SHIFT));
     dest->SetVMap("Texture");
     dest->m_Flags.set(CSurface::sf2Sided, d.double_side);
     LPCSTR sh_name = _ChangeSymbol(strcpy(tmp, d.eng_name.asChar()), '/', '\\');
-    if (!sh_name || !sh_name[0]) {
+    if (!sh_name || !sh_name[0])
+    {
         Log("!Empty shader name, material: ", d.name.asChar());
         return FALSE;
     }
@@ -30,10 +32,12 @@ BOOL CEditableObject::ParseMAMaterial(CSurface* dest, SXRShaderData& d)
 CSurface* CEditableObject::CreateSurface(LPCSTR m_name, SXRShaderData& d)
 {
     CSurface* S = FindSurfaceByName(m_name);
-    if (!S) {
+    if (!S)
+    {
         S = new CSurface();
         S->SetName(m_name);
-        if (!ParseMAMaterial(S, d)) {
+        if (!ParseMAMaterial(S, d))
+        {
             xr_delete(S);
             return 0;
         }
@@ -46,10 +50,12 @@ MStatus CXRayObjectExport::ExportAll(CEditableObject* O)
 {
     MStatus status = MS::kSuccess;
 
-    if (initializeSetsAndLookupTables(true)) {
+    if (initializeSetsAndLookupTables(true))
+    {
         MItDag dagIterator(MItDag::kBreadthFirst, MFn::kInvalid, &status);
 
-        if (MS::kSuccess != status) {
+        if (MS::kSuccess != status)
+        {
             fprintf(stderr, "Failure in DAG iterator setup.\n");
             return MS::kFailure;
         }
@@ -60,7 +66,8 @@ MStatus CXRayObjectExport::ExportAll(CEditableObject* O)
             MObject component = MObject::kNullObj;
             status = dagIterator.getPath(dagPath);
 
-            if (!status) {
+            if (!status)
+            {
                 fprintf(stderr, "Failure getting DAG path.\n");
                 freeLookupTables();
                 return MS::kFailure;
@@ -69,9 +76,11 @@ MStatus CXRayObjectExport::ExportAll(CEditableObject* O)
             // skip over intermediate objects
             //
             MFnDagNode dagNode(dagPath, &status);
-            if (dagNode.isIntermediateObject()) continue;
+            if (dagNode.isIntermediateObject())
+                continue;
 
-            if ((dagPath.hasFn(MFn::kNurbsSurface)) && (dagPath.hasFn(MFn::kTransform))) {
+            if ((dagPath.hasFn(MFn::kNurbsSurface)) && (dagPath.hasFn(MFn::kTransform)))
+            {
                 status = MS::kSuccess;
                 fprintf(stderr, "Warning: skipping Nurbs Surface.\n");
             }
@@ -93,13 +102,14 @@ MStatus CXRayObjectExport::ExportAll(CEditableObject* O)
                 //
                 status = ExportPart(O, dagPath, component);
                 objectId++;
-                if (status != MS::kSuccess) {
+                if (status != MS::kSuccess)
+                {
                     fprintf(stderr, "Error: exporting geom failed.\n");
                     freeLookupTables();
-                    destroyEdgeTable();  // Free up the edge table
+                    destroyEdgeTable(); // Free up the edge table
                     return MS::kFailure;
                 }
-                destroyEdgeTable();  // Free up the edge table
+                destroyEdgeTable(); // Free up the edge table
             }
         }
     }
@@ -119,14 +129,16 @@ MStatus CXRayObjectExport::ExportSelected(CEditableObject* O)
     MStatus status;
     MString filename;
 
-    if (initializeSetsAndLookupTables(false)) {
+    if (initializeSetsAndLookupTables(false))
+    {
         // Create an iterator for the active selection list
         //
         MSelectionList slist;
         MGlobal::getActiveSelectionList(slist);
         MItSelectionList iter(slist);
 
-        if (iter.isDone()) {
+        if (iter.isDone())
+        {
             fprintf(stderr, "Error: Nothing is selected.\n");
             return MS::kFailure;
         }
@@ -152,19 +164,23 @@ MStatus CXRayObjectExport::ExportSelected(CEditableObject* O)
                 MObject component = MObject::kNullObj;
                 status = dagIterator.getPath(dagPath);
 
-                if (!status) {
+                if (!status)
+                {
                     fprintf(stderr, "Failure getting DAG path.\n");
                     freeLookupTables();
                     return MS::kFailure;
                 }
 
-                if (status) {
+                if (status)
+                {
                     // skip over intermediate objects
                     //
                     MFnDagNode dagNode(dagPath, &status);
-                    if (dagNode.isIntermediateObject()) continue;
+                    if (dagNode.isIntermediateObject())
+                        continue;
 
-                    if (dagPath.hasFn(MFn::kNurbsSurface)) {
+                    if (dagPath.hasFn(MFn::kNurbsSurface))
+                    {
                         status = MS::kSuccess;
                         fprintf(stderr, "Warning: skipping Nurbs Surface.\n");
                     }
@@ -184,13 +200,14 @@ MStatus CXRayObjectExport::ExportSelected(CEditableObject* O)
 
                         status = ExportPart(O, dagPath, component);
                         objectId++;
-                        if (status != MS::kSuccess) {
+                        if (status != MS::kSuccess)
+                        {
                             fprintf(stderr, "Error: exporting geom failed, check your selection.\n");
                             freeLookupTables();
-                            destroyEdgeTable();  // Free up the edge table
+                            destroyEdgeTable(); // Free up the edge table
                             return MS::kFailure;
                         }
-                        destroyEdgeTable();  // Free up the edge table
+                        destroyEdgeTable(); // Free up the edge table
                     }
                 }
             }
@@ -217,7 +234,8 @@ int AppendVertex(FvectorVec& _points, MPoint& _pt)
     pt.set((float)dst_x.asMeters(), (float)dst_y.asMeters(), -(float)dst_z.asMeters());
 
     for (FvectorIt it = _points.begin(); it != _points.end(); it++)
-        if (it->similar(pt)) return it - _points.begin();
+        if (it->similar(pt))
+            return it - _points.begin();
     _points.push_back(pt);
     return _points.size() - 1;
 }
@@ -229,7 +247,7 @@ int AppendUV(st_VMap*& VM, Fvector2& _uv)
 }
 
 MStatus CXRayObjectExport::set_smoth_flags(
-    u32& flags, const MIntArray& tri_vert_indeces)  //  const MFnMesh &fnMesh, const MItMeshPolygon &meshPoly,
+    u32& flags, const MIntArray& tri_vert_indeces) //  const MFnMesh &fnMesh, const MItMeshPolygon &meshPoly,
 {
     return t_set_smoth_flags(*this, flags, tri_vert_indeces);
 }
@@ -240,7 +258,8 @@ MStatus CXRayObjectExport::ExportPart(CEditableObject* O, MDagPath& mdagPath, MO
     MSpace::Space space = MSpace::kWorld;
 
     MFnMesh fnMesh(mdagPath, &stat);
-    if (MS::kSuccess != stat) {
+    if (MS::kSuccess != stat)
+    {
         fprintf(stderr, "Failure in MFnMesh initialization.\n");
         return MS::kFailure;
     }
@@ -252,10 +271,12 @@ MStatus CXRayObjectExport::ExportPart(CEditableObject* O, MDagPath& mdagPath, MO
     for (u32 ip = 0; ip < pc; ++ip)
     {
         MObject object_parent = dagNode1.parent(ip, &stat);
-        if (object_parent.hasFn(MFn::kTransform)) {
+        if (object_parent.hasFn(MFn::kTransform))
+        {
             MFnTransform parent_transform(object_parent, &stat);
 
-            if (MS::kSuccess == stat) {
+            if (MS::kSuccess == stat)
+            {
                 mdagPathNodeName = parent_transform.name();
                 break;
             }
@@ -263,13 +284,15 @@ MStatus CXRayObjectExport::ExportPart(CEditableObject* O, MDagPath& mdagPath, MO
     }
 
     MItMeshPolygon meshPoly(mdagPath, mComponent, &stat);
-    if (MS::kSuccess != stat) {
+    if (MS::kSuccess != stat)
+    {
         fprintf(stderr, "Failure in MItMeshPolygon initialization.\n");
         return MS::kFailure;
     }
 
     MItMeshVertex vtxIter(mdagPath, mComponent, &stat);
-    if (MS::kSuccess != stat) {
+    if (MS::kSuccess != stat)
+    {
         fprintf(stderr, "Failure in MItMeshVertex initialization.\n");
         return MS::kFailure;
     }
@@ -278,14 +301,16 @@ MStatus CXRayObjectExport::ExportPart(CEditableObject* O, MDagPath& mdagPath, MO
     // instance this path refers to.
     //
     int instanceNum = 0;
-    if (mdagPath.isInstanced()) instanceNum = mdagPath.instanceNumber();
+    if (mdagPath.isInstanced())
+        instanceNum = mdagPath.instanceNumber();
 
     // Get a list of all shaders attached to this mesh
     MObjectArray rgShaders;
     MIntArray texMap;
     MStatus status;
     status = fnMesh.getConnectedShaders(instanceNum, rgShaders, texMap);
-    if (status == MStatus::kFailure) {
+    if (status == MStatus::kFailure)
+    {
         Log("!Unable to load shaders for mesh");
         return (MStatus::kFailure);
     }
@@ -300,7 +325,8 @@ MStatus CXRayObjectExport::ExportPart(CEditableObject* O, MDagPath& mdagPath, MO
             SXRShaderData& D = xr_data.back();
 
             status = parseShader(shader, D);
-            if (status == MStatus::kFailure) {
+            if (status == MStatus::kFailure)
+            {
                 status.perror("Unable to retrieve filename of texture");
                 continue;
             }
@@ -319,7 +345,8 @@ MStatus CXRayObjectExport::ExportPart(CEditableObject* O, MDagPath& mdagPath, MO
     {
         for (int i = 0; i < length; i++)
         {
-            if (objectNodeNamesArray[i] == mdagPathNodeName) {
+            if (objectNodeNamesArray[i] == mdagPathNodeName)
+            {
                 objectIdx = i;
                 break;
             }
@@ -374,7 +401,8 @@ MStatus CXRayObjectExport::ExportPart(CEditableObject* O, MDagPath& mdagPath, MO
                 ptMap.insert(PtLookupMap::value_type(meshPoly.vertexIndex(i), i));
 
             // verify polygon zero area
-            if (meshPoly.zeroArea()) {
+            if (meshPoly.zeroArea())
+            {
                 status = MS::kFailure;
                 Log("!polygon have zero area:", meshPoly.index());
                 return status;
@@ -388,7 +416,8 @@ MStatus CXRayObjectExport::ExportPart(CEditableObject* O, MDagPath& mdagPath, MO
                         }
             */
             // verify polygon has UV information
-            if (!meshPoly.hasUVs(&status)) {
+            if (!meshPoly.hasUVs(&status))
+            {
                 status = MS::kFailure;
                 Log("!polygon is missing UV information:", meshPoly.index());
                 return status;
@@ -397,7 +426,8 @@ MStatus CXRayObjectExport::ExportPart(CEditableObject* O, MDagPath& mdagPath, MO
             int cTri;
             // now iterate through each triangle on this polygon and create a triangle object in our list
             status = meshPoly.numTriangles(cTri);
-            if (!status) {
+            if (!status)
+            {
                 Log("!can't getting triangle count");
                 return status;
             }
@@ -405,18 +435,20 @@ MStatus CXRayObjectExport::ExportPart(CEditableObject* O, MDagPath& mdagPath, MO
             for (int i = 0; i < cTri; i++)
             {
                 // for each triangle, first get the triangle data
-                rgpt.clear();   // triangle vertices
-                rgint.clear();  // triangle vertex indices
+                rgpt.clear(); // triangle vertices
+                rgint.clear(); // triangle vertex indices
 
                 // triangles that come from object are retrieved in world space
                 status = meshPoly.getTriangle(i, rgpt, rgint, MSpace::kWorld);
 
-                if (!status) {
+                if (!status)
+                {
                     Log("can't getting triangle for mesh poly");
                     return status;
                 }
 
-                if ((rgpt.length() != 3) || (rgint.length() != 3)) {
+                if ((rgpt.length() != 3) || (rgint.length() != 3))
+                {
                     Msg("!3 points not returned for triangle");
                     return MS::kFailure;
                 }
@@ -439,14 +471,16 @@ MStatus CXRayObjectExport::ExportPart(CEditableObject* O, MDagPath& mdagPath, MO
                     int vt = rgint[vtx];
                     mapIt = ptMap.find(vt);
                     Fvector2 uv;
-                    if (mapIt == ptMap.end()) {
+                    if (mapIt == ptMap.end())
+                    {
                         Msg("!Can't find local index.");
                         return MS::kFailure;
                     }
                     vtLocal = (*mapIt).second;
 
                     status = meshPoly.getUVIndex(vtLocal, vtUV, uv.x, uv.y);
-                    if (!status) {
+                    if (!status)
+                    {
                         Msg("!error getting UV Index for local vertex '%d' and object vertex '%d'", vtLocal, vt);
                         return status;
                     }
@@ -465,12 +499,14 @@ MStatus CXRayObjectExport::ExportPart(CEditableObject* O, MDagPath& mdagPath, MO
                 }
                 // out face material
                 int iTexture = texMap[meshPoly.index()];
-                if (iTexture < 0) xrDebug::Fatal(DEBUG_INFO, "Can't find material for polygon: %d", meshPoly.index());
+                if (iTexture < 0)
+                    xrDebug::Fatal(DEBUG_INFO, "Can't find material for polygon: %d", meshPoly.index());
                 SXRShaderData& D = xr_data[iTexture];
 
                 int compIdx = meshPoly.index();
                 surf = MESH->Parent()->CreateSurface(getMaterialName(mdagPath, compIdx, objectIdx), D);
-                if (!surf) return MStatus::kFailure;
+                if (!surf)
+                    return MStatus::kFailure;
                 _surf_faces[surf].push_back(_faces.size() - 1);
             }
         }
@@ -487,7 +523,8 @@ MStatus CXRayObjectExport::ExportPart(CEditableObject* O, MDagPath& mdagPath, MO
 
             MESH->RecomputeBBox();
         }
-        if ((MESH->GetVertexCount() < 4) || (MESH->GetFaceCount(true, false) < 2)) {
+        if ((MESH->GetVertexCount() < 4) || (MESH->GetFaceCount(true, false) < 2))
+        {
             Log("!Invalid mesh: '%s'. Faces<2 or Verts<4", *MESH->Name());
             return MS::kFailure;
         }
@@ -505,9 +542,11 @@ LPCSTR CXRayObjectExport::getMaterialName(MDagPath& mdagPath, int cid, int objec
 
     for (i = 0; i < numSets; i++)
     {
-        if (lookup(mdagPath, i, cid)) {
+        if (lookup(mdagPath, i, cid))
+        {
             MFnSet fnSet((*sets)[i]);
-            if (MFnSet::kRenderableOnly == fnSet.restriction(&stat)) {
+            if (MFnSet::kRenderableOnly == fnSet.restriction(&stat))
+            {
                 currentMaterials->append(i);
                 mArray.append(fnSet.name());
             }
@@ -517,26 +556,32 @@ LPCSTR CXRayObjectExport::getMaterialName(MDagPath& mdagPath, int cid, int objec
     // Test for equivalent materials
     //
     bool materialsEqual = false;
-    if ((lastMaterials != NULL) && (lastMaterials->length() == currentMaterials->length())) {
+    if ((lastMaterials != NULL) && (lastMaterials->length() == currentMaterials->length()))
+    {
         materialsEqual = true;
         length = lastMaterials->length();
         for (i = 0; i < length; i++)
         {
-            if ((*lastMaterials)[i] != (*currentMaterials)[i]) {
+            if ((*lastMaterials)[i] != (*currentMaterials)[i])
+            {
                 materialsEqual = false;
                 break;
             }
         }
     }
 
-    if (!materialsEqual) {
-        if (lastMaterials != NULL) xr_delete(lastMaterials);
+    if (!materialsEqual)
+    {
+        if (lastMaterials != NULL)
+            xr_delete(lastMaterials);
 
         lastMaterials = currentMaterials;
 
         int mLength = mArray.length();
-        if (mLength == 0) xrDebug::Fatal(DEBUG_INFO, "Object '%s' has polygon '%d' without material.", 0, cid);
-        if (mLength > 1) {
+        if (mLength == 0)
+            xrDebug::Fatal(DEBUG_INFO, "Object '%s' has polygon '%d' without material.", 0, cid);
+        if (mLength > 1)
+        {
             xrDebug::Fatal(DEBUG_INFO, "Object '%s' has polygon '%d' with more than one material.", 0, cid);
         }
     }

@@ -10,10 +10,7 @@ gsc_dsigned_ltx_writer::gsc_dsigned_ltx_writer(u8 const p_number[crypto::xr_dsa:
     pkf_func(m_private_key);
 }
 
-gsc_dsigned_ltx_writer::~gsc_dsigned_ltx_writer()
-{
-}
-
+gsc_dsigned_ltx_writer::~gsc_dsigned_ltx_writer() {}
 static char const* dsign_secion = "dsign";
 
 void gsc_dsigned_ltx_writer::sign_and_save(IWriter& writer)
@@ -28,8 +25,8 @@ void gsc_dsigned_ltx_writer::sign_and_save(IWriter& writer)
 
     m_mem_writer.seek(tmp_write_pos);
     LPCSTR append_value = NULL;
-    STRCONCAT(append_value, "\r\n[", dsign_secion, "]\r\n	date		=	", dsign_time,
-        "\r\n	sign_hash	=	", tmp_sign_value.c_str());
+    STRCONCAT(append_value, "\r\n[", dsign_secion, "]\r\n	date		=	", dsign_time, "\r\n	sign_hash	=	",
+        tmp_sign_value.c_str());
     m_ltx.save_as(writer);
     writer.w_stringZ(append_value);
 }
@@ -42,7 +39,8 @@ static char* search_dsign_section(u8* buffer, u32 buffer_size)
     int r_size = static_cast<int>(buffer_size - sstr_size);
     do
     {
-        if (!memcmp(rbegin, dsign_secion, sstr_size)) {
+        if (!memcmp(rbegin, dsign_secion, sstr_size))
+        {
             return static_cast<char*>((void*)rbegin);
         }
         --rbegin;
@@ -58,17 +56,14 @@ gsc_dsigned_ltx_reader::gsc_dsigned_ltx_reader(u8 const p_number[crypto::xr_dsa:
 {
 }
 
-gsc_dsigned_ltx_reader::~gsc_dsigned_ltx_reader()
-{
-    xr_delete(m_ltx);
-}
-
+gsc_dsigned_ltx_reader::~gsc_dsigned_ltx_reader() { xr_delete(m_ltx); }
 bool gsc_dsigned_ltx_reader::load_and_verify(u8* buffer, u32 const size)
 {
     char* dsign_section = search_dsign_section(buffer, size);
-    if (dsign_section == NULL) return false;
+    if (dsign_section == NULL)
+        return false;
 
-    dsign_section -= 3;  // \r\n[
+    dsign_section -= 3; // \r\n[
     u32 const dsign_sect_size = size - static_cast<u32>((u8*)dsign_section - buffer);
 
     IReader sign_reader(dsign_section, dsign_sect_size);
@@ -79,8 +74,9 @@ bool gsc_dsigned_ltx_reader::load_and_verify(u8* buffer, u32 const size)
 
     *dsign_section = 0;
     xr_strcat(dsign_section, dsign_sect_size, ltx_date.c_str());
-    u32 new_size = size - dsign_sect_size + ltx_date.size() + 1;  // xr_strlen(buffer)
-    if (!verify(buffer, new_size, ltx_dsign)) {
+    u32 new_size = size - dsign_sect_size + ltx_date.size() + 1; // xr_strlen(buffer)
+    if (!verify(buffer, new_size, ltx_dsign))
+    {
         return false;
     }
     *dsign_section = 0;

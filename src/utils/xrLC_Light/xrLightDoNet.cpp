@@ -45,9 +45,11 @@ void xrNetDOLight()
         int x, z;
         gl_data.slots_data.header().slot_x_z(end, x, z);
         ++end;
-        if (gl_data.slots_data.calculate_ignore(x, z)) continue;
+        if (gl_data.slots_data.calculate_ignore(x, z))
+            continue;
         ++task_slots_number;
-        if (task_slots_number == max_task_slots_number || end == slot_count) {
+        if (task_slots_number == max_task_slots_number || end == slot_count)
+        {
             tnet_execution_base<et_detail_light>* el = lc_net::execution_factory.create<et_detail_light>();
             el->implementation().construct(start, end);
             get_task_manager().add_task(el);

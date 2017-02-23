@@ -6,7 +6,7 @@
 
 class CUIDoubleProgressBar : public CUIWindow
 {
-public:  // func
+public: // func
     CUIDoubleProgressBar();
     virtual ~CUIDoubleProgressBar();
 
@@ -17,7 +17,7 @@ protected:
     CUIProgressBar m_progress_one;
     CUIProgressBar m_progress_two;
 
-    u32 m_less_color;  // red
-    u32 m_more_color;  // green
+    u32 m_less_color; // red
+    u32 m_more_color; // green
 
-};  // class CUIDoubleProgressBar
+}; // class CUIDoubleProgressBar

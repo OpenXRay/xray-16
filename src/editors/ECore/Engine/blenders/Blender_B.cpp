@@ -17,15 +17,8 @@ CBlender_B::CBlender_B()
     description.version = 2;
 }
 
-CBlender_B::~CBlender_B()
-{
-}
-
-void CBlender_B::Save(IWriter& fs)
-{
-    IBlender::Save(fs);
-}
-
+CBlender_B::~CBlender_B() {}
+void CBlender_B::Save(IWriter& fs) { IBlender::Save(fs); }
 void CBlender_B::Load(IReader& fs, u16 version)
 {
     IBlender::Load(fs, version);
@@ -47,7 +40,8 @@ void CBlender_B::Load(IReader& fs, u16 version)
 void CBlender_B::Compile(CBlender_Compile& C)
 {
     IBlender::Compile(C);
-    if (C.bEditor) {
+    if (C.bEditor)
+    {
         C.PassBegin();
         {
             C.PassSET_ZB(TRUE, TRUE);
@@ -65,7 +59,8 @@ void CBlender_B::Compile(CBlender_Compile& C)
     }
     else
     {
-        if (2 == C.iElement) {
+        if (2 == C.iElement)
+        {
             C.PassBegin();
             {
                 C.PassSET_ZB(TRUE, TRUE);

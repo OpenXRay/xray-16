@@ -31,7 +31,8 @@ TfrmPropertiesEObject* TfrmPropertiesEObject::CreateProperties(
 {
     TfrmPropertiesEObject* props = new TfrmPropertiesEObject(parent);
     props->OnModifiedEvent = modif;
-    if (parent) {
+    if (parent)
+    {
         props->Parent = parent;
         props->Align = align;
         props->BorderStyle = bsNone;
@@ -63,7 +64,8 @@ void TfrmPropertiesEObject::FillBasicProps()
     {
         // basic
         CSceneObject* S = *it;
-        if (S->GetReference()) {
+        if (S->GetReference())
+        {
             CEditableObject* O = S->GetReference();
             O->FillBasicProps(0, items);
         }
@@ -82,7 +84,8 @@ void TfrmPropertiesEObject::FillSurfProps()
     {
         // surfaces
         CSceneObject* S = *it;
-        if (S->GetReference()) {
+        if (S->GetReference())
+        {
             CEditableObject* O = S->GetReference();
             for (SurfaceIt it = O->FirstSurface(); it != O->LastSurface(); it++)
             {
@@ -137,14 +140,16 @@ void TfrmPropertiesEObject::OnSurfaceFocused(TElTreeItem* item)
 {
     xr_delete(m_Thumbnail);
 
-    if (item && item->Tag) {
+    if (item && item->Tag)
+    {
         PropItem* prop = (PropItem*)item->Tag;
         EPropType type = TProperties::GetItemType(item);
         switch (type)
         {
         case PROP_CAPTION:
         {
-            if (m_pEditObjects.size() == 1) {
+            if (m_pEditObjects.size() == 1)
+            {
                 PropValue* V = prop->GetFrontValue();
                 VERIFY(V);
                 CSceneObject* O = m_pEditObjects[0];
@@ -157,14 +162,17 @@ void TfrmPropertiesEObject::OnSurfaceFocused(TElTreeItem* item)
         {
             ChooseValue* V = dynamic_cast<ChooseValue*>(prop->GetFrontValue());
             VERIFY(V);
-            if (smTexture == V->m_ChooseID) {
+            if (smTexture == V->m_ChooseID)
+            {
                 LPCSTR nm = TProperties::GetItemColumn(item, 0);
-                if (nm && nm[0]) {
+                if (nm && nm[0])
+                {
                     m_Thumbnail = new ETextureThumbnail(nm);
                     lbWidth->Caption = m_Thumbnail->_Width();
                     lbHeight->Caption = m_Thumbnail->_Height();
                     lbAlpha->Caption = (m_Thumbnail->_Alpha()) ? "present" : "absent";
-                    if (m_Thumbnail->_Width() != m_Thumbnail->_Height()) paImage->Repaint();
+                    if (m_Thumbnail->_Width() != m_Thumbnail->_Height())
+                        paImage->Repaint();
                     paImage->Repaint();
                 }
             }
@@ -172,7 +180,8 @@ void TfrmPropertiesEObject::OnSurfaceFocused(TElTreeItem* item)
         break;
         }
     }
-    if (!m_Thumbnail) {
+    if (!m_Thumbnail)
+    {
         lbWidth->Caption = "...";
         lbHeight->Caption = "...";
         lbAlpha->Caption = "...";
@@ -184,7 +193,8 @@ void TfrmPropertiesEObject::OnSurfaceFocused(TElTreeItem* item)
 
 void __fastcall TfrmPropertiesEObject::paImagePaint(TObject* Sender)
 {
-    if (m_Thumbnail) m_Thumbnail->Draw(paImage);
+    if (m_Thumbnail)
+        m_Thumbnail->Draw(paImage);
 }
 
 //---------------------------------------------------------------------------
@@ -192,7 +202,8 @@ void __fastcall TfrmPropertiesEObject::paImagePaint(TObject* Sender)
 void __fastcall TfrmPropertiesEObject::OnPick(const SRayPickInfo& pinf)
 {
     R_ASSERT(pinf.e_mesh);
-    if (ebDropper->Down && /*m_pEditObject*/ m_pEditObjects.size()) {
+    if (ebDropper->Down && /*m_pEditObject*/ m_pEditObjects.size())
+    {
         CSurface* surf = pinf.e_mesh->GetSurfaceByFaceID(pinf.inf.id);
         AnsiString s_name = AnsiString("Surfaces\\") + AnsiString(surf->_Name());
         FHelper.RestoreSelection(m_SurfProp->tvProperties, s_name, false);

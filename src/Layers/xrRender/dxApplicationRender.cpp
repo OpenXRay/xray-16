@@ -6,11 +6,7 @@
 
 void draw_multiline_text(CGameFont* F, float fTargetWidth, LPCSTR pszText);
 
-void dxApplicationRender::Copy(IApplicationRender& _in)
-{
-    *this = *(dxApplicationRender*)&_in;
-}
-
+void dxApplicationRender::Copy(IApplicationRender& _in) { *this = *(dxApplicationRender*)&_in; }
 void dxApplicationRender::LoadBegin()
 {
     ll_hGeom.create(FVF::F_TL, RCache.Vertex.Buffer(), RCache.QuadIB);
@@ -27,50 +23,43 @@ void dxApplicationRender::destroy_loading_shaders()
     hLevelLogo_Add.destroy();
 }
 
-void dxApplicationRender::setLevelLogo(LPCSTR pszLogoName)
-{
-    hLevelLogo.create("hud\\default", pszLogoName);
-}
-
-void dxApplicationRender::KillHW()
-{
-    ZeroMemory(&HW, sizeof(CHW));
-}
-
+void dxApplicationRender::setLevelLogo(LPCSTR pszLogoName) { hLevelLogo.create("hud\\default", pszLogoName); }
+void dxApplicationRender::KillHW() { ZeroMemory(&HW, sizeof(CHW)); }
 u32 calc_progress_color(u32, u32, int, int);
 
 void dxApplicationRender::load_draw_internal(CApplication& owner)
 {
 #if defined(USE_DX10) || defined(USE_DX11)
-    //	TODO: DX10: remove this???
+    //  TODO: DX10: remove this???
     RImplementation.rmNormal();
     RCache.set_RT(HW.pBaseRT);
     RCache.set_ZB(HW.pBaseZB);
-#endif  //	USE_DX10
+#endif //   USE_DX10
 
 #if defined(USE_DX10) || defined(USE_DX11)
     FLOAT ColorRGBA[4] = {0.0f, 0.0f, 0.0f, 0.0f};
     HW.pContext->ClearRenderTargetView(RCache.get_RT(), ColorRGBA);
-#else   //	USE_DX10
+#else //    USE_DX10
     CHK_DX(HW.pDevice->Clear(0, 0, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0, 0, 0, 0), 1, 0));
-#endif  //	USE_DX10
+#endif //   USE_DX10
 
-    if (!sh_progress) {
+    if (!sh_progress)
+    {
         return;
     }
 
 #if defined(USE_DX10) || defined(USE_DX11)
-//	TODO: DX10: remove this
-//	FLOAT ColorRGBA[4] = {0.0f, 0.0f, 1.0f, 0.0f};
-//	HW.pContext->ClearRenderTargetView( RCache.get_RT(), ColorRGBA);
-//	HW.pContext->ClearDepthStencilView( RCache.get_ZB(), D3D_CLEAR_DEPTH|D3D_CLEAR_STENCIL, 1.0f, 0);
-#endif  //	USE_DX10
+//  TODO: DX10: remove this
+//  FLOAT ColorRGBA[4] = {0.0f, 0.0f, 1.0f, 0.0f};
+//  HW.pContext->ClearRenderTargetView( RCache.get_RT(), ColorRGBA);
+//  HW.pContext->ClearDepthStencilView( RCache.get_ZB(), D3D_CLEAR_DEPTH|D3D_CLEAR_STENCIL, 1.0f, 0);
+#endif //   USE_DX10
 
     float _w = (float)Device.dwWidth;
     float _h = (float)Device.dwHeight;
     bool b_ws = (_w / _h) > 1.34f;
     bool b_16x9 = b_ws && ((_w / _h) > 1.77f);
-    float ws_k = (b_16x9) ? 0.75f : 0.8333f;  // 16:9 or 16:10
+    float ws_k = (b_16x9) ? 0.75f : 0.8333f; // 16:9 or 16:10
     float ws_w = b_ws ? (b_16x9 ? 171.0f : 102.6f) : 0.0f;
 
     float bw = 1024.0f;
@@ -89,7 +78,7 @@ void dxApplicationRender::load_draw_internal(CApplication& owner)
 
     Fvector2 back_offset;
     if (b_ws)
-        back_offset.set(ws_w * ws_k, 0.0f);  // ws_w == 171
+        back_offset.set(ws_w * ws_k, 0.0f); // ws_w == 171
     else
         back_offset.set(0.0f, 0.0f);
 
@@ -97,13 +86,15 @@ void dxApplicationRender::load_draw_internal(CApplication& owner)
 
     back_tex_size.set(506, 4);
     back_size.set(506, 4);
-    if (b_ws) back_size.x *= ws_k;  // ws
+    if (b_ws)
+        back_size.x *= ws_k; // ws
 
     back_tex_coords.lt.set(0, 772);
     back_tex_coords.rb.add(back_tex_coords.lt, back_tex_size);
 
     back_coords.lt.set(260, 599);
-    if (b_ws) back_coords.lt.x *= ws_k;
+    if (b_ws)
+        back_coords.lt.x *= ws_k;
     back_coords.lt.add(back_offset);
 
     back_coords.rb.add(back_coords.lt, back_size);
@@ -146,7 +137,8 @@ void dxApplicationRender::load_draw_internal(CApplication& owner)
 
     back_tex_size.set(1024, 768);
     back_size.set(1024, 768);
-    if (b_ws) back_size.x *= ws_k;  // ws
+    if (b_ws)
+        back_size.x *= ws_k; // ws
 
     back_tex_coords.lt.set(0, 0);
     back_tex_coords.rb.add(back_tex_coords.lt, back_tex_size);
@@ -159,12 +151,13 @@ void dxApplicationRender::load_draw_internal(CApplication& owner)
     back_coords.rb.mul(k);
     draw_face(sh_progress, back_coords, back_tex_coords, tsz);
 
-    if (b_ws)  // draw additional frames (left&right)
+    if (b_ws) // draw additional frames (left&right)
     {
         // left
         back_size.set(ws_w * ws_k, 768.0f);
 
-        if (b_16x9) {
+        if (b_16x9)
+        {
             back_tex_coords.lt.set(0, 0);
             back_tex_coords.rb.set(128, 768);
         }
@@ -181,7 +174,8 @@ void dxApplicationRender::load_draw_internal(CApplication& owner)
         draw_face(hLevelLogo_Add, back_coords, back_tex_coords, tsz);
 
         // right
-        if (b_16x9) {
+        if (b_16x9)
+        {
             back_tex_coords.lt.set(128, 0);
             back_tex_coords.rb.set(256, 768);
         }
@@ -216,18 +210,21 @@ void dxApplicationRender::load_draw_internal(CApplication& owner)
     owner.pFontSystem->OnRender();
 
     // draw level-specific screenshot
-    if (hLevelLogo) {
+    if (hLevelLogo)
+    {
         Frect r;
         r.lt.set(0, 173);
 
-        if (b_ws) r.lt.x *= ws_k;
+        if (b_ws)
+            r.lt.x *= ws_k;
         r.lt.add(back_offset);
 
         r.lt.x += offs;
         r.lt.y += offs;
         back_size.set(1024, 399);
 
-        if (b_ws) back_size.x *= ws_k;  // ws 0.625
+        if (b_ws)
+            back_size.x *= ws_k; // ws 0.625
 
         r.rb.add(r.lt, back_size);
         r.lt.mul(k);
@@ -275,16 +272,15 @@ u32 calc_progress_color(u32 idx, u32 total, int stage, int max_stage)
     return color_argb_f(f, 1.0f, 1.0f, 1.0f);
 }
 
-#define IsSpace(ch)                                                                                                    \
-    ((ch) == ' ' || (ch) == '\t' || (ch) == '\r' || (ch) == '\n' || (ch) == ',' || (ch) == '.' || (ch) == ':' ||       \
-        (ch) == '!')
+#define IsSpace(ch)\
+    ((ch)==' ' || (ch)=='\t' || (ch)=='\r' || (ch)=='\n' || (ch)==',' || (ch)=='.' || (ch)==':' || (ch)=='!')
 
 void parse_word(LPCSTR str, CGameFont* font, float& length, LPCSTR& next_word)
 {
     length = 0.0f;
     while (*str && !IsSpace(*str))
     {
-        //		length  += font->GetCharTC(*str).z;
+        //length += font->GetCharTC(*str).z;
         length += font->SizeOf_(*str);
         ++str;
     }
@@ -293,7 +289,8 @@ void parse_word(LPCSTR str, CGameFont* font, float& length, LPCSTR& next_word)
 
 void draw_multiline_text(CGameFont* F, float fTargetWidth, LPCSTR pszText)
 {
-    if (!pszText || xr_strlen(pszText) == 0) return;
+    if (!pszText || xr_strlen(pszText) == 0)
+        return;
 
     LPCSTR ch = pszText;
     float curr_word_len = 0.0f;
@@ -305,7 +302,8 @@ void draw_multiline_text(CGameFont* F, float fTargetWidth, LPCSTR pszText)
     while (*ch)
     {
         parse_word(ch, F, curr_word_len, next_word);
-        if (curr_len + curr_word_len > fTargetWidth) {
+        if (curr_len + curr_word_len > fTargetWidth)
+        {
             F->OutNext(buff);
             curr_len = 0.0f;
             buff[0] = 0;
@@ -316,7 +314,7 @@ void draw_multiline_text(CGameFont* F, float fTargetWidth, LPCSTR pszText)
             strncpy_s(buff + xr_strlen(buff), sizeof(buff) - xr_strlen(buff), ch, next_word - ch);
             ch = next_word;
         }
-        if (0 == *next_word)  // end of text
+        if (0 == *next_word) // end of text
         {
             strncpy_s(buff + xr_strlen(buff), sizeof(buff) - xr_strlen(buff), ch, next_word - ch);
             F->OutNext(buff);

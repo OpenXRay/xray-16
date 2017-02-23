@@ -46,8 +46,8 @@ private:
     void add_animation(LPCSTR animation_type, luabind::adl::object const& table);
 };
 
-}  // namespace smart_cover
+} // namespace smart_cover
 
 #include "smart_cover_action_inline.h"
 
-#endif  // SMART_COVER_ACTION_H_INCLUDED
+#endif // SMART_COVER_ACTION_H_INCLUDED

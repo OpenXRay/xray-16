@@ -114,11 +114,8 @@ struct ECORE_API STextureParams
     shared_str ext_normal_map_name;
 
     STextureParams() { Clear(); }
-
     IC void destroy_shared_str(shared_str& object) { object.~shared_str(); }
-
     IC void construct_shared_str(shared_str& object) { ::new (&object) shared_str(); }
-
     IC void Clear()
     {
         destroy_shared_str(detail_name);
@@ -146,7 +143,7 @@ struct ECORE_API STextureParams
         // исходная текстура содержит альфа канал
         return flags.is(flHasAlpha);
     }
-    IC BOOL HasAlphaChannel()  // игровая текстура содержит альфа канал
+    IC BOOL HasAlphaChannel() // игровая текстура содержит альфа канал
     {
         switch (fmt)
         {

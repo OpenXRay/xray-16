@@ -18,15 +18,13 @@ FProgressive::FProgressive() : Fvisual()
     last_lod = 0;
 }
 
-FProgressive::~FProgressive()
-{
-}
-
+FProgressive::~FProgressive() {}
 void FProgressive::Release()
 {
     Fvisual::Release();
     xr_free(nSWI.sw);
-    if (xSWI) {
+    if (xSWI)
+    {
         xr_free(xSWI->sw);
         xr_delete(xSWI);
     }
@@ -38,7 +36,7 @@ void FProgressive::Load(const char* N, IReader* data, u32 dwFlags)
 
     // normal SWI
     destructor<IReader> lods(data->open_chunk(OGF_SWIDATA));
-    nSWI.reserved[0] = lods().r_u32();  // reserved 16 bytes
+    nSWI.reserved[0] = lods().r_u32(); // reserved 16 bytes
     nSWI.reserved[1] = lods().r_u32();
     nSWI.reserved[2] = lods().r_u32();
     nSWI.reserved[3] = lods().r_u32();
@@ -49,12 +47,13 @@ void FProgressive::Load(const char* N, IReader* data, u32 dwFlags)
 
 // fast
 #if RENDER != R_R1
-    if (m_fast) {
+    if (m_fast)
+    {
         destructor<IReader> geomdef(data->open_chunk(OGF_FASTPATH));
         destructor<IReader> def(geomdef().open_chunk(OGF_SWIDATA));
 
         xSWI = new FSlideWindowItem();
-        xSWI->reserved[0] = def().r_u32();  // reserved 16 bytes
+        xSWI->reserved[0] = def().r_u32(); // reserved 16 bytes
         xSWI->reserved[1] = def().r_u32();
         xSWI->reserved[2] = def().r_u32();
         xSWI->reserved[3] = def().r_u32();
@@ -69,7 +68,8 @@ void FProgressive::Load(const char* N, IReader* data, u32 dwFlags)
 void FProgressive::Render(float LOD)
 {
 #if RENDER != R_R1
-    if (m_fast && RImplementation.phase == CRender::PHASE_SMAP) {
+    if (m_fast && RImplementation.phase == CRender::PHASE_SMAP)
+    {
         int lod_id = iFloor((1.f - clampr(LOD, 0.f, 1.f)) * float(xSWI->count - 1) + 0.5f);
         VERIFY(lod_id >= 0 && lod_id < int(xSWI->count));
         FSlideWindow& SW = xSWI->sw[lod_id];
@@ -80,7 +80,8 @@ void FProgressive::Render(float LOD)
     else
     {
         int lod_id = last_lod;
-        if (LOD >= 0.f) {
+        if (LOD >= 0.f)
+        {
             clamp(LOD, 0.f, 1.f);
             lod_id = iFloor((1.f - LOD) * float(nSWI.count - 1) + 0.5f);
             last_lod = lod_id;
@@ -93,7 +94,8 @@ void FProgressive::Render(float LOD)
     }
 #else
     int lod_id = last_lod;
-    if (LOD >= 0.f) {
+    if (LOD >= 0.f)
+    {
         clamp(LOD, 0.f, 1.f);
         lod_id = iFloor((1.f - LOD) * float(nSWI.count - 1) + 0.5f);
         last_lod = lod_id;

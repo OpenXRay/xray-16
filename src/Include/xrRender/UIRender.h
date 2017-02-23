@@ -66,4 +66,4 @@ public:
     virtual void CacheSetCullMode(CullMode) = 0;
 };
 
-#endif  //	UIRender_included
+#endif //	UIRender_included

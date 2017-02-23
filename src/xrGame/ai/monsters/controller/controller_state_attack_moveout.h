@@ -25,14 +25,12 @@ class CStateControlMoveOut : public CState<_Object>
 public:
     CStateControlMoveOut(_Object* obj) : inherited(obj) {}
     virtual ~CStateControlMoveOut() {}
-
     virtual void initialize();
     virtual void execute();
     virtual bool check_completion();
     virtual bool check_start_conditions();
 
     virtual void remove_links(IGameObject* object) {}
-
 private:
     void update_target_point();
     void update_look_point();

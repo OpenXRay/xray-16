@@ -7,7 +7,8 @@ namespace lc_net
 {
 bool task_manager::run_task(IAgent* agent, DWORD sessionId, IGenericStream* inStream, IGenericStream* outStream)
 {
-    if (!initialize_session(sessionId)) return false;
+    if (!initialize_session(sessionId))
+        return false;
 
     u8 pool_id(u8(-1));
 
@@ -16,9 +17,11 @@ bool task_manager::run_task(IAgent* agent, DWORD sessionId, IGenericStream* inSt
     // inStream->Clear( );
     //////////////////////////////////////////////////////
     R_ASSERT(pools[pool_id]);
-    if (!e) return false;
+    if (!e)
+        return false;
 
-    if (!e->execute(agent, sessionId)) {
+    if (!e->execute(agent, sessionId))
+    {
         pools[pool_id]->remove_task(e);
         return false;
     }

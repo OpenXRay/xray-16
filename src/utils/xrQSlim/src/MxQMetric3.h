@@ -1,4 +1,4 @@
-#ifndef MXQMETRIC3_INCLUDED  // -*- C++ -*-
+#ifndef MXQMETRIC3_INCLUDED // -*- C++ -*-
 #define MXQMETRIC3_INCLUDED
 #if !defined(__GNUC__)
 #pragma once
@@ -36,7 +36,6 @@ public:
     MxQuadric3(const float* n, double d, double area = 1.0) { init(n[0], n[1], n[2], d, area); }
     MxQuadric3(const double* n, double d, double area = 1.0) { init(n[0], n[1], n[2], d, area); }
     MxQuadric3(const MxQuadric3& Q) { *this = Q; }
-
     Mat3 tensor() const;
     Vec3 vector() const { return Vec3(ad, bd, cd); }
     double offset() const { return d2; }
@@ -57,11 +56,9 @@ public:
     double evaluate(double x, double y, double z) const;
     double evaluate(const double* v) const { return evaluate(v[0], v[1], v[2]); }
     double evaluate(const float* v) const { return evaluate(v[0], v[1], v[2]); }
-
     double operator()(double x, double y, double z) const { return evaluate(x, y, z); }
     double operator()(const double* v) const { return evaluate(v[0], v[1], v[2]); }
     double operator()(const float* v) const { return evaluate(v[0], v[1], v[2]); }
-
     bool optimize(Vec3& v) const;
     bool optimize(float* x, float* y, float* z) const;
 

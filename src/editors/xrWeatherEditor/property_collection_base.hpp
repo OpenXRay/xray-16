@@ -22,29 +22,28 @@ ref class property_collection_converter;
     : public XRay::SdkControls::IProperty,
       public System::Collections::IList
 {
-  public:
+public:
     typedef editor::property_holder_collection collection_type;
     typedef editor::property_holder property_holder;
     typedef System::Collections::IEnumerator IEnumerator;
     typedef System::Array Array;
     typedef System::Object Object;
 
-  public:
+public:
     property_collection_base();
     virtual ~property_collection_base();
     !property_collection_base();
     virtual Object ^ GetValue();
     virtual void SetValue(Object ^ object);
 
-  public:
+public:
     virtual void CopyTo(Array ^ items, int index);
     virtual IEnumerator ^ GetEnumerator();
 
-  public:
+public:
     property bool IsSynchronized { virtual bool get(); }
     property Object ^ SyncRoot { virtual Object ^ get(); } property int Count { virtual int get(); }
-
-  public:
+public:
     virtual int Add(Object ^ value);
     virtual void Clear();
     virtual bool Contains(Object ^ value);
@@ -53,7 +52,7 @@ ref class property_collection_converter;
     virtual void Remove(Object ^ value);
     virtual void RemoveAt(int index);
 
-  public:
+public:
     property bool IsFixedSize { virtual bool get(); }
     property bool IsReadOnly { virtual bool get(); }
     property Object ^ default[ int ]
@@ -62,11 +61,11 @@ ref class property_collection_converter;
         virtual void set(int index, Object ^ value);
     }
 
-  public:
+public:
     property_container ^ create();
 
-  protected:
+protected:
     virtual collection_type* collection() = 0;
-};  // ref class property_collection_base
+}; // ref class property_collection_base
 
-#endif  // ifndef PROPERTY_COLLECTION_BASE_HPP_INCLUDED
+#endif // ifndef PROPERTY_COLLECTION_BASE_HPP_INCLUDED

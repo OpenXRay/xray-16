@@ -11,64 +11,21 @@
 #include "UIScrollView.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
-CFontManager& mngr()
-{
-    return UI().Font();
-}
+CFontManager& mngr() { return UI().Font(); }
 // hud font
-CGameFont* GetFontSmall()
-{
-    return mngr().pFontStat;
-}
-
-CGameFont* GetFontMedium()
-{
-    return mngr().pFontMedium;
-}
-CGameFont* GetFontDI()
-{
-    return mngr().pFontDI;
-}
+CGameFont* GetFontSmall() { return mngr().pFontStat; }
+CGameFont* GetFontMedium() { return mngr().pFontMedium; }
+CGameFont* GetFontDI() { return mngr().pFontDI; }
 //רנטפעû הכÿ טםעונפויסא
-CGameFont* GetFontGraffiti19Russian()
-{
-    return mngr().pFontGraffiti19Russian;
-}
-CGameFont* GetFontGraffiti22Russian()
-{
-    return mngr().pFontGraffiti22Russian;
-}
-CGameFont* GetFontLetterica16Russian()
-{
-    return mngr().pFontLetterica16Russian;
-}
-CGameFont* GetFontLetterica18Russian()
-{
-    return mngr().pFontLetterica18Russian;
-}
-CGameFont* GetFontGraffiti32Russian()
-{
-    return mngr().pFontGraffiti32Russian;
-}
-CGameFont* GetFontGraffiti50Russian()
-{
-    return mngr().pFontGraffiti50Russian;
-}
-CGameFont* GetFontLetterica25()
-{
-    return mngr().pFontLetterica25;
-}
-
-int GetARGB(u16 a, u16 r, u16 g, u16 b)
-{
-    return color_argb(a, r, g, b);
-}
-
-const Fvector2* get_wnd_pos(CUIWindow* w)
-{
-    return &w->GetWndPos();
-}
-
+CGameFont* GetFontGraffiti19Russian() { return mngr().pFontGraffiti19Russian; }
+CGameFont* GetFontGraffiti22Russian() { return mngr().pFontGraffiti22Russian; }
+CGameFont* GetFontLetterica16Russian() { return mngr().pFontLetterica16Russian; }
+CGameFont* GetFontLetterica18Russian() { return mngr().pFontLetterica18Russian; }
+CGameFont* GetFontGraffiti32Russian() { return mngr().pFontGraffiti32Russian; }
+CGameFont* GetFontGraffiti50Russian() { return mngr().pFontGraffiti50Russian; }
+CGameFont* GetFontLetterica25() { return mngr().pFontLetterica25; }
+int GetARGB(u16 a, u16 r, u16 g, u16 b) { return color_argb(a, r, g, b); }
+const Fvector2* get_wnd_pos(CUIWindow* w) { return &w->GetWndPos(); }
 using namespace luabind;
 using namespace luabind::policy;
 

@@ -18,7 +18,7 @@ namespace Wml
 template <class Real>
 class WML_ITEM Minimize1
 {
-  public:
+public:
     typedef Real (*Function)(Real, void*);
 
     Minimize1(Function oFunction, int iMaxLevel, int iMaxBracket, void* pvData = 0);
@@ -29,7 +29,7 @@ class WML_ITEM Minimize1
 
     void GetMinimum(Real fT0, Real fT1, Real fTInitial, Real& rfTMin, Real& rfFMin);
 
-  protected:
+protected:
     Function m_oFunction;
     int m_iMaxLevel, m_iMaxBracket;
     Real m_fTMin, m_fFMin;

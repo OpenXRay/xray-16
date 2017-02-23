@@ -14,20 +14,9 @@
 #define GROUPOBJ_CHUNK_REFERENCE 0x0004
 #define GROUPOBJ_CHUNK_OPEN_OBJECT_LIST 0x0005
 
-CGroupObject::CGroupObject(LPVOID data, LPCSTR name) : CCustomObject(data, name)
-{
-    Construct(data);
-}
-
-void CGroupObject::Construct(LPVOID data)
-{
-    ClassID = OBJCLASS_GROUP;
-}
-
-CGroupObject::~CGroupObject()
-{
-}
-
+CGroupObject::CGroupObject(LPVOID data, LPCSTR name) : CCustomObject(data, name) { Construct(data); }
+void CGroupObject::Construct(LPVOID data) { ClassID = OBJCLASS_GROUP; }
+CGroupObject::~CGroupObject() {}
 u32 CGroupObject::GetObjects(ObjectList& lst)
 {
     lst.clear();
@@ -41,7 +30,8 @@ u32 CGroupObject::GetObjects(ObjectList& lst)
 void CGroupObject::Select(int flag)
 {
     inherited::Select(flag);
-    if (EPrefs->object_flags.test(epoSelectInGroup)) {
+    if (EPrefs->object_flags.test(epoSelectInGroup))
+    {
         for (ObjectsInGroup::iterator it = m_ObjectsInGroup.begin(); it != m_ObjectsInGroup.end(); ++it)
             it->pObject->Select(flag);
     }
@@ -67,11 +57,13 @@ void CGroupObject::OnFrame()
 
 bool CGroupObject::LL_AppendObject(CCustomObject* object)
 {
-    if (!object->CanAttach()) {
+    if (!object->CanAttach())
+    {
         ELog.Msg(mtError, "Can't attach object: '%s'", object->Name);
         return false;
     }
-    if (object->GetOwner()) {
+    if (object->GetOwner())
+    {
         if (mrNo ==
             ELog.DlgMsg(mtConfirmation, TMsgDlgButtons() << mbYes << mbNo,
                 "Object '%s' already in group '%s'. Change group?", object->Name, object->GetOwner()->Name))
@@ -98,7 +90,8 @@ bool CGroupObject::AppendObjectLoadCB(CCustomObject* object)
     string256 buf;
     Scene->GenObjectName(object->ClassID, buf, object->Name);
     LPCSTR N = object->Name;
-    if (xr_strcmp(N, buf) != 0) {
+    if (xr_strcmp(N, buf) != 0)
+    {
         Msg("Load_Append name changed from[%s] to[%s]", object->Name, buf);
         object->Name = buf;
     }
@@ -123,7 +116,8 @@ void CGroupObject::SetRefName(LPCSTR nm)
 bool CGroupObject::LoadLTX(CInifile& ini, LPCSTR sect_name)
 {
     u32 version = ini.r_u32(sect_name, "version");
-    if (version < 0x0011) {
+    if (version < 0x0011)
+    {
         ELog.DlgMsg(mtError, "CGroupObject: unsupported file version. Object can't load.");
         return false;
     }
@@ -131,10 +125,12 @@ bool CGroupObject::LoadLTX(CInifile& ini, LPCSTR sect_name)
 
     Flags32 tmp_flags;
     tmp_flags.zero();
-    if (version < 0x0012) tmp_flags.assign(ini.r_u32(sect_name, "flags"));
+    if (version < 0x0012)
+        tmp_flags.assign(ini.r_u32(sect_name, "flags"));
 
     // objects
-    if (/*IsOpened()*/ tmp_flags.test((1 << 0))) {  // old opened group save format
+    if (/*IsOpened()*/ tmp_flags.test((1 << 0)))
+    { // old opened group save format
         ELog.DlgMsg(mtError, "old opened group save format");
         return false;
         /*
@@ -157,11 +153,14 @@ bool CGroupObject::LoadLTX(CInifile& ini, LPCSTR sect_name)
     VERIFY(m_ObjectsInGroup.size());
 
     SetRefName(ini.r_string(sect_name, "ref_name"));
-    if (!m_ReferenceName_.size()) ELog.Msg(mtError, "ERROR: group '%s' - has empty reference. Corrupted file?", Name);
+    if (!m_ReferenceName_.size())
+        ELog.Msg(mtError, "ERROR: group '%s' - has empty reference. Corrupted file?", Name);
 
-    if (version < 0x0012) {
+    if (version < 0x0012)
+    {
         for (ObjectsInGroup::iterator it = m_ObjectsInGroup.begin(); it != m_ObjectsInGroup.end(); ++it)
-            if (it->pObject) {
+            if (it->pObject)
+            {
                 it->pObject->m_CO_Flags.set(flObjectInGroup, TRUE);
                 it->pObject->m_CO_Flags.set(flObjectInGroupUnique, TRUE);
             }
@@ -195,7 +194,8 @@ bool CGroupObject::LoadStream(IReader& F)
     u16 version = 0;
 
     R_ASSERT(F.r_chunk(GROUPOBJ_CHUNK_VERSION, &version));
-    if (version < 0x0011) {
+    if (version < 0x0011)
+    {
         ELog.DlgMsg(mtError, "CGroupObject: unsupported file version. Object can't load.");
         return false;
     }
@@ -203,10 +203,12 @@ bool CGroupObject::LoadStream(IReader& F)
 
     Flags32 tmp_flags;
     tmp_flags.zero();
-    if (version < 0x0012) F.r_chunk(GROUPOBJ_CHUNK_FLAGS, &tmp_flags);
+    if (version < 0x0012)
+        F.r_chunk(GROUPOBJ_CHUNK_FLAGS, &tmp_flags);
 
     // objects
-    if (tmp_flags.test(1 << 0)) {  // old format, opened group
+    if (tmp_flags.test(1 << 0))
+    { // old format, opened group
         ELog.DlgMsg(mtError, "old format, opened group");
         return false;
         /*
@@ -225,15 +227,18 @@ bool CGroupObject::LoadStream(IReader& F)
     }
     VERIFY(m_ObjectsInGroup.size());
 
-    if (F.find_chunk(GROUPOBJ_CHUNK_REFERENCE)) {
+    if (F.find_chunk(GROUPOBJ_CHUNK_REFERENCE))
+    {
         shared_str rn;
         F.r_stringZ(rn);
         SetRefName(rn.c_str());
     }
 
-    if (version < 0x0012) {
+    if (version < 0x0012)
+    {
         for (ObjectsInGroup::iterator it = m_ObjectsInGroup.begin(); it != m_ObjectsInGroup.end(); ++it)
-            if (it->pObject) {
+            if (it->pObject)
+            {
                 it->pObject->m_CO_Flags.set(flObjectInGroup, TRUE);
                 it->pObject->m_CO_Flags.set(flObjectInGroupUnique, TRUE);
             }
@@ -270,16 +275,8 @@ void CGroupObject::SaveStream(IWriter& F)
 
 //----------------------------------------------------
 
-bool CGroupObject::ExportGame(SExportStreams* data)
-{
-    return true;
-}
-
-void CGroupObject::ReferenceChange(PropValue* sender)
-{
-    UpdateReference(true);
-}
-
+bool CGroupObject::ExportGame(SExportStreams* data) { return true; }
+void CGroupObject::ReferenceChange(PropValue* sender) { UpdateReference(true); }
 //----------------------------------------------------
 
 bool CGroupObject::SetReference(LPCSTR ref_name)
@@ -287,7 +284,8 @@ bool CGroupObject::SetReference(LPCSTR ref_name)
     shared_str old_refs = m_ReferenceName_;
     SetRefName(ref_name);
     bool bres = UpdateReference(old_refs != ref_name);
-    if (false == bres) SetRefName(old_refs.c_str());
+    if (false == bres)
+        SetRefName(old_refs.c_str());
 
     return bres;
 }
@@ -299,7 +297,8 @@ extern BOOL bForceInitListBox;
 
 bool CGroupObject::UpdateReference(bool bForceReload)
 {
-    if (!m_ReferenceName_.size()) {
+    if (!m_ReferenceName_.size())
+    {
         ELog.Msg(mtError, "ERROR: '%s' - has empty reference.", Name);
         return false;
     }
@@ -308,11 +307,13 @@ bool CGroupObject::UpdateReference(bool bForceReload)
     fn = EFS.ChangeFileExt(fn, ".group");
     IReader* R = FS.r_open(_groups_, fn.c_str());
     bool bres = false;
-    if (R) {
+    if (R)
+    {
         bForceInitListBox = TRUE;
         ObjectsInGroup ObjectsInGroupBk = m_ObjectsInGroup;
 
-        if (bForceReload) ClearInternal(ObjectsInGroupBk);
+        if (bForceReload)
+            ClearInternal(ObjectsInGroupBk);
 
         m_ObjectsInGroup.clear();
 
@@ -323,7 +324,8 @@ bool CGroupObject::UpdateReference(bool bForceReload)
         Fvector old_rot = PRotation;
         Fvector old_sc = PScale;
 
-        if (LoadStream(*R)) {
+        if (LoadStream(*R))
+        {
             Name = nm.c_str();
             bres = true;
             UpdateTransform(true);
@@ -336,14 +338,16 @@ bool CGroupObject::UpdateReference(bool bForceReload)
         NumSetScale(old_sc);
         UpdateTransform(true);
 
-        if (m_ObjectsInGroup.size() == ObjectsInGroupBk.size()) {
+        if (m_ObjectsInGroup.size() == ObjectsInGroupBk.size())
+        {
             ObjectsInGroup::iterator it = m_ObjectsInGroup.begin();
             ObjectsInGroup::iterator itBk = ObjectsInGroupBk.begin();
             for (; it != m_ObjectsInGroup.end(); ++it, ++itBk)
             {
                 it->pObject->m_CO_Flags.set(flObjectInGroupUnique, FALSE);
 
-                if (itBk->pObject->m_CO_Flags.test(flObjectInGroupUnique)) {
+                if (itBk->pObject->m_CO_Flags.test(flObjectInGroupUnique))
+                {
                     std::swap(*itBk, *it);
                 }
                 else
@@ -352,13 +356,14 @@ bool CGroupObject::UpdateReference(bool bForceReload)
         }
         else
         {
-            if (ObjectsInGroupBk.size()) {
+            if (ObjectsInGroupBk.size())
+            {
                 ELog.Msg(mtError, "Not all objects synchronised correctly", Name);
                 for (ObjectsInGroup::iterator it = m_ObjectsInGroup.begin(); it != m_ObjectsInGroup.end(); ++it)
                     it->pObject->m_CO_Flags.set(flObjectInGroupUnique, FALSE);
             }
             else
-            {  // first setup
+            { // first setup
                 for (ObjectsInGroup::iterator it = m_ObjectsInGroup.begin(); it != m_ObjectsInGroup.end(); ++it)
                     it->pObject->m_CO_Flags.set(flObjectInGroupUnique, FALSE);
             }
@@ -430,7 +435,8 @@ void CGroupObject::OnShowHint(AStringVec& dest)
 void CGroupObject::OnObjectRemove(const CCustomObject* object)
 {
     ObjectsInGroup::iterator it = std::find(m_ObjectsInGroup.begin(), m_ObjectsInGroup.end(), object);
-    if (it == m_ObjectsInGroup.end()) return;
+    if (it == m_ObjectsInGroup.end())
+        return;
 
     m_ObjectsInGroup.erase(it);
 }
@@ -441,7 +447,8 @@ void CGroupObject::OnSceneUpdate()
 
     for (ObjectsInGroup::iterator it = m_ObjectsInGroup.begin(); it != m_ObjectsInGroup.end(); ++it)
     {
-        if (it->pObject == NULL) {
+        if (it->pObject == NULL)
+        {
             R_ASSERT(0);
             /*
                             R_ASSERT(it->ObjectName.size());
@@ -467,7 +474,8 @@ void CGroupObject::OnSceneUpdate()
             */
         }
     }
-    if (m_ObjectsInGroup.empty()) {
+    if (m_ObjectsInGroup.empty())
+    {
         ELog.Msg(mtInformation, "Group '%s' has no objects and will be removed.", Name);
         DeleteThis();
     }
@@ -480,7 +488,8 @@ bool CGroupObject::CanUngroup(bool bMsg)
     for (ObjectsInGroup::iterator it = m_ObjectsInGroup.begin(); it != m_ObjectsInGroup.end(); ++it)
     {
         ESceneToolBase* tool = Scene->GetTool(it->pObject->ClassID);
-        if (!tool->IsEditable()) {
+        if (!tool->IsEditable())
+        {
             if (bMsg)
                 Msg("!.Can't detach object '%s'. Target '%s' in readonly mode.", it->pObject->Name, tool->ClassDesc());
             res = false;
@@ -494,13 +503,15 @@ void CGroupObject::GroupObjects(ObjectList& lst)
     R_ASSERT(lst.size());
     for (ObjectIt it = lst.begin(); it != lst.end(); ++it)
     {
-        if ((*it)->m_CO_Flags.test(flObjectInGroup)) {
+        if ((*it)->m_CO_Flags.test(flObjectInGroup))
+        {
             ELog.DlgMsg(mtInformation, "object[%s] already in group", (*it)->Name);
             continue;
         }
         LL_AppendObject(*it);
     }
-    if (m_ObjectsInGroup.size()) UpdatePivot(0, false);
+    if (m_ObjectsInGroup.size())
+        UpdatePivot(0, false);
 }
 
 void CGroupObject::UngroupObjects()

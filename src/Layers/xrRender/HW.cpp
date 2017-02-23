@@ -17,18 +17,10 @@ void free_vid_mode_list();
 void fill_render_mode_list();
 void free_render_mode_list();
 #else
-void fill_vid_mode_list(CHW* _hw)
-{
-}
-void free_vid_mode_list()
-{
-}
-void fill_render_mode_list()
-{
-}
-void free_render_mode_list()
-{
-}
+void fill_vid_mode_list(CHW* _hw) {}
+void free_vid_mode_list() {}
+void fill_render_mode_list() {}
+void free_render_mode_list() {}
 #endif
 
 CHW HW;
@@ -37,16 +29,8 @@ CHW HW;
 IDirect3DStateBlock9* dwDebugSB = 0;
 #endif
 
-CHW::CHW() : hD3D(NULL), pD3D(NULL), pDevice(NULL), pBaseRT(NULL), pBaseZB(NULL), m_move_window(true)
-{
-    ;
-}
-
-CHW::~CHW()
-{
-    ;
-}
-
+CHW::CHW() : hD3D(NULL), pD3D(NULL), pDevice(NULL), pBaseRT(NULL), pBaseZB(NULL), m_move_window(true) { ; }
+CHW::~CHW() { ; }
 void CHW::Reset(HWND hwnd)
 {
 #ifdef DEBUG
@@ -57,12 +41,13 @@ void CHW::Reset(HWND hwnd)
 
 #ifndef _EDITOR
     //#ifndef DEDICATED_SERVER
-    //	BOOL	bWindowed		= !psDeviceFlags.is	(rsFullscreen);
+    //  BOOL    bWindowed       = !psDeviceFlags.is (rsFullscreen);
     //#else
-    //	BOOL	bWindowed		= TRUE;
+    //  BOOL    bWindowed       = TRUE;
     //#endif
     BOOL bWindowed = TRUE;
-    if (!g_dedicated_server) bWindowed = !psDeviceFlags.is(rsFullscreen);
+    if (!g_dedicated_server)
+        bWindowed = !psDeviceFlags.is(rsFullscreen);
 
     selectResolution(DevPP.BackBufferWidth, DevPP.BackBufferHeight, bWindowed);
     // Windoze
@@ -78,7 +63,8 @@ void CHW::Reset(HWND hwnd)
     while (TRUE)
     {
         HRESULT _hr = HW.pDevice->Reset(&DevPP);
-        if (SUCCEEDED(_hr)) break;
+        if (SUCCEEDED(_hr))
+            break;
         Msg("! ERROR: [%dx%d]: %s", DevPP.BackBufferWidth, DevPP.BackBufferHeight, xrDebug::ErrorToString(_hr));
         Sleep(100);
     }
@@ -97,9 +83,9 @@ void CHW::Reset(HWND hwnd)
 void CHW::CreateD3D()
 {
     //#ifndef DEDICATED_SERVER
-    //	LPCSTR		_name			= "d3d9.dll";
+    //  LPCSTR      _name           = "d3d9.dll";
     //#else
-    //	LPCSTR		_name			= "xrD3D9-Null";
+    //  LPCSTR      _name           = "xrD3D9-Null";
     //#endif
 
     LPCSTR _name = "xrD3D9-Null";
@@ -131,7 +117,8 @@ D3DFORMAT CHW::selectDepthStencil(D3DFORMAT fTarget)
 {
 // R2 hack
 #pragma todo("R2 need to specify depth format")
-    if (psDeviceFlags.test(rsR2)) return D3DFMT_D24S8;
+    if (psDeviceFlags.test(rsR2))
+        return D3DFMT_D24S8;
 
     // R1 usual
     static D3DFORMAT fDS_Try1[6] = {D3DFMT_D24S8, D3DFMT_D24X4S4, D3DFMT_D32, D3DFMT_D24X8, D3DFMT_D16, D3DFMT_D15S1};
@@ -144,7 +131,8 @@ D3DFORMAT CHW::selectDepthStencil(D3DFORMAT fTarget)
         if (SUCCEEDED(pD3D->CheckDeviceFormat(
                 DevAdapter, DevT, fTarget, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_SURFACE, fDS_Try[it])))
         {
-            if (SUCCEEDED(pD3D->CheckDepthStencilMatch(DevAdapter, DevT, fTarget, fTarget, fDS_Try[it]))) {
+            if (SUCCEEDED(pD3D->CheckDepthStencilMatch(DevAdapter, DevT, fTarget, fTarget, fDS_Try[it])))
+            {
                 return fDS_Try[it];
             }
         }
@@ -179,25 +167,27 @@ void CHW::selectResolution(u32& dwWidth, u32& dwHeight, BOOL bWindowed)
 {
     fill_vid_mode_list(this);
 #ifndef _EDITOR
-    if (g_dedicated_server) {
+    if (g_dedicated_server)
+    {
         dwWidth = 640;
         dwHeight = 480;
     }
     else
 #endif
     {
-        if (bWindowed) {
+        if (bWindowed)
+        {
             dwWidth = psCurrentVidMode[0];
             dwHeight = psCurrentVidMode[1];
         }
-        else  // check
+        else // check
         {
 #ifndef _EDITOR
             string64 buff;
             xr_sprintf(buff, sizeof(buff), "%dx%d", psCurrentVidMode[0], psCurrentVidMode[1]);
 
-            if (_ParseItem(buff, GlobalEnv.vid_mode_token) == u32(-1))  // not found
-            {                                                           // select safe
+            if (_ParseItem(buff, GlobalEnv.vid_mode_token) == u32(-1)) // not found
+            { // select safe
                 xr_sprintf(buff, sizeof(buff), "vid_mode %s", GlobalEnv.vid_mode_token[0].name);
                 Console->Execute(buff);
             }
@@ -217,15 +207,16 @@ void CHW::CreateDevice(HWND m_hWnd, bool move_window)
 
     // General - select adapter and device
     //#ifdef DEDICATED_SERVER
-    //	BOOL  bWindowed			= TRUE;
+    //  BOOL  bWindowed         = TRUE;
     //#else
-    //	BOOL  bWindowed			= !psDeviceFlags.is(rsFullscreen);
+    //  BOOL  bWindowed         = !psDeviceFlags.is(rsFullscreen);
     //#endif
 
     BOOL bWindowed = TRUE;
 
 #ifndef _EDITOR
-    if (!g_dedicated_server) bWindowed = !psDeviceFlags.is(rsFullscreen);
+    if (!g_dedicated_server)
+        bWindowed = !psDeviceFlags.is(rsFullscreen);
 #else
     bWindowed = 1;
 #endif
@@ -240,13 +231,14 @@ void CHW::CreateDevice(HWND m_hWnd, bool move_window)
     {
         D3DADAPTER_IDENTIFIER9 Identifier;
         HRESULT Res = pD3D->GetAdapterIdentifier(Adapter, 0, &Identifier);
-        if (SUCCEEDED(Res) && (xr_strcmp(Identifier.Description, "NVIDIA PerfHUD") == 0)) {
+        if (SUCCEEDED(Res) && (xr_strcmp(Identifier.Description, "NVIDIA PerfHUD") == 0))
+        {
             DevAdapter = Adapter;
             DevT = D3DDEVTYPE_REF;
             break;
         }
     }
-#endif  //	MASTER_GOLD
+#endif //   MASTER_GOLD
 
     // Display the name of video board
     D3DADAPTER_IDENTIFIER9 adapterID;
@@ -269,7 +261,8 @@ void CHW::CreateDevice(HWND m_hWnd, bool move_window)
     // Select back-buffer & depth-stencil format
     D3DFORMAT& fTarget = Caps.fTarget;
     D3DFORMAT& fDepth = Caps.fDepth;
-    if (bWindowed) {
+    if (bWindowed)
+    {
         fTarget = mWindowed.Format;
         R_CHK(pD3D->CheckDeviceType(DevAdapter, DevT, fTarget, fTarget, TRUE));
         fDepth = selectDepthStencil(fTarget);
@@ -280,28 +273,35 @@ void CHW::CreateDevice(HWND m_hWnd, bool move_window)
         {
         case 32:
             fTarget = D3DFMT_X8R8G8B8;
-            if (SUCCEEDED(pD3D->CheckDeviceType(DevAdapter, DevT, fTarget, fTarget, FALSE))) break;
+            if (SUCCEEDED(pD3D->CheckDeviceType(DevAdapter, DevT, fTarget, fTarget, FALSE)))
+                break;
             fTarget = D3DFMT_A8R8G8B8;
-            if (SUCCEEDED(pD3D->CheckDeviceType(DevAdapter, DevT, fTarget, fTarget, FALSE))) break;
+            if (SUCCEEDED(pD3D->CheckDeviceType(DevAdapter, DevT, fTarget, fTarget, FALSE)))
+                break;
             fTarget = D3DFMT_R8G8B8;
-            if (SUCCEEDED(pD3D->CheckDeviceType(DevAdapter, DevT, fTarget, fTarget, FALSE))) break;
+            if (SUCCEEDED(pD3D->CheckDeviceType(DevAdapter, DevT, fTarget, fTarget, FALSE)))
+                break;
             fTarget = D3DFMT_UNKNOWN;
             break;
         case 16:
         default:
             fTarget = D3DFMT_R5G6B5;
-            if (SUCCEEDED(pD3D->CheckDeviceType(DevAdapter, DevT, fTarget, fTarget, FALSE))) break;
+            if (SUCCEEDED(pD3D->CheckDeviceType(DevAdapter, DevT, fTarget, fTarget, FALSE)))
+                break;
             fTarget = D3DFMT_X1R5G5B5;
-            if (SUCCEEDED(pD3D->CheckDeviceType(DevAdapter, DevT, fTarget, fTarget, FALSE))) break;
+            if (SUCCEEDED(pD3D->CheckDeviceType(DevAdapter, DevT, fTarget, fTarget, FALSE)))
+                break;
             fTarget = D3DFMT_X4R4G4B4;
-            if (SUCCEEDED(pD3D->CheckDeviceType(DevAdapter, DevT, fTarget, fTarget, FALSE))) break;
+            if (SUCCEEDED(pD3D->CheckDeviceType(DevAdapter, DevT, fTarget, fTarget, FALSE)))
+                break;
             fTarget = D3DFMT_UNKNOWN;
             break;
         }
         fDepth = selectDepthStencil(fTarget);
     }
 
-    if ((D3DFMT_UNKNOWN == fTarget) || (D3DFMT_UNKNOWN == fTarget)) {
+    if ((D3DFMT_UNKNOWN == fTarget) || (D3DFMT_UNKNOWN == fTarget))
+    {
         Msg("Failed to initialize graphics hardware.\n"
             "Please try to restart the game.\n"
             "Can not find matching format for back buffer.");
@@ -319,8 +319,8 @@ void CHW::CreateDevice(HWND m_hWnd, bool move_window)
     selectResolution(P.BackBufferWidth, P.BackBufferHeight, bWindowed);
 #endif
     // Back buffer
-    //.	P.BackBufferWidth		= dwWidth;
-    //. P.BackBufferHeight		= dwHeight;
+    //. P.BackBufferWidth       = dwWidth;
+    //. P.BackBufferHeight      = dwHeight;
     P.BackBufferFormat = fTarget;
     P.BackBufferCount = 1;
 
@@ -336,7 +336,7 @@ void CHW::CreateDevice(HWND m_hWnd, bool move_window)
     // Depth/stencil
     P.EnableAutoDepthStencil = TRUE;
     P.AutoDepthStencilFormat = fDepth;
-    P.Flags = 0;  //. D3DPRESENTFLAG_DISCARD_DEPTHSTENCIL;
+    P.Flags = 0; //. D3DPRESENTFLAG_DISCARD_DEPTHSTENCIL;
 
     // Refresh rate
     P.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
@@ -348,20 +348,21 @@ void CHW::CreateDevice(HWND m_hWnd, bool move_window)
     // Create the device
     u32 GPU = selectGPU();
     HRESULT R = HW.pD3D->CreateDevice(DevAdapter, DevT, m_hWnd,
-        GPU | D3DCREATE_MULTITHREADED,  //. ? locks at present
+        GPU | D3DCREATE_MULTITHREADED, //. ? locks at present
         &P, &pDevice);
 
-    if (FAILED(R)) {
+    if (FAILED(R))
+    {
         R = HW.pD3D->CreateDevice(DevAdapter, DevT, m_hWnd,
-            GPU | D3DCREATE_MULTITHREADED,  //. ? locks at present
+            GPU | D3DCREATE_MULTITHREADED, //. ? locks at present
             &P, &pDevice);
     }
-    if (D3DERR_DEVICELOST == R) {
+    if (D3DERR_DEVICELOST == R)
+    {
         // Fatal error! Cannot create rendering device AT STARTUP !!!
         Msg("Failed to initialize graphics hardware.\n"
             "Please try to restart the game.\n"
-            "CreateDevice returned 0x%08x(D3DERR_DEVICELOST)",
-            R);
+            "CreateDevice returned 0x%08x(D3DERR_DEVICELOST)", R);
         FlushLog();
         MessageBox(NULL, "Failed to initialize graphics hardware.\nPlease try to restart the game.", "Error!",
             MB_OK | MB_ICONERROR);
@@ -398,9 +399,12 @@ u32 CHW::selectPresentInterval()
     D3DCAPS9 caps;
     pD3D->GetDeviceCaps(DevAdapter, DevT, &caps);
 
-    if (!psDeviceFlags.test(rsVSync)) {
-        if (caps.PresentationIntervals & D3DPRESENT_INTERVAL_IMMEDIATE) return D3DPRESENT_INTERVAL_IMMEDIATE;
-        if (caps.PresentationIntervals & D3DPRESENT_INTERVAL_ONE) return D3DPRESENT_INTERVAL_ONE;
+    if (!psDeviceFlags.test(rsVSync))
+    {
+        if (caps.PresentationIntervals & D3DPRESENT_INTERVAL_IMMEDIATE)
+            return D3DPRESENT_INTERVAL_IMMEDIATE;
+        if (caps.PresentationIntervals & D3DPRESENT_INTERVAL_ONE)
+            return D3DPRESENT_INTERVAL_ONE;
     }
     return D3DPRESENT_INTERVAL_DEFAULT;
 }
@@ -410,7 +414,8 @@ u32 CHW::selectGPU()
 #if RENDER == R_R1
     BOOL isIntelGMA = FALSE;
 
-    if (Caps.id_vendor == 0x8086) {  // Intel
+    if (Caps.id_vendor == 0x8086)
+    { // Intel
 
 #define GMA_SL_SIZE 43
 
@@ -422,13 +427,15 @@ u32 CHW::selectGPU()
             0x2E93, 0x0042, 0x0046};
 
         for (int idx = 0; idx < GMA_SL_SIZE; ++idx)
-            if (IntelGMA_SoftList[idx] == Caps.id_device) {
+            if (IntelGMA_SoftList[idx] == Caps.id_device)
+            {
                 isIntelGMA = TRUE;
                 break;
             }
     }
 
-    if (isIntelGMA) switch (ps_r1_SoftwareSkinning)
+    if (isIntelGMA)
+        switch (ps_r1_SoftwareSkinning)
         {
         case 0:
             Msg("* Enabling software skinning");
@@ -446,14 +453,16 @@ u32 CHW::selectGPU()
         Msg("*   setting 'r1_software_skinning' to '0' should improve performance");
     }
 
-#endif  // RENDER == R_R1
+#endif // RENDER == R_R1
 
-    if (Caps.bForceGPU_SW) return D3DCREATE_SOFTWARE_VERTEXPROCESSING;
+    if (Caps.bForceGPU_SW)
+        return D3DCREATE_SOFTWARE_VERTEXPROCESSING;
 
     D3DCAPS9 caps;
     pD3D->GetDeviceCaps(DevAdapter, DevT, &caps);
 
-    if (caps.DevCaps & D3DDEVCAPS_HWTRANSFORMANDLIGHT) {
+    if (caps.DevCaps & D3DDEVCAPS_HWTRANSFORMANDLIGHT)
+    {
         if (Caps.bForceGPU_NonPure)
             return D3DCREATE_HARDWARE_VERTEXPROCESSING;
         else
@@ -481,8 +490,10 @@ u32 CHW::selectRefresh(u32 dwWidth, u32 dwHeight, D3DFORMAT fmt)
         {
             D3DDISPLAYMODE Mode;
             pD3D->EnumAdapterModes(DevAdapter, fmt, I, &Mode);
-            if (Mode.Width == dwWidth && Mode.Height == dwHeight) {
-                if (Mode.RefreshRate > selected) selected = Mode.RefreshRate;
+            if (Mode.Width == dwWidth && Mode.Height == dwHeight)
+            {
+                if (Mode.RefreshRate > selected)
+                    selected = Mode.RefreshRate;
             }
         }
         return selected;
@@ -500,24 +511,28 @@ BOOL CHW::support(D3DFORMAT fmt, DWORD type, DWORD usage)
 
 void CHW::updateWindowProps(HWND m_hWnd)
 {
-    //	BOOL	bWindowed				= strstr(Core.Params,"-dedicated") ? TRUE : !psDeviceFlags.is	(rsFullscreen);
+    //BOOL bWindowed = strstr(Core.Params,"-dedicated") ? TRUE : !psDeviceFlags.is(rsFullscreen);
     //#ifndef DEDICATED_SERVER
-    //	BOOL	bWindowed				= !psDeviceFlags.is	(rsFullscreen);
+    //BOOL bWindowed = !psDeviceFlags.is(rsFullscreen);
     //#else
-    //	BOOL	bWindowed				= TRUE;
+    //BOOL bWindowed = TRUE;
     //#endif
 
     BOOL bWindowed = TRUE;
 #ifndef _EDITOR
-    if (!g_dedicated_server) bWindowed = !psDeviceFlags.is(rsFullscreen);
+    if (!g_dedicated_server)
+        bWindowed = !psDeviceFlags.is(rsFullscreen);
 #endif
 
     u32 dwWindowStyle = 0;
     // Set window properties depending on what mode were in.
-    if (bWindowed) {
-        if (m_move_window) {
+    if (bWindowed)
+    {
+        if (m_move_window)
+        {
             dwWindowStyle = WS_BORDER | WS_VISIBLE;
-            if (!strstr(Core.Params, "-no_dialog_header")) dwWindowStyle |= WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX;
+            if (!strstr(Core.Params, "-no_dialog_header"))
+                dwWindowStyle |= WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX;
             SetWindowLong(m_hWnd, GWL_STYLE, dwWindowStyle);
             // When moving from fullscreen to windowed mode, it is important to
             // adjust the window size after recreating the device rather than
@@ -551,7 +566,8 @@ void CHW::updateWindowProps(HWND m_hWnd)
     }
 
 #ifndef _EDITOR
-    if (!g_dedicated_server) {
+    if (!g_dedicated_server)
+    {
         ShowCursor(FALSE);
         SetForegroundWindow(m_hWnd);
     }
@@ -579,7 +595,8 @@ void free_vid_mode_list()
 
 void fill_vid_mode_list(CHW* _hw)
 {
-    if (GlobalEnv.vid_mode_token != NULL) return;
+    if (GlobalEnv.vid_mode_token != NULL)
+        return;
     xr_vector<LPCSTR> _tmp;
     u32 cnt = _hw->pD3D->GetAdapterModeCount(_hw->DevAdapter, _hw->Caps.fTarget);
 
@@ -590,11 +607,13 @@ void fill_vid_mode_list(CHW* _hw)
         string32 str;
 
         _hw->pD3D->EnumAdapterModes(_hw->DevAdapter, _hw->Caps.fTarget, i, &Mode);
-        if (Mode.Width < 800) continue;
+        if (Mode.Width < 800)
+            continue;
 
         xr_sprintf(str, sizeof(str), "%dx%d", Mode.Width, Mode.Height);
 
-        if (_tmp.end() != std::find_if(_tmp.begin(), _tmp.end(), _uniq_mode(str))) continue;
+        if (_tmp.end() != std::find_if(_tmp.begin(), _tmp.end(), _uniq_mode(str)))
+            continue;
 
         _tmp.push_back(NULL);
         _tmp.back() = xr_strdup(str);
@@ -609,14 +628,14 @@ void fill_vid_mode_list(CHW* _hw)
 
 #ifdef DEBUG
     Msg("Available video modes[%d]:", _tmp.size());
-#endif  // DEBUG
+#endif // DEBUG
     for (i = 0; i < _tmp.size(); ++i)
     {
         GlobalEnv.vid_mode_token[i].id = i;
         GlobalEnv.vid_mode_token[i].name = _tmp[i];
 #ifdef DEBUG
         Msg("[%s]", _tmp[i]);
-#endif  // DEBUG
+#endif // DEBUG
     }
 }
 #endif

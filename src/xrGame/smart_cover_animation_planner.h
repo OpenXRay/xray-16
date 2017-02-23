@@ -83,8 +83,8 @@ public:
     virtual LPCSTR object_name() const;
 };
 
-}  // namespace smart_cover
+} // namespace smart_cover
 
 #include "smart_cover_animation_planner_inline.h"
 
-#endif  // SMART_COVER_ANIMATION_PLANNER_H_INCLUDED
+#endif // SMART_COVER_ANIMATION_PLANNER_H_INCLUDED

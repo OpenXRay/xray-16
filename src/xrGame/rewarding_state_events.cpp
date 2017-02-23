@@ -13,10 +13,7 @@ rewarding_state_events::rewarding_state_events(
 {
 }
 
-rewarding_state_events::~rewarding_state_events()
-{
-}
-
+rewarding_state_events::~rewarding_state_events() {}
 void rewarding_state_events::init()
 {
     clear_events();
@@ -123,7 +120,7 @@ void rewarding_state_events::init()
                                     float_bfunc_cf::get_function(float_bfunc_cf::tt_greater_equal), 6.0f),
                   add_accumm_value_condition(acpv_killer_victim_angle,
                       float_bfunc_cf::get_function(float_bfunc_cf::tt_less_equal),
-                      _cos(PI_DIV_2 - 0.345f))  //~ 90 +- 20 degrees
+                      _cos(PI_DIV_2 - 0.345f)) //~ 90 +- 20 degrees
                   ),
         1, eGameIDDeathmatch | eGameIDTeamDeathmatch | eGameIDArtefactHunt | eGameIDCaptureTheArtefact,
         gamespy_profile::at_award_sprinter_stopper);
@@ -186,4 +183,4 @@ void rewarding_state_events::init()
         gamespy_profile::at_award_silent_death);
 }
 
-}  // namespace award_system
+} // namespace award_system

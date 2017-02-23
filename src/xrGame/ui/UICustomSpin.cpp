@@ -43,11 +43,7 @@ CUICustomSpin::CUICustomSpin()
     m_textColor[1] = color_argb(255, 100, 100, 100);
 }
 
-CUICustomSpin::~CUICustomSpin()
-{
-    xr_delete(m_pLines);
-}
-
+CUICustomSpin::~CUICustomSpin() { xr_delete(m_pLines); }
 void CUICustomSpin::InitSpin(Fvector2 pos, Fvector2 size)
 {
     CUIWindow::SetWndPos(pos);
@@ -70,8 +66,10 @@ void CUICustomSpin::InitSpin(Fvector2 pos, Fvector2 size)
 
 void CUICustomSpin::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 {
-    if (BUTTON_CLICKED == msg) {
-        if (m_pBtnUp == pWnd) {
+    if (BUTTON_CLICKED == msg)
+    {
+        if (m_pBtnUp == pWnd)
+        {
             OnBtnUpClick();
         }
         else if (m_pBtnDown == pWnd)
@@ -88,21 +86,13 @@ void CUICustomSpin::Enable(bool status)
     m_pBtnUp->Enable(status);
 
     if (!status)
-        m_pLines->SetTextColor(m_textColor[0]);  // enabled color
+        m_pLines->SetTextColor(m_textColor[0]); // enabled color
     else
-        m_pLines->SetTextColor(m_textColor[1]);  // disabled color
+        m_pLines->SetTextColor(m_textColor[1]); // disabled color
 }
 
-void CUICustomSpin::OnBtnUpClick()
-{
-    GetMessageTarget()->SendMessage(this, BUTTON_CLICKED);
-}
-
-void CUICustomSpin::OnBtnDownClick()
-{
-    GetMessageTarget()->SendMessage(this, BUTTON_CLICKED);
-}
-
+void CUICustomSpin::OnBtnUpClick() { GetMessageTarget()->SendMessage(this, BUTTON_CLICKED); }
+void CUICustomSpin::OnBtnDownClick() { GetMessageTarget()->SendMessage(this, BUTTON_CLICKED); }
 void CUICustomSpin::Draw()
 {
     CUIWindow::Draw();
@@ -114,11 +104,15 @@ void CUICustomSpin::Draw()
 void CUICustomSpin::Update()
 {
     CUIWindow::Update();
-    if (!m_pBtnUp->CursorOverWindow()) m_pBtnUp->SetButtonState(CUIButton::BUTTON_NORMAL);
-    if (!m_pBtnDown->CursorOverWindow()) m_pBtnDown->SetButtonState(CUIButton::BUTTON_NORMAL);
+    if (!m_pBtnUp->CursorOverWindow())
+        m_pBtnUp->SetButtonState(CUIButton::BUTTON_NORMAL);
+    if (!m_pBtnDown->CursorOverWindow())
+        m_pBtnDown->SetButtonState(CUIButton::BUTTON_NORMAL);
 
-    if (CUIButton::BUTTON_PUSHED == m_pBtnUp->GetButtonState() && m_pBtnUp->CursorOverWindow()) {
-        if (m_time_begin < Device.dwTimeContinual - m_p_delay) {
+    if (CUIButton::BUTTON_PUSHED == m_pBtnUp->GetButtonState() && m_pBtnUp->CursorOverWindow())
+    {
+        if (m_time_begin < Device.dwTimeContinual - m_p_delay)
+        {
             m_time_begin = Device.dwTimeContinual;
             float tmp = float(m_u_delay);
             float step = powf(tmp, 0.7f);
@@ -130,12 +124,14 @@ void CUICustomSpin::Update()
 
             m_u_delay += 50;
 
-            if (m_p_delay > 50) m_p_delay -= 50;
+            if (m_p_delay > 50)
+                m_p_delay -= 50;
         }
     }
     else if (CUIButton::BUTTON_PUSHED == m_pBtnDown->GetButtonState() && m_pBtnDown->CursorOverWindow())
     {
-        if (m_time_begin < Device.dwTimeContinual - m_p_delay) {
+        if (m_time_begin < Device.dwTimeContinual - m_p_delay)
+        {
             m_time_begin = Device.dwTimeContinual;
             float tmp = float(m_u_delay);
             float step = powf(tmp, 0.7f);
@@ -147,7 +143,8 @@ void CUICustomSpin::Update()
 
             m_u_delay += 50;
 
-            if (m_p_delay > 50) m_p_delay -= 50;
+            if (m_p_delay > 50)
+                m_p_delay -= 50;
         }
     }
     else
@@ -157,7 +154,8 @@ void CUICustomSpin::Update()
         m_time_begin = 0;
     }
 
-    if (IsEnabled()) {
+    if (IsEnabled())
+    {
         m_pBtnUp->Enable(CanPressUp());
         m_pBtnDown->Enable(CanPressDown());
         m_pLines->SetTextColor(m_textColor[0]);
@@ -170,17 +168,6 @@ void CUICustomSpin::Update()
     }
 }
 
-LPCSTR CUICustomSpin::GetText()
-{
-    return m_pLines->GetText();
-}
-
-void CUICustomSpin::SetTextColor(u32 color)
-{
-    m_textColor[0] = color;
-}
-
-void CUICustomSpin::SetTextColorD(u32 color)
-{
-    m_textColor[1] = color;
-}
+LPCSTR CUICustomSpin::GetText() { return m_pLines->GetText(); }
+void CUICustomSpin::SetTextColor(u32 color) { m_textColor[0] = color; }
+void CUICustomSpin::SetTextColorD(u32 color) { m_textColor[1] = color; }

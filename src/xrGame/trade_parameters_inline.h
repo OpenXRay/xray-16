@@ -24,58 +24,29 @@ IC void CTradeParameters::clear()
 
 IC CTradeParameters& CTradeParameters::instance()
 {
-    if (m_instance) return (*m_instance);
+    if (m_instance)
+        return (*m_instance);
 
     m_instance = new CTradeParameters();
     return (*m_instance);
 }
 
-IC void CTradeParameters::clean()
-{
-    xr_delete(m_instance);
-}
-
-IC CTradeParameters& default_trade_parameters()
-{
-    return (CTradeParameters::instance());
-}
-
-IC const CTradeActionParameters& CTradeParameters::action(action_buy) const
-{
-    return (m_buy);
-}
-
-IC const CTradeActionParameters& CTradeParameters::action(action_sell) const
-{
-    return (m_sell);
-}
-
-IC const CTradeBoolParameters& CTradeParameters::action(action_show) const
-{
-    return (m_show);
-}
-
-IC CTradeActionParameters& CTradeParameters::action(action_buy)
-{
-    return (m_buy);
-}
-
-IC CTradeActionParameters& CTradeParameters::action(action_sell)
-{
-    return (m_sell);
-}
-
-IC CTradeBoolParameters& CTradeParameters::action(action_show)
-{
-    return (m_show);
-}
-
+IC void CTradeParameters::clean() { xr_delete(m_instance); }
+IC CTradeParameters& default_trade_parameters() { return (CTradeParameters::instance()); }
+IC const CTradeActionParameters& CTradeParameters::action(action_buy) const { return (m_buy); }
+IC const CTradeActionParameters& CTradeParameters::action(action_sell) const { return (m_sell); }
+IC const CTradeBoolParameters& CTradeParameters::action(action_show) const { return (m_show); }
+IC CTradeActionParameters& CTradeParameters::action(action_buy) { return (m_buy); }
+IC CTradeActionParameters& CTradeParameters::action(action_sell) { return (m_sell); }
+IC CTradeBoolParameters& CTradeParameters::action(action_show) { return (m_show); }
 template <typename _action_type>
 IC bool CTradeParameters::enabled(_action_type type, const shared_str& section) const
 {
-    if (action(type).disabled(section)) return (false);
+    if (action(type).disabled(section))
+        return (false);
 
-    if (default_trade_parameters().action(type).disabled(section)) return (false);
+    if (default_trade_parameters().action(type).disabled(section))
+        return (false);
 
     return (true);
 }
@@ -85,7 +56,8 @@ IC const CTradeFactors& CTradeParameters::factors(_action_type type, const share
 {
     VERIFY(enabled(type, section));
 
-    if (action(type).enabled(section)) return (action(type).factors(section));
+    if (action(type).enabled(section))
+        return (action(type).factors(section));
 
     if (default_trade_parameters().action(type).enabled(section))
         return (default_trade_parameters().action(type).factors(section));
@@ -106,7 +78,8 @@ IC void CTradeParameters::process(_action_type type, CInifile& ini_file, const s
     CInifile::SectCIt E = S.Data.end();
     for (; I != E; ++I)
     {
-        if (!(*I).second.size()) {
+        if (!(*I).second.size())
+        {
             _action.disable((*I).first);
             continue;
         }

@@ -13,28 +13,18 @@
 #pragma resource "*.dfm"
 
 //---------------------------------------------------------------------------
-__fastcall TfraSector::TfraSector(TComponent* Owner) : TForm(Owner)
-{
-}
-
+__fastcall TfraSector::TfraSector(TComponent* Owner) : TForm(Owner) {}
 //---------------------------------------------------------------------------
-void __fastcall TfraSector::PanelMinClick(TObject* Sender)
-{
-    PanelMinMaxClick(Sender);
-}
-
+void __fastcall TfraSector::PanelMinClick(TObject* Sender) { PanelMinMaxClick(Sender); }
 //---------------------------------------------------------------------------
-void __fastcall TfraSector::TopClick(TObject* Sender)
-{
-    PanelMaximizeClick(Sender);
-}
-
+void __fastcall TfraSector::TopClick(TObject* Sender) { PanelMaximizeClick(Sender); }
 //---------------------------------------------------------------------------
 
 void __fastcall TfraSector::ebCaptureInsideVolumeClick(TObject* Sender)
 {
     CSector* S = PortalUtils.GetSelectedSector();
-    if (S) {
+    if (S)
+    {
         S->CaptureInsideVolume();
         Scene->UndoSave();
     }
@@ -45,7 +35,8 @@ void __fastcall TfraSector::ebCaptureInsideVolumeClick(TObject* Sender)
 void __fastcall TfraSector::ebDistributeObjectsClick(TObject* Sender)
 {
     CSector* S = PortalUtils.GetSelectedSector();
-    if (S) {
+    if (S)
+    {
         S->DistributeInsideObjects();
         Scene->UndoSave();
     }
@@ -60,7 +51,8 @@ void __fastcall TfraSector::ebCreateDefaultClick(TObject* Sender)
         ELog.DlgMsg(mtInformation, "Default sector already present. Remove this and try again.");
     else
     {
-        if (!PortalUtils.CreateDefaultSector()) ELog.DlgMsg(mtInformation, "Default can't created.");
+        if (!PortalUtils.CreateDefaultSector())
+            ELog.DlgMsg(mtInformation, "Default can't created.");
     }
 }
 
@@ -68,21 +60,19 @@ void __fastcall TfraSector::ebCreateDefaultClick(TObject* Sender)
 
 void __fastcall TfraSector::ebRemoveDefaultClick(TObject* Sender)
 {
-    if (!PortalUtils.RemoveDefaultSector()) ELog.DlgMsg(mtInformation, "Default sector not found.");
+    if (!PortalUtils.RemoveDefaultSector())
+        ELog.DlgMsg(mtInformation, "Default sector not found.");
 }
 
 //---------------------------------------------------------------------------
 
-void __fastcall TfraSector::ebValidateClick(TObject* Sender)
-{
-    PortalUtils.Validate(true);
-}
-
+void __fastcall TfraSector::ebValidateClick(TObject* Sender) { PortalUtils.Validate(true); }
 //---------------------------------------------------------------------------
 
 void __fastcall TfraSector::ebBoxPickClick(TObject* Sender)
 {
-    if (ebCreateNewSingle->Down || ebCreateNewMultiple->Down) ebBoxPick->Down = false;
+    if (ebCreateNewSingle->Down || ebCreateNewMultiple->Down)
+        ebBoxPick->Down = false;
 }
 
 //---------------------------------------------------------------------------

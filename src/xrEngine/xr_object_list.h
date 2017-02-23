@@ -88,12 +88,13 @@ public:
     void net_Register(IGameObject* O);
     void net_Unregister(IGameObject* O);
 
-    u32 net_Export(NET_Packet* P, u32 _start, u32 _count);  // return next start
+    u32 net_Export(NET_Packet* P, u32 _start, u32 _count); // return next start
     void net_Import(NET_Packet* P);
 
     ICF IGameObject* net_Find(u16 ID) const
     {
-        if (ID == u16(-1)) return (0);
+        if (ID == u16(-1))
+            return (0);
 
         return (map_NETID[ID]);
     }
@@ -116,12 +117,13 @@ public:
     void register_object_to_destroy(IGameObject* object_to_destroy);
 #ifdef DEBUG
     bool registered_object_to_destroy(const IGameObject* object_to_destroy) const;
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 
 private:
     IC Objects& get_crows()
     {
-        if (GetCurrentThreadId() == m_owner_thread_id) return (m_crows[0]);
+        if (GetCurrentThreadId() == m_owner_thread_id)
+            return (m_crows[0]);
 
         return (m_crows[1]);
     }
@@ -130,4 +132,4 @@ private:
     static void dump_list(Objects& v, LPCSTR reason);
 };
 
-#endif  //__XR_OBJECT_LIST_H__
+#endif //__XR_OBJECT_LIST_H__

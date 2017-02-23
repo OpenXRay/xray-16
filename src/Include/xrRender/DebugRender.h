@@ -43,9 +43,9 @@ public:
 
 #ifdef DEBUG
     virtual void dbg_DrawTRI(Fmatrix& T, Fvector& p1, Fvector& p2, Fvector& p3, u32 C) = 0;
-#endif  //	DEBUG
+#endif //	DEBUG
 };
 
-#endif  // DEBUG
+#endif // DEBUG
 
-#endif  //	DebugRender_included
+#endif //	DebugRender_included

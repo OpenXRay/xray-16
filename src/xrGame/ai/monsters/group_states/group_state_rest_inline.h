@@ -10,7 +10,7 @@
 #include "group_state_rest_idle.h"
 #include "group_state_custom.h"
 
-#define TEMPLATE_SPECIALIZATION                                                                                        \
+#define TEMPLATE_SPECIALIZATION \
     template <typename _Object\
 >
 
@@ -28,10 +28,7 @@ CStateGroupRestAbstract::CStateGroupRest(_Object* obj) : inherited(obj)
 }
 
 TEMPLATE_SPECIALIZATION
-CStateGroupRestAbstract::~CStateGroupRest()
-{
-}
-
+CStateGroupRestAbstract::~CStateGroupRest() {}
 TEMPLATE_SPECIALIZATION
 void CStateGroupRestAbstract::initialize()
 {
@@ -64,8 +61,10 @@ void CStateGroupRestAbstract::execute()
 
     bool captured_by_smart_terrain = false;
 
-    if (prev_substate == eStateSmartTerrainTask) {
-        if (!get_state(eStateSmartTerrainTask)->check_completion()) captured_by_smart_terrain = true;
+    if (prev_substate == eStateSmartTerrainTask)
+    {
+        if (!get_state(eStateSmartTerrainTask)->check_completion())
+            captured_by_smart_terrain = true;
     }
     else if (get_state(eStateSmartTerrainTask)->check_start_conditions())
         captured_by_smart_terrain = true;
@@ -77,8 +76,10 @@ void CStateGroupRestAbstract::execute()
         // check restrictions
         bool move_to_restrictor = false;
 
-        if (prev_substate == eStateCustomMoveToRestrictor) {
-            if (!get_state(eStateCustomMoveToRestrictor)->check_completion()) move_to_restrictor = true;
+        if (prev_substate == eStateCustomMoveToRestrictor)
+        {
+            if (!get_state(eStateCustomMoveToRestrictor)->check_completion())
+                move_to_restrictor = true;
         }
         else if (get_state(eStateCustomMoveToRestrictor)->check_start_conditions())
             move_to_restrictor = true;
@@ -90,8 +91,10 @@ void CStateGroupRestAbstract::execute()
             // check home point
             bool move_to_home_point = false;
 
-            if (prev_substate == eStateRest_MoveToHomePoint) {
-                if (!get_state(eStateRest_MoveToHomePoint)->check_completion()) move_to_home_point = true;
+            if (prev_substate == eStateRest_MoveToHomePoint)
+            {
+                if (!get_state(eStateRest_MoveToHomePoint)->check_completion())
+                    move_to_home_point = true;
             }
             else if (get_state(eStateRest_MoveToHomePoint)->check_start_conditions())
                 move_to_home_point = true;
@@ -101,7 +104,8 @@ void CStateGroupRestAbstract::execute()
             else
             {
                 // check squad behaviour
-                if (object->saved_state == eStateRest_Sleep) {
+                if (object->saved_state == eStateRest_Sleep)
+                {
                     switch (object->get_number_animation())
                     {
                     case u32(8): object->set_current_animation(13); break;
@@ -112,7 +116,8 @@ void CStateGroupRestAbstract::execute()
                         break;
                     default: break;
                     }
-                    if (object->b_state_check) {
+                    if (object->b_state_check)
+                    {
                         object->b_state_check = false;
                         select_state(eStateCustom);
                         get_state_current()->execute();
@@ -129,8 +134,10 @@ void CStateGroupRestAbstract::execute()
                     return;
                 }
                 bool use_to_do = false;
-                if (prev_substate == eStateRest_Sleep) {
-                    if (time() <= time_for_sleep) {
+                if (prev_substate == eStateRest_Sleep)
+                {
+                    if (time() <= time_for_sleep)
+                    {
                         use_to_do = true;
                     }
                     else
@@ -144,8 +151,10 @@ void CStateGroupRestAbstract::execute()
                         return;
                     }
                 }
-                if (!use_to_do) {
-                    if (time() > time_for_life && object->Home->at_min_home(object->Position())) {
+                if (!use_to_do)
+                {
+                    if (time() > time_for_life && object->Home->at_min_home(object->Position()))
+                    {
                         object->set_current_animation(8);
                         select_state(eStateCustom);
                         object->saved_state = eStateRest_Sleep;
@@ -168,7 +177,8 @@ void CStateGroupRestAbstract::execute()
                             prev_substate = current_substate;
                             return;
                         }
-                        if (object->b_state_check) {
+                        if (object->b_state_check)
+                        {
                             select_state(eStateCustom);
                             object->b_state_check = false;
                         }

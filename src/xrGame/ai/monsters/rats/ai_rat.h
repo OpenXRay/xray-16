@@ -23,7 +23,7 @@ class rat_state_manager;
 namespace steering_behaviour
 {
 class manager;
-}  // namespace steering_behaviour
+} // namespace steering_behaviour
 class CAI_Rat : public CCustomMonster, public CEatableItem
 {
 private:
@@ -364,7 +364,6 @@ public:
     virtual CScriptEntity* cast_script_entity() { return this; }
     virtual CWeapon* cast_weapon() { return NULL; }
     virtual CAI_Rat* dcast_Rat() { return this; };
-
 public:
     virtual BOOL renderable_ShadowReceive();
     virtual BOOL renderable_ShadowGenerate();
@@ -413,15 +412,14 @@ public:
     virtual void reinit();
     virtual void reload(LPCSTR section);
     virtual const SRotation Orientation() const { return (inherited::Orientation()); };
-
 public:
     virtual void make_Interpolation();
-    virtual void PH_B_CrPr();  // actions & operations before physic correction-prediction steps
-    virtual void PH_I_CrPr();  // actions & operations after correction before prediction steps
+    virtual void PH_B_CrPr(); // actions & operations before physic correction-prediction steps
+    virtual void PH_I_CrPr(); // actions & operations after correction before prediction steps
 #ifdef DEBUG
-    virtual void PH_Ch_CrPr();  //
+    virtual void PH_Ch_CrPr(); //
 #endif
-    virtual void PH_A_CrPr();  // actions & operations after phisic correction-prediction steps
+    virtual void PH_A_CrPr(); // actions & operations after phisic correction-prediction steps
     virtual void OnH_A_Chield();
     virtual void create_physic_shell();
     virtual void setup_physic_shell();

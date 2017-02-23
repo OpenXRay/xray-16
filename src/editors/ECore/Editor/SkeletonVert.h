@@ -33,7 +33,8 @@ struct st_SVERT
 
     void SetBone(DWORD B)
     {
-        if (bone == BONE_NONE) {
+        if (bone == BONE_NONE)
+        {
             bone = B;
         }
         else
@@ -42,18 +43,24 @@ struct st_SVERT
 
     BOOL similar(st_SVERT& V)
     {
-        if (bone != V.bone) return FALSE;
-        if (uv.size() != V.uv.size()) return FALSE;
+        if (bone != V.bone)
+            return FALSE;
+        if (uv.size() != V.uv.size())
+            return FALSE;
         for (DWORD i = 0; i < uv.size(); i++)
         {
-            if (!fsimilar(uv[i].x, V.uv[i].x)) return FALSE;
-            if (!fsimilar(uv[i].y, V.uv[i].y)) return FALSE;
+            if (!fsimilar(uv[i].x, V.uv[i].x))
+                return FALSE;
+            if (!fsimilar(uv[i].y, V.uv[i].y))
+                return FALSE;
         }
-        if (!O.similar(V.O)) return FALSE;
-        if (!N.similar(V.N)) return FALSE;
+        if (!O.similar(V.O))
+            return FALSE;
+        if (!N.similar(V.N))
+            return FALSE;
         return TRUE;
     }
 };
 
 DEFINE_VECTOR(st_SVERT*, vSVERT, SVERTIt);
-#endif  //_SkeletonVert_H_
+#endif //_SkeletonVert_H_

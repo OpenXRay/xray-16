@@ -26,12 +26,12 @@ public:
 protected:
     // data of the vector is u32 - kill time
     AssociativeVector<shared_str, u32> m_victims;
-};  // class black_list
+}; // class black_list
 
 ADD_ACCUMULATIVE_STATE(acpv_black_list, black_list);
 #undef ACCUMULATIVE_STATE_LIST
 #define ACCUMULATIVE_STATE_LIST SAVE_TYPE_LIST(acpv_black_list, black_list)
 
-}  // namespace award_system
+} // namespace award_system
 
-#endif  //#ifndef BLACK_LIST_INCLUDED
+#endif //#ifndef BLACK_LIST_INCLUDED

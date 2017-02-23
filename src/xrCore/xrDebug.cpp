@@ -5,7 +5,7 @@
 #include "os_clipboard.h"
 #include "Debug/dxerr.h"
 #pragma warning(push)
-#pragma warning(disable : 4091)  // 'typedef ': ignored on left of '' when no variable is declared
+#pragma warning(disable : 4091) // 'typedef ': ignored on left of '' when no variable is declared
 #include "Debug/StackTrace.h"
 #include "Debug/MiniDump.h"
 #pragma warning(pop)
@@ -34,9 +34,9 @@ static BOOL bException = FALSE;
 #pragma comment(lib, "BugTrap.lib")
 #endif
 
-#include <new.h>       // for _set_new_mode
-#include <signal.h>    // for signals
-#include <errorrep.h>  // ReportFault
+#include <new.h> // for _set_new_mode
+#include <signal.h> // for signals
+#include <errorrep.h> // ReportFault
 #pragma comment(lib, "FaultRep.lib")
 
 #ifdef DEBUG
@@ -65,14 +65,11 @@ string_path xrDebug::BugReportFile;
 bool xrDebug::ErrorAfterDialog = false;
 StackTraceInfo xrDebug::StackTrace = {};
 
-void xrDebug::SetBugReportFile(const char* fileName)
-{
-    strcpy_s(BugReportFile, fileName);
-}
-
+void xrDebug::SetBugReportFile(const char* fileName) { strcpy_s(BugReportFile, fileName); }
 void xrDebug::LogStackTrace(const char* header)
 {
-    if (!shared_str_initialized) return;
+    if (!shared_str_initialized)
+        return;
     StackTrace.Count = BuildStackTrace(StackTrace.Frames, StackTrace.Capacity, StackTrace.LineCapacity);
     Msg("%s", header);
     for (size_t i = 1; i < StackTrace.Count; i++)
@@ -86,7 +83,8 @@ size_t xrDebug::BuildStackTrace(char* buffer, size_t capacity, size_t lineCapaci
     EXCEPTION_POINTERS ex_ptrs;
     void* ebp;
     context.ContextFlags = CONTEXT_FULL;
-    if (GetThreadContext(GetCurrentThread(), &context)) {
+    if (GetThreadContext(GetCurrentThread(), &context))
+    {
         context.Eip = (DWORD)GetInstructionPtr();
         context.Ebp = (DWORD)&ebp;
         context.Esp = (DWORD)&context;
@@ -116,7 +114,8 @@ void xrDebug::GatherInfo(char* assertionInfo, const ErrorLocation& loc, const ch
     const char* arg1, const char* arg2)
 {
     char* buffer = assertionInfo;
-    if (!expr) expr = "<no expression>";
+    if (!expr)
+        expr = "<no expression>";
     bool extendedDesc = desc && strchr(desc, '\n');
     char* prefix = "[error] ";
     buffer += sprintf(buffer, "\nFATAL ERROR\n\n");
@@ -124,18 +123,23 @@ void xrDebug::GatherInfo(char* assertionInfo, const ErrorLocation& loc, const ch
     buffer += sprintf(buffer, "%sFunction      : %s\n", prefix, loc.Function);
     buffer += sprintf(buffer, "%sFile          : %s\n", prefix, loc.File);
     buffer += sprintf(buffer, "%sLine          : %d\n", prefix, loc.Line);
-    if (extendedDesc) {
+    if (extendedDesc)
+    {
         buffer += sprintf(buffer, "\n%s\n", desc);
-        if (arg1) {
+        if (arg1)
+        {
             buffer += sprintf(buffer, "%s\n", arg1);
-            if (arg2) buffer += sprintf(buffer, "%s\n", arg2);
+            if (arg2)
+                buffer += sprintf(buffer, "%s\n", arg2);
         }
     }
     else
     {
         buffer += sprintf(buffer, "%sDescription   : %s\n", prefix, desc);
-        if (arg1) {
-            if (arg2) {
+        if (arg1)
+        {
+            if (arg2)
+            {
                 buffer += sprintf(buffer, "%sArgument 0    : %s\n", prefix, arg1);
                 buffer += sprintf(buffer, "%sArgument 1    : %s\n", prefix, arg2);
             }
@@ -144,7 +148,8 @@ void xrDebug::GatherInfo(char* assertionInfo, const ErrorLocation& loc, const ch
         }
     }
     buffer += sprintf(buffer, "\n");
-    if (shared_str_initialized) {
+    if (shared_str_initialized)
+    {
         Log(assertionInfo);
         FlushLog();
     }
@@ -152,21 +157,25 @@ void xrDebug::GatherInfo(char* assertionInfo, const ErrorLocation& loc, const ch
 #ifdef USE_MEMORY_MONITOR
     memory_monitor::flush_each_time(true);
     memory_monitor::flush_each_time(false);
-#endif  // USE_MEMORY_MONITOR
-    if (IsDebuggerPresent() || !strstr(GetCommandLine(), "-no_call_stack_assert")) return;
-    if (shared_str_initialized) Log("stack trace:\n");
+#endif // USE_MEMORY_MONITOR
+    if (IsDebuggerPresent() || !strstr(GetCommandLine(), "-no_call_stack_assert"))
+        return;
+    if (shared_str_initialized)
+        Log("stack trace:\n");
 #ifdef USE_OWN_ERROR_MESSAGE_WINDOW
     buffer += sprintf(buffer, "stack trace:\n\n");
-#endif  // USE_OWN_ERROR_MESSAGE_WINDOW
+#endif // USE_OWN_ERROR_MESSAGE_WINDOW
     BuildStackTrace(StackTrace.Frames, StackTrace.Capacity, StackTrace.LineCapacity);
     for (size_t i = 2; i < StackTrace.Count; i++)
     {
-        if (shared_str_initialized) Log(StackTrace[i]);
+        if (shared_str_initialized)
+            Log(StackTrace[i]);
 #ifdef USE_OWN_ERROR_MESSAGE_WINDOW
         buffer += sprintf(buffer, "%s\n", StackTrace[i]);
-#endif  // USE_OWN_ERROR_MESSAGE_WINDOW
+#endif // USE_OWN_ERROR_MESSAGE_WINDOW
     }
-    if (shared_str_initialized) FlushLog();
+    if (shared_str_initialized)
+        FlushLog();
     os_clipboard::copy_to_clipboard(assertionInfo);
 }
 
@@ -200,14 +209,17 @@ void xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* exp
     string4096 assertionInfo;
     GatherInfo(assertionInfo, loc, expr, desc, arg1, arg2);
 #ifdef USE_OWN_ERROR_MESSAGE_WINDOW
-    strcat(assertionInfo, "\r\n"
-                          "Press CANCEL to abort execution\r\n"
-                          "Press TRY AGAIN to continue execution\r\n"
-                          "Press CONTINUE to continue execution and ignore all the errors of this type\r\n"
-                          "\r\n");
+    strcat(assertionInfo,
+        "\r\n"
+        "Press CANCEL to abort execution\r\n"
+        "Press TRY AGAIN to continue execution\r\n"
+        "Press CONTINUE to continue execution and ignore all the errors of this type\r\n"
+        "\r\n");
 #endif
-    if (OnCrash) OnCrash();
-    if (OnDialog) OnDialog(true);
+    if (OnCrash)
+        OnCrash();
+    if (OnDialog)
+        OnDialog(true);
     FlushLog();
     if (Core.PluginMode)
         MessageBox(NULL, assertionInfo, "X-Ray error", MB_OK | MB_ICONERROR | MB_SYSTEMMODAL);
@@ -231,14 +243,15 @@ void xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* exp
             break;
         default: DEBUG_BREAK;
         }
-#else  // !USE_OWN_ERROR_MESSAGE_WINDOW
+#else // !USE_OWN_ERROR_MESSAGE_WINDOW
 #ifdef USE_BUG_TRAP
         BT_SetUserMessage(assertionInfo);
 #endif
         DEBUG_BREAK;
 #endif
     }
-    if (OnDialog) OnDialog(false);
+    if (OnDialog)
+        OnDialog(false);
     lock.Leave();
 }
 
@@ -260,7 +273,8 @@ LPCSTR xrDebug::ErrorToString(long code)
     const char* result = nullptr;
     static string1024 descStorage;
     DXGetErrorDescription(code, descStorage, sizeof(descStorage));
-    if (!result) {
+    if (!result)
+    {
         FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, 0, code, 0, descStorage, sizeof(descStorage) - 1, 0);
         result = descStorage;
     }
@@ -290,12 +304,14 @@ extern LPCSTR log_name();
 #ifdef USE_BUG_TRAP
 void WINAPI xrDebug::PreErrorHandler(INT_PTR)
 {
-    if (!xr_FS || !FS.m_Flags.test(CLocatorAPI::flReady)) return;
+    if (!xr_FS || !FS.m_Flags.test(CLocatorAPI::flReady))
+        return;
     string_path logDir;
     __try
     {
         FS.update_path(logDir, "$logs$", "");
-        if (logDir[0] != '\\' && logDir[1] != ':') {
+        if (logDir[0] != '\\' && logDir[1] != ':')
+        {
             string256 currentDir;
             _getcwd(currentDir, sizeof(currentDir));
             string256 relDir;
@@ -310,7 +326,8 @@ void WINAPI xrDebug::PreErrorHandler(INT_PTR)
     string_path temp;
     strconcat(sizeof(temp), temp, logDir, log_name());
     BT_AddLogFile(temp);
-    if (*BugReportFile) BT_AddLogFile(BugReportFile);
+    if (*BugReportFile)
+        BT_AddLogFile(BugReportFile);
     BT_SaveSnapshot(nullptr);
 }
 
@@ -324,25 +341,26 @@ void xrDebug::SetupExceptionHandler(const bool& dedicated)
         BT_SetActivityType(BTA_SHOWUI);
     else
         BT_SetActivityType(BTA_SAVEREPORT);
-    BT_SetDialogMessage(BTDM_INTRO2, "This is X-Ray Engine v1.6 crash reporting client. "
-                                     "To help the development process, "
-                                     "please Submit Bug or save report and email it manually (button More...)."
-                                     "\r\n"
-                                     "Many thanks in advance and sorry for the inconvenience.");
+    BT_SetDialogMessage(BTDM_INTRO2,
+        "This is X-Ray Engine v1.6 crash reporting client. "
+        "To help the development process, "
+        "please Submit Bug or save report and email it manually (button More...)."
+        "\r\n"
+        "Many thanks in advance and sorry for the inconvenience.");
     BT_SetPreErrHandler(PreErrorHandler, 0);
     BT_SetAppName("X-Ray Engine");
     BT_SetReportFormat(BTRF_TEXT);
     BT_SetFlags(BTF_DETAILEDMODE | BTF_ATTACHREPORT);
 #ifdef MASTER_GOLD
-#ifdef _EDITOR  // MASTER_GOLD && EDITOR
+#ifdef _EDITOR // MASTER_GOLD && EDITOR
     auto minidumpFlags = !dedicated ? MiniDumpNoDump : MiniDumpWithDataSegs;
-#else  // MASTER_GOLD && !EDITOR
+#else // MASTER_GOLD && !EDITOR
     auto minidumpFlags = !dedicated ? MiniDumpNoDump : MiniDumpWithDataSegs | MiniDumpWithIndirectlyReferencedMemory;
 #endif
 #else
-#ifdef EDITOR  // !MASTER_GOLD && EDITOR
+#ifdef EDITOR // !MASTER_GOLD && EDITOR
     auto minidumpFlags = MiniDumpWithDataSegs;
-#else  // !MASTER_GOLD && !EDITOR
+#else // !MASTER_GOLD && !EDITOR
     auto minidumpFlags = MiniDumpWithDataSegs | MiniDumpWithIndirectlyReferencedMemory;
 #endif
 #endif
@@ -350,7 +368,7 @@ void xrDebug::SetupExceptionHandler(const bool& dedicated)
     // XXX nitrocaster: use some other email?
     BT_SetSupportEMail("cop-crash-report@stalker-game.com");
 }
-#endif  // USE_BUG_TRAP
+#endif // USE_BUG_TRAP
 
 #ifdef USE_OWN_MINI_DUMP
 void xrDebug::SaveMiniDump(EXCEPTION_POINTERS* exPtrs)
@@ -361,7 +379,8 @@ void xrDebug::SaveMiniDump(EXCEPTION_POINTERS* exPtrs)
     sprintf(dumpPath, "%s_%s_%s.mdmp", Core.ApplicationName, Core.UserName, dateStr);
     __try
     {
-        if (FS.path_exist("$logs$")) FS.update_path(dumpPath, "$logs$", dumpPath);
+        if (FS.path_exist("$logs$"))
+            FS.update_path(dumpPath, "$logs$", dumpPath);
     }
     __except (EXCEPTION_EXECUTE_HANDLER)
     {
@@ -376,7 +395,8 @@ void xrDebug::SaveMiniDump(EXCEPTION_POINTERS* exPtrs)
 void xrDebug::FormatLastError(char* buffer, const size_t& bufferSize)
 {
     int lastErr = GetLastError();
-    if (lastErr == ERROR_SUCCESS) {
+    if (lastErr == ERROR_SUCCESS)
+    {
         *buffer = 0;
         return;
     }
@@ -392,46 +412,60 @@ LONG WINAPI xrDebug::UnhandledFilter(EXCEPTION_POINTERS* exPtrs)
 {
     string256 errMsg;
     FormatLastError(errMsg, sizeof(errMsg));
-    if (!ErrorAfterDialog && !strstr(GetCommandLine(), "-no_call_stack_assert")) {
+    if (!ErrorAfterDialog && !strstr(GetCommandLine(), "-no_call_stack_assert"))
+    {
         CONTEXT save = *exPtrs->ContextRecord;
         StackTrace.Count = BuildStackTrace(exPtrs, StackTrace.Frames, StackTrace.Capacity, StackTrace.LineCapacity);
         *exPtrs->ContextRecord = save;
-        if (shared_str_initialized) Msg("stack trace:\n");
-        if (!IsDebuggerPresent()) os_clipboard::copy_to_clipboard("stack trace:\r\n\r\n");
+        if (shared_str_initialized)
+            Msg("stack trace:\n");
+        if (!IsDebuggerPresent())
+            os_clipboard::copy_to_clipboard("stack trace:\r\n\r\n");
         string4096 buffer;
         for (size_t i = 0; i < StackTrace.Count; i++)
         {
-            if (shared_str_initialized) Log(StackTrace[i]);
+            if (shared_str_initialized)
+                Log(StackTrace[i]);
             sprintf(buffer, "%s\r\n", StackTrace[i]);
 #ifdef DEBUG
-            if (!IsDebuggerPresent()) os_clipboard::update_clipboard(buffer);
+            if (!IsDebuggerPresent())
+                os_clipboard::update_clipboard(buffer);
 #endif
         }
-        if (*errMsg) {
-            if (shared_str_initialized) Msg("\n%s", errMsg);
+        if (*errMsg)
+        {
+            if (shared_str_initialized)
+                Msg("\n%s", errMsg);
             strcat(errMsg, "\r\n");
 #ifdef DEBUG
-            if (!IsDebuggerPresent()) os_clipboard::update_clipboard(buffer);
+            if (!IsDebuggerPresent())
+                os_clipboard::update_clipboard(buffer);
 #endif
         }
     }
-    if (shared_str_initialized) FlushLog();
+    if (shared_str_initialized)
+        FlushLog();
 #ifndef USE_OWN_ERROR_MESSAGE_WINDOW
 #ifdef USE_OWN_MINI_DUMP
     SaveMiniDump(exPtrs);
 #endif
 #else
-    if (!ErrorAfterDialog) {
-        if (OnDialog) OnDialog(true);
-        MessageBox(NULL, "Fatal error occured\n\n"
-                         "Press OK to abort program execution",
+    if (!ErrorAfterDialog)
+    {
+        if (OnDialog)
+            OnDialog(true);
+        MessageBox(NULL,
+            "Fatal error occured\n\n"
+            "Press OK to abort program execution",
             "Fatal error", MB_OK | MB_ICONERROR | MB_SYSTEMMODAL);
     }
 #endif
     ReportFault(exPtrs, 0);
-    if (PrevFilter) PrevFilter(exPtrs);
+    if (PrevFilter)
+        PrevFilter(exPtrs);
 #ifdef USE_OWN_ERROR_MESSAGE_WINDOW
-    if (OnDialog) OnDialog(false);
+    if (OnDialog)
+        OnDialog(false);
 #endif
     return EXCEPTION_CONTINUE_SEARCH;
 }
@@ -439,14 +473,15 @@ LONG WINAPI xrDebug::UnhandledFilter(EXCEPTION_POINTERS* exPtrs)
 #ifndef USE_BUG_TRAP
 void _terminate()
 {
-    if (strstr(GetCommandLine(), "-silent_error_mode")) exit(-1);
+    if (strstr(GetCommandLine(), "-silent_error_mode"))
+        exit(-1);
     string4096 assertionInfo;
     xrDebug::GatherInfo(assertionInfo, DEBUG_INFO, nullptr, "Unexpected application termination");
     strcat(assertionInfo, "Press OK to abort execution\r\n");
     MessageBox(GetTopWindow(NULL), assertionInfo, "Fatal Error", MB_OK | MB_ICONERROR | MB_SYSTEMMODAL);
     exit(-1);
 }
-#endif  // USE_BUG_TRAP
+#endif // USE_BUG_TRAP
 
 static void handler_base(const char* reason)
 {
@@ -480,38 +515,15 @@ static void invalid_parameter_handler(
     xrDebug::Fail(ignoreAlways, {mbFile, int(line), mbFunction}, mbExpression, "invalid parameter");
 }
 
-static void pure_call_handler()
-{
-    handler_base("pure virtual function call");
-}
-
+static void pure_call_handler() { handler_base("pure virtual function call"); }
 #ifdef XRAY_USE_EXCEPTIONS
-static void unexpected_handler()
-{
-    handler_base("unexpected program termination");
-}
+static void unexpected_handler() { handler_base("unexpected program termination"); }
 #endif
 
-static void abort_handler(int signal)
-{
-    handler_base("application is aborting");
-}
-
-static void floating_point_handler(int signal)
-{
-    handler_base("floating point error");
-}
-
-static void illegal_instruction_handler(int signal)
-{
-    handler_base("illegal instruction");
-}
-
-static void termination_handler(int signal)
-{
-    handler_base("termination with exit code 3");
-}
-
+static void abort_handler(int signal) { handler_base("application is aborting"); }
+static void floating_point_handler(int signal) { handler_base("floating point error"); }
+static void illegal_instruction_handler(int signal) { handler_base("illegal instruction"); }
+static void termination_handler(int signal) { handler_base("termination with exit code 3"); }
 void xrDebug::OnThreadSpawn()
 {
 #ifdef USE_BUG_TRAP
@@ -530,7 +542,7 @@ void xrDebug::OnThreadSpawn()
     _set_new_mode(1);
     _set_new_handler(&out_of_memory_handler);
     _set_purecall_handler(&pure_call_handler);
-#if 0  // should be if we use exceptions
+#if 0 // should be if we use exceptions
     std::set_unexpected(_terminate);
 #endif
 }

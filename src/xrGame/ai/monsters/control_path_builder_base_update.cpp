@@ -24,11 +24,14 @@ void CControlPathBuilderBase::update_target_point()
 {
     m_reset_actuality = false;
 
-    if (!m_enable) return;
-    if (m_path_type != MovementManager::ePathTypeLevelPath) return;
+    if (!m_enable)
+        return;
+    if (m_path_type != MovementManager::ePathTypeLevelPath)
+        return;
 
     // проверить условия, когда путь строить не нужно
-    if (!target_point_need_update()) return;
+    if (!target_point_need_update())
+        return;
 
     STarget saved_target;
     saved_target.set(m_target_found.position(), m_target_found.node());
@@ -41,7 +44,8 @@ void CControlPathBuilderBase::update_target_point()
 
     //-----------------------------------------------------------------------
     // postprocess target_point
-    if (m_target_found.node() == saved_target.node()) {
+    if (m_target_found.node() == saved_target.node())
+    {
         // level_path останется актуальным - сбросить актуальность
         m_reset_actuality = true;
     }
@@ -57,7 +61,8 @@ void CControlPathBuilderBase::update_target_point()
 void CControlPathBuilderBase::set_path_builder_params()
 {
     SControlPathBuilderData* ctrl_data = (SControlPathBuilderData*)m_man->data(this, ControlCom::eControlPath);
-    if (!ctrl_data) return;
+    if (!ctrl_data)
+        return;
 
     ctrl_data->use_dest_orientation = m_use_dest_orient;
     ctrl_data->dest_orientation = m_dest_dir;
@@ -80,7 +85,8 @@ void CControlPathBuilderBase::update_path_builder_state()
     m_state = eStatePathValid;
 
     // нет пути
-    if (m_man->path_builder().detail().path().empty()) {
+    if (m_man->path_builder().detail().path().empty())
+    {
         m_state = eStateNoPath;
     }
     // проверка на конец пути
@@ -97,7 +103,8 @@ void CControlPathBuilderBase::update_path_builder_state()
         m_state |= eStateWaitNewPath;
     }
 
-    if (m_failed) {
+    if (m_failed)
+    {
         // set
         m_state |= eStatePathFailed;
         // clear

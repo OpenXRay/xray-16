@@ -40,16 +40,21 @@ IC float getLastRP_Scale(CDB::COLLIDER* DB, RayCache& C)
             Level.get_tris()[rpinf.id];
             b_rc_face& F = g_rc_faces[rpinf.id];
 
-            if (F.dwMaterial >= g_materials.size()) Msg("[%d] -> [%d]", F.dwMaterial, g_materials.size());
+            if (F.dwMaterial >= g_materials.size())
+                Msg("[%d] -> [%d]", F.dwMaterial, g_materials.size());
             b_material& M = g_materials[F.dwMaterial];
             b_texture& T = g_textures[M.surfidx];
             Shader_xrLCVec& LIB = g_shaders_xrlc->Library();
-            if (M.shader_xrlc >= LIB.size()) return 0;  //. hack
+            if (M.shader_xrlc >= LIB.size())
+                return 0; //. hack
             Shader_xrLC& SH = LIB[M.shader_xrlc];
-            if (!SH.flags.bLIGHT_CastShadow) continue;
+            if (!SH.flags.bLIGHT_CastShadow)
+                continue;
 
-            if (0 == T.pSurface) T.bHasAlpha = FALSE;
-            if (!T.bHasAlpha) {
+            if (0 == T.pSurface)
+                T.bHasAlpha = FALSE;
+            if (!T.bHasAlpha)
+            {
                 // Opaque poly - cache it
                 C[0].set(rpinf.verts[0]);
                 C[1].set(rpinf.verts[1]);
@@ -70,9 +75,11 @@ IC float getLastRP_Scale(CDB::COLLIDER* DB, RayCache& C)
             int U = iFloor(uv.x * float(T.dwWidth) + .5f);
             int V = iFloor(uv.y * float(T.dwHeight) + .5f);
             U %= T.dwWidth;
-            if (U < 0) U += T.dwWidth;
+            if (U < 0)
+                U += T.dwWidth;
             V %= T.dwHeight;
-            if (V < 0) V += T.dwHeight;
+            if (V < 0)
+                V += T.dwHeight;
 
             u32 pixel = T.pSurface[V * T.dwWidth + U];
             u32 pixel_a = color_get_A(pixel);
@@ -95,15 +102,18 @@ IC float rayTrace(CDB::COLLIDER* DB, Fvector& P, Fvector& D, float R, RayCache& 
     // 1. Check cached polygon
     float _u, _v, range;
     bool res = CDB::TestRayTri(P, D, C, _u, _v, range, false);
-    if (res) {
-        if (range > 0 && range < R) return 0;
+    if (res)
+    {
+        if (range > 0 && range < R)
+            return 0;
     }
 
     // 2. Polygon doesn't pick - real database query
     DB->ray_query(&Level, P, D, R);
 
     // 3. Analyze polygons and cache nearest if possible
-    if (0 == DB->r_count()) {
+    if (0 == DB->r_count())
+    {
         return 1;
     }
     else
@@ -121,9 +131,11 @@ IC int calcSphereSector(Fvector& dir)
     flat.norm();
 
     // analyze
-    if (_abs(flat.x) > _abs(flat.y)) {
+    if (_abs(flat.x) > _abs(flat.y))
+    {
         // sector 0,7,3,4
-        if (flat.x < 0) {
+        if (flat.x < 0)
+        {
             // sector 3,4
             if (flat.y > 0)
                 return 3;
@@ -142,7 +154,8 @@ IC int calcSphereSector(Fvector& dir)
     else
     {
         // sector 1,2,6,5
-        if (flat.x < 0) {
+        if (flat.x < 0)
+        {
             // sector 2,5
             if (flat.y > 0)
                 return 2;
@@ -187,15 +200,19 @@ public:
 
     IC void Perform(u32 ID)
     {
-        if (ID == InvalidNode) return;
-        if (ID >= q_Marks.size()) return;
-        if (q_Marks[ID]) return;
+        if (ID == InvalidNode)
+            return;
+        if (ID >= q_Marks.size())
+            return;
+        if (q_Marks[ID])
+            return;
 
         q_Marks[ID] = true;
         q_Clear.push_back(ID);
 
         vertex& N = g_nodes[ID];
-        if (q_Base.distance_to_sqr(N.Pos) > cover_sqr_dist) return;
+        if (q_Base.distance_to_sqr(N.Pos) > cover_sqr_dist)
+            return;
 
         // ok
         q_List.push_back(ID);
@@ -252,7 +269,8 @@ public:
             // calc dir & range
             u32 ID = *it;
             R_ASSERT(ID < g_nodes.size());
-            if (N == ID) continue;
+            if (N == ID)
+                continue;
             vertex& N = g_nodes[ID];
             Fvector& Pos = N.Pos;
             Fvector Dir;
@@ -263,7 +281,7 @@ public:
             // raytrace
             int sector = calcSphereSector(Dir);
             c_total[sector] += 1.f;
-            c_passed[sector] += rayTrace(&DB, TestPos, Dir, range, cache[ID].C);  //
+            c_passed[sector] += rayTrace(&DB, TestPos, Dir, range, cache[ID].C); //
         }
         Q.Clear();
 
@@ -279,18 +297,19 @@ public:
             clamp(value[dirs], 0.f, 1.f);
         }
 
-        if (value[0] < .999f) {
+        if (value[0] < .999f)
+        {
             value[0] = value[0];
         }
 
         cover[0] = (value[2] + value[3] + value[4] + value[5]) / 4.f;
-        clamp(cover[0], 0.f, 1.f);  // left
+        clamp(cover[0], 0.f, 1.f); // left
         cover[1] = (value[0] + value[1] + value[2] + value[3]) / 4.f;
-        clamp(cover[1], 0.f, 1.f);  // forward
+        clamp(cover[1], 0.f, 1.f); // forward
         cover[2] = (value[6] + value[7] + value[0] + value[1]) / 4.f;
-        clamp(cover[2], 0.f, 1.f);  // right
+        clamp(cover[2], 0.f, 1.f); // right
         cover[3] = (value[4] + value[5] + value[6] + value[7]) / 4.f;
-        clamp(cover[3], 0.f, 1.f);  // back
+        clamp(cover[3], 0.f, 1.f); // back
     }
 
     virtual void Execute()
@@ -314,7 +333,8 @@ public:
             thProgress = float(N - Nstart) / float(Nend - Nstart);
             vertex& BaseNode = g_nodes[N];
 
-            if (!g_cover_nodes[N]) {
+            if (!g_cover_nodes[N])
+            {
                 BaseNode.high_cover[0] = flt_max;
                 BaseNode.high_cover[1] = flt_max;
                 BaseNode.high_cover[2] = flt_max;
@@ -332,11 +352,7 @@ public:
     }
 };
 
-bool valid_vertex_id(const u32& vertex_id)
-{
-    return (vertex_id != InvalidNode);
-}
-
+bool valid_vertex_id(const u32& vertex_id) { return (vertex_id != InvalidNode); }
 bool cover(const vertex& v, u32 index0, u32 index1)
 {
     return (valid_vertex_id(v.n[index0]) && valid_vertex_id(g_nodes[v.n[index0]].n[index1]));
@@ -351,7 +367,7 @@ bool critical_point(const vertex& v, u32 index, u32 index0, u32 index1)
 bool is_cover(const vertex& v)
 {
     return (critical_point(v, 0, 1, 3) || critical_point(v, 2, 1, 3) || critical_point(v, 1, 0, 2) ||
-            critical_point(v, 3, 0, 2));
+        critical_point(v, 3, 0, 2));
 }
 
 extern float CalculateHeight(Fbox& BB);
@@ -370,7 +386,8 @@ void compute_cover_nodes()
     COVER_NODES::iterator J = g_cover_nodes.begin();
     for (; I != E; ++I, ++J)
     {
-        if (!is_cover(*I)) continue;
+        if (!is_cover(*I))
+            continue;
 
         *J = true;
         g_covers->insert(new CCoverPoint((*I).Pos, u32(I - B)));
@@ -399,20 +416,24 @@ bool vertex_in_direction(const u32& start_vertex_id, const u32& target_vertex_id
         for (int I = 0, E = 4; I != E; ++I)
         {
             u32 next_vertex_id = g_nodes[cur_vertex_id].n[I];
-            if ((next_vertex_id == prev_vertex_id) || !valid_vertex_id(next_vertex_id)) continue;
+            if ((next_vertex_id == prev_vertex_id) || !valid_vertex_id(next_vertex_id))
+                continue;
 
             const Fvector& position = g_nodes[next_vertex_id].Pos;
             temp = Fvector2().set(position.x, position.z);
             box.min = box.max = temp;
             box.grow(identity);
-            if (box.pick_exact(start, dir)) {
-                if (next_vertex_id == target_vertex_id) return (true);
+            if (box.pick_exact(start, dir))
+            {
+                if (next_vertex_id == target_vertex_id)
+                    return (true);
 
                 Fvector2 temp;
                 temp.add(box.min, box.max);
                 temp.mul(.5f);
                 float dist = _sqr(temp.x - dest.x) + _sqr(temp.y - dest.y);
-                if (dist > cur_sqr) continue;
+                if (dist > cur_sqr)
+                    continue;
 
                 cur_sqr = dist;
                 found = true;
@@ -422,7 +443,8 @@ bool vertex_in_direction(const u32& start_vertex_id, const u32& target_vertex_id
             }
         }
 
-        if (!found) return (false);
+        if (!found)
+            return (false);
     }
 }
 
@@ -447,9 +469,11 @@ void compute_non_covers()
         COVER_NODES::iterator J = g_cover_nodes.begin();
         for (; I != E; ++I, ++J)
         {
-            if (!*J) continue;
+            if (!*J)
+                continue;
 
-            if (((*I).high_cover[0] + (*I).high_cover[1] + (*I).high_cover[2] + (*I).high_cover[3]) >= 4 * .999f) {
+            if (((*I).high_cover[0] + (*I).high_cover[1] + (*I).high_cover[2] + (*I).high_cover[3]) >= 4 * .999f)
+            {
                 if (((*I).low_cover[0] + (*I).low_cover[1] + (*I).low_cover[2] + (*I).low_cover[3]) >= 4 * .999f)
                     continue;
             }
@@ -469,10 +493,12 @@ void compute_non_covers()
     COVER_NODES::iterator J = g_cover_nodes.begin();
     for (; I != E; ++I, ++J)
     {
-        if (*J) continue;
+        if (*J)
+            continue;
 
         g_covers->nearest((*I).Pos, cover_distance, nearest);
-        if (nearest.empty()) {
+        if (nearest.empty())
+        {
             for (int i = 0; i < 4; ++i)
             {
                 VERIFY((*I).high_cover[i] == flt_max);
@@ -493,7 +519,8 @@ void compute_non_covers()
             COVERS::const_iterator e = nearest.end();
             for (; i != e; ++i)
             {
-                if (!vertex_in_direction(u32(I - B), (*i)->level_vertex_id())) continue;
+                if (!vertex_in_direction(u32(I - B), (*i)->level_vertex_id()))
+                    continue;
 
                 float weight = 1.f / (*i)->position().distance_to((*I).Pos);
                 cumulative_weight += weight;
@@ -502,7 +529,8 @@ void compute_non_covers()
         }
 
         // this is incorrect
-        if (cover_pairs.empty()) {
+        if (cover_pairs.empty())
+        {
             for (int i = 0; i < 4; ++i)
             {
                 VERIFY((*I).high_cover[i] == flt_max);
@@ -566,7 +594,8 @@ void xrCover(bool pure_covers)
     Threads.wait();
     Msg("%d seconds elapsed.", (timeGetTime() - start_time) / 1000);
 
-    if (!pure_covers) {
+    if (!pure_covers)
+    {
         compute_non_covers();
 
         COVERS nearest;
@@ -594,7 +623,8 @@ void xrCover(bool pure_covers)
 
             for (int nid = 0; nid < 4; nid++)
             {
-                if (Base.n[nid] != InvalidNode) {
+                if (Base.n[nid] != InvalidNode)
+                {
                     val += Old[Base.n[nid]].high_cover[dir];
                     val2 += Old[Base.n[nid]].low_cover[dir];
                     cnt += 1.f;

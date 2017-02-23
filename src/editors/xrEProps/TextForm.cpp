@@ -61,8 +61,10 @@ void __fastcall TfrmText::ebCancelClick(TObject* Sender)
 
 void __fastcall TfrmText::ebApplyClick(TObject* Sender)
 {
-    if (!OnApplyClick.empty()) {
-        if (OnApplyClick(mmText->Text.c_str())) *m_Text = mmText->Text;
+    if (!OnApplyClick.empty())
+    {
+        if (OnApplyClick(mmText->Text.c_str()))
+            *m_Text = mmText->Text;
     }
     else
     {
@@ -122,14 +124,12 @@ void TfrmText::SetText(AnsiString& text)
 
 void __fastcall TfrmText::DestroyForm(TfrmText* form)
 {
-    if (form) form->Close();
+    if (form)
+        form->Close();
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TfrmText::mmTextChange(TObject* Sender)
-{
-    ebOk->Enabled = mmText->Modified;
-}
+void __fastcall TfrmText::mmTextChange(TObject* Sender) { ebOk->Enabled = mmText->Modified; }
 //---------------------------------------------------------------------------
 
 void __fastcall TfrmText::FormClose(TObject* Sender, TCloseAction& Action)
@@ -141,7 +141,8 @@ void __fastcall TfrmText::FormClose(TObject* Sender, TCloseAction& Action)
 void __fastcall TfrmText::ebLoadClick(TObject* Sender)
 {
     xr_string fn;
-    if (EFS.GetOpenName(_import_, fn, false, NULL, 2)) {
+    if (EFS.GetOpenName(_import_, fn, false, NULL, 2))
+    {
         xr_string buf;
         IReader* F = FS.r_open(fn.c_str());
         F->r_stringZ(buf);
@@ -155,17 +156,20 @@ void __fastcall TfrmText::ebLoadClick(TObject* Sender)
 void __fastcall TfrmText::ebSaveClick(TObject* Sender)
 {
     xr_string fn;
-    if (EFS.GetSaveName(_import_, fn, NULL, 2)) {
+    if (EFS.GetSaveName(_import_, fn, NULL, 2))
+    {
         CMemoryWriter F;
         F.w_stringZ(mmText->Text.c_str());
-        if (!F.save_to(fn.c_str())) Log("!Can't save text file:", fn.c_str());
+        if (!F.save_to(fn.c_str()))
+            Log("!Can't save text file:", fn.c_str());
     }
 }
 //---------------------------------------------------------------------------
 
 void __fastcall TfrmText::FormCloseQuery(TObject* Sender, bool& CanClose)
 {
-    if (!OnCloseClick.empty()) CanClose = OnCloseClick();
+    if (!OnCloseClick.empty())
+        CanClose = OnCloseClick();
 }
 //---------------------------------------------------------------------------
 
@@ -178,12 +182,14 @@ void TfrmText::OutLineNumber()
 
 void __fastcall TfrmText::mmTextKeyUp(TObject* Sender, WORD& Key, TShiftState Shift)
 {
-    if ((Key == VK_SPACE) && (Shift.Contains(ssCtrl)) && (Shift.Contains(ssShift)) && !OnCodeInsight.empty()) {
+    if ((Key == VK_SPACE) && (Shift.Contains(ssCtrl)) && (Shift.Contains(ssShift)) && !OnCodeInsight.empty())
+    {
         AnsiString src_line, hint;
         src_line = mmText->Lines->Strings[mmText->CaretPos.y];
         bool result = true;
         OnCodeInsight(src_line, hint, result);
-        if (result) {
+        if (result)
+        {
             sbStatusPanel->Panels->Items[1]->Text = AnsiString("Hint: ") + hint;
             sbStatusPanel->Hint = hint;
         }
@@ -202,16 +208,14 @@ void __fastcall TfrmText::mmTextKeyUp(TObject* Sender, WORD& Key, TShiftState Sh
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TfrmText::ebClearClick(TObject* Sender)
-{
-    mmText->Clear();
-}
+void __fastcall TfrmText::ebClearClick(TObject* Sender) { mmText->Clear(); }
 //---------------------------------------------------------------------------
 
 void TfrmText::InsertTextCP(const AnsiString& line, bool bCommas)
 {
     AnsiString txt = (bCommas) ? AnsiString("\"") + line + AnsiString("\"") : line;
-    if (!txt.IsEmpty()) {
+    if (!txt.IsEmpty())
+    {
         AnsiString h = mmText->Lines->Strings[mmText->CaretPos.y];
         h.Insert(txt, mmText->CaretPos.x + 1);
         mmText->Lines->Strings[mmText->CaretPos.y] = h;
@@ -221,24 +225,16 @@ void TfrmText::InsertTextCP(const AnsiString& line, bool bCommas)
 
 void TfrmText::InsertLine(const AnsiString& line)
 {
-    if (!line.IsEmpty()) mmText->Lines->Insert(mmText->CaretPos.y, line);
+    if (!line.IsEmpty())
+        mmText->Lines->Insert(mmText->CaretPos.y, line);
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TfrmText::tmIdleTimer(TObject* Sender)
-{
-    OutLineNumber();
-}
+void __fastcall TfrmText::tmIdleTimer(TObject* Sender) { OutLineNumber(); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfrmText::FormActivate(TObject* Sender)
-{
-    tmIdle->Enabled = true;
-}
+void __fastcall TfrmText::FormActivate(TObject* Sender) { tmIdle->Enabled = true; }
 //---------------------------------------------------------------------------
 
-void __fastcall TfrmText::FormDeactivate(TObject* Sender)
-{
-    tmIdle->Enabled = false;
-}
+void __fastcall TfrmText::FormDeactivate(TObject* Sender) { tmIdle->Enabled = false; }
 //---------------------------------------------------------------------------

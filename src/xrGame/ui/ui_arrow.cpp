@@ -14,10 +14,7 @@ UI_Arrow::UI_Arrow()
     m_pos = 0.0f;
 }
 
-UI_Arrow::~UI_Arrow()
-{
-}
-
+UI_Arrow::~UI_Arrow() {}
 void UI_Arrow::init_from_xml(CUIXml& xml, LPCSTR path, CUIWindow* parent)
 {
     // m_arrow             = UIHelper::CreateStatic( xml, "arrow", this );
@@ -29,7 +26,8 @@ void UI_Arrow::init_from_xml(CUIXml& xml, LPCSTR path, CUIWindow* parent)
     m_angle_end = xml.ReadAttribFlt(path, 0, "end_angle", PI_MUL_2);
     m_ang_velocity = xml.ReadAttribFlt(path, 0, "ang_velocity", 1.0f);
     bool arrow_clockwise = (xml.ReadAttribInt(path, 0, "clockwise", 1) == 1) ? true : false;
-    if (arrow_clockwise) {
+    if (arrow_clockwise)
+    {
         m_angle_range = -_abs(m_angle_end - m_angle_begin);
     }
     else
@@ -41,7 +39,8 @@ void UI_Arrow::init_from_xml(CUIXml& xml, LPCSTR path, CUIWindow* parent)
 void UI_Arrow::SetNewValue(float new_value)
 {
     clamp(new_value, 0.0f, 1.0f);
-    if (fsimilar(m_pos, m_temp_pos)) {
+    if (fsimilar(m_pos, m_temp_pos))
+    {
         m_temp_pos = m_pos + 1.05f * (new_value - m_pos);
         clamp(m_temp_pos, 0.0f, 1.0f);
     }
@@ -54,7 +53,7 @@ void UI_Arrow::SetNewValue(float new_value)
         val *= (dif > 0.0f) ? +1.0f : -1.0f;
         m_pos += val;
     }
-    clamp(m_pos, 0.0f, 1.0f);  // min = 0,  max = 1
+    clamp(m_pos, 0.0f, 1.0f); // min = 0,  max = 1
     SetPos(m_pos);
 }
 

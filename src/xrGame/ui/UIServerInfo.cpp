@@ -47,15 +47,8 @@ CUIServerInfo::CUIServerInfo()
     Init();
 }
 
-CUIServerInfo::~CUIServerInfo()
-{
-}
-
-void CUIServerInfo::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
-{
-    CUIWndCallback::OnEvent(pWnd, msg, pData);
-}
-
+CUIServerInfo::~CUIServerInfo() {}
+void CUIServerInfo::SendMessage(CUIWindow* pWnd, s16 msg, void* pData) { CUIWndCallback::OnEvent(pWnd, msg, pData); }
 void CUIServerInfo::Init()
 {
     CUIXml xml_doc;
@@ -100,17 +93,19 @@ void CUIServerInfo::SetServerLogo(u8 const* data_ptr, u32 const data_size)
 {
     CxMemFile tmp_memfile(const_cast<BYTE*>(data_ptr), data_size);
     CxImage tmp_image;
-    if (!tmp_image.Decode(&tmp_memfile, CXIMAGE_FORMAT_JPG)) {
+    if (!tmp_image.Decode(&tmp_memfile, CXIMAGE_FORMAT_JPG))
+    {
         Msg("! ERROR: Failed to decode server logo image as JPEG formated.");
         return;
     }
 
     IWriter* tmp_writer = FS.w_open("$game_saves$", tmp_logo_file_name);
-    if (!tmp_writer) {
+    if (!tmp_writer)
+    {
         Msg("! ERROR: failed to create temporary dds file");
         return;
     }
-    tmp_writer->w((void*)data_ptr, data_size);  // sorry :(
+    tmp_writer->w((void*)data_ptr, data_size); // sorry :(
     FS.w_close(tmp_writer);
     m_dds_file_created = true;
     m_image->InitTexture(tmp_logo_file_name);
@@ -121,7 +116,8 @@ void CUIServerInfo::SetServerRules(u8 const* data_ptr, u32 const data_size)
 {
     string4096 tmp_string;
     u32 new_size = data_size;
-    if (new_size > (sizeof(tmp_string) - 1)) new_size = (sizeof(tmp_string) - 1);
+    if (new_size > (sizeof(tmp_string) - 1))
+        new_size = (sizeof(tmp_string) - 1);
 
     strncpy_s(tmp_string, reinterpret_cast<char const*>(data_ptr), new_size);
     tmp_string[new_size] = 0;
@@ -137,7 +133,7 @@ void CUIServerInfo::SetServerRules(u8 const* data_ptr, u32 const data_size)
         tmp_iter = strstr(tmp_iter, "\r\n");
     }
 
-    m_text_body->SetText(tmp_string);  // will create shared_str
+    m_text_body->SetText(tmp_string); // will create shared_str
     m_text_body->AdjustHeightToText();
 }
 
@@ -170,6 +166,6 @@ bool CUIServerInfo::OnKeyboardAction(int dik, EUIMessages keyboard_action)
         return true;
     }
     break;
-    };  // switch (dik)
+    }; // switch (dik)
     return false;
 }

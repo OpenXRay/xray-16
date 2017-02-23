@@ -14,11 +14,7 @@ CUIMotionIcon::CUIMotionIcon()
     cur_pos = 0.f;
 }
 
-CUIMotionIcon::~CUIMotionIcon()
-{
-    g_pMotionIcon = NULL;
-}
-
+CUIMotionIcon::~CUIMotionIcon() { g_pMotionIcon = NULL; }
 void CUIMotionIcon::ResetVisibility()
 {
     m_npc_visibility.clear();
@@ -60,7 +56,8 @@ void CUIMotionIcon::Init(Frect const& zonemap_rect)
 
 void CUIMotionIcon::SetNoise(float Pos)
 {
-    if (!IsGameTypeSingle()) return;
+    if (!IsGameTypeSingle())
+        return;
 
     Pos = clampr(Pos, 0.f, 100.f);
     m_noise_progress.SetPos(Pos / 100.f);
@@ -68,25 +65,25 @@ void CUIMotionIcon::SetNoise(float Pos)
 
 void CUIMotionIcon::SetLuminosity(float Pos)
 {
-    if (!IsGameTypeSingle()) return;
+    if (!IsGameTypeSingle())
+        return;
 
     m_luminosity = Pos;
 }
 
-void CUIMotionIcon::Draw()
-{
-    inherited::Draw();
-}
-
+void CUIMotionIcon::Draw() { inherited::Draw(); }
 void CUIMotionIcon::Update()
 {
-    if (!IsGameTypeSingle()) {
+    if (!IsGameTypeSingle())
+    {
         inherited::Update();
         return;
     }
-    if (m_bchanged) {
+    if (m_bchanged)
+    {
         m_bchanged = false;
-        if (m_npc_visibility.size()) {
+        if (m_npc_visibility.size())
+        {
             std::sort(m_npc_visibility.begin(), m_npc_visibility.end());
             SetLuminosity(m_npc_visibility.back().value);
         }
@@ -96,9 +93,11 @@ void CUIMotionIcon::Update()
     inherited::Update();
 
     // m_luminosity_progress
-    if (cur_pos != m_luminosity) {
+    if (cur_pos != m_luminosity)
+    {
         float _diff = _abs(m_luminosity - cur_pos);
-        if (m_luminosity > cur_pos) {
+        if (m_luminosity > cur_pos)
+        {
             cur_pos += _diff * Device.fTimeDelta;
         }
         else
@@ -112,9 +111,11 @@ void CUIMotionIcon::Update()
 
 void SetActorVisibility(u16 who_id, float value)
 {
-    if (!IsGameTypeSingle()) return;
+    if (!IsGameTypeSingle())
+        return;
 
-    if (g_pMotionIcon) g_pMotionIcon->SetActorVisibility(who_id, value);
+    if (g_pMotionIcon)
+        g_pMotionIcon->SetActorVisibility(who_id, value);
 }
 
 void CUIMotionIcon::SetActorVisibility(u16 who_id, float value)
@@ -124,7 +125,8 @@ void CUIMotionIcon::SetActorVisibility(u16 who_id, float value)
 
     xr_vector<_npc_visibility>::iterator it = std::find(m_npc_visibility.begin(), m_npc_visibility.end(), who_id);
 
-    if (it == m_npc_visibility.end() && value != 0) {
+    if (it == m_npc_visibility.end() && value != 0)
+    {
         m_npc_visibility.resize(m_npc_visibility.size() + 1);
         _npc_visibility& v = m_npc_visibility.back();
         v.id = who_id;
@@ -132,7 +134,8 @@ void CUIMotionIcon::SetActorVisibility(u16 who_id, float value)
     }
     else if (fis_zero(value))
     {
-        if (it != m_npc_visibility.end()) m_npc_visibility.erase(it);
+        if (it != m_npc_visibility.end())
+            m_npc_visibility.erase(it);
     }
     else
     {

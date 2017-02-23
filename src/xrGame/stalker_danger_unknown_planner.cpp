@@ -42,16 +42,8 @@ void CStalkerDangerUnknownPlanner::initialize()
     CScriptActionPlanner::m_storage.set_property(eWorldPropertyLookedAround, false);
 }
 
-void CStalkerDangerUnknownPlanner::update()
-{
-    inherited::update();
-}
-
-void CStalkerDangerUnknownPlanner::finalize()
-{
-    inherited::finalize();
-}
-
+void CStalkerDangerUnknownPlanner::update() { inherited::update(); }
+void CStalkerDangerUnknownPlanner::finalize() { inherited::finalize(); }
 void CStalkerDangerUnknownPlanner::add_evaluators()
 {
     add_evaluator(eWorldPropertyDanger, new CStalkerPropertyEvaluatorDangers(m_object, "danger"));

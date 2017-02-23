@@ -13,7 +13,7 @@
 #include "common/object_broker.h"
 #include "Include/xrAPI/xrAPI.h"
 
-string4096 g_ca_stdout;  // XXX: allocate dynamically for each CScriptEngine instance
+string4096 g_ca_stdout; // XXX: allocate dynamically for each CScriptEngine instance
 
 CScriptProcess::CScriptProcess(CScriptEngine* scriptEngine, shared_str name, shared_str scripts)
 {
@@ -28,11 +28,7 @@ CScriptProcess::CScriptProcess(CScriptEngine* scriptEngine, shared_str name, sha
     m_iterator = 0;
 }
 
-CScriptProcess::~CScriptProcess()
-{
-    delete_data(m_scripts);
-}
-
+CScriptProcess::~CScriptProcess() { delete_data(m_scripts); }
 void CScriptProcess::run_scripts()
 {
     LPSTR S;
@@ -64,16 +60,19 @@ void CScriptProcess::update()
     return;
 #else
     run_scripts();
-    if (m_scripts.empty()) return;
+    if (m_scripts.empty())
+        return;
     // update script
     g_ca_stdout[0] = 0;
     u32 _id = ++m_iterator % m_scripts.size();
-    if (!m_scripts[_id]->update()) {
+    if (!m_scripts[_id]->update())
+    {
         xr_delete(m_scripts[_id]);
         m_scripts.erase(m_scripts.begin() + _id);
-        --m_iterator;  // try to avoid skipping
+        --m_iterator; // try to avoid skipping
     }
-    if (g_ca_stdout[0]) {
+    if (g_ca_stdout[0])
+    {
         fputc(0, stderr);
         scriptEngine->script_log(LuaMessageType::Info, "%s", g_ca_stdout);
         fflush(stderr);

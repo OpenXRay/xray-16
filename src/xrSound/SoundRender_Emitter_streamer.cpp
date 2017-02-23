@@ -52,7 +52,8 @@ void CSoundRender_Emitter::fill_data(u8* _dest, u32 offset, u32 size)
     while (size)
     {
         // cache access
-        if (SoundRender->cache.request(source()->CAT, line)) {
+        if (SoundRender->cache.request(source()->CAT, line))
+        {
             source()->decompress(line, target->get_data());
         }
 
@@ -77,13 +78,15 @@ void CSoundRender_Emitter::fill_block(void* ptr, u32 size)
     LPBYTE dest = LPBYTE(ptr);
     u32 dwBytesTotal = get_bytes_total();
 
-    if ((get_cursor(true) + size) > dwBytesTotal) {
+    if ((get_cursor(true) + size) > dwBytesTotal)
+    {
         // We are reaching the end of data, what to do?
         switch (m_current_state)
         {
         case stPlaying:
-        {  // Fill as much data as we can, zeroing remainder
-            if (get_cursor(true) >= dwBytesTotal) {
+        { // Fill as much data as we can, zeroing remainder
+            if (get_cursor(true) >= dwBytesTotal)
+            {
                 // ??? We requested the block after remainder - just zero
                 memset(dest, 0, size);
             }
@@ -119,22 +122,24 @@ void CSoundRender_Emitter::fill_block(void* ptr, u32 size)
     else
     {
         u32 bt_handle = ((CSoundRender_Source*)owner_data->handle)->dwBytesTotal;
-        if (get_cursor(true) + size > m_cur_handle_cursor + bt_handle) {
+        if (get_cursor(true) + size > m_cur_handle_cursor + bt_handle)
+        {
             R_ASSERT(owner_data->fn_attached[0].size());
 
             u32 rem = 0;
-            if ((m_cur_handle_cursor + bt_handle) > get_cursor(true)) {
+            if ((m_cur_handle_cursor + bt_handle) > get_cursor(true))
+            {
                 rem = (m_cur_handle_cursor + bt_handle) - get_cursor(true);
 
 #ifdef DEBUG
                 Msg("reminder from prev source %d", rem);
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
                 fill_data(dest, get_cursor(false), rem);
                 move_cursor(rem);
             }
 #ifdef DEBUG
             Msg("recurce from next source %d", size - rem);
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
             fill_block(dest + rem, size - rem);
         }
         else

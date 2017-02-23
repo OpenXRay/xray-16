@@ -13,7 +13,7 @@ class server_info_uploader : Noncopyable
     {
         eUploadNotActive = 0x00,
         eUploadingInfo
-    };  // enum ESvInfoUploadState
+    }; // enum ESvInfoUploadState
     ESvInfoUploadState m_state;
     u8* m_logo_data;
     u32 m_logo_size;
@@ -36,6 +36,6 @@ public:
     void start_upload_info(IReader const* svlogo, IReader const* svrules, ClientID const& toclient,
         svinfo_upload_complete_cb const& complete_cb);
     void __stdcall upload_server_info_callback(file_transfer::sending_status_t status, u32 uploaded, u32 total);
-};  // class server_info_uploader
+}; // class server_info_uploader
 
-#endif  //#ifndef SERVER_INFO_UPLOADER
+#endif //#ifndef SERVER_INFO_UPLOADER

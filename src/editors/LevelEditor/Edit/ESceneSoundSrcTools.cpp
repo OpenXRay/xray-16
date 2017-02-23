@@ -5,18 +5,10 @@
 #include "UI_LevelTools.h"
 #include "ESound_Source.h"
 
-void ESceneSoundSrcTool::CreateControls()
-{
-    inherited::CreateDefaultControls(estDefault);
-}
-
+void ESceneSoundSrcTool::CreateControls() { inherited::CreateDefaultControls(estDefault); }
 //----------------------------------------------------
 
-void ESceneSoundSrcTool::RemoveControls()
-{
-    inherited::RemoveControls();
-}
-
+void ESceneSoundSrcTool::RemoveControls() { inherited::RemoveControls(); }
 //----------------------------------------------------
 
 CCustomObject* ESceneSoundSrcTool::CreateObject(LPVOID data, LPCSTR name)

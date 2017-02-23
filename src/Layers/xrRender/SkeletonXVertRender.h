@@ -3,7 +3,7 @@
 #pragma once
 
 #pragma pack(push, 2)
-struct vertRender  // T&B are not skinned, because in R2 skinning occurs always in hardware
+struct vertRender // T&B are not skinned, because in R2 skinning occurs always in hardware
 {
     Fvector P;
     Fvector N;
@@ -11,4 +11,4 @@ struct vertRender  // T&B are not skinned, because in R2 skinning occurs always 
 };
 #pragma pack(pop)
 
-#endif  //	SkeletonXVertRender_h_included
+#endif //	SkeletonXVertRender_h_included

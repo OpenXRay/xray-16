@@ -11,7 +11,8 @@ void fix_texture_name(LPSTR fn);
 void CBlender_Compile::r_Stencil(BOOL Enable, u32 Func, u32 Mask, u32 WriteMask, u32 Fail, u32 Pass, u32 ZFail)
 {
     RS.SetRS(D3DRS_STENCILENABLE, BC(Enable));
-    if (!Enable) return;
+    if (!Enable)
+        return;
     RS.SetRS(D3DRS_STENCILFUNC, Func);
     RS.SetRS(D3DRS_STENCILMASK, Mask);
     RS.SetRS(D3DRS_STENCILWRITEMASK, WriteMask);
@@ -27,20 +28,13 @@ void CBlender_Compile::r_Stencil(BOOL Enable, u32 Func, u32 Mask, u32 WriteMask,
     RS.SetRS(D3DRS_CCW_STENCILZFAIL, ZFail);
 }
 
-void CBlender_Compile::r_StencilRef(u32 Ref)
-{
-    RS.SetRS(D3DRS_STENCILREF, Ref);
-}
-
-void CBlender_Compile::r_CullMode(D3DCULL Mode)
-{
-    RS.SetRS(D3DRS_CULLMODE, (u32)Mode);
-}
-
+void CBlender_Compile::r_StencilRef(u32 Ref) { RS.SetRS(D3DRS_STENCILREF, Ref); }
+void CBlender_Compile::r_CullMode(D3DCULL Mode) { RS.SetRS(D3DRS_CULLMODE, (u32)Mode); }
 void CBlender_Compile::r_dx10Texture(LPCSTR ResourceName, LPCSTR texture)
 {
     VERIFY(ResourceName);
-    if (!texture) return;
+    if (!texture)
+        return;
     //
     string256 TexName;
     xr_strcpy(TexName, texture);
@@ -49,7 +43,8 @@ void CBlender_Compile::r_dx10Texture(LPCSTR ResourceName, LPCSTR texture)
     // Find index
     ref_constant C = ctable.get(ResourceName);
     // VERIFY(C);
-    if (!C) return;
+    if (!C)
+        return;
 
     R_ASSERT(C->type == RC_dx10texture);
     u32 stage = C->samp.index;
@@ -60,7 +55,8 @@ void CBlender_Compile::r_dx10Texture(LPCSTR ResourceName, LPCSTR texture)
 void CBlender_Compile::i_dx10Address(u32 s, u32 address)
 {
     // VERIFY(s!=u32(-1));
-    if (s == u32(-1)) {
+    if (s == u32(-1))
+    {
         Msg("s != u32(-1)");
     }
     RS.SetSAMP(s, D3DSAMP_ADDRESSU, address);
@@ -68,10 +64,7 @@ void CBlender_Compile::i_dx10Address(u32 s, u32 address)
     RS.SetSAMP(s, D3DSAMP_ADDRESSW, address);
 }
 
-void CBlender_Compile::i_dx10BorderColor(u32 s, u32 color)
-{
-    RS.SetSAMP(s, D3DSAMP_BORDERCOLOR, color);
-}
+void CBlender_Compile::i_dx10BorderColor(u32 s, u32 color) { RS.SetSAMP(s, D3DSAMP_BORDERCOLOR, color); }
 void CBlender_Compile::i_dx10Filter_Min(u32 s, u32 f)
 {
     VERIFY(s != u32(-1));
@@ -117,7 +110,8 @@ u32 CBlender_Compile::r_dx10Sampler(LPCSTR ResourceName)
     // ref_constant C			= ctable.get(ResourceName);
     ref_constant C = ctable.get(name);
     // VERIFY(C);
-    if (!C) return u32(-1);
+    if (!C)
+        return u32(-1);
 
     R_ASSERT(C->type == RC_sampler);
     u32 stage = C->samp.index;
@@ -125,45 +119,52 @@ u32 CBlender_Compile::r_dx10Sampler(LPCSTR ResourceName)
     //	init defaults here
 
     //	Use D3DTADDRESS_CLAMP,	D3DTEXF_POINT,			D3DTEXF_NONE,	D3DTEXF_POINT
-    if (0 == xr_strcmp(ResourceName, "smp_nofilter")) {
+    if (0 == xr_strcmp(ResourceName, "smp_nofilter"))
+    {
         i_dx10Address(stage, D3DTADDRESS_CLAMP);
         i_dx10Filter(stage, D3DTEXF_POINT, D3DTEXF_NONE, D3DTEXF_POINT);
     }
 
     //	Use D3DTADDRESS_CLAMP,	D3DTEXF_LINEAR,			D3DTEXF_NONE,	D3DTEXF_LINEAR
-    if (0 == xr_strcmp(ResourceName, "smp_rtlinear")) {
+    if (0 == xr_strcmp(ResourceName, "smp_rtlinear"))
+    {
         i_dx10Address(stage, D3DTADDRESS_CLAMP);
         i_dx10Filter(stage, D3DTEXF_LINEAR, D3DTEXF_NONE, D3DTEXF_LINEAR);
     }
 
     //	Use	D3DTADDRESS_WRAP,	D3DTEXF_LINEAR,			D3DTEXF_LINEAR,	D3DTEXF_LINEAR
-    if (0 == xr_strcmp(ResourceName, "smp_linear")) {
+    if (0 == xr_strcmp(ResourceName, "smp_linear"))
+    {
         i_dx10Address(stage, D3DTADDRESS_WRAP);
         i_dx10Filter(stage, D3DTEXF_LINEAR, D3DTEXF_LINEAR, D3DTEXF_LINEAR);
     }
 
     //	Use D3DTADDRESS_WRAP,	D3DTEXF_ANISOTROPIC, 	D3DTEXF_LINEAR,	D3DTEXF_ANISOTROPIC
-    if (0 == xr_strcmp(ResourceName, "smp_base")) {
+    if (0 == xr_strcmp(ResourceName, "smp_base"))
+    {
         i_dx10Address(stage, D3DTADDRESS_WRAP);
         i_dx10FilterAnizo(stage, TRUE);
         // i_dx10Filter(stage, D3DTEXF_LINEAR, D3DTEXF_LINEAR, D3DTEXF_LINEAR);
     }
 
     //	Use D3DTADDRESS_CLAMP,	D3DTEXF_LINEAR,			D3DTEXF_NONE,	D3DTEXF_LINEAR
-    if (0 == xr_strcmp(ResourceName, "smp_material")) {
+    if (0 == xr_strcmp(ResourceName, "smp_material"))
+    {
         i_dx10Address(stage, D3DTADDRESS_CLAMP);
         i_dx10Filter(stage, D3DTEXF_LINEAR, D3DTEXF_NONE, D3DTEXF_LINEAR);
         RS.SetSAMP(stage, D3DSAMP_ADDRESSW, D3DTADDRESS_WRAP);
     }
 
-    if (0 == xr_strcmp(ResourceName, "smp_smap")) {
+    if (0 == xr_strcmp(ResourceName, "smp_smap"))
+    {
         i_dx10Address(stage, D3DTADDRESS_CLAMP);
         i_dx10Filter(stage, D3DTEXF_LINEAR, D3DTEXF_NONE, D3DTEXF_LINEAR);
         RS.SetSAMP(stage, XRDX10SAMP_COMPARISONFILTER, TRUE);
         RS.SetSAMP(stage, XRDX10SAMP_COMPARISONFUNC, D3D_COMPARISON_LESS_EQUAL);
     }
 
-    if (0 == xr_strcmp(ResourceName, "smp_jitter")) {
+    if (0 == xr_strcmp(ResourceName, "smp_jitter"))
+    {
         i_dx10Address(stage, D3DTADDRESS_WRAP);
         i_dx10Filter(stage, D3DTEXF_POINT, D3DTEXF_NONE, D3DTEXF_POINT);
     }
@@ -202,7 +203,8 @@ void CBlender_Compile::r_Pass(LPCSTR _vs, LPCSTR _gs, LPCSTR _ps, bool bFog, BOO
     ctable.merge(&gs->constants);
 
     // Last Stage - disable
-    if (0 == stricmp(_ps, "null")) {
+    if (0 == stricmp(_ps, "null"))
+    {
         RS.SetTSS(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
         RS.SetTSS(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
     }

@@ -38,8 +38,8 @@ enum EVirtualChannels
 {
     eBaseChannel = u32(1) << 7,
     eChannelIndependent =
-        u32(1) << 15,               // can be played in any time with any conditions (need shift operator for every id)
-    eCaptureAllChannels = u32(-1),  // play only this one
+        u32(1) << 15, // can be played in any time with any conditions (need shift operator for every id)
+    eCaptureAllChannels = u32(-1), // play only this one
 };
 };
 

@@ -17,7 +17,7 @@ struct new_profile_data
     shared_str email;
     shared_str password;
     // shared_str	cd_key;
-};  // struct new_account_data
+}; // struct new_account_data
 
 typedef mixed_delegate<void(bool, char const*), account_operation_cb_tag> account_operation_cb;
 
@@ -62,10 +62,8 @@ public:
     bool verify_email(char const* email);
     bool verify_password(char const* pass);
     char const* get_verify_error_descr() const { return m_verifyer_error.c_str(); }
-
     profiles_nicks_ptrs_t const& get_found_profiles() const { return m_result_profiles_ptrs; };
     suggested_nicks_ptrs_t const& get_suggested_unicks() const { return m_suggested_nicks_ptrs; };
-
 private:
     CGameSpy_GP* m_gamespy_gp;
     account_operation_cb m_account_creation_cb;
@@ -127,8 +125,8 @@ private:
     /*static void __cdecl			profiles_cb		(GPConnection * connection,
                                                  void * arg,
                                                  void * param);*/
-};  // class account_manager
-}  // namespace gamespy_gp
+}; // class account_manager
+} // namespace gamespy_gp
 
 typedef gamespy_gp::account_manager gamespy_gp_account_manager;
 typedef gamespy_gp::suggest_nicks_cb gamespy_gp_suggest_nicks_cb;
@@ -136,4 +134,4 @@ typedef gamespy_gp::account_operation_cb gamespy_gp_account_operation_cb;
 typedef gamespy_gp::account_profiles_cb gamespy_gp_account_profiles_cb;
 typedef gamespy_gp::found_email_cb gamespy_gp_found_email_cb;
 
-#endif  //#ifndef ACCOUNT_MANAGER
+#endif //#ifndef ACCOUNT_MANAGER

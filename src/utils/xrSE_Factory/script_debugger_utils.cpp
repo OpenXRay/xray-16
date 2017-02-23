@@ -7,26 +7,10 @@
 #	include <errno.h>
 #endif*/
 
-xr_event::xr_event(bool broadcast, bool signalled)
-{
-    m_event = CreateEvent(0, broadcast, signalled, 0);
-}
-
-xr_event::~xr_event()
-{
-    CloseHandle(m_event);
-}
-
-bool xr_event::signal()
-{
-    return SetEvent(m_event) != 0;
-}
-
-bool xr_event::reset()
-{
-    return ResetEvent(m_event) != 0;
-}
-
+xr_event::xr_event(bool broadcast, bool signalled) { m_event = CreateEvent(0, broadcast, signalled, 0); }
+xr_event::~xr_event() { CloseHandle(m_event); }
+bool xr_event::signal() { return SetEvent(m_event) != 0; }
+bool xr_event::reset() { return ResetEvent(m_event) != 0; }
 xrEventWaitRes xr_event::wait()
 {
     if (WaitForSingleObject(m_event, INFINITE) == WAIT_OBJECT_0)
@@ -38,27 +22,17 @@ xrEventWaitRes xr_event::wait()
 xrEventWaitRes xr_event::wait(unsigned msec)
 {
     DWORD res = WaitForSingleObject(m_event, msec);
-    if (res == WAIT_OBJECT_0) return wrSignaled;
-    if (res == WAIT_TIMEOUT) return wrTimeOut;
+    if (res == WAIT_OBJECT_0)
+        return wrSignaled;
+    if (res == WAIT_TIMEOUT)
+        return wrTimeOut;
     return wrError;
 }
 ////////////////////////////////////////////////////////////
 
-xr_mutex::xr_mutex()
-{
-    InitializeCriticalSection(&m_mutex);
-}
-
-xr_mutex::~xr_mutex()
-{
-    DeleteCriticalSection(&m_mutex);
-}
-
-bool xr_mutex::trylock()
-{
-    return TryEnterCriticalSection(&m_mutex) != 0;
-}
-
+xr_mutex::xr_mutex() { InitializeCriticalSection(&m_mutex); }
+xr_mutex::~xr_mutex() { DeleteCriticalSection(&m_mutex); }
+bool xr_mutex::trylock() { return TryEnterCriticalSection(&m_mutex) != 0; }
 bool xr_mutex::lock()
 {
     EnterCriticalSection(&m_mutex);
@@ -71,16 +45,8 @@ bool xr_mutex::unlock()
     return true;
 }
 
-xr_sync::xr_sync(xr_mutex& mutex) : m_mutex(mutex)
-{
-    m_mutex.lock();
-}
-
-xr_sync::~xr_sync()
-{
-    m_mutex.unlock();
-}
-
+xr_sync::xr_sync(xr_mutex& mutex) : m_mutex(mutex) { m_mutex.lock(); }
+xr_sync::~xr_sync() { m_mutex.unlock(); }
 ////////////////////////////////////////////////////////////
 DWORD __stdcall xrThreadStart(void* th)
 {
@@ -88,13 +54,11 @@ DWORD __stdcall xrThreadStart(void* th)
     return 0;
 }
 
-xr_thread::xr_thread() : m_thread(0)
-{
-}
-
+xr_thread::xr_thread() : m_thread(0) {}
 xr_thread::~xr_thread()
 {
-    if (m_thread) CloseHandle(m_thread);
+    if (m_thread)
+        CloseHandle(m_thread);
 }
 
 bool xr_thread::start()
@@ -107,52 +71,37 @@ bool xr_thread::start()
 
 bool xr_thread::kill()
 {
-    if (!m_thread) return true;
+    if (!m_thread)
+        return true;
 
     BOOL res = TRUE;
-    if (WaitForSingleObject(m_thread, 0) != WAIT_OBJECT_0) res = TerminateThread(m_thread, 0);
-    if (res) {
+    if (WaitForSingleObject(m_thread, 0) != WAIT_OBJECT_0)
+        res = TerminateThread(m_thread, 0);
+    if (res)
+    {
         CloseHandle(m_thread);
         m_thread = 0;
     }
     return res != 0;
 }
 
-bool xr_thread::join()
-{
-    return (WaitForSingleObject(m_thread, INFINITE) == WAIT_OBJECT_0);
-}
-
+bool xr_thread::join() { return (WaitForSingleObject(m_thread, INFINITE) == WAIT_OBJECT_0); }
 bool xr_thread::yield()
 {
     Sleep(0);
     return true;
 }
 
-void xr_thread::sleep(unsigned msec)
-{
-    Sleep(msec);
-}
-
+void xr_thread::sleep(unsigned msec) { Sleep(msec); }
 /*
 pid_t xr_thread::getId()
 {
     return GetCurrentThreadId();
 }*/
 
-unsigned xr_thread::getTickCount()
-{
-    return GetTickCount();
-}
-
-xr_waitableThread::xr_waitableThread() : m_event(true, true)
-{
-}
-
-xr_waitableThread::~xr_waitableThread()
-{
-}
-
+unsigned xr_thread::getTickCount() { return GetTickCount(); }
+xr_waitableThread::xr_waitableThread() : m_event(true, true) {}
+xr_waitableThread::~xr_waitableThread() {}
 bool xr_waitableThread::start()
 {
     m_event.reset();
@@ -168,7 +117,8 @@ bool xr_waitableThread::start()
 
 bool xr_waitableThread::kill()
 {
-    if (xr_thread::kill()) {
+    if (xr_thread::kill())
+    {
         m_event.signal();
         return true;
     }
@@ -176,21 +126,9 @@ bool xr_waitableThread::kill()
         return false;
 }
 
-bool xr_waitableThread::join()
-{
-    return xr_thread::join();
-}
-
-bool xr_waitableThread::join(unsigned msec)
-{
-    return m_event.wait(msec) == wrSignaled;
-}
-
-bool xr_waitableThread::yield()
-{
-    return xr_thread::yield();
-}
-
+bool xr_waitableThread::join() { return xr_thread::join(); }
+bool xr_waitableThread::join(unsigned msec) { return m_event.wait(msec) == wrSignaled; }
+bool xr_waitableThread::yield() { return xr_thread::yield(); }
 void xr_waitableThread::run()
 {
     run_w();

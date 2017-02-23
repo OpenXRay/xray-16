@@ -30,20 +30,17 @@ shared_str CGameSpy_GP::TryToTranslate(GPResult const& res)
 
 CGameSpy_GP::CGameSpy_GP()
 {
-    m_GPConnection = NULL;  // GPConnection type is: void*
+    m_GPConnection = NULL; // GPConnection type is: void*
     Init();
 }
 
-CGameSpy_GP::~CGameSpy_GP()
-{
-    ShutDown();
-}
-
+CGameSpy_GP::~CGameSpy_GP() { ShutDown(); }
 bool CGameSpy_GP::Init()
 {
     GPResult init_res = gpInitialize(&m_GPConnection, GAMESPY_PRODUCTID, GAMESPY_GP_NAMESPACE_ID, GP_PARTNERID_GAMESPY);
     VERIFY2(init_res == GP_NO_ERROR, "GameSpy GP: failed to initialize");
-    if (init_res != GP_NO_ERROR) {
+    if (init_res != GP_NO_ERROR)
+    {
         Msg("! GameSpy GP: failed to initialize, error code: %d", init_res);
         return false;
     }
@@ -53,19 +50,22 @@ bool CGameSpy_GP::Init()
 
 void CGameSpy_GP::Think()
 {
-    if (!m_GPConnection) {
+    if (!m_GPConnection)
+    {
         Msg("! GameSpy GP ERROR: GameSpy GP connection not ititialized");
         return;
     }
     GPResult process_res = gpProcess(&m_GPConnection);
-    if (process_res != GP_NO_ERROR) {
+    if (process_res != GP_NO_ERROR)
+    {
         Msg("! GameSpy GP ERROR: process failed: %d", process_res);
     }
 }
 
 void CGameSpy_GP::ShutDown()
 {
-    if (m_GPConnection) gpDestroy(&m_GPConnection);
+    if (m_GPConnection)
+        gpDestroy(&m_GPConnection);
 }
 
 GPResult CGameSpy_GP::NewUser(shared_str const& nick, shared_str const& unique_nick, shared_str const& email,
@@ -105,11 +105,7 @@ GPResult CGameSpy_GP::Connect(
         &m_GPConnection, nick.c_str(), email.c_str(), password.c_str(), GP_FIREWALL, GP_NON_BLOCKING, callback, param);
 }
 
-void CGameSpy_GP::Disconnect()
-{
-    gpDisconnect(&m_GPConnection);
-}
-
+void CGameSpy_GP::Disconnect() { gpDisconnect(&m_GPConnection); }
 GPResult CGameSpy_GP::GetLoginTicket(char loginTicket[GP_LOGIN_TICKET_LEN])
 {
     return gpGetLoginTicket(&m_GPConnection, loginTicket);
@@ -126,7 +122,8 @@ void __cdecl CGameSpy_GP::OnGameSpyErrorCb(GPConnection* connection, void* arg, 
     GPErrorArg* earg = static_cast<GPErrorArg*>(arg);
     VERIFY(earg);
     char const* error_descr = earg->errorString ? earg->errorString : "unknown";
-    if (earg->fatal) {
+    if (earg->fatal)
+    {
         Msg("! GameSpy FATAL GP ERROR: error code: %d, description: %s", earg->errorCode, error_descr);
         return;
     }

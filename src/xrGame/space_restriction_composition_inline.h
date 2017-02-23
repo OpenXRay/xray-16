@@ -16,21 +16,10 @@ IC CSpaceRestrictionComposition::CSpaceRestrictionComposition(
     m_space_restrictors = space_restrictors;
 #ifdef DEBUG
     check_restrictor_type();
-#endif  // DEBUG
+#endif // DEBUG
     ++g_restriction_checker;
 }
 
-IC shared_str CSpaceRestrictionComposition::name() const
-{
-    return (m_space_restrictors);
-}
-
-IC bool CSpaceRestrictionComposition::shape() const
-{
-    return (false);
-}
-
-IC bool CSpaceRestrictionComposition::default_restrictor() const
-{
-    return (false);
-}
+IC shared_str CSpaceRestrictionComposition::name() const { return (m_space_restrictors); }
+IC bool CSpaceRestrictionComposition::shape() const { return (false); }
+IC bool CSpaceRestrictionComposition::default_restrictor() const { return (false); }

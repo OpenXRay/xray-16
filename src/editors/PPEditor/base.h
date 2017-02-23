@@ -19,7 +19,7 @@ enum
 
 class TPPPropEditor
 {
-  public:
+public:
     virtual TForm* GetForm() = 0;
     virtual void Clear() = 0;
     virtual void ShowCurrent(u32 keyIdx) = 0;

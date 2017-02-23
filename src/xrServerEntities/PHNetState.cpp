@@ -138,29 +138,18 @@ template <typename src>
 void SPHNetState::read(src& P)
 {
     linear_vel = P.r_vec3();
-    angular_vel.set(0.f, 0.f, 0.f);  // P.r_vec3(angular_vel);
-    force.set(0.f, 0.f, 0.f);        // P.r_vec3(force);
-    torque.set(0.f, 0.f, 0.f);       // P.r_vec3(torque);
+    angular_vel.set(0.f, 0.f, 0.f); // P.r_vec3(angular_vel);
+    force.set(0.f, 0.f, 0.f); // P.r_vec3(force);
+    torque.set(0.f, 0.f, 0.f); // P.r_vec3(torque);
     position = P.r_vec3();
     *((Fvector4*)&quaternion) = P.r_vec4();
-    previous_quaternion.set(quaternion);  // P.r_vec4(*((Fvector4*)&previous_quaternion));
+    previous_quaternion.set(quaternion); // P.r_vec4(*((Fvector4*)&previous_quaternion));
     enabled = !!P.r_u8();
 }
 
-void SPHNetState::net_Import(NET_Packet& P)
-{
-    read(P);
-}
-void SPHNetState::net_Import(IReader& P)
-{
-    read(P);
-}
-
-void SPHNetState::net_Save(NET_Packet& P)
-{
-    net_Export(P);
-}
-
+void SPHNetState::net_Import(NET_Packet& P) { read(P); }
+void SPHNetState::net_Import(IReader& P) { read(P); }
+void SPHNetState::net_Save(NET_Packet& P) { net_Export(P); }
 void SPHNetState::net_Load(NET_Packet& P)
 {
     net_Import(P);
@@ -227,7 +216,7 @@ void SPHBonesData::net_Save(NET_Packet& P)
 
     P.w_vec3(get_min());
     P.w_vec3(get_max());
-    P.w_u16((u16)bones.size());  // bones number;
+    P.w_u16((u16)bones.size()); // bones number;
     PHNETSTATE_I i = bones.begin(), e = bones.end();
     for (; e != i; i++)
     {
@@ -250,7 +239,7 @@ void SPHBonesData::net_Load(NET_Packet& P)
     P.r_vec3(_mx);
     set_min_max(_mn, _mx);
 
-    u16 bones_number = P.r_u16();  // bones number /**/
+    u16 bones_number = P.r_u16(); // bones number /**/
     for (int i = 0; i < bones_number; i++)
     {
         SPHNetState S;

@@ -18,7 +18,8 @@ void CActorMP::net_Import(NET_Packet& P)
     /*if (m_i_am_dead)
         return;*/
 
-    if (OnClient()) {
+    if (OnClient())
+    {
         /*#ifdef DEBUG
                 if (GetfHealth() != m_state_holder.state().health)
                     Msg("net_Import: [%d][%s], is going to set health to %2.04f", this->ID(), Name(),
@@ -27,29 +28,34 @@ void CActorMP::net_Import(NET_Packet& P)
 
         game_PlayerState* ps = Game().GetPlayerByGameID(this->object_id());
         float new_health = m_state_holder.state().health;
-        if (GetfHealth() < new_health) {
+        if (GetfHealth() < new_health)
+        {
             SetfHealth(new_health);
         }
         else
         {
-            if (!ps || !ps->testFlag(GAME_PLAYER_FLAG_INVINCIBLE)) {
+            if (!ps || !ps->testFlag(GAME_PLAYER_FLAG_INVINCIBLE))
+            {
                 SetfHealth(new_health);
             }
         }
     }
 
-    if (PPhysicsShell() != NULL) {
+    if (PPhysicsShell() != NULL)
+    {
         return;
     }
 
-    if (OnClient()) SetfRadiation(m_state_holder.state().radiation * 100.0f);
+    if (OnClient())
+        SetfRadiation(m_state_holder.state().radiation * 100.0f);
 
     u16 ActiveSlot = m_state_holder.state().inventory_active_slot;
 
-    if (OnClient() && (inventory().GetActiveSlot() != ActiveSlot)) {
+    if (OnClient() && (inventory().GetActiveSlot() != ActiveSlot))
+    {
 #ifdef DEBUG
         Msg("Client-SetActiveSlot[%d][%d]", ActiveSlot, Device.dwFrame);
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
         inventory().SetActiveSlot(ActiveSlot);
     }
 
@@ -63,10 +69,12 @@ void CActorMP::net_Import(NET_Packet& P)
     N.o_torso.pitch = m_state_holder.state().camera_pitch;
     N.o_torso.roll = m_state_holder.state().camera_roll;
 
-    if (N.o_torso.roll > PI) N.o_torso.roll -= PI_MUL_2;
+    if (N.o_torso.roll > PI)
+        N.o_torso.roll -= PI_MUL_2;
 
     {
-        if (Level().IsDemoPlay() || OnServer() || Remote()) {
+        if (Level().IsDemoPlay() || OnServer() || Remote())
+        {
             unaffected_r_torso.yaw = N.o_torso.yaw;
             unaffected_r_torso.pitch = N.o_torso.pitch;
             unaffected_r_torso.roll = N.o_torso.roll;
@@ -106,22 +114,27 @@ void CActorMP::postprocess_packet(net_update_A& N_A)
     N_A.State.previous_position = N_A.State.position;
     N_A.State.previous_quaternion = N_A.State.quaternion;
 
-    if (Local() && OnClient() || !g_Alive()) return;
+    if (Local() && OnClient() || !g_Alive())
+        return;
 
     {
         //-----------------------------------------------
-        if (!NET_A.empty() && N_A.dwTimeStamp < NET_A.back().dwTimeStamp) return;
-        if (!NET_A.empty() && N_A.dwTimeStamp == NET_A.back().dwTimeStamp) {
+        if (!NET_A.empty() && N_A.dwTimeStamp < NET_A.back().dwTimeStamp)
+            return;
+        if (!NET_A.empty() && N_A.dwTimeStamp == NET_A.back().dwTimeStamp)
+        {
             NET_A.back() = N_A;
         }
         else
         {
             VERIFY(valid_pos(N_A.State.position));
             NET_A.push_back(N_A);
-            if (NET_A.size() > 5) NET_A.pop_front();
+            if (NET_A.size() > 5)
+                NET_A.pop_front();
         };
 
-        if (!NET_A.empty()) m_bInterpolate = true;
+        if (!NET_A.empty())
+            m_bInterpolate = true;
     };
 
     Level().AddObject_To_Objects4CrPr(this);
@@ -131,21 +144,26 @@ void CActorMP::postprocess_packet(net_update_A& N_A)
 
 void CActorMP::process_packet(net_update& N)
 {
-    if (Local() && OnClient()) return;
+    if (Local() && OnClient())
+        return;
 
-    if (!NET.empty() && (N.dwTimeStamp < NET.back().dwTimeStamp)) return;
+    if (!NET.empty() && (N.dwTimeStamp < NET.back().dwTimeStamp))
+        return;
 
-    if (g_Alive()) {
+    if (g_Alive())
+    {
         setVisible((BOOL)!HUDview());
         setEnabled(TRUE);
     };
 
-    if (!NET.empty() && (N.dwTimeStamp == NET.back().dwTimeStamp)) {
+    if (!NET.empty() && (N.dwTimeStamp == NET.back().dwTimeStamp))
+    {
         NET.back() = N;
         return;
     }
 
     NET.push_back(N);
 
-    if (NET.size() > 5) NET.pop_front();
+    if (NET.size() > 5)
+        NET.pop_front();
 }

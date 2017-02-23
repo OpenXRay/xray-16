@@ -52,7 +52,6 @@ public:
     inline_ Matrix4x4(const Matrix4x4& mat) { CopyMemory(m, &mat.m, 16 * sizeof(float)); }
     //! Destructor.
     inline_ ~Matrix4x4() {}
-
     //! Assign values (rotation only)
     inline_ Matrix4x4& Set(
         float m00, float m01, float m02, float m10, float m11, float m12, float m20, float m21, float m22)
@@ -108,8 +107,9 @@ public:
         m[3][2] = p.z;
     }
     //! Sets the translation part of the matrix, from a HPoint.
-    //		inline_	void				SetTrans(const HPoint& p)					{ m[3][0]=p.x;	m[3][1]=p.y;	m[3][2]=p.z;
-    //m[3][3]=p.w;	}
+    //		inline_	void				SetTrans(const HPoint& p)					{ m[3][0]=p.x;	m[3][1]=p.y;
+    //m[3][2]=p.z;
+    // m[3][3]=p.w;	}
     //! Sets the translation part of the matrix, from floats.
     inline_ void SetTrans(float tx, float ty, float tz)
     {
@@ -162,11 +162,11 @@ public:
 
     //! Copy from a Matrix4x4
     inline_ void Copy(const Matrix4x4& source) { CopyMemory(m, source.m, 16 * sizeof(float)); }
-
     // Row-column access
     //! Returns a row.
-    //		inline_	void				GetRow(const udword r, HPoint& p)	const	{ p.x=m[r][0];	p.y=m[r][1];	p.z=m[r][2];
-    //p.w=m[r][3];		}
+    //		inline_	void				GetRow(const udword r, HPoint& p)	const	{ p.x=m[r][0];	p.y=m[r][1];
+    //p.z=m[r][2];
+    // p.w=m[r][3];		}
     //! Returns a row.
     inline_ void GetRow(const udword r, Point& p) const
     {
@@ -175,8 +175,9 @@ public:
         p.z = m[r][2];
     }
     //! Sets a row.
-    //		inline_	void				SetRow(const udword r, const HPoint& p)		{ m[r][0]=p.x;	m[r][1]=p.y;	m[r][2]=p.z;
-    //m[r][3]=p.w;		}
+    //		inline_	void				SetRow(const udword r, const HPoint& p)		{ m[r][0]=p.x;	m[r][1]=p.y;
+    //m[r][2]=p.z;
+    // m[r][3]=p.w;		}
     //! Sets a row.
     inline_ void SetRow(const udword r, const Point& p)
     {
@@ -186,8 +187,9 @@ public:
         m[r][3] = (r != 3) ? 0.0f : 1.0f;
     }
     //! Returns a column.
-    //		inline_	void				GetCol(const udword c, HPoint& p)	const	{ p.x=m[0][c];	p.y=m[1][c];	p.z=m[2][c];
-    //p.w=m[3][c];		}
+    //		inline_	void				GetCol(const udword c, HPoint& p)	const	{ p.x=m[0][c];	p.y=m[1][c];
+    //p.z=m[2][c];
+    // p.w=m[3][c];		}
     //! Returns a column.
     inline_ void GetCol(const udword c, Point& p) const
     {
@@ -196,8 +198,9 @@ public:
         p.z = m[2][c];
     }
     //! Sets a column.
-    //		inline_	void				SetCol(const udword c, const HPoint& p)		{ m[0][c]=p.x;	m[1][c]=p.y;	m[2][c]=p.z;
-    //m[3][c]=p.w;		}
+    //		inline_	void				SetCol(const udword c, const HPoint& p)		{ m[0][c]=p.x;	m[1][c]=p.y;
+    //m[2][c]=p.z;
+    // m[3][c]=p.w;		}
     //! Sets a column.
     inline_ void SetCol(const udword c, const Point& p)
     {
@@ -267,25 +270,41 @@ public:
     //! Checks for identity
     inline_ bool IsIdentity() const
     {
-        if (IR(m[0][0]) != IEEE_1_0) return false;
-        if (IR(m[0][1]) != 0) return false;
-        if (IR(m[0][2]) != 0) return false;
-        if (IR(m[0][3]) != 0) return false;
+        if (IR(m[0][0]) != IEEE_1_0)
+            return false;
+        if (IR(m[0][1]) != 0)
+            return false;
+        if (IR(m[0][2]) != 0)
+            return false;
+        if (IR(m[0][3]) != 0)
+            return false;
 
-        if (IR(m[1][0]) != 0) return false;
-        if (IR(m[1][1]) != IEEE_1_0) return false;
-        if (IR(m[1][2]) != 0) return false;
-        if (IR(m[1][3]) != 0) return false;
+        if (IR(m[1][0]) != 0)
+            return false;
+        if (IR(m[1][1]) != IEEE_1_0)
+            return false;
+        if (IR(m[1][2]) != 0)
+            return false;
+        if (IR(m[1][3]) != 0)
+            return false;
 
-        if (IR(m[2][0]) != 0) return false;
-        if (IR(m[2][1]) != 0) return false;
-        if (IR(m[2][2]) != IEEE_1_0) return false;
-        if (IR(m[2][3]) != 0) return false;
+        if (IR(m[2][0]) != 0)
+            return false;
+        if (IR(m[2][1]) != 0)
+            return false;
+        if (IR(m[2][2]) != IEEE_1_0)
+            return false;
+        if (IR(m[2][3]) != 0)
+            return false;
 
-        if (IR(m[3][0]) != 0) return false;
-        if (IR(m[3][1]) != 0) return false;
-        if (IR(m[3][2]) != 0) return false;
-        if (IR(m[3][3]) != IEEE_1_0) return false;
+        if (IR(m[3][0]) != 0)
+            return false;
+        if (IR(m[3][1]) != 0)
+            return false;
+        if (IR(m[3][2]) != 0)
+            return false;
+        if (IR(m[3][3]) != IEEE_1_0)
+            return false;
         return true;
     }
 
@@ -422,8 +441,9 @@ public:
     }
 
     //! Operator for HPoint Mul = Matrix4x4 * HPoint;
-    //		inline_	HPoint				operator*(const HPoint& v)		const	{ return HPoint(ROW[0]|v, ROW[1]|v, ROW[2]|v,
-    //ROW[3]|v); }
+    //		inline_	HPoint				operator*(const HPoint& v)		const	{ return HPoint(ROW[0]|v, ROW[1]|v,
+    //ROW[2]|v,
+    // ROW[3]|v); }
 
     //! Operator for Point Mul = Matrix4x4 * Point;
     inline_ Point operator*(const Point& v) const
@@ -452,7 +472,8 @@ public:
     //! Operator for Matrix4x4 Div = Matrix4x4 / float;
     inline_ Matrix4x4 operator/(float s) const
     {
-        if (s) s = 1.0f / s;
+        if (s)
+            s = 1.0f / s;
 
         return Matrix4x4(m[0][0] * s, m[0][1] * s, m[0][2] * s, m[0][3] * s, m[1][0] * s, m[1][1] * s, m[1][2] * s,
             m[1][3] * s, m[2][0] * s, m[2][1] * s, m[2][2] * s, m[2][3] * s, m[3][0] * s, m[3][1] * s, m[3][2] * s,
@@ -584,7 +605,8 @@ public:
     //! Operator for Matrix4x4 /= float;
     inline_ Matrix4x4& operator/=(float s)
     {
-        if (s) s = 1.0f / s;
+        if (s)
+            s = 1.0f / s;
         m[0][0] *= s;
         m[0][1] *= s;
         m[0][2] *= s;
@@ -606,7 +628,6 @@ public:
 
     inline_ const HPoint* operator[](int nRow) const { return (const HPoint*)&m[nRow][0]; }
     inline_ HPoint* operator[](int nRow) { return (HPoint*)&m[nRow][0]; }
-
 public:
     float m[4][4];
 };
@@ -629,4 +650,4 @@ inline_ void TransformPoint3x3(Point& dest, const Point& source, const Matrix4x4
 
 ICEMATHS_API void InvertPRMatrix(Matrix4x4& dest, const Matrix4x4& src);
 
-#endif  // __ICEMATRIX4X4_H__
+#endif // __ICEMATRIX4X4_H__

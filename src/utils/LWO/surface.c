@@ -21,10 +21,14 @@ Free the memory used by an lwPlugin.
 
 void lwFreePlugin(lwPlugin* p)
 {
-    if (p) {
-        if (p->ord) free(p->ord);
-        if (p->name) free(p->name);
-        if (p->data) free(p->data);
+    if (p)
+    {
+        if (p->ord)
+            free(p->ord);
+        if (p->name)
+            free(p->name);
+        if (p->data)
+            free(p->data);
         free(p);
     }
 }
@@ -38,20 +42,27 @@ Free the memory used by an lwTexture.
 
 void lwFreeTexture(lwTexture* t)
 {
-    if (t) {
-        if (t->ord) free(t->ord);
+    if (t)
+    {
+        if (t->ord)
+            free(t->ord);
         switch (t->type)
         {
         case ID_IMAP:
-            if (t->param.imap.vmap_name) free(t->param.imap.vmap_name);
+            if (t->param.imap.vmap_name)
+                free(t->param.imap.vmap_name);
             break;
         case ID_PROC:
-            if (t->param.proc.name) free(t->param.proc.name);
-            if (t->param.proc.data) free(t->param.proc.data);
+            if (t->param.proc.name)
+                free(t->param.proc.name);
+            if (t->param.proc.data)
+                free(t->param.proc.data);
             break;
         case ID_GRAD:
-            if (t->param.grad.key) free(t->param.grad.key);
-            if (t->param.grad.ikey) free(t->param.grad.ikey);
+            if (t->param.grad.key)
+                free(t->param.grad.key);
+            if (t->param.grad.ikey)
+                free(t->param.grad.ikey);
             break;
         }
         free(t);
@@ -67,9 +78,12 @@ Free the memory used by an lwSurface.
 
 void lwFreeSurface(lwSurface* surf)
 {
-    if (surf) {
-        if (surf->name) free(surf->name);
-        if (surf->srcname) free(surf->srcname);
+    if (surf)
+    {
+        if (surf->name)
+            free(surf->name);
+        if (surf->srcname)
+            free(surf->srcname);
 
         lwListFree(surf->shader, lwFreePlugin);
 
@@ -116,7 +130,8 @@ int lwGetTHeader(FILE* fp, int hsz, lwTexture* tex)
 
     id = getU4(fp);
     sz = getU2(fp);
-    if (0 > get_flen()) return 0;
+    if (0 > get_flen())
+        return 0;
 
     /* process subchunks as they're encountered */
 
@@ -147,22 +162,26 @@ int lwGetTHeader(FILE* fp, int hsz, lwTexture* tex)
         /* error while reading current subchunk? */
 
         rlen = get_flen();
-        if (rlen < 0 || rlen > sz) return 0;
+        if (rlen < 0 || rlen > sz)
+            return 0;
 
         /* skip unread parts of the current subchunk */
 
-        if (rlen < sz) fseek(fp, sz - rlen, SEEK_CUR);
+        if (rlen < sz)
+            fseek(fp, sz - rlen, SEEK_CUR);
 
         /* end of the texture header subchunk? */
 
-        if (hsz <= ftell(fp) - pos) break;
+        if (hsz <= ftell(fp) - pos)
+            break;
 
         /* get the next subchunk header */
 
         set_flen(0);
         id = getU4(fp);
         sz = getU2(fp);
-        if (6 != get_flen()) return 0;
+        if (6 != get_flen())
+            return 0;
     }
 
     set_flen(ftell(fp) - pos);
@@ -186,7 +205,8 @@ int lwGetTMap(FILE* fp, int tmapsz, lwTMap* tmap)
     pos = ftell(fp);
     id = getU4(fp);
     sz = getU2(fp);
-    if (0 > get_flen()) return 0;
+    if (0 > get_flen())
+        return 0;
 
     while (1)
     {
@@ -230,22 +250,26 @@ int lwGetTMap(FILE* fp, int tmapsz, lwTMap* tmap)
         /* error while reading the current subchunk? */
 
         rlen = get_flen();
-        if (rlen < 0 || rlen > sz) return 0;
+        if (rlen < 0 || rlen > sz)
+            return 0;
 
         /* skip unread parts of the current subchunk */
 
-        if (rlen < sz) fseek(fp, sz - rlen, SEEK_CUR);
+        if (rlen < sz)
+            fseek(fp, sz - rlen, SEEK_CUR);
 
         /* end of the TMAP subchunk? */
 
-        if (tmapsz <= ftell(fp) - pos) break;
+        if (tmapsz <= ftell(fp) - pos)
+            break;
 
         /* get the next subchunk header */
 
         set_flen(0);
         id = getU4(fp);
         sz = getU2(fp);
-        if (6 != get_flen()) return 0;
+        if (6 != get_flen())
+            return 0;
     }
 
     set_flen(ftell(fp) - pos);
@@ -268,7 +292,8 @@ int lwGetImageMap(FILE* fp, int rsz, lwTexture* tex)
     pos = ftell(fp);
     id = getU4(fp);
     sz = getU2(fp);
-    if (0 > get_flen()) return 0;
+    if (0 > get_flen())
+        return 0;
 
     while (1)
     {
@@ -278,7 +303,8 @@ int lwGetImageMap(FILE* fp, int rsz, lwTexture* tex)
         switch (id)
         {
         case ID_TMAP:
-            if (!lwGetTMap(fp, sz, &tex->tmap)) return 0;
+            if (!lwGetTMap(fp, sz, &tex->tmap))
+                return 0;
             break;
 
         case ID_PROJ: tex->param.imap.projection = getU2(fp); break;
@@ -327,22 +353,26 @@ int lwGetImageMap(FILE* fp, int rsz, lwTexture* tex)
         /* error while reading the current subchunk? */
 
         rlen = get_flen();
-        if (rlen < 0 || rlen > sz) return 0;
+        if (rlen < 0 || rlen > sz)
+            return 0;
 
         /* skip unread parts of the current subchunk */
 
-        if (rlen < sz) fseek(fp, sz - rlen, SEEK_CUR);
+        if (rlen < sz)
+            fseek(fp, sz - rlen, SEEK_CUR);
 
         /* end of the image map? */
 
-        if (rsz <= ftell(fp) - pos) break;
+        if (rsz <= ftell(fp) - pos)
+            break;
 
         /* get the next subchunk header */
 
         set_flen(0);
         id = getU4(fp);
         sz = getU2(fp);
-        if (6 != get_flen()) return 0;
+        if (6 != get_flen())
+            return 0;
     }
 
     set_flen(ftell(fp) - pos);
@@ -365,7 +395,8 @@ int lwGetProcedural(FILE* fp, int rsz, lwTexture* tex)
     pos = ftell(fp);
     id = getU4(fp);
     sz = getU2(fp);
-    if (0 > get_flen()) return 0;
+    if (0 > get_flen())
+        return 0;
 
     while (1)
     {
@@ -375,15 +406,18 @@ int lwGetProcedural(FILE* fp, int rsz, lwTexture* tex)
         switch (id)
         {
         case ID_TMAP:
-            if (!lwGetTMap(fp, sz, &tex->tmap)) return 0;
+            if (!lwGetTMap(fp, sz, &tex->tmap))
+                return 0;
             break;
 
         case ID_AXIS: tex->param.proc.axis = getU2(fp); break;
 
         case ID_VALU:
             tex->param.proc.value[0] = getF4(fp);
-            if (sz >= 8) tex->param.proc.value[1] = getF4(fp);
-            if (sz >= 12) tex->param.proc.value[2] = getF4(fp);
+            if (sz >= 8)
+                tex->param.proc.value[1] = getF4(fp);
+            if (sz >= 12)
+                tex->param.proc.value[2] = getF4(fp);
             break;
 
         case ID_FUNC:
@@ -398,22 +432,26 @@ int lwGetProcedural(FILE* fp, int rsz, lwTexture* tex)
         /* error while reading the current subchunk? */
 
         rlen = get_flen();
-        if (rlen < 0 || rlen > sz) return 0;
+        if (rlen < 0 || rlen > sz)
+            return 0;
 
         /* skip unread parts of the current subchunk */
 
-        if (rlen < sz) fseek(fp, sz - rlen, SEEK_CUR);
+        if (rlen < sz)
+            fseek(fp, sz - rlen, SEEK_CUR);
 
         /* end of the procedural block? */
 
-        if (rsz <= ftell(fp) - pos) break;
+        if (rsz <= ftell(fp) - pos)
+            break;
 
         /* get the next subchunk header */
 
         set_flen(0);
         id = getU4(fp);
         sz = getU2(fp);
-        if (6 != get_flen()) return 0;
+        if (6 != get_flen())
+            return 0;
     }
 
     set_flen(ftell(fp) - pos);
@@ -436,7 +474,8 @@ int lwGetGradient(FILE* fp, int rsz, lwTexture* tex)
     pos = ftell(fp);
     id = getU4(fp);
     sz = getU2(fp);
-    if (0 > get_flen()) return 0;
+    if (0 > get_flen())
+        return 0;
 
     while (1)
     {
@@ -446,7 +485,8 @@ int lwGetGradient(FILE* fp, int rsz, lwTexture* tex)
         switch (id)
         {
         case ID_TMAP:
-            if (!lwGetTMap(fp, sz, &tex->tmap)) return 0;
+            if (!lwGetTMap(fp, sz, &tex->tmap))
+                return 0;
             break;
 
         case ID_PNAM: tex->param.grad.paramname = getS0(fp); break;
@@ -462,7 +502,8 @@ int lwGetGradient(FILE* fp, int rsz, lwTexture* tex)
         case ID_FKEY:
             nkeys = sz / sizeof(lwGradKey);
             tex->param.grad.key = calloc(nkeys, sizeof(lwGradKey));
-            if (!tex->param.grad.key) return 0;
+            if (!tex->param.grad.key)
+                return 0;
             for (i = 0; i < nkeys; i++)
             {
                 tex->param.grad.key[i].value = getF4(fp);
@@ -474,7 +515,8 @@ int lwGetGradient(FILE* fp, int rsz, lwTexture* tex)
         case ID_IKEY:
             nkeys = sz / 2;
             tex->param.grad.ikey = calloc(nkeys, sizeof(short));
-            if (!tex->param.grad.ikey) return 0;
+            if (!tex->param.grad.ikey)
+                return 0;
             for (i = 0; i < nkeys; i++)
                 tex->param.grad.ikey[i] = getU2(fp);
             break;
@@ -485,22 +527,26 @@ int lwGetGradient(FILE* fp, int rsz, lwTexture* tex)
         /* error while reading the current subchunk? */
 
         rlen = get_flen();
-        if (rlen < 0 || rlen > sz) return 0;
+        if (rlen < 0 || rlen > sz)
+            return 0;
 
         /* skip unread parts of the current subchunk */
 
-        if (rlen < sz) fseek(fp, sz - rlen, SEEK_CUR);
+        if (rlen < sz)
+            fseek(fp, sz - rlen, SEEK_CUR);
 
         /* end of the gradient? */
 
-        if (rsz <= ftell(fp) - pos) break;
+        if (rsz <= ftell(fp) - pos)
+            break;
 
         /* get the next subchunk header */
 
         set_flen(0);
         id = getU4(fp);
         sz = getU2(fp);
-        if (6 != get_flen()) return 0;
+        if (6 != get_flen())
+            return 0;
     }
 
     set_flen(ftell(fp) - pos);
@@ -521,7 +567,8 @@ lwTexture* lwGetTexture(FILE* fp, int bloksz, unsigned int type)
     int ok;
 
     tex = calloc(1, sizeof(lwTexture));
-    if (!tex) return NULL;
+    if (!tex)
+        return NULL;
 
     tex->type = type;
     tex->tmap.size.val[0] = tex->tmap.size.val[1] = tex->tmap.size.val[2] = 1.0f;
@@ -529,7 +576,8 @@ lwTexture* lwGetTexture(FILE* fp, int bloksz, unsigned int type)
     tex->enabled = 1;
 
     sz = getU2(fp);
-    if (!lwGetTHeader(fp, sz, tex)) {
+    if (!lwGetTHeader(fp, sz, tex))
+    {
         free(tex);
         return NULL;
     }
@@ -543,7 +591,8 @@ lwTexture* lwGetTexture(FILE* fp, int bloksz, unsigned int type)
     default: ok = !fseek(fp, sz, SEEK_CUR);
     }
 
-    if (!ok) {
+    if (!ok)
+    {
         lwFreeTexture(tex);
         return NULL;
     }
@@ -567,7 +616,8 @@ lwPlugin* lwGetShader(FILE* fp, int bloksz)
     int hsz, rlen, pos;
 
     shdr = calloc(1, sizeof(lwPlugin));
-    if (!shdr) return NULL;
+    if (!shdr)
+        return NULL;
 
     pos = ftell(fp);
     set_flen(0);
@@ -575,13 +625,15 @@ lwPlugin* lwGetShader(FILE* fp, int bloksz)
     shdr->ord = getS0(fp);
     id = getU4(fp);
     sz = getU2(fp);
-    if (0 > get_flen()) goto Fail;
+    if (0 > get_flen())
+        goto Fail;
 
     while (hsz > 0)
     {
         sz += sz & 1;
         hsz -= sz;
-        if (id == ID_ENAB) {
+        if (id == ID_ENAB)
+        {
             shdr->flags = getU2(fp);
             break;
         }
@@ -595,7 +647,8 @@ lwPlugin* lwGetShader(FILE* fp, int bloksz)
 
     id = getU4(fp);
     sz = getU2(fp);
-    if (0 > get_flen()) goto Fail;
+    if (0 > get_flen())
+        goto Fail;
 
     while (1)
     {
@@ -616,22 +669,26 @@ lwPlugin* lwGetShader(FILE* fp, int bloksz)
         /* error while reading the current subchunk? */
 
         rlen = get_flen();
-        if (rlen < 0 || rlen > sz) goto Fail;
+        if (rlen < 0 || rlen > sz)
+            goto Fail;
 
         /* skip unread parts of the current subchunk */
 
-        if (rlen < sz) fseek(fp, sz - rlen, SEEK_CUR);
+        if (rlen < sz)
+            fseek(fp, sz - rlen, SEEK_CUR);
 
         /* end of the shader block? */
 
-        if (bloksz <= ftell(fp) - pos) break;
+        if (bloksz <= ftell(fp) - pos)
+            break;
 
         /* get the next subchunk header */
 
         set_flen(0);
         id = getU4(fp);
         sz = getU2(fp);
-        if (6 != get_flen()) goto Fail;
+        if (6 != get_flen())
+            goto Fail;
     }
 
     set_flen(ftell(fp) - pos);
@@ -651,16 +708,8 @@ Callbacks for the lwListInsert() function, which is called to add
 textures to surface channels and shaders to surfaces.
 ====================================================================== */
 
-static int compare_textures(lwTexture* a, lwTexture* b)
-{
-    return strcmp(a->ord, b->ord);
-}
-
-static int compare_shaders(lwPlugin* a, lwPlugin* b)
-{
-    return strcmp(a->ord, b->ord);
-}
-
+static int compare_textures(lwTexture* a, lwTexture* b) { return strcmp(a->ord, b->ord); }
+static int compare_shaders(lwPlugin* a, lwPlugin* b) { return strcmp(a->ord, b->ord); }
 /*
 ======================================================================
 add_texture()
@@ -704,7 +753,8 @@ lwSurface* lwDefaultSurface(void)
     lwSurface* surf;
 
     surf = calloc(1, sizeof(lwSurface));
-    if (!surf) return NULL;
+    if (!surf)
+        return NULL;
 
     surf->color.rgb[0] = 0.78431f;
     surf->color.rgb[1] = 0.78431f;
@@ -737,7 +787,8 @@ lwSurface* lwGetSurface(FILE* fp, int cksize)
     /* allocate the Surface structure */
 
     surf = calloc(1, sizeof(lwSurface));
-    if (!surf) goto Fail;
+    if (!surf)
+        goto Fail;
 
     /* non-zero defaults */
 
@@ -764,7 +815,8 @@ lwSurface* lwGetSurface(FILE* fp, int cksize)
 
     id = getU4(fp);
     sz = getU2(fp);
-    if (0 > get_flen()) goto Fail;
+    if (0 > get_flen())
+        goto Fail;
 
     /* process subchunks as they're encountered */
 
@@ -868,9 +920,12 @@ lwSurface* lwGetSurface(FILE* fp, int cksize)
 
         case ID_LINE:
             surf->line.enabled = 1;
-            if (sz >= 2) surf->line.flags = getU2(fp);
-            if (sz >= 6) surf->line.size.val = getF4(fp);
-            if (sz >= 8) surf->line.size.eindex = getVX(fp);
+            if (sz >= 2)
+                surf->line.flags = getU2(fp);
+            if (sz >= 6)
+                surf->line.size.val = getF4(fp);
+            if (sz >= 8)
+                surf->line.size.eindex = getVX(fp);
             break;
 
         case ID_ALPH:
@@ -889,13 +944,16 @@ lwSurface* lwGetSurface(FILE* fp, int cksize)
             case ID_PROC:
             case ID_GRAD:
                 tex = lwGetTexture(fp, sz - 4, type);
-                if (!tex) goto Fail;
-                if (!add_texture(surf, tex)) lwFreeTexture(tex);
+                if (!tex)
+                    goto Fail;
+                if (!add_texture(surf, tex))
+                    lwFreeTexture(tex);
                 set_flen(4 + get_flen());
                 break;
             case ID_SHDR:
                 shdr = lwGetShader(fp, sz - 4);
-                if (!shdr) goto Fail;
+                if (!shdr)
+                    goto Fail;
                 lwListInsert(&surf->shader, shdr, compare_shaders);
                 ++surf->nshaders;
                 set_flen(4 + get_flen());
@@ -909,27 +967,32 @@ lwSurface* lwGetSurface(FILE* fp, int cksize)
         /* error while reading current subchunk? */
 
         rlen = get_flen();
-        if (rlen < 0 || rlen > sz) goto Fail;
+        if (rlen < 0 || rlen > sz)
+            goto Fail;
 
         /* skip unread parts of the current subchunk */
 
-        if (rlen < sz) fseek(fp, sz - rlen, SEEK_CUR);
+        if (rlen < sz)
+            fseek(fp, sz - rlen, SEEK_CUR);
 
         /* end of the SURF chunk? */
 
-        if (cksize <= ftell(fp) - pos) break;
+        if (cksize <= ftell(fp) - pos)
+            break;
 
         /* get the next subchunk header */
 
         set_flen(0);
         id = getU4(fp);
         sz = getU2(fp);
-        if (6 != get_flen()) goto Fail;
+        if (6 != get_flen())
+            goto Fail;
     }
 
     return surf;
 
 Fail:
-    if (surf) lwFreeSurface(surf);
+    if (surf)
+        lwFreeSurface(surf);
     return NULL;
 }

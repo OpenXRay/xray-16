@@ -213,7 +213,7 @@ typedef struct st_lwEnvelope
     char* name;
     lwKey* key; /* linked list of keys */
     int nkeys;
-    int behavior[2];   /* pre and post (extrapolation) */
+    int behavior[2]; /* pre and post (extrapolation) */
     lwPlugin* cfilter; /* linked list of channel filters */
     int ncfilters;
 } lwEnvelope;
@@ -370,7 +370,7 @@ typedef struct st_lwGradient
     float end;
     int repeat;
     lwGradKey* key; /* array of gradient keys */
-    short* ikey;    /* array of interpolation codes */
+    short* ikey; /* array of interpolation codes */
 } lwGradient;
 
 typedef struct st_lwTexture
@@ -487,7 +487,7 @@ typedef struct st_lwPoint
 {
     float pos[3];
     int npols; /* number of polygons sharing the point */
-    int* pol;  /* array of polygon indexes */
+    int* pol; /* array of polygon indexes */
     int nvmaps;
     lwVMapPt* vm; /* array of vmap references */
 } lwPoint;
@@ -503,7 +503,7 @@ typedef struct st_lwPolVert
 typedef struct st_lwPolygon
 {
     lwSurface* surf;
-    int part;      /* part index */
+    int part; /* part index */
     int smoothgrp; /* smoothing group */
     int flags;
     unsigned int type;
@@ -515,16 +515,16 @@ typedef struct st_lwPolygon
 typedef struct st_lwPointList
 {
     int count;
-    int offset;  /* only used during reading */
+    int offset; /* only used during reading */
     lwPoint* pt; /* array of points */
 } lwPointList;
 
 typedef struct st_lwPolygonList
 {
     int count;
-    int offset;     /* only used during reading */
-    int vcount;     /* total number of vertices */
-    int voffset;    /* only used during reading */
+    int offset; /* only used during reading */
+    int vcount; /* total number of vertices */
+    int voffset; /* only used during reading */
     lwPolygon* pol; /* array of polygons */
 } lwPolygonList;
 
@@ -558,9 +558,9 @@ typedef struct st_lwTagList
 
 typedef struct st_lwObject
 {
-    lwLayer* layer;  /* linked list of layers */
+    lwLayer* layer; /* linked list of layers */
     lwEnvelope* env; /* linked list of envelopes */
-    lwClip* clip;    /* linked list of clips */
+    lwClip* clip; /* linked list of clips */
     lwSurface* surf; /* linked list of surfaces */
     lwTagList taglist;
     int nlayers;

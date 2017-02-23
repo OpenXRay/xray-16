@@ -46,7 +46,7 @@ void CRenderTarget::draw_rain(light& RainSetup)
 
         // setup
         //		float	intensity			= 0.3f*fuckingsun->color.r + 0.48f*fuckingsun->color.g +
-        //0.22f*fuckingsun->color.b;
+        // 0.22f*fuckingsun->color.b;
         //		Fvector	dir					= L_dir;
         //		dir.normalize().mul	(- _sqrt(intensity+EPS));
         //		RCache.set_Element			(s_accum_mask->E[SE_MASK_DIRECT]);		// masker
@@ -256,7 +256,8 @@ void CRenderTarget::draw_rain(light& RainSetup)
         RCache.set_c("m_sunmask", m_clouds_shadow);
         RCache.set_c("RainDensity", fRainFactor, 0, 0, 0);
         RCache.set_c("RainFallof", ps_r3_dyn_wet_surf_near, ps_r3_dyn_wet_surf_far, 0, 0);
-        if (!RImplementation.o.dx10_msaa) {
+        if (!RImplementation.o.dx10_msaa)
+        {
             RCache.set_Stencil(TRUE, D3DCMP_EQUAL, 0x01, 0x01, 0);
             RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
         }
@@ -267,7 +268,8 @@ void CRenderTarget::draw_rain(light& RainSetup)
             RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
 
             // per sample
-            if (RImplementation.o.dx10_msaa_opt) {
+            if (RImplementation.o.dx10_msaa_opt)
+            {
                 RCache.set_Element(s_rain_msaa[0]->E[0]);
                 RCache.set_c("Ldynamic_dir", L_dir.x, L_dir.y, L_dir.z, 0);
                 RCache.set_c("WorldX", W_dirX.x, W_dirX.y, W_dirX.z, 0);
@@ -305,7 +307,8 @@ void CRenderTarget::draw_rain(light& RainSetup)
         RCache.set_c("m_shadow", m_shadow);
         RCache.set_c("m_sunmask", m_clouds_shadow);
 
-        if (!RImplementation.o.dx10_gbuffer_opt) {
+        if (!RImplementation.o.dx10_gbuffer_opt)
+        {
             //	Do this in blender!
             // StateManager.SetColorWriteEnable( D3Dxx_COLOR_WRITE_ENABLE_RED | D3Dxx_COLOR_WRITE_ENABLE_GREEN |
             // D3Dxx_COLOR_WRITE_ENABLE_BLUE );
@@ -323,7 +326,8 @@ void CRenderTarget::draw_rain(light& RainSetup)
                 u_setrt(rt_Position, NULL, NULL, rt_MSAADepth->pZRT);
         }
 
-        if (!RImplementation.o.dx10_msaa) {
+        if (!RImplementation.o.dx10_msaa)
+        {
             RCache.set_Stencil(TRUE, D3DCMP_EQUAL, 0x01, 0x01, 0);
             RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
         }
@@ -334,7 +338,8 @@ void CRenderTarget::draw_rain(light& RainSetup)
             RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
 
             // per sample
-            if (RImplementation.o.dx10_msaa_opt) {
+            if (RImplementation.o.dx10_msaa_opt)
+            {
                 RCache.set_Element(s_rain_msaa[0]->E[1]);
                 RCache.set_Stencil(TRUE, D3DCMP_EQUAL, 0x81, 0x81, 0);
                 RCache.set_CullMode(CULL_NONE);
@@ -367,7 +372,8 @@ void CRenderTarget::draw_rain(light& RainSetup)
         else
             u_setrt(rt_Color, NULL, NULL, rt_MSAADepth->pZRT);
 
-        if (!RImplementation.o.dx10_msaa) {
+        if (!RImplementation.o.dx10_msaa)
+        {
             RCache.set_Stencil(TRUE, D3DCMP_EQUAL, 0x01, 0x01, 0);
             RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
         }
@@ -378,7 +384,8 @@ void CRenderTarget::draw_rain(light& RainSetup)
             RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
 
             // per sample
-            if (RImplementation.o.dx10_msaa_opt) {
+            if (RImplementation.o.dx10_msaa_opt)
+            {
                 RCache.set_Element(s_rain_msaa[0]->E[2]);
                 RCache.set_Stencil(TRUE, D3DCMP_EQUAL, 0x81, 0x81, 0);
                 RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);

@@ -29,12 +29,9 @@ struct SPrimitiveBuffer
     TOnRender OnRender;
 
     void xr_stdcall RenderDIP() { DU_DRAW_DIP(p_type, pGeom, 0, 0, v_cnt, 0, p_cnt); }
-
     void xr_stdcall RenderDP() { DU_DRAW_DP(p_type, pGeom, 0, p_cnt); }
-
-  public:
+public:
     SPrimitiveBuffer() : OnRender(0), pGeom(0) { ; }
-
     void CreateFromData(
         D3DPRIMITIVETYPE _pt, u32 _p_cnt, u32 FVF, LPVOID vertices, u32 _v_cnt, u16* indices = 0, u32 _i_cnt = 0);
     void Destroy();
@@ -63,24 +60,24 @@ class ECORE_API CDrawUtilities :
     CGameFont* m_Font;
     CEditableObject* m_axis_object;
 
-  public:
+public:
     ref_geom vs_L;
     ref_geom vs_TL;
     ref_geom vs_LIT;
 
-  protected:
+protected:
     FVF::L* m_DD_pv;
     FVF::L* m_DD_pv_start;
     u32 m_DD_base;
     BOOL m_DD_wire;
     void DD_DrawFace_flush(BOOL try_again);
 
-  public:
+public:
     void DD_DrawFace_begin(BOOL bWire);
     void DD_DrawFace_push(const Fvector& p0, const Fvector& p1, const Fvector& p2, u32 clr);
     void DD_DrawFace_end();
 
-  public:
+public:
     CDrawUtilities()
     {
         vs_L = 0;

@@ -13,7 +13,8 @@ public:
     static void LWBoneParser::Parse(CBone& bone, LWItemID boneId)
     {
         LWItemID P = g_iteminfo->parent(boneId);
-        if (g_iteminfo->type(P) == LWI_BONE) bone.SetParentName(g_iteminfo->name(P));
+        if (g_iteminfo->type(P) == LWI_BONE)
+            bone.SetParentName(g_iteminfo->name(P));
         LWDVector vec;
         g_boneinfo->restParam(boneId, LWIP_POSITION, vec);
         bone.rest_offset.set((float)vec[0], (float)vec[1], (float)vec[2]);
@@ -39,7 +40,8 @@ static void RecurseBone(LWItemID parent)
     LWItemID bone = g_iteminfo->firstChild(parent);
     while (bone != LWITEM_NULL)
     {
-        if (g_iteminfo->type(bone) == LWI_BONE) {
+        if (g_iteminfo->type(bone) == LWI_BONE)
+        {
             AppendBone(bone);
             RecurseBone(bone);
         }
@@ -52,7 +54,8 @@ static bool ParseObjectBones(LWItemID object, int& obj_cnt)
     LWItemID bone, parent;
     bone = g_iteminfo->first(LWI_BONE, object);
 
-    if (!bone) {
+    if (!bone)
+    {
         g_msg->error("Can't find bone.", 0);
         return false;
     }
@@ -60,7 +63,8 @@ static bool ParseObjectBones(LWItemID object, int& obj_cnt)
     while (true)
     {
         parent = g_iteminfo->parent(bone);
-        if (!parent) {
+        if (!parent)
+        {
             g_msg->error("Can't find root bone.", 0);
             return false;
         }
@@ -70,8 +74,10 @@ static bool ParseObjectBones(LWItemID object, int& obj_cnt)
             bone = parent;
     }
 
-    if (bone) {
-        if (obj_cnt > 0) {
+    if (bone)
+    {
+        if (obj_cnt > 0)
+        {
             g_msg->error("Can't support multiple objects.", 0);
             return false;
         }
@@ -116,9 +122,11 @@ void __cdecl SaveObject(GlobalFunc* global)
 
     while (object)
     {
-        if (g_intinfo->itemFlags(object) & LWITEMF_SELECTED) {
+        if (g_intinfo->itemFlags(object) & LWITEMF_SELECTED)
+        {
             bObjSel = true;
-            if (EFS.GetSaveName("$import$", buf, 0, 0)) {
+            if (EFS.GetSaveName("$import$", buf, 0, 0))
+            {
                 bErr = false;
 
                 char name[1024];
@@ -129,11 +137,14 @@ void __cdecl SaveObject(GlobalFunc* global)
 
                 // parse bone if exist
                 bool bBoneExists = false;
-                if (g_iteminfo->first(LWI_BONE, object)) {
+                if (g_iteminfo->first(LWI_BONE, object))
+                {
                     m_LWBones = &obj->Bones();
                     bBoneExists = true;
-                    if (!ParseObjectBones(object, obj_cnt)) bErr = true;
-                    if (bErr) {
+                    if (!ParseObjectBones(object, obj_cnt))
+                        bErr = true;
+                    if (bErr)
+                    {
                         // default bone part
                         obj->BoneParts().push_back(SBonePart());
                         SBonePart& BP = obj->BoneParts().back();
@@ -142,15 +153,18 @@ void __cdecl SaveObject(GlobalFunc* global)
                             BP.bones.push_back(obj->Bones()[b_i]->Name());
                     }
                 }
-                if (!bErr) {
+                if (!bErr)
+                {
                     LPCSTR lwo_nm = g_objinfo->filename(object);
-                    {  // append path
+                    { // append path
                         string_path path, dr, di;
                         _splitpath(lwo_nm, dr, di, 0, 0);
                         strconcat(sizeof(path), path, dr, di);
-                        if (!FS.path_exist(path)) FS.append_path(path, path, 0, FALSE);
+                        if (!FS.path_exist(path))
+                            FS.append_path(path, path, 0, FALSE);
                     }
-                    if (FS.exist(lwo_nm)) {
+                    if (FS.exist(lwo_nm))
+                    {
                         if (!obj->ImportLWO(lwo_nm, false))
                             bErr = true;
                         else

@@ -44,7 +44,6 @@ public:
     IC Fvector Right() const { return Fvector().crossproduct(vNormal, vDirection); }
     IC float Fov() const { return f_fov; }
     IC float Aspect() const { return f_aspect; }
-
     int tag;
 
 public:
@@ -81,7 +80,6 @@ public:
 
     virtual float GetWorldYaw() { return 0; };
     virtual float GetWorldPitch() { return 0; };
-
     virtual float CheckLimYaw();
     virtual float CheckLimPitch();
     virtual float CheckLimRoll();
@@ -92,7 +90,7 @@ IC void tviewport_size(CRenderDeviceBase& D, float _viewport_near, const T& cam_
 {
     h_h = _viewport_near * tan(deg2rad(cam_info.Fov()) / 2.f);
     VERIFY2(_valid(h_h), make_string("invalide viewporrt params fov: %f ", cam_info.Fov()));
-    float aspect = D.fASPECT;  // cam_info.Aspect();
+    float aspect = D.fASPECT; // cam_info.Aspect();
     VERIFY(aspect > EPS);
     h_w = h_h / aspect;
 }
@@ -103,4 +101,4 @@ IC void viewport_size(float _viewport_near, const T& cam_info, float& h_w, float
     tviewport_size<T>(Device, _viewport_near, cam_info, h_w, h_h);
 }
 
-#endif  // !defined(AFX_CAMERABASE_H__B11F8AE1_1213_11D4_B4E3_4854E82A090D__INCLUDED_)
+#endif // !defined(AFX_CAMERABASE_H__B11F8AE1_1213_11D4_B4E3_4854E82A090D__INCLUDED_)

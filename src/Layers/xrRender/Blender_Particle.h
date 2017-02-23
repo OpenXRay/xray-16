@@ -15,7 +15,6 @@ class CBlender_Particle : public IBlender
 public:
     virtual LPCSTR getComment() { return "particles"; }
     virtual BOOL canBeLMAPped() { return FALSE; }
-
     virtual void Save(IWriter& fs);
     virtual void Load(IReader& fs, u16 version);
 
@@ -25,4 +24,4 @@ public:
     virtual ~CBlender_Particle();
 };
 
-#endif  // !defined(AFX_BLENDER_SCREEN_SET_H__A215FA40_D885_4D06_9032_ED934AE295E3__INCLUDED_P)
+#endif // !defined(AFX_BLENDER_SCREEN_SET_H__A215FA40_D885_4D06_9032_ED934AE295E3__INCLUDED_P)

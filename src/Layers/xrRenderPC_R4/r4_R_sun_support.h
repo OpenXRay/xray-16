@@ -32,7 +32,8 @@ public:
                 light_cuboid_points[P.points[0]], light_cuboid_points[P.points[2]], light_cuboid_points[P.points[1]]);
 
             // verify
-            if (_debug) {
+            if (_debug)
+            {
                 Fvector& p0 = light_cuboid_points[P.points[0]];
                 Fvector& p1 = light_cuboid_points[P.points[1]];
                 Fvector& p2 = light_cuboid_points[P.points[2]];
@@ -55,7 +56,8 @@ public:
     {
         translation.set(0.f, 0.f, 0.f);
 
-        if (fis_zero(1 - abs(view_ray.D.dotproduct(light_ray.D)), EPS_S)) return;
+        if (fis_zero(1 - abs(view_ray.D.dotproduct(light_ray.D)), EPS_S))
+            return;
 
         // compute planes for each polygon.
         compute_planes();
@@ -70,12 +72,14 @@ public:
         for (u32 i = 0; i < LIGHT_CUBOIDSIDEPOLYS_COUNT; i++)
         {
             float tmp_dot = view_ray.D.dotproduct(light_cuboid_polys[i].plane.n);
-            if (tmp_dot <= EPS_L) continue;
+            if (tmp_dot <= EPS_L)
+                continue;
 
             align_planes[align_planes_count] = i;
             ++align_planes_count;
 
-            if (align_planes_count == 2) break;
+            if (align_planes_count == 2)
+                break;
         }
 
         Fvector align_vector;
@@ -119,7 +123,8 @@ public:
             for (u32 i = 0; i < view_frustum_rays.size(); ++i)
             {
                 float plane_dot_ray = view_frustum_rays[i].D.dotproduct(light_cuboid_polys[align_planes[p]].plane.n);
-                if (plane_dot_ray < 0) {
+                if (plane_dot_ray < 0)
+                {
                     Fvector per_plane_view;
                     per_plane_view.crossproduct(light_cuboid_polys[align_planes[p]].plane.n, view_ray.D);
                     Fvector per_view_to_plane;
@@ -131,7 +136,8 @@ public:
                 }
             }
 
-            if (fis_zero(max_mag)) continue;
+            if (fis_zero(max_mag))
+                continue;
 
             VERIFY(max_mag <= 1.f);
 
@@ -150,13 +156,15 @@ public:
             tmp_vector.crossproduct(view_frustum_rays[i].D, light_ray.D);
 
             // check if the vectors are parallel
-            if (fis_zero(tmp_vector.square_magnitude(), EPS)) continue;
+            if (fis_zero(tmp_vector.square_magnitude(), EPS))
+                continue;
 
             Fplane tmp_plane;
             tmp_plane.build(view_frustum_rays[i].P, tmp_vector);
 
             float sign = 0;
-            if (check_cull_plane_valid(tmp_plane, sign, 5)) {
+            if (check_cull_plane_valid(tmp_plane, sign, 5))
+            {
                 tmp_plane.n.mul(-sign);
                 tmp_plane.d *= -sign;
                 dest.push_back(tmp_plane);
@@ -164,7 +172,8 @@ public:
         }
 
         // compute culling planes by ray points pairs as edges
-        if (clip_by_view_near && abs(view_ray.D.dotproduct(light_ray.D)) < 0.8) {
+        if (clip_by_view_near && abs(view_ray.D.dotproduct(light_ray.D)) < 0.8)
+        {
             Fvector perp_light_view, perp_light_to_view;
             perp_light_view.crossproduct(view_ray.D, light_ray.D);
             perp_light_to_view.crossproduct(perp_light_view, light_ray.D);
@@ -181,13 +190,15 @@ public:
                 Fvector P = view_frustum_rays[i].P;
                 P.mad(view_frustum_rays[i].D, 5);
 
-                if (plane.classify(P) > max_dist) {
+                if (plane.classify(P) > max_dist)
+                {
                     max_dist = 0.f;
                     break;
                 }
             }
 
-            if (max_dist > -1000) {
+            if (max_dist > -1000)
+            {
                 plane.d += max_dist;
                 dest.push_back(plane);
             }
@@ -213,7 +224,8 @@ public:
                 else
                     light_cuboid_polys[p].plane.intersectRayDist(view_frustum_rays[i].P, view_frustum_rays[i].D, dist);
 
-                if (dist > EPS_L && dist < min_dist) min_dist = dist;
+                if (dist > EPS_L && dist < min_dist)
+                    min_dist = dist;
             }
 
             view_frustum_rays[i].P.mad(view_frustum_rays[i].D, min_dist);
@@ -232,16 +244,19 @@ public:
             tmp_pt.mad(view_frustum_rays[j].D, mad_factor);
             tmp_dist = plane.classify(tmp_pt);
 
-            if (fis_zero(tmp_dist, EPS_L)) continue;
+            if (fis_zero(tmp_dist, EPS_L))
+                continue;
 
-            if (!oriented) {
+            if (!oriented)
+            {
                 orient = tmp_dist > 0.f ? 1.f : -1.f;
                 valid = true;
                 oriented = true;
                 continue;
             }
 
-            if (tmp_dist < 0 && orient < 0 || tmp_dist > 0 && orient > 0) continue;
+            if (tmp_dist < 0 && orient < 0 || tmp_dist > 0 && orient > 0)
+                continue;
 
             valid = false;
             break;
@@ -281,7 +296,8 @@ public:
         int counter;
         _edge(int _p0, int _p1, int m) : p0(_p0), p1(_p1), counter(m)
         {
-            if (p0 > p1) swap(p0, p1);
+            if (p0 > p1)
+                swap(p0, p1);
         }
         bool equal(_edge& E) { return p0 == E.p0 && p1 == E.p1; }
     };
@@ -307,14 +323,16 @@ public:
 
             len = P.planeN.magnitude();
 
-            if (len > std::numeric_limits<float>::min()) {
+            if (len > std::numeric_limits<float>::min())
+            {
                 P.planeN.mul(1 / len);
             }
             else
             {
                 t2.sub(points[P.points[0]], points[P.points[3]]);
                 P.planeN.crossproduct(t1, t2);
-                if (len > std::numeric_limits<float>::min()) {
+                if (len > std::numeric_limits<float>::min())
+                {
                     P.planeN.mul(1 / len);
                 }
                 else
@@ -330,7 +348,8 @@ public:
             P.planeD = -P.planeN.dotproduct(points[P.points[0]]);
 
             // verify
-            if (_debug) {
+            if (_debug)
+            {
                 Fvector& p0 = points[P.points[0]];
                 Fvector& p1 = points[P.points[1]];
                 Fvector& p2 = points[P.points[2]];
@@ -389,7 +408,8 @@ public:
         for (int it = 0; it < int(polys.size()); it++)
         {
             _poly& base = polys[it];
-            if (base.classify(cog) > 0) std::reverse(base.points.begin(), base.points.end());
+            if (base.classify(cog) > 0)
+                std::reverse(base.points.begin(), base.points.end());
         }
 
         // remove faceforward polys, build list of edges -> find open ones
@@ -397,7 +417,7 @@ public:
         for (int it = 0; it < int(polys.size()); it++)
         {
             _poly& base = polys[it];
-            VERIFY(base.classify(cog) < 0);  // debug
+            VERIFY(base.classify(cog) < 0); // debug
 
             int marker = (base.planeN.dotproduct(direction) <= 0) ? -1 : 1;
 
@@ -408,19 +428,23 @@ public:
                 _edge E(plist[p], plist[(p + 1) % plist.size()], marker);
                 bool found = false;
                 for (int e = 0; e < int(edges.size()); e++)
-                    if (edges[e].equal(E)) {
+                    if (edges[e].equal(E))
+                    {
                         edges[e].counter += marker;
                         found = true;
                         break;
                     }
-                if (!found) {
+                if (!found)
+                {
                     edges.push_back(E);
-                    if (_debug) T.dbg_addline(points[E.p0], points[E.p1], color_rgba(255, 0, 0, 255));
+                    if (_debug)
+                        T.dbg_addline(points[E.p0], points[E.p1], color_rgba(255, 0, 0, 255));
                 }
             }
 
             // remove if unused
-            if (marker < 0) {
+            if (marker < 0)
+            {
                 polys.erase(polys.begin() + it);
                 it--;
             }
@@ -429,9 +453,11 @@ public:
         // Extend model to infinity, the volume is not capped, so this is indeed up to infinity
         for (int e = 0; e < int(edges.size()); e++)
         {
-            if (edges[e].counter != 0) continue;
+            if (edges[e].counter != 0)
+                continue;
             _edge& E = edges[e];
-            if (_debug) T.dbg_addline(points[E.p0], points[E.p1], color_rgba(255, 255, 255, 255));
+            if (_debug)
+                T.dbg_addline(points[E.p0], points[E.p1], color_rgba(255, 255, 255, 255));
             Fvector3 point;
             points.push_back(point.sub(points[E.p0], direction));
             points.push_back(point.sub(points[E.p1], direction));
@@ -440,8 +466,8 @@ public:
             int pend = int(points.size());
             P.points.push_back(E.p0);
             P.points.push_back(E.p1);
-            P.points.push_back(pend - 1);  // p1 mod
-            P.points.push_back(pend - 2);  // p0 mod
+            P.points.push_back(pend - 1); // p1 mod
+            P.points.push_back(pend - 2); // p0 mod
             if (_debug)
                 T.dbg_addline(points[E.p0], point.mad(points[E.p0], direction, -1000), color_rgba(0, 255, 0, 255));
             if (_debug)
@@ -453,7 +479,8 @@ public:
         for (int it = 0; it < int(polys.size()); it++)
         {
             _poly& base = polys[it];
-            if (base.classify(cog) > 0) std::reverse(base.points.begin(), base.points.end());
+            if (base.classify(cog) > 0)
+                std::reverse(base.points.begin(), base.points.end());
         }
 
         // Export
@@ -467,4 +494,4 @@ public:
     }
 };
 
-#endif  //	r3_R_sun_support_included
+#endif //	r3_R_sun_support_included

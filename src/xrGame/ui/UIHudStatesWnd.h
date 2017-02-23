@@ -96,7 +96,6 @@ public:
 
     float get_zone_cur_power(ALife::EHitType hit_type);
     float get_main_sensor_value() { return m_radia_hit; }
-
     void DrawZoneIndicators();
     void FakeUpdateIndicatorType(u8 t, float power);
     void EnableFakeIndicators(bool enable);
@@ -108,4 +107,4 @@ protected:
     void UpdateIndicatorType(CActor* actor, ALife::EInfluenceType type);
     //			void	SwitchLA			( bool state, ALife::EInfluenceType type );
 
-};  // class CUIHudStatesWnd
+}; // class CUIHudStatesWnd

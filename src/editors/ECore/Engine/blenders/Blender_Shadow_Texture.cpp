@@ -7,25 +7,10 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-CBlender_ShTex::CBlender_ShTex()
-{
-    description.CLS = B_SHADOW_TEX;
-}
-
-CBlender_ShTex::~CBlender_ShTex()
-{
-}
-
-void CBlender_ShTex::Save(IWriter& fs)
-{
-    IBlender::Save(fs);
-}
-
-void CBlender_ShTex::Load(IReader& fs, u16 version)
-{
-    IBlender::Load(fs, version);
-}
-
+CBlender_ShTex::CBlender_ShTex() { description.CLS = B_SHADOW_TEX; }
+CBlender_ShTex::~CBlender_ShTex() {}
+void CBlender_ShTex::Save(IWriter& fs) { IBlender::Save(fs); }
+void CBlender_ShTex::Load(IReader& fs, u16 version) { IBlender::Load(fs, version); }
 void CBlender_ShTex::Compile(CBlender_Compile& C)
 {
     IBlender::Compile(C);

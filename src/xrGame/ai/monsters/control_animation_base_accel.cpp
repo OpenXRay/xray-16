@@ -4,10 +4,7 @@
 #include "detail_path_manager.h"
 #include "monster_velocity_space.h"
 
-void CControlAnimationBase::accel_init()
-{
-    m_accel.active = false;
-}
+void CControlAnimationBase::accel_init() { m_accel.active = false; }
 void CControlAnimationBase::accel_load(LPCSTR section)
 {
     m_accel.calm = pSettings->r_float(section, "Accel_Calm");
@@ -24,7 +21,8 @@ void CControlAnimationBase::accel_activate(EAccelType type)
 
 float CControlAnimationBase::accel_get(EAccelValue val)
 {
-    if (!accel_active(val)) return flt_max;
+    if (!accel_active(val))
+        return flt_max;
 
     switch (m_accel.type)
     {
@@ -80,11 +78,14 @@ bool CControlAnimationBase::accel_chain_get(
                 best_param = &item_it->velocity;
             }
 
-            if ((*IT) == target_anim) found = true;
-            if (found && best_param) break;
+            if ((*IT) == target_anim)
+                found = true;
+            if (found && best_param)
+                break;
         }
 
-        if (!found) continue;
+        if (!found)
+            continue;
 
         R_ASSERT2(best_param, "probably incompatible speed ranges");
         // calc anim_speed
@@ -132,25 +133,29 @@ bool CControlAnimationBase::accel_chain_test()
 
 bool CControlAnimationBase::accel_check_braking(float before_interval, float nominal_speed)
 {
-    if (!m_man->path_builder().is_moving_on_path()) return (braking_mode = false);
-    if (!accel_active(eAV_Braking)) return (braking_mode = false);
+    if (!m_man->path_builder().is_moving_on_path())
+        return (braking_mode = false);
+    if (!accel_active(eAV_Braking))
+        return (braking_mode = false);
 
     float acceleration = accel_get(eAV_Braking);
     float braking_dist =
         (nominal_speed * ((braking_mode) ? nominal_speed : m_man->movement().velocity_current())) / (2 * acceleration);
 
     braking_dist += before_interval;
-    if (m_man->path_builder().is_path_end(braking_dist)) return (braking_mode = true);
+    if (m_man->path_builder().is_path_end(braking_dist))
+        return (braking_mode = true);
 
     // проверить точки пути, где необходимо остановиться
-    float dist = 0.f;  // дистанция до найденной точки
+    float dist = 0.f; // дистанция до найденной точки
     for (u32 i = m_man->path_builder().detail().curr_travel_point_index() + 1;
          i < m_man->path_builder().detail().path().size(); i++)
     {
         dist += m_man->path_builder().detail().path()[i].position.distance_to(
             m_man->path_builder().detail().path()[i - 1].position);
 
-        if (m_man->path_builder().detail().path()[i].velocity == MonsterMovement::eVelocityParameterStand) {
+        if (m_man->path_builder().detail().path()[i].velocity == MonsterMovement::eVelocityParameterStand)
+        {
             if (dist < braking_dist)
                 return (braking_mode = true);
             else

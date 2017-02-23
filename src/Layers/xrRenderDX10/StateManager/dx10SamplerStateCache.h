@@ -73,4 +73,4 @@ private:
 
 extern dx10SamplerStateCache SSManager;
 
-#endif  //	dx10SamplerStateCache_included
+#endif //	dx10SamplerStateCache_included

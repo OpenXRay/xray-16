@@ -38,7 +38,6 @@ public:
         static Node* GetFirst() { return firstNode; }
         static Node* GetLast() { return lastNode; }
         static size_t GetCount() { return nodeCount; }
-
     private:
         bool HasDependency(const Node* node) const;
         static void InsertAfter(Node* target, Node* node);
@@ -66,44 +65,44 @@ public:
 #define SCRIPT_INHERIT4(_1, _2, _3, _4) #_1, #_2, #_3, #_4
 #define SCRIPT_INHERIT(...) CALL_OVERLOAD(SCRIPT_INHERIT, __VA_ARGS__)
 
-#define SCRIPT_EXPORT_WRAP(id, dependencies, ...)                                                                      \
+#define SCRIPT_EXPORT_WRAP(id, dependencies, ...)                                                                 \
     \
-namespace XRay                                                                                                         \
+namespace XRay                                                                                                    \
     \
-{                                                                                                               \
+{                                                                                                          \
         \
-namespace ScriptExportDetails                                                                                          \
+namespace ScriptExportDetails                                                                                     \
         \
-{                                                                                                           \
-            __pragma(warning(push)) __pragma(warning(disable : 4003)) static const char* const id##_Deps[] = {         \
-                nullptr, SCRIPT_INHERIT(NOOP dependencies)};                                                           \
-            __pragma(warning(pop)) __pragma(optimize("s", on)) static void id##_ScriptExport(lua_State* luaState)      \
-                __VA_ARGS__ static const ScriptExporter::Node id##_ScriptExporterNode(                                 \
-                    #id, sizeof(id##_Deps) / sizeof(*id##_Deps) - 1, id##_Deps + 1, id##_ScriptExport);                \
+{                                                                                                      \
+            __pragma(warning(push)) __pragma(warning(disable : 4003)) static const char* const id##_Deps[] = {    \
+                nullptr, SCRIPT_INHERIT(NOOP dependencies)};                                                      \
+            __pragma(warning(pop)) __pragma(optimize("s", on)) static void id##_ScriptExport(lua_State* luaState) \
+                __VA_ARGS__ static const ScriptExporter::Node id##_ScriptExporterNode(                            \
+                    #id, sizeof(id##_Deps) / sizeof(*id##_Deps) - 1, id##_Deps + 1, id##_ScriptExport);           \
         \
-}                                                                                                           \
+}                                                                                                      \
     \
 }
 
-#define SCRIPT_EXPORT_FUNC_WRAP(id, dependencies, func)                                                                \
+#define SCRIPT_EXPORT_FUNC_WRAP(id, dependencies, func)                                                           \
     \
-namespace XRay                                                                                                         \
+namespace XRay                                                                                                    \
     \
-{                                                                                                               \
+{                                                                                                          \
         \
-namespace ScriptExportDetails                                                                                          \
+namespace ScriptExportDetails                                                                                     \
         \
-{                                                                                                           \
-            __pragma(warning(push)) __pragma(warning(disable : 4003)) static const char* const id##_Deps[] = {         \
-                nullptr, SCRIPT_INHERIT(NOOP dependencies)};                                                           \
-            __pragma(warning(pop)) __pragma(optimize("s", on)) static void id##_ScriptExport(lua_State* luaState)      \
-            {                                                                                                          \
-                func(luaState);                                                                                        \
-            }                                                                                                          \
-            static const ScriptExporter::Node id##_ScriptExporterNode(                                                 \
-                #id, sizeof(id##_Deps) / sizeof(*id##_Deps) - 1, id##_Deps + 1, id##_ScriptExport);                    \
+{                                                                                                      \
+            __pragma(warning(push)) __pragma(warning(disable : 4003)) static const char* const id##_Deps[] = {    \
+                nullptr, SCRIPT_INHERIT(NOOP dependencies)};                                                      \
+            __pragma(warning(pop)) __pragma(optimize("s", on)) static void id##_ScriptExport(lua_State* luaState) \
+            {                                                                                                     \
+                func(luaState);                                                                                   \
+            }                                                                                                     \
+            static const ScriptExporter::Node id##_ScriptExporterNode(                                            \
+                #id, sizeof(id##_Deps) / sizeof(*id##_Deps) - 1, id##_Deps + 1, id##_ScriptExport);               \
         \
-}                                                                                                           \
+}                                                                                                      \
     \
 }
 

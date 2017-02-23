@@ -7,11 +7,7 @@
 
 __declspec(thread) HEAP_ALLOC(rtc_wrkmem, LZO1X_1_MEM_COMPRESS);
 
-void rtc_initialize()
-{
-    VERIFY(lzo_init() == LZO_E_OK);
-}
-
+void rtc_initialize() { VERIFY(lzo_init() == LZO_E_OK); }
 u32 rtc_csize(u32 in)
 {
     VERIFY(in);

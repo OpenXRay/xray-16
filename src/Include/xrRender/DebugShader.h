@@ -7,4 +7,4 @@
 
 typedef FactoryPtr<IUIShader> debug_shader;
 
-#endif  //	DebugShader_included
+#endif //	DebugShader_included

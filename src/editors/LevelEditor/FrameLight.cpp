@@ -11,23 +11,12 @@
 #pragma resource "*.dfm"
 
 //---------------------------------------------------------------------------
-__fastcall TfraLight::TfraLight(TComponent* Owner) : TForm(Owner)
-{
-}
-
+__fastcall TfraLight::TfraLight(TComponent* Owner) : TForm(Owner) {}
 //---------------------------------------------------------------------------
-void __fastcall TfraLight::PaneMinClick(TObject* Sender)
-{
-    PanelMinMaxClick(Sender);
-}
-
+void __fastcall TfraLight::PaneMinClick(TObject* Sender) { PanelMinMaxClick(Sender); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfraLight::ExpandClick(TObject* Sender)
-{
-    PanelMaximizeClick(Sender);
-}
-
+void __fastcall TfraLight::ExpandClick(TObject* Sender) { PanelMaximizeClick(Sender); }
 //---------------------------------------------------------------------------
 
 void TfraLight::UseInD3D(bool bAll, bool bFlag)
@@ -37,12 +26,14 @@ void TfraLight::UseInD3D(bool bAll, bool bFlag)
     for (; _F != _E; _F++)
     {
         CLight* L = (CLight*)*_F;
-        if (bAll) {
+        if (bAll)
+        {
             L->AffectD3D(bFlag);
         }
         else
         {
-            if (L->Selected() && L->Visible()) L->AffectD3D(bFlag);
+            if (L->Selected() && L->Visible())
+                L->AffectD3D(bFlag);
         }
     }
     UI->RedrawScene();
@@ -50,30 +41,14 @@ void TfraLight::UseInD3D(bool bAll, bool bFlag)
 
 //----------------------------------------------------
 
-void __fastcall TfraLight::ebUseSelInD3DClick(TObject* Sender)
-{
-    UseInD3D(false, true);
-}
-
+void __fastcall TfraLight::ebUseSelInD3DClick(TObject* Sender) { UseInD3D(false, true); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfraLight::ebUnuseSelInD3DClick(TObject* Sender)
-{
-    UseInD3D(false, false);
-}
-
+void __fastcall TfraLight::ebUnuseSelInD3DClick(TObject* Sender) { UseInD3D(false, false); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfraLight::ebUseAllInD3DClick(TObject* Sender)
-{
-    UseInD3D(true, true);
-}
-
+void __fastcall TfraLight::ebUseAllInD3DClick(TObject* Sender) { UseInD3D(true, true); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfraLight::ebUnuseAllInD3DClick(TObject* Sender)
-{
-    UseInD3D(true, false);
-}
-
+void __fastcall TfraLight::ebUnuseAllInD3DClick(TObject* Sender) { UseInD3D(true, false); }
 //---------------------------------------------------------------------------

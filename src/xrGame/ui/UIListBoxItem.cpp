@@ -10,19 +10,12 @@ CUIListBoxItem::CUIListBoxItem(float height) : m_text(NULL), tag(u32(-1))
     m_text = AddTextField("---", 10.0f);
 }
 
-void CUIListBoxItem::SetTAG(u32 value)
-{
-    tag = value;
-}
-
-u32 CUIListBoxItem::GetTAG()
-{
-    return tag;
-}
-
+void CUIListBoxItem::SetTAG(u32 value) { tag = value; }
+u32 CUIListBoxItem::GetTAG() { return tag; }
 void CUIListBoxItem::Draw()
 {
-    if (m_bSelected) DrawElements();
+    if (m_bSelected)
+        DrawElements();
 
     CUIWindow::Draw();
 }
@@ -33,24 +26,13 @@ void CUIListBoxItem::OnFocusReceive()
     GetMessageTarget()->SendMessage(this, LIST_ITEM_FOCUS_RECEIVED);
 }
 
-void CUIListBoxItem::InitDefault()
-{
-    InitTexture("ui_listline", "hud\\default");
-}
-
-void CUIListBoxItem::SetFont(CGameFont* F)
-{
-    m_text->SetFont(F);
-}
-
-CGameFont* CUIListBoxItem::GetFont()
-{
-    return (m_text) ? m_text->GetFont() : NULL;
-}
-
+void CUIListBoxItem::InitDefault() { InitTexture("ui_listline", "hud\\default"); }
+void CUIListBoxItem::SetFont(CGameFont* F) { m_text->SetFont(F); }
+CGameFont* CUIListBoxItem::GetFont() { return (m_text) ? m_text->GetFont() : NULL; }
 bool CUIListBoxItem::OnMouseDown(int mouse_btn)
 {
-    if (mouse_btn == MOUSE_1) {
+    if (mouse_btn == MOUSE_1)
+    {
         smart_cast<CUIScrollView*>(GetParent()->GetParent())->SetSelected(this);
         GetMessageTarget()->SendMessage(this, LIST_ITEM_SELECT, &tag);
         GetMessageTarget()->SendMessage(this, LIST_ITEM_CLICKED, &tag);
@@ -60,19 +42,12 @@ bool CUIListBoxItem::OnMouseDown(int mouse_btn)
         return false;
 }
 
-void CUIListBoxItem::SetTextColor(u32 color)
-{
-    m_text->SetTextColor(color);
-}
-
-u32 CUIListBoxItem::GetTextColor()
-{
-    return (m_text) ? m_text->GetTextColor() : 0xffffffff;
-}
-
+void CUIListBoxItem::SetTextColor(u32 color) { m_text->SetTextColor(color); }
+u32 CUIListBoxItem::GetTextColor() { return (m_text) ? m_text->GetTextColor() : 0xffffffff; }
 float CUIListBoxItem::FieldsLength() const
 {
-    if (m_ChildWndList.empty()) return 0.0f;
+    if (m_ChildWndList.empty())
+        return 0.0f;
 
     float len = 0.0f;
     /*
@@ -116,22 +91,7 @@ CUITextWnd* CUIListBoxItem::AddTextField(LPCSTR txt, float width)
     return st;
 }
 
-void CUIListBoxItem::SetData(void* data)
-{
-    pData = data;
-}
-
-void* CUIListBoxItem::GetData()
-{
-    return pData;
-}
-
-void CUIListBoxItem::SetText(LPCSTR txt)
-{
-    m_text->SetText(txt);
-}
-
-LPCSTR CUIListBoxItem::GetText()
-{
-    return m_text->GetText();
-}
+void CUIListBoxItem::SetData(void* data) { pData = data; }
+void* CUIListBoxItem::GetData() { return pData; }
+void CUIListBoxItem::SetText(LPCSTR txt) { m_text->SetText(txt); }
+LPCSTR CUIListBoxItem::GetText() { return m_text->GetText(); }

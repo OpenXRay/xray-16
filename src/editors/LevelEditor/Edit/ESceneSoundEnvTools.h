@@ -8,19 +8,16 @@ class ESceneSoundEnvTool : public ESceneCustomOTool
 {
     typedef ESceneCustomOTool inherited;
 
-  protected:
+protected:
     // controls
     virtual void CreateControls();
     virtual void RemoveControls();
 
-  public:
+public:
     ESceneSoundEnvTool() : ESceneCustomOTool(OBJCLASS_SOUND_ENV) { ; }
-
     // definition
     IC LPCSTR ClassName() { return "sound_env"; }
-
     IC LPCSTR ClassDesc() { return "Sound Environment"; }
-
     IC
 
         int
@@ -33,7 +30,6 @@ class ESceneSoundEnvTool : public ESceneCustomOTool
 
     // IO
     virtual bool IsNeedSave() { return inherited::IsNeedSave(); }
-
     virtual bool LoadStream(IReader&);
     virtual bool LoadLTX(CInifile&);
     virtual void SaveStream(IWriter&);

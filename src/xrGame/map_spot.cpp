@@ -23,14 +23,12 @@ CMapSpot::CMapSpot(CMapLocation* ml) : m_map_location(ml)
     m_scale_bounds.set(-1.0f, -1.0f);
 }
 
-CMapSpot::~CMapSpot()
-{
-}
-
+CMapSpot::~CMapSpot() {}
 void CMapSpot::Load(CUIXml* xml, LPCSTR path)
 {
     CUIXmlInit::InitStatic(*xml, path, 0, this);
-    if (!Heading()) {
+    if (!Heading())
+    {
         SetWidth(GetWidth() * UI().get_current_kx());
         SetStretchTexture(true);
     }
@@ -38,7 +36,8 @@ void CMapSpot::Load(CUIXml* xml, LPCSTR path)
     int i = xml->ReadAttribInt(path, 0, "scale", 0);
     m_bScale = (i == 1);
     m_scale_bounds.x = xml->ReadAttribFlt(path, 0, "scale_min", -1.0f);
-    if (m_bScale) {
+    if (m_bScale)
+    {
         m_scale_bounds.y = xml->ReadAttribFlt(path, 0, "scale_max", -1.0f);
         R_ASSERT2(m_scale_bounds.x > 0 && m_scale_bounds.y > 0, path);
     }
@@ -48,10 +47,12 @@ void CMapSpot::Load(CUIXml* xml, LPCSTR path)
 
     string512 str;
     strconcat(sizeof(str), str, path, ":static_border");
-    if (xml->NavigateToNode(str)) {
+    if (xml->NavigateToNode(str))
+    {
         m_border_static = UIHelper::CreateStatic(*xml, str, this);
         m_border_static->Show(false);
-        if (!Heading()) {
+        if (!Heading())
+        {
             m_border_static->SetWidth(m_border_static->GetWidth() * UI().get_current_kx());
             m_border_static->SetStretchTexture(true);
         }
@@ -59,21 +60,15 @@ void CMapSpot::Load(CUIXml* xml, LPCSTR path)
     m_mark_focused = false;
 }
 
-LPCSTR CMapSpot::GetHint()
-{
-    return MapLocation()->GetHint();
-};
-
-void CMapSpot::SetWndPos(const Fvector2& pos)
-{
-    inherited::SetWndPos(pos);
-}
-
+LPCSTR CMapSpot::GetHint() { return MapLocation()->GetHint(); };
+void CMapSpot::SetWndPos(const Fvector2& pos) { inherited::SetWndPos(pos); }
 void CMapSpot::Update()
 {
     inherited::Update();
-    if (m_bCursorOverWindow) {
-        if (Device.dwTimeGlobal > (m_dwFocusReceiveTime + 500)) {
+    if (m_bCursorOverWindow)
+    {
+        if (Device.dwTimeGlobal > (m_dwFocusReceiveTime + 500))
+        {
             GetMessageTarget()->SendMessage(this, MAP_SHOW_HINT, NULL);
         }
     }
@@ -81,9 +76,11 @@ void CMapSpot::Update()
 
 bool CMapSpot::OnMouseDown(int mouse_btn)
 {
-    if (mouse_btn == MOUSE_1) {
+    if (mouse_btn == MOUSE_1)
+    {
         CGameTask* t = Level().GameTaskManager().HasGameTask(m_map_location, true);
-        if (t) {
+        if (t)
+        {
             GetMessageTarget()->SendMessage(this, MAP_SELECT_SPOT);
             return true;
         }
@@ -103,40 +100,21 @@ void CMapSpot::OnFocusLost()
 
 void CMapSpot::show_static_border(bool status)
 {
-    if (m_border_static) {
+    if (m_border_static)
+    {
         m_border_static->Show(status);
     }
 }
 
-void CMapSpot::mark_focused()
-{
-    m_mark_focused = true;
-}
-
+void CMapSpot::mark_focused() { m_mark_focused = true; }
 // -------------------------------------------------------------------------------------------------
 
-CMapSpotPointer::CMapSpotPointer(CMapLocation* ml) : inherited(ml)
-{
-}
-
-CMapSpotPointer::~CMapSpotPointer()
-{
-}
-
-LPCSTR CMapSpotPointer::GetHint()
-{
-    return NULL;
-}
-
+CMapSpotPointer::CMapSpotPointer(CMapLocation* ml) : inherited(ml) {}
+CMapSpotPointer::~CMapSpotPointer() {}
+LPCSTR CMapSpotPointer::GetHint() { return NULL; }
 //////////////////////////////////////////////////
-CMiniMapSpot::CMiniMapSpot(CMapLocation* ml) : inherited(ml)
-{
-}
-
-CMiniMapSpot::~CMiniMapSpot()
-{
-}
-
+CMiniMapSpot::CMiniMapSpot(CMapLocation* ml) : inherited(ml) {}
+CMiniMapSpot::~CMiniMapSpot() {}
 void CMiniMapSpot::Load(CUIXml* xml, LPCSTR path)
 {
     inherited::Load(xml, path);
@@ -154,10 +132,12 @@ void CMiniMapSpot::Load(CUIXml* xml, LPCSTR path)
 
     strconcat(sizeof(buf), buf, path, ":texture_above");
     n = xml->NavigateToNode(buf, 0);
-    if (n) {
+    if (n)
+    {
         LPCSTR texture = xml->Read(buf, 0, NULL);
         CUITextureMaster::InitTexture(texture, &m_UIStaticItem);
-        if (strchr(texture, '\\')) {
+        if (strchr(texture, '\\'))
+        {
             float x = xml->ReadAttribFlt(buf, 0, "x", base_rect.x1);
             float y = xml->ReadAttribFlt(buf, 0, "y", base_rect.y1);
             float width = xml->ReadAttribFlt(buf, 0, "width", base_rect.width());
@@ -172,10 +152,12 @@ void CMiniMapSpot::Load(CUIXml* xml, LPCSTR path)
 
     strconcat(sizeof(buf), buf, path, ":texture_below");
     n = xml->NavigateToNode(buf, 0);
-    if (n) {
+    if (n)
+    {
         LPCSTR texture = xml->Read(buf, 0, NULL);
         CUITextureMaster::InitTexture(texture, &m_UIStaticItem);
-        if (strchr(texture, '\\')) {
+        if (strchr(texture, '\\'))
+        {
             float x = xml->ReadAttribFlt(buf, 0, "x", base_rect.x1);
             float y = xml->ReadAttribFlt(buf, 0, "y", base_rect.y1);
             float width = xml->ReadAttribFlt(buf, 0, "width", base_rect.width());
@@ -189,10 +171,12 @@ void CMiniMapSpot::Load(CUIXml* xml, LPCSTR path)
     }
     strconcat(sizeof(buf), buf, path, ":texture");
     n = xml->NavigateToNode(buf, 0);
-    if (n) {
+    if (n)
+    {
         LPCSTR texture = xml->Read(buf, 0, NULL);
         CUITextureMaster::InitTexture(texture, &m_UIStaticItem);
-        if (strchr(texture, '\\')) {
+        if (strchr(texture, '\\'))
+        {
             float x = xml->ReadAttribFlt(buf, 0, "x", base_rect.x1);
             float y = xml->ReadAttribFlt(buf, 0, "y", base_rect.y1);
             float width = xml->ReadAttribFlt(buf, 0, "width", base_rect.width());
@@ -211,11 +195,13 @@ void CMiniMapSpot::Load(CUIXml* xml, LPCSTR path)
 void CMiniMapSpot::Draw()
 {
     IGameObject* O = Level().CurrentViewEntity();
-    if (O && m_icon_above->inited() && m_icon_below->inited()) {
+    if (O && m_icon_above->inited() && m_icon_below->inited())
+    {
         float ml_y = MapLocation()->GetLastPosition().y;
         float d = O->Position().y - ml_y;
 
-        if (d > 1.8f) {
+        if (d > 1.8f)
+        {
             GetUIStaticItem().SetShader(m_icon_below);
             GetUIStaticItem().SetTextureRect(m_tex_rect_below);
         }
@@ -258,10 +244,7 @@ CComplexMapSpot::CComplexMapSpot(CMapLocation* ml) : inherited(ml)
     m_timer = NULL;
 }
 
-CComplexMapSpot::~CComplexMapSpot()
-{
-}
-
+CComplexMapSpot::~CComplexMapSpot() {}
 CUIStaticOrig* CComplexMapSpot::CreateStaticOrig(CUIXml& xml, LPCSTR ui_path)
 {
     CUIStaticOrig* ui = new CUIStaticOrig();
@@ -272,7 +255,7 @@ CUIStaticOrig* CComplexMapSpot::CreateStaticOrig(CUIXml& xml, LPCSTR ui_path)
     return ui;
 }
 
-void CComplexMapSpot::Load(CUIXml* xml, LPCSTR path)  // complex_spot_template
+void CComplexMapSpot::Load(CUIXml* xml, LPCSTR path) // complex_spot_template
 {
     inherited::Load(xml, path);
 
@@ -288,9 +271,10 @@ void CComplexMapSpot::Load(CUIXml* xml, LPCSTR path)  // complex_spot_template
     xml->SetLocalRoot(stored_root);
 }
 
-void CComplexMapSpot::SetTimerFinish(ALife::_TIME_ID time)  // ms
+void CComplexMapSpot::SetTimerFinish(ALife::_TIME_ID time) // ms
 {
-    if (time <= 0) {
+    if (time <= 0)
+    {
         m_timer_finish = 0;
         m_infinity_time = true;
         m_timer->Show(false);
@@ -308,9 +292,11 @@ void CComplexMapSpot::Update()
     inherited::Update();
 
     m_last_delay += Device.dwTimeDelta;
-    if (m_last_delay > 310) {
+    if (m_last_delay > 310)
+    {
         m_last_delay = 0;
-        if (Level().GetGameTime() > m_timer_finish) {
+        if (Level().GetGameTime() > m_timer_finish)
+        {
             /*if ( !m_infinity_time )
             {
                 MapLocation()->DisableSpot();
@@ -318,7 +304,8 @@ void CComplexMapSpot::Update()
         }
         else
         {
-            if (!m_infinity_time) {
+            if (!m_infinity_time)
+            {
                 ALife::_TIME_ID dt = m_timer_finish - Level().GetGameTime();
                 m_timer->TextItemControl()->SetText(
                     GetTimeAsString(dt, InventoryUtilities::etpTimeToMinutes, ':', false).c_str());
@@ -326,7 +313,8 @@ void CComplexMapSpot::Update()
         }
     }
 
-    if (MapLocation()->SpotEnabled()) {
+    if (MapLocation()->SpotEnabled())
+    {
         m_timer->Show((m_timer->GetWndSize().x > 5.0f) && (Level().GetGameTime() < m_timer_finish));
     }
 }
@@ -335,7 +323,8 @@ void CComplexMapSpot::SetWndSize(const Fvector2& size)
 {
     inherited::SetWndSize(size);
 
-    if (m_originSize.x == 0.0f || m_originSize.y == 0.0f) {
+    if (m_originSize.x == 0.0f || m_originSize.y == 0.0f)
+    {
         return;
     }
     float k = size.x / m_originSize.x;
@@ -343,12 +332,14 @@ void CComplexMapSpot::SetWndSize(const Fvector2& size)
     for (WINDOW_LIST_it it = m_ChildWndList.begin(); m_ChildWndList.end() != it; ++it)
     {
         CUIStaticOrig* static_orig = smart_cast<CUIStaticOrig*>(*it);
-        if (static_orig) {
+        if (static_orig)
+        {
             static_orig->ScaleOrigin(k);
         }
     }
 
-    if (m_timer) {
+    if (m_timer)
+    {
         float xp = 0.5f * (GetWndSize().x - m_timer->GetWndSize().x);
         m_timer->SetWndPos(Fvector2().set(xp, m_timer->GetWndPos().y));
     }

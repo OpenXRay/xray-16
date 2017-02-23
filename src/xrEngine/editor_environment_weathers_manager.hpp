@@ -71,11 +71,11 @@ private:
 public:
     environment::manager& m_manager;
     mutable bool m_changed;
-};  // class manager
-}  // namespace weathers
-}  // namespace environment
-}  // namespace editor
+}; // class manager
+} // namespace weathers
+} // namespace environment
+} // namespace editor
 
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR
 
-#endif  // ifndef EDITOR_ENVIRONMENT_WEATHERS_MANAGER_HPP_INCLUDED
+#endif // ifndef EDITOR_ENVIRONMENT_WEATHERS_MANAGER_HPP_INCLUDED

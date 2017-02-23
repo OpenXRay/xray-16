@@ -53,8 +53,8 @@ __forceinline int lines_intersect(float x1, float y1, /* First line segment */
     )
 {
     float a1, a2, b1, b2, c1, c2; /* Coefficients of line eqns. */
-    float r1, r2, r3, r4;         /* 'Sign' values */
-    float denom, num;             /* Intermediate values */
+    float r1, r2, r3, r4; /* 'Sign' values */
+    float denom, num; /* Intermediate values */
 
     /* Compute a1, b1, c1, where line joining points 1 and 2
     * is "a1 x  +  b1 y  +  c1  =  0".
@@ -74,7 +74,8 @@ __forceinline int lines_intersect(float x1, float y1, /* First line segment */
     * same side of line 1, the line segments do not intersect.
     */
 
-    if (r3 * r4 > 0) return (LI_NONE);
+    if (r3 * r4 > 0)
+        return (LI_NONE);
 
     /* Compute a2, b2, c2 */
 
@@ -92,16 +93,19 @@ __forceinline int lines_intersect(float x1, float y1, /* First line segment */
     * not intersect.
     */
 
-    if (r1 * r2 > 0) return (LI_NONE);
+    if (r1 * r2 > 0)
+        return (LI_NONE);
 
     // Check for equality
-    if (_abs(r1 * r2) < EPS_S && _abs(r3 * r4) < EPS_S) return LI_NONE;
+    if (_abs(r1 * r2) < EPS_S && _abs(r3 * r4) < EPS_S)
+        return LI_NONE;
 
     /* Line segments intersect: compute intersection point.
     */
 
     denom = a1 * b2 - a2 * b1;
-    if (_abs(denom) < EPS) return (LI_COLLINEAR);
+    if (_abs(denom) < EPS)
+        return (LI_COLLINEAR);
 
     num = b1 * c2 - b2 * c1;
     *x = num / denom;

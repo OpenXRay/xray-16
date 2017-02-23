@@ -5,7 +5,7 @@ Copyright (c) 1997-2000 John Robbins -- All rights reserved.
 
 #include "stdafx.h"
 #pragma warning(push)
-#pragma warning(disable : 4091)  // 'typedef ': ignored on left of '' when no variable is declared
+#pragma warning(disable : 4091) // 'typedef ': ignored on left of '' when no variable is declared
 #include "StackTrace.h"
 #include "SymbolEngine.h"
 #include "MiniDump.h"
@@ -116,7 +116,8 @@ BOOL __stdcall ReadCurrentProcessMemory(
 LPCTSTR __stdcall InternalGetStackTraceString(DWORD dwOpts, EXCEPTION_POINTERS* pExPtrs)
 {
     // ASSERT(IsBadReadPtr(pExPtrs, sizeof(EXCEPTION_POINTERS)) == FALSE);
-    if (IsBadReadPtr(pExPtrs, sizeof(EXCEPTION_POINTERS)) == TRUE) {
+    if (IsBadReadPtr(pExPtrs, sizeof(EXCEPTION_POINTERS)) == TRUE)
+    {
         SetLastError(ERROR_INVALID_ADDRESS);
         // TRACE0("GetStackTraceString - invalid pExPtrs!\n");
         return NULL;
@@ -148,7 +149,8 @@ LPCTSTR __stdcall InternalGetStackTraceString(DWORD dwOpts, EXCEPTION_POINTERS* 
         BOOL bSWRet = StackWalk(CH_MACHINE, hProcess, GetCurrentThread(), &g_stFrame, pExPtrs->ContextRecord,
             (PREAD_PROCESS_MEMORY_ROUTINE)ReadCurrentProcessMemory, SymFunctionTableAccess, SymGetModuleBase, NULL);
 
-        if ((bSWRet == FALSE) || (g_stFrame.AddrFrame.Offset == 0)) {
+        if ((bSWRet == FALSE) || (g_stFrame.AddrFrame.Offset == 0))
+        {
             szRet = NULL;
             __leave;
         }
@@ -159,7 +161,8 @@ LPCTSTR __stdcall InternalGetStackTraceString(DWORD dwOpts, EXCEPTION_POINTERS* 
         // StackWalk returns TRUE but the address doesn't belong to
         // a module in the process.
         dwModBase = SymGetModuleBase(hProcess, g_stFrame.AddrPC.Offset);
-        if (dwModBase == 0) {
+        if (dwModBase == 0)
+        {
             szRet = NULL;
             __leave;
         }
@@ -176,7 +179,8 @@ LPCTSTR __stdcall InternalGetStackTraceString(DWORD dwOpts, EXCEPTION_POINTERS* 
 #endif
 
         // Output the parameters?
-        if ((dwOpts & GSTSO_PARAMS) == GSTSO_PARAMS) {
+        if ((dwOpts & GSTSO_PARAMS) == GSTSO_PARAMS)
+        {
             iCurr += wsprintf(g_szBuff + iCurr,
 #ifdef _WIN64
                 _T(" (0x%016I64X 0x%016I64X 0x%016I64X 0x%016I64X)"),
@@ -187,7 +191,8 @@ LPCTSTR __stdcall InternalGetStackTraceString(DWORD dwOpts, EXCEPTION_POINTERS* 
                 g_stFrame.Params[0], g_stFrame.Params[1], g_stFrame.Params[2], g_stFrame.Params[3]);
         }
         // Output the module name.
-        if ((dwOpts & GSTSO_MODULE) == GSTSO_MODULE) {
+        if ((dwOpts & GSTSO_MODULE) == GSTSO_MODULE)
+        {
             iCurr += wsprintf(g_szBuff + iCurr, _T(" "));
             // ASSERT(iCurr < (BUFF_SIZE - MAX_PATH));
             iCurr += GetModuleBaseName(GetCurrentProcess(), (HINSTANCE)dwModBase, g_szBuff + iCurr, BUFF_SIZE - iCurr);
@@ -196,18 +201,21 @@ LPCTSTR __stdcall InternalGetStackTraceString(DWORD dwOpts, EXCEPTION_POINTERS* 
         // ASSERT(iCurr < (BUFF_SIZE - MAX_PATH));
         DWORD dwDisp;
         // Output the symbol name?
-        if ((dwOpts & GSTSO_SYMBOL) == GSTSO_SYMBOL) {
+        if ((dwOpts & GSTSO_SYMBOL) == GSTSO_SYMBOL)
+        {
             // Start looking up the exception address.
             PIMAGEHLP_SYMBOL pSym = (PIMAGEHLP_SYMBOL)&g_stSymbol;
             ZeroMemory(pSym, SYM_BUFF_SIZE);
             pSym->SizeOfStruct = sizeof(IMAGEHLP_SYMBOL);
             pSym->MaxNameLength = SYM_BUFF_SIZE - sizeof(IMAGEHLP_SYMBOL);
 
-            if (SymGetSymFromAddr(hProcess, g_stFrame.AddrPC.Offset, &dwDisp, pSym) == TRUE) {
+            if (SymGetSymFromAddr(hProcess, g_stFrame.AddrPC.Offset, &dwDisp, pSym) == TRUE)
+            {
                 iCurr += wsprintf(g_szBuff + iCurr, _T(", "));
                 // Copy no more symbol information than there's room for.
                 dwTemp = lstrlen(pSym->Name);
-                if (dwTemp > (DWORD)(BUFF_SIZE - iCurr - (MAX_SYM_SIZE + 50))) {
+                if (dwTemp > (DWORD)(BUFF_SIZE - iCurr - (MAX_SYM_SIZE + 50)))
+                {
                     lstrcpyn(g_szBuff + iCurr, pSym->Name, BUFF_SIZE - iCurr - 1);
                     // Gotta leave now
                     szRet = g_szBuff;
@@ -215,7 +223,8 @@ LPCTSTR __stdcall InternalGetStackTraceString(DWORD dwOpts, EXCEPTION_POINTERS* 
                 }
                 else
                 {
-                    if (dwDisp > 0) {
+                    if (dwDisp > 0)
+                    {
                         // iCurr += wsprintf(g_szBuff + iCurr, _T("%s() + %I64d byte(s)"), pSym->Name, dwDisp);
                         iCurr += wsprintf(g_szBuff + iCurr, _T("%s() + %d byte(s)"), pSym->Name, dwDisp);
                     }
@@ -237,17 +246,20 @@ LPCTSTR __stdcall InternalGetStackTraceString(DWORD dwOpts, EXCEPTION_POINTERS* 
         // ASSERT(iCurr < (BUFF_SIZE - MAX_PATH));
 
         // Output the source file and line number information?
-        if ((dwOpts & GSTSO_SRCLINE) == GSTSO_SRCLINE) {
+        if ((dwOpts & GSTSO_SRCLINE) == GSTSO_SRCLINE)
+        {
             ZeroMemory(&g_stLine, sizeof(IMAGEHLP_LINE));
             g_stLine.SizeOfStruct = sizeof(IMAGEHLP_LINE);
 
-            if (SymGetLineFromAddr(hProcess, g_stFrame.AddrPC.Offset, &dwDisp, &g_stLine) == TRUE) {
+            if (SymGetLineFromAddr(hProcess, g_stFrame.AddrPC.Offset, &dwDisp, &g_stLine) == TRUE)
+            {
                 iCurr += wsprintf(g_szBuff + iCurr, _T(", "));
 
                 // Copy no more of the source file and line number
                 // information than there's room for.
                 dwTemp = lstrlen(g_stLine.FileName);
-                if (dwTemp > (DWORD)(BUFF_SIZE - iCurr - (MAX_PATH + 50))) {
+                if (dwTemp > (DWORD)(BUFF_SIZE - iCurr - (MAX_PATH + 50)))
+                {
                     lstrcpyn(g_szBuff + iCurr, g_stLine.FileName, BUFF_SIZE - iCurr - 1);
                     // Gotta leave now
                     szRet = g_szBuff;
@@ -255,7 +267,8 @@ LPCTSTR __stdcall InternalGetStackTraceString(DWORD dwOpts, EXCEPTION_POINTERS* 
                 }
                 else
                 {
-                    if (dwDisp > 0) {
+                    if (dwDisp > 0)
+                    {
                         iCurr += wsprintf(g_szBuff + iCurr, _T("%s, line %d + %d byte(s)"), g_stLine.FileName,
                             g_stLine.LineNumber, dwDisp);
                     }
@@ -283,7 +296,8 @@ LPCTSTR __stdcall InternalGetStackTraceString(DWORD dwOpts, EXCEPTION_POINTERS* 
 BOOL __stdcall GetFirstStackTraceStringVB(DWORD dwOpts, EXCEPTION_POINTERS* pExPtrs, LPTSTR szBuff, UINT uiSize)
 {
     // ASSERT(IsBadWritePtr(szBuff, uiSize) == FALSE);
-    if (IsBadWritePtr(szBuff, uiSize) == TRUE) {
+    if (IsBadWritePtr(szBuff, uiSize) == TRUE)
+    {
         return FALSE;
     }
 
@@ -292,7 +306,8 @@ BOOL __stdcall GetFirstStackTraceStringVB(DWORD dwOpts, EXCEPTION_POINTERS* pExP
     __try
     {
         szRet = GetFirstStackTraceString(dwOpts, pExPtrs);
-        if (NULL == szRet) {
+        if (NULL == szRet)
+        {
             __leave;
         }
         lstrcpyn(szBuff, szRet, std::min((UINT)lstrlen(szRet) + 1, uiSize));
@@ -307,14 +322,16 @@ BOOL __stdcall GetFirstStackTraceStringVB(DWORD dwOpts, EXCEPTION_POINTERS* pExP
 BOOL __stdcall GetNextStackTraceStringVB(DWORD dwOpts, EXCEPTION_POINTERS* pExPtrs, LPTSTR szBuff, UINT uiSize)
 {
     // ASSERT(IsBadWritePtr(szBuff, uiSize) == FALSE);
-    if (IsBadWritePtr(szBuff, uiSize) == TRUE) {
+    if (IsBadWritePtr(szBuff, uiSize) == TRUE)
+    {
         return FALSE;
     }
     LPCTSTR szRet;
     __try
     {
         szRet = GetNextStackTraceString(dwOpts, pExPtrs);
-        if (NULL == szRet) {
+        if (NULL == szRet)
+        {
             __leave;
         }
         lstrcpyn(szBuff, szRet, std::min((UINT)lstrlen(szRet) + 1, uiSize));
@@ -330,7 +347,8 @@ BOOL __stdcall GetNextStackTraceStringVB(DWORD dwOpts, EXCEPTION_POINTERS* pExPt
 void InitializeSymbolEngine(void)
 {
     // static char const ms_symsrv[] = "http://msdl.microsoft.com/download/symbols";
-    if (!g_bSymEngInit) {
+    if (!g_bSymEngInit)
+    {
         // Set up the symbol engine.
         DWORD dwOpts = SymGetOptions();
         // Turn on line loading and deferred loading.
@@ -350,7 +368,8 @@ void InitializeSymbolEngine(void)
 // Cleans up the symbol engine if needed
 void DeinitializeSymbolEngine(void)
 {
-    if (g_bSymEngInit) {
+    if (g_bSymEngInit)
+    {
         SymCleanup((HANDLE)GetCurrentProcessId());
         g_bSymEngInit = FALSE;
     }

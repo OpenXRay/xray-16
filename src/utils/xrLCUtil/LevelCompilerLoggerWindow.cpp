@@ -14,7 +14,8 @@ LevelCompilerLoggerWindow::LevelCompilerLoggerWindow()
 
 void LevelCompilerLoggerWindow::Initialize(const char* name)
 {
-    if (initialized) return;
+    if (initialized)
+        return;
     InitCommonControls();
     Sleep(150);
     xr_strcpy(this->name, name);
@@ -43,7 +44,8 @@ static INT_PTR CALLBACK LevelCompilerLoggerWindowDlgProc(HWND hw, UINT msg, WPAR
     case WM_DESTROY: break;
     case WM_CLOSE: ExitProcess(0); break;
     case WM_COMMAND:
-        if (LOWORD(wp) == IDCANCEL) ExitProcess(0);
+        if (LOWORD(wp) == IDCANCEL)
+            ExitProcess(0);
         break;
     default: return FALSE;
     }
@@ -55,7 +57,8 @@ void LevelCompilerLoggerWindow::LogThreadProc()
     SetProcessPriorityBoost(GetCurrentProcess(), TRUE);
     logWindow =
         CreateDialog(HINSTANCE(GetModuleHandle(0)), MAKEINTRESOURCE(IDD_LOG), 0, LevelCompilerLoggerWindowDlgProc);
-    if (!logWindow) R_CHK(GetLastError());
+    if (!logWindow)
+        R_CHK(GetLastError());
     SetWindowText(logWindow, name);
     SetWindowPos(logWindow, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
     hwLog = GetDlgItem(logWindow, IDC_LOG);
@@ -77,7 +80,8 @@ void LevelCompilerLoggerWindow::LogThreadProc()
     unsigned long u_size = sizeof(u_name) - 1;
     GetUserName(u_name, &u_size);
     _strlwr(u_name);
-    if (!xr_strcmp(u_name, "oles") || !xr_strcmp(u_name, "alexmx")) bHighPriority = TRUE;
+    if (!xr_strcmp(u_name, "oles") || !xr_strcmp(u_name, "alexmx"))
+        bHighPriority = TRUE;
     // Main cycle
     u32 LogSize = 0;
     float PrSave = 0;
@@ -97,30 +101,35 @@ void LevelCompilerLoggerWindow::LogThreadProc()
         BOOL bWasChanges = FALSE;
         char tbuf[256];
         csLog.Enter();
-        if (LogSize != LogFile->size()) {
+        if (LogSize != LogFile->size())
+        {
             bWasChanges = TRUE;
             for (; LogSize < LogFile->size(); LogSize++)
             {
                 const char* S = *(*LogFile)[LogSize];
-                if (!S) S = "";
+                if (!S)
+                    S = "";
                 SendMessage(hwLog, LB_ADDSTRING, 0, (LPARAM)S);
             }
             SendMessage(hwLog, LB_SETTOPINDEX, LogSize - 1, 0);
             FlushLog();
         }
         csLog.Leave();
-        if (_abs(PrSave - progress) > EPS_L) {
+        if (_abs(PrSave - progress) > EPS_L)
+        {
             bWasChanges = TRUE;
             PrSave = progress;
             SendMessage(hwProgress, PBM_SETPOS, u32(progress * 1000.f), 0);
             // timing
-            if (progress > 0.005f) {
+            if (progress > 0.005f)
+            {
                 u32 dwCurrentTime = timeGetTime();
                 u32 dwTimeDiff = dwCurrentTime - phase_start_time;
                 u32 secElapsed = dwTimeDiff / 1000;
                 u32 secRemain = u32(float(secElapsed) / progress) - secElapsed;
-                xr_sprintf(tbuf, "Elapsed: %s\n"
-                                 "Remain:  %s",
+                xr_sprintf(tbuf,
+                    "Elapsed: %s\n"
+                    "Remain:  %s",
                     make_time(secElapsed).c_str(), make_time(secRemain).c_str());
                 SetWindowText(hwTime, tbuf);
             }
@@ -130,18 +139,21 @@ void LevelCompilerLoggerWindow::LogThreadProc()
             xr_sprintf(tbuf, "%3.2f%%", progress * 100.f);
             SetWindowText(hwPText, tbuf);
         }
-        if (bStatusChange) {
+        if (bStatusChange)
+        {
             bWasChanges = TRUE;
             bStatusChange = FALSE;
             SetWindowText(hwInfo, status);
         }
-        if (bWasChanges) {
+        if (bWasChanges)
+        {
             UpdateWindow(logWindow);
             bWasChanges = FALSE;
         }
         csLog.Leave();
         ProcessMessages();
-        if (close) break;
+        if (close)
+            break;
         Sleep(200);
     }
     // Cleanup
@@ -151,7 +163,8 @@ void LevelCompilerLoggerWindow::LogThreadProc()
 void LevelCompilerLoggerWindow::ProcessMessages()
 {
     MSG msg;
-    if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+    if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+    {
         TranslateMessage(&msg);
         DispatchMessage(&msg);
     }
@@ -206,11 +219,7 @@ void LevelCompilerLoggerWindow::StatusV(const char* format, va_list args)
     csLog.Leave();
 }
 
-void LevelCompilerLoggerWindow::Progress(float progress)
-{
-    this->progress = progress;
-}
-
+void LevelCompilerLoggerWindow::Progress(float progress) { this->progress = progress; }
 void LevelCompilerLoggerWindow::Phase(const char* phaseName)
 {
     while (!(hwPhaseTime && hwStage))
@@ -241,12 +250,5 @@ void LevelCompilerLoggerWindow::Success(const char* msg)
     MessageBox(logWindow, msg, "Congratulation!", MB_OK | MB_ICONINFORMATION);
 }
 
-void LevelCompilerLoggerWindow::Failure(const char* msg)
-{
-    MessageBox(logWindow, msg, "Error!", MB_OK | MB_ICONERROR);
-}
-
-HWND LevelCompilerLoggerWindow::GetWindow() const
-{
-    return logWindow;
-}
+void LevelCompilerLoggerWindow::Failure(const char* msg) { MessageBox(logWindow, msg, "Error!", MB_OK | MB_ICONERROR); }
+HWND LevelCompilerLoggerWindow::GetWindow() const { return logWindow; }

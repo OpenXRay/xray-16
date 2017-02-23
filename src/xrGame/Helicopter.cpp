@@ -22,7 +22,8 @@ CHelicopter::CHelicopter()
     m_lanim = NULL;
 
     ISpatial* self = smart_cast<ISpatial*>(this);
-    if (self) self->GetSpatialData().type |= STYPE_VISIBLEFORAI;
+    if (self)
+        self->GetSpatialData().type |= STYPE_VISIBLEFORAI;
 
     m_movement.parent = this;
     m_body.parent = this;
@@ -34,11 +35,7 @@ CHelicopter::~CHelicopter()
     HUD_SOUND_ITEM::DestroySound(m_sndShotRocket);
 }
 
-void CHelicopter::setState(CHelicopter::EHeliState s)
-{
-    m_curState = s;
-}
-
+void CHelicopter::setState(CHelicopter::EHeliState s) { m_curState = s; }
 void CHelicopter::init()
 {
     m_cur_rot.set(0.0f, 0.0f);
@@ -90,7 +87,7 @@ void CHelicopter::Load(LPCSTR section)
     HUD_SOUND_ITEM::LoadSound(section, "snd_shoot_rocket", m_sndShotRocket, SOUND_TYPE_WEAPON_SHOOTING);
     CRocketLauncher::Load(section);
 
-    UseFireTrail(m_enemy.bUseFireTrail);  // temp force reloar disp params
+    UseFireTrail(m_enemy.bUseFireTrail); // temp force reloar disp params
 
     m_sAmmoType = pSettings->r_string(section, "ammo_class");
     m_CurrentAmmo.Load(*m_sAmmoType, 0);
@@ -120,19 +117,13 @@ void CHelicopter::Load(LPCSTR section)
     m_lanim = LALib.FindItem(lanim);
 }
 
-void CHelicopter::reload(LPCSTR section)
-{
-    inherited::reload(section);
-}
-
+void CHelicopter::reload(LPCSTR section) { inherited::reload(section); }
 void CollisionCallbackAlife(bool& do_colide, bool bo1, dContact& c, SGameMtl* material_1, SGameMtl* material_2)
 {
     do_colide = false;
 }
 
-void ContactCallbackAlife(CDB::TRI* T, dContactGeom* c)
-{
-}
+void ContactCallbackAlife(CDB::TRI* T, dContactGeom* c) {}
 BOOL CHelicopter::net_Spawn(CSE_Abstract* DC)
 {
     SetfHealth(100.0f);
@@ -143,7 +134,8 @@ BOOL CHelicopter::net_Spawn(CSE_Abstract* DC)
     m_ready_explode = false;
     m_dead = false;
 
-    if (!inherited::net_Spawn(DC)) return (FALSE);
+    if (!inherited::net_Spawn(DC))
+        return (FALSE);
 
     CPHSkeleton::Spawn((CSE_Abstract*)(DC));
     for (u32 i = 0; i < 4; ++i)
@@ -173,7 +165,8 @@ BOOL CHelicopter::net_Spawn(CSE_Abstract* DC)
 
     LPCSTR s = pUserData->r_string("helicopter_definition", "hit_section");
 
-    if (pUserData->section_exist(s)) {
+    if (pUserData->section_exist(s))
+    {
         int lc = pUserData->line_count(s);
         LPCSTR name;
         LPCSTR value;
@@ -207,7 +200,8 @@ BOOL CHelicopter::net_Spawn(CSE_Abstract* DC)
     m_bind_y.set(matrices[m_rotate_y_bone].c);
 
     IKinematicsAnimated* A = smart_cast<IKinematicsAnimated*>(Visual());
-    if (A) {
+    if (A)
+    {
         A->PlayCycle(*heli->startup_animation);
         K->CalculateBones(TRUE);
     }
@@ -229,9 +223,11 @@ BOOL CHelicopter::net_Spawn(CSE_Abstract* DC)
     m_light_render->set_range(m_light_range);
     m_light_render->set_color(m_light_color);
 
-    if (g_Alive()) processing_activate();
+    if (g_Alive())
+        processing_activate();
     TurnEngineSound(false);
-    if (pUserData->section_exist("destroyed")) CPHDestroyable::Load(pUserData, "destroyed");
+    if (pUserData->section_exist("destroyed"))
+        CPHDestroyable::Load(pUserData, "destroyed");
 #ifdef DEBUG
     Device.seqRender.Add(this, REG_PRIORITY_LOW - 1);
 #endif
@@ -260,7 +256,8 @@ void CHelicopter::net_Destroy()
 void CHelicopter::SpawnInitPhysics(CSE_Abstract* D)
 {
     PPhysicsShell() = P_build_Shell(this, false);
-    if (g_Alive()) {
+    if (g_Alive())
+    {
         PPhysicsShell()->EnabledCallbacks(FALSE);
         PPhysicsShell()->set_ObjectContactCallback(CollisionCallbackAlife);
         PPhysicsShell()->set_ContactCallback(ContactCallbackAlife);
@@ -281,7 +278,8 @@ void CHelicopter::MoveStep()
     Fvector dir, pathDir;
     float desired_H = m_movement.currPathH;
     float desired_P;
-    if (m_movement.type != eMovNone) {
+    if (m_movement.type != eMovNone)
+    {
         float dist = m_movement.currP.distance_to(m_movement.desiredPoint);
 
         dir.sub(m_movement.desiredPoint, m_movement.currP);
@@ -306,13 +304,16 @@ void CHelicopter::MoveStep()
         m_movement.currP.mad(dir, vp);
         m_movement.curLinearSpeed += m_movement.curLinearAcc * STEP;
         static bool aaa = false;
-        if (aaa) Log("1-m_movement.curLinearSpeed=", m_movement.curLinearSpeed);
+        if (aaa)
+            Log("1-m_movement.curLinearSpeed=", m_movement.curLinearSpeed);
         clamp(m_movement.curLinearSpeed, 0.0f, 1000.0f);
-        if (aaa) Log("2-m_movement.curLinearSpeed=", m_movement.curLinearSpeed);
+        if (aaa)
+            Log("2-m_movement.curLinearSpeed=", m_movement.curLinearSpeed);
     }
     else
-    {  // go stopping
-        if (!fis_zero(m_movement.curLinearSpeed)) {
+    { // go stopping
+        if (!fis_zero(m_movement.curLinearSpeed))
+        {
             m_movement.curLinearAcc = -m_movement.LinearAcc_bk;
 
             float vp = m_movement.curLinearSpeed * STEP + (m_movement.curLinearAcc * STEP * STEP) / 2.0f;
@@ -330,7 +331,8 @@ void CHelicopter::MoveStep()
         }
     };
 
-    if (m_body.b_looking_at_point) {
+    if (m_body.b_looking_at_point)
+    {
         Fvector desired_dir;
         desired_dir.sub(m_body.looking_point, m_movement.currP).normalize_safe();
 
@@ -346,7 +348,8 @@ void CHelicopter::MoveStep()
     }
 
     float needBodyP = -m_body.model_pitch_k * m_movement.curLinearSpeed;
-    if (m_movement.curLinearAcc < 0) needBodyP *= -1;
+    if (m_movement.curLinearAcc < 0)
+        needBodyP *= -1;
     angle_lerp(m_body.currBodyHPB.y, needBodyP, m_body.model_angSpeedPitch, STEP);
 
     float sign;
@@ -367,7 +370,8 @@ void CHelicopter::UpdateCL()
 {
     inherited::UpdateCL();
     CExplosive::UpdateCL();
-    if (PPhysicsShell() && (state() == CHelicopter::eDead)) {
+    if (PPhysicsShell() && (state() == CHelicopter::eDead))
+    {
         PPhysicsShell()->InterpolateGlobalTransform(&XFORM());
 
         IKinematics* K = smart_cast<IKinematics*>(Visual());
@@ -375,7 +379,8 @@ void CHelicopter::UpdateCL()
         // smoke
         UpdateHeliParticles();
 
-        if (m_brokenSound._feedback()) m_brokenSound.set_position(XFORM().c);
+        if (m_brokenSound._feedback())
+            m_brokenSound.set_position(XFORM().c);
 
         return;
     }
@@ -392,7 +397,8 @@ void CHelicopter::UpdateCL()
     }
 
 #ifdef DEBUG
-    if (bDebug) {
+    if (bDebug)
+    {
         CGameFont* F = UI().Font().pFontDI;
         F->SetAligment(CGameFont::alCenter);
         //		F->SetSizeI			(0.02f);
@@ -403,7 +409,8 @@ void CHelicopter::UpdateCL()
     }
 #endif
 
-    if (m_engineSound._feedback()) m_engineSound.set_position(XFORM().c);
+    if (m_engineSound._feedback())
+        m_engineSound.set_position(XFORM().c);
 
     m_enemy.Update();
     // weapon
@@ -416,7 +423,8 @@ void CHelicopter::UpdateCL()
 
 void CHelicopter::shedule_Update(u32 time_delta)
 {
-    if (!getEnabled()) return;
+    if (!getEnabled())
+        return;
 
     inherited::shedule_Update(time_delta);
     if (CPHDestroyable::Destroyed())
@@ -424,11 +432,13 @@ void CHelicopter::shedule_Update(u32 time_delta)
     else
         CPHSkeleton::Update(time_delta);
 
-    if (state() != CHelicopter::eDead) {
+    if (state() != CHelicopter::eDead)
+    {
         for (u32 i = getRocketCount(); i < 4; ++i)
             CRocketLauncher::SpawnRocket(*m_sRocketSection, this);
     }
-    if (m_ready_explode) ExplodeHelicopter();
+    if (m_ready_explode)
+        ExplodeHelicopter();
 }
 
 void CHelicopter::goPatrolByPatrolPath(LPCSTR path_name, int start_idx)
@@ -441,11 +451,7 @@ void CHelicopter::goByRoundPath(Fvector center, float radius, bool clockwise)
     m_movement.goByRoundPath(center, radius, clockwise);
 }
 
-void CHelicopter::LookAtPoint(Fvector point, bool do_it)
-{
-    m_body.LookAtPoint(point, do_it);
-}
-
+void CHelicopter::LookAtPoint(Fvector point, bool do_it) { m_body.LookAtPoint(point, do_it); }
 void CHelicopter::save(NET_Packet& output_packet)
 {
     m_movement.save(output_packet);
@@ -470,7 +476,7 @@ void CHelicopter::load(IReader& input_packet)
     m_enemy.load(input_packet);
     input_packet.r_fvector3(XFORM().c);
     m_barrel_dir_tolerance = input_packet.r_float();
-    UseFireTrail(m_enemy.bUseFireTrail);  // force reloar disp params
+    UseFireTrail(m_enemy.bUseFireTrail); // force reloar disp params
 
     load_data(m_use_rocket_on_attack, input_packet);
     load_data(m_use_mgun_on_attack, input_packet);

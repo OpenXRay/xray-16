@@ -21,10 +21,10 @@ public:
     Fmatrix* val_pTransform;
     BOOL val_bHUD;
     BOOL val_bInvisible;
-    BOOL val_bRecordMP;                                   // record nearest for multi-pass
-    R_feedback* val_feedback;                             // feedback for geometry being rendered
-    u32 val_feedback_breakp;                              // breakpoint
-    xr_vector<Fbox3, render_alloc<Fbox3>>* val_recorder;  // coarse structure recorder
+    BOOL val_bRecordMP; // record nearest for multi-pass
+    R_feedback* val_feedback; // feedback for geometry being rendered
+    u32 val_feedback_breakp; // breakpoint
+    xr_vector<Fbox3, render_alloc<Fbox3>>* val_recorder; // coarse structure recorder
     u32 phase;
     u32 marker;
     bool pmask[2];
@@ -33,7 +33,7 @@ public:
 public:
     // Dynamic scene graph
     // R_dsgraph::mapNormal_T										mapNormal	[2]		;	// 2==(priority/2)
-    R_dsgraph::mapNormalPasses_T mapNormalPasses[2];  // 2==(priority/2)
+    R_dsgraph::mapNormalPasses_T mapNormalPasses[2]; // 2==(priority/2)
     // R_dsgraph::mapMatrix_T										mapMatrix	[2]		;
     R_dsgraph::mapMatrixPasses_T mapMatrixPasses[2];
     R_dsgraph::mapSorted_T mapSorted;
@@ -42,7 +42,7 @@ public:
     R_dsgraph::mapSorted_T mapDistort;
 
 #if RENDER != R_R1
-    R_dsgraph::mapSorted_T mapWmark;  // sorted
+    R_dsgraph::mapSorted_T mapWmark; // sorted
     R_dsgraph::mapSorted_T mapEmissive;
     R_dsgraph::mapSorted_T mapHUDEmissive;
 #endif
@@ -51,7 +51,7 @@ public:
     xr_vector<R_dsgraph::mapNormalVS::TNode*, render_alloc<R_dsgraph::mapNormalVS::TNode*>> nrmVS;
 #if defined(USE_DX10) || defined(USE_DX11)
     xr_vector<R_dsgraph::mapNormalGS::TNode*, render_alloc<R_dsgraph::mapNormalGS::TNode*>> nrmGS;
-#endif  //	USE_DX10
+#endif //	USE_DX10
     xr_vector<R_dsgraph::mapNormalPS::TNode*, render_alloc<R_dsgraph::mapNormalPS::TNode*>> nrmPS;
     xr_vector<R_dsgraph::mapNormalCS::TNode*, render_alloc<R_dsgraph::mapNormalCS::TNode*>> nrmCS;
     xr_vector<R_dsgraph::mapNormalStates::TNode*, render_alloc<R_dsgraph::mapNormalStates::TNode*>> nrmStates;
@@ -61,7 +61,7 @@ public:
     xr_vector<R_dsgraph::mapMatrixVS::TNode*, render_alloc<R_dsgraph::mapMatrixVS::TNode*>> matVS;
 #if defined(USE_DX10) || defined(USE_DX11)
     xr_vector<R_dsgraph::mapMatrixGS::TNode*, render_alloc<R_dsgraph::mapMatrixGS::TNode*>> matGS;
-#endif  //	USE_DX10
+#endif //	USE_DX10
     xr_vector<R_dsgraph::mapMatrixPS::TNode*, render_alloc<R_dsgraph::mapMatrixPS::TNode*>> matPS;
     xr_vector<R_dsgraph::mapMatrixCS::TNode*, render_alloc<R_dsgraph::mapMatrixCS::TNode*>> matCS;
     xr_vector<R_dsgraph::mapMatrixStates::TNode*, render_alloc<R_dsgraph::mapMatrixStates::TNode*>> matStates;
@@ -80,8 +80,8 @@ public:
     BOOL b_loaded;
 
 public:
-    friend class CSkeletonX;   // Stats.Skinning
-    friend class CKinematics;  // Stats.Animation
+    friend class CSkeletonX; // Stats.Skinning
+    friend class CKinematics; // Stats.Animation
     RenderStatistics BasicStats;
 
 public:
@@ -93,7 +93,6 @@ public:
     virtual void set_HUD(BOOL V) override { val_bHUD = V; }
     virtual BOOL get_HUD() override { return val_bHUD; }
     virtual void set_Invisible(BOOL V) override { val_bInvisible = V; }
-
     void set_Feedback(R_feedback* V, u32 id)
     {
         val_feedback_breakp = id;
@@ -102,7 +101,8 @@ public:
     void set_Recorder(xr_vector<Fbox3, render_alloc<Fbox3>>* dest)
     {
         val_recorder = dest;
-        if (dest) dest->clear();
+        if (dest)
+            dest->clear();
     }
     void get_Counters(u32& s, u32& d)
     {
@@ -110,7 +110,6 @@ public:
         d = counter_D;
     }
     void clear_Counters() { counter_S = counter_D = 0; }
-
 public:
     D3DXRenderBase();
 
@@ -184,7 +183,6 @@ public:
         IRender_Sector* _sector, Fmatrix& mCombined, Fvector& _cop, BOOL _dynamic, BOOL _precise_portals = FALSE);
     void r_dsgraph_render_R1_box(IRender_Sector* _sector, Fbox& _bb, int _element);
     virtual u32 memory_usage() override { return g_render_allocator.get_allocated_size(); }
-
     virtual void Copy(IRender& _in) override;
     //	Gamma correction functions
     virtual void setGamma(float fGamma) override;

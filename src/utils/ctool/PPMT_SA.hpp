@@ -53,15 +53,13 @@ inline void* RemoveNode(int indx)
     FreeList[indx].next = RetVal->next;
     return RetVal;
 }
-inline UINT U2B(int NU)
-{
-    return 16 * NU + 4 * NU;
-}
+inline UINT U2B(int NU) { return 16 * NU + 4 * NU; }
 inline void SplitBlock(void* pv, int OldIndx, int NewIndx)
 {
     int i, UDiff = Indx2Units[OldIndx] - Indx2Units[NewIndx];
     BYTE* p = ((BYTE*)pv) + U2B(Indx2Units[NewIndx]);
-    if (Indx2Units[i = Units2Indx[UDiff - 1]] != UDiff) {
+    if (Indx2Units[i = Units2Indx[UDiff - 1]] != UDiff)
+    {
         InsertNode(p, --i);
         p += U2B(i = Indx2Units[i]);
         UDiff -= i;
@@ -82,7 +80,8 @@ DWORD _STDCALL GetUsedMemory()
 BOOL _STDCALL StartSubAllocator(int SASize)
 {
     DWORD t = SASize << 20;
-    if ((HeapStart = new BYTE[t]) == NULL) return FALSE;
+    if ((HeapStart = new BYTE[t]) == NULL)
+        return FALSE;
     SubAllocatorSize = t;
     return TRUE;
 }
@@ -111,7 +110,8 @@ static inline void GlueFreeBlocks()
 {
     MEM_BLK s0, *p, *p1;
     int i, k, sz;
-    if (LoUnit != HiUnit) *LoUnit = 0;
+    if (LoUnit != HiUnit)
+        *LoUnit = 0;
     for (i = 0, s0.next = s0.prev = &s0; i < N_INDEXES; i++)
         while (FreeList[i].next)
         {
@@ -130,7 +130,8 @@ static inline void GlueFreeBlocks()
     {
         for (p->remove(), sz = p->NU; sz > 128; sz -= 128, p += 128)
             InsertNode(p, N_INDEXES - 1);
-        if (Indx2Units[i = Units2Indx[sz - 1]] != sz) {
+        if (Indx2Units[i = Units2Indx[sz - 1]] != sz)
+        {
             k = sz - Indx2Units[--i];
             InsertNode(p + (sz - k), k - 1);
         }
@@ -139,15 +140,18 @@ static inline void GlueFreeBlocks()
 }
 static void* AllocUnitsRare(int indx)
 {
-    if (!GlueCount) {
+    if (!GlueCount)
+    {
         GlueCount = 255;
         GlueFreeBlocks();
-        if (FreeList[indx].next) return RemoveNode(indx);
+        if (FreeList[indx].next)
+            return RemoveNode(indx);
     }
     int i = indx;
     do
     {
-        if (++i == N_INDEXES) {
+        if (++i == N_INDEXES)
+        {
             GlueCount--;
             i = U2B(Indx2Units[indx]);
             return (UnitsStart - pText > i) ? (UnitsStart -= i) : (NULL);
@@ -160,25 +164,31 @@ static void* AllocUnitsRare(int indx)
 inline void* AllocUnits(int NU)
 {
     int indx = Units2Indx[NU - 1];
-    if (FreeList[indx].next) return RemoveNode(indx);
+    if (FreeList[indx].next)
+        return RemoveNode(indx);
     void* RetVal = LoUnit;
     LoUnit += U2B(Indx2Units[indx]);
-    if (LoUnit <= HiUnit) return RetVal;
+    if (LoUnit <= HiUnit)
+        return RetVal;
     LoUnit -= U2B(Indx2Units[indx]);
     return AllocUnitsRare(indx);
 }
 inline void* AllocContext()
 {
-    if (HiUnit != LoUnit) return (HiUnit -= UNIT_SIZE);
-    if (FreeList->next) return RemoveNode(0);
+    if (HiUnit != LoUnit)
+        return (HiUnit -= UNIT_SIZE);
+    if (FreeList->next)
+        return RemoveNode(0);
     return AllocUnitsRare(0);
 }
 inline void* ExpandUnits(void* OldPtr, int OldNU)
 {
     int i0 = Units2Indx[OldNU - 1], i1 = Units2Indx[OldNU - 1 + 1];
-    if (i0 == i1) return OldPtr;
+    if (i0 == i1)
+        return OldPtr;
     void* ptr = AllocUnits(OldNU + 1);
-    if (ptr) {
+    if (ptr)
+    {
         memcpy(ptr, OldPtr, U2B(OldNU));
         InsertNode(OldPtr, i0);
     }
@@ -190,7 +200,8 @@ void _STDCALL PrintInfo(FILE* DecodedFile)
     UINT UsedMemory = GetUsedMemory();
     UINT m1 = UsedMemory >> 18;
     UINT m2 = (10U * (UsedMemory - (m1 << 18)) + (1 << 17)) >> 18;
-    if (m2 == 10) {
+    if (m2 == 10)
+    {
         m1++;
         m2 = 0;
     }

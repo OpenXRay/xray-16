@@ -11,15 +11,15 @@ class ENGINE_API CSoundStream : public CSound_stream_interface
 protected:
     struct sxr_riff
     {
-        u8 id[4];         // identifier string = "RIFF"
-        u32 len;          // remaining length after this header
-        char wave_id[4];  // "WAVE"
+        u8 id[4]; // identifier string = "RIFF"
+        u32 len; // remaining length after this header
+        char wave_id[4]; // "WAVE"
     };
 
     struct sxr_hdr
     {
-        u8 id[4];  // identifier, e.g. "fmt " or "data"
-        u32 len;   // remaining chunk length after header
+        u8 id[4]; // identifier, e.g. "fmt " or "data"
+        u32 len; // remaining chunk length after header
     };
 
 private:
@@ -49,10 +49,11 @@ private:
     u32 dwFMT_Size;
     u32 dwSrcBufSize;
     u32 dwTotalSize;
-    unsigned char *WaveSource, *WaveDest;
+    unsigned char* WaveSource;
+    unsigned char* WaveDest;
 
     u32 writepos;
-    BOOL isPresentData;  // признак окончания буфера
+    BOOL isPresentData; // признак окончания буфера
     u32 dwDecPos;
     IReader* hf;
     int DataPos;
@@ -60,9 +61,9 @@ private:
 private:
     //-----------------------------------------------------
     BOOL Decompress(unsigned char* dest);
-    void AppWriteDataToBuffer(u32 dwOffset,  // our own write cursor
-        LPBYTE lpbSoundData,                 // start of our data
-        u32 dwSoundBytes);                   // size of block to copy
+    void AppWriteDataToBuffer(u32 dwOffset, // our own write cursor
+        LPBYTE lpbSoundData, // start of our data
+        u32 dwSoundBytes); // size of block to copy
 
     void LoadADPCM();
 
@@ -86,8 +87,7 @@ public:
     float GetVolume() { return fVolume; }
     void Restore();
     void Update();
-
     void OnMove();
 };
 
-#endif  //__XR_STREAM_SOUND_H__
+#endif //__XR_STREAM_SOUND_H__

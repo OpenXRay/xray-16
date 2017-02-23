@@ -124,7 +124,7 @@ class CActionPlanner;
 typedef CActionPlanner<CScriptGameObject, false, CActionBase<CScriptGameObject>, CPropertyEvaluator<CScriptGameObject>,
     CActionBase<CScriptGameObject>*, CPropertyEvaluator<CScriptGameObject>*>
     script_planner;
-#endif  // DEBUG
+#endif // DEBUG
 
 class CScriptGameObject;
 
@@ -610,7 +610,7 @@ public:
     // LAMP
     CHangingLamp* get_hanging_lamp();
     CHolderCustom* get_custom_holder();
-    CHolderCustom* get_current_holder();  // actor only
+    CHolderCustom* get_current_holder(); // actor only
 
     void start_particles(LPCSTR pname, LPCSTR bone);
     void stop_particles(LPCSTR pname, LPCSTR bone);

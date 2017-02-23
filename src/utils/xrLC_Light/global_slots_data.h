@@ -15,7 +15,6 @@ private:
 
 public:
     global_slots_data() : dtS(0), dtFS(0), recalculation_data(dtH) {}
-
     void Load();
     void Free();
 
@@ -25,19 +24,13 @@ public:
     void write(IWriter& w) const;
 
     IC const DetailHeader& header() const { return dtH; }
-
     IC u32 size_x() const { return dtH.x_size(); }
-
     IC u32 size_z() const { return dtH.z_size(); }
     IC void set_slot_calculated(int _x, int _z) { recalculation_data.set_slot_calculated(_x, _z); }
     IC bool calculate_ignore(int _x, int _z) const { return recalculation_data.skip_slot(_x, _z); }
-
     IC bool skip_slot(int _x, int _z) const { return is_empty(get_slot(_x, _z)) || calculate_ignore(_x, _z); }
-
     IC DetailSlot& get_slot(int _x, int _z) { return dtS[dtH.slot_index(_x, _z)]; }
-
     IC const DetailSlot& get_slot(int _x, int _z) const { return dtS[dtH.slot_index(_x, _z)]; }
-
     IC const DetailSlot& get_slot(u32 idx) const
     {
         VERIFY(idx < dtH.slot_count());
@@ -78,4 +71,4 @@ public:
     void process_all_pallete();
 };
 
-#endif  //__GLOBAL_SLOTS_DATA_H__
+#endif //__GLOBAL_SLOTS_DATA_H__

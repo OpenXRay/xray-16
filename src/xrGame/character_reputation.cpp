@@ -28,7 +28,8 @@ int CHARACTER_REPUTATION::ValueToIndex(CHARACTER_REPUTATION_VALUE val)
     T_VECTOR::iterator it_e = m_pItemDataVector->end();
     for (; it != it_e; ++it)
     {
-        if (val < (*it).threshold) return (int)std::distance(m_pItemDataVector->begin(), it);
+        if (val < (*it).threshold)
+            return (int)std::distance(m_pItemDataVector->begin(), it);
     }
     return inherited::GetMaxIndex();
 }
@@ -39,11 +40,7 @@ void CHARACTER_REPUTATION::set(CHARACTER_REPUTATION_VALUE new_val)
     m_current_index = ValueToIndex(new_val);
 }
 
-shared_str CHARACTER_REPUTATION::id() const
-{
-    return IndexToId(m_current_index);
-}
-
+shared_str CHARACTER_REPUTATION::id() const { return IndexToId(m_current_index); }
 void CHARACTER_REPUTATION::InitIdToIndex()
 {
     section_name = GAME_RELATIONS_SECT;
@@ -52,11 +49,7 @@ void CHARACTER_REPUTATION::InitIdToIndex()
     m_relation_table.set_table_params(REPUTATION_TABLE);
 }
 
-CHARACTER_GOODWILL CHARACTER_REPUTATION::relation(int to)
-{
-    return relation(m_current_index, to);
-}
-
+CHARACTER_GOODWILL CHARACTER_REPUTATION::relation(int to) { return relation(m_current_index, to); }
 CHARACTER_GOODWILL CHARACTER_REPUTATION::relation(int from, int to)
 {
     VERIFY(from >= 0 && from < (int)m_relation_table.table().size());

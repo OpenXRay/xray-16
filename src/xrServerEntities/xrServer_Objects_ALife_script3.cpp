@@ -13,11 +13,7 @@
 
 using namespace luabind;
 
-void set_yaw(CSE_ALifeObjectPhysic* obj, const float yaw)
-{
-    obj->o_Angle.y = yaw;
-}
-
+void set_yaw(CSE_ALifeObjectPhysic* obj, const float yaw) { obj->o_Angle.y = yaw; }
 SCRIPT_EXPORT(CSE_ALifeObjectHangingLamp, (CSE_ALifeDynamicObjectVisual, CSE_PHSkeleton), {
     module(luaState)[luabind_class_dynamic_alife2(
         CSE_ALifeObjectHangingLamp, "cse_alife_object_hanging_lamp", CSE_ALifeDynamicObjectVisual, CSE_PHSkeleton)];

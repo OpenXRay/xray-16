@@ -59,11 +59,17 @@ AABB& AABB::Add(const AABB& aabb)
 bool AABB::IsInside(const AABB& box) const
 {
     // ### to customize
-    if (box.GetMin(0) > GetMin(0)) return false;
-    if (box.GetMin(1) > GetMin(1)) return false;
-    if (box.GetMin(2) > GetMin(2)) return false;
-    if (box.GetMax(0) < GetMax(0)) return false;
-    if (box.GetMax(1) < GetMax(1)) return false;
-    if (box.GetMax(2) < GetMax(2)) return false;
+    if (box.GetMin(0) > GetMin(0))
+        return false;
+    if (box.GetMin(1) > GetMin(1))
+        return false;
+    if (box.GetMin(2) > GetMin(2))
+        return false;
+    if (box.GetMax(0) < GetMax(0))
+        return false;
+    if (box.GetMax(1) < GetMax(1))
+        return false;
+    if (box.GetMax(2) < GetMax(2))
+        return false;
     return true;
 }

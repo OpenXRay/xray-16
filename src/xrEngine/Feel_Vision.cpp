@@ -8,14 +8,8 @@
 
 namespace Feel
 {
-Vision::Vision(IGameObject const* owner) : pure_relcase(&Vision::feel_vision_relcase), m_owner(owner)
-{
-}
-
-Vision::~Vision()
-{
-}
-
+Vision::Vision(IGameObject const* owner) : pure_relcase(&Vision::feel_vision_relcase), m_owner(owner) {}
+Vision::~Vision() {}
 struct SFeelParam
 {
     Vision* parent;
@@ -32,7 +26,8 @@ IC BOOL feel_vision_callback(collide::rq_result& result, LPVOID params)
     SFeelParam* fp = (SFeelParam*)params;
     float vis = fp->parent->feel_vision_mtl_transp(result.O, result.element);
     fp->vis *= vis;
-    if (NULL == result.O && fis_zero(vis)) {
+    if (NULL == result.O && fis_zero(vis))
+    {
         CDB::TRI* T = g_pGameLevel->ObjectSpace.GetStaticTris() + result.element;
         Fvector* V = g_pGameLevel->ObjectSpace.GetStaticVerts();
         fp->item->Cache.verts[0].set(V[T->verts[0]]);
@@ -58,7 +53,8 @@ void Vision::o_delete(IGameObject* O)
 {
     xr_vector<feel_visible_Item>::iterator I = feel_visible.begin(), TE = feel_visible.end();
     for (; I != TE; I++)
-        if (I->O == O) {
+        if (I->O == O)
+        {
             feel_visible.erase(I);
             return;
         }
@@ -76,14 +72,18 @@ void Vision::feel_vision_relcase(IGameObject* object)
 {
     xr_vector<IGameObject*>::iterator Io;
     Io = std::find(seen.begin(), seen.end(), object);
-    if (Io != seen.end()) seen.erase(Io);
+    if (Io != seen.end())
+        seen.erase(Io);
     Io = std::find(query.begin(), query.end(), object);
-    if (Io != query.end()) query.erase(Io);
+    if (Io != query.end())
+        query.erase(Io);
     Io = std::find(diff.begin(), diff.end(), object);
-    if (Io != diff.end()) diff.erase(Io);
+    if (Io != diff.end())
+        diff.erase(Io);
     xr_vector<feel_visible_Item>::iterator Ii = feel_visible.begin(), IiE = feel_visible.end();
     for (; Ii != IiE; ++Ii)
-        if (Ii->O == object) {
+        if (Ii->O == object)
+        {
             feel_visible.erase(Ii);
             break;
         }
@@ -104,19 +104,23 @@ void Vision::feel_vision_query(Fmatrix& mFull, Fvector& P)
     {
         ISpatial* spatial = r_spatial[o_it];
         IGameObject* object = spatial->dcast_GameObject();
-        if (object && feel_vision_isRelevant(object)) seen.push_back(object);
+        if (object && feel_vision_isRelevant(object))
+            seen.push_back(object);
     }
-    if (seen.size() > 1) {
+    if (seen.size() > 1)
+    {
         std::sort(seen.begin(), seen.end());
         xr_vector<IGameObject*>::iterator end = std::unique(seen.begin(), seen.end());
-        if (end != seen.end()) seen.erase(end, seen.end());
+        if (end != seen.end())
+            seen.erase(end, seen.end());
     }
 }
 
 void Vision::feel_vision_update(IGameObject* parent, Fvector& P, float dt, float vis_threshold)
 {
     // B-A = objects, that become visible
-    if (!seen.empty()) {
+    if (!seen.empty())
+    {
         xr_vector<IGameObject*>::iterator E = std::remove(seen.begin(), seen.end(), parent);
         seen.resize(E - seen.begin());
 
@@ -131,7 +135,8 @@ void Vision::feel_vision_update(IGameObject* parent, Fvector& P, float dt, float
     }
 
     // A-B = objects, that are invisible
-    if (!query.empty()) {
+    if (!query.empty())
+    {
         diff.resize(_max(seen.size(), query.size()));
         xr_vector<IGameObject*>::iterator E =
             std::set_difference(query.begin(), query.end(), seen.begin(), seen.end(), diff.begin());
@@ -150,7 +155,8 @@ void Vision::o_trace(Fvector& P, float dt, float vis_threshold)
     xr_vector<feel_visible_Item>::iterator I = feel_visible.begin(), E = feel_visible.end();
     for (; I != E; I++)
     {
-        if (0 == I->O->GetCForm()) {
+        if (0 == I->O->GetCForm())
+        {
             I->fuzzy = -1;
             continue;
         }
@@ -167,20 +173,23 @@ void Vision::o_trace(Fvector& P, float dt, float vis_threshold)
         //
         Fvector D, OP = I->cp_LAST;
         D.sub(OP, P);
-        if (fis_zero(D.magnitude())) {
+        if (fis_zero(D.magnitude()))
+        {
             I->fuzzy = 1.f;
             continue;
         }
 
         float f = D.magnitude() + .2f;
-        if (f > fuzzy_guaranteed) {
+        if (f > fuzzy_guaranteed)
+        {
             D.div(f);
             // setup ray defs & feel params
             collide::ray_defs RD(P, D, f, CDB::OPT_CULL,
                 collide::rq_target(collide::rqtStatic | /**/ collide::rqtObject | /**/ collide::rqtObstacle));
             SFeelParam feel_params(this, &*I, vis_threshold);
             // check cache
-            if (I->Cache.result && I->Cache.similar(P, D, f)) {
+            if (I->Cache.result && I->Cache.similar(P, D, f))
+            {
                 // similar with previous query
                 feel_params.vis = I->Cache_vis;
                 // Log("cache 0");
@@ -188,7 +197,8 @@ void Vision::o_trace(Fvector& P, float dt, float vis_threshold)
             else
             {
                 float _u, _v, _range;
-                if (CDB::TestRayTri(P, D, I->Cache.verts, _u, _v, _range, false) && (_range > 0 && _range < f)) {
+                if (CDB::TestRayTri(P, D, I->Cache.verts, _u, _v, _range, false) && (_range > 0 && _range < f))
+                {
                     feel_params.vis = 0.f;
                     // Log("cache 1");
                 }
@@ -197,7 +207,8 @@ void Vision::o_trace(Fvector& P, float dt, float vis_threshold)
                     // cache outdated. real query.
                     VERIFY(!fis_zero(RD.dir.magnitude()));
 
-                    if (g_pGameLevel->ObjectSpace.RayQuery(RQR, RD, feel_vision_callback, &feel_params, NULL, NULL)) {
+                    if (g_pGameLevel->ObjectSpace.RayQuery(RQR, RD, feel_vision_callback, &feel_params, NULL, NULL))
+                    {
                         I->Cache_vis = feel_params.vis;
                         I->Cache.set(P, D, f, TRUE);
                     }
@@ -221,21 +232,26 @@ void Vision::o_trace(Fvector& P, float dt, float vis_threshold)
             xr_vector<ISpatial*>::const_iterator e = r_spatial.end();
             for (; i != e; ++i)
             {
-                if (*i == m_owner) continue;
+                if (*i == m_owner)
+                    continue;
 
-                if (*i == I->O) continue;
+                if (*i == I->O)
+                    continue;
 
                 IGameObject const* object = (*i)->dcast_GameObject();
                 RQR.r_clear();
-                if (object && object->GetCForm() && !object->GetCForm()->_RayQuery(RD, RQR)) continue;
+                if (object && object->GetCForm() && !object->GetCForm()->_RayQuery(RD, RQR))
+                    continue;
 
                 collision_found = true;
                 break;
             }
 
-            if (collision_found) feel_params.vis = 0.f;
+            if (collision_found)
+                feel_params.vis = 0.f;
 
-            if (feel_params.vis < feel_params.vis_threshold) {
+            if (feel_params.vis < feel_params.vis_threshold)
+            {
                 // INVISIBLE, choose next point
                 I->fuzzy -= fuzzy_update_novis * dt;
                 clamp(I->fuzzy, -.5f, 1.f);

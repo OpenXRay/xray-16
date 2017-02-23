@@ -87,7 +87,8 @@ void text_tree::output(int current_indent, int indent, Columns& columns, OutFunc
         size_t num_padding_spaces = *c - (*i).size();
         num_padding_spaces -= (i == strings.begin()) ? current_indent : 0;
 
-        if (strings.size() == 1) {
+        if (strings.size() == 1)
+        {
             num_padding_spaces = 0;
         }
 
@@ -98,7 +99,8 @@ void text_tree::output(int current_indent, int indent, Columns& columns, OutFunc
 
         Strings::iterator next = i;
         ++next;
-        if (next != strings.end()) {
+        if (next != strings.end())
+        {
             // trailing separator
             buffer += " ";
             buffer += separator;
@@ -108,13 +110,15 @@ void text_tree::output(int current_indent, int indent, Columns& columns, OutFunc
 
     buffer += char(0);
 
-    if (strings.size() && buffer.size()) {
+    if (strings.size() && buffer.size())
+    {
         func(buffer.data(), num_siblings);
     }
 
     for (Children::iterator i = children.begin(); i != children.end(); ++i)
     {
-        if ((*i)->shown) {
+        if ((*i)->shown)
+        {
             (*i)->output(current_indent + indent, indent, columns, func);
         }
     }

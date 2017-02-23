@@ -15,13 +15,16 @@ void ColorMapManager::SetTextures(const shared_str& tex0, const shared_str& tex1
 
 void ColorMapManager::UpdateTexture(const shared_str& strTexName, int iTex)
 {
-    if (strTexName == m_strCMap[iTex]) return;
+    if (strTexName == m_strCMap[iTex])
+        return;
 
     m_strCMap[iTex] = strTexName;
 
-    if (strTexName.size()) {
+    if (strTexName.size())
+    {
         map_TexIt I = m_TexCache.find(strTexName);
-        if (I != m_TexCache.end()) {
+        if (I != m_TexCache.end())
+        {
             ID3DBaseTexture* e0 = I->second->surface_get();
             m_CMap[iTex]->surface_set(e0);
             _RELEASE(e0);

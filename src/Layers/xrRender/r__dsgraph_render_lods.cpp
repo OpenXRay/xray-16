@@ -12,31 +12,30 @@
 extern float r_ssaLOD_A;
 extern float r_ssaLOD_B;
 
-ICF bool pred_dot(const std::pair<float, u32>& _1, const std::pair<float, u32>& _2)
-{
-    return _1.first < _2.first;
-}
+ICF bool pred_dot(const std::pair<float, u32>& _1, const std::pair<float, u32>& _2) { return _1.first < _2.first; }
 void D3DXRenderBase::r_dsgraph_render_lods(bool _setup_zb, bool _clear)
 {
     if (_setup_zb)
-        mapLOD.getLR(lstLODs);  // front-to-back
+        mapLOD.getLR(lstLODs); // front-to-back
     else
-        mapLOD.getRL(lstLODs);  // back-to-front
-    if (lstLODs.empty()) return;
+        mapLOD.getRL(lstLODs); // back-to-front
+    if (lstLODs.empty())
+        return;
 
     // *** Fill VB and generate groups
     u32 shid = _setup_zb ? SE_R1_LMODELS : SE_R1_NORMAL_LQ;
     FLOD* firstV = (FLOD*)lstLODs[0].pVisual;
     ref_selement cur_S = firstV->shader->E[shid];
     float ssaRange = r_ssaLOD_A - r_ssaLOD_B;
-    if (ssaRange < EPS_S) ssaRange = EPS_S;
+    if (ssaRange < EPS_S)
+        ssaRange = EPS_S;
 
     const u32 uiVertexPerImposter = 4;
     const u32 uiImpostersFit = RCache.Vertex.GetSize() / (firstV->geom->vb_stride * uiVertexPerImposter);
 
-    // Msg						("dbg_lods: shid[%d],firstV[%X]",shid,u32((void*)firstV));
-    // Msg						("dbg_lods: shader[%X]",u32((void*)firstV->shader._get()));
-    // Msg						("dbg_lods: shader_E[%X]",u32((void*)cur_S._get()));
+    //Msg("dbg_lods: shid[%d],firstV[%X]",shid,u32((void*)firstV));
+    //Msg("dbg_lods: shader[%X]",u32((void*)firstV->shader._get()));
+    //Msg("dbg_lods: shader_E[%X]",u32((void*)cur_S._get()));
 
     for (u32 i = 0; i < lstLODs.size(); i++)
     {
@@ -123,7 +122,8 @@ void D3DXRenderBase::r_dsgraph_render_lods(bool _setup_zb, bool _clear)
             {
                 int p_count = lstLODgroups[g];
                 u32 uiNumPasses = lstLODs[current].pVisual->shader->E[shid]->passes.size();
-                if (uiPass < uiNumPasses) {
+                if (uiPass < uiNumPasses)
+                {
                     RCache.set_Element(lstLODs[current].pVisual->shader->E[shid], uiPass);
                     RCache.set_Geometry(firstV->geom);
                     RCache.Render(D3DPT_TRIANGLELIST, vCurOffset, 0, 4 * p_count, 0, 2 * p_count);
@@ -139,5 +139,6 @@ void D3DXRenderBase::r_dsgraph_render_lods(bool _setup_zb, bool _clear)
 
     lstLODs.clear();
 
-    if (_clear) mapLOD.clear();
+    if (_clear)
+        mapLOD.clear();
 }

@@ -24,15 +24,18 @@ s16 game_cl_Deathmatch::GetBuyMenuItemIndex(u8 Addons, u8 ItemID)
 
 void game_cl_Deathmatch::OnBuyMenu_Ok()
 {
-    if (!m_bBuyEnabled) return;
+    if (!m_bBuyEnabled)
+        return;
     IGameObject* l_pObj = Level().CurrentEntity();
 
     CGameObject* l_pPlayer = smart_cast<CGameObject*>(l_pObj);
-    if (!l_pPlayer) return;
+    if (!l_pPlayer)
+        return;
     CActor* pActor = smart_cast<CActor*>(l_pObj);
 
     game_PlayerState* Pl = local_player;
-    if (!Pl) return;
+    if (!Pl)
+        return;
 
     NET_Packet P;
     l_pPlayer->u_EventGen(P, GE_GAME_EVENT, l_pPlayer->ID());
@@ -42,9 +45,11 @@ void game_cl_Deathmatch::OnBuyMenu_Ok()
     PRESET_ITEMS tmpItems;
     tmpItems.clear();
 
-    const preset_items* _p = &(pCurBuyMenu->GetPreset(_preset_idx_last));  //_preset_idx_last : _preset_idx_origin);
-    if (_p->size() == 0) {
-        if (!pActor || !pActor->g_Alive()) _p = &(pCurBuyMenu->GetPreset(_preset_idx_origin));
+    const preset_items* _p = &(pCurBuyMenu->GetPreset(_preset_idx_last)); //_preset_idx_last : _preset_idx_origin);
+    if (_p->size() == 0)
+    {
+        if (!pActor || !pActor->g_Alive())
+            _p = &(pCurBuyMenu->GetPreset(_preset_idx_origin));
     }
 
     u32 ItemsCount = _p->size();
@@ -67,14 +72,16 @@ void game_cl_Deathmatch::OnBuyMenu_Ok()
     }
 
     //принудительно добавляем нож
-    if (local_player && local_player->testFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD)) {
+    if (local_player && local_player->testFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD))
+    {
         u8 KnifeSlot, KnifeIndex;
         pCurBuyMenu->GetWeaponIndexByName("mp_wpn_knife", KnifeSlot, KnifeIndex);
         tmpItems.push_back(GetBuyMenuItemIndex(KnifeSlot, KnifeIndex));
     }
 
     //-------------------------------------------------------------------------------
-    if (pCurBuyMenu->IsIgnoreMoneyAndRank()) {
+    if (pCurBuyMenu->IsIgnoreMoneyAndRank())
+    {
         P.w_s32(0);
     }
     else
@@ -100,7 +107,8 @@ void game_cl_Deathmatch::OnBuyMenu_Ok()
     //-------------------------------------------------------------------------------
     l_pPlayer->u_EventSend(P);
     //-------------------------------------------------------------------------------
-    if (m_bMenuCalledFromReady) {
+    if (m_bMenuCalledFromReady)
+    {
         OnKeyboardPress(kJUMP);
     }
     set_buy_menu_not_ready();
@@ -117,22 +125,25 @@ void game_cl_Deathmatch::OnBuyMenu_DefaultItems()
 
 		pCurBuyMenu->SectionToSlot(u8((ItemID&0xff00)>>0x08), u8(ItemID&0x00ff), false);
 	};
-*/  //---------------------------------------------------------
+*/ //---------------------------------------------------------
     SetBuyMenuItems(&PlayerDefItems, TRUE);
 };
 
 void game_cl_Deathmatch::SetBuyMenuItems(PRESET_ITEMS* pItems, BOOL OnlyPreset)
 {
     game_PlayerState* P = local_player;
-    if (!P) return;
-    if (pCurBuyMenu->IsShown()) return;
+    if (!P)
+        return;
+    if (pCurBuyMenu->IsShown())
+        return;
 
     pCurBuyMenu->ResetItems();
     //---------------------------------------------------------
     pCurBuyMenu->SetupPlayerItemsBegin();
     //---------------------------------------------------------
     CActor* pCurActor = smart_cast<CActor*>(Level().Objects.net_Find(P->GameID));
-    if (pCurActor) {
+    if (pCurActor)
+    {
         // defusing all weapons
         u32 max_addammo_count = pCurActor->inventory().m_all.size();
         aditional_ammo_t add_ammo(
@@ -146,22 +157,29 @@ void game_cl_Deathmatch::SetBuyMenuItems(PRESET_ITEMS* pItems, BOOL OnlyPreset)
         for (; ISlot <= ESlot; ++ISlot)
         {
             PIItem pItem = pCurActor->inventory().ItemFromSlot(ISlot);
-            if (!pItem) continue;
+            if (!pItem)
+                continue;
             // if (pItem->IsInvalid() || pItem->object().CLS_ID == CLSID_OBJECT_W_KNIFE)	continue;
-            if (pItem->IsInvalid() || smart_cast<CWeaponKnife*>(&pItem->object())) continue;
-            if (!pItem->CanTrade()) {
+            if (pItem->IsInvalid() || smart_cast<CWeaponKnife*>(&pItem->object()))
+                continue;
+            if (!pItem->CanTrade())
+            {
                 continue;
             }
 
-            if (pSettings->line_exist(GetBaseCostSect(), pItem->object().cNameSect())) {
+            if (pSettings->line_exist(GetBaseCostSect(), pItem->object().cNameSect()))
+            {
                 u8 Addons = 0;
                 CWeapon* pWeapon = smart_cast<CWeapon*>(pItem);
                 {
-                    if (pWeapon) Addons = pWeapon->GetAddonsState();
+                    if (pWeapon)
+                        Addons = pWeapon->GetAddonsState();
                 }
                 CWeaponAmmo* pAmmo = smart_cast<CWeaponAmmo*>(pItem);
-                if (pAmmo) {
-                    if (pAmmo->m_boxCurr != pAmmo->m_boxSize) continue;
+                if (pAmmo)
+                {
+                    if (pAmmo->m_boxCurr != pAmmo->m_boxSize)
+                        continue;
                 }
                 pCurBuyMenu->ItemToSlot(pItem->object().cNameSect(), Addons);
             }
@@ -175,15 +193,20 @@ void game_cl_Deathmatch::SetBuyMenuItems(PRESET_ITEMS* pItems, BOOL OnlyPreset)
         {
             PIItem pItem = (*IBelt);
             // if (pItem->IsInvalid() || pItem->object().CLS_ID == CLSID_OBJECT_W_KNIFE) continue;
-            if (pItem->IsInvalid() || smart_cast<CWeaponKnife*>(&pItem->object())) continue;
-            if (!pItem->CanTrade()) {
+            if (pItem->IsInvalid() || smart_cast<CWeaponKnife*>(&pItem->object()))
+                continue;
+            if (!pItem->CanTrade())
+            {
                 continue;
             }
 
-            if (pSettings->line_exist(GetBaseCostSect(), pItem->object().cNameSect())) {
+            if (pSettings->line_exist(GetBaseCostSect(), pItem->object().cNameSect()))
+            {
                 CWeaponAmmo* pAmmo = smart_cast<CWeaponAmmo*>(pItem);
-                if (pAmmo) {
-                    if (pAmmo->m_boxCurr != pAmmo->m_boxSize) continue;
+                if (pAmmo)
+                {
+                    if (pAmmo->m_boxCurr != pAmmo->m_boxSize)
+                        continue;
                 }
                 pCurBuyMenu->ItemToBelt(pItem->object().cNameSect());
             }
@@ -197,20 +220,26 @@ void game_cl_Deathmatch::SetBuyMenuItems(PRESET_ITEMS* pItems, BOOL OnlyPreset)
         {
             PIItem pItem = *IRuck;
             // if (pItem->IsInvalid() || pItem->object().CLS_ID == CLSID_OBJECT_W_KNIFE) continue;
-            if (pItem->IsInvalid() || smart_cast<CWeaponKnife*>(&pItem->object())) continue;
-            if (!pItem->CanTrade()) {
+            if (pItem->IsInvalid() || smart_cast<CWeaponKnife*>(&pItem->object()))
+                continue;
+            if (!pItem->CanTrade())
+            {
                 continue;
             }
 
-            if (pSettings->line_exist(GetBaseCostSect(), pItem->object().cNameSect())) {
+            if (pSettings->line_exist(GetBaseCostSect(), pItem->object().cNameSect()))
+            {
                 u8 Addons = 0;
                 CWeapon* pWeapon = smart_cast<CWeapon*>(pItem);
                 {
-                    if (pWeapon) Addons = pWeapon->GetAddonsState();
+                    if (pWeapon)
+                        Addons = pWeapon->GetAddonsState();
                 }
                 CWeaponAmmo* pAmmo = smart_cast<CWeaponAmmo*>(pItem);
-                if (pAmmo) {
-                    if (pAmmo->m_boxCurr != pAmmo->m_boxSize) continue;
+                if (pAmmo)
+                {
+                    if (pAmmo->m_boxCurr != pAmmo->m_boxSize)
+                        continue;
                 }
                 pCurBuyMenu->ItemToRuck(pItem->object().cNameSect(), Addons);
             }
@@ -230,7 +259,8 @@ void game_cl_Deathmatch::SetBuyMenuItems(PRESET_ITEMS* pItems, BOOL OnlyPreset)
         for (; It != Et; ++It)
         {
             PresetItem PIT = *It;
-            if (PIT.ItemID == KnifeIndex) continue;
+            if (PIT.ItemID == KnifeIndex)
+                continue;
             pCurBuyMenu->ItemToSlot(pCurBuyMenu->GetWeaponNameByIndex(0, PIT.ItemID), PIT.SlotID);
         };
         //---------------------------------------------------------
@@ -245,41 +275,54 @@ void game_cl_Deathmatch::CheckItem(PIItem pItem, PRESET_ITEMS* pPresetItems, BOO
 {
     R_ASSERT(pItem);
     R_ASSERT(pPresetItems);
-    if (pItem->IsInvalid()) return;
+    if (pItem->IsInvalid())
+        return;
 
     u8 SlotID, ItemID;
     pCurBuyMenu->GetWeaponIndexByName(*pItem->object().cNameSect(), SlotID, ItemID);
-    if (SlotID == 0xff || ItemID == 0xff) return;
+    if (SlotID == 0xff || ItemID == 0xff)
+        return;
     s16 BigID = GetBuyMenuItemIndex(SlotID, ItemID);
     CWeaponAmmo* pAmmo = smart_cast<CWeaponAmmo*>(pItem);
-    if (pAmmo) {
-        if (pAmmo->m_boxCurr != pAmmo->m_boxSize) return;
+    if (pAmmo)
+    {
+        if (pAmmo->m_boxCurr != pAmmo->m_boxSize)
+            return;
     }
     //-----------------------------------------------------
     PRESET_ITEMS_it PresetItemIt = std::find(pPresetItems->begin(), pPresetItems->end(), BigID);
-    if (OnlyPreset) {
-        if (PresetItemIt == pPresetItems->end()) return;
+    if (OnlyPreset)
+    {
+        if (PresetItemIt == pPresetItems->end())
+            return;
     }
 
-    if (SlotID == INV_SLOT_2) {
+    if (SlotID == INV_SLOT_2)
+    {
         PRESET_ITEMS_it DefPistolIt = std::find(PlayerDefItems.begin(), PlayerDefItems.end(), BigID);
-        if (DefPistolIt != PlayerDefItems.end() && PresetItemIt == pPresetItems->end()) return;
+        if (DefPistolIt != PlayerDefItems.end() && PresetItemIt == pPresetItems->end())
+            return;
     }
 
     pCurBuyMenu->SectionToSlot(SlotID, ItemID, true);
     //-----------------------------------------------------
     s16 DesiredAddons = 0;
-    if (PresetItemIt != pPresetItems->end()) {
+    if (PresetItemIt != pPresetItems->end())
+    {
         DesiredAddons = (*PresetItemIt).ItemID >> 5;
         pPresetItems->erase(PresetItemIt);
     }
     //-----------------------------------------------------
     CWeapon* pWeapon = smart_cast<CWeapon*>(pItem);
-    if (pWeapon) {
-        if (pWeapon->ScopeAttachable()) {
+    if (pWeapon)
+    {
+        if (pWeapon->ScopeAttachable())
+        {
             pCurBuyMenu->GetWeaponIndexByName(*pWeapon->GetScopeName(), SlotID, ItemID);
-            if (SlotID != 0xff && ItemID != 0xff) {
-                if (pWeapon->IsScopeAttached()) {
+            if (SlotID != 0xff && ItemID != 0xff)
+            {
+                if (pWeapon->IsScopeAttached())
+                {
                     if ((DesiredAddons & CSE_ALifeItemWeapon::eWeaponAddonScope) || !OnlyPreset)
                         pCurBuyMenu->AddonToSlot(CSE_ALifeItemWeapon::eWeaponAddonScope, pWeapon->BaseSlot(), true);
                 }
@@ -291,10 +334,13 @@ void game_cl_Deathmatch::CheckItem(PIItem pItem, PRESET_ITEMS* pPresetItems, BOO
             }
         };
 
-        if (pWeapon->GrenadeLauncherAttachable()) {
+        if (pWeapon->GrenadeLauncherAttachable())
+        {
             pCurBuyMenu->GetWeaponIndexByName(*pWeapon->GetGrenadeLauncherName(), SlotID, ItemID);
-            if (SlotID != 0xff && ItemID != 0xff) {
-                if (pWeapon->IsGrenadeLauncherAttached()) {
+            if (SlotID != 0xff && ItemID != 0xff)
+            {
+                if (pWeapon->IsGrenadeLauncherAttached())
+                {
                     if ((DesiredAddons & CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher) || !OnlyPreset)
                         pCurBuyMenu->AddonToSlot(
                             CSE_ALifeItemWeapon::eWeaponAddonGrenadeLauncher, pWeapon->BaseSlot(), true);
@@ -308,10 +354,13 @@ void game_cl_Deathmatch::CheckItem(PIItem pItem, PRESET_ITEMS* pPresetItems, BOO
             }
         };
 
-        if (pWeapon->SilencerAttachable()) {
+        if (pWeapon->SilencerAttachable())
+        {
             pCurBuyMenu->GetWeaponIndexByName(*pWeapon->GetSilencerName(), SlotID, ItemID);
-            if (SlotID != 0xff && ItemID != 0xff) {
-                if (pWeapon->IsSilencerAttached()) {
+            if (SlotID != 0xff && ItemID != 0xff)
+            {
+                if (pWeapon->IsSilencerAttached())
+                {
                     if ((DesiredAddons & CSE_ALifeItemWeapon::eWeaponAddonSilencer) || !OnlyPreset)
                         pCurBuyMenu->AddonToSlot(CSE_ALifeItemWeapon::eWeaponAddonSilencer, pWeapon->BaseSlot(), true);
                 }
@@ -328,9 +377,12 @@ void game_cl_Deathmatch::CheckItem(PIItem pItem, PRESET_ITEMS* pPresetItems, BOO
 void game_cl_Deathmatch::LoadTeamDefaultPresetItems(
     const shared_str& caSection, IBuyWnd* pBuyMenu, PRESET_ITEMS* pPresetItems)
 {
-    if (!pSettings->line_exist(caSection, "default_items")) return;
-    if (!pBuyMenu) return;
-    if (!pPresetItems) return;
+    if (!pSettings->line_exist(caSection, "default_items"))
+        return;
+    if (!pBuyMenu)
+        return;
+    if (!pPresetItems)
+        return;
 
     pPresetItems->clear();
 
@@ -346,7 +398,8 @@ void game_cl_Deathmatch::LoadTeamDefaultPresetItems(
 
         u8 SlotID, ItemID;
         pBuyMenu->GetWeaponIndexByName(ItemName, SlotID, ItemID);
-        if (SlotID == 0xff || ItemID == 0xff) continue;
+        if (SlotID == 0xff || ItemID == 0xff)
+            continue;
         //		s16 ID = GetBuyMenuItemIndex(SlotID, ItemID);
         s16 ID = GetBuyMenuItemIndex(0, ItemID);
         pPresetItems->push_back(ID);
@@ -355,7 +408,8 @@ void game_cl_Deathmatch::LoadTeamDefaultPresetItems(
 
 void game_cl_Deathmatch::LoadDefItemsForRank(IBuyWnd* pBuyMenu)
 {
-    if (!pBuyMenu) return;
+    if (!pBuyMenu)
+        return;
     //---------------------------------------------------
     LoadPlayerDefItems(getTeamSection(local_player->team), pBuyMenu);
     //---------------------------------------------------
@@ -366,23 +420,27 @@ void game_cl_Deathmatch::LoadDefItemsForRank(IBuyWnd* pBuyMenu)
     for (int i = 1; i <= local_player->rank; i++)
     {
         strconcat(sizeof(RankStr), RankStr, "rank_", itoa(i, tmp, 10));
-        if (!pSettings->section_exist(RankStr)) continue;
+        if (!pSettings->section_exist(RankStr))
+            continue;
         for (u32 it = 0; it < PlayerDefItems.size(); it++)
         {
             //			s16* pItemID = &(PlayerDefItems[it]);
             //			char* ItemName = pBuyMenu->GetWeaponNameByIndex(u8(((*pItemID)&0xff00)>>0x08),
-            //u8((*pItemID)&0x00ff));
+            // u8((*pItemID)&0x00ff));
             PresetItem* pDefItem = &(PlayerDefItems[it]);
             const shared_str& ItemName = pBuyMenu->GetWeaponNameByIndex(pDefItem->SlotID, pDefItem->ItemID);
-            if (!ItemName.size()) continue;
+            if (!ItemName.size())
+                continue;
             strconcat(sizeof(ItemStr), ItemStr, "def_item_repl_", ItemName.c_str());
-            if (!pSettings->line_exist(RankStr, ItemStr)) continue;
+            if (!pSettings->line_exist(RankStr, ItemStr))
+                continue;
 
             xr_strcpy(NewItemStr, sizeof(NewItemStr), pSettings->r_string(RankStr, ItemStr));
 
             u8 SlotID, ItemID;
             pBuyMenu->GetWeaponIndexByName(NewItemStr, SlotID, ItemID);
-            if (SlotID == 0xff || ItemID == 0xff) continue;
+            if (SlotID == 0xff || ItemID == 0xff)
+                continue;
 
             //			s16 ID = GetBuyMenuItemIndex(SlotID, ItemID);
             s16 ID = GetBuyMenuItemIndex(0, ItemID);
@@ -398,9 +456,12 @@ void game_cl_Deathmatch::LoadDefItemsForRank(IBuyWnd* pBuyMenu)
         //		char* ItemName = pBuyMenu->GetWeaponNameByIndex(u8(((*pItemID)&0xff00)>>0x08), u8((*pItemID)&0x00ff));
         PresetItem* pDefItem = &(PlayerDefItems[it]);
         const shared_str& ItemName = pBuyMenu->GetWeaponNameByIndex(pDefItem->SlotID, pDefItem->ItemID);
-        if (!ItemName.size()) continue;
-        if (!xr_strcmp(*ItemName, "mp_wpn_knife")) continue;
-        if (!pSettings->line_exist(ItemName, "ammo_class")) continue;
+        if (!ItemName.size())
+            continue;
+        if (!xr_strcmp(*ItemName, "mp_wpn_knife"))
+            continue;
+        if (!pSettings->line_exist(ItemName, "ammo_class"))
+            continue;
 
         string1024 wpnAmmos, BaseAmmoName;
         xr_strcpy(wpnAmmos, pSettings->r_string(ItemName, "ammo_class"));
@@ -408,19 +469,22 @@ void game_cl_Deathmatch::LoadDefItemsForRank(IBuyWnd* pBuyMenu)
 
         u8 SlotID, ItemID;
         pBuyMenu->GetWeaponIndexByName(BaseAmmoName, SlotID, ItemID);
-        if (SlotID == 0xff || ItemID == 0xff) continue;
+        if (SlotID == 0xff || ItemID == 0xff)
+            continue;
 
         //		s16 ID = GetBuyMenuItemIndex(SlotID, ItemID);
 
         s16 ID = GetBuyMenuItemIndex(0, ItemID);
 
-        if (GameID() != eGameIDDeathmatch) {
+        if (GameID() != eGameIDDeathmatch)
+        {
             PlayerDefItems.push_back(ID);
             PlayerDefItems.push_back(ID);
         }
     };
     //-------------------------------------------------------------
-    if (pCurBuyMenu->IsShown()) return;
+    if (pCurBuyMenu->IsShown())
+        return;
     pCurBuyMenu->ResetItems();
     pCurBuyMenu->SetupDefaultItemsBegin();
     //---------------------------------------------------------
@@ -433,7 +497,8 @@ void game_cl_Deathmatch::LoadDefItemsForRank(IBuyWnd* pBuyMenu)
     for (; It != Et; ++It)
     {
         PresetItem PIT = *It;
-        if (PIT.ItemID == KnifeIndex) continue;
+        if (PIT.ItemID == KnifeIndex)
+            continue;
         pCurBuyMenu->ItemToSlot(pCurBuyMenu->GetWeaponNameByIndex(0, PIT.ItemID), PIT.SlotID);
     };
     //---------------------------------------------------------
@@ -442,12 +507,14 @@ void game_cl_Deathmatch::LoadDefItemsForRank(IBuyWnd* pBuyMenu)
 
 void game_cl_Deathmatch::ChangeItemsCosts(IBuyWnd* pBuyMenu)
 {
-    if (!pBuyMenu) return;
+    if (!pBuyMenu)
+        return;
 };
 
 void game_cl_Deathmatch::OnMoneyChanged()
 {
-    if (pCurBuyMenu && pCurBuyMenu->IsShown()) {
+    if (pCurBuyMenu && pCurBuyMenu->IsShown())
+    {
         pCurBuyMenu->SetMoneyAmount(local_player->money_for_round);
         pCurBuyMenu->CheckBuyAvailabilityInSlots();
     }
@@ -466,7 +533,8 @@ void game_cl_Deathmatch::TryToDefuseAllWeapons(aditional_ammo_t& dest_ammo)
     for (TIItemContainer::const_iterator i = all_items.begin(), ie = all_items.end(); i != ie; ++i)
     {
         CWeapon* tmp_weapon = smart_cast<CWeapon*>(*i);
-        if (tmp_weapon) TryToDefuseWeapon(tmp_weapon, all_items, dest_ammo);
+        if (tmp_weapon)
+            TryToDefuseWeapon(tmp_weapon, all_items, dest_ammo);
     }
 }
 
@@ -483,13 +551,17 @@ struct AmmoSearcherPredicate
     bool operator()(PIItem const& item)
     {
         CWeaponAmmo* temp_ammo = smart_cast<CWeaponAmmo*>(item);
-        if (!temp_ammo) return false;
+        if (!temp_ammo)
+            return false;
 
-        if (temp_ammo->m_boxCurr >= temp_ammo->m_boxSize) return false;
+        if (temp_ammo->m_boxCurr >= temp_ammo->m_boxSize)
+            return false;
 
-        if (temp_ammo->cNameSect() != ammo_section) return false;
+        if (temp_ammo->cNameSect() != ammo_section)
+            return false;
 
-        if ((temp_ammo->m_boxCurr + additional_ammo_count) < temp_ammo->m_boxSize) return false;
+        if ((temp_ammo->m_boxCurr + additional_ammo_count) < temp_ammo->m_boxSize)
+            return false;
 
         return true;
     }
@@ -499,14 +571,16 @@ void game_cl_Deathmatch::AdditionalAmmoInserter(aditional_ammo_t::value_type con
 {
     VERIFY(pCurBuyMenu);
 
-    if (!pSettings->line_exist(GetBaseCostSect(), sect_name.c_str())) return;
+    if (!pSettings->line_exist(GetBaseCostSect(), sect_name.c_str()))
+        return;
 
     pCurBuyMenu->ItemToSlot(sect_name.c_str(), 0);
 }
 
 bool game_cl_Deathmatch::LocalPlayerCanBuyItem(shared_str const& name_sect)
 {
-    if (name_sect == "mp_wpn_knife") return true;
+    if (name_sect == "mp_wpn_knife")
+        return true;
     CUIMpTradeWnd* buy_menu = smart_cast<CUIMpTradeWnd*>(pCurBuyMenu);
     R_ASSERT(buy_menu);
     return buy_menu->HasItemInGroup(name_sect);

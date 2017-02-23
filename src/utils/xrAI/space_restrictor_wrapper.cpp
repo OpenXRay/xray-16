@@ -51,7 +51,8 @@ bool CSpaceRestrictorWrapper::inside(const Fvector& position, float radius) cons
             Fsphere temp;
             m_xform.transform_tiny(temp.P, (*I).data.sphere.P);
             temp.R = (*I).data.sphere.R;
-            if (sphere.intersect(temp)) return (true);
+            if (sphere.intersect(temp))
+                return (true);
 
             continue;
         }
@@ -83,17 +84,23 @@ bool CSpaceRestrictorWrapper::inside(const Fvector& position, float radius) cons
             temp.transform_tiny(points[7], vertices);
 
             plane.build(points[0], points[3], points[5]);
-            if (plane.classify(sphere.P) > sphere.R) break;
+            if (plane.classify(sphere.P) > sphere.R)
+                break;
             plane.build(points[1], points[2], points[3]);
-            if (plane.classify(sphere.P) > sphere.R) break;
+            if (plane.classify(sphere.P) > sphere.R)
+                break;
             plane.build(points[6], points[5], points[4]);
-            if (plane.classify(sphere.P) > sphere.R) break;
+            if (plane.classify(sphere.P) > sphere.R)
+                break;
             plane.build(points[4], points[2], points[1]);
-            if (plane.classify(sphere.P) > sphere.R) break;
+            if (plane.classify(sphere.P) > sphere.R)
+                break;
             plane.build(points[3], points[2], points[4]);
-            if (plane.classify(sphere.P) > sphere.R) break;
+            if (plane.classify(sphere.P) > sphere.R)
+                break;
             plane.build(points[1], points[0], points[6]);
-            if (plane.classify(sphere.P) > sphere.R) break;
+            if (plane.classify(sphere.P) > sphere.R)
+                break;
             return (true);
         }
         default: NODEFAULT;
@@ -175,23 +182,23 @@ bool CSpaceRestrictorWrapper::inside(u32 level_vertex_id, bool partially_inside,
     if (partially_inside)
         return (inside(construct_position(level_graph(), level_vertex_id, position.x + offset, position.z + offset),
                     radius) ||
-                inside(construct_position(level_graph(), level_vertex_id, position.x + offset, position.z - offset),
-                    radius) ||
-                inside(construct_position(level_graph(), level_vertex_id, position.x - offset, position.z + offset),
-                    radius) ||
-                inside(construct_position(level_graph(), level_vertex_id, position.x - offset, position.z - offset),
-                    radius) ||
-                inside(Fvector().set(position.x, position.y, position.z), radius));
+            inside(
+                construct_position(level_graph(), level_vertex_id, position.x + offset, position.z - offset), radius) ||
+            inside(
+                construct_position(level_graph(), level_vertex_id, position.x - offset, position.z + offset), radius) ||
+            inside(
+                construct_position(level_graph(), level_vertex_id, position.x - offset, position.z - offset), radius) ||
+            inside(Fvector().set(position.x, position.y, position.z), radius));
     else
         return (inside(construct_position(level_graph(), level_vertex_id, position.x + offset, position.z + offset),
                     radius) &&
-                inside(construct_position(level_graph(), level_vertex_id, position.x + offset, position.z - offset),
-                    radius) &&
-                inside(construct_position(level_graph(), level_vertex_id, position.x - offset, position.z + offset),
-                    radius) &&
-                inside(construct_position(level_graph(), level_vertex_id, position.x - offset, position.z - offset),
-                    radius) &&
-                inside(Fvector().set(position.x, position.y, position.z), radius));
+            inside(
+                construct_position(level_graph(), level_vertex_id, position.x + offset, position.z - offset), radius) &&
+            inside(
+                construct_position(level_graph(), level_vertex_id, position.x - offset, position.z + offset), radius) &&
+            inside(
+                construct_position(level_graph(), level_vertex_id, position.x - offset, position.z - offset), radius) &&
+            inside(Fvector().set(position.x, position.y, position.z), radius));
 }
 
 struct sort_by_xz_predicate
@@ -246,12 +253,14 @@ void CSpaceRestrictorWrapper::verify_connectivity()
     CLevelGraph::const_vertex_iterator I = level_graph().begin();
     CLevelGraph::const_vertex_iterator E = level_graph().end();
     for (; I != E; ++I)
-        if (!inside(level_graph().vertex(I), true)) {
+        if (!inside(level_graph().vertex(I), true))
+        {
             start_vertex_id = level_graph().vertex(I);
             break;
         }
 
-    if (!level_graph().valid_vertex_id(start_vertex_id)) {
+    if (!level_graph().valid_vertex_id(start_vertex_id))
+    {
         Msg("Warning : restrictor %s covers the whole AI map");
         return;
     }
@@ -266,7 +275,8 @@ void CSpaceRestrictorWrapper::verify_connectivity()
     level_graph().clear_mask(m_border);
 
     VERIFY(nodes.size() + m_internal.size() <= level_graph().header().vertex_count());
-    if (nodes.size() + m_internal.size() == level_graph().header().vertex_count()) return;
+    if (nodes.size() + m_internal.size() == level_graph().header().vertex_count())
+        return;
 
     Msg("! %d nodes are disconnected!", level_graph().header().vertex_count() - (nodes.size() + m_internal.size()));
 
@@ -284,7 +294,8 @@ void CSpaceRestrictorWrapper::verify(CLevelGraph& level_graph, CGraphEngine& gra
 
     build_border();
 
-    if (!no_separator_check) verify_connectivity();
+    if (!no_separator_check)
+        verify_connectivity();
 
     clear();
 }

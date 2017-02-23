@@ -18,8 +18,8 @@
 //---------------------------------------------------------------------------
 class TfraLeftBar : public TFrame
 {
-    __published :  // IDE-managed Components
-                   TPanel* paLeftBar;
+    __published : // IDE-managed Components
+                  TPanel* paLeftBar;
     TPanel* paScene;
     TPanel* paEdit;
     TPanel* paTarget;
@@ -292,13 +292,13 @@ class TfraLeftBar : public TFrame
     void __fastcall btEnableObjectClick(TObject* Sender);
     void __fastcall ClipEditor1Click(TObject* Sender);
 
-  private:  // User declarations
+private: // User declarations
     void RedrawBar();
     void __fastcall miRecentFilesClick(TObject* Sender);
 
     xr_vector<std::pair<TExtBtn*, TExtBtn*>> m_TargetButtons;
 
-  public:  // User declarations
+public: // User declarations
     __fastcall TfraLeftBar(TComponent* Owner);
     void ChangeTarget(ObjClassID tgt);
     void UpdateSnapList();

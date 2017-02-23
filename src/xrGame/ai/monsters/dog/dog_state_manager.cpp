@@ -21,9 +21,9 @@ namespace dog
 {
 const float atack_decision_maxdist = 6.f;
 
-}  // dog
+} // dog
 
-}  // detail
+} // detail
 
 CStateManagerDog::CStateManagerDog(CAI_Dog* monster) : inherited(monster)
 {
@@ -48,45 +48,56 @@ void CStateManagerDog::execute()
     const CEntityAlive* enemy = object->EnemyMan.get_enemy();
 
     bool atack = false;
-    if (enemy) {
+    if (enemy)
+    {
         const Fvector3& enemy_pos = enemy->Position();
 
-        if (squad) {
-            if (object->Home->at_min_home(enemy_pos)) {
+        if (squad)
+        {
+            if (object->Home->at_min_home(enemy_pos))
+            {
                 squad->set_home_in_danger();
             }
 
-            if (object->Position().distance_to(enemy_pos) < detail::dog::atack_decision_maxdist) {
+            if (object->Position().distance_to(enemy_pos) < detail::dog::atack_decision_maxdist)
+            {
                 squad->set_home_in_danger();
             }
 
-            if (squad->home_in_danger()) {
+            if (squad->home_in_danger())
+            {
                 atack = true;
             }
         }
 
-        if (object->Home->at_mid_home(enemy_pos)) {
+        if (object->Home->at_mid_home(enemy_pos))
+        {
             atack = true;
         }
     }
 
-    if (!object->is_under_control()) {
-        if (atack) {
+    if (!object->is_under_control())
+    {
+        if (atack)
+        {
             CMonsterSquad* squad = monster_squad().get_squad(object);
             switch (object->EnemyMan.get_danger_type())
             {
             case eStrong: state_id = eStatePanic; break;
             case eWeak: state_id = eStateAttack; break;
             }
-            if (state_id == eStatePanic && squad->squad_alife_count() > 2) {
+            if (state_id == eStatePanic && squad->squad_alife_count() > 2)
+            {
                 state_id = eStateAttack;
             }
         }
         else if (object->HitMemory.is_hit())
         {
             // only inform squad of new hit (made not later then after 1 sec)
-            if (current_substate != eStateHitted && time() < object->HitMemory.get_last_hit_time() + 1000) {
-                if (squad) {
+            if (current_substate != eStateHitted && time() < object->HitMemory.get_last_hit_time() + 1000)
+            {
+                if (squad)
+                {
                     squad->set_home_in_danger();
                 }
             }
@@ -108,13 +119,16 @@ void CStateManagerDog::execute()
         }
         else
         {
-            if (object->get_custom_anim_state()) {
+            if (object->get_custom_anim_state())
+            {
                 return;
             }
 
-            if (check_eat()) {
+            if (check_eat())
+            {
                 state_id = eStateEat;
-                if (!object->EatedCorpse) {
+                if (!object->EatedCorpse)
+                {
                     object->EatedCorpse = object->CorpseMan.get_corpse();
                     const_cast<CEntityAlive*>(object->EatedCorpse)->set_lock_corpse(true);
                 }
@@ -132,12 +146,15 @@ void CStateManagerDog::execute()
 
     select_state(state_id);
 
-    if (prev_substate != current_substate && object->get_custom_anim_state()) {
+    if (prev_substate != current_substate && object->get_custom_anim_state())
+    {
         object->anim_end_reinit();
     }
 
-    if (prev_substate == eStateEat && current_substate != eStateEat) {
-        if (object->character_physics_support()->movement()->PHCapture()) {
+    if (prev_substate == eStateEat && current_substate != eStateEat)
+    {
+        if (object->character_physics_support()->movement()->PHCapture())
+        {
             object->character_physics_support()->movement()->PHReleaseObject();
         }
     }
@@ -150,8 +167,10 @@ void CStateManagerDog::execute()
 
 bool CStateManagerDog::check_eat()
 {
-    if (!object->CorpseMan.get_corpse()) {
-        if (!object->EatedCorpse) {
+    if (!object->CorpseMan.get_corpse())
+    {
+        if (!object->EatedCorpse)
+        {
             return false;
         }
     }

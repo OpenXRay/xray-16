@@ -35,12 +35,13 @@ void CBlender_Compile::r_Pass(LPCSTR _vs, LPCSTR _ps, bool bFog, BOOL bZtest, BO
     dest.ds = RImplementation.Resources->_CreateDS("null");
     dest.cs = RImplementation.Resources->_CreateCS("null");
 #endif
-#endif  //	USE_DX10
+#endif //	USE_DX10
     ctable.merge(&ps->constants);
     ctable.merge(&vs->constants);
 
     // Last Stage - disable
-    if (0 == stricmp(_ps, "null")) {
+    if (0 == stricmp(_ps, "null"))
+    {
         RS.SetTSS(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
         RS.SetTSS(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
     }
@@ -50,7 +51,8 @@ void CBlender_Compile::r_Constant(LPCSTR name, R_constant_setup* s)
 {
     R_ASSERT(s);
     ref_constant C = ctable.get(name);
-    if (C) C->handler = s;
+    if (C)
+        C->handler = s;
 }
 
 void CBlender_Compile::r_ColorWriteEnable(bool cR, bool cG, bool cB, bool cA)
@@ -78,7 +80,8 @@ u32 CBlender_Compile::i_Sampler(LPCSTR _name)
 
     // Find index
     ref_constant C = ctable.get(name);
-    if (!C) return u32(-1);
+    if (!C)
+        return u32(-1);
 
     R_ASSERT(C->type == RC_sampler);
     u32 stage = C->samp.index;
@@ -89,7 +92,8 @@ u32 CBlender_Compile::i_Sampler(LPCSTR _name)
 }
 void CBlender_Compile::i_Texture(u32 s, LPCSTR name)
 {
-    if (name) passTextures.push_back(mk_pair(s, ref_texture(RImplementation.Resources->_CreateTexture(name))));
+    if (name)
+        passTextures.push_back(mk_pair(s, ref_texture(RImplementation.Resources->_CreateTexture(name))));
 }
 void CBlender_Compile::i_Projective(u32 s, bool b)
 {
@@ -104,22 +108,10 @@ void CBlender_Compile::i_Address(u32 s, u32 address)
     RS.SetSAMP(s, D3DSAMP_ADDRESSV, address);
     RS.SetSAMP(s, D3DSAMP_ADDRESSW, address);
 }
-void CBlender_Compile::i_BorderColor(u32 s, u32 color)
-{
-    RS.SetSAMP(s, D3DSAMP_BORDERCOLOR, color);
-}
-void CBlender_Compile::i_Filter_Min(u32 s, u32 f)
-{
-    RS.SetSAMP(s, D3DSAMP_MINFILTER, f);
-}
-void CBlender_Compile::i_Filter_Mip(u32 s, u32 f)
-{
-    RS.SetSAMP(s, D3DSAMP_MIPFILTER, f);
-}
-void CBlender_Compile::i_Filter_Mag(u32 s, u32 f)
-{
-    RS.SetSAMP(s, D3DSAMP_MAGFILTER, f);
-}
+void CBlender_Compile::i_BorderColor(u32 s, u32 color) { RS.SetSAMP(s, D3DSAMP_BORDERCOLOR, color); }
+void CBlender_Compile::i_Filter_Min(u32 s, u32 f) { RS.SetSAMP(s, D3DSAMP_MINFILTER, f); }
+void CBlender_Compile::i_Filter_Mip(u32 s, u32 f) { RS.SetSAMP(s, D3DSAMP_MIPFILTER, f); }
+void CBlender_Compile::i_Filter_Mag(u32 s, u32 f) { RS.SetSAMP(s, D3DSAMP_MAGFILTER, f); }
 void CBlender_Compile::i_Filter(u32 s, u32 _min, u32 _mip, u32 _mag)
 {
     i_Filter_Min(s, _min);
@@ -130,23 +122,27 @@ u32 CBlender_Compile::r_Sampler(
     LPCSTR _name, LPCSTR texture, bool b_ps1x_ProjectiveDivide, u32 address, u32 fmin, u32 fmip, u32 fmag)
 {
     dwStage = i_Sampler(_name);
-    if (u32(-1) != dwStage) {
+    if (u32(-1) != dwStage)
+    {
         i_Texture(dwStage, texture);
 
         // force ANISO-TF for "s_base"
-        if ((0 == xr_strcmp(_name, "s_base")) && (fmin == D3DTEXF_LINEAR)) {
+        if ((0 == xr_strcmp(_name, "s_base")) && (fmin == D3DTEXF_LINEAR))
+        {
             fmin = D3DTEXF_ANISOTROPIC;
             fmag = D3DTEXF_ANISOTROPIC;
         }
 
-        if (0 == xr_strcmp(_name, "s_base_hud")) {
-            fmin = D3DTEXF_GAUSSIANQUAD;  // D3DTEXF_PYRAMIDALQUAD; //D3DTEXF_ANISOTROPIC; //D3DTEXF_LINEAR;
-                                          // //D3DTEXF_POINT; //D3DTEXF_NONE
-            fmag = D3DTEXF_GAUSSIANQUAD;  // D3DTEXF_PYRAMIDALQUAD; //D3DTEXF_ANISOTROPIC; //D3DTEXF_LINEAR;
-                                          // //D3DTEXF_POINT; //D3DTEXF_NONE;
+        if (0 == xr_strcmp(_name, "s_base_hud"))
+        {
+            fmin = D3DTEXF_GAUSSIANQUAD; // D3DTEXF_PYRAMIDALQUAD; //D3DTEXF_ANISOTROPIC; //D3DTEXF_LINEAR;
+            // //D3DTEXF_POINT; //D3DTEXF_NONE
+            fmag = D3DTEXF_GAUSSIANQUAD; // D3DTEXF_PYRAMIDALQUAD; //D3DTEXF_ANISOTROPIC; //D3DTEXF_LINEAR;
+            // //D3DTEXF_POINT; //D3DTEXF_NONE;
         }
 
-        if ((0 == xr_strcmp(_name, "s_detail")) && (fmin == D3DTEXF_LINEAR)) {
+        if ((0 == xr_strcmp(_name, "s_detail")) && (fmin == D3DTEXF_LINEAR))
+        {
             fmin = D3DTEXF_ANISOTROPIC;
             fmag = D3DTEXF_ANISOTROPIC;
         }
@@ -155,7 +151,8 @@ u32 CBlender_Compile::r_Sampler(
         i_Address(dwStage, address);
         i_Filter(dwStage, fmin, fmip, fmag);
         //.i_Filter				(dwStage,D3DTEXF_POINT,D3DTEXF_POINT,D3DTEXF_POINT); // show pixels
-        if (dwStage < 4) i_Projective(dwStage, b_ps1x_ProjectiveDivide);
+        if (dwStage < 4)
+            i_Projective(dwStage, b_ps1x_ProjectiveDivide);
     }
     return dwStage;
 }
@@ -172,7 +169,8 @@ void CBlender_Compile::r_Sampler_clw(LPCSTR name, LPCSTR texture, bool b_ps1x_Pr
 {
     u32 s = r_Sampler(
         name, texture, b_ps1x_ProjectiveDivide, D3DTADDRESS_CLAMP, D3DTEXF_LINEAR, D3DTEXF_NONE, D3DTEXF_LINEAR);
-    if (u32(-1) != s) RS.SetSAMP(s, D3DSAMP_ADDRESSW, D3DTADDRESS_WRAP);
+    if (u32(-1) != s)
+        RS.SetSAMP(s, D3DSAMP_ADDRESSW, D3DTADDRESS_WRAP);
 }
 
 void CBlender_Compile::r_End()
@@ -187,4 +185,4 @@ void CBlender_Compile::r_End()
 #endif
     SH->passes.push_back(RImplementation.Resources->_CreatePass(dest));
 }
-#endif  //	USE_DX10
+#endif //	USE_DX10

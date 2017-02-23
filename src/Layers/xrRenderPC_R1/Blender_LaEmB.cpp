@@ -19,10 +19,7 @@ CBlender_LaEmB::CBlender_LaEmB()
     xr_strcpy(oT2_const, "$null");
 }
 
-CBlender_LaEmB::~CBlender_LaEmB()
-{
-}
-
+CBlender_LaEmB::~CBlender_LaEmB() {}
 void CBlender_LaEmB::Save(IWriter& fs)
 {
     IBlender::Save(fs);
@@ -46,7 +43,8 @@ void CBlender_LaEmB::Compile(CBlender_Compile& C)
     IBlender::Compile(C);
 
     BOOL bConstant = (0 != stricmp(oT2_const, "$null"));
-    if (C.bEditor) {
+    if (C.bEditor)
+    {
         if (bConstant)
             compile_EDc(C);
         else
@@ -54,7 +52,8 @@ void CBlender_LaEmB::Compile(CBlender_Compile& C)
     }
     else
     {
-        if (2 == C.iElement) {
+        if (2 == C.iElement)
+        {
             if (bConstant)
                 compile_Lc(C);
             else
@@ -64,13 +63,13 @@ void CBlender_LaEmB::Compile(CBlender_Compile& C)
         {
             switch (HW.Caps.raster.dwStages)
             {
-            case 2:  // Geforce1/2/MX
+            case 2: // Geforce1/2/MX
                 if (bConstant)
                     compile_2c(C);
                 else
                     compile_2(C);
                 break;
-            case 3:  // Kyro, Radeon, Radeon2, Geforce3/4
+            case 3: // Kyro, Radeon, Radeon2, Geforce3/4
             default:
                 if (bConstant)
                     compile_3c(C);

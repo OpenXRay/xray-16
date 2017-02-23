@@ -17,10 +17,10 @@ public:
 public:
     CSingleton() {}
     virtual ~CSingleton() { _self = NULL; }
-
     static void DestroySingleton()
     {
-        if (!_self) return;
+        if (!_self)
+            return;
         Log("DestroySingleton::RefCounter:", _refcount);
         VERIFY(_on_self_delete == false);
         VERIFY(_refcount == 0);
@@ -30,14 +30,17 @@ public:
 public:
     static T* Instance()
     {
-        if (!_self) _self = new T();
+        if (!_self)
+            _self = new T();
         ++_refcount;
         return _self;
     }
     void FreeInst()
     {
-        if (0 == --_refcount) {
-            if (_on_self_delete) {
+        if (0 == --_refcount)
+        {
+            if (_on_self_delete)
+            {
                 CSingleton<T>* ptr = this;
                 xr_delete(ptr);
             }
@@ -76,7 +79,8 @@ public:
         SHARED_TYPE* _data;
 
         // if not found - create appropriate shared data object
-        if (_shared_tab.end() == shared_it) {
+        if (_shared_tab.end() == shared_it)
+        {
             _data = new SHARED_TYPE();
             _shared_tab.insert(mk_pair(id, _data));
         }
@@ -93,7 +97,6 @@ class CSharedResource
 
 public:
     CSharedResource() { loaded = false; }
-
     bool IsLoaded() { return loaded; }
     void SetLoad(bool l = true) { loaded = l; }
 };
@@ -111,29 +114,27 @@ public:
         pSharedObj->_on_self_delete = auto_delete;
     }
     virtual ~CSharedClass() { pSharedObj->FreeInst(); }
-
     static void DeleteSharedData() { CSharedObj<SHARED_TYPE, KEY_TYPE>::DestroySingleton(); }
-
     void load_shared(KEY_TYPE key, LPCSTR section)
     {
         _sd = pSharedObj->get_shared(key);
 
-        if (!get_sd()->IsLoaded()) {
+        if (!get_sd()->IsLoaded())
+        {
             load_shared(section);
             get_sd()->SetLoad();
         }
     }
 
     virtual void load_shared(LPCSTR section) {}
-
     SHARED_TYPE* get_sd() { return _sd; }
     const SHARED_TYPE* get_sd() const { return _sd; }
-
     // управление загрузкой данных при компонентном подходе (загрузка данных вручную)
     bool start_load_shared(KEY_TYPE key)
     {
         _sd = pSharedObj->get_shared(key);
-        if (get_sd()->IsLoaded()) return false;
+        if (get_sd()->IsLoaded())
+            return false;
         return true;
     }
     void finish_load_shared() { get_sd()->SetLoad(); }

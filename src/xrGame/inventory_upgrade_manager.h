@@ -41,7 +41,7 @@ private:
 
 public:
     Manager();
-    virtual ~Manager();  // change this to debug_make_final<Manager>();
+    virtual ~Manager(); // change this to debug_make_final<Manager>();
 
 public:
     Root* get_root(shared_str const& root_id);
@@ -70,7 +70,7 @@ public:
 #ifdef DEBUG
     void log_hierarchy();
     void test_all_upgrades(CInventoryItem& item);
-#endif  // DEBUG
+#endif // DEBUG
 
     void highlight_hierarchy(CInventoryItem& item, shared_str const& upgrade_id);
     void reset_highlight(CInventoryItem& item);
@@ -92,11 +92,11 @@ private:
 public:
     Properties_type m_properties;
 
-};  // class Manager
+}; // class Manager
 
-}  // namespace upgrade
-}  // namespace inventory
+} // namespace upgrade
+} // namespace inventory
 
 #include "inventory_upgrade_manager_inline.h"
 
-#endif  // INVENTORY_UPGRADE_MANAGER_H_INCLUDED
+#endif // INVENTORY_UPGRADE_MANAGER_H_INCLUDED

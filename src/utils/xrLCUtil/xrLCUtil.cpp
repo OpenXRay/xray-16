@@ -8,7 +8,8 @@ std::string make_time(u32 sec)
     int len = int(xr_strlen(buf));
     for (int i = 0; i < len; i++)
     {
-        if (buf[i] == ' ') buf[i] = '0';
+        if (buf[i] == ' ')
+            buf[i] = '0';
     }
     return std::string(buf);
 }

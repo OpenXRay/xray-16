@@ -20,31 +20,11 @@ IC void CALifeMonsterPatrolPathManager::path(const CPatrolPath* path)
     m_path = path;
 }
 
-IC void CALifeMonsterPatrolPathManager::path(LPCSTR path_name)
-{
-    path(shared_str(path_name));
-}
-
-IC bool CALifeMonsterPatrolPathManager::actual() const
-{
-    return (m_actual);
-}
-
-IC bool CALifeMonsterPatrolPathManager::completed() const
-{
-    return (actual() && m_completed);
-}
-
-IC void CALifeMonsterPatrolPathManager::start_type(const EPatrolStartType& start_type)
-{
-    m_start_type = start_type;
-}
-
-IC void CALifeMonsterPatrolPathManager::route_type(const EPatrolRouteType& route_type)
-{
-    m_route_type = route_type;
-}
-
+IC void CALifeMonsterPatrolPathManager::path(LPCSTR path_name) { path(shared_str(path_name)); }
+IC bool CALifeMonsterPatrolPathManager::actual() const { return (m_actual); }
+IC bool CALifeMonsterPatrolPathManager::completed() const { return (actual() && m_completed); }
+IC void CALifeMonsterPatrolPathManager::start_type(const EPatrolStartType& start_type) { m_start_type = start_type; }
+IC void CALifeMonsterPatrolPathManager::route_type(const EPatrolRouteType& route_type) { m_route_type = route_type; }
 IC const CALifeMonsterPatrolPathManager::EPatrolStartType& CALifeMonsterPatrolPathManager::start_type() const
 {
     return (m_start_type);
@@ -66,11 +46,7 @@ IC void CALifeMonsterPatrolPathManager::start_vertex_index(const u32& start_vert
     m_start_vertex_index = start_vertex_index;
 }
 
-IC bool CALifeMonsterPatrolPathManager::use_randomness() const
-{
-    return (m_use_randomness);
-}
-
+IC bool CALifeMonsterPatrolPathManager::use_randomness() const { return (m_use_randomness); }
 IC void CALifeMonsterPatrolPathManager::use_randomness(const bool& use_randomness)
 {
     m_use_randomness = use_randomness;

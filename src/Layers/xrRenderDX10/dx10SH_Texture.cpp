@@ -15,11 +15,7 @@
 #define PRIORITY_NORMAL 8
 #define PRIORITY_LOW 4
 
-void resptrcode_texture::create(LPCSTR _name)
-{
-    _set(RImplementation.Resources->_CreateTexture(_name));
-}
-
+void resptrcode_texture::create(LPCSTR _name) { _set(RImplementation.Resources->_CreateTexture(_name)); }
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
@@ -50,28 +46,33 @@ CTexture::~CTexture()
 
 void CTexture::surface_set(ID3DBaseTexture* surf)
 {
-    if (surf) surf->AddRef();
+    if (surf)
+        surf->AddRef();
     _RELEASE(pSurface);
     _RELEASE(m_pSRView);
 
     pSurface = surf;
 
-    if (pSurface) {
+    if (pSurface)
+    {
         desc_update();
 
         D3D_RESOURCE_DIMENSION type;
         pSurface->GetType(&type);
-        if (D3D_RESOURCE_DIMENSION_TEXTURE2D == type) {
+        if (D3D_RESOURCE_DIMENSION_TEXTURE2D == type)
+        {
             D3D_SHADER_RESOURCE_VIEW_DESC ViewDesc;
 
-            if (desc.MiscFlags & D3D_RESOURCE_MISC_TEXTURECUBE) {
+            if (desc.MiscFlags & D3D_RESOURCE_MISC_TEXTURECUBE)
+            {
                 ViewDesc.ViewDimension = D3D_SRV_DIMENSION_TEXTURECUBE;
                 ViewDesc.TextureCube.MostDetailedMip = 0;
                 ViewDesc.TextureCube.MipLevels = desc.MipLevels;
             }
             else
             {
-                if (desc.SampleDesc.Count <= 1) {
+                if (desc.SampleDesc.Count <= 1)
+                {
                     ViewDesc.ViewDimension = D3D_SRV_DIMENSION_TEXTURE2D;
                     ViewDesc.Texture2D.MostDetailedMip = 0;
                     ViewDesc.Texture2D.MipLevels = desc.MipLevels;
@@ -106,9 +107,11 @@ void CTexture::surface_set(ID3DBaseTexture* surf)
 
 ID3DBaseTexture* CTexture::surface_get()
 {
-    if (flags.bLoadedAsStaging) ProcessStaging();
+    if (flags.bLoadedAsStaging)
+        ProcessStaging();
 
-    if (pSurface) pSurface->AddRef();
+    if (pSurface)
+        pSurface->AddRef();
     return pSurface;
 }
 
@@ -156,9 +159,9 @@ void CTexture::ProcessStaging()
 
         T = 0;
 
-        CHK_DX(HW.pDevice->CreateTexture2D(&TexDesc,  // Texture desc
-            NULL,                                     // Initial data
-            &T));                                     // [out] Texture
+        CHK_DX(HW.pDevice->CreateTexture2D(&TexDesc, // Texture desc
+            NULL, // Initial data
+            &T)); // [out] Texture
 
         pTargetSurface = T;
     }
@@ -174,9 +177,9 @@ void CTexture::ProcessStaging()
 
         T = 0;
 
-        CHK_DX(HW.pDevice->CreateTexture3D(&TexDesc,  // Texture desc
-            NULL,                                     // Initial data
-            &T));                                     // [out] Texture
+        CHK_DX(HW.pDevice->CreateTexture3D(&TexDesc, // Texture desc
+            NULL, // Initial data
+            &T)); // [out] Texture
 
         pTargetSurface = T;
     }
@@ -216,7 +219,8 @@ void CTexture::ProcessStaging()
 
 void CTexture::Apply(u32 dwStage)
 {
-    if (flags.bLoadedAsStaging) ProcessStaging();
+    if (flags.bLoadedAsStaging)
+        ProcessStaging();
 
     // if( !RImplementation.o.dx10_msaa )
     //   VERIFY( !((!pSurface)^(!m_pSRView)) );	//	Both present or both missing
@@ -226,31 +230,31 @@ void CTexture::Apply(u32 dwStage)
     //   return;
     //}
 
-    if (dwStage < rstVertex)  //	Pixel shader stage resources
+    if (dwStage < rstVertex) //	Pixel shader stage resources
     {
         // HW.pDevice->PSSetShaderResources(dwStage, 1, &m_pSRView);
         SRVSManager.SetPSResource(dwStage, m_pSRView);
     }
-    else if (dwStage < rstGeometry)  //	Vertex shader stage resources
+    else if (dwStage < rstGeometry) //	Vertex shader stage resources
     {
         // HW.pDevice->VSSetShaderResources(dwStage-rstVertex, 1, &m_pSRView);
         SRVSManager.SetVSResource(dwStage - rstVertex, m_pSRView);
     }
-    else if (dwStage < rstHull)  //	Geometry shader stage resources
+    else if (dwStage < rstHull) //	Geometry shader stage resources
     {
         // HW.pDevice->GSSetShaderResources(dwStage-rstGeometry, 1, &m_pSRView);
         SRVSManager.SetGSResource(dwStage - rstGeometry, m_pSRView);
     }
 #ifdef USE_DX11
-    else if (dwStage < rstDomain)  //	Geometry shader stage resources
+    else if (dwStage < rstDomain) //	Geometry shader stage resources
     {
         SRVSManager.SetHSResource(dwStage - rstHull, m_pSRView);
     }
-    else if (dwStage < rstCompute)  //	Geometry shader stage resources
+    else if (dwStage < rstCompute) //	Geometry shader stage resources
     {
         SRVSManager.SetDSResource(dwStage - rstDomain, m_pSRView);
     }
-    else if (dwStage < rstInvalid)  //	Geometry shader stage resources
+    else if (dwStage < rstInvalid) //	Geometry shader stage resources
     {
         SRVSManager.SetCSResource(dwStage - rstCompute, m_pSRView);
     }
@@ -261,7 +265,8 @@ void CTexture::Apply(u32 dwStage)
 
 void CTexture::apply_theora(u32 dwStage)
 {
-    if (pTheora->Update(m_play_time != 0xFFFFFFFF ? m_play_time : Device.dwTimeContinual)) {
+    if (pTheora->Update(m_play_time != 0xFFFFFFFF ? m_play_time : Device.dwTimeContinual))
+    {
         D3D_RESOURCE_DIMENSION type;
         pSurface->GetType(&type);
         R_ASSERT(D3D_RESOURCE_DIMENSION_TEXTURE2D == type);
@@ -298,7 +303,8 @@ void CTexture::apply_theora(u32 dwStage)
 };
 void CTexture::apply_avi(u32 dwStage)
 {
-    if (pAVI->NeedUpdate()) {
+    if (pAVI->NeedUpdate())
+    {
         D3D_RESOURCE_DIMENSION type;
         pSurface->GetType(&type);
         R_ASSERT(D3D_RESOURCE_DIMENSION_TEXTURE2D == type);
@@ -329,11 +335,13 @@ void CTexture::apply_avi(u32 dwStage)
 void CTexture::apply_seq(u32 dwStage)
 {
     // SEQ
-    u32 frame = Device.dwTimeContinual / seqMSPF;  // Device.dwTimeGlobal
+    u32 frame = Device.dwTimeContinual / seqMSPF; // Device.dwTimeGlobal
     u32 frame_data = seqDATA.size();
-    if (flags.seqCycles) {
+    if (flags.seqCycles)
+    {
         u32 frame_id = frame % (frame_data * 2);
-        if (frame_id >= frame_data) frame_id = (frame_data - 1) - (frame_id % frame_data);
+        if (frame_id >= frame_data)
+            frame_id = (frame_data - 1) - (frame_id % frame_data);
         pSurface = seqDATA[frame_id];
         m_pSRView = m_seqSRView[frame_id];
     }
@@ -362,12 +370,15 @@ void CTexture::Load()
 {
     flags.bLoaded = true;
     desc_cache = 0;
-    if (pSurface) return;
+    if (pSurface)
+        return;
 
     flags.bUser = false;
     flags.MemoryUsage = 0;
-    if (0 == stricmp(*cName, "$null")) return;
-    if (0 != strstr(*cName, "$user$")) {
+    if (0 == stricmp(*cName, "$null"))
+        return;
+    if (0 != strstr(*cName, "$user$"))
+    {
         flags.bUser = true;
         return;
     }
@@ -378,12 +389,14 @@ void CTexture::Load()
 
     // Check for OGM
     string_path fn;
-    if (FS.exist(fn, "$game_textures$", *cName, ".ogm")) {
+    if (FS.exist(fn, "$game_textures$", *cName, ".ogm"))
+    {
         // AVI
         pTheora = new CTheoraSurface();
         m_play_time = 0xFFFFFFFF;
 
-        if (!pTheora->Load(fn)) {
+        if (!pTheora->Load(fn))
+        {
             xr_delete(pTheora);
             FATAL("Can't open video stream");
         }
@@ -414,7 +427,8 @@ void CTexture::Load()
             HRESULT hrr = HW.pDevice->CreateTexture2D(&desc, 0, &pTexture);
 
             pSurface = pTexture;
-            if (FAILED(hrr)) {
+            if (FAILED(hrr))
+            {
                 FATAL("Invalid video stream");
                 R_CHK(hrr);
                 xr_delete(pTheora);
@@ -432,7 +446,8 @@ void CTexture::Load()
         // AVI
         pAVI = new CAviPlayerCustom();
 
-        if (!pAVI->Load(fn)) {
+        if (!pAVI->Load(fn))
+        {
             xr_delete(pAVI);
             FATAL("Can't open video stream");
         }
@@ -461,7 +476,8 @@ void CTexture::Load()
             HRESULT hrr = HW.pDevice->CreateTexture2D(&desc, 0, &pTexture);
 
             pSurface = pTexture;
-            if (FAILED(hrr)) {
+            if (FAILED(hrr))
+            {
                 FATAL("Invalid video stream");
                 R_CHK(hrr);
                 xr_delete(pAVI);
@@ -482,7 +498,8 @@ void CTexture::Load()
 
         flags.seqCycles = FALSE;
         _fs->r_string(buffer, sizeof(buffer));
-        if (0 == stricmp(buffer, "cycled")) {
+        if (0 == stricmp(buffer, "cycled"))
+        {
             flags.seqCycles = TRUE;
             _fs->r_string(buffer, sizeof(buffer));
         }
@@ -493,11 +510,13 @@ void CTexture::Load()
         {
             _fs->r_string(buffer, sizeof(buffer));
             _Trim(buffer);
-            if (buffer[0]) {
+            if (buffer[0])
+            {
                 // Load another texture
                 u32 mem = 0;
                 pSurface = ::RImplementation.texture_load(buffer, mem);
-                if (pSurface) {
+                if (pSurface)
+                {
                     // pSurface->SetPriority	(PRIORITY_LOW);
                     seqDATA.push_back(pSurface);
                     m_seqSRView.push_back(0);
@@ -516,19 +535,22 @@ void CTexture::Load()
         // pSurface = ::RImplementation.texture_load	(*cName,mem);
         pSurface = ::RImplementation.texture_load(*cName, mem, true);
 
-        if (GetUsage() == D3D_USAGE_STAGING) {
+        if (GetUsage() == D3D_USAGE_STAGING)
+        {
             flags.bLoadedAsStaging = TRUE;
             bCreateView = false;
         }
 
         // Calc memory usage and preload into vid-mem
-        if (pSurface) {
+        if (pSurface)
+        {
             // pSurface->SetPriority	(PRIORITY_NORMAL);
             flags.MemoryUsage = mem;
         }
     }
 
-    if (pSurface && bCreateView) CHK_DX(HW.pDevice->CreateShaderResourceView(pSurface, NULL, &m_pSRView));
+    if (pSurface && bCreateView)
+        CHK_DX(HW.pDevice->CreateShaderResourceView(pSurface, NULL, &m_pSRView));
     PostLoad();
 }
 
@@ -537,13 +559,14 @@ void CTexture::Unload()
 #ifdef DEBUG
     string_path msg_buff;
     xr_sprintf(msg_buff, sizeof(msg_buff), "* Unloading texture [%s] pSurface RefCount=", cName.c_str());
-#endif  // DEBUG
+#endif // DEBUG
 
     //.	if (flags.bLoaded)		Msg		("* Unloaded: %s",cName.c_str());
 
     flags.bLoaded = FALSE;
     flags.bLoadedAsStaging = FALSE;
-    if (!seqDATA.empty()) {
+    if (!seqDATA.empty())
+    {
         for (u32 I = 0; I < seqDATA.size(); I++)
         {
             _RELEASE(seqDATA[I]);
@@ -557,7 +580,7 @@ void CTexture::Unload()
 
 #ifdef DEBUG
     _SHOW_REF(msg_buff, pSurface);
-#endif  // DEBUG
+#endif // DEBUG
     _RELEASE(pSurface);
     _RELEASE(m_pSRView);
 
@@ -570,10 +593,12 @@ void CTexture::Unload()
 void CTexture::desc_update()
 {
     desc_cache = pSurface;
-    if (pSurface) {
+    if (pSurface)
+    {
         D3D_RESOURCE_DIMENSION type;
         pSurface->GetType(&type);
-        if (D3D_RESOURCE_DIMENSION_TEXTURE2D == type) {
+        if (D3D_RESOURCE_DIMENSION_TEXTURE2D == type)
+        {
             ID3DTexture2D* T = (ID3DTexture2D*)pSurface;
             T->GetDesc(&desc);
         }
@@ -584,7 +609,8 @@ D3D_USAGE CTexture::GetUsage()
 {
     D3D_USAGE res = D3D_USAGE_DEFAULT;
 
-    if (pSurface) {
+    if (pSurface)
+    {
         D3D_RESOURCE_DIMENSION type;
         pSurface->GetType(&type);
         switch (type)
@@ -625,20 +651,20 @@ D3D_USAGE CTexture::GetUsage()
 
 void CTexture::video_Play(BOOL looped, u32 _time)
 {
-    if (pTheora) pTheora->Play(looped, (_time != 0xFFFFFFFF) ? (m_play_time = _time) : Device.dwTimeContinual);
+    if (pTheora)
+        pTheora->Play(looped, (_time != 0xFFFFFFFF) ? (m_play_time = _time) : Device.dwTimeContinual);
 }
 
 void CTexture::video_Pause(BOOL state)
 {
-    if (pTheora) pTheora->Pause(state);
+    if (pTheora)
+        pTheora->Pause(state);
 }
 
 void CTexture::video_Stop()
 {
-    if (pTheora) pTheora->Stop();
+    if (pTheora)
+        pTheora->Stop();
 }
 
-BOOL CTexture::video_IsPlaying()
-{
-    return (pTheora) ? pTheora->IsPlaying() : FALSE;
-}
+BOOL CTexture::video_IsPlaying() { return (pTheora) ? pTheora->IsPlaying() : FALSE; }

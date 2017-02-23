@@ -19,7 +19,7 @@ interface class property_container_holder;
     : public Flobbster::Windows::Forms::PropertyBag,
       public XRay::SdkControls::IPropertyContainer
 {
-  public:
+public:
     typedef Flobbster::Windows::Forms::PropertySpec PropertySpec;
     typedef Flobbster::Windows::Forms::PropertySpecEventArgs PropertySpecEventArgs;
     typedef System::Collections::IDictionary IDictionary;
@@ -27,7 +27,7 @@ interface class property_container_holder;
     typedef System::Object Object;
     typedef System::String String;
 
-  public:
+public:
     property_container(property_holder* holder, property_container_holder ^ container_holder);
     virtual ~property_container();
     !property_container();
@@ -39,7 +39,7 @@ interface class property_container_holder;
     ArrayList % ordered_properties();
     void clear();
 
-  private:
+private:
     void get_value_handler(Object ^ sender, PropertySpecEventArgs ^ e);
     void set_value_handler(Object ^ sender, PropertySpecEventArgs ^ e);
     bool equal_category(String ^ new_category, String ^ old_category);
@@ -47,12 +47,12 @@ interface class property_container_holder;
     void try_update_name(PropertySpec ^ description, String ^ name);
     void update_names(String ^ name);
 
-  private:
+private:
     IDictionary ^ m_properties;
     ArrayList ^ m_categories;
     ArrayList ^ m_ordered_properties;
     property_holder* m_holder;
     property_container_holder ^ m_container_holder;
-};  // class property_container
+}; // class property_container
 
-#endif  // ifndef PROPERTY_CONTAINER_HPP_INCLUDED
+#endif // ifndef PROPERTY_CONTAINER_HPP_INCLUDED

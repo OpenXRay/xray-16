@@ -89,7 +89,8 @@ void game_cl_Deathmatch::SetGameUI(CUIGameCustom* uigame)
 
 CUIGameCustom* game_cl_Deathmatch::createGameUI()
 {
-    if (g_dedicated_server) return NULL;
+    if (g_dedicated_server)
+        return NULL;
 
     CLASS_ID clsid = CLSID_GAME_UI_DEATHMATCH;
     m_game_ui = smart_cast<CUIGameDM*>(NEW_INSTANCE(clsid));
@@ -101,7 +102,8 @@ CUIGameCustom* game_cl_Deathmatch::createGameUI()
 
 void game_cl_Deathmatch::SetCurrentSkinMenu()
 {
-    if (!pCurSkinMenu) pCurSkinMenu = InitSkinMenu(0);
+    if (!pCurSkinMenu)
+        pCurSkinMenu = InitSkinMenu(0);
 }
 
 void game_cl_Deathmatch::net_import_state(NET_Packet& P)
@@ -131,10 +133,12 @@ void game_cl_Deathmatch::net_import_state(NET_Packet& P)
     {
         P.r_stringZ(WinnerName);
         bool NeedSndMessage = (xr_strlen(WinnerName) != 0);
-        if (NeedSndMessage && local_player && !xr_strcmp(WinnerName, local_player->getName())) {
+        if (NeedSndMessage && local_player && !xr_strcmp(WinnerName, local_player->getName()))
+        {
             PlaySndMessage(ID_YOU_WON);
         }
-        if (NeedSndMessage && m_reward_generator) {
+        if (NeedSndMessage && m_reward_generator)
+        {
             m_reward_generator->OnRoundEnd();
             m_reward_generator->CommitBestResults();
         }
@@ -147,8 +151,10 @@ void game_cl_Deathmatch::net_import_update(NET_Packet& P)
 {
     inherited::net_import_update(P);
     //-----------------------------------
-    if (pCurBuyMenu && local_player) {
-        if (local_player->rank != pCurBuyMenu->GetRank() && !pCurBuyMenu->IsIgnoreMoneyAndRank()) {
+    if (pCurBuyMenu && local_player)
+    {
+        if (local_player->rank != pCurBuyMenu->GetRank() && !pCurBuyMenu->IsIgnoreMoneyAndRank())
+        {
             pCurBuyMenu->SetRank(local_player->rank);
             LoadDefItemsForRank(pCurBuyMenu);
             ChangeItemsCosts(pCurBuyMenu);
@@ -158,7 +164,8 @@ void game_cl_Deathmatch::net_import_update(NET_Packet& P)
 
 IBuyWnd* game_cl_Deathmatch::InitBuyMenu(const shared_str& BasePriceSection, s16 Team)
 {
-    if (Team == -1) {
+    if (Team == -1)
+    {
         Team = local_player->team;
     };
 
@@ -171,7 +178,8 @@ IBuyWnd* game_cl_Deathmatch::InitBuyMenu(const shared_str& BasePriceSection, s16
 
 CUISkinSelectorWnd* game_cl_Deathmatch::InitSkinMenu(s16 Team)
 {
-    if (Team == -1) {
+    if (Team == -1)
+    {
         Team = local_player->team;
     };
 
@@ -183,20 +191,18 @@ CUISkinSelectorWnd* game_cl_Deathmatch::InitSkinMenu(s16 Team)
 
 void game_cl_Deathmatch::OnMapInfoAccept()
 {
-    if (CanCallSkinMenu()) pCurSkinMenu->ShowDialog(true);
+    if (CanCallSkinMenu())
+        pCurSkinMenu->ShowDialog(true);
 };
 
-void game_cl_Deathmatch::OnSkinMenuBack()
-{
-    m_game_ui->ShowServerInfo();
-};
-
+void game_cl_Deathmatch::OnSkinMenuBack() { m_game_ui->ShowServerInfo(); };
 void game_cl_Deathmatch::OnSkinMenu_Ok()
 {
     IGameObject* l_pObj = Level().CurrentEntity();
 
     CGameObject* l_pPlayer = smart_cast<CGameObject*>(l_pObj);
-    if (!l_pPlayer) return;
+    if (!l_pPlayer)
+        return;
 
     NET_Packet P;
     l_pPlayer->u_EventGen(P, GE_GAME_EVENT, l_pPlayer->ID());
@@ -211,8 +217,10 @@ void game_cl_Deathmatch::OnSkinMenu_Ok()
 
 void game_cl_Deathmatch::OnSkinMenu_Cancel()
 {
-    if (!m_bSkinSelected && !m_bSpectatorSelected) {
-        if (CanCallSkinMenu() && !pCurSkinMenu->IsShown()) {
+    if (!m_bSkinSelected && !m_bSpectatorSelected)
+    {
+        if (CanCallSkinMenu() && !pCurSkinMenu->IsShown())
+        {
             pCurSkinMenu->ShowDialog(true);
             return;
         }
@@ -222,18 +230,24 @@ void game_cl_Deathmatch::OnSkinMenu_Cancel()
 
 BOOL game_cl_Deathmatch::CanCallBuyMenu()
 {
-    if (Phase() != GAME_PHASE_INPROGRESS) return false;
+    if (Phase() != GAME_PHASE_INPROGRESS)
+        return false;
 
-    if (!is_buy_menu_ready()) return FALSE;
+    if (!is_buy_menu_ready())
+        return FALSE;
 
-    if (Level().CurrentEntity() && !smart_cast<CSpectator*>(Level().CurrentEntity())) {
+    if (Level().CurrentEntity() && !smart_cast<CSpectator*>(Level().CurrentEntity()))
+    {
         return FALSE;
     };
-    if (!m_bSkinSelected || m_bSpectatorSelected) return FALSE;
-    if (pCurSkinMenu && pCurSkinMenu->IsShown()) {
+    if (!m_bSkinSelected || m_bSpectatorSelected)
+        return FALSE;
+    if (pCurSkinMenu && pCurSkinMenu->IsShown())
+    {
         return FALSE;
     };
-    if (m_game_ui && m_game_ui->GetActorMenu().IsShown()) {
+    if (m_game_ui && m_game_ui->GetActorMenu().IsShown())
+    {
         return FALSE;
     }
     /*if (m_game_ui->m_pInventoryMenu && m_game_ui->m_pInventoryMenu->IsShown())
@@ -245,33 +259,42 @@ BOOL game_cl_Deathmatch::CanCallBuyMenu()
 
 BOOL game_cl_Deathmatch::CanCallSkinMenu()
 {
-    if (Phase() != GAME_PHASE_INPROGRESS) return false;
-    if (m_game_ui && m_game_ui->GetActorMenu().IsShown()) {
+    if (Phase() != GAME_PHASE_INPROGRESS)
+        return false;
+    if (m_game_ui && m_game_ui->GetActorMenu().IsShown())
+    {
         return FALSE;
     }
     /*if (m_game_ui->m_pInventoryMenu && m_game_ui->m_pInventoryMenu->IsShown())
     {
         return FALSE;
     };*/
-    if (pCurBuyMenu && pCurBuyMenu->IsShown()) {
+    if (pCurBuyMenu && pCurBuyMenu->IsShown())
+    {
         return FALSE;
     };
     SetCurrentSkinMenu();
-    if (!pCurSkinMenu) return FALSE;
-    if (!pCurSkinMenu->IsShown()) pCurSkinMenu->SetCurSkin(local_player->skin);
+    if (!pCurSkinMenu)
+        return FALSE;
+    if (!pCurSkinMenu->IsShown())
+        pCurSkinMenu->SetCurSkin(local_player->skin);
     return TRUE;
 };
 
 BOOL game_cl_Deathmatch::CanCallInventoryMenu()
 {
-    if (Phase() != GAME_PHASE_INPROGRESS) return false;
-    if (Level().CurrentEntity() && !smart_cast<CActor*>(Level().CurrentEntity())) {
+    if (Phase() != GAME_PHASE_INPROGRESS)
+        return false;
+    if (Level().CurrentEntity() && !smart_cast<CActor*>(Level().CurrentEntity()))
+    {
         return FALSE;
     }
-    if (pCurSkinMenu && pCurSkinMenu->IsShown()) {
+    if (pCurSkinMenu && pCurSkinMenu->IsShown())
+    {
         return FALSE;
     };
-    if (local_player->testFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD)) {
+    if (local_player->testFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD))
+    {
         return FALSE;
     }
     return TRUE;
@@ -279,9 +302,11 @@ BOOL game_cl_Deathmatch::CanCallInventoryMenu()
 
 void game_cl_Deathmatch::SetCurrentBuyMenu()
 {
-    if (g_dedicated_server) return;
+    if (g_dedicated_server)
+        return;
 
-    if (!pCurBuyMenu) {
+    if (!pCurBuyMenu)
+    {
         pCurBuyMenu = InitBuyMenu(GetBaseCostSect(), 0);
         LoadTeamDefaultPresetItems(GetTeamMenu(0), pCurBuyMenu, &PresetItemsTeam0);
         pCurPresetItems = &PresetItemsTeam0;
@@ -293,17 +318,20 @@ void game_cl_Deathmatch::SetCurrentBuyMenu()
     else
         pCurBuyMenu->IgnoreMoneyAndRank(false);
     //-----------------------------------
-    if (!local_player) return;
+    if (!local_player)
+        return;
 };
 
 void game_cl_Deathmatch::ClearBuyMenu()
 {
-    if (!pCurBuyMenu) return;
+    if (!pCurBuyMenu)
+        return;
 };
 
 bool game_cl_Deathmatch::CanBeReady()
 {
-    if (!local_player) return false;
+    if (!local_player)
+        return false;
 
     m_bMenuCalledFromReady = TRUE;
 
@@ -311,26 +339,32 @@ bool game_cl_Deathmatch::CanBeReady()
 
     SetCurrentBuyMenu();
 
-    if (pCurBuyMenu && !pCurBuyMenu->IsShown()) {
+    if (pCurBuyMenu && !pCurBuyMenu->IsShown())
+    {
         pCurBuyMenu->ResetItems();
         SetBuyMenuItems(&PlayerDefItems);
     }
 
-    if (!m_bSkinSelected) {
+    if (!m_bSkinSelected)
+    {
         m_bMenuCalledFromReady = FALSE;
-        if (CanCallSkinMenu()) pCurSkinMenu->ShowDialog(true);
+        if (CanCallSkinMenu())
+            pCurSkinMenu->ShowDialog(true);
 
         return false;
     };
 
-    if (pCurBuyMenu) {
+    if (pCurBuyMenu)
+    {
         const preset_items& _p = pCurBuyMenu->GetPreset(_preset_idx_last);
         bool Passed = false;
         Passed =
             (_p.size() == 0) ? 1 : (s32(pCurBuyMenu->GetPresetCost(_preset_idx_last)) <= local_player->money_for_round);
         Passed |= pCurBuyMenu->IsIgnoreMoneyAndRank();
-        if (!Passed) {
-            if (CanCallBuyMenu()) {
+        if (!Passed)
+        {
+            if (CanCallBuyMenu())
+            {
                 ShowBuyMenu();
             }
             return false;
@@ -350,16 +384,13 @@ void game_cl_Deathmatch::OnSpectatorSelect()
     inherited::OnSpectatorSelect();
 };
 
-char* game_cl_Deathmatch::getTeamSection(int Team)
-{
-    return "deathmatch_team0";
-};
-
+char* game_cl_Deathmatch::getTeamSection(int Team) { return "deathmatch_team0"; };
 void game_cl_Deathmatch::Check_Invincible_Players(){};
 
 void game_cl_Deathmatch::ConvertTime2String(string64* str, u32 Time)
 {
-    if (!str) return;
+    if (!str)
+        return;
 
     u32 RHour = Time / 3600000;
     Time %= 3600000;
@@ -372,7 +403,8 @@ void game_cl_Deathmatch::ConvertTime2String(string64* str, u32 Time)
 
 int game_cl_Deathmatch::GetPlayersPlace(game_PlayerState* ps)
 {
-    if (!ps) return -1;
+    if (!ps)
+        return -1;
     game_cl_GameState::PLAYERS_MAP_IT I = Game().players.begin();
     game_cl_GameState::PLAYERS_MAP_IT E = Game().players.end();
 
@@ -385,7 +417,8 @@ int game_cl_Deathmatch::GetPlayersPlace(game_PlayerState* ps)
     int Place = 1;
     for (u32 i = 0; i < Players.size(); i++)
     {
-        if (Players[i] == ps) return Place;
+        if (Players[i] == ps)
+            return Place;
         Place++;
     };
     return -1;
@@ -398,7 +431,8 @@ string16 places[] = {"1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th", "9t
 void game_cl_Deathmatch::OnConnected()
 {
     inherited::OnConnected();
-    if (m_game_ui) {
+    if (m_game_ui)
+    {
         VERIFY(!g_dedicated_server);
         m_game_ui = smart_cast<CUIGameDM*>(CurrentGameUI());
         m_game_ui->SetClGame(this);
@@ -411,10 +445,12 @@ void game_cl_Deathmatch::shedule_Update(u32 dt)
 
     inherited::shedule_Update(dt);
 
-    if (g_dedicated_server) return;
+    if (g_dedicated_server)
+        return;
 
     // fake
-    if (m_game_ui) {
+    if (m_game_ui)
+    {
         m_game_ui->SetTimeMsgCaption(NULL);
         m_game_ui->SetRoundResultCaption(NULL);
         m_game_ui->SetSpectatorMsgCaption(NULL);
@@ -434,10 +470,13 @@ void game_cl_Deathmatch::shedule_Update(u32 dt)
 
         Check_Invincible_Players();
 
-        if (!m_game_ui) break;
+        if (!m_game_ui)
+            break;
 
-        if (m_s32TimeLimit && m_cl_dwWarmUp_Time == 0) {
-            if (Level().timeServer() < (m_start_time + m_s32TimeLimit)) {
+        if (m_s32TimeLimit && m_cl_dwWarmUp_Time == 0)
+        {
+            if (Level().timeServer() < (m_start_time + m_s32TimeLimit))
+            {
                 u32 lts = Level().timeServer();
                 u32 Rest = (m_start_time + m_s32TimeLimit) - lts;
                 string64 S;
@@ -450,10 +489,13 @@ void game_cl_Deathmatch::shedule_Update(u32 dt)
             }
         };
         game_PlayerState* lookat_player = Game().lookat_player();
-        if (local_player && !local_player->IsSkip()) {
-            if (m_bFirstRun) {
+        if (local_player && !local_player->IsSkip())
+        {
+            if (m_bFirstRun)
+            {
                 m_bFirstRun = FALSE;
-                if (!Level().IsDemoPlayStarted() && Level().CurrentEntity()) {
+                if (!Level().IsDemoPlayStarted() && Level().CurrentEntity())
+                {
                     VERIFY(m_game_ui);
                     m_bFirstRun = m_game_ui->ShowServerInfo() ? FALSE : TRUE;
                 }
@@ -461,7 +503,8 @@ void game_cl_Deathmatch::shedule_Update(u32 dt)
                 GetActiveVoting();
             };
 
-            if (lookat_player) {
+            if (lookat_player)
+            {
                 string256 MoneyStr;
                 xr_sprintf(MoneyStr, "%d", lookat_player->money_for_round);
                 m_game_ui->ChangeTotalMoneyIndicator(MoneyStr);
@@ -470,7 +513,8 @@ void game_cl_Deathmatch::shedule_Update(u32 dt)
             m_game_ui->SetPressJumpMsgCaption(NULL);
             m_game_ui->SetPressBuyMsgCaption(NULL);
 
-            if (m_cl_dwWarmUp_Time > Level().timeServer()) {
+            if (m_cl_dwWarmUp_Time > Level().timeServer())
+            {
                 u32 TimeRemains = m_cl_dwWarmUp_Time - Level().timeServer();
                 string64 S;
                 ConvertTime2String(&S, TimeRemains);
@@ -485,7 +529,8 @@ void game_cl_Deathmatch::shedule_Update(u32 dt)
                     {
                         static u32 dwLastTimeRemains = 10;
                         u32 dwCurTimeRemains = TimeRemains / 1000;
-                        if (dwLastTimeRemains != dwCurTimeRemains) {
+                        if (dwLastTimeRemains != dwCurTimeRemains)
+                        {
                             if (dwCurTimeRemains > 0 && dwCurTimeRemains <= 5)
                                 PlaySndMessage(ID_COUNTDOWN_1 + dwCurTimeRemains - 1);
                         }
@@ -498,7 +543,8 @@ void game_cl_Deathmatch::shedule_Update(u32 dt)
                 m_game_ui->SetWarmUpCaption(tmpStr);
             }
 
-            if (Level().CurrentEntity() && smart_cast<CSpectator*>(Level().CurrentEntity())) {
+            if (Level().CurrentEntity() && smart_cast<CSpectator*>(Level().CurrentEntity()))
+            {
                 if (!(pCurBuyMenu && pCurBuyMenu->IsShown()) && !(pCurSkinMenu && pCurSkinMenu->IsShown()) &&
                     !m_game_ui->IsServerInfoShown() && (CurrentGameUI() && CurrentGameUI()->GameIndicatorsShown()))
                 {
@@ -507,7 +553,8 @@ void game_cl_Deathmatch::shedule_Update(u32 dt)
                     else
                         m_game_ui->SetPressJumpMsgCaption("mp_press_jump2start");
 
-                    if (CanCallBuyMenu()) m_game_ui->SetPressBuyMsgCaption("mp_press_to_buy");
+                    if (CanCallBuyMenu())
+                        m_game_ui->SetPressBuyMsgCaption("mp_press_to_buy");
                 };
             };
 
@@ -515,7 +562,8 @@ void game_cl_Deathmatch::shedule_Update(u32 dt)
                 (CurrentGameUI()->GameIndicatorsShown()))
             {
                 CSpectator* pSpectator = smart_cast<CSpectator*>(Level().CurrentControlEntity());
-                if (pSpectator) {
+                if (pSpectator)
+                {
                     string1024 SpectatorStr = "";
                     pSpectator->GetSpectatorString(SpectatorStr);
                     m_game_ui->SetSpectatorMsgCaption(SpectatorStr);
@@ -523,7 +571,8 @@ void game_cl_Deathmatch::shedule_Update(u32 dt)
             }
 
             u32 CurTime = Level().timeServer();
-            if (IsVotingEnabled() && IsVotingActive() && m_dwVoteEndTime >= CurTime) {
+            if (IsVotingEnabled() && IsVotingActive() && m_dwVoteEndTime >= CurTime)
+            {
                 u32 TimeLeft = m_dwVoteEndTime - Level().timeServer();
                 string1024 VoteTimeResStr;
                 u32 SecsLeft = (TimeLeft % 60000) / 1000;
@@ -535,7 +584,8 @@ void game_cl_Deathmatch::shedule_Update(u32 dt)
                 for (; I != players.end(); ++I)
                 {
                     game_PlayerState* ps = I->second;
-                    if (ps->m_bCurrentVoteAgreed == 1) NumAgreed++;
+                    if (ps->m_bCurrentVoteAgreed == 1)
+                        NumAgreed++;
                 }
 
                 xr_sprintf(VoteTimeResStr, st.translate("mp_timeleft").c_str(), MinitsLeft, SecsLeft,
@@ -555,19 +605,23 @@ void game_cl_Deathmatch::shedule_Update(u32 dt)
                 m_game_ui->SetForceRespawnTimeCaption(FullS);
             };
 
-            if (Level().CurrentViewEntity()) {
+            if (Level().CurrentViewEntity())
+            {
                 game_PlayerState* ps = GetPlayerByGameID(Level().CurrentViewEntity()->ID());
 
-                if (ps && m_game_ui) m_game_ui->SetRank(ps->team, ps->rank);
+                if (ps && m_game_ui)
+                    m_game_ui->SetRank(ps->team, ps->rank);
 
-                if (ps && m_game_ui) m_game_ui->SetFraglimit(ps->frags(), m_s32FragLimit);
+                if (ps && m_game_ui)
+                    m_game_ui->SetFraglimit(ps->frags(), m_s32FragLimit);
             }
         };
     }
     break;
     case GAME_PHASE_PENDING:
     {
-        if (!m_game_ui) break;
+        if (!m_game_ui)
+            break;
 
         m_game_ui->UpdateTeamPanels();
         m_game_ui->ShowPlayersList(true);
@@ -575,7 +629,8 @@ void game_cl_Deathmatch::shedule_Update(u32 dt)
     break;
     case GAME_PHASE_PLAYER_SCORES:
     {
-        if (!m_game_ui) break;
+        if (!m_game_ui)
+            break;
 
         string128 resstring;
         xr_sprintf(resstring, st.translate("mp_player_wins").c_str(), WinnerName);
@@ -589,15 +644,18 @@ void game_cl_Deathmatch::shedule_Update(u32 dt)
     };
 
     //-----------------------------------------
-    if (!CanCallBuyMenu()) HideBuyMenu();
+    if (!CanCallBuyMenu())
+        HideBuyMenu();
 
-    if (pCurSkinMenu && pCurSkinMenu->IsShown() && !CanCallSkinMenu()) pCurSkinMenu->HideDialog();
+    if (pCurSkinMenu && pCurSkinMenu->IsShown() && !CanCallSkinMenu())
+        pCurSkinMenu->HideDialog();
     //-----------------------------------------------
 
     //-----------------------------------------------
     // if (m_game_ui->m_pInventoryMenu && m_game_ui->m_pInventoryMenu->IsShown() && !CanCallInventoryMenu())
     //	StartStopMenu(m_game_ui->m_pInventoryMenu,true);
-    if (m_game_ui && m_game_ui->GetActorMenu().IsShown() && !CanCallInventoryMenu()) {
+    if (m_game_ui && m_game_ui->GetActorMenu().IsShown() && !CanCallInventoryMenu())
+    {
         m_game_ui->HideActorMenu();
     }
 
@@ -609,41 +667,54 @@ void game_cl_Deathmatch::shedule_Update(u32 dt)
     //	m_game_ui->m_pMapDesc->HideDialog();
     //}
 
-    if (pCurSkinMenu && pCurSkinMenu->IsShown() && cur_game_state != GAME_PHASE_INPROGRESS) {
+    if (pCurSkinMenu && pCurSkinMenu->IsShown() && cur_game_state != GAME_PHASE_INPROGRESS)
+    {
         pCurSkinMenu->HideDialog();
     }
 }
 
 void game_cl_Deathmatch::SetScore()
 {
-    if (Level().CurrentViewEntity() && m_game_ui) {
+    if (Level().CurrentViewEntity() && m_game_ui)
+    {
         game_PlayerState* ps = GetPlayerByGameID(Level().CurrentViewEntity()->ID());
-        if (ps && m_game_ui) m_game_ui->SetRank(ps->team, ps->rank);
+        if (ps && m_game_ui)
+            m_game_ui->SetRank(ps->team, ps->rank);
 
-        if (ps && m_game_ui) m_game_ui->SetFraglimit(ps->frags(), m_s32FragLimit);
+        if (ps && m_game_ui)
+            m_game_ui->SetFraglimit(ps->frags(), m_s32FragLimit);
     }
 };
 
 bool game_cl_Deathmatch::OnKeyboardPress(int key)
 {
-    if (inherited::OnKeyboardPress(key)) return true;
+    if (inherited::OnKeyboardPress(key))
+        return true;
 
-    if (Level().IsDemoPlay() && (key != kSCORES) && (key != kCROUCH)) return false;
+    if (Level().IsDemoPlay() && (key != kSCORES) && (key != kCROUCH))
+        return false;
 
-    if (kSCORES == key && Phase() == GAME_PHASE_INPROGRESS) {
-        if (m_game_ui) m_game_ui->ShowFragList(true);
+    if (kSCORES == key && Phase() == GAME_PHASE_INPROGRESS)
+    {
+        if (m_game_ui)
+            m_game_ui->ShowFragList(true);
         return true;
     };
 
-    if (kINVENTORY == key) {
-        if (Level().CurrentControlEntity() && smart_cast<CActor*>(Level().CurrentControlEntity())) {
-            if (m_game_ui) {
-                if (m_game_ui->GetActorMenu().IsShown()) {
+    if (kINVENTORY == key)
+    {
+        if (Level().CurrentControlEntity() && smart_cast<CActor*>(Level().CurrentControlEntity()))
+        {
+            if (m_game_ui)
+            {
+                if (m_game_ui->GetActorMenu().IsShown())
+                {
                     m_game_ui->HideActorMenu();
                 }
                 else
                 {
-                    if (CanCallInventoryMenu()) {
+                    if (CanCallInventoryMenu())
+                    {
                         m_game_ui->ShowActorMenu();
                     }
                 }
@@ -652,19 +723,23 @@ bool game_cl_Deathmatch::OnKeyboardPress(int key)
         }
     }
 
-    if (kBUY == key) {
+    if (kBUY == key)
+    {
         if (pCurBuyMenu && pCurBuyMenu->IsShown())
             HideBuyMenu();
         else
         {
-            if (CanCallBuyMenu()) {
+            if (CanCallBuyMenu())
+            {
                 SetCurrentBuyMenu();
 
-                if (!pCurBuyMenu) return true;
+                if (!pCurBuyMenu)
+                    return true;
 
                 pCurBuyMenu->ResetItems();
 
-                if (!pCurBuyMenu->IsShown()) SetBuyMenuItems(&PlayerDefItems);
+                if (!pCurBuyMenu->IsShown())
+                    SetBuyMenuItems(&PlayerDefItems);
 
                 //				LoadDefItemsForRank(pCurBuyMenu);
                 ShowBuyMenu();
@@ -674,12 +749,14 @@ bool game_cl_Deathmatch::OnKeyboardPress(int key)
         return true;
     };
 
-    if (kSKIN == key) {
+    if (kSKIN == key)
+    {
         if (pCurSkinMenu && pCurSkinMenu->IsShown())
             pCurSkinMenu->HideDialog();
         else
         {
-            if (CanCallSkinMenu()) {
+            if (CanCallSkinMenu())
+            {
                 SetCurrentSkinMenu();
                 pCurSkinMenu->ShowDialog(true);
             }
@@ -708,9 +785,12 @@ bool game_cl_Deathmatch::OnKeyboardPress(int key)
 
 bool game_cl_Deathmatch::OnKeyboardRelease(int key)
 {
-    if (inherited::OnKeyboardRelease(key)) return true;
-    if (kSCORES == key) {
-        if (m_game_ui) {
+    if (inherited::OnKeyboardRelease(key))
+        return true;
+    if (kSCORES == key)
+    {
+        if (m_game_ui)
+        {
             m_game_ui->ShowFragList(false);
         };
         return true;
@@ -730,7 +810,8 @@ void game_cl_Deathmatch::OnVoteStart(NET_Packet& P)
     P.r_stringZ(Player);
     m_dwVoteEndTime = Level().timeServer() + P.r_u32();
 
-    if (m_game_ui) {
+    if (m_game_ui)
+    {
         string4096 CmdName = "";
         string1024 NewCmd;
         xr_strcpy(NewCmd, Command);
@@ -738,7 +819,8 @@ void game_cl_Deathmatch::OnVoteStart(NET_Packet& P)
         sscanf(Command, "%s %s %s %s %s %s", CmdName, CmdParams[0], CmdParams[1], CmdParams[2], CmdParams[3],
             CmdParams[4]);
 
-        if (!xr_strcmp(CmdName, "restart")) {
+        if (!xr_strcmp(CmdName, "restart"))
+        {
             xr_sprintf(NewCmd, "%s", *st.translate("mp_restart"));
         }
         else if (!xr_strcmp(CmdName, "restart_fast"))
@@ -750,7 +832,8 @@ void game_cl_Deathmatch::OnVoteStart(NET_Packet& P)
             xr_sprintf(NewCmd, "%s %s", *st.translate("mp_kick"), CmdParams[0]);
             for (int i = 1; i < MAX_VOTE_PARAMS; i++)
             {
-                if (xr_strlen(CmdParams[i])) {
+                if (xr_strlen(CmdParams[i]))
+                {
                     xr_strcat(NewCmd, " ");
                     xr_strcat(NewCmd, CmdParams[i]);
                 }
@@ -761,7 +844,8 @@ void game_cl_Deathmatch::OnVoteStart(NET_Packet& P)
             xr_sprintf(NewCmd, "%s %s", *st.translate("mp_ban"), CmdParams[0]);
             for (int i = 1; i < MAX_VOTE_PARAMS; i++)
             {
-                if (xr_strlen(CmdParams[i])) {
+                if (xr_strlen(CmdParams[i]))
+                {
                     xr_strcat(NewCmd, " ");
                     xr_strcat(NewCmd, CmdParams[i]);
                 }
@@ -781,7 +865,8 @@ void game_cl_Deathmatch::OnVoteStart(NET_Packet& P)
 
         m_game_ui->SetVoteMessage(VoteStr);
         m_game_ui->SetVoteTimeResultMsg("");
-        if (!m_pVoteRespondWindow) m_pVoteRespondWindow = new CUIVote();
+        if (!m_pVoteRespondWindow)
+            m_pVoteRespondWindow = new CUIVote();
         m_pVoteRespondWindow->SetVoting(VoteStr);
     };
 };
@@ -789,7 +874,8 @@ void game_cl_Deathmatch::OnVoteStart(NET_Packet& P)
 void game_cl_Deathmatch::OnVoteStop(NET_Packet& P)
 {
     inherited::OnVoteStop(P);
-    if (m_game_ui) {
+    if (m_game_ui)
+    {
         m_game_ui->SetVoteMessage(NULL);
         m_game_ui->SetVoteTimeResultMsg(NULL);
     }
@@ -798,7 +884,8 @@ void game_cl_Deathmatch::OnVoteStop(NET_Packet& P)
 void game_cl_Deathmatch::OnVoteEnd(NET_Packet& P)
 {
     inherited::OnVoteEnd(P);
-    if (m_game_ui) {
+    if (m_game_ui)
+    {
         m_game_ui->SetVoteMessage(NULL);
         m_game_ui->SetVoteTimeResultMsg(NULL);
     }
@@ -828,32 +915,31 @@ void game_cl_Deathmatch::GetMapEntities(xr_vector<SZoneMapEntityData>& dst)
     */
 }
 
-bool game_cl_Deathmatch::IsEnemy(game_PlayerState* ps)
-{
-    return true;
-}
-
-bool game_cl_Deathmatch::IsEnemy(CEntityAlive* ea1, CEntityAlive* ea2)
-{
-    return true;
-};
-
+bool game_cl_Deathmatch::IsEnemy(game_PlayerState* ps) { return true; }
+bool game_cl_Deathmatch::IsEnemy(CEntityAlive* ea1, CEntityAlive* ea2) { return true; };
 void game_cl_Deathmatch::OnRender()
 {
     game_PlayerState* lookat_player = Game().lookat_player();
-    if (m_bDamageBlockIndicators && local_player && (local_player == lookat_player)) {
+    if (m_bDamageBlockIndicators && local_player && (local_player == lookat_player))
+    {
         PLAYERS_MAP_IT it = players.begin();
         for (; it != players.end(); ++it)
         {
             game_PlayerState* ps = it->second;
             u16 id = ps->GameID;
-            if (ps->testFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD)) continue;
-            if (!ps->testFlag(GAME_PLAYER_FLAG_INVINCIBLE)) continue;
+            if (ps->testFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD))
+                continue;
+            if (!ps->testFlag(GAME_PLAYER_FLAG_INVINCIBLE))
+                continue;
             IGameObject* pObject = Level().Objects.net_Find(id);
-            if (!pObject) continue;
-            if (!pObject || !smart_cast<CActor*>(pObject)) continue;
-            if (ps == local_player) continue;
-            if (!IsEnemy(ps)) continue;
+            if (!pObject)
+                continue;
+            if (!pObject || !smart_cast<CActor*>(pObject))
+                continue;
+            if (ps == local_player)
+                continue;
+            if (!IsEnemy(ps))
+                continue;
             cl_TeamStruct* pTS = &TeamList[ModifyTeam(ps->team)];
 
             VERIFY(pObject);
@@ -866,9 +952,12 @@ void game_cl_Deathmatch::OnRender()
 
 IC bool DM_Compare_Players(game_PlayerState* p1, game_PlayerState* p2)
 {
-    if (p1->testFlag(GAME_PLAYER_FLAG_SPECTATOR) && !p2->testFlag(GAME_PLAYER_FLAG_SPECTATOR)) return false;
-    if (!p1->testFlag(GAME_PLAYER_FLAG_SPECTATOR) && p2->testFlag(GAME_PLAYER_FLAG_SPECTATOR)) return true;
-    if (p1->frags() == p2->frags()) {
+    if (p1->testFlag(GAME_PLAYER_FLAG_SPECTATOR) && !p2->testFlag(GAME_PLAYER_FLAG_SPECTATOR))
+        return false;
+    if (!p1->testFlag(GAME_PLAYER_FLAG_SPECTATOR) && p2->testFlag(GAME_PLAYER_FLAG_SPECTATOR))
+        return true;
+    if (p1->frags() == p2->frags())
+    {
         return p1->m_iDeaths < p2->m_iDeaths;
     }
     return p1->frags() > p2->frags();
@@ -876,7 +965,8 @@ IC bool DM_Compare_Players(game_PlayerState* p1, game_PlayerState* p2)
 
 void game_cl_Deathmatch::PlayParticleEffect(LPCSTR EffName, Fvector& pos)
 {
-    if (!EffName) return;
+    if (!EffName)
+        return;
     // вычислить позицию и направленность партикла
     Fmatrix M;
     M.translate(pos);
@@ -895,21 +985,28 @@ void game_cl_Deathmatch::PlayParticleEffect(LPCSTR EffName, Fvector& pos)
 void game_cl_Deathmatch::OnSpawn(IGameObject* pObj)
 {
     inherited::OnSpawn(pObj);
-    if (!pObj) return;
+    if (!pObj)
+        return;
     CActor* pActor = smart_cast<CActor*>(pObj);
-    if (pActor) {
-        if (xr_strlen(Actor_Spawn_Effect)) PlayParticleEffect(Actor_Spawn_Effect.c_str(), pObj->Position());
+    if (pActor)
+    {
+        if (xr_strlen(Actor_Spawn_Effect))
+            PlayParticleEffect(Actor_Spawn_Effect.c_str(), pObj->Position());
         game_PlayerState* ps = GetPlayerByGameID(pActor->ID());
 
-        if (ps && m_reward_generator) {
+        if (ps && m_reward_generator)
+        {
             m_reward_generator->OnPlayerSpawned(ps);
             m_reward_generator->init_bone_groups(pActor);
         }
     };
-    if (smart_cast<CWeapon*>(pObj)) {
-        if (pObj->H_Parent()) {
+    if (smart_cast<CWeapon*>(pObj))
+    {
+        if (pObj->H_Parent())
+        {
             game_PlayerState* ps = GetPlayerByGameID(pObj->H_Parent()->ID());
-            if (ps) {
+            if (ps)
+            {
                 m_WeaponUsageStatistic->OnWeaponBought(ps, pObj->cNameSect().c_str());
             }
         }
@@ -942,7 +1039,8 @@ void game_cl_Deathmatch::OnSwitchPhase(u32 old_phase, u32 new_phase)
 {
     inherited::OnSwitchPhase(old_phase, new_phase);
 
-    if (!m_game_ui) return;
+    if (!m_game_ui)
+        return;
 
     switch (new_phase)
     {
@@ -956,8 +1054,10 @@ void game_cl_Deathmatch::OnSwitchPhase(u32 old_phase, u32 new_phase)
     case GAME_PHASE_PLAYER_SCORES:
     {
         m_game_ui->UpdateTeamPanels();
-        if (local_player) {
-            if (!xr_strcmp(WinnerName, local_player->getName())) {
+        if (local_player)
+        {
+            if (!xr_strcmp(WinnerName, local_player->getName()))
+            {
                 PlaySndMessage(ID_YOU_WON);
             }
         }
@@ -972,24 +1072,30 @@ void game_cl_Deathmatch::OnSwitchPhase(u32 old_phase, u32 new_phase)
 void game_cl_Deathmatch::OnGameRoundStarted()
 {
     inherited::OnGameRoundStarted();
-    if (pCurBuyMenu && pCurBuyMenu->IsShown()) pCurBuyMenu->HideDialog();
+    if (pCurBuyMenu && pCurBuyMenu->IsShown())
+        pCurBuyMenu->HideDialog();
 
-    if (local_player) {
-        if (pCurBuyMenu) {
+    if (local_player)
+    {
+        if (pCurBuyMenu)
+        {
             pCurBuyMenu->IgnoreMoneyAndRank(false);
             pCurBuyMenu->SetRank(local_player->rank);
         }
         ClearBuyMenu();
         LoadDefItemsForRank(pCurBuyMenu);
         ChangeItemsCosts(pCurBuyMenu);
-        if (pCurBuyMenu && pCurPresetItems) {
+        if (pCurBuyMenu && pCurPresetItems)
+        {
             LoadTeamDefaultPresetItems(GetTeamMenu(local_player->team), pCurBuyMenu, pCurPresetItems);
             ReInitRewardGenerator(local_player);
         }
     }
-    if (pCurBuyMenu) pCurBuyMenu->ClearPreset(_preset_idx_last);
+    if (pCurBuyMenu)
+        pCurBuyMenu->ClearPreset(_preset_idx_last);
     //-----------------------------------------------------------------
-    if (m_game_ui && m_game_ui->GetActorMenu().IsShown()) {
+    if (m_game_ui && m_game_ui->GetActorMenu().IsShown())
+    {
         m_game_ui->HideActorMenu();
     }
 }
@@ -997,7 +1103,8 @@ void game_cl_Deathmatch::OnGameRoundStarted()
 void game_cl_Deathmatch::OnRankChanged(u8 OldRank)
 {
     inherited::OnRankChanged(OldRank);
-    if (pCurBuyMenu) pCurBuyMenu->SetRank(local_player->rank);
+    if (pCurBuyMenu)
+        pCurBuyMenu->SetRank(local_player->rank);
     LoadDefItemsForRank(pCurBuyMenu);
     ChangeItemsCosts(pCurBuyMenu);
     //---------------------------------------------
@@ -1006,7 +1113,8 @@ void game_cl_Deathmatch::OnRankChanged(u8 OldRank)
 
 void game_cl_Deathmatch::PlayRankChangesSndMessage()
 {
-    if (local_player) {
+    if (local_player)
+    {
         switch (local_player->rank)
         {
         case 0: break;
@@ -1017,15 +1125,18 @@ void game_cl_Deathmatch::PlayRankChangesSndMessage()
 
 void game_cl_Deathmatch::OnTeamChanged()
 {
-    if (!pCurBuyMenu) return;
-    if (pCurBuyMenu) pCurBuyMenu->SetRank(local_player->rank);
+    if (!pCurBuyMenu)
+        return;
+    if (pCurBuyMenu)
+        pCurBuyMenu->SetRank(local_player->rank);
     LoadDefItemsForRank(pCurBuyMenu);
     ChangeItemsCosts(pCurBuyMenu);
 };
 
 void game_cl_Deathmatch::LoadPlayerDefItems(char* TeamName, IBuyWnd* pBuyMenu)
 {
-    if (!local_player) return;
+    if (!local_player)
+        return;
     LoadTeamDefaultPresetItems(TeamName, pBuyMenu, &PlayerDefItems);
 };
 
@@ -1034,18 +1145,21 @@ void game_cl_Deathmatch::OnGameMenuRespond_ChangeSkin(NET_Packet& P)
     s8 NewSkin = P.r_s8();
     local_player->skin = NewSkin;
 
-    if (pCurSkinMenu && pCurSkinMenu->IsShown()) pCurSkinMenu->HideDialog();
+    if (pCurSkinMenu && pCurSkinMenu->IsShown())
+        pCurSkinMenu->HideDialog();
 
     // if (m_game_ui->m_pMapDesc && m_game_ui->m_pMapDesc->IsShown())
     //	m_game_ui->m_pMapDesc->HideDialog();
 
     SetCurrentSkinMenu();
-    if (pCurSkinMenu) pCurSkinMenu->SetCurSkin(local_player->skin);
+    if (pCurSkinMenu)
+        pCurSkinMenu->SetCurSkin(local_player->skin);
     SetCurrentBuyMenu();
     ReInitRewardGenerator(local_player);
     m_bSpectatorSelected = FALSE;
 
-    if (m_bMenuCalledFromReady) {
+    if (m_bMenuCalledFromReady)
+    {
         OnKeyboardPress(kJUMP);
     }
 };
@@ -1053,23 +1167,30 @@ void game_cl_Deathmatch::OnGameMenuRespond_ChangeSkin(NET_Packet& P)
 void game_cl_Deathmatch::OnPlayerFlagsChanged(game_PlayerState* ps)
 {
     inherited::OnPlayerFlagsChanged(ps);
-    if (!ps) return;
-    if (m_game_ui) m_game_ui->UpdateTeamPanels();
+    if (!ps)
+        return;
+    if (m_game_ui)
+        m_game_ui->UpdateTeamPanels();
 
-    if (ps->testFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD)) {
-        if (ps == local_player && m_game_ui && m_game_ui->GetActorMenu().IsShown()) {
+    if (ps->testFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD))
+    {
+        if (ps == local_player && m_game_ui && m_game_ui->GetActorMenu().IsShown())
+        {
             m_game_ui->HideActorMenu();
         }
         return;
     }
 
     IGameObject* pObject = Level().Objects.net_Find(ps->GameID);
-    if (!pObject) return;
+    if (!pObject)
+        return;
 
-    if (!smart_cast<CActor*>(pObject)) return;
+    if (!smart_cast<CActor*>(pObject))
+        return;
 
     CActor* pActor = smart_cast<CActor*>(pObject);
-    if (!pActor) return;
+    if (!pActor)
+        return;
 
     pActor->conditions().SetCanBeHarmedState(!ps->testFlag(GAME_PLAYER_FLAG_INVINCIBLE));
 };
@@ -1082,17 +1203,15 @@ void game_cl_Deathmatch::SendPickUpEvent(u16 ID_who, u16 ID_what)
     u_EventSend(P);
 };
 
-const shared_str game_cl_Deathmatch::GetTeamMenu(s16 team)
-{
-    return TEAM0_MENU;
-}
-
+const shared_str game_cl_Deathmatch::GetTeamMenu(s16 team) { return TEAM0_MENU; }
 #define SELF_LOCATION "mp_self_location"
 void game_cl_Deathmatch::UpdateMapLocations()
 {
     inherited::UpdateMapLocations();
-    if (local_player) {
-        if (!Level().MapManager().HasMapLocation(SELF_LOCATION, local_player->GameID)) {
+    if (local_player)
+    {
+        if (!Level().MapManager().HasMapLocation(SELF_LOCATION, local_player->GameID))
+        {
             (Level().MapManager().AddMapLocation(SELF_LOCATION, local_player->GameID))->EnablePointer();
         }
     }
@@ -1100,31 +1219,33 @@ void game_cl_Deathmatch::UpdateMapLocations()
 
 void game_cl_Deathmatch::ShowBuyMenu()
 {
-    if (!local_player) return;
-    if (!pCurBuyMenu || pCurBuyMenu->IsShown()) return;
+    if (!local_player)
+        return;
+    if (!pCurBuyMenu || pCurBuyMenu->IsShown())
+        return;
 
     pCurBuyMenu->ShowDialog(true);
 
-    if (local_player->testFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD)) {
+    if (local_player->testFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD))
+    {
         const preset_items& _p = pCurBuyMenu->GetPreset(_preset_idx_last);
-        if (_p.size() != 0) pCurBuyMenu->TryUsePreset(_preset_idx_last);
+        if (_p.size() != 0)
+            pCurBuyMenu->TryUsePreset(_preset_idx_last);
     }
 };
 
 void game_cl_Deathmatch::HideBuyMenu()
 {
-    if (!pCurBuyMenu || !pCurBuyMenu->IsShown()) return;
+    if (!pCurBuyMenu || !pCurBuyMenu->IsShown())
+        return;
     pCurBuyMenu->HideDialog();
 }
 
-s16 game_cl_Deathmatch::ModifyTeam(s16 Team)
-{
-    return Team;
-}
-
+s16 game_cl_Deathmatch::ModifyTeam(s16 Team) { return Team; }
 bool game_cl_Deathmatch::IsPlayerInTeam(game_PlayerState* ps, ETeam team)
 {
-    if (ps->testFlag(GAME_PLAYER_FLAG_SPECTATOR) && (team == etSpectatorsTeam)) {
+    if (ps->testFlag(GAME_PLAYER_FLAG_SPECTATOR) && (team == etSpectatorsTeam))
+    {
         return true;
     }
     else if (!ps->testFlag(GAME_PLAYER_FLAG_SPECTATOR) && (team == etGreenTeam))

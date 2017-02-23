@@ -25,7 +25,6 @@ public:
     CUIStatic* AddIconField(float width);
 
     CUITextWnd* GetTextItem() { return m_text; }
-
     // TextControl
     void SetText(LPCSTR txt);
     LPCSTR GetText();

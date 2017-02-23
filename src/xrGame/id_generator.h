@@ -21,7 +21,6 @@ private:
         TYPE_ID m_tpIDs[tBlockSize];
 
         IC SID_Block() : m_tCount(0) {}
-
         IC bool operator<(const SID_Block& b) const { return (m_tCount && ((m_tTimeID < b.m_tTimeID) || !b.m_tCount)); }
     };
 
@@ -48,7 +47,8 @@ private:
         VERIFY(l_tID_Block.m_tCount);
         BLOCK_ID l_tBlockID = BLOCK_ID(&l_tID_Block - m_tppBlocks);
 
-        if (l_tID_Block.m_tCount == 1) {
+        if (l_tID_Block.m_tCount == 1)
+        {
             --m_available_count;
             VERIFY(m_available_count >= 0);
         }
@@ -70,7 +70,8 @@ public:
         for (VALUE_ID i = tMinValue;; ++i)
         {
             vfFreeID(i, tStartTime);
-            if (i >= tMaxValue) break;
+            if (i >= tMaxValue)
+                break;
         }
         VERIFY(m_available_count == m_tBlockCount);
         for (u32 j = 0; j < m_tBlockCount; ++j)
@@ -79,7 +80,8 @@ public:
 
     IC VALUE_ID tfGetID(VALUE_ID tValueID = tInvalidValueID)
     {
-        if (tInvalidValueID != tValueID) return (tfGetFromBlock(m_tppBlocks[tfGetBlockByValue(tValueID)], tValueID));
+        if (tInvalidValueID != tValueID)
+            return (tfGetFromBlock(m_tppBlocks[tfGetBlockByValue(tValueID)], tValueID));
 
         R_ASSERT2(m_available_count, "Not enough IDs");
         SID_Block* I = std::min_element(m_tppBlocks, m_tppBlocks + m_tBlockCount);
@@ -94,7 +96,8 @@ public:
 
         VERIFY(l_tID_Block.m_tCount < tBlockSize);
 
-        if (!l_tID_Block.m_tCount) {
+        if (!l_tID_Block.m_tCount)
+        {
             ++m_available_count;
             VERIFY(m_available_count <= m_tBlockCount);
         }

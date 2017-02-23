@@ -31,12 +31,14 @@ game_PlayerState::game_PlayerState(NET_Packet* account_info)
 
     clear();
 
-    if (account_info) {
+    if (account_info)
+    {
         net_Import(*account_info);
     }
     else
     {
-        if (g_dedicated_server) {
+        if (g_dedicated_server)
+        {
             setFlag(GAME_PLAYER_FLAG_SKIP);
         }
         else
@@ -79,21 +81,9 @@ game_PlayerState::~game_PlayerState()
     pSpawnPointsList.clear();
 };
 
-bool game_PlayerState::testFlag(u16 f) const
-{
-    return !!(flags__ & f);
-}
-
-void game_PlayerState::setFlag(u16 f)
-{
-    flags__ |= f;
-}
-
-void game_PlayerState::resetFlag(u16 f)
-{
-    flags__ &= ~(f);
-}
-
+bool game_PlayerState::testFlag(u16 f) const { return !!(flags__ & f); }
+void game_PlayerState::setFlag(u16 f) { flags__ |= f; }
+void game_PlayerState::resetFlag(u16 f) { flags__ &= ~(f); }
 void game_PlayerState::net_Export(NET_Packet& P, BOOL Full)
 {
     P.w_u8(Full ? 1 : 0);
@@ -114,7 +104,8 @@ void game_PlayerState::net_Export(NET_Packet& P, BOOL Full)
     P.w_u8(m_bCurrentVoteAgreed);
 
     P.w_u32(Device.dwTimeGlobal - DeathTime);
-    if (Full) {
+    if (Full)
+    {
         m_account.net_Export(P);
     }
 };
@@ -141,7 +132,8 @@ void game_PlayerState::net_Import(NET_Packet& P)
     P.r_u8(m_bCurrentVoteAgreed);
 
     DeathTime = P.r_u32();
-    if (bFullUpdate) {
+    if (bFullUpdate)
+    {
         m_account.net_Import(P);
     }
 };
@@ -150,32 +142,34 @@ void game_PlayerState::skip_Import(NET_Packet& P)
 {
     BOOL bFullUpdate = !!P.r_u8();
 
-    P.r_u8();  //	team	);
+    P.r_u8(); //	team	);
 
-    P.r_s16();  //	m_iRivalKills	);
-    P.r_s16();  //	m_iSelfKills	);
-    P.r_s16();  //	m_iTeamKills	);
-    P.r_s16();  //	m_iDeaths		);
+    P.r_s16(); //	m_iRivalKills	);
+    P.r_s16(); //	m_iSelfKills	);
+    P.r_s16(); //	m_iTeamKills	);
+    P.r_s16(); //	m_iDeaths		);
 
-    P.r_s32();  //	money_for_round	);
-    P.r_u8();   //	rank		);
-    P.r_u8();   //	af_count	);
-    P.r_u16();  //	flags__	);
-    P.r_u16();  //	ping	);
+    P.r_s32(); //	money_for_round	);
+    P.r_u8(); //	rank		);
+    P.r_u8(); //	af_count	);
+    P.r_u16(); //	flags__	);
+    P.r_u16(); //	ping	);
 
-    P.r_u16();  //	GameID	);
-    P.r_s8();   //	skin	);
-    P.r_u8();   //	m_bCurrentVoteAgreed	);
+    P.r_u16(); //	GameID	);
+    P.r_s8(); //	skin	);
+    P.r_u8(); //	m_bCurrentVoteAgreed	);
 
-    P.r_u32();  // DeathTime
-    if (bFullUpdate) {
+    P.r_u32(); // DeathTime
+    if (bFullUpdate)
+    {
         player_account::skip_Import(P);
     }
 }
 
 void game_PlayerState::SetGameID(u16 NewID)
 {
-    if (mOldIDs.size() >= 10) {
+    if (mOldIDs.size() >= 10)
+    {
         mOldIDs.pop_front();
     };
     mOldIDs.push_back(GameID);
@@ -184,7 +178,8 @@ void game_PlayerState::SetGameID(u16 NewID)
 bool game_PlayerState::HasOldID(u16 ID)
 {
     OLD_GAME_ID_it ID_i = std::find(mOldIDs.begin(), mOldIDs.end(), ID);
-    if (ID_i != mOldIDs.end() && *(ID_i) == ID) return true;
+    if (ID_i != mOldIDs.end() && *(ID_i) == ID)
+        return true;
     return false;
 }
 
@@ -258,22 +253,14 @@ void game_GameState::switch_Phase(u32 new_phase)
     m_start_time = Level().timeServer();
 }
 
-ALife::_TIME_ID game_GameState::GetStartGameTime()
-{
-    return (m_qwStartGameTime);
-}
-
+ALife::_TIME_ID game_GameState::GetStartGameTime() { return (m_qwStartGameTime); }
 ALife::_TIME_ID game_GameState::GetGameTime()
 {
     return (m_qwStartGameTime +
-            ALife::_TIME_ID(m_fTimeFactor * float(Level().timeServer_Async() - m_qwStartProcessorTime)));
+        ALife::_TIME_ID(m_fTimeFactor * float(Level().timeServer_Async() - m_qwStartProcessorTime)));
 }
 
-float game_GameState::GetGameTimeFactor()
-{
-    return (m_fTimeFactor);
-}
-
+float game_GameState::GetGameTimeFactor() { return (m_fTimeFactor); }
 void game_GameState::SetGameTimeFactor(const float fTimeFactor)
 {
     m_qwStartGameTime = GetGameTime();
@@ -291,14 +278,10 @@ void game_GameState::SetGameTimeFactor(ALife::_TIME_ID GameTime, const float fTi
 ALife::_TIME_ID game_GameState::GetEnvironmentGameTime()
 {
     return (m_qwEStartGameTime +
-            ALife::_TIME_ID(m_fETimeFactor * float(Level().timeServer_Async() - m_qwEStartProcessorTime)));
+        ALife::_TIME_ID(m_fETimeFactor * float(Level().timeServer_Async() - m_qwEStartProcessorTime)));
 }
 
-float game_GameState::GetEnvironmentGameTimeFactor()
-{
-    return (m_fETimeFactor);
-}
-
+float game_GameState::GetEnvironmentGameTimeFactor() { return (m_fETimeFactor); }
 void game_GameState::SetEnvironmentGameTimeFactor(const float fTimeFactor)
 {
     m_qwEStartGameTime = GetEnvironmentGameTime();

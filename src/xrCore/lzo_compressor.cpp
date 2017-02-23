@@ -16,12 +16,5 @@ int lzo_decompress_dict(
         (lzo_bytep)input, inputSize, (lzo_bytep)output, (lzo_uintp)&outputSize, workMem, (lzo_bytep)dict, dictSize);
 }
 
-int lzo_initialize()
-{
-    return lzo_init();
-}
-
-u32 lzo_get_workmem_size()
-{
-    return LZO1X_999_MEM_COMPRESS;
-}
+int lzo_initialize() { return lzo_init(); }
+u32 lzo_get_workmem_size() { return LZO1X_999_MEM_COMPRESS; }

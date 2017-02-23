@@ -53,7 +53,7 @@ CALifeHumanBrain::CALifeHumanBrain(object_type* object) : inherited(object)
     m_cpEquipmentPreferences.resize(iFloor(ai().ef_storage().m_pfEquipmentType->ffGetMaxResultValue() + .5f));
     m_cpMainWeaponPreferences.resize(iFloor(ai().ef_storage().m_pfMainWeaponType->ffGetMaxResultValue() + .5f));
     R_ASSERT2((iFloor(ai().ef_storage().m_pfEquipmentType->ffGetMaxResultValue() + .5f) == 5) &&
-                  (iFloor(ai().ef_storage().m_pfMainWeaponType->ffGetMaxResultValue() + .5f) == 4),
+            (iFloor(ai().ef_storage().m_pfMainWeaponType->ffGetMaxResultValue() + .5f) == 4),
         "Recompile Level Editor and xrAI and rebuild file \"game.spawn\"!");
 #endif
 
@@ -73,7 +73,8 @@ CALifeHumanBrain::~CALifeHumanBrain()
 
 void CALifeHumanBrain::on_state_write(NET_Packet& packet)
 {
-    if (packet.inistream == NULL) {
+    if (packet.inistream == NULL)
+    {
         save_data(m_cpEquipmentPreferences, packet);
         save_data(m_cpMainWeaponPreferences, packet);
     }
@@ -81,9 +82,11 @@ void CALifeHumanBrain::on_state_write(NET_Packet& packet)
 
 void CALifeHumanBrain::on_state_read(NET_Packet& packet)
 {
-    if (object().m_wVersion <= 19) return;
+    if (object().m_wVersion <= 19)
+        return;
 
-    if (object().m_wVersion < 110) {
+    if (object().m_wVersion < 110)
+    {
         {
             DWORD_VECTOR temp;
             load_data(temp, packet);
@@ -94,19 +97,23 @@ void CALifeHumanBrain::on_state_read(NET_Packet& packet)
         }
     }
 
-    if (object().m_wVersion <= 35) return;
+    if (object().m_wVersion <= 35)
+        return;
 
-    if (object().m_wVersion < 110) {
+    if (object().m_wVersion < 110)
+    {
         shared_str temp;
         packet.r_stringZ(temp);
     }
 
-    if (object().m_wVersion < 118) {
+    if (object().m_wVersion < 118)
+    {
         ALife::OBJECT_VECTOR temp;
         load_data(temp, packet);
     }
 
-    if (packet.inistream == NULL) {
+    if (packet.inistream == NULL)
+    {
         load_data(m_cpEquipmentPreferences, packet);
         load_data(m_cpMainWeaponPreferences, packet);
     }

@@ -44,7 +44,8 @@ ALife::ERelationType RELATION_REGISTRY::GetRelationType(T from, T to) const
 
     CHARACTER_GOODWILL attitude = GetAttitude(from, to);
 
-    if (attitude == NO_GOODWILL) return ALife::eRelationTypeNeutral;
+    if (attitude == NO_GOODWILL)
+        return ALife::eRelationTypeNeutral;
 
     if (attitude < attitude_neutral)
         return ALife::eRelationTypeEnemy;

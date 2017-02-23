@@ -18,12 +18,12 @@ namespace Wml
 template <class Real>
 class Quaternion
 {
-  public:
+public:
     // A quaternion is q = w + x*i + y*j + z*k where (w,x,y,z) is not
     // necessarily a unit length vector in 4D.
 
     // construction
-    Quaternion();  // uninitialized
+    Quaternion(); // uninitialized
     Quaternion(Real fW, Real fX, Real fY, Real fZ);
     Quaternion(const Quaternion& rkQ);
 
@@ -82,11 +82,11 @@ class Quaternion
     void ToAxisAngle(Vector3<Real>& rkAxis, Real& rfAngle) const;
 
     // functions of a quaternion
-    Real Dot(const Quaternion& rkQ) const;  // dot product
-    Quaternion Inverse() const;             // apply to non-zero quaternion
+    Real Dot(const Quaternion& rkQ) const; // dot product
+    Quaternion Inverse() const; // apply to non-zero quaternion
     Quaternion Conjugate() const;
-    Quaternion Exp() const;  // apply to quaternion with w = 0
-    Quaternion Log() const;  // apply to unit-length quaternion
+    Quaternion Exp() const; // apply to quaternion with w = 0
+    Quaternion Log() const; // apply to unit-length quaternion
 
     // rotation of a vector by a quaternion
     Vector3<Real> operator*(const Vector3<Real>& rkVector) const;
@@ -123,10 +123,10 @@ class Quaternion
     void DecomposeNoTwistTimesTwist(const Vector3<Real>& rkAxis, Quaternion& rkTwist, Quaternion& rkNoTwist);
 
     // special values
-    WML_ITEM static const Quaternion IDENTITY;  // the identity rotation
+    WML_ITEM static const Quaternion IDENTITY; // the identity rotation
     WML_ITEM static const Quaternion ZERO;
 
-  protected:
+protected:
     // support for comparisons
     int CompareArrays(const Quaternion& rkQ) const;
 

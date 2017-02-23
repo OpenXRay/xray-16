@@ -16,7 +16,7 @@
 // T_INIT		-	класс где определена статическа€ InitIdToIndex
 //					функци€ инициализации section_name и line_name
 
-#define TEMPLATE_SPECIALIZATION                                                                                        \
+#define TEMPLATE_SPECIALIZATION \
     template <u32 ITEM_REC_NUM, typename ITEM_DATA, typename T_ID, typename T_INDEX, typename T_INIT>
 #define CSINI_IdToIndex CIni_IdToIndex<ITEM_REC_NUM, ITEM_DATA, T_ID, T_INDEX, T_INIT>
 
@@ -93,7 +93,6 @@ public:
     }
 
     static const T_INDEX GetMaxIndex() { return m_pItemDataVector->size() - 1; }
-
     //удаление статичекого массива
     static void DeleteIdToIndexData();
 };
@@ -107,25 +106,21 @@ TEMPLATE_SPECIALIZATION
 LPCSTR CSINI_IdToIndex::line_name = NULL;
 
 TEMPLATE_SPECIALIZATION
-CSINI_IdToIndex::CIni_IdToIndex()
-{
-}
-
+CSINI_IdToIndex::CIni_IdToIndex() {}
 TEMPLATE_SPECIALIZATION
-CSINI_IdToIndex::~CIni_IdToIndex()
-{
-}
-
+CSINI_IdToIndex::~CIni_IdToIndex() {}
 TEMPLATE_SPECIALIZATION
 const typename ITEM_DATA* CSINI_IdToIndex::GetById(const T_ID& str_id, bool no_assert)
 {
     T_VECTOR::iterator it;
     for (it = m_pItemDataVector->begin(); m_pItemDataVector->end() != it; it++)
     {
-        if (!xr_strcmp((*it).id, str_id)) break;
+        if (!xr_strcmp((*it).id, str_id))
+            break;
     }
 
-    if (m_pItemDataVector->end() == it) {
+    if (m_pItemDataVector->end() == it)
+    {
         R_ASSERT3(no_assert, "item not found, id", *str_id);
         return NULL;
     }
@@ -136,7 +131,8 @@ const typename ITEM_DATA* CSINI_IdToIndex::GetById(const T_ID& str_id, bool no_a
 TEMPLATE_SPECIALIZATION
 const typename ITEM_DATA* CSINI_IdToIndex::GetByIndex(T_INDEX index, bool no_assert)
 {
-    if ((size_t)index >= m_pItemDataVector->size()) {
+    if ((size_t)index >= m_pItemDataVector->size())
+    {
         if (!no_assert)
             xrDebug::Fatal(DEBUG_INFO, "item by index not found in section %s, line %s", section_name, line_name);
         return NULL;
@@ -145,11 +141,7 @@ const typename ITEM_DATA* CSINI_IdToIndex::GetByIndex(T_INDEX index, bool no_ass
 }
 
 TEMPLATE_SPECIALIZATION
-void CSINI_IdToIndex::DeleteIdToIndexData()
-{
-    xr_delete(m_pItemDataVector);
-}
-
+void CSINI_IdToIndex::DeleteIdToIndexData() { xr_delete(m_pItemDataVector); }
 TEMPLATE_SPECIALIZATION
 typename void CSINI_IdToIndex::InitInternal()
 {

@@ -18,7 +18,8 @@ void blit(u32* dest, u32 ds_x, u32 ds_y, u32* src, u32 ss_x, u32 ss_y, u32 px, u
             u32 dx = px + x;
             u32 dy = py + y;
             u32 sc = src[y * ss_x + x];
-            if (color_get_A(sc) >= aREF) dest[dy * ds_x + dx] = sc;
+            if (color_get_A(sc) >= aREF)
+                dest[dy * ds_x + dx] = sc;
         }
 }
 
@@ -37,7 +38,8 @@ void lblit(lm_layer& dst, lm_layer& src, u32 px, u32 py, u32 aREF)
             u32 dy = py + y;
             base_color sc = src.surface[y * ss_x + x];
             u8 sm = src.marker[y * ss_x + x];
-            if (sm >= aREF) {
+            if (sm >= aREF)
+            {
                 dst.surface[dy * ds_x + dx] = sc;
                 dst.marker[dy * ds_x + dx] = sm;
             }
@@ -55,7 +57,8 @@ void blit(lm_layer& dst, u32 ds_x, u32 ds_y, lm_layer& src, u32 ss_x, u32 ss_y, 
             u32 dy = py + y;
             base_color sc = src.surface[y * ss_x + x];
             u8 sm = src.marker[y * ss_x + x];
-            if (sm >= aREF) {
+            if (sm >= aREF)
+            {
                 dst.surface[dy * ds_x + dx] = sc;
                 dst.marker[dy * ds_x + dx] = sm;
             }
@@ -72,7 +75,8 @@ void blit_r(u32* dest, u32 ds_x, u32 ds_y, u32* src, u32 ss_x, u32 ss_y, u32 px,
             u32 dx = px + y;
             u32 dy = py + x;
             u32 sc = src[y * ss_x + x];
-            if (color_get_A(sc) >= aREF) dest[dy * ds_x + dx] = sc;
+            if (color_get_A(sc) >= aREF)
+                dest[dy * ds_x + dx] = sc;
         }
 }
 
@@ -87,7 +91,8 @@ void blit_r(lm_layer& dst, u32 ds_x, u32 ds_y, lm_layer& src, u32 ss_x, u32 ss_y
             u32 dy = py + x;
             base_color sc = src.surface[y * ss_x + x];
             u8 sm = src.marker[y * ss_x + x];
-            if (sm >= aREF) {
+            if (sm >= aREF)
+            {
                 dst.surface[dy * ds_x + dx] = sc;
                 dst.marker[dy * ds_x + dx] = sm;
             }
@@ -113,13 +118,11 @@ CDeflector::CDeflector() : _net_session(0)
     bMerged = FALSE;
     UVpolys.reserve(32);
 }
-CDeflector::~CDeflector()
-{
-}
-
+CDeflector::~CDeflector() {}
 void CDeflector::OA_Export()
 {
-    if (UVpolys.empty()) return;
+    if (UVpolys.empty())
+        return;
 
     // Correct normal
     //  (semi-proportional to pixel density)
@@ -165,7 +168,8 @@ void CDeflector::OA_Export()
     at.set(0, 0, 0);
     from.add(at, normal);
     y.set(0, 1, 0);
-    if (_abs(normal.y) > .99f) y.set(1, 0, 0);
+    if (_abs(normal.y) > .99f)
+        y.set(1, 0, 0);
     right.crossproduct(y, normal);
     right.normalize_safe();
     up.crossproduct(normal, right);
@@ -178,7 +182,7 @@ void CDeflector::OA_Export()
     {
         UVtri* T = &*it;
         Face* F = T->owner;
-        Fvector P;  // projected
+        Fvector P; // projected
 
         for (int i = 0; i < 3; i++)
         {
@@ -208,7 +212,8 @@ BOOL CDeflector::OA_Place(Face* owner)
     // It is not correct to rely solely on normal-split-angle for lmaps - imagine smooth sphere
     float cosa = normal.dotproduct(owner->N);
     VERIFY(inlc_global_data());
-    if (cosa < _cos(deg2rad(inlc_global_data()->g_params().m_sm_angle + 1))) return FALSE;
+    if (cosa < _cos(deg2rad(inlc_global_data()->g_params().m_sm_angle + 1)))
+        return FALSE;
 
     UVtri T;
     T.owner = owner;
@@ -263,12 +268,14 @@ void CDeflector::RemapUV(
     d_min.y = (float(base_v) + .5f) / float(lm_v);
     d_max.x = (float(base_u + size_u) - .5f) / float(lm_u);
     d_max.y = (float(base_v + size_v) - .5f) / float(lm_v);
-    if (d_min.x >= d_max.x) {
+    if (d_min.x >= d_max.x)
+    {
         d_min.x = d_max.x = (d_min.x + d_max.x) / 2;
         d_min.x -= EPS_S;
         d_max.x += EPS_S;
     }
-    if (d_min.y >= d_max.y) {
+    if (d_min.y >= d_max.y)
+    {
         d_min.y = d_max.y = (d_min.y + d_max.y) / 2;
         d_min.y -= EPS_S;
         d_max.y += EPS_S;
@@ -278,7 +285,8 @@ void CDeflector::RemapUV(
     // Remapping
     Fvector2 tc;
     UVtri tnew;
-    if (bRotate) {
+    if (bRotate)
+    {
         for (UVIt it = UVpolys.begin(); it != UVpolys.end(); it++)
         {
             UVtri& T = *it;
@@ -346,11 +354,7 @@ void CDeflector::L_Calculate(CDB::COLLIDER* DB, base_lighting* LightsSelected, H
     }
 }
 
-u16 CDeflector::GetBaseMaterial()
-{
-    return UVpolys.front().owner->dwMaterial;
-}
-
+u16 CDeflector::GetBaseMaterial() { return UVpolys.front().owner->dwMaterial; }
 /*
 xr_vector<UVtri>			UVpolys;
 Fvector						normal;
@@ -421,19 +425,25 @@ void CDeflector::write(IWriter& w) const
 
 bool CDeflector::similar(const CDeflector& D, float eps /* =EPS */) const
 {
-    if (bMerged != D.bMerged) return false;
+    if (bMerged != D.bMerged)
+        return false;
 
-    if (!normal.similar(D.normal, eps)) return false;
+    if (!normal.similar(D.normal, eps))
+        return false;
 
-    if (!Sphere.P.similar(D.Sphere.P, eps)) return false;
+    if (!Sphere.P.similar(D.Sphere.P, eps))
+        return false;
 
-    if (!fsimilar(Sphere.R, D.Sphere.R, eps)) return false;
+    if (!fsimilar(Sphere.R, D.Sphere.R, eps))
+        return false;
 
-    if (UVpolys.size() != D.UVpolys.size()) return false;
+    if (UVpolys.size() != D.UVpolys.size())
+        return false;
 
     for (u32 i = 0; i < UVpolys.size(); ++i)
     {
-        if (!UVpolys[i].similar(D.UVpolys[i], eps)) {
+        if (!UVpolys[i].similar(D.UVpolys[i], eps))
+        {
             return false;
         }
     }
@@ -441,11 +451,7 @@ bool CDeflector::similar(const CDeflector& D, float eps /* =EPS */) const
     return layer.similar(D.layer, eps);
 }
 
-CDeflector* CDeflector::read_create()
-{
-    return new CDeflector();
-}
-
+CDeflector* CDeflector::read_create() { return new CDeflector(); }
 void DumpDeflctor(u32 id)
 {
     VERIFY(inlc_global_data()->g_deflectors().size() > id);

@@ -18,14 +18,8 @@
 #include "ui/UIInventoryUtilities.h"
 //////////////////////////////////////////////////////////////////////////
 
-CUIZoneMap::CUIZoneMap() : m_current_map_idx(u8(-1)), visible(true)
-{
-}
-
-CUIZoneMap::~CUIZoneMap()
-{
-}
-
+CUIZoneMap::CUIZoneMap() : m_current_map_idx(u8(-1)), visible(true) {}
+CUIZoneMap::~CUIZoneMap() {}
 void CUIZoneMap::Init()
 {
     CUIXml uiXml;
@@ -86,7 +80,8 @@ void CUIZoneMap::Init()
     rel_pos.mul(m_background.GetWndSize());
     m_clock_wnd->SetWndPos(rel_pos);
 
-    if (IsGameTypeSingle()) {
+    if (IsGameTypeSingle())
+    {
         xml_init.InitStatic(uiXml, "minimap:static_counter", 0, &m_Counter);
         m_background.AttachChild(&m_Counter);
         xml_init.InitTextWnd(uiXml, "minimap:static_counter:text_static", 0, &m_Counter_text);
@@ -100,7 +95,8 @@ void CUIZoneMap::Init()
 
 void CUIZoneMap::Render()
 {
-    if (!visible) return;
+    if (!visible)
+        return;
 
     m_clipFrame.Draw();
     m_background.Draw();
@@ -109,16 +105,20 @@ void CUIZoneMap::Render()
 void CUIZoneMap::Update()
 {
     CActor* pActor = smart_cast<CActor*>(Level().CurrentViewEntity());
-    if (!pActor) return;
+    if (!pActor)
+        return;
 
-    if (!(Device.dwFrame % 20) && IsGameTypeSingle()) {
+    if (!(Device.dwFrame % 20) && IsGameTypeSingle())
+    {
         string16 text_str;
         xr_strcpy(text_str, sizeof(text_str), "");
 
         CPda* pda = pActor->GetPDA();
-        if (pda) {
+        if (pda)
+        {
             u32 cn = pda->ActiveContactsNum();
-            if (cn > 0) {
+            if (cn > 0)
+            {
                 xr_sprintf(text_str, sizeof(text_str), "%d", cn);
             }
         }
@@ -147,16 +147,8 @@ void CUIZoneMap::UpdateRadar(Fvector pos)
     m_activeMap->SetActivePoint(pos);
 }
 
-bool CUIZoneMap::ZoomIn()
-{
-    return true;
-}
-
-bool CUIZoneMap::ZoomOut()
-{
-    return true;
-}
-
+bool CUIZoneMap::ZoomIn() { return true; }
+bool CUIZoneMap::ZoomOut() { return true; }
 void CUIZoneMap::SetupCurrentMap()
 {
     m_activeMap->Initialize(Level().name(), "hud\\default");
@@ -169,8 +161,10 @@ void CUIZoneMap::SetupCurrentMap()
     float zoom_factor = float(m_clipFrame.GetWidth()) / 100.0f;
 
     LPCSTR ln = Level().name().c_str();
-    if (pGameIni->section_exist(ln)) {
-        if (pGameIni->line_exist(ln, "minimap_zoom")) zoom_factor *= pGameIni->r_float(ln, "minimap_zoom");
+    if (pGameIni->section_exist(ln))
+    {
+        if (pGameIni->line_exist(ln, "minimap_zoom"))
+            zoom_factor *= pGameIni->r_float(ln, "minimap_zoom");
     }
     else if (g_pGameLevel->pLevel->section_exist("minimap_zoom"))
     {
@@ -183,27 +177,28 @@ void CUIZoneMap::SetupCurrentMap()
 
 void CUIZoneMap::OnSectorChanged(int sector)
 {
-    if (!g_pGameLevel->pLevel->section_exist("sub_level_map")) return;
+    if (!g_pGameLevel->pLevel->section_exist("sub_level_map"))
+        return;
     u8 map_idx = u8(-1);
     string64 s_sector;
     xr_sprintf(s_sector, "%d", sector);
 
-    if (!g_pGameLevel->pLevel->line_exist("sub_level_map", s_sector)) return;
+    if (!g_pGameLevel->pLevel->line_exist("sub_level_map", s_sector))
+        return;
 
     map_idx = g_pGameLevel->pLevel->r_u8("sub_level_map", s_sector);
-    if (m_current_map_idx == map_idx) return;
+    if (m_current_map_idx == map_idx)
+        return;
 
     m_current_map_idx = map_idx;
 
     string_path sub_texture;
     xr_sprintf(sub_texture, "%s#%d", m_activeMap->m_texture.c_str(), m_current_map_idx);
 
-    if (map_idx == u8(-1)) xr_sprintf(sub_texture, "%s", m_activeMap->m_texture.c_str());
+    if (map_idx == u8(-1))
+        xr_sprintf(sub_texture, "%s", m_activeMap->m_texture.c_str());
 
     m_activeMap->InitTextureEx(sub_texture, m_activeMap->m_shader_name.c_str());
 }
 
-void CUIZoneMap::Counter_ResetClrAnimation()
-{
-    m_Counter_text.ResetColorAnimation();
-}
+void CUIZoneMap::Counter_ResetClrAnimation() { m_Counter_text.ResetColorAnimation(); }

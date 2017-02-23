@@ -17,14 +17,11 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-FHierrarhyVisual::FHierrarhyVisual() : dxRender_Visual()
-{
-    bDontDelete = FALSE;
-}
-
+FHierrarhyVisual::FHierrarhyVisual() : dxRender_Visual() { bDontDelete = FALSE; }
 FHierrarhyVisual::~FHierrarhyVisual()
 {
-    if (!bDontDelete) {
+    if (!bDontDelete)
+    {
         for (u32 i = 0; i < children.size(); i++)
             GlobalEnv.Render->model_Delete((IRenderVisual*&)children[i]);
     }
@@ -33,7 +30,8 @@ FHierrarhyVisual::~FHierrarhyVisual()
 
 void FHierrarhyVisual::Release()
 {
-    if (!bDontDelete) {
+    if (!bDontDelete)
+    {
         for (u32 i = 0; i < children.size(); i++)
             children[i]->Release();
     }
@@ -42,7 +40,8 @@ void FHierrarhyVisual::Release()
 void FHierrarhyVisual::Load(const char* N, IReader* data, u32 dwFlags)
 {
     dxRender_Visual::Load(N, data, dwFlags);
-    if (data->find_chunk(OGF_CHILDREN_L)) {
+    if (data->find_chunk(OGF_CHILDREN_L))
+    {
         // From Link
         u32 cnt = data->r_u32();
         children.resize(cnt);
@@ -59,16 +58,19 @@ void FHierrarhyVisual::Load(const char* N, IReader* data, u32 dwFlags)
     }
     else
     {
-        if (data->find_chunk(OGF_CHILDREN)) {
+        if (data->find_chunk(OGF_CHILDREN))
+        {
             // From stream
             IReader* OBJ = data->open_chunk(OGF_CHILDREN);
-            if (OBJ) {
+            if (OBJ)
+            {
                 IReader* O = OBJ->open_chunk(0);
                 for (int count = 1; O; count++)
                 {
                     string_path name_load, short_name, num;
                     xr_strcpy(short_name, N);
-                    if (strext(short_name)) *strext(short_name) = 0;
+                    if (strext(short_name))
+                        *strext(short_name) = 0;
                     strconcat(sizeof(name_load), name_load, short_name, ":", itoa(count, num, 10));
                     children.push_back((dxRender_Visual*)GlobalEnv.Render->model_CreateChild(name_load, O));
                     O->close();

@@ -2,7 +2,7 @@
 
 #include "ai/Monsters/states/state_move_to_point.h"
 
-#define TEMPLATE_SPECIALIZATION                                                                                        \
+#define TEMPLATE_SPECIALIZATION \
     template <typename _Object\
 >
 
@@ -16,10 +16,7 @@ CBloodsuckerStateAttackAbstract::CBloodsuckerStateAttack(_Object* obj) : inherit
 }
 
 TEMPLATE_SPECIALIZATION
-CBloodsuckerStateAttackAbstract::~CBloodsuckerStateAttack()
-{
-}
-
+CBloodsuckerStateAttackAbstract::~CBloodsuckerStateAttack() {}
 TEMPLATE_SPECIALIZATION
 void CBloodsuckerStateAttackAbstract::initialize()
 {
@@ -50,9 +47,9 @@ const u32 encircle_time = 3000;
 const float loose_health_diff = 0.15f;
 const u32 change_behaviour_time = 1000;
 
-}  // namespace bloodsucker
+} // namespace bloodsucker
 
-}  // namespace detail
+} // namespace detail
 
 TEMPLATE_SPECIALIZATION
 void CBloodsuckerStateAttackAbstract::execute()
@@ -76,8 +73,10 @@ void CBloodsuckerStateAttackAbstract::execute()
         // определить тип атаки
         bool b_melee = false;
 
-        if (prev_substate == eStateAttack_Melee) {
-            if (!get_state_current()->check_completion()) {
+        if (prev_substate == eStateAttack_Melee)
+        {
+            if (!get_state_current()->check_completion())
+            {
                 b_melee = true;
             }
         }
@@ -86,7 +85,8 @@ void CBloodsuckerStateAttackAbstract::execute()
             b_melee = true;
         }
 
-        if (!b_melee && (prev_substate == eStateAttack_Melee)) {
+        if (!b_melee && (prev_substate == eStateAttack_Melee))
+        {
             select_state(eStateAttack_Hide);
         }
         else
@@ -107,7 +107,8 @@ void CBloodsuckerStateAttackAbstract::execute()
     }
 
     // clear behinder var if not melee state selected
-    if (current_substate != eStateAttack_Melee) {
+    if (current_substate != eStateAttack_Melee)
+    {
         m_time_start_check_behinder = 0;
     }
     else
@@ -120,7 +121,8 @@ void CBloodsuckerStateAttackAbstract::execute()
 
     // Notify squad
     CMonsterSquad* squad = monster_squad().get_squad(object);
-    if (squad) {
+    if (squad)
+    {
         SMemberGoal goal;
 
         goal.type = MG_AttackEnemy;
@@ -133,12 +135,15 @@ void CBloodsuckerStateAttackAbstract::execute()
 TEMPLATE_SPECIALIZATION
 bool CBloodsuckerStateAttackAbstract::check_vampire()
 {
-    if (prev_substate != eStateVampire_Execute) {
-        if (get_state(eStateVampire_Execute)->check_start_conditions()) return true;
+    if (prev_substate != eStateVampire_Execute)
+    {
+        if (get_state(eStateVampire_Execute)->check_start_conditions())
+            return true;
     }
     else
     {
-        if (!get_state(eStateVampire_Execute)->check_completion()) return true;
+        if (!get_state(eStateVampire_Execute)->check_completion())
+            return true;
     }
     return false;
 }
@@ -149,7 +154,8 @@ bool CBloodsuckerStateAttackAbstract::check_hiding()
     const bool health_step_lost =
         object->conditions().GetHealth() < m_last_health - detail::bloodsucker::loose_health_diff;
 
-    if (health_step_lost) {
+    if (health_step_lost)
+    {
         object->start_runaway_invisible();
         m_last_health = object->conditions().GetHealth();
         m_start_with_encircle = true;
@@ -158,13 +164,15 @@ bool CBloodsuckerStateAttackAbstract::check_hiding()
 
     // if we get here before 1 sec after last critical hit:
     u32 last_critical_hit_tick = object->get_last_critical_hit_tick();
-    if (last_critical_hit_tick && time() < last_critical_hit_tick + 1000) {
+    if (last_critical_hit_tick && time() < last_critical_hit_tick + 1000)
+    {
         object->clear_last_critical_hit_tick();
         m_start_with_encircle = true;
         return true;
     }
 
-    if (current_substate == eStateAttack_Hide) {
+    if (current_substate == eStateAttack_Hide)
+    {
         return !get_state_current()->check_completion();
     }
 
@@ -177,12 +185,13 @@ void CBloodsuckerStateAttackAbstract::setup_substates()
 {
     state_ptr state = get_state_current();
 
-    if (current_substate == eStateAttack_Hide) {
+    if (current_substate == eStateAttack_Hide)
+    {
         CStateMonsterBackstubEnemy<_Object>::StateParams data;
 
         data.action.action = ACT_RUN;
         data.action.time_out = 0;
-        data.completion_dist = 1.f;  // get exactly to the point
+        data.completion_dist = 1.f; // get exactly to the point
         data.time_to_rebuild = 200;
         data.accelerated = true;
         data.braking = false;
@@ -224,13 +233,16 @@ void CStateMonsterBackstubEnemy<_Object>::execute()
         m_next_change_behaviour_tick = Device.dwTimeGlobal + detail::bloodsucker::change_behaviour_time;
         m_last_health = object->conditions().GetHealth();
         m_encircle = !m_encircle;
-        if (m_encircle) {
+        if (m_encircle)
+        {
             m_encircle_end_tick = Device.dwTimeGlobal + detail::bloodsucker::encircle_time;
         }
     }
 
-    if (Device.dwTimeGlobal > m_encircle_end_tick) {
-        if (object->EnemyMan.enemy_see_me_now()) {
+    if (Device.dwTimeGlobal > m_encircle_end_tick)
+    {
+        if (object->EnemyMan.enemy_see_me_now())
+        {
             m_encircle = false;
         }
     }
@@ -254,7 +266,8 @@ void CStateMonsterBackstubEnemy<_Object>::execute()
     object->path().set_use_covers();
     object->path().set_cover_params(5.f, 30.f, 1.f, 30.f);
 
-    if (m_encircle) {
+    if (m_encircle)
+    {
         object->path().set_use_dest_orient(true);
         object->path().set_dest_direction(data.target_direction);
         object->path().set_try_min_time(false);
@@ -265,12 +278,14 @@ void CStateMonsterBackstubEnemy<_Object>::execute()
         object->path().set_use_dest_orient(false);
     }
 
-    if (data.accelerated) {
+    if (data.accelerated)
+    {
         object->anim().accel_activate(EAccelType(data.accel_type));
         object->anim().accel_set_braking(data.braking);
     }
 
-    if (data.action.sound_type != u32(-1)) {
+    if (data.action.sound_type != u32(-1))
+    {
         object->set_state_sound(data.action.sound_type, data.action.sound_delay == u32(-1));
     }
 }
@@ -278,7 +293,8 @@ void CStateMonsterBackstubEnemy<_Object>::execute()
 template <class _Object>
 bool CStateMonsterBackstubEnemy<_Object>::check_start_conditions()
 {
-    if (!object->Home->at_home(object->EnemyMan.get_enemy_position())) {
+    if (!object->Home->at_home(object->EnemyMan.get_enemy_position()))
+    {
         return false;
     }
 
@@ -290,22 +306,25 @@ bool CStateMonsterBackstubEnemy<_Object>::check_start_conditions()
 template <class _Object>
 bool CStateMonsterBackstubEnemy<_Object>::check_completion()
 {
-    if (!object->Home->at_home(object->EnemyMan.get_enemy_position())) {
+    if (!object->Home->at_home(object->EnemyMan.get_enemy_position()))
+    {
         return true;
     }
 
-    const bool real_path_end =
-        fis_zero(data.completion_dist) ?
-            (data.point.distance_to_xz(object->Position()) < ai().level_graph().header().cell_size()) :
-            true;
+    const bool real_path_end = fis_zero(data.completion_dist) ?
+        (data.point.distance_to_xz(object->Position()) < ai().level_graph().header().cell_size()) :
+        true;
 
-    if (object->control().path_builder().is_path_end(data.completion_dist) && real_path_end) {
+    if (object->control().path_builder().is_path_end(data.completion_dist) && real_path_end)
+    {
         // in straight-mode we're done
-        if (!m_encircle) {
+        if (!m_encircle)
+        {
             return true;
         }
 
-        if (object->EnemyMan.see_enemy_now() && !object->EnemyMan.enemy_see_me_now()) {
+        if (object->EnemyMan.see_enemy_now() && !object->EnemyMan.enemy_see_me_now())
+        {
             // object->sound().play(MonsterSound::eMonsterSoundSteal);
             return true;
         }

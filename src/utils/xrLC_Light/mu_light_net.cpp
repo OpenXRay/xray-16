@@ -21,7 +21,8 @@ void RunRefModelsNet()
     SetRefModelLightDataInitialized();
 
     const u32 num_tasks = inlc_global_data()->mu_refs().size();
-    if (num_tasks == 0) {
+    if (num_tasks == 0)
+    {
         SetMuModelsLocalCalcLighteningCompleted();
         return;
     }
@@ -44,7 +45,8 @@ void RunRefModelsNet()
 }
 void WaitRefModelsNet()
 {
-    if (!ref_models_pool) return;
+    if (!ref_models_pool)
+        return;
     R_ASSERT(ref_models_pool);
     ref_models_pool->wait();
 }
@@ -54,7 +56,8 @@ void RunBaseModelsNet()
     WaitNetBaseCompileDataPrepare();
 
     const u32 num = inlc_global_data()->mu_models().size();
-    if (num == 0) return;
+    if (num == 0)
+        return;
     for (u32 i = 0; i < num; i++)
     {
         tnet_execution_base<et_mu_base_light>* el = lc_net::execution_factory.create<et_mu_base_light>();
@@ -67,7 +70,8 @@ void RunBaseModelsNet()
 
 void WaitBaseModelsNet()
 {
-    if (!base_models_pool) return;
+    if (!base_models_pool)
+        return;
     R_ASSERT(base_models_pool);
     base_models_pool->wait();
 }

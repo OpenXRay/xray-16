@@ -6,7 +6,7 @@
 #define TRANSLATE_TYPE(val) EEffectorPPType(val ? u32(u64(typeid(this).name())) : u32(u64(this) & u32(-1)))
 
 #pragma warning(push)
-#pragma warning(disable : 4355)  // 'this' : used in base member initializer list
+#pragma warning(disable : 4355) // 'this' : used in base member initializer list
 
 CPPEffectorCustom::CPPEffectorCustom(const SPPInfo& ppi, bool one_instance, bool destroy_from_engine)
     : inherited(TRANSLATE_TYPE(one_instance), flt_max, destroy_from_engine)
@@ -21,10 +21,12 @@ CPPEffectorCustom::CPPEffectorCustom(const SPPInfo& ppi, bool one_instance, bool
 
 BOOL CPPEffectorCustom::Process(SPPInfo& pp)
 {
-    if (!inherited::Process(pp)) return FALSE;
+    if (!inherited::Process(pp))
+        return FALSE;
 
     // update factor
-    if (!update()) return FALSE;
+    if (!update())
+        return FALSE;
 
     pp.lerp(pp_identity, m_state, m_factor);
 
@@ -45,13 +47,11 @@ BOOL CPPEffectorControlled::update()
     return TRUE;
 }
 
-CPPEffectorController::CPPEffectorController()
-{
-}
-
+CPPEffectorController::CPPEffectorController() {}
 CPPEffectorController::~CPPEffectorController()
 {
-    if (m_effector) {
+    if (m_effector)
+    {
         Actor()->Cameras().RemovePPEffector(m_effector->get_type());
     }
 }
@@ -74,8 +74,10 @@ void CPPEffectorController::deactivate()
 
 void CPPEffectorController::frame_update()
 {
-    if (m_effector) {
-        if (check_completion()) deactivate();
+    if (m_effector)
+    {
+        if (check_completion())
+            deactivate();
     }
     else if (check_start_conditions())
         activate();

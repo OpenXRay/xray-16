@@ -12,22 +12,22 @@ class CLAItem;
 
 class CLight : public CCustomObject
 {
-  protected:
+protected:
     typedef CCustomObject inherited;
 
-  public:
+public:
     // flags
     Flags32 m_Flags;
 
     // light
     ELight::EType m_Type; /* Type of light source */
-    Fcolor m_Color;       /* Diffuse color of light */
+    Fcolor m_Color; /* Diffuse color of light */
     float m_Brightness;
-    float m_Range;        /* Cutoff range */
+    float m_Range; /* Cutoff range */
     float m_Attenuation0; /* Constant attenuation */
     float m_Attenuation1; /* Linear attenuation */
     float m_Attenuation2; /* Quadratic attenuation */
-    float m_Cone;         /* Outer angle of spotlight cone */
+    float m_Cone; /* Outer angle of spotlight cone */
 
     float m_VirtualSize;
 
@@ -99,24 +99,22 @@ class CLight : public CCustomObject
     void __stdcall OnAttenuationDraw(CanvasValue* sender, void* canvas, const Irect& rect);
     void __stdcall OnPointDataTestEqual(CanvasValue* a, CanvasValue* b, bool& res);
 
-  protected:
+protected:
     //    virtual Fvector& GetPosition()						{ return m_D3D.position; 	}
     //    virtual void 	SetPosition	(const Fvector& pos)	{ m_D3D.position.set(pos);	UpdateTransform();}
-  public:
+public:
     CLight(LPVOID data, LPCSTR name);
     void Construct(LPVOID data);
     virtual ~CLight();
     void CopyFrom(CLight* src);
 
     virtual bool CanAttach() { return true; }
-
     // pick functions
     virtual bool RayPick(float& distance, const Fvector& start, const Fvector& direction, SRayPickInfo* pinf = NULL);
     virtual bool FrustumPick(const CFrustum& frustum);
 
     // change position/orientation methods
     virtual void Scale(Fvector& amount) { ; }
-
     // placement functions
     virtual bool GetBox(Fbox& box) const;
 

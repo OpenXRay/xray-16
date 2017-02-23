@@ -17,14 +17,8 @@
 
 using namespace StalkerDecisionSpace;
 
-CStalkerDeathPlanner::CStalkerDeathPlanner(CAI_Stalker* object, LPCSTR action_name) : inherited(object, action_name)
-{
-}
-
-CStalkerDeathPlanner::~CStalkerDeathPlanner()
-{
-}
-
+CStalkerDeathPlanner::CStalkerDeathPlanner(CAI_Stalker* object, LPCSTR action_name) : inherited(object, action_name) {}
+CStalkerDeathPlanner::~CStalkerDeathPlanner() {}
 void CStalkerDeathPlanner::setup(CAI_Stalker* object, CPropertyStorage* storage)
 {
     inherited::setup(object, storage);

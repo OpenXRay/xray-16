@@ -131,27 +131,32 @@ bool NVMeshMender::Munge(const NVMeshMender::VAVector& input, NVMeshMender::VAVe
     {
         // for every output that has a match in the input, just copy it over
         Mapping::iterator in = inmap.find(output[c].Name_);
-        if (in != inmap.end()) {
+        if (in != inmap.end())
+        {
             // copy over existing indices, position, or whatever
             output[c] = input[(*in).second];
         }
     }
 
-    if (inmap.find("indices") == inmap.end()) {
+    if (inmap.find("indices") == inmap.end())
+    {
         SetLastError("Missing indices from input");
         return false;
     }
-    if (outmap.find("indices") == outmap.end()) {
+    if (outmap.find("indices") == outmap.end())
+    {
         SetLastError("Missing indices from output");
         return false;
     }
 
     // Go through all required outputs & generate as necessary
-    if (inmap.find("position") == inmap.end()) {
+    if (inmap.find("position") == inmap.end())
+    {
         SetLastError("Missing position from input");
         return false;
     }
-    if (outmap.find("position") == outmap.end()) {
+    if (outmap.find("position") == outmap.end())
+    {
         SetLastError("Missing position from output");
         return false;
     }
@@ -170,8 +175,10 @@ bool NVMeshMender::Munge(const NVMeshMender::VAVector& input, NVMeshMender::VAVe
     // initialize all attributes
     for (unsigned int att = 0; att < output.size(); ++att)
     {
-        if (output[att].Name_ != "indices") {
-            if (output[att].floatVector_.size() == 0) {
+        if (output[att].Name_ != "indices")
+        {
+            if (output[att].floatVector_.size() == 0)
+            {
                 output[att].floatVector_ = positions;
             }
         }
@@ -191,17 +198,20 @@ bool NVMeshMender::Munge(const NVMeshMender::VAVector& input, NVMeshMender::VAVe
     bool bComputeTangentSpace = false;
 
     // see if texture coords are needed
-    if (outmap.find("tex0") != outmap.end()) {
+    if (outmap.find("tex0") != outmap.end())
+    {
         bNeedTexCoords = true;
     }
 
     // see if tangent or binormal are needed
-    if ((outmap.find("binormal") != outmap.end()) || (outmap.find("tangent") != outmap.end())) {
+    if ((outmap.find("binormal") != outmap.end()) || (outmap.find("tangent") != outmap.end()))
+    {
         bComputeTangentSpace = true;
     }
 
     // see if normals are needed
-    if (outmap.find("normal") != outmap.end()) {
+    if (outmap.find("normal") != outmap.end())
+    {
         bNeedNormals = true;
     }
 
@@ -209,11 +219,14 @@ bool NVMeshMender::Munge(const NVMeshMender::VAVector& input, NVMeshMender::VAVe
     Mapping::iterator want = outmap.find("normal");
     bool have_normals = (inmap.find("normal") != inmap.end()) ? true : false;
 
-    if (bNeedNormals || bComputeTangentSpace) {
+    if (bNeedNormals || bComputeTangentSpace)
+    {
         // see if normals are provided
-        if (!have_normals) {
+        if (!have_normals)
+        {
             // create normals
-            if (want == outmap.end()) {
+            if (want == outmap.end())
+            {
                 VertexAttribute norAtt;
                 norAtt.Name_ = "normal";
                 output.push_back(norAtt);
@@ -250,7 +263,8 @@ bool NVMeshMender::Munge(const NVMeshMender::VAVector& input, NVMeshMender::VAVe
 
                 vec3 faceNormal = edge0 ^ edge1;
 
-                if (_WeightNormalsByFaceSize == DontWeightNormalsByFaceSize) {
+                if (_WeightNormalsByFaceSize == DontWeightNormalsByFaceSize)
+                {
                     // Renormalize face normal, so it's not weighted by face size
                     exact_normalize(&faceNormal.x);
                 }
@@ -271,8 +285,10 @@ bool NVMeshMender::Munge(const NVMeshMender::VAVector& input, NVMeshMender::VAVe
     }
 
     // Compute texture coordinates.
-    if (bNeedTexCoords || bComputeTangentSpace) {
-        if (outmap.find("tex0") == outmap.end()) {
+    if (bNeedTexCoords || bComputeTangentSpace)
+    {
+        if (outmap.find("tex0") == outmap.end())
+        {
             VertexAttribute texCoordAtt;
             texCoordAtt.Name_ = "tex0";
             output.push_back(texCoordAtt);
@@ -328,10 +344,12 @@ bool NVMeshMender::Munge(const NVMeshMender::VAVector& input, NVMeshMender::VAVe
 
             nv_scalar deltaMajor;
 
-            if ((delta.x >= delta.y) && (delta.x >= delta.z)) {
+            if ((delta.x >= delta.y) && (delta.x >= delta.z))
+            {
                 maxx = true;
                 deltaMajor = delta.x;
-                if (delta.y > delta.z) {
+                if (delta.y > delta.z)
+                {
                     minz = true;
                 }
                 else
@@ -343,7 +361,8 @@ bool NVMeshMender::Munge(const NVMeshMender::VAVector& input, NVMeshMender::VAVe
             {
                 maxz = true;
                 deltaMajor = delta.z;
-                if (delta.y > delta.x) {
+                if (delta.y > delta.x)
+                {
                     minx = true;
                 }
                 else
@@ -355,7 +374,8 @@ bool NVMeshMender::Munge(const NVMeshMender::VAVector& input, NVMeshMender::VAVe
             {
                 maxy = true;
                 deltaMajor = delta.y;
-                if (delta.x > delta.z) {
+                if (delta.x > delta.z)
+                {
                     minz = true;
                 }
                 else
@@ -372,9 +392,11 @@ bool NVMeshMender::Munge(const NVMeshMender::VAVector& input, NVMeshMender::VAVe
 
                 nv_scalar Major, Minor, Other = nv_zero;
 
-                if (maxx) {
+                if (maxx)
+                {
                     Major = texCoords.x;
-                    if (miny) {
+                    if (miny)
+                    {
                         Minor = texCoords.y;
                         Other = texCoords.z;
                     }
@@ -387,7 +409,8 @@ bool NVMeshMender::Munge(const NVMeshMender::VAVector& input, NVMeshMender::VAVe
                 else if (maxy)
                 {
                     Major = texCoords.y;
-                    if (minx) {
+                    if (minx)
+                    {
                         Minor = texCoords.x;
                         Other = texCoords.z;
                     }
@@ -400,7 +423,8 @@ bool NVMeshMender::Munge(const NVMeshMender::VAVector& input, NVMeshMender::VAVe
                 else if (maxz)
                 {
                     Major = texCoords.z;
-                    if (miny) {
+                    if (miny)
+                    {
                         Minor = texCoords.y;
                         Other = texCoords.x;
                     }
@@ -414,8 +438,10 @@ bool NVMeshMender::Munge(const NVMeshMender::VAVector& input, NVMeshMender::VAVe
                 nv_scalar longitude = nv_zero;
 
                 // Prevent zero or near-zero from being passed into atan2
-                if (_abs(Other) < 0.0001f) {
-                    if (Other >= nv_zero) {
+                if (_abs(Other) < 0.0001f)
+                {
+                    if (Other >= nv_zero)
+                    {
                         Other = 0.0001f;
                     }
                     else
@@ -438,13 +464,15 @@ bool NVMeshMender::Munge(const NVMeshMender::VAVector& input, NVMeshMender::VAVe
                 texCoords.y = nv_min(texCoords.y, 1.0f);
 
                 pTex0[p].x = texCoords.x - 0.25f;
-                if (pTex0[p].x < nv_zero) pTex0[p].x += 1.0;
+                if (pTex0[p].x < nv_zero)
+                    pTex0[p].x += 1.0;
                 pTex0[p].y = 1.0f - texCoords.y;
                 pTex0[p].z = 1.0f;
             }
         }
 
-        if (_FixCylindricalTexGen == FixCylindricalTexGen) {
+        if (_FixCylindricalTexGen == FixCylindricalTexGen)
+        {
             Mapping::iterator texIter = outmap.find("tex0");
 
             VertexAttribute::FloatVector& texcoords = (output[(*texIter).second].floatVector_);
@@ -458,7 +486,8 @@ bool NVMeshMender::Munge(const NVMeshMender::VAVector& input, NVMeshMender::VAVe
                     int start = f + v;
                     int end = start + 1;
 
-                    if (v == 2) {
+                    if (v == 2)
+                    {
                         end = f;
                     }
 
@@ -470,9 +499,11 @@ bool NVMeshMender::Munge(const NVMeshMender::VAVector& input, NVMeshMender::VAVe
 
                     unsigned int theOneToChange = start;
 
-                    if (_abs(dS) >= 0.5f) {
+                    if (_abs(dS) >= 0.5f)
+                    {
                         bDoS = true;
-                        if (texcoords[indices[start] * 3 + 0] < texcoords[indices[end] * 3 + 0]) {
+                        if (texcoords[indices[start] * 3 + 0] < texcoords[indices[end] * 3 + 0])
+                        {
                             newS = texcoords[indices[start] * 3 + 0] + 1.0f;
                         }
                         else
@@ -482,29 +513,32 @@ bool NVMeshMender::Munge(const NVMeshMender::VAVector& input, NVMeshMender::VAVe
                         }
                     }
 
-                    if (bDoS == true) {
+                    if (bDoS == true)
+                    {
                         unsigned int theNewIndex = texcoords.size() / 3;
                         // Duplicate every part of the vertex
                         for (unsigned int att = 0; att < output.size(); ++att)
                         {
                             // No new indices are created, just vertex attributes
-                            if (output[att].Name_ != "indices") {
-                                if (output[att].Name_ == "tex0") {
-                                    output[att].floatVector_.push_back((float)newS);  // y
+                            if (output[att].Name_ != "indices")
+                            {
+                                if (output[att].Name_ == "tex0")
+                                {
+                                    output[att].floatVector_.push_back((float)newS); // y
                                     output[att].floatVector_.push_back(
-                                        output[att].floatVector_[indices[theOneToChange] * 3 + 1]);  // x
+                                        output[att].floatVector_[indices[theOneToChange] * 3 + 1]); // x
                                     output[att].floatVector_.push_back(
-                                        output[att].floatVector_[indices[theOneToChange] * 3 + 2]);  // z
+                                        output[att].floatVector_[indices[theOneToChange] * 3 + 2]); // z
                                 }
                                 else
                                 {
                                     // *3 b/c we are looking up 3vectors in an array of floats
                                     output[att].floatVector_.push_back(
-                                        output[att].floatVector_[indices[theOneToChange] * 3 + 0]);  // x
+                                        output[att].floatVector_[indices[theOneToChange] * 3 + 0]); // x
                                     output[att].floatVector_.push_back(
-                                        output[att].floatVector_[indices[theOneToChange] * 3 + 1]);  // y
+                                        output[att].floatVector_[indices[theOneToChange] * 3 + 1]); // y
                                     output[att].floatVector_.push_back(
-                                        output[att].floatVector_[indices[theOneToChange] * 3 + 2]);  // z
+                                        output[att].floatVector_[indices[theOneToChange] * 3 + 2]); // z
                                 }
                             }
                         }
@@ -517,7 +551,7 @@ bool NVMeshMender::Munge(const NVMeshMender::VAVector& input, NVMeshMender::VAVe
                         // point to where the new vertices will go
                         indices[theOneToChange] = theNewIndex;
                     }
-                }  // for v
+                } // for v
 
                 {
                     for (int v = 0; v < 3; ++v)
@@ -525,7 +559,8 @@ bool NVMeshMender::Munge(const NVMeshMender::VAVector& input, NVMeshMender::VAVe
                         int start = f + v;
                         int end = start + 1;
 
-                        if (v == 2) {
+                        if (v == 2)
+                        {
                             end = f;
                         }
 
@@ -537,9 +572,11 @@ bool NVMeshMender::Munge(const NVMeshMender::VAVector& input, NVMeshMender::VAVe
 
                         unsigned int theOneToChange = start;
 
-                        if (_abs(dT) >= 0.5f) {
+                        if (_abs(dT) >= 0.5f)
+                        {
                             bDoT = true;
-                            if (texcoords[indices[start] * 3 + 1] < texcoords[indices[end] * 3 + 1]) {
+                            if (texcoords[indices[start] * 3 + 1] < texcoords[indices[end] * 3 + 1])
+                            {
                                 newT = texcoords[indices[start] * 3 + 1] + 1.0f;
                             }
                             else
@@ -549,29 +586,32 @@ bool NVMeshMender::Munge(const NVMeshMender::VAVector& input, NVMeshMender::VAVe
                             }
                         }
 
-                        if (bDoT == true) {
+                        if (bDoT == true)
+                        {
                             unsigned int theNewIndex = texcoords.size() / 3;
                             // Duplicate every part of the vertex
                             for (unsigned int att = 0; att < output.size(); ++att)
                             {
                                 // No new indices are created, just vertex attributes
-                                if (output[att].Name_ != "indices") {
-                                    if (output[att].Name_ == "tex0") {
+                                if (output[att].Name_ != "indices")
+                                {
+                                    if (output[att].Name_ == "tex0")
+                                    {
                                         output[att].floatVector_.push_back(
-                                            output[att].floatVector_[indices[theOneToChange] * 3 + 0]);  // x
-                                        output[att].floatVector_.push_back((float)newT);                 // y
+                                            output[att].floatVector_[indices[theOneToChange] * 3 + 0]); // x
+                                        output[att].floatVector_.push_back((float)newT); // y
                                         output[att].floatVector_.push_back(
-                                            output[att].floatVector_[indices[theOneToChange] * 3 + 2]);  // z
+                                            output[att].floatVector_[indices[theOneToChange] * 3 + 2]); // z
                                     }
                                     else
                                     {
                                         // *3 b/c we are looking up 3vectors in an array of floats
                                         output[att].floatVector_.push_back(
-                                            output[att].floatVector_[indices[theOneToChange] * 3 + 0]);  // x
+                                            output[att].floatVector_[indices[theOneToChange] * 3 + 0]); // x
                                         output[att].floatVector_.push_back(
-                                            output[att].floatVector_[indices[theOneToChange] * 3 + 1]);  // y
+                                            output[att].floatVector_[indices[theOneToChange] * 3 + 1]); // y
                                         output[att].floatVector_.push_back(
-                                            output[att].floatVector_[indices[theOneToChange] * 3 + 2]);  // z
+                                            output[att].floatVector_[indices[theOneToChange] * 3 + 2]); // z
                                     }
                                 }
                             }
@@ -585,10 +625,11 @@ bool NVMeshMender::Munge(const NVMeshMender::VAVector& input, NVMeshMender::VAVe
                             indices[theOneToChange] = theNewIndex;
                         }
                     }
-                }  // for v
-            }      // for f
-        }          // if fix texgen
-        if (pTextureMatrix) {
+                } // for v
+            } // for f
+        } // if fix texgen
+        if (pTextureMatrix)
+        {
             const mat4 M(pTextureMatrix[0], pTextureMatrix[1], pTextureMatrix[2], pTextureMatrix[3], pTextureMatrix[4],
                 pTextureMatrix[5], pTextureMatrix[6], pTextureMatrix[7], pTextureMatrix[8], pTextureMatrix[9],
                 pTextureMatrix[10], pTextureMatrix[11], pTextureMatrix[12], pTextureMatrix[13], pTextureMatrix[14],
@@ -605,7 +646,8 @@ bool NVMeshMender::Munge(const NVMeshMender::VAVector& input, NVMeshMender::VAVe
         }
     }
 
-    if (bComputeTangentSpace) {
+    if (bComputeTangentSpace)
+    {
         EdgeSet Edges;
 
         Mapping::iterator texIter = outmap.find("tex0");
@@ -616,7 +658,8 @@ bool NVMeshMender::Munge(const NVMeshMender::VAVector& input, NVMeshMender::VAVe
 
         // create tangents
         want = outmap.find("tangent");
-        if (want == outmap.end()) {
+        if (want == outmap.end())
+        {
             VertexAttribute tanAtt;
             tanAtt.Name_ = "tangent";
             output.push_back(tanAtt);
@@ -628,7 +671,8 @@ bool NVMeshMender::Munge(const NVMeshMender::VAVector& input, NVMeshMender::VAVe
 
         // create binormals
         want = outmap.find("binormal");
-        if (want == outmap.end()) {
+        if (want == outmap.end())
+        {
             VertexAttribute binAtt;
             binAtt.Name_ = "binormal";
             output.push_back(binAtt);
@@ -676,9 +720,11 @@ bool NVMeshMender::Munge(const NVMeshMender::VAVector& input, NVMeshMender::VAVe
             b = sxt.y;
             c = sxt.z;
             double ds_dx = nv_zero;
-            if (_abs(a) > _eps) ds_dx = -b / a;
+            if (_abs(a) > _eps)
+                ds_dx = -b / a;
             double dt_dx = nv_zero;
-            if (_abs(a) > _eps) dt_dx = -c / a;
+            if (_abs(a) > _eps)
+                dt_dx = -c / a;
 
             // create an edge out of y, s and t
             edge0.x = pPositions[indices[f + 1]].y - pPositions[indices[f]].y;
@@ -689,9 +735,11 @@ bool NVMeshMender::Munge(const NVMeshMender::VAVector& input, NVMeshMender::VAVe
             b = sxt.y;
             c = sxt.z;
             double ds_dy = nv_zero;
-            if (_abs(a) > _eps) ds_dy = -b / a;
+            if (_abs(a) > _eps)
+                ds_dy = -b / a;
             double dt_dy = nv_zero;
-            if (_abs(a) > _eps) dt_dy = -c / a;
+            if (_abs(a) > _eps)
+                dt_dy = -c / a;
 
             // create an edge out of z, s and t
             edge0.x = pPositions[indices[f + 1]].z - pPositions[indices[f]].z;
@@ -702,9 +750,11 @@ bool NVMeshMender::Munge(const NVMeshMender::VAVector& input, NVMeshMender::VAVe
             b = sxt.y;
             c = sxt.z;
             double ds_dz = nv_zero;
-            if (_abs(a) > _eps) ds_dz = -b / a;
+            if (_abs(a) > _eps)
+                ds_dz = -b / a;
             double dt_dz = nv_zero;
-            if (_abs(a) > _eps) dt_dz = -c / a;
+            if (_abs(a) > _eps)
+                dt_dz = -c / a;
 
             // generate coordinate frame from the gradients
             s = vec3d(ds_dx, ds_dy, ds_dz);
@@ -720,7 +770,8 @@ bool NVMeshMender::Munge(const NVMeshMender::VAVector& input, NVMeshMender::VAVe
             tVector.push_back(vec3(t));
             sxtVector.push_back(vec3(sxt));
 
-            if (_FixTangents == FixTangents) {
+            if (_FixTangents == FixTangents)
+            {
                 // Look for each edge of the triangle in the edge map, in order to find
                 //  a neighboring face along the edge
 
@@ -731,7 +782,8 @@ bool NVMeshMender::Munge(const NVMeshMender::VAVector& input, NVMeshMender::VAVe
                     int start = f + e;
                     int end = start + 1;
 
-                    if (e == 2) {
+                    if (e == 2)
+                    {
                         end = f;
                     }
                     // order vertex indices ( low, high )
@@ -741,7 +793,8 @@ bool NVMeshMender::Munge(const NVMeshMender::VAVector& input, NVMeshMender::VAVe
                     EdgeSet::iterator iter = Edges.find(edge);
 
                     // if we are the only triangle with this edge...
-                    if (iter == Edges.end()) {
+                    if (iter == Edges.end())
+                    {
                         // ...then add us to the set of edges
                         edge.face = f / 3;
                         Edges.insert(edge);
@@ -773,21 +826,22 @@ bool NVMeshMender::Munge(const NVMeshMender::VAVector& input, NVMeshMender::VAVe
                             for (unsigned int att = 0; att < output.size(); ++att)
                             {
                                 // No new indices are created, just vertex attributes
-                                if (output[att].Name_ != "indices") {
+                                if (output[att].Name_ != "indices")
+                                {
                                     // *3 b/c we are looking up 3vectors in an array of floats
                                     output[att].floatVector_.push_back(
-                                        output[att].floatVector_[indices[start] * 3 + 0]);  // x
+                                        output[att].floatVector_[indices[start] * 3 + 0]); // x
                                     output[att].floatVector_.push_back(
-                                        output[att].floatVector_[indices[start] * 3 + 1]);  // y
+                                        output[att].floatVector_[indices[start] * 3 + 1]); // y
                                     output[att].floatVector_.push_back(
-                                        output[att].floatVector_[indices[start] * 3 + 2]);  // z
+                                        output[att].floatVector_[indices[start] * 3 + 2]); // z
 
                                     output[att].floatVector_.push_back(
-                                        output[att].floatVector_[indices[end] * 3 + 0]);  // x
+                                        output[att].floatVector_[indices[end] * 3 + 0]); // x
                                     output[att].floatVector_.push_back(
-                                        output[att].floatVector_[indices[end] * 3 + 1]);  // y
+                                        output[att].floatVector_[indices[end] * 3 + 1]); // y
                                     output[att].floatVector_.push_back(
-                                        output[att].floatVector_[indices[end] * 3 + 2]);  // z
+                                        output[att].floatVector_[indices[end] * 3 + 2]); // z
                                 }
                             }
 
@@ -803,7 +857,7 @@ bool NVMeshMender::Munge(const NVMeshMender::VAVector& input, NVMeshMender::VAVe
                         //  because the two faces will sum their tangent basis vectors into separate indices
                     }
                 }
-            }  // if fixtangents
+            } // if fixtangents
         }
 
         // Allocate std::vector & Zero out average basis for tangent space smoothing
@@ -812,8 +866,8 @@ bool NVMeshMender::Munge(const NVMeshMender::VAVector& input, NVMeshMender::VAVe
 
         for (unsigned int p = 0; p < positions.size(); p += 3)
         {
-            avgS.push_back(vec3_null);  // do S
-            avgT.push_back(vec3_null);  // now t
+            avgS.push_back(vec3_null); // do S
+            avgT.push_back(vec3_null); // now t
         }
 
         //  go through faces and add up the bases for each vertex
@@ -832,7 +886,8 @@ bool NVMeshMender::Munge(const NVMeshMender::VAVector& input, NVMeshMender::VAVe
             avgT[pIndices[face * 3 + 2]] += tVector[face];
         }
 
-        if (_FixCylindricalTexGen == FixCylindricalTexGen) {
+        if (_FixCylindricalTexGen == FixCylindricalTexGen)
+        {
             for (unsigned int v = 0; v < IdenticalVertices_.size(); ++v)
             {
                 // go through each vertex & sum up it's true neighbors
@@ -851,8 +906,8 @@ bool NVMeshMender::Munge(const NVMeshMender::VAVector& input, NVMeshMender::VAVe
         // now renormalize
         for (unsigned int b = 0; b < positions.size(); b += 3)
         {
-            *reinterpret_cast<vec3*>(&output[(*tangent).second].floatVector_[b]) = normalize(avgS[b / 3]);   // s
-            *reinterpret_cast<vec3*>(&output[(*binormal).second].floatVector_[b]) = normalize(avgT[b / 3]);  // T
+            *reinterpret_cast<vec3*>(&output[(*tangent).second].floatVector_[b]) = normalize(avgS[b / 3]); // s
+            *reinterpret_cast<vec3*>(&output[(*binormal).second].floatVector_[b]) = normalize(avgT[b / 3]); // T
         }
     }
 

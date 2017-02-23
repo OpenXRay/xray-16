@@ -21,7 +21,7 @@ struct ConsistantKey
     }
 };
 
-IC bool operator<(const ConsistantKey& A, const ConsistantKey& B)  // note: inverse operator
+IC bool operator<(const ConsistantKey& A, const ConsistantKey& B) // note: inverse operator
 {
     return A.w > B.w;
 }
@@ -36,7 +36,7 @@ IC void MakeKeysConsistant(ConsistantKey *keys, int count)
         Fquaternion Q1,Q2;
         Q1.add(keys[i].K->Q,keys[i+1].K->Q);
         Q2.sub(keys[i].K->Q,keys[i+1].K->Q);
-        if (Q1.magnitude()<Q2.magnitude())	keys[i+1].K->Q.inverse_with_w();
+        if (Q1.magnitude()<Q2.magnitude())  keys[i+1].K->Q.inverse_with_w();
     }
 }
 */
@@ -49,8 +49,8 @@ IC void MakeKeysSelected(ConsistantKey* keys, int count)
 /*
 ICF float smooth(float x)
 {
-    float x0	= x*2.f-1.f;
-    float s 	= (x0<0.f)?-1.f:1.f;
+    float x0    = x*2.f-1.f;
+    float s     = (x0<0.f)?-1.f:1.f;
 
     return ((s*pow(_abs(x0),1.f/1.5f))+1.f)/2.f;
 }
@@ -87,7 +87,8 @@ IC void Dequantize(CKey& K, const CBlend& BD, const CMotion& M)
     float delta = time - float(frame);
     u32 count = M.get_count();
     // rotation
-    if (M.test_flag(flRKeyAbsent)) {
+    if (M.test_flag(flRKeyAbsent))
+    {
         const CKeyQR* K = &M._keysR[0];
         QR2Quat(*K, D->Q);
     }
@@ -102,9 +103,11 @@ IC void Dequantize(CKey& K, const CBlend& BD, const CMotion& M)
     }
 
     // translate
-    if (M.test_flag(flTKeyPresent)) {
+    if (M.test_flag(flTKeyPresent))
+    {
         Fvector T1, T2;
-        if (M.test_flag(flTKey16IsBit)) {
+        if (M.test_flag(flTKey16IsBit))
+        {
             const CKeyQT16* K1t = &M._keysT16[(frame + 0) % count];
             const CKeyQT16* K2t = &M._keysT16[(frame + 1) % count];
 
@@ -120,13 +123,13 @@ IC void Dequantize(CKey& K, const CBlend& BD, const CMotion& M)
             QT8_2T(*K2t, M, T2);
         }
         /*
-        T1.x		= float(K1t->x)*M._sizeT.x+M._initT.x;
-        T1.y		= float(K1t->y)*M._sizeT.y+M._initT.y;
-        T1.z		= float(K1t->z)*M._sizeT.z+M._initT.z;
+        T1.x        = float(K1t->x)*M._sizeT.x+M._initT.x;
+        T1.y        = float(K1t->y)*M._sizeT.y+M._initT.y;
+        T1.z        = float(K1t->z)*M._sizeT.z+M._initT.z;
 
-        T2.x		= float(K2t->x)*M._sizeT.x+M._initT.x;
-        T2.y		= float(K2t->y)*M._sizeT.y+M._initT.y;
-        T2.z		= float(K2t->z)*M._sizeT.z+M._initT.z;
+        T2.x        = float(K2t->x)*M._sizeT.x+M._initT.x;
+        T2.y        = float(K2t->y)*M._sizeT.y+M._initT.y;
+        T2.z        = float(K2t->z)*M._sizeT.z+M._initT.z;
         */
         D->T.lerp(T1, T2, delta);
         /*
@@ -168,7 +171,7 @@ IC void Dequantize(CKey& K, const CBlend& BD, const CMotion& M)
 
         }
         */
-    }  // if (M.test_flag(flTKeyPresent))
+    } // if (M.test_flag(flTKeyPresent))
     else
     {
         D->T.set(M._initT);
@@ -208,28 +211,30 @@ IC void MixInterlerp(CKey& Result, const CKey* R, const CBlend* const BA[MAX_BLE
         else
             w = w1 / ws;
 #ifdef DEBUG
-//.					if (fis_zero(w0+w1) || (!_valid(w))){
-//.						xrDebug::Fatal		(DEBUG_INFO,"TO ALEXMX VERY IMPORTANT: (TOTAL: %f) w: %f, w0: %f, w1: %f, ws:%f, BIS:
-//%d",w0+w1,w,w0,w1,ws,BLEND_INST.Blend.size());
-//.					}
+//    if (fis_zero(w0+w1) || (!_valid(w)))
+//    {
+//        xrDebug::Fatal(DEBUG_INFO, "TO ALEXMX VERY IMPORTANT: (TOTAL: %f) w: %f, w0: %f, w1: %f, ws:%f, BIS: %d",
+//            w0+w1, w, w0, w1, ws, BLEND_INST.Blend.size());
+//    }
 #endif
         KEY_Interp(Result, R[0], R[1], clampr(w, 0.f, 1.f));
         /*
-        if(Result.T.y>10000){
-        Log("2");
-        Log("BLEND_INST",BLEND_INST.Blend.size());
-        Log("Bone",LL_BoneName_dbg(SelfID));
-        Msg("Result.Q %f,%f,%f,%f",Result.Q.x,Result.Q.y,Result.Q.z,Result.Q.w);
-        Log("Result.T",Result.T);
-        Log("parent",*parent);
-        VERIFY(0);
+        if (Result.T.y>10000)
+        {
+            Log("2");
+            Log("BLEND_INST", BLEND_INST.Blend.size());
+            Log("Bone", LL_BoneName_dbg(SelfID));
+            Msg("Result.Q %f,%f,%f,%f", Result.Q.x, Result.Q.y, Result.Q.z, Result.Q.w);
+            Log("Result.T", Result.T);
+            Log("parent", *parent);
+            VERIFY(0);
         }
         */
     }
     break;
     default:
     {
-        // int 	count 	= Blend.size();
+        //int count = Blend.size();
         float total = 0;
         ConsistantKey S[MAX_BLENDED];
         for (int i = 0; i < b_count; i++)
@@ -251,10 +256,11 @@ IC void MixInterlerp(CKey& Result, const CKey* R, const CBlend* const BA[MAX_BLE
             clampr(d, 0.f, 1.f);
 
 #ifdef DEBUG
-//.						if ((total==0) || (!_valid(S[cnt].w/total))){
-//.							xrDebug::Fatal		(DEBUG_INFO,"TO ALEXMX VERY IMPORTANT: (TOTAL: %f) w: %f, total: %f, count: %d, real
-//count: %d",total,S[cnt].w,total,count,BLEND_INST.Blend.size());
-//.						}
+//if ((total==0) || (!_valid(S[cnt].w/total)))
+//{
+//    xrDebug::Fatal(DEBUG_INFO, "TO ALEXMX VERY IMPORTANT: (TOTAL: %f) w: %f, total: %f, count: %d, real count: %d",
+//        total, S[cnt].w, total, count, BLEND_INST.Blend.size());
+//}
 #endif
 
             KEY_Interp(Result, tmp, *S[cnt].K, d);
@@ -265,7 +271,7 @@ IC void MixInterlerp(CKey& Result, const CKey* R, const CBlend* const BA[MAX_BLE
     }
 }
 
-IC void key_sub(CKey& rk, const CKey& k0, const CKey& k1)  // sub right
+IC void key_sub(CKey& rk, const CKey& k0, const CKey& k1) // sub right
 {
     Fquaternion q;
     q.inverse(k1.Q);
@@ -279,7 +285,7 @@ IC void key_identity(CKey& k)
     k.Q.identity();
     k.T.set(0, 0, 0);
 }
-IC void key_add(CKey& res, const CKey& k0, const CKey& k1)  // add right
+IC void key_add(CKey& res, const CKey& k0, const CKey& k1) // add right
 {
     res.Q.set(Fquaternion().mul(k0.Q, k1.Q));
     // res.Q.normalize();
@@ -353,7 +359,7 @@ IC void q_add_scaled_basem(
 IC float DET(const Fmatrix& a)
 {
     return ((a._11 * (a._22 * a._33 - a._23 * a._32) - a._12 * (a._21 * a._33 - a._23 * a._31) +
-             a._13 * (a._21 * a._32 - a._22 * a._31)));
+        a._13 * (a._21 * a._32 - a._22 * a._31)));
 }
 
 IC bool check_scale(const Fmatrix& m)

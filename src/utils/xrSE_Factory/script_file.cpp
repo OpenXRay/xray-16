@@ -13,10 +13,7 @@ CScriptFile::CScriptFile()
     //	GetSystemTime(&m_timeCompiled);
 }
 
-CScriptFile::~CScriptFile()
-{
-}
-
+CScriptFile::~CScriptFile() {}
 void CScriptFile::RemoveAllDebugLines()
 {
     m_nMinDebugLine = 2147483647;
@@ -29,8 +26,10 @@ void CScriptFile::RemoveAllDebugLines()
 void CScriptFile::AddDebugLine(int nLine)
 {
     m_debugLines[nLine] = 1;
-    if (nLine < m_nMinDebugLine) m_nMinDebugLine = nLine;
-    if (nLine > m_nMaxDebugLine) m_nMaxDebugLine = nLine;
+    if (nLine < m_nMinDebugLine)
+        m_nMinDebugLine = nLine;
+    if (nLine > m_nMaxDebugLine)
+        m_nMaxDebugLine = nLine;
 }
 
 void CScriptFile::RemoveAllBreakPoints()
@@ -48,8 +47,10 @@ void CScriptFile::RemoveAllBreakPoints()
 void CScriptFile::AddBreakPoint(int nLine)
 {
     m_breakPoints[nLine] = 1;
-    if (nLine < m_nMinBreakPoint) m_nMinBreakPoint = nLine;
-    if (nLine > m_nMaxBreakPoint) m_nMaxBreakPoint = nLine;
+    if (nLine < m_nMinBreakPoint)
+        m_nMinBreakPoint = nLine;
+    if (nLine > m_nMaxBreakPoint)
+        m_nMaxBreakPoint = nLine;
 
     //	CProject* pProject = ((CMainFrame*)AfxGetMainWnd())->GetProject();
     //	pProject->SetModifiedFlag(TRUE);
@@ -66,8 +67,10 @@ void CScriptFile::RemoveBreakPoint(int nLine)
     uniIt It = m_breakPoints.begin();
     for (; It != m_breakPoints.end(); ++It)
     {
-        if (It->first < m_nMinBreakPoint) m_nMinBreakPoint = It->first;
-        if (It->first > m_nMaxBreakPoint) m_nMaxBreakPoint = It->first;
+        if (It->first < m_nMinBreakPoint)
+            m_nMinBreakPoint = It->first;
+        if (It->first > m_nMaxBreakPoint)
+            m_nMaxBreakPoint = It->first;
     }
 
     /*	POSITION pos = m_breakPoints.GetStartPosition();
@@ -114,18 +117,22 @@ int CScriptFile::GetPreviousDebugLine(int nLine)
 int CScriptFile::GetNearestDebugLine(int nLine)
 {
     int nNearest;
-    if (m_debugLines.find(nLine) != m_debugLines.end()) return nLine;
+    if (m_debugLines.find(nLine) != m_debugLines.end())
+        return nLine;
 
-    if ((nNearest = GetNextDebugLine(nLine)) > 0) return nNearest;
+    if ((nNearest = GetNextDebugLine(nLine)) > 0)
+        return nNearest;
 
-    if ((nNearest = GetPreviousDebugLine(nLine)) > 0) return nNearest;
+    if ((nNearest = GetPreviousDebugLine(nLine)) > 0)
+        return nNearest;
 
     return 0;
 }
 
 BOOL CScriptFile::PositionBreakPoints()
 {
-    if (!CDbgLuaHelper::LoadDebugLines(this)) return FALSE;
+    if (!CDbgLuaHelper::LoadDebugLines(this))
+        return FALSE;
 
     /*	BOOL bModified = FALSE;
         POSITION pos = m_breakPoints.GetStartPosition();
@@ -152,11 +159,7 @@ BOOL CScriptFile::PositionBreakPoints()
     return TRUE;
 }
 
-const char* CScriptFile::GetName()
-{
-    return m_strPathName;
-}
-
+const char* CScriptFile::GetName() { return m_strPathName; }
 /*
 CString CProjectFile::GetName()
 {
@@ -181,11 +184,7 @@ CString CProjectFile::GetNameExt()
 }
 */
 
-BOOL CScriptFile::HasBreakPoint(int nLine)
-{
-    return m_breakPoints.find(nLine) != m_breakPoints.end();
-}
-
+BOOL CScriptFile::HasBreakPoint(int nLine) { return m_breakPoints.find(nLine) != m_breakPoints.end(); }
 void CScriptFile::SetBreakPointsIn(CLuaEditor* pEditor)
 {
     /*	pEditor->ClearAllBreakpoints();

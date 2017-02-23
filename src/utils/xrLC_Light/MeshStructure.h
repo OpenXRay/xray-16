@@ -18,7 +18,6 @@ class MESHSTRUCTURE_API vector_item
 {
 protected:
     vector_item() : m_self_index(u32(-1)) {}
-
 private:
     u32 m_self_index;
 
@@ -72,17 +71,20 @@ public:
     // Replace ONE vertex by ANOTHER
     IC void VReplace(type_vertex* what, type_vertex* to)
     {
-        if (v[0] == what) {
+        if (v[0] == what)
+        {
             v[0] = to;
             what->prep_remove(this);
             to->prep_add(this);
         }
-        if (v[1] == what) {
+        if (v[1] == what)
+        {
             v[1] = to;
             what->prep_remove(this);
             to->prep_add(this);
         }
-        if (v[2] == what) {
+        if (v[2] == what)
+        {
             v[2] = to;
             what->prep_remove(this);
             to->prep_add(this);
@@ -90,24 +92,30 @@ public:
     };
     IC void VReplace_not_remove(type_vertex* what, type_vertex* to)
     {
-        if (v[0] == what) {
+        if (v[0] == what)
+        {
             v[0] = to;
             to->prep_add(this);
         }
-        if (v[1] == what) {
+        if (v[1] == what)
+        {
             v[1] = to;
             to->prep_add(this);
         }
-        if (v[2] == what) {
+        if (v[2] == what)
+        {
             v[2] = to;
             to->prep_add(this);
         }
     };
     IC int VIndex(const type_vertex* pV)
     {
-        if (v[0] == pV) return 0;
-        if (v[1] == pV) return 1;
-        if (v[2] == pV) return 2;
+        if (v[0] == pV)
+            return 0;
+        if (v[1] == pV)
+            return 1;
+        if (v[2] == pV)
+            return 2;
         return -1;
     };
 
@@ -138,12 +146,18 @@ public:
     BOOL isEqual(type_face& F)
     {
         // Test for 6 variations
-        if ((v[0] == F.v[0]) && (v[1] == F.v[1]) && (v[2] == F.v[2])) return true;
-        if ((v[0] == F.v[0]) && (v[2] == F.v[1]) && (v[1] == F.v[2])) return true;
-        if ((v[2] == F.v[0]) && (v[0] == F.v[1]) && (v[1] == F.v[2])) return true;
-        if ((v[2] == F.v[0]) && (v[1] == F.v[1]) && (v[0] == F.v[2])) return true;
-        if ((v[1] == F.v[0]) && (v[0] == F.v[1]) && (v[2] == F.v[2])) return true;
-        if ((v[1] == F.v[0]) && (v[2] == F.v[1]) && (v[0] == F.v[2])) return true;
+        if ((v[0] == F.v[0]) && (v[1] == F.v[1]) && (v[2] == F.v[2]))
+            return true;
+        if ((v[0] == F.v[0]) && (v[2] == F.v[1]) && (v[1] == F.v[2]))
+            return true;
+        if ((v[2] == F.v[0]) && (v[0] == F.v[1]) && (v[1] == F.v[2]))
+            return true;
+        if ((v[2] == F.v[0]) && (v[1] == F.v[1]) && (v[0] == F.v[2]))
+            return true;
+        if ((v[1] == F.v[0]) && (v[0] == F.v[1]) && (v[2] == F.v[2]))
+            return true;
+        if ((v[1] == F.v[0]) && (v[2] == F.v[1]) && (v[0] == F.v[2]))
+            return true;
         return false;
     }
 
@@ -158,7 +172,8 @@ public:
         t2.sub(*v2, *v1);
         N.crossproduct(t1, t2);
         float mag = N.magnitude();
-        if (mag < EPS_S) {
+        if (mag < EPS_S)
+        {
             Fvector3 save_N = N;
             if (exact_normalize(save_N))
                 N = save_N;
@@ -183,7 +198,8 @@ public:
         t2.sub(v2, v1);
         dN.crossproduct(t1, t2);
         double mag = dN.magnitude();
-        if (mag < dbl_zero) {
+        if (mag < dbl_zero)
+        {
             Failure();
             Dvector Nabs;
             Nabs.abs(dN);
@@ -223,8 +239,10 @@ public:
         float e2 = v[0]->P.distance_to(v[2]->P);
         float e3 = v[1]->P.distance_to(v[2]->P);
 
-        if (e1 > e2 && e1 > e3) return e1;
-        if (e2 > e1 && e2 > e3) return e2;
+        if (e1 > e2 && e1 > e3)
+            return e1;
+        if (e2 > e1 && e2 > e3)
+            return e2;
         return e3;
     }
     void CalcCenter(Fvector& C)
@@ -276,13 +294,15 @@ struct MESHSTRUCTURE_API Tvertex : public DataVertexType, public vector_item
     IC void prep_add(type_face* F)
     {
         v_faces_it I = std::find(m_adjacents.begin(), m_adjacents.end(), F);
-        if (I == m_adjacents.end()) m_adjacents.push_back(F);
+        if (I == m_adjacents.end())
+            m_adjacents.push_back(F);
     }
 
     IC void prep_remove(type_face* F)
     {
         v_faces_it I = std::find(m_adjacents.begin(), m_adjacents.end(), F);
-        if (I != m_adjacents.end()) m_adjacents.erase(I);
+        if (I != m_adjacents.end())
+            m_adjacents.erase(I);
     }
 
     IC void normalFromAdj()
@@ -305,7 +325,8 @@ struct remove_pred
 {
     bool operator()(typeVertex*& v)
     {
-        if (v && v->m_adjacents.empty()) {
+        if (v && v->m_adjacents.empty())
+        {
             _destroy_vertex(v, false);
             return true;
         }
@@ -316,15 +337,18 @@ struct remove_pred
 template <typename typeVertex>
 IC void isolate_vertices(BOOL bProgress, xr_vector<typeVertex*>& vertices)
 {
-    if (bProgress) Logger.Status("Isolating vertices...");
+    if (bProgress)
+        Logger.Status("Isolating vertices...");
     // g_bUnregister		= false;
     const u32 verts_old = vertices.size();
 
     for (int it = 0; it < int(verts_old); ++it)
     {
-        if (bProgress) Logger.Progress(float(it) / float(verts_old));
+        if (bProgress)
+            Logger.Progress(float(it) / float(verts_old));
 
-        if (vertices[it] && vertices[it]->m_adjacents.empty()) _destroy_vertex(vertices[it], false);
+        if (vertices[it] && vertices[it]->m_adjacents.empty())
+            _destroy_vertex(vertices[it], false);
     }
     VERIFY(verts_old == vertices.size());
 
@@ -339,12 +363,14 @@ IC void isolate_vertices(BOOL bProgress, xr_vector<typeVertex*>& vertices)
     // g_bUnregister		= true;
     Memory.mem_compact();
 
-    if (bProgress) Logger.Progress(1.f);
+    if (bProgress)
+        Logger.Progress(1.f);
 
     u32 verts_new = vertices.size();
     u32 _count = verts_old - verts_new;
 
-    if (_count) Logger.clMsg("::compact:: %d verts removed", _count);
+    if (_count)
+        Logger.clMsg("::compact:: %d verts removed", _count);
 }
 
-#endif  //__MESHSTRUCTURE_H__
+#endif //__MESHSTRUCTURE_H__

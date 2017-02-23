@@ -10,11 +10,7 @@
 #include "fitter.h"
 #include <functional>
 
-IC REAL dfEvaluation(REAL& A, REAL& C, REAL& D)
-{
-    return (A * C + D);
-}
-
+IC REAL dfEvaluation(REAL& A, REAL& C, REAL& D) { return (A * C + D); }
 REAL dfComputeEvalResults(xr_vector<xr_vector<REAL>>& daEvalResults, xr_vector<xr_vector<REAL>>& A,
     xr_vector<xr_vector<REAL>>& B, xr_vector<REAL>& C, xr_vector<REAL>& D)
 {
@@ -65,7 +61,8 @@ void vfOptimizeParameters(xr_vector<xr_vector<REAL>>& A, xr_vector<xr_vector<REA
     xr_vector<xr_vector<REAL>> daEvalResults;
     daEvalResults.resize(dwTestCount);
 
-    if (!B.size()) {
+    if (!B.size())
+    {
         Logger.clMsg("ERROR : there are no parameters to fit!");
         return;
     }
@@ -96,7 +93,8 @@ void vfOptimizeParameters(xr_vector<xr_vector<REAL>>& A, xr_vector<xr_vector<REA
         i++;
     } while ((((dPreviousFunctional - dFunctional) / dwTestCount) > dEpsilon) && (i <= dwMaxIterationCount));
 
-    if (dPreviousFunctional < dFunctional) {
+    if (dPreviousFunctional < dFunctional)
+    {
         std::transform(daDelta.begin(), daDelta.end(), daDelta.begin(), std::bind2nd(std::multiplies<REAL>(), -1));
         std::transform(C.begin(), C.end(), daDelta.begin(), C.begin(), std::plus<REAL>());
         std::transform(D.begin(), D.end(), daDelta.begin(), D.begin(), std::plus<REAL>());

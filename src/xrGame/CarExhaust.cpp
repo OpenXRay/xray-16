@@ -13,11 +13,7 @@
 // extern CPHWorld*	ph_world;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CCar::SExhaust::~SExhaust()
-{
-    CParticlesObject::Destroy(p_pgobject);
-}
-
+CCar::SExhaust::~SExhaust() { CParticlesObject::Destroy(p_pgobject); }
 void CCar::SExhaust::Init()
 {
     VERIFY(!physics_world()->Processing());
@@ -55,11 +51,7 @@ void CCar::SExhaust::Update()
     p_pgobject->UpdateParent(global_transform, res_vel);
 }
 
-void CCar::SExhaust::Clear()
-{
-    CParticlesObject::Destroy(p_pgobject);
-}
-
+void CCar::SExhaust::Clear() { CParticlesObject::Destroy(p_pgobject); }
 void CCar::SExhaust::Play()
 {
     VERIFY(!physics_world()->Processing());

@@ -19,23 +19,25 @@
 template <class T>
 class ArbitraryList
 {
-    T* pT;              // The list.
-    u32 iSize;          // The current size of the list.
-    u32 iReservedSize;  // The current reserved size of the list.
-  public:
+    T* pT; // The list.
+    u32 iSize; // The current size of the list.
+    u32 iReservedSize; // The current reserved size of the list.
+public:
     // Constructor, with optional initial size setting.
     ArbitraryList(u32 iInitialSize = 0)
     {
         pT = NULL;
         iSize = 0;
         iReservedSize = 0;
-        if (iInitialSize > 0) resize(iInitialSize);
+        if (iInitialSize > 0)
+            resize(iInitialSize);
     }
 
     // Destructor.
     ~ArbitraryList(void)
     {
-        if (pT == NULL) {
+        if (pT == NULL)
+        {
             VERIFY(iReservedSize == 0);
             VERIFY(iSize == 0);
         }
@@ -57,10 +59,8 @@ class ArbitraryList
 
     // Returns the pointer to the first item.
     IC T* ptr() { return (pT); }
-
     // Returns the size of the list
     IC u32 size() const { return iSize; }
-
     // Grows or shrinks the list to this number of items.
     // Preserves existing items.
     // Items that fall off the end of a shrink may vanish.
@@ -69,8 +69,10 @@ class ArbitraryList
     {
         VERIFY(iNum >= 0);
         iSize = iNum;
-        if (iNum <= iReservedSize) {
-            if (iNum == 0) {
+        if (iNum <= iReservedSize)
+        {
+            if (iNum == 0)
+            {
                 // Shrunk to 0 - bin the memory.
                 delete[] pT;
                 pT = NULL;
@@ -87,7 +89,8 @@ class ArbitraryList
             // Need to grow. Grow by 50% more than
             // needed to avoid constant regrows.
             u32 iNewSize = (iNum * 3) >> 1;
-            if (pT == NULL) {
+            if (pT == NULL)
+            {
                 VERIFY(iReservedSize == 0);
                 pT = new T[iNewSize];
             }
@@ -178,10 +181,11 @@ class ArbitraryList
         pT = NULL;
         iSize = 0;
         iReservedSize = 0;
-        if (iNumItems > 0) resize(iNumItems);
+        if (iNumItems > 0)
+            resize(iNumItems);
         for (u32 i = 0; i < iNumItems; i++)
             *(item(i)) = other[i];
     }
 };
 
-#endif  //#ifndef ArbitraryListH
+#endif //#ifndef ArbitraryListH
